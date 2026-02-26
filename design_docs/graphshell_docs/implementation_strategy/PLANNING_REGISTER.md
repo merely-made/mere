@@ -295,6 +295,58 @@ The following entry in the Stabilization Bug Register (§1A) should be updated t
 
 **Updated done gate**: Servo focus affordance visible during tile rearrange (Pass 3 over Pass 2 for `CompositedTexture` mode); Wry path has explicit chrome-region affordance and documented limitation; `CompositorAdapter` GL state isolation test passes; diagnostics prove pass ordering in compositor frame samples.
 
+### 0.10 Foundation-First Activation (Appendix A Operationalization)
+
+Project phase statement (2026-02-26): **fix the foundation to enable aspirational capabilities**.
+
+Appendix A in `2026-02-26_composited_viewer_pass_contract.md` introduces 10 strategic opportunities (`A.1`..`A.10`). To avoid speculative drift, execution is constrained to a foundation-first sequence where architecture slices are landed before capability expansion.
+
+#### 0.10.1 Foundation slice order (must-run)
+
+1. **Pass-order + render-mode correctness (A.0/A.3 baseline)**
+  - Land `TileRenderMode` runtime authority + compositor pass ordering proofs.
+  - Blockers cleared: hidden focus ring symptom, inferred render-path ambiguity.
+2. **Compositor invariants and forensic tooling (A.1 + A.3)**
+  - Extend adapter diagnostics from "detect leak" to "replay + chaos-verify" mode.
+  - Blockers cleared: low reproducibility of GL regressions.
+3. **Performance and resource safety rails (A.8 + A.7)**
+  - Differential composition before GPU budget/degradation.
+  - Blockers cleared: unnecessary full-frame recomposition and opaque GPU pressure failure.
+4. **Backend control-plane maturity (A.2 + A.9 groundwork)**
+  - Hot-swap intent scaffolding + telemetry schema (local-only first).
+  - Blockers cleared: backend choice is static and anecdotal.
+
+#### 0.10.2 Foundation now vs later (scope discipline)
+
+**Now (architecture-enabling):**
+- A.1 Replay capture scaffolding (diagnostics-backed)
+- A.3 Chaos mode harness (feature-gated)
+- A.8 Differential composition hooks
+- A.7 GPU budget accounting + explicit degradation diagnostics
+- A.2 Hot-swap intent/model contract (without full state parity guarantees)
+
+**Later (capability expansion after foundation):**
+- A.6 cross-tile cinematic transitions
+- A.5 content-aware adaptive overlay styling
+- A.10 mod-hosted compositor extension passes
+- A.9 Verse-published telemetry races (keep local telemetry first)
+- A.4 upstream/shared protocol packaging to Verso once Graphshell contract stabilizes
+
+#### 0.10.3 Issue seeding from foundation slices
+
+Foundation child issues opened (2026-02-26):
+
+1. `#166` — `Compositor replay traces for callback-state forensics` (`lane:stabilization` / parent `#88`)
+2. `#171` — `Compositor chaos mode for GL isolation invariants` (`lane:embedder-debt` / parent `#90`)
+3. `#167` — `Differential composition for unchanged composited tiles` (`lane:stabilization` / parent `#88`)
+4. `#168` — `Per-tile GPU budget and degradation diagnostics` (`lane:viewer-platform` / parent `#92`)
+5. `#169` — `Viewer backend hot-swap intent and state contract` (`lane:viewer-platform` / parent `#92`)
+6. `#170` — `Backend telemetry schema (local-first, Verse-ready)` (`lane:runtime-followon` / parent `#91`)
+
+Duplicate cleanup note: `#172` was created in parallel and closed as a duplicate of `#170`.
+
+Each issue should explicitly reference Appendix subsection IDs (`A.1`, `A.3`, etc.) and include a **Foundation Done Gate**: "removes one concrete blocker for future capabilities without introducing new cross-lane hotspot conflicts."
+
 ---
 
 ## 1. Immediate Priorities Register (10/10/10)
@@ -393,7 +445,8 @@ Snapshot note (2026-02-26 queue execution audit + tracker reconciliation):
   - Hotspots likely: `render/mod.rs`, `app.rs`, `gui.rs`, input/camera command paths
   - Rule: run as a single focused PR, do not overlap with quick refactors in the same hotspots
 2. **lane:roadmap (docs/planning, merge-safe default lane)**
-  - `#11` → `#12` → `#13` → `#14` → `#18` → `#19`
+  - Queue reconciled (2026-02-26): `#11`, `#12`, `#13`, `#14`, `#18` closed as completed adoption/planning slices.
+  - Remaining open roadmap queue item: `#19` (`2D↔3D` hotswitch; still deferred/blocked).
   - Low conflict risk with runtime/render hot files; preferred background lane while bugfix lane is idle
 3. **lane:runtime-followon (new tickets required)**
   - `SYSTEM_REGISTER.md` SR2 (signal routing contract) before SR3 (`SignalBus`/equivalent fabric)
@@ -404,7 +457,7 @@ Snapshot note (2026-02-26 queue execution audit + tracker reconciliation):
 ### Near-term PR stack plan (merge order)
 
 - Completed (2026-02-26 audit/reconciliation): `lane:p6`, `lane:p7` phase-1, `lane:p10`, `lane:runtime`, `lane:quickwins` queues listed above
-- Active merge-safe default stack: `lane:roadmap` docs/planning items (`#11` → `#12` → `#13` → `#14` → `#18` → `#19`)
+- Active merge-safe default stack: `lane:roadmap` docs/planning follow-on (`#19` only; blocked until prerequisites)
 - Conditional priority override: `lane:stabilization` bugfix PR (zoom/control regression) supersedes roadmap lane while active
 - Parallel planning only (no code until ticketed): Register signal-routing roadmap slices (SR2/SR3)
 
@@ -414,32 +467,46 @@ Track active regressions here before they get folded into broader refactors. The
 
 | Bug / Gap | Symptom | Likely Hotspots | Notes / Architectural Context | Done Gate |
 | --- | --- | --- | --- | --- |
-| Zoom-to-fit / unresponsive controls | Camera commands or controls intermittently no-op / feel stuck | `app.rs`, `render/mod.rs`, `shell/desktop/ui/gui.rs`, `input/mod.rs` | Multi-view exists, but camera command path still uses global pending workspace state; likely focus/input ownership interaction. | Repro captured, root cause fixed, focused regression tests added, diagnostics prove target view + command application. |
+| Graph canvas camera controls fail globally | `pan drag`, `wheel zoom`, `zoom in/out/reset`, and `zoom-to-fit` fail in the default graph pane (not just multi-pane) | `render/mod.rs`, `app.rs`, `shell/desktop/ui/gui.rs`, `input/mod.rs` | Recent camera-targeting fixes landed, but user still reports global camera-control failure; likely input gating/consumption, metadata availability, or focus ownership debt. | Default graph pane supports pan + wheel zoom + zoom commands again; repro is closed with targeted tests/diagnostics. |
 | Lasso metadata ID mismatch after multi-view | Selection/lasso behavior breaks or targets wrong graph metadata in multi-pane scenarios | `render/mod.rs` | Known hardcoded `egui_graphs_metadata_` path needs per-view metadata keying. | Lasso works across split graph panes; test covers second pane / non-default `GraphViewId`. |
+| Tab/pane spawn focus activation race (blank viewport) | Newly opened tab/pane sometimes spawns visually blank until extra clicks/tab switches; graph pane can remain unfocused after pane deletion | `shell/desktop/ui/gui.rs`, `shell/desktop/ui/gui_frame.rs`, `shell/desktop/workbench/*`, `shell/desktop/lifecycle/webview_controller.rs` | Looks like focus ownership + render activation ordering debt (likely overlaps `lane:embedder-debt` servoshell-era host/frame assumptions). | New focused panes render on first activation consistently; pane-deletion focus handoff is deterministic and renders immediately. |
+| Selection deselect click-away inconsistency | Node selection works, but clicking background to deselect is "funky" and may hide state-transition edge cases | `render/mod.rs`, `input/mod.rs`, selection state in `app.rs` | Likely local selection-state logic plus pane-focus interaction. | Deselect-on-background-click behavior is deterministic and covered by targeted selection tests. |
+| Lasso boundary miss at selection edge | Lasso sometimes misses nodes at the edge of the box despite user expectation that center-in-box should count | `render/mod.rs`, `render/spatial_index.rs` | Correctness issue first; live lasso preview UX should be tracked separately under `lane:control-ui-settings`. | Lasso inclusion semantics are documented (center-inclusive minimum) and covered by edge-boundary tests. |
 | Tile rearrange focus indicator hidden under document view | Blue focus ring does not render over document/web content while rearranging tile | `shell/desktop/workbench/tile_compositor.rs`, new `compositor_adapter.rs` | **Root cause identified in §0.3**: focus ring and web content both paint at `egui::Order::Middle` without guaranteed ordering; `render_to_parent` GL callback has no post-content overlay hook. **Fix class**: Surface Composition Contract — compositor pass model (Content Pass → Overlay Affordance Pass) with `CompositorAdapter` GL state isolation and per-`TileRenderMode` overlay affordance policy. Not addressable by additional egui layers. | Servo focus affordance visible during tile rearrange (Pass 3 over Pass 2 for `CompositedTexture` mode); Wry path has explicit chrome-region affordance and documented limitation; `CompositorAdapter` GL state isolation test passes; diagnostics prove pass ordering in compositor frame samples. |
-| Command palette trigger parity | Command palette feels node-context-only; pointer/global triggers inconsistent | `render/mod.rs`, `render/command_palette.rs`, `input/mod.rs` | Keyboard trigger exists; pointer/global UX path and palette semantics still lag behind plan. | Global + contextual trigger paths documented and implemented; palette opens outside node hover/right-click path. |
+| Legacy web content context menu / new-tab path bypasses node semantics | Right-click or ctrl-click link in webpage can use short legacy menu/path and may open tile/tab without creating mapped graph node | `shell/desktop/ui/gui.rs`, `shell/desktop/host/*`, `shell/desktop/lifecycle/webview_controller.rs`, `shell/desktop/workbench/tile_runtime.rs` | Graphshell command/pane semantics are bypassed by legacy webview path; cross-lane with `lane:embedder-debt` + `lane:control-ui-settings`. | Web content open-in-new-view flows route through Graphshell node/pane semantics or are explicitly bridged/deferred with limitations documented. |
+| Command palette trigger parity + naming confusion | F2 summons `Edge Commands`; pointer/global trigger availability is context-biased and inconsistent | `render/mod.rs`, `render/command_palette.rs`, `input/mod.rs` | Keyboard trigger exists; command-surface model/naming/context policy lag behind plan. | Shared command-surface model backs F2 and contextual palette variants; naming reflects actual scope (not `Edge Commands` unless edge-specific). |
 
 #### Known Rendering/Input Regressions (tracked under `lane:stabilization`)
 
-- Focus ring layer order mismatch while rearranging tile: ring paint layer is background while webview tile content renders at middle layer. **Root cause and fix class identified in §0 (Surface Composition Contract)**; tracked as compositor pass contract child issue under `#88`.
-- Camera command ownership mismatch in multi-graph-pane context (global pending command state vs focused-view targeting).
-- Lasso metadata ID targeting drift after per-view metadata changes.
-- Input consumption/focus ownership edge cases when graph pane and node pane coexist.
+- Global graph camera interaction failure remains active in user repro (`pan`, `wheel zoom`, `zoom commands`, `zoom-to-fit`) even after recent targeting fixes.
+- Pane/tab focus activation and render timing are inconsistent (blank viewport until extra clicks/tab switches in some flows).
+- Focus ring over composited web content remains a compositor pass/state-contract issue (Servo path), not an `egui` layer-count issue.
+- Input consumption/focus ownership edge cases remain likely when graph pane and node pane coexist.
+- Lasso correctness follow-ons remain: edge-boundary inclusion semantics and selection-state polish.
 
 Use these as first-pass stabilization issue seeds when a dedicated issue does not yet exist.
 
 #### Command Surface + Settings Parity Checklist (tracked under `lane:control-ui-settings`)
 
-- Command palette must remain keyboard-triggerable and gain non-node pointer/global trigger parity.
-- Command palette semantics must be global + contextual (not node-hover/right-click biased).
+- Command palette must remain keyboard-triggerable and gain non-node pointer/global trigger parity (canvas, pane/workspace chrome, nodes/edges).
+- F2/global command surface and right-click/contextual command surface should share one backend model while allowing different presentation sizes.
+- `Edge Commands` labeling should be retired or narrowed to truly edge-specific UI.
+- Contextual command categories should map to actionable entities (node/edge/tile/pane/workbench/canvas) with a clear disabled-state policy.
+- Radial menu needs spacing/readability polish before primary-use promotion.
+- Omnibar node-search iteration should retain input focus after Enter in search mode.
+- Theme mode toggle (`System` / `Light` / `Dark`) should be added to settings and persisted.
 - Settings IA must converge from transitional legacy booleans/bridge path to one page-backed settings surface.
 - Settings tool pane must graduate from placeholder to scaffolded runtime surface.
+
+Issue-ready intake stubs from the latest user report:
+- `design_docs/graphshell_docs/implementation_strategy/2026-02-26_stabilization_control_ui_issue_stubs_from_user_report.md`
 
 ### Debt-Retirement Lanes (Current)
 
 - `lane:embedder-debt` (servoshell inheritance retirement)
   - Hub: `#90` (Servoshell inheritance retirement tracker)
   - Scope: `gui.rs`/`gui_frame.rs` decomposition, `RunningAppState` coupling reduction, host/UI boundary cleanup, misleading servoshell-era naming/comments removal
+  - Important child slice: composited webview callback pass contract + GL state isolation (`tile_compositor.rs`) to fix Servo-path overlay affordance failures that are not Wry/native-overlay limitations
   - Primary guide: `design_docs/graphshell_docs/implementation_strategy/2026-02-20_embedder_decomposition_plan.md`
   - Rule: pair mechanical moves with invariants/tests; avoid mixing with feature work in the same PR
 
@@ -493,9 +560,9 @@ This supersedes the earlier registry-closure-heavy priority table. The queue aud
 
 | Rank | Lane | Why Now | Primary Scope (Next Tasks) | Primary Sources / Hotspots | Lane Done Gate |
 | --- | --- | --- | --- | --- | --- |
-| 1 | **`lane:stabilization` (`#88`)** | User-visible regressions block trust and mask deeper architecture mistakes. | Fix zoom-to-fit / control responsiveness, lasso metadata keying, **Surface Composition Contract** (§0: compositor pass model + `CompositorAdapter` GL state isolation for tile focus z-order), tile focus affordance over document views; add regression tests + control diagnostics. | `render/mod.rs`, `app.rs`, `shell/desktop/ui/gui.rs`, `input/mod.rs`, `shell/desktop/workbench/tile_compositor.rs`, new `shell/desktop/workbench/compositor_adapter.rs`; `SUBSYSTEM_DIAGNOSTICS.md` | Repros are tracked, fixed, and covered by targeted tests; no known open control/focus regressions in active bug register; compositor pass ordering is validated by diagnostics + invariant tests. |
-| 2 | **`lane:control-ui-settings` (`#89`)** | Control surfaces and settings IA still feel transitional despite underlying action plumbing progress. | Global/contextual command palette trigger parity, radial/palette dispatch unification, settings scaffold replacing placeholder pane, settings page model start. | `2026-02-24_control_ui_ux_plan.md`, `2026-02-20_settings_architecture_plan.md`, `render/command_palette.rs`, `render/mod.rs`, `shell/desktop/workbench/tile_behavior.rs` | Command surfaces share one dispatch boundary; settings pane is no longer placeholder-only. |
-| 3 | **`lane:embedder-debt` (`#90`)** | Servoshell inheritance debt is now the main source of friction in host/UI evolution and regressions. | Decompose `gui.rs`/`gui_frame.rs`, reduce `RunningAppState` coupling, narrow host/UI boundaries, retire misleading servoshell-era assumptions/comments. | `2026-02-20_embedder_decomposition_plan.md`, `shell/desktop/ui/gui.rs`, `shell/desktop/ui/gui_frame.rs`, `shell/desktop/host/*` | One stage of decomposition lands with tests/receipts; reduced hotspot surface area and clearer module ownership. |
+| 1 | **`lane:stabilization` (`#88`)** | User-visible regressions block trust and currently prevent normal graph interaction, masking deeper architecture mistakes. | Restore graph camera controls (pan/wheel/zoom/fit), close tab/pane focus/render activation regressions, finish lasso correctness follow-ons, and keep focus-affordance/compositor regressions isolated with tests/diagnostics. | `render/mod.rs`, `app.rs`, `shell/desktop/ui/gui.rs`, `input/mod.rs`, `shell/desktop/workbench/tile_compositor.rs`, `shell/desktop/workbench/*`; `SUBSYSTEM_DIAGNOSTICS.md` | Repros are tracked, fixed, and covered by targeted tests/receipts; normal graph interaction works reliably in default and split-pane contexts. |
+| 2 | **`lane:control-ui-settings` (`#89`)** | Control surfaces and settings IA are now clearly specified by user needs, but the runtime UI still exposes transitional/legacy command surfaces. | Unify F2 + contextual command surfaces, retire/rename `Edge Commands`, define contextual category/disabled-state policy, radial readability pass, omnibar focus retention, theme mode toggle, settings scaffold replacing placeholder pane. | `2026-02-24_control_ui_ux_plan.md`, `2026-02-20_settings_architecture_plan.md`, `render/command_palette.rs`, `render/mod.rs`, `shell/desktop/ui/toolbar/*`, `shell/desktop/workbench/tile_behavior.rs` | Command surfaces share one dispatch/context model across UI contexts; settings pane supports theme mode and is no longer placeholder-only for core settings paths. |
+| 3 | **`lane:embedder-debt` (`#90`)** | Servoshell inheritance debt is the main source of host/UI focus/compositor friction and still leaks legacy behavior into user-facing flows. | Decompose `gui.rs`/`gui_frame.rs`, reduce `RunningAppState` coupling, narrow host/UI boundaries, fix legacy webview context-menu/new-tab bypass paths, retire misleading servoshell-era assumptions/comments. | `2026-02-20_embedder_decomposition_plan.md`, `shell/desktop/ui/gui.rs`, `shell/desktop/ui/gui_frame.rs`, `shell/desktop/host/*`, `shell/desktop/lifecycle/webview_controller.rs` | One stage of decomposition lands with tests/receipts; legacy webview path bypasses are either bridged or retired; hotspot surface area is reduced. |
 | 4 | **`lane:runtime-followon` (`#91`)** | `SYSTEM_REGISTER.md` remaining gaps are now mostly SR2/SR3 signal routing contract/fabric + observability. | Open child issues for SR2/SR3; implement typed signal envelope/facade, routing diagnostics, misroute observability, fabric/backpressure policy. | `SYSTEM_REGISTER.md`, `TERMINOLOGY.md`, `shell/desktop/runtime/control_panel.rs`, `shell/desktop/runtime/registries/mod.rs` | SR2/SR3 child issues are landed or explicitly ticketed with done gates; signal routing boundary is testable and observable. |
 | 5 | **`lane:viewer-platform` (`#92`)** | Viewer selection/capability scaffolding is ahead of actual embedded viewers; Wry remains design-only; **`TileRenderMode` enum** (§0.3.3) needed for compositor pass dispatch and overlay policy. | Replace non-web viewer placeholders (`settings`/`pdf`/`csv` first), implement Wry feature gate + manager/viewer foundation, align Verso manifest/spec claims, **add `TileRenderMode` to `NodePaneState` with ViewerRegistry-driven resolution**. | `2026-02-24_universal_content_model_plan.md`, `2026-02-23_wry_integration_strategy.md`, `GRAPHSHELL_AS_BROWSER.md`, `mods/native/verso/mod.rs`, `Cargo.toml`, `shell/desktop/workbench/tile_behavior.rs`, `shell/desktop/workbench/tile_kind.rs` | At least one non-web native viewer is embedded; `viewer:wry` foundation exists behind feature gate or spec/docs are explicitly downgraded; `TileRenderMode` is set on every `NodePaneState` at viewer attachment time. |
 | 6 | **`lane:accessibility` (`#95`)** | Accessibility is a project-level requirement; phase-1 bridge work exists but Graph Reader/Inspector paths remain incomplete. | Finish bridge diagnostics/health surfacing, implement Graph Reader scaffolds, replace Accessibility Inspector placeholder pane, add focus/nav regression tests. | `SUBSYSTEM_ACCESSIBILITY.md`, `shell/desktop/workbench/tile_behavior.rs`, `shell/desktop/ui/gui.rs` | Accessibility Inspector is functional, bridge invariants/tests are green, and Graph Reader phase entry point exists. |
@@ -520,9 +587,9 @@ This is the complete lane catalog for near/mid-term planning. `§1C` is the prio
 | Lane | Scope | Status | Primary Docs / Hotspots | Notes |
 | --- | --- | --- | --- | --- |
 | `lane:stabilization` (`#88`) | User-visible regressions, control responsiveness, focus affordances, camera/lasso correctness | Active when regressions exist | `render/mod.rs`, `app.rs`, `gui.rs`, `input/mod.rs`, `tile_compositor.rs` | Preempts other lanes while an active repro exists. |
-| `lane:roadmap` | Docs/planning issues `#11/#12/#13/#14/#18/#19` | Active merge-safe default | `IMPLEMENTATION_ROADMAP.md`, planning docs | Low conflict background lane. |
-| `lane:control-ui-settings` (`#89`) | Command surfaces + settings IA/surface execution | Prospective (high priority) | `2026-02-24_control_ui_ux_plan.md`, `2026-02-20_settings_architecture_plan.md` | Promoted due to command palette parity + settings placeholder debt. |
-| `lane:embedder-debt` (`#90`) | Servoshell inheritance retirement / host-UI decomposition | Prospective (high priority) | `2026-02-20_embedder_decomposition_plan.md`, `gui.rs`, `gui_frame.rs` | Debt-retirement lane; avoid feature mixing. |
+| `lane:roadmap` | Remaining docs/planning follow-on `#19` (`2D↔3D` hotswitch, blocked) | Active merge-safe default (low activity while blocked) | `PLANNING_REGISTER.md`, planning docs | Adoption/planning issues `#11/#12/#13/#14/#18` were closed in queue reconciliation (2026-02-26). |
+| `lane:control-ui-settings` (`#89`) | Command surfaces + settings IA/surface execution | Active planning / queued (high priority) | `2026-02-24_control_ui_ux_plan.md`, `2026-02-20_settings_architecture_plan.md`, `render/command_palette.rs` | User report now provides concrete issue-ready slices (palette/context unification, theme toggle, omnibar/radial polish). |
+| `lane:embedder-debt` (`#90`) | Servoshell inheritance retirement / host-UI decomposition | Prospective (high priority, active child slices) | `2026-02-20_embedder_decomposition_plan.md`, `gui.rs`, `gui_frame.rs`, `host/*` | Includes compositor callback pass contract and legacy webview context-menu/new-tab path retirement/bridging. |
 | `lane:runtime-followon` (`#91`) | SR2/SR3 signal routing contract/fabric + observability | Prospective (ticket first) | `SYSTEM_REGISTER.md`, `TERMINOLOGY.md` | Requires fresh child issues; do not reuse queue-cleanup issues. |
 
 ### B. Core Platform / Architecture Completion Lanes
@@ -540,7 +607,7 @@ This is the complete lane catalog for near/mid-term planning. `§1C` is the prio
 | Lane | Scope | Status | Primary Docs / Hotspots | Notes |
 | --- | --- | --- | --- | --- |
 | `lane:knowledge-capture` (`#98`) | UDC organization, import, clipping, badges/tags, visible graph effects | Prospective | `2026-02-23_udc_semantic_tagging_plan.md`, `2026-02-24_layout_behaviors_plan.md`, `2026-02-20_node_badge_and_tagging_plan.md`, `2026-02-11_*_plan.md` | Canonical “capture + classify + surface” lane. |
-| `lane:layout-semantics` | Layout injection hook, Magnetic Zones prerequisites and execution | Prospective | `2026-02-24_layout_behaviors_plan.md` | May stay nested under `knowledge-capture` until hooks land. |
+| `lane:layout-semantics` | Layout injection hook, Magnetic Zones prerequisites and execution; workbench/workspace/tile semantic distinctions | Prospective (design pressure increasing) | `2026-02-24_layout_behaviors_plan.md`, `2026-02-22_workbench_tab_semantics_overlay_and_promotion_plan.md` | User report surfaced unresolved tile vs workspace semantics and need for a root workbench overview UX. |
 | `lane:performance-physics` | Culling, LOD, physics responsiveness/reheat, policy tuning | Partial / follow-on | `2026-02-24_performance_tuning_plan.md`, `2026-02-24_physics_engine_extensibility_plan.md` | Some slices landed; keep as follow-on lane for deeper performance + policy work. |
 | `lane:command-surface-parity` | Omnibar/palette/radial/menu trigger parity and command discoverability | Prospective | `GRAPHSHELL_AS_BROWSER.md`, control UI UX docs, `render/command_palette.rs` | Can remain under `control-ui-settings` unless scope expands. |
 | `lane:graph-ux-polish` | Multi-select, semantic tab titles, small high-leverage graph interactions | Prospective / quick-slice feeder | `2026-02-18_graph_ux_research_report.md`, `2026-02-23_graph_interaction_consistency_plan.md` | Good feeder lane for low-risk UX improvements between bigger slices. |
@@ -555,7 +622,7 @@ These are mostly sourced from the forgotten-concepts table and adopted strategy 
 | `lane:presence-collaboration` | Collaborative presence (ghost cursors, follow mode, remote selection) | Verse sync + identity/presence semantics stable | `design_docs/verse_docs/implementation_strategy/2026-02-25_verse_presence_plan.md` | Crosses Graphshell + Verse; likely needs dedicated hub. |
 | `lane:lens-physics` | Progressive lenses + lens/physics binding policy execution | Runtime lens resolution + distinct physics preset behavior | `2026-02-25_progressive_lens_and_physics_binding_plan.md`, interaction/physics docs | Can begin with policy wiring before full UX polish. |
 | `lane:doi-fisheye` | Semantic fisheye / DOI implementation | Basic LOD + viewport culling stable | `2026-02-25_doi_fisheye_plan.md`, graph UX research | Visual ergonomics lane; pair with diagnostics/perf instrumentation. |
-| `lane:visual-tombstones` | Ghost nodes/edges after deletion | Deletion/traversal/history UX stable | `2026-02-25_visual_tombstones_plan.md` | Adopted concept with strategy doc; candidate early roadmap lane. |
+| `lane:visual-tombstones` | Ghost nodes/edges after deletion | Deletion/traversal/history UX stable | `2026-02-26_visual_tombstones_plan.md` | Adopted concept with strategy doc; candidate early roadmap lane. |
 | `lane:omnibar` | Unified omnibar (URL + graph search + web search) | Command palette/input routing stabilized | `GRAPHSHELL_AS_BROWSER.md`, graph UX research | Core browser differentiator; keep distinct from palette cleanup. |
 | `lane:view-dimension` | 2D↔3D hotswitch + position parity | Pane/view model + graph view state stable | `2026-02-24_physics_engine_extensibility_plan.md`, `PROJECT_DESCRIPTION.md` | Future-facing but should remain visible in planning. |
 | `lane:html-export` | Interactive HTML export | Viewer/content model + snapshot/export shape defined | archived philosophy + browser docs | Strong shareability lane; non-core until model/export safety is defined. |
@@ -604,7 +671,7 @@ These are not "do now" items. They are concepts that should be explicitly adopte
 | 10 | **Interactive HTML Export (self-contained graph artifact)** | Strong shareability and offline review workflow; distinctive output mode. | `design_docs/archive_docs/checkpoint_2026-01-29/PROJECT_PHILOSOPHY.md` (archived concept) | After viewer/content model and export-safe snapshot shape are defined. |
 
 Appended adoption note (preserved from PR `#55`, pending table refactor):
-- Visual Tombstones (`Rank 1`) is now backed by `design_docs/graphshell_docs/implementation_strategy/2026-02-25_visual_tombstones_plan.md` and should be treated as `✅ adopted` in future table cleanup.
+- Visual Tombstones (`Rank 1`) is now backed by `design_docs/graphshell_docs/implementation_strategy/2026-02-26_visual_tombstones_plan.md` and should be treated as `✅ adopted` in future table cleanup.
 
 Appended adoption note (preserved from PR `#56`, pending table refactor):
 - Temporal Navigation / Time-Travel Preview (`Rank 2`) should be treated as `✅ adopted` and promoted to a tracked staged backlog item via `design_docs/graphshell_docs/implementation_strategy/2026-02-20_edge_traversal_impl_plan.md` Stage F.
