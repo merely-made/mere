@@ -4,6 +4,7 @@
 
 pub(crate) mod host;
 pub(crate) mod lifecycle;
+pub(crate) mod render_backend;
 pub(crate) mod runtime;
 pub(crate) mod ui;
 pub(crate) mod workbench;
