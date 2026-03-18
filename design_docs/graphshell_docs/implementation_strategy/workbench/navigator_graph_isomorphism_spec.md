@@ -1,7 +1,15 @@
-# Navigator -> Graph / Workbench Interaction Contract
+# Navigator Interaction Contract — Moved
 
-**Date**: 2026-03-15  
-**Status**: Design — Pre-Implementation  
+**Moved**: 2026-03-17
+**Canonical location**: [`../navigator/navigator_interaction_contract.md`](../navigator/navigator_interaction_contract.md)
+
+This file is retained as a forwarding stub. Do not edit here — edit the canonical copy in the Navigator domain.
+
+---
+
+## Original content (superseded)
+
+**Date**: 2026-03-15
 **Purpose**: Define the canonical interaction grammar for the Sidebar Navigator
 and Toolbar Navigator, including which rows select nodes, which rows expand
 containers, and how node navigation resolves between graph and workbench
