@@ -1,8 +1,8 @@
 # Hybrid Graph-View Management Plan (Graph Overview Plane + Navigator Atlas)
 
 **Date**: 2026-03-05
-**Status**: Active implementation follow-on (updated 2026-04-01)
-**Priority**: High (UX semantics)
+**Status**: Closed / Archived 2026-04-01 — retained as migration history only; canonical authority now lives in `multi_view_pane_spec.md` and `../navigator/NAVIGATOR.md`
+**Priority**: Historical migration receipt
 
 **Related**:
 
@@ -36,6 +36,7 @@ Refined stance:
 
 - The **Overview Plane** remains graph-owned and is the explicit authoring surface for graph-view regions.
 - The **Atlas** is not a second graph manager. It is a Navigator-hosted orientation surface that may project graph views as swatches, lists, or strips depending on host form factor.
+- The Atlas swatch should eventually be backed by a reusable **Swatch Spec** so Graphshell can embed small interactive graph projections in multiple UI contexts without inventing a new minimap widget each time.
 - **Sidebar** Navigator hosts may render a true overview swatch or minimap-like card when there is enough space.
 - **Toolbar** Navigator hosts should degrade to compact chips, strips, and counts rather than forcing a tiny canvas that is too cramped for reliable manipulation.
 - **Freefloating Navigator hosts are deferred**. The current host model is edge-mounted; a floating Navigator would require a separate Shell host-model expansion instead of being smuggled into this plan.
@@ -58,8 +59,8 @@ Implementation receipt as of 2026-04-01:
 - Sidebar Navigator hosts now ship list-first with an optional width-gated swatch card, archived-view filter toggles, and aggregated occupancy / external-link hints; toolbar hosts continue to degrade to compact strips/summaries rather than a minimap.
 - Graph-view layout-manager persistence is now covered by restart round-trip evidence, including archived-slot restore using persisted coordinates.
 - Transfer and region mutation diagnostics channels now exist, and Overview Plane ships keyboard parity for traversal, focus, open, move/create-adjacent, and explicit transfer handoff.
-- The first slice is still intentionally narrower than the full plan: no resize carrier and no Atlas drag-transfer parity for spacious hosts.
-- Current Atlas limitation: drag-transfer parity remains deferred to spacious hosts; the shipping sidebar Atlas is still click/list-first with optional swatch projection rather than a gestural minimap-first surface.
+- Spacious sidebar Navigator hosts now support Atlas drag-transfer parity through the same reducer intent path as Overview Plane when the swatch can keep transfer targets spacious enough for reliable interaction.
+- The first slice remains intentionally narrower than the full original sketch: there is still no resize carrier, and generalized `SwatchSpec` extraction remains deferred beyond the Atlas shipping path.
 
 ---
 
@@ -161,6 +162,43 @@ Non-goal:
 
 - Atlas does not become a second persisted region model or an alternate source of truth for graph-view layout.
 
+### 4.3 Swatch Spec (reusable embedded graph projection)
+
+The Atlas overview card should be treated as one host of a broader **Swatch
+Spec** concept rather than as a one-off minimap implementation.
+
+Definition:
+
+- A `SwatchSpec` is a reusable rendering contract for small, optionally interactive graph projections embedded throughout the UI.
+- It chooses an appropriate compact layout and interaction profile from host context, flags, and size constraints.
+
+Potential hosts:
+
+- Navigator Atlas overview cards
+- graph-view or graphlet summary cards
+- selected-node neighborhood previews
+- workbench/session/history previews that need a compact graph representation
+- help, inspector, or documentation surfaces that need alternate graph projections
+
+Contract dimensions:
+
+- **Source scope**: whole graph, graph view, graphlet, local neighborhood, semantic subset, or other derived representation
+- **Layout profile**: region overview, local neighborhood, hierarchy/tree, strip, clustered summary, or other host-selected compact layout
+- **Density policy**: labels on/off, edge suppression, aggregation hints, occupancy badges, and archived-item visibility
+- **Interaction profile**: passive preview, focus/routing target, selection/reveal affordance, or transfer-capable target where ergonomics permit
+- **Host options**: size class, chrome level, counts/badges, animation policy, and context-specific feature flags
+
+Rules:
+
+- `SwatchSpec` configures compact rendering and allowed interactions only; it does not introduce a second persistence model.
+- Mutating interactions remain reducer-authoritative and may be disabled entirely for hosts that are preview-only.
+- Different hosts may choose different layouts for the same underlying data without changing graph truth.
+
+First-shipping guidance:
+
+- Do not block the current Atlas slice on a fully generalized swatch framework.
+- As new compact graph surfaces appear, prefer extracting toward `SwatchSpec` instead of cloning bespoke minimap widgets.
+
 ---
 
 ## 5. Implementation Roadmap
@@ -219,7 +257,7 @@ Done gates:
 
 - [x] Navigator Atlas click focuses target view deterministically
 - [x] first sidebar Atlas ships as list-first with optional swatch-card gating instead of requiring a minimap-first layout
-- [ ] sidebar-host Atlas drag transfer uses same reducer intent path as Overview
+- [x] sidebar-host Atlas drag transfer uses same reducer intent path as Overview
 - [x] toolbar-host Atlas degrades to non-minimap list/strip semantics without losing routing parity
 - [x] archived graph views are hidden by default and surfaced through an explicit filter toggle in compact Navigator contexts
 - [x] high-density cross-view relationships degrade to aggregated hints rather than detailed inter-view edge rendering
@@ -246,6 +284,7 @@ Deferred (not in this plan slice):
 - projection mode (`Project`)
 - copy mode (`Copy`)
 - true graph-of-graphs browse mode
+- generalized `SwatchSpec` extraction beyond the current Atlas/overview card slice
 
 Done gates:
 
@@ -263,6 +302,7 @@ Done gates:
 6. `H3.2`: sidebar Atlas drag transfer parity with Overview and toolbar degradation rules.
 7. `H4.1`: diagnostics channels for region/transfer outcomes.
 8. `H4.2`: keyboard and accessibility parity for hybrid surfaces.
+9. `H5.1`: extract a reusable `SwatchSpec` contract for compact embedded graph projections once multiple hosts need it.
 
 ---
 
@@ -280,11 +320,13 @@ Still open after H2/H3 entry:
 
 1. Should aggregated cross-view hints differentiate semantic families, or remain view-level only in the first Atlas slice?
 2. What host-width threshold should enable the optional swatch card without destabilizing Navigator layout density?
+3. Which compact layout profiles should be first-class in `SwatchSpec` once Atlas is no longer the only host?
 
 ## 8. Current Remainder (2026-04-01)
 
-What is still left for this plan to close:
+This plan no longer carries required active work.
 
-1. H3 gestural follow-on: add drag-transfer parity only for spacious sidebar Atlas hosts if it proves ergonomically useful.
+Future work, if needed, belongs elsewhere:
 
-Until that lands, this plan is no longer a broad discovery draft; it is a narrow follow-on for optional spacious-host drag transfer parity only.
+1. Promote generalized `SwatchSpec` extraction only if multiple compact graph surfaces beyond Navigator need the same rendering contract.
+2. Treat any richer minimap gestures beyond the shipped spacious-host drag parity as a fresh enhancement, not as unfinished core scope from this plan.
