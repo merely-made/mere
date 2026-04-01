@@ -1,7 +1,22 @@
 # UDC Semantic Tagging & Layout Plan (2026-02-23)
 
-**Status**: In Progress (Runtime Model Aligned)
-**Goal**: Implement Universal Decimal Classification (UDC) to drive semantic graph clustering and automated workbench organization.
+**Status**: Closed / Archived 2026-04-01 — historical execution record only
+
+**Canonical authority now lives in**:
+
+- `semantic_tagging_and_knowledge_spec.md` — KnowledgeRegistry, canonicalization, semantic index, UDC facet parity, and diagnostics
+- `node_badge_and_tagging_spec.md` — tag assignment UI, canonical UDC chip behavior, and badge exposure
+- `2026-03-11_graph_enrichment_plan.md` — active knowledge-capture lane and remaining user-facing payoff work
+- `layout_behaviors_and_physics_spec.md` and `2026-02-24_layout_behaviors_plan.md` — semantic clustering force and layout follow-on work
+
+## Closure Summary
+
+- `KnowledgeRegistry` parsing, search, canonicalization, and reconcile flow landed in runtime code.
+- The plan's old `workspace.semantic_tags` transport model is stale; durable tag truth now lives on `Node.tags`, while `semantic_index` remains a derived runtime cache.
+- UDC filter/routing parity, tag-panel inference, canonicalization, and diagnostics moved into the canonical specs above.
+- The only meaningful open tail from this plan is no longer owned here: visible semantic payoff, enrichment UX, and any remaining semantic-physics tuning belong to the enrichment and layout/physics docs.
+
+Historical plan text is retained below as implementation record only; unchecked tasks are not active authority.
 
 ## Context
 Current tags (`#starred`, `research`) are "flat"—the system knows string equality but not relationship. UDC provides a hierarchical, faceted ontology (e.g., `51` Mathematics is a parent of `519.6` Computational Mathematics).
