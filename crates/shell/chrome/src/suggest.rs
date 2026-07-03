@@ -2,11 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-//! Omnibar suggestions, sourced from meerkat's own [`History`] but expressed in
+//! Omnibar suggestions, sourced from chrome-owned [`History`] but expressed in
 //! the **reused** [`OmnibarMatch`] vocabulary from the graphshell chrome domain.
 //!
 //! graphshell's omnibar generates matches by graph search (node / edge / tab
-//! fuzzy matching) behind an async provider mailbox. meerkat has no graph and no
+//! fuzzy matching) behind an async provider mailbox. A host may have no graph and no
 //! async provider, so it generates matches synchronously from its history plus a
 //! direct-navigation and a web-search affordance — but it still produces the
 //! domain's [`OmnibarMatch`] types, so the rendering is "the next host widget
@@ -19,7 +19,7 @@
 use std::cmp::Ordering;
 use std::collections::{HashMap, HashSet};
 
-use chrome::omnibar::{HistoricalNodeMatch, OmnibarMatch, SearchProviderKind};
+use crate::omnibar::{HistoricalNodeMatch, OmnibarMatch, SearchProviderKind};
 
 use crate::nav::{self, History, NavTarget};
 

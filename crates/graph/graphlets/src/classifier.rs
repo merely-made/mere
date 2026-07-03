@@ -16,7 +16,7 @@ use kernel::graph::Graph;
 
 /// One ranked shape candidate: the kind, a fit score in `[0, 1]`, and a short chip label.
 #[derive(Clone, Debug, PartialEq)]
-pub(crate) struct ShapeRank {
+pub struct ShapeRank {
     pub kind: GraphletKind,
     pub fit: f32,
     pub label: String,
@@ -25,7 +25,7 @@ pub(crate) struct ShapeRank {
 /// Classify a selection's induced subgraph: `n` nodes (ids `0..n`) and `edges` (undirected pairs,
 /// `a != b`; duplicates and out-of-range ignored). Returns the candidate shapes ranked by fit,
 /// dominant first. Always non-empty — the floor is Loose / Session. (Swatch primitive — P3.)
-pub(crate) fn classify(n: usize, edges: &[(usize, usize)]) -> Vec<ShapeRank> {
+pub fn classify(n: usize, edges: &[(usize, usize)]) -> Vec<ShapeRank> {
     let mut deg = vec![0usize; n];
     let mut adj: Vec<Vec<usize>> = vec![Vec::new(); n];
     let mut seen = HashSet::new();
@@ -105,7 +105,7 @@ pub(crate) fn classify(n: usize, edges: &[(usize, usize)]) -> Vec<ShapeRank> {
 /// inter-edges among them (the induced subgraph), and rank the shapes. The graph-aware convenience
 /// over [`classify`] for callers holding a `Graph` + a selection (the connections swatch, and
 /// crystallize). (Swatch primitive — P3.)
-pub(crate) fn classify_selection(graph: &Graph, members: &[uuid::Uuid]) -> Vec<ShapeRank> {
+pub fn classify_selection(graph: &Graph, members: &[uuid::Uuid]) -> Vec<ShapeRank> {
     let mut index = std::collections::HashMap::new();
     for &m in members {
         if let Some((key, _)) = graph.get_node_by_id(m) {
@@ -131,7 +131,7 @@ fn rank(kind: GraphletKind, fit: f32, label: String) -> ShapeRank {
 /// A stable string tag for a shape kind, carried on the swatch chip strip's DOM
 /// (`data-shape-kind`) so a chip click can name the shape to crystallize as. The inverse is
 /// [`shape_kind_from_tag`]. (Swatch primitive — P3, chip-click crystallize.)
-pub(crate) fn shape_kind_tag(kind: &GraphletKind) -> String {
+pub fn shape_kind_tag(kind: &GraphletKind) -> String {
     match kind {
         GraphletKind::Ego { radius } => format!("ego:{radius}"),
         GraphletKind::Corridor => "corridor".into(),
@@ -147,7 +147,7 @@ pub(crate) fn shape_kind_tag(kind: &GraphletKind) -> String {
 
 /// Parse a [`shape_kind_tag`] back to its kind; `None` for an unknown tag (a stale DOM
 /// attribute never panics the input path).
-pub(crate) fn shape_kind_from_tag(tag: &str) -> Option<GraphletKind> {
+pub fn shape_kind_from_tag(tag: &str) -> Option<GraphletKind> {
     Some(match tag {
         "corridor" => GraphletKind::Corridor,
         "component" => GraphletKind::Component,

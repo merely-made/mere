@@ -2,12 +2,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-//! Tests for the per-session graphlet index (`graphlets.rs`). Split into a
+//! Tests for the per-session graphlet index (`lib.rs`). Split into a
 //! sibling file per the 600-LOC ceiling.
 
-use crate::graphlets::*;
-use kernel::graph::fixtures::GraphFixtures;
+use crate::*;
 use forme::{GraphletBinding, GraphletKind, GraphletSpec};
+use kernel::graph::fixtures::GraphFixtures;
 use kernel::graph::{EdgeFamily, Graph};
 
 #[test]

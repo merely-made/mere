@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-//! meerkat's navigation model: location-bar text classification plus a
+//! Chrome's host-neutral navigation model: location-bar text classification plus a
 //! linear back/forward history.
 //!
 //! The reused `chrome` domain projects `can_go_back` / `can_go_forward`

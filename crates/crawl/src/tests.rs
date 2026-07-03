@@ -10,6 +10,44 @@ fn policy(max_depth: u32, max_pages: usize, max_fanout: usize, scope: HostScope)
     }
 }
 
+fn extract_links(base: &str, body: &str) -> Vec<String> {
+    let mut links = Vec::new();
+    let mut rest = body;
+    while let Some(idx) = rest.find("href='").or_else(|| rest.find("href=\"")) {
+        let quote = rest.as_bytes()[idx + 5] as char;
+        let after = &rest[idx + 6..];
+        let Some(end) = after.find(quote) else {
+            break;
+        };
+        let href = &after[..end];
+        let resolved = if let Ok(url) = url::Url::parse(href) {
+            url.to_string()
+        } else if let Ok(url) = url::Url::parse(base).and_then(|b| b.join(href)) {
+            url.to_string()
+        } else {
+            href.to_string()
+        };
+        links.push(resolved);
+        rest = &after[end + 1..];
+    }
+    links
+}
+
+fn test_process_page(
+    frontier: &mut Frontier,
+    url: &str,
+    depth: u32,
+    fetched: &Fetched,
+) -> Vec<GraphContribution> {
+    let targets = extract_links(url, &fetched.body);
+    frontier.enqueue(&targets, depth);
+    if targets.is_empty() {
+        Vec::new()
+    } else {
+        vec![GraphContribution::default()]
+    }
+}
+
 #[test]
 fn host_scope_key_round_trips() {
     // The settings picker + on-disk pref round-trip scopes through their string keys.
@@ -184,14 +222,14 @@ fn breadth_first_order() {
 }
 
 #[test]
-fn crawl_page_harvests_links_and_enqueues_them() {
+fn process_page_enqueues_links_and_emits_a_contribution() {
     let mut f = Frontier::new("https://s.test/", CrawlPolicy::default());
     let _ = f.next(); // consume the seed @0
     let fetched = Fetched {
         content_type: Some("text/html".to_string()),
         body: "<a href='/a'>A</a><a href='/b'>B</a>".to_string(),
     };
-    let contributions = crawl_page(&mut f, "https://s.test/", 0, &fetched);
+    let contributions = test_process_page(&mut f, "https://s.test/", 0, &fetched);
     assert!(!contributions.is_empty(), "a link contribution is produced");
     // The two same-host targets are now queued at depth 1.
     assert_eq!(f.next(), Some(("https://s.test/a".to_string(), 1)));
@@ -238,6 +276,7 @@ fn run_crawl_visits_a_small_site_within_the_depth_cap() {
         Duration::ZERO,
         fetch,
         || false,
+        test_process_page,
         |update| match update {
             CrawlUpdate::Progress { last_url, .. } => visited.push(last_url),
             CrawlUpdate::Contribution { .. } => contribution_count += 1,
@@ -295,6 +334,7 @@ fn run_crawl_stops_at_the_page_cap() {
         Duration::ZERO,
         fetch,
         || false,
+        test_process_page,
         |_| {},
     ));
     assert_eq!(total, 3, "the page cap stops the crawl at 3 fetches");
@@ -344,6 +384,7 @@ fn run_crawl_honors_robots_disallow() {
         Duration::ZERO,
         fetch,
         || false,
+        test_process_page,
         |update| {
             if let CrawlUpdate::Progress { last_url, .. } = update {
                 visited.push(last_url);
@@ -410,6 +451,7 @@ fn run_crawl_cancels_mid_crawl() {
         Duration::ZERO,
         fetch,
         cancelled,
+        test_process_page,
         |update| {
             if matches!(update, CrawlUpdate::Progress { .. }) {
                 fetched_pages += 1;
@@ -461,6 +503,7 @@ fn run_crawl_seeds_from_the_sitemap() {
         Duration::ZERO,
         fetch,
         || false,
+        test_process_page,
         |update| {
             if let CrawlUpdate::Progress { last_url, .. } = update {
                 visited.push(last_url);

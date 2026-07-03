@@ -2,23 +2,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-//! Per-session graphlet index — the seam for wiring forme's graphlet layer into the
-//! live shell.
+//! Per-session graphlet derivation and persistence for Mere's graph family.
 //!
-//! **STUB / scaffold.** Landed at a checkpoint, not yet wired into the session
-//! lifecycle. The wiring (construct on session load, persist beside `graph.json`, the
-//! window carries a `GraphletId`, the branch op writes here) is Phase 1 of the
-//! [graphlet-wiring plan](../../../design_docs/mere_docs/implementation_strategy/2026-06-25_graphlet_wiring_plan.md).
-//!
-//! Design (plan recommendation **B**): forme's `GraphletRef` type is first-class and
-//! tested, but its `GraphTree` container (members + topology + lens + layout) is
-//! superseded by the live arrangement — the kernel graph is truth, the orrery is its
-//! cartography projection, platen's `Workbench` its tree projection. So we reuse only
-//! `GraphletRef`, held here as a per-session index keyed by `GraphMemberId` (the kernel
-//! node uuid the orrery + workbench already use), rather than resurrecting `GraphTree`.
+//! This crate owns the pure half of the graphlet seam: the per-session graphlet
+//! index, linked-graphlet derivation/reconciliation, and the shape classifier in
+//! [`classifier`]. It depends only on forme + kernel + serde.
 
-// Some accessors (`get`, future kinds) land ahead of their Phase 2 consumers.
-#![allow(dead_code)]
+#![doc(html_root_url = "https://docs.rs/graphlets/0.0.1")]
 
 use std::collections::HashSet;
 use std::path::Path;
@@ -30,15 +20,23 @@ use forme::{
 use kernel::graph::{EdgeFamily, Graph, RelationSelector};
 use serde::{Deserialize, Serialize};
 
+pub mod classifier;
+
+/// Crate version.
+pub const VERSION: &str = env!("CARGO_PKG_VERSION");
+
+/// Lifecycle stage marker.
+pub const STAGE: &str = "pre-alpha";
+
 /// Sidecar filename for a session's graphlet index, beside `graph.json`.
-pub(crate) const GRAPHLETS_FILE: &str = "graphlets.json";
+pub const GRAPHLETS_FILE: &str = "graphlets.json";
 
 /// The graphlets belonging to one session's graph: named sub-structures (a tear-out
 /// **branch**, later document-groups / relational-browse neighborhoods) over the same
 /// kernel nodes the orrery + workbench render. One per session, persisted beside the
 /// graph. (Graphlet-wiring Phase 1; plan recommendation B.)
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
-pub(crate) struct SessionGraphlets {
+pub struct SessionGraphlets {
     graphlets: Vec<GraphletRef<GraphMemberId>>,
     /// Monotonic id source. `GraphletId` is forme's lightweight `u32` index, unique
     /// within this session's index (not globally).
@@ -48,32 +46,32 @@ pub(crate) struct SessionGraphlets {
 impl SessionGraphlets {
     /// An empty index. A freshly-created session seeds one default `Session`-kind
     /// graphlet via [`with_default_session`](Self::with_default_session).
-    pub(crate) fn new() -> Self {
+    pub fn new() -> Self {
         Self::default()
     }
 
     /// The empty index plus the default whole-session graphlet (the grouping every
     /// session starts with, before any branch). The seed for a new session.
-    pub(crate) fn with_default_session(mut self) -> Self {
+    pub fn with_default_session(mut self) -> Self {
         let id = self.mint_id();
         self.graphlets.push(GraphletRef::new_session(id));
         self
     }
 
     /// The graphlets in this session, in creation order.
-    pub(crate) fn graphlets(&self) -> &[GraphletRef<GraphMemberId>] {
+    pub fn graphlets(&self) -> &[GraphletRef<GraphMemberId>] {
         &self.graphlets
     }
 
     /// Look a graphlet up by id.
-    pub(crate) fn get(&self, id: GraphletId) -> Option<&GraphletRef<GraphMemberId>> {
+    pub fn get(&self, id: GraphletId) -> Option<&GraphletRef<GraphMemberId>> {
         self.graphlets.iter().find(|g| g.id == id)
     }
 
     /// Preview a Linked graphlet's drift without mutating its roster. This powers
     /// the Roster Graphlet Card's dry diff; [`reconcile`](Self::reconcile) uses
     /// the same derivation and then applies the truth set.
-    pub(crate) fn preview_reconcile(
+    pub fn preview_reconcile(
         &self,
         graph: &Graph,
         id: GraphletId,
@@ -94,7 +92,7 @@ impl SessionGraphlets {
     ///
     /// `parent_spec` is the donor graphlet's spec if it had one, else a default derived
     /// from the anchor (see [`default_spec_for`]).
-    pub(crate) fn record_branch(
+    pub fn record_branch(
         &mut self,
         anchor: GraphMemberId,
         parent_spec: GraphletSpec,
@@ -114,7 +112,7 @@ impl SessionGraphlets {
     /// the superseded `GraphTree` member map is not in play (Phase 3 may distinguish
     /// seed anchors from a derived roster). A tear-out **branch** grows this as its
     /// window navigates, so it diverges from the donor. (Graphlet wiring Phase 2.)
-    pub(crate) fn add_member(&mut self, id: GraphletId, node: GraphMemberId) -> bool {
+    pub fn add_member(&mut self, id: GraphletId, node: GraphMemberId) -> bool {
         if let Some(g) = self.graphlets.iter_mut().find(|g| g.id == id) {
             if !g.anchors.contains(&node) {
                 g.anchors.push(node);
@@ -129,7 +127,7 @@ impl SessionGraphlets {
     /// initial roster is derived now; [`reconcile`](Self::reconcile) re-derives it when the
     /// graph drifts. `anchors` holds the live derived set; `spec.primary_anchor` holds the
     /// seed (the anchors-vs-members split). Returns the new id. (Graphlet wiring Phase 3.)
-    pub(crate) fn record_linked(&mut self, graph: &Graph, spec: GraphletSpec) -> GraphletId {
+    pub fn record_linked(&mut self, graph: &Graph, spec: GraphletSpec) -> GraphletId {
         let id = self.mint_id();
         let members = derive_members(graph, &spec);
         let seed = spec.primary_anchor.as_deref().and_then(|s| s.parse().ok());
@@ -147,7 +145,7 @@ impl SessionGraphlets {
     /// `kind` for display. Unlike a Linked graphlet it does not derive or drift — it is the frozen
     /// selection, so it works for any shape (including the disconnected Loose / Session grab-bag the
     /// kind-derivation cannot). Returns the new id. (Swatch primitive — P3b crystallize.)
-    pub(crate) fn record_session(
+    pub fn record_session(
         &mut self,
         kind: GraphletKind,
         members: Vec<GraphMemberId>,
@@ -166,7 +164,7 @@ impl SessionGraphlets {
     /// tracks truth); the user-choice proposal path (keep-linked / unlink / save-as-branch)
     /// is a later sub-slice. The diff is the harvested `compute_roster_delta` over the
     /// kernel-derived truth and the stored roster — no `GraphTree`. (Graphlet wiring P3.)
-    pub(crate) fn reconcile(
+    pub fn reconcile(
         &mut self,
         graph: &Graph,
         id: GraphletId,
@@ -210,7 +208,7 @@ impl SessionGraphlets {
 
     /// Convert a linked/branched graphlet to an unlinked session grouping without
     /// changing its current member roster.
-    pub(crate) fn keep_as_session(&mut self, id: GraphletId) -> bool {
+    pub fn keep_as_session(&mut self, id: GraphletId) -> bool {
         let Some(g) = self.graphlets.iter_mut().find(|g| g.id == id) else {
             return false;
         };
@@ -227,7 +225,7 @@ impl SessionGraphlets {
     /// live re-derivation (`reconcile` / `preview_reconcile`); a no-op elsewhere
     /// (`Branched`'s `parent_spec` is lineage, not an active derivation rule).
     /// Returns whether the toggle applied.
-    pub(crate) fn toggle_family_selector(&mut self, id: GraphletId, family: EdgeFamily) -> bool {
+    pub fn toggle_family_selector(&mut self, id: GraphletId, family: EdgeFamily) -> bool {
         let Some(g) = self.graphlets.iter_mut().find(|g| g.id == id) else {
             return false;
         };
@@ -251,7 +249,7 @@ impl SessionGraphlets {
     /// Branch an existing graphlet's current seed/roster into a new local graphlet.
     /// The parent spec is preserved when present; otherwise we derive a default spec
     /// from the first available member.
-    pub(crate) fn branch_from_graphlet(&mut self, id: GraphletId) -> Option<GraphletId> {
+    pub fn branch_from_graphlet(&mut self, id: GraphletId) -> Option<GraphletId> {
         let parent = self.graphlets.iter().find(|g| g.id == id)?.clone();
         let anchor = parent
             .primary_anchor
@@ -266,7 +264,7 @@ impl SessionGraphlets {
 
     /// Whether any graphlet is `Linked` (so worth reconciling against graph truth). The
     /// host gates the per-save reconcile on this. (Graphlet wiring Phase 3 slice 2+.)
-    pub(crate) fn has_linked(&self) -> bool {
+    pub fn has_linked(&self) -> bool {
         self.graphlets
             .iter()
             .any(|g| matches!(g.binding, GraphletBinding::Linked { .. }))
@@ -276,7 +274,7 @@ impl SessionGraphlets {
     /// each), returning whether any roster changed (so the caller persists). Drift at the
     /// data level: a Linked graphlet's persisted roster tracks the graph (the window
     /// already tracks it live via re-derive). (Graphlet wiring Phase 3 slice 2+.)
-    pub(crate) fn reconcile_all(&mut self, graph: &Graph) -> bool {
+    pub fn reconcile_all(&mut self, graph: &Graph) -> bool {
         let ids: Vec<GraphletId> = self
             .graphlets
             .iter()
@@ -294,7 +292,7 @@ impl SessionGraphlets {
 
     /// Persist this index to `graphlets.json` in the session dir. Best-effort, like the
     /// other per-session sidecars (graph / workbench / cartography).
-    pub(crate) fn save(&self, session_dir: &Path) -> std::io::Result<()> {
+    pub fn save(&self, session_dir: &Path) -> std::io::Result<()> {
         let json = serde_json::to_string_pretty(self)
             .map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidData, e))?;
         std::fs::write(session_dir.join(GRAPHLETS_FILE), json)
@@ -302,8 +300,8 @@ impl SessionGraphlets {
 
     /// Load a session's graphlet index from its sidecar, falling back to a fresh
     /// default-session index on a missing or corrupt file (the same forgiving posture
-    /// as [`load_workbench`](crate::session_ops::load_workbench)).
-    pub(crate) fn load(session_dir: &Path) -> Self {
+    /// as sibling persisted graph sidecars.
+    pub fn load(session_dir: &Path) -> Self {
         std::fs::read_to_string(session_dir.join(GRAPHLETS_FILE))
             .ok()
             .and_then(|s| serde_json::from_str(&s).ok())
@@ -318,7 +316,7 @@ impl SessionGraphlets {
 /// (where the primitives + the relation vocabulary are), forme supplies only the spec type.
 /// Corridor / Loop / Frontier / Facet kinds are later sub-slices; they fall back to the
 /// seed alone for now.
-pub(crate) fn derive_members(graph: &Graph, spec: &GraphletSpec) -> Vec<GraphMemberId> {
+pub fn derive_members(graph: &Graph, spec: &GraphletSpec) -> Vec<GraphMemberId> {
     let Some(seed) = spec.primary_anchor.as_deref().and_then(|s| s.parse().ok()) else {
         return Vec::new();
     };
@@ -371,7 +369,7 @@ fn edge_family_str(family: EdgeFamily) -> &'static str {
 
 /// The relation families a Linked graphlet's spec can filter its derivation walk to
 /// (Graphlet Card selector/family editing chips).
-pub(crate) const EDGE_FAMILIES: [EdgeFamily; 6] = [
+pub const EDGE_FAMILIES: [EdgeFamily; 6] = [
     EdgeFamily::Semantic,
     EdgeFamily::Traversal,
     EdgeFamily::Containment,
@@ -382,7 +380,7 @@ pub(crate) const EDGE_FAMILIES: [EdgeFamily; 6] = [
 
 /// Whether `family` is present in a graphlet spec's selector-string list (a Graphlet
 /// Card selector chip's checked state).
-pub(crate) fn spec_has_family(spec: &GraphletSpec, family: EdgeFamily) -> bool {
+pub fn spec_has_family(spec: &GraphletSpec, family: EdgeFamily) -> bool {
     let name = edge_family_str(family);
     spec.selectors.iter().any(|s| s.eq_ignore_ascii_case(name))
 }
@@ -390,7 +388,7 @@ pub(crate) fn spec_has_family(spec: &GraphletSpec, family: EdgeFamily) -> bool {
 /// A minimal `GraphletSpec` for a branch whose donor carried no canonical spec: a
 /// single-anchor `Session` grouping. Phase 2 enriches this from the donor's actual
 /// graphlet once branches can carry one.
-pub(crate) fn default_spec_for(anchor: GraphMemberId) -> GraphletSpec {
+pub fn default_spec_for(anchor: GraphMemberId) -> GraphletSpec {
     GraphletSpec {
         kind: GraphletKind::Session,
         anchors: vec![anchor.to_string()],
@@ -398,3 +396,6 @@ pub(crate) fn default_spec_for(anchor: GraphMemberId) -> GraphletSpec {
         selectors: Vec::new(),
     }
 }
+
+#[cfg(test)]
+mod tests;
