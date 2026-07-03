@@ -4,7 +4,7 @@ version.workspace = true
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
-description = "Gloss domain layer for the Mere browser — peripheral content-commentary strip; v0 projects an EngineDocument outline."
+description = "Gloss domain layer for Mere: outline snapshots, minimap geometry, and document-outline projection."
 documentation = "https://docs.rs/gloss"
 readme = "README.md"
 keywords = ["gloss", "outline", "mere", "uxtree"]
@@ -15,6 +15,12 @@ path = "src/lib.rs"
 
 [dependencies]
 accesskit.workspace = true
+forme.workspace = true
+glossary.workspace = true
 inker.workspace = true
+kernel.workspace = true
+orrery.workspace = true
+register-theme.workspace = true
 tracing.workspace = true
 uxtree.workspace = true
+netrender = { git = "https://github.com/mark-ik/netrender.git", branch = "main" }
