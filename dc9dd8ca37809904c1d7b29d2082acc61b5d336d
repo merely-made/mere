@@ -1,0 +1,1 @@
+Swept in, not mine: 17 design-doc renames into design_docs/archive_docs/2026-09-02_retired_plans/ that the other lane had staged (git mv) before this commit's git add. Zero-line renames; the commit message describes only the C4b.3 work. Recorded here per the workspace git conventions rather than amended.
