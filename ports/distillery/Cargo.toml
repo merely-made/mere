@@ -17,6 +17,11 @@ muniment.workspace = true
 personae.workspace = true
 pandect.workspace = true
 cambium.workspace = true
+chirograph.workspace = true
+graphshell-endpoint.workspace = true
+sceno.workspace = true
+scenomise.workspace = true
+scenotime.workspace = true
 eidetic = { workspace = true, optional = true }
 esp = { workspace = true, features = ["decoder-lora"], optional = true }
 safetensors = { version = "0.4", optional = true }

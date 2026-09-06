@@ -38,7 +38,7 @@ fn run(args: Vec<String>) -> Result<(), String> {
                 options.data_root.display(),
                 settings.profile
             );
-        }
+        },
         "inspect" => {
             if options.profile.is_some() {
                 return Err("--profile only belongs to configure".into());
@@ -59,7 +59,7 @@ fn run(args: Vec<String>) -> Result<(), String> {
                 authority.protection(),
                 authority.data_root().display()
             );
-        }
+        },
         _ => return Err(usage()),
     }
     Ok(())

@@ -13,6 +13,7 @@ headed captures.
 | `h2_browser_receipts.json`, `h2_chromium_*.png`, `h2_firefox_*.png` | headed Chromium and Firefox capture | - |
 | `h3_browser_receipts.json`, `h3_chromium_*.png` | headed Chromium capture | - |
 | `projection_authoring_receipt.json`, `projection_*.png` | current-tree Chromium/WebGPU authoring and fresh-page reopen scenarios | source and capture SHA-256 in receipt |
+| `distillery_chronicle_w1.json` | Distillery Chronicle snapshot, same-session rediscovery/resume by diff, and frozen table | byte-checked by the focused `distillery_w1` test; `distillery_chronicle_host` proves admitted serving through `ResidentProjectionHost::accept_one`; the external `distillery_chronicle_w1.scn` headed receipt proves WebRTC mounting while retaining its observed overlapping-card layout failure as an open W1 gate |
 | `practice_workspace_receipt.json` (forthcoming) | current-tree Graphshell practice workspace browser proof | source/evidence validation and scenario results recorded in the receipt |
 | `projection_refresh_surface_reuse_receipt.json`, `projection_refresh.png` | dependency refresh, Reader appearances, producer budgets, and placement reuse proof | focused test/build outcomes, source hashes, browser scenarios, and benchmark scope in receipt |
 | `co_op_process_receipt.json`, `co_op_browser_receipt.json`, `co_op_*.png` | two independent native peers over HTTP, then two browser surfaces reopening offline | source, operation and capture evidence in receipts |
