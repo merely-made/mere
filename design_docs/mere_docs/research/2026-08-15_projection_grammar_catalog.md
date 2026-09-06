@@ -89,6 +89,32 @@ The distinction between instances and derived marks matters. A bar representing 
 
 ## Capability grammar
 
+### Projection requirements and disclosed facets (2026-09-05)
+
+Agreed with Mark: **projection requirements matched against disclosed facets**
+determine which representations make sense for a subject. This applies to a
+widget, pane, or scene. Optional domain facts enrich the subject without
+requiring a new universal node type. A requirement must express semantic meaning
+as well as value shape: two numbers alone do not establish geographic coordinates,
+and a media-type label alone does not supply playable content.
+
+Keep three questions distinct: whether the disclosed facts/content/capabilities
+satisfy the projection; whether an explicit, provenance-bearing transformation
+can supply missing inputs; and whether the host authorizes the operations involved.
+Knot evaluation can produce an application surface, but recognition of an eligible
+block does not itself authorize execution. Presentation eligibility cannot grant
+storage, network, or source-write authority.
+
+Content eligibility also differs from representation detail. Cartography's
+current `RepresentationLadder` selects using screen dimensions, zoom, recency,
+and focus with hysteresis; it is not a general semantic requirements matcher.
+Graphshell's executable compiler already validates its named disclosed fields
+and values. Generalizing that bounded check remains consumer work, not a claim
+that one portable matcher is implemented.
+
+Working surfaces and their historical leaf precedents are reviewed in the
+[platform direction record](../../2026-08-23_projection_scenes_and_graph_native_platform.md#2026-09-05-review-working-surfaces-and-leaf-precedents).
+
 ### 1. Readings and operators
 
 A reading determines which graph facts are exposed to a projection and which values are derived.

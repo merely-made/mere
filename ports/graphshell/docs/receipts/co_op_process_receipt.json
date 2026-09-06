@@ -1,0 +1,1903 @@
+{
+  "result": "ok",
+  "kind": "two Rust peers in two HTTP gateway processes; no browser automation",
+  "binary_sha256": "e7f2470242ca70978cac8504ea100c73a2ccd8b2ef3d9d47c1dbfb25d7e5b9bb",
+  "comparison_sha256": "e159ca8c6ee70cb324027b92ff24e047d2bce21c0c22b04590a0aeaa7ebe841b",
+  "negative_checks": {
+    "invitation_roundtrip_installed": true,
+    "ok": true,
+    "tampered_grant_rejected": true,
+    "unauthorized_writer_rejected": true,
+    "unsigned_rule_mutation_rejected": true,
+    "wrong_container_operation_rejected": true,
+    "wrong_space_invitation_rejected": true
+  },
+  "states": {
+    "initial": [
+      {
+        "role": "founder",
+        "online": true,
+        "process_open": true,
+        "process_id": 44648,
+        "process_generation": 1,
+        "last_sync_error": null,
+        "comparison": {
+          "source": {
+            "authority": "woodshed",
+            "domain": "music.practice",
+            "resource": "set:musical-comparison"
+          },
+          "revision": "musical-comparison-fixture-v1",
+          "method": {
+            "id": "keyed-pitch-set-singleton",
+            "version": 1
+          },
+          "left": {
+            "occurrence_id": "card:1",
+            "source": {
+              "adapter": "woodshed.stage",
+              "id": "chord:Major"
+            },
+            "label": "C Major",
+            "root_pitch_class": 0,
+            "pitch_set": [
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              },
+              {
+                "pitch_class": 7,
+                "label": "G"
+              }
+            ]
+          },
+          "right": {
+            "occurrence_id": "card:2",
+            "source": {
+              "adapter": "woodshed.stage",
+              "id": "chord:Minor"
+            },
+            "label": "A Minor",
+            "root_pitch_class": 9,
+            "pitch_set": [
+              {
+                "pitch_class": 9,
+                "label": "A"
+              },
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              }
+            ]
+          },
+          "result": {
+            "version": 1,
+            "status": "applicable",
+            "shared": [
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              }
+            ],
+            "left_only": [
+              {
+                "pitch_class": 7,
+                "label": "G"
+              }
+            ],
+            "right_only": [
+              {
+                "pitch_class": 9,
+                "label": "A"
+              }
+            ],
+            "singleton_motion": {
+              "from": {
+                "pitch_class": 7,
+                "label": "G"
+              },
+              "to": {
+                "pitch_class": 9,
+                "label": "A"
+              }
+            }
+          }
+        },
+        "service": {
+          "authority_installed": false,
+          "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "local_root": "af06a3e3291714e4f356c19c9b15cd1951ec6e6662aa77be07547f289383341d",
+          "ok": true,
+          "operations": [],
+          "pending_authority_count": 0,
+          "records": [],
+          "retained_count": 0,
+          "revoked_authority_count": 0,
+          "role": "founder"
+        },
+        "records": [],
+        "retained_count": 0,
+        "traffic": []
+      },
+      {
+        "role": "member",
+        "online": true,
+        "process_open": true,
+        "process_id": 26956,
+        "process_generation": 1,
+        "last_sync_error": null,
+        "comparison": {
+          "source": {
+            "authority": "woodshed",
+            "domain": "music.practice",
+            "resource": "set:musical-comparison"
+          },
+          "revision": "musical-comparison-fixture-v1",
+          "method": {
+            "id": "keyed-pitch-set-singleton",
+            "version": 1
+          },
+          "left": {
+            "occurrence_id": "card:1",
+            "source": {
+              "adapter": "woodshed.stage",
+              "id": "chord:Major"
+            },
+            "label": "C Major",
+            "root_pitch_class": 0,
+            "pitch_set": [
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              },
+              {
+                "pitch_class": 7,
+                "label": "G"
+              }
+            ]
+          },
+          "right": {
+            "occurrence_id": "card:2",
+            "source": {
+              "adapter": "woodshed.stage",
+              "id": "chord:Minor"
+            },
+            "label": "A Minor",
+            "root_pitch_class": 9,
+            "pitch_set": [
+              {
+                "pitch_class": 9,
+                "label": "A"
+              },
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              }
+            ]
+          },
+          "result": {
+            "version": 1,
+            "status": "applicable",
+            "shared": [
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              }
+            ],
+            "left_only": [
+              {
+                "pitch_class": 7,
+                "label": "G"
+              }
+            ],
+            "right_only": [
+              {
+                "pitch_class": 9,
+                "label": "A"
+              }
+            ],
+            "singleton_motion": {
+              "from": {
+                "pitch_class": 7,
+                "label": "G"
+              },
+              "to": {
+                "pitch_class": 9,
+                "label": "A"
+              }
+            }
+          }
+        },
+        "service": {
+          "authority_installed": false,
+          "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "local_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
+          "ok": true,
+          "operations": [],
+          "pending_authority_count": 0,
+          "records": [],
+          "retained_count": 0,
+          "revoked_authority_count": 0,
+          "role": "member"
+        },
+        "records": [],
+        "retained_count": 0,
+        "traffic": []
+      }
+    ],
+    "shared": [
+      {
+        "role": "founder",
+        "online": true,
+        "process_open": true,
+        "process_id": 44648,
+        "process_generation": 1,
+        "last_sync_error": null,
+        "comparison": {
+          "source": {
+            "authority": "woodshed",
+            "domain": "music.practice",
+            "resource": "set:musical-comparison"
+          },
+          "revision": "musical-comparison-fixture-v1",
+          "method": {
+            "id": "keyed-pitch-set-singleton",
+            "version": 1
+          },
+          "left": {
+            "occurrence_id": "card:1",
+            "source": {
+              "adapter": "woodshed.stage",
+              "id": "chord:Major"
+            },
+            "label": "C Major",
+            "root_pitch_class": 0,
+            "pitch_set": [
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              },
+              {
+                "pitch_class": 7,
+                "label": "G"
+              }
+            ]
+          },
+          "right": {
+            "occurrence_id": "card:2",
+            "source": {
+              "adapter": "woodshed.stage",
+              "id": "chord:Minor"
+            },
+            "label": "A Minor",
+            "root_pitch_class": 9,
+            "pitch_set": [
+              {
+                "pitch_class": 9,
+                "label": "A"
+              },
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              }
+            ]
+          },
+          "result": {
+            "version": 1,
+            "status": "applicable",
+            "shared": [
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              }
+            ],
+            "left_only": [
+              {
+                "pitch_class": 7,
+                "label": "G"
+              }
+            ],
+            "right_only": [
+              {
+                "pitch_class": 9,
+                "label": "A"
+              }
+            ],
+            "singleton_motion": {
+              "from": {
+                "pitch_class": 7,
+                "label": "G"
+              },
+              "to": {
+                "pitch_class": 9,
+                "label": "A"
+              }
+            }
+          }
+        },
+        "service": {
+          "authority_installed": true,
+          "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "local_root": "af06a3e3291714e4f356c19c9b15cd1951ec6e6662aa77be07547f289383341d",
+          "ok": true,
+          "operations": [
+            {
+              "author_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
+              "operation_id": "367ec90086c6c71edec0a48197de3828671f73cdc0af38ff0b8723389e390753",
+              "writer": "bd11126ba11021a0c894a5290d352d5de6c8e3d4b071d5404a09b1817c050458"
+            }
+          ],
+          "pending_authority_count": 0,
+          "records": [
+            {
+              "body_utf8_hex": "7b226c656674223a7b226c6162656c223a2243204d616a6f72222c226f6363757272656e63655f6964223a22636172643a31222c2270697463685f736574223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d2c7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c22726f6f745f70697463685f636c617373223a302c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d616a6f72227d7d2c226d6574686f64223a7b226964223a226b657965642d70697463682d7365742d73696e676c65746f6e222c2276657273696f6e223a317d2c22726573756c74223a7b226c6566745f6f6e6c79223a5b7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c2272696768745f6f6e6c79223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d5d2c22736861726564223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c2273696e676c65746f6e5f6d6f74696f6e223a7b2266726f6d223a7b226c6162656c223a2247222c2270697463685f636c617373223a377d2c22746f223a7b226c6162656c223a2241222c2270697463685f636c617373223a397d7d2c22737461747573223a226170706c696361626c65222c2276657273696f6e223a317d2c227265766973696f6e223a226d75736963616c2d636f6d70617269736f6e2d666978747572652d7631222c227269676874223a7b226c6162656c223a2241204d696e6f72222c226f6363757272656e63655f6964223a22636172643a32222c2270697463685f736574223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d2c7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c22726f6f745f70697463685f636c617373223a392c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d696e6f72227d7d2c22736f75726365223a7b22617574686f72697479223a22776f6f6473686564222c22646f6d61696e223a226d757369632e7072616374696365222c227265736f75726365223a227365743a6d75736963616c2d636f6d70617269736f6e227d7d",
+              "id": "woodshed-comparison:member:0",
+              "media_type": "application/vnd.woodshed.comparison+json"
+            }
+          ],
+          "retained_count": 1,
+          "revoked_authority_count": 0,
+          "role": "founder"
+        },
+        "records": [
+          {
+            "body_utf8_hex": "7b226c656674223a7b226c6162656c223a2243204d616a6f72222c226f6363757272656e63655f6964223a22636172643a31222c2270697463685f736574223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d2c7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c22726f6f745f70697463685f636c617373223a302c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d616a6f72227d7d2c226d6574686f64223a7b226964223a226b657965642d70697463682d7365742d73696e676c65746f6e222c2276657273696f6e223a317d2c22726573756c74223a7b226c6566745f6f6e6c79223a5b7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c2272696768745f6f6e6c79223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d5d2c22736861726564223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c2273696e676c65746f6e5f6d6f74696f6e223a7b2266726f6d223a7b226c6162656c223a2247222c2270697463685f636c617373223a377d2c22746f223a7b226c6162656c223a2241222c2270697463685f636c617373223a397d7d2c22737461747573223a226170706c696361626c65222c2276657273696f6e223a317d2c227265766973696f6e223a226d75736963616c2d636f6d70617269736f6e2d666978747572652d7631222c227269676874223a7b226c6162656c223a2241204d696e6f72222c226f6363757272656e63655f6964223a22636172643a32222c2270697463685f736574223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d2c7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c22726f6f745f70697463685f636c617373223a392c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d696e6f72227d7d2c22736f75726365223a7b22617574686f72697479223a22776f6f6473686564222c22646f6d61696e223a226d757369632e7072616374696365222c227265736f75726365223a227365743a6d75736963616c2d636f6d70617269736f6e227d7d",
+            "id": "woodshed-comparison:member:0",
+            "media_type": "application/vnd.woodshed.comparison+json"
+          }
+        ],
+        "retained_count": 1,
+        "traffic": [
+          {
+            "direction": "incoming",
+            "path": "/wire",
+            "bytes": 18,
+            "sha256": "9389e6512af6fefa0599e7a946ef8eb432546cec8eb92d674ad516e2b98d7f1e"
+          },
+          {
+            "direction": "incoming",
+            "path": "/wire",
+            "bytes": 6850,
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36"
+          }
+        ]
+      },
+      {
+        "role": "member",
+        "online": true,
+        "process_open": true,
+        "process_id": 26956,
+        "process_generation": 1,
+        "last_sync_error": null,
+        "comparison": {
+          "source": {
+            "authority": "woodshed",
+            "domain": "music.practice",
+            "resource": "set:musical-comparison"
+          },
+          "revision": "musical-comparison-fixture-v1",
+          "method": {
+            "id": "keyed-pitch-set-singleton",
+            "version": 1
+          },
+          "left": {
+            "occurrence_id": "card:1",
+            "source": {
+              "adapter": "woodshed.stage",
+              "id": "chord:Major"
+            },
+            "label": "C Major",
+            "root_pitch_class": 0,
+            "pitch_set": [
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              },
+              {
+                "pitch_class": 7,
+                "label": "G"
+              }
+            ]
+          },
+          "right": {
+            "occurrence_id": "card:2",
+            "source": {
+              "adapter": "woodshed.stage",
+              "id": "chord:Minor"
+            },
+            "label": "A Minor",
+            "root_pitch_class": 9,
+            "pitch_set": [
+              {
+                "pitch_class": 9,
+                "label": "A"
+              },
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              }
+            ]
+          },
+          "result": {
+            "version": 1,
+            "status": "applicable",
+            "shared": [
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              }
+            ],
+            "left_only": [
+              {
+                "pitch_class": 7,
+                "label": "G"
+              }
+            ],
+            "right_only": [
+              {
+                "pitch_class": 9,
+                "label": "A"
+              }
+            ],
+            "singleton_motion": {
+              "from": {
+                "pitch_class": 7,
+                "label": "G"
+              },
+              "to": {
+                "pitch_class": 9,
+                "label": "A"
+              }
+            }
+          }
+        },
+        "service": {
+          "authority_installed": true,
+          "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "local_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
+          "ok": true,
+          "operations": [
+            {
+              "author_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
+              "operation_id": "367ec90086c6c71edec0a48197de3828671f73cdc0af38ff0b8723389e390753",
+              "writer": "bd11126ba11021a0c894a5290d352d5de6c8e3d4b071d5404a09b1817c050458"
+            }
+          ],
+          "pending_authority_count": 0,
+          "records": [
+            {
+              "body_utf8_hex": "7b226c656674223a7b226c6162656c223a2243204d616a6f72222c226f6363757272656e63655f6964223a22636172643a31222c2270697463685f736574223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d2c7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c22726f6f745f70697463685f636c617373223a302c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d616a6f72227d7d2c226d6574686f64223a7b226964223a226b657965642d70697463682d7365742d73696e676c65746f6e222c2276657273696f6e223a317d2c22726573756c74223a7b226c6566745f6f6e6c79223a5b7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c2272696768745f6f6e6c79223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d5d2c22736861726564223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c2273696e676c65746f6e5f6d6f74696f6e223a7b2266726f6d223a7b226c6162656c223a2247222c2270697463685f636c617373223a377d2c22746f223a7b226c6162656c223a2241222c2270697463685f636c617373223a397d7d2c22737461747573223a226170706c696361626c65222c2276657273696f6e223a317d2c227265766973696f6e223a226d75736963616c2d636f6d70617269736f6e2d666978747572652d7631222c227269676874223a7b226c6162656c223a2241204d696e6f72222c226f6363757272656e63655f6964223a22636172643a32222c2270697463685f736574223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d2c7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c22726f6f745f70697463685f636c617373223a392c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d696e6f72227d7d2c22736f75726365223a7b22617574686f72697479223a22776f6f6473686564222c22646f6d61696e223a226d757369632e7072616374696365222c227265736f75726365223a227365743a6d75736963616c2d636f6d70617269736f6e227d7d",
+              "id": "woodshed-comparison:member:0",
+              "media_type": "application/vnd.woodshed.comparison+json"
+            }
+          ],
+          "retained_count": 1,
+          "revoked_authority_count": 0,
+          "role": "member"
+        },
+        "records": [
+          {
+            "body_utf8_hex": "7b226c656674223a7b226c6162656c223a2243204d616a6f72222c226f6363757272656e63655f6964223a22636172643a31222c2270697463685f736574223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d2c7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c22726f6f745f70697463685f636c617373223a302c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d616a6f72227d7d2c226d6574686f64223a7b226964223a226b657965642d70697463682d7365742d73696e676c65746f6e222c2276657273696f6e223a317d2c22726573756c74223a7b226c6566745f6f6e6c79223a5b7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c2272696768745f6f6e6c79223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d5d2c22736861726564223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c2273696e676c65746f6e5f6d6f74696f6e223a7b2266726f6d223a7b226c6162656c223a2247222c2270697463685f636c617373223a377d2c22746f223a7b226c6162656c223a2241222c2270697463685f636c617373223a397d7d2c22737461747573223a226170706c696361626c65222c2276657273696f6e223a317d2c227265766973696f6e223a226d75736963616c2d636f6d70617269736f6e2d666978747572652d7631222c227269676874223a7b226c6162656c223a2241204d696e6f72222c226f6363757272656e63655f6964223a22636172643a32222c2270697463685f736574223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d2c7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c22726f6f745f70697463685f636c617373223a392c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d696e6f72227d7d2c22736f75726365223a7b22617574686f72697479223a22776f6f6473686564222c22646f6d61696e223a226d757369632e7072616374696365222c227265736f75726365223a227365743a6d75736963616c2d636f6d70617269736f6e227d7d",
+            "id": "woodshed-comparison:member:0",
+            "media_type": "application/vnd.woodshed.comparison+json"
+          }
+        ],
+        "retained_count": 1,
+        "traffic": [
+          {
+            "direction": "outgoing",
+            "path": "/invitation",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "direction": "outgoing",
+            "path": "/wire",
+            "bytes": 18,
+            "sha256": "9389e6512af6fefa0599e7a946ef8eb432546cec8eb92d674ad516e2b98d7f1e"
+          },
+          {
+            "direction": "outgoing",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "direction": "outgoing",
+            "path": "/wire",
+            "bytes": 6850,
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36"
+          },
+          {
+            "direction": "outgoing",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        ]
+      }
+    ],
+    "closed": [
+      {
+        "role": "founder",
+        "online": false,
+        "process_open": false,
+        "process_id": null,
+        "process_generation": 1,
+        "last_sync_error": null,
+        "comparison": {
+          "source": {
+            "authority": "woodshed",
+            "domain": "music.practice",
+            "resource": "set:musical-comparison"
+          },
+          "revision": "musical-comparison-fixture-v1",
+          "method": {
+            "id": "keyed-pitch-set-singleton",
+            "version": 1
+          },
+          "left": {
+            "occurrence_id": "card:1",
+            "source": {
+              "adapter": "woodshed.stage",
+              "id": "chord:Major"
+            },
+            "label": "C Major",
+            "root_pitch_class": 0,
+            "pitch_set": [
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              },
+              {
+                "pitch_class": 7,
+                "label": "G"
+              }
+            ]
+          },
+          "right": {
+            "occurrence_id": "card:2",
+            "source": {
+              "adapter": "woodshed.stage",
+              "id": "chord:Minor"
+            },
+            "label": "A Minor",
+            "root_pitch_class": 9,
+            "pitch_set": [
+              {
+                "pitch_class": 9,
+                "label": "A"
+              },
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              }
+            ]
+          },
+          "result": {
+            "version": 1,
+            "status": "applicable",
+            "shared": [
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              }
+            ],
+            "left_only": [
+              {
+                "pitch_class": 7,
+                "label": "G"
+              }
+            ],
+            "right_only": [
+              {
+                "pitch_class": 9,
+                "label": "A"
+              }
+            ],
+            "singleton_motion": {
+              "from": {
+                "pitch_class": 7,
+                "label": "G"
+              },
+              "to": {
+                "pitch_class": 9,
+                "label": "A"
+              }
+            }
+          }
+        },
+        "service": {
+          "authority_installed": true,
+          "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "local_root": "af06a3e3291714e4f356c19c9b15cd1951ec6e6662aa77be07547f289383341d",
+          "ok": true,
+          "operations": [
+            {
+              "author_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
+              "operation_id": "367ec90086c6c71edec0a48197de3828671f73cdc0af38ff0b8723389e390753",
+              "writer": "bd11126ba11021a0c894a5290d352d5de6c8e3d4b071d5404a09b1817c050458"
+            }
+          ],
+          "pending_authority_count": 0,
+          "records": [
+            {
+              "body_utf8_hex": "7b226c656674223a7b226c6162656c223a2243204d616a6f72222c226f6363757272656e63655f6964223a22636172643a31222c2270697463685f736574223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d2c7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c22726f6f745f70697463685f636c617373223a302c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d616a6f72227d7d2c226d6574686f64223a7b226964223a226b657965642d70697463682d7365742d73696e676c65746f6e222c2276657273696f6e223a317d2c22726573756c74223a7b226c6566745f6f6e6c79223a5b7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c2272696768745f6f6e6c79223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d5d2c22736861726564223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c2273696e676c65746f6e5f6d6f74696f6e223a7b2266726f6d223a7b226c6162656c223a2247222c2270697463685f636c617373223a377d2c22746f223a7b226c6162656c223a2241222c2270697463685f636c617373223a397d7d2c22737461747573223a226170706c696361626c65222c2276657273696f6e223a317d2c227265766973696f6e223a226d75736963616c2d636f6d70617269736f6e2d666978747572652d7631222c227269676874223a7b226c6162656c223a2241204d696e6f72222c226f6363757272656e63655f6964223a22636172643a32222c2270697463685f736574223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d2c7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c22726f6f745f70697463685f636c617373223a392c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d696e6f72227d7d2c22736f75726365223a7b22617574686f72697479223a22776f6f6473686564222c22646f6d61696e223a226d757369632e7072616374696365222c227265736f75726365223a227365743a6d75736963616c2d636f6d70617269736f6e227d7d",
+              "id": "woodshed-comparison:member:0",
+              "media_type": "application/vnd.woodshed.comparison+json"
+            }
+          ],
+          "retained_count": 1,
+          "revoked_authority_count": 0,
+          "role": "founder"
+        },
+        "records": [
+          {
+            "body_utf8_hex": "7b226c656674223a7b226c6162656c223a2243204d616a6f72222c226f6363757272656e63655f6964223a22636172643a31222c2270697463685f736574223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d2c7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c22726f6f745f70697463685f636c617373223a302c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d616a6f72227d7d2c226d6574686f64223a7b226964223a226b657965642d70697463682d7365742d73696e676c65746f6e222c2276657273696f6e223a317d2c22726573756c74223a7b226c6566745f6f6e6c79223a5b7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c2272696768745f6f6e6c79223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d5d2c22736861726564223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c2273696e676c65746f6e5f6d6f74696f6e223a7b2266726f6d223a7b226c6162656c223a2247222c2270697463685f636c617373223a377d2c22746f223a7b226c6162656c223a2241222c2270697463685f636c617373223a397d7d2c22737461747573223a226170706c696361626c65222c2276657273696f6e223a317d2c227265766973696f6e223a226d75736963616c2d636f6d70617269736f6e2d666978747572652d7631222c227269676874223a7b226c6162656c223a2241204d696e6f72222c226f6363757272656e63655f6964223a22636172643a32222c2270697463685f736574223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d2c7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c22726f6f745f70697463685f636c617373223a392c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d696e6f72227d7d2c22736f75726365223a7b22617574686f72697479223a22776f6f6473686564222c22646f6d61696e223a226d757369632e7072616374696365222c227265736f75726365223a227365743a6d75736963616c2d636f6d70617269736f6e227d7d",
+            "id": "woodshed-comparison:member:0",
+            "media_type": "application/vnd.woodshed.comparison+json"
+          }
+        ],
+        "retained_count": 1,
+        "traffic": [
+          {
+            "direction": "incoming",
+            "path": "/wire",
+            "bytes": 18,
+            "sha256": "9389e6512af6fefa0599e7a946ef8eb432546cec8eb92d674ad516e2b98d7f1e"
+          },
+          {
+            "direction": "incoming",
+            "path": "/wire",
+            "bytes": 6850,
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36"
+          }
+        ]
+      },
+      {
+        "role": "member",
+        "online": false,
+        "process_open": false,
+        "process_id": null,
+        "process_generation": 1,
+        "last_sync_error": null,
+        "comparison": {
+          "source": {
+            "authority": "woodshed",
+            "domain": "music.practice",
+            "resource": "set:musical-comparison"
+          },
+          "revision": "musical-comparison-fixture-v1",
+          "method": {
+            "id": "keyed-pitch-set-singleton",
+            "version": 1
+          },
+          "left": {
+            "occurrence_id": "card:1",
+            "source": {
+              "adapter": "woodshed.stage",
+              "id": "chord:Major"
+            },
+            "label": "C Major",
+            "root_pitch_class": 0,
+            "pitch_set": [
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              },
+              {
+                "pitch_class": 7,
+                "label": "G"
+              }
+            ]
+          },
+          "right": {
+            "occurrence_id": "card:2",
+            "source": {
+              "adapter": "woodshed.stage",
+              "id": "chord:Minor"
+            },
+            "label": "A Minor",
+            "root_pitch_class": 9,
+            "pitch_set": [
+              {
+                "pitch_class": 9,
+                "label": "A"
+              },
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              }
+            ]
+          },
+          "result": {
+            "version": 1,
+            "status": "applicable",
+            "shared": [
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              }
+            ],
+            "left_only": [
+              {
+                "pitch_class": 7,
+                "label": "G"
+              }
+            ],
+            "right_only": [
+              {
+                "pitch_class": 9,
+                "label": "A"
+              }
+            ],
+            "singleton_motion": {
+              "from": {
+                "pitch_class": 7,
+                "label": "G"
+              },
+              "to": {
+                "pitch_class": 9,
+                "label": "A"
+              }
+            }
+          }
+        },
+        "service": {
+          "authority_installed": true,
+          "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "local_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
+          "ok": true,
+          "operations": [
+            {
+              "author_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
+              "operation_id": "367ec90086c6c71edec0a48197de3828671f73cdc0af38ff0b8723389e390753",
+              "writer": "bd11126ba11021a0c894a5290d352d5de6c8e3d4b071d5404a09b1817c050458"
+            }
+          ],
+          "pending_authority_count": 0,
+          "records": [
+            {
+              "body_utf8_hex": "7b226c656674223a7b226c6162656c223a2243204d616a6f72222c226f6363757272656e63655f6964223a22636172643a31222c2270697463685f736574223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d2c7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c22726f6f745f70697463685f636c617373223a302c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d616a6f72227d7d2c226d6574686f64223a7b226964223a226b657965642d70697463682d7365742d73696e676c65746f6e222c2276657273696f6e223a317d2c22726573756c74223a7b226c6566745f6f6e6c79223a5b7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c2272696768745f6f6e6c79223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d5d2c22736861726564223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c2273696e676c65746f6e5f6d6f74696f6e223a7b2266726f6d223a7b226c6162656c223a2247222c2270697463685f636c617373223a377d2c22746f223a7b226c6162656c223a2241222c2270697463685f636c617373223a397d7d2c22737461747573223a226170706c696361626c65222c2276657273696f6e223a317d2c227265766973696f6e223a226d75736963616c2d636f6d70617269736f6e2d666978747572652d7631222c227269676874223a7b226c6162656c223a2241204d696e6f72222c226f6363757272656e63655f6964223a22636172643a32222c2270697463685f736574223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d2c7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c22726f6f745f70697463685f636c617373223a392c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d696e6f72227d7d2c22736f75726365223a7b22617574686f72697479223a22776f6f6473686564222c22646f6d61696e223a226d757369632e7072616374696365222c227265736f75726365223a227365743a6d75736963616c2d636f6d70617269736f6e227d7d",
+              "id": "woodshed-comparison:member:0",
+              "media_type": "application/vnd.woodshed.comparison+json"
+            }
+          ],
+          "retained_count": 1,
+          "revoked_authority_count": 0,
+          "role": "member"
+        },
+        "records": [
+          {
+            "body_utf8_hex": "7b226c656674223a7b226c6162656c223a2243204d616a6f72222c226f6363757272656e63655f6964223a22636172643a31222c2270697463685f736574223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d2c7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c22726f6f745f70697463685f636c617373223a302c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d616a6f72227d7d2c226d6574686f64223a7b226964223a226b657965642d70697463682d7365742d73696e676c65746f6e222c2276657273696f6e223a317d2c22726573756c74223a7b226c6566745f6f6e6c79223a5b7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c2272696768745f6f6e6c79223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d5d2c22736861726564223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c2273696e676c65746f6e5f6d6f74696f6e223a7b2266726f6d223a7b226c6162656c223a2247222c2270697463685f636c617373223a377d2c22746f223a7b226c6162656c223a2241222c2270697463685f636c617373223a397d7d2c22737461747573223a226170706c696361626c65222c2276657273696f6e223a317d2c227265766973696f6e223a226d75736963616c2d636f6d70617269736f6e2d666978747572652d7631222c227269676874223a7b226c6162656c223a2241204d696e6f72222c226f6363757272656e63655f6964223a22636172643a32222c2270697463685f736574223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d2c7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c22726f6f745f70697463685f636c617373223a392c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d696e6f72227d7d2c22736f75726365223a7b22617574686f72697479223a22776f6f6473686564222c22646f6d61696e223a226d757369632e7072616374696365222c227265736f75726365223a227365743a6d75736963616c2d636f6d70617269736f6e227d7d",
+            "id": "woodshed-comparison:member:0",
+            "media_type": "application/vnd.woodshed.comparison+json"
+          }
+        ],
+        "retained_count": 1,
+        "traffic": [
+          {
+            "direction": "outgoing",
+            "path": "/invitation",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "direction": "outgoing",
+            "path": "/wire",
+            "bytes": 18,
+            "sha256": "9389e6512af6fefa0599e7a946ef8eb432546cec8eb92d674ad516e2b98d7f1e"
+          },
+          {
+            "direction": "outgoing",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "direction": "outgoing",
+            "path": "/wire",
+            "bytes": 6850,
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36"
+          },
+          {
+            "direction": "outgoing",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        ]
+      }
+    ],
+    "reopened_offline": [
+      {
+        "role": "founder",
+        "online": false,
+        "process_open": true,
+        "process_id": 51880,
+        "process_generation": 2,
+        "last_sync_error": null,
+        "comparison": {
+          "source": {
+            "authority": "woodshed",
+            "domain": "music.practice",
+            "resource": "set:musical-comparison"
+          },
+          "revision": "musical-comparison-fixture-v1",
+          "method": {
+            "id": "keyed-pitch-set-singleton",
+            "version": 1
+          },
+          "left": {
+            "occurrence_id": "card:1",
+            "source": {
+              "adapter": "woodshed.stage",
+              "id": "chord:Major"
+            },
+            "label": "C Major",
+            "root_pitch_class": 0,
+            "pitch_set": [
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              },
+              {
+                "pitch_class": 7,
+                "label": "G"
+              }
+            ]
+          },
+          "right": {
+            "occurrence_id": "card:2",
+            "source": {
+              "adapter": "woodshed.stage",
+              "id": "chord:Minor"
+            },
+            "label": "A Minor",
+            "root_pitch_class": 9,
+            "pitch_set": [
+              {
+                "pitch_class": 9,
+                "label": "A"
+              },
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              }
+            ]
+          },
+          "result": {
+            "version": 1,
+            "status": "applicable",
+            "shared": [
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              }
+            ],
+            "left_only": [
+              {
+                "pitch_class": 7,
+                "label": "G"
+              }
+            ],
+            "right_only": [
+              {
+                "pitch_class": 9,
+                "label": "A"
+              }
+            ],
+            "singleton_motion": {
+              "from": {
+                "pitch_class": 7,
+                "label": "G"
+              },
+              "to": {
+                "pitch_class": 9,
+                "label": "A"
+              }
+            }
+          }
+        },
+        "service": {
+          "authority_installed": true,
+          "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "local_root": "af06a3e3291714e4f356c19c9b15cd1951ec6e6662aa77be07547f289383341d",
+          "ok": true,
+          "operations": [
+            {
+              "author_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
+              "operation_id": "367ec90086c6c71edec0a48197de3828671f73cdc0af38ff0b8723389e390753",
+              "writer": "bd11126ba11021a0c894a5290d352d5de6c8e3d4b071d5404a09b1817c050458"
+            }
+          ],
+          "pending_authority_count": 0,
+          "records": [
+            {
+              "body_utf8_hex": "7b226c656674223a7b226c6162656c223a2243204d616a6f72222c226f6363757272656e63655f6964223a22636172643a31222c2270697463685f736574223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d2c7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c22726f6f745f70697463685f636c617373223a302c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d616a6f72227d7d2c226d6574686f64223a7b226964223a226b657965642d70697463682d7365742d73696e676c65746f6e222c2276657273696f6e223a317d2c22726573756c74223a7b226c6566745f6f6e6c79223a5b7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c2272696768745f6f6e6c79223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d5d2c22736861726564223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c2273696e676c65746f6e5f6d6f74696f6e223a7b2266726f6d223a7b226c6162656c223a2247222c2270697463685f636c617373223a377d2c22746f223a7b226c6162656c223a2241222c2270697463685f636c617373223a397d7d2c22737461747573223a226170706c696361626c65222c2276657273696f6e223a317d2c227265766973696f6e223a226d75736963616c2d636f6d70617269736f6e2d666978747572652d7631222c227269676874223a7b226c6162656c223a2241204d696e6f72222c226f6363757272656e63655f6964223a22636172643a32222c2270697463685f736574223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d2c7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c22726f6f745f70697463685f636c617373223a392c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d696e6f72227d7d2c22736f75726365223a7b22617574686f72697479223a22776f6f6473686564222c22646f6d61696e223a226d757369632e7072616374696365222c227265736f75726365223a227365743a6d75736963616c2d636f6d70617269736f6e227d7d",
+              "id": "woodshed-comparison:member:0",
+              "media_type": "application/vnd.woodshed.comparison+json"
+            }
+          ],
+          "retained_count": 1,
+          "revoked_authority_count": 0,
+          "role": "founder"
+        },
+        "records": [
+          {
+            "body_utf8_hex": "7b226c656674223a7b226c6162656c223a2243204d616a6f72222c226f6363757272656e63655f6964223a22636172643a31222c2270697463685f736574223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d2c7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c22726f6f745f70697463685f636c617373223a302c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d616a6f72227d7d2c226d6574686f64223a7b226964223a226b657965642d70697463682d7365742d73696e676c65746f6e222c2276657273696f6e223a317d2c22726573756c74223a7b226c6566745f6f6e6c79223a5b7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c2272696768745f6f6e6c79223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d5d2c22736861726564223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c2273696e676c65746f6e5f6d6f74696f6e223a7b2266726f6d223a7b226c6162656c223a2247222c2270697463685f636c617373223a377d2c22746f223a7b226c6162656c223a2241222c2270697463685f636c617373223a397d7d2c22737461747573223a226170706c696361626c65222c2276657273696f6e223a317d2c227265766973696f6e223a226d75736963616c2d636f6d70617269736f6e2d666978747572652d7631222c227269676874223a7b226c6162656c223a2241204d696e6f72222c226f6363757272656e63655f6964223a22636172643a32222c2270697463685f736574223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d2c7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c22726f6f745f70697463685f636c617373223a392c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d696e6f72227d7d2c22736f75726365223a7b22617574686f72697479223a22776f6f6473686564222c22646f6d61696e223a226d757369632e7072616374696365222c227265736f75726365223a227365743a6d75736963616c2d636f6d70617269736f6e227d7d",
+            "id": "woodshed-comparison:member:0",
+            "media_type": "application/vnd.woodshed.comparison+json"
+          }
+        ],
+        "retained_count": 1,
+        "traffic": [
+          {
+            "direction": "incoming",
+            "path": "/wire",
+            "bytes": 18,
+            "sha256": "9389e6512af6fefa0599e7a946ef8eb432546cec8eb92d674ad516e2b98d7f1e"
+          },
+          {
+            "direction": "incoming",
+            "path": "/wire",
+            "bytes": 6850,
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36"
+          }
+        ]
+      },
+      {
+        "role": "member",
+        "online": false,
+        "process_open": true,
+        "process_id": 26392,
+        "process_generation": 2,
+        "last_sync_error": null,
+        "comparison": {
+          "source": {
+            "authority": "woodshed",
+            "domain": "music.practice",
+            "resource": "set:musical-comparison"
+          },
+          "revision": "musical-comparison-fixture-v1",
+          "method": {
+            "id": "keyed-pitch-set-singleton",
+            "version": 1
+          },
+          "left": {
+            "occurrence_id": "card:1",
+            "source": {
+              "adapter": "woodshed.stage",
+              "id": "chord:Major"
+            },
+            "label": "C Major",
+            "root_pitch_class": 0,
+            "pitch_set": [
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              },
+              {
+                "pitch_class": 7,
+                "label": "G"
+              }
+            ]
+          },
+          "right": {
+            "occurrence_id": "card:2",
+            "source": {
+              "adapter": "woodshed.stage",
+              "id": "chord:Minor"
+            },
+            "label": "A Minor",
+            "root_pitch_class": 9,
+            "pitch_set": [
+              {
+                "pitch_class": 9,
+                "label": "A"
+              },
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              }
+            ]
+          },
+          "result": {
+            "version": 1,
+            "status": "applicable",
+            "shared": [
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              }
+            ],
+            "left_only": [
+              {
+                "pitch_class": 7,
+                "label": "G"
+              }
+            ],
+            "right_only": [
+              {
+                "pitch_class": 9,
+                "label": "A"
+              }
+            ],
+            "singleton_motion": {
+              "from": {
+                "pitch_class": 7,
+                "label": "G"
+              },
+              "to": {
+                "pitch_class": 9,
+                "label": "A"
+              }
+            }
+          }
+        },
+        "service": {
+          "authority_installed": true,
+          "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "local_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
+          "ok": true,
+          "operations": [
+            {
+              "author_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
+              "operation_id": "367ec90086c6c71edec0a48197de3828671f73cdc0af38ff0b8723389e390753",
+              "writer": "bd11126ba11021a0c894a5290d352d5de6c8e3d4b071d5404a09b1817c050458"
+            }
+          ],
+          "pending_authority_count": 0,
+          "records": [
+            {
+              "body_utf8_hex": "7b226c656674223a7b226c6162656c223a2243204d616a6f72222c226f6363757272656e63655f6964223a22636172643a31222c2270697463685f736574223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d2c7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c22726f6f745f70697463685f636c617373223a302c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d616a6f72227d7d2c226d6574686f64223a7b226964223a226b657965642d70697463682d7365742d73696e676c65746f6e222c2276657273696f6e223a317d2c22726573756c74223a7b226c6566745f6f6e6c79223a5b7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c2272696768745f6f6e6c79223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d5d2c22736861726564223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c2273696e676c65746f6e5f6d6f74696f6e223a7b2266726f6d223a7b226c6162656c223a2247222c2270697463685f636c617373223a377d2c22746f223a7b226c6162656c223a2241222c2270697463685f636c617373223a397d7d2c22737461747573223a226170706c696361626c65222c2276657273696f6e223a317d2c227265766973696f6e223a226d75736963616c2d636f6d70617269736f6e2d666978747572652d7631222c227269676874223a7b226c6162656c223a2241204d696e6f72222c226f6363757272656e63655f6964223a22636172643a32222c2270697463685f736574223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d2c7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c22726f6f745f70697463685f636c617373223a392c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d696e6f72227d7d2c22736f75726365223a7b22617574686f72697479223a22776f6f6473686564222c22646f6d61696e223a226d757369632e7072616374696365222c227265736f75726365223a227365743a6d75736963616c2d636f6d70617269736f6e227d7d",
+              "id": "woodshed-comparison:member:0",
+              "media_type": "application/vnd.woodshed.comparison+json"
+            }
+          ],
+          "retained_count": 1,
+          "revoked_authority_count": 0,
+          "role": "member"
+        },
+        "records": [
+          {
+            "body_utf8_hex": "7b226c656674223a7b226c6162656c223a2243204d616a6f72222c226f6363757272656e63655f6964223a22636172643a31222c2270697463685f736574223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d2c7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c22726f6f745f70697463685f636c617373223a302c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d616a6f72227d7d2c226d6574686f64223a7b226964223a226b657965642d70697463682d7365742d73696e676c65746f6e222c2276657273696f6e223a317d2c22726573756c74223a7b226c6566745f6f6e6c79223a5b7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c2272696768745f6f6e6c79223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d5d2c22736861726564223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c2273696e676c65746f6e5f6d6f74696f6e223a7b2266726f6d223a7b226c6162656c223a2247222c2270697463685f636c617373223a377d2c22746f223a7b226c6162656c223a2241222c2270697463685f636c617373223a397d7d2c22737461747573223a226170706c696361626c65222c2276657273696f6e223a317d2c227265766973696f6e223a226d75736963616c2d636f6d70617269736f6e2d666978747572652d7631222c227269676874223a7b226c6162656c223a2241204d696e6f72222c226f6363757272656e63655f6964223a22636172643a32222c2270697463685f736574223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d2c7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c22726f6f745f70697463685f636c617373223a392c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d696e6f72227d7d2c22736f75726365223a7b22617574686f72697479223a22776f6f6473686564222c22646f6d61696e223a226d757369632e7072616374696365222c227265736f75726365223a227365743a6d75736963616c2d636f6d70617269736f6e227d7d",
+            "id": "woodshed-comparison:member:0",
+            "media_type": "application/vnd.woodshed.comparison+json"
+          }
+        ],
+        "retained_count": 1,
+        "traffic": [
+          {
+            "direction": "outgoing",
+            "path": "/invitation",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "direction": "outgoing",
+            "path": "/wire",
+            "bytes": 18,
+            "sha256": "9389e6512af6fefa0599e7a946ef8eb432546cec8eb92d674ad516e2b98d7f1e"
+          },
+          {
+            "direction": "outgoing",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "direction": "outgoing",
+            "path": "/wire",
+            "bytes": 6850,
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36"
+          },
+          {
+            "direction": "outgoing",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        ]
+      }
+    ],
+    "resynced": [
+      {
+        "role": "founder",
+        "online": true,
+        "process_open": true,
+        "process_id": 51880,
+        "process_generation": 2,
+        "last_sync_error": "HTTP Error 409: Conflict",
+        "comparison": {
+          "source": {
+            "authority": "woodshed",
+            "domain": "music.practice",
+            "resource": "set:musical-comparison"
+          },
+          "revision": "musical-comparison-fixture-v1",
+          "method": {
+            "id": "keyed-pitch-set-singleton",
+            "version": 1
+          },
+          "left": {
+            "occurrence_id": "card:1",
+            "source": {
+              "adapter": "woodshed.stage",
+              "id": "chord:Major"
+            },
+            "label": "C Major",
+            "root_pitch_class": 0,
+            "pitch_set": [
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              },
+              {
+                "pitch_class": 7,
+                "label": "G"
+              }
+            ]
+          },
+          "right": {
+            "occurrence_id": "card:2",
+            "source": {
+              "adapter": "woodshed.stage",
+              "id": "chord:Minor"
+            },
+            "label": "A Minor",
+            "root_pitch_class": 9,
+            "pitch_set": [
+              {
+                "pitch_class": 9,
+                "label": "A"
+              },
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              }
+            ]
+          },
+          "result": {
+            "version": 1,
+            "status": "applicable",
+            "shared": [
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              }
+            ],
+            "left_only": [
+              {
+                "pitch_class": 7,
+                "label": "G"
+              }
+            ],
+            "right_only": [
+              {
+                "pitch_class": 9,
+                "label": "A"
+              }
+            ],
+            "singleton_motion": {
+              "from": {
+                "pitch_class": 7,
+                "label": "G"
+              },
+              "to": {
+                "pitch_class": 9,
+                "label": "A"
+              }
+            }
+          }
+        },
+        "service": {
+          "authority_installed": true,
+          "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "local_root": "af06a3e3291714e4f356c19c9b15cd1951ec6e6662aa77be07547f289383341d",
+          "ok": true,
+          "operations": [
+            {
+              "author_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
+              "operation_id": "367ec90086c6c71edec0a48197de3828671f73cdc0af38ff0b8723389e390753",
+              "writer": "bd11126ba11021a0c894a5290d352d5de6c8e3d4b071d5404a09b1817c050458"
+            }
+          ],
+          "pending_authority_count": 0,
+          "records": [
+            {
+              "body_utf8_hex": "7b226c656674223a7b226c6162656c223a2243204d616a6f72222c226f6363757272656e63655f6964223a22636172643a31222c2270697463685f736574223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d2c7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c22726f6f745f70697463685f636c617373223a302c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d616a6f72227d7d2c226d6574686f64223a7b226964223a226b657965642d70697463682d7365742d73696e676c65746f6e222c2276657273696f6e223a317d2c22726573756c74223a7b226c6566745f6f6e6c79223a5b7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c2272696768745f6f6e6c79223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d5d2c22736861726564223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c2273696e676c65746f6e5f6d6f74696f6e223a7b2266726f6d223a7b226c6162656c223a2247222c2270697463685f636c617373223a377d2c22746f223a7b226c6162656c223a2241222c2270697463685f636c617373223a397d7d2c22737461747573223a226170706c696361626c65222c2276657273696f6e223a317d2c227265766973696f6e223a226d75736963616c2d636f6d70617269736f6e2d666978747572652d7631222c227269676874223a7b226c6162656c223a2241204d696e6f72222c226f6363757272656e63655f6964223a22636172643a32222c2270697463685f736574223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d2c7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c22726f6f745f70697463685f636c617373223a392c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d696e6f72227d7d2c22736f75726365223a7b22617574686f72697479223a22776f6f6473686564222c22646f6d61696e223a226d757369632e7072616374696365222c227265736f75726365223a227365743a6d75736963616c2d636f6d70617269736f6e227d7d",
+              "id": "woodshed-comparison:member:0",
+              "media_type": "application/vnd.woodshed.comparison+json"
+            }
+          ],
+          "retained_count": 1,
+          "revoked_authority_count": 0,
+          "role": "founder"
+        },
+        "records": [
+          {
+            "body_utf8_hex": "7b226c656674223a7b226c6162656c223a2243204d616a6f72222c226f6363757272656e63655f6964223a22636172643a31222c2270697463685f736574223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d2c7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c22726f6f745f70697463685f636c617373223a302c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d616a6f72227d7d2c226d6574686f64223a7b226964223a226b657965642d70697463682d7365742d73696e676c65746f6e222c2276657273696f6e223a317d2c22726573756c74223a7b226c6566745f6f6e6c79223a5b7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c2272696768745f6f6e6c79223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d5d2c22736861726564223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c2273696e676c65746f6e5f6d6f74696f6e223a7b2266726f6d223a7b226c6162656c223a2247222c2270697463685f636c617373223a377d2c22746f223a7b226c6162656c223a2241222c2270697463685f636c617373223a397d7d2c22737461747573223a226170706c696361626c65222c2276657273696f6e223a317d2c227265766973696f6e223a226d75736963616c2d636f6d70617269736f6e2d666978747572652d7631222c227269676874223a7b226c6162656c223a2241204d696e6f72222c226f6363757272656e63655f6964223a22636172643a32222c2270697463685f736574223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d2c7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c22726f6f745f70697463685f636c617373223a392c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d696e6f72227d7d2c22736f75726365223a7b22617574686f72697479223a22776f6f6473686564222c22646f6d61696e223a226d757369632e7072616374696365222c227265736f75726365223a227365743a6d75736963616c2d636f6d70617269736f6e227d7d",
+            "id": "woodshed-comparison:member:0",
+            "media_type": "application/vnd.woodshed.comparison+json"
+          }
+        ],
+        "retained_count": 1,
+        "traffic": [
+          {
+            "direction": "incoming",
+            "path": "/wire",
+            "bytes": 18,
+            "sha256": "9389e6512af6fefa0599e7a946ef8eb432546cec8eb92d674ad516e2b98d7f1e"
+          },
+          {
+            "direction": "incoming",
+            "path": "/wire",
+            "bytes": 6850,
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36"
+          },
+          {
+            "direction": "incoming",
+            "path": "/wire",
+            "bytes": 6850,
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36"
+          }
+        ]
+      },
+      {
+        "role": "member",
+        "online": true,
+        "process_open": true,
+        "process_id": 26392,
+        "process_generation": 2,
+        "last_sync_error": null,
+        "comparison": {
+          "source": {
+            "authority": "woodshed",
+            "domain": "music.practice",
+            "resource": "set:musical-comparison"
+          },
+          "revision": "musical-comparison-fixture-v1",
+          "method": {
+            "id": "keyed-pitch-set-singleton",
+            "version": 1
+          },
+          "left": {
+            "occurrence_id": "card:1",
+            "source": {
+              "adapter": "woodshed.stage",
+              "id": "chord:Major"
+            },
+            "label": "C Major",
+            "root_pitch_class": 0,
+            "pitch_set": [
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              },
+              {
+                "pitch_class": 7,
+                "label": "G"
+              }
+            ]
+          },
+          "right": {
+            "occurrence_id": "card:2",
+            "source": {
+              "adapter": "woodshed.stage",
+              "id": "chord:Minor"
+            },
+            "label": "A Minor",
+            "root_pitch_class": 9,
+            "pitch_set": [
+              {
+                "pitch_class": 9,
+                "label": "A"
+              },
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              }
+            ]
+          },
+          "result": {
+            "version": 1,
+            "status": "applicable",
+            "shared": [
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              }
+            ],
+            "left_only": [
+              {
+                "pitch_class": 7,
+                "label": "G"
+              }
+            ],
+            "right_only": [
+              {
+                "pitch_class": 9,
+                "label": "A"
+              }
+            ],
+            "singleton_motion": {
+              "from": {
+                "pitch_class": 7,
+                "label": "G"
+              },
+              "to": {
+                "pitch_class": 9,
+                "label": "A"
+              }
+            }
+          }
+        },
+        "service": {
+          "authority_installed": true,
+          "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "local_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
+          "ok": true,
+          "operations": [
+            {
+              "author_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
+              "operation_id": "367ec90086c6c71edec0a48197de3828671f73cdc0af38ff0b8723389e390753",
+              "writer": "bd11126ba11021a0c894a5290d352d5de6c8e3d4b071d5404a09b1817c050458"
+            }
+          ],
+          "pending_authority_count": 0,
+          "records": [
+            {
+              "body_utf8_hex": "7b226c656674223a7b226c6162656c223a2243204d616a6f72222c226f6363757272656e63655f6964223a22636172643a31222c2270697463685f736574223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d2c7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c22726f6f745f70697463685f636c617373223a302c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d616a6f72227d7d2c226d6574686f64223a7b226964223a226b657965642d70697463682d7365742d73696e676c65746f6e222c2276657273696f6e223a317d2c22726573756c74223a7b226c6566745f6f6e6c79223a5b7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c2272696768745f6f6e6c79223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d5d2c22736861726564223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c2273696e676c65746f6e5f6d6f74696f6e223a7b2266726f6d223a7b226c6162656c223a2247222c2270697463685f636c617373223a377d2c22746f223a7b226c6162656c223a2241222c2270697463685f636c617373223a397d7d2c22737461747573223a226170706c696361626c65222c2276657273696f6e223a317d2c227265766973696f6e223a226d75736963616c2d636f6d70617269736f6e2d666978747572652d7631222c227269676874223a7b226c6162656c223a2241204d696e6f72222c226f6363757272656e63655f6964223a22636172643a32222c2270697463685f736574223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d2c7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c22726f6f745f70697463685f636c617373223a392c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d696e6f72227d7d2c22736f75726365223a7b22617574686f72697479223a22776f6f6473686564222c22646f6d61696e223a226d757369632e7072616374696365222c227265736f75726365223a227365743a6d75736963616c2d636f6d70617269736f6e227d7d",
+              "id": "woodshed-comparison:member:0",
+              "media_type": "application/vnd.woodshed.comparison+json"
+            }
+          ],
+          "retained_count": 1,
+          "revoked_authority_count": 0,
+          "role": "member"
+        },
+        "records": [
+          {
+            "body_utf8_hex": "7b226c656674223a7b226c6162656c223a2243204d616a6f72222c226f6363757272656e63655f6964223a22636172643a31222c2270697463685f736574223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d2c7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c22726f6f745f70697463685f636c617373223a302c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d616a6f72227d7d2c226d6574686f64223a7b226964223a226b657965642d70697463682d7365742d73696e676c65746f6e222c2276657273696f6e223a317d2c22726573756c74223a7b226c6566745f6f6e6c79223a5b7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c2272696768745f6f6e6c79223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d5d2c22736861726564223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c2273696e676c65746f6e5f6d6f74696f6e223a7b2266726f6d223a7b226c6162656c223a2247222c2270697463685f636c617373223a377d2c22746f223a7b226c6162656c223a2241222c2270697463685f636c617373223a397d7d2c22737461747573223a226170706c696361626c65222c2276657273696f6e223a317d2c227265766973696f6e223a226d75736963616c2d636f6d70617269736f6e2d666978747572652d7631222c227269676874223a7b226c6162656c223a2241204d696e6f72222c226f6363757272656e63655f6964223a22636172643a32222c2270697463685f736574223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d2c7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c22726f6f745f70697463685f636c617373223a392c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d696e6f72227d7d2c22736f75726365223a7b22617574686f72697479223a22776f6f6473686564222c22646f6d61696e223a226d757369632e7072616374696365222c227265736f75726365223a227365743a6d75736963616c2d636f6d70617269736f6e227d7d",
+            "id": "woodshed-comparison:member:0",
+            "media_type": "application/vnd.woodshed.comparison+json"
+          }
+        ],
+        "retained_count": 1,
+        "traffic": [
+          {
+            "direction": "outgoing",
+            "path": "/invitation",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "direction": "outgoing",
+            "path": "/wire",
+            "bytes": 18,
+            "sha256": "9389e6512af6fefa0599e7a946ef8eb432546cec8eb92d674ad516e2b98d7f1e"
+          },
+          {
+            "direction": "outgoing",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "direction": "outgoing",
+            "path": "/wire",
+            "bytes": 6850,
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36"
+          },
+          {
+            "direction": "outgoing",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "direction": "outgoing",
+            "path": "/wire",
+            "bytes": 6850,
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36"
+          },
+          {
+            "direction": "outgoing",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        ]
+      }
+    ],
+    "outsider_retained_but_not_effective": [
+      {
+        "role": "founder",
+        "online": true,
+        "process_open": true,
+        "process_id": 51880,
+        "process_generation": 2,
+        "last_sync_error": null,
+        "comparison": {
+          "source": {
+            "authority": "woodshed",
+            "domain": "music.practice",
+            "resource": "set:musical-comparison"
+          },
+          "revision": "musical-comparison-fixture-v1",
+          "method": {
+            "id": "keyed-pitch-set-singleton",
+            "version": 1
+          },
+          "left": {
+            "occurrence_id": "card:1",
+            "source": {
+              "adapter": "woodshed.stage",
+              "id": "chord:Major"
+            },
+            "label": "C Major",
+            "root_pitch_class": 0,
+            "pitch_set": [
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              },
+              {
+                "pitch_class": 7,
+                "label": "G"
+              }
+            ]
+          },
+          "right": {
+            "occurrence_id": "card:2",
+            "source": {
+              "adapter": "woodshed.stage",
+              "id": "chord:Minor"
+            },
+            "label": "A Minor",
+            "root_pitch_class": 9,
+            "pitch_set": [
+              {
+                "pitch_class": 9,
+                "label": "A"
+              },
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              }
+            ]
+          },
+          "result": {
+            "version": 1,
+            "status": "applicable",
+            "shared": [
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              }
+            ],
+            "left_only": [
+              {
+                "pitch_class": 7,
+                "label": "G"
+              }
+            ],
+            "right_only": [
+              {
+                "pitch_class": 9,
+                "label": "A"
+              }
+            ],
+            "singleton_motion": {
+              "from": {
+                "pitch_class": 7,
+                "label": "G"
+              },
+              "to": {
+                "pitch_class": 9,
+                "label": "A"
+              }
+            }
+          }
+        },
+        "service": {
+          "authority_installed": true,
+          "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "local_root": "af06a3e3291714e4f356c19c9b15cd1951ec6e6662aa77be07547f289383341d",
+          "ok": true,
+          "operations": [
+            {
+              "author_root": "a7f6dfaf8f38b89ba8ce649b594f91e4d01fdc57f9c9493df43b5e50a9987367",
+              "operation_id": "f9a47c337cdcbace14f18534baadb540b836b820e0777de81fc47eac0fae8766",
+              "writer": "a8ff7590b139d75054d6b1fa126b6ab7688869c266a910914767b180185d2b98"
+            },
+            {
+              "author_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
+              "operation_id": "367ec90086c6c71edec0a48197de3828671f73cdc0af38ff0b8723389e390753",
+              "writer": "bd11126ba11021a0c894a5290d352d5de6c8e3d4b071d5404a09b1817c050458"
+            }
+          ],
+          "pending_authority_count": 1,
+          "records": [
+            {
+              "body_utf8_hex": "7b226c656674223a7b226c6162656c223a2243204d616a6f72222c226f6363757272656e63655f6964223a22636172643a31222c2270697463685f736574223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d2c7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c22726f6f745f70697463685f636c617373223a302c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d616a6f72227d7d2c226d6574686f64223a7b226964223a226b657965642d70697463682d7365742d73696e676c65746f6e222c2276657273696f6e223a317d2c22726573756c74223a7b226c6566745f6f6e6c79223a5b7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c2272696768745f6f6e6c79223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d5d2c22736861726564223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c2273696e676c65746f6e5f6d6f74696f6e223a7b2266726f6d223a7b226c6162656c223a2247222c2270697463685f636c617373223a377d2c22746f223a7b226c6162656c223a2241222c2270697463685f636c617373223a397d7d2c22737461747573223a226170706c696361626c65222c2276657273696f6e223a317d2c227265766973696f6e223a226d75736963616c2d636f6d70617269736f6e2d666978747572652d7631222c227269676874223a7b226c6162656c223a2241204d696e6f72222c226f6363757272656e63655f6964223a22636172643a32222c2270697463685f736574223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d2c7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c22726f6f745f70697463685f636c617373223a392c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d696e6f72227d7d2c22736f75726365223a7b22617574686f72697479223a22776f6f6473686564222c22646f6d61696e223a226d757369632e7072616374696365222c227265736f75726365223a227365743a6d75736963616c2d636f6d70617269736f6e227d7d",
+              "id": "woodshed-comparison:member:0",
+              "media_type": "application/vnd.woodshed.comparison+json"
+            }
+          ],
+          "retained_count": 2,
+          "revoked_authority_count": 0,
+          "role": "founder"
+        },
+        "records": [
+          {
+            "body_utf8_hex": "7b226c656674223a7b226c6162656c223a2243204d616a6f72222c226f6363757272656e63655f6964223a22636172643a31222c2270697463685f736574223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d2c7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c22726f6f745f70697463685f636c617373223a302c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d616a6f72227d7d2c226d6574686f64223a7b226964223a226b657965642d70697463682d7365742d73696e676c65746f6e222c2276657273696f6e223a317d2c22726573756c74223a7b226c6566745f6f6e6c79223a5b7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c2272696768745f6f6e6c79223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d5d2c22736861726564223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c2273696e676c65746f6e5f6d6f74696f6e223a7b2266726f6d223a7b226c6162656c223a2247222c2270697463685f636c617373223a377d2c22746f223a7b226c6162656c223a2241222c2270697463685f636c617373223a397d7d2c22737461747573223a226170706c696361626c65222c2276657273696f6e223a317d2c227265766973696f6e223a226d75736963616c2d636f6d70617269736f6e2d666978747572652d7631222c227269676874223a7b226c6162656c223a2241204d696e6f72222c226f6363757272656e63655f6964223a22636172643a32222c2270697463685f736574223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d2c7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c22726f6f745f70697463685f636c617373223a392c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d696e6f72227d7d2c22736f75726365223a7b22617574686f72697479223a22776f6f6473686564222c22646f6d61696e223a226d757369632e7072616374696365222c227265736f75726365223a227365743a6d75736963616c2d636f6d70617269736f6e227d7d",
+            "id": "woodshed-comparison:member:0",
+            "media_type": "application/vnd.woodshed.comparison+json"
+          }
+        ],
+        "retained_count": 2,
+        "traffic": [
+          {
+            "direction": "incoming",
+            "path": "/wire",
+            "bytes": 18,
+            "sha256": "9389e6512af6fefa0599e7a946ef8eb432546cec8eb92d674ad516e2b98d7f1e"
+          },
+          {
+            "direction": "incoming",
+            "path": "/wire",
+            "bytes": 6850,
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36"
+          },
+          {
+            "direction": "incoming",
+            "path": "/wire",
+            "bytes": 6850,
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36"
+          },
+          {
+            "direction": "incoming",
+            "path": "/wire",
+            "bytes": 7344,
+            "sha256": "9ea771d5ffceb2cde77b8abe601a8cf588d1005f240357e955c2c335b1e438e5"
+          },
+          {
+            "direction": "outgoing",
+            "path": "/wire",
+            "bytes": 14178,
+            "sha256": "99a913eab56bcb40828294e04f3d6c8123571d1f70b1f9daf4d5525fca23ea71"
+          },
+          {
+            "direction": "outgoing",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        ]
+      },
+      {
+        "role": "member",
+        "online": true,
+        "process_open": true,
+        "process_id": 26392,
+        "process_generation": 2,
+        "last_sync_error": null,
+        "comparison": {
+          "source": {
+            "authority": "woodshed",
+            "domain": "music.practice",
+            "resource": "set:musical-comparison"
+          },
+          "revision": "musical-comparison-fixture-v1",
+          "method": {
+            "id": "keyed-pitch-set-singleton",
+            "version": 1
+          },
+          "left": {
+            "occurrence_id": "card:1",
+            "source": {
+              "adapter": "woodshed.stage",
+              "id": "chord:Major"
+            },
+            "label": "C Major",
+            "root_pitch_class": 0,
+            "pitch_set": [
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              },
+              {
+                "pitch_class": 7,
+                "label": "G"
+              }
+            ]
+          },
+          "right": {
+            "occurrence_id": "card:2",
+            "source": {
+              "adapter": "woodshed.stage",
+              "id": "chord:Minor"
+            },
+            "label": "A Minor",
+            "root_pitch_class": 9,
+            "pitch_set": [
+              {
+                "pitch_class": 9,
+                "label": "A"
+              },
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              }
+            ]
+          },
+          "result": {
+            "version": 1,
+            "status": "applicable",
+            "shared": [
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              }
+            ],
+            "left_only": [
+              {
+                "pitch_class": 7,
+                "label": "G"
+              }
+            ],
+            "right_only": [
+              {
+                "pitch_class": 9,
+                "label": "A"
+              }
+            ],
+            "singleton_motion": {
+              "from": {
+                "pitch_class": 7,
+                "label": "G"
+              },
+              "to": {
+                "pitch_class": 9,
+                "label": "A"
+              }
+            }
+          }
+        },
+        "service": {
+          "authority_installed": true,
+          "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "local_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
+          "ok": true,
+          "operations": [
+            {
+              "author_root": "a7f6dfaf8f38b89ba8ce649b594f91e4d01fdc57f9c9493df43b5e50a9987367",
+              "operation_id": "f9a47c337cdcbace14f18534baadb540b836b820e0777de81fc47eac0fae8766",
+              "writer": "a8ff7590b139d75054d6b1fa126b6ab7688869c266a910914767b180185d2b98"
+            },
+            {
+              "author_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
+              "operation_id": "367ec90086c6c71edec0a48197de3828671f73cdc0af38ff0b8723389e390753",
+              "writer": "bd11126ba11021a0c894a5290d352d5de6c8e3d4b071d5404a09b1817c050458"
+            }
+          ],
+          "pending_authority_count": 1,
+          "records": [
+            {
+              "body_utf8_hex": "7b226c656674223a7b226c6162656c223a2243204d616a6f72222c226f6363757272656e63655f6964223a22636172643a31222c2270697463685f736574223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d2c7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c22726f6f745f70697463685f636c617373223a302c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d616a6f72227d7d2c226d6574686f64223a7b226964223a226b657965642d70697463682d7365742d73696e676c65746f6e222c2276657273696f6e223a317d2c22726573756c74223a7b226c6566745f6f6e6c79223a5b7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c2272696768745f6f6e6c79223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d5d2c22736861726564223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c2273696e676c65746f6e5f6d6f74696f6e223a7b2266726f6d223a7b226c6162656c223a2247222c2270697463685f636c617373223a377d2c22746f223a7b226c6162656c223a2241222c2270697463685f636c617373223a397d7d2c22737461747573223a226170706c696361626c65222c2276657273696f6e223a317d2c227265766973696f6e223a226d75736963616c2d636f6d70617269736f6e2d666978747572652d7631222c227269676874223a7b226c6162656c223a2241204d696e6f72222c226f6363757272656e63655f6964223a22636172643a32222c2270697463685f736574223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d2c7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c22726f6f745f70697463685f636c617373223a392c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d696e6f72227d7d2c22736f75726365223a7b22617574686f72697479223a22776f6f6473686564222c22646f6d61696e223a226d757369632e7072616374696365222c227265736f75726365223a227365743a6d75736963616c2d636f6d70617269736f6e227d7d",
+              "id": "woodshed-comparison:member:0",
+              "media_type": "application/vnd.woodshed.comparison+json"
+            }
+          ],
+          "retained_count": 2,
+          "revoked_authority_count": 0,
+          "role": "member"
+        },
+        "records": [
+          {
+            "body_utf8_hex": "7b226c656674223a7b226c6162656c223a2243204d616a6f72222c226f6363757272656e63655f6964223a22636172643a31222c2270697463685f736574223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d2c7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c22726f6f745f70697463685f636c617373223a302c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d616a6f72227d7d2c226d6574686f64223a7b226964223a226b657965642d70697463682d7365742d73696e676c65746f6e222c2276657273696f6e223a317d2c22726573756c74223a7b226c6566745f6f6e6c79223a5b7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c2272696768745f6f6e6c79223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d5d2c22736861726564223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c2273696e676c65746f6e5f6d6f74696f6e223a7b2266726f6d223a7b226c6162656c223a2247222c2270697463685f636c617373223a377d2c22746f223a7b226c6162656c223a2241222c2270697463685f636c617373223a397d7d2c22737461747573223a226170706c696361626c65222c2276657273696f6e223a317d2c227265766973696f6e223a226d75736963616c2d636f6d70617269736f6e2d666978747572652d7631222c227269676874223a7b226c6162656c223a2241204d696e6f72222c226f6363757272656e63655f6964223a22636172643a32222c2270697463685f736574223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d2c7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c22726f6f745f70697463685f636c617373223a392c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d696e6f72227d7d2c22736f75726365223a7b22617574686f72697479223a22776f6f6473686564222c22646f6d61696e223a226d757369632e7072616374696365222c227265736f75726365223a227365743a6d75736963616c2d636f6d70617269736f6e227d7d",
+            "id": "woodshed-comparison:member:0",
+            "media_type": "application/vnd.woodshed.comparison+json"
+          }
+        ],
+        "retained_count": 2,
+        "traffic": [
+          {
+            "direction": "outgoing",
+            "path": "/invitation",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "direction": "outgoing",
+            "path": "/wire",
+            "bytes": 18,
+            "sha256": "9389e6512af6fefa0599e7a946ef8eb432546cec8eb92d674ad516e2b98d7f1e"
+          },
+          {
+            "direction": "outgoing",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "direction": "outgoing",
+            "path": "/wire",
+            "bytes": 6850,
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36"
+          },
+          {
+            "direction": "outgoing",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "direction": "outgoing",
+            "path": "/wire",
+            "bytes": 6850,
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36"
+          },
+          {
+            "direction": "outgoing",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "direction": "incoming",
+            "path": "/wire",
+            "bytes": 14178,
+            "sha256": "99a913eab56bcb40828294e04f3d6c8123571d1f70b1f9daf4d5525fca23ea71"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,197 @@
+{
+  "date": "2026-09-04 America/New_York",
+  "scope": "Current dirty shared working tree; focused executable fixture proof; not a release or full Woodshed workspace receipt",
+  "host": "Codex in-app Chromium, WebGPU, 1280x720, loopback HTTP",
+  "wasm_sha256": "1dd8acdf1bcb5a47d9f1de596a3ed51895e45055999ff2bb4539a21b9c1dbb75",
+  "source_sha256": {
+    "ports/graphshell/src/projection_compile.rs": "a53e5d33b5656834f7dd8f838d2f82a75ba00cb261bf4e13c2ef29c9721a4474",
+    "ports/graphshell/src/web_projection.rs": "2415e23234f7de979a8978f9233f1e6b4540672c2614a0fb475e9795fba6c714",
+    "ports/graphshell/src/web.rs": "4580de4d5450b95364fc9cf6fd0afc7b9e3787c12e0c0acd585be6d4161b49b0",
+    "ports/graphshell/src/web_events.rs": "76036ee6a887392cb98d687778cbd44f28a26e77275ac73b9b69e5884ae48b3a",
+    "ports/graphshell/web/component.html": "71e7e05a68a37822f3d170aea57dfdcff95f64499897dd8bf14154165f00817a",
+    "ports/graphshell/web/styles.css": "65d5b5d1d00ce254df981820fba6cd26c1de5f0bbf1a36504ce8a65311f6bdb6",
+    "ports/graphshell/web/fixtures/woodshed-stage.json": "e23353cd22fa22b309ff4e46e1941429525b3b20c7a5f832fbf66e3011f32b7f",
+    "ports/graphshell/web/scenarios/projection_authoring.scn": "ada7b85a1bf05d0175ae00e26b81b0d3e4f449033005abd339bb94e5ae8da6ac",
+    "ports/graphshell/web/scenarios/projection_reopen.scn": "23c52dcb5b443c3dc637952bde0161dd866b4b7b37178eeb6936575029de90ec"
+  },
+  "build": {
+    "command": "cargo build --offline --target wasm32-unknown-unknown -j1 --target-dir <isolated target>",
+    "cwd": "ports/graphshell/web",
+    "result": "pass"
+  },
+  "tests": {
+    "native_graphshell_projection_compile": 7,
+    "isolated_compiler_and_editor": 14,
+    "isolated_stage_and_arrangement": 15,
+    "isolated_exporter": 3,
+    "note": "Source-path and native compiler coverage overlaps; do not sum as unique workspace tests."
+  },
+  "runs": [
+    {
+      "scenario": {
+        "state": "ok",
+        "errors": [],
+        "result": {
+          "captures": 3,
+          "frames": 87,
+          "log": [
+            "captured projection_grid",
+            "waited 1 frames",
+            "captured projection_scatter",
+            "waited 0 frames",
+            "captured projection_reopened",
+            "waited 1 frames",
+            "executable projection authoring proof complete"
+          ],
+          "result": "ok",
+          "steps": 58
+        },
+        "captures": [
+          {
+            "name": "projection_grid",
+            "width": 1280,
+            "height": 720,
+            "bytes": 130590
+          },
+          {
+            "name": "projection_scatter",
+            "width": 1280,
+            "height": 720,
+            "bytes": 142646
+          },
+          {
+            "name": "projection_reopened",
+            "width": 1280,
+            "height": 720,
+            "bytes": 142646
+          }
+        ]
+      },
+      "projection_editor": {
+        "open": true,
+        "panel": "preview",
+        "content": "open:graphshell.projection-editor.panel:preview",
+        "validation": "valid",
+        "errors": 0,
+        "saveCount": 1,
+        "status": "Reopened executable projection and occurrence selection",
+        "preview": "My practice session \u00b7 read nodes by occurrence_id \u00b7 scatter.default \u00b7 x=order y=tempo_bpm \u00b7 canvas",
+        "source": {
+          "authority": "woodshed",
+          "domain": "music.practice",
+          "resource": "stage-set:catalog-fixture"
+        },
+        "reading": {
+          "key": "occurrence_id"
+        },
+        "encoding": {
+          "x": "order",
+          "y": "tempo_bpm"
+        },
+        "arrangement": {
+          "kind": "scatter.default",
+          "direction": "coordinates",
+          "spacing": "16"
+        },
+        "appearance": {
+          "realization": "canvas",
+          "title": "My practice session"
+        },
+        "provenance": {
+          "author": "Graphshell",
+          "sourceRevision": "stage-fixture-v1",
+          "note": "Disclosed Woodshed Set; grid ranks numeric fields, scatter uses their values."
+        }
+      }
+    },
+    {
+      "scenario": {
+        "state": "ok",
+        "errors": [],
+        "result": {
+          "captures": 1,
+          "frames": 16,
+          "log": [
+            "captured projection_fresh_page",
+            "waited 0 frames",
+            "executable projection fresh-page reopen complete"
+          ],
+          "result": "ok",
+          "steps": 13
+        },
+        "captures": [
+          {
+            "name": "projection_fresh_page",
+            "width": 1280,
+            "height": 720,
+            "bytes": 142646
+          }
+        ]
+      },
+      "projection_editor": {
+        "open": true,
+        "panel": "preview",
+        "content": "open:graphshell.projection-editor.panel:preview",
+        "validation": "valid",
+        "errors": 0,
+        "saveCount": 0,
+        "status": "Reopened executable projection and occurrence selection",
+        "preview": "My practice session \u00b7 read nodes by occurrence_id \u00b7 scatter.default \u00b7 x=order y=tempo_bpm \u00b7 canvas",
+        "source": {
+          "authority": "woodshed",
+          "domain": "music.practice",
+          "resource": "stage-set:catalog-fixture"
+        },
+        "reading": {
+          "key": "occurrence_id"
+        },
+        "encoding": {
+          "x": "order",
+          "y": "tempo_bpm"
+        },
+        "arrangement": {
+          "kind": "scatter.default",
+          "direction": "coordinates",
+          "spacing": "16"
+        },
+        "appearance": {
+          "realization": "canvas",
+          "title": "My practice session"
+        },
+        "provenance": {
+          "author": "Graphshell",
+          "sourceRevision": "stage-fixture-v1",
+          "note": "Disclosed Woodshed Set; grid ranks numeric fields, scatter uses their values."
+        }
+      }
+    }
+  ],
+  "manual_browser_checks": {
+    "full_page_screenshot": "visually inspected after CSS specificity fix",
+    "keyboard": "Enter on list card:1 selects card:1 in both views",
+    "pointer": "click spatial card:2 selects card:2 in both views; card:1 false",
+    "semantic_rectangles": "all six absolute and transparent; selected spatial rect x336 y288 w164 h68, list rect x1026 y248 w230 h68"
+  },
+  "captures": [
+    {
+      "path": "projection_grid.png",
+      "sha256": "914226a98da66fa94db1f2367c61a99d30b7b4b9621bbbd3cc264adaf03d12b2",
+      "kind": "actual GPU frame, excludes HTML controls"
+    },
+    {
+      "path": "projection_scatter.png",
+      "sha256": "e52e91c4446b214b3d9ede60d4e0eaa0ee2ea22c95e3870cfa0adfbdecf6b203",
+      "kind": "actual GPU frame, excludes HTML controls"
+    },
+    {
+      "path": "projection_reopened.png",
+      "sha256": "e52e91c4446b214b3d9ede60d4e0eaa0ee2ea22c95e3870cfa0adfbdecf6b203",
+      "kind": "actual GPU frame, excludes HTML controls"
+    },
+    {
+      "path": "projection_fresh_page.png",
+      "sha256": "e52e91c4446b214b3d9ede60d4e0eaa0ee2ea22c95e3870cfa0adfbdecf6b203",
+      "kind": "actual GPU frame, excludes HTML controls"
+    }
+  ]
+}

@@ -4,6 +4,8 @@ The design-docs index for the [Mere](../README.md) workspace. All authoritative
 project documentation belongs under `design_docs/`. Entries are one line each;
 the deep rationale lives in the doc itself.
 
+Current bounded proofs (2026-09-05): the [projection grammar adoption plan](mere_docs/implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md) records executable Graphshell authoring, the interactive practice workspace with retained rendering and measured compiler improvements, and the two-peer Woodshed comparison space with signed admission, authority filtering, and offline disk reopening; fixture scope and source-hashed receipts are explicit.
+
 ## Required reading order
 
 Active implementation: [projection refresh and surface reuse](mere_docs/implementation_strategy/2026-09-05_projection_refresh_and_surface_reuse_plan.md) covers dependency-aware layout caching, independent appearances, bounded live richness, and separation of paint from placement work.

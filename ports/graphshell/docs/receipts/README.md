@@ -12,6 +12,10 @@ headed captures.
 | `h4_identity_surface.html`, `h4_identity_receipt.json` | `h4_identity_receipt` | - |
 | `h2_browser_receipts.json`, `h2_chromium_*.png`, `h2_firefox_*.png` | headed Chromium and Firefox capture | - |
 | `h3_browser_receipts.json`, `h3_chromium_*.png` | headed Chromium capture | - |
+| `projection_authoring_receipt.json`, `projection_*.png` | current-tree Chromium/WebGPU authoring and fresh-page reopen scenarios | source and capture SHA-256 in receipt |
+| `practice_workspace_receipt.json` (forthcoming) | current-tree Graphshell practice workspace browser proof | source/evidence validation and scenario results recorded in the receipt |
+| `projection_refresh_surface_reuse_receipt.json`, `projection_refresh.png` | dependency refresh, Reader appearances, producer budgets, and placement reuse proof | focused test/build outcomes, source hashes, browser scenarios, and benchmark scope in receipt |
+| `co_op_process_receipt.json`, `co_op_browser_receipt.json`, `co_op_*.png` | two independent native peers over HTTP, then two browser surfaces reopening offline | source, operation and capture evidence in receipts |
 
 ## Regenerating
 
@@ -52,6 +56,40 @@ update.
   600x800, with wide and narrow screenshots after selected-subgraph export.
 
 ## Notes
+
+The co-op proof uses exactly pinned fixture rules and signed member delegation,
+separate redb stores, a fixed clock and loopback HTTP. Its process receipt proves
+an unauthorized signed record can be retained without entering the effective
+projection. It does not establish production onboarding, Internet discovery,
+graph encryption, or shared Woodshed Set editing. Reproduction lives in the
+projection grammar adoption plan, under Shared practice proof.
+
+The 2026-09-04 projection proof uses a generated three-occurrence Woodshed
+Set/catalog fixture. It covers executable recipe editing, two placements,
+coordinated selection, invalid-field rejection, and browser-local reopening.
+Its PNGs capture the actual GPU frame; HTML controls were separately inspected
+in the full browser page. It is not a full Woodshed release or GUI-design receipt.
+Reproduction and scope are recorded in the projection grammar adoption plan.
+
+The September 5 practice workspace proof is a Graphshell browser component
+over a disclosed Woodshed comparison, with Relations, pitch-membership Compare,
+History, typed selection, and source/evidence-validated save/reopen. It uses
+real Seiche dragging, Grid/Scatter, fixed-60 Hz physics capped at three
+substeps, demand-driven redraw, and retained Cambium/Genet/Netrender faces.
+It does not wire projection fields and does not establish a native Woodshed
+application, release, or final performance result. Serve `web/` over loopback
+after building the current web package, then run
+`practice.html?scenario=scenarios/practice_workspace.scn`,
+`practice.html?scenario=scenarios/practice_reopen.scn`, and
+`practice-embed.html?scenario=scenarios/practice_embedded.scn`. The last page
+checks the same WASM component inside its wrapper. The
+`practice_workspace_receipt.json` records 14 reducer/disclosure
+tests, 15 overlapping compiler/editor tests, four physics tests, a passing
+wasm build, and 45/11/14 standalone/reopen/embedded scenario steps. The existing
+58-step authoring scenario also passes. Narrow comparison and stacked relations
+were visually checked at 360px, including keyboard Save. The `practice_*.png`
+files capture actual GPU frames. The receipt separates compiler timings,
+motion preparation counters, idle observations, and remaining GPU-scale limits.
 
 The dated receipt notes for every slice, including the ones with no artifact in
 this folder, are in [`../`](..). Each names its own acceptance boundary.

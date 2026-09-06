@@ -1,5 +1,142 @@
 # Projection Grammar Adoption Plan
 
+**Status:** active: the executable Graphshell authoring proof landed 2026-09-04; A5 and the remaining portable-grammar questions stay open.
+
+## Executable authoring proof (2026-09-04, verified in current working tree)
+
+Mark requested Luna/Terra subagents to try the review's bounded proof. Graphshell's
+editor previously saved definitions while its preview only formatted a sentence. This
+slice resolves a supported definition against disclosed Woodshed Set facts and
+compiles it through existing Score/Scene machinery. Woodshed owns the export;
+Graphshell has no dependency on Woodshed's product crates. This does not promote
+new portable grammar contracts or close A5.
+
+Done when a generated export from actual Woodshed Set/catalog types, including
+two occurrences of one source, drives two arrangements in the existing browser
+host; spatial and list selection name the same occurrence; saving and reopening
+restores the definition and selection. Unsupported registrations, fields, and
+stale source revisions must fail explicitly. Validate the exporter, focused
+compiler tests, wasm build, and a headed browser interaction with a captured
+frame. Preserve concurrent Cambium and Woodshed release work.
+
+Findings (2026-09-04): the executable subset resolves `nodes`, numeric x/y
+fields, a text label field, `grid.default` (dense numeric ranks), and
+`scatter.default` (numeric values). Both compile through `scenomise::solve`;
+Graphshell realizes the result through Cambium, Genet, and Netrender. Single
+occurrence selection is coordinated between spatial cards and an occurrence
+list; the saved payload holds the definition and occurrence id. Unsupported
+registrations, channels, realization policies, and stale source revisions are
+explicit failures. Source ownership remains in Woodshed; the included export
+is a reproducible three-card Set made from its real musical catalog, not a live
+connection to a user's saved practice library.
+
+Progress (2026-09-04): Luna produced the Woodshed exporter and Terra the
+compiler skeleton before both hit the account usage limit. Root completed
+integration. An isolated source-path harness passed 14 compiler/editor tests,
+15 existing Stage/arrangement tests, and 3 exporter tests. This harness points
+at the actual Rust source modules and excludes unrelated application hosts;
+it is not a full Woodshed workspace test. The exporter replay SHA-256 is
+`E23353CD22FA22B309FF4E46E1941429525B3B20C7A5F832FBF66E3011F32B7F`.
+The fixture is `ports/graphshell/web/fixtures/woodshed-stage.json`, produced by
+`woodshed/crates/woodshed-core/examples/stage_projection_export.rs`.
+The browser scenarios are `projection_authoring.scn` and
+`projection_reopen.scn` under `ports/graphshell/web/scenarios`.
+The actual standalone Graphshell wasm build passed offline. Terra also ran
+`cargo test -p graphshell projection_compile --lib -j 1` against the native
+workspace: 7 tests passed (overlaps the harness coverage above).
+
+The final Chromium/WebGPU run at 1280x720 passed 58 authoring steps and 13
+fresh-page reopen steps, with four GPU captures and no page errors. Additional
+real browser input verified Enter selection from the list and pointer selection
+from the spatial view. A full-page screenshot exposed a CSS specificity bug in
+the semantic overlay; the final run verifies transparent, absolutely positioned
+buttons aligned with the painted card rectangles. Invalid numeric spacing now
+invalidates the typed draft and blocks saving instead of saving its old value.
+
+Evidence is in `ports/graphshell/docs/receipts/projection_authoring_receipt.json`
+and the four `projection_*.png` files beside it. The receipt records source and
+wasm hashes, exact scenario results, and manual browser checks. These are current
+dirty-tree receipts, not a committed release baseline. To replay, build the
+standalone web package, run wasm-bindgen with `--target web`, serve the web assets
+over loopback HTTP, and open `index.html?scenario=scenarios/projection_authoring.scn`,
+then `index.html?scenario=scenarios/projection_reopen.scn` on the same origin.
+The loader exposes scenario results and captures on the page; an optional `sink`
+query parameter receives the existing JSON receipt protocol.
+
+The Woodshed musical-projections plan is the next product-directed refinement.
+Its review addendum records metric, complete-cost, history-provenance, and voicing
+resolver corrections. This proof does not implement those slices or settle the
+finished product appearance, narrow layouts, arbitrary data loading, or release
+packaging.
+
+## Shared practice proof (2026-09-04, verified in current working tree)
+
+Mark authorized a second Luna/Terra proof: two people join a Woodshed practice
+space, contribute one musical comparison, disconnect, and reopen retained work.
+Woodshed's `musical_comparison_export` example owns the keyed C Major/A Minor
+disclosure and versioned singleton-difference method. It does not implement a
+general voice-leading metric or publish personal browsing history.
+
+`commons_practice_peer` is a proof-only native consumer of real Commons redb
+replicas, Personae writer attestations, and Gemot authority-filtered projections.
+Each peer owns an independent store. Fixed identities, a fixed evaluation clock,
+and an exactly pinned fixture constitution establish the test boundary; signed
+delegations admit the member. This is not a constitutional lifecycle or identity
+onboarding implementation. The gateway carries canonical signed plaintext graph
+operations over loopback HTTP. It does not establish Internet P2P discovery,
+encryption, or a production invitation protocol.
+
+Graphshell's `co_op.html` hosts membership, contribution, sync and offline-reopen
+controls alongside the existing Genet/Netrender projection. Only effective shared
+records enter the contributed rows. Local source material is separately marked
+as a preview. `co_op_receipt.py` reproduces the process/HTTP receipt, including
+an unauthorized signed record retained but excluded from the effective view;
+headed browser verification is a separate gate. Disconnect closes the native
+process, and offline reopen starts a fresh process over the same local store.
+
+Both gates passed. The process/HTTP receipt proves pre-invitation join and
+pre-admission contribution rejection, successful signed admission, byte-equivalent
+comparison retention on both peers, distinct process IDs after offline reopen,
+unchanged network traffic during that reopen, and duplicate-free reconciliation.
+A third fixture writer's signed operation remains retained but pending authority:
+both peers retain two operations and expose only the one admitted comparison.
+Six native checks also pass: invitation codec roundtrip, tampered delegation,
+unsigned rule mutation, wrong-space invitation, unauthorized author, and
+wrong-container operation.
+
+Two browser surfaces completed found/join/contribute/disconnect/reopen. Fresh
+pages then each passed the seven-step retained-projection capture scenario at
+1280x720 with no page errors. Keyboard selection of the shared comparison maps
+to its spatial occurrence. Full-page visual inspection corrected a sidebar
+overlap, stale host status, and an unavailable arrow glyph. The executable wasm
+build passed, as did Woodshed's seven exporter tests. The first authoring proof
+also passed its 58-step authoring and 13-step reopen regression after adding the
+external-source seam (before the final cosmetic fixes).
+
+`ports/graphshell/docs/receipts/co_op_process_receipt.json` records the process
+states and negative checks. `co_op_browser_receipt.json` records browser actions,
+source/wasm hashes, offline peer states and the two `co_op_*.png` GPU captures.
+The PNGs exclude HTML controls; those were separately inspected in full-page
+browser screenshots. Receipts describe a dirty working tree, not a published
+feature. Membership changes over time, public hosting, encryption, discovery,
+arbitrary shared Set editing and production identity onboarding remain unproven.
+
+Reproduce from Mere after building the standalone Graphshell web package and
+running wasm-bindgen into its `pkg` directory (an isolated copied asset directory
+also works):
+
+```powershell
+cargo build -p commons-spine --example commons_practice_peer -j 1 --target-dir <isolated-target>
+python ports/graphshell/web/co_op_receipt.py --binary <isolated-target>/debug/examples/commons_practice_peer.exe --comparison ../woodshed/scenarios/woodshed_musical_comparison.json --assets ports/graphshell/web --output <new-receipt-directory>
+```
+
+For interactive reproduction, run `co_op_gateway.py` twice with separate `--store`
+directories, `--role founder` / `--role member`, ports 8860 / 8861, and opposite
+`--peer-port` values. Both require the same `--binary`, `--comparison`, `--assets`
+and a `--receipts` output directory. Open each server's `co_op.html`. After offline
+reopen, `?scenario=scenarios/co_op_retained.scn&sink=http://127.0.0.1:<port>/scenario-receipt`
+captures the retained GPU projection on that origin.
+
 **Date**: 2026-08-15
 **Status (reconciled 2026-09-01)**: A0, A6, A1, C1, B1, B2, B3, C3, A3 stage
 one, A4+C2, and A2 are closed. Turnstone `648bf19` is B1's definitive close,
@@ -1149,3 +1286,44 @@ is raised in Progress for Mark.
   each toolchain bump; if it links, drop the override. The served-endpoint
   ruling is closed by this receipt; A3 stage one now holds for the product
   endpoint.
+
+## 2026-09-05 practice workspace browser proof
+
+The current-tree Graphshell practice proof gives one disclosed Woodshed
+comparison a small browser workspace: Relations, a pitch-membership Compare
+view, and History share typed occurrence/comparison selection. Save and reopen
+retain the bounded workspace location and runtime settings only when the
+current source identity, revision, occurrence IDs, and complete disclosed
+comparison evidence still validate. This is a Graphshell component proof, not
+native Woodshed: the same WASM component runs in `web/practice.html` and in
+the `web/practice-embed.html` wrapper.
+
+Relations use real Seiche dragging around projection slots; Grid and Scatter
+remain recipes, physics runs at a fixed 60 Hz with at most three substeps, and
+redraw is demand-driven. Cambium/Genet and Netrender retain faces across
+frames. Projection fields are not wired into this proof yet.
+
+The current-tree
+`ports/graphshell/docs/receipts/practice_workspace_receipt.json` records the
+current-tree checks: 14 reducer/disclosure tests, 15 overlapping
+compiler/editor tests, four physics tests, and a passing wasm build. The
+browser scenarios passed 45 standalone, 11 fresh-reopen, 14 embedded, and
+58 existing-authoring regression steps. At 360px, Compare remains readable
+and Relations stacks its cards; keyboard Enter saves successfully. Idle
+counters remain unchanged. A real drag added 367 physics steps with zero
+projection compiles or text layouts. These CPU counters exclude GPU present.
+
+Grid compilation previously rebuilt and sorted channel ranks for every card.
+Precomputing ranks once changes that path from quadratic sorting work to
+O(n log n). Sequential single-sample release runs at 10,000 occurrences measured
+14,328,279us before and 19,618us after, including Scenomise solving. The receipt
+preserves raw output and binary hashes; the baseline source snapshot was not
+archived. The reproducible example is `ports/graphshell/examples/projection_compile_perf.rs`.
+This is not a large-graph interactive frame budget or a release benchmark.
+
+To reproduce, build the current Graphshell web package, serve
+`ports/graphshell/web` over loopback HTTP, then open
+`practice.html?scenario=scenarios/practice_workspace.scn`. Reopen on the same
+origin with `practice.html?scenario=scenarios/practice_reopen.scn`. For the
+component-in-wrapper check, open
+`practice-embed.html?scenario=scenarios/practice_embedded.scn` on that origin.
