@@ -439,9 +439,16 @@ Tasks, each strictly behind its proof:
 - Every proof: an accessible static realization in the receipt (B1 defines
   the shape). Read GoFish in full before the facet and flow proofs; it is the
   chart-side proof of the catalog's central bet.
-Forcing consumer: unassigned. Entrance gate: a named product consumer needs
-one proof strongly enough to state its task, source facts, interaction, and
-accessible output. Found the suite around that proof. Any portable addition
+Forcing consumer: no A5 proof is activated. The
+[Distillery projection walk](2026-09-02_distillery_projection_walk_plan.md)
+W3 is the prospective schematic consumer: training/provenance records and the
+workspace dependency graph, manifest/evaluation interactions, and a frozen
+navigable table. At W3's entrance, check existing routed polylines and endpoint
+semantics before claiming a portable port/routing addition is needed. Naming
+this candidate does not close its entrance check or open the other A5 families.
+Entrance gate: a named product consumer needs one proof strongly enough to
+state its task, source facts, interaction, and accessible output. Found the
+suite around that proof. Any portable addition
 still needs the catalog's second heterogeneous consumer; the other suite views
 do not count as substitutes merely because they share a fixture.
 Validation: per the catalog's promotion checklist, unchanged.
@@ -707,6 +714,13 @@ qualifies the consumer ruling's "its asks open gates" is not settled here; it
 is raised in Progress for Mark.
 
 ## Progress
+
+- **2026-09-05:** cross-plan review names Distillery W3 as the prospective
+  schematic proof consumer. W1's cleared repository-move prerequisite is not a
+  W3 or A5 receipt. Existing `sceno::RoutedRelation` already carries full
+  polylines; the W3 entrance review must distinguish route realization from
+  any missing reusable port-anchor semantics. Every portable addition still
+  requires the catalog's independent heterogeneous consumer proof.
 
 - 2026-08-15: plan founded from the projection grammar report (pass one: six
   specification grammars and the five gap anatomies; pass two: the

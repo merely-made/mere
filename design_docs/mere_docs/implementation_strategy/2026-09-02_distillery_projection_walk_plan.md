@@ -1,11 +1,16 @@
 # Distillery Projection Walk Plan
 
 **Date:** 2026-09-02
-**Status:** W0 complete — landed 2026-09-02, all three tests verified in the
-real crate 2026-09-03 once mere's surface imports followed the
-`mere-surface-api` split; W1 held until the boundary migration's P2/P3 moves
-settle (Progress, 2026-09-03). §2 was read at mere `77a3701f052` and corrected at `3ce750f5`
-by the W0 implementation, which read the code rather than this plan.
+**Status:** W0 complete. W1's endpoint, admitted catalog seam, Graphshell
+mount, session-local resume by diff, detailed frozen table, machine-readable
+headless receipt, admitted `ResidentProjectionHost` carrier path, and headed
+WebRTC fixture receipt are green 2026-09-06. A readable three-card layout and
+live Distillery-resident route remain before W1 is closed. Continuation
+across a fresh admission is a separate protocol question because it receives
+a fresh transcript-derived projection session (Progress). §2 was read at mere
+`77a3701f052` and corrected at
+`3ce750f5` by the W0 implementation, which read the code rather than this
+plan.
 **Scope:** the first end-to-end scene binding for a port — dataset → scene →
 Scenograph → host — walked on Distillery. This plan owns the walk; the
 [Distillery v0 plan](2026-08-12_distillery_v0_plan.md) owns the works
@@ -156,7 +161,7 @@ Chronicle sits in (W4).
 Each phase names its forcing consumer and its receipt. Nothing here closes a
 gate in the adoption plan; evidence it produces is filed there.
 
-**W0. Assemble — landed 2026-09-02, one leg unverified.** Fixtures for both
+**W0. Assemble — landed 2026-09-02, verified 2026-09-03.** Fixtures for both
 second datasets, readable without Distillery, plus a headless drive of the
 installed surface through its own runner (the headed `.scn` belongs to W4,
 because Turnstone admits the surface through a *pinned* mere revision in
@@ -166,11 +171,12 @@ installed surface end to end. Nothing rendered yet.
 *State:* complete. All three tests pass in the real crate as of 2026-09-03
 (Progress).
 
-**W1. The endpoint.** `ports/distillery` implements `ProjectionCatalog`,
+**W1. The endpoint — software acceptance implemented 2026-09-06.** `ports/distillery` implements `ProjectionCatalog`,
 `ProjectionSource`, and `ResumableProjectionSource` over the board and the
 receipt stream: one offer whose score uses the timeline arrangement with
-per-item disclosed axis values (tick, epoch), a presentation manifest of
-`PortableCardV1` per job, and no intents in v1. Served through the resident
+one disclosed observation-tick axis value per item; lease epoch and window
+remain presentation facts because `ScoreItem` has one axis. It supplies a
+presentation manifest of `PortableCardV1` per job and no intents in v1. Served through the resident
 projection host like every other endpoint; admitted by Notochord; resumable
 by revision.
 *Done when:* Graphshell mounts Distillery's offer and renders the job
@@ -178,6 +184,22 @@ Chronicle as a served scene; snapshot, diff, reconnect, and resume are in one
 machine-readable receipt; the `FrozenScene` realization lists jobs by name
 with their spans in its table; a second Distillery session over the same
 mesh yields byte-identical scores (determinism receipt).
+*Current next step:* make the three mounted Chronicle cards visually distinct
+and readable, then wire the observer to the live Distillery resident route and
+repeat the headed capture there. The checked-in headless receipt
+carries snapshot revision 11, same-session rediscovery and resume by a
+contiguous Distillery diff to revision 12, three named job rows, and
+presentation-supplied tick and lease-span detail. The admitted carrier test
+separately runs `ResidentProjectionHost::accept_one` over `MemoryTransport`,
+binds the factory to the admitted session, transfers the snapshot and all card
+resources, rings revision 12, applies its diff in `ClientState`, freezes the
+  updated table, and closes cleanly. It is a software carrier receipt. The
+  separate headed fixture proves admitted WebRTC delivery and browser mounting,
+  but its capture exposes overlapping card geometry rather than a readable
+  Chronicle. A fresh admission mints a new
+projection session, so carrying an old acknowledgement across it requires an
+explicit continuity contract before this plan can claim reconnect across
+admissions.
 
 **W2. The binding, authored.** The Chronicle recipe is expressed as a
 Scenograph definition — Source, Reading, Encoding, Arrangement, Interaction,
@@ -266,6 +288,21 @@ runs onto the board. Not opened before that.
   resolving genet from `eff0cb6` is unaffected. The migration of mere's
   side is the boundary plan's P1/P3 work, in flight in another session, and
   not this plan's to make.
+- W0 refresh (2026-09-05): the boundary plan records P2 complete and the
+  Cambium/engine-management P3 receiving move landed in Mere; the live
+  workspace now owns `crates/cambium/*`, `crates/system/surface-api`, and
+  `crates/system/{content-contract,document-lanes,errand,fetch,luggage,
+  notochord,pandect,proofs,registry,resident,shell-state,ux-events}`.
+  `ports/distillery/src/surface.rs` imports `mere_surface_api`, so the old
+  local split mismatch is no longer an active prerequisite hold. A new locked
+  `walk_fixtures` run began with an isolated target directory but was stopped
+  during its first dependency build to avoid consuming the shared machine; it
+  supplies no new pass or fail result. From `C:\Users\mark_`, outside the
+  repository's `.cargo` directory and with no user Cargo config present,
+  `cargo metadata --manifest-path C:\Users\mark_\Code\repos\mere\Cargo.toml --locked --no-deps --format-version 1`
+  exited 0. This checks workspace manifests and member discovery without the
+  local repository patches; `--no-deps` does not prove dependency resolution,
+  compilation, or tests for Distillery.
 
 ## Progress
 
@@ -294,7 +331,7 @@ runs onto the board. Not opened before that.
   `cargo test -p distillery --test walk_fixtures` twice once mere's surface
   imports follow the `mere-surface-api` split. §2 corrected in five places
   by the same pass.
-- 2026-09-03: **W0 verified in the real crate; W1 held.** Mere was repointed
+- 2026-09-03: **W0 verified in the real crate; W1 then held.** Mere was repointed
   to genet head after P1 (`487e18a4`), `surface.rs` now imports from
   `mere_surface_api`, `cargo check -p distillery` is clean, and
   `cargo test -p distillery --test walk_fixtures` passes 3 of 3 — the
@@ -312,3 +349,90 @@ runs onto the board. Not opened before that.
   `LiveEndpoint` pattern in `ports/graphshell/src/live_endpoint.rs`,
   `Arrangement::Timeline` with `ScoreItem.axis: Option<AxisValue>`, and
   registration through `ResidentEndpointCatalog::register_resumable_notifying`.
+- 2026-09-05: **W0 prerequisite refresh.** The boundary plan now records P2
+  and the Cambium/engine-management P3 move as landed. W1 therefore no longer
+  waits on that move and is the next implementation target; its endpoint and
+  joined served-scene, reconnection/resume, readable-table, and determinism
+  receipt remain open. The attempted real-crate PowerShell command was
+  `$env:CARGO_TARGET_DIR = 'C:\Users\mark_\Code\target-distillery-projection-walk-20260905'; cargo test -p distillery --test walk_fixtures --locked -j 1`;
+  it was intentionally interrupted during initial dependency compilation, so
+  the standing 2026-09-03 3/3 receipt remains the latest completed test result.
+- 2026-09-06: **W1 headless path implemented and verified.** Distillery now
+  owns `ChronicleEndpoint`: a caller-session-bound, solver-realized Timeline
+  score over the folded `JobBoard`, deterministic content-addressed
+  `PortableCardV1` resources, explicit generation/epoch/revision, one retained
+  contiguous diff, notice polling, snapshot fallback outside that retained
+  base, and total intent refusal. Graphshell owns `ChronicleMount`, catalog
+  registration through an `AdmittedEndpointContext`, client acknowledgement,
+  reconnect/resume, and the frozen realization. `FrozenInstance` gained an
+  optional presentation-supplied detail field so the generic table can retain
+  card facts without learning Distillery vocabulary. The checked-in
+  `ports/graphshell/docs/receipts/distillery_chronicle_w1.json` records the
+  revision 11 snapshot, reconnect-by-diff to 12, and three frozen job rows.
+  Verification with isolated `CARGO_TARGET_DIR` and `-j 1`: `cargo test -p
+  distillery --lib chronicle --offline` passed 4/4; `cargo test -p graphshell
+  --lib distillery_w1 --offline` passed 4/4 (181 filtered). The latter covered
+  the real Distillery endpoint, the generic diff client, exact admitted
+  session/subject delivery into the factory, and the table's tick, lease epoch,
+  and lease window values, and byte-compared the generated receipt with the
+  checked-in JSON. A subsequent `--locked` repeat was stopped while waiting on
+  the shared Cargo package-cache lock; the completed unlocked offline run had
+  already updated and exercised the current lockfile graph.
+
+  The implementation exposed two planning corrections. First, `JobBoard`
+  preserves current state and lease epochs but no posting timestamp, while
+  `ResidentReceipt` has no `JobId`; the present Chronicle can truthfully place
+  an observation and show lease spans, but cannot reconstruct Posted-to-terminal
+  job spans. A historical Chronicle needs an owner-supplied correlated event
+  journal before W2. Second, a projection's accessible alternate needs readable
+  presentation facts as well as scene identity. That is now a generic frozen
+  contract rather than a Distillery special case.
+
+- 2026-09-06: **W1 admitted resident-host software path verified.** Distillery
+  now owns `ChronicleObserver`, which retains the materialized board, card
+  resources, one contiguous diff, and notice generation without retaining any
+  admitted session. Its factory creates a session-bound `ChronicleEndpoint`
+  for each admitted context. The Graphshell integration test
+  `distillery_chronicle_host` uses a signed delegation and real
+  `MemoryTransport` dial into `ResidentProjectionHost::accept_one`; over the
+  carrier it opens the Chronicle, takes revision 11, fetches and validates all
+  three `PortableCardV1` resources, observes revision 12, receives the notice,
+  resumes by the real diff, fetches the three changed cards, builds the frozen
+  table, and closes. `cargo test -p graphshell --test
+  distillery_chronicle_host --offline -j1` passed 1/1 in the isolated
+  `target-distillery-w1-root` target.
+
+  This closes admission and serving as software, not W1 as a product path.
+  Four evidence layers must stay distinct: direct endpoint behavior, admitted
+  carrier serving, headed realization, and a live resident feeding the route.
+  At this point the first two are green; headed transport/mounting is green but
+  readable realization is not, and the live resident remains open. The review
+  also corrected “reconnect” in the earlier
+  receipt: `ChronicleMount::reconnect` is same-session rediscovery. Ordinary
+  reconnection is a new admission whose nonces and carrier binding mint a new
+  `ProjectionSession`; the retained Distillery observer preserves source state
+  but does not authorize Graphshell to transplant an old session's
+  acknowledgement. Cross-admission continuation therefore belongs in an
+  explicit protocol envelope, keyed by retained authority and source identity,
+  rather than in Chronicle endpoint state.
+
+- 2026-09-06: **W1 headed fixture transport and mount verified; readable layout
+  remains open.** Graphshell's C4 host now has an opt-in
+  `distillery-chronicle-fixture` feature and `--endpoint
+  distillery-chronicle` launch mode. It loads Distillery's checked-in three-job
+  board, creates a session-bound endpoint from the shared observer in the
+  admitted route factory, and leaves the ordinary live-board endpoint as the
+  default. Both the Chronicle feature configuration and the default
+  `webrtc-session` configuration pass focused `cargo check`; the current
+  fixture executable also completed a native build. The headed Chrome scenario
+  `distillery_chronicle_w1.scn` passed 11/11 steps over the real WebRTC door:
+  link `webrtc`, state `open`, revision `11`, three remote cards, selectable
+  remote session, and one capture. Receipt artifacts are under
+  `C:\Users\mark_\Code\testing\mere\scenarios\graphshell-web\distillery_chronicle_w1`.
+
+  The capture is useful adverse evidence: the status and semantic receipt say
+  three objects, but the canvas presents their geometry as one overlapping,
+  unreadable block. This proves headed carrier delivery and mounting, not W1's
+  readable Chronicle experience. W1 therefore still needs a layout/encoding
+  correction, a headed capture that visibly distinguishes all three named
+  jobs, and the live resident-owned route.

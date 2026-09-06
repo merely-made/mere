@@ -1,8 +1,10 @@
 # Mere Modular Integration Plan
 
 **Date**: 2026-06-02
-**Status**: Draft (for review). The unifying sequence + architecture spine for
-integrating all of Mere onto the single genet-as-host shell (`meerkat`). It does not replace the
+**Status**: Historical browser/Meerkat integration plan; superseded as Mere-wide
+architecture by the [Platform Boundary and Repository Topology Plan](2026-09-02_platform_boundary_and_repository_topology_plan.md).
+The unifying sequence + architecture spine for integrating the browser product
+onto the single genet-as-host shell (`meerkat`). It does not replace the
 canonical docs it weaves: the [composition spine](../technical_architecture/2026-05-21_mere_composition_spine.md)
 (the model), the [genet-as-host flip plan](2026-06-01_genet_host_flip_plan.md)
 (the host migration), and the [adoption roadmap](2026-05-27_adoption_roadmap.md)
@@ -12,6 +14,16 @@ leverage surface, and schedules the cleanup.
 **Grounded in**: a whole-corpus read this session (7 tracks over ~50 design docs +
 crate verification against the 2026-06-02 tree). Where a doc disagrees with the
 code, the code wins and the doc is flagged for reconciliation (§7).
+
+> **Historical scope (2026-09-05).** This plan records the browser/Meerkat
+> integration decision and its receipts. Its graph-rooted model remains a valid
+> product-specific choice for that browser slice, but it is not the architecture
+> of all Mere. The current semantic boundary gives Mere multiple owned lanes:
+> Cambium retained UI, data scenes, application composition, projection policy,
+> and session/workspace policy. Read this plan with the [family composition
+> thesis](../../2026-08-12_family_composition_thesis_brief.md), where each
+> application keeps its own source truth and Graphshell is a composable
+> projection capability.
 
 ---
 
@@ -366,7 +378,36 @@ consumer appears.
 
 ---
 
+## Findings
+
+### 2026-09-05 — scope and open-tail review
+
+- The graph-rooted shell rule is retained as the historical browser/Meerkat
+  product choice recorded here. It is superseded as a Mere-wide architecture by
+  the [platform boundary and repository topology plan](2026-09-02_platform_boundary_and_repository_topology_plan.md),
+  which assigns Mere the Cambium UI, scene, composition, projection-policy, and
+  session/workspace lanes.
+- The family-level model is now the [family composition thesis](../../2026-08-12_family_composition_thesis_brief.md):
+  applications keep their own source truth, while Graphshell is a composable
+  projection capability. The [composition spine](../technical_architecture/2026-05-21_mere_composition_spine.md)
+  remains canonical for arrangement ontology, but its older host rows require the
+  current boundary plan's reading.
+- Historical tail topics route to current owners: S5 comms and sync in the
+  active [Murm peer runtime and Moot domain plan](2026-07-12_murm_peer_runtime_and_moot_domain_plan.md)
+  and the active [Moot collections and community publishing plan](../../moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md);
+  S6 external content in the [Scrying tile plan](2026-06-10_scrying_tile_plan.md);
+  S7 retirement and documentation reconciliation in the platform plan's P7
+  section. Pandect already owns `hidden_relations` persistence in
+  [`view_intent_store.rs`](../../../crates/system/pandect/src/view_intent_store.rs)
+  and restores it through `live_view.rs`; any per-family visibility UI requires
+  a current consumer audit before reactivation.
+
 ## Progress
+
+- **2026-09-05 — scoped reconciliation.** Corrected the historical-tail review:
+  S5/S6 references route topics to their current owner plans without asserting
+  unverified implementation status, and Pandect's existing
+  `hidden_relations` save/reopen path is recorded as the persistence owner.
 
 - **2026-06-02** — Plan created from a whole-corpus read (7-track read-only fan-out
   over ~50 docs + crate verification). Settled the architecture root question with
