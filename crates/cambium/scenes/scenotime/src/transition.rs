@@ -365,7 +365,7 @@ fn transition_endpoints(
         (None, Some(after)) => {
             let target = TransitionValue::of(after);
             Some((TransitionClass::Enter, target.with_opacity(0.0), target))
-        }
+        },
         (Some(before), Some(after)) => Some((
             TransitionClass::Update,
             TransitionValue::of(before),
@@ -374,7 +374,7 @@ fn transition_endpoints(
         (Some(before), None) => {
             let source = TransitionValue::of(before);
             Some((TransitionClass::Exit, source, source.with_opacity(0.0)))
-        }
+        },
         (None, None) => None,
     }
 }

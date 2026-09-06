@@ -61,11 +61,13 @@ where
             let frame_profile = self.s.last_frame_profile;
             let commands = self.s.commands.clone();
             let window = self.s.window.as_deref();
+            let layout = self.s.layout.as_ref();
             let Some(runner) = self.s.runner.as_mut() else {
                 return false;
             };
             let mut ctx = AppCtx {
                 runner,
+                layout,
                 window,
                 logical_size,
                 ui_zoom,

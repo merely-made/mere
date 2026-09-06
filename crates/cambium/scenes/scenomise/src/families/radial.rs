@@ -36,17 +36,17 @@ pub(super) fn place(config: &Radial, items: &[&ScoreItem]) -> Vec<Vec2> {
             RadialUnreachablePolicy::OuterRing => {
                 let outer = rings.keys().next_back().map_or(0, |deepest| deepest + 1);
                 distribute(config, items, &unreachable, outer, &mut placed);
-            }
+            },
             RadialUnreachablePolicy::Center => {
                 for index in unreachable {
                     placed[index] = config.center;
                 }
-            }
+            },
             RadialUnreachablePolicy::LeaveInPlace => {
                 for index in unreachable {
                     placed[index] = disclosed_position(items[index], config.center);
                 }
-            }
+            },
         }
     }
     placed
@@ -92,7 +92,7 @@ fn distribute(
             for (slot, index) in order.iter().enumerate() {
                 placed[*index] = at_angle(config.rotation_offset + slot as f32 * step);
             }
-        }
+        },
         // Arc width in proportion to the disclosed weight, so a hub gets room
         // for its satellites instead of the same slice as a leaf. Here the item
         // *is* centred in its arc — a wide arc means room around the item, and
@@ -116,7 +116,7 @@ fn distribute(
                 placed[*index] = at_angle(cursor + arc * 0.5);
                 cursor += arc;
             }
-        }
+        },
     }
 }
 

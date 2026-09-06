@@ -154,8 +154,8 @@ impl SceneSnapshot {
                 (Some(_), None) => return invalid(format!("active item {index} lacks order")),
                 (None, Some(_)) => {
                     return invalid(format!("tombstoned item {index} retains order"));
-                }
-                _ => {}
+                },
+                _ => {},
             }
         }
 

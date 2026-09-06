@@ -483,11 +483,7 @@ where
     /// host reports `scale_factor() == 1.0`, so the factor is passed in rather
     /// than read, and the conversion under test is the production helper, not a
     /// copy of it.
-    pub fn wheel_from_winit(
-        &mut self,
-        delta: winit::event::MouseScrollDelta,
-        scale_factor: f64,
-    ) {
+    pub fn wheel_from_winit(&mut self, delta: winit::event::MouseScrollDelta, scale_factor: f64) {
         let (dx, dy) = genet_winit_host::wheel_delta_from_winit_logical(delta, scale_factor);
         self.host.wheel(dx, dy);
         self.relayout();

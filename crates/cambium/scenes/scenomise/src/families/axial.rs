@@ -45,11 +45,11 @@ pub(super) fn timeline(config: &Timeline, items: &[&ScoreItem]) -> Vec<Vec2> {
             Some((_, used)) => {
                 *used += 1;
                 *used - 1
-            }
+            },
             None => {
                 rows_at.push((key, 1));
                 0
-            }
+            },
         }
     };
 
@@ -59,7 +59,7 @@ pub(super) fn timeline(config: &Timeline, items: &[&ScoreItem]) -> Vec<Vec2> {
             Some(value) => {
                 let x = normalize(*value);
                 Vec2::new(x, config.origin.y + row_for(x) as f32 * config.row_gap)
-            }
+            },
             None => match config.fallback {
                 TimelineFallback::LeaveInPlace => disclosed_position(item, config.origin),
                 TimelineFallback::StackBelowOrigin => {
@@ -68,11 +68,11 @@ pub(super) fn timeline(config: &Timeline, items: &[&ScoreItem]) -> Vec<Vec2> {
                         x,
                         config.origin.y - (row_for(x) + 1) as f32 * config.row_gap,
                     )
-                }
+                },
                 TimelineFallback::StackPastEnd => {
                     let x = config.origin.x + config.axis_length;
                     Vec2::new(x, config.origin.y + row_for(x) as f32 * config.row_gap)
-                }
+                },
             },
         });
     }

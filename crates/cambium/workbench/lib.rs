@@ -352,7 +352,7 @@ impl TileTree {
                     stack.tabs.insert(i + 1, tile);
                     stack.active = i + 1;
                     true
-                }
+                },
                 None => false,
             },
             TileTree::Split { children, .. } => children
@@ -393,7 +393,7 @@ impl TileTree {
                 for branch in children {
                     branch.tree.collect_tiles(out);
                 }
-            }
+            },
             TileTree::Stack(stack) => out.extend(stack.tabs.iter()),
         }
     }
@@ -411,7 +411,7 @@ impl TileTree {
             TileTree::Stack(stack) => stack.tabs.iter_mut().find(|t| t.id == id),
             TileTree::Split { children, .. } => {
                 children.iter_mut().find_map(|b| b.tree.tile_mut(id))
-            }
+            },
         }
     }
 
@@ -448,7 +448,7 @@ impl TileTree {
                     self.collapse();
                 }
                 removed
-            }
+            },
             TileEvent::DividerMoved { split, fractions } => self.set_fractions(split, fractions),
             TileEvent::Dragged { tile, to } => self.drag(*tile, to),
         }
@@ -461,7 +461,7 @@ impl TileTree {
                 Some(i) if stack.active != i => {
                     stack.active = i;
                     true
-                }
+                },
                 _ => false,
             },
             TileTree::Split { children, .. } => children.iter_mut().any(|b| b.tree.activate(id)),
@@ -480,10 +480,10 @@ impl TileTree {
                     stack.active = stack.tabs.len().saturating_sub(1);
                 }
                 Some(tile)
-            }
+            },
             TileTree::Split { children, .. } => {
                 children.iter_mut().find_map(|b| b.tree.remove_tile(id))
-            }
+            },
         }
     }
 
@@ -542,7 +542,7 @@ impl TileTree {
                     }
                 }
                 changed
-            }
+            },
             _ => false,
         }
     }
@@ -554,7 +554,7 @@ impl TileTree {
         let target_ok = match to {
             DropTarget::Stack { stack, .. } => {
                 matches!(self.node_at(stack), Some(TileTree::Stack(_)))
-            }
+            },
             DropTarget::Edge { tile, .. } => self.find(*tile).is_some(),
             DropTarget::Outside => false,
         };
@@ -571,10 +571,10 @@ impl TileTree {
                     s.tabs.insert(i, tile);
                     s.active = i;
                 }
-            }
+            },
             DropTarget::Edge { tile: target, edge } => {
                 self.split_at_tile(*target, *edge, tile);
-            }
+            },
             DropTarget::Outside => return false,
         }
         self.collapse();
@@ -604,7 +604,7 @@ impl TileTree {
                     vec![TileBranch::new(0.5, first), TileBranch::new(0.5, second)],
                 );
                 true
-            }
+            },
             TileTree::Stack(_) => false,
             TileTree::Split { children, .. } => children
                 .iter_mut()
@@ -882,7 +882,7 @@ mod tests {
                 // Right edge → target (1) first, dragged (2) second.
                 assert_eq!(children[0].tree.tiles()[0].id.0, 1);
                 assert_eq!(children[1].tree.tiles()[0].id.0, 2);
-            }
+            },
             _ => panic!("expected a split"),
         }
     }

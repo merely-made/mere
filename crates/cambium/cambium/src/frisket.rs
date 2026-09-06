@@ -424,8 +424,7 @@ where
         .map(|tile| {
             let mut item = TabItem::new(tile.title.clone()).with_key(tile.id.0.to_string());
             if let Some(accent) = tile.accent {
-                item =
-                    item.with_accent(TabAccentColors::new(accent.background, accent.foreground));
+                item = item.with_accent(TabAccentColors::new(accent.background, accent.foreground));
             }
             item
         })
@@ -782,8 +781,8 @@ mod tests {
         // And the default frame is all holes, also empty.
         let (hole_dom, hole_runner) = harness();
         let hole_dom = hole_dom.borrow();
-        let hole = find_attr(&hole_dom, hole_runner.root(), FRISKET_TILE_ATTR, "2")
-            .expect("hole content");
+        let hole =
+            find_attr(&hole_dom, hole_runner.root(), FRISKET_TILE_ATTR, "2").expect("hole content");
         assert_eq!(attr_of(&hole_dom, hole, "data-slot"), Some("hole"));
         assert_eq!(hole_dom.dom_children(hole).count(), 0);
     }

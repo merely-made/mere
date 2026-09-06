@@ -2505,11 +2505,15 @@ mod tests {
     fn committed_receipts_match_the_live_catalog() {
         assert_eq!(
             super::receipt_html(super::CatalogWidth::Narrow),
-            include_str!("../../../../design_docs/cambium_docs/testing/receipts/component_catalog_narrow.html")
+            include_str!(
+                "../../../../design_docs/cambium_docs/testing/receipts/component_catalog_narrow.html"
+            )
         );
         assert_eq!(
             super::receipt_html(super::CatalogWidth::Regular),
-            include_str!("../../../../design_docs/cambium_docs/testing/receipts/component_catalog_regular.html")
+            include_str!(
+                "../../../../design_docs/cambium_docs/testing/receipts/component_catalog_regular.html"
+            )
         );
     }
 }

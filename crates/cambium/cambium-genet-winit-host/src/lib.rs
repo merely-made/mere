@@ -495,13 +495,7 @@ where
             let _ = proxy.send_event(HostEvent::Wake);
         }),
     );
-    let mut host = WinitHost::new(Host::new(
-        options,
-        Some(Box::new(init)),
-        hooks,
-        s,
-        wake,
-    ));
+    let mut host = WinitHost::new(Host::new(options, Some(Box::new(init)), hooks, s, wake));
     event_loop.run_app(&mut host)
 }
 /// Which resize edge a point near the window border maps to, in logical

@@ -548,6 +548,12 @@ pub enum HostPointer {
     Press(f32, f32),
     /// Release the left button at this point.
     Release(f32, f32),
+    /// Press the right button at this point.
+    ///
+    /// A secondary press begins no pointer capture, and the native host does
+    /// not route a matching right-button release. The press is therefore the
+    /// complete context-menu gesture, just as it is in the winit event arm.
+    SecondaryPress(f32, f32),
 }
 
 /// What the application sees inside a hook. One shape for every hook so the
@@ -559,6 +565,12 @@ where
 {
     /// The runner: state access, updates, and dispatch.
     pub runner: &'a mut Runner<State, Logic, V>,
+    /// The host-owned retained layout for read-only geometry queries.
+    ///
+    /// Kept private to the crate so an application cannot couple itself to
+    /// the layout engine. [`painted_rect`](Self::painted_rect) is the public
+    /// seam: node identity in, the rectangle used by hit testing out.
+    pub(crate) layout: Option<&'a OwnedLayout>,
     /// The native window (chrome requests, redraws, cursor, IME area), when
     /// there is one. `None` under [`Harness`], the windowless test host — an
     /// application that asks for window chrome must tolerate its absence
@@ -618,6 +630,24 @@ where
     /// CPU-side attribution for the frame that just completed. Present in
     /// `after_frame`; other hooks see the last completed frame, if any.
     pub frame_profile: Option<FrameProfile>,
+}
+
+impl<State, Logic, V> AppCtx<'_, State, Logic, V>
+where
+    Logic: FnMut(&State) -> V,
+    V: RootView<State>,
+{
+    /// Where a retained DOM node actually paints, in the logical coordinate
+    /// space used by [`HostPointer`]: `(x, y, width, height)`.
+    ///
+    /// `None` means no layout exists yet or the node does not paint. This is a
+    /// read-only observation of host-owned geometry, not a second layout path.
+    pub fn painted_rect(&self, node: NodeId) -> Option<(f32, f32, f32, f32)> {
+        let layout = self.layout?;
+        let dom = self.runner.dom();
+        let dom = dom.borrow();
+        layout.painted_rect(&*dom, node)
+    }
 }
 
 /// A per-frame hook: return `true` to keep frames coming.
@@ -1080,11 +1110,13 @@ where
             let frame_profile = self.s.last_frame_profile;
             let commands = self.s.commands.clone();
             let window = self.s.window.as_deref();
+            let layout = self.s.layout.as_ref();
             let Some(runner) = self.s.runner.as_mut() else {
                 return;
             };
             let mut ctx = AppCtx {
                 runner,
+                layout,
                 window,
                 logical_size,
                 ui_zoom,
@@ -1155,12 +1187,14 @@ where
             let frame_profile = self.s.last_frame_profile;
             let commands = self.s.commands.clone();
             let window = self.s.window.as_deref();
+            let layout = self.s.layout.as_ref();
             let Some(runner) = self.s.runner.as_mut() else {
                 self.s.close_requested = true;
                 return None;
             };
             let mut ctx = AppCtx {
                 runner,
+                layout,
                 window,
                 logical_size,
                 ui_zoom,
@@ -1213,6 +1247,10 @@ where
                 HostPointer::Release(x, y) => {
                     self.s.cursor = (x, y);
                     self.release();
+                },
+                HostPointer::SecondaryPress(x, y) => {
+                    self.s.cursor = (x, y);
+                    self.secondary_press();
                 },
             }
         }

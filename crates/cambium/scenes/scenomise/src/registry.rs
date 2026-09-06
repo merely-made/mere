@@ -245,7 +245,10 @@ impl SolverRegistry {
 /// consults it, and a failure there is returned rather than absorbed: a score
 /// naming a solver nobody registered has not been laid out, and saying so is the
 /// difference between a diagnosable error and a canvas of items at the origin.
-pub fn solve_via(score: &sceno::Score, registry: &SolverRegistry) -> Result<sceno::Scene, SolveError> {
+pub fn solve_via(
+    score: &sceno::Score,
+    registry: &SolverRegistry,
+) -> Result<sceno::Scene, SolveError> {
     let sceno::Arrangement::Custom { id, config } = &score.arrangement else {
         return Ok(crate::solve(score));
     };
@@ -281,11 +284,11 @@ pub fn solve_via(score: &sceno::Score, registry: &SolverRegistry) -> Result<scen
                 positions: positions.len(),
             });
             None
-        }
+        },
         Err(error) => {
             failure = Some(error);
             None
-        }
+        },
     });
 
     match failure {

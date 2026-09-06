@@ -398,7 +398,11 @@ where
         .attr(
             "class",
             class_with(
-                if bar.current { "tablist current" } else { "tablist" },
+                if bar.current {
+                    "tablist current"
+                } else {
+                    "tablist"
+                },
                 names.bar,
             ),
         );
