@@ -18,9 +18,11 @@ use inker::{
 };
 use pelt_core::{
     PeltClock, PeltDocumentState, PeltRegistries, PeltRouteSource, PeltRouteState, PeltTileRequest,
-    PeltWorkspace, WorkspaceRect,
+    PeltWorkspace, SurfaceResourcePolicy, WorkspaceRect,
 };
-use workbench::{ContentSource, DocumentRef, SplitAxis, Tile, TileBranch, TileId, TileTree};
+use workbench::{
+    ContentSource, DocumentRef, SplitAxis, Tile, TileBranch, TileEvent, TileId, TileTree,
+};
 
 #[derive(Default)]
 struct DocumentProbe {
@@ -203,6 +205,7 @@ struct SurfaceProbe {
     resizes: Vec<(u32, u32)>,
     offsets: Vec<(i32, i32)>,
     frames: usize,
+    frame_urls: Vec<String>,
 }
 
 struct FakeSurfaceEngine(Arc<Mutex<SurfaceProbe>>);
@@ -217,25 +220,33 @@ impl SurfaceEngine for FakeSurfaceEngine {
         request: &SurfaceSpawnRequest,
     ) -> Result<Box<dyn SurfaceProducer>, SurfaceError> {
         self.0.lock().unwrap().spawns.push(request.url.clone());
-        Ok(Box::new(FakeSurface(self.0.clone())))
+        Ok(Box::new(FakeSurface {
+            probe: self.0.clone(),
+            url: request.url.clone(),
+        }))
     }
 }
 
-struct FakeSurface(Arc<Mutex<SurfaceProbe>>);
+struct FakeSurface {
+    probe: Arc<Mutex<SurfaceProbe>>,
+    url: String,
+}
 
 impl SurfaceProducer for FakeSurface {
     fn resize(&mut self, width: u32, height: u32) -> Result<(), SurfaceError> {
-        self.0.lock().unwrap().resizes.push((width, height));
+        self.probe.lock().unwrap().resizes.push((width, height));
         Ok(())
     }
 
     fn set_offset(&mut self, x: i32, y: i32) -> Result<(), SurfaceError> {
-        self.0.lock().unwrap().offsets.push((x, y));
+        self.probe.lock().unwrap().offsets.push((x, y));
         Ok(())
     }
 
     fn acquire_frame(&mut self) -> Result<Option<SurfaceFrame>, SurfaceError> {
-        self.0.lock().unwrap().frames += 1;
+        let mut probe = self.probe.lock().unwrap();
+        probe.frames += 1;
+        probe.frame_urls.push(self.url.clone());
         Ok(None)
     }
 
@@ -279,6 +290,92 @@ fn tile(id: u64) -> Tile {
         content: ContentSource::Document(DocumentRef(format!("tile-{id}.html"))),
         accent: None,
     }
+}
+
+#[test]
+fn surface_budget_rotates_live_producers_without_cached_frames_advancing_schedule() {
+    let surfaces = Arc::new(Mutex::new(SurfaceProbe::default()));
+    let mut surface_engines = SurfaceEngineRegistry::new();
+    surface_engines.register(Box::new(FakeSurfaceEngine(surfaces.clone())));
+    let registries: PeltRegistries<String> = PeltRegistries::new(
+        SessionRegistry::new(),
+        surface_engines,
+        EngineRoutePolicy {
+            rules: Vec::new(),
+            fallback: EngineRouteRule::new(
+                std::iter::empty::<&str>(),
+                "fake.surface",
+                SurfaceContractMode::CompositedTexture,
+            ),
+            per_host_overrides: HashMap::new(),
+        },
+        "pelt-budget-test",
+        "fake.surface",
+        EngineProfileBinding {
+            user_data_dir: "pelt-budget-test-profile".to_owned(),
+        },
+    );
+    let tree = TileTree::split(
+        SplitAxis::Row,
+        (1..=3)
+            .map(|id| TileBranch::new(1.0 / 3.0, TileTree::single(tile(id))))
+            .collect(),
+    );
+    let mut workspace = PeltWorkspace::try_routed(
+        tree,
+        registries,
+        |tile| {
+            Ok(PeltTileRequest::new(
+                format!("surface://tile-{}", tile.id.0),
+                (80, 60),
+            ))
+        },
+        || Box::new(TestClock),
+    )
+    .expect("three surface routes install");
+    workspace.set_content_rects([
+        (TileId(1), WorkspaceRect::new(0.0, 0.0, 80.0, 60.0)),
+        (TileId(2), WorkspaceRect::new(80.0, 0.0, 80.0, 60.0)),
+        (TileId(3), WorkspaceRect::new(160.0, 0.0, 80.0, 60.0)),
+    ]);
+    workspace.set_surface_resource_policy(SurfaceResourcePolicy {
+        max_refreshes_per_frame: 1,
+        refresh_every_n_frames: 3,
+    });
+
+    workspace.frame();
+    workspace.frame_with_cached_surfaces();
+    workspace.frame_with_cached_surfaces();
+    workspace.frame();
+    workspace.frame_with_cached_surfaces();
+    workspace.frame();
+    workspace.frame_with_cached_surfaces();
+    workspace.frame();
+    assert_eq!(
+        surfaces.lock().unwrap().frame_urls,
+        ["surface://tile-1", "surface://tile-2"],
+        "only scheduled passes poll, and cached composition does not advance cadence"
+    );
+
+    // A new policy and a removed producer must not leave the rotation cursor
+    // pointing beyond the live set or continue polling the detached producer.
+    workspace.set_surface_resource_policy(SurfaceResourcePolicy {
+        max_refreshes_per_frame: 1,
+        refresh_every_n_frames: 1,
+    });
+    assert!(workspace.apply(&TileEvent::Closed(TileId(2))));
+    workspace.frame();
+    workspace.frame();
+    assert_eq!(
+        surfaces.lock().unwrap().frame_urls,
+        [
+            "surface://tile-1",
+            "surface://tile-2",
+            "surface://tile-1",
+            "surface://tile-3",
+        ],
+        "both remaining producers continue to be polled after detaching tile two"
+    );
 }
 
 #[test]
@@ -457,6 +554,28 @@ fn shared_registries_route_documents_surfaces_overrides_and_visible_fallbacks() 
     assert_eq!(cached_frame.surfaces.len(), 1);
     assert!(cached_frame.surfaces[0].frame.as_ref().unwrap().is_none());
     assert_eq!(surfaces.lock().unwrap().frames, 1);
+
+    // Resource pressure defers the expensive producer poll while the active
+    // tile and its retained surface remain present for composition.
+    workspace.set_surface_resource_policy(SurfaceResourcePolicy {
+        max_refreshes_per_frame: 0,
+        refresh_every_n_frames: 1,
+    });
+    let deferred = workspace.frame();
+    assert!(deferred.surfaces[0].frame.as_ref().unwrap().is_none());
+    assert_eq!(surfaces.lock().unwrap().frames, 1);
+
+    workspace.set_surface_resource_policy(SurfaceResourcePolicy {
+        max_refreshes_per_frame: 1,
+        refresh_every_n_frames: 2,
+    });
+    let skipped = workspace.frame();
+    assert!(skipped.surfaces[0].frame.as_ref().unwrap().is_none());
+    assert_eq!(surfaces.lock().unwrap().frames, 2);
+    let resumed = workspace.frame();
+    assert!(resumed.surfaces[0].frame.as_ref().unwrap().is_none());
+    assert_eq!(surfaces.lock().unwrap().frames, 2);
+
     assert!(workspace.pump());
     assert_eq!(workspace.poll_surface_web_event(TileId(1)), Ok(None));
     assert!(

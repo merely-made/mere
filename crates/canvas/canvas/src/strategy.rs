@@ -49,11 +49,19 @@ impl Canvas {
         id == "radial.default"
     }
 
+    /// Whether a strategy's inputs include the URL authority partition. Only
+    /// by-site kanban reads it; unrelated URL edits must not invalidate the
+    /// other analytic layouts.
+    fn strategy_uses_url_grouping(id: &str) -> bool {
+        id == "kanban.default"
+    }
+
     /// Whether the active analytic layout must be recomputed: `true` when its inputs — the strategy,
-    /// the kernel's structural [`Graph::revision`](kernel::graph::Graph::revision), the viewport, and
-    /// the focus (only for focus-driven strategies) — differ from the last computed layout. The host
-    /// gates its per-frame `project_canvas_strategy` call on this, so an unchanged analytic layout is
-    /// computed once per real change, not every frame. (Arrangements — the layout cache.)
+    /// the kernel's structural [`Graph::revision`](kernel::graph::Graph::revision), URL-authority grouping
+    /// revision, Canvas footprint revision, viewport, and focus (only for focus-driven strategies) —
+    /// differ from the last computed layout. The host gates its per-frame `project_canvas_strategy`
+    /// call on this, so an unchanged analytic layout is computed once per real change, not every
+    /// frame. (Arrangements — the layout cache.)
     pub fn needs_strategy_recompute(
         &self,
         id: &str,
@@ -61,20 +69,16 @@ impl Canvas {
         h: u32,
         focus: Option<NodeKey>,
     ) -> bool {
-        // The by-site kanban groups by URL host — node *content* the structural revision does not
-        // track (a url edit is content, not structure). Its layout is cheap (host extraction +
-        // grouping), so recompute it every frame rather than risk a stale column. The structural
-        // strategies (grid, penrose, radial, timeline, community-kanban, ...) cache on the revision.
-        if id == "kanban.default" {
-            return true;
-        }
         // A freshly restored score owns the layout until a real input moves:
         // recomputing here would replace the saved arrangement with one derived
         // from live state (losing, e.g., the recency ordering and measured
         // spacing the score was saved with). (Projection proofs — P3 restore.)
-        if let Some((sid, rev)) = &self.restored_score_hold
+        if let Some((sid, rev, url_groups, footprint)) = &self.restored_score_hold
             && sid.as_str() == id
             && *rev == self.graph.revision()
+            && (!Self::strategy_uses_url_grouping(id)
+                || *url_groups == self.graph.url_grouping_revision())
+            && *footprint == self.strategy_footprint_revision
         {
             return false;
         }
@@ -84,13 +88,16 @@ impl Canvas {
             None
         };
         match &self.last_strategy_inputs {
-            Some((sid, rev, sw, sh, sfocus)) => {
+            Some((sid, rev, url_groups, footprint, sw, sh, sfocus)) => {
                 sid.as_str() != id
                     || *rev != self.graph.revision()
+                    || (Self::strategy_uses_url_grouping(id)
+                        && *url_groups != self.graph.url_grouping_revision())
+                    || *footprint != self.strategy_footprint_revision
                     || *sw != w
                     || *sh != h
                     || *sfocus != focus
-            }
+            },
             None => true,
         }
     }
@@ -104,7 +111,15 @@ impl Canvas {
         } else {
             None
         };
-        self.last_strategy_inputs = Some((id.to_string(), self.graph.revision(), w, h, focus));
+        self.last_strategy_inputs = Some((
+            id.to_string(),
+            self.graph.revision(),
+            self.graph.url_grouping_revision(),
+            self.strategy_footprint_revision,
+            w,
+            h,
+            focus,
+        ));
         // A recorded recompute is the ordinary cache taking over from the
         // restored score's claim.
         self.restored_score_hold = None;
@@ -280,7 +295,12 @@ impl Canvas {
         // frame — from *live* inputs, not the saved ones — and the restored
         // positions would never paint. The claim lapses as soon as the graph
         // changes or the user picks a layout.
-        self.restored_score_hold = Some(("phyllotaxis.default".to_string(), self.graph.revision()));
+        self.restored_score_hold = Some((
+            "phyllotaxis.default".to_string(),
+            self.graph.revision(),
+            self.graph.url_grouping_revision(),
+            self.strategy_footprint_revision,
+        ));
         // Same default as picking an arrangement: hold the restored placement,
         // via the visible global pause rather than a hidden halt.
         self.set_physics_paused(true);

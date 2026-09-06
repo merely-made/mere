@@ -449,13 +449,21 @@ pub struct Canvas {
     /// The [`Graph::revision`](kernel::graph::Graph::revision) [`community_cache`](Self::community_cache)
     /// was computed at, so a stale partition is recomputed and a fresh one reused. (Graph signals.)
     community_cache_revision: u64,
-    /// The inputs the active analytic layout was last computed for: `(strategy_id, graph revision,
-    /// width, height, focus)`. The host gates its per-frame `project_canvas_strategy` call on these
-    /// via [`needs_strategy_recompute`](Self::needs_strategy_recompute), so an unchanged analytic
-    /// layout (grid, kanban, penrose, radial, ...) is computed once per real change, not every frame.
-    /// `focus` is only recorded for focus-driven strategies (radial), so a selection change does not
-    /// invalidate the others. Reset when the strategy changes. (Arrangements — the layout cache.)
-    last_strategy_inputs: Option<(String, u64, u32, u32, Option<NodeKey>)>,
+    /// The inputs the active analytic layout was last computed for: strategy id, structural graph
+    /// revision, URL-authority grouping revision, Canvas footprint revision, viewport, and focus. The
+    /// host gates its per-frame `project_canvas_strategy` call on these via
+    /// [`needs_strategy_recompute`](Self::needs_strategy_recompute), so an unchanged analytic layout
+    /// is computed once per real dependency change. `focus` is only recorded for focus-driven
+    /// strategies (radial). Reset when the strategy changes. (Arrangements — the layout cache.)
+    last_strategy_inputs: Option<(String, u64, u64, u64, u32, u32, Option<NodeKey>)>,
+    /// Monotonic generation for the Canvas-resolved geometry that analytic layouts consume through
+    /// [`strategy_extents`](Self::strategy_extents). This stays local because explicit sizes and
+    /// size channels are view state, not graph truth.
+    strategy_footprint_revision: u64,
+    /// The resolved square face side for each node at the last geometry push. Collider refreshes
+    /// also happen after harmless content work, so this lets the dependency revision advance only
+    /// when the analytic extent input actually changed.
+    strategy_footprints: HashMap<NodeKey, f32>,
     /// Scene toggle: when on, each node wears a halo in the colour of its Louvain community, so the
     /// partition reads as spatial clusters under any layout. Drives the same generation-gated
     /// [`community_cache`](Self::community_cache) the cluster-kanban strategy uses. Default off.
@@ -625,7 +633,8 @@ pub struct Canvas {
     /// Where the Depth overlay reads a node's depth from (roots, layers, the
     /// focus). (Physics catalog — P1b.)
     physics_depth_source: PhysicsDepthSource,
-    /// A restored score's `(strategy id, graph revision)` claim on the layout.
+    /// A restored score's `(strategy id, graph revision, URL-authority revision, footprint revision)`
+    /// claim on the layout.
     /// [`restore_projection_score`](Self::restore_projection_score) buffers the
     /// score's own positions; without this the host's very next
     /// [`needs_strategy_recompute`](Self::needs_strategy_recompute) would report
@@ -633,7 +642,7 @@ pub struct Canvas {
     /// from scratch, discarding the restored score before it ever painted.
     /// Cleared once the graph actually changes, the user picks a strategy, or a
     /// recompute is recorded. (Projection proofs — P3 score restore.)
-    restored_score_hold: Option<(String, u64)>,
+    restored_score_hold: Option<(String, u64, u64, u64)>,
     /// The pane's "scope" lens: when `Some`, the canvas renders only these nodes (a
     /// curated subset), projecting through a curated forme arrangement instead of the
     /// full Identity one. `None` shows the whole graph. (Curated canvas.)

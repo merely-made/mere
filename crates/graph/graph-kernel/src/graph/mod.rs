@@ -308,6 +308,12 @@ pub struct Graph {
     /// (Graph signals — the universal cache key.)
     revision: u64,
 
+    /// A monotonic revision for the URL-authority partition used by views such
+    /// as site kanban. URL edits do not change topology, so they deliberately
+    /// do not advance [`revision`](Self::revision); a consumer that groups
+    /// nodes by authority must depend on this narrower signal instead.
+    url_grouping_revision: u64,
+
     /// The current app-launch session number, set once by the host via
     /// [`set_current_session`](Self::set_current_session) right after construction/
     /// restore. `0` (the default) means "not wired" — [`navigate_node`](Self::navigate_node)
@@ -329,6 +335,7 @@ impl Graph {
             couplings: HashMap::new(),
             nav: SharedNavigationMemory::empty(),
             revision: 0,
+            url_grouping_revision: 0,
             current_session: 0,
         }
     }
@@ -347,10 +354,33 @@ impl Graph {
         self.revision
     }
 
+    /// The current URL-authority grouping revision. This advances only when a
+    /// node's primary URL moves between site groups, letting site-grouped
+    /// projections refresh without invalidating structural caches for an
+    /// ordinary same-site navigation.
+    pub fn url_grouping_revision(&self) -> u64 {
+        self.url_grouping_revision
+    }
+
+    /// The categorical site key used by URL-grouped projections: the authority
+    /// after `://` and before a path, query, or fragment, or the whole hostless
+    /// input. It deliberately retains ports and opaque values.
+    pub fn url_grouping_key(url: &str) -> &str {
+        let after_scheme = url.split_once("://").map(|(_, rest)| rest).unwrap_or(url);
+        after_scheme
+            .split(['/', '?', '#'])
+            .next()
+            .unwrap_or(after_scheme)
+    }
+
     /// Advance the structural revision. Called by the topology/relation mutators on a real change.
     /// (Graph signals — the universal cache key.)
     fn bump_revision(&mut self) {
         self.revision = self.revision.wrapping_add(1);
+    }
+
+    fn bump_url_grouping_revision(&mut self) {
+        self.url_grouping_revision = self.url_grouping_revision.wrapping_add(1);
     }
 
     // Single-write-path boundary (Phase 6.5 — ENFORCED as of the 2026-07-01
@@ -463,10 +493,13 @@ impl Graph {
     pub(crate) fn update_node_url(&mut self, key: NodeKey, new_url: String) -> Option<String> {
         let node = self.inner.node_mut(key)?;
         let old_url = node.primary_address().as_url_str().to_string();
+        let host_changed = cached_host_from_url(&old_url) != cached_host_from_url(&new_url);
+        let site_group_changed =
+            Self::url_grouping_key(&old_url) != Self::url_grouping_key(&new_url);
         // A navigation to a different host invalidates the favicon (it was the old
         // site's icon); clear it so a stale favicon does not linger on the tile until
         // the new one loads. A same-host path change keeps it. (Favicon-on-tile.)
-        if cached_host_from_url(&old_url) != cached_host_from_url(&new_url) {
+        if host_changed {
             node.clear_image(crate::types::ImageRole::Favicon);
         }
         // Primary-first is Container's address-role mapping. Replace index 0;
@@ -477,6 +510,9 @@ impl Graph {
         }
         self.remove_url_mapping(&old_url, key);
         self.url_to_nodes.entry(new_url).or_default().push(key);
+        if site_group_changed {
+            self.bump_url_grouping_revision();
+        }
         Some(old_url)
     }
 

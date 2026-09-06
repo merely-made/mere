@@ -69,12 +69,40 @@ fn revision_advances_on_structural_change_only() {
         "a url edit is content, not structure"
     );
 
+    let url_groups = graph.url_grouping_revision();
+    graph.update_node_url(a, "https://a2.example/another-page".to_string());
+    assert_eq!(
+        graph.url_grouping_revision(),
+        url_groups,
+        "a same-host URL edit does not move a host-grouped projection"
+    );
+    graph.update_node_url(a, "https://other.example/".to_string());
+    assert!(
+        graph.url_grouping_revision() > url_groups,
+        "a host move advances the narrow URL-grouping dependency"
+    );
+    let url_groups = graph.url_grouping_revision();
+    graph.update_node_url(a, "https://other.example:8443/".to_string());
+    assert!(
+        graph.url_grouping_revision() > url_groups,
+        "a port is part of Canvas's site authority grouping"
+    );
+
     // Removing a node is structural.
     graph.remove_node(b);
     assert!(
         graph.revision() > after_edge,
         "removing a node advances the revision"
     );
+}
+
+#[test]
+fn url_grouping_key_matches_site_kanban_authority() {
+    assert_eq!(
+        Graph::url_grouping_key("https://example.test:8443/a?b#c"),
+        "example.test:8443"
+    );
+    assert_eq!(Graph::url_grouping_key("mere:opaque"), "mere:opaque");
 }
 
 #[test]

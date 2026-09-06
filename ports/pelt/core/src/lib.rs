@@ -5,6 +5,7 @@
 //! Window-neutral Pelt host controller.
 
 mod workspace;
+mod surface_policy;
 
 use std::sync::Arc;
 use std::sync::atomic::{AtomicU64, Ordering};
@@ -22,6 +23,7 @@ pub use workspace::{
     PeltTileInspection, PeltTileRequest, PeltTileRoute, PeltWorkspace, PeltWorkspaceFrame,
     PeltWorkspaceOutcome, WorkspaceRect,
 };
+pub use surface_policy::SurfaceResourcePolicy;
 
 /// Host-neutral state for a controller's document presentation.
 ///
