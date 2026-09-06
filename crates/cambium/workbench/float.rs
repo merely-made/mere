@@ -236,14 +236,14 @@ impl Workspace {
                 } else {
                     WorkbenchOutcome::Unchanged
                 };
-            }
+            },
             WorkspaceEvent::Tile(TileEvent::Closed(id)) if self.is_floating(*id) => {
                 self.floating.retain(|f| f.tile.id != *id);
                 true
-            }
+            },
             WorkspaceEvent::Tile(TileEvent::Activated(id)) if self.is_floating(*id) => {
                 self.raise(*id)
-            }
+            },
             WorkspaceEvent::Tile(event) => self.tiled.apply(event),
             WorkspaceEvent::Float(event) => self.apply_float(*event),
         };
@@ -266,11 +266,11 @@ impl Workspace {
             FloatEvent::SetRect { tile, rect } => self.with_float(tile, |f| f.rect = rect),
             FloatEvent::SetConstraints { tile, constraints } => {
                 self.with_float(tile, |f| f.constraints = constraints)
-            }
+            },
             FloatEvent::SetPinned { tile, pinned } => self.with_float(tile, |f| f.pinned = pinned),
             FloatEvent::SetVisible { tile, visible } => {
                 self.with_float(tile, |f| f.visible = visible)
-            }
+            },
         }
     }
 
@@ -279,7 +279,7 @@ impl Workspace {
             Some(float) => {
                 edit(float);
                 true
-            }
+            },
             None => false,
         }
     }
@@ -319,7 +319,7 @@ impl Workspace {
                 }
                 self.tiled = TileTree::single(tile);
                 true
-            }
+            },
             FloatDockTarget::Beside { target, edge } => self.tiled.split_beside(target, edge, tile),
             FloatDockTarget::Tab { target } => self.tiled.insert_tab_after(target, tile),
         };
@@ -537,7 +537,7 @@ mod tests {
             TileTree::Stack(TabStack { tabs, active }) => {
                 assert_eq!(tabs.iter().map(|t| t.id.0).collect::<Vec<_>>(), vec![1, 2]);
                 assert_eq!(*active, 1, "the docked tab is the active one");
-            }
+            },
             other => panic!("expected a two-tab stack, got {other:?}"),
         }
     }

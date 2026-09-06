@@ -102,7 +102,7 @@ fn subdivide_p3(triangle: Triangle) -> Vec<Triangle> {
                     c: triangle.b,
                 },
             ]
-        }
+        },
         TriangleKind::Obtuse => {
             let q = lerp(triangle.b, triangle.c, INV_PHI);
             vec![
@@ -119,7 +119,7 @@ fn subdivide_p3(triangle: Triangle) -> Vec<Triangle> {
                     c: triangle.b,
                 },
             ]
-        }
+        },
     }
 }
 
@@ -150,7 +150,7 @@ fn subdivide_p2(triangle: Triangle) -> Vec<Triangle> {
                     c: triangle.b,
                 },
             ]
-        }
+        },
         TriangleKind::Obtuse => {
             let p = lerp(triangle.b, triangle.a, INV_PHI);
             vec![
@@ -167,7 +167,7 @@ fn subdivide_p2(triangle: Triangle) -> Vec<Triangle> {
                     c: triangle.b,
                 },
             ]
-        }
+        },
     }
 }
 

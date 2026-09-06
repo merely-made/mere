@@ -45,7 +45,7 @@ pub(super) fn place(config: &Embedded, items: &[&ScoreItem]) -> Vec<Vec2> {
                         config.origin.x + ring_radius * angle.cos(),
                         config.origin.y + ring_radius * angle.sin(),
                     )
-                }
+                },
             },
         })
         .collect()

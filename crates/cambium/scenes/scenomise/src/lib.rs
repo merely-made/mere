@@ -34,8 +34,8 @@
 //! the item, rather than shipping source truth for a solver to re-derive.
 
 mod families;
-mod relax;
 pub mod registry;
+mod relax;
 mod solve;
 
 pub use registry::{

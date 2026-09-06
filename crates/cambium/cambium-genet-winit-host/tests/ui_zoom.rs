@@ -21,9 +21,7 @@
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use cambium::{
-    AnyView, GenetCtx, GenetElement, WheelEvent, clickable, el, on_wheel, text,
-};
+use cambium::{AnyView, GenetCtx, GenetElement, WheelEvent, clickable, el, on_wheel, text};
 use cambium_genet_winit_host::{
     Harness, HostHooks, HostOptions, Init, Modifiers, ZOOM_LADDER, fit_zoom, inert_hooks,
 };
@@ -54,22 +52,18 @@ fn root(state: &App) -> Child {
             "div",
             (
                 clickable(
-                    el("button", text("Target"))
-                        .attr("class", "target")
-                        .attr(
-                            "style",
-                            "display:block;position:absolute;left:100px;top:100px;\
+                    el("button", text("Target")).attr("class", "target").attr(
+                        "style",
+                        "display:block;position:absolute;left:100px;top:100px;\
                              width:120px;height:40px;",
-                        ),
+                    ),
                     |s: &mut App, _| s.clicks.push("target"),
                 ),
                 on_wheel(
-                    el("div", text("wheel"))
-                        .attr("class", "wheelbox")
-                        .attr(
-                            "style",
-                            "position:absolute;left:0px;top:300px;width:200px;height:60px;",
-                        ),
+                    el("div", text("wheel")).attr("class", "wheelbox").attr(
+                        "style",
+                        "position:absolute;left:0px;top:300px;width:200px;height:60px;",
+                    ),
                     move |_: &mut App, e: WheelEvent| {
                         if cancels {
                             e.prevent_default();
@@ -90,12 +84,10 @@ fn root(state: &App) -> Child {
                     "style",
                     "position:absolute;left:0px;top:400px;width:100%;font-size:16px;",
                 ),
-                el("span", text("Advance"))
-                    .attr("class", "run")
-                    .attr(
-                        "style",
-                        "display:block;position:absolute;left:0px;top:0px;font-size:16px;",
-                    ),
+                el("span", text("Advance")).attr("class", "run").attr(
+                    "style",
+                    "display:block;position:absolute;left:0px;top:0px;font-size:16px;",
+                ),
             ),
         )
         .attr("style", "position:relative;width:100%;height:100%;"),
@@ -129,7 +121,11 @@ fn harness_at(zoom: f32) -> Harness<App, fn(&App) -> Child, Child> {
 
 fn painted(h: &Harness<App, fn(&App) -> Child, Child>, class: &str) -> (f32, f32, f32, f32) {
     let node = h
-        .with_dom(|dom| genet_probe::matching(dom, &Selector::class(class)).first().copied())
+        .with_dom(|dom| {
+            genet_probe::matching(dom, &Selector::class(class))
+                .first()
+                .copied()
+        })
         .unwrap_or_else(|| panic!("no element with class {class}"));
     h.painted_rect(node)
         .unwrap_or_else(|| panic!("{class} has no painted box"))
@@ -233,11 +229,8 @@ fn the_accessibility_root_transform_carries_the_layout_scale() {
 /// why the design is never cropped.
 #[test]
 fn fit_design_scales_the_interface_until_the_design_fits() {
-    let mut h = Harness::with_hooks_and_options(
-        init(),
-        inert_hooks(),
-        options(1.0, Some((1100.0, 820.0))),
-    );
+    let mut h =
+        Harness::with_hooks_and_options(init(), inert_hooks(), options(1.0, Some((1100.0, 820.0))));
     h.layout_at(1100.0, 752.0);
 
     let expected = 752.0 / 820.0;
@@ -248,7 +241,10 @@ fn fit_design_scales_the_interface_until_the_design_fits() {
         "the public helper computes the host's own number",
     );
     let (lw, lh) = h.logical_size();
-    assert!((lh - 820.0).abs() < 0.01, "the binding axis lands exactly: {lh}");
+    assert!(
+        (lh - 820.0).abs() < 0.01,
+        "the binding axis lands exactly: {lh}"
+    );
     assert!(
         (lw - 1100.0 / expected).abs() < 0.01,
         "the slack axis gets more room than the design asked for: {lw}",
@@ -259,18 +255,18 @@ fn fit_design_scales_the_interface_until_the_design_fits() {
 /// Resizing recomputes it, with no application involvement at all.
 #[test]
 fn resizing_recomputes_the_fit() {
-    let mut h = Harness::with_hooks_and_options(
-        init(),
-        inert_hooks(),
-        options(1.0, Some((1100.0, 820.0))),
-    );
+    let mut h =
+        Harness::with_hooks_and_options(init(), inert_hooks(), options(1.0, Some((1100.0, 820.0))));
     h.layout_at(1100.0, 820.0);
     assert_eq!(h.ui_zoom(), 1.0, "the design fits exactly");
 
     h.layout_at(550.0, 410.0);
     assert!((h.ui_zoom() - 0.5).abs() < 1e-5, "{}", h.ui_zoom());
     let (lw, lh) = h.logical_size();
-    assert!((lw - 1100.0).abs() < 0.01 && (lh - 820.0).abs() < 0.01, "{lw}x{lh}");
+    assert!(
+        (lw - 1100.0).abs() < 0.01 && (lh - 820.0).abs() < 0.01,
+        "{lw}x{lh}"
+    );
 }
 
 /// Without a design the explicit knob is the whole answer. With one it is an
@@ -413,12 +409,20 @@ fn the_keyboard_walks_the_ladder_both_ways() {
     h.key_char("=");
     assert_eq!(h.ui_zoom(), 1.1);
     h.key_char("+");
-    assert_eq!(h.ui_zoom(), 1.25, "the shifted spelling means the same thing");
+    assert_eq!(
+        h.ui_zoom(),
+        1.25,
+        "the shifted spelling means the same thing"
+    );
     h.key_char("-");
     assert_eq!(h.ui_zoom(), 1.1);
     h.key_char("0");
     assert_eq!(h.ui_zoom(), 1.0);
-    assert_eq!(h.logical_size(), (1200.0, 800.0), "and the layout came back");
+    assert_eq!(
+        h.logical_size(),
+        (1200.0, 800.0),
+        "and the layout came back"
+    );
 }
 
 /// The ladder clamps at both ends rather than wrapping or running away.
@@ -429,7 +433,10 @@ fn the_ladder_clamps_at_its_ends() {
     for _ in 0..20 {
         h.key_char("=");
     }
-    assert_eq!(h.ui_zoom(), *ZOOM_LADDER.last().expect("a ladder has rungs"));
+    assert_eq!(
+        h.ui_zoom(),
+        *ZOOM_LADDER.last().expect("a ladder has rungs")
+    );
     for _ in 0..40 {
         h.key_char("-");
     }
@@ -450,7 +457,11 @@ fn an_application_can_veto_the_zoom_chord() {
     h.set_modifiers(ctrl());
 
     h.key_char("=");
-    assert_eq!(h.ui_zoom(), 1.0, "the intercept consumed it, so nothing moved");
+    assert_eq!(
+        h.ui_zoom(),
+        1.0,
+        "the intercept consumed it, so nothing moved"
+    );
     h.key_char("0");
     assert_eq!(h.ui_zoom(), 1.0);
 }
@@ -492,11 +503,8 @@ fn a_wheel_handler_can_prevent_the_zoom_default() {
 /// and Ctrl+0 clears the offset rather than forcing the interface to 1.0.
 #[test]
 fn a_step_under_fit_design_is_an_offset_and_ctrl_zero_clears_it() {
-    let mut h = Harness::with_hooks_and_options(
-        init(),
-        inert_hooks(),
-        options(1.0, Some((1100.0, 820.0))),
-    );
+    let mut h =
+        Harness::with_hooks_and_options(init(), inert_hooks(), options(1.0, Some((1100.0, 820.0))));
     h.layout_at(550.0, 410.0);
     assert!((h.ui_zoom() - 0.5).abs() < 1e-5);
 

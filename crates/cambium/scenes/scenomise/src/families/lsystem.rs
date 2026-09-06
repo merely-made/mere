@@ -106,7 +106,7 @@ fn walk(grammar: &GrammarDef, depth: u8) -> Vec<Vec2> {
                 x += heading.cos();
                 y += heading.sin();
                 positions.push(Vec2::new(x, y));
-            }
+            },
             '+' => heading -= grammar.angle,
             '-' => heading += grammar.angle,
             '[' => stack.push((x, y, heading)),
@@ -114,8 +114,8 @@ fn walk(grammar: &GrammarDef, depth: u8) -> Vec<Vec2> {
                 if let Some((sx, sy, sh)) = stack.pop() {
                     (x, y, heading) = (sx, sy, sh);
                 }
-            }
-            _ => {}
+            },
+            _ => {},
         }
     }
     positions

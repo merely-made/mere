@@ -535,7 +535,10 @@ mod tests {
             "display: flex;",
             "flex-direction: column;",
         ] {
-            assert!(style.contains(fragment), "{fragment:?} missing from {style:?}");
+            assert!(
+                style.contains(fragment),
+                "{fragment:?} missing from {style:?}"
+            );
         }
         assert!(
             !style.contains("max-width"),
@@ -573,7 +576,11 @@ mod tests {
             .iter()
             .map(|node| attr_of(&dom, *node, FRISKET_TILE_ATTR).unwrap().to_string())
             .collect();
-        assert_eq!(ids, ["5"], "only the pinned float outlives the hidden layer");
+        assert_eq!(
+            ids,
+            ["5"],
+            "only the pinned float outlives the hidden layer"
+        );
     }
 
     #[test]
@@ -707,19 +714,14 @@ mod tests {
         bumps: u32,
     }
 
-    fn counter_body(
-        props: &CounterProps,
-        local: &CounterLocal,
-    ) -> ComponentView<CounterLocal, ()> {
-        Box::new(
-            on_click(
-                el::<_, CounterLocal, ()>("div", ())
-                    .attr("class", "counter")
-                    .attr("data-bumps", local.bumps.to_string())
-                    .attr("data-note", props.note.clone()),
-                |local: &mut CounterLocal, _: PointerClick| local.bumps += 1,
-            ),
-        )
+    fn counter_body(props: &CounterProps, local: &CounterLocal) -> ComponentView<CounterLocal, ()> {
+        Box::new(on_click(
+            el::<_, CounterLocal, ()>("div", ())
+                .attr("class", "counter")
+                .attr("data-bumps", local.bumps.to_string())
+                .attr("data-note", props.note.clone()),
+            |local: &mut CounterLocal, _: PointerClick| local.bumps += 1,
+        ))
     }
 
     fn counter(tile: u64, note: String) -> AcceptView {
@@ -776,10 +778,7 @@ mod tests {
                 },
                 |_: &mut AcceptState, _| {},
                 move |tile: &Tile| match tile.id.0 {
-                    1 => Slot::View(counter(
-                        1,
-                        notes.get(&1).cloned().unwrap_or_default(),
-                    )),
+                    1 => Slot::View(counter(1, notes.get(&1).cloned().unwrap_or_default())),
                     _ => Slot::Hole,
                 },
             ))
@@ -857,7 +856,11 @@ mod tests {
         // window does: take it from one workspace and insert it in the other.
         runner.update(|state| {
             let tile = state.spaces[0].take_tile(TileId(1)).expect("tile 1");
-            assert!(state.spaces[1].tiled_mut().insert_tab_after(TileId(9), tile));
+            assert!(
+                state.spaces[1]
+                    .tiled_mut()
+                    .insert_tab_after(TileId(9), tile)
+            );
         });
 
         assert!(

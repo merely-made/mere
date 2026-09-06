@@ -49,7 +49,7 @@ impl Footprint {
             )),
             Footprint::Rect { size } => {
                 Some(Rect::new(Vec2::new(-size.w / 2.0, -size.h / 2.0), *size))
-            }
+            },
             Footprint::Polygon { points } if points.len() >= 3 => points_bounds(points),
             Footprint::Path { points, width } if points.len() >= 2 => {
                 points_bounds(points).map(|r| {
@@ -59,7 +59,7 @@ impl Footprint {
                         Size2::new(r.size.w + width, r.size.h + width),
                     )
                 })
-            }
+            },
             _ => None,
         }
     }
@@ -78,17 +78,17 @@ impl Footprint {
             Footprint::Point => false,
             Footprint::Circle { radius } => {
                 local.x * local.x + local.y * local.y <= radius * radius
-            }
+            },
             Footprint::Rect { size } => {
                 local.x.abs() <= size.w / 2.0 && local.y.abs() <= size.h / 2.0
-            }
+            },
             Footprint::Polygon { points } if points.len() >= 3 => polygon_contains(points, local),
             Footprint::Path { points, width } if points.len() >= 2 => {
                 let half = width / 2.0;
                 points
                     .windows(2)
                     .any(|seg| distance_to_segment(local, seg[0], seg[1]) <= half)
-            }
+            },
             _ => false,
         }
     }

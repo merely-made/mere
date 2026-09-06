@@ -173,27 +173,27 @@ impl SceneSnapshot {
         match operation {
             SceneOp::AddSource { index, value } => {
                 append(&mut tables.sources, index.0, value.clone(), "source")
-            }
+            },
             SceneOp::UpdateSource { index, value } => {
                 update(&mut tables.sources, index.0, value.clone(), "source")
-            }
+            },
             SceneOp::TombstoneSource { index } => tombstone(&mut tables.sources, index.0, "source"),
             SceneOp::AddSpace { index, value } => {
                 append(&mut tables.spaces, index.0, value.clone(), "space")
-            }
+            },
             SceneOp::UpdateSpace { index, value } => {
                 update(&mut tables.spaces, index.0, value.clone(), "space")
-            }
+            },
             SceneOp::TombstoneSpace { index } => tombstone(&mut tables.spaces, index.0, "space"),
             SceneOp::AddBackdrop { index, value } => {
                 append(&mut tables.backdrops, index.0, value.clone(), "backdrop")
-            }
+            },
             SceneOp::UpdateBackdrop { index, value } => {
                 update(&mut tables.backdrops, index.0, value.clone(), "backdrop")
-            }
+            },
             SceneOp::TombstoneBackdrop { index } => {
                 tombstone(&mut tables.backdrops, index.0, "backdrop")
-            }
+            },
             SceneOp::AddItem {
                 index,
                 value,
@@ -201,46 +201,46 @@ impl SceneSnapshot {
             } => {
                 append(&mut tables.items, index.0, value.clone(), "item")?;
                 append(&mut tables.item_order, index.0, *order, "item order")
-            }
+            },
             SceneOp::UpdateItem { index, value } => {
                 update(&mut tables.items, index.0, value.clone(), "item")
-            }
+            },
             SceneOp::TombstoneItem { index } => {
                 tombstone(&mut tables.items, index.0, "item")?;
                 tombstone(&mut tables.item_order, index.0, "item order")
-            }
+            },
             SceneOp::SetItemLayer { index, layer } => {
                 active_mut(&mut tables.items, index.0, "item")?.layer = *layer;
                 Ok(())
-            }
+            },
             SceneOp::SetItemOrder { index, order } => {
                 *active_mut(&mut tables.item_order, index.0, "item order")? = *order;
                 Ok(())
-            }
+            },
             SceneOp::AddRelation { index, value } => {
                 append(&mut tables.relations, index.0, value.clone(), "relation")
-            }
+            },
             SceneOp::UpdateRelation { index, value } => {
                 update(&mut tables.relations, index.0, value.clone(), "relation")
-            }
+            },
             SceneOp::TombstoneRelation { index } => {
                 tombstone(&mut tables.relations, index.0, "relation")
-            }
+            },
             SceneOp::AddRegion { index, value } => {
                 append(&mut tables.regions, index.0, value.clone(), "region")
-            }
+            },
             SceneOp::UpdateRegion { index, value } => {
                 update(&mut tables.regions, index.0, value.clone(), "region")
-            }
+            },
             SceneOp::TombstoneRegion { index } => tombstone(&mut tables.regions, index.0, "region"),
             SceneOp::SetBounds { bounds } => {
                 tables.bounds = *bounds;
                 Ok(())
-            }
+            },
             SceneOp::SetGeneration { generation } => {
                 tables.generation = *generation;
                 Ok(())
-            }
+            },
         }
     }
 }
@@ -669,7 +669,7 @@ mod tests {
                         value: updated.clone(),
                     });
                     oracle_items[index] = Some(updated);
-                }
+                },
                 2 if active.len() > 1 => {
                     let index = active[(seed as usize >> 8) % active.len()];
                     operations.push(SceneOp::TombstoneItem {
@@ -677,7 +677,7 @@ mod tests {
                     });
                     oracle_items[index] = None;
                     oracle_order[index] = None;
-                }
+                },
                 _ => {
                     let index = oracle_items.len();
                     let value = item(SourceIx(0), (seed % 700) as f32);
@@ -689,7 +689,7 @@ mod tests {
                     });
                     oracle_items.push(Some(value));
                     oracle_order.push(Some(order));
-                }
+                },
             }
             let base = Revision(step + 1);
             state

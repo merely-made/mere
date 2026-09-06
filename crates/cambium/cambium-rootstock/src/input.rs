@@ -460,7 +460,10 @@ where
         }
         if self.zoom_chord(press) {
             if trace {
-                eprintln!("[cambium-host]   zoom chord: ui_zoom now {}", self.ui_zoom());
+                eprintln!(
+                    "[cambium-host]   zoom chord: ui_zoom now {}",
+                    self.ui_zoom()
+                );
             }
             return;
         }
