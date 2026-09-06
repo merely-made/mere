@@ -76,6 +76,11 @@ records source hashes, exact commands/logs, and scope:
   compile and 27.573 ms for validated label refresh. Concurrent builds were
   active; this excludes GPU work and is not a headed FPS benchmark.
 
-Native Reader has compile and state-test coverage, not a headed interaction
-receipt. Persisted resource settings, background-work/residency budgets, and
-independent appearances for other engines remain outside this bounded slice.
+Native Reader's headed scroll/close proof passed on 2026-09-06; see
+`turnstone/design_docs/2026-09-06_reader_appearance_native_check_receipt.md`.
+It verifies shared source identity, different viewport widths, independent
+scroll, and stable surviving inset identity after Workbench closes. Three
+global wait steps reached their frame caps, so whole-app idle behavior and
+native frame performance remain unverified. Persisted resource settings,
+background-work/residency budgets, and independent appearances for other
+engines remain outside this bounded slice.
