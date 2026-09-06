@@ -1,0 +1,283 @@
+{
+  "date": "2026-09-05",
+  "scope": "Current dirty-tree browser component proof, not a release baseline or native Woodshed integration.",
+  "source_sha256": {
+    "ports/graphshell/src/practice_workspace.rs": "e2b7a576a8b436aaddd62bdb02ab65e3c64883a885e9c31561cfc49b4e562772",
+    "ports/graphshell/src/practice_disclosure.rs": "68da741e4444234957dc6fe14d93da586362ce55ceb75c203070f92827130377",
+    "ports/graphshell/src/web_practice.rs": "45a8e43bb2d859b86e0efea79081972b443e51644bf04fda26882cdcc30126a4",
+    "ports/graphshell/src/projection_compile.rs": "49a834807c804063f79096effa2feeb2b401d87d12dc6bb16322de5382d7f568",
+    "ports/graphshell/src/web.rs": "ef3a0541b7dfc8ceed18e0ac8da950020d83dde1e23931bc2fcb6828734e253c",
+    "ports/graphshell/src/web_events.rs": "f378e2abff41d4a3764f76527ad87bfd456f7d3638b3572dc26f24b0422397d3",
+    "ports/graphshell/src/web_gpu.rs": "df36d968f776a83e09a7f83466662f2111e71f55e6b2a420185147171a2ca26e",
+    "ports/graphshell/src/web_scenario.rs": "3d2178601f9968ac3419a8b7d33aa70246b7d1acfb2d6b4734d1da8825156d15",
+    "ports/graphshell/src/lib.rs": "9fa38667278099d9b58d7bf479f59cfa32cd7ea8222b6abb7f9a6f48cc43893b",
+    "ports/graphshell/web/Cargo.toml": "0f3fd6a21543a9f6d921bfe60e93b0259c7a95c768d77148bab0b2ae07dfded9",
+    "ports/graphshell/web/loader.js": "778d9844288b1ed4e5efd1a55183af192653bd4aa0113aa3da2d4e9ba51e4067",
+    "ports/graphshell/web/styles.css": "4da74cd6a85e17dc1843f860a6c151242d6eb6385aa7fe03f0b6d359d268492d",
+    "ports/graphshell/web/practice.html": "71f5ae503907020ae6703656ff9e82f7eb6e971b9d3856d57ec93498ae0cbd8a",
+    "ports/graphshell/web/practice-embed.html": "a4e2f88b20ba3dc68921d419bb328fc6229d967f35efc98cc5b8f2fee32ffb4d",
+    "ports/graphshell/web/fixtures/woodshed-comparison.json": "e159ca8c6ee70cb324027b92ff24e047d2bce21c0c22b04590a0aeaa7ebe841b",
+    "ports/graphshell/web/scenarios/practice_workspace.scn": "e280d388cf7f4bf01f5cada5eac925aac3a502691e3557291ecb46787b7d8e03",
+    "ports/graphshell/web/scenarios/practice_reopen.scn": "2f0914d6d03586b3646e96dd30cfb969c27a60b1ed3f769c96cc370d40d34857",
+    "ports/graphshell/web/scenarios/practice_embedded.scn": "59382f0d1009a6cc887ca360ffc1d6daa87cb320a48f44e035b5195144933bab",
+    "ports/graphshell/examples/projection_compile_perf.rs": "e4fad0400ad1cf34b365405ce7407b169c8698721b9f0b3ad2c2b4758a7f6cfd",
+    "crates/canvas/canvas/src/physics_board.rs": "66ba2891710a2109b09ec56a6de442d970fc09b20889ad2c3c1dd17e7f6d64f1"
+  },
+  "woodshed_export": {
+    "path": "C:\\Users\\mark_\\Code\\repos\\woodshed\\scenarios\\woodshed_musical_comparison.json",
+    "sha256": "e159ca8c6ee70cb324027b92ff24e047d2bce21c0c22b04590a0aeaa7ebe841b",
+    "byte_equal_to_graphshell_fixture": true
+  },
+  "repository_heads": {
+    "repos/mere": "579b2415606c839b9b243fe52307ab78031d9aca",
+    "repos/woodshed": "31dde483445648705eb86a86f982a7deeb50fd00",
+    "worktrees/genet-head": "115d348deddc344d949754e63beaece47cf49f34",
+    "repos/netrender": "24b021419d1afe5d3ef865e613e5574ce9b20e28"
+  },
+  "build": {
+    "result": "passed",
+    "target": "wasm32-unknown-unknown",
+    "profile": "dev",
+    "command": "cargo build --offline --target wasm32-unknown-unknown -j1 --target-dir C:/Users/mark_/Code/scratch/projection-proof/wasm-target",
+    "cwd": "repos/mere/ports/graphshell/web",
+    "local_overrides": [
+      "worktrees/genet-head",
+      "repos/netrender"
+    ],
+    "log_sha256": "d25be6079a8e5b63eb607539e204f736a801fb5f6c176852946cb09eb6a12e23",
+    "served_wasm_sha256": "f3662f75908d20492d181a7958255b06ab952d9ee57142f1be5fbf2611883de9",
+    "custom_debug_section_removal": {
+      "input_bytes": 322882819,
+      "served_bytes": 35006269,
+      "removed": [
+        {
+          "name": "name",
+          "bytes": 287876436
+        },
+        {
+          "name": "producers",
+          "bytes": 114
+        }
+      ]
+    },
+    "shipping_size_claim": false
+  },
+  "focused_tests": [
+    {
+      "scope": "practice reducer and named disclosure source-path harness",
+      "passed": 14
+    },
+    {
+      "scope": "projection compiler/editor source-path release harness; overlaps earlier proof",
+      "passed": 15
+    },
+    {
+      "scope": "cargo test -p mere-canvas physics_board::tests:: --lib -j1",
+      "passed": 4
+    }
+  ],
+  "browser_scenarios": {
+    "practice_saved": {
+      "state": "ok",
+      "errors": [],
+      "result": {
+        "captures": 3,
+        "frames": 73,
+        "log": [
+          "captured practice_compare",
+          "waited 2 frames",
+          "captured practice_history",
+          "waited 1 frames",
+          "captured practice_saved",
+          "waited 2 frames",
+          "workspace views selection history recipe and persistence complete"
+        ],
+        "result": "ok",
+        "steps": 45
+      },
+      "captures": [
+        {
+          "name": "practice_compare",
+          "width": 1280,
+          "height": 720,
+          "bytes": 96174
+        },
+        {
+          "name": "practice_history",
+          "width": 1280,
+          "height": 720,
+          "bytes": 112046
+        },
+        {
+          "name": "practice_saved",
+          "width": 1280,
+          "height": 720,
+          "bytes": 109930
+        }
+      ]
+    },
+    "practice_fresh_reopen": {
+      "state": "ok",
+      "errors": [],
+      "result": {
+        "captures": 1,
+        "frames": 16,
+        "log": [
+          "captured practice_fresh_reopen",
+          "waited 2 frames",
+          "workspace fresh page reopen complete"
+        ],
+        "result": "ok",
+        "steps": 11
+      },
+      "captures": [
+        {
+          "name": "practice_fresh_reopen",
+          "width": 1280,
+          "height": 720,
+          "bytes": 110102
+        }
+      ]
+    },
+    "practice_embedded": {
+      "state": "ok",
+      "errors": [],
+      "result": {
+        "captures": 1,
+        "frames": 23,
+        "log": [
+          "captured practice_embedded",
+          "waited 2 frames",
+          "same component embedded selection and reopening complete"
+        ],
+        "result": "ok",
+        "steps": 14
+      },
+      "captures": [
+        {
+          "name": "practice_embedded",
+          "width": 1040,
+          "height": 740,
+          "bytes": 92126
+        }
+      ]
+    },
+    "projection_reopened": {
+      "state": "ok",
+      "errors": [],
+      "result": {
+        "captures": 3,
+        "frames": 88,
+        "log": [
+          "captured projection_grid",
+          "waited 1 frames",
+          "captured projection_scatter",
+          "waited 1 frames",
+          "captured projection_reopened",
+          "waited 1 frames",
+          "executable projection authoring proof complete"
+        ],
+        "result": "ok",
+        "steps": 58
+      },
+      "captures": [
+        {
+          "name": "projection_grid",
+          "width": 1280,
+          "height": 720,
+          "bytes": 129238
+        },
+        {
+          "name": "projection_scatter",
+          "width": 1280,
+          "height": 720,
+          "bytes": 141226
+        },
+        {
+          "name": "projection_reopened",
+          "width": 1280,
+          "height": 720,
+          "bytes": 141226
+        }
+      ]
+    }
+  },
+  "manual_browser_checks": {
+    "viewport_narrow": [
+      360,
+      920
+    ],
+    "narrow_compare_and_stacked_relations": "visually inspected; readable; page scrolls vertically",
+    "narrow_document_scroll_width": 345,
+    "keyboard_enter_save": true,
+    "page_errors": {
+      "standalone": [],
+      "embedded": [],
+      "authoring_regression": []
+    },
+    "drag": {
+      "input": "CUA real pointer drag [500,285] to [620,375]; C Major already selected",
+      "before": {
+        "compiles": 3,
+        "layouts": 73,
+        "physics_ticks": 725,
+        "presents": 731,
+        "frame_cpu_ms": 796.2000001221895,
+        "settling": false,
+        "x": 428.84375,
+        "y": 252.8203125
+      },
+      "after": {
+        "compiles": 3,
+        "layouts": 73,
+        "physics_ticks": 1092,
+        "presents": 1101,
+        "frame_cpu_ms": 935.900000154972,
+        "settling": false,
+        "x": 429.2890625,
+        "y": 253.0625
+      },
+      "cpu_scope": "Scene preparation, excludes GPU present; not an FPS measurement"
+    },
+    "idle": {
+      "two_dom_reads_separated_by_other_verification": "identical",
+      "metrics": {
+        "compiles": 2,
+        "frame_cpu_ms": 558.5999999791384,
+        "frames": 29,
+        "layouts": 77,
+        "max_frame_cpu_ms": 150.8999999910593,
+        "physics_ticks": 5,
+        "presents": 10,
+        "semantic_creates": 32,
+        "semantic_updates": 182
+      }
+    }
+  },
+  "compiler_measurement": {
+    "scope": "Projection compile plus Scenomise solve, synthetic reversed grid occurrences and 17 source IDs; CPU only.",
+    "samples_per_count": 1,
+    "execution": "Sequential existing baseline then optimized release binaries; raw output and binary hashes preserved. Baseline source snapshot was not archived.",
+    "measurements": {
+      "baseline": {
+        "raw_output": "occurrences=100 samples=1 median_us=808\noccurrences=1000 samples=1 median_us=59283\noccurrences=10000 samples=1 median_us=14328279",
+        "binary_sha256": "05e13db97440222898d59781549a99bba9909e7e29b09c6c47a332b80fbce0fc"
+      },
+      "after": {
+        "raw_output": "occurrences=100 samples=1 median_us=193\noccurrences=1000 samples=1 median_us=1105\noccurrences=10000 samples=1 median_us=19618",
+        "binary_sha256": "1b03dbc45ca7d4487bd462bd4cb43aba07e126153ce9fcdcd7b3b598deb3981d"
+      }
+    },
+    "reproduction_example": "ports/graphshell/examples/projection_compile_perf.rs",
+    "example_verification": "Passed isolated release cargo check including exact repository example and actual compiler/editor source modules; broad Graphshell package build not run for this example."
+  },
+  "limits": [
+    "Three visible graph cards; no large-scene GPU/frame-budget receipt.",
+    "Fields/coupling are not connected in this proof.",
+    "Physics sleeps after bounded settle ticks, not an energy convergence test.",
+    "Narrow layout stacks cards for readability.",
+    "Browser native controls bridge semantic input to retained Cambium/Genet/Netrender faces; native application host integration remains.",
+    "Motion geometry is transient; saved source comparison and recipe do not acquire physical positions.",
+    "Application publication, production persistence and co-op networking are outside this browser receipt."
+  ]
+}

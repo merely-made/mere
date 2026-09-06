@@ -1,0 +1,249 @@
+{
+  "date": "2026-09-06",
+  "scope": "Focused dirty-tree proof of four bounded optimization slices; not a release or whole-workspace gate.",
+  "repository_heads": {
+    "mere": "17e96448d38684426709c1518f108a24642b8497",
+    "turnstone": "115259595f8f00bf553a4f723324871d0d07fa7e"
+  },
+  "source_sha256": {
+    "mere/crates/graph/graph-kernel/src/graph/mod.rs": "465c06ed3ece0e781b332de2b61252d0921c3298702b3c5de721bcb9a0a34bb9",
+    "mere/crates/graph/graph-kernel/src/graph/tests/nodes_and_edges.rs": "d78ec7a7eb281fad056f0bf9ebe80f753667ad71786f0929cb6173e4bd12f4b2",
+    "mere/crates/canvas/canvas/src/lib.rs": "1a93311f0e55c8a30818af5b80897b6cdf16000e4b28b79f461edf20d6e392d8",
+    "mere/crates/canvas/canvas/src/lifecycle.rs": "dffea354a92fa95eff6adddab2e846626213b48d2286dc8f970defcbab60b70f",
+    "mere/crates/canvas/canvas/src/strategy.rs": "fd3b559df93cda5c091b3089426e9672f680f59685a38424ea7abe6dcdcb7f27",
+    "mere/crates/canvas/canvas/src/cartography_scene.rs": "2a3f8de4994f8c6bd8c2e3e33408cf5a63546a293c6f844883d77af3cc0e18fd",
+    "mere/crates/canvas/canvas/src/physics_catalog.rs": "1aafec45054cb5fe8e7c5b9a07e4f3dd9b437621388ccca7882b1b2173642aec",
+    "mere/crates/canvas/canvas/src/tests/rings.rs": "c58274448b2ed930e174721e1a605891bddb0d3a268238c0e2f415b0c5fe8c25",
+    "mere/crates/system/document-lanes/src/reader.rs": "132a188d81e1cc3bef52c4ef6d4464be6896a21193bc1a80a2766dd62dcd9bce",
+    "mere/crates/system/document-lanes/src/smolweb.rs": "656b90f2b1dc74de678580dd84cff1c82fac3a31ab0662c6bcb77c6d47855654",
+    "mere/ports/pelt/core/src/surface_policy.rs": "db19ea88209464dd45552370bf0835e7df015a68ac7916511c4ef21bb62bbf0a",
+    "mere/ports/pelt/core/src/workspace.rs": "a69c865bd7bc90407d80c90f53f84db6b0b9b1fece77fb3ff223f5d305cb4142",
+    "mere/ports/pelt/core/src/lib.rs": "6e1abae326ed369912aeda05c297a22c39eb2714451e5abe46c1efd786cb1a14",
+    "mere/ports/pelt/core/tests/routing.rs": "44adc3764c1000a06a7d361b59864ee505dc71fcbb3cb1ea3f5e9c1dfa162aa3",
+    "mere/ports/pelt/desktop/workspace_viewer.rs": "dae17bc494a29c8c1795f9a73577dad714ce99067547ab55613df7a0abbc65be",
+    "mere/ports/graphshell/src/projection_compile.rs": "9f532971614ab9014219cbc84d5a6cf15a4595f6192de27d64644252b4cd22c8",
+    "mere/ports/graphshell/src/web_projection.rs": "848e893a579062ed65bfca3e2fa7bac88a7e3edff17fa47c1f9f8a98272ea23a",
+    "mere/ports/graphshell/src/web_practice.rs": "21609597e00eb281d4e0edb7c8b5b40cc20766cd6892810f488476b499387f7e",
+    "mere/ports/graphshell/examples/projection_compile_perf.rs": "ebd0667d5384c8e45aa24a650f5e481f4e78d99ee68b3db0ebc671f1250744ba",
+    "mere/ports/graphshell/web/scenarios/projection_refresh.scn": "32cc8170004835054da6143ea7aaec418c5fc0890b274ff1aa92599d249dffa7",
+    "turnstone/Cargo.toml": "21457cab594ca36eac66b59cc7f7b84732c7456944639e85ee600e080c16d73a",
+    "turnstone/src/surface.rs": "277d14e00dd826b863261f08fad5d9c21f4a79e256d8a5e2612083dd54b326b7",
+    "turnstone/src/surface/appearance.rs": "858d44aa4331d6379a576a626adffc397392f3973b81fb6d542c7add99208360",
+    "turnstone/src/app/mod.rs": "b2282e2b0fc6a7591f0769ce1486c91c78492bb2ba67115033b28b004cad7651",
+    "turnstone/src/shell/mod.rs": "3034405dcd17319dd3bda38a6fb67cd34209be8516edc60d74c0eaad34c4add3",
+    "turnstone/src/shell/render.rs": "88052c8d7a8ca7ee603739f2a9e77dcbeb3a48889e615d3c9dd8d94bacdbbff1",
+    "turnstone/src/shell/input.rs": "31c9e4479af0f80e2c5816be9885c3e27cc494bc065df15ad3007d7f2b6bc8a4",
+    "turnstone/src/shell/keys.rs": "dcf3bc5c547e77ebb0f769111f966cd88721e94d5c743fef14faf1c859fef26d",
+    "turnstone/src/shell/lens.rs": "78c223e824c7b830d045109cfd24e3c10a5f354573423d232ea7c4782bee36a0",
+    "turnstone/src/shell/effects.rs": "7612227d34b97512577d13751895b1d8ac56119bd322671256b4b76459638aa9"
+  },
+  "validation": {
+    "graphshell_compiler": {
+      "result": "passed",
+      "tests": 18,
+      "method": "Release source-path harness importing the actual compiler/editor modules",
+      "log": "C:/Users/mark_/Code/scratch/refresh-proof/compiler-tests.log",
+      "log_sha256": "9e290ec40c26fee76de0f3f5d62a2ace40f9f25497452a84f12496764ce812d4"
+    },
+    "wasm": {
+      "result": "passed",
+      "command": "cargo build --offline --target wasm32-unknown-unknown -j1 --target-dir C:/Users/mark_/Code/scratch/projection-proof/wasm-target",
+      "cwd": "C:/Users/mark_/Code/repos/mere/ports/graphshell/web",
+      "log": "C:/Users/mark_/Code/scratch/refresh-proof/wasm-final-build.log",
+      "profile": "dev; name/producers custom sections removed after wasm-bindgen for browser serving",
+      "log_sha256": "b1cef964abbdeb6c02401726cc21291e6f845110724bddfc97411072f6e48fca"
+    },
+    "pelt": {
+      "result": "passed",
+      "routing_tests": 4,
+      "policy_unit_tests": 4,
+      "desktop_check": "passed",
+      "log": "C:/Users/mark_/Code/repos/mere/scratch/refresh-proof/pelt-validation.log",
+      "log_sha256": "afb796f27c695ac8352669ce5bc8e53c92f68f6530ab2c358c55e8039aede938"
+    },
+    "graph_dependency": {
+      "result": "passed",
+      "tests": 1,
+      "log": "C:/Users/mark_/Code/target/mere-canvas-layout-cache-tests/graph-url-grouping.log",
+      "log_sha256": "10d123a869dccff1d97b6f26b698cd8b0f8f3bc83a3224d76953411c4f3128d2"
+    },
+    "canvas_dependency": {
+      "result": "passed",
+      "tests": 1,
+      "log": "C:/Users/mark_/Code/target/mere-canvas-layout-cache-tests/canvas-layout-cache.log",
+      "log_sha256": "e0b8bb3e5656ec51feff7092217a0574c5b64818f0480368cd96b7371426675d"
+    },
+    "reader": {
+      "result": "passed",
+      "tests": 1,
+      "log": "C:/Users/mark_/Code/target-appearance-reader-test.log",
+      "log_sha256": "89171cea3b8eaf57c5566c5bab1c4d97f9bf97b49a95556096b2e6e1b8f6f794"
+    },
+    "document_lanes": {
+      "result": "passed",
+      "tests": 20,
+      "command": "cargo test -p mere-document-lanes --lib --features smolweb --offline -j 1",
+      "log": "C:/Users/mark_/Code/scratch/refresh-proof/document-lanes-tests.log",
+      "log_sha256": "8f9962db00f07848d2906f63f8b50761b515f3ad04c83b9b7ccf4f46ce62cba9"
+    },
+    "turnstone": {
+      "result": "passed",
+      "command": "cargo check -p turnstone --offline --config C:/Users/mark_/Code/scratch/refresh-proof/turnstone-local.toml -j 1",
+      "log": "C:/Users/mark_/Code/scratch/refresh-proof/turnstone-local-check-fallback.log",
+      "overlay": "C:/Users/mark_/Code/scratch/refresh-proof/turnstone-local.toml",
+      "scope": "122 local Mere package overrides; committed pins unchanged. Distillery alone retained its pinned git version because unrelated local chronicle.rs:324 uses scenomise without declaring that dependency.",
+      "headed_native_reader": "not run",
+      "log_sha256": "76a8be2d6d78de74a48ee06d97a54d26d48a1b358b9e9370900fd9ba2de81895",
+      "overlay_sha256": "cf04500918b884423f03c22a149a14c2e5ea6897191934457c4db5284acc9357"
+    },
+    "surface_planning": {
+      "result": "passed",
+      "tests": 13,
+      "method": "Source-path harness imports actual surface.rs and surface/appearance.rs with a minimal numeric PaneId stub. Native host compilation is a separate gate.",
+      "log": "C:/Users/mark_/Code/scratch/refresh-proof/surface-tests.log",
+      "log_sha256": "b52ceaf9282c98b8c14202873d4f9899db3f6e55f108d889e8c60919b7680598"
+    }
+  },
+  "browser_scenarios": {
+    "projection_refresh": {
+      "result": {
+        "captures": 1,
+        "frames": 34,
+        "log": [
+          "captured projection_refresh",
+          "waited 1 frames",
+          "labels and appearance reuse geometry; changed arrangement solves once"
+        ],
+        "result": "ok",
+        "steps": 22
+      },
+      "log": "C:\\Users\\mark_\\Code\\scratch\\refresh-proof\\receipts\\projection_refresh.json",
+      "sha256": "ea5f36d9d6b9512e4fed43dc92a726a2bd093ef1f41ff253889f57326825324c"
+    },
+    "practice_saved": {
+      "result": {
+        "captures": 3,
+        "frames": 118,
+        "log": [
+          "captured practice_compare",
+          "waited 16 frames",
+          "captured practice_history",
+          "waited 17 frames",
+          "captured practice_saved",
+          "waited 17 frames",
+          "workspace views selection history recipe and persistence complete"
+        ],
+        "result": "ok",
+        "steps": 45
+      },
+      "log": "C:\\Users\\mark_\\Code\\scratch\\refresh-proof\\receipts\\practice_saved.json",
+      "sha256": "8bf0751e8db4fe5a6e4764804d9b0ba011c0842db149075a88c4447409763ba1"
+    },
+    "projection_reopened": {
+      "result": {
+        "captures": 3,
+        "frames": 91,
+        "log": [
+          "captured projection_grid",
+          "waited 2 frames",
+          "captured projection_scatter",
+          "waited 2 frames",
+          "captured projection_reopened",
+          "waited 2 frames",
+          "executable projection authoring proof complete"
+        ],
+        "result": "ok",
+        "steps": 58
+      },
+      "log": "C:\\Users\\mark_\\Code\\scratch\\refresh-proof\\receipts\\projection_reopened.json",
+      "sha256": "d2e2fd051778e48f293929a63072ed3d83800c754d7ccd7b64d160a96bd6f854"
+    },
+    "practice_fresh_reopen": {
+      "result": {
+        "captures": 1,
+        "frames": 30,
+        "log": [
+          "captured practice_fresh_reopen",
+          "waited 16 frames",
+          "workspace fresh page reopen complete"
+        ],
+        "result": "ok",
+        "steps": 11
+      },
+      "log": "C:\\Users\\mark_\\Code\\scratch\\refresh-proof\\receipts\\practice_fresh_reopen.json",
+      "sha256": "6c978fae91542e0f32de336116720ba5286bc2340ebd27ce1d947fb5cf39502a"
+    }
+  },
+  "motion": {
+    "method": "Real pointer drag in practice workspace, motion enabled, settled before and after.",
+    "before": {
+      "compiles": 3,
+      "layouts": 73,
+      "physics_ticks": 372,
+      "placement_solves": 2,
+      "placement_reuses": 1,
+      "frames": 494,
+      "presents": 335
+    },
+    "after": {
+      "compiles": 3,
+      "layouts": 73,
+      "physics_ticks": 740,
+      "placement_solves": 2,
+      "placement_reuses": 1,
+      "frames": 786,
+      "presents": 608
+    },
+    "idle_recheck": "Counters unchanged after subsequent read; data-practice-settling=false.",
+    "scope": "Observed on first successful WASM build in this turn, before final Canvas parser consolidation. CPU/GPU frame throughput is not measured by these counters."
+  },
+  "benchmark": {
+    "samples_per_case": 5,
+    "unit": "microseconds",
+    "method": "Release compiler example; full compile versus validated label refresh retaining placement; concurrent workspace builds active.",
+    "medians": [
+      {
+        "occurrences": 100,
+        "compile": 131,
+        "refresh": 122
+      },
+      {
+        "occurrences": 1000,
+        "compile": 2292,
+        "refresh": 1821
+      },
+      {
+        "occurrences": 10000,
+        "compile": 33235,
+        "refresh": 27573
+      }
+    ],
+    "log": "C:\\Users\\mark_\\Code\\scratch\\refresh-proof\\compiler-refresh.log",
+    "log_sha256": "bda0f7a31832392edae8396d686f95556f6ade76cf53ef50ef41cbb5ba2b0bd1",
+    "limits": "Five samples per case, not an isolated performance baseline or GPU/headed FPS benchmark."
+  },
+  "limits": [
+    "Refresh still validates data and constructs layout inputs; not a general incremental dependency engine.",
+    "Independent appearances apply to Reader; other document engines retain their single-session behavior.",
+    "Surface policy bounds external producer polls, not background compute, texture residency, or ordinary document rendering.",
+    "Resource policy is configurable through host API/builder, not a persisted user setting.",
+    "Turnstone checks are recorded separately from Graphshell headed browser evidence."
+  ],
+  "browser_steps": 136,
+  "served_wasm_sha256": "76c52afb327a9e9a4fd5790e9138ac79eb3ffbc28cc92b1dcd2151dd5bcb4929",
+  "debug_strip": {
+    "input_bytes": 322917318,
+    "served_bytes": 35031265,
+    "removed": [
+      {
+        "name": "name",
+        "bytes": 287885939
+      },
+      {
+        "name": "producers",
+        "bytes": 114
+      }
+    ]
+  },
+  "capture_sha256": "74c94eb87617f027f1ab1bc1cbb45d39e2c1852edd312f8ed68811733238ed18"
+}

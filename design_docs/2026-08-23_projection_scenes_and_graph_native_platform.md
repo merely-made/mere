@@ -243,6 +243,60 @@ This capability supports Deck, Document, Matrix drill-through, and a possible
 Matryoshka product recipe. It belongs to the platform rather than to one named
 scene.
 
+### 2026-09-05 review: working surfaces and leaf precedents
+
+Mark proposes leaves as places where graph exploration becomes a working
+surface: a snapshot/context card, document in a workbench, or nested scene.
+This is a presentation interpretation under review, not a new terminal graph
+entity or an implemented universal host contract. Projection eligibility follows
+the [agreed requirements/facets basis](mere_docs/research/2026-08-15_projection_grammar_catalog.md#projection-requirements-and-disclosed-facets-2026-09-05).
+
+There are three relevant precedents:
+
+- The [June 2 integration model](mere_docs/implementation_strategy/2026-06-02_modular_integration_plan.md#1-the-architecture-a-graph-rooted-projection-model)
+  explicitly calls a detached tile a leaf retaining its graph binding. Preserve
+  that source custody without requiring every application to have a spatial
+  graph as its privileged visible root.
+- The [July 1 summoning model](mere_docs/design/2026-07-01_node_card_summoning_design.md)
+  distinguishes a visible node instance from cards about its source. Its
+  snapshot audit corrects the earlier assumption that re-rendering cached
+  content reproduces a captured live viewport. Capture identity, source
+  revision, viewport, freshness, and retention remain separate concerns.
+- The [Chisel design](cambium_docs/implementation_strategy/2026-07-07_chisel_widget_leaf_design.md)
+  uses leaf to mean a custom-paint element inside a host's layout/input/paint
+  machinery. That is a realization mechanism. A working surface may contain
+  such leaves, ordinary document content, or another scene.
+
+The [June 7 card attempt](archive_docs/2026-06-09_completed_plans/2026-06-07_card_system_and_staging_plan.md)
+also names a concrete failure: focus activated the node, so returning to the
+graph reactivated the previous tile. Its two-stage card separated preview
+from activation. Preserve that distinction when eligibility or increased
+detail offers a live surface; focus, zoom, or availability alone should not
+silently start an application session.
+
+The June 22 research's rule that a source keeps one chosen form across all
+projections is superseded for this purpose by section 4 above: separate
+instances share source identity while retaining their own representation and
+focus. Current Sceno expresses source/instance identity, representation slots,
+and nested coordinate spaces. Those types support the direction; they do not
+alone prove nested application focus, navigation, execution authority, or
+resource lifecycle.
+
+Current Forme also separates a stored, graph-bound `FormeDocument` from an
+implicit identity view over graph membership. Cambium Workbench's `Tile` is a
+handle onto host-resolved `ContentSource`, including an open domain lane.
+These existing distinctions are preferable starting points to another durable
+"leaf node" wrapper. A custom surface need not pretend to be a web document.
+
+A useful next consumer check is one subject shown as a context card, snapshot,
+and opened document/scene. Selection should coordinate; focus should enter and
+leave the surface predictably; dismissing or detaching a surface must preserve
+source authority; stale/unsupported representations must explain their state.
+Moving the outer surface should reuse its content, and inactive live content
+needs an explicit resource budget. This defines a possible proof, not a new
+implementation commitment. The existing practice-workspace receipt proves
+retained moving faces, not this entire lifecycle.
+
 ## 6. Field scenes remain distinct
 
 Territory and Contour are related but not interchangeable.

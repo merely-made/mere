@@ -84,6 +84,9 @@ pub struct PhysicsBoard {
     items: Vec<BoardItem>,
     choice: PhysicsChoice,
     pull: f32,
+    /// The item currently held by the pointer. This is transient view state;
+    /// score slots and `items` remain the arrangement authority.
+    dragging: Option<NodeKey>,
 }
 
 impl Default for PhysicsBoard {
@@ -102,6 +105,7 @@ impl PhysicsBoard {
             items: Vec::new(),
             choice: PhysicsChoice::default(),
             pull: DEFAULT_BOARD_PULL,
+            dragging: None,
         }
     }
 
@@ -160,6 +164,13 @@ impl PhysicsBoard {
             .map(|item| (item.id.as_str(), self.keys[&item.id]))
             .collect();
         self.keys.retain(|id, _| live.contains_key(id.as_str()));
+        if self
+            .dragging
+            .is_some_and(|key| !live.values().any(|live_key| *live_key == key))
+        {
+            self.dragging = None;
+            self.physics.set_dragging(false);
+        }
         // Every body, at its slot; `sync_nodes` leaves an existing body where
         // the simulation put it and spawns the new ones where told.
         self.physics.sync_nodes(
@@ -189,6 +200,67 @@ impl PhysicsBoard {
     /// out (see [`settle_for_choice`](Self::settle_for_choice)).
     pub fn tick(&mut self) -> bool {
         self.physics.advance_frame(&mut self.view)
+    }
+
+    /// Begin a transient drag of an item. The body is pinned at its current
+    /// simulated position so the first pointer move cannot jump it, while the
+    /// other bodies continue responding to the board's forces.
+    pub fn drag_start(&mut self, id: &str) -> bool {
+        let Some(&key) = self.keys.get(id) else {
+            return false;
+        };
+        if self.dragging.is_some() {
+            return false;
+        }
+        let Some(position) = self.position(id) else {
+            return false;
+        };
+        self.dragging = Some(key);
+        self.physics.pin(key, Point2D::new(position.0, position.1));
+        self.physics.set_dragging(true);
+        true
+    }
+
+    /// Move the currently-held item in score coordinates. This only updates
+    /// the pinned body; it does not rebuild forces or reset any other body.
+    pub fn drag_move(&mut self, x: f32, y: f32) -> bool {
+        if !x.is_finite() || !y.is_finite() {
+            return false;
+        }
+        let Some(key) = self.dragging else {
+            return false;
+        };
+        self.physics.pin(key, Point2D::new(x, y));
+        true
+    }
+
+    /// Release the held item back to the dynamic solver. Existing anchor slots
+    /// remain intact, so the item eases back toward its arrangement slot.
+    pub fn drag_end(&mut self) -> bool {
+        let Some(key) = self.dragging.take() else {
+            return false;
+        };
+        self.physics.unpin(key);
+        self.physics.set_dragging(false);
+        self.settle_for_choice();
+        true
+    }
+
+    /// Halt motion for a paused board. An active drag is cancelled and its
+    /// body is returned to the dynamic solver before the halt, so a later
+    /// `sync` or choice change can explicitly reawaken the board.
+    pub fn halt(&mut self) {
+        if let Some(key) = self.dragging.take() {
+            self.physics.unpin(key);
+            self.physics.set_dragging(false);
+        }
+        self.physics.halt();
+    }
+
+    /// Whether the board still needs frames for settling, a drag, or a
+    /// deliberately continuous law.
+    pub fn is_settling(&self) -> bool {
+        self.physics.is_settling()
     }
 
     /// Where the item is now, in the score's units.
@@ -329,6 +401,52 @@ mod tests {
         board.sync(vec![item("b", 300.0, 0.0)]);
         assert!(board.position("a").is_none());
         assert_eq!(board.len(), 1);
+    }
+
+    #[test]
+    fn drag_pins_one_item_and_release_returns_toward_its_slot() {
+        let mut board = PhysicsBoard::new();
+        board.set_pull(DEFAULT_ANCHOR_STIFFNESS);
+        board.sync(vec![item("a", 0.0, 0.0), item("b", 220.0, 0.0)]);
+        for _ in 0..SETTLE_TICKS {
+            board.tick();
+        }
+
+        let start = board.position("a").unwrap();
+        assert!(board.drag_start("a"));
+        assert!(!board.drag_start("b"));
+        assert!(board.drag_move(140.0, 70.0));
+        assert!(board.tick());
+        let held = board.position("a").unwrap();
+        assert!((held.0 - 140.0).abs() < 1.0 && (held.1 - 70.0).abs() < 1.0);
+        assert!(board.is_settling());
+
+        assert!(board.drag_end());
+        assert!(!board.drag_move(20.0, 20.0));
+        for _ in 0..SETTLE_TICKS {
+            board.tick();
+        }
+        let released = board.position("a").unwrap();
+        assert!(
+            (released.0 - 0.0).abs() < (held.0 - 0.0).abs(),
+            "release should let the item return toward its slot: start={start:?}, held={held:?}, released={released:?}"
+        );
+    }
+
+    #[test]
+    fn halt_cancels_drag_and_sync_removal_clears_it() {
+        let mut board = PhysicsBoard::new();
+        board.sync(vec![item("a", 0.0, 0.0), item("b", 120.0, 0.0)]);
+        assert!(board.drag_start("a"));
+        assert!(!board.drag_move(f32::NAN, 4.0));
+        board.halt();
+        assert!(!board.drag_move(20.0, 20.0));
+        assert!(!board.is_settling());
+
+        assert!(board.drag_start("b"));
+        board.sync(vec![item("a", 0.0, 0.0)]);
+        assert!(!board.drag_move(20.0, 20.0));
+        assert!(!board.drag_end());
     }
 
     /// Under Charge with a weak pull, two items whose slots overlap settle

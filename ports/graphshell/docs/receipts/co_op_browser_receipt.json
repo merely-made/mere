@@ -1,0 +1,407 @@
+{
+  "result": "ok",
+  "date": "2026-09-04 America/New_York",
+  "scope": "Current dirty tree; fixture identities and fixed clock; pinned constitution and signed delegation; loopback HTTP plaintext graph; not a release or full Woodshed application integration",
+  "host": "Codex in-app Chromium WebGPU 1280x720",
+  "wasm_sha256": "4956bd7d03f5850e754dffbee489c32c9339d6ee11db88a12edff5210dcebc1c",
+  "source_sha256": {
+    "ports/graphshell/src/web_projection.rs": "bd47de7fd96c09c066929c432ce30edf25b96e699aaef83fece3c1bb81075d08",
+    "ports/graphshell/src/web_events.rs": "38e78f17a887f89edcd344fa55c5eb34d4cf8a313905d8448294092878be06c3",
+    "ports/graphshell/src/web.rs": "1b9f774d2281dbf4443a40d56644b59f90f79ed3349a502eb80b571959306daa",
+    "ports/graphshell/web/co_op.js": "de8c1940be0b58eccfa195b4f7edb1ffad1ff15e92c06ef3b4a5e458fe1cc3d6",
+    "ports/graphshell/web/co_op.css": "a0402ff506c7a8b8170389a9d165d5882508d642e0bcbc7446b42e8db1a9d925",
+    "ports/graphshell/web/co_op.html": "cc377c543f57c45b03b1f72157265aeea73f1c5c92053e46681cbf19fe1fa0a0",
+    "ports/graphshell/web/co_op_gateway.py": "0a978f55724a55a986bb284d69c987e6d9c1a814c4e8166fa998597f2ba86649",
+    "ports/graphshell/web/co_op_receipt.py": "777c4cadf49edcda27ffbc38733c09692bc616ba1ca4babedfabe43e167dcad4",
+    "ports/graphshell/web/scenarios/co_op_retained.scn": "7ec4a079deeb6db885bef0e10557ba7f4299c6a8eb5eb124097adbd652f8f1fc",
+    "crates/moot/commons/examples/commons_practice_peer.rs": "c56203e8b6fc6a36fac9d82ca5a474455ef1cf3bfa5a29187d3e6f927b24d1a9"
+  },
+  "browser_actions": [
+    "member join before invitation rejected",
+    "founder created signed invitation",
+    "member joined",
+    "member contributed musical comparison; both browsers showed same effective record",
+    "both disconnected and closed native stores",
+    "both reopened offline in new processes; IDs/generations recorded",
+    "fresh pages reconstructed both scenes from disk while peer exchange stayed disabled",
+    "Enter on list shared comparison selected its matching spatial occurrence"
+  ],
+  "visual_checks": [
+    "full page inspected; sidebar overlap corrected",
+    "shared labels decoded from effective retained body",
+    "painted status reflects loaded source",
+    "native arrow glyph fallback replaced with plain text on canvas"
+  ],
+  "runs": [
+    {
+      "role": "founder",
+      "scenario": {
+        "state": "ok",
+        "errors": [],
+        "result": {
+          "captures": 1,
+          "frames": 251,
+          "log": [
+            "captured co_op_retained",
+            "waited 3 frames",
+            "shared practice retained projection captured"
+          ],
+          "result": "ok",
+          "steps": 7
+        },
+        "captures": [
+          {
+            "name": "co_op_retained",
+            "width": 1280,
+            "height": 720,
+            "bytes": 135738
+          }
+        ]
+      },
+      "peer_state": {
+        "role": "founder",
+        "online": false,
+        "process_open": true,
+        "process_id": 48680,
+        "process_generation": 2,
+        "last_sync_error": null,
+        "comparison": {
+          "source": {
+            "authority": "woodshed",
+            "domain": "music.practice",
+            "resource": "set:musical-comparison"
+          },
+          "revision": "musical-comparison-fixture-v1",
+          "method": {
+            "id": "keyed-pitch-set-singleton",
+            "version": 1
+          },
+          "left": {
+            "occurrence_id": "card:1",
+            "source": {
+              "adapter": "woodshed.stage",
+              "id": "chord:Major"
+            },
+            "label": "C Major",
+            "root_pitch_class": 0,
+            "pitch_set": [
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              },
+              {
+                "pitch_class": 7,
+                "label": "G"
+              }
+            ]
+          },
+          "right": {
+            "occurrence_id": "card:2",
+            "source": {
+              "adapter": "woodshed.stage",
+              "id": "chord:Minor"
+            },
+            "label": "A Minor",
+            "root_pitch_class": 9,
+            "pitch_set": [
+              {
+                "pitch_class": 9,
+                "label": "A"
+              },
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              }
+            ]
+          },
+          "result": {
+            "version": 1,
+            "status": "applicable",
+            "shared": [
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              }
+            ],
+            "left_only": [
+              {
+                "pitch_class": 7,
+                "label": "G"
+              }
+            ],
+            "right_only": [
+              {
+                "pitch_class": 9,
+                "label": "A"
+              }
+            ],
+            "singleton_motion": {
+              "from": {
+                "pitch_class": 7,
+                "label": "G"
+              },
+              "to": {
+                "pitch_class": 9,
+                "label": "A"
+              }
+            }
+          }
+        },
+        "service": {
+          "authority_installed": true,
+          "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "local_root": "af06a3e3291714e4f356c19c9b15cd1951ec6e6662aa77be07547f289383341d",
+          "ok": true,
+          "operations": [
+            {
+              "author_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
+              "operation_id": "367ec90086c6c71edec0a48197de3828671f73cdc0af38ff0b8723389e390753",
+              "writer": "bd11126ba11021a0c894a5290d352d5de6c8e3d4b071d5404a09b1817c050458"
+            }
+          ],
+          "pending_authority_count": 0,
+          "records": [
+            {
+              "body_utf8_hex": "7b226c656674223a7b226c6162656c223a2243204d616a6f72222c226f6363757272656e63655f6964223a22636172643a31222c2270697463685f736574223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d2c7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c22726f6f745f70697463685f636c617373223a302c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d616a6f72227d7d2c226d6574686f64223a7b226964223a226b657965642d70697463682d7365742d73696e676c65746f6e222c2276657273696f6e223a317d2c22726573756c74223a7b226c6566745f6f6e6c79223a5b7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c2272696768745f6f6e6c79223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d5d2c22736861726564223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c2273696e676c65746f6e5f6d6f74696f6e223a7b2266726f6d223a7b226c6162656c223a2247222c2270697463685f636c617373223a377d2c22746f223a7b226c6162656c223a2241222c2270697463685f636c617373223a397d7d2c22737461747573223a226170706c696361626c65222c2276657273696f6e223a317d2c227265766973696f6e223a226d75736963616c2d636f6d70617269736f6e2d666978747572652d7631222c227269676874223a7b226c6162656c223a2241204d696e6f72222c226f6363757272656e63655f6964223a22636172643a32222c2270697463685f736574223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d2c7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c22726f6f745f70697463685f636c617373223a392c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d696e6f72227d7d2c22736f75726365223a7b22617574686f72697479223a22776f6f6473686564222c22646f6d61696e223a226d757369632e7072616374696365222c227265736f75726365223a227365743a6d75736963616c2d636f6d70617269736f6e227d7d",
+              "id": "woodshed-comparison:member:0",
+              "media_type": "application/vnd.woodshed.comparison+json"
+            }
+          ],
+          "retained_count": 1,
+          "revoked_authority_count": 0,
+          "role": "founder"
+        },
+        "records": [
+          {
+            "body_utf8_hex": "7b226c656674223a7b226c6162656c223a2243204d616a6f72222c226f6363757272656e63655f6964223a22636172643a31222c2270697463685f736574223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d2c7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c22726f6f745f70697463685f636c617373223a302c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d616a6f72227d7d2c226d6574686f64223a7b226964223a226b657965642d70697463682d7365742d73696e676c65746f6e222c2276657273696f6e223a317d2c22726573756c74223a7b226c6566745f6f6e6c79223a5b7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c2272696768745f6f6e6c79223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d5d2c22736861726564223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c2273696e676c65746f6e5f6d6f74696f6e223a7b2266726f6d223a7b226c6162656c223a2247222c2270697463685f636c617373223a377d2c22746f223a7b226c6162656c223a2241222c2270697463685f636c617373223a397d7d2c22737461747573223a226170706c696361626c65222c2276657273696f6e223a317d2c227265766973696f6e223a226d75736963616c2d636f6d70617269736f6e2d666978747572652d7631222c227269676874223a7b226c6162656c223a2241204d696e6f72222c226f6363757272656e63655f6964223a22636172643a32222c2270697463685f736574223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d2c7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c22726f6f745f70697463685f636c617373223a392c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d696e6f72227d7d2c22736f75726365223a7b22617574686f72697479223a22776f6f6473686564222c22646f6d61696e223a226d757369632e7072616374696365222c227265736f75726365223a227365743a6d75736963616c2d636f6d70617269736f6e227d7d",
+            "id": "woodshed-comparison:member:0",
+            "media_type": "application/vnd.woodshed.comparison+json"
+          }
+        ],
+        "retained_count": 1,
+        "traffic": [
+          {
+            "direction": "incoming",
+            "path": "/wire",
+            "bytes": 18,
+            "sha256": "9389e6512af6fefa0599e7a946ef8eb432546cec8eb92d674ad516e2b98d7f1e"
+          },
+          {
+            "direction": "incoming",
+            "path": "/wire",
+            "bytes": 6850,
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36"
+          }
+        ]
+      },
+      "capture": "co_op_founder.png",
+      "capture_sha256": "3ad9338a662de893a9867d3add1a7e5a046b074c35e492a0787858eb92776c61"
+    },
+    {
+      "role": "member",
+      "scenario": {
+        "state": "ok",
+        "errors": [],
+        "result": {
+          "captures": 1,
+          "frames": 250,
+          "log": [
+            "captured co_op_retained",
+            "waited 2 frames",
+            "shared practice retained projection captured"
+          ],
+          "result": "ok",
+          "steps": 7
+        },
+        "captures": [
+          {
+            "name": "co_op_retained",
+            "width": 1280,
+            "height": 720,
+            "bytes": 135738
+          }
+        ]
+      },
+      "peer_state": {
+        "role": "member",
+        "online": false,
+        "process_open": true,
+        "process_id": 17400,
+        "process_generation": 2,
+        "last_sync_error": null,
+        "comparison": {
+          "source": {
+            "authority": "woodshed",
+            "domain": "music.practice",
+            "resource": "set:musical-comparison"
+          },
+          "revision": "musical-comparison-fixture-v1",
+          "method": {
+            "id": "keyed-pitch-set-singleton",
+            "version": 1
+          },
+          "left": {
+            "occurrence_id": "card:1",
+            "source": {
+              "adapter": "woodshed.stage",
+              "id": "chord:Major"
+            },
+            "label": "C Major",
+            "root_pitch_class": 0,
+            "pitch_set": [
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              },
+              {
+                "pitch_class": 7,
+                "label": "G"
+              }
+            ]
+          },
+          "right": {
+            "occurrence_id": "card:2",
+            "source": {
+              "adapter": "woodshed.stage",
+              "id": "chord:Minor"
+            },
+            "label": "A Minor",
+            "root_pitch_class": 9,
+            "pitch_set": [
+              {
+                "pitch_class": 9,
+                "label": "A"
+              },
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              }
+            ]
+          },
+          "result": {
+            "version": 1,
+            "status": "applicable",
+            "shared": [
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              }
+            ],
+            "left_only": [
+              {
+                "pitch_class": 7,
+                "label": "G"
+              }
+            ],
+            "right_only": [
+              {
+                "pitch_class": 9,
+                "label": "A"
+              }
+            ],
+            "singleton_motion": {
+              "from": {
+                "pitch_class": 7,
+                "label": "G"
+              },
+              "to": {
+                "pitch_class": 9,
+                "label": "A"
+              }
+            }
+          }
+        },
+        "service": {
+          "authority_installed": true,
+          "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "local_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
+          "ok": true,
+          "operations": [
+            {
+              "author_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
+              "operation_id": "367ec90086c6c71edec0a48197de3828671f73cdc0af38ff0b8723389e390753",
+              "writer": "bd11126ba11021a0c894a5290d352d5de6c8e3d4b071d5404a09b1817c050458"
+            }
+          ],
+          "pending_authority_count": 0,
+          "records": [
+            {
+              "body_utf8_hex": "7b226c656674223a7b226c6162656c223a2243204d616a6f72222c226f6363757272656e63655f6964223a22636172643a31222c2270697463685f736574223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d2c7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c22726f6f745f70697463685f636c617373223a302c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d616a6f72227d7d2c226d6574686f64223a7b226964223a226b657965642d70697463682d7365742d73696e676c65746f6e222c2276657273696f6e223a317d2c22726573756c74223a7b226c6566745f6f6e6c79223a5b7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c2272696768745f6f6e6c79223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d5d2c22736861726564223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c2273696e676c65746f6e5f6d6f74696f6e223a7b2266726f6d223a7b226c6162656c223a2247222c2270697463685f636c617373223a377d2c22746f223a7b226c6162656c223a2241222c2270697463685f636c617373223a397d7d2c22737461747573223a226170706c696361626c65222c2276657273696f6e223a317d2c227265766973696f6e223a226d75736963616c2d636f6d70617269736f6e2d666978747572652d7631222c227269676874223a7b226c6162656c223a2241204d696e6f72222c226f6363757272656e63655f6964223a22636172643a32222c2270697463685f736574223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d2c7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c22726f6f745f70697463685f636c617373223a392c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d696e6f72227d7d2c22736f75726365223a7b22617574686f72697479223a22776f6f6473686564222c22646f6d61696e223a226d757369632e7072616374696365222c227265736f75726365223a227365743a6d75736963616c2d636f6d70617269736f6e227d7d",
+              "id": "woodshed-comparison:member:0",
+              "media_type": "application/vnd.woodshed.comparison+json"
+            }
+          ],
+          "retained_count": 1,
+          "revoked_authority_count": 0,
+          "role": "member"
+        },
+        "records": [
+          {
+            "body_utf8_hex": "7b226c656674223a7b226c6162656c223a2243204d616a6f72222c226f6363757272656e63655f6964223a22636172643a31222c2270697463685f736574223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d2c7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c22726f6f745f70697463685f636c617373223a302c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d616a6f72227d7d2c226d6574686f64223a7b226964223a226b657965642d70697463682d7365742d73696e676c65746f6e222c2276657273696f6e223a317d2c22726573756c74223a7b226c6566745f6f6e6c79223a5b7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c2272696768745f6f6e6c79223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d5d2c22736861726564223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c2273696e676c65746f6e5f6d6f74696f6e223a7b2266726f6d223a7b226c6162656c223a2247222c2270697463685f636c617373223a377d2c22746f223a7b226c6162656c223a2241222c2270697463685f636c617373223a397d7d2c22737461747573223a226170706c696361626c65222c2276657273696f6e223a317d2c227265766973696f6e223a226d75736963616c2d636f6d70617269736f6e2d666978747572652d7631222c227269676874223a7b226c6162656c223a2241204d696e6f72222c226f6363757272656e63655f6964223a22636172643a32222c2270697463685f736574223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d2c7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c22726f6f745f70697463685f636c617373223a392c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d696e6f72227d7d2c22736f75726365223a7b22617574686f72697479223a22776f6f6473686564222c22646f6d61696e223a226d757369632e7072616374696365222c227265736f75726365223a227365743a6d75736963616c2d636f6d70617269736f6e227d7d",
+            "id": "woodshed-comparison:member:0",
+            "media_type": "application/vnd.woodshed.comparison+json"
+          }
+        ],
+        "retained_count": 1,
+        "traffic": [
+          {
+            "direction": "outgoing",
+            "path": "/invitation",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "direction": "outgoing",
+            "path": "/wire",
+            "bytes": 18,
+            "sha256": "9389e6512af6fefa0599e7a946ef8eb432546cec8eb92d674ad516e2b98d7f1e"
+          },
+          {
+            "direction": "outgoing",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "direction": "outgoing",
+            "path": "/wire",
+            "bytes": 6850,
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36"
+          },
+          {
+            "direction": "outgoing",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        ]
+      },
+      "capture": "co_op_member.png",
+      "capture_sha256": "3ad9338a662de893a9867d3add1a7e5a046b074c35e492a0787858eb92776c61"
+    }
+  ]
+}
