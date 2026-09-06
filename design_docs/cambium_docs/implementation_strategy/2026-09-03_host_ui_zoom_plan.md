@@ -476,3 +476,11 @@ preference as the user's offset on it.
   target: the only errors left are the two pre-existing `winit::platform::
   wayland` calls the un-gating exposes. 281 host, rootstock and cambium tests
   green.
+- **2026-09-04, the X11 frame-extents ruling has a headed receipt.** A clean
+  detached worktree at Mere `5e3d2d98` ran the host smoke example on the
+  ThinkPad's Fedora 44 GNOME Xwayland server with an app frame, inset 8, and UI
+  zoom 1.25. The host logged `left=10 right=10 top=10 bottom=10`; querying the
+  live `host smoke` window returned `_GTK_FRAME_EXTENTS(CARDINAL) = 10, 10, 10,
+  10`. This proves the X11 property path under Xwayland, including the
+  non-unit-zoom arithmetic. It is not a native Xorg receipt. The temporary
+  worktree was removed after the query.

@@ -7,6 +7,13 @@ Names what a communal graph actually requires and the two decisions the note
 originally found unowned. Both decisions are now answered by executable
 receipts and the [Commons profile](../design/2026-07-27_commons_profile_v1.md).
 
+**2026-09-04 continuation:** the [Moot implementation plan](../../moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md#community-collections-and-author-offline-publishing-2026-09-04)
+now scopes captured collections, author-offline community publishing, application
+co-op, and addressed mesh delivery. First gate: an independent volunteer retains a
+signed publication, restarts, and serves a fresh reader while its author is offline.
+Independent personae, community-specific recognition and voluntary hosting are
+part of the model; the isolated Fleece experiment establishes local behavior only.
+
 ## The commons is a profile, not an engine
 
 The substrate for a shared, encrypted, permissioned graph already exists or

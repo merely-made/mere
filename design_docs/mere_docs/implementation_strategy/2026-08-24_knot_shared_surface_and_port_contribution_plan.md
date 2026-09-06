@@ -293,6 +293,23 @@ mere and Turnstone through the established alignment cadence. Expected
 churn outside Genet: the two mere descriptor literals shrink; Turnstone
 needs nothing beyond the rev bump.
 
+### 2026-09-05: contract completion and host interaction are separate receipts
+
+P0 remains complete. A live-code check confirms the older T-lane capture
+finding still applies: `turnstone/src/contributed_surface.rs::pointer` builds
+move/up events from pane coordinates and pane size without consulting
+`RetainedSurfaceSession::pointer_capture`. The shell retains the pane during a
+drag, but that does not supply the captured widget's local coordinates.
+`crates/cambium/cambium-rootstock/src/input.rs` demonstrates the existing
+captured-element routing; the frozen trait already exposes the needed target.
+
+Before promoting a contributed drag-widget surface, the Turnstone consumer
+receipt must cover a widget offset inside a scrolled pane, movement outside
+the widget, and release, with events expressed in the captured widget's frame.
+This is host-adoption work under T0's routing scope, not a reason to reopen the
+v1 descriptor/trait freeze or duplicate the surface contract. F0 remains the
+separate broader Knot authority-surface work.
+
 ## 3. Boundary
 
 ```text

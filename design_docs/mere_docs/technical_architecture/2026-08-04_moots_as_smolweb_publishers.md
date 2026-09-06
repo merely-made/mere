@@ -1,7 +1,8 @@
 # Moots as smolweb publishers — and whether knot is a smolweb format
 
 **Date:** 2026-08-04
-**Status:** analysis, answering Mark's questions. Nothing scheduled.
+**Status (2026-09-04):** architecture analysis, with community-hosting clarification
+below. Execution is scoped in the [Moot plan continuation](../../moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md#community-collections-and-author-offline-publishing-2026-09-04).
 **Companion to:** carrier independence (`smolweb/design_docs/research/2026-08-04_protocol_carrier_independence.md`)
 (which handles the client direction) and the
 smolweb home decision (`smolweb/design_docs/technical_architecture/2026-08-03_smolweb_home_decision.md`).
@@ -131,10 +132,12 @@ Mark's question — should a gemtext capsule be a moot template, or is that only
 for formats we own? — has a clean answer, and getting it wrong would import
 exactly the heaviness the small web exists to reject.
 
-**A capsule is one author.** A directory of files, served. It has no
-coordination problem, so it needs no coordination machinery: no membership, no
-delegation certificates, no merge. Putting a moot under a personal capsule
-would be paying Gemot's whole cost to solve problems that do not exist there.
+**A personally served capsule can stay simple:** a directory of files, served.
+**Clarification with Mark, 2026-09-04:** a single author can also publish through
+a moot whose members agree to retain and serve the work while the author is
+offline. That has a coordination problem even with one writer: hosting promises,
+budgets, admission, revision authority and availability. Authorship, contribution,
+community endorsement and service remain separate facts.
 
 So the two concepts separate:
 
@@ -143,14 +146,15 @@ So the two concepts separate:
 | **Projection** | how content is served: a gemtext capsule, a dict database, a gophermap | **any node**, moot or not, including a solo user with none |
 | **Template** | a preconfigured governance shape: content classes, authority rules, projection config | only where there is coordination to govern |
 
-> **Single-author publishing needs no moot. A moot earns its place at the
-> second writer.**
+> **Single-author publishing can be self-served or community-hosted. A moot
+> earns its place through shared commitments as well as shared authorship.**
 
 "Serve my knot notes as a gemtext capsule" must work with no moot anywhere in
 the picture. "Instantiate the dictionary template" is a moot, because a
 dictionary many people add to is a governance problem wearing a content
-schema. Mark's dictionary is the second case and a personal capsule is the
-first, and they should not be made to share a mechanism.
+schema. A community-hosted personal capsule adds hosting coordination without
+making its content jointly authored. These all use the appropriate existing
+storage and replication seams, with governance where shared commitments need it.
 
 This also rhymes with a decision already taken: under the Knot-in-graphshell
 plan's Option A, personal documents replicate while shared documents project.
