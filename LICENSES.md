@@ -69,9 +69,8 @@ crates under Exhibit A and every manifest on `MPL-2.0`.
 
 | Crate | Path | Published version's grant | In-tree notice files |
 |---|---|---|---|
-| `inker` | `crates/inker/inker` | 0.1.1, MIT OR Apache-2.0 | — |
+| `inker` | `crates/inker/inker` | 0.1.1, MIT OR Apache-2.0 | `LICENSE-MIT`, `LICENSE-APACHE` (carried over from `verso-tile` 0.1.0 when it folded into `inker::flip`, 2026-09-05) |
 | `document-canvas` | `crates/inker/document-canvas` | 0.1.0 | — |
-| `verso-tile` | `crates/inker/verso-tile` | 0.1.0, MIT OR Apache-2.0 | `LICENSE-MIT`, `LICENSE-APACHE` |
 | `nematic` | `crates/nematic/nematic` | 0.1.1 | — |
 | `illume` | `crates/nematic/illume` | 0.0.2 | — |
 | `errand` | `crates/system/errand` | 0.3.4, MIT OR Apache-2.0 | — |
@@ -79,8 +78,8 @@ crates under Exhibit A and every manifest on `MPL-2.0`.
 
 Each arrived from genet 2026-09-03 under its own published grant; relicensing
 is the sweep plan's call at the next bump. Nothing here was relicensed on the
-move, and the four `LICENSE-MIT` / `LICENSE-APACHE` files that `verso-tile` and
-`tinct` carry are **not** to be deleted: they are the notice text for versions
+move, and the four `LICENSE-MIT` / `LICENSE-APACHE` files that `inker` (for the
+folded `verso-tile`) and `tinct` carry are **not** to be deleted: they are the notice text for versions
 already on crates.io. This is the same disposition genet's own ledger records,
 which names `sprigging` 0.2.1, `illume` 0.0.2, `errand` 0.3.4, `tinct` 0.1.2
 and `inker` 0.1.1 explicitly and keeps the ruling as the precedent the sweep was
