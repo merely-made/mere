@@ -362,6 +362,9 @@ pub struct PeltWorkspace<F> {
     pointer_capture: Option<TileId>,
     surface_scale_factor: f32,
     routed: Option<RoutedWorkspace<F>>,
+    surface_resource_policy: crate::SurfaceResourcePolicy,
+    surface_frame_index: u64,
+    surface_refresh_cursor: usize,
 }
 
 impl<F: 'static> PeltWorkspace<F> {
@@ -419,6 +422,9 @@ impl<F: 'static> PeltWorkspace<F> {
             pointer_capture: None,
             surface_scale_factor: 1.0,
             routed: None,
+            surface_resource_policy: crate::SurfaceResourcePolicy::default(),
+            surface_frame_index: 0,
+            surface_refresh_cursor: 0,
         };
         workspace.sync_tile_metadata();
         workspace.sync_visibility();
@@ -468,6 +474,9 @@ impl<F: 'static> PeltWorkspace<F> {
                 base_titles,
                 clock_for: Arc::new(clock_for),
             }),
+            surface_resource_policy: crate::SurfaceResourcePolicy::default(),
+            surface_frame_index: 0,
+            surface_refresh_cursor: 0,
         };
         let ids = workspace
             .routed
@@ -601,6 +610,16 @@ impl<F: 'static> PeltWorkspace<F> {
             .as_web_surface()
             .ok_or_else(|| format!("tile {} surface has no web event plane", tile.0))?;
         Ok(web.poll_web_event())
+    }
+
+    /// Configure polling pressure without changing activation, visibility, or
+    /// focus routing. Deferred polls retain the producer's last composed image.
+    pub fn set_surface_resource_policy(&mut self, policy: crate::SurfaceResourcePolicy) {
+        self.surface_resource_policy = policy.normalized();
+    }
+
+    pub fn surface_resource_policy(&self) -> crate::SurfaceResourcePolicy {
+        self.surface_resource_policy
     }
 
     /// Replace or clear the user engine choice for one live tile. The selected
@@ -897,6 +916,9 @@ impl<F: 'static> PeltWorkspace<F> {
             pointer_capture: None,
             surface_scale_factor: self.surface_scale_factor,
             routed,
+            surface_resource_policy: self.surface_resource_policy,
+            surface_frame_index: 0,
+            surface_refresh_cursor: 0,
         };
         destination.focus(tile);
         destination.sync_tile_metadata();
@@ -961,6 +983,32 @@ impl<F: 'static> PeltWorkspace<F> {
 
     fn frame_with_surface_polling(&mut self, poll_surfaces: bool) -> PeltWorkspaceFrame<F> {
         let active = active_tiles(self.workbench.tree());
+        let frame_index = self.surface_frame_index;
+        if poll_surfaces {
+            self.surface_frame_index = self.surface_frame_index.wrapping_add(1);
+        }
+        let surface_ids = active
+            .iter()
+            .copied()
+            .filter(|id| self.surfaces.contains_key(id))
+            .collect::<Vec<_>>();
+        let mut refresh_ids = std::collections::HashSet::new();
+        if poll_surfaces && !surface_ids.is_empty() {
+            let policy = self.surface_resource_policy.normalized();
+            if policy.admits(frame_index, 0) {
+                let limit = policy.max_refreshes_per_frame.min(surface_ids.len());
+                for index in crate::surface_policy::rotated_indices(
+                    surface_ids.len(),
+                    self.surface_refresh_cursor,
+                    limit,
+                ) {
+                    refresh_ids.insert(surface_ids[index]);
+                }
+                self.surface_refresh_cursor =
+                    (self.surface_refresh_cursor + limit) % surface_ids.len();
+            }
+        }
+        let mut surface_refreshes = 0;
         let mut tiles = Vec::with_capacity(active.len());
         let mut surfaces = Vec::new();
         for tile in active {
@@ -975,7 +1023,13 @@ impl<F: 'static> PeltWorkspace<F> {
                     frame: controller.frame(width, height),
                 });
             } else if let Some(surface) = self.surfaces.get_mut(&tile) {
-                let frame = if poll_surfaces {
+                let frame = if poll_surfaces
+                    && refresh_ids.contains(&tile)
+                    && self
+                        .surface_resource_policy
+                        .admits(frame_index, surface_refreshes)
+                {
+                    surface_refreshes += 1;
                     surface.frame(rect, self.surface_scale_factor)
                 } else {
                     Ok(None)

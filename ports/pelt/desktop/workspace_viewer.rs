@@ -36,7 +36,7 @@ use netrender::{ColorLoad, NetrenderOptions, Scene};
 use pelt_core::{
     PeltController, PeltDocumentState, PeltHostEffect, PeltRegistries, PeltRouteSource,
     PeltRouteState, PeltSessionIdentity, PeltTileInspection, PeltTileRequest, PeltWorkspace,
-    PeltWorkspaceFrame, WorkspaceRect,
+    PeltWorkspaceFrame, SurfaceResourcePolicy, WorkspaceRect,
 };
 #[cfg(target_os = "windows")]
 use raw_window_handle::{HasWindowHandle, RawWindowHandle};
@@ -353,6 +353,8 @@ pub struct WorkspaceViewerConfig {
     /// Caller-owned Pelt appearance storage. Without it Chrome selection stays
     /// in this process only; Pelt does not invent a config-directory owner.
     pub appearance_store: Option<Box<dyn AppearanceStore>>,
+    /// Caller-owned cap and cadence for polling composited surface producers.
+    pub surface_resource_policy: SurfaceResourcePolicy,
 }
 
 impl WorkspaceViewerConfig {
@@ -373,6 +375,7 @@ impl WorkspaceViewerConfig {
             artifact: None,
             route_overrides: HashMap::new(),
             appearance_store: None,
+            surface_resource_policy: SurfaceResourcePolicy::default(),
         }
     }
 
@@ -383,6 +386,11 @@ impl WorkspaceViewerConfig {
 
     pub fn with_frame_limit(mut self, frames: u32) -> Self {
         self.frames = Some(frames.max(1));
+        self
+    }
+
+    pub fn with_surface_resource_policy(mut self, policy: SurfaceResourcePolicy) -> Self {
+        self.surface_resource_policy = policy.normalized();
         self
     }
 
@@ -605,6 +613,8 @@ pub fn run_livery_workspace_viewer(
         },
         || Box::new(WorkspaceClock(Instant::now())),
     )?;
+    let mut workspace = workspace;
+    workspace.set_surface_resource_policy(config.surface_resource_policy);
     let frisket = FrisketSurface::new(workspace.tree());
     let event_loop =
         EventLoop::new().map_err(|error| format!("could not create event loop: {error}"))?;

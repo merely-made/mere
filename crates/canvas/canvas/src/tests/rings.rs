@@ -71,6 +71,65 @@ fn arrangement_recompute_is_gated_on_its_inputs() {
         "grid ignores focus, so a selection change does not force a recompute"
     );
 
+    // Host-grouped kanban shares the ordinary cache. A same-host navigation
+    // keeps its column, while a cross-host move advances the graph's narrow
+    // URL-grouping dependency without disturbing structural caches.
+    canvas.note_strategy_computed("kanban.default", 800, 600, None);
+    assert!(
+        !canvas.needs_strategy_recompute("kanban.default", 800, 600, None),
+        "unchanged kanban no longer recomputes every frame"
+    );
+    canvas.ingest_graph(|g| {
+        kernel::graph::apply::apply_graph_delta(
+            g,
+            kernel::graph::apply::GraphDelta::SetNodeUrl {
+                key: ak,
+                new_url: "https://a.example/elsewhere".to_string(),
+            },
+        );
+        true
+    });
+    assert!(
+        !canvas.needs_strategy_recompute("kanban.default", 800, 600, None),
+        "same-host navigation leaves kanban columns and the cache intact"
+    );
+    canvas.ingest_graph(|g| {
+        kernel::graph::apply::apply_graph_delta(
+            g,
+            kernel::graph::apply::GraphDelta::SetNodeUrl {
+                key: ak,
+                new_url: "https://elsewhere.example/".to_string(),
+            },
+        );
+        true
+    });
+    assert!(
+        canvas.needs_strategy_recompute("kanban.default", 800, 600, None),
+        "a host move invalidates the kanban grouping"
+    );
+
+    canvas.note_strategy_computed("grid.default", 800, 600, None);
+    canvas.ingest_graph(|g| {
+        kernel::graph::apply::apply_graph_delta(
+            g,
+            kernel::graph::apply::GraphDelta::SetNodeUrl {
+                key: bk,
+                new_url: "https://another-site.example/".to_string(),
+            },
+        );
+        true
+    });
+    assert!(
+        !canvas.needs_strategy_recompute("grid.default", 800, 600, None),
+        "the URL-authority dependency is selected only for by-site kanban"
+    );
+    canvas.note_strategy_computed("grid.default", 800, 600, None);
+    canvas.set_node_size(canvas.graph().get_node(ak).unwrap().id, 80.0);
+    assert!(
+        canvas.needs_strategy_recompute("grid.default", 800, 600, None),
+        "resolved face footprint changes invalidate extent-aware layouts"
+    );
+
     // Radial is focus-driven, so a focus change DOES re-trigger it.
     canvas.note_strategy_computed("radial.default", 800, 600, Some(ak));
     assert!(

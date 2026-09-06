@@ -6,6 +6,8 @@ the deep rationale lives in the doc itself.
 
 ## Required reading order
 
+Active implementation: [projection refresh and surface reuse](mere_docs/implementation_strategy/2026-09-05_projection_refresh_and_surface_reuse_plan.md) covers dependency-aware layout caching, independent appearances, bounded live richness, and separation of paint from placement work.
+
 1. [`DOC_POLICY.md`](DOC_POLICY.md) — documentation governance rules.
 2. [`TERMINOLOGY.md`](TERMINOLOGY.md) — canonical current terminology.
 3. [`2026-05-04_lexicon_brief.md`](2026-05-04_lexicon_brief.md) — naming history; its 2026-08-31 amendment points current terms back to `TERMINOLOGY.md`.

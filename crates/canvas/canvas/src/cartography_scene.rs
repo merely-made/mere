@@ -168,17 +168,6 @@ pub struct CanvasStrategyProjection {
     pub score: Option<sceno::Score>,
 }
 
-/// The URL's host/authority — the substring between `://` and the next `/` (or end), else the
-/// whole string. The kanban categorical axis groups nodes by this. (Arrangements — kanban.)
-pub(crate) fn url_host(url: &str) -> String {
-    let after_scheme = url.split_once("://").map(|(_, rest)| rest).unwrap_or(url);
-    after_scheme
-        .split(['/', '?', '#'])
-        .next()
-        .unwrap_or(after_scheme)
-        .to_string()
-}
-
 /// Dispatch `id` to its cartography adapter and project against `graph` at viewport
 /// `(width, height)`, returning the full [`cartography::Projection`] (positions + edges; overlays
 /// are added by [`project_canvas_lens`]). [`Projection::empty`](cartography::Projection::empty) for
@@ -225,7 +214,12 @@ fn project_canvas_dispatch(
         "kanban.default" => {
             let axis = graph
                 .nodes()
-                .map(|(key, node)| (key, AxisValue::Categorical(url_host(node.url()))))
+                .map(|(key, node)| {
+                    (
+                        key,
+                        AxisValue::Categorical(Graph::url_grouping_key(node.url()).to_string()),
+                    )
+                })
                 .collect::<HashMap<_, _>>();
             let mut intent = options.to_view_intent();
             intent.axis_values = Some(axis);
@@ -234,7 +228,7 @@ fn project_canvas_dispatch(
                 signals: &signals,
                 intent,
             })
-        }
+        },
         // Same kanban adapter, but the column key is the graph-structural **community** (the
         // Louvain partition) instead of the URL host — so the board groups by how the graph
         // actually clusters, not by site. Community is the expensive signal, so it is computed
@@ -248,7 +242,7 @@ fn project_canvas_dispatch(
                 None => {
                     computed = signals::community_louvain(graph);
                     &computed
-                }
+                },
             };
             let mut axis: HashMap<NodeKey, AxisValue> = HashMap::new();
             for (i, cluster) in clusters.clusters.iter().enumerate() {
@@ -267,7 +261,7 @@ fn project_canvas_dispatch(
                 signals: &signals,
                 intent,
             })
-        }
+        },
         // Timeline orders nodes along the horizontal axis by creation order (their enumeration
         // index) — a stand-in until a real per-node timestamp is plumbed. (Arrangements — timeline.)
         "timeline.default" => {
@@ -283,7 +277,7 @@ fn project_canvas_dispatch(
                 signals: &signals,
                 intent,
             })
-        }
+        },
         // Focus-driven: centers on `focus` (the pane's selection), BFS rings outward.
         // Without a focus there is no layout to compute, so leave the canvas as-is.
         "radial.default" => {
@@ -295,7 +289,7 @@ fn project_canvas_dispatch(
                 ..options.clone()
             };
             project_with(graph, &signals, &focused, &RadialAdapter::default())
-        }
+        },
         _ => return cartography::Projection::empty(),
     };
     projection

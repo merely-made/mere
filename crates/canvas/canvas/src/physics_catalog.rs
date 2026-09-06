@@ -48,7 +48,6 @@ use seiche::{
     MagneticSpring, NodeExclusion, ParticleLife, StressSpring,
 };
 
-use crate::cartography_scene::url_host;
 use crate::seiche_bridge::visible_relation_edges;
 use crate::{Canvas, SETTLE_TICKS};
 
@@ -676,7 +675,7 @@ impl<'a> LawInputs<'a> {
     ) -> Self {
         let sites = graph
             .nodes()
-            .map(|(key, node)| (key, url_host(node.url())))
+            .map(|(key, node)| (key, Graph::url_grouping_key(node.url()).to_string()))
             .collect();
         let mut inputs = Self::from_parts(
             graph.nodes().map(|(key, _)| key).collect(),
@@ -811,7 +810,7 @@ impl<'a> LawInputs<'a> {
                     .iter()
                     .map(|&key| (key, 1.0 + degree.get(&key).copied().unwrap_or(0) as f32))
                     .collect()
-            }
+            },
             PhysicsMassSource::PageRank => self
                 .page_rank_weights()
                 .into_iter()
@@ -827,7 +826,7 @@ impl<'a> LawInputs<'a> {
             PhysicsKindSource::Site => self.site_groups(),
             PhysicsKindSource::Cluster => {
                 self.cluster_groups().unwrap_or_else(|| self.site_groups())
-            }
+            },
             PhysicsKindSource::Coloring => self.coloring_groups(),
             PhysicsKindSource::Component => self.component_groups(),
             PhysicsKindSource::Degree => {
@@ -847,7 +846,7 @@ impl<'a> LawInputs<'a> {
                         )
                     })
                     .collect()
-            }
+            },
         };
         // Particle life reads best with a handful of kinds; fold a long tail of
         // sites into eight, keeping a small catalog its own size.
@@ -1047,7 +1046,7 @@ impl<'a> LawInputs<'a> {
                     Box::new(NodeExclusion::default()),
                     Box::new(ParticleLife::seeded(kinds, kind_count, LAW_SEED)),
                 ]
-            }
+            },
             PhysicsLaw::Flock => vec![
                 Box::new(NodeExclusion::default()),
                 Box::new(Boids::default()),
@@ -1059,7 +1058,7 @@ impl<'a> LawInputs<'a> {
                     Box::new(NodeExclusion::default()),
                     Box::new(Kuramoto::new(radii)),
                 ]
-            }
+            },
             PhysicsLaw::Flow => vec![
                 Box::new(NodeExclusion::default()),
                 Box::new(MagneticSpring::default()),
@@ -1083,18 +1082,18 @@ impl<'a> LawInputs<'a> {
                 PhysicsMassSource::Degree => Box::new(DegreeRepulsion::default()),
                 PhysicsMassSource::PageRank => {
                     Box::new(DegreeRepulsion::default().with_weights(self.page_rank_weights()))
-                }
+                },
             },
             PhysicsOverlay::DomainCluster => Box::new(DomainCluster::new(self.site_groups())),
             PhysicsOverlay::HubGravity => match sources.mass {
                 PhysicsMassSource::Degree => Box::new(HubGravity::default()),
                 PhysicsMassSource::PageRank => {
                     Box::new(HubGravity::default().with_weights(self.page_rank_weights()))
-                }
+                },
             },
             PhysicsOverlay::DepthGravity => {
                 Box::new(DepthGravity::new(self.depths(sources.depth, sources.focus)))
-            }
+            },
             PhysicsOverlay::GridSnap => Box::new(GridSnap::default()),
             PhysicsOverlay::GravityLocus => Box::new(GravityLocus::at((0.0, 0.0))),
             PhysicsOverlay::Tide => Box::new(GravityLocus::tidal((0.0, 0.0), 240.0, 24.0)),

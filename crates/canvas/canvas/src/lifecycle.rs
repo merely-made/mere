@@ -164,6 +164,8 @@ impl Canvas {
             community_cache: None,
             community_cache_revision: 0,
             last_strategy_inputs: None,
+            strategy_footprint_revision: 0,
+            strategy_footprints: HashMap::new(),
             show_community_rings: false,
             offthread_wake: None,
             community_actor: None,
@@ -388,6 +390,17 @@ impl Canvas {
             .nodes()
             .map(|(key, _)| (key, self.node_size(key) / 2.0))
             .collect();
+        let footprints: HashMap<NodeKey, f32> = radii
+            .iter()
+            .map(|&(key, radius)| (key, radius * 2.0))
+            .collect();
+        // Analytic strategies consume the same resolved face extents. Collider refreshes occur
+        // for other reasons too (for example a same-host URL navigation), so advance the local
+        // dependency only when that input actually differs, never by hashing it per frame.
+        if footprints != self.strategy_footprints {
+            self.strategy_footprints = footprints;
+            self.strategy_footprint_revision = self.strategy_footprint_revision.wrapping_add(1);
+        }
         self.view.set_radii(radii.iter().copied());
         // The physics collider matches the *shape*, not just the size: a square node collides
         // square, a circle round (Decision 1 — the face is the collider). The view keeps the
