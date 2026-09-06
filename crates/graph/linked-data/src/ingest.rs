@@ -266,12 +266,6 @@ pub fn from_jsonld_with_contexts(
     collect_contribution(quads, &namespace)
 }
 
-/// Extract every `<script type="application/ld+json">` block from an HTML body
-/// and parse each as JSON-LD, returning the contributions that parsed (parse
-/// failures and other `<script>` types are skipped). A lightweight tag scan, not
-/// a full HTML parser — enough to harvest the structured data most pages embed.
-/// A host pairs this with rendering: a page both displays and contributes its
-/// linked data.
 /// Scan a JSON-LD document for the remote `@context` URLs it references — the
 /// string entries of any `@context`, top-level or nested, including inside
 /// `@graph`. A host fetches these (minus the ones the bundled packs already
@@ -320,40 +314,6 @@ fn collect_context_strings(ctx: &serde_json::Value, out: &mut Vec<String>) {
         _ => {},
     }
 }
-
-pub fn from_html(html: &str) -> Vec<GraphContribution> {
-    from_html_with_contexts(html, ContextCache::new())
-}
-
-/// Like [`from_html`], but each embedded document is parsed with `contexts`, so a
-/// `<script>` block referencing a remote `@context` (e.g. schema.org) resolves
-/// from the bundled cache rather than being skipped.
-pub fn from_html_with_contexts(html: &str, contexts: ContextCache) -> Vec<GraphContribution> {
-    let lower = html.to_ascii_lowercase();
-    let mut out = Vec::new();
-    let mut pos = 0;
-    while let Some(rel) = lower[pos..].find("<script") {
-        let tag_start = pos + rel;
-        let Some(gt) = lower[tag_start..].find('>') else {
-            break;
-        };
-        let open_tag = &lower[tag_start..tag_start + gt];
-        let content_start = tag_start + gt + 1;
-        let Some(close_rel) = lower[content_start..].find("</script>") else {
-            break;
-        };
-        let content_end = content_start + close_rel;
-        if open_tag.contains("application/ld+json") {
-            let block = html[content_start..content_end].as_bytes();
-            if let Ok(contribution) = from_jsonld_with_contexts(block, contexts.clone()) {
-                out.push(contribution);
-            }
-        }
-        pos = content_end + "</script>".len();
-    }
-    out
-}
-
 /// The reifier-IRI prefix `dataset_quads` mints fact handles under.
 const STATEMENT_REIFIER_PREFIX: &str = "urn:mere:statement:";
 const RDF_REIFIES: &str = "http://www.w3.org/1999/02/22-rdf-syntax-ns#reifies";
@@ -431,7 +391,7 @@ fn collect_contribution<E: std::fmt::Display>(
             reified.insert(
                 reifier,
                 ReifiedStatement {
-                    subject: subject_iri(&triple.subject.clone().into(), namespace),
+                    subject: subject_iri(&triple.subject.clone(), namespace),
                     predicate: normalize_schema_org(triple.predicate.as_str()),
                     object,
                     graph_scope: scope_from_graph_name(&quad.graph_name, namespace),
@@ -697,7 +657,7 @@ fn collect_contribution<E: std::fmt::Display>(
 /// URL not present, so a document's remote `@context` never hits the network.
 #[derive(Clone, Default)]
 pub struct ContextCache {
-    documents: std::collections::HashMap<String, Vec<u8>>,
+    documents: std::sync::Arc<std::collections::HashMap<String, Vec<u8>>>,
 }
 
 /// The URL Mere's curated context is served at.
@@ -802,7 +762,7 @@ impl ContextCache {
 
     /// Bundle a context document under its URL (builder style).
     pub fn with(mut self, url: impl Into<String>, document: impl Into<Vec<u8>>) -> Self {
-        self.documents.insert(url.into(), document.into());
+        std::sync::Arc::make_mut(&mut self.documents).insert(url.into(), document.into());
         self
     }
 
@@ -812,6 +772,7 @@ impl ContextCache {
 }
 
 mod apply;
+#[cfg(not(target_arch = "wasm32"))]
 pub use apply::ApplyOutcome;
 #[cfg(not(target_arch = "wasm32"))]
 pub use apply::apply_contribution;

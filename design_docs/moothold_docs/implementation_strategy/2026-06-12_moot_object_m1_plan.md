@@ -1,7 +1,7 @@
 # Moot Object M1 — a moot you can declare, join, and share into
 
 **Date**: 2026-06-12
-**Status (2026-09-05)**: Historical M1 landed as recorded below. The active
+**Status (2026-09-06)**: Historical M1 landed as recorded below. The active
 continuation is [Community collections and author-offline publishing](#community-collections-and-author-offline-publishing-2026-09-04). Its same-machine live-peer process proof passed with stable-Persona binding and current Gemot command authority. Production publication/hosting records, historical authority proof, the Persona-to-device adapter, and a two-machine receipt remain open.
 The original M1 body preserves its dated vocabulary and ownership. Current owners
 are Gemot for community authority and recognition, Commons for shared graph
@@ -267,7 +267,7 @@ immutable canonical-text resource. Eidetic owns the complete Annotation JSON-LD
 envelope and wraps the payload with source URL, capture time, response and DOM-mode
 facts, plus raw or replay blob identities. Fleece retains no fetch, storage,
 replication, or Moot policy. The complete cross-standard ledger lives in Genet's
-`design_docs/2026-09-05_fleece_preservation_contract_plan.md`.
+`genet/design_docs/2026-09-05_fleece_preservation_contract_plan.md`.
 
 Done when real selected pages survive peer transfer/reopen, a body-only query finds
 them, duplicate submissions preserve both contributors while results group content,
@@ -316,7 +316,7 @@ management require their own subsequent consumer receipts.
   16 anchors, a changed paragraph, independent journal forks and body-text queries.
   It exercised neither p2panda transport nor service commitments. Its sources and
   reproducible command are local artifacts, not checked-in shipping evidence.
-- Concurrent untracked `crates/moot/commons/examples/commons_practice_peer.rs`
+- Concurrent untracked `crates/moot/commons/examples/commons_practice_peer.rs` *(planned target)* <!-- doc-audit: planned-path -->
   describes a line-JSON retained Woodshed space with one redb store per process and
   explicitly no transport implementation. `ports/graphshell/web/co_op.*` and
   related projection work are another active lane. Their presence is not a landed
@@ -335,15 +335,17 @@ management require their own subsequent consumer receipts.
   exchange. Distinct Personae roots signed the publication/contribution and
   hosting facts. Corrupt carrier bytes and a foreign-Moot operation were refused;
   proof-local policy rejected unauthorized publication and hosting candidates;
-  an unpublished path returned Gemini `51`. Receipt and exact ids:
-  [author-offline community publication proof](../research/2026-09-05_author_offline_publication_proof.md).
+  an unpublished path returned Gemini `51`. The concurrent proof artifact is
+  not yet committed; its target and exact ids are:
+  [author-offline community publication proof](../research/2026-09-05_author_offline_publication_proof.md) *(planned target)* <!-- doc-audit: planned-link -->
   P1 remains partial: candidate publication/hosting records and explicit fixture
   policy must become production authority. Current `Shared` and Standing folds
   also need attested outer-signer binding to stable Personae roots. The
   Persona-to-device-key adapter and a two-machine receipt remain open.
 
-- **2026-09-05:** the first P3 preservation slice passed. Genet's local Fleece
-  0.5 surface now carries document-level canonical-text identity, arbitrary
+- **2026-09-06:** the first P3 preservation slice passed and its cross-repository
+  adoption landed. Genet Fleece 0.5 at `221415af6643e7b31510547963217973ada6332b`
+  carries document-level canonical-text identity, arbitrary
   range mint/resolve operations, the RFC 5147/quote/position selector triple,
   ordered mixed-language and direction evidence, lossless embedded JSON-LD
   blocks, and validated optional wire records. Mere's opt-in
@@ -352,8 +354,22 @@ management require their own subsequent consumer receipts.
   canonical-page scope, saves it as an Eidetic typed payload, closes Fjall, and
   reopens the same validated Annotation envelope. An independent offline
   `oxjsonld`/`oxrdf` oracle expands the envelope with the official W3C context and
-  verifies the expected dataset up to blank-node identity. The bridge currently
-  compiles against Mere's pinned Fleece 0.4 API and reconstructs the matching
-  contract; adopting a real released 0.5 Genet revision remains an integration
-  step. Official JSON-LD test suites, captured response/DOM evidence, peer
-  transfer, and capture-state preservation remain open.
+  verifies the expected dataset up to blank-node identity. All 28 root-workspace
+  Mere Genet dependency pins move together to that revision. The bridge embeds
+  and validates Fleece's `CanonicalTextRecordV1` directly. Fleece's preserved JSON-LD blocks now
+  feed linked-data through a document-lanes adapter, and linked-data's duplicate
+  HTML string scanner is retired. The detailed adapter retains document order,
+  element id, declared media type, and either the contribution or its parse or
+  expansion failure; a convenience projection keeps the former best-effort
+  successful-results behavior. Existing callers of linked-data's removed
+  `from_html*` helpers must extract with Fleece and call this adapter. Re-ingesting
+  an old HTML fixture can also change blank-node skolem IRIs where DOM text
+  normalization changes the exact JSON-LD bytes; migrations must treat those as
+  derived identities and regroup by durable source facts. The Mere adoption gate
+  passed 46 focused native tests, strict Clippy for both changed crates, and a
+  `wasm32-unknown-unknown` check using the workspace's established `wasm_js`
+  getrandom backend. The full workspace resolver still retains Fleece 0.4 through
+  the externally pinned `knot-editor`; that repository must widen its Fleece
+  requirement before the transitive graph can collapse to one revision. Official
+  JSON-LD test suites, captured response/DOM evidence, peer transfer, and
+  capture-state preservation remain open.
