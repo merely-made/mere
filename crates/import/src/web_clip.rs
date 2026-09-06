@@ -563,22 +563,22 @@ fn append_block_text(block: &Block, out: &mut String) {
     match block {
         Block::Heading { spans, .. } | Block::Paragraph { spans } => {
             push_text(out, &inker::inline_text(spans));
-        }
+        },
         Block::CodeBlock { text, .. } | Block::Preformatted { text } => push_text(out, text),
         Block::Quote { blocks } => {
             for block in blocks {
                 append_block_text(block, out);
             }
-        }
+        },
         Block::List { items, .. } => {
             for item in items {
                 for block in item {
                     append_block_text(block, out);
                 }
             }
-        }
+        },
         Block::Image { alt, .. } => push_text(out, alt),
-        Block::Rule => {}
+        Block::Rule => {},
         Block::FeedHeader {
             title,
             subtitle,
@@ -592,7 +592,7 @@ fn append_block_text(block: &Block, out: &mut String) {
             if let Some(summary) = summary {
                 push_text(out, summary);
             }
-        }
+        },
         Block::FeedEntry {
             title,
             date,
@@ -606,7 +606,7 @@ fn append_block_text(block: &Block, out: &mut String) {
             if let Some(summary) = summary {
                 push_text(out, summary);
             }
-        }
+        },
         Block::MetadataRow { label, value } => push_text(out, &format!("{label}: {value}")),
         Block::Badge { text } => push_text(out, text),
         Block::Table { header, rows, .. } => {
@@ -618,7 +618,7 @@ fn append_block_text(block: &Block, out: &mut String) {
                     push_text(out, &inker::inline_text(cell));
                 }
             }
-        }
+        },
     }
 }
 
@@ -647,19 +647,19 @@ fn collect_block_links(block: &Block, links: &mut Vec<String>) {
     match block {
         Block::Heading { spans, .. } | Block::Paragraph { spans } => {
             collect_span_links(spans, links);
-        }
+        },
         Block::Quote { blocks } => {
             for block in blocks {
                 collect_block_links(block, links);
             }
-        }
+        },
         Block::List { items, .. } => {
             for item in items {
                 for block in item {
                     collect_block_links(block, links);
                 }
             }
-        }
+        },
         Block::Image { url, .. } => links.push(url.clone()),
         Block::FeedHeader { source_url, .. } => push_optional_link(source_url, links),
         Block::FeedEntry {
@@ -669,7 +669,7 @@ fn collect_block_links(block: &Block, links: &mut Vec<String>) {
         } => {
             push_optional_link(article_url, links);
             push_optional_link(source_url, links);
-        }
+        },
         Block::Table { header, rows, .. } => {
             for cell in header {
                 collect_span_links(cell, links);
@@ -679,12 +679,12 @@ fn collect_block_links(block: &Block, links: &mut Vec<String>) {
                     collect_span_links(cell, links);
                 }
             }
-        }
+        },
         Block::CodeBlock { .. }
         | Block::Preformatted { .. }
         | Block::Rule
         | Block::MetadataRow { .. }
-        | Block::Badge { .. } => {}
+        | Block::Badge { .. } => {},
     }
 }
 
@@ -696,16 +696,16 @@ fn collect_span_links(spans: &[InlineSpan], links: &mut Vec<String>) {
             } => {
                 links.push(url.clone());
                 collect_span_links(inner, links);
-            }
+            },
             InlineSpan::Emphasis(inner)
             | InlineSpan::Strong(inner)
             | InlineSpan::Submit { spans: inner, .. } => {
                 collect_span_links(inner, links);
-            }
+            },
             InlineSpan::Text(_)
             | InlineSpan::Code(_)
             | InlineSpan::LineBreak
-            | InlineSpan::SoftBreak => {}
+            | InlineSpan::SoftBreak => {},
         }
     }
 }

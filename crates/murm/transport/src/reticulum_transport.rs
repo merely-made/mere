@@ -258,10 +258,10 @@ impl ReticulumTransport {
             match iface {
                 ReticulumInterface::TcpServer { bind } => {
                     endpoint.listen_tcp(bind).await?;
-                }
+                },
                 ReticulumInterface::TcpClient { addr } => {
                     endpoint.attach_tcp_client(addr).await?;
-                }
+                },
             }
         }
 

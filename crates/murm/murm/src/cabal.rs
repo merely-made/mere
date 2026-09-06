@@ -298,7 +298,7 @@ impl CabalHandle {
                 Some((seq_num, _, prior_id)) => {
                     post_seq_num > *seq_num
                         || (post_seq_num == *seq_num && post_id.as_bytes() > prior_id.as_bytes())
-                }
+                },
                 None => true,
             };
             if replace {

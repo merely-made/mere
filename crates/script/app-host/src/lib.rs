@@ -36,8 +36,8 @@
 //! the host survives.
 
 use std::path::Path;
-use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::Duration;
 
 use wasmtime::component::{Component, HasSelf, Linker, ResourceTable};

@@ -169,7 +169,7 @@ impl Canvas {
             PointerButton::Middle => {
                 self.middle_drag = Some(self.cursor);
                 self.pan_velocity = (0.0, 0.0);
-            }
+            },
             PointerButton::Left => {
                 if self.alt {
                     // Alt+left begins an orbit drag (yaw + tilt the camera); it owns the gesture,
@@ -190,8 +190,8 @@ impl Canvas {
                 } else {
                     self.marquee = Some(self.cursor);
                 }
-            }
-            PointerButton::Right => {}
+            },
+            PointerButton::Right => {},
         }
         false
     }
@@ -206,7 +206,7 @@ impl Canvas {
             PointerButton::Middle => {
                 self.middle_drag = None;
                 false
-            }
+            },
             PointerButton::Left => {
                 // End an orbit drag: the camera already moved live, nothing to settle. (P2.)
                 if self.orbit_drag.take().is_some() {
@@ -290,7 +290,7 @@ impl Canvas {
                 } else {
                     false
                 }
-            }
+            },
             PointerButton::Right => false,
         }
     }

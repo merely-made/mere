@@ -53,7 +53,7 @@ impl ConversationStorage {
                 })?;
                 let path = conversation_path(directory, conversation_id);
                 Ok(ConversationBackend::Redb(RedbBackend::open(path)?))
-            }
+            },
         }
     }
 }

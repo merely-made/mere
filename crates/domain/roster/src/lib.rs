@@ -96,7 +96,7 @@ impl RosterSubject {
             RosterSubject::Node(_) => RosterTab::Nodes,
             RosterSubject::LinkBundle { .. } | RosterSubject::RelationCell { .. } => {
                 RosterTab::Links
-            }
+            },
             RosterSubject::Graphlet(_) => RosterTab::Graphlets,
             RosterSubject::Field(_) => RosterTab::Fields,
             RosterSubject::Facet(facet) => facet.natural_tab(),

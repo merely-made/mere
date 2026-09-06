@@ -508,7 +508,7 @@ impl BlobStore {
                     .shutdown()
                     .await
                     .map_err(|e| BlobError::Backend(format!("shutdown blob store: {e:?}")))
-            }
+            },
         }
     }
 

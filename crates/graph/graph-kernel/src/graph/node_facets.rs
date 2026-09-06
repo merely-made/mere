@@ -187,7 +187,7 @@ impl Graph {
                     }
                     existing.provenance_iri = property.provenance_iri.clone();
                     existing.asserted_at_ms = property.asserted_at_ms;
-                }
+                },
                 None => properties.push(property.clone()),
             }
             accepted.push(property);

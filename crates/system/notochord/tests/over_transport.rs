@@ -233,7 +233,7 @@ async fn admit_session_yields_the_principal_or_consumes_the_stream() {
                     "the verified claims travel with the admitted session for later revocation checks"
                 );
                 assert_eq!(session.principal.action.path, MURM);
-            }
+            },
             Err(reason) => {
                 assert!(!expect_admit);
                 assert_eq!(reason, DenyReason::ServiceNotOffered);
@@ -249,7 +249,7 @@ async fn admit_session_yields_the_principal_or_consumes_the_stream() {
                 .expect("a finished refusal must not leave the peer hanging")
                 .expect("read to end");
                 assert!(rest.is_empty(), "a refusal sends nothing after its reply");
-            }
+            },
         }
     }
 }

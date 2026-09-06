@@ -60,7 +60,7 @@ fn validate_runtime_channel_ownership(
                     reason: format!("mod channels must use namespace '{expected_prefix}*'"),
                 });
             }
-        }
+        },
         DiagnosticsChannelSource::Verse => {
             if !descriptor.channel_id.starts_with("verse.") {
                 return Err(ChannelRegistrationError::InvalidOwnership {
@@ -68,8 +68,8 @@ fn validate_runtime_channel_ownership(
                     reason: "verse channels must use namespace 'verse.*'".to_string(),
                 });
             }
-        }
-        _ => {}
+        },
+        _ => {},
     }
     Ok(())
 }
@@ -112,35 +112,35 @@ fn channel_payload_schema(channel_id: &str) -> DiagnosticPayloadSchema {
         | CHANNEL_PROTOCOL_RESOLVE_FAILED
         | CHANNEL_PROTOCOL_RESOLVE_FALLBACK_USED => {
             DiagnosticPayloadSchema::Structured(PROTOCOL_RESOLVE_FIELDS.to_vec())
-        }
+        },
         CHANNEL_VIEWER_SELECT_STARTED | CHANNEL_VIEWER_SELECT_SUCCEEDED => {
             DiagnosticPayloadSchema::Structured(VIEWER_SELECT_FIELDS.to_vec())
-        }
+        },
         CHANNEL_ACTION_EXECUTE_STARTED
         | CHANNEL_ACTION_EXECUTE_SUCCEEDED
         | CHANNEL_ACTION_EXECUTE_FAILED => {
             DiagnosticPayloadSchema::Structured(ACTION_EXECUTE_FIELDS.to_vec())
-        }
+        },
         CHANNEL_IDENTITY_SIGN_STARTED
         | CHANNEL_IDENTITY_SIGN_SUCCEEDED
         | CHANNEL_IDENTITY_SIGN_FAILED => {
             DiagnosticPayloadSchema::Structured(IDENTITY_SIGN_FIELDS.to_vec())
-        }
+        },
         CHANNEL_NOSTR_RELAY_CONNECT_STARTED
         | CHANNEL_NOSTR_RELAY_CONNECT_SUCCEEDED
         | CHANNEL_NOSTR_RELAY_CONNECT_FAILED
         | CHANNEL_NOSTR_RELAY_DISCONNECTED => {
             DiagnosticPayloadSchema::Structured(NOSTR_RELAY_CONNECT_FIELDS.to_vec())
-        }
+        },
         CHANNEL_RENDERER_ATTACH | CHANNEL_RENDERER_DETACH => {
             DiagnosticPayloadSchema::Structured(RENDERER_ATTACH_FIELDS.to_vec())
-        }
+        },
         CHANNEL_UI_COMMAND_SURFACE_ROUTE_RESOLVED
         | CHANNEL_UI_COMMAND_SURFACE_ROUTE_BLOCKED
         | CHANNEL_UI_COMMAND_SURFACE_ROUTE_FALLBACK
         | CHANNEL_UI_COMMAND_SURFACE_ROUTE_NO_TARGET => {
             DiagnosticPayloadSchema::Structured(COMMAND_SURFACE_ROUTE_FIELDS.to_vec())
-        }
+        },
         _ => DiagnosticPayloadSchema::FreeText,
     }
 }

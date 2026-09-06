@@ -184,38 +184,38 @@ impl Graph {
                                     trigger: match traversal.trigger {
                                         NavigationTrigger::Unknown => {
                                             PersistedNavigationTrigger::Unknown
-                                        }
+                                        },
                                         NavigationTrigger::LinkClick => {
                                             PersistedNavigationTrigger::LinkClick
-                                        }
+                                        },
                                         NavigationTrigger::Back => PersistedNavigationTrigger::Back,
                                         NavigationTrigger::Forward => {
                                             PersistedNavigationTrigger::Forward
-                                        }
+                                        },
                                         NavigationTrigger::AddressBarEntry => {
                                             PersistedNavigationTrigger::AddressBarEntry
-                                        }
+                                        },
                                         NavigationTrigger::PanePromotion => {
                                             PersistedNavigationTrigger::PanePromotion
-                                        }
+                                        },
                                         NavigationTrigger::Programmatic => {
                                             PersistedNavigationTrigger::Programmatic
-                                        }
+                                        },
                                         NavigationTrigger::Redirect => {
                                             PersistedNavigationTrigger::Redirect
-                                        }
+                                        },
                                         NavigationTrigger::ReopenSession => {
                                             PersistedNavigationTrigger::ReopenSession
-                                        }
+                                        },
                                         NavigationTrigger::JumpAnchor => {
                                             PersistedNavigationTrigger::JumpAnchor
-                                        }
+                                        },
                                         NavigationTrigger::InPageSearchJump => {
                                             PersistedNavigationTrigger::InPageSearchJump
-                                        }
+                                        },
                                         NavigationTrigger::ImportedHistory => {
                                             PersistedNavigationTrigger::ImportedHistory
-                                        }
+                                        },
                                     },
                                 })
                                 .collect(),
@@ -234,25 +234,25 @@ impl Graph {
                                 .map(|sub_kind| match sub_kind {
                                     ContainmentSubKind::UrlPath => {
                                         PersistedContainmentSubKind::UrlPath
-                                    }
+                                    },
                                     ContainmentSubKind::Domain => {
                                         PersistedContainmentSubKind::Domain
-                                    }
+                                    },
                                     ContainmentSubKind::FileSystem => {
                                         PersistedContainmentSubKind::FileSystem
-                                    }
+                                    },
                                     ContainmentSubKind::UserFolder => {
                                         PersistedContainmentSubKind::UserFolder
-                                    }
+                                    },
                                     ContainmentSubKind::ClipSource => {
                                         PersistedContainmentSubKind::ClipSource
-                                    }
+                                    },
                                     ContainmentSubKind::NotebookSection => {
                                         PersistedContainmentSubKind::NotebookSection
-                                    }
+                                    },
                                     ContainmentSubKind::CollectionMember => {
                                         PersistedContainmentSubKind::CollectionMember
-                                    }
+                                    },
                                 })
                                 .collect(),
                         }
@@ -269,13 +269,13 @@ impl Graph {
                                 .map(|sub_kind| match sub_kind {
                                     ArrangementSubKind::FrameMember => {
                                         PersistedArrangementSubKind::FrameMember
-                                    }
+                                    },
                                     ArrangementSubKind::TileGroup => {
                                         PersistedArrangementSubKind::TileGroup
-                                    }
+                                    },
                                     ArrangementSubKind::SplitPair => {
                                         PersistedArrangementSubKind::SplitPair
-                                    }
+                                    },
                                 })
                                 .collect(),
                         }
@@ -289,25 +289,25 @@ impl Graph {
                                 .map(|sub_kind| match sub_kind {
                                     ImportedSubKind::BookmarkFolder => {
                                         PersistedImportedSubKind::BookmarkFolder
-                                    }
+                                    },
                                     ImportedSubKind::HistoryImport => {
                                         PersistedImportedSubKind::HistoryImport
-                                    }
+                                    },
                                     ImportedSubKind::SessionImport => {
                                         PersistedImportedSubKind::SessionImport
-                                    }
+                                    },
                                     ImportedSubKind::RssMembership => {
                                         PersistedImportedSubKind::RssMembership
-                                    }
+                                    },
                                     ImportedSubKind::FileSystemImport => {
                                         PersistedImportedSubKind::FileSystemImport
-                                    }
+                                    },
                                     ImportedSubKind::ArchiveMembership => {
                                         PersistedImportedSubKind::ArchiveMembership
-                                    }
+                                    },
                                     ImportedSubKind::SharedCollection => {
                                         PersistedImportedSubKind::SharedCollection
-                                    }
+                                    },
                                 })
                                 .collect(),
                         }),
@@ -320,31 +320,31 @@ impl Graph {
                                 .map(|sub_kind| match sub_kind {
                                     ProvenanceSubKind::ClippedFrom => {
                                         PersistedProvenanceSubKind::ClippedFrom
-                                    }
+                                    },
                                     ProvenanceSubKind::ExcerptedFrom => {
                                         PersistedProvenanceSubKind::ExcerptedFrom
-                                    }
+                                    },
                                     ProvenanceSubKind::SummarizedFrom => {
                                         PersistedProvenanceSubKind::SummarizedFrom
-                                    }
+                                    },
                                     ProvenanceSubKind::TranslatedFrom => {
                                         PersistedProvenanceSubKind::TranslatedFrom
-                                    }
+                                    },
                                     ProvenanceSubKind::RewrittenFrom => {
                                         PersistedProvenanceSubKind::RewrittenFrom
-                                    }
+                                    },
                                     ProvenanceSubKind::GeneratedFrom => {
                                         PersistedProvenanceSubKind::GeneratedFrom
-                                    }
+                                    },
                                     ProvenanceSubKind::ExtractedFrom => {
                                         PersistedProvenanceSubKind::ExtractedFrom
-                                    }
+                                    },
                                     ProvenanceSubKind::ImportedFromSource => {
                                         PersistedProvenanceSubKind::ImportedFromSource
-                                    }
+                                    },
                                     ProvenanceSubKind::CopiedFrom => {
                                         PersistedProvenanceSubKind::CopiedFrom
-                                    }
+                                    },
                                 })
                                 .collect(),
                         }),
@@ -374,7 +374,7 @@ impl Graph {
                     },
                     FieldExtent::AttachedToNode(id) => {
                         PersistedFieldExtent::AttachedToNode(id.to_string())
-                    }
+                    },
                     FieldExtent::Polygon { points } => PersistedFieldExtent::Polygon {
                         points: points.clone(),
                     },
@@ -404,7 +404,7 @@ impl Graph {
                     CouplingResponse::FlowAdvect => PersistedCouplingResponse::FlowAdvect,
                     CouplingResponse::DampenInside { factor } => {
                         PersistedCouplingResponse::DampenInside { factor: *factor }
-                    }
+                    },
                     CouplingResponse::ContainmentWall => PersistedCouplingResponse::ContainmentWall,
                     CouplingResponse::Open { predicate } => PersistedCouplingResponse::Open {
                         predicate: predicate.clone(),

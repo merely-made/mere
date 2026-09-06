@@ -111,18 +111,18 @@ pub(crate) fn b64url_encode(bytes: &[u8]) -> String {
         out.push(B64URL_ALPHABET[usize::try_from(n & 0x3f).unwrap()] as char);
     }
     match chunks.remainder() {
-        [] => {}
+        [] => {},
         &[b0] => {
             let n = u32::from(b0) << 16;
             out.push(B64URL_ALPHABET[usize::try_from(n >> 18 & 0x3f).unwrap()] as char);
             out.push(B64URL_ALPHABET[usize::try_from(n >> 12 & 0x3f).unwrap()] as char);
-        }
+        },
         &[b0, b1] => {
             let n = (u32::from(b0) << 16) | (u32::from(b1) << 8);
             out.push(B64URL_ALPHABET[usize::try_from(n >> 18 & 0x3f).unwrap()] as char);
             out.push(B64URL_ALPHABET[usize::try_from(n >> 12 & 0x3f).unwrap()] as char);
             out.push(B64URL_ALPHABET[usize::try_from(n >> 6 & 0x3f).unwrap()] as char);
-        }
+        },
         _ => unreachable!("chunks_exact(3)'s remainder is under 3 bytes"),
     }
     out
@@ -173,13 +173,13 @@ pub(crate) fn b64url_decode(text: &str) -> Option<Vec<u8>> {
         out.push(n as u8);
     }
     match chunks.remainder() {
-        [] => {}
+        [] => {},
         &[c0, c1] => {
             let a = b64url_digit(c0)?;
             let b = b64url_digit(c1)?;
             let n = (u32::from(a) << 18) | (u32::from(b) << 12);
             out.push((n >> 16) as u8);
-        }
+        },
         &[c0, c1, c2] => {
             let a = b64url_digit(c0)?;
             let b = b64url_digit(c1)?;
@@ -187,7 +187,7 @@ pub(crate) fn b64url_decode(text: &str) -> Option<Vec<u8>> {
             let n = (u32::from(a) << 18) | (u32::from(b) << 12) | (u32::from(c) << 6);
             out.push((n >> 16) as u8);
             out.push((n >> 8) as u8);
-        }
+        },
         _ => return None, // len % 4 == 1 is already caught above.
     }
     Some(out)

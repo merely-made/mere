@@ -49,7 +49,7 @@ impl OtpCodeTile {
                     period_seconds: period,
                     expires_at_unix_secs: unix_secs.saturating_add(seconds_remaining),
                 })
-            }
+            },
             OtpKind::Hotp { .. } => None,
         };
         Self {

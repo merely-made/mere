@@ -155,7 +155,7 @@ pub fn spawn_crawl(
                         },
                         |update| out.emit(update),
                     ));
-                }
+                },
             }
         }
     });
@@ -215,7 +215,7 @@ where
                     fetched: frontier.fetched(),
                     last_url: url,
                 });
-            }
+            },
             Err(error) => tracing::warn!(%url, %error, "crawl fetch failed; skipping"),
         }
     }
@@ -350,16 +350,16 @@ pub fn fold_update(
             if let Some(gid) = graph_id {
                 applied.extend(contributions.into_iter().map(|c| (gid, c)));
             }
-        }
+        },
         CrawlUpdate::Progress { fetched, last_url } => {
             progress.fetched = fetched;
             progress.last_url = Some(last_url);
             progress.running = true;
-        }
+        },
         CrawlUpdate::Done { fetched } => {
             progress.fetched = fetched;
             progress.running = false;
-        }
+        },
     }
 }
 

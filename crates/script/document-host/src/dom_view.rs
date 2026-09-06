@@ -112,22 +112,22 @@ fn apply_one(dom: &mut ScriptedDom, m: Mutation) {
     match m {
         Mutation::SetText(SetTextArgs { node, text }) => {
             dom.set_text(NodeId::from_raw(node as usize), &text);
-        }
+        },
         Mutation::Remove(id) => {
             dom.remove(NodeId::from_raw(id as usize));
-        }
+        },
         Mutation::InsertBefore(InsertArgs { reference, new }) => {
             let reference = NodeId::from_raw(reference as usize);
             if let Some(parent) = dom.parent(reference) {
                 let child = create_block(dom, new);
                 dom.insert_before(parent, child, Some(reference));
             }
-        }
+        },
         Mutation::AppendChild(AppendArgs { parent, new }) => {
             let parent = NodeId::from_raw(parent as usize);
             let child = create_block(dom, new);
             dom.append_child(parent, child);
-        }
+        },
     }
 }
 

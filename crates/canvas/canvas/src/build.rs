@@ -190,11 +190,11 @@ pub(crate) fn dedup_edges_weighted(graph: &Graph) -> Vec<(NodeKey, NodeKey, u32)
                 if is_statement {
                     edges[i].2 += 1;
                 }
-            }
+            },
             None => {
                 index.insert(pair, edges.len());
                 edges.push((r.from, r.to, u32::from(is_statement)));
-            }
+            },
         }
     }
     // A pair connected only by traversal events still draws an edge (weight floor 1).

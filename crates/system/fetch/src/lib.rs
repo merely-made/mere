@@ -136,7 +136,7 @@ impl std::fmt::Display for FetchFailure {
             Self::ClientCertificateRequired { .. } => f.write_str("client certificate required"),
             Self::CertificateChanged { target, .. } => {
                 write!(f, "certificate for {target} changed")
-            }
+            },
             Self::Failed(error) => f.write_str(error),
         }
     }
@@ -345,7 +345,7 @@ pub fn is_fetchable(url: &str) -> bool {
     match scheme_of(url) {
         Some(scheme) => {
             scheme == "http" || scheme == "https" || errand::Scheme::parse(scheme).is_some()
-        }
+        },
         None => false,
     }
 }
@@ -454,7 +454,7 @@ pub fn spawn_fetcher(wake: Wake) -> (ActorHandle<FetchCommand>, Receiver<FetchUp
                     if let Some((_, superseded)) = page_tasks.insert(request, (task_url, task)) {
                         superseded.abort();
                     }
-                }
+                },
                 FetchCommand::CancelPage { request } => {
                     if let Some((url, task)) = page_tasks.remove(&request) {
                         task.abort();
@@ -464,14 +464,14 @@ pub fn spawn_fetcher(wake: Wake) -> (ActorHandle<FetchCommand>, Receiver<FetchUp
                             result: Err(FetchFailure::Cancelled),
                         }));
                     }
-                }
+                },
                 FetchCommand::Subresource(url) => {
                     let out = out.clone();
                     runtime.spawn(async move {
                         let result = fetch_bytes(&url).await;
                         out.emit(FetchUpdate::Subresource(SubresourceOutcome { url, result }));
                     });
-                }
+                },
                 FetchCommand::Favicon { request, url } => {
                     let out = out.clone();
                     runtime.spawn(async move {
@@ -480,7 +480,7 @@ pub fn spawn_fetcher(wake: Wake) -> (ActorHandle<FetchCommand>, Receiver<FetchUp
                             result: fetch_bytes(&url).await,
                         }));
                     });
-                }
+                },
                 FetchCommand::Submit {
                     request,
                     submission,
@@ -495,7 +495,7 @@ pub fn spawn_fetcher(wake: Wake) -> (ActorHandle<FetchCommand>, Receiver<FetchUp
                             result,
                         }));
                     });
-                }
+                },
             }
         }
     })
@@ -505,7 +505,7 @@ async fn submit_smolweb(submission: SmolwebSubmission) -> Result<SubmissionAnswe
     if match &submission {
         SmolwebSubmission::Titan { body, .. } | SmolwebSubmission::Spartan { body, .. } => {
             body.len() > PAGE_BODY_CAP
-        }
+        },
     } {
         return Err(FetchFailure::Failed(format!(
             "submission exceeds the {PAGE_BODY_CAP}-byte cap"
@@ -541,7 +541,7 @@ async fn submit_smolweb(submission: SmolwebSubmission) -> Result<SubmissionAnswe
                             identity.errand_view(),
                         )
                         .await
-                    }
+                    },
                     None => errand::titan_upload(&parsed, &body, &mime, token.as_deref()).await,
                 }
             };
@@ -550,7 +550,7 @@ async fn submit_smolweb(submission: SmolwebSubmission) -> Result<SubmissionAnswe
                 .map_err(|_| FetchFailure::Failed("submission timed out".to_string()))?
                 .map_err(|error| smolweb_transport_failure(&parsed, error))?;
             (parsed, response)
-        }
+        },
         SmolwebSubmission::Spartan { url, body } => {
             let parsed = url::Url::parse(&url)
                 .map_err(|error| FetchFailure::Failed(format!("bad URL: {error}")))?;
@@ -565,7 +565,7 @@ async fn submit_smolweb(submission: SmolwebSubmission) -> Result<SubmissionAnswe
                     .map_err(|_| FetchFailure::Failed("submission timed out".to_string()))?
                     .map_err(|error| smolweb_transport_failure(&parsed, error))?;
             (parsed, response)
-        }
+        },
     };
     smolweb_submission_answer(&url, response)
 }
@@ -585,7 +585,7 @@ fn smolweb_submission_answer(
                 bytes,
                 body,
             }))
-        }
+        },
         errand::Status::Redirect => {
             let target = request_url
                 .join(&response.meta)
@@ -600,7 +600,7 @@ fn smolweb_submission_answer(
                 ));
             }
             Ok(SubmissionAnswer::Redirect(target.to_string()))
-        }
+        },
         errand::Status::Input => Err(smolweb_input_failure(request_url, &response)),
         errand::Status::CertRequired => Err(FetchFailure::ClientCertificateRequired {
             url: request_url.to_string(),
@@ -675,7 +675,7 @@ where
                 Err(error) => tracing::warn!(url = %log_url, %error, "smolweb failed"),
             }
             result
-        }
+        },
         None => do_fetch(url, max_bytes).await.map_err(FetchFailure::Failed),
     }
 }
@@ -703,7 +703,7 @@ pub async fn fetch_page_anonymous_capped(url: &str, max_bytes: usize) -> Result<
         None => {
             let cx = netfetcher::FetchContext::permissive();
             do_fetch_ua_with_context(url, max_bytes, None, &cx).await
-        }
+        },
     }
 }
 
@@ -782,13 +782,13 @@ where
                         |chunk| on_progress(&response_url, chunk.content_type, chunk.bytes),
                     )
                     .await
-                }
+                },
                 None => {
                     errand::fetch_gemini_url_streaming_timeout(&current, SMOLWEB_TIMEOUT, |chunk| {
                         on_progress(&response_url, chunk.content_type, chunk.bytes)
                     })
                     .await
-                }
+                },
             }
         } else {
             match identity.filter(|identity| identity.applies_to(&current)) {
@@ -799,7 +799,7 @@ where
                         SMOLWEB_TIMEOUT,
                     )
                     .await
-                }
+                },
                 None => errand::fetch_url_timeout(&current, SMOLWEB_TIMEOUT).await,
             }
         }
@@ -807,29 +807,29 @@ where
         match response.status {
             errand::Status::Success => {
                 return Ok((current, response));
-            }
+            },
             errand::Status::Redirect => {
                 current = current.join(&response.meta).map_err(|error| {
                     FetchFailure::Failed(format!("bad redirect target: {error}"))
                 })?;
-            }
+            },
             errand::Status::Input => {
                 return Err(smolweb_input_failure(&current, &response));
-            }
+            },
             errand::Status::CertRequired => {
                 return Err(FetchFailure::ClientCertificateRequired {
                     url: current.to_string(),
                     prompt: response.meta,
                     code: response.raw_status,
                 });
-            }
+            },
             errand::Status::Failure => {
                 return Err(FetchFailure::Failed(if response.meta.is_empty() {
                     "request failed".to_string()
                 } else {
                     response.meta
                 }));
-            }
+            },
         }
     }
     Err(FetchFailure::Failed("too many redirects".to_string()))
@@ -844,7 +844,7 @@ fn smolweb_transport_failure(current: &url::Url, error: errand::Error) -> FetchF
                 pinned,
                 seen,
             }
-        }
+        },
         error => FetchFailure::Failed(error.to_string()),
     }
 }

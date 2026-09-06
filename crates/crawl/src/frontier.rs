@@ -186,7 +186,7 @@ impl Frontier {
             HostScope::SameHost => host_of(url).as_deref() == Some(self.seed_host.as_str()),
             HostScope::SameDomain => {
                 host_of(url).is_some_and(|h| same_registrable_domain(&h, &self.seed_host))
-            }
+            },
         }
     }
 }
@@ -233,7 +233,7 @@ pub(crate) fn normalize(url: &str) -> String {
         Ok(mut u) => {
             u.set_fragment(None);
             u.to_string()
-        }
+        },
         Err(_) => url.trim().to_string(),
     }
 }

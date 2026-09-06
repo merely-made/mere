@@ -435,7 +435,7 @@ impl fmt::Display for SitedStationGrantError {
             ),
             Self::MissingGrant { device_id } => {
                 write!(f, "sited station grant missing for {}", device_id.as_uuid())
-            }
+            },
             Self::MissingRoster => f.write_str("the host device roster is missing"),
             Self::UnknownDevice { device_id } => {
                 write!(
@@ -443,10 +443,10 @@ impl fmt::Display for SitedStationGrantError {
                     "sited station device {} is absent from the host roster",
                     device_id.as_uuid()
                 )
-            }
+            },
             Self::Revoked { device_id } => {
                 write!(f, "sited station device {} is revoked", device_id.as_uuid())
-            }
+            },
             Self::NotRemoteAuth { device_id } => write!(
                 f,
                 "sited station device {} is not a RemoteAuth device",
@@ -476,13 +476,13 @@ impl fmt::Display for SitedStationGrantError {
             Self::InvalidSignature => f.write_str("sited station grant signature is invalid"),
             Self::PersonaAuthority => {
                 f.write_str("sited station grants must not authorize any persona")
-            }
+            },
             Self::PrivateEpochMaterial => {
                 f.write_str("sited station grants must not carry private epoch material")
-            }
+            },
             Self::ScopeViolation => {
                 f.write_str("sited station grants must contain only the transport.egress scope")
-            }
+            },
             Self::AttenuationViolation => f.write_str(
                 "sited station grants must contain only the no-subdelegation attenuation",
             ),

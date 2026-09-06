@@ -208,7 +208,7 @@ mod tests {
         match carrier.request(CarrierRequestBody::Discover).unwrap() {
             CarrierResponseBody::Descriptor(descriptor) => {
                 assert_eq!(descriptor.label, "counting");
-            }
+            },
             other => panic!("expected a descriptor, got {other:?}"),
         }
         assert_eq!(

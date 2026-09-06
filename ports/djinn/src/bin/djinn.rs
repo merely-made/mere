@@ -110,7 +110,7 @@ async fn main() {
         Err(message) => {
             eprintln!("{message}");
             std::process::exit(2);
-        }
+        },
     };
     // Pairing is a management operation, not a run of the host: it edits the
     // settings and reports, so it writes to the console rather than the log.
@@ -120,7 +120,7 @@ async fn main() {
             (Some(_), Some(_), _) => {
                 eprintln!("djinn: --pair-node and --unpair-node are mutually exclusive");
                 std::process::exit(2);
-            }
+            },
             (Some(request), None, _) => Some(pair_device(&args, request)),
             (None, Some(node_id), _) => Some(unpair_device(&args, node_id)),
             (None, None, true) => Some(report_pairing_facts(&args)),
@@ -131,11 +131,11 @@ async fn main() {
                 Ok(message) => {
                     println!("{message}");
                     return;
-                }
+                },
                 Err(error) => {
                     eprintln!("djinn: {error}");
                     std::process::exit(1);
-                }
+                },
             }
         }
     }
@@ -202,59 +202,59 @@ fn parse_args() -> Result<Args, String> {
         match arg.as_str() {
             "--dir" => {
                 vault_dir = PathBuf::from(argv.next().ok_or("--dir needs a value")?);
-            }
+            },
             "--profile" => {
                 profile = Some(ProfileId(argv.next().ok_or("--profile needs a value")?));
-            }
+            },
             "--agent-endpoint" => {
                 agent_endpoint = Some(argv.next().ok_or("--agent-endpoint needs a value")?);
-            }
+            },
             "--receipt-agent-endpoint" => {
                 receipt_agent_endpoint = Some(
                     argv.next()
                         .ok_or("--receipt-agent-endpoint needs a value")?,
                 );
-            }
+            },
             "--browser-endpoint" => {
                 browser_endpoint = argv.next().ok_or("--browser-endpoint needs a value")?;
-            }
+            },
             "--app-endpoint" => {
                 app_endpoint = argv.next().ok_or("--app-endpoint needs a value")?;
-            }
+            },
             "--data-root" => {
                 data_root = Some(PathBuf::from(
                     argv.next().ok_or("--data-root needs a value")?,
                 ));
-            }
+            },
             "--log-file" => {
                 log_file = Some(PathBuf::from(
                     argv.next().ok_or("--log-file needs a value")?,
                 ));
-            }
+            },
             #[cfg(feature = "personal-sync")]
             "--sync-graph" => {
                 sync_graph = Some(argv.next().ok_or("--sync-graph needs a value")?);
-            }
+            },
             #[cfg(feature = "personal-sync")]
             "--sync-store" => {
                 sync_store = Some(PathBuf::from(
                     argv.next().ok_or("--sync-store needs a value")?,
                 ));
-            }
+            },
             #[cfg(feature = "personal-sync")]
             "--sync-root" => {
                 let value = argv.next().ok_or("--sync-root needs a value")?;
                 owner_settings::parse_hex32(&value).map_err(|error| error.to_string())?;
                 sync_roots.push(value);
-            }
+            },
             #[cfg(feature = "personal-sync")]
             "--sync-relay" => {
                 sync_relays.push(argv.next().ok_or("--sync-relay needs a url")?);
-            }
+            },
             #[cfg(feature = "personal-sync")]
             "--sync-peer" => {
                 sync_peers.push(argv.next().ok_or("--sync-peer needs a value")?);
-            }
+            },
             // Prefer this over --sync-peer: a ticket embeds the peer's current
             // address and is rebuilt on every bind, so a stored one is stale
             // after that device restarts. A node id is stable.
@@ -263,27 +263,27 @@ fn parse_args() -> Result<Args, String> {
                 let value = argv.next().ok_or("--sync-peer-node needs a value")?;
                 owner_settings::parse_hex32(&value).map_err(|error| error.to_string())?;
                 sync_peer_nodes.push(value);
-            }
+            },
             #[cfg(feature = "personal-sync")]
             "--sync-facet" => {
                 sync_facets.push(argv.next().ok_or("--sync-facet needs a value")?);
-            }
+            },
             #[cfg(feature = "personal-sync")]
             "--pair-node" => {
                 let value = argv.next().ok_or("--pair-node needs a value")?;
                 owner_settings::parse_hex32(&value).map_err(|error| error.to_string())?;
                 pair_node = Some(value);
-            }
+            },
             #[cfg(feature = "personal-sync")]
             "--pair-root" => {
                 let value = argv.next().ok_or("--pair-root needs a value")?;
                 owner_settings::parse_hex32(&value).map_err(|error| error.to_string())?;
                 pair_root = Some(value);
-            }
+            },
             #[cfg(feature = "personal-sync")]
             "--pair-label" => {
                 pair_label = argv.next().ok_or("--pair-label needs a value")?;
-            }
+            },
             // Only needed for a device with no roster root here. It cannot
             // author, so it cannot announce itself, and this device relays what
             // it disclosed instead. Validated now rather than at relay time, so
@@ -293,7 +293,7 @@ fn parse_args() -> Result<Args, String> {
                 let value = argv.next().ok_or("--pair-prekey needs a value")?;
                 owner_settings::parse_hex(&value).map_err(|error| error.to_string())?;
                 pair_prekey = Some(value);
-            }
+            },
             #[cfg(feature = "personal-sync")]
             "--pairing-facts" => pairing_facts = true,
             #[cfg(feature = "personal-sync")]
@@ -303,27 +303,27 @@ fn parse_args() -> Result<Args, String> {
                     .next()
                     .ok_or("--seed-node needs a title after the address")?;
                 seed_notes.push(device_sync::SeedNote { address, title });
-            }
+            },
             #[cfg(feature = "personal-sync")]
             "--stage-blob" => {
                 let path = argv.next().ok_or("--stage-blob needs a file path")?;
                 blob_actions.push(device_sync::BlobAction::Stage {
                     path: PathBuf::from(path),
                 });
-            }
+            },
             #[cfg(feature = "personal-sync")]
             "--fetch-blob" => {
                 let value = argv.next().ok_or("--fetch-blob needs a 64-hex hash")?;
                 let blob =
                     owner_settings::parse_hex32(&value).map_err(|error| error.to_string())?;
                 blob_actions.push(device_sync::BlobAction::Fetch { blob });
-            }
+            },
             #[cfg(feature = "personal-sync")]
             "--unpair-node" => {
                 let value = argv.next().ok_or("--unpair-node needs a value")?;
                 owner_settings::parse_hex32(&value).map_err(|error| error.to_string())?;
                 unpair_node = Some(value);
-            }
+            },
             #[cfg(feature = "personal-sync")]
             "--sync-access" => sync_access = true,
             #[cfg(feature = "personal-sync")]
@@ -334,7 +334,7 @@ fn parse_args() -> Result<Args, String> {
             "--sync-blobs" => sync_blobs = true,
             "--help" | "-h" => {
                 return Err(usage().to_string());
-            }
+            },
             other => return Err(format!("unknown argument: {other}")),
         }
     }
@@ -443,10 +443,10 @@ fn unpair_device(args: &Args, node_id: &str) -> Result<String, String> {
     Ok(match outcome {
         pairing::UnpairOutcome::Removed { path } => {
             format!("unpaired {} in {}", node_id, path.display())
-        }
+        },
         pairing::UnpairOutcome::NotPaired => {
             format!("{node_id} was not paired; settings unchanged")
-        }
+        },
     })
 }
 
@@ -493,7 +493,7 @@ fn pair_device(args: &Args, request: &PairRequest) -> Result<String, String> {
         ),
         pairing::PairOutcome::AlreadyPaired => {
             format!("{} was already paired; settings unchanged", request.node_id)
-        }
+        },
     })
 }
 
@@ -735,7 +735,7 @@ async fn run(args: Args) -> Result<(), Box<dyn std::error::Error>> {
                         cards,
                     )
                     .await
-                }
+                },
                 None => {
                     serve_browser_broker(
                         &args.browser_endpoint,
@@ -745,7 +745,7 @@ async fn run(args: Args) -> Result<(), Box<dyn std::error::Error>> {
                         session_duration_ms(),
                     )
                     .await
-                }
+                },
             }
         };
         #[cfg(not(feature = "personal-sync"))]
@@ -777,7 +777,7 @@ async fn run(args: Args) -> Result<(), Box<dyn std::error::Error>> {
                         observe_distillery(&receipt)
                     })
                     .await
-                }
+                },
                 None => std::future::pending::<Result<(), String>>().await,
             }
         };
@@ -865,7 +865,7 @@ async fn run(args: Args) -> Result<(), Box<dyn std::error::Error>> {
         (Ok(()), Err(error)) => Err(error.into()),
         (Err(outcome), Err(shutdown)) => {
             Err(format!("{outcome}; resident shutdown: {shutdown}").into())
-        }
+        },
     }
 }
 
@@ -883,10 +883,10 @@ fn observe_distillery(receipt: &ResidentReceipt) {
                     .all(|step| matches!(step, mesh_host::Step::Idle)) =>
         {
             tracing::debug!("Distillery supervisor turn with nothing to do")
-        }
+        },
         ResidentReceipt::Tick { steps } => {
             tracing::info!(steps = steps.len(), "Distillery supervisor turn")
-        }
+        },
         ResidentReceipt::MaintenanceCompleted(report) => tracing::info!(
             candidates = report.candidates,
             collected = report.collected,
@@ -894,14 +894,14 @@ fn observe_distillery(receipt: &ResidentReceipt) {
         ),
         ResidentReceipt::MaintenanceIdle => {
             tracing::debug!("Distillery frontier unchanged; nothing to checkpoint")
-        }
+        },
         // Non-fatal and expected: a live lease is the ordinary reason.
         ResidentReceipt::MaintenanceFailed { error } => {
             tracing::warn!(%error, "Distillery maintenance refused")
-        }
+        },
         ResidentReceipt::SupervisorFailed { error } => {
             tracing::error!(%error, "Distillery supervisor failed")
-        }
+        },
         ResidentReceipt::StopRequested => tracing::info!("Distillery works stopping"),
     }
 }
@@ -933,7 +933,7 @@ async fn prepare_unix_agent_endpoint(endpoint: &str) -> Result<(), std::io::Erro
                 Err(error) if error.kind() == std::io::ErrorKind::NotFound => Ok(()),
                 Err(error) => Err(error),
             }
-        }
+        },
         Err(error) => Err(error),
     }
 }

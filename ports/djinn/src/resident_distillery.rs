@@ -164,12 +164,12 @@ impl ResidentDistillery {
                      faces in one process",
                     installed.profile, profile.0
                 ));
-            }
-            Some(_) => {}
+            },
+            Some(_) => {},
             None => {
                 InstalledAuthority::configure(data_root, profile.clone())
                     .map_err(|error| format!("configure the Distillery works: {error}"))?;
-            }
+            },
         }
 
         let authority = InstalledAuthority::open_with(data_root, vault_dir, unlock)
@@ -264,7 +264,7 @@ impl ResidentDistillery {
                         );
                         trainer_adapter = Some(adapter);
                         device
-                    }
+                    },
                     _ => distillery::TrainerDevice::ndarray(),
                 };
                 let mut registry = mesh::ResourceRegistry::builtin();
@@ -275,7 +275,7 @@ impl ResidentDistillery {
                     )))
                     .map_err(|error| format!("register the trainer resource: {error}"))?;
                 Some(registry)
-            }
+            },
             None => None,
         };
 

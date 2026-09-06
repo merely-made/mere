@@ -690,7 +690,7 @@ impl Canvas {
                         (*half, *half),
                         (-half, *half),
                     ])
-                }
+                },
                 NodeCollider::Hull { points, .. } if points.len() >= 3 => Some(points.clone()),
                 NodeCollider::Hull { .. } => None,
             };
@@ -734,7 +734,7 @@ impl Canvas {
                             dash: None,
                         }),
                     }));
-                }
+                },
                 None => {
                     let radius = match &body.collider {
                         NodeCollider::Ball { radius } => *radius,
@@ -775,7 +775,7 @@ impl Canvas {
                         tile_size: LayoutSize::new(2.0 * r, 2.0 * r),
                         tile_spacing: LayoutSize::zero(),
                     }));
-                }
+                },
             }
         }
         (scene_cmds, scene_sprite_cmds, scene_sprite_images)

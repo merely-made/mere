@@ -102,7 +102,7 @@ impl ResidentKnot {
                 blobs,
                 "Knot evidence migration remains verified"
             ),
-            LegacyBlobMigration::SourceAbsent | LegacyBlobMigration::AlreadyShared => {}
+            LegacyBlobMigration::SourceAbsent | LegacyBlobMigration::AlreadyShared => {},
         }
         blob_custody.bind_scope(scope).await?;
         let blobs = blob_custody.blobs();
@@ -142,7 +142,7 @@ impl ResidentKnot {
                     .await
                     .map_err(|error| format!("could not start resident Knot sync: {error}"))?,
                 )
-            }
+            },
             None => None,
         };
 

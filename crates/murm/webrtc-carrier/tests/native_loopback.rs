@@ -233,7 +233,7 @@ async fn an_oversize_frame_is_rejected(placement: DriverPlacement) {
         Err(NativeError::Frame(FrameError::Oversize { declared, max })) => {
             assert_eq!(declared, u64::from(u32::MAX));
             assert_eq!(max, MAX_FRAME_PAYLOAD_BYTES);
-        }
+        },
         other => panic!("expected an oversize rejection, got {other:?}"),
     }
 
@@ -307,7 +307,7 @@ async fn a_sustained_transfer_crosses_the_marks(placement: DriverPlacement) {
             Ok(Ok(Some(frame))) => {
                 assert_eq!(frame.len(), PAYLOAD);
                 received += 1;
-            }
+            },
             Ok(Ok(None)) => panic!("{}", report("the stream ended", received)),
             Ok(Err(err)) => panic!(
                 "{}",
@@ -581,7 +581,7 @@ async fn survive(
                     if frames_sent >= PUMP_CEILING {
                         break Ok(());
                     }
-                }
+                },
                 Err(err) => break Err(err),
             }
         }

@@ -141,7 +141,7 @@ where
             .map_err(|error| error.to_string()),
         CarrierRequestBody::Resume(request) => {
             resume(endpoint, request).map(CarrierResponseBody::Resume)
-        }
+        },
         CarrierRequestBody::Intent(intent) => endpoint
             .invoke(intent)
             .map(CarrierResponseBody::Intent)
@@ -151,19 +151,19 @@ where
                 id,
                 verb: SessionPlaneVerb::Open(open),
             });
-        }
+        },
         CarrierRequestBody::Close => {
             return Err(SessionPlaneRequest {
                 id,
                 verb: SessionPlaneVerb::Close,
             });
-        }
+        },
         CarrierRequestBody::Suspend => {
             return Err(SessionPlaneRequest {
                 id,
                 verb: SessionPlaneVerb::Suspend,
             });
-        }
+        },
     };
     Ok(CarrierResponse {
         id,
@@ -342,7 +342,7 @@ impl std::fmt::Display for LiveViewReferenceRefusal {
         match self {
             Self::MissingSource => {
                 write!(formatter, "the requested live-view source is unavailable")
-            }
+            },
             Self::StaleCursor => write!(formatter, "the requested live-view cursor is unavailable"),
             Self::AccessDenied => write!(
                 formatter,
@@ -372,7 +372,7 @@ pub fn resolve_live_view_reference(
             return IntentResult::Rejected {
                 reason: error.to_string(),
             };
-        }
+        },
     };
     match gate.open_live_view_reference(&reference) {
         Ok(()) => IntentResult::Accepted,

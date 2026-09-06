@@ -215,7 +215,7 @@ fn scope_from_graph_name(graph_name: &oxrdf::GraphName, namespace: &str) -> Grap
         },
         oxrdf::GraphName::BlankNode(node) => {
             GraphScope::Custom(skolemize(namespace, node.as_str()))
-        }
+        },
     }
 }
 
@@ -301,9 +301,9 @@ fn collect_context_urls(value: &serde_json::Value, out: &mut Vec<String>) {
                     collect_context_urls(child, out);
                 }
             }
-        }
+        },
         serde_json::Value::Array(items) => items.iter().for_each(|i| collect_context_urls(i, out)),
-        _ => {}
+        _ => {},
     }
 }
 
@@ -313,11 +313,11 @@ fn collect_context_strings(ctx: &serde_json::Value, out: &mut Vec<String>) {
     match ctx {
         serde_json::Value::String(s) if s.starts_with("http://") || s.starts_with("https://") => {
             out.push(s.clone());
-        }
+        },
         serde_json::Value::Array(items) => {
             items.iter().for_each(|i| collect_context_strings(i, out))
-        }
-        _ => {}
+        },
+        _ => {},
     }
 }
 
@@ -420,7 +420,7 @@ fn collect_contribution<E: std::fmt::Display>(
                 Term::NamedNode(node) => ReifiedObject::Resource(node.as_str().to_string()),
                 Term::BlankNode(node) => {
                     ReifiedObject::Resource(skolemize(namespace, node.as_str()))
-                }
+                },
                 Term::Literal(literal) => ReifiedObject::Literal {
                     value: literal.value().to_string(),
                     datatype: literal.datatype().as_str().to_string(),
@@ -463,14 +463,14 @@ fn collect_contribution<E: std::fmt::Display>(
             match (quad.predicate.as_str(), &quad.object) {
                 (RDFS_LABEL, Term::Literal(literal)) => {
                     statement.label = Some(literal.value().to_string());
-                }
+                },
                 (PROV_WAS_ATTRIBUTED_TO, Term::NamedNode(agent)) => {
                     statement.provenance_iri = Some(agent.as_str().to_string());
-                }
+                },
                 (PROV_GENERATED_AT_TIME, Term::Literal(literal)) => {
                     statement.asserted_at_ms = parse_xsd_datetime_ms(literal.value());
-                }
-                _ => {}
+                },
+                _ => {},
             }
         }
     }
@@ -507,7 +507,7 @@ fn collect_contribution<E: std::fmt::Display>(
                     property.lang = lang;
                     node.properties.push(property);
                 }
-            }
+            },
             Term::NamedNode(object) => route_resource(
                 &mut nodes,
                 &mut edges,
@@ -524,7 +524,7 @@ fn collect_contribution<E: std::fmt::Display>(
                 skolemize(namespace, object.as_str()),
                 graph_scope,
             ),
-            Term::Triple(_) => {}
+            Term::Triple(_) => {},
         }
     }
 
@@ -619,7 +619,7 @@ fn collect_contribution<E: std::fmt::Display>(
                         asserted_at_ms: statement.asserted_at_ms,
                     });
                 }
-            }
+            },
             ReifiedObject::Literal {
                 value,
                 datatype,
@@ -650,7 +650,7 @@ fn collect_contribution<E: std::fmt::Display>(
                 }
                 property.provenance_iri = statement.provenance_iri;
                 property.asserted_at_ms = statement.asserted_at_ms;
-            }
+            },
         }
     }
 

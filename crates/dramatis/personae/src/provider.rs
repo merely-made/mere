@@ -152,7 +152,7 @@ impl SealedIdentityProvider {
                     )));
                 }
                 record
-            }
+            },
             None => {
                 let master = Ed25519Keypair::generate();
                 let record = SealedIdentityRecord {
@@ -161,7 +161,7 @@ impl SealedIdentityProvider {
                 };
                 storage.save_record(record_path, &record)?;
                 record
-            }
+            },
         };
         let master = Ed25519Keypair::from_seed(record.master_seed);
         record.master_seed.zeroize();

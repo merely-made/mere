@@ -569,10 +569,10 @@ where
             match policy {
                 PlacementPolicy::ChildOfConnection => {
                     topo.attach_child(target, &current);
-                }
+                },
                 PlacementPolicy::SiblingOfConnection => {
                     topo.attach_sibling(target, &current);
-                }
+                },
                 PlacementPolicy::ChildOfAnchor => {
                     // Find the root ancestor of current, attach as child of that
                     let mut ancestor = current.clone();
@@ -580,7 +580,7 @@ where
                         ancestor = p.clone();
                     }
                     topo.attach_child(target, &ancestor);
-                }
+                },
             }
 
             queue.push_back(target_idx);

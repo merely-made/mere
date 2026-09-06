@@ -28,8 +28,8 @@ pub mod dom_view;
 /// The `register-mod-loader` `WasmModRuntime` bridge (P2.4).
 pub mod runtime;
 
-use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::Duration;
 
 use genet_scripted_dom::ScriptedDom;

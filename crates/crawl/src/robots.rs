@@ -54,7 +54,7 @@ impl RobotsRules {
                         seen_rule = false;
                     }
                     group_uas.push(value.to_ascii_lowercase());
-                }
+                },
                 "disallow" | "allow" => {
                     seen_rule = true;
                     if value.is_empty() {
@@ -67,8 +67,8 @@ impl RobotsRules {
                     if group_uas.iter().any(|u| u == CRAWLER_UA) {
                         ours.push(rule);
                     }
-                }
-                _ => {}
+                },
+                _ => {},
             }
         }
         let rules = if ours.is_empty() { star } else { ours };

@@ -557,7 +557,7 @@ impl<S: IdentityStorage + 'static> PersonaeHost<S> {
                 Err(error) => {
                     tracing::warn!(%error, profile = %id.0, "switched without remembering");
                     false
-                }
+                },
             },
             None => false,
         };
@@ -626,46 +626,46 @@ impl<S: IdentityStorage + 'static> PersonaeHost<S> {
                 let payload: SigningDecisionIntentV1 = serde_json::from_slice(payload)?;
                 self.approve_once(payload.request_id)?;
                 Ok(IdentityIntentOutcome::SigningDecision)
-            }
+            },
             SIGNING_APPROVE_IDLE_INTENT => {
                 let payload: SigningDecisionIntentV1 = serde_json::from_slice(payload)?;
                 self.approve_until_idle(payload.request_id)?;
                 Ok(IdentityIntentOutcome::SigningDecision)
-            }
+            },
             SIGNING_DENY_INTENT => {
                 let payload: SigningDecisionIntentV1 = serde_json::from_slice(payload)?;
                 self.deny(payload.request_id)?;
                 Ok(IdentityIntentOutcome::SigningDecision)
-            }
+            },
             SSH_GENERATE_INTENT => {
                 let payload: GenerateSshKeyIntentV1 = serde_json::from_slice(payload)?;
                 self.generate_ssh_key(payload)
                     .map(IdentityIntentOutcome::SshKeyMutation)
-            }
+            },
             SSH_REMOVE_INTENT => {
                 let payload: RemoveSshKeyIntentV1 = serde_json::from_slice(payload)?;
                 self.remove_ssh_key(payload)
                     .map(IdentityIntentOutcome::SshKeyMutation)
-            }
+            },
             SSH_IMPORT_NATIVE_INTENT => {
                 let _: ImportSshKeyNativeIntentV1 = serde_json::from_slice(payload)?;
                 Err(IdentityIntentError::NativeHandoffRequired)
-            }
+            },
             DEVICE_REVOKE_INTENT => {
                 let payload: RevokeDeviceIntentV1 = serde_json::from_slice(payload)?;
                 self.revoke_device(payload)
                     .map(IdentityIntentOutcome::DeviceRevocation)
-            }
+            },
             PROFILE_SWITCH_INTENT => {
                 let payload: SwitchProfileIntentV1 = serde_json::from_slice(payload)?;
                 self.switch_profile(payload)
                     .map(IdentityIntentOutcome::ProfileSwitch)
-            }
+            },
             PROFILE_CREATE_INTENT => {
                 let payload: CreateProfileIntentV1 = serde_json::from_slice(payload)?;
                 self.create_profile(payload)
                     .map(IdentityIntentOutcome::ProfileCreated)
-            }
+            },
             _ => Err(IdentityIntentError::UnknownIntent),
         }
     }
@@ -699,7 +699,7 @@ fn unlock_tier(policy: SshUnlockPolicyIntentV1) -> Result<UnlockTier, IdentityIn
             if (1..=MAX_SHORT_TTL_SECONDS).contains(&idle_seconds) =>
         {
             Ok(UnlockTier::ShortTtl { idle_seconds })
-        }
+        },
         SshUnlockPolicyIntentV1::ShortTtl { .. } => Err(IdentityIntentError::InvalidIdleWindow),
         SshUnlockPolicyIntentV1::PerUse => Ok(UnlockTier::PerUse),
     }
@@ -710,7 +710,7 @@ fn lineage_label(lineage: CredentialLineage) -> &'static str {
         CredentialLineage::LocallyDerived => "locally derived",
         CredentialLineage::LocallyGeneratedExternallyRegistered => {
             "locally generated, externally registered"
-        }
+        },
         CredentialLineage::ExternallyIssued => "externally issued",
         CredentialLineage::ExternallyRootedLocallyHeld => "externally rooted, locally held",
     }
@@ -809,7 +809,7 @@ mod tests {
                 assert_eq!(receipt.id, "alt");
                 assert_eq!(receipt.display_name, "Late Night Alt");
                 assert!(receipt.master_public_fingerprint.starts_with("blake3:"));
-            }
+            },
             other => panic!("expected a creation receipt, got {other:?}"),
         }
 
@@ -981,7 +981,7 @@ mod tests {
             IdentityIntentOutcome::ProfileSwitch(receipt) => {
                 assert_eq!(receipt.profile, "personal");
                 assert!(receipt.remembered);
-            }
+            },
             other => panic!("expected a profile switch receipt, got {other:?}"),
         }
         assert_eq!(

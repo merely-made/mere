@@ -157,7 +157,7 @@ impl IdentityStorage for SealedProfileStorage {
                     "list profiles dir {:?}: {err}",
                     dir
                 )));
-            }
+            },
         };
         let mut out = Vec::new();
         for entry in entries {

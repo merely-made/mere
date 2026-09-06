@@ -276,7 +276,7 @@ impl ViewerRegistry {
                 if self.fallback_viewer_id == "viewer:webview" =>
             {
                 "viewer:plaintext"
-            }
+            },
             _ => self.fallback_viewer_id,
         };
         self.selection(fallback, true, "fallback")
@@ -420,7 +420,7 @@ fn render_mode_for_viewer_id(viewer_id: &str) -> ViewerRenderMode {
         "viewer:middlenet" | "viewer:plaintext" | "viewer:markdown" | "viewer:pdf"
         | "viewer:csv" | "viewer:settings" | "viewer:metadata" | "viewer:audio" => {
             ViewerRenderMode::EmbeddedHost
-        }
+        },
         _ => ViewerRenderMode::Placeholder,
     }
 }
@@ -437,7 +437,7 @@ fn middlenet_viewer_for_uri_scheme(uri: &str) -> Option<&'static str> {
             ) =>
         {
             Some("viewer:middlenet")
-        }
+        },
         _ => None,
     }
 }

@@ -160,8 +160,8 @@ mod tests {
                         NamedNode::new(iri).is_ok(),
                         "{sub_kind:?} maps to a valid standard IRI"
                     );
-                }
-                Alignment::MereOnly => {}
+                },
+                Alignment::MereOnly => {},
             }
         }
     }

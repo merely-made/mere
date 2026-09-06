@@ -473,7 +473,7 @@ impl ContentCommandWire {
             ContentCommandMessage::Resource { url, bytes } => Self::Resource { url, bytes },
             ContentCommandMessage::SetLifecycle { hidden, frozen } => {
                 Self::SetLifecycle { hidden, frozen }
-            }
+            },
             ContentCommandMessage::Scroll {
                 band_y,
                 band_h,
@@ -530,14 +530,14 @@ impl ContentCommandWire {
             },
             ContentCommandMessage::DetachScript { viewport_gen } => {
                 Self::DetachScript { viewport_gen }
-            }
+            },
             ContentCommandMessage::MaterializeLinks { viewport_gen } => {
                 Self::MaterializeLinks { viewport_gen }
-            }
+            },
             #[cfg(feature = "scripted")]
             ContentCommandMessage::ScriptedClick { x, y, viewport_gen } => {
                 Self::ScriptedClick { x, y, viewport_gen }
-            }
+            },
         }
     }
 
@@ -577,7 +577,7 @@ impl ContentCommandWire {
             Self::Resource { url, bytes } => ContentCommandMessage::Resource { url, bytes },
             Self::SetLifecycle { hidden, frozen } => {
                 ContentCommandMessage::SetLifecycle { hidden, frozen }
-            }
+            },
             Self::Scroll {
                 band_y,
                 band_h,
@@ -634,14 +634,14 @@ impl ContentCommandWire {
             },
             Self::DetachScript { viewport_gen } => {
                 ContentCommandMessage::DetachScript { viewport_gen }
-            }
+            },
             Self::MaterializeLinks { viewport_gen } => {
                 ContentCommandMessage::MaterializeLinks { viewport_gen }
-            }
+            },
             #[cfg(feature = "scripted")]
             Self::ScriptedClick { x, y, viewport_gen } => {
                 ContentCommandMessage::ScriptedClick { x, y, viewport_gen }
-            }
+            },
         })
     }
 
@@ -837,7 +837,7 @@ impl ContentUpdateWire {
             },
             ContentUpdateMessage::ScriptOutcome { nav, outcome } => {
                 Self::ScriptOutcome { nav, outcome }
-            }
+            },
             ContentUpdateMessage::TransportError { reason } => Self::TransportError { reason },
         }
     }
@@ -922,7 +922,7 @@ impl ContentUpdateWire {
             },
             Self::ScriptOutcome { nav, outcome } => {
                 ContentUpdateMessage::ScriptOutcome { nav, outcome }
-            }
+            },
             Self::TransportError { reason } => ContentUpdateMessage::TransportError { reason },
         })
     }

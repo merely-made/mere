@@ -90,7 +90,7 @@ pub fn ensure_wallet_state(
             let seed = InMemoryProvider::random().master_keypair().to_seed();
             save_identity_seed(data_root, seed)?;
             seed
-        }
+        },
     };
 
     let mut identity_wallet = load_identity_wallet(data_root)?.unwrap_or_default();
@@ -123,7 +123,7 @@ pub fn ensure_wallet_state(
             };
             save_device_roster(data_root, &roster)?;
             roster
-        }
+        },
     };
 
     let persona_wallet = match load_persona_wallet(data_root, persona)? {
@@ -134,7 +134,7 @@ pub fn ensure_wallet_state(
             let wallet = PersonaWalletManifest::new(persona, chain_root, KeyEpochId::new());
             save_persona_wallet(data_root, &wallet)?;
             wallet
-        }
+        },
     };
     ensure_persona_epoch_bridge(data_root, persona, persona_wallet.private_epoch_head)?;
 

@@ -35,7 +35,7 @@ pub fn load_persona_epoch_bridge(
     if let Some(store) = &secret_store {
         match store.load_record::<PersonaEpochBridge>(relative) {
             Ok(bridge) => return Ok(bridge),
-            Err(_) => {}
+            Err(_) => {},
         }
     }
     if secret_store.is_none() && looks_like_sealed_record(&path) {
@@ -104,14 +104,14 @@ pub fn stage_persona_private_epoch(
                 existing.epoch_secret = epoch_secret.to_vec();
                 changed = true;
             }
-        }
+        },
         None => {
             bridge.epochs.push(PrivateEpochRecord {
                 epoch_id,
                 epoch_secret: epoch_secret.to_vec(),
             });
             changed = true;
-        }
+        },
     }
     if changed {
         save_persona_epoch_bridge(data_root, &bridge)?;

@@ -114,7 +114,7 @@ impl ModRegistry {
             Ok(ordered) => {
                 self.load_order = ordered.iter().map(|m| m.mod_id.clone()).collect();
                 Ok(())
-            }
+            },
             Err(err) => {
                 // Emit diagnostics for missing dependencies
                 if let ModDependencyError::MissingRequirement {
@@ -128,7 +128,7 @@ impl ModRegistry {
                     });
                 }
                 Err(err)
-            }
+            },
         }
     }
 
@@ -169,7 +169,7 @@ impl ModRegistry {
                     Self::activate_native_mod(native_runtime.as_ref(), &manifest.mod_id)
                         .map_err(ModActivationError::failed)?;
                     Ok(Vec::new())
-                }
+                },
                 ModType::Wasm => {
                     let source = wasm_source.ok_or_else(|| {
                         ModActivationError::failed(format!(
@@ -189,7 +189,7 @@ impl ModRegistry {
                     Ok(vec![ModExtensionRecord::WasmRuntime {
                         mod_id: manifest.mod_id.clone(),
                     }])
-                }
+                },
             },
             |record| match record {
                 ModExtensionRecord::WasmRuntime { mod_id } => {
@@ -198,7 +198,7 @@ impl ModRegistry {
                     } else {
                         Ok(())
                     }
-                }
+                },
                 ModExtensionRecord::ProtocolScheme { .. }
                 | ModExtensionRecord::ViewerMime { .. }
                 | ModExtensionRecord::ViewerExtension { .. }
@@ -261,7 +261,7 @@ impl ModRegistry {
                             + manifest.provides.iter().map(|s| s.len()).sum::<usize>(),
                     });
                     loaded.push(mod_id.clone());
-                }
+                },
                 Err(error) => {
                     let (reason, mut applied_records) = error.into_parts();
                     let failure_reason = if applied_records.is_empty() {
@@ -277,7 +277,7 @@ impl ModRegistry {
                                     byte_len: mod_id.len() + reason.len(),
                                 });
                                 reason
-                            }
+                            },
                             Err(rollback_reason) => {
                                 self.status.insert(mod_id.clone(), ModStatus::Quarantined);
                                 self.extension_records
@@ -291,14 +291,14 @@ impl ModRegistry {
                                     byte_len: mod_id.len() + rollback_reason.len(),
                                 });
                                 format!("{reason}; rollback failed: {rollback_reason}")
-                            }
+                            },
                         }
                     };
                     emit_event(DiagnosticEvent::MessageSent {
                         channel_id: CHANNEL_MOD_LOAD_FAILED,
                         byte_len: mod_id.len() + failure_reason.len(),
                     });
-                }
+                },
             }
         }
 

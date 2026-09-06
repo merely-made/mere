@@ -51,18 +51,18 @@ fn main() {
     }
 
     match cmd.status() {
-        Ok(status) if status.success() => {}
+        Ok(status) if status.success() => {},
         Ok(status) => {
             println!(
                 "cargo::warning={dir}: guest build failed ({status}). The tests that load \
                  it will fail and name the command to run by hand."
             );
             return;
-        }
+        },
         Err(err) => {
             println!("cargo::warning={dir}: could not run cargo ({err})");
             return;
-        }
+        },
     }
 
     let built = guest.join("target/wasm32-wasip2/release").join(artifact);

@@ -366,7 +366,7 @@ impl ThemeRegistry {
                     tokens.display_name = name.to_string();
                 }
                 true
-            }
+            },
             _ => false,
         }
     }

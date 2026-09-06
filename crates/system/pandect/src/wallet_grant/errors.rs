@@ -26,10 +26,10 @@ impl fmt::Display for DeviceGrantError {
             Self::DelegatorMismatch => write!(f, "delegator keypair does not match payload"),
             Self::InvalidDelegatorPublicKey => {
                 write!(f, "device grant carries invalid delegator public key bytes")
-            }
+            },
             Self::InvalidSignatureLength => {
                 write!(f, "device grant signature is not 64 bytes")
-            }
+            },
         }
     }
 }
@@ -56,13 +56,13 @@ impl fmt::Display for WrappedEpochError {
             ),
             Self::UnsupportedWrapFormat(format) => {
                 write!(f, "unsupported wrapped private epoch format: {format}")
-            }
+            },
             Self::InvalidWrappedKeyLength => {
                 write!(
                     f,
                     "wrapped private epoch bytes are shorter than an XChaCha20 nonce"
                 )
-            }
+            },
             Self::Encrypt => write!(f, "private epoch wrap encryption failed"),
             Self::Decrypt => write!(f, "private epoch wrap decryption failed"),
         }

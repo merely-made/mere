@@ -85,25 +85,25 @@ fn parse_args() -> Result<Args, String> {
         match arg.as_str() {
             "--dir" => {
                 dir = PathBuf::from(argv.next().ok_or("--dir needs a value")?);
-            }
+            },
             "--profile" => {
                 profile = argv.next().ok_or("--profile needs a value")?;
-            }
+            },
             "--socket" => {
                 socket = Some(argv.next().ok_or("--socket needs a value")?);
-            }
+            },
             "--log-file" => {
                 log_file = Some(PathBuf::from(
                     argv.next().ok_or("--log-file needs a value")?,
                 ));
-            }
+            },
             "--help" | "-h" => {
                 return Err(
                     "usage: personae-agent [--dir <vault-dir>] [--profile <name>] \
                      [--socket <path>] [--log-file <path>]"
                         .to_string(),
                 );
-            }
+            },
             other => return Err(format!("unknown argument: {other}")),
         }
     }
@@ -123,7 +123,7 @@ async fn main() {
         Err(message) => {
             eprintln!("{message}");
             std::process::exit(2);
-        }
+        },
     };
 
     if let Some(path) = &args.log_file {
@@ -141,11 +141,11 @@ async fn main() {
                     .with_ansi(false)
                     .with_writer(std::sync::Mutex::new(file))
                     .init();
-            }
+            },
             Err(err) => {
                 eprintln!("personae-agent: open log file {path:?}: {err}");
                 std::process::exit(1);
-            }
+            },
         }
     } else {
         tracing_subscriber::fmt()

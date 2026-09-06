@@ -176,7 +176,7 @@ pub async fn refusal_from(opened: Result<DjinnResident, String>, why: &str) -> S
         Ok(resident) => {
             let _ = resident.shutdown().await;
             panic!("{why}");
-        }
+        },
     }
 }
 
@@ -534,12 +534,12 @@ pub async fn run_trainer_job(
                             Step::Completed { .. } => {
                                 settled = Some(true);
                                 stop.notify_one();
-                            }
+                            },
                             Step::Released { .. } => {
                                 settled = Some(false);
                                 stop.notify_one();
-                            }
-                            _ => {}
+                            },
+                            _ => {},
                         }
                     }
                 }
@@ -585,6 +585,6 @@ pub async fn run_trainer_job(
                 receipt: serde_json::from_slice(&bytes).expect("receipt JSON"),
                 elapsed,
             }
-        }
+        },
     }
 }

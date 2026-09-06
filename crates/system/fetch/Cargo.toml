@@ -24,7 +24,7 @@ pandect.workspace = true
 tokio = { version = "1", features = ["rt-multi-thread", "time", "io-util", "sync"] }
 tracing.workspace = true
 url = "2"
-verso-tile = { workspace = true }
+inker = { workspace = true }
 zeroize = "1"
 
 [lints]

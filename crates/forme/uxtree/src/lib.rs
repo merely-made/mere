@@ -182,7 +182,7 @@ fn project_block(block: &Block, path: &str, nodes: &mut Vec<(NodeId, Node)>) -> 
             n.set_level(*level as usize);
             attach_link_children(spans, path, "heading-link", nodes, &mut n);
             n
-        }
+        },
         Block::Table { header, rows, .. } => {
             // A flat accessible label until row / cell child projection lands;
             // tables are unreachable until the parsers emit them.
@@ -194,13 +194,13 @@ fn project_block(block: &Block, path: &str, nodes: &mut Vec<(NodeId, Node)>) -> 
                 .collect();
             n.set_label(cells.join(" | "));
             n
-        }
+        },
         Block::Paragraph { spans } => {
             let mut n = Node::new(Role::Paragraph);
             n.set_label(inline_text(spans));
             attach_link_children(spans, path, "paragraph-link", nodes, &mut n);
             n
-        }
+        },
         Block::CodeBlock { language, text } => {
             // AccessKit 0.24 uses one Role::Code for both inline and block
             // code; block context is implicit from the parent.
@@ -213,7 +213,7 @@ fn project_block(block: &Block, path: &str, nodes: &mut Vec<(NodeId, Node)>) -> 
                 n.set_description(format!("language: {lang}"));
             }
             n
-        }
+        },
         Block::Quote { blocks } => {
             let mut n = Node::new(Role::Blockquote);
             let mut child_ids = Vec::with_capacity(blocks.len());
@@ -223,7 +223,7 @@ fn project_block(block: &Block, path: &str, nodes: &mut Vec<(NodeId, Node)>) -> 
             }
             n.set_children(child_ids);
             n
-        }
+        },
         Block::List { ordered, items } => {
             let mut n = Node::new(Role::List);
             if *ordered {
@@ -245,13 +245,13 @@ fn project_block(block: &Block, path: &str, nodes: &mut Vec<(NodeId, Node)>) -> 
             }
             n.set_children(item_ids);
             n
-        }
+        },
         Block::Image { url, alt } => {
             let mut n = Node::new(Role::Image);
             n.set_label(alt.clone());
             n.set_value(url.clone());
             n
-        }
+        },
         Block::Preformatted { text } => {
             // No dedicated Role::Pre in AccessKit 0.24; reuse Role::Code
             // since the semantic ("verbatim text, preserve whitespace") is
@@ -259,7 +259,7 @@ fn project_block(block: &Block, path: &str, nodes: &mut Vec<(NodeId, Node)>) -> 
             let mut n = Node::new(Role::Code);
             n.set_value(text.clone());
             n
-        }
+        },
         Block::Rule => Node::new(Role::Splitter),
         Block::FeedHeader {
             title,
@@ -286,7 +286,7 @@ fn project_block(block: &Block, path: &str, nodes: &mut Vec<(NodeId, Node)>) -> 
                 n.set_description(bits.join(" — "));
             }
             n
-        }
+        },
         Block::FeedEntry {
             title,
             date,
@@ -313,7 +313,7 @@ fn project_block(block: &Block, path: &str, nodes: &mut Vec<(NodeId, Node)>) -> 
                 n.set_description(bits.join(" — "));
             }
             n
-        }
+        },
         Block::MetadataRow { label, value } => {
             // No definition-list role pair in AccessKit 0.24's stable
             // surface; project as a Group whose label is the term and
@@ -322,12 +322,12 @@ fn project_block(block: &Block, path: &str, nodes: &mut Vec<(NodeId, Node)>) -> 
             n.set_label(label.clone());
             n.set_value(value.clone());
             n
-        }
+        },
         Block::Badge { text } => {
             let mut n = Node::new(Role::Note);
             n.set_label(text.clone());
             n
-        }
+        },
     };
     nodes.push((id, node));
     id
@@ -378,16 +378,16 @@ where
             } => {
                 f(url.as_str(), title.as_ref(), spans.as_slice());
                 walk_inline_links(spans, f);
-            }
+            },
             InlineSpan::Emphasis(inner)
             | InlineSpan::Strong(inner)
             | InlineSpan::Submit { spans: inner, .. } => {
                 walk_inline_links(inner, f);
-            }
+            },
             InlineSpan::Text(_)
             | InlineSpan::Code(_)
             | InlineSpan::LineBreak
-            | InlineSpan::SoftBreak => {}
+            | InlineSpan::SoftBreak => {},
         }
     }
 }

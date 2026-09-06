@@ -520,7 +520,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::NodeAdded(key)
-        }
+        },
         GraphDelta::AssertRelation {
             from,
             to,
@@ -540,7 +540,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::EdgeAdded(edge)
-        }
+        },
         GraphDelta::RemoveNode { key } => {
             let node_id = graph.get_node(key).map(|node| node.id);
             let removed = graph.remove_node(key);
@@ -550,7 +550,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::NodeRemoved(removed)
-        }
+        },
         GraphDelta::ReplayAddNodeWithIdIfMissing { id, url, position } => {
             let capture_url = url.clone();
             let capture_position = [position.x, position.y];
@@ -563,7 +563,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::NodeMaybeAdded(added)
-        }
+        },
         GraphDelta::ReplayAssertRelationByIds {
             from_id,
             to_id,
@@ -579,7 +579,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::EdgeAdded(edge)
-        }
+        },
         GraphDelta::ReplayRemoveNodeById { node_id } => {
             let removed = graph.replay_remove_node_by_id(node_id);
             if removed {
@@ -588,7 +588,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::NodeRemoved(removed)
-        }
+        },
         GraphDelta::ReplayRetractRelationsByIds {
             from_id,
             to_id,
@@ -603,7 +603,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::EdgesRemoved(removed)
-        }
+        },
         GraphDelta::ReplayAppendTraversalByIds {
             from_id,
             to_id,
@@ -621,7 +621,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::TraversalAppended(appended)
-        }
+        },
         GraphDelta::RetractRelations { from, to, selector } => {
             let from_id = graph.get_node(from).map(|node| node.id);
             let to_id = graph.get_node(to).map(|node| node.id);
@@ -636,7 +636,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::EdgesRemoved(removed)
-        }
+        },
         GraphDelta::AppendTraversal {
             from,
             to,
@@ -662,7 +662,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::TraversalAppended(appended)
-        }
+        },
         GraphDelta::ReplaySetNodeTitleById { node_id, title } => {
             let updated = graph
                 .get_node_key_by_id(node_id)
@@ -674,7 +674,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::NodeMetadataUpdated(updated)
-        }
+        },
         GraphDelta::SetNodeTitle { key, title } => {
             let node_id = graph.get_node(key).map(|node| node.id);
             let capture_title = title.clone();
@@ -686,7 +686,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::NodeMetadataUpdated(updated)
-        }
+        },
         GraphDelta::ReplaySetNodeUrlById { node_id, new_url } => {
             let updated = graph
                 .get_node_key_by_id(node_id)
@@ -698,7 +698,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::NodeUrlUpdated(updated)
-        }
+        },
         GraphDelta::SetNodeUrl { key, new_url } => {
             let node_id = graph.get_node(key).map(|node| node.id);
             let capture_url = new_url.clone();
@@ -712,7 +712,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::NodeUrlUpdated(updated)
-        }
+        },
         GraphDelta::ReplaySetNodeImageById {
             node_id,
             role,
@@ -729,7 +729,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::NodeMetadataUpdated(updated)
-        }
+        },
         GraphDelta::SetNodeImage { key, role, image } => {
             let node_id = graph.get_node(key).map(|node| node.id);
             let updated = graph.set_node_image(key, role, image);
@@ -741,7 +741,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::NodeMetadataUpdated(updated)
-        }
+        },
         GraphDelta::ReplaySetNodeMimeHintById { node_id, mime_hint } => {
             let updated = graph
                 .get_node_key_by_id(node_id)
@@ -753,7 +753,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::NodeMetadataUpdated(updated)
-        }
+        },
         GraphDelta::SetNodeMimeHint { key, mime_hint } => {
             let node_id = graph.get_node(key).map(|node| node.id);
             let capture_mime_hint = mime_hint.clone();
@@ -765,7 +765,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::NodeMetadataUpdated(updated)
-        }
+        },
         GraphDelta::ReplaySetNodeContentById { node_id, content } => {
             let updated = graph
                 .get_node_key_by_id(node_id)
@@ -777,7 +777,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::NodeMetadataUpdated(updated)
-        }
+        },
         GraphDelta::SetNodeContent { key, content } => {
             let node_id = graph.get_node(key).map(|node| node.id);
             let updated = graph.set_node_content(key, content);
@@ -788,7 +788,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::NodeMetadataUpdated(updated)
-        }
+        },
         GraphDelta::ReplaySetNodeNestedById { node_id, nested } => {
             let log = nested.clone().map(muniment::LogId::new);
             let updated = graph
@@ -801,7 +801,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::NodeMetadataUpdated(updated)
-        }
+        },
         GraphDelta::SetNodeNested { key, nested } => {
             let node_id = graph.get_node(key).map(|node| node.id);
             let capture_nested = nested.as_ref().map(|log| log.as_str().to_string());
@@ -813,7 +813,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::NodeMetadataUpdated(updated)
-        }
+        },
         GraphDelta::ReplaySetNodePinnedById { node_id, is_pinned } => {
             let updated = graph
                 .get_node_key_by_id(node_id)
@@ -825,7 +825,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::NodeMetadataUpdated(updated)
-        }
+        },
         GraphDelta::SetNodePinned { key, is_pinned } => {
             let node_id = graph.get_node(key).map(|node| node.id);
             let updated = graph.set_node_pinned(key, is_pinned);
@@ -836,7 +836,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::NodeMetadataUpdated(updated)
-        }
+        },
         GraphDelta::ReplaySetNodeFacetById {
             node_id,
             facet,
@@ -854,7 +854,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::NodeMetadataUpdated(updated)
-        }
+        },
         GraphDelta::SetNodeFacet { key, facet, value } => {
             let node_id = graph.get_node(key).map(|node| node.id);
             let capture_value = value.clone();
@@ -868,7 +868,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::NodeMetadataUpdated(updated)
-        }
+        },
         GraphDelta::ReplayRemoveNodeFacetById { node_id, facet } => {
             let updated = graph
                 .get_node_key_by_id(node_id)
@@ -880,7 +880,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::NodeMetadataUpdated(updated)
-        }
+        },
         GraphDelta::RemoveNodeFacet { key, facet } => {
             let node_id = graph.get_node(key).map(|node| node.id);
             let updated = remove_node_facet(graph, key, &facet);
@@ -891,7 +891,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::NodeMetadataUpdated(updated)
-        }
+        },
         GraphDelta::ReplayAppendFrameLayoutHintById { node_id, hint } => {
             let updated = graph
                 .get_node_key_by_id(node_id)
@@ -903,7 +903,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::NodeMetadataUpdated(updated)
-        }
+        },
         GraphDelta::AppendFrameLayoutHint { key, hint } => {
             let node_id = graph.get_node(key).map(|node| node.id);
             let capture_hint = hint.clone();
@@ -915,7 +915,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::NodeMetadataUpdated(updated)
-        }
+        },
         GraphDelta::ReplayRemoveFrameLayoutHintById {
             node_id,
             hint_index,
@@ -930,7 +930,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::NodeMetadataUpdated(updated)
-        }
+        },
         GraphDelta::RemoveFrameLayoutHint { key, hint_index } => {
             let node_id = graph.get_node(key).map(|node| node.id);
             let updated = graph.remove_frame_layout_hint_at(key, hint_index);
@@ -941,7 +941,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::NodeMetadataUpdated(updated)
-        }
+        },
         GraphDelta::ReplayMoveFrameLayoutHintById {
             node_id,
             from_index,
@@ -958,7 +958,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::NodeMetadataUpdated(updated)
-        }
+        },
         GraphDelta::MoveFrameLayoutHint {
             key,
             from_index,
@@ -974,7 +974,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::NodeMetadataUpdated(updated)
-        }
+        },
         GraphDelta::ReplaySetFrameSplitOfferSuppressedById {
             node_id,
             suppressed,
@@ -989,7 +989,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::NodeMetadataUpdated(updated)
-        }
+        },
         GraphDelta::SetFrameSplitOfferSuppressed { key, suppressed } => {
             let node_id = graph.get_node(key).map(|node| node.id);
             let updated = graph.set_frame_split_offer_suppressed(key, suppressed);
@@ -1000,7 +1000,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::NodeMetadataUpdated(updated)
-        }
+        },
         GraphDelta::ReplayUpdateNodeHistoryById {
             node_id,
             entries,
@@ -1017,7 +1017,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::NodeMetadataUpdated(updated)
-        }
+        },
         GraphDelta::UpdateNodeHistory {
             key,
             entries,
@@ -1034,14 +1034,14 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::NodeMetadataUpdated(updated)
-        }
+        },
         GraphDelta::ReplaySetImportRecords { import_records } => {
             let changed = graph.set_import_records(import_records);
             if changed {
                 capture_resolved_import_records(graph);
             }
             GraphDeltaResult::ImportRecordsUpdated(changed)
-        }
+        },
         GraphDelta::ReplayTouchNodeLastVisitedById {
             node_id,
             timestamp_ms,
@@ -1056,7 +1056,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::NodeMetadataUpdated(updated)
-        }
+        },
         GraphDelta::NavigateNode { key, url } => {
             let Some(node_id) = graph.get_node(key).map(|node| node.id) else {
                 return GraphDeltaResult::Applied;
@@ -1076,7 +1076,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 last_session_visited,
             });
             GraphDeltaResult::Applied
-        }
+        },
         GraphDelta::BranchHistory { child, parent } => {
             if let (Some(child_id), Some(parent_id)) = (
                 graph.get_node(child).map(|node| node.id),
@@ -1089,7 +1089,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::Applied
-        }
+        },
         GraphDelta::NodeHistoryBack { key } => {
             let Some(node_id) = graph.get_node(key).map(|node| node.id) else {
                 return GraphDeltaResult::HistoryStepped(None);
@@ -1104,7 +1104,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::HistoryStepped(stepped)
-        }
+        },
         GraphDelta::NodeHistoryForward { key } => {
             let Some(node_id) = graph.get_node(key).map(|node| node.id) else {
                 return GraphDeltaResult::HistoryStepped(None);
@@ -1119,7 +1119,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::HistoryStepped(stepped)
-        }
+        },
         GraphDelta::ReplayInsertNodeTagById { node_id, tag } => {
             let updated = graph
                 .get_node_key_by_id(node_id)
@@ -1131,7 +1131,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::NodeMetadataUpdated(updated)
-        }
+        },
         GraphDelta::InsertNodeTag { key, tag } => {
             let node_id = graph.get_node(key).map(|node| node.id);
             let capture_tag = tag.clone();
@@ -1143,7 +1143,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::NodeMetadataUpdated(updated)
-        }
+        },
         GraphDelta::ReplayRemoveNodeTagById { node_id, tag } => {
             let updated = graph
                 .get_node_key_by_id(node_id)
@@ -1155,7 +1155,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::NodeMetadataUpdated(updated)
-        }
+        },
         GraphDelta::RemoveNodeTag { key, tag } => {
             let node_id = graph.get_node(key).map(|node| node.id);
             let updated = graph.remove_node_tag(key, &tag);
@@ -1166,7 +1166,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::NodeMetadataUpdated(updated)
-        }
+        },
         GraphDelta::ReplaySetNodeBodyById { node_id, body } => {
             let updated = graph
                 .get_node_key_by_id(node_id)
@@ -1178,7 +1178,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::NodeMetadataUpdated(updated)
-        }
+        },
         GraphDelta::SetNodeBody { key, body } => {
             let node_id = graph.get_node(key).map(|node| node.id);
             let capture_body = body.clone();
@@ -1190,7 +1190,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::NodeMetadataUpdated(updated)
-        }
+        },
         GraphDelta::ReplayNavigateNodeById {
             node_id,
             url,
@@ -1216,7 +1216,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::Applied
-        }
+        },
         GraphDelta::ReplayBranchHistoryByIds {
             child_id,
             parent_id,
@@ -1228,7 +1228,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 (Some(_child), Some(_parent)) => {
                     graph.nav.spawn(child_id, parent_id);
                     true
-                }
+                },
                 _ => false,
             };
             if applied {
@@ -1238,7 +1238,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::Applied
-        }
+        },
         GraphDelta::ReplayNodeHistoryBackById {
             node_id,
             timestamp_ms,
@@ -1255,7 +1255,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::HistoryStepped(stepped)
-        }
+        },
         GraphDelta::ReplayNodeHistoryForwardById {
             node_id,
             timestamp_ms,
@@ -1272,7 +1272,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::HistoryStepped(stepped)
-        }
+        },
         GraphDelta::ReplayAppendNodePropertyById { node_id, property } => {
             let updated = graph
                 .get_node_key_by_id(node_id)
@@ -1284,7 +1284,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::NodeMetadataUpdated(updated)
-        }
+        },
         GraphDelta::AppendNodeProperty { key, property } => {
             let node_id = graph.get_node(key).map(|node| node.id);
             let capture_property = property.clone();
@@ -1296,7 +1296,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::NodeMetadataUpdated(updated)
-        }
+        },
         GraphDelta::ReplayAddNodeClassificationById {
             node_id,
             classification,
@@ -1311,7 +1311,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::NodeMetadataUpdated(updated)
-        }
+        },
         GraphDelta::AddNodeClassification {
             key,
             classification,
@@ -1326,7 +1326,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::NodeMetadataUpdated(updated)
-        }
+        },
         GraphDelta::ReplayRemoveNodeClassificationById {
             node_id,
             scheme,
@@ -1343,7 +1343,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::NodeMetadataUpdated(updated)
-        }
+        },
         GraphDelta::RemoveNodeClassification { key, scheme, value } => {
             let node_id = graph.get_node(key).map(|node| node.id);
             let capture_scheme = scheme.clone();
@@ -1357,7 +1357,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::NodeMetadataUpdated(updated)
-        }
+        },
         GraphDelta::ReplaySetNodeClassificationStatusById {
             node_id,
             scheme,
@@ -1376,7 +1376,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::NodeMetadataUpdated(updated)
-        }
+        },
         GraphDelta::SetNodeClassificationStatus {
             key,
             scheme,
@@ -1397,7 +1397,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::NodeMetadataUpdated(updated)
-        }
+        },
         GraphDelta::ReplaySetNodePrimaryClassificationById {
             node_id,
             scheme,
@@ -1414,7 +1414,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::NodeMetadataUpdated(updated)
-        }
+        },
         GraphDelta::SetNodePrimaryClassification { key, scheme, value } => {
             let node_id = graph.get_node(key).map(|node| node.id);
             let capture_scheme = scheme.clone();
@@ -1428,7 +1428,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::NodeMetadataUpdated(updated)
-        }
+        },
         GraphDelta::ReplayRecordNodeDerivationById {
             node_id,
             derivation,
@@ -1443,7 +1443,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::NodeMetadataUpdated(updated)
-        }
+        },
         GraphDelta::RecordNodeDerivation { key, derivation } => {
             let node_id = graph.get_node(key).map(|node| node.id);
             let capture_derivation = derivation.clone();
@@ -1455,7 +1455,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::NodeMetadataUpdated(updated)
-        }
+        },
         GraphDelta::ReplaySetNodeTagIconOverrideById { node_id, tag, icon } => {
             let updated = graph
                 .get_node_key_by_id(node_id)
@@ -1468,7 +1468,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::NodeMetadataUpdated(updated)
-        }
+        },
         GraphDelta::SetNodeTagIconOverride { key, tag, icon } => {
             let node_id = graph.get_node(key).map(|node| node.id);
             let capture_tag = tag.clone();
@@ -1482,7 +1482,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::NodeMetadataUpdated(updated)
-        }
+        },
         GraphDelta::ReplaySetEdgeSemanticPredicateByIds {
             from_id,
             to_id,
@@ -1498,7 +1498,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::NodeMetadataUpdated(updated)
-        }
+        },
         GraphDelta::ReplayAssertSemanticPredicateByIds {
             from_id,
             to_id,
@@ -1514,7 +1514,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::EdgeAdded(edge)
-        }
+        },
         GraphDelta::SetEdgeSemanticPredicate { edge, predicate } => {
             let endpoints = graph
                 .inner
@@ -1531,7 +1531,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::NodeMetadataUpdated(updated)
-        }
+        },
         GraphDelta::AssertSemanticPredicate {
             from,
             to,
@@ -1551,7 +1551,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::EdgeAdded(edge)
-        }
+        },
         GraphDelta::ReplayAddField { field } => {
             let changed = if let Some(field) = field_from_persisted(&field) {
                 graph.add_field(field);
@@ -1563,7 +1563,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 record_captured_delta(&CapturedDelta::ReplayAddField { field });
             }
             GraphDeltaResult::FieldChanged(changed)
-        }
+        },
         GraphDelta::ReplayRetireFieldById { field_id } => {
             let changed = Uuid::parse_str(&field_id)
                 .ok()
@@ -1573,7 +1573,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 record_captured_delta(&CapturedDelta::ReplayRetireFieldById { field_id });
             }
             GraphDeltaResult::FieldChanged(changed)
-        }
+        },
         GraphDelta::ReplayAddCoupling { coupling } => {
             let changed = if let Some(coupling_model) = coupling_from_persisted(&coupling) {
                 graph.add_coupling(coupling_model);
@@ -1585,7 +1585,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 record_captured_delta(&CapturedDelta::ReplayAddCoupling { coupling });
             }
             GraphDeltaResult::FieldChanged(changed)
-        }
+        },
         GraphDelta::ReplaySetFieldCouplingStrengthByFieldId { field_id, strength } => {
             let changed = Uuid::parse_str(&field_id)
                 .ok()
@@ -1598,7 +1598,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::FieldChanged(changed)
-        }
+        },
         GraphDelta::ReplayActivateFieldById { field_id } => {
             let changed = Uuid::parse_str(&field_id)
                 .ok()
@@ -1608,7 +1608,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 record_captured_delta(&CapturedDelta::ReplayActivateFieldById { field_id });
             }
             GraphDeltaResult::FieldChanged(changed)
-        }
+        },
         GraphDelta::ReplayRetractCouplingById { coupling_id } => {
             let changed = Uuid::parse_str(&coupling_id)
                 .ok()
@@ -1618,7 +1618,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 record_captured_delta(&CapturedDelta::ReplayRetractCouplingById { coupling_id });
             }
             GraphDeltaResult::FieldChanged(changed)
-        }
+        },
         GraphDelta::AddField { field } => {
             let capture_field = persisted_field_from_field(&field);
             graph.add_field(field);
@@ -1626,7 +1626,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 field: capture_field,
             });
             GraphDeltaResult::FieldChanged(true)
-        }
+        },
         GraphDelta::RetireField { id } => {
             let changed = graph.retire_field(id);
             if changed {
@@ -1635,7 +1635,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::FieldChanged(changed)
-        }
+        },
         GraphDelta::AddCoupling { coupling } => {
             let capture_coupling = persisted_coupling_from_coupling(&coupling);
             graph.add_coupling(coupling);
@@ -1643,7 +1643,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 coupling: capture_coupling,
             });
             GraphDeltaResult::FieldChanged(true)
-        }
+        },
         GraphDelta::SetFieldCouplingStrength { field, strength } => {
             let changed = graph.set_field_coupling_strength(field, strength);
             if changed {
@@ -1653,7 +1653,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::FieldChanged(changed)
-        }
+        },
         GraphDelta::ActivateField { id } => {
             let changed = graph.activate_field(id);
             if changed {
@@ -1662,7 +1662,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::FieldChanged(changed)
-        }
+        },
         GraphDelta::RetractCoupling { id } => {
             let changed = graph.retract_coupling(id);
             if changed {
@@ -1671,21 +1671,21 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::FieldChanged(changed)
-        }
+        },
         GraphDelta::SetImportRecords { import_records } => {
             let changed = graph.set_import_records(import_records);
             if changed {
                 capture_resolved_import_records(graph);
             }
             GraphDeltaResult::ImportRecordsUpdated(changed)
-        }
+        },
         GraphDelta::DeleteImportRecord { record_id } => {
             let changed = graph.delete_import_record(&record_id);
             if changed {
                 capture_resolved_import_records(graph);
             }
             GraphDeltaResult::ImportRecordsUpdated(changed)
-        }
+        },
         GraphDelta::SetImportRecordMembershipSuppressed {
             record_id,
             key,
@@ -1697,7 +1697,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 capture_resolved_import_records(graph);
             }
             GraphDeltaResult::ImportRecordsUpdated(changed)
-        }
+        },
         GraphDelta::SetNodeImportProvenance {
             key,
             import_provenance,
@@ -1707,7 +1707,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 capture_resolved_import_records(graph);
             }
             GraphDeltaResult::ImportRecordsUpdated(changed)
-        }
+        },
         GraphDelta::TouchNodeLastVisited { key } => {
             let node_id = graph.get_node(key).map(|node| node.id);
             let updated = graph.touch_node_last_visited_now(key);
@@ -1724,7 +1724,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             GraphDeltaResult::NodeMetadataUpdated(updated)
-        }
+        },
     }
 }
 

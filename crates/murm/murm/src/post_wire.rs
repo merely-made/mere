@@ -113,26 +113,26 @@ pub(crate) fn decompose(
         PostKind::Text { channel, text, .. } => {
             ext.channel = channel.as_str().to_string();
             text.as_bytes().to_vec()
-        }
+        },
         PostKind::Topic { channel, topic, .. } => {
             ext.channel = channel.as_str().to_string();
             topic.as_bytes().to_vec()
-        }
+        },
         PostKind::Join { channel, .. } | PostKind::Leave { channel, .. } => {
             ext.channel = channel.as_str().to_string();
             Vec::new()
-        }
+        },
         PostKind::Info { entries, .. } => {
             ext.info = entries
                 .iter()
                 .map(|e| (e.key.clone(), e.value.clone()))
                 .collect();
             Vec::new()
-        }
+        },
         PostKind::Delete { posts, .. } => {
             ext.deletes = posts.iter().map(|p| *p.as_bytes()).collect();
             Vec::new()
-        }
+        },
     };
     (ext, body)
 }

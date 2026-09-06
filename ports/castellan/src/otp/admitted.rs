@@ -91,22 +91,22 @@ impl fmt::Display for OtpAdmittedReleaseError {
         match self {
             Self::ActionNotServed => {
                 f.write_str("the admitted session does not name one Castellan OTP release item")
-            }
+            },
             Self::ActionNotCovered => {
                 f.write_str("the admitted authority does not cover its OTP release item")
-            }
+            },
             Self::AuthorityLapsed(AuthorityLapse::Expired { at_ms }) => {
                 write!(f, "the admitted authority expired at {at_ms}")
-            }
+            },
             Self::AuthorityLapsed(AuthorityLapse::Revoked) => {
                 f.write_str("the admitted authority was revoked")
-            }
+            },
             Self::ForeignRequest(id) => {
                 write!(f, "OTP release {id} belongs to another admitted session")
-            }
+            },
             Self::ForeignApproval => {
                 f.write_str("the approved OTP release belongs to another admitted session")
-            }
+            },
             Self::CodeExpired => f.write_str("the approved TOTP code expired before delivery"),
             Self::Release(error) => write!(f, "OTP release gate: {error}"),
         }

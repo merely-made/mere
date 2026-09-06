@@ -237,13 +237,13 @@ impl ManifestStore {
                     let id = manifest.session_id;
                     self.manifests.insert(id, manifest);
                     report.loaded.push(id);
-                }
+                },
                 Err(reason) => {
                     report.failed.push(LoadFailure {
                         dir_name: dir_name.to_string(),
                         reason,
                     });
-                }
+                },
             }
         }
         Ok(report)

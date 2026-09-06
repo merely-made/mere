@@ -64,7 +64,7 @@ impl UxProbe for DestructiveActionGateProbe {
             } => {
                 let mut grant = self.confirm_grant.lock().unwrap();
                 *grant = matches!(reason, DismissReason::Confirmed);
-            }
+            },
             UxEvent::ActionDispatched { action_id, .. } => {
                 let mut grant = self.confirm_grant.lock().unwrap();
                 if self.destructive.contains(action_id) && !*grant {
@@ -81,8 +81,8 @@ impl UxProbe for DestructiveActionGateProbe {
                 // Either way, consume the grant. A lingering grant must
                 // not authorise a later, unrelated destructive dispatch.
                 *grant = false;
-            }
-            _ => {}
+            },
+            _ => {},
         }
     }
 

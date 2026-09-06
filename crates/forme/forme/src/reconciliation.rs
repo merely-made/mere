@@ -139,14 +139,14 @@ pub fn apply_reconciliation<N: MemberId>(
                 graphlet: gid,
                 reason: format!("applied: {}", proposal.reason),
             });
-        }
+        },
 
         ReconciliationChoice::KeepAsUnlinkedSession => {
             // Convert binding to UnlinkedSession.
             if let Some(graphlet) = tree.graphlets_mut().iter_mut().find(|g| g.id == gid) {
                 graphlet.binding = GraphletBinding::UnlinkedSession;
             }
-        }
+        },
 
         ReconciliationChoice::SaveAsNewFork { ref reason } => {
             // Branch: preserve current roster, change binding to Branched.
@@ -168,11 +168,11 @@ pub fn apply_reconciliation<N: MemberId>(
                     reason: reason.clone(),
                 };
             }
-        }
+        },
 
         ReconciliationChoice::Cancel => {
             // No-op: discard the proposal, tree unchanged.
-        }
+        },
     }
 
     intents
@@ -433,7 +433,7 @@ mod tests {
             } => {
                 assert_eq!(parent_spec.kind, GraphletKind::Session);
                 assert_eq!(reason, "user override");
-            }
+            },
             _ => panic!("expected Branched binding"),
         }
     }

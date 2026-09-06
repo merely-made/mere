@@ -242,7 +242,7 @@ impl SessionGraphlets {
         {
             Some(pos) => {
                 spec.selectors.remove(pos);
-            }
+            },
             None => spec.selectors.push(name.to_string()),
         }
         true

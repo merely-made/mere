@@ -69,14 +69,14 @@ impl UxProbe for MutualExclusionProbe {
                     });
                 }
                 open.push(*surface);
-            }
+            },
             UxEvent::SurfaceDismissed { surface, .. } if is_modal_like(*surface) => {
                 let mut open = self.open_modals.lock().unwrap();
                 if let Some(pos) = open.iter().position(|s| s == surface) {
                     open.swap_remove(pos);
                 }
-            }
-            _ => {}
+            },
+            _ => {},
         }
     }
 

@@ -109,7 +109,7 @@ impl ProductiveSelectionProbe {
             (ProductiveOutcome::OpenNode, UxEvent::OpenNodeDispatched { .. }) => true,
             (ProductiveOutcome::Open(target), UxEvent::SurfaceOpened { surface }) => {
                 target == *surface
-            }
+            },
             _ => false,
         }
     }

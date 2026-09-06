@@ -371,7 +371,7 @@ impl DeviceConditionSensor {
                         .map(|delta| kbps_over(delta, elapsed_ms));
                     true
                 }
-            }
+            },
         };
         if rebaseline {
             state.previous = Some(BandwidthSample { at, total_octets });
@@ -658,7 +658,7 @@ mod sensed {
                     // reading defers to what the owner stated.
                     unnameable = true;
                     continue;
-                }
+                },
             };
             best = Some(best.map_or(class, |seen| seen.max(class)));
         }

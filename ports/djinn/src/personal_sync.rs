@@ -162,7 +162,7 @@ pub async fn start<P: IdentityProvider + ?Sized>(
             blobs,
             "personal graph blob migration remains verified"
         ),
-        LegacyBlobMigration::SourceAbsent | LegacyBlobMigration::AlreadyShared => {}
+        LegacyBlobMigration::SourceAbsent | LegacyBlobMigration::AlreadyShared => {},
     }
     blob_custody
         .bind_scope(blob_scope)
@@ -353,7 +353,7 @@ async fn stage_blob(host: &PersonalSyncHost, path: &Path) {
         Err(error) => {
             tracing::error!(path = %path.display(), %error, "could not read the file to stage");
             return;
-        }
+        },
     };
     let byte_len = bytes.len();
     let container = uuid::Uuid::new_v4();
@@ -367,7 +367,7 @@ async fn stage_blob(host: &PersonalSyncHost, path: &Path) {
         ),
         Err(error) => {
             tracing::error!(path = %path.display(), %error, "could not stage the blob")
-        }
+        },
     }
 }
 
@@ -507,7 +507,7 @@ fn spawn_pairing_watch(
                 Err(error) => {
                     tracing::warn!(%error, "could not reload owner settings");
                     continue;
-                }
+                },
             };
             // Absent sync means the owner turned it off in the file, which is
             // not the same as an empty roster; leave the live overlay alone
@@ -518,7 +518,7 @@ fn spawn_pairing_watch(
                 Err(error) => {
                     tracing::warn!(%error, "owner settings hold an unusable node id");
                     continue;
-                }
+                },
             };
 
             // Each phase carries its own failure and retry policy, and they run
@@ -554,7 +554,7 @@ async fn reconcile_roster(
                 host.set_roster(next).await;
                 tracing::info!(admitted = roots_len, "personal sync roster changed");
             }
-        }
+        },
         Err(error) => tracing::warn!(%error, "owner settings hold an unusable roster root"),
     }
 }
@@ -590,7 +590,7 @@ async fn reconcile_authority(
                         "could not revoke changed key authority; will retry"
                     );
                     continue;
-                }
+                },
             }
         }
         applied.insert(node, next);
@@ -629,7 +629,7 @@ async fn apply_arrivals(
                     node = %owner_settings::hex32(&node),
                     "applied a newly paired device without a restart"
                 );
-            }
+            },
             // Leave it unapplied so the next pass retries rather than
             // silently dropping the pairing.
             Err(error) => tracing::warn!(
@@ -668,7 +668,7 @@ async fn relay_prekey(host: &PersonalSyncHost, node: [u8; 32], prekey: &str) {
                 "the paired device's recorded pre-key is unreadable"
             );
             return;
-        }
+        },
     };
     if let Err(error) = host
         .author(vec![PersonalGraphEvent::PublishPrekey { bundle }])
@@ -710,7 +710,7 @@ async fn apply_departures(
                         "could not retire the unpaired device's readership; will retry"
                     );
                     continue;
-                }
+                },
             }
         }
         match host.unpair_node(node).await {
@@ -720,7 +720,7 @@ async fn apply_departures(
                     node = %owner_settings::hex32(&node),
                     "dropped an unpaired device without a restart"
                 );
-            }
+            },
             // Keep it in `applied` so the next pass retries: a device
             // the owner removed must not stay on the overlay quietly.
             Err(error) => tracing::warn!(
@@ -752,10 +752,10 @@ async fn ensure_encryption(host: &PersonalSyncHost, sync: &owner_settings::SyncS
         },
         // Somebody created it. This device waits to be added,
         // which is the ordinary path for every device but one.
-        Ok(true) => {}
+        Ok(true) => {},
         Err(error) => {
             tracing::warn!(%error, "could not tell whether this graph has a key group")
-        }
+        },
     }
 }
 
@@ -768,7 +768,7 @@ async fn ensure_encryption(host: &PersonalSyncHost, sync: &owner_settings::SyncS
 /// unconditional rather than gated on a setting.
 async fn key_paired_devices(host: &PersonalSyncHost) {
     match host.key_paired_devices().await {
-        Ok(0) => {}
+        Ok(0) => {},
         Ok(keyed) => tracing::info!(keyed, "keyed newly paired devices"),
         Err(error) => tracing::warn!(%error, "could not key paired devices this pass"),
     }
@@ -794,7 +794,7 @@ async fn refresh_peer_directory(
         Err(error) => {
             tracing::warn!(%error, "could not read the peer directory");
             return;
-        }
+        },
     };
     // Refresh the cached dial hints while the truth is live. Only connected
     // peers: an address the endpoint holds for a peer it is NOT talking to may
@@ -854,7 +854,7 @@ async fn refresh_dial_hint(
         Err(error) => {
             tracing::warn!(%error, "could not read a peer's current address");
             return;
-        }
+        },
     };
     // Encode the node once, not once per candidate device: this runs on every
     // pairing poll, and hex32 inside the `find` predicate allocated a 64-byte
@@ -876,7 +876,7 @@ async fn refresh_dial_hint(
         Err(error) => {
             tracing::warn!(%error, "could not reload settings to refresh a hint");
             return;
-        }
+        },
     };
     let Some(live) = latest.sync.as_mut() else {
         return;
@@ -887,7 +887,7 @@ async fn refresh_dial_hint(
     match latest.save(settings_file) {
         Ok(()) => {
             tracing::info!(node = %node_hex, "recorded a fresh dial hint for a connected device")
-        }
+        },
         Err(error) => tracing::warn!(%error, "could not persist a refreshed dial hint"),
     }
 }
@@ -914,7 +914,7 @@ fn spawn_accept_watch(host: Arc<PersonalSyncHost>, surface: DeviceSurfaceHandle)
                 Err(_) => {
                     tracing::warn!("transfer decisions are unreadable; accepts will not be served");
                     continue;
-                }
+                },
             };
             for decision in accepted {
                 match serve_accepted_transfer(&host, &decision).await {
@@ -926,7 +926,7 @@ fn spawn_accept_watch(host: Arc<PersonalSyncHost>, surface: DeviceSurfaceHandle)
                             blobs,
                             "accepted transfer is staged and released to the browser"
                         );
-                    }
+                    },
                     Err(error) => tracing::warn!(
                         transfer = %decision.transfer_id,
                         %error,
@@ -986,7 +986,7 @@ fn spawn_card_refresh(host: Arc<PersonalSyncHost>, surface: DeviceSurfaceHandle)
                     // accepting a transfer, not derived from the projection,
                     // so a refresh must not revoke them.
                     surface.write().await.cards = snapshot;
-                }
+                },
                 Err(error) => tracing::warn!(%error, "personal sync projection refresh failed"),
             }
         }
@@ -1060,7 +1060,7 @@ fn spawn_receipt_intake(host: Arc<PersonalSyncHost>, inbox: PathBuf) {
                 Err(error) => {
                     tracing::warn!(%error, inbox = %inbox.display(), "receipt intake scan failed");
                     continue;
-                }
+                },
             };
             for receipt in waiting {
                 let events = receipt.events.len();
@@ -1072,7 +1072,7 @@ fn spawn_receipt_intake(host: Arc<PersonalSyncHost>, inbox: PathBuf) {
                 // is fatal for this receipt rather than skipped, for the same
                 // reason: a half-staged receipt makes a claim it cannot meet.
                 match stage_captures(&host, &receipt).await {
-                    Ok(0) => {}
+                    Ok(0) => {},
                     Ok(staged) => tracing::info!(
                         staged,
                         path = %receipt.path.display(),
@@ -1085,7 +1085,7 @@ fn spawn_receipt_intake(host: Arc<PersonalSyncHost>, inbox: PathBuf) {
                             "could not stage a receipt's captures; leaving it pending"
                         );
                         continue;
-                    }
+                    },
                 }
                 match host.author(receipt.events).await {
                     Ok(()) => {
@@ -1105,7 +1105,7 @@ fn spawn_receipt_intake(host: Arc<PersonalSyncHost>, inbox: PathBuf) {
                             path = %receipt.path.display(),
                             "authored a receipt into the personal graph"
                         );
-                    }
+                    },
                     Err(error) => tracing::warn!(
                         %error,
                         path = %receipt.path.display(),

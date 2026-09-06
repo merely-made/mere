@@ -70,10 +70,10 @@ impl DjinnResident {
                             format!(
                                 "open resident Knot: {open_error}; close blob custody: {close_error}"
                             )
-                        }
+                        },
                         None => open_error,
                     });
-                }
+                },
             },
             None => None,
         };
@@ -98,9 +98,9 @@ impl DjinnResident {
                             message.push_str(&format!("; close blob custody: {close_error}"));
                         }
                         return Err(message);
-                    }
+                    },
                 }
-            }
+            },
             None => None,
         };
         Ok(Self {

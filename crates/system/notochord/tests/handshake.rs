@@ -170,7 +170,7 @@ fn an_authorized_hello_is_admitted_and_the_reply_decodes() {
                 hello.session_id(&binding),
                 "both sides derive the same session id from the bound transcript"
             );
-        }
+        },
         SessionReply::Reject { reason } => panic!("unexpected rejection: {reason}"),
     }
 }

@@ -146,9 +146,9 @@ impl DiagnosticsRegistry {
                             existing_schema_version: existing.schema_version,
                             requested_schema_version: normalized_descriptor.schema_version,
                         });
-                    }
+                    },
                     ChannelRegistrationPolicy::KeepExisting => return Ok(false),
-                    ChannelRegistrationPolicy::ReplaceExisting => {}
+                    ChannelRegistrationPolicy::ReplaceExisting => {},
                 }
             } else if !matches!(policy, ChannelRegistrationPolicy::ReplaceExisting) {
                 return Ok(false);

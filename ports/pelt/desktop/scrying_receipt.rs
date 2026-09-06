@@ -16,8 +16,7 @@ use inker::{
     WebSurfaceCapabilities, WebSurfaceEvent,
 };
 use scrying_engine::scrying::{
-    Dx12FenceSynchronizer, HostWgpuContext, PlatformWebSurfaceConfig,
-    PlatformWebSurfaceProducer,
+    Dx12FenceSynchronizer, HostWgpuContext, PlatformWebSurfaceConfig, PlatformWebSurfaceProducer,
 };
 use scrying_engine::{ScryingProducer, translation::map_error};
 

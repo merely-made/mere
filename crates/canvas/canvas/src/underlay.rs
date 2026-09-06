@@ -218,7 +218,7 @@ fn projected_undirected_edges(
                     path: Vec::new(),
                     weight: 1.0,
                 });
-            }
+            },
         }
     }
     edges

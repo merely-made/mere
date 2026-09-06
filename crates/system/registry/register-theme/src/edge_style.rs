@@ -73,11 +73,11 @@ impl EdgeStyleKey {
             Self::Hidden => None,
             Self::Hyperlink | Self::UserGrouped | Self::AgentDerived => {
                 Some(EdgeStyleFamily::Semantic)
-            }
+            },
             Self::TraversalHistory => Some(EdgeStyleFamily::Traversal),
             Self::ContainmentUrlPath | Self::ContainmentDomain => {
                 Some(EdgeStyleFamily::Containment)
-            }
+            },
             Self::ArrangementFrameMember
             | Self::ArrangementTileGroup
             | Self::ArrangementSplitPair => Some(EdgeStyleFamily::Arrangement),
@@ -467,7 +467,7 @@ impl EdgeStyleRegistry {
                 EdgeStyleKey::AgentDerived => lerp(0.55, 0.15, decay_progress.clamp(0.0, 1.0)),
                 _ => {
                     (family_token.opacity * kind_token.opacity_multiplier.max(0.0)).clamp(0.0, 1.0)
-                }
+                },
             },
             end_marker: kind_token
                 .end_marker_override

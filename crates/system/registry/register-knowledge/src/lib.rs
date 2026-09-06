@@ -196,7 +196,7 @@ impl KnowledgeRegistry {
                     return None;
                 }
                 Self::parse_udc_code(&normalized)
-            }
+            },
             KnowledgeProvider::Schema | KnowledgeProvider::Unknown => None,
         }
     }
@@ -206,7 +206,7 @@ impl KnowledgeRegistry {
         match self.validate_tag(trimmed) {
             TagValidationResult::Valid { canonical_code, .. } => {
                 Some(format!("udc:{canonical_code}"))
-            }
+            },
             TagValidationResult::Unknown { .. } | TagValidationResult::Malformed { .. } => None,
         }
     }
@@ -245,7 +245,7 @@ impl KnowledgeRegistry {
                     canonical_code: normalized,
                     display_label: label.to_string(),
                 }
-            }
+            },
             KnowledgeProvider::Schema => TagValidationResult::Unknown {
                 suggestions: Vec::new(),
             },

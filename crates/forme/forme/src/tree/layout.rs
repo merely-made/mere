@@ -47,7 +47,7 @@ impl<N: MemberId> GraphTree<N> {
         let (pane_rects, split_boundaries) = match self.layout_mode {
             LayoutMode::TreeStyleTabs | LayoutMode::FlatTabs => {
                 (self.layout_single_pane(&available), Vec::new())
-            }
+            },
             LayoutMode::SplitPanes => self.layout_split_panes(&available),
         };
 
@@ -366,12 +366,12 @@ impl<N: MemberId> GraphTree<N> {
                         // Boundary is a vertical line between before's right edge and after's left edge.
                         let x = (br.x + br.w + ar.x) / 2.0;
                         (x, abs_y, abs_y + layout.size.height)
-                    }
+                    },
                     SplitDirection::Vertical => {
                         // Boundary is a horizontal line between before's bottom and after's top.
                         let y = (br.y + br.h + ar.y) / 2.0;
                         (y, abs_x, abs_x + layout.size.width)
-                    }
+                    },
                 };
 
                 boundaries.push(SplitBoundary {

@@ -31,14 +31,14 @@ impl<N: MemberId> GraphTree<N> {
             NavAction::Reorder { parent, new_order } => self.apply_reorder(parent, new_order),
             NavAction::SetLifecycle(member, lifecycle) => {
                 self.apply_set_lifecycle(member, lifecycle)
-            }
+            },
             NavAction::SetLayoutMode(mode) => self.apply_set_layout_mode(mode),
             NavAction::SetLens(lens) => self.apply_set_lens(lens),
             NavAction::CycleFocus(direction) => self.apply_cycle_focus(direction),
             NavAction::CycleFocusRegion(region) => self.apply_cycle_focus_region(region),
             NavAction::SetLayoutOverride(member, layout_override) => {
                 self.apply_set_layout_override(member, layout_override)
-            }
+            },
         }
     }
 
@@ -115,7 +115,7 @@ impl<N: MemberId> GraphTree<N> {
         let placed = match &provenance {
             Provenance::Traversal { source, .. } => {
                 self.topology.attach_child(member.clone(), source)
-            }
+            },
             Provenance::Manual {
                 source: Some(source),
                 ..
@@ -131,7 +131,7 @@ impl<N: MemberId> GraphTree<N> {
             _ => {
                 // Anchor, Restored, Manual without source, Derived without connection
                 self.topology.attach_root(member.clone())
-            }
+            },
         };
 
         // If provenance-guided placement failed (e.g. source not in topology),
@@ -271,7 +271,7 @@ impl<N: MemberId> GraphTree<N> {
                 } else {
                     idx - 1
                 }
-            }
+            },
             (None, _) => 0,
         };
 

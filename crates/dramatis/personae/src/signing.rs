@@ -259,7 +259,7 @@ impl std::fmt::Display for DecisionError {
                     formatter,
                     "the key policy does not allow that remember scope"
                 )
-            }
+            },
             Self::RequestClosed => write!(formatter, "signing requester is no longer waiting"),
         }
     }
@@ -342,7 +342,7 @@ impl ApprovalBroker {
                     policy,
                     source: ApprovalSource::SessionPolicy,
                 });
-            }
+            },
             SigningPolicy::ShortTtl { idle_seconds } => {
                 let key = ApprovalCacheKey::from(&request);
                 let mut state = self.state.lock().unwrap();
@@ -362,8 +362,8 @@ impl ApprovalBroker {
                         source: ApprovalSource::CachedShortTtl,
                     });
                 }
-            }
-            SigningPolicy::PerUse => {}
+            },
+            SigningPolicy::PerUse => {},
         }
 
         self.await_visible_decision(request, policy).await
@@ -399,7 +399,7 @@ impl ApprovalBroker {
                 SigningDecision::Deny => {
                     self.push_terminal_record(request, policy, None, SigningRecordResult::Denied);
                     Err(AuthorizationError::Denied)
-                }
+                },
             },
             Ok(Err(_)) => {
                 self.state
@@ -416,7 +416,7 @@ impl ApprovalBroker {
                     },
                 );
                 Err(AuthorizationError::BrokerClosed)
-            }
+            },
             Err(_) => {
                 self.state
                     .lock()
@@ -425,7 +425,7 @@ impl ApprovalBroker {
                     .remove(&request.request_id);
                 self.push_terminal_record(request, policy, None, SigningRecordResult::TimedOut);
                 Err(AuthorizationError::TimedOut)
-            }
+            },
         }
     }
 

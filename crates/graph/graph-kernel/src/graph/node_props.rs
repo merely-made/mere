@@ -470,13 +470,13 @@ impl Graph {
                 }
                 presentation.icon_overrides.insert(tag.to_string(), icon);
                 self.set_node_facet(key, PRESENTATION_TAGS, &presentation)
-            }
+            },
             None => {
                 if presentation.icon_overrides.remove(tag).is_none() {
                     return false;
                 }
                 self.set_node_facet(key, PRESENTATION_TAGS, &presentation)
-            }
+            },
         }
     }
 

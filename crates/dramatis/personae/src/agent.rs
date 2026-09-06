@@ -311,7 +311,7 @@ impl<S: IdentityStorage + 'static> Session for VaultAgent<S> {
                     extensions: vec!["query".into(), "session-bind@openssh.com".into()],
                 })?;
                 Ok(Some(response))
-            }
+            },
             // Modern OpenSSH binds each connection to a host session. v1
             // verifies the binding signature and acknowledges; per-session
             // key restrictions (the constraint half) are not enforced yet.
@@ -332,13 +332,13 @@ impl<S: IdentityStorage + 'static> Session for VaultAgent<S> {
                     });
                     tracing::debug!("session-bind acknowledged");
                     Ok(None)
-                }
+                },
                 None => Err(AgentError::Failure),
             },
             other => {
                 tracing::debug!(extension = other, "unsupported extension");
                 Err(AgentError::ExtensionFailure)
-            }
+            },
         }
     }
 

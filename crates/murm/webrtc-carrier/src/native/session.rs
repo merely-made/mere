@@ -668,18 +668,18 @@ impl FrameWriter {
                     .frames_enqueued
                     .fetch_add(1, Ordering::Relaxed);
                 Ok(())
-            }
+            },
             Err(mpsc::error::TrySendError::Full(_)) => {
                 self.unqueue(len);
                 Err(NativeError::WouldBlock {
                     queued: self.shared.counters.queued_bytes(),
                     high_water: self.shared.backpressure.high_water_bytes(),
                 })
-            }
+            },
             Err(mpsc::error::TrySendError::Closed(_)) => {
                 self.unqueue(len);
                 Err(self.shared.terminal_error())
-            }
+            },
         }
     }
 
@@ -744,11 +744,11 @@ impl FrameWriter {
                     .frames_enqueued
                     .fetch_add(1, Ordering::Relaxed);
                 Ok(())
-            }
+            },
             Err(_) => {
                 self.unqueue(len);
                 Err(self.shared.terminal_error())
-            }
+            },
         }
     }
 
@@ -839,7 +839,7 @@ fn dedicated_failure(thread: Option<std::thread::JoinHandle<()>>) -> String {
                 .or_else(|| payload.downcast_ref::<String>().cloned())
                 .unwrap_or_else(|| "a payload that is not a string".to_owned());
             format!("the carrier driver thread panicked: {text}")
-        }
+        },
     }
 }
 
@@ -879,7 +879,7 @@ where
                     // carrier must not leave a socket registered behind it.
                     drop(runtime);
                     outcome
-                }
+                },
                 Err(err) => Err(NativeError::DriverThread(err)),
             };
             raise.store(true, Ordering::Release);
@@ -1159,7 +1159,7 @@ pub async fn serve_advertised(
                 &config,
             );
             DriverHandle::Task(tokio::spawn(driver.run()))
-        }
+        },
         DriverPlacement::DedicatedThread { stack_bytes } => {
             // Handed over as a std socket and re-registered on the other side.
             // A tokio socket carries the io driver it was registered with, so
@@ -1180,7 +1180,7 @@ pub async fn serve_advertised(
                         let err = NativeError::Socket(err);
                         driver_shared.set_terminal(Terminal::Failed(err.to_string()));
                         return Err(err);
-                    }
+                    },
                 };
                 Ok(Driver::new(
                     rtc,
@@ -1195,7 +1195,7 @@ pub async fn serve_advertised(
                     &driver_config,
                 ))
             })?
-        }
+        },
     };
 
     let mut control = CarrierControl {
@@ -1205,7 +1205,7 @@ pub async fn serve_advertised(
     };
 
     match tokio::time::timeout(config.open_timeout, opened_rx).await {
-        Ok(Ok(())) => {}
+        Ok(Ok(())) => {},
         Ok(Err(_)) => {
             // The driver dropped the signal, which means it ended first.
             let reason = control.join_task().await;
@@ -1213,7 +1213,7 @@ pub async fn serve_advertised(
                 Ok(()) => NativeError::Closed,
                 Err(err) => err,
             });
-        }
+        },
         Err(_) => {
             control.cancel();
             let _ = control.join_task().await;
@@ -1221,7 +1221,7 @@ pub async fn serve_advertised(
                 label: config.channel_label,
                 timeout: config.open_timeout,
             });
-        }
+        },
     }
 
     Ok(Carrier {

@@ -177,7 +177,7 @@ impl<S: AsyncRead + AsyncWrite + Unpin> Carrier for NetworkCarrier<S> {
                     CarrierOutput::Notice(notice) => notices.push_back(notice),
                     CarrierOutput::Response(response) => {
                         return match_response(response, id);
-                    }
+                    },
                 }
             }
         })

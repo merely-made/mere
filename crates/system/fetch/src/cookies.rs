@@ -257,17 +257,17 @@ pub(crate) fn session_context() -> netfetcher::FetchContext {
 
 /// The shared session's cookies for `url`, as portable records for a verso flip.
 /// Reads the jar's structured same-site cookies (a flip is a same-origin top-level
-/// navigation) and maps each to a [`verso_tile::api::Cookie`], carrying `Domain` / `Path` /
+/// navigation) and maps each to a [`inker::flip::api::Cookie`], carrying `Domain` / `Path` /
 /// `Secure` / `HttpOnly` / `SameSite` / expiry faithfully (the lossless structured
 /// read, native session store plan §5). `Partitioned` is not tracked by the jar yet.
-pub fn session_cookies_for(url: &str) -> Vec<verso_tile::api::Cookie> {
+pub fn session_cookies_for(url: &str) -> Vec<inker::flip::api::Cookie> {
     let Ok(parsed) = url::Url::parse(url) else {
         return Vec::new();
     };
     session_jar()
         .records_for(&parsed, SameSiteContext::same_site())
         .into_iter()
-        .map(|r| verso_tile::api::Cookie {
+        .map(|r| inker::flip::api::Cookie {
             name: r.name,
             value: r.value,
             domain: r.domain,
@@ -282,10 +282,10 @@ pub fn session_cookies_for(url: &str) -> Vec<verso_tile::api::Cookie> {
 }
 
 /// netfetcher's `SameSite` (the `cookie` crate's) to verso's engine-agnostic one.
-pub(crate) fn map_same_site(same_site: SameSite) -> verso_tile::api::SameSite {
+pub(crate) fn map_same_site(same_site: SameSite) -> inker::flip::api::SameSite {
     match same_site {
-        SameSite::Strict => verso_tile::api::SameSite::Strict,
-        SameSite::Lax => verso_tile::api::SameSite::Lax,
-        SameSite::None => verso_tile::api::SameSite::None,
+        SameSite::Strict => inker::flip::api::SameSite::Strict,
+        SameSite::Lax => inker::flip::api::SameSite::Lax,
+        SameSite::None => inker::flip::api::SameSite::None,
     }
 }

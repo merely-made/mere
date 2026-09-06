@@ -810,7 +810,7 @@ mod tests {
             Err(InviteError::Oversize { got, max }) => {
                 assert_eq!(got, huge_body.len());
                 assert_eq!(max, MAX_FRAGMENT_BODY_BYTES);
-            }
+            },
             other => panic!("expected Oversize, got {other:?}"),
         }
     }

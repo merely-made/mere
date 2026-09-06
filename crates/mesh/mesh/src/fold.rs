@@ -68,7 +68,7 @@ impl Posted {
                     winner,
                     output: output.clone(),
                 }
-            }
+            },
             _ => JobState::Claimed { winner },
         }
     }

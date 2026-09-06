@@ -188,7 +188,7 @@ async fn tampered_ciphertext_is_refused_rather_than_delivered() {
     let _ = stream.flush().await;
 
     match server.await.unwrap() {
-        Err(_) => {}
+        Err(_) => {},
         Ok(received) => assert_ne!(
             received, payload,
             "tampered ciphertext must never decrypt to the original plaintext"

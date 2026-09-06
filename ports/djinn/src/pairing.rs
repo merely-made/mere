@@ -171,9 +171,9 @@ pub fn pairing_facts<P: IdentityProvider + ?Sized>(
                         "could not read this device's group pre-key; a device pairing with                          these facts will be reachable but not readable"
                     );
                     String::new()
-                }
+                },
             }
-        }
+        },
         None => String::new(),
     };
     Ok(Some(PairingFacts {

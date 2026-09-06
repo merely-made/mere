@@ -167,9 +167,9 @@ where
                                     filled: 0,
                                 };
                             }
-                        }
+                        },
                     }
-                }
+                },
                 ReadState::Body { buffer, filled } => {
                     if *filled < buffer.len() {
                         let mut read = ReadBuf::new(&mut buffer[*filled..]);
@@ -182,7 +182,7 @@ where
                                     return Poll::Ready(Err(io::ErrorKind::UnexpectedEof.into()));
                                 }
                                 *filled += got;
-                            }
+                            },
                         }
                     }
                     if *filled == buffer.len() {
@@ -201,7 +201,7 @@ where
                             filled: 0,
                         };
                     }
-                }
+                },
             }
         }
     }

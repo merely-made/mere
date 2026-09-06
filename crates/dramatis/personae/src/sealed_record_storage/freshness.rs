@@ -90,12 +90,12 @@ impl FileFreshnessLedger {
                 entry.pending = None;
                 self.save(&record_id, entry.current, None)?;
                 Ok(pending)
-            }
+            },
             Some(_) if observed == entry.current => {
                 entry.pending = None;
                 self.save(&record_id, entry.current, None)?;
                 Ok(entry.current)
-            }
+            },
             Some(_) => Err(rollback_error(
                 record_aad,
                 "record matches neither the committed nor prepared revision",
@@ -164,7 +164,7 @@ impl FileFreshnessLedger {
                 return Err(IdentityError::Backend(format!(
                     "read freshness evidence {path:?}: {error}"
                 )));
-            }
+            },
         };
         let entry: LedgerEntry = serde_json::from_slice(&bytes).map_err(|error| {
             IdentityError::Backend(format!("parse freshness evidence {path:?}: {error}"))

@@ -145,7 +145,7 @@ impl DocumentScript {
                     Err(TurnError::UnknownNode(id)) => TurnOutcome::UnknownNode(id),
                     Err(TurnError::Refused(w)) => TurnOutcome::Refused(w),
                 }
-            }
+            },
             Err(TurnError::RevisionConflict(c)) => TurnOutcome::Conflict(c),
             Err(TurnError::UnknownNode(id)) => TurnOutcome::UnknownNode(id),
             Err(TurnError::Refused(w)) => TurnOutcome::Refused(w),

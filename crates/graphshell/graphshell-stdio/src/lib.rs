@@ -113,7 +113,7 @@ mod native {
                         Err(response) => {
                             write_response(&mut writer, &response)?;
                             continue;
-                        }
+                        },
                     };
                     let (response, close) = dispatch(endpoint, request, &mut resume);
                     write_response(&mut writer, &response)?;
@@ -126,7 +126,7 @@ mod native {
                     {
                         write_notice(&mut writer, &notice)?;
                     }
-                }
+                },
                 Ok(Err(error)) => return Err(error),
                 Err(mpsc::RecvTimeoutError::Timeout) => {
                     if let Some(notice) = endpoint
@@ -135,7 +135,7 @@ mod native {
                     {
                         write_notice(&mut writer, &notice)?;
                     }
-                }
+                },
                 Err(mpsc::RecvTimeoutError::Disconnected) => return Ok(()),
             }
         }
@@ -168,7 +168,7 @@ mod native {
                 Err(response) => {
                     write_response(&mut writer, &response)?;
                     continue;
-                }
+                },
             };
             let (response, close) = dispatch(endpoint, request, &mut resume);
             write_response(&mut writer, &response)?;
@@ -327,7 +327,7 @@ mod native {
                         return response
                             .body
                             .map_err(|failure| CarrierError::Refused(failure.message));
-                    }
+                    },
                 }
             }
         }

@@ -72,7 +72,7 @@ impl ConversationPolicy {
                 {
                     return Err(Self::reject("conversation text is not UTF-8"));
                 }
-            }
+            },
             1 => {
                 if !ext.info.is_empty() {
                     return Err(Self::reject("deletion operation carries profile data"));
@@ -80,7 +80,7 @@ impl ConversationPolicy {
                 if operation.header.payload_hash.is_some() || operation.header.payload_size != 0 {
                     return Err(Self::reject("deletion operation carries a body"));
                 }
-            }
+            },
             2 => {
                 if !ext.deletes.is_empty() {
                     return Err(Self::reject("profile operation carries deletion targets"));
@@ -88,7 +88,7 @@ impl ConversationPolicy {
                 if operation.header.payload_hash.is_some() || operation.header.payload_size != 0 {
                     return Err(Self::reject("profile operation carries a body"));
                 }
-            }
+            },
             4 | 5 => {
                 if !ext.info.is_empty() || !ext.deletes.is_empty() {
                     return Err(Self::reject(
@@ -98,7 +98,7 @@ impl ConversationPolicy {
                 if operation.header.payload_hash.is_some() || operation.header.payload_size != 0 {
                     return Err(Self::reject("membership operation carries a body"));
                 }
-            }
+            },
             _ => return Err(Self::reject("unknown conversation post type")),
         }
         Ok(())

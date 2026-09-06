@@ -137,12 +137,12 @@ pub async fn migrate_legacy_images(
                     node.legacy_favicon_width = 0;
                     node.legacy_favicon_height = 0;
                     written += 1;
-                }
+                },
                 None => {
                     // Put it back: an un-encodable favicon is a visible
                     // leftover, not a silent loss.
                     node.legacy_favicon_rgba = Some(rgba);
-                }
+                },
             }
         }
     }

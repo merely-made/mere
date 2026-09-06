@@ -48,7 +48,7 @@ pub fn load_local_device_identity(data_root: &Path) -> io::Result<Option<LocalDe
     if let Some(store) = &local_store {
         match store.load_record::<LocalDeviceIdentity>(relative) {
             Ok(identity) => return Ok(identity),
-            Err(_) => {}
+            Err(_) => {},
         }
     }
     if local_store.is_none() && looks_like_sealed_record(&path) {
@@ -109,7 +109,7 @@ pub fn load_remote_auth_wrapping_key_bridge(
                     return Ok(Some(bridge));
                 }
                 return Err(io_backend_error(err));
-            }
+            },
         }
     }
     if looks_like_sealed_record(&path) {

@@ -23,8 +23,8 @@ use scrying_engine::scrying::{
 };
 use windows::Win32::Foundation::HANDLE;
 use windows::Win32::Graphics::Direct3D12::{
-    D3D12_RESOURCE_DIMENSION_TEXTURE2D, D3D12_RESOURCE_FLAG_ALLOW_SIMULTANEOUS_ACCESS,
-    ID3D12Fence, ID3D12Resource,
+    D3D12_RESOURCE_DIMENSION_TEXTURE2D, D3D12_RESOURCE_FLAG_ALLOW_SIMULTANEOUS_ACCESS, ID3D12Fence,
+    ID3D12Resource,
 };
 use windows::Win32::Graphics::Dxgi::Common::{
     DXGI_FORMAT, DXGI_FORMAT_B8G8R8A8_UNORM, DXGI_FORMAT_B8G8R8A8_UNORM_SRGB,
@@ -125,10 +125,7 @@ impl Dx12SurfaceCache {
         synchronizer: Arc<Dx12FenceSynchronizer>,
     ) {
         let host = HostWgpuContext::new(device.clone(), queue.clone());
-        let importer = WgpuTextureImporter::with_synchronizer(
-            host,
-            Box::new(synchronizer.clone()),
-        );
+        let importer = WgpuTextureImporter::with_synchronizer(host, Box::new(synchronizer.clone()));
         self.scrying_importer = Some(Rc::new(ScryingDx12Importer {
             importer,
             synchronizer,

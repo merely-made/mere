@@ -318,7 +318,7 @@ impl<B: Backend + Clone + Send + Sync + 'static> MeshHost<B> {
                 })
                 .await?;
                 steps.push(Step::Claimed { job });
-            }
+            },
             WorkerAction::Grant {
                 job,
                 epoch,
@@ -338,7 +338,7 @@ impl<B: Backend + Clone + Send + Sync + 'static> MeshHost<B> {
                     epoch,
                     lease: LeaseId(op),
                 });
-            }
+            },
             WorkerAction::Heartbeat { job, lease } => {
                 // The payload comes from the run itself, so a heartbeat cannot
                 // claim progress that did not happen.
@@ -359,12 +359,12 @@ impl<B: Backend + Clone + Send + Sync + 'static> MeshHost<B> {
                     lease,
                     progress,
                 });
-            }
+            },
             WorkerAction::Execute(job) => {
                 if let Some(step) = self.start(&board, job, now_ms) {
                     steps.push(step);
                 }
-            }
+            },
             WorkerAction::Reclaim { job, lease, reason } => {
                 let class = board
                     .job(job)
@@ -373,7 +373,7 @@ impl<B: Backend + Clone + Send + Sync + 'static> MeshHost<B> {
                 self.begin_reclaim(job, reason, class, now_ms);
                 steps.push(Step::AwaitingStop { job });
                 let _ = lease;
-            }
+            },
         }
         Ok(steps)
     }
@@ -470,7 +470,7 @@ impl<B: Backend + Clone + Send + Sync + 'static> MeshHost<B> {
                     .await
                     .map(|output| RunOutcome::Committed(Box::new(output)))
                 })
-            }
+            },
             (None, Some(kind)) => {
                 let payload = record.payload.clone()?;
                 tokio::spawn(async move {
@@ -478,7 +478,7 @@ impl<B: Backend + Clone + Send + Sync + 'static> MeshHost<B> {
                         .await
                         .map(RunOutcome::Inline)
                 })
-            }
+            },
             (None, None) => return None,
         };
 
@@ -515,13 +515,13 @@ impl<B: Backend + Clone + Send + Sync + 'static> MeshHost<B> {
             CheckpointClass::Restart => {
                 flight.handle.cancel();
                 true
-            }
+            },
             CheckpointClass::Resumable => {
                 // Stop at a boundary the run can name, rather than throwing the
                 // work away outright.
                 flight.handle.request_checkpoint();
                 true
-            }
+            },
             CheckpointClass::NonInterruptible => false,
         };
         flight.reclaim = Some(Reclaiming {
@@ -598,7 +598,7 @@ impl<B: Backend + Clone + Send + Sync + 'static> MeshHost<B> {
                     };
                     self.author(&event).await?;
                     steps.push(Step::Completed { job, lease });
-                }
+                },
                 Ok(Ok(RunOutcome::Inline(result))) => {
                     self.author(&MeshEvent::JobDone {
                         job: job.0,
@@ -607,18 +607,18 @@ impl<B: Backend + Clone + Send + Sync + 'static> MeshHost<B> {
                     })
                     .await?;
                     steps.push(Step::Completed { job, lease: None });
-                }
+                },
                 Ok(Err(error)) => {
                     let reason = release_reason(&error);
                     steps.push(self.give_back(job, lease, reason, now_ms).await?);
-                }
+                },
                 // A panicked run is a failed run; the ring should not wait for it.
                 Err(_) => {
                     steps.push(
                         self.give_back(job, lease, ReleaseReason::Failed, now_ms)
                             .await?,
                     );
-                }
+                },
             }
         }
         Ok(steps)

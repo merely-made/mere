@@ -213,11 +213,11 @@ impl fmt::Display for ContentReferenceError {
         formatter.write_str(match self {
             Self::InvalidNamedInformation => {
                 "content name is not canonical ni:///sha-256;<base64url>"
-            }
+            },
             Self::InvalidSha256Hex => "SHA-256 digest is not 64 lowercase hexadecimal characters",
             Self::InvalidBlake3 => {
                 "BLAKE3 transport address is not blake3:<64 lowercase hexadecimal characters>"
-            }
+            },
             Self::ByteSizeMismatch => "content byte length does not match its reference",
             Self::Blake3Mismatch => "content bytes do not match their BLAKE3 transport address",
             Self::Sha256Mismatch => "content bytes do not match their RFC 6920 SHA-256 identity",
@@ -531,49 +531,49 @@ impl fmt::Display for ActionFormError {
                     formatter,
                     "action schema {expected} does not match form schema {form}"
                 )
-            }
+            },
             Self::EmptyFieldName => write!(formatter, "action form field name is empty"),
             Self::ReservedFieldName => {
                 write!(formatter, "action form field name schema is reserved")
-            }
+            },
             Self::DuplicateField(field) => write!(formatter, "action form repeats field {field}"),
             Self::EmptyFieldLabel(field) => {
                 write!(formatter, "action form field {field} has no label")
-            }
+            },
             Self::EmptyChoices(field) => {
                 write!(formatter, "action form field {field} has no choices")
-            }
+            },
             Self::EmptyChoiceValue(field) => {
                 write!(
                     formatter,
                     "action form field {field} has an empty choice value"
                 )
-            }
+            },
             Self::EmptyChoiceLabel(field) => {
                 write!(
                     formatter,
                     "action form field {field} has an empty choice label"
                 )
-            }
+            },
             Self::DuplicateChoiceValue { field, value } => {
                 write!(
                     formatter,
                     "action form field {field} repeats choice value {value}"
                 )
-            }
+            },
             Self::MissingField(field) => write!(formatter, "action form requires field {field}"),
             Self::UnknownField(field) => {
                 write!(formatter, "action form does not define field {field}")
-            }
+            },
             Self::InvalidChoice { field, value } => {
                 write!(
                     formatter,
                     "action form field {field} does not offer choice {value}"
                 )
-            }
+            },
             Self::Encode(error) => {
                 write!(formatter, "could not encode action form payload: {error}")
-            }
+            },
         }
     }
 }

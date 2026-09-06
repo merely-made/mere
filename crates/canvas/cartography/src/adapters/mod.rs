@@ -101,7 +101,7 @@ impl GridColumns {
             Self::AspectRatio(ratio) => {
                 let raw = (count as f32 * ratio.max(0.01)).sqrt().ceil() as u32;
                 raw.max(1).min(count.max(1) as u32)
-            }
+            },
         }
     }
 }

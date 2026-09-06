@@ -261,7 +261,7 @@ impl CapturedDelta {
                     url: url.clone(),
                     position: Point2D::new(position[0], position[1]),
                 }
-            }
+            },
             Self::ReplayAssertRelationByIds {
                 from_id,
                 to_id,
@@ -316,31 +316,31 @@ impl CapturedDelta {
             // bytes are dropped and the preview regenerates on next capture.
             Self::ReplaySetNodeThumbnailById { .. } | Self::ReplaySetNodeFaviconById { .. } => {
                 return None;
-            }
+            },
             Self::ReplaySetNodeMimeHintById { node_id, mime_hint } => {
                 GraphDelta::ReplaySetNodeMimeHintById {
                     node_id: parse_uuid(node_id),
                     mime_hint: mime_hint.clone(),
                 }
-            }
+            },
             Self::ReplaySetNodeContentById { node_id, content } => {
                 GraphDelta::ReplaySetNodeContentById {
                     node_id: parse_uuid(node_id),
                     content: content.map(muniment::Hash::from_bytes),
                 }
-            }
+            },
             Self::ReplaySetNodeNestedById { node_id, nested } => {
                 GraphDelta::ReplaySetNodeNestedById {
                     node_id: parse_uuid(node_id),
                     nested: nested.clone(),
                 }
-            }
+            },
             Self::ReplaySetNodePinnedById { node_id, is_pinned } => {
                 GraphDelta::ReplaySetNodePinnedById {
                     node_id: parse_uuid(node_id),
                     is_pinned: *is_pinned,
                 }
-            }
+            },
             Self::ReplaySetNodeFacetById {
                 node_id,
                 facet,
@@ -352,13 +352,13 @@ impl CapturedDelta {
                     facet: facet.clone(),
                     value,
                 }
-            }
+            },
             Self::ReplayRemoveNodeFacetById { node_id, facet } => {
                 GraphDelta::ReplayRemoveNodeFacetById {
                     node_id: parse_uuid(node_id),
                     facet: facet.clone(),
                 }
-            }
+            },
             Self::ReplayInsertNodeTagById { node_id, tag } => GraphDelta::ReplayInsertNodeTagById {
                 node_id: parse_uuid(node_id),
                 tag: tag.clone(),
@@ -410,7 +410,7 @@ impl CapturedDelta {
                     node_id: parse_uuid(node_id),
                     property: property.clone(),
                 }
-            }
+            },
             Self::ReplayAddNodeClassificationById {
                 node_id,
                 classification,
@@ -460,7 +460,7 @@ impl CapturedDelta {
                     tag: tag.clone(),
                     icon: icon.clone(),
                 }
-            }
+            },
             Self::ReplaySetEdgeSemanticPredicateByIds {
                 from_id,
                 to_id,
@@ -484,7 +484,7 @@ impl CapturedDelta {
                     node_id: parse_uuid(node_id),
                     hint: hint.clone(),
                 }
-            }
+            },
             Self::ReplayRemoveFrameLayoutHintById {
                 node_id,
                 hint_index,
@@ -541,7 +541,7 @@ impl CapturedDelta {
                     field_id: field_id.clone(),
                     strength: *strength,
                 }
-            }
+            },
             Self::ReplayActivateFieldById { field_id } => GraphDelta::ReplayActivateFieldById {
                 field_id: field_id.clone(),
             },
@@ -549,7 +549,7 @@ impl CapturedDelta {
                 GraphDelta::ReplayRetractCouplingById {
                     coupling_id: coupling_id.clone(),
                 }
-            }
+            },
         })
     }
 }
@@ -639,7 +639,7 @@ pub(crate) fn persisted_coupling_from_coupling(coupling: &Coupling) -> Persisted
             CouplingResponse::FlowAdvect => PersistedCouplingResponse::FlowAdvect,
             CouplingResponse::DampenInside { factor } => {
                 PersistedCouplingResponse::DampenInside { factor: *factor }
-            }
+            },
             CouplingResponse::ContainmentWall => PersistedCouplingResponse::ContainmentWall,
             CouplingResponse::Open { predicate } => PersistedCouplingResponse::Open {
                 predicate: predicate.clone(),
@@ -665,7 +665,7 @@ pub(crate) fn coupling_from_persisted(pcoupling: &PersistedCoupling) -> Option<C
         PersistedCouplingResponse::FlowAdvect => CouplingResponse::FlowAdvect,
         PersistedCouplingResponse::DampenInside { factor } => {
             CouplingResponse::DampenInside { factor: *factor }
-        }
+        },
         PersistedCouplingResponse::ContainmentWall => CouplingResponse::ContainmentWall,
         PersistedCouplingResponse::Open { predicate } => CouplingResponse::Open {
             predicate: predicate.clone(),

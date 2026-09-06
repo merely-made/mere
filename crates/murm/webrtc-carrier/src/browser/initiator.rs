@@ -418,8 +418,7 @@ impl BrowserInitiator {
     pub async fn create_restart_offer(&self) -> Result<String, BrowserError> {
         let options = RtcOfferOptions::new();
         options.set_ice_restart(true);
-        let value =
-            JsFuture::from(self.peer.create_offer_with_rtc_offer_options(&options)).await?;
+        let value = JsFuture::from(self.peer.create_offer_with_rtc_offer_options(&options)).await?;
         let sdp = offer_sdp_field(&value)?;
         let local = RtcSessionDescriptionInit::new(RtcSdpType::Offer);
         local.set_sdp(&sdp);
@@ -661,7 +660,7 @@ fn on_channel_message(inner: &Rc<RefCell<Inner>>, event: MessageEvent) {
         Err(_) => {
             set_terminal(inner, BrowserError::UnexpectedMessageType);
             return;
-        }
+        },
     };
     let array = Uint8Array::new(&buffer);
     let mut bytes = vec![0u8; array.length() as usize];
@@ -674,7 +673,7 @@ fn on_channel_message(inner: &Rc<RefCell<Inner>>, event: MessageEvent) {
             drop(guard);
             set_terminal(inner, BrowserError::from(frame_error));
             return;
-        }
+        },
     };
     // Same rule as the ICE handler: the borrow must end before user code
     // runs. A frame callback that touches the initiator would otherwise
@@ -735,9 +734,8 @@ mod tests {
         };
         let built = build_rtc_ice_server(&entry);
 
-        let urls = js_sys::Array::from(
-            &js_sys::Reflect::get(&built, &JsValue::from_str("urls")).unwrap(),
-        );
+        let urls =
+            js_sys::Array::from(&js_sys::Reflect::get(&built, &JsValue::from_str("urls")).unwrap());
         assert_eq!(urls.length(), 1);
         assert_eq!(
             urls.get(0).as_string().as_deref(),

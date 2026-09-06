@@ -72,7 +72,7 @@ fn add_and_retrieve_slot_round_trip() {
     match slot {
         IdentitySlot::Direct { payload, .. } => {
             assert_eq!(payload.as_slice(), &[0x42; 32]);
-        }
+        },
         _ => panic!("expected Direct"),
     }
 }
@@ -99,7 +99,7 @@ fn bootstrap_slot_carries_state_dir() {
             assert_eq!(kind, "matrix");
             assert_eq!(bootstrap.as_slice(), b"login-flow-seed");
             assert_eq!(state_dir, &dir);
-        }
+        },
         _ => panic!("expected Bootstrap"),
     }
 }
@@ -199,7 +199,7 @@ fn missing_profile_returns_backend_error() {
     // so we match on the Result rather than expect_err().
     let storage = InMemoryStorage::new();
     match storage.load_profile(&ProfileId("nope".into())) {
-        Err(IdentityError::Backend(_)) => {}
+        Err(IdentityError::Backend(_)) => {},
         Err(other) => panic!("unexpected error variant: {other}"),
         Ok(_) => panic!("expected error, got Ok"),
     }

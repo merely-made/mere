@@ -111,7 +111,7 @@ impl std::fmt::Display for ProofError {
                     f,
                     "identity proof does not sign this session's handshake hash"
                 )
-            }
+            },
         }
     }
 }

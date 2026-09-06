@@ -188,14 +188,14 @@ impl FocusRingCurve {
             Self::EaseOut => {
                 let remaining = 1.0 - p;
                 remaining * remaining
-            }
+            },
             Self::Step => {
                 if p >= 1.0 {
                     0.0
                 } else {
                     1.0
                 }
-            }
+            },
         }
     }
 }

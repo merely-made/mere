@@ -85,18 +85,18 @@ impl InputRegistry {
         match self.bindings.entry((context, binding)) {
             Entry::Vacant(entry) => {
                 entry.insert(BindingSlot::Routed(normalized_action_id));
-            }
+            },
             Entry::Occupied(mut entry) => match entry.get_mut() {
-                BindingSlot::Routed(existing) if *existing == normalized_action_id => {}
+                BindingSlot::Routed(existing) if *existing == normalized_action_id => {},
                 BindingSlot::Routed(existing) => {
                     let actions = vec![existing.clone(), normalized_action_id];
                     entry.insert(BindingSlot::Conflict(actions));
-                }
+                },
                 BindingSlot::Conflict(actions) => {
                     if !actions.contains(&normalized_action_id) {
                         actions.push(normalized_action_id);
                     }
-                }
+                },
             },
         }
     }
@@ -179,14 +179,14 @@ impl InputRegistry {
                     binding_label: binding_label(&old, context),
                     action_ids,
                 });
-            }
+            },
         };
 
         match self.bindings.entry(new_key) {
             Entry::Vacant(entry) => {
                 entry.insert(BindingSlot::Routed(action_id));
                 Ok(())
-            }
+            },
             Entry::Occupied(entry) => {
                 let conflict = match entry.get() {
                     BindingSlot::Routed(existing) if *existing == action_id => None,
@@ -206,7 +206,7 @@ impl InputRegistry {
                     Some(conflict) => Err(conflict),
                     None => Ok(()),
                 }
-            }
+            },
         }
     }
 

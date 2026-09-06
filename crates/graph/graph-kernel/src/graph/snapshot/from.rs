@@ -232,7 +232,7 @@ impl Graph {
                                 EdgeAssertion::Arrangement {
                                     sub_kind: ArrangementSubKind::FrameMember,
                                 }
-                            }
+                            },
                             PersistedArrangementSubKind::TileGroup => EdgeAssertion::Arrangement {
                                 sub_kind: ArrangementSubKind::TileGroup,
                             },
@@ -282,7 +282,7 @@ impl Graph {
                                 EdgeAssertion::Imported {
                                     sub_kind: ImportedSubKind::ArchiveMembership,
                                 }
-                            }
+                            },
                             PersistedImportedSubKind::SharedCollection => EdgeAssertion::Imported {
                                 sub_kind: ImportedSubKind::SharedCollection,
                             },
@@ -300,37 +300,37 @@ impl Graph {
                                 EdgeAssertion::Provenance {
                                     sub_kind: ProvenanceSubKind::ExcerptedFrom,
                                 }
-                            }
+                            },
                             PersistedProvenanceSubKind::SummarizedFrom => {
                                 EdgeAssertion::Provenance {
                                     sub_kind: ProvenanceSubKind::SummarizedFrom,
                                 }
-                            }
+                            },
                             PersistedProvenanceSubKind::TranslatedFrom => {
                                 EdgeAssertion::Provenance {
                                     sub_kind: ProvenanceSubKind::TranslatedFrom,
                                 }
-                            }
+                            },
                             PersistedProvenanceSubKind::RewrittenFrom => {
                                 EdgeAssertion::Provenance {
                                     sub_kind: ProvenanceSubKind::RewrittenFrom,
                                 }
-                            }
+                            },
                             PersistedProvenanceSubKind::GeneratedFrom => {
                                 EdgeAssertion::Provenance {
                                     sub_kind: ProvenanceSubKind::GeneratedFrom,
                                 }
-                            }
+                            },
                             PersistedProvenanceSubKind::ExtractedFrom => {
                                 EdgeAssertion::Provenance {
                                     sub_kind: ProvenanceSubKind::ExtractedFrom,
                                 }
-                            }
+                            },
                             PersistedProvenanceSubKind::ImportedFromSource => {
                                 EdgeAssertion::Provenance {
                                     sub_kind: ProvenanceSubKind::ImportedFromSource,
                                 }
-                            }
+                            },
                             PersistedProvenanceSubKind::CopiedFrom => EdgeAssertion::Provenance {
                                 sub_kind: ProvenanceSubKind::CopiedFrom,
                             },
@@ -355,38 +355,38 @@ impl Graph {
                                 trigger: match record.trigger {
                                     PersistedNavigationTrigger::Unknown => {
                                         NavigationTrigger::Unknown
-                                    }
+                                    },
                                     PersistedNavigationTrigger::LinkClick => {
                                         NavigationTrigger::LinkClick
-                                    }
+                                    },
                                     PersistedNavigationTrigger::Back => NavigationTrigger::Back,
                                     PersistedNavigationTrigger::Forward => {
                                         NavigationTrigger::Forward
-                                    }
+                                    },
                                     PersistedNavigationTrigger::AddressBarEntry => {
                                         NavigationTrigger::AddressBarEntry
-                                    }
+                                    },
                                     PersistedNavigationTrigger::PanePromotion => {
                                         NavigationTrigger::PanePromotion
-                                    }
+                                    },
                                     PersistedNavigationTrigger::Programmatic => {
                                         NavigationTrigger::Programmatic
-                                    }
+                                    },
                                     PersistedNavigationTrigger::Redirect => {
                                         NavigationTrigger::Redirect
-                                    }
+                                    },
                                     PersistedNavigationTrigger::ReopenSession => {
                                         NavigationTrigger::ReopenSession
-                                    }
+                                    },
                                     PersistedNavigationTrigger::JumpAnchor => {
                                         NavigationTrigger::JumpAnchor
-                                    }
+                                    },
                                     PersistedNavigationTrigger::InPageSearchJump => {
                                         NavigationTrigger::InPageSearchJump
-                                    }
+                                    },
                                     PersistedNavigationTrigger::ImportedHistory => {
                                         NavigationTrigger::ImportedHistory
-                                    }
+                                    },
                                 },
                             })
                             .collect();
@@ -463,7 +463,7 @@ impl Graph {
                 PersistedCouplingResponse::FlowAdvect => CouplingResponse::FlowAdvect,
                 PersistedCouplingResponse::DampenInside { factor } => {
                     CouplingResponse::DampenInside { factor: *factor }
-                }
+                },
                 PersistedCouplingResponse::ContainmentWall => CouplingResponse::ContainmentWall,
                 PersistedCouplingResponse::Open { predicate } => CouplingResponse::Open {
                     predicate: predicate.clone(),

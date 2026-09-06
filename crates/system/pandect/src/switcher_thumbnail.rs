@@ -407,16 +407,16 @@ mod tests {
             EdgeFamily::Traversal => RelationKind::Traversal,
             EdgeFamily::Containment => {
                 RelationKind::Containment(kernel::graph::ContainmentSubKind::UrlPath)
-            }
+            },
             EdgeFamily::Arrangement => {
                 RelationKind::Arrangement(kernel::graph::ArrangementSubKind::FrameMember)
-            }
+            },
             EdgeFamily::Imported => {
                 RelationKind::Imported(kernel::graph::ImportedSubKind::BookmarkFolder)
-            }
+            },
             EdgeFamily::Provenance => {
                 RelationKind::Provenance(kernel::graph::ProvenanceSubKind::ClippedFrom)
-            }
+            },
         };
         ((representative.tag() >> 24) & 0xff) as u8
     }
