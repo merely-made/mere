@@ -67,7 +67,7 @@ impl FrozenRole {
             Representation::Glyph => Self::Symbol,
             Representation::Card | Representation::Sprite | Representation::Snapshot => {
                 Self::Object
-            }
+            },
             Representation::LivePane => Self::LiveContent,
             // An unrecognized rung is content until a host says otherwise;
             // calling it a symbol would understate it.
@@ -86,6 +86,9 @@ pub struct FrozenInstance {
     /// True when `name` fell back to the source id.
     pub named_by_fallback: bool,
     pub role: FrozenRole,
+    /// Source-supplied readable facts for the table alternate.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub detail: Option<String>,
 }
 
 /// One relation, resolved to the names at both ends.
@@ -134,6 +137,7 @@ impl FrozenScene {
             scene.relations.iter(),
             &scene.unmet_holds,
             |_, source| names.get(source).cloned(),
+            |_, _| None,
         )
     }
 
@@ -147,6 +151,20 @@ impl FrozenScene {
         snapshot: &SceneSnapshot,
         name: &str,
         names: &HashMap<InstanceId, String>,
+    ) -> Self {
+        Self::freeze_snapshot_with_details(snapshot, name, names, &HashMap::new())
+    }
+
+    /// Freeze a sparse snapshot with names and readable per-instance facts.
+    ///
+    /// Details come from the presentation plane rather than scene geometry.
+    /// This lets a frozen table preserve disclosed values such as dates and
+    /// spans without teaching the scene client a product's vocabulary.
+    pub fn freeze_snapshot_with_details(
+        snapshot: &SceneSnapshot,
+        name: &str,
+        names: &HashMap<InstanceId, String>,
+        details: &HashMap<InstanceId, String>,
     ) -> Self {
         Self::freeze_parts(
             name,
@@ -166,6 +184,7 @@ impl FrozenScene {
             snapshot.tables.relations.iter().filter_map(Option::as_ref),
             &snapshot.tables.unmet_holds,
             |instance, _| names.get(&instance).cloned(),
+            |instance, _| details.get(&instance).cloned(),
         )
     }
 
@@ -176,6 +195,7 @@ impl FrozenScene {
         relations: impl IntoIterator<Item = &'a RoutedRelation>,
         unmet_holds: &[HeldPlacement],
         resolve_name: impl Fn(InstanceId, &SourceRef) -> Option<String>,
+        resolve_detail: impl Fn(InstanceId, &SourceRef) -> Option<String>,
     ) -> Self {
         let mut instances = Vec::new();
         let mut name_by_instance = HashMap::new();
@@ -200,6 +220,7 @@ impl FrozenScene {
                 name: resolved,
                 named_by_fallback: supplied.is_none(),
                 role: FrozenRole::of(&item.representation),
+                detail: resolve_detail(instance, source),
             });
         }
 
@@ -237,11 +258,14 @@ impl FrozenScene {
             rows.push((
                 "instance".to_owned(),
                 instance.name.clone(),
-                match instance.role {
-                    FrozenRole::Symbol => "symbol".to_owned(),
-                    FrozenRole::Object => "object".to_owned(),
-                    FrozenRole::LiveContent => "live content".to_owned(),
-                },
+                instance
+                    .detail
+                    .clone()
+                    .unwrap_or_else(|| match instance.role {
+                        FrozenRole::Symbol => "symbol".to_owned(),
+                        FrozenRole::Object => "object".to_owned(),
+                        FrozenRole::LiveContent => "live content".to_owned(),
+                    }),
             ));
         }
         for relation in &self.relations {
@@ -395,18 +419,18 @@ impl FrozenScene {
         html.push_str("<caption>Every item and relationship in this projection</caption>");
         html.push_str("<thead><tr><th scope=\"col\">Kind</th><th scope=\"col\">Name</th><th scope=\"col\">Detail</th></tr></thead><tbody>");
         for instance in &self.instances {
-            let detail = match instance.role {
+            let detail = instance.detail.as_deref().unwrap_or(match instance.role {
                 FrozenRole::Symbol => "symbol",
                 FrozenRole::Object => "object",
                 FrozenRole::LiveContent => "live content",
-            };
+            });
             html.push_str(&format!(
                 "<tr data-projection-instance=\"{}\" data-source-adapter=\"{}\" data-source-id=\"{}\"><td>instance</td><th scope=\"row\">{}</th><td>{}</td></tr>",
                 instance.instance.0,
                 escape(&instance.source.adapter),
                 escape(&instance.source.id),
                 escape(&instance.name),
-                detail
+                escape(detail)
             ));
         }
         for relation in &self.relations {

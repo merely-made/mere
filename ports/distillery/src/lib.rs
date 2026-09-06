@@ -45,6 +45,7 @@
 #![warn(missing_docs)]
 
 mod authority;
+mod chronicle;
 
 #[cfg(feature = "flora")]
 pub mod flora;
@@ -58,6 +59,9 @@ mod trainer;
 
 pub use authority::{
     BlobCustody, Distillery, DistilleryError, MaintenanceReport, RetentionSettings,
+};
+pub use chronicle::{
+    ChronicleEndpoint, ChronicleEndpointError, ChronicleObserver, ChronicleRevision,
 };
 pub use installed::{
     DISTILLERY_MESH_SALT, DistilleryPaths, InstalledAuthority, InstalledError, InstalledSettings,

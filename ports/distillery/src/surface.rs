@@ -208,7 +208,7 @@ fn receipt_label(receipt: &ResidentReceipt) -> String {
     match receipt {
         ResidentReceipt::Tick { steps } => {
             format!("Resident receipt: tick ({} steps)", steps.len())
-        }
+        },
         ResidentReceipt::MaintenanceCompleted(report) => format!(
             "Resident receipt: maintenance completed ({} candidates, {} custody tags released)",
             report.candidates, report.collected
@@ -216,10 +216,10 @@ fn receipt_label(receipt: &ResidentReceipt) -> String {
         ResidentReceipt::MaintenanceIdle => "Resident receipt: maintenance idle".to_owned(),
         ResidentReceipt::MaintenanceFailed { error } => {
             format!("Resident receipt: maintenance failed ({error})")
-        }
+        },
         ResidentReceipt::SupervisorFailed { error } => {
             format!("Resident receipt: supervisor failed ({error})")
-        }
+        },
         ResidentReceipt::StopRequested => "Resident receipt: stop requested".to_owned(),
     }
 }

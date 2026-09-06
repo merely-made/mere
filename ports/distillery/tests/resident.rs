@@ -132,8 +132,8 @@ async fn resident_lifecycle_ticks_maintains_persists_and_closes() {
                         if let Some(stop_tx) = stop_tx.take() {
                             let _ = stop_tx.send(());
                         }
-                    }
-                    _ => {}
+                    },
+                    _ => {},
                 }
                 receipts.push(receipt);
             },

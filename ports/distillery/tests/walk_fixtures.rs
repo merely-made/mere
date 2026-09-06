@@ -42,9 +42,9 @@ use distillery::{
     MaintenanceReport, ResidentReceipt, ResidentSettings, RetentionSettings,
     distillery_installed_descriptor, distillery_installed_surface,
 };
-use mere_surface_api::SurfaceAvailability;
 use genet_scripted_dom::ScriptedDom;
 use layout_dom_api::LayoutDom;
+use mere_surface_api::SurfaceAvailability;
 use mesh::spec::{DeterminismClass, JobOutput, JobSpec, VerificationClass};
 use mesh::{
     BlobRef, Digest, ImplementationId, Job, JobBoard, JobBoardSnapshot, JobId, JobState,
@@ -357,7 +357,7 @@ fn compare_or_author(path: &Path, document: &str) {
         None if std::env::var(WRITE_VAR).as_deref() == Ok("1") => {
             fs::create_dir_all(path.parent().expect("fixture parent")).expect("fixture directory");
             fs::write(path, document).expect("author fixture");
-        }
+        },
         None => panic!(
             "{} is absent; re-run with {WRITE_VAR}=1 to author it",
             path.display()
@@ -410,14 +410,11 @@ fn tool_output(program: &str, args: &[&str]) -> String {
 /// Keys are sorted and the document ends in a newline, so two runs against one
 /// commit produce byte-identical files.
 fn generate_workspace_graph() -> PathBuf {
-    let metadata: serde_json::Value =
-        serde_json::from_str(&tool_output(&cargo_binary(), &[
-            "metadata",
-            "--format-version",
-            "1",
-            "--no-deps",
-        ]))
-        .expect("cargo metadata parses");
+    let metadata: serde_json::Value = serde_json::from_str(&tool_output(
+        &cargo_binary(),
+        &["metadata", "--format-version", "1", "--no-deps"],
+    ))
+    .expect("cargo metadata parses");
     let packages = metadata["packages"]
         .as_array()
         .expect("cargo metadata names its packages");
@@ -430,8 +427,7 @@ fn generate_workspace_graph() -> PathBuf {
         .iter()
         .map(|package| package["name"].as_str().expect("package name").to_owned())
         .collect();
-    let mut edges: std::collections::BTreeSet<(String, String)> =
-        std::collections::BTreeSet::new();
+    let mut edges: std::collections::BTreeSet<(String, String)> = std::collections::BTreeSet::new();
     for package in packages {
         let source = package["name"].as_str().expect("package name");
         for dependency in package["dependencies"]
@@ -441,7 +437,7 @@ fn generate_workspace_graph() -> PathBuf {
             // `kind` is null for a normal dependency, "build" for a
             // build-script one, "dev" for a test-only one.
             match dependency["kind"].as_str() {
-                None | Some("build") => {}
+                None | Some("build") => {},
                 Some(_) => continue,
             }
             let target = dependency["name"].as_str().expect("dependency name");
@@ -504,7 +500,9 @@ fn chronicle_fixtures_are_deterministic_and_round_trip() {
             document(&build()),
             "{owner}: two folds of one authored history disagree, so the fixture is not a fixture"
         );
-        let path = fixtures().join("chronicle").join(format!("{owner}_board.json"));
+        let path = fixtures()
+            .join("chronicle")
+            .join(format!("{owner}_board.json"));
         compare_or_author(&path, &rendered);
 
         let fixture: ChronicleFixture =
@@ -578,7 +576,10 @@ fn workspace_graph_fixture_is_a_dag_over_named_packages() {
         !graph.generated_from.is_empty(),
         "the graph names the commit it was read from"
     );
-    assert!(graph.packages.len() > 1, "a workspace of one is not a graph");
+    assert!(
+        graph.packages.len() > 1,
+        "a workspace of one is not a graph"
+    );
 
     // A stale or empty graph is caught here rather than by the DAG walk, which
     // is happy to succeed over nothing. These four are load-bearing members of
@@ -643,7 +644,7 @@ fn workspace_graph_fixture_is_a_dag_over_named_packages() {
                         colour[next] = 1;
                         stack.push((next, 0));
                     }
-                }
+                },
                 None => colour[node] = 2,
             }
         }
