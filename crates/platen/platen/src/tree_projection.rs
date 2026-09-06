@@ -100,16 +100,16 @@ pub fn project_tree(arrangement: &Arrangement) -> WorkbenchPlan {
                     PlanSlot::Tile(first) => {
                         let first = first.clone();
                         slots[i] = PlanSlot::Tabs(vec![first, tile.clone()]);
-                    }
+                    },
                     PlanSlot::Tabs(v) => v.push(tile.clone()),
                 }
                 slot_of.insert(tile.node, i);
-            }
+            },
             None => {
                 let i = slots.len();
                 slot_of.insert(tile.node, i);
                 slots.push(PlanSlot::Tile(tile));
-            }
+            },
         }
     }
 
@@ -323,7 +323,7 @@ mod tests {
             TileTree::Stack(s) => {
                 assert_eq!(s.tabs.len(), 2, "both stacked tiles are tabs");
                 assert_eq!(s.active, 0, "the first is active");
-            }
+            },
             other => panic!("expected a stack, got {other:?}"),
         }
     }
@@ -348,7 +348,7 @@ mod tests {
                         b.fraction
                     );
                 }
-            }
+            },
             other => panic!("expected a row split, got {other:?}"),
         }
         assert_eq!(

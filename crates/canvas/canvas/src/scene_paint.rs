@@ -272,7 +272,7 @@ pub fn paint_projection_filtered(
                 // visual edge. (Node-rep Decision 5 — face geometry.)
                 (Some(&a), Some(&b)) => {
                     trim_to_faces(a, b, radius_of(&edge.from), radius_of(&edge.to))
-                }
+                },
                 _ => continue,
             }
         };

@@ -326,7 +326,7 @@ impl TileLayout {
                         })
                         .collect(),
                 })
-            }
+            },
         };
     }
 
@@ -373,7 +373,7 @@ impl TileLayout {
                     axis: SplitAxis::Row,
                     children,
                 });
-            }
+            },
             Some(other) => {
                 self.root = Some(Pane::Split {
                     axis: SplitAxis::Row,
@@ -388,7 +388,7 @@ impl TileLayout {
                         },
                     ],
                 });
-            }
+            },
         }
     }
 
@@ -422,7 +422,7 @@ fn collect_slots<'a>(pane: &'a Pane, weight: f32, out: &mut Vec<SlotView<'a>>) {
             for b in children {
                 collect_slots(&b.pane, b.fraction, out);
             }
-        }
+        },
     }
 }
 

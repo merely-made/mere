@@ -151,14 +151,14 @@ impl CommandPaletteSession {
             Some(current) => {
                 let current = current as isize;
                 ((current + delta).rem_euclid(count)) as usize
-            }
+            },
             None => {
                 if delta >= 0 {
                     0
                 } else {
                     (count - 1) as usize
                 }
-            }
+            },
         };
         self.selected_index = Some(next);
     }

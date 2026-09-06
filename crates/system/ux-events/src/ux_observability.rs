@@ -194,16 +194,16 @@ impl UxObserver for CountingObserver {
         match event {
             UxEvent::SurfaceOpened { .. } => {
                 self.surfaces_opened.fetch_add(1, Ordering::Relaxed);
-            }
+            },
             UxEvent::SurfaceDismissed { .. } => {
                 self.surfaces_dismissed.fetch_add(1, Ordering::Relaxed);
-            }
+            },
             UxEvent::ActionDispatched { .. } => {
                 self.actions_dispatched.fetch_add(1, Ordering::Relaxed);
-            }
+            },
             UxEvent::OpenNodeDispatched { .. } => {
                 self.open_nodes_dispatched.fetch_add(1, Ordering::Relaxed);
-            }
+            },
         }
     }
 }

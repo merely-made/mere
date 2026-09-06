@@ -192,7 +192,7 @@ mod tests {
             } => {
                 assert_eq!(channel_id, "test.routed");
                 assert_eq!(byte_len, 7);
-            }
+            },
             _ => panic!("wrong variant"),
         }
 
@@ -221,7 +221,7 @@ mod tests {
                 assert_eq!(name, "test.span");
                 assert_eq!(phase, SpanPhase::Exit);
                 assert_eq!(duration_us, Some(1234));
-            }
+            },
             _ => panic!("wrong variant"),
         }
 

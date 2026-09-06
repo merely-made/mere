@@ -131,7 +131,7 @@ where
 {
     let mut length = [0u8; 4];
     match stream.read_exact(&mut length).await {
-        Ok(_) => {}
+        Ok(_) => {},
         Err(error) if error.kind() == std::io::ErrorKind::UnexpectedEof => return Ok(None),
         Err(error) => return Err(error.into()),
     }
@@ -237,11 +237,11 @@ where
                 facts: facts.clone(),
                 limits,
             }))
-        }
+        },
         Err(reason) => {
             finish_refusal(&mut stream).await;
             Ok(Err(reason))
-        }
+        },
     }
 }
 

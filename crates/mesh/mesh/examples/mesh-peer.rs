@@ -90,12 +90,12 @@ fn parse_args() -> Result<Args, String> {
                 .next()
                 .ok_or_else(|| "post needs the text to echo: mesh-peer post <text>".to_string())?;
             Mode::Post(text)
-        }
+        },
         other => {
             return Err(format!(
                 "usage: mesh-peer work|post <text> [--peer <ticket>] (got {other:?})"
             ));
-        }
+        },
     };
     let mut peer_tickets = Vec::new();
     while let Some(flag) = args.next() {
@@ -219,7 +219,7 @@ async fn main() -> Result<(), String> {
         Ok(path) => {
             let store = MeshStore::at_path(&path).map_err(|e| format!("store: {e}"))?;
             run(store, transport, author, me, mesh_id, args.mode).await
-        }
+        },
         Err(_) => {
             run(
                 MeshStore::in_memory(),
@@ -230,7 +230,7 @@ async fn main() -> Result<(), String> {
                 args.mode,
             )
             .await
-        }
+        },
     };
 }
 
@@ -294,7 +294,7 @@ async fn run<B: Backend + Clone + Send + Sync + 'static>(
                     std::process::exit(0);
                 }
             }
-        }
+        },
         Mode::Work => {
             // What this device advertises. The blob space is device-local: a V2
             // job whose input this machine does not hold simply fails to run,
@@ -332,7 +332,7 @@ async fn run<B: Backend + Clone + Send + Sync + 'static>(
                             "mesh-peer does not supervise leases; {action:?} needs a host \
                              supervisor (mesh host lanes plan, gate H0)"
                         ));
-                    }
+                    },
                     WorkerAction::Claim(id) => {
                         println!("claiming job {}", hex8(&id.0));
                         synced
@@ -345,7 +345,7 @@ async fn run<B: Backend + Clone + Send + Sync + 'static>(
                             )
                             .await
                             .map_err(|e| format!("claim: {e}"))?;
-                    }
+                    },
                     WorkerAction::Execute(id) => {
                         let job = board.job(id).expect("execute targets a known job");
                         // Blocking, single-job, uncancellable — which is exactly
@@ -374,7 +374,7 @@ async fn run<B: Backend + Clone + Send + Sync + 'static>(
                                     output: Box::new(output),
                                     at_ms: now_ms(),
                                 }
-                            }
+                            },
                             None => {
                                 // `payload` is `None` only after an accepted checkpoint erased a
                                 // TERMINAL job's input, and `next_action` already guards on it
@@ -398,13 +398,13 @@ async fn run<B: Backend + Clone + Send + Sync + 'static>(
                                     result,
                                     at_ms: now_ms(),
                                 }
-                            }
+                            },
                         };
                         synced
                             .author(&author, &event)
                             .await
                             .map_err(|e| format!("return result: {e}"))?;
-                    }
+                    },
                     WorkerAction::Idle => {
                         let status = synced.sync_status();
                         let line = format!(
@@ -420,9 +420,9 @@ async fn run<B: Backend + Clone + Send + Sync + 'static>(
                             print_board(&board);
                             last_status = line;
                         }
-                    }
+                    },
                 }
             }
-        }
+        },
     }
 }

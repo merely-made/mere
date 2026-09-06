@@ -210,28 +210,28 @@ pub async fn run_turns(component_path: &Path, turns: &[(&str, &str)]) -> wasmtim
                 match dom_view::apply(&mut h.dom, &mut h.revision, batch) {
                     Ok(new_rev) if new_rev == before => {
                         outcomes.push(format!("{kind}: no-op (rev unchanged at {new_rev})"))
-                    }
+                    },
                     Ok(new_rev) => {
                         outcomes.push(format!("{kind}: applied (cited {cited}) -> rev {new_rev}"))
-                    }
+                    },
                     Err(TurnError::RevisionConflict(cur)) => outcomes.push(format!(
                         "{kind}: revision-conflict (cited {cited}, current {cur})"
                     )),
                     Err(TurnError::UnknownNode(id)) => {
                         outcomes.push(format!("{kind}: unknown-node {id} (nothing applied)"))
-                    }
+                    },
                     Err(TurnError::Refused(why)) => {
                         outcomes.push(format!("{kind}: refused ({why})"))
-                    }
+                    },
                 }
-            }
+            },
             Err(TurnError::Refused(why)) => outcomes.push(format!("{kind}: declined ({why})")),
             Err(TurnError::RevisionConflict(cur)) => {
                 outcomes.push(format!("{kind}: guest revision-conflict ({cur})"))
-            }
+            },
             Err(TurnError::UnknownNode(id)) => {
                 outcomes.push(format!("{kind}: guest unknown-node {id}"))
-            }
+            },
         }
     }
 

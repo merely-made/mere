@@ -90,7 +90,7 @@ pub(super) fn wallet_local_secret_store(
             load_or_create_auto_unlock_root(identity_auto_unlock_root_path(data_root))
                 .map(|root| root.map(|key| SealedRecordStorage::open_with_key(data_root, key)))
                 .map_err(io_backend_error)
-        }
+        },
         StartupUnlockMode::Prompt | StartupUnlockMode::Locked => Ok(None),
     }
 }
@@ -108,7 +108,7 @@ fn wallet_local_secret_store_read_only(
             load_existing_auto_unlock_root(identity_auto_unlock_root_path(data_root))
                 .map(|root| root.map(|key| SealedRecordStorage::open_with_key(data_root, key)))
                 .map_err(io_backend_error)
-        }
+        },
         StartupUnlockMode::Prompt | StartupUnlockMode::Locked => Ok(None),
     }
 }
@@ -157,7 +157,7 @@ pub fn load_identity_seed(data_root: &Path) -> io::Result<Option<[u8; 32]>> {
         match store.load_record::<[u8; 32]>(relative) {
             Ok(Some(seed)) => return Ok(Some(seed)),
             Ok(None) => return Ok(None),
-            Err(_) => {}
+            Err(_) => {},
         }
     }
     if local_store.is_none() && looks_like_sealed_record(&path) {

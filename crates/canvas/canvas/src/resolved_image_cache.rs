@@ -66,7 +66,7 @@ impl ResolvedImageCache {
             Some(entry) => {
                 entry.touched = self.clock;
                 true
-            }
+            },
             None => false,
         }
     }

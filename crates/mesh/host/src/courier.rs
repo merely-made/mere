@@ -260,7 +260,7 @@ impl BlobCourier for TransportCourier {
                         self.blobs
                             .fetch_from_named(&self.transport, peer, hash, tag)
                             .await
-                    }
+                    },
                     None => self.blobs.fetch_from(&self.transport, peer, hash).await,
                 };
                 if fetched.is_ok() {

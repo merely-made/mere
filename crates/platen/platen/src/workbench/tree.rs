@@ -79,7 +79,7 @@ impl Pane {
                 for b in children {
                     b.pane.collect_members(out);
                 }
-            }
+            },
         }
     }
 
@@ -96,7 +96,7 @@ impl Pane {
         match self {
             Pane::Stack(s) if s.members.contains(&member) => {
                 s.members.iter().copied().find(|m| *m != member)
-            }
+            },
             Pane::Stack(_) => None,
             Pane::Split { children, .. } => children
                 .iter()
@@ -131,7 +131,7 @@ impl Pane {
                 } else {
                     false
                 }
-            }
+            },
             Pane::Split { children, .. } => children.iter_mut().any(|b| b.pane.activate(member)),
         }
     }
@@ -155,7 +155,7 @@ impl Pane {
                     self.collapse();
                 }
                 found
-            }
+            },
         }
     }
 
@@ -192,7 +192,7 @@ impl Pane {
                     s.active = ti + 1;
                 }
                 true
-            }
+            },
             Pane::Split { children, .. } => children
                 .iter_mut()
                 .any(|b| b.pane.stack_into(member, target)),
@@ -246,7 +246,7 @@ impl Pane {
                 };
                 *self = Pane::Split { axis, children };
                 true
-            }
+            },
             Pane::Stack(_) => false,
             Pane::Split {
                 axis: my_axis,
@@ -283,7 +283,7 @@ impl Pane {
                 children
                     .iter_mut()
                     .any(|b| b.pane.split_beside(member, target, axis, after))
-            }
+            },
         }
     }
 
@@ -293,10 +293,10 @@ impl Pane {
         match (self, path.split_first()) {
             (Pane::Split { children, .. }, None) => {
                 Some(children.iter().map(|b| b.fraction).collect())
-            }
+            },
             (Pane::Split { children, .. }, Some((&i, rest))) => {
                 children.get(i).and_then(|b| b.pane.fractions_at(rest))
-            }
+            },
             _ => None,
         }
     }
@@ -311,7 +311,7 @@ impl Pane {
                 }
                 renormalize(children);
                 true
-            }
+            },
             (Pane::Split { children, .. }, Some((&i, rest))) => children
                 .get_mut(i)
                 .map(|b| b.pane.set_fractions_at(rest, fractions))
@@ -330,14 +330,14 @@ impl Pane {
             Pane::Stack(s) if s.members.len() == 1 => TileTree::single(tile_for(s.members[0])),
             Pane::Stack(s) => {
                 TileTree::stack(s.members.iter().map(|m| tile_for(*m)).collect(), s.active)
-            }
+            },
             Pane::Split { axis, children } => {
                 let branches = children
                     .iter()
                     .map(|b| TileBranch::new(b.fraction, b.pane.to_tile_tree(tile_for)))
                     .collect();
                 TileTree::split(*axis, branches)
-            }
+            },
         }
     }
 }
@@ -396,7 +396,7 @@ mod tests {
                 assert_eq!(children.len(), 3, "extended, not nested");
                 let sum: f32 = children.iter().map(|b| b.fraction).sum();
                 assert!((sum - 1.0).abs() < 1e-5, "fractions renormalized");
-            }
+            },
             other => panic!("expected a row split, got {other:?}"),
         }
         assert_eq!(members(&root), vec![m(1), m(2), m(3)]);
@@ -431,10 +431,10 @@ mod tests {
                             "the second column nests a Column split"
                         );
                         assert_eq!(children.len(), 2);
-                    }
+                    },
                     other => panic!("expected a nested column split, got {other:?}"),
                 }
-            }
+            },
             other => panic!("expected a row split, got {other:?}"),
         }
         assert_eq!(members(&root), vec![m(1), m(2), m(3)]);
@@ -476,7 +476,7 @@ mod tests {
                     matches!(&children[1].pane, Pane::Stack(s) if s.members == vec![m(2)]),
                     "the column collapsed to a plain stack"
                 );
-            }
+            },
             other => panic!("expected a row split, got {other:?}"),
         }
         assert_eq!(members(&root), vec![m(1), m(2)]);

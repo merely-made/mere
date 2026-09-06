@@ -312,10 +312,10 @@ impl SecretServiceStore {
         match collection {
             Some(id) => {
                 catalog.aliases.insert(alias.to_string(), id);
-            }
+            },
             None => {
                 catalog.aliases.remove(alias);
-            }
+            },
         }
         self.save_catalog(&catalog)
     }

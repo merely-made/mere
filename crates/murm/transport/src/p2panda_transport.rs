@@ -160,7 +160,7 @@ impl AsyncWrite for P2pandaStream {
                 self.shutdown_ack = None;
                 self.shutdown_complete = result.is_ok();
                 Poll::Ready(result)
-            }
+            },
         }
     }
 }
@@ -263,14 +263,14 @@ impl ProtocolHandler for ScopedBlobsProtocol {
                 match request {
                     iroh_blobs::protocol::Request::Get(request) => {
                         let _ = iroh_blobs::provider::handle_get(pair, store, request).await;
-                    }
+                    },
                     iroh_blobs::protocol::Request::GetMany(request) => {
                         let _ = iroh_blobs::provider::handle_get_many(pair, store, request).await;
-                    }
+                    },
                     iroh_blobs::protocol::Request::Observe(request) => {
                         let _ = iroh_blobs::provider::handle_observe(pair, store, request).await;
-                    }
-                    _ => {}
+                    },
+                    _ => {},
                 }
             });
         }
@@ -314,7 +314,7 @@ async fn scoped_request_allowed(
                         .map(|hash| authorizer.allows(scope, peer, BlobHash::from(hash)))
                         .unwrap_or(false)
                 })
-        }
+        },
         Request::GetMany(request) => request
             .hashes
             .iter()
@@ -664,7 +664,7 @@ impl P2pandaTransport {
         // earlier priority chain built the plain protocol up front and then
         // discarded it unused whenever a scoped authorizer was present.
         match blobs {
-            BlobServing::None => {}
+            BlobServing::None => {},
             BlobServing::Plain(store) => {
                 endpoint
                     .accept(
@@ -673,7 +673,7 @@ impl P2pandaTransport {
                     )
                     .await
                     .map_err(|e| TransportError::Backend(format!("blobs register: {e}")))?;
-            }
+            },
             BlobServing::Authorized(store, authorizer) => {
                 endpoint
                     .accept(
@@ -687,7 +687,7 @@ impl P2pandaTransport {
                     .map_err(|e| {
                         TransportError::Backend(format!("authorized blobs register: {e}"))
                     })?;
-            }
+            },
             BlobServing::Scoped(store, scope, authorizer) => {
                 endpoint
                     .accept(
@@ -700,7 +700,7 @@ impl P2pandaTransport {
                     )
                     .await
                     .map_err(|e| TransportError::Backend(format!("scoped blobs register: {e}")))?;
-            }
+            },
         }
 
         // Optional LAN discovery: mDNS populates the address book so peers on

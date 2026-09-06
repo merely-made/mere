@@ -139,12 +139,12 @@ impl Backend for FjallStore {
                     self.partition
                         .insert(key, value.as_slice())
                         .map_err(|e| StoreError::Backend(format!("fjall batch put {key}: {e}")))?;
-                }
+                },
                 WriteOp::Delete { key } => {
                     self.partition.remove(key).map_err(|e| {
                         StoreError::Backend(format!("fjall batch delete {key}: {e}"))
                     })?;
-                }
+                },
             }
         }
         Ok(())

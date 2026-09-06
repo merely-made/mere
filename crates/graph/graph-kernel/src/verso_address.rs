@@ -83,7 +83,7 @@ impl VersoAddress {
                     Some(segment) => GraphshellSettingsPath::from_segment(&segment),
                 };
                 Some(Self::Settings(settings_path))
-            }
+            },
             "frame" => Some(Self::Frame(segments.next()?)),
             "tile-group" => Some(Self::TileGroup(segments.next()?)),
             "view" => {
@@ -102,19 +102,19 @@ impl VersoAddress {
                                     category,
                                     segments: preserved_segments,
                                 });
-                            }
+                            },
                         };
                         Some(Self::View(view_target))
-                    }
+                    },
                 }
-            }
+            },
             "tool" => {
                 let name = segments.next()?;
                 let instance = segments
                     .next()
                     .and_then(|segment| segment.parse::<u32>().ok());
                 Some(Self::Tool { name, instance })
-            }
+            },
             "clip" => Some(Self::Clip(segments.next()?)),
             _ => Some(Self::Other {
                 category,
@@ -219,19 +219,19 @@ impl fmt::Display for VersoAddress {
             Self::Frame(frame_id) => write!(f, "{VERSO_SCHEME_PREFIX}frame/{frame_id}"),
             Self::TileGroup(group_id) => {
                 write!(f, "{VERSO_SCHEME_PREFIX}tile-group/{group_id}")
-            }
+            },
             Self::View(VersoViewTarget::Legacy(view_id)) => {
                 write!(f, "{VERSO_SCHEME_PREFIX}view/{view_id}")
-            }
+            },
             Self::View(VersoViewTarget::Graph(graph_id)) => {
                 write!(f, "{VERSO_SCHEME_PREFIX}view/graph/{graph_id}")
-            }
+            },
             Self::View(VersoViewTarget::Node(node_id)) => {
                 write!(f, "{VERSO_SCHEME_PREFIX}view/node/{node_id}")
-            }
+            },
             Self::View(VersoViewTarget::Note(note_id)) => {
                 write!(f, "{VERSO_SCHEME_PREFIX}view/note/{note_id}")
-            }
+            },
             Self::Tool { name, instance } => match instance {
                 Some(instance) => write!(f, "{VERSO_SCHEME_PREFIX}tool/{name}/{instance}"),
                 None => write!(f, "{VERSO_SCHEME_PREFIX}tool/{name}"),
@@ -243,7 +243,7 @@ impl fmt::Display for VersoAddress {
                     write!(f, "/{segment}")?;
                 }
                 Ok(())
-            }
+            },
         }
     }
 }

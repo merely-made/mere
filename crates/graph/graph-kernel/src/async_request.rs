@@ -146,7 +146,7 @@ impl<T> AsyncRequestState<T> {
             } if *pending == generation => {
                 *self = Self::Ready { generation, value };
                 true
-            }
+            },
             _ => false,
         }
     }

@@ -162,7 +162,7 @@ impl EdgePayload {
                     self.containment = None;
                 }
                 true
-            }
+            },
             RelationSelector::Arrangement(sub_kind) => {
                 let Some(data) = self.arrangement.as_mut() else {
                     return false;
@@ -174,7 +174,7 @@ impl EdgePayload {
                     self.arrangement = None;
                 }
                 true
-            }
+            },
             RelationSelector::Imported(sub_kind) => {
                 let Some(data) = self.imported.as_mut() else {
                     return false;
@@ -186,7 +186,7 @@ impl EdgePayload {
                     self.imported = None;
                 }
                 true
-            }
+            },
             RelationSelector::Provenance(sub_kind) => {
                 let Some(data) = self.provenance.as_mut() else {
                     return false;
@@ -198,7 +198,7 @@ impl EdgePayload {
                     self.provenance = None;
                 }
                 true
-            }
+            },
         }
     }
 

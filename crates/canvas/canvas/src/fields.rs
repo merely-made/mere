@@ -301,7 +301,7 @@ impl Canvas {
                 max_x += dx;
                 min_y += dy;
                 max_y += dy;
-            }
+            },
             FieldHandle::Resize { left, top } => {
                 if left {
                     min_x = omin_x + dx;
@@ -327,7 +327,7 @@ impl Canvas {
                 if max_y - min_y < FIELD_MIN_SIZE {
                     max_y = min_y + FIELD_MIN_SIZE;
                 }
-            }
+            },
         }
         self.reshape_field(fd.id, min_x, min_y, max_x, max_y);
     }

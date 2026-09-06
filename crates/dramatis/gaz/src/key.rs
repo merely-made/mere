@@ -162,7 +162,7 @@ impl fmt::Display for KeyParseError {
         match self {
             Self::Length { found } => {
                 write!(f, "a contact key is 64 hex characters, found {found}")
-            }
+            },
             Self::Digit => f.write_str("a contact key holds hex digits only"),
         }
     }

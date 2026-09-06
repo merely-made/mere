@@ -100,15 +100,15 @@ impl std::fmt::Display for LiveViewRecordError {
         match self {
             Self::UnsupportedVersion { found } => {
                 write!(formatter, "unsupported live-view record version {found}")
-            }
+            },
             Self::MissingProvider => write!(formatter, "live-view source provider is missing"),
             Self::MissingScope => write!(formatter, "live-view source scope is missing"),
             Self::EmptyHistoricalCursor => {
                 write!(formatter, "live-view historical cursor is missing")
-            }
+            },
             Self::UnsupportedFoldVersion { found } => {
                 write!(formatter, "unsupported fold record version {found}")
-            }
+            },
             Self::FoldScopeMismatch {
                 fold_scope,
                 source_scope,
@@ -121,7 +121,7 @@ impl std::fmt::Display for LiveViewRecordError {
                     formatter,
                     "live-view fold must contain sorted, distinct members"
                 )
-            }
+            },
         }
     }
 }
@@ -187,7 +187,7 @@ impl std::fmt::Display for LiveViewSourceError {
         match self {
             Self::MissingSource => {
                 write!(formatter, "the requested live-view source is unavailable")
-            }
+            },
             Self::StaleCursor => write!(formatter, "the requested live-view cursor is unavailable"),
             Self::AccessDenied => write!(
                 formatter,
@@ -198,7 +198,7 @@ impl std::fmt::Display for LiveViewSourceError {
                     formatter,
                     "the requested live-view arrangement is unsupported"
                 )
-            }
+            },
         }
     }
 }

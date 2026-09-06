@@ -116,7 +116,7 @@ impl MeshDropSelector {
             // is enough to fetch it. It counts as an input for privacy.
             MeshEvent::JobPosted { .. } | MeshEvent::JobPostedV2 { .. } => {
                 self.privacy.include_job_inputs
-            }
+            },
             MeshEvent::JobDone { .. }
             | MeshEvent::JobDoneV2 { .. }
             | MeshEvent::JobCompletedUnderLease { .. } => self.privacy.include_job_results,
@@ -139,7 +139,7 @@ impl MeshDropSelector {
                     .any(|job| job.state.is_terminal());
                 (self.privacy.include_job_inputs || !contains_inputs)
                     && (self.privacy.include_job_results || !contains_results)
-            }
+            },
             // A device saying which master key it answers to carries no job
             // content at all — and a catch-up without it cannot resolve who to
             // fetch blobs from, so it always travels.
@@ -166,7 +166,7 @@ impl MeshDropSelector {
             | MeshEvent::LeaseRevokedByOwner { .. } => self.priorities.job_claimed,
             MeshEvent::JobPosted { .. } | MeshEvent::JobPostedV2 { .. } => {
                 self.priorities.job_posted
-            }
+            },
         }
     }
 

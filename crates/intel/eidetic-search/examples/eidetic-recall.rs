@@ -252,12 +252,12 @@ async fn open_or_mint(store: &mut FjallStore, index_dir: &str) -> Result<TrailIn
             );
             let memory = load(store).await?;
             mint_index(&memory, index_dir)
-        }
+        },
         Err(SearchError::Missing(_)) => {
             println!("no index yet — minting from traces");
             let memory = load(store).await?;
             mint_index(&memory, index_dir)
-        }
+        },
         Err(e) => Err(format!("open index: {e}")),
     }
 }
@@ -276,23 +276,23 @@ async fn run() -> Result<(), String> {
             "--db" => {
                 i += 1;
                 db = args.get(i).cloned().ok_or("--db needs a path")?;
-            }
+            },
             "--index" => {
                 i += 1;
                 index_dir = Some(args.get(i).cloned().ok_or("--index needs a path")?);
-            }
+            },
             "--model-dir" => {
                 i += 1;
                 model_dir = args.get(i).cloned().ok_or("--model-dir needs a path")?;
-            }
+            },
             "--backend" => {
                 i += 1;
                 backend = args.get(i).cloned().ok_or("--backend needs cpu|wgpu")?;
-            }
+            },
             "--owner" => {
                 i += 1;
                 owner = args.get(i).cloned().ok_or("--owner needs a tag")?;
-            }
+            },
             other => rest.push(other.to_string()),
         }
         i += 1;
@@ -328,7 +328,7 @@ async fn run() -> Result<(), String> {
                 items.len(),
                 traces.len()
             );
-        }
+        },
         Some("ingest-history") => {
             let path = rest.get(1).ok_or(usage)?;
             let contents =
@@ -350,7 +350,7 @@ async fn run() -> Result<(), String> {
                 items.len(),
                 traces.len()
             );
-        }
+        },
         Some("index") => {
             let memory = load(&mut store).await?;
             let index = mint_index(&memory, &index_dir)?;
@@ -358,7 +358,7 @@ async fn run() -> Result<(), String> {
                 "minted trail index at {index_dir}: {} traversal document(s)",
                 index.doc_count().map_err(|e| format!("count: {e}"))?
             );
-        }
+        },
         Some("search") => {
             let query = rest.get(1).ok_or(usage)?;
             let n = rest.get(2).and_then(|s| s.parse().ok()).unwrap_or(10);
@@ -374,7 +374,7 @@ async fn run() -> Result<(), String> {
                     h.at_ms
                 );
             }
-        }
+        },
         Some("embed-index") => {
             let provider = load_provider(&model_dir, &backend)?;
             let memory = load(&mut store).await?;
@@ -420,7 +420,7 @@ async fn run() -> Result<(), String> {
                 pages.len(),
                 provider.dimensions()
             );
-        }
+        },
         Some("recall") => {
             let query = rest.get(1).ok_or(usage)?;
             let n = rest.get(2).and_then(|s| s.parse().ok()).unwrap_or(10);
@@ -473,7 +473,7 @@ async fn run() -> Result<(), String> {
                     titles.get(&hit.url).map(String::as_str).unwrap_or("")
                 );
             }
-        }
+        },
         Some("report") => {
             let index = open_or_mint(&mut store, &index_dir).await?;
             let domains = index
@@ -490,7 +490,7 @@ async fn run() -> Result<(), String> {
             for (bucket, count) in &histogram {
                 println!("  {bucket:>13}  {count}");
             }
-        }
+        },
         Some("corridor") => {
             let n = rest.get(1).and_then(|s| s.parse().ok()).unwrap_or(10);
             let memory = load(&mut store).await?;
@@ -499,7 +499,7 @@ async fn run() -> Result<(), String> {
             for e in &corridor {
                 print_event(e);
             }
-        }
+        },
         Some("window") => {
             let start: u64 = rest.get(1).and_then(|s| s.parse().ok()).ok_or(usage)?;
             let end: u64 = rest.get(2).and_then(|s| s.parse().ok()).ok_or(usage)?;
@@ -509,7 +509,7 @@ async fn run() -> Result<(), String> {
             for p in &pages {
                 println!("  {} {}", p.url, p.title.as_deref().unwrap_or(""));
             }
-        }
+        },
         Some("co") => {
             let a = rest.get(1).ok_or(usage)?;
             let b = rest.get(2).ok_or(usage)?;
@@ -518,7 +518,7 @@ async fn run() -> Result<(), String> {
                 "direct traversals between the two (either direction): {}",
                 memory.co_occurrence(a, b)
             );
-        }
+        },
         Some("stats") => {
             let memory = load(&mut store).await?;
             let traces: Vec<&BrowsingTrace> = memory.traces().collect();
@@ -532,7 +532,7 @@ async fn run() -> Result<(), String> {
             let span = match (traces.first(), traces.last()) {
                 (Some(first), Some(last)) => {
                     format!("{} → {}", first.started_at_ms, last.ended_at_ms)
-                }
+                },
                 _ => "empty".to_string(),
             };
             println!(
@@ -541,7 +541,7 @@ async fn run() -> Result<(), String> {
                 events,
                 urls.len()
             );
-        }
+        },
         _ => return Err(usage.to_string()),
     }
     Ok(())

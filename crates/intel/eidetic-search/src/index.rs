@@ -462,7 +462,7 @@ mod tests {
             Err(SearchError::FormatMismatch { found, current }) => {
                 assert!(found.contains("0.1.0"));
                 assert!(!current.is_empty());
-            }
+            },
             other => panic!("expected FormatMismatch, got {:?}", other.err()),
         }
 
@@ -494,7 +494,7 @@ mod tests {
             Err(SearchError::FormatMismatch { found, current }) => {
                 assert!(found.contains("fields v2"));
                 assert!(current.contains("fields v3"));
-            }
+            },
             other => panic!("expected field-version mismatch, got {:?}", other.err()),
         }
 

@@ -110,7 +110,7 @@ impl OperationPolicy<MeshExt> for MeshPolicy<'_> {
                         .then_some(Hash::from(job.id.0))
                 });
                 Ok(Admission::keep(target).erasing_payloads(erased))
-            }
+            },
             MeshEvent::HistoryPruned { checkpoint, .. } => {
                 if !operation.header.extensions.prune_flag.is_set() {
                     return Err(Reject::new(
@@ -131,7 +131,7 @@ impl OperationPolicy<MeshExt> for MeshPolicy<'_> {
                     ));
                 }
                 Ok(Admission::prune_before_current(target))
-            }
+            },
             _ => {
                 if operation.header.extensions.prune_flag.is_set() {
                     return Err(Reject::new(
@@ -150,13 +150,13 @@ impl OperationPolicy<MeshExt> for MeshPolicy<'_> {
                     MeshEvent::JobPostedV2 { spec, .. } => {
                         spec.validate()
                             .map_err(|err| Reject::new("invalid-job-spec", err.to_string()))?;
-                    }
+                    },
                     MeshEvent::JobDoneV2 { output, .. }
                     | MeshEvent::JobCompletedUnderLease { output, .. } => {
                         output
                             .validate_self()
                             .map_err(|err| Reject::new("invalid-job-result", err.to_string()))?;
-                    }
+                    },
                     MeshEvent::LeaseGranted {
                         granted_at_ms,
                         expires_at_ms,
@@ -174,7 +174,7 @@ impl OperationPolicy<MeshExt> for MeshPolicy<'_> {
                                 "lease window exceeds the longest a job may authorize",
                             ));
                         }
-                    }
+                    },
                     MeshEvent::DeviceAttested { attestation }
                         if !crate::directory::attests(
                             *operation.header.verifying_key.as_bytes(),
@@ -185,11 +185,11 @@ impl OperationPolicy<MeshExt> for MeshPolicy<'_> {
                             "invalid-device-attestation",
                             "an attestation must be signed by the author's own master key",
                         ));
-                    }
-                    _ => {}
+                    },
+                    _ => {},
                 }
                 Ok(Admission::keep(target))
-            }
+            },
         }
     }
 }
@@ -461,7 +461,7 @@ impl<B: Backend + Clone> MeshStore<B> {
             .filter_map(|decoded| match &decoded.event {
                 MeshEvent::RetentionCheckpoint { checkpoint } => {
                     Some((decoded.op, checkpoint.as_ref()))
-                }
+                },
                 _ => None,
             })
             .collect();

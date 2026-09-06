@@ -75,7 +75,7 @@ impl UxProbe for OpenDismissBalanceProbe {
                     });
                 }
                 *entry += 1;
-            }
+            },
             UxEvent::SurfaceDismissed { surface, .. } => {
                 let mut counts = self.open_counts.lock().unwrap();
                 let entry = counts.entry(*surface).or_insert(0);
@@ -88,8 +88,8 @@ impl UxProbe for OpenDismissBalanceProbe {
                 } else {
                     *entry -= 1;
                 }
-            }
-            _ => {}
+            },
+            _ => {},
         }
     }
 

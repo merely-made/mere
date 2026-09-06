@@ -154,7 +154,7 @@ impl Murm<P2pandaTransport> {
                 .await
                 .map_err(|e| MurmError::Backend(e.to_string()))?;
                 Some(joined)
-            }
+            },
             None => None,
         };
 

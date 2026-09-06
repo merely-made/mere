@@ -115,7 +115,7 @@ impl SandFall {
                 match self.cells[idx] {
                     SAND => self.settle_sand(c, r),
                     WATER => self.settle_water(c, r),
-                    _ => {}
+                    _ => {},
                 }
             }
         }
@@ -161,7 +161,7 @@ impl SandFall {
         match self.cells[below] {
             EMPTY => return self.relocate(src, below),
             WATER => return self.swap_cells(src, below),
-            _ => {}
+            _ => {},
         }
         for dx in self.rand_dirs() {
             let nc = c as i32 + dx;
@@ -172,7 +172,7 @@ impl SandFall {
             match self.cells[diag] {
                 EMPTY => return self.relocate(src, diag),
                 WATER => return self.swap_cells(src, diag),
-                _ => {}
+                _ => {},
             }
         }
     }

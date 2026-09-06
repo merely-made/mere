@@ -111,7 +111,7 @@ pub(crate) fn cmd_mint(profile: &Profile, rest: &[String]) -> Result<(), String>
             std::fs::write(&path, format!("{encoded}\n"))
                 .map_err(|err| format!("write {path}: {err}"))?;
             println!("wrote {path}");
-        }
+        },
         None => println!("{encoded}"),
     }
     eprintln!(
@@ -208,7 +208,7 @@ fn resolve_ssh_key(profile: &Profile, typed: &str) -> Result<ssh_key::PrivateKey
                 "{typed:?} is ambiguous; it matches:\n  {}",
                 names.join("\n  ")
             ))
-        }
+        },
     }
 }
 
@@ -330,7 +330,7 @@ pub(crate) fn cmd_face(
                 return Err(format!(
                     "unknown face shape {other:?} (work, research, burner)"
                 ));
-            }
+            },
         };
         ssh_face::store_policy(&mut profile, &policy).map_err(str_err)?;
         storage

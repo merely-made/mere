@@ -110,7 +110,7 @@ impl Canvas {
             None => {
                 fallback_edges = dedup_edges_weighted(&self.graph);
                 &fallback_edges
-            }
+            },
         };
         let edges = weighted
             .iter()
@@ -145,7 +145,7 @@ impl Canvas {
                             }
                         }
                     }
-                }
+                },
                 signals::Overlay::BridgeEmphasis { node, .. } => {
                     if in_scope(node) {
                         if let Some(p) = positions.get(node) {
@@ -156,8 +156,8 @@ impl Canvas {
                             ));
                         }
                     }
-                }
-                _ => {}
+                },
+                _ => {},
             }
         }
         (nodes, edges, rings)
@@ -206,7 +206,7 @@ impl Canvas {
                     || *bridges != self.show_bridge_rings
                     || *scope != self.gloss_scope_keys()
                     || *sfocus != focus
-            }
+            },
             None => true,
         }
     }

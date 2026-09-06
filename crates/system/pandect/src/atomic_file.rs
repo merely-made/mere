@@ -71,7 +71,7 @@ fn replace_temporary_with_backup(
         Ok(()) => {
             fs::remove_file(backup)?;
             Ok(())
-        }
+        },
         Err(replacement_error) => {
             if let Err(restore_error) = rename(backup, target) {
                 return Err(io::Error::other(format!(
@@ -79,7 +79,7 @@ fn replace_temporary_with_backup(
                 )));
             }
             Err(replacement_error)
-        }
+        },
     }
 }
 

@@ -75,14 +75,14 @@ pub fn sparql(graph: &Graph, query: &str) -> Result<QueryRows, String> {
                 rows.push(row);
             }
             Ok(QueryRows { variables, rows })
-        }
+        },
         QueryResults::Boolean(value) => Ok(QueryRows {
             variables: vec!["result".to_string()],
             rows: vec![vec![Some(value.to_string())]],
         }),
         QueryResults::Graph(_) => {
             Err("CONSTRUCT / DESCRIBE results are not supported in this cut".to_string())
-        }
+        },
     }
 }
 
@@ -148,14 +148,14 @@ mod baseline {
                     rows.push(row);
                 }
                 Ok(QueryRows { variables, rows })
-            }
+            },
             OxQueryResults::Boolean(value) => Ok(QueryRows {
                 variables: vec!["result".to_string()],
                 rows: vec![vec![Some(value.to_string())]],
             }),
             OxQueryResults::Graph(_) => {
                 Err("CONSTRUCT / DESCRIBE results are not supported in this cut".to_string())
-            }
+            },
         }
     }
 
@@ -184,7 +184,7 @@ mod baseline {
                     )
                     .into()
                 }
-            }
+            },
             oxrdf::Term::Triple(triple) => OxTriple::new(
                 to_ox_subject(&triple.subject)?,
                 OxNamedNode::new(triple.predicate.as_str()).ok()?,

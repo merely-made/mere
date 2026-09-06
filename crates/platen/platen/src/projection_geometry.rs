@@ -112,7 +112,7 @@ impl TreeGeometry {
                 for b in children {
                     b.node.collect_members(out);
                 }
-            }
+            },
         }
     }
 
@@ -122,7 +122,7 @@ impl TreeGeometry {
             TreeGeometry::Stack { .. } => 1,
             TreeGeometry::Split { children, .. } => {
                 children.iter().map(|b| b.node.leaf_count()).sum()
-            }
+            },
         }
     }
 
@@ -137,7 +137,7 @@ impl TreeGeometry {
                 } else if *active >= members.len() {
                     *active = members.len() - 1;
                 }
-            }
+            },
             TreeGeometry::Split { children, .. } => {
                 // Renormalize only when the stored fractions are actually invalid (a
                 // non-positive share, or a sum drifted past a hair from 1). Valid
@@ -161,7 +161,7 @@ impl TreeGeometry {
                 for b in children.iter_mut() {
                     b.node.sanitize();
                 }
-            }
+            },
         }
     }
 }
@@ -235,7 +235,7 @@ mod tests {
                     TreeGeometry::Stack { active, .. } => assert_eq!(*active, 0, "active clamped"),
                     other => panic!("expected a stack, got {other:?}"),
                 }
-            }
+            },
             other => panic!("expected a split, got {other:?}"),
         }
     }

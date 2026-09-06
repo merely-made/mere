@@ -93,15 +93,15 @@ mod stream;
 pub use crate::native::answerer::{Answerer, AnswererConfig, fingerprint_from_str0m};
 pub use crate::native::error::NativeError;
 pub use crate::native::loopback::{LoopbackOfferer, loopback_pair};
-pub use crate::native::stream::{
-    PumpEnd, STREAM_BUFFER_BYTES, stream_over_frames, stream_over_frames_with,
-};
 pub use crate::native::session::{
     Carrier, CarrierConfig, CarrierControl, CarrierStats, DEDICATED_DRIVER_STACK_BYTES,
     DEDICATED_SCTP_WINDOW_BYTES, DEFAULT_CHANNEL_LABEL, DEFAULT_IDLE_TIMEOUT,
     DEFAULT_INBOUND_QUEUE_FRAMES, DEFAULT_OPEN_TIMEOUT, DEFAULT_OUTBOUND_QUEUE_FRAMES,
     DEFAULT_SCTP_WINDOW_BYTES, DriverPlacement, FrameReader, FrameWriter,
     MIN_DEDICATED_DRIVER_STACK_BYTES, SessionFingerprints, serve, serve_advertised,
+};
+pub use crate::native::stream::{
+    PumpEnd, STREAM_BUFFER_BYTES, stream_over_frames, stream_over_frames_with,
 };
 
 /// The WebRTC engine this adapter drives, re-exported.

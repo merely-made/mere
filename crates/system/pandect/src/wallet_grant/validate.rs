@@ -115,7 +115,7 @@ pub(crate) fn validate_remote_auth_enrollment_bundle(
     // certificate would ride in on the others' validity.
     for certificate in bundle.grant.certificates() {
         match certificate_device_id(certificate) {
-            Some(device) if device == local.device_id => {}
+            Some(device) if device == local.device_id => {},
             Some(device) => {
                 return Err(io::Error::new(
                     io::ErrorKind::PermissionDenied,
@@ -125,13 +125,13 @@ pub(crate) fn validate_remote_auth_enrollment_bundle(
                         local.device_id.as_uuid()
                     ),
                 ));
-            }
+            },
             None => {
                 return Err(io::Error::new(
                     io::ErrorKind::InvalidData,
                     "grant certificate does not address a device",
                 ));
-            }
+            },
         }
         if certificate.certificate.subject != local.public_key().0 {
             return Err(io::Error::new(

@@ -262,7 +262,7 @@ impl From<SecretServiceError> for SecretDbusError {
         match error {
             SecretServiceError::CollectionNotFound(_) | SecretServiceError::ItemNotFound(_) => {
                 Self::NoSuchObject(error.to_string())
-            }
+            },
             SecretServiceError::Limit(_) => Self::LimitsExceeded(error.to_string()),
             SecretServiceError::InvalidText(_) => Self::InvalidArgs(error.to_string()),
             _ => Self::Failed(error.to_string()),

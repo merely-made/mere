@@ -496,7 +496,7 @@ fn load_all_quarantines_when_rollback_fails() {
         |record| match record {
             ModExtensionRecord::Action { action_id } if action_id == "action:mod:failing" => {
                 Err("simulated rollback failure".to_string())
-            }
+            },
             _ => Ok(()),
         },
     );
@@ -553,7 +553,7 @@ fn unload_mod_quarantines_and_preserves_records_on_removal_failure() {
         .unload_mod_with("mod:target", |record| match record {
             ModExtensionRecord::Action { action_id } if action_id == "action:mod:target" => {
                 Err("simulated removal failure".to_string())
-            }
+            },
             _ => Ok(()),
         })
         .expect_err("unload should fail when removal fails");

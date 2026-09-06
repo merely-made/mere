@@ -317,7 +317,7 @@ pub fn project_fold(graph: &Graph, fold: &FoldRecord) -> Option<FoldProjection> 
                         relation.kind.family(),
                     ))
                     .or_default() += 1;
-            }
+            },
             (false, true) => {
                 *bundles
                     .entry((
@@ -326,8 +326,8 @@ pub fn project_fold(graph: &Graph, fold: &FoldRecord) -> Option<FoldProjection> 
                         relation.kind.family(),
                     ))
                     .or_default() += 1;
-            }
-            (false, false) => {}
+            },
+            (false, false) => {},
         }
     }
 

@@ -173,11 +173,11 @@ impl DelegationCertificate {
             DelegationParent::Root(id) => {
                 bytes.push(0);
                 bytes.extend_from_slice(&id);
-            }
+            },
             DelegationParent::Certificate(id) => {
                 bytes.push(1);
                 bytes.extend_from_slice(&id.0);
-            }
+            },
         }
         bytes.extend_from_slice(&self.issuer);
         bytes.extend_from_slice(&self.subject);
@@ -454,7 +454,7 @@ fn push_expiry(bytes: &mut Vec<u8>, value: Option<u64>) {
         Some(value) => {
             bytes.push(1);
             bytes.extend_from_slice(&value.to_le_bytes());
-        }
+        },
         None => bytes.push(0),
     }
 }

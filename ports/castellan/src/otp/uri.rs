@@ -81,14 +81,14 @@ impl fmt::Display for OtpUriError {
             OtpUriError::MissingCounter => f.write_str("a hotp uri must carry a counter parameter"),
             OtpUriError::InvalidNumber { parameter, value } => {
                 write!(f, "{parameter} is not a number: {value:?}")
-            }
+            },
             OtpUriError::UnknownAlgorithm(a) => write!(f, "unknown algorithm {a:?}"),
             OtpUriError::UnsupportedDigits(digits) => {
                 write!(f, "the key uri format supports 6 or 8 digits, not {digits}")
-            }
+            },
             OtpUriError::DuplicateParameter(parameter) => {
                 write!(f, "the uri repeats the {parameter} parameter")
-            }
+            },
             OtpUriError::IssuerMismatch { label, parameter } => write!(
                 f,
                 "issuer label {label:?} does not match issuer parameter {parameter:?}"
@@ -251,21 +251,21 @@ fn percent_decode(input: &str) -> String {
                     Some(byte) => {
                         out.push(byte);
                         i += 3;
-                    }
+                    },
                     None => {
                         out.push(bytes[i]);
                         i += 1;
-                    }
+                    },
                 }
-            }
+            },
             b'+' => {
                 out.push(b' ');
                 i += 1;
-            }
+            },
             byte => {
                 out.push(byte);
                 i += 1;
-            }
+            },
         }
     }
     String::from_utf8_lossy(&out).into_owned()

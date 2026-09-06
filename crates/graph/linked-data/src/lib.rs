@@ -644,7 +644,7 @@ fn compact_node_object(
                     predicate.to_string()
                 };
                 (emit_key, json!({ "@id": object.as_str() }))
-            }
+            },
             Term::Literal(object) => (predicate.to_string(), compact_literal_json_value(object)),
             _ => continue,
         };

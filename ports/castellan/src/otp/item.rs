@@ -108,10 +108,10 @@ impl fmt::Display for OtpItemError {
             OtpItemError::NotFound(id) => write!(f, "no OTP item {id} for this persona"),
             OtpItemError::UnsupportedRecordVersion(version) => {
                 write!(f, "unsupported sealed OTP item version {version}")
-            }
+            },
             OtpItemError::HotpCounterExhausted => {
                 f.write_str("the HOTP counter has no next durable value")
-            }
+            },
         }
     }
 }
@@ -351,7 +351,7 @@ impl StoredOtpItem {
                 .map_err(OtpItemError::Generation),
             StoredOtpCodeStyle::SteamGuard => {
                 Ok(SteamGuard::from_secret_bytes(&self.secret)?.code_at_unix_time(unix_secs))
-            }
+            },
         }
     }
 
@@ -370,7 +370,7 @@ impl StoredOtpItem {
                 .map_err(OtpItemError::Generation)?,
             StoredOtpKind::Hotp { counter } => {
                 Otp::hotp(self.secret.clone(), counter).map_err(OtpItemError::Generation)?
-            }
+            },
         };
         otp.with_digits(self.digits)
             .map_err(OtpItemError::Generation)

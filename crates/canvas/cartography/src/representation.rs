@@ -130,7 +130,7 @@ impl RepresentationState {
                 } else {
                     0.0
                 }
-            }
+            },
         }
     }
 }

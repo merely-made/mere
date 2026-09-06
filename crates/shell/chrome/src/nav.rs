@@ -133,7 +133,7 @@ fn encode_query(q: &str) -> String {
         match b {
             b'A'..=b'Z' | b'a'..=b'z' | b'0'..=b'9' | b'-' | b'.' | b'_' | b'~' => {
                 out.push(b as char)
-            }
+            },
             b' ' => out.push('+'),
             _ => out.push_str(&format!("%{b:02X}")),
         }

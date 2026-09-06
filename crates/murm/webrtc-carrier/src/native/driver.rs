@@ -332,10 +332,10 @@ impl Driver {
                                 self.closing = true;
                                 self.close_deadline = Some(Instant::now() + CLOSE_FLUSH_LIMIT);
                             }
-                        }
-                        Command::Run => {}
+                        },
+                        Command::Run => {},
                     }
-                }
+                },
                 Wake::Datagram(Ok((len, source))) => {
                     self.reset_streak = 0;
                     self.shared
@@ -347,7 +347,7 @@ impl Driver {
                             self.rtc
                                 .handle_input(Input::Receive(Instant::now(), receive))
                                 .map_err(engine)?;
-                        }
+                        },
                         Err(_) => {
                             // Not STUN, DTLS, RTP or RTCP. A stray datagram on
                             // a public UDP port is ordinary; it is counted and
@@ -356,16 +356,16 @@ impl Driver {
                                 .counters
                                 .malformed_datagrams
                                 .fetch_add(1, Ordering::Relaxed);
-                        }
+                        },
                     }
-                }
+                },
                 Wake::Datagram(Err(err)) if peer_is_gone(&err) => {
                     self.reset_streak += 1;
                     self.shared
                         .counters
                         .socket_resets
                         .fetch_add(1, Ordering::Relaxed);
-                }
+                },
                 Wake::Datagram(Err(err)) => return Err(NativeError::Socket(err)),
                 Wake::Outbound(Some(frame)) => self.pending_out = Some(frame),
                 Wake::Outbound(None) => self.outbound_open = false,
@@ -377,7 +377,7 @@ impl Driver {
                     self.rtc
                         .handle_input(Input::Timeout(Instant::now()))
                         .map_err(engine)?;
-                }
+                },
             }
         }
     }
@@ -404,10 +404,10 @@ impl Driver {
                                 .counters
                                 .socket_resets
                                 .fetch_add(1, Ordering::Relaxed);
-                        }
+                        },
                         Err(err) => return Err(NativeError::Socket(err)),
                     }
-                }
+                },
                 Output::Event(event) => self.on_event(event)?,
             }
         }
@@ -422,7 +422,7 @@ impl Driver {
                     self.channel = None;
                     self.finished = true;
                 }
-            }
+            },
             Event::ChannelBufferedAmountLow(id) => {
                 if self.channel == Some(id) {
                     self.shared
@@ -430,19 +430,19 @@ impl Driver {
                         .low_water_events
                         .fetch_add(1, Ordering::Relaxed);
                 }
-            }
+            },
             Event::Connected => self.capture_fingerprints()?,
             Event::Closed => self.finished = true,
             Event::IceConnectionStateChange(state) => match state {
                 IceConnectionState::Disconnected => {
                     self.disconnect_deadline = Some(Instant::now() + self.idle_timeout);
-                }
+                },
                 IceConnectionState::Connected | IceConnectionState::Completed => {
                     self.disconnect_deadline = None;
-                }
-                _ => {}
+                },
+                _ => {},
             },
-            _ => {}
+            _ => {},
         }
         Ok(())
     }
@@ -551,12 +551,12 @@ impl Driver {
                         .bytes_received
                         .fetch_add(used as u64, Ordering::Relaxed);
                     self.delivery.pending.push_back(frame);
-                }
+                },
                 Err(FrameError::Incomplete { .. } | FrameError::ShortHeader { .. }) => break,
                 Err(err) => {
                     self.rx_buf.drain(..consumed);
                     return Err(NativeError::Frame(err));
-                }
+                },
             }
         }
         self.rx_buf.drain(..consumed);
@@ -573,7 +573,7 @@ impl Driver {
                         .pop_front()
                         .expect("the queue was checked non-empty");
                     permit.send(frame);
-                }
+                },
                 Err(mpsc::error::TrySendError::Full(())) => break,
                 Err(mpsc::error::TrySendError::Closed(())) => {
                     // The reader is gone. Reading is not optional on a session
@@ -586,7 +586,7 @@ impl Driver {
                     self.delivery.pending.clear();
                     self.delivery.closed = true;
                     break;
-                }
+                },
             }
         }
     }
@@ -688,13 +688,13 @@ impl Driver {
                     .bytes_sent
                     .fetch_add(len as u64, Ordering::Relaxed);
                 Ok(true)
-            }
+            },
             // SCTP declined: it stays ours, still counted as queued, retried on
             // the next turn. This is the case the 5 ms clamp exists for.
             Ok(false) => {
                 self.pending_out = Some(frame);
                 Ok(false)
-            }
+            },
             Err(err) => Err(NativeError::Write(err.to_string())),
         }
     }

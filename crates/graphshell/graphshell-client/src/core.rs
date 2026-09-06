@@ -274,7 +274,7 @@ impl SessionCore {
         {
             PresentationResolution::Ready(presentation) => {
                 Ok(Progress::Done(Outcome::Resolved(Box::new(presentation))))
-            }
+            },
             PresentationResolution::NeedsResource(request) => Ok(self.begin(
                 Pending::Resolve {
                     session: session.clone(),
@@ -451,14 +451,14 @@ impl SessionCore {
                 CarrierResponseBody::Descriptor(descriptor) => {
                     self.descriptor = descriptor.clone();
                     Ok(Progress::Done(Outcome::Descriptor(Box::new(descriptor))))
-                }
+                },
                 other => Err(unexpected("descriptor", &other)),
             },
             Pending::Mount { request } => match body {
                 CarrierResponseBody::Snapshot(snapshot) => {
                     let session = self.apply_snapshot(*snapshot, request)?;
                     Ok(Progress::Done(Outcome::Mounted(session)))
-                }
+                },
                 other => Err(unexpected("snapshot", &other)),
             },
             Pending::Resnapshot { session, request } => match body {
@@ -471,7 +471,7 @@ impl SessionCore {
                     }
                     self.apply_snapshot(*snapshot, request)?;
                     Ok(Progress::Done(Outcome::Resnapshotted))
-                }
+                },
                 other => Err(unexpected("snapshot", &other)),
             },
             Pending::Resolve { session, instance } => match body {
@@ -481,30 +481,30 @@ impl SessionCore {
                         .map_err(|error| format!("resource was rejected: {error:?}"))?;
                     // May want another resource; `resolve` asks again if so.
                     self.resolve(&session, instance)
-                }
+                },
                 other => Err(unexpected("resource", &other)),
             },
             Pending::Intent => match body {
                 CarrierResponseBody::Intent(result) => {
                     Ok(Progress::Done(Outcome::Intent(Box::new(result))))
-                }
+                },
                 other => Err(unexpected("intent result", &other)),
             },
             Pending::Resume { notice, attempts } => match body {
                 CarrierResponseBody::Resume(reply) => {
-                    let applied = self
-                        .client
-                        .apply_resume(&notice.session, reply)
-                        .map_err(|error| {
-                            format!(
-                                "Graphshell rejected resume for {}: {error:?}",
-                                notice.session.0
-                            )
-                        })?;
+                    let applied =
+                        self.client
+                            .apply_resume(&notice.session, reply)
+                            .map_err(|error| {
+                                format!(
+                                    "Graphshell rejected resume for {}: {error:?}",
+                                    notice.session.0
+                                )
+                            })?;
                     match applied {
                         ResumeApplication::Current(_) | ResumeApplication::Applied(_) => {
                             Ok(Progress::Done(Outcome::Changed(true)))
-                        }
+                        },
                         ResumeApplication::Resynchronize(next) => {
                             let attempts = attempts + 1;
                             if attempts >= RESUME_ATTEMPTS {
@@ -516,9 +516,9 @@ impl SessionCore {
                                 Pending::Resume { notice, attempts },
                                 CarrierRequestBody::Resume(next),
                             ))
-                        }
+                        },
                     }
-                }
+                },
                 other => Err(unexpected("resume reply", &other)),
             },
             Pending::PollDiscover => match body {
@@ -529,7 +529,7 @@ impl SessionCore {
                 CarrierResponseBody::Closed => {
                     self.purge();
                     Ok(Progress::Done(Outcome::Closed))
-                }
+                },
                 other => Err(unexpected("session close", &other)),
             },
         }

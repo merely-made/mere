@@ -55,7 +55,7 @@ impl Unlock {
         match std::env::var_os(PASSPHRASE_ENV) {
             Some(value) => {
                 Self::Passphrase(Zeroizing::new(value.to_string_lossy().as_bytes().to_vec()))
-            }
+            },
             None => Self::AutoOs,
         }
     }
@@ -100,7 +100,7 @@ pub fn open_storage(dir: &Path, unlock: Unlock) -> Result<OpenedStorage, Identit
                 storage: Box::new(storage),
                 description: format!("passphrase-encrypted vault at {}", path.display()),
             })
-        }
+        },
         Unlock::AutoOs => match SealedProfileStorage::open_auto_os(dir)? {
             Some(storage) => Ok(OpenedStorage {
                 storage: Box::new(storage),

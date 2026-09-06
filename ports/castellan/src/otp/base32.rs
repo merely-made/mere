@@ -38,16 +38,16 @@ impl fmt::Display for Base32Error {
         match self {
             Base32Error::InvalidCharacter(c) => {
                 write!(f, "character {c:?} is not in the base32 alphabet")
-            }
+            },
             Base32Error::InvalidLength(n) => {
                 write!(f, "{n} base32 characters do not form whole bytes")
-            }
+            },
             Base32Error::NonCanonical => {
                 write!(
                     f,
                     "trailing bits are not zero; the encoding is not canonical"
                 )
-            }
+            },
         }
     }
 }

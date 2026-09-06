@@ -341,7 +341,7 @@ fn run_crawl_visits_a_small_site_within_the_depth_cap() {
         |update| match update {
             CrawlUpdate::Progress { last_url, .. } => visited.push(last_url),
             CrawlUpdate::Contribution { .. } => contribution_count += 1,
-            CrawlUpdate::Done { .. } => {}
+            CrawlUpdate::Done { .. } => {},
         },
     ));
 

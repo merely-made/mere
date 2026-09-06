@@ -88,11 +88,11 @@ impl ActionSink for StubGate {
             Ok(()) => {
                 self.accepted.push((name.to_string(), payload.to_string()));
                 Ok(())
-            }
+            },
             Err(refusal) => {
                 self.refusals.push(refusal.clone());
                 Err(refusal)
-            }
+            },
         }
     }
 }

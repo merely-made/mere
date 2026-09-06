@@ -220,11 +220,11 @@ pub fn load_carry_view(data_root: &Path) -> io::Result<CarryView> {
                             .unwrap_or_default(),
                         wrapped_epoch_count,
                     });
-                }
+                },
                 true if device.grant_ref.is_some() => view
                     .unavailable
                     .push(format!("grant bytes unavailable for device {device_id}")),
-                true => {}
+                true => {},
             }
         }
     } else {

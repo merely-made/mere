@@ -780,7 +780,7 @@ mod tests {
                 assert_eq!(channel.as_str(), "session");
                 assert_eq!(text, "hello, bob, this is alice from a real signed post");
                 assert_eq!(*timestamp_ms, 1_700_000_000_000);
-            }
+            },
             _ => panic!("expected Text post"),
         }
     }

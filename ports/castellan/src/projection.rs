@@ -629,7 +629,7 @@ fn policy_label(policy: personae::signing::SigningPolicy) -> String {
         personae::signing::SigningPolicy::Session => "session".to_string(),
         personae::signing::SigningPolicy::ShortTtl { idle_seconds } => {
             format!("{idle_seconds}s idle")
-        }
+        },
         personae::signing::SigningPolicy::PerUse => "every use".to_string(),
     }
 }

@@ -186,7 +186,7 @@ async fn memory_transport_admits_and_refuses_by_owner_rule() {
             match decision {
                 SessionDecision::Deny { reason } => {
                     assert_eq!(reason, DenyReason::ServiceNotOffered)
-                }
+                },
                 SessionDecision::Accept { .. } => unreachable!(),
             }
         }

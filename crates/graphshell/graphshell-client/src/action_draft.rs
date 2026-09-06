@@ -134,11 +134,11 @@ impl ActionDraft {
                     .insert(field_name.to_string(), value.to_string());
                 self.error = None;
                 Ok(())
-            }
+            },
             Err(error) => {
                 self.error = Some(error.to_string());
                 Err(error)
-            }
+            },
         }
     }
 
@@ -160,11 +160,11 @@ impl ActionDraft {
                     intent: self.action.intent.0.clone(),
                     payload,
                 })
-            }
+            },
             Err(error) => {
                 self.error = Some(error.to_string());
                 Err(error)
-            }
+            },
         }
     }
 

@@ -72,20 +72,20 @@ pub fn scene_from_projection(
         match overlay {
             Overlay::ImportanceScale { node, factor } => {
                 importance.insert(*node, *factor);
-            }
+            },
             Overlay::ActivityHeat { node, intensity } => {
                 channels
                     .entry(*node)
                     .or_default()
                     .push((HEAT_CHANNEL.to_string(), *intensity));
-            }
+            },
             Overlay::BridgeEmphasis { node, weight } => {
                 channels
                     .entry(*node)
                     .or_default()
                     .push((BRIDGE_CHANNEL.to_string(), *weight));
-            }
-            _ => {}
+            },
+            _ => {},
         }
     }
 

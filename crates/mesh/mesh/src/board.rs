@@ -224,14 +224,14 @@ impl JobBoard {
                         .entry(job.id)
                         .or_default()
                         .insert(*winner, ResultRecord::Inline(result.clone()));
-                }
+                },
                 JobState::Committed { winner, output } => {
                     results
                         .entry(job.id)
                         .or_default()
                         .insert(*winner, ResultRecord::Committed(output.clone()));
-                }
-                JobState::Posted | JobState::Claimed { .. } => {}
+                },
+                JobState::Posted | JobState::Claimed { .. } => {},
             }
         }
 
@@ -257,7 +257,7 @@ impl JobBoard {
                             by: author,
                         },
                     );
-                }
+                },
                 MeshEvent::JobPostedV2 { spec, .. } => {
                     // Defence in depth: the store refuses a malformed spec
                     // before it is ever persisted, so this only fires for a
@@ -274,25 +274,25 @@ impl JobBoard {
                             by: author,
                         },
                     );
-                }
+                },
                 MeshEvent::JobClaimed { job, at_ms } => {
                     claims
                         .entry(JobId(job))
                         .or_default()
                         .insert(*op.hash.as_bytes(), ClaimFact { author, at_ms });
-                }
+                },
                 MeshEvent::JobDone { job, result, .. } => {
                     results
                         .entry(JobId(job))
                         .or_default()
                         .insert(author, ResultRecord::Inline(result));
-                }
+                },
                 MeshEvent::JobDoneV2 { job, output, .. } => {
                     results
                         .entry(JobId(job))
                         .or_default()
                         .insert(author, ResultRecord::Committed(output));
-                }
+                },
                 MeshEvent::LeaseGranted {
                     job,
                     epoch,
@@ -310,7 +310,7 @@ impl JobBoard {
                             expires_at_ms,
                         },
                     );
-                }
+                },
                 MeshEvent::LeaseHeartbeat {
                     job,
                     lease,
@@ -328,7 +328,7 @@ impl JobBoard {
                             body: LeaseFactBody::Heartbeat(progress),
                         },
                     );
-                }
+                },
                 MeshEvent::LeaseReleased {
                     job,
                     lease,
@@ -346,7 +346,7 @@ impl JobBoard {
                             body: LeaseFactBody::End(LeaseEnd::Released { reason, at_ms }),
                         },
                     );
-                }
+                },
                 MeshEvent::LeaseRevokedByOwner {
                     job,
                     lease,
@@ -364,7 +364,7 @@ impl JobBoard {
                             body: LeaseFactBody::End(LeaseEnd::Reclaimed { reason, at_ms }),
                         },
                     );
-                }
+                },
                 MeshEvent::JobCompletedUnderLease {
                     job,
                     lease,
@@ -380,12 +380,12 @@ impl JobBoard {
                             output,
                         },
                     );
-                }
+                },
                 MeshEvent::DeviceAttested { attestation } => {
                     // Defence in depth behind the store's admission check.
                     devices.admit(author, &attestation);
-                }
-                MeshEvent::RetentionCheckpoint { .. } | MeshEvent::HistoryPruned { .. } => {}
+                },
+                MeshEvent::RetentionCheckpoint { .. } | MeshEvent::HistoryPruned { .. } => {},
             }
         }
 
@@ -434,7 +434,7 @@ impl JobBoard {
                     (None, None) => JobState::Posted,
                     (None, Some(winner)) => {
                         post.resolve(winner, results.get(&id).and_then(|r| r.get(&winner)))
-                    }
+                    },
                 },
             };
             jobs.insert(

@@ -138,7 +138,7 @@ where
                 } else {
                     outcome.posts_rejected += 1;
                 }
-            }
+            },
             Err(_) => outcome.posts_rejected += 1,
         }
     }
@@ -199,7 +199,7 @@ where
         .map_err(|e| MurmError::Backend(e.to_string()))?;
     match reply {
         notochord::SessionReply::Reject { reason } => return Ok(Err(reason)),
-        notochord::SessionReply::Accept { .. } => {}
+        notochord::SessionReply::Accept { .. } => {},
     }
     for post in posts {
         write_frame(&mut stream, &encode_post(post), MAX_POST_FRAME)

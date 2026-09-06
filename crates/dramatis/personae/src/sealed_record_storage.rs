@@ -138,17 +138,17 @@ impl SealedRecordStorage {
                 ))
             })?;
         match lease.try_lock() {
-            Ok(()) => {}
+            Ok(()) => {},
             Err(TryLockError::WouldBlock) => {
                 return Err(IdentityError::Backend(format!(
                     "sealed-record authority is already held for {root:?}"
                 )));
-            }
+            },
             Err(TryLockError::Error(error)) => {
                 return Err(IdentityError::Backend(format!(
                     "claim sealed-record authority {lease_path:?}: {error}"
                 )));
-            }
+            },
         }
         Ok(Self {
             root,
@@ -180,13 +180,13 @@ impl SealedRecordStorage {
             Err(err) if err.kind() == std::io::ErrorKind::NotFound => {
                 self.reconcile_freshness(&aad, revision(None, 0, true), true)?;
                 return Ok(None);
-            }
+            },
             Err(err) => {
                 return Err(IdentityError::Backend(format!(
                     "read sealed record {:?}: {err}",
                     path
                 )));
-            }
+            },
         };
         let envelope: SealedRecordEnvelope = serde_json::from_slice(&bytes).map_err(|err| {
             IdentityError::Backend(format!("parse sealed record {:?}: {err}", path))
@@ -371,12 +371,12 @@ impl SealedRecordStorage {
             Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
                 let absent = revision(None, 0, true);
                 return self.reconcile_freshness(aad, absent, true);
-            }
+            },
             Err(error) => {
                 return Err(IdentityError::Backend(format!(
                     "read sealed record {path:?}: {error}"
                 )));
-            }
+            },
         };
         let envelope: SealedRecordEnvelope = match serde_json::from_slice(&bytes) {
             Ok(envelope) => envelope,
@@ -400,7 +400,7 @@ impl SealedRecordStorage {
                 }
                 let unsealed = revision(None, 0, true);
                 return self.reconcile_freshness(aad, unsealed, true);
-            }
+            },
         };
         let legacy = envelope.version == LEGACY_SEALED_RECORD_FORMAT_VERSION;
         if !legacy && envelope.version != SEALED_RECORD_FORMAT_VERSION {
@@ -480,14 +480,14 @@ fn resolve_record_path(root: &Path, relative: &Path) -> Result<(PathBuf, String)
                 }
                 aad.push_str(&part.to_string_lossy());
                 normalized.push(part);
-            }
-            Component::CurDir => {}
+            },
+            Component::CurDir => {},
             Component::ParentDir | Component::RootDir | Component::Prefix(_) => {
                 return Err(IdentityError::Backend(format!(
                     "sealed record path must be relative and traversal-free: {:?}",
                     relative
                 )));
-            }
+            },
         }
     }
     if aad.is_empty() {

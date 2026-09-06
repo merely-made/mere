@@ -418,13 +418,13 @@ impl GatheredLeases {
                     if newest_heartbeat.is_none_or(|(at, op, _)| key > (at, op)) {
                         newest_heartbeat = Some((fact.at_ms, fact.operation, progress));
                     }
-                }
+                },
                 LeaseFactBody::End(end) => {
                     let key = (fact.at_ms, fact.operation);
                     if earliest_end.is_none_or(|(at, op, _)| key < (at, op)) {
                         earliest_end = Some((fact.at_ms, fact.operation, end));
                     }
-                }
+                },
             }
         }
 

@@ -291,7 +291,7 @@ impl SemanticData {
                         statement.predicate = predicate.clone();
                     }
                 }
-            }
+            },
             None => {
                 self.statements
                     .retain(|statement| statement.recognized_sub_kind.is_some());
@@ -300,7 +300,7 @@ impl SemanticData {
                         statement.predicate = predicate_iri(sub_kind).to_string();
                     }
                 }
-            }
+            },
         }
         self.rebuild_compat();
     }

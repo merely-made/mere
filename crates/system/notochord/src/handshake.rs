@@ -161,7 +161,7 @@ fn push_option(bytes: &mut Vec<u8>, value: Option<&[u8]>) {
         Some(value) => {
             bytes.push(1);
             push_bytes(bytes, value);
-        }
+        },
         None => bytes.push(0),
     }
 }
@@ -401,7 +401,7 @@ pub fn admit(
                 }),
                 Err(_) => Err(DenyReason::MalformedHello),
             }
-        }
+        },
     };
     (reply, outcome)
 }
@@ -449,11 +449,11 @@ pub fn respond(
                             }),
                             SessionDecision::Accept { class },
                         );
-                    }
+                    },
                     denial => denial,
                 }
             }
-        }
+        },
     };
     let reason = match &decision {
         SessionDecision::Deny { reason } => reason.clone(),

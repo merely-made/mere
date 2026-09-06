@@ -402,7 +402,7 @@ mod tests {
         match res {
             Err(IdentityError::Backend(msg)) => {
                 assert!(msg.contains("incorrect passphrase"), "got: {msg}");
-            }
+            },
             Err(e) => panic!("unexpected error variant: {e}"),
             Ok(_) => panic!("expected error, got Ok"),
         }

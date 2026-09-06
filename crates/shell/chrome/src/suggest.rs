@@ -175,7 +175,7 @@ pub fn match_label(m: &OmnibarMatch) -> String {
         OmnibarMatch::NodeUrl(h) => h.url.clone(),
         OmnibarMatch::SearchQuery { query, .. } => {
             format!("Search the web for \u{201c}{query}\u{201d}")
-        }
+        },
         // meerkat never produces the graph-scoped variants.
         _ => String::new(),
     }

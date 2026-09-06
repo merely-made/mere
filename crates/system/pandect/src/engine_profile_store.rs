@@ -97,7 +97,7 @@ pub fn engine_profile_path(
                     .join(ENGINE_PROFILES_DIR)
                     .join(engine_id),
             )
-        }
+        },
         EngineProfileScope::Graph => {
             let session_id = session_id?;
             let graph_id = graph_id?;
@@ -110,7 +110,7 @@ pub fn engine_profile_path(
                     .join(ENGINE_PROFILES_DIR)
                     .join(engine_id),
             )
-        }
+        },
     }
 }
 

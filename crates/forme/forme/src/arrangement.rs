@@ -254,7 +254,7 @@ impl Arrangement {
             Some(ArrangementNodeKind::TileIntent { member: slot }) => {
                 *slot = member;
                 true
-            }
+            },
             _ => false,
         }
     }

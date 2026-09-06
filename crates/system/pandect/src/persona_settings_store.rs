@@ -92,7 +92,7 @@ pub fn load_persona_settings(
             let settings = serde_json::from_str(&text)
                 .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))?;
             Ok(Some(settings))
-        }
+        },
         Err(e) if e.kind() == io::ErrorKind::NotFound => Ok(None),
         Err(e) => Err(e),
     }

@@ -370,7 +370,7 @@ fn tier_label(tier: UnlockTier) -> String {
         UnlockTier::Session => "session".to_string(),
         UnlockTier::ShortTtl { idle_seconds } => {
             format!("short-ttl ({idle_seconds}s idle; not enforced yet)")
-        }
+        },
         UnlockTier::PerUse => "per-use (agent refuses to sign; no confirmation UI yet)".to_string(),
     }
 }
@@ -428,7 +428,7 @@ fn resolve_key(profile: &Profile, typed: &str) -> Result<ProtocolKey, String> {
                 "{typed:?} is ambiguous; it matches:\n  {}",
                 candidates.join("\n  ")
             ))
-        }
+        },
     }
 }
 

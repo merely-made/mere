@@ -86,7 +86,7 @@ impl TileLayout {
                     }
                 }
                 (!pane.is_empty()).then_some(pane)
-            }
+            },
             None => flat_pane(arrangement),
         };
         TileLayout {
@@ -198,12 +198,12 @@ fn build_arrangement(
                 }
                 prev = Some(id);
             }
-        }
+        },
         Pane::Split { children, .. } => {
             for b in children {
                 build_arrangement(&b.pane, arr, node_of);
             }
-        }
+        },
     }
 }
 
@@ -235,7 +235,7 @@ fn flat_pane(arrangement: &Arrangement) -> Option<Pane> {
                     .map(|pane| Branch { fraction, pane })
                     .collect(),
             })
-        }
+        },
     }
 }
 
@@ -465,28 +465,28 @@ mod tests {
                 match lcg(&mut st) % 8 {
                     0 => {
                         wb.open_tile(a);
-                    }
+                    },
                     1 => {
                         wb.open_stack(&[a, b]);
-                    }
+                    },
                     2 => {
                         wb.split_beside_axis(a, b, axis, after);
-                    }
+                    },
                     3 => {
                         wb.split_out(a, axis, after);
-                    }
+                    },
                     4 => {
                         wb.move_to_slot_of(a, b);
-                    }
+                    },
                     5 => {
                         wb.open_in_slot_of(a, b);
-                    }
+                    },
                     6 => {
                         wb.close_tile(a);
-                    }
+                    },
                     _ => {
                         wb.activate(a);
-                    }
+                    },
                 }
                 // Occasionally nudge a top-level divider, exercising the fraction path.
                 if lcg(&mut st) % 3 == 0 {

@@ -42,7 +42,7 @@ impl Graph {
             Some(field) => {
                 field.lifecycle = lifecycle;
                 true
-            }
+            },
             None => false,
         }
     }

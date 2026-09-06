@@ -520,13 +520,13 @@ impl OwnerSettings {
             Ok(text) => text,
             Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
                 return Ok(Self::default());
-            }
+            },
             Err(error) => {
                 return Err(OwnerSettingsError::File {
                     path: path.display().to_string(),
                     message: error.to_string(),
                 });
-            }
+            },
         };
         serde_json::from_str(&text).map_err(|error| OwnerSettingsError::File {
             path: path.display().to_string(),
@@ -775,7 +775,7 @@ pub fn resolve_sync(
             } else {
                 Some(resolved)
             }
-        }
+        },
     }
 }
 

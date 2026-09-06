@@ -55,7 +55,7 @@ use std::sync::Mutex;
 use register_mod_loader::{ModCapability, ModManifest, WasmModRuntime, WasmModSource};
 use wasmtime::{Engine, Store, StoreLimits};
 
-use crate::{build_instance, seed_dom, DocumentCore, Grant, ScriptHost};
+use crate::{DocumentCore, Grant, ScriptHost, build_instance, seed_dom};
 
 /// One activated wasm mod: the live store + bindings, retained so `deactivate` can
 /// drive the teardown export before the store (and the instance it owns) is freed.

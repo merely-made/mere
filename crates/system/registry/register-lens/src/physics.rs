@@ -497,7 +497,7 @@ fn canonical_physics_profile_alias(requested: &str) -> Option<&'static str> {
     match requested {
         PHYSICS_ID_DRIFT | PHYSICS_ID_LEGACY_DEFAULT | PHYSICS_ID_LEGACY_LIQUID => {
             Some(PHYSICS_ID_DRIFT)
-        }
+        },
         PHYSICS_ID_SCATTER | PHYSICS_ID_LEGACY_GAS => Some(PHYSICS_ID_SCATTER),
         PHYSICS_ID_SETTLE | PHYSICS_ID_LEGACY_SOLID => Some(PHYSICS_ID_SETTLE),
         PHYSICS_ID_ARCHIPELAGO => Some(PHYSICS_ID_ARCHIPELAGO),

@@ -210,7 +210,7 @@ pub fn device_grant_set_ref(set: &DeviceGrantSet) -> CarryRef {
         Some(certificate) => {
             bytes.push(1);
             bytes.extend_from_slice(&certificate.certificate.id().0);
-        }
+        },
         None => bytes.push(0),
     }
     for (persona, certificate) in &set.personas {
@@ -252,7 +252,7 @@ pub fn load_device_grant_set(data_root: &Path, device: DeviceId) -> io::Result<D
 
     match std::fs::read(device_scope_certificate_path(data_root, device)) {
         Ok(bytes) => set.device = Some(decode_certificate(&bytes).map_err(invalid_data)?),
-        Err(e) if e.kind() == io::ErrorKind::NotFound => {}
+        Err(e) if e.kind() == io::ErrorKind::NotFound => {},
         Err(e) => return Err(e),
     }
 

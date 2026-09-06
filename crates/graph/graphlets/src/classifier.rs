@@ -162,7 +162,7 @@ pub fn shape_kind_from_tag(tag: &str) -> Option<GraphletKind> {
         _ => {
             let radius = tag.strip_prefix("ego:")?.parse().ok()?;
             GraphletKind::Ego { radius }
-        }
+        },
     })
 }
 

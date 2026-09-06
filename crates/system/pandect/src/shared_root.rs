@@ -87,7 +87,7 @@ pub fn adopt_legacy_identity(shared: &Path, legacy: &Path) -> io::Result<bool> {
                 copy_tree(&from, &to)?;
                 std::fs::remove_dir_all(&from)?;
                 moved = true;
-            }
+            },
         }
     }
     Ok(moved)

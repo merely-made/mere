@@ -192,7 +192,7 @@ fn split_beside_axis_makes_a_vertical_split() {
         workbench::TileTree::Split { axis, children } => {
             assert_eq!(axis, SplitAxis::Column, "a vertical split");
             assert_eq!(children.len(), 2);
-        }
+        },
         other => panic!("expected a column split, got {other:?}"),
     }
 }
@@ -301,7 +301,7 @@ fn to_tile_tree_stacked_slot_keeps_active() {
         TileTree::Stack(s) => {
             assert_eq!(s.tabs.len(), 3, "all tabs carried");
             assert_eq!(s.active, 2, "the active tab is preserved");
-        }
+        },
         other => panic!("expected a stack, got {other:?}"),
     }
 }
@@ -326,7 +326,7 @@ fn to_tile_tree_slots_become_a_weighted_row_split() {
                 "got {}",
                 children[1].fraction
             );
-        }
+        },
         other => panic!("expected a row split, got {other:?}"),
     }
 }

@@ -442,7 +442,7 @@ impl ActionId {
             | Self::NodeMarkTombstone => ActionCategory::Node,
             Self::EdgeConnectPair | Self::EdgeConnectBoth | Self::EdgeRemoveUser => {
                 ActionCategory::Edge
-            }
+            },
             Self::GraphFit
             | Self::GraphFitGraphlet
             | Self::GraphCycleFocusRegion

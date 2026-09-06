@@ -287,7 +287,7 @@ impl CoordinatedSelection {
                     resolved.retain(|target| targets.contains(target));
                 }
                 Some(resolved)
-            }
+            },
         }
     }
 }
@@ -468,7 +468,7 @@ impl fmt::Display for ProjectionCaptureError {
         match self {
             Self::UnsupportedVersion { found } => {
                 write!(formatter, "unsupported projection-capture version {found}")
-            }
+            },
             Self::InvalidScene(error) => write!(formatter, "invalid projection capture: {error}"),
             Self::MissingPresentationResource(resource) => write!(
                 formatter,
@@ -476,10 +476,10 @@ impl fmt::Display for ProjectionCaptureError {
             ),
             Self::Decode(error) => {
                 write!(formatter, "could not decode projection capture: {error}")
-            }
+            },
             Self::Encode(error) => {
                 write!(formatter, "could not encode projection capture: {error}")
-            }
+            },
         }
     }
 }
@@ -639,7 +639,7 @@ impl fmt::Display for LiveViewReferenceError {
                     formatter,
                     "unsupported live-view reference schema {found:?}"
                 )
-            }
+            },
             Self::MissingRecord => write!(formatter, "live-view record reference is missing"),
             Self::InvalidOpaqueReference => write!(
                 formatter,
@@ -647,10 +647,10 @@ impl fmt::Display for LiveViewReferenceError {
             ),
             Self::Decode(error) => {
                 write!(formatter, "could not decode live-view reference: {error}")
-            }
+            },
             Self::Encode(error) => {
                 write!(formatter, "could not encode live-view reference: {error}")
-            }
+            },
         }
     }
 }
@@ -876,13 +876,13 @@ impl fmt::Display for AssemblyError {
             Self::CorruptChunk => write!(formatter, "resource chunk failed its own address"),
             Self::OutOfOrder { expected, found } => {
                 write!(formatter, "expected chunk at {expected}, received {found}")
-            }
+            },
             Self::WrongResource => {
                 write!(
                     formatter,
                     "assembled bytes do not match the resource address"
                 )
-            }
+            },
         }
     }
 }
@@ -1367,7 +1367,7 @@ impl core::fmt::Display for CarrierError {
             CarrierError::Refused(message) => write!(f, "the endpoint refused: {message}"),
             CarrierError::Disconnected(message) => {
                 write!(f, "the endpoint is no longer reachable: {message}")
-            }
+            },
         }
     }
 }
@@ -1762,7 +1762,7 @@ mod tests {
             CarrierRequestBody::Resume(request) => {
                 assert_eq!(request.epoch, SceneEpoch(1));
                 assert_eq!(request.revision, Revision(4));
-            }
+            },
             other => panic!("resynchronize recovers a session: {other:?}"),
         }
         // Every session verb still round-trips.

@@ -129,7 +129,7 @@ impl SessionDriver {
             Some(core) => {
                 let progress = core.rediscover();
                 self.begin(progress)
-            }
+            },
         }
     }
 
@@ -161,7 +161,7 @@ impl SessionDriver {
             CarrierOutput::Notice(notice) => {
                 self.notices.push_back(notice);
                 Ok(Advance::Noted)
-            }
+            },
             CarrierOutput::Response(response) => {
                 let expected = self.inflight.ok_or_else(|| {
                     format!(
@@ -181,10 +181,10 @@ impl SessionDriver {
                 match core {
                     Adopted::Descriptor(descriptor) => {
                         Ok(Advance::Done(Outcome::Descriptor(Box::new(descriptor))))
-                    }
+                    },
                     Adopted::Folded(progress) => self.begin(progress),
                 }
-            }
+            },
         }
     }
 
@@ -230,10 +230,7 @@ impl SessionDriver {
 
     /// Route one response body: the first descriptor builds the core, anything
     /// else is folded into it.
-    fn core_or_adopt(
-        &mut self,
-        body: CarrierResponseBody,
-    ) -> Result<Adopted, String> {
+    fn core_or_adopt(&mut self, body: CarrierResponseBody) -> Result<Adopted, String> {
         match self.core.as_mut() {
             Some(core) => Ok(Adopted::Folded(core.on_response(body)?)),
             None => match body {
@@ -243,7 +240,7 @@ impl SessionDriver {
                         self.profile.clone(),
                     ));
                     Ok(Adopted::Descriptor(descriptor))
-                }
+                },
                 other => Err(crate::session::unexpected("descriptor", &other)),
             },
         }
@@ -346,7 +343,10 @@ mod tests {
         let advance = driver
             .on_line(&reply)
             .expect("the descriptor is an answer the core was waiting for");
-        assert!(matches!(advance, Advance::Done(Outcome::Descriptor(_))), "{advance:?}");
+        assert!(
+            matches!(advance, Advance::Done(Outcome::Descriptor(_))),
+            "{advance:?}"
+        );
         assert!(driver.core().is_some(), "the core survives a rediscovery");
         assert!(!driver.is_awaiting());
     }
@@ -425,7 +425,10 @@ mod tests {
         let advance = driver.on_line(&bell).expect("a bell is readable");
         assert!(matches!(advance, Advance::Noted));
         assert_eq!(driver.queued_notices(), 1);
-        assert!(driver.is_awaiting(), "the snapshot answer is still expected");
+        assert!(
+            driver.is_awaiting(),
+            "the snapshot answer is still expected"
+        );
         assert!(driver.take_notice().is_some());
         assert_eq!(driver.queued_notices(), 0);
     }

@@ -398,13 +398,13 @@ pub(super) fn legacy_binding(binding_id: &str) -> Option<(InputBinding, InputCon
         binding_id::toolbar::SUBMIT => Some((toolbar_submit_binding(), InputContext::OmnibarOpen)),
         binding_id::toolbar::NAV_BACK => {
             Some((toolbar_nav_back_binding(), InputContext::DetailView))
-        }
+        },
         binding_id::toolbar::NAV_FORWARD => {
             Some((toolbar_nav_forward_binding(), InputContext::DetailView))
-        }
+        },
         binding_id::toolbar::NAV_RELOAD => {
             Some((toolbar_nav_reload_binding(), InputContext::DetailView))
-        }
+        },
         _ => None,
     }
 }

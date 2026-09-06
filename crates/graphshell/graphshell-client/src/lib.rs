@@ -236,7 +236,7 @@ impl ClientState {
                     epoch: current.scene.epoch,
                     revision: current.scene.revision,
                 }));
-            }
+            },
             Err(error) => return Err(ClientDiffError::InvalidScene(error)),
         };
         let ack = ProjectionAck {
@@ -255,20 +255,20 @@ impl ClientState {
                         .bindings
                         .retain(|existing| existing.instance != binding.instance);
                     next.presentation.bindings.push(binding.clone());
-                }
+                },
                 PresentationChange::Unbind { instance } => next
                     .presentation
                     .bindings
                     .retain(|binding| binding.instance != *instance),
                 PresentationChange::ReplaceOffers { key, offers } => {
                     next.presentation.offers.insert(key.clone(), offers.clone());
-                }
+                },
                 PresentationChange::RemoveOffers { key } => {
                     next.presentation.offers.remove(key);
-                }
+                },
                 PresentationChange::InvalidateResource { resource } => {
                     next_resources.remove(&(diff.session.clone(), *resource));
-                }
+                },
             }
         }
         validate_presentation(&next).map_err(ClientDiffError::InvalidPresentation)?;
@@ -451,7 +451,7 @@ impl ClientState {
                 next.mounted.get_mut(session).unwrap().status = SessionStatus::Live;
                 *self = next;
                 Ok(ResumeApplication::Current(ack))
-            }
+            },
             ResumeReply::Diffs(diffs) => {
                 let mut last_ack = next
                     .acknowledgement(session)
@@ -466,16 +466,16 @@ impl ClientState {
                     {
                         DiffApplication::Applied(ack) | DiffApplication::AlreadyApplied(ack) => {
                             last_ack = ack
-                        }
+                        },
                         DiffApplication::Resynchronize(request) => {
                             return Ok(ResumeApplication::Resynchronize(request));
-                        }
+                        },
                     }
                 }
                 next.mounted.get_mut(session).unwrap().status = SessionStatus::Live;
                 *self = next;
                 Ok(ResumeApplication::Applied(last_ack))
-            }
+            },
             ResumeReply::Snapshot(snapshot) => {
                 if &snapshot.session != session {
                     return Err(ResumeApplyError::WrongSession);
@@ -487,7 +487,7 @@ impl ClientState {
                     .ok_or(ResumeApplyError::UnknownSession)?;
                 *self = next;
                 Ok(ResumeApplication::Applied(ack))
-            }
+            },
         }
     }
 
@@ -667,7 +667,7 @@ fn check_persistence_policy<E>(
         CacheRetention::MemoryOnly => Err(PersistenceError::NotPermitted),
         CacheRetention::EncryptedPersistent if protection != StoreProtection::EncryptedAtRest => {
             Err(PersistenceError::RequiresEncryptedStore)
-        }
+        },
         CacheRetention::EncryptedPersistent | CacheRetention::Exportable => Ok(()),
     }
 }

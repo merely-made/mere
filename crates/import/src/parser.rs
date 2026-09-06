@@ -83,7 +83,7 @@ fn collect_chrome_node(
                     tags: Vec::new(),
                 });
             }
-        }
+        },
         "folder" => {
             let label = normalize_optional_text(node.get("name").and_then(Value::as_str));
             let next_depth = folder_path.len();
@@ -103,14 +103,14 @@ fn collect_chrome_node(
             if node.get("name").and_then(Value::as_str).is_some() && !folder_path.is_empty() {
                 folder_path.pop();
             }
-        }
+        },
         _ => {
             if let Some(children) = node.get("children").and_then(Value::as_array) {
                 for child in children {
                     collect_chrome_node(child, location, folder_path, items);
                 }
             }
-        }
+        },
     }
 }
 
@@ -131,13 +131,13 @@ pub(super) fn parse_netscape_bookmark_html(contents: &str) -> Vec<ImportedBookma
                     match &tokens[index] {
                         HtmlToken::Tag(next) if next.is_closing("h3") => break,
                         HtmlToken::Text(text) => label.push_str(text),
-                        _ => {}
+                        _ => {},
                     }
                     index += 1;
                 }
                 let decoded_label = decode_html_entities(&label);
                 pending_folder_label = normalize_optional_text(Some(decoded_label.as_str()));
-            }
+            },
             HtmlToken::Tag(tag) if tag.is_opening("dl") => {
                 if let Some(label) = pending_folder_label.take() {
                     let depth = folder_path.len();
@@ -150,12 +150,12 @@ pub(super) fn parse_netscape_bookmark_html(contents: &str) -> Vec<ImportedBookma
                 } else {
                     dl_stack.push(false);
                 }
-            }
+            },
             HtmlToken::Tag(tag) if tag.is_closing("dl") => {
                 if dl_stack.pop().unwrap_or(false) {
                     folder_path.pop();
                 }
-            }
+            },
             HtmlToken::Tag(tag) if tag.is_opening("a") => {
                 let Some(raw_url) = tag.attr("href") else {
                     index += 1;
@@ -167,7 +167,7 @@ pub(super) fn parse_netscape_bookmark_html(contents: &str) -> Vec<ImportedBookma
                     match &tokens[index] {
                         HtmlToken::Tag(next) if next.is_closing("a") => break,
                         HtmlToken::Text(text) => title.push_str(text),
-                        _ => {}
+                        _ => {},
                     }
                     index += 1;
                 }
@@ -193,8 +193,8 @@ pub(super) fn parse_netscape_bookmark_html(contents: &str) -> Vec<ImportedBookma
                         tags: Vec::new(),
                     });
                 }
-            }
-            _ => {}
+            },
+            _ => {},
         }
         index += 1;
     }
@@ -398,6 +398,6 @@ fn decode_html_entity(entity: &str) -> Option<char> {
             } else {
                 None
             }
-        }
+        },
     }
 }

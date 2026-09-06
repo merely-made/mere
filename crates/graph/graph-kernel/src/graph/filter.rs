@@ -231,7 +231,7 @@ impl FacetExpr {
                     }
                 }
                 Ok(true)
-            }
+            },
             FacetExpr::Or(exprs) => {
                 for e in exprs {
                     if e.evaluate(projection)? {
@@ -239,7 +239,7 @@ impl FacetExpr {
                     }
                 }
                 Ok(false)
-            }
+            },
             FacetExpr::Not(inner) => Ok(!inner.evaluate(projection)?),
         }
     }
@@ -257,7 +257,7 @@ impl FacetPredicate {
         match self.operator {
             FacetOperator::Exists => return Ok(projection.contains_key(&self.facet_key)),
             FacetOperator::NotExists => return Ok(!projection.contains_key(&self.facet_key)),
-            _ => {}
+            _ => {},
         }
 
         let Some(value) = projection.get(&self.facet_key) else {
@@ -268,25 +268,25 @@ impl FacetPredicate {
         match (&self.operator, value, &self.operand) {
             (FacetOperator::Eq, FacetValue::Scalar(scalar), FacetOperand::Scalar(operand)) => {
                 Ok(scalar == operand)
-            }
+            },
             (FacetOperator::NotEq, FacetValue::Scalar(scalar), FacetOperand::Scalar(operand)) => {
                 Ok(scalar != operand)
-            }
+            },
             (FacetOperator::In, FacetValue::Scalar(scalar), FacetOperand::Set(set)) => {
                 Ok(set.contains(scalar))
-            }
+            },
             (FacetOperator::ContainsAny, FacetValue::Collection(coll), FacetOperand::Set(set)) => {
                 Ok(set.iter().any(|operand| {
                     coll.iter()
                         .any(|value| collection_value_matches(&self.facet_key, value, operand))
                 }))
-            }
+            },
             (FacetOperator::ContainsAll, FacetValue::Collection(coll), FacetOperand::Set(set)) => {
                 Ok(set.iter().all(|operand| {
                     coll.iter()
                         .any(|value| collection_value_matches(&self.facet_key, value, operand))
                 }))
-            }
+            },
             (
                 FacetOperator::Range,
                 FacetValue::Scalar(FacetScalar::Number(n)),
@@ -331,19 +331,19 @@ impl FacetPredicate {
             (FacetOperator::NotExists, _) => format!("!{}", self.facet_key),
             (FacetOperator::Eq, FacetOperand::Scalar(value)) => {
                 format!("{}={}", self.facet_key, facet_scalar_label(value))
-            }
+            },
             (FacetOperator::NotEq, FacetOperand::Scalar(value)) => {
                 format!("{}!={}", self.facet_key, facet_scalar_label(value))
-            }
+            },
             (FacetOperator::In, FacetOperand::Set(values)) => {
                 format!("{} in {}", self.facet_key, facet_set_label(values))
-            }
+            },
             (FacetOperator::ContainsAny, FacetOperand::Set(values)) => {
                 format!("{} has any {}", self.facet_key, facet_set_label(values))
-            }
+            },
             (FacetOperator::ContainsAll, FacetOperand::Set(values)) => {
                 format!("{} has all {}", self.facet_key, facet_set_label(values))
-            }
+            },
             (FacetOperator::Range, FacetOperand::Range { lo, hi }) => format!(
                 "{} in [{}..{}]",
                 self.facet_key,
@@ -391,7 +391,7 @@ fn collection_value_matches(facet_key: &str, value: &FacetScalar, operand: &Face
     match (facet_key, value, operand) {
         (facet_keys::UDC_CLASSES, FacetScalar::Text(actual), FacetScalar::Text(expected)) => {
             udc_operand_matches(actual, expected)
-        }
+        },
         _ => value == operand,
     }
 }
@@ -420,12 +420,12 @@ pub fn evaluate_filter_result(graph: &Graph, expr: &FacetExpr) -> FilterEvaluati
                 for facet_key in projection.keys() {
                     *facet_counts.entry(facet_key.clone()).or_insert(0) += 1;
                 }
-            }
+            },
             Ok(false) => filtered_out_nodes.push(key),
             Err(error) => {
                 warnings.push(error);
                 filtered_out_nodes.push(key);
-            }
+            },
         }
     }
 

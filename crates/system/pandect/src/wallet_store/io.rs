@@ -20,7 +20,7 @@ where
             let value = serde_json::from_str(&text)
                 .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))?;
             Ok(Some(value))
-        }
+        },
         Err(e) if e.kind() == io::ErrorKind::NotFound => Ok(None),
         Err(e) => Err(e),
     }

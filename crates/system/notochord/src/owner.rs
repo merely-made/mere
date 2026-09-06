@@ -172,25 +172,25 @@ impl OwnerNetworkPolicy {
         match edit {
             OwnerPolicyEdit::AcceptedProfiles(profiles) => {
                 self.policy.accepted_profiles = profiles;
-            }
+            },
             OwnerPolicyEdit::TrustedRoots(roots) => {
                 self.policy.trusted_roots = roots;
-            }
+            },
             OwnerPolicyEdit::Service { path, rule } => {
                 self.policy.services.insert(path, rule);
-            }
+            },
             OwnerPolicyEdit::RemoveService { path } => {
                 self.policy.services.remove(&path);
-            }
+            },
             OwnerPolicyEdit::HandshakeLimits(limits) => {
                 self.policy.limits = limits.clamped();
-            }
+            },
             OwnerPolicyEdit::Discovery(announce) => {
                 self.policy.discovery = DiscoveryPolicy { announce };
-            }
+            },
             OwnerPolicyEdit::Transit(enabled) => {
                 self.policy.transit = TransitPolicy { enabled };
-            }
+            },
         }
     }
 

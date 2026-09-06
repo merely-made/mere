@@ -121,18 +121,18 @@ impl CredentialLineage {
         match self {
             Self::LocallyDerived => {
                 "Recoverable: the master key re-derives this slot deterministically."
-            }
+            },
             Self::LocallyGeneratedExternallyRegistered => {
                 "Not recoverable from the vault alone: register a replacement with the service. \
                  A recovery phrase unlocks the vault; it does not regenerate this key."
-            }
+            },
             Self::ExternallyIssued => {
                 "Not backupable: credentials of this kind rotate and expire by design. \
                  Re-authenticate with the issuer."
-            }
+            },
             Self::ExternallyRootedLocallyHeld => {
                 "Upstream's call: the issuing authority revokes and reissues."
-            }
+            },
         }
     }
 }

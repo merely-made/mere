@@ -79,7 +79,7 @@ impl RetainedAuthority {
         match self.deadline_ms() {
             Some(deadline) if now_ms > deadline => {
                 Some(AuthorityLapse::Expired { at_ms: deadline })
-            }
+            },
             _ => None,
         }
     }

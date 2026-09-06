@@ -73,7 +73,7 @@ impl Canvas {
             Some(key) => {
                 self.select_only(key);
                 true
-            }
+            },
             None => false,
         }
     }

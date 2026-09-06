@@ -106,7 +106,7 @@ impl MeshResource for DelayedResource {
                 // One cooperative point per link. A checkpoint request stops
                 // here and says where; a cancel throws the work away.
                 match control.signal() {
-                    ControlSignal::Continue => {}
+                    ControlSignal::Continue => {},
                     ControlSignal::Checkpoint => {
                         control.hold_checkpoint(true);
                         return Err(Checkpoint {
@@ -114,7 +114,7 @@ impl MeshResource for DelayedResource {
                             total_units: chain.units,
                         }
                         .into());
-                    }
+                    },
                     ControlSignal::Cancel => return Err(crate::resource::Cancelled.into()),
                 }
                 state = blake3::hash(&state).as_bytes().to_vec();

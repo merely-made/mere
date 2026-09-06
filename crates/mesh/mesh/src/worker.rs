@@ -192,7 +192,7 @@ pub fn next_action(board: &JobBoard, me: &[u8; 32], offer: &HostOffer<'_>) -> Wo
         let mine = match phase {
             LeasePhase::Unleased => {
                 matches!(&job.state, JobState::Claimed { winner } if winner == me)
-            }
+            },
             _ => phase.held_by(me),
         };
         if mine && !offer.is_running(job.id) && offer.can_run(job) {

@@ -269,11 +269,11 @@ impl InputBinding {
         match self {
             Self::Key { modifiers, keycode } => {
                 format!("key:{}:{}", modifiers.label(), keycode.label())
-            }
+            },
             Self::Chord(sequence) => {
                 let parts = sequence.iter().map(Self::label).collect::<Vec<_>>();
                 format!("chord:{}", parts.join(">"))
-            }
+            },
         }
     }
 
@@ -313,7 +313,7 @@ impl InputBinding {
                     Keycode::Char(ch) => ch.to_ascii_uppercase().to_string(),
                 });
                 parts.join("+")
-            }
+            },
             Self::Chord(sequence) => sequence
                 .iter()
                 .map(Self::display_label)

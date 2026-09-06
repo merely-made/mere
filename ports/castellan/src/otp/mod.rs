@@ -179,11 +179,11 @@ impl fmt::Display for OtpError {
         match self {
             OtpError::UnsupportedDigits(n) => {
                 write!(f, "{n} digits is outside the supported range of 6 to 10")
-            }
+            },
             OtpError::ZeroPeriod => f.write_str("the time step must be at least one second"),
             OtpError::TimeBeforeEpoch => {
                 f.write_str("the requested time is before this generator's epoch")
-            }
+            },
             OtpError::ClockBeforeUnixEpoch => f.write_str("the host clock is before 1970"),
             OtpError::SecretTooShort { bytes } => write!(
                 f,
@@ -317,7 +317,7 @@ impl Otp {
                 }
                 let elapsed = unix_secs.checked_sub(t0).ok_or(OtpError::TimeBeforeEpoch)?;
                 Ok(elapsed / period)
-            }
+            },
             OtpKind::Hotp { counter } => Ok(counter),
         }
     }
@@ -330,7 +330,7 @@ impl Otp {
             OtpKind::Totp { period, t0 } if period > 0 => {
                 let elapsed = unix_secs.checked_sub(t0)?;
                 Some(period - (elapsed % period))
-            }
+            },
             _ => None,
         }
     }

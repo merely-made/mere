@@ -276,7 +276,7 @@ impl RetainedEndpointSession {
                 Progress::Ask(body) => {
                     let answer = self.ask(body)?;
                     progress = self.core.on_response(answer)?;
-                }
+                },
             }
         }
     }
@@ -304,7 +304,7 @@ impl RetainedEndpointSession {
                     self.core.disconnect();
                 }
                 Err(error.to_string())
-            }
+            },
         }
     }
 
@@ -361,7 +361,7 @@ pub fn resume_after_notice(
             })? {
             crate::ResumeApplication::Current(_) | crate::ResumeApplication::Applied(_) => {
                 return Ok(true);
-            }
+            },
             crate::ResumeApplication::Resynchronize(next) => request = next,
         }
     }

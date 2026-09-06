@@ -119,7 +119,7 @@ fn build_trie(graph: &Graph) -> (OutlineTrie, Vec<(String, String)>) {
                     cur = cur.children.entry(seg).or_default();
                 }
                 cur.here = Some((label, url.to_string()));
-            }
+            },
             None => loose.push((label, url.to_string())),
         }
     }

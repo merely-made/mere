@@ -83,7 +83,7 @@ impl EvictionPolicy {
             EvictionPolicy::KeepDays(d) => format!("evicting recent memory after {d} day(s)"),
             EvictionPolicy::KeepSessions(n) => {
                 format!("evicting recent memory after {n} session(s)")
-            }
+            },
         }
     }
 
@@ -125,12 +125,12 @@ impl EvictionPolicy {
                 last_visit_ms
                     .get(&node_id)
                     .is_some_and(|&visited| visited < cutoff)
-            }
+            },
             EvictionPolicy::KeepSessions(sessions) => {
                 let last_session_visited = graph.node_last_session_visited(key).unwrap_or_default();
                 last_session_visited != 0
                     && current_session.saturating_sub(last_session_visited) >= u64::from(*sessions)
-            }
+            },
         }
     }
 }
