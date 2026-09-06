@@ -79,8 +79,13 @@ records source hashes, exact commands/logs, and scope:
 Native Reader's headed scroll/close proof passed on 2026-09-06; see
 `turnstone/design_docs/2026-09-06_reader_appearance_native_check_receipt.md`.
 It verifies shared source identity, different viewport widths, independent
-scroll, and stable surviving inset identity after Workbench closes. Three
-global wait steps reached their frame caps, so whole-app idle behavior and
-native frame performance remain unverified. Persisted resource settings,
+scroll, and stable surviving inset identity after Workbench closes. The first
+three global waits reached their frame caps. A follow-up traced this to a
+failed favicon request whose actor never reported completion. Mere now emits
+a terminal favicon result with request identity; Turnstone retires only the
+matching request on either outcome. Three focused tests and the native rerun
+passed: waits completed in 103, 0, and 0 frames, all busy reasons were clear,
+and the former endpoint-shutdown diagnostic was absent. Native frame
+performance and background CPU remain unmeasured. Persisted resource settings,
 background-work/residency budgets, and independent appearances for other
 engines remain outside this bounded slice.

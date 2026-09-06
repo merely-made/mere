@@ -369,11 +369,11 @@ pub enum FetchCommand {
     CancelPage { request: FetchRequestId },
     /// Fetch the subresource at the (already absolute) `url` as raw bytes.
     Subresource(String),
-    /// Fetch the favicon at `url` (already absolute) as raw bytes, remembering it
-    /// belongs to the node currently at `owner_url` so the host applies the decoded
-    /// icon to that node. Carried separately from `Subresource` so favicon bytes
-    /// reach the graph, not the content actors' render stores. (Favicon-on-tile.)
-    Favicon { owner_url: String, url: String },
+    /// Fetch the favicon at `url` (already absolute) as raw bytes. `request`
+    /// preserves completion identity when the same page asks again before an
+    /// older answer lands. Carried separately from `Subresource` so favicon
+    /// bytes reach the graph, not the content actors' render stores.
+    Favicon { request: FetchRequestId, url: String },
     /// Perform one user-confirmed smolweb write exactly once.
     Submit {
         request: u64,
@@ -386,13 +386,18 @@ pub enum FetchUpdate {
     PageProgress(PageProgress),
     Page(FetchOutcome),
     Subresource(SubresourceOutcome),
-    /// Raw favicon bytes (only on success) plus the page they belong to; the host
-    /// decodes them to RGBA and stamps them on that node. (Favicon-on-tile.)
-    Favicon {
-        owner_url: String,
-        bytes: Vec<u8>,
-    },
+    /// One terminal favicon result. Failure remains typed so hosts can retire
+    /// their exact pending request while keeping their existing tile unchanged.
+    Favicon(FaviconOutcome),
     Submission(SubmissionOutcome),
+}
+
+/// A terminal favicon completion. The fetch actor reports both success and
+/// failure because request bookkeeping must finish even when enrichment is
+/// deliberately silent in the UI.
+pub struct FaviconOutcome {
+    pub request: FetchRequestId,
+    pub result: Result<Vec<u8>, String>,
 }
 
 /// Spawn the fetch actor on its own thread (armillary harness). It owns a
@@ -467,14 +472,13 @@ pub fn spawn_fetcher(wake: Wake) -> (ActorHandle<FetchCommand>, Receiver<FetchUp
                         out.emit(FetchUpdate::Subresource(SubresourceOutcome { url, result }));
                     });
                 }
-                FetchCommand::Favicon { owner_url, url } => {
+                FetchCommand::Favicon { request, url } => {
                     let out = out.clone();
                     runtime.spawn(async move {
-                        // Best-effort: a missing / undecodable favicon simply never
-                        // arrives, and the node keeps its colored tile.
-                        if let Ok(bytes) = fetch_bytes(&url).await {
-                            out.emit(FetchUpdate::Favicon { owner_url, bytes });
-                        }
+                        out.emit(FetchUpdate::Favicon(FaviconOutcome {
+                            request,
+                            result: fetch_bytes(&url).await,
+                        }));
                     });
                 }
                 FetchCommand::Submit {
