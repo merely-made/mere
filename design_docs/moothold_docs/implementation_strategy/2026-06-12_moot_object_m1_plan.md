@@ -263,10 +263,20 @@ implementation version; validates anchors on decode; supports pure range-to-anch
 and anchor-resolution operations for human selections; and projects RFC 5147
 Fragment, Text Quote, and Text Position selectors over the same immutable
 canonical-text resource. Eidetic owns the complete Annotation JSON-LD
-envelope and wraps the payload with source URL, capture time, response and DOM-mode
-facts, plus raw or replay blob identities. Fleece retains no fetch, storage,
-replication, or Moot policy. The complete cross-standard ledger lives in Genet's
-`genet/design_docs/2026-09-05_fleece_preservation_contract_plan.md`.
+envelope and wraps the payload with source URL, capture time, available response
+type and DOM-mode facts, plus raw or replay blob identities. Fleece retains no
+fetch, storage, replication, or Moot policy. The complete cross-standard ledger
+lives in Genet's `genet/design_docs/2026-09-05_fleece_preservation_contract_plan.md`.
+
+The capture host remains the standards boundary. A fuller archival response can
+map its record id, request/effective URI, response status and headers, capture
+time, payload/block digests and truncation state to
+[WARC 1.1](https://iipc.github.io/warc-specifications/specifications/warc-format/warc-1.1-annotated/),
+[HTTP semantics](https://www.rfc-editor.org/rfc/rfc9110.html), and
+[HTTP digest fields](https://www.rfc-editor.org/rfc/rfc9530.html). Memento fields
+apply when datetime negotiation actually occurred; WACZ is a package for carrying
+captures and indexes. Fleece consumes the resulting capture reference and scoped
+digest as extraction input evidence rather than owning those protocols.
 
 Done when real selected pages survive peer transfer/reopen, a body-only query finds
 them, duplicate submissions preserve both contributors while results group content,
@@ -382,5 +392,28 @@ management require their own subsequent consumer receipts.
   adapter and Eidetic gate passed 47 focused native tests, strict Clippy for both
   changed crates, and a
   `wasm32-unknown-unknown` check using the workspace's established `wasm_js`
-  getrandom backend. Full official JSON-LD and Web Annotation test suites, captured
-  response/DOM evidence, peer transfer, and capture-state preservation remain open.
+  getrandom backend. Full official JSON-LD and Web Annotation test suites remain
+  open.
+
+- **2026-09-07:** the next P3 capture proof binds host-observed acquisition facts
+  into the durable extraction. `CaptureEvidenceV1` retains the final absolute
+  source, BLAKE3 identity of the exact acquired bytes, capture time, available
+  response content type, source/rendered/caller-supplied DOM mode, and optional
+  raw/replay manifest identities. The raw manifest, when present, must name the
+  same bytes as the capture hash. A hash of the complete evidence record is also
+  bound into the Web Annotation target; mutation tests cover every retained field,
+  while records serialized before the extension remain readable with those facts
+  explicitly absent.
+
+  A native receipt sends a `TrustedPeersOnly` annotation manifest and exact HTML
+  capture over authenticated p2panda QUIC, validates peer/protocol/privacy/schema
+  and both content hashes before storage, then closes and reopens a receiver-only
+  Fjall store. The reopened annotation and raw page bytes are exact. This proves
+  transport of the document evidence and durable receiver reopen. Commons' existing
+  LogSync test separately proves operation convergence; this receipt does not prove
+  that manifest operation sync, authenticated carrier identity grants Moot
+  membership, or sharing consent. Genet's current `ResourceResponse` exposes final
+  URL, content type and body bytes, but not requested URL, status, lossless headers
+  or truncation state. WARC-grade full-response capture therefore remains a host
+  contract follow-on. Body query, contributor-preserving deduplication, corpus and
+  cost measurements, and the held-out search-engine decision also remain open.
