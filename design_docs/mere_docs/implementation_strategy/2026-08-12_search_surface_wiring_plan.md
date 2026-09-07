@@ -450,4 +450,42 @@ store, not fixtures only.
   (needs a picked-row signal from the omnibar and a store write path), a
   settings knob for the lane weight, a producer for `dwell_ms` (ledger row 4,
   Intersection Observer), and turnstone tuning of `FrecencyConfig`.
+- **2026-09-07 — W6d built** (uncommitted at writing).
+  `crates/eidetic/eidetic-core/src/browsing/page.rs`: `canonical_url`
+  (lowercase scheme and host; drop fragment, default port, the trailing
+  slash on an empty path, and `utm_*` plus an explicit tracking-param list;
+  everything else verbatim; no URL crate, since the key must be computable
+  in the storage layer), `PageFingerprint` with a visible `source` (`Text`
+  or `CanonicalUrl`), blake3 exact over whitespace-collapsed text and a
+  64-bit simhash over lowercased 3-word shingles, `PageRecord` (canonical
+  URL set, last verbatim URL, best title, first and last seen, visits, the
+  text slot W6c fills), `page_table` with the `text_for` shape of
+  `rebuild_with_text`, near-duplicate collapse oldest-first under
+  `PageTableConfig` (default Hamming 3, `EXACT` for 0), and
+  `frecency_by_page`. The threshold was measured on page-length prose: one
+  word changed costs 1 bit, a header swap 2, an unrelated page 37, a
+  truncation to half 16; a 55-word paragraph made the same edit cost 8, so
+  the near key means nothing until real bodies arrive with W6c. Six tests;
+  `mere-eidetic` 105 pass.
+
+  Turnstone: `recall_documents` and the lexical corpus are per page record
+  (one tantivy document per page, the 3x W6a found), the frecency lane is
+  keyed by fingerprint and re-keyed to the record's address so the fusion
+  lanes and `RecallHit` still speak URLs; `MintReceipt` gains
+  `collapsed_urls` and `page_table`. Test
+  `two_urls_for_one_page_recall_once_with_one_frecency`; 9 pass. Ladder,
+  release, vector on:
+
+  | corpus | lexical before | lexical after | page table | total before | total after |
+  |---|---:|---:|---:|---:|---:|
+  | 10k | 89.8 ms | 65.3 ms | 27.8 ms | 130.8 ms | 136.8 ms |
+  | 100k | 1,693.0 ms | 519.1 ms | 393.5 ms | 2,315.3 ms | 1,393.1 ms |
+
+  Follow-ons named: `canonical_url` runs three times per event across the
+  projection, corpus and frecency (memoized once); passing the fingerprint
+  index through would cut about a third of the projection cost but widens a
+  stack signature. Turnstone has never had its rustfmt sweep; an accidental
+  `cargo fmt` rewrote 82 files and was reverted. `cargo clippy` cannot carry
+  `--config`, so turnstone's clippy is unreachable under the scratch patch
+  until the family re-pin.
 
