@@ -52,10 +52,45 @@ anchor embed's lib.rs cites).
 - **W3 — reports.** The trail/steward surface renders `top_domains` and
   `visits_histogram` from the fast-field columns (no re-index needed).
   Small; may ride W2's session.
-  **Fleece boundary audit (2026-08-26):** the live host capture path supplies
-  extracted page text to the trace corpus. `mere-eidetic-search` consumes those
-  traces rather than a DOM, so its direct Fleece dependency is unused and is
-  now removed under `genet/design_docs/2026-08-26_fleece_followthrough_plan.md`.
+  **Fleece boundary audit (2026-08-26, corrected 2026-09-07):** the 2026-08-26
+  note claimed the live host capture path supplies extracted page text to the
+  trace corpus. It does not: `TraceEvent` carries url and title only, and
+  turnstone extracts only the title. The removal of `mere-eidetic-search`'s
+  direct Fleece dependency (`genet/design_docs/2026-08-26_fleece_followthrough_plan.md`)
+  stands on the right ground anyway: the index consumes traces, not a DOM, so
+  text enters through the host, never through the search crate. See W6.
+- **W6 — restore page text, rank by behaviour, key by content (ruled
+  2026-09-07 by Mark on the
+  [lighter recall brief](../../eidetic_docs/research/2026-09-07_lighter_recall_and_standards_ledger_brief.md)).**
+  Four slices, in this order:
+  - **W6a — measure.** Instrument turnstone's `RecallIndex::mint` to report
+    trace and event counts, corpus bytes, and lexical and vector mint
+    latency; run a real session; record the numbers here. The engine
+    decision (in-tree BM25 with one shared tokenizer, `probly-search`, or
+    tantivy kept) waits on this receipt. **Done when** a real session's
+    numbers are in §5.
+  - **W6b — frecency.** A fold over `TraceTransition` kinds and `at_ms`
+    under a 30-day half-life (Firefox's bucket weights as the starting
+    table), fused as a third ranking beside the lexical and vector ones.
+    `dwell_ms` joins when a producer fills it. Lands before any engine
+    change so the engine is judged against a lane that already ranks well.
+    **Done when** a typed-URL prefix recalls the page the user picked last,
+    and the fusion receipt shows the behavioural ranking contributing.
+  - **W6c — page text, restored.** The capture plan's C5 was built in
+    meerkat (`8b8b039`, 2026-06-28) and lost when turnstone obviated it. The
+    host extracts `main_text` through fleece at fetch time and attaches it to
+    a fingerprint-keyed page record (W6d), not to the trace event. Consent
+    gating stays C4's. **Done when** a body-only term recalls the page from
+    a real session, as the meerkat receipt once did.
+  - **W6d — page identity by content.** Traces stay an event log; a page
+    table is a projection keyed by a content fingerprint over `main_text`
+    (blake3 exact, plus a near-duplicate hash). It is the dedup key and the
+    index key, and collapses the review brief's five materializations to
+    one page plus events. **Done when** two URLs for one page resolve to
+    one page record and one index document.
+  The tokenizer W6a's engine uses is genet's, once the UAX #29 segmentation
+  component ruled the same day is founded there; until then the search lane
+  keeps a local tokenizer and names the swap.
 - **W4 — canvas semantic search.** Wire `canvas::canvas_search` +
   `canvas::field_bridge` into the canvas's live surface: a query becomes a
   similarity field over the canvas through quint, with
@@ -348,3 +383,71 @@ store, not fixtures only.
   remembered intent before consulting stored titles, and run the admitted
   receipt. A setting becomes a promotion candidate only if that held-out run
   says so. W4 remains an independent canvas-field lane.
+
+- **2026-09-07 — W6 ruled.** Mark answered the six questions of the
+  [lighter recall brief](../../eidetic_docs/research/2026-09-07_lighter_recall_and_standards_ledger_brief.md)
+  yes: measure before choosing the engine, frecency before the engine
+  change, restore body text as a stated slice (C5 was lost with meerkat, not
+  decided against), found one UAX #29 segmenter in genet, found the
+  standards-to-features ledger in genet beside the WPT census, and read
+  traces as an event log with a fingerprint-keyed page table projected over
+  them. The false 2026-08-26 W3 note is corrected above. W6a's
+  instrumentation is the first action.
+- **2026-09-07 — W6a measured** (turnstone working tree, uncommitted;
+  `MintReceipt` at `src/trail_memory.rs:322`, emitted as one `tracing::info!`
+  line at mint; tests `mint_receipt_counts_the_corpus_exactly` and the
+  `#[ignore]`d `mint_receipt_scale_ladder` and
+  `captured_trail_mint_receipt`). Release build, Windows 11:
+
+  | corpus | events | pages | bytes | lexical ms | vector ms | total ms |
+  |---|---:|---:|---:|---:|---:|---:|
+  | captured session, vector on | 35 | 11 | 712 | 37.6 | 0.2 | 37.8 |
+  | synthetic 1k, vector on | 1,000 | 333 | 50,004 | 29.0 | 3.4 | 33.1 |
+  | synthetic 10k, vector on | 10,000 | 3,333 | 530,001 | 89.8 | 34.6 | 130.8 |
+  | synthetic 100k, vector on | 100,000 | 33,333 | 5,599,998 | 1,693.0 | 493.8 | 2,315.3 |
+
+  Three findings. **tantivy's mint is about 40 ms of fixed cost** (directory
+  wipe, index create, writer, commit, sidecar) regardless of corpus size, paid
+  on every recall after a navigation; corpus size dominates only past about
+  10k events. **The lexical lane indexes one document per event**, so at 100k
+  events tantivy holds 100,000 documents against 33,333 pages; the 3x is
+  free to reclaim. **The vector lane is the memory problem, not tantivy**:
+  `esp`'s dense `VectorIndex` at 4,096 dims is 16 KB per page, 55 MB at 10k
+  events and 546 MB at 100k, resident in the actor for a disposable index,
+  and `fused_hits` scans it linearly per query. The real store measured is
+  small (35 traversals, 11 pages), so the ladder carries the scaling claim.
+
+  Build note: turnstone HEAD `c6ee31e` does not compile against its committed
+  mere pin `d82afa17` (eight errors in `browse.rs`, `shell/mod.rs`,
+  `shell/reader_observe.rs` from mere APIs that landed later), and patching
+  mere alone splits `genet_scripted_dom`. The numbers were taken with mere
+  and genet both patched to the local checkouts per invocation
+  (`cargo --config`), nothing edited. The pin reconciliation is Mark's.
+- **2026-09-07 — W6b built** (uncommitted at writing). The fold lives in the
+  stack: `crates/eidetic/eidetic-core/src/browsing/frecency.rs` (pure,
+  clockless; `TransitionWeights` exhaustive over `TraceTransition`,
+  `FrecencyConfig` with a 30-day half-life and a +0.5 dwell bonus at 30 s,
+  `frecency_by` keyed by a caller function so W6d's fingerprint slots in
+  without a signature change). Defaults follow Firefox's visit bonuses over
+  100: typed 20, link click and tab spawn 1, imported 0.75, back and forward
+  0.25, reload, redirect and restore 0. `Unknown` is 1.0 rather than
+  Firefox's 0 because turnstone maps the engine's `ContentNavigated` to
+  `Unknown`, and at zero the whole live corpus scores nothing; ruled 1.0 by
+  Mark, 2026-09-07. `eidetic-search::fusion` generalizes reciprocal-rank fusion to N
+  weighted rankings (`Ranking`, `fuse_many`; `fuse` is the two-lane wrapper,
+  `FusedHit` gains index-aligned `ranks`). Turnstone folds the table at mint
+  (`MintReceipt.frecency`), filters candidates by whole-query substring over
+  URL and title, and fuses a third lane at weight 2.0 (`RecallConfig::
+  frecency_weight`; above 1.0 so an opposed two-lane tie resolves by
+  behaviour rather than by URL order). Tests: four in eidetic-core, two new
+  in fusion, `typed_prefix_recall_follows_frecency_over_title_overlap` in
+  turnstone; 99 + 16 + 4 and 8 pass respectively.
+
+  Receipt on the captured store (11 pages, thin corpus): the behavioural
+  lane lifts the top-frecency page from fourth to first for a typed prefix.
+  Cost: 33 µs beside a 61.7 ms lexical re-mint; 103 ms beside 12.15 s on the
+  100k-event ladder. Follow-ons named, not built: adaptive input history
+  (needs a picked-row signal from the omnibar and a store write path), a
+  settings knob for the lane weight, a producer for `dwell_ms` (ledger row 4,
+  Intersection Observer), and turnstone tuning of `FrecencyConfig`.
+
