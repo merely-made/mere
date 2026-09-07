@@ -396,9 +396,9 @@ management require their own subsequent consumer receipts.
   open.
 
 - **2026-09-07:** the next P3 capture proof binds host-observed acquisition facts
-  into the durable extraction. `CaptureEvidenceV1` retains the final absolute
-  source, BLAKE3 identity of the exact acquired bytes, capture time, available
-  response content type, source/rendered/caller-supplied DOM mode, and optional
+  into the durable extraction at Mere `ee533436`. `CaptureEvidenceV1` retains the
+  final absolute source, BLAKE3 identity of the exact acquired bytes, capture time,
+  available response content type, source/rendered/caller-supplied DOM mode, and optional
   raw/replay manifest identities. The raw manifest, when present, must name the
   same bytes as the capture hash. A hash of the complete evidence record is also
   bound into the Web Annotation target; mutation tests cover every retained field,
@@ -417,3 +417,5 @@ management require their own subsequent consumer receipts.
   or truncation state. WARC-grade full-response capture therefore remains a host
   contract follow-on. Body query, contributor-preserving deduplication, corpus and
   cost measurements, and the held-out search-engine decision also remain open.
+  The same gate exposed UUID 1.25's new wasm RNG-selection requirement; Inker
+  `aac6e5df` now selects its JavaScript-backed provider only on wasm targets.
