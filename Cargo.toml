@@ -265,8 +265,8 @@ graphshell-network = { version = "0.0.1", path = "crates/graphshell/graphshell-n
 # Turnstone consume one immutable revision. The `[patch]` table at the bottom of
 # this file makes this checkout the implementation source for the Mere contracts
 # Knot names, so those types keep one Cargo source identity.
-knot-editor = { version = "0.0.3", git = "https://github.com/merely-made/knot-editor.git", rev = "7da29a6bd75112e4d28abb8066490cb9e514d543" }
-knot-document = { version = "0.0.1", git = "https://github.com/merely-made/knot-editor.git", rev = "7da29a6bd75112e4d28abb8066490cb9e514d543" }
+knot-editor = { version = "0.0.3", git = "https://github.com/merely-made/knot-editor.git", rev = "fdb8d154a5f23419d77db4a8791089bed64b76d9" }
+knot-document = { version = "0.0.1", git = "https://github.com/merely-made/knot-editor.git", rev = "fdb8d154a5f23419d77db4a8791089bed64b76d9" }
 # The credential-keeper port (dramatis plan D4). No longer a reservation:
 # C1/C2 landed the OTP core, sealed OTP items, the release gate, and the
 # `keeper` identity surface graphshell re-exports.
