@@ -33,9 +33,10 @@ use genet_scripted_dom::{NodeId, ScriptedDom};
 use layout_dom_api::{LayoutDom, LayoutDomMut, LocalName, Namespace};
 use meristem::{DynMessage, MessageCtx, MessageResult, View, ViewId};
 
+use crate::context::FocusRequest;
 use crate::{
     DomHandle, FocusEvent, FocusPhase, GenetCtx, GenetElement, GenetElementMut, HoverEvent, Key,
-    KeyEvent, NamedKey, PointerButton, PointerClick, PointerEvent, WheelEvent,
+    KeyEvent, NamedKey, PointerButton, PointerClick, PointerEvent, ValueEvent, WheelEvent,
 };
 
 /// The per-tree half of a runner: one `ScriptedDom` target, its [`GenetCtx`]
@@ -118,9 +119,10 @@ where
 
         // Attach the produced root under the mount node (append).
         dom.borrow_mut().insert_before(mount, root.node, None);
-        let focus = ctx
-            .take_focus_request()
-            .filter(|&node| dom.borrow().is_live(node));
+        let focus = match ctx.take_focus_request() {
+            Some(FocusRequest::Focus(node)) if dom.borrow().is_live(node) => Some(node),
+            _ => None,
+        };
 
         Self {
             dom,
@@ -193,10 +195,12 @@ where
         // Clear them at the publication boundary before the host can ask for
         // the next dispatch target or captured-element rect.
         self.scrub_dead_interaction_handles();
-        if let Some(node) = self.ctx.take_focus_request()
-            && self.node_is_live(node)
-        {
-            self.focus = Some(node);
+        if let Some(request) = self.ctx.take_focus_request() {
+            match request {
+                FocusRequest::Focus(node) if self.node_is_live(node) => self.focus = Some(node),
+                FocusRequest::Blur(node) if self.focus == Some(node) => self.focus = None,
+                _ => {},
+            }
         }
     }
 
@@ -853,6 +857,45 @@ where
         actions
     }
 
+    /// Route an accessibility numeric value to its exact registered element.
+    pub(crate) fn dispatch_value(
+        &mut self,
+        logic: &mut impl FnMut(&State) -> V,
+        state: &mut State,
+        node: NodeId,
+        event: ValueEvent,
+    ) -> Vec<Action> {
+        if !event.value.is_finite() || !self.node_is_live(node) {
+            return Vec::new();
+        }
+        let Some(path) = self.ctx.value_handler(node).map(<[ViewId]>::to_vec) else {
+            return Vec::new();
+        };
+        let mut actions = Vec::new();
+        {
+            let Self {
+                view,
+                view_state,
+                root,
+                dom,
+                ..
+            } = self;
+            let mut message = MessageCtx::new(path, DynMessage::new(event));
+            let element = GenetElementMut {
+                node: &mut root.node,
+                dom: dom.clone(),
+                parent: Some(dom.borrow().document()),
+            };
+            if let MessageResult::Action(action) =
+                view.message(view_state, &mut message, element, state)
+            {
+                actions.push(action);
+            }
+        }
+        self.rebuild(logic, state);
+        actions
+    }
+
     /// Route a wheel/scroll notch to the nearest ancestor of `target` (including
     /// itself) carrying an [`on_wheel`](crate::on_wheel) handler.
     pub(crate) fn dispatch_wheel(
@@ -1023,6 +1066,14 @@ where
     pub fn dispatch_click(&mut self, target: NodeId, event: PointerClick) -> Vec<Action> {
         self.tree
             .dispatch_click(&mut self.logic, &mut self.state, target, event)
+    }
+
+    /// Dispatch a finite numeric value requested by an accessibility host.
+    /// Invalid values and nodes without an [`on_value`](crate::on_value) handler
+    /// are ignored.
+    pub fn dispatch_value(&mut self, target: NodeId, event: ValueEvent) -> Vec<Action> {
+        self.tree
+            .dispatch_value(&mut self.logic, &mut self.state, target, event)
     }
 
     /// Whether the most recent dispatch had its default action prevented by a

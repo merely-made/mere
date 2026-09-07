@@ -14,13 +14,17 @@
 //! adapter is given.
 
 use accesskit::{Action, ActionRequest, Role};
-use cambium::{AnyView, GenetCtx, GenetElement, clickable, el, focusable, text};
+use cambium::{
+    AnyView, GenetCtx, GenetElement, RangeScrubber, RangeScrubberEvent, clickable, el, focusable,
+    range_scrubber, text,
+};
 use cambium_genet_winit_host::{Harness, IdlePolicy};
 use cambium_winit_a11y::{A11yAction, A11yHost};
 
 #[derive(Default)]
 struct App {
     activated: Vec<&'static str>,
+    value: f64,
 }
 
 type Child = Box<dyn AnyView<App, (), GenetCtx, GenetElement>>;
@@ -29,7 +33,7 @@ fn place(x: i32, y: i32, w: i32, h: i32) -> String {
     format!("position:absolute;left:{x}px;top:{y}px;width:{w}px;height:{h}px;")
 }
 
-fn root(_state: &App) -> Child {
+fn root(state: &App) -> Child {
     Box::new(
         el(
             "div",
@@ -42,6 +46,20 @@ fn root(_state: &App) -> Child {
                     el("button", text("Cancel")).attr("style", place(0, 50, 120, 40)),
                     |s: &mut App, _| s.activated.push("cancel"),
                 )),
+                el(
+                    "div",
+                    range_scrubber(
+                        RangeScrubber::new(0.0, 10.0, state.value)
+                            .with_steps(1.0, 5.0)
+                            .with_label("Strength"),
+                        |state: &mut App, event| {
+                            let (RangeScrubberEvent::Preview(value)
+                            | RangeScrubberEvent::Commit(value)) = event;
+                            state.value = value;
+                        },
+                    ),
+                )
+                .attr("style", place(0, 100, 200, 40)),
             ),
         )
         .attr("role", "main")
@@ -144,6 +162,22 @@ fn a_focus_request_focuses_without_activating() {
     let (tree, _) = h.a11y_tree();
     let (cancel_id, _) = node_named(&tree, "Cancel").expect("Cancel still projects");
     assert_eq!(tree.focus, cancel_id);
+}
+
+/// A numeric request follows the host route into the same controlled value
+/// handler used by the scrubber's pointer and keyboard input.
+#[test]
+fn a_set_value_request_updates_a_numeric_control() {
+    let mut h = harness();
+    let (tree, _) = h.a11y_tree();
+    let (strength, node) = node_named(&tree, "Strength").expect("Strength projects");
+    assert!(node.supports_action(Action::SetValue));
+    let dom_node = h
+        .a11y_dom_node(strength)
+        .expect("Strength resolves to a DOM node");
+
+    h.a11y_set_value(dom_node, 7.4);
+    assert_eq!(h.state().value, 7.0, "the shared step policy quantizes");
 }
 
 /// The raw-request mapping keeps the two actions apart and drops the ones this
