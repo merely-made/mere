@@ -23,9 +23,9 @@
 //! mints a UUID; a wasm host materializes from the same contribution with
 //! `add_node_with_id`.
 //!
-//! Out of scope here (later): `@type` → node classification (a class-IRI scheme,
-//! as in export), CURIE/remote `@context` resolution (bundled-context loader),
-//! and named-graph / statement metadata fidelity.
+//! The parser expands `@type` values and can resolve explicitly cached remote
+//! contexts without network access. Class-IRI projection policy and complete
+//! named-graph / statement metadata fidelity remain outside this layer.
 
 use crate::{SCHEMA_KEYWORDS, SCHEMA_NAME};
 use kernel::types::{GraphScope, NodeProperty};
@@ -249,8 +249,28 @@ pub fn from_jsonld_with_contexts(
     bytes: &[u8],
     contexts: ContextCache,
 ) -> Result<GraphContribution, IngestError> {
+    from_jsonld_with_contexts_and_base_iri(bytes, contexts, None)
+}
+
+/// Like [`from_jsonld_with_contexts`], while resolving relative IRIs against
+/// `base_iri` when the caller has retained the document's resolved address.
+///
+/// The base is an input to JSON-LD's expansion algorithm, not a source-identity
+/// claim. Callers that do not own a resolved document address must pass `None`;
+/// this parser never infers one or fetches it from the network.
+pub fn from_jsonld_with_contexts_and_base_iri(
+    bytes: &[u8],
+    contexts: ContextCache,
+    base_iri: Option<&str>,
+) -> Result<GraphContribution, IngestError> {
     let namespace = doc_namespace(bytes);
-    let quads = JsonLdParser::new()
+    let parser = match base_iri {
+        Some(base_iri) => JsonLdParser::new()
+            .with_base_iri(base_iri)
+            .map_err(|error| IngestError::Parse(format!("invalid JSON-LD base IRI: {error}")))?,
+        None => JsonLdParser::new(),
+    };
+    let quads = parser
         .for_slice(bytes)
         .with_load_document_callback(move |url, _options| {
             contexts

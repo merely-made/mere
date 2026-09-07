@@ -69,7 +69,8 @@ pub mod query;
 pub use ingest::{ApplyOutcome, apply_contribution};
 pub use ingest::{
     ContextCache, EdgeContribution, GraphContribution, IngestError, NodeContribution, from_jsonld,
-    from_jsonld_with_contexts, from_quads, is_bundled_context, referenced_context_urls,
+    from_jsonld_with_contexts, from_jsonld_with_contexts_and_base_iri, from_quads,
+    is_bundled_context, referenced_context_urls,
 };
 pub use serialize::{from_nquads, from_trig, to_nquads, to_trig};
 pub use statements::{StatementOutcome, apply_link_statements, resolve_rel};
