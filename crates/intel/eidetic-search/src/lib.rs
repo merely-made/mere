@@ -25,10 +25,12 @@
 //!   [`TrailIndex::visits_histogram`] over the reserved fast-field columns
 //!   (domain / owner / time / transition are columnar from day one, so
 //!   reports need no re-index).
-//! - **Fusion** — [`fuse`]: the engine-agnostic seam that merges this
-//!   crate's lexical ranking with a vector ranking (`intel/embed` or any
-//!   other) by reciprocal-rank fusion. This crate deliberately does not
-//!   depend on an embedding engine; the caller brings both rankings.
+//! - **Fusion** — [`fuse`] / [`fuse_many`]: the engine-agnostic seam that
+//!   merges this crate's lexical ranking with a vector ranking (`intel/embed`
+//!   or any other) and any further lane — the behavioural one in
+//!   `eidetic::browsing::frecency` — by reciprocal-rank fusion. This crate
+//!   deliberately does not depend on an embedding engine; the caller brings
+//!   the rankings.
 //!
 //! The `SearchIndexSpec` codicil ([`spec`]) is the hand-off contract: it
 //! names the field set, tokenizer, and tantivy format version. Locally it
@@ -40,7 +42,7 @@ pub mod fusion;
 pub mod index;
 pub mod spec;
 
-pub use fusion::{FusedHit, fuse};
+pub use fusion::{FusedHit, Ranking, fuse, fuse_many};
 pub use index::{Hit, TrailIndex};
 pub use spec::{SEARCH_INDEX_SCHEMA_REF, SPEC_SIDECAR, SearchIndexSpec, bootstrap_search_schema};
 
