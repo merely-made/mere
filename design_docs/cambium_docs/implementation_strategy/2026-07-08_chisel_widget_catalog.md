@@ -1,6 +1,14 @@
 # chisel widget catalog: coverage across the xilem-serval consumers
 
-**Status:** proposed catalog + build order (2026-07-08). Companion to
+**Status (updated 2026-09-06):** historical catalog and build-order record
+from 2026-07-08. In current practice, Cambium owns view composition and
+Sprigging owns retained paint leaves; the current catalog is
+[2026-07-15_component_catalog_growth_plan.md](./2026-07-15_component_catalog_growth_plan.md)
+and [component-catalog.md](../technical_architecture/component-catalog.md).
+`chisel`, `xilem-serval`, and the consumer routes below are the proposal's
+historical vocabulary.
+
+**Original proposal:** catalog + build order (2026-07-08). Companion to
 [2026-07-07_chisel_widget_leaf_design.md](./2026-07-07_chisel_widget_leaf_design.md)
 (the leaf contract, paint paths, retention gates). This doc maps what each
 xilem-serval consumer (Mere/meerkat, Strophe, Woodshed, Isometry) needs, what

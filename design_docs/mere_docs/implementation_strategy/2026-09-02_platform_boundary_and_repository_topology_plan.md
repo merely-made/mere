@@ -6,8 +6,10 @@ closed 2026-09-04 with single-source, software, and headed receipts. P6's
 public topology, hosted Pages, domain verification, certificate issuance, and
 HTTPS enforcement closed 2026-09-05. P7 closed 2026-09-06 when the
 documentation-policy D3 audit reached zero failing structural, link, path, and
-annotation findings. Vello V1-V4 are owned separately by Netrender's durable
-upstream-ask note.
+annotation findings. The 15 actionable D2 recommendations were reconciled in
+the [2026-09-06 remediation pass](../../../support/doc-audit/d2/remediation_2026-09-06.md);
+the 11 unverifiable claims remain explicit evidence requests. Vello V1-V4 are
+owned separately by Netrender's durable upstream-ask note.
 **Authority:** this is the canonical plan for the Genet/Mere boundary and the
 follow-on repository-topology review. Mer3ly continues to own the public
 repository manifest and transfer receipts.  
