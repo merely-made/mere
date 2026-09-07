@@ -373,12 +373,14 @@ management require their own subsequent consumer receipts.
   an old HTML fixture can also change blank-node skolem IRIs where DOM text
   normalization changes the exact JSON-LD bytes; migrations must treat those as
   derived identities and regroup by durable source facts. `knot-editor`
-  `64489d10ba2d0f92e71c5ba1a9832054a577ae1c` widens its direct dependency to
-  Fleece 0.5; its exact annotation seam passed a one-test harness and strict Clippy,
-  while the full Knot workspace resolver did not finish within two bounded
-  ten-minute attempts. Mere's generated locked graph now contains exactly one
-  Fleece, 0.5 at the hardened Genet revision. The combined adapter and Eidetic gate
-  passed 47 focused native tests, strict Clippy for both changed crates, and a
+  `7da29a6bd75112e4d28abb8066490cb9e514d543` widens its direct dependency to
+  Fleece 0.5 and carries Cargo's corrected lock resolution. Its 94 locked library
+  tests pass. Whole-crate strict Clippy reaches four existing lints in endpoint,
+  publishing, wire validation, and vault code outside this manifest-only adoption;
+  the exact annotation seam passes strict Clippy. Mere's generated locked graph now
+  contains exactly one Fleece, 0.5 at the hardened Genet revision. The combined
+  adapter and Eidetic gate passed 47 focused native tests, strict Clippy for both
+  changed crates, and a
   `wasm32-unknown-unknown` check using the workspace's established `wasm_js`
   getrandom backend. Full official JSON-LD and Web Annotation test suites, captured
   response/DOM evidence, peer transfer, and capture-state preservation remain open.
