@@ -1,6 +1,7 @@
 # FLORA, Tulpa, and Standing plan
 
-**Status:** complete on `codex/0831-integration` (2026-08-31). Gemot owns the
+**Status:** landed on `main` (2026-09-02), after the integration branch completed
+on 2026-08-31. Gemot owns the
 social protocol, Distillery owns exact tensor execution, and the integrated
 signed, replicated, restart-durable receipt is green.
 

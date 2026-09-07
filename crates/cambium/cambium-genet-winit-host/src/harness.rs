@@ -597,6 +597,11 @@ where
         self.relayout();
     }
 
+    /// Route a finite AccessKit numeric value request through the host seam.
+    pub fn a11y_set_value(&mut self, node: NodeId, value: f64) {
+        self.a11y_request(A11yAction::SetValue(value), node);
+    }
+
     /// The AccessKit tree as the accessibility host would publish it: projected
     /// from this frame's layout, then stamped with the host's layout scale.
     ///

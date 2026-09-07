@@ -256,18 +256,27 @@ records, canonical/reader extraction plus anchors, and replay resources. Preserv
 Fleece version and normalization; selector positions refer to canonical DOM text,
 not the shorter reader text. Any missing anchor remains explicitly missing.
 
-Fleece 0.4 already supplies canonical DOM text, paired quote/position selectors,
-reader structure, structured data, metadata links, and semantic tables. Its 0.5
-gate is preservation plus the declared Web Annotation `text/plain` selector
-profile: every extract carries the text and reader profile, quote context, and
-implementation version; a versioned record validates anchors on decode; pure
-range-to-anchor plus anchor-resolution operations support human selections; and
-RFC 5147 Fragment, Text Quote, and Text Position selectors resolve to the same
-immutable canonical-text resource. Eidetic owns the complete Annotation JSON-LD
-envelope and wraps the payload with source URL, capture time, response and DOM-mode
-facts, plus raw or replay blob identities. Fleece retains no fetch, storage,
-replication, or Moot policy. The complete cross-standard ledger lives in Genet's
-`genet/design_docs/2026-09-05_fleece_preservation_contract_plan.md`.
+Fleece 0.5 supplies canonical DOM text, paired quote/position selectors, reader
+structure, structured data, metadata links, and semantic tables. Its versioned
+preservation record carries the text and reader profile, quote context, and
+implementation version; validates anchors on decode; supports pure range-to-anchor
+and anchor-resolution operations for human selections; and projects RFC 5147
+Fragment, Text Quote, and Text Position selectors over the same immutable
+canonical-text resource. Eidetic owns the complete Annotation JSON-LD
+envelope and wraps the payload with source URL, capture time, available response
+type and DOM-mode facts, plus raw or replay blob identities. Fleece retains no
+fetch, storage, replication, or Moot policy. The complete cross-standard ledger
+lives in Genet's `genet/design_docs/2026-09-05_fleece_preservation_contract_plan.md`.
+
+The capture host remains the standards boundary. A fuller archival response can
+map its record id, request/effective URI, response status and headers, capture
+time, payload/block digests and truncation state to
+[WARC 1.1](https://iipc.github.io/warc-specifications/specifications/warc-format/warc-1.1-annotated/),
+[HTTP semantics](https://www.rfc-editor.org/rfc/rfc9110.html), and
+[HTTP digest fields](https://www.rfc-editor.org/rfc/rfc9530.html). Memento fields
+apply when datetime negotiation actually occurred; WACZ is a package for carrying
+captures and indexes. Fleece consumes the resulting capture reference and scoped
+digest as extraction input evidence rather than owning those protocols.
 
 Done when real selected pages survive peer transfer/reopen, a body-only query finds
 them, duplicate submissions preserve both contributors while results group content,
@@ -344,32 +353,69 @@ management require their own subsequent consumer receipts.
   Persona-to-device-key adapter and a two-machine receipt remain open.
 
 - **2026-09-06:** the first P3 preservation slice passed and its cross-repository
-  adoption landed. Genet Fleece 0.5 at `221415af6643e7b31510547963217973ada6332b`
-  carries document-level canonical-text identity, arbitrary
-  range mint/resolve operations, the RFC 5147/quote/position selector triple,
-  ordered mixed-language and direction evidence, lossless embedded JSON-LD
-  blocks, and validated optional wire records. Mere's opt-in
-  `mere-document-lanes/eidetic-bridge` binds the selected immutable
+  adoption landed. Genet Fleece 0.5 at `9e8f9dc2f3ddc0af1658580bb51964462a03923f`
+  carries document-level canonical-text identity, arbitrary range mint/resolve
+  operations, the RFC 5147/quote/position selector triple, ordered mixed-language
+  and direction evidence, lossless embedded JSON-LD blocks, and validated optional
+  wire records. Quote resolution now checks every Unicode code-point start, so
+  overlapping occurrences remain distinct matches, then applies Fleece's stricter
+  grapheme-boundary rule. Its focused gate passed 69 tests, strict Clippy, and
+  `wasm32-unknown-unknown`. This is a tested extraction and selector profile, not a
+  claim of general HTML, JSON-LD, RDF, Web Annotation, or browser conformance.
+  Mere's opt-in `mere-document-lanes/eidetic-bridge` binds the selected immutable
   `text/plain; charset=utf-8` resource to caller-supplied capture evidence and
   canonical-page scope, saves it as an Eidetic typed payload, closes Fjall, and
   reopens the same validated Annotation envelope. An independent offline
   `oxjsonld`/`oxrdf` oracle expands the envelope with the official W3C context and
   verifies the expected dataset up to blank-node identity. All 28 root-workspace
-  Mere Genet dependency pins move together to that revision. The bridge embeds
-  and validates Fleece's `CanonicalTextRecordV1` directly. Fleece's preserved JSON-LD blocks now
-  feed linked-data through a document-lanes adapter, and linked-data's duplicate
-  HTML string scanner is retired. The detailed adapter retains document order,
-  element id, declared media type, and either the contribution or its parse or
-  expansion failure; a convenience projection keeps the former best-effort
-  successful-results behavior. Existing callers of linked-data's removed
+  Mere Genet dependency pins move together to the hardened revision.
+
+- **2026-09-06:** Fleece's preserved JSON-LD blocks now feed linked-data through a
+  document-lanes adapter, and linked-data's duplicate HTML string scanner is
+  retired. The detailed adapter retains document order, element id, declared media
+  type, source text, and either the contribution or its parse or expansion failure;
+  a convenience projection keeps the former best-effort successful-results
+  behavior. The host can supply its resolved document IRI for JSON-LD expansion
+  without giving Fleece source, fetch, or custody authority. W3C JSON-LD ToRDF
+  `t0017` proves relative IRI expansion against that caller-owned base; absent and
+  invalid bases retain distinct outcomes. Existing callers of linked-data's removed
   `from_html*` helpers must extract with Fleece and call this adapter. Re-ingesting
   an old HTML fixture can also change blank-node skolem IRIs where DOM text
   normalization changes the exact JSON-LD bytes; migrations must treat those as
-  derived identities and regroup by durable source facts. The Mere adoption gate
-  passed 46 focused native tests, strict Clippy for both changed crates, and a
+  derived identities and regroup by durable source facts. `knot-editor`
+  `7da29a6bd75112e4d28abb8066490cb9e514d543` widens its direct dependency to
+  Fleece 0.5 and carries Cargo's corrected lock resolution. Its 94 locked library
+  tests pass. Whole-crate strict Clippy reaches four existing lints in endpoint,
+  publishing, wire validation, and vault code outside this manifest-only adoption;
+  the exact annotation seam passes strict Clippy. Mere's generated locked graph now
+  contains exactly one Fleece, 0.5 at the hardened Genet revision. The combined
+  adapter and Eidetic gate passed 47 focused native tests, strict Clippy for both
+  changed crates, and a
   `wasm32-unknown-unknown` check using the workspace's established `wasm_js`
-  getrandom backend. The full workspace resolver still retains Fleece 0.4 through
-  the externally pinned `knot-editor`; that repository must widen its Fleece
-  requirement before the transitive graph can collapse to one revision. Official
-  JSON-LD test suites, captured response/DOM evidence, peer transfer, and
-  capture-state preservation remain open.
+  getrandom backend. Full official JSON-LD and Web Annotation test suites remain
+  open.
+
+- **2026-09-07:** the next P3 capture proof binds host-observed acquisition facts
+  into the durable extraction at Mere `ee533436`. `CaptureEvidenceV1` retains the
+  final absolute source, BLAKE3 identity of the exact acquired bytes, capture time,
+  available response content type, source/rendered/caller-supplied DOM mode, and optional
+  raw/replay manifest identities. The raw manifest, when present, must name the
+  same bytes as the capture hash. A hash of the complete evidence record is also
+  bound into the Web Annotation target; mutation tests cover every retained field,
+  while records serialized before the extension remain readable with those facts
+  explicitly absent.
+
+  A native receipt sends a `TrustedPeersOnly` annotation manifest and exact HTML
+  capture over authenticated p2panda QUIC, validates peer/protocol/privacy/schema
+  and both content hashes before storage, then closes and reopens a receiver-only
+  Fjall store. The reopened annotation and raw page bytes are exact. This proves
+  transport of the document evidence and durable receiver reopen. Commons' existing
+  LogSync test separately proves operation convergence; this receipt does not prove
+  that manifest operation sync, authenticated carrier identity grants Moot
+  membership, or sharing consent. Genet's current `ResourceResponse` exposes final
+  URL, content type and body bytes, but not requested URL, status, lossless headers
+  or truncation state. WARC-grade full-response capture therefore remains a host
+  contract follow-on. Body query, contributor-preserving deduplication, corpus and
+  cost measurements, and the held-out search-engine decision also remain open.
+  The same gate exposed UUID 1.25's new wasm RNG-selection requirement; Inker
+  `aac6e5df` now selects its JavaScript-backed provider only on wasm targets.

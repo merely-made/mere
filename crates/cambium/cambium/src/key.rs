@@ -342,6 +342,9 @@ where
                 ctx.unregister_key(prev_node, &view_state.path);
                 let path = ctx.view_path().to_vec();
                 ctx.register_key(node, path.clone(), self.capture, self.focusable);
+                if prev.focusable && !self.focusable && !ctx.is_focusable(prev_node) {
+                    ctx.request_blur(prev_node);
+                }
                 view_state.node = node;
                 view_state.path = path;
             }

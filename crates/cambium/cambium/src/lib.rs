@@ -59,6 +59,7 @@ mod pointer;
 mod portable;
 mod propagation;
 mod radio;
+mod range_scrubber;
 mod reorderable_list;
 mod resize_handle;
 mod runner;
@@ -75,6 +76,7 @@ mod surface;
 mod tabs;
 mod tags;
 mod text;
+mod value;
 mod wheel;
 mod workspace;
 
@@ -140,6 +142,7 @@ pub use pointer::{OnPointer, PointerButton, PointerEvent, PointerPhase, on_point
 pub use portable::{PortableKeyed, PortableKeyedState};
 pub use propagation::Propagation;
 pub use radio::{RadioGroup, radio_group};
+pub use range_scrubber::{RangeScrubber, RangeScrubberEvent, RangeScrubberPin, range_scrubber};
 pub use reorderable_list::{
     ReorderItem, ReorderMove, ReorderState, reorderable_list, reorderable_list_with,
 };
@@ -181,6 +184,7 @@ pub use tabs::{
 };
 pub use tags::*;
 pub use text::text;
+pub use value::{OnValue, OnValueState, ValueEvent, on_value};
 pub use wheel::{OnWheel, WheelEvent, on_wheel};
 pub use workspace::{WORKSPACE_CSS, WorkspaceModel, composited_slots, workspace_view};
 

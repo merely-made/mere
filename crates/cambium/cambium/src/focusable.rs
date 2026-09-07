@@ -147,6 +147,9 @@ where
                 if self.enabled {
                     ctx.register_focusable(node);
                 }
+                if view_state.enabled && !self.enabled && !ctx.is_focusable(prev_node) {
+                    ctx.request_blur(prev_node);
+                }
                 view_state.node = node;
                 view_state.enabled = self.enabled;
             }

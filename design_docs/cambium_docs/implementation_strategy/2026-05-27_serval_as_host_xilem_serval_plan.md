@@ -1,8 +1,12 @@
 # serval as host: the `xilem_serval` reactive backend
 
-Status: **strong through Stages 0-7; the previously named host-backend blockers
-are now landed.** Scopes using
-serval as the application host (chrome and content rendered by one engine),
+**Status (updated 2026-09-06):** historical extraction plan; its current
+implementation is Cambium over Genet. The public backend names are
+`GenetAppRunner`, `GenetCtx`, and `GenetElement`; `Serval*` below is the
+pre-extraction vocabulary retained only as deprecated compatibility aliases.
+The implementation remains strong through Stages 0-7, with the previously
+named host-backend blockers landed. The plan scopes using serval as the
+application host (chrome and content rendered by one engine),
 and the reactive authoring layer that requires. The finding held: that
 layer is mostly *reuse* of `xilem_core` (a third backend beside Masonry and
 `xilem_web`), not a from-scratch Dioxus-style framework. The full loop —

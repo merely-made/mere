@@ -642,6 +642,9 @@ where
                     runner.dispatch_click(request.node, PointerClick::at((0.0, 0.0)));
                 },
                 A11yAction::Focus => runner.set_focus(Some(request.node)),
+                A11yAction::SetValue(value) => {
+                    runner.dispatch_value(request.node, cambium::ValueEvent { value });
+                },
             }
         }
         // Focus may have moved without any pointer motion; refresh the

@@ -1,10 +1,12 @@
 # Genet compatibility
 
 Cambium consumes Genet through published seam packages. `cambium-nematic`
-adds reactive projections over Errand's portable smolweb ASTs; Genet's retained
-document runtime remains in `genet-documents`.
+adds reactive projections over Errand's portable smolweb ASTs. Genet's
+engine-side Livery and Scripted document runtime remains in `genet-documents`;
+Mere's application-facing reader and smolweb lanes live in
+`mere-document-lanes`.
 
-## Current verified set
+## Historical verified Genet seam set (2026-07-22)
 
 Verified on 2026-07-22:
 
@@ -23,7 +25,7 @@ Verified on 2026-07-22:
 | `genet-static-dom` | 0.1.0 | crates.io |
 | `genet-scripted-dom` | 0.1.0 | crates.io and sibling path |
 
-## The Cambium stack: source vs registry (updated 2026-08-20)
+## Historical Cambium stack: source vs registry (updated 2026-08-20)
 
 | Package | Workspace | crates.io | State |
 | --- | --- | --- | --- |
@@ -46,10 +48,28 @@ that state under its own number and `cambium-winit` 0.3.0 requires it.
 holding the genet-coupled half keeps `cambium-winit` down to `cambium` +
 `winit`.
 
-Consumers still ride the git-first rule (every sibling takes the family from
-genet.git by branch, per the 2026-07-26 ruling); the registry serves
-external consumers. Cambium Nematic's release boundary is Cambium plus the
-protocol AST package, without Genet's layout or rendering engine.
+At that table's date, consumers followed a git-first family rule through
+`genet.git`; the registry served external consumers. Cambium Nematic's release
+boundary was Cambium plus the protocol AST package, without Genet's layout or
+rendering engine.
+
+## Current Mere-owned compatibility (2026-09-06)
+
+Cambium is now a Mere workspace family under `crates/cambium/`; it is not a
+Genet workspace subtree. Mere owns the current `cambium`, `meristem`,
+`sprigging`, and `workbench` paths, while pinning Genet seam packages at one
+immutable `genet.git` revision (`221415af6643e7b31510547963217973ada6332b`).
+Errand is likewise Mere-owned at workspace version 0.3.4.
+
+| Boundary | Current source in this workspace | State |
+| --- | --- | --- |
+| Cambium family | `crates/cambium/` workspace members | Mere-owned |
+| Genet DOM seams | `genet-scripted-dom`, `layout-dom-api`, and `genet-static-dom` pinned to the revision above | Genet dependency boundary |
+| Errand | `crates/system/errand` 0.3.4 | Mere-owned protocol AST dependency |
+
+Downstream consumers' pins and registry publication state need verification in
+their own repositories or registries; this document records only the current
+Mere workspace boundary.
 
 ## Custom-leaf protocol
 

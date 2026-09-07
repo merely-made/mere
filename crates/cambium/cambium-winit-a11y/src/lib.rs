@@ -28,7 +28,7 @@
 
 use std::collections::HashMap;
 
-use accesskit::{Action, Affine, NodeId as A11yNodeId, TreeUpdate};
+use accesskit::{Action, ActionData, Affine, NodeId as A11yNodeId, TreeUpdate};
 use genet_scripted_dom::{NodeId, ScriptedDom};
 use genet_winit_host::{AccessKitBridge, BridgeStatus};
 use layout_dom_api::{LayoutDom as _, LocalName, Namespace, NodeKind};
@@ -145,6 +145,12 @@ impl A11yHost {
                 let action = match req.action {
                     Action::Click => A11yAction::Click,
                     Action::Focus => A11yAction::Focus,
+                    Action::SetValue => match req.data {
+                        Some(ActionData::NumericValue(value)) if value.is_finite() => {
+                            A11yAction::SetValue(value)
+                        },
+                        _ => return None,
+                    },
                     _ => return None,
                 };
                 let node = self.action_map.get(&req.target_node).copied()?;
@@ -173,6 +179,12 @@ impl A11yHost {
         let action = match request.action {
             Action::Click => A11yAction::Click,
             Action::Focus => A11yAction::Focus,
+            Action::SetValue => match request.data {
+                Some(ActionData::NumericValue(value)) if value.is_finite() => {
+                    A11yAction::SetValue(value)
+                },
+                _ => return None,
+            },
             _ => return None,
         };
         let node = self.action_map.get(&request.target_node).copied()?;
@@ -209,6 +221,18 @@ pub fn project_tree(
                 .find(|(candidate, _)| *candidate == id)
         {
             leaf.accessibility(access);
+        }
+        if dom.attribute(
+            node,
+            &Namespace::default(),
+            &LocalName::from("data-cambium-set-value"),
+        ) == Some("true")
+            && let Some((_, access)) = tree
+                .nodes
+                .iter_mut()
+                .find(|(candidate, _)| *candidate == id)
+        {
+            access.add_action(Action::SetValue);
         }
     });
     (tree, action_map)
@@ -264,7 +288,7 @@ fn custom_leaf_key(dom: &ScriptedDom, node: NodeId) -> Option<u64> {
 #[cfg(test)]
 mod dpi_tests {
     use super::*;
-    use accesskit::{Node, Role, Tree, TreeId};
+    use accesskit::{ActionRequest, Node, Role, Tree, TreeId};
 
     /// A 125% window must report physical coordinates to the platform: the
     /// logical layout bounds ride a root transform that scales them.
@@ -281,5 +305,32 @@ mod dpi_tests {
         scale_tree_to_window(&mut tree, &dom, 1.25);
         let (_, node) = tree.nodes.iter().find(|(id, _)| *id == root).unwrap();
         assert_eq!(node.transform(), Some(&Affine::scale(1.25)));
+    }
+
+    #[test]
+    fn numeric_set_value_maps_only_finite_numeric_data() {
+        let dom = ScriptedDom::new();
+        let node = dom.document();
+        let target = A11yNodeId(44);
+        let mut host = A11yHost::new(|| {});
+        host.action_map.insert(target, node);
+        let request = |data| ActionRequest {
+            action: Action::SetValue,
+            target_tree: TreeId::ROOT,
+            target_node: target,
+            data,
+        };
+        assert_eq!(
+            host.map_request(&request(Some(ActionData::NumericValue(2.5)))),
+            Some(A11yRequest {
+                action: A11yAction::SetValue(2.5),
+                node
+            }),
+        );
+        assert_eq!(host.map_request(&request(None)), None);
+        assert_eq!(
+            host.map_request(&request(Some(ActionData::NumericValue(f64::NAN)))),
+            None,
+        );
     }
 }

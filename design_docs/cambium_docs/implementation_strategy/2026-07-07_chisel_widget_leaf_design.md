@@ -1,6 +1,14 @@
 # chisel: custom-paint widget leaves for the serval host
 
-**Status:** proposed (2026-07-07); first design pass. Defines a small, sharp
+**Status (updated 2026-09-06):** historical design record from 2026-07-07.
+Its retained-paint direction landed as the `sprigging` workspace crate; the
+current authoring element is `<custom-leaf>`, with `<chisel-leaf>` retained
+only as a read-side compatibility spelling. The current catalog is
+[2026-07-15_component_catalog_growth_plan.md](./2026-07-15_component_catalog_growth_plan.md)
+and [component-catalog.md](../technical_architecture/component-catalog.md).
+`chisel` and `xilem-serval` below are the proposal's historical names.
+
+**Original proposal:** first design pass. Defines a small, sharp
 widget-leaf layer that lets imperative custom-paint widgets (knobs, meters,
 waveforms, graph canvases) live as first-class serval elements without a second
 UI engine. Sits beside the reactive backend from
@@ -11,7 +19,7 @@ Working crate name **`chisel`** (needs a crates.io check before reservation).
 
 Code samples are **illustrative** unless marked implementation-ready.
 
-**Implementation status (2026-07-07):**
+**Recorded implementation status (2026-07-07):**
 
 - `components/chisel` *(historical citation)* <!-- doc-audit: historical-path --> scaffolded and building (workspace member; deps
   `paint_list_api` + `accesskit`). Ships the `Leaf` trait, `PaintCx` (Path A),
