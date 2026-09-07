@@ -1,7 +1,8 @@
 # Cambium fact-visualization leaves
 
 **Date:** 2026-09-06
-**Status (2026-09-06):** V0 and V1 landed; V2 planned
+**Status (2026-09-06):** V0-V2 landed, including Cleromancy's first controlled
+range-scrubber adoption
 
 ## Decision
 
@@ -10,7 +11,7 @@ landed fact surfaces:
 
 1. a read-only angle strip for several positions on one cyclic range;
 2. a read-only dimension line for one measured relation;
-3. a range-bounded scrubber with durable pins.
+3. a range-bounded controlled scrubber with semantic pins.
 
 The first two are tier-2 Sprigging vector leaves. They paint geometry only.
 Names, values, units, provenance, and alternate tabular readings remain normal
@@ -126,11 +127,15 @@ effect after a scrubber event.
 - the component catalog covers empty pins, dense pins, disabled state, and
   keyboard routing;
 - the first product adoption proves application-owned side effects and
-  persistence.
+  retained application-state persistence across rerenders and tab switches,
+  not new durable graph storage.
 
 ## Verification wall
 
 ```powershell
+cargo test -p cambium --lib --locked
+cargo test -p cambium-winit-a11y --lib --locked
+cargo test -p cambium-genet-winit-host --test accessibility --locked
 cargo test -p sprigging --lib --locked
 cargo test -p cambium --example component_catalog --all-features --locked
 cargo run -p cambium --example component_catalog --all-features -- --write-receipts
@@ -172,3 +177,19 @@ cargo test --test chart_surface_dom --features analytic-ephemeris --offline -j 1
   passes 3/3 in default and `analytic-ephemeris` builds. Independent review
   found and closed chart-switch focus and selector-reconciliation gaps; final
   review is clean.
+- **2026-09-06:** V2 landed in Cambium as the controlled `RangeScrubber`.
+  Immutable application props supply finite bounds, value, stepping, labels,
+  pins, and optional disabled reason; `Preview` and `Commit` events return the
+  reconciled value to application state. Pointer, keyboard, and AccessKit
+  numeric `SetValue` share the same finite clamp-and-quantize helper. Pins and
+  disabled explanations remain semantic DOM, while invalid ranges are inert.
+  The catalog covers ordinary keyboard routing, empty pins, dense pins, and a
+  disabled specimen. Cleromancy's Chart surface now uses the scrubber to select
+  stored charts, resets its view-local aspect choice when selection changes,
+  and preserves that application-owned selection through rerenders and tab
+  switches. This proof introduces no durable graph storage. Review found and
+  closed a focused-to-disabled reconciliation gap: focus and blur requests now
+  preserve an explicit focus move while clearing a control that alone ceased
+  to be focusable. Cambium passes 204/204; the AccessKit adapter passes 2/2;
+  native accessibility passes 6/6; and the catalog plus committed receipts
+  pass 2/2.

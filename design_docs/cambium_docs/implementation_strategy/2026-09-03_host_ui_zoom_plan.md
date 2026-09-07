@@ -7,7 +7,10 @@ the Cambium family (platform boundary plan, P2), landing in
 read `components/cambium/...` *(historical citation)* <!-- doc-audit: historical-path --> are genet's, before the move; the code is at
 `crates/cambium/...` here.
 
-**Status:** in progress (2026-09-03); Z0 through Z4 landed in genet, Z5 landed in isometry with its design figure open (see Progress); nothing committed. Founded when isometry's host migration exposed a panel laid out for
+**Status:** in progress (2026-09-03); Z0 through Z4 are committed in this
+Mere snapshot, and Z5 was recorded as landed in Isometry with its design
+figure open (see Progress). Current consumer adoption remains a separate
+check. Founded when isometry's host migration exposed a panel laid out for
 820 logical pixels on a display that offers 752.
 
 **Related:** `genet/docs/2026-08-09_cambium_desktop_host_g1_receipt.md` (the host

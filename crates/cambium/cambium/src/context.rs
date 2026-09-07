@@ -51,6 +51,12 @@ pub struct Handler {
     pub focusable: bool,
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(crate) enum FocusRequest {
+    Focus(NodeId),
+    Blur(NodeId),
+}
+
 /// The [`ViewPathTracker`] context for all Genet views.
 ///
 /// The context tracks the current Meristem view path, the shared DOM, and the
@@ -93,6 +99,8 @@ pub struct GenetCtx {
     /// hit node's ancestor chain through this on `pointerdown` to find the
     /// element that captures the drag.
     pointer_handlers: HashMap<NodeId, Vec<ViewId>>,
+    /// `NodeId → routing path` for accessible numeric value handlers.
+    value_handlers: HashMap<NodeId, Vec<ViewId>>,
     /// `NodeId → routing path` for pointer-hover handlers
     /// ([`OnHover`](crate::OnHover)). Hover routes directly to the nearest
     /// registered ancestor selected by the host's hit-test transition.
@@ -107,7 +115,7 @@ pub struct GenetCtx {
     /// One-shot programmatic focus requested by a view during build/rebuild.
     /// The runner consumes this after the DOM mutation pass, once the target is
     /// attached and its liveness can be checked.
-    focus_request: Option<NodeId>,
+    focus_request: Option<FocusRequest>,
     /// The portable-child nursery (moveBefore plan S5, cross-parent): children a
     /// [`PortableKeyed`](crate::PortableKeyed) parked because their key left its
     /// list, waiting within the same rebuild pass to be claimed by the sequence
@@ -194,6 +202,7 @@ impl GenetCtx {
             focusable: HashMap::new(),
             focus_handlers: HashMap::new(),
             pointer_handlers: HashMap::new(),
+            value_handlers: HashMap::new(),
             hover_handlers: HashMap::new(),
             wheel_handlers: HashMap::new(),
             focus_request: None,
@@ -202,10 +211,16 @@ impl GenetCtx {
     }
 
     pub(crate) fn request_focus(&mut self, node: NodeId) {
-        self.focus_request = Some(node);
+        self.focus_request = Some(FocusRequest::Focus(node));
     }
 
-    pub(crate) fn take_focus_request(&mut self) -> Option<NodeId> {
+    pub(crate) fn request_blur(&mut self, node: NodeId) {
+        if !matches!(self.focus_request, Some(FocusRequest::Focus(_))) {
+            self.focus_request = Some(FocusRequest::Blur(node));
+        }
+    }
+
+    pub(crate) fn take_focus_request(&mut self) -> Option<FocusRequest> {
         self.focus_request.take()
     }
 
@@ -443,6 +458,21 @@ impl GenetCtx {
     /// this to find the drag-capturing element.
     pub fn pointer_handler(&self, node: NodeId) -> Option<&[ViewId]> {
         self.pointer_handlers.get(&node).map(Vec::as_slice)
+    }
+
+    /// Register `path` as the accessible numeric-value handler for `node`.
+    pub fn register_value(&mut self, node: NodeId, path: Vec<ViewId>) {
+        self.value_handlers.insert(node, path);
+    }
+
+    /// Drop the accessible numeric-value handler for `node`.
+    pub fn unregister_value(&mut self, node: NodeId) {
+        self.value_handlers.remove(&node);
+    }
+
+    /// The accessible numeric-value routing path on `node`, if registered.
+    pub fn value_handler(&self, node: NodeId) -> Option<&[ViewId]> {
+        self.value_handlers.get(&node).map(Vec::as_slice)
     }
 
     /// Register `path` as the hover handler for `node`.

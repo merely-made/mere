@@ -1,9 +1,9 @@
 # Autodiff LoRA trainer plan
 
-**Status:** in progress (2026-09-02). Assessment complete; Mark ruled D1–D3
+**Status:** complete on `main` (2026-09-03). Assessment complete; Mark ruled D1–D3
 on 2026-09-02, each on the recommended option; every phase landed 2026-09-03 and the
-receipts were rerun on the rebased tree and on the Fedora ThinkPad. Complete
-once the branch is on `main`; the padding-with-mask follow-on and the burn
+receipts were rerun on the rebased tree and on the Fedora ThinkPad. The
+padding-with-mask follow-on and the burn
 `LoraAdapter` question stay open in Findings. Follow-on to the
 [distillery v0 plan](2026-08-12_distillery_v0_plan.md) (§9 trainer forcing,
 and the 2026-09-02 discrete-GPU trainer entry) and the

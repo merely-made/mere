@@ -200,16 +200,18 @@ pub trait Surface {
 /// navigating a list with a virtual cursor issues `Focus`, and turning that into
 /// a click activates every control the reader merely moves across. The host
 /// routes `Click` through its activation path and `Focus` through `set_focus`.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum A11yAction {
     /// Activate the element: the reader's equivalent of a pointer click.
     Click,
     /// Move focus to the element, without activating it.
     Focus,
+    /// Set an accessible numeric control's value without implying a click.
+    SetValue(f64),
 }
 
 /// One drained screen-reader request: which action, on which DOM node.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub struct A11yRequest {
     pub action: A11yAction,
     pub node: NodeId,

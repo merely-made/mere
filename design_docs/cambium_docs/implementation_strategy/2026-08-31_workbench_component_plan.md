@@ -11,8 +11,8 @@ composition, which is Mere's. Nothing about what it owns changed.
 
 **Date**: 2026-08-31
 **Status:** W5 opened (2026-09-04) — Turnstone's panes become tiles, ruled by
-Mark; S1 and S2 landed the same day; S3 is Turnstone's and waits on a push
-of this repository and a pin bump. W1 through W4 are implemented and landed through
+Mark; S1 and S2 are committed in this Mere snapshot; S3 remains Turnstone's
+pin/adoption work. W1 through W4 are implemented and landed through
 coordinated Genet, Mere, and product branches. W4 has captured native Pelt
 acceptance and cancellation receipts, a headed Graphshell browser
 save/mutate/reload receipt, and a durable Woodshed open-lane consumer with full
@@ -353,10 +353,11 @@ switches tabs, closes one from its ×, restarts, and finds the stack where it
 was; the accessibility tree is the frame's own rather than a stitched one;
 and the graph pane's frame time is not worse than today's.
 
-**Sequencing and the pin.** Turnstone consumes mere by git revision and the
-family is git-first, so S3 cannot start against unpushed S1/S2: pushing mere
-and bumping Turnstone's pin are Mark's steps between S2 and S3. The
-`physics catalog` P4 native drag half waits on the same bump.
+**Sequencing and the pin (updated 2026-09-06).** Turnstone consumes Mere by
+git revision. This snapshot already contains S1/S2; S3 starts when Turnstone
+adopts a Mere revision containing them. Turnstone's current pin and adoption
+are not verifiable from this repository, so they remain an external consumer
+gate. The `physics catalog` P4 native-drag half waits on that same adoption.
 
 ## Progress
 
