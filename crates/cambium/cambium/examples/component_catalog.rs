@@ -21,14 +21,14 @@ use cambium::{
     DomHandle, GenetAppRunner, GenetCtx, GenetElement, GraphCanvasEdge, GraphCanvasNode,
     GraphCanvasSubgraph, GraphCanvasSwatch, GridColumn, GridSpec, GridView, HoverEvent, HoverPhase,
     Key, KeyEvent, NamedKey, OverlayDismiss, OverlayRole, OverlaySurface, Placement, PointerClick,
-    PointerEvent, PointerPhase, RadioGroup, ReorderItem, ReorderMove, ReorderState, SelectState,
-    SelectionItem, SelectionState, Slider, StyleRange, SummaryBody, TabActivation, TextInput,
-    TreeItem, TreeState, accordion_with, button, button_with, checkbox, command_menu,
-    command_palette, command_picker, component, custom_leaf, data_grid, detail_popover, disclosure,
-    el, filter_chips, frisket, graph_canvas_swatch, graph_canvas_swatch_with_focus, lens,
-    map_action, on_hover, on_pointer, overlay_surface, radio_group, reorderable_list,
-    segmented_control, select, setting_row, slider, styled_textarea, summary_body, tab_bar,
-    text_field_typed, textarea_typed, toggle, tree_view,
+    PointerEvent, PointerPhase, RadioGroup, RangeScrubber, RangeScrubberEvent, RangeScrubberPin,
+    ReorderItem, ReorderMove, ReorderState, SelectState, SelectionItem, SelectionState, Slider,
+    StyleRange, SummaryBody, TabActivation, TextInput, TreeItem, TreeState, accordion_with, button,
+    button_with, checkbox, command_menu, command_palette, command_picker, component, custom_leaf,
+    data_grid, detail_popover, disclosure, el, filter_chips, frisket, graph_canvas_swatch,
+    graph_canvas_swatch_with_focus, lens, map_action, on_hover, on_pointer, overlay_surface,
+    radio_group, range_scrubber, reorderable_list, segmented_control, select, setting_row, slider,
+    styled_textarea, summary_body, tab_bar, text_field_typed, textarea_typed, toggle, tree_view,
 };
 use genet_scripted_dom::{NodeId, ScriptedDom};
 use layout_dom_api::{LayoutDom, LocalName, Namespace};
@@ -121,6 +121,7 @@ struct CatalogState {
     tree: TreeState<&'static str>,
     select: SelectState,
     slider: Slider,
+    range_value: f64,
     text: TextInput,
     multiline: TextInput,
     styled: TextInput,
@@ -189,6 +190,7 @@ impl Default for CatalogState {
                 .with_selected("workspace"),
             select: SelectState::new(1).with_label("Rendering mode"),
             slider: Slider::new(0.35).with_steps(0.05, 0.2).with_label("Zoom"),
+            range_value: 24.0,
             text: TextInput::new("turnstone"),
             multiline: TextInput::new("First line\nSecond line"),
             styled: TextInput::new("let answer = 42;"),
@@ -706,6 +708,59 @@ fn catalog(state: &CatalogState) -> CatalogView {
                 ),
             )
             .attr("id", "catalog-slider")
+            .attr("class", "catalog-row"),
+            el(
+                "div",
+                range_scrubber(
+                    RangeScrubber::new(0.0, 100.0, state.range_value)
+                        .with_steps(5.0, 20.0)
+                        .with_label("Consultation strength")
+                        .with_pins([
+                            RangeScrubberPin::new(0.0, "Minimum"),
+                            RangeScrubberPin::new(50.0, "Midpoint"),
+                            RangeScrubberPin::new(100.0, "Maximum"),
+                        ]),
+                    |state: &mut CatalogState, event| match event {
+                        RangeScrubberEvent::Preview(value) | RangeScrubberEvent::Commit(value) => {
+                            state.range_value = value
+                        },
+                    },
+                ),
+            )
+            .attr("id", "catalog-range-scrubber")
+            .attr("class", "catalog-row"),
+            el(
+                "div",
+                range_scrubber(
+                    RangeScrubber::new(0.0, 12.0, 6.0).with_label("Empty pin range"),
+                    |_state: &mut CatalogState, _event| {},
+                ),
+            )
+            .attr("id", "catalog-range-scrubber-empty")
+            .attr("class", "catalog-row"),
+            el(
+                "div",
+                range_scrubber(
+                    RangeScrubber::new(0.0, 8.0, 4.0)
+                        .with_label("Dense pin range")
+                        .with_pins((0..=8).map(|value| {
+                            RangeScrubberPin::new(value as f64, format!("Tick {value}"))
+                        })),
+                    |_state: &mut CatalogState, _event| {},
+                ),
+            )
+            .attr("id", "catalog-range-scrubber-dense")
+            .attr("class", "catalog-row"),
+            el(
+                "div",
+                range_scrubber(
+                    RangeScrubber::new(0.0, 10.0, 5.0)
+                        .with_label("Unavailable range")
+                        .disabled("A source must be selected first."),
+                    |_state: &mut CatalogState, _event| {},
+                ),
+            )
+            .attr("id", "catalog-range-scrubber-disabled")
             .attr("class", "catalog-row"),
             button("Apply", |state: &mut CatalogState, _: PointerClick| {
                 state.presses += 1;
@@ -1787,6 +1842,40 @@ fn assert_initial_surface(dom: &ScriptedDom, root: NodeId, width: CatalogWidth) 
     assert_attr(dom, slider, "aria-label", "Zoom");
     assert_attr(dom, slider, "aria-valuenow", "0.35");
 
+    let scrubber_root = find_id(dom, root, "catalog-range-scrubber");
+    let scrubber = find_where(dom, scrubber_root, &|dom, node| {
+        attr(dom, node, "role") == Some("slider")
+    })
+    .expect("range scrubber semantics");
+    assert_attr(dom, scrubber, "aria-label", "Consultation strength");
+    assert_attr(dom, scrubber, "aria-valuenow", "25");
+    assert_eq!(
+        find_where(dom, scrubber_root, &|dom, node| has_class(
+            dom,
+            node,
+            "range-scrubber-pin"
+        ))
+        .is_some(),
+        true,
+        "pins remain semantic DOM siblings",
+    );
+    let empty = find_id(dom, root, "catalog-range-scrubber-empty");
+    assert!(
+        find_where(dom, empty, &|dom, node| has_class(
+            dom,
+            node,
+            "range-scrubber-pin"
+        ))
+        .is_none()
+    );
+    let disabled = find_id(dom, root, "catalog-range-scrubber-disabled");
+    let disabled_slider = find_where(dom, disabled, &|dom, node| {
+        attr(dom, node, "role") == Some("slider")
+    })
+    .expect("disabled scrubber");
+    assert_attr(dom, disabled_slider, "aria-disabled", "true");
+    assert_attr(dom, disabled_slider, "tabindex", "-1");
+
     let text_root = find_id(dom, root, "catalog-text");
     assert!(
         find_where(dom, text_root, &|dom, node| {
@@ -2137,6 +2226,21 @@ fn run_interactions(runner: &mut CatalogRunner) {
     runner.set_focus(Some(slider));
     runner.dispatch_key(KeyEvent::new(Key::Named(NamedKey::PageUp)));
     assert!((runner.state().slider.value - 0.55).abs() < f32::EPSILON);
+
+    let scrubber_root = find_id(&runner.dom().borrow(), root, "catalog-range-scrubber");
+    let scrubber = find_where(&runner.dom().borrow(), scrubber_root, &|dom, node| {
+        attr(dom, node, "role") == Some("slider")
+    })
+    .expect("range scrubber");
+    runner.set_focus(Some(scrubber));
+    runner.dispatch_key(KeyEvent::new(Key::Named(NamedKey::ArrowRight)));
+    assert_eq!(runner.state().range_value, 30.0);
+    runner.dispatch_key(KeyEvent::new(Key::Named(NamedKey::PageUp)));
+    assert_eq!(runner.state().range_value, 50.0);
+    runner.dispatch_key(KeyEvent::new(Key::Named(NamedKey::Home)));
+    assert_eq!(runner.state().range_value, 0.0);
+    runner.dispatch_key(KeyEvent::new(Key::Named(NamedKey::End)));
+    assert_eq!(runner.state().range_value, 100.0);
 
     let text_root = find_id(&runner.dom().borrow(), root, "catalog-text");
     let text = find_where(&runner.dom().borrow(), text_root, &|dom, node| {
