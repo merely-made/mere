@@ -29,6 +29,9 @@
 //! - **Reports** — [`TrailIndex::top_domains`] /
 //!   [`TrailIndex::visits_histogram`] over the stored columns (domain / owner
 //!   / time / transition, so reports need no re-index).
+//! - **Candidates** — [`CandidateIndex`]: a token-prefix lookup over the same
+//!   tokenizer, for a lane that must narrow the corpus before it ranks
+//!   (the behavioural one) without scanning every record per keystroke.
 //! - **Fusion** — [`fuse`] / [`fuse_many`]: the engine-agnostic seam that
 //!   merges this crate's lexical ranking with a vector ranking (`intel/esp`
 //!   or any other) and any further lane — the behavioural one in
@@ -43,12 +46,14 @@
 //! half (deferred) would verify before merging.
 
 pub mod bm25;
+pub mod candidates;
 pub mod fusion;
 pub mod index;
 pub mod spec;
 pub mod tokenize;
 
 pub use bm25::{Bm25Config, Bm25Index};
+pub use candidates::CandidateIndex;
 pub use fusion::{FusedHit, Ranking, fuse, fuse_many};
 pub use index::{FieldWeights, Hit, IndexConfig, TrailIndex};
 pub use spec::{SEARCH_INDEX_SCHEMA_REF, SPEC_SIDECAR, SearchIndexSpec, bootstrap_search_schema};
