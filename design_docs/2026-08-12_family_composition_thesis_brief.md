@@ -499,7 +499,16 @@ Existing owner plans remain the implementation homes.
 | S7 | Genet Ortet O5 integration | Wire native host wake and replacement to the real scripted session and obtain explicit Boa/Nova host receipts; automated conformance remains with genet-wpt | Depends on S6 and O5 prerequisites |
 | S8 | Host visibility and resource disposal | Exercise real hidden/suspended/resumed session behavior and product-owned resource removal/stale-revision refusal; record policy ownership and any required local correction | Depends on available host controls; no shared lease assumed |
 | S9 | Turnstone capture correlation | Integrate exact target and nonreused request identity into the actual capture path, with stale/duplicate/unsupported refusal; keep envelope and pixel-storage acceptance explicit | Action-to-host correlation implemented for review; replacement-id alias found and corrected, validation running; durable deposit remains open |
-| S10 | Turnstone/Mere custody lifecycle | Integrate owner-specific references and a serialized/transactional transfer/collection boundary with recovery and disclosure policy, including same-kind multiple owners and stale collection proposals | Depends on actual S9 envelope/reference seam |
+| S10 | Turnstone/Mere custody lifecycle | Integrate owner-specific references and a serialized/transactional transfer/collection boundary with recovery and disclosure policy, including same-kind multiple owners and stale collection proposals | Actual Muniment/redb probe: 3 pass, including reopen and stale-delete negative control; production writer/envelope integration remains open |
+
+The [actual custody-backend probe](mere_docs/testing/receipts/2026-09-08_stack_pillar_probes/custody-backend/RECEIPT.md)
+uses Muniment/redb and BLAKE3: owner-specific transfer survives reopen, a
+rechecked collection refuses a later claim, and an atomic but stale delete
+batch demonstrably loses the newly claimed bytes. This selects a requirement
+for S10: all claims, transfers and collection share one serialized writer, or
+the store provides conditional transactional reads and writes. `Backend::apply`
+alone does not cover the read-to-delete interval. Process-kill recovery and
+actual capture envelope/deposit integration remain open.
 
 Sidequests require a concrete finding that affects one of those done-conditions,
 a named owner and a bounded receipt. A root-accounting defect or a missing host
