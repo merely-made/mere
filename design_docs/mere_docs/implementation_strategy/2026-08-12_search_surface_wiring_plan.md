@@ -606,4 +606,32 @@ store, not fixtures only.
   write it never reads. Turnstone's W6c host half is `c863b8e`, the corpus
   harness `696bc2f`; mere's W6c stack half `5231ae3e`, engine `7a5b7e19`,
   corpus `fc0c9e8c`. All unpushed pending the family re-pin.
+- **2026-09-07 — candidate index for the behavioural lane.** W6e found the
+  lane substring-scanning all 41,822 pages per keystroke. `eidetic-search::
+  candidates::CandidateIndex` is a token-prefix lookup over the shared
+  tokenizer: four flat arrays (a token blob, token offsets, ascending
+  deduplicated postings, posting offsets), a prefix range by two binary
+  searches, AND across query tokens by sorted intersection; `candidate_ids`
+  returns record ids in build order so a consumer scores a wide set by
+  index. Semantics change, deliberate and tested: token prefix, not
+  whole-query substring, so `zette` no longer reaches `gazette`; hosts need
+  no special case because the tokenizer already splits `example.test`.
+  Turnstone builds it at mint over each record's addresses and title
+  (`MintReceipt.candidates`, `candidate_bytes`), keeps a score `Vec` aligned
+  to the ids, and orders only the head with `select_nth_unstable_by`. Eight
+  tests in eidetic-search; synthetic 42k pages build in 60 ms at 40 bytes
+  per page, median query 74 µs. On the Firefox corpus, release:
+
+  | query, two-char prefix | before | after | top-frecency first |
+  |---|---:|---:|---|
+  | busiest page 1 | 22.7 ms | 115 µs | yes |
+  | busiest page 2 | 22.6 ms | 491 µs | yes |
+  | busiest page 3 | 20.8 ms | 437 µs | yes |
+
+  The index costs 488 ms and 4.6 MB (110 bytes per page) at mint on real
+  addresses, which carry far more tokens than the synthetic ones; sharing
+  the tokenization pass with the BM25 build would remove most of that and
+  is the named follow-on. The Opus session limit interrupted the agent
+  after the index was built; the id-aligned scoring and partial sort that
+  closed the remaining cost were finished by hand.
 
