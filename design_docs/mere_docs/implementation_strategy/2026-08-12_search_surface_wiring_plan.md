@@ -634,4 +634,32 @@ store, not fixtures only.
   is the named follow-on. The Opus session limit interrupted the agent
   after the index was built; the id-aligned scoring and partial sort that
   closed the remaining cost were finished by hand.
+- **2026-09-08 — the hashed vector lane retired from recall.** Mark's
+  ruling on the 685 MB finding: retire first, measure, then revisit esp's
+  representation (sparse storage, or 256 to 512 dimensions as esp's own
+  docs advise) if a vector lane is wanted again. Turnstone's `RecallIndex`
+  fuses two lanes, lexical and behavioural; `RecallConfig` is the one
+  frecency weight; the `recall.phrase_order` and `recall.phrase_influence`
+  settings are gone (an old persisted value deserializes and is never
+  read); the esp dependency leaves turnstone; the evaluation module shrinks
+  from 1,292 to 508 lines because its manifest apparatus was the vector A/B
+  entire. Firefox corpus, release, before and after:
+
+  | measure | before | after |
+  |---|---:|---:|
+  | mint total, lexical plus behavioural | 2,270 ms | 1,036 ms |
+  | mint page table / lexical / candidates | 1,013 / 377 / 728 ms | 411 / 194 / 335 ms |
+  | query with the behavioural lane, three prefixes | 102 / 551 / 578 µs | 46 / 255 / 279 µs |
+  | peak resident, whole test process | 1,178 MB | 367 MB |
+  | Spearman vs Firefox / top-100 overlap | 0.859 / 36 | 0.859 / 36 |
+
+  Ranking is unchanged on every query line. The retained lanes halved
+  because `recall_documents` built a concatenated title, URL and body string
+  per page purely as vector-ingest input inside the page-table window; the
+  rest of the speedup is reproducible but not isolated, allocator pressure
+  being the plausible cause. Comparable: Firefox's own places.sqlite holds
+  this whole profile in 36.7 MB, about 800 bytes per page; no production
+  browser stores a vector per page. Next, when measured against a want: a
+  sparse representation in esp (about 100 bytes per page) or 512 dims
+  (85 MB), and a semantic embedder as the case a vector lane is for.
 
