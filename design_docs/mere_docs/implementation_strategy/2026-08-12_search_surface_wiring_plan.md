@@ -561,4 +561,49 @@ store, not fixtures only.
   updates as a tombstone plus vacuum, the invalidated-projection shape;
   turnstone still calls plain `rebuild` and so pays the persisted write it
   never reads, one argument at its call site takes the transient path.
+- **2026-09-07 — W6e, a real corpus: Mark's Firefox history** (94,096
+  visits over 20 months, 44,557 places; exported from a copy, never the
+  live profile, and no address, title or term appears in any receipt).
+  `scripts/firefox_history_export.py` and `import::history` (mapping table
+  in its doc comment, asserted against `TransitionWeights::default()` by
+  test) plus the `#[ignore]`d turnstone harness
+  `firefox_history_corpus_receipt`. Receipts, release:
+
+  | measure | value |
+  |---|---:|
+  | traces / events / pages | 2,941 / 94,096 / 41,822 |
+  | addresses collapsed by canonicalization | 2,082 (top collapse sizes 422, 115, 82, 39, 35) |
+  | mint, vector off | page table 529 ms, lexical 261 ms, frecency 85 ms, total 895 ms |
+  | mint, vector on | plus 566 ms vector, total 1,440 ms; about 685 MB resident |
+  | Spearman vs Firefox frecency | 0.859 (0.858 with the dwell bonus off) |
+  | Firefox top-100 pages found in our top 100 | 36 |
+  | events with dwell / over the 30 s bonus | 6,335 (6.7%) / 1,410 (1.5%) |
+  | typed-prefix query, three hosts | 19 to 22 µs without the frecency lane; 20.8 to 22.7 ms with it; the top-frecency candidate came first in all three only with the lane |
+
+  What the numbers say. The behavioural lane is right and slow: it
+  substring-scans all 41,822 entries per keystroke, a thousand times the
+  lexical query; it needs a candidate index (tokenized prefix lookup over
+  the page table) before it can ship at this size. Global rank agreement
+  with Firefox is strong and head agreement is weak, and the head is where
+  the omnibar lives; the weight table and the half-life are the knobs. The
+  dwell bonus is inert on this profile because Firefox's interaction data
+  reaches back only about four months and only 1.5% of visits clear 30 s;
+  the threshold or the producer, not the fold, is what to tune. Near-
+  duplicate collapse did nothing because every fingerprint is URL-sourced
+  without stored bodies, confirming W6d's caveat at scale. Firefox
+  `visit_type` 4 and 8 never appear in this profile, so `AutoSubframe` is
+  exercised only by the unit test. 1,299 of 20,675 referring visits are
+  dangling (expired rows), capping reconstructed lineage. A weaker copy of
+  the mapping lives in `eidetic-search`'s `eidetic-recall` example
+  (`transition_of`), collapsing subframes and downloads to `Imported`;
+  `import::history_to_traces` supersedes it and the example should call
+  through. `visited_at_unix_secs` is second-granular; the exporter and the
+  stable sort preserve intra-second order, a millisecond field would make
+  that a property of the type.
+- **2026-09-07 — turnstone takes the transient index** (`c863b8e`): the
+  mint calls `rebuild_with_config` with `persist: false`, so the recall
+  path pays the 258 ms mint at 100k pages rather than the 435 ms persisted
+  write it never reads. Turnstone's W6c host half is `c863b8e`, the corpus
+  harness `696bc2f`; mere's W6c stack half `5231ae3e`, engine `7a5b7e19`,
+  corpus `fc0c9e8c`. All unpushed pending the family re-pin.
 
