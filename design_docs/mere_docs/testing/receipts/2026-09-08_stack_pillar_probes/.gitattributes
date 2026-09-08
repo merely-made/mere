@@ -1,0 +1,6 @@
+# Preserve receipt and runner bytes so recorded SHA-256 digests survive checkout.
+* -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+# Unified patches encode empty context lines as one literal space.
+*.patch whitespace=-blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+# Cargo's captured output includes terminal blank lines.
+*.log whitespace=blank-at-eol,-blank-at-eof,space-before-tab,cr-at-eol

@@ -1,0 +1,6 @@
+{
+  "scope": "disposable snapshot only; no production fix",
+  "baseline_sha256": "2ae4dbd65ef9e0e5b997c3d20c31a1279dcc37b479c48dac12b721decb7c21f0",
+  "candidate_sha256": "3b9adce55ed77d1be9356b371849b196432b8bcffd2e6a3457700d28e2732495",
+  "patch_sha256": "59a5f7e9444cd919469633eb643aa477ca4c5d3a1ce18a45036117d28eb425ff"
+}
