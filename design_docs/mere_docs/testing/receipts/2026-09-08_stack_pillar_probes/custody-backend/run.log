@@ -1,0 +1,47 @@
+warning: struct `Custody` is never constructed
+ --> src\lib.rs:4:8
+  |
+4 | struct Custody {
+  |        ^^^^^^^
+  |
+  = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: associated items `new`, `key`, `claim`, `transfer`, `release`, and `apply_collection` are never used
+  --> src\lib.rs:9:8
+   |
+ 8 | impl Custody {
+   | ------------ associated items in this implementation
+ 9 |     fn new(backend: RedbBackend) -> Self { Self { store: BlobStore::new(backend) } }
+   |        ^^^
+10 |     fn key(hash: Hash, class: &str, owner: &str) -> String {
+   |        ^^^
+...
+13 |     async fn claim(&mut self, hash: Hash, class: &str, owner: &str) {
+   |              ^^^^^
+...
+17 |     async fn transfer(&mut self, hash: Hash, from: (&str, &str), to: (&str, &str)) {
+   |              ^^^^^^^^
+...
+27 |     async fn release(&mut self, hash: Hash, class: &str, owner: &str) {
+   |              ^^^^^^^
+...
+32 |     async fn apply_collection(&mut self, hash: Hash) -> bool {
+   |              ^^^^^^^^^^^^^^^^
+
+warning: `custody-backend-probe` (lib) generated 2 warnings
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.95s
+     Running unittests src\lib.rs (scratch\pillar-research-20260908\custody-next\target\debug\deps\custody_backend_probe-397d1db464ae5659.exe)
+
+running 3 tests
+test tests::negative_control_atomic_delete_batch_does_not_recheck_owner ... ok
+test tests::stale_collection_proposal_rechecks_new_owner ... ok
+test tests::owner_specific_transfer_and_reopen_preserve_equal_blob ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.77s
+
+   Doc-tests custody_backend_probe
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

@@ -1,0 +1,25 @@
+{
+  "revision": "ef2a47fdad0b36a96e454a1bbfc45c5cc9591ce7",
+  "source_files": {
+    "source\\Cargo.toml": "bef0e4516f5f3289fb6db7b928e187e9840c6111c7d1994c39960884cf7aeeb2",
+    "source\\crates\\eidetic\\muniment\\.gitignore": "6096d8ea6df2332a6a03c5f4f1108da11bc0718db62e9ebfbaad2f3438c4ef32",
+    "source\\crates\\eidetic\\muniment\\Cargo.toml": "8fa6e4236cbdcc3453dd0f03b4a208c1f72244dcfb96a826fc8fb77ea9a1d32a",
+    "source\\crates\\eidetic\\muniment\\README.md": "05ca1d1af4bea7ae8954a64a1e132f74b89b0608cd86e710fdce4de2f4fb389d",
+    "source\\crates\\eidetic\\muniment\\src\\backend.rs": "36e86dc5737e5a3c3e5ac8e8be76fbb728927c0c000385f8ec7d19990a1d7348",
+    "source\\crates\\eidetic\\muniment\\src\\blob.rs": "4b16e4c4aff72c4d6396d2fff916dd655800d362108f523a19adcbeaf95e09c6",
+    "source\\crates\\eidetic\\muniment\\src\\codec.rs": "bc76550275429d4905411116a8db082bbed92b6399c2579204d7046dc023d7a5",
+    "source\\crates\\eidetic\\muniment\\src\\error.rs": "e36c72e4e27f168a90391a245c35fffc8431dbeeeee59cc17d446f281d39ed7e",
+    "source\\crates\\eidetic\\muniment\\src\\indexeddb_backend.rs": "b478d599a7b6fcd7cb95e7ccad055b0d89886fe163d32bc0d377f318c47febbf",
+    "source\\crates\\eidetic\\muniment\\src\\journal\\causal.rs": "8375f1cb4eb90dfe95a77521a6bde509355eb00016c1c70b56de6fe776930e35",
+    "source\\crates\\eidetic\\muniment\\src\\journal\\fork.rs": "2a49a9f60034bf41f8c7ea4c35ac696c66ff08c4439168f1459f2a3f3518e732",
+    "source\\crates\\eidetic\\muniment\\src\\journal\\log.rs": "61ef7711127b79a3595e01ca978eedfcc35d8980f293da8efb7168906c4a4138",
+    "source\\crates\\eidetic\\muniment\\src\\journal\\mod.rs": "740c7b8f5dc8b2e8de62333eabc39543dcf876a1ef8228680f558078ffb7db5f",
+    "source\\crates\\eidetic\\muniment\\src\\journal\\persist.rs": "508396efed748761a4f01fcd564399ffb77613f739aae2f82a6c022cea24b69c",
+    "source\\crates\\eidetic\\muniment\\src\\journal\\seq.rs": "a316438074569859bb28d54b5a1c579815c1a11cde9718e9d1af70566a8d7808",
+    "source\\crates\\eidetic\\muniment\\src\\lib.rs": "d4c304b870453f4b150e8dd50da7f82e13d96fae2cb12080c6a9a1dc96cfc100",
+    "source\\crates\\eidetic\\muniment\\src\\redb_backend.rs": "f5981c87acccb77887727eb1511797fcc04e99dc28ca701d3ee735ab9a0b5430",
+    "source\\crates\\eidetic\\muniment\\src\\slot.rs": "de93fce74acbb642ccc8b49c1d5ae9d60fde9996951257375ad8109196b57ece",
+    "source\\crates\\eidetic\\muniment\\src\\zip_backend.rs": "3af67ce47290919d97aa1c11e762a2dbdb3fcc43ca32805549a7dad4cb3d68b7"
+  },
+  "workspace": "Minimal isolated manifest; original muniment source and package manifest unchanged"
+}

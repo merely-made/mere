@@ -1,0 +1,11 @@
+[package]
+name="custody-backend-probe"
+version="0.0.0"
+edition="2024"
+[workspace]
+[workspace.package]
+license="MPL-2.0"
+[dependencies]
+muniment={path="source/crates/eidetic/muniment",features=["redb"]}
+pollster="0.4"
+tempfile="3"

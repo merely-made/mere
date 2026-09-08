@@ -1,0 +1,27 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--manifest-path",
+    "C:\\Users\\mark_\\Code\\scratch\\pillar-research-20260908\\custody-next\\Cargo.toml",
+    "--offline",
+    "--locked",
+    "--",
+    "--nocapture"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 6.045135974884033,
+  "engine": "none",
+  "renderer": "none",
+  "server": "none",
+  "features": "muniment default json + redb",
+  "profile": "dev test",
+  "compiler": "rustc 1.97.1 (8bab26f4f 2026-07-14)",
+  "sources": {
+    "Cargo.toml": "50b65430ca7bbf12ac4592048605c0989dfeca4d65c7b55ee77e00e8eea72037",
+    "Cargo.lock": "6e2c67dc7fc5c2b113f851cead8f2eef23418ce43884f1ff77e88c1d7124054c",
+    "src\\lib.rs": "c7ce525861b2d2b8bfa1969a35a63713e710a14a38c5ed2f435841e40a4aade2",
+    "source-manifest.json": "26fd4c7a1d0ea371163a5507ac80e6fb7c9341fae696955922184d3383e1c1b4",
+    "run.py": "a7fdd1525965d36326313341fb5a00a886d63c05c8570aab3d4ff74463206d3e"
+  }
+}
