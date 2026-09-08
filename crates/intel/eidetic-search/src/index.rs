@@ -4,76 +4,116 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! The trail index — tantivy over `BrowsingTrace` events, native produce path.
+//! The trail index — an in-tree postings map over `BrowsingTrace` events.
 //!
-//! One document per traversal event. Tokenized title, page-text, and URL
-//! component fields carry BM25 recall; the canonical URL and domain remain
-//! exact string fields. The **reserved fast-field columns** (domain, owner,
-//! at_ms, transition) carry the reports — columnar from day one so
-//! aggregations never force a re-index (the derivation plan's E3 rule).
+//! One document per traversal event, three scored fields (URL tokens, title,
+//! page text) weighted by [`FieldWeights`], plus the stored columns (domain,
+//! owner, at_ms, transition) the reports read directly — no re-index, no text
+//! scan.
 //!
 //! The index is derived state. [`TrailIndex::rebuild`] re-mints it from the
-//! trace corpus, and [`TrailIndex::open`] refuses an index whose spec
+//! trace corpus, and [`TrailIndex::open`] refuses a projection whose spec
 //! sidecar doesn't match this build ([`SearchError::FormatMismatch`]) so the
-//! caller re-mints instead of reading segments tantivy may misparse.
+//! caller re-mints instead. Persistence is a cache policy, not the engine's
+//! job: [`IndexConfig::persist`] turns the disk write off for the re-mint hot
+//! path, and the file itself holds the projected documents — postings are
+//! rebuilt on `open`, so `open` and `rebuild` cannot rank differently.
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, HashMap};
 use std::path::{Path, PathBuf};
 
 use eidetic::browsing::BrowsingTrace;
-use tantivy::collector::TopDocs;
-use tantivy::query::{Query, QueryParser, TermQuery};
-use tantivy::schema::{
-    FAST, Field, INDEXED, IndexRecordOption, STORED, STRING, Schema, TEXT, Value,
-};
-use tantivy::{Index, TantivyDocument, Term, doc};
+use serde::{Deserialize, Serialize};
 
+use crate::bm25::{Bm25Config, Bm25Index, idf};
 use crate::spec::SearchIndexSpec;
+use crate::tokenize::Tokenizer;
 use crate::{Result, SearchError};
 
-/// Writer memory budget — small; trail segments are tiny by tantivy
-/// standards.
-const WRITER_BUDGET_BYTES: usize = 15_000_000;
+/// The persisted projection's file name inside an index directory.
+pub const PROJECTION_FILE: &str = "trail-projection.json";
 
-#[derive(Clone, Copy)]
-struct Fields {
-    url: Field,
-    url_text: Field,
-    title: Field,
-    text: Field,
-    domain: Field,
-    owner: Field,
-    at_ms: Field,
-    transition: Field,
+/// The scored fields, in postings-map order.
+const FIELD_URL: usize = 0;
+const FIELD_TITLE: usize = 1;
+const FIELD_TEXT: usize = 2;
+const FIELD_COUNT: usize = 3;
+
+/// Per-field weights: a title match outranks a body match, which outranks a
+/// URL-component match. Settings, not constants in the scorer.
+#[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
+pub struct FieldWeights {
+    pub url: f32,
+    pub title: f32,
+    pub text: f32,
 }
 
-fn trail_schema() -> (Schema, Fields) {
-    let mut builder = Schema::builder();
-    let url = builder.add_text_field("url", STRING | STORED);
-    // Preserve `url` as the exact stored identity while indexing the same
-    // canonical bytes through the default tokenizer for host/path recall.
-    let url_text = builder.add_text_field("url_text", TEXT);
-    let title = builder.add_text_field("title", TEXT | STORED);
-    // Page main text (reader-mode), tokenized for BM25 body recall; not stored —
-    // hits return url/title, not the body. (C5.)
-    let text = builder.add_text_field("text", TEXT);
-    let domain = builder.add_text_field("domain", STRING | STORED | FAST);
-    let owner = builder.add_text_field("owner", STRING | FAST);
-    let at_ms = builder.add_u64_field("at_ms", INDEXED | STORED | FAST);
-    let transition = builder.add_text_field("transition", STRING | FAST);
-    (
-        builder.build(),
-        Fields {
-            url,
-            url_text,
-            title,
-            text,
-            domain,
-            owner,
-            at_ms,
-            transition,
-        },
-    )
+impl Default for FieldWeights {
+    fn default() -> Self {
+        Self {
+            url: 1.0,
+            title: 3.0,
+            text: 1.5,
+        }
+    }
+}
+
+impl FieldWeights {
+    fn to_vec(self) -> Vec<f32> {
+        let mut weights = vec![0.0; FIELD_COUNT];
+        weights[FIELD_URL] = self.url;
+        weights[FIELD_TITLE] = self.title;
+        weights[FIELD_TEXT] = self.text;
+        weights
+    }
+}
+
+/// How a [`TrailIndex`] is minted.
+#[derive(Clone, Copy, Debug, Default)]
+pub struct IndexConfig {
+    pub bm25: Bm25Config,
+    pub weights: FieldWeights,
+    pub tokenizer: Tokenizer,
+    /// Write the projection to disk so [`TrailIndex::open`] can read it back.
+    /// The consumer that re-mints on every recall wants this off.
+    pub persist: bool,
+}
+
+impl IndexConfig {
+    /// The minting defaults: literature BM25, title over text over URL, and a
+    /// projection written to disk (what `rebuild` has always done).
+    pub fn persistent() -> Self {
+        Self {
+            persist: true,
+            ..Self::default()
+        }
+    }
+}
+
+/// One indexed traversal, and the columns the reports read.
+#[derive(Clone, Debug, Serialize, Deserialize)]
+struct TrailDoc {
+    url: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    title: Option<String>,
+    /// Derived from the URL on every build, so it never reaches the file.
+    #[serde(skip)]
+    domain: String,
+    owner: String,
+    at_ms: u64,
+    transition: String,
+    /// Page main text, retained only to persist the projection.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    text: Option<String>,
+}
+
+/// The on-disk projection: the documents plus the scoring settings that made
+/// them. Postings are rebuilt from this on `open`.
+#[derive(Serialize, Deserialize)]
+struct Projection {
+    bm25: Bm25Config,
+    weights: FieldWeights,
+    docs: Vec<TrailDoc>,
 }
 
 /// The host of a URL, lowercased — good enough for report facets without a
@@ -87,8 +127,8 @@ fn domain_of(url: &str) -> String {
         .to_ascii_lowercase()
 }
 
-/// A single absolute URL bypasses Tantivy's field-query grammar (`https:`
-/// would otherwise be read as a field name) and takes the exact URL path.
+/// A single absolute URL bypasses term scoring and takes the exact URL path,
+/// so a query that *is* an identity is answered as one.
 fn is_absolute_url_query(query: &str) -> bool {
     let Some((scheme, rest)) = query.split_once("://") else {
         return false;
@@ -112,41 +152,44 @@ pub struct Hit {
 
 /// The lexical index over a trail, at a directory.
 pub struct TrailIndex {
-    index: Index,
-    fields: Fields,
+    config: IndexConfig,
+    postings: Bm25Index,
+    docs: Vec<TrailDoc>,
+    /// Canonical URL to the documents that carry it, for the exact lane.
+    by_url: HashMap<String, Vec<u32>>,
     path: PathBuf,
 }
 
 impl TrailIndex {
-    /// Open an existing index, refusing on spec mismatch (re-mint instead —
-    /// the corpus is the source of truth) and `Missing` when there is none.
+    /// Open an existing projection, refusing on spec mismatch (re-mint instead
+    /// — the corpus is the source of truth) and `Missing` when there is none.
+    ///
+    /// The persisted settings come back with it; a stemming hook does not,
+    /// since it is a function pointer. An index minted with one is re-minted,
+    /// not reopened.
     pub fn open(path: impl AsRef<Path>) -> Result<Self> {
         let path = path.as_ref().to_path_buf();
         let on_disk = SearchIndexSpec::read_sidecar(&path)?;
         if !on_disk.matches_current() {
             return Err(SearchError::FormatMismatch {
-                found: format!(
-                    "{} (fields v{})",
-                    on_disk.tantivy_version, on_disk.fields_version
-                ),
-                current: format!(
-                    "{} (fields v{})",
-                    SearchIndexSpec::current().tantivy_version,
-                    SearchIndexSpec::current().fields_version
-                ),
+                found: on_disk.describe(),
+                current: SearchIndexSpec::current().describe(),
             });
         }
-        let index = Index::open_in_dir(&path)?;
-        let (_, fields) = trail_schema();
-        Ok(Self {
-            index,
-            fields,
-            path,
-        })
+        let bytes = std::fs::read(path.join(PROJECTION_FILE))
+            .map_err(|_| SearchError::Missing(path.display().to_string()))?;
+        let projection: Projection = serde_json::from_slice(&bytes)
+            .map_err(|e| SearchError::Engine(format!("projection parse: {e}")))?;
+        let config = IndexConfig {
+            bm25: projection.bm25,
+            weights: projection.weights,
+            tokenizer: Tokenizer::new(),
+            persist: true,
+        };
+        Ok(Self::from_docs(config, projection.docs, path))
     }
 
-    /// Re-mint the index at `path` from the trace corpus: delete whatever is
-    /// there, create fresh, index every event, write the spec sidecar.
+    /// Re-mint the index at `path` from the trace corpus.
     pub fn rebuild<'a>(
         path: impl AsRef<Path>,
         traces: impl IntoIterator<Item = &'a BrowsingTrace>,
@@ -163,41 +206,97 @@ impl TrailIndex {
         traces: impl IntoIterator<Item = &'a BrowsingTrace>,
         text_for: impl Fn(&str) -> Option<String>,
     ) -> Result<Self> {
-        let path = path.as_ref().to_path_buf();
-        if path.exists() {
-            std::fs::remove_dir_all(&path)?;
-        }
-        std::fs::create_dir_all(&path)?;
-        let (schema, fields) = trail_schema();
-        let index = Index::create_in_dir(&path, schema)?;
+        Self::rebuild_with_config(path, traces, text_for, IndexConfig::persistent())
+    }
 
-        let mut writer = index.writer::<TantivyDocument>(WRITER_BUDGET_BYTES)?;
+    /// Re-mint under explicit settings — the BM25 knobs, the field weights, the
+    /// tokenizer, and whether the projection reaches disk at all.
+    pub fn rebuild_with_config<'a>(
+        path: impl AsRef<Path>,
+        traces: impl IntoIterator<Item = &'a BrowsingTrace>,
+        text_for: impl Fn(&str) -> Option<String>,
+        config: IndexConfig,
+    ) -> Result<Self> {
+        let path = path.as_ref().to_path_buf();
+        let mut docs = Vec::new();
         for trace in traces {
             for event in &trace.events {
-                let mut document = doc!(
-                    fields.url => event.to.url.clone(),
-                    fields.url_text => event.to.url.clone(),
-                    fields.domain => domain_of(&event.to.url),
-                    fields.owner => trace.owner.clone(),
-                    fields.at_ms => event.at_ms,
-                    fields.transition => format!("{:?}", event.transition),
-                );
-                if let Some(title) = &event.to.title {
-                    document.add_text(fields.title, title);
-                }
-                if let Some(text) = text_for(&event.to.url) {
-                    document.add_text(fields.text, &text);
-                }
-                writer.add_document(document)?;
+                docs.push(TrailDoc {
+                    url: event.to.url.clone(),
+                    title: event.to.title.clone(),
+                    domain: String::new(),
+                    owner: trace.owner.clone(),
+                    at_ms: event.at_ms,
+                    transition: format!("{:?}", event.transition),
+                    text: text_for(&event.to.url),
+                });
             }
         }
-        writer.commit()?;
-        SearchIndexSpec::current().write_sidecar(&path)?;
-        Ok(Self {
-            index,
-            fields,
+        let index = Self::from_docs(config, docs, path);
+        if config.persist {
+            index.write()?;
+        }
+        Ok(index)
+    }
+
+    /// Build the postings map, the exact-URL lane and the domain column over a
+    /// document set — the one path `rebuild` and `open` both take, so a
+    /// reopened projection cannot rank differently from a fresh mint.
+    fn from_docs(config: IndexConfig, mut docs: Vec<TrailDoc>, path: PathBuf) -> Self {
+        let mut postings = Bm25Index::new(config.bm25, config.weights.to_vec());
+        let mut by_url: HashMap<String, Vec<u32>> = HashMap::new();
+        let mut fields: Vec<Vec<String>> = vec![Vec::new(); FIELD_COUNT];
+        for (position, doc) in docs.iter_mut().enumerate() {
+            for field in &mut fields {
+                field.clear();
+            }
+            config
+                .tokenizer
+                .tokens_into(&doc.url, &mut fields[FIELD_URL]);
+            if let Some(title) = &doc.title {
+                config
+                    .tokenizer
+                    .tokens_into(title, &mut fields[FIELD_TITLE]);
+            }
+            if let Some(text) = &doc.text {
+                config.tokenizer.tokens_into(text, &mut fields[FIELD_TEXT]);
+            }
+            postings.add_document(&fields);
+            by_url
+                .entry(doc.url.clone())
+                .or_default()
+                .push(position as u32);
+            doc.domain = domain_of(&doc.url);
+            if !config.persist {
+                // Bodies are only held in order to write them out.
+                doc.text = None;
+            }
+        }
+        Self {
+            config,
+            postings,
+            docs,
+            by_url,
             path,
-        })
+        }
+    }
+
+    /// Write the projection and its spec sidecar into the index directory,
+    /// replacing whatever was there.
+    fn write(&self) -> Result<()> {
+        if self.path.exists() {
+            std::fs::remove_dir_all(&self.path)?;
+        }
+        std::fs::create_dir_all(&self.path)?;
+        let projection = Projection {
+            bm25: self.config.bm25,
+            weights: self.config.weights,
+            docs: self.docs.clone(),
+        };
+        let bytes = serde_json::to_vec(&projection)
+            .map_err(|e| SearchError::Engine(format!("projection serialize: {e}")))?;
+        std::fs::write(self.path.join(PROJECTION_FILE), bytes)?;
+        SearchIndexSpec::current().write_sidecar(&self.path)
     }
 
     /// Where the index lives.
@@ -207,89 +306,56 @@ impl TrailIndex {
 
     /// How many traversal documents the index holds.
     pub fn doc_count(&self) -> Result<u64> {
-        let reader = self.index.reader()?;
-        Ok(reader.searcher().num_docs())
+        Ok(self.docs.len() as u64)
     }
 
     /// BM25 recall over tokenized titles, page text, and URL components. A
-    /// single absolute-URL query takes an exact term path on the canonical URL
-    /// field so query syntax cannot mistake its scheme for a field name. Other
-    /// input uses the existing parser over the tokenized fields plus exact URL
-    /// and domain terms. Hits come back ranked, newest-irrelevant — relevance
-    /// is the ranking; time is a column the caller can re-sort by.
+    /// single absolute-URL query takes the exact canonical-URL lane instead, so
+    /// an identity query is answered as an identity. Hits come back ranked,
+    /// newest-irrelevant — relevance is the ranking; time is a column the
+    /// caller can re-sort by.
     pub fn search(&self, query: &str, limit: usize) -> Result<Vec<Hit>> {
-        let reader = self.index.reader()?;
-        let searcher = reader.searcher();
-        let parser = QueryParser::for_index(
-            &self.index,
-            vec![
-                self.fields.title,
-                self.fields.url,
-                self.fields.url_text,
-                self.fields.domain,
-                self.fields.text,
-            ],
-        );
         let query = query.trim();
-        let parsed: Box<dyn Query> = if is_absolute_url_query(query) {
-            Box::new(TermQuery::new(
-                Term::from_field_text(self.fields.url, query),
-                IndexRecordOption::Basic,
-            ))
+        let limit = limit.max(1);
+        let ranked: Vec<(u32, f32)> = if is_absolute_url_query(query) {
+            match self.by_url.get(query) {
+                Some(docs) => {
+                    let score = idf(self.docs.len(), docs.len());
+                    docs.iter().take(limit).map(|doc| (*doc, score)).collect()
+                },
+                None => Vec::new(),
+            }
         } else {
-            parser
-                .parse_query(query)
-                .map_err(|e| SearchError::Tantivy(format!("query: {e}")))?
+            self.postings
+                .search(&self.config.tokenizer.tokens(query), limit)
         };
-        let top = searcher.search(
-            parsed.as_ref(),
-            &TopDocs::with_limit(limit.max(1)).order_by_score(),
-        )?;
-        let mut hits = Vec::with_capacity(top.len());
-        for (score, address) in top {
-            let document: TantivyDocument = searcher.doc(address)?;
-            let url = document
-                .get_first(self.fields.url)
-                .and_then(|v| v.as_str())
-                .unwrap_or_default()
-                .to_string();
-            let title = document
-                .get_first(self.fields.title)
-                .and_then(|v| v.as_str())
-                .map(str::to_string);
-            let at_ms = document
-                .get_first(self.fields.at_ms)
-                .and_then(|v| v.as_u64())
-                .unwrap_or(0);
-            hits.push(Hit {
-                url,
-                title,
-                at_ms,
-                score,
-            });
-        }
-        Ok(hits)
+        Ok(ranked
+            .into_iter()
+            .map(|(doc, score)| {
+                let doc = &self.docs[doc as usize];
+                Hit {
+                    url: doc.url.clone(),
+                    title: doc.title.clone(),
+                    at_ms: doc.at_ms,
+                    score,
+                }
+            })
+            .collect())
     }
 
-    /// Report: the most-visited domains, by traversal count, over the fast
+    /// Report: the most-visited domains, by traversal count, over the stored
     /// columns (no re-index, no text scan).
     pub fn top_domains(&self, n: usize) -> Result<Vec<(String, u64)>> {
-        let request = serde_json::json!({
-            "domains": { "terms": { "field": "domain", "size": n } }
-        });
-        let buckets = self.run_aggregation(request)?;
-        let mut out = Vec::new();
-        if let Some(entries) = buckets
-            .get("domains")
-            .and_then(|d| d.get("buckets"))
-            .and_then(|b| b.as_array())
-        {
-            for entry in entries {
-                let key = entry.get("key").and_then(|k| k.as_str()).unwrap_or("");
-                let count = entry.get("doc_count").and_then(|c| c.as_u64()).unwrap_or(0);
-                out.push((key.to_string(), count));
-            }
+        let mut counts: BTreeMap<&str, u64> = BTreeMap::new();
+        for doc in &self.docs {
+            *counts.entry(doc.domain.as_str()).or_insert(0) += 1;
         }
+        let mut out: Vec<(String, u64)> = counts
+            .into_iter()
+            .map(|(domain, count)| (domain.to_string(), count))
+            .collect();
+        out.sort_by(|a, b| b.1.cmp(&a.1).then(a.0.cmp(&b.0)));
+        out.truncate(n);
         Ok(out)
     }
 
@@ -297,39 +363,12 @@ impl TrailIndex {
     /// 86_400_000). Returns `(bucket_start_ms, count)` for non-empty
     /// buckets, ascending.
     pub fn visits_histogram(&self, interval_ms: u64) -> Result<Vec<(u64, u64)>> {
-        let request = serde_json::json!({
-            "visits": { "histogram": { "field": "at_ms", "interval": interval_ms as f64 } }
-        });
-        let buckets = self.run_aggregation(request)?;
-        let mut out = BTreeMap::new();
-        if let Some(entries) = buckets
-            .get("visits")
-            .and_then(|d| d.get("buckets"))
-            .and_then(|b| b.as_array())
-        {
-            for entry in entries {
-                let key = entry.get("key").and_then(|k| k.as_f64()).unwrap_or(0.0) as u64;
-                let count = entry.get("doc_count").and_then(|c| c.as_u64()).unwrap_or(0);
-                if count > 0 {
-                    out.insert(key, count);
-                }
-            }
+        let interval = interval_ms.max(1);
+        let mut buckets: BTreeMap<u64, u64> = BTreeMap::new();
+        for doc in &self.docs {
+            *buckets.entry(doc.at_ms / interval * interval).or_insert(0) += 1;
         }
-        Ok(out.into_iter().collect())
-    }
-
-    fn run_aggregation(&self, request: serde_json::Value) -> Result<serde_json::Value> {
-        use tantivy::aggregation::AggregationCollector;
-        use tantivy::aggregation::agg_req::Aggregations;
-        use tantivy::query::AllQuery;
-
-        let aggregations: Aggregations = serde_json::from_value(request)
-            .map_err(|e| SearchError::Tantivy(format!("aggregation request: {e}")))?;
-        let collector = AggregationCollector::from_aggs(aggregations, Default::default());
-        let reader = self.index.reader()?;
-        let result = reader.searcher().search(&AllQuery, &collector)?;
-        serde_json::to_value(result)
-            .map_err(|e| SearchError::Tantivy(format!("aggregation result: {e}")))
+        Ok(buckets.into_iter().collect())
     }
 }
 
@@ -453,7 +492,7 @@ mod tests {
 
         // Sabotage the sidecar to an older format.
         let drifted = SearchIndexSpec {
-            tantivy_version: "tantivy 0.1.0".to_string(),
+            engine_version: "tantivy 0.1.0".to_string(),
             ..SearchIndexSpec::current()
         };
         drifted.write_sidecar(&path).unwrap();
@@ -474,17 +513,21 @@ mod tests {
         // And a normal reopen now succeeds.
         let reopened = TrailIndex::open(&path).unwrap();
         assert_eq!(reopened.doc_count().unwrap(), 3);
+        assert_eq!(
+            reopened.search("wgpu", 5).unwrap()[0].url,
+            "https://news.example/wgpu"
+        );
     }
 
     #[test]
-    fn open_refuses_v2_fields_and_rebuild_recovers_url_recall() {
+    fn open_refuses_v3_fields_and_rebuild_recovers_url_recall() {
         let dir = tempfile::tempdir().unwrap();
         let path = dir.path().join("idx");
         let traces = corpus();
         TrailIndex::rebuild(&path, &traces).unwrap();
 
         SearchIndexSpec {
-            fields_version: crate::spec::FIELDS_V2,
+            fields_version: crate::spec::FIELDS_V3,
             ..SearchIndexSpec::current()
         }
         .write_sidecar(&path)
@@ -492,8 +535,8 @@ mod tests {
 
         match TrailIndex::open(&path) {
             Err(SearchError::FormatMismatch { found, current }) => {
-                assert!(found.contains("fields v2"));
-                assert!(current.contains("fields v3"));
+                assert!(found.contains("fields v3"));
+                assert!(current.contains("fields v4"));
             },
             other => panic!("expected field-version mismatch, got {:?}", other.err()),
         }
@@ -503,6 +546,27 @@ mod tests {
             rebuilt.search("docs example tantivy", 5).unwrap()[0].url,
             "https://docs.example/tantivy"
         );
+    }
+
+    /// A directory a tantivy build left behind refuses cleanly rather than
+    /// being misread: the sidecar's engine string is the tell.
+    #[test]
+    fn a_tantivy_era_sidecar_refuses_as_a_format_mismatch() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("idx");
+        std::fs::create_dir_all(&path).unwrap();
+        std::fs::write(
+            path.join(crate::spec::SPEC_SIDECAR),
+            br#"{"tantivy_version":"tantivy 0.26.0","fields_version":3,"tokenizer":"default"}"#,
+        )
+        .unwrap();
+
+        match TrailIndex::open(&path) {
+            Err(SearchError::FormatMismatch { found, .. }) => {
+                assert!(found.contains("tantivy"), "{found}");
+            },
+            other => panic!("expected FormatMismatch, got {:?}", other.err()),
+        }
     }
 
     #[test]
@@ -515,7 +579,64 @@ mod tests {
     }
 
     #[test]
-    fn reports_run_over_the_fast_columns() {
+    fn a_transient_index_writes_nothing_and_still_recalls() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("idx");
+        let index = TrailIndex::rebuild_with_config(
+            &path,
+            &corpus(),
+            |_| None,
+            IndexConfig::default(), // persist defaults to false
+        )
+        .unwrap();
+        assert_eq!(
+            index.search("wgpu", 5).unwrap()[0].url,
+            "https://news.example/wgpu"
+        );
+        assert!(!path.exists());
+        assert!(matches!(
+            TrailIndex::open(&path),
+            Err(SearchError::Missing(_))
+        ));
+    }
+
+    #[test]
+    fn field_weights_are_settings_the_ranking_follows() {
+        let dir = tempfile::tempdir().unwrap();
+        let trace = BrowsingTrace::from_events(
+            "m",
+            vec![
+                event("https://a.test/wombat", "unrelated heading", 1),
+                event("https://b.test/page", "wombat", 2),
+            ],
+        );
+        let title_first = TrailIndex::rebuild(dir.path().join("a"), [&trace]).unwrap();
+        assert_eq!(
+            title_first.search("wombat", 5).unwrap()[0].url,
+            "https://b.test/page"
+        );
+
+        let url_first = TrailIndex::rebuild_with_config(
+            dir.path().join("b"),
+            [&trace],
+            |_| None,
+            IndexConfig {
+                weights: FieldWeights {
+                    url: 10.0,
+                    ..FieldWeights::default()
+                },
+                ..IndexConfig::default()
+            },
+        )
+        .unwrap();
+        assert_eq!(
+            url_first.search("wombat", 5).unwrap()[0].url,
+            "https://a.test/wombat"
+        );
+    }
+
+    #[test]
+    fn reports_run_over_the_stored_columns() {
         let dir = tempfile::tempdir().unwrap();
         let index = TrailIndex::rebuild(dir.path().join("idx"), &corpus()).unwrap();
 
