@@ -27,7 +27,10 @@
 
 use serde::{Deserialize, Serialize};
 
+pub mod history;
 pub mod web_clip;
+
+pub use history::{HISTORY_SEGMENT_SIZE, history_event, history_to_traces, history_to_traces_with};
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum BrowserImportPayload {
@@ -133,6 +136,12 @@ pub struct ImportedHistoryVisitItem {
     pub transition: Option<HistoryTransitionKind>,
     pub referring_url: Option<String>,
     pub session_context: Option<ExternalSessionContext>,
+    /// Foreground time on the page, when the source browser kept an
+    /// interaction timer (Firefox's `moz_places_metadata.total_view_time`).
+    /// Becomes `TraceEvent::dwell_ms`, which frecency's interaction bonus
+    /// reads. Defaulted, so older payloads still deserialize.
+    #[serde(default)]
+    pub view_time_ms: Option<u64>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]

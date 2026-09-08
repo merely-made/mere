@@ -11,6 +11,9 @@ publish = false
 path = "src/lib.rs"
 
 [dependencies]
+# The browsing corpus imported visits are lowered onto (transition mapping +
+# trace segmentation). Storage-free: the browsing module is unconditional.
+eidetic = { workspace = true }
 forme = { workspace = true }
 image = { version = "0.25", default-features = false, features = ["png"] }
 inker = { workspace = true }
