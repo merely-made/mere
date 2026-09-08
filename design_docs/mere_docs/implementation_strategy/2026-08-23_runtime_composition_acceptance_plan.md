@@ -35,6 +35,13 @@ Two extraction rules govern every row:
 
 ## Ownership and acceptance ledger
 
+Cross-stack research now has a shared home in the
+[family composition brief, §7](../../2026-08-12_family_composition_thesis_brief.md#7-stack-pillars-research-before-implementation-2026-09-08)
+(2026-09-08): R1 investigates host drive demand and resource lifetime; R2
+investigates identity, provenance and custody. Their probes are scoped, not
+run. This ledger retains its product ownership and second-consumer gates;
+research proposals do not promote a common clock, identifier or lease.
+
 | Concern | Authority and natural owner | Product-profile seam | First executable proof | Promotion gate | State |
 |---|---|---|---|---|---|
 | Durable rules and consequences | Each product core and ordered record | Accepted product intent or event enters adapters | Isometry `Intent -> Resolved`; Mesocosm ordered `Intent` and replay | Never promoted as one game-rule vocabulary | Established product-local |

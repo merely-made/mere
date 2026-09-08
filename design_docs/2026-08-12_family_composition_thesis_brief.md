@@ -3,7 +3,8 @@
 **Date:** 2026-08-12
 **Kind:** research brief digesting a chat chain (Mark's framing prompt + assistant
 response, 2026-08-12); analysis, terminology alignment, and system-shape prior
-art added here. Nothing scheduled.
+art added here. Extended 2026-09-08 with stack-pillar research lanes (§7).
+Research is scoped; experiments and implementation promotion remain open.
 **Anchors:** [application prospects brief](2026-07-24_application_prospects_brief.md)
 (the three-seam composition thesis this elevates),
 [Graphshell remote projection host plan](mere_docs/implementation_strategy/2026-07-22_graphshell_remote_projection_host_plan.md)
@@ -30,8 +31,10 @@ universal repository, the single account namespace, or the landlord cloud. The
 projection brief's Graphshell line already said half of this — "like a cloud
 service, except the app is the backend, wherever it runs" — for *reachability*.
 The chain extends it to the *data model*: there is no central store to reach.
-Each application is the store. What crosses applications is identity,
-association, and views — never custody.
+Each application remains authoritative for its datalake. Composition exposes identity,
+association, and views. The original shorthand was "never custody"; §7's
+2026-09-08 clarification distinguishes delegated retention from surrendering
+domain authority.
 
 The response's concise formulation, kept as the family's four-noun shorthand:
 
@@ -223,10 +226,229 @@ first three without the fourth.
    correlation* threat model — which compositions let a host join two
    personae it was shown separately. Dramatis-tier research brief candidate.
 
+## 7. Stack pillars: research before implementation (2026-09-08)
+
+**Status:** bounded source survey complete for R1/R2; execution/lifetime (R1) and
+identity/custody (R2) experiments scoped, not run. The observations below are
+code inspection, not behavioral receipts. This section is the shared research
+home; implementation belongs in the repository that owns the selected seam.
+
+A pillar is a durable guarantee with an accountable owner, consumers, and
+failure tests. It need not become a new crate. The arena, shared wgpu device,
+Mere, and Cambium describe different architectural levels: storage/lifetime,
+device ownership, application composition, and UI composition. Elevating a
+contract means making its responsibilities and evidence discoverable, rather
+than flattening those levels into one kind of component.
+
+### Candidate map
+
+| Concern | Existing owner or seam | Research disposition |
+|---|---|---|
+| Document storage and reachability | Genet `ScriptedDom`, runtime reflectors and pins | R2 tests reference validity and retention; an arena is not a durable identity system. |
+| Shared GPU device and resource lifetime | Embedder device/queue; Genet RenderCore; Netrender tenants; product-owned resources | Device ownership already has a contract. R1 investigates wake, cancellation, and disposal around it. |
+| Source authority and projections | Mere source bindings, Forme, sceno/scenomise/scenotime; product authorities | Existing [projection research](2026-08-23_projection_scenes_and_graph_native_platform.md); R2 challenges identity across source and derived instances. |
+| UI composition | Cambium, Meristem, Sprigging and Genet adapters | Existing [Cambium architecture](cambium_docs/technical_architecture/2026-09-03_cambium_architecture.md); extend its consumer proofs when a specific seam fails. |
+| Geometry, text and presentation | Livery/Buckram/Parley; Netrender PaintList/Scene | Candidate contracts for geometry/selection agreement and renderer-neutral presentation, distinct from sharing a device. Scope a lane when a concrete cross-consumer disagreement is identified. |
+| Execution and lifetime | Retained document sessions, product runtime profiles, renderer tenants | R1 below; first investigate host drive demand and cancellation. |
+| Identity, provenance and custody | Product identities and revisions; document handles; Muniment; replication | R2 below; first investigate invalidation and retained provenance. |
+| Capabilities and authority | Mere capability algebra, Servitor and Gemot admission | Existing owners; prospective end-to-end grant/revocation research, keeping observation separate from mutation permission. |
+| Resource resolution | Genet resource fetch interfaces; Mere transport/protocol adapters; host policy | Prospective lane for consistent resolution/cancellation across script, document and host paths. Fetching bytes does not decide admission or durable custody. |
+| Semantic observation and control | Genet engine observables; Cambium input/accessibility; host automation | Prospective lane for semantic readback and action routing through real hosts. Ortet O5 is the first platform-host boundary proof. |
+| Configuration | Typed owner settings, providers, Cambium presentation, host application | Already governed by the [configuration ownership plan](mere_docs/implementation_strategy/2026-08-06_configuration_ownership_settings_projection_plan.md); use its gaps rather than opening a duplicate lane. |
+
+Spatial, inference, audio and networking components may be domain pillars
+without becoming obligations of every application. R1 and R2 are the first
+research lanes; the candidate map does not schedule all remaining rows.
+
+### Research and implementation gates
+
+Each lane records existing guarantees, the unresolved question, competing
+designs including retaining local behavior, representative consumers, and
+experiments that can discriminate between those designs. A small disposable
+probe may be part of research. It does not promote its API into stack law.
+
+**Research done:** the named probes have results, negative cases and resource
+costs; the decision states the chosen owner, rejected alternatives, unresolved
+limits and whether any common contract is warranted. A result that keeps
+contracts local is a successful research outcome.
+
+**Implementation ready:** a selected contract names state and authority,
+identifier scope, lifetime/invalidation, inputs/outputs, cancellation and
+failure behavior, a forcing consumer, and bounded owner-specific slices.
+Reuse the [runtime composition ledger's](mere_docs/implementation_strategy/2026-08-23_runtime_composition_acceptance_plan.md)
+distinction: settled reusable mechanics can move for one forcing consumer;
+cross-product orchestration, identity, authority and lease contracts require
+a heterogeneous second consumer before promotion.
+
+**Implementation done:** the selected slice passes its named regression
+manifest, including refusal and teardown cases, through the actual consumer
+path. Receipts record repository revisions, dirty overlay or patch digests,
+lockfile and runner digests, features, engine/renderer/backend, server/host
+mode, commands and required assertions. Aggregate counts measure progress.
+Do not transfer a runtime-only result into a headed-host claim.
+
+For Genet, `genet-wpt` remains the automated conformance runner; Ortet O5
+(`genet/design_docs/2026-09-03_ortet_founding_plan.md`) is the scoped headed
+scripted platform target. Mere's Pelt proves downstream composition. Research
+here neither duplicates O5 nor treats its planned receipts as already met.
+
+### R1. Execution and lifetime
+
+**Question:** can a retained session describe when it needs driving while
+leaving time sources, scheduling policy and wake mechanisms with the host?
+Can session replacement cancel work without admitting a stale completion?
+
+Source survey on 2026-09-08: Mere `c33dfe67`, Genet `ee0b314b3e9`, Isometry
+`243c0dd`, Mesocosm `6fa5ebb`, Netrender `c77b0be84`. Concurrent working-tree
+changes, particularly Genet worker/runtime work, make this an inspection
+baseline rather than a reproducible test receipt. Repin before experiments.
+
+- Genet `components/shared/document-session-api/src/session_engine.rs` keeps
+  sessions single-owner and host-driven. `pump(now_ms)` and `settled()` expose
+  driving and quiescence, without a deadline or an external-wake contract.
+  `ports/ortet/src/shell.rs` currently redraws while unsettled.
+- Genet `components/script-runtime-api/lib.rs` already exposes timer delay,
+  worker work/pumping and worker shutdown. In the inspected
+  `components/genet-scripted/document.rs`, the Livery pump advances timers,
+  microtasks, capture and GC; it does not call `pump_workers`, and pending
+  work is timer-based. This identifies an integration question for O5, not
+  evidence that worker support is absent from the runtime.
+- Genet `components/genet-render-host/src/lib.rs` and Netrender
+  `netrender/src/renderer/init.rs` already place device creation with the
+  embedder. Isometry `crates/isometry-runtime/src/render.rs` owns its tenant
+  and stale-view refusal. Mesocosm
+  `crates/mesocosm-core/src/voxel_profile.rs` gates disposable derived state
+  against durable source revisions. These challenge lifetime assumptions
+  without requiring the same clock or a universal resource lease.
+
+Compare retaining `settled()` with host-local polling against a narrow drive
+report exposing immediate work, a host-time deadline, and outstanding external
+work. These facts can coexist; a mutually exclusive enum may be insufficient.
+Specify wake registration and completion races before choosing the API, and
+distinguish work outstanding from work runnable now. Product simulation ticks
+remain distinct from UI wall time and GPU completion.
+
+| Probe | Required observations and negative cases | Decision it enables |
+|---|---|---|
+| R1-A: scripted Ortet wake and replacement | Boa and Nova timer, microtask and worker reply through a real retained session; idle wake and completion racing wake registration; navigate away before reply; exactly-once delivery to the live session, stale reply refusal and bounded teardown; record pump/redraw counts while idle | Whether drive facts and cancellation need a session API, and whether O5 reaches the runtime worker path |
+| R1-B: visibility and suspension | Inventory controls actually exposed by the selected session; visible/hidden behavior, timer clamping, suspension/resume where supported, and worker completion during suspension; unsupported controls remain explicit gaps | Which behavior belongs to document semantics and which policy belongs to the host; whether drive demand preserves those boundaries |
+| R1-C: derived resource disposal | Isometry tenant update/removal and Mesocosm stale-revision refusal; record allocation/release, owner and last usable revision, including rejected stale views | Whether a shared lifetime contract is needed; retaining separate resource types is an admissible result |
+
+Prospective implementation slices, gated by those results:
+
+1. **Genet session contract:** the selected minimal drive/cancellation seam in
+   `document-session-api` and scripted adapters, only if R1-A/B require it.
+   Reconcile and repin worker work first; keep host policy out of the trait.
+2. **Genet Ortet integration:** adopt the selected wake policy and regression
+   fixture in existing O5, proving timer/worker wake and session replacement
+   in Boa and Nova. This depends on the selected contract or a documented
+   decision to retain the existing trait.
+3. **Product resource correction:** an Isometry or Mesocosm disposal fix and
+   receipt only if R1-C finds a failure. Shared lease extraction needs the
+   demonstrated common requirement; a comparison alone does not authorize it.
+
+### R2. Identity and custody
+
+**Question:** which references must survive detachment, navigation, capture,
+deletion, restoration and delegation, and which must become invalid? Can
+those transitions be expressed at their current ownership boundaries?
+
+The survey uses the Mere/Genet baseline above and Turnstone `fa4cca57363f`.
+The taxonomy below describes distinct meanings, not a proposal to introduce
+new types or a global identity registry.
+
+| Identity or reference | Scope and owner | Must not be mistaken for |
+|---|---|---|
+| Arena node handle | Genet `NodeId`, monotonic within one `ScriptedDom`; retention depends on roots and pins | A durable page id or a portable cross-arena reference |
+| Document ownership | Genet DOM semantics; distinct from parent/tree connectivity | Connectivity: detachment does not itself change the owning document |
+| Browsing-context generation | Genet context slot/generation | The durable page entity occupying that context |
+| Capture target generation | Turnstone host; required by the capture plan, not yet implemented | The current page or a context slot alone |
+| Durable page entity | Turnstone graph node UUID; restore preserves the entity id | Its URL, title, content hash or current appearance |
+| Artifact, revision and lineage | Muniment hashes immutable bytes; Eidetic manifests identify typed records; journals retain their own log/fork lineage | One identity shared by all observations of equal bytes |
+| Appearance | Host/document plus pane role; owns view-specific layout, scroll and focus | Source content authority or a durable capture attachment key |
+| Capture request and observation | Host request id scoped to a surface; proposed durable envelope identifies the successful observation | A request succeeding merely because an id was allocated |
+| Principal and custodian | Existing identity/admission owners; proposed domain retention/delegation record | Ownership acquired merely by storing or serving bytes |
+
+Evidence homes are Genet `components/genet-scripted-dom/lib.rs`,
+`components/genet-documents/src/browsing_context.rs` and
+`components/shared/document-session-api/src/page_capture.rs`; Mere
+`crates/eidetic/muniment/src/blob.rs`,
+`crates/eidetic/eidetic-core/src/deleted.rs` and `schema.rs`; Turnstone
+`src/action.rs` and
+`design_docs/2026-09-05_reader_appearance_isolation_plan.md`.
+
+Genet's current arena fence is enabled only on 64-bit debug builds. Release
+and wasm need an explicit refusal/translation contract for foreign handles.
+Ownership facts are split across Rust and JS `ownerDocuments`; wrappers,
+ranges, queued observer records, secondary documents and detached subtrees
+need separate root accounting. Inspection also identifies a possible pin
+bypass through `set_text_content -> release_subtree -> drop_subtree` when
+observers are disabled. This is an unrun failure hypothesis, not a reproduced
+bug. The existing G5 section in
+`genet/docs/2026-06-11_gc_arena_dom_plan.md` owns this investigation and any
+arena fix; this lane adds the cross-stack comparison.
+
+Compare an opaque document-scoped boundary handle (arena instance plus local
+node, possibly encoded through a side table) with a session-owned,
+generation-checked handle table. Measure lookup/storage cost and refusal
+behavior on native release and wasm before selecting either. Internal IDs
+may remain compact. Adoption needs an explicit ownership transition that
+preserves required DOM identity and references; it cannot simply reinterpret
+a raw id in another arena. A globally shared arena is not required by either
+design.
+
+Turnstone's `design_docs/2026-08-28_page_capture_plan.md` already scopes P2/P3:
+freeze the session, durable node, document/navigation generation and
+surface/request correlation at capture start; attach to that exact target or
+refuse a stale completion. Engine results supply observed facts. The domain
+envelope supplies attachment, acquisition context and retention references.
+Muniment's byte deduplication does not merge two observations. The existing
+generic `ProvenanceRecord` does not yet express all capture acquisition facts,
+and tombstone capture references/reaping remain work in
+`turnstone/design_docs/2026-09-06_page_lifecycle_plan.md`.
+
+**Custody clarification:** composing a view does not surrender or merge the
+originating application's authoritative store. Storage and retention can be
+explicitly delegated: another custodian may hold, replicate or serve bytes
+under stated terms while semantic authority remains with the domain owner.
+An explicit delegation contract should record retention and disclosure obligations, provenance and
+revocation behavior; revocation does not by itself prove remote erasure.
+This is the sense in which §1's former "never custody" wording is narrowed.
+
+| Probe | Required observations and negative cases | Decision it enables |
+|---|---|---|
+| R2-A: arena identity and roots | Boa/Nova retain, detach, text/fragment replacement, collect, adopt, mutate and release; observers off/on, independent wrapper/range/observer roots; release/wasm foreign-handle refusal; retained readback survives, ownership changes only on adoption, stale ids do not alias, and released nodes return to a bounded baseline | Select a G5 boundary representation and complete root inventory; use Ortet O5 for headed proof separately |
+| R2-B: capture correlation | Start on page A/session S/generation G/surface P, then navigate, close or switch before completion; duplicate completion and equal-byte captures; attach once to the exact target or fail typed, and never to the replacement; distinct successful observations may share one blob | Select the domain envelope and adapter refusal contract without extending engine authority |
+| R2-C: custody and recovery | Model one artifact referenced by a live page, a tombstone and a download facet; retire references in varied orders using MemoryBackend or temporary redb; preserve bytes until the last reference, model restoration of the same UUID and proposed envelope, recheck references before deletion, and keep local custody during redacted export | Determine the narrow retention/reference contract and versioning needed by existing lifecycle work |
+
+R2-B compares a hosted Weld adapter with a retained Livery/unsupported route.
+A model or fake can establish correlation/refusal during research; it cannot
+prove pixels were captured or that the production adapter is integrated.
+R2-C compares Turnstone recovery with export/place-share policy consumers.
+These are distinct uses within one product, not the heterogeneous second
+product required to promote a universal cross-product custody contract.
+
+Prospective implementation slices, after the probes choose the contracts:
+
+1. **Genet G5:** implement the chosen handle/ownership boundary and retention
+   fixes in scripted DOM/runtime, reconciling concurrent work first. Keep
+   native/wasm refusal and Boa/Nova root manifests explicit; Ortet owns the
+   headed consumer receipt.
+2. **Turnstone capture P2/P3:** add the deposit-only capture path, versioned
+   observation envelope and stale-completion refusal through existing
+   session/action/effect ownership. Genet reports capture facts and Muniment
+   holds bytes. Depends on R2-B and the capture plan's existing compile gates.
+3. **Existing lifecycle owners:** extend Eidetic typed tombstones and the
+   product-supplied reference set for restoration, redaction and safe reaping.
+   Select schema migration/refusal behavior before storing new records; route
+   policy through existing Pandect/Athanor seams where applicable. Depends on
+   the capture envelope and R2-C. Broader custody extraction remains gated by
+   another product's actual requirement.
+
 ## What this brief deliberately does not do
 
-No schedules, no crate founding, no name claims, no new machinery. It records
-the chain, aligns its vocabulary, extracts the port law / capability-embedding
-/ anti-shell / gradient deltas, and files the decomposition-altitude prior
-art beside its three sibling surveys. The sidequests convert into dated plans
-only when their consumers arrive.
+This brief records the composition thesis and its research lanes. It does
+not found crates or promote proposed APIs. The historical sidequests and §7
+implementation candidates enter owner-specific plans when their research
+and consumer gates are met; existing implementation plans retain authority
+over work already in progress.
