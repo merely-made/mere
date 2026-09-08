@@ -4,7 +4,8 @@
 **Kind:** research brief digesting a chat chain (Mark's framing prompt + assistant
 response, 2026-08-12); analysis, terminology alignment, and system-shape prior
 art added here. Extended 2026-09-08 with stack-pillar research lanes (§7).
-Research is scoped; experiments and implementation promotion remain open.
+Research includes initial model and Rust arena experiments; full consumer experiments and
+implementation promotion remain open (see §7's experiment results).
 **Anchors:** [application prospects brief](2026-07-24_application_prospects_brief.md)
 (the three-seam composition thesis this elevates),
 [Graphshell remote projection host plan](mere_docs/implementation_strategy/2026-07-22_graphshell_remote_projection_host_plan.md)
@@ -228,9 +229,9 @@ first three without the fourth.
 
 ## 7. Stack pillars: research before implementation (2026-09-08)
 
-**Status:** bounded source survey complete for R1/R2; execution/lifetime (R1) and
-identity/custody (R2) experiments scoped, not run. The observations below are
-code inspection, not behavioral receipts. This section is the shared research
+**Status:** bounded source survey complete for R1/R2; initial model and Rust arena experiments
+run, full consumer probes open. The survey observations below remain code
+inspection; measured results are separated at the end of §7. This is the shared research
 home; implementation belongs in the repository that owns the selected seam.
 
 A pillar is a durable guarantee with an accountable owner, consumers, and
@@ -383,8 +384,9 @@ Ownership facts are split across Rust and JS `ownerDocuments`; wrappers,
 ranges, queued observer records, secondary documents and detached subtrees
 need separate root accounting. Inspection also identifies a possible pin
 bypass through `set_text_content -> release_subtree -> drop_subtree` when
-observers are disabled. This is an unrun failure hypothesis, not a reproduced
-bug. The existing G5 section in
+observers are disabled. This began as a source-review hypothesis; the pinned
+Rust experiment below now reproduces it without involving a JS backend.
+The existing G5 section in
 `genet/docs/2026-06-11_gc_arena_dom_plan.md` owns this investigation and any
 arena fix; this lane adds the cross-stack comparison.
 
@@ -444,6 +446,38 @@ Prospective implementation slices, after the probes choose the contracts:
    policy through existing Pandect/Athanor seams where applicable. Depends on
    the capture envelope and R2-C. Broader custody extraction remains gated by
    another product's actual requirement.
+
+### First experiment results (2026-09-08)
+
+The [arena receipt](mere_docs/testing/receipts/2026-09-08_stack_pillar_probes/arena/R2_A_RECEIPT.md),
+[execution receipt](mere_docs/testing/receipts/2026-09-08_stack_pillar_probes/execution/R1_EXECUTION_RECEIPT.md)
+and [capture/custody receipt](mere_docs/testing/receipts/2026-09-08_stack_pillar_probes/identity/R2_B_C_RECEIPT.md)
+preserve the disposable scripts, commands, source census and limitations.
+Both models were independently rerun after review. The arena fixture calls
+real `ScriptedDom`/`Pins` from Genet `ee0b314b3e9`; the other fixtures model
+proposed contracts. None is a threaded-runtime, storage-backend or headed receipt.
+
+| Experiment | Observed result | Contract consequence |
+|---|---|---|
+| R2-A Rust arena baseline | Native x64 debug: 5 assertions pass, 2 fail. Text and fragment replacement with observers off delete a pinned child before collection; ordinary detachment and observers-on cases pass. | The retention failure is reproduced in the engine-owned store. G5 needs semantic mutation to preserve retained nodes until pin-aware collection can decide reclamation. |
+| R2-A fence-disabled Rust arena | Dev profile with debug assertions disabled only for `genet-scripted-dom`: 4 pass, 3 fail. The added failure resolves a foreign `NodeId(2)` to a local `NodeId(2)`. | Cross-arena refusal cannot depend on debug assertions. This exercises the fence-disabled configuration, not full optimized release or wasm. |
+| R2-A disposable retention correction | Same seven assertions, baseline debug configuration and lock: 7 pass after the scratch patch removes immediate deletion from the two replacement paths. | Supports a bounded G5 correction that leaves reclamation to pin-aware collection. The patch is preserved as an experiment; production source, backend-root coverage and the foreign-handle gap are unchanged. |
+| R1 drive model | Pass: immediate work, deadline and external work coexist; query/register/recheck detects modeled completion races; stale and duplicate completions refuse. Broken one-bit/callback-only controls lose information or a wake. | Investigate an additive drive report and a registration protocol that cannot lose a wake. The model selects necessary information, not an implemented API or a concurrency proof. |
+| R2-B capture model | Pass within the 14-test combined suite: exact frozen-target correlation, stale/duplicate refusal, distinct observations sharing one blob, and refusal to reuse a request identity after success or failure. Broken controls attach to the current page or collapse stored observations. | Request identity must remain unique for the surface-instance lifetime, including terminal failures; define exhaustion/restart epochs. Observation identity remains separate from artifact hash. |
+| R2-C custody model | Pass within the same suite: all six retirement orders, two live owners of one artifact, recovery identity, transfer interleavings, collection recheck and redacted export. Broken controls expose stale-proposal deletion and a false orphan during remove-first transfer. | Track `(reference class, owner identity, artifact hash)`, not one bit per class. Add the destination reference before retiring the source; give transfer and collection one serialized or transactional boundary. Apply must recheck current references. |
+
+The review itself found two useful weaknesses in the initial models: completed
+request IDs could be reused, and a class-level set of hashes collapsed two
+live owners. The retained scripts include the strengthened rules and negative
+controls. SHA-256 in the Python model stands in for equality only; Muniment's
+production artifact addressing remains BLAKE3.
+
+The real `script-runtime-api` worker-suite attempt stopped at Cargo's shared
+package-cache lock before compilation/test output. R1-A/B's retained-session
+and Ortet paths, R1-C's actual resource disposal comparison, release/wasm
+handle representation costs, and real capture/storage integration remain open.
+The full research-done gate has not passed, and none of these model results
+closes O5, G5, capture P2/P3 or page-lifecycle implementation acceptance.
 
 ## What this brief deliberately does not do
 

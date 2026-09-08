@@ -1,0 +1,27 @@
+[package]
+name = "arena-research-probe"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+[workspace]
+
+[dependencies]
+genet-scripted-dom = { path = "../source/components/genet-scripted-dom" }
+layout-dom-api = { path = "../source/components/shared/layout-dom" }
+
+[patch.crates-io]
+engine-observables-api = { path = "../source/components/shared/engine-observables-api" }
+genet-paint-types = { path = "../source/components/shared/paint-types" }
+genet-scripted-dom = { path = "../source/components/genet-scripted-dom" }
+genet-static-dom = { path = "../source/components/genet-static-dom" }
+layout-dom-api = { path = "../source/components/shared/layout-dom" }
+gpu-allocator = { path = "../source/support/patches/gpu-allocator" }
+parley = { path = "../source/support/patches/parley" }
+fontique = { path = "../source/support/patches/fontique" }
+sonic-rs = { path = "../source/support/patches/sonic-rs-0.5.8" }
+genet-taffy = { path = "../source/support/patches/taffy" }
+ipc-channel = { path = "../source/support/patches/ipc-channel" }
+
+[profile.dev.package.genet-scripted-dom]
+debug-assertions = false

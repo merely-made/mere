@@ -1,0 +1,43 @@
+warning: patch `fontique v0.10.0 (C:\Users\mark_\Code\scratch\pillar-research-20260908\arena\source\support\patches\fontique)` was not used in the crate graph
+warning: patch `genet-taffy v0.14.0 (C:\Users\mark_\Code\scratch\pillar-research-20260908\arena\source\support\patches\taffy)` was not used in the crate graph
+warning: patch `gpu-allocator v0.28.0 (C:\Users\mark_\Code\scratch\pillar-research-20260908\arena\source\support\patches\gpu-allocator)` was not used in the crate graph
+warning: patch `parley v0.10.0 (C:\Users\mark_\Code\scratch\pillar-research-20260908\arena\source\support\patches\parley)` was not used in the crate graph
+warning: patch `sonic-rs v0.5.8 (C:\Users\mark_\Code\scratch\pillar-research-20260908\arena\source\support\patches\sonic-rs-0.5.8)` was not used in the crate graph
+help: Check that the patched package version and available features are compatible
+      with the dependency requirements. If the patch has a different version from
+      what is locked in the Cargo.lock file, run `cargo update` to use the new
+      version. This may also occur with an optional dependency that is not enabled.
+   Compiling genet-scripted-dom v0.1.0 (C:\Users\mark_\Code\scratch\pillar-research-20260908\arena\source\components\genet-scripted-dom)
+   Compiling arena-research-probe v0.0.0 (C:\Users\mark_\Code\scratch\pillar-research-20260908\arena\probe)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 07s
+     Running unittests src\lib.rs (C:\Users\mark_\Code\scratch\pillar-research-20260908\arena\target\debug\deps\arena_research_probe-2170f7edf776902c.exe)
+
+running 7 tests
+
+thread 'probes::foreign_handle_refuses_same_local_slot' (8792) panicked at src\lib.rs:67:9:
+a foreign arena handle must not resolve to a local node: foreign=NodeId(2), local=NodeId(2)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test probes::foreign_handle_refuses_same_local_slot ... FAILED
+test probes::control_remove_child_retains_pin_until_release ... ok
+test probes::fragment_replacement_retains_pin_observers_on ... ok
+
+thread 'probes::fragment_replacement_retains_pin_observers_off' (37608) panicked at src\lib.rs:54:9:
+retained child lost: observing=false, live_before_gc=false, live_after_gc=false
+test probes::fragment_replacement_retains_pin_observers_off ... FAILED
+test probes::control_released_ids_do_not_alias_after_churn ... ok
+test probes::text_replacement_retains_pin_observers_on ... ok
+
+thread 'probes::text_replacement_retains_pin_observers_off' (33544) panicked at src\lib.rs:41:9:
+retained child lost: observing=false, live_before_gc=false, live_after_gc=false
+test probes::text_replacement_retains_pin_observers_off ... FAILED
+
+failures:
+
+failures:
+    probes::foreign_handle_refuses_same_local_slot
+    probes::fragment_replacement_retains_pin_observers_off
+    probes::text_replacement_retains_pin_observers_off
+
+test result: FAILED. 4 passed; 3 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.76s
+
+error: test failed, to rerun pass `--lib`
