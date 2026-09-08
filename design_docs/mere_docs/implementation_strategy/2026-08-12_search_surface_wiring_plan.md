@@ -662,4 +662,36 @@ store, not fixtures only.
   browser stores a vector per page. Next, when measured against a want: a
   sparse representation in esp (about 100 bytes per page) or 512 dims
   (85 MB), and a semantic embedder as the case a vector lane is for.
+- **2026-09-08 — esp: sparse lexical vectors beside dense.** `SparseVector`
+  (sorted `(u32, f32)` pairs, L2-normalized, no exact-zero entry as an
+  invariant), `VectorIndex<K, V = Vec<f32>>` generic over an `IndexVector`
+  trait so `SparseIndex<K>` is the same index with one `nearest` and one
+  `SimilarityMetric`; the lexical provider emits sparse directly from its
+  hashed pairs without a dense pass. Dense stays for `index_burn`, `bert`
+  and W4's canvas search. Bit identity, not tolerance: the omitted buckets
+  contribute exactly zero and signs are integers, asserted across a mixed
+  corpus of scripts, dims and n-gram orders. `RECOMMENDED_DIMENSIONS_SHORT_
+  TEXT` is 256..=512 and `hashing_stats` makes collision rate measurable.
+  Bytes per vector `32 + 8·nnz` against `4·dims`. Receipt, release, 42,000
+  synthetic titles, 100 queries:
+
+  | dims | storage | bytes per vector | total | ingest | queries | collision rate |
+  |---:|---|---:|---:|---:|---:|---:|
+  | 4,096 | dense | 16,384 | 688 MB | 471 ms | 38.4 s | 0.90 |
+  | 4,096 | sparse | 96 | 4 MB | 41 ms | 277 ms | |
+  | 512 | dense | 2,048 | 86 MB | 86 ms | 5.2 s | 0.99 |
+  | 512 | sparse | 96 | 4 MB | 44 ms | 310 ms | |
+
+  Two findings. The top-10 sets differ on 37 of 100 queries only where a
+  score tie straddles rank 10 and `nearest` breaks ties by hash-map
+  iteration order, a pre-existing dense property; a key tiebreak would make
+  ranking deterministic. And the collision rate says no storable dense
+  dimension fixes corpus-scale collisions for a hashed embedding: 42,032
+  distinct unigrams into 4,096 buckets collide at 0.90; the 256 to 512
+  guidance is about one text's features, not a corpus vocabulary, so the
+  lexical vector is a per-text similarity signal, not a corpus index.
+  Consumers: nothing in turnstone or `ports/`; canvas search and the field
+  bridge are generic over dimension; the mesh lexical codec takes the
+  caller's dimension up to 4,096. `SemanticSearch` and the canvas surface
+  stay dense-only pending a design call on how sparse reaches the facade.
 
