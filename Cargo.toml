@@ -451,8 +451,9 @@ eidetic = { package = "mere-eidetic", version = "0.0.2", path = "crates/eidetic/
 eidetic-fjall = { package = "mere-eidetic-fjall", path = "crates/eidetic/eidetic-fjall" }
 eidetic-https-fetcher = { package = "mere-eidetic-https-fetcher", path = "crates/eidetic/eidetic-https-fetcher" }
 eidetic-iroh-fetcher = { package = "mere-eidetic-iroh-fetcher", path = "crates/eidetic/eidetic-iroh-fetcher" }
-# Lexical search over the trail (Phase 9 producer half): tantivy index +
-# BM25 recall + fast-field reports + the hybrid-fusion seam. Lives under
+# Lexical search over the trail (Phase 9 producer half): an in-tree BM25
+# index + weighted-field recall + column reports + the hybrid-fusion seam.
+# tantivy was retired 2026-09-07 (98 crates, a C build, no wasm). Lives under
 # `crates/intel/` since 2026-09-04 (platform boundary plan, P5): it is a Mere
 # product concern over browsing traces, reaching esp and import, and the
 # lexical half of the hybrid recall whose vector half is `esp::embed`. The

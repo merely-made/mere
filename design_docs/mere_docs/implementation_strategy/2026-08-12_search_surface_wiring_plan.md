@@ -488,4 +488,77 @@ store, not fixtures only.
   `cargo fmt` rewrote 82 files and was reverted. `cargo clippy` cannot carry
   `--config`, so turnstone's clippy is unreachable under the scratch patch
   until the family re-pin.
+- **2026-09-07 — W6c built** (uncommitted at writing). Page text is back,
+  and it lives in the stack: `crates/eidetic/eidetic-core/src/browsing/text.rs`
+  is `PageTextStore` over muniment's two stores, bytes at the
+  content-addressed `blob/<blake3>` and one slot per address at
+  `page-text/<blake3 of canonical_url>` holding `{url, blob, stored_at_ms}`,
+  idempotent on an unchanged body; `PageTexts::lookup()` is the `text_for`
+  closure `page_table` and `rebuild_with_text` take. muniment gains
+  `impl Backend for &B` so one `FjallStore` carries both stores unmoved.
+  The canonicalize-once follow-on landed with it: `page_table` returns a
+  `PageTable { records, by_address }`, `frecency_by_page` takes the table,
+  and `fingerprint_index` is gone. `mere-eidetic` 109 pass, `muniment` 38.
+
+  Turnstone: `browse.rs::page_text` extracts `extract_main_text` and falls
+  back to `extract_text` wherever main text is `None`, which is exactly the
+  landing pages and app shells a body-term recall is otherwise blindest to;
+  `Effect::RecordPageText` rides the trail actor's own handle as
+  `TrailCommand::RecordText`, so a page's text and its visit stay ordered;
+  the actor writes through `PageTextStore` into the session store and marks
+  the index stale. `consented_to_keep` is the named C4 no-op, the one place
+  a policy refuses. `RecallIndex::mint` calls `rebuild_with_text` with each
+  record's own text; no `SearchIndexSpec` bump, since the text field has
+  existed since `FIELDS_V2` and presence is per document. `MintReceipt`
+  gains `pages_with_text` and `text_bytes`. Test
+  `a_body_only_term_recalls_the_page` with a negative control in the same
+  run; 10 pass.
+
+  Headed receipt, `scenarios/trail_text_recall.scn` over a loopback fixture
+  with two articles whose bodies alone carry HAGIOSCOPE and PARBUCKLE:
+  `RESULT ok`, two captures, each term offers exactly its own page in the
+  omnibar; artifacts at `Code/testing/turnstone/trail_text_recall/`. Done
+  condition met: a body-only term recalls the page from a real session, as
+  the meerkat receipt once did. Open, named for C4: no size cap on a stored
+  body, and blobs are never collected (`forget` drops the slot only).
+- **2026-09-07 — engine swap built** (uncommitted at writing). tantivy is
+  retired from `crates/intel/eidetic-search`. `tokenize.rs` is one
+  tokenizer for indexing and querying, UAX #29 word segmentation through
+  `unicode-segmentation`, lowercased, with a no-op `Stemmer` hook;
+  `Tokenizer::segment` is the named swap point for genet's segmentation
+  component, and the type is exported for `esp`'s lexical embedder to share
+  later. `bm25.rs` is a field-agnostic in-memory postings index with
+  `Bm25Config` (k1 1.2, b 0.75), per-field IDF and length normalization,
+  and `select_nth_unstable_by` before the head sort. `index.rs` keeps
+  `TrailIndex::rebuild`, `rebuild_with_text`, `search`, `Hit`,
+  `doc_count`, `top_domains`, `visits_histogram` and `open`; adds
+  `rebuild_with_config` with `FieldWeights` (title 3.0, text 1.5, url
+  1.0) and a `persist` flag, default on so disk behaviour is unchanged.
+  Persistence writes the projected documents plus scoring settings as
+  JSON and `open` replays the build, so a reopened index cannot rank
+  differently from a fresh mint. `spec.rs` moves to `FIELDS_V4` with
+  `engine_version` (serde alias for the old field), so a tantivy-era
+  directory refuses as `FormatMismatch`. Two deliberate renames:
+  `SearchError::Tantivy` to `Engine`, `tantivy_version` to
+  `engine_version`; no consumer named either. The `domain` scoring field is
+  dropped (the tokenized URL already carries the host parts); it stays a
+  stored column for reports.
+
+  Receipts: `cargo tree` 121 unique packages to 24 (the 98 the review brief
+  counted); wasm32 check clean; `esp`'s `lexical_ngram_recall` fixture,
+  which asserts tantivy's exact BM25 tallies and eight fusion ties, passes
+  unchanged. Release, one document per page:
+
+  | pages | mint, transient | mint, persisted | tantivy (W6d) | query |
+  |---:|---:|---:|---:|---:|
+  | 1,000 | 2.0 ms | 5.4 ms | about 40 ms fixed | 8 µs |
+  | 10,000 | 25.4 ms | 40.0 ms | 65.3 ms | 59 µs |
+  | 100,000 | 258.2 ms | 434.9 ms | 519.1 ms | 409 µs |
+
+  Named, not built: CJK segments per ideograph without a dictionary (the
+  genet component's problem, now a one-function swap); stemming stays off
+  until body text warrants it; esp sharing the tokenizer; incremental
+  updates as a tombstone plus vacuum, the invalidated-projection shape;
+  turnstone still calls plain `rebuild` and so pays the persisted write it
+  never reads, one argument at its call site takes the transient path.
 

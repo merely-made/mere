@@ -36,7 +36,7 @@
 //!
 //! The index lives beside the store at `<db>.index` (override with
 //! `--index <dir>`); it is derived state — `index` re-mints it from the
-//! trace corpus, and `search` re-mints automatically when a tantivy format
+//! trace corpus, and `search` re-mints automatically when an index format
 //! mismatch refuses the on-disk one.
 //!
 //! **Bookmarks**: any Chrome/Chromium `Bookmarks` JSON or Netscape bookmark
@@ -79,11 +79,6 @@ use import::{
     HistoryTransitionKind, ImportedBookmarkItem, ImportedHistoryVisitItem, ImportedPageSeed,
     parse_bookmark_items,
 };
-
-/// The CPU backend the rehearsal bin embeds on by default.
-
-/// The GPU backend behind `--backend wgpu` (burn brief Lane 1's first
-/// consumer wiring; ~38x on batch embedding at MiniLM dims).
 
 /// Texts per embedding batch (CPU-friendly).
 const EMBED_BATCH: usize = 16;
@@ -241,7 +236,7 @@ async fn load_vector_index(store: &mut FjallStore) -> Result<Option<VectorIndex<
         .map_err(|e| format!("load vector index: {e}"))
 }
 
-/// Open the index; on a tantivy format mismatch, re-mint from the corpus
+/// Open the index; on an index format mismatch, re-mint from the corpus
 /// (the index is derived state — refusal then re-mint is the contract).
 async fn open_or_mint(store: &mut FjallStore, index_dir: &str) -> Result<TrailIndex, String> {
     match TrailIndex::open(index_dir) {
