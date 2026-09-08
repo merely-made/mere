@@ -479,6 +479,35 @@ handle representation costs, and real capture/storage integration remain open.
 The full research-done gate has not passed, and none of these model results
 closes O5, G5, capture P2/P3 or page-lifecycle implementation acceptance.
 
+### Bounded continuation, approximately ten slices (2026-09-08)
+
+The user authorized implementation and further experiments in this direction,
+with room for roughly ten slices and evidence-driven sidequests. This is a
+working sequence, not a quota. A proven local defect can be corrected while
+broader research continues; completing every R1/R2 experiment is not a
+prerequisite for S1. Shared-contract promotion still requires its own evidence.
+Existing owner plans remain the implementation homes.
+
+| Slice | Work and natural owner | Done-condition | Current state |
+|---|---|---|---|
+| S1 | Genet G5 replacement retention | Production text/fragment replacement preserves retained descendants, readback and reattachment; observer records remain correct; unpinning and repeated replacement reclaim nodes; focused and existing arena tests pass on an exact overlay | Committed `ec5421b7591`: 6 production, 37 existing source and 7 research tests pass; `genet/design_docs/receipts/2026-09-08_g5_s1/receipt.md` |
+| S2 | Genet G5 root closure | Exercise retained wrappers, descendants, queued observer/range roots and shadow/template edges; distinguish store roots from backend roots, fix reproduced local defects, and record residual owner-document/adoption requirements | Store correction committed `c52ee06f53a`: directed template-owner roots and stale metadata retirement, 58 assertions pass; backend-root probe running |
+| S3 | Genet G5 handle representation | Compare viable all-target boundary identities against real raw-reflector/NodeId consumers; record rejection, exhaustion, memory/lookup cost and native/wasm feasibility; choose a bounded representation | Packed 24/40 u64 candidate audited; wasm runtime narrowing requires a checked-conversion migration first; pinned rerun underway |
+| S4 | Genet G5 handle implementation | Implement the selected boundary, with foreign/stale refusal and exhaustion tests through the supported backends and compiled target configurations; retain a separate wasm residual if it is not executed | S4a checked-conversion seam under isolated implementation; representation change remains gated |
+| S5 | Genet runtime worker delivery | Run actual runtime message/timer/completion and shutdown assertions, including duplicate/stale cases, with a named regression manifest and isolated build provenance | Real Boa Runtime probe passes: timer-only negative, worker-pump delivery and acknowledged idle; receipt provenance being finalized |
+| S6 | Genet session drive contract | Expose the selected minimal runnable/deadline/external facts and lossless wake/cancellation protocol through a real retained session; test completion during registration and replacement | S6a document worker forwarding under isolated test; additive drive/wake contract remains open |
+| S7 | Genet Ortet O5 integration | Wire native host wake and replacement to the real scripted session and obtain explicit Boa/Nova host receipts; automated conformance remains with genet-wpt | Depends on S6 and O5 prerequisites |
+| S8 | Host visibility and resource disposal | Exercise real hidden/suspended/resumed session behavior and product-owned resource removal/stale-revision refusal; record policy ownership and any required local correction | Depends on available host controls; no shared lease assumed |
+| S9 | Turnstone capture correlation | Integrate exact target and nonreused request identity into the actual capture path, with stale/duplicate/unsupported refusal; keep envelope and pixel-storage acceptance explicit | Action-to-host correlation implemented for review; replacement-id alias found and corrected, validation running; durable deposit remains open |
+| S10 | Turnstone/Mere custody lifecycle | Integrate owner-specific references and a serialized/transactional transfer/collection boundary with recovery and disclosure policy, including same-kind multiple owners and stale collection proposals | Depends on actual S9 envelope/reference seam |
+
+Sidequests require a concrete finding that affects one of those done-conditions,
+a named owner and a bounded receipt. A root-accounting defect or a missing host
+wake is sufficient; a desire to found another platform crate is not. Reconcile
+concurrent edits before promoting a slice, and record research-only, compiled,
+runtime and headed outcomes separately. The scope permits progression through
+the sequence without a new approval for each routine slice.
+
 ## What this brief deliberately does not do
 
 This brief records the composition thesis and its research lanes. It does
