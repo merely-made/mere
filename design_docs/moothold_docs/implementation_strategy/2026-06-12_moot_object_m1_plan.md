@@ -419,3 +419,36 @@ management require their own subsequent consumer receipts.
   cost measurements, and the held-out search-engine decision also remain open.
   The same gate exposed UUID 1.25's new wasm RNG-selection requirement; Inker
   `aac6e5df` now selects its JavaScript-backed provider only on wasm targets.
+
+- **2026-09-08:** the P3 search projection now has a production-shaped seam.
+  `eidetic-search::DocumentIndex<K>` is a transient in-tree BM25 over
+  caller-owned documents with opaque keys, primary and alias addresses, title
+  and body fields. It does not accept `BrowsingTrace`, own a store or write an
+  index directory. The existing `TrailIndex` adapter and API are unchanged.
+
+  Moot's new opt-in `captured-web` surface builds from
+  `MootRoster::authorized_fauna`, then validates caller-resolved
+  `FleeceAnnotationRecord`s. It groups only the exact canonical-text hash under
+  the same Fleece extraction schema, normalization and reader profile. URL,
+  raw-capture identity, manifest identity and near similarity do not merge
+  records. Each group retains every signed `FaunaEntry` and `CaptureIdentity`;
+  missing, unsupported and invalid manifests remain explicit rejections.
+
+  The focused fixture has seven fauna entries: three authorized valid shares,
+  two over identical text from distinct contributors and source URLs, plus one
+  changed revision; one unauthorized decoy; and three authorized rejected
+  references (missing, unsupported schema and integrity-invalid). The projection
+  yields two searchable documents, retains all three valid contribution records,
+  returns each body-only term once, returns both revisions for their shared exact
+  source URL, and excludes the unauthorized decoy. `mere-eidetic-search` has 37
+  passing library tests with one timing test ignored; `mere-moot --features
+  captured-web` passes its focused test and doc tests. Both changed production
+  crates pass strict no-deps Clippy, the search crate passes
+  `wasm32-unknown-unknown`, and the port remains dependency-free with the feature
+  off.
+
+  This composes with the 2026-09-07 authenticated transfer and receiver-reopen
+  receipt, but is not yet one headed Turnstone receipt. P3 still needs the
+  Turnstone place worker to resolve locally replicated fauna manifests into this
+  projection, explicit capture consent and withdrawal/remint behavior, collection
+  version/fork records, shared-corpus cost measurements and held-out relevance.
