@@ -12,6 +12,7 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use mere_resident::{CloseAction, CloseFuture, close_all};
+use mesh::JobBoard;
 use mesh_host::{MeshHost, Step, TransportBlobSpace};
 use muniment::Backend;
 use tokio::time::{Instant, MissedTickBehavior, interval, interval_at};
@@ -261,6 +262,28 @@ impl<B: Backend + Clone + Send + Sync + 'static> ResidentAuthority<B> {
         S: Future<Output = ()>,
         O: FnMut(ResidentReceipt),
     {
+        self.run_until_with_board(shutdown, |receipt, _board| observe(receipt))
+            .await
+    }
+
+    /// Drive the authority until `shutdown` resolves, folding the current
+    /// board before delivering each receipt.
+    ///
+    /// This is the resident-to-projection seam: the board is folded by the
+    /// Distillery authority after the real supervisor or maintenance event,
+    /// then delivered beside the exact receipt that caused the observation.
+    /// An application owner can therefore update a read-only observer in the
+    /// same callback without reaching through `MeshHost` or reconstructing
+    /// the board from receipts.
+    pub async fn run_until_with_board<S, O>(
+        &mut self,
+        shutdown: S,
+        mut observe: O,
+    ) -> Result<(), ResidentError>
+    where
+        S: Future<Output = ()>,
+        O: FnMut(ResidentReceipt, JobBoard),
+    {
         let mut shutdown = Box::pin(shutdown);
         let mut ticks = interval(self.settings.tick_every);
         ticks.set_missed_tick_behavior(MissedTickBehavior::Skip);
@@ -274,16 +297,19 @@ impl<B: Backend + Clone + Send + Sync + 'static> ResidentAuthority<B> {
             tokio::select! {
                 biased;
                 _ = &mut shutdown => {
-                    observe(ResidentReceipt::StopRequested);
+                    observe(ResidentReceipt::StopRequested, self.authority.board().await?);
                     return Ok(());
                 }
                 _ = ticks.tick() => {
                     match self.authority.tick().await {
-                        Ok(steps) => observe(ResidentReceipt::Tick { steps }),
+                        Ok(steps) => {
+                            let board = self.authority.board().await?;
+                            observe(ResidentReceipt::Tick { steps }, board);
+                        }
                         Err(error) => {
                             observe(ResidentReceipt::SupervisorFailed {
                                 error: error.to_string(),
-                            });
+                            }, self.authority.board().await?);
                             return Err(error.into());
                         }
                     }
@@ -296,15 +322,16 @@ impl<B: Backend + Clone + Send + Sync + 'static> ResidentAuthority<B> {
                         None => std::future::pending::<()>().await,
                     }
                 } => {
-                    match self.authority.maintain_if_advanced().await {
+                    let receipt = match self.authority.maintain_if_advanced().await {
                         Ok(Some(report)) => {
-                            observe(ResidentReceipt::MaintenanceCompleted(Box::new(report)));
+                            ResidentReceipt::MaintenanceCompleted(Box::new(report))
                         }
-                        Ok(None) => observe(ResidentReceipt::MaintenanceIdle),
-                        Err(error) => observe(ResidentReceipt::MaintenanceFailed {
+                        Ok(None) => ResidentReceipt::MaintenanceIdle,
+                        Err(error) => ResidentReceipt::MaintenanceFailed {
                             error: error.to_string(),
-                        }),
-                    }
+                        },
+                    };
+                    observe(receipt, self.authority.board().await?);
                 }
             }
         }

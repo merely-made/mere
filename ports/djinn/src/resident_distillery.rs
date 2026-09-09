@@ -56,12 +56,16 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use distillery::{
-    Distillery, InstalledAuthority, InstalledSettings, ResidentAuthority, ResidentReceipt,
-    ResidentSettings, RetentionSettings,
+    ChronicleObserver, ChronicleRevision, Distillery, InstalledAuthority, InstalledSettings,
+    ResidentAuthority, ResidentReceipt, ResidentSettings, RetentionSettings,
+};
+use graphshell::native::endpoint_catalog::{
+    ResidentEndpointCatalog, ResidentEndpointCatalogError, ResidentEndpointRoute,
 };
 use mesh::spec::JobSpec;
-use mesh::{AvailabilityPolicy, DevicePolicy, ErasurePolicy, MeshRetentionPolicy};
+use mesh::{AvailabilityPolicy, DevicePolicy, ErasurePolicy, JobBoard, MeshRetentionPolicy};
 use muniment::RedbBackend;
+use notochord::LocalNetworkPolicy;
 use personae::bootstrap::Unlock;
 use personae::{Ed25519Keypair, ProfileId};
 use tokio::sync::Mutex;
@@ -69,9 +73,27 @@ use tokio::sync::Mutex;
 use crate::conditions::{DeviceConditionSensor, StatedConditions, validate_policy_coverage};
 use crate::settings::{DistilleryLaneSettings, parse_keep_bound, sanitize_profile};
 
+/// Stable first-party route for the resident Distillery Chronicle.
+pub const RESIDENT_DISTILLERY_CHRONICLE_ROUTE: &str = "distillery.chronicle";
+
+/// Notice cadence for live Chronicle revisions on the first-party route.
+pub const RESIDENT_DISTILLERY_CHRONICLE_NOTICE_POLL: Duration = Duration::from_millis(250);
+
 /// One resident Distillery works, bound to this profile's personal mesh.
 pub struct ResidentDistillery {
     resident: ResidentAuthority<RedbBackend>,
+    /// The read-only projection materialized from the actual board this
+    /// resident opened. It is separate from the work authority: a session can
+    /// read it, but cannot reach the job host or mutate a job through it.
+    chronicle: ChronicleObserver,
+    /// Monotonic observation timebase consumed by the resident-owned
+    /// Chronicle. It records lifecycle observations without retaining the
+    /// unbounded receipt stream.
+    chronicle_tick: u64,
+    /// The next materialization version for the resident-owned Chronicle.
+    /// The epoch is stable for this resident; generation and revision advance
+    /// together for each observation tick.
+    chronicle_revision: ChronicleRevision,
     /// Retained because on a single device the poster and the runner are the
     /// same process: this resident authors its own job posts as itself. The
     /// key is already resident inside the supervisor for the lane's whole
@@ -320,8 +342,24 @@ impl ResidentDistillery {
             .await
             .map_err(|error| format!("bind the Distillery resident: {error}"))?;
 
+        // Chronicle needs a board snapshot but owns neither the board nor its
+        // lifecycle. Take that snapshot only after the resident authority is
+        // completely assembled, then retain the observer beside the works so
+        // reconnecting first-party sessions share its source without ever
+        // sharing an admitted session.
+        //
+        // This is materialization one. The lifecycle path advances it from
+        // fresh folded boards and the observation tick after every event.
+        let board = resident.authority().board().await.map_err(|error| {
+            format!("read the resident Distillery board for Chronicle: {error}")
+        })?;
+        let chronicle = ChronicleObserver::new_at_tick(&board, 0, ChronicleRevision::new(1, 1, 1));
+
         Ok(Self {
             resident,
+            chronicle,
+            chronicle_tick: 0,
+            chronicle_revision: ChronicleRevision::new(1, 1, 1),
             author,
             mesh_id,
             profile: profile_name,
@@ -382,6 +420,61 @@ impl ResidentDistillery {
         self.resident.authority()
     }
 
+    /// Clone the resident-owned Chronicle source for first-party route
+    /// assembly. The clone carries source state only; each admitted route
+    /// factory still creates its own session-bound endpoint.
+    pub fn chronicle_observer(&self) -> ChronicleObserver {
+        self.chronicle.clone()
+    }
+
+    /// Register a Chronicle source held by this resident under its stable
+    /// first-party route.
+    ///
+    /// The observer is passed by value so a caller can retain it across
+    /// [`Self::run_until`]'s long mutable borrow. Every factory invocation
+    /// receives Graphshell's already-admitted context and binds the endpoint
+    /// to that context's projection session.
+    pub fn register_chronicle_route(
+        observer: ChronicleObserver,
+        catalog: &mut ResidentEndpointCatalog,
+    ) -> Result<ResidentEndpointRoute, ResidentEndpointCatalogError> {
+        catalog.register_resumable_notifying(
+            RESIDENT_DISTILLERY_CHRONICLE_ROUTE,
+            "Distillery Chronicle",
+            move |context| Ok(observer.endpoint(context.session().clone())),
+        )?;
+        Ok(Self::chronicle_route())
+    }
+
+    /// Build the live Chronicle host a WebRTC signaling owner hands joined
+    /// browsers into. The caller supplies network policy and signaling; Djinn
+    /// supplies only the resident-owned source and its fixed first-party
+    /// route.
+    pub fn chronicle_projection_host(
+        observer: ChronicleObserver,
+        policy: LocalNetworkPolicy,
+    ) -> Result<
+        graphshell::native::projection_host::ResidentProjectionHost,
+        ResidentEndpointCatalogError,
+    > {
+        let mut catalog = ResidentEndpointCatalog::new();
+        let route = Self::register_chronicle_route(observer, &mut catalog)?;
+        Ok(
+            graphshell::native::projection_host::ResidentProjectionHost::new(
+                policy, route, catalog,
+            ),
+        )
+    }
+
+    /// Local route descriptor granted to an installed first-party client.
+    pub fn chronicle_route() -> ResidentEndpointRoute {
+        ResidentEndpointRoute::new(
+            RESIDENT_DISTILLERY_CHRONICLE_ROUTE,
+            RESIDENT_DISTILLERY_CHRONICLE_NOTICE_POLL,
+        )
+        .expect("the resident Distillery Chronicle route is valid")
+    }
+
     /// The mesh-scoped blob space this works reads and writes.
     ///
     /// Staging a job's input goes through here, which is also why the lane
@@ -421,8 +514,19 @@ impl ResidentDistillery {
         S: Future<Output = ()>,
         O: FnMut(ResidentReceipt),
     {
-        self.resident
-            .run_until(shutdown, observe)
+        let Self {
+            resident,
+            chronicle,
+            chronicle_tick,
+            chronicle_revision,
+            ..
+        } = self;
+        let mut observe = observe;
+        resident
+            .run_until_with_board(shutdown, |receipt, board| {
+                advance_chronicle(chronicle, chronicle_tick, chronicle_revision, &board);
+                observe(receipt);
+            })
             .await
             .map_err(|error| format!("resident Distillery works: {error}"))
     }
@@ -434,6 +538,38 @@ impl ResidentDistillery {
             .await
             .map_err(|error| format!("could not close the resident Distillery works: {error}"))
     }
+}
+
+/// Advance the resident-owned Chronicle before exposing a lifecycle receipt to
+/// the rest of Djinn. The authority supplied this board after the event, so
+/// Chronicle remains a projection of current mesh truth rather than a second
+/// board fold or a fixture replay.
+fn advance_chronicle(
+    chronicle: &ChronicleObserver,
+    observation_tick: &mut u64,
+    revision: &mut ChronicleRevision,
+    board: &JobBoard,
+) {
+    *observation_tick = (*observation_tick)
+        .checked_add(1)
+        .expect("a resident Chronicle observation tick cannot wrap");
+    let generation = revision
+        .generation
+        .checked_add(1)
+        .expect("a resident Chronicle generation cannot wrap");
+    let next_revision = ChronicleRevision::new(
+        generation,
+        revision.epoch.0,
+        revision
+            .revision
+            .0
+            .checked_add(1)
+            .expect("a resident Chronicle revision cannot wrap"),
+    );
+    chronicle
+        .observe_at_tick(board, *observation_tick, next_revision)
+        .expect("a resident Chronicle version advances monotonically in one epoch");
+    *revision = next_revision;
 }
 
 /// Where this persona's trained artifacts live.

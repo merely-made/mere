@@ -12,6 +12,7 @@ categories = ["concurrency"]
 [dependencies]
 mesh.workspace = true
 mesh-host.workspace = true
+incipit.workspace = true
 mere-resident.workspace = true
 muniment.workspace = true
 personae.workspace = true

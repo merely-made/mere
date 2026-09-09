@@ -33,11 +33,21 @@ trainer-gpu = ["trainer", "distillery/trainer-gpu"]
 # admission and never quietly trained with the other one, which is the same
 # posture `trainer-gpu` takes about the device.
 trainer-autodiff = ["trainer", "distillery/trainer-autodiff"]
+# A deliberately opt-in headed receipt host. This composes a temporary real
+# Djinn resident and the Graphshell WebRTC door without changing the ordinary
+# resident binary or importing fixture release identity into product startup.
+distillery-chronicle-receipt-host = [
+    "personal-sync",
+    "graphshell/webrtc-session",
+    "dep:rand_core",
+    "dep:webrtc-carrier",
+]
 
 [dependencies]
 blake3.workspace = true
 castellan = { workspace = true, features = ["keeper"] }
 chirograph.workspace = true
+incipit.workspace = true
 # The operational works composed as this resident's fourth lane
 # (`src/resident_distillery.rs`). Default features only unless djinn's own
 # `trainer` feature is on: `remote` would pull the burn stack into the desktop
@@ -52,8 +62,10 @@ mere-resident.workspace = true
 mesh.workspace = true
 mesh-host.workspace = true
 muniment.workspace = true
+notochord.workspace = true
 pandect.workspace = true
 personae = { workspace = true, features = ["agent"] }
+rand_core = { version = "0.6", features = ["getrandom"], optional = true }
 sceno.workspace = true
 serde = { version = "1", features = ["derive"] }
 serde_json.workspace = true
@@ -66,6 +78,7 @@ tracing.workspace = true
 tracing-subscriber.workspace = true
 transport = { workspace = true, features = ["notochord"] }
 uuid = { workspace = true, features = ["v5"] }
+webrtc-carrier = { workspace = true, optional = true }
 zeroize = "1"
 
 # Device condition sensing (`src/conditions.rs`). Win32 only — no COM, no WMI,
@@ -103,6 +116,11 @@ name = "djinn"
 path = "src/bin/djinn.rs"
 required-features = ["personal-sync"]
 
+[[bin]]
+name = "distillery_chronicle_receipt_host"
+path = "src/bin/distillery_chronicle_receipt_host.rs"
+required-features = ["distillery-chronicle-receipt-host"]
+
 [dev-dependencies]
 # The trainer receipt (`tests/distillery_trainer.rs`) authors the synthetic
 # base model and reads the published artifacts back out of the model library,
@@ -113,5 +131,6 @@ eidetic.workspace = true
 graphshell-endpoint.workspace = true
 p2panda-core = "0.7.0"
 safetensors = "0.4"
+scenotime.workspace = true
 tempfile = "3"
 tokio = { version = "1", features = ["macros", "rt", "rt-multi-thread", "sync", "time"] }
