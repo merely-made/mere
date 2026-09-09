@@ -43,14 +43,35 @@ pub fn build_query_similarity_field<K>(
 where
     K: Hash + Eq + Clone,
 {
-    let mut field = ScalarField::Const(0.0);
     let metric = index.metric();
-    for (key, vec) in index.iter() {
-        let Some(&(x, y)) = node_positions.get(key) else {
+    let scores = index
+        .iter()
+        .map(|(key, vec)| (key.clone(), raw_score(metric, query, vec)));
+    build_similarity_field_from_scores(scores, metric, node_positions, sigma)
+}
+
+/// The same field from raw metric scores already computed elsewhere — the form
+/// that does not care how the vectors were stored.
+///
+/// `scores` are raw metric values, as an index's `nearest` reports them;
+/// `metric` decides the sign, since a Euclidean *distance* is a smaller number
+/// for a closer node and a field weight has to grow instead.
+pub fn build_similarity_field_from_scores<K>(
+    scores: impl IntoIterator<Item = (K, f32)>,
+    metric: SimilarityMetric,
+    node_positions: &HashMap<K, (f32, f32)>,
+    sigma: f32,
+) -> ScalarField
+where
+    K: Hash + Eq + Clone,
+{
+    let mut field = ScalarField::Const(0.0);
+    for (key, raw) in scores {
+        let Some(&(x, y)) = node_positions.get(&key) else {
             continue;
         };
-        let similarity = score(metric, query, vec);
-        let term = ScalarField::Scale(Box::new(ScalarField::gaussian_at(x, y, sigma)), similarity);
+        let weight = if metric.higher_is_better() { raw } else { -raw };
+        let term = ScalarField::Scale(Box::new(ScalarField::gaussian_at(x, y, sigma)), weight);
         field = ScalarField::Add(Box::new(field), Box::new(term));
     }
     field
@@ -73,14 +94,28 @@ where
     projection.add_scalar(name, field)
 }
 
-fn score(metric: SimilarityMetric, a: &[f32], b: &[f32]) -> f32 {
+/// [`register_query_similarity_field`] over pre-computed raw scores.
+pub fn register_similarity_field_from_scores<K>(
+    projection: &mut FieldProjection,
+    name: &str,
+    scores: impl IntoIterator<Item = (K, f32)>,
+    metric: SimilarityMetric,
+    node_positions: &HashMap<K, (f32, f32)>,
+    sigma: f32,
+) -> FieldId
+where
+    K: Hash + Eq + Clone,
+{
+    let field = build_similarity_field_from_scores(scores, metric, node_positions, sigma);
+    projection.add_scalar(name, field)
+}
+
+/// The index's own metric value — no sign flip; that is the field's business.
+fn raw_score(metric: SimilarityMetric, a: &[f32], b: &[f32]) -> f32 {
     match metric {
         SimilarityMetric::Cosine => cosine(a, b),
         SimilarityMetric::DotProduct => dot(a, b),
-        // Euclidean: lower-is-better; we negate so larger-is-more-similar
-        // for use as a field weight (so a node *closer* to the query
-        // contributes a *larger* gaussian peak).
-        SimilarityMetric::Euclidean => -euclidean(a, b),
+        SimilarityMetric::Euclidean => euclidean(a, b),
     }
 }
 

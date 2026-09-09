@@ -694,4 +694,23 @@ store, not fixtures only.
   bridge are generic over dimension; the mesh lexical codec takes the
   caller's dimension up to 4,096. `SemanticSearch` and the canvas surface
   stay dense-only pending a design call on how sparse reaches the facade.
+- **2026-09-08 — esp: deterministic ranking and sparse through the facade.**
+  `VectorIndex::nearest` orders equal scores by key (`K: Ord` on `nearest`
+  only; a partial `select_nth_unstable_by` keeps the head sort), so two
+  indexes over one corpus return one answer; the parity receipt's dense
+  versus sparse top-10 identity is 100 of 100 in every row.
+  `EmbeddingProvider::embed_sparse` is optional and defaults to `None`;
+  capability is probed with an empty batch; the lexical provider implements
+  it and `bert` and the stub decline. `SemanticSearch` holds a sparse store
+  when the provider offers one and a dense store otherwise, behind its
+  existing methods, plus `nearest`, `scores` and `metric` so consumers stop
+  reaching into the index type; `forget` returns whether a key was held.
+  Canvas search reads through those, and the field bridge builds its
+  similarity field from scores rather than from a borrowed dense index,
+  which fixes a latent bug: with a sparse provider the old path summed over
+  an empty dense index and produced a constant-zero field. Persistence
+  gains `SPARSE_INDEX_SCHEMA_REF` with a round trip beside the dense one.
+  Tests: esp 81 plus the 9 parity tests, canvas 199, mesh 122. The lane was
+  finished by a sonnet agent after an opus agent hit the session limit,
+  then reviewed and verified here.
 

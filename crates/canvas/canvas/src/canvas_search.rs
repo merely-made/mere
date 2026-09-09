@@ -25,7 +25,7 @@ use std::hash::Hash;
 
 use numen::{FieldId, FieldProjection};
 
-use crate::field_bridge::register_query_similarity_field;
+use crate::field_bridge::register_similarity_field_from_scores;
 use esp::embed::VectorIndex;
 use esp::embed::provider::EmbeddingProvider;
 use esp::embed::search::{SearchError, SemanticSearch};
@@ -116,11 +116,14 @@ impl<K: Hash + Eq + Clone, P: EmbeddingProvider> CanvasSearchSurface<K, P> {
     }
 
     /// Top-`k` semantic neighbours for the current focus query, if set.
-    pub fn search_focus(&self, k: usize) -> Result<Option<Vec<(K, f32)>>, SearchError> {
+    pub fn search_focus(&self, k: usize) -> Result<Option<Vec<(K, f32)>>, SearchError>
+    where
+        K: Ord,
+    {
         let Some(q) = &self.focus_query else {
             return Ok(None);
         };
-        Ok(Some(self.search.index().nearest(q, k)?))
+        Ok(Some(self.search.nearest(q, k)?))
     }
 
     /// Register the current focus query as a similarity scalar field on
@@ -139,11 +142,11 @@ impl<K: Hash + Eq + Clone, P: EmbeddingProvider> CanvasSearchSurface<K, P> {
         if self.positions.is_empty() {
             return None;
         }
-        Some(register_query_similarity_field(
+        Some(register_similarity_field_from_scores(
             projection,
             name,
-            q,
-            self.search.index(),
+            self.search.scores(q),
+            self.search.metric(),
             &self.positions,
             self.sigma,
         ))
@@ -173,16 +176,30 @@ impl<K: Hash + Eq + Clone, P: EmbeddingProvider> CanvasSearchSurface<K, P> {
         self.sigma = sigma;
     }
 
-    /// Borrow the underlying index (e.g. for persistence).
+    /// Borrow the underlying dense index (e.g. for persistence). Empty when
+    /// the provider is sparse-capable — see [`Self::is_sparse`] and
+    /// [`Self::sparse_index`].
     pub fn index(&self) -> &VectorIndex<K> {
         self.search.index()
+    }
+
+    /// Whether the surface's entries are held sparsely — i.e. in
+    /// [`Self::sparse_index`] rather than [`Self::index`].
+    pub fn is_sparse(&self) -> bool {
+        self.search.is_sparse()
+    }
+
+    /// Borrow the underlying sparse index, present exactly when
+    /// [`Self::is_sparse`].
+    pub fn sparse_index(&self) -> Option<&esp::embed::SparseIndex<K>> {
+        self.search.sparse_index()
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use esp::embed::StubEmbeddingProvider;
+    use esp::embed::{LexicalEmbeddingProvider, StubEmbeddingProvider};
     use numen::{FieldDef, FieldRegistry, eval_scalar};
 
     fn provider() -> StubEmbeddingProvider {
@@ -345,5 +362,53 @@ mod tests {
         let tight_at_far = eval_scalar(tight_f, &registry, 100.0, 0.0, 0.0).abs();
         let wide_at_far = eval_scalar(wide_f, &registry, 100.0, 0.0, 0.0).abs();
         assert!(wide_at_far > tight_at_far);
+    }
+
+    // --- a sparse-capable provider must not go through the empty dense
+    // store: `search`, `search_focus`, `register_focus_field` and `index`
+    // read `SemanticSearch`'s own methods, not `.index()` directly. ---
+
+    #[test]
+    fn sparse_provider_selects_the_sparse_store_and_index_stays_empty() {
+        let mut s = CanvasSearchSurface::<u32, _>::new(LexicalEmbeddingProvider::new(64).unwrap(), 50.0);
+        s.ingest(1, "rust async runtime", (0.0, 0.0)).unwrap();
+        s.ingest(2, "italian dinner recipes", (100.0, 0.0)).unwrap();
+        assert!(s.is_sparse());
+        assert_eq!(s.sparse_index().unwrap().len(), 2);
+        assert!(s.index().is_empty());
+    }
+
+    #[test]
+    fn search_focus_works_with_a_sparse_provider() {
+        let mut s = CanvasSearchSurface::<u32, _>::new(LexicalEmbeddingProvider::new(64).unwrap(), 50.0);
+        s.ingest(1, "rust async runtime", (0.0, 0.0)).unwrap();
+        s.ingest(2, "italian dinner recipes", (100.0, 0.0)).unwrap();
+        s.set_focus_query("rust async").unwrap();
+        let result = s.search_focus(1).unwrap().expect("focus set");
+        assert_eq!(result[0].0, 1);
+    }
+
+    #[test]
+    fn register_focus_field_works_with_a_sparse_provider() {
+        let mut s = CanvasSearchSurface::<u32, _>::new(LexicalEmbeddingProvider::new(64).unwrap(), 50.0);
+        s.ingest(1, "rust async runtime", (100.0, 100.0)).unwrap();
+        s.ingest(2, "italian dinner recipes", (500.0, 500.0)).unwrap();
+        s.set_focus_query("rust async runtime").unwrap();
+
+        let mut projection = FieldProjection::new();
+        let id = s
+            .register_focus_field(&mut projection, "focus_similarity")
+            .expect("field registered");
+        let registry = FieldRegistry::new();
+        let field = match projection.registry.get(id) {
+            Some(FieldDef::Scalar(f)) => f,
+            _ => panic!("expected scalar field"),
+        };
+        let at_one = eval_scalar(field, &registry, 100.0, 100.0, 0.0);
+        let at_two = eval_scalar(field, &registry, 500.0, 500.0, 0.0);
+        // Before the fix this field was always Const(0.0) — the empty dense
+        // index has no entries to sum gaussians over.
+        assert!(at_one > at_two);
+        assert!(at_one > 0.5);
     }
 }
