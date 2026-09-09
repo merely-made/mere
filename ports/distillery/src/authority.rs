@@ -10,7 +10,6 @@ use std::future::Future;
 use std::pin::Pin;
 use std::sync::Arc;
 
-#[cfg(feature = "remote")]
 use mesh::JobBoard;
 use mesh::{BlobRef, MeshStoreError, RetentionCheckpoint, RetentionEffect};
 use mesh_host::{HostError, MeshHost, Step, TransportBlobSpace};
@@ -124,6 +123,17 @@ impl<B: Backend + Clone + Send + Sync + 'static> Distillery<B> {
         #[cfg(feature = "remote")]
         self.refresh_remote().await?;
         Ok(steps)
+    }
+
+    /// Fold the current synced event store into the product job board.
+    ///
+    /// The fold stays behind the Distillery authority so an application
+    /// resident can update a read-only projection immediately after a real
+    /// supervisor tick without reaching through the host's lower-level
+    /// plumbing. The returned board is a value snapshot; it does not grant
+    /// mutation or ownership of the mesh store.
+    pub async fn board(&self) -> Result<JobBoard, DistilleryError> {
+        Ok(self.host.synced().board().await?)
     }
 
     #[cfg(feature = "remote")]

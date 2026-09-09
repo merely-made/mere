@@ -23,6 +23,8 @@ use djinn::pairing;
 use djinn::personal_sync as device_sync;
 use djinn::resident::DjinnResident;
 #[cfg(feature = "personal-sync")]
+use djinn::resident_distillery::ResidentDistillery;
+#[cfg(feature = "personal-sync")]
 use djinn::settings::{self as owner_settings, SyncOverrides};
 use graphshell::browser_carrier::AllowedExtensions;
 use graphshell::identity::VaultProtectionView;
@@ -647,6 +649,10 @@ async fn run(args: Args) -> Result<(), Box<dyn std::error::Error>> {
     // needs `&mut` on the resident. Lifting the lane out for the duration
     // splits a borrow Rust cannot split on its own; it goes back in below,
     // before the ordered shutdown that owns its close.
+    // Chronicle carries an immutable, resident-owned projection source into
+    // the app catalog. Clone that narrow handle before lifting the mutable
+    // works into their run loop, preserving the deliberate borrow split.
+    let distillery_chronicle = resident.distillery_chronicle_observer();
     let mut works = resident.take_distillery();
 
     // Keep every broker future inside this async block.  Its captures, most
@@ -704,6 +710,10 @@ async fn run(args: Args) -> Result<(), Box<dyn std::error::Error>> {
                 ResidentEndpointRoute::new("identity", Duration::from_millis(50))?,
             )];
             if let Some(route) = resident.register_knot_route(&mut catalog)? {
+                grants.push((AppId::new("turnstone"), route));
+            }
+            if let Some(observer) = distillery_chronicle {
+                let route = ResidentDistillery::register_chronicle_route(observer, &mut catalog)?;
                 grants.push((AppId::new("turnstone"), route));
             }
             (

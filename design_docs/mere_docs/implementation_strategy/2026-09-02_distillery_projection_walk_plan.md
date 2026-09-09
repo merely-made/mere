@@ -1,16 +1,20 @@
 # Distillery Projection Walk Plan
 
 **Date:** 2026-09-02
-**Status:** W0 complete. W1's endpoint, admitted catalog seam, Graphshell
-mount, session-local resume by diff, detailed frozen table, machine-readable
-headless receipt, admitted `ResidentProjectionHost` carrier path, and headed
-WebRTC fixture receipt are green 2026-09-06. A readable three-card layout and
-live Distillery-resident route remain before W1 is closed. Continuation
+**Status:** W0 through W2 complete. W1's endpoint, admitted catalog seam,
+Graphshell mount, session-local resume by diff, detailed frozen table,
+machine-readable headless receipt, admitted `ResidentProjectionHost` carrier
+path, readable headed WebRTC fixture receipt, live Djinn-owned resident route,
+stable-topology authority diff, and live headed WebRTC receipt are green.
+W2's authored two-source recipe, authority-generation shelfmark, single-option
+variant, and headed binding receipt are green through 2026-09-08. Continuation
 across a fresh admission is a separate protocol question because it receives
 a fresh transcript-derived projection session (Progress). §2 was read at mere
 `77a3701f052` and corrected at
 `3ce750f5` by the W0 implementation, which read the code rather than this
-plan.
+plan. On 2026-09-09 the host-neutral definition, validation, binding, variant,
+and deterministic-JSON contract moved into the `scenograph` authoring crate;
+Graphshell retains its editor UI, compiler, persistence, and Chronicle recipe.
 **Scope:** the first end-to-end scene binding for a port — dataset → scene →
 Scenograph → host — walked on Distillery. This plan owns the walk; the
 [Distillery v0 plan](2026-08-12_distillery_v0_plan.md) owns the works
@@ -184,9 +188,11 @@ Chronicle as a served scene; snapshot, diff, reconnect, and resume are in one
 machine-readable receipt; the `FrozenScene` realization lists jobs by name
 with their spans in its table; a second Distillery session over the same
 mesh yields byte-identical scores (determinism receipt).
-*Current next step:* make the three mounted Chronicle cards visually distinct
-and readable, then wire the observer to the live Distillery resident route and
-repeat the headed capture there. The checked-in headless receipt
+*Current next step:* carry Djinn's live `distillery.chronicle` catalog route
+through the browser/WebRTC door and repeat the headed capture there. The
+readable fixture receipt records
+three distinct named cards and zero card-footprint overlaps. The checked-in
+headless receipt
 carries snapshot revision 11, same-session rediscovery and resume by a
 contiguous Distillery diff to revision 12, three named job rows, and
 presentation-supplied tick and lease-span detail. The admitted carrier test
@@ -194,9 +200,8 @@ separately runs `ResidentProjectionHost::accept_one` over `MemoryTransport`,
 binds the factory to the admitted session, transfers the snapshot and all card
 resources, rings revision 12, applies its diff in `ClientState`, freezes the
   updated table, and closes cleanly. It is a software carrier receipt. The
-  separate headed fixture proves admitted WebRTC delivery and browser mounting,
-  but its capture exposes overlapping card geometry rather than a readable
-  Chronicle. A fresh admission mints a new
+  separate headed fixture proves admitted WebRTC delivery, browser mounting,
+  and readable Chronicle layout. A fresh admission mints a new
 projection session, so carrying an old acknowledgement across it requires an
 explicit continuity contract before this plan can claim reconnect across
 admissions.
@@ -204,8 +209,10 @@ admissions.
 **W2. The binding, authored.** The Chronicle recipe is expressed as a
 Scenograph definition — Source, Reading, Encoding, Arrangement, Interaction,
 Appearance, Provenance — over Distillery's endpoint, cited by a shelfmark whose
-`expects.generation` checks against the board's checkpoint hash. The same
-definition is then pointed at Djinn's resident log.
+`expects.generation` checks the authority-emitted generation carried by the
+source score. This is not a retention checkpoint hash: a live Chronicle can
+exist before retention accepts a checkpoint. The same definition is then
+pointed at Djinn's resident log.
 *Done when:* one authored definition, two datasets, both read true in the
 headed receipt; the shelfmark round-trips; changing one lever (era bands off)
 yields a variant, not a new definition.
@@ -436,3 +443,154 @@ runs onto the board. Not opened before that.
   readable Chronicle experience. W1 therefore still needs a layout/encoding
   correction, a headed capture that visibly distinguishes all three named
   jobs, and the live resident-owned route.
+
+- 2026-09-06: **W1 readable headed Chronicle fixture verified.** Chronicle's
+  timeline now reserves 180 pixels per 156-pixel card while retaining the
+  common observation tick. Graphshell renders the endpoint-supplied accessible
+  labels as three responsive card articles and exposes their exact board
+  footprints to the receipt. The strengthened `distillery_chronicle_w1.scn`
+  checks all three fixed job labels and `remote-overlaps == 0`. Its headed
+  Chrome run passed over the real WebRTC door with link `webrtc`, state `open`,
+  revision `11`, three cards, all three labels, and zero overlaps. Visual
+  inspection of `distillery_chronicle_w1_mounted.png` confirms three readable,
+  vertically separated cards in the 1282 by 722 viewport. The fixture receipt
+  closes the readable-layout gate. W1 remains open only for a live
+  Distillery-resident owner feeding the admitted route and the corresponding
+  headed capture.
+
+  The live seam belongs in Djinn's first-party application catalog rather than
+  the C4 fixture process. C4 cannot be the live owner because its separate
+  process would cross Distillery's single-writer Redb boundary.
+
+- 2026-09-07: **W1 live Djinn-owned admitted route verified.**
+  `ResidentDistillery` now retains one session-free `ChronicleObserver`, a
+  constant-space monotonic observation tick, and the next projection revision beside
+  the real resident authority. `ResidentAuthority::run_until_with_board`
+  supplies the freshly folded board with each lifecycle receipt; Djinn advances
+  Chronicle before forwarding that receipt. It retains no receipt journal.
+  Djinn registers the stable `distillery.chronicle` factory in its first-party
+  catalog and grants the route to Turnstone through the existing
+  `AllowedAppRoutes` boundary. Each catalog open still binds a new endpoint to
+  the admitted projection session.
+
+  The `distillery_chronicle_route` integration receipt opens a real
+  `DjinnResident`, posts a real mesh job after the observer's empty revision-1
+  materialization, admits a signed viewer over `MemoryTransport`, and drives
+  the production `ResidentDistillery::run_until`. The resident tick folds the
+  job, rings a later revision notice, and resume returns a one-card snapshot;
+  the test never calls `ChronicleObserver::observe` itself. `cargo test -p
+  djinn --test distillery_chronicle_route --offline -j1` passed 1/1 against the
+  stable Genet checkout, and `cargo test -p djinn --lib --offline -j1` passed
+  65/65.
+
+  This closes live authority ownership and local admitted carriage. It does not
+  turn the C4 fixture receipt into evidence for the live Djinn source. W1's
+  remaining product gate is an explicit bridge from Djinn's first-party
+  catalog route to the browser/WebRTC door, followed by the same readable
+  headed capture. The first observed job changes Chronicle topology, so resume
+  correctly returns a snapshot; a later state transition with stable topology
+  remains the focused diff receipt. Historical Posted-to-terminal spans remain
+  gated on an owner-correlated event journal because `JobBoard` has no posting
+  tick and `ResidentReceipt` has no `JobId`.
+
+- 2026-09-07: **W1 live headed route verified and closed.** Graphshell now
+  owns `admit_webrtc_catalog`, the bridge from a joined browser carrier into
+  the route already configured on `ResidentProjectionHost`. It snapshots the
+  host policy, revocation ledger, and live count under a short lock, performs
+  the WebRTC join without holding that lock, then opens the catalog route. The
+  returned `ServedWebRtcProjection` keeps the projection loop, frame pump, and
+  carrier control together through orderly finish. C4's signaling host now
+  uses this shared bridge; `cargo test -p graphshell --features webrtc-session
+  --test c4_host_signaling --offline -j1` passed 2/2, including a real served
+  projection and refusal of an invitation this host did not issue.
+
+  Djinn supplies `ResidentDistillery::chronicle_projection_host`, while the
+  opt-in `distillery_chronicle_receipt_host` composes the headed evidence path:
+  a temporary real `DjinnResident`, one posted `mesh.blake3/v1` job, one real
+  authority fold before signaling opens, the production
+  `distillery.chronicle` observer and catalog route, and a fresh per-run WebRTC
+  identity. Its release reference and invitation exist only for the receipt
+  process. `cargo build -p djinn --features
+  distillery-chronicle-receipt-host --bin
+  distillery_chronicle_receipt_host --offline -j1` passed against the stable
+  Genet checkout.
+
+  The strengthened Djinn integration receipt covers the other live update
+  shape. A later authority fold over the same one-card topology rings a later
+  revision and resumes from the acknowledged base by exactly one contiguous
+  diff with one `SetGeneration` plus changed presentation data. The unchanged
+  job keeps its item geometry and identity; the later observation advances the
+  materialization generation and its readable tick facts. The test drives
+  both observations through `ResidentDistillery::run_until` and never mutates
+  `ChronicleObserver` directly. `cargo test -p djinn --test
+  distillery_chronicle_route --offline -j1` passed 2/2.
+
+  Finally, headed Chrome ran `distillery_chronicle_live_w1.scn` against that
+  receipt host over the real WebRTC door. All 13 steps passed: link `webrtc`,
+  state `open`, revision at least 2, one card with the supplied `Job` label,
+  remote-session selection, zero exact-footprint overlaps, and a 1282 by 722
+  capture. The measured run mounted revision 270 because the receipt resident
+  observes at its configured 25 ms cadence; the board still held one job.
+  Artifacts are under
+  `C:\Users\mark_\Code\testing\mere\scenarios\graphshell-web\distillery_chronicle_live_w1`.
+
+  This closes W1's evidence boundary. Production hosting remains a separate
+  composition decision: Luggage must supply durable `ReleaseRefV1` identity,
+  the owner must select network policy, and deployed signaling and TURN must
+  host the same catalog bridge. Those choices must not inherit the receipt
+  process's ephemeral release identity.
+
+- 2026-09-08: **W2 authored binding verified and closed.** Graphshell now owns
+  `AuthoredProjectionDefinition`, a deterministic recipe with named source
+  bindings and per-source authority-generation expectations. The one
+  `distillery.chronicle` definition carries Reading, Encoding, Arrangement,
+  Interaction, Appearance, and Provenance across both the deterministic W0
+  Distillery fixture and Djinn's live resident log. `era-bands-off` changes
+  only the timeline's `era_bands` arrangement option and retains the base
+  definition id. The existing executable compiler explicitly refuses
+  arrangement options because Chronicle's endpoint already realizes the
+  timeline and that generic compiler does not own this lever.
+
+  Distillery supplies the `distillery.chronicle/v1` Shelfmark adapter. Each
+  input retains its opaque authority record, `chronicle` reading, and the
+  exact `ChronicleRevision.generation` stamped into its source score. A live
+  observation may predate any accepted retention checkpoint, so this contract
+  does not substitute a checkpoint hash. Focused verification passed 7/7
+  Chronicle tests, 10/10 projection-editor tests, and 12/12 projection-compiler
+  tests.
+
+  The receipt-only Djinn host now freezes after the first real resident fold,
+  reads both sources, serves the versioned binding report at
+  `/chronicle-binding`, and mounts the matching Djinn scene through the same
+  admitted WebRTC route as W1. `loader.js` verifies the two reads, definition
+  sources, authority records, generations, Shelfmark round trip, allowed
+  variant, and equality between the cited Djinn generation and the mounted
+  scene generation before exposing the result to a scenario. Headed Chrome
+  passed all 18 steps with definition `distillery.chronicle`, two reads true,
+  source generations 41 and 3, remote revision and generation 3, one card,
+  zero overlaps, and a 1282 by 722 capture. The binding, browser result, and
+  PNG are under
+  `C:\Users\mark_\Code\testing\mere\scenarios\graphshell-web\distillery_chronicle_w2`.
+
+  The authored-definition contract moved on 2026-09-09 from Graphshell into
+  `crates/cambium/scenes/scenograph`, using the published name previously held
+  for the authoring product. This does not restore the removed generic engine
+  facade: `sceno`, `scenomise`, and `scenotime` remain direct dependencies and
+  `scenograph` re-exports none of them. Graphshell publicly re-exports the
+  authoring types for compatibility while retaining its Workbench panels,
+  reducer, sink, compiler, persistence, and Chronicle-specific recipe.
+
+  Turnstone's Knot editor forced the revision contract to split on 2026-09-09.
+  `PublicSourceRevision` records authority-issued durable identity, while
+  `RuntimeSourceBinding<W>` carries an opaque host witness only for the live
+  binding operation. Runtime witnesses implement no serialization contract and
+  cannot be passed through ordinary durable binding. Knot now exposes the exact
+  signed operation head of a synced vault document as
+  `EditableTextV1.public_revision`; files-in-place leave that field absent, and
+  `base_token` remains the private optimistic-concurrency capability used only
+  for saving. Turnstone can adopt this split once its immutable Mere and Knot
+  pins advance together. Its checkout remains unchanged until then so the plan
+  does not claim an adapter against unpublished APIs. The other larger open
+  seams remain owner-correlated event history for true Posted-to-terminal spans
+  and a generation model that can cite accepted checkpoints alongside live
+  materializations without conflating them.

@@ -28,6 +28,7 @@ use graphshell_endpoint::{
     IntentSink, PresentationSource, ProjectionCatalog, ProjectionNoticeSource, ProjectionSource,
     ResumableProjectionSource,
 };
+use incipit::{ShelfmarkAuthorityV1, ShelfmarkInputV1, ShelfmarkV1};
 use mesh::{Job, JobBoard, JobState};
 use sceno::{
     Arrangement, AxisValue, Footprint, InstanceId, Placement, Representation, Scene, Score,
@@ -39,6 +40,13 @@ use crate::ResidentReceipt;
 
 const DEFAULT_SESSION: &str = "distillery.chronicle/v1";
 const SOURCE_NAMESPACE: &str = "distillery.chronicle";
+/// Shelfmark adapter id for the Distillery Chronicle board authority.
+pub const CHRONICLE_SHELFMARK_ADAPTER: &str = "distillery.chronicle/v1";
+/// Shelfmark projection id for the authored Distillery Chronicle definition.
+pub const CHRONICLE_SHELFMARK_PROJECTION: &str = "distillery.chronicle";
+/// Shelfmark reading id for the folded job board rendered as a Chronicle.
+pub const CHRONICLE_SHELFMARK_READING: &str = "chronicle";
+const CHRONICLE_SHELFMARK_INPUT: &str = "board";
 
 /// A caller-owned materialization version.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -75,6 +83,37 @@ pub enum ChronicleEndpointError {
     InvalidRevision,
 }
 
+/// Why a Distillery Chronicle shelfmark could not be honored.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum ChronicleShelfmarkError {
+    /// The envelope is malformed or names another projection.
+    Invalid(String),
+    /// The shelfmark does not contain the Chronicle board input.
+    MissingBoardInput,
+    /// The cited authority generation differs from this endpoint.
+    GenerationMismatch {
+        /// Generation cited by the shelfmark.
+        expected: String,
+        /// Generation emitted by the resolved Chronicle endpoint.
+        found: String,
+    },
+}
+
+impl std::fmt::Display for ChronicleShelfmarkError {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Invalid(error) => write!(formatter, "invalid Chronicle shelfmark: {error}"),
+            Self::MissingBoardInput => write!(formatter, "Chronicle shelfmark lacks board input"),
+            Self::GenerationMismatch { expected, found } => write!(
+                formatter,
+                "Chronicle board authority moved: expected {expected}, found {found}"
+            ),
+        }
+    }
+}
+
+impl std::error::Error for ChronicleShelfmarkError {}
+
 impl std::fmt::Display for ChronicleEndpointError {
     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
@@ -92,9 +131,9 @@ impl std::error::Error for ChronicleEndpointError {}
 
 /// The shared Distillery observation behind its admitted Chronicle endpoints.
 ///
-/// A resident owns this observer for the lifetime of its board and receipt
-/// stream. Carrier reconnects create fresh [`ChronicleEndpoint`] values from
-/// it, retaining the current snapshot and one honest contiguous diff without
+/// A resident owns this observer for the lifetime of its board and observation
+/// tick. Carrier reconnects create fresh [`ChronicleEndpoint`] values from it,
+/// retaining the current snapshot and one honest contiguous diff without
 /// sharing a caller's admitted session.
 #[derive(Clone)]
 pub struct ChronicleObserver(Arc<Mutex<ChronicleObservation>>);
@@ -102,9 +141,19 @@ pub struct ChronicleObserver(Arc<Mutex<ChronicleObservation>>);
 impl ChronicleObserver {
     /// Read the current board and receipt stream into a new shared observation.
     pub fn new(board: &JobBoard, receipts: &[ResidentReceipt], version: ChronicleRevision) -> Self {
+        Self::new_at_tick(board, receipt_tick(receipts), version)
+    }
+
+    /// Read the current board and explicit observation tick into a new shared
+    /// observation.
+    pub fn new_at_tick(
+        board: &JobBoard,
+        observation_tick: u64,
+        version: ChronicleRevision,
+    ) -> Self {
         Self(Arc::new(Mutex::new(
             ChronicleObservation::from_materialization(
-                materialize(board, receipts, version),
+                materialize(board, observation_tick, version),
                 version,
             ),
         )))
@@ -133,11 +182,21 @@ impl ChronicleObserver {
         receipts: &[ResidentReceipt],
         version: ChronicleRevision,
     ) -> Result<(), ChronicleEndpointError> {
+        self.observe_at_tick(board, receipt_tick(receipts), version)
+    }
+
+    /// Replace the observed board with a later explicit observation tick.
+    pub fn observe_at_tick(
+        &self,
+        board: &JobBoard,
+        observation_tick: u64,
+        version: ChronicleRevision,
+    ) -> Result<(), ChronicleEndpointError> {
         let mut current = self.state();
         if version.epoch != current.version.epoch || version.revision <= current.version.revision {
             return Err(ChronicleEndpointError::InvalidRevision);
         }
-        let next = materialize(board, receipts, version);
+        let next = materialize(board, observation_tick, version);
         let history = scene_diff_between(&current, &next, version).map(|scene| RetainedDiff {
             scene,
             presentation: presentation_changes(&current.presentation, &next.presentation),
@@ -179,7 +238,18 @@ impl ChronicleEndpoint {
         receipts: &[ResidentReceipt],
         version: ChronicleRevision,
     ) -> Self {
-        ChronicleObserver::new(board, receipts, version).endpoint(session)
+        Self::new_at_tick(session, board, receipt_tick(receipts), version)
+    }
+
+    /// Read a board and explicit observation tick into the caller's admitted
+    /// session.
+    pub fn new_at_tick(
+        session: ProjectionSession,
+        board: &JobBoard,
+        observation_tick: u64,
+        version: ChronicleRevision,
+    ) -> Self {
+        ChronicleObserver::new_at_tick(board, observation_tick, version).endpoint(session)
     }
 
     /// Read an unauthenticated local observation under Distillery's default id.
@@ -190,10 +260,20 @@ impl ChronicleEndpoint {
         receipts: &[ResidentReceipt],
         version: ChronicleRevision,
     ) -> Self {
-        Self::new(
+        Self::with_default_session_at_tick(board, receipt_tick(receipts), version)
+    }
+
+    /// Read an unauthenticated local observation with an explicit tick under
+    /// Distillery's default id.
+    pub fn with_default_session_at_tick(
+        board: &JobBoard,
+        observation_tick: u64,
+        version: ChronicleRevision,
+    ) -> Self {
+        Self::new_at_tick(
             ProjectionSession(DEFAULT_SESSION.to_string()),
             board,
-            receipts,
+            observation_tick,
             version,
         )
     }
@@ -212,6 +292,35 @@ impl ChronicleEndpoint {
         self.observer.revision()
     }
 
+    /// The resolved authority generation cited by a Chronicle shelfmark.
+    ///
+    /// The current endpoint contract carries this as the explicit numeric
+    /// generation stamped into [`Score::generation`]. A checkpoint hash cannot
+    /// be claimed here because W0/W1 observations do not retain an accepted
+    /// mesh `RetentionCheckpoint` identity.
+    pub fn dataset_generation(&self) -> String {
+        self.observer.revision().generation.to_string()
+    }
+
+    /// Cite the current Chronicle board so another endpoint can reconstitute
+    /// it and check that the authority has not moved.
+    pub fn shelfmark(&self) -> ShelfmarkV1 {
+        let mut shelfmark = ShelfmarkV1::new(CHRONICLE_SHELFMARK_PROJECTION);
+        shelfmark.inputs.insert(
+            CHRONICLE_SHELFMARK_INPUT.to_owned(),
+            chronicle_shelfmark_input("board", self.dataset_generation()),
+        );
+        shelfmark
+            .validate()
+            .expect("the Chronicle shelfmark is constructed with a valid input");
+        shelfmark
+    }
+
+    /// Verify a cited Chronicle against this endpoint's current board.
+    pub fn verify_shelfmark(&self, shelfmark: &ShelfmarkV1) -> Result<(), ChronicleShelfmarkError> {
+        verify_chronicle_shelfmark(shelfmark, &self.dataset_generation())
+    }
+
     /// The product-free timeline score supplied to the scene solver.
     pub fn score(&self) -> Score {
         self.observer.state().score.clone()
@@ -228,7 +337,18 @@ impl ChronicleEndpoint {
         receipts: &[ResidentReceipt],
         version: ChronicleRevision,
     ) -> Result<(), ChronicleEndpointError> {
-        self.observer.observe(board, receipts, version)
+        self.observe_at_tick(board, receipt_tick(receipts), version)
+    }
+
+    /// Replace this source's observation with a strictly later explicit tick.
+    pub fn observe_at_tick(
+        &mut self,
+        board: &JobBoard,
+        observation_tick: u64,
+        version: ChronicleRevision,
+    ) -> Result<(), ChronicleEndpointError> {
+        self.observer
+            .observe_at_tick(board, observation_tick, version)
     }
 
     fn snapshot_for_current_score(&self) -> ProjectionSnapshot {
@@ -404,14 +524,13 @@ struct Materialization {
 
 fn materialize(
     board: &JobBoard,
-    receipts: &[ResidentReceipt],
+    observation_tick: u64,
     version: ChronicleRevision,
 ) -> Materialization {
-    let tick = u64::try_from(receipts.len()).unwrap_or(u64::MAX);
     let jobs: Vec<&Job> = board.jobs().collect();
-    let score = score_for(&jobs, tick, version.generation);
+    let score = score_for(&jobs, observation_tick, version.generation);
     let scene = scenomise::solve(&score);
-    let (presentation, resources) = presentation_for(&jobs, tick);
+    let (presentation, resources) = presentation_for(&jobs, observation_tick);
     Materialization {
         score,
         scene,
@@ -420,8 +539,84 @@ fn materialize(
     }
 }
 
+/// Verify a Chronicle shelfmark against an independently observed board
+/// generation. The caller supplies the found authority generation because the
+/// envelope layer does not own the board or its resolver.
+pub fn verify_chronicle_shelfmark(
+    shelfmark: &ShelfmarkV1,
+    found_generation: &str,
+) -> Result<(), ChronicleShelfmarkError> {
+    shelfmark
+        .validate()
+        .map_err(|error| ChronicleShelfmarkError::Invalid(format!("{error:?}")))?;
+    if shelfmark.projection != CHRONICLE_SHELFMARK_PROJECTION {
+        return Err(ChronicleShelfmarkError::Invalid(
+            "citation is not a Distillery Chronicle projection".into(),
+        ));
+    }
+    let input = shelfmark
+        .inputs
+        .get(CHRONICLE_SHELFMARK_INPUT)
+        .ok_or(ChronicleShelfmarkError::MissingBoardInput)?;
+    verify_chronicle_shelfmark_input(input, found_generation)
+}
+
+/// Build the Distillery-owned shelfmark input for one host-composed dataset.
+///
+/// The authority record is opaque here so a combined Chronicle can cite, for
+/// example, Distillery's board and Djinn's resident log separately while both
+/// retain the same input semantics.
+pub fn chronicle_shelfmark_input(
+    authority_record: impl Into<String>,
+    generation: impl Into<String>,
+) -> ShelfmarkInputV1 {
+    ShelfmarkInputV1 {
+        authority: ShelfmarkAuthorityV1 {
+            adapter: CHRONICLE_SHELFMARK_ADAPTER.to_owned(),
+            record: authority_record.into(),
+        },
+        reading: CHRONICLE_SHELFMARK_READING.to_owned(),
+        reading_parameters: None,
+        arrangement: None,
+        expects_generation: generation.into(),
+    }
+}
+
+/// Verify one host-composed Chronicle input against its resolved generation.
+pub fn verify_chronicle_shelfmark_input(
+    input: &ShelfmarkInputV1,
+    found_generation: &str,
+) -> Result<(), ChronicleShelfmarkError> {
+    if input.authority.adapter != CHRONICLE_SHELFMARK_ADAPTER
+        || input.reading != CHRONICLE_SHELFMARK_READING
+        || input.authority.record.trim().is_empty()
+    {
+        return Err(ChronicleShelfmarkError::Invalid(
+            "citation names another Chronicle authority or reading".into(),
+        ));
+    }
+    if input.expects_generation != found_generation {
+        return Err(ChronicleShelfmarkError::GenerationMismatch {
+            expected: input.expects_generation.clone(),
+            found: found_generation.to_owned(),
+        });
+    }
+    Ok(())
+}
+
+fn receipt_tick(receipts: &[ResidentReceipt]) -> u64 {
+    u64::try_from(receipts.len()).unwrap_or(u64::MAX)
+}
+
 fn score_for(jobs: &[&Job], tick: u64, generation: u64) -> Score {
-    let mut score = Score::new(Arrangement::Timeline(Timeline::default()));
+    // Chronicle cards are substantially taller than the generic timeline's
+    // default row gap. Keep the observation tick on the shared time axis, but
+    // give coincident jobs enough vertical pitch to remain individually
+    // legible in a viewer that honors the score positions.
+    let mut score = Score::new(Arrangement::Timeline(Timeline {
+        row_gap: CHRONICLE_CARD_ROW_GAP,
+        ..Timeline::default()
+    }));
     score.generation = generation;
     score.items = jobs
         .iter()
@@ -486,6 +681,8 @@ fn card_footprint() -> Footprint {
         size: Size2::new(280.0, 156.0),
     }
 }
+
+const CHRONICLE_CARD_ROW_GAP: f32 = 180.0;
 
 fn card_for(job: &Job, tick: u64) -> chirograph::PortableCardV1 {
     let current_epoch = job.lease.current();
@@ -673,6 +870,11 @@ mod tests {
             descriptor.projections[0].request.score.arrangement,
             Arrangement::Timeline(_)
         ));
+        let Arrangement::Timeline(timeline) = &descriptor.projections[0].request.score.arrangement
+        else {
+            unreachable!("Chronicle advertises its timeline arrangement")
+        };
+        assert_eq!(timeline.row_gap, CHRONICLE_CARD_ROW_GAP);
         assert_eq!(descriptor.projections[0].request.score.generation, 41);
         assert!(
             descriptor.projections[0]
@@ -717,6 +919,58 @@ mod tests {
     }
 
     #[test]
+    fn shelfmark_round_trips_and_checks_the_resolved_generation() {
+        let endpoint = endpoint();
+        let shelfmark = endpoint.shelfmark();
+        let wire = serde_json::to_string(&shelfmark).expect("serialize Chronicle shelfmark");
+        let decoded: ShelfmarkV1 = serde_json::from_str(&wire).expect("decode Chronicle shelfmark");
+        assert_eq!(decoded, shelfmark);
+        assert_eq!(endpoint.dataset_generation(), "41");
+        assert_eq!(
+            shelfmark.inputs[CHRONICLE_SHELFMARK_INPUT].expects_generation,
+            endpoint.dataset_generation()
+        );
+        assert_eq!(
+            endpoint.dataset_generation(),
+            endpoint.revision().generation.to_string(),
+            "the shelfmark cites the resolved generation stamped into the score"
+        );
+        endpoint
+            .verify_shelfmark(&decoded)
+            .expect("current board honors its shelfmark");
+
+        let mut moved = decoded.clone();
+        moved
+            .inputs
+            .get_mut(CHRONICLE_SHELFMARK_INPUT)
+            .expect("board input")
+            .expects_generation = "moved".into();
+        assert_eq!(
+            endpoint.verify_shelfmark(&moved),
+            Err(ChronicleShelfmarkError::GenerationMismatch {
+                expected: "moved".into(),
+                found: endpoint.dataset_generation(),
+            })
+        );
+    }
+
+    #[test]
+    fn host_composed_inputs_keep_authority_records_distinct() {
+        let distillery = chronicle_shelfmark_input("distillery-board", "41");
+        let djinn = chronicle_shelfmark_input("djinn-resident-log", "41");
+        assert_ne!(distillery.authority.record, djinn.authority.record);
+        verify_chronicle_shelfmark_input(&distillery, "41").expect("Distillery input verifies");
+        verify_chronicle_shelfmark_input(&djinn, "41").expect("Djinn input verifies");
+        assert_eq!(
+            verify_chronicle_shelfmark_input(&djinn, "42"),
+            Err(ChronicleShelfmarkError::GenerationMismatch {
+                expected: "41".into(),
+                found: "42".into(),
+            })
+        );
+    }
+
+    #[test]
     fn identical_inputs_are_byte_identical_and_wrong_selection_is_refused() {
         let mut first = endpoint();
         let mut second = endpoint();
@@ -735,6 +989,33 @@ mod tests {
         assert_eq!(
             first.snapshot(wrong_session),
             Err(ChronicleEndpointError::WrongSession)
+        );
+    }
+
+    #[test]
+    fn explicit_observation_ticks_drive_materialization_without_receipt_history() {
+        let mut endpoint = ChronicleEndpoint::new_at_tick(
+            ProjectionSession("admitted:tick".into()),
+            &board(),
+            17,
+            ChronicleRevision::new(41, 7, 11),
+        );
+        assert!(
+            endpoint
+                .score()
+                .items
+                .iter()
+                .all(|item| item.axis == Some(AxisValue::Numeric(17.0)))
+        );
+        endpoint
+            .observe_at_tick(&board(), 18, ChronicleRevision::new(42, 7, 12))
+            .expect("later explicit observation tick");
+        assert!(
+            endpoint
+                .score()
+                .items
+                .iter()
+                .all(|item| item.axis == Some(AxisValue::Numeric(18.0)))
         );
     }
 

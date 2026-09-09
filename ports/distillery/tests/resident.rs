@@ -117,15 +117,16 @@ async fn resident_lifecycle_ticks_maintains_persists_and_closes() {
     let (stop_tx, stop_rx) = tokio::sync::oneshot::channel();
     let mut stop_tx = Some(stop_tx);
     let mut maintenance_completed = false;
+    let mut observed_terminal_board = false;
     resident
-        .run_until(
+        .run_until_with_board(
             async move {
                 tokio::select! {
                     _ = stop_rx => {}
                     _ = tokio::time::sleep(Duration::from_secs(3)) => {}
                 }
             },
-            |receipt| {
+            |receipt, board| {
                 match &receipt {
                     ResidentReceipt::MaintenanceCompleted(_) => maintenance_completed = true,
                     ResidentReceipt::MaintenanceIdle if maintenance_completed => {
@@ -135,6 +136,7 @@ async fn resident_lifecycle_ticks_maintains_persists_and_closes() {
                     },
                     _ => {},
                 }
+                observed_terminal_board |= board.jobs().any(|job| job.state.is_terminal());
                 receipts.push(receipt);
             },
         )
@@ -148,6 +150,10 @@ async fn resident_lifecycle_ticks_maintains_persists_and_closes() {
                 if steps.iter().any(|step| matches!(step, Step::Completed { .. }))
         )),
         "the resident cadence drove the real job to completion"
+    );
+    assert!(
+        observed_terminal_board,
+        "the board-observing resident seam delivered the folded terminal board"
     );
     assert!(
         receipts.iter().any(|receipt| matches!(

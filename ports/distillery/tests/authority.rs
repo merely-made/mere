@@ -118,6 +118,12 @@ async fn the_port_drives_the_host_and_collects_only_after_checkpoint() {
         completed,
         "Distillery drove the substrate job to completion"
     );
+    let board = distillery.board().await.expect("fold the current board");
+    assert_eq!(board.jobs().count(), 1);
+    assert!(
+        board.jobs().all(|job| job.state.is_terminal()),
+        "the read-only fold helper sees the real completed board"
+    );
     assert!(
         space.has(&input).await,
         "completion alone retains the input"

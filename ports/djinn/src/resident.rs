@@ -162,6 +162,16 @@ impl DjinnResident {
         self.distillery.as_ref()
     }
 
+    /// Clone the resident-owned Chronicle source before the works are lifted
+    /// into their long-running loop. The caller can register that source with
+    /// Graphshell while the mutable works borrow is active; only endpoint
+    /// source state crosses the split, never job or authority access.
+    pub fn distillery_chronicle_observer(&self) -> Option<distillery::ChronicleObserver> {
+        self.distillery
+            .as_ref()
+            .map(ResidentDistillery::chronicle_observer)
+    }
+
     /// Lift the works out so a caller can drive
     /// [`ResidentDistillery::run_until`] for the length of its run loop.
     ///

@@ -61,7 +61,10 @@ pub use authority::{
     BlobCustody, Distillery, DistilleryError, MaintenanceReport, RetentionSettings,
 };
 pub use chronicle::{
+    CHRONICLE_SHELFMARK_ADAPTER, CHRONICLE_SHELFMARK_PROJECTION, CHRONICLE_SHELFMARK_READING,
     ChronicleEndpoint, ChronicleEndpointError, ChronicleObserver, ChronicleRevision,
+    ChronicleShelfmarkError, chronicle_shelfmark_input, verify_chronicle_shelfmark,
+    verify_chronicle_shelfmark_input,
 };
 pub use installed::{
     DISTILLERY_MESH_SALT, DistilleryPaths, InstalledAuthority, InstalledError, InstalledSettings,
