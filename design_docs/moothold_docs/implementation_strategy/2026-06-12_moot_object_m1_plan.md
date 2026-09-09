@@ -532,3 +532,35 @@ management require their own subsequent consumer receipts.
   Focused Gemot withdrawal tests pass 5/5 and the captured-web feature tests
   pass 2/2. This remains a local implementation receipt; peer interoperability
   requires the upgraded records wire to be deployed on both sides.
+
+  **2026-09-09: P3d collection lineage implemented locally.** The records wire
+  now carries caller-minted same-Moot collection ids, contribution references
+  to original signed `Shared` operations, fork roots, and per-contribution
+  membership decisions over exact observed heads. Collection versions commit
+  to the sorted causal frontier and curated membership, independent of current
+  fauna authority. Read-time projection separately reports curated and
+  effective selections, so withdrawal or capability revocation cannot rewrite
+  historical version identity. Causally later edits dominate ancestors;
+  concurrent edits to distinct contributions commute and concurrent decisions
+  about one contribution use the operation hash as stable tiebreak.
+
+  Fork roots reproduce the named parent membership commitment and materialize
+  those contribution references. Foreign Moot references, false fork
+  commitments, missing parents, and currently ineffective contributions remain
+  explicit diagnostics while raw signed facts remain retained. Retention
+  checkpoints carry the collection facts inside their roster snapshot: a
+  focused prune test removes the source operations, resolves the same version,
+  authors a fork, and accepts a later child change against the retained head.
+  The service exposes stable-identity authoring only, checks current
+  collection-scoped authority and membership, requires exact current heads,
+  and refuses additions outside current effective fauna.
+
+  The complete Gemot library gate passes 145/145 tests, including the four
+  collection-fold cases, signed wire and stable-author round trip, and
+  checkpoint/prune/fork/child case; strict no-deps Clippy and diff-check also
+  pass. Cross-Moot
+  lineage, collection merge UI, private collection encryption, and a headed
+  Turnstone collection editor remain later gates. A collection fork copies no
+  Moot membership, capability grants, delegations, key epochs, Standing facts,
+  leases, hosting promises, or capture payloads; its wire type contains only
+  the parent version and contribution references.
