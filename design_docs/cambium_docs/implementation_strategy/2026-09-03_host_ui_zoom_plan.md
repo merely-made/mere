@@ -348,6 +348,16 @@ preference as the user's offset on it.
 
 ## Progress
 
+- **2026-09-08, Woodshed selector consumer verified.** The isolated dependency
+  bridge `691f9a0b` retains this host API and aligns Genet to `09515e03d22`.
+  Woodshed now resolves scenario selectors with `AppCtx::painted_rect` and
+  treats a missing host target as an authoritative miss. Its 406 focused tests
+  and five native Windows runs pass, including recentering at UI zoom 0.65.
+  This is a consumer receipt, not a full revalidation of Mere. The unchanged
+  Stage scenario still requires scrolling or a wide viewport to reach its
+  arrangement selector. Receipt:
+  `Code/testing/woodshed/retained-selectors-20260908/receipt.json`.
+
 - **2026-09-03.** Plan founded; decisions in §3 taken with Mark.
 - **2026-09-03. Z0 landed.** The audit table above; `Host::layout_scale`,
   `Host::available_size` and `Host::layout_point` introduced and the ten
