@@ -517,3 +517,18 @@ management require their own subsequent consumer receipts.
   collection merge UI, private collection encryption, hosted Weld DOM capture,
   WARC-grade custody, near-duplicate grouping, distributed indexes, corpus-cost
   measurement and relevance admission remain later gates.
+
+  **2026-09-09: P3b landed in the Gemot records lane.** `MootEvent::Withdrawn`
+  is a signed, upgraded-peer wire event carrying the original `Shared`
+  operation hash and withdrawal time. The roster retains every distinct signed
+  withdrawal fact (duplicate copies of one operation collapse by operation
+  hash), resolves the stable withdrawing root, and filters only the targeted
+  share when that root matches the share's stable contributor. Unknown targets
+  and mismatched identities are refused by `Moot::withdraw_share_for_identity`
+  before authoring; there is no seed-only withdrawal command. Checkpoint
+  snapshots carry the withdrawal facts, so pruning and late replay cannot
+  resurrect the contribution. The captured-web projection inherits the
+  exclusion through `authorized_fauna` and remints without withdrawn records.
+  Focused Gemot withdrawal tests pass 5/5 and the captured-web feature tests
+  pass 2/2. This remains a local implementation receipt; peer interoperability
+  requires the upgraded records wire to be deployed on both sides.
