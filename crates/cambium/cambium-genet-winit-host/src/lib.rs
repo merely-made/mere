@@ -820,6 +820,10 @@ where
     /// repaints the same application rather than restarting it.
     fn suspended(&mut self, _event_loop: &ActiveEventLoop) {
         self.s.surface = None;
+        // Fragment IDs belong to the renderer that just died. Redraw returns
+        // early without a surface, so retire these here before resume installs
+        // a fresh renderer. The application leaf registry itself survives.
+        self.s.leaf_fragments.clear();
     }
 
     fn about_to_wait(&mut self, event_loop: &ActiveEventLoop) {
