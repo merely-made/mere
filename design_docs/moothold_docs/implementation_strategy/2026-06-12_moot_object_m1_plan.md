@@ -452,3 +452,68 @@ management require their own subsequent consumer receipts.
   Turnstone place worker to resolve locally replicated fauna manifests into this
   projection, explicit capture consent and withdrawal/remint behavior, collection
   version/fork records, shared-corpus cost measurements and held-out relevance.
+
+- **2026-09-09:** P3 was split into four ordered implementation lanes after a
+  Turnstone, consent/withdrawal and collection-lineage review. The captured-web
+  consumer is not the next patch. It has no production Fleece record resolver to
+  consume yet, and Turnstone's current hosted capture work produces a viewport
+  PNG rather than canonical DOM text.
+
+  **P3a: explicit source-document capture.** Turnstone owns this application
+  action. Its fetched-page path already receives exact response bytes, decoded
+  HTML and content type, parses a `StaticDocument`, and calls Fleece for reader
+  text. Retain the exact bytes, final URL, content type and acquisition time in
+  the node-and-URL-scoped capture candidate long enough for an explicit action to
+  deposit the representation, run `fleece::extract_document`, and save a
+  `FleeceAnnotationRecord` as `LocalOnly`. A whole-document capture uses an
+  explicit whole-text anchor; later human annotations use their selected ranges.
+  The action is separate from sharing. It may share Keep, envelope, tombstone and
+  garbage-collection mechanics with visual capture, but a PNG hash and a source
+  document hash remain distinct artifacts.
+
+  Hosted Weld is unsupported in this lane: it fetches internally and currently
+  returns only correlated pixels. A later engine seam must expose a correlated
+  source or named serialized-DOM snapshot with final URL, content type,
+  acquisition time and privacy semantics. Accessibility text, OCR and pixels do
+  not substitute for Fleece's canonical DOM text. Turnstone must also replace its
+  unconditional page-text retention hook with an actual local setting or stop
+  retaining those bodies. Incidental trail text is never capture evidence and is
+  never eligible for Moot sharing.
+
+  **P3b: contribution withdrawal.** Gemot's records lane should add one signed
+  `Withdrawn { target_share, at_ms }` event, targeting the original `Shared`
+  operation hash. Only that share's stable author may withdraw it. The roster
+  retains the positive and withdrawal facts while `authorized_fauna` excludes an
+  effectively withdrawn contribution. Delegation revocation remains the broader
+  operation that removes all of a sharer's current contributions. Withdrawal
+  changes current search and serving after remint; it does not erase Fleece
+  records, local blobs, audit history or copies already held elsewhere. This is a
+  records-wire change and therefore requires upgraded peers before use.
+
+  **P3c: Turnstone collection consumption.** Once P3a and P3b exist, update all
+  of Turnstone's Mere pins together and compose `mere-moot` with `captured-web` in
+  the existing place worker. The worker resolves locally held annotation records
+  by manifest id, supplies its current `GemotAuthorityView`, and emits an
+  app-owned collection summary plus a locally reminted `DocumentIndex`. The
+  render-free two-peer fixture has two authorized identical captures at distinct
+  URLs and one missing manifest; it proves one grouped result with both signed
+  contributions, body and alias recall, explicit rejection, then withdrawal or
+  capability revocation removing the result after resync and cold reopen while
+  retained facts remain inspectable. Index bytes and scores never replicate.
+
+  **P3d: collection lineage.** Extend Gemot's existing signed records lane rather
+  than creating another journal or transport. A collection has a caller-minted
+  stable id; changes name their exact observed collection-event heads; a derived
+  version is the collection reference, sorted causal frontier and canonical
+  membership commitment. Membership references the signed `Shared` operation,
+  preserving its contributor rather than naming only content. A fork root names
+  the parent version and copies the selected contribution references so it can be
+  read after source-history pruning. The first receipt is same-Moot only. A fork
+  carries neither community membership, delegations, group keys, Standing facts,
+  leases nor hosting promises.
+
+  P3a and P3b are independent first gates and may land in parallel. P3c waits for
+  both; P3d follows the working consumer. Cross-Moot lineage verification,
+  collection merge UI, private collection encryption, hosted Weld DOM capture,
+  WARC-grade custody, near-duplicate grouping, distributed indexes, corpus-cost
+  measurement and relevance admission remain later gates.
