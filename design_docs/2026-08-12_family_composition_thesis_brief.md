@@ -229,10 +229,12 @@ first three without the fourth.
 
 ## 7. Stack pillars: research before implementation (2026-09-08)
 
-**Status:** bounded source survey complete for R1/R2; initial model and Rust arena experiments
-run, full consumer probes open. The survey observations below remain code
-inspection; measured results are separated at the end of §7. This is the shared research
-home; implementation belongs in the repository that owns the selected seam.
+**Status:** bounded source survey and initial model, arena, Boa runtime/document,
+Muniment/redb and Turnstone correlation experiments recorded for R1/R2.
+Broader consumer and headed gates remain open in the ten-slice ledger below.
+The survey observations remain code inspection; measured results are separated
+at the end of §7. This is the shared research home; implementation belongs in
+the repository that owns the selected seam.
 
 A pillar is a durable guarantee with an accountable owner, consumers, and
 failure tests. It need not become a new crate. The arena, shared wgpu device,
