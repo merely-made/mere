@@ -836,6 +836,7 @@ mod tests {
             encoding: TextEncoding::Utf8,
             source: "# Field note\n".into(),
             base_token: vec![7; 32],
+            public_revision: None,
             derived: None,
         };
         let editable = serde_json::to_vec(&editable_value).unwrap();
@@ -976,6 +977,7 @@ mod tests {
             encoding: TextEncoding::Utf8,
             source: "private source".into(),
             base_token: vec![3; 32],
+            public_revision: None,
             derived: None,
         })
         .unwrap();
