@@ -16,9 +16,12 @@ Sources keep their native truth behind adapters; what is shared is the scene
 contract, not a data model. The representation measures content; the projection
 places it.
 
-Three crates on the unpublished 0.0.4 development line, sharing the `sceno-`
-stem with one function morpheme each. They landed under `crates/cambium/scenes/`
-on 2026-09-03 with the Cambium family, per the platform boundary plan's P2:
+Four crates on the unpublished 0.0.4 development line. The three engine crates
+share the `sceno-` stem with one function morpheme each; `scenograph` is the
+published name for authoring definitions. The engine crates landed under
+`crates/cambium/scenes/` on 2026-09-03 with the Cambium family, and the
+authoring crate followed on 2026-09-09 when a second host forced extraction,
+per the platform boundary plan's P2:
 the widget lane and the scene lane share lifecycle, input, styling and host
 integration, and keep their state models apart. A widget tree is retained
 interaction structure; a scene is a projection of content.
@@ -28,6 +31,7 @@ interaction structure; a scene is a projection of content.
 | [sceno](sceno/) | Core contracts. `SourceRef` / `SourceIx`, `Space` / `SpaceId`, `InstanceId`, `Backdrop`, `Footprint`, `Representation`, `ProjectedItem`, `RoutedRelation`, `Region`, `Scene`, plus the persisted `Score` / `ScoreItem` / `Arrangement` / `Placement` / `SCORE_VERSION` vocabulary and the geometry types `Vec2`, `Size2`, `Rect`, `Transform2`. |
 | [scenomise](scenomise/) | Choreography. `solve(&Score) -> Scene` realizes the arrangements; `relax(&mut Scene, &Relaxation)` is a dependency-free repulsion / spring / arrangement-pull pass for surfaces without their own physics sim, including static collision against collidable backdrops. |
 | [scenotime](scenotime/) | Runtime. `SceneSnapshot` / `SceneTables` with tombstoned slots, `SceneEpoch` / `Revision` / `BackdropId` / `RelationId` / `RegionId`, `SceneDiff` / `SceneOp` / `apply_diff` returning `ApplyOutcome`, `TransitionSpec` / `TransitionSchedule` with pure host-time sampling, and `pick(world) -> Option<InstanceId>`. |
+| [scenograph](scenograph/) | Host-neutral authoring model. Durable projection definitions, local validation, reusable definition binding and variants, deterministic JSON, public source revisions, and opaque runtime witness binding. It owns neither a widget UI, a source authority, a solver, nor a renderer. |
 
 ## Vocabulary
 
@@ -61,18 +65,19 @@ item's `hit` shape when present and its footprint otherwise.
 
 `sceno` depends on `serde` alone. `scenomise` depends on `sceno`, `serde` and
 `serde_json` — the last two for the solver registry it absorbed. `scenotime`
-depends on `sceno` and `serde`. No product, engine, or GPU dependencies: the
-scene lane does not reach up into Cambium's widgets or down into Genet.
+depends on `sceno` and `serde`. `scenograph` depends on `serde` and
+`serde_json` for its durable authoring wire format. No product, engine, or GPU
+dependencies: the scene lane does not reach up into Cambium's widgets or down
+into Genet.
 
-The generic `scenograph` facade crate is gone (platform boundary plan §1).
-Every consumer already took the members directly, and its one substantive
-file, the solver registry behind `sceno::Arrangement::Custom`, moved into
-`scenomise` as `scenomise::registry` — a registry needs the score contract and
-the solver contract at once, and `scenomise` owns both. Its types are
-re-exported at `scenomise`'s root as the facade exported them; its `solve` is
-named `scenomise::solve_via`, because the plain name is already
-`scenomise`'s closed-form solve over the named families. The published
-`scenograph 0.0.4` name is held for the scene editor product.
+The generic `scenograph` facade is still gone (platform boundary plan §1).
+Every engine consumer takes the member it needs directly, and the former
+facade's solver registry behind `sceno::Arrangement::Custom` lives in
+`scenomise::registry`: a registry needs the score and solver contracts at once.
+`scenomise::solve_via` remains the registry dispatch entry because the plain
+name is its closed-form solve over named families. The `scenograph 0.0.4` name
+now hosts the portable authoring model only; it is neither an engine facade nor
+a runtime.
 
 ## Status
 

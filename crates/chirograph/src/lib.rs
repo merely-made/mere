@@ -958,6 +958,12 @@ pub struct EditableTextV1 {
     pub encoding: TextEncoding,
     pub source: String,
     pub base_token: Vec<u8>,
+    /// An authority-issued revision for durable source provenance.
+    ///
+    /// This is distinct from the private `base_token`. Unsigned sources,
+    /// including files-in-place, leave it absent.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub public_revision: Option<[u8; 32]>,
     /// A host-authorized rendering derived from `source`. A sealed source
     /// endpoint may restore this projection from its attributable cache.
     ///
@@ -1839,6 +1845,7 @@ mod tests {
             encoding: TextEncoding::Utf8,
             source: "# Field note\n".into(),
             base_token: vec![1, 2, 3],
+            public_revision: None,
             derived: Some(DerivedTextV1 {
                 source: "# Field note\n\nFetched.\n".into(),
                 summary: "resolved 1; denied 0; failed 0".into(),
@@ -1858,6 +1865,12 @@ mod tests {
             editable
         );
         let legacy = br#"{"address":"knot://legacy","media_type":"text/vnd.knot","encoding":"Utf8","source":"old","base_token":[1]}"#;
+        assert!(
+            serde_json::from_slice::<EditableTextV1>(legacy)
+                .unwrap()
+                .public_revision
+                .is_none()
+        );
         assert!(
             serde_json::from_slice::<EditableTextV1>(legacy)
                 .unwrap()
