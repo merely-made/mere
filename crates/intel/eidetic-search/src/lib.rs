@@ -4,9 +4,11 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! eidetic-search — lexical recall over your own trail (Phase 9, producer half).
+//! eidetic-search — lexical recall over derived document projections.
 //!
-//! The [`TrailIndex`] is an in-tree BM25 index minted **from** `BrowsingTrace`
+//! [`DocumentIndex`] is the neutral transient seam: callers provide already
+//! grouped [`SearchDocument`] values and receive their opaque keys back. The
+//! [`TrailIndex`] adapter is an in-tree BM25 index minted **from** `BrowsingTrace`
 //! codicils: derived state, never the source of truth. The trace corpus in
 //! the eidetic store is the authority; the index can always be re-minted
 //! from it ([`TrailIndex::rebuild`]), which is exactly what happens when an
@@ -39,14 +41,14 @@
 //!   deliberately does not depend on an embedding engine; the caller brings
 //!   the rankings.
 //!
-//! The `SearchIndexSpec` codicil ([`spec`]) is the hand-off contract: it
-//! names the field set, tokenizer, and scoring engine. Locally it also rides
-//! a sidecar file in the index directory so `open` can check compatibility
-//! before reading the projection; as a codicil it is what a moot's consume
-//! half (deferred) would verify before merging.
+//! The [`SearchIndexSpec`] is the persisted [`TrailIndex`] projection's local
+//! compatibility contract. Community consumers exchange admitted capture
+//! records and remint [`DocumentIndex`] locally rather than treating a shared
+//! index or its scores as authority.
 
 pub mod bm25;
 pub mod candidates;
+pub mod document;
 pub mod fusion;
 pub mod index;
 pub mod spec;
@@ -54,6 +56,7 @@ pub mod tokenize;
 
 pub use bm25::{Bm25Config, Bm25Index};
 pub use candidates::CandidateIndex;
+pub use document::{DocumentHit, DocumentIndex, DocumentIndexConfig, SearchDocument};
 pub use fusion::{FusedHit, Ranking, fuse, fuse_many};
 pub use index::{FieldWeights, Hit, IndexConfig, TrailIndex};
 pub use spec::{SEARCH_INDEX_SCHEMA_REF, SPEC_SIDECAR, SearchIndexSpec, bootstrap_search_schema};
