@@ -43,7 +43,7 @@
 //! The package is `mere-moot` because crates.io `moot` is held by an
 //! unrelated crate with real code, and `murmur` is likewise taken. The
 //! library keeps the product name.
-//!
-//! No implementation yet.
-
 #![doc(html_no_source)]
+
+#[cfg(feature = "captured-web")]
+pub mod captured_web;
