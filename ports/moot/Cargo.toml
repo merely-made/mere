@@ -13,4 +13,24 @@ categories = ["network-programming"]
 name = "moot"
 path = "src/lib.rs"
 
+[features]
+default = []
+# An opt-in derived view over authorized Fleece page captures. The ordinary
+# Moot port stays mountable by murmur without pulling the capture/search lanes.
+captured-web = [
+    "dep:gemot",
+    "dep:servitor",
+    "dep:mere-document-lanes",
+    "dep:eidetic-search",
+]
+
 [dependencies]
+gemot = { workspace = true, optional = true }
+servitor = { workspace = true, optional = true }
+mere-document-lanes = { workspace = true, optional = true, features = ["eidetic-bridge"] }
+eidetic-search = { workspace = true, optional = true }
+
+[dev-dependencies]
+eidetic = { workspace = true }
+fleece = { workspace = true }
+genet-static-dom = { workspace = true }

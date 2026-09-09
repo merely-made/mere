@@ -59,7 +59,7 @@ impl Default for FieldWeights {
 }
 
 impl FieldWeights {
-    fn to_vec(self) -> Vec<f32> {
+    pub(crate) fn to_vec(self) -> Vec<f32> {
         let mut weights = vec![0.0; FIELD_COUNT];
         weights[FIELD_URL] = self.url;
         weights[FIELD_TITLE] = self.title;
