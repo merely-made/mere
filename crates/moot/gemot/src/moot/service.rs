@@ -17,7 +17,7 @@ use muniment::{Backend, MemoryBackend, RedbBackend};
 use p2panda_core::cbor::{decode_cbor, encode_cbor};
 use proofs::Digest;
 use serde::{Deserialize, Serialize};
-use servitor::{Cap, cap_path};
+use servitor::{AuthorityProvider, Cap, Mode, Subject, cap_path};
 use stickleback::{
     DropExportBudget, DropExportDecision, DropExportProfile, DropExportSelector, DropId,
     DropImportReport, DropLimits, DropProtector, DropRecord, DropWriteReceipt, EvidenceKind,
@@ -41,8 +41,9 @@ use super::group::{MootGroup, MootGroupSnapshot, MootMembershipAction};
 
 use super::MootId;
 use super::records::{
-    AvailabilityPolicy, ErasurePolicy, FaunaEntry, MootEvent, MootRetentionPolicy, MootRoster,
-    MootStore, MootStoreError, PolicyRevision, fauna_cap,
+    AvailabilityPolicy, CollectionChange, CollectionEvent, CollectionFork, CollectionId,
+    CollectionRef, CollectionView, ErasurePolicy, FaunaEntry, MootEvent, MootRetentionPolicy,
+    MootRoster, MootStore, MootStoreError, PolicyRevision, collection_cap, fauna_cap,
 };
 use super::standing::{
     DenyReason, GateDecision, StandingEvent, StandingExt, StandingFacts, StandingFileStore,
@@ -95,9 +96,13 @@ impl DropExportSelector<super::MootExt> for MootDropSelector {
         let priority = match super::from_operation(operation) {
             Ok((_, MootEvent::RetentionCheckpoint { .. })) => self.checkpoint_priority,
             Ok((_, MootEvent::Declared { .. } | MootEvent::Joined { .. })) => self.roster_priority,
-            Ok((_, MootEvent::Shared { .. } | MootEvent::HistoryPruned { .. })) => {
-                self.fauna_priority
-            },
+            Ok((
+                _,
+                MootEvent::Shared { .. }
+                | MootEvent::Withdrawn { .. }
+                | MootEvent::Collection { .. }
+                | MootEvent::HistoryPruned { .. },
+            )) => self.fauna_priority,
             Err(_) => return DropExportDecision::Omit,
         };
         DropExportDecision::Full { priority }
@@ -303,6 +308,50 @@ pub enum MootError {
     OutboundMissing,
     #[error("Moot authority denied the local command: {0:?}")]
     Unauthorized(DenyReason),
+    #[error("withdrawal targets an unknown shared operation")]
+    WithdrawalUnknownTarget,
+    #[error("withdrawal identity did not author the target shared operation")]
+    WithdrawalWrongIdentity,
+    #[error("collection event references another Moot")]
+    ForeignCollection,
+    #[error("collection fork does not reproduce its named parent membership")]
+    InvalidCollectionFork,
+    #[error("collection does not have an effective current view")]
+    CollectionUnknown,
+    #[error("collection change does not name the exact current heads")]
+    StaleCollectionHeads,
+    #[error("collection membership names a contribution outside current effective fauna")]
+    IneffectiveCollectionContribution,
+}
+
+struct CurrentCollectionAuthority<'a> {
+    typed: MootAuthority<'a>,
+    group: &'a MootGroup,
+    rules: &'a ConstitutionRules,
+    at_ms: u64,
+}
+
+impl AuthorityProvider for CurrentCollectionAuthority<'_> {
+    fn covers(&self, subject: Subject, needed: &Cap, mode: Mode) -> bool {
+        if !self.typed.covers(subject, needed, mode) {
+            return false;
+        }
+        let request = MootAuthorizationRequest {
+            subject: subject.0,
+            capability_path: cap_path(needed),
+            at_ms: self.at_ms,
+        };
+        let inputs = self.group.inputs(&request);
+        matches!(
+            authorize(
+                &self.rules.admission,
+                inputs.capability_covers,
+                &inputs.facts,
+                self.at_ms,
+            ),
+            GateDecision::Allow
+        )
+    }
 }
 
 /// One Moot's constitutional and replicated object services.
@@ -750,6 +799,189 @@ impl<B: Backend + Clone> Moot<B> {
             },
             GateDecision::Deny(reason) => Err(MootError::Unauthorized(reason)),
         }
+    }
+
+    /// Withdraw one of this stable identity's own shared contributions.
+    ///
+    /// The target must already be a retained `Shared` operation authored by
+    /// this identity. The command deliberately has no seed-only counterpart:
+    /// stable-root binding is required before a withdrawal can be authored.
+    pub async fn withdraw_share_for_identity<P: identity::IdentityProvider + ?Sized>(
+        &self,
+        identity: &P,
+        target_share: [u8; 32],
+        at_ms: u64,
+    ) -> Result<MootCommandReceipt, MootError> {
+        let roster = self.objects.roster(self.moot_id.0).await?;
+        let share = roster
+            .fauna
+            .iter()
+            .find(|entry| entry.op_hash == target_share)
+            .ok_or(MootError::WithdrawalUnknownTarget)?;
+        if share.shared_by != identity.master_public_key().to_bytes() {
+            return Err(MootError::WithdrawalWrongIdentity);
+        }
+        self.governance.snapshot().await?;
+        let operation = self
+            .objects
+            .author_for_identity(
+                identity,
+                self.moot_id.0,
+                &MootEvent::Withdrawn {
+                    target_share,
+                    at_ms,
+                },
+            )
+            .await?;
+        Ok(MootCommandReceipt {
+            operation: *operation.hash.as_bytes(),
+            lane: MootLane::Objects,
+            snapshot: self.snapshot().await?,
+        })
+    }
+
+    /// Resolve a collection through current membership, typed capability, and
+    /// contribution authority. Raw history remains in the object roster.
+    pub async fn authorized_collection(
+        &self,
+        collection_id: CollectionId,
+        at_ms: u64,
+    ) -> Result<Option<CollectionView>, MootError> {
+        let rules = self.governance.snapshot().await?.rules;
+        let delegations = self.delegations.delegations(&rules).await?;
+        let group = self.membership().await?;
+        let authority = CurrentCollectionAuthority {
+            typed: MootAuthority {
+                delegations: &delegations,
+                rules: &rules,
+                moot_id: self.moot_id.0,
+                now_ms: at_ms,
+            },
+            group: &group,
+            rules: &rules,
+            at_ms,
+        };
+        Ok(self
+            .objects
+            .roster(self.moot_id.0)
+            .await?
+            .authorized_collection(self.moot_id.0, collection_id, &authority))
+    }
+
+    /// Mint a same-Moot collection root under a stable Personae identity.
+    pub async fn declare_collection_for_identity<P: identity::IdentityProvider + ?Sized>(
+        &self,
+        identity: &P,
+        collection_id: CollectionId,
+        name: String,
+        fork: Option<CollectionFork>,
+        at_ms: u64,
+    ) -> Result<MootCommandReceipt, MootError> {
+        if let Some(seed) = &fork {
+            if seed.parent.collection.moot_id != self.moot_id.0
+                || seed.selected.iter().any(|member| member.moot_id != self.moot_id.0)
+            {
+                return Err(MootError::ForeignCollection);
+            }
+            if !seed.verifies() {
+                return Err(MootError::InvalidCollectionFork);
+            }
+            let source = self
+                .authorized_collection(seed.parent.collection.collection_id, at_ms)
+                .await?
+                .ok_or(MootError::CollectionUnknown)?;
+            if source.version != seed.parent {
+                return Err(MootError::InvalidCollectionFork);
+            }
+            let effective: std::collections::BTreeSet<_> =
+                source.effective_selected.into_iter().collect();
+            if seed.selected.iter().any(|member| !effective.contains(member)) {
+                return Err(MootError::IneffectiveCollectionContribution);
+            }
+        }
+        let collection = CollectionRef { moot_id: self.moot_id.0, collection_id };
+        self.author_collection_for_identity(
+            identity,
+            collection,
+            CollectionEvent::Declared { collection_id, name, fork, at_ms },
+            at_ms,
+        ).await
+    }
+
+    /// Apply one membership decision against the exact observed collection heads.
+    pub async fn set_collection_membership_for_identity<P: identity::IdentityProvider + ?Sized>(
+        &self,
+        identity: &P,
+        collection: CollectionRef,
+        mut parents: Vec<[u8; 32]>,
+        change: CollectionChange,
+        at_ms: u64,
+    ) -> Result<MootCommandReceipt, MootError> {
+        if collection.moot_id != self.moot_id.0 {
+            return Err(MootError::ForeignCollection);
+        }
+        parents.sort();
+        parents.dedup();
+        let view = self
+            .authorized_collection(collection.collection_id, at_ms)
+            .await?
+            .ok_or(MootError::CollectionUnknown)?;
+        if parents != view.heads {
+            return Err(MootError::StaleCollectionHeads);
+        }
+        let CollectionChange::SetMembership { contribution, included } = change;
+        if contribution.moot_id != self.moot_id.0 {
+            return Err(MootError::ForeignCollection);
+        }
+        if included {
+            let effective = self.authorized_fauna(at_ms).await?;
+            if !effective.iter().any(|entry| entry.op_hash == contribution.share) {
+                return Err(MootError::IneffectiveCollectionContribution);
+            }
+        }
+        self.author_collection_for_identity(
+            identity,
+            collection,
+            CollectionEvent::Changed {
+                collection,
+                parents,
+                change: CollectionChange::SetMembership { contribution, included },
+                at_ms,
+            },
+            at_ms,
+        ).await
+    }
+
+    async fn author_collection_for_identity<P: identity::IdentityProvider + ?Sized>(
+        &self,
+        identity: &P,
+        collection: CollectionRef,
+        event: CollectionEvent,
+        at_ms: u64,
+    ) -> Result<MootCommandReceipt, MootError> {
+        let group = self.membership().await?;
+        let request = MootAuthorizationRequest {
+            subject: identity.master_public_key().to_bytes(),
+            capability_path: cap_path(&collection_cap(collection)),
+            at_ms,
+        };
+        match self.authorize_current_capability(&group, &request).await? {
+            GateDecision::Allow => {},
+            GateDecision::Deny(reason) => return Err(MootError::Unauthorized(reason)),
+        }
+        let operation = self
+            .objects
+            .author_for_identity(
+                identity,
+                self.moot_id.0,
+                &MootEvent::Collection { event },
+            )
+            .await?;
+        Ok(MootCommandReceipt {
+            operation: *operation.hash.as_bytes(),
+            lane: MootLane::Objects,
+            snapshot: self.snapshot().await?,
+        })
     }
 
     async fn author_object(
@@ -1774,6 +2006,59 @@ mod tests {
             Err(MootError::Unauthorized(DenyReason::BelowThreshold))
         ));
         assert!(service.authorized_fauna(11).await.unwrap().is_empty());
+    }
+
+    #[tokio::test]
+    async fn identity_withdrawal_refuses_unknown_and_wrong_targets_before_authoring() {
+        let founder = keypair(0x2a);
+        let sharer = InMemoryProvider::from_seed([0x2b; 32]);
+        let stranger = InMemoryProvider::from_seed([0x2c; 32]);
+        let service = Moot::in_memory(ID, founder.public_key().to_bytes(), retention());
+        service
+            .found(
+                founder.to_seed(),
+                None,
+                None,
+                ConstitutionRules::founder_only(founder.public_key().to_bytes()),
+                1,
+            )
+            .await
+            .unwrap();
+        let share = service
+            .share_for_identity(&sharer, [0xa1; 32], "fleece/v1".into(), "page".into(), 2)
+            .await
+            .unwrap();
+        let before = service.object_store().ops(ID.0).await.unwrap().len();
+        assert!(matches!(
+            service
+                .withdraw_share_for_identity(&sharer, [0xff; 32], 3)
+                .await,
+            Err(MootError::WithdrawalUnknownTarget)
+        ));
+        assert!(matches!(
+            service
+                .withdraw_share_for_identity(&stranger, share.operation, 3)
+                .await,
+            Err(MootError::WithdrawalWrongIdentity)
+        ));
+        assert_eq!(
+            service.object_store().ops(ID.0).await.unwrap().len(),
+            before
+        );
+
+        let withdrawal = service
+            .withdraw_share_for_identity(&sharer, share.operation, 4)
+            .await
+            .unwrap();
+        let roster = service.object_store().roster(ID.0).await.unwrap();
+        assert_eq!(roster.fauna.len(), 1);
+        assert_eq!(roster.withdrawals.len(), 1);
+        assert_eq!(roster.withdrawals[0].target_share, share.operation);
+        assert_eq!(
+            roster.withdrawals[0].withdrawn_by,
+            sharer.master_public_key().to_bytes()
+        );
+        assert_ne!(withdrawal.operation, share.operation);
     }
 
     #[tokio::test]
