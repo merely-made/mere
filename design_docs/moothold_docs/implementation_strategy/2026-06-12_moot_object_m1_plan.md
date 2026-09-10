@@ -517,3 +517,50 @@ management require their own subsequent consumer receipts.
   collection merge UI, private collection encryption, hosted Weld DOM capture,
   WARC-grade custody, near-duplicate grouping, distributed indexes, corpus-cost
   measurement and relevance admission remain later gates.
+
+  **2026-09-09: P3b landed in the Gemot records lane.** `MootEvent::Withdrawn`
+  is a signed, upgraded-peer wire event carrying the original `Shared`
+  operation hash and withdrawal time. The roster retains every distinct signed
+  withdrawal fact (duplicate copies of one operation collapse by operation
+  hash), resolves the stable withdrawing root, and filters only the targeted
+  share when that root matches the share's stable contributor. Unknown targets
+  and mismatched identities are refused by `Moot::withdraw_share_for_identity`
+  before authoring; there is no seed-only withdrawal command. Checkpoint
+  snapshots carry the withdrawal facts, so pruning and late replay cannot
+  resurrect the contribution. The captured-web projection inherits the
+  exclusion through `authorized_fauna` and remints without withdrawn records.
+  Focused Gemot withdrawal tests pass 5/5 and the captured-web feature tests
+  pass 2/2. This remains a local implementation receipt; peer interoperability
+  requires the upgraded records wire to be deployed on both sides.
+
+  **2026-09-09: P3d collection lineage implemented locally.** The records wire
+  now carries caller-minted same-Moot collection ids, contribution references
+  to original signed `Shared` operations, fork roots, and per-contribution
+  membership decisions over exact observed heads. Collection versions commit
+  to the sorted causal frontier and curated membership, independent of current
+  fauna authority. Read-time projection separately reports curated and
+  effective selections, so withdrawal or capability revocation cannot rewrite
+  historical version identity. Causally later edits dominate ancestors;
+  concurrent edits to distinct contributions commute and concurrent decisions
+  about one contribution use the operation hash as stable tiebreak.
+
+  Fork roots reproduce the named parent membership commitment and materialize
+  those contribution references. Foreign Moot references, false fork
+  commitments, missing parents, and currently ineffective contributions remain
+  explicit diagnostics while raw signed facts remain retained. Retention
+  checkpoints carry the collection facts inside their roster snapshot: a
+  focused prune test removes the source operations, resolves the same version,
+  authors a fork, and accepts a later child change against the retained head.
+  The service exposes stable-identity authoring only, checks current
+  collection-scoped authority and membership, requires exact current heads,
+  and refuses additions outside current effective fauna.
+
+  The complete Gemot library gate passes 145/145 tests, including the four
+  collection-fold cases, signed wire and stable-author round trip, and
+  checkpoint/prune/fork/child case; strict no-deps Clippy and diff-check also
+  pass. Cross-Moot
+  lineage, collection merge UI, private collection encryption, and a headed
+  Turnstone collection editor remain later gates. A collection fork copies no
+  Moot membership, capability grants, delegations, key epochs, Standing facts,
+  leases, hosting promises, or capture payloads; its wire type contains only
+  the parent version and contribution references.

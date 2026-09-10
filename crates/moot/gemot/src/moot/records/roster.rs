@@ -25,6 +25,7 @@ use serde::{Deserialize, Serialize};
 
 use servitor::{AuthorityProvider, Cap, Mode, Subject};
 
+use super::collection::CollectionFact;
 use super::retention::MootRosterSnapshot;
 use super::wire::{MootEvent, MootExt, from_operation, stable_author, verify};
 
@@ -63,6 +64,23 @@ pub struct FaunaEntry {
     pub op_hash: [u8; 32],
 }
 
+/// One signed withdrawal fact for a single `Shared` operation.
+///
+/// The withdrawing root is resolved from the operation's stable identity
+/// binding during the fold. Withdrawal facts stay in the roster after they
+/// affect the authorized projection, which lets callers inspect consent and
+/// audit history without retaining a live contribution.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct FaunaWithdrawal {
+    /// The original `Shared` operation being withdrawn.
+    pub target_share: [u8; 32],
+    /// Stable Personae root of the withdrawing contributor.
+    pub withdrawn_by: [u8; 32],
+    pub at_ms: u64,
+    /// The signed withdrawal operation's hash.
+    pub op_hash: [u8; 32],
+}
+
 /// The capability a sharer must hold for their contribution to count as part
 /// of the moot's commons: the typed scope `moot/fauna`
 /// (`scope/moot/fauna` on the wire, per the capability-model encoding).
@@ -80,6 +98,12 @@ pub struct MootRoster {
     pub membership_revision: [u8; 32],
     /// Fauna entries in `(at_ms, op_hash)` order.
     pub fauna: Vec<FaunaEntry>,
+    /// Withdrawal facts in `(target_share, at_ms, op_hash)` order.
+    #[serde(default)]
+    pub withdrawals: Vec<FaunaWithdrawal>,
+    /// Raw signed collection facts, retained independently of current authority.
+    #[serde(default)]
+    pub collections: Vec<CollectionFact>,
 }
 
 impl MootRoster {
@@ -130,7 +154,13 @@ impl MootRoster {
         let cap = fauna_cap();
         self.fauna
             .iter()
-            .filter(|entry| authority.covers(Subject::new(entry.shared_by), &cap, Mode::Write))
+            .filter(|entry| {
+                authority.covers(Subject::new(entry.shared_by), &cap, Mode::Write)
+                    && !self.withdrawals.iter().any(|withdrawal| {
+                        withdrawal.target_share == entry.op_hash
+                            && withdrawal.withdrawn_by == entry.shared_by
+                    })
+            })
             .collect()
     }
 
@@ -161,6 +191,8 @@ impl MootRoster {
         // breaks at_ms ties deterministically.
         let mut joins: BTreeMap<[u8; 32], (u64, [u8; 32], String)> = BTreeMap::new();
         let mut fauna: Vec<FaunaEntry> = Vec::new();
+        let mut withdrawals: BTreeMap<[u8; 32], FaunaWithdrawal> = BTreeMap::new();
+        let mut collections: BTreeMap<[u8; 32], CollectionFact> = BTreeMap::new();
 
         if let Some(declaration) = &snapshot.roster.declaration {
             declarations.insert(declaration.op_hash, declaration.clone());
@@ -176,6 +208,12 @@ impl MootRoster {
             );
         }
         fauna.extend(snapshot.roster.fauna.iter().cloned());
+        for withdrawal in &snapshot.roster.withdrawals {
+            withdrawals.insert(withdrawal.op_hash, withdrawal.clone());
+        }
+        for fact in &snapshot.roster.collections {
+            collections.insert(fact.op_hash, fact.clone());
+        }
 
         for op in ops {
             if !verify(op) {
@@ -234,6 +272,24 @@ impl MootRoster {
                         op_hash,
                     });
                 },
+                MootEvent::Withdrawn {
+                    target_share,
+                    at_ms,
+                } => {
+                    withdrawals.entry(op_hash).or_insert(FaunaWithdrawal {
+                        target_share,
+                        withdrawn_by: author,
+                        at_ms,
+                        op_hash,
+                    });
+                },
+                MootEvent::Collection { event } => {
+                    collections.entry(op_hash).or_insert(CollectionFact {
+                        event,
+                        by: author,
+                        op_hash,
+                    });
+                },
                 MootEvent::RetentionCheckpoint { .. } | MootEvent::HistoryPruned { .. } => {},
             }
         }
@@ -255,12 +311,23 @@ impl MootRoster {
             })
             .collect();
         fauna.sort_by_key(|entry| (entry.at_ms, entry.op_hash));
+        let mut withdrawals: Vec<_> = withdrawals.into_values().collect();
+        withdrawals.sort_by_key(|withdrawal| {
+            (
+                withdrawal.target_share,
+                withdrawal.at_ms,
+                withdrawal.op_hash,
+            )
+        });
+        let collections = collections.into_values().collect();
 
         Self {
             declaration,
             members,
             membership_revision,
             fauna,
+            withdrawals,
+            collections,
         }
     }
 }
@@ -272,6 +339,8 @@ impl Default for MootRoster {
             members: BTreeMap::new(),
             membership_revision: membership_revision(&BTreeMap::new()),
             fauna: Vec::new(),
+            withdrawals: Vec::new(),
+            collections: Vec::new(),
         }
     }
 }
@@ -290,6 +359,8 @@ mod tests {
     use super::*;
     use crate::moot::records::wire::to_operation;
     use identity::{Ed25519Keypair, IdentityProvider, InMemoryProvider};
+    use servitor::{Cap, Mode, Subject};
+    use std::collections::BTreeSet;
 
     const MOOT: [u8; 32] = [0x6d; 32];
 
@@ -301,6 +372,14 @@ mod tests {
 
     fn author(kp: &Ed25519Keypair) -> [u8; 32] {
         kp.public_key().to_bytes()
+    }
+
+    struct Allowed(BTreeSet<[u8; 32]>);
+
+    impl AuthorityProvider for Allowed {
+        fn covers(&self, subject: Subject, _: &Cap, mode: Mode) -> bool {
+            mode == Mode::Write && self.0.contains(&subject.0)
+        }
     }
 
     #[test]
@@ -548,5 +627,93 @@ mod tests {
         assert_eq!(roster.fauna.len(), 2, "foreign-moot share skipped");
         assert_eq!(roster.fauna[0].title, "early");
         assert_eq!(roster.fauna[1].title, "late");
+    }
+
+    #[test]
+    fn withdrawal_is_order_independent_and_only_hides_the_matching_share() {
+        let identity = keypair(0x44);
+        let other = keypair(0x45);
+        let share = to_operation(
+            &identity,
+            MOOT,
+            &MootEvent::Shared {
+                manifest_id: [0xaa; 32],
+                schema_id: "fleece/v1".into(),
+                title: "one".into(),
+                at_ms: 1,
+            },
+            0,
+            None,
+        );
+        let other_share = to_operation(
+            &other,
+            MOOT,
+            &MootEvent::Shared {
+                manifest_id: [0xaa; 32],
+                schema_id: "fleece/v1".into(),
+                title: "copy".into(),
+                at_ms: 2,
+            },
+            0,
+            None,
+        );
+        let withdrawal = to_operation(
+            &identity,
+            MOOT,
+            &MootEvent::Withdrawn {
+                target_share: *share.hash.as_bytes(),
+                at_ms: 3,
+            },
+            1,
+            Some(*share.hash.as_bytes()),
+        );
+        let one = MootRoster::fold(MOOT, [&withdrawal, &other_share, &share]);
+        let two = MootRoster::fold(MOOT, [&share, &other_share, &withdrawal]);
+        assert_eq!(one, two);
+        assert_eq!(one.withdrawals.len(), 1);
+        assert_eq!(one.fauna.len(), 2);
+        let authority = Allowed([author(&identity), author(&other)].into_iter().collect());
+        let visible = one.authorized_fauna(&authority);
+        assert_eq!(visible.len(), 1);
+        assert_eq!(visible[0].title, "copy");
+
+        // A withdrawal signed by another stable root is retained as a fact,
+        // but cannot hide the contribution it did not author.
+        let forged = to_operation(
+            &other,
+            MOOT,
+            &MootEvent::Withdrawn {
+                target_share: *share.hash.as_bytes(),
+                at_ms: 4,
+            },
+            1,
+            Some(*other_share.hash.as_bytes()),
+        );
+        let with_forged = MootRoster::fold(MOOT, [&share, &other_share, &withdrawal, &forged]);
+        assert_eq!(with_forged.withdrawals.len(), 2);
+        let visible = with_forged.authorized_fauna(&authority);
+        assert_eq!(
+            visible.len(),
+            1,
+            "the valid withdrawal still hides the target"
+        );
+        assert_eq!(visible[0].title, "copy");
+    }
+
+    #[test]
+    fn repeated_withdrawal_operation_is_retained_once() {
+        let identity = keypair(0x46);
+        let withdrawal = to_operation(
+            &identity,
+            MOOT,
+            &MootEvent::Withdrawn {
+                target_share: [0xaa; 32],
+                at_ms: 3,
+            },
+            0,
+            None,
+        );
+        let roster = MootRoster::fold(MOOT, [&withdrawal, &withdrawal]);
+        assert_eq!(roster.withdrawals.len(), 1);
     }
 }

@@ -111,7 +111,10 @@ impl<K: Hash + Eq + Clone, P: EmbeddingProvider> CanvasSearchSurface<K, P> {
 
     /// Top-`k` semantic neighbours for an arbitrary query string.
     /// Independent of the current focus query.
-    pub fn search(&self, query: &str, k: usize) -> Result<Vec<(K, f32)>, SearchError> {
+    pub fn search(&self, query: &str, k: usize) -> Result<Vec<(K, f32)>, SearchError>
+    where
+        K: Ord,
+    {
         self.search.search(query, k)
     }
 

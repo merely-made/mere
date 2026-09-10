@@ -295,4 +295,44 @@ mod tests {
             "both exact revisions keep the source address"
         );
     }
+
+    #[test]
+    fn withdrawn_share_is_absent_after_collection_remint() {
+        let html = "<main><p>A shared passage carries the withdrawal term.</p></main>";
+        let kept = share(1, 1, "kept", 10);
+        let withdrawn = share(2, 1, "withdrawn", 11);
+        let mut roster = MootRoster::default();
+        roster.fauna = vec![kept.clone(), withdrawn.clone()];
+        roster.withdrawals.push(gemot::moot::FaunaWithdrawal {
+            target_share: withdrawn.op_hash,
+            withdrawn_by: withdrawn.shared_by,
+            at_ms: 12,
+            op_hash: [9; 32],
+        });
+        let records = [
+            (kept.manifest_id, record("https://kept.test", html, 1)),
+            (
+                withdrawn.manifest_id,
+                record("https://withdrawn.test", html, 2),
+            ),
+        ]
+        .into_iter()
+        .collect();
+        let authority = Allowed([[1; 32]].into_iter().collect());
+        let projection = CapturedCollectionProjection::from_roster(&roster, &authority, &records);
+        assert_eq!(projection.pages.len(), 1);
+        assert_eq!(projection.pages[0].contributions.len(), 1);
+        assert_eq!(
+            projection.pages[0].contributions[0].share.op_hash,
+            kept.op_hash
+        );
+        assert_eq!(
+            projection
+                .search_index(DocumentIndexConfig::default())
+                .search("withdrawal", 5)
+                .len(),
+            1,
+            "the surviving capture still remints its text"
+        );
+    }
 }
