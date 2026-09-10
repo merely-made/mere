@@ -810,7 +810,9 @@ where
             }
         }
         self.last_default_prevented = event.prop.default_prevented();
-        self.rebuild(logic, state);
+        if !event.rebuild_is_deferred() {
+            self.rebuild(logic, state);
+        }
         actions
     }
 
@@ -1042,6 +1044,16 @@ where
     pub fn update(&mut self, f: impl FnOnce(&mut State)) {
         f(&mut self.state);
         self.tree.rebuild(&mut self.logic, &mut self.state);
+    }
+
+    /// Update retained paint state without rebuilding the semantic view tree.
+    ///
+    /// Use for host-driven animation whose changing geometry is painted by a
+    /// separately refreshed leaf. The caller must refresh that leaf and request
+    /// frames while it is active. Changes affecting DOM content or hit targets
+    /// still require [`Self::update`], including reconciliation after animation.
+    pub fn update_deferred<R>(&mut self, f: impl FnOnce(&mut State) -> R) -> R {
+        f(&mut self.state)
     }
 
     /// Dispatch a native pointer click that hit `target`.
@@ -1298,6 +1310,28 @@ mod tests {
         let mut out = Vec::new();
         dom.borrow_mut().drain_mutations(&mut out);
         out
+    }
+
+    #[test]
+    fn deferred_paint_updates_leave_semantics_until_reconciled() {
+        let dom: DomHandle = Rc::new(RefCell::new(ScriptedDom::new()));
+        let mut runner = GenetAppRunner::new(dom.clone(), counter_view, Counter { count: 0 });
+        drain(&dom);
+        for _ in 0..60 {
+            runner.update_deferred(|state| state.count += 1);
+        }
+        assert_eq!(runner.state().count, 60);
+        assert!(drain(&dom).is_empty());
+        assert_eq!(
+            text_child(&dom.borrow(), runner.root()).as_deref(),
+            Some("0")
+        );
+        runner.update(|_| {});
+        assert_eq!(
+            text_child(&dom.borrow(), runner.root()).as_deref(),
+            Some("60")
+        );
+        assert!(!drain(&dom).is_empty());
     }
 
     #[test]

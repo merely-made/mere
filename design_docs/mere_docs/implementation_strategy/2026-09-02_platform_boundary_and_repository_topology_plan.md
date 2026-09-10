@@ -2786,5 +2786,35 @@ matter of picking the hour; the Workbench W4 receipts are on genet main.
   and deploy gates; the live custom domain served the new artifact after that
   deployment. **P6's topology done-condition is met.** Separate site hardening
   remains outside this repository move: Cloudflare still proxies the custom
-  domain, GitHub therefore reports the organization domain unverified and does
-  not yet permit HTTPS enforcement.
+    domain, GitHub therefore reports the organization domain unverified and does
+    not yet permit HTTPS enforcement.
+
+## Games-wing renderer adoption (2026-09-09)
+
+The games-wing source audit found that Mesocosm needed two revisions of Netrender
+for UI paint and opaque-tenant composition. This follow-up aligns Mere's renderer,
+paint-list API and lowering dependencies, including the standalone web consumers,
+with Netrender `c77b0be84fb6fc28a3c1602a2b1637f7d913acc0`. Genet's matching owner
+pin is updated together. The public legacy RenderGraph helper removal has no
+Mere consumer; the ordinary paint and host APIs remain the adoption boundary.
+
+Changes are isolated from ongoing work in the main checkout. Genet is pinned to
+its isolated adoption commit `3a7b50230d447f6fa7ed6921cba019f78347d932`.
+The pin-only baseline passed the focused all-target check of
+`cambium-genet-winit-host`, `cambium`, and `sprigging` against that Git source and
+Netrender c77. The full workspace all-features/all-targets attempt stopped in the
+separately pinned Knot editor: `EditableTextV1` initializers in `endpoint.rs`
+are missing `public_revision`.
+
+The consumer closure also requires the existing atlas and deferred-input work:
+Cambium's polygon fields, retained callout paint and separate `GraphAtlasEvent`;
+Sprigging's retained polygon/compound-path paint; Scenotime's configurable return
+motion; and the native host's public frame hook and split relayout timings.
+These owned files are promoted from the tabletop-tested local changes. The
+original graph callback enum remains compatible. Product terrain, travel rules,
+and durable map state remain in Isometry. The focused all-target check passes for
+`cambium-genet-winit-host`, `cambium`, `sprigging`, and `scenotime` with these
+source additions. Scenotime's 36 library tests pass, including configurable return
+motion, pin/release, finite tuning and reduced-motion settling. The earlier
+tabletop-native atlas receipt used these owned local changes; this check verifies
+their compatibility with the selected Git Genet/Netrender closure.

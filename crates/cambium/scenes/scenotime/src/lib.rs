@@ -14,11 +14,13 @@
 mod diff;
 mod ids;
 mod pick;
+mod return_motion;
 mod snapshot;
 mod transition;
 
 pub use diff::{ApplyOutcome, DiffError, SceneDiff, SceneOp};
 pub use ids::{BackdropId, RegionId, RelationId, Revision, SceneEpoch};
+pub use return_motion::{ReturnMotion, ReturnMotionMode, ReturnMotionSettings, ReturnMotionTick};
 pub use snapshot::{SceneSnapshot, SceneTables, SnapshotError};
 pub use transition::{
     ScheduledItem, TransitionClass, TransitionEasing, TransitionError, TransitionFrame,

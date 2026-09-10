@@ -38,6 +38,9 @@ pub struct OwnedLayout {
     viewport_scroll: (f32, f32),
     element_scroll: HashMap<NodeId, (f32, f32)>,
     content_extent: (f32, f32),
+    style_resolve_us: u64,
+    layout_with_text_us: u64,
+    content_extent_us: u64,
     generation: u64,
 }
 
@@ -51,8 +54,11 @@ impl OwnedLayout {
         let style_set = StyleSet::cambium(sheets);
         let device = Device::screen(width, height);
         let interactions = InteractionStates::default();
+        let phase = crate::Instant::now();
         let styles = resolve_styles(dom, &style_set, &device, &interactions);
+        let style_resolve_us = elapsed_us(phase.elapsed());
         let mut text = TextSystem::new();
+        let phase = crate::Instant::now();
         let (styles, fragments) = layout_with_text_system(
             dom,
             &styles,
@@ -63,7 +69,10 @@ impl OwnedLayout {
             &HashMap::new(),
         )
         .expect("Cambium's authored Livery layout must resolve");
+        let layout_with_text_us = elapsed_us(phase.elapsed());
+        let phase = crate::Instant::now();
         let content_extent = content_extent(dom, &fragments);
+        let content_extent_us = elapsed_us(phase.elapsed());
         Self {
             style_set,
             device,
@@ -77,6 +86,9 @@ impl OwnedLayout {
             viewport_scroll: (0.0, 0.0),
             element_scroll: HashMap::new(),
             content_extent,
+            style_resolve_us,
+            layout_with_text_us,
+            content_extent_us,
             generation: 1,
         }
     }
@@ -89,7 +101,10 @@ impl OwnedLayout {
     ) {
         self.viewport = (width, height);
         self.device.set_viewport_size(width, height);
+        let phase = crate::Instant::now();
         let styles = resolve_styles(dom, &self.style_set, &self.device, &self.interactions);
+        self.style_resolve_us = elapsed_us(phase.elapsed());
+        let phase = crate::Instant::now();
         let (styles, fragments) = layout_with_text_system(
             dom,
             &styles,
@@ -100,11 +115,22 @@ impl OwnedLayout {
             &HashMap::new(),
         )
         .expect("Cambium's authored Livery layout must resolve");
+        self.layout_with_text_us = elapsed_us(phase.elapsed());
         self.styles = styles;
         self.fragments = fragments;
+        let phase = crate::Instant::now();
         self.content_extent = content_extent(dom, &self.fragments);
+        self.content_extent_us = elapsed_us(phase.elapsed());
         self.clamp_viewport_scroll();
         self.generation = self.generation.saturating_add(1);
+    }
+
+    pub(crate) fn stage_timings(&self) -> (u64, u64, u64) {
+        (
+            self.style_resolve_us,
+            self.layout_with_text_us,
+            self.content_extent_us,
+        )
     }
 
     pub fn fragments(&self) -> &LiveryLayout<NodeId> {
@@ -476,6 +502,10 @@ fn content_extent<D: LayoutDom<NodeId = NodeId>>(
         }
     });
     extent
+}
+
+fn elapsed_us(elapsed: crate::Duration) -> u64 {
+    elapsed.as_micros().min(u64::MAX as u128) as u64
 }
 
 fn walk<D: LayoutDom<NodeId = NodeId>>(dom: &D, node: NodeId, visit: &mut impl FnMut(NodeId)) {

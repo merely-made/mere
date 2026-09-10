@@ -28,6 +28,7 @@ use layout_dom_api::{LocalName, Namespace, QualName};
 
 mod action_list;
 mod arrangement;
+mod atlas;
 mod command_surface;
 mod component;
 mod context;
@@ -85,6 +86,11 @@ mod tests;
 
 pub use action_list::{ActionItem, ActionListEvent, ActionListState, action_list};
 pub use arrangement::{arrangement, placed, placed_with};
+pub use atlas::{
+    GraphCanvasAtlas, GraphCanvasAtlasCallout, GraphCanvasAtlasCompoundOutline,
+    GraphCanvasAtlasField, GraphCanvasAtlasPaint, GraphCanvasAtlasProjectedCompoundPath,
+    GraphCanvasAtlasProjectedShape, GraphCanvasAtlasRoute, GraphCanvasAtlasView,
+};
 pub use command_surface::{
     CommandEvent, CommandItem, CommandState, CommandSurfaceKind, command_menu, command_palette,
     command_picker, command_surface,
@@ -102,9 +108,9 @@ pub use disclosure::{
 };
 pub use editor::{EditHistory, pair_close, wrap_selection};
 pub use graph_canvas::{
-    GRAPH_CANVAS_SWATCH_CSS, GraphCanvasEdge, GraphCanvasEvent, GraphCanvasNode,
+    GRAPH_CANVAS_SWATCH_CSS, GraphAtlasEvent, GraphCanvasEdge, GraphCanvasEvent, GraphCanvasNode,
     GraphCanvasNodeDrag, GraphCanvasNodeFootprint, GraphCanvasNodeRegion, GraphCanvasRelation,
-    GraphCanvasSubgraph, GraphCanvasSwatch, graph_canvas, graph_canvas_swatch,
+    GraphCanvasSubgraph, GraphCanvasSwatch, graph_atlas_swatch, graph_canvas, graph_canvas_swatch,
     graph_canvas_swatch_with_drag, graph_canvas_swatch_with_drag_and_relations,
     graph_canvas_swatch_with_focus, graph_canvas_swatch_with_focus_and_drag,
     graph_canvas_swatch_with_focus_and_drag_and_relations,

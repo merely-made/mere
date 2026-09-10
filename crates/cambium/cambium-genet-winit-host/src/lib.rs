@@ -53,8 +53,9 @@ pub use cambium_rootstock::{
     AppCtx, AppFrameInsets, AppHook, AppRegion, CaptureFn, CloseDisposition, CloseRequest,
     CloseRequestHook, Direction, FocusedTextHook, FocusedTextSlot, Frame, FrameHook, FrameProfile,
     Host, HostHooks, HostOptions, HostPointer, HostWake, HostWindow, IdlePolicy, Init, Key,
-    KeyInterceptHook, KeyPress, Modifiers, NamedKey, Runner, Surface, WindowCommand,
-    WindowCommands, WindowFrame, WindowGeometry, ZOOM_LADDER, fit_zoom, ladder_step, read_frame,
+    KeyInterceptHook, KeyPress, Modifiers, NamedKey, RelayoutProfile, Runner, Surface,
+    WindowCommand, WindowCommands, WindowFrame, WindowGeometry, ZOOM_LADDER, fit_zoom, ladder_step,
+    read_frame,
 };
 pub use harness::{Harness, inert_hooks};
 
