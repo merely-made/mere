@@ -34,6 +34,26 @@ pub struct GraphGlyphRelation {
     pub emphasized: bool,
 }
 
+/// A fixed leaf-local atlas polygon painted beneath graph routes and nodes.
+#[derive(Clone, Debug, PartialEq)]
+pub struct GraphAtlasPolygon {
+    pub points: Vec<(f32, f32)>,
+    pub fill: ColorF,
+    pub stroke: Option<ColorF>,
+    pub stroke_width: f32,
+}
+
+/// One filled path with all of its contours retained together. Opposite-wound
+/// inner contours therefore remain counters under the paint list's non-zero
+/// fill rule (for example the hole in `O` or `a`).
+#[derive(Clone, Debug, PartialEq)]
+pub struct GraphAtlasCompoundPath {
+    pub contours: Vec<Vec<(f32, f32)>>,
+    pub fill: ColorF,
+    pub stroke: Option<ColorF>,
+    pub stroke_width: f32,
+}
+
 /// Pane-local camera for a [`GraphCanvas`]. Pan is expressed in normalized
 /// scene coordinates; zoom is centred on `(0.5, 0.5)`.
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -74,6 +94,8 @@ pub struct GraphCanvas {
     /// Routed relations. Kept beside legacy endpoint edges so existing glyph
     /// callers do not need to manufacture routes.
     relations: Vec<GraphGlyphRelation>,
+    atlas_polygons: Vec<GraphAtlasPolygon>,
+    atlas_paths: Vec<GraphAtlasCompoundPath>,
     pub node_radius: f32,
     pub edge_width: f32,
     pub edge_color: ColorF,
@@ -95,6 +117,8 @@ impl GraphCanvas {
             nodes,
             edges,
             relations: Vec::new(),
+            atlas_polygons: Vec::new(),
+            atlas_paths: Vec::new(),
             node_radius: 2.5,
             edge_width: 1.0,
             edge_color: ColorF {
@@ -136,6 +160,21 @@ impl GraphCanvas {
     pub fn set_relations(&mut self, relations: Vec<GraphGlyphRelation>) {
         if self.relations != relations {
             self.relations = relations;
+            self.dirty = true;
+        }
+    }
+
+    /// Replace caller-projected fixed-world terrain and field paint.
+    pub fn set_atlas_polygons(&mut self, polygons: Vec<GraphAtlasPolygon>) {
+        if self.atlas_polygons != polygons {
+            self.atlas_polygons = polygons;
+            self.dirty = true;
+        }
+    }
+
+    pub fn set_atlas_paths(&mut self, paths: Vec<GraphAtlasCompoundPath>) {
+        if self.atlas_paths != paths {
+            self.atlas_paths = paths;
             self.dirty = true;
         }
     }
@@ -212,6 +251,50 @@ impl Leaf for GraphCanvas {
         // Inset so node circles at 0/1 coordinates stay inside the box.
         let inset = self.node_radius + self.edge_width;
         let place = |n: &GraphGlyphNode| self.viewport.project((n.x, n.y), s, inset);
+        for polygon in &self.atlas_polygons {
+            if polygon.points.len() < 3 {
+                continue;
+            }
+            let mut path = Path::new();
+            for (index, &(x, y)) in polygon.points.iter().enumerate() {
+                path = if index == 0 {
+                    path.move_to(x, y)
+                } else {
+                    path.line_to(x, y)
+                };
+            }
+            let path = path.close().build();
+            cx.fill_path(path.clone(), polygon.fill);
+            if let Some(stroke) = polygon.stroke {
+                cx.stroke_path(path, round_stroke(stroke, polygon.stroke_width.max(0.1)));
+            }
+        }
+        for compound in &self.atlas_paths {
+            let mut path = Path::new();
+            let mut meaningful = false;
+            for contour in &compound.contours {
+                if contour.len() < 3 {
+                    continue;
+                }
+                meaningful = true;
+                for (index, &(x, y)) in contour.iter().enumerate() {
+                    path = if index == 0 {
+                        path.move_to(x, y)
+                    } else {
+                        path.line_to(x, y)
+                    };
+                }
+                path = path.close();
+            }
+            if !meaningful {
+                continue;
+            }
+            let path = path.build();
+            cx.fill_path(path.clone(), compound.fill);
+            if let Some(stroke) = compound.stroke {
+                cx.stroke_path(path, round_stroke(stroke, compound.stroke_width.max(0.1)));
+            }
+        }
         // Edges under nodes.
         for &(a, b) in &self.edges {
             let (Some(na), Some(nb)) = (self.nodes.get(a as usize), self.nodes.get(b as usize))

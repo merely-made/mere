@@ -41,7 +41,8 @@ pub use angle::{AngleStrip, AngleStripMark};
 pub use arrange::{Placement, VirtualWindow};
 pub use dimension::{DimensionLine, DimensionLineTraversal};
 pub use glyphs::{
-    GraphCanvas, GraphGlyph, GraphGlyphNode, GraphGlyphRelation, GraphViewport, Knob, Meter,
+    GraphAtlasCompoundPath, GraphAtlasPolygon, GraphCanvas, GraphGlyph, GraphGlyphNode,
+    GraphGlyphRelation, GraphViewport, Knob, Meter,
 };
 pub use grid::{GridColumn, GridSpec};
 pub use path::Path;

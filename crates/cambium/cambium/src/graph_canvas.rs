@@ -9,8 +9,15 @@
 //! [`GraphViewport`] as the leaf. Paint, hit targets, keyboard focus, and hover
 //! therefore stay aligned without teaching a paint leaf about app actions.
 
-use sprigging::{ColorF, GraphCanvas, GraphGlyphNode, GraphGlyphRelation, GraphViewport, Size};
+use sceno::Vec2;
+use sprigging::{
+    ColorF, GraphAtlasCompoundPath, GraphAtlasPolygon, GraphCanvas, GraphGlyphNode,
+    GraphGlyphRelation, GraphViewport, Size,
+};
 
+use crate::GraphCanvasAtlas;
+#[cfg(test)]
+use crate::GraphCanvasAtlasField;
 use crate::component::{ComponentView, component};
 use crate::{
     FocusEvent, FocusPhase, GenetCtx, GenetElement, HoverEvent, HoverPhase, OptionalAction,
@@ -199,6 +206,10 @@ pub struct GraphCanvasSwatch<Id, Kind> {
     pub relations: Vec<GraphCanvasRelation<Id>>,
     /// App-owned rectangular overlays currently occupying graph nodes.
     pub node_footprints: Vec<GraphCanvasNodeFootprint<Id>>,
+    /// Optional fixed-world atlas beneath the graph labels and callouts.
+    /// Geographic field identity refers to existing graph node ids, while the
+    /// atlas's paint and picking geometry remain caller-produced projection data.
+    pub atlas: Option<GraphCanvasAtlas<Id>>,
     pub selected: Option<Id>,
     pub focus: Option<Id>,
     pub hovered: Option<Id>,
@@ -237,6 +248,7 @@ impl<Id, Kind> GraphCanvasSwatch<Id, Kind> {
             graph,
             relations: Vec::new(),
             node_footprints: Vec::new(),
+            atlas: None,
             selected: None,
             focus: None,
             hovered: None,
@@ -288,6 +300,15 @@ impl<Id, Kind> GraphCanvasSwatch<Id, Kind> {
     #[must_use]
     pub fn with_deferred_drag_rebuild(mut self, on: bool) -> Self {
         self.defer_drag_rebuild = on;
+        self
+    }
+
+    /// Attach caller-owned fixed-world paint, field and route geometry.
+    /// The atlas is cloned with the swatch, so no scene borrow outlives the
+    /// source projection that produced it.
+    #[must_use]
+    pub fn with_atlas(mut self, atlas: GraphCanvasAtlas<Id>) -> Self {
+        self.atlas = Some(atlas);
         self
     }
 
@@ -350,8 +371,16 @@ impl<Id: PartialEq, Kind> GraphCanvasSwatch<Id, Kind> {
             Vec::new()
         };
         let mut leaf = GraphCanvas::new(
-            nodes,
-            edges,
+            if self.atlas.is_some() {
+                Vec::new()
+            } else {
+                nodes
+            },
+            if self.atlas.is_some() {
+                Vec::new()
+            } else {
+                edges
+            },
             Size {
                 width: self.width as f32,
                 height: self.height as f32,
@@ -359,7 +388,13 @@ impl<Id: PartialEq, Kind> GraphCanvasSwatch<Id, Kind> {
         );
         leaf.node_radius = self.node_radius;
         leaf.edge_width = self.edge_width;
-        if !self.relations.is_empty() {
+        // Atlas fields are the geographic visual identity. Graph nodes remain
+        // callout/label state, so the old mandatory circular markers do not
+        // paint over the caller's authored field polygons.
+        if self.atlas.is_some() {
+            leaf.node_radius = 0.0;
+        }
+        if self.atlas.is_none() && !self.relations.is_empty() {
             leaf.set_relations(
                 self.resolved_relation_routes()
                     .into_iter()
@@ -371,6 +406,40 @@ impl<Id: PartialEq, Kind> GraphCanvasSwatch<Id, Kind> {
             );
         }
         leaf.set_viewport(self.viewport);
+        if let Some(atlas) = &self.atlas {
+            let view = atlas.view(self.viewport, self.width as f32, self.height as f32);
+            leaf.set_atlas_polygons(
+                atlas
+                    .projected_paint(view)
+                    .into_iter()
+                    .chain(atlas.projected_routes(view))
+                    .chain(atlas.projected_field_feedback(
+                        view,
+                        self.selected.as_ref(),
+                        self.hovered.as_ref().or(self.focus.as_ref()),
+                    ))
+                    .chain(atlas.projected_callouts(view, &self.graph.nodes))
+                    .map(|shape| GraphAtlasPolygon {
+                        points: shape.points,
+                        fill: shape.fill,
+                        stroke: shape.stroke,
+                        stroke_width: shape.stroke_width,
+                    })
+                    .collect(),
+            );
+            leaf.set_atlas_paths(
+                atlas
+                    .projected_callout_paths(view, &self.graph.nodes)
+                    .into_iter()
+                    .map(|path| GraphAtlasCompoundPath {
+                        contours: path.contours,
+                        fill: path.fill,
+                        stroke: path.stroke,
+                        stroke_width: path.stroke_width,
+                    })
+                    .collect(),
+            );
+        }
         leaf.set_emphasis(
             self.node_index(self.selected.as_ref()),
             self.node_index(self.focus.as_ref()),
@@ -1430,6 +1499,18 @@ pub enum GraphCanvasEvent<Id> {
 
 impl<Id> crate::Action for GraphCanvasEvent<Id> {}
 
+/// Atlas-only interaction events. Kept separate from [`GraphCanvasEvent`] so
+/// the established generic graph callback remains source-compatible.
+#[derive(Clone, Debug, PartialEq)]
+pub enum GraphAtlasEvent<Id> {
+    Activate(Id),
+    Drag(GraphCanvasNodeDrag<Id>),
+    Hover(Option<Id>),
+    Focus(Option<Id>),
+}
+
+impl<Id> crate::Action for GraphAtlasEvent<Id> {}
+
 /// Component-owned interaction state for [`graph_canvas`].
 struct GraphCanvasLocal<Id> {
     /// Background-drag anchor for pointer panning: the last pointer position,
@@ -1554,13 +1635,153 @@ where
     .memo()
 }
 
+/// An atlas-specific swatch interaction surface.
+///
+/// Geographic field buttons exist solely for keyboard focus and activation.
+/// They deliberately have `pointer-events:none`: the full-size surface below
+/// is the only pointer route, so a field's rectangular semantic box can never
+/// turn an empty polygon corner into a hit. Pointer capture preserves the
+/// selected field across a drag even after the cursor leaves its footprint.
+pub fn graph_atlas_swatch<State, A, Output, Id, Kind, F>(
+    swatch: &GraphCanvasSwatch<Id, Kind>,
+    on_event: F,
+) -> impl View<State, A, GenetCtx, Element = GenetElement> + use<State, A, Output, Id, Kind, F>
+where
+    State: 'static,
+    A: 'static,
+    Output: OptionalAction<A> + 'static,
+    Id: Clone + PartialEq + 'static,
+    Kind: Clone + PartialEq + 'static,
+    F: Fn(&mut State, GraphAtlasEvent<Id>) -> Output + 'static,
+{
+    component(
+        swatch.clone(),
+        |_props: &GraphCanvasSwatch<Id, Kind>| AtlasCanvasLocal {
+            captured: None,
+            down: None,
+        },
+        |_prev, _next, _local| {},
+        |props: &GraphCanvasSwatch<Id, Kind>, _local: &AtlasCanvasLocal<Id>| {
+            let atlas = props.atlas.as_ref().expect("graph_atlas_swatch requires swatch.atlas");
+            let view = atlas.view(props.viewport, props.width as f32, props.height as f32);
+            let field_buttons: Vec<_> = atlas
+                .focus_order()
+                .into_iter()
+                .filter_map(|field| {
+                    let bounds = field.footprint.bounds()?;
+                    let top_left = view.project(Vec2::new(
+                        field.anchor.x + bounds.origin.x,
+                        field.anchor.y + bounds.origin.y,
+                    ));
+                    let bottom_right = view.project(Vec2::new(
+                        field.anchor.x + bounds.origin.x + bounds.size.w,
+                        field.anchor.y + bounds.origin.y + bounds.size.h,
+                    ));
+                    let id = field.id.clone();
+                    let focus_id = id.clone();
+                    Some(on_focus(focusable(on_click(
+                        el::<_, AtlasCanvasLocal<Id>, GraphAtlasEvent<Id>>("button", ())
+                            .attr("type", "button")
+                            .attr("class", "graph-canvas-atlas-field")
+                            .attr("aria-label", field.label.clone())
+                            .attr(
+                                "style",
+                                format!(
+                                    "position:absolute;pointer-events:none;background:transparent;border:0;padding:0;left:{}px;top:{}px;width:{}px;height:{}px;",
+                                    top_left.0.min(bottom_right.0),
+                                    top_left.1.min(bottom_right.1),
+                                    (bottom_right.0 - top_left.0).abs().max(1.0),
+                                    (bottom_right.1 - top_left.1).abs().max(1.0),
+                                ),
+                            ),
+                        move |_: &mut AtlasCanvasLocal<Id>, _: PointerClick| {
+                            GraphAtlasEvent::Activate(id.clone())
+                        },
+                    )), move |_: &mut AtlasCanvasLocal<Id>, event: FocusEvent| {
+                        GraphAtlasEvent::Focus(if matches!(event.phase, FocusPhase::Gained) { Some(focus_id.clone()) } else { None })
+                    }))
+                })
+                .collect();
+            let atlas_for_pointer = atlas.clone();
+            let atlas_for_hover = atlas.clone();
+            let viewport = props.viewport;
+            let width = props.width;
+            let height = props.height;
+            let defer_drag = props.defer_drag_rebuild;
+            let root = el(
+                "div",
+                (
+                    custom_leaf::<AtlasCanvasLocal<Id>, GraphAtlasEvent<Id>>(
+                        props.leaf_key,
+                        width,
+                        height,
+                    )
+                    .attr("aria-hidden", "true"),
+                    el("div", field_buttons).attr(
+                        "style",
+                        format!(
+                            "position:absolute;left:0;top:0;width:{width}px;height:{height}px;"
+                        ),
+                    ),
+                ),
+            )
+            .attr("class", "graph-canvas-swatch graph-canvas-atlas-swatch")
+            .attr("role", "group")
+            .attr("aria-label", props.label.clone())
+            .attr(
+                "style",
+                format!(
+                    "position:relative;display:block;overflow:hidden;width:{width}px;height:{height}px;max-width:100%;"
+                ),
+            );
+            Box::new(on_hover(on_pointer(root, move |local: &mut AtlasCanvasLocal<Id>, event: PointerEvent| {
+                if event.button != crate::PointerButton::Primary { return None; }
+                if defer_drag && matches!(event.phase, PointerPhase::Move) {
+                    event.defer_rebuild();
+                }
+                let view = atlas_for_pointer.view(viewport, width as f32, height as f32);
+                let position = view.unproject_normalized(event.local);
+                match event.phase {
+                    PointerPhase::Down => {
+                        local.down = Some(event.local);
+                        local.captured = atlas_for_pointer.pick(view, event.local).map(|field| field.id.clone());
+                    }
+                    PointerPhase::Move => {}
+                    PointerPhase::Up => {}
+                }
+                let Some(id) = local.captured.clone() else { return None; };
+                let Some(position) = position else { return None; };
+                let drag = GraphAtlasEvent::Drag(GraphCanvasNodeDrag { id: id.clone(), phase: event.phase, position });
+                if matches!(event.phase, PointerPhase::Up) {
+                    local.captured = None;
+                    local.down = None;
+                }
+                Some(drag)
+            }), move |_: &mut AtlasCanvasLocal<Id>, event: HoverEvent| {
+                if defer_drag { event.defer_rebuild(); }
+                let picked = if matches!(event.phase, HoverPhase::Leave) { None } else {
+                    atlas_for_hover.pick(atlas_for_hover.view(viewport, width as f32, height as f32), event.local).map(|field| field.id.clone())
+                };
+                Some(GraphAtlasEvent::Hover(picked))
+            })) as ComponentView<AtlasCanvasLocal<Id>, GraphAtlasEvent<Id>>
+        },
+        on_event,
+    )
+    .memo()
+}
+
+struct AtlasCanvasLocal<Id> {
+    captured: Option<Id>,
+    down: Option<(f32, f32)>,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::{AnyView, DomHandle, GenetAppRunner};
     use genet_scripted_dom::{NodeId, ScriptedDom};
     use layout_dom_api::{LayoutDom, LocalName, Namespace};
-    use std::cell::RefCell;
+    use std::cell::{Cell, RefCell};
     use std::rc::Rc;
 
     #[derive(Default)]
@@ -2162,6 +2383,181 @@ mod tests {
         assert_eq!(
             runner.state().events,
             [GraphCanvasEvent::Activate(2), GraphCanvasEvent::Expand]
+        );
+    }
+
+    struct AtlasState {
+        events: Vec<GraphAtlasEvent<u8>>,
+        deferred: bool,
+        builds: Rc<Cell<u32>>,
+    }
+
+    impl Default for AtlasState {
+        fn default() -> Self {
+            Self {
+                events: Vec::new(),
+                deferred: false,
+                builds: Rc::new(Cell::new(0)),
+            }
+        }
+    }
+
+    type AtlasView = Box<dyn AnyView<AtlasState, (), GenetCtx, GenetElement>>;
+
+    fn atlas_view(state: &AtlasState) -> AtlasView {
+        use sceno::{Footprint, Rect, Size2, Vec2};
+
+        state.builds.set(state.builds.get() + 1);
+
+        let swatch = GraphCanvasSwatch::new(
+            77,
+            GraphCanvasSubgraph {
+                nodes: vec![GraphCanvasNode {
+                    id: 1,
+                    kind: (),
+                    position: (0.5, 0.5),
+                    label: "Tower".into(),
+                    key: None,
+                }],
+                edges: Vec::new(),
+            },
+        )
+        .with_size(200, 100)
+        .with_expand(false)
+        .with_atlas(
+            GraphCanvasAtlas::new(Rect::new(Vec2::ZERO, Size2::new(100.0, 50.0))).with_fields(
+                vec![GraphCanvasAtlasField {
+                    id: 1,
+                    anchor: Vec2::new(50.0, 25.0),
+                    footprint: Footprint::Polygon {
+                        points: vec![
+                            Vec2::new(-10.0, -10.0),
+                            Vec2::new(10.0, 0.0),
+                            Vec2::new(-10.0, 10.0),
+                        ],
+                    },
+                    priority: 1,
+                    label: "Tower field".into(),
+                }],
+            ),
+        );
+        let swatch = if state.deferred {
+            swatch.with_deferred_drag_rebuild(true)
+        } else {
+            swatch
+        };
+        Box::new(graph_atlas_swatch(
+            &swatch,
+            |state: &mut AtlasState, event| {
+                state.events.push(event);
+            },
+        ))
+    }
+
+    #[test]
+    fn atlas_pointer_uses_polygon_not_semantic_button_bounds_and_captures_drag() {
+        let dom: DomHandle = Rc::new(RefCell::new(ScriptedDom::new()));
+        let mut runner =
+            GenetAppRunner::<_, _, _, ()>::new(dom.clone(), atlas_view, AtlasState::default());
+        let root = find_attr(
+            &dom.borrow(),
+            runner.root(),
+            "class",
+            "graph-canvas-swatch graph-canvas-atlas-swatch",
+        )
+        .expect("atlas root");
+        let size = (200.0, 100.0);
+        // (115, 30) lies in the triangle's bounding rectangle but outside its
+        // actual edge, proving the full-surface handler does not accept it.
+        runner.dispatch_pointer_down(
+            root,
+            PointerEvent::new(PointerPhase::Down, (115.0, 30.0), size),
+        );
+        runner.dispatch_pointer_up(PointerEvent::new(PointerPhase::Up, (115.0, 30.0), size));
+        assert!(runner.state().events.is_empty());
+
+        runner.dispatch_pointer_down(
+            root,
+            PointerEvent::new(PointerPhase::Down, (100.0, 50.0), size),
+        );
+        runner.dispatch_pointer_move(PointerEvent::new(PointerPhase::Move, (180.0, 50.0), size));
+        runner.dispatch_pointer_up(PointerEvent::new(PointerPhase::Up, (180.0, 50.0), size));
+        let drags: Vec<_> = runner
+            .state()
+            .events
+            .iter()
+            .filter_map(|event| match event {
+                GraphAtlasEvent::Drag(drag) => Some(drag),
+                _ => None,
+            })
+            .collect();
+        assert_eq!(drags.len(), 3, "down/move/up retain the geographic field");
+        assert!(drags.iter().all(|drag| drag.id == 1));
+        assert!(
+            drags[1].position.0 > 0.5,
+            "inverse atlas view remains normalized"
+        );
+    }
+
+    #[test]
+    fn deferred_atlas_hover_and_move_do_not_rebuild_the_logic_view() {
+        let dom: DomHandle = Rc::new(RefCell::new(ScriptedDom::new()));
+        let builds = Rc::new(Cell::new(0));
+        let mut runner = GenetAppRunner::<_, _, _, ()>::new(
+            dom.clone(),
+            atlas_view,
+            AtlasState {
+                events: Vec::new(),
+                deferred: true,
+                builds: builds.clone(),
+            },
+        );
+        let root = find_attr(
+            &dom.borrow(),
+            runner.root(),
+            "class",
+            "graph-canvas-swatch graph-canvas-atlas-swatch",
+        )
+        .expect("atlas root");
+        let size = (200.0, 100.0);
+        assert_eq!(builds.get(), 1);
+        for _ in 0..3 {
+            runner.dispatch_hover(root, HoverEvent::new(HoverPhase::Move, (100.0, 50.0), size));
+        }
+        runner.dispatch_pointer_down(
+            root,
+            PointerEvent::new(PointerPhase::Down, (100.0, 50.0), size),
+        );
+        runner.dispatch_pointer_move(PointerEvent::new(PointerPhase::Move, (120.0, 50.0), size));
+        runner.dispatch_pointer_move(PointerEvent::new(PointerPhase::Move, (140.0, 50.0), size));
+        assert_eq!(
+            builds.get(),
+            2,
+            "Down rebuilds once; deferred hover and move do not"
+        );
+        runner.dispatch_pointer_up(PointerEvent::new(PointerPhase::Up, (140.0, 50.0), size));
+        assert_eq!(
+            builds.get(),
+            3,
+            "release reconciles the retained surface once"
+        );
+    }
+
+    #[test]
+    fn atlas_field_focus_and_enter_emit_focus_then_activation() {
+        let dom: DomHandle = Rc::new(RefCell::new(ScriptedDom::new()));
+        let mut runner =
+            GenetAppRunner::<_, _, _, ()>::new(dom.clone(), atlas_view, AtlasState::default());
+        let field = find_attr(&dom.borrow(), runner.root(), "aria-label", "Tower field")
+            .expect("semantic geographic field button");
+        runner.set_focus(Some(field));
+        runner.dispatch_key(crate::KeyEvent::new(crate::Key::Named(crate::NamedKey::Enter)));
+        assert_eq!(
+            runner.state().events,
+            [
+                GraphAtlasEvent::Focus(Some(1)),
+                GraphAtlasEvent::Activate(1)
+            ]
         );
     }
 }
