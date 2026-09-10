@@ -2798,10 +2798,23 @@ with Netrender `c77b0be84fb6fc28a3c1602a2b1637f7d913acc0`. Genet's matching owne
 pin is updated together. The public legacy RenderGraph helper removal has no
 Mere consumer; the ordinary paint and host APIs remain the adoption boundary.
 
-Changes are isolated from ongoing work in the main checkout. This dependency
-adoption does not publish the separate local atlas or input-performance changes.
-Genet is pinned to its isolated adoption commit
-`3a7b50230d447f6fa7ed6921cba019f78347d932`. The focused all-target check of
-`cambium-genet-winit-host`, `cambium`, and `sprigging` passed against that Git
-source and Netrender c77. The whole-workspace all-features/all-targets check is
-tracked separately and is pending at this publication point.
+Changes are isolated from ongoing work in the main checkout. Genet is pinned to
+its isolated adoption commit `3a7b50230d447f6fa7ed6921cba019f78347d932`.
+The pin-only baseline passed the focused all-target check of
+`cambium-genet-winit-host`, `cambium`, and `sprigging` against that Git source and
+Netrender c77. The full workspace all-features/all-targets attempt stopped in the
+separately pinned Knot editor: `EditableTextV1` initializers in `endpoint.rs`
+are missing `public_revision`.
+
+The consumer closure also requires the existing atlas and deferred-input work:
+Cambium's polygon fields, retained callout paint and separate `GraphAtlasEvent`;
+Sprigging's retained polygon/compound-path paint; Scenotime's configurable return
+motion; and the native host's public frame hook and split relayout timings.
+These owned files are promoted from the tabletop-tested local changes. The
+original graph callback enum remains compatible. Product terrain, travel rules,
+and durable map state remain in Isometry. The focused all-target check passes for
+`cambium-genet-winit-host`, `cambium`, `sprigging`, and `scenotime` with these
+source additions. Scenotime's 36 library tests pass, including configurable return
+motion, pin/release, finite tuning and reduced-motion settling. The earlier
+tabletop-native atlas receipt used these owned local changes; this check verifies
+their compatibility with the selected Git Genet/Netrender closure.
