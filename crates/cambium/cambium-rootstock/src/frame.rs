@@ -53,7 +53,7 @@ where
 {
     /// Run the application's per-frame hook. Returns `true` when it wants more
     /// frames (an animation is live).
-    fn frame_hook(&mut self) -> bool {
+    pub fn prepare_frame(&mut self) -> bool {
         let animating = {
             let logical_size = self.logical_size();
             let (ui_zoom, zoom_changed) = self.take_zoom_edge();
@@ -157,6 +157,9 @@ where
         let mut tick_us = 0;
         let apply_us = 0;
         let mut rebuild_us = 0;
+        let mut style_resolve_us = 0;
+        let mut layout_with_text_us = 0;
+        let mut content_extent_us = 0;
         let mut rebuilt = false;
         match self.s.layout.as_mut() {
             Some(layout) if muts.is_empty() && !size_changed && !titlebar_moved => {
@@ -187,6 +190,9 @@ where
             },
         }
         let layout = self.s.layout.as_ref().expect("layout just ensured");
+        if rebuilt {
+            (style_resolve_us, layout_with_text_us, content_extent_us) = layout.stage_timings();
+        }
         let anim_active = layout.has_active_animations();
         let layout_update_us = elapsed_us(layout_update_started.elapsed());
         let leaf_boxes_started = crate::Instant::now();
@@ -206,6 +212,9 @@ where
         self.s.last_layout_tick_us = tick_us;
         self.s.last_layout_apply_us = apply_us;
         self.s.last_layout_rebuild_us = rebuild_us;
+        self.s.last_style_resolve_us = style_resolve_us;
+        self.s.last_layout_with_text_us = layout_with_text_us;
+        self.s.last_content_extent_us = content_extent_us;
         self.s.last_layout_mutations = mutation_count;
         self.s.last_layout_rebuilt = rebuilt;
         self.s.last_leaf_boxes_us = leaf_boxes_us;
@@ -413,7 +422,7 @@ where
         // The application's frame hook first: animation drives, leaf syncs,
         // backend polls. Its return keeps frames coming.
         let phase = crate::Instant::now();
-        let animating = self.frame_hook();
+        let animating = self.prepare_frame();
         profile.frame_hook_us = elapsed_us(phase.elapsed());
         // One scale for the whole frame: device times zoom. Layout runs at
         // `physical / layout_scale` and the rasterizer composes that scene
@@ -446,6 +455,9 @@ where
         profile.layout_tick_us = self.s.last_layout_tick_us;
         profile.layout_apply_us = self.s.last_layout_apply_us;
         profile.layout_rebuild_us = self.s.last_layout_rebuild_us;
+        profile.style_resolve_us = self.s.last_style_resolve_us;
+        profile.layout_with_text_us = self.s.last_layout_with_text_us;
+        profile.content_extent_us = self.s.last_content_extent_us;
         profile.layout_mutations = self.s.last_layout_mutations;
         profile.layout_rebuilt = self.s.last_layout_rebuilt;
         profile.leaf_boxes_us = self.s.last_leaf_boxes_us;

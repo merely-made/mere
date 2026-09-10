@@ -221,6 +221,13 @@ where
         }
     }
 
+    /// Run the application's frame preparation without a GPU or window.
+    /// Returns whether its animations request another frame. Call `relayout`
+    /// afterwards when asserting painted geometry or updated leaf contents.
+    pub fn prepare_frame(&mut self) -> bool {
+        self.host.prepare_frame()
+    }
+
     /// The effective interface zoom: the fit factor times the user's own.
     pub fn ui_zoom(&self) -> f32 {
         self.host.ui_zoom()
@@ -236,6 +243,12 @@ where
     /// application reads as [`AppCtx::logical_size`](crate::AppCtx).
     pub fn logical_size(&self) -> (f32, f32) {
         self.host.s.layout_size
+    }
+
+    /// CPU timings from the most recent retained relayout. This is distinct
+    /// from a presented frame profile because the harness has no surface.
+    pub fn relayout_profile(&self) -> crate::RelayoutProfile {
+        self.host.relayout_profile()
     }
 
     /// Set the user's zoom and re-lay out, as the runtime setter does.

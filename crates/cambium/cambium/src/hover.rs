@@ -44,6 +44,7 @@ pub struct HoverEvent {
     pub size: (f32, f32),
     /// Shared cancellation state for host defaults and propagation policy.
     pub prop: Propagation,
+    rebuild_deferred: std::rc::Rc<std::cell::Cell<bool>>,
 }
 
 impl HoverEvent {
@@ -54,12 +55,22 @@ impl HoverEvent {
             local,
             size,
             prop: Propagation::new(),
+            rebuild_deferred: std::rc::Rc::new(std::cell::Cell::new(false)),
         }
     }
 
     /// Cancel the host's default for this hover pass.
     pub fn prevent_default(&self) {
         self.prop.prevent_default();
+    }
+
+    /// Defer DOM reconciliation when a host refreshes retained paint directly.
+    pub fn defer_rebuild(&self) {
+        self.rebuild_deferred.set(true);
+    }
+
+    pub(crate) fn rebuild_is_deferred(&self) -> bool {
+        self.rebuild_deferred.get()
     }
 }
 

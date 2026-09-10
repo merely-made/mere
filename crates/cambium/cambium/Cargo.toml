@@ -14,6 +14,7 @@ highlight = ["dep:illume", "dep:tinct"]
 [dependencies]
 meristem = { version = "0.2.0", path = "../meristem" }
 sprigging = { version = "0.2.0", path = "../sprigging" }
+sceno = { workspace = true }
 genet-scripted-dom = { workspace = true }
 # Cambium also renders host settings and surface descriptors, which remain
 # product-neutral Genet host contracts rather than workspace vocabulary.

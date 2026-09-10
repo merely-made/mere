@@ -455,6 +455,26 @@ pub struct FocusedTextSlot<State> {
     pub get_mut: Box<dyn Fn(&mut State) -> &mut TextInput>,
 }
 
+/// CPU-side timings from the most recent retained relayout.
+///
+/// This remains available to windowless harnesses, where no frame is
+/// presented and [`FrameProfile`] is therefore not populated.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct RelayoutProfile {
+    pub layout_update_us: u64,
+    pub layout_tick_us: u64,
+    pub layout_apply_us: u64,
+    pub layout_rebuild_us: u64,
+    pub style_resolve_us: u64,
+    pub layout_with_text_us: u64,
+    pub content_extent_us: u64,
+    pub layout_mutations: u64,
+    pub layout_rebuilt: bool,
+    pub leaf_boxes_us: u64,
+    pub leaf_render_us: u64,
+    pub leaf_repaints: u64,
+}
+
 /// CPU-side timings for the most recently presented frame.
 ///
 /// These are host pipeline spans, not GPU timestamp queries. They answer which
@@ -471,6 +491,9 @@ pub struct FrameProfile {
     pub layout_tick_us: u64,
     pub layout_apply_us: u64,
     pub layout_rebuild_us: u64,
+    pub style_resolve_us: u64,
+    pub layout_with_text_us: u64,
+    pub content_extent_us: u64,
     pub layout_mutations: u64,
     pub layout_rebuilt: bool,
     pub leaf_boxes_us: u64,
@@ -500,7 +523,7 @@ impl FrameProfile {
     /// One compact line suitable for a headed receipt's diagnostic log.
     pub fn summary(self) -> String {
         format!(
-            "total={}us hook={}us relayout={}us layout-update={}us tick={}us apply={}us layout-rebuild={}us mutations={} layout-rebuilt={} leaf-boxes={}us leaf-render={}us leaf-repaints={} fragments={}us emit={}us raster={}us acquire={}us clear={}us compose={}us present={}us a11y={}us raster-inner={}us invalidate={}us rebuild={}us master={}us vello={}us dirty-tiles={}",
+            "total={}us hook={}us relayout={}us layout-update={}us tick={}us apply={}us layout-rebuild={}us style-resolve={}us layout-text={}us content-extent={}us mutations={} layout-rebuilt={} leaf-boxes={}us leaf-render={}us leaf-repaints={} fragments={}us emit={}us raster={}us acquire={}us clear={}us compose={}us capture={}us present={}us a11y={}us raster-inner={}us invalidate={}us rebuild={}us master={}us vello={}us dirty-tiles={}",
             self.total_us,
             self.frame_hook_us,
             self.relayout_us,
@@ -508,6 +531,9 @@ impl FrameProfile {
             self.layout_tick_us,
             self.layout_apply_us,
             self.layout_rebuild_us,
+            self.style_resolve_us,
+            self.layout_with_text_us,
+            self.content_extent_us,
             self.layout_mutations,
             self.layout_rebuilt,
             self.leaf_boxes_us,
@@ -519,6 +545,7 @@ impl FrameProfile {
             self.acquire_us,
             self.clear_us,
             self.compose_us,
+            self.capture_us,
             self.present_us,
             self.a11y_us,
             self.raster_total_us,
@@ -756,6 +783,9 @@ where
     pub(crate) last_layout_tick_us: u64,
     pub(crate) last_layout_apply_us: u64,
     pub(crate) last_layout_rebuild_us: u64,
+    pub(crate) last_style_resolve_us: u64,
+    pub(crate) last_layout_with_text_us: u64,
+    pub(crate) last_content_extent_us: u64,
     pub(crate) last_layout_mutations: u64,
     pub(crate) last_layout_rebuilt: bool,
     pub(crate) last_leaf_boxes_us: u64,
@@ -848,6 +878,9 @@ where
             last_layout_tick_us: 0,
             last_layout_apply_us: 0,
             last_layout_rebuild_us: 0,
+            last_style_resolve_us: 0,
+            last_layout_with_text_us: 0,
+            last_content_extent_us: 0,
             last_layout_mutations: 0,
             last_layout_rebuilt: false,
             last_leaf_boxes_us: 0,
@@ -995,6 +1028,31 @@ where
                 (size.0.max(1) as f32 / scale, size.1.max(1) as f32 / scale)
             },
             None => self.s.surface_size.unwrap_or(self.s.layout_size),
+        }
+    }
+
+    /// CPU timings from the most recently presented frame. Windowless
+    /// harnesses use [`Self::relayout_profile`] instead.
+    pub fn frame_profile(&self) -> Option<FrameProfile> {
+        self.s.last_frame_profile
+    }
+
+    /// Timings from the most recent retained relayout, including windowless
+    /// harness relayouts that never enter the presentation pipeline.
+    pub fn relayout_profile(&self) -> RelayoutProfile {
+        RelayoutProfile {
+            layout_update_us: self.s.last_layout_update_us,
+            layout_tick_us: self.s.last_layout_tick_us,
+            layout_apply_us: self.s.last_layout_apply_us,
+            layout_rebuild_us: self.s.last_layout_rebuild_us,
+            style_resolve_us: self.s.last_style_resolve_us,
+            layout_with_text_us: self.s.last_layout_with_text_us,
+            content_extent_us: self.s.last_content_extent_us,
+            layout_mutations: self.s.last_layout_mutations,
+            layout_rebuilt: self.s.last_layout_rebuilt,
+            leaf_boxes_us: self.s.last_leaf_boxes_us,
+            leaf_render_us: self.s.last_leaf_render_us,
+            leaf_repaints: self.s.last_leaf_repaints,
         }
     }
 
