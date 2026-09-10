@@ -2788,3 +2788,20 @@ matter of picking the hour; the Workbench W4 receipts are on genet main.
   remains outside this repository move: Cloudflare still proxies the custom
   domain, GitHub therefore reports the organization domain unverified and does
   not yet permit HTTPS enforcement.
+
+## Games-wing renderer adoption (2026-09-09)
+
+The games-wing source audit found that Mesocosm needed two revisions of Netrender
+for UI paint and opaque-tenant composition. This follow-up aligns Mere's renderer,
+paint-list API and lowering dependencies, including the standalone web consumers,
+with Netrender `c77b0be84fb6fc28a3c1602a2b1637f7d913acc0`. Genet's matching owner
+pin is updated together. The public legacy RenderGraph helper removal has no
+Mere consumer; the ordinary paint and host APIs remain the adoption boundary.
+
+Changes are isolated from ongoing work in the main checkout. This dependency
+adoption does not publish the separate local atlas or input-performance changes.
+Genet is pinned to its isolated adoption commit
+`3a7b50230d447f6fa7ed6921cba019f78347d932`. The focused all-target check of
+`cambium-genet-winit-host`, `cambium`, and `sprigging` passed against that Git
+source and Netrender c77. The whole-workspace all-features/all-targets check is
+tracked separately and is pending at this publication point.
