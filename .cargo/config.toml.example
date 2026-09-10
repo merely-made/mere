@@ -108,8 +108,9 @@ paint_list_render = { path = "../netrender/paint_list_render" }
 # The manifest patches these crates-io names to the mark-ik git fork; this
 # config-level entry overrides that at the local clone, same pattern as taffy.
 # Patch the seven sibling packages together so the local dalek-3 family stays
-# source-identical. The net crate is the published `mere-p2panda-net =0.7.2`;
-# its former `p2panda-net` override never matched that renamed package.
+# source-identical. The net crate is the tagged `mere-p2panda-net =0.7.3` fork;
+# the local override uses the correctly named package.
+mere-p2panda-net = { path = "../../crates/p2panda/p2panda-net" }
 p2panda-auth = { path = "../../crates/p2panda/p2panda-auth" }
 p2panda-core = { path = "../../crates/p2panda/p2panda-core" }
 p2panda-discovery = { path = "../../crates/p2panda/p2panda-discovery" }
