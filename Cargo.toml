@@ -718,18 +718,18 @@ taffy = { package = "genet-taffy", version = "=0.14.0", git = "https://github.co
 # number). Missing this is invisible while a consumer resolves a *published*
 # genet-livery, and a compile error the moment it resolves the working copy.
 parley = { git = "https://github.com/merely-made/genet.git", rev = "9e8f9dc2f3ddc0af1658580bb51964462a03923f" }
-# The published `mere-p2panda-net =0.7.2` owns the exact-ALPN net crate. Its
-# seven sibling packages still come from the owned fork for the dalek-3 port;
-# pin them to the matching immutable release tag. There is deliberately no
-# `p2panda-net` patch: that package name is not consumed and the old entry was
-# permanently unused after the published crate rename.
-p2panda-auth = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.2" }
-p2panda-core = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.2" }
-p2panda-discovery = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.2" }
-p2panda-encryption = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.2" }
-p2panda-store = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.2" }
-p2panda-stream = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.2" }
-p2panda-sync = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.2" }
+# The tagged `mere-p2panda-net =0.7.3` fork release owns the exact-ALPN net
+# crate and its seven sibling packages. The correctly named net patch supplies
+# the renamed package while the sibling patches keep the dalek-3 family on the
+# same immutable release tag.
+mere-p2panda-net = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.3" }
+p2panda-auth = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.3" }
+p2panda-core = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.3" }
+p2panda-discovery = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.3" }
+p2panda-encryption = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.3" }
+p2panda-store = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.3" }
+p2panda-stream = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.3" }
+p2panda-sync = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.3" }
 
 # ─── LAN peer discovery (H10): one real mDNS fix, one dead theory ────────────
 # iroh-mdns-address-lookup 0.4.0 joins the multicast group only on the
