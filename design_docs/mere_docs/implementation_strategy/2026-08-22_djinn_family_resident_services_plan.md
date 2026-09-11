@@ -443,3 +443,84 @@ release:
 - treating DNS-SD reachability as authorization;
 - making Athanor a graph-truth authority;
 - staged percentage rollout infrastructure before a release operator needs it.
+
+## 13. Ordinary site serving and governed replication (2026-09-11 scope)
+
+**Status:** proposal only. The authorized implementation in
+`knot-editor/design_docs/2026-09-11_small_web_authoring_plan.md` adds ordinary
+native files, explicit snapshot publication and in-process loopback serving.
+It does not install a daemon or enable a public listener. The release gate and
+earlier phases above are not claimed complete by this proposal.
+
+### Verified composition seams
+
+`ports/djinn/src/resident.rs::DjinnResident` already composes device lifetime,
+resident Knot, identity and Distillery. `resident_knot.rs::ResidentKnot` keeps
+one source and optional personal sync host alive. `resident_blobs.rs` provides
+scoped blob custody and rebinds serving leases after restart. These are useful
+existing services, but none makes Djinn a general small-web site host.
+
+`crates/system/errand/src/serve` separates content through `Source` and
+`Item::Document` from protocol projection. `gemini-protocol::server` and
+`spartan-protocol::serve` own wire transactions. Knot's site model supplies
+bounded, immutable native bytes; it cannot hand a server an arbitrary script
+or mutable editor buffer. That same read-only content contract can support
+both a Knot-owned process lifetime and a later Djinn-owned lifetime.
+
+The [author-offline publication proof](../../moothold_docs/research/2026-09-05_author_offline_publication_proof.md)
+already demonstrated author exit, retained content, scoped peer transfer and
+ordinary Gemini reading. Its production publication/hosting record ownership
+and cross-machine acceptance are separate gates, not daemon acceptance.
+
+### Concrete options
+
+| Option | Useful behavior | Authority and remaining gate |
+|---|---|---|
+| Knot owns the listener | An ordinary site is readable while the authoring application runs. | Knot selects saved files, shared protocol crates serve their snapshot, closing Knot stops the listener. Current implementation scope. |
+| Djinn holds published snapshots | Sites remain readable after Knot exits and resume according to a saved startup policy. | Knot explicitly transfers an immutable selected revision to a local authenticated service. Djinn retains bytes and owns listener lifetime. Preferred first persistent slice; requires the gates below. |
+| Djinn also composes governed hosting | A device can retain and serve publications accepted from a moot under current hosting authority. | Gemot owns membership, contribution and hosting permission; domain stores own durable records; transport owns replication. Djinn supervises those services and rechecks their conclusions. Separate later slice. |
+
+The second option is recommended first. Serving ordinary published content must
+work without Gemot membership, paired devices or a moot replica. Adding a moot
+hosting commitment is a distinct opt-in operation. Likewise, broadcasting
+availability through discovery does not copy content, grant a reader access,
+or authorize hosting. The UI should expose publication, replication and
+advertisement as separate settings with their current state.
+
+### Proposed persistent service contract
+
+The host submits a versioned descriptor identifying a publication, exact
+snapshot digest, native paths/MIME types, byte limits and listener policy.
+It supplies retained content through the shared read-only source seam. The
+descriptor distinguishes ordinary owner-selected content from a governed
+hosting lease; the latter carries references to the domain's verified
+authority, expiry and revocation state. Djinn must not recreate Gemot's grant
+evaluation inside the protocol handler.
+
+The process-neutral serving component should accept a snapshot and listener
+configuration and return a lifetime handle with replace/stop/status operations.
+It owns neither editable files nor moot records. Protocol grammar stays in the
+existing shared protocol crates. Knot may compose it locally; Djinn may compose
+it with durable custody. No new distributed protocol or arbitrary-code execution
+host is required for this step.
+
+Before persistent rollout is concrete and reviewable, settle and verify:
+
+1. Explicit local caller authorization for publish, replace, stop and removal;
+   restoring a saved descriptor cannot silently expand its audience.
+2. Stable certificate/key ownership across restart, including a visible rotation
+   operation that does not train clients to ignore changed certificates.
+3. Configurable interface and port binding, disabled-by-default automatic startup,
+   advertisement policy, connection and byte limits, and useful failure status.
+4. Atomic snapshot handoff and recovery after interrupted writes; only complete
+   selected revisions become visible. Editing a source file is not publishing.
+5. Retention and garbage-collection policy, including what Stop does and whether
+   retained bytes remain for later restart. Removal is a separate operation.
+6. For governed content, current hosting permission after restart and on every
+   authority change, with refusal after revocation or expiry.
+7. Acceptance with an independent ordinary client after Knot exits and after a
+   Djinn restart, plus bind-conflict, malformed-request, resource-bound and
+   shutdown tests. Public exposure needs its own reviewed deployment receipt.
+
+This section proposes ownership and done-conditions. It neither schedules a
+daemon rollout nor selects public binding for the user.
