@@ -12,7 +12,7 @@ Audit base: Mere `55e21c81` (2026-09-11), working tree. `archive_docs/` is exclu
 ## mere_docs/implementation_strategy/2026-09-11_recursive_query_experiments_plan.md
 
 - disposition: current
-- status line: "E1–E3 merged to main 2026-09-12 (...); Q1/Q2 scoped below, awaiting Mark's ruling; the graphlets → subgraph rename unparked" — accurate: yes
+- status line: "E1–E3 merged to main 2026-09-12 (...); Q1/Q2 landed 2026-09-12; the graphlets → subgraph rename landed" — accurate: yes
 - claims checked: 6 — holds: 6, stale: 0, unverifiable: 0
 
 ### Stale claims

@@ -763,7 +763,7 @@ mod tests {
     use crate::graph::{
         ContainmentSubKind, Coupling, CouplingId, CouplingResponse, EdgeAssertion, Field,
         FieldDefinition, FieldExtent, FieldId, Graph, NavigationTrigger, NodeSelector,
-        ProvenanceSubKind, ScalarField, SemanticSubKind, SharedNavigationMemory,
+        ProvenanceSubKind, RelationKind, ScalarField, SemanticSubKind, SharedNavigationMemory,
     };
     use crate::types::{
         BadgeIcon, ClassificationProvenance, ClassificationScheme, ClassificationStatus,
@@ -1354,7 +1354,19 @@ mod tests {
         assert!(graph.get_node_by_id(a_id).is_some());
         assert!(graph.get_node_by_id(b_id).is_some());
         assert!(graph.get_node_by_id(c_id).is_some());
-        assert_eq!(graph.relations().count(), 2);
+        // Four rows over two edges: a->b carries Containment + Traversal +
+        // the open predicate set by `ReplaySetEdgeSemanticPredicateByIds`,
+        // and b->c is an open-predicate-only edge. Open-predicate
+        // statements emit `RelationKind::OpenPredicate` rows since the
+        // 2026-09-12 Q1 ruling (previously invisible to `relations()`).
+        assert_eq!(graph.relations().count(), 4);
+        assert_eq!(
+            graph
+                .relations()
+                .filter(|r| r.kind == RelationKind::OpenPredicate)
+                .count(),
+            2
+        );
         let from = graph.get_node_key_by_id(a_id).expect("from key");
         let to = graph.get_node_key_by_id(b_id).expect("to key");
         let edge = graph.find_edge_key(from, to).expect("edge key");

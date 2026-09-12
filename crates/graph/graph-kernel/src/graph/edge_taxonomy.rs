@@ -357,6 +357,14 @@ impl NavigationTrigger {
 /// `Traversal` is the one variant without a sub-kind: traversal
 /// is event-shaped, with temporal nuance in [`NavigationTrigger`]
 /// rather than a `TraversalSubKind` enum.
+///
+/// `OpenPredicate` is a Semantic statement whose predicate IRI has no
+/// recognized [`SemanticSubKind`] (minted by `assert_semantic_predicate`
+/// / JSON-LD ingest). It exists so `relations()` emits one row per
+/// statement, matching `has_relation(Family(Semantic))` (Q1 ruling,
+/// 2026-09-12). The IRI is reached through the typed payload
+/// (`semantic_statements()`), not carried on the row, so the kind stays
+/// `Copy`.
 #[derive(
     Debug,
     Clone,
@@ -372,6 +380,7 @@ impl NavigationTrigger {
 )]
 pub enum RelationKind {
     Semantic(SemanticSubKind),
+    OpenPredicate,
     Traversal,
     Containment(ContainmentSubKind),
     Arrangement(ArrangementSubKind),
@@ -379,12 +388,16 @@ pub enum RelationKind {
     Provenance(ProvenanceSubKind),
 }
 
+/// Sub-kind ordinal reserved in the Semantic family byte for
+/// [`RelationKind::OpenPredicate`] in [`RelationKind::tag`].
+const OPEN_PREDICATE_TAG_SUB: u32 = 0x00ff_ffff;
+
 impl RelationKind {
     /// Project to the relation's family. Pure function — no payload
     /// access required.
     pub fn family(self) -> EdgeFamily {
         match self {
-            RelationKind::Semantic(_) => EdgeFamily::Semantic,
+            RelationKind::Semantic(_) | RelationKind::OpenPredicate => EdgeFamily::Semantic,
             RelationKind::Traversal => EdgeFamily::Traversal,
             RelationKind::Containment(_) => EdgeFamily::Containment,
             RelationKind::Arrangement(_) => EdgeFamily::Arrangement,
@@ -398,10 +411,15 @@ impl RelationKind {
     /// `graph-canvas::CanvasEdge::tag` / `HitProxy::Edge::tag`).
     /// The top byte is the family ordinal (0..5); the bottom three
     /// bytes are the sub-kind ordinal within the family.
+    /// [`OpenPredicate`](Self::OpenPredicate) keeps the Semantic family
+    /// byte and uses the all-ones sub-ordinal
+    /// ([`OPEN_PREDICATE_TAG_SUB`]) as its sentinel, so a consumer that
+    /// reads only the family byte still sees Semantic.
     /// [`Self::from_tag`] is the inverse.
     pub fn tag(self) -> u32 {
         let (family, sub) = match self {
             RelationKind::Semantic(sk) => (0u32, sk as u32),
+            RelationKind::OpenPredicate => (0, OPEN_PREDICATE_TAG_SUB),
             RelationKind::Traversal => (1, 0),
             RelationKind::Containment(sk) => (2, sk as u32),
             RelationKind::Arrangement(sk) => (3, sk as u32),
@@ -418,6 +436,7 @@ impl RelationKind {
         let family = tag >> 24;
         let sub = tag & 0x00ff_ffff;
         match family {
+            0 if sub == OPEN_PREDICATE_TAG_SUB => Some(RelationKind::OpenPredicate),
             0 => SemanticSubKind::from_repr(sub as usize).map(RelationKind::Semantic),
             1 => (sub == 0).then_some(RelationKind::Traversal),
             2 => ContainmentSubKind::from_repr(sub as usize).map(RelationKind::Containment),
