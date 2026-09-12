@@ -33,7 +33,7 @@ pub use gloss;
 #[cfg(feature = "graph")]
 pub use glossary;
 #[cfg(feature = "graph")]
-pub use graphlets;
+pub use subgraph;
 #[cfg(feature = "graph")]
 pub use kernel;
 #[cfg(feature = "linked-data")]

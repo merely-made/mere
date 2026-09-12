@@ -312,11 +312,11 @@ impl Default for Stack {
 /// A Penrose aperiodic tiling; items take tiling vertices in ordinal order.
 ///
 /// Assignment strategy is deliberately absent. The `arrangements` original
-/// carried a five-variant `NodeAssignmentStrategy` (graphlet-aware,
+/// carried a five-variant `NodeAssignmentStrategy` (subgraph-aware,
 /// domain-clustered, UDC-clustered, edge-affinity) of which four were
 /// documented as falling back to the fifth and none were implemented. All five
 /// describe an *ordering*, and [`ScoreItem::ordinal`] is already this
-/// contract's ordering channel: a producer that wants graphlet-adjacent items
+/// contract's ordering channel: a producer that wants subgraph-adjacent items
 /// on adjacent vertices sorts them into adjacent ordinals.
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub struct Penrose {

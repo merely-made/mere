@@ -1,5 +1,7 @@
 # The Swatch Primitive (design)
 
+*Vocabulary updated 2026-09-12: graphlet → subgraph per TERMINOLOGY.md (retired 2026-09-05); the rulings and the model are unchanged. Links to archived plans keep those plans' original titles.*
+
 **Date**: 2026-06-27
 **Status**: Design, from a Mark + Claude session. Elevates
 [gloss = the Navigator](2026-06-07_gloss_navigator_design.md) §2a/§2b's "the swatch
@@ -9,13 +11,13 @@ not a build plan; the current tree has only fragments, each owned by a sibling p
 **Related**: [gloss = the Navigator](2026-06-07_gloss_navigator_design.md) (the swatch
 as the Navigator; this realizes it),
 [scope model reconciliation](2026-06-27_scope_model_reconciliation.md),
-[graphlet derivation from selection](2026-06-13_graphlet_derivation_from_selection.md),
+[subgraph derivation from selection](2026-06-13_subgraph_derivation_from_selection.md),
 [node body & face model plan](../implementation_strategy/2026-06-23_node_body_face_model_plan.md)
 (owns the node-body-editor swatch, B3),
 [object card plan](../../archive_docs/2026-09-02_retired_plans/2026-06-21_object_card_plan.md)
 (owns the focus-card-slot card),
 [graphlet wiring plan](../../archive_docs/2026-07-04_completed_plans/2026-06-25_graphlet_wiring_plan.md)
-(owns the per-window instance machinery + graphlets),
+(owns the per-window instance machinery + subgraphs),
 [graph signals layer plan](../../archive_docs/2026-08-20_completed_plans/2026-06-22_graph_signals_layer_plan.md)
 (owns the gloss swatch lens),
 [petgraph / RDF plan](../implementation_strategy/2026-06-18_petgraph_rdf_plan.md)
@@ -31,7 +33,7 @@ The graph has three content primitives: **node** (entity), **edge** (relation),
 **field** (the ambient force / continuous layer). The swatch is a fourth, of a
 different kind: it is the **canvas** primitive. A swatch is an embeddable,
 manipulable, configurable projection of the graph, a little slice of it, scoped to a
-node, a graphlet, a selection, or the whole graph.
+node, a subgraph, a selection, or the whole graph.
 
 The consequence that organizes everything below: **the orrery is the root swatch**
 (scope = whole graph). It is not a privileged "truth surface" that swatches imitate.
@@ -59,7 +61,7 @@ Only one plane is shared.
 This is the rule that keeps the model honest: a swatch is as flexible as the real
 graph, but its flexibility lives entirely in its own curation. Hiding a relation in
 one instance leaves it drawn and live in every other instance, in a selection, in a
-Linked graphlet. The facts persist; the picture changes.
+Linked subgraph. The facts persist; the picture changes.
 
 ## 3. The instance config
 
@@ -68,7 +70,7 @@ A swatch instance is its curation over shared truth (illustrative-signature-only
 ```rust
 // illustrative-signature-only — the fields, not the final type
 struct SwatchInstance {
-    scope:      Scope,        // Node | Selection | Graphlet | Graph
+    scope:      Scope,        // Node | Selection | Subgraph | Graph
     layout:     Layout,       // minimap | body | radial | astroid | timeline | grid | force | ...
     lens:       Lens,         // content-peek | signal-heatmap | facet | revealed-edges | ...
     projection: EdgeProjection,       // which families this instance's layout + derivation follow
@@ -158,7 +160,7 @@ What flattens them is purely the orrery draw, "one undirected line per pair"
 2. **Per-cell weight**: thickness becomes each relation's own metric, not per-pair
    density.
 3. **Per-cell hit-test**: selection resolves to the specific relation, which is the
-   per-edge selection the graphlet-wiring open item #1 deferred.
+   per-edge selection the subgraph-wiring open item #1 deferred.
 
 This aligns with the [petgraph / RDF plan](../implementation_strategy/2026-06-18_petgraph_rdf_plan.md),
 which rules that the multigraph is logical (one statement per fact, enumerated as
@@ -184,7 +186,7 @@ Higher layers win, and a higher layer never writes down into a lower one. So:
 - **GraphDefault** is the graph-native "hidden in the graph" base, the answer to
   "choose which edges are hidden in the graph." It is the only graph-wide layer.
 - **A per-instance hide stays local.** Hiding a cell in the orrery or one swatch
-  never hides it in another context, a selection, or a Linked graphlet. This is the
+  never hides it in another context, a selection, or a Linked subgraph. This is the
   crucial property.
 
 **Hiding relaxes the spring, in that instance only** (Mark, 2026-06-27). Visibility
@@ -192,7 +194,7 @@ feeds the physics: an instance's spring set is its visible cells intersected wit
 its projection. So decluttering a view also de-tangles its layout, and because the
 hide is per-instance, no other view re-settles. Membership stays on truth:
 derivation follows projection over real edges, so a hide never drops a node out of a
-graphlet.
+subgraph.
 
 A placed field-region rule
 ([scriptable field regions](../implementation_strategy/2026-06-13_scriptable_field_regions_plan.md))
@@ -277,7 +279,7 @@ Fragments exist, each owned by a sibling plan; the unifying primitive does not.
   / camera / scope isolation, branch-scoped orrery), the substrate the
   swatch-as-instance generalizes. From the
   [graphlet wiring plan](../../archive_docs/2026-07-04_completed_plans/2026-06-25_graphlet_wiring_plan.md).
-- **The shape classifier** (selection -> ranked graphlet kinds) is still unbuilt,
+- **The shape classifier** (selection -> ranked subgraph kinds) is still unbuilt,
   the named gap from the 2026-06-13 doc and reconciliation ruling 6.
 
 ## 11. Open questions
@@ -300,5 +302,5 @@ Fragments exist, each owned by a sibling plan; the unifying primitive does not.
 - **Field as a scope** (Mark, 2026-06-28; deferred). A field region's spatial extent is a
   candidate swatch scope: the nodes inside it become the scoped set, a convenient grab-bag that
   need not be connected (so it reads as a Loose / Session shape, not a structural one). Extends the
-  scope axis (node / selection / graphlet / graph, plus **field**); cross-refs the
+  scope axis (node / selection / subgraph / graph, plus **field**); cross-refs the
   [scriptable field regions plan](../implementation_strategy/2026-06-13_scriptable_field_regions_plan.md).

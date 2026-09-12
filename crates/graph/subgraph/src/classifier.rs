@@ -5,7 +5,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 //! The shape classifier (swatch-primitive plan P3): given a selection's induced subgraph (node
-//! count + undirected edge pairs), rank which canonical graphlet shapes it best fits. Pure
+//! count + undirected edge pairs), rank which canonical subgraph shapes it best fits. Pure
 //! topology — no graph handle — so it is unit-tested in isolation. This is the 2026-06-13 doc's
 //! named "one real gap"; it feeds the connections swatch's shape chip. Structural detectors only
 //! for now (Ego / Corridor / Loop / Component / Loose); Bridge / Facet / Frontier /
@@ -13,13 +13,13 @@
 
 use std::collections::HashSet;
 
-use forme::GraphletKind;
+use forme::SubgraphKind;
 use kernel::graph::Graph;
 
 /// One ranked shape candidate: the kind, a fit score in `[0, 1]`, and a short chip label.
 #[derive(Clone, Debug, PartialEq)]
 pub struct ShapeRank {
-    pub kind: GraphletKind,
+    pub kind: SubgraphKind,
     pub fit: f32,
     pub label: String,
 }
@@ -54,28 +54,28 @@ pub fn classify(n: usize, edges: &[(usize, usize)]) -> Vec<ShapeRank> {
 
     // Loop (cycle): connected, every node degree 2, one edge per node.
     if connected && n >= 3 && m == n && deg.iter().all(|&d| d == 2) {
-        ranks.push(rank(GraphletKind::Loop, 1.0, format!("Loop · {n}")));
+        ranks.push(rank(SubgraphKind::Loop, 1.0, format!("Loop · {n}")));
     }
     // Ego (star): a hub adjacent to every other node, all leaves degree 1, tree-sparse.
     if n >= 3 && m == n - 1 && max_deg == n - 1 && deg1 == n - 1 {
         ranks.push(rank(
-            GraphletKind::Ego { radius: 1 },
+            SubgraphKind::Ego { radius: 1 },
             1.0,
             format!("Ego · hub + {}", n - 1),
         ));
     } else if n >= 4 && connected && m <= n && max_deg >= n - 2 {
         ranks.push(rank(
-            GraphletKind::Ego { radius: 1 },
+            SubgraphKind::Ego { radius: 1 },
             0.6,
             "Ego · near-hub".into(),
         ));
     }
     // Corridor (simple path): connected, tree, max degree 2, exactly two endpoints.
     if connected && n >= 2 && m == n - 1 && max_deg <= 2 && deg1 == 2 {
-        ranks.push(rank(GraphletKind::Corridor, 1.0, format!("Corridor · {n}")));
+        ranks.push(rank(SubgraphKind::Corridor, 1.0, format!("Corridor · {n}")));
     } else if connected && n >= 3 && max_deg <= 2 && m <= n {
         ranks.push(rank(
-            GraphletKind::Corridor,
+            SubgraphKind::Corridor,
             0.5,
             "Corridor · path-ish".into(),
         ));
@@ -83,17 +83,17 @@ pub fn classify(n: usize, edges: &[(usize, usize)]) -> Vec<ShapeRank> {
     // Component: the connected-baseline descriptor (a weak fit whenever everything links up).
     if connected && n >= 2 {
         ranks.push(rank(
-            GraphletKind::Component,
+            SubgraphKind::Component,
             0.55,
             format!("Component · {n}"),
         ));
     }
     // Loose / Session: a disconnected grab-bag (the floor, e.g. a field-scoped set).
     if !connected && n >= 2 {
-        ranks.push(rank(GraphletKind::Session, 0.7, format!("Loose · {n}")));
+        ranks.push(rank(SubgraphKind::Session, 0.7, format!("Loose · {n}")));
     }
     if ranks.is_empty() {
-        ranks.push(rank(GraphletKind::Session, 0.6, format!("Loose · {n}")));
+        ranks.push(rank(SubgraphKind::Session, 0.6, format!("Loose · {n}")));
     }
     ranks.sort_by(|a, b| {
         b.fit
@@ -126,42 +126,42 @@ pub fn classify_selection(graph: &Graph, members: &[uuid::Uuid]) -> Vec<ShapeRan
     classify(index.len(), &edges)
 }
 
-fn rank(kind: GraphletKind, fit: f32, label: String) -> ShapeRank {
+fn rank(kind: SubgraphKind, fit: f32, label: String) -> ShapeRank {
     ShapeRank { kind, fit, label }
 }
 
 /// A stable string tag for a shape kind, carried on the swatch chip strip's DOM
 /// (`data-shape-kind`) so a chip click can name the shape to crystallize as. The inverse is
 /// [`shape_kind_from_tag`]. (Swatch primitive — P3, chip-click crystallize.)
-pub fn shape_kind_tag(kind: &GraphletKind) -> String {
+pub fn shape_kind_tag(kind: &SubgraphKind) -> String {
     match kind {
-        GraphletKind::Ego { radius } => format!("ego:{radius}"),
-        GraphletKind::Corridor => "corridor".into(),
-        GraphletKind::Component => "component".into(),
-        GraphletKind::Loop => "loop".into(),
-        GraphletKind::Frontier => "frontier".into(),
-        GraphletKind::Facet => "facet".into(),
-        GraphletKind::Session => "session".into(),
-        GraphletKind::Bridge => "bridge".into(),
-        GraphletKind::WorkbenchCorrespondence => "workbench-correspondence".into(),
+        SubgraphKind::Ego { radius } => format!("ego:{radius}"),
+        SubgraphKind::Corridor => "corridor".into(),
+        SubgraphKind::Component => "component".into(),
+        SubgraphKind::Loop => "loop".into(),
+        SubgraphKind::Frontier => "frontier".into(),
+        SubgraphKind::Facet => "facet".into(),
+        SubgraphKind::Session => "session".into(),
+        SubgraphKind::Bridge => "bridge".into(),
+        SubgraphKind::WorkbenchCorrespondence => "workbench-correspondence".into(),
     }
 }
 
 /// Parse a [`shape_kind_tag`] back to its kind; `None` for an unknown tag (a stale DOM
 /// attribute never panics the input path).
-pub fn shape_kind_from_tag(tag: &str) -> Option<GraphletKind> {
+pub fn shape_kind_from_tag(tag: &str) -> Option<SubgraphKind> {
     Some(match tag {
-        "corridor" => GraphletKind::Corridor,
-        "component" => GraphletKind::Component,
-        "loop" => GraphletKind::Loop,
-        "frontier" => GraphletKind::Frontier,
-        "facet" => GraphletKind::Facet,
-        "session" => GraphletKind::Session,
-        "bridge" => GraphletKind::Bridge,
-        "workbench-correspondence" => GraphletKind::WorkbenchCorrespondence,
+        "corridor" => SubgraphKind::Corridor,
+        "component" => SubgraphKind::Component,
+        "loop" => SubgraphKind::Loop,
+        "frontier" => SubgraphKind::Frontier,
+        "facet" => SubgraphKind::Facet,
+        "session" => SubgraphKind::Session,
+        "bridge" => SubgraphKind::Bridge,
+        "workbench-correspondence" => SubgraphKind::WorkbenchCorrespondence,
         _ => {
             let radius = tag.strip_prefix("ego:")?.parse().ok()?;
-            GraphletKind::Ego { radius }
+            SubgraphKind::Ego { radius }
         },
     })
 }
@@ -191,14 +191,14 @@ fn is_connected(n: usize, adj: &[Vec<usize>]) -> bool {
 mod tests {
     use super::*;
 
-    fn top(n: usize, edges: &[(usize, usize)]) -> GraphletKind {
+    fn top(n: usize, edges: &[(usize, usize)]) -> SubgraphKind {
         classify(n, edges).first().unwrap().kind.clone()
     }
 
     #[test]
     fn path_is_a_corridor() {
         // 0-1-2-3
-        assert_eq!(top(4, &[(0, 1), (1, 2), (2, 3)]), GraphletKind::Corridor);
+        assert_eq!(top(4, &[(0, 1), (1, 2), (2, 3)]), SubgraphKind::Corridor);
     }
 
     #[test]
@@ -206,19 +206,19 @@ mod tests {
         // hub 0 -> 1, 2, 3
         assert_eq!(
             top(4, &[(0, 1), (0, 2), (0, 3)]),
-            GraphletKind::Ego { radius: 1 }
+            SubgraphKind::Ego { radius: 1 }
         );
     }
 
     #[test]
     fn triangle_is_a_loop() {
-        assert_eq!(top(3, &[(0, 1), (1, 2), (2, 0)]), GraphletKind::Loop);
+        assert_eq!(top(3, &[(0, 1), (1, 2), (2, 0)]), SubgraphKind::Loop);
     }
 
     #[test]
     fn disconnected_is_loose_session() {
         // two separate edges 0-1 and 2-3 — a grab-bag, not one shape.
-        assert_eq!(top(4, &[(0, 1), (2, 3)]), GraphletKind::Session);
+        assert_eq!(top(4, &[(0, 1), (2, 3)]), SubgraphKind::Session);
     }
 
     #[test]
@@ -226,28 +226,28 @@ mod tests {
         // K4: dense, every node degree 3 — not a star, not a path; the Component baseline wins.
         assert_eq!(
             top(4, &[(0, 1), (0, 2), (0, 3), (1, 2), (1, 3), (2, 3)]),
-            GraphletKind::Component
+            SubgraphKind::Component
         );
     }
 
     #[test]
     fn two_connected_nodes_are_a_trivial_corridor() {
-        assert_eq!(top(2, &[(0, 1)]), GraphletKind::Corridor);
+        assert_eq!(top(2, &[(0, 1)]), SubgraphKind::Corridor);
     }
 
     #[test]
     fn shape_kind_tags_round_trip_every_kind() {
         let kinds = [
-            GraphletKind::Ego { radius: 1 },
-            GraphletKind::Ego { radius: 2 },
-            GraphletKind::Corridor,
-            GraphletKind::Component,
-            GraphletKind::Loop,
-            GraphletKind::Frontier,
-            GraphletKind::Facet,
-            GraphletKind::Session,
-            GraphletKind::Bridge,
-            GraphletKind::WorkbenchCorrespondence,
+            SubgraphKind::Ego { radius: 1 },
+            SubgraphKind::Ego { radius: 2 },
+            SubgraphKind::Corridor,
+            SubgraphKind::Component,
+            SubgraphKind::Loop,
+            SubgraphKind::Frontier,
+            SubgraphKind::Facet,
+            SubgraphKind::Session,
+            SubgraphKind::Bridge,
+            SubgraphKind::WorkbenchCorrespondence,
         ];
         for kind in kinds {
             assert_eq!(

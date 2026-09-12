@@ -5,7 +5,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 use crate::MemberId;
-use crate::graphlet::GraphletId;
+use crate::subgraph::SubgraphId;
 use crate::layout::LayoutMode;
 use crate::lens::ProjectionLens;
 use crate::member::{LayoutOverride, Lifecycle, Provenance};
@@ -128,9 +128,9 @@ pub enum TreeIntent<N: MemberId> {
     RequestDismissal(N),
     /// Request the host to focus a member's content.
     RequestFocus(N),
-    /// A graphlet needs reconciliation with its spec.
+    /// A subgraph needs reconciliation with its spec.
     ReconciliationNeeded {
-        graphlet: GraphletId,
+        subgraph: SubgraphId,
         reason: String,
     },
     /// The projection lens changed — host may update edge visibility.

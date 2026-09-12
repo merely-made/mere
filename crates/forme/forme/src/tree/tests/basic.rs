@@ -241,7 +241,7 @@ fn cycle_focus_wraps() {
 }
 
 #[test]
-fn graphlet_membership() {
+fn subgraph_membership() {
     let mut tree = GraphTree::new(LayoutMode::TreeStyleTabs, ProjectionLens::Traversal);
 
     tree.apply(NavAction::Attach {
@@ -256,15 +256,15 @@ fn graphlet_membership() {
         },
     });
 
-    let graphlet = GraphletRef::new_session(0).with_kind(GraphletKind::Session);
-    tree.add_graphlet(graphlet);
+    let subgraph = SubgraphRef::new_session(0).with_kind(SubgraphKind::Session);
+    tree.add_subgraph(subgraph);
 
-    tree.get_mut(&1).unwrap().graphlet_membership.push(0);
-    tree.get_mut(&2).unwrap().graphlet_membership.push(0);
+    tree.get_mut(&1).unwrap().subgraph_membership.push(0);
+    tree.get_mut(&2).unwrap().subgraph_membership.push(0);
 
-    let members = tree.graphlet_members(0);
+    let members = tree.subgraph_members(0);
     assert_eq!(members.len(), 2);
-    assert!(tree.graphlet_of(&1).is_some());
+    assert!(tree.subgraph_of(&1).is_some());
 }
 
 #[test]

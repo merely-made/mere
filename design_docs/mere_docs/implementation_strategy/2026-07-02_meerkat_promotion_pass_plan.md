@@ -1,5 +1,7 @@
 # Meerkat Promotion Pass Plan
 
+*Written before the 2026-09-05 retirement of graphlet (TERMINOLOGY.md): read graphlet as subgraph. Identifiers such as GraphletId, GraphletRef, and SessionGraphlets are now SubgraphId, SubgraphRef, and SessionSubgraphs, and the graphlets crate is crates/graph/subgraph (code renamed 2026-09-12).*
+
 **Date**: 2026-07-02
 **Status**: P1/P2/P3-first-slice/P4/P5/P6/P7 promoted. P8's input-snapshot seam,
 first two domain moves, roster's pure helper layer, roster's explicit builder
@@ -139,7 +141,7 @@ super::{WindowCtx, fetch, render}` feeding a single `impl WindowCtx` block
 `src/graphlets_tests.rs` (299): pure forme + kernel + serde derivation, zero
 `crate::` refs. Pure graph-shape derivation belongs with the graph crates.
 
-- Home: `crates/graph/graphlets` beside glossary / graph-kernel /
+- Home: `crates/graph/graphlets` *(historical citation)* <!-- doc-audit: historical-path --> (now `crates/graph/subgraph`) beside glossary / graph-kernel /
   linked-data / node-lineage.
 - Done when: derivation + classifier + tests build there; meerkat's
   roster_view_graphlets consumes the crate.

@@ -19,7 +19,7 @@ pub enum ProjectionLens {
     /// Natural tree-style-tabs view. **Default.**
     Traversal,
 
-    /// Arrangement-first: group by graphlet -> frame -> tab group.
+    /// Arrangement-first: group by subgraph -> frame -> tab group.
     /// The workbench-scope view.
     Arrangement,
 
@@ -34,7 +34,7 @@ pub enum ProjectionLens {
     /// Recency-first: ordered by last-touched timestamp.
     Recency,
 
-    /// All members: flat with optional graphlet grouping.
+    /// All members: flat with optional subgraph grouping.
     All,
 }
 

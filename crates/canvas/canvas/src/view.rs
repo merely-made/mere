@@ -178,7 +178,7 @@ impl Canvas {
 
     /// The current scope lens as member uuids, or `None` when unscoped. The inverse of
     /// [`scope_to_members`](Self::scope_to_members) — a host saves this before a transient
-    /// per-window scope override (a branch window scoping to its graphlet) and restores it
+    /// per-window scope override (a branch window scoping to its subgraph) and restores it
     /// after. (Per-window branch scope.)
     pub fn scope_members(&self) -> Option<Vec<uuid::Uuid>> {
         self.scope.as_ref().map(|keys| {

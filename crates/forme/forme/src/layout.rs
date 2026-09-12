@@ -6,7 +6,7 @@
 
 use crate::MemberId;
 use crate::Rect;
-use crate::graphlet::GraphletId;
+use crate::subgraph::SubgraphId;
 use crate::member::{Lifecycle, SplitDirection};
 use crate::topology::TreeRow;
 use serde::{Deserialize, Serialize};
@@ -78,7 +78,7 @@ pub struct TabEntry<N: MemberId> {
     pub lifecycle: Lifecycle,
     pub is_anchor: bool,
     pub depth: usize,
-    pub graphlet_id: Option<GraphletId>,
+    pub subgraph_id: Option<SubgraphId>,
 }
 
 /// Owned version of `TreeRow` for storage in `LayoutResult`.
@@ -89,7 +89,7 @@ pub struct OwnedTreeRow<N: MemberId> {
     pub is_expanded: bool,
     pub has_children: bool,
     pub is_last_sibling: bool,
-    pub graphlet_id: Option<GraphletId>,
+    pub subgraph_id: Option<SubgraphId>,
 }
 
 impl<'a, N: MemberId> From<TreeRow<'a, N>> for OwnedTreeRow<N> {
@@ -100,7 +100,7 @@ impl<'a, N: MemberId> From<TreeRow<'a, N>> for OwnedTreeRow<N> {
             is_expanded: row.is_expanded,
             has_children: row.has_children,
             is_last_sibling: row.is_last_sibling,
-            graphlet_id: row.graphlet_id,
+            subgraph_id: row.subgraph_id,
         }
     }
 }

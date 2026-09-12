@@ -1,5 +1,7 @@
 # Mere Composition Spine — graph-capable forme, projections, surfaces
 
+*Written before the 2026-09-05 retirement of graphlet (TERMINOLOGY.md): read graphlet as subgraph. Identifiers such as GraphletId, GraphletRef, and SessionGraphlets are now SubgraphId, SubgraphRef, and SessionSubgraphs, and the graphlets crate is crates/graph/subgraph (code renamed 2026-09-12). CollapsedGraphlet is now ArrangementKind::Supernode.*
+
 **Date**: 2026-05-21
 **Status**: Canonical for the arrangement ontology (§2-§8, §10-§15). The
 host/realization rows (§1, §7, §9, §12) are pre-flip; read them through the

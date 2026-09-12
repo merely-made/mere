@@ -5,7 +5,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 use crate::MemberId;
-use crate::graphlet::{GraphletId, GraphletRef};
+use crate::subgraph::{SubgraphId, SubgraphRef};
 use crate::layout::LayoutMode;
 use crate::lens::ProjectionLens;
 use crate::member::MemberEntry;
@@ -27,8 +27,8 @@ pub struct GraphTree<N: MemberId> {
     // --- Topology (graph-derived parent/child) ---
     topology: TreeTopology<N>,
 
-    // --- Graphlet index (connected sub-structures) ---
-    graphlets: Vec<GraphletRef<N>>,
+    // --- Subgraph index (connected sub-structures) ---
+    subgraphs: Vec<SubgraphRef<N>>,
 
     // --- Active projection lens ---
     active_lens: ProjectionLens,
@@ -51,7 +51,7 @@ impl<N: MemberId> GraphTree<N> {
         Self {
             members: HashMap::new(),
             topology: TreeTopology::new(),
-            graphlets: Vec::new(),
+            subgraphs: Vec::new(),
             active_lens: lens,
             active: None,
             expanded: HashSet::new(),
@@ -63,14 +63,14 @@ impl<N: MemberId> GraphTree<N> {
     pub fn from_members(
         members: Vec<(N, MemberEntry<N>)>,
         topology: TreeTopology<N>,
-        graphlets: Vec<GraphletRef<N>>,
+        subgraphs: Vec<SubgraphRef<N>>,
         layout: LayoutMode,
         lens: ProjectionLens,
     ) -> Self {
         Self {
             members: members.into_iter().collect(),
             topology,
-            graphlets,
+            subgraphs,
             active_lens: lens,
             active: None,
             expanded: HashSet::new(),
@@ -140,31 +140,31 @@ impl<N: MemberId> GraphTree<N> {
     }
 
     // ---------------------------------------------------------------
-    // Graphlets
+    // Subgraphs
     // ---------------------------------------------------------------
 
-    pub fn graphlets(&self) -> &[GraphletRef<N>] {
-        &self.graphlets
+    pub fn subgraphs(&self) -> &[SubgraphRef<N>] {
+        &self.subgraphs
     }
 
-    pub fn graphlets_mut(&mut self) -> &mut Vec<GraphletRef<N>> {
-        &mut self.graphlets
+    pub fn subgraphs_mut(&mut self) -> &mut Vec<SubgraphRef<N>> {
+        &mut self.subgraphs
     }
 
-    pub fn add_graphlet(&mut self, graphlet: GraphletRef<N>) {
-        self.graphlets.push(graphlet);
+    pub fn add_subgraph(&mut self, subgraph: SubgraphRef<N>) {
+        self.subgraphs.push(subgraph);
     }
 
-    pub fn graphlet_of(&self, member: &N) -> Option<&GraphletRef<N>> {
+    pub fn subgraph_of(&self, member: &N) -> Option<&SubgraphRef<N>> {
         let entry = self.members.get(member)?;
-        let gid = entry.graphlet_membership.first()?;
-        self.graphlets.iter().find(|g| g.id == *gid)
+        let gid = entry.subgraph_membership.first()?;
+        self.subgraphs.iter().find(|g| g.id == *gid)
     }
 
-    pub fn graphlet_members(&self, id: GraphletId) -> Vec<&N> {
+    pub fn subgraph_members(&self, id: SubgraphId) -> Vec<&N> {
         self.members
             .iter()
-            .filter(|(_, entry)| entry.graphlet_membership.contains(&id))
+            .filter(|(_, entry)| entry.subgraph_membership.contains(&id))
             .map(|(n, _)| n)
             .collect()
     }

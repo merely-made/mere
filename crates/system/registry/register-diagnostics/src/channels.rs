@@ -116,8 +116,8 @@ pub const CHANNEL_UI_GRAPH_CAMERA_FIT_BLOCKED_ZERO_VIEW: &str =
     "runtime.ui.graph.camera_fit_blocked_zero_view";
 pub const CHANNEL_UI_GRAPH_FIT_SELECTION_FALLBACK_TO_FIT: &str =
     "runtime.ui.graph.fit_selection_fallback_to_fit";
-pub const CHANNEL_UI_GRAPH_FIT_GRAPHLET_FALLBACK_TO_FIT: &str =
-    "runtime.ui.graph.fit_graphlet_fallback_to_fit";
+pub const CHANNEL_UI_GRAPH_FIT_SUBGRAPH_FALLBACK_TO_FIT: &str =
+    "runtime.ui.graph.fit_subgraph_fallback_to_fit";
 pub const CHANNEL_UI_GRAPH_CAMERA_FIT_BLOCKED_NO_BOUNDS: &str =
     "runtime.ui.graph.camera_fit_blocked_no_bounds";
 pub const CHANNEL_UI_GRAPH_CAMERA_FIT_DEFERRED_NO_METADATA: &str =

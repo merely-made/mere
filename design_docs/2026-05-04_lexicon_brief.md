@@ -1,5 +1,7 @@
 # Mere Lexicon Brief
 
+*Written before the 2026-09-05 retirement of graphlet (TERMINOLOGY.md): read graphlet as subgraph. Identifiers such as GraphletId, GraphletRef, and SessionGraphlets are now SubgraphId, SubgraphRef, and SessionSubgraphs, and the graphlets crate is crates/graph/subgraph (code renamed 2026-09-12).*
+
 **Status**: Active / authoritative for terms covered
 **Date**: 2026-05-04
 **Scope**: Establishes the post-rename naming scheme and in-product vocabulary for the Mere project. Authoritative for terms it covers; supersedes the prior [2026-05-03 lexicon brief](../../graphshell/design_docs/2026-05-03_lexicon_brief.md) *(historical citation)* <!-- doc-audit: historical-link --> (which had Strophos+Orrery as the product) and complements [`TERMINOLOGY.md`](TERMINOLOGY.md) until that file is fully populated. Terms not addressed here are covered by the donor harvest indexes; the donor `graphshell` repo is GitHub-archived (read-only) and its local clone was deleted 2026-05-27, so `../../graphshell/design_docs/` paths no longer resolve.

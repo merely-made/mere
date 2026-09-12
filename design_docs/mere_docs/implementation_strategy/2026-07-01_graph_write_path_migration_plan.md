@@ -1,5 +1,7 @@
 # Graph write-path migration (finish Phase 6.5)
 
+*Written before the 2026-09-05 retirement of graphlet (TERMINOLOGY.md): read graphlet as subgraph. Identifiers such as GraphletId, GraphletRef, and SessionGraphlets are now SubgraphId, SubgraphRef, and SessionSubgraphs, and the graphlets crate is crates/graph/subgraph (code renamed 2026-09-12).*
+
 **Date**: 2026-07-01
 **Status**: In progress. Finishes the single-write-path boundary that `graph/mod.rs:328` declares but
 does not enforce ("graph topology mutators are crate-internal... other runtime/shell code paths should

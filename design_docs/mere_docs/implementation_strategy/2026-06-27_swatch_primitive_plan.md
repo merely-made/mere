@@ -1,5 +1,7 @@
 # Swatch Primitive Plan — one configurable, embeddable projection of the graph
 
+*Vocabulary updated 2026-09-12: graphlet → subgraph per TERMINOLOGY.md (retired 2026-09-05). Dated status and Progress entries keep the meerkat-era names they recorded (branch_graphlet_from, graphlets.rs, graphlet_classifier.rs, graphlets.json, GraphletBinding::Forked); read them as history. The live names are SessionSubgraphs in crates/graph/subgraph and the subgraphs.json sidecar.*
+
 **Date**: 2026-06-27
 **Status (2026-07-01)**: P1, P2, and P3a/b/c landed — see Progress below. P2b
 (cartography re-layout, `Scope`/`SwatchInstance` unification) and the rest of P3's
@@ -36,7 +38,7 @@ each existing fragment; it extends them, it does not duplicate them.
 - [object card plan](../../archive_docs/2026-09-02_retired_plans/2026-06-21_object_card_plan.md) **owns the focus-card slot**.
   P2 adds the slot's multi-selection branch (`render/cards.rs:129` TODO).
 - [graphlet wiring plan](../../archive_docs/2026-07-04_completed_plans/2026-06-25_graphlet_wiring_plan.md) **owns the per-window
-  instance machinery + graphlet derivation/reconcile**. P3 crystallize reuses it.
+  instance machinery + subgraph derivation/reconcile**. P3 crystallize reuses it.
 - [petgraph / RDF plan](2026-06-18_petgraph_rdf_plan.md) **owns edge multigraph
   storage** and the ruling that visual collapse is an experience-LOD setting. P4 is
   that experience-LOD render; it needs no kernel storage change.
@@ -73,7 +75,7 @@ clip-path polygon, the `node-swatch` + `data-subject` hit-test contract at
 the **element model** (the list of semantic placed elements with `data-*` node /
 edge / vertex ids) as the render output. Add the `SwatchInstance` config (design §3)
 and a geometry provider keyed by scope: `Scope::Node` is the degenerate single-node
-face/hull (today's path); `Scope::Selection / Graphlet / Graph` route to cartography
+face/hull (today's path); `Scope::Selection / Subgraph / Graph` route to cartography
 `project()`. The node-body editor becomes **template #1** riding the generic
 component, behavior-preserved (the hull-vertex drag at `input/editing.rs:208` keeps
 working).
@@ -139,7 +141,7 @@ WorkbenchCorrespondence / Session) over the induced subgraph under a chosen edge
 projection, ranked by fit and edge strength. The strip in the connections swatch
 reads it: ranked chips, the projection toggle (the instance's `EdgeProjection`,
 re-deriving the shape live), frontier ghosts, crystallize. Crystallize reuses the
-built graphlet machinery (`graphlets.rs` `record_linked` / `record_branch`): Session
+built subgraph machinery (`graphlets.rs` `record_linked` / `record_branch`): Session
 is ephemeral, Linked is drift-tracking. This is the derivation-from-selection UX
 routed through the swatch (reconciliation ruling 4), and the `SelectionShapeEdit`
 edit strategy (design §6).
@@ -147,14 +149,14 @@ edit strategy (design §6).
 **Done when**: the connections swatch names the dominant shape (all-families default,
 dominant pre-ranked, per 2026-06-13), re-derives it live as the projection toggles,
 ghosts the one-hop frontier, and crystallizes the selection to a Session or Linked
-graphlet through the existing index.
+subgraph through the existing index.
 
 **Status (2026-06-30): P3a/b/c done**, full done condition still open. P3a (2026-06-28, the
 classifier keystone + the shape chip): `graphlet_classifier::classify(n, edges) -> ranked
 [ShapeRank]`, pure topology over the selection's induced subgraph: structural detectors for
 **Loop / Ego / Corridor / Component**, with **Loose / Session** the disconnected-grab-bag floor,
 ranked by fit (6 unit tests green). P3b (2026-06-28, crystallize via context menu):
-`Shell::crystallize_selection` freezes the selection as a Session graphlet tagged with the
+`Shell::crystallize_selection` freezes the selection as a Session subgraph tagged with the
 classifier's dominant shape (`session_ops/shell_session.rs`, `graphlets.rs` `record_session`).
 P3c (2026-06-28, the chip strip): `compute_connections_card` sets the classifier's top-3
 fit-ranked shapes (fit ≥ 0.4) as `ConnectionsSpec.shape_chips`, rendered as a ranked chip strip
@@ -173,7 +175,7 @@ Un-collapse the orrery edge render. The "one undirected line per pair"
 per-cell: each populated `(family, sub_kind)` cell between a pair draws as its own
 fanned, family-coloured line. The gyre `edge_hit_test` (`gyre/.../query.rs`) resolves
 to the specific cell `(source, target, RelationSelector)`, which is the per-edge
-selection graphlet-wiring open item #1 deferred. Thickness becomes per-cell (the
+selection subgraph-wiring open item #1 deferred. Thickness becomes per-cell (the
 cell's own metric) rather than per-pair density. No kernel storage change: the cells
 already exist in `EdgePayload`'s family sidecars (`edge_payload.rs`); this is the
 experience-LOD render the petgraph-RDF plan assigns here. Benefits the orrery (root
@@ -200,13 +202,13 @@ instance only** (Mark, 2026-06-27): feed the instance's effective visibility int
 gyre spring set (spring set = visible cells intersected with projection); the spring
 and drawn-edge list already rebuild on reconcile (`orrery/.../selection.rs:95`).
 Membership stays on truth: derivation follows projection over real edges, so a hide
-never drops a node out of a graphlet. The selected-cell edge controls (show / hide /
+never drops a node out of a subgraph. The selected-cell edge controls (show / hide /
 relate / retract) live in the strip. Field-region visibility
 (scriptable-field-regions) resolves into this stack as another contributor.
 
 **Done when**: hiding a cell in one instance relaxes its spring there and nowhere
 else; the cell stays drawn and live in every other instance, in a selection, and in
-a Linked graphlet; a `GraphDefault` hide applies as the base everywhere; graphlet
+a Linked subgraph; a `GraphDefault` hide applies as the base everywhere; subgraph
 membership is unaffected by any hide.
 
 **Status (2026-07-01)**: The named "hiding relaxes the spring in that instance
@@ -214,8 +216,8 @@ only" behavior is built — `orrery::build::visible_relation_edges` feeds the
 instance's `hidden_edges` into the gyre spring sync, and every hide/show
 mutator re-syncs immediately (see the [roster detail cards
 plan](../../archive_docs/2026-09-02_retired_plans/2026-06-29_graph_object_roster_detail_cards_plan.md)'s 2026-07-01 entry).
-Graphlet membership is confirmed unaffected (hide/show never touches
-`derive_members`/graphlet truth). **Not built**: the `GraphDefault <
+Subgraph membership is confirmed unaffected (hide/show never touches
+`derive_members`/subgraph truth). **Not built**: the `GraphDefault <
 GraphViewOverride < SelectionOverride` layered stack itself — hide/show is
 still the one session-scoped layer it always was, just now spring-aware; there
 is no graph-level default layer yet.
@@ -268,7 +270,7 @@ template renders a purpose-built UI over its own subgraph.
   component exists.
 - **The research-surface lenses** (Trail / Claim / Provenance / Neighborhoods):
   graph-projections research; this plan ships the lens slot, not those lenses.
-- **The window-per-graphlet to scope-nav reform** (reconciliation ruling 1): related
+- **The window-per-subgraph to scope-nav reform** (reconciliation ruling 1): related
   but separately greenlit; tracked in the scope reconciliation.
 
 ---
@@ -297,7 +299,7 @@ template renders a purpose-built UI over its own subgraph.
 - **No edge visibility state exists.** Visibility covers ghost nodes and facet scope,
   never edges; the GraphDefault base is net-new.
 - **The instance machinery exists for branches.** `WindowView` carries per-graph
-  selection, camera, and scope, isolated per window (graphlet-wiring open item #1),
+  selection, camera, and scope, isolated per window (subgraph-wiring open item #1),
   the substrate the swatch-as-instance generalizes.
 - **The shape classifier does not exist.** A workspace search finds no kind dispatch
   / induced-subgraph fit ranking; forward derivation (kind -> members) is built
@@ -334,7 +336,7 @@ template renders a purpose-built UI over its own subgraph.
   provider, the `swatch.rs` lift a type-parameterization, the focus-card slot the
   ready socket, the edge un-collapse a render change with no storage edit, no edge
   visibility state yet, the classifier the one genuinely-new piece. Ownership split
-  recorded: this plan owns the spine; node-body-face B3, object-card, graphlet-wiring,
+  recorded: this plan owns the spine; node-body-face B3, object-card, subgraph-wiring,
   petgraph-RDF, graph-signals, and field-regions own the fragments it coordinates. No
   code yet.
 - **2026-06-27** — **P1 done (host-generic lift)**. `swatch.rs`'s `swatch_view`
@@ -356,7 +358,7 @@ template renders a purpose-built UI over its own subgraph.
   nodes tagged `data-element` for P4. Six clean files touched, **not** the concurrently-edited
   `cards.rs` (whose `len == 1` snapshot gate already suppresses multi-select; its TODO updated to
   point here). 2 unit tests green. **Verification lesson**: `swatch` / `render` / `window_view` /
-  `graphlets` are **bin** modules (declared in `main.rs`), so `cargo check -p meerkat --lib` does
+  `subgraphs` are **bin** modules (declared in `main.rs`), so `cargo check -p meerkat --lib` does
   **not** compile them — verify these with `cargo test -p meerkat --bin meerkat` (or
   `cargo check -p meerkat`); the `--lib` greens on P1 + P2 were false-clean until the bin build
   caught a `u32` arg type. P2b deferrals: cartography re-layout, the `Scope`/`SwatchInstance`
@@ -380,17 +382,17 @@ template renders a purpose-built UI over its own subgraph.
   idea in the design doc open questions. Deferred to P3b/c: the multi-chip strip, projection toggle,
   frontier ghosts, crystallize, and the contextual detectors. Bin compiles; chip not yet headed-verified.
 - **2026-06-28** — **P3b built (crystallize via context menu)**. The commit gesture: a multi-node
-  "Crystallize selection" context-menu item freezes the selection as a Session graphlet tagged with
+  "Crystallize selection" context-menu item freezes the selection as a Session subgraph tagged with
   the classifier's dominant shape and scopes the orrery to it in place (ruling 1, not a new window).
   Primitives (clean files, unit-tested): `graphlet_classifier::classify_selection(graph, members)`
-  (graph-aware classifier, now also backs the swatch chip) + `SessionGraphlets::record_session(kind,
+  (graph-aware classifier, now also backs the swatch chip) + `SessionSubgraphs::record_session(kind,
   members)` (freeze-the-selection index method — works for any shape incl. the Loose grab-bag, unlike
   Linked derivation). Host method `Shell::crystallize_selection(from)` (`session_ops/shell_session.rs`):
   classify → record_session → persist → `scope_to_members`. Trigger mirrors "Open component": new
   `ContextAction::CrystallizeSelection` + registry tuple + `DEFAULT_MENU_ACTIONS` + `MenuScope::MultiNode`
   (command.rs) + menu row (build.rs) + dispatch pushing `ShellCommand::CrystallizeSelection` (actions.rs)
   → drain (shell_ops.rs) → the Shell method. Threaded the two concurrently-edited hot files cleanly. Bin
-  compiles, 14 graphlet tests green. **Default = Session-freeze** (the 2026-06-13 default, any shape);
+  compiles, 14 subgraph tests green. **Default = Session-freeze** (the 2026-06-13 default, any shape);
   Linked-derivation crystallize (Component/Ego) + the Astroid option are P3c. Not headed-verified (the
   app's pre-existing sqlx/sync crash makes a drive flaky). **P3 substantially done**; remaining P3c/P4:
   the live projection toggle, frontier ghosts, the contextual detectors, and the swatch hit-test
@@ -400,7 +402,7 @@ template renders a purpose-built UI over its own subgraph.
   shapes (fit ≥ 0.4), and `connections_swatch_view` renders them as a chip strip across the top of the
   card (dominant highlighted, runners-up dimmed). Completes the "strip" half of P3's name as a
   read-only ranked display; the live projection toggle that re-derives it is still P4 (needs the swatch
-  hit-test). Bin compiles, 14 graphlet tests green.
+  hit-test). Bin compiles, 14 subgraph tests green.
 - **2026-06-30 - P4/P5 partial via roster/orrery relation-cell work.** The
   [graph object roster detail-cards plan](../../archive_docs/2026-09-02_retired_plans/2026-06-29_graph_object_roster_detail_cards_plan.md)
   landed fanned canvas relation-cell overlay/picking, selected-cell redraw, Link
@@ -419,8 +421,8 @@ template renders a purpose-built UI over its own subgraph.
   of waiting for an unrelated reconcile. This is exactly the "hiding relaxes
   the spring in that instance only" behavior P5 named. `gyre`'s own edge type
   is untouched by design (still `(NodeKey, NodeKey)`, taxonomy-agnostic);
-  multiplicity is how the orrery hands it weight. Graphlet family-selector
-  editing also landed (Graphlet Card chips, `SessionGraphlets::
+  multiplicity is how the orrery hands it weight. Subgraph family-selector
+  editing also landed (Subgraph Card chips, `SessionSubgraphs::
   toggle_family_selector`), separate from this P4/P5 edge work but closing the
   roster plan's other named R6 item. Still open for P4/P5: per-cell edge
   thickness, one shared element-model edge renderer between the orrery and the

@@ -5,7 +5,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 use crate::MemberId;
-use crate::graphlet::GraphletId;
+use crate::subgraph::SubgraphId;
 use serde::{Deserialize, Serialize};
 
 /// What each member of the tree carries.
@@ -20,8 +20,8 @@ pub struct MemberEntry<N: MemberId> {
     /// edge sub-kinds. Preserved for reconciliation and undo.
     pub provenance: Provenance<N>,
 
-    /// Which graphlet(s) this member belongs to.
-    pub graphlet_membership: Vec<GraphletId>,
+    /// Which subgraph(s) this member belongs to.
+    pub subgraph_membership: Vec<SubgraphId>,
 
     /// Optional taffy layout overrides (min size, flex grow, etc.).
     pub layout_override: Option<LayoutOverride>,
@@ -32,13 +32,13 @@ impl<N: MemberId> MemberEntry<N> {
         Self {
             lifecycle,
             provenance,
-            graphlet_membership: Vec::new(),
+            subgraph_membership: Vec::new(),
             layout_override: None,
         }
     }
 
-    pub fn with_graphlet(mut self, id: GraphletId) -> Self {
-        self.graphlet_membership.push(id);
+    pub fn with_subgraph(mut self, id: SubgraphId) -> Self {
+        self.subgraph_membership.push(id);
         self
     }
 
@@ -92,9 +92,9 @@ pub enum Provenance<N: MemberId> {
         source: Option<N>,
         context: Option<String>,
     },
-    /// Present as a graphlet anchor or graph view root.
+    /// Present as a subgraph anchor or graph view root.
     Anchor,
-    /// Derived by graphlet computation (component, ego, corridor, etc.).
+    /// Derived by subgraph computation (component, ego, corridor, etc.).
     /// Placed as sibling of its connection point in the topology.
     Derived {
         connection: Option<N>,

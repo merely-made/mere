@@ -9,7 +9,7 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
-use forme::{GraphMemberId, GraphletBinding, GraphletId, GraphletKind, GraphletRef};
+use forme::{GraphMemberId, SubgraphBinding, SubgraphId, SubgraphKind, SubgraphRef};
 use kernel::graph::{
     ContainmentSubKind, EdgeFamily, FieldDefinition, FieldExtent, FieldId, Graph, NodeKey,
     ProvenanceSubKind, RelationKind, RelationSelector, SemanticSubKind,
@@ -19,7 +19,7 @@ use kernel::graph::{
 pub enum RosterTab {
     Nodes,
     Links,
-    Graphlets,
+    Subgraphs,
     Fields,
 }
 
@@ -27,7 +27,7 @@ impl RosterTab {
     pub const ALL: [RosterTab; 4] = [
         RosterTab::Nodes,
         RosterTab::Links,
-        RosterTab::Graphlets,
+        RosterTab::Subgraphs,
         RosterTab::Fields,
     ];
 
@@ -35,7 +35,7 @@ impl RosterTab {
         match self {
             RosterTab::Nodes => "Nodes",
             RosterTab::Links => "Links",
-            RosterTab::Graphlets => "Graphlets",
+            RosterTab::Subgraphs => "Subgraphs",
             RosterTab::Fields => "Fields",
         }
     }
@@ -44,7 +44,7 @@ impl RosterTab {
         match self {
             RosterTab::Nodes => "No nodes yet",
             RosterTab::Links => "No relations yet",
-            RosterTab::Graphlets => "No graphlets yet",
+            RosterTab::Subgraphs => "No subgraphs yet",
             RosterTab::Fields => "No fields yet",
         }
     }
@@ -68,7 +68,7 @@ pub enum RosterSubject {
         to: GraphMemberId,
         selector: RelationSelector,
     },
-    Graphlet(GraphletId),
+    Subgraph(SubgraphId),
     Field(FieldId),
     Facet(FacetSubject),
 }
@@ -97,7 +97,7 @@ impl RosterSubject {
             RosterSubject::LinkBundle { .. } | RosterSubject::RelationCell { .. } => {
                 RosterTab::Links
             },
-            RosterSubject::Graphlet(_) => RosterTab::Graphlets,
+            RosterSubject::Subgraph(_) => RosterTab::Subgraphs,
             RosterSubject::Field(_) => RosterTab::Fields,
             RosterSubject::Facet(facet) => facet.natural_tab(),
         }
@@ -165,8 +165,8 @@ pub struct LinkRow {
 }
 
 #[derive(Clone)]
-pub struct GraphletRow {
-    pub id: GraphletId,
+pub struct SubgraphRow {
+    pub id: SubgraphId,
     pub kind_label: String,
     pub binding_label: String,
     pub member_count: usize,
@@ -226,8 +226,8 @@ pub struct LinkCard {
 }
 
 #[derive(Clone)]
-pub struct GraphletCard {
-    pub id: GraphletId,
+pub struct SubgraphCard {
+    pub id: SubgraphId,
     pub kind_label: String,
     pub binding_label: String,
     pub members: Vec<String>,
@@ -293,7 +293,7 @@ pub struct FacetCard {
 pub enum RosterDetail {
     Node(NodeDetail),
     Link(LinkCard),
-    Graphlet(GraphletCard),
+    Subgraph(SubgraphCard),
     Field(FieldDetail),
     Facet(FacetCard),
 }
@@ -302,16 +302,16 @@ pub enum RosterDetail {
 pub struct RosterSnapshot {
     pub node_rows: Vec<RosterRow>,
     pub link_rows: Vec<LinkRow>,
-    pub graphlet_rows: Vec<GraphletRow>,
+    pub subgraph_rows: Vec<SubgraphRow>,
     pub field_rows: Vec<FieldRow>,
     pub detail: Option<RosterDetail>,
 }
 
 #[derive(Clone)]
-pub struct GraphletRowInput {
-    pub id: GraphletId,
-    pub kind: Option<GraphletKind>,
-    pub binding: GraphletBinding,
+pub struct SubgraphRowInput {
+    pub id: SubgraphId,
+    pub kind: Option<SubgraphKind>,
+    pub binding: SubgraphBinding,
     pub member_count: usize,
     pub added_count: usize,
     pub removed_count: usize,
@@ -319,10 +319,10 @@ pub struct GraphletRowInput {
 }
 
 #[derive(Clone)]
-pub struct GraphletCardInput {
-    pub id: GraphletId,
-    pub kind: Option<GraphletKind>,
-    pub binding: GraphletBinding,
+pub struct SubgraphCardInput {
+    pub id: SubgraphId,
+    pub kind: Option<SubgraphKind>,
+    pub binding: SubgraphBinding,
     pub members: Vec<String>,
     pub family_selectors: Option<Vec<(EdgeFamily, bool)>>,
     pub added: Vec<String>,
@@ -491,16 +491,16 @@ pub fn build_link_rows(inputs: Vec<LinkRowInput>) -> Vec<LinkRow> {
     rows
 }
 
-pub fn build_graphlet_rows(inputs: Vec<GraphletRowInput>) -> Vec<GraphletRow> {
+pub fn build_subgraph_rows(inputs: Vec<SubgraphRowInput>) -> Vec<SubgraphRow> {
     inputs
         .into_iter()
-        .map(|input| GraphletRow {
+        .map(|input| SubgraphRow {
             id: input.id,
-            kind_label: graphlet_kind_label(input.kind.as_ref()),
-            binding_label: graphlet_binding_label(&input.binding).to_string(),
+            kind_label: subgraph_kind_label(input.kind.as_ref()),
+            binding_label: subgraph_binding_label(&input.binding).to_string(),
             member_count: input.member_count,
-            selectors_label: graphlet_binding_selectors_label(&input.binding),
-            drift_label: graphlet_drift_label(
+            selectors_label: subgraph_binding_selectors_label(&input.binding),
+            drift_label: subgraph_drift_label(
                 &input.binding,
                 input.added_count,
                 input.removed_count,
@@ -596,15 +596,15 @@ pub fn build_link_card(input: LinkCardInput) -> LinkCard {
     }
 }
 
-pub fn build_graphlet_card(input: GraphletCardInput) -> GraphletCard {
-    let drift_tracking = matches!(input.binding, GraphletBinding::Linked { .. });
-    let drift_summary = graphlet_drift_summary(&input.binding, &input.added, &input.removed);
-    GraphletCard {
+pub fn build_subgraph_card(input: SubgraphCardInput) -> SubgraphCard {
+    let drift_tracking = matches!(input.binding, SubgraphBinding::Linked { .. });
+    let drift_summary = subgraph_drift_summary(&input.binding, &input.added, &input.removed);
+    SubgraphCard {
         id: input.id,
-        kind_label: graphlet_kind_label(input.kind.as_ref()),
-        binding_label: graphlet_binding_label(&input.binding).to_string(),
+        kind_label: subgraph_kind_label(input.kind.as_ref()),
+        binding_label: subgraph_binding_label(&input.binding).to_string(),
         members: input.members,
-        selectors_label: graphlet_binding_selectors_label(&input.binding),
+        selectors_label: subgraph_binding_selectors_label(&input.binding),
         family_selectors: input.family_selectors,
         drift_tracking,
         drift_summary,
@@ -687,38 +687,38 @@ pub fn edge_family_label(family: EdgeFamily) -> &'static str {
     }
 }
 
-pub fn graphlet_kind_label(kind: Option<&GraphletKind>) -> String {
+pub fn subgraph_kind_label(kind: Option<&SubgraphKind>) -> String {
     match kind {
-        Some(GraphletKind::Ego { radius }) => format!("Ego r{radius}"),
-        Some(GraphletKind::Corridor) => "Corridor".to_string(),
-        Some(GraphletKind::Component) => "Component".to_string(),
-        Some(GraphletKind::Loop) => "Loop".to_string(),
-        Some(GraphletKind::Frontier) => "Frontier".to_string(),
-        Some(GraphletKind::Facet) => "Facet".to_string(),
-        Some(GraphletKind::Session) => "Session".to_string(),
-        Some(GraphletKind::Bridge) => "Bridge".to_string(),
-        Some(GraphletKind::WorkbenchCorrespondence) => "Workbench".to_string(),
-        None => "Graphlet".to_string(),
+        Some(SubgraphKind::Ego { radius }) => format!("Ego r{radius}"),
+        Some(SubgraphKind::Corridor) => "Corridor".to_string(),
+        Some(SubgraphKind::Component) => "Component".to_string(),
+        Some(SubgraphKind::Loop) => "Loop".to_string(),
+        Some(SubgraphKind::Frontier) => "Frontier".to_string(),
+        Some(SubgraphKind::Facet) => "Facet".to_string(),
+        Some(SubgraphKind::Session) => "Session".to_string(),
+        Some(SubgraphKind::Bridge) => "Bridge".to_string(),
+        Some(SubgraphKind::WorkbenchCorrespondence) => "Workbench".to_string(),
+        None => "Subgraph".to_string(),
     }
 }
 
-pub fn graphlet_binding_label(binding: &GraphletBinding) -> &'static str {
+pub fn subgraph_binding_label(binding: &SubgraphBinding) -> &'static str {
     match binding {
-        GraphletBinding::UnlinkedSession => "Session",
-        GraphletBinding::Linked { .. } => "Linked",
-        GraphletBinding::Branched { .. } => "Branched",
+        SubgraphBinding::UnlinkedSession => "Session",
+        SubgraphBinding::Linked { .. } => "Linked",
+        SubgraphBinding::Branched { .. } => "Branched",
     }
 }
 
-pub fn graphlet_selectors_label(graphlet: &GraphletRef<GraphMemberId>) -> String {
-    graphlet_binding_selectors_label(&graphlet.binding)
+pub fn subgraph_selectors_label(subgraph: &SubgraphRef<GraphMemberId>) -> String {
+    subgraph_binding_selectors_label(&subgraph.binding)
 }
 
-pub fn graphlet_binding_selectors_label(binding: &GraphletBinding) -> String {
+pub fn subgraph_binding_selectors_label(binding: &SubgraphBinding) -> String {
     let selectors = match binding {
-        GraphletBinding::Linked { spec } => &spec.selectors,
-        GraphletBinding::Branched { parent_spec, .. } => &parent_spec.selectors,
-        GraphletBinding::UnlinkedSession => return "all relations".to_string(),
+        SubgraphBinding::Linked { spec } => &spec.selectors,
+        SubgraphBinding::Branched { parent_spec, .. } => &parent_spec.selectors,
+        SubgraphBinding::UnlinkedSession => return "all relations".to_string(),
     };
     if selectors.is_empty() {
         "all relations".to_string()
@@ -1087,28 +1087,28 @@ fn facet_entry(
     }
 }
 
-fn graphlet_drift_label(
-    binding: &GraphletBinding,
+fn subgraph_drift_label(
+    binding: &SubgraphBinding,
     added_count: usize,
     removed_count: usize,
 ) -> String {
     if added_count > 0 || removed_count > 0 {
         format!("+{added_count} -{removed_count}")
-    } else if matches!(binding, GraphletBinding::Linked { .. }) {
+    } else if matches!(binding, SubgraphBinding::Linked { .. }) {
         "clean".to_string()
     } else {
         "manual".to_string()
     }
 }
 
-fn graphlet_drift_summary(
-    binding: &GraphletBinding,
+fn subgraph_drift_summary(
+    binding: &SubgraphBinding,
     added: &[String],
     removed: &[String],
 ) -> String {
     if !added.is_empty() || !removed.is_empty() {
         format!("drift proposal: +{} -{}", added.len(), removed.len())
-    } else if matches!(binding, GraphletBinding::Linked { .. }) {
+    } else if matches!(binding, SubgraphBinding::Linked { .. }) {
         "drift proposal: clean".to_string()
     } else {
         "drift proposal: not tracked".to_string()
@@ -1268,13 +1268,13 @@ mod tests {
     }
 
     #[test]
-    fn build_graphlet_card_derives_drift_and_selector_labels() {
-        let card = build_graphlet_card(GraphletCardInput {
+    fn build_subgraph_card_derives_drift_and_selector_labels() {
+        let card = build_subgraph_card(SubgraphCardInput {
             id: 7,
-            kind: Some(GraphletKind::Facet),
-            binding: GraphletBinding::Linked {
-                spec: forme::GraphletSpec {
-                    kind: GraphletKind::Facet,
+            kind: Some(SubgraphKind::Facet),
+            binding: SubgraphBinding::Linked {
+                spec: forme::SubgraphSpec {
+                    kind: SubgraphKind::Facet,
                     anchors: Vec::new(),
                     primary_anchor: None,
                     selectors: vec!["semantic".to_string()],

@@ -1,5 +1,7 @@
 # Graph query layer plan (RDF / SPARQL / Oxigraph)
 
+*Written before the 2026-09-05 retirement of graphlet (TERMINOLOGY.md): read graphlet as subgraph. Identifiers such as GraphletId, GraphletRef, and SessionGraphlets are now SubgraphId, SubgraphRef, and SessionSubgraphs, and the graphlets crate is crates/graph/subgraph (code renamed 2026-09-12).*
+
 Status: **slices 1+2 shipped and verified.** SPARQL query over the focused graph,
 kernel-sourced and one-way (the kernel stays truth; this is a derived, read-only
 view for interop and exploration). A residual backlog follows; none of it blocks.
