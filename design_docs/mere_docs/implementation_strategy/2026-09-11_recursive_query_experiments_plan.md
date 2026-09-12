@@ -270,11 +270,21 @@ helper is being reworked anyway. 3 is a substrate decision, not a bug fix.
 - 2026-09-11 (test). `source_time_canvas_scrubs_every_canvas_arrangement_without_rewriting_live_truth`
   in mere-canvas is flaky (about one run in five) because it compares two
   snapshots that embed wall-clock seconds. Unchanged.
-- 2026-09-12 (Q1 implementation). Round-trip gap found while writing the
-  parity test: `snapshot/from.rs` ~249-259 restores only the `UrlPath` and
-  `Domain` containment sub-kinds and skips the rest, while `to.rs` persists
-  all seven, so a `CollectionMember` containment edge round-trips to nothing.
-  Unchanged; the parity test checks only surviving edges. Needs its own fix.
+- 2026-09-12 (Q1 implementation, since fixed). Round-trip gap found while
+  writing the parity test: `snapshot/from.rs` restored only the `UrlPath` and
+  `Domain` containment sub-kinds and skipped the rest behind a `_ => continue`
+  catch-all, while `to.rs` persists all seven with no durability filter. The
+  five authored sub-kinds were therefore dropped on load. `CollectionMember`
+  is the one with live writers (`ports/graphshell/src/product.rs` transfer of
+  members, plus fixtures), so a collection's membership edges did not survive
+  save/load. The two it did restore are precisely the two that
+  `rebuild_derived_containment_relations` re-derives at the end of the same
+  load, so the branch preserved only what it did not need to. Fixed the same
+  day: the match is exhaustive, so a new variant is now a compile error.
+  Contrast the arrangement branch, whose skips are correct: its writer filters
+  on `durability() == Durable` first, so the session-scoped sub-kinds are never
+  persisted and the loader's skip is symmetric. Containment has no durability
+  concept.
 
 ## Progress
 
@@ -321,3 +331,9 @@ helper is being reworked anyway. 3 is a substrate decision, not a bug fix.
   open-predicate edges are now visible rows. The predicted canvas, journal
   fingerprint, glossary, linked-data, and classifier fallout did not occur.
   Roster gained the `Predicate` label for the new kind.
+- 2026-09-12. Fixed the containment round-trip bug found during Q1. The
+  snapshot loader now restores all seven containment sub-kinds and matches
+  exhaustively. Two tests: the five authored sub-kinds survive a round trip
+  (it fails against the old loader), and the derived `UrlPath` relation is
+  rebuilt child-to-parent on load, which pins why the derived pair is not
+  carried across verbatim.

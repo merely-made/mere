@@ -248,16 +248,37 @@ impl Graph {
                 }
                 if let Some(containment) = &pedge.containment {
                     for sub_kind in &containment.sub_kinds {
-                        let assertion = match sub_kind {
-                            PersistedContainmentSubKind::UrlPath => EdgeAssertion::Containment {
-                                sub_kind: ContainmentSubKind::UrlPath,
+                        // Every persisted sub-kind is restored. `UrlPath` and
+                        // `Domain` are re-derived below by
+                        // `rebuild_derived_containment_relations`, but the
+                        // authored ones exist only here: dropping any of them
+                        // loses user data. Matched exhaustively so a new
+                        // variant is a compile error rather than a silent
+                        // omission.
+                        let sub_kind = match sub_kind {
+                            PersistedContainmentSubKind::UrlPath => ContainmentSubKind::UrlPath,
+                            PersistedContainmentSubKind::Domain => ContainmentSubKind::Domain,
+                            PersistedContainmentSubKind::FileSystem => {
+                                ContainmentSubKind::FileSystem
                             },
-                            PersistedContainmentSubKind::Domain => EdgeAssertion::Containment {
-                                sub_kind: ContainmentSubKind::Domain,
+                            PersistedContainmentSubKind::UserFolder => {
+                                ContainmentSubKind::UserFolder
                             },
-                            _ => continue,
+                            PersistedContainmentSubKind::ClipSource => {
+                                ContainmentSubKind::ClipSource
+                            },
+                            PersistedContainmentSubKind::NotebookSection => {
+                                ContainmentSubKind::NotebookSection
+                            },
+                            PersistedContainmentSubKind::CollectionMember => {
+                                ContainmentSubKind::CollectionMember
+                            },
                         };
-                        let _ = graph.assert_relation(from, to, assertion);
+                        let _ = graph.assert_relation(
+                            from,
+                            to,
+                            EdgeAssertion::Containment { sub_kind },
+                        );
                     }
                 }
                 if let Some(imported) = &pedge.imported {
