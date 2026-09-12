@@ -744,3 +744,82 @@ fn test_snapshot_roundtrips_open_coupling_response() {
     );
     assert_eq!(c.response.predicate(), Some(iri.as_str()));
 }
+
+#[test]
+fn every_authored_containment_sub_kind_survives_snapshot_roundtrip() {
+    // The writer persists all seven containment sub-kinds; the loader once
+    // restored only UrlPath and Domain and dropped the rest, so an authored
+    // CollectionMember edge round-tripped to nothing.
+    //
+    // UrlPath and Domain are the two DERIVED sub-kinds: the loader ends with
+    // `rebuild_derived_containment_relations`, which retracts them graph-wide
+    // and re-derives them child-to-parent from the URLs. They are therefore
+    // not restored verbatim, and are covered separately below. The other five
+    // are authored and exist only in the snapshot, so dropping any of them
+    // loses user data.
+    let authored = [
+        ContainmentSubKind::FileSystem,
+        ContainmentSubKind::UserFolder,
+        ContainmentSubKind::ClipSource,
+        ContainmentSubKind::NotebookSection,
+        ContainmentSubKind::CollectionMember,
+    ];
+
+    let mut graph = Graph::new();
+    let parent = graph.add_node("https://box.test/".to_string(), Point2D::new(0.0, 0.0));
+    let child = graph.add_node("https://box.test/item".to_string(), Point2D::new(0.0, 0.0));
+    for sub_kind in authored {
+        let _ = graph.assert_relation(parent, child, EdgeAssertion::Containment { sub_kind });
+    }
+
+    let restored = Graph::from_snapshot(&graph.to_snapshot());
+
+    let (rparent, _) = restored.get_node_by_url("https://box.test/").unwrap();
+    let (rchild, _) = restored.get_node_by_url("https://box.test/item").unwrap();
+    let key = restored
+        .find_edge_key(rparent, rchild)
+        .expect("the authored containment edge survives the round trip");
+    let restored_sub_kinds = restored
+        .get_edge(key)
+        .expect("payload survives")
+        .containment_data()
+        .expect("the containment sidecar survives")
+        .sub_kinds
+        .clone();
+
+    for sub_kind in authored {
+        assert!(
+            restored_sub_kinds.contains(&sub_kind),
+            "{sub_kind:?} was dropped by the snapshot loader"
+        );
+    }
+}
+
+#[test]
+fn derived_containment_is_rebuilt_child_to_parent_on_load() {
+    // The companion to the authored case: UrlPath is not carried across as
+    // written but re-derived from the URLs, in the canonical child-to-parent
+    // direction, by the rebuild at the end of the load.
+    let mut graph = Graph::new();
+    let _parent = graph.add_node("https://box.test/".to_string(), Point2D::new(0.0, 0.0));
+    let _child = graph.add_node("https://box.test/item".to_string(), Point2D::new(0.0, 0.0));
+
+    let restored = Graph::from_snapshot(&graph.to_snapshot());
+
+    let (rparent, _) = restored.get_node_by_url("https://box.test/").unwrap();
+    let (rchild, _) = restored.get_node_by_url("https://box.test/item").unwrap();
+    let key = restored
+        .find_edge_key(rchild, rparent)
+        .expect("the derived containment edge runs child to parent");
+    let sub_kinds = restored
+        .get_edge(key)
+        .expect("payload exists")
+        .containment_data()
+        .expect("the derived containment sidecar exists")
+        .sub_kinds
+        .clone();
+    assert!(
+        sub_kinds.contains(&ContainmentSubKind::UrlPath),
+        "the URL-path parent relation is re-derived on load, got {sub_kinds:?}"
+    );
+}
