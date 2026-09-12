@@ -29,28 +29,30 @@ use super::snapshot::containment_parent_url;
 use super::{ArrangementEdgeView, ContainmentEdgeView, Graph, RelationView, SemanticEdgeView};
 
 /// Expand one pair-local edge bucket into its [`RelationView`] rows: one
-/// per recognized semantic statement, one for traversal presence, and one
-/// per sub-kind in each of the remaining families. Shared by every
-/// relation iterator so per-node and whole-graph reads agree row for row.
+/// per semantic statement (`Semantic(sub_kind)` when recognized, else
+/// `OpenPredicate`), one for traversal-sidecar presence, and one per
+/// sub-kind in each of the remaining families. Shared by every relation
+/// iterator so per-node and whole-graph reads agree row for row.
+///
+/// Row families agree with [`EdgePayload::families`] for every edge
+/// shape (Q1 ruling, 2026-09-12; pinned by `row_family_parity_tests`).
 fn relation_rows(from: NodeKey, to: NodeKey, payload: &EdgePayload) -> Vec<RelationView> {
     use super::edge_taxonomy::RelationKind;
     let mut out: Vec<RelationView> = Vec::new();
     for statement in payload.semantic_statements() {
-        if let Some(sub_kind) = statement.recognized_sub_kind {
-            out.push(RelationView {
-                from,
-                to,
-                kind: RelationKind::Semantic(sub_kind),
-            });
-        }
+        let kind = match statement.recognized_sub_kind {
+            Some(sub_kind) => RelationKind::Semantic(sub_kind),
+            None => RelationKind::OpenPredicate,
+        };
+        out.push(RelationView { from, to, kind });
     }
-    // Traversal is event-shaped, no sub-kind. Presence of
-    // any traversal data (events or metrics) yields one
-    // row. Family-aware view callers reach for the
-    // typed payload for actual events.
-    if let Some(traversal) = payload.traversal_data()
-        && (!traversal.traversals.is_empty() || traversal.metrics.total_navigations > 0)
-    {
+    // Traversal is event-shaped, no sub-kind. Presence of the
+    // traversal sidecar yields one row, matching
+    // `has_family(Traversal)`; an event-free sidecar (reachable
+    // only by deserializing such a snapshot) still counts.
+    // Family-aware view callers reach for the typed payload for
+    // actual events.
+    if payload.traversal_data().is_some() {
         out.push(RelationView {
             from,
             to,
@@ -629,18 +631,20 @@ impl Graph {
         order
     }
 
-    /// Whether the edge between `a` and `b` (either direction) matches any of `selectors`
-    /// (a relation family or sub-kind). Used by the selector-projected derivation walk.
+    /// Whether any edge between `a` and `b` (either direction, every
+    /// parallel edge) matches any of `selectors` (a relation family or
+    /// sub-kind). Used by the selector-projected derivation walk. Scans
+    /// the whole pair via [`Self::edges_between_undirected`] so an
+    /// antiparallel pair with different families (a->b Semantic, b->a
+    /// Traversal) is crossed from either end (Q2 ruling, 2026-09-12).
     fn edge_matches_selectors(
         &self,
         a: NodeKey,
         b: NodeKey,
         selectors: &[super::RelationSelector],
     ) -> bool {
-        self.find_edge_key(a, b)
-            .or_else(|| self.find_edge_key(b, a))
-            .and_then(|k| self.inner.edge(k))
-            .is_some_and(|payload| selectors.iter().any(|&s| payload.has_relation(s)))
+        self.edges_between_undirected(a, b)
+            .any(|(_, payload)| selectors.iter().any(|&s| payload.has_relation(s)))
     }
 
     /// Strongly connected components in the directed graph.
@@ -764,5 +768,216 @@ mod derivation_tests {
             1,
             "Containment projection: just A (no Containment edge from A)"
         );
+    }
+
+    /// Q2 (ruled 2026-09-12): an antiparallel pair carrying different
+    /// families on each arc (n1->n2 Semantic hyperlink, n2->n1 Traversal,
+    /// the shape `tests/snapshot_basic.rs::test_snapshot_preserves_edge_types`
+    /// pins as two separate edges) is crossed by a selector-projected walk
+    /// from either end, because `edge_matches_selectors` scans the whole
+    /// pair rather than the first arc `find_edge_key` happens to return.
+    #[test]
+    fn antiparallel_pair_is_crossed_from_either_end() {
+        use crate::graph::{EdgeFamily, NavigationTrigger, RelationSelector};
+        let mut g = Graph::new();
+        let n1 = g.add_node("https://a".to_string(), Point2D::new(0.0, 0.0));
+        let n2 = g.add_node("https://b".to_string(), Point2D::new(1.0, 0.0));
+        g.assert_relation(
+            n1,
+            n2,
+            EdgeAssertion::Semantic {
+                sub_kind: SemanticSubKind::Hyperlink,
+                label: None,
+                decay_progress: None,
+            },
+        );
+        assert!(g.append_traversal(n2, n1, NavigationTrigger::LinkClick, Some(1_000_000)));
+        assert_eq!(g.edge_count(), 2, "two arcs, one per direction");
+        let pair: Vec<_> = g.edges_between_undirected(n1, n2).collect();
+        assert_eq!(pair.len(), 2, "the pair primitive sees both arcs");
+        assert_eq!(
+            g.edges_between_undirected(n2, n1).count(),
+            2,
+            "and from the other end"
+        );
+        let id1 = g.get_node(n1).unwrap().id;
+        let id2 = g.get_node(n2).unwrap().id;
+
+        for family in [EdgeFamily::Traversal, EdgeFamily::Semantic] {
+            let sel = [RelationSelector::Family(family)];
+            for (seed, other) in [(id1, id2), (id2, id1)] {
+                let members = g.component_members(seed, &sel);
+                assert!(
+                    members.contains(&seed) && members.contains(&other),
+                    "{family:?} projection seeded at {seed} must cross the pair; got {members:?}"
+                );
+            }
+        }
+        // A family on neither arc still excludes.
+        let sel = [RelationSelector::Family(EdgeFamily::Containment)];
+        assert_eq!(g.component_members(id1, &sel), vec![id1]);
+        assert_eq!(g.component_members(id2, &sel), vec![id2]);
+    }
+}
+
+/// Q1 (ruled 2026-09-12): `has_family` / `families()` and the row set
+/// from `relation_rows` agree for every family on every edge shape,
+/// including the two that used to diverge (open-predicate-only Semantic,
+/// event-free Traversal sidecar).
+#[cfg(test)]
+mod row_family_parity_tests {
+    use super::*;
+    use crate::graph::{
+        ArrangementSubKind, EdgeFamily, ImportedSubKind, NavigationTrigger, ProvenanceSubKind,
+        RelationKind, SemanticSubKind,
+    };
+    use euclid::default::Point2D;
+    use std::collections::BTreeSet;
+
+    fn row_families(
+        g: &Graph,
+    ) -> Vec<(NodeKey, NodeKey, BTreeSet<EdgeFamily>, BTreeSet<EdgeFamily>)> {
+        g.inner
+            .inner()
+            .edge_references()
+            .map(|e| {
+                let rows = relation_rows(e.source(), e.target(), e.weight());
+                let from_rows: BTreeSet<EdgeFamily> =
+                    rows.iter().map(|r| r.kind.family()).collect();
+                (e.source(), e.target(), e.weight().families(), from_rows)
+            })
+            .collect()
+    }
+
+    #[test]
+    fn families_equal_row_families_for_every_edge_shape() {
+        let mut g = Graph::new();
+        let mut node = |g: &mut Graph, i: usize| {
+            g.add_node(format!("https://n{i}"), Point2D::new(i as f32, 0.0))
+        };
+        let hub = node(&mut g, 0);
+        let open = node(&mut g, 1);
+        let hyper = node(&mut g, 2);
+        let trav = node(&mut g, 3);
+        let cont = node(&mut g, 4);
+        let arr = node(&mut g, 5);
+        let imp = node(&mut g, 6);
+        let prov = node(&mut g, 7);
+        let mixed = node(&mut g, 8);
+        let sem = || EdgeAssertion::Semantic {
+            sub_kind: SemanticSubKind::Hyperlink,
+            label: None,
+            decay_progress: None,
+        };
+
+        // Open predicate only: Semantic to `has_family`, formerly no rows.
+        let open_key = g
+            .assert_semantic_predicate(hub, open, "https://schema.org/citation".to_string())
+            .expect("open-predicate edge");
+        g.assert_relation(hub, hyper, sem());
+        assert!(g.append_traversal(hub, trav, NavigationTrigger::LinkClick, Some(1)));
+        g.assert_relation(
+            hub,
+            cont,
+            EdgeAssertion::Containment {
+                sub_kind: ContainmentSubKind::CollectionMember,
+            },
+        );
+        g.assert_relation(
+            hub,
+            arr,
+            EdgeAssertion::Arrangement {
+                sub_kind: ArrangementSubKind::FrameMember,
+            },
+        );
+        g.assert_relation(
+            hub,
+            imp,
+            EdgeAssertion::Imported {
+                sub_kind: ImportedSubKind::BookmarkFolder,
+            },
+        );
+        g.assert_relation(
+            hub,
+            prov,
+            EdgeAssertion::Provenance {
+                sub_kind: ProvenanceSubKind::ClippedFrom,
+            },
+        );
+        // Mixed: recognized statement + open statement + traversal on one edge.
+        g.assert_relation(hub, mixed, sem());
+        g.assert_semantic_predicate(hub, mixed, "https://example.org/related".to_string());
+        assert!(g.append_traversal(hub, mixed, NavigationTrigger::Back, Some(2)));
+
+        // The open-predicate edge yields exactly one OpenPredicate row.
+        let open_rows = relation_rows(hub, open, g.get_edge(open_key).unwrap());
+        assert_eq!(
+            open_rows.iter().map(|r| r.kind).collect::<Vec<_>>(),
+            vec![RelationKind::OpenPredicate]
+        );
+
+        // Live graph: every edge agrees.
+        for (from, to, families, from_rows) in row_families(&g) {
+            assert_eq!(families, from_rows, "live edge {from:?}->{to:?}");
+        }
+
+        // Event-free Traversal sidecar: unreachable from the writers
+        // (`push_traversal` always records metrics), so reach it through
+        // a snapshot whose traversal record has no events and zero
+        // metrics. `has_family(Traversal)` is sidecar presence, and the
+        // row must follow it.
+        let mut snapshot = g.to_snapshot();
+        let mut stripped = 0;
+        for edge in &mut snapshot.edges {
+            if let Some(t) = edge.traversal.as_mut() {
+                t.traversals.clear();
+                t.metrics = Default::default();
+                stripped += 1;
+            }
+        }
+        assert_eq!(stripped, 2, "the traversal-only edge and the mixed edge");
+        let restored = Graph::from_snapshot(&snapshot);
+        // Note: the restored graph is not asserted edge-for-edge equal to
+        // the live one. `snapshot/from.rs` only restores `UrlPath` /
+        // `Domain` containment sub-kinds, so the CollectionMember edge
+        // does not come back; that gap predates this test and is not
+        // what it pins. Parity is checked on every edge that survives.
+        let mut saw_event_free_traversal = 0;
+        let mut saw_open_predicate = 0;
+        for (from, to, families, from_rows) in row_families(&restored) {
+            assert_eq!(families, from_rows, "restored edge {from:?}->{to:?}");
+            let payload = restored
+                .find_edge_key(from, to)
+                .and_then(|k| restored.get_edge(k))
+                .unwrap();
+            if families.contains(&EdgeFamily::Traversal) {
+                assert!(payload.traversals().is_empty());
+                assert_eq!(payload.metrics().total_navigations, 0);
+                saw_event_free_traversal += 1;
+            }
+            saw_open_predicate += relation_rows(from, to, payload)
+                .iter()
+                .filter(|r| r.kind == RelationKind::OpenPredicate)
+                .count();
+        }
+        assert_eq!(
+            saw_event_free_traversal, 2,
+            "traversal-only and mixed edges"
+        );
+        assert_eq!(saw_open_predicate, 2, "open-predicate-only and mixed edges");
+    }
+
+    #[test]
+    fn open_predicate_tag_round_trips_and_keeps_the_semantic_family_byte() {
+        let tag = RelationKind::OpenPredicate.tag();
+        assert_eq!(
+            tag >> 24,
+            RelationKind::Semantic(SemanticSubKind::Hyperlink).tag() >> 24
+        );
+        assert_eq!(
+            RelationKind::from_tag(tag),
+            Some(RelationKind::OpenPredicate)
+        );
+        assert_eq!(RelationKind::OpenPredicate.family(), EdgeFamily::Semantic);
     }
 }

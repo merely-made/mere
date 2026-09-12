@@ -1,6 +1,6 @@
 # Recursive query experiments plan
 
-**Status:** E1–E3 merged to main 2026-09-12 (`794a96bd`, `7ba1df59`, `ef64c1cc`); ascent dev-dependency and bench removed after recording the numbers; Q1/Q2 scoped below, awaiting Mark's ruling; the `graphlets` → `subgraph` crate rename landed 2026-09-12 (see Progress).
+**Status:** E1–E3 merged to main 2026-09-12 (`794a96bd`, `7ba1df59`, `ef64c1cc`); ascent dev-dependency and bench removed after recording the numbers; Q1/Q2 landed 2026-09-12 (`RelationKind::OpenPredicate`, Traversal row on presence, `edges_between_undirected` pair scan); the `graphlets` → `subgraph` crate rename landed 2026-09-12 (see Progress).
 
 ## Why
 
@@ -78,6 +78,35 @@ Done-conditions:
   since that load is the fair-comparison term.
 - Findings record the numbers and a recommendation: rules layer above the
   kernel is worth a plan, or not.
+
+### Q1/Q2 — ruled 2026-09-12: widen the rows, scan the pair
+
+Mark ruled for Q1 option 2 and Q2 option 1 with the pair primitive from Q2
+option 2 folded in.
+
+Done-conditions:
+- `relation_rows` emits one Semantic row per statement. Statements with a
+  recognized sub-kind keep `RelationKind::Semantic(sub_kind)`; statements
+  without one emit a new open-predicate row kind whose `family()` is
+  Semantic. The kind stays `Copy`; the predicate IRI is reached through the
+  typed payload, not carried on the row.
+- `relation_rows` emits a Traversal row whenever the traversal sidecar is
+  present, matching `has_family(Traversal)`.
+- `has_family` and `relation_rows` agree for all six families, pinned by a
+  test that builds every divergent shape (open-predicate-only Semantic,
+  event-free Traversal via a deserialized snapshot) and asserts
+  `families()` equals the set of row families.
+- A kernel pair primitive returns every edge between two nodes in either
+  direction, and `edge_matches_selectors` matches if any of those payloads
+  matches. A test mirroring `tests/snapshot_basic.rs` ~352-388 (a→b Semantic,
+  b→a Traversal) shows a Traversal-selected component walk crossing the pair
+  from either end.
+- Journal fingerprints, capture table stats, canvas relation-count
+  assertions, and the subgraph classifier are updated to the new row set,
+  with each changed assertion explained in the commit body. No
+  persisted-format change.
+- Workspace check green; kernel, canvas, subgraph, forme, linked-data,
+  glossary, and cartography tests green.
 
 ## Scoped: two kernel selector-semantics questions (2026-09-12)
 
@@ -241,6 +270,11 @@ helper is being reworked anyway. 3 is a substrate decision, not a bug fix.
 - 2026-09-11 (test). `source_time_canvas_scrubs_every_canvas_arrangement_without_rewriting_live_truth`
   in mere-canvas is flaky (about one run in five) because it compares two
   snapshots that embed wall-clock seconds. Unchanged.
+- 2026-09-12 (Q1 implementation). Round-trip gap found while writing the
+  parity test: `snapshot/from.rs` ~249-259 restores only the `UrlPath` and
+  `Domain` containment sub-kinds and skips the rest, while `to.rs` persists
+  all seven, so a `CollectionMember` containment edge round-trips to nothing.
+  Unchanged; the parity test checks only surviving edges. Needs its own fix.
 
 ## Progress
 
@@ -275,3 +309,15 @@ helper is being reworked anyway. 3 is a substrate decision, not a bug fix.
   struck and its open item closed, the subgraph design set rewritten, the
   2026-06-13 derivation design doc moved to its new name, and the
   pre-retirement briefs marked rather than rewritten.
+- 2026-09-12. Q1 and Q2 landed. `RelationKind::OpenPredicate` (family
+  Semantic, tag keeps the Semantic family byte with a sentinel sub-ordinal)
+  gives every statement a row; the Traversal row now follows sidecar
+  presence; `Graph::edges_between_undirected(a, b)` yields every edge in
+  either direction and `edge_matches_selectors` matches on any of them. Three
+  kernel tests added (antiparallel pair crossed from either end; families()
+  equals row families for every edge shape, live and after a snapshot round
+  trip with traversal events stripped; open-predicate tag round trip). One
+  assertion changed: `capture.rs` table-stats count 2 → 4, since two replay
+  open-predicate edges are now visible rows. The predicted canvas, journal
+  fingerprint, glossary, linked-data, and classifier fallout did not occur.
+  Roster gained the `Predicate` label for the new kind.

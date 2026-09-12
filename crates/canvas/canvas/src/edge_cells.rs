@@ -135,6 +135,7 @@ pub(crate) fn visible_edge_cell_segments(
 pub(crate) fn selector_for_relation_kind(kind: RelationKind) -> RelationSelector {
     match kind {
         RelationKind::Semantic(sub) => RelationSelector::Semantic(sub),
+        RelationKind::OpenPredicate => RelationSelector::Family(EdgeFamily::Semantic),
         RelationKind::Traversal => RelationSelector::Family(EdgeFamily::Traversal),
         RelationKind::Containment(sub) => RelationSelector::Containment(sub),
         RelationKind::Arrangement(sub) => RelationSelector::Arrangement(sub),

@@ -668,6 +668,7 @@ pub fn relation_label(graph: &Graph, from: NodeKey, to: NodeKey) -> Option<Strin
 pub fn relation_selector(kind: RelationKind) -> RelationSelector {
     match kind {
         RelationKind::Semantic(sub) => RelationSelector::Semantic(sub),
+        RelationKind::OpenPredicate => RelationSelector::Family(EdgeFamily::Semantic),
         RelationKind::Traversal => RelationSelector::Family(EdgeFamily::Traversal),
         RelationKind::Containment(sub) => RelationSelector::Containment(sub),
         RelationKind::Arrangement(sub) => RelationSelector::Arrangement(sub),
@@ -780,6 +781,7 @@ pub fn relation_kind_label(kind: RelationKind) -> &'static str {
     use SemanticSubKind::*;
     match kind {
         RelationKind::Traversal => "Traversal",
+        RelationKind::OpenPredicate => "Predicate",
         RelationKind::Semantic(Hyperlink) => "Hyperlink",
         RelationKind::Semantic(UserGrouped) => "Grouped",
         RelationKind::Semantic(AgentDerived) => "Agent",
