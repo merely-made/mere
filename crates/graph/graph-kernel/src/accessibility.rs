@@ -80,7 +80,7 @@ pub enum SurfaceId {
     InspectorPane,
     /// The steward pane: live async operations and actionable actor/job state.
     StewardPane,
-    /// The gloss pane: outline, swatch, and graphlet navigation surface.
+    /// The gloss pane: outline, swatch, and subgraph navigation surface.
     GlossPane,
     /// The apparatus pane: system diagnostics, settings, probes, and a11y status.
     ApparatusPane,
@@ -225,7 +225,7 @@ pub fn descriptor_for(surface: SurfaceId) -> AccessibilityDescriptor {
             role: Role::TabPanel,
             label: "Tile pane",
             description: Some(
-                "Pane showing the active tiles of a graphlet. \
+                "Pane showing the active tiles of a subgraph. \
                  Right-click for tile actions.",
             ),
             keyboard_shortcut: None,
@@ -274,7 +274,7 @@ pub fn descriptor_for(surface: SurfaceId) -> AccessibilityDescriptor {
         SurfaceId::GlossPane => AccessibilityDescriptor {
             role: Role::Navigation,
             label: "Gloss pane",
-            description: Some("Navigator surface for outlines, swatches, and graphlets."),
+            description: Some("Navigator surface for outlines, swatches, and subgraphs."),
             keyboard_shortcut: Some("Ctrl+G"),
         },
         SurfaceId::ApparatusPane => AccessibilityDescriptor {

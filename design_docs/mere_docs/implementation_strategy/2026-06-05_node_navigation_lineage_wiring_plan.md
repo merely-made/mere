@@ -1,5 +1,7 @@
 # Node navigation + lineage — wiring plan (live meerkat/orrery/kernel path)
 
+*Written before the 2026-09-05 retirement of graphlet (TERMINOLOGY.md): read graphlet as subgraph. Identifiers such as GraphletId, GraphletRef, and SessionGraphlets are now SubgraphId, SubgraphRef, and SessionSubgraphs, and the graphlets crate is crates/graph/subgraph (code renamed 2026-09-12).*
+
 **Date**: 2026-06-05
 **Status**: Implementation plan — pre-build
 **Scope**: Drive the already-built per-node navigation-lineage substrate from the live navigation path, so navigating the focused tile changes *that node* in place (within-node history), an explicit gesture mints a new node (a new browsing surface) with a typed lineage edge back to its origin, and the two histories (within-node back/forward, across-node previous/next) become real. This is a **wiring + finish** job: the model is decided and the substrate exists; the live path never drives it.

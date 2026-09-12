@@ -109,7 +109,7 @@ fn open_as_new_node_mints_distinct_node_with_navigated_from_edge() {
         "the minted node carries its opening page as its first visit",
     );
 
-    // No origin → an unlinked node (a graphlet candidate), no extra edge.
+    // No origin → an unlinked node (a subgraph candidate), no extra edge.
     let edges_now = canvas.graph().relations().count();
     let orphan = canvas.open_member_as_new_node(None, "https://orphan.example");
     assert_ne!(orphan, new_id);

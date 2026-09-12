@@ -23,6 +23,8 @@
 
 # Verse Distributed Index Protocol (VDIP) v0.1
 
+*Note (2026-09-12): "graphlet" in this brief is the donor VDIP protocol's own term for a shareable card subset. It is not Mere's retired graphlet (now subgraph, TERMINOLOGY.md) and is left as written.*
+
 > Archived on 2026-04-17. Superseded by [2026-04-17_verse_graph_contribution_protocol_v0_1.md](2026-04-17_verse_graph_contribution_protocol_v0_1.md). This file was moved from active Verse technical architecture docs into the archive checkpoint after VGCP replaced it as the active protocol authority.
 
 **Status:** Draft v0.1

@@ -4,21 +4,21 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! Tests for the per-session graphlet index (`lib.rs`). Split into a
+//! Tests for the per-session subgraph index (`lib.rs`). Split into a
 //! sibling file per the 600-LOC ceiling.
 
 use crate::*;
-use forme::{GraphletBinding, GraphletKind, GraphletSpec};
+use forme::{SubgraphBinding, SubgraphKind, SubgraphSpec};
 use kernel::graph::fixtures::GraphFixtures;
 use kernel::graph::{EdgeFamily, Graph};
 
 #[test]
-fn default_session_seeds_one_graphlet() {
-    let g = SessionGraphlets::new().with_default_session();
-    assert_eq!(g.graphlets().len(), 1);
+fn default_session_seeds_one_subgraph() {
+    let g = SessionSubgraphs::new().with_default_session();
+    assert_eq!(g.subgraphs().len(), 1);
     assert!(matches!(
-        g.graphlets()[0].binding,
-        GraphletBinding::UnlinkedSession
+        g.subgraphs()[0].binding,
+        SubgraphBinding::UnlinkedSession
     ));
 }
 
@@ -26,9 +26,9 @@ fn default_session_seeds_one_graphlet() {
 fn record_session_freezes_the_selection_with_its_kind() {
     let a = uuid::Uuid::from_u128(1);
     let b = uuid::Uuid::from_u128(2);
-    let mut idx = SessionGraphlets::new();
-    let id = idx.record_session(GraphletKind::Corridor, vec![a, b]);
-    let g = idx.get(id).expect("the session graphlet exists");
+    let mut idx = SessionSubgraphs::new();
+    let id = idx.record_session(SubgraphKind::Corridor, vec![a, b]);
+    let g = idx.get(id).expect("the session subgraph exists");
     assert_eq!(
         g.anchors,
         vec![a, b],
@@ -36,35 +36,35 @@ fn record_session_freezes_the_selection_with_its_kind() {
     );
     assert_eq!(
         g.kind,
-        Some(GraphletKind::Corridor),
+        Some(SubgraphKind::Corridor),
         "tagged with the classified kind"
     );
     assert!(
-        matches!(g.binding, GraphletBinding::UnlinkedSession),
-        "a frozen Session graphlet, not a derived one"
+        matches!(g.binding, SubgraphBinding::UnlinkedSession),
+        "a frozen Session subgraph, not a derived one"
     );
 }
 
 #[test]
-fn record_branch_mints_a_branched_graphlet_anchored_on_the_node() {
+fn record_branch_mints_a_branched_subgraph_anchored_on_the_node() {
     let anchor = uuid::Uuid::from_u128(0x42);
-    let mut g = SessionGraphlets::new().with_default_session();
+    let mut g = SessionSubgraphs::new().with_default_session();
     let id = g.record_branch(anchor, default_spec_for(anchor));
 
-    let branch = g.get(id).expect("the branch graphlet exists");
+    let branch = g.get(id).expect("the branch subgraph exists");
     assert_eq!(branch.primary_anchor, Some(anchor));
     match &branch.binding {
-        GraphletBinding::Branched { reason, .. } => assert_eq!(reason, "tearout-branch"),
+        SubgraphBinding::Branched { reason, .. } => assert_eq!(reason, "tearout-branch"),
         other => panic!("expected a Branched binding, got {other:?}"),
     }
-    // It is distinct from the default session graphlet.
-    assert_eq!(g.graphlets().len(), 2);
+    // It is distinct from the default session subgraph.
+    assert_eq!(g.subgraphs().len(), 2);
 }
 
 #[test]
 fn add_member_grows_the_roster_and_dedups() {
     let anchor = uuid::Uuid::from_u128(0x42);
-    let mut g = SessionGraphlets::new().with_default_session();
+    let mut g = SessionSubgraphs::new().with_default_session();
     let id = g.record_branch(anchor, default_spec_for(anchor));
     assert!(
         g.get(id).unwrap().anchors.contains(&anchor),
@@ -83,7 +83,7 @@ fn add_member_grows_the_roster_and_dedups() {
 }
 
 #[test]
-fn linked_component_graphlet_derives_and_reconciles_on_drift() {
+fn linked_component_subgraph_derives_and_reconciles_on_drift() {
     use euclid::default::Point2D;
     use kernel::graph::{EdgeAssertion, SemanticSubKind};
     let mut graph = Graph::new();
@@ -105,10 +105,10 @@ fn linked_component_graphlet_derives_and_reconciles_on_drift() {
     let a_id = graph.get_node(a).unwrap().id;
     let c_id = graph.get_node(c).unwrap().id;
 
-    // A Linked Component graphlet seeded on A derives {A, B}.
-    let mut idx = SessionGraphlets::new();
-    let spec = GraphletSpec {
-        kind: GraphletKind::Component,
+    // A Linked Component subgraph seeded on A derives {A, B}.
+    let mut idx = SessionSubgraphs::new();
+    let spec = SubgraphSpec {
+        kind: SubgraphKind::Component,
         anchors: vec![a_id.to_string()],
         primary_anchor: Some(a_id.to_string()),
         selectors: Vec::new(),
@@ -137,7 +137,7 @@ fn linked_component_graphlet_derives_and_reconciles_on_drift() {
 }
 
 #[test]
-fn linked_ego_graphlet_is_radius_bounded() {
+fn linked_ego_subgraph_is_radius_bounded() {
     use euclid::default::Point2D;
     use kernel::graph::{EdgeAssertion, SemanticSubKind};
     let mut graph = Graph::new();
@@ -159,9 +159,9 @@ fn linked_ego_graphlet_is_radius_bounded() {
     link(&mut graph, b, c); // A–B–C chain
     let a_id = graph.get_node(a).unwrap().id;
 
-    let mut idx = SessionGraphlets::new();
-    let spec = GraphletSpec {
-        kind: GraphletKind::Ego { radius: 1 },
+    let mut idx = SessionSubgraphs::new();
+    let spec = SubgraphSpec {
+        kind: SubgraphKind::Ego { radius: 1 },
         anchors: vec![a_id.to_string()],
         primary_anchor: Some(a_id.to_string()),
         selectors: Vec::new(),
@@ -196,15 +196,15 @@ fn reconcile_all_updates_linked_rosters_on_drift() {
     link(&mut graph, a, b); // A–B; C isolated
     let a_id = graph.get_node(a).unwrap().id;
 
-    let mut idx = SessionGraphlets::new();
-    let spec = GraphletSpec {
-        kind: GraphletKind::Component,
+    let mut idx = SessionSubgraphs::new();
+    let spec = SubgraphSpec {
+        kind: SubgraphKind::Component,
         anchors: vec![a_id.to_string()],
         primary_anchor: Some(a_id.to_string()),
         selectors: Vec::new(),
     };
     let id = idx.record_linked(&graph, spec);
-    assert!(idx.has_linked(), "the index has a Linked graphlet");
+    assert!(idx.has_linked(), "the index has a Linked subgraph");
     assert!(!idx.reconcile_all(&graph), "no drift yet → no change");
 
     link(&mut graph, b, c); // C joins A's component
@@ -218,10 +218,10 @@ fn reconcile_all_updates_linked_rosters_on_drift() {
 
 #[test]
 fn toggle_family_selector_mutates_a_linked_specs_selectors_and_is_a_noop_elsewhere() {
-    let mut idx = SessionGraphlets::new().with_default_session();
-    let session_id = idx.graphlets()[0].id;
-    let spec = GraphletSpec {
-        kind: GraphletKind::Component,
+    let mut idx = SessionSubgraphs::new().with_default_session();
+    let session_id = idx.subgraphs()[0].id;
+    let spec = SubgraphSpec {
+        kind: SubgraphKind::Component,
         anchors: Vec::new(),
         primary_anchor: None,
         selectors: Vec::new(),
@@ -236,7 +236,7 @@ fn toggle_family_selector_mutates_a_linked_specs_selectors_and_is_a_noop_elsewhe
     assert!(idx.toggle_family_selector(linked_id, EdgeFamily::Semantic));
     assert!(spec_has_family(
         match &idx.get(linked_id).unwrap().binding {
-            GraphletBinding::Linked { spec } => spec,
+            SubgraphBinding::Linked { spec } => spec,
             _ => unreachable!(),
         },
         EdgeFamily::Semantic
@@ -245,7 +245,7 @@ fn toggle_family_selector_mutates_a_linked_specs_selectors_and_is_a_noop_elsewhe
     assert!(idx.toggle_family_selector(linked_id, EdgeFamily::Semantic));
     assert!(!spec_has_family(
         match &idx.get(linked_id).unwrap().binding {
-            GraphletBinding::Linked { spec } => spec,
+            SubgraphBinding::Linked { spec } => spec,
             _ => unreachable!(),
         },
         EdgeFamily::Semantic
@@ -253,7 +253,7 @@ fn toggle_family_selector_mutates_a_linked_specs_selectors_and_is_a_noop_elsewhe
 }
 
 #[test]
-fn toggle_family_selector_narrows_a_linked_graphlets_derivation() {
+fn toggle_family_selector_narrows_a_linked_subgraphs_derivation() {
     use euclid::default::Point2D;
     use kernel::graph::{ContainmentSubKind, EdgeAssertion, SemanticSubKind};
     let mut graph = Graph::new();
@@ -278,9 +278,9 @@ fn toggle_family_selector_narrows_a_linked_graphlets_derivation() {
     );
     let a_id = graph.get_node(a).unwrap().id;
 
-    let mut idx = SessionGraphlets::new();
-    let spec = GraphletSpec {
-        kind: GraphletKind::Component,
+    let mut idx = SessionSubgraphs::new();
+    let spec = SubgraphSpec {
+        kind: SubgraphKind::Component,
         anchors: vec![a_id.to_string()],
         primary_anchor: Some(a_id.to_string()),
         selectors: Vec::new(),
@@ -331,10 +331,10 @@ fn hyperlink(g: &mut Graph, x: kernel::graph::NodeKey, y: kernel::graph::NodeKey
     );
 }
 
-fn component_spec_on(graph: &Graph, key: kernel::graph::NodeKey) -> GraphletSpec {
+fn component_spec_on(graph: &Graph, key: kernel::graph::NodeKey) -> SubgraphSpec {
     let id = graph.get_node(key).unwrap().id;
-    GraphletSpec {
-        kind: GraphletKind::Component,
+    SubgraphSpec {
+        kind: SubgraphKind::Component,
         anchors: vec![id.to_string()],
         primary_anchor: Some(id.to_string()),
         selectors: Vec::new(),
@@ -344,7 +344,7 @@ fn component_spec_on(graph: &Graph, key: kernel::graph::NodeKey) -> GraphletSpec
 #[test]
 fn reconcile_all_skips_derivation_when_the_graph_revision_is_unchanged() {
     let (graph, a, _b, _c) = ab_graph_with_isolated_c();
-    let mut idx = SessionGraphlets::new();
+    let mut idx = SessionSubgraphs::new();
     let id = idx.record_linked(&graph, component_spec_on(&graph, a));
     let roster = idx.get(id).unwrap().anchors.clone();
     assert_eq!(
@@ -358,7 +358,7 @@ fn reconcile_all_skips_derivation_when_the_graph_revision_is_unchanged() {
     assert!(!idx.reconcile_all(&graph), "and again");
     assert!(
         idx.reconcile(&graph, id).is_none(),
-        "the single-graphlet path is gated too"
+        "the single-subgraph path is gated too"
     );
     assert!(idx.preview_reconcile(&graph, id).is_none());
     assert_eq!(
@@ -381,7 +381,7 @@ fn reconcile_all_skips_derivation_when_the_graph_revision_is_unchanged() {
 #[test]
 fn reconcile_derives_and_reports_the_added_member_after_the_graph_moves() {
     let (mut graph, a, b, c) = ab_graph_with_isolated_c();
-    let mut idx = SessionGraphlets::new();
+    let mut idx = SessionSubgraphs::new();
     let id = idx.record_linked(&graph, component_spec_on(&graph, a));
     let before = graph.revision();
     let walks = idx.derive_calls.get();
@@ -405,9 +405,9 @@ fn reconcile_derives_and_reports_the_added_member_after_the_graph_moves() {
 }
 
 #[test]
-fn a_linked_graphlet_kept_as_session_is_never_reconciled() {
+fn a_linked_subgraph_kept_as_session_is_never_reconciled() {
     let (mut graph, a, b, c) = ab_graph_with_isolated_c();
-    let mut idx = SessionGraphlets::new();
+    let mut idx = SessionSubgraphs::new();
     let id = idx.record_linked(&graph, component_spec_on(&graph, a));
     assert!(idx.keep_as_session(id));
     assert_eq!(
@@ -434,7 +434,7 @@ fn a_linked_graphlet_kept_as_session_is_never_reconciled() {
 #[test]
 fn a_deserialized_index_reconciles_on_its_first_call() {
     let (graph, a, _b, _c) = ab_graph_with_isolated_c();
-    let mut idx = SessionGraphlets::new();
+    let mut idx = SessionSubgraphs::new();
     let id = idx.record_linked(&graph, component_spec_on(&graph, a));
     assert!(!idx.reconcile_all(&graph), "gate armed in memory");
 
@@ -443,8 +443,8 @@ fn a_deserialized_index_reconciles_on_its_first_call() {
         !json.contains("reconciled_revision") && !json.contains("derive_calls"),
         "the revision is a cache key, not persisted content: {json}"
     );
-    let mut loaded: SessionGraphlets = serde_json::from_str(&json).expect("round-trips");
-    assert_eq!(loaded.graphlets().len(), 1);
+    let mut loaded: SessionSubgraphs = serde_json::from_str(&json).expect("round-trips");
+    assert_eq!(loaded.subgraphs().len(), 1);
     assert_eq!(
         loaded.reconciled_revision(id),
         None,

@@ -98,10 +98,10 @@ pub enum OmnibarMatch {
         from: NodeKey,
         to: NodeKey,
     },
-    /// A durable graphlet peer of a warm node that is currently `Cold`
+    /// A durable subgraph peer of a warm node that is currently `Cold`
     /// (no live tile). Shown with ○ in the `TabsLocal` empty-query
-    /// roster; activating opens a tile via graphlet routing.
-    ColdGraphletMember(NodeKey),
+    /// roster; activating opens a tile via subgraph routing.
+    ColdSubgraphMember(NodeKey),
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -373,7 +373,7 @@ mod tests {
             query: "rust".into(),
             provider: SearchProviderKind::DuckDuckGo,
         });
-        set.insert(OmnibarMatch::ColdGraphletMember(NodeKey::new(3)));
+        set.insert(OmnibarMatch::ColdSubgraphMember(NodeKey::new(3)));
         assert_eq!(set.len(), 5);
 
         // Duplicate insertion is a no-op.

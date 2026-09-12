@@ -160,7 +160,7 @@ pub fn tile_tree_from_plan(
 }
 
 /// A leaf tile plan for member/tile-intent nodes; `None` for non-leaf kinds
-/// (root, group, portal, collapsed-graphlet — not surfaced in the v1 tree).
+/// (root, group, portal, collapsed-subgraph — not surfaced in the v1 tree).
 fn tile_plan(node: &ArrangementNode) -> Option<TilePlan> {
     let member = match &node.kind {
         ArrangementNodeKind::MemberIntent { member } => Some(*member),

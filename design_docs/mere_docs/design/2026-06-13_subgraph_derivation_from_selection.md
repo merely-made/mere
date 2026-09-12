@@ -1,13 +1,15 @@
-# Graphlet Derivation from Selection
+# Subgraph Derivation from Selection
+
+*Renamed 2026-09-12 from `2026-06-13_graphlet_derivation_from_selection.md` when graphlet was retired (TERMINOLOGY.md, 2026-09-05); vocabulary updated to subgraph, content otherwise unchanged.*
 
 A multi-selection is a question: *what structure do these nodes already share?* This
 is the UX that answers it — select nodes, reveal the latent edges among them,
-read the shape they form, and optionally crystallize it into a graphlet. It is
+read the shape they form, and optionally crystallize it into a subgraph. It is
 the read-side sibling of manual edge creation (`assert_selected_relation`): one
 *asserts* a new relation, this *reveals and derives* from the relations that are
 already there.
 
-The satisfying part is how much substrate already exists. The forme graphlet
+The satisfying part is how much substrate already exists. The forme subgraph
 model has the nine canonical shapes (Ego, Corridor, Component, Loop, Frontier,
 Facet, Bridge, WorkbenchCorrespondence, Session), the projection sourcing
 (`SelectionOverride { seed_nodes }` is the highest-precedence binding, beating
@@ -48,10 +50,10 @@ shape" already exists.
 4. **Frontier ghosts complete the shape.** Beside the chips, the canvas ghosts the
    one-hop frontier — nodes just outside the selection that would close a clean
    shape if included ("add these two to complete the Ego"). The difference between
-   classifying what you selected and deriving the graphlet that explains it.
+   classifying what you selected and deriving the subgraph that explains it.
 
 5. **Crystallize, with a choice of permanence.** Clicking a chip binds the
-   selection as a graphlet:
+   selection as a subgraph:
    - **Session** (default): groups them now as a tile-group or astroid, no link to
      graph truth. Ephemeral, like a sticky grouping.
    - **Linked**: the roster tracks the derivation rule. A Linked Ego(C) grows as C
@@ -66,9 +68,9 @@ shape" already exists.
 
 Steps 1-4 are pure read-side projection over graph truth. Nothing is committed
 while you explore, so you can sweep selections and flip projections freely. Only
-crystallize writes, and it writes exactly one thing: a `GraphletRef` plus either
+crystallize writes, and it writes exactly one thing: a `SubgraphRef` plus either
 an Arrangement edge (session, tile-group) or a Containment edge (linked,
-CollectionMember). The graph changes only when you commit a graphlet. This is the
+CollectionMember). The graph changes only when you commit a subgraph. This is the
 same discipline as the edge-creation work — the canvas is a read until an explicit
 gesture writes.
 

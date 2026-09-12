@@ -1,6 +1,6 @@
 # Recursive query experiments plan
 
-**Status:** E1–E3 merged to main 2026-09-12 (`794a96bd`, `7ba1df59`, `ef64c1cc`); ascent dev-dependency and bench removed after recording the numbers; Q1/Q2 scoped below, awaiting Mark's ruling; the `graphlets` → subgraph rename unparked 2026-09-12 as its own commit.
+**Status:** E1–E3 merged to main 2026-09-12 (`794a96bd`, `7ba1df59`, `ef64c1cc`); ascent dev-dependency and bench removed after recording the numbers; Q1/Q2 scoped below, awaiting Mark's ruling; the `graphlets` → `subgraph` crate rename landed 2026-09-12 (see Progress).
 
 ## Why
 
@@ -23,10 +23,10 @@ cheapest first, without touching the substrate decision.
 ## Scope
 
 - E1: `canvas::fold_projection::collapse_descendants` (canvas crate only).
-- E2: `graphlets::SessionGraphlets::reconcile_all` / `reconcile_delta`
-  (graphlets crate only; no kernel change).
-- E3: an `ascent` prototype of graphlet derivation, as a dev-dependency of
-  graphlets with a timing harness on `std::time::Instant`. No criterion.
+- E2: `subgraph::SessionSubgraphs::reconcile_all` / `reconcile_delta`
+  (subgraph crate only; no kernel change).
+- E3: an `ascent` prototype of subgraph derivation, as a dev-dependency of
+  `mere-subgraph` with a timing harness on `std::time::Instant`. No criterion.
 
 Out of scope: any change to `graph-kernel`'s write path or a relation delta
 journal (a possible E2 phase 2, gated on E2's numbers); the substrate decision;
@@ -48,27 +48,27 @@ Done-conditions:
   noise relations asserts the member set is unchanged from the old walk.
 - Existing canvas fold tests pass. `cargo test -p canvas` green.
 
-### E2 — revision-gate graphlet reconciliation
+### E2 — revision-gate subgraph reconciliation
 
-`reconcile_all` re-derives every Linked graphlet's full member set on every
+`reconcile_all` re-derives every Linked subgraph's full member set on every
 call, regardless of whether the graph changed.
 
 Done-conditions:
-- Each Linked graphlet records the kernel `Graph::revision()` it was last
-  reconciled against; `reconcile_all` and the single-graphlet reconcile skip
+- Each Linked subgraph records the kernel `Graph::revision()` it was last
+  reconciled against; `reconcile_all` and the single-subgraph reconcile skip
   derivation when the revision is unchanged and return "no change".
 - A forced path (or a revision reset) remains for callers that need a full
   re-derive, and persistence round-trips without serializing the revision as
   truth (it is a cache key, not content).
 - Tests: unchanged graph → no derivation and no delta; mutated graph → delta as
-  before. `cargo test -p graphlets` green.
+  before. `cargo test -p mere-subgraph` green.
 - Findings record whether the kernel needs a relation delta journal for a
   true semi-naive expansion (E2 phase 2, not started here).
 
-### E3 — ascent prototype of graphlet derivation
+### E3 — ascent prototype of subgraph derivation
 
 Done-conditions:
-- `ascent` 0.8.x added as a dev-dependency of graphlets only.
+- `ascent` 0.8.x added as a dev-dependency of `mere-subgraph` only.
 - An `#[ignore]`d test builds synthetic graphs at three sizes (roughly 1k, 10k,
   100k relations, mixed families), extracts `relations()` rows as the
   extensional database, and derives Component and Ego(radius) membership with
@@ -115,7 +115,7 @@ Facts:
   every snapshot, and the `edge_kind_labels` facet. Side B consumers: 19
   dependents across 15 files, including every canvas edge projection, the
   glossary metrics, `capture.rs` table stats, the journal replay
-  `fingerprint`, and `graphlets/classifier.rs`. The sharpest split is inside
+  `fingerprint`, and `subgraph/classifier.rs`. The sharpest split is inside
   the subgraph crate: derivation uses A, shape classification uses B.
 
 Options:
@@ -184,7 +184,7 @@ helper is being reworked anyway. 3 is a substrate decision, not a bug fix.
   per frontier node, quadratic). Neither is memoized.
 - 2026-09-11. Invalidation is comparison on a single monotonic
   `Graph::revision`; canvas caches (community, bridges, affinity, strategy
-  positions) and every Linked graphlet recompute wholesale on any topology
+  positions) and every Linked subgraph recompute wholesale on any topology
   change. salsa was considered and rejected for dependency-tracking weight
   (2026-06-03 actor constellation plan). No existing delta journal on the
   kernel; `apply_graph_delta` is the write funnel a journal would hang off.
@@ -261,5 +261,17 @@ helper is being reworked anyway. 3 is a substrate decision, not a bug fix.
   dev tree). Fixed the flaky canvas source-time test by zeroing
   `timestamp_secs` before comparing snapshots. Gitignored `.claude/` (agent
   worktrees). Scoped Q1 and Q2 with options and recommendations; ruling
-  pending. Rename of the `graphlets` crate to the subgraph vocabulary started
+  pending. Rename of the `subgraphs` crate to the subgraph vocabulary started
   as a separate commit.
+- 2026-09-12. The `graphlets` → `subgraph` rename landed as its own commit:
+  crate directory `crates/graph/subgraph` (package `mere-subgraph`, lib
+  `subgraph`); forme's `graphlet.rs` → `crates/forme/forme/src/subgraph.rs`
+  with `SubgraphId` / `SubgraphRef` / `SubgraphSpec` / `SubgraphKind` /
+  `SubgraphBinding` / `SubgraphMemberDelta`; `SessionSubgraphs`; the
+  `subgraphs.json` sidecar; actions `graph:fit_subgraph` and
+  `node:remove_from_subgraph`; `ArrangementKind::Supernode` (was
+  `CollapsedGraphlet`); roster tab "Subgraphs". Kind and binding variants
+  unchanged. Docs followed in the same pass: TERMINOLOGY.md's survivors row
+  struck and its open item closed, the subgraph design set rewritten, the
+  2026-06-13 derivation design doc moved to its new name, and the
+  pre-retirement briefs marked rather than rewritten.

@@ -25,7 +25,7 @@
 //!   `apply()` pipeline handles all transitions, preserving intents and
 //!   consistency.
 //! - **Cold is cheap.** Demoting to Cold preserves topology, provenance,
-//!   and graphlet membership. Only runtime resources are freed.
+//!   and subgraph membership. Only runtime resources are freed.
 //! - **No hard capacity limits.** Policy is advisory — it recommends
 //!   demotions, the host decides whether to apply them.
 

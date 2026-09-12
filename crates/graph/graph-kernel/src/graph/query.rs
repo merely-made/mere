@@ -566,7 +566,7 @@ impl Graph {
     /// (undirected), breadth-first. Empty if `seed` is not in the graph. `selectors` is the
     /// **edge projection**: only edges matching a selector are followed (an empty slice
     /// follows every family). So the *same* nodes can be one Component under one projection
-    /// and a different one under another. The **Component** graphlet's derivation. (Graphlet
+    /// and a different one under another. The **Component** subgraph's derivation. (Subgraph
     /// derivation, Phase 3 — selectors.)
     pub fn component_members(
         &self,
@@ -578,7 +578,7 @@ impl Graph {
 
     /// The **Ego** neighborhood of `seed`: itself plus every node within `radius`
     /// undirected hops, breadth-first (`radius` 0 = just the seed), over the `selectors`
-    /// edge projection (empty = all families). The Ego graphlet's derivation. (Graphlet
+    /// edge projection (empty = all families). The Ego subgraph's derivation. (Subgraph
     /// derivation, Phase 3 — selectors.)
     pub fn ego_members(
         &self,
@@ -617,7 +617,7 @@ impl Graph {
             for neighbor in self.neighbors_undirected_sorted(key) {
                 // Edge projection: only follow an edge matching a selector (empty = all
                 // families). This is what makes the same nodes derive a different shape
-                // under a different relation projection. (Graphlet derivation — selectors.)
+                // under a different relation projection. (Subgraph derivation — selectors.)
                 if !selectors.is_empty() && !self.edge_matches_selectors(key, neighbor, selectors) {
                     continue;
                 }

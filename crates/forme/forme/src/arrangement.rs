@@ -19,8 +19,8 @@
 //! ProjectionKind)`; camera/focus lives in the pane view-intent.
 //!
 //! **Discipline (spine §3, §10):** graph *shape*, small vocabulary. The
-//! graphlet-reconciliation / pressure / lens machinery from the graphshell era
-//! is *parked* — `CollapsedGraphlet` is the only minimal hook kept for the
+//! subgraph-reconciliation / pressure / lens machinery from the graphshell era
+//! is *parked* — `Supernode` is the only minimal hook kept for the
 //! future derived-arrangement lane.
 //!
 //! forme stays framework-free: members are referenced by their stable graph id
@@ -78,9 +78,9 @@ pub enum ArrangementNodeKind {
     /// A mirror/portal of another arrangement node (the original lives
     /// elsewhere in the arrangement; the `MirrorOf` edge points to it).
     Portal,
-    /// Minimal hook for the future derived-arrangement lane (a graphlet shown
+    /// Minimal hook for the future derived-arrangement lane (a subgraph shown
     /// collapsed). Parked: no reconciliation machinery in v1.
-    CollapsedGraphlet,
+    Supernode,
 }
 
 /// One arrangement node: a local id, a kind, an optional label.

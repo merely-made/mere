@@ -1,5 +1,7 @@
 # Scriptable Field Regions Plan
 
+*Written before the 2026-09-05 retirement of graphlet (TERMINOLOGY.md): read graphlet as subgraph. Identifiers such as GraphletId, GraphletRef, and SessionGraphlets are now SubgraphId, SubgraphRef, and SessionSubgraphs, and the graphlets crate is crates/graph/subgraph (code renamed 2026-09-12).*
+
 **Status:** partially implemented: movable and resizable field regions landed; physics-setting and further scripted-region work remains deferred.
 
 A **field region** is a spatial area you place on the graph that carries a rule
@@ -52,7 +54,7 @@ rule surface**.
   region scopes it to a placed extent.
 - **Edge visibility** — the graphlet
   [`EdgeProjectionSpec`](../research/2026-06-13_edge_system_audit.md) (the design
-  in [graphlet derivation](../design/2026-06-13_graphlet_derivation_from_selection.md))
+  in [subgraph derivation](../design/2026-06-13_subgraph_derivation_from_selection.md))
   already models "which edge families count" for a node subset. A field region's
   edge-visibility rule is an `EdgeProjectionSpec` scoped to the nodes in its
   extent.

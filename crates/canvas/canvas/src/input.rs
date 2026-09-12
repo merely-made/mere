@@ -406,7 +406,7 @@ impl Canvas {
     /// navigation this always mints a node (no URL dedup — duplicates are welcome
     /// in the node-identity model); unlike [`visit`](Self::visit) the origin is
     /// explicit (the focused tile in Tree, the selection in Cartography). An
-    /// `origin` of `None` or an unknown member mints an unlinked node — a graphlet
+    /// `origin` of `None` or an unknown member mints an unlinked node — a subgraph
     /// candidate. Returns the new node's member id. This backs the "open in new
     /// node/tile" gesture (Ctrl/Cmd-Enter, middle-click, context menu) — P2 of the
     /// node-navigation-lineage plan.
@@ -629,7 +629,7 @@ impl Canvas {
 
     /// Mint an unlinked node at an explicit world `seed`, selecting it. The
     /// origin-less twin of [`mint_node`](Self::mint_node): no navigated-from edge,
-    /// no branched history — a fresh graphlet candidate placed exactly where asked.
+    /// no branched history — a fresh subgraph candidate placed exactly where asked.
     fn mint_node_at(&mut self, seed: Point2D<f32>, url: &str) -> NodeKey {
         let key = graph_apply::add_node(
             &mut self.graph,

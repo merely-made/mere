@@ -5,7 +5,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 use crate::MemberId;
-use crate::graphlet::GraphletId;
+use crate::subgraph::SubgraphId;
 use crate::lens::ProjectionLens;
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, HashSet};
@@ -17,8 +17,8 @@ use std::collections::{HashMap, HashSet};
 /// - Traversal: child of source node ("opened B from A" -> B is child of A)
 /// - Manual add: sibling of connection point (same parent as the node
 ///   you were looking at when you added it)
-/// - Derived (graphlet computation): sibling of connection point,
-///   or child of graphlet anchor if no specific connection
+/// - Derived (subgraph computation): sibling of connection point,
+///   or child of subgraph anchor if no specific connection
 /// - AgentDerived: sibling of source, pending user accept
 /// - Anchor: root
 /// - Restored: original position from persistence
@@ -356,7 +356,7 @@ impl<N: MemberId> TreeTopology<N> {
             is_expanded: is_expanded && has_children,
             has_children,
             is_last_sibling: is_last,
-            graphlet_id: None, // Filled in by GraphTree when walking
+            subgraph_id: None, // Filled in by GraphTree when walking
         });
 
         if has_children && is_expanded {
@@ -502,7 +502,7 @@ pub struct TreeRow<'a, N: MemberId> {
     pub is_expanded: bool,
     pub has_children: bool,
     pub is_last_sibling: bool,
-    pub graphlet_id: Option<GraphletId>,
+    pub subgraph_id: Option<SubgraphId>,
 }
 
 /// How derived members are placed in the topology.
@@ -512,7 +512,7 @@ pub enum PlacementPolicy {
     ChildOfConnection,
     /// Sibling of the node they're connected to (same parent).
     SiblingOfConnection,
-    /// Child of the graphlet anchor.
+    /// Child of the subgraph anchor.
     ChildOfAnchor,
 }
 

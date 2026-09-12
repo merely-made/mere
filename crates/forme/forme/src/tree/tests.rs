@@ -5,7 +5,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 use crate::Rect;
-use crate::graphlet::{GraphletKind, GraphletRef};
+use crate::subgraph::{SubgraphKind, SubgraphRef};
 use crate::layout::LayoutMode;
 use crate::lens::ProjectionLens;
 use crate::member::{LayoutOverride, Lifecycle, Provenance, SplitDirection};

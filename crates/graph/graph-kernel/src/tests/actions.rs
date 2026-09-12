@@ -124,7 +124,7 @@ fn action_id_has_namespace_format_rejects_malformed_inputs() {
 #[test]
 fn action_id_has_namespace_format_accepts_valid_inputs() {
     assert!(action_id_has_namespace_format("node:new"));
-    assert!(action_id_has_namespace_format("graph:fit_graphlet"));
+    assert!(action_id_has_namespace_format("graph:fit_subgraph"));
     assert!(action_id_has_namespace_format("ns2:name3"));
     assert!(action_id_has_namespace_format("a:b"));
 }

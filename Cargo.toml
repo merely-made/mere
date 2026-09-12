@@ -6,7 +6,7 @@ members = [
     "crates/canvas/cartography",
     "crates/canvas/pictograph",
     "crates/graph/glossary",
-    "crates/graph/graphlets",
+    "crates/graph/subgraph",
     "crates/graph/graph-kernel",
     "crates/graph/linked-data",
     "crates/shell/chrome",
@@ -216,7 +216,7 @@ conatus = { path = "crates/conatus/conatus" }
 cartography = { package = "mere-cartography", version = "0.0.2", path = "crates/canvas/cartography" }
 linked-data = { package = "mere-linked-data", version = "0.0.1", path = "crates/graph/linked-data" }
 kernel = { package = "mere-kernel", version = "0.0.2", path = "crates/graph/graph-kernel" }
-graphlets = { version = "0.0.1", path = "crates/graph/graphlets" }
+subgraph = { package = "mere-subgraph", version = "0.0.1", path = "crates/graph/subgraph" }
 # The graph-canvas content-root (was `orrery`; that name retired to the Merely
 # product tier ladder, 2026-07-09 — see the boundary pass plan amendments).
 canvas = { package = "mere-canvas", version = "0.0.1", path = "crates/canvas/canvas" }

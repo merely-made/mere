@@ -155,7 +155,7 @@ genet's `design_docs/`, not here.
 
 ### From workbench_staging (no code, 2026-06-09)
 
-- **Where the latent staging relation lives** — gloss-owned graphlet store
+- **Where the latent staging relation lives** — gloss-owned subgraph store
   versus a kernel edge family flagged latent — explicitly Mark's call,
   unanswered; with it the chain-versus-bus default. The set primitive exists
   unconsumed (`platen/src/workbench.rs:182 open_split`, `:189 open_stack`);
@@ -175,7 +175,7 @@ genet's `design_docs/`, not here.
   the chip — `Ledger::score` exists, no consumer) and 7 (Steward per-row
   controls — the pane is a read-only downloads projection) are unbuilt with
   their substrate present.
-- **Forme dead-submodule cleanup, never done**: `graphlet`, `lens`, `parity`,
+- **Forme dead-submodule cleanup, never done**: `subgraph` (renamed from `graphlet` 2026-09-12), `lens`, `parity`,
   `pressure`, `reconciliation` still exist at `crates/forme/forme/src/`. A
   deletion; wants a yes.
 
@@ -242,9 +242,9 @@ genet's `design_docs/`, not here.
 
 ### From graph_object_roster_detail_cards (model migrated, views deleted)
 
-- The model lives on verbatim — `RosterTab`/`RosterSubject`/`GraphletSpec` in
+- The model lives on verbatim — `RosterTab`/`RosterSubject`/`SubgraphSpec` in
   `crates/domain/roster`, `EdgeCell`/`EdgeFamily` and `visible_relation_edges`
-  in canvas, the selectors in `crates/graph/graphlets`. Open: **sub-kind
+  in canvas, the selectors in `crates/graph/subgraph`. Open: **sub-kind
   selector editing**, the **P5 `GraphDefault < GraphViewOverride <
   SelectionOverride` stack**, **true parallel edge instances**; the plan's
   §Contradictions and §Pitfalls are durable design notes.

@@ -1,5 +1,7 @@
 # Edge System Audit
 
+*Written before the 2026-09-05 retirement of graphlet (TERMINOLOGY.md): read graphlet as subgraph. Identifiers such as GraphletId, GraphletRef, and SessionGraphlets are now SubgraphId, SubgraphRef, and SessionSubgraphs, and the graphlets crate is crates/graph/subgraph (code renamed 2026-09-12).*
+
 > **Current state (2026-06-15 reconciliation).** The opening symptom below is
 > **resolved**: create / retract / traverse between two existing nodes all shipped
 > (`command_drain.rs:97-112`, context menu `menus.rs:193`, `>relate` / `>unrelate`,
@@ -225,8 +227,8 @@ same seam knot links ride).
    physics or ranking (traversal has counts, semantic has decay, arrangement has
    durability; layout wants one number). Per the configurability rule, the decay
    curve and the strength projection probably want to be settings, not constants.
-   This is the same strength the [graphlet
-   classifier](../design/2026-06-13_graphlet_derivation_from_selection.md) ranks
+   This is the same strength the [subgraph
+   classifier](../design/2026-06-13_subgraph_derivation_from_selection.md) ranks
    by.
 5. **Containment vs Arrangement overlap.** Both express grouping — Containment is
    "belongs to" (durable, semantic), Arrangement is "shown together" (often

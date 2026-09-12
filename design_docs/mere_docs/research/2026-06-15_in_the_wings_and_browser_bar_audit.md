@@ -1,5 +1,7 @@
 # In the Wings + the Browser Bar — a Wiring-Gap Audit and Roadmap
 
+*Written before the 2026-09-05 retirement of graphlet (TERMINOLOGY.md): read graphlet as subgraph. Identifiers such as GraphletId, GraphletRef, and SessionGraphlets are now SubgraphId, SubgraphRef, and SessionSubgraphs, and the graphlets crate is crates/graph/subgraph (code renamed 2026-09-12). CollapsedGraphlet is now ArrangementKind::Supernode.*
+
 A code-verified sweep of capabilities that are **built but not reachable from a meerkat
 user action**, plus the table-stakes a browser still owes, plus the sequence that turns
 the first into the second. Every claim below carries a `file:line` and a check for whether

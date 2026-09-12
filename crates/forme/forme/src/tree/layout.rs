@@ -25,9 +25,9 @@ impl<N: MemberId> GraphTree<N> {
             .into_iter()
             .map(|row| {
                 let mut owned = OwnedTreeRow::from(row);
-                // Fill in graphlet_id from membership
+                // Fill in subgraph_id from membership
                 if let Some(entry) = self.members.get(&owned.member) {
-                    owned.graphlet_id = entry.graphlet_membership.first().copied();
+                    owned.subgraph_id = entry.subgraph_membership.first().copied();
                 }
                 owned
             })
@@ -72,7 +72,7 @@ impl<N: MemberId> GraphTree<N> {
                         lifecycle: entry.lifecycle,
                         is_anchor: matches!(entry.provenance, Provenance::Anchor),
                         depth: self.topology.depth_of(id),
-                        graphlet_id: entry.graphlet_membership.first().copied(),
+                        subgraph_id: entry.subgraph_membership.first().copied(),
                     });
                 }
             }

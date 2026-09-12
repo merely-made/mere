@@ -1,5 +1,7 @@
 # Graph Projections Research: five new ways to read the browsing graph
 
+*Written before the 2026-09-05 retirement of graphlet (TERMINOLOGY.md): read graphlet as subgraph. Identifiers such as GraphletId, GraphletRef, and SessionGraphlets are now SubgraphId, SubgraphRef, and SessionSubgraphs, and the graphlets crate is crates/graph/subgraph (code renamed 2026-09-12).*
+
 **Date**: 2026-06-22
 **Status**: Research / design probe (with Mark). Five projection ideas, code-grounded but
 uncommitted. Each graduates to its own `implementation_strategy/` plan if and when it is picked
@@ -124,7 +126,7 @@ as it reads, since it already emits `AgentDerived` edges.
 **Lives as.** An orrery mode (a stance-partitioned arrangement plus an edge-family filter), not a
 new pane. It reuses platen's relation-level edge-visibility predicate (`Fn(&RelationView) -> bool`,
 already used to hide / show edge families) and the reveal / derive machinery of
-[graphlet_derivation_from_selection](../design/2026-06-13_graphlet_derivation_from_selection.md)
+[subgraph_derivation_from_selection](../design/2026-06-13_subgraph_derivation_from_selection.md)
 (select nodes, reveal latent edges, read the shape). The new piece is the stance partition layout,
 kin to the `kanban` adapter's axis logic.
 

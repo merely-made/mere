@@ -1,16 +1,18 @@
 # Tear-out gestures plan (leaf / branch / fork + cross-graph drag)
 
+*Vocabulary updated 2026-09-12: graphlet → subgraph per TERMINOLOGY.md (retired 2026-09-05). Dated status and Progress entries keep the meerkat-era names they recorded (branch_graphlet_from, graphlets.rs, graphlet_classifier.rs, graphlets.json, GraphletBinding::Forked); read them as history. The live names are SessionSubgraphs in crates/graph/subgraph and the subgraphs.json sidecar.*
+
 **Date**: 2026-06-24
 **⚠️ 2026-07-19 — the entire implementation below was meerkat/orrery, deleted with meerkat
 (2026-07-18). The gesture stack is UNWIRED on turnstone.** The kernel primitives survive
-(`copy_component_from`, `copy_node_from`, graphlet bindings, `CopiedFrom` provenance); the host
+(`copy_component_from`, `copy_node_from`, subgraph bindings, `CopiedFrom` provenance); the host
 half (shell commands, `fork_session_from`, the live drag seam) died with meerkat and awaits a
 turnstone re-wire. Fork specifically now carries layout through the `arrangement.*` / `scene.*`
 facet families, not the retired `commit_positions_to_graph` write-back — see **G4-R** at the
 tail. The status line below is the meerkat-era record, kept for the design (not the wiring).
 
 **Status:** **Trichotomy + cross-graph copy/move + cascade DONE + driven** (meerkat-era; G1
-plumbing, G3 branch, G4 fork, G5 copy+move, G6 cascade via graphlet #3; graphlet #1 per-window
+plumbing, G3 branch, G4 fork, G5 copy+move, G6 cascade via subgraph #3; subgraph #1 per-window
 focus also landed). **Tile-tab leaf tear-out is now DONE + fresh-headed verified.** The one substantial
 interactive item still open is the ambiguous **no-modifier orrery drag** path, which now cleanly
 belongs to the notification/toast subsystem plus the pin-vs-drag-out gesture split:
@@ -36,7 +38,7 @@ gestures and the cross-graph drag, plus the carried open questions. It implement
 [tear-out operations brief](../research/2026-05-11_tearout_operations_brief.md) on top of the
 banked substrate.
 **Code**: `crates/meerkat/` *(historical citation)* <!-- doc-audit: historical-path --> (input, chrome, window registry), `crates/graph/graph-kernel/`
- (subgraph copy), `crates/forme/forme/` (graphlets), `crates/shell/frame/` *(historical citation)* <!-- doc-audit: historical-path -->.
+ (subgraph copy), `crates/forme/forme/` (subgraphs), `crates/shell/frame/` *(historical citation)* <!-- doc-audit: historical-path -->.
 
 Cross-refs:
 
@@ -72,11 +74,11 @@ gesture time (brief §1, §3):
 | Gesture | Operation | Identity change | Survives donor delete? |
 | --- | --- | --- | --- |
 | Drag (no modifier) | **Leaf** | none (tile facet of the donor's node, donor's graph) | no |
-| Shift + drag | **Branch** | new `GraphletId` in the donor's graph (forme) | no |
+| Shift + drag | **Branch** | new `SubgraphId` in the donor's graph (forme) | no |
 | Ctrl/Cmd + Shift + drag | **Fork** | new `SessionId` + `GraphId` (snapshot subgraph) | yes |
 
 Stability principle (brief §2): a tile's binding to its node, and a node's binding to its
-graph, change only on an affirmative user action. No auto-fork-on-edit, no implicit graphlet.
+graph, change only on an affirmative user action. No auto-fork-on-edit, no implicit subgraph.
 
 Toast on the ambiguous (no-modifier) drag (brief §3.2): the drop defaults to **leaf** and a
 toast offers `[Branch] [Fork] [Keep as leaf]`, escalating the leaf *in place* (not re-running
@@ -117,7 +119,7 @@ side-by-side second graph pane).
 **Slice 3 — operation split — DONE (2026-06-25).** `TearOutDrag` carries a `TearOp` fixed at
 press by the modifier (Ctrl+Shift = `Fork`, plain Shift = `Branch`). The release dispatches the
 tear axis on it: `Fork` → `ForkNode` (G4, wired + driven); `Branch` → `BranchNode` (G3, wired +
-driven — mints a `Branched` graphlet, no longer a leaf-stub). Cross-graph-pane drops still
+driven — mints a `Branched` subgraph, no longer a leaf-stub). Cross-graph-pane drops still
 short-circuit to the G5 copy before the op split.
 
 **Slice 2+ — remaining:** the **toast** on the ambiguous drop (new chrome element, escalating the
@@ -149,40 +151,40 @@ queues `TearOut { node, from }` and is fresh-headed verified; the **ambiguous-dr
 
 ### G3 — Branch (Shift+drag) — Phase 1 + Phase 2 DONE + driven (2026-06-25)
 
-Mint a forme graphlet with `GraphletBinding::Branched { parent_spec, reason: "tearout-branch" }`
+Mint a forme subgraph with `SubgraphBinding::Branched { parent_spec, reason: "tearout-branch" }`
 in the donor's graph (brief §4.2); the torn window's leaf carries the donor `GraphId` + the new
-`GraphletId`. Branch + donor share kernel nodes, diverge in the graphlet's lineage facet.
+`SubgraphId`. Branch + donor share kernel nodes, diverge in the subgraph's lineage facet.
 
 **Status (2026-06-25): Phases 1 + 2 of the [graphlet wiring plan](../../archive_docs/2026-07-04_completed_plans/2026-06-25_graphlet_wiring_plan.md)
 landed + driven.** Shift+drag dispatches `BranchNode` → `Shell::branch_graphlet_from`, which mints
-a persisted `Branched` graphlet anchored on the torn node (in the donor's `SessionGraphlets`
+a persisted `Branched` subgraph anchored on the torn node (in the donor's `SessionSubgraphs`
 sidecar, round-trips a restart) and opens a window on the donor's *same* graph carrying the new
-`GraphletId`. The branch window **reads as distinct** (an accent `⎇ <anchor>` chip) and
-**accumulates its own lineage**: navigating in it grows the graphlet's roster (via `sync_orrery` →
+`SubgraphId`. The branch window **reads as distinct** (an accent `⎇ <anchor>` chip) and
+**accumulates its own lineage**: navigating in it grows the subgraph's roster (via `sync_orrery` →
 `RecordBranchMember`), diverging from the donor while the new node joins the shared graph. Branch is
-no longer a leaf-stub or a bare graphlet. Remaining graphlet work (reconciliation, orrery scope +
+no longer a leaf-stub or a bare subgraph. Remaining subgraph work (reconciliation, orrery scope +
 per-window focus) is Phase 3 / Slice 3 of that plan. The scouting that established the prerequisite
 is preserved below.
 
 **Substrate scouted (2026-06-25).** The prior "grep found neither" note was a wrong path — forme
 lives at `crates/forme/forme`, not `crates/graph/forme` *(historical citation)* <!-- doc-audit: historical-path -->. At the right path the API is **first-class
-and unit-tested**: `GraphletId`, `GraphletRef<N>`, `GraphletBinding::{UnlinkedSession, Linked,
-Branched}` (graphlet.rs), 9 `GraphletKind`s, `GraphletSpec`, projection specs, and full
-reconciliation types, with `GraphTree::add_graphlet` + fork transitions in reconciliation.rs.
+and unit-tested**: `SubgraphId`, `SubgraphRef<N>`, `SubgraphBinding::{UnlinkedSession, Linked,
+Branched}` (forme's `subgraph.rs`, then `graphlet.rs`), 9 `SubgraphKind`s, `SubgraphSpec`, projection specs, and full
+reconciliation types, with `GraphTree::add_subgraph` + fork transitions in reconciliation.rs.
 
 **But the layer is built and UNWIRED.** A workspace grep finds zero live construction of a
-`GraphTree` or `GraphletRef` outside forme's own tests. meerkat consumes forme's *member /
+`GraphTree` or `SubgraphRef` outside forme's own tests. meerkat consumes forme's *member /
 tile-tree* layer heavily (`forme::GraphMemberId` is in ~20 files) but holds no live
-`GraphTree`-with-graphlets. So branch's real prerequisite is not "mint a `GraphletRef`" — it is
+`GraphTree`-with-subgraphs. So branch's real prerequisite is not "mint a `SubgraphRef`" — it is
 wiring a whole subsystem: a per-session `GraphTree`, projected into the workbench, persisted, that
-a branch graphlet can group tiles + accumulate lineage in. Without that a branch graphlet is an
+a branch subgraph can group tiles + accumulate lineage in. Without that a branch subgraph is an
 orphan and branch collapses to leaf.
 
-**Decision (Mark, 2026-06-25): graphlet layer wired as its own plan** —
+**Decision (Mark, 2026-06-25): subgraph layer wired as its own plan** —
 [graphlet wiring](../../archive_docs/2026-07-04_completed_plans/2026-06-25_graphlet_wiring_plan.md), with broader payoff (document groups,
 reconciliation, the relational-browse front-end all want it); branch is its first consumer.
-**Phase 1 has since landed** (Shift+drag mints + persists a `Branched` graphlet via
-`branch_graphlet_from`, driven), so branch is no longer a leaf-stub. Its **Phase 2** (the graphlet
+**Phase 1 has since landed** (Shift+drag mints + persists a `Branched` subgraph via
+`branch_graphlet_from`, driven), so branch is no longer a leaf-stub. Its **Phase 2** (the subgraph
 visibly scoping the window + accumulating lineage) is tracked in that plan. The remaining
 tear-out-gesture wins (the toast, the tile-tab leaf origin, G5 move) are independent of it.
 
@@ -192,7 +194,7 @@ green, 114 tests) so it no longer collides with the host's real `ForkNode` / `fo
 `detect_fork_on_manual_override` and the `ReconciliationChoice::SaveAsNewFork` choice still carry
 the old "fork" word — rename when the layer is wired.
 
-Done when: Shift+drag mints a branch graphlet in the donor; the branch window populates its own
+Done when: Shift+drag mints a branch subgraph in the donor; the branch window populates its own
 lineage while node edits still reach the donor.
 
 ### G4 — Fork (Ctrl+Shift+drag) — the subgraph copy — DONE (2026-06-25), driven
@@ -254,7 +256,7 @@ second graph pane.
 Done when: a tile dragged from a graph-A pane into a graph-B pane produces a provenance-tracked
 node in B, source intact (copy) or released (move).
 
-### G6 — Cascade on donor delete — DONE (2026-06-25) via graphlet plan #3
+### G6 — Cascade on donor delete — DONE (2026-06-25) via subgraph plan #3
 
 When a donor session with live tear-outs is killed: **branches die** with it (they live in the
 donor's graph), **forks survive** (independent; the weak `parent_session` dangles), **leaves
@@ -263,10 +265,10 @@ the `session.cascaded_branch_delete` diagnostic.
 
 Done when: killing a donor with a live leaf + branch + fork applies the three outcomes.
 
-**Status (2026-06-25): met.** Graphlet plan open-item **#3** landed + driven:
+**Status (2026-06-25): met.** Subgraph plan open-item **#3** landed + driven:
 `close_session` calls `Shell::close_windows_on_graph(graph)` (closes every secondary window
 whose `focused_graph` is the dead graph, so branches + leaves close) then drops the dead
-`graphlets` / `orreries` / `orrery_lru` pool entries; forks live on their own `GraphId` so they
+`subgraphs` / `orreries` / `orrery_lru` pool entries; forks live on their own `GraphId` so they
 survive; the session dir trash carries `graphlets.json`. Drove a leaf on the active graph →
 deleting the session closed the leaf + switched to the survivor. The only unbuilt nuance is the
 "donor deleted" *dismissible* leaf state (today the leaf window just closes, which the done-when
@@ -275,14 +277,14 @@ allows).
 **Implementation seam (2026-06-25):** the branch-die half is scoped as **#3** in the
 [graphlet wiring plan](../../archive_docs/2026-07-04_completed_plans/2026-06-25_graphlet_wiring_plan.md) — `close_session` already trashes
 the session dir (so `graphlets.json` trashes with it), so the work is dropping the in-memory
-`graphlets` / `orreries` pool entries and closing windows on the deleted graph. Closing
+`subgraphs` / `orreries` pool entries and closing windows on the deleted graph. Closing
 windows on session-delete is a *general* multi-window gap (not branch-specific); do this with
 that general handling.
 
 ### Trailing tear-out items — scope (2026-06-25)
 
-The remaining gesture work, with seams and rough size. Independent of the graphlet subsystem
-(whose own open items #1 focus-isolation and #3 donor-delete live in the graphlet plan).
+The remaining gesture work, with seams and rough size. Independent of the subgraph subsystem
+(whose own open items #1 focus-isolation and #3 donor-delete live in the subgraph plan).
 
 - **Ambiguous-drag toast (G1) — now a notification-subsystem consumer; foundation DONE
   (2026-06-27).** Mark's reframe: notifications are a **Steward-accounted subsystem**, and toasts
@@ -358,11 +360,11 @@ orthogonal to the gestures; sequence when the unified element work is picked up.
   (orrery/lib.rs:1721) routes through `navigate_node`, which reuses the node and records a visit;
   it does **not** mint a node. So within-tile navigation in a leaf adds lineage, not kernel
   nodes, exactly as the brief §6.1 assumes. No prerequisite work.
-- **OQ-7 (new) — branch forme API. RESOLVED (2026-06-25).** `GraphletRef` /
-  `GraphletBinding::Branched` (renamed from `Forked`) exist and are first-class + unit-tested at
-  `crates/forme/forme`, but the graphlet layer is **unwired** — no live `GraphTree` outside forme's
+- **OQ-7 (new) — branch forme API. RESOLVED (2026-06-25).** `SubgraphRef` /
+  `SubgraphBinding::Branched` (renamed from `Forked`) exist and are first-class + unit-tested at
+  `crates/forme/forme`, but the subgraph layer is **unwired** — no live `GraphTree` outside forme's
   tests. So the substrate is the *whole layer*, not the variant. Decision: **defer branch**, wire
-  the graphlet layer as its own plan (see G3). Branch stays the leaf-stub meanwhile.
+  the subgraph layer as its own plan (see G3). Branch stays the leaf-stub meanwhile.
 
 ## Gesture-design decisions (2026-06-24 probe)
 
@@ -394,8 +396,8 @@ only tears with a modifier (so it never steals the pin). Modifiers are captured 
   menu), following the cursor with the node's icon/color/title; the origin node stays put.
 - **GA-6 empty-donor fate**: when the last tile is torn, the donor window persists empty with an
   explicit close (optional "no tiles left, close?" safety toast). No silent auto-close.
-- **GA-7 branch frame binding**: add `graphlet_id: Option<GraphletId>` to the leaf pane (None =
-  donor default; G3 sets it) so a branch's workbench populates the new graphlet.
+- **GA-7 branch frame binding**: add `subgraph_id: Option<SubgraphId>` to the leaf pane (None =
+  donor default; G3 sets it) so a branch's workbench populates the new subgraph.
 - **OQ-8 same-graph other-pane drop** (the third drop-target case, beyond OQ-1's two): a node
   dropped on another pane resolving to the *same* graph. Recommend **no-op** for v0 (a node is
   already in that graph; a same-graph "copy" is a duplicate, deferred), with new-window as the
@@ -417,8 +419,8 @@ v0 (palette parent link suffices); auto-consolidation policy disabled by default
 - **2026-06-24** — Spun out of the completed tearout-composability plan (foundation done +
   driven headed). Scoped the gesture model against the current substrate: leaf window-kind +
   camera + MW3 + single-node `copy_node_from` are banked; the drag gesture, toast, leaf
-  content, branch graphlet wiring, fork subgraph copy, and G5 copy/move are the live work.
-  Grounded the gaps (no tear-out drag in meerkat; forme graphlet API unconfirmed; subgraph copy
+  content, branch subgraph wiring, fork subgraph copy, and G5 copy/move are the live work.
+  Grounded the gaps (no tear-out drag in meerkat; forme subgraph API unconfirmed; subgraph copy
   absent but `weakly_connected_components` is the building block). No code written.
 - **2026-06-24** — **OQ-1 resolved (with Mark): drop-target-determined** (empty/new-window =
   trichotomy; another graph's pane = copy/move). Ran an adversarial 4-lens probe for further
@@ -454,16 +456,16 @@ v0 (palette parent link suffices); auto-consolidation policy disabled by default
   full component laid out. Driving caught a pile-at-seed bug (kernel node positions are the spawn
   seed, not the live layout); fixed with `Orrery::commit_positions_to_graph` (bake live positions
   before the clone). meerkat 81 lib / 153 bin + kernel green. Branch is a leaf stub pending its
-  forme graphlet op (G3 / OQ-7); the toast + tile-tab leaf origin + G5 move variant remain.
-- **2026-06-25** — **G3 branch fully live (Phases 1+2 via the graphlet wiring plan); trailing
-  items scoped.** Branch now mints + persists a `Branched` graphlet, shows a `⎇ <anchor>` chip,
+  forme subgraph op (G3 / OQ-7); the toast + tile-tab leaf origin + G5 move variant remain.
+- **2026-06-25** — **G3 branch fully live (Phases 1+2 via the subgraph wiring plan); trailing
+  items scoped.** Branch now mints + persists a `Branched` subgraph, shows a `⎇ <anchor>` chip,
   and accumulates lineage on navigation (driven). Added a scoped "Trailing tear-out items"
   section (toast, tile-tab leaf origin, G2 leaf content, G5 move, fork restore-into-switcher)
-  with seams + a rough order, and pointed G6's branch-die half at the graphlet plan's #3. The
-  graphlet subsystem's own open items (#1 per-window focus isolation, #3 donor-delete) live in
+  with seams + a rough order, and pointed G6's branch-die half at the subgraph plan's #3. The
+  subgraph subsystem's own open items (#1 per-window focus isolation, #3 donor-delete) live in
   the [graphlet wiring plan](../../archive_docs/2026-07-04_completed_plans/2026-06-25_graphlet_wiring_plan.md).
 - **2026-06-27** — **Trailing items pass: G6 + fork-restore + G5 move + G2 content done; toast +
-  tile-tab reframed.** Verified **G6 cascade** is met via the graphlet plan's #3 (close-windows +
+  tile-tab reframed.** Verified **G6 cascade** is met via the subgraph plan's #3 (close-windows +
   pool-drop; marked done). **Fork restore** turned out to be already working — `fork_session_from`
   persists the manifest+graph like `create_session`, so `bootstrap_sessions`' `load_from_disk`
   re-lists it; the "not wired" note predated the code. Locked by `fork_session_restores_on_restart`.

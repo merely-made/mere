@@ -1,16 +1,17 @@
 [package]
-name = "graphlets"
+name = "mere-subgraph"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
-description = "Pure graphlet derivation and shape classification for the Mere graph family."
-documentation = "https://docs.rs/graphlets"
+description = "Pure subgraph derivation and shape classification for the Mere graph family."
+documentation = "https://docs.rs/mere-subgraph"
 readme = "README.md"
-keywords = ["graph", "graphlets", "mere", "forme", "classifier"]
+keywords = ["graph", "subgraph", "mere", "classifier"]
 categories = ["algorithms", "data-structures"]
 
 [lib]
+name = "subgraph"
 path = "src/lib.rs"
 
 [dependencies]

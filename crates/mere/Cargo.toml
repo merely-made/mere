@@ -15,7 +15,7 @@ default = ["graph", "linked-data", "canvas", "workbench"]
 # presentation or host-workbench dependencies.
 graph = [
     "dep:forme",
-    "dep:graphlets",
+    "dep:subgraph",
     "dep:glossary",
     "dep:kernel",
     "dep:roster",
@@ -48,7 +48,7 @@ forme = { workspace = true, optional = true }
 # The engine-management layer (genet component since 2026-07-10): the facade
 # composes mere's routing vocabulary over inker's host-neutral policy.
 inker = { workspace = true, optional = true }
-graphlets = { workspace = true, optional = true }
+subgraph = { workspace = true, optional = true }
 glossary = { workspace = true, optional = true }
 gloss = { workspace = true, optional = true }
 kernel = { workspace = true, optional = true }

@@ -172,7 +172,6 @@ Retired words that remain as code identifiers, migrating opportunistically when 
 | `inker::Engine`, `ENGINE_ID`, `engine_id()` | engine (for readers) | the reader trait |
 | `Scope::Orrery` | orrery (as tier) | the form factor; rename to a form-factor enum when touched |
 | `crates/forme` (`forme`, `mere-forme`) | forme (as graphlet qualifier) | a *different* sense that stays live: the workbench arrangement authority, named for the locked-up printing forme. The retirement covers only the graphlet-qualifier use |
-| `crates/graph/graphlets` | graphlet | per-session subgraph derivation and the shape classifier; rename to the subgraph vocabulary when next touched |
 | `tessera.redb`, `tessera_operations` | Tessera | on-disk compatibility only |
 
 ## Retired terms (do not revive)
@@ -217,4 +216,6 @@ Canonical for the words it defines. The lexicon brief remains the working source
 
 Done-condition: every capitalized term used in the body has its own entry or a retired-table row, and no word appears in two senses on this page. Met 2026-09-05 for the thirteen previously undefined terms (seiche, chartulary, Navigator, sceno family, muniment, Journal, kernel, shellbar, pane, tile, Scrying, Castellan, pelt); ortet, fleece and tabard were added in the same pass because the tree uses them.
 
-Open: the `graphlets` crate rename waits for its next touch; `design_docs/verso_docs/` keeps its name until someone has a reason to move it.
+Resolved 2026-09-12: the `graphlets` crate rename landed as `crates/graph/subgraph` (package `mere-subgraph`, lib `subgraph`), with forme's `graphlet.rs` becoming `crates/forme/forme/src/subgraph.rs` (`SubgraphId`, `SubgraphRef`, `SubgraphSpec`, `SubgraphKind`, `SubgraphBinding`, `SubgraphMemberDelta`), `SessionSubgraphs`, the `subgraphs.json` sidecar, the `graph:fit_subgraph` / `node:remove_from_subgraph` actions, `ArrangementKind::Supernode` (was `CollapsedGraphlet`), and the roster tab "Subgraphs". Kind variants (Ego, Component, Corridor, ...) and binding variants (UnlinkedSession, Linked, Branched) are unchanged. The survivors row for the crate is struck; the retired-table row above stays as the record. Docs written before the retirement keep the word under a leading note or a historical-citation marker rather than a rewrite.
+
+Open: `design_docs/verso_docs/` keeps its name until someone has a reason to move it.

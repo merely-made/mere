@@ -7,30 +7,30 @@
 use crate::MemberId;
 use serde::{Deserialize, Serialize};
 
-/// Graphlet identity. Lightweight integer index within a single GraphTree.
-pub type GraphletId = u32;
+/// Subgraph identity. Lightweight integer index within a single GraphTree.
+pub type SubgraphId = u32;
 
-/// A graphlet is a connected sub-structure within the GraphTree.
-/// Multiple graphlets exist in a graph view — like document groups
+/// A subgraph is a connected sub-structure within the GraphTree.
+/// Multiple subgraphs exist in a graph view — like document groups
 /// in a folder. Each tracks its own binding and anchor state.
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(bound = "")]
-pub struct GraphletRef<N: MemberId> {
-    pub id: GraphletId,
+pub struct SubgraphRef<N: MemberId> {
+    pub id: SubgraphId,
     pub anchors: Vec<N>,
     pub primary_anchor: Option<N>,
-    pub binding: GraphletBinding,
-    pub kind: Option<GraphletKind>,
+    pub binding: SubgraphBinding,
+    pub kind: Option<SubgraphKind>,
 }
 
-impl<N: MemberId> GraphletRef<N> {
-    pub fn new_session(id: GraphletId) -> Self {
+impl<N: MemberId> SubgraphRef<N> {
+    pub fn new_session(id: SubgraphId) -> Self {
         Self {
             id,
             anchors: Vec::new(),
             primary_anchor: None,
-            binding: GraphletBinding::UnlinkedSession,
-            kind: Some(GraphletKind::Session),
+            binding: SubgraphBinding::UnlinkedSession,
+            kind: Some(SubgraphKind::Session),
         }
     }
 
@@ -40,42 +40,42 @@ impl<N: MemberId> GraphletRef<N> {
         self
     }
 
-    pub fn with_kind(mut self, kind: GraphletKind) -> Self {
+    pub fn with_kind(mut self, kind: SubgraphKind) -> Self {
         self.kind = Some(kind);
         self
     }
 }
 
-/// How a tile group binds to a graphlet definition.
+/// How a tile group binds to a subgraph definition.
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub enum GraphletBinding {
-    /// No link to a canonical graphlet definition. Pure session grouping.
+pub enum SubgraphBinding {
+    /// No link to a canonical subgraph definition. Pure session grouping.
     UnlinkedSession,
-    /// Linked to a canonical graphlet spec. Roster updates from graph.
-    Linked { spec: GraphletSpec },
+    /// Linked to a canonical subgraph spec. Roster updates from graph.
+    Linked { spec: SubgraphSpec },
     /// Was linked, but a user override created a local divergence — the tear-out
     /// **branch** operation (a new grouping inside the donor's own graph). Named
     /// `Branched`, not `Forked`, to stay distinct from the host's **fork** (a new
     /// session + graph), which is the opposite operation a layer up. (See the tear-out
     /// operations brief §4.2.)
     Branched {
-        parent_spec: GraphletSpec,
+        parent_spec: SubgraphSpec,
         reason: String,
     },
 }
 
-/// Canonical graphlet specification (referenced by Linked bindings).
+/// Canonical subgraph specification (referenced by Linked bindings).
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct GraphletSpec {
-    pub kind: GraphletKind,
+pub struct SubgraphSpec {
+    pub kind: SubgraphKind,
     pub anchors: Vec<String>,
     pub primary_anchor: Option<String>,
     pub selectors: Vec<String>,
 }
 
-/// The 9 canonical graphlet shapes from `graphlet_model.md`.
+/// The 9 canonical subgraph shapes from `subgraph_model.md`.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub enum GraphletKind {
+pub enum SubgraphKind {
     Ego { radius: u8 },
     Corridor,
     Component,
@@ -88,12 +88,12 @@ pub enum GraphletKind {
 }
 
 // ---------------------------------------------------------------------------
-// Edge projection spec (consumed from graphlet_projection_binding_spec.md §3)
+// Edge projection spec (consumed from subgraph_projection_binding_spec.md §3)
 // ---------------------------------------------------------------------------
 
 /// Where the active edge projection originates.
 ///
-/// See `graphlet_projection_binding_spec.md §3.1` for the canonical shape.
+/// See `subgraph_projection_binding_spec.md §3.1` for the canonical shape.
 /// The `graph_view_id` and `graph_id` fields are carried as opaque strings
 /// because the forme crate has no dependency on Graphshell's ID types.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -109,7 +109,7 @@ pub enum ProjectionSource {
     },
 }
 
-/// Which edges contribute to graphlet derivation.
+/// Which edges contribute to subgraph derivation.
 ///
 /// This is the tree-side carrier for the binding spec's `EdgeProjectionSpec`.
 /// Selectors are opaque strings because the tree crate doesn't own the
@@ -121,13 +121,13 @@ pub struct EdgeProjectionSpec {
 }
 
 // ---------------------------------------------------------------------------
-// Reconciliation types (graphlet_projection_binding_spec.md §7 + §11)
+// Reconciliation types (subgraph_projection_binding_spec.md §7 + §11)
 // ---------------------------------------------------------------------------
 
-/// Difference between a linked graphlet's expected member set and the tree's
-/// current member set for that graphlet.
+/// Difference between a linked subgraph's expected member set and the tree's
+/// current member set for that subgraph.
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub struct GraphletMemberDelta<N: MemberId> {
+pub struct SubgraphMemberDelta<N: MemberId> {
     /// Members present in graph truth but absent from the tree.
     pub added: Vec<N>,
     /// Members present in the tree but absent from graph truth.
@@ -136,7 +136,7 @@ pub struct GraphletMemberDelta<N: MemberId> {
     pub rebased_seeds: Vec<N>,
 }
 
-impl<N: MemberId> GraphletMemberDelta<N> {
+impl<N: MemberId> SubgraphMemberDelta<N> {
     pub fn empty() -> Self {
         Self {
             added: Vec::new(),
@@ -152,11 +152,11 @@ impl<N: MemberId> GraphletMemberDelta<N> {
 
 /// Proposal produced by reconciliation for the host to present to the user.
 ///
-/// See `graphlet_projection_binding_spec.md §7.1` for the four choices.
+/// See `subgraph_projection_binding_spec.md §7.1` for the four choices.
 #[derive(Clone, Debug)]
 pub struct ReconciliationProposal<N: MemberId> {
-    pub graphlet_id: GraphletId,
-    pub delta: GraphletMemberDelta<N>,
+    pub subgraph_id: SubgraphId,
+    pub delta: SubgraphMemberDelta<N>,
     pub reason: String,
 }
 
@@ -167,7 +167,7 @@ pub enum ReconciliationChoice {
     ApplyKeepLinked,
     /// Preserve the current tree roster; convert to unlinked session.
     KeepAsUnlinkedSession,
-    /// Fork a new graphlet from the parent.
+    /// Fork a new subgraph from the parent.
     SaveAsNewFork { reason: String },
     /// Discard the pending change; restore the last synced roster.
     Cancel,

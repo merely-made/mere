@@ -27,11 +27,11 @@
 //!
 //! ## Parked (graphshell-era machinery — git-revivable)
 //!
-//! The modules below are the rich graph-derived-navigation lane (graphlet
+//! The modules below are the rich graph-derived-navigation lane (subgraph
 //! topology, lenses, reconciliation, pressure, the tree-first `GraphTree` /
 //! `TreeTopology`). They are **not** the v1 arrangement core and will be
 //! removed from the active crate in a follow-up (kept only as the future
-//! `CollapsedGraphlet` / derived-arrangement hook). Do not build new product
+//! `Supernode` / derived-arrangement hook). Do not build new product
 //! paths on them.
 //!
 //! No egui. No iced. No winit. No wgpu. Pure data + pure functions.
@@ -55,7 +55,7 @@ pub use fold::{FOLD_RECORD_VERSION, FoldBoundaryPolicy, FoldId, FoldRecord};
 pub use forme_document::{FormeDocument, FormeId, FormeRef};
 
 // ── Parked graphshell-era machinery (git-revivable; pending removal) ─────────
-mod graphlet;
+mod subgraph;
 mod layout;
 mod lens;
 mod member;
@@ -68,7 +68,7 @@ mod topology;
 mod tree;
 mod ux;
 
-pub use graphlet::*;
+pub use subgraph::*;
 pub use layout::*;
 pub use lens::*;
 pub use member::*;

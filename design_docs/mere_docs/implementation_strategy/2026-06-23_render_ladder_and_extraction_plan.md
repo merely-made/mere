@@ -1,5 +1,7 @@
 # Mere render ladder + web-extraction lane
 
+*Written before the 2026-09-05 retirement of graphlet (TERMINOLOGY.md): read graphlet as subgraph. Identifiers such as GraphletId, GraphletRef, and SessionGraphlets are now SubgraphId, SubgraphRef, and SessionSubgraphs, and the graphlets crate is crates/graph/subgraph (code renamed 2026-09-12).*
+
 **Date**: 2026-06-23
 **Status:** substantially built (2026-07-01) — see Progress. Phase 1a (rung taxonomy),
 phase 2a-c (scripted render rung + external scripts + cookies), phase 3 (input → event

@@ -126,7 +126,7 @@ pub enum ActionId {
     NodeDetachToSplit,
     NodeMoveToActivePane,
     NodeWarmSelect,
-    NodeRemoveFromGraphlet,
+    NodeRemoveFromSubgraph,
     NodeImportWebFinger,
     NodeResolveNip05,
     NodeResolveMatrix,
@@ -145,7 +145,7 @@ pub enum ActionId {
     EdgeRemoveUser,
     // Graph actions
     GraphFit,
-    GraphFitGraphlet,
+    GraphFitSubgraph,
     GraphCycleFocusRegion,
     GraphToggleOverviewPlane,
     GraphTogglePhysics,
@@ -206,7 +206,7 @@ impl ActionId {
             Self::NodeDetachToSplit => "node:detach_to_split",
             Self::NodeMoveToActivePane => "node:move_to_active_pane",
             Self::NodeWarmSelect => "node:warm_select",
-            Self::NodeRemoveFromGraphlet => "node:remove_from_graphlet",
+            Self::NodeRemoveFromSubgraph => "node:remove_from_subgraph",
             Self::NodeImportWebFinger => "node:import_webfinger",
             Self::NodeResolveNip05 => "node:resolve_nip05",
             Self::NodeResolveMatrix => "node:resolve_matrix",
@@ -222,7 +222,7 @@ impl ActionId {
             Self::EdgeConnectBoth => "edge:connect_both",
             Self::EdgeRemoveUser => "edge:remove_user",
             Self::GraphFit => "graph:fit",
-            Self::GraphFitGraphlet => "graph:fit_graphlet",
+            Self::GraphFitSubgraph => "graph:fit_subgraph",
             Self::GraphCycleFocusRegion => "graph:cycle_focus_region",
             Self::GraphToggleOverviewPlane => "graph:toggle_overview_plane",
             Self::GraphTogglePhysics => "graph:toggle_physics",
@@ -280,7 +280,7 @@ impl ActionId {
             Self::NodeDetachToSplit => "Detach",
             Self::NodeMoveToActivePane => "Move",
             Self::NodeWarmSelect => "Open Cold",
-            Self::NodeRemoveFromGraphlet => "Leave Group",
+            Self::NodeRemoveFromSubgraph => "Leave Group",
             Self::NodeImportWebFinger => "WebFinger",
             Self::NodeResolveNip05 => "NIP-05",
             Self::NodeResolveMatrix => "Matrix",
@@ -296,7 +296,7 @@ impl ActionId {
             Self::EdgeConnectBoth => "Both",
             Self::EdgeRemoveUser => "Remove",
             Self::GraphFit => "Fit",
-            Self::GraphFitGraphlet => "Fit Graphlet",
+            Self::GraphFitSubgraph => "Fit Subgraph",
             Self::GraphCycleFocusRegion => "Focus",
             Self::GraphToggleOverviewPlane => "Overview",
             Self::GraphTogglePhysics => "Physics",
@@ -354,7 +354,7 @@ impl ActionId {
             Self::NodeDetachToSplit => "Detach Focused to Split",
             Self::NodeMoveToActivePane => "Move Node to Active Pane",
             Self::NodeWarmSelect => "Open Cold Selection as Tiles",
-            Self::NodeRemoveFromGraphlet => "Remove from Graphlet",
+            Self::NodeRemoveFromSubgraph => "Remove from Subgraph",
             Self::NodeImportWebFinger => "Import WebFinger Discovery",
             Self::NodeResolveNip05 => "Resolve NIP-05 Identity",
             Self::NodeResolveMatrix => "Resolve Matrix Profile",
@@ -370,7 +370,7 @@ impl ActionId {
             Self::EdgeConnectBoth => "Connect Both Directions",
             Self::EdgeRemoveUser => "Remove User Edge",
             Self::GraphFit => "Fit Graph to Screen",
-            Self::GraphFitGraphlet => "Fit Graphlet to Screen",
+            Self::GraphFitSubgraph => "Fit Subgraph to Screen",
             Self::GraphCycleFocusRegion => "Cycle Focus Region",
             Self::GraphToggleOverviewPlane => "Toggle Overview Plane",
             Self::GraphTogglePhysics => "Toggle Physics Simulation",
@@ -433,7 +433,7 @@ impl ActionId {
             | Self::NodeRenderWebView
             | Self::NodeRenderWry
             | Self::NodeWarmSelect
-            | Self::NodeRemoveFromGraphlet
+            | Self::NodeRemoveFromSubgraph
             | Self::NodeImportWebFinger
             | Self::NodeResolveNip05
             | Self::NodeResolveMatrix
@@ -444,7 +444,7 @@ impl ActionId {
                 ActionCategory::Edge
             },
             Self::GraphFit
-            | Self::GraphFitGraphlet
+            | Self::GraphFitSubgraph
             | Self::GraphCycleFocusRegion
             | Self::GraphToggleOverviewPlane
             | Self::GraphTogglePhysics
@@ -515,7 +515,7 @@ pub fn all_action_ids() -> &'static [ActionId] {
         NodeRenderWebView,
         NodeRenderWry,
         NodeWarmSelect,
-        NodeRemoveFromGraphlet,
+        NodeRemoveFromSubgraph,
         NodeImportWebFinger,
         NodeResolveNip05,
         NodeResolveMatrix,
@@ -526,7 +526,7 @@ pub fn all_action_ids() -> &'static [ActionId] {
         EdgeConnectBoth,
         EdgeRemoveUser,
         GraphFit,
-        GraphFitGraphlet,
+        GraphFitSubgraph,
         GraphCycleFocusRegion,
         GraphToggleOverviewPlane,
         GraphTogglePhysics,

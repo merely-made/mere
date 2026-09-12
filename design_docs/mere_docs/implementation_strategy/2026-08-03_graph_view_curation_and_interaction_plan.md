@@ -1,5 +1,7 @@
 # Graph View Curation and Interaction Plan
 
+*Written before the 2026-09-05 retirement of graphlet (TERMINOLOGY.md): read graphlet as subgraph. Identifiers such as GraphletId, GraphletRef, and SessionGraphlets are now SubgraphId, SubgraphRef, and SessionSubgraphs, and the graphlets crate is crates/graph/subgraph (code renamed 2026-09-12). CollapsedGraphlet is now ArrangementKind::Supernode.*
+
 **Date:** 2026-08-03  
 **Status:** C3's root-Canvas fold is landed; its Swatch proof remains pending.
 C4 is complete: the source-time contract has journal-prefix and Git-authority
@@ -80,7 +82,7 @@ geometry, and scene delivery retain separate owners.
 - **Isometry is a real second Swatch consumer.**
   `isometry-views/src/overmap.rs` produces a Cambium `GraphCanvasSwatch`.
 - **Grouping vocabulary exists.** Forme carries `Group`,
-  `CollapsedGraphlet`, `MemberOf`, and `PinnedIn`. Sceno carries nested
+  `CollapsedGraphlet` (now `ArrangementKind::Supernode`, renamed 2026-09-12), `MemberOf`, and `PinnedIn`. Sceno carries nested
   `Space`s and member `Region`s. The missing piece is a view-level fold with a
   stable identity and boundary-relation policy.
 - **Portable scene time exists, but it means delivery time.** Scenotime's

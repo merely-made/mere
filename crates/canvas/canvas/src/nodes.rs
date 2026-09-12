@@ -354,7 +354,7 @@ impl Canvas {
 
     /// The graph members (node UUIDs) of the currently-selected nodes. The host
     /// reads this for a selection-driven open: a single selection opens that
-    /// node's graphlet, a multi-selection opens the selected nodes.
+    /// node's subgraph, a multi-selection opens the selected nodes.
     pub fn selected_members(&self) -> Vec<uuid::Uuid> {
         self.selected
             .iter()
@@ -386,7 +386,7 @@ impl Canvas {
     /// The members in `member`'s connected component — `member` plus every node
     /// reachable from it through relations (undirected), breadth-first from the
     /// queried node. Empty if `member` is not in the graph. This is the node's
-    /// "graphlet"; the host intersects it with the warm-tab set to decide what to
+    /// "subgraph"; the host intersects it with the warm-tab set to decide what to
     /// tile.
     pub fn connected_members(&self, member: uuid::Uuid) -> Vec<uuid::Uuid> {
         let Some((start, _)) = self.graph.get_node_by_id(member) else {

@@ -4,38 +4,38 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! Graphlet binding reconciliation.
+//! Subgraph binding reconciliation.
 //!
-//! When a linked graphlet's graph-truth membership changes, the tree must
+//! When a linked subgraph's graph-truth membership changes, the tree must
 //! detect the delta, propose reconciliation to the host, and apply the
 //! chosen outcome. This module implements the delta computation and
 //! outcome application described in
-//! `graphlet_projection_binding_spec.md §7`.
+//! `subgraph_projection_binding_spec.md §7`.
 
 use std::collections::HashSet;
 
 use crate::MemberId;
-use crate::graphlet::{
-    GraphletBinding, GraphletId, GraphletMemberDelta, GraphletSpec, ReconciliationChoice,
+use crate::subgraph::{
+    SubgraphBinding, SubgraphId, SubgraphMemberDelta, SubgraphSpec, ReconciliationChoice,
     ReconciliationProposal,
 };
 use crate::member::Lifecycle;
 use crate::nav::TreeIntent;
 use crate::tree::GraphTree;
 
-/// Compute the roster delta between a linked graphlet's expected members
-/// (from graph truth) and the tree's current members for that graphlet.
+/// Compute the roster delta between a linked subgraph's expected members
+/// (from graph truth) and the tree's current members for that subgraph.
 ///
 /// `graph_truth_members` is the authoritative member set as derived from
-/// the graph using the graphlet's edge projection spec.
+/// the graph using the subgraph's edge projection spec.
 pub fn compute_roster_delta<N: MemberId>(
     tree: &GraphTree<N>,
-    graphlet_id: GraphletId,
+    subgraph_id: SubgraphId,
     graph_truth_members: &[N],
-) -> GraphletMemberDelta<N> {
+) -> SubgraphMemberDelta<N> {
     let truth_set: HashSet<&N> = graph_truth_members.iter().collect();
     let tree_members: Vec<N> = tree
-        .graphlet_members(graphlet_id)
+        .subgraph_members(subgraph_id)
         .into_iter()
         .cloned()
         .collect();
@@ -53,29 +53,29 @@ pub fn compute_roster_delta<N: MemberId>(
         .cloned()
         .collect();
 
-    GraphletMemberDelta {
+    SubgraphMemberDelta {
         added,
         removed,
         rebased_seeds: Vec::new(),
     }
 }
 
-/// Build a reconciliation proposal for a linked graphlet that has drifted
+/// Build a reconciliation proposal for a linked subgraph that has drifted
 /// from graph truth.
 ///
 /// Returns `None` if the delta is empty (no reconciliation needed).
 pub fn propose_reconciliation<N: MemberId>(
     tree: &GraphTree<N>,
-    graphlet_id: GraphletId,
+    subgraph_id: SubgraphId,
     graph_truth_members: &[N],
     reason: impl Into<String>,
 ) -> Option<ReconciliationProposal<N>> {
-    let delta = compute_roster_delta(tree, graphlet_id, graph_truth_members);
+    let delta = compute_roster_delta(tree, subgraph_id, graph_truth_members);
     if delta.is_empty() {
         return None;
     }
     Some(ReconciliationProposal {
-        graphlet_id,
+        subgraph_id,
         delta,
         reason: reason.into(),
     })
@@ -90,26 +90,26 @@ pub fn apply_reconciliation<N: MemberId>(
     proposal: &ReconciliationProposal<N>,
     choice: ReconciliationChoice,
 ) -> Vec<TreeIntent<N>> {
-    let gid = proposal.graphlet_id;
+    let gid = proposal.subgraph_id;
     let mut intents = Vec::new();
 
     match choice {
         ReconciliationChoice::ApplyKeepLinked => {
-            // Add new members to the tree with graphlet membership.
+            // Add new members to the tree with subgraph membership.
             for member in &proposal.delta.added {
                 if tree.get(member).is_none() {
                     tree.apply(crate::nav::NavAction::Attach {
                         member: member.clone(),
                         provenance: crate::member::Provenance::Derived {
                             connection: None,
-                            derivation: format!("graphlet-reconciliation:{}", gid),
+                            derivation: format!("subgraph-reconciliation:{}", gid),
                         },
                     });
                 }
-                // Tag with graphlet membership.
+                // Tag with subgraph membership.
                 if let Some(entry) = tree.get_mut(member) {
-                    if !entry.graphlet_membership.contains(&gid) {
-                        entry.graphlet_membership.push(gid);
+                    if !entry.subgraph_membership.contains(&gid) {
+                        entry.subgraph_membership.push(gid);
                     }
                 }
                 intents.push(TreeIntent::MemberAttached(member.clone()));
@@ -118,13 +118,13 @@ pub fn apply_reconciliation<N: MemberId>(
             // Remove members no longer in graph truth.
             for member in &proposal.delta.removed {
                 if let Some(entry) = tree.get_mut(member) {
-                    entry.graphlet_membership.retain(|id| *id != gid);
+                    entry.subgraph_membership.retain(|id| *id != gid);
                 }
-                // If the member has no remaining graphlet memberships and is Cold,
+                // If the member has no remaining subgraph memberships and is Cold,
                 // detach it entirely.
                 let should_detach = tree
                     .get(member)
-                    .map(|e| e.graphlet_membership.is_empty() && e.lifecycle == Lifecycle::Cold)
+                    .map(|e| e.subgraph_membership.is_empty() && e.lifecycle == Lifecycle::Cold)
                     .unwrap_or(false);
                 if should_detach {
                     tree.apply(crate::nav::NavAction::Detach {
@@ -136,34 +136,34 @@ pub fn apply_reconciliation<N: MemberId>(
             }
 
             intents.push(TreeIntent::ReconciliationNeeded {
-                graphlet: gid,
+                subgraph: gid,
                 reason: format!("applied: {}", proposal.reason),
             });
         },
 
         ReconciliationChoice::KeepAsUnlinkedSession => {
             // Convert binding to UnlinkedSession.
-            if let Some(graphlet) = tree.graphlets_mut().iter_mut().find(|g| g.id == gid) {
-                graphlet.binding = GraphletBinding::UnlinkedSession;
+            if let Some(subgraph) = tree.subgraphs_mut().iter_mut().find(|g| g.id == gid) {
+                subgraph.binding = SubgraphBinding::UnlinkedSession;
             }
         },
 
         ReconciliationChoice::SaveAsNewFork { ref reason } => {
             // Branch: preserve current roster, change binding to Branched.
-            if let Some(graphlet) = tree.graphlets_mut().iter_mut().find(|g| g.id == gid) {
-                let parent_spec = match &graphlet.binding {
-                    GraphletBinding::Linked { spec } => spec.clone(),
-                    _ => GraphletSpec {
-                        kind: graphlet
+            if let Some(subgraph) = tree.subgraphs_mut().iter_mut().find(|g| g.id == gid) {
+                let parent_spec = match &subgraph.binding {
+                    SubgraphBinding::Linked { spec } => spec.clone(),
+                    _ => SubgraphSpec {
+                        kind: subgraph
                             .kind
                             .clone()
-                            .unwrap_or(crate::graphlet::GraphletKind::Session),
+                            .unwrap_or(crate::subgraph::SubgraphKind::Session),
                         anchors: Vec::new(),
                         primary_anchor: None,
                         selectors: Vec::new(),
                     },
                 };
-                graphlet.binding = GraphletBinding::Branched {
+                subgraph.binding = SubgraphBinding::Branched {
                     parent_spec,
                     reason: reason.clone(),
                 };
@@ -179,23 +179,23 @@ pub fn apply_reconciliation<N: MemberId>(
 }
 
 /// Detect whether a manual operation (user-initiated attach/detach) on a
-/// member that belongs to a linked graphlet should trigger a fork.
+/// member that belongs to a linked subgraph should trigger a fork.
 ///
-/// Returns the graphlet ID and a fork reason if the operation diverges
+/// Returns the subgraph ID and a fork reason if the operation diverges
 /// from the linked spec.
 pub fn detect_fork_on_manual_override<N: MemberId>(
     tree: &GraphTree<N>,
     member: &N,
     operation: &str,
-) -> Option<(GraphletId, String)> {
+) -> Option<(SubgraphId, String)> {
     let entry = tree.get(member)?;
-    for &gid in &entry.graphlet_membership {
-        let graphlet = tree.graphlets().iter().find(|g| g.id == gid)?;
-        if matches!(graphlet.binding, GraphletBinding::Linked { .. }) {
+    for &gid in &entry.subgraph_membership {
+        let subgraph = tree.subgraphs().iter().find(|g| g.id == gid)?;
+        if matches!(subgraph.binding, SubgraphBinding::Linked { .. }) {
             return Some((
                 gid,
                 format!(
-                    "manual {} on member {:?} diverges from linked graphlet {}",
+                    "manual {} on member {:?} diverges from linked subgraph {}",
                     operation, member, gid
                 ),
             ));
@@ -204,21 +204,21 @@ pub fn detect_fork_on_manual_override<N: MemberId>(
     None
 }
 
-/// Transition a linked graphlet to Branched state.
+/// Transition a linked subgraph to Branched state.
 ///
 /// Called when `detect_fork_on_manual_override` fires and the host
 /// decides (or auto-policy decides) that the override should fork.
-pub fn apply_fork<N: MemberId>(tree: &mut GraphTree<N>, graphlet_id: GraphletId, reason: String) {
-    if let Some(graphlet) = tree
-        .graphlets_mut()
+pub fn apply_fork<N: MemberId>(tree: &mut GraphTree<N>, subgraph_id: SubgraphId, reason: String) {
+    if let Some(subgraph) = tree
+        .subgraphs_mut()
         .iter_mut()
-        .find(|g| g.id == graphlet_id)
+        .find(|g| g.id == subgraph_id)
     {
-        let parent_spec = match &graphlet.binding {
-            GraphletBinding::Linked { spec } => spec.clone(),
+        let parent_spec = match &subgraph.binding {
+            SubgraphBinding::Linked { spec } => spec.clone(),
             _ => return, // Not linked — nothing to fork.
         };
-        graphlet.binding = GraphletBinding::Branched {
+        subgraph.binding = SubgraphBinding::Branched {
             parent_spec,
             reason,
         };
@@ -286,11 +286,11 @@ pub fn derive_containment_topology<N: MemberId>(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::graphlet::{GraphletKind, GraphletRef};
+    use crate::subgraph::{SubgraphKind, SubgraphRef};
     use crate::member::Provenance;
     use crate::nav::NavAction;
 
-    fn make_tree_with_linked_graphlet(members: &[u64], graphlet_members: &[u64]) -> GraphTree<u64> {
+    fn make_tree_with_linked_subgraph(members: &[u64], subgraph_members: &[u64]) -> GraphTree<u64> {
         let mut tree = GraphTree::new(
             crate::layout::LayoutMode::TreeStyleTabs,
             crate::lens::ProjectionLens::Traversal,
@@ -305,24 +305,24 @@ mod tests {
             });
         }
 
-        let spec = GraphletSpec {
-            kind: GraphletKind::Session,
+        let spec = SubgraphSpec {
+            kind: SubgraphKind::Session,
             anchors: Vec::new(),
             primary_anchor: None,
             selectors: Vec::new(),
         };
-        let graphlet = GraphletRef {
+        let subgraph = SubgraphRef {
             id: 0,
             anchors: Vec::new(),
             primary_anchor: None,
-            binding: GraphletBinding::Linked { spec },
-            kind: Some(GraphletKind::Session),
+            binding: SubgraphBinding::Linked { spec },
+            kind: Some(SubgraphKind::Session),
         };
-        tree.add_graphlet(graphlet);
+        tree.add_subgraph(subgraph);
 
-        for &m in graphlet_members {
+        for &m in subgraph_members {
             if let Some(entry) = tree.get_mut(&m) {
-                entry.graphlet_membership.push(0);
+                entry.subgraph_membership.push(0);
             }
         }
         tree
@@ -330,14 +330,14 @@ mod tests {
 
     #[test]
     fn empty_delta_when_synchronized() {
-        let tree = make_tree_with_linked_graphlet(&[1, 2, 3], &[1, 2, 3]);
+        let tree = make_tree_with_linked_subgraph(&[1, 2, 3], &[1, 2, 3]);
         let delta = compute_roster_delta(&tree, 0, &[1, 2, 3]);
         assert!(delta.is_empty());
     }
 
     #[test]
     fn delta_detects_additions() {
-        let tree = make_tree_with_linked_graphlet(&[1, 2], &[1, 2]);
+        let tree = make_tree_with_linked_subgraph(&[1, 2], &[1, 2]);
         let delta = compute_roster_delta(&tree, 0, &[1, 2, 3]);
         assert_eq!(delta.added, vec![3]);
         assert!(delta.removed.is_empty());
@@ -345,7 +345,7 @@ mod tests {
 
     #[test]
     fn delta_detects_removals() {
-        let tree = make_tree_with_linked_graphlet(&[1, 2, 3], &[1, 2, 3]);
+        let tree = make_tree_with_linked_subgraph(&[1, 2, 3], &[1, 2, 3]);
         let delta = compute_roster_delta(&tree, 0, &[1, 2]);
         assert!(delta.added.is_empty());
         assert_eq!(delta.removed, vec![3]);
@@ -353,7 +353,7 @@ mod tests {
 
     #[test]
     fn delta_detects_both() {
-        let tree = make_tree_with_linked_graphlet(&[1, 2, 3], &[1, 2, 3]);
+        let tree = make_tree_with_linked_subgraph(&[1, 2, 3], &[1, 2, 3]);
         let delta = compute_roster_delta(&tree, 0, &[1, 2, 4]);
         assert_eq!(delta.added, vec![4]);
         assert_eq!(delta.removed, vec![3]);
@@ -361,13 +361,13 @@ mod tests {
 
     #[test]
     fn propose_returns_none_when_synchronized() {
-        let tree = make_tree_with_linked_graphlet(&[1, 2], &[1, 2]);
+        let tree = make_tree_with_linked_subgraph(&[1, 2], &[1, 2]);
         assert!(propose_reconciliation(&tree, 0, &[1, 2], "test").is_none());
     }
 
     #[test]
     fn propose_returns_some_when_diverged() {
-        let tree = make_tree_with_linked_graphlet(&[1, 2], &[1, 2]);
+        let tree = make_tree_with_linked_subgraph(&[1, 2], &[1, 2]);
         let proposal = propose_reconciliation(&tree, 0, &[1, 2, 3], "graph change");
         assert!(proposal.is_some());
         assert_eq!(proposal.unwrap().delta.added, vec![3]);
@@ -375,33 +375,33 @@ mod tests {
 
     #[test]
     fn apply_keep_linked_adds_members() {
-        let mut tree = make_tree_with_linked_graphlet(&[1, 2], &[1, 2]);
+        let mut tree = make_tree_with_linked_subgraph(&[1, 2], &[1, 2]);
         let proposal = propose_reconciliation(&tree, 0, &[1, 2, 3], "test").unwrap();
         let intents =
             apply_reconciliation(&mut tree, &proposal, ReconciliationChoice::ApplyKeepLinked);
 
         // Member 3 should now exist in the tree.
         assert!(tree.get(&3).is_some());
-        // And should be tagged with graphlet 0.
-        assert!(tree.get(&3).unwrap().graphlet_membership.contains(&0));
+        // And should be tagged with subgraph 0.
+        assert!(tree.get(&3).unwrap().subgraph_membership.contains(&0));
         assert!(!intents.is_empty());
     }
 
     #[test]
     fn apply_keep_linked_removes_cold_unaffiliated_members() {
-        let mut tree = make_tree_with_linked_graphlet(&[1, 2, 3], &[1, 2, 3]);
+        let mut tree = make_tree_with_linked_subgraph(&[1, 2, 3], &[1, 2, 3]);
         // Make member 3 Cold so it can be auto-detached.
         tree.apply(NavAction::SetLifecycle(3, Lifecycle::Cold));
         let proposal = propose_reconciliation(&tree, 0, &[1, 2], "test").unwrap();
         apply_reconciliation(&mut tree, &proposal, ReconciliationChoice::ApplyKeepLinked);
 
-        // Member 3 should be detached (no remaining graphlet membership + Cold).
+        // Member 3 should be detached (no remaining subgraph membership + Cold).
         assert!(tree.get(&3).is_none());
     }
 
     #[test]
     fn apply_keep_unlinked_converts_binding() {
-        let mut tree = make_tree_with_linked_graphlet(&[1, 2], &[1, 2]);
+        let mut tree = make_tree_with_linked_subgraph(&[1, 2], &[1, 2]);
         let proposal = propose_reconciliation(&tree, 0, &[1, 2, 3], "test").unwrap();
         apply_reconciliation(
             &mut tree,
@@ -409,13 +409,13 @@ mod tests {
             ReconciliationChoice::KeepAsUnlinkedSession,
         );
 
-        let binding = &tree.graphlets()[0].binding;
-        assert!(matches!(binding, GraphletBinding::UnlinkedSession));
+        let binding = &tree.subgraphs()[0].binding;
+        assert!(matches!(binding, SubgraphBinding::UnlinkedSession));
     }
 
     #[test]
     fn apply_fork_preserves_parent_spec() {
-        let mut tree = make_tree_with_linked_graphlet(&[1, 2], &[1, 2]);
+        let mut tree = make_tree_with_linked_subgraph(&[1, 2], &[1, 2]);
         let proposal = propose_reconciliation(&tree, 0, &[1, 2, 3], "test").unwrap();
         apply_reconciliation(
             &mut tree,
@@ -425,13 +425,13 @@ mod tests {
             },
         );
 
-        let binding = &tree.graphlets()[0].binding;
+        let binding = &tree.subgraphs()[0].binding;
         match binding {
-            GraphletBinding::Branched {
+            SubgraphBinding::Branched {
                 parent_spec,
                 reason,
             } => {
-                assert_eq!(parent_spec.kind, GraphletKind::Session);
+                assert_eq!(parent_spec.kind, SubgraphKind::Session);
                 assert_eq!(reason, "user override");
             },
             _ => panic!("expected Branched binding"),
@@ -440,7 +440,7 @@ mod tests {
 
     #[test]
     fn cancel_leaves_tree_unchanged() {
-        let mut tree = make_tree_with_linked_graphlet(&[1, 2], &[1, 2]);
+        let mut tree = make_tree_with_linked_subgraph(&[1, 2], &[1, 2]);
         let proposal = propose_reconciliation(&tree, 0, &[1, 2, 3], "test").unwrap();
         apply_reconciliation(&mut tree, &proposal, ReconciliationChoice::Cancel);
 
@@ -448,14 +448,14 @@ mod tests {
         assert!(tree.get(&3).is_none());
         // Binding should still be Linked.
         assert!(matches!(
-            tree.graphlets()[0].binding,
-            GraphletBinding::Linked { .. }
+            tree.subgraphs()[0].binding,
+            SubgraphBinding::Linked { .. }
         ));
     }
 
     #[test]
-    fn detect_fork_finds_linked_graphlet() {
-        let tree = make_tree_with_linked_graphlet(&[1, 2], &[1, 2]);
+    fn detect_fork_finds_linked_subgraph() {
+        let tree = make_tree_with_linked_subgraph(&[1, 2], &[1, 2]);
         let result = detect_fork_on_manual_override(&tree, &1, "dismiss");
         assert!(result.is_some());
         let (gid, _reason) = result.unwrap();
@@ -464,20 +464,20 @@ mod tests {
 
     #[test]
     fn detect_fork_ignores_unlinked() {
-        let mut tree = make_tree_with_linked_graphlet(&[1, 2], &[1, 2]);
+        let mut tree = make_tree_with_linked_subgraph(&[1, 2], &[1, 2]);
         // Convert to unlinked.
-        tree.graphlets_mut()[0].binding = GraphletBinding::UnlinkedSession;
+        tree.subgraphs_mut()[0].binding = SubgraphBinding::UnlinkedSession;
         let result = detect_fork_on_manual_override(&tree, &1, "dismiss");
         assert!(result.is_none());
     }
 
     #[test]
     fn apply_fork_transitions_to_forked() {
-        let mut tree = make_tree_with_linked_graphlet(&[1, 2], &[1, 2]);
+        let mut tree = make_tree_with_linked_subgraph(&[1, 2], &[1, 2]);
         apply_fork(&mut tree, 0, "manual override".to_string());
         assert!(matches!(
-            tree.graphlets()[0].binding,
-            GraphletBinding::Branched { .. }
+            tree.subgraphs()[0].binding,
+            SubgraphBinding::Branched { .. }
         ));
     }
 

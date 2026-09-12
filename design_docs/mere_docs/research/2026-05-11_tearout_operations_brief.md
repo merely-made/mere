@@ -1,5 +1,7 @@
 # Tear-out operations (leaf, branch, fork) — design brief
 
+*Written before the 2026-09-05 retirement of graphlet (TERMINOLOGY.md): read graphlet as subgraph. Identifiers such as GraphletId, GraphletRef, and SessionGraphlets are now SubgraphId, SubgraphRef, and SessionSubgraphs, and the graphlets crate is crates/graph/subgraph (code renamed 2026-09-12).*
+
 **Date**: 2026-05-11
 **Status**: Design brief — supersedes the earlier "sticky-note fork-model decision brief" (same date), which framed this as three competing options. The resolution is that those weren't options to pick between — they were three coexisting operations the user picks at gesture time.
 
@@ -14,7 +16,7 @@
 - [`2026-05-11_memory_tiers_brief.md`](2026-05-11_memory_tiers_brief.md) — short-term vs. long-term memory partitioning. Diff/branch state lives in short-term by default; consolidation into engrams is an affirmative gesture. This brief depends on the memory-tiers framing for its diff substrate.
 - [`../../archive_docs/2026-06-09_completed_plans/2026-05-11_graph_session_manifest_plan.md`](../../archive_docs/2026-06-09_completed_plans/2026-05-11_graph_session_manifest_plan.md) — `parent_session` reference fields used by **fork**.
 - Phase 2 Part 1 tear-out: [`crates/mere-host/src/tearout.rs`](../../../crates/mere-host/src/tearout.rs) *(historical citation)* <!-- doc-audit: historical-link -->. The current sticky-note implementation is the **leaf** operation in this brief's vocabulary, made explicit.
-- Graphlet primitives: [`crates/forme/forme/src/graphlet.rs`](../../../crates/forme/forme/src/graphlet.rs) — `GraphletId`, `GraphletRef`, `GraphletBinding::{UnlinkedSession, Linked, Branched}`. Already first-class (the types + reconciliation are unit-tested); **branch** uses these. Note (2026-06-25): the layer is built but **not yet wired into the live shell** — no live `GraphTree` exists outside forme's tests, so branch needs that wiring first (its own plan).
+- Graphlet primitives: [`crates/forme/forme/src/graphlet.rs`](../../../crates/forme/forme/src/graphlet.rs) *(historical citation)* <!-- doc-audit: historical-link --> — `GraphletId`, `GraphletRef`, `GraphletBinding::{UnlinkedSession, Linked, Branched}`. Already first-class (the types + reconciliation are unit-tested); **branch** uses these. Note (2026-06-25): the layer is built but **not yet wired into the live shell** — no live `GraphTree` exists outside forme's tests, so branch needs that wiring first (its own plan).
 - Eidetic engrams: [`crates/eidetic/src/engram.rs`](../../../crates/eidetic/src/engram.rs) *(historical citation)* <!-- doc-audit: historical-link --> — content-addressed immutable snapshots; the long-term substrate for consolidated branches and forks.
 
 ---

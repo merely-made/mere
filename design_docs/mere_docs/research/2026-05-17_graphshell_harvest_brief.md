@@ -1,5 +1,7 @@
 # Graphshell harvest brief — spatial hypertext + multiplexer + Xilem
 
+*Written before the 2026-09-05 retirement of graphlet (TERMINOLOGY.md): read graphlet as subgraph. Identifiers such as GraphletId, GraphletRef, and SessionGraphlets are now SubgraphId, SubgraphRef, and SessionSubgraphs, and the graphlets crate is crates/graph/subgraph (code renamed 2026-09-12).*
+
 **Date**: 2026-05-17
 **Status**: Research brief. Concept inventory pulled from the donor graphshell `design_docs/` for adoption into the active Mere spatial-chrome / multiplexer / Xilem-host lane. Decides nothing about adoption sequencing — that is the spatial-chrome adoption plan's job ([`../implementation_strategy/2026-05-15_spatial_chrome_modular_adoption_plan.md`](../implementation_strategy/2026-05-15_spatial_chrome_modular_adoption_plan.md) *(historical citation)* <!-- doc-audit: historical-link -->).
 **Scope**: Concepts only, with source citations. Five concurrent surveys covered ~70 graphshell docs across `design/`, `implementation_strategy/` (aspects + subsystems + workspace), `research/`, and `technical_architecture/`. Items mentioned independently by ≥2 surveys are flagged Tier 1.

@@ -110,7 +110,7 @@ pub struct GraphSessionManifest {
     /// The session's primary graph. v0: every session has one;
     /// `sub_graph_refs` is empty.
     pub root_graph_id: GraphId,
-    /// Additional graphs referenced by this session (e.g. graphlets
+    /// Additional graphs referenced by this session (e.g. subgraphs
     /// promoted to first-class sub-graphs). v0 empty.
     #[serde(default)]
     pub sub_graph_refs: Vec<GraphId>,
