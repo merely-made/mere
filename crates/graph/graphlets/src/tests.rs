@@ -299,3 +299,169 @@ fn toggle_family_selector_narrows_a_linked_graphlets_derivation() {
     assert_eq!(delta.removed, vec![graph.get_node(c).unwrap().id]);
     assert_eq!(idx.get(id).unwrap().anchors.len(), 2, "now just A, B");
 }
+
+// ---- Revision gate (recursive-query experiment E2) -------------------------
+
+/// A–B linked, C isolated; returns (graph, a_key, b_key, c_key).
+fn ab_graph_with_isolated_c() -> (
+    Graph,
+    kernel::graph::NodeKey,
+    kernel::graph::NodeKey,
+    kernel::graph::NodeKey,
+) {
+    use euclid::default::Point2D;
+    let mut graph = Graph::new();
+    let a = graph.add_node("https://a".to_string(), Point2D::new(0.0, 0.0));
+    let b = graph.add_node("https://b".to_string(), Point2D::new(1.0, 0.0));
+    let c = graph.add_node("https://c".to_string(), Point2D::new(2.0, 0.0));
+    hyperlink(&mut graph, a, b);
+    (graph, a, b, c)
+}
+
+fn hyperlink(g: &mut Graph, x: kernel::graph::NodeKey, y: kernel::graph::NodeKey) {
+    use kernel::graph::{EdgeAssertion, SemanticSubKind};
+    g.assert_relation(
+        x,
+        y,
+        EdgeAssertion::Semantic {
+            sub_kind: SemanticSubKind::Hyperlink,
+            label: None,
+            decay_progress: None,
+        },
+    );
+}
+
+fn component_spec_on(graph: &Graph, key: kernel::graph::NodeKey) -> GraphletSpec {
+    let id = graph.get_node(key).unwrap().id;
+    GraphletSpec {
+        kind: GraphletKind::Component,
+        anchors: vec![id.to_string()],
+        primary_anchor: Some(id.to_string()),
+        selectors: Vec::new(),
+    }
+}
+
+#[test]
+fn reconcile_all_skips_derivation_when_the_graph_revision_is_unchanged() {
+    let (graph, a, _b, _c) = ab_graph_with_isolated_c();
+    let mut idx = SessionGraphlets::new();
+    let id = idx.record_linked(&graph, component_spec_on(&graph, a));
+    let roster = idx.get(id).unwrap().anchors.clone();
+    assert_eq!(
+        idx.reconciled_revision(id),
+        Some(graph.revision()),
+        "record_linked walks the graph, so it records the revision it saw"
+    );
+    let walks = idx.derive_calls.get();
+
+    assert!(!idx.reconcile_all(&graph), "unchanged graph → no change");
+    assert!(!idx.reconcile_all(&graph), "and again");
+    assert!(
+        idx.reconcile(&graph, id).is_none(),
+        "the single-graphlet path is gated too"
+    );
+    assert!(idx.preview_reconcile(&graph, id).is_none());
+    assert_eq!(
+        idx.derive_calls.get(),
+        walks,
+        "no derivation ran: the revision gate short-circuited every call"
+    );
+    assert_eq!(idx.get(id).unwrap().anchors, roster, "roster is stable");
+
+    // The forced path re-walks even though nothing changed, and finds no drift.
+    assert!(!idx.force_reconcile_all(&graph));
+    assert_eq!(idx.derive_calls.get(), walks + 1, "force bypassed the gate");
+    assert_eq!(
+        idx.reconciled_revision(id),
+        Some(graph.revision()),
+        "and re-armed the gate at the current revision"
+    );
+}
+
+#[test]
+fn reconcile_derives_and_reports_the_added_member_after_the_graph_moves() {
+    let (mut graph, a, b, c) = ab_graph_with_isolated_c();
+    let mut idx = SessionGraphlets::new();
+    let id = idx.record_linked(&graph, component_spec_on(&graph, a));
+    let before = graph.revision();
+    let walks = idx.derive_calls.get();
+
+    hyperlink(&mut graph, b, c); // C joins A's component
+    assert_ne!(
+        graph.revision(),
+        before,
+        "a new relation bumps the revision"
+    );
+    let delta = idx.reconcile(&graph, id).expect("the component grew");
+    assert_eq!(delta.added, vec![graph.get_node(c).unwrap().id]);
+    assert!(delta.removed.is_empty());
+    assert_eq!(idx.derive_calls.get(), walks + 1, "exactly one walk");
+    assert_eq!(idx.get(id).unwrap().anchors.len(), 3, "roster is A, B, C");
+    assert_eq!(idx.reconciled_revision(id), Some(graph.revision()));
+
+    // Now at the new revision the gate engages again.
+    assert!(!idx.reconcile_all(&graph));
+    assert_eq!(idx.derive_calls.get(), walks + 1);
+}
+
+#[test]
+fn a_linked_graphlet_kept_as_session_is_never_reconciled() {
+    let (mut graph, a, b, c) = ab_graph_with_isolated_c();
+    let mut idx = SessionGraphlets::new();
+    let id = idx.record_linked(&graph, component_spec_on(&graph, a));
+    assert!(idx.keep_as_session(id));
+    assert_eq!(
+        idx.reconciled_revision(id),
+        None,
+        "the rebind drops the cache entry along with the derivation rule"
+    );
+    let frozen = idx.get(id).unwrap().anchors.clone();
+    let walks = idx.derive_calls.get();
+
+    hyperlink(&mut graph, b, c);
+    assert!(!idx.reconcile_all(&graph), "nothing Linked to reconcile");
+    assert!(idx.reconcile(&graph, id).is_none());
+    assert!(!idx.force_reconcile_all(&graph));
+    assert_eq!(idx.derive_calls.get(), walks, "no walk touched it");
+    assert_eq!(
+        idx.get(id).unwrap().anchors,
+        frozen,
+        "roster frozen at A, B"
+    );
+    assert_eq!(idx.reconciled_revision(id), None);
+}
+
+#[test]
+fn a_deserialized_index_reconciles_on_its_first_call() {
+    let (graph, a, _b, _c) = ab_graph_with_isolated_c();
+    let mut idx = SessionGraphlets::new();
+    let id = idx.record_linked(&graph, component_spec_on(&graph, a));
+    assert!(!idx.reconcile_all(&graph), "gate armed in memory");
+
+    let json = serde_json::to_string(&idx).expect("serializes");
+    assert!(
+        !json.contains("reconciled_revision") && !json.contains("derive_calls"),
+        "the revision is a cache key, not persisted content: {json}"
+    );
+    let mut loaded: SessionGraphlets = serde_json::from_str(&json).expect("round-trips");
+    assert_eq!(loaded.graphlets().len(), 1);
+    assert_eq!(
+        loaded.reconciled_revision(id),
+        None,
+        "a loaded roster is stale until it is reconciled"
+    );
+
+    let walks = loaded.derive_calls.get();
+    assert!(
+        !loaded.reconcile_all(&graph),
+        "the roster on disk already matched truth, so no change"
+    );
+    assert_eq!(
+        loaded.derive_calls.get(),
+        walks + 1,
+        "but the first call derived rather than trusting an unknown revision"
+    );
+    assert_eq!(loaded.reconciled_revision(id), Some(graph.revision()));
+    assert!(!loaded.reconcile_all(&graph));
+    assert_eq!(loaded.derive_calls.get(), walks + 1, "gated from then on");
+}

@@ -12,7 +12,7 @@
 
 #![doc(html_root_url = "https://docs.rs/graphlets/0.0.1")]
 
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 use std::path::Path;
 
 use forme::{
@@ -43,6 +43,18 @@ pub struct SessionGraphlets {
     /// Monotonic id source. `GraphletId` is forme's lightweight `u32` index, unique
     /// within this session's index (not globally).
     next_id: GraphletId,
+    /// The kernel [`Graph::revision`] each `Linked` graphlet's roster was last derived
+    /// against. A **cache key, not content**: it is never persisted (`serde(skip)`), so a
+    /// freshly loaded index has no entries and every Linked graphlet reads as stale until
+    /// its first reconcile. An entry is dropped whenever something other than the graph
+    /// changes what the derivation would produce (a spec edit, a roster edit, a rebind).
+    #[serde(skip)]
+    reconciled_revision: HashMap<GraphletId, u64>,
+    /// Test-only observable: how many times [`derive_members`] has run through this
+    /// index's reconcile paths, so tests can assert the revision gate skipped the walk.
+    #[cfg(test)]
+    #[serde(skip)]
+    derive_calls: std::cell::Cell<usize>,
 }
 
 impl SessionGraphlets {
@@ -72,13 +84,42 @@ impl SessionGraphlets {
 
     /// Preview a Linked graphlet's drift without mutating its roster. This powers
     /// the Roster Graphlet Card's dry diff; [`reconcile`](Self::reconcile) uses
-    /// the same derivation and then applies the truth set.
+    /// the same derivation and then applies the truth set. Subject to the same
+    /// revision gate: `None` when the graph has not changed since the last reconcile.
     pub fn preview_reconcile(
         &self,
         graph: &Graph,
         id: GraphletId,
     ) -> Option<GraphletMemberDelta<GraphMemberId>> {
-        self.reconcile_delta(graph, id).map(|(_, delta)| delta)
+        self.reconcile_delta(graph, id)
+            .and_then(|(_, delta)| (!delta.is_empty()).then_some(delta))
+    }
+
+    /// The kernel revision graphlet `id`'s roster was last derived against, or `None`
+    /// when it is stale (never reconciled, loaded from disk, or invalidated by an edit).
+    pub fn reconciled_revision(&self, id: GraphletId) -> Option<u64> {
+        self.reconciled_revision.get(&id).copied()
+    }
+
+    /// Forget every recorded reconcile revision, so the next [`reconcile`](Self::reconcile)
+    /// / [`reconcile_all`](Self::reconcile_all) re-derives every Linked graphlet in full.
+    /// For callers that swapped the underlying graph (a revision counter is per `Graph`
+    /// instance) or otherwise cannot trust the gate.
+    pub fn clear_reconciled_revisions(&mut self) {
+        self.reconciled_revision.clear();
+    }
+
+    /// [`reconcile_all`](Self::reconcile_all) with the revision gate bypassed: every
+    /// Linked graphlet is re-derived and diffed regardless of the recorded revision.
+    pub fn force_reconcile_all(&mut self, graph: &Graph) -> bool {
+        self.clear_reconciled_revisions();
+        self.reconcile_all(graph)
+    }
+
+    fn derive_members_counted(&self, graph: &Graph, spec: &GraphletSpec) -> Vec<GraphMemberId> {
+        #[cfg(test)]
+        self.derive_calls.set(self.derive_calls.get() + 1);
+        derive_members(graph, spec)
     }
 
     fn mint_id(&mut self) -> GraphletId {
@@ -115,11 +156,13 @@ impl SessionGraphlets {
     /// seed anchors from a derived roster). A tear-out **branch** grows this as its
     /// window navigates, so it diverges from the donor. (Graphlet wiring Phase 2.)
     pub fn add_member(&mut self, id: GraphletId, node: GraphMemberId) -> bool {
-        if let Some(g) = self.graphlets.iter_mut().find(|g| g.id == id) {
-            if !g.anchors.contains(&node) {
-                g.anchors.push(node);
-                return true;
-            }
+        if let Some(g) = self.graphlets.iter_mut().find(|g| g.id == id)
+            && !g.anchors.contains(&node)
+        {
+            g.anchors.push(node);
+            // A hand edit to the roster is drift the gate cannot see.
+            self.reconciled_revision.remove(&id);
+            return true;
         }
         false
     }
@@ -131,7 +174,7 @@ impl SessionGraphlets {
     /// seed (the anchors-vs-members split). Returns the new id. (Graphlet wiring Phase 3.)
     pub fn record_linked(&mut self, graph: &Graph, spec: GraphletSpec) -> GraphletId {
         let id = self.mint_id();
-        let members = derive_members(graph, &spec);
+        let members = self.derive_members_counted(graph, &spec);
         let seed = spec.primary_anchor.as_deref().and_then(|s| s.parse().ok());
         let mut g = GraphletRef::new_session(id);
         g.kind = Some(spec.kind.clone());
@@ -139,6 +182,7 @@ impl SessionGraphlets {
         g.primary_anchor = seed;
         g.binding = GraphletBinding::Linked { spec };
         self.graphlets.push(g);
+        self.reconciled_revision.insert(id, graph.revision());
         id
     }
 
@@ -166,18 +210,32 @@ impl SessionGraphlets {
     /// tracks truth); the user-choice proposal path (keep-linked / unlink / save-as-branch)
     /// is a later sub-slice. The diff is the harvested `compute_roster_delta` over the
     /// kernel-derived truth and the stored roster — no `GraphTree`. (Graphlet wiring P3.)
+    ///
+    /// **Revision gate:** when `graph.revision()` equals the revision this graphlet was
+    /// last reconciled against, the derivation is skipped and `None` is returned (the
+    /// roster already equals truth). Otherwise the walk runs, the roster is applied, and
+    /// the new revision is recorded. See [`force_reconcile_all`](Self::force_reconcile_all).
     pub fn reconcile(
         &mut self,
         graph: &Graph,
         id: GraphletId,
     ) -> Option<GraphletMemberDelta<GraphMemberId>> {
         let (truth, delta) = self.reconcile_delta(graph, id)?;
+        // The walk ran against this revision; record it whether or not anything drifted.
+        self.reconciled_revision.insert(id, graph.revision());
+        if delta.is_empty() {
+            return None;
+        }
         if let Some(gm) = self.graphlets.iter_mut().find(|g| g.id == id) {
             gm.anchors = truth; // auto-apply: the live set tracks graph truth
         }
         Some(delta)
     }
 
+    /// Derive graphlet `id`'s truth set and diff it against the stored roster. `None`
+    /// when the graphlet is not `Linked` or the revision gate says the derivation would
+    /// be a repeat; otherwise `Some` even when the delta is empty (so [`reconcile`]
+    /// (Self::reconcile) can record the revision it walked against).
     fn reconcile_delta(
         &self,
         graph: &Graph,
@@ -188,8 +246,11 @@ impl SessionGraphlets {
             GraphletBinding::Linked { spec } => spec,
             _ => return None,
         };
+        if self.reconciled_revision.get(&id) == Some(&graph.revision()) {
+            return None;
+        }
         let current = g.anchors.clone();
-        let truth = derive_members(graph, spec);
+        let truth = self.derive_members_counted(graph, spec);
         let truth_set: HashSet<&GraphMemberId> = truth.iter().collect();
         let cur_set: HashSet<&GraphMemberId> = current.iter().collect();
         let delta = GraphletMemberDelta {
@@ -205,7 +266,7 @@ impl SessionGraphlets {
                 .collect(),
             rebased_seeds: Vec::new(),
         };
-        (!delta.is_empty()).then_some((truth, delta))
+        Some((truth, delta))
     }
 
     /// Convert a linked/branched graphlet to an unlinked session grouping without
@@ -218,6 +279,7 @@ impl SessionGraphlets {
             return false;
         }
         g.binding = GraphletBinding::UnlinkedSession;
+        self.reconciled_revision.remove(&id);
         true
     }
 
@@ -245,6 +307,8 @@ impl SessionGraphlets {
             },
             None => spec.selectors.push(name.to_string()),
         }
+        // The spec changed, so the derivation changes without the graph moving.
+        self.reconciled_revision.remove(&id);
         true
     }
 
@@ -276,6 +340,10 @@ impl SessionGraphlets {
     /// each), returning whether any roster changed (so the caller persists). Drift at the
     /// data level: a Linked graphlet's persisted roster tracks the graph (the window
     /// already tracks it live via re-derive). (Graphlet wiring Phase 3 slice 2+.)
+    ///
+    /// Revision-gated per graphlet (see [`reconcile`](Self::reconcile)): a graphlet whose
+    /// recorded revision equals `graph.revision()` is skipped without a walk. Use
+    /// [`force_reconcile_all`](Self::force_reconcile_all) to bypass the gate.
     pub fn reconcile_all(&mut self, graph: &Graph) -> bool {
         let ids: Vec<GraphletId> = self
             .graphlets
