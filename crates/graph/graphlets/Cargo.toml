@@ -23,9 +23,6 @@ uuid.workspace = true
 [dev-dependencies]
 kernel = { workspace = true, features = ["fixtures"] }
 euclid = "0.22"
-# E3 probe only (recursive-query experiments plan, 2026-09-11): ascent prototype of
-# graphlet derivation in `tests/ascent_bench.rs`. Delete together with that file.
-ascent = "0.8"
 
 [lints]
 workspace = true

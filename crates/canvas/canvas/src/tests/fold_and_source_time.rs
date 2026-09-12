@@ -245,8 +245,13 @@ fn source_time_canvas_scrubs_every_canvas_arrangement_without_rewriting_live_tru
             .apply_strategy_positions(&positions);
         source_canvas.frame(800, 600);
 
-        let live_truth = serde_json::to_vec(&source_canvas.live_canvas().graph().to_snapshot())
-            .expect("live graph persists");
+        // `to_snapshot` stamps wall-clock seconds; zero it so two snapshots taken
+        // across a second boundary still compare equal on content.
+        let persisted_truth = |mut snapshot: kernel::persistence::GraphSnapshot| {
+            snapshot.timestamp_secs = 0;
+            serde_json::to_vec(&snapshot).expect("live graph persists")
+        };
+        let live_truth = persisted_truth(source_canvas.live_canvas().graph().to_snapshot());
         let live_position = source_canvas
             .live_canvas()
             .node_position(focus)
@@ -275,8 +280,7 @@ fn source_time_canvas_scrubs_every_canvas_arrangement_without_rewriting_live_tru
             "{arrangement_id} retains the shared member slot"
         );
         assert_eq!(
-            serde_json::to_vec(&source_canvas.live_canvas().graph().to_snapshot())
-                .expect("live graph remains persistable"),
+            persisted_truth(source_canvas.live_canvas().graph().to_snapshot()),
             live_truth,
             "{arrangement_id} source scrubbing does not rewrite live truth"
         );

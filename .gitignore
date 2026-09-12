@@ -104,3 +104,6 @@ ports/graphshell/docs/2026-07-28_h4f_resident_device_host_receipt.md
 # `ports/distillery/tests/walk_fixtures.rs`, not authored. A committed copy
 # fell a generation behind every time a member was added (2026-09-03).
 ports/distillery/tests/fixtures/circuit/
+
+# Claude Code agent worktrees (machine-local)
+.claude/
