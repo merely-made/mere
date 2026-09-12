@@ -21,11 +21,80 @@ use petgraph::algo::{astar, dijkstra, has_path_connecting, kosaraju_scc};
 use petgraph::visit::{EdgeRef, IntoEdgeReferences, UndirectedAdaptor};
 use uuid::Uuid;
 
+use super::edge_payload::EdgePayload;
 use super::edge_taxonomy::{ContainmentSubKind, EdgeAssertion, RelationSelector};
 use super::identity::{EdgeKey, NodeKey};
 use super::node::Node;
 use super::snapshot::containment_parent_url;
 use super::{ArrangementEdgeView, ContainmentEdgeView, Graph, RelationView, SemanticEdgeView};
+
+/// Expand one pair-local edge bucket into its [`RelationView`] rows: one
+/// per recognized semantic statement, one for traversal presence, and one
+/// per sub-kind in each of the remaining families. Shared by every
+/// relation iterator so per-node and whole-graph reads agree row for row.
+fn relation_rows(from: NodeKey, to: NodeKey, payload: &EdgePayload) -> Vec<RelationView> {
+    use super::edge_taxonomy::RelationKind;
+    let mut out: Vec<RelationView> = Vec::new();
+    for statement in payload.semantic_statements() {
+        if let Some(sub_kind) = statement.recognized_sub_kind {
+            out.push(RelationView {
+                from,
+                to,
+                kind: RelationKind::Semantic(sub_kind),
+            });
+        }
+    }
+    // Traversal is event-shaped, no sub-kind. Presence of
+    // any traversal data (events or metrics) yields one
+    // row. Family-aware view callers reach for the
+    // typed payload for actual events.
+    if let Some(traversal) = payload.traversal_data()
+        && (!traversal.traversals.is_empty() || traversal.metrics.total_navigations > 0)
+    {
+        out.push(RelationView {
+            from,
+            to,
+            kind: RelationKind::Traversal,
+        });
+    }
+    if let Some(containment) = payload.containment_data() {
+        for &sub_kind in &containment.sub_kinds {
+            out.push(RelationView {
+                from,
+                to,
+                kind: RelationKind::Containment(sub_kind),
+            });
+        }
+    }
+    if let Some(arrangement) = payload.arrangement_data() {
+        for &sub_kind in &arrangement.sub_kinds {
+            out.push(RelationView {
+                from,
+                to,
+                kind: RelationKind::Arrangement(sub_kind),
+            });
+        }
+    }
+    if let Some(imported) = payload.imported_data() {
+        for &sub_kind in &imported.sub_kinds {
+            out.push(RelationView {
+                from,
+                to,
+                kind: RelationKind::Imported(sub_kind),
+            });
+        }
+    }
+    if let Some(prov) = payload.provenance_data() {
+        for &sub_kind in &prov.sub_kinds {
+            out.push(RelationView {
+                from,
+                to,
+                kind: RelationKind::Provenance(sub_kind),
+            });
+        }
+    }
+    out
+}
 
 impl Graph {
     /// Get a node by key
@@ -98,72 +167,32 @@ impl Graph {
     /// plan §2. Stage 4 removed the legacy `EdgeType`-flavoured
     /// `edges()` iterator that this replaces.
     pub fn relations(&self) -> impl Iterator<Item = RelationView> + '_ {
-        use super::edge_taxonomy::RelationKind;
-        self.inner.inner().edge_references().flat_map(|edge| {
-            let from = edge.source();
-            let to = edge.target();
-            let payload = edge.weight();
-            let mut out: Vec<RelationView> = Vec::new();
-            for statement in payload.semantic_statements() {
-                if let Some(sub_kind) = statement.recognized_sub_kind {
-                    out.push(RelationView {
-                        from,
-                        to,
-                        kind: RelationKind::Semantic(sub_kind),
-                    });
-                }
-            }
-            // Traversal is event-shaped, no sub-kind. Presence of
-            // any traversal data (events or metrics) yields one
-            // row. Family-aware view callers reach for the
-            // typed payload for actual events.
-            if let Some(traversal) = payload.traversal_data()
-                && (!traversal.traversals.is_empty() || traversal.metrics.total_navigations > 0)
-            {
-                out.push(RelationView {
-                    from,
-                    to,
-                    kind: RelationKind::Traversal,
-                });
-            }
-            if let Some(containment) = payload.containment_data() {
-                for &sub_kind in &containment.sub_kinds {
-                    out.push(RelationView {
-                        from,
-                        to,
-                        kind: RelationKind::Containment(sub_kind),
-                    });
-                }
-            }
-            if let Some(arrangement) = payload.arrangement_data() {
-                for &sub_kind in &arrangement.sub_kinds {
-                    out.push(RelationView {
-                        from,
-                        to,
-                        kind: RelationKind::Arrangement(sub_kind),
-                    });
-                }
-            }
-            if let Some(imported) = payload.imported_data() {
-                for &sub_kind in &imported.sub_kinds {
-                    out.push(RelationView {
-                        from,
-                        to,
-                        kind: RelationKind::Imported(sub_kind),
-                    });
-                }
-            }
-            if let Some(prov) = payload.provenance_data() {
-                for &sub_kind in &prov.sub_kinds {
-                    out.push(RelationView {
-                        from,
-                        to,
-                        kind: RelationKind::Provenance(sub_kind),
-                    });
-                }
-            }
-            out.into_iter()
-        })
+        self.inner
+            .inner()
+            .edge_references()
+            .flat_map(|edge| relation_rows(edge.source(), edge.target(), edge.weight()))
+    }
+
+    /// Relations whose `from` endpoint is `key`, expanded with exactly the
+    /// row semantics of [`Self::relations`] but visiting only that node's
+    /// outgoing edges. Cost is proportional to the node's out-degree, not
+    /// the graph's edge count.
+    pub fn outgoing_relations(&self, key: NodeKey) -> impl Iterator<Item = RelationView> + '_ {
+        self.inner
+            .inner()
+            .edges_directed(key, Direction::Outgoing)
+            .flat_map(|edge| relation_rows(edge.source(), edge.target(), edge.weight()))
+    }
+
+    /// Relations whose `to` endpoint is `key`, expanded with exactly the
+    /// row semantics of [`Self::relations`] but visiting only that node's
+    /// incoming edges. Cost is proportional to the node's in-degree, not
+    /// the graph's edge count.
+    pub fn incoming_relations(&self, key: NodeKey) -> impl Iterator<Item = RelationView> + '_ {
+        self.inner
+            .inner()
+            .edges_directed(key, Direction::Incoming)
+            .flat_map(|edge| relation_rows(edge.source(), edge.target(), edge.weight()))
     }
 
     pub fn semantic_edges(&self) -> impl Iterator<Item = SemanticEdgeView> + '_ {
