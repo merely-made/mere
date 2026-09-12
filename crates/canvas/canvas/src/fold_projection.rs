@@ -146,23 +146,7 @@ impl Canvas {
         if self.fold.is_some() || self.graph.get_node(root).is_none() {
             return None;
         }
-        let mut members = BTreeSet::from([root]);
-        let mut pending = VecDeque::from([root]);
-        while let Some(current) = pending.pop_front() {
-            for relation in self.graph.relations() {
-                if relation.kind.family() != hierarchy_family {
-                    continue;
-                }
-                let next = match direction {
-                    FoldTraversalDirection::Outgoing if relation.from == current => relation.to,
-                    FoldTraversalDirection::Incoming if relation.to == current => relation.from,
-                    _ => continue,
-                };
-                if members.insert(next) {
-                    pending.push_back(next);
-                }
-            }
-        }
+        let members = hierarchy_closure(&self.graph, root, hierarchy_family, direction);
         let record = FoldRecord::from_selection(
             source_scope,
             members
@@ -288,6 +272,42 @@ impl Canvas {
 /// A stale or unsupported record is refused rather than folding a partial
 /// member set. The caller can keep the record for inspection and offer an
 /// explicit repair or removal action.
+/// Every node reachable from `root` through relations of `hierarchy_family`
+/// in `direction`, `root` included. Each frontier node visits only its own
+/// incident edges on the requested side, so the walk costs O(reachable ×
+/// degree) rather than rescanning the whole relation table per node.
+fn hierarchy_closure(
+    graph: &Graph,
+    root: NodeKey,
+    hierarchy_family: EdgeFamily,
+    direction: FoldTraversalDirection,
+) -> BTreeSet<NodeKey> {
+    let mut members = BTreeSet::from([root]);
+    let mut pending = VecDeque::from([root]);
+    while let Some(current) = pending.pop_front() {
+        let incident: Box<dyn Iterator<Item = NodeKey>> = match direction {
+            FoldTraversalDirection::Outgoing => Box::new(
+                graph
+                    .outgoing_relations(current)
+                    .filter(|relation| relation.kind.family() == hierarchy_family)
+                    .map(|relation| relation.to),
+            ),
+            FoldTraversalDirection::Incoming => Box::new(
+                graph
+                    .incoming_relations(current)
+                    .filter(|relation| relation.kind.family() == hierarchy_family)
+                    .map(|relation| relation.from),
+            ),
+        };
+        for next in incident {
+            if members.insert(next) {
+                pending.push_back(next);
+            }
+        }
+    }
+    members
+}
+
 pub fn project_fold(graph: &Graph, fold: &FoldRecord) -> Option<FoldProjection> {
     if fold.version != FOLD_RECORD_VERSION || fold.members.len() < 2 {
         return None;
@@ -356,7 +376,8 @@ pub fn project_fold(graph: &Graph, fold: &FoldRecord) -> Option<FoldProjection> 
 mod tests {
     use euclid::default::Point2D;
     use kernel::graph::{
-        ContainmentSubKind, EdgeAssertion, SemanticSubKind, fixtures::GraphFixtures,
+        ArrangementSubKind, ContainmentSubKind, EdgeAssertion, SemanticSubKind,
+        fixtures::GraphFixtures,
     };
 
     use super::*;
@@ -509,5 +530,205 @@ mod tests {
         assert!(canvas.active_fold_projection().is_none());
         assert!(canvas.redo_fold(), "redo restores the same hierarchy fold");
         assert_eq!(canvas.active_fold_projection().unwrap().fold_id, id);
+    }
+
+    /// The pre-E1 closure: rescan every relation row in the graph for each
+    /// frontier node. Kept only as the reference the incident-edge walk must
+    /// reproduce member for member.
+    fn brute_force_hierarchy_closure(
+        graph: &Graph,
+        root: NodeKey,
+        hierarchy_family: EdgeFamily,
+        direction: FoldTraversalDirection,
+    ) -> BTreeSet<NodeKey> {
+        let mut members = BTreeSet::from([root]);
+        let mut pending = VecDeque::from([root]);
+        while let Some(current) = pending.pop_front() {
+            for relation in graph.relations() {
+                if relation.kind.family() != hierarchy_family {
+                    continue;
+                }
+                let next = match direction {
+                    FoldTraversalDirection::Outgoing if relation.from == current => relation.to,
+                    FoldTraversalDirection::Incoming if relation.to == current => relation.from,
+                    _ => continue,
+                };
+                if members.insert(next) {
+                    pending.push_back(next);
+                }
+            }
+        }
+        members
+    }
+
+    /// A containment chain of `chain_len` nodes, a containment star of
+    /// `star_len` leaves hung off the chain's middle node, and a dense mesh
+    /// of unrelated Semantic and Arrangement relations over every node.
+    /// Returns the graph and the chain in root-to-tip order.
+    fn large_hierarchy_fixture(chain_len: usize, star_len: usize) -> (Graph, Vec<NodeKey>) {
+        let mut graph = Graph::new();
+        let chain: Vec<NodeKey> = (0..chain_len)
+            .map(|i| graph.add_node(format!("https://chain/{i}"), Point2D::new(i as f32, 0.0)))
+            .collect();
+        for pair in chain.windows(2) {
+            graph.assert_relation(
+                pair[0],
+                pair[1],
+                EdgeAssertion::Containment {
+                    sub_kind: ContainmentSubKind::Domain,
+                },
+            );
+        }
+        let hub = chain[chain_len / 2];
+        let leaves: Vec<NodeKey> = (0..star_len)
+            .map(|i| graph.add_node(format!("https://leaf/{i}"), Point2D::new(i as f32, 1.0)))
+            .collect();
+        for &leaf in &leaves {
+            graph.assert_relation(
+                hub,
+                leaf,
+                EdgeAssertion::Containment {
+                    sub_kind: ContainmentSubKind::Domain,
+                },
+            );
+        }
+        // Unrelated families in every direction, including edges that would
+        // pull the whole graph into one component if the family were ignored.
+        let all: Vec<NodeKey> = chain.iter().chain(leaves.iter()).copied().collect();
+        let total = all.len();
+        for (i, &from) in all.iter().enumerate() {
+            for stride in [1usize, 7, 13, 101] {
+                let to = all[(i + stride) % total];
+                graph.assert_relation(
+                    to,
+                    from,
+                    EdgeAssertion::Semantic {
+                        sub_kind: SemanticSubKind::Cites,
+                        label: None,
+                        decay_progress: None,
+                    },
+                );
+                graph.assert_relation(
+                    from,
+                    to,
+                    EdgeAssertion::Arrangement {
+                        sub_kind: ArrangementSubKind::TileGroup,
+                    },
+                );
+            }
+        }
+        (graph, chain)
+    }
+
+    #[test]
+    fn incident_edge_walk_matches_brute_force_closure_on_large_hierarchy() {
+        let (graph, chain) = large_hierarchy_fixture(300, 300);
+        assert!(
+            graph.relations().count() > 2_000,
+            "the fixture must carry many unrelated relations"
+        );
+        let root = chain[0];
+        let mid = chain[chain.len() / 2];
+        let tip = chain[chain.len() - 1];
+
+        for (start, direction) in [
+            (root, FoldTraversalDirection::Outgoing),
+            (mid, FoldTraversalDirection::Outgoing),
+            (mid, FoldTraversalDirection::Incoming),
+            (tip, FoldTraversalDirection::Incoming),
+        ] {
+            let expected =
+                brute_force_hierarchy_closure(&graph, start, EdgeFamily::Containment, direction);
+            assert!(
+                expected.len() >= 2,
+                "{direction:?} from {start:?} reaches a fold"
+            );
+            let mut canvas = Canvas::with_graph(graph.clone());
+            canvas
+                .collapse_descendants(
+                    start,
+                    EdgeFamily::Containment,
+                    direction,
+                    "canvas:hierarchy-large",
+                )
+                .expect("a hierarchy fold with at least two members");
+            let projection = canvas
+                .active_fold_projection()
+                .expect("current fold projects");
+            assert_eq!(projection.members, expected, "{direction:?} from {start:?}");
+        }
+
+        // Sanity on the reference itself: the root's outgoing closure is the
+        // whole hierarchy and nothing else.
+        let whole = brute_force_hierarchy_closure(
+            &graph,
+            root,
+            EdgeFamily::Containment,
+            FoldTraversalDirection::Outgoing,
+        );
+        assert_eq!(whole.len(), 600);
+
+        // The tip has no outgoing containment, so both walks stop at the root
+        // alone and the fold is refused exactly as before: a durable record
+        // needs at least two members.
+        let alone = brute_force_hierarchy_closure(
+            &graph,
+            tip,
+            EdgeFamily::Containment,
+            FoldTraversalDirection::Outgoing,
+        );
+        assert_eq!(alone, BTreeSet::from([tip]));
+        let mut canvas = Canvas::with_graph(graph.clone());
+        assert!(
+            canvas
+                .collapse_descendants(
+                    tip,
+                    EdgeFamily::Containment,
+                    FoldTraversalDirection::Outgoing,
+                    "canvas:hierarchy-large",
+                )
+                .is_none()
+        );
+        assert!(canvas.active_fold_projection().is_none());
+    }
+
+    #[test]
+    fn outgoing_and_incoming_from_mid_chain_yield_distinct_correct_sets() {
+        let (graph, chain) = large_hierarchy_fixture(301, 50);
+        let mid_index = chain.len() / 2;
+        let mid = chain[mid_index];
+
+        let mut down = Canvas::with_graph(graph.clone());
+        down.collapse_descendants(
+            mid,
+            EdgeFamily::Containment,
+            FoldTraversalDirection::Outgoing,
+            "canvas:hierarchy-down",
+        )
+        .expect("descendants fold");
+        let down_members = down.active_fold_projection().unwrap().members;
+
+        let mut up = Canvas::with_graph(graph);
+        up.collapse_descendants(
+            mid,
+            EdgeFamily::Containment,
+            FoldTraversalDirection::Incoming,
+            "canvas:hierarchy-up",
+        )
+        .expect("ancestors fold");
+        let up_members = up.active_fold_projection().unwrap().members;
+
+        // Outgoing: the mid node, the rest of the chain below it, and every
+        // star leaf hung off it.
+        let expected_down: BTreeSet<NodeKey> = chain[mid_index..].iter().copied().collect();
+        assert_eq!(down_members.len(), expected_down.len() + 50);
+        assert!(down_members.is_superset(&expected_down));
+        // Incoming: the mid node and the chain above it, no leaves.
+        let expected_up: BTreeSet<NodeKey> = chain[..=mid_index].iter().copied().collect();
+        assert_eq!(up_members, expected_up);
+
+        assert_ne!(down_members, up_members);
+        let overlap: BTreeSet<NodeKey> = down_members.intersection(&up_members).copied().collect();
+        assert_eq!(overlap, BTreeSet::from([mid]));
     }
 }
