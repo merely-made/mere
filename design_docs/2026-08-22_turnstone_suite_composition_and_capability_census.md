@@ -721,3 +721,14 @@ The parallel I2 privacy audit promotes no new badge: a recorded sender key is
 not sufficient evidence of validated message ingestion. A future shared
 identity/privacy projection must carry that verification provenance explicitly.
 The PPK2 fixture remains deferred while these software gates progress.
+
+### I3c local place status, 2026-09-13
+
+Turnstone's **Place status** command exposes retained-state versus opened-lane
+observations, all nine local sync lanes, and refresh-time message/graph write
+capability verdicts. The command refreshes local projections without dialing;
+ordinary authoring still rechecks authority. A filtered omnibar view and the
+app observation snapshot share the same status lines. These observations do
+not establish peer reachability, message delivery, or confidentiality. The
+focused validation and remaining headed gate live in
+`turnstone/design_docs/2026-07-28_turnstone_place_port_plan.md`.
