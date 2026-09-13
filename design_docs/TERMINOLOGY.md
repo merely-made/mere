@@ -67,6 +67,15 @@ Terms from the [graph roster and frame taxonomy](mere_docs/design/2026-06-07_gra
 
 ## Comms layers
 
+**Product ruling, 2026-09-13:** **Gemot** is the community surface containing
+**murmurs** (secret conversations), **moots** (spaces of agreement), and **coop**
+(shared activities among peers). Use these names; explain the activities in
+plain language within them. Write `coop` without a hyphen. The technical
+`gemot` library owns governance; the presentation currently lives at
+`ports/moot` (`mere-moot`, library `moot`). Package coordinates do not redefine
+the product. The active execution plan is the
+[Gemot continuation](2026-08-22_turnstone_suite_composition_and_capability_census.md#gemot-murmurs-moots-and-coop-2026-09-13).
+
 - **Stickleback** — the shared replicated-space layer beneath every signed peer
   domain: joined spaces and their drain, policy-before-insert processing,
   muniment-backed replicated storage, checkpoints, retention mechanics, and
@@ -77,7 +86,9 @@ Terms from the [graph roster and frame taxonomy](mere_docs/design/2026-06-07_gra
   materialization — Stickleback never infers authority from transport access or
   visible membership.
 - **Murm** — the peer-exchange family, a domain over Stickleback. Its public
-  conversation service owns invitation-scoped murmurs, mail, and co-op exchange.
+  conversation service owns invitation-scoped conversation history and exchange.
+  Coop uses shared admission and exchange machinery, while each application
+  owns its collaborative state and operation semantics.
   - **Murmuring** — retired inner crate. Its signed-operation grammar and
     conversation engine were folded into `murm` on 2026-07-14. Internal
     mechanics use `ConversationEngine` and `ConversationStore`.
@@ -100,11 +111,17 @@ Terms from the [graph roster and frame taxonomy](mere_docs/design/2026-06-07_gra
 
 ## In-product vocabulary
 
-- **murmur** — the user-facing word for an invitation-scoped conversation
+- **murmur** — a secret, invitation-scoped conversation
   between identified participants. A murmur is the container, and individual
   posts are utterances within it. Participant count does not select Murm versus
   Moot; a Moot is distinguished by durable governance. Product surfaces say
-  murmur.
+  murmur. Privacy is a capability to prove for the selected path: a public mesh
+  channel or possession of a shared radio key does not establish secret,
+  individually authenticated conversation. Foreign protocol views retain their
+  actual privacy and delivery facts.
+- **coop** — peer-to-peer shared activity, such as editing or browsing together.
+  It can happen within a moot or through a temporary invitation. The application
+  owns what changes; governance applies when the activity belongs to a moot.
 - **Cable** — the semantic ancestry for conversations, channels, and signed
   posts. `mere/cable/v1` names Mere's Cable-shaped p2panda dialect. It does not
   claim wire interoperability with the cabal-club Cable protocol. Use
