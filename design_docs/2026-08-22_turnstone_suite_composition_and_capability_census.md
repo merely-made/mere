@@ -681,3 +681,20 @@ registered by this slice. Signalman's full desktop library check also passes;
 headed acceptance remains distinct from these compile/model checks. See
 `retinue/design_docs/2026-08-09_signalman_cambium_desktop_scope.md` for consumer
 validation details.
+
+### I3a execution receipt, 2026-09-13
+
+The consumer audit found that Turnstone and the Woodshed peer comparison proof
+both demonstrate offline reopening, not the full reconnect ceremony. Turnstone
+now exposes an explicit host-only **Leave place** command: release the worker,
+remove the local binding, and return to a personal session. Failure remains
+visible; retained graph/history, private overlays and governance membership
+remain intact. Session/generation checks reject stale teardown and completion.
+
+The local app/session tests cover completion, failure and retry, plus binding
+removal without deleting retained files. This uses Turnstone's local workspace
+resolution, not a locked release or headed lifecycle receipt. Exact validation
+and remaining timeout/reconnect boundaries live in
+`turnstone/design_docs/2026-07-28_turnstone_place_port_plan.md`. A second
+application's explicit leave and renewed-admission reconnect remain open; the
+shared coop lifecycle contract is still to be earned from those consumers.
