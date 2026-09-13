@@ -8,7 +8,11 @@ use genet_livery::{InteractionStates, StyleSet, resolve_styles};
 use genet_static_dom::StaticDocument;
 use layout_dom_api::LayoutDom;
 use livery::{media::Device, values::Color};
-use tabard::{DTCG_2025_10_SCHEMA, DtcgDocument, DtcgTokenType, TABARD_EXTENSION_KEY, Theme};
+use tabard::{
+    DTCG_2025_10_SCHEMA, DtcgDocument, DtcgTokenType, LAGRANGE_PALETTE_LABELS,
+    LAGRANGE_V1_21_1_IGNORED_LABELS, LagrangePaletteDiagnostic, LagrangePaletteMode,
+    TABARD_EXTENSION_KEY, Theme,
+};
 use tinct::{Seeds, Srgb, color_to_hex, contrast};
 
 fn theme() -> Theme {
@@ -148,6 +152,192 @@ fn livery_resolves_the_emitted_custom_properties() {
         computed.background_color,
         color_to_hex(palette.surface).parse::<Color>().unwrap()
     );
+}
+
+#[test]
+fn lagrange_palette_matches_golden_documented_shape() {
+    let export = theme().lagrange_palette_txt();
+    assert_eq!(
+        export.text,
+        include_str!("fixtures/lagrange_palette.txt"),
+        "Lagrange palette output is a stable artifact"
+    );
+
+    let mut lines = export.text.lines();
+    assert_eq!(lines.next(), Some("# Dark"));
+    for label in LAGRANGE_PALETTE_LABELS {
+        let line = lines.next().expect("dark palette line");
+        assert_eq!(
+            line.split_once(':').map(|(name, _)| name.trim()),
+            Some(label)
+        );
+        parse_hex_color(line);
+    }
+    assert_eq!(lines.next(), Some(""));
+    assert_eq!(lines.next(), Some("# Light"));
+    for label in LAGRANGE_PALETTE_LABELS {
+        let line = lines.next().expect("light palette line");
+        assert_eq!(
+            line.split_once(':').map(|(name, _)| name.trim()),
+            Some(label)
+        );
+    }
+    assert!(lines.next().is_none());
+}
+
+#[test]
+fn lagrange_palette_reports_collapsed_and_unrepresented_roles_per_mode() {
+    let diagnostics = theme().lagrange_palette_txt().diagnostics;
+    assert!(
+        diagnostics.contains(&LagrangePaletteDiagnostic::CollapsedRole {
+            source_role: "primary",
+            labels: vec!["brown", "orange"],
+        })
+    );
+    assert!(
+        diagnostics.contains(&LagrangePaletteDiagnostic::CollapsedRole {
+            source_role: "secondary",
+            labels: vec!["teal", "cyan"],
+        })
+    );
+    for mode in [LagrangePaletteMode::Dark, LagrangePaletteMode::Light] {
+        for label in LAGRANGE_V1_21_1_IGNORED_LABELS {
+            assert!(
+                diagnostics.contains(&LagrangePaletteDiagnostic::StockVersionIgnored {
+                    mode,
+                    label,
+                    version: "v1.21.1",
+                })
+            );
+        }
+        for (label, value) in [
+            ("yellow", "#FFFF20"),
+            ("magenta", "#FF00FF"),
+            ("blue", "#8484FF"),
+        ] {
+            assert!(
+                diagnostics.contains(&LagrangePaletteDiagnostic::ReservedDefault {
+                    mode,
+                    label,
+                    value,
+                })
+            );
+        }
+    }
+    for role in ["text-header", "text-dim", "text-disabled"] {
+        assert!(
+            diagnostics.contains(&LagrangePaletteDiagnostic::UnrepresentedRole {
+                mode: LagrangePaletteMode::Dark,
+                source_role: role,
+            })
+        );
+    }
+    for role in ["bg", "text-header", "text-disabled"] {
+        assert!(
+            diagnostics.contains(&LagrangePaletteDiagnostic::UnrepresentedRole {
+                mode: LagrangePaletteMode::Light,
+                source_role: role,
+            })
+        );
+    }
+}
+
+#[test]
+fn lagrange_palette_orders_neutrals_and_accent_variants_for_adversarial_seeds() {
+    let mut seeds = theme().seeds;
+    seeds.text_header = Some(Srgb::rgb(0xF8, 0x10, 0x10));
+    seeds.text_body = Some(Srgb::rgb(0xF0, 0xF0, 0xF0));
+    let export = Theme::new("Adversarial", seeds).lagrange_palette_txt();
+
+    for section in export.text.split("# ").skip(1) {
+        let mut lines = section.lines().skip(1);
+        let values = (0..5)
+            .map(|_| parse_hex_color(lines.next().expect("neutral line")))
+            .collect::<Vec<_>>();
+        assert!(
+            values
+                .windows(2)
+                .all(|pair| srgb_luma(pair[0]) <= srgb_luma(pair[1])),
+            "neutral ramp is ordered in {section}"
+        );
+
+        let first_accent = parse_hex_color(lines.next().expect("brown line"));
+        let second_accent = parse_hex_color(lines.next().expect("orange line"));
+        assert!(srgb_luma(first_accent) <= srgb_luma(second_accent));
+        let first_secondary = parse_hex_color(lines.next().expect("teal line"));
+        let second_secondary = parse_hex_color(lines.next().expect("cyan line"));
+        assert!(srgb_luma(first_secondary) <= srgb_luma(second_secondary));
+    }
+}
+
+#[test]
+fn lagrange_palette_falls_back_for_non_semantic_status_hues() {
+    let mut seeds = theme().seeds;
+    seeds.danger = Srgb::rgb(0x20, 0x60, 0xE0);
+    seeds.success = Srgb::rgb(0xDC, 0x28, 0xC8);
+    let export = Theme::new("Status fallback", seeds).lagrange_palette_txt();
+
+    assert!(export.text.contains("red:        #FF4040"));
+    assert!(export.text.contains("green:      #00C800"));
+    assert!(export.text.contains("green:      #009600"));
+    for mode in [LagrangePaletteMode::Dark, LagrangePaletteMode::Light] {
+        assert!(
+            export
+                .diagnostics
+                .contains(&LagrangePaletteDiagnostic::ReservedDefault {
+                    mode,
+                    label: "red",
+                    value: "#FF4040",
+                })
+        );
+        let green = if mode == LagrangePaletteMode::Dark {
+            "#00C800"
+        } else {
+            "#009600"
+        };
+        assert!(
+            export
+                .diagnostics
+                .contains(&LagrangePaletteDiagnostic::ReservedDefault {
+                    mode,
+                    label: "green",
+                    value: green,
+                })
+        );
+    }
+}
+
+#[test]
+fn lagrange_palette_reports_rgb_alpha_loss() {
+    let mut seeds = theme().seeds;
+    seeds.danger = Srgb::rgba(0xD5, 0x4E, 0x4E, 0x80);
+    let export = Theme::new("Alpha", seeds).lagrange_palette_txt();
+    for mode in [LagrangePaletteMode::Dark, LagrangePaletteMode::Light] {
+        assert!(
+            export
+                .diagnostics
+                .contains(&LagrangePaletteDiagnostic::AlphaDiscarded {
+                    mode,
+                    label: "red",
+                    source_role: "danger",
+                })
+        );
+    }
+}
+
+fn parse_hex_color(line: &str) -> Srgb {
+    let value = line.split_once(':').expect("palette separator").1.trim();
+    assert_eq!(value.len(), 7);
+    assert_eq!(&value[..1], "#");
+    Srgb::rgb(
+        u8::from_str_radix(&value[1..3], 16).expect("red channel"),
+        u8::from_str_radix(&value[3..5], 16).expect("green channel"),
+        u8::from_str_radix(&value[5..7], 16).expect("blue channel"),
+    )
+}
+
+fn srgb_luma(color: Srgb) -> u32 {
+    77 * u32::from(color.r) + 150 * u32::from(color.g) + 29 * u32::from(color.b)
 }
 
 fn css_value<'a>(stylesheet: &'a str, name: &str) -> &'a str {

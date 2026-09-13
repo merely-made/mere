@@ -5,7 +5,8 @@
 graduation open). From Mark's theme-model decision (2026-07-05), unblocking the W3C adoption
 plan's P3 host half.
 
-**2026-09-13 extension:** Tabard small-web adapters are scoped below. The July
+**2026-09-13 extension:** Tabard's Lagrange artifact exporter is implemented;
+native reader adapters and stock-client visual acceptance remain open below. The July
 receipts describe their original host; they do not establish current Knot or
 Turnstone settings, foreign exports or persistence.
 **Related**: `repos/genet/docs/2026-07-05_w3c_mechanism_adoption_plan.md` (P3 engine half landed:
@@ -16,8 +17,8 @@ switch path).
 ## Tabard small-web adapters (2026-09-13 scope)
 
 **Current code:** `ports/tabard/src/lib.rs::Theme` derives a Tinct palette and
-emits DTCG color JSON or deterministic CSS custom properties. It is a library,
-without foreign-client exporters. The recorded Pelt chrome/Reader preview
+emits DTCG color JSON, deterministic CSS custom properties, and
+`lagrange_palette_txt()` with typed mapping diagnostics. It is a library. The recorded Pelt chrome/Reader preview
 receipts prove consumer mappings, not installed user settings. In Mere,
 `crates/system/document-lanes/src/smolweb.rs` accepts `SmolwebTheme::App` and an
 explicit `DocumentStyleSheet`. Those are the native reader seams; protocol
@@ -49,6 +50,15 @@ reader overrides their appearance. Gemtext needs no styling extension.
    Preserve the documented neutral ordering and status-color meanings; do not
    claim CSS/DTCG import or control over a site's page theme. Exporting a file
    and installing it into an existing client profile are separate user actions.
+   **Implementation receipt:** nine Tabard tests pass with `--offline --locked`,
+   including both-mode golden output, neutral/accent ordering, reserved status
+   meanings, alpha loss and unsupported-role diagnostics. The
+   [v1.21.1 loader](https://raw.githubusercontent.com/skyjake/lagrange/v1.21.1/src/color.c)
+   ignores `yellow` and `magenta` despite their presence in that release's
+   [help](https://raw.githubusercontent.com/skyjake/lagrange/v1.21.1/res/about/help.gmi).
+   The documented artifact retains those entries and reports
+   `StockVersionIgnored` for each mode. Stock-client visual load/restart and
+   link-icon contrast remain unqualified; this receipt does not close that gate.
 3. **Geopard contract discovery.** Its
    [official README](https://raw.githubusercontent.com/ranfdev/Geopard/master/README.gemini)
    describes per-domain colors and a configuration directory but establishes
