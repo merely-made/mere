@@ -4,23 +4,22 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! **Moot**, the Mere platform's places port.
+//! **Gemot**, the community surface for murmurs, moots, and coop.
 //!
-//! A moot is an assembly and the ground it is held on. This port is the
-//! first-party application surface for the family's shared spaces, and it
-//! carries two surfaces rather than one, because the workflows separate
-//! cleanly and their consumers do not want them together:
+//! The first-party community surface composes independently usable activities:
 //!
-//! - **murmur** — the conversation surface. Direct and invitation-scoped
+//! - **murmurs** — secret conversations. Direct and invitation-scoped
 //!   conversations, store-and-forward mail, history, drafts, delivery,
 //!   refusal and retry, attachments through shared content custody, and
 //!   calls once the transport and media receipts support them. Its model is
 //!   `mere-comms` (the WASM-clean inbox: `Conversation`, `Message`, `Draft`,
 //!   and the `ProtocolAdapter` seam).
-//! - **moot** — the community surface. Find, preview, join, leave and
+//! - **moots** — spaces of agreement. Find, preview, join, leave and
 //!   reconnect ceremony; membership and role inspection; proposals,
 //!   decisions, moderation and appeals; storage and compute contributions;
 //!   space health, replication and reachability.
+//!
+//! **coop** is shared activity among peers; application domains own its state.
 //!
 //! **murmur must mount alone.** Signalman wants messages and voice drops
 //! without governance UI, and that constraint is what keeps the two surfaces
@@ -40,9 +39,8 @@
 //!   application half of that ruling and left the authority half standing.
 //!   Turnstone composes this port like any other host.
 //!
-//! The package is `mere-moot` because crates.io `moot` is held by an
-//! unrelated crate with real code, and `murmur` is likewise taken. The
-//! library keeps the product name.
+//! The technical package remains `mere-moot` (library `moot`) at `ports/moot`.
+//! Gemot is the product name; the `gemot` dependency remains the governance owner.
 #![doc(html_no_source)]
 
 #[cfg(feature = "captured-web")]

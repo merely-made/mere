@@ -97,8 +97,13 @@ in place. Two peers on the same cabal key converge over a `P2pandaTransport`
 (tested). The host wires a networked cabal into mere's Comms pane end to end
 (join ticket, connect-by-ticket, live post drain).
 
-Ahead: host-led co-op sessions (`host_coop` / `join_coop`), cross-author causal
-links, retention-aware pruning, and group key distribution. Native drops have
+Ahead: cross-author causal links, retention-aware pruning, and group key
+distribution. Coop lifecycle belongs to concrete shared activities over the
+existing admission, transport and Stickleback seams; the historical
+`host_coop` / `join_coop` suggestion is not a commitment to put application
+collaboration state in Murm. See the Gemot continuation in
+[`suite composition`](../../../design_docs/2026-08-22_turnstone_suite_composition_and_capability_census.md#gemot-murmurs-moots-and-coop-2026-09-13).
+Native drops have
 epoch-aware protection today; authorization, epoch distribution, and persisted
 key history still belong to personae or a p2panda group-state adapter.
 

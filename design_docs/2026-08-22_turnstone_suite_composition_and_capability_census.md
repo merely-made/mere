@@ -254,6 +254,12 @@ contract is not secretly a Knot interface.
 
 ### 7.1 Communications: earned now
 
+**Superseded product naming, 2026-09-13:** the umbrella is **Gemot**, containing
+**murmurs**, **moots**, and **coop**. The August naming/package decision below is
+historical; the implementation continuation at the end of this document owns
+the current product scope and lane order. Existing package coordinates remain
+explicit technical names, not a second product taxonomy.
+
 **Ruled 2026-08-22 (with Mark), amending this section and 7.2:** one port,
 **Moot**, carries both. The package is `mere-moot` with `[lib] name = "moot"`
 — the `mere-signalman` / `mere-gloss` pattern — because crates.io `moot` is
@@ -586,3 +592,75 @@ The suite composition is real when:
 - Signalman remains usable for recovery with Turnstone absent;
 - handler selection, status, errors, accessibility, commands, and settings
   survive both sovereign and composed hosts.
+
+## Gemot, murmurs, moots, and coop (2026-09-13)
+
+This continuation supersedes the August product naming above. **Gemot** is the
+community surface containing **murmurs** (secret conversations), **moots**
+(spaces of agreement), and **coop** (shared activities among peers). Explain
+conversations, communities, and particular activities plainly within those
+names. Write `coop` without a hyphen. Technical coordinates remain `ports/moot`,
+package `mere-moot`, library `moot`; `gemot` remains the governance library.
+
+The product starts with the hardware people already have and voluntary sharing
+within trust. Contributions of work should be attributable and visible.
+Participation in the platform does not require a subscription. Communities
+retain control over contributions, resource limits, and real operating costs.
+These are product constraints, not a claim that every device or protocol is
+already supported.
+
+### Research lanes and promotion rules
+
+| Lane | Owner and evidence | Done condition |
+|---|---|---|
+| R1: reference parity and resident cost | Retinue; `retinue/design_docs/2026-08-25_permissive_radio_protocol_compatibility_survey.md` is the parity ledger; controller MC4c receipts remain physical authority | Each promoted behavior has a reference version or an explicit missing pin, implementation location, embedded scope, independent evidence, and remaining gap. Self-peer success is separate from reference interoperability. |
+| R2: conversation and activity composition | Mere Comms, Retinue Signalman, Turnstone place sessions, and existing Woodshed peer proof | Identify current durable owners and actual consumers before extracting shared presentation or lifecycle. Reuse existing history and session stores. |
+
+R1 keeps Retinue as the preferred radio foundation while Sennet and Tucket earn
+support through useful participation in their existing networks. Rural/urban
+use cases inform user choices; they do not hardcode protocol selection.
+Murmuration concerns our resident implementations, retaining protocol state
+per instance with explicit bounded excursions and home pinning. Installation
+of third-party firmware remains a separate operation.
+
+R2 audit found that `crates/shell/comms` currently names Misfin and Murm, and
+its message model lacks Signalman's delivery facts. Signalman's authority is
+`retinue/apps/signalman/src/message.rs`; its desktop `MessageStore` already
+replays that journal and its Messages view already projects the records.
+Adding another inbox or another durable message store would duplicate this
+work. Mere's generic Comms layer must not depend on a Retinue application.
+
+### Implementation lanes
+
+| Lane | Bounded changes | Acceptance and current state |
+|---|---|---|
+| I1: Tucket contact preservation (Terra) | `retinue/crates/tucket/src/node.rs`: refuse different full identities sharing an occupied short address; retain the accepted identity and route | Implemented this pass. Collision and same-identity refresh regressions; 69 Tucket tests, strict clippy and formatting pass. Wider address/path parity remains open. |
+| I2: protocol-faithful conversation presentation | First add only consumer-needed delivery/privacy facts to Comms, then a consumer-side mapping beside Signalman's existing Messages view; native Murm and LXMF/Sennet/Tucket retain explicit protocol identity | Next code lane, scoped but not implemented. Replay existing message events through the mapping; preserve queued, handed-to-radio, propagation acceptance, fetched, direct receipt, cancellation, and failure distinctly. Unknown receipt never means read. Keep unsupported operations visible. Render from the existing store. |
+| I3: coop ceremony | Audit and extend Turnstone's existing place-session commands and Woodshed's peer comparison proof before extracting a common invite/join/leave/reconnect view contract | Next activity lane, scoped but not implemented. Two concrete application consumers must demonstrate the same lifecycle facts. Domain state, history, merge, and authorization stay with their existing owners. |
+| I4: Gemot composition | Canonical terminology, port manifest/module/README, Murm README and Turnstone plan aligned in this pass; conversation components mount independently | Documentation aligned. Product rendering remains open; the port's existing captured-web implementation is not a completed conversation or coop surface. No package rename is required for this slice. |
+| I5: PPK2 measurements | Inventory kit, target SKU, power path, voltage, USB/backfeed behavior, and event markers; capture baseline and idle/RX/TX/transition traces for a named build/configuration | Physical lane pending fixture setup. Record raw trace, integration window, voltage/current ranges and charge per operation; compare identical fixtures. Treat power-cut durability as a separate witnessed receipt. |
+
+I2 must describe actual privacy: public traffic and shared-key radio messages
+must not acquire a secret or individually authenticated badge from presentation.
+The product's secret conversations require an established protection boundary;
+existing-network traffic can share useful presentation with an honest capability
+label. Sending, retry, attachment, and call controls follow actual backend
+capabilities. Native Murm's transport-agnostic exchange remains distinct from
+legacy Cable wire compatibility and from LXMF exchange.
+
+I3's first acceptance sequence is invite a particular peer to a particular
+activity with bounded authority, refuse a wrong target or unauthorized grant,
+join, leave, and reconnect after restart. Leaving stops the local session's
+participation; reconnect rechecks current admission and authority rather than
+silently restoring an old grant. Duplicate replay must not duplicate activity
+state. Expiry and revocation must be visible. Existing Turnstone and Woodshed
+receipts keep their exact scope; this sequence does not reopen completed gates
+or claim that every step already exists. A moot supplies governance where the
+activity requires it. Murm carries conversation exchange, not everyone's
+collaborative state; the historical `host_coop`/`join_coop` suggestion is retired.
+
+Root consolidates each lane with a scoped diff, applicable tests, and current
+receipt links. Promote I2 and I3 from their actual consumer seams; additional
+protocol parity and platform-wide session abstractions require their own
+bounded acceptance evidence. PPK2 measurements can proceed independently once
+the physical fixture is identified.
