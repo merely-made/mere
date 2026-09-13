@@ -1,11 +1,11 @@
 # Virtualized line-based editor buffer (the IDE-editor ladder, rung 3)
 
 **Date**: 2026-07-09
-**Status**: design, pre-build. The rung-3 *infrastructure* (arrangement leaf +
-`VirtualWindow`) is already built in genet; this plan is the editor that consumes it,
-so the knot editor can fold sections, show a gutter, and scale to large files. The one
-gating decision (the text-editing layer) is called out below and wants a call before the
-large build. Grew out of the [djot editor plan](../../archive_docs/2026-08-06_completed_plans/2026-06-24_djot_editor_knot_nodes_plan.md)
+**Status**: partially implemented and next shared-editor work scoped. The rung-3
+*infrastructure* (arrangement leaf + `VirtualWindow`) is built in Genet, and
+Cambium now has a read-only fold projection. This plan covers the coordinate
+map and projected focused-text path required before folding can become a live
+editor, plus the later gutter and large-file work. Grew out of the [djot editor plan](../../archive_docs/2026-08-06_completed_plans/2026-06-24_djot_editor_knot_nodes_plan.md)
 Phase 3 (folds), which is blocked on this.
 
 ## Why (what the textarea cannot do)
@@ -109,6 +109,57 @@ B stays the door if pixel-exact editing control is ever wanted.
   IDE pane, Isometry's log/console, a Strophe list — gets a virtualized code view.
 - **Deferred:** the chisel Path-A fold glyph (polish over the Unicode arrow); a rope buffer
   for very large files (djot plan Phase 6); diagnostics dots in the gutter.
+
+## Editable-fold follow-on scope
+
+The first slice of the live-fold track is a pure Cambium coordinate map. It can
+proceed independently of P1/P2's virtualized line display and gutter, and does
+not count as their receipt. An
+`EditableFoldProjection` or equivalently named value borrows one source witness,
+normalizes concealed UTF-8 ranges, and publishes source-to-rendered and
+rendered-to-source boundary mappings. Marker interiors do not invent source
+offsets: their two edges map to the concealed range's start and end with
+explicit affinity, while a marker hit reports the concealed source range as an
+action target. The map also projects source selections into visible spans and
+reports when an edit, visual movement, pointer drag, or IME selection must
+expand a fold before continuing.
+
+The second slice extends Rootstock's focused-text slot with an optional
+state-built projection. Pointer placement and drag selection convert rendered
+hits back to source positions. Visual key movement, caret and selection paint,
+and the IME candidate rectangle convert source positions into rendered
+geometry. The ordinary unprojected path remains behaviorally identical. A
+product value is rebuilt from current state for each use; Rootstock does not
+retain a borrow into product state or learn Knot grammar.
+
+The third slice adds a Cambium folded styled textarea beside
+`styled_textarea`. It renders exactly the text described by the coordinate map,
+including active IME preedit, while routing edits to the same authoritative
+`TextInput`. Activating an inline marker prevents the normal click-to-caret
+default and requests expansion. Movement, selection, composition, or a
+destructive edit that would enter concealed source expands the outer fold,
+rebuilds layout, and applies or retries only after the refreshed projection is
+current; concealed source is never silently skipped or removed.
+
+Only after those shared slices pass does Knot replace its alternate read-only
+fold reading with the live field. Fold state remains transient per-view state;
+source edits invalidate and rederive fold ranges. Native Scroll, Gemtext and
+Micron formats do not borrow Djot fold ranges. Turnstone adopts the same retained
+Knot component only after the standalone headed receipt passes.
+
+The coordinate-map gate covers combining marks, ZWJ emoji, CRLF, nested and
+crossing ranges, stale witnesses, marker-edge affinity, and round trips. The
+Rootstock gate covers click and drag around a marker, visual arrows, selection
+and caret rectangles, and IME geometry under zoom. The Knot gate covers typing
+beside folds, reveal-before-destructive-edit, Japanese or Korean composition,
+undo/redo, exact save/reopen bytes, marker accessibility, and a headed native
+receipt. The existing marker's read-only `role="note"` is not an editable
+accessibility receipt.
+
+Stop if the design requires a mirrored editable buffer, persisted fold facts,
+Knot-specific mapping inside Cambium or Rootstock, text operations that cross
+hidden source without revealing it, or a Knot consumer before every Rootstock
+coordinate path uses the projection.
 
 ## Decisions
 
