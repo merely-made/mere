@@ -42,6 +42,7 @@ mod event;
 mod focus;
 mod focus_request;
 mod focusable;
+mod fold_projection;
 mod frisket;
 mod graph_canvas;
 mod grid;
@@ -131,6 +132,10 @@ pub use event::{OnClick, OnClickState, PointerClick, clickable, on_click};
 pub use focus::{FocusEvent, FocusPhase, OnFocus, OnFocusState, on_focus};
 pub use focus_request::{FocusRequest, FocusRequestState, request_focus};
 pub use focusable::{Focusable, FocusableState, focusable, focusable_if};
+pub use fold_projection::{
+    FOLD_MARKER_ACCESSIBLE_LABEL, FOLD_MARKER_CLASS, FoldProjection, FoldProjectionError,
+    FoldProjectionSegment, FoldRange, fold_projection,
+};
 #[cfg(feature = "highlight")]
 pub use highlight::{
     Highlight, entity_styles, highlighted_text_field, highlighted_textarea, note_styles,

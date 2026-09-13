@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Add `fold_projection`, a generic read-only source projection that validates a
+  caller-held source-length witness, clips `StyleRange` highlights around
+  collapsed regions, and renders `fold-marker` spans named "Folded content".
+  It borrows caller-owned source and has no `TextInput` path; live editable
+  folding still needs the coordinate map and hidden-input work.
 - Freeze the retained surface contract at v1 with `genet-host-api`'s
   descriptor vocabulary. The descriptor keeps identity, label, and
   `accepted_source` (now the admission truth a host asserts against its
