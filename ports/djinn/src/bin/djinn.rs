@@ -712,6 +712,8 @@ async fn run(args: Args) -> Result<(), Box<dyn std::error::Error>> {
             if let Some(route) = resident.register_knot_route(&mut catalog)? {
                 grants.push((AppId::new("turnstone"), route));
             }
+            let route = resident.register_published_site_route(&mut catalog)?;
+            grants.push((AppId::new("knot-editor"), route));
             if let Some(observer) = distillery_chronicle {
                 let route = ResidentDistillery::register_chronicle_route(observer, &mut catalog)?;
                 grants.push((AppId::new("turnstone"), route));
