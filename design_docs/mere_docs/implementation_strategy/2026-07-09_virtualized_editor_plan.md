@@ -144,6 +144,14 @@ B stays the door if pixel-exact editing control is ever wanted.
 
 ## Progress
 
+- **2026-09-13, read-only fold projection landed.** Cambium now provides
+  `fold_projection`: a source-borrowing, generic read-only projection which
+  validates the caller's byte-length witness and UTF-8 fold ranges, removes
+  nested ranges under their outer fold, rejects crossing ranges, clips existing
+  `StyleRange` highlights to visible source, and emits a semantic `fold-marker`
+  span for each collapsed region. This advances the shared P1/P2 display rung;
+  it does not virtualize lines, provide a gutter/control, or make folding live.
+  Editable folds still require P3's coordinate map and hidden-input path.
 - **2026-07-09, design written.** Confirmed the rung-3 infra (arrangement + `VirtualWindow`
   + `placed`) is built genet-side with no meerkat consumer yet; framed the editor over it;
   surfaced the editing-layer as the gating decision (A hidden-textarea / B full custom / C
