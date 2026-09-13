@@ -1,0 +1,277 @@
+[
+  {
+    "case": "swarm_crossing",
+    "frame": 0,
+    "counts": {
+      "pixels_with_both_observed_colours_on_tied_top_faces": 221,
+      "non_body_top_pixels": 2
+    },
+    "unresolved_count": 0,
+    "unresolved_examples": [],
+    "examples": [
+      {
+        "pixel": [
+          948,
+          221
+        ],
+        "world_y": 14,
+        "body_materials": [
+          [
+            1,
+            6
+          ],
+          [
+            4,
+            5
+          ]
+        ]
+      },
+      {
+        "pixel": [
+          946,
+          222
+        ],
+        "world_y": 14,
+        "body_materials": [
+          [
+            1,
+            6
+          ],
+          [
+            4,
+            5
+          ]
+        ]
+      },
+      {
+        "pixel": [
+          947,
+          222
+        ],
+        "world_y": 14,
+        "body_materials": [
+          [
+            1,
+            6
+          ],
+          [
+            4,
+            5
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "case": "swarm_crossing",
+    "frame": 30,
+    "counts": {
+      "pixels_with_both_observed_colours_on_tied_top_faces": 1637,
+      "non_body_top_pixels": 2
+    },
+    "unresolved_count": 0,
+    "unresolved_examples": [],
+    "examples": [
+      {
+        "pixel": [
+          714,
+          264
+        ],
+        "world_y": 10,
+        "body_materials": [
+          [
+            4,
+            3
+          ],
+          [
+            6,
+            4
+          ]
+        ]
+      },
+      {
+        "pixel": [
+          715,
+          264
+        ],
+        "world_y": 10,
+        "body_materials": [
+          [
+            4,
+            3
+          ],
+          [
+            6,
+            4
+          ]
+        ]
+      },
+      {
+        "pixel": [
+          713,
+          265
+        ],
+        "world_y": 10,
+        "body_materials": [
+          [
+            4,
+            3
+          ],
+          [
+            6,
+            4
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "case": "swarm_crossing",
+    "frame": 59,
+    "counts": {
+      "pixels_with_both_observed_colours_on_tied_top_faces": 210,
+      "non_body_top_pixels": 1
+    },
+    "unresolved_count": 0,
+    "unresolved_examples": [],
+    "examples": [
+      {
+        "pixel": [
+          769,
+          352
+        ],
+        "world_y": 14,
+        "body_materials": [
+          [
+            0,
+            6
+          ],
+          [
+            3,
+            5
+          ]
+        ]
+      },
+      {
+        "pixel": [
+          769,
+          353
+        ],
+        "world_y": 14,
+        "body_materials": [
+          [
+            0,
+            6
+          ],
+          [
+            3,
+            5
+          ]
+        ]
+      },
+      {
+        "pixel": [
+          689,
+          354
+        ],
+        "world_y": 14,
+        "body_materials": [
+          [
+            0,
+            5
+          ],
+          [
+            5,
+            6
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "case": "articulated",
+    "frame": 30,
+    "bad_body_pixels": 110,
+    "in_shared_x26_face": 110,
+    "examples": [
+      {
+        "pixel": [
+          1242,
+          466
+        ],
+        "world_point": [
+          26.0,
+          8.935595643040077,
+          11.203135875170391
+        ],
+        "inside_shared_face": true
+      },
+      {
+        "pixel": [
+          1231,
+          482
+        ],
+        "world_point": [
+          26.0,
+          8.497901444921062,
+          11.779296956137209
+        ],
+        "inside_shared_face": true
+      },
+      {
+        "pixel": [
+          1259,
+          488
+        ],
+        "world_point": [
+          26.0,
+          7.492439996714663,
+          10.312705113676225
+        ],
+        "inside_shared_face": true
+      },
+      {
+        "pixel": [
+          1255,
+          500
+        ],
+        "world_point": [
+          26.0,
+          7.052865502938628,
+          10.52221823402779
+        ],
+        "inside_shared_face": true
+      }
+    ],
+    "other": [
+      [
+        683,
+        633,
+        [
+          211,
+          211,
+          211
+        ],
+        [
+          147,
+          147,
+          147
+        ]
+      ],
+      [
+        817,
+        832,
+        [
+          197,
+          197,
+          197
+        ],
+        [
+          147,
+          147,
+          147
+        ]
+      ]
+    ]
+  }
+]

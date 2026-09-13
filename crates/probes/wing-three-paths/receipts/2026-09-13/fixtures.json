@@ -1,0 +1,1836 @@
+{
+  "adapter": {
+    "backend": "Vulkan",
+    "device_type": "DiscreteGpu",
+    "driver": "NVIDIA",
+    "driver_info": "610.88",
+    "name": "NVIDIA GeForce RTX 4060 Laptop GPU"
+  },
+  "bodies": null,
+  "check_frames": [
+    0,
+    30,
+    59
+  ],
+  "date": "2026-09-13",
+  "frames": 60,
+  "invalidation_scope": "warmup plus measured frames, except measured_* fields",
+  "mesh_cache_capacity": 2048,
+  "oracle_checked": true,
+  "percentile_method": "nearest rank over finite measured frame samples",
+  "probe": "L0c three paths",
+  "requested_shapes": null,
+  "runs": [
+    {
+      "build_ms": 0.0329,
+      "case": "crossing",
+      "checks": [
+        {
+          "frame": 0,
+          "interior": 2033560,
+          "interior_mismatch": 2918,
+          "mean_abs": 0.31238425925925284,
+          "mismatch": 7627,
+          "pixels": 2073600
+        },
+        {
+          "frame": 30,
+          "interior": 2034824,
+          "interior_mismatch": 2889,
+          "mean_abs": 0.30866914223251873,
+          "mismatch": 7365,
+          "pixels": 2073600
+        },
+        {
+          "frame": 59,
+          "interior": 2031088,
+          "interior_mismatch": 4999,
+          "mean_abs": 0.41150414737651225,
+          "mismatch": 10163,
+          "pixels": 2073600
+        }
+      ],
+      "encode_ms": 0.9253,
+      "first_draw": {
+        "build_ms": 1.229,
+        "encode_ms": 4.5679,
+        "frame_ms": 11.6105,
+        "poll_ms": 5.8136,
+        "scope": "first path.frame call; excludes GPU bootstrap and path construction"
+      },
+      "frame_max_ms": 3.2247,
+      "frame_ms": 1.5562,
+      "frame_p95_ms": 2.2162,
+      "frames": 60,
+      "invalidation": {
+        "rects_resident": 1695,
+        "registered_fragments": 134,
+        "registered_rects": 1695,
+        "relower_calls": 0,
+        "relowered_rects": 0
+      },
+      "notes": "fragment_lower_count=134 master_hits=3 rects_total=1695; ",
+      "path": "a",
+      "poll_ms": 0.55595,
+      "pose_policy": "continuous_body_yaw",
+      "rss_mb": 156.55859375,
+      "workload": {
+        "digest": "0b4753ec284194a0582fb0dff85140484d073a248300e431691ae7005759b7be",
+        "digest_scope": "initial world and all scripted world frames; excludes path-specific pose quantization",
+        "final_geometry": {
+          "body_instances": 2,
+          "chunk_instances": 4,
+          "draw_instances": 8,
+          "mesh_quads_instances": 792,
+          "mesh_quads_unique_volumes": 432,
+          "part_instances": 4,
+          "solid_voxels_instances": 4128,
+          "unique_body_topologies": 1,
+          "unique_chunk_volumes": 4,
+          "unique_part_topologies": 2,
+          "unique_part_volumes": 2,
+          "unique_topologies": 6,
+          "unique_volumes": 6,
+          "voxel_cells_instances": 8896
+        },
+        "initial_geometry": {
+          "body_instances": 2,
+          "chunk_instances": 4,
+          "draw_instances": 8,
+          "mesh_quads_instances": 792,
+          "mesh_quads_unique_volumes": 432,
+          "part_instances": 4,
+          "solid_voxels_instances": 4128,
+          "unique_body_topologies": 1,
+          "unique_chunk_volumes": 4,
+          "unique_part_topologies": 2,
+          "unique_part_volumes": 2,
+          "unique_topologies": 6,
+          "unique_volumes": 6,
+          "voxel_cells_instances": 8896
+        },
+        "max_live_unique_volumes": 6,
+        "oracle_checked": true,
+        "requested_shapes": null,
+        "seed": null,
+        "shape_generator": null,
+        "unique_volumes_over_run": 6,
+        "version": "check_fixtures_v1"
+      }
+    },
+    {
+      "build_ms": 0.00995,
+      "case": "crossing",
+      "checks": [
+        {
+          "frame": 0,
+          "interior": 2033560,
+          "interior_mismatch": 5957,
+          "mean_abs": 0.2302081725823095,
+          "mismatch": 9223,
+          "pixels": 2073600
+        },
+        {
+          "frame": 30,
+          "interior": 2034824,
+          "interior_mismatch": 9692,
+          "mean_abs": 0.3602248906892928,
+          "mismatch": 12969,
+          "pixels": 2073600
+        },
+        {
+          "frame": 59,
+          "interior": 2031088,
+          "interior_mismatch": 4922,
+          "mean_abs": 0.23035960005146247,
+          "mismatch": 9388,
+          "pixels": 2073600
+        }
+      ],
+      "encode_ms": 0.70335,
+      "first_draw": {
+        "build_ms": 10.6237,
+        "encode_ms": 3.6814,
+        "frame_ms": 21.228099999999998,
+        "poll_ms": 6.923,
+        "scope": "first path.frame call; excludes GPU bootstrap and path construction"
+      },
+      "frame_max_ms": 2.3392,
+      "frame_ms": 1.20655,
+      "frame_p95_ms": 1.5646,
+      "frames": 60,
+      "invalidation": {
+        "cache_hits": 248,
+        "cache_misses": 4,
+        "image_bytes": 4898264,
+        "images_uploaded": 8,
+        "measured_image_bytes": 0,
+        "measured_images_uploaded": 0,
+        "part_cache_entries": 4
+      },
+      "notes": "",
+      "path": "b",
+      "poll_ms": 0.48305,
+      "pose_policy": "quarter_turn_sprites",
+      "rss_mb": 167.234375,
+      "workload": {
+        "digest": "0b4753ec284194a0582fb0dff85140484d073a248300e431691ae7005759b7be",
+        "digest_scope": "initial world and all scripted world frames; excludes path-specific pose quantization",
+        "final_geometry": {
+          "body_instances": 2,
+          "chunk_instances": 4,
+          "draw_instances": 8,
+          "mesh_quads_instances": 792,
+          "mesh_quads_unique_volumes": 432,
+          "part_instances": 4,
+          "solid_voxels_instances": 4128,
+          "unique_body_topologies": 1,
+          "unique_chunk_volumes": 4,
+          "unique_part_topologies": 2,
+          "unique_part_volumes": 2,
+          "unique_topologies": 6,
+          "unique_volumes": 6,
+          "voxel_cells_instances": 8896
+        },
+        "initial_geometry": {
+          "body_instances": 2,
+          "chunk_instances": 4,
+          "draw_instances": 8,
+          "mesh_quads_instances": 792,
+          "mesh_quads_unique_volumes": 432,
+          "part_instances": 4,
+          "solid_voxels_instances": 4128,
+          "unique_body_topologies": 1,
+          "unique_chunk_volumes": 4,
+          "unique_part_topologies": 2,
+          "unique_part_volumes": 2,
+          "unique_topologies": 6,
+          "unique_volumes": 6,
+          "voxel_cells_instances": 8896
+        },
+        "max_live_unique_volumes": 6,
+        "oracle_checked": true,
+        "requested_shapes": null,
+        "seed": null,
+        "shape_generator": null,
+        "unique_volumes_over_run": 6,
+        "version": "check_fixtures_v1"
+      }
+    },
+    {
+      "build_ms": 0.00215,
+      "case": "crossing",
+      "checks": [
+        {
+          "frame": 0,
+          "interior": 2033560,
+          "interior_mismatch": 1,
+          "mean_abs": 0.0003059092078189301,
+          "mismatch": 13,
+          "pixels": 2073600
+        },
+        {
+          "frame": 30,
+          "interior": 2034824,
+          "interior_mismatch": 2,
+          "mean_abs": 0.0002972286522633745,
+          "mismatch": 12,
+          "pixels": 2073600
+        },
+        {
+          "frame": 59,
+          "interior": 2031088,
+          "interior_mismatch": 2,
+          "mean_abs": 0.0002972286522633745,
+          "mismatch": 10,
+          "pixels": 2073600
+        }
+      ],
+      "encode_ms": 0.9424,
+      "first_draw": {
+        "build_ms": 0.4218,
+        "encode_ms": 6.8459,
+        "frame_ms": 10.667000000000002,
+        "poll_ms": 3.3993,
+        "scope": "first path.frame call; excludes GPU bootstrap and path construction"
+      },
+      "frame_max_ms": 2.2204,
+      "frame_ms": 1.2656,
+      "frame_p95_ms": 1.8856,
+      "frames": 60,
+      "invalidation": {
+        "cache_capacity": 2048,
+        "cached_meshes_end": 6,
+        "draws_total": 378,
+        "evictions": 0,
+        "instance_upload_bytes": 27328,
+        "instances_per_frame": 8,
+        "measured_evictions": 0,
+        "measured_instance_upload_bytes": 26432,
+        "measured_mesh_upload_bytes": 0,
+        "measured_mesh_uploads": 0,
+        "mesh_upload_bytes": 62208,
+        "mesh_uploads": 6
+      },
+      "notes": "",
+      "path": "c",
+      "poll_ms": 0.32515,
+      "pose_policy": "continuous_body_yaw",
+      "rss_mb": 172.30078125,
+      "workload": {
+        "digest": "0b4753ec284194a0582fb0dff85140484d073a248300e431691ae7005759b7be",
+        "digest_scope": "initial world and all scripted world frames; excludes path-specific pose quantization",
+        "final_geometry": {
+          "body_instances": 2,
+          "chunk_instances": 4,
+          "draw_instances": 8,
+          "mesh_quads_instances": 792,
+          "mesh_quads_unique_volumes": 432,
+          "part_instances": 4,
+          "solid_voxels_instances": 4128,
+          "unique_body_topologies": 1,
+          "unique_chunk_volumes": 4,
+          "unique_part_topologies": 2,
+          "unique_part_volumes": 2,
+          "unique_topologies": 6,
+          "unique_volumes": 6,
+          "voxel_cells_instances": 8896
+        },
+        "initial_geometry": {
+          "body_instances": 2,
+          "chunk_instances": 4,
+          "draw_instances": 8,
+          "mesh_quads_instances": 792,
+          "mesh_quads_unique_volumes": 432,
+          "part_instances": 4,
+          "solid_voxels_instances": 4128,
+          "unique_body_topologies": 1,
+          "unique_chunk_volumes": 4,
+          "unique_part_topologies": 2,
+          "unique_part_volumes": 2,
+          "unique_topologies": 6,
+          "unique_volumes": 6,
+          "voxel_cells_instances": 8896
+        },
+        "max_live_unique_volumes": 6,
+        "oracle_checked": true,
+        "requested_shapes": null,
+        "seed": null,
+        "shape_generator": null,
+        "unique_volumes_over_run": 6,
+        "version": "check_fixtures_v1"
+      }
+    },
+    {
+      "build_ms": 0.033049999999999996,
+      "case": "articulated",
+      "checks": [
+        {
+          "frame": 0,
+          "interior": 2021608,
+          "interior_mismatch": 28003,
+          "mean_abs": 0.9742410943930178,
+          "mismatch": 38826,
+          "pixels": 2073600
+        },
+        {
+          "frame": 30,
+          "interior": 2023216,
+          "interior_mismatch": 20442,
+          "mean_abs": 0.7859995498970834,
+          "mismatch": 29939,
+          "pixels": 2073600
+        },
+        {
+          "frame": 59,
+          "interior": 2022362,
+          "interior_mismatch": 22357,
+          "mean_abs": 0.8721506880141733,
+          "mismatch": 31865,
+          "pixels": 2073600
+        }
+      ],
+      "encode_ms": 0.70845,
+      "first_draw": {
+        "build_ms": 1.0992,
+        "encode_ms": 3.1177,
+        "frame_ms": 11.494800000000001,
+        "poll_ms": 7.277900000000001,
+        "scope": "first path.frame call; excludes GPU bootstrap and path construction"
+      },
+      "frame_max_ms": 2.1161999999999996,
+      "frame_ms": 1.2715999999999998,
+      "frame_p95_ms": 1.7963,
+      "frames": 60,
+      "invalidation": {
+        "rects_resident": 1935,
+        "registered_fragments": 137,
+        "registered_rects": 1935,
+        "relower_calls": 9,
+        "relowered_rects": 720
+      },
+      "notes": "fragment_lower_count=146 master_hits=59 rects_total=1935; ",
+      "path": "a",
+      "poll_ms": 0.5179,
+      "pose_policy": "continuous_body_yaw",
+      "rss_mb": 173.57421875,
+      "workload": {
+        "digest": "df5a569019c10f24cb9a60c662500cbe47c0cfb476b52ab0b7c722d255a1c8c8",
+        "digest_scope": "initial world and all scripted world frames; excludes path-specific pose quantization",
+        "final_geometry": {
+          "body_instances": 3,
+          "chunk_instances": 4,
+          "draw_instances": 11,
+          "mesh_quads_instances": 1272,
+          "mesh_quads_unique_volumes": 552,
+          "part_instances": 7,
+          "solid_voxels_instances": 4536,
+          "unique_body_topologies": 2,
+          "unique_chunk_volumes": 4,
+          "unique_part_topologies": 3,
+          "unique_part_volumes": 3,
+          "unique_topologies": 7,
+          "unique_volumes": 7,
+          "voxel_cells_instances": 9304
+        },
+        "initial_geometry": {
+          "body_instances": 3,
+          "chunk_instances": 4,
+          "draw_instances": 11,
+          "mesh_quads_instances": 1272,
+          "mesh_quads_unique_volumes": 552,
+          "part_instances": 7,
+          "solid_voxels_instances": 4536,
+          "unique_body_topologies": 2,
+          "unique_chunk_volumes": 4,
+          "unique_part_topologies": 3,
+          "unique_part_volumes": 3,
+          "unique_topologies": 7,
+          "unique_volumes": 7,
+          "voxel_cells_instances": 9304
+        },
+        "max_live_unique_volumes": 7,
+        "oracle_checked": true,
+        "requested_shapes": null,
+        "seed": null,
+        "shape_generator": null,
+        "unique_volumes_over_run": 7,
+        "version": "check_fixtures_v1"
+      }
+    },
+    {
+      "build_ms": 0.01235,
+      "case": "articulated",
+      "checks": [
+        {
+          "frame": 0,
+          "interior": 2021608,
+          "interior_mismatch": 10110,
+          "mean_abs": 0.3674705825617417,
+          "mismatch": 14563,
+          "pixels": 2073600
+        },
+        {
+          "frame": 30,
+          "interior": 2023216,
+          "interior_mismatch": 20268,
+          "mean_abs": 0.6100208976336569,
+          "mismatch": 26444,
+          "pixels": 2073600
+        },
+        {
+          "frame": 59,
+          "interior": 2022362,
+          "interior_mismatch": 11091,
+          "mean_abs": 0.3878906250000264,
+          "mismatch": 15662,
+          "pixels": 2073600
+        }
+      ],
+      "encode_ms": 0.745,
+      "first_draw": {
+        "build_ms": 10.076099999999999,
+        "encode_ms": 3.5483,
+        "frame_ms": 20.705499999999997,
+        "poll_ms": 7.0811,
+        "scope": "first path.frame call; excludes GPU bootstrap and path construction"
+      },
+      "frame_max_ms": 2.6349,
+      "frame_ms": 1.2919,
+      "frame_p95_ms": 2.3598,
+      "frames": 60,
+      "invalidation": {
+        "cache_hits": 435,
+        "cache_misses": 6,
+        "image_bytes": 5591588,
+        "images_uploaded": 10,
+        "measured_image_bytes": 814844,
+        "measured_images_uploaded": 3,
+        "part_cache_entries": 6
+      },
+      "notes": "",
+      "path": "b",
+      "poll_ms": 0.51355,
+      "pose_policy": "quarter_turn_sprites",
+      "rss_mb": 179.28515625,
+      "workload": {
+        "digest": "df5a569019c10f24cb9a60c662500cbe47c0cfb476b52ab0b7c722d255a1c8c8",
+        "digest_scope": "initial world and all scripted world frames; excludes path-specific pose quantization",
+        "final_geometry": {
+          "body_instances": 3,
+          "chunk_instances": 4,
+          "draw_instances": 11,
+          "mesh_quads_instances": 1272,
+          "mesh_quads_unique_volumes": 552,
+          "part_instances": 7,
+          "solid_voxels_instances": 4536,
+          "unique_body_topologies": 2,
+          "unique_chunk_volumes": 4,
+          "unique_part_topologies": 3,
+          "unique_part_volumes": 3,
+          "unique_topologies": 7,
+          "unique_volumes": 7,
+          "voxel_cells_instances": 9304
+        },
+        "initial_geometry": {
+          "body_instances": 3,
+          "chunk_instances": 4,
+          "draw_instances": 11,
+          "mesh_quads_instances": 1272,
+          "mesh_quads_unique_volumes": 552,
+          "part_instances": 7,
+          "solid_voxels_instances": 4536,
+          "unique_body_topologies": 2,
+          "unique_chunk_volumes": 4,
+          "unique_part_topologies": 3,
+          "unique_part_volumes": 3,
+          "unique_topologies": 7,
+          "unique_volumes": 7,
+          "voxel_cells_instances": 9304
+        },
+        "max_live_unique_volumes": 7,
+        "oracle_checked": true,
+        "requested_shapes": null,
+        "seed": null,
+        "shape_generator": null,
+        "unique_volumes_over_run": 7,
+        "version": "check_fixtures_v1"
+      }
+    },
+    {
+      "build_ms": 0.0036,
+      "case": "articulated",
+      "checks": [
+        {
+          "frame": 0,
+          "interior": 2021608,
+          "interior_mismatch": 2,
+          "mean_abs": 0.0003714956275720165,
+          "mismatch": 15,
+          "pixels": 2073600
+        },
+        {
+          "frame": 30,
+          "interior": 2023216,
+          "interior_mismatch": 112,
+          "mean_abs": 0.0070013503086420546,
+          "mismatch": 155,
+          "pixels": 2073600
+        },
+        {
+          "frame": 59,
+          "interior": 2022362,
+          "interior_mismatch": 2,
+          "mean_abs": 0.002221257716049271,
+          "mismatch": 13,
+          "pixels": 2073600
+        }
+      ],
+      "encode_ms": 0.9632499999999999,
+      "first_draw": {
+        "build_ms": 0.5446,
+        "encode_ms": 5.1474,
+        "frame_ms": 11.0839,
+        "poll_ms": 5.3919,
+        "scope": "first path.frame call; excludes GPU bootstrap and path construction"
+      },
+      "frame_max_ms": 2.6065,
+      "frame_ms": 1.2945,
+      "frame_p95_ms": 1.7944999999999998,
+      "frames": 60,
+      "invalidation": {
+        "cache_capacity": 2048,
+        "cached_meshes_end": 7,
+        "draws_total": 441,
+        "evictions": 0,
+        "instance_upload_bytes": 1568,
+        "instances_per_frame": 11,
+        "measured_evictions": 0,
+        "measured_instance_upload_bytes": 336,
+        "measured_mesh_upload_bytes": 0,
+        "measured_mesh_uploads": 0,
+        "mesh_upload_bytes": 79488,
+        "mesh_uploads": 7
+      },
+      "notes": "",
+      "path": "c",
+      "poll_ms": 0.34215,
+      "pose_policy": "continuous_body_yaw",
+      "rss_mb": 173.45703125,
+      "workload": {
+        "digest": "df5a569019c10f24cb9a60c662500cbe47c0cfb476b52ab0b7c722d255a1c8c8",
+        "digest_scope": "initial world and all scripted world frames; excludes path-specific pose quantization",
+        "final_geometry": {
+          "body_instances": 3,
+          "chunk_instances": 4,
+          "draw_instances": 11,
+          "mesh_quads_instances": 1272,
+          "mesh_quads_unique_volumes": 552,
+          "part_instances": 7,
+          "solid_voxels_instances": 4536,
+          "unique_body_topologies": 2,
+          "unique_chunk_volumes": 4,
+          "unique_part_topologies": 3,
+          "unique_part_volumes": 3,
+          "unique_topologies": 7,
+          "unique_volumes": 7,
+          "voxel_cells_instances": 9304
+        },
+        "initial_geometry": {
+          "body_instances": 3,
+          "chunk_instances": 4,
+          "draw_instances": 11,
+          "mesh_quads_instances": 1272,
+          "mesh_quads_unique_volumes": 552,
+          "part_instances": 7,
+          "solid_voxels_instances": 4536,
+          "unique_body_topologies": 2,
+          "unique_chunk_volumes": 4,
+          "unique_part_topologies": 3,
+          "unique_part_volumes": 3,
+          "unique_topologies": 7,
+          "unique_volumes": 7,
+          "voxel_cells_instances": 9304
+        },
+        "max_live_unique_volumes": 7,
+        "oracle_checked": true,
+        "requested_shapes": null,
+        "seed": null,
+        "shape_generator": null,
+        "unique_volumes_over_run": 7,
+        "version": "check_fixtures_v1"
+      }
+    },
+    {
+      "build_ms": 0.034,
+      "case": "terrain_edit",
+      "checks": [
+        {
+          "frame": 0,
+          "interior": 2037614,
+          "interior_mismatch": 4584,
+          "mean_abs": 0.34097029320985045,
+          "mismatch": 9327,
+          "pixels": 2073600
+        },
+        {
+          "frame": 30,
+          "interior": 2037614,
+          "interior_mismatch": 4584,
+          "mean_abs": 0.3409501993312496,
+          "mismatch": 9327,
+          "pixels": 2073600
+        },
+        {
+          "frame": 59,
+          "interior": 2037614,
+          "interior_mismatch": 4584,
+          "mean_abs": 0.3409501993312496,
+          "mismatch": 9327,
+          "pixels": 2073600
+        }
+      ],
+      "encode_ms": 0.81155,
+      "first_draw": {
+        "build_ms": 1.7769000000000001,
+        "encode_ms": 4.6369,
+        "frame_ms": 12.8798,
+        "poll_ms": 6.466,
+        "scope": "first path.frame call; excludes GPU bootstrap and path construction"
+      },
+      "frame_max_ms": 3.0906000000000002,
+      "frame_ms": 1.4471500000000002,
+      "frame_p95_ms": 2.1612,
+      "frames": 60,
+      "invalidation": {
+        "rects_resident": 1699,
+        "registered_fragments": 134,
+        "registered_rects": 1695,
+        "relower_calls": 65,
+        "relowered_rects": 600
+      },
+      "notes": "fragment_lower_count=199 master_hits=61 rects_total=1699; ",
+      "path": "a",
+      "poll_ms": 0.56965,
+      "pose_policy": "continuous_body_yaw",
+      "rss_mb": 180.5,
+      "workload": {
+        "digest": "4ea015fd8111b6e878fc9237fb0ee578b09b8fcc13197bf8f89b4b954a88c8b7",
+        "digest_scope": "initial world and all scripted world frames; excludes path-specific pose quantization",
+        "final_geometry": {
+          "body_instances": 2,
+          "chunk_instances": 4,
+          "draw_instances": 8,
+          "mesh_quads_instances": 808,
+          "mesh_quads_unique_volumes": 448,
+          "part_instances": 4,
+          "solid_voxels_instances": 4120,
+          "unique_body_topologies": 1,
+          "unique_chunk_volumes": 4,
+          "unique_part_topologies": 2,
+          "unique_part_volumes": 2,
+          "unique_topologies": 6,
+          "unique_volumes": 6,
+          "voxel_cells_instances": 8896
+        },
+        "initial_geometry": {
+          "body_instances": 2,
+          "chunk_instances": 4,
+          "draw_instances": 8,
+          "mesh_quads_instances": 792,
+          "mesh_quads_unique_volumes": 432,
+          "part_instances": 4,
+          "solid_voxels_instances": 4128,
+          "unique_body_topologies": 1,
+          "unique_chunk_volumes": 4,
+          "unique_part_topologies": 2,
+          "unique_part_volumes": 2,
+          "unique_topologies": 6,
+          "unique_volumes": 6,
+          "voxel_cells_instances": 8896
+        },
+        "max_live_unique_volumes": 6,
+        "oracle_checked": true,
+        "requested_shapes": null,
+        "seed": null,
+        "shape_generator": null,
+        "unique_volumes_over_run": 8,
+        "version": "check_fixtures_v1"
+      }
+    },
+    {
+      "build_ms": 0.012199999999999999,
+      "case": "terrain_edit",
+      "checks": [
+        {
+          "frame": 0,
+          "interior": 2037614,
+          "interior_mismatch": 10110,
+          "mean_abs": 0.32346482767490575,
+          "mismatch": 12613,
+          "pixels": 2073600
+        },
+        {
+          "frame": 30,
+          "interior": 2037614,
+          "interior_mismatch": 10110,
+          "mean_abs": 0.32346482767490575,
+          "mismatch": 12613,
+          "pixels": 2073600
+        },
+        {
+          "frame": 59,
+          "interior": 2037614,
+          "interior_mismatch": 10110,
+          "mean_abs": 0.32346482767490575,
+          "mismatch": 12613,
+          "pixels": 2073600
+        }
+      ],
+      "encode_ms": 0.9129499999999999,
+      "first_draw": {
+        "build_ms": 11.5528,
+        "encode_ms": 3.9278000000000004,
+        "frame_ms": 22.6284,
+        "poll_ms": 7.1478,
+        "scope": "first path.frame call; excludes GPU bootstrap and path construction"
+      },
+      "frame_max_ms": 6.8001000000000005,
+      "frame_ms": 1.8611,
+      "frame_p95_ms": 2.8019000000000003,
+      "frames": 60,
+      "invalidation": {
+        "cache_hits": 250,
+        "cache_misses": 2,
+        "image_bytes": 6558680,
+        "images_uploaded": 8,
+        "measured_image_bytes": 2054552,
+        "measured_images_uploaded": 2,
+        "part_cache_entries": 2
+      },
+      "notes": "",
+      "path": "b",
+      "poll_ms": 0.9354,
+      "pose_policy": "quarter_turn_sprites",
+      "rss_mb": 189.3359375,
+      "workload": {
+        "digest": "4ea015fd8111b6e878fc9237fb0ee578b09b8fcc13197bf8f89b4b954a88c8b7",
+        "digest_scope": "initial world and all scripted world frames; excludes path-specific pose quantization",
+        "final_geometry": {
+          "body_instances": 2,
+          "chunk_instances": 4,
+          "draw_instances": 8,
+          "mesh_quads_instances": 808,
+          "mesh_quads_unique_volumes": 448,
+          "part_instances": 4,
+          "solid_voxels_instances": 4120,
+          "unique_body_topologies": 1,
+          "unique_chunk_volumes": 4,
+          "unique_part_topologies": 2,
+          "unique_part_volumes": 2,
+          "unique_topologies": 6,
+          "unique_volumes": 6,
+          "voxel_cells_instances": 8896
+        },
+        "initial_geometry": {
+          "body_instances": 2,
+          "chunk_instances": 4,
+          "draw_instances": 8,
+          "mesh_quads_instances": 792,
+          "mesh_quads_unique_volumes": 432,
+          "part_instances": 4,
+          "solid_voxels_instances": 4128,
+          "unique_body_topologies": 1,
+          "unique_chunk_volumes": 4,
+          "unique_part_topologies": 2,
+          "unique_part_volumes": 2,
+          "unique_topologies": 6,
+          "unique_volumes": 6,
+          "voxel_cells_instances": 8896
+        },
+        "max_live_unique_volumes": 6,
+        "oracle_checked": true,
+        "requested_shapes": null,
+        "seed": null,
+        "shape_generator": null,
+        "unique_volumes_over_run": 8,
+        "version": "check_fixtures_v1"
+      }
+    },
+    {
+      "build_ms": 0.0033,
+      "case": "terrain_edit",
+      "checks": [
+        {
+          "frame": 0,
+          "interior": 2037614,
+          "interior_mismatch": 2,
+          "mean_abs": 0.0002930491255144033,
+          "mismatch": 10,
+          "pixels": 2073600
+        },
+        {
+          "frame": 30,
+          "interior": 2037614,
+          "interior_mismatch": 2,
+          "mean_abs": 0.0002930491255144033,
+          "mismatch": 10,
+          "pixels": 2073600
+        },
+        {
+          "frame": 59,
+          "interior": 2037614,
+          "interior_mismatch": 2,
+          "mean_abs": 0.0002930491255144033,
+          "mismatch": 10,
+          "pixels": 2073600
+        }
+      ],
+      "encode_ms": 1.2374,
+      "first_draw": {
+        "build_ms": 0.4933,
+        "encode_ms": 5.2163,
+        "frame_ms": 15.6356,
+        "poll_ms": 9.926,
+        "scope": "first path.frame call; excludes GPU bootstrap and path construction"
+      },
+      "frame_max_ms": 5.613,
+      "frame_ms": 2.1108000000000002,
+      "frame_p95_ms": 3.493,
+      "frames": 60,
+      "invalidation": {
+        "cache_capacity": 2048,
+        "cached_meshes_end": 8,
+        "draws_total": 378,
+        "evictions": 0,
+        "instance_upload_bytes": 1120,
+        "instances_per_frame": 8,
+        "measured_evictions": 0,
+        "measured_instance_upload_bytes": 224,
+        "measured_mesh_upload_bytes": 6336,
+        "measured_mesh_uploads": 2,
+        "mesh_upload_bytes": 68544,
+        "mesh_uploads": 8
+      },
+      "notes": "",
+      "path": "c",
+      "poll_ms": 0.7957000000000001,
+      "pose_policy": "continuous_body_yaw",
+      "rss_mb": 184.91015625,
+      "workload": {
+        "digest": "4ea015fd8111b6e878fc9237fb0ee578b09b8fcc13197bf8f89b4b954a88c8b7",
+        "digest_scope": "initial world and all scripted world frames; excludes path-specific pose quantization",
+        "final_geometry": {
+          "body_instances": 2,
+          "chunk_instances": 4,
+          "draw_instances": 8,
+          "mesh_quads_instances": 808,
+          "mesh_quads_unique_volumes": 448,
+          "part_instances": 4,
+          "solid_voxels_instances": 4120,
+          "unique_body_topologies": 1,
+          "unique_chunk_volumes": 4,
+          "unique_part_topologies": 2,
+          "unique_part_volumes": 2,
+          "unique_topologies": 6,
+          "unique_volumes": 6,
+          "voxel_cells_instances": 8896
+        },
+        "initial_geometry": {
+          "body_instances": 2,
+          "chunk_instances": 4,
+          "draw_instances": 8,
+          "mesh_quads_instances": 792,
+          "mesh_quads_unique_volumes": 432,
+          "part_instances": 4,
+          "solid_voxels_instances": 4128,
+          "unique_body_topologies": 1,
+          "unique_chunk_volumes": 4,
+          "unique_part_topologies": 2,
+          "unique_part_volumes": 2,
+          "unique_topologies": 6,
+          "unique_volumes": 6,
+          "voxel_cells_instances": 8896
+        },
+        "max_live_unique_volumes": 6,
+        "oracle_checked": true,
+        "requested_shapes": null,
+        "seed": null,
+        "shape_generator": null,
+        "unique_volumes_over_run": 8,
+        "version": "check_fixtures_v1"
+      }
+    },
+    {
+      "build_ms": 0.03805,
+      "case": "clipped",
+      "checks": [
+        {
+          "frame": 0,
+          "interior": 2036080,
+          "interior_mismatch": 2917,
+          "mean_abs": 0.27772376543209587,
+          "mismatch": 6806,
+          "pixels": 2073600
+        },
+        {
+          "frame": 30,
+          "interior": 2036030,
+          "interior_mismatch": 2888,
+          "mean_abs": 0.27889467592594225,
+          "mismatch": 6694,
+          "pixels": 2073600
+        },
+        {
+          "frame": 59,
+          "interior": 2036624,
+          "interior_mismatch": 4997,
+          "mean_abs": 0.3569013631687161,
+          "mismatch": 8886,
+          "pixels": 2073600
+        }
+      ],
+      "encode_ms": 1.7537500000000001,
+      "first_draw": {
+        "build_ms": 1.1557,
+        "encode_ms": 3.7268000000000003,
+        "frame_ms": 17.326500000000003,
+        "poll_ms": 12.444,
+        "scope": "first path.frame call; excludes GPU bootstrap and path construction"
+      },
+      "frame_max_ms": 4.842700000000001,
+      "frame_ms": 3.23655,
+      "frame_p95_ms": 4.3499,
+      "frames": 60,
+      "invalidation": {
+        "rects_resident": 1695,
+        "registered_fragments": 134,
+        "registered_rects": 1695,
+        "relower_calls": 0,
+        "relowered_rects": 0
+      },
+      "notes": "fragment_lower_count=0 master_hits=3 rects_total=1695; ",
+      "path": "a",
+      "poll_ms": 1.3143,
+      "pose_policy": "continuous_body_yaw",
+      "rss_mb": 186.21484375,
+      "workload": {
+        "digest": "d39a97b2084b9bab2d50a8ee85cdef0ae263a8f0203dbf42b804f5db08c4313e",
+        "digest_scope": "initial world and all scripted world frames; excludes path-specific pose quantization",
+        "final_geometry": {
+          "body_instances": 2,
+          "chunk_instances": 4,
+          "draw_instances": 8,
+          "mesh_quads_instances": 792,
+          "mesh_quads_unique_volumes": 432,
+          "part_instances": 4,
+          "solid_voxels_instances": 4128,
+          "unique_body_topologies": 1,
+          "unique_chunk_volumes": 4,
+          "unique_part_topologies": 2,
+          "unique_part_volumes": 2,
+          "unique_topologies": 6,
+          "unique_volumes": 6,
+          "voxel_cells_instances": 8896
+        },
+        "initial_geometry": {
+          "body_instances": 2,
+          "chunk_instances": 4,
+          "draw_instances": 8,
+          "mesh_quads_instances": 792,
+          "mesh_quads_unique_volumes": 432,
+          "part_instances": 4,
+          "solid_voxels_instances": 4128,
+          "unique_body_topologies": 1,
+          "unique_chunk_volumes": 4,
+          "unique_part_topologies": 2,
+          "unique_part_volumes": 2,
+          "unique_topologies": 6,
+          "unique_volumes": 6,
+          "voxel_cells_instances": 8896
+        },
+        "max_live_unique_volumes": 6,
+        "oracle_checked": true,
+        "requested_shapes": null,
+        "seed": null,
+        "shape_generator": null,
+        "unique_volumes_over_run": 6,
+        "version": "check_fixtures_v1"
+      }
+    },
+    {
+      "build_ms": 0.013749999999999998,
+      "case": "clipped",
+      "checks": [
+        {
+          "frame": 0,
+          "interior": 2036080,
+          "interior_mismatch": 5957,
+          "mean_abs": 0.21786345807613464,
+          "mismatch": 8899,
+          "pixels": 2073600
+        },
+        {
+          "frame": 30,
+          "interior": 2036030,
+          "interior_mismatch": 9692,
+          "mean_abs": 0.3558476401748884,
+          "mismatch": 12866,
+          "pixels": 2073600
+        },
+        {
+          "frame": 59,
+          "interior": 2036624,
+          "interior_mismatch": 4922,
+          "mean_abs": 0.20562564300413147,
+          "mismatch": 8395,
+          "pixels": 2073600
+        }
+      ],
+      "encode_ms": 0.8924000000000001,
+      "first_draw": {
+        "build_ms": 10.715300000000001,
+        "encode_ms": 4.9173,
+        "frame_ms": 38.233000000000004,
+        "poll_ms": 22.6004,
+        "scope": "first path.frame call; excludes GPU bootstrap and path construction"
+      },
+      "frame_max_ms": 5.0934,
+      "frame_ms": 2.3357,
+      "frame_p95_ms": 3.1980000000000004,
+      "frames": 60,
+      "invalidation": {
+        "cache_hits": 248,
+        "cache_misses": 4,
+        "image_bytes": 4898264,
+        "images_uploaded": 8,
+        "measured_image_bytes": 0,
+        "measured_images_uploaded": 0,
+        "part_cache_entries": 4
+      },
+      "notes": "",
+      "path": "b",
+      "poll_ms": 1.4303,
+      "pose_policy": "quarter_turn_sprites",
+      "rss_mb": 192.27734375,
+      "workload": {
+        "digest": "d39a97b2084b9bab2d50a8ee85cdef0ae263a8f0203dbf42b804f5db08c4313e",
+        "digest_scope": "initial world and all scripted world frames; excludes path-specific pose quantization",
+        "final_geometry": {
+          "body_instances": 2,
+          "chunk_instances": 4,
+          "draw_instances": 8,
+          "mesh_quads_instances": 792,
+          "mesh_quads_unique_volumes": 432,
+          "part_instances": 4,
+          "solid_voxels_instances": 4128,
+          "unique_body_topologies": 1,
+          "unique_chunk_volumes": 4,
+          "unique_part_topologies": 2,
+          "unique_part_volumes": 2,
+          "unique_topologies": 6,
+          "unique_volumes": 6,
+          "voxel_cells_instances": 8896
+        },
+        "initial_geometry": {
+          "body_instances": 2,
+          "chunk_instances": 4,
+          "draw_instances": 8,
+          "mesh_quads_instances": 792,
+          "mesh_quads_unique_volumes": 432,
+          "part_instances": 4,
+          "solid_voxels_instances": 4128,
+          "unique_body_topologies": 1,
+          "unique_chunk_volumes": 4,
+          "unique_part_topologies": 2,
+          "unique_part_volumes": 2,
+          "unique_topologies": 6,
+          "unique_volumes": 6,
+          "voxel_cells_instances": 8896
+        },
+        "max_live_unique_volumes": 6,
+        "oracle_checked": true,
+        "requested_shapes": null,
+        "seed": null,
+        "shape_generator": null,
+        "unique_volumes_over_run": 6,
+        "version": "check_fixtures_v1"
+      }
+    },
+    {
+      "build_ms": 0.0031999999999999997,
+      "case": "clipped",
+      "checks": [
+        {
+          "frame": 0,
+          "interior": 2036080,
+          "interior_mismatch": 1,
+          "mean_abs": 0.00024305555555555555,
+          "mismatch": 12,
+          "pixels": 2073600
+        },
+        {
+          "frame": 30,
+          "interior": 2036030,
+          "interior_mismatch": 2,
+          "mean_abs": 0.000234375,
+          "mismatch": 11,
+          "pixels": 2073600
+        },
+        {
+          "frame": 59,
+          "interior": 2036624,
+          "interior_mismatch": 2,
+          "mean_abs": 0.00022006815843621399,
+          "mismatch": 8,
+          "pixels": 2073600
+        }
+      ],
+      "encode_ms": 1.1603999999999999,
+      "first_draw": {
+        "build_ms": 0.5902000000000001,
+        "encode_ms": 5.2807,
+        "frame_ms": 24.878999999999998,
+        "poll_ms": 19.0081,
+        "scope": "first path.frame call; excludes GPU bootstrap and path construction"
+      },
+      "frame_max_ms": 3.5473,
+      "frame_ms": 2.20775,
+      "frame_p95_ms": 3.0655,
+      "frames": 60,
+      "invalidation": {
+        "cache_capacity": 2048,
+        "cached_meshes_end": 6,
+        "draws_total": 378,
+        "evictions": 0,
+        "instance_upload_bytes": 27328,
+        "instances_per_frame": 8,
+        "measured_evictions": 0,
+        "measured_instance_upload_bytes": 26432,
+        "measured_mesh_upload_bytes": 0,
+        "measured_mesh_uploads": 0,
+        "mesh_upload_bytes": 62208,
+        "mesh_uploads": 6
+      },
+      "notes": "",
+      "path": "c",
+      "poll_ms": 0.9394,
+      "pose_policy": "continuous_body_yaw",
+      "rss_mb": 186.22265625,
+      "workload": {
+        "digest": "d39a97b2084b9bab2d50a8ee85cdef0ae263a8f0203dbf42b804f5db08c4313e",
+        "digest_scope": "initial world and all scripted world frames; excludes path-specific pose quantization",
+        "final_geometry": {
+          "body_instances": 2,
+          "chunk_instances": 4,
+          "draw_instances": 8,
+          "mesh_quads_instances": 792,
+          "mesh_quads_unique_volumes": 432,
+          "part_instances": 4,
+          "solid_voxels_instances": 4128,
+          "unique_body_topologies": 1,
+          "unique_chunk_volumes": 4,
+          "unique_part_topologies": 2,
+          "unique_part_volumes": 2,
+          "unique_topologies": 6,
+          "unique_volumes": 6,
+          "voxel_cells_instances": 8896
+        },
+        "initial_geometry": {
+          "body_instances": 2,
+          "chunk_instances": 4,
+          "draw_instances": 8,
+          "mesh_quads_instances": 792,
+          "mesh_quads_unique_volumes": 432,
+          "part_instances": 4,
+          "solid_voxels_instances": 4128,
+          "unique_body_topologies": 1,
+          "unique_chunk_volumes": 4,
+          "unique_part_topologies": 2,
+          "unique_part_volumes": 2,
+          "unique_topologies": 6,
+          "unique_volumes": 6,
+          "voxel_cells_instances": 8896
+        },
+        "max_live_unique_volumes": 6,
+        "oracle_checked": true,
+        "requested_shapes": null,
+        "seed": null,
+        "shape_generator": null,
+        "unique_volumes_over_run": 6,
+        "version": "check_fixtures_v1"
+      }
+    },
+    {
+      "build_ms": 0.03605,
+      "case": "material_change",
+      "checks": [
+        {
+          "frame": 0,
+          "interior": 2033560,
+          "interior_mismatch": 2918,
+          "mean_abs": 0.31238425925925284,
+          "mismatch": 7627,
+          "pixels": 2073600
+        },
+        {
+          "frame": 30,
+          "interior": 2034824,
+          "interior_mismatch": 5092,
+          "mean_abs": 0.31434333204730736,
+          "mismatch": 10461,
+          "pixels": 2073600
+        },
+        {
+          "frame": 59,
+          "interior": 2031088,
+          "interior_mismatch": 9631,
+          "mean_abs": 0.42799173739707086,
+          "mismatch": 16126,
+          "pixels": 2073600
+        }
+      ],
+      "encode_ms": 1.06475,
+      "first_draw": {
+        "build_ms": 1.3154,
+        "encode_ms": 4.8372,
+        "frame_ms": 24.7607,
+        "poll_ms": 18.6081,
+        "scope": "first path.frame call; excludes GPU bootstrap and path construction"
+      },
+      "frame_max_ms": 4.1308,
+      "frame_ms": 2.70575,
+      "frame_p95_ms": 3.8041,
+      "frames": 60,
+      "invalidation": {
+        "rects_resident": 1695,
+        "registered_fragments": 134,
+        "registered_rects": 1695,
+        "relower_calls": 1,
+        "relowered_rects": 132
+      },
+      "notes": "fragment_lower_count=135 master_hits=3 rects_total=1695; ",
+      "path": "a",
+      "poll_ms": 1.52855,
+      "pose_policy": "continuous_body_yaw",
+      "rss_mb": 188.99609375,
+      "workload": {
+        "digest": "15ccd29564f98865a12b45066c003c44fecab6482ab842af8de5e6f040d0d985",
+        "digest_scope": "initial world and all scripted world frames; excludes path-specific pose quantization",
+        "final_geometry": {
+          "body_instances": 2,
+          "chunk_instances": 4,
+          "draw_instances": 8,
+          "mesh_quads_instances": 792,
+          "mesh_quads_unique_volumes": 696,
+          "part_instances": 4,
+          "solid_voxels_instances": 4128,
+          "unique_body_topologies": 1,
+          "unique_chunk_volumes": 4,
+          "unique_part_topologies": 2,
+          "unique_part_volumes": 3,
+          "unique_topologies": 6,
+          "unique_volumes": 7,
+          "voxel_cells_instances": 8896
+        },
+        "initial_geometry": {
+          "body_instances": 2,
+          "chunk_instances": 4,
+          "draw_instances": 8,
+          "mesh_quads_instances": 792,
+          "mesh_quads_unique_volumes": 432,
+          "part_instances": 4,
+          "solid_voxels_instances": 4128,
+          "unique_body_topologies": 1,
+          "unique_chunk_volumes": 4,
+          "unique_part_topologies": 2,
+          "unique_part_volumes": 2,
+          "unique_topologies": 6,
+          "unique_volumes": 6,
+          "voxel_cells_instances": 8896
+        },
+        "max_live_unique_volumes": 7,
+        "oracle_checked": true,
+        "requested_shapes": null,
+        "seed": null,
+        "shape_generator": null,
+        "unique_volumes_over_run": 7,
+        "version": "check_fixtures_v1"
+      }
+    },
+    {
+      "build_ms": 0.01435,
+      "case": "material_change",
+      "checks": [
+        {
+          "frame": 0,
+          "interior": 2033560,
+          "interior_mismatch": 5957,
+          "mean_abs": 0.2302081725823095,
+          "mismatch": 9223,
+          "pixels": 2073600
+        },
+        {
+          "frame": 30,
+          "interior": 2034824,
+          "interior_mismatch": 15358,
+          "mean_abs": 0.3751964377571922,
+          "mismatch": 18897,
+          "pixels": 2073600
+        },
+        {
+          "frame": 59,
+          "interior": 2031088,
+          "interior_mismatch": 7369,
+          "mean_abs": 0.24370064943415382,
+          "mismatch": 12028,
+          "pixels": 2073600
+        }
+      ],
+      "encode_ms": 0.9155500000000001,
+      "first_draw": {
+        "build_ms": 11.5389,
+        "encode_ms": 5.2933,
+        "frame_ms": 39.5767,
+        "poll_ms": 22.744500000000002,
+        "scope": "first path.frame call; excludes GPU bootstrap and path construction"
+      },
+      "frame_max_ms": 6.5619,
+      "frame_ms": 2.5706,
+      "frame_p95_ms": 4.1267000000000005,
+      "frames": 60,
+      "invalidation": {
+        "cache_hits": 247,
+        "cache_misses": 5,
+        "image_bytes": 5183464,
+        "images_uploaded": 9,
+        "measured_image_bytes": 285200,
+        "measured_images_uploaded": 1,
+        "part_cache_entries": 5
+      },
+      "notes": "",
+      "path": "b",
+      "poll_ms": 1.6244,
+      "pose_policy": "quarter_turn_sprites",
+      "rss_mb": 195.1640625,
+      "workload": {
+        "digest": "15ccd29564f98865a12b45066c003c44fecab6482ab842af8de5e6f040d0d985",
+        "digest_scope": "initial world and all scripted world frames; excludes path-specific pose quantization",
+        "final_geometry": {
+          "body_instances": 2,
+          "chunk_instances": 4,
+          "draw_instances": 8,
+          "mesh_quads_instances": 792,
+          "mesh_quads_unique_volumes": 696,
+          "part_instances": 4,
+          "solid_voxels_instances": 4128,
+          "unique_body_topologies": 1,
+          "unique_chunk_volumes": 4,
+          "unique_part_topologies": 2,
+          "unique_part_volumes": 3,
+          "unique_topologies": 6,
+          "unique_volumes": 7,
+          "voxel_cells_instances": 8896
+        },
+        "initial_geometry": {
+          "body_instances": 2,
+          "chunk_instances": 4,
+          "draw_instances": 8,
+          "mesh_quads_instances": 792,
+          "mesh_quads_unique_volumes": 432,
+          "part_instances": 4,
+          "solid_voxels_instances": 4128,
+          "unique_body_topologies": 1,
+          "unique_chunk_volumes": 4,
+          "unique_part_topologies": 2,
+          "unique_part_volumes": 2,
+          "unique_topologies": 6,
+          "unique_volumes": 6,
+          "voxel_cells_instances": 8896
+        },
+        "max_live_unique_volumes": 7,
+        "oracle_checked": true,
+        "requested_shapes": null,
+        "seed": null,
+        "shape_generator": null,
+        "unique_volumes_over_run": 7,
+        "version": "check_fixtures_v1"
+      }
+    },
+    {
+      "build_ms": 0.0033,
+      "case": "material_change",
+      "checks": [
+        {
+          "frame": 0,
+          "interior": 2033560,
+          "interior_mismatch": 1,
+          "mean_abs": 0.0003059092078189301,
+          "mismatch": 13,
+          "pixels": 2073600
+        },
+        {
+          "frame": 30,
+          "interior": 2034824,
+          "interior_mismatch": 2,
+          "mean_abs": 0.00030896347736625513,
+          "mismatch": 12,
+          "pixels": 2073600
+        },
+        {
+          "frame": 59,
+          "interior": 2031088,
+          "interior_mismatch": 2,
+          "mean_abs": 0.0002972286522633745,
+          "mismatch": 10,
+          "pixels": 2073600
+        }
+      ],
+      "encode_ms": 1.2501,
+      "first_draw": {
+        "build_ms": 0.486,
+        "encode_ms": 5.0277,
+        "frame_ms": 25.3888,
+        "poll_ms": 19.8751,
+        "scope": "first path.frame call; excludes GPU bootstrap and path construction"
+      },
+      "frame_max_ms": 5.8728,
+      "frame_ms": 2.5530999999999997,
+      "frame_p95_ms": 3.257,
+      "frames": 60,
+      "invalidation": {
+        "cache_capacity": 2048,
+        "cached_meshes_end": 7,
+        "draws_total": 408,
+        "evictions": 0,
+        "instance_upload_bytes": 27328,
+        "instances_per_frame": 8,
+        "measured_evictions": 0,
+        "measured_instance_upload_bytes": 26432,
+        "measured_mesh_upload_bytes": 38016,
+        "measured_mesh_uploads": 1,
+        "mesh_upload_bytes": 100224,
+        "mesh_uploads": 7
+      },
+      "notes": "",
+      "path": "c",
+      "poll_ms": 1.2840500000000001,
+      "pose_policy": "continuous_body_yaw",
+      "rss_mb": 191.140625,
+      "workload": {
+        "digest": "15ccd29564f98865a12b45066c003c44fecab6482ab842af8de5e6f040d0d985",
+        "digest_scope": "initial world and all scripted world frames; excludes path-specific pose quantization",
+        "final_geometry": {
+          "body_instances": 2,
+          "chunk_instances": 4,
+          "draw_instances": 8,
+          "mesh_quads_instances": 792,
+          "mesh_quads_unique_volumes": 696,
+          "part_instances": 4,
+          "solid_voxels_instances": 4128,
+          "unique_body_topologies": 1,
+          "unique_chunk_volumes": 4,
+          "unique_part_topologies": 2,
+          "unique_part_volumes": 3,
+          "unique_topologies": 6,
+          "unique_volumes": 7,
+          "voxel_cells_instances": 8896
+        },
+        "initial_geometry": {
+          "body_instances": 2,
+          "chunk_instances": 4,
+          "draw_instances": 8,
+          "mesh_quads_instances": 792,
+          "mesh_quads_unique_volumes": 432,
+          "part_instances": 4,
+          "solid_voxels_instances": 4128,
+          "unique_body_topologies": 1,
+          "unique_chunk_volumes": 4,
+          "unique_part_topologies": 2,
+          "unique_part_volumes": 2,
+          "unique_topologies": 6,
+          "unique_volumes": 6,
+          "voxel_cells_instances": 8896
+        },
+        "max_live_unique_volumes": 7,
+        "oracle_checked": true,
+        "requested_shapes": null,
+        "seed": null,
+        "shape_generator": null,
+        "unique_volumes_over_run": 7,
+        "version": "check_fixtures_v1"
+      }
+    },
+    {
+      "build_ms": 0.15195,
+      "case": "continuous_yaw",
+      "checks": [
+        {
+          "frame": 0,
+          "interior": 2044389,
+          "interior_mismatch": 3546,
+          "mean_abs": 0.2714250578703637,
+          "mismatch": 7397,
+          "pixels": 2073600
+        },
+        {
+          "frame": 30,
+          "interior": 2044436,
+          "interior_mismatch": 1541,
+          "mean_abs": 0.22846595293211078,
+          "mismatch": 4824,
+          "pixels": 2073600
+        },
+        {
+          "frame": 59,
+          "interior": 2042088,
+          "interior_mismatch": 2,
+          "mean_abs": 0.18972270447531708,
+          "mismatch": 3417,
+          "pixels": 2073600
+        }
+      ],
+      "encode_ms": 1.08425,
+      "first_draw": {
+        "build_ms": 1.0315999999999999,
+        "encode_ms": 3.3705,
+        "frame_ms": 24.7987,
+        "poll_ms": 20.3966,
+        "scope": "first path.frame call; excludes GPU bootstrap and path construction"
+      },
+      "frame_max_ms": 5.538,
+      "frame_ms": 3.1155999999999997,
+      "frame_p95_ms": 4.2646,
+      "frames": 60,
+      "invalidation": {
+        "rects_resident": 1515,
+        "registered_fragments": 132,
+        "registered_rects": 1515,
+        "relower_calls": 118,
+        "relowered_rects": 10580
+      },
+      "notes": "fragment_lower_count=250 master_hits=3 rects_total=1515; ",
+      "path": "a",
+      "poll_ms": 1.83075,
+      "pose_policy": "continuous_body_yaw",
+      "rss_mb": 195.90234375,
+      "workload": {
+        "digest": "d33b19eb6d1b6a5cdfd30ab3b12799d031e6f71421c3b675e3bdfaad648882b3",
+        "digest_scope": "initial world and all scripted world frames; excludes path-specific pose quantization",
+        "final_geometry": {
+          "body_instances": 1,
+          "chunk_instances": 4,
+          "draw_instances": 6,
+          "mesh_quads_instances": 432,
+          "mesh_quads_unique_volumes": 432,
+          "part_instances": 2,
+          "solid_voxels_instances": 3776,
+          "unique_body_topologies": 1,
+          "unique_chunk_volumes": 4,
+          "unique_part_topologies": 2,
+          "unique_part_volumes": 2,
+          "unique_topologies": 6,
+          "unique_volumes": 6,
+          "voxel_cells_instances": 8544
+        },
+        "initial_geometry": {
+          "body_instances": 1,
+          "chunk_instances": 4,
+          "draw_instances": 6,
+          "mesh_quads_instances": 432,
+          "mesh_quads_unique_volumes": 432,
+          "part_instances": 2,
+          "solid_voxels_instances": 3776,
+          "unique_body_topologies": 1,
+          "unique_chunk_volumes": 4,
+          "unique_part_topologies": 2,
+          "unique_part_volumes": 2,
+          "unique_topologies": 6,
+          "unique_volumes": 6,
+          "voxel_cells_instances": 8544
+        },
+        "max_live_unique_volumes": 6,
+        "oracle_checked": true,
+        "requested_shapes": null,
+        "seed": null,
+        "shape_generator": null,
+        "unique_volumes_over_run": 6,
+        "version": "check_fixtures_v1"
+      }
+    },
+    {
+      "build_ms": 0.0115,
+      "case": "continuous_yaw",
+      "checks": [
+        {
+          "frame": 0,
+          "interior": 2044389,
+          "interior_mismatch": 5830,
+          "mean_abs": 0.149942290380658,
+          "mismatch": 6912,
+          "pixels": 2073600
+        },
+        {
+          "frame": 30,
+          "interior": 2044436,
+          "interior_mismatch": 3710,
+          "mean_abs": 0.15295122813785994,
+          "mismatch": 5028,
+          "pixels": 2073600
+        },
+        {
+          "frame": 59,
+          "interior": 2042088,
+          "interior_mismatch": 13596,
+          "mean_abs": 0.4226565715019347,
+          "mismatch": 19959,
+          "pixels": 2073600
+        }
+      ],
+      "encode_ms": 0.8780000000000001,
+      "first_draw": {
+        "build_ms": 11.1398,
+        "encode_ms": 4.2756,
+        "frame_ms": 39.920199999999994,
+        "poll_ms": 24.5048,
+        "scope": "first path.frame call; excludes GPU bootstrap and path construction"
+      },
+      "frame_max_ms": 4.7893,
+      "frame_ms": 2.89515,
+      "frame_p95_ms": 4.41,
+      "frames": 60,
+      "invalidation": {
+        "cache_hits": 120,
+        "cache_misses": 6,
+        "image_bytes": 5291576,
+        "images_uploaded": 10,
+        "measured_image_bytes": 787448,
+        "measured_images_uploaded": 4,
+        "part_cache_entries": 6
+      },
+      "notes": "",
+      "path": "b",
+      "poll_ms": 1.91235,
+      "pose_policy": "quarter_turn_sprites",
+      "rss_mb": 201.7109375,
+      "workload": {
+        "digest": "d33b19eb6d1b6a5cdfd30ab3b12799d031e6f71421c3b675e3bdfaad648882b3",
+        "digest_scope": "initial world and all scripted world frames; excludes path-specific pose quantization",
+        "final_geometry": {
+          "body_instances": 1,
+          "chunk_instances": 4,
+          "draw_instances": 6,
+          "mesh_quads_instances": 432,
+          "mesh_quads_unique_volumes": 432,
+          "part_instances": 2,
+          "solid_voxels_instances": 3776,
+          "unique_body_topologies": 1,
+          "unique_chunk_volumes": 4,
+          "unique_part_topologies": 2,
+          "unique_part_volumes": 2,
+          "unique_topologies": 6,
+          "unique_volumes": 6,
+          "voxel_cells_instances": 8544
+        },
+        "initial_geometry": {
+          "body_instances": 1,
+          "chunk_instances": 4,
+          "draw_instances": 6,
+          "mesh_quads_instances": 432,
+          "mesh_quads_unique_volumes": 432,
+          "part_instances": 2,
+          "solid_voxels_instances": 3776,
+          "unique_body_topologies": 1,
+          "unique_chunk_volumes": 4,
+          "unique_part_topologies": 2,
+          "unique_part_volumes": 2,
+          "unique_topologies": 6,
+          "unique_volumes": 6,
+          "voxel_cells_instances": 8544
+        },
+        "max_live_unique_volumes": 6,
+        "oracle_checked": true,
+        "requested_shapes": null,
+        "seed": null,
+        "shape_generator": null,
+        "unique_volumes_over_run": 6,
+        "version": "check_fixtures_v1"
+      }
+    },
+    {
+      "build_ms": 0.0031999999999999997,
+      "case": "continuous_yaw",
+      "checks": [
+        {
+          "frame": 0,
+          "interior": 2044389,
+          "interior_mismatch": 2,
+          "mean_abs": 0.0002817965534979424,
+          "mismatch": 10,
+          "pixels": 2073600
+        },
+        {
+          "frame": 30,
+          "interior": 2044436,
+          "interior_mismatch": 2,
+          "mean_abs": 0.00035108024691358033,
+          "mismatch": 9,
+          "pixels": 2073600
+        },
+        {
+          "frame": 59,
+          "interior": 2042088,
+          "interior_mismatch": 2,
+          "mean_abs": 0.003321277006173161,
+          "mismatch": 8,
+          "pixels": 2073600
+        }
+      ],
+      "encode_ms": 1.22145,
+      "first_draw": {
+        "build_ms": 0.4557,
+        "encode_ms": 5.5896,
+        "frame_ms": 26.8942,
+        "poll_ms": 20.8489,
+        "scope": "first path.frame call; excludes GPU bootstrap and path construction"
+      },
+      "frame_max_ms": 4.3992,
+      "frame_ms": 2.65335,
+      "frame_p95_ms": 3.5145999999999997,
+      "frames": 60,
+      "invalidation": {
+        "cache_capacity": 2048,
+        "cached_meshes_end": 6,
+        "draws_total": 378,
+        "evictions": 0,
+        "instance_upload_bytes": 13888,
+        "instances_per_frame": 6,
+        "measured_evictions": 0,
+        "measured_instance_upload_bytes": 13216,
+        "measured_mesh_upload_bytes": 0,
+        "measured_mesh_uploads": 0,
+        "mesh_upload_bytes": 62208,
+        "mesh_uploads": 6
+      },
+      "notes": "",
+      "path": "c",
+      "poll_ms": 1.4397000000000002,
+      "pose_policy": "continuous_body_yaw",
+      "rss_mb": 197.890625,
+      "workload": {
+        "digest": "d33b19eb6d1b6a5cdfd30ab3b12799d031e6f71421c3b675e3bdfaad648882b3",
+        "digest_scope": "initial world and all scripted world frames; excludes path-specific pose quantization",
+        "final_geometry": {
+          "body_instances": 1,
+          "chunk_instances": 4,
+          "draw_instances": 6,
+          "mesh_quads_instances": 432,
+          "mesh_quads_unique_volumes": 432,
+          "part_instances": 2,
+          "solid_voxels_instances": 3776,
+          "unique_body_topologies": 1,
+          "unique_chunk_volumes": 4,
+          "unique_part_topologies": 2,
+          "unique_part_volumes": 2,
+          "unique_topologies": 6,
+          "unique_volumes": 6,
+          "voxel_cells_instances": 8544
+        },
+        "initial_geometry": {
+          "body_instances": 1,
+          "chunk_instances": 4,
+          "draw_instances": 6,
+          "mesh_quads_instances": 432,
+          "mesh_quads_unique_volumes": 432,
+          "part_instances": 2,
+          "solid_voxels_instances": 3776,
+          "unique_body_topologies": 1,
+          "unique_chunk_volumes": 4,
+          "unique_part_topologies": 2,
+          "unique_part_volumes": 2,
+          "unique_topologies": 6,
+          "unique_volumes": 6,
+          "voxel_cells_instances": 8544
+        },
+        "max_live_unique_volumes": 6,
+        "oracle_checked": true,
+        "requested_shapes": null,
+        "seed": null,
+        "shape_generator": null,
+        "unique_volumes_over_run": 6,
+        "version": "check_fixtures_v1"
+      }
+    }
+  ],
+  "schema_version": 2,
+  "seed": null,
+  "shape_generator": null,
+  "swarm_check_limit": 32,
+  "swarm_rng": null,
+  "viewport": [
+    1920,
+    1080
+  ],
+  "warmup": 3,
+  "workload_version": "check_fixtures_v1"
+}
