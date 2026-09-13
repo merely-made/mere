@@ -588,8 +588,9 @@ was changed without republishing. Python's TLS client retrieved the original
 69 bytes exactly, and stock Lagrange 1.21.1 `--dump` retrieved the same content
 (normalizing only its Windows stdout newlines). After abrupt termination and
 restart of the task-owned Djinn process, both readers retrieved that revision
-again with the same certificate. Stop and remove succeeded; a further resident
-restart reported `Unavailable`.
+again with the same certificate. A final run selected a fixed port and verified
+that the identical URL survived restart as well. Stop and remove succeeded;
+a further resident restart reported `Unavailable`.
 
 - Tested `djinn.exe` SHA-256: `f929e4b53fe32fe835861ee4e0ed15deb981c29d55fb9d2fe4fca502223c9d0b`.
 - Tested `djinn-site.exe` SHA-256: `db8d08dfab8f88f32da0597d02b4fa4eca8cf016f31946cc8c103d0aa9782c36`.

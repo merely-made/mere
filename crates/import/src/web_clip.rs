@@ -561,6 +561,7 @@ fn blocks_text(blocks: &[Block]) -> String {
 
 fn append_block_text(block: &Block, out: &mut String) {
     match block {
+        Block::Presented { block, .. } => append_block_text(block, out),
         Block::Heading { spans, .. } | Block::Paragraph { spans } => {
             push_text(out, &inker::inline_text(spans));
         },
@@ -645,6 +646,7 @@ fn block_links(blocks: &[Block]) -> Vec<String> {
 
 fn collect_block_links(block: &Block, links: &mut Vec<String>) {
     match block {
+        Block::Presented { block, .. } => collect_block_links(block, links),
         Block::Heading { spans, .. } | Block::Paragraph { spans } => {
             collect_span_links(spans, links);
         },
@@ -697,7 +699,8 @@ fn collect_span_links(spans: &[InlineSpan], links: &mut Vec<String>) {
                 links.push(url.clone());
                 collect_span_links(inner, links);
             },
-            InlineSpan::Emphasis(inner)
+            InlineSpan::Presented { spans: inner, .. }
+            | InlineSpan::Emphasis(inner)
             | InlineSpan::Strong(inner)
             | InlineSpan::Submit { spans: inner, .. } => {
                 collect_span_links(inner, links);
@@ -832,6 +835,37 @@ mod tests {
         assert_eq!(clip.links, vec!["https://example.test/ref"]);
         assert!(clip.text.contains("Heading"));
         assert!(clip.text.contains("reference"));
+    }
+
+    #[test]
+    fn micron_clip_preserves_text_and_links_inside_source_presentation() {
+        let mut registry = EngineRegistry::new();
+        for engine in nematic::engines() {
+            registry.register(engine);
+        }
+        // The host explicitly admits Micron for this native node address.
+        let mut policy = EngineRoutePolicy::default();
+        policy.fallback.engine_id = nematic::micron::ENGINE_MICRON.into();
+        let clip = fragment_from_body(
+            "0123456789abcdef0123456789abcdef:/page/index.mu",
+            None,
+            Some("text/x-micron"),
+            "`c`Ff00`_`[Reference`:/page/ref.mu]\n",
+            &registry,
+            &policy,
+        );
+        assert_eq!(clip.text, "Reference");
+        assert_eq!(
+            clip.links,
+            vec!["0123456789abcdef0123456789abcdef:/page/ref.mu"]
+        );
+        assert!(
+            clip.blocks
+                .as_ref()
+                .unwrap()
+                .iter()
+                .any(|block| { matches!(block, Block::Presented { .. }) })
+        );
     }
 
     #[test]
