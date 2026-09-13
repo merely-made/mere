@@ -26,6 +26,8 @@ use genet_scripted_dom::NodeId;
 use crate::meristem_bounds::RootView;
 use crate::{Host, Key, KeyPress, NamedKey};
 
+mod trace;
+
 pub(crate) fn to_visual_caret(caret: CaretPosition) -> VisualCaret {
     VisualCaret {
         byte: caret.byte,
@@ -92,6 +94,7 @@ where
     /// one divergence away from a subtle input bug, and there is about to be a
     /// second event source.
     pub fn pointer_moved(&mut self, x: f32, y: f32) {
+        let _trace = trace::InputSpan::start("pointer-move");
         self.s.cursor = (x, y);
         let captured = self
             .s
@@ -561,6 +564,7 @@ where
     /// A wheel notch, in logical pixels. The event source normalizes lines
     /// versus pixels; both winit and the DOM report both kinds.
     pub fn wheel(&mut self, dx: f32, dy: f32) {
+        let _trace = trace::InputSpan::start("wheel");
         // The notch as it arrived, before the Shift axis swap: Ctrl+wheel
         // zooms on the vertical gesture whatever Shift is doing.
         let raw_dy = dy;

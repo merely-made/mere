@@ -665,9 +665,9 @@ where
         self.after_dispatch();
     }
 
-    /// Drive `:hover` / `:focus` restyles on target change (engine
-    /// `set_interaction`; `Unchanged` when nothing interaction-sensitive
-    /// matched, so idle movement stays free).
+    /// Drive `:hover` / `:focus` restyles on target change. The retained layout
+    /// skips the cascade when no rule can depend on that state, and skips
+    /// text layout when the cascade leaves the computed styles unchanged.
     pub fn hover(&mut self) {
         let (Some(runner), Some(layout)) = (self.s.runner.as_ref(), self.s.layout.as_mut()) else {
             return;

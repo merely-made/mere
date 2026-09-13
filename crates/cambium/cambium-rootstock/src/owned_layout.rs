@@ -9,15 +9,16 @@
 use std::collections::HashMap;
 
 use genet_livery::{
-    Device, InteractionStates, LiveryLayout, LiveryPaintList, StatePseudoClass, StylePlane,
-    StyleSet, TextRange, TextSystem, ViewportSizes,
-    emit_paint_list_with_text_system_scrolled_with_images, hit_test_with_scroll,
-    layout_with_text_system, resolve_styles,
+    Device, InteractionStates, LiveryLayout, LiveryPaintList, StylePlane, StyleSet, TextRange,
+    TextSystem, ViewportSizes, emit_paint_list_with_text_system_scrolled_with_images,
+    hit_test_with_scroll, layout_with_text_system, resolve_styles,
 };
 use genet_render::{VisualAffinity, VisualCaret, VisualMovement, VisualSelection};
 use genet_scripted_dom::NodeId;
 use layout_dom_api::{LayoutDom, LocalName, Namespace, NodeKind};
 use paint_list_api::{ColorF, DeviceIntSize, LayoutPoint, LayoutRect, LayoutSize};
+
+mod interaction;
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum ScrollTarget {
@@ -27,10 +28,13 @@ pub enum ScrollTarget {
 
 pub struct OwnedLayout {
     style_set: StyleSet,
+    interaction_dependencies: interaction::Dependencies,
     device: Device,
     interactions: InteractionStates<NodeId>,
     hovered: Option<NodeId>,
     focused: Option<NodeId>,
+    // Keep the cascade result separately: layout can adjust its output styles.
+    resolved_styles: StylePlane<NodeId>,
     styles: StylePlane<NodeId>,
     fragments: LiveryLayout<NodeId>,
     text: TextSystem,
@@ -52,16 +56,17 @@ impl OwnedLayout {
         height: f32,
     ) -> Self {
         let style_set = StyleSet::cambium(sheets);
+        let interaction_dependencies = interaction::Dependencies::new(&style_set);
         let device = Device::screen(width, height);
         let interactions = InteractionStates::default();
         let phase = crate::Instant::now();
-        let styles = resolve_styles(dom, &style_set, &device, &interactions);
+        let resolved_styles = resolve_styles(dom, &style_set, &device, &interactions);
         let style_resolve_us = elapsed_us(phase.elapsed());
         let mut text = TextSystem::new();
         let phase = crate::Instant::now();
         let (styles, fragments) = layout_with_text_system(
             dom,
-            &styles,
+            &resolved_styles,
             width,
             height,
             ViewportSizes::uniform(width, height),
@@ -75,10 +80,12 @@ impl OwnedLayout {
         let content_extent_us = elapsed_us(phase.elapsed());
         Self {
             style_set,
+            interaction_dependencies,
             device,
             interactions,
             hovered: None,
             focused: None,
+            resolved_styles,
             styles,
             fragments,
             text,
@@ -104,10 +111,19 @@ impl OwnedLayout {
         let phase = crate::Instant::now();
         let styles = resolve_styles(dom, &self.style_set, &self.device, &self.interactions);
         self.style_resolve_us = elapsed_us(phase.elapsed());
+        self.layout_resolved(dom, styles);
+    }
+
+    fn layout_resolved<D: LayoutDom<NodeId = NodeId>>(
+        &mut self,
+        dom: &D,
+        resolved_styles: StylePlane<NodeId>,
+    ) {
+        let (width, height) = self.viewport;
         let phase = crate::Instant::now();
         let (styles, fragments) = layout_with_text_system(
             dom,
-            &styles,
+            &resolved_styles,
             width,
             height,
             self.device.viewport_sizes,
@@ -116,6 +132,7 @@ impl OwnedLayout {
         )
         .expect("Cambium's authored Livery layout must resolve");
         self.layout_with_text_us = elapsed_us(phase.elapsed());
+        self.resolved_styles = resolved_styles;
         self.styles = styles;
         self.fragments = fragments;
         let phase = crate::Instant::now();
@@ -147,37 +164,6 @@ impl OwnedLayout {
         _now: f64,
     ) -> bool {
         false
-    }
-
-    pub(crate) fn set_interaction<D: LayoutDom<NodeId = NodeId>>(
-        &mut self,
-        dom: &D,
-        hovered: Option<NodeId>,
-        focused: Option<NodeId>,
-    ) -> bool {
-        let mut changed = false;
-        if self.hovered != hovered {
-            if let Some(old) = self.hovered {
-                changed |= self.interactions.set(old, StatePseudoClass::Hover, false);
-            }
-            if let Some(next) = hovered {
-                changed |= self.interactions.set(next, StatePseudoClass::Hover, true);
-            }
-            self.hovered = hovered;
-        }
-        if self.focused != focused {
-            if let Some(old) = self.focused {
-                changed |= self.interactions.set(old, StatePseudoClass::Focus, false);
-            }
-            if let Some(next) = focused {
-                changed |= self.interactions.set(next, StatePseudoClass::Focus, true);
-            }
-            self.focused = focused;
-        }
-        if changed {
-            self.rebuild(dom, self.viewport.0, self.viewport.1);
-        }
-        changed
     }
 
     pub fn element_scroll(&self) -> &HashMap<NodeId, (f32, f32)> {
