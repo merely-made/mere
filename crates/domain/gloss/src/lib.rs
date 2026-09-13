@@ -13,7 +13,7 @@
 
 #![doc(html_root_url = "https://docs.rs/gloss/0.0.1")]
 
-use accesskit::{Node, Role};
+use accesskit::{Node, NodeId, Role};
 use canvas::NodeState;
 use forme::GraphMemberId;
 use inker::{Block, EngineDocument, inline_text};
@@ -261,15 +261,7 @@ pub fn project_outline(doc: &EngineDocument) -> UxTree {
 
     let mut child_ids = Vec::new();
     for (idx, block) in doc.blocks.iter().enumerate() {
-        if let Block::Heading { level, spans } = block {
-            let path = format!("{root_path}/heading/{idx}");
-            let acc_id = node_id_for_path(&path);
-            let mut acc_node = Node::new(Role::Heading);
-            acc_node.set_label(inline_text(spans));
-            acc_node.set_level(*level as usize);
-            nodes.push((acc_id, acc_node));
-            child_ids.push(acc_id);
-        }
+        project_outline_block(block, idx, &root_path, &mut nodes, &mut child_ids);
     }
 
     let mut root = Node::new(Role::Group);
@@ -286,6 +278,30 @@ pub fn project_outline(doc: &EngineDocument) -> UxTree {
     UxTree {
         root: root_id,
         nodes,
+    }
+}
+
+fn project_outline_block(
+    block: &Block,
+    source_index: usize,
+    root_path: &str,
+    nodes: &mut Vec<(NodeId, Node)>,
+    child_ids: &mut Vec<NodeId>,
+) {
+    match block {
+        Block::Presented { block, .. } => {
+            project_outline_block(block, source_index, root_path, nodes, child_ids);
+        },
+        Block::Heading { level, spans } => {
+            let path = format!("{root_path}/heading/{source_index}");
+            let acc_id = node_id_for_path(&path);
+            let mut acc_node = Node::new(Role::Heading);
+            acc_node.set_label(inline_text(spans));
+            acc_node.set_level(*level as usize);
+            nodes.push((acc_id, acc_node));
+            child_ids.push(acc_id);
+        },
+        _ => {},
     }
 }
 
@@ -344,6 +360,61 @@ mod tests {
         assert!(headings.contains(&("Introduction".to_string(), Some(1))));
         assert!(headings.contains(&("Background".to_string(), Some(2))));
         assert!(headings.contains(&("Architecture".to_string(), Some(1))));
+    }
+
+    #[test]
+    fn presented_headings_keep_outline_order_depth_and_source_ids() {
+        let mut document = doc_with_headings();
+        document.blocks = vec![
+            Block::Presented {
+                presentation: Default::default(),
+                block: Box::new(Block::Heading {
+                    level: 3,
+                    spans: vec![InlineSpan::Text("Wrapped first".to_string())],
+                }),
+            },
+            Block::Heading {
+                level: 1,
+                spans: vec![InlineSpan::Text("Plain second".to_string())],
+            },
+            Block::Presented {
+                presentation: Default::default(),
+                block: Box::new(Block::Heading {
+                    level: 2,
+                    spans: vec![InlineSpan::Text("Wrapped third".to_string())],
+                }),
+            },
+        ];
+
+        let tree = project_outline(&document);
+        let (_, root) = tree.nodes.iter().find(|(id, _)| *id == tree.root).unwrap();
+        let expected_ids = [
+            node_id_for_path("gloss/outline/doc:test/heading/0"),
+            node_id_for_path("gloss/outline/doc:test/heading/1"),
+            node_id_for_path("gloss/outline/doc:test/heading/2"),
+        ];
+        assert_eq!(root.children(), expected_ids);
+
+        let headings: Vec<_> = root
+            .children()
+            .iter()
+            .map(|id| {
+                let (_, node) = tree
+                    .nodes
+                    .iter()
+                    .find(|(node_id, _)| node_id == id)
+                    .unwrap();
+                (node.label().unwrap_or("").to_string(), node.level())
+            })
+            .collect();
+        assert_eq!(
+            headings,
+            vec![
+                ("Wrapped first".to_string(), Some(3)),
+                ("Plain second".to_string(), Some(1)),
+                ("Wrapped third".to_string(), Some(2)),
+            ]
+        );
     }
 
     #[test]
