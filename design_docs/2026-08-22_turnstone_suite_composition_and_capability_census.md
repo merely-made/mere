@@ -664,3 +664,20 @@ receipt links. Promote I2 and I3 from their actual consumer seams; additional
 protocol parity and platform-wide session abstractions require their own
 bounded acceptance evidence. PPK2 measurements can proceed independently once
 the physical fixture is identified.
+
+### I2a execution receipt, 2026-09-13
+
+Mere `ab067f1e` adds the shared `DeliveryStatus` and queue-reason vocabulary.
+Signalman's optional `comms` feature projects its existing retained records into
+that vocabulary; the current desktop Messages view consumes the projection.
+This closes the delivery-facts prerequisite of I2, with 16 Comms tests and its
+doctest plus 32 Signalman library tests against the exact Mere git pin.
+The borrowed record retains transport identifiers and application authority.
+Unknown delivery does not become read, and failure detail remains visible.
+
+Protocol identity routing, capability/privacy presentation and additional native
+Murm/LXMF/Sennet/Tucket adapters remain I2 follow-ons. No additional protocol is
+registered by this slice. Signalman's full desktop library check also passes;
+headed acceptance remains distinct from these compile/model checks. See
+`retinue/design_docs/2026-08-09_signalman_cambium_desktop_scope.md` for consumer
+validation details.
