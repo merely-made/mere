@@ -1,0 +1,612 @@
+[
+  {
+    "case": "crossing",
+    "frame": 0,
+    "interior": 1996642,
+    "foreground_pixels": 621735,
+    "foreground_interior": 553489,
+    "bad_interior": 223,
+    "bad_foreground_interior": 223,
+    "foreground_interior_bad_percent": 0.04028987025939088,
+    "pairs": [
+      {
+        "oracle": [
+          189,
+          160,
+          189
+        ],
+        "c": [
+          201,
+          213,
+          224
+        ],
+        "count": 126
+      },
+      {
+        "oracle": [
+          224,
+          213,
+          201
+        ],
+        "c": [
+          213,
+          160,
+          160
+        ],
+        "count": 87
+      },
+      {
+        "oracle": [
+          213,
+          160,
+          160
+        ],
+        "c": [
+          224,
+          213,
+          201
+        ],
+        "count": 8
+      },
+      {
+        "oracle": [
+          211,
+          211,
+          211
+        ],
+        "c": [
+          147,
+          147,
+          147
+        ],
+        "count": 1
+      },
+      {
+        "oracle": [
+          197,
+          197,
+          197
+        ],
+        "c": [
+          147,
+          147,
+          147
+        ],
+        "count": 1
+      }
+    ],
+    "bbox": [
+      683,
+      221,
+      955,
+      832
+    ]
+  },
+  {
+    "case": "crossing",
+    "frame": 30,
+    "interior": 1996248,
+    "foreground_pixels": 649624,
+    "foreground_interior": 581752,
+    "bad_interior": 1639,
+    "bad_foreground_interior": 1639,
+    "foreground_interior_bad_percent": 0.28173517237585777,
+    "pairs": [
+      {
+        "oracle": [
+          189,
+          160,
+          189
+        ],
+        "c": [
+          201,
+          213,
+          224
+        ],
+        "count": 693
+      },
+      {
+        "oracle": [
+          201,
+          213,
+          224
+        ],
+        "c": [
+          189,
+          160,
+          189
+        ],
+        "count": 597
+      },
+      {
+        "oracle": [
+          224,
+          213,
+          201
+        ],
+        "c": [
+          213,
+          160,
+          160
+        ],
+        "count": 239
+      },
+      {
+        "oracle": [
+          213,
+          160,
+          160
+        ],
+        "c": [
+          224,
+          213,
+          201
+        ],
+        "count": 108
+      },
+      {
+        "oracle": [
+          211,
+          211,
+          211
+        ],
+        "c": [
+          147,
+          147,
+          147
+        ],
+        "count": 1
+      },
+      {
+        "oracle": [
+          197,
+          197,
+          197
+        ],
+        "c": [
+          147,
+          147,
+          147
+        ],
+        "count": 1
+      }
+    ],
+    "bbox": [
+      683,
+      264,
+      1036,
+      832
+    ]
+  },
+  {
+    "case": "crossing",
+    "frame": 59,
+    "interior": 2005862,
+    "foreground_pixels": 572029,
+    "foreground_interior": 513345,
+    "bad_interior": 211,
+    "bad_foreground_interior": 211,
+    "foreground_interior_bad_percent": 0.04110296194567006,
+    "pairs": [
+      {
+        "oracle": [
+          213,
+          160,
+          160
+        ],
+        "c": [
+          224,
+          213,
+          201
+        ],
+        "count": 97
+      },
+      {
+        "oracle": [
+          224,
+          213,
+          201
+        ],
+        "c": [
+          213,
+          160,
+          160
+        ],
+        "count": 81
+      },
+      {
+        "oracle": [
+          189,
+          160,
+          189
+        ],
+        "c": [
+          201,
+          213,
+          224
+        ],
+        "count": 29
+      },
+      {
+        "oracle": [
+          201,
+          213,
+          224
+        ],
+        "c": [
+          189,
+          160,
+          189
+        ],
+        "count": 3
+      },
+      {
+        "oracle": [
+          197,
+          197,
+          197
+        ],
+        "c": [
+          147,
+          147,
+          147
+        ],
+        "count": 1
+      }
+    ],
+    "bbox": [
+      685,
+      352,
+      1199,
+      832
+    ]
+  },
+  {
+    "case": "articulated",
+    "frame": 0,
+    "interior": 2021608,
+    "foreground_pixels": 546403,
+    "foreground_interior": 503354,
+    "bad_interior": 2,
+    "bad_foreground_interior": 2,
+    "foreground_interior_bad_percent": 0.0003973346789734461,
+    "pairs": [
+      {
+        "oracle": [
+          211,
+          211,
+          211
+        ],
+        "c": [
+          147,
+          147,
+          147
+        ],
+        "count": 1
+      },
+      {
+        "oracle": [
+          197,
+          197,
+          197
+        ],
+        "c": [
+          147,
+          147,
+          147
+        ],
+        "count": 1
+      }
+    ],
+    "bbox": [
+      683,
+      633,
+      817,
+      832
+    ]
+  },
+  {
+    "case": "articulated",
+    "frame": 30,
+    "interior": 2023216,
+    "foreground_pixels": 545346,
+    "foreground_interior": 503884,
+    "bad_interior": 112,
+    "bad_foreground_interior": 112,
+    "foreground_interior_bad_percent": 0.022227338038119885,
+    "pairs": [
+      {
+        "oracle": [
+          180,
+          191,
+          200
+        ],
+        "c": [
+          202,
+          177,
+          145
+        ],
+        "count": 110
+      },
+      {
+        "oracle": [
+          211,
+          211,
+          211
+        ],
+        "c": [
+          147,
+          147,
+          147
+        ],
+        "count": 1
+      },
+      {
+        "oracle": [
+          197,
+          197,
+          197
+        ],
+        "c": [
+          147,
+          147,
+          147
+        ],
+        "count": 1
+      }
+    ],
+    "bbox": [
+      683,
+      466,
+      1263,
+      832
+    ],
+    "grid50": [
+      [
+        [
+          25,
+          9
+        ],
+        56
+      ],
+      [
+        [
+          24,
+          9
+        ],
+        52
+      ],
+      [
+        [
+          25,
+          10
+        ],
+        2
+      ],
+      [
+        [
+          13,
+          12
+        ],
+        1
+      ],
+      [
+        [
+          16,
+          16
+        ],
+        1
+      ]
+    ],
+    "samples": [
+      [
+        1242,
+        466
+      ],
+      [
+        1236,
+        476
+      ],
+      [
+        1234,
+        480
+      ],
+      [
+        1256,
+        483
+      ],
+      [
+        1255,
+        485
+      ],
+      [
+        1257,
+        488
+      ],
+      [
+        1262,
+        491
+      ],
+      [
+        1261,
+        493
+      ]
+    ]
+  },
+  {
+    "case": "articulated",
+    "frame": 59,
+    "interior": 2022362,
+    "foreground_pixels": 545346,
+    "foreground_interior": 503030,
+    "bad_interior": 2,
+    "bad_foreground_interior": 2,
+    "foreground_interior_bad_percent": 0.00039759060095819333,
+    "pairs": [
+      {
+        "oracle": [
+          211,
+          211,
+          211
+        ],
+        "c": [
+          147,
+          147,
+          147
+        ],
+        "count": 1
+      },
+      {
+        "oracle": [
+          197,
+          197,
+          197
+        ],
+        "c": [
+          147,
+          147,
+          147
+        ],
+        "count": 1
+      }
+    ],
+    "bbox": [
+      683,
+      633,
+      817,
+      832
+    ]
+  },
+  {
+    "case": "continuous_yaw",
+    "frame": 0,
+    "interior": 2044389,
+    "foreground_pixels": 504441,
+    "foreground_interior": 483824,
+    "bad_interior": 2,
+    "bad_foreground_interior": 2,
+    "foreground_interior_bad_percent": 0.00041337345811700123,
+    "pairs": [
+      {
+        "oracle": [
+          211,
+          211,
+          211
+        ],
+        "c": [
+          147,
+          147,
+          147
+        ],
+        "count": 1
+      },
+      {
+        "oracle": [
+          197,
+          197,
+          197
+        ],
+        "c": [
+          147,
+          147,
+          147
+        ],
+        "count": 1
+      }
+    ],
+    "bbox": [
+      683,
+      633,
+      817,
+      832
+    ]
+  },
+  {
+    "case": "continuous_yaw",
+    "frame": 30,
+    "interior": 2044436,
+    "foreground_pixels": 519582,
+    "foreground_interior": 499143,
+    "bad_interior": 2,
+    "bad_foreground_interior": 2,
+    "foreground_interior_bad_percent": 0.0004006867771360111,
+    "pairs": [
+      {
+        "oracle": [
+          211,
+          211,
+          211
+        ],
+        "c": [
+          147,
+          147,
+          147
+        ],
+        "count": 1
+      },
+      {
+        "oracle": [
+          197,
+          197,
+          197
+        ],
+        "c": [
+          147,
+          147,
+          147
+        ],
+        "count": 1
+      }
+    ],
+    "bbox": [
+      683,
+      633,
+      817,
+      832
+    ]
+  },
+  {
+    "case": "continuous_yaw",
+    "frame": 59,
+    "interior": 2042088,
+    "foreground_pixels": 520709,
+    "foreground_interior": 497963,
+    "bad_interior": 2,
+    "bad_foreground_interior": 2,
+    "foreground_interior_bad_percent": 0.0004016362661482881,
+    "pairs": [
+      {
+        "oracle": [
+          211,
+          211,
+          211
+        ],
+        "c": [
+          147,
+          147,
+          147
+        ],
+        "count": 1
+      },
+      {
+        "oracle": [
+          197,
+          197,
+          197
+        ],
+        "c": [
+          147,
+          147,
+          147
+        ],
+        "count": 1
+      }
+    ],
+    "bbox": [
+      683,
+      633,
+      817,
+      832
+    ]
+  }
+]

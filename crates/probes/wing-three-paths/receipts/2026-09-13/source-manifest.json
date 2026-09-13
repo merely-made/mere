@@ -1,0 +1,106 @@
+{
+  "captured_at": "2026-09-13T05:16:06.1034705Z",
+  "repositories": {
+    "mere": {
+      "head": "70704c3042c5ad895ff4b9f8cb1ec1157a650d14",
+      "status": []
+    },
+    "isometry": {
+      "head": "5e98d14359b4ae752924a15b554e07b9f6afd476",
+      "status": [
+        " M mesocosm/crates/mesocosm-genet/src/section/bodies.rs",
+        " M mesocosm/crates/mesocosm-genet/src/section/depth_tests.rs",
+        " M mesocosm/crates/mesocosm-render/src/live_body.rs",
+        " M mesocosm/crates/mesocosm-render/src/live_body_tests.rs",
+        " M mesocosm/design_docs/2026-09-11_orthographic_voxel_presentation_plan.md",
+        " M mesocosm/design_docs/DOC_README.md"
+      ]
+    },
+    "netrender": {
+      "head": "3961aca919f707ab09a786379eb4ce8bb121258e",
+      "status": []
+    }
+  },
+  "probe_git_status": "ignored by Mere /crates/probes rule; preserved in probe-source.zip",
+  "source_files": [
+    {
+      "path": "Cargo.lock",
+      "sha256": "1bd04a46f491174c1f8c05ca4999c33f9dde68d3866e1ae9c757aa3d845a2747"
+    },
+    {
+      "path": "Cargo.toml",
+      "sha256": "ad926f26ac7d4dace58fd3323358cbc512af265744535aa7146c3f656586252e"
+    },
+    {
+      "path": "src/gpu.rs",
+      "sha256": "253d1de6530652cb5201cb89f34eb38fb2a549ef925468f08f7fc6b00abddec9"
+    },
+    {
+      "path": "src/main.rs",
+      "sha256": "f6dc1170b095ce8ce7b479abb686cfa62d270ecd139a4d63d8fa312f147745d0"
+    },
+    {
+      "path": "src/measurement.rs",
+      "sha256": "4ebab12f86bbed422cd721c7642446738e6dc109d001a5aa3061b5ac426b0c70"
+    },
+    {
+      "path": "src/path_a.rs",
+      "sha256": "d1539928a2101c8d7032be83c0779ad657ead9297c244e8db0c7e4e64e82ee8d"
+    },
+    {
+      "path": "src/path_b_tests.rs",
+      "sha256": "b185c2f7ce43bf1421cad96c48ab2b7e3e81093b3c5632c987f6a482e5e35fad"
+    },
+    {
+      "path": "src/path_b.rs",
+      "sha256": "2c0ba07640f305325860986116a417801d73bc5d6502350e4d0f7064757ff71b"
+    },
+    {
+      "path": "src/path_c.rs",
+      "sha256": "ff625e2c3f8f69a54bfe66c2e1893d06d34bd3b0c5a316bf87fcd65a05faedd4"
+    },
+    {
+      "path": "src/project.rs",
+      "sha256": "d34c294edf597fc1631ed33ade21fde174bc0346e8f1705761a0ddd332f0c260"
+    },
+    {
+      "path": "src/world.rs",
+      "sha256": "fc3b87aba598d03fbaee43984305fe0fb5ceac98fb5d91277d09e457d7a6b6d6"
+    }
+  ],
+  "adapter_files": [
+    {
+      "path": "mesocosm/crates/mesocosm-render/src/live_body.rs",
+      "sha256": "d2638234b230f90ba03a4cb898c3f0064561f055ad3ad57a689c134ea84c7bd6"
+    },
+    {
+      "path": "mesocosm/crates/mesocosm-render/src/live_body_tests.rs",
+      "sha256": "5aed035df0f73a857a467efd922cbc774210831c87cdedd7c0d87272e6748c8e"
+    },
+    {
+      "path": "mesocosm/crates/mesocosm-genet/src/section/bodies.rs",
+      "sha256": "c1ffb5043f8d218abea2712fab6ddfbe4bfb7ae8bd53b9c45f346779c340e006"
+    },
+    {
+      "path": "mesocosm/crates/mesocosm-genet/src/section/depth_tests.rs",
+      "sha256": "cef64c2309d5b016bdbbbe0293a9962750a8612a4089adaf9e0a116b9f3c2545"
+    }
+  ],
+  "compiler": [
+    "rustc 1.97.1 (8bab26f4f 2026-07-14)",
+    "binary: rustc",
+    "commit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452",
+    "commit-date: 2026-07-14",
+    "host: x86_64-pc-windows-msvc",
+    "release: 1.97.1",
+    "LLVM version: 22.1.6"
+  ],
+  "executable": {
+    "path": "repos/mere/crates/probes/wing-three-paths/target/release/wing-three-paths.exe",
+    "sha256": "2cfc385de6bf3b1e48025101973257182a599c5bbdfbabf45baf7289a2f49c26"
+  },
+  "archive_sha256": "8796a0a677ec117792600d69d53f28d1df3ea099628d6651c3a2b53fce0a8eee",
+  "build_command": "CARGO_TARGET_DIR=probe/target; cargo build --manifest-path repos/mere/crates/probes/wing-three-paths/Cargo.toml --release --locked --offline -j 2",
+  "workload": "swarm_v2; corrected full-range RNG; surface_notches_v1; seed=24301",
+  "measurement_environment": "Serial probe runs, owned compiler/GPU work stopped; other workspace Rust compilation observed active. Background interference is not controlled."
+}

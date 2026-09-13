@@ -1,0 +1,68 @@
+{
+  "date": "2026-09-13",
+  "purpose": "Tracked archival copy of the completed probe. No algorithm changes or new performance measurements.",
+  "measured_source_manifest": "source-manifest.json",
+  "excluded": "Cargo.lock, probe-source.zip, executable, logs and full frames remain in the machine-local receipt.",
+  "source_files": [
+    {
+      "path": "Cargo.toml",
+      "measured_sha256": "ad926f26ac7d4dace58fd3323358cbc512af265744535aa7146c3f656586252e",
+      "archived_sha256": "1120d0110d316d1419f4f3e155fdefef811f406c8969b03890440f3662d561c5",
+      "change": "Prepend MPL-2.0 house header and change package license metadata only."
+    },
+    {
+      "path": "src/gpu.rs",
+      "measured_sha256": "253d1de6530652cb5201cb89f34eb38fb2a549ef925468f08f7fc6b00abddec9",
+      "archived_sha256": "66856a5d33c844715f0f46c12ed1d1ade28a937b215a6841a7c78e183528809c",
+      "change": "Prepend MPL-2.0 house header; measured source bytes remain an exact suffix."
+    },
+    {
+      "path": "src/main.rs",
+      "measured_sha256": "f6dc1170b095ce8ce7b479abb686cfa62d270ecd139a4d63d8fa312f147745d0",
+      "archived_sha256": "88f9250ddb25809445fe1086f7040638ddce0719f4a7df74e50aa027536647c3",
+      "change": "Prepend MPL-2.0 house header; measured source bytes remain an exact suffix."
+    },
+    {
+      "path": "src/measurement.rs",
+      "measured_sha256": "4ebab12f86bbed422cd721c7642446738e6dc109d001a5aa3061b5ac426b0c70",
+      "archived_sha256": "2af21c1e2d3a84c02624ee10108902a85c5117d040edbe0fcef49fa55fde47e5",
+      "change": "Prepend MPL-2.0 house header; measured source bytes remain an exact suffix."
+    },
+    {
+      "path": "src/path_a.rs",
+      "measured_sha256": "d1539928a2101c8d7032be83c0779ad657ead9297c244e8db0c7e4e64e82ee8d",
+      "archived_sha256": "5a2f91a6b856501656c26d4a311f1eb4434b1494e362a8744ac7cbe4fa9b9e1c",
+      "change": "Prepend MPL-2.0 house header; measured source bytes remain an exact suffix."
+    },
+    {
+      "path": "src/path_b_tests.rs",
+      "measured_sha256": "b185c2f7ce43bf1421cad96c48ab2b7e3e81093b3c5632c987f6a482e5e35fad",
+      "archived_sha256": "8da6b38593f5342407ef92ddb7ebdbcc32d8656b4387f7d714b831af695a265d",
+      "change": "Prepend MPL-2.0 house header; measured source bytes remain an exact suffix."
+    },
+    {
+      "path": "src/path_b.rs",
+      "measured_sha256": "2c0ba07640f305325860986116a417801d73bc5d6502350e4d0f7064757ff71b",
+      "archived_sha256": "4461bc092ce3211a85f609fd1712b2dfb8301de4db0c556e795bea7c13e85f8d",
+      "change": "Prepend MPL-2.0 house header; measured source bytes remain an exact suffix."
+    },
+    {
+      "path": "src/path_c.rs",
+      "measured_sha256": "ff625e2c3f8f69a54bfe66c2e1893d06d34bd3b0c5a316bf87fcd65a05faedd4",
+      "archived_sha256": "d5515ebc9607b5823530ecdd449f7dc66f10f03bcccec777dc06bc6beb816929",
+      "change": "Prepend MPL-2.0 house header; measured source bytes remain an exact suffix."
+    },
+    {
+      "path": "src/project.rs",
+      "measured_sha256": "d34c294edf597fc1631ed33ade21fde174bc0346e8f1705761a0ddd332f0c260",
+      "archived_sha256": "d1953f96e8a952eb15197b70c69d37a2926b17fde73792dbcfca8cdab0fa84cf",
+      "change": "Prepend MPL-2.0 house header; measured source bytes remain an exact suffix."
+    },
+    {
+      "path": "src/world.rs",
+      "measured_sha256": "fc3b87aba598d03fbaee43984305fe0fb5ceac98fb5d91277d09e457d7a6b6d6",
+      "archived_sha256": "721497a2c5cf1b704866884c9fa3a957ee502b3543d3fb3b1f3c95994f61bd6d",
+      "change": "Prepend MPL-2.0 house header; measured source bytes remain an exact suffix."
+    }
+  ]
+}

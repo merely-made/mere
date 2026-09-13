@@ -1,0 +1,32 @@
+# Copyright 2026 Mark Alan Boykin
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# SPDX-License-Identifier: MPL-2.0
+
+[package]
+name = "wing-three-paths"
+version = "0.0.1"
+edition = "2024"
+license = "MPL-2.0"
+publish = false
+
+# L0c: one voxel scene presented three ways into netrender, no genet DOM.
+#   A  retained planar fragments (strips + parts), re-lowered on change
+#   B  cached sprites, one image per facing / chunk
+#   C  resident geometry through Mesocosm's live_body adapter into a depth
+#      attachment, composited through netrender's external texture
+
+[dependencies]
+netrender = { path = "../../../../netrender/netrender" }
+netrender_device = { path = "../../../../netrender/netrender_device" }
+mesocosm-core = { path = "../../../../isometry/mesocosm/crates/mesocosm-core" }
+mesocosm-mesh = { path = "../../../../isometry/mesocosm/crates/mesocosm-mesh" }
+mesocosm-render = { path = "../../../../isometry/mesocosm/crates/mesocosm-render" }
+wgpu = { version = "30", default-features = false, features = ["std", "wgsl"] }
+glam = "0.30"
+blake3 = "1"
+serde_json = "1"
+
+[profile.release]
+debug = true
