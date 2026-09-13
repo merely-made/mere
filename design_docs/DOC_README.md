@@ -8,6 +8,8 @@ Current bounded proofs (2026-09-05): the [projection grammar adoption plan](mere
 
 ## Required reading order
 
+Active continuation (2026-09-13): [Gemot, murmurs, moots, and coop](2026-08-22_turnstone_suite_composition_and_capability_census.md#gemot-murmurs-moots-and-coop-2026-09-13) records current product names, reference-parity and power lanes, messaging presentation boundaries, and application-owned coop lifecycle.
+
 Active implementation: [projection refresh and surface reuse](mere_docs/implementation_strategy/2026-09-05_projection_refresh_and_surface_reuse_plan.md) covers dependency-aware layout caching, independent appearances, bounded live richness, and separation of paint from placement work.
 
 Active continuation (2026-09-05): [Moot collections and community publishing](moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md#community-collections-and-author-offline-publishing-2026-09-04) extends the historical M1 plan. Its [same-machine live-peer proof](moothold_docs/research/2026-09-05_author_offline_publication_proof.md) passed scoped iroh transfer, stable-Persona binding, current Gemot contribution/hosting authority, unadmitted-peer refusal, author exit, durable host restart and ordinary Gemini retrieval. Production publication/hosting records, historical authority proof, the Persona-to-device adapter and a two-machine receipt remain open. Retention, Fleece collections, application co-op and addressed mesh delivery follow.

@@ -1,36 +1,28 @@
-# moot
+# Gemot
 
-Founding reservation for **Moot**, the Mere platform's places port: the
-first-party application surface over governed shared spaces.
+The community surface containing **murmurs** (secret conversations), **moots**
+(spaces of agreement), and **coop** (shared activities among peers).
 
-One port, two surfaces, because the workflows separate cleanly:
+Use the hardware you have. Share resources with people you trust, contribute
+work voluntarily, and make contributions visible. Platform participation does
+not require a subscription; communities decide their own contributions and
+how to meet actual operating costs.
 
-- **murmur** — conversation. Direct and invitation-scoped conversations,
-  store-and-forward mail, history, drafts, delivery and refusal, attachments,
-  and calls when the transport and media receipts support them.
-- **moot** — community. Find, preview, join and reconnect ceremony;
-  membership and roles; proposals, decisions, moderation and appeals; storage
-  and compute contributions; space health, replication, and reachability.
+Conversation presentation must mount independently for consumers such as
+Signalman. A shared presentation preserves each protocol's identity, delivery
+meaning, and privacy limits. Public radio traffic does not become secret merely
+by appearing alongside a murmur.
 
-**murmur mounts alone.** Signalman wants messages and voice drops without
-governance UI, and that constraint is what keeps the two surfaces separable
-rather than one screen with tabs.
+The `gemot` library owns governance and membership; `murm` owns conversation
+exchange; Commons and application domains own their shared state; Stickleback
+owns replication machinery. Coop exposes activity lifecycle without moving
+application state into a second store. Turnstone composes these surfaces.
 
-The boundaries are the point: not [gemot](https://crates.io/crates/gemot)
-(governance, membership, and constitution stay the authority's), not
-[murm](https://crates.io/crates/murm) (the post grammar, signed logs, and
-sync lanes), not the commons spine or
-[stickleback](https://crates.io/crates/stickleback) (the shared graph and its
-replication), and no longer a Turnstone feature — the 2026-07-28 place-port
-ruling's application half was reversed by the 2026-08-22 suite census, while
-its authority half stands.
-
-The package is `mere-moot` because crates.io `moot` is held by an unrelated
-crate with real code, and `murmur` is likewise taken; the library keeps the
-product name.
-
-Lives in the [mere](https://github.com/merely-made/mere) workspace at
-`ports/moot`. No implementation yet.
+The technical package remains `mere-moot`, library `moot`, at `ports/moot`.
+The existing optional `captured-web` module is a bounded implementation;
+the composed conversation and coop experiences remain planned. The active
+[Gemot implementation lanes](../../design_docs/2026-08-22_turnstone_suite_composition_and_capability_census.md#gemot-murmurs-moots-and-coop-2026-09-13)
+define the next receipts.
 
 ## License
 
