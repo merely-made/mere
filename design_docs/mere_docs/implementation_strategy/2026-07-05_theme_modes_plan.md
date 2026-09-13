@@ -4,10 +4,64 @@
 **Status**: T1–T5 implemented 2026-07-05 (see Progress; T5 shipped the declarative lane, rhai
 graduation open). From Mark's theme-model decision (2026-07-05), unblocking the W3C adoption
 plan's P3 host half.
+
+**2026-09-13 extension:** Tabard small-web adapters are scoped below. The July
+receipts describe their original host; they do not establish current Knot or
+Turnstone settings, foreign exports or persistence.
 **Related**: `repos/genet/docs/2026-07-05_w3c_mechanism_adoption_plan.md` (P3 engine half landed:
 `IncrementalLayout::set_prefers_color_scheme`), `repos/tincture` *(historical citation)* <!-- doc-audit: historical-path --> (tinct seed-to-palette
 derivation), `crates/meerkat/src/theme_sheets.rs` *(historical citation)* <!-- doc-audit: historical-path --> + `theme_edit.rs` (current sheet baking +
 switch path).
+
+## Tabard small-web adapters (2026-09-13 scope)
+
+**Current code:** `ports/tabard/src/lib.rs::Theme` derives a Tinct palette and
+emits DTCG color JSON or deterministic CSS custom properties. It is a library,
+without foreign-client exporters. The recorded Pelt chrome/Reader preview
+receipts prove consumer mappings, not installed user settings. In Mere,
+`crates/system/document-lanes/src/smolweb.rs` accepts `SmolwebTheme::App` and an
+explicit `DocumentStyleSheet`. Those are the native reader seams; protocol
+parsers need no dependency on Tabard.
+
+Keep three targets explicit: application chrome, reader appearance, and an
+author's published stylesheet. Changing a reader preference must not rewrite
+source or publish it. Micron's authored colors remain source facts even when a
+reader overrides their appearance. Gemtext needs no styling extension.
+
+1. **Native reader adapter.** Map existing Tabard roles into the shared reader
+   palette/style sheet, with Knot and Turnstone owning selection, persistence
+   and precedence over site-derived defaults. Knot's current
+   `apps/desktop/src/appearance.rs` derives its own Tinct palette; its consumer
+   can reuse Tabard while keeping editor appearance separate from published CSS.
+   Done when one theme is selected, previewed and restored in both apps, while
+   document bytes, history, selection and viewport remain held; ordinary,
+   visited/focused links and reader contrast overrides stay legible. Preserve
+   unsupported roles explicitly rather than pretending every target uses them.
+2. **Lagrange UI palette exporter.** Its
+   [official help](https://raw.githubusercontent.com/skyjake/lagrange/dev/res/about/help.gmi)
+   documents `palette.txt`, with Dark/Light sections and named RGB entries.
+   This controls browser UI colors; document themes are separate. Link icons
+   also use the UI palette, so test them against different page backgrounds.
+   Tabard owns a deterministic exporter and an explicit semantic-role mapping,
+   including diagnostics where roles collapse or have no representation.
+   Done when exact golden files cover syntax and both modes and a stock Lagrange
+   installation actually loads the exported file, including after restart.
+   Preserve the documented neutral ordering and status-color meanings; do not
+   claim CSS/DTCG import or control over a site's page theme. Exporting a file
+   and installing it into an existing client profile are separate user actions.
+3. **Geopard contract discovery.** Its
+   [official README](https://raw.githubusercontent.com/ranfdev/Geopard/master/README.gemini)
+   describes per-domain colors and a configuration directory but establishes
+   no theme-import schema. An exporter stays uncommitted until public docs or
+   controlled black-box observations establish a supported file contract and
+   a stock-client import receipt. GTK/CSS implementation details are not that
+   contract. This gate does not delay the other two adapters.
+
+This extends the existing artifact and consumer boundaries. Font packs, arbitrary
+stylesheet conversion and additional protocol-specific exporters need separate
+consumer evidence before entering implementation. The shared Micron presentation
+scope lives in the
+[fidelity plan](../../nematic_docs/implementation_strategy/2026-07-01_smolweb_fidelity_plan.md#micron-completion-scope-2026-09-13).
 
 ## The model (decision record)
 
