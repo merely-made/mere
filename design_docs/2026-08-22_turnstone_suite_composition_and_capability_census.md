@@ -698,3 +698,26 @@ and remaining timeout/reconnect boundaries live in
 `turnstone/design_docs/2026-07-28_turnstone_place_port_plan.md`. A second
 application's explicit leave and renewed-admission reconnect remain open; the
 shared coop lifecycle contract is still to be earned from those consumers.
+
+### I3b explicit reconnect, 2026-09-13
+
+Turnstone now offers **Reconnect place** using a bounded contact descriptor
+saved after admission. The old invitation's governance and welcome artifacts
+are never persisted for replay. Ordinary reopening stays offline. Reconnect
+validates the retained group binding and local membership, then reuses existing
+lanes; subsequent sync and authoring retain their existing authority checks.
+Contact expiry requires a renewed offer. This does not establish globally fresh
+membership before sync or discover a peer's new endpoint after its restart.
+
+The local two-peer test reopens the guest offline, authors there, reconnects,
+and confirms that both the offline and subsequent live message reach the host.
+Descriptor bounds, scope, expiry, replacement failure, and partial leave
+failures have focused tests. Validation is under Turnstone's local workspace
+resolution; headed, physical radio and power-cut receipts remain separate.
+The authoritative behavior and acceptance detail remain in
+`turnstone/design_docs/2026-07-28_turnstone_place_port_plan.md`.
+
+The parallel I2 privacy audit promotes no new badge: a recorded sender key is
+not sufficient evidence of validated message ingestion. A future shared
+identity/privacy projection must carry that verification provenance explicitly.
+The PPK2 fixture remains deferred while these software gates progress.
