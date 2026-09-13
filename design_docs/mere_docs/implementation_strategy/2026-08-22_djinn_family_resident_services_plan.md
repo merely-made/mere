@@ -524,3 +524,46 @@ Before persistent rollout is concrete and reviewable, settle and verify:
 
 This section proposes ownership and done-conditions. It neither schedules a
 daemon rollout nor selects public binding for the user.
+
+### Implementation boundary and first acceptance (2026-09-13)
+
+**Status:** scoped, not implemented. Current code sharpens the proposal:
+
+- Knot's `crates/knot-site/src/lib.rs::Site::publication` reopens saved metadata and files
+  before constructing an immutable `Publication`; its page collection is private.
+  The missing handoff is a versioned snapshot descriptor plus read-only bytes,
+  usable across processes. It is not an editor-buffer or vault handle.
+- Knot's `crates/knot-site/src/local.rs` owns a loopback listener, temporary
+  certificate and worker lifetime. Desktop `scroll_site.rs` replaces or stops
+  that local server. Reusing its protocol work does not supply durable identity.
+- Djinn's `ResidentBlobCustody` already supplies shared physical storage and
+  serving-scope rebinding. `ResidentKnot`'s admitted local route and pairing refresh
+  serve personal sync/evidence; those grants do not authorize a website's audience.
+  The daemon lifecycle in `ports/djinn/src/bin/djinn.rs` is the supervision seam.
+
+Implement one ordinary saved-snapshot service first: Knot selects and submits a
+complete revision; Djinn retains its exact bytes, descriptor, identity reference
+and explicit startup policy. Local authenticated publish/replace/stop/remove/status
+operations control that service. Begin with Gemini to exercise stable TLS identity
+and an existing ordinary browser. Reuse a process-neutral snapshot source and
+listener lifecycle so Spartan and NomadNet can follow with their own identities
+and independent-client receipts. Parsing Micron forms is not a prerequisite.
+
+Done when a separate Lagrange process reads the selected revision after Knot
+exits and again after Djinn restarts, using the same certificate. Also record
+byte-exact protocol retrieval, atomic revision replacement, interrupted-handoff
+recovery, unauthorized-caller refusal, bind conflicts, byte/connection bounds
+and clean shutdown. Unsaved edits must remain absent. Stop releases the listener;
+removal separately determines retained content. A changed certificate is an
+explicit rotation outcome, not a normal restart. This proves local resident
+serving only; public and two-machine exposure require their own receipts.
+
+Governed selective hosting follows the production records in the
+[Moot publication plan](../../moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md#community-collections-and-author-offline-publishing-2026-09-04).
+Its author-offline proof is evidence for the desired behavior, not an implemented
+Djinn service. Production revision/hosting records, historical authority,
+Persona/device binding and two-machine acceptance remain distinct gates.
+Select accepted revisions/files by their hashes, retain them under the relevant
+lease and recheck hosting permission on restart and authority changes. Discovery
+advertises availability separately; retaining bytes grants neither editing rights
+nor decryption keys. Serving a saved ordinary site must keep working without a moot.
