@@ -39,6 +39,12 @@ use genet_render::VisualMovement;
 
 mod owned_layout;
 pub use owned_layout::{OwnedLayout, ScrollTarget};
+pub mod producer;
+pub use producer::{
+    ProducedTexture, ProducerContext, ProducerError, ProducerFrameInfo, ProducerFrameStats,
+    ProducerRegistrationError, ProducerRegistry, ResolvedAppearance, SourceAlpha, SourceEncoding,
+    TextureProducer,
+};
 
 /// The host's clock.
 ///

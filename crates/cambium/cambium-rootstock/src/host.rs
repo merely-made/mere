@@ -484,6 +484,7 @@ pub struct RelayoutProfile {
 /// wgpu, Vello, or a platform event loop.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct FrameProfile {
+    pub producers: crate::ProducerFrameStats,
     pub total_us: u64,
     pub frame_hook_us: u64,
     pub relayout_us: u64,
@@ -523,7 +524,7 @@ impl FrameProfile {
     /// One compact line suitable for a headed receipt's diagnostic log.
     pub fn summary(self) -> String {
         format!(
-            "total={}us hook={}us relayout={}us layout-update={}us tick={}us apply={}us layout-rebuild={}us style-resolve={}us layout-text={}us content-extent={}us mutations={} layout-rebuilt={} leaf-boxes={}us leaf-render={}us leaf-repaints={} fragments={}us emit={}us raster={}us acquire={}us clear={}us compose={}us capture={}us present={}us a11y={}us raster-inner={}us invalidate={}us rebuild={}us master={}us vello={}us dirty-tiles={}",
+            "total={}us hook={}us relayout={}us layout-update={}us tick={}us apply={}us layout-rebuild={}us style-resolve={}us layout-text={}us content-extent={}us mutations={} layout-rebuilt={} leaf-boxes={}us leaf-render={}us leaf-repaints={} fragments={}us emit={}us raster={}us acquire={}us clear={}us compose={}us capture={}us present={}us a11y={}us raster-inner={}us invalidate={}us rebuild={}us master={}us vello={}us dirty-tiles={} producer={}us staging={}us producer-calls={} stages={}",
             self.total_us,
             self.frame_hook_us,
             self.relayout_us,
@@ -554,6 +555,10 @@ impl FrameProfile {
             self.master_compose_us,
             self.vello_render_us,
             self.dirty_tiles,
+            self.producers.render_us,
+            self.producers.stage_us,
+            self.producers.render_calls,
+            self.producers.stages,
         )
     }
 }
@@ -595,8 +600,8 @@ where
     /// The host-owned retained layout for read-only geometry queries.
     ///
     /// Kept private to the crate so an application cannot couple itself to
-    /// the layout engine. [`painted_rect`](Self::painted_rect) is the public
-    /// seam: node identity in, the rectangle used by hit testing out.
+    /// the layout engine. Geometry and declared appearance are exposed through
+    /// read-only methods keyed by DOM node identity.
     pub(crate) layout: Option<&'a OwnedLayout>,
     /// The native window (chrome requests, redraws, cursor, IME area), when
     /// there is one. `None` under [`Harness`], the windowless test host — an
@@ -634,6 +639,8 @@ where
     pub set_ui_zoom: &'a mut Option<f32>,
     /// The custom-paint leaf registry the paint pass renders from.
     pub leaves: &'a mut sprigging::LeafRegistry<u64>,
+    /// Same-device viewport producers, keyed to existing custom-leaf slots.
+    pub producers: &'a mut crate::ProducerRegistry,
     /// Set to swap the stylesheet; the host relayouts under the new sheet.
     pub set_sheet: &'a mut Option<String>,
     /// Set to end the application after this event.
@@ -793,6 +800,7 @@ where
     pub(crate) last_leaf_repaints: u64,
     pub sheet: String,
     pub leaves: sprigging::LeafRegistry<u64>,
+    pub producers: crate::ProducerRegistry,
     pub rendered: sprigging::RenderedLeaves,
     /// Netrender roadmap E4 — leaf key → (retained `FragmentId`, epoch it was
     /// translated at). Synced against `rendered` each redraw while a surface
@@ -888,6 +896,7 @@ where
             last_leaf_repaints: 0,
             sheet: String::new(),
             leaves: sprigging::LeafRegistry::new(),
+            producers: crate::ProducerRegistry::new(),
             rendered: sprigging::RenderedLeaves::new(),
             leaf_fragments: std::collections::HashMap::new(),
             cursor: (0.0, 0.0),
@@ -1180,6 +1189,7 @@ where
                 ui_zoom,
                 zoom_changed,
                 leaves: &mut self.s.leaves,
+                producers: &mut self.s.producers,
                 set_sheet: &mut self.s.pending_sheet,
                 set_ui_zoom: &mut self.s.pending_ui_zoom,
                 close: &mut self.s.close_requested,
@@ -1258,6 +1268,7 @@ where
                 ui_zoom,
                 zoom_changed,
                 leaves: &mut self.s.leaves,
+                producers: &mut self.s.producers,
                 set_sheet: &mut self.s.pending_sheet,
                 set_ui_zoom: &mut self.s.pending_ui_zoom,
                 close: &mut self.s.close_requested,

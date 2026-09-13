@@ -53,13 +53,22 @@ At that table's date, consumers followed a git-first family rule through
 boundary was Cambium plus the protocol AST package, without Genet's layout or
 rendering engine.
 
-## Current Mere-owned compatibility (2026-09-06)
+## Current Mere-owned compatibility (2026-09-13)
 
 Cambium is now a Mere workspace family under `crates/cambium/`; it is not a
 Genet workspace subtree. Mere owns the current `cambium`, `meristem`,
 `sprigging`, and `workbench` paths, while pinning Genet seam packages at one
-immutable `genet.git` revision (`221415af6643e7b31510547963217973ada6332b`).
+immutable `genet.git` revision (`101d9e9ade8671564e723443d9f0498e899a33f1`).
 Errand is likewise Mere-owned at workspace version 0.3.4.
+
+The external viewport bridge uses that revision's content-box geometry and typed
+used-color queries. Genet's vendored Parley and Taffy patch entries carry the same
+revision; upstream Parley 0.10 has the same version but lacks the engine's local
+extensions. Netrender and the paint-list family align to
+`3961aca919f707ab09a786379eb4ce8bb121258e`, matching Genet's own dependencies.
+Mixing that revision with Mere's former Netrender pin produced distinct Rust
+types when ignored sibling patches were absent. Root and standalone host manifests
+must keep these families aligned.
 
 | Boundary | Current source in this workspace | State |
 | --- | --- | --- |

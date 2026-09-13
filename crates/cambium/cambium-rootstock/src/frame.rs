@@ -33,11 +33,14 @@ fn elapsed_us(elapsed: crate::Duration) -> u64 {
 
 struct SpriggingSource<'a> {
     rendered: &'a sprigging::RenderedLeaves,
+    producers: &'a crate::ProducerRegistry,
 }
 
 impl SpriggingSource<'_> {
     fn leaf_commands(&self, key: u64) -> Option<Vec<paint_list_api::PaintCmd>> {
-        self.rendered.get(key).map(<[_]>::to_vec)
+        self.producers
+            .commands(key)
+            .or_else(|| self.rendered.get(key).map(<[_]>::to_vec))
     }
 }
 
@@ -73,6 +76,7 @@ where
                 ui_zoom,
                 zoom_changed,
                 leaves: &mut self.s.leaves,
+                producers: &mut self.s.producers,
                 set_sheet: &mut self.s.pending_sheet,
                 set_ui_zoom: &mut self.s.pending_ui_zoom,
                 close: &mut self.s.close_requested,
@@ -352,6 +356,7 @@ where
         let dom_ref = dom.borrow();
         let source = SpriggingSource {
             rendered: &self.s.rendered,
+            producers: &self.s.producers,
         };
         let mut list = layout.emit_paint_list_with_leaves(
             &*dom_ref,
@@ -439,6 +444,7 @@ where
             // nothing to present. The layout still advances, so a resume
             // repaints current state rather than a stale one.
             let (lw, lh) = self.logical_size();
+            self.suspend_producers();
             let phase = crate::Instant::now();
             self.relayout(lw, lh);
             profile.relayout_us = elapsed_us(phase.elapsed());
@@ -463,6 +469,7 @@ where
         profile.leaf_boxes_us = self.s.last_leaf_boxes_us;
         profile.leaf_render_us = self.s.last_leaf_render_us;
         profile.leaf_repaints = self.s.last_leaf_repaints;
+        profile.producers = self.prepare_producers(scale);
         let phase = crate::Instant::now();
         self.sync_leaf_fragments();
         profile.leaf_fragments_us = elapsed_us(phase.elapsed());

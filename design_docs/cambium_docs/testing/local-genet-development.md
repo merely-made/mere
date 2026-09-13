@@ -4,7 +4,8 @@ Cambium landed in mere on 2026-09-03 (the platform boundary plan's P2). Its
 manifests now name the Genet seam crates through mere's root
 `[workspace.dependencies]`, which pins `genet.git` at one revision for the
 whole repository — not crates.io, and not a relative path into a sibling
-checkout. Repointing them is a one-file edit at mere's root.
+checkout. The standalone Graphshell web host and Cambium web smoke also restate
+these pins and the engine's vendored patches; update them in the same change.
 
 To test unpublished Genet seam changes, redirect that git source to a local
 Genet checkout in the uncommitted `.cargo/config.toml` at mere's root; copy
@@ -22,3 +23,10 @@ records, both learned the hard way:
 
 A change that requires the redirect is ready to publish only after the matching
 Genet seam release is on the pinned revision.
+
+The crates.io `parley` patch must also point at the selected Genet checkout's
+`support/patches/parley` during local engine work. A Git-source redirect alone
+does not replace this separate patch entry. For shipping verification, invoke
+Cargo from outside the repository with `--manifest-path` so its ignored local
+config is not inherited, and inspect resolved package sources. A successful local
+patch build cannot establish that the committed Genet and Netrender pins agree.

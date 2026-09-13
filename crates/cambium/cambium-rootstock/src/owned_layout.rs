@@ -19,6 +19,7 @@ use layout_dom_api::{LayoutDom, LocalName, Namespace, NodeKind};
 use paint_list_api::{ColorF, DeviceIntSize, LayoutPoint, LayoutRect, LayoutSize};
 
 mod interaction;
+mod producer;
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum ScrollTarget {
@@ -187,15 +188,10 @@ impl OwnedLayout {
         &self,
         dom: &D,
     ) -> Vec<(u64, (f32, f32))> {
-        let mut leaves = Vec::new();
-        walk(dom, dom.document(), &mut |node| {
-            if let Some(key) = custom_leaf_key(dom, node)
-                && let Some(fragment) = self.fragments.get(node)
-            {
-                leaves.push((key, (fragment.width, fragment.height)));
-            }
-        });
-        leaves
+        self.custom_leaf_nodes(dom)
+            .into_iter()
+            .filter_map(|(key, node)| Some((key, self.element_geometry(dom, node)?.content_size())))
+            .collect()
     }
 
     pub(crate) fn hit_test<D: LayoutDom<NodeId = NodeId>>(
