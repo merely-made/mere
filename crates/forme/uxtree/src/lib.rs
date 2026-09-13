@@ -174,8 +174,12 @@ fn engine_root_path(address: &str) -> String {
 }
 
 fn project_block(block: &Block, path: &str, nodes: &mut Vec<(NodeId, Node)>) -> NodeId {
+    if let Block::Presented { block, .. } = block {
+        return project_block(block, path, nodes);
+    }
     let id = node_id_for_path(path);
     let node = match block {
+        Block::Presented { .. } => unreachable!("presentation unwrapped above"),
         Block::Heading { level, spans } => {
             let mut n = Node::new(Role::Heading);
             n.set_label(inline_text(spans));
@@ -381,6 +385,7 @@ where
             },
             InlineSpan::Emphasis(inner)
             | InlineSpan::Strong(inner)
+            | InlineSpan::Presented { spans: inner, .. }
             | InlineSpan::Submit { spans: inner, .. } => {
                 walk_inline_links(inner, f);
             },
@@ -550,5 +555,32 @@ mod tests {
             .expect("link node");
         assert_eq!(link.label(), Some("the docs"));
         assert_eq!(link.value(), Some("https://example.test/"));
+    }
+
+    #[test]
+    fn presentation_preserves_accessible_identity_and_nested_links() {
+        let block = Block::Paragraph {
+            spans: vec![InlineSpan::Link {
+                url: "gemini://example.test/".into(),
+                title: None,
+                spans: vec![InlineSpan::Text("Read this".into())],
+                predicate: None,
+            }],
+        };
+        let plain = project_document(&doc_with(vec![block.clone()]));
+        let Block::Paragraph { spans } = block else {
+            unreachable!()
+        };
+        let styled = project_document(&doc_with(vec![Block::Presented {
+            presentation: inker::BlockPresentation::default(),
+            block: Box::new(Block::Paragraph {
+                spans: vec![InlineSpan::Presented {
+                    presentation: inker::InlinePresentation::default(),
+                    spans,
+                }],
+            }),
+        }]));
+        assert_eq!(plain.root, styled.root);
+        assert_eq!(plain.nodes, styled.nodes);
     }
 }
