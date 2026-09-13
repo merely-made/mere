@@ -732,3 +732,20 @@ app observation snapshot share the same status lines. These observations do
 not establish peer reachability, message delivery, or confidentiality. The
 focused validation and remaining headed gate live in
 `turnstone/design_docs/2026-07-28_turnstone_place_port_plan.md`.
+
+
+### I3d founder path and two-window place receipt, 2026-09-13
+
+Turnstone now founds a place, exports a place card, offers a pre-key, invites
+an offered pre-key, joins from an invitation file and sends a place message,
+all as palette actions with omnibar prompts. Founding is product code with a
+root grant opened at the authority clock; a founder binds listen-only with
+active mDNS and reports its own ticket, and reconnects through an empty
+rendezvous descriptor. A two-process driver under isolated vaults proved
+reframe steps 1, 2, 3 and 6: admission through an invitation, one shared
+root graph (converged empty), one message each way, and a stop, absent
+authoring, restart and convergence, with two Personae roots, one Moot and
+identical projection digests recorded on both sides. Steps 4, 5 and 7 stay
+open. Delivery, peer reachability and confidentiality remain unclaimed. The
+receipt and its limits live in
+`turnstone/design_docs/2026-07-28_turnstone_place_port_plan.md` under T5a.
