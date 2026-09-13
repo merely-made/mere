@@ -141,11 +141,11 @@ where
     /// size — the pair a Cambium pointer or wheel handler normalizes with
     /// (`local.0 / size.0` is a slider's value) without knowing layout.
     ///
-    /// Read from the *painted* rect, so an element inside a scrolled container
-    /// reports where it actually is rather than where it would be unscrolled.
+    /// Use Genet's inverse accumulated paint transform and scroll geometry.
+    /// Custom leaves use their content box; ordinary controls use their border box.
     /// `((0, 0), (0, 0))` when the node has no laid-out box.
     fn local_in(&self, node: NodeId) -> ((f32, f32), (f32, f32)) {
-        let rect =
+        let local =
             self.s
                 .runner
                 .as_ref()
@@ -153,12 +153,18 @@ where
                 .and_then(|(runner, layout)| {
                     let dom = runner.dom();
                     let dom_ref = dom.borrow();
-                    layout.painted_rect(&*dom_ref, node)
+                    layout.local_coordinates(&*dom_ref, node, self.s.cursor)
                 });
-        match rect {
-            Some((x, y, w, h)) => ((self.s.cursor.0 - x, self.s.cursor.1 - y), (w, h)),
-            None => ((0.0, 0.0), (0.0, 0.0)),
-        }
+        local.unwrap_or(((0.0, 0.0), (0.0, 0.0)))
+    }
+
+    fn producer_admits_pointer(&self, node: NodeId) -> bool {
+        let Some((runner, layout)) = self.s.runner.as_ref().zip(self.s.layout.as_ref()) else {
+            return false;
+        };
+        let dom = runner.dom();
+        let dom = dom.borrow();
+        layout.producer_admits_pointer(&*dom, node, self.s.cursor, &self.s.producers)
     }
 
     /// A left-button press in the content area: click, then drag capture, then
@@ -168,6 +174,9 @@ where
         let Some(node) = self.hit_at_cursor() else {
             return;
         };
+        if !self.producer_admits_pointer(node) {
+            return;
+        }
         // 1. The click, carrying the real hit point in the target's space.
         let (local, _) = self.local_in(node);
         let mut prevented = {
@@ -231,6 +240,9 @@ where
         let Some(node) = self.hit_at_cursor() else {
             return;
         };
+        if !self.producer_admits_pointer(node) {
+            return;
+        }
         // Measure against the element that would capture, exactly as `click`
         // does, so `local`/`size` are the handler's own box rather than the
         // deeper node the cursor happened to hit.

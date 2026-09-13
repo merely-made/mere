@@ -62,6 +62,11 @@ pub use harness::{Harness, inert_hooks};
 pub use cambium_rootstock::Instant;
 use cambium_rootstock::meristem_bounds::RootView;
 use cambium_rootstock::{Hook, HostState, env_size};
+pub use cambium_rootstock::{
+    ProducedTexture, ProducerContext, ProducerError, ProducerFrameInfo, ProducerFrameStats,
+    ProducerRegistrationError, ProducerRegistry, ResolvedAppearance, SourceAlpha, SourceEncoding,
+    TextureProducer,
+};
 pub use decorations::ClickCadence;
 #[derive(Clone, Copy, Debug)]
 enum HostEvent {
@@ -465,6 +470,7 @@ where
                     window.set_visible(false);
                 }
                 self.core.s.hidden = true;
+                self.core.suspend_producers();
             },
             Some(CloseDisposition::Exit) | None => {},
         }
@@ -820,6 +826,7 @@ where
     /// and the leaf registry all survive, so `resumed` re-boots a surface and
     /// repaints the same application rather than restarting it.
     fn suspended(&mut self, _event_loop: &ActiveEventLoop) {
+        self.suspend_producers();
         self.s.surface = None;
         // Fragment IDs belong to the renderer that just died. Redraw returns
         // early without a surface, so retire these here before resume installs
