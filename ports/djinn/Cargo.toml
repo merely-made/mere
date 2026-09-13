@@ -54,7 +54,10 @@ incipit.workspace = true
 # resident, and `trainer` pulls it deliberately and by the owner's request.
 distillery.workspace = true
 graphshell = { version = "0.0.2", path = "../graphshell", features = ["personal-sync"] }
+graphshell-endpoint.workspace = true
 knot-editor.workspace = true
+# Immutable saved-site snapshot contract published by Knot.
+knot-site = { git = "https://github.com/merely-made/knot-editor.git", rev = "6b68405e8fba77dd4cc3d9b7ac79d229ba42df71", package = "knot-site" }
 mere-resident.workspace = true
 # The policy vocabulary the device sensor fills in (`DeviceConditions`), and
 # the `ConditionSource` seam it plugs into. `mere-mesh` refuses to touch the
@@ -67,8 +70,14 @@ pandect.workspace = true
 personae = { workspace = true, features = ["agent"] }
 rand_core = { version = "0.6", features = ["getrandom"], optional = true }
 sceno.workspace = true
+scenotime.workspace = true
 serde = { version = "1", features = ["derive"] }
 serde_json.workspace = true
+rcgen = "0.13.2"
+rustls = { version = "0.23", default-features = false, features = ["ring", "std", "tls12"] }
+tokio-rustls = { version = "0.26", default-features = false, features = ["ring", "tls12"] }
+gemini-protocol = { version = "=0.1.7", features = ["server"] }
+sha2 = "0.10"
 ssh-agent-lib = "0.6"
 thiserror = "1"
 # "signal" is what lets the run loop stop the mesh works deliberately on Ctrl-C
@@ -114,6 +123,11 @@ libc = "0.2"
 [[bin]]
 name = "djinn"
 path = "src/bin/djinn.rs"
+required-features = ["personal-sync"]
+
+[[bin]]
+name = "djinn-site"
+path = "src/bin/djinn_site.rs"
 required-features = ["personal-sync"]
 
 [[bin]]

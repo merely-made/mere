@@ -12,6 +12,7 @@
 //! lifetimes and local storage topology coherent.
 
 use std::path::{Path, PathBuf};
+use std::sync::Arc;
 
 use castellan::resident::CastellanResident;
 use graphshell::native::endpoint_catalog::{
@@ -20,11 +21,13 @@ use graphshell::native::endpoint_catalog::{
 use mere_resident::{CloseAction, CloseFuture, close_all};
 use personae::bootstrap::Unlock;
 use personae::{IdentityProvider, ProfileId};
+use transport::BlobScope;
 use zeroize::Zeroize;
 
 use crate::resident_blobs::ResidentBlobCustody;
 use crate::resident_distillery::ResidentDistillery;
 use crate::resident_knot::ResidentKnot;
+use crate::resident_site::{PublishedSiteEndpoint, PublishedSiteService};
 use crate::settings::OwnerSettings;
 
 const CASTELLAN_RECORD_SALT: &[u8] = b"mere.djinn/castellan/records/v1";
@@ -34,6 +37,7 @@ const CASTELLAN_FRESHNESS_SALT: &[u8] = b"mere.djinn/castellan/freshness/v1";
 pub struct DjinnResident {
     credentials: CastellanResident,
     blobs: ResidentBlobCustody,
+    site: Arc<tokio::sync::Mutex<PublishedSiteService>>,
     knot: Option<ResidentKnot>,
     distillery: Option<ResidentDistillery>,
 }
@@ -60,10 +64,25 @@ impl DjinnResident {
     ) -> Result<Self, String> {
         let credentials = claim_credentials(identity, data_root, profile)?;
         let blobs = ResidentBlobCustody::open(data_root, &owner.content).await?;
+        let site_root = published_site_profile_root(data_root, profile);
+        let site_scope = published_site_profile_scope(profile);
+        let site = match PublishedSiteService::open(&site_root, site_scope, blobs.clone()).await {
+            Ok(site) => Arc::new(tokio::sync::Mutex::new(site)),
+            Err(open_error) => {
+                let close_error = blobs.shutdown().await.err();
+                return Err(match close_error {
+                    Some(close_error) => format!(
+                        "open published-site service: {open_error}; close blob custody: {close_error}"
+                    ),
+                    None => open_error,
+                });
+            },
+        };
         let knot = match owner.knot {
             Some(settings) => match ResidentKnot::open(data_root, settings, blobs.clone()).await {
                 Ok(knot) => Some(knot),
                 Err(open_error) => {
+                    drop(site);
                     let close_error = blobs.shutdown().await.err();
                     return Err(match close_error {
                         Some(close_error) => {
@@ -89,6 +108,7 @@ impl DjinnResident {
                             Some(knot) => knot.close().await.err(),
                             None => None,
                         };
+                        drop(site);
                         let close_error = blobs.shutdown().await.err();
                         let mut message = format!("open resident Distillery: {open_error}");
                         if let Some(knot_error) = knot_error {
@@ -106,6 +126,7 @@ impl DjinnResident {
         Ok(Self {
             credentials,
             blobs,
+            site,
             knot,
             distillery,
         })
@@ -119,6 +140,22 @@ impl DjinnResident {
     /// Clone the shared physical blob custody for a composed product lane.
     pub fn blobs(&self) -> ResidentBlobCustody {
         self.blobs.clone()
+    }
+
+    /// Djinn's ordinary immutable-site service. Callers arrive through its
+    /// separately admitted first-party route; this never exposes Knot vault or
+    /// evidence authority.
+    pub fn published_site(&self) -> Arc<tokio::sync::Mutex<PublishedSiteService>> {
+        Arc::clone(&self.site)
+    }
+
+    /// Register the owner-only published-site route. It shares no Knot route,
+    /// sync pairing, or evidence reader authority.
+    pub fn register_published_site_route(
+        &self,
+        catalog: &mut ResidentEndpointCatalog,
+    ) -> Result<ResidentEndpointRoute, ResidentEndpointCatalogError> {
+        PublishedSiteEndpoint::register(Arc::clone(&self.site), catalog)
     }
 
     /// Register the optional Knot source under its stable first-party route.
@@ -196,6 +233,7 @@ impl DjinnResident {
         let Self {
             credentials,
             blobs,
+            site,
             knot,
             distillery,
         } = self;
@@ -212,6 +250,20 @@ impl DjinnResident {
                             Some(distillery) => distillery.close().await,
                             None => Ok(()),
                         }
+                    }) as CloseFuture<'static>
+                }) as CloseAction<'static>,
+            ),
+            (
+                "published site",
+                Box::new(move || {
+                    Box::pin(async move {
+                        let site = Arc::try_unwrap(site)
+                            .map_err(|_| {
+                                "published-site route still has active borrowers".to_string()
+                            })?
+                            .into_inner();
+                        site.shutdown();
+                        Ok(())
                     }) as CloseFuture<'static>
                 }) as CloseAction<'static>,
             ),
@@ -282,6 +334,16 @@ fn claim_credentials<P: IdentityProvider + ?Sized>(
     claimed.map_err(|error| format!("claim Castellan resident: {error}"))
 }
 
+fn published_site_profile_root(data_root: &Path, profile: &ProfileId) -> PathBuf {
+    data_root
+        .join("published-sites")
+        .join(blake3::hash(profile.0.as_bytes()).to_hex().to_string())
+}
+
+fn published_site_profile_scope(profile: &ProfileId) -> BlobScope {
+    BlobScope::new(*blake3::hash(profile.0.as_bytes()).as_bytes())
+}
+
 fn credential_profile_root(data_root: &Path, profile: &ProfileId) -> PathBuf {
     let segment: String = profile
         .0
@@ -308,7 +370,9 @@ fn credential_profile_root(data_root: &Path, profile: &ProfileId) -> PathBuf {
 mod tests {
     use personae::{IdentityProvider, InMemoryProvider, ProfileId};
 
-    use super::credential_profile_root;
+    use super::{
+        credential_profile_root, published_site_profile_root, published_site_profile_scope,
+    };
 
     #[test]
     fn credential_roots_stay_profile_scoped_and_below_the_data_root() {
@@ -332,5 +396,20 @@ mod tests {
                 .unwrap()
                 .to_seed()
         );
+    }
+    #[test]
+    fn published_sites_keep_profile_paths_and_custody_scopes_distinct() {
+        let root = std::path::Path::new("resident-data");
+        let work = ProfileId("work/../burner".into());
+        let personal = ProfileId("personal".into());
+        assert_ne!(
+            published_site_profile_root(root, &work),
+            published_site_profile_root(root, &personal)
+        );
+        assert_ne!(
+            published_site_profile_scope(&work),
+            published_site_profile_scope(&personal)
+        );
+        assert!(published_site_profile_root(root, &work).starts_with(root));
     }
 }

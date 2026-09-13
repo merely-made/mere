@@ -446,11 +446,11 @@ release:
 
 ## 13. Ordinary site serving and governed replication (2026-09-11 scope)
 
-**Status:** proposal only. The authorized implementation in
-`knot-editor/design_docs/2026-09-11_small_web_authoring_plan.md` adds ordinary
-native files, explicit snapshot publication and in-process loopback serving.
-It does not install a daemon or enable a public listener. The release gate and
-earlier phases above are not claimed complete by this proposal.
+**Status:** ordinary saved-snapshot service implemented; local resident retrieval
+and restart acceptance passed. Knot's in-process serving remains available. Djinn now has a separate
+owner-controlled Gemini publication route and CLI, described below. Public
+binding and governed replication retain their own gates; this does not complete
+the resident release gate or the earlier phases above.
 
 ### Verified composition seams
 
@@ -458,7 +458,8 @@ earlier phases above are not claimed complete by this proposal.
 resident Knot, identity and Distillery. `resident_knot.rs::ResidentKnot` keeps
 one source and optional personal sync host alive. `resident_blobs.rs` provides
 scoped blob custody and rebinds serving leases after restart. These are useful
-existing services, but none makes Djinn a general small-web site host.
+existing services. The bounded Gemini service below composes them without
+turning Djinn into a general application server.
 
 `crates/system/errand/src/serve` separates content through `Source` and
 `Item::Document` from protocol projection. `gemini-protocol::server` and
@@ -522,41 +523,92 @@ Before persistent rollout is concrete and reviewable, settle and verify:
    Djinn restart, plus bind-conflict, malformed-request, resource-bound and
    shutdown tests. Public exposure needs its own reviewed deployment receipt.
 
-This section proposes ownership and done-conditions. It neither schedules a
-daemon rollout nor selects public binding for the user.
+These contracts retain the ownership and done-conditions for further protocols
+and deployment. The first implementation only binds the loopback interface.
 
 ### Implementation boundary and first acceptance (2026-09-13)
 
-**Status:** scoped, not implemented. Current code sharpens the proposal:
+**Status:** first ordinary Gemini service implemented, with an actual local
+resident and independent-reader receipt on 2026-09-13.
 
-- Knot's `crates/knot-site/src/lib.rs::Site::publication` reopens saved metadata and files
-  before constructing an immutable `Publication`; its page collection is private.
-  The missing handoff is a versioned snapshot descriptor plus read-only bytes,
-  usable across processes. It is not an editor-buffer or vault handle.
-- Knot's `crates/knot-site/src/local.rs` owns a loopback listener, temporary
-  certificate and worker lifetime. Desktop `scroll_site.rs` replaces or stops
-  that local server. Reusing its protocol work does not supply durable identity.
-- Djinn's `ResidentBlobCustody` already supplies shared physical storage and
-  serving-scope rebinding. `ResidentKnot`'s admitted local route and pairing refresh
-  serve personal sync/evidence; those grants do not authorize a website's audience.
-  The daemon lifecycle in `ports/djinn/src/bin/djinn.rs` is the supervision seam.
+- Knot's `PublishedSnapshotV1` (knot-editor `6b68405`) serializes the selected
+  saved pages, native format, metadata and exact bytes. Validation enforces
+  canonical encoding, path/MIME constraints and bounded content. Thirteen
+  standalone snapshot tests pass. No authoring directory or editor buffer is
+  exposed to the daemon.
+- `ports/djinn/src/resident_site.rs` retains a snapshot under a profile-scoped
+  blob lease and persists its digest, listener policy and certificate fingerprint.
+  Each selected profile gets one publication and its own durable TLS identity.
+  The default startup policy is stopped; resuming after restart requires explicit
+  `resume_on_restart`. The API bounds connections and total request lifetime.
+- `djinn-site publish SITE_DIR [PORT] [--resume]` uploads a complete snapshot in
+  64 KiB frames through `published-site-v1`, then explicitly commits it. A page
+  is limited to 1 MiB, all raw pages to 16 MiB, and the encoded snapshot to 24 MiB.
+  The live listener accepts only a completed, digest-verified revision. Later
+  edits to the authoring files do not change the publication.
+- The application broker admits local owner processes and grants this route to
+  the `knot-editor` label. That label is routing metadata, not authenticated
+  executable identity. Website reader access is independent of personal-sync
+  or evidence-reader authority. Status uses a valid portable card referencing
+  separately typed status bytes.
+- Stop releases the listener while retaining the snapshot. Remove releases the
+  publication's lease separately; retained cleanup is visible and retryable.
+  The certificate remains for the next publication. Restore refuses missing or
+  mismatched identity instead of silently rotating it.
 
-Implement one ordinary saved-snapshot service first: Knot selects and submits a
-complete revision; Djinn retains its exact bytes, descriptor, identity reference
-and explicit startup policy. Local authenticated publish/replace/stop/remove/status
-operations control that service. Begin with Gemini to exercise stable TLS identity
-and an existing ordinary browser. Reuse a process-neutral snapshot source and
-listener lifecycle so Spartan and NomadNet can follow with their own identities
-and independent-client receipts. Parsing Micron forms is not a prerequisite.
+The initial authoring caller is the CLI. A Knot desktop publish-to-Djinn control,
+explicit identity rotation, installation, public binding, additional protocols,
+and governed hosting are further slices. Existing `knot-site` local serving is
+still a separate editor-owned lifetime.
 
-Done when a separate Lagrange process reads the selected revision after Knot
-exits and again after Djinn restarts, using the same certificate. Also record
-byte-exact protocol retrieval, atomic revision replacement, interrupted-handoff
-recovery, unauthorized-caller refusal, bind conflicts, byte/connection bounds
-and clean shutdown. Unsaved edits must remain absent. Stop releases the listener;
-removal separately determines retained content. A changed certificate is an
-explicit rotation outcome, not a normal restart. This proves local resident
-serving only; public and two-machine exposure require their own receipts.
+Acceptance must distinguish the standalone publisher process from a headed
+Knot window. The local resident gate requires ordinary Lagrange reading after
+the publisher exits, after a Djinn restart with the same certificate, byte-exact
+TLS retrieval, and absent unpublished edits. Focused lifecycle tests cover
+replacement failure, stop/reopen, profile isolation and connection limits. A
+headed Knot handoff, clean operating-system shutdown and public/two-machine
+exposure retain separate receipts. Stock-reader byte retrieval is not a visual
+layout or theme acceptance result.
+
+#### Local resident receipt (2026-09-13)
+
+The actual `djinn` and `djinn-site` binaries built with Rust 1.97.1,
+`--locked --offline -j2`, against the published Knot snapshot contract
+`6b68405`, Genet `101d9e9` and Netrender `3961aca`. The shared dependency
+baseline is Mere `b5750a96`; the new resident implementation was tested from
+this checkout before publication. The library suite passes 74 tests; the public
+service integration passes three tests covering occupied-port rollback,
+persisted stop/reopen and independent profile custody. Final binaries were
+rebuilt after the lifecycle fixes, then the independent acceptance below was
+repeated successfully.
+
+A separate publisher submitted a saved two-page Gemini site to an isolated,
+owner-only named-pipe endpoint. After that process exited, the authoring file
+was changed without republishing. Python's TLS client retrieved the original
+69 bytes exactly, and stock Lagrange 1.21.1 `--dump` retrieved the same content
+(normalizing only its Windows stdout newlines). After abrupt termination and
+restart of the task-owned Djinn process, both readers retrieved that revision
+again with the same certificate. Stop and remove succeeded; a further resident
+restart reported `Unavailable`.
+
+- Tested `djinn.exe` SHA-256: `f929e4b53fe32fe835861ee4e0ed15deb981c29d55fb9d2fe4fca502223c9d0b`.
+- Tested `djinn-site.exe` SHA-256: `db8d08dfab8f88f32da0597d02b4fa4eca8cf016f31946cc8c103d0aa9782c36`.
+- Selected body SHA-256: `0f8e13689b24cbba4952e583343df84c0e652b8c58eb6fb05595f65fdf8366c8`.
+- Certificate SHA-256 before/after restart: `db67ef36257e429cfe07051bf30a62f0b3fcac2153713ca3bf7bb469cb067aad`.
+- Stock portable client release: [Lagrange v1.21.1](https://github.com/skyjake/lagrange/releases/tag/v1.21.1).
+  Downloaded ZIP SHA-256: `d5c65777d9075f79b78fd58d92c8efd340729a3dd5b79358d3c1016e2fc615f1`.
+- Raw local receipt directory: `C:/t/smolweb-next-20260913/acceptance/`;
+  orchestration log: `C:/t/smolweb-next-20260913/resident-acceptance.log`.
+  The directory includes a private test vault and identity; it is not a
+  publication artifact and must not be copied into source control.
+
+The accepted reader URL was `gemini://localhost:<bound-port>/`. The same stock
+client refused the literal `127.0.0.1` URL with certificate-verification status
+`-87`; ordinary verification stayed enabled for the successful hostname run.
+Python's independent check also pinned the exact certificate across restart.
+This records CLI publication and resident recovery, not a headed Knot publish
+control, visual Lagrange rendering, public exposure, power-loss testing or clean
+operating-system shutdown. The source files remained ordinary files throughout.
 
 Governed selective hosting follows the production records in the
 [Moot publication plan](../../moothold_docs/implementation_strategy/2026-06-12_moot_object_m1_plan.md#community-collections-and-author-offline-publishing-2026-09-04).

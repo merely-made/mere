@@ -13,12 +13,48 @@ when they use persona-held state.
 ## Run
 
 ```text
-cargo run -p djinn --bin djinn -- --vault-dir <personae-vault> --data-root <data-root>
+cargo run -p djinn --bin djinn -- --dir <personae-vault> --data-root <data-root>
 ```
 
 The default configuration continues to read the existing Graphshell
 application directory. That is a compatibility bridge for selected profiles,
 pairing records, and content-store migrations, not an additional resident.
+
+## Saved Gemini sites
+
+`djinn-site` submits an ordinary saved Knot site to the running resident through
+its owner-only application broker. Each selected Personae profile has one
+publication, its own certificate, and independently retained content.
+
+```text
+djinn-site publish <site-directory> 1965 --resume
+djinn-site status
+djinn-site stop
+djinn-site remove
+```
+
+The port is optional; zero asks the operating system for a free loopback port.
+Status reports the bound address, snapshot digest and certificate fingerprint.
+Browse `gemini://localhost:<reported-port>/` in Lagrange. The stock 1.21.1 client
+passed with this hostname; its IP-literal certificate check refused the same
+loopback certificate, so `127.0.0.1` is not an accepted Lagrange URL receipt.
+`--resume` explicitly enables serving after a resident restart. Without it,
+the saved publication starts stopped on the next run. The default listener is
+restricted to `127.0.0.1`. The broker endpoint follows
+`GRAPHSHELL_APP_ENDPOINT`, matching the resident's `--app-endpoint` when one is
+selected.
+
+Publishing selects saved bytes once. Later source edits become visible only
+after another successful publish. Stop releases the listener and retains the
+publication. Remove forgets the serving record and releases its storage lease;
+status reports retained custody if cleanup needs retrying. The profile's TLS
+identity remains available for its next publication. Missing or mismatched
+identity files are refused during serving restoration.
+
+The initial caller is a command-line utility. Knot's desktop controls, explicit
+certificate rotation, additional protocols, public binding and governed moot
+hosting remain separate integration work. Exporting Tabard's Lagrange palette
+does not change Gemini page content or this listener's policy.
 
 ## Publishing
 
