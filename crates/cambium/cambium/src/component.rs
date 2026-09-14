@@ -91,7 +91,7 @@ impl<Props, Local, Event, State, Action, Output, Init, Reconcile, Body, OnEvent>
     Component<Props, Local, Event, State, Action, Output, Init, Reconcile, Body, OnEvent>
 {
     /// Stamp a caller-owned, DOM-visible identity on the component root for
-    /// `genet-probe` attribute selectors.
+    /// `taproot` attribute selectors.
     #[must_use]
     pub fn probe_id(mut self, id: impl Into<String>) -> Self {
         self.probe_id = Some(id.into());

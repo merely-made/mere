@@ -58,8 +58,14 @@ rendering engine.
 Cambium is now a Mere workspace family under `crates/cambium/`; it is not a
 Genet workspace subtree. Mere owns the current `cambium`, `meristem`,
 `sprigging`, and `workbench` paths, while pinning Genet seam packages at one
-immutable `genet.git` revision (`101d9e9ade8671564e723443d9f0498e899a33f1`).
+immutable `genet.git` revision (`7baa554c66f966295ee945d908738b635afe136a`).
 Errand is likewise Mere-owned at workspace version 0.3.4.
+
+That pin moved from `101d9e9ade8671564e723443d9f0498e899a33f1` on 2026-09-14,
+eight commits forward, to take `genet-probe`'s new name `taproot`. The
+compatibility table below was not re-validated at the new revision; the
+2026-09-13 receipt in the architecture doc still names the old one, which is
+what it measured.
 
 The external viewport bridge uses that revision's content-box geometry and typed
 used-color queries. Genet's vendored Parley and Taffy patch entries carry the same

@@ -14,6 +14,8 @@ remain for source compatibility during consumer migration.
 - `cambium-winit`: winit keyboard translation for Cambium applications
 - `cambium-nematic`: reactive views and themes over Errand's smolweb ASTs
 - `sprigging`: engine-neutral custom leaves and arrangement geometry
+- `mesquite`: the scenario lane over a document host — scenario ticking,
+  captures, pixel checks, cost accounting and one JSON receipt
 
 Every crate is MPL-2.0 (see the repository `LICENSE`); Meristem, a Xilem
 derivative, keeps the Xilem Authors' Apache-2.0 notice in each derived file.

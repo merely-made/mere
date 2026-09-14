@@ -1061,7 +1061,7 @@ mod tests {
 
     #[test]
     fn a_probe_can_reach_every_instance_by_carried_identity() {
-        use genet_probe::{ProbeSurface, Selector, resolve};
+        use taproot::{ProbeSurface, Selector, resolve};
 
         let names = named(&[
             ("fixture.map", "harbor", "Harbor"),
@@ -1097,7 +1097,7 @@ mod tests {
 
     #[test]
     fn a_probe_resolves_an_instance_by_its_announced_name() {
-        use genet_probe::{ProbeSurface, Selector, resolve, text_present};
+        use taproot::{ProbeSurface, Selector, resolve, text_present};
 
         let names = named(&[("fixture.map", "harbor", "Harbor")]);
         let frozen = FrozenScene::freeze(&coastal(), "Coastal map", &names);
@@ -1133,7 +1133,7 @@ mod tests {
 
     #[test]
     fn two_instances_sharing_a_name_stay_distinguishable() {
-        use genet_probe::{ProbeSurface, Selector, resolve};
+        use taproot::{ProbeSurface, Selector, resolve};
 
         // The documented reason data attributes exist: a visible label that is
         // not unique. Two sources, one name.

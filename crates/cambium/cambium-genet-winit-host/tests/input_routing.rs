@@ -24,7 +24,7 @@ use cambium::{
     TextInput, WheelEvent, clickable, el, focusable, on_hover, on_key, on_pointer, on_wheel, text,
 };
 use cambium_genet_winit_host::{FocusedTextSlot, Harness, HostHooks, Init, Modifiers, inert_hooks};
-use genet_probe::Selector;
+use taproot::Selector;
 use winit::keyboard::{Key, NamedKey};
 
 // ---------------------------------------------------------------- the app
@@ -450,7 +450,7 @@ fn enter_activates_the_focused_control() {
 }
 
 /// Semantic targeting: the harness resolves a control by role and label and
-/// clicks it, which is the same resolver a `genet-probe` scenario uses.
+/// clicks it, which is the same resolver a `taproot` scenario uses.
 #[test]
 fn a_control_can_be_clicked_by_role_and_label() {
     let mut h = harness();
