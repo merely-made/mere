@@ -749,3 +749,45 @@ identical projection digests recorded on both sides. Steps 4, 5 and 7 stay
 open. Delivery, peer reachability and confidentiality remain unclaimed. The
 receipt and its limits live in
 `turnstone/design_docs/2026-07-28_turnstone_place_port_plan.md` under T5a.
+
+### I3e lane leave latency, planned 2026-09-13
+
+A same-process `Reconnect place` in Turnstone must leave its nine live lanes
+before it can reopen the Moot store, because each lane's p2panda `LogSync`
+actor holds a store clone on its own thread-local spawner thread. Leaving
+costs about five seconds regardless of traffic. Assessed against the pinned
+fork `mark-ik/p2panda` at `85f88345` (tag `mere-p2panda-net-0.7.3`):
+
+- `stickleback/src/joined_space.rs:194-203` `leave_and_wait` calls
+  `LogSync::shutdown`, which is `stop_and_wait(None, None)` with no timeout
+  (`p2panda-net/src/sync/log_sync/api.rs:118-124`).
+- `SyncManager::post_stop` drains each topic manager untimed
+  (`sync/actors/manager.rs:280-295`); `TopicManager::post_stop` drains its
+  poller with `drain_and_wait(Some(5000 ms))` (`sync/actors/topic_manager.rs:167`).
+- The poller loops on `manager.subscribe()` (`poller.rs:59-72`) whose sender
+  lives in `TopicManagerState` and is dropped only after `post_stop` returns,
+  so with no peer event the drain always runs to the ceiling. Nine lanes in
+  parallel cost one ceiling; in sequence, nine.
+- The remaining 200 to 600 ms before the store reopens is the spawner threads
+  unwinding their actor state (`ractor-0.16.5/src/thread_local.rs:447-487`);
+  each lane creates two such threads. Best-evidence account, not instrumented.
+
+Turnstone cannot shorten this; it can only abandon the wait, which leaves the
+store clone held at reopen. The fix belongs in the fork.
+
+**Candidate fixes, in preference order.** (1) Make the poller terminable:
+one `stream.next()` per message with a re-cast, or a select against the
+actor's own drain signal, so the drain completes in microseconds. (2) Close
+the manager's senders before draining the poller in `TopicManager::post_stop`,
+so the stream ends on its own; needs a `close` on `TopicSyncManager` and a
+check that no in-flight event is truncated. (3) A configurable, shorter drain
+timeout at the one constant; a band-aid that can cut a real peer drain short.
+Sharing one spawner across the nine lanes trims threads but not the ceiling.
+
+**Done when:** a fork commit on a new `mere-p2panda-net` tag makes the lanes
+test `a_closed_live_bind_releases_the_store_lock_for_a_reopen` in
+`turnstone/src/place/lanes.rs` report a release under one second with the
+Turnstone `LEAVE_BUDGET` unchanged, the existing p2panda-net sync tests pass,
+and the two-window proof's return phase still converges. Turnstone then
+repins mere and the fork together; the reopen retry stays as the guard for
+the spawner tail.
