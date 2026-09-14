@@ -750,7 +750,21 @@ open. Delivery, peer reachability and confidentiality remain unclaimed. The
 receipt and its limits live in
 `turnstone/design_docs/2026-07-28_turnstone_place_port_plan.md` under T5a.
 
-### I3e lane leave latency, planned 2026-09-13
+### I3e lane leave latency, planned 2026-09-13, done 2026-09-14
+
+**Result.** Fork commit `3bb36461` (release `mere-p2panda-net-0.7.4`, upstream
+merged through `b90081d9`) takes candidate (1): the topic manager hands its
+poller a finish signal and fires it in `post_stop` when no sync session actors
+remain; the poller forwards anything already buffered and returns, so the
+drain completes instead of running out its ceiling. Idle shutdown of one
+subscribed topic measures about half a millisecond, down from five seconds;
+with sessions alive the poller is untouched and the timeout still bounds the
+drain. The Turnstone lanes test reports the store lock released about 494 ms
+after the leave, inside the reopen retry. Every consumer pins the crate's
+exact version, so knot-editor (`30c85702`) and mere (`0db9d10d`, then
+`976ca0a0` for the knot-editor repin) moved together. The plan text below is
+kept as the record of the diagnosis.
+
 
 A same-process `Reconnect place` in Turnstone must leave its nine live lanes
 before it can reopen the Moot store, because each lane's p2panda `LogSync`
