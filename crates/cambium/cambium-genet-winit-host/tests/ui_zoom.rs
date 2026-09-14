@@ -25,7 +25,7 @@ use cambium::{AnyView, GenetCtx, GenetElement, WheelEvent, clickable, el, on_whe
 use cambium_genet_winit_host::{
     Harness, HostHooks, HostOptions, Init, Modifiers, ZOOM_LADDER, fit_zoom, inert_hooks,
 };
-use genet_probe::Selector;
+use taproot::Selector;
 
 // ---------------------------------------------------------------- the app
 
@@ -122,7 +122,7 @@ fn harness_at(zoom: f32) -> Harness<App, fn(&App) -> Child, Child> {
 fn painted(h: &Harness<App, fn(&App) -> Child, Child>, class: &str) -> (f32, f32, f32, f32) {
     let node = h
         .with_dom(|dom| {
-            genet_probe::matching(dom, &Selector::class(class))
+            taproot::matching(dom, &Selector::class(class))
                 .first()
                 .copied()
         })

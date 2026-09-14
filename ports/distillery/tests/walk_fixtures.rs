@@ -22,7 +22,7 @@
 //!   time a crate is added, so there is no committed snapshot any more.
 //! - **The bare scenario.** `distillery.installed.v1` composed against a
 //!   scripted DOM and driven by its own runner, with one exact resident
-//!   receipt observed. This is the skeleton the headed genet-probe receipts of
+//!   receipt observed. This is the skeleton the headed taproot receipts of
 //!   W1 and W4 grow from.
 //!
 //! Every identity here is seeded and every instant is authored, so two runs

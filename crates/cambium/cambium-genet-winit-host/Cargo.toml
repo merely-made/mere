@@ -26,7 +26,8 @@ cambium-winit-a11y = { version = "0.3.0", path = "../cambium-winit-a11y" }
 sprigging = { version = "0.2.1", path = "../sprigging" }
 # The semantic-selector resolver the headless `Harness` drives applications by,
 # so a host test targets a control by role and label rather than by pixel.
-genet-probe = { workspace = true }
+# Named genet-probe until genet 7baa554c (2026-09-14).
+taproot = { workspace = true }
 genet-scripted-dom = { workspace = true }
 genet-winit-host = { workspace = true }
 layout_dom_api = { workspace = true }

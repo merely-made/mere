@@ -29,7 +29,7 @@
 //! states and its keyboard order without a display.
 
 use cambium_winit_a11y::{A11yAction, A11yRequest};
-use genet_probe::{ProbeSurface, Selector};
+use taproot::{ProbeSurface, Selector};
 use genet_scripted_dom::NodeId;
 use winit::keyboard::{Key as WinitKey, NamedKey};
 
@@ -361,7 +361,7 @@ where
         f(&dom_ref)
     }
 
-    /// Present the retained DOM to a `genet-probe` visitor as this app's single
+    /// Present the retained DOM to a `taproot` visitor as this app's single
     /// surface, so `resolve` / `text_present` work against it unchanged.
     pub fn with_surfaces<R>(&self, f: impl FnOnce(&[ProbeSurface<'_>]) -> R) -> R {
         let dom = self.runner().dom();
@@ -383,7 +383,7 @@ where
     pub fn resolve(&self, selector: &Selector) -> Option<(f32, f32)> {
         let dom = self.runner().dom();
         let dom_ref = dom.borrow();
-        genet_probe::matching(&dom_ref, selector)
+        taproot::matching(&dom_ref, selector)
             .into_iter()
             .find_map(|node| {
                 self.painted_rect(node)

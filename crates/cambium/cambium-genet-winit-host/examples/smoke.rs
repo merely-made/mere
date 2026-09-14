@@ -44,7 +44,7 @@ use cambium_genet_winit_host::{
     AppCtx, AppFrameInsets, Frame, HostHooks, HostOptions, HostPointer, Init, Runner,
     WindowCommand, WindowFrame, read_frame, run,
 };
-use genet_probe::{Automatable, Driveable, ProbeSnapshot, ProbeSurface, Progress, Scenario};
+use taproot::{Automatable, Driveable, ProbeSnapshot, ProbeSurface, Progress, Scenario};
 
 // ------------------------------------------------------------------ state
 
@@ -208,7 +208,7 @@ fn root(state: &Smoke) -> Child {
 
 // The controls keep genet's UA `display: inline-block`, the standards-correct
 // display for a form control. They used to need `display: block`: an inline-level
-// box got no fragment of its own, so neither `painted_rect` nor a `genet-probe`
+// box got no fragment of its own, so neither `painted_rect` nor a `taproot`
 // selector could locate one, and an app had to style its controls to suit the
 // driver. The engine now reads a rect back per inline box, so the scenario below
 // drives these buttons by role and label with nothing arranged for it.
@@ -483,7 +483,7 @@ impl Lane {
         }
     }
 
-    fn write_receipt(&mut self, outcome: genet_probe::Outcome) {
+    fn write_receipt(&mut self, outcome: taproot::Outcome) {
         if self.finished {
             return;
         }

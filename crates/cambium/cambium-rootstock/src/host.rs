@@ -567,7 +567,7 @@ impl FrameProfile {
 /// logical window coordinates.
 ///
 /// The host owns hit testing, capture, and the dispatch order, so an
-/// application that drives itself — a `genet-probe` scenario clicking a
+/// application that drives itself — a `taproot` scenario clicking a
 /// resolved element, a demo replaying a gesture — must not re-roll that
 /// routing. It queues one of these instead and the host runs it through the
 /// same path a real mouse takes, so a self-driven receipt exercises the

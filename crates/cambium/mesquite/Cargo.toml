@@ -1,0 +1,31 @@
+[package]
+name = "mesquite"
+version = "0.1.0"
+description = "The scenario lane for a Cambium document host: ticks a taproot scenario per presented frame, arms captures, writes PNGs and one JSON receipt, checks pixels, accounts cost, and sets the exit code, behind a Product trait each app implements"
+edition.workspace = true
+rust-version = "1.92"
+license = "MPL-2.0"
+repository.workspace = true
+# Publishes with the rest of the family once taproot can (a stale buckram
+# release blocks taproot's own publish today).
+publish = false
+
+[dependencies]
+# The document host seam this lane drives: `AppCtx`, the capture arming hook,
+# `read_frame`, the frame profile and the pointer queue. Path deps like every
+# other member of the family.
+cambium = { version = "0.3.3", path = "../cambium" }
+cambium-rootstock = { version = "0.1.0", path = "../cambium-rootstock" }
+# The scenario grammar, the selector resolver and the `Automatable`/`Driveable`
+# seam this crate implements generically. Through the workspace genet pins, so
+# one genet identity stays in every consumer's graph.
+# Named genet-probe until genet 7baa554c (2026-09-14).
+taproot = { workspace = true }
+# Carried from the source crate. No `use` in this crate's own code: it is here
+# so the DOM type taproot resolves against is pinned from the same workspace
+# entry the rest of the family uses.
+genet-scripted-dom = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+# The capture encoder and the decoder the pixel checks read back through.
+png = "0.17"
