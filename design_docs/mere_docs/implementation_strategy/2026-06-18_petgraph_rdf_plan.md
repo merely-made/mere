@@ -420,3 +420,35 @@ kernel directly, with no oxigraph Store in the path.
   dataset/SPARQL path as RDF 1.2 reifier nodes keyed by `StatementId`. The
   JSON-LD shapers still stay on direct default-graph node quads, and ingest still
   treats triple-term reifier metadata as a deferred gap.
+
+- **2026-09-15 (consumer audit, from Knot)** — Knot is designing predicate
+  identity for authored relations
+  (`knot-editor/design_docs/2026-09-15_knot_predicates_inference_scripting_plan.md`,
+  Track 1) and consumes `vocab.rs` as the standard alignment for its core
+  predicates. It is the first consumer to read the table against a writer's
+  meaning, and four rows read differently from the outside. Recorded here as
+  proposals for Mere to rule on; Knot consumes the table as it stands until
+  then.
+
+  | Sub-kind | Table today | Proposal | Why |
+  | --- | --- | --- | --- |
+  | `Supports` | Exact `cito:agreesWith` | Exact `cito:supports` | CiTO separates agreeing with a statement (opinion) from providing intellectual or factual support for it (evidence). A writer's "supports" is the evidence sense. |
+  | `Contradicts` | Exact `cito:disagreesWith` | Exact `cito:disputes`, with `cito:refutes` reachable by specialization | Same split: disagreeing is opinion, disputing is a claim against a claim, refuting is disputing with evidence. Knot keeps one writer predicate and lets a defined predicate narrow it. |
+  | `Elaborates` | Approximate `cito:cites` | Exact `cito:extends` | CiTO has the term; "cites" loses the meaning. |
+  | `Hyperlink` | Approximate `rdfs:seeAlso` | Exact `cito:linksTo` | `linksTo` is defined as providing a link in the form of a URL to the cited entity, which is the fact exactly. |
+
+  Two further rows are worth a look while the table is open: `ExampleOf` is
+  Mere-only and `schema:exampleOfWork` is an approximate superproperty;
+  `Summarizes` sits under `cito:cites` and `cito:describes` is the closer
+  superproperty. Neither blocks Knot.
+
+  Two Knot-side facts the table's consumer should know. Knot exports
+  assertions with Web Annotation selectors on each endpoint and PROV
+  attribution to a `did:key` author, and will carry an author-asserted
+  `asserted_at_ms` on operations, matching this plan's statement metadata.
+  And Knot's user-defined predicates export as `rdfs:subPropertyOf` a
+  standard or Mere IRI in the vocabulary graph, the same mechanism this
+  module uses, so a reasoner treats them like any Mere-only term with a
+  declared superproperty. The raw-IRI `Semantic` edge path (Phase 2's
+  deferred half) is what Knot needs for those predicates to enter a Mere
+  graph rather than be reported as unrecognized.
