@@ -36,6 +36,8 @@ fn harness_with(
             state: State::default(),
             logic: root as Logic,
             sheet: String::new(),
+            fonts: Vec::new(),
+            images: Vec::new(),
         },
         hooks,
     )

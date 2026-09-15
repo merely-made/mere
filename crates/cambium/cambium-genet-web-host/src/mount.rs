@@ -106,10 +106,13 @@ where
         state,
         logic,
         sheet,
+        fonts,
+        images,
     } = init(&window, &s.commands.clone(), &wake);
     let dom = Rc::new(RefCell::new(ScriptedDom::new()));
 
     s.sheet = sheet;
+    s.set_resources(fonts, images);
     s.runner = Some(Runner::new(dom, logic, state));
     s.a11y = Some(Box::new(DomAccessibility::new(canvas.clone(), label)));
     s.window = Some(Box::new(window.clone()));

@@ -713,6 +713,8 @@ fn main() {
             },
             logic: root as Logic,
             sheet: SHEET.to_string(),
+            fonts: Vec::new(),
+            images: Vec::new(),
         },
         hooks,
     )

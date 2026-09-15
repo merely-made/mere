@@ -24,7 +24,7 @@
 //!
 //! ```ignore
 //! let options = HostOptions { title: "App".into(), ..Default::default() };
-//! run(options, |window, commands, wake| Init { state, logic, sheet }, hooks)
+//! run(options, |window, commands, wake| Init { state, logic, sheet, fonts, images }, hooks)
 //! ```
 
 use std::sync::Arc;
@@ -52,10 +52,10 @@ mod x11_frame;
 pub use cambium_rootstock::{
     AppCtx, AppFrameInsets, AppHook, AppRegion, CaptureFn, CloseDisposition, CloseRequest,
     CloseRequestHook, Direction, FocusedTextHook, FocusedTextSlot, Frame, FrameHook, FrameProfile,
-    Host, HostHooks, HostOptions, HostPointer, HostWake, HostWindow, IdlePolicy, Init, Key,
-    KeyInterceptHook, KeyPress, Modifiers, NamedKey, RelayoutProfile, Runner, Surface,
-    WindowCommand, WindowCommands, WindowFrame, WindowGeometry, ZOOM_LADDER, fit_zoom, ladder_step,
-    read_frame,
+    Host, HostFont, HostHooks, HostImage, HostOptions, HostPointer, HostWake, HostWindow,
+    IdlePolicy, Init, Key, KeyInterceptHook, KeyPress, Modifiers, NamedKey, RelayoutProfile,
+    Runner, Surface, WindowCommand, WindowCommands, WindowFrame, WindowGeometry, ZOOM_LADDER,
+    fit_zoom, ladder_step, read_frame,
 };
 pub use harness::{Harness, inert_hooks};
 
@@ -789,6 +789,8 @@ where
             state,
             logic,
             sheet,
+            fonts,
+            images,
         } = init(
             &WinitWindow(window.clone()),
             &self.s.commands.clone(),
@@ -800,6 +802,7 @@ where
         a11y.attach(window.clone());
         self.s.a11y = Some(Box::new(a11y));
         self.s.sheet = sheet;
+        self.s.set_resources(fonts, images);
         self.native_window = Some(window.clone());
         self.s.window = Some(Box::new(WinitWindow(window)));
         self.restored_geometry = restored;

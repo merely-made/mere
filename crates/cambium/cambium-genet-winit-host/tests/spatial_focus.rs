@@ -177,6 +177,8 @@ fn the_option_turns_it_off() {
             state: Grid::default(),
             logic: root as Logic,
             sheet: SHEET.to_string(),
+            fonts: Vec::new(),
+            images: Vec::new(),
         },
         inert_hooks(),
         HostOptions {
