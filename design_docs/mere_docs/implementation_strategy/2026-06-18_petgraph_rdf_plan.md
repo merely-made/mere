@@ -426,9 +426,10 @@ kernel directly, with no oxigraph Store in the path.
   (`knot-editor/design_docs/2026-09-15_knot_predicates_inference_scripting_plan.md`,
   Track 1) and consumes `vocab.rs` as the standard alignment for its core
   predicates. It is the first consumer to read the table against a writer's
-  meaning, and four rows read differently from the outside. Recorded here as
-  proposals for Mere to rule on; Knot consumes the table as it stands until
-  then.
+  meaning, and four rows read differently from the outside. **Ruled 2026-09-15, the same day: the evidence sense.** All four
+  proposals landed in `vocab.rs` with the test pinning them; the stance doc's
+  correspondence list was updated to match. The two further rows below are
+  still open.
 
   | Sub-kind | Table today | Proposal | Why |
   | --- | --- | --- | --- |
