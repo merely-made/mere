@@ -41,8 +41,8 @@ cambium = { path = "../../cambium" }
 # genet engine core. These were relative paths into genet's `components/`;
 # from mere they are git pins at the revision every genet.git pin in this
 # repository names.
-genet-scripted-dom = { git = "https://github.com/merely-made/genet.git", rev = "7baa554c66f966295ee945d908738b635afe136a" }
-genet-livery = { git = "https://github.com/merely-made/genet.git", rev = "7baa554c66f966295ee945d908738b635afe136a" }
+genet-scripted-dom = { git = "https://github.com/merely-made/genet.git", rev = "5ae30cad0ea421085a52dc9f86ead53028f0592d" }
+genet-livery = { git = "https://github.com/merely-made/genet.git", rev = "5ae30cad0ea421085a52dc9f86ead53028f0592d" }
 
 # rasterizer stack — git deps matching the genet workspace's own
 # netrender source, so paint_list_api unifies with genet-livery's copy
@@ -74,11 +74,11 @@ console_error_panic_hook = "0.1"
 [patch.crates-io]
 # Keep the standalone smoke on this checkout's current scripted-DOM and
 # render-neutral DOM contracts instead of a previously published graph.
-genet-scripted-dom = { git = "https://github.com/merely-made/genet.git", rev = "7baa554c66f966295ee945d908738b635afe136a" }
-layout-dom-api = { git = "https://github.com/merely-made/genet.git", rev = "7baa554c66f966295ee945d908738b635afe136a" }
+genet-scripted-dom = { git = "https://github.com/merely-made/genet.git", rev = "5ae30cad0ea421085a52dc9f86ead53028f0592d" }
+layout-dom-api = { git = "https://github.com/merely-made/genet.git", rev = "5ae30cad0ea421085a52dc9f86ead53028f0592d" }
 # Published Genet Taffy fork, locally patched to this checkout for smoke builds.
-genet-taffy = { git = "https://github.com/merely-made/genet.git", rev = "7baa554c66f966295ee945d908738b635afe136a" }
+genet-taffy = { git = "https://github.com/merely-made/genet.git", rev = "5ae30cad0ea421085a52dc9f86ead53028f0592d" }
 # ahash runtime-rng/getrandom-0.3 drop for the wasm graph.
-sonic-rs = { git = "https://github.com/merely-made/genet.git", rev = "7baa554c66f966295ee945d908738b635afe136a" }
+sonic-rs = { git = "https://github.com/merely-made/genet.git", rev = "5ae30cad0ea421085a52dc9f86ead53028f0592d" }
 # netrender pulls vello, and upstream vello 0.10 still requires wgpu 29.
 vello = { git = "https://github.com/mark-ik/vello.git", tag = "vello-0.10.0" }

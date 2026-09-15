@@ -35,7 +35,7 @@ pub fn snapshot(dom: &ScriptedDom, revision: u64) -> DocumentView {
 /// view if the id is not live.
 pub fn snapshot_subtree(dom: &ScriptedDom, revision: u64, root_id: u64) -> DocumentView {
     let mut nodes = Vec::new();
-    let root = NodeId::from_raw(root_id as usize);
+    let root = NodeId::from_raw(root_id as u64);
     if dom.is_live(root) {
         walk(dom, root, &mut nodes);
     }
@@ -93,7 +93,7 @@ pub fn apply(
             Mutation::AppendChild(a) => Some(a.parent),
         };
         if let Some(raw) = referenced {
-            if !dom.is_live(NodeId::from_raw(raw as usize)) {
+            if !dom.is_live(NodeId::from_raw(raw as u64)) {
                 return Err(TurnError::UnknownNode(raw));
             }
         }
@@ -111,20 +111,20 @@ pub fn apply(
 fn apply_one(dom: &mut ScriptedDom, m: Mutation) {
     match m {
         Mutation::SetText(SetTextArgs { node, text }) => {
-            dom.set_text(NodeId::from_raw(node as usize), &text);
+            dom.set_text(NodeId::from_raw(node as u64), &text);
         },
         Mutation::Remove(id) => {
-            dom.remove(NodeId::from_raw(id as usize));
+            dom.remove(NodeId::from_raw(id as u64));
         },
         Mutation::InsertBefore(InsertArgs { reference, new }) => {
-            let reference = NodeId::from_raw(reference as usize);
+            let reference = NodeId::from_raw(reference as u64);
             if let Some(parent) = dom.parent(reference) {
                 let child = create_block(dom, new);
                 dom.insert_before(parent, child, Some(reference));
             }
         },
         Mutation::AppendChild(AppendArgs { parent, new }) => {
-            let parent = NodeId::from_raw(parent as usize);
+            let parent = NodeId::from_raw(parent as u64);
             let child = create_block(dom, new);
             dom.append_child(parent, child);
         },
@@ -217,7 +217,7 @@ mod tests {
             },
         );
         assert!(matches!(r, Ok(1)), "set-text should apply: {r:?}");
-        assert_eq!(dom.text(NodeId::from_raw(t1_id as usize)), Some("Edited"));
+        assert_eq!(dom.text(NodeId::from_raw(t1_id as u64)), Some("Edited"));
 
         // append a <p> under body.
         let r = apply(
