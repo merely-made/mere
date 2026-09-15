@@ -822,3 +822,23 @@ and a later run three everywhere. Step 5, the shared Knot document by
 projection, remains the open step and the second application the coop
 contract is meant to follow. Receipt and limits:
 `turnstone/design_docs/2026-07-28_turnstone_place_port_plan.md`, T5b.
+
+### I3g Gemot facts reach connected peers live, 2026-09-15
+
+The membership lag seen in I3f was a missing publish, not a lag. Commons
+graph and chat writes were pushed into every already-open live sync
+session; the seven Gemot lanes never were, so a membership admission or a
+delegation issued after peers were connected waited for a reconciliation
+session that p2panda opens only on a gossip neighbour event, with no
+timer. A render-free test showed a shared node crossing in about a third of
+a second and a third member never arriving within the window. Mere
+`1a3dda4e` gives `MootLanes` a publish set for all seven lanes, and
+Turnstone's invite path publishes the membership and delegation operations
+its stores already returned (turnstone `f6ac3b5`). The test now asserts
+arrival, measured at 0.9 to 1.9 s under load with the lane counters showing
+live delivery and no new round, and the four-window proof shows three
+members on every side. Founding writes happen before any peer and still
+travel by reconciliation; the other five lanes have the publish path but no
+Turnstone author yet. Every consumer pins mere by revision, so knot-editor
+`0eb684f7`, mere `bce789e7` and woodshed's redshank port `a1c5772` moved
+together.
