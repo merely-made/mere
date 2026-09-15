@@ -190,9 +190,12 @@ where
                 );
                 // Carry BOTH scroll planes across rebuilds: element scroll and
                 // the document scroll. Dropping the latter snaps a scrolled
-                // page back to the top on structural re-render.
+                // page back to the top on structural re-render. Both setters
+                // clamp against the layout this session has already done, so a
+                // container that shrank or stopped scrolling cannot carry a
+                // stale offset in.
                 if let Some(prev) = self.s.layout.as_ref() {
-                    layout.set_element_scroll(prev.element_scroll().clone());
+                    layout.set_element_scroll(&*dom_ref, prev.element_scroll().clone());
                     layout.set_viewport_scroll(prev.viewport_scroll());
                 }
                 self.s.layout = Some(layout);
