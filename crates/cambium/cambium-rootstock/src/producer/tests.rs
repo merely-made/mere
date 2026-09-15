@@ -18,7 +18,7 @@ fn fixture(sheet: &str) -> (ScriptedDom, OwnedLayout, NodeId) {
     let node = dom.create_element(name("custom-leaf"));
     dom.set_attribute(node, name("key"), "7");
     dom.append_child(dom.document(), node);
-    let layout = OwnedLayout::new(&dom, &[sheet], 160.0, 120.0);
+    let layout = OwnedLayout::new(&dom, &[sheet], 160.0, 120.0, &[], &Default::default());
     (dom, layout, node)
 }
 
@@ -273,7 +273,7 @@ fn gpu_producer_refresh_resize_suspend_remove_and_recreate_use_fresh_images() {
         "color:rgb",
         "box-shadow:1px 1px 2px black;border-color:red;color:rgb",
     );
-    layout = OwnedLayout::new(&dom, &[&decoration], 160.0, 120.0);
+    layout = OwnedLayout::new(&dom, &[&decoration], 160.0, 120.0, &[], &Default::default());
     assert_eq!(registry.prepare(&surface, &layout, &dom, 1.0).stages, 0);
     producer.borrow_mut().pixel_override = None;
     layout = OwnedLayout::new(
@@ -281,6 +281,8 @@ fn gpu_producer_refresh_resize_suspend_remove_and_recreate_use_fresh_images() {
         &[&SHEET.replace("64,128,192", "0,255,0")],
         160.0,
         120.0,
+        &[],
+        &Default::default(),
     );
     assert_eq!(registry.prepare(&surface, &layout, &dom, 1.0).stages, 1);
     assert_eq!(
@@ -294,7 +296,14 @@ fn gpu_producer_refresh_resize_suspend_remove_and_recreate_use_fresh_images() {
         [12, 9]
     );
     assert!(producer.borrow().frames.last().unwrap().needs_frame);
-    layout = OwnedLayout::new(&dom, &["custom-leaf { display:none; }"], 160.0, 120.0);
+    layout = OwnedLayout::new(
+        &dom,
+        &["custom-leaf { display:none; }"],
+        160.0,
+        120.0,
+        &[],
+        &Default::default(),
+    );
     assert_eq!(
         registry.prepare(&surface, &layout, &dom, 1.0).suspensions,
         1
@@ -306,14 +315,14 @@ fn gpu_producer_refresh_resize_suspend_remove_and_recreate_use_fresh_images() {
     assert_eq!(producer.borrow().suspended, 1);
     assert!(registry.contains(7));
     assert!(registry.commands(7).unwrap().is_empty());
-    layout = OwnedLayout::new(&dom, &[SHEET], 160.0, 120.0);
+    layout = OwnedLayout::new(&dom, &[SHEET], 160.0, 120.0, &[], &Default::default());
     assert_eq!(registry.prepare(&surface, &layout, &dom, 1.0).stages, 1);
     registry.suspend_all(Some(surface.renderer()));
     assert!(registry.commands(7).unwrap().is_empty());
     assert_eq!(registry.prepare(&surface, &layout, &dom, 1.0).stages, 1);
 
     dom.remove(node);
-    layout = OwnedLayout::new(&dom, &[SHEET], 160.0, 120.0);
+    layout = OwnedLayout::new(&dom, &[SHEET], 160.0, 120.0, &[], &Default::default());
     assert_eq!(
         registry.prepare(&surface, &layout, &dom, 1.0).retirements,
         1
@@ -328,7 +337,7 @@ fn gpu_producer_refresh_resize_suspend_remove_and_recreate_use_fresh_images() {
     let new_node = dom.create_element(name("custom-leaf"));
     dom.set_attribute(new_node, name("key"), "7");
     dom.append_child(dom.document(), new_node);
-    layout = OwnedLayout::new(&dom, &[SHEET], 160.0, 120.0);
+    layout = OwnedLayout::new(&dom, &[SHEET], 160.0, 120.0, &[], &Default::default());
     registry.register(7, producer.clone(), &["color"]).unwrap();
     assert_eq!(registry.prepare(&surface, &layout, &dom, 1.0).stages, 1);
     assert_eq!(
@@ -365,7 +374,7 @@ fn gpu_unsupported_encoding_and_duplicate_dom_key_refuse_stale_pixels() {
     let duplicate = dom.create_element(name("custom-leaf"));
     dom.set_attribute(duplicate, name("key"), "7");
     dom.append_child(dom.document(), duplicate);
-    layout = OwnedLayout::new(&dom, &[SHEET], 160.0, 120.0);
+    layout = OwnedLayout::new(&dom, &[SHEET], 160.0, 120.0, &[], &Default::default());
     let stats = registry.prepare(&surface, &layout, &dom, 1.0);
     assert_eq!((stats.render_calls, stats.invalid_frames), (0, 1));
     assert_eq!(registry.error(7), Some(ProducerError::DuplicateDomKey));

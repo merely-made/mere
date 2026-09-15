@@ -70,6 +70,8 @@ fn harness() -> Harness<State, Logic, View> {
             },
             logic: view as Logic,
             sheet: String::new(),
+            fonts: Vec::new(),
+            images: Vec::new(),
         },
         hooks,
     );

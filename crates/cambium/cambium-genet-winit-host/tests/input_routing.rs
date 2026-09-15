@@ -556,6 +556,8 @@ fn the_caret_defaults_run_through_the_focused_text_seam() {
             },
             logic: field_root as fn(&Field) -> FieldChild,
             sheet: FIELD_SHEET.to_string(),
+            fonts: Vec::new(),
+            images: Vec::new(),
         },
         hooks,
     );

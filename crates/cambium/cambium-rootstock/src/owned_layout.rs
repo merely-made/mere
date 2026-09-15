@@ -43,6 +43,9 @@ pub struct OwnedLayout {
     viewport_scroll: (f32, f32),
     element_scroll: HashMap<NodeId, (f32, f32)>,
     content_extent: (f32, f32),
+    /// Host-supplied image bytes by URL. Layout resolves intrinsic sizes and
+    /// paint decodes textures out of the same ledger, so it is retained here.
+    images: HashMap<String, Vec<u8>>,
     style_resolve_us: u64,
     layout_with_text_us: u64,
     content_extent_us: u64,
@@ -50,11 +53,17 @@ pub struct OwnedLayout {
 }
 
 impl OwnedLayout {
+    /// A retained session over the host's resource ledger: font faces to
+    /// register into its text system, and image bytes to resolve `url()`
+    /// against. The session is rebuilt whenever the ledger changes, so
+    /// registration cannot outlive a face the host withdrew.
     pub(crate) fn new<D: LayoutDom<NodeId = NodeId>>(
         dom: &D,
         sheets: &[&str],
         width: f32,
         height: f32,
+        fonts: &[crate::HostFont],
+        images: &HashMap<String, Vec<u8>>,
     ) -> Self {
         let style_set = StyleSet::cambium(sheets);
         let interaction_dependencies = interaction::Dependencies::new(&style_set);
@@ -64,6 +73,7 @@ impl OwnedLayout {
         let resolved_styles = resolve_styles(dom, &style_set, &device, &interactions);
         let style_resolve_us = elapsed_us(phase.elapsed());
         let mut text = TextSystem::new();
+        register_fonts(&mut text, fonts);
         let phase = crate::Instant::now();
         let (styles, fragments) = layout_with_text_system(
             dom,
@@ -72,7 +82,7 @@ impl OwnedLayout {
             height,
             ViewportSizes::uniform(width, height),
             &mut text,
-            &HashMap::new(),
+            images,
         )
         .expect("Cambium's authored Livery layout must resolve");
         let layout_with_text_us = elapsed_us(phase.elapsed());
@@ -94,6 +104,7 @@ impl OwnedLayout {
             viewport_scroll: (0.0, 0.0),
             element_scroll: HashMap::new(),
             content_extent,
+            images: images.clone(),
             style_resolve_us,
             layout_with_text_us,
             content_extent_us,
@@ -129,7 +140,7 @@ impl OwnedLayout {
             height,
             self.device.viewport_sizes,
             &mut self.text,
-            &HashMap::new(),
+            &self.images,
         )
         .expect("Cambium's authored Livery layout must resolve");
         self.layout_with_text_us = elapsed_us(phase.elapsed());
@@ -153,6 +164,12 @@ impl OwnedLayout {
 
     pub fn fragments(&self) -> &LiveryLayout<NodeId> {
         &self.fragments
+    }
+
+    /// Font instances this session's text system has materialised. The
+    /// observable end of the host font seam.
+    pub fn retained_font_count(&self) -> usize {
+        self.text.retained_font_count()
     }
 
     pub(crate) fn has_active_animations(&self) -> bool {
@@ -356,7 +373,7 @@ impl OwnedLayout {
             self.generation,
             &mut self.text,
             &self.element_scroll,
-            &HashMap::new(),
+            &self.images,
         );
         // Slots were recorded against the un-translated list. Fill them before
         // the document viewport transform is added so their indices and their
@@ -470,6 +487,25 @@ fn element_scroll_range<D: LayoutDom<NodeId = NodeId>>(
         (extent.0 - container.x - container.width).max(0.0),
         (extent.1 - container.y - container.height).max(0.0),
     )
+}
+
+/// Register the host's faces into a freshly built text system. Every
+/// construction site calls this, so a face survives any relayout that rebuilds
+/// the session.
+fn register_fonts(text: &mut TextSystem, fonts: &[crate::HostFont]) {
+    for font in fonts {
+        match font.family.as_deref() {
+            // `@font-face` semantics: the sheet's family name wins over the one
+            // the face's own name table declares. The feature-settings value
+            // comes through its parser because its CSS type lives in `livery`,
+            // which rootstock reaches only through genet-livery.
+            Some(family) => {
+                let normal = "normal".parse().expect("`normal` font-feature-settings");
+                text.register_font_face_bytes(font.bytes.clone(), family, &normal)
+            },
+            None => text.register_font_bytes(font.bytes.clone()),
+        }
+    }
 }
 
 fn content_extent<D: LayoutDom<NodeId = NodeId>>(

@@ -29,8 +29,8 @@
 //! states and its keyboard order without a display.
 
 use cambium_winit_a11y::{A11yAction, A11yRequest};
-use taproot::{ProbeSurface, Selector};
 use genet_scripted_dom::NodeId;
+use taproot::{ProbeSurface, Selector};
 use winit::keyboard::{Key as WinitKey, NamedKey};
 
 use crate::{
@@ -85,6 +85,8 @@ where
                 state,
                 logic,
                 sheet: sheet.into(),
+                fonts: Vec::new(),
+                images: Vec::new(),
             },
             inert_hooks(),
         )
@@ -109,6 +111,8 @@ where
                 state,
                 logic,
                 sheet: sheet.into(),
+                fonts: Vec::new(),
+                images: Vec::new(),
             },
             inert_hooks(),
         );
@@ -182,12 +186,15 @@ where
             state,
             logic,
             sheet,
+            fonts,
+            images,
         } = init;
         let mut s = HostState::new();
         let dom = std::rc::Rc::new(std::cell::RefCell::new(
             genet_scripted_dom::ScriptedDom::new(),
         ));
         s.sheet = sheet;
+        s.set_resources(fonts, images);
         s.runner = Some(Runner::new(dom, logic, state));
         let wake = HostWake::new(s.wake_pending.clone(), std::sync::Arc::new(|| {}));
         Self {

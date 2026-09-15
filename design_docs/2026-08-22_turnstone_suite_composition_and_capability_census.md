@@ -805,3 +805,20 @@ Turnstone `LEAVE_BUDGET` unchanged, the existing p2panda-net sync tests pass,
 and the two-window proof's return phase still converges. Turnstone then
 repins mere and the fork together; the reopen retry stays as the guard for
 the spawner tail.
+
+### I3f shared address and refused write, 2026-09-14
+
+Turnstone's first-proof steps 4 and 7 are receipted in commit `c0fcf36`:
+`Share focused node` is a palette row, and `Invite to place as reader` admits
+a pre-key's root at Read with no delegation. A four-window driver run (founder,
+joiner, returning joiner, reader) showed one shared address presented as a live
+web surface on every side from the reconciled node, and a reader whose own
+worker refused its share before authoring, with one identical graph digest
+across all three final records. The address is loopback HTTP, not HTTPS,
+because the build registers no live-content engine for local files.
+Membership can lag the content lanes on an already-connected peer; one run
+recorded two members on the returning joiner where the others saw three,
+and a later run three everywhere. Step 5, the shared Knot document by
+projection, remains the open step and the second application the coop
+contract is meant to follow. Receipt and limits:
+`turnstone/design_docs/2026-07-28_turnstone_place_port_plan.md`, T5b.

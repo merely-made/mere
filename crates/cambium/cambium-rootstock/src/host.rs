@@ -737,6 +737,31 @@ pub struct Init<State, Logic> {
     pub logic: Logic,
     /// The stylesheet the layout runs under.
     pub sheet: String,
+    /// Font faces the application bundles, registered into every text system
+    /// the host builds. Empty means system faces only.
+    pub fonts: Vec<HostFont>,
+    /// Images the application bundles, resolved against the `url()` the sheet
+    /// or the DOM names. Empty means no host-supplied images.
+    pub images: Vec<HostImage>,
+}
+
+/// One host-supplied font face.
+///
+/// `family` pins the face to a CSS family name, the way `@font-face` does, so
+/// a sheet can name `'IBM Plex Sans'` without the face declaring it. `None`
+/// registers the face under whatever family its own name table carries.
+#[derive(Clone, Debug)]
+pub struct HostFont {
+    pub family: Option<String>,
+    pub bytes: Vec<u8>,
+}
+
+/// One host-supplied image, keyed by the URL a sheet or the DOM names. The
+/// bytes are the encoded file (PNG, JPEG, …); Livery decodes them itself.
+#[derive(Clone, Debug)]
+pub struct HostImage {
+    pub url: String,
+    pub bytes: Vec<u8>,
 }
 
 type InitFn<State, Logic> =
@@ -799,6 +824,11 @@ where
     pub(crate) last_leaf_render_us: u64,
     pub(crate) last_leaf_repaints: u64,
     pub sheet: String,
+    /// Host-supplied faces. Held here, not in the layout, so a rebuilt text
+    /// system is registered again from the same list.
+    pub fonts: Vec<HostFont>,
+    /// Host-supplied image bytes by URL, handed to layout and paint each frame.
+    pub images: std::collections::HashMap<String, Vec<u8>>,
     pub leaves: sprigging::LeafRegistry<u64>,
     pub producers: crate::ProducerRegistry,
     pub rendered: sprigging::RenderedLeaves,
@@ -895,6 +925,8 @@ where
             last_leaf_render_us: 0,
             last_leaf_repaints: 0,
             sheet: String::new(),
+            fonts: Vec::new(),
+            images: std::collections::HashMap::new(),
             leaves: sprigging::LeafRegistry::new(),
             producers: crate::ProducerRegistry::new(),
             rendered: sprigging::RenderedLeaves::new(),
@@ -921,6 +953,17 @@ where
             last_frame_profile: None,
             tab_held: false,
         }
+    }
+
+    /// Store the bundled resources an [`Init`] carried. One call so every
+    /// event source lands them the same way; the image list becomes the
+    /// URL-keyed ledger Livery resolves against.
+    pub fn set_resources(&mut self, fonts: Vec<HostFont>, images: Vec<HostImage>) {
+        self.fonts = fonts;
+        self.images = images
+            .into_iter()
+            .map(|image| (image.url, image.bytes))
+            .collect();
     }
 }
 

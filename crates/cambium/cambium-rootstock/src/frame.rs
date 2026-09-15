@@ -180,7 +180,14 @@ where
             _ => {
                 rebuilt = true;
                 let phase = crate::Instant::now();
-                let mut layout = crate::OwnedLayout::new(&*dom_ref, &sheets, lw, lh);
+                let mut layout = crate::OwnedLayout::new(
+                    &*dom_ref,
+                    &sheets,
+                    lw,
+                    lh,
+                    &self.s.fonts,
+                    &self.s.images,
+                );
                 // Carry BOTH scroll planes across rebuilds: element scroll and
                 // the document scroll. Dropping the latter snaps a scrolled
                 // page back to the top on structural re-render.

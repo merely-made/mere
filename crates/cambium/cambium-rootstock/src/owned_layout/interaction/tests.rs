@@ -24,7 +24,7 @@ fn fixture(sheet: &str) -> (ScriptedDom, OwnedLayout, NodeId, NodeId) {
         let text = dom.create_text("Retained text with a second line of words.");
         dom.append_child(node, text);
     }
-    let layout = OwnedLayout::new(&dom, &[sheet], 300.0, 100.0);
+    let layout = OwnedLayout::new(&dom, &[sheet], 300.0, 100.0, &[], &Default::default());
     (dom, layout, a, b)
 }
 

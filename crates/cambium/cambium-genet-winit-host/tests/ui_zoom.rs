@@ -109,6 +109,8 @@ fn init() -> Init<App, fn(&App) -> Child> {
         state: App::default(),
         logic: root as fn(&App) -> Child,
         sheet: SHEET.into(),
+        fonts: Vec::new(),
+        images: Vec::new(),
     }
 }
 
