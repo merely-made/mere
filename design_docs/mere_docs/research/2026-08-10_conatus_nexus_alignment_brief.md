@@ -112,6 +112,19 @@ determinism experiment.
 
 ## 7. Progress
 
+- **2026-09-15 — §1 is stale on one fact, and A1/A2 landed under another
+  name.** `conatus` has carried `rapier3d` 0.33 as its private tactile
+  backend since 2026-08-22 (`cc40c24f`): products see the body vocabulary,
+  never rapier handles or math types, which is the A1 seam in 3D. `seiche`
+  keeps `rapier2d` 0.33 for the planar canvas. Both ride one parry
+  generation today; the 0.34/parry 0.29 alignment note above still applies
+  at A3. Renderling was axed by Mark (2026-09-15); it was a render consumer
+  of conatus positions, and the spatial compute plan's law that physics
+  state is independent of renderers means nothing here moves. The nexus
+  LBVH/radix harvest is complete as an ignored probe (`crates/probes/
+  nexus-lbvh`, hand-written WGSL); promotion into conatus waits on a wing
+  spatial query the CPU path cannot carry, per the resident-views plan's
+  second-consumer rule.
 - **2026-08-12 — A0 answered, by nexus's own manifests.** Nexus is not a
   rapier replacement; it *contains* rapier. The workspace pins
   `rapier2d`/`rapier3d` 0.34 and `parry2d`/`parry3d` 0.29, and

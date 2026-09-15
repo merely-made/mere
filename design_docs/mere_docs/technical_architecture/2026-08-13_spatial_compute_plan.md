@@ -36,6 +36,18 @@ renderers.
   resident readers are always tenants composed through the tenancy seam
   (netrender 2026-08-10), and netrender composes what it never parses.
 
+> **2026-09-15.** Renderling is axed (Mark). It appears above and below as
+> the wing's render consumer and as the exemplar of the consumed-artifact
+> rust-gpu carriage. Neither role changes this plan: the wing's 2.5D/3D
+> render consumer is now the genet-native scene layer being brought up
+> under the layoutit direction (polycss, cssgraphics, glyphcss, voxels,
+> terra), still a tenant composed through the tenancy seam and still a
+> reader of conatus state, never its owner; and the rust-gpu carriage
+> stands on its own tooling (the local fork plus rebuilt cargo-gpu) with
+> nexus's khal kernels as its remaining consumed artifact at the adoption
+> gate. The nexus LBVH/radix harvest of 2026-08-16 landed as WGSL, not
+> SPIR-V, so it does not ride that carriage at all.
+
 **Ownership follows advanced state; the regime is chosen by the
 algorithm's shape.** The integrator is conatus's because it advances
 conatus state, even when renderling consumes its positions.
