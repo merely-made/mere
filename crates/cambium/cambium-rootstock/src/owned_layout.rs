@@ -20,6 +20,8 @@ use paint_list_api::{ColorF, DeviceIntSize, LayoutPoint, LayoutRect, LayoutSize}
 
 mod interaction;
 mod producer;
+#[cfg(test)]
+mod tests;
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum ScrollTarget {
@@ -151,6 +153,7 @@ impl OwnedLayout {
         self.content_extent = content_extent(dom, &self.fragments);
         self.content_extent_us = elapsed_us(phase.elapsed());
         self.clamp_viewport_scroll();
+        self.clamp_element_scroll(dom);
         self.generation = self.generation.saturating_add(1);
     }
 
@@ -188,8 +191,16 @@ impl OwnedLayout {
         &self.element_scroll
     }
 
-    pub(crate) fn set_element_scroll(&mut self, scroll: HashMap<NodeId, (f32, f32)>) {
+    /// Adopt a scroll plane taken against an older layout. A carried plane
+    /// arrives *after* the new session has laid out, so it is clamped here
+    /// rather than waiting for the next `layout_resolved`.
+    pub(crate) fn set_element_scroll<D: LayoutDom<NodeId = NodeId>>(
+        &mut self,
+        dom: &D,
+        scroll: HashMap<NodeId, (f32, f32)>,
+    ) {
         self.element_scroll = scroll;
+        self.clamp_element_scroll(dom);
     }
 
     pub fn viewport_scroll(&self) -> (f32, f32) {
@@ -414,14 +425,7 @@ impl OwnedLayout {
     ) -> Option<ScrollTarget> {
         let mut candidate = self.hit_test(dom, x, y);
         while let Some(node) = candidate {
-            let overflow_x = self.styles.computed_style(node, "overflow-x");
-            let overflow_y = self.styles.computed_style(node, "overflow-y");
-            let scrolls_x = overflow_x
-                .as_deref()
-                .is_some_and(|value| matches!(value, "auto" | "scroll"));
-            let scrolls_y = overflow_y
-                .as_deref()
-                .is_some_and(|value| matches!(value, "auto" | "scroll"));
+            let (scrolls_x, scrolls_y) = scroll_axes(&self.styles, node);
             if scrolls_x || scrolls_y {
                 let range = element_scroll_range(dom, &self.fragments, node);
                 let current = self.element_scroll.get(&node).copied().unwrap_or_default();
@@ -461,6 +465,35 @@ impl OwnedLayout {
             .1
             .clamp(0.0, (self.content_extent.1 - self.viewport.1).max(0.0));
     }
+
+    /// A nested offset outlives the layout it was taken against. Drop the ones
+    /// whose node is gone or no longer scrolls — an absent computed overflow
+    /// reads the same as a non-scrolling one — and clamp the rest to the range
+    /// the current fragments give. The nested half of `clamp_viewport_scroll`,
+    /// and the same shape as genet-livery's nested clamp.
+    fn clamp_element_scroll<D: LayoutDom<NodeId = NodeId>>(&mut self, dom: &D) {
+        let (styles, fragments) = (&self.styles, &self.fragments);
+        self.element_scroll.retain(|&node, offset| {
+            let (scrolls_x, scrolls_y) = scroll_axes(styles, node);
+            if !scrolls_x && !scrolls_y {
+                return false;
+            }
+            let range = element_scroll_range(dom, fragments, node);
+            offset.0 = offset.0.clamp(0.0, range.0);
+            offset.1 = offset.1.clamp(0.0, range.1);
+            true
+        });
+    }
+}
+
+/// Whether the node's computed overflow scrolls, per axis.
+fn scroll_axes(styles: &StylePlane<NodeId>, node: NodeId) -> (bool, bool) {
+    let scrolls = |property| {
+        styles
+            .computed_style(node, property)
+            .is_some_and(|value| matches!(value.as_str(), "auto" | "scroll"))
+    };
+    (scrolls("overflow-x"), scrolls("overflow-y"))
 }
 
 fn element_scroll_range<D: LayoutDom<NodeId = NodeId>>(

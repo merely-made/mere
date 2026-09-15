@@ -113,3 +113,28 @@ packages at `3961aca919f707ab09a786379eb4ce8bb121258e`, one source identity per 
 This is focused package validation; it does not claim a regenerated full Mere
 workspace lock or a full workspace test run. Native specimen-bench acceptance
 remains the consumer's receipt in the wing plan named above.
+
+## Scroll planes across a rebuild (2026-09-15)
+
+Rootstock's retained layout owns two scroll planes: the document's viewport offset
+and a per-node map of offsets for nested `overflow: auto` containers. Both are carried
+across a layout rebuild, and both are now clamped against the layout that rebuild
+produced. Nested entries are additionally pruned: a node that no longer resolves a
+scrolling overflow — because its style changed, or because it left the DOM — drops its
+offset instead of holding a position no box can occupy. Previously only the viewport
+plane was re-clamped, so an application whose nested box shrank kept a stale offset.
+
+The clamp runs at the end of `layout_resolved` for an in-place rebuild, and again inside
+`set_element_scroll` for the branch that constructs a fresh session and carries the plane
+onto it — that plane arrives after the new session has already laid out, so a clamp in
+`layout_resolved` alone would never see it. The shape mirrors genet-livery's
+`clamp_nested_scroll` (`genet/components/genet-livery/src/document/scrolling.rs`), but
+rootstock reuses its own `element_scroll_range` and its own overflow test rather than
+copying code across repositories. Implementation in
+[`owned_layout.rs`](../../../crates/cambium/cambium-rootstock/src/owned_layout.rs), with
+four cases in
+[`owned_layout/tests.rs`](../../../crates/cambium/cambium-rootstock/src/owned_layout/tests.rs):
+a shrinking container, a box that stops scrolling or leaves the DOM, an untouched
+sibling, and a plane carried onto a fresh session. Three of the four fail with the clamp
+calls removed. Validated on Rust 1.97.1, `--offline --locked`: rootstock's 40 tests and
+the native host's 80 across nine suites.

@@ -30,11 +30,16 @@ fn fixture(sheet: &str) -> (ScriptedDom, OwnedLayout, NodeId, NodeId) {
 
 #[test]
 fn equal_hover_cascade_retains_geometry_text_generation_and_scroll() {
+    // `overflow` and the outsized line box are what make the scroll offsets
+    // below survivable state rather than stale figures: both planes are
+    // clamped as they are set, so `a` has to be a real scroll container with
+    // a real range for 12px to mean anything.
     let (dom, mut layout, a, b) = fixture(
-        "div { width: 220px; height: 180px; color: black !important; } div:hover { color: red; }",
+        "div { width: 220px; height: 180px; line-height: 200px; overflow: auto; \
+         color: black !important; } div:hover { color: red; }",
     );
     layout.set_viewport_scroll((0.0, 40.0));
-    layout.set_element_scroll(HashMap::from([(a, (0.0, 12.0))]));
+    layout.set_element_scroll(&dom, HashMap::from([(a, (0.0, 12.0))]));
     let generation = layout.generation;
     let rect = layout.painted_rect(&dom, a);
     for hovered in [Some(a), Some(b), None, Some(a)] {
