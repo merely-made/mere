@@ -77,27 +77,35 @@ pub fn alignment(sub_kind: SemanticSubKind) -> Alignment {
     // CiTO — the Citation Typing Ontology (`http://purl.org/spar/cito/`).
     const CITO_CITES: &str = "http://purl.org/spar/cito/cites";
     const CITO_INCLUDES_QUOTATION_FROM: &str = "http://purl.org/spar/cito/includesQuotationFrom";
-    const CITO_AGREES_WITH: &str = "http://purl.org/spar/cito/agreesWith";
-    const CITO_DISAGREES_WITH: &str = "http://purl.org/spar/cito/disagreesWith";
-    // OWL / RDFS / Dublin Core Terms.
+    // The evidence sense, ruled 2026-09-15 from Knot's consumer audit: CiTO
+    // separates agreeing with a statement (opinion) from supporting it with
+    // evidence, and disagreeing from disputing it. A writer's relation is the
+    // evidence sense. `cito:refutes` (disputing with evidence) is reached by a
+    // consumer's narrower predicate, not by this table.
+    const CITO_SUPPORTS: &str = "http://purl.org/spar/cito/supports";
+    const CITO_DISPUTES: &str = "http://purl.org/spar/cito/disputes";
+    const CITO_EXTENDS: &str = "http://purl.org/spar/cito/extends";
+    const CITO_LINKS_TO: &str = "http://purl.org/spar/cito/linksTo";
+    // OWL / Dublin Core Terms.
     const OWL_SAME_AS: &str = "http://www.w3.org/2002/07/owl#sameAs";
-    const RDFS_SEE_ALSO: &str = "http://www.w3.org/2000/01/rdf-schema#seeAlso";
     const DCTERMS_REQUIRES: &str = "http://purl.org/dc/terms/requires";
 
     match sub_kind {
-        // Exact CiTO / OWL correspondences (stance-doc anchored).
+        // Exact CiTO / OWL correspondences (stance-doc anchored; the four
+        // 2026-09-15 rows are recorded in the petgraph-RDF plan's progress).
         Cites => Exact(CITO_CITES),
         Quotes => Exact(CITO_INCLUDES_QUOTATION_FROM),
-        Supports => Exact(CITO_AGREES_WITH),
-        Contradicts => Exact(CITO_DISAGREES_WITH),
+        Supports => Exact(CITO_SUPPORTS),
+        Contradicts => Exact(CITO_DISPUTES),
+        Elaborates => Exact(CITO_EXTENDS),
+        // `linksTo` is defined as providing a URL link to the cited entity.
+        Hyperlink => Exact(CITO_LINKS_TO),
         SameEntityAs => Exact(OWL_SAME_AS),
 
         // Approximate: the Mere relation is a narrower case of a standard term.
-        // Summarizing / elaborating / questioning a work all entail referencing
-        // it, so each is a subproperty of `cito:cites`.
-        Summarizes | Elaborates | Questions => Approximate(CITO_CITES),
-        // A hyperlink is a (structural) "see also".
-        Hyperlink => Approximate(RDFS_SEE_ALSO),
+        // Summarizing / questioning a work both entail referencing it, so each
+        // is a subproperty of `cito:cites`.
+        Summarizes | Questions => Approximate(CITO_CITES),
         // A dependency is a narrower "requires".
         DependsOn => Approximate(DCTERMS_REQUIRES),
 
@@ -185,12 +193,28 @@ mod tests {
             "alignment lives in the vocab graph"
         );
 
-        let hyperlink = predicate_iri(SemanticSubKind::Hyperlink);
-        let hyperlink_quad = quads
+        // The 2026-09-15 evidence-sense rows are exact.
+        for (sub_kind, iri) in [
+            (SemanticSubKind::Supports, "<http://purl.org/spar/cito/supports>"),
+            (SemanticSubKind::Contradicts, "<http://purl.org/spar/cito/disputes>"),
+            (SemanticSubKind::Elaborates, "<http://purl.org/spar/cito/extends>"),
+            (SemanticSubKind::Hyperlink, "<http://purl.org/spar/cito/linksTo>"),
+        ] {
+            let subject = predicate_iri(sub_kind);
+            let quad = quads
+                .iter()
+                .find(|q| q.subject.to_string().contains(subject))
+                .unwrap_or_else(|| panic!("{sub_kind:?} has an alignment quad"));
+            assert_eq!(quad.predicate.as_str(), OWL_EQUIVALENT_PROPERTY);
+            assert_eq!(quad.object.to_string(), iri);
+        }
+
+        let summarizes = predicate_iri(SemanticSubKind::Summarizes);
+        let summarizes_quad = quads
             .iter()
-            .find(|q| q.subject.to_string().contains(hyperlink))
-            .expect("hyperlink has an alignment quad");
-        assert_eq!(hyperlink_quad.predicate.as_str(), RDFS_SUB_PROPERTY_OF);
+            .find(|q| q.subject.to_string().contains(summarizes))
+            .expect("summarizes has an alignment quad");
+        assert_eq!(summarizes_quad.predicate.as_str(), RDFS_SUB_PROPERTY_OF);
 
         // A Mere-only relation contributes no alignment quad.
         let blocks = predicate_iri(SemanticSubKind::Blocks);
