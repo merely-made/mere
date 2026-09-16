@@ -408,3 +408,21 @@ Stop on any of these conditions:
   LoRA dtype/allocation and Burnpack streaming fixes are concrete follow-up
   probes, not production scope. A full Distillery pre.3 check was blocked
   before rustc by a shared genet checkout lock and remains open.
+
+- **2026-09-16 — Mark authorized the `0.22.0-pre.3` repin now, superseding
+  the stable-release gate** (ruling in the Knot predicates/inference plan's
+  Track 2 thread). The trigger is Knot: its opt-in `embed-bert` feature
+  resolved burn to pre.3, and Mark chose to move Mere to match rather than
+  hold Knot back. Scope as recorded by the 2026-08-26 audit and the
+  2026-09-16 recount: thirteen manifests request pre.2 (conatus, numen,
+  seiche, esp, six probes, Distillery's probe crates); the `burn-cubecl`
+  same-allocation patch and the `burn-remote` lease-bound close patch are
+  still required on pre.3 and must be rebased onto pre.3 source with fresh
+  receipts (headed same-allocation and BERT-width LayerNorm for
+  `burn-cubecl`); the `cubecl-runtime` packaging patch retires because pre.3
+  carries both upstream fixes; Distillery's pre.3 source compatibility is
+  still unverified. Remote Fusion/autotune stays out of production defaults.
+  The repin runs in an isolated worktree (`Code/worktrees/mere-burn-pre3`)
+  with its own target directory, because live sessions build Mere's main
+  tree. A grounded execution plan with done-conditions is appended below
+  before any manifest moves.
