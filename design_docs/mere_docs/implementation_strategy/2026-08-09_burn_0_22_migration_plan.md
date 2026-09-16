@@ -460,6 +460,48 @@ every pre.2 and pre.3 crate involved, with each source rebase checked by
   sessions, wait for each idle notice, then fast-forward push and tell them
   to pull.
 
+### Phase A progress (2026-09-16)
+
+S1 to S6 done in `Code/worktrees/mere-burn-pre3` on branch `burn-pre3-repin`,
+based on `origin/main` at `7db4fe0a` rather than `d15619b4` because main had
+moved; the branch's upstream is unset so it cannot be mistaken for main. No
+stop rule fired and nothing is pushed.
+
+| Patch | Against pristine pre.3 | Commit |
+| --- | --- | --- |
+| cubecl-runtime | 4 files, +55: two identity methods, one test, `[workspace]` | `276608d5` |
+| burn-cubecl | 5 files, +90 / -3: three launcher blocks at offset 6, manifest tail | `e1c0cb44` |
+| burn-remote | 11 files, +583 / -117; `tests/iroh.rs` absent | `31102555` |
+| cubek-reduce | 5 files, +273 / -3: helper, two call sites, licenses | `610a32c5` |
+
+cubecl-runtime committed before burn-cubecl so no commit leaves burn-cubecl
+calling a missing helper. Each patch's standalone check could not run offline
+(dev-dependencies absent from the cache, and burn-cubecl's upstream lock pins a
+`cubecl-hip-sys` not cached), so each was compiled as a path dependency of a
+throwaway crate under `C:	\mere-burn-pre3-checks` with rustc 1.97.1; all four
+built, and `cargo tree` confirmed the worktree patches were used. Mere's two new
+burn-remote session-close tests were not compiled; S9 and S10 cover them.
+
+**The three-way burn-remote check closes risk 6.** With pristine pre.2 now on
+disk, upstream changed only version pins, packaging metadata, its published
+lock and tests between pre.2 and pre.3; all seven server, shared and transport
+files Mere edits are byte-identical across the two, and Mere's pre.2 delta
+applied to pre.3 with no fuzz or offset.
+
+**Correction, blocking S7 and S8:** Mere has not committed `Cargo.lock` since
+`ea9d3169` (2026-06-18, "stop committing Cargo.lock, track latest deps"), so
+12.4's "the committed lock already uses genet rev=5ae30cad" and S8's
+"regenerate the root lock" have no committed baseline, and S1's `--locked`
+check cannot pass as written. The worktree has no lock. The main tree's local,
+ignored lock was last written 2026-09-16 11:05 and holds burn pre.2. The
+baseline is Mark's decision before S7.
+
+Also found: the cubek-reduce patch carried LICENSE files and a whitespace trim
+12.1 did not list (the trim is dropped, pre.3 replaced that file); Mere's
+burn-remote tests still call `to_vec`, now deprecated, carried as warnings;
+`support/patches/cubecl-wgpu` is a retired 0.10.0 archive nothing patches in,
+left alone.
+
 ### 12.0 Corrections to the 2026-09-16 recorded scope
 
 1. **The `cubecl-runtime` patch shrinks; it does not retire.** Pre.3 carries
