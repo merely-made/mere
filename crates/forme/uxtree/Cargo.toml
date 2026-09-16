@@ -17,3 +17,7 @@ path = "src/lib.rs"
 accesskit.workspace = true
 inker.workspace = true
 tracing.workspace = true
+
+[dev-dependencies]
+# Fold projection tests lower the committed Micron probe pages.
+nematic.workspace = true

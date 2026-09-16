@@ -33,10 +33,11 @@
 
 #![doc(html_root_url = "https://docs.rs/uxtree/0.0.1")]
 
+use std::collections::HashMap;
 use std::hash::{Hash, Hasher};
 
-use accesskit::{Node, NodeId, Role, Tree, TreeId, TreeUpdate};
-use inker::{Block, EngineDocument, InlineSpan, inline_text};
+use accesskit::{Action, Node, NodeId, Role, Tree, TreeId, TreeUpdate};
+use inker::{Block, EngineDocument, FoldState, InlineSpan, inline_text};
 
 /// Crate version.
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -135,16 +136,52 @@ fn child_ids_len(nodes: &[(NodeId, Node)], root_id: NodeId) -> usize {
 /// `Role::Document` node. Children come from the document's blocks; inline
 /// spans are flattened into the parent block's accessible name today
 /// (with `Role::Link` children as the one exception, since links are
-/// interactive and need addressable identity).
+/// interactive and need addressable identity). Collapsible sections take
+/// their authored state; see [`project_document_with_folds`].
 pub fn project_document(doc: &EngineDocument) -> UxTree {
+    project_document_with_folds(doc, &FoldState::default())
+}
+
+/// Project under a reader's fold state (plan decision 13). A collapsible
+/// heading reports expanded or collapsed and offers the opposite action;
+/// blocks inside a closed extent are omitted. Paths keep original block
+/// indices, so node ids do not move when a fold toggles.
+pub fn project_document_with_folds(doc: &EngineDocument, folds: &FoldState) -> UxTree {
     let mut nodes = Vec::new();
     let root_path = engine_root_path(&doc.address);
     let root_id = node_id_for_path(&root_path);
+    let navigation = &doc.navigation;
+    let (hidden, headings) = if navigation.is_current(&doc.blocks) {
+        let headings: HashMap<usize, bool> = (0..navigation.folds.len())
+            .map(|fold| {
+                (
+                    navigation.folds[fold].heading,
+                    folds.is_open(navigation, fold),
+                )
+            })
+            .collect();
+        (folds.hidden(navigation), headings)
+    } else {
+        Default::default()
+    };
 
     let mut child_ids = Vec::new();
     for (i, block) in doc.blocks.iter().enumerate() {
+        if hidden.iter().any(|range| range.contains(&i)) {
+            continue;
+        }
         let path = format!("{root_path}#blocks/{i}");
         let id = project_block(block, &path, &mut nodes);
+        if let Some(&open) = headings.get(&i)
+            && let Some((_, heading)) = nodes.last_mut().filter(|(last, _)| *last == id)
+        {
+            heading.set_expanded(open);
+            heading.add_action(if open {
+                Action::Collapse
+            } else {
+                Action::Expand
+            });
+        }
         child_ids.push(id);
     }
 
@@ -337,10 +374,10 @@ fn project_block(block: &Block, path: &str, nodes: &mut Vec<(NodeId, Node)>) -> 
     id
 }
 
-/// Walk inline spans for `Link`s and project each as a `Role::Link` child
-/// of the enclosing block. Other inline styling (Code/Emphasis/Strong)
-/// stays as text in the parent's accessible name; links are interactive
-/// so they need their own addressable identity.
+/// Walk inline spans for network and in-page links and project each as a
+/// `Role::Link` child of the enclosing block. Other inline styling
+/// (Code/Emphasis/Strong) stays as text in the parent's accessible name;
+/// links are interactive so they need their own addressable identity.
 fn attach_link_children(
     spans: &[InlineSpan],
     parent_path: &str,
@@ -361,7 +398,10 @@ fn attach_link_children(
         if let Some(t) = link_title {
             link_node.set_description(t.clone());
         }
-        link_node.set_value(link_url.to_string());
+        // An in-page link has no URL, so no host can treat it as navigation.
+        if let Some(url) = link_url {
+            link_node.set_value(url.to_string());
+        }
         nodes.push((link_id, link_node));
         existing.push(link_id);
         counter += 1;
@@ -373,21 +413,24 @@ fn attach_link_children(
 
 fn walk_inline_links<'a, F>(spans: &'a [InlineSpan], f: &mut F)
 where
-    F: FnMut(&'a str, Option<&'a String>, &'a [InlineSpan]),
+    F: FnMut(Option<&'a str>, Option<&'a String>, &'a [InlineSpan]),
 {
     for span in spans {
         match span {
             InlineSpan::Link {
                 url, title, spans, ..
             } => {
-                f(url.as_str(), title.as_ref(), spans.as_slice());
+                f(Some(url.as_str()), title.as_ref(), spans.as_slice());
+                walk_inline_links(spans, f);
+            },
+            InlineSpan::InPage { spans, .. } => {
+                f(None, None, spans.as_slice());
                 walk_inline_links(spans, f);
             },
             InlineSpan::Emphasis(inner)
             | InlineSpan::Strong(inner)
             | InlineSpan::Presented { spans: inner, .. }
-            | InlineSpan::Submit { spans: inner, .. }
-            | InlineSpan::InPage { spans: inner, .. } => {
+            | InlineSpan::Submit { spans: inner, .. } => {
                 walk_inline_links(inner, f);
             },
             InlineSpan::Text(_)
@@ -560,7 +603,7 @@ mod tests {
     }
 
     #[test]
-    fn in_page_link_projects_as_label_text_without_a_link_node() {
+    fn in_page_link_projects_as_a_link_without_a_url() {
         let doc = doc_with(vec![Block::Paragraph {
             spans: vec![InlineSpan::InPage {
                 target: inker::InPageTarget {
@@ -571,7 +614,14 @@ mod tests {
             }],
         }]);
         let tree = project_document(&doc);
-        assert!(!tree.nodes.iter().any(|(_, n)| n.role() == Role::Link));
+        let link = tree
+            .nodes
+            .iter()
+            .map(|(_, n)| n)
+            .find(|n| n.role() == Role::Link)
+            .expect("in-page link node");
+        assert_eq!(link.label(), Some("Setup"));
+        assert_eq!(link.value(), None, "decision 13: no URL");
         let paragraph = tree
             .nodes
             .iter()
@@ -606,5 +656,107 @@ mod tests {
         }]));
         assert_eq!(plain.root, styled.root);
         assert_eq!(plain.nodes, styled.nodes);
+    }
+
+    const NODE: &str = "923706ddc70d389bd3719258c41f6592";
+
+    fn micron(file: &str, source: &str) -> EngineDocument {
+        use inker::{Engine, EngineInput};
+        nematic::MicronEngine::new()
+            .render(&EngineInput::new(format!("{NODE}:/page/{file}"), source))
+            .unwrap()
+    }
+
+    fn block_label(block: &Block) -> Option<String> {
+        match block {
+            Block::Presented { block, .. } => block_label(block),
+            Block::Heading { spans, .. } | Block::Paragraph { spans } => Some(inline_text(spans)),
+            _ => None,
+        }
+    }
+
+    fn labelled<'a>(tree: &'a UxTree, role: Role, label: &str) -> Option<(NodeId, &'a Node)> {
+        tree.nodes
+            .iter()
+            .find(|(_, node)| node.role() == role && node.label() == Some(label))
+            .map(|(id, node)| (*id, node))
+    }
+
+    #[test]
+    fn probes_05_17_fold_headings_carry_expanded_state_and_hidden_blocks_are_omitted() {
+        for (file, source, target, links, ancestors) in [
+            (
+                "probe-nav-05-closed-target.mu",
+                include_str!(
+                    "../../../nematic/nematic/tests/fixtures/micron/nomadnet-1.4.2/navigation/probe-nav-05-closed-target.mu"
+                ),
+                (Role::Heading, "Hidden Target"),
+                &[
+                    "jump to the hidden heading",
+                    "jump to the hidden explicit anchor",
+                ][..],
+                &["Closed Outer"][..],
+            ),
+            (
+                "probe-nav-17-nested-closed-target.mu",
+                include_str!(
+                    "../../../nematic/nematic/tests/fixtures/micron/nomadnet-1.4.2/navigation/probe-nav-17-nested-closed-target.mu"
+                ),
+                (
+                    Role::Paragraph,
+                    "MARKER NESTED DEEP TARGET: bound inside both closed folds.",
+                ),
+                &["jump into two closed sections"],
+                &["Outer Closed", "Inner Closed"],
+            ),
+        ] {
+            let doc = micron(file, source);
+            let mut unfolded = doc.clone();
+            unfolded.navigation = Default::default();
+            let unfolded = project_document(&unfolded);
+
+            let authored = project_document(&doc);
+            let (_, outer) = labelled(&authored, Role::Heading, ancestors[0]).unwrap();
+            assert_eq!(outer.is_expanded(), Some(false), "{file}");
+            assert!(outer.supports_action(Action::Expand), "{file}");
+            assert!(
+                labelled(&authored, target.0, target.1).is_none(),
+                "{file}: hidden"
+            );
+            assert!(
+                ancestors[1..]
+                    .iter()
+                    .all(|inner| labelled(&authored, Role::Heading, inner).is_none()),
+                "{file}: a nested heading hides with its ancestor"
+            );
+            assert_eq!(
+                labelled(&authored, Role::Heading, "Sentinel After").map(|(id, _)| id),
+                labelled(&unfolded, Role::Heading, "Sentinel After").map(|(id, _)| id),
+                "{file}: a block after a closed extent keeps its node id"
+            );
+            for link in links {
+                let (_, node) = labelled(&authored, Role::Link, link).unwrap();
+                assert_eq!(node.value(), None, "{file}: {link} has no URL");
+            }
+
+            let mut state = FoldState::default();
+            let target_block = doc
+                .blocks
+                .iter()
+                .position(|block| block_label(block).as_deref() == Some(target.1))
+                .unwrap();
+            assert!(state.open_ancestors(&doc.navigation, target_block));
+            let revealed = project_document_with_folds(&doc, &state);
+            for ancestor in ancestors {
+                let (_, heading) = labelled(&revealed, Role::Heading, ancestor).unwrap();
+                assert_eq!(heading.is_expanded(), Some(true), "{file}: {ancestor}");
+                assert!(heading.supports_action(Action::Collapse));
+            }
+            assert_eq!(
+                labelled(&revealed, target.0, target.1).map(|(id, _)| id),
+                labelled(&unfolded, target.0, target.1).map(|(id, _)| id),
+                "{file}: the revealed target has its unfolded node id"
+            );
+        }
     }
 }
