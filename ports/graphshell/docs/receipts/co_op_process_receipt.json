@@ -1,26 +1,128 @@
 {
   "result": "ok",
   "kind": "two Rust peers in two HTTP gateway processes; no browser automation",
-  "binary_sha256": "e7f2470242ca70978cac8504ea100c73a2ccd8b2ef3d9d47c1dbfb25d7e5b9bb",
+  "binary_sha256": "03e24a047d330ebfa92acb1d01d578ec933c3d9d2f64628e3d374f1466919ce3",
   "comparison_sha256": "e159ca8c6ee70cb324027b92ff24e047d2bce21c0c22b04590a0aeaa7ebe841b",
   "negative_checks": {
+    "expiry_refuses_contribution_and_recheck": true,
     "invitation_roundtrip_installed": true,
+    "leave_retains_and_refuses_contribution": true,
     "ok": true,
+    "revocation_refuses_recheck_and_withdraws_later_operation": true,
     "tampered_grant_rejected": true,
     "unauthorized_writer_rejected": true,
     "unsigned_rule_mutation_rejected": true,
     "wrong_container_operation_rejected": true,
     "wrong_space_invitation_rejected": true
   },
+  "lifecycle_steps": [
+    {
+      "step": "leave_and_rejoin",
+      "left_lifecycle": "left",
+      "left_retained_count": 2,
+      "left_effective_records": 0,
+      "contribute_refused": "not joined: this peer left the space; install an invitation to join again",
+      "sync_refused": "not joined: this peer left the space; install an invitation to join again",
+      "wire_entries_during_refused_sync": [
+        0,
+        0
+      ],
+      "founder_sync_into_left_member_refused": "Peer refused /wire: not joined: this peer left the space; install an invitation to join again",
+      "member_import_result": "refused: not joined: this peer left the space; install an invitation to join again",
+      "rejoined_lifecycles": [
+        "joined",
+        "joined"
+      ],
+      "rejoined_retained_counts": [
+        2,
+        2
+      ]
+    },
+    {
+      "step": "revocation",
+      "revocation_message": "Revoked Bea's delegation with a signed Gemot revocation. Peer sync unavailable: Peer refused /wire: Peer disconnected",
+      "revoked_member_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
+      "later_operation_id": "8ab0dc841ed6abaf310b391f83e7f491a42f9021be9012e97328016cb6b361d7",
+      "later_operation_authority": [
+        "revoked",
+        "revoked"
+      ],
+      "retained_counts": [
+        4,
+        4
+      ],
+      "retained_delegation_counts": [
+        2,
+        2
+      ],
+      "revoked_authority_counts": [
+        2,
+        2
+      ],
+      "effective_record_ids": [
+        [
+          "woodshed-comparison:founder:2"
+        ],
+        [
+          "woodshed-comparison:founder:2"
+        ]
+      ],
+      "admitted_reconnect_wire_entries": [
+        2,
+        2
+      ],
+      "lifecycles": [
+        "joined",
+        "revoked"
+      ],
+      "contribute_refused": "revoked: the issuer revoked this peer's delegation",
+      "reopen_refused": "revoked: the issuer revoked this peer's delegation",
+      "reconnect_refused": "revoked: the issuer revoked this peer's delegation",
+      "wire_entries_during_refused_reconnect": [
+        0,
+        0
+      ],
+      "refused_reconnect_recheck": {
+        "action": "connect",
+        "admitted": false,
+        "lifecycle": "revoked",
+        "reason": "revoked: the issuer revoked this peer's delegation"
+      }
+    },
+    {
+      "step": "expiry",
+      "now_ms": 1001,
+      "lifecycle": "expired",
+      "contribute_refused": "expired: this peer's grant ended at 1000 ms; store clock is 1001 ms",
+      "reopen_refused": "expired: this peer's grant ended at 1000 ms; store clock is 1001 ms",
+      "reconnect_refused": "expired: this peer's grant ended at 1000 ms; store clock is 1001 ms",
+      "wire_entries_during_refused_reconnect": [
+        0,
+        0
+      ],
+      "refused_reconnect_recheck": {
+        "action": "connect",
+        "admitted": false,
+        "lifecycle": "expired",
+        "reason": "expired: this peer's grant ended at 1000 ms; store clock is 1001 ms"
+      },
+      "retained_count": 4,
+      "effective_records": 0,
+      "pending_authority_count": 4
+    }
+  ],
   "states": {
     "initial": [
       {
         "role": "founder",
         "online": true,
         "process_open": true,
-        "process_id": 44648,
+        "process_id": 27344,
         "process_generation": 1,
         "last_sync_error": null,
+        "lifecycle": "not_joined",
+        "now_ms": 50,
+        "last_recheck": null,
         "comparison": {
           "source": {
             "authority": "woodshed",
@@ -118,13 +220,18 @@
         "service": {
           "authority_installed": false,
           "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "lifecycle": "not_joined",
+          "lifecycle_reason": "not joined: no invitation is installed in this store",
           "local_root": "af06a3e3291714e4f356c19c9b15cd1951ec6e6662aa77be07547f289383341d",
+          "now_ms": 50,
           "ok": true,
           "operations": [],
           "pending_authority_count": 0,
           "records": [],
           "retained_count": 0,
+          "retained_delegation_count": 0,
           "revoked_authority_count": 0,
+          "revoked_members": [],
           "role": "founder"
         },
         "records": [],
@@ -135,9 +242,12 @@
         "role": "member",
         "online": true,
         "process_open": true,
-        "process_id": 26956,
+        "process_id": 22060,
         "process_generation": 1,
         "last_sync_error": null,
+        "lifecycle": "not_joined",
+        "now_ms": 50,
+        "last_recheck": null,
         "comparison": {
           "source": {
             "authority": "woodshed",
@@ -235,13 +345,18 @@
         "service": {
           "authority_installed": false,
           "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "lifecycle": "not_joined",
+          "lifecycle_reason": "not joined: no invitation is installed in this store",
           "local_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
+          "now_ms": 50,
           "ok": true,
           "operations": [],
           "pending_authority_count": 0,
           "records": [],
           "retained_count": 0,
+          "retained_delegation_count": 0,
           "revoked_authority_count": 0,
+          "revoked_members": [],
           "role": "member"
         },
         "records": [],
@@ -254,9 +369,12 @@
         "role": "founder",
         "online": true,
         "process_open": true,
-        "process_id": 44648,
+        "process_id": 27344,
         "process_generation": 1,
         "last_sync_error": null,
+        "lifecycle": "joined",
+        "now_ms": 50,
+        "last_recheck": null,
         "comparison": {
           "source": {
             "authority": "woodshed",
@@ -354,11 +472,15 @@
         "service": {
           "authority_installed": true,
           "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "lifecycle": "joined",
+          "lifecycle_reason": null,
           "local_root": "af06a3e3291714e4f356c19c9b15cd1951ec6e6662aa77be07547f289383341d",
+          "now_ms": 50,
           "ok": true,
           "operations": [
             {
               "author_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
+              "authority": "effective",
               "operation_id": "367ec90086c6c71edec0a48197de3828671f73cdc0af38ff0b8723389e390753",
               "writer": "bd11126ba11021a0c894a5290d352d5de6c8e3d4b071d5404a09b1817c050458"
             }
@@ -372,7 +494,9 @@
             }
           ],
           "retained_count": 1,
+          "retained_delegation_count": 0,
           "revoked_authority_count": 0,
+          "revoked_members": [],
           "role": "founder"
         },
         "records": [
@@ -386,15 +510,35 @@
         "traffic": [
           {
             "direction": "incoming",
+            "method": "POST",
             "path": "/wire",
             "bytes": 18,
-            "sha256": "9389e6512af6fefa0599e7a946ef8eb432546cec8eb92d674ad516e2b98d7f1e"
+            "sha256": "9389e6512af6fefa0599e7a946ef8eb432546cec8eb92d674ad516e2b98d7f1e",
+            "result": "ok"
           },
           {
             "direction": "incoming",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "POST",
             "path": "/wire",
             "bytes": 6850,
-            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36"
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
           }
         ]
       },
@@ -402,9 +546,17 @@
         "role": "member",
         "online": true,
         "process_open": true,
-        "process_id": 26956,
+        "process_id": 22060,
         "process_generation": 1,
         "last_sync_error": null,
+        "lifecycle": "joined",
+        "now_ms": 50,
+        "last_recheck": {
+          "action": "sync",
+          "admitted": true,
+          "lifecycle": "joined",
+          "reason": null
+        },
         "comparison": {
           "source": {
             "authority": "woodshed",
@@ -502,11 +654,15 @@
         "service": {
           "authority_installed": true,
           "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "lifecycle": "joined",
+          "lifecycle_reason": null,
           "local_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
+          "now_ms": 50,
           "ok": true,
           "operations": [
             {
               "author_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
+              "authority": "effective",
               "operation_id": "367ec90086c6c71edec0a48197de3828671f73cdc0af38ff0b8723389e390753",
               "writer": "bd11126ba11021a0c894a5290d352d5de6c8e3d4b071d5404a09b1817c050458"
             }
@@ -520,7 +676,9 @@
             }
           ],
           "retained_count": 1,
+          "retained_delegation_count": 0,
           "revoked_authority_count": 0,
+          "revoked_members": [],
           "role": "member"
         },
         "records": [
@@ -534,33 +692,51 @@
         "traffic": [
           {
             "direction": "outgoing",
+            "method": "GET",
             "path": "/invitation",
             "bytes": 0,
-            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "refused: Founder has not created an invitation"
           },
           {
             "direction": "outgoing",
+            "method": "GET",
+            "path": "/invitation",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "POST",
             "path": "/wire",
             "bytes": 18,
-            "sha256": "9389e6512af6fefa0599e7a946ef8eb432546cec8eb92d674ad516e2b98d7f1e"
+            "sha256": "9389e6512af6fefa0599e7a946ef8eb432546cec8eb92d674ad516e2b98d7f1e",
+            "result": "ok"
           },
           {
             "direction": "outgoing",
+            "method": "GET",
             "path": "/wire",
             "bytes": 0,
-            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
           },
           {
             "direction": "outgoing",
+            "method": "POST",
             "path": "/wire",
             "bytes": 6850,
-            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36"
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36",
+            "result": "ok"
           },
           {
             "direction": "outgoing",
+            "method": "GET",
             "path": "/wire",
             "bytes": 0,
-            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
           }
         ]
       }
@@ -573,6 +749,9 @@
         "process_id": null,
         "process_generation": 1,
         "last_sync_error": null,
+        "lifecycle": "joined",
+        "now_ms": 50,
+        "last_recheck": null,
         "comparison": {
           "source": {
             "authority": "woodshed",
@@ -670,11 +849,15 @@
         "service": {
           "authority_installed": true,
           "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "lifecycle": "joined",
+          "lifecycle_reason": null,
           "local_root": "af06a3e3291714e4f356c19c9b15cd1951ec6e6662aa77be07547f289383341d",
+          "now_ms": 50,
           "ok": true,
           "operations": [
             {
               "author_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
+              "authority": "effective",
               "operation_id": "367ec90086c6c71edec0a48197de3828671f73cdc0af38ff0b8723389e390753",
               "writer": "bd11126ba11021a0c894a5290d352d5de6c8e3d4b071d5404a09b1817c050458"
             }
@@ -688,7 +871,9 @@
             }
           ],
           "retained_count": 1,
+          "retained_delegation_count": 0,
           "revoked_authority_count": 0,
+          "revoked_members": [],
           "role": "founder"
         },
         "records": [
@@ -702,15 +887,35 @@
         "traffic": [
           {
             "direction": "incoming",
+            "method": "POST",
             "path": "/wire",
             "bytes": 18,
-            "sha256": "9389e6512af6fefa0599e7a946ef8eb432546cec8eb92d674ad516e2b98d7f1e"
+            "sha256": "9389e6512af6fefa0599e7a946ef8eb432546cec8eb92d674ad516e2b98d7f1e",
+            "result": "ok"
           },
           {
             "direction": "incoming",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "POST",
             "path": "/wire",
             "bytes": 6850,
-            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36"
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
           }
         ]
       },
@@ -721,6 +926,14 @@
         "process_id": null,
         "process_generation": 1,
         "last_sync_error": null,
+        "lifecycle": "joined",
+        "now_ms": 50,
+        "last_recheck": {
+          "action": "sync",
+          "admitted": true,
+          "lifecycle": "joined",
+          "reason": null
+        },
         "comparison": {
           "source": {
             "authority": "woodshed",
@@ -818,11 +1031,15 @@
         "service": {
           "authority_installed": true,
           "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "lifecycle": "joined",
+          "lifecycle_reason": null,
           "local_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
+          "now_ms": 50,
           "ok": true,
           "operations": [
             {
               "author_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
+              "authority": "effective",
               "operation_id": "367ec90086c6c71edec0a48197de3828671f73cdc0af38ff0b8723389e390753",
               "writer": "bd11126ba11021a0c894a5290d352d5de6c8e3d4b071d5404a09b1817c050458"
             }
@@ -836,7 +1053,9 @@
             }
           ],
           "retained_count": 1,
+          "retained_delegation_count": 0,
           "revoked_authority_count": 0,
+          "revoked_members": [],
           "role": "member"
         },
         "records": [
@@ -850,33 +1069,51 @@
         "traffic": [
           {
             "direction": "outgoing",
+            "method": "GET",
             "path": "/invitation",
             "bytes": 0,
-            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "refused: Founder has not created an invitation"
           },
           {
             "direction": "outgoing",
+            "method": "GET",
+            "path": "/invitation",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "POST",
             "path": "/wire",
             "bytes": 18,
-            "sha256": "9389e6512af6fefa0599e7a946ef8eb432546cec8eb92d674ad516e2b98d7f1e"
+            "sha256": "9389e6512af6fefa0599e7a946ef8eb432546cec8eb92d674ad516e2b98d7f1e",
+            "result": "ok"
           },
           {
             "direction": "outgoing",
+            "method": "GET",
             "path": "/wire",
             "bytes": 0,
-            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
           },
           {
             "direction": "outgoing",
+            "method": "POST",
             "path": "/wire",
             "bytes": 6850,
-            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36"
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36",
+            "result": "ok"
           },
           {
             "direction": "outgoing",
+            "method": "GET",
             "path": "/wire",
             "bytes": 0,
-            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
           }
         ]
       }
@@ -886,9 +1123,17 @@
         "role": "founder",
         "online": false,
         "process_open": true,
-        "process_id": 51880,
+        "process_id": 31724,
         "process_generation": 2,
         "last_sync_error": null,
+        "lifecycle": "joined",
+        "now_ms": 50,
+        "last_recheck": {
+          "action": "reopen",
+          "admitted": true,
+          "lifecycle": "joined",
+          "reason": null
+        },
         "comparison": {
           "source": {
             "authority": "woodshed",
@@ -986,11 +1231,15 @@
         "service": {
           "authority_installed": true,
           "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "lifecycle": "joined",
+          "lifecycle_reason": null,
           "local_root": "af06a3e3291714e4f356c19c9b15cd1951ec6e6662aa77be07547f289383341d",
+          "now_ms": 50,
           "ok": true,
           "operations": [
             {
               "author_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
+              "authority": "effective",
               "operation_id": "367ec90086c6c71edec0a48197de3828671f73cdc0af38ff0b8723389e390753",
               "writer": "bd11126ba11021a0c894a5290d352d5de6c8e3d4b071d5404a09b1817c050458"
             }
@@ -1004,7 +1253,9 @@
             }
           ],
           "retained_count": 1,
+          "retained_delegation_count": 0,
           "revoked_authority_count": 0,
+          "revoked_members": [],
           "role": "founder"
         },
         "records": [
@@ -1018,15 +1269,35 @@
         "traffic": [
           {
             "direction": "incoming",
+            "method": "POST",
             "path": "/wire",
             "bytes": 18,
-            "sha256": "9389e6512af6fefa0599e7a946ef8eb432546cec8eb92d674ad516e2b98d7f1e"
+            "sha256": "9389e6512af6fefa0599e7a946ef8eb432546cec8eb92d674ad516e2b98d7f1e",
+            "result": "ok"
           },
           {
             "direction": "incoming",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "POST",
             "path": "/wire",
             "bytes": 6850,
-            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36"
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
           }
         ]
       },
@@ -1034,9 +1305,17 @@
         "role": "member",
         "online": false,
         "process_open": true,
-        "process_id": 26392,
+        "process_id": 32452,
         "process_generation": 2,
         "last_sync_error": null,
+        "lifecycle": "joined",
+        "now_ms": 50,
+        "last_recheck": {
+          "action": "reopen",
+          "admitted": true,
+          "lifecycle": "joined",
+          "reason": null
+        },
         "comparison": {
           "source": {
             "authority": "woodshed",
@@ -1134,11 +1413,15 @@
         "service": {
           "authority_installed": true,
           "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "lifecycle": "joined",
+          "lifecycle_reason": null,
           "local_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
+          "now_ms": 50,
           "ok": true,
           "operations": [
             {
               "author_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
+              "authority": "effective",
               "operation_id": "367ec90086c6c71edec0a48197de3828671f73cdc0af38ff0b8723389e390753",
               "writer": "bd11126ba11021a0c894a5290d352d5de6c8e3d4b071d5404a09b1817c050458"
             }
@@ -1152,7 +1435,9 @@
             }
           ],
           "retained_count": 1,
+          "retained_delegation_count": 0,
           "revoked_authority_count": 0,
+          "revoked_members": [],
           "role": "member"
         },
         "records": [
@@ -1166,33 +1451,51 @@
         "traffic": [
           {
             "direction": "outgoing",
+            "method": "GET",
             "path": "/invitation",
             "bytes": 0,
-            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "refused: Founder has not created an invitation"
           },
           {
             "direction": "outgoing",
+            "method": "GET",
+            "path": "/invitation",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "POST",
             "path": "/wire",
             "bytes": 18,
-            "sha256": "9389e6512af6fefa0599e7a946ef8eb432546cec8eb92d674ad516e2b98d7f1e"
+            "sha256": "9389e6512af6fefa0599e7a946ef8eb432546cec8eb92d674ad516e2b98d7f1e",
+            "result": "ok"
           },
           {
             "direction": "outgoing",
+            "method": "GET",
             "path": "/wire",
             "bytes": 0,
-            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
           },
           {
             "direction": "outgoing",
+            "method": "POST",
             "path": "/wire",
             "bytes": 6850,
-            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36"
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36",
+            "result": "ok"
           },
           {
             "direction": "outgoing",
+            "method": "GET",
             "path": "/wire",
             "bytes": 0,
-            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
           }
         ]
       }
@@ -1202,9 +1505,17 @@
         "role": "founder",
         "online": true,
         "process_open": true,
-        "process_id": 51880,
+        "process_id": 31724,
         "process_generation": 2,
-        "last_sync_error": "HTTP Error 409: Conflict",
+        "last_sync_error": "Peer refused /wire: Peer disconnected",
+        "lifecycle": "joined",
+        "now_ms": 50,
+        "last_recheck": {
+          "action": "connect",
+          "admitted": true,
+          "lifecycle": "joined",
+          "reason": null
+        },
         "comparison": {
           "source": {
             "authority": "woodshed",
@@ -1302,11 +1613,15 @@
         "service": {
           "authority_installed": true,
           "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "lifecycle": "joined",
+          "lifecycle_reason": null,
           "local_root": "af06a3e3291714e4f356c19c9b15cd1951ec6e6662aa77be07547f289383341d",
+          "now_ms": 50,
           "ok": true,
           "operations": [
             {
               "author_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
+              "authority": "effective",
               "operation_id": "367ec90086c6c71edec0a48197de3828671f73cdc0af38ff0b8723389e390753",
               "writer": "bd11126ba11021a0c894a5290d352d5de6c8e3d4b071d5404a09b1817c050458"
             }
@@ -1320,7 +1635,9 @@
             }
           ],
           "retained_count": 1,
+          "retained_delegation_count": 0,
           "revoked_authority_count": 0,
+          "revoked_members": [],
           "role": "founder"
         },
         "records": [
@@ -1334,21 +1651,59 @@
         "traffic": [
           {
             "direction": "incoming",
+            "method": "POST",
             "path": "/wire",
             "bytes": 18,
-            "sha256": "9389e6512af6fefa0599e7a946ef8eb432546cec8eb92d674ad516e2b98d7f1e"
+            "sha256": "9389e6512af6fefa0599e7a946ef8eb432546cec8eb92d674ad516e2b98d7f1e",
+            "result": "ok"
           },
           {
             "direction": "incoming",
+            "method": "GET",
             "path": "/wire",
-            "bytes": 6850,
-            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36"
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
           },
           {
             "direction": "incoming",
+            "method": "POST",
             "path": "/wire",
             "bytes": 6850,
-            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36"
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 6850,
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36",
+            "result": "refused: Peer disconnected"
+          },
+          {
+            "direction": "incoming",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 6850,
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
           }
         ]
       },
@@ -1356,9 +1711,17 @@
         "role": "member",
         "online": true,
         "process_open": true,
-        "process_id": 26392,
+        "process_id": 32452,
         "process_generation": 2,
         "last_sync_error": null,
+        "lifecycle": "joined",
+        "now_ms": 50,
+        "last_recheck": {
+          "action": "connect",
+          "admitted": true,
+          "lifecycle": "joined",
+          "reason": null
+        },
         "comparison": {
           "source": {
             "authority": "woodshed",
@@ -1456,11 +1819,15 @@
         "service": {
           "authority_installed": true,
           "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "lifecycle": "joined",
+          "lifecycle_reason": null,
           "local_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
+          "now_ms": 50,
           "ok": true,
           "operations": [
             {
               "author_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
+              "authority": "effective",
               "operation_id": "367ec90086c6c71edec0a48197de3828671f73cdc0af38ff0b8723389e390753",
               "writer": "bd11126ba11021a0c894a5290d352d5de6c8e3d4b071d5404a09b1817c050458"
             }
@@ -1474,7 +1841,9 @@
             }
           ],
           "retained_count": 1,
+          "retained_delegation_count": 0,
           "revoked_authority_count": 0,
+          "revoked_members": [],
           "role": "member"
         },
         "records": [
@@ -1488,45 +1857,75 @@
         "traffic": [
           {
             "direction": "outgoing",
+            "method": "GET",
             "path": "/invitation",
             "bytes": 0,
-            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "refused: Founder has not created an invitation"
           },
           {
             "direction": "outgoing",
+            "method": "GET",
+            "path": "/invitation",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "POST",
             "path": "/wire",
             "bytes": 18,
-            "sha256": "9389e6512af6fefa0599e7a946ef8eb432546cec8eb92d674ad516e2b98d7f1e"
+            "sha256": "9389e6512af6fefa0599e7a946ef8eb432546cec8eb92d674ad516e2b98d7f1e",
+            "result": "ok"
           },
           {
             "direction": "outgoing",
+            "method": "GET",
             "path": "/wire",
             "bytes": 0,
-            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
           },
           {
             "direction": "outgoing",
+            "method": "POST",
             "path": "/wire",
             "bytes": 6850,
-            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36"
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36",
+            "result": "ok"
           },
           {
             "direction": "outgoing",
+            "method": "GET",
             "path": "/wire",
             "bytes": 0,
-            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
           },
           {
-            "direction": "outgoing",
+            "direction": "incoming",
+            "method": "POST",
             "path": "/wire",
             "bytes": 6850,
-            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36"
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36",
+            "result": "refused: Peer disconnected"
           },
           {
             "direction": "outgoing",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 6850,
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "GET",
             "path": "/wire",
             "bytes": 0,
-            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
           }
         ]
       }
@@ -1536,9 +1935,17 @@
         "role": "founder",
         "online": true,
         "process_open": true,
-        "process_id": 51880,
+        "process_id": 31724,
         "process_generation": 2,
         "last_sync_error": null,
+        "lifecycle": "joined",
+        "now_ms": 50,
+        "last_recheck": {
+          "action": "sync",
+          "admitted": true,
+          "lifecycle": "joined",
+          "reason": null
+        },
         "comparison": {
           "source": {
             "authority": "woodshed",
@@ -1636,16 +2043,21 @@
         "service": {
           "authority_installed": true,
           "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "lifecycle": "joined",
+          "lifecycle_reason": null,
           "local_root": "af06a3e3291714e4f356c19c9b15cd1951ec6e6662aa77be07547f289383341d",
+          "now_ms": 50,
           "ok": true,
           "operations": [
             {
               "author_root": "a7f6dfaf8f38b89ba8ce649b594f91e4d01fdc57f9c9493df43b5e50a9987367",
+              "authority": "pending_authority",
               "operation_id": "f9a47c337cdcbace14f18534baadb540b836b820e0777de81fc47eac0fae8766",
               "writer": "a8ff7590b139d75054d6b1fa126b6ab7688869c266a910914767b180185d2b98"
             },
             {
               "author_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
+              "authority": "effective",
               "operation_id": "367ec90086c6c71edec0a48197de3828671f73cdc0af38ff0b8723389e390753",
               "writer": "bd11126ba11021a0c894a5290d352d5de6c8e3d4b071d5404a09b1817c050458"
             }
@@ -1659,7 +2071,9 @@
             }
           ],
           "retained_count": 2,
+          "retained_delegation_count": 0,
           "revoked_authority_count": 0,
+          "revoked_members": [],
           "role": "founder"
         },
         "records": [
@@ -1673,39 +2087,83 @@
         "traffic": [
           {
             "direction": "incoming",
+            "method": "POST",
             "path": "/wire",
             "bytes": 18,
-            "sha256": "9389e6512af6fefa0599e7a946ef8eb432546cec8eb92d674ad516e2b98d7f1e"
+            "sha256": "9389e6512af6fefa0599e7a946ef8eb432546cec8eb92d674ad516e2b98d7f1e",
+            "result": "ok"
           },
           {
             "direction": "incoming",
-            "path": "/wire",
-            "bytes": 6850,
-            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36"
-          },
-          {
-            "direction": "incoming",
-            "path": "/wire",
-            "bytes": 6850,
-            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36"
-          },
-          {
-            "direction": "incoming",
-            "path": "/wire",
-            "bytes": 7344,
-            "sha256": "9ea771d5ffceb2cde77b8abe601a8cf588d1005f240357e955c2c335b1e438e5"
-          },
-          {
-            "direction": "outgoing",
-            "path": "/wire",
-            "bytes": 14178,
-            "sha256": "99a913eab56bcb40828294e04f3d6c8123571d1f70b1f9daf4d5525fca23ea71"
-          },
-          {
-            "direction": "outgoing",
+            "method": "GET",
             "path": "/wire",
             "bytes": 0,
-            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 6850,
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 6850,
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36",
+            "result": "refused: Peer disconnected"
+          },
+          {
+            "direction": "incoming",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 6850,
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 7344,
+            "sha256": "9ea771d5ffceb2cde77b8abe601a8cf588d1005f240357e955c2c335b1e438e5",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 14178,
+            "sha256": "99a913eab56bcb40828294e04f3d6c8123571d1f70b1f9daf4d5525fca23ea71",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
           }
         ]
       },
@@ -1713,9 +2171,17 @@
         "role": "member",
         "online": true,
         "process_open": true,
-        "process_id": 26392,
+        "process_id": 32452,
         "process_generation": 2,
         "last_sync_error": null,
+        "lifecycle": "joined",
+        "now_ms": 50,
+        "last_recheck": {
+          "action": "connect",
+          "admitted": true,
+          "lifecycle": "joined",
+          "reason": null
+        },
         "comparison": {
           "source": {
             "authority": "woodshed",
@@ -1813,16 +2279,21 @@
         "service": {
           "authority_installed": true,
           "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "lifecycle": "joined",
+          "lifecycle_reason": null,
           "local_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
+          "now_ms": 50,
           "ok": true,
           "operations": [
             {
               "author_root": "a7f6dfaf8f38b89ba8ce649b594f91e4d01fdc57f9c9493df43b5e50a9987367",
+              "authority": "pending_authority",
               "operation_id": "f9a47c337cdcbace14f18534baadb540b836b820e0777de81fc47eac0fae8766",
               "writer": "a8ff7590b139d75054d6b1fa126b6ab7688869c266a910914767b180185d2b98"
             },
             {
               "author_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
+              "authority": "effective",
               "operation_id": "367ec90086c6c71edec0a48197de3828671f73cdc0af38ff0b8723389e390753",
               "writer": "bd11126ba11021a0c894a5290d352d5de6c8e3d4b071d5404a09b1817c050458"
             }
@@ -1836,7 +2307,9 @@
             }
           ],
           "retained_count": 2,
+          "retained_delegation_count": 0,
           "revoked_authority_count": 0,
+          "revoked_members": [],
           "role": "member"
         },
         "records": [
@@ -1850,51 +2323,3041 @@
         "traffic": [
           {
             "direction": "outgoing",
+            "method": "GET",
             "path": "/invitation",
             "bytes": 0,
-            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "refused: Founder has not created an invitation"
           },
           {
             "direction": "outgoing",
+            "method": "GET",
+            "path": "/invitation",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "POST",
             "path": "/wire",
             "bytes": 18,
-            "sha256": "9389e6512af6fefa0599e7a946ef8eb432546cec8eb92d674ad516e2b98d7f1e"
+            "sha256": "9389e6512af6fefa0599e7a946ef8eb432546cec8eb92d674ad516e2b98d7f1e",
+            "result": "ok"
           },
           {
             "direction": "outgoing",
+            "method": "GET",
             "path": "/wire",
             "bytes": 0,
-            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
           },
           {
             "direction": "outgoing",
+            "method": "POST",
             "path": "/wire",
             "bytes": 6850,
-            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36"
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36",
+            "result": "ok"
           },
           {
             "direction": "outgoing",
+            "method": "GET",
             "path": "/wire",
             "bytes": 0,
-            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-          },
-          {
-            "direction": "outgoing",
-            "path": "/wire",
-            "bytes": 6850,
-            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36"
-          },
-          {
-            "direction": "outgoing",
-            "path": "/wire",
-            "bytes": 0,
-            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
           },
           {
             "direction": "incoming",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 6850,
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36",
+            "result": "refused: Peer disconnected"
+          },
+          {
+            "direction": "outgoing",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 6850,
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "POST",
             "path": "/wire",
             "bytes": 14178,
-            "sha256": "99a913eab56bcb40828294e04f3d6c8123571d1f70b1f9daf4d5525fca23ea71"
+            "sha256": "99a913eab56bcb40828294e04f3d6c8123571d1f70b1f9daf4d5525fca23ea71",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          }
+        ]
+      }
+    ],
+    "left": [
+      {
+        "role": "founder",
+        "online": true,
+        "process_open": true,
+        "process_id": 31724,
+        "process_generation": 2,
+        "last_sync_error": "Peer refused /wire: not joined: this peer left the space; install an invitation to join again",
+        "lifecycle": "joined",
+        "now_ms": 50,
+        "last_recheck": {
+          "action": "sync",
+          "admitted": true,
+          "lifecycle": "joined",
+          "reason": null
+        },
+        "comparison": {
+          "source": {
+            "authority": "woodshed",
+            "domain": "music.practice",
+            "resource": "set:musical-comparison"
+          },
+          "revision": "musical-comparison-fixture-v1",
+          "method": {
+            "id": "keyed-pitch-set-singleton",
+            "version": 1
+          },
+          "left": {
+            "occurrence_id": "card:1",
+            "source": {
+              "adapter": "woodshed.stage",
+              "id": "chord:Major"
+            },
+            "label": "C Major",
+            "root_pitch_class": 0,
+            "pitch_set": [
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              },
+              {
+                "pitch_class": 7,
+                "label": "G"
+              }
+            ]
+          },
+          "right": {
+            "occurrence_id": "card:2",
+            "source": {
+              "adapter": "woodshed.stage",
+              "id": "chord:Minor"
+            },
+            "label": "A Minor",
+            "root_pitch_class": 9,
+            "pitch_set": [
+              {
+                "pitch_class": 9,
+                "label": "A"
+              },
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              }
+            ]
+          },
+          "result": {
+            "version": 1,
+            "status": "applicable",
+            "shared": [
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              }
+            ],
+            "left_only": [
+              {
+                "pitch_class": 7,
+                "label": "G"
+              }
+            ],
+            "right_only": [
+              {
+                "pitch_class": 9,
+                "label": "A"
+              }
+            ],
+            "singleton_motion": {
+              "from": {
+                "pitch_class": 7,
+                "label": "G"
+              },
+              "to": {
+                "pitch_class": 9,
+                "label": "A"
+              }
+            }
+          }
+        },
+        "service": {
+          "authority_installed": true,
+          "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "lifecycle": "joined",
+          "lifecycle_reason": null,
+          "local_root": "af06a3e3291714e4f356c19c9b15cd1951ec6e6662aa77be07547f289383341d",
+          "now_ms": 50,
+          "ok": true,
+          "operations": [
+            {
+              "author_root": "a7f6dfaf8f38b89ba8ce649b594f91e4d01fdc57f9c9493df43b5e50a9987367",
+              "authority": "pending_authority",
+              "operation_id": "f9a47c337cdcbace14f18534baadb540b836b820e0777de81fc47eac0fae8766",
+              "writer": "a8ff7590b139d75054d6b1fa126b6ab7688869c266a910914767b180185d2b98"
+            },
+            {
+              "author_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
+              "authority": "effective",
+              "operation_id": "367ec90086c6c71edec0a48197de3828671f73cdc0af38ff0b8723389e390753",
+              "writer": "bd11126ba11021a0c894a5290d352d5de6c8e3d4b071d5404a09b1817c050458"
+            }
+          ],
+          "pending_authority_count": 1,
+          "records": [
+            {
+              "body_utf8_hex": "7b226c656674223a7b226c6162656c223a2243204d616a6f72222c226f6363757272656e63655f6964223a22636172643a31222c2270697463685f736574223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d2c7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c22726f6f745f70697463685f636c617373223a302c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d616a6f72227d7d2c226d6574686f64223a7b226964223a226b657965642d70697463682d7365742d73696e676c65746f6e222c2276657273696f6e223a317d2c22726573756c74223a7b226c6566745f6f6e6c79223a5b7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c2272696768745f6f6e6c79223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d5d2c22736861726564223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c2273696e676c65746f6e5f6d6f74696f6e223a7b2266726f6d223a7b226c6162656c223a2247222c2270697463685f636c617373223a377d2c22746f223a7b226c6162656c223a2241222c2270697463685f636c617373223a397d7d2c22737461747573223a226170706c696361626c65222c2276657273696f6e223a317d2c227265766973696f6e223a226d75736963616c2d636f6d70617269736f6e2d666978747572652d7631222c227269676874223a7b226c6162656c223a2241204d696e6f72222c226f6363757272656e63655f6964223a22636172643a32222c2270697463685f736574223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d2c7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c22726f6f745f70697463685f636c617373223a392c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d696e6f72227d7d2c22736f75726365223a7b22617574686f72697479223a22776f6f6473686564222c22646f6d61696e223a226d757369632e7072616374696365222c227265736f75726365223a227365743a6d75736963616c2d636f6d70617269736f6e227d7d",
+              "id": "woodshed-comparison:member:0",
+              "media_type": "application/vnd.woodshed.comparison+json"
+            }
+          ],
+          "retained_count": 2,
+          "retained_delegation_count": 0,
+          "revoked_authority_count": 0,
+          "revoked_members": [],
+          "role": "founder"
+        },
+        "records": [
+          {
+            "body_utf8_hex": "7b226c656674223a7b226c6162656c223a2243204d616a6f72222c226f6363757272656e63655f6964223a22636172643a31222c2270697463685f736574223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d2c7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c22726f6f745f70697463685f636c617373223a302c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d616a6f72227d7d2c226d6574686f64223a7b226964223a226b657965642d70697463682d7365742d73696e676c65746f6e222c2276657273696f6e223a317d2c22726573756c74223a7b226c6566745f6f6e6c79223a5b7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c2272696768745f6f6e6c79223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d5d2c22736861726564223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c2273696e676c65746f6e5f6d6f74696f6e223a7b2266726f6d223a7b226c6162656c223a2247222c2270697463685f636c617373223a377d2c22746f223a7b226c6162656c223a2241222c2270697463685f636c617373223a397d7d2c22737461747573223a226170706c696361626c65222c2276657273696f6e223a317d2c227265766973696f6e223a226d75736963616c2d636f6d70617269736f6e2d666978747572652d7631222c227269676874223a7b226c6162656c223a2241204d696e6f72222c226f6363757272656e63655f6964223a22636172643a32222c2270697463685f736574223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d2c7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c22726f6f745f70697463685f636c617373223a392c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d696e6f72227d7d2c22736f75726365223a7b22617574686f72697479223a22776f6f6473686564222c22646f6d61696e223a226d757369632e7072616374696365222c227265736f75726365223a227365743a6d75736963616c2d636f6d70617269736f6e227d7d",
+            "id": "woodshed-comparison:member:0",
+            "media_type": "application/vnd.woodshed.comparison+json"
+          }
+        ],
+        "retained_count": 2,
+        "traffic": [
+          {
+            "direction": "incoming",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 18,
+            "sha256": "9389e6512af6fefa0599e7a946ef8eb432546cec8eb92d674ad516e2b98d7f1e",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 6850,
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 6850,
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36",
+            "result": "refused: Peer disconnected"
+          },
+          {
+            "direction": "incoming",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 6850,
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 7344,
+            "sha256": "9ea771d5ffceb2cde77b8abe601a8cf588d1005f240357e955c2c335b1e438e5",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 14178,
+            "sha256": "99a913eab56bcb40828294e04f3d6c8123571d1f70b1f9daf4d5525fca23ea71",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 14178,
+            "sha256": "99a913eab56bcb40828294e04f3d6c8123571d1f70b1f9daf4d5525fca23ea71",
+            "result": "refused: not joined: this peer left the space; install an invitation to join again"
+          }
+        ]
+      },
+      {
+        "role": "member",
+        "online": true,
+        "process_open": true,
+        "process_id": 32452,
+        "process_generation": 2,
+        "last_sync_error": "not joined: this peer left the space; install an invitation to join again",
+        "lifecycle": "left",
+        "now_ms": 50,
+        "last_recheck": {
+          "action": "sync",
+          "admitted": false,
+          "lifecycle": "left",
+          "reason": "not joined: this peer left the space; install an invitation to join again"
+        },
+        "comparison": {
+          "source": {
+            "authority": "woodshed",
+            "domain": "music.practice",
+            "resource": "set:musical-comparison"
+          },
+          "revision": "musical-comparison-fixture-v1",
+          "method": {
+            "id": "keyed-pitch-set-singleton",
+            "version": 1
+          },
+          "left": {
+            "occurrence_id": "card:1",
+            "source": {
+              "adapter": "woodshed.stage",
+              "id": "chord:Major"
+            },
+            "label": "C Major",
+            "root_pitch_class": 0,
+            "pitch_set": [
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              },
+              {
+                "pitch_class": 7,
+                "label": "G"
+              }
+            ]
+          },
+          "right": {
+            "occurrence_id": "card:2",
+            "source": {
+              "adapter": "woodshed.stage",
+              "id": "chord:Minor"
+            },
+            "label": "A Minor",
+            "root_pitch_class": 9,
+            "pitch_set": [
+              {
+                "pitch_class": 9,
+                "label": "A"
+              },
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              }
+            ]
+          },
+          "result": {
+            "version": 1,
+            "status": "applicable",
+            "shared": [
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              }
+            ],
+            "left_only": [
+              {
+                "pitch_class": 7,
+                "label": "G"
+              }
+            ],
+            "right_only": [
+              {
+                "pitch_class": 9,
+                "label": "A"
+              }
+            ],
+            "singleton_motion": {
+              "from": {
+                "pitch_class": 7,
+                "label": "G"
+              },
+              "to": {
+                "pitch_class": 9,
+                "label": "A"
+              }
+            }
+          }
+        },
+        "service": {
+          "authority_installed": false,
+          "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "lifecycle": "left",
+          "lifecycle_reason": "not joined: this peer left the space; install an invitation to join again",
+          "local_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
+          "now_ms": 50,
+          "ok": true,
+          "operations": [
+            {
+              "author_root": "a7f6dfaf8f38b89ba8ce649b594f91e4d01fdc57f9c9493df43b5e50a9987367",
+              "authority": null,
+              "operation_id": "f9a47c337cdcbace14f18534baadb540b836b820e0777de81fc47eac0fae8766",
+              "writer": "a8ff7590b139d75054d6b1fa126b6ab7688869c266a910914767b180185d2b98"
+            },
+            {
+              "author_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
+              "authority": null,
+              "operation_id": "367ec90086c6c71edec0a48197de3828671f73cdc0af38ff0b8723389e390753",
+              "writer": "bd11126ba11021a0c894a5290d352d5de6c8e3d4b071d5404a09b1817c050458"
+            }
+          ],
+          "pending_authority_count": 0,
+          "records": [],
+          "retained_count": 2,
+          "retained_delegation_count": 0,
+          "revoked_authority_count": 0,
+          "revoked_members": [],
+          "role": "member"
+        },
+        "records": [],
+        "retained_count": 2,
+        "traffic": [
+          {
+            "direction": "outgoing",
+            "method": "GET",
+            "path": "/invitation",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "refused: Founder has not created an invitation"
+          },
+          {
+            "direction": "outgoing",
+            "method": "GET",
+            "path": "/invitation",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 18,
+            "sha256": "9389e6512af6fefa0599e7a946ef8eb432546cec8eb92d674ad516e2b98d7f1e",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 6850,
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 6850,
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36",
+            "result": "refused: Peer disconnected"
+          },
+          {
+            "direction": "outgoing",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 6850,
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 14178,
+            "sha256": "99a913eab56bcb40828294e04f3d6c8123571d1f70b1f9daf4d5525fca23ea71",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 14178,
+            "sha256": "99a913eab56bcb40828294e04f3d6c8123571d1f70b1f9daf4d5525fca23ea71",
+            "result": "refused: not joined: this peer left the space; install an invitation to join again"
+          }
+        ]
+      }
+    ],
+    "rejoined": [
+      {
+        "role": "founder",
+        "online": true,
+        "process_open": true,
+        "process_id": 31724,
+        "process_generation": 2,
+        "last_sync_error": "Peer refused /wire: not joined: this peer left the space; install an invitation to join again",
+        "lifecycle": "joined",
+        "now_ms": 50,
+        "last_recheck": {
+          "action": "sync",
+          "admitted": true,
+          "lifecycle": "joined",
+          "reason": null
+        },
+        "comparison": {
+          "source": {
+            "authority": "woodshed",
+            "domain": "music.practice",
+            "resource": "set:musical-comparison"
+          },
+          "revision": "musical-comparison-fixture-v1",
+          "method": {
+            "id": "keyed-pitch-set-singleton",
+            "version": 1
+          },
+          "left": {
+            "occurrence_id": "card:1",
+            "source": {
+              "adapter": "woodshed.stage",
+              "id": "chord:Major"
+            },
+            "label": "C Major",
+            "root_pitch_class": 0,
+            "pitch_set": [
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              },
+              {
+                "pitch_class": 7,
+                "label": "G"
+              }
+            ]
+          },
+          "right": {
+            "occurrence_id": "card:2",
+            "source": {
+              "adapter": "woodshed.stage",
+              "id": "chord:Minor"
+            },
+            "label": "A Minor",
+            "root_pitch_class": 9,
+            "pitch_set": [
+              {
+                "pitch_class": 9,
+                "label": "A"
+              },
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              }
+            ]
+          },
+          "result": {
+            "version": 1,
+            "status": "applicable",
+            "shared": [
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              }
+            ],
+            "left_only": [
+              {
+                "pitch_class": 7,
+                "label": "G"
+              }
+            ],
+            "right_only": [
+              {
+                "pitch_class": 9,
+                "label": "A"
+              }
+            ],
+            "singleton_motion": {
+              "from": {
+                "pitch_class": 7,
+                "label": "G"
+              },
+              "to": {
+                "pitch_class": 9,
+                "label": "A"
+              }
+            }
+          }
+        },
+        "service": {
+          "authority_installed": true,
+          "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "lifecycle": "joined",
+          "lifecycle_reason": null,
+          "local_root": "af06a3e3291714e4f356c19c9b15cd1951ec6e6662aa77be07547f289383341d",
+          "now_ms": 50,
+          "ok": true,
+          "operations": [
+            {
+              "author_root": "a7f6dfaf8f38b89ba8ce649b594f91e4d01fdc57f9c9493df43b5e50a9987367",
+              "authority": "pending_authority",
+              "operation_id": "f9a47c337cdcbace14f18534baadb540b836b820e0777de81fc47eac0fae8766",
+              "writer": "a8ff7590b139d75054d6b1fa126b6ab7688869c266a910914767b180185d2b98"
+            },
+            {
+              "author_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
+              "authority": "effective",
+              "operation_id": "367ec90086c6c71edec0a48197de3828671f73cdc0af38ff0b8723389e390753",
+              "writer": "bd11126ba11021a0c894a5290d352d5de6c8e3d4b071d5404a09b1817c050458"
+            }
+          ],
+          "pending_authority_count": 1,
+          "records": [
+            {
+              "body_utf8_hex": "7b226c656674223a7b226c6162656c223a2243204d616a6f72222c226f6363757272656e63655f6964223a22636172643a31222c2270697463685f736574223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d2c7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c22726f6f745f70697463685f636c617373223a302c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d616a6f72227d7d2c226d6574686f64223a7b226964223a226b657965642d70697463682d7365742d73696e676c65746f6e222c2276657273696f6e223a317d2c22726573756c74223a7b226c6566745f6f6e6c79223a5b7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c2272696768745f6f6e6c79223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d5d2c22736861726564223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c2273696e676c65746f6e5f6d6f74696f6e223a7b2266726f6d223a7b226c6162656c223a2247222c2270697463685f636c617373223a377d2c22746f223a7b226c6162656c223a2241222c2270697463685f636c617373223a397d7d2c22737461747573223a226170706c696361626c65222c2276657273696f6e223a317d2c227265766973696f6e223a226d75736963616c2d636f6d70617269736f6e2d666978747572652d7631222c227269676874223a7b226c6162656c223a2241204d696e6f72222c226f6363757272656e63655f6964223a22636172643a32222c2270697463685f736574223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d2c7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c22726f6f745f70697463685f636c617373223a392c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d696e6f72227d7d2c22736f75726365223a7b22617574686f72697479223a22776f6f6473686564222c22646f6d61696e223a226d757369632e7072616374696365222c227265736f75726365223a227365743a6d75736963616c2d636f6d70617269736f6e227d7d",
+              "id": "woodshed-comparison:member:0",
+              "media_type": "application/vnd.woodshed.comparison+json"
+            }
+          ],
+          "retained_count": 2,
+          "retained_delegation_count": 0,
+          "revoked_authority_count": 0,
+          "revoked_members": [],
+          "role": "founder"
+        },
+        "records": [
+          {
+            "body_utf8_hex": "7b226c656674223a7b226c6162656c223a2243204d616a6f72222c226f6363757272656e63655f6964223a22636172643a31222c2270697463685f736574223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d2c7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c22726f6f745f70697463685f636c617373223a302c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d616a6f72227d7d2c226d6574686f64223a7b226964223a226b657965642d70697463682d7365742d73696e676c65746f6e222c2276657273696f6e223a317d2c22726573756c74223a7b226c6566745f6f6e6c79223a5b7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c2272696768745f6f6e6c79223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d5d2c22736861726564223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c2273696e676c65746f6e5f6d6f74696f6e223a7b2266726f6d223a7b226c6162656c223a2247222c2270697463685f636c617373223a377d2c22746f223a7b226c6162656c223a2241222c2270697463685f636c617373223a397d7d2c22737461747573223a226170706c696361626c65222c2276657273696f6e223a317d2c227265766973696f6e223a226d75736963616c2d636f6d70617269736f6e2d666978747572652d7631222c227269676874223a7b226c6162656c223a2241204d696e6f72222c226f6363757272656e63655f6964223a22636172643a32222c2270697463685f736574223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d2c7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c22726f6f745f70697463685f636c617373223a392c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d696e6f72227d7d2c22736f75726365223a7b22617574686f72697479223a22776f6f6473686564222c22646f6d61696e223a226d757369632e7072616374696365222c227265736f75726365223a227365743a6d75736963616c2d636f6d70617269736f6e227d7d",
+            "id": "woodshed-comparison:member:0",
+            "media_type": "application/vnd.woodshed.comparison+json"
+          }
+        ],
+        "retained_count": 2,
+        "traffic": [
+          {
+            "direction": "incoming",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 18,
+            "sha256": "9389e6512af6fefa0599e7a946ef8eb432546cec8eb92d674ad516e2b98d7f1e",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 6850,
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 6850,
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36",
+            "result": "refused: Peer disconnected"
+          },
+          {
+            "direction": "incoming",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 6850,
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 7344,
+            "sha256": "9ea771d5ffceb2cde77b8abe601a8cf588d1005f240357e955c2c335b1e438e5",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 14178,
+            "sha256": "99a913eab56bcb40828294e04f3d6c8123571d1f70b1f9daf4d5525fca23ea71",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 14178,
+            "sha256": "99a913eab56bcb40828294e04f3d6c8123571d1f70b1f9daf4d5525fca23ea71",
+            "result": "refused: not joined: this peer left the space; install an invitation to join again"
+          },
+          {
+            "direction": "incoming",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 14178,
+            "sha256": "99a913eab56bcb40828294e04f3d6c8123571d1f70b1f9daf4d5525fca23ea71",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          }
+        ]
+      },
+      {
+        "role": "member",
+        "online": true,
+        "process_open": true,
+        "process_id": 32452,
+        "process_generation": 2,
+        "last_sync_error": null,
+        "lifecycle": "joined",
+        "now_ms": 50,
+        "last_recheck": {
+          "action": "sync",
+          "admitted": true,
+          "lifecycle": "joined",
+          "reason": null
+        },
+        "comparison": {
+          "source": {
+            "authority": "woodshed",
+            "domain": "music.practice",
+            "resource": "set:musical-comparison"
+          },
+          "revision": "musical-comparison-fixture-v1",
+          "method": {
+            "id": "keyed-pitch-set-singleton",
+            "version": 1
+          },
+          "left": {
+            "occurrence_id": "card:1",
+            "source": {
+              "adapter": "woodshed.stage",
+              "id": "chord:Major"
+            },
+            "label": "C Major",
+            "root_pitch_class": 0,
+            "pitch_set": [
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              },
+              {
+                "pitch_class": 7,
+                "label": "G"
+              }
+            ]
+          },
+          "right": {
+            "occurrence_id": "card:2",
+            "source": {
+              "adapter": "woodshed.stage",
+              "id": "chord:Minor"
+            },
+            "label": "A Minor",
+            "root_pitch_class": 9,
+            "pitch_set": [
+              {
+                "pitch_class": 9,
+                "label": "A"
+              },
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              }
+            ]
+          },
+          "result": {
+            "version": 1,
+            "status": "applicable",
+            "shared": [
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              }
+            ],
+            "left_only": [
+              {
+                "pitch_class": 7,
+                "label": "G"
+              }
+            ],
+            "right_only": [
+              {
+                "pitch_class": 9,
+                "label": "A"
+              }
+            ],
+            "singleton_motion": {
+              "from": {
+                "pitch_class": 7,
+                "label": "G"
+              },
+              "to": {
+                "pitch_class": 9,
+                "label": "A"
+              }
+            }
+          }
+        },
+        "service": {
+          "authority_installed": true,
+          "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "lifecycle": "joined",
+          "lifecycle_reason": null,
+          "local_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
+          "now_ms": 50,
+          "ok": true,
+          "operations": [
+            {
+              "author_root": "a7f6dfaf8f38b89ba8ce649b594f91e4d01fdc57f9c9493df43b5e50a9987367",
+              "authority": "pending_authority",
+              "operation_id": "f9a47c337cdcbace14f18534baadb540b836b820e0777de81fc47eac0fae8766",
+              "writer": "a8ff7590b139d75054d6b1fa126b6ab7688869c266a910914767b180185d2b98"
+            },
+            {
+              "author_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
+              "authority": "effective",
+              "operation_id": "367ec90086c6c71edec0a48197de3828671f73cdc0af38ff0b8723389e390753",
+              "writer": "bd11126ba11021a0c894a5290d352d5de6c8e3d4b071d5404a09b1817c050458"
+            }
+          ],
+          "pending_authority_count": 1,
+          "records": [
+            {
+              "body_utf8_hex": "7b226c656674223a7b226c6162656c223a2243204d616a6f72222c226f6363757272656e63655f6964223a22636172643a31222c2270697463685f736574223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d2c7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c22726f6f745f70697463685f636c617373223a302c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d616a6f72227d7d2c226d6574686f64223a7b226964223a226b657965642d70697463682d7365742d73696e676c65746f6e222c2276657273696f6e223a317d2c22726573756c74223a7b226c6566745f6f6e6c79223a5b7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c2272696768745f6f6e6c79223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d5d2c22736861726564223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c2273696e676c65746f6e5f6d6f74696f6e223a7b2266726f6d223a7b226c6162656c223a2247222c2270697463685f636c617373223a377d2c22746f223a7b226c6162656c223a2241222c2270697463685f636c617373223a397d7d2c22737461747573223a226170706c696361626c65222c2276657273696f6e223a317d2c227265766973696f6e223a226d75736963616c2d636f6d70617269736f6e2d666978747572652d7631222c227269676874223a7b226c6162656c223a2241204d696e6f72222c226f6363757272656e63655f6964223a22636172643a32222c2270697463685f736574223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d2c7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c22726f6f745f70697463685f636c617373223a392c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d696e6f72227d7d2c22736f75726365223a7b22617574686f72697479223a22776f6f6473686564222c22646f6d61696e223a226d757369632e7072616374696365222c227265736f75726365223a227365743a6d75736963616c2d636f6d70617269736f6e227d7d",
+              "id": "woodshed-comparison:member:0",
+              "media_type": "application/vnd.woodshed.comparison+json"
+            }
+          ],
+          "retained_count": 2,
+          "retained_delegation_count": 0,
+          "revoked_authority_count": 0,
+          "revoked_members": [],
+          "role": "member"
+        },
+        "records": [
+          {
+            "body_utf8_hex": "7b226c656674223a7b226c6162656c223a2243204d616a6f72222c226f6363757272656e63655f6964223a22636172643a31222c2270697463685f736574223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d2c7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c22726f6f745f70697463685f636c617373223a302c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d616a6f72227d7d2c226d6574686f64223a7b226964223a226b657965642d70697463682d7365742d73696e676c65746f6e222c2276657273696f6e223a317d2c22726573756c74223a7b226c6566745f6f6e6c79223a5b7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c2272696768745f6f6e6c79223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d5d2c22736861726564223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c2273696e676c65746f6e5f6d6f74696f6e223a7b2266726f6d223a7b226c6162656c223a2247222c2270697463685f636c617373223a377d2c22746f223a7b226c6162656c223a2241222c2270697463685f636c617373223a397d7d2c22737461747573223a226170706c696361626c65222c2276657273696f6e223a317d2c227265766973696f6e223a226d75736963616c2d636f6d70617269736f6e2d666978747572652d7631222c227269676874223a7b226c6162656c223a2241204d696e6f72222c226f6363757272656e63655f6964223a22636172643a32222c2270697463685f736574223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d2c7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c22726f6f745f70697463685f636c617373223a392c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d696e6f72227d7d2c22736f75726365223a7b22617574686f72697479223a22776f6f6473686564222c22646f6d61696e223a226d757369632e7072616374696365222c227265736f75726365223a227365743a6d75736963616c2d636f6d70617269736f6e227d7d",
+            "id": "woodshed-comparison:member:0",
+            "media_type": "application/vnd.woodshed.comparison+json"
+          }
+        ],
+        "retained_count": 2,
+        "traffic": [
+          {
+            "direction": "outgoing",
+            "method": "GET",
+            "path": "/invitation",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "refused: Founder has not created an invitation"
+          },
+          {
+            "direction": "outgoing",
+            "method": "GET",
+            "path": "/invitation",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 18,
+            "sha256": "9389e6512af6fefa0599e7a946ef8eb432546cec8eb92d674ad516e2b98d7f1e",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 6850,
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 6850,
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36",
+            "result": "refused: Peer disconnected"
+          },
+          {
+            "direction": "outgoing",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 6850,
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 14178,
+            "sha256": "99a913eab56bcb40828294e04f3d6c8123571d1f70b1f9daf4d5525fca23ea71",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 14178,
+            "sha256": "99a913eab56bcb40828294e04f3d6c8123571d1f70b1f9daf4d5525fca23ea71",
+            "result": "refused: not joined: this peer left the space; install an invitation to join again"
+          },
+          {
+            "direction": "outgoing",
+            "method": "GET",
+            "path": "/invitation",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 14178,
+            "sha256": "99a913eab56bcb40828294e04f3d6c8123571d1f70b1f9daf4d5525fca23ea71",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          }
+        ]
+      }
+    ],
+    "revocation_synced": [
+      {
+        "role": "founder",
+        "online": true,
+        "process_open": true,
+        "process_id": 31724,
+        "process_generation": 2,
+        "last_sync_error": "Peer refused /wire: Peer disconnected",
+        "lifecycle": "joined",
+        "now_ms": 50,
+        "last_recheck": {
+          "action": "sync",
+          "admitted": true,
+          "lifecycle": "joined",
+          "reason": null
+        },
+        "comparison": {
+          "source": {
+            "authority": "woodshed",
+            "domain": "music.practice",
+            "resource": "set:musical-comparison"
+          },
+          "revision": "musical-comparison-fixture-v1",
+          "method": {
+            "id": "keyed-pitch-set-singleton",
+            "version": 1
+          },
+          "left": {
+            "occurrence_id": "card:1",
+            "source": {
+              "adapter": "woodshed.stage",
+              "id": "chord:Major"
+            },
+            "label": "C Major",
+            "root_pitch_class": 0,
+            "pitch_set": [
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              },
+              {
+                "pitch_class": 7,
+                "label": "G"
+              }
+            ]
+          },
+          "right": {
+            "occurrence_id": "card:2",
+            "source": {
+              "adapter": "woodshed.stage",
+              "id": "chord:Minor"
+            },
+            "label": "A Minor",
+            "root_pitch_class": 9,
+            "pitch_set": [
+              {
+                "pitch_class": 9,
+                "label": "A"
+              },
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              }
+            ]
+          },
+          "result": {
+            "version": 1,
+            "status": "applicable",
+            "shared": [
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              }
+            ],
+            "left_only": [
+              {
+                "pitch_class": 7,
+                "label": "G"
+              }
+            ],
+            "right_only": [
+              {
+                "pitch_class": 9,
+                "label": "A"
+              }
+            ],
+            "singleton_motion": {
+              "from": {
+                "pitch_class": 7,
+                "label": "G"
+              },
+              "to": {
+                "pitch_class": 9,
+                "label": "A"
+              }
+            }
+          }
+        },
+        "service": {
+          "authority_installed": true,
+          "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "lifecycle": "joined",
+          "lifecycle_reason": null,
+          "local_root": "af06a3e3291714e4f356c19c9b15cd1951ec6e6662aa77be07547f289383341d",
+          "now_ms": 50,
+          "ok": true,
+          "operations": [
+            {
+              "author_root": "af06a3e3291714e4f356c19c9b15cd1951ec6e6662aa77be07547f289383341d",
+              "authority": "effective",
+              "operation_id": "2c9f1e51b777258452fe1f9d7be102605852907e05434c4e6c8e655c940f5de0",
+              "writer": "181215902123d322959dbf105736e17af4bfe075e0d5808f39d8087e1b545068"
+            },
+            {
+              "author_root": "a7f6dfaf8f38b89ba8ce649b594f91e4d01fdc57f9c9493df43b5e50a9987367",
+              "authority": "pending_authority",
+              "operation_id": "f9a47c337cdcbace14f18534baadb540b836b820e0777de81fc47eac0fae8766",
+              "writer": "a8ff7590b139d75054d6b1fa126b6ab7688869c266a910914767b180185d2b98"
+            },
+            {
+              "author_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
+              "authority": "revoked",
+              "operation_id": "367ec90086c6c71edec0a48197de3828671f73cdc0af38ff0b8723389e390753",
+              "writer": "bd11126ba11021a0c894a5290d352d5de6c8e3d4b071d5404a09b1817c050458"
+            },
+            {
+              "author_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
+              "authority": "revoked",
+              "operation_id": "8ab0dc841ed6abaf310b391f83e7f491a42f9021be9012e97328016cb6b361d7",
+              "writer": "bd11126ba11021a0c894a5290d352d5de6c8e3d4b071d5404a09b1817c050458"
+            }
+          ],
+          "pending_authority_count": 1,
+          "records": [
+            {
+              "body_utf8_hex": "7b226c656674223a7b226c6162656c223a2243204d616a6f72222c226f6363757272656e63655f6964223a22636172643a31222c2270697463685f736574223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d2c7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c22726f6f745f70697463685f636c617373223a302c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d616a6f72227d7d2c226d6574686f64223a7b226964223a226b657965642d70697463682d7365742d73696e676c65746f6e222c2276657273696f6e223a317d2c22726573756c74223a7b226c6566745f6f6e6c79223a5b7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c2272696768745f6f6e6c79223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d5d2c22736861726564223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c2273696e676c65746f6e5f6d6f74696f6e223a7b2266726f6d223a7b226c6162656c223a2247222c2270697463685f636c617373223a377d2c22746f223a7b226c6162656c223a2241222c2270697463685f636c617373223a397d7d2c22737461747573223a226170706c696361626c65222c2276657273696f6e223a317d2c227265766973696f6e223a226d75736963616c2d636f6d70617269736f6e2d666978747572652d7631222c227269676874223a7b226c6162656c223a2241204d696e6f72222c226f6363757272656e63655f6964223a22636172643a32222c2270697463685f736574223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d2c7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c22726f6f745f70697463685f636c617373223a392c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d696e6f72227d7d2c22736f75726365223a7b22617574686f72697479223a22776f6f6473686564222c22646f6d61696e223a226d757369632e7072616374696365222c227265736f75726365223a227365743a6d75736963616c2d636f6d70617269736f6e227d7d",
+              "id": "woodshed-comparison:founder:2",
+              "media_type": "application/vnd.woodshed.comparison+json"
+            }
+          ],
+          "retained_count": 4,
+          "retained_delegation_count": 2,
+          "revoked_authority_count": 2,
+          "revoked_members": [
+            "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6"
+          ],
+          "role": "founder"
+        },
+        "records": [
+          {
+            "body_utf8_hex": "7b226c656674223a7b226c6162656c223a2243204d616a6f72222c226f6363757272656e63655f6964223a22636172643a31222c2270697463685f736574223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d2c7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c22726f6f745f70697463685f636c617373223a302c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d616a6f72227d7d2c226d6574686f64223a7b226964223a226b657965642d70697463682d7365742d73696e676c65746f6e222c2276657273696f6e223a317d2c22726573756c74223a7b226c6566745f6f6e6c79223a5b7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c2272696768745f6f6e6c79223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d5d2c22736861726564223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c2273696e676c65746f6e5f6d6f74696f6e223a7b2266726f6d223a7b226c6162656c223a2247222c2270697463685f636c617373223a377d2c22746f223a7b226c6162656c223a2241222c2270697463685f636c617373223a397d7d2c22737461747573223a226170706c696361626c65222c2276657273696f6e223a317d2c227265766973696f6e223a226d75736963616c2d636f6d70617269736f6e2d666978747572652d7631222c227269676874223a7b226c6162656c223a2241204d696e6f72222c226f6363757272656e63655f6964223a22636172643a32222c2270697463685f736574223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d2c7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c22726f6f745f70697463685f636c617373223a392c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d696e6f72227d7d2c22736f75726365223a7b22617574686f72697479223a22776f6f6473686564222c22646f6d61696e223a226d757369632e7072616374696365222c227265736f75726365223a227365743a6d75736963616c2d636f6d70617269736f6e227d7d",
+            "id": "woodshed-comparison:founder:2",
+            "media_type": "application/vnd.woodshed.comparison+json"
+          }
+        ],
+        "retained_count": 4,
+        "traffic": [
+          {
+            "direction": "incoming",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 18,
+            "sha256": "9389e6512af6fefa0599e7a946ef8eb432546cec8eb92d674ad516e2b98d7f1e",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 6850,
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 6850,
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36",
+            "result": "refused: Peer disconnected"
+          },
+          {
+            "direction": "incoming",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 6850,
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 7344,
+            "sha256": "9ea771d5ffceb2cde77b8abe601a8cf588d1005f240357e955c2c335b1e438e5",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 14178,
+            "sha256": "99a913eab56bcb40828294e04f3d6c8123571d1f70b1f9daf4d5525fca23ea71",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 14178,
+            "sha256": "99a913eab56bcb40828294e04f3d6c8123571d1f70b1f9daf4d5525fca23ea71",
+            "result": "refused: not joined: this peer left the space; install an invitation to join again"
+          },
+          {
+            "direction": "incoming",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 14178,
+            "sha256": "99a913eab56bcb40828294e04f3d6c8123571d1f70b1f9daf4d5525fca23ea71",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 21564,
+            "sha256": "378e821b64baf945dd82ac38567cf86ed410fc316ce1307f60cb382f1a9a97aa",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 31068,
+            "sha256": "a380e608af77c6204ee957cab5180e622049f82f0d115d2c256dcb65306fc017",
+            "result": "refused: Peer disconnected"
+          },
+          {
+            "direction": "incoming",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 29266,
+            "sha256": "df4c674b9313c6a50520b07e3cadc603c1f9dc136f82ef6b6ea542c51f95b18f",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          }
+        ]
+      },
+      {
+        "role": "member",
+        "online": true,
+        "process_open": true,
+        "process_id": 27200,
+        "process_generation": 3,
+        "last_sync_error": null,
+        "lifecycle": "revoked",
+        "now_ms": 50,
+        "last_recheck": {
+          "action": "connect",
+          "admitted": true,
+          "lifecycle": "joined",
+          "reason": null
+        },
+        "comparison": {
+          "source": {
+            "authority": "woodshed",
+            "domain": "music.practice",
+            "resource": "set:musical-comparison"
+          },
+          "revision": "musical-comparison-fixture-v1",
+          "method": {
+            "id": "keyed-pitch-set-singleton",
+            "version": 1
+          },
+          "left": {
+            "occurrence_id": "card:1",
+            "source": {
+              "adapter": "woodshed.stage",
+              "id": "chord:Major"
+            },
+            "label": "C Major",
+            "root_pitch_class": 0,
+            "pitch_set": [
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              },
+              {
+                "pitch_class": 7,
+                "label": "G"
+              }
+            ]
+          },
+          "right": {
+            "occurrence_id": "card:2",
+            "source": {
+              "adapter": "woodshed.stage",
+              "id": "chord:Minor"
+            },
+            "label": "A Minor",
+            "root_pitch_class": 9,
+            "pitch_set": [
+              {
+                "pitch_class": 9,
+                "label": "A"
+              },
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              }
+            ]
+          },
+          "result": {
+            "version": 1,
+            "status": "applicable",
+            "shared": [
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              }
+            ],
+            "left_only": [
+              {
+                "pitch_class": 7,
+                "label": "G"
+              }
+            ],
+            "right_only": [
+              {
+                "pitch_class": 9,
+                "label": "A"
+              }
+            ],
+            "singleton_motion": {
+              "from": {
+                "pitch_class": 7,
+                "label": "G"
+              },
+              "to": {
+                "pitch_class": 9,
+                "label": "A"
+              }
+            }
+          }
+        },
+        "service": {
+          "authority_installed": true,
+          "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "lifecycle": "revoked",
+          "lifecycle_reason": "revoked: the issuer revoked this peer's delegation",
+          "local_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
+          "now_ms": 50,
+          "ok": true,
+          "operations": [
+            {
+              "author_root": "af06a3e3291714e4f356c19c9b15cd1951ec6e6662aa77be07547f289383341d",
+              "authority": "effective",
+              "operation_id": "2c9f1e51b777258452fe1f9d7be102605852907e05434c4e6c8e655c940f5de0",
+              "writer": "181215902123d322959dbf105736e17af4bfe075e0d5808f39d8087e1b545068"
+            },
+            {
+              "author_root": "a7f6dfaf8f38b89ba8ce649b594f91e4d01fdc57f9c9493df43b5e50a9987367",
+              "authority": "pending_authority",
+              "operation_id": "f9a47c337cdcbace14f18534baadb540b836b820e0777de81fc47eac0fae8766",
+              "writer": "a8ff7590b139d75054d6b1fa126b6ab7688869c266a910914767b180185d2b98"
+            },
+            {
+              "author_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
+              "authority": "revoked",
+              "operation_id": "367ec90086c6c71edec0a48197de3828671f73cdc0af38ff0b8723389e390753",
+              "writer": "bd11126ba11021a0c894a5290d352d5de6c8e3d4b071d5404a09b1817c050458"
+            },
+            {
+              "author_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
+              "authority": "revoked",
+              "operation_id": "8ab0dc841ed6abaf310b391f83e7f491a42f9021be9012e97328016cb6b361d7",
+              "writer": "bd11126ba11021a0c894a5290d352d5de6c8e3d4b071d5404a09b1817c050458"
+            }
+          ],
+          "pending_authority_count": 1,
+          "records": [
+            {
+              "body_utf8_hex": "7b226c656674223a7b226c6162656c223a2243204d616a6f72222c226f6363757272656e63655f6964223a22636172643a31222c2270697463685f736574223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d2c7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c22726f6f745f70697463685f636c617373223a302c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d616a6f72227d7d2c226d6574686f64223a7b226964223a226b657965642d70697463682d7365742d73696e676c65746f6e222c2276657273696f6e223a317d2c22726573756c74223a7b226c6566745f6f6e6c79223a5b7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c2272696768745f6f6e6c79223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d5d2c22736861726564223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c2273696e676c65746f6e5f6d6f74696f6e223a7b2266726f6d223a7b226c6162656c223a2247222c2270697463685f636c617373223a377d2c22746f223a7b226c6162656c223a2241222c2270697463685f636c617373223a397d7d2c22737461747573223a226170706c696361626c65222c2276657273696f6e223a317d2c227265766973696f6e223a226d75736963616c2d636f6d70617269736f6e2d666978747572652d7631222c227269676874223a7b226c6162656c223a2241204d696e6f72222c226f6363757272656e63655f6964223a22636172643a32222c2270697463685f736574223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d2c7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c22726f6f745f70697463685f636c617373223a392c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d696e6f72227d7d2c22736f75726365223a7b22617574686f72697479223a22776f6f6473686564222c22646f6d61696e223a226d757369632e7072616374696365222c227265736f75726365223a227365743a6d75736963616c2d636f6d70617269736f6e227d7d",
+              "id": "woodshed-comparison:founder:2",
+              "media_type": "application/vnd.woodshed.comparison+json"
+            }
+          ],
+          "retained_count": 4,
+          "retained_delegation_count": 2,
+          "revoked_authority_count": 2,
+          "revoked_members": [
+            "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6"
+          ],
+          "role": "member"
+        },
+        "records": [
+          {
+            "body_utf8_hex": "7b226c656674223a7b226c6162656c223a2243204d616a6f72222c226f6363757272656e63655f6964223a22636172643a31222c2270697463685f736574223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d2c7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c22726f6f745f70697463685f636c617373223a302c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d616a6f72227d7d2c226d6574686f64223a7b226964223a226b657965642d70697463682d7365742d73696e676c65746f6e222c2276657273696f6e223a317d2c22726573756c74223a7b226c6566745f6f6e6c79223a5b7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c2272696768745f6f6e6c79223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d5d2c22736861726564223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c2273696e676c65746f6e5f6d6f74696f6e223a7b2266726f6d223a7b226c6162656c223a2247222c2270697463685f636c617373223a377d2c22746f223a7b226c6162656c223a2241222c2270697463685f636c617373223a397d7d2c22737461747573223a226170706c696361626c65222c2276657273696f6e223a317d2c227265766973696f6e223a226d75736963616c2d636f6d70617269736f6e2d666978747572652d7631222c227269676874223a7b226c6162656c223a2241204d696e6f72222c226f6363757272656e63655f6964223a22636172643a32222c2270697463685f736574223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d2c7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c22726f6f745f70697463685f636c617373223a392c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d696e6f72227d7d2c22736f75726365223a7b22617574686f72697479223a22776f6f6473686564222c22646f6d61696e223a226d757369632e7072616374696365222c227265736f75726365223a227365743a6d75736963616c2d636f6d70617269736f6e227d7d",
+            "id": "woodshed-comparison:founder:2",
+            "media_type": "application/vnd.woodshed.comparison+json"
+          }
+        ],
+        "retained_count": 4,
+        "traffic": [
+          {
+            "direction": "outgoing",
+            "method": "GET",
+            "path": "/invitation",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "refused: Founder has not created an invitation"
+          },
+          {
+            "direction": "outgoing",
+            "method": "GET",
+            "path": "/invitation",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 18,
+            "sha256": "9389e6512af6fefa0599e7a946ef8eb432546cec8eb92d674ad516e2b98d7f1e",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 6850,
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 6850,
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36",
+            "result": "refused: Peer disconnected"
+          },
+          {
+            "direction": "outgoing",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 6850,
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 14178,
+            "sha256": "99a913eab56bcb40828294e04f3d6c8123571d1f70b1f9daf4d5525fca23ea71",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 14178,
+            "sha256": "99a913eab56bcb40828294e04f3d6c8123571d1f70b1f9daf4d5525fca23ea71",
+            "result": "refused: not joined: this peer left the space; install an invitation to join again"
+          },
+          {
+            "direction": "outgoing",
+            "method": "GET",
+            "path": "/invitation",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 14178,
+            "sha256": "99a913eab56bcb40828294e04f3d6c8123571d1f70b1f9daf4d5525fca23ea71",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 21564,
+            "sha256": "378e821b64baf945dd82ac38567cf86ed410fc316ce1307f60cb382f1a9a97aa",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 31068,
+            "sha256": "a380e608af77c6204ee957cab5180e622049f82f0d115d2c256dcb65306fc017",
+            "result": "refused: Peer disconnected"
+          },
+          {
+            "direction": "outgoing",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 29266,
+            "sha256": "df4c674b9313c6a50520b07e3cadc603c1f9dc136f82ef6b6ea542c51f95b18f",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          }
+        ]
+      }
+    ],
+    "revoked_reconnect_refused": [
+      {
+        "role": "founder",
+        "online": true,
+        "process_open": true,
+        "process_id": 31724,
+        "process_generation": 2,
+        "last_sync_error": "Peer refused /wire: Peer disconnected",
+        "lifecycle": "joined",
+        "now_ms": 50,
+        "last_recheck": {
+          "action": "sync",
+          "admitted": true,
+          "lifecycle": "joined",
+          "reason": null
+        },
+        "comparison": {
+          "source": {
+            "authority": "woodshed",
+            "domain": "music.practice",
+            "resource": "set:musical-comparison"
+          },
+          "revision": "musical-comparison-fixture-v1",
+          "method": {
+            "id": "keyed-pitch-set-singleton",
+            "version": 1
+          },
+          "left": {
+            "occurrence_id": "card:1",
+            "source": {
+              "adapter": "woodshed.stage",
+              "id": "chord:Major"
+            },
+            "label": "C Major",
+            "root_pitch_class": 0,
+            "pitch_set": [
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              },
+              {
+                "pitch_class": 7,
+                "label": "G"
+              }
+            ]
+          },
+          "right": {
+            "occurrence_id": "card:2",
+            "source": {
+              "adapter": "woodshed.stage",
+              "id": "chord:Minor"
+            },
+            "label": "A Minor",
+            "root_pitch_class": 9,
+            "pitch_set": [
+              {
+                "pitch_class": 9,
+                "label": "A"
+              },
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              }
+            ]
+          },
+          "result": {
+            "version": 1,
+            "status": "applicable",
+            "shared": [
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              }
+            ],
+            "left_only": [
+              {
+                "pitch_class": 7,
+                "label": "G"
+              }
+            ],
+            "right_only": [
+              {
+                "pitch_class": 9,
+                "label": "A"
+              }
+            ],
+            "singleton_motion": {
+              "from": {
+                "pitch_class": 7,
+                "label": "G"
+              },
+              "to": {
+                "pitch_class": 9,
+                "label": "A"
+              }
+            }
+          }
+        },
+        "service": {
+          "authority_installed": true,
+          "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "lifecycle": "joined",
+          "lifecycle_reason": null,
+          "local_root": "af06a3e3291714e4f356c19c9b15cd1951ec6e6662aa77be07547f289383341d",
+          "now_ms": 50,
+          "ok": true,
+          "operations": [
+            {
+              "author_root": "af06a3e3291714e4f356c19c9b15cd1951ec6e6662aa77be07547f289383341d",
+              "authority": "effective",
+              "operation_id": "2c9f1e51b777258452fe1f9d7be102605852907e05434c4e6c8e655c940f5de0",
+              "writer": "181215902123d322959dbf105736e17af4bfe075e0d5808f39d8087e1b545068"
+            },
+            {
+              "author_root": "a7f6dfaf8f38b89ba8ce649b594f91e4d01fdc57f9c9493df43b5e50a9987367",
+              "authority": "pending_authority",
+              "operation_id": "f9a47c337cdcbace14f18534baadb540b836b820e0777de81fc47eac0fae8766",
+              "writer": "a8ff7590b139d75054d6b1fa126b6ab7688869c266a910914767b180185d2b98"
+            },
+            {
+              "author_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
+              "authority": "revoked",
+              "operation_id": "367ec90086c6c71edec0a48197de3828671f73cdc0af38ff0b8723389e390753",
+              "writer": "bd11126ba11021a0c894a5290d352d5de6c8e3d4b071d5404a09b1817c050458"
+            },
+            {
+              "author_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
+              "authority": "revoked",
+              "operation_id": "8ab0dc841ed6abaf310b391f83e7f491a42f9021be9012e97328016cb6b361d7",
+              "writer": "bd11126ba11021a0c894a5290d352d5de6c8e3d4b071d5404a09b1817c050458"
+            }
+          ],
+          "pending_authority_count": 1,
+          "records": [
+            {
+              "body_utf8_hex": "7b226c656674223a7b226c6162656c223a2243204d616a6f72222c226f6363757272656e63655f6964223a22636172643a31222c2270697463685f736574223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d2c7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c22726f6f745f70697463685f636c617373223a302c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d616a6f72227d7d2c226d6574686f64223a7b226964223a226b657965642d70697463682d7365742d73696e676c65746f6e222c2276657273696f6e223a317d2c22726573756c74223a7b226c6566745f6f6e6c79223a5b7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c2272696768745f6f6e6c79223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d5d2c22736861726564223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c2273696e676c65746f6e5f6d6f74696f6e223a7b2266726f6d223a7b226c6162656c223a2247222c2270697463685f636c617373223a377d2c22746f223a7b226c6162656c223a2241222c2270697463685f636c617373223a397d7d2c22737461747573223a226170706c696361626c65222c2276657273696f6e223a317d2c227265766973696f6e223a226d75736963616c2d636f6d70617269736f6e2d666978747572652d7631222c227269676874223a7b226c6162656c223a2241204d696e6f72222c226f6363757272656e63655f6964223a22636172643a32222c2270697463685f736574223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d2c7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c22726f6f745f70697463685f636c617373223a392c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d696e6f72227d7d2c22736f75726365223a7b22617574686f72697479223a22776f6f6473686564222c22646f6d61696e223a226d757369632e7072616374696365222c227265736f75726365223a227365743a6d75736963616c2d636f6d70617269736f6e227d7d",
+              "id": "woodshed-comparison:founder:2",
+              "media_type": "application/vnd.woodshed.comparison+json"
+            }
+          ],
+          "retained_count": 4,
+          "retained_delegation_count": 2,
+          "revoked_authority_count": 2,
+          "revoked_members": [
+            "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6"
+          ],
+          "role": "founder"
+        },
+        "records": [
+          {
+            "body_utf8_hex": "7b226c656674223a7b226c6162656c223a2243204d616a6f72222c226f6363757272656e63655f6964223a22636172643a31222c2270697463685f736574223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d2c7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c22726f6f745f70697463685f636c617373223a302c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d616a6f72227d7d2c226d6574686f64223a7b226964223a226b657965642d70697463682d7365742d73696e676c65746f6e222c2276657273696f6e223a317d2c22726573756c74223a7b226c6566745f6f6e6c79223a5b7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c2272696768745f6f6e6c79223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d5d2c22736861726564223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c2273696e676c65746f6e5f6d6f74696f6e223a7b2266726f6d223a7b226c6162656c223a2247222c2270697463685f636c617373223a377d2c22746f223a7b226c6162656c223a2241222c2270697463685f636c617373223a397d7d2c22737461747573223a226170706c696361626c65222c2276657273696f6e223a317d2c227265766973696f6e223a226d75736963616c2d636f6d70617269736f6e2d666978747572652d7631222c227269676874223a7b226c6162656c223a2241204d696e6f72222c226f6363757272656e63655f6964223a22636172643a32222c2270697463685f736574223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d2c7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c22726f6f745f70697463685f636c617373223a392c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d696e6f72227d7d2c22736f75726365223a7b22617574686f72697479223a22776f6f6473686564222c22646f6d61696e223a226d757369632e7072616374696365222c227265736f75726365223a227365743a6d75736963616c2d636f6d70617269736f6e227d7d",
+            "id": "woodshed-comparison:founder:2",
+            "media_type": "application/vnd.woodshed.comparison+json"
+          }
+        ],
+        "retained_count": 4,
+        "traffic": [
+          {
+            "direction": "incoming",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 18,
+            "sha256": "9389e6512af6fefa0599e7a946ef8eb432546cec8eb92d674ad516e2b98d7f1e",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 6850,
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 6850,
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36",
+            "result": "refused: Peer disconnected"
+          },
+          {
+            "direction": "incoming",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 6850,
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 7344,
+            "sha256": "9ea771d5ffceb2cde77b8abe601a8cf588d1005f240357e955c2c335b1e438e5",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 14178,
+            "sha256": "99a913eab56bcb40828294e04f3d6c8123571d1f70b1f9daf4d5525fca23ea71",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 14178,
+            "sha256": "99a913eab56bcb40828294e04f3d6c8123571d1f70b1f9daf4d5525fca23ea71",
+            "result": "refused: not joined: this peer left the space; install an invitation to join again"
+          },
+          {
+            "direction": "incoming",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 14178,
+            "sha256": "99a913eab56bcb40828294e04f3d6c8123571d1f70b1f9daf4d5525fca23ea71",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 21564,
+            "sha256": "378e821b64baf945dd82ac38567cf86ed410fc316ce1307f60cb382f1a9a97aa",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 31068,
+            "sha256": "a380e608af77c6204ee957cab5180e622049f82f0d115d2c256dcb65306fc017",
+            "result": "refused: Peer disconnected"
+          },
+          {
+            "direction": "incoming",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 29266,
+            "sha256": "df4c674b9313c6a50520b07e3cadc603c1f9dc136f82ef6b6ea542c51f95b18f",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          }
+        ]
+      },
+      {
+        "role": "member",
+        "online": false,
+        "process_open": true,
+        "process_id": 32364,
+        "process_generation": 4,
+        "last_sync_error": null,
+        "lifecycle": "revoked",
+        "now_ms": 50,
+        "last_recheck": {
+          "action": "connect",
+          "admitted": false,
+          "lifecycle": "revoked",
+          "reason": "revoked: the issuer revoked this peer's delegation"
+        },
+        "comparison": {
+          "source": {
+            "authority": "woodshed",
+            "domain": "music.practice",
+            "resource": "set:musical-comparison"
+          },
+          "revision": "musical-comparison-fixture-v1",
+          "method": {
+            "id": "keyed-pitch-set-singleton",
+            "version": 1
+          },
+          "left": {
+            "occurrence_id": "card:1",
+            "source": {
+              "adapter": "woodshed.stage",
+              "id": "chord:Major"
+            },
+            "label": "C Major",
+            "root_pitch_class": 0,
+            "pitch_set": [
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              },
+              {
+                "pitch_class": 7,
+                "label": "G"
+              }
+            ]
+          },
+          "right": {
+            "occurrence_id": "card:2",
+            "source": {
+              "adapter": "woodshed.stage",
+              "id": "chord:Minor"
+            },
+            "label": "A Minor",
+            "root_pitch_class": 9,
+            "pitch_set": [
+              {
+                "pitch_class": 9,
+                "label": "A"
+              },
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              }
+            ]
+          },
+          "result": {
+            "version": 1,
+            "status": "applicable",
+            "shared": [
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              }
+            ],
+            "left_only": [
+              {
+                "pitch_class": 7,
+                "label": "G"
+              }
+            ],
+            "right_only": [
+              {
+                "pitch_class": 9,
+                "label": "A"
+              }
+            ],
+            "singleton_motion": {
+              "from": {
+                "pitch_class": 7,
+                "label": "G"
+              },
+              "to": {
+                "pitch_class": 9,
+                "label": "A"
+              }
+            }
+          }
+        },
+        "service": {
+          "authority_installed": true,
+          "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "lifecycle": "revoked",
+          "lifecycle_reason": "revoked: the issuer revoked this peer's delegation",
+          "local_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
+          "now_ms": 50,
+          "ok": true,
+          "operations": [
+            {
+              "author_root": "af06a3e3291714e4f356c19c9b15cd1951ec6e6662aa77be07547f289383341d",
+              "authority": "effective",
+              "operation_id": "2c9f1e51b777258452fe1f9d7be102605852907e05434c4e6c8e655c940f5de0",
+              "writer": "181215902123d322959dbf105736e17af4bfe075e0d5808f39d8087e1b545068"
+            },
+            {
+              "author_root": "a7f6dfaf8f38b89ba8ce649b594f91e4d01fdc57f9c9493df43b5e50a9987367",
+              "authority": "pending_authority",
+              "operation_id": "f9a47c337cdcbace14f18534baadb540b836b820e0777de81fc47eac0fae8766",
+              "writer": "a8ff7590b139d75054d6b1fa126b6ab7688869c266a910914767b180185d2b98"
+            },
+            {
+              "author_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
+              "authority": "revoked",
+              "operation_id": "367ec90086c6c71edec0a48197de3828671f73cdc0af38ff0b8723389e390753",
+              "writer": "bd11126ba11021a0c894a5290d352d5de6c8e3d4b071d5404a09b1817c050458"
+            },
+            {
+              "author_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
+              "authority": "revoked",
+              "operation_id": "8ab0dc841ed6abaf310b391f83e7f491a42f9021be9012e97328016cb6b361d7",
+              "writer": "bd11126ba11021a0c894a5290d352d5de6c8e3d4b071d5404a09b1817c050458"
+            }
+          ],
+          "pending_authority_count": 1,
+          "records": [
+            {
+              "body_utf8_hex": "7b226c656674223a7b226c6162656c223a2243204d616a6f72222c226f6363757272656e63655f6964223a22636172643a31222c2270697463685f736574223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d2c7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c22726f6f745f70697463685f636c617373223a302c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d616a6f72227d7d2c226d6574686f64223a7b226964223a226b657965642d70697463682d7365742d73696e676c65746f6e222c2276657273696f6e223a317d2c22726573756c74223a7b226c6566745f6f6e6c79223a5b7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c2272696768745f6f6e6c79223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d5d2c22736861726564223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c2273696e676c65746f6e5f6d6f74696f6e223a7b2266726f6d223a7b226c6162656c223a2247222c2270697463685f636c617373223a377d2c22746f223a7b226c6162656c223a2241222c2270697463685f636c617373223a397d7d2c22737461747573223a226170706c696361626c65222c2276657273696f6e223a317d2c227265766973696f6e223a226d75736963616c2d636f6d70617269736f6e2d666978747572652d7631222c227269676874223a7b226c6162656c223a2241204d696e6f72222c226f6363757272656e63655f6964223a22636172643a32222c2270697463685f736574223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d2c7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c22726f6f745f70697463685f636c617373223a392c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d696e6f72227d7d2c22736f75726365223a7b22617574686f72697479223a22776f6f6473686564222c22646f6d61696e223a226d757369632e7072616374696365222c227265736f75726365223a227365743a6d75736963616c2d636f6d70617269736f6e227d7d",
+              "id": "woodshed-comparison:founder:2",
+              "media_type": "application/vnd.woodshed.comparison+json"
+            }
+          ],
+          "retained_count": 4,
+          "retained_delegation_count": 2,
+          "revoked_authority_count": 2,
+          "revoked_members": [
+            "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6"
+          ],
+          "role": "member"
+        },
+        "records": [
+          {
+            "body_utf8_hex": "7b226c656674223a7b226c6162656c223a2243204d616a6f72222c226f6363757272656e63655f6964223a22636172643a31222c2270697463685f736574223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d2c7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c22726f6f745f70697463685f636c617373223a302c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d616a6f72227d7d2c226d6574686f64223a7b226964223a226b657965642d70697463682d7365742d73696e676c65746f6e222c2276657273696f6e223a317d2c22726573756c74223a7b226c6566745f6f6e6c79223a5b7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c2272696768745f6f6e6c79223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d5d2c22736861726564223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c2273696e676c65746f6e5f6d6f74696f6e223a7b2266726f6d223a7b226c6162656c223a2247222c2270697463685f636c617373223a377d2c22746f223a7b226c6162656c223a2241222c2270697463685f636c617373223a397d7d2c22737461747573223a226170706c696361626c65222c2276657273696f6e223a317d2c227265766973696f6e223a226d75736963616c2d636f6d70617269736f6e2d666978747572652d7631222c227269676874223a7b226c6162656c223a2241204d696e6f72222c226f6363757272656e63655f6964223a22636172643a32222c2270697463685f736574223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d2c7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c22726f6f745f70697463685f636c617373223a392c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d696e6f72227d7d2c22736f75726365223a7b22617574686f72697479223a22776f6f6473686564222c22646f6d61696e223a226d757369632e7072616374696365222c227265736f75726365223a227365743a6d75736963616c2d636f6d70617269736f6e227d7d",
+            "id": "woodshed-comparison:founder:2",
+            "media_type": "application/vnd.woodshed.comparison+json"
+          }
+        ],
+        "retained_count": 4,
+        "traffic": [
+          {
+            "direction": "outgoing",
+            "method": "GET",
+            "path": "/invitation",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "refused: Founder has not created an invitation"
+          },
+          {
+            "direction": "outgoing",
+            "method": "GET",
+            "path": "/invitation",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 18,
+            "sha256": "9389e6512af6fefa0599e7a946ef8eb432546cec8eb92d674ad516e2b98d7f1e",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 6850,
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 6850,
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36",
+            "result": "refused: Peer disconnected"
+          },
+          {
+            "direction": "outgoing",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 6850,
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 14178,
+            "sha256": "99a913eab56bcb40828294e04f3d6c8123571d1f70b1f9daf4d5525fca23ea71",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 14178,
+            "sha256": "99a913eab56bcb40828294e04f3d6c8123571d1f70b1f9daf4d5525fca23ea71",
+            "result": "refused: not joined: this peer left the space; install an invitation to join again"
+          },
+          {
+            "direction": "outgoing",
+            "method": "GET",
+            "path": "/invitation",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 14178,
+            "sha256": "99a913eab56bcb40828294e04f3d6c8123571d1f70b1f9daf4d5525fca23ea71",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 21564,
+            "sha256": "378e821b64baf945dd82ac38567cf86ed410fc316ce1307f60cb382f1a9a97aa",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 31068,
+            "sha256": "a380e608af77c6204ee957cab5180e622049f82f0d115d2c256dcb65306fc017",
+            "result": "refused: Peer disconnected"
+          },
+          {
+            "direction": "outgoing",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 29266,
+            "sha256": "df4c674b9313c6a50520b07e3cadc603c1f9dc136f82ef6b6ea542c51f95b18f",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          }
+        ]
+      }
+    ],
+    "expired_reconnect_refused": [
+      {
+        "role": "founder",
+        "online": false,
+        "process_open": true,
+        "process_id": 17328,
+        "process_generation": 3,
+        "last_sync_error": "Peer refused /wire: Peer disconnected",
+        "lifecycle": "expired",
+        "now_ms": 1001,
+        "last_recheck": {
+          "action": "connect",
+          "admitted": false,
+          "lifecycle": "expired",
+          "reason": "expired: this peer's grant ended at 1000 ms; store clock is 1001 ms"
+        },
+        "comparison": {
+          "source": {
+            "authority": "woodshed",
+            "domain": "music.practice",
+            "resource": "set:musical-comparison"
+          },
+          "revision": "musical-comparison-fixture-v1",
+          "method": {
+            "id": "keyed-pitch-set-singleton",
+            "version": 1
+          },
+          "left": {
+            "occurrence_id": "card:1",
+            "source": {
+              "adapter": "woodshed.stage",
+              "id": "chord:Major"
+            },
+            "label": "C Major",
+            "root_pitch_class": 0,
+            "pitch_set": [
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              },
+              {
+                "pitch_class": 7,
+                "label": "G"
+              }
+            ]
+          },
+          "right": {
+            "occurrence_id": "card:2",
+            "source": {
+              "adapter": "woodshed.stage",
+              "id": "chord:Minor"
+            },
+            "label": "A Minor",
+            "root_pitch_class": 9,
+            "pitch_set": [
+              {
+                "pitch_class": 9,
+                "label": "A"
+              },
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              }
+            ]
+          },
+          "result": {
+            "version": 1,
+            "status": "applicable",
+            "shared": [
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              }
+            ],
+            "left_only": [
+              {
+                "pitch_class": 7,
+                "label": "G"
+              }
+            ],
+            "right_only": [
+              {
+                "pitch_class": 9,
+                "label": "A"
+              }
+            ],
+            "singleton_motion": {
+              "from": {
+                "pitch_class": 7,
+                "label": "G"
+              },
+              "to": {
+                "pitch_class": 9,
+                "label": "A"
+              }
+            }
+          }
+        },
+        "service": {
+          "authority_installed": true,
+          "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "lifecycle": "expired",
+          "lifecycle_reason": "expired: this peer's grant ended at 1000 ms; store clock is 1001 ms",
+          "local_root": "af06a3e3291714e4f356c19c9b15cd1951ec6e6662aa77be07547f289383341d",
+          "now_ms": 1001,
+          "ok": true,
+          "operations": [
+            {
+              "author_root": "af06a3e3291714e4f356c19c9b15cd1951ec6e6662aa77be07547f289383341d",
+              "authority": "pending_authority",
+              "operation_id": "2c9f1e51b777258452fe1f9d7be102605852907e05434c4e6c8e655c940f5de0",
+              "writer": "181215902123d322959dbf105736e17af4bfe075e0d5808f39d8087e1b545068"
+            },
+            {
+              "author_root": "a7f6dfaf8f38b89ba8ce649b594f91e4d01fdc57f9c9493df43b5e50a9987367",
+              "authority": "pending_authority",
+              "operation_id": "f9a47c337cdcbace14f18534baadb540b836b820e0777de81fc47eac0fae8766",
+              "writer": "a8ff7590b139d75054d6b1fa126b6ab7688869c266a910914767b180185d2b98"
+            },
+            {
+              "author_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
+              "authority": "pending_authority",
+              "operation_id": "367ec90086c6c71edec0a48197de3828671f73cdc0af38ff0b8723389e390753",
+              "writer": "bd11126ba11021a0c894a5290d352d5de6c8e3d4b071d5404a09b1817c050458"
+            },
+            {
+              "author_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
+              "authority": "pending_authority",
+              "operation_id": "8ab0dc841ed6abaf310b391f83e7f491a42f9021be9012e97328016cb6b361d7",
+              "writer": "bd11126ba11021a0c894a5290d352d5de6c8e3d4b071d5404a09b1817c050458"
+            }
+          ],
+          "pending_authority_count": 4,
+          "records": [],
+          "retained_count": 4,
+          "retained_delegation_count": 2,
+          "revoked_authority_count": 0,
+          "revoked_members": [
+            "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6"
+          ],
+          "role": "founder"
+        },
+        "records": [],
+        "retained_count": 4,
+        "traffic": [
+          {
+            "direction": "incoming",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 18,
+            "sha256": "9389e6512af6fefa0599e7a946ef8eb432546cec8eb92d674ad516e2b98d7f1e",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 6850,
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 6850,
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36",
+            "result": "refused: Peer disconnected"
+          },
+          {
+            "direction": "incoming",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 6850,
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 7344,
+            "sha256": "9ea771d5ffceb2cde77b8abe601a8cf588d1005f240357e955c2c335b1e438e5",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 14178,
+            "sha256": "99a913eab56bcb40828294e04f3d6c8123571d1f70b1f9daf4d5525fca23ea71",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 14178,
+            "sha256": "99a913eab56bcb40828294e04f3d6c8123571d1f70b1f9daf4d5525fca23ea71",
+            "result": "refused: not joined: this peer left the space; install an invitation to join again"
+          },
+          {
+            "direction": "incoming",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 14178,
+            "sha256": "99a913eab56bcb40828294e04f3d6c8123571d1f70b1f9daf4d5525fca23ea71",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 21564,
+            "sha256": "378e821b64baf945dd82ac38567cf86ed410fc316ce1307f60cb382f1a9a97aa",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 31068,
+            "sha256": "a380e608af77c6204ee957cab5180e622049f82f0d115d2c256dcb65306fc017",
+            "result": "refused: Peer disconnected"
+          },
+          {
+            "direction": "incoming",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 29266,
+            "sha256": "df4c674b9313c6a50520b07e3cadc603c1f9dc136f82ef6b6ea542c51f95b18f",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          }
+        ]
+      },
+      {
+        "role": "member",
+        "online": false,
+        "process_open": true,
+        "process_id": 32364,
+        "process_generation": 4,
+        "last_sync_error": null,
+        "lifecycle": "revoked",
+        "now_ms": 50,
+        "last_recheck": {
+          "action": "connect",
+          "admitted": false,
+          "lifecycle": "revoked",
+          "reason": "revoked: the issuer revoked this peer's delegation"
+        },
+        "comparison": {
+          "source": {
+            "authority": "woodshed",
+            "domain": "music.practice",
+            "resource": "set:musical-comparison"
+          },
+          "revision": "musical-comparison-fixture-v1",
+          "method": {
+            "id": "keyed-pitch-set-singleton",
+            "version": 1
+          },
+          "left": {
+            "occurrence_id": "card:1",
+            "source": {
+              "adapter": "woodshed.stage",
+              "id": "chord:Major"
+            },
+            "label": "C Major",
+            "root_pitch_class": 0,
+            "pitch_set": [
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              },
+              {
+                "pitch_class": 7,
+                "label": "G"
+              }
+            ]
+          },
+          "right": {
+            "occurrence_id": "card:2",
+            "source": {
+              "adapter": "woodshed.stage",
+              "id": "chord:Minor"
+            },
+            "label": "A Minor",
+            "root_pitch_class": 9,
+            "pitch_set": [
+              {
+                "pitch_class": 9,
+                "label": "A"
+              },
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              }
+            ]
+          },
+          "result": {
+            "version": 1,
+            "status": "applicable",
+            "shared": [
+              {
+                "pitch_class": 0,
+                "label": "C"
+              },
+              {
+                "pitch_class": 4,
+                "label": "E"
+              }
+            ],
+            "left_only": [
+              {
+                "pitch_class": 7,
+                "label": "G"
+              }
+            ],
+            "right_only": [
+              {
+                "pitch_class": 9,
+                "label": "A"
+              }
+            ],
+            "singleton_motion": {
+              "from": {
+                "pitch_class": 7,
+                "label": "G"
+              },
+              "to": {
+                "pitch_class": 9,
+                "label": "A"
+              }
+            }
+          }
+        },
+        "service": {
+          "authority_installed": true,
+          "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "lifecycle": "revoked",
+          "lifecycle_reason": "revoked: the issuer revoked this peer's delegation",
+          "local_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
+          "now_ms": 50,
+          "ok": true,
+          "operations": [
+            {
+              "author_root": "af06a3e3291714e4f356c19c9b15cd1951ec6e6662aa77be07547f289383341d",
+              "authority": "effective",
+              "operation_id": "2c9f1e51b777258452fe1f9d7be102605852907e05434c4e6c8e655c940f5de0",
+              "writer": "181215902123d322959dbf105736e17af4bfe075e0d5808f39d8087e1b545068"
+            },
+            {
+              "author_root": "a7f6dfaf8f38b89ba8ce649b594f91e4d01fdc57f9c9493df43b5e50a9987367",
+              "authority": "pending_authority",
+              "operation_id": "f9a47c337cdcbace14f18534baadb540b836b820e0777de81fc47eac0fae8766",
+              "writer": "a8ff7590b139d75054d6b1fa126b6ab7688869c266a910914767b180185d2b98"
+            },
+            {
+              "author_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
+              "authority": "revoked",
+              "operation_id": "367ec90086c6c71edec0a48197de3828671f73cdc0af38ff0b8723389e390753",
+              "writer": "bd11126ba11021a0c894a5290d352d5de6c8e3d4b071d5404a09b1817c050458"
+            },
+            {
+              "author_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
+              "authority": "revoked",
+              "operation_id": "8ab0dc841ed6abaf310b391f83e7f491a42f9021be9012e97328016cb6b361d7",
+              "writer": "bd11126ba11021a0c894a5290d352d5de6c8e3d4b071d5404a09b1817c050458"
+            }
+          ],
+          "pending_authority_count": 1,
+          "records": [
+            {
+              "body_utf8_hex": "7b226c656674223a7b226c6162656c223a2243204d616a6f72222c226f6363757272656e63655f6964223a22636172643a31222c2270697463685f736574223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d2c7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c22726f6f745f70697463685f636c617373223a302c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d616a6f72227d7d2c226d6574686f64223a7b226964223a226b657965642d70697463682d7365742d73696e676c65746f6e222c2276657273696f6e223a317d2c22726573756c74223a7b226c6566745f6f6e6c79223a5b7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c2272696768745f6f6e6c79223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d5d2c22736861726564223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c2273696e676c65746f6e5f6d6f74696f6e223a7b2266726f6d223a7b226c6162656c223a2247222c2270697463685f636c617373223a377d2c22746f223a7b226c6162656c223a2241222c2270697463685f636c617373223a397d7d2c22737461747573223a226170706c696361626c65222c2276657273696f6e223a317d2c227265766973696f6e223a226d75736963616c2d636f6d70617269736f6e2d666978747572652d7631222c227269676874223a7b226c6162656c223a2241204d696e6f72222c226f6363757272656e63655f6964223a22636172643a32222c2270697463685f736574223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d2c7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c22726f6f745f70697463685f636c617373223a392c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d696e6f72227d7d2c22736f75726365223a7b22617574686f72697479223a22776f6f6473686564222c22646f6d61696e223a226d757369632e7072616374696365222c227265736f75726365223a227365743a6d75736963616c2d636f6d70617269736f6e227d7d",
+              "id": "woodshed-comparison:founder:2",
+              "media_type": "application/vnd.woodshed.comparison+json"
+            }
+          ],
+          "retained_count": 4,
+          "retained_delegation_count": 2,
+          "revoked_authority_count": 2,
+          "revoked_members": [
+            "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6"
+          ],
+          "role": "member"
+        },
+        "records": [
+          {
+            "body_utf8_hex": "7b226c656674223a7b226c6162656c223a2243204d616a6f72222c226f6363757272656e63655f6964223a22636172643a31222c2270697463685f736574223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d2c7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c22726f6f745f70697463685f636c617373223a302c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d616a6f72227d7d2c226d6574686f64223a7b226964223a226b657965642d70697463682d7365742d73696e676c65746f6e222c2276657273696f6e223a317d2c22726573756c74223a7b226c6566745f6f6e6c79223a5b7b226c6162656c223a2247222c2270697463685f636c617373223a377d5d2c2272696768745f6f6e6c79223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d5d2c22736861726564223a5b7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c2273696e676c65746f6e5f6d6f74696f6e223a7b2266726f6d223a7b226c6162656c223a2247222c2270697463685f636c617373223a377d2c22746f223a7b226c6162656c223a2241222c2270697463685f636c617373223a397d7d2c22737461747573223a226170706c696361626c65222c2276657273696f6e223a317d2c227265766973696f6e223a226d75736963616c2d636f6d70617269736f6e2d666978747572652d7631222c227269676874223a7b226c6162656c223a2241204d696e6f72222c226f6363757272656e63655f6964223a22636172643a32222c2270697463685f736574223a5b7b226c6162656c223a2241222c2270697463685f636c617373223a397d2c7b226c6162656c223a2243222c2270697463685f636c617373223a307d2c7b226c6162656c223a2245222c2270697463685f636c617373223a347d5d2c22726f6f745f70697463685f636c617373223a392c22736f75726365223a7b2261646170746572223a22776f6f64736865642e7374616765222c226964223a2263686f72643a4d696e6f72227d7d2c22736f75726365223a7b22617574686f72697479223a22776f6f6473686564222c22646f6d61696e223a226d757369632e7072616374696365222c227265736f75726365223a227365743a6d75736963616c2d636f6d70617269736f6e227d7d",
+            "id": "woodshed-comparison:founder:2",
+            "media_type": "application/vnd.woodshed.comparison+json"
+          }
+        ],
+        "retained_count": 4,
+        "traffic": [
+          {
+            "direction": "outgoing",
+            "method": "GET",
+            "path": "/invitation",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "refused: Founder has not created an invitation"
+          },
+          {
+            "direction": "outgoing",
+            "method": "GET",
+            "path": "/invitation",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 18,
+            "sha256": "9389e6512af6fefa0599e7a946ef8eb432546cec8eb92d674ad516e2b98d7f1e",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 6850,
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 6850,
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36",
+            "result": "refused: Peer disconnected"
+          },
+          {
+            "direction": "outgoing",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 6850,
+            "sha256": "9b13edd0d1a3ed97fb8b9a8a64d4af63dfb76b7ca6f88566a82222dc9deb6b36",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 14178,
+            "sha256": "99a913eab56bcb40828294e04f3d6c8123571d1f70b1f9daf4d5525fca23ea71",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 14178,
+            "sha256": "99a913eab56bcb40828294e04f3d6c8123571d1f70b1f9daf4d5525fca23ea71",
+            "result": "refused: not joined: this peer left the space; install an invitation to join again"
+          },
+          {
+            "direction": "outgoing",
+            "method": "GET",
+            "path": "/invitation",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 14178,
+            "sha256": "99a913eab56bcb40828294e04f3d6c8123571d1f70b1f9daf4d5525fca23ea71",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 21564,
+            "sha256": "378e821b64baf945dd82ac38567cf86ed410fc316ce1307f60cb382f1a9a97aa",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
+          },
+          {
+            "direction": "incoming",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 31068,
+            "sha256": "a380e608af77c6204ee957cab5180e622049f82f0d115d2c256dcb65306fc017",
+            "result": "refused: Peer disconnected"
+          },
+          {
+            "direction": "outgoing",
+            "method": "POST",
+            "path": "/wire",
+            "bytes": 29266,
+            "sha256": "df4c674b9313c6a50520b07e3cadc603c1f9dc136f82ef6b6ea542c51f95b18f",
+            "result": "ok"
+          },
+          {
+            "direction": "outgoing",
+            "method": "GET",
+            "path": "/wire",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "result": "ok"
           }
         ]
       }
