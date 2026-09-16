@@ -485,6 +485,7 @@ pub fn fragment_to_knot_body(fragment: &ClipFragment) -> String {
         provenance: DocumentProvenance::default(),
         trust: DocumentTrustState::Unknown,
         diagnostics: Vec::new(),
+        navigation: Default::default(),
         blocks: fragment_blocks(fragment),
     }
     .write_knot_body(&mut body);
@@ -702,7 +703,8 @@ fn collect_span_links(spans: &[InlineSpan], links: &mut Vec<String>) {
             InlineSpan::Presented { spans: inner, .. }
             | InlineSpan::Emphasis(inner)
             | InlineSpan::Strong(inner)
-            | InlineSpan::Submit { spans: inner, .. } => {
+            | InlineSpan::Submit { spans: inner, .. }
+            | InlineSpan::InPage { spans: inner, .. } => {
                 collect_span_links(inner, links);
             },
             InlineSpan::Text(_)
@@ -884,6 +886,30 @@ mod tests {
         assert!(clip.text.contains("The retained article paragraph."));
         assert!(!clip.text.contains("Site chrome"));
         assert!(!clip.text.contains("Footer chrome"));
+    }
+
+    #[test]
+    fn micron_in_page_link_clips_as_label_text_not_a_link() {
+        let mut registry = EngineRegistry::new();
+        for engine in nematic::engines() {
+            registry.register(engine);
+        }
+        let mut policy = EngineRoutePolicy::default();
+        policy.fallback.engine_id = nematic::micron::ENGINE_MICRON.into();
+        let clip = fragment_from_body(
+            "0123456789abcdef0123456789abcdef:/page/index.mu",
+            None,
+            Some("text/x-micron"),
+            "`[Reference`:/page/ref.mu] `[Setup notes`#setup]\n>Setup\n",
+            &registry,
+            &policy,
+        );
+        assert!(clip.text.contains("Setup notes"), "{}", clip.text);
+        assert_eq!(
+            clip.links,
+            vec!["0123456789abcdef0123456789abcdef:/page/ref.mu"]
+        );
+        assert!(!fragment_to_knot_body(&clip).contains("#setup"));
     }
 
     #[test]
