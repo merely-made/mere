@@ -38,7 +38,7 @@ pub use sprigging::LeafRegistry;
 use genet_render::VisualMovement;
 
 mod owned_layout;
-pub use owned_layout::{OwnedLayout, ScrollTarget};
+pub use owned_layout::{OwnedLayout, ScrollAlign, ScrollTarget};
 pub mod producer;
 pub use producer::{
     ProducedTexture, ProducerContext, ProducerError, ProducerFrameInfo, ProducerFrameStats,
@@ -800,7 +800,8 @@ pub use host::{
     AppCtx, AppFrameInsets, AppHook, CaptureFn, CloseDisposition, CloseRequest, CloseRequestHook,
     FocusedTextHook, FocusedTextSlot, FrameHook, FrameProfile, Hook, Host, HostFont, HostHooks,
     HostImage, HostOptions, HostPointer, HostState, IdlePolicy, Init, KeyInterceptHook,
-    RelayoutProfile, Runner, WindowFrame, ZOOM_LADDER, env_size, fit_zoom, ladder_step,
+    RelayoutProfile, Runner, ScrollIntoView, WindowFrame, ZOOM_LADDER, env_size, fit_zoom,
+    ladder_step,
 };
 pub use wake::HostWake;
 pub use window_verbs::{AppRegion, WindowCommand, WindowCommands, WindowGeometry};

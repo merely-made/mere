@@ -83,6 +83,7 @@ where
                 wake: &self.wake,
                 capture: &mut self.s.pending_capture,
                 pointer: &mut self.s.pending_pointer,
+                scroll: &mut self.s.pending_scroll,
                 window_commands: &commands,
                 geometry,
                 frame_profile,
@@ -202,6 +203,20 @@ where
                 self.s.layout_size = (lw, lh);
                 rebuild_us = elapsed_us(phase.elapsed());
             },
+        }
+        // Scroll requests resolve against the layout just brought current, so
+        // a node the requesting dispatch created already has a box. Each
+        // resolves on its own: one that finds nothing drops only itself.
+        if !self.s.pending_scroll.is_empty() {
+            let layout = self.s.layout.as_mut().expect("layout just ensured");
+            let now = crate::Instant::now();
+            for request in std::mem::take(&mut self.s.pending_scroll) {
+                if let Some(target) =
+                    layout.scroll_into_view(&*dom_ref, request.node, request.align)
+                {
+                    self.s.scrollbar_fade.note(target, now);
+                }
+            }
         }
         let layout = self.s.layout.as_ref().expect("layout just ensured");
         if rebuilt {

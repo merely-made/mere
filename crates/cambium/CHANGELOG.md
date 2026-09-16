@@ -14,6 +14,16 @@
   placement hint, potential capabilities) is removed and returns additively
   with a real consumer. `RetainedSurfaceSession` keeps all fourteen
   methods. Changes are additive until a v2.
+- Add an application scroll request to `cambium-rootstock`:
+  `AppCtx::scroll_into_view(node, ScrollAlign)` queues a request that the host
+  resolves on its next layout against the node's painted rect. It moves the
+  nearest ancestor that scrolls vertically and has room to, otherwise the
+  window viewport, clamped to that plane's range. `ScrollAlign::Start` puts
+  the element's top at the top of the scroll area; `Nearest` moves only as far
+  as a partly hidden element needs. A node that is gone or does not paint is a
+  no-op. Both event sources honour it through `Host::relayout`, and the
+  windowless `Harness` in `cambium-genet-winit-host` gains `viewport_scroll`.
+  Both crates are unpublished, so no version moves.
 
 ## 0.3.3 - 2026-08-09
 

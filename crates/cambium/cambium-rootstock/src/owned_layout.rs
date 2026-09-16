@@ -29,6 +29,20 @@ pub enum ScrollTarget {
     Element(NodeId),
 }
 
+/// Where a scroll request places its element in the scroll area. No animation:
+/// the offset moves in one step.
+#[derive(Clone, Copy, Debug, Default, Eq, Hash, PartialEq)]
+pub enum ScrollAlign {
+    /// The element's top edge at the top of the scroll area.
+    #[default]
+    Start,
+    /// Move only if the element is not fully visible, and only as far as it
+    /// needs: its top edge to the area's top when it sits above, its bottom
+    /// edge to the area's bottom when below. An element taller than the area
+    /// aligns its top.
+    Nearest,
+}
+
 pub struct OwnedLayout {
     style_set: StyleSet,
     interaction_dependencies: interaction::Dependencies,
@@ -453,6 +467,76 @@ impl OwnedLayout {
         self.viewport_scroll.1 += dy;
         self.clamp_viewport_scroll();
         (self.viewport_scroll != before).then_some(ScrollTarget::Document)
+    }
+
+    /// Bring `node` into view on the vertical axis by moving one plane: the
+    /// nearest ancestor that scrolls vertically and has room to, otherwise the
+    /// document viewport, clamped to that plane's range. `None` when nothing
+    /// moved, which includes a node that is gone or does not paint.
+    pub(crate) fn scroll_into_view<D: LayoutDom<NodeId = NodeId>>(
+        &mut self,
+        dom: &D,
+        node: NodeId,
+        align: ScrollAlign,
+    ) -> Option<ScrollTarget> {
+        let (_, top, _, height) = self.painted_rect(dom, node)?;
+        let container = self.vertical_scroll_container(dom, node);
+        let (area_top, area_height, current, range) = match container {
+            Some((container, range)) => {
+                let (_, y, _, h) = self.painted_rect(dom, container)?;
+                let current = self.element_scroll.get(&container).map_or(0.0, |s| s.1);
+                (y, h, current, range)
+            },
+            None => (
+                0.0,
+                self.viewport.1,
+                self.viewport_scroll.1,
+                (self.content_extent.1 - self.viewport.1).max(0.0),
+            ),
+        };
+        let to_top = top - area_top;
+        let to_bottom = top + height - (area_top + area_height);
+        let delta = match align {
+            ScrollAlign::Start => to_top,
+            ScrollAlign::Nearest if to_top < 0.0 => to_top,
+            ScrollAlign::Nearest if to_bottom > 0.0 => to_bottom.min(to_top),
+            ScrollAlign::Nearest => 0.0,
+        };
+        let next = (current + delta).clamp(0.0, range);
+        if next == current {
+            return None;
+        }
+        Some(match container {
+            Some((container, _)) => {
+                self.element_scroll.entry(container).or_default().1 = next;
+                ScrollTarget::Element(container)
+            },
+            None => {
+                self.viewport_scroll.1 = next;
+                ScrollTarget::Document
+            },
+        })
+    }
+
+    /// The nearest ancestor of `node` that scrolls vertically and has room to,
+    /// with its range. An `overflow: auto` box that grows to its content has
+    /// none, so a request passes over it, as the wheel does.
+    fn vertical_scroll_container<D: LayoutDom<NodeId = NodeId>>(
+        &self,
+        dom: &D,
+        node: NodeId,
+    ) -> Option<(NodeId, f32)> {
+        let mut candidate = dom.parent(node);
+        while let Some(ancestor) = candidate {
+            if scroll_axes(&self.styles, ancestor).1 {
+                let range = element_scroll_range(dom, &self.fragments, ancestor).1;
+                if range > 0.0 {
+                    return Some((ancestor, range));
+                }
+            }
+            candidate = dom.parent(ancestor);
+        }
+        None
     }
 
     fn clamp_viewport_scroll(&mut self) {
