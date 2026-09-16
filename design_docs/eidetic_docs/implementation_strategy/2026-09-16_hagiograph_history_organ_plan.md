@@ -2,8 +2,8 @@
 
 **Date:** 2026-09-16
 
-**Status, 2026-09-16:** plan. H1 (this rescope) landed with this document;
-H2 to H4 are dispatched. No consumer yet.
+**Status, 2026-09-16:** H1 to H4 landed. H5, Mesocosm pinning and adopting
+the crate, is next. No consumer yet.
 
 **Owns:** turning the 26-line `hagiograph` reservation into the history organ
 Mark ruled on 2026-09-16: the record of standing marks and the feat rule over
@@ -42,6 +42,8 @@ This plan carries only what this crate builds.
    product's world rules, stops on an epoch boundary, and hands the world
    over with its clock continued. The product keeps the baseline, the world
    and its history, rather than re-running deep time on load.
+6. **The span varies.** Six epochs is Mesocosm's generated preset for now,
+   and "this is gonna need to vary": nothing here may assume a span.
 
 ## 1. What exists
 
@@ -136,3 +138,12 @@ legend nobody tells fade, and memorials handed to the stack's voxel lane.
 ## Progress
 
 - **2026-09-16.** Plan written; H1 landed with it.
+- **2026-09-16.** H2 to H4 landed, built by a Sonnet agent and verified by
+  rerunning every gate: `record.rs` (155), `reckoning.rs` (61),
+  `deep_time.rs` (114), each with a sibling test file; 21 tests; clippy with
+  `-D warnings`, rustfmt and a `wasm32-unknown-unknown` check all clean. The
+  record reproduces the §1 fixture bytes from mirrors of Mesocosm's types.
+  `Record`'s `Default` is written out so an empty record puts no bounds on
+  its axis and holder, and `merge` and `reckon` alone require `Clone`.
+  `DeepTimeError::Stalled.ticks` counts the advances made, which equals the
+  ceiling when refused.
