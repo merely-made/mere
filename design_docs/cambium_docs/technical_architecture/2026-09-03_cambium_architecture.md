@@ -138,3 +138,87 @@ a shrinking container, a box that stops scrolling or leaves the DOM, an untouche
 sibling, and a plane carried onto a fresh session. Three of the four fail with the clamp
 calls removed. Validated on Rust 1.97.1, `--offline --locked`: rootstock's 40 tests and
 the native host's 80 across nine suites.
+
+## Scroll requests (2026-09-16)
+
+An application can ask the host to bring one of its own elements into view. The two
+scroll planes above stay host-owned and their setters stay crate-private; what an
+application gets is a request. Decision 18 of the Micron navigation plan
+(`nematic_docs/implementation_strategy/2026-09-15_micron_navigation_plan.md`) settled
+that the request belongs to Cambium, for every Cambium application, rather than Knot's
+preview becoming a scroll container of its own.
+
+```rust
+// Illustrative: an `after_dispatch` hook revealing a node it found in the DOM.
+ctx.scroll_into_view(node, ScrollAlign::Start);
+```
+
+**Where the request is made.** Cambium's view handlers see only application state; an
+application reaches the host through its hooks, and `AppCtx` already carries requests
+the host applies once a hook returns: `set_sheet`, `set_ui_zoom`, `pointer`, `capture`.
+`AppCtx::scroll_into_view(node, align)` joins them, available from every hook. It
+pushes a `ScrollIntoView` onto `HostState::pending_scroll`. It is not resolved when the
+hook returns, because the dispatch that asked may have created the node and the next
+layout has not seen it yet, and a `frame` hook runs before the first layout exists.
+`Host::relayout` resolves the queue in order once its layout is current, whichever
+branch brought it there (tick, in-place rebuild, or a fresh session carrying both
+planes). Each request resolves on its own, so one that finds nothing drops only itself.
+A hook running after the frame (`after_frame`) would otherwise wait for an unrelated
+redraw, so applying a hook's requests also asks the window for one. A plane that moves
+notes the overlay-scrollbar fade, as the wheel default does.
+
+**How the element is named.** By `NodeId`, the identity `AppCtx::painted_rect` already
+takes, and the one `runner.set_focus`, `runner.focusables()`, `FocusedTextSlot` and
+`A11yRequest` use; the harness's `taproot` selectors resolve to it too. An application
+that can ask where an element paints can ask for the same element to be shown. Genet's
+node ids are monotonic and never reused, so a request that outlives its element misses
+rather than landing on another one. Three alternatives were weighed. A `taproot`
+selector would make rootstock depend on the probe crate, and a role or label is not
+identity. A DOM `id` string would require authored ids and a document walk per request.
+A view wrapper in the shape of `request_focus` would name the element structurally, but
+would put a layout-dependent request into `GenetAppRunner`, which stays free of layout
+and presentation. Such a wrapper could later be sugar over this request.
+
+**Which plane moves.** Exactly one: the nearest ancestor whose computed `overflow-y`
+scrolls *and* whose vertical range is positive, otherwise the window viewport. The range
+condition is load-bearing. Knot's `.knot-scroll-preview` and `.knot-workspace` are both
+`overflow: auto` but grow to their content, so the window carries the offset; a rule
+that stopped at the first scrolling overflow would pick a box with no room and move
+nothing. The wheel default passes over such a box for the same reason. Unlike the DOM's
+`scrollIntoView`, outer planes are not chained: a container that is itself off screen is
+scrolled but not brought into the window. The request is vertical only and leaves
+horizontal offsets alone. There is no animation.
+
+**Alignment.** `ScrollAlign::Start` puts the element's top edge at the top of the scroll
+area: the viewport's top, or the container's box as `element_scroll_range` measures it.
+`ScrollAlign::Nearest` does nothing for a fully visible element; otherwise it moves the
+top edge to the area's top when the element sits above, and the bottom edge to the
+area's bottom when below, with an element taller than the area aligning its top. It was
+a few lines once `Start` existed. Both clamp to the plane's range, and the existing
+rebuild clamp keeps a carried offset inside shorter content later.
+
+**Hosts.** Both event sources honour it with no code of their own. The winit source
+derefs to rootstock's `Host`, and the browser source calls the same `Host::redraw` and,
+on resize, `Host::relayout`. `cambium-genet-web-host` was checked for
+`wasm32-unknown-unknown` against this change. The windowless `Harness` gained
+`viewport_scroll()` so a test can tell the window's offset from a container's.
+
+Implementation: `AppCtx::scroll_into_view` and `ScrollIntoView` in
+[`host.rs`](../../../crates/cambium/cambium-rootstock/src/host.rs), resolution in
+`Host::relayout` in [`frame.rs`](../../../crates/cambium/cambium-rootstock/src/frame.rs),
+and `ScrollAlign` with `OwnedLayout::scroll_into_view` in
+[`owned_layout.rs`](../../../crates/cambium/cambium-rootstock/src/owned_layout.rs).
+Eight harness cases in
+[`tests/scroll_request.rs`](../../../crates/cambium/cambium-genet-winit-host/tests/scroll_request.rs)
+drive the request from an `after_dispatch` hook: an element far below the fold reaches
+the viewport top (and an element above the new offset comes back up); a nested
+container scrolls and the window does not; a grow-to-content `overflow: auto` box is
+passed over for the window; a stale node is a no-op and does not stop the requests
+queued with it; a request made before the first layout resolves after it; both planes
+survive an in-place rebuild and a fresh session; an offset past the content's end
+clamps at the request and again when the content shrinks; and `Nearest` moves only as
+far as needed. Eleven positive controls each broke one rule and watched the named test
+fail. Validated on Rust 1.97.1, `--offline --locked`: rootstock's 40 tests, the native
+host's 88 across ten suites, cambium's 216, mere-document-lanes with `smolweb` 33, the
+web host checked natively and for wasm32, the format check on the three host crates,
+and the workspace check.
