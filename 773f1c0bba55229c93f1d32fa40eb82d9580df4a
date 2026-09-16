@@ -1,0 +1,1 @@
+This commit's message is wrong: its text edit was a blind replace that made two statements false. Repaired in the following commit, 'Repair the fold-marker references broken in 773f1c0b'.
