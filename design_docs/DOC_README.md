@@ -511,6 +511,12 @@ and it stays in `genet/design_docs/archive_docs/2026-09-02/`, cited by path.
   smolweb family (gemtext/gopher/feed/scroll/misfin, a per-format AST, views
   shared with the host because they avoid `Block`). Its §5 crate-home diagram
   is superseded by the smolweb home decision; crate homes read through that.)
+- [micron_navigation_plan](nematic_docs/implementation_strategy/2026-09-15_micron_navigation_plan.md)
+  (**plan, awaiting sign-off** 2026-09-15: lane 2 of the fidelity plan. Anchors and
+  collapsible sections: stock captures for the open spellings first, then fold
+  extents and anchor resolution in Nematic, session-owned fold state and
+  scroll-to-anchor in the shared presentation, then both consumers and headed
+  receipts. Zero transport for an in-page anchor is a done-condition.)
 - [smolweb_fidelity_plan](nematic_docs/implementation_strategy/2026-07-01_smolweb_fidelity_plan.md)
   (**planning (with Mark)**: recovers the spec-faithfulness the flavour-neutral
   pipeline collapses. Key code-verified finding — **the losses are at the parse
