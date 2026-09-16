@@ -429,10 +429,36 @@ Stop on any of these conditions:
 
 ## 12. Pre.3 repin execution plan (2026-09-16)
 
-**Status:** plan only, awaiting Mark's S0 decisions. Nothing in the tree has
-moved. Grounded by a read-only assessment against the registry sources for
+**Status:** S0 answered 2026-09-16; execution begins in the worktree. Main
+has not moved. Grounded by a read-only assessment against the registry sources for
 every pre.2 and pre.3 crate involved, with each source rebase checked by
 `diff | patch --dry-run`.
+
+### S0 rulings (Mark, 2026-09-16)
+
+- **D1, caret requirements.** Manifests move to `0.22.0-pre.3`,
+  `0.11.0-pre.3` and `0.3.0-pre.3` as caret requirements, like today's
+  production rows. Consequence recorded, not overridden: a later
+  `cargo update -p burn` in any consumer, Knot included, can move burn to
+  pre.4 once published while the Mere patches stay pre.3, leaving them unused.
+  The tripwire is the standing rule never to scroll past "patch was not used";
+  every lock step below keeps that check in its done-condition. Loosening or
+  tightening revisits at the stable 0.22.0 repin.
+- **D2, `cubek-reduce` in scope.** Rebased with the other three.
+- **D3, downloads permitted and done.** `wasm-bindgen-0.2.122-x86_64-pc-windows-msvc.tar.gz`
+  (7,556,076 bytes, sha256 `03ba3056eb0c2ad2d0d30a0c0edefb590656a1e237596226804abb87b71b77ad`)
+  from the wasm-bindgen GitHub release, extracted to
+  `C:	\wasm-bindgen-0.2.122\wasm-bindgen-0.2.122-x86_64-pc-windows-msvc\wasm-bindgen.exe`,
+  which reports `wasm-bindgen 0.2.122`. `burn-remote-0.22.0-pre.2.crate`
+  (111,186 bytes, sha256 matching crates.io
+  `fa8db206a100d838eeb100b8525ff8e3051958ee822fcfecd736fe58eddaeeaa`) extracted
+  to `C:	urn-remote-0.22.0-pre.2urn-remote-0.22.0-pre.2`, enabling the
+  three-way burn-remote check. Both are under `C:	`, which the 2026-09-15
+  reclaim script clears after 24 idle hours; it runs only by hand, so do not
+  run it during the repin.
+- **D4, coordinate via idle notices.** At S16, message the busy Mere
+  sessions, wait for each idle notice, then fast-forward push and tell them
+  to pull.
 
 ### 12.0 Corrections to the 2026-09-16 recorded scope
 
@@ -721,10 +747,10 @@ manifest is ignored when it is a dependency. Each patch declares
 paths declare those package names. Knot's root `[patch.crates-io]` gains:
 
 ```toml
-burn-cubecl    = { version = "=0.22.0-pre.3", git = "https://github.com/merely-made/mere.git", rev = "<R>" }
-cubecl-runtime = { version = "=0.11.0-pre.3", git = "https://github.com/merely-made/mere.git", rev = "<R>" }
+burn-cubecl    = { version = "0.22.0-pre.3", git = "https://github.com/merely-made/mere.git", rev = "<R>" }
+cubecl-runtime = { version = "0.11.0-pre.3", git = "https://github.com/merely-made/mere.git", rev = "<R>" }
 # only if Knot ever runs BERT on BrowserWebGpu:
-# cubek-reduce = { version = "=0.3.0-pre.3", git = "https://github.com/merely-made/mere.git", rev = "<R>" }
+# cubek-reduce = { version = "0.3.0-pre.3", git = "https://github.com/merely-made/mere.git", rev = "<R>" }
 ```
 
 All of Knot's Mere pins move to R together. *Done in Knot:* no unused-patch
