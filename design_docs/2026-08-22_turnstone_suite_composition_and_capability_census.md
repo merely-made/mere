@@ -842,3 +842,25 @@ travel by reconciliation; the other five lanes have the publish path but no
 Turnstone author yet. Every consumer pins mere by revision, so knot-editor
 `0eb684f7`, mere `bce789e7` and woodshed's redshank port `a1c5772` moved
 together.
+
+### I3h shared Knot document by projection, 2026-09-15
+
+Turnstone's first-proof step 5 is receipted in commit `647c184` on top of
+`26a92c7` and `c20cd71`, under the K1 decision that shared documents are
+projected. The founder's Turnstone serves its directory-mode Knot vault on
+the place transport through `ResidentProjectionHost`; a writer invitation
+carries a projection-connect grant to the member's Personae root with one
+delegation hop, and the member self-issues a leaf to its place-transport key
+at dial time, so the handshake's subject is the authenticated peer and
+per-place unlinkability holds. A shared node is rewritten to
+`knot://<holder root>/<path>`; a visiting hub runs the same authoring loop
+over a network carrier, and a member with no vault registers a visit-only
+engine. A four-window run showed both peers' revisions on both sides with
+one derived digest, the founder's file on disk as the truth, the visitor
+told unavailable after the holder exited with its last scene kept and no
+save offered, and a reader refused at the door. Owed to mere: graphshell's
+`accept_projection_session` samples the admission clock and revocation
+ledger before awaiting the connection; Turnstone works around it by
+accepting, then sampling, then admitting, and the fork should sample after.
+With steps 1 through 7 each receipted, Murm's exchange and this projected
+document are the two concrete applications the coop contract was to follow.
