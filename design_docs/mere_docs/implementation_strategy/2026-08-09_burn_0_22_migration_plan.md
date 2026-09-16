@@ -426,3 +426,319 @@ Stop on any of these conditions:
   with its own target directory, because live sessions build Mere's main
   tree. A grounded execution plan with done-conditions is appended below
   before any manifest moves.
+
+## 12. Pre.3 repin execution plan (2026-09-16)
+
+**Status:** plan only, awaiting Mark's S0 decisions. Nothing in the tree has
+moved. Grounded by a read-only assessment against the registry sources for
+every pre.2 and pre.3 crate involved, with each source rebase checked by
+`diff | patch --dry-run`.
+
+### 12.0 Corrections to the 2026-09-16 recorded scope
+
+1. **The `cubecl-runtime` patch shrinks; it does not retire.** Pre.3 carries
+   both packaging fixes (`cubecl-runtime-0.11.0-pre.3/Cargo.toml:98-104`,
+   `:206-212`, `:228-229`). But the patch also adds
+   `Handle::is_same_allocation` and `ManagedMemoryHandle::is_same_allocation`,
+   which the `burn-cubecl` patch calls, and pre.3 exposes no public allocation
+   identity (`memory_pool/handle.rs:8` private, `:167` and `:70`
+   `pub(crate)`). The identity helpers stay.
+2. **A fourth patch, `cubek-reduce`, is in scope.** Four Distillery probe
+   manifests patch it, including the `burn_browser_embedding` repro that
+   produces the same-allocation receipt. Pre.3 still builds infinity from
+   literal bits (`cubek-reduce-0.3.0-pre.3/src/components/instructions/extrema.rs:24`,
+   `:34`).
+3. **Ten manifests request pre.2, not thirteen.** The six `crates/probes/*`
+   crates are standalone workspaces on burn 0.21 (excluded at
+   `Cargo.toml:175-176`) and are out of scope. Seven lockfiles regenerate.
+4. **Knot must patch `cubecl-runtime` as well as `burn-cubecl`**, or Mere's
+   `burn-cubecl` does not compile inside Knot (12.8).
+
+### 12.1 The patches against pre.3
+
+Upstream commits: `burn-cubecl` and `burn-remote` pre.3 `13f0a12b`;
+`cubecl-runtime` pre.3 `b0d2e688`; `cubek-reduce` pre.3 `73743e34`.
+
+**`burn-cubecl`.** Mere's delta: in `launch_binop`, `launch_binop_float` and
+`launch_binop_int`, a block before `if lhs.can_mut_broadcast(&rhs)` that, when
+both inputs share an allocation, creates a separate output, binds storage once
+and passes `rhs.as_linear_view_alias(0)`; plus `[workspace]` and a
+`cubecl-runtime` path patch in its manifest. Pre.3 added a zero-size early
+return above the anchor in all three files; the anchors are otherwise
+unchanged (`binary.rs:251`, `binary_float.rs:78`, `binary_int.rs:145`),
+`tensor/base.rs` is byte-identical, and `dtype_to_storage_type` now returns
+`ElemType` where `#[define(C)]` expects it. All three hunks apply at offset 6.
+None of the fix is upstream. The receipt still exercises it: pre.3's default
+`layer_norm` still calls `B::float_mul(centered.clone(), centered.clone())`
+(`burn-backend-0.22.0-pre.3/src/backend/ops/modules/base.rs:859`).
+
+**`cubecl-runtime`.** The `memory_pool/handle.rs` hunk applies cleanly. The
+`server/handle.rs` hunk fails only on trailing context because pre.3 renamed
+`Binding` to `BufferBinding` (`:73`); insert the method by hand after
+`can_mut()` (`:69-71`), every field it reads still exists (`:10-21`). The
+manifest change reduces to `[workspace]`. Add a `MERE-PATCH.md`.
+
+**`burn-remote`.** Pre.2 source is not on disk (not in registry `src` or
+`cache`; the first vendoring commit `d210519e` already held Mere's changes), so
+the patch was diffed against pre.3 and every hunk accounted for: version
+bumps; upstream test renames (`to_vec` to `try_to_vec` in `lib.rs` tests and
+`tests/iroh.rs`); and Mere's lease-bound close work across `Cargo.toml`
+(`server` adds `tokio/macros`, restored dev-dependencies, self `[patch]`,
+`[workspace]`), `lib.rs` (visibility plus two tests), `server/mod.rs`,
+`server/pump.rs`, `server/service/mod.rs`, `server/session.rs`,
+`server/worker.rs`, `shared/mod.rs`, `transport/iroh/protocol.rs`. Upstream
+changed only tests between pre.2 and pre.3; pre.3's `close()` still only
+removes the map entry. Rebase: pristine pre.3, copy Mere's seven non-`lib.rs`
+source files, apply Mere's `lib.rs` hunks keeping `try_to_vec`, re-apply the
+four manifest edits with dev-dependencies at `=0.22.0-pre.3`. Residual risk:
+an upstream change on exactly the lines Mere replaced would be hidden; low,
+and the two-peer remote receipt is the behavioural check. A three-way check
+would need downloading `burn-remote-0.22.0-pre.2.crate`.
+
+**`cubek-reduce`.** Mere's delta: a `runtime_f32_from_bits` helper passing
+bits through a mutable local at both identity sites, plus `[workspace]`. Hunk 1
+fails only on pre.3's `type_of` to `elem_type_of` rename; hunk 2 applies with
+fuzz. Re-apply by hand at pre.3 `extrema.rs:19-37`. The real risk is
+behavioural: pre.3 rewrote CubeCL's IR and WGSL backend (`cubecl-opt` 30 to 12
+files, `cubecl-wgpu` 30 to 42) and `extrema.rs` now uses `IsNanOp`. Only the
+headed extrema receipt decides whether the trick still yields a runtime value.
+
+### 12.2 Manifests and API
+
+| File:line | Change |
+| --- | --- |
+| `crates/conatus/conatus/Cargo.toml:18-20` | cubecl to 0.11.0-pre.3; burn, burn-wgpu to 0.22.0-pre.3 |
+| `crates/conatus/numen/Cargo.toml:20-21` | burn, burn-wgpu |
+| `crates/conatus/seiche/Cargo.toml:34-35` | burn, burn-wgpu |
+| `crates/intel/esp/Cargo.toml:25` (comment `:71`) | burn |
+| `ports/distillery/Cargo.toml:36-38, 59` | burn-backend, burn-ir, burn-remote, burn-flex (exact pins) |
+| `ports/distillery/probe/Cargo.toml:21` | burn |
+| `ports/distillery/probe/native-fixture/Cargo.toml:12` | burn |
+| `ports/distillery/probe/remote-fixture/Cargo.toml:12-14` | burn, burn-wgpu, cubecl |
+| `ports/distillery/probe/repros/burn_browser_embedding/Cargo.toml:19, 27` | burn (twice) |
+| `ports/distillery/probe/repros/cubek_browser_extrema/Cargo.toml:19` | burn; drop the `cubecl-runtime` row at `:27` (packaging-only) |
+
+Lockfiles to regenerate: root, `probe`, `native-fixture`, `remote-fixture`,
+`session-fixture`, and both repros. Root `[patch]` rows at `Cargo.toml:711,
+718, 725` stay; rewrite their comments (`:706-725`).
+
+**API.** No hard breaks found in what Mere uses. esp: `Device::{ndarray, wgpu}`,
+`DeviceKind`, `autodiff()`, `into_data_async`, `into_scalar_async`, the
+`burn::nn` layers and `burn::optim::{AdamConfig, GradientsParams::from_grads}`
+unchanged. conatus: burn-wgpu `lib.rs` byte-identical; `WgpuSetup`,
+`init_device`, `RuntimeOptions`, `CubeTensor::new_contiguous`,
+`ComputeClient::{create_from_slice, get_resource, read_one}`,
+`BufferArg::from_raw_parts`, `WgpuResource`, `Shared::new_slice` unchanged;
+`burn::backend::wgpu` still exists through `burn-dispatch`. Distillery:
+burn-remote's public API unchanged, burn-ir only gained items.
+
+New deprecation warnings, not errors: `TensorData::to_vec` and `into_vec`
+(about 60 call sites across esp, numen, seiche, Distillery), and
+`Device::ndarray()` announcing burn-ndarray's removal. Do not switch the CPU
+reference backend inside this repin; log it as a follow-up.
+
+Not yet built on pre.3: esp's `decoder-lora`, `decoder-autodiff`,
+`model-session`, `persistence` rows. Pre.3 changed burn-core's `module/lora`
+and `param/*` and burn-optim's `state` and `visitor`.
+
+MSRV stays 1.95, toolchain 1.97.1, one wgpu `^30`, one `libsqlite3-sys`.
+
+### 12.3 Receipts and how they are produced
+
+- **Same-allocation and BERT-width LayerNorm (headed).**
+  `ports/distillery/probe/repros/burn_browser_embedding/run-repro.ps1`, built
+  outside the checkout with `cargo build --locked --release --target
+  wasm32-unknown-unknown`, wasm-bindgen CLI **0.2.122** required, served by
+  `python -m http.server`; in headed Chromium run the graph cases or
+  `window.burnEmbeddingRepro.run()`. Prior receipt
+  `receipts/2026-08-22_binary_alias_iab.json`. Native control
+  `shared_binary_and_layer_norm_pass_native_wgpu` (`src/lib.rs:674`).
+- **Extrema (headed).** `repros/cubek_browser_extrema/run-repro.ps1`, then
+  `window.cubekExtremaRepro.run()`. Prior receipt
+  `receipts/2026-08-22_patched_iab.json`.
+- **burn-remote lifecycle.** `ports/distillery/src/remote.rs` tests
+  `a_live_lease_runs_on_the_shared_endpoint_and_reclaim_ends_the_client`
+  (`:413`) and `distillery_closes_the_session_before_authoring_owner_reclaim`
+  (`:606`); two-peer run `ports/distillery/probe/run-remote-minilm.ps1`.
+  Prior receipt `receipts/2026-08-23_remote_minilm.json`.
+- **Existing-device.** `cargo test -p conatus --release --features resident
+  --test resident --test resident_chunk`: nine tests.
+- **Tooling gap.** No wasm-bindgen 0.2.122 CLI on this machine;
+  `~/.cargo/bin/wasm-bindgen.exe` is 0.2.126, which the scripts reject because
+  versions from 0.2.123 break wgpu 30's `popErrorScope`
+  (`probe/Cargo.toml:24-26`).
+
+### 12.4 Isolation
+
+- Worktree `Code/worktrees/mere-burn-pre3` on branch `burn-pre3-repin` from
+  `d15619b4`. Mere's gitignored `.cargo/config.toml` source redirects are not
+  inherited, so the worktree resolves exactly what is committed; the committed
+  lock already uses genet `rev=5ae30cad`, whose checkout exists.
+- Every step: `CARGO_TARGET_DIR=C:\t\mere-burn-pre3-target`,
+  `CARGO_NET_OFFLINE=true`; scripts get `-TargetDir C:\t\mere-burn-pre3-<name>`.
+- The 2026-08-26 Distillery check was blocked by a git fetch holding the
+  package cache lock. Offline, Cargo never fetches git. Every pre.3 burn,
+  cubecl and cubek crate in the graph is already cached, except
+  `burn-communication`, used only by burn-remote's own websocket tests. Never
+  run `cargo generate-lockfile` or a bare `cargo update`. Fallback: a copied
+  `CARGO_HOME` under `C:\t`, offline.
+- Models are gitignored; pass `-ModelDir` or `SIBYLLA_MINILM_DIR` pointing at
+  the main tree's `models/all-MiniLM-L6-v2`.
+- `-j 4` as a compromise with live sessions.
+
+### 12.5 Steps and done-conditions
+
+- **S0. Decisions (Mark).** D1 exact or caret pins; D2 `cubek-reduce` in
+  scope; D3 permission to install wasm-bindgen-cli 0.2.122 and for any
+  one-off fetch; D4 the merge window. *Done:* answered, and the 0.2.122 CLI
+  prints its version.
+- **S1. Worktree.** `git -C repos\mere worktree add -b burn-pre3-repin
+  Code\worktrees\mere-burn-pre3 d15619b4`. *Done:* no `.cargo\config.toml` in
+  the worktree; `cargo tree --offline --locked -p esp --features bert-wgpu -e
+  normal --depth 1` exits 0 on the pre.2 baseline.
+- **S2. Capture deltas.** `diff -u` pristine pre.2 against each patch into
+  `C:\t\mere-burn-pre3-deltas`; burn-remote against pre.3. *Done:* four diffs
+  matching 12.1.
+- **S3. Rebase burn-cubecl.** *Done:* against pristine pre.3 the diff is three
+  17-line insertions, the manifest tail and `MERE-PATCH.md`.
+- **S4. Rebase cubecl-runtime to identity-only.** *Done:* diff is two methods,
+  one test and `[workspace]`.
+- **S5. Rebase burn-remote.** *Done:* diff lists only `Cargo.toml`,
+  `Cargo.toml.orig`, `MERE-PATCH.md`, `src/lib.rs` and the seven server,
+  shared and transport files; `tests/iroh.rs` absent.
+- **S6. Rebase cubek-reduce.** *Done:* diff is one helper, two call sites and
+  `[workspace]`.
+- **S7. Move the manifests** and rewrite root `Cargo.toml:706-725` comments.
+  *Done:* `git grep` for the three pre.2 versions in manifests matches only
+  comments and `support/patches/*/Cargo.toml.orig`.
+- **S8. Regenerate the root lock, offline and targeted:** `cargo update
+  --offline -p burn -p burn-wgpu -p cubecl -p burn-backend -p burn-ir -p
+  burn-remote -p burn-flex`. *Done:* no `pre.2"` in the lock; the three
+  patched crates at pre.3 with no `source`; no "patch was not used"; the lock
+  diff touches only the burn, cubecl and cubek families and their needs; one
+  wgpu 30.x; esp with no default features has no burn and no tokenizers.
+- **S9. Build and test.** Native: esp default, `bert,bert-validation`,
+  `index-burn-wgpu`, `decoder-wgpu`, `decoder-lora,decoder-autodiff`; numen
+  `field-burn`; seiche `tensor-burn`. GPU release: numen `field-burn-wgpu`,
+  seiche `tensor-burn-wgpu`, conatus `resident`, esp BERT wgpu parity against
+  real MiniLM. wasm, each `--target wasm32-unknown-unknown
+  --no-default-features`: esp's eleven matrix rows; numen `""`, `field-burn`,
+  `field-burn-wgpu`, `field-rhai`; seiche `""`, `tensor-burn`,
+  `tensor-burn-wgpu`; conatus `resident`. *Done:* every suite passes, conatus
+  nine with no missing-adapter lines, BERT wgpu parity under `2.0e-3`, every
+  wasm row exits 0. Ambiguous failures rerun on a detached pre.2 worktree.
+- **S10. Distillery.** `cargo check --offline -p distillery --all-targets
+  --features remote,trainer-gpu,trainer-autodiff,flora`; `cargo test --offline
+  -p distillery --features remote --lib remote::tests`; `cargo check --offline
+  -p djinn --features trainer-gpu,trainer-autodiff`. *Done:* all exit 0, both
+  lease tests pass. This is the missing Distillery pre.3 receipt.
+- **S11. Whole workspace.** `cargo check --offline --workspace --all-targets`.
+  *Done:* exit 0, or any failure is outside burn's graph and fails identically
+  on `main`.
+- **S12. Nested lockfiles** for `probe`, `native-fixture`, `remote-fixture`,
+  `session-fixture` and both repros, offline and targeted. *Done:* no pre.2
+  entries, no unused-patch warnings; `remote-fixture` keeps its older p2panda
+  0.7.3 pins. Commit patches, manifests and locks before receipts so receipts
+  record a clean commit.
+- **S13. Receipts.**
+  - (a) Same-allocation and LayerNorm, headed, into
+    `receipts/<date>_binary_alias_pre3_iab.json`, plus the native control.
+    *Done:* `passed: true`, eleven embedding controls pass, four graph cases
+    `matches_expected: true`, `gpu_errors: []`.
+  - (a') Unpatched control: temporarily drop only the `burn-cubecl` and
+    `cubecl-runtime` rows, build into a separate target, record, restore.
+    *Done:* `burn-unit-raw-mul-shared` false and both LayerNorm cases
+    `output_matches_input_bits: true`, proving the patch is still needed.
+  - (b) Extrema, headed. *Done:* four cases pass, `gpu_errors: []`.
+  - (c) Two-peer remote run. *Done:* receipt `dirty=false`; 384 values match
+    ESP native within the pre.2 receipt's tolerance (pre.2 recorded
+    1.4901161e-7); the 512-row in-flight request fails on reclaim without
+    hanging; CubeCL allocations and bytes return to baseline; a fresh lease
+    reproduces the output. Fusion/autotune matrix not required.
+  - (d) conatus and (e) esp wgpu parity outputs from S9, recorded.
+- **S14. Commits on the branch:** one per patch; manifests and locks; receipt
+  files; docs. No attribution trailers. Pushing is S16.
+- **S15. Docs:** this plan's status lines and a progress entry; the closure
+  doc's production row and patch table; `MERE-PATCH.md` in all four patches;
+  esp's manifest comment; the probe and repro READMEs; the feature/target
+  matrix. *Done:* no current-state doc says pre.2 is production.
+- **S16. Merge back.** Rebase onto `origin/main`; on a `Cargo.lock`-only
+  conflict take `origin/main`'s lock and rerun S8's targeted update; smoke
+  `esp --features bert-wgpu`, `distillery --features remote`, conatus
+  `resident_chunk`; fast-forward push to `main` with Mark's authorization in
+  the D4 window; record the pushed revision R. Do not merge into the main
+  working tree beneath a live session. *Done:* `origin/main` is R and a doc
+  commit records it.
+- **S17. Knot handoff** (12.8).
+
+### 12.6 Stop rules (halt and return to Mark)
+
+1. A patch needs different logic, not new context: pre.3 changed
+   `can_mut_broadcast`, `Handle`'s fields, or `SessionManager`'s structure.
+2. The unpatched control (S13 a') passes the shared-input cases: the patch
+   may be removable, and carrying or dropping it is Mark's call.
+3. A patched same-allocation or extrema case fails, or `gpu_errors` is
+   non-empty.
+4. The remote run hangs on reclaim, allocations miss baseline, or numbers
+   differ from the pre.2 receipt without an upstream explanation.
+5. Any numeric or parity result moves without an explained upstream change
+   (repeats §9).
+6. A compile fix would change an esp public contract, a feature name, device
+   ownership, or the burn-remote patch API. Mechanical renames and
+   deprecation warnings are not stops.
+7. Lock regeneration moves wgpu off 30.x, adds a second burn, cubecl, wgpu or
+   `libsqlite3-sys`, or moves unrelated majors (iroh, tokio, p2panda).
+8. esp with no default features pulls burn or tokenizers.
+9. Rebasing onto `main` conflicts in a manifest.
+10. Cargo insists on a network git fetch while offline outside D3.
+
+### 12.7 Risks, highest first
+
+1. CubeCL's pre.3 IR and WGSL rewrite changes browser behaviour: the extrema
+   trick may stop working, and the same-allocation defect may worsen or
+   vanish. Only S13 a, a' and b decide it.
+2. Knot carries a patch that is unused or does not compile, if
+   `cubecl-runtime` is not patched with `burn-cubecl` or caret pins drift to
+   pre.4 (D1).
+3. Headed tooling: the 0.2.122 CLI is absent, newer CLIs break wgpu 30 error
+   scopes, and a headed Chromium session is required.
+4. Live sessions: cache locks, `Cargo.lock` conflicts at merge, and every
+   session rebuilding the burn stack afterwards.
+5. esp's LoRA and autodiff rows never built on pre.3.
+6. burn-remote pre.2 source unavailable; the Mere-only finding rests on hunk
+   accounting.
+7. Deprecation noise and burn-ndarray's announced removal: follow-up.
+8. Older mismatches (remote-fixture on p2panda 0.7.3) may surface.
+
+### 12.8 Knot handoff
+
+After S16, `origin/main` at R must contain `support/patches/burn-cubecl`
+(`0.22.0-pre.3`) and `support/patches/cubecl-runtime` (`0.11.0-pre.3` with
+the identity helpers). Knot needs both because `burn-cubecl` calls
+`Handle::is_same_allocation`, and the `[patch]` inside `burn-cubecl`'s own
+manifest is ignored when it is a dependency. Each patch declares
+`[workspace]`, so Cargo loads it from a git checkout, and only these four
+paths declare those package names. Knot's root `[patch.crates-io]` gains:
+
+```toml
+burn-cubecl    = { version = "=0.22.0-pre.3", git = "https://github.com/merely-made/mere.git", rev = "<R>" }
+cubecl-runtime = { version = "=0.11.0-pre.3", git = "https://github.com/merely-made/mere.git", rev = "<R>" }
+# only if Knot ever runs BERT on BrowserWebGpu:
+# cubek-reduce = { version = "=0.3.0-pre.3", git = "https://github.com/merely-made/mere.git", rev = "<R>" }
+```
+
+All of Knot's Mere pins move to R together. *Done in Knot:* no unused-patch
+warning, and `cargo tree -p knot-editor --features embed-bert-wgpu -i
+burn-cubecl` shows the git source at R. Note for Knot's plan: Knot is
+desktop-only today and Mere's native WGPU control passes without the patch;
+the patch protects a future browser build.
+
+### 12.9 Effort
+
+Mechanical: S1 to S5, S7, S8, S12, S14, S15, S17. About half a day of focused
+work, mostly build waits. Investigation: S6 and S13 b (extrema on the new IR),
+S9's LoRA and autodiff rows, S10 Distillery, S13 a and a' (headed tooling and
+interpreting the control), S16 timing. Machine time roughly half a day at
+`-j 4` into a cold target, a full day at `-j 1`. Total about one to one and a
+half working days with no stop rule firing; add half a day to two days if the
+extrema or same-allocation receipts behave differently on pre.3.
