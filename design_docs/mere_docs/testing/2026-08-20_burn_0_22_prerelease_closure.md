@@ -107,6 +107,10 @@ pre.3 contains the two upstream packaging fixes above. The Mere-owned
 same-allocation `burn-cubecl` patch and targeted `burn-remote` lifecycle patch
 still need a source rebase and fresh receipts on whichever row is selected.
 
+**2026-09-16:** Mark authorized the pre.3 repin, superseding the stable
+gate above. The row is now `0.22.0-pre.3`; the two Mere-owned patches rebase
+onto it. Execution is tracked in the Burn 0.22 migration plan's progress.
+
 ## 2026-08-26 pre.3 compatibility audit
 
 The crates.io API reports the exact prerelease packages needed by the current
