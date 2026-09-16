@@ -28,6 +28,8 @@ Woodshed contributes only the comparison export; no Woodshed code changes.
 - Revocation is a product action in both consumers, not a test-only fact.
 - The fixture reaches expiry through a proof-only advance-clock command; its
   clock stays deterministic.
+- Turnstone invitations gain an optional grant lifetime, so both consumers can
+  show a grant expiring while joined (T3).
 
 ## Assessment, 2026-09-16
 
@@ -87,6 +89,17 @@ the member's later operations without deleting them. Host-only in the ring.
 admission. Make it observable as a status line and event naming the expiry
 time, and test it.
 
+**T3. Optional grant lifetime.** `Invite to place` accepts an optional
+trailing ` for <n>s|m|h|d` after the pre-key path; without it grants never
+expire, so existing prompts and scenarios are unchanged. The lifetime bounds
+the writer's Commons and projection delegations; a reader invitation carries
+no grant, so a lifetime on it is refused with a named reason rather than
+ignored. Past expiry the member's status names the expired grant and its time,
+both write permissions read not effective, writes and projection dials are
+refused as expired, and `Reconnect place` still reconnects, because membership
+is intact and reading needs no delegation. That last point is a recorded
+difference from the fixture, whose grant is its only authority.
+
 ## Done conditions
 
 - Fixture: `co_op_receipt.py` extended to cover leave and rejoin, expiry by
@@ -98,7 +111,10 @@ time, and test it.
 - Turnstone: render-free tests that a revoked member sees the revocation live
   on a connected session, has writes and dials refused, and is refused on
   reconnect after restart, and that the founder's projection withdraws its
-  later operation; app tests for the revoke rows and the expiry report; the
+  later operation; a render-free test that a writer invited with a short
+  lifetime sees its grant expire while connected, with writes and dials refused
+  and reconnect still admitted; app tests for the revoke rows, the lifetime
+  suffix and its refusal on a reader invitation, and the expiry report; the
   place tests and the four-window proof still pass.
 - The facts table below is filled from those receipts, with each consumer's
   exact status wording per fact, and every difference stated as a difference.
@@ -116,14 +132,6 @@ time, and test it.
 | Duplicate replay | | | |
 | Expiry visible | | | |
 | Revocation visible | | | |
-
-## Open decision
-
-Turnstone's founder issues grants with no expiry, so a joined member's grant
-never expires, while the fixture's grant does. Either Turnstone invitations
-gain an optional grant lifetime so both consumers can show a grant expiring
-while joined, or the table records that Turnstone's expiry fact is
-invitation-only by product choice.
 
 ## Stop rules
 
