@@ -862,5 +862,7 @@ save offered, and a reader refused at the door. Owed to mere: graphshell's
 `accept_projection_session` samples the admission clock and revocation
 ledger before awaiting the connection; Turnstone works around it by
 accepting, then sampling, then admitting, and the fork should sample after.
-With steps 1 through 7 each receipted, Murm's exchange and this projected
-document are the two concrete applications the coop contract was to follow.
+This is Turnstone's side of I3 only. The coop lifecycle contract still waits
+on its second consumer, the Woodshed practice space, whose explicit leave and
+renewed-admission reconnect remain open as I3a records; Murm carries
+conversation exchange, not collaborative state, and is not that consumer.
