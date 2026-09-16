@@ -659,6 +659,10 @@ or claim that every step already exists. A moot supplies governance where the
 activity requires it. Murm carries conversation exchange, not everyone's
 collaborative state; the historical `host_coop`/`join_coop` suggestion is retired.
 
+I3 slice 1, bringing both consumers to this sequence and recording where they
+agree and differ, is planned in
+`design_docs/mere_docs/implementation_strategy/2026-09-16_coop_lifecycle_parity_plan.md`.
+
 Root consolidates each lane with a scoped diff, applicable tests, and current
 receipt links. Promote I2 and I3 from their actual consumer seams; additional
 protocol parity and platform-wide session abstractions require their own
