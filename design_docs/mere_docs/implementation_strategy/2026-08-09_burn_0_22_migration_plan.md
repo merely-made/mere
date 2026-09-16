@@ -502,6 +502,39 @@ burn-remote tests still call `to_vec`, now deprecated, carried as warnings;
 `support/patches/cubecl-wgpu` is a retired 0.10.0 archive nothing patches in,
 left alone.
 
+### Phase B, first attempt and rulings (2026-09-16)
+
+Phase B stopped at its first check, as designed. Main's local lock (sha256
+`06a159dc...`, written 11:05:36) was copied as the baseline, and S1's
+`--locked` check exited 101 on the branch and, in a throwaway worktree, on
+pre.2 itself. Cause: main's lock was written under the gitignored
+`.cargo/config.toml` redirects, so about 36 genet, netrender and retinue
+packages are recorded as local paths, and four path-only unused patch rows
+(outrider, postilion, radio-hand, tulle) appear. A copy Cargo rewrote once
+offline changed no package version (burn, burn-cubecl, cubecl-runtime,
+burn-remote, cubek-reduce, wgpu 30.0.1, libsqlite3-sys, tokio, iroh and
+p2panda unchanged), moved those sources to git at the same pinned revisions
+(genet `5ae30cad`, netrender `3961aca9`, retinue `85e716c7`), and passed
+`--locked` at pre.2.
+
+**Rulings (Mark, 2026-09-16).**
+
+- **Baseline:** the normalized lock,
+  `C:	\mere-burn-pre3-baseline-normalized-pre2.lock`, sha256
+  `6055022d3433481918b70a86243a8e3fca10a99bfc2c3a43c443d32916657f88`. It is
+  what a clean checkout of committed Mere resolves, which is what the
+  worktree builds.
+- **Stop rule narrowed:** an unused-patch warning stops the repin only for
+  `burn-cubecl`, `cubecl-runtime`, `burn-remote` or `cubek-reduce`. Pre-existing
+  unused patches are recorded in the receipt as present before the repin.
+- **Open defect, deferred until after the repin:** under the committed-state
+  resolution, Mere's main already reports `patch was not used` for
+  `boa_engine` and `boa_gc` (`Cargo.toml:788-789`, `mark-ik/boa` branch
+  `genet`) and `iroh-mdns-address-lookup` (`Cargo.toml:756`, `=0.4.0` on
+  `mark-ik/iroh-address-lookups` branch `mere`). Main believes it builds those
+  forks and does not. Diagnosis waits so the repin's lock diff stays free of
+  unrelated movement; it gets its own home when opened.
+
 ### 12.0 Corrections to the 2026-09-16 recorded scope
 
 1. **The `cubecl-runtime` patch shrinks; it does not retire.** Pre.3 carries
