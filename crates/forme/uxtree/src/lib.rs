@@ -386,7 +386,8 @@ where
             InlineSpan::Emphasis(inner)
             | InlineSpan::Strong(inner)
             | InlineSpan::Presented { spans: inner, .. }
-            | InlineSpan::Submit { spans: inner, .. } => {
+            | InlineSpan::Submit { spans: inner, .. }
+            | InlineSpan::InPage { spans: inner, .. } => {
                 walk_inline_links(inner, f);
             },
             InlineSpan::Text(_)
@@ -411,6 +412,7 @@ mod tests {
             provenance: DocumentProvenance::default(),
             trust: DocumentTrustState::Unknown,
             diagnostics: Vec::new(),
+            navigation: Default::default(),
             blocks,
         }
     }
@@ -555,6 +557,28 @@ mod tests {
             .expect("link node");
         assert_eq!(link.label(), Some("the docs"));
         assert_eq!(link.value(), Some("https://example.test/"));
+    }
+
+    #[test]
+    fn in_page_link_projects_as_label_text_without_a_link_node() {
+        let doc = doc_with(vec![Block::Paragraph {
+            spans: vec![InlineSpan::InPage {
+                target: inker::InPageTarget {
+                    fragment: Some("setup".to_string()),
+                    block: Some(0),
+                },
+                spans: vec![InlineSpan::Text("Setup".to_string())],
+            }],
+        }]);
+        let tree = project_document(&doc);
+        assert!(!tree.nodes.iter().any(|(_, n)| n.role() == Role::Link));
+        let paragraph = tree
+            .nodes
+            .iter()
+            .map(|(_, n)| n)
+            .find(|n| n.role() == Role::Paragraph)
+            .expect("paragraph node");
+        assert_eq!(paragraph.label(), Some("Setup"));
     }
 
     #[test]

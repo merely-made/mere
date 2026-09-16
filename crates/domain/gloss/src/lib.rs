@@ -319,6 +319,7 @@ mod tests {
             diagnostics: Vec::new(),
             provenance: Default::default(),
             trust: Default::default(),
+            navigation: Default::default(),
             blocks: vec![
                 Block::Heading {
                     level: 1,
@@ -427,6 +428,7 @@ mod tests {
             diagnostics: Vec::new(),
             provenance: Default::default(),
             trust: Default::default(),
+            navigation: Default::default(),
             blocks: vec![],
         };
         let tree = project_outline(&doc);
