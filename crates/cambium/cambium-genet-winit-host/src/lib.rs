@@ -54,8 +54,8 @@ pub use cambium_rootstock::{
     CloseRequestHook, Direction, FocusedTextHook, FocusedTextSlot, Frame, FrameHook, FrameProfile,
     Host, HostFont, HostHooks, HostImage, HostOptions, HostPointer, HostWake, HostWindow,
     IdlePolicy, Init, Key, KeyInterceptHook, KeyPress, Modifiers, NamedKey, RelayoutProfile,
-    Runner, Surface, WindowCommand, WindowCommands, WindowFrame, WindowGeometry, ZOOM_LADDER,
-    fit_zoom, ladder_step, read_frame,
+    Runner, ScrollAlign, ScrollIntoView, Surface, WindowCommand, WindowCommands, WindowFrame,
+    WindowGeometry, ZOOM_LADDER, fit_zoom, ladder_step, read_frame,
 };
 pub use harness::{Harness, inert_hooks};
 

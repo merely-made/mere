@@ -23,7 +23,7 @@ use crate::meristem_bounds::RootView;
 use crate::wake::HostWake;
 use crate::{Accessibility, HostWindow, Surface, WindowCommands, WindowGeometry};
 use crate::{KeyPress, Modifiers};
-use crate::{OwnedLayout, ScrollTarget};
+use crate::{OwnedLayout, ScrollAlign, ScrollTarget};
 
 /// An application-level close request. Native window chrome and an app's own
 /// Close command deliberately use the same path.
@@ -588,6 +588,16 @@ pub enum HostPointer {
     SecondaryPress(f32, f32),
 }
 
+/// A request to bring one retained DOM node into view, queued by
+/// [`AppCtx::scroll_into_view`] and resolved on the host's next layout.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct ScrollIntoView {
+    /// The node to reveal, by the identity [`AppCtx::painted_rect`] takes.
+    pub node: NodeId,
+    /// Where it lands in its scroll area.
+    pub align: ScrollAlign,
+}
+
 /// What the application sees inside a hook. One shape for every hook so the
 /// application-side plumbing stays boring.
 pub struct AppCtx<'a, State: 'static, Logic, V>
@@ -654,6 +664,9 @@ where
     /// Pointer events for the host to deliver to itself once this hook
     /// returns, in order. See [`HostPointer`].
     pub pointer: &'a mut Vec<HostPointer>,
+    /// Scroll requests for the next layout; queued through
+    /// [`scroll_into_view`](Self::scroll_into_view).
+    pub(crate) scroll: &'a mut Vec<ScrollIntoView>,
     /// The window-verb seam, for a hook that wants to minimize/maximize/close
     /// without routing through application state. The same handle `init`
     /// received.
@@ -681,6 +694,18 @@ where
         let dom = self.runner.dom();
         let dom = dom.borrow();
         layout.painted_rect(&*dom, node)
+    }
+
+    /// Ask the host to scroll `node` into view.
+    ///
+    /// Resolved on the host's next layout against the node's painted rect
+    /// there, so a node this dispatch created, or a request made before the
+    /// first layout, is found. One plane moves: the nearest ancestor that
+    /// scrolls vertically and has room to, otherwise the window viewport,
+    /// clamped to its range. Vertical only. A node that no longer exists or
+    /// does not paint is a no-op; requests queued together resolve in order.
+    pub fn scroll_into_view(&mut self, node: NodeId, align: ScrollAlign) {
+        self.scroll.push(ScrollIntoView { node, align });
     }
 }
 
@@ -886,6 +911,9 @@ where
     /// Pointer events an application hook asked the host to deliver to itself,
     /// drained through the real input path once the hook returns.
     pub pending_pointer: Vec<HostPointer>,
+    /// Scroll requests an application hook queued, resolved in order by the
+    /// next [`relayout`](Host::relayout) once its layout is current.
+    pub pending_scroll: Vec<ScrollIntoView>,
     /// The last frame's host-owned phase attribution.
     pub last_frame_profile: Option<FrameProfile>,
     /// Tab is being held: the arrow keys steer focus instead of reaching the
@@ -950,6 +978,7 @@ where
             pending_ui_zoom: None,
             pending_capture: None,
             pending_pointer: Vec::new(),
+            pending_scroll: Vec::new(),
             last_frame_profile: None,
             tab_held: false,
         }
@@ -1239,6 +1268,7 @@ where
                 wake: &self.wake,
                 capture: &mut self.s.pending_capture,
                 pointer: &mut self.s.pending_pointer,
+                scroll: &mut self.s.pending_scroll,
                 window_commands: &commands,
                 geometry,
                 frame_profile,
@@ -1263,6 +1293,13 @@ where
         }
         if let Some(zoom) = self.s.pending_ui_zoom.take() {
             self.set_ui_zoom(zoom);
+        }
+        // Scroll requests resolve at the next layout; a hook that runs after
+        // the frame (`after_frame`) would otherwise wait for an unrelated one.
+        if !self.s.pending_scroll.is_empty()
+            && let Some(window) = self.s.window.as_ref()
+        {
+            window.request_redraw();
         }
         self.drain_pointer();
     }
@@ -1318,6 +1355,7 @@ where
                 wake: &self.wake,
                 capture: &mut self.s.pending_capture,
                 pointer: &mut self.s.pending_pointer,
+                scroll: &mut self.s.pending_scroll,
                 window_commands: &commands,
                 geometry,
                 frame_profile,

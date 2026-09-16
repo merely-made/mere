@@ -325,6 +325,16 @@ where
         element + vx.abs() + vy.abs()
     }
 
+    /// The window viewport's own scroll offset, `(x, y)`, apart from any nested
+    /// container's. `(0, 0)` before the first layout.
+    pub fn viewport_scroll(&self) -> (f32, f32) {
+        self.host
+            .s
+            .layout
+            .as_ref()
+            .map_or((0.0, 0.0), |layout| layout.viewport_scroll())
+    }
+
     /// The runner, for assertions the state alone cannot make (focus, capture).
     pub fn runner(&self) -> &Runner<State, Logic, V> {
         self.host.s.runner.as_ref().expect("harness has a runner")
