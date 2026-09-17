@@ -54,6 +54,11 @@ Woodshed contributes only the comparison export; no Woodshed code changes.
   the handle. No lane mutates the shared handle to prune.
 - Root runs the pin cascade for these mere changes rather than waiting for
   the lattice sync pass, which had not started.
+- `GroupSession` gains `forget_epochs` in stickleback, so the host prunes the
+  session itself (2026-09-17).
+- Chat replays from its latest checkpoint for projection, admission and
+  authoring, so epochs a checkpoint covers can be forgotten, rather than
+  holding every epoch a full replay would decrypt (2026-09-17).
 
 ## Assessment, 2026-09-16
 
@@ -186,14 +191,31 @@ yet covered: refresh over a live LogSync lane, and a later member reading
 encrypted graph history through the retained epoch bundle; both belong to
 R2 and E2's tests.
 
-**E1b. Host-owned pruning (mere Commons).** E1 found that chat's pruning
-replaces the shared handle, so pruning chat would drop epochs the encrypted
-graph still needs, and refreshing from the group session would restore
-pruned epochs. Chat's pruning stops mutating the handle and reports what it
-could forget; the encrypted graph reports the epochs its retained records
-need; a Commons helper intersects the lanes' needs; the host prunes the group
-session and refreshes the handle. Turnstone does not prune today, so its
-wiring is not part of this slice.
+**E1b. Host-owned pruning (mere stickleback and Commons).** E1 found that
+chat's pruning replaces the shared handle, so pruning chat would drop epochs
+the encrypted graph still needs, and refreshing from the group session would
+restore pruned epochs. The first E1b pass stopped before changing anything and
+found two more facts. `GroupSession` has no public way to forget an epoch, and
+it hands every retained epoch to later invitees, so pruning only the handle
+cannot hold. And chat pruning was already unsafe: it releases epochs whose
+messages a checkpoint covers, while projection, admission and authoring still
+decrypt every retained record, so all three failed with an unknown epoch after
+pruning in a temporary probe; the existing pruning test had no data records.
+
+- **S1.** `GroupSession::forget_epochs` refuses the current epoch and unheld
+  ones, applies on a copy and commits all-or-nothing, and the session's
+  exported keyring and later welcomes no longer carry forgotten epochs.
+- **C1.** Chat replays from its latest checkpoint for projection, admission and
+  authoring, finds that checkpoint without decrypting older ones, and still
+  withdraws a revoked writer's checkpoint-covered records under today's
+  evaluation-time semantics. If a checkpoint cannot carry what authority
+  re-evaluation needs, stop and report rather than weaken revocation.
+- **C2.** Chat's pruning reports what it can release without touching the
+  handle; the encrypted graph reports the epochs its retained records need;
+  a Commons helper releases only epochs no lane needs and that are not
+  current; the host forgets them with `forget_epochs`, saves the session and
+  refreshes the handle from it. Turnstone does not prune today, so its wiring
+  is not part of this slice.
 
 **E2. Encrypted place graph (Turnstone).** New places open the shared graph
 with the encrypted profile. Existing places live only in scratch test
@@ -219,6 +241,11 @@ session's wing-wide bump if one is running.
   and reconnect still admitted; app tests for the revoke rows, the lifetime
   suffix and its refusal on a reader invitation, and the expiry report; the
   place tests and the four-window proof still pass.
+- Pruning: after the host releases an epoch a chat checkpoint covers, chat's
+  projection, admission and authoring still work; an epoch the encrypted
+  graph needs is retained with its reason; a refresh from the session does
+  not restore a forgotten epoch; a later invitee's welcome does not carry it;
+  a writer revoked after a checkpoint still loses its covered records.
 - Reading: R0's result is recorded. A member invited earlier decrypts chat
   authored after a later invite. After revoke and rotation, the revoked member
   cannot decrypt chat or read shared graph nodes authored after the rotation,
