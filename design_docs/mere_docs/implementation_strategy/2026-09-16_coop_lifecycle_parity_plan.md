@@ -127,12 +127,21 @@ the domain has authenticated and causally ordered it, but no lane carries those
 frames: only an invitation does, and only to the invitee. The shared graph
 replica has no encryption. The Gemot lanes stay plaintext in this slice.
 
-**R0. Test the add-invite suspicion.** Code reading suggests that inviting a
-third member rotates the group epoch without the already-joined members ever
-receiving the control frame, so they could not decrypt later chat. A
-render-free Turnstone test with a positive control (chat before the third
-invite decrypts) settles it before R1 is built; the result is recorded either
-way.
+**R0. Add-invite suspicion: refuted, 2026-09-16.** Code reading suggested
+that inviting a third member rotates the group epoch without already-joined
+members receiving the frame. Turnstone `3262006`'s
+`a_joined_member_reads_chat_authored_after_a_later_invite` shows otherwise:
+stickleback's `GroupSession::add` hands the invitee the existing keys and never
+rotates, the epoch was identical after founding and after both invites, and the
+earlier member read chat authored after the later invite, live, with a positive
+control and a seal/open probe across the two sessions. Three facts carry into
+R2. `remove` and `update` do rotate, so every remaining member must receive
+those frames. The founder's running worker loads its group and chat keyring
+once at open and invites change only the copy on disk, so after a rotation the
+running worker must refresh or it keeps encrypting to the old epoch. Chat
+admission silently drops records it cannot decrypt and lane counters count only
+accepted ones, so proving a member cannot read needs a positive control beside
+it.
 
 **R1. Group-key lane (mere).** A signed, causally ordered lane beside
 stickleback's group session carrying `GroupControlFrame` and addressed
