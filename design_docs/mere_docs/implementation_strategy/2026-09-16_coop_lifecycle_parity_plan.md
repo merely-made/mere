@@ -44,6 +44,10 @@ Woodshed contributes only the comparison export; no Woodshed code changes.
 - Group-key frames travel on a dedicated group-key lane, keeping the recorded
   rule that Gemot decides who belongs and the group session decides who can
   read.
+- Live members follow rotations through a refreshable key handle in Commons,
+  shared by chat and the encrypted graph profile, rather than rejoining lanes
+  after each rotation. Chat's keyring is otherwise fixed at construction and
+  captured when its lane joins.
 
 ## Assessment, 2026-09-16
 
@@ -148,7 +152,13 @@ stickleback's group session carrying `GroupControlFrame` and addressed
 `GroupDirectFrame` records for add, remove and rotate, authenticated by the
 authoring member's Personae root and applied through `GroupSession::process`
 in order. Frames are size-bounded; duplicate and stale frames are ignored. It
-joins like the other lanes and has a publish path.
+joins like the other lanes and has a publish path. Landed as mere `71a767b8`:
+`stickleback::GroupKeyLane`, whose drain takes a persist closure and writes
+settled marks only after the host saved the session, and parks records that
+arrive ahead of their author's previous record. Its tests show a remaining
+member opening post-rotation ciphertext while the removed member gets an
+unknown-epoch refusal. Late joiners know only their adder's sequence, which
+holds while only the founder authors frames.
 
 **R2. Rekey on invite and revoke (Turnstone).** The group-key lane becomes the
 tenth place lane. Invite publishes its add dispatch on it; the invitation
@@ -160,8 +170,11 @@ caveat line is removed once this works.
 **E1. Encrypted graph profile (mere Commons).** Graph operation payloads are
 sealed to the current group epoch with the same keyring approach chat uses,
 and the projection decrypts with retained epochs, so a later member welcomed
-with the retained epoch bundle reads history. The plaintext profile stays
-unchanged for the practice fixture and other consumers.
+with the retained epoch bundle reads history. Chat and this profile read keys
+through one refreshable handle the host updates after draining the group-key
+lane, so a joined lane admits new-epoch records and authors to the current
+epoch without rejoining. The plaintext profile stays unchanged for the
+practice fixture and other consumers.
 
 **E2. Encrypted place graph (Turnstone).** New places open the shared graph
 with the encrypted profile. Existing places live only in scratch test
@@ -215,8 +228,9 @@ session's wing-wide bump if one is running.
 - No shared contract type, crate or view is extracted in this slice.
 - No change to Gemot semantics; both consumers use existing membership,
   delegation and revocation operations. Commons gains an encrypted graph
-  profile beside the unchanged plaintext one, and stickleback gains the
-  group-key lane; nothing else in either changes.
+  profile beside the unchanged plaintext one and a refreshable key handle used
+  by chat and that profile; stickleback gains the group-key lane; nothing else
+  in either changes.
 - The Gemot lanes stay plaintext: a removed member can still read membership
   and delegation facts, and the facts table says so.
 - Authoring-time judgement of revoked writers' earlier operations is its own
