@@ -59,6 +59,14 @@ Woodshed contributes only the comparison export; no Woodshed code changes.
 - Chat replays from its latest checkpoint for projection, admission and
   authoring, so epochs a checkpoint covers can be forgotten, rather than
   holding every epoch a full replay would decrypt (2026-09-17).
+- Records naming an epoch a member does not hold yet are parked and
+  re-admitted after its keys refresh, in Commons, rather than forcing a sync
+  round through a fork hook (2026-09-17).
+- Turnstone's R2 and E2 work stays uncommitted until parking lands, so
+  remaining members never ship with lost messages after a revoke (2026-09-17).
+- Stickleback exports the group-key lane's sync topic and a lookup from
+  Personae root to group recipient; Turnstone drops its copies and a revoke
+  with no known recipient is refused by name (2026-09-17).
 
 ## Assessment, 2026-09-16
 
@@ -232,6 +240,39 @@ the fold needs covered records' headers to stay in the store.
 **E2. Encrypted place graph (Turnstone).** New places open the shared graph
 with the encrypted profile. Existing places live only in scratch test
 directories and are not migrated.
+
+**R2 and E2 status, 2026-09-17: implemented, tested, held uncommitted.** The
+group-key lane is the tenth place lane; invite publishes its add frame; revoke
+removes, rotates and publishes; every member drains at open, on nudges and
+before authoring, then refreshes its handle. A revoked member refuses chat and
+shared nodes authored after the rotation beside positive controls, a later
+invitee reads encrypted graph history, and a place with only a plaintext graph
+store is refused as `this place predates encrypted shared graphs`. Headed run
+29 passed with chat sent after the reader joined. Drain latency measured 246
+to 1104 ms. A runtime probe found the race held against landing: content
+sealed to the new epoch that reaches a member before it applies the rotation
+is refused and never offered again, and that author's later records then fail
+for want of their predecessor, so the member stops receiving until it
+reconnects. Two library gaps surfaced too: the group-key lane's sync topic is
+private, so Turnstone copied its derivation, and `GroupSession` cannot map a
+Personae root to its recipient, so a revoke with no recorded recipient revokes
+in Gemot without rotating and says nothing.
+
+**M1. Stickleback exports.** `GroupKeyLane` exposes its sync topic, and
+`GroupSession` resolves a Personae root to its group recipient from the
+pre-keys it registered.
+
+**P1. Parking (mere Commons).** Chat and the encrypted graph park, bounded and
+durably, records naming an epoch the member lacks and same-author successors
+waiting on them, without counting them as accepted. After the host replaces
+the key handle it asks each lane to re-admit parked records in causal order.
+A member that never receives the epoch keeps them parked within the bound;
+eviction is counted and visible.
+
+**R2b. Turnstone adoption.** Use the exported topic and recipient lookup,
+refuse a revoke with no group recipient by name, and re-admit parked records
+after every drain. A render-free test sends chat and shares a node
+immediately after a revoke and shows the remaining member receiving both.
 
 **Cascade.** R1, E1 and E1b change mere, so knot-editor, mere's own knot-editor pin,
 Woodshed's Redshank port and Turnstone move together, or ride the Paredros
