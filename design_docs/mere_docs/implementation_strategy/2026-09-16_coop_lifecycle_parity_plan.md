@@ -48,6 +48,12 @@ Woodshed contributes only the comparison export; no Woodshed code changes.
   shared by chat and the encrypted graph profile, rather than rejoining lanes
   after each rotation. Chat's keyring is otherwise fixed at construction and
   captured when its lane joins.
+- The host owns epoch pruning for every lane sharing that handle: a lane
+  reports the epochs its retained records still need, the host forgets only
+  epochs no lane needs, prunes the group session itself, and then refreshes
+  the handle. No lane mutates the shared handle to prune.
+- Root runs the pin cascade for these mere changes rather than waiting for
+  the lattice sync pass, which had not started.
 
 ## Assessment, 2026-09-16
 
@@ -174,13 +180,26 @@ with the retained epoch bundle reads history. Chat and this profile read keys
 through one refreshable handle the host updates after draining the group-key
 lane, so a joined lane admits new-epoch records and authors to the current
 epoch without rejoining. The plaintext profile stays unchanged for the
-practice fixture and other consumers.
+practice fixture and other consumers. Landed as mere `af674f30`: `GroupKeys`
+and `encrypted::EncryptedReplica` on lane `commons/graph/encrypted/v1`. Not
+yet covered: refresh over a live LogSync lane, and a later member reading
+encrypted graph history through the retained epoch bundle; both belong to
+R2 and E2's tests.
+
+**E1b. Host-owned pruning (mere Commons).** E1 found that chat's pruning
+replaces the shared handle, so pruning chat would drop epochs the encrypted
+graph still needs, and refreshing from the group session would restore
+pruned epochs. Chat's pruning stops mutating the handle and reports what it
+could forget; the encrypted graph reports the epochs its retained records
+need; a Commons helper intersects the lanes' needs; the host prunes the group
+session and refreshes the handle. Turnstone does not prune today, so its
+wiring is not part of this slice.
 
 **E2. Encrypted place graph (Turnstone).** New places open the shared graph
 with the encrypted profile. Existing places live only in scratch test
 directories and are not migrated.
 
-**Cascade.** R1 and E1 change mere, so knot-editor, mere's own knot-editor pin,
+**Cascade.** R1, E1 and E1b change mere, so knot-editor, mere's own knot-editor pin,
 Woodshed's Redshank port and Turnstone move together, or ride the Paredros
 session's wing-wide bump if one is running.
 
