@@ -273,10 +273,13 @@ M1 and P1 landed as mere `11f0d705`: `group_key_sync_topic`,
 `GroupSession::recipient_for_root`, and parking with `readmit_parked` and
 `parking_status` on chat and the encrypted graph. `accept` now answers
 `Ok(false)` for a record it parks where it used to return an error, which R2b
-must absorb. Decided 2026-09-17 and following in a small mere change:
-`recipient_for_root` prefers the recipient that is a current member, and
-stickleback's atomic insert becomes public so unparking commits with the
-insert. Recorded limits: a record's author binding is sealed inside its
+must absorb. Both follow-ups landed as mere `41f35b4d`:
+`recipient_for_root` returns a sole recipient whether or not it is a member,
+prefers the one that is a current member when a root registered several, and
+answers `None` when that is ambiguous; the processor's new public
+`process_with_writes` carries the parking deletion in the insert's own batch,
+so nothing is ever stored and parked at once, and a refused batch applies
+neither. The group-key lane was already atomic, being in-crate. Recorded limits: a record's author binding is sealed inside its
 ciphertext and sync lanes admit any peer, so anyone reaching a lane can fill
 the park with fake-epoch records and evict real ones, which belongs with the
 membership-gated sync hardening already recorded; a ciphertext sealed to
