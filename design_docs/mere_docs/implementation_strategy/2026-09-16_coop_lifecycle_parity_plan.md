@@ -327,18 +327,36 @@ session's wing-wide bump if one is running.
   exact status wording per fact, and every difference stated as a difference.
 - `git diff --check` clean in both repositories.
 
-## Facts table (to be filled from receipts)
+## Facts table, filled 2026-09-17
 
-| I3 fact | Turnstone evidence and wording | Fixture evidence and wording | Agree? |
+Turnstone evidence: commits `a1c9884`, `3262006`, `9ef9ce5`; headed runs 29 and
+30. Fixture evidence: commit `5e3850f7` and its process receipt.
+
+| I3 fact | Turnstone | Practice fixture | Agree? |
 |---|---|---|---|
-| Invite with bounded authority | | | |
-| Refuse wrong target or grant | | | |
-| Join | | | |
-| Leave | | | |
-| Reconnect rechecks | | | |
-| Duplicate replay | | | |
-| Expiry visible | | | |
-| Revocation visible | | | |
+| Invite a particular peer with bounded authority | `Invite to place` and `Invite to place as reader`, bound to an offered pre-key, writer grants optionally bounded by a ` for 10m` lifetime | `found` then a signed invitation naming the invited root | Yes |
+| Refuse a wrong target or unauthorized grant | `Gemot membership does not contain the invited root`; a reader's write and projection dial refused as `this profile holds no effective capability to author here`; `a reader invitation carries no grant to bound` | wrong-space invitation, tampered delegation and pre-admission contribution each refused by name | Yes |
+| Join | `Join place` from an invitation file | `join` installs the invitation's authority | Yes |
+| Leave, keeping history | `Leave place` detaches the binding and keeps graph, chat and governance membership | `leave` removes the installed authority and keeps every retained operation; `not joined: this peer left the space` | Yes |
+| Reconnect rechecks current admission | `Reconnect place` rechecks retained membership and refuses `this identity is no longer a member in retained place state` | `connect` and `reopen` recheck before any traffic and send nothing when refused | Yes |
+| Duplicate replay adds no activity state | by sync convergence; not separately receipted | duplicate-free reconciliation receipted | Partly: only the fixture receipts it |
+| Expiry visible | `Place not joined: invitation expired at <utc>` and `Grant: expired at <utc>`; an expired grant still admits a reconnect, because membership is intact | `expired: this peer's grant ended at 1000 ms; store clock is 1001 ms`, refusing contribution and reconnect | Differs: the fixture's grant is its only authority, so expiry there also stops reading and reconnecting |
+| Revocation visible | `Revoke place member` removes membership, revokes the grants and rotates the group; `Membership: revoked`, writes and dials refused as `its place membership was revoked`, reconnect refused | `revoke_member` records a revocation on its delegation lane; `revoked: the issuer revoked this peer's delegation` | Yes for the verdict |
+| Revocation stops reading | Yes: the group rotates and the shared graph is encrypted, so chat and nodes authored afterwards are unreadable to the revoked member | No: the fixture's records are plaintext, so revocation only withdraws them from the effective view | Differs |
+| Revocation scope over earlier work | Every operation the revoked writer authored leaves the effective view, earlier ones included, and stays retained | Same | Yes, and both wait on the authoring-time lane |
+
+Differences worth carrying into slice 2: the fixture treats one grant as all
+authority while Turnstone separates membership from delegation; only Turnstone
+cuts reading; only the fixture receipts duplicate replay. One Turnstone-only
+limit belongs with them: a revoke resolves the member's group recipient from
+the pre-keys the local session registered, so a manager who never invited that
+member is refused by name rather than half-revoking. That is honest but
+incomplete, and wants its own lane.
+
+**Slice 1 is done.** Every done condition above is met: the fixture receipt,
+the Turnstone tests and headed runs, the pruning conditions, the reading
+conditions, and this table. Slice 2, extracting the shared lifecycle contract
+from these two consumers, is the next decision.
 
 ## Stop rules
 
