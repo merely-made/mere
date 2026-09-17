@@ -269,6 +269,21 @@ the key handle it asks each lane to re-admit parked records in causal order.
 A member that never receives the epoch keeps them parked within the bound;
 eviction is counted and visible.
 
+M1 and P1 landed as mere `11f0d705`: `group_key_sync_topic`,
+`GroupSession::recipient_for_root`, and parking with `readmit_parked` and
+`parking_status` on chat and the encrypted graph. `accept` now answers
+`Ok(false)` for a record it parks where it used to return an error, which R2b
+must absorb. Decided 2026-09-17 and following in a small mere change:
+`recipient_for_root` prefers the recipient that is a current member, and
+stickleback's atomic insert becomes public so unparking commits with the
+insert. Recorded limits: a record's author binding is sealed inside its
+ciphertext and sync lanes admit any peer, so anyone reaching a lane can fill
+the park with fake-epoch records and evict real ones, which belongs with the
+membership-gated sync hardening already recorded; a ciphertext sealed to
+another group's epoch parks until evicted; a parked record admitted live
+stays counted as parked until the next readmission; and live inserts do not
+release parked successors, so the host calls readmission after every drain.
+
 **R2b. Turnstone adoption.** Use the exported topic and recipient lookup,
 refuse a revoke with no group recipient by name, and re-admit parked records
 after every drain. A render-free test sends chat and shares a node
@@ -327,9 +342,10 @@ session's wing-wide bump if one is running.
 - No shared contract type, crate or view is extracted in this slice.
 - No change to Gemot semantics; both consumers use existing membership,
   delegation and revocation operations. In stickleback and Commons, only the
-  changes this plan names: the group-key lane and `forget_epochs`, the
-  refreshable key handle, the encrypted graph profile, chat's checkpoint
-  replay and host-owned pruning.
+  changes this plan names: the group-key lane, `forget_epochs`, the exported
+  sync topic and recipient lookup, a public atomic insert, the refreshable key
+  handle, the encrypted graph profile, chat's checkpoint replay, host-owned
+  pruning and parking with re-admission.
 - The Gemot lanes stay plaintext: a removed member can still read membership
   and delegation facts, and the facts table says so.
 - Authoring-time judgement of revoked writers' earlier operations is its own
