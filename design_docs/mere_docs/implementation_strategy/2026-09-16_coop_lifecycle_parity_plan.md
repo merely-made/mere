@@ -1,7 +1,9 @@
 # Coop Lifecycle Parity Plan
 
 **Date:** 2026-09-16
-**Status:** planned. Slice 1 of census lane I3.
+**Status:** in progress. Slice 1 of census lane I3. F1 to F4 landed as mere
+`5e3850f7`; T1 to T3 landed as Turnstone `a1c9884` as an intermediate step.
+The reading work below is open, so slice 1 is not done.
 **Lane owner:** [suite census, I3 coop ceremony](../../2026-08-22_turnstone_suite_composition_and_capability_census.md)
 
 ## Purpose
@@ -30,6 +32,18 @@ Woodshed contributes only the comparison export; no Woodshed code changes.
   clock stays deterministic.
 - Turnstone invitations gain an optional grant lifetime, so both consumers can
   show a grant expiring while joined (T3).
+- Revocation currently withdraws every operation a revoked writer authored,
+  earlier ones included, because Gemot judges a grant at evaluation time
+  rather than at each operation's authoring time. Judging each operation
+  against the grant valid when it was written is planned as its own mere lane
+  after slice 1.
+- Slice 1 also makes revocation cut off reading: rekey the place's group on
+  revoke and encrypt the shared graph lane. The tested revoke and lifetime work
+  lands first as an intermediate step, with the revoked member's status saying
+  reading is not yet revoked.
+- Group-key frames travel on a dedicated group-key lane, keeping the recorded
+  rule that Gemot decides who belongs and the group session decides who can
+  read.
 
 ## Assessment, 2026-09-16
 
@@ -69,21 +83,25 @@ reconnect are refused as expired. Gateway action and button marked proof-only.
 **F4. Revoke.** The founder's `revoke_member` authors a revocation of the
 member's delegation using Gemot's existing revocation semantics, retained and
 carried over the same wire as operations. After sync, both peers retain the
-member's operations; any authored after revocation read as revoked authority
-and leave the effective view. The member's next reconnect is refused as
-revoked. Gateway action and button `Revoke member`.
+member's operations and all of them read as revoked authority, earlier ones
+included (see Decisions). The member's next reconnect is refused as revoked.
+Gateway action and button `Revoke member`. Landed: revocation is recorded on a
+real Gemot delegation lane in the fixture's store and carried over the existing
+wire; a refused step sends no traffic.
 
 ### Turnstone
 
 **T1. Revoke place member.** A founder-only palette action per member, shown
 as a situational row naming the member's short root and access. The worker
 authors a membership `Remove` and a revocation of the member's Commons and
-projection delegations through `author_revoke`, stores both, and publishes
-both on the live lanes. The revoked member's status shows both write
+projection delegations, stores both, and publishes both on the live lanes.
+Landed: Gemot's delegation store admits only Moot-scoped statements, so the
+graphshell-scoped projection grant is revoked in the holder's revocation
+ledger, rebuilt at every bind from the Gemot fold. The revoked member's status shows both write
 permissions not effective and a line naming the revocation; its writes and
 projection dials are refused with a named reason; its `Reconnect place` is
 refused by the existing membership recheck. The founder's projection withdraws
-the member's later operations without deleting them. Host-only in the ring.
+all of the member's operations without deleting them. Host-only in the ring.
 
 **T2. Expiry reported.** An expired invitation's refusal already exists at
 admission. Make it observable as a status line and event naming the expiry
@@ -99,6 +117,50 @@ both write permissions read not effective, writes and projection dials are
 refused as expired, and `Reconnect place` still reconnects, because membership
 is intact and reading needs no delegation. That last point is a recorded
 difference from the fixture, whose grant is its only authority.
+
+### Reading
+
+Assessed 2026-09-16. Chat already encrypts to the place's group through a
+`DataKeyring` loaded from stickleback's `GroupSession`, which can add, remove
+and rotate. Each change yields a control frame every member must process after
+the domain has authenticated and causally ordered it, but no lane carries those
+frames: only an invitation does, and only to the invitee. The shared graph
+replica has no encryption. The Gemot lanes stay plaintext in this slice.
+
+**R0. Test the add-invite suspicion.** Code reading suggests that inviting a
+third member rotates the group epoch without the already-joined members ever
+receiving the control frame, so they could not decrypt later chat. A
+render-free Turnstone test with a positive control (chat before the third
+invite decrypts) settles it before R1 is built; the result is recorded either
+way.
+
+**R1. Group-key lane (mere).** A signed, causally ordered lane beside
+stickleback's group session carrying `GroupControlFrame` and addressed
+`GroupDirectFrame` records for add, remove and rotate, authenticated by the
+authoring member's Personae root and applied through `GroupSession::process`
+in order. Frames are size-bounded; duplicate and stale frames are ignored. It
+joins like the other lanes and has a publish path.
+
+**R2. Rekey on invite and revoke (Turnstone).** The group-key lane becomes the
+tenth place lane. Invite publishes its add dispatch on it; the invitation
+still carries the welcome for the invitee. Revoke removes the member from the
+group, rotates, and publishes both. Every member processes frames in order,
+refreshes its chat keyring, and is nudged like any lane arrival. The reading
+caveat line is removed once this works.
+
+**E1. Encrypted graph profile (mere Commons).** Graph operation payloads are
+sealed to the current group epoch with the same keyring approach chat uses,
+and the projection decrypts with retained epochs, so a later member welcomed
+with the retained epoch bundle reads history. The plaintext profile stays
+unchanged for the practice fixture and other consumers.
+
+**E2. Encrypted place graph (Turnstone).** New places open the shared graph
+with the encrypted profile. Existing places live only in scratch test
+directories and are not migrated.
+
+**Cascade.** R1 and E1 change mere, so knot-editor, mere's own knot-editor pin,
+Woodshed's Redshank port and Turnstone move together, or ride the Paredros
+session's wing-wide bump if one is running.
 
 ## Done conditions
 
@@ -116,6 +178,12 @@ difference from the fixture, whose grant is its only authority.
   and reconnect still admitted; app tests for the revoke rows, the lifetime
   suffix and its refusal on a reader invitation, and the expiry report; the
   place tests and the four-window proof still pass.
+- Reading: R0's result is recorded. A member invited earlier decrypts chat
+  authored after a later invite. After revoke and rotation, the revoked member
+  cannot decrypt chat or read shared graph nodes authored after the rotation,
+  while remaining members can, proven render-free with a positive control. The
+  four-window run sends chat after the reader joins and shows the joiner reads
+  it. The reading caveat line is gone.
 - The facts table below is filled from those receipts, with each consumer's
   exact status wording per fact, and every difference stated as a difference.
 - `git diff --check` clean in both repositories.
@@ -136,8 +204,14 @@ difference from the fixture, whose grant is its only authority.
 ## Stop rules
 
 - No shared contract type, crate or view is extracted in this slice.
-- No change to Commons or Gemot semantics; both consumers use existing
-  membership, delegation and revocation operations.
+- No change to Gemot semantics; both consumers use existing membership,
+  delegation and revocation operations. Commons gains an encrypted graph
+  profile beside the unchanged plaintext one, and stickleback gains the
+  group-key lane; nothing else in either changes.
+- The Gemot lanes stay plaintext: a removed member can still read membership
+  and delegation facts, and the facts table says so.
+- Authoring-time judgement of revoked writers' earlier operations is its own
+  lane after this slice.
 - Murm is not involved: it carries conversation exchange, not activity state.
 - The fixture stays proof-only; fixed identities are not promoted to onboarding.
 - Woodshed's repository is untouched.
