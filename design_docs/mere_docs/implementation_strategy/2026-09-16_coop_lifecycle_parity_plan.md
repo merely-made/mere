@@ -217,6 +217,18 @@ pruning in a temporary probe; the existing pruning test had no data records.
   refreshes the handle from it. Turnstone does not prune today, so its wiring
   is not part of this slice.
 
+Landed as mere `3d3ad81c`. Checkpoints are chained in chat's signed header
+and version 2 carries each covered operation's stable author and each
+author's last channel write; version 1 is refused by name. Checkpoint
+admission rebuilds the candidate from the covered records, so a peer missing
+covered records refuses the checkpoint until they arrive. Chat's own
+execution, keyring restore and `projection_from_checkpoint` are removed;
+nothing outside Commons called them. Known limits: chat's report keeps its
+existing eight-epoch floor; a checkpoint's epoch list must be a prefix of the
+receiver's epoch order, so peers that prune differently would refuse each
+other's later checkpoints; only the tip checkpoint is revalidated on read;
+the fold needs covered records' headers to stay in the store.
+
 **E2. Encrypted place graph (Turnstone).** New places open the shared graph
 with the encrypted profile. Existing places live only in scratch test
 directories and are not migrated.
@@ -273,10 +285,10 @@ session's wing-wide bump if one is running.
 
 - No shared contract type, crate or view is extracted in this slice.
 - No change to Gemot semantics; both consumers use existing membership,
-  delegation and revocation operations. Commons gains an encrypted graph
-  profile beside the unchanged plaintext one and a refreshable key handle used
-  by chat and that profile; stickleback gains the group-key lane; nothing else
-  in either changes.
+  delegation and revocation operations. In stickleback and Commons, only the
+  changes this plan names: the group-key lane and `forget_epochs`, the
+  refreshable key handle, the encrypted graph profile, chat's checkpoint
+  replay and host-owned pruning.
 - The Gemot lanes stay plaintext: a removed member can still read membership
   and delegation facts, and the facts table says so.
 - Authoring-time judgement of revoked writers' earlier operations is its own
