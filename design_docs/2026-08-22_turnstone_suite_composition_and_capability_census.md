@@ -870,3 +870,26 @@ This is Turnstone's side of I3 only. The coop lifecycle contract still waits
 on its second consumer, the Woodshed practice space, whose explicit leave and
 renewed-admission reconnect remain open as I3a records; Murm carries
 conversation exchange, not collaborative state, and is not that consumer.
+
+### I3 slice 1 done, 2026-09-17
+
+Both consumers now demonstrate I3's acceptance sequence, and the facts table
+recording where they agree and differ lives in
+`design_docs/mere_docs/implementation_strategy/2026-09-16_coop_lifecycle_parity_plan.md`.
+The practice fixture gained leave, a proof-only clock, revocation and a
+reconnect recheck (`5e3850f7`). Turnstone gained `Revoke place member`,
+optional grant lifetimes and named invitation expiry (`a1c9884`), then group
+rekeying on revoke and an encrypted shared graph (`9ef9ce5`), so revocation
+stops reading rather than only writing. Mere gained the group-key lane,
+`forget_epochs`, a refreshable key handle, the encrypted Commons graph
+profile, chat checkpoint replay, host-owned pruning and parking with
+re-admission.
+
+Differences the extraction slice must weigh: the fixture treats one grant as
+all authority while Turnstone separates membership from delegation; only
+Turnstone cuts reading; only the fixture receipts duplicate replay; and a
+Turnstone revoke resolves its recipient from locally registered pre-keys, so a
+manager who never invited that member is refused by name. Two lanes are
+recorded and not started: judging a revoked writer's earlier operations at
+authoring time, and membership-gated sync, which also bounds the parking
+flood a peer could cause. Slice 2 extracts the shared lifecycle contract.
