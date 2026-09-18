@@ -1,9 +1,8 @@
 # Coop Lifecycle Parity Plan
 
 **Date:** 2026-09-16
-**Status:** in progress. Slice 1 of census lane I3. F1 to F4 landed as mere
-`5e3850f7`; T1 to T3 landed as Turnstone `a1c9884` as an intermediate step.
-The reading work below is open, so slice 1 is not done.
+**Status:** slice 1 done 2026-09-17 (facts table below); slice 2, the
+contract, planned 2026-09-17 and in progress.
 **Lane owner:** [suite census, I3 coop ceremony](../../2026-08-22_turnstone_suite_composition_and_capability_census.md)
 
 ## Purpose
@@ -357,6 +356,47 @@ incomplete, and wants its own lane.
 the Turnstone tests and headed runs, the pruning conditions, the reading
 conditions, and this table. Slice 2, extracting the shared lifecycle contract
 from these two consumers, is the next decision.
+
+## Slice 2: the coop lifecycle contract (planned 2026-09-17)
+
+Decided by the census: the contract is a view contract, not a state owner.
+Domain state, history, merge and authorization stay with Gemot, Commons,
+Turnstone's place worker and the fixture's store. Its technical home is the
+`mere-moot` port, library `moot`, which the census names as coop's package.
+
+**K1. Contract (mere, `moot::coop`).** A data-only lifecycle report every
+consumer can produce from its own snapshot: a verdict (`joined`, `left`,
+`expired`, `revoked`, `not_joined`, `not_admitted`), the refusal reason when
+not joined, membership as the consumer sees it (count, this profile's access),
+grant facts (present, expiry time, expired at), revocation facts (revoked, by
+whom when known), whether reading continues after revocation, and the
+consumer's clock. Serde with a version field, plain names, and a conformance
+harness: a trait a consumer implements over its own snapshot plus one shared
+test that walks the I3 sequence (invite, refuse, join, leave, reconnect,
+expiry, revoke) against whatever driver the consumer supplies, asserting the
+same verdicts and reasons at each step. The harness must be able to express
+the recorded differences (an expired grant that still admits reconnect; a
+consumer that cannot cut reading) as declared capabilities, not as failures.
+
+**K2. Fixture adoption (mere).** The practice peer's status carries the
+contract report beside its existing fields, and its self-check runs the
+conformance harness with the fixture as driver, declaring its capabilities:
+grant is all authority; reading is not cut.
+
+**K3. Turnstone adoption.** `PlaceState` and `PlaceStanding` map onto the
+report, which enters observation and `record-place`; the conformance harness
+runs render-free with the place worker as driver, declaring: membership and
+grant separate; reading cut after rotation. Status wording is unchanged.
+
+**K4. Duplicate replay receipt (Turnstone).** The one "partly" row: a
+render-free test delivers a duplicate operation on a live place and shows no
+activity state changes and the counters do not double.
+
+Done when: K1 has its own tests; both consumers pass the shared harness with
+their declared capabilities; both receipts show the contract report; the
+facts table gains a row citing the harness as the shared evidence; `git diff
+--check` is clean in both repositories. Nothing moves out of the consumers
+except the report's shape.
 
 ## Stop rules
 
