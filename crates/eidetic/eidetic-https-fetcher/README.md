@@ -1,6 +1,6 @@
-# mere-eidetic-https-fetcher
+# eidetic-https-fetcher
 
-Package `mere-eidetic-https-fetcher`; the library is `eidetic_https_fetcher`.
+Package `eidetic-https-fetcher`; the library is `eidetic_https_fetcher`.
 
 `HttpsFetcher` is an `eidetic::BlobFetcher` that resolves
 `BlobSource::Https { url }` with a synchronous HTTPS GET via `ureq`. Every other
@@ -24,7 +24,7 @@ the manifest's declared `content_hash`.
 Native-only; `ureq` is a native HTTP client. Browser-side fetching would use the
 wasm `fetch` API in a separate crate.
 
-Dependencies: `mere-eidetic`, `ureq` 2.10 (`default-features = false`, feature
+Dependencies: `eidetic`, `ureq` 2.10 (`default-features = false`, feature
 `tls`), `async-trait`.
 
 ## License

@@ -1,5 +1,5 @@
 [package]
-name = "mere-eidetic-https-fetcher"
+name = "eidetic-https-fetcher"
 version.workspace = true
 edition.workspace = true
 license.workspace = true

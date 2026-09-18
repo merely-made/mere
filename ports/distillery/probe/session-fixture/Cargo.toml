@@ -9,7 +9,7 @@ description = "Real PEFT LoRA receipt for ESP's immutable ModelSession seam."
 [workspace]
 
 [dependencies]
-eidetic = { package = "mere-eidetic", path = "../../../../crates/eidetic/eidetic-core", default-features = false }
+eidetic = { path = "../../../../crates/eidetic/eidetic-core", default-features = false }
 esp = { path = "../../../../crates/intel/esp", features = ["decoder-lora"] }
 half = "2"
 muniment = { path = "../../../../crates/eidetic/muniment" }

@@ -1,6 +1,6 @@
-# mere-eidetic-fjall
+# eidetic-fjall
 
-Package `mere-eidetic-fjall`; the library is `eidetic_fjall`.
+Package `eidetic-fjall`; the library is `eidetic_fjall`.
 
 `FjallStore` is a fjall LSM [`muniment::Backend`], which is what
 `eidetic::Store` aliases. The production-default native store for the eidetic
@@ -24,7 +24,7 @@ matters, wrap the call in `tokio::task::spawn_blocking` at the call site.
 Native-only. Browser-side persistence uses muniment's `IndexedDbBackend`
 (feature `indexeddb`).
 
-Dependencies: `muniment`, `mere-eidetic`, `fjall` 2, `async-trait`.
+Dependencies: `muniment`, `eidetic`, `fjall` 2, `async-trait`.
 
 ## License
 

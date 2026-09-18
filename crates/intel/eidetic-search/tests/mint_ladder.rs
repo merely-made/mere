@@ -9,7 +9,7 @@
 //! One document per page, which is what the consumer now feeds. Run
 //! optimized — the debug numbers are not the ones to quote:
 //!
-//! `cargo test -p mere-eidetic-search --release --test mint_ladder -- --ignored --nocapture`
+//! `cargo test -p eidetic-search --release --test mint_ladder -- --ignored --nocapture`
 
 use std::time::Instant;
 
