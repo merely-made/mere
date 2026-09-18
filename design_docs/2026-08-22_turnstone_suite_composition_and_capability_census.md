@@ -893,3 +893,17 @@ manager who never invited that member is refused by name. Two lanes are
 recorded and not started: judging a revoked writer's earlier operations at
 authoring time, and membership-gated sync, which also bounds the parking
 flood a peer could cause. Slice 2 extracts the shared lifecycle contract.
+
+### I3 slice 2 done, 2026-09-18
+
+The shared lifecycle contract is `moot::coop` in `ports/moot` (`4837248d`): a
+versioned, serde report (verdict, reason, membership, grant, revocation,
+reading, clock) and `conform`, one walk of the I3 sequence against whatever
+driver a consumer supplies, with declared capabilities carrying the recorded
+differences rather than skipping checks. The practice fixture (`445c6ceb`)
+and Turnstone (`6a2e2f3`) both pass it and both receipts carry the report.
+Turnstone's walk exposed two product gaps before it passed, a left session
+that read as never joined and no way back in after a local leave, both fixed
+in the product (`PlaceState::Left`, a persisted left mark, `Rejoin place`).
+The record and the filled facts table are in
+`design_docs/mere_docs/implementation_strategy/2026-09-16_coop_lifecycle_parity_plan.md`.

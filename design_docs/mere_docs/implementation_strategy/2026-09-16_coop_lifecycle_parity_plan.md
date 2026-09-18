@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-16
 **Status:** slice 1 done 2026-09-17 (facts table below); slice 2, the
-contract, planned 2026-09-17 and in progress.
+contract, done 2026-09-18 (record at the end).
 **Lane owner:** [suite census, I3 coop ceremony](../../2026-08-22_turnstone_suite_composition_and_capability_census.md)
 
 ## Purpose
@@ -336,9 +336,11 @@ Turnstone evidence: commits `a1c9884`, `3262006`, `9ef9ce5`; headed runs 29 and
 | Invite a particular peer with bounded authority | `Invite to place` and `Invite to place as reader`, bound to an offered pre-key, writer grants optionally bounded by a ` for 10m` lifetime | `found` then a signed invitation naming the invited root | Yes |
 | Refuse a wrong target or unauthorized grant | `Gemot membership does not contain the invited root`; a reader's write and projection dial refused as `this profile holds no effective capability to author here`; `a reader invitation carries no grant to bound` | wrong-space invitation, tampered delegation and pre-admission contribution each refused by name | Yes |
 | Join | `Join place` from an invitation file | `join` installs the invitation's authority | Yes |
-| Leave, keeping history | `Leave place` detaches the binding and keeps graph, chat and governance membership | `leave` removes the installed authority and keeps every retained operation; `not joined: this peer left the space` | Yes |
+| Leave, keeping history | `Leave place` marks the binding left and keeps it with graph, chat and governance membership; `Place left: history retained; N shared nodes, M messages` (slice 2: it previously landed in the personal state, indistinguishable from never joined) | `leave` removes the installed authority and keeps every retained operation; `not joined: this peer left the space` | Yes |
+| Rejoin after leave | `Rejoin place` clears the mark and reconnects; membership and the group still hold the seat, so no new invitation is needed (slice 2: previously impossible, since leave deleted the binding the reconnect needs) | `join` installs the invitation's authority again | Yes for the verdict; the fixture needs its invitation back, Turnstone does not |
 | Reconnect rechecks current admission | `Reconnect place` rechecks retained membership and refuses `this identity is no longer a member in retained place state` | `connect` and `reopen` recheck before any traffic and send nothing when refused | Yes |
-| Duplicate replay adds no activity state | by sync convergence; not separately receipted | duplicate-free reconciliation receipted | Partly: only the fixture receipts it |
+| Duplicate replay adds no activity state | `a_replayed_operation_adds_no_place_state` (slice 2, K4): a duplicate membership operation on a live place changes no counter | duplicate-free reconciliation receipted | Yes |
+| Shared harness | `the_place_worker_conforms_to_the_coop_lifecycle_contract` walks `moot::coop::conform` over a founder and member worker pair under `{grant_is_all_authority: false, cuts_reading_on_revoke: true, receipts_duplicate_replay: true, clock: System}`; receipt `design_docs/receipts/coop_contract_conformance.json` | `contract_conformance` self-check under `{true, false, true, Fixed}`; receipt `ports/graphshell/docs/receipts/co_op_process_receipt.json` | Yes: same verdicts and reasons at every step, the declared capabilities carrying the recorded differences |
 | Expiry visible | `Place not joined: invitation expired at <utc>` and `Grant: expired at <utc>`; an expired grant still admits a reconnect, because membership is intact | `expired: this peer's grant ended at 1000 ms; store clock is 1001 ms`, refusing contribution and reconnect | Differs: the fixture's grant is its only authority, so expiry there also stops reading and reconnecting |
 | Revocation visible | `Revoke place member` removes membership, revokes the grants and rotates the group; `Membership: revoked`, writes and dials refused as `its place membership was revoked`, reconnect refused | `revoke_member` records a revocation on its delegation lane; `revoked: the issuer revoked this peer's delegation` | Yes for the verdict |
 | Revocation stops reading | Yes: the group rotates and the shared graph is encrypted, so chat and nodes authored afterwards are unreadable to the revoked member | No: the fixture's records are plaintext, so revocation only withdraws them from the effective view | Differs |
@@ -387,6 +389,8 @@ grant is all authority; reading is not cut.
 report, which enters observation and `record-place`; the conformance harness
 runs render-free with the place worker as driver, declaring: membership and
 grant separate; reading cut after rotation. Status wording is unchanged.
+Done 2026-09-18 (turnstone `6a2e2f3`); see the slice 2 record for the two
+product gaps the walk exposed.
 
 **K4. Duplicate replay receipt (Turnstone).** The one "partly" row: a
 render-free test delivers a duplicate operation on a live place and shows no
@@ -414,3 +418,35 @@ except the report's shape.
 - Murm is not involved: it carries conversation exchange, not activity state.
 - The fixture stays proof-only; fixed identities are not promoted to onboarding.
 - Woodshed's repository is untouched.
+
+## Slice 2 done, 2026-09-18
+
+K1 `moot::coop` (`4837248d`), K2 fixture adoption (`445c6ceb`), K4 duplicate
+replay receipt (turnstone `cef3deb`), K3 Turnstone adoption (turnstone
+`6a2e2f3`). Both consumers pass `conform` under their declared capabilities;
+both receipts carry the contract report; the facts table above gained the
+harness row, and its leave and replay rows changed.
+
+The harness earned its keep before it passed. Turnstone's walk failed at the
+`leave` step: `Leave place` landed in the personal state, so a left session
+read as never joined and the product could not say what the facts table
+claimed for it. It then failed at `rejoin`: leave deleted the binding sidecar
+the reconnect needs while Gemot membership and the crypto group still held the
+seat, so a fresh invitation was refused as already present and a reconnect as
+not joined. Turnstone has no way back after a local leave until this slice.
+Both were decided as product changes, not as harness capabilities:
+`PlaceState::Left` carries the binding and the retained counts; leave writes a
+`place-left.json` mark beside the binding and keeps every file; startup reads
+a marked binding as left without opening lanes; a host-only `Rejoin place`
+clears the mark and reconnects, and plain reconnect reads left as not joined
+so the mark cannot be bypassed.
+
+Contract notes for the next consumer. Turnstone's report leaves
+`grant.expires_at_ms` and `revocation.by`/`at_ms` empty: its standing is
+recomputed live from the delegation fold, which retains neither the forward
+bound nor who revoked when. The report's `now_ms` is the last refresh, not the
+call: with a system clock, two reads of one unchanged standing must compare
+equal for the duplicate-replay check. `coop`'s own reference-driver test still
+declares `receipts_duplicate_replay: false` for Turnstone's profile; that is
+the store-free reference, not Turnstone's declaration, and is left for the
+next mere pass rather than a repin cascade of its own.
