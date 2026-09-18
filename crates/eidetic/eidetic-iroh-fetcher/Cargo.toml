@@ -1,5 +1,5 @@
 [package]
-name = "mere-eidetic-iroh-fetcher"
+name = "eidetic-iroh-fetcher"
 version.workspace = true
 edition.workspace = true
 license.workspace = true

@@ -459,10 +459,10 @@ apparatus = { package = "mere-apparatus", version = "0.0.1", path = "crates/doma
 gloss = { package = "mere-gloss", version = "0.0.1", path = "crates/domain/gloss" }
 roster = { package = "mere-roster", version = "0.0.1", path = "crates/domain/roster" }
 trail = { package = "mere-trail", version = "0.0.1", path = "crates/domain/trail" }
-eidetic = { package = "mere-eidetic", version = "0.0.2", path = "crates/eidetic/eidetic-core", default-features = false }
-eidetic-fjall = { package = "mere-eidetic-fjall", path = "crates/eidetic/eidetic-fjall" }
-eidetic-https-fetcher = { package = "mere-eidetic-https-fetcher", path = "crates/eidetic/eidetic-https-fetcher" }
-eidetic-iroh-fetcher = { package = "mere-eidetic-iroh-fetcher", path = "crates/eidetic/eidetic-iroh-fetcher" }
+eidetic = { version = "0.0.2", path = "crates/eidetic/eidetic-core", default-features = false }
+eidetic-fjall = { path = "crates/eidetic/eidetic-fjall" }
+eidetic-https-fetcher = { path = "crates/eidetic/eidetic-https-fetcher" }
+eidetic-iroh-fetcher = { path = "crates/eidetic/eidetic-iroh-fetcher" }
 # Lexical search over the trail (Phase 9 producer half): an in-tree BM25
 # index + weighted-field recall + column reports + the hybrid-fusion seam.
 # tantivy was retired 2026-09-07 (98 crates, a C build, no wasm). Lives under
@@ -470,7 +470,7 @@ eidetic-iroh-fetcher = { package = "mere-eidetic-iroh-fetcher", path = "crates/e
 # product concern over browsing traces, reaching esp and import, and the
 # lexical half of the hybrid recall whose vector half is `esp::embed`. The
 # portable eidetic core it was sitting beside reaches neither.
-eidetic-search = { package = "mere-eidetic-search", path = "crates/intel/eidetic-search" }
+eidetic-search = { path = "crates/intel/eidetic-search" }
 
 # Browser-data ingest (bookmarks/history/session models + parsers); consumed
 # by the eidetic-recall bridge and, later, the shell's import verbs.
@@ -635,7 +635,7 @@ cambium = { path = "crates/cambium/cambium" }
 cambium-genet-winit-host = { path = "crates/cambium/cambium-genet-winit-host" }
 chartulary = { path = "crates/eidetic/chartulary" }
 chirograph = { path = "crates/chirograph" }
-mere-eidetic = { path = "crates/eidetic/eidetic-core" }
+eidetic = { path = "crates/eidetic/eidetic-core" }
 esp = { path = "crates/intel/esp" }
 mere-fetch = { path = "crates/system/fetch" }
 gemot = { path = "crates/moot/gemot" }

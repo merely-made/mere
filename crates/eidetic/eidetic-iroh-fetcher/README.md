@@ -1,6 +1,6 @@
-# mere-eidetic-iroh-fetcher
+# eidetic-iroh-fetcher
 
-Package `mere-eidetic-iroh-fetcher`; the library is `eidetic_iroh_fetcher`.
+Package `eidetic-iroh-fetcher`; the library is `eidetic_iroh_fetcher`.
 
 `IrohFetcher` is an `eidetic::BlobFetcher` that resolves
 `BlobSource::Iroh { ticket }` by parsing the ticket, pulling the blob from the
@@ -32,7 +32,7 @@ verifies as part of its transfer protocol, and
 
 Native-only; pulls in iroh and iroh-blobs transitively.
 
-Dependencies: `mere-eidetic`, `mere-transport` (as `transport`), `async-trait`.
+Dependencies: `eidetic`, `mere-transport` (as `transport`), `async-trait`.
 
 ## License
 

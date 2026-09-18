@@ -2,8 +2,9 @@
 
 **Date**: 2026-09-16
 
-**Status: plan, 2026-09-16.** Every decision below is Mark's; nothing has moved.
-Awaiting his go.
+**Status: plan, reviewed 2026-09-16.** The rulings below preserve the earlier
+decision record. This review revises the execution and acceptance criteria;
+it does not execute the migration or cleanup.
 
 ## Objective
 
@@ -16,16 +17,40 @@ local state is removed.
 
 1. Every `merely-made/*` rev pin in every committed manifest equals its source's
    origin head as of this pass, or trails it only by the pass's own pin-only
-   commits (the cycle rule below). One revision per source per repository.
-2. Every `rust-toolchain` pin reads `1.98.1`.
+   commits (the cycle rule below). One direct revision per source across the
+   repository's maintained manifests; transitive cycle exceptions are recorded
+   and checked for incompatible type identities.
+2. Every supported stable development toolchain and owned CI selector uses
+   `1.98.1`. Inventory explicit MSRV, firmware and purpose-specific nightly
+   exceptions separately; do not rewrite them as ordinary stable pins.
 3. The seven redirect repos carry `resolver.lockfile-path` locally, ignore
    `.cargo/local/` in git, and commit a lock with no path package from outside
    the repository.
-4. Each repository passes `cargo check --workspace --locked` on 1.98.1 from a
-   redirect-free checkout, with no unused-patch row the pass did not inherit.
-5. Every repository is level with origin, apart from uncommitted work that live
-   sessions hold.
-6. The cleanup in P2 is done.
+4. Each supported workspace passes its recorded check command on 1.98.1 from a
+   redirect-free checkout, with no new unexplained unused-patch row. The host
+   default-feature gate is `cargo +1.98.1 check --workspace --locked`;
+   target-specific workspaces have explicit commands and prerequisites.
+5. Every completed migration commit is published and its tested revision is
+   recorded. Active checkouts may await integration; that is recorded separately.
+6. Local development resolves the intended sibling packages and leaves every
+   committed lock byte-identical. Each independent workspace has its own local
+   lock, and tracked setup instructions reproduce this on another machine.
+
+Cleanup in P2 is a separate deliverable, not a prerequisite for portable builds.
+Blocked repositories remain incomplete, even when independent ones finish.
+
+## Two resolution modes
+
+Committed manifests keep fetchable Git revisions for cross-repository
+dependencies. Paths within the same repository remain normal. Committed locks
+describe the portable graph; ignored Cargo patches and local locks describe the
+developer's sibling graph. A local lock does not freeze the contents of a path
+dependency, and a successful local build does not validate the portable graph.
+
+The lock redirect protects a file, not dependency identity. Use `cargo metadata`
+to verify the actual selected packages, versions, sources and manifest paths in
+both modes. Do not infer provenance just from a package name in `Cargo.lock`,
+which does not record the filesystem path of a path package.
 
 ## Rulings (Mark, 2026-09-16)
 
@@ -44,6 +69,17 @@ local state is removed.
   Renderling's uncommitted edits are committed to a branch and pushed to the fork.
 
 ## Findings (2026-09-16)
+
+The original audit counts, pin lags and session states below are a dated
+snapshot, not a live execution inventory. P0 must refresh them before mutation.
+
+**Review verified:** Mere still ignores `Cargo.lock` at every depth in
+`.gitignore`; `.cargo/config.toml.example` teaches redirects without a separate
+lock. `ports/graphshell/web/Cargo.toml` and
+`knot-editor/crates/knot-document/Cargo.toml` define independent workspaces.
+`Code/.cargo/config.toml` exists (currently comments only). These are concrete
+reasons to update setup examples, inventory nested roots and inspect inherited
+configuration rather than treating a new worktree as isolation.
 
 **Committed locks are clean today.** A read-only audit of every repository
 compared each lock's path packages against the packages its tracked manifests
@@ -73,6 +109,21 @@ lockfile-path = ".cargo/local/Cargo.lock"
 
 Cargo older than 1.97 ignores the key and would rewrite the committed lock.
 Hocket pins 1.96.0, so its toolchain moves in the same step as its config.
+
+The [Cargo configuration reference](https://doc.rust-lang.org/stable/cargo/reference/config.html#resolverlockfile-path)
+confirms the 1.97 minimum. The snippet above is for one workspace. If inherited
+by an independent nested workspace, its fixed path still names the same lock.
+Give each nested workspace a distinct ignored lock and an explicit configuration
+or launcher. Cargo discovers config from the invocation directory and its
+ancestors, so `--manifest-path` alone does not select a nested config. Verify
+both the documented shell command and editor invocation before rollout.
+
+**Review probe, Cargo 1.97.1:** two dependency-free workspaces, one nested,
+inherited the snippet above. Running `generate-lockfile --offline` first at the
+root and then in the nested workspace replaced the root's local lock with the
+nested package; no nested local lock was created. This confirms that the
+single-workspace scratch test does not establish safe nested use. Reproduce
+this control, then prove distinct locks under the chosen local setup on 1.98.1.
 
 **Toolchain.** Stable 1.98.1 (manifest date 2026-09-03). The component set
 matches 1.97.1's install, 294.1 MB compressed from `static.rust-lang.org/dist`:
@@ -161,12 +212,25 @@ all three. No pass can leave every pin at head, hence the cycle rule.
 
 ## Method
 
-Each repository step works in `Code/worktrees/sync-<repo>` off `origin/main`,
-with `CARGO_TARGET_DIR=C:\t\sync-<repo>` (trap 10). A worktree has no untracked
-config, so its build resolves exactly what a fresh checkout would. Each step
-lands as one commit in that repository, with no attribution trailer. Before it
-merges, peers busy in that repository are messaged and their idle notice awaited.
-Nothing is pulled into a main tree beneath an active session. The 2026-09-15
+Use main directly when it is idle and the edit set can be isolated. Create
+`Code/worktrees/sync-<repo>` only to avoid an actual collision, recording its
+base and ownership, with `CARGO_TARGET_DIR=C:\t\sync-<repo>`. Keep build outputs
+outside the checkout. Use a disposable checkout of the candidate revision for
+portable validation; do not disable redirects in a live development tree.
+
+A worktree omits untracked repo config but still inherits ancestor config,
+Cargo-home config and environment overrides. Run from the intended workspace
+directory, inspect both `config` and `config.toml` and any includes, and use an
+isolated Cargo home or a verified redirect-free one. Clear resolver/path/source
+overrides for the validation process. Preserve documented build requirements
+(linkers, SDKs and required flags); move missing portable requirements into
+tracked setup rather than quietly copying machine-specific config.
+
+Each level lands as a bounded commit; Mere needs at least passes A and B.
+Coordinate files with active sessions before editing their local config or
+integrating commits. Recheck origin before pushing: if it advanced, integrate
+and rerun affected gates without force-pushing. Nothing is pulled into a main
+tree beneath an active session. The 2026-09-15
 reclaim script is not run during the pass, because the work lives under `C:\t`.
 
 `cargo check` covers default features on the host target. It proves nothing
@@ -177,24 +241,52 @@ about feature-gated or wasm code, and the pass claims no more than that.
 Record every `merely-made/*` source's origin head as the target set in Progress.
 List live sessions and message those working in repositories the pass will touch.
 
-*Done:* target set recorded; peers messaged.
+Fetch each source first; a cached remote-tracking ref is not a fresh head
+receipt. Record fetch failures as blocked. Freeze the target set rather than
+chasing unrelated commits throughout the pass; update it only for recorded
+prerequisites or this pass's published commits.
+
+Build a finite inventory of repositories and independently resolved workspace
+roots, including nested/excluded ports. For each row record its manifest, lock
+tracking policy, toolchain/CI selectors, build command, platform prerequisites,
+redirect config, expected local lock, and baseline unused patches. Historical
+fixtures and vendored workspaces need explicit classification, not blind repins.
+Every repository in scope needs a row, even if it requires no pin change.
+
+*Done:* refreshed target set and complete workspace inventory recorded; active
+ownership recorded and relevant sessions notified before their files change.
 
 ## P1. Tooling
 
 1. Install 1.98.1 with the component set above.
-2. For each of the seven redirect repos, copy its current `Cargo.lock` to
-   `.cargo/local/Cargo.lock`, so a local session keeps its present resolution.
-   Then add the verified `[resolver]` snippet to its untracked config. Hocket's
-   config waits for its P3 step.
+2. Once the relevant session is idle, back up the config and existing locks.
+   For each independently resolved workspace in the seven redirect repos, seed
+   its distinct local lock from its current lock if present. Do not overwrite an
+   existing local lock on rerun. Add the redirect only after confirming the
+   command/editor uses Cargo 1.97 or newer. Hocket waits for its P3 toolchain
+   integration; changing a toolchain only in a worktree does not update main.
+3. Verify root and nested workspace commands resolve different local locks.
+   Compare hashes of committed locks before/after, including locks currently
+   ignored by git. `git status` alone cannot detect changes to ignored locks.
 
 *Done:* `rustc +1.98.1 -V` reports 1.98.1 with the full component list. In six
-repos a local `cargo tree --depth 0` leaves `git status -- Cargo.lock` unchanged.
+repos local metadata identifies the intended sibling packages and leaves
+portable lock hashes unchanged. Record Hocket as pending until its P3 step.
 
 ## P2. Cleanup
 
+Run independently after P0; cleanup must not delay P3. Before each removal,
+refresh worktree registration, dirty/untracked state, unpushed commits and active
+process/session use. Resolve the exact absolute path and verify containment in
+the named cleanup directory, including junction targets. Preserve changed or
+active candidates and record them as deferred. A missing worktree registration
+is not evidence that its files are disposable.
+
 1. **Burn branch.** Tag mere's `burn-pre3-repin` head `610a32c5` as
-   `archive/burn-pre3-repin-20260916` and push the tag. Remove the worktree with
-   its uncommitted manifest edits, then delete the branch. Mark the pre.3 section
+   `archive/burn-pre3-repin-20260916` and push the tag after verifying that head.
+   A tag preserves committed content only: separately save the dirty diff and
+   untracked files with a restore recipe before removing the worktree and branch.
+   Verify the saved content. Mark the pre.3 section
    of the Burn 0.22 migration plan shelved.
    *Done:* `git ls-remote --tags origin` lists the tag; the branch and worktree
    are gone.
@@ -223,7 +315,8 @@ repos a local `cargo tree --depth 0` leaves `git status -- Cargo.lock` unchanged
    - webgl-livery
    - knot-editor-clean-4434584, a clone that is clean with nothing unpushed
 
-   *Done:* only the pass's own worktrees remain.
+   *Done:* eligible named candidates are gone; changed or active candidates are
+   listed as deferred. Unlisted worktrees remain untouched.
 6. **Code root.** Delete generated leftovers:
    - empty `cargo-homes`, `.targets`, `.codex-worktrees`, `.codex-targets`,
      `.codex-target`, `.codex-runner-setup`
@@ -249,9 +342,11 @@ repos a local `cargo tree --depth 0` leaves `git status -- Cargo.lock` unchanged
    - `artifacts`, `scratch`, `archive`, `targets`, `membackup`, `morning-briefs`
      and the tool config folders
 
-   *Done:* the delete list is gone; the kept list is untouched.
+   *Done:* eligible delete-list entries are gone; deferrals are recorded and the
+   kept list is untouched.
 7. **Toolchain lint.** Run `rustup override unset --nonexistent`, then uninstall
-   1.90.0 and 1.93.0, which no pin references.
+   1.90.0 and 1.93.0 only after checking current pins, CI, overrides, installed
+   tooling and active processes; absence from repository pins alone is insufficient.
    *Done:* `rustup override list` shows no missing directory; neither toolchain
    is listed.
 
@@ -262,19 +357,34 @@ harmless, and that setting is a security control, so it is left for Mark.
 
 **Per-repository recipe.** Steps 1 to 6 happen in the repository's worktree.
 
-1. Set `rust-toolchain` to `1.98.1`.
-2. Move every `merely-made/*` rev pin in every manifest, nested workspaces
-   included (trap 8), to the target named for that level.
-3. For a redirect repo, add `.cargo/local/` to `.gitignore`. For hocket, also add
-   the P1 config snippet now that its toolchain has moved.
+1. Set the supported stable toolchain and matching owned CI selectors to
+   `1.98.1`, preserving the inventoried explicit exceptions.
+2. Move every in-scope `merely-made/*` rev pin in maintained manifests, nested
+   workspaces included, to the target named for that level.
+3. For a redirect repo, ignore local locks at every inventoried workspace root.
+   Replace blanket lock-ignore rules with explicit tracking of supported
+   portable locks; keep any fixture exclusions explicit. Update tracked config
+   examples and setup instructions with the minimum Cargo version, separate
+   local locks, configurable sibling locations and commands for both modes.
+   For Hocket, install its P1 config only after main's toolchain is integrated.
 4. Update the lock with a targeted `cargo update -p` for crates from moved
    sources, or generate it where none is committed yet. Sweep every nested lock
-   that resolves a changed manifest (trap 9). Re-run the lock audit: it must
-   report no outside path package.
-5. Run `cargo check --workspace --locked` on 1.98.1. Record `--all-targets`
-   without gating on it.
+   that resolves a changed manifest. Re-run the lock audit: it must
+   report no outside path package. Inspect tracked manifests for sibling paths
+   too, including target-specific dependencies and patches. Confirm every
+   source-less metadata package has a manifest inside the repository and that
+   its required files are tracked. Git/registry packages live in Cargo's cache
+   and are classified by source, not rejected for being outside the checkout.
+5. Run the inventoried locked check for every supported workspace, plus
+   `cargo metadata --locked --format-version 1` for source identity. Record
+   `--all-targets` without gating on it. Hash committed locks before and after;
+   prove Cargo read those locks rather than a redirected one. Record candidate
+   SHA, command, working directory, toolchain, config inputs, exit code and log.
 6. Compare unused-patch rows with the Findings list; a new one stops the step.
-7. Commit, coordinate, push, and fast-forward the main tree once idle.
+7. Commit, coordinate, push, and integrate into main once idle. Run a final
+   locked check from the published revision with redirects absent. Recheck
+   local mode after integration; local lock changes are expected when pins move,
+   but portable locks must stay unchanged.
 
 **Porting.** Far-behind repositories will fail step 5. A port proceeds when the
 fix follows mechanically from the upstream change: a rename, a moved path, or a
@@ -283,7 +393,17 @@ Mark when it needs a design choice, such as a removed capability with no
 replacement, a changed meaning, or anything touching product behaviour. A
 stopped repository stays in its worktree, and every step that consumes it waits.
 
-**Levels.** Each level pins the heads left by the levels before it.
+**Levels.** Each level pins the published, tested heads left by the levels
+before it, using P0's frozen heads for unchanged sources. Complete the inventory
+for sources absent from this list before starting; this list alone does not
+cover the stated every-repository scope.
+
+Repository cycles can leave old Git source identities reachable transitively.
+The pin-only exception permits finite history, not arbitrary duplicate type
+families. Inspect the resolved graph at L5 and downstream: direct-pin alignment
+does not prove transitive unification. Record unavoidable historical sources;
+stop on incompatible duplicate identities. A structural fix, if needed, is a
+separate boundary change, not repeated repinning toward an impossible fixed point.
 
 - **L0.** Toolchain-only commits in wgpu-graft, wgpu-scry and wgpu-weld, which
   are sources with no owned pins.
@@ -308,8 +428,21 @@ stopped repository stays in its worktree, and every step that consumes it waits.
   - isometry: cleromancy at L6, mere at L5 unified from three revisions, genet,
     netrender unified; after its live session goes idle
 
-*Done:* done-conditions 1 to 5 hold for every repository not stopped under the
-porting rule. Stopped repositories are listed in Progress with the reason.
+*Done:* done-conditions 1 to 6 hold for every inventory row. Blocked rows retain
+their failure reason and prevent claiming the full pass complete; independent
+rows may still land.
+
+## P3 follow-through. Keep fresh checkouts working
+
+Add a redirect-free CI check for the inventoried supported workspaces, using
+committed locks and the recorded toolchain. Include the manifest/metadata source
+audit and lock hash check so a future local-path leak fails visibly. Document a
+local setup command that refuses unsupported Cargo versions before resolution
+and can be rerun without overwriting local configuration or locks.
+
+*Done:* a clean clone needs only documented prerequisites, while the optional
+local setup selects sibling sources and preserves the portable locks. Both
+commands are recorded in tracked developer instructions and exercised once.
 
 ## P4. Unused patches
 
@@ -334,3 +467,8 @@ wrong source. Report to Mark; change nothing.
 ## Progress
 
 - **2026-09-16:** plan written from Mark's rulings; P0 not started.
+- **2026-09-16 review:** clarified portable versus local resolution, nested lock
+  isolation, inherited config, lock tracking and CI, frozen source receipts,
+  cycle identity checks and cleanup preservation. Reviewed local manifests,
+  config examples and ignore rules; a Cargo 1.97.1 scratch probe reproduced the
+  inherited nested-lock collision. No migration or cleanup executed.
