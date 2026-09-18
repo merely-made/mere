@@ -29,8 +29,11 @@ gemot = { workspace = true, optional = true }
 servitor = { workspace = true, optional = true }
 mere-document-lanes = { workspace = true, optional = true, features = ["eidetic-bridge"] }
 eidetic-search = { workspace = true, optional = true }
+# The coop lifecycle contract is data plus a harness: serde only, never gated.
+serde = { workspace = true }
 
 [dev-dependencies]
+serde_json = { workspace = true }
 eidetic = { workspace = true }
 fleece = { workspace = true }
 genet-static-dom = { workspace = true }
