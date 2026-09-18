@@ -1,9 +1,267 @@
 {
   "result": "ok",
   "kind": "two Rust peers in two HTTP gateway processes; no browser automation",
-  "binary_sha256": "03e24a047d330ebfa92acb1d01d578ec933c3d9d2f64628e3d374f1466919ce3",
+  "binary_sha256": "e33b87fc2f966a481996c634b83cc0b51f035ce1fbbc5d0753892c3bb7e0a60a",
   "comparison_sha256": "e159ca8c6ee70cb324027b92ff24e047d2bce21c0c22b04590a0aeaa7ebe841b",
   "negative_checks": {
+    "contract_conformance": true,
+    "contract_conformance_detail": {
+      "conformance": {
+        "capabilities": {
+          "clock": "fixed",
+          "cuts_reading_on_revoke": false,
+          "grant_is_all_authority": true,
+          "receipts_duplicate_replay": true
+        },
+        "steps": [
+          [
+            "fresh",
+            {
+              "grant": null,
+              "membership": null,
+              "now_ms": 50,
+              "reading": "unknown",
+              "reason": "not joined: no invitation is installed in this store",
+              "revocation": null,
+              "verdict": "not_joined",
+              "version": 1
+            }
+          ],
+          [
+            "invite_wrong_target",
+            {
+              "grant": null,
+              "membership": null,
+              "now_ms": 50,
+              "reading": "unknown",
+              "reason": "not joined: no invitation is installed in this store",
+              "revocation": null,
+              "verdict": "not_joined",
+              "version": 1
+            }
+          ],
+          [
+            "join",
+            {
+              "grant": {
+                "expired_at_ms": null,
+                "expires_at_ms": 1000
+              },
+              "membership": {
+                "access": "write",
+                "members": 2
+              },
+              "now_ms": 50,
+              "reading": "unknown",
+              "reason": null,
+              "revocation": null,
+              "verdict": "joined",
+              "version": 1
+            }
+          ],
+          [
+            "leave",
+            {
+              "grant": null,
+              "membership": null,
+              "now_ms": 50,
+              "reading": "unknown",
+              "reason": "not joined: this peer left the space; install an invitation to join again",
+              "revocation": null,
+              "verdict": "left",
+              "version": 1
+            }
+          ],
+          [
+            "rejoin",
+            {
+              "grant": {
+                "expired_at_ms": null,
+                "expires_at_ms": 1000
+              },
+              "membership": {
+                "access": "write",
+                "members": 2
+              },
+              "now_ms": 50,
+              "reading": "unknown",
+              "reason": null,
+              "revocation": null,
+              "verdict": "joined",
+              "version": 1
+            }
+          ],
+          [
+            "reconnect",
+            {
+              "grant": {
+                "expired_at_ms": null,
+                "expires_at_ms": 1000
+              },
+              "membership": {
+                "access": "write",
+                "members": 2
+              },
+              "now_ms": 50,
+              "reading": "unknown",
+              "reason": null,
+              "revocation": null,
+              "verdict": "joined",
+              "version": 1
+            }
+          ],
+          [
+            "expire",
+            {
+              "grant": {
+                "expired_at_ms": 1000,
+                "expires_at_ms": 1000
+              },
+              "membership": {
+                "access": "write",
+                "members": 2
+              },
+              "now_ms": 1001,
+              "reading": "unknown",
+              "reason": "expired: this peer's grant ended at 1000 ms; store clock is 1001 ms",
+              "revocation": null,
+              "verdict": "expired",
+              "version": 1
+            }
+          ],
+          [
+            "reconnect_after_expiry",
+            {
+              "grant": {
+                "expired_at_ms": 1000,
+                "expires_at_ms": 1000
+              },
+              "membership": {
+                "access": "write",
+                "members": 2
+              },
+              "now_ms": 1001,
+              "reading": "unknown",
+              "reason": "expired: this peer's grant ended at 1000 ms; store clock is 1001 ms",
+              "revocation": null,
+              "verdict": "expired",
+              "version": 1
+            }
+          ],
+          [
+            "revoke",
+            {
+              "grant": {
+                "expired_at_ms": 1000,
+                "expires_at_ms": 1000
+              },
+              "membership": {
+                "access": "write",
+                "members": 2
+              },
+              "now_ms": 1001,
+              "reading": "continues",
+              "reason": "revoked: the issuer revoked this peer's delegation",
+              "revocation": {
+                "at_ms": 50,
+                "by": [
+                  175,
+                  6,
+                  163,
+                  227,
+                  41,
+                  23,
+                  20,
+                  228,
+                  243,
+                  86,
+                  193,
+                  156,
+                  155,
+                  21,
+                  205,
+                  25,
+                  81,
+                  236,
+                  110,
+                  102,
+                  98,
+                  170,
+                  119,
+                  190,
+                  7,
+                  84,
+                  127,
+                  40,
+                  147,
+                  131,
+                  52,
+                  29
+                ]
+              },
+              "verdict": "revoked",
+              "version": 1
+            }
+          ],
+          [
+            "replay_duplicate",
+            {
+              "grant": {
+                "expired_at_ms": 1000,
+                "expires_at_ms": 1000
+              },
+              "membership": {
+                "access": "write",
+                "members": 2
+              },
+              "now_ms": 1001,
+              "reading": "continues",
+              "reason": "revoked: the issuer revoked this peer's delegation",
+              "revocation": {
+                "at_ms": 50,
+                "by": [
+                  175,
+                  6,
+                  163,
+                  227,
+                  41,
+                  23,
+                  20,
+                  228,
+                  243,
+                  86,
+                  193,
+                  156,
+                  155,
+                  21,
+                  205,
+                  25,
+                  81,
+                  236,
+                  110,
+                  102,
+                  98,
+                  170,
+                  119,
+                  190,
+                  7,
+                  84,
+                  127,
+                  40,
+                  147,
+                  131,
+                  52,
+                  29
+                ]
+              },
+              "verdict": "revoked",
+              "version": 1
+            }
+          ]
+        ]
+      },
+      "ok": true
+    },
     "expiry_refuses_contribution_and_recheck": true,
     "invitation_roundtrip_installed": true,
     "leave_retains_and_refuses_contribution": true,
@@ -36,6 +294,50 @@
       "rejoined_retained_counts": [
         2,
         2
+      ],
+      "left_contract": {
+        "grant": null,
+        "membership": null,
+        "now_ms": 50,
+        "reading": "unknown",
+        "reason": "not joined: this peer left the space; install an invitation to join again",
+        "revocation": null,
+        "verdict": "left",
+        "version": 1
+      },
+      "rejoined_contracts": [
+        {
+          "grant": {
+            "expired_at_ms": null,
+            "expires_at_ms": 1000
+          },
+          "membership": {
+            "access": "write",
+            "members": 2
+          },
+          "now_ms": 50,
+          "reading": "unknown",
+          "reason": null,
+          "revocation": null,
+          "verdict": "joined",
+          "version": 1
+        },
+        {
+          "grant": {
+            "expired_at_ms": null,
+            "expires_at_ms": 1000
+          },
+          "membership": {
+            "access": "write",
+            "members": 2
+          },
+          "now_ms": 50,
+          "reading": "unknown",
+          "reason": null,
+          "revocation": null,
+          "verdict": "joined",
+          "version": 1
+        }
       ]
     },
     {
@@ -87,6 +389,128 @@
         "admitted": false,
         "lifecycle": "revoked",
         "reason": "revoked: the issuer revoked this peer's delegation"
+      },
+      "contracts": [
+        {
+          "grant": {
+            "expired_at_ms": null,
+            "expires_at_ms": 1000
+          },
+          "membership": {
+            "access": "write",
+            "members": 2
+          },
+          "now_ms": 50,
+          "reading": "unknown",
+          "reason": null,
+          "revocation": null,
+          "verdict": "joined",
+          "version": 1
+        },
+        {
+          "grant": {
+            "expired_at_ms": null,
+            "expires_at_ms": 1000
+          },
+          "membership": {
+            "access": "write",
+            "members": 2
+          },
+          "now_ms": 50,
+          "reading": "continues",
+          "reason": "revoked: the issuer revoked this peer's delegation",
+          "revocation": {
+            "at_ms": 50,
+            "by": [
+              175,
+              6,
+              163,
+              227,
+              41,
+              23,
+              20,
+              228,
+              243,
+              86,
+              193,
+              156,
+              155,
+              21,
+              205,
+              25,
+              81,
+              236,
+              110,
+              102,
+              98,
+              170,
+              119,
+              190,
+              7,
+              84,
+              127,
+              40,
+              147,
+              131,
+              52,
+              29
+            ]
+          },
+          "verdict": "revoked",
+          "version": 1
+        }
+      ],
+      "refused_reconnect_contract": {
+        "grant": {
+          "expired_at_ms": null,
+          "expires_at_ms": 1000
+        },
+        "membership": {
+          "access": "write",
+          "members": 2
+        },
+        "now_ms": 50,
+        "reading": "continues",
+        "reason": "revoked: the issuer revoked this peer's delegation",
+        "revocation": {
+          "at_ms": 50,
+          "by": [
+            175,
+            6,
+            163,
+            227,
+            41,
+            23,
+            20,
+            228,
+            243,
+            86,
+            193,
+            156,
+            155,
+            21,
+            205,
+            25,
+            81,
+            236,
+            110,
+            102,
+            98,
+            170,
+            119,
+            190,
+            7,
+            84,
+            127,
+            40,
+            147,
+            131,
+            52,
+            29
+          ]
+        },
+        "verdict": "revoked",
+        "version": 1
       }
     },
     {
@@ -108,7 +532,23 @@
       },
       "retained_count": 4,
       "effective_records": 0,
-      "pending_authority_count": 4
+      "pending_authority_count": 4,
+      "contract": {
+        "grant": {
+          "expired_at_ms": 1000,
+          "expires_at_ms": 1000
+        },
+        "membership": {
+          "access": "write",
+          "members": 2
+        },
+        "now_ms": 1001,
+        "reading": "unknown",
+        "reason": "expired: this peer's grant ended at 1000 ms; store clock is 1001 ms",
+        "revocation": null,
+        "verdict": "expired",
+        "version": 1
+      }
     }
   ],
   "states": {
@@ -117,11 +557,21 @@
         "role": "founder",
         "online": true,
         "process_open": true,
-        "process_id": 27344,
+        "process_id": 20268,
         "process_generation": 1,
         "last_sync_error": null,
         "lifecycle": "not_joined",
         "now_ms": 50,
+        "contract": {
+          "grant": null,
+          "membership": null,
+          "now_ms": 50,
+          "reading": "unknown",
+          "reason": "not joined: no invitation is installed in this store",
+          "revocation": null,
+          "verdict": "not_joined",
+          "version": 1
+        },
         "last_recheck": null,
         "comparison": {
           "source": {
@@ -220,6 +670,16 @@
         "service": {
           "authority_installed": false,
           "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "contract": {
+            "grant": null,
+            "membership": null,
+            "now_ms": 50,
+            "reading": "unknown",
+            "reason": "not joined: no invitation is installed in this store",
+            "revocation": null,
+            "verdict": "not_joined",
+            "version": 1
+          },
           "lifecycle": "not_joined",
           "lifecycle_reason": "not joined: no invitation is installed in this store",
           "local_root": "af06a3e3291714e4f356c19c9b15cd1951ec6e6662aa77be07547f289383341d",
@@ -242,11 +702,21 @@
         "role": "member",
         "online": true,
         "process_open": true,
-        "process_id": 22060,
+        "process_id": 42432,
         "process_generation": 1,
         "last_sync_error": null,
         "lifecycle": "not_joined",
         "now_ms": 50,
+        "contract": {
+          "grant": null,
+          "membership": null,
+          "now_ms": 50,
+          "reading": "unknown",
+          "reason": "not joined: no invitation is installed in this store",
+          "revocation": null,
+          "verdict": "not_joined",
+          "version": 1
+        },
         "last_recheck": null,
         "comparison": {
           "source": {
@@ -345,6 +815,16 @@
         "service": {
           "authority_installed": false,
           "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "contract": {
+            "grant": null,
+            "membership": null,
+            "now_ms": 50,
+            "reading": "unknown",
+            "reason": "not joined: no invitation is installed in this store",
+            "revocation": null,
+            "verdict": "not_joined",
+            "version": 1
+          },
           "lifecycle": "not_joined",
           "lifecycle_reason": "not joined: no invitation is installed in this store",
           "local_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
@@ -369,11 +849,27 @@
         "role": "founder",
         "online": true,
         "process_open": true,
-        "process_id": 27344,
+        "process_id": 20268,
         "process_generation": 1,
         "last_sync_error": null,
         "lifecycle": "joined",
         "now_ms": 50,
+        "contract": {
+          "grant": {
+            "expired_at_ms": null,
+            "expires_at_ms": 1000
+          },
+          "membership": {
+            "access": "write",
+            "members": 2
+          },
+          "now_ms": 50,
+          "reading": "unknown",
+          "reason": null,
+          "revocation": null,
+          "verdict": "joined",
+          "version": 1
+        },
         "last_recheck": null,
         "comparison": {
           "source": {
@@ -472,6 +968,22 @@
         "service": {
           "authority_installed": true,
           "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "contract": {
+            "grant": {
+              "expired_at_ms": null,
+              "expires_at_ms": 1000
+            },
+            "membership": {
+              "access": "write",
+              "members": 2
+            },
+            "now_ms": 50,
+            "reading": "unknown",
+            "reason": null,
+            "revocation": null,
+            "verdict": "joined",
+            "version": 1
+          },
           "lifecycle": "joined",
           "lifecycle_reason": null,
           "local_root": "af06a3e3291714e4f356c19c9b15cd1951ec6e6662aa77be07547f289383341d",
@@ -546,11 +1058,27 @@
         "role": "member",
         "online": true,
         "process_open": true,
-        "process_id": 22060,
+        "process_id": 42432,
         "process_generation": 1,
         "last_sync_error": null,
         "lifecycle": "joined",
         "now_ms": 50,
+        "contract": {
+          "grant": {
+            "expired_at_ms": null,
+            "expires_at_ms": 1000
+          },
+          "membership": {
+            "access": "write",
+            "members": 2
+          },
+          "now_ms": 50,
+          "reading": "unknown",
+          "reason": null,
+          "revocation": null,
+          "verdict": "joined",
+          "version": 1
+        },
         "last_recheck": {
           "action": "sync",
           "admitted": true,
@@ -654,6 +1182,22 @@
         "service": {
           "authority_installed": true,
           "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "contract": {
+            "grant": {
+              "expired_at_ms": null,
+              "expires_at_ms": 1000
+            },
+            "membership": {
+              "access": "write",
+              "members": 2
+            },
+            "now_ms": 50,
+            "reading": "unknown",
+            "reason": null,
+            "revocation": null,
+            "verdict": "joined",
+            "version": 1
+          },
           "lifecycle": "joined",
           "lifecycle_reason": null,
           "local_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
@@ -751,6 +1295,22 @@
         "last_sync_error": null,
         "lifecycle": "joined",
         "now_ms": 50,
+        "contract": {
+          "grant": {
+            "expired_at_ms": null,
+            "expires_at_ms": 1000
+          },
+          "membership": {
+            "access": "write",
+            "members": 2
+          },
+          "now_ms": 50,
+          "reading": "unknown",
+          "reason": null,
+          "revocation": null,
+          "verdict": "joined",
+          "version": 1
+        },
         "last_recheck": null,
         "comparison": {
           "source": {
@@ -849,6 +1409,22 @@
         "service": {
           "authority_installed": true,
           "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "contract": {
+            "grant": {
+              "expired_at_ms": null,
+              "expires_at_ms": 1000
+            },
+            "membership": {
+              "access": "write",
+              "members": 2
+            },
+            "now_ms": 50,
+            "reading": "unknown",
+            "reason": null,
+            "revocation": null,
+            "verdict": "joined",
+            "version": 1
+          },
           "lifecycle": "joined",
           "lifecycle_reason": null,
           "local_root": "af06a3e3291714e4f356c19c9b15cd1951ec6e6662aa77be07547f289383341d",
@@ -928,6 +1504,22 @@
         "last_sync_error": null,
         "lifecycle": "joined",
         "now_ms": 50,
+        "contract": {
+          "grant": {
+            "expired_at_ms": null,
+            "expires_at_ms": 1000
+          },
+          "membership": {
+            "access": "write",
+            "members": 2
+          },
+          "now_ms": 50,
+          "reading": "unknown",
+          "reason": null,
+          "revocation": null,
+          "verdict": "joined",
+          "version": 1
+        },
         "last_recheck": {
           "action": "sync",
           "admitted": true,
@@ -1031,6 +1623,22 @@
         "service": {
           "authority_installed": true,
           "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "contract": {
+            "grant": {
+              "expired_at_ms": null,
+              "expires_at_ms": 1000
+            },
+            "membership": {
+              "access": "write",
+              "members": 2
+            },
+            "now_ms": 50,
+            "reading": "unknown",
+            "reason": null,
+            "revocation": null,
+            "verdict": "joined",
+            "version": 1
+          },
           "lifecycle": "joined",
           "lifecycle_reason": null,
           "local_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
@@ -1123,11 +1731,27 @@
         "role": "founder",
         "online": false,
         "process_open": true,
-        "process_id": 31724,
+        "process_id": 47268,
         "process_generation": 2,
         "last_sync_error": null,
         "lifecycle": "joined",
         "now_ms": 50,
+        "contract": {
+          "grant": {
+            "expired_at_ms": null,
+            "expires_at_ms": 1000
+          },
+          "membership": {
+            "access": "write",
+            "members": 2
+          },
+          "now_ms": 50,
+          "reading": "unknown",
+          "reason": null,
+          "revocation": null,
+          "verdict": "joined",
+          "version": 1
+        },
         "last_recheck": {
           "action": "reopen",
           "admitted": true,
@@ -1231,6 +1855,22 @@
         "service": {
           "authority_installed": true,
           "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "contract": {
+            "grant": {
+              "expired_at_ms": null,
+              "expires_at_ms": 1000
+            },
+            "membership": {
+              "access": "write",
+              "members": 2
+            },
+            "now_ms": 50,
+            "reading": "unknown",
+            "reason": null,
+            "revocation": null,
+            "verdict": "joined",
+            "version": 1
+          },
           "lifecycle": "joined",
           "lifecycle_reason": null,
           "local_root": "af06a3e3291714e4f356c19c9b15cd1951ec6e6662aa77be07547f289383341d",
@@ -1305,11 +1945,27 @@
         "role": "member",
         "online": false,
         "process_open": true,
-        "process_id": 32452,
+        "process_id": 54364,
         "process_generation": 2,
         "last_sync_error": null,
         "lifecycle": "joined",
         "now_ms": 50,
+        "contract": {
+          "grant": {
+            "expired_at_ms": null,
+            "expires_at_ms": 1000
+          },
+          "membership": {
+            "access": "write",
+            "members": 2
+          },
+          "now_ms": 50,
+          "reading": "unknown",
+          "reason": null,
+          "revocation": null,
+          "verdict": "joined",
+          "version": 1
+        },
         "last_recheck": {
           "action": "reopen",
           "admitted": true,
@@ -1413,6 +2069,22 @@
         "service": {
           "authority_installed": true,
           "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "contract": {
+            "grant": {
+              "expired_at_ms": null,
+              "expires_at_ms": 1000
+            },
+            "membership": {
+              "access": "write",
+              "members": 2
+            },
+            "now_ms": 50,
+            "reading": "unknown",
+            "reason": null,
+            "revocation": null,
+            "verdict": "joined",
+            "version": 1
+          },
           "lifecycle": "joined",
           "lifecycle_reason": null,
           "local_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
@@ -1505,11 +2177,27 @@
         "role": "founder",
         "online": true,
         "process_open": true,
-        "process_id": 31724,
+        "process_id": 47268,
         "process_generation": 2,
         "last_sync_error": "Peer refused /wire: Peer disconnected",
         "lifecycle": "joined",
         "now_ms": 50,
+        "contract": {
+          "grant": {
+            "expired_at_ms": null,
+            "expires_at_ms": 1000
+          },
+          "membership": {
+            "access": "write",
+            "members": 2
+          },
+          "now_ms": 50,
+          "reading": "unknown",
+          "reason": null,
+          "revocation": null,
+          "verdict": "joined",
+          "version": 1
+        },
         "last_recheck": {
           "action": "connect",
           "admitted": true,
@@ -1613,6 +2301,22 @@
         "service": {
           "authority_installed": true,
           "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "contract": {
+            "grant": {
+              "expired_at_ms": null,
+              "expires_at_ms": 1000
+            },
+            "membership": {
+              "access": "write",
+              "members": 2
+            },
+            "now_ms": 50,
+            "reading": "unknown",
+            "reason": null,
+            "revocation": null,
+            "verdict": "joined",
+            "version": 1
+          },
           "lifecycle": "joined",
           "lifecycle_reason": null,
           "local_root": "af06a3e3291714e4f356c19c9b15cd1951ec6e6662aa77be07547f289383341d",
@@ -1711,11 +2415,27 @@
         "role": "member",
         "online": true,
         "process_open": true,
-        "process_id": 32452,
+        "process_id": 54364,
         "process_generation": 2,
         "last_sync_error": null,
         "lifecycle": "joined",
         "now_ms": 50,
+        "contract": {
+          "grant": {
+            "expired_at_ms": null,
+            "expires_at_ms": 1000
+          },
+          "membership": {
+            "access": "write",
+            "members": 2
+          },
+          "now_ms": 50,
+          "reading": "unknown",
+          "reason": null,
+          "revocation": null,
+          "verdict": "joined",
+          "version": 1
+        },
         "last_recheck": {
           "action": "connect",
           "admitted": true,
@@ -1819,6 +2539,22 @@
         "service": {
           "authority_installed": true,
           "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "contract": {
+            "grant": {
+              "expired_at_ms": null,
+              "expires_at_ms": 1000
+            },
+            "membership": {
+              "access": "write",
+              "members": 2
+            },
+            "now_ms": 50,
+            "reading": "unknown",
+            "reason": null,
+            "revocation": null,
+            "verdict": "joined",
+            "version": 1
+          },
           "lifecycle": "joined",
           "lifecycle_reason": null,
           "local_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
@@ -1935,11 +2671,27 @@
         "role": "founder",
         "online": true,
         "process_open": true,
-        "process_id": 31724,
+        "process_id": 47268,
         "process_generation": 2,
         "last_sync_error": null,
         "lifecycle": "joined",
         "now_ms": 50,
+        "contract": {
+          "grant": {
+            "expired_at_ms": null,
+            "expires_at_ms": 1000
+          },
+          "membership": {
+            "access": "write",
+            "members": 2
+          },
+          "now_ms": 50,
+          "reading": "unknown",
+          "reason": null,
+          "revocation": null,
+          "verdict": "joined",
+          "version": 1
+        },
         "last_recheck": {
           "action": "sync",
           "admitted": true,
@@ -2043,6 +2795,22 @@
         "service": {
           "authority_installed": true,
           "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "contract": {
+            "grant": {
+              "expired_at_ms": null,
+              "expires_at_ms": 1000
+            },
+            "membership": {
+              "access": "write",
+              "members": 2
+            },
+            "now_ms": 50,
+            "reading": "unknown",
+            "reason": null,
+            "revocation": null,
+            "verdict": "joined",
+            "version": 1
+          },
           "lifecycle": "joined",
           "lifecycle_reason": null,
           "local_root": "af06a3e3291714e4f356c19c9b15cd1951ec6e6662aa77be07547f289383341d",
@@ -2171,11 +2939,27 @@
         "role": "member",
         "online": true,
         "process_open": true,
-        "process_id": 32452,
+        "process_id": 54364,
         "process_generation": 2,
         "last_sync_error": null,
         "lifecycle": "joined",
         "now_ms": 50,
+        "contract": {
+          "grant": {
+            "expired_at_ms": null,
+            "expires_at_ms": 1000
+          },
+          "membership": {
+            "access": "write",
+            "members": 2
+          },
+          "now_ms": 50,
+          "reading": "unknown",
+          "reason": null,
+          "revocation": null,
+          "verdict": "joined",
+          "version": 1
+        },
         "last_recheck": {
           "action": "connect",
           "admitted": true,
@@ -2279,6 +3063,22 @@
         "service": {
           "authority_installed": true,
           "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "contract": {
+            "grant": {
+              "expired_at_ms": null,
+              "expires_at_ms": 1000
+            },
+            "membership": {
+              "access": "write",
+              "members": 2
+            },
+            "now_ms": 50,
+            "reading": "unknown",
+            "reason": null,
+            "revocation": null,
+            "verdict": "joined",
+            "version": 1
+          },
           "lifecycle": "joined",
           "lifecycle_reason": null,
           "local_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
@@ -2417,11 +3217,27 @@
         "role": "founder",
         "online": true,
         "process_open": true,
-        "process_id": 31724,
+        "process_id": 47268,
         "process_generation": 2,
         "last_sync_error": "Peer refused /wire: not joined: this peer left the space; install an invitation to join again",
         "lifecycle": "joined",
         "now_ms": 50,
+        "contract": {
+          "grant": {
+            "expired_at_ms": null,
+            "expires_at_ms": 1000
+          },
+          "membership": {
+            "access": "write",
+            "members": 2
+          },
+          "now_ms": 50,
+          "reading": "unknown",
+          "reason": null,
+          "revocation": null,
+          "verdict": "joined",
+          "version": 1
+        },
         "last_recheck": {
           "action": "sync",
           "admitted": true,
@@ -2525,6 +3341,22 @@
         "service": {
           "authority_installed": true,
           "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "contract": {
+            "grant": {
+              "expired_at_ms": null,
+              "expires_at_ms": 1000
+            },
+            "membership": {
+              "access": "write",
+              "members": 2
+            },
+            "now_ms": 50,
+            "reading": "unknown",
+            "reason": null,
+            "revocation": null,
+            "verdict": "joined",
+            "version": 1
+          },
           "lifecycle": "joined",
           "lifecycle_reason": null,
           "local_root": "af06a3e3291714e4f356c19c9b15cd1951ec6e6662aa77be07547f289383341d",
@@ -2661,11 +3493,21 @@
         "role": "member",
         "online": true,
         "process_open": true,
-        "process_id": 32452,
+        "process_id": 54364,
         "process_generation": 2,
         "last_sync_error": "not joined: this peer left the space; install an invitation to join again",
         "lifecycle": "left",
         "now_ms": 50,
+        "contract": {
+          "grant": null,
+          "membership": null,
+          "now_ms": 50,
+          "reading": "unknown",
+          "reason": "not joined: this peer left the space; install an invitation to join again",
+          "revocation": null,
+          "verdict": "left",
+          "version": 1
+        },
         "last_recheck": {
           "action": "sync",
           "admitted": false,
@@ -2769,6 +3611,16 @@
         "service": {
           "authority_installed": false,
           "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "contract": {
+            "grant": null,
+            "membership": null,
+            "now_ms": 50,
+            "reading": "unknown",
+            "reason": "not joined: this peer left the space; install an invitation to join again",
+            "revocation": null,
+            "verdict": "left",
+            "version": 1
+          },
           "lifecycle": "left",
           "lifecycle_reason": "not joined: this peer left the space; install an invitation to join again",
           "local_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
@@ -2903,11 +3755,27 @@
         "role": "founder",
         "online": true,
         "process_open": true,
-        "process_id": 31724,
+        "process_id": 47268,
         "process_generation": 2,
         "last_sync_error": "Peer refused /wire: not joined: this peer left the space; install an invitation to join again",
         "lifecycle": "joined",
         "now_ms": 50,
+        "contract": {
+          "grant": {
+            "expired_at_ms": null,
+            "expires_at_ms": 1000
+          },
+          "membership": {
+            "access": "write",
+            "members": 2
+          },
+          "now_ms": 50,
+          "reading": "unknown",
+          "reason": null,
+          "revocation": null,
+          "verdict": "joined",
+          "version": 1
+        },
         "last_recheck": {
           "action": "sync",
           "admitted": true,
@@ -3011,6 +3879,22 @@
         "service": {
           "authority_installed": true,
           "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "contract": {
+            "grant": {
+              "expired_at_ms": null,
+              "expires_at_ms": 1000
+            },
+            "membership": {
+              "access": "write",
+              "members": 2
+            },
+            "now_ms": 50,
+            "reading": "unknown",
+            "reason": null,
+            "revocation": null,
+            "verdict": "joined",
+            "version": 1
+          },
           "lifecycle": "joined",
           "lifecycle_reason": null,
           "local_root": "af06a3e3291714e4f356c19c9b15cd1951ec6e6662aa77be07547f289383341d",
@@ -3163,11 +4047,27 @@
         "role": "member",
         "online": true,
         "process_open": true,
-        "process_id": 32452,
+        "process_id": 54364,
         "process_generation": 2,
         "last_sync_error": null,
         "lifecycle": "joined",
         "now_ms": 50,
+        "contract": {
+          "grant": {
+            "expired_at_ms": null,
+            "expires_at_ms": 1000
+          },
+          "membership": {
+            "access": "write",
+            "members": 2
+          },
+          "now_ms": 50,
+          "reading": "unknown",
+          "reason": null,
+          "revocation": null,
+          "verdict": "joined",
+          "version": 1
+        },
         "last_recheck": {
           "action": "sync",
           "admitted": true,
@@ -3271,6 +4171,22 @@
         "service": {
           "authority_installed": true,
           "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "contract": {
+            "grant": {
+              "expired_at_ms": null,
+              "expires_at_ms": 1000
+            },
+            "membership": {
+              "access": "write",
+              "members": 2
+            },
+            "now_ms": 50,
+            "reading": "unknown",
+            "reason": null,
+            "revocation": null,
+            "verdict": "joined",
+            "version": 1
+          },
           "lifecycle": "joined",
           "lifecycle_reason": null,
           "local_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
@@ -3441,11 +4357,27 @@
         "role": "founder",
         "online": true,
         "process_open": true,
-        "process_id": 31724,
+        "process_id": 47268,
         "process_generation": 2,
         "last_sync_error": "Peer refused /wire: Peer disconnected",
         "lifecycle": "joined",
         "now_ms": 50,
+        "contract": {
+          "grant": {
+            "expired_at_ms": null,
+            "expires_at_ms": 1000
+          },
+          "membership": {
+            "access": "write",
+            "members": 2
+          },
+          "now_ms": 50,
+          "reading": "unknown",
+          "reason": null,
+          "revocation": null,
+          "verdict": "joined",
+          "version": 1
+        },
         "last_recheck": {
           "action": "sync",
           "admitted": true,
@@ -3549,6 +4481,22 @@
         "service": {
           "authority_installed": true,
           "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "contract": {
+            "grant": {
+              "expired_at_ms": null,
+              "expires_at_ms": 1000
+            },
+            "membership": {
+              "access": "write",
+              "members": 2
+            },
+            "now_ms": 50,
+            "reading": "unknown",
+            "reason": null,
+            "revocation": null,
+            "verdict": "joined",
+            "version": 1
+          },
           "lifecycle": "joined",
           "lifecycle_reason": null,
           "local_root": "af06a3e3291714e4f356c19c9b15cd1951ec6e6662aa77be07547f289383341d",
@@ -3755,11 +4703,63 @@
         "role": "member",
         "online": true,
         "process_open": true,
-        "process_id": 27200,
+        "process_id": 7340,
         "process_generation": 3,
         "last_sync_error": null,
         "lifecycle": "revoked",
         "now_ms": 50,
+        "contract": {
+          "grant": {
+            "expired_at_ms": null,
+            "expires_at_ms": 1000
+          },
+          "membership": {
+            "access": "write",
+            "members": 2
+          },
+          "now_ms": 50,
+          "reading": "continues",
+          "reason": "revoked: the issuer revoked this peer's delegation",
+          "revocation": {
+            "at_ms": 50,
+            "by": [
+              175,
+              6,
+              163,
+              227,
+              41,
+              23,
+              20,
+              228,
+              243,
+              86,
+              193,
+              156,
+              155,
+              21,
+              205,
+              25,
+              81,
+              236,
+              110,
+              102,
+              98,
+              170,
+              119,
+              190,
+              7,
+              84,
+              127,
+              40,
+              147,
+              131,
+              52,
+              29
+            ]
+          },
+          "verdict": "revoked",
+          "version": 1
+        },
         "last_recheck": {
           "action": "connect",
           "admitted": true,
@@ -3863,6 +4863,58 @@
         "service": {
           "authority_installed": true,
           "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "contract": {
+            "grant": {
+              "expired_at_ms": null,
+              "expires_at_ms": 1000
+            },
+            "membership": {
+              "access": "write",
+              "members": 2
+            },
+            "now_ms": 50,
+            "reading": "continues",
+            "reason": "revoked: the issuer revoked this peer's delegation",
+            "revocation": {
+              "at_ms": 50,
+              "by": [
+                175,
+                6,
+                163,
+                227,
+                41,
+                23,
+                20,
+                228,
+                243,
+                86,
+                193,
+                156,
+                155,
+                21,
+                205,
+                25,
+                81,
+                236,
+                110,
+                102,
+                98,
+                170,
+                119,
+                190,
+                7,
+                84,
+                127,
+                40,
+                147,
+                131,
+                52,
+                29
+              ]
+            },
+            "verdict": "revoked",
+            "version": 1
+          },
           "lifecycle": "revoked",
           "lifecycle_reason": "revoked: the issuer revoked this peer's delegation",
           "local_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
@@ -4087,11 +5139,27 @@
         "role": "founder",
         "online": true,
         "process_open": true,
-        "process_id": 31724,
+        "process_id": 47268,
         "process_generation": 2,
         "last_sync_error": "Peer refused /wire: Peer disconnected",
         "lifecycle": "joined",
         "now_ms": 50,
+        "contract": {
+          "grant": {
+            "expired_at_ms": null,
+            "expires_at_ms": 1000
+          },
+          "membership": {
+            "access": "write",
+            "members": 2
+          },
+          "now_ms": 50,
+          "reading": "unknown",
+          "reason": null,
+          "revocation": null,
+          "verdict": "joined",
+          "version": 1
+        },
         "last_recheck": {
           "action": "sync",
           "admitted": true,
@@ -4195,6 +5263,22 @@
         "service": {
           "authority_installed": true,
           "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "contract": {
+            "grant": {
+              "expired_at_ms": null,
+              "expires_at_ms": 1000
+            },
+            "membership": {
+              "access": "write",
+              "members": 2
+            },
+            "now_ms": 50,
+            "reading": "unknown",
+            "reason": null,
+            "revocation": null,
+            "verdict": "joined",
+            "version": 1
+          },
           "lifecycle": "joined",
           "lifecycle_reason": null,
           "local_root": "af06a3e3291714e4f356c19c9b15cd1951ec6e6662aa77be07547f289383341d",
@@ -4401,11 +5485,63 @@
         "role": "member",
         "online": false,
         "process_open": true,
-        "process_id": 32364,
+        "process_id": 49520,
         "process_generation": 4,
         "last_sync_error": null,
         "lifecycle": "revoked",
         "now_ms": 50,
+        "contract": {
+          "grant": {
+            "expired_at_ms": null,
+            "expires_at_ms": 1000
+          },
+          "membership": {
+            "access": "write",
+            "members": 2
+          },
+          "now_ms": 50,
+          "reading": "continues",
+          "reason": "revoked: the issuer revoked this peer's delegation",
+          "revocation": {
+            "at_ms": 50,
+            "by": [
+              175,
+              6,
+              163,
+              227,
+              41,
+              23,
+              20,
+              228,
+              243,
+              86,
+              193,
+              156,
+              155,
+              21,
+              205,
+              25,
+              81,
+              236,
+              110,
+              102,
+              98,
+              170,
+              119,
+              190,
+              7,
+              84,
+              127,
+              40,
+              147,
+              131,
+              52,
+              29
+            ]
+          },
+          "verdict": "revoked",
+          "version": 1
+        },
         "last_recheck": {
           "action": "connect",
           "admitted": false,
@@ -4509,6 +5645,58 @@
         "service": {
           "authority_installed": true,
           "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "contract": {
+            "grant": {
+              "expired_at_ms": null,
+              "expires_at_ms": 1000
+            },
+            "membership": {
+              "access": "write",
+              "members": 2
+            },
+            "now_ms": 50,
+            "reading": "continues",
+            "reason": "revoked: the issuer revoked this peer's delegation",
+            "revocation": {
+              "at_ms": 50,
+              "by": [
+                175,
+                6,
+                163,
+                227,
+                41,
+                23,
+                20,
+                228,
+                243,
+                86,
+                193,
+                156,
+                155,
+                21,
+                205,
+                25,
+                81,
+                236,
+                110,
+                102,
+                98,
+                170,
+                119,
+                190,
+                7,
+                84,
+                127,
+                40,
+                147,
+                131,
+                52,
+                29
+              ]
+            },
+            "verdict": "revoked",
+            "version": 1
+          },
           "lifecycle": "revoked",
           "lifecycle_reason": "revoked: the issuer revoked this peer's delegation",
           "local_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
@@ -4733,11 +5921,27 @@
         "role": "founder",
         "online": false,
         "process_open": true,
-        "process_id": 17328,
+        "process_id": 49972,
         "process_generation": 3,
         "last_sync_error": "Peer refused /wire: Peer disconnected",
         "lifecycle": "expired",
         "now_ms": 1001,
+        "contract": {
+          "grant": {
+            "expired_at_ms": 1000,
+            "expires_at_ms": 1000
+          },
+          "membership": {
+            "access": "write",
+            "members": 2
+          },
+          "now_ms": 1001,
+          "reading": "unknown",
+          "reason": "expired: this peer's grant ended at 1000 ms; store clock is 1001 ms",
+          "revocation": null,
+          "verdict": "expired",
+          "version": 1
+        },
         "last_recheck": {
           "action": "connect",
           "admitted": false,
@@ -4841,6 +6045,22 @@
         "service": {
           "authority_installed": true,
           "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "contract": {
+            "grant": {
+              "expired_at_ms": 1000,
+              "expires_at_ms": 1000
+            },
+            "membership": {
+              "access": "write",
+              "members": 2
+            },
+            "now_ms": 1001,
+            "reading": "unknown",
+            "reason": "expired: this peer's grant ended at 1000 ms; store clock is 1001 ms",
+            "revocation": null,
+            "verdict": "expired",
+            "version": 1
+          },
           "lifecycle": "expired",
           "lifecycle_reason": "expired: this peer's grant ended at 1000 ms; store clock is 1001 ms",
           "local_root": "af06a3e3291714e4f356c19c9b15cd1951ec6e6662aa77be07547f289383341d",
@@ -5035,11 +6255,63 @@
         "role": "member",
         "online": false,
         "process_open": true,
-        "process_id": 32364,
+        "process_id": 49520,
         "process_generation": 4,
         "last_sync_error": null,
         "lifecycle": "revoked",
         "now_ms": 50,
+        "contract": {
+          "grant": {
+            "expired_at_ms": null,
+            "expires_at_ms": 1000
+          },
+          "membership": {
+            "access": "write",
+            "members": 2
+          },
+          "now_ms": 50,
+          "reading": "continues",
+          "reason": "revoked: the issuer revoked this peer's delegation",
+          "revocation": {
+            "at_ms": 50,
+            "by": [
+              175,
+              6,
+              163,
+              227,
+              41,
+              23,
+              20,
+              228,
+              243,
+              86,
+              193,
+              156,
+              155,
+              21,
+              205,
+              25,
+              81,
+              236,
+              110,
+              102,
+              98,
+              170,
+              119,
+              190,
+              7,
+              84,
+              127,
+              40,
+              147,
+              131,
+              52,
+              29
+            ]
+          },
+          "verdict": "revoked",
+          "version": 1
+        },
         "last_recheck": {
           "action": "connect",
           "admitted": false,
@@ -5143,6 +6415,58 @@
         "service": {
           "authority_installed": true,
           "container_hex": "5757575757575757575757575757575757575757575757575757575757575757",
+          "contract": {
+            "grant": {
+              "expired_at_ms": null,
+              "expires_at_ms": 1000
+            },
+            "membership": {
+              "access": "write",
+              "members": 2
+            },
+            "now_ms": 50,
+            "reading": "continues",
+            "reason": "revoked: the issuer revoked this peer's delegation",
+            "revocation": {
+              "at_ms": 50,
+              "by": [
+                175,
+                6,
+                163,
+                227,
+                41,
+                23,
+                20,
+                228,
+                243,
+                86,
+                193,
+                156,
+                155,
+                21,
+                205,
+                25,
+                81,
+                236,
+                110,
+                102,
+                98,
+                170,
+                119,
+                190,
+                7,
+                84,
+                127,
+                40,
+                147,
+                131,
+                52,
+                29
+              ]
+            },
+            "verdict": "revoked",
+            "version": 1
+          },
           "lifecycle": "revoked",
           "lifecycle_reason": "revoked: the issuer revoked this peer's delegation",
           "local_root": "2df04125f0015afb47ce853aef8772094ff9498c14cb1b9e12973c2927da0fa6",
