@@ -45,3 +45,5 @@
 
 #[cfg(feature = "captured-web")]
 pub mod captured_web;
+
+pub mod coop;
