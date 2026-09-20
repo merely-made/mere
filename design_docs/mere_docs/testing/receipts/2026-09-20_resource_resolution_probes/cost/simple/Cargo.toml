@@ -1,0 +1,12 @@
+[package]
+name = "cost-simple"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+[workspace]
+
+[dependencies]
+cost-server = { path = "../server" }
+# As ports/redshank/Cargo.toml declares it.
+ureq = { version = "3.4", default-features = false, features = ["rustls"] }

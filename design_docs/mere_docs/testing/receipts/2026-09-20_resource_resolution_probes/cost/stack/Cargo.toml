@@ -1,0 +1,13 @@
+[package]
+name = "cost-stack"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+[workspace]
+
+[dependencies]
+cost-server = { path = "../server" }
+netfetcher = { git = "https://github.com/merely-made/genet.git", rev = "5ae30cad0ea421085a52dc9f86ead53028f0592d" }
+tokio = { version = "1", features = ["rt-multi-thread"] }
+url = "2.5"

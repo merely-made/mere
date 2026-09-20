@@ -1,0 +1,11 @@
+running 6 tests
+test a_blocking_thread_reads_exact_ranges_with_identity_encoding ... R3-A ranges: 4 requests, 196609 of 3000000 bytes, http audio with no initiator not upgraded
+ok
+test a_cached_whole_object_and_a_ranged_request ... R3-A cache: default-mode ranged request after a cached whole object -> status 200, 3000000 bytes, reached network: false
+ok
+test a_changed_representation_is_visible_through_if_range ... ok
+test a_ranged_read_carries_its_own_personas_cookie_and_no_other ... ok
+test a_redirect_keeps_the_range_and_reports_the_final_url ... ok
+test a_whole_body_streams_before_the_server_finishes ... R3-A stream: first chunk 8192 bytes before release, largest chunk 507904 bytes, nothing held whole
+ok
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.28s

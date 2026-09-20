@@ -1,0 +1,15 @@
+BUILD simple cold_release_seconds=15 bytes=2231808
+{"variant":"ureq free function (Redshank today)","median_us":1498,"p95_us":1695,"connections":301,"requests":301}
+{"variant":"ureq shared agent","median_us":102,"p95_us":182,"connections":1,"requests":301}
+{"variant":"ureq free function (Redshank today)","median_us":1497,"p95_us":1710,"connections":301,"requests":301}
+{"variant":"ureq shared agent","median_us":106,"p95_us":179,"connections":1,"requests":301}
+{"variant":"ureq free function (Redshank today)","median_us":1511,"p95_us":1701,"connections":301,"requests":301}
+{"variant":"ureq shared agent","median_us":120,"p95_us":196,"connections":1,"requests":301}
+BUILD lean cold_release_seconds=47 bytes=5250048
+{"variant":"cost-lean","median_us":138,"p95_us":219,"connections":1,"requests":301}
+{"variant":"cost-lean","median_us":121,"p95_us":190,"connections":1,"requests":301}
+{"variant":"cost-lean","median_us":129,"p95_us":191,"connections":1,"requests":301}
+BUILD stack cold_release_seconds=59 bytes=6730240
+{"variant":"cost-stack","median_us":143,"p95_us":218,"connections":1,"requests":301}
+{"variant":"cost-stack","median_us":126,"p95_us":204,"connections":1,"requests":301}
+{"variant":"cost-stack","median_us":133,"p95_us":206,"connections":1,"requests":301}

@@ -96,6 +96,12 @@ Knot vault into one observable node identity.
 | Communal membership and capability projection | Gemot |
 | Portable byte identity | Standards-oriented content reference |
 | Fast storage and transfer address | iroh BLAKE3 blob hash |
+| HTTP(S) fetching | Each host process, over the one per-persona session store (ruled 2026-09-20; not a resident network runtime) |
+
+The HTTP row was absent until 2026-09-20. The resident's network runtimes are
+the peer lanes above; a host fetches web resources in its own process, as the
+netfetcher plan's fetcher pool has it, against the persona's cookies and cache
+from the [session store plan](2026-06-23_native_session_store_plan.md).
 
 Murm supplies resident services and reusable owners. It does not decide which
 Knot document a reference belongs to or whether a Gemot participant may read
