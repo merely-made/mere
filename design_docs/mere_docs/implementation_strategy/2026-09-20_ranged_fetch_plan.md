@@ -1,7 +1,7 @@
 # Ranged Fetch Plan
 
 **Date:** 2026-09-20  
-**Status:** **plan accepted 2026-09-20 with D1 to D7 decided; lane F1 to F3 built on `slice/ranged-fetch-20260920`, F4 open.** Nothing merged.  
+**Status:** **plan accepted 2026-09-20 with D1 to D7 decided; lane F complete on `slice/ranged-fetch-20260920`, awaiting sign-off to merge.** Nothing merged.  
 **Authority:** the implementation home for rulings 2 to 4 of lane R3 in the
 [family composition thesis](../../2026-08-12_family_composition_thesis_brief.md#r3-resource-resolution-opened-2026-09-20).
 The research, probes and rulings stay there; this plan owns the work.  
@@ -136,4 +136,18 @@ so that it can answer a range from a stored body. The page-side media element.
     crate stood). Twenty-four of the 48 are netfetcher's HTTP/3 and WebSocket
     lanes, which Mere's workspace enables; taking netfetcher without them is a
     further cut, not made, that would bring a small host to about 24.
-  - F4 (the actor building its context from a host's `Stores`) is not started.
+  - F4 landed: `spawn_fetcher_with(wake, stores)` gives the page actor a host's
+    `Stores`, and `spawn_fetcher` passes `session_stores()`, the shared session
+    jar with no cache, HSTS memory or Alt-Svc memory, which is what every fetch
+    did before, so default behaviour is unchanged. Test: a login made by a page
+    fetch through the actor is carried by a ranged read through a handle over the
+    same stores, with the control that the process session saw nothing.
+  - Rebased onto main after the lattice change landed (`68f78873`, `b45ecbbb`);
+    main never touched the fetch crate. On Rust 1.98.1 against the tracked
+    portable lock, `cargo test --locked -p mere-fetch` passes 18, so the lock
+    needs no change. Clippy is clean across all seven feature sets, 8 tests pass
+    with only `actor`, 7 with defaults off, and `mere-crawl` checks. The three
+    unused-patch warnings (boa twice, iroh-mdns) are the inherited baseline the
+    lattice sync pass plan owns under its P4.
+  - **Lane F is complete on the branch and awaits Mark's sign-off to merge and
+    push.** Lanes R, T and I need a pushed Mere revision to pin.
