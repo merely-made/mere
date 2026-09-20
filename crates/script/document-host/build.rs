@@ -44,15 +44,30 @@ fn main() {
         // Rebuild when the guest's own sources move, not on every touch of the host.
         println!("cargo::rerun-if-changed={}/src", guest.display());
         println!("cargo::rerun-if-changed={}/Cargo.toml", guest.display());
+        println!("cargo::rerun-if-changed={}/Cargo.lock", guest.display());
+        println!(
+            "cargo::rerun-if-changed={}/rust-toolchain.toml",
+            guest.display()
+        );
 
         // The guest is a separate workspace with its own target dir and toolchain
         // pin. Strip the parent cargo's environment so the child resolves its own:
         // inherited RUSTFLAGS / CARGO_TARGET_DIR / toolchain vars would otherwise
         // leak the host's native build into a wasm one.
         let mut cmd = Command::new("cargo");
-        cmd.current_dir(&guest)
-            .args(["build", "--target", "wasm32-wasip2", "--release"]);
+        cmd.current_dir(&guest).args([
+            "build",
+            "--locked",
+            "--target",
+            "wasm32-wasip2",
+            "--release",
+        ]);
         for (key, _) in std::env::vars() {
+            // Keep the caller's cache/config boundary and resource limit.
+            // Clearing CARGO_HOME would escape a portable-check isolation home.
+            if key == "CARGO_HOME" || key == "CARGO_BUILD_JOBS" {
+                continue;
+            }
             if key.starts_with("CARGO")
                 || key.starts_with("RUSTC")
                 || key.starts_with("RUSTUP")

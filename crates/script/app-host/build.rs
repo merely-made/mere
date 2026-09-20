@@ -31,14 +31,28 @@ fn main() {
 
     println!("cargo::rerun-if-changed={}/src", guest.display());
     println!("cargo::rerun-if-changed={}/Cargo.toml", guest.display());
+    println!("cargo::rerun-if-changed={}/Cargo.lock", guest.display());
+    println!(
+        "cargo::rerun-if-changed={}/rust-toolchain.toml",
+        guest.display()
+    );
     println!("cargo::rerun-if-changed=../wit/world.wit");
 
     // The guest is a separate workspace with its own target dir and toolchain
     // pin. Strip the parent cargo's environment so the child resolves its own.
     let mut cmd = Command::new("cargo");
-    cmd.current_dir(&guest)
-        .args(["build", "--target", "wasm32-wasip2", "--release"]);
+    cmd.current_dir(&guest).args([
+        "build",
+        "--locked",
+        "--target",
+        "wasm32-wasip2",
+        "--release",
+    ]);
     for (key, _) in std::env::vars() {
+        // Keep the caller's cache/config boundary and resource limit.
+        if key == "CARGO_HOME" || key == "CARGO_BUILD_JOBS" {
+            continue;
+        }
         if key.starts_with("CARGO")
             || key.starts_with("RUSTC")
             || key.starts_with("RUSTUP")

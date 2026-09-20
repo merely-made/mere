@@ -1,5 +1,8 @@
-# EXAMPLE local Cargo config. Copy to .cargo/config.toml to enable the
-# sibling-checkout edit loop; the live file is gitignored and optional.
+# EXAMPLE local Cargo config. Copy to .cargo/config.local.toml and use
+# `python scripts/cargo_mode.py local check --workspace` (Python 3.11+,
+# Cargo 1.97+). The launcher assigns each workspace its own ignored local lock.
+# Ordinary Cargo commands use the portable graph. Existing overrides migrate
+# with `python scripts/cargo_mode.py setup`; it preserves existing local locks.
 #
 # Paths are RELATIVE to this file's parent directory (the repo root), not to
 # .cargo/ — verified empirically: `../genet` resolves to Code/repos/genet.
@@ -89,11 +92,9 @@ fleece = { path = "../genet/components/fleece" }
 "script-engine-boa" = { path = "../genet/components/script-engine-boa" }
 "script-engine-nova" = { path = "../genet/components/script-engine-nova" }
 # Package names differ from the directory and from mere's dependency key.
-"servo-paint" = { path = "../genet/components/paint" }
 "servo-webgl-wgpu" = { path = "../genet/components/webgl-wgpu" }
 livery = { path = "../genet/components/livery" }
 # Named for the same missing-entry reason as genet-render-host.
-"genet-probe" = { path = "../genet/components/genet-probe" }
 # Adopted into genet 2026-07-23 (repo consolidation).
 netfetcher = { path = "../genet/components/netfetcher" }
 
