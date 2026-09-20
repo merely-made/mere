@@ -16,6 +16,14 @@ frames** through a byte/frame seam, the same way it consumes fetched bytes.
 > session integration, and decode. Shared peer-connection mechanics may be
 > consumed later; admission and Graphshell carriage do not live here.
 >
+> **2026-09-20 ownership ruling (Mark):** media is split. Genet owns the player
+> *contract*, the vocabulary a page or application speaks to a player
+> (`servo-media-player`'s controller, which Redshank already consumes). This
+> plan owns decoders and backends. Redshank's Symphonia and Firewheel backend
+> (`woodshed/ports/redshank/playback`) is the first increment of §6 in practice,
+> still living in its port; it moves here when a second consumer forces it.
+> Recorded with the family thesis's R3 lane.
+>
 > Status: **plan-only.** No `net-media` crate exists yet. Bucket #3 of the
 > networking/web-API/media triage (bucket #1 netfetcher ✓ implemented, bucket #2
 > web-API shared-middle planned). This fixes scope, the decode-tier policy (the

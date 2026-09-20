@@ -449,6 +449,93 @@ Prospective implementation slices, after the probes choose the contracts:
    the capture envelope and R2-C. Broader custody extraction remains gated by
    another product's actual requirement.
 
+### R3. Resource resolution (opened 2026-09-20)
+
+**Question:** when a first-party application needs remote bytes by range (a
+podcast episode while it plays) or a held object by offset (the same episode
+after download), can it get them through the host's one fetch policy and the
+stack's content store, and what does a small standalone host pay for that?
+
+The forcing consumer is Redshank in Turnstone. `redshank-playback` reads HTTP
+ranges through its own ureq client, outside Turnstone's cookies, HSTS, cache,
+redirect limit and transport seam, which
+`turnstone/design_docs/2026-09-14_redshank_episode_surface_plan.md` records as
+its open gate 1. A side client would also bypass the I2P and Arti lanes the
+[reachability plan](mere_docs/implementation_strategy/2026-08-03_reachability_rungs_and_privacy_lanes_plan.md)
+puts in Turnstone's fetch stack. Existing guarantees: netfetcher sends `Range`
+with identity encoding and streams bodies; the netfetcher plan (archived
+2026-06-09) puts a fetcher pool in each host's session layer over persona-scoped
+stores, and no such worker exists yet; the
+[session store plan](mere_docs/implementation_strategy/2026-06-23_native_session_store_plan.md)
+rules one substrate per persona; the
+[resident plan](mere_docs/implementation_strategy/2026-08-20_device_resident_consolidation_plan.md)
+makes iroh's BLAKE3 blob store the shared content store.
+
+Rulings (Mark, 2026-09-20):
+
+- Redshank's persona-held state (notes and sharing, synced library, voice
+  bodies, offline episodes) goes through the device resident as a client, the
+  way Knot's persona-vault mode does. Local-only listening stays embedded
+  (resident plan invariant 9).
+- Each host process runs its own HTTP fetcher pool over the one per-persona
+  session store. The resident's network runtimes stay peer networking.
+- Media ownership is split: Genet owns the player contract; Mere's net-media
+  owns decoders and backends, with Redshank's Symphonia and Firewheel backend as
+  its first increment.
+- Held episodes use iroh's content store. A chunked Muniment blob format,
+  proposed earlier the same week, is withdrawn.
+- Where a ranged fetch contract lives, and whether standalone Redshank keeps
+  its simple HTTP client, are decided after the probes. Keeping the standalone
+  client local is an admissible result.
+
+| Probe | Required observations and negative cases | Decision it enables |
+|---|---|---|
+| R3-A: ranged read on a persona-scoped context | Through real netfetcher from a blocking decoder-style thread: 206 with exact `Content-Range`, identity encoding, `If-Range` change detection, `Range` kept across a redirect with the final URL reported, a cookie from an earlier page fetch carried and another persona's cookie absent; negative: a ranged request in default cache mode after the whole object was cached, against the same request as no-store; a body observed streaming before the server finishes | What a ranged caller needs from the host, and which guards the host must apply |
+| R3-B: held and partial episodes in iroh's store | Real iroh-blobs store: seek-and-read over a complete blob from a blocking thread; whether a streamed import is readable before it completes; a partial blob serves present ranges and refuses absent ones | Whether a held episode and a downloading one can share one reader, and where progressive HTTP download must live instead |
+| R3-C: standalone cost | The same ranged read built on ureq and on netfetcher: packages Redshank's lock would gain and lose, build time, binary size, loopback latency; the policy the simple client skips, by construction | Whether the standalone host keeps its simple client |
+
+Research done and implementation ready follow the gates above. No production
+code changes in this lane.
+
+#### R3 results (2026-09-20)
+
+[Receipt](mere_docs/testing/receipts/2026-09-20_resource_resolution_probes/RECEIPT.md),
+with sources, locks and logs. Real netfetcher (genet `5ae30cad`), real
+iroh-blobs 0.103, real ureq 3.4; loopback HTTP servers only, so no TLS, no WAN,
+and no Redshank, Turnstone or resident code in the loop.
+
+| Probe | Observed | Consequence |
+|---|---|---|
+| R3-A, 6 of 6 | A blocking thread over a shared runtime reads exact ranges with identity encoding at Redshank's own 6.6% figure; `If-Range` change, redirect with final URL, per-persona cookies and body streaming all hold. **Pinned negative:** once the whole object is cached, a default-mode ranged request never reaches the network and returns 200 with all 3,000,000 bytes. | netfetcher already carries everything a ranged caller needs. The host must send ranged requests as no-store until netfetcher's cache can answer a range from a stored body. HTTP permits the current behaviour, so this is a cost and a trap, not a conformance defect. |
+| R3-B, 3 of 3 | A streamed import has no hash and nothing addressable until its last byte. A complete blob survives reopen and serves blocking seek-and-read at 2.8 ms per 64 KiB in release. **Pinned negative:** the reader refuses `SeekFrom::End`. With the hash known up front, a partial blob reads present ranges and errors on absent ones. | A held episode plays from iroh's store through a small bridge. A progressive HTTP download cannot live there while it downloads, because a feed gives no BLAKE3. Streaming stays HTTP ranges, held playback is the store, and the episode enters the store when the download completes. One reader for both means one decoder-facing `Read + Seek` with two sources behind it, not one store. |
+| R3-C | Redshank's reader calls ureq's free function, which uses a use-once agent: 301 connections for 301 requests and 1.5 ms per read on loopback, a TLS handshake per 64 KiB chunk over `https`. One shared ureq agent: 0.10 ms, 1 connection. netfetcher: 0.13 ms, 1 connection. netfetcher with only its hyper transport adds 24 crates to Redshank's lock and drops 6, 47 s cold build against 15 s, 5.3 MB against 2.2 MB; default features add 47. | The simple client costs the standalone host nothing in speed once it shares an agent. The stack fetch is affordable for it, and buys cookies, HSTS, cache, redirect limit and transport seam that a standalone podcast player mostly does not exercise. |
+
+Rulings on the results (Mark, 2026-09-20). The lane's recommendation is kept
+beside each where he ruled otherwise, so the record shows both:
+
+1. **Fix Redshank's per-chunk connection now.** One shared agent in
+   `redshank-playback`'s range reader. Independent of everything below.
+2. **Standalone Redshank moves onto netfetcher.** One HTTP stack across both
+   hosts, and the standalone host gains the privacy lanes when they land. The
+   measured cost is accepted: with only the hyper transport, 24 crates gained
+   and 6 dropped, a 47 s cold build against 15 s, 5.3 MB against 2.2 MB. (The
+   lane recommended keeping the simple client, as Redshank's own plan had it.)
+3. **The ranged contract is a trait in Mere now,** with Redshank as its first
+   consumer, ahead of a second one. (The lane recommended a supplied function
+   until a second consumer appeared.) What R3-A fixes about its shape: one
+   blocking call, a range in, and bytes, total length, validator, final URL and
+   content type out; ranged requests go no-store.
+4. **Turnstone's one persona-scoped context remains the larger piece** and is
+   Mere and Turnstone work, not Redshank's: the fetch actor and document-lanes'
+   `RemoteFetcher` sharing one context over the persona's jar and cache, and
+   cookie persistence getting a caller again.
+5. **Held episodes through the resident** wait for Redshank's resident client
+   work; R3-B says the store side is ready and names the bridge's two
+   obligations (translate seek-from-end, import on completion).
+
+Rulings 2 to 4 are implementation and leave this research home for an
+owner-specific plan in Mere.
+
 ### First experiment results (2026-09-08)
 
 The [arena receipt](mere_docs/testing/receipts/2026-09-08_stack_pillar_probes/arena/R2_A_RECEIPT.md),

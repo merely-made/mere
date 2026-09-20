@@ -1,0 +1,18 @@
+[package]
+name = "cost-lean"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+[workspace]
+
+# One source for both netfetcher variants; only the features differ.
+[[bin]]
+name = "cost-lean"
+path = "../stack/src/main.rs"
+
+[dependencies]
+cost-server = { path = "../server" }
+netfetcher = { git = "https://github.com/merely-made/genet.git", rev = "5ae30cad0ea421085a52dc9f86ead53028f0592d", default-features = false, features = ["hyper-transport"] }
+tokio = { version = "1", features = ["rt-multi-thread"] }
+url = "2.5"

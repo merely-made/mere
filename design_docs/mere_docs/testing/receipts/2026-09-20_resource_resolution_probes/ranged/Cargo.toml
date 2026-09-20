@@ -1,0 +1,13 @@
+[package]
+name = "ranged-probe"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+[workspace]
+
+[dependencies]
+# The genet revision every consumer in the lattice pins as of 2026-09-20.
+netfetcher = { git = "https://github.com/merely-made/genet.git", rev = "5ae30cad0ea421085a52dc9f86ead53028f0592d" }
+tokio = { version = "1", features = ["rt-multi-thread", "time"] }
+url = "2.5"

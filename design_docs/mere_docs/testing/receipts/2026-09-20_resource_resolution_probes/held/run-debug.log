@@ -1,0 +1,8 @@
+running 3 tests
+test a_held_episode_seeks_from_a_blocking_thread_and_survives_reopen ... R3-B held: 200 seek+read of 65536 bytes after reopen, 9467 us each (fs store, debug build)
+ok
+test a_partial_blob_serves_present_ranges_and_refuses_absent_ones ... R3-B partial: with the hash known up front, present ranges read, absent ranges error, and completion needs no new reader shape
+ok
+test a_streamed_import_has_no_identity_until_its_last_byte ... R3-B import: a streamed import is unaddressable until complete; a download in flight cannot be played from the store
+ok
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.56s

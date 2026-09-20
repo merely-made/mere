@@ -1,0 +1,15 @@
+[package]
+name = "held-probe"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+[workspace]
+
+[dependencies]
+# The version mere-transport pins (crates/murm/transport/Cargo.toml).
+iroh-blobs = "=0.103.0"
+tokio = { version = "1", features = ["rt-multi-thread", "time", "sync", "io-util"] }
+tokio-stream = "0.1"
+bytes = "1"
+tempfile = "3"
