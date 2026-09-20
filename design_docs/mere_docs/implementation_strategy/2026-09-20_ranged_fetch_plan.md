@@ -1,7 +1,7 @@
 # Ranged Fetch Plan
 
 **Date:** 2026-09-20  
-**Status:** **plan accepted 2026-09-20 with D1 to D7 decided; lane F complete on `slice/ranged-fetch-20260920`, awaiting sign-off to merge.** Nothing merged.  
+**Status:** **plan accepted 2026-09-20 with D1 to D7 decided; lane F merged to main and pushed 2026-09-20; lanes R, T and I not started.**  
 **Authority:** the implementation home for rulings 2 to 4 of lane R3 in the
 [family composition thesis](../../2026-08-12_family_composition_thesis_brief.md#r3-resource-resolution-opened-2026-09-20).
 The research, probes and rulings stay there; this plan owns the work.  
@@ -149,5 +149,7 @@ so that it can answer a range from a stored body. The page-side media element.
     with only `actor`, 7 with defaults off, and `mere-crawl` checks. The three
     unused-patch warnings (boa twice, iroh-mdns) are the inherited baseline the
     lattice sync pass plan owns under its P4.
-  - **Lane F is complete on the branch and awaits Mark's sign-off to merge and
-    push.** Lanes R, T and I need a pushed Mere revision to pin.
+  - **Lane F merged to main by fast-forward and pushed with Mark's sign-off**
+    (`c0463e98`, `ba4f4951`, `e35898d1`). Lanes R, T and I pin from here; their
+    pin moves belong with the [lattice sync pass](2026-09-16_lattice_sync_pass_plan.md),
+    which owns cross-repo revisions.
