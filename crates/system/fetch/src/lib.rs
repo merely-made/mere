@@ -25,28 +25,33 @@
 //! Subresources use the same scheme routing and Gemini trust store as pages,
 //! while retaining raw bytes for images and other binary media.
 
+#[cfg(feature = "actor")]
 use std::collections::HashMap;
 use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
+#[cfg(feature = "actor")]
 use std::sync::mpsc::Receiver;
-use std::sync::{Arc, Mutex, OnceLock};
+use std::sync::{Arc, OnceLock};
+#[cfg(feature = "smolweb")]
 use std::time::Duration;
 
+#[cfg(feature = "actor")]
 use armillary::{ActorHandle, Emitter, Wake, spawn};
-use eidetic::Store;
-use netfetcher::{CookieRecord, CookieStore, InMemoryCookieJar, SameSite, SameSiteContext};
-use pandect::PersonaId;
-use serde::{Deserialize, Serialize};
+use netfetcher::{CookieRecord, CookieStore, InMemoryCookieJar, SameSiteContext};
+#[cfg(feature = "actor")]
 use tokio::runtime::Builder;
 use zeroize::Zeroizing;
 
 /// Host-supplied durable trust storage for Gemini-style TLS.
+#[cfg(feature = "smolweb")]
 pub use errand::TofuStore as SmolwebTofuStore;
 
 /// The most redirects a smolweb fetch will follow before giving up.
+#[cfg(feature = "smolweb")]
 const MAX_REDIRECTS: usize = 5;
 
 /// Per-hop timeout for smolweb fetches. Applied to each request in a redirect
 /// chain independently so a chain of N slow hops can take up to N × this value.
+#[cfg(feature = "smolweb")]
 const SMOLWEB_TIMEOUT: Duration = Duration::from_secs(30);
 
 /// Host-side cap on a fetched page body (§A5): a hard ceiling enforced *while*
@@ -56,6 +61,7 @@ const SMOLWEB_TIMEOUT: Duration = Duration::from_secs(30);
 const PAGE_BODY_CAP: usize = 64 * 1024 * 1024;
 
 /// The subresource counterpart (a page's images / CSS): generous but bounded.
+#[cfg(feature = "actor")]
 const SUBRESOURCE_BODY_CAP: usize = 32 * 1024 * 1024;
 
 /// Process-local correlation for one page request. The id crosses the actor
@@ -298,6 +304,7 @@ impl GeminiClientIdentity {
         self.certificate_der.as_ref()
     }
 
+    #[cfg(feature = "smolweb")]
     fn applies_to(&self, url: &url::Url) -> bool {
         matches!(url.scheme(), "gemini" | "titan")
             && url
@@ -306,6 +313,7 @@ impl GeminiClientIdentity {
             && url.port().unwrap_or(1965) == self.port
     }
 
+    #[cfg(feature = "smolweb")]
     fn errand_view(&self) -> errand::GeminiClientIdentity<'_> {
         errand::GeminiClientIdentity {
             certificate_der: self.certificate_der.as_ref(),
@@ -343,11 +351,21 @@ impl ContentState {
 /// scheme), vs a synthesized `mere://` page or another non-network scheme.
 pub fn is_fetchable(url: &str) -> bool {
     match scheme_of(url) {
-        Some(scheme) => {
-            scheme == "http" || scheme == "https" || errand::Scheme::parse(scheme).is_some()
-        },
+        Some(scheme) => scheme == "http" || scheme == "https" || is_smolweb(url),
         None => false,
     }
+}
+
+/// Whether `url` names a small-web scheme this build can fetch. Always false
+/// without the `smolweb` feature, so such an address fails as an ordinary fetch.
+fn is_smolweb(url: &str) -> bool {
+    #[cfg(feature = "smolweb")]
+    return scheme_of(url).and_then(errand::Scheme::parse).is_some();
+    #[cfg(not(feature = "smolweb"))]
+    return {
+        let _ = url;
+        false
+    };
 }
 
 /// The scheme of a `scheme://…` URL, if it has an authority component. Returns
@@ -358,6 +376,7 @@ fn scheme_of(url: &str) -> Option<&str> {
 }
 
 /// A command to the fetch actor.
+#[cfg(feature = "actor")]
 pub enum FetchCommand {
     /// Fetch `url` as a page document (decoded body as text).
     Page {
@@ -385,6 +404,7 @@ pub enum FetchCommand {
 }
 
 /// An update from the fetch actor: one completed page, subresource, or favicon fetch.
+#[cfg(feature = "actor")]
 pub enum FetchUpdate {
     PageProgress(PageProgress),
     Page(FetchOutcome),
@@ -412,6 +432,7 @@ pub struct FaviconOutcome {
 /// The internals stay `!Send` where they want to be: the runtime is built *on the
 /// actor thread* inside the closure, never moved across the boundary; only the
 /// `Send` handle and the `Send` `FetchUpdate`s cross.
+#[cfg(feature = "actor")]
 pub fn spawn_fetcher(wake: Wake) -> (ActorHandle<FetchCommand>, Receiver<FetchUpdate>) {
     spawn(wake, |commands, out: Emitter<FetchUpdate>| {
         let runtime = Builder::new_multi_thread()
@@ -491,7 +512,12 @@ pub fn spawn_fetcher(wake: Wake) -> (ActorHandle<FetchCommand>, Receiver<FetchUp
                     let out = out.clone();
                     runtime.spawn(async move {
                         let url = submission.url().to_string();
+                        #[cfg(feature = "smolweb")]
                         let result = submit_smolweb(submission).await;
+                        #[cfg(not(feature = "smolweb"))]
+                        let result = Err(FetchFailure::Failed(
+                            "small-web submissions are not built into this host".to_string(),
+                        ));
                         out.emit(FetchUpdate::Submission(SubmissionOutcome {
                             request,
                             url,
@@ -504,6 +530,8 @@ pub fn spawn_fetcher(wake: Wake) -> (ActorHandle<FetchCommand>, Receiver<FetchUp
     })
 }
 
+// A write is only ever asked for through the actor.
+#[cfg(all(feature = "smolweb", feature = "actor"))]
 async fn submit_smolweb(submission: SmolwebSubmission) -> Result<SubmissionAnswer, FetchFailure> {
     if match &submission {
         SmolwebSubmission::Titan { body, .. } | SmolwebSubmission::Spartan { body, .. } => {
@@ -573,6 +601,7 @@ async fn submit_smolweb(submission: SmolwebSubmission) -> Result<SubmissionAnswe
     smolweb_submission_answer(&url, response)
 }
 
+#[cfg(all(feature = "smolweb", feature = "actor"))]
 fn smolweb_submission_answer(
     request_url: &url::Url,
     response: errand::Response,
@@ -647,8 +676,11 @@ async fn fetch_page_interactive_capped<F>(
 where
     F: FnMut(&url::Url, Option<&str>, &[u8]),
 {
-    match scheme_of(url).and_then(errand::Scheme::parse) {
-        Some(scheme) => {
+    #[cfg(not(feature = "smolweb"))]
+    let _ = (identity, &mut on_progress);
+    #[cfg(feature = "smolweb")]
+    if let Some(scheme) = scheme_of(url).and_then(errand::Scheme::parse) {
+        {
             let log_url = url_without_query(url);
             tracing::info!(url = %log_url, ?scheme, "smolweb fetch");
             let mut streamed_bytes = 0_usize;
@@ -677,12 +709,13 @@ where
                 ),
                 Err(error) => tracing::warn!(url = %log_url, %error, "smolweb failed"),
             }
-            result
-        },
-        None => do_fetch(url, max_bytes).await.map_err(FetchFailure::Failed),
+            return result;
+        }
     }
+    do_fetch(url, max_bytes).await.map_err(FetchFailure::Failed)
 }
 
+#[cfg(feature = "smolweb")]
 fn url_without_query(raw: &str) -> String {
     url::Url::parse(raw)
         .map(|mut parsed| {
@@ -701,19 +734,18 @@ fn url_without_query(raw: &str) -> String {
 /// Gemini should install one explicitly with
 /// [`install_in_memory_smolweb_tofu`] or its own durable store.
 pub async fn fetch_page_anonymous_capped(url: &str, max_bytes: usize) -> Result<Fetched, String> {
-    match scheme_of(url).and_then(errand::Scheme::parse) {
-        Some(_) => fetch_page_capped(url, max_bytes).await,
-        None => {
-            let cx = netfetcher::FetchContext::permissive();
-            do_fetch_ua_with_context(url, max_bytes, None, &cx).await
-        },
+    if is_smolweb(url) {
+        return fetch_page_capped(url, max_bytes).await;
     }
+    let cx = netfetcher::FetchContext::permissive();
+    do_fetch_ua_with_context(url, max_bytes, None, &cx).await
 }
 
 /// Pin Gemini certificates for the lifetime of this process. This is stronger
 /// than errand's permissive default, but it deliberately makes no restart
 /// durability claim; a host with durable trust state should install its own
 /// [`errand::TofuStore`] instead.
+#[cfg(feature = "smolweb")]
 pub fn install_in_memory_smolweb_tofu() {
     install_smolweb_tofu(Arc::new(errand::InMemoryTofu::new()));
 }
@@ -721,6 +753,7 @@ pub fn install_in_memory_smolweb_tofu() {
 /// Install a host-owned Gemini trust store for every smolweb request in this
 /// process. The host keeps the concrete store so certificate-change approval
 /// can replace one pin before retrying the refused request.
+#[cfg(feature = "smolweb")]
 pub fn install_smolweb_tofu(store: Arc<dyn SmolwebTofuStore>) {
     errand::set_trust_store(store);
 }
@@ -730,16 +763,17 @@ pub fn install_smolweb_tofu(store: Arc<dyn SmolwebTofuStore>) {
 /// its UA). The crawl actor fetches every page (and robots.txt) through this, so a
 /// site sees an honest, contactable bot rather than a masquerading browser.
 pub async fn fetch_page_crawler(url: &str) -> Result<Fetched, String> {
-    match scheme_of(url).and_then(errand::Scheme::parse) {
-        Some(_) => fetch_page_capped(url, PAGE_BODY_CAP).await,
-        None => do_fetch_ua(url, PAGE_BODY_CAP, Some(CRAWLER_USER_AGENT)).await,
+    if is_smolweb(url) {
+        return fetch_page_capped(url, PAGE_BODY_CAP).await;
     }
+    do_fetch_ua(url, PAGE_BODY_CAP, Some(CRAWLER_USER_AGENT)).await
 }
 
 /// Fetch a smolweb URL through [`errand`], following redirects up to
 /// [`MAX_REDIRECTS`], and fold the response into a [`Fetched`] the nematic engines
 /// render. Input and certificate statuses stay typed so the host can continue
 /// the protocol conversation; terminal failures remain displayable prose.
+#[cfg(feature = "smolweb")]
 async fn smolweb_fetch<F>(
     url: &str,
     identity: Option<&GeminiClientIdentity>,
@@ -763,6 +797,7 @@ where
 /// Fetch a successful smolweb response without decoding its body. Page loads
 /// and binary subresources share redirect, timeout, certificate, and protocol
 /// status handling through this one path.
+#[cfg(feature = "smolweb")]
 async fn smolweb_fetch_response<F>(
     url: &str,
     identity: Option<&GeminiClientIdentity>,
@@ -838,6 +873,7 @@ where
     Err(FetchFailure::Failed("too many redirects".to_string()))
 }
 
+#[cfg(feature = "smolweb")]
 fn smolweb_transport_failure(current: &url::Url, error: errand::Error) -> FetchFailure {
     match error {
         errand::Error::CertificateChanged { host, pinned, seen } => {
@@ -852,6 +888,7 @@ fn smolweb_transport_failure(current: &url::Url, error: errand::Error) -> FetchF
     }
 }
 
+#[cfg(feature = "smolweb")]
 fn smolweb_input_failure(current: &url::Url, response: &errand::Response) -> FetchFailure {
     FetchFailure::InputRequired {
         url: current.to_string(),
@@ -866,6 +903,7 @@ fn smolweb_input_failure(current: &url::Url, response: &errand::Response) -> Fet
 /// Most schemes carry their own media type (gemini/spartan `text/gemini`, a gopher
 /// menu `application/gopher-menu`, a gopher text file `text/plain`); finger has no
 /// type of its own, so it is tagged `text/x-finger` to reach the finger engine.
+#[cfg(feature = "smolweb")]
 fn smolweb_content_type(url: &url::Url, response: &errand::Response) -> String {
     match errand::Scheme::parse(url.scheme()) {
         // Protocols whose content type must be fixed regardless of the response
@@ -971,8 +1009,10 @@ async fn do_fetch_ua_with_context(
 
 /// Fetch raw response bytes through the same scheme and trust routing as a page,
 /// bounded by [`SUBRESOURCE_BODY_CAP`].
+#[cfg(feature = "actor")]
 async fn fetch_bytes(url: &str) -> Result<Vec<u8>, String> {
-    if scheme_of(url).and_then(errand::Scheme::parse).is_some() {
+    #[cfg(feature = "smolweb")]
+    if is_smolweb(url) {
         let (_final_url, response) = smolweb_fetch_response(url, None, &mut |_, _, _| {})
             .await
             .map_err(|error| error.to_string())?;
@@ -993,5 +1033,5 @@ async fn fetch_bytes(url: &str) -> Result<Vec<u8>, String> {
     read_capped(response.body, SUBRESOURCE_BODY_CAP).await
 }
 
-#[cfg(test)]
+#[cfg(all(test, feature = "smolweb", feature = "actor"))]
 mod tests;
