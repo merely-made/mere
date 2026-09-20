@@ -555,3 +555,41 @@ wrong source. Report to Mark; change nothing.
   `Code/work/lattice-sync-20260920`. Turnstone's baseline passed; its integration
   with the published Mere candidate remains in progress. Other nested ports
   and peripheral repositories remain unqualified by this slice.
+
+
+- **2026-09-20, publication and Turnstone boundary:** Mere's implementation is
+  published as `68f78873a472754df8e9a6393b252a95e9911bb0`. Turnstone's
+  attempted portable update to that revision and Genet `9976945058b` failed:
+  Knot's publishing/projection interfaces carry older Personae, Transport and
+  Graphshell types; Redshank returns older Cambium surface types. The candidate
+  resolved 78 new and 37 old Mere packages, plus 29 new and 13 old Genet
+  packages. Metadata provenance passed, but compilation did not. See
+  `turnstone-genet-check.log`. This is an incompatible identity split under
+  stop rule 4, not a reason to repeat head-chasing until pins appear current.
+  Turnstone therefore retains its tested portable Mere `ca798151` / Genet
+  `5ae30cad` set while gaining explicit local resolution and a tracked lock.
+  Its final redirect-free locked workspace check passed on Cargo 1.98.1:
+  1,322 packages; lock SHA-256
+  `c55301d89c11e512ce3e54468fe3e255634b0107e6454c465563b84434ffcef8`.
+  The next integration must account for Knot and Redshank's actual shared type
+  boundaries; this slice does not claim the whole lattice or Turnstone repin
+  complete.
+- **CI publication limitation:** the portable workflow files are prepared
+  locally in Mere and Turnstone, but GitHub rejected the Mere push because the
+  OAuth credential lacks `workflow` scope. The unpublished commit was amended
+  to exclude the workflow and the implementation push succeeded. CI is not
+  installed by these commits; publish the prepared workflows with a credential
+  authorized for workflow changes. Do not infer continuous enforcement from
+  the successful local receipts.
+- **Unused-patch audit for this slice:** Mere's Boa patches target crates.io,
+  while the selected Boa packages are directly pinned Git sources. Its unused
+  mDNS patch is version 0.4.0 while the graph selects 0.5.0. Turnstone's unused
+  p2panda-stream patch has no selected package. These rows match baseline and
+  were left unchanged.
+
+- **Turnstone local acceptance:** the final manifest retains the portable Git
+  pins and permits genet-livery 0.0.3 or 0.0.4; Git/lock select portable 0.0.3,
+  while the explicit local patches select 0.0.4. The full sibling workspace
+  check passes (`turnstone-retained-pins-local.log`) without changing the
+  portable lock. Four launcher regression tests pass in this checkout too.
+  This demonstrates both supported modes without publishing the failed repin.
