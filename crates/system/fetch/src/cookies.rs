@@ -53,13 +53,38 @@ pub fn mark_cookies_dirty() {
     COOKIES_DIRTY.store(true, Ordering::Relaxed);
 }
 
-/// A `FetchContext` whose cookie jar is the shared [`session_jar`]; the other seams
-/// keep the permissive in-memory defaults for now. Built per fetch (cheap: the jar
-/// inside is shared by `Arc`), so cookies accumulate across navigations.
-pub(crate) fn session_context() -> netfetcher::FetchContext {
-    let mut cx = netfetcher::FetchContext::permissive();
-    cx.cookies = Box::new(SharedJar(session_jar().clone()));
-    cx
+/// The process session as a store set: the shared [`session_jar`] (writes mark it
+/// dirty for persistence) and nothing else remembered between fetches, which is
+/// what every fetch here did before hosts could supply their own [`Stores`]: no
+/// HTTP cache, no HSTS memory, no Alt-Svc memory and so no HTTP/3. A host that
+/// wants those builds its own set and passes it to [`spawn_fetcher_with`] and
+/// [`NetFetch`].
+pub fn session_stores() -> &'static Stores {
+    static STORES: OnceLock<Stores> = OnceLock::new();
+    STORES.get_or_init(|| Stores {
+        cookies: Arc::new(SharedJar(session_jar().clone())),
+        cache: Arc::new(netfetcher::NoHttpCache),
+        hsts: Arc::new(Forgetful),
+        alt_svc: Arc::new(Forgetful),
+    })
+}
+
+/// Remembers nothing: the HSTS and Alt-Svc behaviour of the process session.
+struct Forgetful;
+
+impl netfetcher::HstsStore for Forgetful {
+    fn is_secure(&self, _host: &str) -> bool {
+        false
+    }
+    fn record(&self, _host: &str, _max_age_secs: u64, _include_subdomains: bool) {}
+}
+
+impl netfetcher::AltSvcStore for Forgetful {
+    fn h3_port(&self, _host: &str) -> Option<u16> {
+        None
+    }
+    fn record_h3(&self, _host: &str, _port: u16, _max_age_secs: u64) {}
+    fn clear(&self, _host: &str) {}
 }
 
 #[cfg(feature = "persona-cookies")]

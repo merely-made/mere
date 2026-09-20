@@ -434,7 +434,17 @@ pub struct FaviconOutcome {
 /// `Send` handle and the `Send` `FetchUpdate`s cross.
 #[cfg(feature = "actor")]
 pub fn spawn_fetcher(wake: Wake) -> (ActorHandle<FetchCommand>, Receiver<FetchUpdate>) {
-    spawn(wake, |commands, out: Emitter<FetchUpdate>| {
+    spawn_fetcher_with(wake, session_stores().clone())
+}
+
+/// [`spawn_fetcher`] over stores the host owns, so pages, subresources and
+/// any [`NetFetch`] built from the same [`Stores`] share one session.
+#[cfg(feature = "actor")]
+pub fn spawn_fetcher_with(
+    wake: Wake,
+    stores: Stores,
+) -> (ActorHandle<FetchCommand>, Receiver<FetchUpdate>) {
+    spawn(wake, move |commands, out: Emitter<FetchUpdate>| {
         let runtime = Builder::new_multi_thread()
             .enable_all()
             .build()
@@ -450,6 +460,7 @@ pub fn spawn_fetcher(wake: Wake) -> (ActorHandle<FetchCommand>, Receiver<FetchUp
                     identity,
                 } => {
                     let out = out.clone();
+                    let stores = stores.clone();
                     let task_url = url.clone();
                     let task = runtime.spawn(async move {
                         let progress_out = out.clone();
@@ -458,6 +469,7 @@ pub fn spawn_fetcher(wake: Wake) -> (ActorHandle<FetchCommand>, Receiver<FetchUp
                             &url,
                             PAGE_BODY_CAP,
                             identity.as_ref(),
+                            &stores,
                             move |response_url, content_type, bytes| {
                                 progress_out.emit(FetchUpdate::PageProgress(PageProgress {
                                     request,
@@ -491,17 +503,19 @@ pub fn spawn_fetcher(wake: Wake) -> (ActorHandle<FetchCommand>, Receiver<FetchUp
                 },
                 FetchCommand::Subresource(url) => {
                     let out = out.clone();
+                    let stores = stores.clone();
                     runtime.spawn(async move {
-                        let result = fetch_bytes(&url).await;
+                        let result = fetch_bytes(&url, &stores).await;
                         out.emit(FetchUpdate::Subresource(SubresourceOutcome { url, result }));
                     });
                 },
                 FetchCommand::Favicon { request, url } => {
                     let out = out.clone();
+                    let stores = stores.clone();
                     runtime.spawn(async move {
                         out.emit(FetchUpdate::Favicon(FaviconOutcome {
                             request,
-                            result: fetch_bytes(&url).await,
+                            result: fetch_bytes(&url, &stores).await,
                         }));
                     });
                 },
@@ -659,7 +673,7 @@ pub async fn fetch_page(url: &str) -> Result<Fetched, String> {
 /// body (§A5): the http path enforces it *while streaming* (no OOM); smolweb is
 /// already buffered by errand, so it is checked post-hoc (errand bounds its own read).
 pub async fn fetch_page_capped(url: &str, max_bytes: usize) -> Result<Fetched, String> {
-    fetch_page_interactive_capped(url, max_bytes, None, |_, _, _| {})
+    fetch_page_interactive_capped(url, max_bytes, None, session_stores(), |_, _, _| {})
         .await
         .map_err(|error| error.to_string())
 }
@@ -671,6 +685,7 @@ async fn fetch_page_interactive_capped<F>(
     url: &str,
     max_bytes: usize,
     identity: Option<&GeminiClientIdentity>,
+    stores: &Stores,
     mut on_progress: F,
 ) -> Result<Fetched, FetchFailure>
 where
@@ -712,7 +727,9 @@ where
             return result;
         }
     }
-    do_fetch(url, max_bytes).await.map_err(FetchFailure::Failed)
+    do_fetch_ua_with_context(url, max_bytes, None, &stores.context())
+        .await
+        .map_err(FetchFailure::Failed)
 }
 
 #[cfg(feature = "smolweb")]
@@ -941,12 +958,6 @@ async fn read_capped(
     Ok(buf)
 }
 
-/// Run one WHATWG-Fetch GET and collect the decoded body as text, bounded by
-/// `max_bytes` (§A5: a hard streamed cap so a huge response can't OOM the host).
-async fn do_fetch(url: &str, max_bytes: usize) -> Result<Fetched, String> {
-    do_fetch_ua(url, max_bytes, None).await
-}
-
 /// The crawl actor's descriptive User-Agent: a site can allow / block / reach the bot
 /// from it (politeness, alongside robots.txt). The `merebot` token matches the
 /// `User-agent:` groups `crawl::robots` honors; the `Mozilla/5.0 (compatible; …)`
@@ -954,14 +965,15 @@ async fn do_fetch(url: &str, max_bytes: usize) -> Result<Fetched, String> {
 pub const CRAWLER_USER_AGENT: &str =
     "Mozilla/5.0 (compatible; merebot/0.1; +https://mere.computer/bot)";
 
-/// Like [`do_fetch`], but with an explicit `user_agent` request header when `Some`
-/// (the crawler identifies itself); `None` lets netfetcher add its default browser UA.
+/// One WHATWG-Fetch GET in the process session, body as text, bounded by
+/// `max_bytes` (§A5). An explicit `user_agent` is the crawler identifying itself;
+/// `None` lets netfetcher add its default browser UA.
 async fn do_fetch_ua(
     url: &str,
     max_bytes: usize,
     user_agent: Option<&str>,
 ) -> Result<Fetched, String> {
-    let cx = session_context();
+    let cx = session_stores().context();
     do_fetch_ua_with_context(url, max_bytes, user_agent, &cx).await
 }
 
@@ -1010,7 +1022,7 @@ async fn do_fetch_ua_with_context(
 /// Fetch raw response bytes through the same scheme and trust routing as a page,
 /// bounded by [`SUBRESOURCE_BODY_CAP`].
 #[cfg(feature = "actor")]
-async fn fetch_bytes(url: &str) -> Result<Vec<u8>, String> {
+async fn fetch_bytes(url: &str, stores: &Stores) -> Result<Vec<u8>, String> {
     #[cfg(feature = "smolweb")]
     if is_smolweb(url) {
         let (_final_url, response) = smolweb_fetch_response(url, None, &mut |_, _, _| {})
@@ -1025,7 +1037,7 @@ async fn fetch_bytes(url: &str) -> Result<Vec<u8>, String> {
     }
 
     let parsed = url::Url::parse(url).map_err(|error| format!("bad URL: {error}"))?;
-    let cx = session_context();
+    let cx = stores.context();
     let response = netfetcher::fetch(netfetcher::Request::get(parsed), &cx).await;
     if response.is_network_error() || !(200..300).contains(&response.status) {
         return Err(format!("subresource request failed ({})", response.status));
