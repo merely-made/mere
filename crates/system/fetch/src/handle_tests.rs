@@ -509,3 +509,42 @@ fn a_download_streams_into_its_sink_before_the_server_finishes() {
         "nothing is written when the declared length is over the limit"
     );
 }
+
+#[cfg(feature = "actor")]
+#[test]
+fn a_page_login_through_the_actor_is_carried_by_a_ranged_read() {
+    let server = Server::start();
+    let jar = Arc::new(InMemoryCookieJar::new());
+    let mut stores = Stores::in_memory();
+    stores.cookies = jar.clone();
+
+    // The page actor and the handle are built from one store set.
+    let (woken, wakes) = mpsc::channel();
+    let wake: armillary::Wake = Arc::new(move || {
+        let _ = woken.send(());
+    });
+    let (actor, updates) = crate::spawn_fetcher_with(wake, stores.clone());
+    assert!(actor.command(crate::FetchCommand::Page {
+        request: 1,
+        url: server.url("/page").to_string(),
+        identity: None,
+    }));
+    wakes
+        .recv_timeout(Duration::from_secs(10))
+        .expect("the actor must wake its host");
+    match updates.recv_timeout(Duration::from_secs(10)).unwrap() {
+        crate::FetchUpdate::Page(outcome) => assert_eq!(outcome.result.unwrap().body, "ok"),
+        _ => panic!("expected the page outcome"),
+    }
+    assert_eq!(jar.len(), 1, "the login landed in the host's jar");
+
+    handle(&stores)
+        .read_range(server.url("/episode.mp3").as_str(), FIRST_BYTE, None)
+        .unwrap();
+    assert_eq!(
+        server.seen("/episode.mp3")[0].header("cookie"),
+        Some("session=persona-a")
+    );
+    // Control: the process session, which this actor was not given, saw nothing.
+    assert!(crate::session_jar().is_empty());
+}
