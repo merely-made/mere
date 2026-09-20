@@ -26,7 +26,7 @@ Pre-release, under active development.
   (muniment, chartulary, seiche, personae, stickleback); the rest set
   `publish = false`.
 - Sibling repos genet, netrender, and retinue arrive as git dependencies, so
-  a plain `cargo build` resolves everywhere. Rust pinned at 1.97.1.
+  portable builds resolve published revisions. Rust pinned at 1.98.1.
 
 Current plans live in [`design_docs/`](design_docs/DOC_README.md): distillery
 follow-on slices, device-grant delegation, castellan sealed credentials, and
@@ -56,6 +56,39 @@ cargo run -p mere-canvas --features native-present --bin canvas
 
 `ports/graphshell` has no default binary; pick one explicitly (see
 [`ports/graphshell/README.md`](ports/graphshell/README.md)).
+
+### Portable and local dependencies
+
+The root `Cargo.lock` records the portable graph. Use `cargo check --workspace
+--locked` for that graph. Python 3.11+ can additionally check configuration,
+package provenance and lock preservation with `python scripts/cargo_mode.py
+verify`. Run acceptance checks in a clean checkout with documented platform
+prerequisites; a local-path build is a separate receipt.
+
+For sibling development, copy `.cargo/config.toml.example` to
+`.cargo/config.local.toml` and adjust its paths for your checkout layout. Existing
+users run `python scripts/cargo_mode.py setup` once from the repository root:
+it preserves current locks and renames ignored automatic configs to opt-in local
+configs. It does not overwrite an existing local config or local lock.
+
+```sh
+python scripts/cargo_mode.py local check --workspace
+python scripts/cargo_mode.py local check --manifest-path ports/graphshell/web/Cargo.toml --target wasm32-unknown-unknown
+```
+
+The launcher requires Cargo 1.97+ and selects `<workspace>/.cargo/local/Cargo.lock`
+even with `--manifest-path`. Commands run from the selected workspace root;
+other relative command arguments are interpreted there. Local commands load
+root and nested local configs;
+ordinary Cargo commands do not. Use the launcher for editor check commands too
+(an absolute script path works from a member directory). Editor metadata using
+bare Cargo sees the portable graph. Do not set a global lockfile redirect.
+Nested workspace portable locks and platform gates are tracked separately in
+the [lattice plan](design_docs/mere_docs/implementation_strategy/2026-09-16_lattice_sync_pass_plan.md).
+
+Integration uses a tested set of published revisions. Local sibling changes do
+not require immediate Git repins, and pin-only commits do not trigger reciprocal
+repins. Advance pins when accepting a tested integration or a required fix.
 
 ## License
 

@@ -2,9 +2,33 @@
 
 **Date**: 2026-09-16
 
-**Status: plan, reviewed 2026-09-16.** The rulings below preserve the earlier
-decision record. This review revises the execution and acceptance criteria;
-it does not execute the migration or cleanup.
+**Status: in progress, 2026-09-20.** Mark authorized the reviewed sequence:
+establish local and portable resolution in Mere and Turnstone first, then move
+that pair onto a tested published Genet revision. Broader consumers follow the
+same procedure once qualified. The September 16 counts below remain historical.
+
+## Execution amendment (2026-09-20)
+
+- Local config is now explicit: `scripts/cargo_mode.py local <cargo arguments>`
+  loads `.cargo/config.local.toml` from root through the selected workspace and
+  supplies an absolute workspace-specific lock path. Bare Cargo uses portable
+  configuration. `setup` preserves existing locks and renames ignored automatic
+  configs; it refuses to overwrite pre-existing local configuration.
+- This supersedes the original automatic root `[resolver]` rollout. It also
+  handles root-invoked `--manifest-path` without needing a lock-path template or
+  assuming Cargo discovers nested config from a manifest argument.
+- Initial build gates cover Mere and Turnstone's root workspaces. Mere's nested
+  guest/wasm, port, vendored and historical fixture workspaces are inventoried by
+  setup and have separate local locks; their portable build gates remain pending.
+  Do not describe the root gate as covering them.
+- Use tested published revision sets. A pin-only change does not trigger a
+  reciprocal repin. Keep old cycle edges when compatible and record actual
+  incompatible duplicate identities rather than chasing repository heads.
+- Genet target is `9976945058b921437ea59cd95b112bd1da910013`, verified published
+  on September 20. Root portable baselines are being checked before repinning.
+- Cleanup is owned by the concurrently active disk-cleanup task. Preserve this
+  pass's `Code/work/lattice-sync-20260920` checkouts/receipts and
+  `C:\t\lattice-sync-20260920` build outputs while checks run.
 
 ## Objective
 
@@ -69,6 +93,46 @@ which does not record the filesystem path of a path package.
   Renderling's uncommitted edits are committed to a branch and pushed to the fork.
 
 ## Findings (2026-09-16)
+
+### Execution findings (2026-09-20)
+
+- Root portable resolution succeeds at Mere `0f5283d9` and Turnstone `60374e7`
+  on Cargo 1.98.1. Metadata provenance checks pass with 1,587 and 1,322 packages
+  respectively. Both baseline `cargo +1.98.1 check --workspace --locked -j2`
+  commands passed in redirect-free disposable checkouts. These validate the
+  old Genet revision; the integration candidate needs its own receipts.
+- Turnstone's existing local config patched Netrender and the engine adapters,
+  but neither Mere nor Genet. Its new example maps the 79 Mere and 29 Genet
+  packages in its portable root graph to sibling manifests. All mapped paths
+  exist in the current standard layout. Mere's example had two dead entries,
+  `servo-paint` and `genet-probe`, which were removed to match the live config.
+- Mere's pre-integration local graph contains both Git and path versions of
+  Buckram (0.0.2/0.0.3), Livery (0.0.4/0.0.5) and genet-livery (0.0.3/0.0.4).
+  Genet's published version bumps mean changing revisions alone is insufficient;
+  align direct version constraints and inspect the resulting graph.
+- The pre-integration local build actually fails at
+  `crates/cambium/cambium-winit-a11y/src/lib.rs:211`: Git genet-livery's layout
+  reaches the local genet-render accessibility function, which expects its
+  own version of that type. This is a demonstrated source/version split, not
+  an inferred problem from commit lag.
+- Baseline document-host guest builds warn because three nested guest toolchain
+  pins still name 1.93.0 and that installation's Cargo is unusable on this host.
+  The host workspace check passes despite these warnings. Align ordinary guest
+  pins with 1.98.1, track their portable locks, make build-script child commands
+  locked, and explicitly qualify all three WASI guests before claiming them.
+- Crate-level cycle inventory: Mere's root points to `retinue`; Retinue's Mere
+  dependencies are in `apps/signalman` and `apps/signalman-desktop`. Mere also
+  consumes Knot's editor/document packages and Djinn consumes `knot-site`;
+  Knot declares 35 Mere dependency/patch entries. This does not establish a
+  removable shared-interface crate. Defer extraction until a concrete type or
+  ownership conflict identifies the boundary.
+- Peripheral package-name audit: Hocket, Woodshed (including its old Hocket
+  port), and Retinue's desktop app still request `genet-probe` and `parley`
+  from Genet. The former is gone; the fork is now named `genet-parley`.
+  Mer3ly, Isometry and Cleromancy had no missing Mere/Genet package names in
+  this limited audit. None received a build receipt or dormancy designation.
+
+### Original snapshot
 
 The original audit counts, pin lags and session states below are a dated
 snapshot, not a live execution inventory. P0 must refresh them before mutation.
@@ -472,3 +536,22 @@ wrong source. Report to Mark; change nothing.
   cycle identity checks and cleanup preservation. Reviewed local manifests,
   config examples and ignore rules; a Cargo 1.97.1 scratch probe reproduced the
   inherited nested-lock collision. No migration or cleanup executed.
+- **2026-09-20, Mere gate passed:** the redirect-free root check and the local
+  sibling root check both pass with Genet `9976945058b`. The final portable
+  `scripts/cargo_mode.py verify +1.98.1` passes with 1,586 packages and lock
+  SHA-256 `62e85beafd2f28b215ac382c20f6ab0573c57e8d575e3773b294f3a238ea10f2`.
+  Local Buckram, Livery, genet-livery, genet-host-api and layout-dom-api each
+  resolve to one local package; the previous accessibility type split is gone.
+  Portable history still contains Knot's old `fleece` and `layout-dom-api`
+  sources; the root build accepts that isolated edge, so no reciprocal repin
+  was made merely to chase a repository head. Unused portable patches remain
+  the same three as baseline (boa_engine, boa_gc, iroh-mdns-address-lookup).
+  All three WASI guests pass explicit release builds with `--locked`, and each
+  passes portable metadata provenance checks. The launcher regression suite
+  passes four tests, including nested cwd/manifest selection and relative path
+  preservation; Cargo 1.96 was separately refused before resolution.
+  Local Genet advanced to `b7d56321a78` during validation, but its only change
+  from the frozen target is documentation. Logs and inventories are in
+  `Code/work/lattice-sync-20260920`. Turnstone's baseline passed; its integration
+  with the published Mere candidate remains in progress. Other nested ports
+  and peripheral repositories remain unqualified by this slice.

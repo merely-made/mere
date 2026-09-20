@@ -1,6 +1,6 @@
 # The shipped document-core guest (transplanted from the P0/P1 probe). Standalone
-# (own `[workspace]` + the parent's 1.93 pin via inheritance is not automatic, so
-# build with the 1.93 toolchain). Built to wasm32-wasip2; the host test loads the
+# with its own `[workspace]` and Rust 1.98.1 pin. Built to wasm32-wasip2;
+# the host test loads the
 # resulting component.
 [workspace]
 
