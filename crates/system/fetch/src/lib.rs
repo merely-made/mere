@@ -373,7 +373,10 @@ pub enum FetchCommand {
     /// preserves completion identity when the same page asks again before an
     /// older answer lands. Carried separately from `Subresource` so favicon
     /// bytes reach the graph, not the content actors' render stores.
-    Favicon { request: FetchRequestId, url: String },
+    Favicon {
+        request: FetchRequestId,
+        url: String,
+    },
     /// Perform one user-confirmed smolweb write exactly once.
     Submit {
         request: u64,
@@ -877,6 +880,9 @@ fn smolweb_content_type(url: &url::Url, response: &errand::Response) -> String {
 
 mod cookies;
 pub use cookies::*;
+
+mod handle;
+pub use handle::{Body, Facts, Fetch, FetchError, NetFetch, Range, RangeReply, Stores};
 
 /// Drain a streaming [`netfetcher::ResponseBody`] into a buffer, aborting with an
 /// error once the accumulated length would exceed `max_bytes` (§A5). Enforced *during*
