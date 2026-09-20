@@ -1,7 +1,7 @@
 # Ranged Fetch Plan
 
 **Date:** 2026-09-20  
-**Status:** **plan accepted 2026-09-20 with D1 to D7 decided; lane F starting in a worktree.** Nothing merged.  
+**Status:** **plan accepted 2026-09-20 with D1 to D7 decided; lane F1 to F3 built on `slice/ranged-fetch-20260920`, F4 open.** Nothing merged.  
 **Authority:** the implementation home for rulings 2 to 4 of lane R3 in the
 [family composition thesis](../../2026-08-12_family_composition_thesis_brief.md#r3-resource-resolution-opened-2026-09-20).
 The research, probes and rulings stay there; this plan owns the work.  
@@ -117,3 +117,23 @@ so that it can answer a range from a stored body. The page-side media element.
 ## Progress
 
 - **2026-09-20:** plan written from the R3 rulings; D1 to D7 decided the same day.
+- **2026-09-20, lane F on `slice/ranged-fetch-20260920`, not merged:**
+  - F2 and F3 landed (`af6dbc7a`): `Fetch`, `NetFetch`, `Stores` and the reply
+    types in `crates/system/fetch/src/handle.rs`, with seven tests against a real
+    local server moved in from the R3-A probe, the pinned cache negative
+    included. One addition to D2's names: `Facts` (final URL, content type,
+    declared length, validators) rides on every reply, and `Body` is what
+    `read_all` returns.
+  - F1 landed: four default-on features. Public shapes do not vary with features;
+    only behaviour does (without `smolweb`, a small-web address fails as an
+    ordinary fetch and the actor refuses a submission in words). Durable cookies
+    and the flip export moved to `cookies_persist.rs` and `cookies_flip.rs`.
+    Verified: each feature builds alone, and `actor` with `smolweb`; default
+    tests 17 pass, defaults-off tests 7 pass; Clippy is clean for the crate both
+    ways; `mere-crawl` checks untouched. With defaults off the dependency tree
+    names none of armillary, eidetic, pandect, inker or errand, and standalone
+    Redshank's lock would gain **48 crates** (the bound was 71, and 393 as the
+    crate stood). Twenty-four of the 48 are netfetcher's HTTP/3 and WebSocket
+    lanes, which Mere's workspace enables; taking netfetcher without them is a
+    further cut, not made, that would bring a small host to about 24.
+  - F4 (the actor building its context from a host's `Stores`) is not started.

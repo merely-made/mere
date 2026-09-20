@@ -11,20 +11,34 @@ description = "Host-neutral fetch actor and session-cookie runtime for Mere."
 name = "fetch"
 path = "src/lib.rs"
 
+[features]
+# Everything the crate did before the blocking handle arrived stays on by
+# default. A small host turns the defaults off and takes only `Fetch` over
+# netfetcher (design_docs/.../2026-09-20_ranged_fetch_plan.md, D3).
+default = ["actor", "smolweb", "persona-cookies", "flip"]
+# The off-UI-thread page actor.
+actor = ["dep:armillary"]
+# gemini, gopher, finger, spartan, nex, guppy and titan through errand.
+smolweb = ["dep:errand"]
+# Durable per-persona cookies in an eidetic store.
+persona-cookies = ["dep:eidetic", "dep:pandect", "dep:serde", "dep:serde_json", "dep:pollster"]
+# The session's cookies as portable records for an engine flip.
+flip = ["dep:inker"]
+
 [dependencies]
-armillary.workspace = true
-eidetic.workspace = true
-errand = { workspace = true }
+armillary = { workspace = true, optional = true }
+eidetic = { workspace = true, optional = true }
+errand = { workspace = true, optional = true }
 netfetcher = { workspace = true }
-pollster = "0.4"
+pollster = { version = "0.4", optional = true }
 rustls-pki-types = "1"
-serde = { workspace = true }
-serde_json = { workspace = true }
-pandect.workspace = true
+serde = { workspace = true, optional = true }
+serde_json = { workspace = true, optional = true }
+pandect = { workspace = true, optional = true }
 tokio = { version = "1", features = ["rt-multi-thread", "time", "io-util", "sync"] }
 tracing.workspace = true
 url = "2"
-inker = { workspace = true }
+inker = { workspace = true, optional = true }
 zeroize = "1"
 
 [lints]
