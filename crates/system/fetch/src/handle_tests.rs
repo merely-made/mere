@@ -20,7 +20,7 @@ use std::{
     time::Duration,
 };
 
-use netfetcher::InMemoryCookieJar;
+use netfetcher::{InMemoryCookieJar, RawResponse, Transport, TransportFuture, WireRequest};
 
 use super::*;
 
@@ -547,4 +547,78 @@ fn a_page_login_through_the_actor_is_carried_by_a_ranged_read() {
     );
     // Control: the process session, which this actor was not given, saw nothing.
     assert!(crate::session_jar().is_empty());
+}
+
+/// A wire that answers every request itself and remembers what it was asked.
+struct Recorded {
+    asked: Mutex<Vec<WireRequest>>,
+}
+
+impl Transport for Recorded {
+    fn send(&self, request: WireRequest) -> TransportFuture<'_> {
+        let range = request
+            .headers
+            .iter()
+            .find(|(name, _)| name == "range")
+            .map(|(_, value)| value.clone());
+        self.asked.lock().unwrap().push(request);
+        Box::pin(async move {
+            let (start, end) = range
+                .as_deref()
+                .and_then(|value| value.strip_prefix("bytes="))
+                .and_then(|value| value.split_once('-'))
+                .map(|(start, end)| (start.parse::<u64>().unwrap(), end.parse::<u64>().unwrap()))
+                .unwrap_or((0, 0));
+            let body: Vec<u8> = (start..=end).map(|index| (index % 251) as u8).collect();
+            Some(RawResponse::once(
+                206,
+                vec![
+                    (
+                        "content-range".to_owned(),
+                        format!("bytes {start}-{end}/{OBJECT_BYTES}"),
+                    ),
+                    ("content-length".to_owned(), body.len().to_string()),
+                    ("content-type".to_owned(), "audio/mpeg".to_owned()),
+                ],
+                body.into(),
+            ))
+        })
+    }
+}
+
+#[test]
+fn a_supplied_transport_is_the_wire_the_handle_sends_through() {
+    let wire = Arc::new(Recorded {
+        asked: Mutex::new(Vec::new()),
+    });
+    let mut stores = Stores::in_memory();
+    stores.transport = Some(wire.clone());
+    let fetch = handle(&stores);
+
+    // No server is listening here: only the supplied wire can answer.
+    let reply = fetch
+        .read_range("http://127.0.0.1:9/episode.mp3", span(65_536), None)
+        .unwrap();
+    assert_eq!(reply.start, 65_536);
+    assert_eq!(reply.total, OBJECT_BYTES as u64);
+    assert_eq!(&reply.bytes[..], &object()[65_536..65_536 + CHUNK as usize]);
+
+    let asked = wire.asked.lock().unwrap();
+    assert_eq!(asked.len(), 1);
+    assert_eq!(asked[0].url.path(), "/episode.mp3");
+    assert!(
+        asked[0]
+            .headers
+            .iter()
+            .any(|(name, value)| name == "range" && value == "bytes=65536-131071")
+    );
+
+    // Control: a wire with no network behind it, and the same address fails.
+    let mut cut = Stores::in_memory();
+    cut.transport = Some(Arc::new(netfetcher::NoTransport));
+    let direct = handle(&cut).read_range("http://127.0.0.1:9/episode.mp3", span(0), None);
+    assert!(
+        matches!(direct, Err(FetchError::Unreachable(_))),
+        "{direct:?}"
+    );
 }
