@@ -1,7 +1,7 @@
 # Ranged Fetch Plan
 
 **Date:** 2026-09-20  
-**Status:** **plan accepted 2026-09-20 with D1 to D7 decided; lane F merged to main and pushed 2026-09-20; lanes R, T and I not started.**  
+**Status:** **plan accepted 2026-09-20 with D1 to D7 decided; lane F merged and pushed 2026-09-20; lane R built and committed in Woodshed 2026-09-22, awaiting push; T and I not started.**  
 **Authority:** the implementation home for rulings 2 to 4 of lane R3 in the
 [family composition thesis](../../2026-08-12_family_composition_thesis_brief.md#r3-resource-resolution-opened-2026-09-20).
 The research, probes and rulings stay there; this plan owns the work.  
@@ -159,3 +159,27 @@ so that it can answer a range from a stored body. The page-side media element.
   I2P and Arti lanes, which plug into netfetcher's transport seam, could not
   reach a handle. Test: a supplied wire is what the handle sends through, with a
   `NoTransport` control. 19 tests by default, 8 with defaults off, Clippy clean.
+- **2026-09-22, lane R, Woodshed `a1ebf6d` and `bf5923d` (local, awaiting
+  sign-off to push):** R1 and R2 landed. `redshank-playback`, `redshank-cache`
+  and the desktop take the fetch crate with defaults off at the Mere revision
+  the port pins (`0e031fa5`, so one Mere revision with Turnstone; the transport
+  slot at `50699731` arrives with the next lattice move). ureq is gone from the
+  lock. `PlaybackRuntime::start_with` takes the host's handle and `start()`
+  keeps its signature over one of its own, so Turnstone builds unchanged until
+  T1. The cache download streams into a hashing, budgeting sink; the feed is
+  `read_all` with its accept header and 4 MiB limit.
+  - R3, measured: the lock gains 48 crates and loses 3 (R3-C predicted 48). 161
+    tests pass, 7 ignored (the two Content-Range parser tests moved to Mere
+    with the parser); strict Clippy clean. Release `redshank-desktop.exe` is
+    32.1 MB after; the before size was not measured, and the release build with
+    warm dependencies took 355 s, which is dominated by Cambium and Genet, not
+    by the fetch crates.
+  - The receipts found a defect the lane did not cause: on this machine the
+    default output device now reports more than two channels, and the output
+    runtime connected one edge per device channel into Firewheel's stereo graph
+    output, so every load ended unavailable. The untouched pushed revision fails
+    the same way. Fixed in `a1ebf6d` by sizing the volume node and its edges to
+    the graph. The same commit makes `listen_playing.scn` and `longnames.scn`
+    assert PLAYING, because both had reported RESULT ok through the failure;
+    the whole scenario set passes with the assertions, longnames on its
+    range-served item, so the ranged path is played rather than drawn.
