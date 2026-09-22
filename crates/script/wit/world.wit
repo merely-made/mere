@@ -132,7 +132,7 @@ interface document-host {
 /// surface: `name` is the kebab-case action name, `payload` its JSON
 /// arguments (`""` for unit actions). The host classifies each emission by
 /// RING — a capability-path family (`app/navigate`, `app/panes`,
-/// `app/dispatch`, `app/session`) — and checks the emitting denizen's grant
+/// `app/dispatch`, `app/session`) — and checks the emitting participant's grant
 /// at that moment, exactly where the piccolo lane already denies. Gate
 /// management (install / confirm / cancel / run) classifies HOST-ONLY: no
 /// grantable path exists, so a component confirming its own install review
@@ -151,7 +151,7 @@ interface actions {
         payload: string,
     }
     variant emit-error {
-        /// The action's ring is not covered by this denizen's grant (or is
+        /// The action's ring is not covered by this participant's grant (or is
         /// host-only); carries the ring-naming reason.
         denied(string),
         /// No action by this name in the host build.
@@ -162,7 +162,7 @@ interface actions {
     emit: func(action: action-envelope) -> result<_, emit-error>;
 }
 
-/// The app-core world: a component that can BE an app denizen. Its runnable
+/// The app-core world: a component that can BE an app participant. Its runnable
 /// body reacts to host events and emits actions through the envelope; the
 /// ring gate decides what lowers. Lifecycle mirrors document-core.
 world app-core {

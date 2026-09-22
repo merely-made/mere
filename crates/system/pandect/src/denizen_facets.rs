@@ -4,18 +4,22 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! The `denizen.*` facet namespace — which nodes are denizens, as facets.
+//! Participant bindings in the legacy `denizen.*` facet namespace.
 //!
-//! A **denizen** (a servitor, an agent, a scenario runner, a peer, a pack) can
-//! reside in the graph as a node. What makes a node a denizen is not a graph
-//! fact — it is host knowledge *about* the node: the denizen's keyholder
-//! identity and kind. Per the one-node ruling, denizen-ness is a **facet
-//! bundle, not a node class**: containment is structure, denizen-ness is
+//! The 2026-09-20 terminology ruling assigns denizen to Isometry's simulation
+//! vocabulary. This module's API names and stored facet IDs retain their
+//! existing spelling so consumers and saved sessions remain compatible.
+//!
+//! A **participant** (a servitor, an agent, a scenario runner, a peer, a pack) can
+//! reside in the graph as a node. What makes a node a participant is not a graph
+//! fact — it is host knowledge *about* the node: the participant's keyholder
+//! identity and kind. Per the one-node ruling, participant status is a **facet
+//! bundle, not a node class**: containment is structure, participant status is
 //! agency, orthogonal on the one node. The nested graph itself (the inner
 //! world, an ordinary chartulary `GraphLog` of grant projections, storage
 //! markers, registered commands, journal cursors) hangs off the node
 //! STRUCTURALLY — `Node.nested`, the kernel's `GraphBearing` impl — not off
-//! this facet: delete the facet and the denizen is un-resided but its world
+//! this facet: delete the facet and the participant is un-resided but its world
 //! stays borne; archive the node and the world rides along.
 //!
 //! This module supersedes the transitional `denizen_bindings.json` sidecar
@@ -23,11 +27,11 @@
 //! path the cartography sidecar took): the binding persists as a
 //! [`DENIZEN_BINDING`] facet in [`facets.json`](crate::facet_store), keyed by
 //! the node's stable UUID like every other facet. Deleting a node's facet
-//! un-resides its denizen without touching the graph or the nested graph
+//! un-resides its participant without touching the graph or the nested graph
 //! (which persists under its own slot and can be re-bound).
 //!
 //! The gate (the `servitor` crate) consumes a binding to run petitions against
-//! the denizen's nested graph; this module only stores the pointer.
+//! the participant's nested graph; this module only stores the pointer.
 
 use serde::{Deserialize, Serialize};
 use serde_json::json;
@@ -35,7 +39,7 @@ use uuid::Uuid;
 
 use crate::facet_store::{AcceptAll, FacetId, NodeFacetStore};
 
-/// Facet id of a node's denizen binding. Payload:
+/// Facet id of a node's participant binding. Payload:
 /// `{"subject": hex, "kind": kebab-case}` — one coherent record, the
 /// `arrangement.material` precedent, not fragment facets. (Bindings written
 /// before the containment ruling also carried `"nested_log"`; it reads as
@@ -43,7 +47,7 @@ use crate::facet_store::{AcceptAll, FacetId, NodeFacetStore};
 /// `Node.nested` and is never written again.)
 pub const DENIZEN_BINDING: &str = "denizen.binding";
 
-/// What kind of denizen a node hosts. Descriptive metadata, never a second
+/// What kind of participant a node hosts. Descriptive metadata, never a second
 /// identity axis (identity is the [`subject`](DenizenBinding::subject) key); the
 /// gate treats every kind the same. Serialized kebab-case; unknown-forward via
 /// the `#[serde(other)]` catch so a newer kind loads on an older build.
@@ -59,19 +63,19 @@ pub enum DenizenKind {
     Peer,
     /// A saved scenario / macro runner.
     Scenario,
-    /// An installed pack's own resident denizen.
+    /// An installed pack's own resident participant.
     Pack,
     /// A kind this build does not recognize (forward compatibility).
     #[serde(other)]
     Unknown,
 }
 
-/// The binding for one denizen node: its keyholder identity and kind — pure
-/// agency. A binding exists only for a node that is a denizen; the node's
+/// The binding for one participant node: its keyholder identity and kind — pure
+/// agency. A binding exists only for a node that is a participant; the node's
 /// borne world lives on `Node.nested` (structure), not here.
 #[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub struct DenizenBinding {
-    /// The denizen's keyholder identity: lowercase hex of the 32-byte public
+    /// The participant's keyholder identity: lowercase hex of the 32-byte public
     /// key (matches `servitor::Subject::to_hex`). Hand-inspectable in the JSON.
     pub subject: String,
     /// LEGACY: the nested-graph log id a pre-containment-ruling binding
@@ -79,7 +83,7 @@ pub struct DenizenBinding {
     /// on adopt; [`write_denizen_binding`] never writes it back.
     #[serde(default, rename = "nested_log", skip_serializing)]
     pub legacy_nested_log: String,
-    /// What kind of denizen this is.
+    /// What kind of participant this is.
     #[serde(default)]
     pub kind: DenizenKind,
 }
@@ -96,13 +100,13 @@ impl DenizenBinding {
 
     /// True when this binding names no keyholder — nothing worth persisting.
     /// [`write_denizen_binding`] treats these as a remove, so the store only
-    /// carries real denizens.
+    /// carries real participants.
     pub fn is_empty(&self) -> bool {
         self.subject.is_empty()
     }
 }
 
-/// Bind (or rebind) `node` as a denizen: write its [`DENIZEN_BINDING`] facet.
+/// Bind (or rebind) `node` as a participant: write its [`DENIZEN_BINDING`] facet.
 /// An [empty](DenizenBinding::is_empty) binding removes instead (nothing worth
 /// persisting). Facets in other namespaces are untouched.
 pub fn write_denizen_binding(store: &mut NodeFacetStore, node: Uuid, binding: &DenizenBinding) {
@@ -117,7 +121,7 @@ pub fn write_denizen_binding(store: &mut NodeFacetStore, node: Uuid, binding: &D
     let _ = store.set(node, FacetId::new(DENIZEN_BINDING), payload, &AcceptAll);
 }
 
-/// Un-reside `node`'s denizen (node removed, or the helper uninstalled),
+/// Un-reside `node`'s participant (node removed, or the helper uninstalled),
 /// returning whether a binding was present. The nested graph is not touched
 /// here; archiving it is the gate's concern.
 pub fn remove_denizen_binding(store: &mut NodeFacetStore, node: Uuid) -> bool {
@@ -126,15 +130,15 @@ pub fn remove_denizen_binding(store: &mut NodeFacetStore, node: Uuid) -> bool {
         .is_some()
 }
 
-/// The binding for one node, or `None` if the node is not a denizen (no facet,
-/// or a malformed payload — a bad facet reads as not-a-denizen rather than
+/// The binding for one node, or `None` if the node is not a participant (no facet,
+/// or a malformed payload — a bad facet reads as an absent participant rather than
 /// failing the caller).
 pub fn read_denizen_binding(store: &NodeFacetStore, node: Uuid) -> Option<DenizenBinding> {
     let value = store.get(&node, &FacetId::new(DENIZEN_BINDING))?;
     parse_binding(value)
 }
 
-/// Every denizen node and its binding, in node-id order (the store's iteration
+/// Every participant node and its binding, in node-id order (the store's iteration
 /// order). Malformed payloads are skipped.
 pub fn read_denizen_bindings(store: &NodeFacetStore) -> Vec<(Uuid, DenizenBinding)> {
     let facet = FacetId::new(DENIZEN_BINDING);
@@ -144,7 +148,7 @@ pub fn read_denizen_bindings(store: &NodeFacetStore) -> Vec<(Uuid, DenizenBindin
         .collect()
 }
 
-/// Whether `node` carries a (well-formed) denizen binding.
+/// Whether `node` carries a (well-formed) participant binding.
 pub fn is_denizen(store: &NodeFacetStore, node: Uuid) -> bool {
     read_denizen_binding(store, node).is_some()
 }

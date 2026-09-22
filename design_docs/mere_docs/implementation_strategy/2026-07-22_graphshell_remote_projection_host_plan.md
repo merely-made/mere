@@ -232,7 +232,7 @@ scene after compilation is too late because undisclosed facts may already have
 influenced labels, relationships, layout, or Burn-produced signals.
 
 Graphshell holds a revocable grant; it cannot mint or widen one. Applications
-may adapt Servitor's denizen gate, a product-specific gate, or a simpler
+may adapt Servitor's participant gate, a product-specific gate, or a simpler
 read-only authorizer behind `graphshell-endpoint`'s traits.
 
 Revocation stops future disclosure and intents. It cannot retract pixels or

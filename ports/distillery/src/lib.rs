@@ -25,7 +25,7 @@
 //!   boundary; distillery drives it.
 //! - **Not mere-mesh or mere-mesh-host.** Job grammar, leases, and the
 //!   supervisor are substrate; distillery embeds and renders them.
-//! - **Not servitor.** Whether an admitted denizen may petition at all stays
+//! - **Not servitor.** Whether an admitted participant may petition at all stays
 //!   the gate's office.
 //! - **Not turnstone.** The flagship embeds the same views; distillery is the
 //!   standalone works.

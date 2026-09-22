@@ -68,7 +68,7 @@ impl ContentBearing for Node {
 impl GraphBearing for Node {
     fn nested(&self) -> Option<&muniment::LogId> {
         // Structural containment (the one-node ruling): the node BEARS the
-        // graph named by this log identity. A denizen's inner world hangs
+        // graph named by this log identity. A participant's inner world hangs
         // here; agency (subject + kind) stays a facet.
         GraphBearing::nested(&self.container)
     }

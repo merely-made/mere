@@ -63,7 +63,7 @@ radio business and a whole-stack demonstration in one surface.
 *Disposition: endorsed direction; rides the V5-V11 receipts; no separate plan
 yet.*
 
-**4. Attenuated-authority agent workshop.** Agents as denizens through the
+**4. Attenuated-authority agent workshop.** Agents as participants through the
 participant gate, driving the same DOM-identified UI humans use via
 genet-probe, their work landing as journal ops with provenance, their
 authority a personae delegation chain (attenuation, depth bounds), revocation

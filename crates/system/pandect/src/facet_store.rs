@@ -26,7 +26,7 @@
 //! ```
 //!
 //! **The convergence target.** The bespoke per-node sidecars (browser state,
-//! denizen bindings, and cartography's per-node arrangement data) are facets
+//! participant bindings, and cartography's per-node arrangement data) are facets
 //! avant la lettre: typed metadata keyed by node id. This store is the one
 //! mechanism they fold into over time (namespaces `web.*`, `denizen.*`,
 //! `arrangement.*`), replacing N hand-rolled documents. This wiring is the

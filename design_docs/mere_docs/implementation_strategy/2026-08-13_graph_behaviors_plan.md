@@ -1,6 +1,11 @@
-# Graph Behaviors Plan: watches, cascades, and the reactive denizen
+# Graph Behaviors Plan: watches, cascades, and the reactive participant
 
 **Date:** 2026-08-13
+**Redesign status, 2026-09-20:** the Servitor resident/run design in
+[section 8](#8-servitor-resident-and-run-redesign-2026-09-20) extends the landed
+behavior primitives. R1a admission, the R1b reducer and the Turnstone adapter
+have source implementations with static review. Cargo validation and the
+portable consumer pin remain pending. R2 and R3 remain planned. The earlier receipts cover only their original implementations.
 **Status:** W0 through W5 landed 2026-08-13, with a green headed receipt
 (`turnstone scenarios/behaviors_wake.scn`, captures under
 `Code/testing/turnstone/behaviors_wake`). Two follow-ups remain: the review row
@@ -12,7 +17,7 @@ connected nodes captured into a knot note, and the family of automations
 behind them).
 **Related:**
 [participant gate + packs](2026-07-17_participant_gate_packs_plan.md) (this
-plan extends it: a behavior IS a denizen, plus a trigger),
+plan extends it: a behavior IS a participant, plus a trigger),
 [scriptable field regions](2026-06-13_scriptable_field_regions_plan.md)
 (owns the projection tier; not re-planned here),
 [runtime mod authoring loop](2026-06-30_runtime_mod_authoring_loop_plan.md)
@@ -39,7 +44,7 @@ cascade replayable).
   cascade discipline. The scriptable field regions plan already owns this
   tier (a placed spatial region carrying rhai rules); "refresh what is near
   this node" is one more rule kind there. This plan does not build any of it.
-- **Graph behaviors** write truth. A behavior is a **denizen with a trigger**:
+- **Graph behaviors** write truth. A behavior is a **participant with a trigger**:
   the identity, grant, petition, and attributed-journal machinery from the
   participant gate plan, plus one new thing: a standing subscription that
   runs the body when something it watches changes, instead of waiting to be
@@ -53,11 +58,11 @@ rather than universal undo.
 
 **The scripting question is not open.** The lanes exist and are placed:
 rhai for privileged local automation (the omnibar `>`-shell, knot
-note-block eval), **piccolo Lua for sandboxed denizen bodies** (turnstone
+note-block eval), **piccolo Lua for sandboxed participant bodies** (turnstone
 `src/denizen.rs`: `.lua` control scripts under a step budget, bindings
-derived from the denizen's authority in `src/component.rs`), Wasm components
+derived from the participant's authority in `src/component.rs`), Wasm components
 for portable untrusted mods (the ring-gated `app-core` world, B3). A
-behavior body is whatever the denizen already runs; this plan adds no
+behavior body is whatever the participant already runs; this plan adds no
 language. Note the 2026-06 four-lane map predates the piccolo lane; the
 memory-level map should read five.
 
@@ -69,7 +74,7 @@ Every site below was read this session, not recalled.
   [`graph-kernel/src/graph/journal.rs`](../../../crates/graph/graph-kernel/src/graph/journal.rs):
   `GraphJournal` is a `codicil::Codicil<AttributedDelta>` where
   `AttributedDelta { author, delta: CapturedDelta }`; `author` is `user`,
-  a denizen subject's hex, or `pre-gate`. It carries `Seq`, `live_cursor()`,
+  a participant subject's hex, or `pre-gate`. It carries `Seq`, `live_cursor()`,
   `replay_from(since, graph)`, and `record_as(author, delta)`. A trigger
   consumer is a cursor-holding reader of this tail. Wasm-clean by its own
   module doc.
@@ -78,7 +83,7 @@ Every site below was read this session, not recalled.
   `commit_batch(author, expected, specs) -> Committed { batch: BatchId, .. }`,
   and the test `effects_enqueue_only_after_a_commit_lands` demonstrates the
   post-commit effect pattern (effects carry the batch id, enqueue only after
-  a landed commit). The nested-graph (denizen-world) side of triggering
+  a landed commit). The nested-graph (participant world) side of triggering
   follows that discipline as designed.
 - **The gate is built.**
   [`servitor/src/gate.rs`](../../../crates/servitor/src/gate.rs):
@@ -88,17 +93,17 @@ Every site below was read this session, not recalled.
   revision-checked commit. `Cap::{Power, Scope}` with segment-prefix scope
   coverage is in `cap.rs`; delegation rides personae signed certs.
 - **The runnable body and its budget exist.** turnstone
-  `src/denizen.rs`: the node IS the denizen (binding facet + nested world),
+  `src/denizen.rs`: the node IS the participant (binding facet + nested world),
   `RunDenizen { member }` runs a piccolo control script under a step budget,
   and `src/ring.rs` checks every emitted Action's ring at emission.
-  `src/component.rs` derives `ScriptCapabilities` from the denizen's
+  `src/component.rs` derives `ScriptCapabilities` from the participant's
   authority. Subjects are content-derived (`blake3(source)`), so an edited
   body is a new subject facing fresh review.
 - **The app-tier event stream exists and names this consumer.** turnstone
   [`src/observe.rs`](../../../../turnstone/src/observe.rs): `AppEvent` +
   `Snapshot`, drained each frame, with the module doc stating that later
   automation consumers "subscribe at the same drain".
-- **What does not exist:** any way for a denizen to run other than explicit
+- **What does not exist:** any way for a participant to run other than explicit
   invocation. No watch registration, no delta matching, no cascade
   discipline, no time source for behaviors. That is the whole gap, and it is
   narrow.
@@ -119,13 +124,13 @@ You cannot be woken by what you cannot read. This is where the wavelet
 brief's Trigger/Observe split actually lands, not as edge kinds on the data
 graph but as the two capability scopes of a behavior: watch = trigger, read
 beyond watch = observe. The data graphs stay declarative; agency lives
-entirely in the denizen tier.
+entirely in the participant tier.
 
 (Vocabulary: **watch** ruled by Mark 2026-08-13, recorded in
 [TERMINOLOGY.md](../../TERMINOLOGY.md).)
 
 **Which graphs a scope can name (found building W0).** Segment-prefix
-matching fits a denizen's nested world, whose node ids *are* scope paths:
+matching fits a participant's nested world, whose node ids *are* scope paths:
 the same strings `Gate::petition` already scope-checks. Mere's main graph
 keys nodes by `Uuid`, and a UUID is one opaque segment, so against that
 journal a `ScopePath` can only ever name one exact node or (via the root)
@@ -206,7 +211,7 @@ Carried over or ruled here:
 
 - No raw positions in, no positions out ("nearby" belongs to the projection
   tier or to a host-answered field query; gate-plan ruling, unchanged).
-- No watch on another denizen's grant projections (the gate already refuses
+- No watch on another participant's grant projections (the gate already refuses
   writes there; watches are refused symmetrically, so authority changes
   cannot be used as a signal channel).
 - Notifications emitted by behaviors are real or absent, never decorative
@@ -262,7 +267,7 @@ Carried over or ruled here:
   and `drain`. `App::update` now splits into `dispatch` plus the drain, so a
   woken body sees the world the action left. Woken subjects run through
   `run_denizen_for_cascade`, which is the ordinary `RunDenizen` lane by
-  another name: a behavior is a denizen whose run was triggered, and a second
+  another name: a behavior is a participant whose run was triggered, and a second
   path would mean a second set of rules. Exhaustion reports as
   `AppEvent::CascadeExhausted`, naming the residents by label.
   **The budget is a settings row (2026-08-13).** `ApplicationSettings`
@@ -302,7 +307,7 @@ Carried over or ruled here:
   so the containment law holds by construction rather than by hope.
   **The inbox rule works (2026-08-13).** A node appearing under a watched
   folder wakes its behavior with nobody asking, and the edit lands attributed
-  to the denizen rather than the user: containment derived at mint, ancestry
+  to the participant rather than the user: containment derived at mint, ancestry
   read as a scope, the watch matched, the cascade run at the drain, the body's
   Action lowered through the ordinary spine. W2 is closed except for a headed
   receipt, which the scenario lane can capture whenever it is wanted. The
@@ -312,7 +317,7 @@ Carried over or ruled here:
   rule** (a node appearing under a watched scope is filed/tagged by
   petition). Done when: the install review screen shows the watch beside
   the rings before anything is granted; the inbox rule runs headed; its
-  edit is attributed in the inspector; and uninstalling the denizen removes
+  edit is attributed in the inspector; and uninstalling the participant removes
   the watch with it.
 - **W2.5: containment is only derived on load. RULED (option 1) and LANDED
   2026-08-13.** `Graph::derive_containment_for` asserts a new node's URL-path
@@ -438,7 +443,7 @@ not automation).
 ## 6. Non-goals
 
 - Operative edges or edge-kind variants in any data or display graph. The
-  2026-08-13 brief's retraction stands; agency lives in denizens.
+  2026-08-13 brief's retraction stands; agency lives in participants.
 - A general scheduler. The cascade runner is a bounded drain loop; wavelet's
   depth machinery waits for evidence of need.
 - New scripting languages or lanes. rhai / piccolo / wasm as placed.
@@ -450,7 +455,7 @@ not automation).
 
 ## 7. Rulings (all three open questions closed 2026-08-13)
 
-1. **The noun is watch.** Recorded in TERMINOLOGY.md beside denizen and
+1. **The noun is watch.** Recorded in TERMINOLOGY.md beside participant and
    petition.
 2. **Watches are reviewed at install**, in the pack manifest beside the
    rings; post-install additions are widenings and re-review (folded into
@@ -460,7 +465,309 @@ not automation).
    one clause: changing the setting takes effect on the next cascade
    without a restart.
 
+## 8. Servitor resident and run redesign (2026-09-20)
+
+**Status:** proposed design, grounded in current consumers. The user reopened
+crate boundaries after the procedural-graphs discussion; this section records
+the recommended design rather than treating the old boundaries as fixed.
+*Participant* names admission through the gate; *servitor* names a resident
+helper. *Denizen* belongs to the Isometry simulation family.
+
+### 8.1 Findings and the boundary to move
+
+The current `crates/servitor/src/lib.rs` exports authority, watch, tick,
+cascade and deadband primitives. The cascade's runner closure leaves body
+execution to the host. Turnstone's `turnstone/src/denizen.rs` owns resident bindings and
+reconstruction; `turnstone/src/app/denizen_arms.rs` selects a script/component, evaluates
+it, applies the deadband, and lowers returned actions. Its
+`turnstone/src/app/palette.rs` attributes those actions to the participant. These are
+real script consumers, not proof of a durable model-driven run.
+
+Move **the meaning and state of a resident run** into Servitor: its cause,
+version bindings, decision/effect sequencing, pause and termination reasons,
+budgets, and procedure adoption. The host supplies observation, execution,
+persistence, and product actions through explicit adapters. A pure reducer
+consumes recorded inputs and produces requests; it does not own a thread or
+perform I/O. Armillary can drive it, as can a deterministic scenario harness.
+
+Two recovery seams need attention before resumable automation: Turnstone's
+`turnstone/src/behaviors.rs` advances the graph cursor before running bodies, and
+`turnstone/src/denizen.rs` (`rebuild`) can reissue certificates from grant projections when
+stored chains do not verify. The latter was written for historical install
+and profile migrations; it must not become the recovery rule for a paused or
+revoked resident. New lifecycle/authority records must make those cases
+distinguishable before R1 admits resumed work.
+
+| Owner | Responsibility after the proposed change |
+| --- | --- |
+| Servitor | Resident and run records; trigger/run coordination; procedure schema and local retrieval; optional guidance protocol; candidate evaluation requirements and adoption rules |
+| Servitor authority modules | Existing participant checks and Chartulary petition adapter, independently callable by scripts and peers |
+| Personae / capability | Identity, signed delegation, revocation and permission algebra |
+| Chartulary / Eidetic | Graph and journal primitives, artifact storage, provenance and retrieval substrates; Servitor defines its record semantics |
+| Armillary | Actor threads, channels and message delivery; Servitor decides whether retrying or accepting a late result is valid |
+| ESP | Model execution and provider-specific streaming/cancellation; it supplies neither resident authority nor run policy |
+| Host / Djinn | Product registry and effect handlers, graph adapters, installation, settings, process lifetime and storage composition |
+| Distillery | Optional compute for refinement/evaluation jobs; the resident's owner determines the adoption policy |
+
+Start with module boundaries in the existing Servitor crate. Authority-only
+consumers such as Gemot and document-host must not acquire an ESP, model,
+thread-runtime or host dependency. Feature-gate integration adapters if they
+become necessary. Extract another crate only when dependency direction or a
+real independent consumer requires it; the reassigned `denizen` name is not
+available for this platform work.
+
+### 8.2 Separate identity, definition and execution
+
+Proposed concepts below are illustrative schema names, not implemented APIs:
+
+| Record | Meaning |
+| --- | --- |
+| `ResidentId` | One installed helper instance in its owning space |
+| `Subject` | Authority principal supplied by the existing admission path |
+| `BodyRef` / `ProcedureRef` | Immutable, versioned behavior artifacts that may be shared by many residents |
+| `ResidentBinding` | Resident, subject, selected artifact versions, settings and owner-approved adoption policy |
+| `RunId` / `StepId` | One invocation and its ordered work, distinct from the resident and authority principal |
+| `RunRecord` | Cause, pinned versions, observed inputs/results, outstanding requests, resource usage and current disposition |
+
+Turnstone currently hashes the installed pack bytes into `Subject` in
+`turnstone/src/denizen.rs` (`stage_install`); editing a pack therefore creates a different
+subject and demands fresh grant review. This is a migration constraint, not a
+reason to silently preserve authority across arbitrary code changes. Import
+existing subjects and bindings unchanged. A future stable resident ID is an
+additional instance identity, never a substitute signing key. Binding an
+updated body or procedure is a separate authorized, version-checked adoption
+event; its policy explicitly decides whether existing grants suffice.
+Eidetic's existing `PackManifest` already separates author, version and content
+IDs. Reuse that artifact provenance; a publisher's signature does not itself
+identify the installed resident or confer its grants. Typed trigger declarations
+belong in a versioned descriptor, with adapters for today's Lua annotations;
+do not copy Turnstone's URL/app-source parsing into Servitor.
+
+Two residents may use one procedure artifact while retaining different
+subjects, scopes, settings, histories and current steps. A run pins the
+body/procedure versions and relevant settings at start. Grant validity remains
+live: pause/resume does not freeze permission, and every consequential dispatch
+must recheck current authority and product preconditions.
+Wake/run routing uses resident IDs separately from subjects: Turnstone's current
+`turnstone/src/behaviors.rs` (`member_of`) searches for a resident by subject, so identical
+packs can make that lookup ambiguous. Import must explicitly bind the instance
+or refuse ambiguity rather than select an arbitrary HashMap entry.
+
+### 8.3 The run contract
+
+Use explicit states for ready, deciding, awaiting a host result, paused,
+reconciling an uncertain effect, and terminal. Completion, refusal, cancellation,
+failure and budget exhaustion are distinct recorded terminal reasons. A wake
+records manual invocation, journal identity plus matched sequence positions,
+or a host-clock tick; sequence numbers alone cannot identify a source across
+journals. A resident's overlap setting chooses reject, queue or coalesce;
+queued/coalesced causes are recorded and ordered, with bounded queue size.
+Pausing a resident is distinct from pausing one run or revoking its authority.
+The owner chooses whether wakes during resident pause are skipped with a
+recorded summary or accumulated in a bounded queue. Cursor advancement and
+the corresponding disposition must be durably associated. Reloading a watch
+does not prove its current read authority; recheck before collecting context
+as well as before writing or dispatching an effect.
+
+Each outbound request carries run ID, step ID, attempt and binding generation.
+The reducer rejects duplicate, stale and post-cancellation results. Cancelling
+requests cooperative provider shutdown and prevents further dispatch; it does
+not claim that a running external operation was undone. Armillary's channel
+closure alone is not a receipt that a model call has stopped.
+
+Record intent before dispatch and the actual result afterward. Host adapters
+declare whether an operation is read-only, deduplicated by a stable operation
+ID, or needs reconciliation when its outcome is unknown. Replay reconstructs
+state from recorded results; it must not resend effects. A crash between an
+external effect and its receipt enters reconciliation, never blind retry.
+This requires host commit/effect integration, not merely a transcript writer.
+The current Chartulary `Gate` applies nested-graph edits; it cannot authorize
+or atomically commit every Turnstone or external action by itself.
+Run attribution must accompany each commit. Turnstone's synchronous lowering
+temporarily changes the journal's current author; carrying that mutable author
+context across asynchronous waits would misattribute concurrent work.
+
+Durable owner decisions and verified certificate/revocation evidence are
+distinct from their graph projections. Reopening a suspended or revoked resident
+must preserve that disposition. Legacy recovery needs explicit migration
+provenance and must never treat an unverifiable chain or readable grant
+projection alone as permission to issue fresh authority.
+
+Budgets cover decisions, model tokens, tool calls, elapsed host time and
+consecutive failures, with counters surviving pause/restart. Resume checks the
+current binding, authority and cancellation state. The host supplies time and
+observations for deterministic replay. Cascades continue to limit reactions
+between residents; a run budget limits work inside one invocation. Slow model
+work must yield rather than hold a synchronous cascade drain open; completion
+returns as a recorded event for a later bounded drain.
+
+### 8.4 Procedures and revision
+
+The [Procedural Graphs paper](https://arxiv.org/html/2609.09153v1) motivates
+local procedural retrieval, guidance during a run, and evaluated revision
+between runs. Its graph is frozen while solving, and its edges provide advice
+to the solver. This design borrows that separation; the following typed
+contracts and authority rules are our adaptation, not claims from the paper.
+
+A proposed `ProcedureGraphV1` contains stable nodes for registered actions,
+observable checks and task states; edges carry condition, guidance and pitfall
+annotations. Registry IDs and schema versions are validated at binding and
+use. Typed checks name host-provided predicates; free-form condition text is
+advice and cannot become an executable permission check. Procedure progression
+and success conditions must cite observations/results, not a model's assertion
+that it succeeded. Localize by typed action/result references; an unmatched
+state is explicit. Retrieval depth, history window and token cap are settings,
+with a bounded fallback when localization fails.
+
+The procedure graph is optional. A scripted driver and a model-guided driver
+share the run contract. The latter may choose an authorized action beyond the
+suggested neighborhood; graph edges are not a replacement permission system.
+Invoking a reusable subprocedure shares the parent's budget and authority
+ceiling, and has a bounded recursion depth. Record the retrieved artifact and
+guidance used so the decision can be inspected without rerunning inference.
+
+Refinement creates an inert candidate artifact citing its base version and
+supporting runs. Servitor defines a versioned evaluation request and result
+schema: task/fixture set, provider and registry identities, settings, success,
+refusal, repetition and resource measurements. Distillery may execute it;
+Eidetic retains evidence. The host's adopted policy chooses explicit review or
+bounded automatic adoption with declared thresholds. Compare-and-adopt checks
+the current binding version, evidence applicability and adoption authority.
+Rejection remains recorded; a delayed result cannot overwrite a newer adopted
+version. Active runs keep their pinned versions. Adoption cannot rewrite grants
+or bypass the independently enforced authority path.
+
+### 8.5 Implementation slices and done-conditions
+
+1. **R1a: resident binding and run admission.** Add inert resident/revision,
+   lifecycle, trigger and run-ticket contracts. Adapt Turnstone's existing
+   resident lookup and one scenario lane. Prove unique instance routing,
+   explicit pause/backlog disposition, current read/write authority and legacy
+   identity preservation. Persist revocation/lifecycle evidence so reopening
+   cannot revive denied work. This slice adds no new external-effect replay.
+2. **R1b: shared run reducer and outcomes.** Drive the contract with the scenario
+   adapter and a deterministic provider fixture. Prove bounded work, cancellation,
+   stale-result refusal, per-commit attribution, durable intent/result ordering
+   and replay without repeat effects. Exercise uncertain-outcome reconciliation
+   before enabling resumable external effects. Existing authority consumers
+   remain usable without model/runtime features through both R1 slices.
+3. **R2: optional procedural guidance.** Add artifact validation and bounded
+   local retrieval. Two residents reuse the same version with different grants
+   and independent progress. Compare flat context with procedural guidance on
+   the same task set; record success, invalid/repeated actions, steps, tokens
+   and latency. Invalid action IDs and fabricated completion fail closed. A
+   live ESP provider supplies a measured receipt before claiming model benefit.
+4. **R3: evaluated adoption.** Create candidates from recorded failures,
+   evaluate on separately held-out tasks, and exercise both rejection and
+   owner-authorized adoption. Prove evidence/version mismatch refusal, adoption
+   races, unchanged active-run versions, and cancellation/revocation while
+   evaluation is outstanding. Never claim statistical improvement from one
+   deterministic fixture or reuse validation tasks as the final test set.
+
+R1a and R1b are the current source implementation slices. R2/R3 describe the extension
+points it must leave available, not requirements to implement all learning
+machinery before one resident runs. Executable gates remain pending the user's
+existing Cargo and process hold.
+
+### 8.6 R1a source implementation and remaining gates
+
+Servitor's `resident` module carries host-supplied instance, principal, body
+revision, generation, lifecycle and trigger values. Admission checks the current
+authority provider. A ticket retains the original required capabilities;
+revalidation checks those requirements as well as any new ones and refuses a
+changed binding. The ticket is a snapshot. Hosts still authorize each action.
+
+Turnstone owns the session lifecycle sidecar and adapts its existing resident
+execution path. The first backlog policy is skip while paused, with a persisted
+count; resuming does not replay skipped triggers. Lifecycle state and delegation
+certificates remain separate from browsable grant projections. Reopening must
+not turn a missing certificate or a malformed lifecycle record into fresh
+authority. Forks remap instance IDs while carrying lifecycle state; copying a
+resident's graph does not itself delegate permission in the child session.
+Reversible node archival retains that lifecycle state for recovery. Uninstall
+records revocation; recovery cannot turn a revoked record back into active state.
+Installation records denial before writing reviewed certificates and publishes
+active state last, so a failed transition leaves work denied.
+
+Component hosting accepts held bytes so the body whose revision was checked is
+the body instantiated. This is an adapter improvement within the existing
+component lane, not a new effect or model runtime.
+
+**Validation and source identity:** unit and consumer regression tests are
+source changes awaiting execution. Static review cannot establish compilation,
+headed behavior, crash recovery or physical power-loss durability. Turnstone's
+existing `.cargo/config.local.toml` and `scripts/cargo_mode.py local` provide
+the sibling-source development lane; neither Cargo nor that launcher was run.
+The portable manifest pins and lockfiles still name the older Mere revision.
+Before portable acceptance, commit the shared sources, align the Mere dependency
+family to one revision, regenerate locks through Cargo, then execute focused
+Servitor and Turnstone gates after the hold is lifted. Do not hand-author a lock
+receipt or mix old and new shared authority types across source identities.
+
+R1b extends admission with durable run intent and outcomes, cancellation,
+stale-result refusal and uncertain-effect reconciliation. Passing admission alone
+does not make retries or interrupted external effects safe.
+
+### 8.7 R1b implementation boundary
+
+The portable run reducer owns deterministic state transitions over recorded
+events. Its header retains the admitted ticket, a host-assigned run ID, starting
+time and budget limits. Correlations name run, step, attempt and binding
+generation. The host also supplies the run-ID namespace, such as the session;
+a numeric run ID alone cannot identify work across sessions. Applying history
+reconstructs state and counters. It does not return executable actions or retry
+commands.
+
+Run limits are host inputs. Intents consume positive decision charges; the
+consumer measures elapsed time and reserves capacity for recording returned
+effects. Observed usage can exceed a limit, and its receipt remains recordable.
+This accounting does not preempt a synchronous evaluator: existing script
+instruction and component runtime bounds remain separate execution controls.
+
+Intent precedes evaluation or application dispatch. Observed results follow it.
+Cancellation denies further work while retaining unresolved consequential
+operations. Recovery of an interrupted consequential operation requires explicit
+reconciliation; neither a restart nor elapsed budget is evidence that an effect
+failed or was undone. The deterministic provider fixture exercises the protocol
+without a model backend. Executable receipts remain pending the Cargo hold.
+
+Turnstone must distinguish three observations: a synchronous application action
+was applied, an effect was handed to a port, and that effect actually completed.
+In particular, `Effect::SaveSession` is a request to the shell; the existing
+best-effort save path is not a durable graph-commit acknowledgement. A durable
+run record can preserve the observation of a local action without certifying
+that the corresponding graph snapshot reached disk.
+
+The first adapter records synchronous invocations and labels returned effects
+as released for untracked handoff by default. That preserves ordinary repeated helpers
+without inventing external completion evidence. Strict effect tracking is an
+explicit host option: unresolved consequential work blocks another invocation
+of the same resident until the host records a resolution. Cancellation alone
+does not settle that uncertainty. Run records retain references and dispositions,
+not copies of document bodies or credentials. Configurable storage limits refuse further work
+rather than silently discarding unresolved records. The run store remains live
+through nested cascades; interruption recovery occurs only on session adoption.
+Forks start a fresh run namespace. These controls currently enter through host
+configuration APIs; a new settings UI is not part of this slice.
+
+**Remaining acceptance boundaries:** portable dependency pins, compilation and
+regression execution remain held. Correlated port completion callbacks and a
+fallible graph-persistence acknowledgement are still required before claiming
+end-to-end durable effects. R2 procedural guidance and R3 evaluated adoption
+remain subsequent slices; they must not infer successful actions from a model's
+text or a queued port request.
+
 ## Progress
+
+- 2026-09-20: reviewed current Servitor/Turnstone consumers and proposed the
+  resident/run redesign in section 8. Separated principal, instance and artifact
+  versions; assigned run semantics to Servitor and execution mechanics to
+  adapters. R1a source implementation and adapter work followed in the same
+  pass; see section 8.6 for the pending validation and dependency gates. R1b
+  followed with the shared event reducer, session-owned run sidecar, correlated
+  reconciliation and source regressions; section 8.7 records its boundaries.
+  Static review and the incremental documentation audit passed. The new tests
+  have not run under the Cargo hold.
 
 - 2026-08-18 (frequency bound / signaling target 3 complete): deadband belongs
   to **actuation**. Suppressing a watch cannot protect the journal from a
@@ -492,7 +799,7 @@ not automation).
   costs more here than in an ordinary reactive system, because the graph is the
   replay of the journal: an oscillating behavior writes history, so load and
   replay stay inflated after the behavior is fixed or deleted, and deleting the
-  denizen does not shrink the journal it wrote. Suggested shape is a **declared
+  participant does not shrink the journal it wrote. Suggested shape is a **declared
   deadband** (a minimum change, a minimum interval) on the behavior rather than
   discipline each modder reinvents correctly, which also fits the existing
   posture that the budget is a setting with no unlimited value. Closed

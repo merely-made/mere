@@ -113,6 +113,41 @@ async fn attached(granted: Vec<&'static str>) -> AppScript<StubGate> {
     script
 }
 
+async fn attached_bytes(
+    bytes: &[u8],
+    granted: Vec<&'static str>,
+) -> AppScript<StubGate> {
+    let engine = Engine::default();
+    let mut script = AppScript::attach_bytes(
+        &engine,
+        bytes,
+        StubGate::new(granted),
+        vec!["mere:script/actions".to_string()],
+        StoreLimits::default(),
+        None,
+    )
+    .await
+    .expect("the guest instantiates from supplied bytes");
+    script.activate().await.expect("activate");
+    script
+}
+
+#[tokio::test(flavor = "current_thread")]
+async fn supplied_fixture_bytes_run_after_the_source_is_detached() {
+    let bytes = std::fs::read(guest_component()).expect("read guest component once");
+    let mut script = attached_bytes(&bytes, vec!["navigate"]).await;
+    drop(bytes);
+
+    script
+        .on_event("browse", "https://example.test/bytes")
+        .await
+        .expect("turn runs from detached bytes");
+    assert_eq!(script.sink().accepted.len(), 1);
+    assert_eq!(script.sink().accepted[0].0, "open-address");
+    assert!(script.sink().accepted[0].1.contains("https://example.test/bytes"));
+    script.deactivate().await.expect("deactivate");
+}
+
 #[tokio::test(flavor = "current_thread")]
 async fn granted_emissions_queue_for_lowering() {
     let mut script = attached(vec!["navigate", "dispatch"]).await;
