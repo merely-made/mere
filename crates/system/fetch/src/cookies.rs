@@ -66,6 +66,7 @@ pub fn session_stores() -> &'static Stores {
         cache: Arc::new(netfetcher::NoHttpCache),
         hsts: Arc::new(Forgetful),
         alt_svc: Arc::new(Forgetful),
+        transport: None,
     })
 }
 

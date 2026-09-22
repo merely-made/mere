@@ -89,7 +89,8 @@ with no local cargo config. Pushes need Mark's sign-off.
   host can run http and https alone), `persona-cookies` (eidetic, pandect),
   `flip` (inker's cookie export).
 - **D4. A caller-supplied store set.** The handle is built from a set the host
-  owns (jar, cache, HSTS, Alt-Svc). The fetch crate does not decide what a scope
+  owns (jar, cache, HSTS, Alt-Svc, and since 2026-09-22 the transport, so the
+  privacy lanes and a test double reach a handle). The fetch crate does not decide what a scope
   is; Turnstone keys its sets by persona now and by the full profile binding
   later, and standalone Redshank passes one.
 - **D5. Lanes T2 and T3 stay in this plan,** after Redshank's reader lands.
@@ -153,3 +154,8 @@ so that it can answer a range from a stored body. The page-side media element.
     (`c0463e98`, `ba4f4951`, `e35898d1`). Lanes R, T and I pin from here; their
     pin moves belong with the [lattice sync pass](2026-09-16_lattice_sync_pass_plan.md),
     which owns cross-repo revisions.
+- **2026-09-22:** `Stores` gains a `transport` slot (`None` is netfetcher's
+  direct HTTP). Found in the R3 assessment: without it the reachability plan's
+  I2P and Arti lanes, which plug into netfetcher's transport seam, could not
+  reach a handle. Test: a supplied wire is what the handle sends through, with a
+  `NoTransport` control. 19 tests by default, 8 with defaults off, Clippy clean.

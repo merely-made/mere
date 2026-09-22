@@ -15,7 +15,7 @@ use std::time::Duration;
 use netfetcher::{
     AltSvcStore, CacheMode, CookieRecord, CookieStore, FetchContext, HstsStore, HttpCache,
     InMemoryAltSvc, InMemoryCookieJar, InMemoryHsts, InMemoryHttpCache, Request, Response,
-    SameSiteContext, StoredResponse,
+    SameSiteContext, StoredResponse, Transport,
 };
 use tokio::runtime::Runtime;
 use url::Url;
@@ -130,6 +130,10 @@ pub struct Stores {
     pub cache: Arc<dyn HttpCache>,
     pub hsts: Arc<dyn HstsStore>,
     pub alt_svc: Arc<dyn AltSvcStore>,
+    /// The wire every fetch in this scope goes through: where a proxy, an
+    /// onion or garlic lane, or a test double plugs in. `None` is netfetcher's
+    /// default, direct HTTP.
+    pub transport: Option<Arc<dyn Transport>>,
 }
 
 impl Stores {
@@ -140,6 +144,7 @@ impl Stores {
             cache: Arc::new(InMemoryHttpCache::new()),
             hsts: Arc::new(InMemoryHsts::new()),
             alt_svc: Arc::new(InMemoryAltSvc::new()),
+            transport: None,
         }
     }
 
@@ -150,6 +155,9 @@ impl Stores {
         context.cache = Arc::new(Shared(self.cache.clone()));
         context.hsts = Box::new(Shared(self.hsts.clone()));
         context.alt_svc = Box::new(Shared(self.alt_svc.clone()));
+        if let Some(transport) = &self.transport {
+            context = context.with_transport(transport.clone());
+        }
         context
     }
 }
