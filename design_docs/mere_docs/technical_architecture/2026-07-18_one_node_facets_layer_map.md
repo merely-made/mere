@@ -95,9 +95,9 @@ what remains is Container.
 
 ## 4. What this session already proved on-seam
 
-- The denizen binding (mere `953bf09`) is a facet in all but name: host
+- The participant binding (mere `953bf09`) is a facet in all but name: host
   knowledge keyed by node id, sidecar beside the graph, kernel Node untouched.
-- Denizens are Container residents (servitor `1af0c91` over chartulary
+- Participants are Container residents (servitor `1af0c91` over chartulary
   nesting), which is the end-state shape, no migration awaiting them.
 - The pack schema round already chose schema engrams as the extension
   mechanism; ruling 3 reuses that decision rather than adding a second one.
@@ -122,7 +122,7 @@ what remains is Container.
    cross-vault queries, p2p share/cooperate.
 
 The participant-gate lane continues in parallel on the current seam (turnstone
-palette + install next); nothing above blocks it, and denizens already sit on
+palette + install next); nothing above blocks it, and participants already sit on
 the end-state side of every line drawn here.
 
 ## 6. Open questions
@@ -139,7 +139,7 @@ the end-state side of every line drawn here.
 3. **Migration mechanics** for existing graphs (rkyv snapshots + journal
    history through the dissolution ladder); the prod-journal window and the
    B0.5 envelope migration are prior art.
-4. **CLOSED 2026-08-18: facet grants.** Which facets a denizen may read or write is a gate
+4. **CLOSED 2026-08-18: facet grants.** Which facets a participant may read or write is a gate
    scope question (the structural cap's path vocabulary may want a facet
    dimension); connects to the participant plan's ability-axis note.
    **Shaped 2026-08-16** by the

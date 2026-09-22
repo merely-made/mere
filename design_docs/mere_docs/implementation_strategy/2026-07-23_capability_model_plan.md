@@ -176,7 +176,7 @@ The user is currently an implicit, infinite authority and install "writes some
 grants". Model the user as a root subject and the picture collapses into one
 mechanism:
 
-- the **visible review is an attenuating delegation** from user to denizen;
+- the **visible review is an attenuating delegation** from user to participant;
 - **expiry** is a delegation with a bound;
 - **revocation** is severing a delegation.
 
@@ -232,7 +232,7 @@ revocation records. It keeps: `Cap`, the encoding, a rooted table that
 verifies chains through personae, and the `AuthorityProvider` seam.
 
 This also makes OQ3 (moot unification) nearly free rather than a project:
-gemot already speaks these certificates, so denizen and moot authority are one
+gemot already speaks these certificates, so participant and moot authority are one
 system with two consumers.
 
 ### D4. Revocation cascades, lazily
@@ -243,7 +243,7 @@ immediately, by construction, with no marking pass and no partial state to get
 stuck in.
 
 The alternative (orphans stay valid until their own expiry) means revoking a
-compromised pack leaves its sub-denizens running, which is precisely the case
+compromised pack leaves its delegated participants running, which is precisely the case
 revocation exists for. Lazy evaluation costs a walk per check; at this scale
 that is free, and the walk result caches per rebuild.
 
@@ -256,7 +256,7 @@ signature untouched so gemot's mirror-shaped seam is unaffected. Expired means
 not covered.
 
 Known window: a grant expiring mid-session is not noticed until the next
-`set_now`. Turnstone sets it at every denizen run, which is the only moment
+`set_now`. Turnstone sets it at every participant run, which is the only moment
 authority is consulted, so the window is not observable there. Any future
 consumer that holds authority across long idles must tick it.
 
@@ -267,7 +267,7 @@ with `media_type` naming the record schema so a reader knows the parse.
 `Container` has no arbitrary payload field, and the alternatives are worse: the
 title is a display string (F3 is what that abuse costs), and content-addressing
 the record as a muniment blob would make `rebuild` require a blob store to
-answer "what may this denizen do".
+answer "what may this participant do".
 
 ```text
 id:         grant:power:navigate
@@ -280,7 +280,7 @@ Every field round-trips; nothing is reconstructed by guess. The record stays
 browsable from the graph, which is the property that made projections the
 authority record in the first place.
 
-A denizen's own outgoing delegations are a *different* record kind
+A participant's own outgoing delegations are a *different* record kind
 (`delegation:<id>`), so "what I hold" and "what I gave away" never share a
 namespace.
 
@@ -315,7 +315,7 @@ namespace.
   `GrantTable` to `DelegationTable`; the root subject comes from the active
   personae identity (OQ2); install issues attenuating root delegations instead
   of flat grants; re-review replaces-and-cascades (OQ1); the Uninstall row
-  beside Run severs. **Done when** severing stops a denizen's whole subtree,
+  beside Run severs. **Done when** severing stops a participant's whole subtree,
   receipted headed: install, run, uninstall, run-refused; and a pre-round
   session still heals.
 
@@ -325,7 +325,7 @@ namespace.
 ## Open questions
 
 1. **RULED (Mark, 2026-07-24): replace and cascade.** A re-review that asks for
-   more replaces the denizen's old root delegations rather than sitting beside
+   more replaces the participant's old root delegations rather than sitting beside
    them: the old set is severed (cascading to any onward delegations made under
    it) and the new set issued. The old chain described a capability set the user
    has now explicitly reconsidered, so keeping it live would be authority the
@@ -411,7 +411,7 @@ are not lost, ordered by how much they matter.
 
 3. **The re-root heal's safety is load-bearing on the projection guard.**
    `denizen::rebuild` re-issues authority from the grant projections in a
-   denizen's own world. A denizen cannot forge one *because* `Gate::petition`
+   participant's own world. A participant cannot forge one *because* `Gate::petition`
    refuses any spec touching the reserved `grant:` namespace, and the heal
    additionally filters projections by subject. Recorded as an invariant: if
    the projection guard ever weakens, the heal becomes an escalation path.
@@ -503,12 +503,12 @@ are not lost, ordered by how much they matter.
   caller" was true only of the `MootAuthorizationProvider` trait; the
   delegation machinery beneath it is fully wired. OQ3's unification is
   therefore much closer than that note implied.
-- **C4 LANDED.** turnstone's denizen authority is now signed delegation.
+- **C4 LANDED.** turnstone's participant authority is now signed delegation.
   - **The root identity**: `turnstone::identity` loads-or-creates a persisted
     Ed25519 master seed in the profile (`<data_root>/identity/master.key`).
     Persistence is load-bearing, not a nicety: every install certificate names
     this key as its root, so a key that changed across restarts would fail
-    every chain as `WrongRoot` and silently un-authorize every denizen. The
+    every chain as `WrongRoot` and silently un-authorize every participant. The
     seed sits **unsealed** for now; personae's `IdentityVault` (sealed, where
     the SSH key already lives) implements the same `IdentityProvider` trait,
     so the swap is a constructor change once turnstone has an unlock path in the
@@ -520,7 +520,7 @@ are not lost, ordered by how much they matter.
     (`denizens/<subject>.certs.json`); the browsable grant projections stay as
     the human-readable audit record of the same facts.
   - **Uninstall revokes**: `Action::UninstallDenizen` calls
-    `revoke_root_grants` (cascading to anything the denizen delegated onward),
+    `revoke_root_grants` (cascading to anything the participant delegated onward),
     removes the binding facet, drops the runtime entry, and deletes the
     certificate file so a later adopt cannot resurrect revoked authority. The
     node and its world are untouched — revoking authority destroys nothing.
@@ -565,7 +565,7 @@ are not lost, ordered by how much they matter.
     seam parses the request's `capability_path` as a servitor `Cap` at the
     boundary (D2's rule) and answers it from the moot's own delegation
     certificates through the same `power/...`/`scope/...` encoding the
-    denizen tier writes. `MootGroup`'s membership impl was path-blind (any
+    participant tier writes. `MootGroup`'s membership impl was path-blind (any
     Write member covered every capability); the typed provider composes
     membership facts from any inner provider with per-path delegated
     coverage. Typed means typed: no silent bridge between vocabularies — a
@@ -580,7 +580,7 @@ are not lost, ordered by how much they matter.
   - **The peer lane landed too**, closing the round with nothing deferred.
     `TypedMootAuthorization` answers gemot's own seam; its sibling
     **`MootAuthority` implements `servitor::AuthorityProvider`**, presenting
-    the same moot certificates to the denizen gate. So a moot peer petitions a
+    the same moot certificates to the participant gate. So a moot peer petitions a
     shared graph through the SAME `servitor::Gate` a script or component uses
     — same projection guard, same scope check, same attributed
     revision-checked commit — differing only in where the chain roots. The
@@ -603,7 +603,7 @@ are not lost, ordered by how much they matter.
   asks for a **facet-namespace kind** with prefix coverage, beside Power
   (equality) and Scope (segment prefix). The gate already scope-checks
   `SetFacet` and `RemoveFacet` by node id, so today it governs which nodes a
-  denizen may touch but not which facet namespaces it may write: a write grant
+  participant may touch but not which facet namespaces it may write: a write grant
   on `trail/` also permits writing `denizen.binding` and `web.*` on those
   nodes. This closes the one-node layer map's open question 4, which had asked
   only whether the path vocabulary "may want a facet dimension".
@@ -636,7 +636,7 @@ are not lost, ordered by how much they matter.
   touch nodes inside the petition's claimed `ScopePath`, and now also require a
   covering facet capability at `Mode::Write`; an unparseable facet id fails
   closed as `UnauthorizedFacet`. Existing installs are not widened or broken:
-  no current denizen petition writes facets, and a future facet writer must ask
+  no current participant petition writes facets, and a future facet writer must ask
   for an explicit reviewed grant. Receipts: `mere-capability` 8/8, servitor
   54/54, gemot 112/112 (including typed authorization 9/9), Turnstone's focused
   signed-install / uninstall-revocation test 1/1, and touched-package Clippy

@@ -58,7 +58,7 @@ impl Guest for Component {
         log(&format!("guest: event '{kind}'"));
         match kind.as_str() {
             // The default turn a host drives: one action from each ring, so a
-            // single run shows exactly where this denizen's grant stops.
+            // single run shows exactly where this participant's grant stops.
             "run" => {
                 try_emit("open-address", "{\"url\": \"mere://kept/note\"}");
                 try_emit("fit-view", "");
@@ -70,7 +70,7 @@ impl Guest for Component {
                 try_emit("open-address", &format!("{{\"url\": \"{payload}\"}}"));
                 try_emit("fit-view", "");
             }
-            // An action in a ring this denizen was not granted.
+            // An action in a ring this participant was not granted.
             "reach" => try_emit("close-session", ""),
             // Gate management: no grant can ever cover it. A component that
             // could confirm its own install review would be self-escalating.

@@ -202,7 +202,7 @@ whole-document tiebreak.
   embeddings invert. Queries are served in-process by the unlocked endpoint
   under grants, so agents keep the cheap read path: one unlock at startup,
   zero marginal crypto per query, and selectivity is a grant scope rather
-  than a second crypto tier (a denizen with a vault-scoped grant gets vault
+  than a second crypto tier (a participant with a vault-scoped grant gets vault
   hits; one without gets disk hits only). Tests span both lanes, prove grant
   selectivity, assert sealed index bytes, and remove vault hits on lock.
 - **K5. Sync. Complete locally 2026-07-27.** Knot supplies its own encrypted

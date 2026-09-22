@@ -202,7 +202,7 @@ up, per the burn brief's own rule.
   registry, lease lifecycle, checkpoint/result facts; **host scheduler** =
   foreground priority, device selection, render-vs-compute budget, reclaim;
   **murm** = the shared iroh endpoint and Router; **servitor::Gate** = whether
-  an admitted denizen may petition the graph at all. Burn's `PeerAuthorizer`
+  an admitted participant may petition the graph at all. Burn's `PeerAuthorizer`
   is session admission, not job authorization; the opaque credential it checks
   may carry a mesh lease reference, but mesh enforces scope, expiry, and
   reclaim locally. (This said `RemoteTicket` until 2026-08-10; no such type
@@ -264,16 +264,19 @@ up, per the burn brief's own rule.
   (tessera-shaped credit, T0-T3 verification) that the resource-coordination
   briefs own.
 
-**The consumer shape.** The servitor crate is a headless identity, capability,
-and petition gate (six consumers: commons-spine, document-host, gemot, knot,
-turnstone, cleromancy); it is not an inference runtime, and this plan gives it
-no new role. The composition is the point: an admitted denizen may be hosted
-by armillary, use an esp model session, retain artifacts through eidetic, and
-petition through `servitor::Gate`. The application host composes those organs;
-none of them owns the resident. That composition is what "harnessing models"
-completes into: not a chat box, a bounded resident with a scoped faculty. The
-thoughtform words (servitor, tulpa, egregore) stay product language, not a
-runtime type hierarchy.
+**The consumer shape (reviewed 2026-09-20).** Servitor currently supplies
+participant authority plus watch, tick, cascade and deadband primitives.
+The [resident/run redesign](2026-08-13_graph_behaviors_plan.md#8-servitor-resident-and-run-redesign-2026-09-20)
+additionally assigns it portable resident/run semantics and optional
+procedural guidance. This supersedes the earlier claim that none of these
+organs should own the resident. R1a admission, the R1b reducer and the Turnstone
+adapter have source implementations with static review; executable validation
+and the consumer pin remain pending. Procedural guidance remains planned. ESP keeps
+model execution, Armillary supplies actor mechanics, Eidetic stores artifacts,
+and the host binds product actions, settings and process lifetime. Existing
+authority-only consumers must not acquire model or actor dependencies through
+this extension. ESP's own implementation and receipts are unchanged by the
+proposal.
 
 **Sequence after E4:** steps 1 through 5 have executable prerelease receipts:
 M2's versioned namespace and registry, M3's lease projection and owner reclaim,

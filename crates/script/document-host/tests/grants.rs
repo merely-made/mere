@@ -53,7 +53,7 @@ fn granted_names_reflect_the_grant() {
 }
 
 /// The one-grant unification (participant gate B3): the SAME servitor
-/// authority a denizen's gate consults derives this world's import grant.
+/// authority a participant's gate consults derives this world's import grant.
 /// A subject whose caps cover doc/ instantiates; a subject granted only its
 /// scenario world fails at instantiation — unimported means unreachable,
 /// decided by the one grant.

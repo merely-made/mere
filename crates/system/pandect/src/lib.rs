@@ -62,7 +62,7 @@ pub mod browser_node_state;
 // / page_scale) in facets.json, replacing the bespoke browser_nodes.json
 // document.
 pub mod web_facets;
-// The denizen.* facet namespace: which graph nodes are denizens (servitor /
+// The denizen.* facet namespace: which graph nodes are participants (servitor /
 // agent / peer / scenario / pack) and where each one's nested graph lives —
 // a facet bundle on the node, in facets.json. Supersedes the transitional
 // denizen_bindings.json sidecar (removed before any host wrote one).
@@ -73,7 +73,7 @@ pub mod device_settings_store;
 pub mod shared_root;
 // Per-node facet-store sidecar (facets.json): the runtime tier of the one-node
 // facet system — typed per-node metadata keyed by node UUID, persisted beside
-// graph.json. The durable home the bespoke per-node sidecars (browser/denizen/
+// graph.json. The durable home the bespoke per-node sidecars (browser/participant/
 // arrangement) converge onto. Wraps chartulary's FacetStore.
 pub mod facet_store;
 // Mere-side adapter from eidetic SchemaDefinition codicils to chartulary's

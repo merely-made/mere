@@ -28,7 +28,7 @@ neighbors.
 The codec half is right and already built. The internodal half is not, and the
 correction is load-bearing rather than pedantic: a `Container` is passive data
 and cannot be aware of anything. The things that act are **participants** (apps,
-denizens, scripts, peers), all of which pass through one gate. So facets are not
+participants, scripts, peers), all of which pass through one gate. So facets are not
 node-to-node communication. They are **participant-to-participant communication
 through nodes**, which is the blackboard and tuple-space lineage, and which the
 stigmergy metaphor describes accurately.
@@ -158,7 +158,7 @@ This matters more here than in an ordinary control system. Normally instability
 wastes energy and wobbles visibly. In an event-sourced substrate, instability
 **writes history**. The graph is the replay of the journal, so an oscillating
 behavior permanently inflates load and replay cost, and that damage outlives the
-fix: deleting the misbehaving denizen does not shrink the journal it wrote. That
+fix: deleting the misbehaving participant does not shrink the journal it wrote. That
 argues for deadband as first-class machinery a behavior declares (a minimum
 change, a minimum interval) rather than discipline every modder must reinvent
 correctly.
@@ -239,7 +239,7 @@ to chartulary with a mere-side reader.
 4. **Scripts as participants.** Scripts have no graph surface today (the rhai
    lane is the knot block evaluator plus the privileged omnibar shell), so the
    lane is open. The shape follows from the gate: a script should petition, never
-   hold a graph handle, exactly as denizens do.
+   hold a graph handle, exactly as participants do.
 
 ## Progress
 

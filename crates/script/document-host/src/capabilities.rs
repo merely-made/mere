@@ -110,7 +110,7 @@ pub struct Grant {
 }
 
 impl Grant {
-    /// Derive this world's import grant from a denizen's structural caps —
+    /// Derive this world's import grant from a participant's structural caps —
     /// the wasm grant bridge as **the import-level face of the one grant**
     /// (participant gate B3). Each capability interface maps to a path under
     /// `doc/` (`doc/log`, `doc/document`, `doc/net`); an interface is linked

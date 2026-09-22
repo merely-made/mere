@@ -16,7 +16,7 @@ civic-deployment scopes.
 ## 1. Grants at the data layer
 
 Grants live at the data layer; the governance layer holds the rules of granting,
-never hardwired, plus the actor and denizen model.
+never hardwired, plus the actor and participant model.
 
 This is the Stickleback rule stated from the other side. A layer that never
 infers authority from transport access or visible membership requires authority
@@ -132,9 +132,9 @@ accountability-bound grants is the binding itself.
 can only be written by the unmasked. Correct if shared truth should carry
 accountability, and a real filter on who participates.
 
-## 4. Moot as denizen
+## 4. Moot as participant
 
-A moot can be a denizen, and moots can exist inside moots as nested graphs.
+A moot can be a participant, and moots can exist inside moots as nested graphs.
 
 The servitor pattern generalizes one tier up without widening the actor model: a
 node bearing a nested graph, holding a personae identity and a grant, acting
@@ -181,7 +181,7 @@ covering for one member. The economics run against it at both ends.
 **What remains live is legibility, not provenance.** The record exists inside the
 sub-moot; whether a parent can read it is a read grant, and suzerainty denies the
 parent that by default, since reading every internal journal is absorption. So a
-parent sees a well-attributed act by a denizen whose internal attribution it may
+parent sees a well-attributed act by a participant whose internal attribution it may
 have no standing to inspect.
 
 This reads as a governed setting rather than a hole. A gemot's admission criteria
@@ -190,7 +190,7 @@ joining: a rule of granting, decided per assembly, and legible before anyone
 invests.
 
 **Residual, not specific to moots:** provenance names the submitter, not the
-instigator. A denizen petitioning under instruction is attributed and whoever
+instigator. A participant petitioning under instruction is attributed and whoever
 directed them is not. No record-keeping system solves this.
 
 ## 6. Cross-cutting patterns

@@ -1,7 +1,11 @@
 # The agent harness (the run loop for models/agents)
 
 **Date**: 2026-07-03
-**Status**: Design brief. No code proposed. Binds the layer between two seams that already
+**Status**: Design brief, revised 2026-09-20. The proposed shared loop now lives
+in Servitor under the [resident/run redesign](../implementation_strategy/2026-08-13_graph_behaviors_plan.md#8-servitor-resident-and-run-redesign-2026-09-20).
+That plan owns the current boundaries and R1-R3 sequence; this brief retains
+the model-guided loop rationale. R1a admission, the R1b reducer and the Turnstone adapter have source implementations with static review; executable receipts remain pending under the Cargo hold.
+The original brief binds the layer between two seams that already
 exist: the model runtime seam (the [local models harness brief](2026-06-24_local_models_harness_brief.md))
 and the typed actuation seam (the D7 agent harness in
 [`meerkat/src/agent_harness.rs`](../../../crates/meerkat/src/agent_harness.rs) *(historical citation)* <!-- doc-audit: historical-link -->). Neither owns
@@ -34,11 +38,12 @@ the loop that puts a model behind the actions. This doc is that loop.
 
 The lane has a brain seam and a hands seam, and both are the right shape:
 
-- **Brain**: `InferenceProvider` (text in, streamed tokens out, capability-matched backends,
-  stub-first). Scoped, unbuilt.
-- **Hands**: the D7 harness (landed, feature-gated, tested). A compact typed observation, a small
-  action vocabulary routed through host methods, `Invoke(id)` over the registry, results with
-  blocked/degraded reasons.
+- **Model execution**: ESP's `InferenceProvider` supplies generation, streaming
+  and deterministic stub providers today. Model execution is separate from
+  deciding what a resident does next.
+- **Host actions**: Turnstone's script/component lanes evaluate participant
+  bodies and lower accepted actions through the host. The D7 harness cited
+  above is historical context; it is not a current runtime receipt for this redesign.
 
 What neither owns: the loop that assembles context, calls the model, parses a tool call, gates it,
 dispatches it, records what happened, and goes around again. The MCP plan calls this "the agent
@@ -49,8 +54,10 @@ without saying how. This doc says how.
 
 ## 2. The loop
 
-One run = one armillary actor (the fetch/sync/Athanor shape; off the UI thread, a real live op in
-Steward, stoppable through the existing `StopFocusedOperation` path). Per turn:
+A run is a Servitor state machine driven by host-supplied observations and
+results. An Armillary actor is one possible execution adapter; deterministic
+drivers use the same transitions without allocating a thread per run. Hosts
+expose progress and cancellation through their operation surfaces. Per turn:
 
 1. **Assemble context**: the current `AgentObservation`, RAG retrieval over capability-scoped
    engrams (persona/moot scope, per the persona brief), the agent's own policy body (for a
@@ -65,9 +72,11 @@ Steward, stoppable through the existing `StopFocusedOperation` path). Per turn:
    user, or the budget (turns/tokens) runs out. Every terminal state is recorded in the run
    engram (§4) with its reason.
 
-The loop is deliberately dumb: scheduling, retries, and streaming shape are actor-framework
-concerns; capability checks live in the gate spine; the tool catalog lives in the registry. The
-harness owns sequencing, transcript, and budget, and nothing else.
+Servitor owns sequencing, transcript, budgets, retry eligibility and pause/resume
+semantics. Armillary carries messages; ESP implements provider calls and streaming.
+Capability checks remain independently callable, and the host registry supplies
+the tool catalog. In particular, an actor retry must never silently repeat an
+external effect whose outcome is unknown. The redesign plan specifies reconciliation.
 
 ---
 
@@ -99,8 +108,9 @@ signatures proposed here).
 A run is an engram: transcript, actions taken, results, terminal state, provider/adapter identity
 (which geist, which backing model). Every mutation the run performs asserts a provenance edge
 pointing at the run, per the borrowed-ideas rule the MCP plan already adopts
-(assert-on-every-agent-mutation). Audit and undo fall out of the existing machinery instead of
-needing an agent-specific log.
+(assert-on-every-agent-mutation). Records support attribution and reconstruction;
+undo requires operation-specific compensation or reversible commits. Recording
+an external effect cannot make it reversible or safe to repeat.
 
 Two mutation postures:
 
@@ -158,32 +168,28 @@ has a smaller registry than meerkat; the loop does not care).
 
 ## 8. Where it lives
 
-Lean: a portable crate owning the loop, transcript/run types, the internal call representation,
-and the provider adapters, with a host-adapter trait for the observation/action surface that
-meerkat implements over its existing D7 harness. The D7 code stays host-side (panes and dividers
-are host concepts); the loop never imports a host. Candidate homes: a sibling to the brief's
-proposed `intel/llm`, or a standalone `agent` crate beside `armillary` (it is closer to an actor
-pattern than to statistics). Settle at first-slice time; the constraint that matters is the
-dependency direction (host implements the trait, loop stays host-free).
+Proposed home: modules in the existing Servitor crate, preserving host-free
+data and transition logic and independently usable participant authority APIs.
+The [redesign plan](../implementation_strategy/2026-08-13_graph_behaviors_plan.md#8-servitor-resident-and-run-redesign-2026-09-20)
+owns the module boundaries. ESP supplies model execution, Chartulary/Eidetic
+store records, and host adapters supply actions and effects. A separate agent
+crate is not the starting assumption. Procedural guidance is one optional
+decision driver alongside scripts and deterministic fixtures.
 
 ---
 
 ## 9. First slice (no model required)
 
-Extends the local models brief's slice 1 with the loop, all testable with stubs:
-
-1. **The call representation + registry rendering**: `enabled_actions` → tool schemas, parse +
-   validate a call, reject a malformed one as a turn result. Pure functions, unit-tested.
-2. **The loop actor with a scripted stub provider**: a deterministic provider that emits a canned
-   action sequence (the `hashed` pattern, agent-shaped) driving the real D7 harness in meerkat:
-   open Apparatus, switch theme, select a node, report diagnostics. The D7 done-condition,
-   finally exercised by a "model."
-3. **Run engram + provenance**: persist the transcript as a typed engram; a stub-run mutation
-   asserts its provenance edge. Proves audit before any real model exists.
-
-After that, the first real brain is whichever provider lands first (remote API or Burn-wgpu
-small model), and it slots in with no loop changes. Interactive-session surface and standing-agent
-triggers come after the loop is proven, as their own slices.
+R1a in the redesign plan supplies resident binding, lifecycle and run admission
+with the existing Turnstone consumer; its source changes await executable
+validation and the portable dependency pin. R1b supplies source for the shared
+run reducer, a deterministic provider fixture and the Turnstone adapter.
+Executable acceptance gates remain pending and include
+cancellation, revocation, stale replies, uncertain effects and replay, alongside
+call validation and attribution. A real model is unnecessary for that contract
+proof. R2 measures optional procedural guidance;
+R3 evaluates and adopts procedure revisions. Their done-conditions live in the
+plan rather than in a second implementation checklist here.
 
 ---
 
@@ -206,8 +212,10 @@ triggers come after the loop is proven, as their own slices.
   agnostic); constrained decode is a Burn-side follow-up once a real local model is wired.
 - **Context budget policy.** How much observation + RAG + transcript fits a small model's window;
   what gets summarized vs dropped. Empirical, per-provider, rides the capability descriptor.
-- **Standing-agent triggers.** Graph signals vs schedule vs both; where trigger evaluation runs
-  (the signals layer is the natural home). Settle when standing agents are built, after the loop.
+- **Standing-agent integration.** Servitor watches, ticks, cascades and deadbands
+  already have Turnstone consumers. The redesign must connect those primitives
+  to resumable runs, including overlap policy and slow model completions, without
+  blocking a cascade drain or replaying an effect.
 - **The interactive surface.** Comms thread vs gloss card vs pane; a user setting per the
   configurability doctrine, but the default needs picking when the session slice lands.
 - **Multi-agent.** Runs spawning runs (an agent invoking another agent node) is representable
@@ -217,6 +225,11 @@ triggers come after the loop is proven, as their own slices.
 ---
 
 ## Progress
+
+- 2026-09-20: proposed Servitor as the shared resident/run owner, replacing the
+  unassigned standalone-agent-crate assumption. Reconciled actor versus run
+  policy, current trigger consumers, historical D7 citations, and audit versus
+  undo. The graph behaviors plan owns the design and pending R1-R3 gates.
 
 - 2026-07-03: Brief drafted from a design conversation with Mark ("a harness for models/agents,
   how should that look"). Grounded against the landed D7 harness code (`agent_harness.rs`:

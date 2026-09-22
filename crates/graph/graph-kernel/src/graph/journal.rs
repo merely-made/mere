@@ -37,7 +37,7 @@ use super::Graph;
 use super::capture::{CapturedDelta, replay_captured_deltas, replay_captured_deltas_onto};
 use super::source_time::{SourceExtent, SourceTime};
 
-/// The author every trusted-UI edit records under. Denizen runs scope their
+/// The author every trusted-UI edit records under. Participant runs scope their
 /// own author (the subject's hex) via [`GraphJournal::set_author`]; entries
 /// migrated from pre-envelope logs carry `pre-gate` (chartulary's convention).
 pub const USER_AUTHOR: &str = "user";
@@ -45,12 +45,12 @@ pub const USER_AUTHOR: &str = "user";
 /// One journal entry: a captured delta in the attribution envelope — the
 /// participant-gate plan's B1 adoption of chartulary's `Batch { author, edits }`
 /// shape over mere's edit spine. WHO made a change rides the journal, so a
-/// denizen's edits read back attributed and compensable.
+/// participant's edits read back attributed and compensable.
 #[derive(
     Debug, Clone, PartialEq, Archive, Serialize, Deserialize, serde::Serialize, serde::Deserialize,
 )]
 pub struct AttributedDelta {
-    /// `user` for the trusted UI path, a denizen subject's hex for gated runs,
+    /// `user` for the trusted UI path, a participant subject's hex for gated runs,
     /// `pre-gate` for entries migrated from bare logs.
     pub author: String,
     pub delta: CapturedDelta,
@@ -64,7 +64,7 @@ pub struct AttributedDelta {
 pub struct GraphJournal {
     log: Journal<AttributedDelta>,
     /// The author the next [`record`](Self::record) attributes — `user` by
-    /// default; a host scopes a denizen run with [`set_author`](Self::set_author)
+    /// default; a host scopes a participant run with [`set_author`](Self::set_author)
     /// and restores afterwards.
     author: String,
 }
@@ -107,7 +107,7 @@ impl GraphJournal {
         &self.author
     }
 
-    /// Scope the recording author (a denizen run); the host restores `user`
+    /// Scope the recording author (a participant run); the host restores `user`
     /// when the run ends.
     pub fn set_author(&mut self, author: impl Into<String>) {
         self.author = author.into();
@@ -358,7 +358,7 @@ mod tests {
     }
 
     /// The envelope: entries carry their author; the default is `user`, a
-    /// scoped author attributes a denizen run, and replay strips the envelope.
+    /// scoped author attributes a participant run, and replay strips the envelope.
     #[test]
     fn entries_are_attributed_and_author_scoping_works() {
         let mut journal = GraphJournal::new();

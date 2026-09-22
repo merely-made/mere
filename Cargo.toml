@@ -520,7 +520,7 @@ mesh-host = { package = "mere-mesh-host", path = "crates/mesh/host" }
 # entries must carry the SAME version: they resolve to one package, and a
 # stale pin here is invisible from the personae line.
 identity = { package = "personae", version = "0.2.1", path = "crates/dramatis/personae" }
-# The denizen authority gate (participant gate B1/B3): document-host derives
+# The participant authority gate (participant gate B1/B3): document-host derives
 # its import-level Grant from a servitor authority — one grant, two faces.
 servitor = { version = "0.0.2", path = "crates/servitor" }
 # Path + version: the path is used for local workspace builds, the version lets

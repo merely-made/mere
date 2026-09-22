@@ -19,7 +19,7 @@
 //! What decides an emission is therefore NOT this crate. This host is
 //! app-agnostic: it moves the envelope across the boundary and hands it to a
 //! host-supplied [`ActionSink`], which decodes it, classifies it into a
-//! capability RING, and checks the emitting denizen's grant (turnstone's `ring`
+//! capability RING, and checks the emitting participant's grant (turnstone's `ring`
 //! module). A [`Refusal`] comes straight back to the guest as a typed error,
 //! so a component learns "denied: session" synchronously rather than trapping
 //! or silently no-op'ing.
@@ -28,7 +28,7 @@
 //! `&mut App` while the app is inside a wasm call, so an allowed emission is
 //! queued in the sink and the app drains it after the turn returns — the same
 //! shape the piccolo lane already uses (evaluate, collect Actions, lower them
-//! through the ordinary spine under the denizen's author).
+//! through the ordinary spine under the participant's author).
 //!
 //! Containment mirrors document-host: [`guarded_engine`] turns on epoch
 //! interruption, [`Watchdog`] bumps the epoch so a runaway turn hits its
@@ -57,7 +57,7 @@ wasmtime::component::bindgen!({
 /// WIT `emit-error`, so a refusal is part of the contract rather than a trap.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Refusal {
-    /// The action's ring is not covered by this denizen's grant, or the ring
+    /// The action's ring is not covered by this participant's grant, or the ring
     /// is host-only (gate management: never grantable to anyone).
     Denied(String),
     /// No action by that name in this host build.
@@ -194,6 +194,32 @@ impl<S: ActionSink + 'static> AppScript<S> {
         epoch_deadline: Option<u64>,
     ) -> wasmtime::Result<Self> {
         let component = Component::from_file(engine, path)?;
+        Self::attach_component(engine, &component, sink, granted, limits, epoch_deadline).await
+    }
+
+    /// Instantiate an `app-core` component from the exact bytes supplied by
+    /// the caller. Hosts can read and verify a body once, then pass those same
+    /// bytes here without reopening a mutable path.
+    pub async fn attach_bytes(
+        engine: &Engine,
+        bytes: &[u8],
+        sink: S,
+        granted: Vec<String>,
+        limits: StoreLimits,
+        epoch_deadline: Option<u64>,
+    ) -> wasmtime::Result<Self> {
+        let component = Component::from_binary(engine, bytes)?;
+        Self::attach_component(engine, &component, sink, granted, limits, epoch_deadline).await
+    }
+
+    async fn attach_component(
+        engine: &Engine,
+        component: &Component,
+        sink: S,
+        granted: Vec<String>,
+        limits: StoreLimits,
+        epoch_deadline: Option<u64>,
+    ) -> wasmtime::Result<Self> {
         let mut linker: Linker<AppHostState<S>> = Linker::new(engine);
         wasmtime_wasi::p2::add_to_linker_async(&mut linker)?;
         // All three imports are intrinsic to the world: `log` and `caps` name
@@ -275,6 +301,25 @@ impl<S: ActionSink + 'static> AppScript<S> {
         pollster::block_on(Self::attach(
             engine,
             path,
+            sink,
+            granted,
+            limits,
+            epoch_deadline,
+        ))
+    }
+
+    /// Blocking counterpart to [`Self::attach_bytes`].
+    pub fn attach_blocking_bytes(
+        engine: &Engine,
+        bytes: &[u8],
+        sink: S,
+        granted: Vec<String>,
+        limits: StoreLimits,
+        epoch_deadline: Option<u64>,
+    ) -> wasmtime::Result<Self> {
+        pollster::block_on(Self::attach_bytes(
+            engine,
+            bytes,
             sink,
             granted,
             limits,

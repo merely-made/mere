@@ -76,7 +76,7 @@ vocabulary:
   granted projection sessions, realize scenes, return typed intents through
   the participant gate.
 - **"Projections"** → granted scores and scenes (scenograph); **"intents"** →
-  petitions from denizens holding grants. The chain's insistence that a
+  petitions from participants holding grants. The chain's insistence that a
   projection is purposeful (per context, audience, capability) rather than a
   generic serialization is the score/admission machinery described at product
   altitude.

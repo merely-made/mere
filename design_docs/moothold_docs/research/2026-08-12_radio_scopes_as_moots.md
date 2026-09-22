@@ -29,7 +29,7 @@ Governance lives here; the radio tier consumes an artifact.
 
 ## What the model buys the radio tier
 
-- **Miscible scopes for free.** A persona is a denizen of many moots;
+- **Miscible scopes for free.** A persona is a participant of many moots;
   overlapping community membership needs no new mechanism. Composition of
   overlapping policies is per domain on the radio side (duties union under
   the owner's ceiling, divisible dwell fractions, exclusive knobs by owner
