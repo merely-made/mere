@@ -25,7 +25,7 @@ pub const STAGE: &str = "pre-alpha";
 /// v0 emits each as an empty group; real content lands per lane.
 const SECTIONS: &[&str] = &[
     "tracing events",
-    "register-diagnostics channels",
+    "registry diagnostics channels",
     "uxtree",
     "accesskit",
 ];

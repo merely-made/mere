@@ -4377,8 +4377,8 @@ version = "0.0.1"
 dependencies = [
  "genet-scripted-dom",
  "layout-dom-api 0.1.1 (git+https://github.com/merely-made/genet.git?rev=532f1fadc53486d60ac4f02835732e8dabd9f62b)",
+ "mere-registry",
  "pollster",
- "register-mod-loader",
  "servitor",
  "tokio",
  "wasmtime",
@@ -8986,8 +8986,8 @@ dependencies = [
  "mere-forme",
  "mere-glossary",
  "mere-kernel",
+ "mere-registry",
  "netrender",
- "register-theme",
  "tracing",
  "uxtree",
 ]
@@ -9141,6 +9141,27 @@ dependencies = [
  "blake3",
  "serde",
  "thiserror 1.0.69",
+]
+
+[[package]]
+name = "mere-registry"
+version = "0.0.1"
+dependencies = [
+ "http",
+ "infer",
+ "inventory",
+ "log",
+ "mere-kernel",
+ "nucleo",
+ "parking_lot",
+ "petgraph 0.8.3",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "tinct",
+ "toml 0.8.23",
+ "tower",
+ "url",
 ]
 
 [[package]]
@@ -13592,93 +13613,6 @@ name = "regex-syntax"
 version = "0.8.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d6f6ff9a378485b298a5286656da665ba74413d36db0979633275d2e708145d4"
-
-[[package]]
-name = "register-diagnostics"
-version = "0.0.1"
-dependencies = [
- "log",
-]
-
-[[package]]
-name = "register-input"
-version = "0.0.1"
-dependencies = [
- "serde",
-]
-
-[[package]]
-name = "register-knowledge"
-version = "0.0.1"
-dependencies = [
- "mere-kernel",
- "nucleo",
- "parking_lot",
- "serde",
- "serde_json",
-]
-
-[[package]]
-name = "register-layout"
-version = "0.0.1"
-dependencies = [
- "serde",
- "serde_json",
-]
-
-[[package]]
-name = "register-lens"
-version = "0.0.1"
-dependencies = [
- "mere-kernel",
- "petgraph 0.8.3",
- "serde",
- "serde_json",
-]
-
-[[package]]
-name = "register-mod-loader"
-version = "0.0.1"
-dependencies = [
- "inventory",
- "register-diagnostics",
- "register-viewer",
- "serde",
- "tempfile",
- "toml 0.8.23",
-]
-
-[[package]]
-name = "register-protocol"
-version = "0.0.1"
-dependencies = [
- "http",
- "tower",
-]
-
-[[package]]
-name = "register-theme"
-version = "0.0.1"
-dependencies = [
- "log",
- "mere-kernel",
- "register-lens",
- "serde",
- "serde_json",
- "tinct",
-]
-
-[[package]]
-name = "register-viewer"
-version = "0.0.1"
-dependencies = [
- "infer",
- "mere-kernel",
- "register-layout",
- "serde",
- "serde_json",
- "url",
-]
 
 [[package]]
 name = "regress"

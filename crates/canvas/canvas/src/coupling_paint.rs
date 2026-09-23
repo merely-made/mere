@@ -128,7 +128,7 @@ pub fn visual_overlays(
 }
 
 /// One overlay rect for a resolved visual response. Colors are fixed for now
-/// (theming via `register-theme` lands later); `intensity ∈ (0, 1]` drives the
+/// (theming via `registry::theme` lands later); `intensity ∈ (0, 1]` drives the
 /// alpha, and the halo's size.
 fn overlay_rect(
     visual: RecognizedVisual,
