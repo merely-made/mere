@@ -101,6 +101,24 @@ which does not record the filesystem path of a path package.
   respectively. Both baseline `cargo +1.98.1 check --workspace --locked -j2`
   commands passed in redirect-free disposable checkouts. These validate the
   old Genet revision; the integration candidate needs its own receipts.
+- **2026-09-22, L2 pass B (genet `532f1fadc53`):** moving the pins added one
+  unused-patch row the pass did not inherit, `ipc-channel v0.22.0`, stop rule
+  3. Cause: the root `[patch.crates-io] ipc-channel -> genet.git` row existed
+  so `servo-malloc-size-of` would take genet's in-process fork; at `a7dd6704`
+  that crate was the row's only dependent, and genet removed it on 2026-09-22
+  (`genet/design_docs/2026-09-22_malloc_size_of_removal_plan.md`). Nothing in
+  Mere's graph depends on `ipc-channel` now, so the row patches nothing. The
+  gpu-allocator unification the row's comment protects is unaffected: the crate
+  that carried the OS-IPC dependencies is gone outright. Referred to Mark.
+- **2026-09-22, shared working tree:** during L2 another session ran an
+  unlocked `cargo check` in Mere's tree and then `git checkout -- Cargo.lock`
+  to undo what it took for its own resolver changes, reverting L2's uncommitted
+  lock while leaving `Cargo.toml` repinned. The first `verify` run therefore
+  failed on "Portable lock changed" after a clean compile. The lock was redone
+  from the same package-id specs and re-verified; the session stood down from
+  Mere until the L2 head is published. Uncommitted pin work in a tree other
+  sessions build in is exposed to exactly this; commit the lock with the pins
+  as soon as the portable gate passes, before the longer gates.
 - Turnstone's existing local config patched Netrender and the engine adapters,
   but neither Mere nor Genet. Its new example maps the 79 Mere and 29 Genet
   packages in its portable root graph to sibling manifests. All mapped paths
