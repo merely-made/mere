@@ -1,7 +1,7 @@
 # Ranged Fetch Plan
 
 **Date:** 2026-09-20  
-**Status:** **plan accepted 2026-09-20 with D1 to D7 decided; lane F merged and pushed 2026-09-20; lane R pushed as Woodshed `bf5923d`; lane T1 built in Turnstone 2026-09-22, awaiting push; T2, T3 open.**  
+**Status:** **plan accepted 2026-09-20 with D1 to D7 decided; lane F merged and pushed 2026-09-20; lane R pushed as Woodshed `bf5923d`; T1 and T3 pushed/built in Turnstone 2026-09-22; M1 built in Mere; T2 waits on the next lattice round.**  
 **Authority:** the implementation home for rulings 2 to 4 of lane R3 in the
 [family composition thesis](../../2026-08-12_family_composition_thesis_brief.md#r3-resource-resolution-opened-2026-09-20).
 The research, probes and rulings stay there; this plan owns the work.  
@@ -199,3 +199,24 @@ so that it can answer a range from a stored body. The page-side media element.
   previous behaviour (session jar, no HTTP cache), and a persona-keyed set with
   a cache is T2's decision, not T1's. Turnstone is not rustfmt-clean, so its
   formatter was not run.
+- **2026-09-22, T1 pushed** (Turnstone `2c451d2`, `77b7ece`).
+- **2026-09-22, M1 built (Mere `b3d52c74`, local):** `fetch::Resources`, the
+  handle as Genet's `ResourceFetcher`, with the engine's default cap, final URL
+  and content type, and a fallback for the schemes it does not serve, so a
+  host chains it ahead of the small-web fetcher. Tested served, refused,
+  redirected, capped, chained, and cookie-sharing. 20 tests, 9 with defaults
+  off, Clippy clean both ways.
+- **2026-09-22, T2 waits:** Turnstone taking M1 is a Mere pin move, which by
+  the lattice pass's stop rule 4 means knot-editor realigns first. The cascade
+  session reports the Genet roadmap session is about to bump Mere to Genet
+  `b3ef95e9729`, which forces the same three-repo round; one round at a Mere
+  revision carrying both changes is the plan. Rulings for T2 (Mark,
+  2026-09-22): one shared set with an in-memory HTTP cache, so pages, images
+  and episodes obey one cache policy.
+- **2026-09-22, T3 built (Turnstone, local):** `cookie_custody` opens a fjall
+  store under `<data_root>/cookies`, loads it into the session jar at start and
+  flushes after each drain. Rulings (Mark, 2026-09-22): the built-in default
+  persona for now, since Turnstone has no persona id of the store's kind, and a
+  profile-level store rather than the session bin. Test: a cookie set in one
+  run is there in the next. The session store plan's persist-trigger gap is
+  closed for Turnstone.
