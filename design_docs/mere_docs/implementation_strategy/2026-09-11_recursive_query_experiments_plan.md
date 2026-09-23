@@ -308,7 +308,7 @@ helper is being reworked anyway. 3 is a substrate decision, not a bug fix.
   pending. Rename of the `subgraphs` crate to the subgraph vocabulary started
   as a separate commit.
 - 2026-09-12. The `graphlets` → `subgraph` rename landed as its own commit:
-  crate directory `crates/graph/subgraph` (package `mere-subgraph`, lib
+  crate directory `crates/graph/subgraph` *(historical citation)* <!-- doc-audit: historical-path --> (package `mere-subgraph`, lib
   `subgraph`); forme's `graphlet.rs` → `crates/forme/forme/src/subgraph.rs`
   with `SubgraphId` / `SubgraphRef` / `SubgraphSpec` / `SubgraphKind` /
   `SubgraphBinding` / `SubgraphMemberDelta`; `SessionSubgraphs`; the

@@ -54,7 +54,7 @@ VATES_TINYLLAMA_DIR=/path/to/TinyLlama-1.1B-Chat-v1.0 \
 ## Next
 
 - Founding proposal and backend roadmap: `design_docs/`.
-- Sibling crate `sibylla` (embedding and retrieval), at `crates/intel/sibylla`.
+- Sibling crate `sibylla` (embedding and retrieval), at `crates/intel/sibylla` *(historical citation)* <!-- doc-audit: historical-path -->; deleted 2026-09-23, its code is `esp::embed`.
 - Actor harness: `crates/armillary`.
 
 License: dual MIT OR Apache-2.0, at your option.

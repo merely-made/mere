@@ -243,8 +243,8 @@ genet's `design_docs/`, not here.
 ### From graph_object_roster_detail_cards (model migrated, views deleted)
 
 - The model lives on verbatim — `RosterTab`/`RosterSubject`/`SubgraphSpec` in
-  `crates/domain/roster`, `EdgeCell`/`EdgeFamily` and `visible_relation_edges`
-  in canvas, the selectors in `crates/graph/subgraph`. Open: **sub-kind
+  `mere::roster` (`crates/mere/src/roster.rs`), `EdgeCell`/`EdgeFamily` and `visible_relation_edges`
+  in canvas, the selectors in `mere::subgraph` (`crates/mere/src/subgraph.rs`). Open: **sub-kind
   selector editing**, the **P5 `GraphDefault < GraphViewOverride <
   SelectionOverride` stack**, **true parallel edge instances**; the plan's
   §Contradictions and §Pitfalls are durable design notes.
@@ -254,7 +254,7 @@ genet's `design_docs/`, not here.
 - **Owed by name**: `crates/mesh/mesh/src/lease.rs:22-26` *(historical citation)* <!-- doc-audit: historical-path --> — "the kith plan,
   which widens the ring beyond one owner, has to revisit it"; gemot is still
   at the ring rule with capability gating a later milestone. **Re-scope onto
-  the shipped vocabulary** — `crates/capability` (`Cap::{Power,Scope,Facet}`),
+  the shipped vocabulary** — `servitor::cap` (`crates/servitor/src/cap.rs`, `Cap::{Power,Scope,Facet}`),
   gemot `typed_authorization.rs` (ruled 2026-07-24), personae delegation
   certificates — keeping only the mesh-specific parts: claim validation in the
   board fold, epoch revocation, the six done-conditions. Meadowcap-shaped

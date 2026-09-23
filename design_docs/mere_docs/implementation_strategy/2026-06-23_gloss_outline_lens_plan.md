@@ -96,7 +96,7 @@ with Mark):
   with the *gloss* it feeds. (Caveat acknowledged: it must stay engine-neutral, also feeding
   apparatus + export, not read as "the gloss's private crate".) `graph-projection` was rejected
   to avoid overloading cartography / `forme::ProjectionLens` / the graph-rooted "projection" model.
-- **Location: `crates/graph/glossary/`,** beside `linked-data` + `node-lineage`, all children of
+- **Location: `crates/graph/glossary/` *(historical citation)* <!-- doc-audit: historical-path -->,** beside `linked-data` + `node-lineage`, all children of
   the graph supercrate. Moves out of `crates/orrery/` *(historical citation)* <!-- doc-audit: historical-path --> (the *spatial* view it no longer is).
   **Considered and declined: folding `linked-data` into `glossary`** (Mark's question). The kinship
   is real (both `Graph -> representation`), but the `crates/graph/` supercrate already expresses it
@@ -164,7 +164,7 @@ an ad-hoc list: the format *is* the editing + export path.
 
 ## Phases (cheapest-first; done-conditions, not dates)
 
-- **P0 — the projection crate.** Rename `mere-orrery` -> `glossary` at `crates/graph/glossary/`;
+- **P0 — the projection crate.** Rename `mere-orrery` -> `glossary` at `crates/graph/glossary/` *(historical citation)* <!-- doc-audit: historical-path -->;
   drop dead `project_graph` + tests; add `outline_djot` + `graph_metrics` + `GraphMetrics` behind
   unit tests over a fixture graph (URL-parsed tree -> expected djot; counts / histogram /
   components exact). Pure data, fully testable with no host. Done: the crate builds, its tests
@@ -205,7 +205,7 @@ an ad-hoc list: the format *is* the editing + export path.
 
 ## Open decisions
 
-1. ~~**Crate name + location**~~ **Settled 2026-06-23:** `glossary` @ `crates/graph/glossary/`,
+1. ~~**Crate name + location**~~ **Settled 2026-06-23:** `glossary` @ `crates/graph/glossary/` *(historical citation)* <!-- doc-audit: historical-path -->,
    sibling to `linked-data` (merge of linked-data considered + declined; see The crate).
 2. ~~**Outline nesting axis** (P0 default)~~ **Settled 2026-06-23:** parsed URL structure for P0
    (containment edges are not auto-populated, so reading them would be flat); pluggable in P2.
@@ -258,14 +258,14 @@ an ad-hoc list: the format *is* the editing + export path.
   third lens and the first notetaking feature. Grounded by a 5-agent code+doc sweep (gloss
   render path, signals layer, djot/knot lane, kernel graph model, projection contract);
   findings above. No code yet; P0 is the first build step.
-- **2026-06-23 (decisions settled with Mark).** Crate = `glossary` at `crates/graph/glossary/`
+- **2026-06-23 (decisions settled with Mark).** Crate = `glossary` at `crates/graph/glossary/` *(historical citation)* <!-- doc-audit: historical-path -->
   (sibling to `linked-data`; merging linked-data in considered + declined). Nesting axis = parsed
   URL structure for P0 — a code check found `UrlPath` containment edges are **not** auto-populated
   on the live path, so reading them would yield a flat outline; the projection computes the host /
   path tree from node addresses directly instead, overlaying explicit containment where present.
   Relation-driven axes deferred to the P2 pluggable lens.
 - **2026-06-23 (P0 landed).** Rename half committed first (`mere-orrery` -> `glossary` at
-  `crates/graph/glossary/`, dead `project_graph` + tests retired, accesskit/uxtree deps dropped,
+  `crates/graph/glossary/` *(historical citation)* <!-- doc-audit: historical-path -->, dead `project_graph` + tests retired, accesskit/uxtree deps dropped,
   meerkat's dead dep removed; commits 8d55f96 + ffb1b5e). Then the functions: `outline_djot(&Graph)
   -> String` (URL-trie nesting host -> path segments, structural intermediate bullets, non-URL nodes
   flat at the end, deterministic via `BTreeMap`; no engine dep, djot is plain text) and
