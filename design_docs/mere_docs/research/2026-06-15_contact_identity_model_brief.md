@@ -192,7 +192,7 @@ key-rooted, NAT-friendly, no always-on listener. Mere can offer "needs a server"
 
 - Exact `VerifiedKey` / `Handle` / `TrustState` shapes.
 - Whether the key resolver is a WebFinger `rel` or a sibling crate.
-- Raw keys vs DIDs (`did:web` / `did:plc`) for the stable middle.
+- ~~Raw keys vs DIDs for the stable middle.~~ Ruled 2026-09-23: a typed key or a `did:plc`; `did:web` is a handle. See the [gaz founding plan](../../dramatis_docs/implementation_strategy/2026-08-08_gaz_founding_plan.md) §2 and §5.
 - Contact-import UX (WebFinger paste, QR, ticket) and how back-claim proof verifies a
   key-to-handle binding.
 - kith vs kin tiering: is the tier trust-derived (verified becomes kin) or user-set?

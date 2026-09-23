@@ -474,11 +474,48 @@ Three more cross-cutting items:
   line-folded 1998 format. ADOPT over vCard 4.0's PULL. WebFinger (RFC 7033)
   stays ADOPT. **Verifiable Credentials 2.0** is the standard the house "insigne"
   concept most closely already is — graded public-key presentations made to be
-  shown — and is worth reading before insigne's own shape is fixed. DIDs are PULL,
-  not ADOPT: `did:key` and `did:web` are the only two methods worth carrying.
+  shown — and is worth reading before insigne's own shape is fixed. **DIDs,
+  amended 2026-09-23 by Mark's ruling, and graded per method rather than as one
+  family.** The first pass carried `did:key` and `did:web` as "the only two
+  methods worth carrying" and recorded no reason. Judged on what a contact
+  anchor needs (stable per account, able to rotate keys, bound by something
+  other than a host), it kept the weakest method and dropped the only one that
+  meets all three. `did:key` is **ADOPT** as the text form of a typed key, which
+  is how gaz writes every key; it can never rotate, so as an identity it is only
+  a key. `did:plc` is **ADOPT** for gaz anchors and gazette resolution: stable
+  per account, rotating, and self-certifying (see the atproto bullet below).
+  `did:web` is **PULL** and is carried as a handle only, because it is a
+  domain's say-so with no history.
   CardDAV and JMAP: SKIP, both server-tenancy. **Nostr NIP-01 is the load-bearing
   document, not NIP-05** — NIP-05 maps a name to a hex pubkey and is meaningless
   without the event/relay/signature model NIP-01 defines.
+- **atproto, identity layer — checked 2026-09-23 against live data.** Sources:
+  the PLC documents and `/log/audit` histories of
+  `did:plc:z72i7hdynmk6r22z27h6tvur` (`bsky.app`) and
+  `did:plc:ewvi7nxzyoun6zhxrhs64oiz` (`atproto.com`), and two 1,000-operation
+  samples of `https://plc.directory/export` (from 2023-04-01 and 2026-08-01).
+  - *Self-certifying, verified here rather than quoted:* each DID re-derives
+    exactly as base32 of SHA-256 over the DAG-CBOR genesis operation, truncated
+    to 24 characters, and a tampered copy of the operation does not. What it
+    binds is that operation's rotation keys, and for both accounts those are
+    the same two keys, held by Bluesky: the DID ties the account to whoever
+    holds its rotation keys. The directory can withhold operations or show
+    different clients different histories; it cannot forge one.
+  - *Signing keys belong to the server, not the person:* both accounts were
+    created with the same signing key, and all 895 accounts in the 2023 sample
+    shared two keys (746 on one). The 2026 sample has one key per account, but
+    the protocol does not require it. Keys change on every server move with no
+    signature from the old key; the authority is a PLC operation signed by a
+    rotation key.
+  - *Key types:* secp256k1 (`zQ3s…`) and P-256 (`zDn…`), 33 bytes compressed;
+    the 2026 sample is 889 P-256 to 111 secp256k1.
+  - *Not a moving target:* every operation in both samples is `plc_operation`
+    with the identical seven-field shape, three and a half years apart. The
+    WATCH grade stands for atproto's repository and sync layers; the identity
+    layer (`did:plc` and handle resolution) is **ADOPT** for gaz and gazette.
+  - Consequences for gaz (anchoring, collisions, proofs of key changes) live in
+    the [gaz founding plan](dramatis_docs/implementation_strategy/2026-08-08_gaz_founding_plan.md)
+    §2 and §5.
 - **moot / murmur.** MLS (RFC 9420) is ADOPT *here* even though it is SKIP for
   the vault — group messaging is what it was designed for. MIMI is WATCH. Matrix:
   SKIP (and note the survey's v1.16 citation was three releases stale; current is
@@ -498,6 +535,15 @@ Three more cross-cutting items:
   a reason, not an oversight. LoRaWAN: SKIP (a network-server architecture,
   against the house posture). Reticulum RNS and LXMF are single-implementation
   specs, not standards — worth recording so the dependency is understood as such.
+  **Checked 2026-09-23 against that implementation**, for gaz's Reticulum key:
+  a public identity is 64 bytes, "the concatenation of a 256 bit encryption key,
+  and a 256 bit signing key" (X25519 then Ed25519; `RNS/Identity.py`,
+  `get_public_key`), and its identity hash is a truncated SHA-256 over all 64
+  (`update_hashes`). `rnid` imports and exports a public identity as
+  undelimited lowercase hex by default, base32 or base64 on request
+  (`RNS/Utilities/rnid.py`, `export_pub_identity`). prns's
+  `PublicIdentityMaterial` (workspace-root checkout, `Code/crates/prns/prns-core/src/identity/material.rs`)
+  agrees on the layout.
   **IEEE 802.15.4-2024 with RPL/6LoWPAN** deserves a named SKIP so retinue's
   bespoke mesh is a deliberate choice rather than an unexamined one.
 - **distillery / alembic.** safetensors: ADOPT. GGUF: PULL (current format
@@ -737,12 +783,12 @@ recorded in §1, §3.3, §5, §6 and §8.
 | ADOPT | JSContact | RFC 9553 (data model), with RFC 9554 (vCard extensions for JSContact) and RFC 9555 (vCard conversion) | crates/dramatis/gaz (the contact store), ports/gazette Ledger projection and recipient picker |
 | PULL | vCard 4.0 and jCard | RFC 6350 (vCard 4.0), RFC 7095 (jCard) | gaz import/export; ports/gazette contact-import UX (the brief names 'WebFinger paste, QR, ticket' as open UX questions) |
 | SKIP | CardDAV, JMAP Core/Mail/Contacts | RFC 6352 (CardDAV); RFC 8620 (JMAP Core), RFC 8621 (JMAP Mail), RFC 9610 (JMAP Contacts) | None. gazette explicitly disclaims delivery ('not a delivery layer — private grants, cross-service posting, and inboxes are moot and murm territory'). |
-| PULL | Decentralized Identifiers (DIDs), with did:key and did:web | W3C DID Core 1.1; did:key and did:web method specs (W3C CCG) | crates/dramatis/gaz (HandleKind::Did already exists, carrying did:web and did:plc), ports/gazette resolver facade, insigne |
+| PULL | Decentralized Identifiers (DIDs), with did:key and did:web | W3C DID Core 1.1; did:key and did:web method specs (W3C CCG) | AMENDED 2026-09-23 (Mark's ruling; §5 prose wins): graded per method. did:key ADOPT (gaz's typed-key text form) and did:plc ADOPT (gaz anchors for atproto contacts, gazette resolution); did:web stays PULL, carried as a handle. Consumers: crates/dramatis/gaz, ports/gazette resolver facade, insigne |
 | ADOPT | Verifiable Credentials Data Model 2.0 | W3C VC Data Model 2.0 | CORRECTED 2026-08-24: no current consumer. crates/dramatis/insigne is a 23-line 0.0.1 name reservation; VC 2.0 is its plausible eventual shape, not a shipped dependency |
 | PULL | Nostr NIP-05 (DNS-based internet identifiers) | NIP-05 | ports/gazette (README names NIP-05 as landing 'beside' WebFinger behind the same facade), gaz HandleKind::Nostr |
 | PULL | ActivityPub (with Activity Streams 2.0) | W3C ActivityPub; W3C Activity Streams 2.0 | ports/gazette (already classifies ActivityPub actor links out of WebFinger JRDs); ports/moot as a future publish target |
 | PULL | HTTP Message Signatures | RFC 9421 | Only if gazette or moot ever writes to the fediverse. No current consumer. |
-| WATCH | AT Protocol (atproto) | draft-newbold-at-architecture, draft-holmgren-at-repository, and the IETF ATP working group charter | ports/gazette — HandleKind::Did already accepts did:plc, and the README names atproto-did resolution as landing behind the resolver facade; the … |
+| WATCH | AT Protocol (atproto) | draft-newbold-at-architecture, draft-holmgren-at-repository, and the IETF ATP working group charter | AMENDED 2026-09-23 (§5 prose wins): WATCH stands for the repository and sync layers only. The identity layer (did:plc, handle resolution) is ADOPT for crates/dramatis/gaz and ports/gazette, checked against live PLC data. |
 | ADOPT | Messaging Layer Security (MLS) | RFC 9420 | CORRECTED 2026-08-24: not ports/moot, which is a 43-line reservation. Prospective home is crates/murm/transport (reserves ALPN mere/mls/v1); crates/moot/commons ships encrypted group chat today via p2panda, not MLS |
 | WATCH | More Instant Messaging Interoperability (MIMI) | draft-ietf-mimi-protocol, draft-ietf-mimi-content, draft-ietf-mimi-arch, draft-ietf-mimi-room-policy | ports/moot (murmur) — speculative only |
 | SKIP | Matrix | Matrix Specification v1.16 (client-server, server-server, and the Olm/Megolm ratchets) | None. moot/murmur is unimplemented and its README scopes it to Mere's own governed spaces. |
