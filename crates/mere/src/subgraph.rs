@@ -10,7 +10,6 @@
 //! index, linked-subgraph derivation/reconciliation, and the shape classifier in
 //! [`classifier`]. It depends only on forme + kernel + serde.
 
-#![doc(html_root_url = "https://docs.rs/mere-subgraph/0.0.1")]
 
 use std::collections::{HashMap, HashSet};
 use std::path::Path;

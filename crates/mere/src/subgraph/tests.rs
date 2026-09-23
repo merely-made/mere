@@ -7,7 +7,7 @@
 //! Tests for the per-session subgraph index (`lib.rs`). Split into a
 //! sibling file per the 600-LOC ceiling.
 
-use crate::*;
+use crate::subgraph::*;
 use forme::{SubgraphBinding, SubgraphKind, SubgraphSpec};
 use kernel::graph::fixtures::GraphFixtures;
 use kernel::graph::{EdgeFamily, Graph};

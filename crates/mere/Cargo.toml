@@ -15,17 +15,25 @@ default = ["graph", "linked-data", "canvas", "workbench"]
 # presentation or host-workbench dependencies.
 graph = [
     "dep:forme",
-    "dep:subgraph",
-    "dep:glossary",
     "dep:kernel",
-    "dep:roster",
-    "dep:trail",
+    "dep:serde",
+    "dep:serde_json",
+    "dep:uuid",
 ]
 # Semantic import/export remains independent of the graph canvas.
 linked-data = ["graph", "dep:linked-data"]
 # Mere's graph-aware visual surface. `gloss` is canvas-backed, so it belongs in
 # this capability rather than the graph-only cone.
-canvas = ["graph", "dep:canvas", "dep:gloss"]
+canvas = [
+    "graph",
+    "dep:accesskit",
+    "dep:canvas",
+    "dep:inker",
+    "dep:netrender",
+    "dep:registry",
+    "dep:tracing",
+    "dep:uxtree",
+]
 # App-host composition and routing. Native hosts use this today; portable
 # graph consumers do not need to pay for it.
 workbench = [
@@ -43,21 +51,28 @@ query = ["linked-data", "linked-data/query"]
 fixtures = ["graph", "kernel/fixtures"]
 
 [dependencies]
+accesskit = { workspace = true, optional = true }
+netrender = { workspace = true, optional = true }
+registry = { workspace = true, features = ["theme"], optional = true }
+serde = { workspace = true, optional = true }
+serde_json = { workspace = true, optional = true }
+tracing = { workspace = true, optional = true }
+uuid = { workspace = true, optional = true }
+uxtree = { workspace = true, optional = true }
 apparatus = { workspace = true, optional = true }
 forme = { workspace = true, optional = true }
 # The engine-management layer (genet component since 2026-07-10): the facade
 # composes mere's routing vocabulary over inker's host-neutral policy.
 inker = { workspace = true, optional = true }
-subgraph = { workspace = true, optional = true }
-glossary = { workspace = true, optional = true }
-gloss = { workspace = true, optional = true }
 kernel = { workspace = true, optional = true }
 linked-data = { workspace = true, optional = true }
 canvas = { workspace = true, optional = true }
 platen = { workspace = true, optional = true }
-roster = { workspace = true, optional = true }
-trail = { workspace = true, optional = true }
 workbench = { workspace = true, optional = true }
+
+[dev-dependencies]
+euclid = "0.22"
+kernel = { workspace = true, features = ["fixtures"] }
 
 [lints]
 workspace = true

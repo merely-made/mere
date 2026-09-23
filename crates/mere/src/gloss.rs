@@ -11,7 +11,6 @@
 //! - gloss minimap geometry and Scene helpers
 //! - `EngineDocument` outline projection into `uxtree`
 
-#![doc(html_root_url = "https://docs.rs/gloss/0.0.1")]
 
 use accesskit::{Node, NodeId, Role};
 use canvas::NodeState;
@@ -68,7 +67,7 @@ pub struct GlossOutlineRow {
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct GlossOutlineSnapshot {
     pub rows: Vec<GlossOutlineRow>,
-    pub metrics: glossary::GraphMetrics,
+    pub metrics: crate::glossary::GraphMetrics,
 }
 
 /// Cap outline rows to what the current pane height can show.
@@ -102,14 +101,14 @@ pub fn cap_outline_rows(
 }
 
 /// Build the gloss outline snapshot for one graph/frame, enriching pure
-/// `glossary::outline_rows` output with node state/selection supplied by the
+/// `mere::glossary::outline_rows` output with node state/selection supplied by the
 /// caller.
 pub fn build_outline_snapshot(
     graph: &Graph,
     mut node_presentation: impl FnMut(GraphMemberId) -> (NodeState, bool),
     available_height: f32,
 ) -> GlossOutlineSnapshot {
-    let rows = glossary::outline_rows(graph)
+    let rows = crate::glossary::outline_rows(graph)
         .into_iter()
         .map(|row| GlossOutlineRow {
             depth: row.depth,
@@ -129,7 +128,7 @@ pub fn build_outline_snapshot(
         .collect();
     GlossOutlineSnapshot {
         rows: cap_outline_rows(rows, available_height),
-        metrics: glossary::graph_metrics(graph),
+        metrics: crate::glossary::graph_metrics(graph),
     }
 }
 
