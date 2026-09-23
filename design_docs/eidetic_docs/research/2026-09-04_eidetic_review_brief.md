@@ -29,8 +29,8 @@ Line counts are `src/**/*.rs` including in-file test modules.
 | `chartulary` | `crates/eidetic/chartulary` | 5,989 | The container graph. |
 | `mere-eidetic` | `crates/eidetic/eidetic-core` | 6,881 | The typed memory lane. |
 | `mere-eidetic-fjall` | `crates/eidetic/eidetic-fjall` | 294 | Native LSM backend. |
-| `mere-eidetic-https-fetcher` | `crates/eidetic/eidetic-https-fetcher` | 226 | `BlobFetcher` for `BlobSource::Https`. |
-| `mere-eidetic-iroh-fetcher` | `crates/eidetic/eidetic-iroh-fetcher` | 272 | `BlobFetcher` for `BlobSource::Iroh`. |
+| `mere-eidetic-https-fetcher` | `crates/eidetic/eidetic-https-fetcher` *(historical citation)* <!-- doc-audit: historical-path --> | 226 | `BlobFetcher` for `BlobSource::Https`. |
+| `mere-eidetic-iroh-fetcher` | `crates/eidetic/eidetic-iroh-fetcher` *(historical citation)* <!-- doc-audit: historical-path --> | 272 | `BlobFetcher` for `BlobSource::Iroh`. |
 | `hagiograph` | `crates/eidetic/hagiograph` | 26 | Name reservation, no implementation. |
 | `mere-eidetic-search` | `crates/intel/eidetic-search` | 952 (+709 example) | The tantivy trail index. |
 
@@ -180,7 +180,7 @@ title and tags, with a single shared `chartulary::stemma::Stemma` visit tree
 queries by what they actually need:
 
 - "recent", "this node's history", "removed" — `mere-trail`'s entire
-  [`TrailInput`](../../../crates/domain/trail/src/lib.rs). Graph and store
+  [`TrailInput`](../../../crates/mere/src/trail.rs). Graph and store
   reads. **No text index needed.**
 - `top_domains`, `visits_histogram` — aggregations over a domain string and
   a timestamp. Columnar or a `BTreeMap` fold. **No text index needed.**
@@ -353,7 +353,7 @@ Five, each anchored in a type that exists today.
 `visits_histogram` (`eidetic-search/src/index.rs:276, 299`) already answer
 "where does my attention go" over fast-field columns with no re-index. The
 consumer they would serve is the Trail pane: `mere-trail`'s `TrailInput`
-([`TrailInput`](../../../crates/domain/trail/src/lib.rs)) is a three-section projection whose
+([`TrailInput`](../../../crates/mere/src/trail.rs)) is a three-section projection whose
 `build_trail_items` **has no caller anywhere in the workspace**. A fourth
 section — top domains, a visits histogram — is a report the data supports
 and nothing renders. (If the tantivy recommendation is taken these become

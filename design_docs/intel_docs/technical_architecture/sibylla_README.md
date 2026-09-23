@@ -57,7 +57,7 @@ cargo test -p sibylla --features bert -- --ignored bert::validation
 ## Next
 
 - Founding split and the kernel plan: `design_docs/`.
-- Sibling crate `vates` (generation), at `crates/intel/vates`.
+- Sibling crate `vates` (generation), at `crates/intel/vates` *(historical citation)* <!-- doc-audit: historical-path -->; deleted 2026-09-23, its code is `esp::infer`.
 - Mere's persistence and canvas glue over this crate: `crates/intel/embed` *(historical citation)* <!-- doc-audit: historical-path -->.
 
 License: dual MIT OR Apache-2.0, at your option.

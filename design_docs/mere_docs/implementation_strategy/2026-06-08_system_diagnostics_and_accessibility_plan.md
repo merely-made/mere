@@ -20,7 +20,7 @@ through typed observations and actions rather than raw pixel puppetry.
   observer/probe hooks, apparatus-facing diagnostics bridging, command-surface
   telemetry, and a stable place for user-facing event semantics distinct from
   low-level tracing.
-- `crates/system/registry/register-diagnostics` is useful as the channel catalog,
+- `registry::diagnostics` (`crates/system/registry/src/diagnostics.rs`) is useful as the channel catalog,
   descriptor/config layer, sampling policy, invariant store, and portable emit
   scaffold. It should configure and classify diagnostics; it should not become
   the live UI state store.
@@ -36,7 +36,7 @@ through typed observations and actions rather than raw pixel puppetry.
 - `crates/shell/chrome` still has valuable Graphshell-era shell semantics:
   toolbar, omnibar, command palette, focus authorities, host intents, routing
   hints, and the eventual `project_chrome(state) -> UxTree` direction.
-- `crates/system/registry/register-input` has useful action/binding/conflict
+- `registry::input` (`crates/system/registry/src/input.rs`) has useful action/binding/conflict
   vocabulary. The current keymap is in meerkat, but the registry gives Apparatus
   and Settings a future shape for shortcuts, command discoverability, and conflict
   diagnostics.
@@ -94,7 +94,7 @@ It should collect:
 Sources:
 
 1. `tracing` subscriber layer for low-level spans/events.
-2. `register-diagnostics::emit` global sender for structured diagnostic events.
+2. `registry::diagnostics::emit` global sender for structured diagnostic events.
 3. `ux-events` observers and `UxChannelObserver` for semantic UI events.
 4. Meerkat actor inbox drains in `user_event` for actor lifecycle and faults.
 5. Frame-tree/layout rebuilds for pane bounds, focus targets, and accessibility
@@ -288,7 +288,7 @@ accessibility states.
 ## Progress
 
 - 2026-06-08: Plan written. Grounded in the live `meerkat`, `ux-events`,
-  `register-diagnostics`, `uxtree`, `frame`, `chrome`, `register-input`, and
+  `registry::diagnostics`, `uxtree`, `frame`, `chrome`, `registry::input`, and
   Graphshell harvest docs. No code yet.
 - 2026-06-08: **D1/D2 seed landed.** Added `meerkat::observability` as a bounded
   host-local observation cache, expanded the shared `SurfaceId` vocabulary for
@@ -298,7 +298,7 @@ accessibility states.
   sections from the snapshot. Actor events are recorded from the kernel inbox
   drain for fetch, sync, content respawns, and comms updates. A coarse a11y
   summary records visible surfaces and explicitly marks the OS AccessKit bridge
-  degraded until the real bridge lands. Full `register-diagnostics` descriptor
+  degraded until the real bridge lands. Full `registry::diagnostics` descriptor
   registry, tracing layer, and probe execution remain D3/D4 follow-ons.
 - 2026-06-08: **D3 landed + D4 seed.** `HostObservability` now owns a local
   `DiagnosticsRegistry`, registers the first `meerkat.*` and pane UX channel

@@ -141,7 +141,7 @@ super::{WindowCtx, fetch, render}` feeding a single `impl WindowCtx` block
 `src/graphlets_tests.rs` (299): pure forme + kernel + serde derivation, zero
 `crate::` refs. Pure graph-shape derivation belongs with the graph crates.
 
-- Home: `crates/graph/graphlets` *(historical citation)* <!-- doc-audit: historical-path --> (now `crates/graph/subgraph`) beside glossary / graph-kernel /
+- Home: `crates/graph/graphlets` *(historical citation)* <!-- doc-audit: historical-path --> (then `crates/graph/subgraph` *(historical citation)* <!-- doc-audit: historical-path -->, now the `mere::subgraph` module) beside glossary / graph-kernel /
   linked-data / node-lineage.
 - Done when: derivation + classifier + tests build there; meerkat's
   roster_view_graphlets consumes the crate.
@@ -223,7 +223,7 @@ view types currently leak into data.
   module. That is the first real move from "data imports a view type" toward the
   P8 target shape.
 - First domain slice landed 2026-07-03: the old `crates/platen/domain/gloss` *(historical citation)* <!-- doc-audit: historical-path -->
-  crate was moved to the new top-level `crates/domain/gloss` home, and the
+  crate was moved to the new top-level `crates/domain/gloss` *(historical citation)* <!-- doc-audit: historical-path --> home, and the
   host-neutral gloss vocabulary/geometry from `meerkat::gloss` moved into that
   crate. `meerkat` now depends on `gloss` directly for the outline snapshot
   types, pane-section math, and minimap helpers, while the host snapshot builder
@@ -233,7 +233,7 @@ view types currently leak into data.
   `gloss::build_outline_snapshot`, so `gloss_outline_data.rs` is down to a thin
   `WindowCtx` wrapper that supplies per-window selection/state callbacks.
 - Second domain slice landed 2026-07-03: `roster_model.rs` moved to the new
-  `crates/domain/roster` crate, and `meerkat::roster` was reduced to the local
+  `crates/domain/roster` *(historical citation)* <!-- doc-audit: historical-path --> crate, and `meerkat::roster` was reduced to the local
   CSS/view wrapper plus re-exports. The roster data builders, facet builders,
   and views now read the same vocabulary through the crate boundary without
   changing their host-local behavior.
@@ -242,10 +242,10 @@ view types currently leak into data.
   `roster_facet_data.rs` too: content bucketing, relation/graphlet/field
   labels and selectors, member-label formatting, and the roster facet/card
   helpers. `roster_data.rs`, `roster_facet_data.rs`, the graphlet roster view,
-  and apparatus now consume those helpers through `crates/domain/roster`,
+  and apparatus now consume those helpers through `crates/domain/roster` *(historical citation)* <!-- doc-audit: historical-path -->,
   while the actual `WindowCtx` graph/store walks still stay local pending a
   later builder-input contract cut.
-- Fourth domain slice landed 2026-07-03: `crates/domain/roster` now owns
+- Fourth domain slice landed 2026-07-03: `crates/domain/roster` *(historical citation)* <!-- doc-audit: historical-path --> now owns
   explicit input structs plus the pure row/detail/facet builders for the node,
   link, and field roster surfaces. `roster_data.rs` was reduced to host-side
   graph/cache reads that gather `NodeRowInput` / `LinkCardInput` /
@@ -398,31 +398,31 @@ Verified by grepping each candidate's `use` lines. "crate-refs" counts
   document lookup. Verified with `cargo check -p import --lib` and
   `cargo check -p meerkat --lib`.
 - **2026-07-03**: P8's first domain move landed. Created the real
-  `crates/domain/gloss` home by moving the old platen-side `gloss` crate there,
+  `crates/domain/gloss` *(historical citation)* <!-- doc-audit: historical-path --> home by moving the old platen-side `gloss` crate there,
   folded the host-neutral `meerkat::gloss` vocabulary/geometry into it, deleted
   the local `meerkat` module, and rewired `meerkat` to consume the crate
   directly. Verified `cargo check -p gloss --lib` and `cargo check -p meerkat --lib`;
   then followed up by moving the pure outline-snapshot projection into
   `gloss::build_outline_snapshot`, leaving only the per-window wrapper in
   `meerkat`. The remaining P8 work is still roster/pane-data promotion.
-- **2026-07-03**: P8's second domain move landed. Added `crates/domain/roster`
+- **2026-07-03**: P8's second domain move landed. Added `crates/domain/roster` *(historical citation)* <!-- doc-audit: historical-path -->
   for the neutral roster snapshot vocabulary, deleted `meerkat`'s local
   `roster_model.rs`, and rewired the roster data/view glue to consume the new
   crate through the existing `meerkat::roster` wrapper. Verified
   `cargo check -p roster --lib` and `cargo check -p meerkat --lib`.
-- **2026-07-03**: P8's third domain move landed. `crates/domain/roster` now
+- **2026-07-03**: P8's third domain move landed. `crates/domain/roster` *(historical citation)* <!-- doc-audit: historical-path --> now
   owns the roster helper layer too: content buckets, relation/field/graphlet
   labels and selectors, member-label formatting, and the facet/card helper
   builders. `roster_data.rs`, `roster_facet_data.rs`, the graphlet view, and
   apparatus were cut over to the crate boundary; the remaining work is the
   heavier builder-input extraction from `WindowCtx`.
-- **2026-07-03**: P8's fourth domain move landed. `crates/domain/roster` now
+- **2026-07-03**: P8's fourth domain move landed. `crates/domain/roster` *(historical citation)* <!-- doc-audit: historical-path --> now
   owns explicit input structs and pure builders for node/link/field rows,
   details, and facet cards. `roster_data.rs` and `roster_facet_data.rs` were
   cut down to host-side data gathering plus crate calls. Verified with
   `cargo check -p roster --lib`, `cargo check -p meerkat --lib`, and
   `cargo test -p roster --lib`.
-- **2026-07-03**: P8's fifth domain move landed. `crates/domain/roster` now
+- **2026-07-03**: P8's fifth domain move landed. `crates/domain/roster` *(historical citation)* <!-- doc-audit: historical-path --> now
   owns explicit graphlet row/card inputs and builders too, so graphlet drift
   labels, selector labels, and card summaries no longer live in
   `roster_data.rs`. In the same pass, `pane_data.rs` was reduced to host-side

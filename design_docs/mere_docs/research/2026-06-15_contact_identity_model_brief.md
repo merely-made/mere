@@ -124,7 +124,7 @@ slots contacts under the
 ## 6. File transfer needs no contact model of its own
 
 File transfer is content- or capability-addressed, not person-addressed. Mere
-already has it: [`eidetic-iroh-fetcher`](../../../crates/eidetic/eidetic-iroh-fetcher/)
+already has it: [eidetic's `iroh-fetcher`](../../../crates/eidetic/eidetic-core/src/iroh_fetcher.rs)
 and [`murm/transport`](../../../crates/murm/transport/src/blobs.rs) move blobs over
 iroh tickets (content hash plus node address); the wider field is the same shape
 (Magic Wormhole's PAKE code, IPFS CIDs, Willow/Earthstar capabilities). You address
