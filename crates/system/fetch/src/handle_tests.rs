@@ -622,3 +622,65 @@ fn a_supplied_transport_is_the_wire_the_handle_sends_through() {
         "{direct:?}"
     );
 }
+
+/// A fallback that records what reached it and answers with a fixed body.
+#[derive(Clone)]
+struct Recording(Arc<Mutex<Vec<String>>>);
+
+impl ResourceFetcher for Recording {
+    fn fetch(&self, url: &str) -> Option<Vec<u8>> {
+        self.0.lock().unwrap().push(url.to_owned());
+        Some(b"from the fallback".to_vec())
+    }
+}
+
+#[test]
+fn the_handle_serves_a_documents_resources_and_hands_other_schemes_on() {
+    let server = Server::start();
+    let stores = Stores::in_memory();
+    let shared: Arc<dyn Fetch> = Arc::new(handle(&stores));
+
+    // Without a fallback: http(s) served, the rest refused.
+    let alone = Resources::new(shared.clone());
+    let feed = alone
+        .fetch_response(server.url("/feed.xml").as_str())
+        .unwrap();
+    assert_eq!(feed.bytes, b"<rss></rss>");
+    assert_eq!(feed.final_url, server.url("/feed.xml").to_string());
+    assert_eq!(feed.content_type.as_deref(), Some("application/rss+xml"));
+    assert!(alone.fetch("gemini://example.test/").is_none());
+    // A redirect reports where the bytes really came from.
+    let moved = alone.fetch_response(server.url("/moved").as_str()).unwrap();
+    assert_eq!(moved.final_url, server.url("/episode.mp3").to_string());
+    // The cap is the document engine's, applied before any body is read.
+    assert!(
+        Resources::new(shared.clone())
+            .with_limit(1_000_000)
+            .fetch(server.url("/episode.mp3").as_str())
+            .is_none()
+    );
+
+    // With a fallback: the same http(s) path, and other schemes handed on.
+    let seen = Recording(Arc::new(Mutex::new(Vec::new())));
+    let chained = Resources::new(shared).with_fallback(seen.clone());
+    assert_eq!(
+        chained.fetch(server.url("/feed.xml").as_str()).unwrap(),
+        b"<rss></rss>"
+    );
+    assert_eq!(
+        chained.fetch("gemini://example.test/").unwrap(),
+        b"from the fallback"
+    );
+    assert_eq!(
+        *seen.0.lock().unwrap(),
+        vec!["gemini://example.test/".to_owned()]
+    );
+
+    // And it shares the scope: a cookie set by the actor's page reaches an image.
+    let page = handle(&stores);
+    page.read_all(server.url("/page").as_str(), None, 1024)
+        .unwrap();
+    Resources::new(Arc::new(handle(&stores))).fetch(server.url("/episode.mp3").as_str());
+    let last = server.seen("/episode.mp3").last().cloned().unwrap();
+    assert_eq!(last.header("cookie"), Some("session=persona-a"));
+}

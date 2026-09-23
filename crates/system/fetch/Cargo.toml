@@ -26,6 +26,9 @@ persona-cookies = ["dep:eidetic", "dep:pandect", "dep:serde", "dep:serde_json", 
 flip = ["dep:inker"]
 
 [dependencies]
+# Genet's host-side resource contract, so a handle can serve a document
+# engine's images and stylesheets under the same policy as every other fetch.
+genet-host-api = { workspace = true }
 armillary = { workspace = true, optional = true }
 eidetic = { workspace = true, optional = true }
 errand = { workspace = true, optional = true }
