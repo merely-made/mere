@@ -771,14 +771,6 @@ iroh-mdns-address-lookup = { git = "https://github.com/mark-ik/iroh-address-look
 # it fixes nothing. Drop it whenever this pin is next revisited.
 swarm-discovery = { git = "https://github.com/mark-ik/swarm-discovery.git", branch = "mere", version = "=0.6.3" }
 
-# ipc-channel: in-process fork, vendored in genet at support/patches/ipc-channel
-# and reached here via genet's git (exactly like the taffy patch above). Mere is
-# single-process, so ipc-channel's OS IPC transport is vestigial; the fork defaults
-# to its built-in force-inprocess backend and makes the OS deps optional, dropping
-# the windows 0.61 pin that let gpu-allocator latch onto 0.61.3 while wgpu-hal forced
-# 0.62.2, breaking the dx12 suballocator. With it gone, gpu-allocator unifies on 0.62.
-ipc-channel = { git = "https://github.com/merely-made/genet.git", rev = "532f1fadc53486d60ac4f02835732e8dabd9f62b" }
-
 # Boa JS engine, for the meerkat `scripted` render rung (the `genet.scripted` lane
 # runs page JS through `ScriptedDocument` on Boa). Mirrors genet's own patch
 # (`script-engine-boa` names `boa_engine`/`boa_gc` `=1.0.0-dev`, resolved to the fork).

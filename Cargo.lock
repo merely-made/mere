@@ -19289,11 +19289,6 @@ version = "1.0.0-dev"
 source = "git+https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff9efdaf0ff6d213ab107bbaefe5838ab0"
 
 [[patch.unused]]
-name = "ipc-channel"
-version = "0.22.0"
-source = "git+https://github.com/merely-made/genet.git?rev=532f1fadc53486d60ac4f02835732e8dabd9f62b#532f1fadc53486d60ac4f02835732e8dabd9f62b"
-
-[[patch.unused]]
 name = "iroh-mdns-address-lookup"
 version = "0.4.0"
 source = "git+https://github.com/mark-ik/iroh-address-lookups.git?branch=mere#1f7cfe8552f1512b55e54f0e0ce933d288f80cea"

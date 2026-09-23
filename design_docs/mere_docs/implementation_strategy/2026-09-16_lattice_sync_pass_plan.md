@@ -109,7 +109,9 @@ which does not record the filesystem path of a path package.
   (`genet/design_docs/2026-09-22_malloc_size_of_removal_plan.md`). Nothing in
   Mere's graph depends on `ipc-channel` now, so the row patches nothing. The
   gpu-allocator unification the row's comment protects is unaffected: the crate
-  that carried the OS-IPC dependencies is gone outright. Referred to Mark.
+  that carried the OS-IPC dependencies is gone outright. Mark ruled
+  2026-09-23: the row and its comment are removed, and the unused-patch rows
+  return to the baseline three.
 - **2026-09-22, shared working tree:** during L2 another session ran an
   unlocked `cargo check` in Mere's tree and then `git checkout -- Cargo.lock`
   to undo what it took for its own resolver changes, reverting L2's uncommitted
@@ -611,3 +613,29 @@ wrong source. Report to Mark; change nothing.
   check passes (`turnstone-retained-pins-local.log`) without changing the
   portable lock. Four launcher regression tests pass in this checkout too.
   This demonstrates both supported modes without publishing the failed repin.
+
+- **2026-09-22, L1 and L2 pass B:** genet moved its four netrender rows to
+  `aba7d837b` (`532f1fadc53`), proven redirect-free in a throwaway worktree
+  with no `.cargo/config.toml`: netrender resolves from git as one identity
+  beside boa `52cfb6ff` and vano `8ad08412`, and scripted Ortet checks. Mere
+  then moved 28 root genet rows to `532f1fadc53`, 3 netrender rows to
+  `aba7d837b` and `genet-scripted-dom` to `=0.1.2` (`2a35077e`). Portable
+  lock moved by package-id spec, settled, and verified on 1.98.1: **1,549
+  packages**, lock SHA-256
+  `f5689734284066f021bbaaa6a8ec8c27ef7495d9aac111aecaaf655dee55ddb9` after
+  the dead `ipc-channel` patch row was removed (`4a5065f8…` with it), one
+  genet and one netrender identity, knot-editor's two `5ae30cad` edges
+  retained as on 2026-09-20, no outside path packages, no new duplicate
+  versions. Launcher regression tests pass. The three WASI guests pass
+  metadata-only verify and `--locked` release builds. Local-mode workspace
+  check passes. A bounded `cargo test --locked` over cambium,
+  cambium-rootstock, cambium-winit and meristem passes 308 / 0. The
+  `cambium-nematic` lib-test compile failure (errand's `FeedEntry` grew
+  fields) is present at `a7dd6704` and inherited, not gated. Unused-patch
+  rows: the baseline three, after the `ipc-channel` row removal (Findings). Nested manifests
+  (`crates/cambium/examples/genet_web_smoke`, `ports/graphshell/web`, still
+  at `5ae30cad`) unchanged, as in pass A. Logs and the lock copy:
+  `Code/testing/mere/l2_genet_repin_20260922/`. Consumer round (knot-editor,
+  woodshed, turnstone) is the Redshank session's, on this Mere head plus
+  genet `532f1fadc53`, with knot-editor's two `=0.1.1` rows moving to
+  `=0.1.2`.
