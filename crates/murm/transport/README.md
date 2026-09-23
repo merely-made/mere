@@ -106,7 +106,7 @@ so a bare `cargo test -p mere-transport` skips it.
 - `gemot` uses transport streams and gossip topics for moot-scoped event sync.
 - `mesh` rides `P2pandaTransport` and `sync_overlay_topic` for its sync lane.
 - `commons-spine` depends on it with `reticulum` enabled.
-- `eidetic-iroh-fetcher` fetches artifacts through `BlobStore` / `BlobHash`
+- eidetic's `iroh-fetcher` feature fetches artifacts through `BlobStore` / `BlobHash`
   over a `P2pandaTransport`.
 
 ## Status

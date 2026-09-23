@@ -4,7 +4,7 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! Iroh [`BlobFetcher`] companion crate for [`eidetic`].
+//! Iroh [`BlobFetcher`](crate::BlobFetcher) for eidetic, behind this feature.
 //!
 //! Implements `eidetic::BlobFetcher` for `BlobSource::Iroh { ticket }` by
 //! parsing the ticket as `"<node-id-hex>/<blob-hash-hex>"`, fetching the
@@ -12,7 +12,7 @@
 //! `P2pandaTransport`, and returning the bytes.
 //!
 //! Returns `Ok(None)` for any other source kind so
-//! [`eidetic::manifest::resolve_blob`] can fall through.
+//! [`crate::manifest::resolve_blob`] can fall through.
 //!
 //! ## Hash verification
 //!
@@ -29,10 +29,9 @@
 //! Picked for simplicity over iroh-blobs' opaque base32 `BlobTicket`
 //! format; both encode the same `(PeerID, Hash)` pair.
 
-#![doc(html_root_url = "https://docs.rs/eidetic-iroh-fetcher/0.0.1")]
 
 use async_trait::async_trait;
-use eidetic::{BlobFetcher, BlobSource, Error, Result};
+use crate::{BlobFetcher, BlobSource, Error, Result};
 use std::sync::Arc;
 use transport::{BlobHash, BlobStore, P2pandaTransport, PeerID};
 
