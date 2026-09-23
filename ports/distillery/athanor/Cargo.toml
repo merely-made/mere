@@ -4,7 +4,7 @@ version = "0.0.1"
 edition.workspace = true
 license = "MPL-2.0"
 repository.workspace = true
-description = "Founding reservation. Athanor is the distillation furnace of Distillery, the Mere platform's works: the authority half of Alembic's workshop — what a furnace pass is, what it may propose (distillation, cleanup, facet proposals), and the grants, runs, petitions, and revocation over bounded actors. It proposes and never becomes graph-truth authority; Djinn schedules it as one resident service."
+description = "Athanor is the distillation furnace of Distillery, the Mere platform's works: the authority half of Alembic's workshop — what a furnace pass is, what it may propose (distillation, cleanup, facet proposals), and the grants, runs, petitions, and revocation over bounded actors. It proposes and never becomes graph-truth authority; Djinn schedules it as one resident service."
 readme = "README.md"
 keywords = ["memory", "agents", "distillation", "automation", "local-first"]
 categories = ["development-tools"]
@@ -14,6 +14,16 @@ name = "athanor"
 path = "src/lib.rs"
 
 [dependencies]
-# Deliberately empty, as for the other reservation stubs (alembic, chatelaine,
-# insigne). Dependencies arrive with the first furnace pass that consumes
-# them, each with a version, so the reservation stays publishable.
+alembic = { workspace = true, features = ["recall"] }
+eidetic.workspace = true
+kernel.workspace = true
+pandect.workspace = true
+
+[dev-dependencies]
+async-trait = "0.1"
+chartulary.workspace = true
+euclid = "0.22"
+kernel = { workspace = true, features = ["fixtures"] }
+muniment.workspace = true
+pollster = "0.4"
+serde_json = "1"

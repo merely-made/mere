@@ -39,8 +39,7 @@
 //!   models; its Alembic component runs work over them, and an agent here may
 //!   use a model there. Re-ruled from a port of its own 2026-09-02.
 //! - **Not the store.** Codicils, retention, and the browsing corpus are
-//!   `eidetic`'s; the graph-codicil spine and memory levels currently sit in
-//!   `pandect`.
+//!   `eidetic`'s; the graph-codicil spine sits in `pandect`.
 //! - **Not the grant algebra.** Scoped capability and the validating gate are
 //!   `servitor`'s, and the identity a grant attenuates from is `personae`'s.
 //!
@@ -51,6 +50,9 @@
 //! completing a useful workflow in two hosts through the same grant and
 //! observation surface.
 //!
-//! No implementation yet.
+//! The recall half starts with [`memory_levels`] (feature `recall`), the three
+//! memory levels' read-model, moved here from `pandect` 2026-09-23. The
+//! workshop has no implementation yet.
 
-#![doc(html_no_source)]
+#[cfg(feature = "recall")]
+pub mod memory_levels;

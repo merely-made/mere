@@ -25,7 +25,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::engine_profile_store::PERSONAS_DIR;
 use crate::manifest::PersonaId;
-use crate::memory_levels::EvictionPolicy;
+use alembic::memory_levels::EvictionPolicy;
 
 /// Subdirectory under a persona holding persona settings.
 pub const PERSONA_SETTINGS_DIR: &str = "settings";

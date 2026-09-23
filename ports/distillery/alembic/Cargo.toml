@@ -4,7 +4,7 @@ version = "0.0.1"
 edition.workspace = true
 license = "MPL-2.0"
 repository.workspace = true
-description = "Founding reservation. Alembic is the recall and workshop component of Distillery, the Mere platform's works: the memory surfaces (short-term, long-term, codicils, search) behind a `recall` feature, and the granted-agent and automation workshop over them — create, grant, run, observe, interrupt, and dissolve a bounded actor. Athanor (mere-athanor), the distillation furnace, is its authority half and the first such actor. Inside Distillery since 2026-09-02: Distillery runs models, its Alembic component runs work over them."
+description = "Alembic is the recall and workshop component of Distillery, the Mere platform's works: the memory surfaces (short-term, long-term, codicils, search) behind a `recall` feature, and the granted-agent and automation workshop over them — create, grant, run, observe, interrupt, and dissolve a bounded actor. Athanor (mere-athanor), the distillation furnace, is its authority half and the first such actor. Inside Distillery since 2026-09-02: Distillery runs models, its Alembic component runs work over them."
 readme = "README.md"
 keywords = ["memory", "agents", "recall", "automation", "local-first"]
 categories = ["development-tools"]
@@ -17,13 +17,15 @@ path = "src/lib.rs"
 # The memory surfaces without the workshop, for a host that wants recall only.
 # Mirrors castellan's `keeper` split: an embeddable half a host composes, and
 # an authority half that stays with the resident.
-recall = []
+recall = ["dep:kernel", "dep:serde"]
 
 [dependencies]
-# Deliberately empty, as for the other reservation stubs (chatelaine,
-# insigne). A `fleece` dependency was added here 2026-08-23 as the fleece
-# scope's F5 alembic receipt and removed 2026-08-24: nothing in this crate
-# calls it yet, and an unused dep made the reservation unpublishable
-# (fleece is carried as a branch-git dep with no version). Re-add it, with
-# a version, when alembic has distillation code that actually consumes an
-# Article.
+kernel = { workspace = true, optional = true }
+serde = { version = "1", features = ["derive"], optional = true }
+
+[dev-dependencies]
+chartulary.workspace = true
+euclid = "0.22"
+kernel = { workspace = true, features = ["fixtures"] }
+serde_json = "1"
+uuid = { version = "1", features = ["v4"] }
