@@ -13,7 +13,7 @@ use distillery::flora::{
 };
 use eidetic::{AdapterRuntimeCompat, Hash, ManifestId, ModelAdapterManifest};
 use esp::infer::decoder::PEFT_LORA_NDARRAY_LOADER;
-use gemot::moot::standing::{
+use mien::{
     ChainRoot, CommitmentId, Scope, StandingConfig, StandingEvent, StandingFileStore,
 };
 use gemot::moot::{
