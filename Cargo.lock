@@ -5533,6 +5533,7 @@ dependencies = [
 name = "gaz"
 version = "0.0.1"
 dependencies = [
+ "postcard",
  "serde",
  "serde_json",
 ]

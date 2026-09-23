@@ -7,8 +7,8 @@ first-pass DID grading (amended to match), and accepted the three M0.5
 proposals from that day's critical pass: anchoring on a peer's root with
 attested keys held concurrently, a whole-identity Reticulum key (verified
 against Reticulum's reference implementation), and `Anchor::Local` for keyless
-contacts. JSContact is ruled *an* exchange format (M1). M0.5 in progress; M1
-and M2 drafted with done-conditions.
+contacts. JSContact is ruled *an* exchange format (M1). M0.5 landed the same
+day; M1 and M2 are drafted with done-conditions.
 **Scope**: the contact layer, standalone. The record model, the persona-scoped
 book, then storage over muniment, then the adapters that turn resolver output
 into records, then mere reconciliation.
@@ -188,22 +188,24 @@ is monotonic, so a replayed or late event cannot rewind a record.
 - **M0.5 — the anchor.** Executes the §2 ruling. Nothing stores a book yet
   and nothing outside gaz consumes it (checked 2026-09-23), so there is no
   migration and no legacy decoder (DOC_POLICY §3). Done when:
-  - [ ] `TypedKey` is an enum over Ed25519 (32 bytes), secp256k1 (33,
-        compressed) and P-256 (33, compressed). A Nostr x-only key converts
+  - [x] `TypedKey` is an enum over Ed25519 (32 bytes), secp256k1 (33,
+        compressed), P-256 (33, compressed) and a whole Reticulum identity
+        (64). A Nostr x-only key converts
         losslessly as `0x02 ‖ x`, since BIP-340 fixes the even-Y point.
-  - [ ] Human-readable serde is the `did:key` string (base58btc multibase over
+  - [x] Human-readable serde is the `did:key` string (base58btc multibase over
         the multicodec prefix: `ed01`, `e701`, `8024`); binary serde is the tagged
         raw bytes. Round-trip tests in both codecs, with `bsky.app`'s live
         secp256k1 signing key (from its PLC document) as a fixture.
-  - [ ] `PlcDid` accepts only `did:plc:` plus 24 characters of lowercase
+  - [x] `PlcDid` accepts only `did:plc:` plus 24 characters of lowercase
         base32 (`a-z2-7`); anything else is refused by name.
-  - [ ] `Anchor` is `#[non_exhaustive] { Key(TypedKey), Plc(PlcDid) }`, the
+  - [x] `Anchor` is `#[non_exhaustive] { Key(TypedKey), Plc(PlcDid),
+        Local(LocalId) }`, the
         `ContactBook` map key, and a stored field on `Contact` rather than
         `keys[0]`.
-  - [ ] `by_key` returns every contact holding the key, not the first. Shared
+  - [x] `by_key` returns every contact holding the key, not the first. Shared
         legacy atproto keys make one-key-one-contact false (§5).
         `mark_contacted` and `get`/`get_mut`/`remove` take an `Anchor`.
-  - [ ] **Accepted 2026-09-23 — anchor on the root, hold keys
+  - [x] **Accepted 2026-09-23 — anchor on the root, hold keys
         concurrently** (§2, reopened). A contact's keys become two sets: the
         *root line* (the anchor key and its rotations, successive, each
         proven by the key before it) and *attested keys* (derived and device
@@ -214,7 +216,7 @@ is monotonic, so a replayed or late event cannot rewind a record.
         the contact under the master key it names. Keys seen with no
         attestation file as their own root until an attestation joins them to
         one, which is an M4 merge.
-  - [ ] **Accepted 2026-09-23, conditional on Reticulum's standard, which
+  - [x] **Accepted 2026-09-23, conditional on Reticulum's standard, which
         it meets (§5) — a Reticulum typed key.** `TypedKey::Reticulum` holds
         the whole 64-byte public identity, X25519 then Ed25519 as the
         reference implementation orders it, not the Ed25519 half. It anchors
@@ -223,7 +225,7 @@ is monotonic, so a replayed or late event cannot rewind a record.
         `rnid` exports a public identity as undelimited lowercase hex of the
         64 bytes, so gaz writes those 128 characters. No multicodec exists
         for it, so it has no `did:key` form.
-  - [ ] **Accepted 2026-09-23 — `Anchor::Local` for keyless contacts** (§2,
+  - [x] **Accepted 2026-09-23 — `Anchor::Local` for keyless contacts** (§2,
         reopened). A version-4 `urn:uuid`, JSContact's recommended `uid` form,
         built from 16 random bytes the caller supplies, the same way gaz takes
         its clock from the caller. A `Local` contact may hold no key; the first
@@ -235,7 +237,7 @@ is monotonic, so a replayed or late event cannot rewind a record.
         at "a bare key", so the typed key is arguably insigne's type, with gaz
         consuming it. Built in gaz's `key` module meanwhile and kept
         self-contained (no gaz types inside it), so moving it is mechanical.
-  - [ ] `cargo test -p gaz` and `cargo clippy -p gaz --all-targets -- -D
+  - [x] `cargo test -p gaz` and `cargo clippy -p gaz --all-targets -- -D
         warnings` green; lib docs and quick-start rewritten to the new types.
 - **M1 — persistence.** An optional `muniment` feature; the core stays
   serde-only and default-featureless. Done when:
@@ -390,6 +392,29 @@ text form all match (sources in the
 [standards survey](../../2026-08-24_standards_survey_brief.md)'s §5
 signalman/retinue bullet), which met Mark's condition for accepting it.
 
+**2026-09-23: M0.5, what building it settled.**
+
+- **serde stops at 32-byte arrays**, so `TypedKey`'s binary form is one byte
+  string, gaz's tag byte then the key (`serialize_bytes`), not a derived
+  enum. Tested through postcard, the codec muniment stores with, so M1's
+  format is the one under test.
+- **The stored book is a list of records, not a map** (`crates/dramatis/gaz/src/book.rs`).
+  M0's map key repeated the anchor already inside each record, and the two
+  could disagree on a hand-edited or corrupted file; now there is one copy,
+  and a load refuses two records on one anchor. M0's JSON shape (hex map keys)
+  is gone with it, which costs nothing: no book was ever stored (DOC_POLICY §3).
+- **Every fixture has a real source**, not invented bytes: the did:key spec's
+  worked example, `bsky.app`'s live secp256k1 key, a live P-256 key from the
+  PLC export, prns's RNS 1.4.2 identity, and the IETF base58 draft's examples.
+  The identity's hash was recomputed as a positive control: the whole 64
+  bytes reproduce prns's expected hash and the Ed25519 half alone does not.
+- **The invariant tests bite.** Two were broken on purpose (an attestation
+  by an unknown root accepted on load; an uncompressed secp256k1 prefix
+  accepted) and their tests went red, then the code was restored.
+- `contact.rs` crossed the 600-line ceiling with its tests, which moved to
+  `contact_tests.rs` by `#[path]`, as personae's `sealed_record_storage_tests.rs`
+  does.
+
 **2026-09-23: WebFinger yields no key.** `gazette::WebFingerImport`
 (`ports/gazette/src/lib.rs`) classifies endpoints and aliases and has no key
 field. That is what the contact brief intends (§3): WebFinger fills in
@@ -453,3 +478,12 @@ reference implementation's `RNS/Identity.py` and `rnid`, and against prns
 `rnid`'s own hex. JSContact is ruled *an* exchange format, not *the*. The M2
 WebFinger rule is no longer conditional: a keyless import starts a `Local`
 contact. Still open: whether `TypedKey` lives in insigne (M0.5). M0.5 starts.
+
+**2026-09-23, M0.5 landed.** `TypedKey`, `Anchor` (`Key`, `Plc`, `Local`),
+the root line and attested keys, `by_key` returning every holder, and a book
+stored as a list. `cargo test -p gaz`: 70 passed plus 1 doctest;
+`cargo clippy -p gaz --all-targets -- -D warnings` clean; rustfmt applied.
+File sizes: contact 396 (+ tests 280), key 483, book 462, anchor 366, encoding
+156, trust 136, handle 129, endpoint 125, lib 102. One dev-dependency added
+(postcard), one `Cargo.lock` line. Still open: where `TypedKey` lives. M1
+(persistence) is next; its at-rest sealing question is still open (M1).

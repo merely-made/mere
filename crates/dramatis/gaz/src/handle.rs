@@ -18,7 +18,9 @@ use crate::trust::TrustState;
 pub enum HandleKind {
     /// A WebFinger account, `acct:user@host`, the host-rooted family.
     Acct,
-    /// A decentralized identifier, `did:web:…` or `did:plc:…`.
+    /// A decentralized identifier used as a name, such as `did:web:…`. A
+    /// `did:plc` files a record (see [`Anchor`](crate::Anchor)) rather than
+    /// labelling one.
     Did,
     /// A Nostr `npub…`.
     Nostr,
