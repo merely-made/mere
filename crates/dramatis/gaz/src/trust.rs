@@ -22,7 +22,8 @@ use serde::{Deserialize, Serialize};
 pub enum ProofMethod {
     /// A signature by the contact's root key.
     Signature,
-    /// A DID document that self-authenticates.
+    /// A DID's own record vouches for it: a valid operation in a `did:plc`
+    /// log, or a DID document that self-authenticates.
     DidAuth,
     /// The back-claim proof: the handle's own well-known document names the key.
     BackClaim,

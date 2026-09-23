@@ -3,7 +3,7 @@ name = "gaz"
 version = "0.0.1"
 edition = "2024"
 license.workspace = true
-description = "The contact layer: persona-scoped, key-rooted contact records. Your petname for them, rooted on stable keys, with handles and endpoints each carrying their own trust state, plus kith/kin tiers and recency. A resolver finds the wide world; gaz keeps who you actually know."
+description = "The contact layer: persona-scoped contact records. Your petname for them, filed under an anchor that never moves (a typed root key, an atproto did:plc, or a local id), with keys, handles and endpoints each carrying their own trust state, plus kith/kin tiers and recency. A resolver finds the wide world; gaz keeps who you actually know."
 repository = "https://github.com/merely-made/mere"
 readme = "README.md"
 keywords = ["contacts", "petname", "identity", "persona", "kith"]
@@ -14,4 +14,7 @@ exclude = ["design_docs/"]
 serde.workspace = true
 
 [dev-dependencies]
+# The binary codec muniment stores with, so the binary serde path is tested
+# against the format M1 persists in.
+postcard = { version = "1", features = ["alloc"] }
 serde_json = "1"

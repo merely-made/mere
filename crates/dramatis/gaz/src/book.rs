@@ -9,10 +9,12 @@
 use std::collections::BTreeMap;
 use std::fmt;
 
-use serde::{Deserialize, Serialize};
+use serde::ser::SerializeStruct;
+use serde::{Deserialize, Serialize, Serializer};
 
+use crate::anchor::Anchor;
 use crate::contact::{Contact, ContactTier};
-use crate::key::ContactKey;
+use crate::key::TypedKey;
 
 /// Which persona a book belongs to.
 ///
@@ -68,13 +70,64 @@ impl core::error::Error for ScopeMismatch {}
 
 /// One persona's contacts.
 ///
-/// Records are filed under their anchor, the first key you ever knew someone
-/// by, so a key rotation never moves a record and an old signature still finds
-/// its owner.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+/// Records are filed under their [`Anchor`], so a key rotation never moves a
+/// record and an old signature still finds its owner. Stored as a list of
+/// records rather than a map, so a filing key can never disagree with the
+/// anchor inside its record.
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize)]
+#[serde(try_from = "BookRecord")]
 pub struct ContactBook {
     scope: PersonaScope,
-    contacts: BTreeMap<ContactKey, Contact>,
+    contacts: BTreeMap<Anchor, Contact>,
+}
+
+/// A book as stored, before its anchors are checked for duplicates.
+#[derive(Deserialize)]
+struct BookRecord {
+    scope: PersonaScope,
+    contacts: Vec<Contact>,
+}
+
+/// Two stored records claimed the same anchor.
+#[derive(Debug)]
+struct DuplicateAnchor(Anchor);
+
+impl fmt::Display for DuplicateAnchor {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "two contacts share the anchor {}", self.0)
+    }
+}
+
+impl TryFrom<BookRecord> for ContactBook {
+    type Error = DuplicateAnchor;
+
+    fn try_from(record: BookRecord) -> Result<Self, DuplicateAnchor> {
+        let mut book = Self::new(record.scope);
+        for contact in record.contacts {
+            let anchor = contact.anchor().clone();
+            if book.insert(contact).is_some() {
+                return Err(DuplicateAnchor(anchor));
+            }
+        }
+        Ok(book)
+    }
+}
+
+impl Serialize for ContactBook {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        let mut state = serializer.serialize_struct("ContactBook", 2)?;
+        state.serialize_field("scope", &self.scope)?;
+        state.serialize_field("contacts", &Records(&self.contacts))?;
+        state.end()
+    }
+}
+
+struct Records<'a>(&'a BTreeMap<Anchor, Contact>);
+
+impl Serialize for Records<'_> {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        serializer.collect_seq(self.0.values())
+    }
 }
 
 impl ContactBook {
@@ -107,28 +160,27 @@ impl ContactBook {
 
     /// File a contact, replacing any record under the same anchor.
     pub fn insert(&mut self, contact: Contact) -> Option<Contact> {
-        self.contacts.insert(contact.anchor(), contact)
+        self.contacts.insert(contact.anchor().clone(), contact)
     }
 
     /// Look a contact up by anchor.
-    pub fn get(&self, anchor: &ContactKey) -> Option<&Contact> {
+    pub fn get(&self, anchor: &Anchor) -> Option<&Contact> {
         self.contacts.get(anchor)
     }
 
     /// Borrow a contact mutably by anchor.
-    pub fn get_mut(&mut self, anchor: &ContactKey) -> Option<&mut Contact> {
+    pub fn get_mut(&mut self, anchor: &Anchor) -> Option<&mut Contact> {
         self.contacts.get_mut(anchor)
     }
 
-    /// Find a contact by any key they have ever used, current or retired.
+    /// Every contact holding this key: root or attested, current or retired.
     ///
-    /// The anchor lookup is a map hit; a retired key costs a scan, which is the
-    /// right trade for an address book and the reason a rotated-away key still
-    /// resolves at all.
-    pub fn by_key(&self, key: &ContactKey) -> Option<&Contact> {
+    /// Every one, not the first. One key can belong to more than one record:
+    /// atproto servers once issued a single signing key to many accounts.
+    pub fn by_key<'a>(&'a self, key: &'a TypedKey) -> impl Iterator<Item = &'a Contact> + 'a {
         self.contacts
-            .get(key)
-            .or_else(|| self.contacts.values().find(|c| c.knows_key(key)))
+            .values()
+            .filter(move |contact| contact.knows_key(key))
     }
 
     /// Find a contact by a handle string a person typed.
@@ -146,7 +198,7 @@ impl ContactBook {
     }
 
     /// Remove a contact by anchor.
-    pub fn remove(&mut self, anchor: &ContactKey) -> Option<Contact> {
+    pub fn remove(&mut self, anchor: &Anchor) -> Option<Contact> {
         self.contacts.remove(anchor)
     }
 
@@ -184,16 +236,15 @@ impl ContactBook {
         self.contacts.values().filter(|contact| contact.has_alarm())
     }
 
-    /// Note contact with whoever owns this key, current or retired.
+    /// Note contact with whoever is filed under this anchor.
     ///
-    /// Returns whether anyone was found.
-    pub fn mark_contacted(&mut self, key: &ContactKey, now_ms: u64) -> bool {
-        let Some(anchor) = self.by_key(key).map(Contact::anchor) else {
+    /// Returns whether anyone was found. To mark by a key a message arrived
+    /// under, resolve it with [`ContactBook::by_key`] first.
+    pub fn mark_contacted(&mut self, anchor: &Anchor, now_ms: u64) -> bool {
+        let Some(contact) = self.contacts.get_mut(anchor) else {
             return false;
         };
-        if let Some(contact) = self.contacts.get_mut(&anchor) {
-            contact.mark_contacted(now_ms);
-        }
+        contact.mark_contacted(now_ms);
         true
     }
 
@@ -216,12 +267,17 @@ impl ContactBook {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::anchor::{LocalId, PlcDid};
     use crate::endpoint::{Endpoint, EndpointKind};
     use crate::handle::Handle;
-    use crate::trust::TrustState;
+    use crate::trust::{ProofMethod, TrustState};
 
-    fn key(seed: u8) -> ContactKey {
-        ContactKey::from_bytes([seed; 32])
+    fn key(seed: u8) -> TypedKey {
+        TypedKey::ed25519([seed; 32])
+    }
+
+    fn anchor(seed: u8) -> Anchor {
+        Anchor::Key(key(seed))
     }
 
     fn book() -> ContactBook {
@@ -245,16 +301,40 @@ mod tests {
         assert_eq!(error.expected, PersonaScope::new("burner"));
     }
 
+    fn names<'a>(contacts: impl Iterator<Item = &'a Contact>) -> Vec<&'a str> {
+        contacts.map(|contact| contact.petname.as_str()).collect()
+    }
+
     #[test]
-    fn a_rotated_key_still_finds_its_owner() {
+    fn a_rotated_or_attested_key_still_finds_its_owner() {
         let mut book = book();
         let mut alice = Contact::new("Alice", key(1));
-        alice.rotate_to(key(2));
+        alice.rotate_to(key(2), Some(ProofMethod::Signature));
+        alice.attest(key(10), "mesh-author", key(2), None).unwrap();
         book.insert(alice);
 
-        assert_eq!(book.by_key(&key(1)).unwrap().petname, "Alice");
-        assert_eq!(book.by_key(&key(2)).unwrap().petname, "Alice");
-        assert!(book.by_key(&key(9)).is_none());
+        for known in [1, 2, 10] {
+            assert_eq!(
+                names(book.by_key(&key(known))),
+                vec!["Alice"],
+                "key {known}"
+            );
+        }
+        assert_eq!(book.by_key(&key(9)).count(), 0);
+    }
+
+    #[test]
+    fn a_shared_key_finds_every_holder() {
+        // atproto servers once gave many accounts one signing key.
+        let mut book = book();
+        let shared = key(7);
+        for (name, did) in [
+            ("Bluesky", "did:plc:z72i7hdynmk6r22z27h6tvur"),
+            ("atproto", "did:plc:ewvi7nxzyoun6zhxrhs64oiz"),
+        ] {
+            book.insert(Contact::new_plc(name, PlcDid::parse(did).unwrap(), shared));
+        }
+        assert_eq!(names(book.by_key(&shared)), vec!["atproto", "Bluesky"]);
     }
 
     #[test]
@@ -262,10 +342,21 @@ mod tests {
         let mut book = book();
         book.insert(Contact::new("Alice", key(1)));
 
-        book.get_mut(&key(1)).unwrap().rotate_to(key(2));
+        book.get_mut(&anchor(1)).unwrap().rotate_to(key(2), None);
 
         assert_eq!(book.len(), 1, "rotation must not create a second record");
-        assert!(book.get(&key(1)).is_some(), "still filed under the anchor");
+        assert!(
+            book.get(&anchor(1)).is_some(),
+            "still filed under the anchor"
+        );
+    }
+
+    #[test]
+    fn a_local_contact_is_filed_under_its_id() {
+        let mut book = book();
+        let id = LocalId::from_random([3; 16]);
+        book.insert(Contact::new_local("Mum", id));
+        assert_eq!(book.get(&Anchor::Local(id)).unwrap().petname, "Mum");
     }
 
     #[test]
@@ -289,8 +380,8 @@ mod tests {
         book.insert(Contact::new("Bob", key(2)));
         book.insert(Contact::new("Carol", key(3)));
 
-        book.mark_contacted(&key(1), 100);
-        book.mark_contacted(&key(2), 300);
+        book.mark_contacted(&anchor(1), 100);
+        book.mark_contacted(&anchor(2), 300);
 
         let names: Vec<&str> = book.recent(10).iter().map(|c| c.petname.as_str()).collect();
         assert_eq!(names, vec!["Bob", "Alice"], "Carol was never contacted");
@@ -301,22 +392,22 @@ mod tests {
         let mut book = book();
         for seed in 1..=5u8 {
             book.insert(Contact::new(format!("P{seed}"), key(seed)));
-            book.mark_contacted(&key(seed), u64::from(seed) * 10);
+            book.mark_contacted(&anchor(seed), u64::from(seed) * 10);
         }
         assert_eq!(book.recent(2).len(), 2);
         assert_eq!(book.recent(2)[0].petname, "P5");
     }
 
     #[test]
-    fn marking_through_a_retired_key_reaches_the_record() {
+    fn marking_an_unknown_anchor_finds_nobody() {
         let mut book = book();
-        let mut alice = Contact::new("Alice", key(1));
-        alice.rotate_to(key(2));
-        book.insert(alice);
-
-        assert!(book.mark_contacted(&key(1), 500));
-        assert_eq!(book.get(&key(1)).unwrap().last_contact_ms, Some(500));
-        assert!(!book.mark_contacted(&key(9), 500), "nobody owns that key");
+        book.insert(Contact::new("Alice", key(1)));
+        assert!(book.mark_contacted(&anchor(1), 500));
+        assert_eq!(book.get(&anchor(1)).unwrap().last_contact_ms, Some(500));
+        assert!(
+            !book.mark_contacted(&anchor(9), 500),
+            "nobody is filed there"
+        );
     }
 
     #[test]
@@ -330,23 +421,42 @@ mod tests {
             ),
         );
 
-        let kin: Vec<&str> = book
-            .tier(ContactTier::Kin)
-            .map(|c| c.petname.as_str())
-            .collect();
-        assert_eq!(kin, vec!["Alice"]);
+        assert_eq!(names(book.tier(ContactTier::Kin)), vec!["Alice"]);
+        assert_eq!(names(book.alarms()), vec!["Bob"]);
+    }
 
-        let alarming: Vec<&str> = book.alarms().map(|c| c.petname.as_str()).collect();
-        assert_eq!(alarming, vec!["Bob"]);
+    fn mixed_book() -> ContactBook {
+        let mut book = book();
+        book.insert(Contact::new("Alice", key(1)).with_handle(Handle::acct("a@x.org")));
+        book.insert(Contact::new_plc(
+            "Bluesky",
+            PlcDid::parse("did:plc:z72i7hdynmk6r22z27h6tvur").unwrap(),
+            key(2),
+        ));
+        book.insert(Contact::new_local("Mum", LocalId::from_random([4; 16])));
+        book.mark_contacted(&anchor(1), 77);
+        book
     }
 
     #[test]
-    fn serde_round_trips_a_book() {
-        let mut book = book();
-        book.insert(Contact::new("Alice", key(1)).with_handle(Handle::acct("a@x.org")));
-        book.mark_contacted(&key(1), 77);
+    fn serde_round_trips_a_mixed_book_in_json_and_binary() {
+        let book = mixed_book();
 
         let json = serde_json::to_string(&book).unwrap();
         assert_eq!(serde_json::from_str::<ContactBook>(&json).unwrap(), book);
+
+        let bytes = postcard::to_allocvec(&book).unwrap();
+        assert_eq!(postcard::from_bytes::<ContactBook>(&bytes).unwrap(), book);
+    }
+
+    #[test]
+    fn a_stored_book_with_two_records_on_one_anchor_fails_to_load() {
+        let alice = serde_json::to_string(&Contact::new("Alice", key(1))).unwrap();
+        let json = format!(r#"{{"scope":"work","contacts":[{alice},{alice}]}}"#);
+        let error = serde_json::from_str::<ContactBook>(&json).unwrap_err();
+        assert!(
+            error.to_string().contains("share the anchor"),
+            "got: {error}"
+        );
     }
 }

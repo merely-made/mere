@@ -4,166 +4,334 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! The stable middle a contact is rooted on.
+//! Public keys, typed by the family that minted them.
+//!
+//! A 32-byte Ed25519 key and a 32-byte Nostr key are not the same thing, so a
+//! key carries its family. Each family keeps its own standard text form: the
+//! multicodec families are written as `did:key` (base58btc multibase over a
+//! multicodec prefix), and a Reticulum identity, which has no multicodec, is
+//! written the way Reticulum's `rnid` exports one, as 128 lowercase hex
+//! characters.
 
 use core::fmt;
 use core::str::FromStr;
 
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
+use serde::de::{self, Deserializer, SeqAccess, Visitor};
+use serde::{Deserialize, Serialize, Serializer};
 
-/// A contact's root public key.
-///
-/// Thirty-two bytes, the width of an Ed25519 public key, which is what
-/// `personae` mints and what murm, Nostr, and the DID methods all carry. A
-/// contact is rooted here rather than on a handle, so a peer who moves hosts
-/// stays the same contact.
+use crate::encoding::{base58_decode, base58_encode, hex_decode, hex_encode};
+
+const DID_KEY: &str = "did:key:";
+const ED25519_CODEC: [u8; 2] = [0xed, 0x01];
+const SECP256K1_CODEC: [u8; 2] = [0xe7, 0x01];
+const P256_CODEC: [u8; 2] = [0x80, 0x24];
+
+/// A public key and the family it belongs to.
 ///
 /// gaz stores keys and compares them. It never verifies a signature with one:
 /// crypto belongs to the trust plane, which is why this crate depends on no
 /// cryptography at all.
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct ContactKey([u8; 32]);
+pub enum TypedKey {
+    /// Ed25519: what `personae` mints, and what murm, iroh and the mesh sign
+    /// with.
+    Ed25519([u8; 32]),
+    /// A compressed secp256k1 point: atproto signing and rotation keys, and
+    /// Nostr keys lifted from x-only form.
+    Secp256k1([u8; 33]),
+    /// A compressed P-256 point: most atproto signing keys issued today.
+    P256([u8; 33]),
+    /// A whole Reticulum identity: the X25519 exchange half, then the Ed25519
+    /// signing half. Reticulum fingerprints the two together, so they are
+    /// never split.
+    Reticulum([u8; 64]),
+}
 
-/// Hex in text formats, raw bytes in binary ones.
-///
-/// Not decoration. A key is a map key in [`ContactBook`], and JSON map keys
-/// must be strings, so a byte array cannot round-trip through the JSON codec
-/// at all. Hex also makes a stored book readable by a person, which is worth
-/// something for a file that holds who you know. Binary formats keep the raw
-/// bytes, so postcard pays nothing for the courtesy.
-///
-/// [`ContactBook`]: crate::ContactBook
-impl Serialize for ContactKey {
-    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
-        if serializer.is_human_readable() {
-            serializer.serialize_str(&self.to_hex())
-        } else {
-            self.0.serialize(serializer)
+/// Which family a [`TypedKey`] belongs to.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum KeyAlgorithm {
+    /// Ed25519.
+    Ed25519,
+    /// secp256k1, compressed.
+    Secp256k1,
+    /// P-256, compressed.
+    P256,
+    /// A Reticulum identity, X25519 then Ed25519.
+    Reticulum,
+}
+
+impl KeyAlgorithm {
+    /// gaz's own tag for the binary form. The text form carries the standard.
+    const fn tag(self) -> u8 {
+        match self {
+            Self::Ed25519 => 1,
+            Self::Secp256k1 => 2,
+            Self::P256 => 3,
+            Self::Reticulum => 4,
         }
     }
 }
 
-impl<'de> Deserialize<'de> for ContactKey {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
-        if deserializer.is_human_readable() {
-            let text = String::deserialize(deserializer)?;
-            Self::from_hex(&text).map_err(serde::de::Error::custom)
-        } else {
-            <[u8; 32]>::deserialize(deserializer).map(Self)
-        }
-    }
-}
-
-impl ContactKey {
-    /// The width of a key in bytes.
-    pub const LEN: usize = 32;
-
-    /// Wrap raw key bytes.
-    pub const fn from_bytes(bytes: [u8; 32]) -> Self {
-        Self(bytes)
+impl TypedKey {
+    /// Wrap an Ed25519 public key.
+    pub const fn ed25519(bytes: [u8; 32]) -> Self {
+        Self::Ed25519(bytes)
     }
 
-    /// Borrow the raw key bytes, for handing to a verifier that does own crypto.
-    pub const fn as_bytes(&self) -> &[u8; 32] {
-        &self.0
+    /// Wrap a compressed secp256k1 point.
+    pub fn secp256k1(bytes: [u8; 33]) -> Result<Self, KeyParseError> {
+        compressed(&bytes)?;
+        Ok(Self::Secp256k1(bytes))
     }
 
-    /// Lowercase hex, 64 characters.
-    pub fn to_hex(&self) -> String {
-        let mut out = String::with_capacity(64);
-        for byte in self.0 {
-            out.push(hex_digit(byte >> 4));
-            out.push(hex_digit(byte & 0x0f));
-        }
-        out
+    /// Wrap a compressed P-256 point.
+    pub fn p256(bytes: [u8; 33]) -> Result<Self, KeyParseError> {
+        compressed(&bytes)?;
+        Ok(Self::P256(bytes))
     }
 
-    /// Parse lowercase or uppercase hex, 64 characters.
-    pub fn from_hex(text: &str) -> Result<Self, KeyParseError> {
-        let bytes = text.as_bytes();
-        if bytes.len() != 64 {
-            return Err(KeyParseError::Length { found: bytes.len() });
-        }
-        let mut out = [0u8; 32];
-        for (index, pair) in bytes.chunks_exact(2).enumerate() {
-            let high = hex_value(pair[0])?;
-            let low = hex_value(pair[1])?;
-            out[index] = (high << 4) | low;
-        }
-        Ok(Self(out))
+    /// Wrap a whole Reticulum public identity, X25519 half first, as
+    /// `RNS.Identity.get_public_key()` returns it.
+    pub const fn reticulum(bytes: [u8; 64]) -> Self {
+        Self::Reticulum(bytes)
     }
 
-    /// The first eight hex characters, for logs and compact UI.
+    /// Lift a Nostr x-only key (BIP-340) into compressed form.
     ///
-    /// A prefix is never an identity. Compare whole keys.
+    /// Lossless: BIP-340 fixes the point with the even Y, which is the `0x02`
+    /// prefix.
+    pub fn from_nostr_x_only(x: [u8; 32]) -> Self {
+        let mut bytes = [0u8; 33];
+        bytes[0] = 0x02;
+        bytes[1..].copy_from_slice(&x);
+        Self::Secp256k1(bytes)
+    }
+
+    /// Which family this key belongs to.
+    pub const fn algorithm(&self) -> KeyAlgorithm {
+        match self {
+            Self::Ed25519(_) => KeyAlgorithm::Ed25519,
+            Self::Secp256k1(_) => KeyAlgorithm::Secp256k1,
+            Self::P256(_) => KeyAlgorithm::P256,
+            Self::Reticulum(_) => KeyAlgorithm::Reticulum,
+        }
+    }
+
+    /// The raw key bytes, for handing to a verifier that does own crypto.
+    pub fn as_bytes(&self) -> &[u8] {
+        match self {
+            Self::Ed25519(bytes) => bytes,
+            Self::Secp256k1(bytes) | Self::P256(bytes) => bytes,
+            Self::Reticulum(bytes) => bytes,
+        }
+    }
+
+    /// The family's standard text form: a `did:key`, or `rnid`'s hex.
+    pub fn to_text(&self) -> String {
+        match self {
+            Self::Ed25519(bytes) => did_key(ED25519_CODEC, bytes),
+            Self::Secp256k1(bytes) => did_key(SECP256K1_CODEC, bytes),
+            Self::P256(bytes) => did_key(P256_CODEC, bytes),
+            Self::Reticulum(bytes) => hex_encode(bytes),
+        }
+    }
+
+    /// The first eight hex characters of the key bytes, for logs and compact
+    /// UI. A prefix is never an identity: compare whole keys.
     pub fn short(&self) -> String {
-        self.to_hex()[..8].to_string()
+        hex_encode(&self.as_bytes()[..4])
+    }
+
+    /// Read gaz's binary form: one tag byte, then the key bytes.
+    fn from_tagged(tagged: &[u8]) -> Result<Self, KeyParseError> {
+        let Some((&tag, key)) = tagged.split_first() else {
+            return Err(KeyParseError::Length {
+                expected: 1,
+                found: 0,
+            });
+        };
+        match tag {
+            1 => exact(key).map(Self::Ed25519),
+            2 => Self::secp256k1(exact(key)?),
+            3 => Self::p256(exact(key)?),
+            4 => exact(key).map(Self::Reticulum),
+            _ => Err(KeyParseError::Codec),
+        }
+    }
+
+    fn to_tagged(self) -> Vec<u8> {
+        let mut tagged = Vec::with_capacity(1 + self.as_bytes().len());
+        tagged.push(self.algorithm().tag());
+        tagged.extend_from_slice(self.as_bytes());
+        tagged
     }
 }
 
-const fn hex_digit(nibble: u8) -> char {
-    match nibble {
-        0..=9 => (b'0' + nibble) as char,
-        _ => (b'a' + nibble - 10) as char,
+fn did_key(codec: [u8; 2], key: &[u8]) -> String {
+    let mut payload = Vec::with_capacity(codec.len() + key.len());
+    payload.extend_from_slice(&codec);
+    payload.extend_from_slice(key);
+    format!("{DID_KEY}z{}", base58_encode(&payload))
+}
+
+fn from_did_key(multibase: &str) -> Result<TypedKey, KeyParseError> {
+    let encoded = multibase
+        .strip_prefix('z')
+        .ok_or(KeyParseError::Multibase)?;
+    let payload = base58_decode(encoded).ok_or(KeyParseError::Base58)?;
+    let (codec, key) = payload.split_at_checked(2).ok_or(KeyParseError::Codec)?;
+    match codec {
+        [0xed, 0x01] => exact(key).map(TypedKey::Ed25519),
+        [0xe7, 0x01] => TypedKey::secp256k1(exact(key)?),
+        [0x80, 0x24] => TypedKey::p256(exact(key)?),
+        _ => Err(KeyParseError::Codec),
     }
 }
 
-const fn hex_value(byte: u8) -> Result<u8, KeyParseError> {
-    match byte {
-        b'0'..=b'9' => Ok(byte - b'0'),
-        b'a'..=b'f' => Ok(byte - b'a' + 10),
-        b'A'..=b'F' => Ok(byte - b'A' + 10),
-        _ => Err(KeyParseError::Digit),
+fn exact<const N: usize>(bytes: &[u8]) -> Result<[u8; N], KeyParseError> {
+    bytes.try_into().map_err(|_| KeyParseError::Length {
+        expected: N,
+        found: bytes.len(),
+    })
+}
+
+fn compressed(bytes: &[u8; 33]) -> Result<(), KeyParseError> {
+    match bytes[0] {
+        0x02 | 0x03 => Ok(()),
+        _ => Err(KeyParseError::NotCompressed),
     }
 }
 
-/// Full hex, so a key round-trips through `to_string` and `parse`.
-impl fmt::Display for ContactKey {
+impl FromStr for TypedKey {
+    type Err = KeyParseError;
+
+    /// Read a `did:key`, or a Reticulum identity as `rnid` writes it (either
+    /// case is accepted; gaz writes lowercase).
+    fn from_str(text: &str) -> Result<Self, Self::Err> {
+        if let Some(multibase) = text.strip_prefix(DID_KEY) {
+            return from_did_key(multibase);
+        }
+        if text.len() == 128 {
+            return hex_decode::<64>(text)
+                .map(Self::Reticulum)
+                .ok_or(KeyParseError::Hex);
+        }
+        Err(KeyParseError::Form)
+    }
+}
+
+/// The standard text form, so a key round-trips through `to_string` and
+/// `parse`.
+impl fmt::Display for TypedKey {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str(&self.to_hex())
+        f.write_str(&self.to_text())
     }
 }
 
 /// Abbreviated, so a log line stays readable.
-impl fmt::Debug for ContactKey {
+impl fmt::Debug for TypedKey {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "ContactKey({})", self.short())
+        write!(f, "{:?}({})", self.algorithm(), self.short())
     }
 }
 
-impl FromStr for ContactKey {
-    type Err = KeyParseError;
-
-    fn from_str(text: &str) -> Result<Self, Self::Err> {
-        Self::from_hex(text)
+/// The text form in human-readable formats, so a stored book stays readable
+/// and a key can serve as a JSON string. Binary formats get the tag and the
+/// raw bytes.
+impl Serialize for TypedKey {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        if serializer.is_human_readable() {
+            serializer.serialize_str(&self.to_text())
+        } else {
+            serializer.serialize_bytes(&self.to_tagged())
+        }
     }
 }
 
-impl From<[u8; 32]> for ContactKey {
-    fn from(bytes: [u8; 32]) -> Self {
-        Self(bytes)
+impl<'de> Deserialize<'de> for TypedKey {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        if deserializer.is_human_readable() {
+            deserializer.deserialize_str(TextVisitor)
+        } else {
+            deserializer.deserialize_bytes(TaggedVisitor)
+        }
     }
 }
 
-/// Why a hex string was not a key.
+struct TextVisitor;
+
+impl Visitor<'_> for TextVisitor {
+    type Value = TypedKey;
+
+    fn expecting(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str("a did:key, or a Reticulum identity in hex")
+    }
+
+    fn visit_str<E: de::Error>(self, text: &str) -> Result<TypedKey, E> {
+        text.parse().map_err(E::custom)
+    }
+}
+
+struct TaggedVisitor;
+
+impl<'de> Visitor<'de> for TaggedVisitor {
+    type Value = TypedKey;
+
+    fn expecting(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str("a key tag followed by the key bytes")
+    }
+
+    fn visit_bytes<E: de::Error>(self, tagged: &[u8]) -> Result<TypedKey, E> {
+        TypedKey::from_tagged(tagged).map_err(E::custom)
+    }
+
+    fn visit_seq<A: SeqAccess<'de>>(self, mut seq: A) -> Result<TypedKey, A::Error> {
+        let mut tagged = Vec::with_capacity(65);
+        while let Some(byte) = seq.next_element::<u8>()? {
+            tagged.push(byte);
+        }
+        TypedKey::from_tagged(&tagged).map_err(de::Error::custom)
+    }
+}
+
+/// Why text or bytes were not a key.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum KeyParseError {
-    /// Not 64 hex characters.
+    /// Neither a `did:key` nor a 128-character Reticulum identity.
+    Form,
+    /// A `did:key` whose multibase is not base58btc (`z`).
+    Multibase,
+    /// A character outside the base58btc alphabet.
+    Base58,
+    /// A multicodec prefix, or a binary tag, gaz does not hold.
+    Codec,
+    /// The right family, the wrong number of bytes.
     Length {
-        /// How many characters were supplied.
+        /// How many bytes the family takes.
+        expected: usize,
+        /// How many were supplied.
         found: usize,
     },
-    /// A character outside `[0-9a-fA-F]`.
-    Digit,
+    /// A secp256k1 or P-256 key that is not a compressed point.
+    NotCompressed,
+    /// A Reticulum identity with a character outside `[0-9a-fA-F]`.
+    Hex,
 }
 
 impl fmt::Display for KeyParseError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::Length { found } => {
-                write!(f, "a contact key is 64 hex characters, found {found}")
+            Self::Form => f.write_str("a key is a did:key or a 128-character Reticulum identity"),
+            Self::Multibase => f.write_str("a did:key is base58btc multibase, starting with z"),
+            Self::Base58 => f.write_str("a did:key holds base58btc characters only"),
+            Self::Codec => f.write_str("not a key family gaz holds"),
+            Self::Length { expected, found } => {
+                write!(f, "this key family takes {expected} bytes, found {found}")
             },
-            Self::Digit => f.write_str("a contact key holds hex digits only"),
+            Self::NotCompressed => {
+                f.write_str("a secp256k1 or P-256 key must be a compressed point")
+            },
+            Self::Hex => f.write_str("a Reticulum identity holds hex digits only"),
         }
     }
 }
@@ -174,68 +342,142 @@ impl core::error::Error for KeyParseError {}
 mod tests {
     use super::*;
 
-    fn sample() -> ContactKey {
-        let mut bytes = [0u8; 32];
-        for (index, slot) in bytes.iter_mut().enumerate() {
-            *slot = index as u8;
+    // The did:key spec's own worked example.
+    const SPEC_ED25519: &str = "did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK";
+    const SPEC_ED25519_HEX: &str =
+        "2e6fcce36701dc791488e0d0b1745cc1e33a4c1c9fcc41c63bd343dbbe0970e6";
+    // bsky.app's live atproto signing key, from its PLC document.
+    const BSKY_SECP256K1: &str = "did:key:zQ3shQo6TF2moaqMTrUZEM1jeuYRQXeHEx4evX9751y2qPqRA";
+    const BSKY_SECP256K1_HEX: &str =
+        "023249d921a1da482dc7117e9451bf2ae48ef641dc87bd9c9ea3648f3e81cce249";
+    // A live P-256 signing key from a 2026-08-01 PLC export sample.
+    const PLC_P256: &str = "did:key:zDnaeyxJYdUvhr4FR6YwqWXutZp6YzQP4wisXUFaftZpyB4wY";
+    const PLC_P256_HEX: &str = "03f217243a9bb95f6c851b406f50c5a167b9fe81de8d470abbee15801120449cb7";
+    // prns's public identity for the RNS 1.4.2 fixture, as rnid would export it.
+    const RNS_IDENTITY: &str = "0faa684ed28867b97f4a6a2dee5df8ce974e76b7018e3f22a1c4cf2678570f20d04ab232742bb4ab3a1368bd4615e4e6d0224ab71a016baf8520a332c9778737";
+
+    fn from_hex<const N: usize>(text: &str) -> [u8; N] {
+        hex_decode(text).unwrap()
+    }
+
+    #[test]
+    fn live_did_keys_decode_to_the_right_family_and_bytes() {
+        let cases = [
+            (SPEC_ED25519, KeyAlgorithm::Ed25519, SPEC_ED25519_HEX),
+            (BSKY_SECP256K1, KeyAlgorithm::Secp256k1, BSKY_SECP256K1_HEX),
+            (PLC_P256, KeyAlgorithm::P256, PLC_P256_HEX),
+        ];
+        for (text, algorithm, hex) in cases {
+            let key: TypedKey = text.parse().unwrap();
+            assert_eq!(key.algorithm(), algorithm, "{text}");
+            assert_eq!(hex_encode(key.as_bytes()), hex, "{text}");
+            assert_eq!(key.to_text(), text, "{text} must re-encode byte for byte");
         }
-        ContactKey::from_bytes(bytes)
     }
 
     #[test]
-    fn hex_round_trips() {
-        let key = sample();
-        assert_eq!(ContactKey::from_hex(&key.to_hex()), Ok(key));
+    fn an_ed25519_key_encodes_to_its_did_key() {
+        let key = TypedKey::ed25519(from_hex(SPEC_ED25519_HEX));
+        assert_eq!(key.to_string(), SPEC_ED25519);
     }
 
     #[test]
-    fn parses_uppercase() {
-        let key = sample();
-        let upper = key.to_hex().to_uppercase();
-        assert_eq!(ContactKey::from_hex(&upper), Ok(key));
+    fn a_reticulum_identity_reads_and_writes_as_rnid_hex() {
+        let key: TypedKey = RNS_IDENTITY.parse().unwrap();
+        assert_eq!(key, TypedKey::reticulum(from_hex(RNS_IDENTITY)));
+        assert_eq!(key.to_text(), RNS_IDENTITY);
+
+        let upper: TypedKey = RNS_IDENTITY.to_uppercase().parse().unwrap();
+        assert_eq!(upper, key, "rnid input is case-insensitive");
+        assert_eq!(upper.to_text(), RNS_IDENTITY, "gaz writes lowercase");
     }
 
     #[test]
-    fn rejects_wrong_length() {
+    fn a_nostr_key_lifts_to_an_even_y_compressed_point() {
+        let x = [7u8; 32];
+        let key = TypedKey::from_nostr_x_only(x);
+        assert_eq!(key.algorithm(), KeyAlgorithm::Secp256k1);
+        assert_eq!(key.as_bytes()[0], 0x02);
+        assert_eq!(&key.as_bytes()[1..], &x);
+    }
+
+    #[test]
+    fn same_bytes_in_different_families_are_different_keys() {
+        let ed = TypedKey::ed25519([7u8; 32]);
+        let nostr = TypedKey::from_nostr_x_only([7u8; 32]);
+        assert_ne!(ed, nostr);
+    }
+
+    #[test]
+    fn malformed_text_is_refused_by_name() {
+        let cases = [
+            ("alice", KeyParseError::Form),
+            ("did:key:f00", KeyParseError::Multibase),
+            ("did:key:z0OIl", KeyParseError::Base58),
+            // A valid base58 payload whose prefix is no family gaz holds.
+            ("did:key:z2NEpo7TZRRrLZSi2U", KeyParseError::Codec),
+        ];
+        for (text, error) in cases {
+            assert_eq!(text.parse::<TypedKey>(), Err(error), "{text}");
+        }
+        let short = format!("did:key:z{}", base58_encode(&[0xed, 0x01, 1, 2, 3]));
         assert_eq!(
-            ContactKey::from_hex("abcd"),
-            Err(KeyParseError::Length { found: 4 })
+            short.parse::<TypedKey>(),
+            Err(KeyParseError::Length {
+                expected: 32,
+                found: 3
+            })
         );
+        assert_eq!("g".repeat(128).parse::<TypedKey>(), Err(KeyParseError::Hex));
     }
 
     #[test]
-    fn rejects_non_hex() {
-        let bad = "z".repeat(64);
-        assert_eq!(ContactKey::from_hex(&bad), Err(KeyParseError::Digit));
+    fn an_uncompressed_prefix_is_refused() {
+        let mut bytes = from_hex::<33>(BSKY_SECP256K1_HEX);
+        bytes[0] = 0x04;
+        assert_eq!(
+            TypedKey::secp256k1(bytes),
+            Err(KeyParseError::NotCompressed)
+        );
+        let text = did_key(SECP256K1_CODEC, &bytes);
+        assert_eq!(text.parse::<TypedKey>(), Err(KeyParseError::NotCompressed));
     }
 
     #[test]
-    fn display_is_full_and_debug_is_short() {
-        let key = sample();
-        assert_eq!(key.to_string().len(), 64);
-        assert_eq!(key.short().len(), 8);
-        assert!(format!("{key:?}").contains(&key.short()));
+    fn debug_is_short_and_names_the_family() {
+        let key: TypedKey = SPEC_ED25519.parse().unwrap();
+        assert_eq!(format!("{key:?}"), "Ed25519(2e6fcce3)");
     }
 
     #[test]
-    fn serde_round_trips() {
-        let key = sample();
-        let json = serde_json::to_string(&key).unwrap();
-        assert_eq!(serde_json::from_str::<ContactKey>(&json).unwrap(), key);
+    fn json_carries_the_text_form() {
+        for text in [SPEC_ED25519, BSKY_SECP256K1, PLC_P256, RNS_IDENTITY] {
+            let key: TypedKey = text.parse().unwrap();
+            let json = serde_json::to_string(&key).unwrap();
+            assert_eq!(json, format!("\"{text}\""));
+            assert_eq!(serde_json::from_str::<TypedKey>(&json).unwrap(), key);
+        }
     }
 
     #[test]
-    fn json_carries_a_hex_string_not_a_byte_array() {
-        let json = serde_json::to_string(&sample()).unwrap();
+    fn binary_carries_the_tag_and_raw_bytes() {
+        for text in [SPEC_ED25519, BSKY_SECP256K1, PLC_P256, RNS_IDENTITY] {
+            let key: TypedKey = text.parse().unwrap();
+            let bytes = postcard::to_allocvec(&key).unwrap();
+            // A length prefix, the tag, then the key: no text form inside.
+            assert_eq!(bytes.len(), 2 + key.as_bytes().len(), "{text}");
+            assert_eq!(bytes[1], key.algorithm().tag());
+            assert_eq!(postcard::from_bytes::<TypedKey>(&bytes).unwrap(), key);
+        }
+    }
+
+    #[test]
+    fn a_bad_binary_tag_fails_to_deserialize() {
+        // postcard bytes: length 3, then tag 9 (no family), then two bytes.
+        let error = postcard::from_bytes::<TypedKey>(&[3, 9, 1, 2]).unwrap_err();
         assert!(
-            json.starts_with('"'),
-            "a key must be a JSON string so it can serve as a map key, got {json}"
+            matches!(error, postcard::Error::SerdeDeCustom),
+            "must fail on the tag, not on framing: {error:?}"
         );
-        assert_eq!(json, format!("\"{}\"", sample().to_hex()));
-    }
-
-    #[test]
-    fn bad_hex_fails_to_deserialize() {
-        assert!(serde_json::from_str::<ContactKey>("\"nope\"").is_err());
     }
 }
