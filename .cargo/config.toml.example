@@ -19,7 +19,7 @@
 # the local edit loop stays live without the path-override warning storm.
 #
 # 2026-07-23 repo consolidation: personae, armillary, the eidetic four,
-# servitor, vates, sibylla, conatus, scenograph, and graphshell are now mere's
+# servitor, conatus, scenograph, and graphshell are now mere's
 # own workspace members, so every patch that used to redirect them is gone —
 # patching a crates.io/git source at a path that is ALSO a workspace member is
 # a hard lockfile collision, not a warning. cambium and netfetcher became genet
