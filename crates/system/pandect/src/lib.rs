@@ -103,16 +103,8 @@ pub mod live_view;
 // snapshots by URL identity, retaining per-member provenance. Pure; the codicil
 // compose op (`graph_codicil::compose_graph_codicils`) layers on top.
 pub mod snapshot_merge;
-// The three memory levels' read-model (Alembic slice C): classify a node as
-// short-term vs long-term (a tag/pin promotes), and compute which short-term nodes
-// an eviction policy would drop. Pure logic; the pane/settings wiring layers on top.
-pub mod memory_levels;
 #[cfg(not(target_arch = "wasm32"))]
 pub mod notochord_policy_store;
-// Athanor's forgetting pass (Alembic slice D): propose which short-term cached
-// content to evict (pure, R0) and apply it by dropping content blobs (never graph
-// truth or codicils). The pass logic; the armillary actor that schedules it layers on top.
-pub mod athanor;
 // The frame.json pane-layout store moved OUT with the pane model at
 // meerkat's deletion (2026-07-18): it lives in turnstone's `frisket::store`
 // now — the pane-coupled half of this crate, split exactly as the

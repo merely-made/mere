@@ -8787,6 +8787,14 @@ dependencies = [
 [[package]]
 name = "mere-alembic"
 version = "0.0.1"
+dependencies = [
+ "chartulary",
+ "euclid",
+ "mere-kernel",
+ "serde",
+ "serde_json",
+ "uuid",
+]
 
 [[package]]
 name = "mere-apparatus"
@@ -8800,6 +8808,18 @@ dependencies = [
 [[package]]
 name = "mere-athanor"
 version = "0.0.1"
+dependencies = [
+ "async-trait",
+ "chartulary",
+ "eidetic",
+ "euclid",
+ "mere-alembic",
+ "mere-kernel",
+ "muniment",
+ "pandect",
+ "pollster",
+ "serde_json",
+]
 
 [[package]]
 name = "mere-canvas"
@@ -11748,6 +11768,7 @@ dependencies = [
  "euclid",
  "hex",
  "incipit",
+ "mere-alembic",
  "mere-forme",
  "mere-kernel",
  "muniment",
