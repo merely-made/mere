@@ -21,15 +21,7 @@ members = [
     "crates/system/proofs",
     "crates/system/shell-state",
     "crates/system/notochord",
-    "crates/system/registry/register-diagnostics",
-    "crates/system/registry/register-input",
-    "crates/system/registry/register-knowledge",
-    "crates/system/registry/register-layout",
-    "crates/system/registry/register-lens",
-    "crates/system/registry/register-mod-loader",
-    "crates/system/registry/register-protocol",
-    "crates/system/registry/register-theme",
-    "crates/system/registry/register-viewer",
+    "crates/system/registry",
     "crates/system/ux-events",
     "crates/forme/forme",
     "crates/forme/uxtree",
@@ -314,8 +306,7 @@ mere-resident = { version = "0.0.1", path = "crates/system/resident" }
 # workspace, which is who it is for.
 luggage = { path = "crates/system/luggage", default-features = false }
 ux-events = { path = "crates/system/ux-events" }
-register-diagnostics = { path = "crates/system/registry/register-diagnostics" }
-register-theme = { path = "crates/system/registry/register-theme" }
+registry = { package = "mere-registry", path = "crates/system/registry", default-features = false }
 
 # The engine-management family moved to genet 2026-07-10 (genet
 # docs/2026-07-09_inker_genet_adoption_plan.md) and came back on 2026-09-03
@@ -590,7 +581,7 @@ tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 uuid = { version = "1", features = ["serde", "v4"] }
-# Shared Merely seed-palette derivation engine (OKLCH). register-theme
+# Shared Merely seed-palette derivation engine (OKLCH). registry's theme module
 # derives the full ThemeTokenSet from a few seed colours via this. Published as
 # `tinct` on crates.io; kept under the local alias `tincture` (Cargo `package =`)
 # so consumers and every `use tincture::` stay unchanged. It landed here as a

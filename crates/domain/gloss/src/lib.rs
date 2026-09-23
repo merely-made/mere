@@ -19,7 +19,7 @@ use forme::GraphMemberId;
 use inker::{Block, EngineDocument, inline_text};
 use kernel::graph::Graph;
 use netrender::Scene;
-use register_theme::chrome::{ChromeTheme, Color32};
+use registry::theme::chrome::{ChromeTheme, Color32};
 use uxtree::{UxTree, node_id_for_path};
 
 /// Crate version.

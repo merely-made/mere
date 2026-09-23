@@ -185,7 +185,7 @@ pub enum FloatingPaneTargetTileContext {
 
 /// Direction for pane split operations. Promoted to kernel
 /// in Slice 64. (Note: `crates/graph-tree::member::SplitDirection`
-/// and `crates/registrar/register-layout::workbench_surface::SplitDirection`
+/// and `registry::layout::workbench_surface::SplitDirection`
 /// are separate types in their respective domains; this is the
 /// pane-mutation enum.)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

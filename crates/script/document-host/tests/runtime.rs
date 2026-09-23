@@ -4,7 +4,7 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! P2.4 verification: the `register-mod-loader` `WasmModRuntime` bridge.
+//! P2.4 verification: the `registry::mod_loader` `WasmModRuntime` bridge.
 //!
 //! A manifest-described wasm mod flows through the trait into the document-host:
 //! `activate` instantiates under a capability grant and runs the `activate` export
@@ -16,7 +16,7 @@
 use std::path::PathBuf;
 
 use document_host::runtime::DocumentScriptRuntime;
-use register_mod_loader::{ModCapability, ModManifest, ModType, WasmModRuntime, WasmModSource};
+use registry::mod_loader::{ModCapability, ModManifest, ModType, WasmModRuntime, WasmModSource};
 
 fn doc_wasm() -> PathBuf {
     let p = std::env::var("DOC_HOST_GUEST_WASM").unwrap_or_else(|_| {

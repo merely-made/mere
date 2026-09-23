@@ -25,7 +25,7 @@ use std::path::Path;
 /// Project / mutate a live genet `ScriptedDom` behind the WIT imports.
 pub mod dom_view;
 
-/// The `register-mod-loader` `WasmModRuntime` bridge (P2.4).
+/// The `registry::mod_loader` `WasmModRuntime` bridge (P2.4).
 pub mod runtime;
 
 use std::sync::Arc;

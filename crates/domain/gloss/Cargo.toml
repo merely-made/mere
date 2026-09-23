@@ -21,7 +21,7 @@ glossary.workspace = true
 inker.workspace = true
 kernel.workspace = true
 canvas.workspace = true
-register-theme.workspace = true
+registry = { workspace = true, features = ["theme"] }
 tracing.workspace = true
 uxtree.workspace = true
 netrender = { workspace = true }

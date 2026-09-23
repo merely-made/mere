@@ -1,0 +1,46 @@
+[package]
+name = "mere-registry"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+description = "Mere's late-binding registries: diagnostics channels, input bindings, knowledge tags, layout domains, lenses, mods, protocol contracts, themes and viewers, one feature each."
+
+[lib]
+name = "registry"
+
+[features]
+default = ["diagnostics", "input", "knowledge", "layout", "lens", "mod-loader", "protocol", "theme", "viewer"]
+diagnostics = ["dep:log"]
+input = ["dep:serde"]
+knowledge = ["dep:kernel", "dep:nucleo", "dep:parking_lot", "dep:serde", "dep:serde_json"]
+layout = ["dep:serde"]
+lens = ["dep:kernel", "dep:petgraph", "dep:serde"]
+mod-loader = ["diagnostics", "viewer", "dep:inventory", "dep:serde", "dep:toml"]
+protocol = ["dep:http", "dep:tower"]
+theme = ["lens", "dep:kernel", "dep:log", "dep:serde", "dep:tincture"]
+viewer = ["layout", "dep:infer", "dep:kernel", "dep:serde", "dep:url"]
+# Module sub-features, kept under their former names.
+audio = ["viewer"]
+pdf = ["viewer"]
+test-utils = ["mod-loader"]
+
+[dependencies]
+http = { version = "1.4", optional = true }
+infer = { version = "0.19", optional = true }
+inventory = { version = "0.3", optional = true }
+kernel = { workspace = true, optional = true }
+log = { version = "0.4.29", optional = true }
+nucleo = { version = "0.5.0", optional = true }
+parking_lot = { version = "0.12", optional = true }
+petgraph = { version = "0.8.3", features = ["serde-1"], optional = true }
+serde = { workspace = true, optional = true }
+serde_json = { workspace = true, optional = true }
+tincture = { workspace = true, optional = true }
+toml = { version = "0.8", optional = true }
+tower = { version = "0.5", optional = true }
+url = { version = "2.5", optional = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }
+tempfile = "3"
