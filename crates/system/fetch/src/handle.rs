@@ -12,6 +12,7 @@ use std::io;
 use std::sync::Arc;
 use std::time::Duration;
 
+use genet_host_api::{ResourceFetcher, ResourceResponse};
 use netfetcher::{
     AltSvcStore, CacheMode, CookieRecord, CookieStore, FetchContext, HstsStore, HttpCache,
     InMemoryAltSvc, InMemoryCookieJar, InMemoryHsts, InMemoryHttpCache, Request, Response,
@@ -435,6 +436,80 @@ impl Fetch for NetFetch {
             sink.write_all(chunk).map_err(FetchError::Sink)
         })?;
         Ok(facts)
+    }
+}
+
+/// The handle as Genet's [`ResourceFetcher`]: a document engine's images and
+/// stylesheets come through the same policy as every other fetch in the scope.
+/// Serves `http` and `https`; every other scheme goes to the fallback, or is
+/// `None` without one.
+pub struct Resources<F = NoFallback> {
+    fetch: Arc<dyn Fetch>,
+    limit: u64,
+    fallback: F,
+}
+
+/// No fetcher behind [`Resources`]: a scheme it does not serve is not served.
+#[derive(Clone, Copy, Debug, Default)]
+pub struct NoFallback;
+
+impl ResourceFetcher for NoFallback {
+    fn fetch(&self, _url: &str) -> Option<Vec<u8>> {
+        None
+    }
+}
+
+impl Resources {
+    /// The default cap on one resource body, Genet's own default policy.
+    pub const DEFAULT_LIMIT: u64 = 8 * 1024 * 1024;
+
+    pub fn new(fetch: Arc<dyn Fetch>) -> Self {
+        Self {
+            fetch,
+            limit: Self::DEFAULT_LIMIT,
+            fallback: NoFallback,
+        }
+    }
+}
+
+impl<F> Resources<F> {
+    pub fn with_limit(mut self, limit: u64) -> Self {
+        self.limit = limit;
+        self
+    }
+
+    /// Hand every scheme this handle does not serve to `fallback`.
+    pub fn with_fallback<G: ResourceFetcher>(self, fallback: G) -> Resources<G> {
+        Resources {
+            fetch: self.fetch,
+            limit: self.limit,
+            fallback,
+        }
+    }
+}
+
+impl<F: ResourceFetcher> ResourceFetcher for Resources<F> {
+    fn fetch(&self, url: &str) -> Option<Vec<u8>> {
+        self.fetch_response(url).map(|response| response.bytes)
+    }
+
+    fn fetch_response(&self, url: &str) -> Option<ResourceResponse> {
+        if parse(url).is_err() {
+            return self.fallback.fetch_response(url);
+        }
+        match self.fetch.read_all(url, None, self.limit) {
+            Ok(body) => {
+                let mut response = ResourceResponse::new(body.facts.final_url, body.bytes);
+                if let Some(content_type) = body.facts.content_type {
+                    response = response.with_content_type(content_type);
+                }
+                Some(response)
+            },
+            Err(error) => {
+                tracing::debug!(url, %error, "resource fetch failed");
+                None
+            },
+        }
     }
 }
 

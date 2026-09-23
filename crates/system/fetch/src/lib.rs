@@ -937,7 +937,9 @@ mod cookies;
 pub use cookies::*;
 
 mod handle;
-pub use handle::{Body, Facts, Fetch, FetchError, NetFetch, Range, RangeReply, Stores};
+pub use handle::{
+    Body, Facts, Fetch, FetchError, NetFetch, NoFallback, Range, RangeReply, Resources, Stores,
+};
 
 /// Drain a streaming [`netfetcher::ResponseBody`] into a buffer, aborting with an
 /// error once the accumulated length would exceed `max_bytes` (§A5). Enforced *during*

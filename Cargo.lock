@@ -9025,6 +9025,7 @@ dependencies = [
  "armillary",
  "eidetic",
  "errand",
+ "genet-host-api",
  "inker",
  "netfetcher",
  "pandect",
