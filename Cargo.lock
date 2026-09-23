@@ -4591,14 +4591,19 @@ version = "0.0.2"
 dependencies = [
  "async-trait",
  "blake3",
+ "bytes",
  "chacha20poly1305 0.11.0",
  "chartulary",
  "jsonschema",
+ "mere-transport",
+ "mockito",
  "muniment",
  "personae",
  "pollster",
  "serde",
  "serde_json",
+ "tokio",
+ "ureq",
 ]
 
 [[package]]
@@ -4612,29 +4617,6 @@ dependencies = [
  "pollster",
  "serde_json",
  "tempfile",
-]
-
-[[package]]
-name = "eidetic-https-fetcher"
-version = "0.0.1"
-dependencies = [
- "async-trait",
- "eidetic",
- "mockito",
- "pollster",
- "ureq",
-]
-
-[[package]]
-name = "eidetic-iroh-fetcher"
-version = "0.0.1"
-dependencies = [
- "async-trait",
- "bytes",
- "eidetic",
- "mere-transport",
- "personae",
- "tokio",
 ]
 
 [[package]]

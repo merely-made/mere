@@ -4,11 +4,11 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! HTTPS [`BlobFetcher`] companion crate for [`eidetic`].
+//! HTTPS [`BlobFetcher`](crate::BlobFetcher) for eidetic, behind this feature.
 //!
 //! Implements `eidetic::BlobFetcher` for `BlobSource::Https { url }` via
 //! synchronous HTTPS GET (ureq). Returns `Ok(None)` for any other source
-//! kind so [`eidetic::manifest::resolve_blob`] can fall through to the
+//! kind so [`crate::manifest::resolve_blob`] can fall through to the
 //! next fetcher / source.
 //!
 //! The fetcher does **not** verify the response hash — that's the
@@ -21,10 +21,9 @@
 //! Browser-side HTTPS fetching uses the wasm `fetch` API and lives in a
 //! separate companion crate (when needed).
 
-#![doc(html_root_url = "https://docs.rs/eidetic-https-fetcher/0.0.1")]
 
 use async_trait::async_trait;
-use eidetic::{BlobFetcher, BlobSource, Error, Result};
+use crate::{BlobFetcher, BlobSource, Error, Result};
 use std::io::Read;
 
 /// HTTPS-only [`BlobFetcher`].
