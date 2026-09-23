@@ -29,11 +29,11 @@ pub use canvas;
 #[cfg(feature = "graph")]
 pub use forme;
 #[cfg(feature = "canvas")]
-pub use gloss;
+pub mod gloss;
 #[cfg(feature = "graph")]
-pub use glossary;
+pub mod glossary;
 #[cfg(feature = "graph")]
-pub use subgraph;
+pub mod subgraph;
 #[cfg(feature = "graph")]
 pub use kernel;
 #[cfg(feature = "linked-data")]
@@ -41,8 +41,8 @@ pub use linked_data;
 #[cfg(feature = "workbench")]
 pub use platen;
 #[cfg(feature = "graph")]
-pub use roster;
+pub mod roster;
 #[cfg(feature = "graph")]
-pub use trail;
+pub mod trail;
 #[cfg(feature = "workbench")]
 pub use workbench;

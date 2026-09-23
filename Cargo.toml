@@ -5,8 +5,6 @@ members = [
     "crates/canvas/canvas",
     "crates/canvas/cartography",
     "crates/canvas/pictograph",
-    "crates/graph/glossary",
-    "crates/graph/subgraph",
     "crates/graph/graph-kernel",
     "crates/graph/linked-data",
     "crates/shell/chrome",
@@ -26,9 +24,6 @@ members = [
     "crates/forme/forme",
     "crates/forme/uxtree",
     "crates/domain/apparatus",
-    "crates/domain/gloss",
-    "crates/domain/roster",
-    "crates/domain/trail",
     "crates/platen/platen",
     "crates/eidetic/eidetic-core",
     "crates/eidetic/eidetic-fjall",
@@ -209,7 +204,6 @@ conatus = { path = "crates/conatus/conatus" }
 cartography = { package = "mere-cartography", version = "0.0.2", path = "crates/canvas/cartography" }
 linked-data = { package = "mere-linked-data", version = "0.0.1", path = "crates/graph/linked-data" }
 kernel = { package = "mere-kernel", version = "0.0.2", path = "crates/graph/graph-kernel" }
-subgraph = { package = "mere-subgraph", version = "0.0.1", path = "crates/graph/subgraph" }
 # The graph-canvas content-root (was `orrery`; that name retired to the Merely
 # product tier ladder, 2026-07-09 — see the boundary pass plan amendments).
 canvas = { package = "mere-canvas", version = "0.0.1", path = "crates/canvas/canvas" }
@@ -217,7 +211,6 @@ pictograph = { version = "0.2.0", path = "crates/canvas/pictograph" }
 # The IconVG implementation pictograph encodes faces with (repos/emblem).
 emblem = "0.2.0"
 # Graph digest projections (djot outline, metrics) — `glossary` (was `mere-orrery`).
-glossary = { package = "mere-glossary", version = "0.0.1", path = "crates/graph/glossary" }
 
 # The actor-kernel runtime (host-neutral): the !Send host-kernel boundary + the
 # Send actor harness the constellation is built on. Promoted to its standalone
@@ -443,9 +436,6 @@ uxtree = { version = "0.0.2", path = "crates/forme/uxtree" }
 
 platen = { version = "0.0.1", path = "crates/platen/platen" }
 apparatus = { package = "mere-apparatus", version = "0.0.1", path = "crates/domain/apparatus" }
-gloss = { package = "mere-gloss", version = "0.0.1", path = "crates/domain/gloss" }
-roster = { package = "mere-roster", version = "0.0.1", path = "crates/domain/roster" }
-trail = { package = "mere-trail", version = "0.0.1", path = "crates/domain/trail" }
 eidetic = { version = "0.0.2", path = "crates/eidetic/eidetic-core", default-features = false }
 eidetic-fjall = { path = "crates/eidetic/eidetic-fjall" }
 eidetic-https-fetcher = { path = "crates/eidetic/eidetic-https-fetcher" }

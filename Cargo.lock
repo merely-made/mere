@@ -8771,18 +8771,22 @@ dependencies = [
 name = "mere"
 version = "0.0.2"
 dependencies = [
+ "accesskit",
+ "euclid",
  "inker",
  "mere-apparatus",
  "mere-canvas",
  "mere-forme",
- "mere-gloss",
- "mere-glossary",
  "mere-kernel",
  "mere-linked-data",
- "mere-roster",
- "mere-subgraph",
- "mere-trail",
+ "mere-registry",
+ "netrender",
  "platen",
+ "serde",
+ "serde_json",
+ "tracing",
+ "uuid",
+ "uxtree",
  "workbench",
 ]
 
@@ -8977,30 +8981,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "mere-gloss"
-version = "0.0.1"
-dependencies = [
- "accesskit",
- "inker",
- "mere-canvas",
- "mere-forme",
- "mere-glossary",
- "mere-kernel",
- "mere-registry",
- "netrender",
- "tracing",
- "uxtree",
-]
-
-[[package]]
-name = "mere-glossary"
-version = "0.0.1"
-dependencies = [
- "euclid",
- "mere-kernel",
-]
-
-[[package]]
 name = "mere-kernel"
 version = "0.0.2"
 dependencies = [
@@ -9169,14 +9149,6 @@ name = "mere-resident"
 version = "0.0.1"
 
 [[package]]
-name = "mere-roster"
-version = "0.0.1"
-dependencies = [
- "mere-forme",
- "mere-kernel",
-]
-
-[[package]]
 name = "mere-signals"
 version = "0.0.2"
 dependencies = [
@@ -9186,27 +9158,11 @@ dependencies = [
 ]
 
 [[package]]
-name = "mere-subgraph"
-version = "0.0.1"
-dependencies = [
- "euclid",
- "mere-forme",
- "mere-kernel",
- "serde",
- "serde_json",
- "uuid",
-]
-
-[[package]]
 name = "mere-surface-api"
 version = "0.1.0"
 dependencies = [
  "workbench",
 ]
-
-[[package]]
-name = "mere-trail"
-version = "0.0.1"
 
 [[package]]
 name = "mere-transport"
