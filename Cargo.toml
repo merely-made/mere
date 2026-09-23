@@ -10,7 +10,6 @@ members = [
     "crates/shell/chrome",
     "crates/shell/comms",
     "crates/incipit",
-    "crates/capability",
     "crates/system/pandect",
     "crates/system/resident",
     "crates/system/luggage",
@@ -455,7 +454,6 @@ import = { path = "crates/import" }
 crawl = { package = "mere-crawl", path = "crates/crawl" }
 
 signals = { package = "mere-signals", version = "0.0.2", path = "crates/intel/signals" }
-capability = { package = "mere-capability", version = "0.0.1", path = "crates/capability" }
 
 # Standalone spec-B misfin implementation (promoted out of this workspace
 # 2026-07-03). It moved into the smolweb workspace in the 2026-07-23
