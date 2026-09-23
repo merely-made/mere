@@ -5710,7 +5710,6 @@ dependencies = [
  "chartulary",
  "errand",
  "gemini-protocol",
- "mere-capability",
  "mere-p2panda-net",
  "mere-proofs",
  "mere-transport",
@@ -8858,10 +8857,6 @@ dependencies = [
  "tracing-subscriber",
  "uuid",
 ]
-
-[[package]]
-name = "mere-capability"
-version = "0.0.1"
 
 [[package]]
 name = "mere-cartography"
@@ -14590,7 +14585,6 @@ name = "servitor"
 version = "0.0.2"
 dependencies = [
  "chartulary",
- "mere-capability",
  "personae",
 ]
 
