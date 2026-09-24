@@ -325,6 +325,19 @@ where
         element + vx.abs() + vy.abs()
     }
 
+    /// Where the focused text field's caret paints, `(x, y, w, h)`, in the
+    /// coordinates [`painted_rect`](Self::painted_rect) uses. `None` with no
+    /// focused field, or while the caret is scrolled out of its field.
+    pub fn caret_rect(&self) -> Option<(f32, f32, f32, f32)> {
+        self.host.focused_caret_rect()
+    }
+
+    /// Where the focused text field's selection paints, one `(x, y, w, h)`
+    /// per line run, clipped to its field. Empty with no selection.
+    pub fn selection_rects(&self) -> Vec<(f32, f32, f32, f32)> {
+        self.host.focused_selection_rects()
+    }
+
     /// The window viewport's own scroll offset, `(x, y)`, apart from any nested
     /// container's. `(0, 0)` before the first layout.
     pub fn viewport_scroll(&self) -> (f32, f32) {

@@ -322,6 +322,36 @@ where
         }
     }
 
+    /// Where the focused field's caret paints, `(x, y, width, height)`, in the
+    /// coordinates the cursor uses. `None` with no focused field, before a
+    /// layout, or while the caret is scrolled out of its field.
+    pub fn focused_caret_rect(&self) -> Option<(f32, f32, f32, f32)> {
+        let (node, caret, _) = self.focused_overlay()?;
+        let layout = self.s.layout.as_ref()?;
+        let dom = self.s.runner.as_ref()?.dom();
+        let dom_ref = dom.borrow();
+        let rect = layout.caret_rect_for_position(&*dom_ref, node, caret, 2.0)?;
+        Some((rect.x, rect.y, rect.width, rect.height))
+    }
+
+    /// Where the focused field's selection paints, one rect per line run, in
+    /// the same coordinates, clipped to the field. Empty with no selection.
+    pub fn focused_selection_rects(&self) -> Vec<(f32, f32, f32, f32)> {
+        let Some((node, _, Some((start, end)))) = self.focused_overlay() else {
+            return Vec::new();
+        };
+        let (Some(layout), Some(runner)) = (self.s.layout.as_ref(), self.s.runner.as_ref()) else {
+            return Vec::new();
+        };
+        let dom = runner.dom();
+        let dom_ref = dom.borrow();
+        layout
+            .selection_rects(&*dom_ref, node, start, end)
+            .into_iter()
+            .map(|rect| (rect.x, rect.y, rect.width, rect.height))
+            .collect()
+    }
+
     /// The focused text field's paint inputs, as the application maps them.
     fn focused_overlay(&self) -> Option<FocusedOverlay> {
         let runner = self.s.runner.as_ref()?;
