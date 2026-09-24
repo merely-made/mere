@@ -60,13 +60,13 @@ fn host() -> Host {
             let focused = runner.focus()?;
             let dom = runner.dom();
             let dom_ref = dom.borrow();
-            (LayoutDom::element_name(&*dom_ref, focused)?.local.as_ref() == "textarea").then(
-                || FocusedTextSlot {
+            (LayoutDom::element_name(&*dom_ref, focused)?.local.as_ref() == "textarea").then(|| {
+                FocusedTextSlot {
                     node: focused,
                     get: Box::new(|field: &Field| &field.text),
                     get_mut: Box::new(|field: &mut Field| &mut field.text),
-                },
-            )
+                }
+            })
         }),
         ..inert_hooks()
     };
@@ -121,7 +121,10 @@ fn a_caret_after_a_line_break_between_spans_sits_on_the_next_line() {
     select(&mut host, 3, 3);
     let (_, first_y, _, first_height) = host.caret_rect().expect("the caret paints");
     assert!(first_y < 30.0, "byte 3 is on the first line, at {first_y}");
-    assert!(first_height <= 20.5, "a caret is a line tall, not {first_height}");
+    assert!(
+        first_height <= 20.5,
+        "a caret is a line tall, not {first_height}"
+    );
 
     select(&mut host, 6, 6);
     let (x, y, _, height) = host.caret_rect().expect("the caret paints");
@@ -140,5 +143,9 @@ fn a_selection_across_the_span_boundary_paints_on_both_lines() {
         lines.iter().any(|y| *y < 30.0) && lines.iter().any(|y| *y >= 29.5),
         "the selection covers both lines: {rects:?}",
     );
-    assert_eq!(host.state().text.text(), "first\nsecond", "and hides no text");
+    assert_eq!(
+        host.state().text.text(),
+        "first\nsecond",
+        "and hides no text"
+    );
 }
