@@ -121,10 +121,10 @@ pub use manifests::{
     save_device_roster, save_identity_wallet, save_persona_wallet,
 };
 pub use paths::{
-    device_grant_path, device_roster_path, identity_auto_unlock_root_path, identity_dir,
-    identity_grants_dir, identity_seed_path, identity_wallet_path, list_personas,
+    PersonaResolutionError, device_grant_path, device_roster_path, identity_auto_unlock_root_path,
+    identity_dir, identity_grants_dir, identity_seed_path, identity_wallet_path, list_personas,
     local_device_identity_path, persona_epoch_bridge_path, persona_wallet_path,
-    remote_auth_wrapping_keys_path,
+    remote_auth_wrapping_keys_path, resolve_persona,
 };
 pub use secrets::{
     identity_seed_locked_at_startup, load_identity_seed, load_identity_seed_read_only,
