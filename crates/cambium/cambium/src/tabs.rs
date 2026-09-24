@@ -139,7 +139,46 @@ impl TabAccentColors {
     }
 }
 
-/// One tab: its label, an optional stable key, an optional host accent.
+/// A live state a host shows on a tab beside its label: unsaved changes, or
+/// something that needs attention (a refused save, a failed binding).
+///
+/// It is the host's current truth, not part of the tab's identity, so it rides
+/// on the item rather than on anything a layout would persist. The mark is
+/// drawn as `.tab-mark` with a `data-mark` token and hidden from assistive
+/// technology; the tab carries the words as `aria-description` instead.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum TabMark {
+    Modified,
+    Attention,
+}
+
+impl TabMark {
+    /// The `data-mark` token a stylesheet addresses.
+    pub fn token(self) -> &'static str {
+        match self {
+            Self::Modified => "modified",
+            Self::Attention => "attention",
+        }
+    }
+
+    /// The words announced with the tab.
+    pub fn description(self) -> &'static str {
+        match self {
+            Self::Modified => "Unsaved changes",
+            Self::Attention => "Needs attention",
+        }
+    }
+
+    fn glyph(self) -> &'static str {
+        match self {
+            Self::Modified => "\u{25cf}",
+            Self::Attention => "!",
+        }
+    }
+}
+
+/// One tab: its label, an optional stable key, an optional host accent, and an
+/// optional live mark.
 ///
 /// The key rides as `data-tabkey` so a host (or a driver) can name a tab by
 /// something that holds still when the list is reordered, which the positional
@@ -152,16 +191,25 @@ pub struct TabItem {
     pub key: Option<String>,
     /// A host tint painted inline on this tab.
     pub accent: Option<TabAccentColors>,
+    /// A live state shown beside the label.
+    pub mark: Option<TabMark>,
 }
 
 impl TabItem {
-    /// A tab showing `label`, with no key and no accent.
+    /// A tab showing `label`, with no key, accent or mark.
     pub fn new(label: impl Into<String>) -> Self {
         Self {
             label: label.into(),
             key: None,
             accent: None,
+            mark: None,
         }
+    }
+
+    /// Show a live state beside the label.
+    pub fn with_mark(mut self, mark: TabMark) -> Self {
+        self.mark = Some(mark);
+        self
     }
 
     /// Set the stable key emitted as `data-tabkey`.
@@ -342,7 +390,13 @@ where
             let wrapped = names.label.map(|class| {
                 el::<_, State, Action>("span", item.label.clone()).attr("class", class)
             });
-            let mut tab = el::<_, State, Action>("div", (bare, wrapped, close))
+            let mark = item.mark.map(|mark| {
+                el::<_, State, Action>("span", mark.glyph())
+                    .attr("class", "tab-mark")
+                    .attr("data-mark", mark.token())
+                    .attr("aria-hidden", "true")
+            });
+            let mut tab = el::<_, State, Action>("div", (bare, wrapped, mark, close))
                 .attr("role", "tab")
                 .attr("aria-selected", if selected { "true" } else { "false" })
                 .attr("tabindex", if selected { "0" } else { "-1" })
@@ -357,6 +411,9 @@ where
             if names.label.is_some() {
                 // The text lives in a child span, so the tab names itself.
                 tab = tab.attr("aria-label", item.label.clone());
+            }
+            if let Some(mark) = item.mark {
+                tab = tab.attr("aria-description", mark.description());
             }
             if let Some(key) = &item.key {
                 tab = tab.attr("data-tabkey", key.clone());
@@ -531,6 +588,40 @@ mod tests {
                 .with_key("two")
                 .with_accent(TabAccentColors::new([1, 2, 3], [250, 251, 252])),
         ]
+    }
+
+    #[test]
+    fn a_marked_tab_hides_its_glyph_and_announces_its_state() {
+        let dom = dom_handle();
+        let runner = GenetAppRunner::new(
+            dom.clone(),
+            |s: &TabStrip| {
+                tab_strip_items::<()>(
+                    s,
+                    &[
+                        TabItem::from("One"),
+                        TabItem::new("Two").with_mark(TabMark::Modified),
+                    ],
+                )
+            },
+            TabStrip::new(0),
+        );
+        let dom = dom.borrow();
+        let root = runner.root();
+        let mark = find_attr(&dom, root, "data-mark", "modified").expect("the mark is drawn");
+        assert_eq!(attr_of(&dom, mark, "class"), Some("tab-mark"));
+        assert_eq!(attr_of(&dom, mark, "aria-hidden"), Some("true"));
+        let tab = dom.parent(mark).expect("the mark sits in its tab");
+        assert_eq!(attr_of(&dom, tab, "role"), Some("tab"));
+        assert_eq!(
+            attr_of(&dom, tab, "aria-description"),
+            Some("Unsaved changes")
+        );
+        assert_eq!(
+            dom.outer_html(root).matches("aria-description").count(),
+            1,
+            "only the marked tab carries a description"
+        );
     }
 
     #[test]
