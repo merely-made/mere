@@ -261,8 +261,17 @@ impl TextInput {
     /// The rendered text split at the caret into `(before, preedit, after)`, so
     /// the field can render the IME preedit as a distinct (underlined) span. The
     /// three concatenate to [`render_text`](Self::render_text); `preedit` is empty
-    /// when not composing.
+    /// when not composing. Only a composition replaces the selection, so a
+    /// selection without one splits at the caret and keeps every byte.
     pub fn render_parts(&self) -> (String, String, String) {
+        if self.composition.is_none() {
+            let split = self.byte_of(self.caret);
+            return (
+                self.text[..split].to_string(),
+                String::new(),
+                self.text[split..].to_string(),
+            );
+        }
         let (lo, hi) = self.selection();
         let start = self.byte_of(lo);
         let end = self.byte_of(hi);

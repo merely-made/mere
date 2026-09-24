@@ -269,53 +269,214 @@ impl OwnedLayout {
 
     pub(crate) fn caret_position_at_point<D: LayoutDom<NodeId = NodeId>>(
         &self,
-        _dom: &D,
-        _node: NodeId,
+        dom: &D,
+        node: NodeId,
         x: f32,
         y: f32,
     ) -> Option<VisualCaret> {
-        self.fragments
-            .text_position_at_point(x + self.viewport_scroll.0, y + self.viewport_scroll.1)
-            .map(|(_, byte)| VisualCaret {
-                byte,
-                affinity: VisualAffinity::Downstream,
-            })
+        let (scroll_x, scroll_y) = self.content_scroll(dom, node);
+        let (text_node, byte) = self
+            .fragments
+            .text_position_at_point(x + scroll_x, y + scroll_y)?;
+        Some(VisualCaret {
+            byte: element_offset(dom, node, text_node, byte)?,
+            affinity: VisualAffinity::Downstream,
+        })
     }
 
+    /// The caret at byte `offset` of `node`'s text, in document coordinates
+    /// before any scroll, from the first of [`text_positions`] the text frame
+    /// can place. A node with no measurable text shows it at the start of its
+    /// content box, a line tall.
+    fn caret_rect_at<D: LayoutDom<NodeId = NodeId>>(
+        &self,
+        dom: &D,
+        node: NodeId,
+        offset: usize,
+    ) -> Option<genet_livery::TextRect> {
+        if let Some(rect) = text_positions(dom, node, offset)
+            .into_iter()
+            .find_map(|(text_node, local)| self.fragments.caret_rect(text_node, local))
+        {
+            return Some(rect);
+        }
+        let fragment = self.fragments.get(node)?;
+        let px = |property| computed_px(&self.styles, node, property);
+        let line = match px("line-height") {
+            height if height > 0.0 => height,
+            _ => px("font-size") * 1.2,
+        };
+        Some(genet_livery::TextRect {
+            x: fragment.x + px("border-left-width") + px("padding-left"),
+            y: fragment.y + px("border-top-width") + px("padding-top"),
+            width: 1.0,
+            height: line,
+        })
+    }
+
+    /// The caret's painted rect in `node`, moved with every scroll that moves
+    /// the node's text and clipped to the node's own box when it clips. `None`
+    /// when the caret is scrolled out of that box.
     pub(crate) fn caret_rect_for_position<D: LayoutDom<NodeId = NodeId>>(
         &self,
-        _dom: &D,
+        dom: &D,
         node: NodeId,
         caret: VisualCaret,
         width: f32,
     ) -> Option<genet_livery::TextRect> {
-        let mut rect = self.fragments.caret_rect(node, caret.byte)?;
-        rect.x -= self.viewport_scroll.0;
-        rect.y -= self.viewport_scroll.1;
+        let mut rect = self.caret_rect_at(dom, node, caret.byte)?;
+        let (scroll_x, scroll_y) = self.content_scroll(dom, node);
+        rect.x -= scroll_x;
+        rect.y -= scroll_y;
         rect.width = width;
-        Some(rect)
+        match self.content_clip(dom, node) {
+            Some(clip) => clip_text_rect(rect, clip),
+            None => Some(rect),
+        }
+    }
+
+    /// Scroll the nearest box that scrolls horizontally, `node` itself first,
+    /// just far enough to show the caret inside its content box: what a
+    /// single-line field does as its caret moves past an edge. `None` when
+    /// nothing moved, which includes a field whose text fits.
+    pub(crate) fn caret_into_view<D: LayoutDom<NodeId = NodeId>>(
+        &mut self,
+        dom: &D,
+        node: NodeId,
+        caret: VisualCaret,
+    ) -> Option<ScrollTarget> {
+        let rect = self.caret_rect_at(dom, node, caret.byte)?;
+        let (container, range) = self.horizontal_scroll_container(dom, node)?;
+        let fragment = self.fragments.get(container)?;
+        let left = fragment.x
+            + computed_px(&self.styles, container, "border-left-width")
+            + computed_px(&self.styles, container, "padding-left");
+        let right = fragment.x + fragment.width
+            - computed_px(&self.styles, container, "border-right-width")
+            - computed_px(&self.styles, container, "padding-right");
+        // Where the scrolls between the caret and the container, the
+        // container's own included, leave the caret.
+        let mut shown = rect.x;
+        let mut current = Some(node);
+        while let Some(box_node) = current {
+            shown -= self.element_scroll.get(&box_node).map_or(0.0, |s| s.0);
+            if box_node == container {
+                break;
+            }
+            current = dom.parent(box_node);
+        }
+        let width = rect.width.max(1.0);
+        let delta = if shown < left {
+            shown - left
+        } else if shown + width > right {
+            (shown + width - right).min(shown - left)
+        } else {
+            0.0
+        };
+        let offset = self.element_scroll.get(&container).map_or(0.0, |s| s.0);
+        let next = (offset + delta).clamp(0.0, range);
+        if next == offset {
+            return None;
+        }
+        self.element_scroll.entry(container).or_default().0 = next;
+        Some(ScrollTarget::Element(container))
+    }
+
+    /// Every scroll that moves `node`'s own content: the viewport's, each
+    /// enclosing container's, and `node`'s own when it scrolls.
+    fn content_scroll<D: LayoutDom<NodeId = NodeId>>(&self, dom: &D, node: NodeId) -> (f32, f32) {
+        let (nested_x, nested_y) = ancestor_scroll(dom, node, &self.element_scroll);
+        let (own_x, own_y) = self.element_scroll.get(&node).copied().unwrap_or_default();
+        (
+            self.viewport_scroll.0 + nested_x + own_x,
+            self.viewport_scroll.1 + nested_y + own_y,
+        )
+    }
+
+    /// Where `node` shows its content when it clips overflow: its padding box,
+    /// painted. `None` when it lets content show outside it.
+    fn content_clip<D: LayoutDom<NodeId = NodeId>>(
+        &self,
+        dom: &D,
+        node: NodeId,
+    ) -> Option<(f32, f32, f32, f32)> {
+        let clips = |property| {
+            self.styles
+                .computed_style(node, property)
+                .is_some_and(|value| value != "visible")
+        };
+        if !clips("overflow-x") && !clips("overflow-y") {
+            return None;
+        }
+        let (x, y, width, height) = self.painted_rect(dom, node)?;
+        let px = |property| computed_px(&self.styles, node, property);
+        let (left, right) = (px("border-left-width"), px("border-right-width"));
+        let (top, bottom) = (px("border-top-width"), px("border-bottom-width"));
+        Some((
+            x + left,
+            y + top,
+            (width - left - right).max(0.0),
+            (height - top - bottom).max(0.0),
+        ))
+    }
+
+    /// The nearest box that scrolls horizontally and has room to, `node`
+    /// itself first, with its range.
+    fn horizontal_scroll_container<D: LayoutDom<NodeId = NodeId>>(
+        &self,
+        dom: &D,
+        node: NodeId,
+    ) -> Option<(NodeId, f32)> {
+        let mut candidate = Some(node);
+        while let Some(box_node) = candidate {
+            if scroll_axes(&self.styles, box_node).0 {
+                let range = element_scroll_range(dom, &self.styles, &self.fragments, box_node).0;
+                if range > 0.0 {
+                    return Some((box_node, range));
+                }
+            }
+            candidate = dom.parent(box_node);
+        }
+        None
     }
 
     pub(crate) fn selection_rects<D: LayoutDom<NodeId = NodeId>>(
         &self,
-        _dom: &D,
+        dom: &D,
         node: NodeId,
         start: usize,
         end: usize,
     ) -> Vec<genet_livery::TextRect> {
+        let (scroll_x, scroll_y) = self.content_scroll(dom, node);
+        let clip = self.content_clip(dom, node);
+        // The selection starts where a caret at `start` would, and ends at
+        // the close of the text before `end`.
+        let (Some((anchor_node, anchor_offset)), Some((focus_node, focus_offset))) = (
+            text_positions(dom, node, start).into_iter().next(),
+            text_positions(dom, node, end).into_iter().last(),
+        ) else {
+            return Vec::new();
+        };
         self.fragments
             .text_selection(TextRange {
-                anchor_node: node,
-                anchor_offset: start,
-                focus_node: node,
-                focus_offset: end,
+                anchor_node,
+                anchor_offset,
+                focus_node,
+                focus_offset,
             })
-            .map(|mut selection| {
-                for rect in &mut selection.rects {
-                    rect.x -= self.viewport_scroll.0;
-                    rect.y -= self.viewport_scroll.1;
-                }
-                selection.rects
+            .map(|selection| {
+                selection
+                    .rects
+                    .into_iter()
+                    .filter_map(|mut rect| {
+                        rect.x -= scroll_x;
+                        rect.y -= scroll_y;
+                        match clip {
+                            Some(clip) => clip_text_rect(rect, clip),
+                            None => Some(rect),
+                        }
+                    })
+                    .collect()
             })
             .unwrap_or_default()
     }
@@ -370,12 +531,14 @@ impl OwnedLayout {
         None
     }
 
+    /// The caret paints in its field's text colour, as `caret-color: auto`
+    /// does, so it shows on a light field as well as a dark one.
     pub(crate) fn caret_color<D: LayoutDom<NodeId = NodeId>>(
         &self,
         _dom: &D,
-        _node: NodeId,
+        node: NodeId,
     ) -> Option<[f32; 4]> {
-        None
+        self.styles.used_color(node)
     }
 
     pub(crate) fn emit_paint_list_with_leaves<D, F, G>(
@@ -441,7 +604,7 @@ impl OwnedLayout {
         while let Some(node) = candidate {
             let (scrolls_x, scrolls_y) = scroll_axes(&self.styles, node);
             if scrolls_x || scrolls_y {
-                let range = element_scroll_range(dom, &self.fragments, node);
+                let range = element_scroll_range(dom, &self.styles, &self.fragments, node);
                 let current = self.element_scroll.get(&node).copied().unwrap_or_default();
                 let next = (
                     if scrolls_x {
@@ -529,7 +692,7 @@ impl OwnedLayout {
         let mut candidate = dom.parent(node);
         while let Some(ancestor) = candidate {
             if scroll_axes(&self.styles, ancestor).1 {
-                let range = element_scroll_range(dom, &self.fragments, ancestor).1;
+                let range = element_scroll_range(dom, &self.styles, &self.fragments, ancestor).1;
                 if range > 0.0 {
                     return Some((ancestor, range));
                 }
@@ -562,7 +725,7 @@ impl OwnedLayout {
             if !scrolls_x && !scrolls_y {
                 return false;
             }
-            let range = element_scroll_range(dom, fragments, node);
+            let range = element_scroll_range(dom, styles, fragments, node);
             offset.0 = offset.0.clamp(0.0, range.0);
             offset.1 = offset.1.clamp(0.0, range.1);
             true
@@ -580,14 +743,25 @@ fn scroll_axes(styles: &StylePlane<NodeId>, node: NodeId) -> (bool, bool) {
     (scrolls("overflow-x"), scrolls("overflow-y"))
 }
 
+/// How far `node` can scroll per axis. As in CSS, its scrollable overflow
+/// ends past its content by its end padding and border, so content scrolled
+/// fully in stops at the content edge rather than under the border; that is
+/// where a single-line field's caret sits at the end of its text.
 fn element_scroll_range<D: LayoutDom<NodeId = NodeId>>(
     dom: &D,
+    styles: &StylePlane<NodeId>,
     fragments: &LiveryLayout<NodeId>,
     node: NodeId,
 ) -> (f32, f32) {
     let Some(container) = fragments.get(node) else {
         return (0.0, 0.0);
     };
+    let end = (
+        computed_px(styles, node, "padding-right")
+            + computed_px(styles, node, "border-right-width"),
+        computed_px(styles, node, "padding-bottom")
+            + computed_px(styles, node, "border-bottom-width"),
+    );
     let mut extent = (
         container.x + container.width,
         container.y + container.height,
@@ -595,8 +769,8 @@ fn element_scroll_range<D: LayoutDom<NodeId = NodeId>>(
     for child in dom.dom_children(node) {
         walk(dom, child, &mut |descendant| {
             if let Some(fragment) = fragments.get(descendant) {
-                extent.0 = extent.0.max(fragment.x + fragment.width);
-                extent.1 = extent.1.max(fragment.y + fragment.height);
+                extent.0 = extent.0.max(fragment.x + fragment.width + end.0);
+                extent.1 = extent.1.max(fragment.y + fragment.height + end.1);
             }
         });
     }
@@ -604,6 +778,33 @@ fn element_scroll_range<D: LayoutDom<NodeId = NodeId>>(
         (extent.0 - container.x - container.width).max(0.0),
         (extent.1 - container.y - container.height).max(0.0),
     )
+}
+
+/// A computed length in pixels, `0` for anything else.
+fn computed_px(styles: &StylePlane<NodeId>, node: NodeId, property: &str) -> f32 {
+    styles
+        .computed_style(node, property)
+        .and_then(|value| value.strip_suffix("px")?.trim().parse().ok())
+        .unwrap_or(0.0)
+}
+
+/// `rect` cut to `clip`, or `None` when nothing of it is left.
+fn clip_text_rect(
+    mut rect: genet_livery::TextRect,
+    (x, y, width, height): (f32, f32, f32, f32),
+) -> Option<genet_livery::TextRect> {
+    let left = rect.x.max(x);
+    let top = rect.y.max(y);
+    let right = (rect.x + rect.width).min(x + width);
+    let bottom = (rect.y + rect.height).min(y + height);
+    if right <= left || bottom <= top {
+        return None;
+    }
+    rect.x = left;
+    rect.y = top;
+    rect.width = right - left;
+    rect.height = bottom - top;
+    Some(rect)
 }
 
 /// Register the host's faces into a freshly built text system. Every
@@ -679,6 +880,63 @@ fn ancestor_scroll<D: LayoutDom<NodeId = NodeId>>(
         current = dom.parent(parent);
     }
     total
+}
+
+/// The text nodes that can hold byte `offset` of `node`'s text, each with the
+/// offset inside it, best first: the node the offset starts or falls inside,
+/// then the node it ends. A field counts its bytes across all its text, as
+/// [`node_text`] reads it, and the text frame per text node; on a boundary the
+/// later node comes first, since a caret after a line break sits on the next
+/// line. Empty nodes hold nothing, and an offset past the end lands at the end
+/// of the last node.
+fn text_positions<D: LayoutDom<NodeId = NodeId>>(
+    dom: &D,
+    node: NodeId,
+    offset: usize,
+) -> Vec<(NodeId, usize)> {
+    let mut start = 0;
+    let (mut inside, mut ending, mut last) = (None, None, None);
+    walk(dom, node, &mut |descendant| {
+        let Some(text) = dom.text(descendant).filter(|text| !text.is_empty()) else {
+            return;
+        };
+        let end = start + text.len();
+        if inside.is_none() && (start..end).contains(&offset) {
+            inside = Some((descendant, offset - start));
+        }
+        if ending.is_none() && offset == end {
+            ending = Some((descendant, text.len()));
+        }
+        last = Some((descendant, text.len()));
+        start = end;
+    });
+    match (inside, ending) {
+        (None, None) => last.into_iter().collect(),
+        (inside, ending) => inside.into_iter().chain(ending).collect(),
+    }
+}
+
+/// [`text_positions`] read backwards: byte `offset` of the text node
+/// `text_node`, counted across all of `node`'s text. `None` when `text_node`
+/// is not `node`'s.
+fn element_offset<D: LayoutDom<NodeId = NodeId>>(
+    dom: &D,
+    node: NodeId,
+    text_node: NodeId,
+    offset: usize,
+) -> Option<usize> {
+    let (mut before, mut found) = (0, false);
+    walk(dom, node, &mut |descendant| {
+        if found {
+            return;
+        }
+        if descendant == text_node {
+            found = true;
+        } else if let Some(text) = dom.text(descendant) {
+            before += text.len();
+        }
+    });
+    found.then_some(before + offset)
 }
 
 fn node_text<D: LayoutDom<NodeId = NodeId>>(dom: &D, node: NodeId) -> String {

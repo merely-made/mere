@@ -124,3 +124,19 @@ fn a_plane_carried_onto_a_fresh_session_is_clamped_as_it_is_set() {
     assert_eq!(fresh.element_scroll()[&scroller], (0.0, 10.0));
     assert_eq!(fresh.element_scroll().len(), 1);
 }
+
+#[test]
+fn a_caret_paints_in_its_fields_text_colour() {
+    let mut dom = ScriptedDom::new();
+    let root = dom.document();
+    let field = div(&mut dom, root, "color:rgb(255, 0, 0);");
+    let layout = OwnedLayout::new(
+        &dom,
+        &[""],
+        VIEWPORT.0,
+        VIEWPORT.1,
+        &[],
+        &Default::default(),
+    );
+    assert_eq!(layout.caret_color(&dom, field), Some([1.0, 0.0, 0.0, 1.0]));
+}
