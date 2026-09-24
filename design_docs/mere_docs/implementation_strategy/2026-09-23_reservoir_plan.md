@@ -1,9 +1,9 @@
 # Reservoir plan: shared meres held by the device resident
 
 **Date:** 2026-09-23
-**Status:** in progress. V1's reservoir index landed in `fe5adc1a`; the
-resident composition and routes are next. §7's decisions were ruled on
-2026-09-23.
+**Status:** in progress. V1 is built on branch `reservoir-v1`: the pandect
+index, wallet-persona resolution, and djinn's reservoir lane and route. A real
+two-process receipt is still owed. §7's decisions were ruled on 2026-09-23.
 **Scope:** give each data domain one mere, and make every mere of an identity
 openable by any of that identity's applications. The meres are held by the
 device resident, with sessions, a graph journal and an Eidetic archive.
@@ -302,3 +302,35 @@ composition presented as two.
   wasm32-wasip2. The resident composition and routes are next. The mere view
   was ruled the same day: a Cambium component built here as V2b, used by every
   application.
+- 2026-09-23: the rest of V1 was built on branch `reservoir-v1`, in the
+  worktree `worktrees/mere-reservoir`. A peer session's crate consolidation
+  had left the shared checkout's `Cargo.toml` needing a lock update, so a
+  `--locked` build could not pass there.
+  - `pandect::wallet_store::resolve_persona` resolves the wallet persona by the
+    2026-08-09 rule: an explicit persona, else the sole wallet; zero or several
+    are refused with what exists.
+  - djinn's `resident_reservoir` holds the reservoir and serves the
+    `reservoir` route: a reservoir card and one card per mere, plus the
+    `mere.reservoir.ensure` intent. It refuses a bad domain or a stale
+    revision without changing anything.
+  - `OwnerSettings.reservoir` is on when absent, as ruled; the owner can turn
+    it off. A reservoir that cannot open leaves the lane unavailable with its
+    reason while the other lanes run. `DjinnResident::open_reservoir` names the
+    shared root, so tests never touch the owner's real one.
+  - The binary grants the route to `turnstone` and `knot-editor`, and the
+    ordered shutdown releases the lock.
+  Done-conditions met:
+  - the resident lists meres;
+  - an existing domain returns its mere;
+  - the reservoir reopens after its owner lets go;
+  - a second owner is refused on a real redb file;
+  - admitted sessions list and ensure meres through the catalog without
+    touching the reservoir's files.
+  Still owed:
+  - a two-process receipt with real processes, since the second-owner check
+    ran in one process;
+  - opening a mere's own route by id, which belongs with V2, once a mere has
+    sessions.
+  Verified: pandect 284 of 284, djinn 78 of 78 library tests, and djinn's
+  integration suites. After rebasing onto `1e1672bf`, the library suites and an
+  all-targets djinn check were re-run and pass.
