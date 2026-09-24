@@ -47,12 +47,77 @@ the direction that makes no dependency cycle.
 | `mien` | standing (event grammar, ledger, persona chains and vault, gate, wire, store) and the composite reputation lens | `gemot::moot::standing`, `moothold::concord` | landed `a1551086` |
 | `chatelaine` | the secret-item taxonomy, shaped against CXF's credential kinds | castellan's secret-free OTP item types, once the taxonomy exists | ruled: design first |
 | `insigne` | presentable proofs: typed keys, delegation certificates and revocations, derived-key attestations | gaz's `TypedKey`; personae's delegation data types | `TypedKey` landed `0f3f854f`; delegation split ruled, in progress (dramatis session) |
-| `tabard` | theme and stylesheet authoring over tinct, illume and CSS | not yet located | named home kept; source to be found |
+| `tabard` | theme and stylesheet authoring over tinct, illume and CSS | registry's theme module, the smolweb palettes, Pelt's theme persistence | ruled 2026-09-24; see C2a |
 | `dramatis` | the tier facade | none misplaced | nothing to move |
 | `mere-apparatus` | the inspector pane | already its own code | nothing to move |
 
 *Done when:* every row is landed, ruled out by Mark, or found to have
 nothing misplaced, and each landed move carries its tests with it.
+
+### C2a. Filling tabard
+
+tabard's own first slice said what it lacked: "no host theme struct, icon
+policy, syntax palette, persistence, or Pelt preview". The assessment of
+2026-09-24 found each of those grown somewhere else, and Mark ruled the same
+day:
+
+- **Registry's theme module moves in, all of it:** `ThemeTokenSet`, the seed
+  derivation, the custom-mode calculators and their mode files, `ChromeTheme`,
+  the edge-style tokens and `ThemeRegistry` (about 2,400 lines), plus lens's
+  `ThemeData`. registry loses its `theme` feature, and its lens takes
+  `ThemeData` from tabard. It is tabard's own charter ("Tinct seeds in, typed
+  design tokens out") run in parallel beside tabard's `Theme`.
+- **`Color32` moves into tinct.** The theme code's only tie to the graph kernel
+  was this 4-byte RGBA struct, used in 9 files; tinct, the colour engine, owns
+  it and kernel and tabard both use it.
+- **The smolweb palettes get one definition, in tabard.** `SmolwebTheme` and
+  `SmolwebPalette` were defined identically in cambium-nematic and in
+  document-lanes (pelt re-exports document-lanes').
+- **tinct keeps deriving the syntax palette**; tabard's output carries it, and
+  tabard owns the theme-file and mode-file formats.
+- **Persistence moves in too**, since not everything that wants theming runs in
+  Pelt.
+- `document-canvas`'s `DocumentStyleSheet` stays where it is, a consumer of
+  tabard's tokens.
+
+**Persistence scope (2026-09-24).** Two stores keep a theme choice today:
+Pelt's `appearance.rs` (a `Dark`/`Light` enum in a one-line file, written
+atomically with `ReplaceFileW` on Windows) and pandect's `ApplicationSettings`
+(`theme_id` and `theme_mode`, persona-synced opt-in, read by nothing yet).
+
+- *Moves to tabard:* the choice itself, as a theme id plus mode rather than a
+  two-value enum (the built-in ids cover dark and light); the store seam
+  (current choice, set it, whether it persists); the in-memory store; and the
+  atomic file store.
+- *Stays in Pelt:* how Pelt presents the choice (labels, the
+  `pelt-theme-*` classes, action ids) and the settings-panel adapter, which
+  projects tabard's store through `mere-surface-api` and `workbench`, host
+  contracts tabard should not carry.
+- *pandect:* `ApplicationSettings` adopts tabard's choice type with the same
+  serialized field names, so stored records read unchanged.
+- *Compatibility:* Pelt's existing one-line appearance file keeps reading.
+
+Phases, each gated like C3:
+
+- **T1. `Color32` into tinct.** *Done when:* tinct defines it, graph-kernel
+  and the nine files use tinct's, and their suites pass.
+- **T2. The theme module and `ThemeData` into tabard.** *Done when:* tabard
+  owns them, registry has no `theme` feature, gloss and lens import from
+  tabard, and every moved test passes. tabard then holds two theme models, its
+  DTCG `Theme` and `ThemeTokenSet`; unifying them is the next design question,
+  for Mark.
+- **T3. One smolweb palette, in tabard.** *Done when:* both crates and Pelt
+  use tabard's definition and their suites pass.
+- **T4. Persistence into tabard.** *Done when:* Pelt's choice and stores live
+  in tabard, Pelt's adapter wraps tabard's store, pandect's record uses
+  tabard's type, and an existing appearance file and settings record both
+  read back.
+- **T5. The syntax palette and file formats in tabard's output.** *Done
+  when:* tabard's tokens and stylesheet carry tinct's syntax roles.
+
+Finding: pandect's `atomic_file::write_bytes_with_backup` and Pelt's
+replace-file writer are two atomic-write implementations; T4 moves Pelt's into
+tabard, and unifying the two is recorded rather than done here.
 
 ### C3. Components folded
 
