@@ -204,6 +204,19 @@ where
                 rebuild_us = elapsed_us(phase.elapsed());
             },
         }
+        // A caret that moved since the last relayout (an edit, a caret key, a
+        // click) is kept in view within its field, as a single-line input
+        // keeps it. One that has not moved stays where the user scrolled it.
+        let caret = self.focused_overlay().map(|(node, caret, _)| (node, caret));
+        match caret {
+            Some((node, caret)) if self.s.caret_followed != Some((node, caret.byte)) => {
+                let layout = self.s.layout.as_mut().expect("layout just ensured");
+                let _ = layout.caret_into_view(&*dom_ref, node, caret);
+                self.s.caret_followed = Some((node, caret.byte));
+            },
+            Some(_) => {},
+            None => self.s.caret_followed = None,
+        }
         // Scroll requests resolve against the layout just brought current, so
         // a node the requesting dispatch created already has a box. Each
         // resolves on its own: one that finds nothing drops only itself.

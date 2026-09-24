@@ -335,6 +335,53 @@ impl OwnedLayout {
         }
     }
 
+    /// Scroll the nearest box that scrolls horizontally, `node` itself first,
+    /// just far enough to show the caret inside its content box: what a
+    /// single-line field does as its caret moves past an edge. `None` when
+    /// nothing moved, which includes a field whose text fits.
+    pub(crate) fn caret_into_view<D: LayoutDom<NodeId = NodeId>>(
+        &mut self,
+        dom: &D,
+        node: NodeId,
+        caret: VisualCaret,
+    ) -> Option<ScrollTarget> {
+        let rect = self.caret_rect_at(dom, node, caret.byte)?;
+        let (container, range) = self.horizontal_scroll_container(dom, node)?;
+        let fragment = self.fragments.get(container)?;
+        let left = fragment.x
+            + computed_px(&self.styles, container, "border-left-width")
+            + computed_px(&self.styles, container, "padding-left");
+        let right = fragment.x + fragment.width
+            - computed_px(&self.styles, container, "border-right-width")
+            - computed_px(&self.styles, container, "padding-right");
+        // Where the scrolls between the caret and the container, the
+        // container's own included, leave the caret.
+        let mut shown = rect.x;
+        let mut current = Some(node);
+        while let Some(box_node) = current {
+            shown -= self.element_scroll.get(&box_node).map_or(0.0, |s| s.0);
+            if box_node == container {
+                break;
+            }
+            current = dom.parent(box_node);
+        }
+        let width = rect.width.max(1.0);
+        let delta = if shown < left {
+            shown - left
+        } else if shown + width > right {
+            (shown + width - right).min(shown - left)
+        } else {
+            0.0
+        };
+        let offset = self.element_scroll.get(&container).map_or(0.0, |s| s.0);
+        let next = (offset + delta).clamp(0.0, range);
+        if next == offset {
+            return None;
+        }
+        self.element_scroll.entry(container).or_default().0 = next;
+        Some(ScrollTarget::Element(container))
+    }
+
     /// Every scroll that moves `node`'s own content: the viewport's, each
     /// enclosing container's, and `node`'s own when it scrolls.
     fn content_scroll<D: LayoutDom<NodeId = NodeId>>(&self, dom: &D, node: NodeId) -> (f32, f32) {
@@ -371,6 +418,26 @@ impl OwnedLayout {
             (width - left - right).max(0.0),
             (height - top - bottom).max(0.0),
         ))
+    }
+
+    /// The nearest box that scrolls horizontally and has room to, `node`
+    /// itself first, with its range.
+    fn horizontal_scroll_container<D: LayoutDom<NodeId = NodeId>>(
+        &self,
+        dom: &D,
+        node: NodeId,
+    ) -> Option<(NodeId, f32)> {
+        let mut candidate = Some(node);
+        while let Some(box_node) = candidate {
+            if scroll_axes(&self.styles, box_node).0 {
+                let range = element_scroll_range(dom, &self.styles, &self.fragments, box_node).0;
+                if range > 0.0 {
+                    return Some((box_node, range));
+                }
+            }
+            candidate = dom.parent(box_node);
+        }
+        None
     }
 
     pub(crate) fn selection_rects<D: LayoutDom<NodeId = NodeId>>(
@@ -537,7 +604,7 @@ impl OwnedLayout {
         while let Some(node) = candidate {
             let (scrolls_x, scrolls_y) = scroll_axes(&self.styles, node);
             if scrolls_x || scrolls_y {
-                let range = element_scroll_range(dom, &self.fragments, node);
+                let range = element_scroll_range(dom, &self.styles, &self.fragments, node);
                 let current = self.element_scroll.get(&node).copied().unwrap_or_default();
                 let next = (
                     if scrolls_x {
@@ -625,7 +692,7 @@ impl OwnedLayout {
         let mut candidate = dom.parent(node);
         while let Some(ancestor) = candidate {
             if scroll_axes(&self.styles, ancestor).1 {
-                let range = element_scroll_range(dom, &self.fragments, ancestor).1;
+                let range = element_scroll_range(dom, &self.styles, &self.fragments, ancestor).1;
                 if range > 0.0 {
                     return Some((ancestor, range));
                 }
@@ -658,7 +725,7 @@ impl OwnedLayout {
             if !scrolls_x && !scrolls_y {
                 return false;
             }
-            let range = element_scroll_range(dom, fragments, node);
+            let range = element_scroll_range(dom, styles, fragments, node);
             offset.0 = offset.0.clamp(0.0, range.0);
             offset.1 = offset.1.clamp(0.0, range.1);
             true
@@ -676,14 +743,25 @@ fn scroll_axes(styles: &StylePlane<NodeId>, node: NodeId) -> (bool, bool) {
     (scrolls("overflow-x"), scrolls("overflow-y"))
 }
 
+/// How far `node` can scroll per axis. As in CSS, its scrollable overflow
+/// ends past its content by its end padding and border, so content scrolled
+/// fully in stops at the content edge rather than under the border; that is
+/// where a single-line field's caret sits at the end of its text.
 fn element_scroll_range<D: LayoutDom<NodeId = NodeId>>(
     dom: &D,
+    styles: &StylePlane<NodeId>,
     fragments: &LiveryLayout<NodeId>,
     node: NodeId,
 ) -> (f32, f32) {
     let Some(container) = fragments.get(node) else {
         return (0.0, 0.0);
     };
+    let end = (
+        computed_px(styles, node, "padding-right")
+            + computed_px(styles, node, "border-right-width"),
+        computed_px(styles, node, "padding-bottom")
+            + computed_px(styles, node, "border-bottom-width"),
+    );
     let mut extent = (
         container.x + container.width,
         container.y + container.height,
@@ -691,8 +769,8 @@ fn element_scroll_range<D: LayoutDom<NodeId = NodeId>>(
     for child in dom.dom_children(node) {
         walk(dom, child, &mut |descendant| {
             if let Some(fragment) = fragments.get(descendant) {
-                extent.0 = extent.0.max(fragment.x + fragment.width);
-                extent.1 = extent.1.max(fragment.y + fragment.height);
+                extent.0 = extent.0.max(fragment.x + fragment.width + end.0);
+                extent.1 = extent.1.max(fragment.y + fragment.height + end.1);
             }
         });
     }
