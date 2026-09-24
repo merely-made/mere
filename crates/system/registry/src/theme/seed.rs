@@ -23,7 +23,6 @@
 //! them. Every derived set clears `validate_theme_tokens` (the contrast-gated
 //! pairs use [`ensure_contrast`]).
 
-use kernel::color::Color32;
 use crate::lens::ThemeData;
 use tincture::oklch::Oklch;
 use tincture::{ModeProfile, Seeds, Srgb, best_on, contrast, derive_palette_with, mix};
@@ -38,16 +37,8 @@ use crate::theme::theme::{
 };
 
 // =============================================================================
-// Colour conversion (Mere `Color32` <-> tincture `Srgb`)
+// Colour helpers
 // =============================================================================
-
-fn srgb(c: Color32) -> Srgb {
-    Srgb::rgba(c.r(), c.g(), c.b(), c.a())
-}
-
-fn c32(s: Srgb) -> Color32 {
-    Color32::from_rgba_unmultiplied(s.r, s.g, s.b, s.a)
-}
 
 fn rgb_tuple(s: Srgb) -> (u8, u8, u8) {
     (s.r, s.g, s.b)
@@ -134,45 +125,39 @@ pub fn derive_token_set(
 
     // Surface ladder: a perceptual lightness step off the neutral hue. In
     // high-contrast mode every surface collapses to the pure extreme.
-    let step = |dl: f64, ll: f64| -> Color32 {
+    let step = |dl: f64, ll: f64| -> Srgb {
         if hc {
-            return c32(neutral.with_l(if dark { 0.0 } else { 1.0 }).to_srgb());
+            return neutral.with_l(if dark { 0.0 } else { 1.0 }).to_srgb();
         }
-        c32(neutral.with_l(if dark { dl } else { ll }).to_srgb())
+        neutral.with_l(if dark { dl } else { ll }).to_srgb()
     };
     // A stroke / divider tone: a mid-neutral, or pure-contrast in HC.
-    let stroke = |dl: f64, ll: f64| -> Color32 {
+    let stroke = |dl: f64, ll: f64| -> Srgb {
         if hc {
-            return c32(best_on(
-                neutral.with_l(if dark { 0.0 } else { 1.0 }).to_srgb(),
-            ));
+            return best_on(neutral.with_l(if dark { 0.0 } else { 1.0 }).to_srgb());
         }
-        c32(neutral.with_l(if dark { dl } else { ll }).to_srgb())
+        neutral.with_l(if dark { dl } else { ll }).to_srgb()
     };
     // Body / header / dim / disabled text, contrast-forced in HC.
-    let surface = c32(p.surface);
-    let text = if hc {
-        c32(best_on(srgb(step(0.0, 1.0))))
-    } else {
-        c32(p.text)
-    };
-    let header = if hc { text } else { c32(p.text_header) };
-    let dim = if hc { text } else { c32(p.text_dim) };
+    let surface = p.surface;
+    let text = if hc { best_on(step(0.0, 1.0)) } else { p.text };
+    let header = if hc { text } else { p.text_header };
+    let dim = if hc { text } else { p.text_dim };
     let disabled = if hc {
         stroke(0.0, 1.0)
     } else {
-        c32(p.text_disabled)
+        p.text_disabled
     };
 
     // Brand triad (used directly; secondary only tints badges, via `p.secondary`).
-    let primary = c32(p.primary);
-    let tertiary = c32(p.tertiary);
+    let primary = p.primary;
+    let tertiary = p.tertiary;
 
     // A primary-tinted selection surface (active rows, focus fills).
     let active = if hc {
         primary
     } else {
-        c32(mix(p.surface, p.primary, 0.40))
+        mix(p.surface, p.primary, 0.40)
     };
 
     // --- Surface tiers -----------------------------------------------------
@@ -187,33 +172,33 @@ pub fn derive_token_set(
 
     // --- Radial menu -------------------------------------------------------
     let hub_fill = step(0.175, 0.975);
-    let hub_text = c32(ensure_contrast(srgb(text), srgb(hub_fill), 4.5));
+    let hub_text = ensure_contrast(text, hub_fill, 4.5);
     let command_disabled_fill = step(0.180, 0.930);
-    let disabled_text = c32(ensure_contrast(srgb(dim), srgb(command_disabled_fill), 4.5));
+    let disabled_text = ensure_contrast(dim, command_disabled_fill, 4.5);
     let idle_fill = step(0.260, 0.900);
 
     // --- Hover label (tooltip) --------------------------------------------
-    let hover_label_bg = with_alpha(step(0.155, 0.985), 235);
-    let hover_label_txt = c32(ensure_contrast(srgb(text), srgb(hover_label_bg), 4.5));
-    let notice = c32(ensure_contrast(p.tertiary, srgb(hover_label_bg), 4.5));
+    let hover_label_bg = step(0.155, 0.985).with_alpha(235);
+    let hover_label_txt = ensure_contrast(text, hover_label_bg, 4.5);
+    let notice = ensure_contrast(p.tertiary, hover_label_bg, 4.5);
 
     // --- Selection highlight (attention; theme-tinted but high-vis) -------
-    let sel_bg = c32(Oklch::from_srgb(p.tertiary)
+    let sel_bg = Oklch::from_srgb(p.tertiary)
         .with_l(if dark { 0.86 } else { 0.80 })
-        .to_srgb());
-    let sel_text = c32(best_on(srgb(sel_bg)));
-    let sel_stroke = c32(best_on(srgb(sel_text)));
+        .to_srgb();
+    let sel_text = best_on(sel_bg);
+    let sel_stroke = best_on(sel_text);
 
     // --- Status ------------------------------------------------------------
-    let success = c32(p.success);
-    let danger = c32(p.danger);
+    let success = p.success;
+    let danger = p.danger;
     let warning = tertiary;
 
     ThemeTokenSet {
         theme_id: theme_id.to_string(),
         display_name: display_name.to_string(),
         theme_data: ThemeData {
-            background_rgb: rgb_tuple(srgb(step(0.160, 0.930))),
+            background_rgb: rgb_tuple(step(0.160, 0.930)),
             accent_rgb: rgb_tuple(p.primary),
             font_scale: profile.font_scale,
             stroke_width: profile.stroke_width,
@@ -229,7 +214,7 @@ pub fn derive_token_set(
         radial_domain_active_fill: if hc {
             primary
         } else {
-            c32(mix(p.primary, p.surface, 0.30))
+            mix(p.primary, p.surface, 0.30)
         },
         radial_domain_idle_fill: idle_fill,
         radial_command_active_fill: primary,
@@ -242,35 +227,31 @@ pub fn derive_token_set(
         hover_label_stroke: stroke(0.420, 0.620),
         hover_label_text: hover_label_txt,
         graph_node_search_match: success,
-        graph_node_search_match_active: c32(Oklch::from_srgb(p.success).lighten(0.10).to_srgb()),
+        graph_node_search_match_active: Oklch::from_srgb(p.success).lighten(0.10).to_srgb(),
         graph_node_hover: tertiary,
         graph_node_selection: tertiary,
-        graph_node_focus_ring: c32(Oklch::from_srgb(p.primary).lighten(0.18).to_srgb()),
-        graph_node_hover_ring: with_alpha(stroke(0.560, 0.560), 190),
+        graph_node_focus_ring: Oklch::from_srgb(p.primary).lighten(0.18).to_srgb(),
+        graph_node_hover_ring: stroke(0.560, 0.560).with_alpha(190),
         graph_node_chrome: GraphNodeChromeTheme {
-            workspace_badge_background: with_alpha(
-                if hc {
-                    step(0.0, 1.0)
-                } else {
-                    c32(mix(p.surface, p.primary, 0.15))
-                },
-                224,
-            ),
-            workspace_badge_text: c32(best_on(srgb(surface))),
-            semantic_badge_background: with_alpha(
-                if hc {
-                    step(0.0, 1.0)
-                } else {
-                    c32(mix(p.surface, p.secondary, 0.15))
-                },
-                224,
-            ),
-            semantic_badge_text: c32(best_on(srgb(surface))),
-            semantic_badge_overflow_background: with_alpha(step(0.140, 0.880), 220),
-            semantic_badge_orbit_background: with_alpha(step(0.165, 0.940), 230),
+            workspace_badge_background: (if hc {
+                step(0.0, 1.0)
+            } else {
+                mix(p.surface, p.primary, 0.15)
+            })
+            .with_alpha(224),
+            workspace_badge_text: best_on(surface),
+            semantic_badge_background: (if hc {
+                step(0.0, 1.0)
+            } else {
+                mix(p.surface, p.secondary, 0.15)
+            })
+            .with_alpha(224),
+            semantic_badge_text: best_on(surface),
+            semantic_badge_overflow_background: step(0.140, 0.880).with_alpha(220),
+            semantic_badge_orbit_background: step(0.165, 0.940).with_alpha(230),
             pinned_fill: stroke(0.980, 0.300),
             pinned_stroke: stroke(0.360, 0.500),
-            clip_ring: c32(Oklch::from_srgb(p.primary).lighten(0.22).to_srgb()),
+            clip_ring: Oklch::from_srgb(p.primary).lighten(0.22).to_srgb(),
             default_stroke: stroke(0.420, 0.600),
         },
         chrome: ChromeTheme {
@@ -288,8 +269,8 @@ pub fn derive_token_set(
             disabled_text: disabled,
             disabled_bg,
             menu_bg,
-            error_text: c32(mix(p.danger, p.text, 0.45)),
-            error_bg: c32(mix(p.danger, p.bg, 0.75)),
+            error_text: mix(p.danger, p.text, 0.45),
+            error_bg: mix(p.danger, p.bg, 0.75),
         },
         status_success: success,
         status_warning: warning,
@@ -299,15 +280,10 @@ pub fn derive_token_set(
         selection_highlight_background: sel_bg,
         selection_highlight_text: sel_text,
         selection_highlight_stroke: sel_stroke,
-        semantic_origin_manual: c32(Oklch::from_srgb(p.primary).lighten(0.12).to_srgb()),
+        semantic_origin_manual: Oklch::from_srgb(p.primary).lighten(0.12).to_srgb(),
         semantic_origin_semantic: success,
         semantic_origin_anchor: tertiary,
     }
-}
-
-/// `Color32` with replaced straight alpha.
-fn with_alpha(c: Color32, a: u8) -> Color32 {
-    Color32::from_rgba_unmultiplied(c.r(), c.g(), c.b(), a)
 }
 
 // =============================================================================
@@ -315,18 +291,14 @@ fn with_alpha(c: Color32, a: u8) -> Color32 {
 // authoring path; bring over Woodshed's curated triad values where they map.
 // =============================================================================
 
-fn rgb(r: u8, g: u8, b: u8) -> Srgb {
-    Srgb::rgb(r, g, b)
-}
-
 /// Slate triad (Woodshed's faithful cool-dark) — used for Default + Dark.
 fn slate_triad() -> (Srgb, Srgb, Srgb, Srgb, Srgb) {
     (
-        rgb(0x33, 0x66, 0xC8), // primary
-        rgb(0x2E, 0x9D, 0xA6), // secondary
-        rgb(0xE0, 0xA8, 0x46), // tertiary
-        rgb(0x4F, 0xB3, 0x6E), // success
-        rgb(0xD5, 0x4E, 0x4E), // danger
+        Srgb::rgb(0x33, 0x66, 0xC8), // primary
+        Srgb::rgb(0x2E, 0x9D, 0xA6), // secondary
+        Srgb::rgb(0xE0, 0xA8, 0x46), // tertiary
+        Srgb::rgb(0x4F, 0xB3, 0x6E), // success
+        Srgb::rgb(0xD5, 0x4E, 0x4E), // danger
     )
 }
 
@@ -445,7 +417,7 @@ pub fn builtin_defs() -> Vec<ThemeDef> {
                 primary: pr,
                 secondary: se,
                 tertiary: te,
-                neutral: rgb(0x10, 0x14, 0x22),
+                neutral: Srgb::rgb(0x10, 0x14, 0x22),
                 text_header: None,
                 text_body: None,
                 success: ok,
@@ -461,10 +433,10 @@ pub fn builtin_defs() -> Vec<ThemeDef> {
             name: "Dark".to_string(),
             source: ThemeSource::BuiltIn,
             seeds: Seeds {
-                primary: rgb(0x6E, 0xAA, 0xFF),
+                primary: Srgb::rgb(0x6E, 0xAA, 0xFF),
                 secondary: se,
                 tertiary: te,
-                neutral: rgb(0x08, 0x09, 0x0D),
+                neutral: Srgb::rgb(0x08, 0x09, 0x0D),
                 text_header: None,
                 text_body: None,
                 success: ok,
@@ -480,14 +452,14 @@ pub fn builtin_defs() -> Vec<ThemeDef> {
             name: "Light".to_string(),
             source: ThemeSource::BuiltIn,
             seeds: Seeds {
-                primary: rgb(0x2A, 0x55, 0xB4),
-                secondary: rgb(0x1F, 0x77, 0x7F),
-                tertiary: rgb(0xA8, 0x6C, 0x14),
-                neutral: rgb(0xDF, 0xE3, 0xEE),
+                primary: Srgb::rgb(0x2A, 0x55, 0xB4),
+                secondary: Srgb::rgb(0x1F, 0x77, 0x7F),
+                tertiary: Srgb::rgb(0xA8, 0x6C, 0x14),
+                neutral: Srgb::rgb(0xDF, 0xE3, 0xEE),
                 text_header: None,
                 text_body: None,
-                success: rgb(0x2F, 0x8A, 0x4F),
-                danger: rgb(0xB8, 0x33, 0x33),
+                success: Srgb::rgb(0x2F, 0x8A, 0x4F),
+                danger: Srgb::rgb(0xB8, 0x33, 0x33),
                 dark: false,
             },
             high_contrast: false,
@@ -499,14 +471,14 @@ pub fn builtin_defs() -> Vec<ThemeDef> {
             name: "High Contrast".to_string(),
             source: ThemeSource::BuiltIn,
             seeds: Seeds {
-                primary: rgb(0xFF, 0xE6, 0x00),
-                secondary: rgb(0x00, 0xFF, 0xAA),
-                tertiary: rgb(0xFF, 0xE6, 0x00),
-                neutral: rgb(0x00, 0x00, 0x00),
+                primary: Srgb::rgb(0xFF, 0xE6, 0x00),
+                secondary: Srgb::rgb(0x00, 0xFF, 0xAA),
+                tertiary: Srgb::rgb(0xFF, 0xE6, 0x00),
+                neutral: Srgb::rgb(0x00, 0x00, 0x00),
                 text_header: None,
                 text_body: None,
-                success: rgb(0x00, 0xFF, 0xAA),
-                danger: rgb(0xFF, 0x40, 0x40),
+                success: Srgb::rgb(0x00, 0xFF, 0xAA),
+                danger: Srgb::rgb(0xFF, 0x40, 0x40),
                 dark: true,
             },
             high_contrast: true,

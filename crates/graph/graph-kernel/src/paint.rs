@@ -26,15 +26,12 @@
 //! foundational; everything else depends on it). The graph-canvas
 //! public API stays stable through the re-export.
 //!
-//! ## Coexistence with `color::Color32`
+//! ## Host palettes
 //!
-//! The kernel also has [`crate::color::Color32`] — an u8-channel
-//! color type used for egui-shaped host palettes (drag-preview
-//! tinting, etc.). [`Color`] in this module is the f32-channel form
-//! used for renderer-style descriptors. The two coexist by design:
-//! `Color32` is the kernel's host-palette type; `Color` is the
-//! kernel's renderer-descriptor type. A future cleanup may unify
-//! them; for now both ship.
+//! [`Color`] is the f32-channel form used for renderer-style
+//! descriptors. u8 host-palette colours (theme tokens and the like)
+//! are tinct's `Srgb`, which the kernel's former `color::Color32`
+//! merged into on 2026-09-24.
 
 use serde::{Deserialize, Serialize};
 

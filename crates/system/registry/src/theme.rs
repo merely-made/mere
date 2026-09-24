@@ -31,7 +31,8 @@
 //! the non-egui case. Per root `Cargo.toml:96`, `egui-host = []` is now an
 //! empty no-op feature — egui has been removed from the dependency graph.
 //! The cfg branch was therefore dead code and was dropped during the move;
-//! this crate always uses `graphshell_core::color::Color32`.
+//! this crate always used `graphshell_core::color::Color32`, which has since
+//! merged into tinct's `Srgb`.
 
 pub mod chrome;
 pub mod edge_style;

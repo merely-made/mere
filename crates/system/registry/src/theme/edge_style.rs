@@ -6,7 +6,7 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
-use kernel::color::Color32;
+use tincture::Srgb;
 
 #[derive(
     Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, serde::Serialize, serde::Deserialize,
@@ -95,19 +95,19 @@ impl EdgeStyleKey {
 
 #[derive(Debug, Clone, Copy, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct EdgeStyleToken {
-    pub color: Color32,
+    pub color: Srgb,
     pub width: f32,
     pub pattern: EdgeStrokePattern,
     pub opacity: f32,
     pub end_marker: EdgeEndpointMarker,
-    pub halo_color: Option<Color32>,
+    pub halo_color: Option<Srgb>,
     pub halo_width: f32,
 }
 
 impl EdgeStyleToken {
-    pub fn resolved_color(self) -> Color32 {
+    pub fn resolved_color(self) -> Srgb {
         let alpha = ((self.opacity.clamp(0.0, 1.0)) * 255.0).round() as u8;
-        Color32::from_rgba_unmultiplied(self.color.r(), self.color.g(), self.color.b(), alpha)
+        Srgb::rgba(self.color.r, self.color.g, self.color.b, alpha)
     }
 
     pub fn luminance(self) -> f32 {
@@ -118,7 +118,7 @@ impl EdgeStyleToken {
 
 #[derive(Debug, Clone, Copy, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct ThemeEdgeFamilyToken {
-    pub color: Color32,
+    pub color: Srgb,
     pub pattern: EdgeStrokePattern,
     pub end_marker: EdgeEndpointMarker,
     pub width: f32,
@@ -127,12 +127,12 @@ pub struct ThemeEdgeFamilyToken {
 
 #[derive(Debug, Clone, Copy, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct ThemeEdgeKindToken {
-    pub color_override: Option<Color32>,
+    pub color_override: Option<Srgb>,
     pub pattern_override: Option<EdgeStrokePattern>,
     pub end_marker_override: Option<EdgeEndpointMarker>,
     pub width_delta: f32,
     pub opacity_multiplier: f32,
-    pub halo_color: Option<Color32>,
+    pub halo_color: Option<Srgb>,
     pub halo_width: f32,
 }
 
@@ -152,8 +152,8 @@ impl Default for ThemeEdgeKindToken {
 
 #[derive(Debug, Clone, Copy, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct ThemeEdgeEmphasisToken {
-    pub foreground_color: Color32,
-    pub halo_color: Color32,
+    pub foreground_color: Srgb,
+    pub halo_color: Srgb,
     pub halo_width: f32,
     pub width_delta: f32,
 }
@@ -189,57 +189,57 @@ impl Default for ThemeEdgeTokens {
 impl ThemeEdgeTokens {
     pub fn default_theme() -> Self {
         Self::with_palette(EdgeThemePalette {
-            hyperlink: Color32::from_rgb(150, 150, 155),
-            grouped: Color32::from_rgb(236, 171, 64),
-            agent: Color32::from_rgb(180, 140, 220),
-            traversal: Color32::from_rgb(120, 180, 210),
-            containment: Color32::from_rgb(42, 168, 132),
-            arrangement: Color32::from_rgb(130, 110, 220),
-            imported: Color32::from_rgb(126, 112, 100),
-            hover_halo: Color32::from_rgba_unmultiplied(236, 244, 255, 84),
-            selection_halo: Color32::from_rgba_unmultiplied(255, 230, 164, 128),
+            hyperlink: Srgb::rgb(150, 150, 155),
+            grouped: Srgb::rgb(236, 171, 64),
+            agent: Srgb::rgb(180, 140, 220),
+            traversal: Srgb::rgb(120, 180, 210),
+            containment: Srgb::rgb(42, 168, 132),
+            arrangement: Srgb::rgb(130, 110, 220),
+            imported: Srgb::rgb(126, 112, 100),
+            hover_halo: Srgb::rgba(236, 244, 255, 84),
+            selection_halo: Srgb::rgba(255, 230, 164, 128),
         })
     }
 
     pub fn light_theme() -> Self {
         Self::with_palette(EdgeThemePalette {
-            hyperlink: Color32::from_rgb(108, 112, 122),
-            grouped: Color32::from_rgb(196, 136, 36),
-            agent: Color32::from_rgb(148, 112, 196),
-            traversal: Color32::from_rgb(66, 128, 170),
-            containment: Color32::from_rgb(10, 130, 92),
-            arrangement: Color32::from_rgb(94, 88, 182),
-            imported: Color32::from_rgb(80, 72, 68),
-            hover_halo: Color32::from_rgba_unmultiplied(40, 78, 114, 54),
-            selection_halo: Color32::from_rgba_unmultiplied(214, 160, 56, 108),
+            hyperlink: Srgb::rgb(108, 112, 122),
+            grouped: Srgb::rgb(196, 136, 36),
+            agent: Srgb::rgb(148, 112, 196),
+            traversal: Srgb::rgb(66, 128, 170),
+            containment: Srgb::rgb(10, 130, 92),
+            arrangement: Srgb::rgb(94, 88, 182),
+            imported: Srgb::rgb(80, 72, 68),
+            hover_halo: Srgb::rgba(40, 78, 114, 54),
+            selection_halo: Srgb::rgba(214, 160, 56, 108),
         })
     }
 
     pub fn dark_theme() -> Self {
         Self::with_palette(EdgeThemePalette {
-            hyperlink: Color32::from_rgb(164, 168, 178),
-            grouped: Color32::from_rgb(236, 171, 64),
-            agent: Color32::from_rgb(188, 148, 232),
-            traversal: Color32::from_rgb(124, 186, 220),
-            containment: Color32::from_rgb(52, 176, 140),
-            arrangement: Color32::from_rgb(142, 124, 236),
-            imported: Color32::from_rgb(124, 112, 104),
-            hover_halo: Color32::from_rgba_unmultiplied(214, 230, 255, 72),
-            selection_halo: Color32::from_rgba_unmultiplied(255, 220, 144, 132),
+            hyperlink: Srgb::rgb(164, 168, 178),
+            grouped: Srgb::rgb(236, 171, 64),
+            agent: Srgb::rgb(188, 148, 232),
+            traversal: Srgb::rgb(124, 186, 220),
+            containment: Srgb::rgb(52, 176, 140),
+            arrangement: Srgb::rgb(142, 124, 236),
+            imported: Srgb::rgb(124, 112, 104),
+            hover_halo: Srgb::rgba(214, 230, 255, 72),
+            selection_halo: Srgb::rgba(255, 220, 144, 132),
         })
     }
 
     pub fn high_contrast_theme() -> Self {
         Self::with_palette(EdgeThemePalette {
-            hyperlink: Color32::from_rgb(255, 255, 255),
-            grouped: Color32::from_rgb(255, 230, 0),
-            agent: Color32::from_rgb(255, 255, 255),
-            traversal: Color32::from_rgb(0, 255, 255),
-            containment: Color32::from_rgb(0, 255, 170),
-            arrangement: Color32::from_rgb(255, 128, 0),
-            imported: Color32::from_rgb(188, 188, 188),
-            hover_halo: Color32::from_rgba_unmultiplied(255, 255, 255, 120),
-            selection_halo: Color32::from_rgba_unmultiplied(255, 230, 0, 156),
+            hyperlink: Srgb::rgb(255, 255, 255),
+            grouped: Srgb::rgb(255, 230, 0),
+            agent: Srgb::rgb(255, 255, 255),
+            traversal: Srgb::rgb(0, 255, 255),
+            containment: Srgb::rgb(0, 255, 170),
+            arrangement: Srgb::rgb(255, 128, 0),
+            imported: Srgb::rgb(188, 188, 188),
+            hover_halo: Srgb::rgba(255, 255, 255, 120),
+            selection_halo: Srgb::rgba(255, 230, 0, 156),
         })
     }
 
@@ -310,10 +310,10 @@ impl ThemeEdgeTokens {
                     end_marker_override: Some(EdgeEndpointMarker::None),
                     width_delta: 1.6,
                     opacity_multiplier: 1.0 / 0.85,
-                    halo_color: Some(Color32::from_rgba_unmultiplied(
-                        palette.grouped.r(),
-                        palette.grouped.g(),
-                        palette.grouped.b(),
+                    halo_color: Some(Srgb::rgba(
+                        palette.grouped.r,
+                        palette.grouped.g,
+                        palette.grouped.b,
                         96,
                     )),
                     halo_width: 1.0,
@@ -387,7 +387,7 @@ impl ThemeEdgeTokens {
             family_tokens,
             kind_tokens,
             hover: ThemeEdgeEmphasisToken {
-                foreground_color: Color32::from_rgb(210, 226, 242),
+                foreground_color: Srgb::rgb(210, 226, 242),
                 halo_color: palette.hover_halo,
                 halo_width: 1.0,
                 width_delta: 0.5,
@@ -438,7 +438,7 @@ impl EdgeStyleRegistry {
     pub fn token_for(&self, key: EdgeStyleKey, decay_progress: f32) -> EdgeStyleToken {
         if key == EdgeStyleKey::Hidden {
             return EdgeStyleToken {
-                color: Color32::TRANSPARENT,
+                color: Srgb::TRANSPARENT,
                 width: 0.0,
                 pattern: EdgeStrokePattern::Solid,
                 opacity: 0.0,
@@ -479,7 +479,7 @@ impl EdgeStyleRegistry {
         match self.accessibility_mode {
             EdgeAccessibilityMode::ColorAndPattern => token,
             EdgeAccessibilityMode::Monochrome => EdgeStyleToken {
-                color: Color32::from_gray(monochrome_value(key)),
+                color: Srgb::gray(monochrome_value(key)),
                 ..token
             },
         }
@@ -587,15 +587,15 @@ fn monochrome_value(key: EdgeStyleKey) -> u8 {
 
 #[derive(Debug, Clone, Copy)]
 struct EdgeThemePalette {
-    hyperlink: Color32,
-    grouped: Color32,
-    agent: Color32,
-    traversal: Color32,
-    containment: Color32,
-    arrangement: Color32,
-    imported: Color32,
-    hover_halo: Color32,
-    selection_halo: Color32,
+    hyperlink: Srgb,
+    grouped: Srgb,
+    agent: Srgb,
+    traversal: Srgb,
+    containment: Srgb,
+    arrangement: Srgb,
+    imported: Srgb,
+    hover_halo: Srgb,
+    selection_halo: Srgb,
 }
 
 #[cfg(test)]

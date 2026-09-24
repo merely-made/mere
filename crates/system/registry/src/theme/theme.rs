@@ -20,15 +20,15 @@
 
 use std::collections::HashMap;
 
-pub use kernel::color::Color32;
+pub use tincture::Srgb;
 
+use crate::lens::{
+    THEME_ID_DARK as LEGACY_THEME_ID_DARK, THEME_ID_DEFAULT as LEGACY_THEME_ID_DEFAULT, ThemeData,
+};
 use crate::theme::chrome::ChromeTheme;
 use crate::theme::edge_style::{
     EdgeAccessibilityMode, ThemeAccessibilitySupport, ThemeContract, ThemeEdgeTokens,
     validate_theme_edge_tokens,
-};
-use crate::lens::{
-    THEME_ID_DARK as LEGACY_THEME_ID_DARK, THEME_ID_DEFAULT as LEGACY_THEME_ID_DEFAULT, ThemeData,
 };
 use tincture::Seeds;
 
@@ -38,31 +38,31 @@ use tincture::Seeds;
 /// the sole consumer.
 #[derive(Clone, Copy, Debug, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct GraphNodeChromeTheme {
-    pub workspace_badge_background: Color32,
-    pub workspace_badge_text: Color32,
-    pub semantic_badge_background: Color32,
-    pub semantic_badge_text: Color32,
-    pub semantic_badge_overflow_background: Color32,
-    pub semantic_badge_orbit_background: Color32,
-    pub pinned_fill: Color32,
-    pub pinned_stroke: Color32,
-    pub clip_ring: Color32,
-    pub default_stroke: Color32,
+    pub workspace_badge_background: Srgb,
+    pub workspace_badge_text: Srgb,
+    pub semantic_badge_background: Srgb,
+    pub semantic_badge_text: Srgb,
+    pub semantic_badge_overflow_background: Srgb,
+    pub semantic_badge_orbit_background: Srgb,
+    pub pinned_fill: Srgb,
+    pub pinned_stroke: Srgb,
+    pub clip_ring: Srgb,
+    pub default_stroke: Srgb,
 }
 
 impl Default for GraphNodeChromeTheme {
     fn default() -> Self {
         Self {
-            workspace_badge_background: Color32::from_rgba_unmultiplied(20, 30, 46, 224),
-            workspace_badge_text: Color32::from_gray(245),
-            semantic_badge_background: Color32::from_rgba_unmultiplied(34, 44, 64, 224),
-            semantic_badge_text: Color32::from_gray(245),
-            semantic_badge_overflow_background: Color32::from_rgba_unmultiplied(24, 24, 24, 216),
-            semantic_badge_orbit_background: Color32::from_rgba_unmultiplied(20, 28, 42, 230),
-            pinned_fill: Color32::WHITE,
-            pinned_stroke: Color32::from_gray(40),
-            clip_ring: Color32::from_rgb(170, 210, 255),
-            default_stroke: Color32::from_gray(90),
+            workspace_badge_background: Srgb::rgba(20, 30, 46, 224),
+            workspace_badge_text: Srgb::gray(245),
+            semantic_badge_background: Srgb::rgba(34, 44, 64, 224),
+            semantic_badge_text: Srgb::gray(245),
+            semantic_badge_overflow_background: Srgb::rgba(24, 24, 24, 216),
+            semantic_badge_orbit_background: Srgb::rgba(20, 28, 42, 230),
+            pinned_fill: Srgb::WHITE,
+            pinned_stroke: Srgb::gray(40),
+            clip_ring: Srgb::rgb(170, 210, 255),
+            default_stroke: Srgb::gray(90),
         }
     }
 }
@@ -80,46 +80,46 @@ pub struct ThemeTokenSet {
     pub accessibility: ThemeAccessibilitySupport,
     pub theme_contract: ThemeContract,
     pub edge_tokens: ThemeEdgeTokens,
-    pub command_notice: Color32,
-    pub radial_disabled_text: Color32,
-    pub radial_hub_fill: Color32,
-    pub radial_hub_stroke: Color32,
-    pub radial_hub_text: Color32,
-    pub radial_domain_active_fill: Color32,
-    pub radial_domain_idle_fill: Color32,
-    pub radial_command_active_fill: Color32,
-    pub radial_command_hover_fill: Color32,
-    pub radial_command_disabled_fill: Color32,
-    pub radial_command_text: Color32,
-    pub radial_chrome_text: Color32,
-    pub radial_warning_text: Color32,
-    pub hover_label_background: Color32,
-    pub hover_label_stroke: Color32,
-    pub hover_label_text: Color32,
-    pub graph_node_search_match: Color32,
-    pub graph_node_search_match_active: Color32,
-    pub graph_node_hover: Color32,
-    pub graph_node_selection: Color32,
-    pub graph_node_focus_ring: Color32,
-    pub graph_node_hover_ring: Color32,
+    pub command_notice: Srgb,
+    pub radial_disabled_text: Srgb,
+    pub radial_hub_fill: Srgb,
+    pub radial_hub_stroke: Srgb,
+    pub radial_hub_text: Srgb,
+    pub radial_domain_active_fill: Srgb,
+    pub radial_domain_idle_fill: Srgb,
+    pub radial_command_active_fill: Srgb,
+    pub radial_command_hover_fill: Srgb,
+    pub radial_command_disabled_fill: Srgb,
+    pub radial_command_text: Srgb,
+    pub radial_chrome_text: Srgb,
+    pub radial_warning_text: Srgb,
+    pub hover_label_background: Srgb,
+    pub hover_label_stroke: Srgb,
+    pub hover_label_text: Srgb,
+    pub graph_node_search_match: Srgb,
+    pub graph_node_search_match_active: Srgb,
+    pub graph_node_hover: Srgb,
+    pub graph_node_selection: Srgb,
+    pub graph_node_focus_ring: Srgb,
+    pub graph_node_hover_ring: Srgb,
     pub graph_node_chrome: GraphNodeChromeTheme,
     /// Tokens for the host's shell chrome (toolbar / omnibar / palette / panes).
     pub chrome: ChromeTheme,
-    pub status_success: Color32,
-    pub status_warning: Color32,
-    pub status_error: Color32,
-    pub status_neutral: Color32,
-    pub workbench_panel_background: Color32,
+    pub status_success: Srgb,
+    pub status_warning: Srgb,
+    pub status_error: Srgb,
+    pub status_neutral: Srgb,
+    pub workbench_panel_background: Srgb,
     /// Highlight background for selection chrome over dense panels
     /// (dropdowns, toast strips). Paired with `selection_highlight_text`
     /// + `selection_highlight_stroke` to form a three-token trio that
     /// maintains contrast on any theme.
-    pub selection_highlight_background: Color32,
-    pub selection_highlight_text: Color32,
-    pub selection_highlight_stroke: Color32,
-    pub semantic_origin_manual: Color32,
-    pub semantic_origin_semantic: Color32,
-    pub semantic_origin_anchor: Color32,
+    pub selection_highlight_background: Srgb,
+    pub selection_highlight_text: Srgb,
+    pub selection_highlight_stroke: Srgb,
+    pub semantic_origin_manual: Srgb,
+    pub semantic_origin_semantic: Srgb,
+    pub semantic_origin_anchor: Srgb,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -609,7 +609,7 @@ fn validate_theme_tokens(tokens: &ThemeTokenSet) -> Result<(), String> {
     Ok(())
 }
 
-fn contrast_ratio(foreground: Color32, background: Color32) -> f32 {
+fn contrast_ratio(foreground: Srgb, background: Srgb) -> f32 {
     let mut l1 = relative_luminance(foreground);
     let mut l2 = relative_luminance(background);
     if l2 > l1 {
@@ -618,10 +618,10 @@ fn contrast_ratio(foreground: Color32, background: Color32) -> f32 {
     (l1 + 0.05) / (l2 + 0.05)
 }
 
-fn relative_luminance(color: Color32) -> f32 {
-    0.2126 * to_linear_component(color.r())
-        + 0.7152 * to_linear_component(color.g())
-        + 0.0722 * to_linear_component(color.b())
+fn relative_luminance(color: Srgb) -> f32 {
+    0.2126 * to_linear_component(color.r)
+        + 0.7152 * to_linear_component(color.g)
+        + 0.0722 * to_linear_component(color.b)
 }
 
 fn to_linear_component(component: u8) -> f32 {

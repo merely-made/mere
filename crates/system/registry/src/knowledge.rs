@@ -22,13 +22,13 @@
 
 use std::collections::HashMap;
 
-use kernel::color::Color32;
 use nucleo::{
     Config, Matcher,
     pattern::{CaseMatching, Normalization, Pattern},
 };
 use parking_lot::Mutex;
 use serde::Deserialize;
+use tincture::Srgb;
 
 const UDC_SEED_JSON: &str = include_str!("../assets/knowledge/udc_seed.json");
 
@@ -304,20 +304,20 @@ impl KnowledgeRegistry {
         Some(self.distance(&a, &b))
     }
 
-    pub fn get_color_hint(&self, code: &str) -> Option<Color32> {
+    pub fn get_color_hint(&self, code: &str) -> Option<Srgb> {
         let normalized = Self::normalize_udc_code(code.strip_prefix("udc:").unwrap_or(code))?;
         let compact = Self::parse_udc_code(&normalized)?;
         Some(match compact.0.first().copied().unwrap_or_default() {
-            0 => Color32::from_rgb(150, 150, 150),
-            1 => Color32::from_rgb(180, 100, 200),
-            2 => Color32::from_rgb(255, 140, 0),
-            3 => Color32::from_rgb(100, 150, 250),
-            5 => Color32::from_rgb(50, 200, 100),
-            6 => Color32::from_rgb(0, 200, 200),
-            7 => Color32::from_rgb(250, 100, 100),
-            8 => Color32::from_rgb(250, 250, 100),
-            9 => Color32::from_rgb(160, 100, 50),
-            _ => Color32::GRAY,
+            0 => Srgb::rgb(150, 150, 150),
+            1 => Srgb::rgb(180, 100, 200),
+            2 => Srgb::rgb(255, 140, 0),
+            3 => Srgb::rgb(100, 150, 250),
+            5 => Srgb::rgb(50, 200, 100),
+            6 => Srgb::rgb(0, 200, 200),
+            7 => Srgb::rgb(250, 100, 100),
+            8 => Srgb::rgb(250, 250, 100),
+            9 => Srgb::rgb(160, 100, 50),
+            _ => Srgb::GRAY,
         })
     }
 
@@ -456,10 +456,7 @@ mod tests {
             registry.get_label("5"),
             Some("Mathematics and natural sciences")
         );
-        assert_eq!(
-            registry.get_color_hint("7"),
-            Some(Color32::from_rgb(250, 100, 100))
-        );
+        assert_eq!(registry.get_color_hint("7"), Some(Srgb::rgb(250, 100, 100)));
     }
 
     #[test]

@@ -10,7 +10,6 @@
 //! index, linked-subgraph derivation/reconciliation, and the shape classifier in
 //! [`classifier`]. It depends only on forme + kernel + serde.
 
-
 use std::collections::{HashMap, HashSet};
 use std::path::Path;
 

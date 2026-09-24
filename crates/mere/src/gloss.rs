@@ -11,14 +11,13 @@
 //! - gloss minimap geometry and Scene helpers
 //! - `EngineDocument` outline projection into `uxtree`
 
-
 use accesskit::{Node, NodeId, Role};
-use pictograph::canvas::NodeState;
 use forme::GraphMemberId;
 use inker::{Block, EngineDocument, inline_text};
 use kernel::graph::Graph;
 use netrender::Scene;
-use registry::theme::chrome::{ChromeTheme, Color32};
+use pictograph::canvas::NodeState;
+use registry::theme::chrome::{ChromeTheme, Srgb};
 use uxtree::{UxTree, node_id_for_path};
 
 /// Crate version.
@@ -146,7 +145,7 @@ pub fn gloss_sections(rect: [f32; 4]) -> ([f32; 4], [f32; 4], [f32; 4]) {
 }
 
 /// A chrome token at `alpha` as a premultiplied `[r, g, b, a]`.
-fn rgba(c: Color32, alpha: f32) -> [f32; 4] {
+fn rgba(c: Srgb, alpha: f32) -> [f32; 4] {
     let [r, g, b, _] = c.to_array();
     [
         r as f32 / 255.0 * alpha,
@@ -157,7 +156,7 @@ fn rgba(c: Color32, alpha: f32) -> [f32; 4] {
 }
 
 /// A chrome token as a CSS `rgb(...)` string.
-pub fn theme_rgb_css(c: Color32) -> String {
+pub fn theme_rgb_css(c: Srgb) -> String {
     let [r, g, b, _] = c.to_array();
     format!("rgb({r}, {g}, {b})")
 }

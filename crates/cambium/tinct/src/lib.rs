@@ -78,6 +78,20 @@ impl Srgb {
     pub const fn with_alpha(self, a: u8) -> Self {
         Self { a, ..self }
     }
+
+    /// An opaque grey: the same value on all three channels.
+    pub const fn gray(value: u8) -> Self {
+        Self::rgb(value, value, value)
+    }
+
+    /// Opaque black.
+    pub const BLACK: Self = Self::rgb(0, 0, 0);
+    /// Opaque white.
+    pub const WHITE: Self = Self::rgb(0xFF, 0xFF, 0xFF);
+    /// Opaque mid grey, `#808080`.
+    pub const GRAY: Self = Self::rgb(0x80, 0x80, 0x80);
+    /// Fully transparent black.
+    pub const TRANSPARENT: Self = Self::rgba(0, 0, 0, 0);
 }
 
 // =============================================================================
