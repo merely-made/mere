@@ -324,6 +324,18 @@ mod tests {
     }
 
     #[test]
+    fn a_selection_without_a_composition_renders_every_byte_split_at_the_caret() {
+        let mut input = TextInput::new("abcd");
+        input.set_caret_byte(1, false);
+        input.set_caret_byte(3, true);
+        assert_eq!(
+            input.render_parts(),
+            ("abc".to_owned(), String::new(), "d".to_owned())
+        );
+        assert_eq!(input.caret_byte_in_render(), 3);
+    }
+
+    #[test]
     fn composition_replaces_the_active_selection_in_render_and_commit() {
         let mut input = TextInput::new("abcd");
         input.set_caret_byte(1, false);
