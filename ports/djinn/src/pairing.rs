@@ -222,6 +222,7 @@ mod tests {
             }),
             knot: None,
             distillery: None,
+            reservoir: Default::default(),
             content: Default::default(),
         }
         .save(&path)
@@ -293,6 +294,7 @@ mod tests {
             }),
             knot: None,
             distillery: None,
+            reservoir: Default::default(),
             content: Default::default(),
         }
         .save(&path)
