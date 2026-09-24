@@ -9,12 +9,12 @@
 use std::collections::BTreeMap;
 use std::fmt;
 
+use insigne::TypedKey;
 use serde::ser::SerializeStruct;
 use serde::{Deserialize, Serialize, Serializer};
 
 use crate::anchor::Anchor;
 use crate::contact::{Contact, ContactTier};
-use crate::key::TypedKey;
 
 /// Which persona a book belongs to.
 ///

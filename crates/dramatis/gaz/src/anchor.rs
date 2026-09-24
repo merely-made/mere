@@ -15,11 +15,10 @@
 use core::fmt;
 use core::str::FromStr;
 
+use insigne::{KeyParseError, TypedKey};
 use serde::de::{self, Deserializer, Visitor};
 use serde::{Deserialize, Serialize, Serializer};
-
-use crate::encoding::{hex_decode, hex_encode};
-use crate::key::{KeyParseError, TypedKey};
+use uuid::Uuid;
 
 const PLC: &str = "did:plc:";
 const URN_UUID: &str = "urn:uuid:";
@@ -64,56 +63,40 @@ impl fmt::Debug for PlcDid {
 ///
 /// gaz reads no random source, as it reads no clock: the caller supplies the
 /// bytes. Any UUID version reads back, since an imported card may carry one.
+/// Built on the `uuid` crate, the stack's UUID type (personae's `PersonaId`
+/// wraps the same).
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct LocalId([u8; 16]);
+pub struct LocalId(Uuid);
 
 impl LocalId {
     /// Mint a version-4 id from 16 random bytes, setting the version and
     /// variant bits RFC 9562 requires.
-    pub fn from_random(mut bytes: [u8; 16]) -> Self {
-        bytes[6] = (bytes[6] & 0x0f) | 0x40;
-        bytes[8] = (bytes[8] & 0x3f) | 0x80;
-        Self(bytes)
+    pub fn from_random(bytes: [u8; 16]) -> Self {
+        Self(uuid::Builder::from_random_bytes(bytes).into_uuid())
     }
 
     /// Accept `urn:uuid:` and a hyphenated UUID, either case.
     pub fn parse(text: &str) -> Result<Self, AnchorParseError> {
-        let (prefix, uuid) = text
+        let (prefix, hyphenated) = text
             .split_at_checked(URN_UUID.len())
             .ok_or(AnchorParseError::Uuid)?;
-        if !prefix.eq_ignore_ascii_case(URN_UUID) {
+        // Thirty-six characters is the hyphenated form and no other.
+        if !prefix.eq_ignore_ascii_case(URN_UUID) || hyphenated.len() != 36 {
             return Err(AnchorParseError::Uuid);
         }
-        let groups: Vec<&str> = uuid.split('-').collect();
-        let shaped = groups.len() == 5
-            && groups
-                .iter()
-                .zip([8, 4, 4, 4, 12])
-                .all(|(group, len)| group.len() == len);
-        if !shaped {
-            return Err(AnchorParseError::Uuid);
-        }
-        hex_decode::<16>(&groups.concat())
+        Uuid::try_parse(hyphenated)
             .map(Self)
-            .ok_or(AnchorParseError::Uuid)
+            .map_err(|_| AnchorParseError::Uuid)
     }
 
     /// The raw UUID bytes.
     pub const fn as_bytes(&self) -> &[u8; 16] {
-        &self.0
+        self.0.as_bytes()
     }
 
     /// The `urn:uuid:` form, lowercase.
     pub fn to_urn(&self) -> String {
-        let hex = hex_encode(&self.0);
-        format!(
-            "{URN_UUID}{}-{}-{}-{}-{}",
-            &hex[..8],
-            &hex[8..12],
-            &hex[12..16],
-            &hex[16..20],
-            &hex[20..]
-        )
+        self.0.urn().to_string()
     }
 }
 
@@ -220,7 +203,7 @@ impl<'de> Deserialize<'de> for Anchor {
             Wire::Plc(text) => PlcDid::parse(&text)
                 .map(Self::Plc)
                 .map_err(de::Error::custom),
-            Wire::Local(bytes) => Ok(Self::Local(LocalId(bytes))),
+            Wire::Local(bytes) => Ok(Self::Local(LocalId(Uuid::from_bytes(bytes)))),
         }
     }
 }

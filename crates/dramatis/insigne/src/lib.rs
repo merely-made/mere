@@ -4,8 +4,8 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! Name reservation for **insigne**, the graded identity proof of the Mere
-//! platform's dramatis tier.
+//! **insigne**, the graded identity proof of the Mere platform's dramatis
+//! tier.
 //!
 //! *Insigne* is the Latin singular of *insignia* — a plural English uses so
 //! exclusively that its singular has dropped out of ordinary use. It names one
@@ -36,6 +36,25 @@
 //! - **Not the keeper.** That is `castellan`, which signs presentations and
 //!   mans the gate.
 //!
-//! No implementation yet.
+//! ## What travels, and what is concluded
+//!
+//! The core is plain, serializable data: the artifacts that travel, that a
+//! gaz keeps, and that anyone may check again later. Checking belongs behind
+//! a feature, and a check that passes yields a local conclusion that is
+//! deliberately not serializable, the rule notochord's `AdmittedPrincipal`
+//! already follows: a conclusion drawn from a verified artifact never travels
+//! as one.
+//!
+//! ## Built today
+//!
+//! [`TypedKey`], the bare-key grade: a public key typed by its family and
+//! written in that family's standard text form (`did:key`, or `rnid`'s hex for
+//! a Reticulum identity). Nothing verifies yet.
 
+#![warn(missing_docs)]
 #![doc(html_no_source)]
+
+mod encoding;
+pub mod key;
+
+pub use key::{KeyAlgorithm, KeyParseError, TypedKey};

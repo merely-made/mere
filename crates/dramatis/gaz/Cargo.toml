@@ -11,7 +11,13 @@ categories = ["data-structures"]
 exclude = ["design_docs/"]
 
 [dependencies]
+# The typed public key is insigne's bare-key grade; its core is plain data,
+# so gaz takes on no cryptography by depending on it.
+insigne.workspace = true
 serde.workspace = true
+# The stack's UUID type, for local anchors. No default features: gaz reads no
+# random source, so it never needs uuid's generators.
+uuid = { version = "1", default-features = false }
 
 [dev-dependencies]
 # The binary codec muniment stores with, so the binary serde path is tested

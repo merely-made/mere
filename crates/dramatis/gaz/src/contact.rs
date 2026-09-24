@@ -9,12 +9,12 @@
 use core::fmt;
 use std::collections::BTreeSet;
 
+use insigne::TypedKey;
 use serde::{Deserialize, Serialize};
 
 use crate::anchor::{Anchor, LocalId, PlcDid};
 use crate::endpoint::Endpoint;
 use crate::handle::Handle;
-use crate::key::TypedKey;
 use crate::trust::ProofMethod;
 
 /// How close a contact is.
