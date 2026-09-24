@@ -27,7 +27,8 @@ linked-data = ["graph", "dep:linked-data"]
 canvas = [
     "graph",
     "dep:accesskit",
-    "dep:canvas",
+    "dep:pictograph",
+    "pictograph/canvas",
     "dep:inker",
     "dep:netrender",
     "dep:registry",
@@ -66,7 +67,7 @@ forme = { workspace = true, optional = true }
 inker = { workspace = true, optional = true }
 kernel = { workspace = true, optional = true }
 linked-data = { workspace = true, optional = true }
-canvas = { workspace = true, optional = true }
+pictograph = { workspace = true, optional = true }
 platen = { workspace = true, optional = true }
 workbench = { workspace = true, optional = true }
 

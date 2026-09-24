@@ -270,7 +270,7 @@ the next public contract is designed.
 
 **Files:**
 
-- Mere: `crates/canvas/canvas/src/input.rs`, `edge_cells.rs`, `selection.rs`
+- Mere: `crates/canvas/pictograph/src/canvas/input.rs`, `edge_cells.rs`, `selection.rs`
 - Mere: `crates/graph/graph-kernel/src/graph/journal.rs`
 - Mere: `crates/system/session-runtime/src/view_intent_store.rs` *(historical citation)* <!-- doc-audit: historical-path -->
 - Genet: `components/cambium/cambium/src/pointer.rs` *(historical citation)* <!-- doc-audit: historical-path -->, `slider.rs`,

@@ -13,7 +13,7 @@
 
 
 use accesskit::{Node, NodeId, Role};
-use canvas::NodeState;
+use pictograph::canvas::NodeState;
 use forme::GraphMemberId;
 use inker::{Block, EngineDocument, inline_text};
 use kernel::graph::Graph;

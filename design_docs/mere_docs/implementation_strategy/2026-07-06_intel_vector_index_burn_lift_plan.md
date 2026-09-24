@@ -7,7 +7,7 @@ once, not just arrangement.
 **Related**: [burn_utilization_brief](../research/2026-07-04_burn_utilization_brief.md)
 (Lane 1 GPU findings, Lane 5 force pass), [orrery_graph_intelligence_plan](2026-07-06_orrery_graph_intelligence_plan.md)
 (where the O(N²) affinity scan lives), `crates/intel/embed/src/index.rs` *(historical citation)* <!-- doc-audit: historical-path --> (the flat
-index this lifts), `crates/intel/eidetic-search` + `crates/canvas/canvas/src/canvas_search.rs`
+index this lifts), `crates/intel/eidetic-search` + `crates/canvas/pictograph/src/canvas/canvas_search.rs`
 (the other two consumers).
 
 ## The insight

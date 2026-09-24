@@ -60,7 +60,7 @@ the divider reads/writes `weights` / `set_weights` / `split_fractions` /
 
 The graph-scene paint lane left platen for the `canvas` crate: `scene_paint`,
 `cartography_scene`, `coupling_paint`, the underlay, and cartography geometry
-now live in `crates/canvas/canvas`. Platen keeps the pane lane.
+now live in pictograph's `canvas` module (`crates/canvas/pictograph/src/canvas`). Platen keeps the pane lane.
 
 ## Status
 

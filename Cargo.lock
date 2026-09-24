@@ -8716,12 +8716,12 @@ dependencies = [
  "euclid",
  "inker",
  "mere-apparatus",
- "mere-canvas",
  "mere-forme",
  "mere-kernel",
  "mere-linked-data",
  "mere-registry",
  "netrender",
+ "pictograph",
  "platen",
  "serde",
  "serde_json",
@@ -8766,38 +8766,6 @@ dependencies = [
  "pandect",
  "pollster",
  "serde_json",
-]
-
-[[package]]
-name = "mere-canvas"
-version = "0.0.1"
-dependencies = [
- "armillary",
- "emblem",
- "esp",
- "euclid",
- "genet-livery",
- "genet-scripted-dom",
- "layout-dom-api",
- "mere-cartography",
- "mere-forme",
- "mere-kernel",
- "mere-signals",
- "netrender",
- "numen",
- "paint_list_api",
- "paint_list_render",
- "petgraph 0.8.3",
- "pictograph",
- "sceno",
- "scenomise",
- "seiche",
- "serde",
- "serde_json",
- "tinct",
- "tracing",
- "tracing-subscriber",
- "uuid",
 ]
 
 [[package]]
@@ -9064,15 +9032,6 @@ dependencies = [
  "toml 0.8.23",
  "tower",
  "url",
-]
-
-[[package]]
-name = "mere-signals"
-version = "0.0.2"
-dependencies = [
- "chartulary",
- "mere-cartography",
- "mere-kernel",
 ]
 
 [[package]]
@@ -12242,9 +12201,33 @@ dependencies = [
 name = "pictograph"
 version = "0.2.0"
 dependencies = [
+ "armillary",
+ "chartulary",
  "emblem",
+ "esp",
+ "euclid",
+ "genet-livery",
+ "genet-scripted-dom",
+ "layout-dom-api",
+ "mere-cartography",
+ "mere-forme",
+ "mere-kernel",
+ "netrender",
  "netrender-vello",
  "netrender_device 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "numen",
+ "paint_list_api",
+ "paint_list_render",
+ "petgraph 0.8.3",
+ "sceno",
+ "scenomise",
+ "seiche",
+ "serde",
+ "serde_json",
+ "tinct",
+ "tracing",
+ "tracing-subscriber",
+ "uuid",
 ]
 
 [[package]]

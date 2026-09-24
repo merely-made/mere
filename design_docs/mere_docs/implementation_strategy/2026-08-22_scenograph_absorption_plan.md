@@ -327,7 +327,7 @@ than appearing to have been lost.
   hand off to a scenograph solver rather than placing anything themselves.
   `spectral` and `semantic_embedding` emit the same
   `Arrangement::Embedded` score and differ only in which producer ran.
-- `crates/canvas/canvas/src/cartography_scene.rs:194` —
+- `crates/canvas/pictograph/src/canvas/cartography_scene.rs:194` —
   `project_canvas_dispatch` — is the **only** non-test `arrangements::`
   reference in mere. Repoint it at the cartography adapters.
 

@@ -25,7 +25,7 @@ pub mod routing;
 #[cfg(feature = "workbench")]
 pub use apparatus;
 #[cfg(feature = "canvas")]
-pub use canvas;
+pub use pictograph::canvas;
 #[cfg(feature = "graph")]
 pub use forme;
 #[cfg(feature = "canvas")]
