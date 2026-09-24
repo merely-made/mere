@@ -128,6 +128,9 @@ pub mod script_bindings_store;
 // distinct from the session/dataspace settings_store and the application/device
 // stores; first field is the configurable menu.
 pub mod persona_settings_store;
+// The reservoir: every mere a persona holds, one per data domain, indexed under
+// `personas/<id>/reservoir/` (reservoir plan V1).
+pub mod reservoir;
 pub mod switcher_thumbnail;
 // The tear-out payload types (PaneDragPayload/TileDragPayload) moved out
 // with the pane model at meerkat's deletion: they name frisket::PaneId, so
@@ -191,6 +194,12 @@ pub use notochord_policy_store::{
 pub use persona_settings_store::{
     PERSONA_SETTINGS_DIR, PERSONA_UI_FILENAME, PersonaSettings, load_persona_settings,
     persona_settings_path, save_persona_settings,
+};
+#[cfg(not(target_arch = "wasm32"))]
+pub use reservoir::open_reservoir_backend;
+pub use reservoir::{
+    DomainId, MERE_RECORD_SCHEMA, MereId, MereRecord, RESERVOIR_DB_FILENAME, RESERVOIR_DIR,
+    ReservoirError, ReservoirStore, reservoir_dir,
 };
 pub use scene_facets::{
     DEFAULT_PHYSICS_DAMPING, SCENE_IMPORTANCE_METRIC, SCENE_PHYSICS_DAMPING, SCENE_SIZE_BY_DEGREE,
