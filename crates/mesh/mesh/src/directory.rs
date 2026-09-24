@@ -26,6 +26,7 @@
 //!   publish a true attestation about somebody else and point the ring's blob
 //!   fetches at a device of their choosing.
 
+use identity::AttestationKeys;
 use std::collections::BTreeMap;
 
 use identity::DerivedKeyAttestation;

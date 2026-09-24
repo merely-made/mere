@@ -229,6 +229,7 @@ pub enum OwnerPolicyEdit {
 
 #[cfg(test)]
 mod tests {
+    use personae::delegation::Issue;
     use personae::delegation::{
         CapabilityScope, DelegationId, DelegationRevocation, SignedDelegationRevocation,
     };

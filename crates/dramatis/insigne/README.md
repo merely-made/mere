@@ -24,9 +24,20 @@ The core is plain, serializable data: the artifacts that travel and that a
 gaz keeps. Checking belongs behind a feature, and a passing check yields a
 local conclusion that is never serialized.
 
-Built today: `TypedKey`, the bare-key grade. A public key typed by its family
-(Ed25519, secp256k1, P-256, or a whole Reticulum identity) and written in that
-family's standard text form: `did:key`, or `rnid`'s hex. Nothing verifies yet.
+Built today:
+
+- `TypedKey`, the bare-key grade. A public key typed by its family (Ed25519,
+  secp256k1, P-256, or a whole Reticulum identity) and written in that
+  family's standard text form: `did:key`, or `rnid`'s hex.
+- `DerivedKeyAttestation`, a master key's signed word that a derived key is its
+  own, and the `delegation` grammar: certificates, revocations and the
+  canonical bytes their signatures cover. Both moved here from
+  [personae](https://crates.io/crates/personae) with their formats unchanged.
+  Issuing stays there, since it needs a persona's keys.
+
+Features: `digest` gives certificate ids and attenuation, on BLAKE3. `verify`
+gives signature checks on ed25519-dalek, in the lax mode personae always used,
+and implies `digest`.
 
 Lives in the [mere](https://github.com/merely-made/mere) workspace under
 `crates/dramatis/`.

@@ -16,6 +16,7 @@
 //! is best-effort and the session proof is the *only* thing that names a
 //! subject there.
 
+use identity::delegation::Issue;
 use std::collections::BTreeMap;
 
 #[cfg(feature = "reticulum")]

@@ -411,7 +411,9 @@ mod tests {
     use super::*;
     use crate::InMemoryProvider;
     use crate::carry::{DeviceId, device_capability_scope};
+    use crate::delegation::Issue;
     use crate::delegation::{DelegationCertificate, DelegationParent};
+    use crate::provider::AttestationKeys;
     use ssh_key::Algorithm;
 
     const NOW_MS: u64 = 1_760_000_000_000;

@@ -11,6 +11,7 @@
 //! [`ProofBinding`] built from its *own* transport identity. The proof
 //! verifies only when the two independently derive the same bytes.
 
+use personae::delegation::Issue;
 use std::collections::BTreeMap;
 
 use notochord::{

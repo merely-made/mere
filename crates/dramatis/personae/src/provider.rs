@@ -12,11 +12,9 @@ use serde::{Deserialize, Serialize};
 use zeroize::{Zeroize, ZeroizeOnDrop};
 
 use crate::sealed_record_storage::SealedRecordStorage;
-use crate::{Ed25519Keypair, Ed25519PublicKey, Ed25519Signature, IdentityError};
+use crate::{Ed25519Keypair, Ed25519PublicKey, IdentityError};
 
 const SEALED_IDENTITY_FORMAT_VERSION: u8 = 1;
-const DERIVED_KEY_ATTESTATION_VERSION: u16 = 1;
-const DERIVED_KEY_ATTESTATION_DOMAIN: &[u8] = b"personae/derived-key-attestation/v1";
 
 #[derive(Serialize, Deserialize, Zeroize, ZeroizeOnDrop)]
 struct SealedIdentityRecord {
@@ -24,40 +22,27 @@ struct SealedIdentityRecord {
     master_seed: [u8; 32],
 }
 
-/// A master-signed statement binding one deterministically derived key to its
-/// identity root and derivation salt.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct DerivedKeyAttestation {
-    format_version: u16,
-    master: [u8; 32],
-    derived: [u8; 32],
-    signature: Vec<u8>,
-}
+pub use insigne::attestation::DerivedKeyAttestation;
 
-impl DerivedKeyAttestation {
+/// Read an attestation's keys as personae's key type.
+///
+/// insigne holds them as plain bytes since the 2026-09-24 move; bring this
+/// into scope for the typed accessors callers used before it.
+pub trait AttestationKeys {
     /// The durable master public key that authorized the derived key.
-    pub fn master_public_key(&self) -> Result<Ed25519PublicKey, IdentityError> {
-        Ed25519PublicKey::from_bytes(&self.master)
-    }
+    fn master_public_key(&self) -> Result<Ed25519PublicKey, IdentityError>;
 
     /// The derived public key authorized by the master.
-    pub fn derived_public_key(&self) -> Result<Ed25519PublicKey, IdentityError> {
-        Ed25519PublicKey::from_bytes(&self.derived)
+    fn derived_public_key(&self) -> Result<Ed25519PublicKey, IdentityError>;
+}
+
+impl AttestationKeys for DerivedKeyAttestation {
+    fn master_public_key(&self) -> Result<Ed25519PublicKey, IdentityError> {
+        Ed25519PublicKey::from_bytes(self.master())
     }
 
-    /// Verify the master signature and the supplied derivation salt.
-    pub fn verify(&self, salt: &[u8]) -> bool {
-        if self.format_version != DERIVED_KEY_ATTESTATION_VERSION {
-            return false;
-        }
-        let Ok(master) = self.master_public_key() else {
-            return false;
-        };
-        let Ok(signature_bytes) = <[u8; 64]>::try_from(self.signature.as_slice()) else {
-            return false;
-        };
-        let signature = Ed25519Signature::from_bytes(&signature_bytes);
-        master.verify(&derived_key_attestation_message(self, salt), &signature)
+    fn derived_public_key(&self) -> Result<Ed25519PublicKey, IdentityError> {
+        Ed25519PublicKey::from_bytes(self.derived())
     }
 }
 
@@ -101,30 +86,13 @@ pub trait IdentityProvider: Send + Sync {
 }
 
 pub(crate) fn attest_derived_key(master: &Ed25519Keypair, salt: &[u8]) -> DerivedKeyAttestation {
+    let master_key = master.public_key().to_bytes();
     let derived = master.derive_child(salt).public_key().to_bytes();
-    let mut attestation = DerivedKeyAttestation {
-        format_version: DERIVED_KEY_ATTESTATION_VERSION,
-        master: master.public_key().to_bytes(),
-        derived,
-        signature: Vec::new(),
-    };
-    attestation.signature = master
-        .sign(&derived_key_attestation_message(&attestation, salt))
+    let signature = master
+        .sign(&DerivedKeyAttestation::message(&master_key, &derived, salt))
         .to_bytes()
         .to_vec();
-    attestation
-}
-
-fn derived_key_attestation_message(attestation: &DerivedKeyAttestation, salt: &[u8]) -> Vec<u8> {
-    let mut message =
-        Vec::with_capacity(DERIVED_KEY_ATTESTATION_DOMAIN.len() + 2 + 8 + salt.len() + 32 + 32);
-    message.extend_from_slice(DERIVED_KEY_ATTESTATION_DOMAIN);
-    message.extend_from_slice(&attestation.format_version.to_le_bytes());
-    message.extend_from_slice(&(salt.len() as u64).to_le_bytes());
-    message.extend_from_slice(salt);
-    message.extend_from_slice(&attestation.master);
-    message.extend_from_slice(&attestation.derived);
-    message
+    DerivedKeyAttestation::from_parts(master_key, derived, signature)
 }
 
 /// An identity provider loaded from a versioned sealed record.
@@ -299,9 +267,15 @@ mod tests {
     #[test]
     fn derived_key_attestation_rejects_tampering() {
         let provider = InMemoryProvider::from_seed([0x31; 32]);
-        let mut attestation = provider.attest_derived_key(b"strophe/session/one").unwrap();
-        attestation.derived[0] ^= 1;
+        let attestation = provider.attest_derived_key(b"strophe/session/one").unwrap();
+        let mut derived = *attestation.derived();
+        derived[0] ^= 1;
+        let tampered = DerivedKeyAttestation::from_parts(
+            *attestation.master(),
+            derived,
+            attestation.signature().to_vec(),
+        );
 
-        assert!(!attestation.verify(b"strophe/session/one"));
+        assert!(!tampered.verify(b"strophe/session/one"));
     }
 }

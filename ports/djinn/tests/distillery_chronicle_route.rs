@@ -28,7 +28,7 @@ use mesh::ResourceId;
 use mesh::spec::{DeterminismClass, JobSpec};
 use notochord::{LocalNetworkPolicy, NetworkId, ProfileRef, TrafficClass, TrustedRoot};
 use personae::delegation::{
-    CapabilityScope, DelegationCertificate, DelegationParent, SignedDelegationCertificate,
+    CapabilityScope, DelegationCertificate, DelegationParent, Issue, SignedDelegationCertificate,
 };
 use personae::{IdentityProvider, InMemoryProvider};
 use tokio::sync::Notify;

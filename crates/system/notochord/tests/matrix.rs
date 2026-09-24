@@ -7,6 +7,7 @@
 //! The V5 policy matrix: deterministic admission decisions over real
 //! personae delegation statements, exercising the crate's public surface.
 
+use personae::delegation::Issue;
 use std::collections::BTreeMap;
 
 use notochord::{

@@ -14,6 +14,7 @@
 
 #![cfg(feature = "tokio")]
 
+use personae::delegation::Issue;
 use std::collections::BTreeMap;
 
 use notochord::{
