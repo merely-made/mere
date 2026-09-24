@@ -4258,8 +4258,7 @@ dependencies = [
  "iroh",
  "layout-dom-api 0.1.1 (git+https://github.com/merely-made/genet.git?rev=532f1fadc53486d60ac4f02835732e8dabd9f62b)",
  "mere-mesh",
- "mere-mesh-host",
- "mere-resident",
+ "mere-proofs",
  "mere-surface-api",
  "mere-transport",
  "mien",
@@ -4298,8 +4297,6 @@ dependencies = [
  "knot-site",
  "libc",
  "mere-mesh",
- "mere-mesh-host",
- "mere-resident",
  "mere-transport",
  "mere-webrtc-carrier",
  "muniment",
@@ -9022,20 +9019,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "mere-mesh-host"
-version = "0.0.1"
-dependencies = [
- "mere-mesh",
- "mere-proofs",
- "mere-transport",
- "muniment",
- "p2panda-core",
- "personae",
- "thiserror 1.0.69",
- "tokio",
-]
-
-[[package]]
 name = "mere-moot"
 version = "0.0.1"
 dependencies = [
@@ -9115,10 +9098,6 @@ dependencies = [
  "tower",
  "url",
 ]
-
-[[package]]
-name = "mere-resident"
-version = "0.0.1"
 
 [[package]]
 name = "mere-signals"

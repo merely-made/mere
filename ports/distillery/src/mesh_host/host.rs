@@ -9,7 +9,7 @@
 use std::collections::BTreeMap;
 use std::sync::Arc;
 
-use identity::{DerivedKeyAttestation, Ed25519Keypair};
+use personae::{DerivedKeyAttestation, Ed25519Keypair};
 use mesh::{
     BlobSink, BlobSource, DevicePolicy, HostFacts, HostOffer, JobControl, JobId, LeaseId,
     LeasePolicy, LeaseProgress, MeshEvent, MeshStoreError, MeshSyncError, ReclaimReason,
@@ -19,9 +19,9 @@ use mesh::{
 };
 use muniment::Backend;
 
-use crate::courier::{BlobCourier, NoCourier, deliver_inputs};
-use crate::inflight::{InFlight, Reclaiming, RunOutcome, release_reason, still_held};
-use crate::sense::{Clock, ConditionSource};
+use crate::mesh_host::courier::{BlobCourier, NoCourier, deliver_inputs};
+use crate::mesh_host::inflight::{InFlight, Reclaiming, RunOutcome, release_reason, still_held};
+use crate::mesh_host::sense::{Clock, ConditionSource};
 
 /// Read and write access to this device's blobs, as one object.
 ///
@@ -65,8 +65,8 @@ impl HostConfig {
             // No delivery lane by default: a host wires `TransportCourier` when
             // it has a transport to pull over.
             courier: Arc::new(NoCourier),
-            clock: Arc::new(crate::sense::SystemClock),
-            conditions: Arc::new(crate::sense::ObservedConditions::spare()),
+            clock: Arc::new(crate::mesh_host::sense::SystemClock),
+            conditions: Arc::new(crate::mesh_host::sense::ObservedConditions::spare()),
             facts: HostFacts::cpu(4096),
             policy: DevicePolicy::permissive(),
             lease: LeasePolicy::default(),

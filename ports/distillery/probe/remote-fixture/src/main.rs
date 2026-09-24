@@ -25,7 +25,7 @@ use mesh::{
     LeaseTerms, MESH_AUTHOR_SALT, MemoryBlobSpace, MeshEvent, MeshStore, RemoteSessionClaim,
     ResourceId, ResourceRegistry, SyncedMesh,
 };
-use mesh_host::{HostConfig, ManualClock, MeshHost, ObservedConditions, Step};
+use distillery::mesh_host::{HostConfig, ManualClock, MeshHost, ObservedConditions, Step};
 use muniment::MemoryBackend;
 use serde::Serialize;
 use serde_json::{Value, json};

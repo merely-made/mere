@@ -54,7 +54,7 @@ use std::sync::Mutex;
 use std::time::Instant;
 
 use mesh::{DeviceConditions, DevicePolicy, NetworkClass};
-use mesh_host::ConditionSource;
+use distillery::mesh_host::ConditionSource;
 
 /// Where one condition signal came from.
 ///

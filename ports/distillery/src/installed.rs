@@ -7,7 +7,7 @@
 //! Installed-product authority: a persisted Personae choice plus private paths.
 //!
 //! This module deliberately owns neither scheduler nor device policy. A caller
-//! supplies the mesh store, its retention policy, [`mesh_host::HostConfig`],
+//! supplies the mesh store, its retention policy, [`crate::mesh_host::HostConfig`],
 //! and [`crate::ResidentSettings`] when it binds a resident. Those are mesh
 //! and device facts, not preferences Distillery may quietly invent.
 
@@ -16,7 +16,7 @@ use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
 use mesh::{MESH_AUTHOR_SALT, MeshStore, SyncedMesh};
-use mesh_host::{HostConfig, MeshHost};
+use crate::mesh_host::{HostConfig, MeshHost};
 use muniment::Backend;
 use personae::bootstrap::{self, Unlock};
 use personae::vault::{IdentityStorage, IdentityVault, ProfileId};
@@ -314,7 +314,7 @@ impl InstalledAuthority {
     ) -> Result<ResidentAuthority<B>, InstalledError>
     where
         B: Backend + Clone + Send + Sync + 'static,
-        F: FnOnce(Arc<mesh_host::TransportBlobSpace>) -> HostConfig,
+        F: FnOnce(Arc<crate::mesh_host::TransportBlobSpace>) -> HostConfig,
     {
         let paths = self.paths(mesh_id);
         let storage =

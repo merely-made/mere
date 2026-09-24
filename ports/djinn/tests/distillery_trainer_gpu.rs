@@ -95,7 +95,7 @@ use eidetic::models::{EvalMetric, EvalReport, OpaqueBlob};
 use eidetic::typed::load_typed;
 use eidetic::{ModelAdapterManifest, NoFetcher};
 use mesh::ResourceId;
-use mesh_host::Step;
+use distillery::mesh_host::Step;
 
 /// A failure bound, not an expectation. The run is stopped by the observer
 /// seeing `Step::Completed`; this only decides how long a *stuck* run is given

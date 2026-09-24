@@ -83,7 +83,7 @@ would then have to reach into an app. It owns:
 5. `CheckpointClass::NonInterruptible` honours `reclaim_grace_ms` before a hard
    cancel.
 
-### Landed 2026-08-09 — `crates/mesh/host` (`mere-mesh-host`)
+### Landed 2026-08-09 — `crates/mesh/host` *(historical citation)* <!-- doc-audit: historical-path --> (`mere-mesh-host`)
 
 `MeshHost::tick` reaps finished runs, abandons any lease it no longer holds,
 escalates an overdue reclaim, then takes at most one new action. It never
@@ -428,3 +428,8 @@ classes, and remote tensor transport beyond the adapter gate above.
   value exactly. This closes the executable remote-model gate. Physical GPU
   allocation telemetry and Burn Fusion's remote MiniLM panic are explicit
   sidequests; stable publication remains the release gate.
+- **2026-09-23**: `mere-mesh-host` folded into distillery as `distillery::mesh_host`
+  (`ports/distillery/src/mesh_host.rs`) under Mark's
+  [crate consolidation](2026-09-23_crate_consolidation_plan.md) ruling; Djinn
+  reaches it through its existing distillery dependency. Its 10 unit and 2
+  integration tests moved with it and pass.

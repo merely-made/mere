@@ -16,7 +16,7 @@ use mesh::{
     AvailabilityPolicy, ErasurePolicy, KeepBound, LeasePolicy, MESH_AUTHOR_SALT, MeshEvent,
     MeshRetentionPolicy, MeshStore, PayloadRule, PolicyRevision, ResourceId, SyncedMesh,
 };
-use mesh_host::{HostConfig, ManualClock, MeshHost, Step, TransportBlobSpace};
+use distillery::mesh_host::{HostConfig, ManualClock, MeshHost, Step, TransportBlobSpace};
 use personae::{IdentityProvider, InMemoryProvider};
 use transport::{BlobStore, P2pandaTransport};
 

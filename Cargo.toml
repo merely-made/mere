@@ -11,7 +11,6 @@ members = [
     "crates/shell/comms",
     "crates/incipit",
     "crates/system/pandect",
-    "crates/system/resident",
     "crates/system/luggage",
     "crates/system/fetch",
     "crates/system/content-contract",
@@ -45,7 +44,6 @@ members = [
     "crates/moot/moothold",
     "crates/moot/mooting",
     "crates/mesh/mesh",
-    "crates/mesh/host",
     "crates/script/rhai",
     "crates/script/document-host",
     "crates/script/app-host",
@@ -278,7 +276,6 @@ incipit = { version = "0.2.0", path = "crates/incipit" }
 chrome = { package = "mere-chrome", path = "crates/shell/chrome" }
 comms = { package = "mere-comms", path = "crates/shell/comms" }
 pandect = { version = "0.1.1", path = "crates/system/pandect" }
-mere-resident = { version = "0.0.1", path = "crates/system/resident" }
 # Self-update over signed manifests (the cargo-packager-updater fork; ruled
 # 2026-07-24: name luggage, home mere). Apps consume it via git dep like the
 # rest of the family; mere itself will when its own packaging lands.
@@ -481,7 +478,6 @@ mesh = { package = "mere-mesh", path = "crates/mesh/mesh" }
 # The host supervisor above the mesh (host lanes plan, gate H0): owns in-flight
 # jobs, their control handles, and the OS-facing condition/clock seams that
 # `mere-mesh` deliberately refuses to have.
-mesh-host = { package = "mere-mesh-host", path = "crates/mesh/host" }
 
 # The same crate as `personae` above, under mere's historical alias. Both
 # entries must carry the SAME version: they resolve to one package, and a

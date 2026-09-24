@@ -86,7 +86,8 @@ not guess either from a profile name.
 
 ## Lifecycle
 
-Djinn uses `mere-resident` for the small rule shared with Distillery: close
+Djinn uses Distillery's `lifecycle` module (the `mere-resident` crate until
+2026-09-23) for the small rule shared with Distillery: close
 resources in a concrete order, attempt every close, and retain every failure.
 It does not share product policy, configuration, or service APIs with
 Distillery.

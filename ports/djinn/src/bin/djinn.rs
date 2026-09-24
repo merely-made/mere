@@ -892,7 +892,7 @@ fn observe_distillery(receipt: &ResidentReceipt) {
             if steps.is_empty()
                 || steps
                     .iter()
-                    .all(|step| matches!(step, mesh_host::Step::Idle)) =>
+                    .all(|step| matches!(step, distillery::mesh_host::Step::Idle)) =>
         {
             tracing::debug!("Distillery supervisor turn with nothing to do")
         },

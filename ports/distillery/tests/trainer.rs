@@ -43,7 +43,7 @@ use mesh::{
     MeshEvent, MeshRetentionPolicy, MeshStore, PayloadRule, PolicyRevision, ResourceId,
     ResourceRegistry, SyncedMesh,
 };
-use mesh_host::{HostConfig, ManualClock, MeshHost, Step, TransportBlobSpace};
+use distillery::mesh_host::{HostConfig, ManualClock, MeshHost, Step, TransportBlobSpace};
 use personae::{IdentityProvider, InMemoryProvider};
 use safetensors::tensor::{Dtype, TensorView};
 use tokio::sync::Mutex;

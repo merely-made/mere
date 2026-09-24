@@ -75,7 +75,7 @@ use eidetic::models::{EvalMetric, EvalReport, OpaqueBlob};
 use eidetic::typed::load_typed;
 use eidetic::{ModelAdapterManifest, NoFetcher};
 use mesh::ResourceId;
-use mesh_host::Step;
+use distillery::mesh_host::Step;
 
 /// Training on the CPU under a `line-tables-only` debug profile takes tens of
 /// seconds. This bound is a *failure* bound — the run is stopped by the

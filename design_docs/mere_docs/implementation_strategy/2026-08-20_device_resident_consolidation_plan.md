@@ -43,7 +43,8 @@ that composition. The old Graphshell application settings directory is still
 read deliberately so a rename does not strand a selected profile or pairing.
 
 Knot was the second real consumer that earned a product-neutral lifecycle
-mechanic. That mechanic is now `mere-resident`: ordered lazy closes that try
+mechanic. That mechanic is now `distillery::lifecycle` (the `mere-resident` crate
+until 2026-09-23): ordered lazy closes that try
 every owned resource and retain every failure. Djinn and Distillery use it;
 their resource policies and receipts remain their own. A third user must add
 another observed lifecycle rule before the shared crate grows.

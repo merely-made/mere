@@ -18,7 +18,7 @@ use castellan::resident::CastellanResident;
 use graphshell::native::endpoint_catalog::{
     ResidentEndpointCatalog, ResidentEndpointCatalogError, ResidentEndpointRoute,
 };
-use mere_resident::{CloseAction, CloseFuture, close_all};
+use distillery::lifecycle::{CloseAction, CloseFuture, close_all};
 use personae::bootstrap::Unlock;
 use personae::{IdentityProvider, ProfileId};
 use transport::BlobScope;

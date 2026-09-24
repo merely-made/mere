@@ -21,14 +21,14 @@
 use std::sync::Arc;
 use std::time::Duration;
 
-use identity::{Ed25519Keypair, IdentityProvider, InMemoryProvider};
+use personae::{Ed25519Keypair, IdentityProvider, InMemoryProvider};
 use mesh::resources::DelayedResource;
 use mesh::spec::{DeterminismClass, JobSpec};
 use mesh::{
     DevicePolicy, HostFacts, JobId, JobState, LeasePhase, LeasePolicy, LeaseTerms, MemoryBlobSpace,
     MeshEvent, MeshStore, ReclaimReason, ResourceId, ResourceRegistry, SyncedMesh,
 };
-use mesh_host::{Clock, HostConfig, ManualClock, MeshHost, ObservedConditions, Step};
+use distillery::mesh_host::{Clock, HostConfig, ManualClock, MeshHost, ObservedConditions, Step};
 use muniment::MemoryBackend;
 use proofs::BlobRef;
 use std::collections::BTreeSet;

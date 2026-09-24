@@ -1,7 +1,9 @@
 # distillery
 
 **Distillery** is the model-works port of the Mere platform. Its first authority
-slice is implemented as the first real consumer of `mere-mesh-host`.
+slice is implemented as the first real consumer of the mesh host supervisor,
+which distillery has held as its `mesh_host` module since 2026-09-23 (it was
+the `mere-mesh-host` crate).
 
 A distillery takes a raw mash and runs it, batch by batch, through stills into
 something concentrated. This port is that works for models: the harness where
@@ -16,8 +18,8 @@ answers to the owner, and reclaim always wins).
 
 The boundaries are the point: not [esp](https://crates.io/crates/esp) (the
 inference/embedding seam crate stays the portable burn boundary; distillery
-drives it), not mere-mesh or mere-mesh-host (job grammar, leases, and the
-supervisor are substrate; distillery embeds and renders them), not servitor
+drives it), not mere-mesh (job grammar and leases are substrate; distillery
+embeds and renders them, and holds the supervisor as `mesh_host`), not servitor
 (petition gating stays the gate's office), and not turnstone (the flagship
 embeds the same views; distillery is the standalone works).
 

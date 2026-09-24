@@ -397,7 +397,7 @@ result: transitions specified relative to explicit start and end states, over
 component classes, with sync/concat composition, and the authors rejected
 extending the visualization spec itself. Scenotime epoch pairs are the
 natural start/end states; the host owns the clock (the same seam discipline
-`mere-mesh-host` uses for `Clock`).
+the mesh host, `distillery::mesh_host`, uses for `Clock`).
 Tasks: a transition spec over diff output (which item classes, what staging,
 duration ratios); pure evaluation against host-supplied time in scenotime;
 default staging so consumers get respectable motion for free; playback in the

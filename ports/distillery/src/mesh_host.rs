@@ -4,7 +4,7 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! # mesh-host
+//! # The mesh host
 //!
 //! The mesh host supervisor — gate **H0** of the host lanes plan.
 //!
