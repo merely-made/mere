@@ -110,6 +110,80 @@ pub fn list_personas(data_root: &Path) -> io::Result<Vec<PersonaId>> {
     Ok(personas)
 }
 
+/// Why no single wallet persona could be chosen under a data root.
+#[derive(Debug)]
+pub enum PersonaResolutionError {
+    /// The personas directory could not be read.
+    List { root: PathBuf, error: io::Error },
+    /// No persona wallet exists yet.
+    Missing { root: PathBuf },
+    /// Several do, and nothing says which.
+    Several {
+        root: PathBuf,
+        personas: Vec<PersonaId>,
+    },
+}
+
+impl std::fmt::Display for PersonaResolutionError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::List { root, error } => {
+                write!(
+                    f,
+                    "could not list personas under {}: {error}",
+                    root.display()
+                )
+            },
+            Self::Missing { root } => write!(
+                f,
+                "no persona wallet exists under {} yet; pair this device first, or name a persona",
+                root.display()
+            ),
+            Self::Several { root, personas } => write!(
+                f,
+                "several personas live under {}; name one of: {}",
+                root.display(),
+                personas
+                    .iter()
+                    .map(|persona| persona.as_uuid().to_string())
+                    .collect::<Vec<_>>()
+                    .join(", ")
+            ),
+        }
+    }
+}
+
+impl std::error::Error for PersonaResolutionError {}
+
+/// The wallet persona to act for under `data_root`: `explicit` when given,
+/// otherwise the sole persona wallet. Zero or several wallets are refused with
+/// what exists, because guessing among real cryptographic identities is how a
+/// document gets sealed to somebody else (family shared identity plan,
+/// 2026-08-09). A remembered choice joins this ladder when something exists to
+/// write one.
+pub fn resolve_persona(
+    data_root: &Path,
+    explicit: Option<PersonaId>,
+) -> Result<PersonaId, PersonaResolutionError> {
+    if let Some(persona) = explicit {
+        return Ok(persona);
+    }
+    let personas = list_personas(data_root).map_err(|error| PersonaResolutionError::List {
+        root: data_root.to_path_buf(),
+        error,
+    })?;
+    match personas.as_slice() {
+        [only] => Ok(*only),
+        [] => Err(PersonaResolutionError::Missing {
+            root: data_root.to_path_buf(),
+        }),
+        _ => Err(PersonaResolutionError::Several {
+            root: data_root.to_path_buf(),
+            personas,
+        }),
+    }
+}
+
 /// `<data_root>/personas/<persona_id>/private-epoch-bridge.json`
 pub fn persona_epoch_bridge_path(data_root: &Path, persona: PersonaId) -> PathBuf {
     data_root
@@ -155,6 +229,42 @@ mod tests {
             list_personas(&root).unwrap(),
             vec![later, real],
             "wallets only, sorted by UUID so the answer is stable"
+        );
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn resolving_a_persona_takes_the_sole_wallet_or_says_what_exists() {
+        let root = temp_data_root("resolve-persona");
+        assert!(matches!(
+            resolve_persona(&root, None),
+            Err(PersonaResolutionError::Missing { .. })
+        ));
+
+        let first = PersonaId::from_uuid(Uuid::from_u128(0x31));
+        save_persona_wallet(
+            &root,
+            &PersonaWalletManifest::new(first, fixture_chain_root(), fixture_epoch()),
+        )
+        .unwrap();
+        assert_eq!(resolve_persona(&root, None).unwrap(), first);
+
+        let second = PersonaId::from_uuid(Uuid::from_u128(0x32));
+        save_persona_wallet(
+            &root,
+            &PersonaWalletManifest::new(second, fixture_chain_root(), fixture_epoch()),
+        )
+        .unwrap();
+        match resolve_persona(&root, None) {
+            Err(PersonaResolutionError::Several { personas, .. }) => {
+                assert_eq!(personas, vec![first, second]);
+            },
+            other => panic!("several wallets must be refused with both named: {other:?}"),
+        }
+        assert_eq!(
+            resolve_persona(&root, Some(second)).unwrap(),
+            second,
+            "an explicit persona wins"
         );
         let _ = fs::remove_dir_all(&root);
     }
