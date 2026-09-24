@@ -199,6 +199,7 @@ pub fn validate_chain(
 
 #[cfg(test)]
 mod tests {
+    use personae::delegation::Issue;
     use personae::delegation::{CapabilityScope, DelegationRevocation};
     use personae::{IdentityProvider, InMemoryProvider};
 

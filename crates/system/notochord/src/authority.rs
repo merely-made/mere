@@ -102,6 +102,7 @@ mod tests {
     use crate::{NetworkId, ProfileRef, RequestedAction, SessionClaims, TrafficClass};
     use personae::IdentityProvider;
     use personae::InMemoryProvider;
+    use personae::delegation::Issue;
     use personae::delegation::{
         CapabilityScope, DelegationCertificate, DelegationParent, DelegationRevocation,
         SignedDelegationCertificate, SignedDelegationRevocation,

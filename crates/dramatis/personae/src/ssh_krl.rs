@@ -164,6 +164,7 @@ pub fn store_ledger(profile: &mut Profile, ledger: &RevocationLedger) -> Result<
 mod tests {
     use super::*;
     use crate::carry::{ACTION_SSH_LOGIN, DeviceId, device_capability_scope};
+    use crate::delegation::Issue;
     use crate::delegation::{DelegationRevocation, SignedDelegationCertificate};
     use crate::ssh_ca::{self, serial_for_device};
     use crate::vault::ProfileId;

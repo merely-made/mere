@@ -36,6 +36,9 @@ agent = ["ssh", "dep:ssh-agent-lib", "dep:tokio", "dep:tracing-subscriber"]
 [dependencies]
 ed25519-dalek = { version = "3", features = ["zeroize"] }
 blake3 = "1.5"
+# Delegation statements and attestations live in insigne; personae issues them
+# and needs the checks.
+insigne = { workspace = true, features = ["verify"] }
 getrandom = "0.3"
 zeroize = { version = "1", features = ["zeroize_derive"] }
 thiserror = "1"

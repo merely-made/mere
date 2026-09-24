@@ -1,8 +1,8 @@
 # Insigne Proofs Plan
 
 **Date**: 2026-09-23
-**Status**: plan. Mark agreed the split on 2026-09-23; how issuing is expressed
-(§2) is his call before phase A starts. Nothing has moved yet.
+**Status**: phase A landed 2026-09-24; phases B–D open. Mark agreed the split
+and ruled how issuing is expressed (§2, option (a)) on 2026-09-23.
 **Scope**: move personae's delegation and attestation data types into insigne's
 plain-data core and their checks behind an insigne feature, with issuing kept in
 personae; then let gaz keep the proofs it receives.
@@ -30,7 +30,9 @@ signatures, so a holder like gaz takes on no cryptography:
 - `DelegationId`, `DelegationParent`, `CapabilityScope` with its
   `attenuates` and well-formedness checks.
 - `DelegationCertificate` and `DelegationRevocation`, with their constructors,
-  `attenuates`, `covers` and canonical signing bytes.
+  `covers` and canonical signing bytes (`signing_bytes`, now public).
+  `DelegationCertificate::attenuates` names its parent by hash, so it went
+  behind `digest` with `id` (§4, 2026-09-24).
 - `SignedDelegationCertificate` and `SignedDelegationRevocation` as data: the
   statement, the signer's attestation and the signature bytes, with a
   constructor from parts for personae's issuer.
@@ -40,15 +42,17 @@ signatures, so a holder like gaz takes on no cryptography:
 The domain strings (`personae/delegation-certificate/v1` and the rest) and the
 format versions move unchanged, so every signature issued so far still checks.
 
-**Moves behind insigne's verification feature** (`ed25519-dalek` 3, the version
-personae already uses, and `blake3`): the three `verify` functions and
-`DelegationCertificate::id`, which is a blake3 hash of the signing bytes.
+**Moves behind insigne's features**, two as built: `digest` (`blake3`) carries
+`DelegationCertificate::id`, a blake3 hash of the signing bytes, and
+`DelegationCertificate::attenuates`; `verify` (`ed25519-dalek` 3, the version
+personae already uses) carries the three `verify` functions and implies
+`digest`.
 
 **Stays in personae**: issuing, which needs `IdentityProvider` and the persona's
 keys, and `IdentityProvider::attest_derived_key`, which signs with the master.
-personae depends on insigne with the verification feature on.
+personae depends on insigne with `verify` on.
 
-## 2. Decision needed: how issuing is expressed
+## 2. Decision: how issuing is expressed (ruled (a), 2026-09-23)
 
 Once the types live in insigne, personae cannot add inherent methods to them
 (the orphan rule), and insigne cannot depend on personae (a cycle). Today
@@ -76,20 +80,41 @@ when they repin.
 Also Mark's call: whether this session makes the other repos' import edits
 when each repins mere, or leaves them to those repos' own sessions.
 
+**Ruled 2026-09-23: (a)**, and for the other repos "you do repins or
+communicate to 'em". Built as two traits rather than one: `Issue` in
+`personae::delegation` provides `issue` for both signed types, and
+`AttestationKeys` at personae's root provides `master_public_key` and
+`derived_public_key`. insigne's attestation also gained plain accessors
+(`master`, `derived`, `signature`) and typed ones (`master_key`,
+`derived_key`, as `TypedKey`).
+
 ## 3. Phases
 
-- **A — relocation, behaviour identical.** Done when:
-  - [ ] the types in §1 live in insigne's core and their checks behind its
-        verification feature; personae keeps issuing and re-exports the types;
-  - [ ] `cargo check --workspace` passes, and the tests of personae, notochord,
+- **A — relocation, behaviour identical.** Landed 2026-09-24. Done when:
+  - [x] the types in §1 live in insigne's core and their checks behind its
+        features; personae keeps issuing and re-exports the types at their
+        old paths;
+  - [x] `cargo check --workspace` passes, and the tests of personae, notochord,
         servitor, gemot, commons and castellan pass without edits to test
-        logic;
-  - [ ] a certificate, a revocation and an attestation serialized and signed
-        before the move load and check after it (signing bytes unchanged);
-  - [ ] insigne's Ed25519 check accepts exactly what personae's
+        logic. The portable gate passed at 1,525 packages. Passing: personae
+        111, notochord 43, servitor 92, gemot 97, commons-spine 67 and castellan
+        59. Beyond the list, stickleback 88, mere-mesh 125, mere-transport 49,
+        gaz 54, djinn's chronicle route 2 and graphshell's two integration
+        tests also passed. Test edits were import lines, plus one change of
+        mechanics: personae's attestation tamper test now builds the tampered
+        value with `from_parts`, because the field is private in insigne. What
+        it tampers and what it asserts are unchanged;
+  - [x] a certificate, a revocation and an attestation serialized and signed
+        before the move load and check after it:
+        `crates/dramatis/insigne/tests/pre_move_personae.rs`, against a fixture
+        personae issued at mere `3943874f`. Each re-serializes to the stored
+        JSON and checks, and the certificate keeps its id;
+  - [x] insigne's Ed25519 check accepts exactly what personae's
         `Ed25519PublicKey::verify` accepts (the same strict or lax mode),
         proven by a test against a signature one mode accepts and the other
-        rejects.
+        rejects. The same test file uses the identity point as both key and
+        `R` with `s = 0`: ed25519-dalek's lax `verify` accepts it,
+        `verify_strict` refuses it, and insigne accepts it.
 - **B — conclusions, not booleans.** A passing check returns a local,
   non-`Serialize` conclusion, notochord's `AdmittedPrincipal` rule. Callers
   migrate crate by crate. Done when no caller reads a `bool` from a check and
@@ -118,6 +143,44 @@ build is the real census.
 `crates/dramatis/personae/src/provider.rs`). Hence the verification feature
 carries both crates, and phase A's strictness condition.
 
+**2026-09-24: the compiler's census.** In mere, 49 files across 11 crates needed
+the trait import (+56 −3 lines). graphshell had 18, gemot 9 and notochord 7.
+knot-editor needed 5 files. The imports followed rustc's own suggestions, with
+one trap: rustc names the package, `personae::`, even in crates that depend on
+it as `identity` (gemot, stickleback, servitor, mere-mesh, mere-transport). That
+path does not resolve there, and phase C's import rewrite will meet the same
+trap.
+
+**2026-09-24: mere and knot-editor compile each other.** djinn pins knot-editor,
+and mere's `[patch]` table serves every mere package Knot names from this tree.
+So knot-editor's non-test code (`publish.rs`) compiles against mere's working
+personae, and a breaking change to a contract Knot names has to land in both
+repos at once. Here, knot-editor `c6d5b9e` added the imports first. Its
+standalone build stayed red until it repinned to this move, and mere pinned it.
+Mark chose that brief break over pinning a branch on 2026-09-24. Phase C will
+meet the same cycle. The repin also removed genet `5ae30cad` from mere's graph.
+The old knot pin had pulled `fleece` and `layout-dom-api` in a second time, and
+without them the graph went from 1,527 packages to 1,525.
+
+**2026-09-24: `attenuates` hashes.** `DelegationCertificate::attenuates` requires
+`parent == Certificate(parent.id())`, so it needs `digest`. §1 had put it in the
+plain core. `CapabilityScope::attenuates` stays plain.
+
+**2026-09-24: two test targets the portable gate never compiles.**
+`scripts/cargo_mode.py verify` runs `cargo check --workspace` without
+`--all-targets`. With it, graphshell's lib tests (`ports/graphshell/src/app.rs:387`,
+a match missing `RelationKind::OpenPredicate`) and cambium-nematic's
+(`crates/cambium/cambium-nematic/src/views.rs:513`, a `FeedEntry` missing six
+fields) fail to compile, both before this move and after it. So graphshell's
+own unit tests could not run for phase A. They compile through type checking,
+which covers their imports.
+
 ## 5. Progress
 
 **2026-09-23.** Plan drafted the day Mark agreed the split. Waits on §2.
+
+**2026-09-24.** Phase A landed, pinned to knot-editor `c6d5b9e` (§4). This
+session repins knot-editor to it. The other repos that pin mere by rev
+(turnstone, mer3ly, hocket, cleromancy) add the two imports when they repin:
+`Issue` for `issue`, and `AttestationKeys` for an attestation's personae-typed
+keys. Next: phase B.

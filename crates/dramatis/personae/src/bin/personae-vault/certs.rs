@@ -10,6 +10,7 @@
 //!
 //! Split from `main.rs` to stay under the 600-line ceiling.
 
+use personae::delegation::Issue;
 use std::io::Write;
 use std::process::{Command, Stdio};
 use std::time::{SystemTime, UNIX_EPOCH};

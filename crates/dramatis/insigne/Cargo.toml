@@ -9,10 +9,22 @@ readme = "README.md"
 keywords = ["identity", "attestation", "proof", "persona", "petname"]
 categories = ["authentication", "cryptography"]
 
+[features]
+# Certificate ids and attenuation, which hash with BLAKE3.
+digest = ["dep:blake3"]
+# Signature checks on ed25519-dalek, the version personae signs with.
+verify = ["digest", "dep:ed25519-dalek"]
+
 [dependencies]
+blake3 = { version = "1.5", optional = true }
+ed25519-dalek = { version = "3", optional = true }
 serde.workspace = true
 
 [dev-dependencies]
+ed25519-dalek = "3"
+# The checks under test sit behind `verify`; this turns it on for every test
+# target, so `cargo test -p insigne` cannot silently skip them.
+insigne = { path = ".", features = ["verify"] }
 # The binary codec muniment stores with, so the binary serde path is tested
 # against the format a gaz persists in.
 postcard = { version = "1", features = ["alloc"] }

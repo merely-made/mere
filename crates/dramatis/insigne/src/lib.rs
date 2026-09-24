@@ -47,14 +47,33 @@
 //!
 //! ## Built today
 //!
-//! [`TypedKey`], the bare-key grade: a public key typed by its family and
-//! written in that family's standard text form (`did:key`, or `rnid`'s hex for
-//! a Reticulum identity). Nothing verifies yet.
+//! - [`TypedKey`], the bare-key grade: a public key typed by its family and
+//!   written in that family's standard text form (`did:key`, or `rnid`'s hex
+//!   for a Reticulum identity).
+//! - [`DerivedKeyAttestation`], the master's signed word that a derived key is
+//!   its own, and the [`delegation`] grammar: certificates, revocations and
+//!   their canonical signing bytes. Both moved here from personae on
+//!   2026-09-24, formats unchanged; issuing stays in personae.
+//!
+//! ## Features
+//!
+//! - `digest`: certificate ids and attenuation, which hash with BLAKE3.
+//! - `verify`: signature checks on ed25519-dalek, in the lax mode personae
+//!   always used; implies `digest`.
 
 #![warn(missing_docs)]
 #![doc(html_no_source)]
 
+pub mod attestation;
+#[cfg(feature = "verify")]
+mod check;
+pub mod delegation;
 mod encoding;
 pub mod key;
 
+pub use attestation::DerivedKeyAttestation;
+pub use delegation::{
+    CapabilityScope, DelegationCertificate, DelegationId, DelegationParent, DelegationRevocation,
+    SignedDelegationCertificate, SignedDelegationRevocation,
+};
 pub use key::{KeyAlgorithm, KeyParseError, TypedKey};

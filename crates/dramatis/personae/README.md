@@ -5,7 +5,8 @@ woodshed). A person has *personae*, plural: a work face, a research face, a
 burner. This crate is the register of them and the root of trust they derive
 from, a master Ed25519 keypair with deterministic per-protocol key derivation,
 a passphrase- or OS-store-unlocked vault, sealed-record storage for secrets at
-rest, and a signed capability-delegation grammar.
+rest, and the issuing side of the signed capability-delegation grammar that
+[insigne](https://crates.io/crates/insigne) defines.
 
 Promoted from mere's `persona/identity`. Edition 2024, pure-Rust crypto
 (`ed25519-dalek`, `blake3`, `argon2`, `chacha20poly1305`).
@@ -29,7 +30,7 @@ identity, so application traffic is never signed with the master key directly.
 
 | Module | Contents |
 | --- | --- |
-| root | `PersonaId`, `IdentityError`, `Ed25519Keypair`, `Ed25519PublicKey`, `Ed25519Signature`, `VERSION`, `STAGE`; and, from the private `provider` module, `IdentityProvider`, `InMemoryProvider`, `SealedIdentityProvider` (`load_or_create`), `DerivedKeyAttestation` |
+| root | `PersonaId`, `IdentityError`, `Ed25519Keypair`, `Ed25519PublicKey`, `Ed25519Signature`, `VERSION`, `STAGE`; and, from the private `provider` module, `IdentityProvider`, `InMemoryProvider`, `SealedIdentityProvider` (`load_or_create`), `DerivedKeyAttestation` (insigne's, re-exported), `AttestationKeys` (its keys as `Ed25519PublicKey`) |
 | `vault` | `IdentityVault`, `Profile`, `ProfileId`, `ProfileSummary`, `IdentitySlot`, `ProtocolKey`, `SecretBytes`, `UnlockTier`, `CredentialLineage`, `IdentityStorage`, `InMemoryStorage` |
 | `bootstrap` | `Unlock`, `PASSPHRASE_ENV`, `load_or_create_profile`; the standard backend-selection and profile-opening ceremony |
 | `passphrase_storage` | `PassphraseEncryptedStorage`, an Argon2id + ChaCha20-Poly1305 on-disk vault |
@@ -38,7 +39,7 @@ identity, so application traffic is never signed with the master key directly.
 | `seal` | `seal_bytes` / `unseal_bytes`, XChaCha20-Poly1305 with a prepended random nonce |
 | `sealed_record_storage` | `SealedRecordStorage`, one sealed typed serde value per path |
 | `sealed_profile_storage` | `SealedProfileStorage`, the `IdentityStorage` backend over sealed records |
-| `delegation` | `DelegationCertificate` / `SignedDelegationCertificate`, `DelegationRevocation` / `SignedDelegationRevocation`, `DelegationId`, `DelegationParent`, `CapabilityScope`, `DelegationError`, `delegation_signing_salt` |
+| `delegation` | Issuing: `Issue` (`issue` for both signed types) and `DelegationError`. The grammar lives in insigne and is re-exported here at its old paths: `DelegationCertificate` / `SignedDelegationCertificate`, `DelegationRevocation` / `SignedDelegationRevocation`, `DelegationId`, `DelegationParent`, `CapabilityScope`, `delegation_signing_salt`, `path_covers` |
 | `signing` | `ApprovalBroker`, `SigningRequest`, `SigningPolicy`, `SigningDecision`, `SigningAuthorization`, `SigningRecord`. Feature `agent` |
 | `ssh_slot` | `SshSlot`, `slot_for`, `private_key_from_slot`, `ssh_slots`, `find_by_public`, `protocol_key_for`, `SSH_MOD_ID`. Feature `ssh` |
 | `ssh_ca` | `SshCertAuthority`, `UserCertRequest`, `HostCertRequest`, `CertMintError`, `self_grant`, `key_id_for`, `ssh_ca_salt`, `MAX_CERT_TTL_MS`, `SSH_CA_MOD_ID`. The delegation grammar projected into OpenSSH certificates. Feature `ssh` |

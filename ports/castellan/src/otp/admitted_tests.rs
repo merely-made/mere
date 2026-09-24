@@ -4,6 +4,7 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
+use personae::delegation::Issue;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use notochord::{

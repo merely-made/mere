@@ -28,6 +28,7 @@
 //! [`DeviceMode::Copy`]: super::DeviceMode::Copy
 //! [`DeviceMode::RemoteAuth`]: super::DeviceMode::RemoteAuth
 
+use crate::delegation::Issue;
 use std::collections::BTreeMap;
 
 use crate::delegation::{
