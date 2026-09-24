@@ -3,8 +3,9 @@
 **Date:** 2026-09-23
 
 **Status:** in progress, 2026-09-23. C1-C3's clear-cut moves are landed and
-pushed through `254b23b6`; C2's dramatis-tier moves and every C4 candidate wait
-on Mark's rulings.
+pushed. In C2, insigne is being filled under Mark's rulings by the dramatis
+session; chatelaine, the delegation question and every C4 candidate wait on
+Mark.
 
 ## The ruling this serves
 
@@ -44,8 +45,8 @@ the direction that makes no dependency cycle.
 | `mere-athanor` | the furnace passes: forgetting, image cleanup, consolidation, retirement | `pandect::athanor` | landed `1bda73d5` |
 | `mere-alembic` | the three memory levels, behind its `recall` feature | `pandect::memory_levels` | landed `1bda73d5` |
 | `mien` | standing (event grammar, ledger, persona chains and vault, gate, wire, store) and the composite reputation lens | `gemot::moot::standing`, `moothold::concord` | landed `a1551086` |
-| `chatelaine` | the secret-item taxonomy | castellan's OTP item types | Mark's ruling pending |
-| `insigne` | presentable proofs: delegation certificates, derived-key attestations | `personae` | Mark's ruling pending |
+| `chatelaine` | the secret-item taxonomy | castellan's secret-free OTP item types only | Mark's ruling pending |
+| `insigne` | presentable proofs: typed public keys first | gaz's `TypedKey` | ruled 2026-09-23, in progress (dramatis session) |
 | `dramatis` | the tier facade | none misplaced | nothing to move |
 | `mere-apparatus` | the inspector pane | already its own code | nothing to move |
 
@@ -115,6 +116,16 @@ workspace-wide crate inventory at the Code root.
   `DerivedKeyAttestation`), so moving it makes personae depend on insigne,
   and gaz's no-cryptography rule needs insigne's core serde-only with
   verification behind a feature.
+- 2026-09-23. Mark ruled on insigne: gaz's `TypedKey` moves into insigne, and
+  insigne's core is plain serializable data with verification behind a
+  feature. Moving personae's delegation certificates too would reverse a
+  recorded ruling: the
+  [device grant delegation reconciliation](../technical_architecture/2026-08-11_device_grant_delegation_reconciliation.md)
+  keeps the identity proof and attenuation grammar in personae ("This needs
+  no change to personae"). This plan's earlier insigne row, which named
+  delegation certificates, contradicted that and is corrected. The dramatis
+  session is putting the split to Mark: data types in insigne, issuing in
+  personae, checking behind insigne's feature.
 - 2026-09-23. The first fold tool rewrote sibling references after prefixing
   module paths, so a module named like its old crate produced
   `crate::crate::subgraph`; caught by the compiler in one test file and
@@ -136,4 +147,7 @@ workspace-wide crate inventory at the Code root.
   fetchers (`254b23b6`, 9 tests), all passing. Mere's workspace went from
   124 members to 106; the portable build from 1,549 packages to 1,531.
 - 2026-09-23. Docs citing the moved paths repaired or annotated as
-  historical; the doc audit reports zero broken relative links.
+  historical; the doc audit reports zero broken relative links. Pushed with
+  Mark's go-ahead as part of `254b23b6..03c05dbd`.
+- 2026-09-23. C2 insigne ruled; the dramatis session is moving gaz's
+  `TypedKey` in. The delegation-certificate question is open.
