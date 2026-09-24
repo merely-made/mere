@@ -3,9 +3,9 @@
 **Date:** 2026-09-23
 
 **Status:** in progress, 2026-09-23. C1-C3's clear-cut moves are landed and
-pushed. In C2, insigne is being filled under Mark's rulings by the dramatis
-session; chatelaine, the delegation question and every C4 candidate wait on
-Mark.
+pushed. Mark ruled every open question the same day (see Rulings): C4's folds
+are in progress in this session, insigne's delegation split is the dramatis
+session's, and chatelaine waits on a CXF-shaped taxonomy.
 
 ## The ruling this serves
 
@@ -45,8 +45,9 @@ the direction that makes no dependency cycle.
 | `mere-athanor` | the furnace passes: forgetting, image cleanup, consolidation, retirement | `pandect::athanor` | landed `1bda73d5` |
 | `mere-alembic` | the three memory levels, behind its `recall` feature | `pandect::memory_levels` | landed `1bda73d5` |
 | `mien` | standing (event grammar, ledger, persona chains and vault, gate, wire, store) and the composite reputation lens | `gemot::moot::standing`, `moothold::concord` | landed `a1551086` |
-| `chatelaine` | the secret-item taxonomy | castellan's secret-free OTP item types only | Mark's ruling pending |
-| `insigne` | presentable proofs: typed public keys first | gaz's `TypedKey` | ruled 2026-09-23, in progress (dramatis session) |
+| `chatelaine` | the secret-item taxonomy, shaped against CXF's credential kinds | castellan's secret-free OTP item types, once the taxonomy exists | ruled: design first |
+| `insigne` | presentable proofs: typed keys, delegation certificates and revocations, derived-key attestations | gaz's `TypedKey`; personae's delegation data types | `TypedKey` landed `0f3f854f`; delegation split ruled, in progress (dramatis session) |
+| `tabard` | theme and stylesheet authoring over tinct, illume and CSS | not yet located | named home kept; source to be found |
 | `dramatis` | the tier facade | none misplaced | nothing to move |
 | `mere-apparatus` | the inspector pane | already its own code | nothing to move |
 
@@ -71,23 +72,29 @@ paths are repaired or annotated as historical.
 
 ### C4. Candidates with outside consumers or chosen names
 
-Each is Mark's call before it moves:
+Ruled by Mark 2026-09-23:
 
-- **Graphshell's carriers.** `graphshell-endpoint`, `graphshell-stdio`,
-  `graphshell-local` and `graphshell-network` could be one crate with a
-  feature per carrier. Five repositories import stdio or local, and
-  `graphshell-network`'s own docs keep carriers out of the port on purpose.
-- **`eidetic-fjall`** could be an eidetic `fjall` feature; Turnstone imports it.
-- **Single-consumer crates with chosen names:** `titulus` (chirograph),
-  `pictograph` and `mere-signals` (mere-canvas), `scenograph` (graphshell),
-  `tabard` (pelt-desktop). Fold, or homes like C2's?
-- **`mere-resident`** (86 lines) is shared by distillery and djinn, neither of
-  which is a natural parent of the other.
+| Candidate | Ruling | State |
+|---|---|---|
+| `titulus` | fold into chirograph | to do |
+| `eidetic-fjall` | fold into eidetic as a `fjall` feature (Turnstone changes one import) | to do |
+| `mere-resident`, `mere-mesh-host` | fold both into distillery; djinn already depends on distillery, so djinn would have made a cycle | to do |
+| `graphshell-stdio`, `graphshell-local`, `graphshell-network` | fold into `graphshell-endpoint`, one feature per carrier (five repositories change imports) | to do |
+| `mere-canvas`, `mere-signals` | fold into `pictograph`, not the reverse; canvas becomes `pictograph::canvas` and the mere facade keeps exposing it at `mere::canvas`, so consumer paths do not change | to do |
+| `scenograph` | stays a crate: its scene editing is useful beyond graphshell | ruled out |
+| `tabard` | stays a crate: the named home for theme and stylesheet authoring (C2) | ruled out |
 
-*Done when:* each candidate is folded or recorded as ruled out, with the
-reason.
+*Done when:* each ruled fold has landed with its tests and gates.
 
-### C5. Registry names
+### C5. Version baseline, after consolidation
+
+Mark's rulings: a one-time baseline of genet 0.6 and Mere 0.4 once the
+consolidated set settles; genet's forks (`genet-taffy` 0.14.0,
+`genet-parley` and `genet-fontique` 0.10.0) keep their upstream-derived
+numbers and are listed with their own republish rule; lockstep
+`version.workspace` follows at the first release.
+
+### C6. Registry names
 
 `sibylla`, `vates` and `mere-capability` remain on crates.io with no crate
 behind them. Deletion is done on the site by Mark and feeds the
