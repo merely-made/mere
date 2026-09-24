@@ -53,8 +53,8 @@ use workbench::{SplitAxis, TabStack, Tile, TileEvent, TileId, TilePath, TileTree
 
 use crate::pod::GenetElement;
 use crate::{
-    AnyView, GenetCtx, PortableKeyed, TabAccentColors, TabBar, TabBarNames, TabItem, View, el,
-    tab_bar_view,
+    AnyView, GenetCtx, PortableKeyed, TabAccentColors, TabBar, TabBarNames, TabItem, TabMark, View,
+    el, tab_bar_view,
 };
 
 /// The erased child-view type a pane frame nests: a split holds splits or
@@ -326,18 +326,44 @@ where
     Ev: Fn(&mut State, TileEvent) + Clone + 'static,
     Fill: Fn(&Tile) -> Slot<State, AppAction> + Clone + 'static,
 {
-    el::<_, State, AppAction>("div", render_node(tree, &[], current, &on_event, &fill))
-        .attr("class", "frisket-body")
-        .attr(
-            "style",
-            "display: flex; width: 100%; height: 100%; min-height: 0;",
-        )
+    frisket_with_marks(tree, current, &|_| None, on_event, fill)
+}
+
+/// [`frisket_with_current`], plus a live [`TabMark`] for any tile the host
+/// wants marked: unsaved changes, or something that needs attention.
+///
+/// `marks` is asked once per tile while the frame is built. Marks are the
+/// host's current truth, not tree state, so nothing a layout persists carries
+/// them. `&|_| None` is [`frisket_with_current`] exactly.
+pub fn frisket_with_marks<State, AppAction, Ev, Fill>(
+    tree: &TileTree,
+    current: Option<TileId>,
+    marks: &dyn Fn(TileId) -> Option<TabMark>,
+    on_event: Ev,
+    fill: Fill,
+) -> impl View<State, AppAction, GenetCtx, Element = GenetElement>
+where
+    State: 'static,
+    AppAction: 'static,
+    Ev: Fn(&mut State, TileEvent) + Clone + 'static,
+    Fill: Fn(&Tile) -> Slot<State, AppAction> + Clone + 'static,
+{
+    el::<_, State, AppAction>(
+        "div",
+        render_node(tree, &[], current, marks, &on_event, &fill),
+    )
+    .attr("class", "frisket-body")
+    .attr(
+        "style",
+        "display: flex; width: 100%; height: 100%; min-height: 0;",
+    )
 }
 
 fn render_node<State, AppAction, Ev, Fill>(
     node: &TileTree,
     path: &[usize],
     current: Option<TileId>,
+    marks: &dyn Fn(TileId) -> Option<TabMark>,
     on_event: &Ev,
     fill: &Fill,
 ) -> PaneView<State, AppAction>
@@ -361,7 +387,7 @@ where
             for (index, branch) in children.iter().enumerate() {
                 let mut child_path = path.to_vec();
                 child_path.push(index);
-                let inner = render_node(&branch.tree, &child_path, current, on_event, fill);
+                let inner = render_node(&branch.tree, &child_path, current, marks, on_event, fill);
                 items.push(Box::new(
                     el::<_, State, AppAction>("div", inner)
                         .attr("class", "frisket-branch")
@@ -398,7 +424,7 @@ where
                     .attr("style", format!("display: flex; flex-direction: {dir};")),
             )
         },
-        TileTree::Stack(stack) => render_stack(stack, path, current, on_event, fill),
+        TileTree::Stack(stack) => render_stack(stack, path, current, marks, on_event, fill),
     }
 }
 
@@ -406,6 +432,7 @@ fn render_stack<State, AppAction, Ev, Fill>(
     stack: &TabStack,
     path: &[usize],
     current: Option<TileId>,
+    marks: &dyn Fn(TileId) -> Option<TabMark>,
     on_event: &Ev,
     fill: &Fill,
 ) -> PaneView<State, AppAction>
@@ -425,6 +452,9 @@ where
             let mut item = TabItem::new(tile.title.clone()).with_key(tile.id.0.to_string());
             if let Some(accent) = tile.accent {
                 item = item.with_accent(TabAccentColors::new(accent.background, accent.foreground));
+            }
+            if let Some(mark) = marks(tile.id) {
+                item = item.with_mark(mark);
             }
             item
         })
@@ -687,6 +717,44 @@ mod tests {
         Box::new(frisket(&state.tree, |state: &mut State, event| {
             state.events.push(event)
         }))
+    }
+
+    /// Only the tile the host marks shows a mark, on its own tab.
+    #[test]
+    fn a_host_mark_reaches_the_tab_of_its_tile_only() {
+        fn marked(state: &State) -> TestView {
+            Box::new(frisket_with_marks(
+                &state.tree,
+                None,
+                &|id| (id == TileId(2)).then_some(TabMark::Attention),
+                |state: &mut State, event| state.events.push(event),
+                |_: &Tile| Slot::Hole,
+            ))
+        }
+        fn find(dom: &ScriptedDom, node: NodeId, name: &str, value: &str) -> Option<NodeId> {
+            if attr(dom, node, name).as_deref() == Some(value) {
+                return Some(node);
+            }
+            dom.dom_children(node)
+                .find_map(|child| find(dom, child, name, value))
+        }
+        let dom: DomHandle = Rc::new(RefCell::new(ScriptedDom::new()));
+        let state = State {
+            tree: sample(),
+            events: Vec::new(),
+        };
+        let runner = GenetAppRunner::new(dom.clone(), marked as fn(&State) -> TestView, state);
+        let dom = dom.borrow();
+        let root = runner.root();
+        let marks = dom.outer_html(root).matches("data-mark=").count();
+        assert_eq!(marks, 1, "one tile marked, one mark drawn");
+        let tab = find(&dom, root, "data-tabkey", "2").expect("tile 2's tab");
+        assert_eq!(
+            attr(&*dom, tab, "aria-description").as_deref(),
+            Some("Needs attention")
+        );
+        let unmarked = find(&dom, root, "data-tabkey", "1").expect("tile 1's tab");
+        assert_eq!(attr(&*dom, unmarked, "aria-description"), None);
     }
 
     fn harness() -> Harness {

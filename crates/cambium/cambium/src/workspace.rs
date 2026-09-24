@@ -49,7 +49,7 @@ use workbench::{
 use crate::pod::GenetElement;
 use crate::{
     FRISKET_TILE_ATTR, GenetCtx, PaneView, Slot, SlotKind, TabAccentColors, TabBar, TabBarNames,
-    TabItem, View, el, frisket_with_current, slot_kind, tab_bar_view,
+    TabItem, TabMark, View, el, frisket_with_marks, slot_kind, tab_bar_view,
 };
 
 /// `data-slot`: which of [`SlotKind`]'s three a content element carries. The
@@ -113,10 +113,29 @@ where
     Ev: Fn(&mut State, WorkspaceEvent) + Clone + 'static,
     Fill: Fn(&Tile) -> Slot<State, AppAction> + Clone + 'static,
 {
+    workspace_view_with_marks(model, &|_| None, on_event, fill)
+}
+
+/// [`workspace_view`], plus a live [`TabMark`] for any tile the host wants
+/// marked, on the frame and on a float's bar alike. See
+/// [`frisket_with_marks`](crate::frisket_with_marks).
+pub fn workspace_view_with_marks<State, AppAction, Ev, Fill>(
+    model: &WorkspaceModel<'_>,
+    marks: &dyn Fn(TileId) -> Option<TabMark>,
+    on_event: Ev,
+    fill: Fill,
+) -> impl View<State, AppAction, GenetCtx, Element = GenetElement>
+where
+    State: 'static,
+    AppAction: 'static,
+    Ev: Fn(&mut State, WorkspaceEvent) + Clone + 'static,
+    Fill: Fn(&Tile) -> Slot<State, AppAction> + Clone + 'static,
+{
     let tile_event = on_event.clone();
-    let frame = frisket_with_current(
+    let frame = frisket_with_marks(
         model.workspace.tiled(),
         model.current,
+        marks,
         move |state: &mut State, event: TileEvent| tile_event(state, WorkspaceEvent::Tile(event)),
         fill.clone(),
     );
@@ -124,7 +143,7 @@ where
         .workspace
         .visible_floating(model.float_layer_visible)
         .into_iter()
-        .map(|float| render_float(float, model.current, &on_event, &fill))
+        .map(|float| render_float(float, model.current, marks, &on_event, &fill))
         .collect();
     let layer = el::<_, State, AppAction>("div", floats).attr("class", "workspace-floats");
     el::<_, State, AppAction>("div", (frame, layer))
@@ -135,6 +154,7 @@ where
 fn render_float<State, AppAction, Ev, Fill>(
     float: &FloatingTile,
     current: Option<TileId>,
+    marks: &dyn Fn(TileId) -> Option<TabMark>,
     on_event: &Ev,
     fill: &Fill,
 ) -> PaneView<State, AppAction>
@@ -149,6 +169,9 @@ where
     let mut item = TabItem::new(tile.title.clone()).with_key(id.0.to_string());
     if let Some(accent) = tile.accent {
         item = item.with_accent(TabAccentColors::new(accent.background, accent.foreground));
+    }
+    if let Some(mark) = marks(id) {
+        item = item.with_mark(mark);
     }
     let items = [item];
     let activate = on_event.clone();

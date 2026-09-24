@@ -28,10 +28,12 @@
 //! as size + digest, which is how the receipt can claim a frame was really
 //! drawn (and, after a resize, really redrawn at the new size).
 //!
-//! This file is also the reference for how an application wires a scenario
-//! through the host: the `Probe` borrow-struct below is the whole trick.
+//! The scenario runs on the host's [`ScenarioLane`]; this file supplies only
+//! the smoke's own half through [`LaneApp`], and is the reference for how an
+//! application does that.
 
 use std::cell::RefCell;
+use std::collections::BTreeSet;
 use std::rc::Rc;
 
 use cambium::{
@@ -41,10 +43,9 @@ use cambium::{
 #[cfg(not(target_os = "macos"))]
 use cambium_genet_winit_host::WindowCommands;
 use cambium_genet_winit_host::{
-    AppCtx, AppFrameInsets, Frame, HostHooks, HostOptions, HostPointer, Init, Runner,
-    WindowCommand, WindowFrame, read_frame, run,
+    AppCtx, AppFrameInsets, CaptureRecord, Frame, HostHooks, HostOptions, Init, LaneApp,
+    LaneConfig, ProbeSnapshot, Runner, ScenarioLane, WindowFrame, run,
 };
-use taproot::{Automatable, Driveable, ProbeSnapshot, ProbeSurface, Progress, Scenario};
 
 // ------------------------------------------------------------------ state
 
@@ -233,21 +234,14 @@ const SHEET: &str = "
 .panel { width: 240px; height: 60px; background: #1d2733; padding: 8px; }
 ";
 
-// -------------------------------------------------------------- the probe
+// --------------------------------------------------------------- the lane
 
-/// What the scenario lane owns between frames. The application state itself
-/// lives in the runner, which only a hook can reach, so this holds the rest.
-struct Lane {
-    /// Moved out for the duration of a tick, so the driver can hold the rest of
-    /// the lane while it runs.
-    scenario: Option<Scenario>,
-    receipt: Option<std::path::PathBuf>,
-    /// Frames captured this run: name, geometry, digest, blankness and alpha.
-    captures: Vec<(String, u32, u32, u64, bool, u8, u8, usize, usize, usize)>,
-    /// Optional directory for exact frame artifacts. The textual receipt keeps
-    /// compact digests; a headed geometry receipt also needs inspectable pixels.
-    capture_dir: Option<std::path::PathBuf>,
-    capture_errors: Vec<String>,
+/// The smoke's half of the scenario lane: its snapshot, its one command, the
+/// external probe's release file, and the frame facts its receipt claims.
+struct SmokeLane {
+    /// Per capture: alpha range, clear pixels, translucent pixels, and
+    /// translucent pixels outside the visible frame.
+    alpha: Vec<(String, u8, u8, usize, usize, usize)>,
     /// A shadow receipt requires both clear margin and blurred shadow pixels.
     require_alpha: bool,
     frame_inset: u32,
@@ -255,35 +249,15 @@ struct Lane {
     /// observing this exact window. This keeps a headed receipt bounded without
     /// guessing how many frames native inspection will take.
     release_file: Option<std::path::PathBuf>,
-    finished: bool,
 }
 
-/// The `Automatable` view of the app, borrowed for the duration of one tick.
-///
-/// This is the pattern: the host owns the runner, so the application cannot
-/// hold a long-lived `&mut` to it. It borrows the hook's context instead, for
-/// exactly as long as the driver needs, and queues pointer delivery back
-/// through the host rather than re-implementing hit testing.
-struct Probe<'a, 'c> {
-    ctx: &'a mut AppCtx<'c, Smoke, Logic, Child>,
-    lane: &'a mut Lane,
-}
-
-impl Automatable for Probe<'_, '_> {
-    fn with_surfaces<R>(&self, f: impl FnOnce(&[ProbeSurface<'_>]) -> R) -> R {
-        let dom = self.ctx.runner.dom();
-        let dom_ref = dom.borrow();
-        let (w, h) = self.ctx.logical_size;
-        f(&[ProbeSurface {
-            name: "smoke",
-            dom: &dom_ref,
-            rect: [0.0, 0.0, w, h],
-            sheet: SHEET,
-        }])
+impl LaneApp<Smoke, Logic, Child> for SmokeLane {
+    fn sheet(&self) -> &str {
+        SHEET
     }
 
-    fn snapshot(&self) -> ProbeSnapshot {
-        let state = self.ctx.runner.state();
+    fn snapshot(&self, ctx: &AppCtx<'_, Smoke, Logic, Child>) -> ProbeSnapshot {
+        let state = ctx.runner.state();
         ProbeSnapshot::default()
             .with_field("clicks", state.clicks.to_string())
             .with_field("level", ((state.level * 100.0).round() as i32).to_string())
@@ -296,28 +270,25 @@ impl Automatable for Probe<'_, '_> {
                 },
             )
             .with_field("app_frame_inset", state.app_frame_inset.to_string())
-            .with_field("captures", self.lane.captures.len().to_string())
             .with_field(
                 "maximized",
-                self.ctx
-                    .geometry
+                ctx.geometry
                     .map(|geometry| geometry.maximized.to_string())
                     .unwrap_or_else(|| "unknown".to_string()),
             )
     }
 
-    fn drain_events(&mut self) -> Vec<String> {
+    fn drain_events(&mut self, ctx: &mut AppCtx<'_, Smoke, Logic, Child>) -> Vec<String> {
         let mut drained = Vec::new();
-        self.ctx
-            .runner
+        ctx.runner
             .update(|s| drained = std::mem::take(&mut s.events));
         drained
     }
 
-    fn act(&mut self, label: &str) -> bool {
+    fn act(&mut self, ctx: &mut AppCtx<'_, Smoke, Logic, Child>, label: &str) -> bool {
         match label {
             "reset" => {
-                self.ctx.runner.update(|s| {
+                ctx.runner.update(|s| {
                     s.clicks = 0;
                     s.level = 0.0;
                     s.note("reset".into());
@@ -328,289 +299,105 @@ impl Automatable for Probe<'_, '_> {
         }
     }
 
-    fn press(&mut self, x: f32, y: f32) {
-        self.ctx.pointer.push(HostPointer::Press(x, y));
-    }
-
-    fn moved(&mut self, x: f32, y: f32) {
-        self.ctx.pointer.push(HostPointer::Moved(x, y));
-    }
-
-    fn release(&mut self, x: f32, y: f32) {
-        self.ctx.pointer.push(HostPointer::Release(x, y));
-    }
-
-    fn busy(&mut self) -> Option<bool> {
-        Some(
-            self.lane
-                .release_file
-                .as_ref()
-                .is_some_and(|path| !path.exists()),
-        )
-    }
-}
-
-impl Driveable for Probe<'_, '_> {
-    /// One app verb: `resize <w> <h>`, in logical px. The host owns the window,
-    /// so a resize receipt has to be asked for through it rather than faked.
-    fn app_step(&mut self, line: &str) -> Result<(), String> {
-        let mut parts = line.split_whitespace();
-        match parts.next() {
-            Some("resize") => {
-                let w: f64 = parts
-                    .next()
-                    .and_then(|v| v.parse().ok())
-                    .ok_or("resize wants a width")?;
-                let h: f64 = parts
-                    .next()
-                    .and_then(|v| v.parse().ok())
-                    .ok_or("resize wants a height")?;
-                // Resizing goes through the window-verb queue, like every
-                // other window verb, rather than through a native handle.
-                self.ctx.window_commands.push(WindowCommand::Resize(w, h));
-                Ok(())
-            },
+    /// `await-release`: hold the run until the external probe writes
+    /// `HOST_SMOKE_RELEASE_FILE`. (`resize` is the lane's own verb.)
+    fn app_step(
+        &mut self,
+        _ctx: &mut AppCtx<'_, Smoke, Logic, Child>,
+        line: &str,
+    ) -> Result<(), String> {
+        match line.split_whitespace().next() {
             Some("await-release") => {
                 let path = std::env::var_os("HOST_SMOKE_RELEASE_FILE")
                     .map(std::path::PathBuf::from)
                     .ok_or("await-release wants HOST_SMOKE_RELEASE_FILE")?;
-                self.lane.release_file = Some(path);
+                self.release_file = Some(path);
                 Ok(())
             },
             _ => Err(format!("unknown verb: {line}")),
         }
     }
 
-    fn capture(&mut self, name: &str) -> bool {
-        let name = name.to_string();
-        let sink = Rc::new(RefCell::new(None::<Frame>));
-        let out = sink.clone();
-        *self.ctx.capture = Some(Box::new(move |surface, view, w, h| {
-            *out.borrow_mut() = read_frame(surface, view, w, h);
-        }));
-        // The capture runs inside the next frame, while the rasterized view is
-        // still alive; record it on the frame after that.
-        self.lane.pending_capture(name, sink);
-        true
-    }
-}
-
-impl Lane {
-    fn pending_capture(&mut self, name: String, sink: Rc<RefCell<Option<Frame>>>) {
-        PENDING.with(|p| *p.borrow_mut() = Some((name, sink)));
+    fn busy(&mut self, _ctx: &mut AppCtx<'_, Smoke, Logic, Child>) -> Option<bool> {
+        Some(
+            self.release_file
+                .as_ref()
+                .is_some_and(|path| !path.exists()),
+        )
     }
 
-    /// Fold in whatever the last armed capture produced.
-    fn collect_capture(&mut self) {
-        let taken = PENDING.with(|p| p.borrow_mut().take());
-        let Some((name, sink)) = taken else { return };
-        let frame = sink.borrow_mut().take();
-        match frame {
-            Some(frame) => {
-                let digest = frame.digest();
-                let blank = frame.is_blank();
-                if let Some(dir) = self.capture_dir.as_ref() {
-                    let safe_name: String = name
-                        .chars()
-                        .map(|ch| {
-                            if ch.is_ascii_alphanumeric() || ch == '-' {
-                                ch
-                            } else {
-                                '_'
-                            }
-                        })
-                        .collect();
-                    let path = dir.join(format!("{safe_name}.bmp"));
-                    if let Err(error) = write_bmp(&path, &frame) {
-                        self.capture_errors
-                            .push(format!("could not write {}: {error}", path.display()));
-                    }
-                }
-                let alpha_min = frame
-                    .rgba
-                    .chunks_exact(4)
-                    .map(|pixel| pixel[3])
-                    .min()
-                    .unwrap_or(0);
-                let alpha_max = frame
-                    .rgba
-                    .chunks_exact(4)
-                    .map(|pixel| pixel[3])
-                    .max()
-                    .unwrap_or(0);
-                let transparent = frame
-                    .rgba
-                    .chunks_exact(4)
-                    .filter(|pixel| pixel[3] == 0)
-                    .count();
-                let translucent = frame
-                    .rgba
-                    .chunks_exact(4)
-                    .filter(|pixel| (1..=254).contains(&pixel[3]))
-                    .count();
-                let inset = self.frame_inset as usize;
-                let width = frame.width as usize;
-                let height = frame.height as usize;
-                let outer_translucent = frame
-                    .rgba
-                    .chunks_exact(4)
-                    .enumerate()
-                    .filter(|(index, pixel)| {
-                        let x = index % width;
-                        let y = index / width;
-                        (1..=254).contains(&pixel[3])
-                            && (x < inset
-                                || x >= width.saturating_sub(inset)
-                                || y < inset
-                                || y >= height.saturating_sub(inset))
-                    })
-                    .count();
-                self.captures.push((
-                    name,
-                    frame.width,
-                    frame.height,
-                    digest,
-                    blank,
-                    alpha_min,
-                    alpha_max,
-                    transparent,
-                    translucent,
-                    outer_translucent,
-                ));
-            },
-            // Not yet presented: put it back and try again next frame.
-            None => PENDING.with(|p| *p.borrow_mut() = Some((name, sink))),
-        }
-    }
-
-    fn write_receipt(&mut self, outcome: taproot::Outcome) {
-        if self.finished {
-            return;
-        }
-        self.finished = true;
-        // Two claims a scenario's own grammar cannot make, checked here because
-        // a receipt that says "ok" while every frame was blank or identical is
-        // worse than no receipt: at least one frame must have real pixels, and
-        // the frames captured around a state change must actually differ.
-        let blanks = self.captures.iter().filter(|c| c.4).count();
-        let distinct: std::collections::BTreeSet<u64> = self.captures.iter().map(|c| c.3).collect();
-        let sizes: std::collections::BTreeSet<(u32, u32)> =
-            self.captures.iter().map(|c| (c.1, c.2)).collect();
-        let alpha_ok = !self.require_alpha
-            || self
-                .captures
-                .iter()
-                .all(|capture| capture.7 > 0 && capture.8 > 0 && capture.9 > 0);
-        let frames_ok = blanks == 0
-            && distinct.len() > 1
-            && sizes.len() > 1
-            && alpha_ok
-            && self.capture_errors.is_empty();
-        let ok = outcome.ok && frames_ok;
-
-        let result = if ok { "RESULT ok" } else { "RESULT fail" };
-        let mut body = vec![result.to_string()];
-        body.extend(outcome.log.iter().cloned());
-        for (
-            name,
-            w,
-            h,
-            digest,
-            blank,
+    fn inspect(&mut self, name: &str, frame: &Frame) {
+        let (pixels, _) = frame.rgba.as_chunks::<4>();
+        let alpha = pixels.iter().map(|pixel| pixel[3]);
+        let alpha_min = alpha.clone().min().unwrap_or(0);
+        let alpha_max = alpha.clone().max().unwrap_or(0);
+        let transparent = alpha.clone().filter(|a| *a == 0).count();
+        let translucent = alpha.filter(|a| (1..=254).contains(a)).count();
+        let inset = self.frame_inset as usize;
+        let width = frame.width as usize;
+        let height = frame.height as usize;
+        let outer_translucent = pixels
+            .iter()
+            .enumerate()
+            .filter(|(index, pixel)| {
+                let x = index % width;
+                let y = index / width;
+                (1..=254).contains(&pixel[3])
+                    && (x < inset
+                        || x >= width.saturating_sub(inset)
+                        || y < inset
+                        || y >= height.saturating_sub(inset))
+            })
+            .count();
+        self.alpha.push((
+            name.to_string(),
             alpha_min,
             alpha_max,
             transparent,
             translucent,
             outer_translucent,
-        ) in &self.captures
-        {
-            body.push(format!(
-                "capture {name} {w}x{h} digest={digest:016x} alpha={alpha_min}..{alpha_max} transparent={transparent} translucent={translucent} outer-translucent={outer_translucent}{}",
-                if *blank { " BLANK" } else { "" }
-            ));
-        }
-        body.push(format!(
-            "frames: {} captured, {} blank, {} distinct digests, {} distinct sizes",
-            self.captures.len(),
-            blanks,
-            distinct.len(),
-            sizes.len(),
         ));
-        if !frames_ok {
-            body.push(
-                "FAIL: frames must be non-blank, must differ across a state change, \
-                 must change size across the resize, and requested artifacts must be written"
+    }
+
+    fn receipt_lines(&self) -> Vec<String> {
+        self.alpha
+            .iter()
+            .map(|(name, min, max, transparent, translucent, outer)| {
+                format!(
+                    "alpha {name} alpha={min}..{max} transparent={transparent} translucent={translucent} outer-translucent={outer}"
+                )
+            })
+            .collect()
+    }
+
+    /// Two claims a scenario's own grammar cannot make: the frames captured
+    /// around a state change must differ, and the resize must change the
+    /// frame size. A shadow run also needs clear margin and shadow pixels.
+    fn receipt_checks(&self, captures: &[CaptureRecord]) -> Vec<String> {
+        let digests: BTreeSet<u64> = captures.iter().map(|c| c.digest).collect();
+        let sizes: BTreeSet<(u32, u32)> = captures.iter().map(|c| (c.width, c.height)).collect();
+        let mut failures = Vec::new();
+        if digests.len() < 2 {
+            failures.push("frames must differ across a state change".to_string());
+        }
+        if sizes.len() < 2 {
+            failures.push("frames must change size across the resize".to_string());
+        }
+        if self.require_alpha
+            && !self
+                .alpha
+                .iter()
+                .all(|(_, _, _, transparent, translucent, outer)| {
+                    *transparent > 0 && *translucent > 0 && *outer > 0
+                })
+        {
+            failures.push(
+                "a frame-shadow capture needs transparent margin pixels and translucent shadow pixels outside the visible frame"
                     .to_string(),
             );
         }
-        if !alpha_ok {
-            body.push(
-                "FAIL: a frame-shadow capture needs transparent margin pixels and translucent shadow pixels outside the visible frame"
-                    .to_string(),
-            );
-        }
-        for error in &self.capture_errors {
-            body.push(format!("FAIL: {error}"));
-        }
-        let text = body.join("\n");
-        eprintln!("[host-smoke] {text}");
-        if let Some(path) = self.receipt.as_ref() {
-            let _ = std::fs::write(path, format!("{text}\n"));
-        }
+        failures
     }
-}
-
-/// Write an inspectable 32-bit BMP without pulling an image codec into the
-/// host example. Rows are bottom-up BGRA, the ordinary uncompressed BMP form.
-fn write_bmp(path: &std::path::Path, frame: &Frame) -> std::io::Result<()> {
-    std::fs::create_dir_all(path.parent().ok_or_else(|| {
-        std::io::Error::new(
-            std::io::ErrorKind::InvalidInput,
-            "capture path has no parent",
-        )
-    })?)?;
-    let pixel_bytes = frame
-        .width
-        .checked_mul(frame.height)
-        .and_then(|pixels| pixels.checked_mul(4))
-        .ok_or_else(|| std::io::Error::other("capture dimensions overflow BMP size"))?;
-    let file_size = 54_u32
-        .checked_add(pixel_bytes)
-        .ok_or_else(|| std::io::Error::other("capture is too large for BMP"))?;
-    let width = i32::try_from(frame.width)
-        .map_err(|_| std::io::Error::other("capture width does not fit BMP"))?;
-    let height = i32::try_from(frame.height)
-        .map_err(|_| std::io::Error::other("capture height does not fit BMP"))?;
-
-    let mut bytes = Vec::with_capacity(file_size as usize);
-    bytes.extend_from_slice(b"BM");
-    bytes.extend_from_slice(&file_size.to_le_bytes());
-    bytes.extend_from_slice(&[0; 4]);
-    bytes.extend_from_slice(&54_u32.to_le_bytes());
-    bytes.extend_from_slice(&40_u32.to_le_bytes());
-    bytes.extend_from_slice(&width.to_le_bytes());
-    bytes.extend_from_slice(&height.to_le_bytes());
-    bytes.extend_from_slice(&1_u16.to_le_bytes());
-    bytes.extend_from_slice(&32_u16.to_le_bytes());
-    bytes.extend_from_slice(&0_u32.to_le_bytes());
-    bytes.extend_from_slice(&pixel_bytes.to_le_bytes());
-    bytes.extend_from_slice(&[0; 16]);
-    for row in (0..frame.height as usize).rev() {
-        let start = row * frame.width as usize * 4;
-        let end = start + frame.width as usize * 4;
-        for rgba in frame.rgba[start..end].chunks_exact(4) {
-            bytes.extend_from_slice(&[rgba[2], rgba[1], rgba[0], rgba[3]]);
-        }
-    }
-    std::fs::write(path, bytes)
-}
-
-thread_local! {
-    /// The capture armed for the next presented frame. A thread-local because
-    /// the capture closure outlives the tick that armed it, and the host runs
-    /// the whole application on one thread.
-    static PENDING: RefCell<Option<(String, Rc<RefCell<Option<Frame>>>)>> =
-        const { RefCell::new(None) };
 }
 
 // --------------------------------------------------------------- wiring
@@ -630,57 +417,31 @@ fn main() {
         Err(std::env::VarError::NotPresent) => 0,
         Err(error) => panic!("HOST_SMOKE_APP_FRAME_INSET is not valid Unicode: {error}"),
     };
-    let lane = Rc::new(RefCell::new(std::env::var("HOST_SMOKE_SCENARIO").ok().map(
-        |path| {
-            let text = std::fs::read_to_string(&path)
-                .unwrap_or_else(|e| panic!("scenario '{path}' unreadable: {e}"));
-            let scenario = Scenario::parse(&text)
-                .unwrap_or_else(|e| panic!("scenario '{path}' rejected: {e}"));
-            eprintln!("[host-smoke] scenario armed: {path}");
-            Lane {
-                scenario: Some(scenario),
-                receipt: std::env::var("HOST_SMOKE_RECEIPT").ok().map(Into::into),
-                captures: Vec::new(),
-                capture_dir: std::env::var("HOST_SMOKE_CAPTURE_DIR").ok().map(Into::into),
-                capture_errors: Vec::new(),
+    // HOST_SMOKE_SCENARIO, HOST_SMOKE_CAPTURE_DIR and HOST_SMOKE_RECEIPT.
+    let lane = LaneConfig::from_env("HOST_SMOKE").map(|config| {
+        let path = config.scenario.display().to_string();
+        let lane = ScenarioLane::new(
+            config,
+            SmokeLane {
+                alpha: Vec::new(),
                 require_alpha: app_frame_inset > 0,
                 frame_inset: app_frame_inset,
                 release_file: None,
-                finished: false,
-            }
-        },
-    )));
+            },
+        )
+        .unwrap_or_else(|error| panic!("{error}"));
+        eprintln!("[host-smoke] scenario armed: {path}");
+        lane
+    });
+    let lane = Rc::new(RefCell::new(lane));
 
     let after_frame_lane = lane.clone();
     let hooks: HostHooks<Smoke, Logic, Child> = HostHooks {
         frame: Box::new(|_ctx| false),
         after_dispatch: Box::new(|_ctx| {}),
         after_frame: Box::new(move |ctx: &mut AppCtx<'_, Smoke, Logic, Child>| {
-            let mut borrowed = after_frame_lane.borrow_mut();
-            let Some(lane) = borrowed.as_mut() else {
-                return;
-            };
-            lane.collect_capture();
-            // The scenario moves out for the tick, so the driver can hold the
-            // rest of the lane (the capture log) while it runs.
-            let Some(mut scenario) = lane.scenario.take() else {
-                return;
-            };
-            let progress = {
-                let mut probe = Probe { ctx, lane };
-                scenario.tick(&mut probe)
-            };
-            // Finish only once every armed capture has actually landed, or the
-            // receipt would claim a frame it never read back.
-            if progress == Progress::Done && PENDING.with(|p| p.borrow().is_none()) {
-                lane.write_receipt(scenario.finish());
-                *ctx.close = true;
-            }
-            lane.scenario = Some(scenario);
-            // A scenario run must keep frames coming: every step is pumped by
-            // one, and an idle app would stall the run rather than finish it.
-            if let Some(window) = ctx.window {
-                window.request_redraw();
+            if let Some(lane) = after_frame_lane.borrow_mut().as_mut() {
+                lane.drive(ctx);
             }
         }),
         after_wake: Box::new(|_ctx| {}),

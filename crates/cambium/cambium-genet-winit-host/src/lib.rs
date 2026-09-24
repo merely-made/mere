@@ -42,6 +42,7 @@ use std::{cell::RefCell, rc::Rc};
 
 mod decorations;
 mod harness;
+pub mod scenario;
 #[cfg(target_os = "windows")]
 mod windows_snap;
 #[cfg(target_os = "windows")]
@@ -58,6 +59,7 @@ pub use cambium_rootstock::{
     WindowGeometry, ZOOM_LADDER, fit_zoom, ladder_step, read_frame,
 };
 pub use harness::{Harness, inert_hooks};
+pub use scenario::{CaptureRecord, LaneApp, LaneConfig, ProbeSnapshot, ScenarioLane};
 
 pub use cambium_rootstock::Instant;
 use cambium_rootstock::meristem_bounds::RootView;

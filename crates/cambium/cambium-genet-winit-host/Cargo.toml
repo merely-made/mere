@@ -30,6 +30,9 @@ sprigging = { version = "0.2.1", path = "../sprigging" }
 taproot = { workspace = true }
 genet-scripted-dom = { workspace = true }
 genet-winit-host = { workspace = true }
+# The scenario lane writes its captures as PNG; already in the lock through
+# the image stack.
+png = "0.18"
 layout_dom_api = { workspace = true }
 netrender = { workspace = true }
 paint_list_api = { workspace = true }
