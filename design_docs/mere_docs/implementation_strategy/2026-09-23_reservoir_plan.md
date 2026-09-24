@@ -172,9 +172,35 @@ types. Graphshell presents it as its mere surface, and every application
 embeds the same component rather than building its own. Mark: "3 by way of 2.
 cambium should be the solution for all" (§7).
 
+**Requirements from Knot (2026-09-23).** The Knot session is Knot's first
+consumer:
+1. It embeds as a Workbench tile behind a keyed lens, with no host-state
+   access, and sizes itself to its tile, from the full centre down to a ~280 px
+   side stack.
+2. Activation is the host's. Activating a node hands the host an id. Mint,
+   switch, fork and trash are requests the host may decline, and a refusal is
+   shown truthfully.
+3. A host action slot beside the graph, for New, Open and recent, since the view
+   takes over the start tile's job when the last document closes.
+4. Host-supplied node states (available, unavailable, open, dirty), dimmed and
+   labelled in words, never by colour alone.
+5. Edge provenance stays visible: extracted links, authored relations and
+   suggestions are distinct, and two relations with the same endpoints never
+   collapse into one.
+6. Layout is a host preference (a cartography `LayoutStrategy`; Knot defaults
+   to Spectral), switchable without losing node identity.
+7. Every node is a native, labelled hit target reachable by keyboard, with a
+   stable data-key so an automation scenario can target it.
+8. Plain empty and error states, each with a host-offered action: no mere or
+   catalog configured, the reservoir locked or unavailable, a reading still
+   building.
+9. Theming through host tokens (CSS custom properties), with no hard-coded
+   colours.
+
 **Done when:**
 - Graphshell, Knot and Cleromancy each show the same component over the same
   mere;
+- Knot's nine requirements above hold in Knot's embedding;
 - a lifecycle action taken from any of them is recorded in the session journal
   with the application that made it;
 - no application keeps a mere view of its own.
