@@ -72,6 +72,7 @@ mod setting_row;
 mod slider;
 mod splice;
 mod split;
+mod status_bar;
 mod styled_field;
 mod summary_body;
 mod surface;
@@ -181,23 +182,29 @@ pub use summary_body::{SummaryBody, summary_body};
 pub use frisket::{
     DividerTarget, FRISKET_CSS, FRISKET_TILE_ATTR, PaneView, Slot, SlotKind, close_target,
     content_target, decode_pane_path, divider_target, encode_pane_path, frisket, frisket_with,
-    frisket_with_current, slot_kind, stack_target, tab_drop_index, tab_target,
+    frisket_with_current, frisket_with_marks, slot_kind, stack_target, tab_drop_index, tab_target,
 };
 pub use sectioned_list::{ListRow, ListRowKind, ListSection, sectioned_list};
 pub use split::{Split, SplitAxis, split};
+pub use status_bar::{
+    STATUS_BAR_CSS, StatusBar, StatusBarEvent, StatusBarState, StatusChip, StatusSeverity,
+    StatusView, status_bar,
+};
 pub use surface::{
     ResolvedSurfaceEvent, RetainedSurfaceSession, RunnerSurfaceSession, SurfaceEffect,
     SurfaceViewport,
 };
 pub use tabs::{
-    TabAccentColors, TabBar, TabBarNames, TabItem, TabStrip, tab_bar_view, tab_strip,
+    TabAccentColors, TabBar, TabBarNames, TabItem, TabMark, TabStrip, tab_bar_view, tab_strip,
     tab_strip_closable, tab_strip_items,
 };
 pub use tags::*;
 pub use text::text;
 pub use value::{OnValue, OnValueState, ValueEvent, on_value};
 pub use wheel::{OnWheel, WheelEvent, on_wheel};
-pub use workspace::{WORKSPACE_CSS, WorkspaceModel, composited_slots, workspace_view};
+pub use workspace::{
+    WORKSPACE_CSS, WorkspaceModel, composited_slots, workspace_view, workspace_view_with_marks,
+};
 
 // Compatibility aliases for consumers that still use the pre-extraction
 // backend names. New code should use the canonical `Genet*` names above.
