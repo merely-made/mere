@@ -7,7 +7,9 @@
 //! An open popover's panel lays out against its trigger: below it and lined
 //! up with its start, or above it and lined up with its end, in a flex
 //! toolbar as in a plain block. POPOVER_CSS places the panel with
-//! percentage insets, which resolve against the anchor's height.
+//! percentage insets, which resolve against the anchor's height. The panel
+//! and the dismiss layer are positioned out of flow, so opening the popover
+//! moves nothing in its toolbar.
 
 use cambium::{
     AnyView, GenetCtx, GenetElement, POPOVER_CSS, Popover, PopoverPlacement, PopoverState, button,
@@ -21,18 +23,20 @@ use layout_dom_api::{LayoutDom, LocalName, Namespace};
 struct Case {
     placement: PopoverPlacement,
     toolbar: &'static str,
+    open: bool,
 }
 
 type Child = Box<dyn AnyView<Case, (), GenetCtx, GenetElement>>;
 type Logic = fn(&Case) -> Child;
+type Rect = (f32, f32, f32, f32);
 
 fn root(case: &Case) -> Child {
-    let open = PopoverState {
-        open: true,
+    let state = PopoverState {
+        open: case.open,
         return_focus: false,
     };
     let pop = popover(
-        Popover::new("Open", &open)
+        Popover::new("Open", &state)
             .with_placement(case.placement)
             .with_trigger_attr("id", "trigger"),
         |_: &mut Case, _| {},
@@ -42,7 +46,15 @@ fn root(case: &Case) -> Child {
         "div",
         (
             el("div", ()).attr("style", "height:120px;"),
-            el("div", (button("Before", |_: &mut Case, _| {}), pop)).attr("style", case.toolbar),
+            el(
+                "div",
+                (
+                    button("Before", |_: &mut Case, _| {}),
+                    pop,
+                    button("After", |_: &mut Case, _| {}).attr("id", "after"),
+                ),
+            )
+            .attr("style", case.toolbar),
         ),
     ))
 }
@@ -55,8 +67,8 @@ fn find(dom: &ScriptedDom, node: NodeId, name: &str, value: &str) -> Option<Node
         .find_map(|child| find(dom, child, name, value))
 }
 
-/// The trigger's and the panel's painted rects.
-fn rects(case: Case) -> ((f32, f32, f32, f32), (f32, f32, f32, f32)) {
+/// The painted rect of the first element whose `name` attribute is `value`.
+fn rect_of(case: Case, name: &str, value: &str) -> Rect {
     let mut host = Harness::with_hooks(
         Init {
             state: case,
@@ -68,15 +80,15 @@ fn rects(case: Case) -> ((f32, f32, f32, f32), (f32, f32, f32, f32)) {
         inert_hooks(),
     );
     host.layout_at(800.0, 400.0);
-    let (trigger, panel) = host.with_dom(|dom| {
-        (
-            find(dom, dom.document(), "id", "trigger").expect("trigger"),
-            find(dom, dom.document(), "class", "popover").expect("panel"),
-        )
-    });
+    let node = host.with_dom(|dom| find(dom, dom.document(), name, value).expect(value));
+    host.painted_rect(node).expect("layout")
+}
+
+/// The trigger's and the open panel's painted rects.
+fn rects(case: Case) -> (Rect, Rect) {
     (
-        host.painted_rect(trigger).expect("trigger layout"),
-        host.painted_rect(panel).expect("panel layout"),
+        rect_of(case, "id", "trigger"),
+        rect_of(case, "class", "popover"),
     )
 }
 
@@ -96,6 +108,7 @@ fn a_below_start_panel_opens_under_its_trigger() {
         let ((x, y, _, height), (panel_x, panel_y, _, _)) = rects(Case {
             placement: PopoverPlacement::BelowStart,
             toolbar,
+            open: true,
         });
         near(
             panel_y,
@@ -112,6 +125,7 @@ fn an_above_panel_opens_over_its_trigger() {
         let ((_, y, _, _), (_, panel_y, _, panel_height)) = rects(Case {
             placement: PopoverPlacement::AboveStart,
             toolbar,
+            open: true,
         });
         near(
             panel_y + panel_height,
@@ -119,4 +133,22 @@ fn an_above_panel_opens_over_its_trigger() {
             &format!("the panel's bottom in `{toolbar}`"),
         );
     }
+}
+
+/// A wrapping toolbar reflows if the open anchor grows with its panel or
+/// with the window-wide dismiss layer.
+#[test]
+fn an_open_popover_moves_nothing_in_its_toolbar() {
+    let after = |open| {
+        rect_of(
+            Case {
+                placement: PopoverPlacement::BelowStart,
+                toolbar: "display:flex; flex-wrap:wrap; gap:8px; width:300px;",
+                open,
+            },
+            "id",
+            "after",
+        )
+    };
+    assert_eq!(after(true), after(false), "the button after the popover");
 }
