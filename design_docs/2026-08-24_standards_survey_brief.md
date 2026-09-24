@@ -21,9 +21,12 @@ tabard might have standards we could *design to* rather than merely comply with.
 That distinction organises the whole brief.
 
 Verdict grammar is the one the [W3C review](mere_docs/research/2026-07-05_w3c_standards_architecture_review.md)
-established: **ADOPT** (build to it, it is load-bearing), **PULL** (implement when
-a real consumer demands it), **SKIP** (deliberately not, on the record),
-**WATCH** (moving target, re-check).
+established: **ADOPT** (build to it, it is load-bearing), **PULL** (design for it
+now, implement in order: the named consumer's data model reserves room for it
+today, and the implementation lands in its turn), **SKIP** (deliberately not,
+on the record), **WATCH** (moving target, re-check). **PULL was redefined by
+Mark on 2026-09-23**; it first meant "implement when a real consumer demands
+it". §7.1 re-reads every PULL row under the new meaning.
 
 ---
 
@@ -679,6 +682,8 @@ PULL, thirty-three SKIP, twenty-two WATCH. Consumers are as the survey assigned
 them and are a starting point, not a ruling. Where a row below conflicts with
 the prose above, **the prose wins**: these rows are as the survey first returned
 them, and the fact-checking pass corrected thirty-two entries after the fact.
+PULL rows are re-read in §7.1 under the 2026-09-23 definition, which also wins
+where it disagrees with a row below.
 The four whose designators were most misleading — TLS 1.3, WebRTC, ICC/ISO and
 Lottie — have been corrected in place here; the rest of the corrections are
 recorded in §1, §3.3, §5, §6 and §8.
@@ -862,6 +867,91 @@ recorded in §1, §3.3, §5, §6 and §8.
 | SKIP | glTF 2.0 — and the games standards vacuum | Khronos glTF 2.0; ISO/IEC 12113:2022, 'Information technology — Runtime 3D asset delivery format — Khronos glTF 2.0' | mesocosm, paredros, isometry — and the honest answer is that none of them wants it. |
 
 ---
+
+## 7.1 PULL re-read under the 2026-09-23 definition
+
+Mark redefined PULL on 2026-09-23, from "implement when a real consumer demands
+it" to "design for it now, implement in order" (see the verdict grammar at the
+top). The first meaning let a standard with a foreseeable consumer go undesigned
+until the consumer arrived; the new one asks each PULL row a single question:
+which data model, owned by a named consumer, reserves room for this standard
+today? A row with an answer stays PULL and records it below. A row whose
+standard is already built moves to ADOPT. A row with nothing to design it into
+(a hypothetical build, an "only if", a doctrine against it) moves to SKIP,
+with what would reopen it. This section wins over the rows in §7 where they
+disagree.
+
+**Basis.** Each row's own consumer text, which §7's table truncates in places.
+Where a grade turned on a fact, the fact was checked on 2026-09-23: which
+crates depend on a UAX #29 segmenter, whether `crates/murm/webrtc-carrier`
+exists, whether genet's design docs mention WebAuthn (they do not), and what
+`repos/emblem` implements. The design-for notes name where room is reserved;
+none of them is built by this re-read.
+
+**Result.** Of fifty-nine rows, forty-two stay PULL, four move to ADOPT
+because they are already built, ten move to SKIP, and three split.
+
+| # | Standard | Design for now: what reserves room | After re-read |
+|---|---|---|---|
+| 1 | scrypt | castellan's import path. The vault format's key-derivation descriptor (§9.1's open format decision) names its algorithm, so scrypt's N, r and p ride beside Argon2id's parameters | PULL |
+| 2 | PBKDF2 / NIST SP 800-132 | the same descriptor, with PBKDF2's hash and iteration count | PULL |
+| 3 | AES-SIV / AES-GCM-SIV | personae's sealed-record format names its AEAD, so multi-writer vault sync (castellan's open replication item) can move to a misuse-resistant mode without a format break | PULL |
+| 4 | BIP-32 / BIP-39 / SLIP-0010 | personae's seed carry: a mnemonic export form, and the versioned derivation context §2.1 found missing | PULL |
+| 5 | SLIP-0039 | personae's vault-root recovery reserves a share-set representation | PULL |
+| 6 | TPM 2.0 NV counters | personae's `FileFreshnessLedger` takes its counter through an interface: a file today, a TPM NV index later | PULL |
+| 7 | CXF / CXP | chatelaine's item taxonomy, shaped against CXF's credential types first (Mark, 2026-09-23) | PULL |
+| 8 | KDBX 4.1 | the same taxonomy covers a KeePass entry: fields, custom fields, attachments, OTP | PULL |
+| 9 | 1PUX / OPVault | the same taxonomy | PULL |
+| 10 | Bitwarden, Chrome, Firefox and Apple exports | the same taxonomy | PULL |
+| 11 | XDG Desktop Portal Secret | none: no Flatpak or Snap build exists or is planned | SKIP, reopened by a planned sandboxed Linux build |
+| 12 | Credential Management API | none on the browser side: genet's design docs never mention WebAuthn. The store side is chatelaine's passkey kind, under row 7 | SKIP, reopened by a genet WebAuthn plan |
+| 13 | CTAP 2.3 | none: user-agent side only, on the same condition | SKIP, reopened by a genet WebAuthn plan that needs roaming authenticators |
+| 14 | Platform credential-provider seams | castellan's authority half exposes a per-platform provider seam, Windows first, where a shippable shell already runs | PULL |
+| 15 | HIBP Pwned Passwords range API | castellan's secret-free read model reserves a per-item exposure status for the vault health view | PULL |
+| 16 | OWASP ASVS 5.0 | castellan's and personae's plans check new surfaces against it, as self-assessment | PULL |
+| 17 | microformats2 / h-entry | gazette's feed and article intake admits h-feed and h-entry beside Atom, RSS and JSON Feed; moot's membership card may map to h-card | PULL |
+| 18 | DCMI Metadata Terms | fleece's Metadata keeps a DC.* term mapping, and eidetic and knot facets normalize to it | PULL |
+| 19 | JSON Feed | gazette's feed model is format-neutral: Atom, RSS and JSON Feed map into one item type | PULL |
+| 20 | Netscape Bookmark File | already built: `mere/crates/import` detects and tokenizes it | ADOPT |
+| 21 | OPML 2.0 | gazette's subscription list round-trips OPML outlines | PULL |
+| 22 | WARC | mere-crawl's stored fetch keeps WARC's request, response and metadata record shape, so export is lossless | PULL |
+| 23 | shared-mime-info / Icon Theme | pelt's and knot's file-type registry keys on shared-mime-info types | PULL |
+| 24 | Windows and macOS registration | each port carries its app identity (ProgID, UTType, URL schemes) now; djinn's Windows installer is the first consumer | PULL |
+| 25 | Web Application Manifest | graphshell and turnstone projection metadata maps onto manifest fields: name, icons, `protocol_handlers` | PULL |
+| 26 | ICC colour profiles | genet-render's image decode carries an embedded profile rather than discarding it | PULL |
+| 27 | HSTS and the preload list | genet netfetch's per-origin policy store reserves an HSTS entry | PULL |
+| 28 | vCard 4.0 / jCard | gaz's JSContact mapping (an exchange format, Mark 2026-09-23) is the hub, and RFC 9555 converts vCard to and from it | PULL |
+| 29 | DIDs | amended in §5: `did:key` and `did:plc` are ADOPT; `did:web` is carried as a gaz handle (`HandleKind::Did`) | PULL, `did:web` only |
+| 30 | Nostr NIP-05 | gazette's resolver facade returns a handle bound to a lifted Nostr key (`TypedKey::from_nostr_x_only`, already in insigne) | PULL |
+| 31 | ActivityPub / Activity Streams 2.0 | gaz's `EndpointKind::ActivityPub` exists; gazette's article model maps AS2 objects; moot's publish path is the named future | PULL |
+| 32 | HTTP Message Signatures | moot's outbound publish path (row 31) signs requests with a persona key through castellan's gate | PULL |
+| 33 | Signal: Double Ratchet, X3DH, PQXDH | murm's bilateral session store reserves per-peer ratchet state | PULL |
+| 34 | WebRTC (and SIP) | WebRTC is already built as `crates/murm/webrtc-carrier`. SIP has no consumer; calls ride WebRTC | WebRTC ADOPT; SIP SKIP, reopened by a telephony bridge |
+| 35 | Reticulum and LXMF | already built: signalman runs on retinue/postilion, and insigne's `TypedKey::Reticulum` holds an identity as the reference implementation defines it (§5) | ADOPT |
+| 36 | AX.25, KISS, APRS | KISS is already built (`retinue/crates/selvage/src/kiss.rs`). AX.25 and APRS are amateur-service protocols, and the house radio posture is unlicensed ISM because amateur service bars encryption (§5) | KISS ADOPT; AX.25 and APRS SKIP, reopened by a plain-text amateur lane |
+| 37 | GGUF | distillery's model source reserves a GGUF loader beside esp's safetensors, for weights and tokenizer metadata both | PULL |
+| 38 | OpenAI-compatible Chat Completions | distillery's inference backend reserves a remote HTTP backend for a server the user already runs | PULL |
+| 39 | Standard MIDI File | woodshed's Set/Rehearsal model keeps tempo, time signature and tick resolution representable as SMF | PULL |
+| 40 | ABC notation | woodshed-graph's tune entries keep ABC's header fields | PULL |
+| 41 | RIFF/WAVE, Broadcast Wave, BW64 | RIFF/WAVE is already built (hocket's export and the phrases inside `.hock`). For Broadcast Wave and BW64, hocket's export reserves the `bext` chunk and 64-bit sizes | RIFF/WAVE ADOPT; Broadcast Wave and BW64 PULL |
+| 42 | Opus | pipit's codec tiers reserve an Opus tier above its vocoders | PULL |
+| 43 | ReplayGain 2.0 | the tag model of row 44 reserves its fields | PULL |
+| 44 | APEv2, Vorbis comments, ID3v2.4 | one tag model in wavicle, APEv2 native, shared with hocket's `.hock` entries | PULL |
+| 45 | Open Sound Control | hocket's transport commands are named as an OSC address space | PULL |
+| 46 | CLAP | none: no plugin host, by doctrine | SKIP, reopened if the doctrine changes |
+| 47 | IPA and its Unicode encoding | mora's phone model is keyed by IPA symbol, with ARPAbet as one input alphabet | PULL |
+| 48 | UAX #29 | already load-bearing through segmenter crates in genet's fleece and genet-documents and mere's cambium and eidetic-search | ADOPT |
+| 49 | Praat TextGrid and ToBI | none: mora has no corpus-validation plan | SKIP, reopened by one |
+| 50 | FITS | none: no consumer and no real hits in the tree | SKIP, reopened by turquet planning image or catalogue ingest |
+| 51 | FITS WCS | none: turquet has no sky view | SKIP, reopened by a sky view |
+| 52 | IVOA VOTable | none: no catalogue-query or table-export surface | SKIP, reopened by one |
+| 53 | IVOA SAMP | none yet: no turquet-backed viewer exists in pelt or graphshell to message. The first IVOA standard to reopen, since its architecture fits the house posture | SKIP, reopened by a turquet-backed viewer |
+| 54 | CCSDS OMM, TLE/SGP4 | none: turquet models solar-system bodies only | SKIP, reopened if Earth satellites join them |
+| 55 | IAU constellation boundaries and star names | cleromancy's sky model names stars from the IAU catalogue and places positions in IAU constellations | PULL |
+| 56 | IconVG | already built: `repos/emblem` decodes and encodes it at the same spec pin (the row's `repos/iconvg` *(historical citation)* <!-- doc-audit: historical-path --> path is stale) | ADOPT |
+| 57 | SVG 1.1 / SVG 2 / SVG Tiny | genet's render tree reserves an SVG paint model | PULL |
+| 58 | Tiled TMX | isometry's map model round-trips TMX layers and tilesets | PULL |
+| 59 | Universal VTT | isometry's map import reserves walls, lights and portals as UVTT carries them | PULL |
 
 ## 8. Method, and what it is not good for
 
