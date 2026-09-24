@@ -1,9 +1,9 @@
 # Reservoir plan: shared meres held by the device resident
 
 **Date:** 2026-09-23
-**Status:** in progress. V1 is built on branch `reservoir-v1`: the pandect
-index, wallet-persona resolution, and djinn's reservoir lane and route. A real
-two-process receipt is still owed. §7's decisions were ruled on 2026-09-23.
+**Status:** in progress. V1 is complete on branch `reservoir-v1`: the pandect
+index, wallet-persona resolution, djinn's reservoir lane and route, and a real
+two-process receipt. V2 is next. §7's decisions were ruled on 2026-09-23.
 **Scope:** give each data domain one mere, and make every mere of an identity
 openable by any of that identity's applications. The meres are held by the
 device resident, with sessions, a graph journal and an Eidetic archive.
@@ -334,3 +334,13 @@ composition presented as two.
   Verified: pandect 284 of 284, djinn 78 of 78 library tests, and djinn's
   integration suites. After rebasing onto `1e1672bf`, the library suites and an
   all-targets djinn check were re-run and pass.
+- 2026-09-23: V1's two-process receipt landed:
+  `ports/djinn/tests/reservoir_two_process.rs`. The test re-runs its own
+  binary as a separate OS process.
+  - While the parent holds the reservoir, the child is refused at once: "could
+    not open the reservoir at …/reservoir.redb: backend: Database already open.
+    Cannot acquire lock." The whole run takes about 0.4 s.
+  - After the parent lets go, a second child opens the reservoir and ensures
+    `divination` through the admitted route, and the parent's next open finds
+    it.
+  V1 is complete. Opening a mere's own route by id moves to V2, with sessions.

@@ -18,7 +18,7 @@ document and are not counted again here.
 ## mere_docs/implementation_strategy/2026-09-23_reservoir_plan.md
 
 - disposition: current
-- status line: "Status: in progress. V1 is built on branch reservoir-v1; a real two-process receipt is still owed." — accurate: yes
+- status line: "Status: in progress. V1 is complete on branch reservoir-v1; V2 is next." — accurate: yes
 - claims checked: 25 — holds: 25, stale: 0, unverifiable: 0
 
 ### Stale claims
