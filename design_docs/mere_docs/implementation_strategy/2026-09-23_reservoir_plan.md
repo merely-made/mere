@@ -1,7 +1,9 @@
 # Reservoir plan: shared meres held by the device resident
 
 **Date:** 2026-09-23
-**Status:** plan. Nothing implemented. §7's decisions were ruled on 2026-09-23.
+**Status:** in progress. V1's reservoir index landed in `fe5adc1a`; the
+resident composition and routes are next. §7's decisions were ruled on
+2026-09-23.
 **Scope:** give each data domain one mere, and make every mere of an identity
 openable by any of that identity's applications. The meres are held by the
 device resident, with sessions, a graph journal and an Eidetic archive.
@@ -162,6 +164,21 @@ recorded with its author.
 - trash removes a session from the mere's manifest set;
 - every journal entry names the person, rule, script or engine that made it.
 
+### V2b. The mere view
+
+One Cambium component shows a mere's sessions and their lifecycle: mint,
+switch, fork and trash. It is built over pandect's reservoir and session
+types. Graphshell presents it as its mere surface, and every application
+embeds the same component rather than building its own. Mark: "3 by way of 2.
+cambium should be the solution for all" (§7).
+
+**Done when:**
+- Graphshell, Knot and Cleromancy each show the same component over the same
+  mere;
+- a lifecycle action taken from any of them is recorded in the session journal
+  with the application that made it;
+- no application keeps a mere view of its own.
+
 ### V3. The Eidetic archive
 
 Wire pandect's graph codicils into the reservoir: save a session as a codicil,
@@ -236,6 +253,11 @@ composition presented as two.
    and every application adopts it.
 4. **Validating a domain's writes.** The owning application's domain authority
    is composed into the resident (§5).
+5. **The mere view.** Asked where a shared mere view lives and who builds it,
+   Mark answered "3 by way of 2. cambium should be the solution for all". So:
+   - Graphshell's surface is the view that applications embed;
+   - it is a Cambium component, built in this plan beside V2 (V2b);
+   - it serves every application.
 
 ## 8. Progress
 
@@ -244,3 +266,13 @@ composition presented as two.
 - 2026-09-23: §7 ruled the same day: reservoir under the shared root per
   persona, stable domain identifiers, Turnstone's lifecycle moved into pandect
   for every application, and domain authorities composed into the resident.
+- 2026-09-23: V1's first piece landed in `fe5adc1a`: `pandect::reservoir`,
+  containing
+  - `DomainId`, `MereId` (a UUIDv5 of persona and domain), `MereRecord` and
+    `ReservoirStore`;
+  - `open_reservoir_backend`, over a redb file whose exclusive lock refuses a
+    second owner.
+  All 8 tests pass, the lock file is unchanged, and pandect builds for
+  wasm32-wasip2. The resident composition and routes are next. The mere view
+  was ruled the same day: a Cambium component built here as V2b, used by every
+  application.
