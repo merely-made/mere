@@ -186,11 +186,11 @@ pub use frisket::{
     content_target, decode_pane_path, divider_target, encode_pane_path, frisket, frisket_with,
     frisket_with_current, frisket_with_marks, slot_kind, stack_target, tab_drop_index, tab_target,
 };
-pub use sectioned_list::{ListRow, ListRowKind, ListSection, sectioned_list};
-pub use split::{Split, SplitAxis, split};
 pub use popover::{
     POPOVER_CSS, Popover, PopoverEvent, PopoverPlacement, PopoverState, PopoverView, popover,
 };
+pub use sectioned_list::{ListRow, ListRowKind, ListSection, sectioned_list};
+pub use split::{Split, SplitAxis, split};
 pub use status_bar::{
     STATUS_BAR_CSS, StatusBar, StatusBarEvent, StatusBarState, StatusChip, StatusSeverity,
     StatusView, status_bar,
