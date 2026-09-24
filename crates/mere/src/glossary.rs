@@ -18,7 +18,6 @@
 //! Renamed from `mere-orrery` 2026-06-23; its a11y `project_graph` moved host-side
 //! into meerkat's `orrery_a11y_tree` (unified-document-host slice 4) and was retired.
 
-
 use std::collections::BTreeMap;
 
 use kernel::graph::{EdgeFamily, Graph};

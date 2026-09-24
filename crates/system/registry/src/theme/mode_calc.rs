@@ -25,7 +25,6 @@
 
 use std::collections::BTreeMap;
 
-use kernel::color::Color32;
 use tincture::oklch::Oklch;
 use tincture::{Seeds, Srgb, best_on};
 
@@ -101,7 +100,7 @@ impl SeedRef {
 }
 
 /// Evaluate one role spec against the seeds.
-fn eval_role(spec: &RoleSpec, seeds: &Seeds) -> Color32 {
+fn eval_role(spec: &RoleSpec, seeds: &Seeds) -> Srgb {
     let mut o = Oklch::from_srgb(spec.seed.resolve(seeds));
     if let Some(l) = spec.l {
         o = o.with_l(l.clamp(0.0, 1.0));
@@ -119,7 +118,7 @@ fn eval_role(spec: &RoleSpec, seeds: &Seeds) -> Color32 {
     if let Some(a) = spec.alpha {
         s = s.with_alpha(a);
     }
-    Color32::from_rgba_unmultiplied(s.r, s.g, s.b, s.a)
+    Srgb::rgba(s.r, s.g, s.b, s.a)
 }
 
 /// The [`ChromeTheme`] role names the calculator must cover, in field order.
@@ -360,11 +359,11 @@ mod tests {
         let def = full_def();
         let chrome = chrome_from_custom_mode(&def, &seeds()).expect("full table evaluates");
         // Text roles landed light, surfaces dark (the l overrides applied).
-        assert!(chrome.body_text.r() > 180, "l: 0.92 lands a light text");
-        assert!(chrome.toolbar_bg.r() < 90, "l: 0.20 lands a dark surface");
+        assert!(chrome.body_text.r > 180, "l: 0.92 lands a light text");
+        assert!(chrome.toolbar_bg.r < 90, "l: 0.20 lands a dark surface");
         // active_bg passed the primary seed through untouched (±rounding).
-        assert!((chrome.active_bg.r() as i32 - 0x33).abs() <= 2);
-        assert!((chrome.active_bg.b() as i32 - 0xC8).abs() <= 2);
+        assert!((chrome.active_bg.r as i32 - 0x33).abs() <= 2);
+        assert!((chrome.active_bg.b as i32 - 0xC8).abs() <= 2);
     }
 
     #[test]
@@ -379,9 +378,7 @@ mod tests {
         );
         let chrome = chrome_from_custom_mode(&def, &seeds()).unwrap();
         let fill = chrome.active_bg; // primary, untouched
-        let lum = |c: Color32| {
-            0.2126 * (c.r() as f64) + 0.7152 * (c.g() as f64) + 0.0722 * (c.b() as f64)
-        };
+        let lum = |c: Srgb| 0.2126 * (c.r as f64) + 0.7152 * (c.g as f64) + 0.0722 * (c.b as f64);
         // best_on over the mid-blue primary picks the near-white.
         assert!(lum(chrome.control_text) > lum(fill));
     }

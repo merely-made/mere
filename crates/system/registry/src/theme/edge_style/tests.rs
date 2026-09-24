@@ -33,8 +33,8 @@ fn monochrome_mode_preserves_pattern_identity() {
     let hyperlink = registry.token_for(EdgeStyleKey::Hyperlink, 0.0);
     let arrangement = registry.token_for(EdgeStyleKey::ArrangementFrameMember, 0.0);
 
-    assert_eq!(hyperlink.color.r(), hyperlink.color.g());
-    assert_eq!(arrangement.color.r(), arrangement.color.g());
+    assert_eq!(hyperlink.color.r, hyperlink.color.g);
+    assert_eq!(arrangement.color.r, arrangement.color.g);
     assert_ne!(hyperlink.pattern, arrangement.pattern);
 }
 

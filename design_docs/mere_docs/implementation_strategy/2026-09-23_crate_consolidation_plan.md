@@ -67,9 +67,11 @@ day:
   `ThemeData`. registry loses its `theme` feature, and its lens takes
   `ThemeData` from tabard. It is tabard's own charter ("Tinct seeds in, typed
   design tokens out") run in parallel beside tabard's `Theme`.
-- **`Color32` moves into tinct.** The theme code's only tie to the graph kernel
-  was this 4-byte RGBA struct, used in 9 files; tinct, the colour engine, owns
-  it and kernel and tabard both use it.
+- **`Color32` merges into tinct's `Srgb`.** The theme code's only tie to the
+  graph kernel was this 4-byte RGBA struct, used in 9 files. `Srgb` holds the
+  same four straight-alpha bytes under the name CSS Color 4 and DTCG give the
+  space, and tabard already emits DTCG's `srgb` colour object, so Mark ruled
+  a merge rather than a second type in tinct.
 - **The smolweb palettes get one definition, in tabard.** `SmolwebTheme` and
   `SmolwebPalette` were defined identically in cambium-nematic and in
   document-lanes (pelt re-exports document-lanes').
@@ -99,8 +101,9 @@ atomically with `ReplaceFileW` on Windows) and pandect's `ApplicationSettings`
 
 Phases, each gated like C3:
 
-- **T1. `Color32` into tinct.** *Done when:* tinct defines it, graph-kernel
-  and the nine files use tinct's, and their suites pass.
+- **T1. `Color32` merged into `Srgb`.** *Done when:* the nine files use
+  tinct's `Srgb`, graph-kernel's `color` module is gone, and their suites
+  pass.
 - **T2. The theme module and `ThemeData` into tabard.** *Done when:* tabard
   owns them, registry has no `theme` feature, gloss and lens import from
   tabard, and every moved test passes. tabard then holds two theme models, its
@@ -162,9 +165,13 @@ numbers and are listed with their own republish rule; lockstep
 
 ### C6. Registry names
 
-`sibylla`, `vates` and `mere-capability` remain on crates.io with no crate
-behind them. Deletion is done on the site by Mark and feeds the
-workspace-wide crate inventory at the Code root.
+Nine names remain on crates.io with no crate behind them: `sibylla`, `vates`,
+`mere-capability`, `titulus`, `mere-resident`, `graphshell-stdio`,
+`graphshell-network`, `mere-canvas` and `mere-signals`. The other folded
+crates (the `register-*` set, the five `mere` modules, the eidetic fetchers,
+`eidetic-fjall`, `mere-mesh-host` and `graphshell-local`) are not on
+crates.io. Deletion is done on the site by Mark and feeds the workspace-wide
+crate inventory at the Code root.
 
 ## Findings
 
@@ -206,6 +213,13 @@ workspace-wide crate inventory at the Code root.
 - 2026-09-23. The C1-C3 moves broke two relative links and 27 path
   citations across ten docs; `scripts/mere_doc_audit.py` run at
   the pre-move commit and at head isolated them.
+- 2026-09-24. `Color32` serialized as a four-element array and `Srgb`
+  serializes as an `r`/`g`/`b`/`a` map, so the merge changes the serialized
+  shape of `ThemeTokenSet`, `ChromeTheme` and the edge tokens. Nothing stores
+  or sends them: saved themes (`ThemeDef`) keep seeds, already `Srgb`, and
+  custom mode files keep seed references and lightness. Nothing inside the
+  kernel used its `Color32`, so the module was deleted rather than moved; the
+  kernel's f32 `Color` in `paint.rs` is the renderer-side type and stays.
 
 ## Progress
 
@@ -230,3 +244,8 @@ workspace-wide crate inventory at the Code root.
   portable build is at 1,521 packages. canvas carried an unbuilt 771-line
   winit canvas-host binary (`autobins = false`, no `[[bin]]`); Mark ruled it
   deleted. Next in this plan: tabard's fill, ruled 2026-09-24.
+- 2026-09-24. T1 landed: `Color32` merged into tinct's `Srgb` in the nine
+  files, and graph-kernel's `color` module deleted. Suites pass as before
+  (tinct 15, kernel 290, registry 139 with 2 ignored, mere 47); registry
+  checks with `knowledge`, `lens` and `theme` each alone; the portable gate
+  passes. Next: T2.

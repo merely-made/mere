@@ -21,7 +21,6 @@ pub mod actions;
 pub mod address;
 pub mod async_host;
 pub mod async_request;
-pub mod color;
 pub mod content;
 pub mod geometry;
 pub mod graph;

@@ -34,8 +34,8 @@
 
 use std::collections::HashMap;
 
-use kernel::address::{AddressKind, address_kind_from_url};
 use crate::layout::CapabilityDeclaration;
+use kernel::address::{AddressKind, address_kind_from_url};
 
 pub const VIEWER_ID_FALLBACK: &str = "viewer:webview";
 

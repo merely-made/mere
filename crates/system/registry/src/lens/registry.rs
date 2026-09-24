@@ -6,7 +6,7 @@
 
 use std::collections::HashMap;
 
-use kernel::color::Color32;
+use tincture::Srgb;
 
 use super::{LayoutMode, PhysicsProfile, THEME_ID_DEFAULT, ThemeData, resolve_theme_data};
 
@@ -30,7 +30,7 @@ pub use kernel::overlay::{GlyphAnchor, GlyphOverlay};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct LensOverlayDescriptor {
-    pub border_tint: Option<Color32>,
+    pub border_tint: Option<Srgb>,
     pub glyph_overlays: Vec<GlyphOverlay>,
     pub opacity_scale: f32,
     pub suppress_default_affordances: bool,
@@ -226,7 +226,7 @@ impl Default for LensRegistry {
                 theme: Some(resolve_theme_data(THEME_ID_DEFAULT).theme),
                 filters: vec!["semantic:overlay".to_string()],
                 overlay_descriptor: Some(LensOverlayDescriptor {
-                    border_tint: Some(Color32::from_rgb(120, 210, 255)),
+                    border_tint: Some(Srgb::rgb(120, 210, 255)),
                     glyph_overlays: vec![GlyphOverlay {
                         glyph_id: "semantic".to_string(),
                         anchor: GlyphAnchor::TopRight,
