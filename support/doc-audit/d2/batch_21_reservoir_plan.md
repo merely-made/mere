@@ -18,7 +18,7 @@ document and are not counted again here.
 ## mere_docs/implementation_strategy/2026-09-23_reservoir_plan.md
 
 - disposition: current
-- status line: "Status: plan. Nothing implemented. §7's decisions were ruled on 2026-09-23." — accurate: yes
+- status line: "Status: in progress. V1's reservoir index landed in fe5adc1a; the resident composition and routes are next." — accurate: yes
 - claims checked: 25 — holds: 25, stale: 0, unverifiable: 0
 
 ### Stale claims
