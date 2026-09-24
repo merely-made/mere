@@ -1994,6 +1994,7 @@ dependencies = [
  "objc2-app-kit 0.3.2",
  "paint_list_api",
  "paint_list_render",
+ "png 0.18.1",
  "raw-window-handle",
  "sprigging",
  "taproot",
