@@ -179,8 +179,21 @@ which covers their imports.
 
 **2026-09-23.** Plan drafted the day Mark agreed the split. Waits on §2.
 
-**2026-09-24.** Phase A landed, pinned to knot-editor `c6d5b9e` (§4). This
-session repins knot-editor to it. The other repos that pin mere by rev
-(turnstone, mer3ly, hocket, cleromancy) add the two imports when they repin:
-`Issue` for `issue`, and `AttestationKeys` for an attestation's personae-typed
-keys. Next: phase B.
+**2026-09-24.** Phase A landed as `5364dfa0`, pinned to knot-editor `c6d5b9e`
+(§4). knot-editor then repinned to it as `a08c1f7`, which made its standalone
+build green again. Repin handoff for the other repos that pin mere by rev,
+found by pattern search; the compiler is the real census at each repin. The
+repos' sessions were offline when this landed, so this note is the handoff.
+
+- turnstone needs `personae::delegation::Issue` in five files:
+  `turnstone/src/denizen.rs`, `turnstone/src/place/lanes.rs`,
+  `turnstone/src/place/projection_host.rs`, `turnstone/src/place/worker.rs` and
+  `turnstone/src/remote_projection.rs`. It has no mere patch table, so its
+  knot-document pin (`44f0519`) must move with mere to a knot commit that pins
+  the same mere rev (`a08c1f7` for `5364dfa0`). Otherwise the graph holds two
+  mere revisions.
+- mer3ly needs the same import in `mer3ly/crates/repo-graph/src/lib.rs`.
+- hocket, cleromancy and woodshed call neither API.
+
+`AttestationKeys` is needed wherever an attestation's `master_public_key` or
+`derived_public_key` is read; none of these repos does today. Next: phase B.
