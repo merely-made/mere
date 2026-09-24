@@ -122,7 +122,10 @@ fn a_long_value_stays_on_one_line_at_the_width_the_sheet_sets() {
     let short = size(&host("notes.djot", SIZED));
     let long = size(&host(LONG, SIZED));
     assert_eq!(short.0, 218.0, "200px of content, padding and border");
-    assert_eq!(long, short, "the long value neither widens nor wraps the field");
+    assert_eq!(
+        long, short,
+        "the long value neither widens nor wraps the field"
+    );
 }
 
 #[test]
@@ -162,13 +165,27 @@ fn a_field_scrolled_by_hand_keeps_its_scroll_until_the_caret_moves() {
     assert!(host.element_scroll(node).0 > 0.0);
 
     host.wheel(-10_000.0, 0.0);
-    assert_eq!(host.element_scroll(node).0, 0.0, "the wheel scrolled it back");
-    assert!(host.caret_rect().is_none(), "the caret is out of view, unpainted");
+    assert_eq!(
+        host.element_scroll(node).0,
+        0.0,
+        "the wheel scrolled it back"
+    );
+    assert!(
+        host.caret_rect().is_none(),
+        "the caret is out of view, unpainted"
+    );
     host.relayout();
-    assert_eq!(host.element_scroll(node).0, 0.0, "a relayout leaves it there");
+    assert_eq!(
+        host.element_scroll(node).0,
+        0.0,
+        "a relayout leaves it there"
+    );
 
     host.key(Key::Named(NamedKey::ArrowLeft));
-    assert!(host.element_scroll(node).0 > 0.0, "a caret move follows it again");
+    assert!(
+        host.element_scroll(node).0 > 0.0,
+        "a caret move follows it again"
+    );
     assert_caret_inside(&host);
 }
 
@@ -211,7 +228,10 @@ fn a_selection_across_a_scrolled_field_paints_only_inside_it() {
             focus: at(LONG.len()),
         }));
     });
-    assert!(host.element_scroll(field(&host)).0 > 0.0, "the caret end scrolled");
+    assert!(
+        host.element_scroll(field(&host)).0 > 0.0,
+        "the caret end scrolled"
+    );
     let rects = host.selection_rects();
     assert!(!rects.is_empty(), "the selection paints");
     for (x, _, width, _) in rects {
