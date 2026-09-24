@@ -473,14 +473,14 @@ pub async fn run_trainer_job(
     request: &distillery::TrainRequest,
     nonce: u64,
     failure_bound: std::time::Duration,
-    observed: &mut Vec<mesh_host::Step>,
+    observed: &mut Vec<distillery::mesh_host::Step>,
 ) -> PostedJob {
     use std::sync::Arc;
 
     use distillery::{ResidentReceipt, TRAINER_REQUEST_INPUT, TRAINER_RESOURCE};
     use mesh::spec::{DeterminismClass, JobSpec};
     use mesh::{BlobSource as _, ResourceId};
-    use mesh_host::Step;
+    use distillery::mesh_host::Step;
     use tokio::sync::Notify;
 
     let request_blob = works

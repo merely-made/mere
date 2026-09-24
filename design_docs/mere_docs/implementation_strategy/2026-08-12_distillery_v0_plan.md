@@ -76,8 +76,8 @@ collection removes physical bytes only after the last tag is gone.
 
 - `ports/distillery/src/authority.rs`: product authority and maintenance report.
 - `ports/distillery/tests/authority.rs`: real joined-mesh D0 receipt.
-- `crates/mesh/host/src/host.rs`: explicit checkpoint operation for a product host.
-- `crates/mesh/host/src/courier.rs`: mesh-scoped transport custody.
+- `crates/mesh/host/src/host.rs` *(historical citation)* <!-- doc-audit: historical-path -->: explicit checkpoint operation for a product host.
+- `crates/mesh/host/src/courier.rs` *(historical citation)* <!-- doc-audit: historical-path -->: mesh-scoped transport custody.
 - `crates/mesh/mesh/src/retention.rs`: checkpoint plus current-tail safety rule.
 - `crates/murm/transport/src/blobs.rs`: named tags and collecting stores.
 

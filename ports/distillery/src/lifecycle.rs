@@ -7,7 +7,7 @@
 //! Narrow lifecycle mechanics shared by long-lived product residents.
 //!
 //! A resident's policies, resources, and receipts remain product-specific.
-//! This crate holds only the proven common rule: shutdown is ordered, every
+//! This module holds only the proven common rule: shutdown is ordered, every
 //! owner gets one close attempt, and later closes are attempted after an
 //! earlier failure.
 

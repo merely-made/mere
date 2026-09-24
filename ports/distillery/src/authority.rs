@@ -12,7 +12,7 @@ use std::sync::Arc;
 
 use mesh::JobBoard;
 use mesh::{BlobRef, MeshStoreError, RetentionCheckpoint, RetentionEffect};
-use mesh_host::{HostError, MeshHost, Step, TransportBlobSpace};
+use crate::mesh_host::{HostError, MeshHost, Step, TransportBlobSpace};
 use muniment::Backend;
 
 type CustodyFuture<'a> = Pin<Box<dyn Future<Output = Result<u64, String>> + Send + 'a>>;

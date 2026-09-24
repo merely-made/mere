@@ -11,9 +11,9 @@ use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use std::time::Duration;
 
-use mere_resident::{CloseAction, CloseFuture, close_all};
+use crate::lifecycle::{CloseAction, CloseFuture, close_all};
 use mesh::JobBoard;
-use mesh_host::{MeshHost, Step, TransportBlobSpace};
+use crate::mesh_host::{MeshHost, Step, TransportBlobSpace};
 use muniment::Backend;
 use tokio::time::{Instant, MissedTickBehavior, interval, interval_at};
 use transport::{BlobError, BlobStore, P2pandaTransport};

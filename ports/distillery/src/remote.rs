@@ -20,7 +20,7 @@ use mesh::{
     LeasePolicy, MeshResource, Prepared, RemoteAdmission, RemoteSessionClaim, ResourceDescriptor,
     ResourceError, ResourceId, ResourceRequirements, RunContext, VerificationClass,
 };
-use mesh_host::Clock;
+use crate::mesh_host::Clock;
 use transport::P2pandaTransport;
 
 use crate::authority::RemoteSessionProjection;
@@ -390,7 +390,7 @@ mod tests {
         MemoryBlobSpace, MeshEvent, MeshStore, ResourceRegistry, RunError, SyncedMesh, run_job_for,
         to_operation,
     };
-    use mesh_host::{HostConfig, ManualClock, MeshHost, ObservedConditions, Step};
+    use crate::mesh_host::{HostConfig, ManualClock, MeshHost, ObservedConditions, Step};
     use personae::{IdentityProvider, InMemoryProvider};
 
     use crate::{BlobCustody, Distillery, RetentionSettings};

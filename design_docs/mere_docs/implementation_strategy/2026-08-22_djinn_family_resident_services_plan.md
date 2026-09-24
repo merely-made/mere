@@ -271,7 +271,7 @@ The resident must distinguish:
 - failed with phase, reason, and retry eligibility.
 
 Djinn attempts every service shutdown and reports every failure through the
-existing `mere-resident` close report.
+existing `distillery::lifecycle` close report.
 
 Done conditions:
 

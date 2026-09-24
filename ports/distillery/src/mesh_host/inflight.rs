@@ -93,7 +93,7 @@ pub fn release_reason(error: &RunError) -> ReleaseReason {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use identity::{Ed25519Keypair, IdentityProvider, InMemoryProvider};
+    use personae::{Ed25519Keypair, IdentityProvider, InMemoryProvider};
     use mesh::spec::{DeterminismClass, JobSpec};
     use mesh::{LeaseTerms, MeshEvent, MeshExt, ResourceId, to_operation};
     use p2panda_core::Operation;

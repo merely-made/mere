@@ -20,14 +20,14 @@
 use std::sync::Arc;
 use std::time::Duration;
 
-use identity::{Ed25519Keypair, IdentityProvider, InMemoryProvider};
+use personae::{Ed25519Keypair, IdentityProvider, InMemoryProvider};
 use mesh::resources::DelayedResource;
 use mesh::spec::{DeterminismClass, JobSpec};
 use mesh::{
     DevicePolicy, HostFacts, JobId, JobState, LeasePolicy, LeaseTerms, MESH_AUTHOR_SALT, MeshEvent,
     MeshStore, ResourceId, ResourceRegistry, SyncedMesh,
 };
-use mesh_host::{
+use distillery::mesh_host::{
     HostConfig, ManualClock, MeshHost, ObservedConditions, Step, TransportBlobSpace,
     TransportCourier,
 };

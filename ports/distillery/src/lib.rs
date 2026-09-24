@@ -50,6 +50,10 @@ mod chronicle;
 #[cfg(feature = "flora")]
 pub mod flora;
 mod installed;
+/// Shutdown ordering shared by long-lived residents; Djinn uses it too.
+pub mod lifecycle;
+/// The mesh host supervisor, shared with Djinn.
+pub mod mesh_host;
 #[cfg(feature = "remote")]
 mod remote;
 mod resident;

@@ -31,7 +31,7 @@ use mesh::{
 };
 use transport::{BlobHash, BlobStore, P2pandaTransport, PeerID};
 
-use crate::host::BlobSpace;
+use crate::mesh_host::host::BlobSpace;
 
 /// Why a fetch could not happen. A blob nobody served is **not** an error here:
 /// that is `Ok(false)`, and the run will fail with `MissingBlob`, which the

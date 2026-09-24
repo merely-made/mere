@@ -58,12 +58,10 @@ graphshell-endpoint.workspace = true
 knot-editor.workspace = true
 # Immutable saved-site snapshot contract published by Knot.
 knot-site = { git = "https://github.com/merely-made/knot-editor.git", rev = "4d880910fd8b6ffa6e4227b65ea65278f3e8011b", package = "knot-site" }
-mere-resident.workspace = true
 # The policy vocabulary the device sensor fills in (`DeviceConditions`), and
 # the `ConditionSource` seam it plugs into. `mere-mesh` refuses to touch the
 # OS; `src/conditions.rs` is the Windows-facing half that seam expects.
 mesh.workspace = true
-mesh-host.workspace = true
 muniment.workspace = true
 notochord.workspace = true
 pandect.workspace = true

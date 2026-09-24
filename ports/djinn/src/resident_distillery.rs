@@ -311,7 +311,7 @@ impl ResidentDistillery {
 
         let resident = authority
             .bind_resident(mesh_id, store, resident_settings(&lane), move |space| {
-                let mut config = mesh_host::HostConfig::supervised(space);
+                let mut config = distillery::mesh_host::HostConfig::supervised(space);
                 config.policy = policy;
                 config.conditions = sensor;
                 config.facts = facts;
@@ -480,7 +480,7 @@ impl ResidentDistillery {
     /// Staging a job's input goes through here, which is also why the lane
     /// needs no courier while it is the only device: what it posts, it already
     /// holds.
-    pub fn space(&self) -> Arc<mesh_host::TransportBlobSpace> {
+    pub fn space(&self) -> Arc<distillery::mesh_host::TransportBlobSpace> {
         self.resident.storage().space()
     }
 

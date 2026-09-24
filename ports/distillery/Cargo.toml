@@ -11,9 +11,7 @@ categories = ["concurrency"]
 
 [dependencies]
 mesh.workspace = true
-mesh-host.workspace = true
 incipit.workspace = true
-mere-resident.workspace = true
 muniment.workspace = true
 personae.workspace = true
 pandect.workspace = true
@@ -31,7 +29,8 @@ mere-surface-api = { workspace = true }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 thiserror = "1"
-tokio = { version = "1", features = ["macros", "sync", "time"] }
+tokio = { version = "1", features = ["macros", "rt", "sync", "time"] }
+p2panda-core = "0.7.0"
 transport.workspace = true
 burn-backend = { version = "=0.22.0-pre.2", optional = true }
 burn-ir = { version = "=0.22.0-pre.2", optional = true }
@@ -62,9 +61,9 @@ mien.workspace = true
 mooting.workspace = true
 tokio = { version = "1", features = ["macros", "rt", "rt-multi-thread", "sync", "time"] }
 tempfile = "3"
+proofs.workspace = true
 genet-scripted-dom = { workspace = true }
 layout-dom-api = { workspace = true }
 # The walk fixtures author a p2panda log directly, so the test names
 # `Operation<MeshExt>`. `mesh` re-exports `MeshExt` and `to_operation` but not
 # p2panda's own `Operation`, and a helper that returns one has to say so.
-p2panda-core = "0.7.0"

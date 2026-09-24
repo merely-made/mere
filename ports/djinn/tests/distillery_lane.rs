@@ -30,7 +30,7 @@
 //!    live assertion in *both* feature sets: the composed half is proved by
 //!    `distillery_trainer.rs`, the refusing half by this file.
 //!
-//! The clock is [`mesh_host::SystemClock`] throughout — there is no
+//! The clock is [`distillery::mesh_host::SystemClock`] throughout — there is no
 //! `ManualClock` here, because a lease is a wall-clock promise and a receipt
 //! taken on a hand-set clock would not be a receipt about this device.
 
@@ -47,7 +47,7 @@ use distillery::ResidentReceipt;
 use djinn::resident::DjinnResident;
 use mesh::spec::{DeterminismClass, JobSpec};
 use mesh::{DevicePolicy, NetworkClass, ResourceId};
-use mesh_host::Step;
+use distillery::mesh_host::Step;
 use tokio::sync::Notify;
 
 /// The whole receipt: stated policy in, completed job out, clean close.
