@@ -12,35 +12,31 @@
 //!
 //! Which chip is open is the caller's state ([`StatusBarState`]), like the
 //! detail popover's mode: the bar renders it and reports [`StatusBarEvent`]s.
-//! The interaction is the bar's. A chip is a button with `aria-expanded`; its
-//! popover is a dialog anchored above the chip by the sheet, so nothing is
-//! measured and the bar works wherever it is docked; Escape and a click outside
-//! close it and return focus to the chip.
+//! Each chip is a [`popover`](crate::popover) whose panel opens above its end,
+//! so nothing is measured and the bar works wherever it is docked; Escape and a
+//! click outside close it and return focus to the chip.
 //!
 //! Severity rides as `data-severity` (`quiet`, `warning`, `refused`) on the
 //! message and on each chip, for the host's sheet to weight. The message is a
 //! polite live region, so a refusal posted there is announced once.
-//! [`STATUS_BAR_CSS`] is the structural minimum; colour is the host's.
+//! [`STATUS_BAR_CSS`] is the structural minimum, over
+//! [`POPOVER_CSS`](crate::POPOVER_CSS) for the chips; colour is the host's.
 
 use meristem::AnyView;
 
 use crate::{
-    GenetCtx, GenetElement, Key, NamedKey, OverlayDismiss, PointerClick, button, el, on_click,
-    on_key, request_focus,
+    GenetCtx, GenetElement, OverlayDismiss, Popover, PopoverEvent, PopoverPlacement, el, popover,
 };
 
 /// The erased view a status bar and its popover content are made of.
 pub type StatusView<State, Action> = Box<dyn AnyView<State, Action, GenetCtx, GenetElement>>;
 
-/// The structural sheet: the popover sits above its chip, the outside layer
-/// covers the window beneath it. No colour; the host's sheet adds weight.
+/// The structural sheet for the bar itself; the chips' popovers take
+/// [`POPOVER_CSS`](crate::POPOVER_CSS). No colour; the host's sheet adds weight.
 pub const STATUS_BAR_CSS: &str = "\
     .status-bar { display: flex; align-items: center; min-width: 0; } \
     .status-message { flex-grow: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; } \
-    .status-chips { display: flex; align-items: center; } \
-    .status-chip-anchor { position: relative; } \
-    .status-dismiss { position: fixed; left: 0px; top: 0px; right: 0px; bottom: 0px; z-index: 50; } \
-    .status-popover { position: absolute; right: 0px; bottom: 100%; z-index: 51; }";
+    .status-chips { display: flex; align-items: center; }";
 
 /// How much weight a message or chip carries.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
@@ -210,61 +206,30 @@ where
     Change: Fn(&mut State, StatusBarEvent) + Clone + 'static,
     Content: Fn(&str) -> Option<StatusView<State, Action>>,
 {
-    let body = (state.open.as_deref() == Some(chip.key.as_str()))
-        .then(|| content(&chip.key))
-        .flatten();
-    let open = body.is_some();
-
-    let toggle = on_change.clone();
     let key = chip.key.clone();
-    let trigger = button(
-        chip.label.clone(),
-        move |app: &mut State, _: PointerClick| {
-            toggle(app, StatusBarEvent::Toggle(key.clone()));
-        },
-    )
-    .attr("class", "status-chip")
-    .attr("data-status-key", chip.key.clone())
-    .attr("data-severity", chip.severity.token())
-    .attr("aria-haspopup", "dialog")
-    .attr("aria-expanded", if open { "true" } else { "false" });
-    let trigger = request_focus(
-        trigger,
-        state.return_focus.as_deref() == Some(chip.key.as_str()),
-    );
-
-    let popover = body.map(|body| {
-        let outside = on_change.clone();
-        (
-            on_click(
-                el::<_, State, Action>("div", ())
-                    .attr("class", "status-dismiss")
-                    .attr("aria-hidden", "true"),
-                move |app: &mut State, _: PointerClick| {
-                    outside(app, StatusBarEvent::Dismiss(OverlayDismiss::OutsideClick));
-                },
-            ),
-            el::<_, State, Action>("div", body)
-                .attr("class", "status-popover")
-                .attr("role", "dialog")
-                .attr("aria-label", chip.label.clone()),
-        )
-    });
-
-    // A passive listener on the anchor sees Escape from the chip or from
-    // anything focused in its popover, without adding a Tab stop.
-    let escape = on_change;
-    Box::new(
-        on_key(
-            el::<_, State, Action>("div", (trigger, popover)).attr("class", "status-chip-anchor"),
-            move |app: &mut State, event| {
-                if open && matches!(event.key, Key::Named(NamedKey::Escape)) {
-                    event.prevent_default();
-                    escape(app, StatusBarEvent::Dismiss(OverlayDismiss::Escape));
-                }
+    let change = move |app: &mut State, event: PopoverEvent| {
+        on_change(
+            app,
+            match event {
+                PopoverEvent::Toggle => StatusBarEvent::Toggle(key.clone()),
+                PopoverEvent::Dismiss(how) => StatusBarEvent::Dismiss(how),
             },
-        )
-        .focusable(false),
+        );
+    };
+    popover(
+        Popover {
+            label: &chip.label,
+            placement: PopoverPlacement::AboveEnd,
+            open: state.open.as_deref() == Some(chip.key.as_str()),
+            return_focus: state.return_focus.as_deref() == Some(chip.key.as_str()),
+            trigger_attrs: vec![
+                ("class", "status-chip".to_owned()),
+                ("data-status-key", chip.key.clone()),
+                ("data-severity", chip.severity.token().to_owned()),
+            ],
+        },
+        change,
+        || content(&chip.key),
     )
 }
 
@@ -276,7 +241,7 @@ mod tests {
     use layout_dom_api::{LayoutDom, LocalName, Namespace};
 
     use super::*;
-    use crate::{DomHandle, GenetAppRunner, KeyEvent};
+    use crate::{DomHandle, GenetAppRunner, Key, KeyEvent, NamedKey, PointerClick, button};
 
     #[derive(Default)]
     struct State {
@@ -389,7 +354,7 @@ mod tests {
         assert_eq!(runner.focus(), Some(chip));
 
         runner.dispatch_click(chip, PointerClick::at((1.0, 1.0)));
-        let outside = find(&dom.borrow(), root, "class", "status-dismiss").expect("outside layer");
+        let outside = find(&dom.borrow(), root, "class", "popover-dismiss").expect("outside layer");
         runner.dispatch_click(outside, PointerClick::at((1.0, 1.0)));
         assert_eq!(runner.state().bar.open, None);
         let chip = find(&dom.borrow(), root, "data-status-key", "catalog").expect("chip");
