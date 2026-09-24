@@ -76,7 +76,6 @@ members = [
     "crates/cambium/scenes/scenotime",
     "crates/cambium/scenes/scenograph",
     "crates/chirograph",
-    "crates/titulus",
     "crates/graphshell/graphshell-client",
     "crates/graphshell/graphshell-endpoint",
     "crates/graphshell/graphshell-stdio",
@@ -237,7 +236,6 @@ mora-cmudict = { version = "0.0.1", path = "crates/intel/mora-cmudict" }
 # renamed 2026-08-14 because the contract is the family's, not the portal's).
 chirograph = { version = "0.0.2", path = "crates/chirograph" }
 # The card vocabulary chirograph re-exports and castellan wants without the wire.
-titulus = { version = "0.0.2", path = "crates/titulus" }
 graphshell-client = { version = "0.0.2", path = "crates/graphshell/graphshell-client" }
 graphshell-local = { path = "crates/graphshell/graphshell-local" }
 graphshell-endpoint = { version = "0.0.2", path = "crates/graphshell/graphshell-endpoint" }

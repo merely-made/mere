@@ -9,12 +9,12 @@ description = "Chirograph: the projection contract, executed in duplicate. Versi
 
 [dependencies]
 # The card vocabulary, extracted 2026-08-14 and re-exported from here.
-titulus.workspace = true
 base64.workspace = true
 blake3.workspace = true
 sceno.workspace = true
 scenotime.workspace = true
 serde.workspace = true
 serde_json.workspace = true
+sha2.workspace = true
 
 [dev-dependencies]
