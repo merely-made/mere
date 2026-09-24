@@ -4,8 +4,8 @@ The durable-memory family covering raw bytes, append-only journals, the
 container graph, semantic projection, the typed memory lane, and its backends.
 
 **This directory is the portable core.** `muniment`, `chartulary`,
-`hagiograph`, the `eidetic-fjall` adapter and eidetic's two fetcher features
-(`https-fetcher`, `iroh-fetcher`) reach nothing that is
+`hagiograph` and eidetic's `fjall`, `https-fetcher` and `iroh-fetcher`
+features reach nothing that is
 specific to the Mere product. Seven repositories outside this one already
 consume `chartulary` and `muniment` on that basis.
 
@@ -46,8 +46,7 @@ names; `mere-eidetic` stays frozen at 0.0.2 on crates.io. Each sets a
 
 | Directory | Package | Lib name | Contents |
 |---|---|---|---|
-| [`eidetic-core`](eidetic-core) | `eidetic` | `eidetic` | Manifests, typed payloads, schemas, codicils, bundles, packs, sealing, browsing traces, model artifacts. `Store` is an alias for `muniment::Backend`. `HttpsFetcher` and `IrohFetcher`, the `BlobFetcher`s for `BlobSource::Https` and `BlobSource::Iroh`, sit behind features `https-fetcher` and `iroh-fetcher`. |
-| [`eidetic-fjall`](eidetic-fjall) | `eidetic-fjall` | `eidetic_fjall` | `FjallStore`, the production-default native backend. |
+| [`eidetic-core`](eidetic-core) | `eidetic` | `eidetic` | Manifests, typed payloads, schemas, codicils, bundles, packs, sealing, browsing traces, model artifacts. `Store` is an alias for `muniment::Backend`. `FjallStore`, the production-default native backend, sits behind feature `fjall`; `HttpsFetcher` and `IrohFetcher`, the `BlobFetcher`s for `BlobSource::Https` and `BlobSource::Iroh`, sit behind features `https-fetcher` and `iroh-fetcher`. |
 
 ## Design docs
 

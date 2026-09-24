@@ -20,7 +20,6 @@
 //! For workloads where blocking the executor is unacceptable, wrap the
 //! call in `tokio::task::spawn_blocking` at the call site.
 
-#![doc(html_root_url = "https://docs.rs/eidetic-fjall/0.0.1")]
 
 use async_trait::async_trait;
 use fjall::{Config, Keyspace, PartitionCreateOptions, PartitionHandle};
@@ -154,8 +153,8 @@ impl Backend for FjallStore {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use eidetic::manifest::{load_manifest, save_manifest};
-    use eidetic::{
+    use crate::manifest::{load_manifest, save_manifest};
+    use crate::{
         BlobManifest, BlobSource, Hash, ManifestId, ModerationState, PrivacyClass,
         ProvenanceOrigin, ProvenanceRecord, SchemaRef, Timestamp, TrustEnvelope, TrustLevel,
     };

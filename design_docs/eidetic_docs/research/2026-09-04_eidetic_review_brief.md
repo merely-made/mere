@@ -28,7 +28,7 @@ Line counts are `src/**/*.rs` including in-file test modules.
 | `muniment` | `crates/eidetic/muniment` | 2,723 | The persistence floor. |
 | `chartulary` | `crates/eidetic/chartulary` | 5,989 | The container graph. |
 | `mere-eidetic` | `crates/eidetic/eidetic-core` | 6,881 | The typed memory lane. |
-| `mere-eidetic-fjall` | `crates/eidetic/eidetic-fjall` | 294 | Native LSM backend. |
+| `mere-eidetic-fjall` | `crates/eidetic/eidetic-fjall` *(historical citation)* <!-- doc-audit: historical-path --> | 294 | Native LSM backend. |
 | `mere-eidetic-https-fetcher` | `crates/eidetic/eidetic-https-fetcher` *(historical citation)* <!-- doc-audit: historical-path --> | 226 | `BlobFetcher` for `BlobSource::Https`. |
 | `mere-eidetic-iroh-fetcher` | `crates/eidetic/eidetic-iroh-fetcher` *(historical citation)* <!-- doc-audit: historical-path --> | 272 | `BlobFetcher` for `BlobSource::Iroh`. |
 | `hagiograph` | `crates/eidetic/hagiograph` | 26 | Name reservation, no implementation. |

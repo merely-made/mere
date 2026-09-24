@@ -220,7 +220,7 @@ Verification: a unit/integration test that `save → (drop) → open` round-trip
 - [peripheral panes architecture](../technical_architecture/2026-06-06_peripheral_panes_architecture.md) — the dock the Alembic pane (B) joins; the Apparatus/Steward axis (D's home).
 - [memory tiers brief](../research/2026-05-11_memory_tiers_brief.md) — the prior two-tier model the seed refined to three levels (C).
 - [statement kernel brief](../technical_architecture/2026-06-19_statement_kernel_brief.md) — short/long-term vs engram framing.
-- eidetic ([eidetic-core](../../../crates/eidetic/eidetic-core/) + [eidetic-fjall](../../../crates/eidetic/eidetic-fjall/)), [armillary](../../../crates/armillary/), [graph-kernel snapshot](../../../crates/graph/graph-kernel/src/graph/snapshot/).
+- eidetic ([eidetic-core](../../../crates/eidetic/eidetic-core/) with its [`fjall` store](../../../crates/eidetic/eidetic-core/src/fjall.rs)), [armillary](../../../crates/armillary/), [graph-kernel snapshot](../../../crates/graph/graph-kernel/src/graph/snapshot/).
 
 ## Progress
 
