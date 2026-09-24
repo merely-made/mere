@@ -295,6 +295,15 @@ is monotonic, so a replayed or late event cannot rewind a record.
         `DidAuth` (a valid PLC operation). A key change the caller reports
         without a proof is stored and marks the contact `Mismatched`, so it
         surfaces in `alarms()`.
+  - [ ] **Ruled 2026-09-23 — gaz keeps the proofs themselves**, not only the
+        `ProofMethod` that names them. A key recorded with a proof also keeps
+        the artifact that proved it (a `DerivedKeyAttestation`, a
+        `SignedDelegationCertificate`, a PLC operation) as plain data from
+        insigne's core, so it can be checked again later, for instance against
+        a newer revocation list, which is why notochord retains its session
+        claims. Waits on personae's delegation data types moving into insigne,
+        which Mark ruled the same day and this session is executing (crate
+        consolidation plan, insigne row).
   - [ ] Intake adds endpoints as `TrustState::Unverified` and never downgrades
         or duplicates an endpoint already held at a stronger state; replaying
         the same intake is a no-op.
@@ -505,3 +514,10 @@ both. He also ruled M1's at-rest sealing the host's, keeping gaz crypto-free.
 Open: whether personae's delegation certificates and attestations move into
 insigne, which reverses the 2026-08-11 reconciliation's "personae owns the
 grammar" and is tracked in the crate consolidation plan.
+
+**2026-09-23, delegation split and kept proofs ruled.** Mark agreed the split:
+personae's delegation data types move into insigne's core, issuing stays in
+personae, and checking goes behind an insigne feature that returns local,
+non-`Serialize` conclusions. He also ruled that gaz keeps the proofs themselves
+(M2), which is why this session takes the move. The standards survey's PULL
+grade was redefined the same day ("design for it now, implement in order").

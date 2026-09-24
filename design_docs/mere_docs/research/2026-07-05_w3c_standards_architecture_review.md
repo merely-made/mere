@@ -18,8 +18,11 @@ of three postures:
 
 - **ADOPT**: use the standard's shape as internal architecture now, even
   before any content-facing API exists.
-- **PULL**: stays knocked out until the named consumer needs it; land it
-  spec-shaped when pulled.
+- **PULL**: designed for now, implemented in order: the named consumer's
+  data model reserves room for it today, and it lands spec-shaped in its turn.
+  Redefined by Mark on 2026-09-23; it first read "stays knocked out until the
+  named consumer needs it". The PULL families below are read under the new
+  meaning but were not re-read in that pass; the standards survey's §7.1 was.
 - **SKIP**: deliberately dead, on the record, with the reason.
 
 Part I is the platform spine (the crucial parts of a browser: loading,
