@@ -21,5 +21,6 @@ pub mod resident;
 pub mod resident_blobs;
 pub mod resident_distillery;
 pub mod resident_knot;
+pub mod resident_reservoir;
 pub mod resident_site;
 pub mod settings;

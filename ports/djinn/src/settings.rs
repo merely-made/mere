@@ -114,6 +114,11 @@ pub struct OwnerSettings {
     pub knot: Option<KnotResidentSettings>,
     /// Absent means this device host does not compose the Distillery works.
     pub distillery: Option<DistilleryLaneSettings>,
+    /// The reservoir lane. Unlike the lanes above, absent means **on**: meres
+    /// are reachable by default (Mark, 2026-09-23), and an owner turns the
+    /// lane off here.
+    #[serde(skip_serializing_if = "ReservoirLaneSettings::is_default")]
+    pub reservoir: ReservoirLaneSettings,
     /// Physical content custody shared by every lane in this resident.
     #[serde(skip_serializing_if = "ResidentContentSettings::is_default")]
     pub content: ResidentContentSettings,
@@ -344,6 +349,33 @@ impl Default for ResidentContentSettings {
         Self {
             root: None,
             gc_interval_seconds: 300,
+        }
+    }
+}
+
+/// The owner's reservoir lane: every mere of one wallet persona, held by this
+/// resident under the shared root (reservoir plan, V1).
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
+#[serde(default, deny_unknown_fields)]
+pub struct ReservoirLaneSettings {
+    /// False turns the lane off.
+    pub enabled: bool,
+    /// The wallet persona whose reservoir this resident holds. Unset means the
+    /// sole persona wallet under the shared root.
+    pub persona: Option<personae::PersonaId>,
+}
+
+impl ReservoirLaneSettings {
+    pub fn is_default(&self) -> bool {
+        self == &Self::default()
+    }
+}
+
+impl Default for ReservoirLaneSettings {
+    fn default() -> Self {
+        Self {
+            enabled: true,
+            persona: None,
         }
     }
 }
@@ -920,6 +952,7 @@ mod tests {
             }),
             knot: None,
             distillery: None,
+            reservoir: ReservoirLaneSettings::default(),
             content: ResidentContentSettings::default(),
         };
         settings.save(&path).unwrap();
@@ -980,6 +1013,30 @@ mod tests {
         let device = &parsed.sync.as_ref().unwrap().paired_devices[0];
         assert_eq!(device.pairing_id, None);
         assert_eq!(device.last_endpoint, None);
+    }
+
+    #[test]
+    fn the_reservoir_lane_is_on_unless_the_owner_turns_it_off() {
+        // Unlike every other lane, absence means on (Mark, 2026-09-23).
+        let absent: OwnerSettings = serde_json::from_str("{}").unwrap();
+        assert!(absent.reservoir.enabled);
+        assert_eq!(absent.reservoir.persona, None);
+        assert!(
+            serde_json::to_value(&absent)
+                .unwrap()
+                .get("reservoir")
+                .is_none(),
+            "the default is never written back, so older files stay unchanged"
+        );
+
+        let off: OwnerSettings =
+            serde_json::from_str(r#"{"reservoir":{"enabled":false}}"#).unwrap();
+        assert!(!off.reservoir.enabled);
+        let written = serde_json::to_value(&off).unwrap();
+        assert_eq!(
+            written["reservoir"]["enabled"], false,
+            "an opt-out survives"
+        );
     }
 
     #[test]

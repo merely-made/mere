@@ -27,8 +27,9 @@ use zeroize::Zeroize;
 use crate::resident_blobs::ResidentBlobCustody;
 use crate::resident_distillery::ResidentDistillery;
 use crate::resident_knot::ResidentKnot;
+use crate::resident_reservoir::{ReservoirLane, ResidentReservoir};
 use crate::resident_site::{PublishedSiteEndpoint, PublishedSiteService};
-use crate::settings::OwnerSettings;
+use crate::settings::{OwnerSettings, ReservoirLaneSettings};
 
 const CASTELLAN_RECORD_SALT: &[u8] = b"mere.djinn/castellan/records/v1";
 const CASTELLAN_FRESHNESS_SALT: &[u8] = b"mere.djinn/castellan/freshness/v1";
@@ -40,6 +41,10 @@ pub struct DjinnResident {
     site: Arc<tokio::sync::Mutex<PublishedSiteService>>,
     knot: Option<ResidentKnot>,
     distillery: Option<ResidentDistillery>,
+    reservoir_settings: ReservoirLaneSettings,
+    /// Off until [`DjinnResident::open_reservoir`] opens it under a shared
+    /// root the caller names.
+    reservoir: ReservoirLane,
 }
 
 impl DjinnResident {
@@ -129,7 +134,38 @@ impl DjinnResident {
             site,
             knot,
             distillery,
+            reservoir_settings: owner.reservoir,
+            reservoir: ReservoirLane::Off,
         })
+    }
+
+    /// Open the reservoir lane under `shared_root` as the owner's settings say.
+    ///
+    /// Kept apart from [`DjinnResident::open`] so the shared root is always
+    /// named by the caller: the binary passes the family-shared root, and a
+    /// test passes a scratch directory rather than the owner's real one. It
+    /// never fails the resident; a reservoir that cannot open leaves the lane
+    /// unavailable with its reason.
+    pub async fn open_reservoir(&mut self, shared_root: &Path) -> &ReservoirLane {
+        self.reservoir = ReservoirLane::open(shared_root, &self.reservoir_settings).await;
+        &self.reservoir
+    }
+
+    /// The reservoir lane's current state.
+    pub fn reservoir(&self) -> &ReservoirLane {
+        &self.reservoir
+    }
+
+    /// Register the reservoir route when the lane is open.
+    pub fn register_reservoir_route(
+        &self,
+        catalog: &mut ResidentEndpointCatalog,
+    ) -> Result<Option<ResidentEndpointRoute>, ResidentEndpointCatalogError> {
+        let Some(reservoir) = self.reservoir.reservoir() else {
+            return Ok(None);
+        };
+        reservoir.register(catalog)?;
+        Ok(Some(ResidentReservoir::route()))
     }
 
     /// The single record authority behind every Castellan view or adapter.
@@ -236,6 +272,8 @@ impl DjinnResident {
             site,
             knot,
             distillery,
+            reservoir_settings: _,
+            reservoir,
         } = self;
         let report = close_all(vec![
             (
@@ -265,6 +303,14 @@ impl DjinnResident {
                         site.shutdown();
                         Ok(())
                     }) as CloseFuture<'static>
+                }) as CloseAction<'static>,
+            ),
+            (
+                // Local teardown that borrows neither blobs nor credentials:
+                // releasing the reservoir frees its lock for the next owner.
+                "reservoir",
+                Box::new(move || {
+                    Box::pin(async move { reservoir.close().await }) as CloseFuture<'static>
                 }) as CloseAction<'static>,
             ),
             (

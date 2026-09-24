@@ -25,6 +25,8 @@ use djinn::resident::DjinnResident;
 #[cfg(feature = "personal-sync")]
 use djinn::resident_distillery::ResidentDistillery;
 #[cfg(feature = "personal-sync")]
+use djinn::resident_reservoir::ReservoirLane;
+#[cfg(feature = "personal-sync")]
 use djinn::settings::{self as owner_settings, SyncOverrides};
 use graphshell::browser_carrier::AllowedExtensions;
 use graphshell::identity::VaultProtectionView;
@@ -620,6 +622,21 @@ async fn run(args: Args) -> Result<(), Box<dyn std::error::Error>> {
         Unlock::from_env(),
     )
     .await?;
+    // The reservoir lives under the family-shared root, not this resident's
+    // data root: every application of the identity reaches the same meres.
+    #[cfg(feature = "personal-sync")]
+    match resident
+        .open_reservoir(&pandect::shared_root::shared_root())
+        .await
+    {
+        ReservoirLane::Open(reservoir) => {
+            tracing::info!(persona = %reservoir.persona().as_uuid(), "resident reservoir open");
+        },
+        ReservoirLane::Unavailable(reason) => {
+            tracing::warn!(%reason, "resident reservoir unavailable");
+        },
+        ReservoirLane::Off => tracing::info!("resident reservoir off by owner setting"),
+    }
     #[cfg(feature = "personal-sync")]
     if let Some(works) = resident.distillery() {
         tracing::info!(
@@ -714,6 +731,13 @@ async fn run(args: Args) -> Result<(), Box<dyn std::error::Error>> {
             }
             let route = resident.register_published_site_route(&mut catalog)?;
             grants.push((AppId::new("knot-editor"), route));
+            // V1 grants the reservoir to the first-party clients this door
+            // already knows; V4 makes it default-on for every one of them.
+            if let Some(route) = resident.register_reservoir_route(&mut catalog)? {
+                for app in ["turnstone", "knot-editor"] {
+                    grants.push((AppId::new(app), route.clone()));
+                }
+            }
             if let Some(observer) = distillery_chronicle {
                 let route = ResidentDistillery::register_chronicle_route(observer, &mut catalog)?;
                 grants.push((AppId::new("turnstone"), route));
