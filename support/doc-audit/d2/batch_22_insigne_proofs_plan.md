@@ -42,6 +42,8 @@ The claims checked: the moved type list against `delegation.rs` and
 ending in `Ed25519PublicKey::verify`; `ed25519-dalek` 3 as personae's
 dependency; `issue` as inherent methods; the key accessors' personae return
 type; the orphan-rule and cycle constraints; 787 references in 97 files, 120
-call sites in 60 files, and 11 `IdentityProvider` implementations, by ripgrep;
+call sites in 60 files, and 11 `IdentityProvider` implementations, by ripgrep,
+with 98 tracked files after a plain grep found one force-tracked probe ripgrep
+skips;
 the repos those span; and notochord's `AdmittedPrincipal` as local and
 non-`Serialize`.

@@ -63,7 +63,7 @@ when they repin.
 - **(a) An extension trait in personae (recommended).** A trait such as
   `personae::delegation::Issue` provides `issue` and the personae-typed key
   accessors. Call syntax is unchanged; each calling file adds one import.
-  personae also re-exports the moved types at their old paths, so the 97 files
+  personae also re-exports the moved types at their old paths, so the 98 files
   that only name the types change nothing. Issuing stays in personae, as ruled.
 - **(b) Free functions in personae**, such as
   `personae::delegation::issue_certificate(&provider, certificate)`. Clearer
@@ -106,8 +106,11 @@ when each repins mere, or leaves them to those repos' own sessions.
 **2026-09-23: the blast radius, counted.** Searched with ripgrep over
 `Code/repos`, build output excluded. 787 references in 97 files name the moved
 types; 120 call sites in 60 files call `issue` or read an attestation's keys; 11
-types implement `IdentityProvider`. Counts from pattern search, not from a
-compiler, so the phase A build is the real census.
+types implement `IdentityProvider`. A plain grep over the same tree finds 99
+files: ripgrep skips `crates/probes/`, which `.gitignore` excludes, although one
+probe there (`murm-direct-phy`) is force-tracked and names the types. So 98
+tracked files. Counts from pattern search, not from a compiler, so the phase A
+build is the real census.
 
 **2026-09-23: what the checks rest on.** `DelegationCertificate::id` is
 `blake3::hash` of the signing bytes, and every check ends in personae's
