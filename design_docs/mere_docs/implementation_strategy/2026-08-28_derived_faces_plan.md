@@ -17,7 +17,7 @@ sketched in §7 so v1's decisions do not foreclose it.
 ## 1. The gap
 
 Before D3, Canvas's `Face` defaulted to `Favicon`
-(`crates/canvas/canvas/src/types.rs:127`): a standard tile wears the fetched
+(`crates/canvas/pictograph/src/canvas/types.rs:127`): a standard tile wears the fetched
 favicon, with the bare state color until one arrives. Every node that is not a
 webpage — files, contacts, moots, personae, radio peers, documents — has no
 favicon source and stayed bare forever. The face override machinery

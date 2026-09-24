@@ -9,7 +9,7 @@ dimensional modes are owned by the
 [isometric orrery camera plan](2026-06-22_isometric_orrery_camera_plan.md); this plan is the scene
 *content and physics*, that one is the *view*.
 **Code**: `crates/orrery/gyre` *(historical citation)* <!-- doc-audit: historical-path --> (the `Simulation`; scene bodies are the gap), `crates/orrery/orrery` *(historical citation)* <!-- doc-audit: historical-path -->
-(`frame.rs` paint + the scene paint pass), `crates/canvas/canvas/src/scene_paint.rs` (the ground
+(`frame.rs` paint + the scene paint pass), `crates/canvas/pictograph/src/canvas/scene_paint.rs` (the ground
 layer), `crates/meerkat` *(historical citation)* <!-- doc-audit: historical-path --> (the tangibility command + scene picker), optional new `crates/orrery/scene` *(planned target)* <!-- doc-audit: planned-path -->
 (scene format + transplanted scenes), `salva2d` (liquid).
 

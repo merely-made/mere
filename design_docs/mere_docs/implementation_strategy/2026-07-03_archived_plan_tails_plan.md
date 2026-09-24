@@ -169,7 +169,7 @@ genet's `design_docs/`, not here.
   the Trail affordance, is met by the palette entry at
   `turnstone:src/panes/registry.rs:342-358`; **item 6, Barnes-Hut, is one
   `add_force` line from live** — `BarnesHutRepulsion` is built and exported in
-  seiche, unwired at `crates/canvas/canvas/src/seiche_bridge.rs:58` (check
+  seiche, unwired at `crates/canvas/pictograph/src/canvas/seiche_bridge.rs:58` (check
   whether "tuning" is the real blocker); items 3 (relation-kind picker — every
   `assert_selected_relation` caller passes `UserGrouped`), 4 (tessera score on
   the chip — `Ledger::score` exists, no consumer) and 7 (Steward per-row
@@ -196,7 +196,7 @@ genet's `design_docs/`, not here.
 
 - **The Widget / Preset / type-scoped-card model and P1–P4** — unimplemented
   design. Widget 1's logic lives on in canvas (`SIZE_TIERS` at
-  `crates/canvas/canvas/src/lib.rs:182`, `node_size_tier`).
+  `crates/canvas/pictograph/src/canvas.rs:182`, `node_size_tier`).
 
 ### From layout_phase_split_probe (never built; genet)
 

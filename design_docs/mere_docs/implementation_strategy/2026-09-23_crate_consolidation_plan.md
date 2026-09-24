@@ -79,8 +79,8 @@ Ruled by Mark 2026-09-23:
 | `titulus` | fold into chirograph | landed `83feb122` |
 | `eidetic-fjall` | fold into eidetic as a `fjall` feature (Turnstone changes its imports) | landed `3943874f` |
 | `mere-resident`, `mere-mesh-host` | fold both into distillery; djinn already depends on distillery, so djinn would have made a cycle | landed: `distillery::lifecycle`, `distillery::mesh_host` |
-| `graphshell-stdio`, `graphshell-local`, `graphshell-network` | fold into `graphshell-endpoint`, one feature per carrier (five repositories change imports) | landed: `graphshell_endpoint::{stdio, local, network}` |
-| `mere-canvas`, `mere-signals` | fold into `pictograph`, not the reverse; canvas becomes `pictograph::canvas` and the mere facade keeps exposing it at `mere::canvas`, so consumer paths do not change | to do |
+| `graphshell-stdio`, `graphshell-local`, `graphshell-network` | fold into `graphshell-endpoint`, one feature per carrier (five repositories change imports) | landed `0c65a9d6`: `graphshell_endpoint::{stdio, local, network}` |
+| `mere-canvas`, `mere-signals` | fold into `pictograph`, not the reverse; canvas becomes `pictograph::canvas` and the mere facade keeps exposing it at `mere::canvas`, so consumer paths do not change | landed: features `canvas` and `signals` on pictograph |
 | `scenograph` | stays a crate: its scene editing is useful beyond graphshell | ruled out |
 | `tabard` | stays a crate: the named home for theme and stylesheet authoring (C2) | ruled out |
 

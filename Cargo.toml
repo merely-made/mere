@@ -2,7 +2,6 @@
 resolver = "2"
 members = [
     "crates/mere",
-    "crates/canvas/canvas",
     "crates/canvas/cartography",
     "crates/canvas/pictograph",
     "crates/graph/graph-kernel",
@@ -29,7 +28,6 @@ members = [
     "crates/intel/esp",
     "crates/intel/eidetic-search",
     "crates/intel/mora-cmudict",
-    "crates/intel/signals",
     "crates/stickleback",
     "crates/murm/murm",
     "crates/murm/transport",
@@ -196,7 +194,6 @@ linked-data = { package = "mere-linked-data", version = "0.0.1", path = "crates/
 kernel = { package = "mere-kernel", version = "0.0.2", path = "crates/graph/graph-kernel" }
 # The graph-canvas content-root (was `orrery`; that name retired to the Merely
 # product tier ladder, 2026-07-09 — see the boundary pass plan amendments).
-canvas = { package = "mere-canvas", version = "0.0.1", path = "crates/canvas/canvas" }
 pictograph = { version = "0.2.0", path = "crates/canvas/pictograph" }
 # The IconVG implementation pictograph encodes faces with (repos/emblem).
 emblem = "0.2.0"
@@ -436,7 +433,6 @@ eidetic-search = { path = "crates/intel/eidetic-search" }
 import = { path = "crates/import" }
 crawl = { package = "mere-crawl", path = "crates/crawl" }
 
-signals = { package = "mere-signals", version = "0.0.2", path = "crates/intel/signals" }
 
 # Standalone spec-B misfin implementation (promoted out of this workspace
 # 2026-07-03). It moved into the smolweb workspace in the 2026-07-23

@@ -62,7 +62,7 @@ one.
   zero engine dependencies (`fuse()` takes both rankings from the caller),
   and it keeps it.
 - **E-R2 — `embed::field_bridge` + `embed::canvas_search` →
-  `crates/canvas/canvas`**, behind a feature if canvas does not already
+  `crates/canvas/pictograph/src/canvas`**, behind a feature if canvas does not already
   carry quint. Their coupling is quint field algebra projected over the
   canvas — canvas-cluster code that was only ever parked in intel.
 - **E-R3 — delete `mere-embed`.** Remove the crate and its workspace

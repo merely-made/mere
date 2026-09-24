@@ -401,7 +401,7 @@ canvas rewrite.
 
 - `crates/mere/Cargo.toml`
 - `crates/mere/src/lib.rs`
-- `crates/canvas/canvas/Cargo.toml`
+- `crates/canvas/pictograph/Cargo.toml`
 - `ports/graphshell/Cargo.toml`
 - `ports/graphshell/src/lib.rs`
 - `ports/graphshell/README.md`

@@ -616,7 +616,7 @@ treating a directory or published package name as a separate authority.
 |---|---|---|
 | Mere facade | `crates/mere/` | Composed graph library consumed by Turnstone and other hosts; owns the trail, glossary, subgraph, roster and gloss modules. |
 | Graph | `crates/graph/` | Graph kernel and linked-data projection. |
-| Canvas | `crates/canvas/` | Canvas presentation, Cartography readings, and Pictograph derived faces. |
+| Canvas | `crates/canvas/` | Pictograph: derived faces, with the graph canvas and graph signals behind its `canvas` and `signals` features (exposed as `mere::canvas`); and Cartography readings. |
 | Cambium | `crates/cambium/` | Retained widgets, Meristem, Sprigging, Workbench, Tinct theming, and application host adapters. Its `scenes/` family contains Sceno, Scenomise, and Scenotime; widget and scene state remain distinct. |
 | Conatus | `crates/conatus/` | Spatial runtime and portable mechanics: Conatus, Numen, Seiche, Nisus, and Modulus. Products retain rules, source identities, and runtime policy. |
 | System | `crates/system/` | Pandect persistence helpers, resident services, Luggage, Notochord, fetch, Errand transport, surface contracts, document lanes, registries, and shell-state/event contracts. |
@@ -626,7 +626,7 @@ treating a directory or published package name as a separate authority.
 | Shell / domain | `crates/shell/`, `crates/domain/` | Chrome/comms and the Apparatus view domain. |
 | Eidetic | `crates/eidetic/` | Codicil/content storage with its HTTPS and iroh fetchers as features, Muniment journals, Chartulary and RDF, Hagiograph, and the Fjall storage adapter. |
 | Dramatis | `crates/dramatis/` | Personae identity, Insigne, Gaz contacts, persona picker, and related identity/credential composition. |
-| Intel | `crates/intel/` | ESP inference/embeddings, Eidetic search, signals, and Mora dictionary. |
+| Intel | `crates/intel/` | ESP inference/embeddings, Eidetic search, and Mora dictionary. |
 | Stickleback / Murm | `crates/stickleback/`, `crates/murm/` | Replicated-space storage/transfer machinery and bilateral exchange/transport; owning domains decide semantic authority. |
 | Moot | `crates/moot/` | Gemot community authority, Commons graph operations, Mooting recognition/storage support, Moothold federation, and Mien (standing and its composite lens). |
 | Mesh | `crates/mesh/` | Shared jobs, leases, retention, and host composition under product policy. |

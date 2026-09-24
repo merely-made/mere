@@ -80,8 +80,9 @@ No cargo features; `default = []`.
   phyllotaxis, grid, radial, axial kanban/timeline, semantic embedding), with
   `LayoutStrategy` adapters in `arrangements::adapters`. Live force physics is
   `seiche`.
-- Renderer: `crates/canvas/canvas` (`mere-canvas`) consumes `Projection`.
-- Signal producers: `crates/intel/signals` and `crates/intel/embed` fill
+- Renderer: pictograph's `canvas` module (`crates/canvas/pictograph`, feature
+  `canvas`) consumes `Projection`.
+- Signal producers: `pictograph::signals` and `crates/intel/embed` fill
   `IntelligenceSignals`.
 
 ## Related
