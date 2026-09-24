@@ -1,17 +1,20 @@
 # Graphshell session stack
 
 Mere's reusable remote-session machinery: a versioned session protocol, the
-client state above it, the traits an authority implements, and one crate per
-carrier.
+client state above it, the traits an authority implements, and the carriers,
+one feature each on `graphshell-endpoint`.
 
 | Crate | Contents |
 |---|---|
 | `chirograph` | Session messages (score, scene, presentation, resource, resume, status, intent); the `Carrier` trait; `CarrierError` |
 | `graphshell-client` | `ClientState` (snapshots, diffs, resume, resource cache, cache policy), `RetainedEndpointSession`, `ActionDraft` |
-| `graphshell-endpoint` | `ProjectionCatalog`, `ProjectionSource`, `PresentationSource`, `IntentSink`, `ResumableProjectionSource`, `ProjectionNoticeSource`, `LiveViewReferenceGate`, `dispatch_common` |
-| `graphshell-stdio` | `StdioCarrier` plus `serve_basic`, `serve_resumable`, `serve_resumable_notifying`: NDJSON over a child process's standard streams |
-| `graphshell-local` | `LocalCarrier`: an endpoint hosted in this process, still round-tripping the wire encoding |
-| `graphshell-network` | `NetworkCarrier`, `CarrierRuntime`: NDJSON over any `AsyncRead + AsyncWrite` |
+| `graphshell-endpoint` | `ProjectionCatalog`, `ProjectionSource`, `PresentationSource`, `IntentSink`, `ResumableProjectionSource`, `ProjectionNoticeSource`, `LiveViewReferenceGate`, `dispatch_common`; and the carriers below |
+| `graphshell-endpoint::stdio` (feature `stdio`) | `StdioCarrier` plus `serve_basic`, `serve_resumable`, `serve_resumable_notifying`: NDJSON over a child process's standard streams |
+| `graphshell-endpoint::local` (feature `local`) | `LocalCarrier`: an endpoint hosted in this process, still round-tripping the wire encoding |
+| `graphshell-endpoint::network` (feature `network`) | `NetworkCarrier`, `CarrierRuntime`: NDJSON over any `AsyncRead + AsyncWrite` |
+
+The carriers were the separate `graphshell-stdio`, `graphshell-local` and
+`graphshell-network` crates until 2026-09-24.
 
 `Carrier::request` returns `Result<CarrierResponseBody, CarrierError>`.
 `CarrierError` is `Refused` (the session is intact) or `Disconnected` (the
@@ -25,11 +28,11 @@ implement `Carrier`.
 | `chirograph` | `sceno`, `scenotime`, `serde`, `serde_json`, `blake3`, `base64` |
 | `graphshell-client` | `chirograph`, `sceno`, `scenotime`, `serde`, `serde_json` |
 | `graphshell-endpoint` | `chirograph` |
-| `graphshell-stdio` | `graphshell-endpoint`, `chirograph`, `serde_json`, `std::process` |
-| `graphshell-local` | `graphshell-endpoint`, `chirograph`, `serde`, `serde_json` |
-| `graphshell-network` | `chirograph`, `serde_json`, Tokio (`io-util`, `rt`, `rt-multi-thread`) |
+| feature `stdio` | adds `serde_json`; uses `std::process` |
+| feature `local` | adds `serde`, `serde_json` |
+| feature `network` | adds `serde_json` and Tokio (`io-util`, `rt`, `rt-multi-thread`) |
 
-`chirograph`, `-client`, and `-endpoint` build for
+`chirograph`, `-client`, and `-endpoint` with no carrier feature build for
 `wasm32-unknown-unknown`. `NetworkCarrier`'s `Carrier` methods block, so they
 must run off a runtime worker thread.
 

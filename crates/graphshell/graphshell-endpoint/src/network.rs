@@ -6,7 +6,7 @@
 
 //! The stream carrier: an endpoint reached across a connection.
 //!
-//! The third carrier, beside `graphshell-stdio` and `graphshell-local`, and
+//! The third carrier, beside the `stdio` and `local` carriers, and
 //! the one that makes remote projection real rather than architectural. It
 //! carries the protocol over any byte stream and knows nothing about how that
 //! stream was obtained: who dialled, which ALPN they asked for, and whether
