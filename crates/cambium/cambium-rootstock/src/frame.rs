@@ -204,6 +204,19 @@ where
                 rebuild_us = elapsed_us(phase.elapsed());
             },
         }
+        // A caret that moved since the last relayout (an edit, a caret key, a
+        // click) is kept in view within its field, as a single-line input
+        // keeps it. One that has not moved stays where the user scrolled it.
+        let caret = self.focused_overlay().map(|(node, caret, _)| (node, caret));
+        match caret {
+            Some((node, caret)) if self.s.caret_followed != Some((node, caret.byte)) => {
+                let layout = self.s.layout.as_mut().expect("layout just ensured");
+                let _ = layout.caret_into_view(&*dom_ref, node, caret);
+                self.s.caret_followed = Some((node, caret.byte));
+            },
+            Some(_) => {},
+            None => self.s.caret_followed = None,
+        }
         // Scroll requests resolve against the layout just brought current, so
         // a node the requesting dispatch created already has a box. Each
         // resolves on its own: one that finds nothing drops only itself.
@@ -320,6 +333,36 @@ where
                 let _ = renderer.remove_fragment(id);
             }
         }
+    }
+
+    /// Where the focused field's caret paints, `(x, y, width, height)`, in the
+    /// coordinates the cursor uses. `None` with no focused field, before a
+    /// layout, or while the caret is scrolled out of its field.
+    pub fn focused_caret_rect(&self) -> Option<(f32, f32, f32, f32)> {
+        let (node, caret, _) = self.focused_overlay()?;
+        let layout = self.s.layout.as_ref()?;
+        let dom = self.s.runner.as_ref()?.dom();
+        let dom_ref = dom.borrow();
+        let rect = layout.caret_rect_for_position(&*dom_ref, node, caret, 2.0)?;
+        Some((rect.x, rect.y, rect.width, rect.height))
+    }
+
+    /// Where the focused field's selection paints, one rect per line run, in
+    /// the same coordinates, clipped to the field. Empty with no selection.
+    pub fn focused_selection_rects(&self) -> Vec<(f32, f32, f32, f32)> {
+        let Some((node, _, Some((start, end)))) = self.focused_overlay() else {
+            return Vec::new();
+        };
+        let (Some(layout), Some(runner)) = (self.s.layout.as_ref(), self.s.runner.as_ref()) else {
+            return Vec::new();
+        };
+        let dom = runner.dom();
+        let dom_ref = dom.borrow();
+        layout
+            .selection_rects(&*dom_ref, node, start, end)
+            .into_iter()
+            .map(|rect| (rect.x, rect.y, rect.width, rect.height))
+            .collect()
     }
 
     /// The focused text field's paint inputs, as the application maps them.

@@ -914,6 +914,9 @@ where
     /// Scroll requests an application hook queued, resolved in order by the
     /// next [`relayout`](Host::relayout) once its layout is current.
     pub pending_scroll: Vec<ScrollIntoView>,
+    /// The focused field and caret byte the last relayout scrolled into view.
+    /// A caret that has not moved since is left where the user scrolled it.
+    pub caret_followed: Option<(NodeId, usize)>,
     /// The last frame's host-owned phase attribution.
     pub last_frame_profile: Option<FrameProfile>,
     /// Tab is being held: the arrow keys steer focus instead of reaching the
@@ -979,6 +982,7 @@ where
             pending_capture: None,
             pending_pointer: Vec::new(),
             pending_scroll: Vec::new(),
+            caret_followed: None,
             last_frame_profile: None,
             tab_held: false,
         }
