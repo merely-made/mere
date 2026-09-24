@@ -124,9 +124,10 @@ pub use setting_row::setting_row;
 // needs no second direct `sprigging` dependency. The grid widget's home
 // is here; its column model rides along.
 pub use controls::{
-    CaretAffinity, CaretMove, CaretPosition, CaretSelection, Checkbox, Composition, TextCommand,
-    TextField, TextFieldMode, TextInput, button, button_with, checkbox, checkbox_typed,
-    text_command_from_key, text_field, text_field_typed, textarea, textarea_typed, toggle,
+    CaretAffinity, CaretMove, CaretPosition, CaretSelection, Checkbox, Composition,
+    SINGLE_LINE_FIELD_STYLE, TextCommand, TextField, TextFieldMode, TextInput, button, button_with,
+    checkbox, checkbox_typed, text_command_from_key, text_field, text_field_typed, textarea,
+    textarea_typed, toggle,
 };
 pub use element::{El, Element, ElementView, el};
 pub use event::{OnClick, OnClickState, PointerClick, clickable, on_click};

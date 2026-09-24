@@ -83,11 +83,22 @@ fn field_body(
     el::<_, TextInput, ()>(tag, crate::styled_field::field_children(input, &[]))
 }
 
+/// What makes a single-line field one line, whatever the host's sheet says:
+/// the value never wraps, scrolls sideways inside the field (the host keeps
+/// the caret in view), and leaves the field's width to the sheet, since inline
+/// size containment takes the value out of it. Inline, so a host that styles
+/// the field cannot lose it.
+pub const SINGLE_LINE_FIELD_STYLE: &str =
+    "white-space: pre; overflow-x: auto; overflow-y: hidden; contain: inline-size;";
+
 /// Build the concrete [`TextField`] for `input` (the shared implementation
 /// behind both [`text_field`] and [`text_field_typed`]).
 fn build_text_field(input: &TextInput) -> TextField {
     let handler: fn(&mut TextInput, KeyEvent) = edit;
-    on_key(field_body("input", input), handler)
+    on_key(
+        field_body("input", input).attr("style", SINGLE_LINE_FIELD_STYLE),
+        handler,
+    )
 }
 
 /// A reusable, editable text field whose state *is* a [`TextInput`].
@@ -107,9 +118,9 @@ fn build_text_field(input: &TextInput) -> TextField {
 ///
 /// The element is an `<input>` so author CSS can target the field (e.g. a
 /// border/background) and so it reads as a control; Genet lays it out as
-/// whatever the cascade resolves. It carries no browser `<input>` value
-/// semantics — its text is just its content, diffed like any other text on
-/// rebuild.
+/// whatever the cascade resolves, over the [`SINGLE_LINE_FIELD_STYLE`] it
+/// carries inline. It carries no browser `<input>` value semantics — its text
+/// is just its content, diffed like any other text on rebuild.
 pub fn text_field(
     input: &TextInput,
 ) -> impl View<TextInput, (), GenetCtx, Element = GenetElement> + use<> {

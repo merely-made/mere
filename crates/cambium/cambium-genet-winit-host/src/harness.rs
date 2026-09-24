@@ -325,6 +325,17 @@ where
         element + vx.abs() + vy.abs()
     }
 
+    /// How far one element's own content is scrolled, `(x, y)`: `(0, 0)` for
+    /// an element that has not scrolled or does not scroll.
+    pub fn element_scroll(&self, node: NodeId) -> (f32, f32) {
+        self.host
+            .s
+            .layout
+            .as_ref()
+            .and_then(|layout| layout.element_scroll().get(&node).copied())
+            .unwrap_or_default()
+    }
+
     /// Where the focused text field's caret paints, `(x, y, w, h)`, in the
     /// coordinates [`painted_rect`](Self::painted_rect) uses. `None` with no
     /// focused field, or while the caret is scrolled out of its field.
