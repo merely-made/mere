@@ -15,7 +15,7 @@
 //! unlike the filesystem [`session_graph_store`](crate::session_graph_store).
 //!
 //! These calls are `async` (the `Store` trait is, for wasm OPFS). A native host
-//! `pollster::block_on`s them over an `eidetic-fjall` store whose futures are
+//! `pollster::block_on`s them over an `eidetic::fjall` store whose futures are
 //! ready, so the call is effectively synchronous on the UI thread.
 
 use eidetic::{Result, Store};

@@ -60,4 +60,4 @@ async-trait = "0.1"
 pollster = "0.4"
 # The real fjall-backed Store, for the graph-codicil persistence test that proves
 # a codicil survives a store close + reopen (the "survives restart" condition).
-eidetic-fjall.workspace = true
+eidetic = { workspace = true, features = ["fjall"] }

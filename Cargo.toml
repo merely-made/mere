@@ -25,7 +25,6 @@ members = [
     "crates/domain/apparatus",
     "crates/platen/platen",
     "crates/eidetic/eidetic-core",
-    "crates/eidetic/eidetic-fjall",
     "crates/import",
     "crates/crawl",
     "crates/intel/esp",
@@ -432,7 +431,6 @@ uxtree = { version = "0.0.2", path = "crates/forme/uxtree" }
 platen = { version = "0.0.1", path = "crates/platen/platen" }
 apparatus = { package = "mere-apparatus", version = "0.0.1", path = "crates/domain/apparatus" }
 eidetic = { version = "0.0.2", path = "crates/eidetic/eidetic-core", default-features = false }
-eidetic-fjall = { path = "crates/eidetic/eidetic-fjall" }
 # Lexical search over the trail (Phase 9 producer half): an in-tree BM25
 # index + weighted-field recall + column reports + the hybrid-fusion seam.
 # tantivy was retired 2026-09-07 (98 crates, a C build, no wasm). Lives under

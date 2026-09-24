@@ -4594,6 +4594,7 @@ dependencies = [
  "bytes",
  "chacha20poly1305 0.11.0",
  "chartulary",
+ "fjall",
  "jsonschema",
  "mere-transport",
  "mockito",
@@ -4602,21 +4603,9 @@ dependencies = [
  "pollster",
  "serde",
  "serde_json",
+ "tempfile",
  "tokio",
  "ureq",
-]
-
-[[package]]
-name = "eidetic-fjall"
-version = "0.0.1"
-dependencies = [
- "async-trait",
- "eidetic",
- "fjall",
- "muniment",
- "pollster",
- "serde_json",
- "tempfile",
 ]
 
 [[package]]
@@ -4624,7 +4613,6 @@ name = "eidetic-search"
 version = "0.0.1"
 dependencies = [
  "eidetic",
- "eidetic-fjall",
  "esp",
  "import",
  "muniment",
@@ -8907,7 +8895,6 @@ dependencies = [
  "document-canvas",
  "document-session-api",
  "eidetic",
- "eidetic-fjall",
  "errand",
  "fleece 0.5.0 (git+https://github.com/merely-made/genet.git?rev=532f1fadc53486d60ac4f02835732e8dabd9f62b)",
  "genet-host-api",
@@ -11744,7 +11731,6 @@ dependencies = [
  "chartulary",
  "dirs 5.0.1",
  "eidetic",
- "eidetic-fjall",
  "euclid",
  "hex",
  "incipit",

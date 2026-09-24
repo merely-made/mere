@@ -36,7 +36,7 @@ tempfile = "3"
 # with only the ndarray feature — compiling solely because `embed/bert-wgpu`
 # unified `burn/wgpu` in. That is exactly the accidental fan-out this removes.
 import = { workspace = true }
-eidetic-fjall = { workspace = true }
+eidetic = { workspace = true, features = ["fjall"] }
 esp = { workspace = true, features = ["bert", "bert-wgpu", "persistence"] }
 
 # `test = true` runs the example's embedded mapper tests under `cargo test`.

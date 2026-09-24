@@ -694,7 +694,7 @@ mod tests {
     fn codicil_survives_a_store_close_and_reopen() {
         // The faithful "survives restart" proof: save through a real fjall store,
         // drop it (shutdown), reopen at the same path, and thaw the same graph.
-        use eidetic_fjall::FjallStore;
+        use eidetic::fjall::FjallStore;
 
         let dir = std::env::temp_dir().join("mere_graph_codicil_fjall_reopen");
         let _ = std::fs::remove_dir_all(&dir);

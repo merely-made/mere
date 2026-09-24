@@ -71,7 +71,7 @@ use eidetic::{
     BrowsingMemory, BrowsingTrace, NoFetcher, PageRef, TraceEvent, TraceTransition,
     bootstrap_browsing_schema, save_trace,
 };
-use eidetic_fjall::FjallStore;
+use eidetic::fjall::FjallStore;
 use eidetic_search::{SearchError, TrailIndex, bootstrap_search_schema, fuse};
 use esp::embed::VectorIndex;
 use esp::embed::provider::EmbeddingProvider;
