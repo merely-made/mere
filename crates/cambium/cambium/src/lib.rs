@@ -72,6 +72,7 @@ mod setting_row;
 mod slider;
 mod splice;
 mod split;
+mod status_bar;
 mod styled_field;
 mod summary_body;
 mod surface;
@@ -185,6 +186,10 @@ pub use frisket::{
 };
 pub use sectioned_list::{ListRow, ListRowKind, ListSection, sectioned_list};
 pub use split::{Split, SplitAxis, split};
+pub use status_bar::{
+    STATUS_BAR_CSS, StatusBar, StatusBarEvent, StatusBarState, StatusChip, StatusSeverity,
+    StatusView, status_bar,
+};
 pub use surface::{
     ResolvedSurfaceEvent, RetainedSurfaceSession, RunnerSurfaceSession, SurfaceEffect,
     SurfaceViewport,
