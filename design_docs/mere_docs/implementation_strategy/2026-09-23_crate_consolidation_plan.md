@@ -89,7 +89,8 @@ Ruled by Mark 2026-09-23:
 ### C5. Version baseline, after consolidation
 
 Mark's rulings: a one-time baseline of genet 0.6 and Mere 0.4 once the
-consolidated set settles; genet's forks (`genet-taffy` 0.14.0,
+dramatis tier lands (insigne's delegation split and chatelaine's CXF-shaped
+taxonomy), so those crates publish once with their real contents; genet's forks (`genet-taffy` 0.14.0,
 `genet-parley` and `genet-fontique` 0.10.0) keep their upstream-derived
 numbers and are listed with their own republish rule; lockstep
 `version.workspace` follows at the first release.
@@ -158,3 +159,9 @@ workspace-wide crate inventory at the Code root.
   Mark's go-ahead as part of `254b23b6..03c05dbd`.
 - 2026-09-23. C2 insigne ruled; the dramatis session is moving gaz's
   `TypedKey` in. The delegation-certificate question is open.
+- 2026-09-24. C4's last two folds landed: the graphshell carriers
+  (`0c65a9d6`) and canvas with mere-signals into pictograph (`f590e45d`).
+  Mere's workspace is at 97 members, down from 124 before this plan; the
+  portable build is at 1,521 packages. canvas carried an unbuilt 771-line
+  winit canvas-host binary (`autobins = false`, no `[[bin]]`); Mark ruled it
+  deleted. Next in this plan: tabard's fill, ruled 2026-09-24.
