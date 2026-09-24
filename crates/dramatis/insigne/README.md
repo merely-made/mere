@@ -1,7 +1,6 @@
 # insigne
 
-Name reservation for **insigne**, the graded identity proof of the Mere
-platform's dramatis tier.
+**insigne**, the graded identity proof of the Mere platform's dramatis tier.
 
 An insigne is what a persona presents: a proof of identity made to be shown and
 surviving showing. The grade is chosen per audience, from a bare key
@@ -21,8 +20,16 @@ disclosure, where everything here is a public-key artifact designed for it),
 and not the keeper (that is
 [castellan](https://crates.io/crates/castellan)).
 
+The core is plain, serializable data: the artifacts that travel and that a
+gaz keeps. Checking belongs behind a feature, and a passing check yields a
+local conclusion that is never serialized.
+
+Built today: `TypedKey`, the bare-key grade. A public key typed by its family
+(Ed25519, secp256k1, P-256, or a whole Reticulum identity) and written in that
+family's standard text form: `did:key`, or `rnid`'s hex. Nothing verifies yet.
+
 Lives in the [mere](https://github.com/merely-made/mere) workspace under
-`crates/dramatis/`. No implementation yet.
+`crates/dramatis/`.
 
 ## License
 

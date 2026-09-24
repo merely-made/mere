@@ -5533,9 +5533,11 @@ dependencies = [
 name = "gaz"
 version = "0.0.1"
 dependencies = [
+ "insigne",
  "postcard",
  "serde",
  "serde_json",
+ "uuid",
 ]
 
 [[package]]
@@ -7299,6 +7301,11 @@ dependencies = [
 [[package]]
 name = "insigne"
 version = "0.0.1"
+dependencies = [
+ "postcard",
+ "serde",
+ "serde_json",
+]
 
 [[package]]
 name = "internment"

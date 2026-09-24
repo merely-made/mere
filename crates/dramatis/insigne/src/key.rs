@@ -28,9 +28,9 @@ const P256_CODEC: [u8; 2] = [0x80, 0x24];
 
 /// A public key and the family it belongs to.
 ///
-/// gaz stores keys and compares them. It never verifies a signature with one:
-/// crypto belongs to the trust plane, which is why this crate depends on no
-/// cryptography at all.
+/// insigne's lowest grade, the bare key: continuity, "same me as last time".
+/// Plain data, like everything insigne's core holds. Nothing here verifies a
+/// signature, so a keeper of keys such as gaz takes on no cryptography.
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum TypedKey {
     /// Ed25519: what `personae` mints, and what murm, iroh and the mesh sign
@@ -61,7 +61,7 @@ pub enum KeyAlgorithm {
 }
 
 impl KeyAlgorithm {
-    /// gaz's own tag for the binary form. The text form carries the standard.
+    /// insigne's own tag for the binary form. The text form carries the standard.
     const fn tag(self) -> u8 {
         match self {
             Self::Ed25519 => 1,
@@ -142,7 +142,7 @@ impl TypedKey {
         hex_encode(&self.as_bytes()[..4])
     }
 
-    /// Read gaz's binary form: one tag byte, then the key bytes.
+    /// Read the binary form: one tag byte, then the key bytes.
     fn from_tagged(tagged: &[u8]) -> Result<Self, KeyParseError> {
         let Some((&tag, key)) = tagged.split_first() else {
             return Err(KeyParseError::Length {
@@ -206,7 +206,7 @@ impl FromStr for TypedKey {
     type Err = KeyParseError;
 
     /// Read a `did:key`, or a Reticulum identity as `rnid` writes it (either
-    /// case is accepted; gaz writes lowercase).
+    /// case is accepted; insigne writes lowercase).
     fn from_str(text: &str) -> Result<Self, Self::Err> {
         if let Some(multibase) = text.strip_prefix(DID_KEY) {
             return from_did_key(multibase);
@@ -303,7 +303,7 @@ pub enum KeyParseError {
     Multibase,
     /// A character outside the base58btc alphabet.
     Base58,
-    /// A multicodec prefix, or a binary tag, gaz does not hold.
+    /// A multicodec prefix, or a binary tag, insigne does not hold.
     Codec,
     /// The right family, the wrong number of bytes.
     Length {
@@ -324,7 +324,7 @@ impl fmt::Display for KeyParseError {
             Self::Form => f.write_str("a key is a did:key or a 128-character Reticulum identity"),
             Self::Multibase => f.write_str("a did:key is base58btc multibase, starting with z"),
             Self::Base58 => f.write_str("a did:key holds base58btc characters only"),
-            Self::Codec => f.write_str("not a key family gaz holds"),
+            Self::Codec => f.write_str("not a key family insigne holds"),
             Self::Length { expected, found } => {
                 write!(f, "this key family takes {expected} bytes, found {found}")
             },
@@ -389,7 +389,7 @@ mod tests {
 
         let upper: TypedKey = RNS_IDENTITY.to_uppercase().parse().unwrap();
         assert_eq!(upper, key, "rnid input is case-insensitive");
-        assert_eq!(upper.to_text(), RNS_IDENTITY, "gaz writes lowercase");
+        assert_eq!(upper.to_text(), RNS_IDENTITY, "insigne writes lowercase");
     }
 
     #[test]
@@ -414,7 +414,7 @@ mod tests {
             ("alice", KeyParseError::Form),
             ("did:key:f00", KeyParseError::Multibase),
             ("did:key:z0OIl", KeyParseError::Base58),
-            // A valid base58 payload whose prefix is no family gaz holds.
+            // A valid base58 payload whose prefix is no family insigne holds.
             ("did:key:z2NEpo7TZRRrLZSi2U", KeyParseError::Codec),
         ];
         for (text, error) in cases {

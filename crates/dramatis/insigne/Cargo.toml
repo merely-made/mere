@@ -4,9 +4,16 @@ version = "0.0.1"
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
-description = "Name reservation. An insigne is a graded, presentable proof of identity in the Mere platform's dramatis tier: made to be shown and surviving showing, from a bare key (continuity) through signed cross-attestations to delegation certificates. Your insigne is what someone else's gaz keeps. Not the secrets (that is chatelaine) and not the keeper (that is castellan)."
+description = "An insigne is a graded, presentable proof of identity in the Mere platform's dramatis tier: made to be shown and surviving showing, from a bare key (continuity) through signed cross-attestations to delegation certificates. Your insigne is what someone else's gaz keeps. Built today: the typed public key, the bare-key grade, as plain data. Not the secrets (that is chatelaine) and not the keeper (that is castellan)."
 readme = "README.md"
 keywords = ["identity", "attestation", "proof", "persona", "petname"]
 categories = ["authentication", "cryptography"]
 
 [dependencies]
+serde.workspace = true
+
+[dev-dependencies]
+# The binary codec muniment stores with, so the binary serde path is tested
+# against the format a gaz persists in.
+postcard = { version = "1", features = ["alloc"] }
+serde_json = "1"

@@ -20,9 +20,9 @@
 //! becoming a second row. The anchor is whatever the peer's own system holds
 //! fixed:
 //!
-//! - **a root key**, typed by its family ([`TypedKey`]): for a personae peer,
-//!   the master key its attestations name, not whichever derived key arrived
-//!   first;
+//! - **a root key**, typed by its family ([`TypedKey`], insigne's bare-key
+//!   grade, re-exported here): for a personae peer, the master key its
+//!   attestations name, not whichever derived key arrived first;
 //! - **a `did:plc`**, for an atproto account, whose signing keys belong to
 //!   its server and change on every move;
 //! - **a local id**, for someone who has shown you no key yet.
@@ -84,10 +84,8 @@
 pub mod anchor;
 pub mod book;
 pub mod contact;
-mod encoding;
 pub mod endpoint;
 pub mod handle;
-pub mod key;
 pub mod trust;
 
 pub use anchor::{Anchor, AnchorParseError, LocalId, PlcDid};
@@ -95,7 +93,7 @@ pub use book::{ContactBook, PersonaScope, ScopeMismatch};
 pub use contact::{AttestError, AttestedKey, Contact, ContactError, ContactTier, RootKey};
 pub use endpoint::{Endpoint, EndpointKind};
 pub use handle::{Handle, HandleKind};
-pub use key::{KeyAlgorithm, KeyParseError, TypedKey};
+pub use insigne::{KeyAlgorithm, KeyParseError, TypedKey};
 pub use trust::{ProofMethod, TrustState};
 
 /// Crate version.

@@ -5,10 +5,10 @@
 // SPDX-License-Identifier: MPL-2.0
 
 //! The two text codecs keys travel in: base58btc (inside `did:key`) and hex
-//! (a Reticulum identity, and UUIDs).
+//! (a Reticulum identity).
 //!
 //! Hand-rolled rather than a dependency, as castellan's base32 is: each is a
-//! few dozen lines, and gaz keeps its dependency list to serde.
+//! few dozen lines, and insigne's core keeps its dependency list to serde.
 
 /// The Bitcoin base58 alphabet, which multibase names `base58btc`.
 const BASE58_ALPHABET: &[u8; 58] = b"123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";

@@ -8,7 +8,8 @@ proposals from that day's critical pass: anchoring on a peer's root with
 attested keys held concurrently, a whole-identity Reticulum key (verified
 against Reticulum's reference implementation), and `Anchor::Local` for keyless
 contacts. JSContact is ruled *an* exchange format (M1). M0.5 landed the same
-day; M1 and M2 are drafted with done-conditions.
+day, and `TypedKey` then moved to insigne, as Mark ruled. M1 (at-rest sealing
+ruled: gaz stays crypto-free) and M2 are drafted with done-conditions.
 **Scope**: the contact layer, standalone. The record model, the persona-scoped
 book, then storage over muniment, then the adapters that turn resolver output
 into records, then mere reconciliation.
@@ -233,10 +234,15 @@ is monotonic, so a replayed or late event cannot rewind a record.
         keyless WebFinger import (M2) therefore starts a `Local` contact
         instead of being refused. `Key` and `Plc` contacts still hold at least
         one key: gazette resolves a DID before gaz files it.
-  - [ ] **Open, Mark's call — where `TypedKey` lives.** insigne's grades start
-        at "a bare key", so the typed key is arguably insigne's type, with gaz
-        consuming it. Built in gaz's `key` module meanwhile and kept
-        self-contained (no gaz types inside it), so moving it is mechanical.
+  - [x] **Ruled 2026-09-23 — `TypedKey` lives in insigne**, whose grades
+        start at "a bare key". Moved there (`git mv`, with its base58 and hex
+        codecs and its tests); gaz depends on insigne and re-exports
+        `TypedKey`, `KeyAlgorithm` and `KeyParseError`, so gaz's API is
+        unchanged. Mark ruled insigne's core plain, serializable data with
+        checking behind a feature, which is what lets gaz depend on it and stay
+        crypto-free. `LocalId` moved onto the `uuid` crate (no default
+        features), the stack's UUID type, instead of keeping a second hex codec
+        in gaz.
   - [x] `cargo test -p gaz` and `cargo clippy -p gaz --all-targets -- -D
         warnings` green; lib docs and quick-start rewritten to the new types.
 - **M1 — persistence.** An optional `muniment` feature; the core stays
@@ -253,13 +259,12 @@ is monotonic, so a replayed or late event cannot rewind a record.
   - [ ] Round-trip tests over `MemoryBackend` and redb, both a JSON and a
         binary codec, and a two-persona test proving one persona's load
         cannot return the other's contacts.
-  - [ ] **Open, Mark's call — at-rest sealing.** This file holds who a person
-        knows. Access records are sealed at rest through castellan's
-        `PersonaeHost::payload_sealer`; muniment itself has no sealing layer.
-        Either gaz stays plain and the host supplies a sealed backend, or M1
-        ships sealing-by-default and gaz gains a sealer seam. Proposed: the
-        former, since it keeps gaz crypto-free, with a host-side receipt that the
-        stored bytes carry no cleartext petname.
+  - [ ] **Ruled 2026-09-23 — at-rest sealing is the host's.** This file holds
+        who a person knows. Access records are sealed at rest through
+        castellan's `PersonaeHost::payload_sealer`; muniment itself has no
+        sealing layer. Mark accepted the proposal: gaz stays plain and
+        crypto-free, and the host supplies a sealed backend. Done when a
+        host-side receipt shows the stored bytes carry no cleartext petname.
   - [ ] **Ruled 2026-09-23 — JSContact is *an* exchange format** (Mark: "the"
         was too strong). The standards survey grades
         JSContact (RFC 9553) ADOPT with "gaz (the contact store)" as consumer,
@@ -487,3 +492,16 @@ File sizes: contact 396 (+ tests 280), key 483, book 462, anchor 366, encoding
 156, trust 136, handle 129, endpoint 125, lib 102. One dev-dependency added
 (postcard), one `Cargo.lock` line. Still open: where `TypedKey` lives. M1
 (persistence) is next; its at-rest sealing question is still open (M1).
+
+**2026-09-23, `TypedKey` to insigne; M1 sealing ruled.** Mark ruled `TypedKey`
+into insigne and insigne's core plain data with checking behind a feature,
+after a check of the stack found no contradiction: notochord already keeps
+travelling claims separate from its local, non-`Serialize` `AdmittedPrincipal`,
+and insigne's own docs call the insigne "the interchange artifact" and gaz "the
+ledger of insignia received". `key.rs` and `encoding.rs` moved by `git mv`; gaz
+re-exports the three key types, and `LocalId` now wraps `uuid::Uuid`. Tests
+are unchanged in number: gaz 54 plus a doctest, insigne 16; clippy clean on
+both. He also ruled M1's at-rest sealing the host's, keeping gaz crypto-free.
+Open: whether personae's delegation certificates and attestations move into
+insigne, which reverses the 2026-08-11 reconciliation's "personae owns the
+grammar" and is tracked in the crate consolidation plan.
