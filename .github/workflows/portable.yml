@@ -1,0 +1,30 @@
+name: Portable dependency graph
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+jobs:
+  windows:
+    runs-on: windows-latest
+    env:
+      CARGO_BUILD_JOBS: 2
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install integration toolchain
+        run: rustup toolchain install 1.98.1 --profile minimal --target wasm32-wasip2,wasm32-unknown-unknown
+      - name: Exercise local lock isolation
+        run: python scripts/test_cargo_mode.py
+      - name: Check portable workspace and lock provenance
+        run: python scripts/cargo_mode.py verify +1.98.1
+      - name: Check embedded guests explicitly
+        shell: pwsh
+        run: |
+          foreach ($guest in @('crates/script/app-host/guest', 'crates/script/document-host/guest', 'crates/script/document-host/guest-bomb')) {
+            python scripts/cargo_mode.py verify +1.98.1 --manifest-path "$guest/Cargo.toml" --metadata-only
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            cargo +1.98.1 build --locked --manifest-path "$guest/Cargo.toml" --target wasm32-wasip2 --release
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }

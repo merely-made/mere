@@ -16,6 +16,15 @@ and [reference host plan](mere_docs/implementation_strategy/2026-07-27_graphshel
 [persona model brief](mere_docs/research/2026-05-14_persona_model_brief.md),
 [participant gate + packs plan](mere_docs/implementation_strategy/2026-07-17_participant_gate_packs_plan.md).
 
+> **Note (2026-09-23): the unit is the data domain, not the application.** Mark
+> ruled that "each data domain deserves its own mere. that isn't the same as
+> every app getting its own mere, like two browsers should share a mere", and
+> that any of an identity's applications can open any of its meres by default.
+> All of an identity's meres together are its **reservoir**
+> ([TERMINOLOGY](TERMINOLOGY.md)). This brief's "every application its own
+> datalake" framing is kept below as its history. For the current rulings, see
+> the [ambiance design](mere_docs/design/2026-09-23_ambiance_design.md) §2.
+
 ## 1. The origin framing (Mark, 2026-08-12, verbatim)
 
 > i just look at it as, you can access your google drive in a bunch of apps.
