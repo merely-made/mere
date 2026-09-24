@@ -24,7 +24,7 @@ mod native {
         CarrierError, CarrierFailure, CarrierNotice, CarrierOutput, CarrierRequest,
         CarrierRequestBody, CarrierResponse, CarrierResponseBody,
     };
-    use graphshell_endpoint::{
+    use crate::{
         IntentSink, PresentationSource, ProjectionCatalog, ProjectionNoticeSource,
         ProjectionSource, ResumableProjectionSource,
     };
@@ -189,7 +189,7 @@ mod native {
     }
 
     /// Stdio's dispatch: the carrier-agnostic verbs come from
-    /// `graphshell_endpoint::dispatch_common`, and only the session-plane
+    /// `crate::dispatch_common`, and only the session-plane
     /// answers are stdio's own.
     ///
     /// Those two refusals are the whole difference between this carrier and an
@@ -208,7 +208,7 @@ mod native {
         <E as IntentSink>::Error: Display,
         F: FnMut(&mut E, chirograph::ResumeRequest) -> Result<chirograph::ResumeReply, String>,
     {
-        let session_plane = match graphshell_endpoint::dispatch_common(endpoint, request, resume) {
+        let session_plane = match crate::dispatch_common(endpoint, request, resume) {
             Ok(response) => return (response, false),
             Err(session_plane) => session_plane,
         };
@@ -217,17 +217,17 @@ mod native {
         let body = match session_plane.verb {
             // Inherited pipes perform no key exchange, so stdio cannot make
             // an authenticated session claim.
-            graphshell_endpoint::SessionPlaneVerb::Open(_) => Err(
+            crate::SessionPlaneVerb::Open(_) => Err(
                 "the stdio carrier does not authenticate; `open` requires a carrier that proves its peer"
                     .to_string(),
             ),
             // Closing this process-scoped session is honest and terminal.
-            graphshell_endpoint::SessionPlaneVerb::Close => {
+            crate::SessionPlaneVerb::Close => {
                 close = true;
                 Ok(CarrierResponseBody::Closed)
             }
             // No stdio session survives the endpoint process.
-            graphshell_endpoint::SessionPlaneVerb::Suspend => Err(
+            crate::SessionPlaneVerb::Suspend => Err(
                 "the stdio carrier has no session that outlives its process; `suspend` requires a carrier that can reconnect"
                     .to_string(),
             ),
@@ -434,7 +434,7 @@ mod native {
             ProjectionSession, ProjectionSnapshot, ProtocolVersion, ResourceRequest,
             ResourceResponse, ResumeReply, ResumeRequest, SessionOpen,
         };
-        use graphshell_endpoint::{
+        use crate::{
             IntentSink, PresentationSource, ProjectionCatalog, ProjectionNoticeSource,
             ProjectionSource, ResumableProjectionSource,
         };

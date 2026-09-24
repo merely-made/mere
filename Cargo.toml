@@ -75,9 +75,6 @@ members = [
     "crates/chirograph",
     "crates/graphshell/graphshell-client",
     "crates/graphshell/graphshell-endpoint",
-    "crates/graphshell/graphshell-stdio",
-    "crates/graphshell/graphshell-local",
-    "crates/graphshell/graphshell-network",
     "ports/graphshell",
     "ports/djinn",
     "ports/castellan",
@@ -234,10 +231,7 @@ mora-cmudict = { version = "0.0.1", path = "crates/intel/mora-cmudict" }
 chirograph = { version = "0.0.2", path = "crates/chirograph" }
 # The card vocabulary chirograph re-exports and castellan wants without the wire.
 graphshell-client = { version = "0.0.2", path = "crates/graphshell/graphshell-client" }
-graphshell-local = { path = "crates/graphshell/graphshell-local" }
 graphshell-endpoint = { version = "0.0.2", path = "crates/graphshell/graphshell-endpoint" }
-graphshell-stdio = { version = "0.0.2", path = "crates/graphshell/graphshell-stdio" }
-graphshell-network = { version = "0.0.1", path = "crates/graphshell/graphshell-network" }
 # Knot is an independent document product that Mere embeds rather than owns
 # (knot-editor `design_docs/2026-09-01_knot_editor_repository_extraction_plan.md`).
 # Its sources left this repository on 2026-09-04 under that plan's E2; Djinn and
@@ -604,8 +598,6 @@ mere-fetch = { path = "crates/system/fetch" }
 gemot = { path = "crates/moot/gemot" }
 graphshell = { path = "ports/graphshell" }
 graphshell-endpoint = { path = "crates/graphshell/graphshell-endpoint" }
-graphshell-local = { path = "crates/graphshell/graphshell-local" }
-graphshell-stdio = { path = "crates/graphshell/graphshell-stdio" }
 illume = { path = "crates/nematic/illume" }
 inker = { path = "crates/inker/inker" }
 knot-editor-host = { path = "crates/inker/knot-editor-host" }

@@ -32,7 +32,7 @@ use chirograph::{
     ResumeReply, ResumeRequest,
 };
 
-use graphshell_endpoint::{CompleteEndpoint, ProjectionNoticeSource, dispatch_common};
+use crate::{CompleteEndpoint, ProjectionNoticeSource, dispatch_common};
 
 /// An endpoint carried in the host's own process.
 ///
@@ -88,9 +88,9 @@ where
 impl<E, F> Carrier for LocalCarrier<E, F>
 where
     E: CompleteEndpoint + ProjectionNoticeSource,
-    <E as graphshell_endpoint::ProjectionSource>::Error: Display,
-    <E as graphshell_endpoint::PresentationSource>::Error: Display,
-    <E as graphshell_endpoint::IntentSink>::Error: Display,
+    <E as crate::ProjectionSource>::Error: Display,
+    <E as crate::PresentationSource>::Error: Display,
+    <E as crate::IntentSink>::Error: Display,
     <E as ProjectionNoticeSource>::Error: Display,
     F: FnMut(&mut E, ResumeRequest) -> Result<ResumeReply, String>,
 {
@@ -142,7 +142,7 @@ mod tests {
         EndpointDescriptor, IntentInvocation, IntentResult, ProjectionRequest, ProjectionSnapshot,
         ResourceRequest, ResourceResponse,
     };
-    use graphshell_endpoint::{
+    use crate::{
         IntentSink, PresentationSource, ProjectionCatalog, ProjectionSource,
     };
 

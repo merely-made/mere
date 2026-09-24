@@ -6,5 +6,21 @@ license.workspace = true
 repository.workspace = true
 description = "Application-injected projection and intent boundary for Graphshell."
 
+[features]
+default = []
+# The carriers, one feature each. The traits and `chirograph` stay wasm-clean;
+# `network` brings Tokio's multi-threaded runtime.
+local = ["dep:serde", "dep:serde_json"]
+network = ["dep:serde_json", "dep:tokio"]
+stdio = ["dep:serde_json"]
+
 [dependencies]
 chirograph.workspace = true
+serde = { workspace = true, optional = true }
+serde_json = { workspace = true, optional = true }
+tokio = { version = "1", features = ["io-util", "rt", "rt-multi-thread"], optional = true }
+
+[dev-dependencies]
+sceno.workspace = true
+scenotime.workspace = true
+tokio = { version = "1", features = ["io-util", "macros", "rt", "rt-multi-thread", "time"] }

@@ -5,6 +5,19 @@
 // SPDX-License-Identifier: MPL-2.0
 
 //! Traits application adapters implement beside their own source truth.
+//!
+//! The carriers live here too, one feature each: `stdio` (NDJSON over a child
+//! process's standard streams), `local` (an endpoint hosted in this process)
+//! and `network` (NDJSON over any async byte stream, bringing Tokio). They were
+//! separate crates until 2026-09-24. With no feature on, the crate stays
+//! wasm-clean.
+
+#[cfg(feature = "local")]
+pub mod local;
+#[cfg(feature = "network")]
+pub mod network;
+#[cfg(feature = "stdio")]
+pub mod stdio;
 
 use std::fmt::Display;
 

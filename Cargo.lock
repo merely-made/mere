@@ -6255,8 +6255,6 @@ dependencies = [
  "getrandom 0.3.4",
  "graphshell-client",
  "graphshell-endpoint",
- "graphshell-network",
- "graphshell-stdio",
  "light-file-dialog",
  "mere",
  "mere-mesh",
@@ -6315,24 +6313,9 @@ name = "graphshell-endpoint"
 version = "0.0.2"
 dependencies = [
  "chirograph",
-]
-
-[[package]]
-name = "graphshell-local"
-version = "0.0.1"
-dependencies = [
- "chirograph",
- "graphshell-endpoint",
  "sceno",
+ "scenotime",
  "serde",
- "serde_json",
-]
-
-[[package]]
-name = "graphshell-network"
-version = "0.0.1"
-dependencies = [
- "chirograph",
  "serde_json",
  "tokio",
 ]
@@ -6340,11 +6323,10 @@ dependencies = [
 [[package]]
 name = "graphshell-stdio"
 version = "0.0.2"
+source = "git+https://github.com/merely-made/mere.git?rev=250fd238a9595dde04eea3582e1b3cc5ec6e1715#250fd238a9595dde04eea3582e1b3cc5ec6e1715"
 dependencies = [
  "chirograph",
  "graphshell-endpoint",
- "sceno",
- "scenotime",
  "serde_json",
 ]
 
