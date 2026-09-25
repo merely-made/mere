@@ -1,9 +1,11 @@
 # Reservoir plan: shared meres held by the device resident
 
 **Date:** 2026-09-23
-**Status:** in progress. V1 is complete on branch `reservoir-v1`: the pandect
-index, wallet-persona resolution, djinn's reservoir lane and route, and a real
-two-process receipt. V2 is next. §7's decisions were ruled on 2026-09-23.
+**Status:** in progress. V1 is complete and on main: the pandect index,
+wallet-persona resolution, djinn's reservoir lane and route, and a real
+two-process receipt. It reached origin with `5364dfa0` on 2026-09-24. V2's
+shape was ruled on 2026-09-23 and 2026-09-24 (§7). Its first step, in
+muniment, is next.
 **Scope:** give each data domain one mere, and make every mere of an identity
 openable by any of that identity's applications. The meres are held by the
 device resident, with sessions, a graph journal and an Eidetic archive.
@@ -95,6 +97,67 @@ sessions.
     (`repos/cleromancy/src/admitted.rs`).
   - No store exists at that default root on the primary development machine.
 
+### V2 findings (verified 2026-09-24)
+
+- **Nothing persists the graph journal yet, and its author is a free string.**
+  `AttributedDelta` carries `author: String`: "`user` for the trusted UI path, a
+  participant subject's hex for gated runs, `pre-gate` for entries migrated
+  from bare logs" (`crates/graph/graph-kernel/src/graph/journal.rs`). No code
+  outside that file calls `GraphJournal::save`, `load` or `migrate_bare_log`,
+  so the stored form can still change freely. muniment writes a journal whole:
+  "the whole log is written as a single slot on each `save`", and the
+  append-friendly form "is the roadmap"
+  (`crates/eidetic/muniment/src/journal/persist.rs`).
+- **Capture is one hook per thread.** `set_captured_delta_hook` installs "the
+  current thread's graph-delta capture hook"
+  (`crates/graph/graph-kernel/src/graph/capture.rs`), and Turnstone installs
+  it once at boot (`repos/turnstone/src/app/session_lifecycle.rs`). A resident
+  holding many sessions cannot share one hook per thread. The event-log plan
+  had already proposed recording as "a per-`Graph`-instance opt-in" (its E1).
+- **No graph diff or inverse exists** in the kernel or pandect, so undo needs
+  one.
+- **Positions and view state bypass the journal.**
+  - Node positions are written into `arrangement.*` facets at save time: "only
+    the durable save-time position lands here"
+    (`crates/system/pandect/src/arrangement_facets.rs`).
+  - Per-pane view state is pandect's `ViewIntent`: hidden relations, folds,
+    camera, focus, layout strategy and mirrored tiles, saved under
+    `views/<frame>/<pane>.json`
+    (`crates/system/pandect/src/view_intent_store.rs`).
+- **Two storage styles.**
+  - `MereHost` persists its graph, facets and projection epoch and revision as
+    one muniment slot (`ports/graphshell/src/mere_host.rs`). Graphshell runs it
+    on IndexedDB in the browser (`ports/graphshell/src/web.rs`) and on memory
+    in native receipts. Cleromancy's host follows the same one-slot pattern
+    (`repos/cleromancy/src/host/mod.rs`).
+  - Turnstone's session files are loose JSON, written by pandect with plain
+    `fs::write` (`crates/system/pandect/src/session_graph_store.rs`).
+- **muniment has no directory backend.** It ships memory, redb, zip and
+  IndexedDB backends. `Backend::apply` is atomic by contract: "every op lands,
+  or none does" (`crates/eidetic/muniment/src/backend.rs`). The stack already
+  keeps a log one entry per key: stickleback's `MunimentStore` stores
+  `log/<author>/<log>/<seq>`, with "a zero-padded 16-hex sequence number so
+  keys sort in log order and a single scan walks a log"
+  (`crates/stickleback/src/store.rs`).
+- **Earlier rulings already shape the log.**
+  - Alembic decision #5 (2026-06-24) made view intent a "**parallel composed
+    stream**" (`2026-06-24_alembic_implementation_plan.md`, §3). The event-log
+    plan keeps it "**never** merged into the `GraphMutation` log — a
+    structural undo and a camera pan must stay independent"
+    (`2026-07-01_event_log_timeline_plan.md`, E4).
+  - The graph view curation plan, which superseded that plan's substrate, gives
+    durable graph history to `GraphJournal` and durable local curation to the
+    view-intent store. It also makes "Restore from here … a separate,
+    confirmable action using the existing delta/engram boundary"
+    (`2026-08-03_graph_view_curation_and_interaction_plan.md`, Ownership and
+    Time).
+- **Turnstone's fork is a component tear-out.** `fork_session_from` copies the
+  connected component around a seed node into a new session with
+  `Graph::copy_component_from`, carries facets through the id remap with
+  `copy_node_facets` and `copy_scene_facets`, and sets `parent_session`. It
+  also carries Turnstone's resident admissions and nested participant worlds,
+  which stay Turnstone's dressing (`repos/turnstone/src/app/session_lifecycle.rs`).
+
 ## 3. Target shape
 
 ```text
@@ -146,23 +209,120 @@ admitted routes.
 - an admitted application opens a mere by id through a Graphshell local
   session and never touches its files.
 
-### V2. Sessions with the full lifecycle
+### V2. Sessions with the full lifecycle and the full log
 
-Move Turnstone's session lifecycle (mint, switch, fork, trash) into pandect as
-product-neutral machinery over its `ManifestStore`, and have every application
-adopt it (ruled, §7). Turnstone keeps only its own dressing, such as windows,
-lens spaces and participant runtime, as hooks. It adopts the pandect lifecycle
-and deletes its copy in its own plan. The reservoir source runs the lifecycle
-for every mere. Install the graph journal per session, so every move is
-recorded with its author.
+Move Turnstone's session lifecycle into pandect as product-neutral machinery,
+and have every application adopt it (ruled, §7). Turnstone keeps only its own
+dressing as hooks: windows, lens spaces, participant runtime, resident
+admissions and nested worlds. It adopts the pandect lifecycle and deletes its
+copy in its own plan. The reservoir source runs the lifecycle for every mere.
+Every session keeps Alembic's full structural log: graph mutations, plus view
+and projection changes, replayable for the Timeline and for undo (ruled, §7).
+
+**Shape** (ruled 2026-09-23 and 2026-09-24; §7 records each ruling):
+- **One schema over muniment.** A mere is one muniment store. Each session
+  lives at keys under `sessions/<id>/`:
+  - its manifest (pandect's `GraphSessionManifest`);
+  - the baseline snapshot its journal starts from;
+  - the latest checkpoint: graph, facets and the journal cursor they reflect;
+  - one key per journal entry;
+  - per application and view, the current view state and one key per entry of
+    its change stream.
+
+  Step 3 fixes the key spellings.
+- **The directory backend.** muniment gains a native directory backend.
+  - It stores each key as a file in Turnstone's layout (`graph.json`,
+    `facets.json`, `manifest.json`).
+  - It appends a log's per-entry keys as the lines of one file,
+    `journal.jsonl`.
+  - A small redo file keeps `Backend::apply` atomic across files. The batch is
+    written first, then applied, and replayed on open if a crash cut it short.
+
+  On redb and IndexedDB the same keys are rows. The per-entry journal form
+  lives in muniment beside `Journal`, so any journal can use it.
+- **The journal is the authority.** A session is its baseline plus its
+  journal, and replaying from the baseline is always correct. A checkpoint,
+  written in one batch, only makes loading cheap. The resident writes one when
+  the last application detaches from a session, and whenever 1,000 entries
+  have accrued since the last. The count is a setting, to be tuned by measured
+  replay cost.
+- **Two streams.** Graph mutations go to the journal. View changes go to each
+  view's own stream and are never merged into the journal (Alembic decision
+  #5). Each view entry records the journal cursor it was made at, so the
+  Timeline composes the two streams by cursor.
+- **Authors.** Every journal and view entry carries a structured author:
+  - its kind: person, rule, script or engine;
+  - its id and version;
+  - the application it came through.
+
+  The resident fills in the application from the admitted route and never
+  takes a client's word for it. The structured author replaces the kernel's
+  free string while nothing persists it yet.
+- **Recording per graph.** Each session's graph records its own mutations, as
+  the event-log plan proposed, instead of going through the per-thread hook.
+- **Undo.** Undo reverts the undoing author's own latest change by appending
+  its inverse under their name.
+  - Other authors' later edits stay, and nothing is truncated.
+  - The Timeline shows the undo.
+  - The inverse is derived by replaying the journal to just before the change,
+    so entries need not carry old values.
+  - "Restore from here" stays a separate, confirmable action on the same
+    mechanism.
+- **View state lives in the session**, per application and view. It holds
+  hidden relations, folds, camera, focus and layout strategy (pandect's
+  `ViewIntent`). It travels with forks and codicils, and the resident writes it
+  for the application.
+- **Lifecycle.** Mint, list, open, fork, trash and restore:
+  - opening a session is the switch;
+  - a fork is taken either at a journal cursor or as a component tear-out
+    (Turnstone's). Either way it records its parent and the cursor it left at,
+    and its journal starts at the fork point;
+  - trash marks the manifest with who trashed the session and when. Its keys
+    stay where they are and the live list skips it;
+  - restore clears the mark. Emptying the trash is a separate, deliberate
+    delete.
+- **`GraphSession`.** pandect gains `GraphSession`, in `pandect::graph_session`.
+  It holds one session's graph, facets, journal, view states and revision
+  counter, opened and persisted over any muniment backend. Graphshell's
+  `MereHost` and Cleromancy's host wrap it. Graphshell's projection stays in
+  Graphshell (ruled, §7).
+
+**Steps, in order:**
+1. muniment: the per-entry journal form over any backend, then the directory
+   backend with its redo file.
+2. graph-kernel: per-graph recording, the structured author, and the inverse of
+   a captured delta against the graph it was applied to.
+3. pandect: the session schema, `GraphSession`, and the lifecycle over a mere's
+   store.
+4. djinn:
+   - open a mere by id on its own route;
+   - list its sessions, with mint, open, fork, trash and restore as intents;
+   - attach to a session;
+   - apply edits and view changes with the route's application as author;
+   - ring a revision bell for every attached session.
+5. Graphshell: `MereHost` on `GraphSession`, reading its stored slot once into
+   the schema.
+
+Turnstone adopts in its own plan, and Cleromancy in its C1.
 
 **Done when:**
-- two applications attached to one session each see the other's edits through
-  revision bells, with no stale copies;
-- replaying a session's journal reproduces its graph;
-- a fork is an independent session whose journal starts from the fork point;
-- trash removes a session from the mere's manifest set;
-- every journal entry names the person, rule, script or engine that made it.
+- two applications, running as two processes attached through djinn, each see
+  the other's edits to one session through revision bells, with no stale
+  copies;
+- replaying a session's journal from its baseline reproduces its graph, and
+  loading the latest checkpoint plus the journal tail gives the same graph;
+- the journal and view streams survive a restart, and a crash inside a batch
+  leaves all of the batch or none of it;
+- every journal and view entry names its author and the application it came
+  through, with the application supplied by the resident;
+- undo reverts the author's own latest change and leaves another author's later
+  edit in place;
+- a fork is an independent session whose journal starts from the fork point and
+  records its parent and cursor;
+- trash removes a session from the mere's live set, and restore brings it back;
+- a session can be scrubbed: the graph at any journal cursor, and each view's
+  state at that cursor;
+- Graphshell's reference host runs on `GraphSession`.
 
 ### V2b. The mere view
 
@@ -257,8 +417,10 @@ A standalone application embeds the resident library when no daemon is running.
   domain authority is composed into the resident, as Knot's was in R3.
   Cleromancy's is the next (ruled 2026-09-23).
 - Nothing here merges distinct network identities (resident invariant 7).
-- No new persistence format: sessions, the journal and codicils are the
-  existing pandect, muniment and Eidetic forms.
+- No persistence format beyond the ruled ones. Sessions and their logs persist
+  through muniment, and the directory backend lays them out as Turnstone's
+  files plus one append-only file per log (ruled 2026-09-24, §7). Codicils are
+  Eidetic's.
 - The shared root's identity rules stay as they are; only meres move.
 
 ## 6. Verification wall
@@ -267,7 +429,7 @@ Per phase, as the done-conditions state. Each receipt names the Mere revision
 it measured. Two-process receipts use real processes, not an in-memory
 composition presented as two.
 
-## 7. Decisions (ruled 2026-09-23)
+## 7. Decisions (ruled 2026-09-23 and 2026-09-24)
 
 1. **Where the reservoir lives on disk.** Under the shared root, per persona:
    `<shared root>/personas/<persona>/reservoir/`.
@@ -284,6 +446,49 @@ composition presented as two.
    - Graphshell's surface is the view that applications embed;
    - it is a Cambium component, built in this plan beside V2 (V2b);
    - it serves every application.
+
+V2's rulings. Items 6 to 8 were ruled on 2026-09-23 and the rest on
+2026-09-24. Where Mark picked an offered option, the option is named:
+
+6. **How a mere's sessions are stored.** "Turnstone's layout", over one redb
+   per mere: per-session files that stay hand-inspectable, so Turnstone's
+   adoption is a path change rather than a format migration.
+7. **How much the log records.** "Full Alembic log": graph mutations plus view
+   and projection changes, replayable for the Timeline and undo. The
+   alternatives were the graph journal with checkpoints alone, or the journal
+   kept in memory. View changes stay a parallel stream, per Alembic decision
+   #5.
+8. **What moves into pandect from `MereHost`.** "Graph + persistence core": the
+   graph, its facets, open and persist over a muniment backend, and the revision
+   counter. Graphshell's projection stays in Graphshell.
+9. **How the journal is written.** "Append-only file": one attributed entry per
+   line of `journal.jsonl`, appended as recorded, with the writer in muniment
+   beside `Journal`. This relaxes §5's rule on new formats by this one file
+   form.
+10. **How an entry names its author.** "Structured record": kind (person,
+    rule, script or engine), id, version, and the application it came through.
+    The resident supplies the application.
+11. **What undo does when two applications edit one session.** "Own last
+    change": undo appends the inverse of the undoing author's own latest
+    change, under their name.
+12. **Where an application's view state lives.** "In the session", per
+    application and view, travelling with forks and codicils.
+13. **How the core persists.** Asked to choose between a two-store port, a
+    directory backend that left the journal outside muniment, and IO in each
+    host, Mark answered "There is no unification to be had?". There is:
+    - one session schema over muniment's `Backend`, with the journal one entry
+      per key, as stickleback already stores its logs;
+    - a directory backend that lays those keys out as Turnstone's files and
+      appends each log to one file.
+
+    He chose "Directory backend" over one redb per mere, which would have
+    reversed item 6.
+14. **Trash.** "Manifest flag": trash marks the manifest, and the session's
+    keys stay in place.
+15. **The core's name.** `GraphSession`, pairing with `GraphSessionManifest`.
+16. **Checkpoints.** "Detach + every 1,000": when the last application
+    detaches from a session, and every 1,000 journal entries. The count is a
+    setting.
 
 ## 8. Progress
 
@@ -344,3 +549,16 @@ composition presented as two.
     `divination` through the admitted route, and the parent's next open finds
     it.
   V1 is complete. Opening a mere's own route by id moves to V2, with sessions.
+- 2026-09-24: V1 rebased onto `c1e7ad7f` and landed on main.
+  - Main had renamed `mere_resident` to `distillery::lifecycle`. weave's merge
+    spliced the file header into `ports/djinn/src/resident.rs`'s imports, and
+    the imports were repaired inside the commit that introduced them.
+  - Re-verified: pandect 284 of 284, djinn 78 of 78 library tests plus every
+    integration suite (the two-process receipt included), and
+    `cargo check -p djinn --all-targets --locked`.
+  - Main fast-forwarded to `0d1a83fb`. A peer session's push of
+    `c1e7ad7f..5364dfa0` carried V1 to origin with its hashes unchanged.
+- 2026-09-24: V2 assessed and ruled. The findings are in §2, the rulings are
+  §7 items 6 to 16, and V2's phase text above is rewritten to match. V2
+  continues on branch `reservoir-v2` in `worktrees/mere-reservoir`, from
+  `bb709523`. No V2 code yet.

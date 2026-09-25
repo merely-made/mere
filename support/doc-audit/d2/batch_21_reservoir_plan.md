@@ -2,14 +2,16 @@
 
 | doc | disposition | status accurate | claims | holds | stale | unverifiable |
 |---|---|---:|---:|---:|---:|---:|
-| mere_docs/implementation_strategy/2026-09-23_reservoir_plan.md | current | yes | 25 | 25 | 0 | 0 |
-| **Totals** |  |  | **25** | **25** | **0** | **0** |
+| mere_docs/implementation_strategy/2026-09-23_reservoir_plan.md | current | yes | 40 | 40 | 0 | 0 |
+| **Totals** |  |  | **40** | **40** | **0** | **0** |
 
-**Totals: 1 doc, 25 claims checked (25 holds, 0 stale, 0 unverifiable), 0 contradictions.**
+**Totals: 1 doc, 40 claims checked (40 holds, 0 stale, 0 unverifiable), 0 contradictions.**
 
 Audit base: Mere `03c05dbd` (2026-09-23), with this pass's documentation edits
 in the working tree. Turnstone, Knot and Cleromancy sources were read from the
-local checkouts on the same day. `archive_docs/` is excluded.
+local checkouts on the same day. `archive_docs/` is excluded. The V2 findings
+added on 2026-09-24 were checked against Mere `bb709523` and the same
+checkouts that day.
 
 This batch exists because the plan is new. It implements the ambiance design's
 rulings. The 2026-09-23 rulings it quotes are recorded first in that design
@@ -18,8 +20,8 @@ document and are not counted again here.
 ## mere_docs/implementation_strategy/2026-09-23_reservoir_plan.md
 
 - disposition: current
-- status line: "Status: in progress. V1 is complete on branch reservoir-v1; V2 is next." — accurate: yes
-- claims checked: 25 — holds: 25, stale: 0, unverifiable: 0
+- status line: "Status: in progress. V1 is complete and on main … V2's shape was ruled on 2026-09-23 and 2026-09-24 (§7). Its first step, in muniment, is next." — accurate: yes
+- claims checked: 40 — holds: 40, stale: 0, unverifiable: 0
 
 ### Stale claims
 
@@ -82,3 +84,38 @@ The claims checked:
   rulings, §9 the per-mere, per-app ambient opt-in, and §6 clones travelling as
   codicils.
 - **The related-document links**, 1 claim: all resolve.
+
+The V2 findings (§2, added 2026-09-24), 15 claims:
+
+- **Graph journal and muniment**, 5 claims:
+  - `AttributedDelta`'s author string and its quoted meanings
+    (`crates/graph/graph-kernel/src/graph/journal.rs`);
+  - no caller of `GraphJournal::save`, `load` or `migrate_bare_log` outside
+    that file;
+  - muniment's founding granularity and its append-form roadmap
+    (`crates/eidetic/muniment/src/journal/persist.rs`);
+  - its four shipped backends, and `Backend::apply`'s atomicity quote
+    (`crates/eidetic/muniment/src/backend.rs`);
+  - stickleback's per-entry log keys (`crates/stickleback/src/store.rs`).
+- **Capture and undo**, 4 claims:
+  - the per-thread capture hook quote
+    (`crates/graph/graph-kernel/src/graph/capture.rs`);
+  - Turnstone installing it at boot;
+  - the event-log plan's per-`Graph` recording quote (E1);
+  - no graph diff or inverse in the kernel or pandect, found by a search for
+    diff, restore, invert and inverse functions whose only hit was
+    `ManifestStore::restore_from_trash`.
+- **Positions, view state and storage**, 4 claims:
+  - the save-time position quote
+    (`crates/system/pandect/src/arrangement_facets.rs`);
+  - `ViewIntent`'s fields and its `views/<frame>/<pane>.json` layout
+    (`crates/system/pandect/src/view_intent_store.rs`);
+  - `MereHost`'s one-slot document, Graphshell's IndexedDB use in
+    `ports/graphshell/src/web.rs` and memory in native receipts, and
+    Cleromancy's one-slot host;
+  - `session_graph_store::save` writing with plain `fs::write`.
+- **Earlier rulings**, 1 claim: Alembic decision #5's parallel stream, the
+  event-log plan's E4 quote, and the curation plan's ownership table and
+  "Restore from here" quote.
+- **Turnstone's fork**, 1 claim: `fork_session_from`'s component copy, facet
+  carry, `parent_session`, admissions and nested worlds.
