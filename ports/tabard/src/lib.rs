@@ -7,13 +7,16 @@
 //! Tabard owns portable theme artifacts: Tinct seeds in, typed design tokens
 //! and a Livery stylesheet out.
 //!
-//! The first slice intentionally exposes only Tinct's base palette. It has no
-//! host theme struct, icon policy, syntax palette, persistence, or Pelt
-//! preview. Those consumers can share the artifact once it is real instead of
-//! each inventing their own theme format.
+//! [`Theme`] derives Tinct's base palette and emits DTCG tokens, a Livery
+//! stylesheet and a Lagrange palette; Pelt previews it. The [`theme`] module
+//! holds the host theme model: `ThemeTokenSet`, its registry, seed derivation
+//! and custom modes. Icon policy, the syntax palette and persistence are not
+//! here yet.
 
 #![doc(html_no_source)]
 #![forbid(unsafe_code)]
+
+pub mod theme;
 
 use std::collections::BTreeMap;
 

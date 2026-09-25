@@ -20,7 +20,6 @@ mod layout;
 mod physics;
 pub mod physics_config;
 mod registry;
-mod theme;
 
 pub use layout::LayoutMode;
 #[allow(unused_imports)]
@@ -34,7 +33,7 @@ pub use registry::{
     GlyphAnchor, GlyphOverlay, LENS_ID_DEFAULT, LENS_ID_SEMANTIC_OVERLAY, LensOverlayDescriptor,
     LensRegistry,
 };
-pub use theme::{
-    THEME_ID_DARK, THEME_ID_DEFAULT, THEME_ID_LIGHT, ThemeData, ThemeResolution,
-    deserialize_optional_theme_data, resolve_theme_data, theme_data_id,
+pub use tabard::theme::data::{
+    ThemeData, ThemeResolution, deserialize_optional_theme_data, resolve_theme_data, theme_data_id,
 };
+pub use tabard::theme::registry::{THEME_ID_DARK, THEME_ID_DEFAULT, THEME_ID_LIGHT};

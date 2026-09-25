@@ -62,7 +62,7 @@ fn registry_lists_built_ins_in_order() {
 
 #[test]
 fn user_theme_crud_fork_rename_remove_add() {
-    use tincture::{Seeds, Srgb};
+    use tinct::{Seeds, Srgb};
 
     let mut reg = ThemeRegistry::default();
     let builtins = reg.list().len();
@@ -115,8 +115,8 @@ fn user_theme_crud_fork_rename_remove_add() {
 
 #[test]
 fn locked_harmony_rotates_accents_to_primary_plus_offset_and_validates() {
-    use tincture::oklch::Oklch;
-    use tincture::{Seeds, Srgb};
+    use tinct::oklch::Oklch;
+    use tinct::{Seeds, Srgb};
     // Saturated seeds so OKLCH hue is well-defined (low-chroma greys have no hue).
     let def = ThemeDef {
         id: "user:harmony".into(),
