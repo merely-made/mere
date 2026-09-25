@@ -8,9 +8,9 @@ shape was ruled on 2026-09-23 and 2026-09-24 (§7). Steps 1 to 3
 (muniment, graph-kernel, pandect) landed on 2026-09-24 and reached origin on
 2026-09-25; step 3b, undo with exact replay, landed on 2026-09-25 and reached
 origin the same day. Step 4, `MereHost` on `GraphSession` in Graphshell, landed
-and reached origin on 2026-09-25. Its browser runtime is unproven: updating
-`graphshell-web`'s genet and netrender and a browser receipt come next (§7
-item 29), then step 5, djinn's routes.
+and reached origin on 2026-09-25, and a browser receipt the same day shows it
+running in Chromium over IndexedDB (§7 item 29); the receipt's scenario verdicts
+await a headed run. Step 5, djinn's routes, is next.
 **Scope:** give each data domain one mere, and make every mere of an identity
 openable by any of that identity's applications. The meres are held by the
 device resident, with sessions, a graph journal and an Eidetic archive.
@@ -928,4 +928,26 @@ V2's rulings. Items 6 to 8 were ruled on 2026-09-23 and the rest on
   `5621ca05768`, re-verified with `--locked`, and pushed with Mark's approval.
   The gate ran on `6a206411`; main then moved one commit (`e8f83f89`, three
   cambium files), and `check --workspace --all-targets --locked` passed again
-  on it. The gate, all `--locked`: `check --workspace --all-targets`; mere-kernel 303 of 303; pandect 301 of 301; graphshell's lib tests with `personal-sync` 295 of 296, the one failure being `distillery_w1`'s CRLF artifact; graphshell's every target with all features; pandect, the kernel and Graphshell's browser cone for `wasm32-unknown-unknown`; pandect for `wasm32-wasip2`.
+  on it. The gate, all `--locked`:
+  - `check --workspace --all-targets`;
+  - mere-kernel 303 of 303 and pandect 301 of 301;
+  - graphshell's lib tests with `personal-sync` 295 of 296, the one failure
+    being `distillery_w1`'s CRLF artifact;
+  - graphshell's every target with all features;
+  - pandect, the kernel and Graphshell's browser cone for
+    `wasm32-unknown-unknown`, and pandect for `wasm32-wasip2`.
+- 2026-09-25: `graphshell-web` builds again, and step 4 runs in a browser (§7
+  item 29).
+  - Its genet pins follow the workspace to `5621ca05768`, netrender to
+    `aba7d837` and `genet-scripted-dom` to `=0.1.2`, and the dead
+    `ipc-channel` row goes. No source change was needed.
+  - In the in-app Chromium, over IndexedDB, as the receipt
+    `ports/graphshell/docs/2026-09-25_reservoir_step4_browser_session_receipt.md`
+    records: a fresh origin seeds one session of 92 journal entries and 12
+    changes, all the persona's via `graphshell`, and reopens it unchanged with
+    a new epoch. An origin holding only the old slot reads it once into a
+    session's baseline, leaves the slot byte-identical, continues its epoch,
+    and does not read it again after the slot is rewritten.
+  - The receipt's three scenarios gave no verdict: the pane was hidden, so the
+    frame pump never ticked. The facts were read from the DOM and IndexedDB
+    directly.
