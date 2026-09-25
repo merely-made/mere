@@ -10,7 +10,9 @@ shape was ruled on 2026-09-23 and 2026-09-24 (§7). Steps 1 to 3
 origin the same day. Step 4, `MereHost` on `GraphSession` in Graphshell, landed
 and reached origin on 2026-09-25, and a browser receipt the same day shows it
 running in Chromium over IndexedDB (§7 item 29); the receipt's scenario verdicts
-await a headed run. Step 5, djinn's routes, is next.
+await a headed run. Step 5, djinn's routes, landed on 2026-09-25 on the
+`reservoir-v2` branch with its two-process receipt, meeting V2's done-conditions
+(§8); it is not yet on origin. V2b, the mere view, is next.
 **Scope:** give each data domain one mere, and make every mere of an identity
 openable by any of that identity's applications. The meres are held by the
 device resident, with sessions, a graph journal and an Eidetic archive.
@@ -1051,4 +1053,41 @@ V2's rulings. Items 6 to 8 were ruled on 2026-09-23 and the rest on
     artifact). One full graphshell run also failed
     `carrier::tests::p2panda_murm_grant_is_refused_before_projection_bytes`,
     which passed three times alone and in the next full run.
+- 2026-09-25: the two-process receipt, `ports/djinn/tests/mere_two_process.rs`.
+  The parent serves djinn's door with the reservoir route and the mere routes
+  over one catalog, and ensures `divination`. Two children, this test binary
+  re-run, attach through the door on `mere/divination`:
+  - the Knot editor, attached first, hears Turnstone's edit at revision 2,
+    sees the node and adds its own;
+  - Turnstone hears that at revision 3 and sees both nodes, with no stale
+    copy;
+  - the stored changes name both applications.
+
+  djinn's tests pass: 80 of 80 in the library, and its integration tests.
+- 2026-09-25: V2's done-conditions, with their evidence.
+  - Two processes through djinn, each seeing the other's edits by bell with no
+    stale copy: the receipt above.
+  - Replay from the baseline, and the checkpoint plus the tail, give the same
+    graph: pandect's
+    `a_checkpoint_and_its_tail_load_the_same_graph_as_the_baseline_and_journal`,
+    which compares whole graphs, facets included.
+  - The streams survive a restart, and a batch lands whole or not at all:
+    pandect's reopen tests, and muniment's directory backend tests (step 1).
+  - Every entry names its author and the application, supplied by the
+    resident: the door names the admitted application (step 5), and the
+    receipt reads both from the stored changes.
+  - Undo reverts the author's own latest change and leaves another's later
+    edit: pandect's undo tests, and djinn's
+    `two_applications_edit_one_session_and_hear_each_other`.
+  - A fork is independent, starts from its fork point, and records its parent
+    and cursor: pandect's
+    `a_fork_at_a_cursor_starts_from_the_parent_there_and_diverges`, and
+    djinn's `the_sessions_projection_runs_the_lifecycle`.
+  - Trash leaves the live set and restore brings the session back: pandect's
+    `trash_marks_the_manifest_and_restore_clears_it`, and the same djinn test.
+  - A session can be scrubbed, graph and views by journal cursor: pandect's
+    `graph_at` and `view_at`, tested in
+    `a_view_keeps_its_own_stream_scrubbable_by_journal_cursor`.
+  - Graphshell's reference host runs on `GraphSession`: step 4, and its
+    browser receipt.
 
