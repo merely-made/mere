@@ -666,6 +666,17 @@ V2's rulings. Items 6 to 8 were ruled on 2026-09-23 and the rest on
     wins. The alternative refused an edit made against an older revision.
     The session item's intents still check the epoch, which names another
     session, not the revision.
+33. **Lifecycle steps from an older list** (2026-09-25). The sessions
+    projection's intents targeted a card by its place in the list, and step 5
+    refused them as stale once the list had moved. Mark chose "Name the
+    session by id": attach, fork, trash and restore carry the session's id in
+    the payload, and every lifecycle intent, mint included, is taken at any
+    revision of the list, as graph edits are (item 32). A step lands only if
+    the named session's card offers it as the session stands now, so trash on
+    a session already in the trash, restore on a live one, and attach to the
+    session the connection holds are refused, as the cards refused them
+    before. The epoch is still checked. The alternative kept the stale
+    refusal, with the application re-reading the list and retrying.
 
 ## 8. Progress
 
@@ -1090,4 +1101,11 @@ V2's rulings. Items 6 to 8 were ruled on 2026-09-23 and the rest on
     `a_view_keeps_its_own_stream_scrubbable_by_journal_cursor`.
   - Graphshell's reference host runs on `GraphSession`: step 4, and its
     browser receipt.
-
+- 2026-09-25: lifecycle steps name their session (§7 item 33). The sessions
+  projection's intents carry the session's id and are taken at any revision
+  of the list; a step lands when the named session's card offers it as the
+  session stands now. This replaces the stale-revision refusal in the entry
+  for djinn's routes above. djinn's `the_sessions_projection_runs_the_lifecycle`
+  now attaches from a list the mint has moved past, and checks each refusal's
+  reason: a step the session's card no longer offers, a session the mere does
+  not hold, and a step naming no session.
