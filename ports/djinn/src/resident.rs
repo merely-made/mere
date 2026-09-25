@@ -15,10 +15,10 @@ use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
 use castellan::resident::CastellanResident;
+use distillery::lifecycle::{CloseAction, CloseFuture, close_all};
 use graphshell::native::endpoint_catalog::{
     ResidentEndpointCatalog, ResidentEndpointCatalogError, ResidentEndpointRoute,
 };
-use distillery::lifecycle::{CloseAction, CloseFuture, close_all};
 use personae::bootstrap::Unlock;
 use personae::{IdentityProvider, ProfileId};
 use transport::BlobScope;
@@ -27,6 +27,7 @@ use zeroize::Zeroize;
 use crate::resident_blobs::ResidentBlobCustody;
 use crate::resident_distillery::ResidentDistillery;
 use crate::resident_knot::ResidentKnot;
+use crate::resident_mere::MereRoutes;
 use crate::resident_reservoir::{ReservoirLane, ResidentReservoir};
 use crate::resident_site::{PublishedSiteEndpoint, PublishedSiteService};
 use crate::settings::{OwnerSettings, ReservoirLaneSettings};
@@ -156,15 +157,17 @@ impl DjinnResident {
         &self.reservoir
     }
 
-    /// Register the reservoir route when the lane is open.
+    /// Register the reservoir route when the lane is open, serving each mere
+    /// it ensures through `routes`.
     pub fn register_reservoir_route(
         &self,
         catalog: &mut ResidentEndpointCatalog,
+        routes: Option<MereRoutes>,
     ) -> Result<Option<ResidentEndpointRoute>, ResidentEndpointCatalogError> {
         let Some(reservoir) = self.reservoir.reservoir() else {
             return Ok(None);
         };
-        reservoir.register(catalog)?;
+        reservoir.register(catalog, routes)?;
         Ok(Some(ResidentReservoir::route()))
     }
 

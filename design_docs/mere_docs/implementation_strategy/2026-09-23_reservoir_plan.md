@@ -1019,3 +1019,36 @@ V2's rulings. Items 6 to 8 were ruled on 2026-09-23 and the rest on
   actions in order, and Graphshell's shows only its nodes. graphshell's lib
   tests with `personal-sync` 300 of 301 (the CRLF artifact); the browser cone
   and djinn check.
+- 2026-09-25: djinn serves each mere on its own route (§7 items 20 to 22 and
+  30 to 32).
+  - `resident_mere::MereRoutes` serves `mere/<domain>`. The lane serves the
+    meres the reservoir holds at startup, and the reservoir route serves each
+    one it ensures; each route is registered in the door's catalog and granted
+    to turnstone and knot-editor while the door serves.
+  - An admitted connection attaches to the live session changed last, minting
+    one if there is none, and sees two projections: the mere's sessions, with
+    mint, attach, fork, trash and restore, and the attached session's graph,
+    served by `MereHost` in resident mode.
+  - Applications attached to one session share one host, so an edit from one
+    rings the others, and none is rung for its own change. Edits, undo, redo
+    and view changes come through the session item as the admitted
+    application's, and are stored at once.
+  - The session item now keeps instance 0, ahead of the nodes, so an edit made
+    from an older snapshot, which is accepted by id, still names it. The first
+    test found this.
+  - pandect re-exports `Author`, `AuthorKind` and `CapturedDelta`.
+
+  Tests:
+  - two applications on one session: each is granted the route as the mere is
+    ensured, hears the other's edit and is not rung for its own, edits by id
+    from an older revision, and undoes only its own change; the stored changes
+    name each application;
+  - the lifecycle through the sessions projection: fork, mint, a stale
+    revision refused, attach to the fork, which starts from the parent and
+    diverges from it, then trash and restore;
+  - djinn's lib tests 80 of 80, with its integration tests; pandect 301 of
+    301; the browser cone checks; graphshell's lib tests 300 of 301 (the CRLF
+    artifact). One full graphshell run also failed
+    `carrier::tests::p2panda_murm_grant_is_refused_before_projection_bytes`,
+    which passed three times alone and in the next full run.
+
