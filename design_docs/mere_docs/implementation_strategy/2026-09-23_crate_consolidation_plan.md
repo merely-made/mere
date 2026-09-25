@@ -333,3 +333,9 @@ crate inventory at the Code root.
   read. tabard 43, pelt-desktop 63 (it builds without default features and
   with each preview and smolweb feature), pandect 285, and the portable gate
   passes. Next: T5.
+- 2026-09-24. T5 landed (`8167d196`): tabard's DTCG document gains a
+  `color.syntax` group and its stylesheet the `--tabard-syntax-*` properties,
+  one per tinct `SyntaxRole`, keyed by the new `SyntaxRole::name`. With T2's
+  move and T4's choice file, tabard also owns the theme-, mode- and
+  choice-file formats. tabard 44, tinct 15, Pelt builds with `tabard-preview`,
+  and the portable gate passes. C2a, tabard's fill, is complete.
