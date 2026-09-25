@@ -9,9 +9,10 @@
 //!
 //! [`Theme`] derives Tinct's base palette and emits DTCG tokens, a Livery
 //! stylesheet and a Lagrange palette; Pelt previews it. The [`theme`] module
-//! holds the host theme model: `ThemeTokenSet`, its registry, seed derivation
-//! and custom modes. The [`smolweb`] module holds the smolweb document
-//! palettes. Icon policy, the syntax palette and persistence are not here yet.
+//! holds the host theme model: `ThemeTokenSet`, its registry, seed derivation,
+//! custom modes, and the user's theme choice with its stores. The [`smolweb`]
+//! module holds the smolweb document palettes. Icon policy and the syntax
+//! palette are not here yet.
 
 #![doc(html_no_source)]
 #![forbid(unsafe_code)]

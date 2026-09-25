@@ -6,32 +6,23 @@
 
 //! Pelt's application-owned appearance setting.
 //!
-//! This is deliberately a small host seam.  The store is injected so callers
+//! This is deliberately a small host seam. The theme choice and its stores
+//! are tabard's (`tabard::theme::choice`); the store is injected so callers
 //! can choose durable storage (or an in-memory store in tests) without making
 //! the settings projection depend on a particular application or document
-//! engine.
-
-use std::fs;
-use std::io;
-use std::io::Write;
-use std::path::{Path, PathBuf};
-use std::sync::atomic::{AtomicU64, Ordering};
-
-#[cfg(target_os = "windows")]
-use std::os::windows::ffi::OsStrExt;
-#[cfg(target_os = "windows")]
-use windows_sys::Win32::Storage::FileSystem::{REPLACEFILE_WRITE_THROUGH, ReplaceFileW};
+//! engine. Pelt keeps how it presents the choice: its Dark and Light options,
+//! their labels, classes and action ids.
 
 use mere_surface_api::settings::{
     SettingControl, SettingMovement, SettingMutability, SettingOption, SettingScope,
     SettingSecurity, SettingSpec, SettingValue, SettingsError, SettingsProvider,
 };
+use tabard::theme::choice::{ThemeChoice, ThemeChoiceStore};
+use tabard::theme::registry::{Mode, THEME_ID_DARK, THEME_ID_LIGHT};
 use workbench::SettingsRef;
 
 pub const APPEARANCE_REFERENCE: &str = "pelt/appearance";
 pub const CHROME_THEME_SETTING: &str = "chrome.theme";
-
-static TEMPORARY_FILE_SEQUENCE: AtomicU64 = AtomicU64::new(0);
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum AppearanceTheme {
@@ -75,162 +66,25 @@ impl AppearanceTheme {
             _ => None,
         }
     }
-}
 
-pub trait AppearanceStore {
-    fn theme(&self) -> AppearanceTheme;
-    fn set_theme(&mut self, theme: AppearanceTheme) -> io::Result<()>;
-
-    /// Whether this store survives a Pelt process restart.
-    fn is_persistent(&self) -> bool {
-        false
-    }
-}
-
-impl<T: AppearanceStore + ?Sized> AppearanceStore for Box<T> {
-    fn theme(&self) -> AppearanceTheme {
-        (**self).theme()
-    }
-
-    fn set_theme(&mut self, theme: AppearanceTheme) -> io::Result<()> {
-        (**self).set_theme(theme)
-    }
-
-    fn is_persistent(&self) -> bool {
-        (**self).is_persistent()
-    }
-}
-
-#[derive(Clone, Debug, Eq, PartialEq)]
-pub struct InMemoryAppearanceStore {
-    theme: AppearanceTheme,
-}
-
-impl InMemoryAppearanceStore {
-    pub fn new(theme: AppearanceTheme) -> Self {
-        Self { theme }
-    }
-}
-
-impl Default for InMemoryAppearanceStore {
-    fn default() -> Self {
-        Self::new(AppearanceTheme::Dark)
-    }
-}
-
-impl AppearanceStore for InMemoryAppearanceStore {
-    fn theme(&self) -> AppearanceTheme {
-        self.theme
-    }
-
-    fn set_theme(&mut self, theme: AppearanceTheme) -> io::Result<()> {
-        self.theme = theme;
-        Ok(())
-    }
-}
-
-#[derive(Clone, Debug, Eq, PartialEq)]
-pub struct FileAppearanceStore {
-    path: PathBuf,
-    theme: AppearanceTheme,
-}
-
-impl FileAppearanceStore {
-    /// Loads a theme from `path`. A missing or malformed value uses the safe
-    /// dark default; other I/O failures stay visible to the caller.
-    pub fn load(path: impl Into<PathBuf>) -> io::Result<Self> {
-        let path = path.into();
-        let theme = match fs::read_to_string(&path) {
-            Ok(contents) => AppearanceTheme::parse(&contents).unwrap_or(AppearanceTheme::Dark),
-            Err(error)
-                if matches!(
-                    error.kind(),
-                    io::ErrorKind::NotFound | io::ErrorKind::InvalidData
-                ) =>
-            {
-                AppearanceTheme::Dark
-            },
-            Err(error) => return Err(error),
-        };
-        Ok(Self { path, theme })
-    }
-
-    pub fn path(&self) -> &Path {
-        &self.path
-    }
-}
-
-impl AppearanceStore for FileAppearanceStore {
-    fn theme(&self) -> AppearanceTheme {
-        self.theme
-    }
-
-    fn set_theme(&mut self, theme: AppearanceTheme) -> io::Result<()> {
-        let temporary = temporary_path(&self.path);
-        let write_result = (|| {
-            let mut file = fs::File::create(&temporary)?;
-            file.write_all(format!("{}\n", theme.as_str()).as_bytes())?;
-            file.sync_all()?;
-            drop(file);
-            replace_file(&temporary, &self.path)
-        })();
-        if let Err(error) = write_result {
-            let _ = fs::remove_file(&temporary);
-            return Err(error);
+    /// The theme choice this option stores.
+    pub fn choice(self) -> ThemeChoice {
+        match self {
+            Self::Dark => ThemeChoice::new(THEME_ID_DARK, Some(Mode::Dark)),
+            Self::Light => ThemeChoice::new(THEME_ID_LIGHT, Some(Mode::Light)),
         }
-        self.theme = theme;
-        Ok(())
     }
 
-    fn is_persistent(&self) -> bool {
-        true
+    /// How a stored choice presents: light modes as Light, other modes as
+    /// Dark, and a choice without a mode by its theme.
+    pub fn of(choice: &ThemeChoice) -> Self {
+        match &choice.theme_mode {
+            Some(Mode::Light | Mode::HcLight) => Self::Light,
+            Some(_) => Self::Dark,
+            None if choice.theme_id == THEME_ID_LIGHT => Self::Light,
+            None => Self::Dark,
+        }
     }
-}
-
-fn temporary_path(path: &Path) -> PathBuf {
-    let sequence = TEMPORARY_FILE_SEQUENCE.fetch_add(1, Ordering::Relaxed);
-    path.with_extension(format!(
-        "pelt-appearance-{}-{sequence}.tmp",
-        std::process::id()
-    ))
-}
-
-#[cfg(target_os = "windows")]
-fn replace_file(temporary: &Path, destination: &Path) -> io::Result<()> {
-    if !destination.exists() {
-        return fs::rename(temporary, destination);
-    }
-    let temporary = temporary
-        .as_os_str()
-        .encode_wide()
-        .chain(Some(0))
-        .collect::<Vec<_>>();
-    let destination = destination
-        .as_os_str()
-        .encode_wide()
-        .chain(Some(0))
-        .collect::<Vec<_>>();
-    // `ReplaceFileW` keeps the old complete file intact until the replacement
-    // has succeeded, unlike delete-then-rename on Windows.
-    let replaced = unsafe {
-        ReplaceFileW(
-            destination.as_ptr(),
-            temporary.as_ptr(),
-            std::ptr::null(),
-            REPLACEFILE_WRITE_THROUGH,
-            std::ptr::null(),
-            std::ptr::null(),
-        )
-    };
-    if replaced == 0 {
-        return Err(io::Error::last_os_error());
-    }
-    Ok(())
-}
-
-#[cfg(not(target_os = "windows"))]
-fn replace_file(temporary: &Path, destination: &Path) -> io::Result<()> {
-    fs::rename(temporary, destination)
 }
 
 pub struct AppearanceSettingsProvider<S> {
@@ -251,7 +105,7 @@ impl<S> AppearanceSettingsProvider<S> {
     }
 }
 
-impl<S: AppearanceStore> SettingsProvider for AppearanceSettingsProvider<S> {
+impl<S: ThemeChoiceStore> SettingsProvider for AppearanceSettingsProvider<S> {
     fn describe(&self, reference: &SettingsRef) -> Result<Vec<SettingSpec>, SettingsError> {
         if reference.0 != APPEARANCE_REFERENCE {
             return Err(SettingsError::UnsupportedReference(reference.clone()));
@@ -275,7 +129,7 @@ impl<S: AppearanceStore> SettingsProvider for AppearanceSettingsProvider<S> {
                     },
                 ],
             },
-            value: SettingValue::Text(self.store.theme().as_str().into()),
+            value: SettingValue::Text(AppearanceTheme::of(self.store.choice()).as_str().into()),
         }])
     }
 
@@ -304,13 +158,15 @@ impl<S: AppearanceStore> SettingsProvider for AppearanceSettingsProvider<S> {
             });
         };
         self.store
-            .set_theme(theme)
+            .set_choice(theme.choice())
             .map_err(|error| SettingsError::Storage(error.to_string()))
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use tabard::theme::choice::InMemoryThemeChoiceStore;
+
     use super::*;
 
     fn reference() -> SettingsRef {
@@ -319,7 +175,7 @@ mod tests {
 
     #[test]
     fn provider_describes_live_local_theme_choice() {
-        let provider = AppearanceSettingsProvider::new(InMemoryAppearanceStore::default());
+        let provider = AppearanceSettingsProvider::new(InMemoryThemeChoiceStore::default());
         let spec = &provider.describe(&reference()).unwrap()[0];
         assert_eq!(spec.id, CHROME_THEME_SETTING);
         assert_eq!(spec.scope, SettingScope::Application);
@@ -346,7 +202,7 @@ mod tests {
 
     #[test]
     fn provider_rejects_unknown_refs_keys_types_and_values() {
-        let mut provider = AppearanceSettingsProvider::new(InMemoryAppearanceStore::default());
+        let mut provider = AppearanceSettingsProvider::new(InMemoryThemeChoiceStore::default());
         assert!(matches!(
             provider.describe(&SettingsRef("other".into())),
             Err(SettingsError::UnsupportedReference(_))
@@ -383,7 +239,7 @@ mod tests {
 
     #[test]
     fn in_memory_store_updates_live_value() {
-        let mut provider = AppearanceSettingsProvider::new(InMemoryAppearanceStore::default());
+        let mut provider = AppearanceSettingsProvider::new(InMemoryThemeChoiceStore::default());
         assert!(!provider.store().is_persistent());
         provider
             .apply(
@@ -392,47 +248,26 @@ mod tests {
                 SettingValue::Text("light".into()),
             )
             .unwrap();
-        assert_eq!(provider.store().theme(), AppearanceTheme::Light);
-    }
-
-    #[test]
-    fn file_store_defaults_missing_or_invalid_and_round_trips() {
-        let path = std::env::temp_dir().join(format!(
-            "pelt-appearance-{}-{}.theme",
-            std::process::id(),
-            TEMPORARY_FILE_SEQUENCE.fetch_add(1, Ordering::Relaxed)
-        ));
-        let _ = fs::remove_file(&path);
-        let mut store = FileAppearanceStore::load(&path).unwrap();
-        assert_eq!(store.theme(), AppearanceTheme::Dark);
-        assert!(store.is_persistent());
-        store.set_theme(AppearanceTheme::Light).unwrap();
+        assert_eq!(provider.store().choice(), &AppearanceTheme::Light.choice());
         assert_eq!(
-            FileAppearanceStore::load(&path).unwrap().theme(),
+            AppearanceTheme::of(provider.store().choice()),
             AppearanceTheme::Light
         );
-        store.set_theme(AppearanceTheme::Dark).unwrap();
-        assert_eq!(
-            FileAppearanceStore::load(&path).unwrap().theme(),
-            AppearanceTheme::Dark
-        );
-        fs::write(&path, "blue").unwrap();
-        assert_eq!(
-            FileAppearanceStore::load(&path).unwrap().theme(),
-            AppearanceTheme::Dark
-        );
-        let _ = fs::remove_file(path);
     }
 
     #[test]
-    fn file_store_surfaces_nonrecoverable_load_errors() {
-        let path = std::env::temp_dir().join(format!(
-            "pelt-appearance-directory-{}-{}",
-            std::process::id(),
-            TEMPORARY_FILE_SEQUENCE.fetch_add(1, Ordering::Relaxed)
-        ));
-        fs::create_dir(&path).unwrap();
-        assert!(FileAppearanceStore::load(&path).is_err());
-        fs::remove_dir(path).unwrap();
+    fn stored_choices_present_as_dark_or_light() {
+        let of = |id: &str, mode| AppearanceTheme::of(&ThemeChoice::new(id, mode));
+        assert_eq!(of("theme:default", Some(Mode::Dark)), AppearanceTheme::Dark);
+        assert_eq!(of("user:mine", Some(Mode::HcLight)), AppearanceTheme::Light);
+        assert_eq!(
+            of("user:mine", Some(Mode::Custom("solar".into()))),
+            AppearanceTheme::Dark
+        );
+        assert_eq!(of(THEME_ID_LIGHT, None), AppearanceTheme::Light);
+        assert_eq!(of("theme:default", None), AppearanceTheme::Dark);
+        for option in [AppearanceTheme::Dark, AppearanceTheme::Light] {
+            assert_eq!(AppearanceTheme::of(&option.choice()), option);
+        }
     }
 }

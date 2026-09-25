@@ -33,10 +33,10 @@ livery = [
 ]
 # Named developer receipt for applying a Tabard artifact to Pelt Chrome. This
 # stays optional so the generic shell has no Tabard runtime dependency.
-tabard-preview = ["livery", "dep:tabard", "dep:tinct"]
+tabard-preview = ["livery", "dep:tinct"]
 # Named developer receipt for mapping Tabard's portable palette onto the
 # already-owned Reader host palette. This does not persist a Pelt theme.
-tabard-reader-preview = ["livery", "reader", "dep:tabard", "dep:tinct"]
+tabard-reader-preview = ["livery", "reader", "dep:tinct"]
 # Shared fleece reader lane over the portable document canvas.
 reader = [
     "present", "dep:genet-documents", "dep:mere-document-lanes", "dep:inker",
@@ -140,7 +140,7 @@ accesskit = { workspace = true, optional = true }
 pelt-core = { workspace = true }
 # Tabard landed beside Pelt under `ports/`; it is a workspace member here, so
 # the former `../../tabard` relative path becomes a workspace path dep.
-tabard = { workspace = true, optional = true }
+tabard = { workspace = true }
 tinct = { workspace = true, optional = true }
 pollster = { version = "0.4", optional = true }
 raw-window-handle = { workspace = true, optional = true }
@@ -189,7 +189,6 @@ base64 = { workspace = true, optional = true }
 [target.'cfg(target_os = "windows")'.dependencies]
 windows-sys = { version = "0.61", features = [
     "Win32_Foundation",
-    "Win32_Storage_FileSystem",
     "Win32_System_Threading",
     "Win32_UI_Input_KeyboardAndMouse",
     "Win32_UI_WindowsAndMessaging",

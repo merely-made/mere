@@ -11673,6 +11673,7 @@ dependencies = [
  "serde",
  "serde_json",
  "servitor",
+ "tabard",
  "tempfile",
  "uuid",
 ]
