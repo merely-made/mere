@@ -724,18 +724,45 @@ impl OwnedLayout {
         (self.viewport_scroll != before).then_some(ScrollTarget::Document)
     }
 
-    /// Bring `node` into view on the vertical axis by moving one plane: the
-    /// nearest ancestor that scrolls vertically and has room to, otherwise the
-    /// document viewport, clamped to that plane's range. `None` when nothing
-    /// moved, which includes a node that is gone or does not paint.
+    /// Bring `node` into view on the vertical axis. The nearest plane that can
+    /// move (an ancestor that scrolls vertically and has room to, otherwise
+    /// the document viewport) moves by `align`; each plane outside it, out to
+    /// the viewport, then moves only as far as the node needs, so a node in a
+    /// scroller that is itself out of sight comes into view. Each plane is
+    /// clamped to its range. Returns the planes that moved, innermost first:
+    /// none for a node that is gone or does not paint.
     pub(crate) fn scroll_into_view<D: LayoutDom<NodeId = NodeId>>(
         &mut self,
         dom: &D,
         node: NodeId,
         align: ScrollAlign,
+    ) -> Vec<ScrollTarget> {
+        let mut moved = Vec::new();
+        // Before any walk: a retired node has no parent to ask for.
+        if self.painted_rect(dom, node).is_none() {
+            return moved;
+        }
+        let (mut from, mut align) = (node, align);
+        loop {
+            let container = self.vertical_scroll_container(dom, from);
+            moved.extend(self.scroll_plane(dom, node, container, align));
+            let Some((container, _)) = container else {
+                return moved;
+            };
+            (from, align) = (container, ScrollAlign::Nearest);
+        }
+    }
+
+    /// Move one plane, `container` or else the document viewport, so `node`
+    /// sits in it by `align`. `None` when the plane did not move.
+    fn scroll_plane<D: LayoutDom<NodeId = NodeId>>(
+        &mut self,
+        dom: &D,
+        node: NodeId,
+        container: Option<(NodeId, f32)>,
+        align: ScrollAlign,
     ) -> Option<ScrollTarget> {
         let (_, top, _, height) = self.painted_rect(dom, node)?;
-        let container = self.vertical_scroll_container(dom, node);
         let (area_top, area_height, current, range) = match container {
             Some((container, range)) => {
                 let (_, y, _, h) = self.painted_rect(dom, container)?;

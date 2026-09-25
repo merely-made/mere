@@ -51,6 +51,8 @@ fn block(id: &'static str, style: String) -> Child {
 /// | `#top`      | (0, 250, 100, 40), visible without scrolling           |
 /// | `#mid`      | (0, 600, 100, 40)                                      |
 /// | `#gone`     | (0, 800, 100, 40), until `removed`                     |
+/// | `#deep`     | (0, 1000, 200, 100), `overflow:auto` over 600px        |
+/// | `#deeper`   | 300px down inside it, 40px tall: laid out at y=1300    |
 /// | `#far`      | (0, 1200, 100, 40)                                     |
 /// | `#grows`    | (0, 1400), `overflow:auto` but as tall as its content  |
 /// | `#grown`    | 80px inside `#grows`                                   |
@@ -84,6 +86,26 @@ fn root(state: &App) -> Child {
         children.push((3, block("gone", place(0, 800, 100, 40))));
     }
     if !state.short {
+        children.push((
+            7,
+            Box::new(
+                el(
+                    "div",
+                    (
+                        el("div", ()).attr("style", "height:300px;"),
+                        el("div", ())
+                            .attr("id", "deeper")
+                            .attr("style", "height:40px;"),
+                        el("div", ()).attr("style", "height:260px;"),
+                    ),
+                )
+                .attr("id", "deep")
+                .attr(
+                    "style",
+                    format!("{}overflow:auto;", place(0, 1000, 200, 100)),
+                ),
+            ),
+        ));
         children.push((4, block("far", place(0, 1200, 100, 40))));
         children.push((
             5,
@@ -214,6 +236,30 @@ fn inside_a_nested_scroll_container_the_container_scrolls_not_the_window() {
     near(host.element_scroll_total(), 300.0, "the container's offset");
 }
 
+/// The container moves by the request's alignment, and the window then moves
+/// only as far as the element needs: `#deep` is itself below the fold, so the
+/// container alone would leave `#deeper` out of sight.
+#[test]
+fn a_container_below_the_fold_brings_the_window_along() {
+    let (mut host, queue) = harness();
+    let deep = node(&host, "deep");
+    let deeper = node(&host, "deeper");
+
+    request(&mut host, &queue, &[(deeper, ScrollAlign::Start)]);
+    near(host.element_scroll(deep).1, 300.0, "the container's offset");
+    near(
+        top(&host, deeper),
+        top(&host, deep),
+        "#deeper's top against the container's",
+    );
+    near(host.viewport_scroll().1, 640.0, "viewport offset");
+    near(
+        top(&host, deeper),
+        360.0,
+        "#deeper's bottom meets the window's",
+    );
+}
+
 /// Knot's preview pane is `overflow:auto` but grows to its content, so the
 /// window carries the offset. A request must pass over such a box.
 #[test]
@@ -265,10 +311,12 @@ fn the_offsets_survive_a_rebuild() {
     let (mut host, queue) = harness();
     let far = node(&host, "far");
     let inner = node(&host, "inner");
+    // `#inner` first: its container shows it without the window moving, and
+    // `#far` then moves the window alone, so both planes hold an offset.
     request(
         &mut host,
         &queue,
-        &[(far, ScrollAlign::Start), (inner, ScrollAlign::Start)],
+        &[(inner, ScrollAlign::Start), (far, ScrollAlign::Start)],
     );
     near(host.viewport_scroll().1, 1200.0, "viewport offset");
 

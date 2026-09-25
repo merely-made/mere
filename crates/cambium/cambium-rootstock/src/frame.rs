@@ -224,9 +224,7 @@ where
             let layout = self.s.layout.as_mut().expect("layout just ensured");
             let now = crate::Instant::now();
             for request in std::mem::take(&mut self.s.pending_scroll) {
-                if let Some(target) =
-                    layout.scroll_into_view(&*dom_ref, request.node, request.align)
-                {
+                for target in layout.scroll_into_view(&*dom_ref, request.node, request.align) {
                     self.s.scrollbar_fade.note(target, now);
                 }
             }
