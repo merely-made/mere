@@ -52,8 +52,9 @@ local state is removed.
    the repository.
 4. Each supported workspace passes its recorded check command on 1.98.1 from a
    redirect-free checkout, with no new unexplained unused-patch row. The host
-   default-feature gate is `cargo +1.98.1 check --workspace --locked`;
-   target-specific workspaces have explicit commands and prerequisites.
+   default-feature gate is `cargo +1.98.1 check --workspace --all-targets
+   --locked` (all targets since 2026-09-25); target-specific workspaces have
+   explicit commands and prerequisites.
 5. Every completed migration commit is published and its tested revision is
    recorded. Active checkouts may await integration; that is recorded separately.
 6. Local development resolves the intended sibling packages and leaves every
@@ -639,3 +640,10 @@ wrong source. Report to Mark; change nothing.
   woodshed, turnstone) is the Redshank session's, on this Mere head plus
   genet `532f1fadc53`, with knot-editor's two `=0.1.1` rows moving to
   `=0.1.2`.
+- 2026-09-25. The portable gate checks all targets. Without
+  `--all-targets` it never built test or example code, so cambium-nematic's
+  lib tests (broken since errand's `FeedEntry` gained podcast fields on
+  2026-09-04) and graphshell's (a `RelationKind` match missing
+  `OpenPredicate`) sat broken without failing it. Both are fixed (`4b33a963`,
+  `bc7121ae`), and `cargo check --workspace --all-targets --keep-going` now
+  fails nowhere. Mark ruled the change.
