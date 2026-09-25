@@ -34,6 +34,8 @@ use crate::engine_profile_store::PERSONAS_DIR;
 pub const RESERVOIR_DIR: &str = "reservoir";
 /// The reservoir index database inside [`RESERVOIR_DIR`].
 pub const RESERVOIR_DB_FILENAME: &str = "reservoir.redb";
+/// The directory under a reservoir that holds each mere's own store.
+pub const MERES_DIR: &str = "meres";
 /// The slot the index lives in.
 pub const RESERVOIR_INDEX_SLOT: &str = "pandect/reservoir/index/v1";
 /// Schema of the index document.
@@ -223,6 +225,30 @@ pub fn open_reservoir_backend(
     let path = dir.join(RESERVOIR_DB_FILENAME);
     muniment::RedbBackend::open(&path).map_err(|error| ReservoirError::Open {
         path,
+        reason: error.to_string(),
+    })
+}
+
+/// Where mere `mere` keeps its sessions: `<reservoir>/meres/<mere id>/`.
+pub fn mere_dir(shared_root: &Path, persona: PersonaId, mere: MereId) -> PathBuf {
+    reservoir_dir(shared_root, persona)
+        .join(MERES_DIR)
+        .join(mere.0.to_string())
+}
+
+/// Open mere `mere`'s store: a muniment directory backend whose keys are the
+/// session files ([`crate::graph_session`]). Only the reservoir's owner, who
+/// already holds [`open_reservoir_backend`]'s lock, should call this; the
+/// store takes its own lock too, so a second opener is refused at once.
+#[cfg(not(target_arch = "wasm32"))]
+pub fn open_mere_backend(
+    shared_root: &Path,
+    persona: PersonaId,
+    mere: MereId,
+) -> Result<muniment::DirectoryBackend, ReservoirError> {
+    let dir = mere_dir(shared_root, persona, mere);
+    muniment::DirectoryBackend::open(&dir).map_err(|error| ReservoirError::Open {
+        path: dir,
         reason: error.to_string(),
     })
 }
@@ -471,5 +497,30 @@ mod tests {
                 Some(5)
             );
         });
+    }
+
+    #[cfg(not(target_arch = "wasm32"))]
+    #[test]
+    fn a_mere_keeps_its_sessions_in_its_own_directory() {
+        use crate::graph_session::MereSessions;
+        use kernel::graph::Author;
+
+        let root = tempfile::tempdir().unwrap();
+        let mere = MereId::derive(persona(1), &domain("divination"));
+        let store = open_mere_backend(root.path(), persona(1), mere).unwrap();
+        assert!(
+            matches!(
+                open_mere_backend(root.path(), persona(1), mere),
+                Err(ReservoirError::Open { .. })
+            ),
+            "a mere's store has one owner"
+        );
+        let session = block_on(MereSessions::new(store).mint(Author::user(), None)).unwrap();
+        let manifest = mere_dir(root.path(), persona(1), mere)
+            .join("sessions")
+            .join(session.session_id.as_uuid().to_string())
+            .join("manifest.json");
+        assert!(manifest.is_file(), "{} exists", manifest.display());
+        assert!(manifest.starts_with(reservoir_dir(root.path(), persona(1)).join(MERES_DIR)));
     }
 }

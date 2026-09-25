@@ -96,6 +96,9 @@ pub mod scene_facets;
 // filesystem). Save redacts private fields by default; open thaws read-only.
 pub mod codicil_seal;
 pub mod graph_codicil;
+// A mere's sessions over one muniment store: the session schema, the live
+// session core and the lifecycle (reservoir plan V2).
+pub mod graph_session;
 // Producer-owned, content-addressed recipes for reopening a source at a
 // cursor with existing durable curation. Source resolution stays at the host.
 pub mod live_view;
@@ -175,6 +178,12 @@ pub use facet_store::{
     NodeFacetStore, NodeFacets, copy_node_facets, load_node_facets, node_facets_path,
     read_expiring_facet, save_node_facets,
 };
+#[cfg(not(target_arch = "wasm32"))]
+pub use graph_session::fork_component_graph;
+pub use graph_session::{
+    Applied, Change, ChangeKind, DEFAULT_CHECKPOINT_INTERVAL, GraphSession, MereSessions,
+    SESSIONS_PREFIX, SessionError, ViewEntry, ViewKey,
+};
 pub use identity::{StartupUnlockMode, auto_unlock_backend_available};
 pub use live_view::{
     LIVE_VIEW_RECORD_SCHEMA_ID, LIVE_VIEW_RECORD_VERSION, LiveViewCursor, LiveViewRecord,
@@ -184,7 +193,7 @@ pub use live_view::{
 };
 pub use manifest::{
     CodicilId, EngineProfileBinding, GraphSessionManifest, MANIFEST_SCHEMA_VERSION, PersonaId,
-    SessionPolicy, SessionPolicyOverride, WorkerKind,
+    SessionPolicy, SessionPolicyOverride, TrashMark, WorkerKind,
 };
 pub use manifest_store::{LoadFailure, LoadReport, MANIFEST_FILE, ManifestStore, TRASH_DIR};
 #[cfg(not(target_arch = "wasm32"))]
@@ -195,12 +204,12 @@ pub use persona_settings_store::{
     PERSONA_SETTINGS_DIR, PERSONA_UI_FILENAME, PersonaSettings, load_persona_settings,
     persona_settings_path, save_persona_settings,
 };
-#[cfg(not(target_arch = "wasm32"))]
-pub use reservoir::open_reservoir_backend;
 pub use reservoir::{
-    DomainId, MERE_RECORD_SCHEMA, MereId, MereRecord, RESERVOIR_DB_FILENAME, RESERVOIR_DIR,
-    ReservoirError, ReservoirStore, reservoir_dir,
+    DomainId, MERE_RECORD_SCHEMA, MERES_DIR, MereId, MereRecord, RESERVOIR_DB_FILENAME,
+    RESERVOIR_DIR, ReservoirError, ReservoirStore, mere_dir, reservoir_dir,
 };
+#[cfg(not(target_arch = "wasm32"))]
+pub use reservoir::{open_mere_backend, open_reservoir_backend};
 pub use scene_facets::{
     DEFAULT_PHYSICS_DAMPING, SCENE_IMPORTANCE_METRIC, SCENE_PHYSICS_DAMPING, SCENE_SIZE_BY_DEGREE,
     SCENE_SIZE_BY_IMPORTANCE, SceneFacets, copy_scene_facets, read_scene_facets,
