@@ -181,8 +181,8 @@ pub use facet_store::{
 #[cfg(not(target_arch = "wasm32"))]
 pub use graph_session::fork_component_graph;
 pub use graph_session::{
-    Applied, Change, ChangeKind, DEFAULT_CHECKPOINT_INTERVAL, GraphSession, MereSessions,
-    SESSIONS_PREFIX, SessionError, ViewEntry, ViewKey,
+    Applied, Change, ChangeKind, DEFAULT_CHECKPOINT_INTERVAL, GraphSession, Kept, MereSessions,
+    Reverted, SESSIONS_PREFIX, SessionError, ViewEntry, ViewKey,
 };
 pub use identity::{StartupUnlockMode, auto_unlock_backend_available};
 pub use live_view::{

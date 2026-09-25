@@ -925,10 +925,10 @@ mod tests {
         let captured = captured.lock().expect("capture sink");
         assert_eq!(
             captured.len(),
-            3,
-            "add, first set, and remove are captured; an identical set is not"
+            4,
+            "add with its visit stamp, first set, and remove are captured; an identical set is not"
         );
-        let set_projection = replay_captured_deltas(captured[..2].iter().cloned());
+        let set_projection = replay_captured_deltas(captured[..3].iter().cloned());
         assert_eq!(
             set_projection
                 .facets()
@@ -2076,7 +2076,41 @@ mod tests {
 
         set_captured_delta_hook(None);
 
-        let out = captured.lock().expect("capture sink");
+        let captured = captured.lock().expect("capture sink");
+        // What replay would otherwise read from the clock or mint again rides
+        // beside the edits: each new node's visit stamp, and the exact edge
+        // after each minted statement. Set those aside, then check the edits.
+        let stamps = captured
+            .windows(2)
+            .filter(|pair| {
+                matches!(pair[0], CapturedDelta::ReplayAddNodeWithIdIfMissing { .. })
+                    && matches!(
+                        pair[1],
+                        CapturedDelta::ReplayTouchNodeLastVisitedById { .. }
+                    )
+            })
+            .count();
+        let minted = captured
+            .iter()
+            .filter(|delta| matches!(delta, CapturedDelta::ReplaySetEdgesByIds { .. }))
+            .count();
+        assert_eq!(
+            (stamps, minted),
+            (3, 2),
+            "three new nodes; a hyperlink and a predicate minted"
+        );
+        let mut out = Vec::new();
+        for (index, delta) in captured.iter().enumerate() {
+            let stamp = index > 0
+                && matches!(delta, CapturedDelta::ReplayTouchNodeLastVisitedById { .. })
+                && matches!(
+                    captured[index - 1],
+                    CapturedDelta::ReplayAddNodeWithIdIfMissing { .. }
+                );
+            if !stamp && !matches!(delta, CapturedDelta::ReplaySetEdgesByIds { .. }) {
+                out.push(delta.clone());
+            }
+        }
         assert_eq!(out.len(), 52);
         assert!(matches!(
             out[0],
