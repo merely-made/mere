@@ -177,6 +177,7 @@ Ruled by Mark 2026-09-23:
 | `mere-canvas`, `mere-signals` | fold into `pictograph`, not the reverse; canvas becomes `pictograph::canvas` and the mere facade keeps exposing it at `mere::canvas`, so consumer paths do not change | landed: features `canvas` and `signals` on pictograph |
 | `scenograph` | stays a crate: its scene editing is useful beyond graphshell | ruled out |
 | `tabard` | stays a crate: the named home for theme and stylesheet authoring (C2) | ruled out |
+| `cambium-nematic` | fold into `cambium` as feature `nematic` (ruled 2026-09-25): no host took its views, since Pelt, Turnstone and Signalman read smolweb through document-lanes' engine-native lane | landed: `cambium::nematic` |
 
 *Done when:* each ruled fold has landed with its tests and gates.
 
@@ -191,9 +192,10 @@ numbers and are listed with their own republish rule; lockstep
 
 ### C6. Registry names
 
-Nine names remain on crates.io with no crate behind them: `sibylla`, `vates`,
+Ten names remain on crates.io with no crate behind them: `sibylla`, `vates`,
 `mere-capability`, `titulus`, `mere-resident`, `graphshell-stdio`,
-`graphshell-network`, `mere-canvas` and `mere-signals`. The other folded
+`graphshell-network`, `mere-canvas`, `mere-signals` and `cambium-nematic`
+(0.3.1). The other folded
 crates (the `register-*` set, the five `mere` modules, the eidetic fetchers,
 `eidetic-fjall`, `mere-mesh-host` and `graphshell-local`) are not on
 crates.io. Deletion is done on the site by Mark and feeds the workspace-wide
@@ -255,8 +257,11 @@ crate inventory at the Code root.
   ruled them deleted the same day. tinct carried the same pair beside an
   MPL-2.0 manifest; Mark ruled those deleted too.
 - 2026-09-24. cambium-nematic is published (0.3.1) but no crate in any
-  repository depends on it: its smolweb views have no consumer here. A
-  consolidation candidate for Mark, not acted on.
+  repository depends on it: its smolweb views have no consumer here. The
+  leverage census (2026-08-12) had held it for the first Cambium app to embed
+  smolweb natively, Signalman or a Turnstone pane; both chose document-lanes'
+  engine-native lane instead. Mark ruled it folded into `cambium` as a
+  feature on 2026-09-25 (C4).
 
 ## Progress
 
@@ -339,3 +344,7 @@ crate inventory at the Code root.
   move and T4's choice file, tabard also owns the theme-, mode- and
   choice-file formats. tabard 44, tinct 15, Pelt builds with `tabard-preview`,
   and the portable gate passes. C2a, tabard's fill, is complete.
+- 2026-09-25. cambium-nematic folded into `cambium` as feature `nematic`
+  (`cambium::nematic`, errand and tabard optional behind it); `git mv` keeps
+  its history. cambium tests 229 without the feature and 236 with it (the
+  moved 7); the lock drops the crate's package. Its crates.io name joins C6.

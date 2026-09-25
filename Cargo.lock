@@ -1949,6 +1949,7 @@ dependencies = [
 name = "cambium"
 version = "0.3.3"
 dependencies = [
+ "errand",
  "genet-scripted-dom",
  "illume",
  "layout-dom-api 0.1.1 (git+https://github.com/merely-made/genet.git?rev=3e8d797fda58132dfe519a1f99a50b2db705a6a5)",
@@ -1956,6 +1957,7 @@ dependencies = [
  "meristem",
  "sceno",
  "sprigging",
+ "tabard",
  "tinct",
  "unicode-segmentation",
  "workbench",
@@ -2002,17 +2004,6 @@ dependencies = [
  "windows-sys 0.61.2",
  "winit",
  "x11rb",
-]
-
-[[package]]
-name = "cambium-nematic"
-version = "0.3.1"
-dependencies = [
- "cambium",
- "errand",
- "genet-scripted-dom",
- "layout-dom-api 0.1.1 (git+https://github.com/merely-made/genet.git?rev=3e8d797fda58132dfe519a1f99a50b2db705a6a5)",
- "tabard",
 ]
 
 [[package]]
