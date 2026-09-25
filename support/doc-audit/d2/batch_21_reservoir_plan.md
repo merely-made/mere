@@ -20,7 +20,7 @@ document and are not counted again here.
 ## mere_docs/implementation_strategy/2026-09-23_reservoir_plan.md
 
 - disposition: current
-- status line: "Status: in progress. V1 is complete and on main … V2's shape was ruled on 2026-09-23 and 2026-09-24 (§7). Step 1, in muniment, landed on 2026-09-24; step 2, in graph-kernel, is next." — accurate: yes
+- status line: "Status: in progress. V1 is complete and on main … V2's shape was ruled on 2026-09-23 and 2026-09-24 (§7). Steps 1 (muniment) and 2 (graph-kernel) landed on 2026-09-24; step 3, in pandect, is next." — accurate: yes
 - claims checked: 40 — holds: 40, stale: 0, unverifiable: 0
 
 ### Stale claims
