@@ -138,7 +138,8 @@ pub use focus::{FocusEvent, FocusPhase, OnFocus, OnFocusState, on_focus};
 pub use focus_request::{FocusRequest, FocusRequestState, request_focus};
 pub use focusable::{Focusable, FocusableState, focusable, focusable_if};
 pub use fold_projection::{
-    FOLD_MARKER_ACCESSIBLE_LABEL, FOLD_MARKER_CLASS, FoldProjection, FoldProjectionError,
+    FOLD_GUTTER_CLASS, FOLD_LINE_CLASS, FOLD_MARKER_ACCESSIBLE_LABEL, FOLD_MARKER_CLASS,
+    FOLD_ROW_CLASS, FOLD_ROWS_CSS, FoldProjection, FoldProjectionError, FoldProjectionLine,
     FoldProjectionSegment, FoldRange, fold_projection,
 };
 #[cfg(feature = "highlight")]

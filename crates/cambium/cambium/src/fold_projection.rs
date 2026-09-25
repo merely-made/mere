@@ -8,16 +8,36 @@
 //! witness before it derives DOM children. It deliberately has no [`TextInput`]
 //! dependency: the caller remains the authority for source storage and for any
 //! later editable coordinate map.
+//!
+//! [`FoldProjection::rows`] lays the same projection out one row per visible
+//! line, each with a gutter cell the host fills, such as fold controls beside
+//! the lines they fold.
 
 use std::cmp::Reverse;
 use std::ops::Range;
 
-use crate::{FieldChild, StyleRange, el};
+use crate::{FieldChild, Keyed, StyleRange, el};
 
 /// The CSS class carried by a collapsed-region marker.
 ///
 /// Hosts theme this plain class as appropriate for their source view.
 pub const FOLD_MARKER_CLASS: &str = "fold-marker";
+
+/// The CSS class of one row of [`FoldProjection::rows`].
+pub const FOLD_ROW_CLASS: &str = "fold-row";
+
+/// The CSS class of a row's gutter cell, which the host fills.
+pub const FOLD_GUTTER_CLASS: &str = "fold-gutter";
+
+/// The CSS class of a row's visible source text.
+pub const FOLD_LINE_CLASS: &str = "fold-line";
+
+/// Structural CSS for [`FoldProjection::rows`]: the gutter beside each line,
+/// and the line wrapping within its own column. Hosts set the gutter's width.
+pub const FOLD_ROWS_CSS: &str = "\
+    .fold-row { display: flex; align-items: flex-start; } \
+    .fold-gutter { flex: none; width: 1.5em; } \
+    .fold-line { flex: 1 1 0px; min-width: 0; white-space: pre-wrap; overflow-wrap: anywhere; }";
 
 /// The accessible name on each collapsed-region marker.
 ///
@@ -46,6 +66,35 @@ pub enum FoldProjectionError {
     InvalidFoldRange(FoldRange),
     /// Two folds overlap without either one containing the other.
     CrossingFoldRanges { first: FoldRange, second: FoldRange },
+}
+
+/// One visible line of a [`FoldProjection`].
+///
+/// A collapsed interval stays on the line it starts on, so the visible text
+/// after it continues that line.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct FoldProjectionLine {
+    /// Where the line's first visible segment begins in the source.
+    pub start: usize,
+    /// The 1-based source line of `start`. Lines hidden inside a collapsed
+    /// interval leave a gap in the numbering.
+    pub number: usize,
+    /// The line's visible source and markers, without its line break.
+    pub segments: Vec<FoldProjectionSegment>,
+    /// The source bytes of the break that ends the line, `\n` or `\r\n`;
+    /// `None` on a last line with no break.
+    pub line_break: Option<Range<usize>>,
+}
+
+impl FoldProjectionLine {
+    fn starting(start: usize, number: usize) -> Self {
+        Self {
+            start,
+            number,
+            segments: Vec::new(),
+            line_break: None,
+        }
+    }
 }
 
 /// A read-only rendering plan over source owned by the caller.
@@ -138,19 +187,114 @@ impl<'source> FoldProjection<'source> {
     ) -> Vec<FieldChild<State, Action>> {
         let mut children = Vec::new();
         for segment in &self.segments {
-            match segment {
-                FoldProjectionSegment::Source(range) => {
-                    emit_source(&mut children, self.source, range.clone(), &self.styles);
-                },
-                FoldProjectionSegment::FoldMarker(_) => children.push(Box::new(
-                    el::<_, State, Action>("span", "…")
-                        .attr("class", FOLD_MARKER_CLASS)
-                        .attr("role", "note")
-                        .attr("aria-label", FOLD_MARKER_ACCESSIBLE_LABEL),
-                )),
-            }
+            self.emit_segment(&mut children, segment);
         }
         children
+    }
+
+    /// The visible source split into lines, in order.
+    pub fn lines(&self) -> Vec<FoldProjectionLine> {
+        let mut lines = Vec::new();
+        let mut open: Option<FoldProjectionLine> = None;
+        // Line breaks in the source before the segment being read.
+        let mut breaks = 0;
+        for segment in &self.segments {
+            match segment {
+                FoldProjectionSegment::FoldMarker(range) => {
+                    open.get_or_insert_with(|| {
+                        FoldProjectionLine::starting(range.start, breaks + 1)
+                    })
+                    .segments
+                    .push(segment.clone());
+                    breaks += self.source[range.clone()].matches('\n').count();
+                },
+                FoldProjectionSegment::Source(range) => {
+                    let mut cursor = range.start;
+                    for (offset, _) in self.source[range.clone()].match_indices('\n') {
+                        let at = range.start + offset;
+                        let line = open.get_or_insert_with(|| {
+                            FoldProjectionLine::starting(cursor, breaks + 1)
+                        });
+                        let text_end = if at > cursor && self.source.as_bytes()[at - 1] == b'\r' {
+                            at - 1
+                        } else {
+                            at
+                        };
+                        if cursor < text_end {
+                            line.segments
+                                .push(FoldProjectionSegment::Source(cursor..text_end));
+                        }
+                        line.line_break = Some(text_end..at + 1);
+                        lines.extend(open.take());
+                        breaks += 1;
+                        cursor = at + 1;
+                    }
+                    if cursor < range.end {
+                        open.get_or_insert_with(|| {
+                            FoldProjectionLine::starting(cursor, breaks + 1)
+                        })
+                        .segments
+                        .push(FoldProjectionSegment::Source(cursor..range.end));
+                    }
+                },
+            }
+        }
+        lines.extend(open);
+        lines
+    }
+
+    /// Render the projection one row per visible line, keyed by where the
+    /// line starts in the source. Each row holds a gutter cell with the
+    /// children `gutter` gives its line, then the line's text. The text keeps
+    /// its line break, so an empty line still takes a line's height and a
+    /// copied row carries its break.
+    pub fn rows<State: 'static, Action: 'static>(
+        &self,
+        mut gutter: impl FnMut(&FoldProjectionLine) -> Vec<FieldChild<State, Action>>,
+    ) -> Keyed<usize, FieldChild<State, Action>> {
+        self.lines()
+            .into_iter()
+            .map(|line| {
+                let mut text = Vec::new();
+                for segment in &line.segments {
+                    self.emit_segment(&mut text, segment);
+                }
+                if line.line_break.is_some() {
+                    text.push(Box::new("\n".to_owned()) as FieldChild<State, Action>);
+                }
+                let row: FieldChild<State, Action> = Box::new(
+                    el::<_, State, Action>(
+                        "div",
+                        (
+                            el::<_, State, Action>("span", gutter(&line))
+                                .attr("class", FOLD_GUTTER_CLASS),
+                            el::<_, State, Action>("span", text).attr("class", FOLD_LINE_CLASS),
+                        ),
+                    )
+                    .attr("class", FOLD_ROW_CLASS)
+                    .attr("data-line", line.number.to_string()),
+                );
+                (line.start, row)
+            })
+            .collect()
+    }
+
+    fn emit_segment<State: 'static, Action: 'static>(
+        &self,
+        children: &mut Vec<FieldChild<State, Action>>,
+        segment: &FoldProjectionSegment,
+    ) {
+        match segment {
+            FoldProjectionSegment::Source(range) => {
+                emit_source(children, self.source, range.clone(), &self.styles);
+            },
+            FoldProjectionSegment::FoldMarker(_) => children.push(Box::new(
+                el::<_, State, Action>("span", "…")
+                    .attr("class", FOLD_MARKER_CLASS)
+                    .attr("role", "note")
+                    .attr("aria-label", FOLD_MARKER_ACCESSIBLE_LABEL),
+            )),
+        }
     }
 }
 
@@ -277,6 +421,151 @@ mod tests {
         dom.dom_children(node)
             .map(|child| node_text(dom, child))
             .collect()
+    }
+
+    /// A line's visible text, with `…` for a marker.
+    fn visible(projection: &FoldProjection<'_>, line: &FoldProjectionLine) -> String {
+        line.segments
+            .iter()
+            .map(|segment| match segment {
+                FoldProjectionSegment::Source(range) => &projection.source()[range.clone()],
+                FoldProjectionSegment::FoldMarker(_) => "…",
+            })
+            .collect()
+    }
+
+    #[test]
+    fn a_marker_stays_on_the_line_it_starts_and_lines_keep_source_numbers() {
+        let source = "# A\nbody one\nbody two\n## B\nsee also: x";
+        let section = 4..source.find("\n## B").unwrap();
+        let inline = source.find("also").unwrap()..source.find(": x").unwrap();
+        let projection =
+            fold_projection(source, source.len(), &[section.clone(), inline], &[]).unwrap();
+        let lines = projection.lines();
+        let seen = lines
+            .iter()
+            .map(|line| (line.start, line.number, visible(&projection, line)))
+            .collect::<Vec<_>>();
+        assert_eq!(
+            seen,
+            vec![
+                (0, 1, "# A".to_owned()),
+                (4, 2, "…".to_owned()),
+                (22, 4, "## B".to_owned()),
+                (27, 5, "see …: x".to_owned()),
+            ]
+        );
+        assert_eq!(lines[1].line_break, Some(section.end..section.end + 1));
+        assert_eq!(lines[3].line_break, None);
+    }
+
+    #[test]
+    fn crlf_is_one_break_and_an_empty_line_is_a_line() {
+        let source = "a\r\n\r\nb\n";
+        let projection = fold_projection(source, source.len(), &[], &[]).unwrap();
+        let lines = projection.lines();
+        assert_eq!(lines.len(), 3, "a trailing break opens no empty line");
+        assert_eq!(
+            (
+                lines[0].start,
+                lines[0].number,
+                visible(&projection, &lines[0])
+            ),
+            (0, 1, "a".to_owned())
+        );
+        assert_eq!(lines[0].line_break, Some(1..3));
+        assert_eq!((lines[1].start, lines[1].number), (3, 2));
+        assert!(lines[1].segments.is_empty());
+        assert_eq!(lines[1].line_break, Some(3..5));
+        assert_eq!(
+            (
+                lines[2].start,
+                lines[2].number,
+                visible(&projection, &lines[2])
+            ),
+            (5, 3, "b".to_owned())
+        );
+        assert_eq!(lines[2].line_break, Some(6..7));
+    }
+
+    #[test]
+    fn rows_put_a_gutter_cell_beside_each_lines_text() {
+        #[derive(Clone)]
+        struct Model;
+        fn view(_: &Model) -> Box<dyn AnyView<Model, (), GenetCtx, GenetElement>> {
+            let source = "# A\nbody\n\n## B\n";
+            let styles = [StyleRange {
+                range: 0..source.len(),
+                class: "syntax".into(),
+            }];
+            let body = source.find("body").unwrap()..source.find("\n\n").unwrap();
+            let projection = fold_projection(source, source.len(), &[body], &styles).unwrap();
+            Box::new(el(
+                "div",
+                projection.rows(|line: &FoldProjectionLine| {
+                    if line.number == 1 {
+                        vec![Box::new(el::<_, Model, ()>("span", "▾")) as FieldChild<Model, ()>]
+                    } else {
+                        Vec::new()
+                    }
+                }),
+            ))
+        }
+
+        let dom: DomHandle = Rc::new(RefCell::new(ScriptedDom::new()));
+        let runner = GenetAppRunner::new(dom.clone(), view, Model);
+        let dom = runner.dom();
+        let dom = dom.borrow();
+        let attribute = |node, name: &str| {
+            dom.attribute(node, &Namespace::from(""), &LocalName::from(name))
+                .map(str::to_owned)
+        };
+        let rows: Vec<_> = dom.dom_children(runner.root()).collect();
+        let cells = |row| dom.dom_children(row).collect::<Vec<_>>();
+        let seen = rows
+            .iter()
+            .map(|row| {
+                let cells = cells(*row);
+                (
+                    attribute(*row, "class"),
+                    attribute(*row, "data-line"),
+                    node_text(&dom, cells[0]),
+                    node_text(&dom, cells[1]),
+                )
+            })
+            .collect::<Vec<_>>();
+        let row = |line: &str, gutter: &str, text: &str| {
+            (
+                Some(FOLD_ROW_CLASS.to_owned()),
+                Some(line.to_owned()),
+                gutter.to_owned(),
+                text.to_owned(),
+            )
+        };
+        assert_eq!(
+            seen,
+            vec![
+                row("1", "▾", "# A\n"),
+                row("2", "", "…\n"),
+                row("3", "", "\n"),
+                row("4", "", "## B\n"),
+            ]
+        );
+        let first = cells(rows[0]);
+        assert_eq!(
+            attribute(first[0], "class").as_deref(),
+            Some(FOLD_GUTTER_CLASS)
+        );
+        assert_eq!(
+            attribute(first[1], "class").as_deref(),
+            Some(FOLD_LINE_CLASS)
+        );
+        let styled = dom.dom_children(first[1]).next().expect("styled text");
+        assert_eq!(
+            attribute(styled, "class").as_deref(),
+            Some("syntax"),
+            "a style spanning lines is clipped to each row"
+        );
     }
 
     #[test]
