@@ -244,6 +244,9 @@ crate inventory at the Code root.
   README say MPL-2.0, and the published 0.0.1 package ships both files. Mark
   ruled them deleted the same day. tinct carries the same mismatch (a
   `LICENSE-MIT` beside an MPL-2.0 manifest), put to Mark separately.
+- 2026-09-24. cambium-nematic is published (0.3.1) but no crate in any
+  repository depends on it: its smolweb views have no consumer here. A
+  consolidation candidate for Mark, not acted on.
 
 ## Progress
 
@@ -297,3 +300,13 @@ crate inventory at the Code root.
   `theme_data_id` still round-trips, and saved lenses read by id and by
   value. tabard 35, registry 115 with 2 ignored, mere 47, and the portable
   gate passes. T2 is complete; next: T3.
+- 2026-09-24. T3 landed (`d16f055f`): `tabard::smolweb` holds `SmolwebTheme`,
+  `SmolwebPalette` and `SmolwebPalette::for_theme`. The two copies agreed on
+  the types and the fixed palettes but not the per-site tint; Mark kept
+  document-lanes' restrained `rgb()` tint, the one Pelt renders, and a probe
+  found tabard's output identical to it across six URLs. document-lanes
+  re-exports the types, so Pelt's path is unchanged; cambium-nematic renders
+  tabard's palette. cambium-nematic's lib tests had not compiled since
+  2026-09-04, when errand's `FeedEntry` gained podcast fields, and were fixed
+  first (`4b33a963`). tabard 38, cambium-nematic 7, document-lanes 8 (33 with
+  `smolweb`); Pelt builds with `smolweb`; the portable gate passes. Next: T4.
