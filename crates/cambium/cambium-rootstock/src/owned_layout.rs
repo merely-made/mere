@@ -267,6 +267,25 @@ impl OwnedLayout {
         ))
     }
 
+    /// The part of `node` a reader can see: its painted rect cut by every
+    /// ancestor that clips its content, and by the viewport. `None` when no
+    /// part of it shows.
+    pub fn visible_rect<D: LayoutDom<NodeId = NodeId>>(
+        &self,
+        dom: &D,
+        node: NodeId,
+    ) -> Option<(f32, f32, f32, f32)> {
+        let mut rect = self.painted_rect(dom, node)?;
+        let mut ancestor = dom.parent(node);
+        while let Some(current) = ancestor {
+            if let Some(clip) = self.content_clip(dom, current) {
+                rect = intersect(rect, clip)?;
+            }
+            ancestor = dom.parent(current);
+        }
+        intersect(rect, (0.0, 0.0, self.viewport.0, self.viewport.1))
+    }
+
     pub(crate) fn caret_position_at_point<D: LayoutDom<NodeId = NodeId>>(
         &self,
         dom: &D,
@@ -862,6 +881,18 @@ fn computed_px(styles: &StylePlane<NodeId>, node: NodeId, property: &str) -> f32
 }
 
 /// `rect` cut to `clip`, or `None` when nothing of it is left.
+/// The overlap of two `(x, y, w, h)` rects; `None` when they do not overlap.
+fn intersect(
+    (x, y, width, height): (f32, f32, f32, f32),
+    (clip_x, clip_y, clip_width, clip_height): (f32, f32, f32, f32),
+) -> Option<(f32, f32, f32, f32)> {
+    let left = x.max(clip_x);
+    let top = y.max(clip_y);
+    let right = (x + width).min(clip_x + clip_width);
+    let bottom = (y + height).min(clip_y + clip_height);
+    (right > left && bottom > top).then_some((left, top, right - left, bottom - top))
+}
+
 fn clip_text_rect(
     mut rect: genet_livery::TextRect,
     (x, y, width, height): (f32, f32, f32, f32),

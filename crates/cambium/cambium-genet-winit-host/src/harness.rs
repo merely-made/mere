@@ -35,7 +35,7 @@ use winit::keyboard::{Key as WinitKey, NamedKey};
 
 use crate::{
     CloseRequest, Host, HostHooks, HostOptions, HostState, HostWake, Init, KeyPress, Runner,
-    WindowCommands, WinitHost,
+    ScrollAlign, ScrollIntoView, WindowCommands, WinitHost,
 };
 use cambium_rootstock::meristem_bounds::RootView;
 
@@ -422,14 +422,18 @@ where
     /// with the shipping layout's, and a receipt must click where the real
     /// window actually painted the control.
     pub fn resolve(&self, selector: &Selector) -> Option<(f32, f32)> {
+        let node = self.resolve_node(selector)?;
+        self.painted_rect(node)
+            .map(|(x, y, width, height)| (x + width / 2.0, y + height / 2.0))
+    }
+
+    /// The first element `selector` matches that paints.
+    fn resolve_node(&self, selector: &Selector) -> Option<NodeId> {
         let dom = self.runner().dom();
         let dom_ref = dom.borrow();
         taproot::matching(&dom_ref, selector)
             .into_iter()
-            .find_map(|node| {
-                self.painted_rect(node)
-                    .map(|(x, y, width, height)| (x + width / 2.0, y + height / 2.0))
-            })
+            .find(|node| self.painted_rect(*node).is_some())
     }
 
     /// Move the cursor: hover restyle, Enter/Leave, captured-drag tracking.
@@ -505,15 +509,36 @@ where
         self.release_at(x, y);
     }
 
-    /// Resolve a selector and click it. `false` when nothing matched, so a test
-    /// fails on the miss rather than on its consequence.
+    /// Resolve a selector, bring the element into view as a reader scrolls to
+    /// it, and click the centre of the part that shows. `false` when nothing
+    /// matched or none of it shows, so a test fails on the miss rather than on
+    /// its consequence. Without the scroll, a click on an element a scrolling
+    /// pane clips lands on whatever paints there; an element taller than its
+    /// pane is clicked where it shows, not at its hidden centre.
     pub fn click_on(&mut self, selector: &Selector) -> bool {
-        let Some((x, y)) = self.resolve(selector) else {
+        let Some(node) = self.resolve_node(selector) else {
             return false;
         };
-        self.click_at(x, y);
+        self.host.s.pending_scroll.push(ScrollIntoView {
+            node,
+            align: ScrollAlign::Nearest,
+        });
+        self.relayout();
+        let Some((x, y, width, height)) = self.visible_rect(node) else {
+            return false;
+        };
+        self.click_at(x + width / 2.0, y + height / 2.0);
         self.relayout();
         true
+    }
+
+    /// The part of `node` a reader can see: its painted rect cut by every
+    /// ancestor that clips it and by the window. `None` when none of it shows.
+    pub fn visible_rect(&self, node: NodeId) -> Option<(f32, f32, f32, f32)> {
+        let layout = self.host.s.layout.as_ref()?;
+        let dom = self.runner().dom();
+        let dom_ref = dom.borrow();
+        layout.visible_rect(&*dom_ref, node)
     }
 
     /// Scroll the wheel at the current cursor: view handlers first, then the
