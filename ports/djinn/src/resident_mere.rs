@@ -11,11 +11,12 @@
 //! granted to the first-party applications the reservoir route is. An admitted
 //! session attaches to one of the mere's sessions, the live one changed last
 //! unless it asks for another (§7 item 24), and sees two projections: the
-//! mere's sessions, with the lifecycle as intents, and the attached session's
-//! graph, served through `MereHost` with its session item (§7 items 21, 22 and
-//! 31). Every application attached to one session shares one host, so each
-//! sees the others' edits, told by a revision bell. The application an edit
-//! comes through is the one the door admitted, never the client's claim.
+//! mere's sessions, with the lifecycle as intents that name their session by
+//! id (§7 item 33), and the attached session's graph, served through
+//! `MereHost` with its session item (§7 items 21, 22 and 31). Every
+//! application attached to one session shares one host, so each sees the
+//! others' edits, told by a revision bell. The application an edit comes
+//! through is the one the door admitted, never the client's claim.
 
 use std::collections::{BTreeMap, HashMap};
 use std::path::PathBuf;
@@ -82,20 +83,35 @@ pub fn mere_route_id(domain: &str) -> String {
     format!("mere/{domain}")
 }
 
-/// Payload of the sessions projection's intents. Only minting reads the name.
+/// Payload of the sessions projection's intents. A step on a session names
+/// it by id, so it lands however the list has moved since the application
+/// looked (§7 item 33); minting names none, and only minting reads the name.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct SessionsActionV1 {
     pub schema: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub session: Option<SessionId>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub display_name: Option<String>,
 }
 
-impl Default for SessionsActionV1 {
-    fn default() -> Self {
+impl SessionsActionV1 {
+    /// A step on session `id`: attach, fork, trash or restore.
+    pub fn on(id: SessionId) -> Self {
         Self {
             schema: SESSIONS_SCHEMA.to_string(),
+            session: Some(id),
             display_name: None,
+        }
+    }
+
+    /// Mint a session, named or not.
+    pub fn mint(display_name: Option<String>) -> Self {
+        Self {
+            schema: SESSIONS_SCHEMA.to_string(),
+            session: None,
+            display_name,
         }
     }
 }
@@ -270,8 +286,6 @@ impl MereShared {
 /// A card of the sessions projection and what it is served as.
 #[derive(Clone)]
 struct SessionsCard {
-    /// The session the card stands for; `None` for the mere's own card.
-    session: Option<SessionId>,
     source: String,
     label: String,
     bytes: Vec<u8>,
@@ -299,8 +313,6 @@ struct MereEndpoint {
     seen_graph: (SceneEpoch, Revision),
     /// The sessions revision this connection last saw or was told of.
     seen_sessions: u64,
-    /// The sessions projection's cards as last served, by instance.
-    cards: Vec<SessionsCard>,
 }
 
 impl MereEndpoint {
@@ -323,7 +335,6 @@ impl MereEndpoint {
                 attached,
                 host,
                 seen_graph,
-                cards: Vec::new(),
             })
         })
     }
@@ -359,7 +370,6 @@ impl MereEndpoint {
             media: Vec::new(),
         };
         cards.push(SessionsCard {
-            session: None,
             source: format!("mere:{}", self.shared.domain),
             label: format!("Mere: {}", self.shared.domain),
             bytes: serde_json::to_vec(&mere).map_err(|error| error.to_string())?,
@@ -391,41 +401,46 @@ impl MereEndpoint {
                 badges,
                 media: Vec::new(),
             };
-            let mut actions = Vec::new();
-            if id != self.attached {
-                actions.push(lifecycle_action(
-                    ATTACH_SESSION_INTENT,
-                    "Attach",
-                    "Show and edit this session instead.",
-                ));
-            }
-            actions.push(lifecycle_action(
-                FORK_SESSION_INTENT,
-                "Fork",
-                "Begin a new session from this one as it stands now.",
-            ));
-            actions.push(if trashed {
-                lifecycle_action(
-                    RESTORE_SESSION_INTENT,
-                    "Restore",
-                    "Take the session out of the trash.",
-                )
-            } else {
-                lifecycle_action(
-                    TRASH_SESSION_INTENT,
-                    "Trash",
-                    "Put the session in the trash; nothing is deleted.",
-                )
-            });
             cards.push(SessionsCard {
-                session: Some(id),
                 source: id.as_uuid().to_string(),
                 label: format!("Session {}", id.as_uuid()),
                 bytes: serde_json::to_vec(&card).map_err(|error| error.to_string())?,
-                actions,
+                actions: self.session_actions(&manifest),
             });
         }
         Ok(cards)
+    }
+
+    /// The steps a session's card offers as the session stands now: attach
+    /// unless this connection holds it, fork, and trash or restore.
+    fn session_actions(&self, manifest: &GraphSessionManifest) -> Vec<AdvertisedAction> {
+        let mut actions = Vec::new();
+        if manifest.session_id != self.attached {
+            actions.push(lifecycle_action(
+                ATTACH_SESSION_INTENT,
+                "Attach",
+                "Show and edit this session instead.",
+            ));
+        }
+        actions.push(lifecycle_action(
+            FORK_SESSION_INTENT,
+            "Fork",
+            "Begin a new session from this one as it stands now.",
+        ));
+        actions.push(if manifest.trashed.is_some() {
+            lifecycle_action(
+                RESTORE_SESSION_INTENT,
+                "Restore",
+                "Take the session out of the trash.",
+            )
+        } else {
+            lifecycle_action(
+                TRASH_SESSION_INTENT,
+                "Trash",
+                "Put the session in the trash; nothing is deleted.",
+            )
+        });
+        actions
     }
 
     fn sessions_snapshot(&mut self) -> Result<ProjectionSnapshot, String> {
@@ -469,7 +484,6 @@ impl MereEndpoint {
                 }],
             );
         }
-        self.cards = cards;
         self.seen_sessions = revision.0;
         Ok(ProjectionSnapshot {
             version: ProtocolVersion::V1,
@@ -482,27 +496,26 @@ impl MereEndpoint {
     }
 
     fn invoke_sessions(&mut self, intent: IntentInvocation) -> Result<IntentResult, String> {
-        let current = self.sessions_revision();
-        if intent.observed_epoch != SESSIONS_EPOCH || intent.observed_revision != current {
+        // A step names its session by id, so it is taken at any revision of
+        // the list (§7 item 33), though not across an epoch.
+        if intent.observed_epoch != SESSIONS_EPOCH {
             return Ok(IntentResult::Stale {
                 current_epoch: SESSIONS_EPOCH,
-                current_revision: current,
+                current_revision: self.sessions_revision(),
             });
         }
-        let Some(card) = self.cards.get(intent.target.0 as usize).cloned() else {
-            return Ok(IntentResult::Rejected {
-                reason: "intent target is not in the disclosed sessions".to_string(),
-            });
+        let names_session = match intent.intent.as_str() {
+            MINT_SESSION_INTENT => false,
+            ATTACH_SESSION_INTENT
+            | FORK_SESSION_INTENT
+            | TRASH_SESSION_INTENT
+            | RESTORE_SESSION_INTENT => true,
+            other => {
+                return Ok(IntentResult::Rejected {
+                    reason: format!("the sessions projection offers no {other:?}"),
+                });
+            },
         };
-        if !card
-            .actions
-            .iter()
-            .any(|action| action.intent.0 == intent.intent)
-        {
-            return Ok(IntentResult::Rejected {
-                reason: format!("the card does not offer {:?}", intent.intent),
-            });
-        }
         let payload: SessionsActionV1 = match serde_json::from_slice(&intent.payload) {
             Ok(payload) => payload,
             Err(error) => {
@@ -516,11 +529,43 @@ impl MereEndpoint {
                 reason: format!("unknown sessions schema {:?}", payload.schema),
             });
         }
+        // The named session must be the mere's, and its card must offer the
+        // step as the session stands now, whatever the list showed.
+        let target = if names_session {
+            let Some(id) = payload.session else {
+                return Ok(IntentResult::Rejected {
+                    reason: format!("{:?} names no session", intent.intent),
+                });
+            };
+            let manifests =
+                run(self.shared.sessions().list()).map_err(|error| error.to_string())?;
+            let Some(manifest) = manifests.iter().find(|manifest| manifest.session_id == id) else {
+                return Ok(IntentResult::Rejected {
+                    reason: format!("this mere holds no session {}", id.as_uuid()),
+                });
+            };
+            if !self
+                .session_actions(manifest)
+                .iter()
+                .any(|action| action.intent.0 == intent.intent)
+            {
+                return Ok(IntentResult::Rejected {
+                    reason: format!(
+                        "session {} does not offer {:?} now",
+                        id.as_uuid(),
+                        intent.intent
+                    ),
+                });
+            }
+            Some(id)
+        } else {
+            None
+        };
         let shared = Arc::clone(&self.shared);
         let author = shared.author(&self.app);
         let app = self.app.clone();
         let outcome: Result<Option<(SessionId, SharedHost)>, String> = run(async move {
-            match (intent.intent.as_str(), card.session) {
+            match (intent.intent.as_str(), target) {
                 (MINT_SESSION_INTENT, None) => {
                     shared
                         .sessions()
@@ -557,7 +602,7 @@ impl MereEndpoint {
                         .await
                         .map_err(|error| error.to_string())?;
                 },
-                _ => return Err("the card does not offer that".to_string()),
+                (other, _) => return Err(format!("the sessions projection offers no {other:?}")),
             }
             shared.moved();
             Ok(None)
@@ -997,18 +1042,36 @@ mod tests {
         assert!(changes.contains("\"via\":\"knot-editor\""), "{changes}");
     }
 
-    fn sessions_intent(
+    /// The sessions a list shows, oldest first.
+    fn session_ids(snapshot: &ProjectionSnapshot) -> Vec<SessionId> {
+        snapshot
+            .scene
+            .active_items_in_order()
+            .into_iter()
+            .filter_map(|(_, item)| {
+                snapshot.scene.tables.sources[item.source.0 as usize]
+                    .as_ref()
+                    .filter(|source| source.adapter == SESSIONS_SOURCE)
+                    .and_then(|source| Uuid::parse_str(&source.id).ok())
+                    .map(SessionId)
+            })
+            .collect()
+    }
+
+    /// A lifecycle step taken from `snapshot`. The payload names the session,
+    /// so the target is only a placeholder.
+    fn sessions_step(
         snapshot: &ProjectionSnapshot,
-        target: u32,
         intent: &str,
+        payload: SessionsActionV1,
     ) -> IntentInvocation {
         IntentInvocation {
             session: snapshot.session.clone(),
-            target: InstanceId(target),
+            target: InstanceId(0),
             observed_epoch: snapshot.scene.epoch,
             observed_revision: snapshot.scene.revision,
             intent: intent.into(),
-            payload: serde_json::to_vec(&SessionsActionV1::default()).unwrap(),
+            payload: serde_json::to_vec(&payload).unwrap(),
         }
     }
 
@@ -1026,40 +1089,34 @@ mod tests {
         // The mere's card and one session card, the one both attached to.
         let listed = projection(&mut turnstone, 0);
         assert_eq!(listed.presentation.bindings.len(), 2);
+        let parent = session_ids(&listed)[0];
 
-        // Fork the session, then mint another: three sessions, and Knot is rung.
-        assert_eq!(
-            turnstone
-                .invoke(sessions_intent(&listed, 1, FORK_SESSION_INTENT))
-                .unwrap(),
-            IntentResult::Accepted
-        );
-        let forked = projection(&mut turnstone, 0);
-        assert_eq!(forked.presentation.bindings.len(), 3);
-        assert_eq!(
-            turnstone
-                .invoke(sessions_intent(&forked, 0, MINT_SESSION_INTENT))
-                .unwrap(),
-            IntentResult::Accepted
-        );
+        // Turnstone forks it, and Knot sees the fork.
+        let fork = sessions_step(&listed, FORK_SESSION_INTENT, SessionsActionV1::on(parent));
+        assert_eq!(turnstone.invoke(fork).unwrap(), IntentResult::Accepted);
+        let knot_list = projection(&mut knot, 0);
+        let fork = session_ids(&knot_list)[1];
+
+        // Turnstone mints another from its first list, older than the fork: a
+        // step is taken at any revision of the list (§7 item 33). Knot is rung.
+        let mint = sessions_step(&listed, MINT_SESSION_INTENT, SessionsActionV1::mint(None));
+        assert_eq!(turnstone.invoke(mint).unwrap(), IntentResult::Accepted);
         let three = projection(&mut turnstone, 0);
-        assert_eq!(three.presentation.bindings.len(), 4);
+        assert_eq!(session_ids(&three).len(), 3);
+        assert_ne!(
+            three.scene.revision, knot_list.scene.revision,
+            "the list moved"
+        );
         assert!(knot.poll_notice().unwrap().is_some(), "knot is rung");
 
-        // A stale revision changes nothing.
-        assert!(matches!(
-            turnstone
-                .invoke(sessions_intent(&listed, 0, MINT_SESSION_INTENT))
-                .unwrap(),
-            IntentResult::Stale { .. }
-        ));
-
-        // Knot attaches to the fork: it holds the parent's node, and an edit
-        // there leaves the parent alone.
-        let mut knot_list = projection(&mut knot, 0);
+        // Knot attaches to the fork from its list, which the mint has moved
+        // past: it holds the parent's node, and an edit there leaves the
+        // parent alone.
+        let step = |intent: &str, id: SessionId| {
+            sessions_step(&knot_list, intent, SessionsActionV1::on(id))
+        };
         assert_eq!(
-            knot.invoke(sessions_intent(&knot_list, 2, ATTACH_SESSION_INTENT))
-                .unwrap(),
+            knot.invoke(step(ATTACH_SESSION_INTENT, fork)).unwrap(),
             IntentResult::Accepted
         );
         let fork_graph = graph(&mut knot);
@@ -1071,15 +1128,43 @@ mod tests {
         assert_eq!(nodes(&graph(&mut knot)), 2);
         assert_eq!(nodes(&graph(&mut turnstone)), 1, "the parent is unchanged");
 
-        // Trash the fork, then restore it.
-        knot_list = projection(&mut knot, 0);
+        // Trash the fork and restore it. A step the session's card does not
+        // offer now, or one naming no session of this mere, is refused.
         assert_eq!(
-            knot.invoke(sessions_intent(&knot_list, 2, TRASH_SESSION_INTENT))
-                .unwrap(),
+            knot.invoke(step(TRASH_SESSION_INTENT, fork)).unwrap(),
             IntentResult::Accepted
         );
-        knot_list = projection(&mut knot, 0);
-        let restore = sessions_intent(&knot_list, 2, RESTORE_SESSION_INTENT);
-        assert_eq!(knot.invoke(restore).unwrap(), IntentResult::Accepted);
+        let unnamed = sessions_step(
+            &knot_list,
+            FORK_SESSION_INTENT,
+            SessionsActionV1::mint(None),
+        );
+        for (refused, why) in [
+            (step(TRASH_SESSION_INTENT, fork), "does not offer"),
+            (step(RESTORE_SESSION_INTENT, parent), "does not offer"),
+            (step(ATTACH_SESSION_INTENT, fork), "does not offer"),
+            (
+                step(ATTACH_SESSION_INTENT, SessionId::new()),
+                "holds no session",
+            ),
+            (unnamed, "names no session"),
+        ] {
+            match knot.invoke(refused).unwrap() {
+                IntentResult::Rejected { reason } => assert!(reason.contains(why), "{reason}"),
+                other => panic!("{other:?}"),
+            }
+        }
+        assert_eq!(
+            knot.invoke(step(RESTORE_SESSION_INTENT, fork)).unwrap(),
+            IntentResult::Accepted
+        );
+
+        // Across an epoch a step is stale.
+        let mut across = step(TRASH_SESSION_INTENT, fork);
+        across.observed_epoch = SceneEpoch(0);
+        assert!(matches!(
+            knot.invoke(across).unwrap(),
+            IntentResult::Stale { .. }
+        ));
     }
 }
