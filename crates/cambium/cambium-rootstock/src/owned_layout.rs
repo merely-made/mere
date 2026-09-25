@@ -335,11 +335,24 @@ impl OwnedLayout {
         }
     }
 
+    /// Keep a caret that moved in view on both axes: across its field, and
+    /// down the nearest plane that scrolls vertically. The vertical target
+    /// when both moved; `None` when neither did.
+    pub(crate) fn caret_into_view<D: LayoutDom<NodeId = NodeId>>(
+        &mut self,
+        dom: &D,
+        node: NodeId,
+        caret: VisualCaret,
+    ) -> Option<ScrollTarget> {
+        let across = self.caret_across_into_view(dom, node, caret);
+        self.caret_down_into_view(dom, node, caret).or(across)
+    }
+
     /// Scroll the nearest box that scrolls horizontally, `node` itself first,
     /// just far enough to show the caret inside its content box: what a
     /// single-line field does as its caret moves past an edge. `None` when
     /// nothing moved, which includes a field whose text fits.
-    pub(crate) fn caret_into_view<D: LayoutDom<NodeId = NodeId>>(
+    fn caret_across_into_view<D: LayoutDom<NodeId = NodeId>>(
         &mut self,
         dom: &D,
         node: NodeId,
@@ -380,6 +393,66 @@ impl OwnedLayout {
         }
         self.element_scroll.entry(container).or_default().0 = next;
         Some(ScrollTarget::Element(container))
+    }
+
+    /// Scroll one plane just far enough to show the caret's line: `node`
+    /// itself when it scrolls vertically, else the nearest ancestor that
+    /// scrolls and has room to, else the document viewport. This keeps
+    /// typing in view in a field that grows with its text inside a scrolling
+    /// pane, as well as in one that scrolls its own text.
+    fn caret_down_into_view<D: LayoutDom<NodeId = NodeId>>(
+        &mut self,
+        dom: &D,
+        node: NodeId,
+        caret: VisualCaret,
+    ) -> Option<ScrollTarget> {
+        let rect = self.caret_rect_at(dom, node, caret.byte)?;
+        let top = rect.y - self.content_scroll(dom, node).1;
+        let bottom = top + rect.height.max(1.0);
+        let own = scroll_axes(&self.styles, node).1
+            && element_scroll_range(dom, &self.styles, &self.fragments, node).1 > 0.0;
+        let container = if own {
+            let range = element_scroll_range(dom, &self.styles, &self.fragments, node).1;
+            Some((node, range))
+        } else {
+            self.vertical_scroll_container(dom, node)
+        };
+        let (area_top, area_height, current, range) = match container {
+            Some((container, range)) => {
+                let (_, y, _, height) = self
+                    .content_clip(dom, container)
+                    .or_else(|| self.painted_rect(dom, container))?;
+                let current = self.element_scroll.get(&container).map_or(0.0, |s| s.1);
+                (y, height, current, range)
+            },
+            None => (
+                0.0,
+                self.viewport.1,
+                self.viewport_scroll.1,
+                (self.content_extent.1 - self.viewport.1).max(0.0),
+            ),
+        };
+        let delta = if top < area_top {
+            top - area_top
+        } else if bottom > area_top + area_height {
+            (bottom - (area_top + area_height)).min(top - area_top)
+        } else {
+            0.0
+        };
+        let next = (current + delta).clamp(0.0, range);
+        if next == current {
+            return None;
+        }
+        Some(match container {
+            Some((container, _)) => {
+                self.element_scroll.entry(container).or_default().1 = next;
+                ScrollTarget::Element(container)
+            },
+            None => {
+                self.viewport_scroll.1 = next;
+                ScrollTarget::Document
+            },
+        })
     }
 
     /// Every scroll that moves `node`'s own content: the viewport's, each
