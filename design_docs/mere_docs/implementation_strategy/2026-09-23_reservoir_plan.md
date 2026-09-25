@@ -4,8 +4,8 @@
 **Status:** in progress. V1 is complete and on main: the pandect index,
 wallet-persona resolution, djinn's reservoir lane and route, and a real
 two-process receipt. It reached origin with `5364dfa0` on 2026-09-24. V2's
-shape was ruled on 2026-09-23 and 2026-09-24 (§7). Its first step, in
-muniment, is next.
+shape was ruled on 2026-09-23 and 2026-09-24 (§7). Step 1, in muniment,
+landed on 2026-09-24; step 2, in graph-kernel, is next.
 **Scope:** give each data domain one mere, and make every mere of an identity
 openable by any of that identity's applications. The meres are held by the
 device resident, with sessions, a graph journal and an Eidetic archive.
@@ -562,3 +562,22 @@ V2's rulings. Items 6 to 8 were ruled on 2026-09-23 and the rest on
   §7 items 6 to 16, and V2's phase text above is rewritten to match. V2
   continues on branch `reservoir-v2` in `worktrees/mere-reservoir`, from
   `bb709523`. No V2 code yet.
+- 2026-09-24: V2 step 1 landed in muniment (`80540b98`).
+  - `Journal::append_entries`, `entry_writes` and `load_entries` keep one
+    entry per key, with its causes. `entry_writes` hands a caller the writes to
+    commit beside a checkpoint. `Journal::starting_from` begins a fork empty,
+    with its provenance pointing at the parent's cursor.
+  - `DirectoryBackend` (feature `directory`) keeps one file per key, and one
+    line per entry for keys under a `.jsonl` file. It refuses a hole in a log,
+    lands batches whole through a checksummed redo file replayed on open,
+    drops a torn last line, and refuses a second owner through an exclusive
+    lock. The shared custody tests run against it.
+  - Measured on the Windows development laptop, release build, entries of
+    about 180 bytes: 100,000 entries written in batches of 1,000 take about
+    0.95 s; one live append takes 1.5 to 4.6 ms, mostly the flush to disk; the
+    17.5 MB journal reloads in 0.7 to 1.0 s.
+  - Found on the way: a single file's multi-line append is not atomic on its
+    own, since a crash can stop it after some lines. It goes through the redo
+    file like a multi-file batch.
+  - muniment: 73 of 73 tests with the directory and redb features. Clippy is
+    clean for the crate, and it still builds for `wasm32-unknown-unknown`.
