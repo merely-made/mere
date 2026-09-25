@@ -8,8 +8,9 @@ shape was ruled on 2026-09-23 and 2026-09-24 (§7). Steps 1 to 3
 (muniment, graph-kernel, pandect) landed on 2026-09-24 and reached origin on
 2026-09-25; step 3b, undo with exact replay, landed on 2026-09-25 and reached
 origin the same day. Step 4, `MereHost` on `GraphSession` in Graphshell, landed
-on 2026-09-25 on the `reservoir-v2` branch, not yet on origin; its browser
-runtime is unproven (§8). Step 5, djinn's routes, is next.
+and reached origin on 2026-09-25. Its browser runtime is unproven: updating
+`graphshell-web`'s genet and netrender and a browser receipt come next (§7
+item 29), then step 5, djinn's routes.
 **Scope:** give each data domain one mere, and make every mere of an identity
 openable by any of that identity's applications. The meres are held by the
 device resident, with sessions, a graph journal and an Eidetic archive.
@@ -634,6 +635,13 @@ V2's rulings. Items 6 to 8 were ruled on 2026-09-23 and the rest on
     the manifest's `updated_at` and rewrites it in the same batch, as the
     manifest's own `touch` describes. The alternative counted lifecycle steps
     only.
+29. **Proving step 4 in a browser** (2026-09-25). `graphshell-web` did not
+    build here: its restated genet and netrender pins lagged the workspace's
+    (§8). Mark chose "Update graphshell-web": move its pins to the
+    workspace's, fix what the move changes, and record, in real Chromium, the
+    seeded session reloading from IndexedDB. The alternatives were to defer
+    the proof to whoever moves genet next, or to rebuild the machine-local
+    path patch.
 
 ## 8. Progress
 
@@ -916,3 +924,8 @@ V2's rulings. Items 6 to 8 were ruled on 2026-09-23 and the rest on
 
   Unchanged: the browser stores at open and at capture, as before, so an
   intent between them stays unsaved until the next capture batch.
+- 2026-09-25: step 4 rebased onto origin's main, which had repinned genet to
+  `5621ca05768`, re-verified with `--locked`, and pushed with Mark's approval.
+  The gate ran on `6a206411`; main then moved one commit (`e8f83f89`, three
+  cambium files), and `check --workspace --all-targets --locked` passed again
+  on it. The gate, all `--locked`: `check --workspace --all-targets`; mere-kernel 303 of 303; pandect 301 of 301; graphshell's lib tests with `personal-sync` 295 of 296, the one failure being `distillery_w1`'s CRLF artifact; graphshell's every target with all features; pandect, the kernel and Graphshell's browser cone for `wasm32-unknown-unknown`; pandect for `wasm32-wasip2`.
