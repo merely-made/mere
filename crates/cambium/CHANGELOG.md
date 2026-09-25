@@ -22,9 +22,10 @@
   it, out to the window, then moves only as far as the element needs, so an
   element in a scroller that is itself out of sight comes into view. Every
   plane is clamped to its range. `ScrollAlign::Start` puts the element's top
-  at the top of that nearest scroll area; `Nearest` moves only as far as a
-  partly hidden element needs. A node that is gone or does not paint is a
-  no-op. Both event sources honour it through `Host::relayout`, and the
+  at the top of that nearest scrollport, inside the container's border;
+  `Nearest` moves only as far as a partly hidden element needs. A moved
+  caret is kept in view down the same planes. A node that is gone or does
+  not paint is a no-op. Both event sources honour it through `Host::relayout`, and the
   windowless `Harness` in `cambium-genet-winit-host` gains `viewport_scroll`.
   Both crates are unpublished, so no version moves.
 
