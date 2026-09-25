@@ -187,19 +187,19 @@ impl Touched {
 
 /// A node's revertible state, part by part.
 #[derive(Clone, Debug, PartialEq)]
-struct NodeState {
-    title: String,
-    url: String,
-    tags: BTreeSet<String>,
-    body: Option<String>,
-    content: Option<[u8; 32]>,
-    media_type: Option<String>,
-    nested: Option<String>,
-    facets: BTreeMap<String, Value>,
-    history: (Vec<String>, usize),
+pub(super) struct NodeState {
+    pub(super) title: String,
+    pub(super) url: String,
+    pub(super) tags: BTreeSet<String>,
+    pub(super) body: Option<String>,
+    pub(super) content: Option<[u8; 32]>,
+    pub(super) media_type: Option<String>,
+    pub(super) nested: Option<String>,
+    pub(super) facets: BTreeMap<String, Value>,
+    pub(super) history: (Vec<String>, usize),
 }
 
-fn node_state(graph: &Graph, id: Uuid) -> Option<NodeState> {
+pub(super) fn node_state(graph: &Graph, id: Uuid) -> Option<NodeState> {
     let (key, node) = graph.get_node_by_id(id)?;
     let history = graph.node_history_projection(key);
     Some(NodeState {
@@ -226,7 +226,7 @@ fn node_state(graph: &Graph, id: Uuid) -> Option<NodeState> {
 
 /// Every relation from `from` to `to`, in persisted form: compared as a
 /// whole and written back as a whole.
-fn edges_between(graph: &Graph, from: Uuid, to: Uuid) -> Vec<PersistedEdge> {
+pub(super) fn edges_between(graph: &Graph, from: Uuid, to: Uuid) -> Vec<PersistedEdge> {
     match (graph.get_node_by_id(from), graph.get_node_by_id(to)) {
         (Some((from, _)), Some((to, _))) => graph.persisted_edges_between(from, to),
         _ => Vec::new(),
@@ -371,7 +371,7 @@ impl Revert {
     }
 
     /// Make a node the change removed again, as it stood before.
-    fn recreate(&mut self, id: Uuid, before: &NodeState) {
+    pub(super) fn recreate(&mut self, id: Uuid, before: &NodeState) {
         self.edits
             .push(CapturedDelta::ReplayAddNodeWithIdIfMissing {
                 id: id.to_string(),
@@ -545,7 +545,7 @@ pub fn revert_change(
 }
 
 #[cfg(test)]
-mod tests {
+pub(super) mod tests {
     use std::sync::{Arc, Mutex};
 
     use super::*;
@@ -555,11 +555,11 @@ mod tests {
     };
     use crate::types::{ImportRecord, ImportRecordMembership};
 
-    fn id(n: u128) -> Uuid {
+    pub(in crate::graph) fn id(n: u128) -> Uuid {
         Uuid::from_u128(n)
     }
 
-    fn add(n: u128) -> CapturedDelta {
+    pub(in crate::graph) fn add(n: u128) -> CapturedDelta {
         CapturedDelta::ReplayAddNodeWithIdIfMissing {
             id: id(n).to_string(),
             url: format!("https://{n}.test/"),
@@ -567,21 +567,21 @@ mod tests {
         }
     }
 
-    fn title(n: u128, title: &str) -> CapturedDelta {
+    pub(in crate::graph) fn title(n: u128, title: &str) -> CapturedDelta {
         CapturedDelta::ReplaySetNodeTitleById {
             node_id: id(n).to_string(),
             title: title.to_string(),
         }
     }
 
-    fn tag(n: u128, tag: &str) -> CapturedDelta {
+    pub(in crate::graph) fn tag(n: u128, tag: &str) -> CapturedDelta {
         CapturedDelta::ReplayInsertNodeTagById {
             node_id: id(n).to_string(),
             tag: tag.to_string(),
         }
     }
 
-    fn facet(n: u128, facet: &str, value: &str) -> CapturedDelta {
+    pub(in crate::graph) fn facet(n: u128, facet: &str, value: &str) -> CapturedDelta {
         CapturedDelta::ReplaySetNodeFacetById {
             node_id: id(n).to_string(),
             facet: facet.to_string(),
@@ -589,7 +589,7 @@ mod tests {
         }
     }
 
-    fn relate(from: u128, to: u128) -> CapturedDelta {
+    pub(in crate::graph) fn relate(from: u128, to: u128) -> CapturedDelta {
         CapturedDelta::ReplayAssertRelationByIds {
             from_id: id(from).to_string(),
             to_id: id(to).to_string(),
@@ -620,7 +620,7 @@ mod tests {
         seen.lock().unwrap().clone()
     }
 
-    fn apply_all(graph: &mut Graph, edits: &[CapturedDelta]) {
+    pub(in crate::graph) fn apply_all(graph: &mut Graph, edits: &[CapturedDelta]) {
         for edit in edits {
             let _ = apply_graph_delta(graph, edit.replay_delta().expect("replayable"));
         }
