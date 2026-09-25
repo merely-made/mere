@@ -30,7 +30,7 @@ pub type PopoverView<State, Action> = Box<dyn AnyView<State, Action, GenetCtx, G
 /// The structural sheet: the panel sits beside its trigger as its placement
 /// says, and the outside layer covers the window beneath it.
 pub const POPOVER_CSS: &str = "\
-    .popover-anchor { position: relative; } \
+    .popover-anchor { position: relative; display: flex; } \
     .popover-dismiss { position: fixed; left: 0px; top: 0px; right: 0px; bottom: 0px; z-index: 50; } \
     .popover { position: absolute; z-index: 51; } \
     .popover[data-placement=below-start] { left: 0px; top: 100%; } \
