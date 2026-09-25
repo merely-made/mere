@@ -2,10 +2,10 @@
 
 | doc | disposition | status accurate | claims | holds | stale | unverifiable |
 |---|---|---:|---:|---:|---:|---:|
-| mere_docs/implementation_strategy/2026-09-23_reservoir_plan.md | current | yes | 40 | 40 | 0 | 0 |
-| **Totals** |  |  | **40** | **40** | **0** | **0** |
+| mere_docs/implementation_strategy/2026-09-23_reservoir_plan.md | current | yes | 43 | 43 | 0 | 0 |
+| **Totals** |  |  | **43** | **43** | **0** | **0** |
 
-**Totals: 1 doc, 40 claims checked (40 holds, 0 stale, 0 unverifiable), 0 contradictions.**
+**Totals: 1 doc, 43 claims checked (43 holds, 0 stale, 0 unverifiable), 0 contradictions.**
 
 Audit base: Mere `03c05dbd` (2026-09-23), with this pass's documentation edits
 in the working tree. Turnstone, Knot and Cleromancy sources were read from the
@@ -21,7 +21,7 @@ document and are not counted again here.
 
 - disposition: current
 - status line: "Status: in progress. V1 is complete and on main … V2's shape was ruled on 2026-09-23 and 2026-09-24 (§7). Steps 1 to 3 (muniment, graph-kernel, pandect) landed on 2026-09-24 and reached origin on 2026-09-25; step 3b, undo with exact replay, landed on 2026-09-25. Step 4, in djinn, is next." — accurate: yes
-- claims checked: 40 — holds: 40, stale: 0, unverifiable: 0
+- claims checked: 43 — holds: 43, stale: 0, unverifiable: 0
 
 ### Stale claims
 
@@ -119,3 +119,17 @@ The V2 findings (§2, added 2026-09-24), 15 claims:
   "Restore from here" quote.
 - **Turnstone's fork**, 1 claim: `fork_session_from`'s component copy, facet
   carry, `parent_session`, admissions and nested worlds.
+
+The step 3b findings (§2, added 2026-09-25), 3 claims, checked against the
+branch that became `301c847b`:
+
+- node creation stamps its visit time from the clock
+  (`crates/graph/graph-kernel/src/graph/mod.rs`), and statement ids are
+  minted from time, salt and counter (`crates/graph/graph-kernel/src/types.rs`);
+  both were unjournaled until `301c847b`, shown by a kernel test that fails
+  when either capture is disabled;
+- `Graph::from_snapshot` plus `overlay_facets` kept default-valued facets
+  imported from snapshot columns, shown by the session checkpoint test's
+  whole-graph comparison before the fix;
+- graphshell's `practice_disclosure.rs` and `practice_workspace.rs` include a
+  woodshed file by a path that resolves from `repos/mere` only.
