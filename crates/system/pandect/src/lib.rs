@@ -182,7 +182,7 @@ pub use facet_store::{
 pub use graph_session::fork_component_graph;
 pub use graph_session::{
     Applied, Change, ChangeKind, DEFAULT_CHECKPOINT_INTERVAL, GraphSession, Kept, MereSessions,
-    Reverted, SESSIONS_PREFIX, SessionError, ViewEntry, ViewKey,
+    Pending, Reverted, SESSIONS_PREFIX, SessionError, ViewEntry, ViewKey,
 };
 pub use identity::{StartupUnlockMode, auto_unlock_backend_available};
 pub use live_view::{
