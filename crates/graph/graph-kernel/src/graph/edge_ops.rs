@@ -27,6 +27,7 @@ use super::edge_payload::EdgePayload;
 use super::edge_taxonomy::{EdgeAssertion, RelationSelector, SemanticSubKind};
 use super::identity::{EdgeKey, NodeKey};
 use super::{DissolvedTraversalRecord, Graph};
+use crate::persistence::PersistedEdge;
 
 impl Graph {
     pub(crate) fn assert_relation(
@@ -405,6 +406,30 @@ impl Graph {
             self.bump_revision();
         }
         removed
+    }
+
+    /// Replace every relation from `from` to `to` with `edges`, given in
+    /// persisted form, or with none. Undo's exact edge write: the relations land
+    /// as a snapshot load would make them.
+    pub(crate) fn set_edges_between(
+        &mut self,
+        from: NodeKey,
+        to: NodeKey,
+        edges: &[PersistedEdge],
+    ) {
+        let existing: Vec<EdgeKey> = self
+            .inner
+            .inner()
+            .edges_connecting(from, to)
+            .map(|edge| edge.id())
+            .collect();
+        for key in existing {
+            let _ = self.inner.disconnect(key);
+        }
+        for edge in edges {
+            self.restore_persisted_edge(from, to, edge);
+        }
+        self.bump_revision();
     }
 
     /// Get a mutable edge payload by key.

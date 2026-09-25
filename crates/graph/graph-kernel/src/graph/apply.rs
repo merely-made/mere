@@ -16,7 +16,7 @@ use super::{
         persisted_coupling_from_coupling, persisted_field_from_field,
     },
 };
-use crate::persistence::{PersistedCoupling, PersistedField};
+use crate::persistence::{PersistedCoupling, PersistedEdge, PersistedField};
 use crate::types::{
     BadgeIcon, ClassificationScheme, ClassificationStatus, GraphScope, ImageRef, ImageRole,
     ImportRecord, NodeClassification, NodeDerivation, NodeImportProvenance, NodeProperty,
@@ -197,6 +197,13 @@ pub enum GraphDelta {
     },
     ReplaySetImportRecords {
         import_records: Vec<ImportRecord>,
+    },
+    /// Replace every relation from one node to another with these, in
+    /// persisted form: undo's exact edge write.
+    ReplaySetEdgesByIds {
+        from_id: Uuid,
+        to_id: Uuid,
+        edges: Vec<PersistedEdge>,
     },
     ReplayTouchNodeLastVisitedById {
         node_id: Uuid,
@@ -406,6 +413,10 @@ pub enum GraphDelta {
         field: PersistedField,
     },
     ReplayRetireFieldById {
+        field_id: String,
+    },
+    /// Remove a field outright: undo's inverse of adding one.
+    ReplayRemoveFieldById {
         field_id: String,
     },
     ReplayAddCoupling {
@@ -1042,6 +1053,25 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
             }
             GraphDeltaResult::ImportRecordsUpdated(changed)
         },
+        GraphDelta::ReplaySetEdgesByIds {
+            from_id,
+            to_id,
+            edges,
+        } => {
+            let (Some(from), Some(to)) = (
+                graph.get_node_key_by_id(from_id),
+                graph.get_node_key_by_id(to_id),
+            ) else {
+                return GraphDeltaResult::Applied;
+            };
+            graph.set_edges_between(from, to, &edges);
+            graph.record_delta(&CapturedDelta::ReplaySetEdgesByIds {
+                from_id: from_id.to_string(),
+                to_id: to_id.to_string(),
+                edges: graph.persisted_edges_between(from, to),
+            });
+            GraphDeltaResult::Applied
+        },
         GraphDelta::ReplayTouchNodeLastVisitedById {
             node_id,
             timestamp_ms,
@@ -1571,6 +1601,16 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 .is_some_and(|id| graph.retire_field(id));
             if changed {
                 graph.record_delta(&CapturedDelta::ReplayRetireFieldById { field_id });
+            }
+            GraphDeltaResult::FieldChanged(changed)
+        },
+        GraphDelta::ReplayRemoveFieldById { field_id } => {
+            let changed = Uuid::parse_str(&field_id)
+                .ok()
+                .map(FieldId::from_uuid)
+                .is_some_and(|id| graph.remove_field(id));
+            if changed {
+                graph.record_delta(&CapturedDelta::ReplayRemoveFieldById { field_id });
             }
             GraphDeltaResult::FieldChanged(changed)
         },

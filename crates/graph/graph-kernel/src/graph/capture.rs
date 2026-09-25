@@ -28,8 +28,8 @@ use super::{
     FieldLifecycle, FrameLayoutHint, Graph, NavigationTrigger, NodeSelector, RelationSelector,
 };
 use crate::persistence::{
-    PersistedCoupling, PersistedCouplingResponse, PersistedField, PersistedFieldExtent,
-    PersistedFieldLifecycle, PersistedNodeSelector,
+    PersistedCoupling, PersistedCouplingResponse, PersistedEdge, PersistedField,
+    PersistedFieldExtent, PersistedFieldLifecycle, PersistedNodeSelector,
 };
 use crate::types::{
     BadgeIcon, ClassificationScheme, ClassificationStatus, ImageRef, ImageRole, ImportRecord,
@@ -218,6 +218,13 @@ pub enum CapturedDelta {
     ReplaySetImportRecords {
         import_records: Vec<ImportRecord>,
     },
+    /// Every relation from one node to another, in persisted form: undo's
+    /// exact edge write.
+    ReplaySetEdgesByIds {
+        from_id: String,
+        to_id: String,
+        edges: Vec<PersistedEdge>,
+    },
     ReplayTouchNodeLastVisitedById {
         node_id: String,
         timestamp_ms: u64,
@@ -226,6 +233,10 @@ pub enum CapturedDelta {
         field: PersistedField,
     },
     ReplayRetireFieldById {
+        field_id: String,
+    },
+    /// A field removed outright: undo's inverse of adding one.
+    ReplayRemoveFieldById {
         field_id: String,
     },
     ReplayAddCoupling {
@@ -520,6 +531,15 @@ impl CapturedDelta {
             Self::ReplaySetImportRecords { import_records } => GraphDelta::ReplaySetImportRecords {
                 import_records: import_records.clone(),
             },
+            Self::ReplaySetEdgesByIds {
+                from_id,
+                to_id,
+                edges,
+            } => GraphDelta::ReplaySetEdgesByIds {
+                from_id: parse_uuid(from_id),
+                to_id: parse_uuid(to_id),
+                edges: edges.clone(),
+            },
             Self::ReplayTouchNodeLastVisitedById {
                 node_id,
                 timestamp_ms,
@@ -531,6 +551,9 @@ impl CapturedDelta {
                 field: field.clone(),
             },
             Self::ReplayRetireFieldById { field_id } => GraphDelta::ReplayRetireFieldById {
+                field_id: field_id.clone(),
+            },
+            Self::ReplayRemoveFieldById { field_id } => GraphDelta::ReplayRemoveFieldById {
                 field_id: field_id.clone(),
             },
             Self::ReplayAddCoupling { coupling } => GraphDelta::ReplayAddCoupling {
