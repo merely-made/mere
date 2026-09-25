@@ -365,6 +365,10 @@ and projection changes, replayable for the Timeline and for undo (ruled, §7).
      none (ruled, §7 item 24).
    - The old slot is read once into the first session's baseline and left in
      place (ruled, §7 item 25).
+   - A codicil import is written as ordinary edits, and opening a codicil mints
+     a new session from it (ruled, §7 item 27).
+   - Every stored change advances the session manifest's `updated_at` (ruled,
+     §7 item 28).
 5. djinn:
    - each mere on its own route, registered at startup and whenever a mere is
      ensured; graphshell's door learns to add routes and grants at runtime
@@ -615,6 +619,20 @@ V2's rulings. Items 6 to 8 were ruled on 2026-09-23 and the rest on
     getrandom major in the browser build, which Graphshell avoids on purpose),
     to split the session core into a crate below pandect, or to keep the
     browser on the single slot.
+27. **Codicils in a session** (2026-09-25). Graphshell swapped in a whole new
+    graph for a codicil import (H6 transfer) and for "Open codicil" in the
+    browser, which a journal cannot record. Mark chose "Import as edits": an
+    import writes ordinary journaled edits, the new nodes rebuilt with the
+    machinery undo uses, so it is one undoable change on the Timeline. Opening
+    a codicil mints a new session from its graph and switches to it, leaving
+    the previous session in the mere. The alternatives were a journal entry
+    carrying the whole resulting graph, or a new session for both.
+28. **What updates a session** (2026-09-25). Ruling 24 opens the live session
+    updated last, but a manifest changed only at mint, trash and restore. Mark
+    chose "Any stored change": every flush that stores new changes advances
+    the manifest's `updated_at` and rewrites it in the same batch, as the
+    manifest's own `touch` describes. The alternative counted lifecycle steps
+    only.
 
 ## 8. Progress
 
@@ -805,3 +823,24 @@ V2's rulings. Items 6 to 8 were ruled on 2026-09-23 and the rest on
 
   Not yet verified: Graphshell's browser build with pandect in its cone, which
   comes with the host change.
+- 2026-09-25: the kernel writes an import as edits (§7 item 27):
+  `import_edits(live, incoming)` in `graph/merge.rs`.
+  - A node the live graph lacks arrives through undo's node recreation, with
+    its images.
+  - A node both hold keeps its fields and takes the incoming facets.
+  - The incoming relations join the live ones between the same two nodes,
+    worked out on a scratch pair as a snapshot load restores them.
+
+  Tests:
+  - on a fixture with shared, new and linked nodes, an image, and three kinds
+    of relation, the edits give the graph the old rebuild gave, apart from the
+    rebuild's empty facets for legacy columns, which the test checks are all
+    empty;
+  - dropping the images, or the joined relations, fails the comparison;
+  - importing what a graph already holds writes nothing;
+  - mere-kernel 303 of 303.
+
+  No codicil carries legacy column data: canonical saves have written the
+  columns empty since 2026-07-27 (`62a3aff6`), and the first engram schema
+  arrived on 2026-07-28 (`10d1b29b`). An import therefore loads a codicil's
+  facet store whole, as a session loads its own.
