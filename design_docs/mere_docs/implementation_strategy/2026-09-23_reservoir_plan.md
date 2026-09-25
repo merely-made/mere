@@ -13,7 +13,8 @@ running in Chromium over IndexedDB (§7 item 29); the receipt's scenario verdict
 await a headed run. Step 5, djinn's routes, landed on 2026-09-25 with its
 two-process receipt, meeting V2's done-conditions (§8), and reached origin the
 same day. V2b, the mere view, was assessed and ruled the same day (§7 items 34
-to 38); its step 1, the component, is next.
+to 40): Graphshell first moves onto one Cambium tree, in its own plan, and
+V2b's step 1, the component, is in progress.
 **Scope:** give each data domain one mere, and make every mere of an identity
 openable by any of that identity's applications. The meres are held by the
 device resident, with sessions, a graph journal and an Eidetic archive.
@@ -235,12 +236,19 @@ sessions.
   its kind (`semantic`, `traversal`, `containment`, `arrangement`, `imported`
   or `provenance`). The sessions projection's cards carry each session's id,
   name, state and offered steps.
-- **Graphshell's browser surface is not a Cambium view tree.** `web.rs` draws
-  pictograph's canvas through WebGPU and updates its panels in the DOM
-  directly. `cambium-genet-web-host` exists, a canvas surface with DOM
-  accessibility for a Cambium application, but nothing uses it yet.
-  Graphshell has no session list or lifecycle controls of its own; its
+- **Graphshell's browser page has three layers**, corrected the same day
+  after a first reading missed the middle one.
+  - A presenter, `web_gpu.rs`, composites two netrender scenes per frame.
+  - The graph scene is pictograph's canvas.
+  - The UI is a small, display-only Cambium chrome (`web_view.rs`) and about
+    100 hand-driven HTML controls (`web/component.html`, driven by `web.rs`).
+
+  `cambium-genet-web-host` mounts a Cambium application in a browser, and
+  `woodshed-web` uses it, but it projects no accessibility yet and has no file
+  seam. Graphshell has no session list or lifecycle controls of its own; its
   `ActiveSession` is local or remote co-op.
+  [Graphshell on one Cambium tree](2026-09-25_graphshell_one_tree_plan.md)
+  records the full reading.
 - **The instrument exists.** `cambium-genet-winit-host` has a scenario lane
   (`ScenarioLane`, `LaneApp`, `CaptureRecord`) from Knot's step 1: it drives
   a Cambium application headed, asserts on its snapshot and captures frames.
@@ -502,8 +510,10 @@ consumer:
   from a mere route's two projections and turns requests into the route's
   intents. The sessions vocabulary moves from djinn into
   `graphshell::session_item`, so djinn and every application share it.
-- **Graphshell's panel sits beside its canvas.** The canvas stays
-  Graphshell's editing surface.
+- **Graphshell moves onto one Cambium tree first**, in
+  [its own plan](2026-09-25_graphshell_one_tree_plan.md), and the panel is one
+  component in that tree, beside the canvas, which stays Graphshell's editing
+  surface.
 
 **Steps:**
 1. The component. The graph is drawn with `graph_canvas` and laid out by the
@@ -526,18 +536,22 @@ consumer:
    and restore through the adapter, each recorded with the admitted
    application, and the adapter's model matches the route's sessions and
    graph.
-4. Graphshell's panel: `graphshell-web` mounts the component through
-   `cambium-genet-web-host`, fed from its `MereHost`. Switching sessions
-   reopens the canvas on the chosen one, and the panel can hide its own graph
-   where the canvas shows it.
-   *Done when* a page scenario reads the panel's sessions, steps and node
-   targets from the DOM, a step taken from the panel is recorded with
+4. Graphshell on one Cambium tree, per
+   [its plan](2026-09-25_graphshell_one_tree_plan.md): accessibility in the
+   browser, a file seam and the canvas as a producer come first, then the
+   move (ruled, §7 items 39 and 40).
+   *Done when* that plan's phases are.
+5. Graphshell's panel: the component in Graphshell's tree, fed from its
+   `MereHost`. Switching sessions reopens the canvas on the chosen one, and
+   the panel can hide its own graph where the canvas shows it.
+   *Done when* the Browser pane's `read_page` lists the panel's sessions,
+   steps and node targets, a step taken from the panel is recorded with
    `graphshell`, and a headed Chromium capture shows the panel beside the
    canvas.
 
 **Done when:**
-- the component is in Cambium, and Graphshell presents it beside its canvas
-  over its own mere;
+- the component is in Cambium, and Graphshell presents it in its one
+  Cambium tree, beside its canvas, over its own mere;
 - Knot's nine requirements above hold in the headed harness, at the full
   centre and in a 280 px side tile;
 - a lifecycle step taken through the component, from Graphshell or through
@@ -801,7 +815,26 @@ V2b's rulings, all 2026-09-25:
     that replacing the canvas would rebuild its lens, physics, transitions,
     projection editor, history and co-op features inside the component and
     turn V2b into a Graphshell rewrite. The alternative was to replace the
-    canvas.
+    canvas. Item 39 changed how the panel is hosted.
+39. **Graphshell on one Cambium tree.** Mark asked which framework was better,
+    Cambium or Graphshell's custom WebGPU presenter, and whether Cambium
+    should become the custom one. He was told three things:
+    - the page is three layers, not a rival framework (the first account of
+      it had missed the Cambium chrome);
+    - Cambium is the better framework for the UI;
+    - the presenter should fold into Cambium, with pictograph's scene kept
+      as a renderer inside the tree.
+
+    He chose "One tree first": Graphshell moves onto one Cambium tree within
+    V2b, and the panel is one component in it. The alternatives were to let
+    the panel start the tree and plan the full move separately, or a side
+    mount with the convergence unrecorded.
+40. **Enablers first.** Told that Cambium's web host projects no
+    accessibility yet, so a Cambium page is one opaque canvas to a screen
+    reader, Mark chose "Enablers first". The accessibility projection, a file
+    seam and a producer proven in a browser come before any control moves, so
+    Graphshell never loses accessibility. The alternatives were to start the
+    move with the projection built alongside, or to rethink the order.
 
 ## 8. Progress
 
@@ -1251,3 +1284,15 @@ V2b's rulings, all 2026-09-25:
   the component, presents it in Graphshell beside the canvas, proves Knot's
   requirements in a headed harness and hands off. The shape and four steps
   are in §4, V2b.
+- 2026-09-25: Graphshell on one Cambium tree (§7 items 39 and 40). A reading
+  of Graphshell's page for Mark's framework question found the Cambium chrome
+  that V2b's findings had missed, the web host's missing accessibility and file
+  seam, and the producer path. It is planned in
+  [its own plan](2026-09-25_graphshell_one_tree_plan.md), which V2b's step 4
+  follows; the panel became step 5.
+- 2026-09-25: V2b step 1 began with two shared pieces. Cartography gains
+  `project_graph_only`, the table of strategies that lay out from a graph
+  alone, which pictograph's canvas now calls; the view lays out through it
+  without pictograph's renderer. `graph_canvas`'s relation cells carry
+  `data-kind`, so a host's sheet can give each kind its own line style.
+  Cartography's tests pass, 44 of 44, as do `graph_canvas`'s and pictograph's.
