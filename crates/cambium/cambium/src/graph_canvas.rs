@@ -1290,6 +1290,9 @@ where
                 .attr("type", "button")
                 .attr("aria-label", format!("{}: {}", relation.kind, relation.label))
                 .attr("data-relation-id", relation.id.clone())
+                // For the host's sheet: a line style per kind, so kinds differ
+                // by more than colour.
+                .attr("data-kind", relation.kind.clone())
                 .attr(
                     "style",
                     format!(
@@ -2199,6 +2202,8 @@ mod tests {
             "hidden cells must not remain hittable"
         );
         assert_eq!(attr(&dom.borrow(), cites, "aria-current"), Some("true"));
+        assert_eq!(attr(&dom.borrow(), cites, "data-kind"), Some("Citation"));
+        assert_eq!(attr(&dom.borrow(), quotes, "data-kind"), Some("Quotation"));
 
         runner.dispatch_hover(
             quotes,

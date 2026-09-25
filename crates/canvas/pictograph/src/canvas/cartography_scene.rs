@@ -183,10 +183,7 @@ fn project_canvas_dispatch(
     extents: Option<&HashMap<NodeKey, (f32, f32)>>,
     recent_first: bool,
 ) -> cartography::Projection {
-    use cartography::adapters::{
-        GridAdapter, KanbanAdapter, LSystemAdapter, PenroseAdapter, RadialAdapter, SpectralAdapter,
-        TimelineAdapter,
-    };
+    use cartography::adapters::{KanbanAdapter, RadialAdapter, TimelineAdapter};
     // The real signal snapshot from intel/signals (degree-based importance for now), replacing
     // the empty `::default()` — the producer -> snapshot -> strategy spine. Strategies that read
     // `signals.importance` now see it; the rest ignore it (additive contract). The generation +
@@ -201,13 +198,6 @@ fn project_canvas_dispatch(
         return cartography::project_spiral_score(graph, extents, focus, recent_first).projection;
     }
     let projection = match id {
-        "grid.default" => project_with(graph, &signals, &options, &GridAdapter::default()),
-        // Spectral: positions from the graph Laplacian's smallest eigenvectors, so the layout
-        // reflects connectivity (clusters separate, paths unroll). The expensive analytic layout the
-        // arrangement cache covers. (Graph signals — P5.)
-        "spectral.default" => project_with(graph, &signals, &options, &SpectralAdapter::default()),
-        "penrose.default" => project_with(graph, &signals, &options, &PenroseAdapter::default()),
-        "lsystem.default" => project_with(graph, &signals, &options, &LSystemAdapter::default()),
         // Axis-driven: the host derives the per-node axis (graph-only first pass) and threads it on
         // the intent, since `axis_values` lives on `ViewIntent`, not `CartographySceneOptions`.
         // Kanban groups by URL host (a categorical column per site). (Arrangements — kanban.)
@@ -290,7 +280,16 @@ fn project_canvas_dispatch(
             };
             project_with(graph, &signals, &focused, &RadialAdapter::default())
         },
-        _ => return cartography::Projection::empty(),
+        // Grid, Spectral, Penrose and L-system lay out from the graph alone.
+        // Cartography keeps their table, shared with the mere view; Spectral is
+        // the expensive one the arrangement cache covers. (Graph signals — P5.)
+        other => {
+            let request = build_projection_request(graph, &signals, &options);
+            match cartography::adapters::project_graph_only(other, &request) {
+                Some(projection) => projection,
+                None => return cartography::Projection::empty(),
+            }
+        },
     };
     projection
 }

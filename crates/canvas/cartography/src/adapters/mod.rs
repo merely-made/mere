@@ -199,6 +199,33 @@ analytic_adapter!(
     Arrangement::Kanban
 );
 
+/// The strategies that lay out from the graph alone, needing no focus, axis
+/// or clusters. A host offering a layout choice over a bare graph picks from
+/// these.
+pub const GRAPH_ONLY_STRATEGIES: &[&str] = &[
+    PhyllotaxisAdapter::PROJECTION_ID,
+    GridAdapter::PROJECTION_ID,
+    SpectralAdapter::PROJECTION_ID,
+    PenroseAdapter::PROJECTION_ID,
+    LSystemAdapter::PROJECTION_ID,
+];
+
+/// Project `request` with the graph-only strategy `id`, or `None` when `id`
+/// names another strategy or none. The canvas's dispatch and the mere view
+/// share this table.
+pub fn project_graph_only(id: &str, request: &ProjectionRequest<'_>) -> Option<Projection> {
+    Some(match id {
+        PhyllotaxisAdapter::PROJECTION_ID => PhyllotaxisAdapter::default().project(request),
+        GridAdapter::PROJECTION_ID => GridAdapter::default().project(request),
+        // Positions from the graph Laplacian's smallest eigenvectors, so the
+        // layout reflects connectivity: clusters separate, paths unroll.
+        SpectralAdapter::PROJECTION_ID => SpectralAdapter::default().project(request),
+        PenroseAdapter::PROJECTION_ID => PenroseAdapter::default().project(request),
+        LSystemAdapter::PROJECTION_ID => LSystemAdapter::default().project(request),
+        _ => return None,
+    })
+}
+
 // No `StackAdapter`. `sceno::Stack` exists and is solved by `scenomise`, but
 // nothing on this side asks for it: `stack.default` is absent from the canvas's
 // `CANVAS_LAYOUT_STRATEGIES`, and mer3ly builds its own score with its own
