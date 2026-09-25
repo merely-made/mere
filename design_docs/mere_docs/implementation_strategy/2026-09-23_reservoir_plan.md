@@ -844,3 +844,24 @@ V2's rulings. Items 6 to 8 were ruled on 2026-09-23 and the rest on
   columns empty since 2026-07-27 (`62a3aff6`), and the first engram schema
   arrived on 2026-07-28 (`10d1b29b`). An import therefore loads a codicil's
   facet store whole, as a session loads its own.
+- 2026-09-25: pandect's session core now writes the way a host needs:
+  - `GraphSession::new` begins a session in memory, and its first flush
+    stores the manifest and baseline with everything since;
+  - `edit_now` and `apply_now` journal an edit synchronously, stored at the
+    next flush;
+  - `pending(at)` and `stored(pending)` let a host write through a batch of
+    its own, and the session's cursors move only once that batch commits.
+    `flush(at)` does both;
+  - every store with new changes stamps the manifest's `updated_at` (§7 item
+    28), and `MereSessions::latest_live` picks the live session changed last
+    (§7 item 24);
+  - a view change writes what the session has pending in the same batch, so
+    no stored view names an unstored cursor;
+  - a checkpoint lands in the batch whose entries reach the interval.
+
+  Three new session tests: a session begun in memory writes nothing until its
+  first flush, then reopens as the same whole graph; a batch that never
+  commits stays pending, and the retry carries it; the latest live session
+  follows stored edits and skips the trash. pandect 301 of 301; it still
+  builds for the browser and `wasm32-wasip2`, its dependents check, and clippy
+  finds nothing new.
