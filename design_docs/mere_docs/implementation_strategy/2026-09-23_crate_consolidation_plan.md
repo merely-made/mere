@@ -241,8 +241,9 @@ crate inventory at the Code root.
   them reading.
 - 2026-09-24. tabard's directory carries `LICENSE-MIT` and `LICENSE-APACHE`
   from its 2026-08-10 reservation, while its manifest, source headers and
-  README say MPL-2.0, and the published 0.0.1 package ships both files. Left
-  for Mark.
+  README say MPL-2.0, and the published 0.0.1 package ships both files. Mark
+  ruled them deleted the same day. tinct carries the same mismatch (a
+  `LICENSE-MIT` beside an MPL-2.0 manifest), put to Mark separately.
 
 ## Progress
 
