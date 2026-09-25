@@ -9,9 +9,6 @@
 
 use std::io;
 
-use p2panda_core::cbor::{decode_cbor, encode_cbor};
-use rand_core::{OsRng, RngCore};
-
 use super::*;
 
 /// Mint a new QR / typed-code pairing ticket for a remote-auth enrollment.
@@ -19,7 +16,7 @@ pub fn mint_remote_auth_pairing_ticket(
     request: &RemoteAuthPairingTicketRequest,
 ) -> RemoteAuthPairingTicket {
     let mut pairing_secret = [0u8; REMOTE_AUTH_PAIRING_SECRET_LEN];
-    OsRng.fill_bytes(&mut pairing_secret);
+    getrandom::fill(&mut pairing_secret).expect("the platform supplies entropy");
     RemoteAuthPairingTicket {
         schema_version: REMOTE_AUTH_PAIRING_TICKET_SCHEMA_VERSION,
         ticket_id: Uuid::new_v4(),

@@ -41,6 +41,7 @@ use kernel::graph::{
     replay_captured_deltas_onto, revert_change,
 };
 use kernel::persistence::GraphSnapshot;
+use kernel::time::wall_clock_now;
 use muniment::{Backend, Journal, JsonCodec, JsonSlots, Provenance, StoreError, WriteOp};
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
 use uuid::Uuid;
@@ -298,8 +299,40 @@ fn provenance(manifest: &GraphSessionManifest) -> Option<Provenance> {
     })
 }
 
+/// Route what `graph` records into `buffer`, for the session to journal.
+fn record_into(graph: &mut Graph, buffer: &Arc<Mutex<Vec<CapturedDelta>>>) {
+    let buffer = Arc::clone(buffer);
+    graph.set_recorder(Some(Arc::new(move |delta: &CapturedDelta| {
+        buffer.lock().expect("recorder buffer").push(delta.clone());
+    })));
+}
+
+/// What a session has not stored yet, as one batch, and what storing it
+/// covers. A host that writes through a batch of its own applies
+/// [`ops`](Self::ops) there and hands this back to [`GraphSession::stored`]
+/// once that batch commits.
+#[derive(Debug)]
+pub struct Pending {
+    ops: Vec<WriteOp>,
+    journal: Seq,
+    changes: Seq,
+    checkpoint: Option<Seq>,
+    updated_at: Option<SystemTime>,
+}
+
+impl Pending {
+    pub fn ops(&self) -> &[WriteOp] {
+        &self.ops
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.ops.is_empty()
+    }
+}
+
 /// One session, open: its graph, journal, changes and views, with every edit
-/// recorded under its author and persisted as it is made.
+/// recorded under its author. The async edits store as they are made; the
+/// `_now` ones wait for [`flush`](Self::flush).
 pub struct GraphSession<B> {
     slots: JsonSlots<B>,
     keys: Keys,
@@ -315,9 +348,61 @@ pub struct GraphSession<B> {
     checkpointed: Seq,
     checkpoint_interval: u64,
     revision: u64,
+    /// Whether the manifest and baseline are in the store yet.
+    head_stored: bool,
+    /// Whether the baseline is written with the head: a session begun from
+    /// no graph stores none, and opens empty.
+    write_baseline: bool,
 }
 
 impl<B: Backend> GraphSession<B> {
+    /// Begin a new session in memory, from `baseline` or empty, with `kind` as
+    /// its first change. Nothing is written until the first flush, which
+    /// stores the manifest and baseline with everything since.
+    pub fn new(
+        backend: B,
+        manifest: GraphSessionManifest,
+        baseline: Option<Graph>,
+        author: Author,
+        kind: ChangeKind,
+    ) -> Self {
+        let id = LogId::new(manifest.session_id.as_uuid().to_string());
+        let journal = match provenance(&manifest) {
+            Some(provenance) => GraphJournal::starting_from(id, provenance),
+            None => GraphJournal::with_id(id),
+        };
+        let mut changes = Journal::new();
+        changes.append(Change {
+            author,
+            kind,
+            first: Seq(0),
+            end: Seq(0),
+        });
+        let write_baseline = baseline.is_some();
+        let baseline = baseline.unwrap_or_default();
+        let mut graph = baseline.clone();
+        let pending = Arc::default();
+        record_into(&mut graph, &pending);
+        Self {
+            slots: JsonSlots::new(backend),
+            keys: Keys::new(manifest.session_id),
+            manifest,
+            baseline,
+            graph,
+            journal,
+            pending,
+            changes,
+            views: BTreeMap::new(),
+            saved: Seq(0),
+            changes_saved: Seq(0),
+            checkpointed: Seq(0),
+            checkpoint_interval: DEFAULT_CHECKPOINT_INTERVAL,
+            revision: 1,
+            head_stored: false,
+            write_baseline,
+        }
+    }
+
     /// Open session `id` from a mere's store: the latest checkpoint and the
     /// journal past it, or the baseline and the whole journal.
     pub async fn open(backend: B, id: SessionId) -> Result<Self, SessionError> {
@@ -379,14 +464,11 @@ impl<B: Backend> GraphSession<B> {
             checkpointed,
             checkpoint_interval: DEFAULT_CHECKPOINT_INTERVAL,
             revision: 1,
+            head_stored: true,
+            write_baseline: false,
         };
         session.load_views().await?;
-        let pending = Arc::clone(&session.pending);
-        session
-            .graph
-            .set_recorder(Some(Arc::new(move |delta: &CapturedDelta| {
-                pending.lock().expect("recorder buffer").push(delta.clone());
-            })));
+        record_into(&mut session.graph, &session.pending);
         Ok(session)
     }
 
@@ -458,18 +540,13 @@ impl<B: Backend> GraphSession<B> {
         author: Author,
         edits: Vec<CapturedDelta>,
     ) -> Result<Applied, SessionError> {
-        let deltas = edits
-            .iter()
-            .map(|edit| {
-                edit.replay_delta()
-                    .ok_or_else(|| SessionError::NotReplayable(format!("{edit:?}")))
-            })
-            .collect::<Result<Vec<_>, _>>()?;
-        self.apply_deltas(author, deltas).await
+        let applied = self.apply_now(author, edits)?;
+        self.store(wall_clock_now(), Vec::new(), false).await?;
+        Ok(applied)
     }
 
     /// Apply edits as one change under `author`, journal what they did, and
-    /// persist it before returning. A change that alters nothing records
+    /// store it before returning. A change that alters nothing records
     /// nothing.
     pub async fn apply_deltas(
         &mut self,
@@ -479,16 +556,49 @@ impl<B: Backend> GraphSession<B> {
         self.apply_as(author, ChangeKind::Edit, deltas).await
     }
 
-    async fn apply_as(
+    /// [`apply`](Self::apply), journaled but not stored until the next flush:
+    /// for a host whose edits arrive on a synchronous path.
+    pub fn apply_now(
+        &mut self,
+        author: Author,
+        edits: Vec<CapturedDelta>,
+    ) -> Result<Applied, SessionError> {
+        let deltas = edits
+            .iter()
+            .map(|edit| {
+                edit.replay_delta()
+                    .ok_or_else(|| SessionError::NotReplayable(format!("{edit:?}")))
+            })
+            .collect::<Result<Vec<_>, _>>()?;
+        Ok(self
+            .edit_as(author, ChangeKind::Edit, |graph| {
+                for delta in deltas {
+                    let _ = apply_graph_delta(graph, delta);
+                }
+            })
+            .1)
+    }
+
+    /// Run `edit` on the live graph as one change under `author`, journaled
+    /// but not stored until the next flush. Every mutation goes through
+    /// `apply_graph_delta`, the kernel's one write path, so the journal sees
+    /// all of them.
+    pub fn edit_now<R>(
+        &mut self,
+        author: Author,
+        edit: impl FnOnce(&mut Graph) -> R,
+    ) -> (R, Applied) {
+        self.edit_as(author, ChangeKind::Edit, edit)
+    }
+
+    fn edit_as<R>(
         &mut self,
         author: Author,
         kind: ChangeKind,
-        deltas: Vec<GraphDelta>,
-    ) -> Result<Applied, SessionError> {
+        edit: impl FnOnce(&mut Graph) -> R,
+    ) -> (R, Applied) {
         let first = self.journal.live_cursor();
-        for delta in deltas {
-            let _ = apply_graph_delta(&mut self.graph, delta);
-        }
+        let result = edit(&mut self.graph);
         let recorded = std::mem::take(&mut *self.pending.lock().expect("recorder buffer"));
         for delta in recorded {
             self.journal.record_as(author.clone(), delta);
@@ -503,53 +613,131 @@ impl<B: Backend> GraphSession<B> {
             });
             self.revision += 1;
         }
-        self.persist(Vec::new()).await?;
-        if end.0 - self.checkpointed.0 >= self.checkpoint_interval {
-            self.checkpoint().await?;
-        }
-        Ok(Applied {
+        let applied = Applied {
             first,
             end,
             revision: self.revision,
-        })
+        };
+        (result, applied)
     }
 
-    /// Record a change that writes no edits (a lifecycle step), with `extra`
-    /// writes landing in the same batch.
+    async fn apply_as(
+        &mut self,
+        author: Author,
+        kind: ChangeKind,
+        deltas: Vec<GraphDelta>,
+    ) -> Result<Applied, SessionError> {
+        let (_, applied) = self.edit_as(author, kind, |graph| {
+            for delta in deltas {
+                let _ = apply_graph_delta(graph, delta);
+            }
+        });
+        self.store(wall_clock_now(), Vec::new(), false).await?;
+        Ok(applied)
+    }
+
+    /// Record a change that writes no edits (a lifecycle step) and store it,
+    /// stamped `at`.
     async fn record(
         &mut self,
         author: Author,
         kind: ChangeKind,
-        extra: Vec<WriteOp>,
+        at: SystemTime,
     ) -> Result<(), SessionError> {
-        let at = self.journal.live_cursor();
+        let cursor = self.journal.live_cursor();
         self.changes.append(Change {
             author,
             kind,
-            first: at,
-            end: at,
+            first: cursor,
+            end: cursor,
         });
         self.revision += 1;
-        self.persist(extra).await
+        self.store(at, Vec::new(), false).await
     }
 
-    /// Write every edit and change not yet stored, with `extra`, as one batch.
-    async fn persist(&mut self, extra: Vec<WriteOp>) -> Result<(), SessionError> {
-        let mut ops = self
-            .journal
-            .log()
-            .entry_writes::<JsonCodec>(&self.keys.at(JOURNAL), self.saved)?;
+    /// Everything not stored yet, as one batch: the manifest and baseline of a
+    /// session begun in memory, new journal entries and changes, and a
+    /// checkpoint once enough entries have accrued. New changes stamp the
+    /// manifest `updated_at` with `at` (reservoir plan §7 item 28).
+    pub fn pending(&self, at: SystemTime) -> Result<Pending, SessionError> {
+        self.pending_with(at, false)
+    }
+
+    fn pending_with(&self, at: SystemTime, checkpoint: bool) -> Result<Pending, SessionError> {
+        let journal = self.journal.live_cursor();
+        let changes = self.changes.next_seq();
+        let updated_at = (changes > self.changes_saved).then_some(at);
+        let mut ops = Vec::new();
+        if !self.head_stored || updated_at.is_some() {
+            let mut manifest = self.manifest.clone();
+            manifest.updated_at = updated_at.unwrap_or(manifest.updated_at);
+            ops.push(pretty(self.keys.at(MANIFEST), &manifest)?);
+        }
+        if !self.head_stored && self.write_baseline {
+            ops.push(pretty(
+                self.keys.at(BASELINE),
+                &baseline_of(&self.baseline),
+            )?);
+        }
+        ops.extend(
+            self.journal
+                .log()
+                .entry_writes::<JsonCodec>(&self.keys.at(JOURNAL), self.saved)?,
+        );
         ops.extend(
             self.changes
                 .entry_writes::<JsonCodec>(&self.keys.at(CHANGES), self.changes_saved)?,
         );
-        ops.extend(extra);
-        if ops.is_empty() {
-            return Ok(());
+        let checkpoint = (checkpoint
+            || journal.0 - self.checkpointed.0 >= self.checkpoint_interval)
+            .then_some(journal);
+        if checkpoint.is_some() {
+            ops.extend([
+                pretty(self.keys.at(GRAPH), &self.graph.to_snapshot())?,
+                pretty(self.keys.at(NODE_FACETS_FILE), self.graph.facets())?,
+                pretty(self.keys.at(CHECKPOINT), &Checkpoint { cursor: journal })?,
+            ]);
         }
-        self.slots.backend().apply(&ops).await?;
-        self.saved = self.journal.live_cursor();
-        self.changes_saved = self.changes.next_seq();
+        Ok(Pending {
+            ops,
+            journal,
+            changes,
+            checkpoint,
+            updated_at,
+        })
+    }
+
+    /// Mark a [`Pending`] batch as stored, once it has committed.
+    pub fn stored(&mut self, pending: Pending) {
+        self.head_stored = true;
+        self.saved = self.saved.max(pending.journal);
+        self.changes_saved = self.changes_saved.max(pending.changes);
+        if let Some(cursor) = pending.checkpoint {
+            self.checkpointed = self.checkpointed.max(cursor);
+        }
+        if let Some(at) = pending.updated_at {
+            self.manifest.updated_at = at;
+        }
+    }
+
+    /// Store everything not stored yet, stamping new changes `at`.
+    pub async fn flush(&mut self, at: SystemTime) -> Result<(), SessionError> {
+        self.store(at, Vec::new(), false).await
+    }
+
+    /// Store what is pending, with `extra`, as one batch.
+    async fn store(
+        &mut self,
+        at: SystemTime,
+        extra: Vec<WriteOp>,
+        checkpoint: bool,
+    ) -> Result<(), SessionError> {
+        let mut pending = self.pending_with(at, checkpoint)?;
+        pending.ops.extend(extra);
+        if !pending.ops.is_empty() {
+            self.slots.backend().apply(&pending.ops).await?;
+        }
+        self.stored(pending);
         Ok(())
     }
 
@@ -667,15 +855,7 @@ impl<B: Backend> GraphSession<B> {
     /// Write a checkpoint: the graph, its facets and the cursor they reflect,
     /// with any unsaved entries, in one batch.
     pub async fn checkpoint(&mut self) -> Result<(), SessionError> {
-        let cursor = self.journal.live_cursor();
-        let extra = vec![
-            pretty(self.keys.at(GRAPH), &self.graph.to_snapshot())?,
-            pretty(self.keys.at(NODE_FACETS_FILE), self.graph.facets())?,
-            pretty(self.keys.at(CHECKPOINT), &Checkpoint { cursor })?,
-        ];
-        self.persist(extra).await?;
-        self.checkpointed = cursor;
-        Ok(())
+        self.store(wall_clock_now(), Vec::new(), true).await
     }
 
     /// Checkpoint if the journal has moved since the last one: what the
@@ -720,7 +900,8 @@ impl<B: Backend> GraphSession<B> {
     }
 
     /// Change a view's state under `author`, stamped with the journal cursor it
-    /// was made at, and persist it with the view's current state.
+    /// was made at, and store it with the view's current state and whatever
+    /// the session has pending, so no stored view names an unstored cursor.
     pub async fn set_view(
         &mut self,
         author: Author,
@@ -728,17 +909,22 @@ impl<B: Backend> GraphSession<B> {
         state: ViewIntent,
     ) -> Result<(), SessionError> {
         let cursor = self.journal.live_cursor();
+        let mut pending = self.pending(wall_clock_now())?;
         let current = self.keys.view(&key);
         let log_key = self.keys.view_log(&key);
-        let view = self.views.entry(key).or_default();
+        let view = self.views.entry(key.clone()).or_default();
         view.log.append(ViewEntry {
             author,
             cursor,
             state: state.clone(),
         });
-        let mut ops = vec![pretty(current, &state)?];
-        ops.extend(view.log.entry_writes::<JsonCodec>(&log_key, view.saved)?);
-        self.slots.backend().apply(&ops).await?;
+        pending.ops.push(pretty(current, &state)?);
+        pending
+            .ops
+            .extend(view.log.entry_writes::<JsonCodec>(&log_key, view.saved)?);
+        self.slots.backend().apply(&pending.ops).await?;
+        self.stored(pending);
+        let view = self.views.get_mut(&key).expect("the view was just written");
         view.current = state;
         view.saved = view.log.next_seq();
         Ok(())
@@ -750,17 +936,13 @@ impl<B: Backend> GraphSession<B> {
             by: author.clone(),
             at,
         });
-        self.manifest.updated_at = at;
-        let extra = vec![pretty(self.keys.at(MANIFEST), &self.manifest)?];
-        self.record(author, ChangeKind::Trashed, extra).await
+        self.record(author, ChangeKind::Trashed, at).await
     }
 
     /// Take the session back out of the trash.
     pub async fn restore(&mut self, author: Author, at: SystemTime) -> Result<(), SessionError> {
         self.manifest.trashed = None;
-        self.manifest.updated_at = at;
-        let extra = vec![pretty(self.keys.at(MANIFEST), &self.manifest)?];
-        self.record(author, ChangeKind::Restored, extra).await
+        self.record(author, ChangeKind::Restored, at).await
     }
 }
 
@@ -840,9 +1022,39 @@ impl<B: Backend + Clone> MereSessions<B> {
         Ok(manifests)
     }
 
+    /// The live session changed last: untrashed, latest by `updated_at`, then
+    /// by minting (reservoir plan §7 items 24 and 28). `None` when there is none.
+    pub async fn latest_live(&self) -> Result<Option<GraphSessionManifest>, SessionError> {
+        Ok(self
+            .list()
+            .await?
+            .into_iter()
+            .filter(|manifest| manifest.trashed.is_none())
+            .max_by_key(|manifest| {
+                (
+                    manifest.updated_at,
+                    manifest.created_at,
+                    *manifest.session_id.as_uuid(),
+                )
+            }))
+    }
+
     /// Open a session.
     pub async fn open(&self, id: SessionId) -> Result<GraphSession<B>, SessionError> {
         GraphSession::open(self.backend.clone(), id).await
+    }
+
+    /// Begin a new session in memory, from `baseline` or empty. Its first
+    /// flush stores it.
+    pub fn begin(&self, author: Author, baseline: Option<Graph>) -> GraphSession<B> {
+        let manifest = GraphSessionManifest::new(SessionId::new(), GraphId::new());
+        GraphSession::new(
+            self.backend.clone(),
+            manifest,
+            baseline,
+            author,
+            ChangeKind::Minted,
+        )
     }
 
     /// Mint an empty session.
@@ -926,21 +1138,15 @@ impl<B: Backend + Clone> MereSessions<B> {
         author: Author,
         kind: ChangeKind,
     ) -> Result<GraphSessionManifest, SessionError> {
-        let keys = Keys::new(manifest.session_id);
-        let mut ops = vec![pretty(keys.at(MANIFEST), &manifest)?];
-        if let Some(graph) = baseline {
-            ops.push(pretty(keys.at(BASELINE), &baseline_of(graph))?);
-        }
-        let mut changes = Journal::new();
-        changes.append(Change {
+        let mut session = GraphSession::new(
+            self.backend.clone(),
+            manifest,
+            baseline.cloned(),
             author,
             kind,
-            first: Seq(0),
-            end: Seq(0),
-        });
-        ops.extend(changes.entry_writes::<JsonCodec>(&keys.at(CHANGES), Seq(0))?);
-        self.backend.apply(&ops).await?;
-        Ok(manifest)
+        );
+        session.flush(wall_clock_now()).await?;
+        Ok(session.manifest().clone())
     }
 }
 
@@ -1339,6 +1545,120 @@ mod tests {
             );
             // The session still opens: trash never moved its keys.
             assert_eq!(mere.open(id).await.unwrap().changes().len(), 3);
+        });
+    }
+
+    #[test]
+    fn a_session_begun_in_memory_is_stored_whole_by_its_first_flush() {
+        pollster::block_on(async {
+            let store = MemoryBackend::new();
+            let mut baseline = Graph::new();
+            replay_captured_deltas_onto(&mut baseline, [add(1), retitle(1, "Kept")]);
+            let manifest = GraphSessionManifest::new(SessionId::new(), GraphId::new());
+            let id = manifest.session_id;
+            let mut session = GraphSession::new(
+                store.clone(),
+                manifest,
+                Some(baseline),
+                person(),
+                ChangeKind::Minted,
+            );
+            let (key, applied) = session.edit_now(person(), |graph| {
+                kernel::graph::apply::add_node(
+                    graph,
+                    Some(Uuid::from_u128(2)),
+                    "https://2.test/".into(),
+                    Point2D::new(0.0, 0.0),
+                )
+            });
+            assert!(session.graph().get_node(key).is_some());
+            assert_eq!(applied.first, Seq(0));
+            assert!(
+                store.list(SESSIONS_PREFIX).await.unwrap().is_empty(),
+                "nothing is written before the flush"
+            );
+
+            let at = SystemTime::UNIX_EPOCH + std::time::Duration::from_secs(1_800_000_000);
+            session.flush(at).await.unwrap();
+            let reopened = GraphSession::open(store, id).await.unwrap();
+            assert_eq!(whole(reopened.graph()), whole(session.graph()));
+            assert_eq!(reopened.changes(), session.changes());
+            assert_eq!(reopened.manifest().updated_at, at);
+            assert!(
+                session.pending(at).unwrap().is_empty(),
+                "a flush with nothing new writes nothing"
+            );
+        });
+    }
+
+    #[test]
+    fn a_batch_that_never_commits_stays_pending_until_one_does() {
+        pollster::block_on(async {
+            let store = MemoryBackend::new();
+            let manifest = GraphSessionManifest::new(SessionId::new(), GraphId::new());
+            let id = manifest.session_id;
+            let mut session =
+                GraphSession::new(store.clone(), manifest, None, person(), ChangeKind::Minted);
+            session.apply_now(person(), vec![add(1)]).unwrap();
+            let at = SystemTime::UNIX_EPOCH + std::time::Duration::from_secs(1_800_000_000);
+            // A host's batch took these writes and then failed to commit.
+            let lost = session.pending(at).unwrap();
+            assert!(!lost.is_empty());
+            session
+                .apply_now(knot(), vec![retitle(1, "Later")])
+                .unwrap();
+
+            let retry = session.pending(at).unwrap();
+            assert!(
+                retry.ops().len() > lost.ops().len(),
+                "the retry carries the lost batch and what followed"
+            );
+            store.apply(retry.ops()).await.unwrap();
+            session.stored(retry);
+            assert!(session.pending(at).unwrap().is_empty());
+
+            let reopened = GraphSession::open(store, id).await.unwrap();
+            assert_eq!(whole(reopened.graph()), whole(session.graph()));
+            assert_eq!(reopened.journal().len(), session.journal().len());
+        });
+    }
+
+    #[test]
+    fn the_latest_live_session_is_the_one_changed_last() {
+        pollster::block_on(async {
+            let store = MemoryBackend::new();
+            let mere = MereSessions::new(store.clone());
+            let first = mere.mint(person(), None).await.unwrap().session_id;
+            let second = mere.mint(person(), None).await.unwrap().session_id;
+            let latest = || async { mere.latest_live().await.unwrap().map(|m| m.session_id) };
+            let base = wall_clock_now() + std::time::Duration::from_secs(60);
+            let at = |seconds| base + std::time::Duration::from_secs(seconds);
+
+            let mut one = mere.open(first).await.unwrap();
+            one.apply_now(person(), vec![add(1)]).unwrap();
+            one.flush(at(0)).await.unwrap();
+            let mut two = mere.open(second).await.unwrap();
+            two.apply_now(person(), vec![add(2)]).unwrap();
+            two.flush(at(1)).await.unwrap();
+            assert_eq!(latest().await, Some(second));
+
+            one.apply_now(person(), vec![retitle(1, "Again")]).unwrap();
+            one.flush(at(2)).await.unwrap();
+            assert_eq!(latest().await, Some(first), "a stored edit updates");
+
+            one.flush(at(3)).await.unwrap();
+            assert_eq!(
+                one.manifest().updated_at,
+                at(2),
+                "a flush with nothing new leaves updated_at alone"
+            );
+
+            one.trash(person(), at(4)).await.unwrap();
+            assert_eq!(
+                latest().await,
+                Some(second),
+                "a trashed session is not live"
+            );
         });
     }
 

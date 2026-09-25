@@ -6,8 +6,13 @@ wallet-persona resolution, djinn's reservoir lane and route, and a real
 two-process receipt. It reached origin with `5364dfa0` on 2026-09-24. V2's
 shape was ruled on 2026-09-23 and 2026-09-24 (§7). Steps 1 to 3
 (muniment, graph-kernel, pandect) landed on 2026-09-24 and reached origin on
-2026-09-25; step 3b, undo with exact replay, landed on 2026-09-25. Step 4, in
-djinn, is next.
+2026-09-25; step 3b, undo with exact replay, landed on 2026-09-25 and reached
+origin the same day. Step 4, `MereHost` on `GraphSession` in Graphshell, landed
+and reached origin on 2026-09-25, and a browser receipt the same day shows it
+running in Chromium over IndexedDB (§7 item 29); the receipt's scenario verdicts
+await a headed run. Step 5, djinn's routes, landed on 2026-09-25 with its
+two-process receipt, meeting V2's done-conditions (§8), and reached origin the
+same day. V2b, the mere view, is next.
 **Scope:** give each data domain one mere, and make every mere of an identity
 openable by any of that identity's applications. The meres are held by the
 device resident, with sessions, a graph journal and an Eidetic archive.
@@ -180,6 +185,25 @@ sessions.
   `woodshed/scenarios/woodshed_musical_comparison.json` by a relative path
   that resolves only from `repos/mere`, not from `worktrees/`.
 
+### Step 4 findings (verified 2026-09-25)
+
+- **pandect did not build for the browser.** Graphshell's browser build
+  (`ports/graphshell/web`, `wasm32-unknown-unknown`) runs `MereHost` over
+  IndexedDB, but Graphshell declares pandect native-only, and pandect fails
+  that target. getrandom 0.2 entered through two sources:
+  - pandect's own `rand_core 0.6`, for three nonce and secret draws;
+  - `p2panda-core`, whose `rand` dependency is unconditional. pandect used it
+    only for two CBOR helpers, each one `ciborium` call.
+
+  The crate doc's "compiles wasm32-clean" held for `wasm32-wasip2` only.
+  Graphshell's join had already moved to getrandom 0.3 for the same reason
+  (`ports/graphshell/src/webrtc_join.rs`).
+- **The manifest read std's clock.** `GraphSessionManifest::new`, `touch` and
+  `record_consolidation` called `std::time::SystemTime::now()`, which panics in
+  a browser, and minting or forking a session calls `new`. A build cannot catch
+  it. The kernel forbids that call for this reason and reads the clock through
+  `web_time` (`crates/graph/graph-kernel/src/lib.rs`).
+
 ## 3. Target shape
 
 ```text
@@ -333,14 +357,36 @@ and projection changes, replayable for the Timeline and for undo (ruled, §7).
     comparison above) and the session's undo and redo order. It follows step 3
     so the session types reach their consumers first; step 2 had carried it as
     "the inverse of a captured delta" before the undo rulings.
-4. djinn:
-   - open a mere by id on its own route;
-   - list its sessions, with mint, open, fork, trash and restore as intents;
-   - attach to a session;
-   - apply edits and view changes with the route's application as author;
+4. Graphshell: `MereHost` on `GraphSession`, reading its stored slot once into
+   the schema. It comes before djinn's routes, because a route projects a
+   session's graph with `MereHost`'s projection (ruled, §7 item 21); this was
+   step 5 until 2026-09-25.
+   - pandect first becomes browser-safe, so the browser build can hold a
+     `GraphSession` too (ruled, §7 item 26).
+   - Edits are the selected persona's, via `graphshell` or via the browser
+     extension that captured them (ruled, §7 item 23).
+   - The host opens the live session updated last, and mints one if there is
+     none (ruled, §7 item 24).
+   - The old slot is read once into the first session's baseline and left in
+     place (ruled, §7 item 25).
+   - A codicil import is written as ordinary edits, and opening a codicil mints
+     a new session from it (ruled, §7 item 27).
+   - Every stored change advances the session manifest's `updated_at` (ruled,
+     §7 item 28).
+5. djinn:
+   - each mere on its own route, `mere/<domain>` (ruled, §7 item 30),
+     registered at startup and whenever a mere is ensured; graphshell's door
+     learns to add routes and grants at runtime (ruled, §7 item 20), and hands
+     the endpoint the application it admitted, so the resident, not the
+     client, names it in each author;
+   - each route projects the mere's sessions, for the mere view, and the
+     attached session's graph, for editing (ruled, §7 item 22);
+   - mint, open, fork, trash, restore, undo and redo as intents;
+   - attach to a session, apply edits and view changes with the route's
+     application as author, through a session item the graph projection shows
+     in resident mode (ruled, §7 item 31), each accepted by id at any revision
+     (ruled, §7 item 32);
    - ring a revision bell for every attached session.
-5. Graphshell: `MereHost` on `GraphSession`, reading its stored slot once into
-   the schema.
 
 Turnstone adopts in its own plan, and Cleromancy in its C1.
 
@@ -468,7 +514,7 @@ Per phase, as the done-conditions state. Each receipt names the Mere revision
 it measured. Two-process receipts use real processes, not an in-memory
 composition presented as two.
 
-## 7. Decisions (ruled 2026-09-23 and 2026-09-24)
+## 7. Decisions (ruled 2026-09-23 to 2026-09-25)
 
 1. **Where the reservoir lives on disk.** Under the shared root, per persona:
    `<shared root>/personas/<persona>/reservoir/`.
@@ -543,6 +589,94 @@ V2's rulings. Items 6 to 8 were ruled on 2026-09-23 and the rest on
     exact edge follows each minted statement id, using existing entry kinds.
     The alternatives were to extend the add-node and assert entries, or to
     have undo and the Timeline ignore those values.
+20. **How an application reaches a mere** (2026-09-25). "A route per mere":
+    each mere gets its own route, registered at startup and when a mere is
+    ensured, and djinn's door learns to add routes and grants at runtime. This
+    keeps V4's denial at the route. The alternative was one route with an
+    attach-by-id intent.
+21. **Step order** (2026-09-25). "Step 5, then 4": `MereHost` moves onto
+    `GraphSession` first, so djinn serves `MereHost`'s projection instead of a
+    projection of its own. The steps are renumbered to match.
+22. **What a mere's route projects** (2026-09-25). "Sessions and graph": the
+    mere's sessions, for the V2b mere view, and the attached session's graph,
+    for editing. The alternative projected the graph only and left the session
+    list on the reservoir route.
+23. **Who Graphshell's edits are by** (2026-09-25). "Person via the channel":
+    the selected persona as a person, via `graphshell` for intents and fixture
+    edits, and via `browser.extension.<source>` for captured visits, so a
+    capture reads as coming through the browser. The alternative named
+    `graphshell` for everything.
+24. **Which session the reference host opens** (2026-09-25). "Most recently
+    updated": the live session whose manifest changed last, minting one if
+    there are none, with no new record to keep. The alternative kept a
+    current-session record, as Turnstone's `record_current_session` does.
+25. **The old slot** (2026-09-25). "Leave it in place": once
+    `graphshell/mere-host/v1` has been read into a new session's baseline it is
+    never read again, but no code path deletes it. The alternative removed it
+    in the batch that writes the new session.
+26. **How the browser build reaches the session core** (2026-09-25). Step 4
+    found that pandect could not build for the browser (§2, step 4 findings).
+    Mark chose "Fix pandect":
+    - nonces and secrets come from getrandom 0.3 directly, as Graphshell's
+      join draws them;
+    - the wallet's CBOR calls `ciborium` directly, the same two calls
+      p2panda-core's helpers made, so the bytes are unchanged;
+    - the manifest reads the kernel's `web_time` clock.
+
+    The alternatives were to turn on getrandom 0.2's browser support (a third
+    getrandom major in the browser build, which Graphshell avoids on purpose),
+    to split the session core into a crate below pandect, or to keep the
+    browser on the single slot.
+27. **Codicils in a session** (2026-09-25). Graphshell swapped in a whole new
+    graph for a codicil import (H6 transfer) and for "Open codicil" in the
+    browser, which a journal cannot record. Mark chose "Import as edits": an
+    import writes ordinary journaled edits, the new nodes rebuilt with the
+    machinery undo uses, so it is one undoable change on the Timeline. Opening
+    a codicil mints a new session from its graph and switches to it, leaving
+    the previous session in the mere. The alternatives were a journal entry
+    carrying the whole resulting graph, or a new session for both.
+28. **What updates a session** (2026-09-25). Ruling 24 opens the live session
+    updated last, but a manifest changed only at mint, trash and restore. Mark
+    chose "Any stored change": every flush that stores new changes advances
+    the manifest's `updated_at` and rewrites it in the same batch, as the
+    manifest's own `touch` describes. The alternative counted lifecycle steps
+    only.
+29. **Proving step 4 in a browser** (2026-09-25). `graphshell-web` did not
+    build here: its restated genet and netrender pins lagged the workspace's
+    (§8). Mark chose "Update graphshell-web": move its pins to the
+    workspace's, fix what the move changes, and record, in real Chromium, the
+    seeded session reloading from IndexedDB. The alternatives were to defer
+    the proof to whoever moves genet next, or to rebuild the machine-local
+    path patch.
+30. **A mere's route name** (2026-09-25). "`mere/<domain>`": a domain has
+    exactly one mere, so a client names the route from the domain it just
+    ensured, without reading the mere's id from the reservoir listing first.
+    The alternative was `mere/<mere id>`.
+31. **Where an attached application edits** (2026-09-25). Every intent
+    targets an item in one projection and names that projection's revision.
+    Mark chose "A session item in the graph": in resident mode the graph
+    projection shows one extra item, the session itself, carrying apply
+    edits, undo, redo and view changes, so an edit names the graph's revision
+    and works on an empty graph. Graphshell's own view never shows it. The
+    alternative put them on the session's card in the sessions projection.
+32. **Stale edits** (2026-09-25). Mark chose "Accept by id": edits name nodes
+    and relations by stable id, so they are well-defined at any revision, and
+    they apply in arrival order, with the journal recording who did what and
+    undo keeping what another author changed; on one field the later write
+    wins. The alternative refused an edit made against an older revision.
+    The session item's intents still check the epoch, which names another
+    session, not the revision.
+33. **Lifecycle steps from an older list** (2026-09-25). The sessions
+    projection's intents targeted a card by its place in the list, and step 5
+    refused them as stale once the list had moved. Mark chose "Name the
+    session by id": attach, fork, trash and restore carry the session's id in
+    the payload, and every lifecycle intent, mint included, is taken at any
+    revision of the list, as graph edits are (item 32). A step lands only if
+    the named session's card offers it as the session stands now, so trash on
+    a session already in the trash, restore on a live one, and attach to the
+    session the connection holds are refused, as the cards refused them
+    before. The epoch is still checked. The alternative kept the stale
+    refusal, with the application re-reading the list and retrying.
 
 ## 8. Progress
 
@@ -713,3 +847,277 @@ V2's rulings. Items 6 to 8 were ruled on 2026-09-23 and the rest on
     - mere-kernel 300 of 300 and pandect 298 of 298.
   - One kernel run straight after restoring the disabled captures failed one
     test; eleven runs since have passed, and the failure did not recur.
+- 2026-09-25: step 4 found that pandect could not reach Graphshell's browser
+  build (§2, step 4 findings), and Mark ruled "Fix pandect" (§7 item 26).
+  Rulings 23 to 25 record his earlier answers for the host. pandect's session
+  core is now browser-safe:
+  - its three nonce and secret draws take getrandom 0.3 directly;
+  - the wallet's CBOR calls `ciborium` directly, and pandect no longer depends
+    on p2panda-core;
+  - the kernel exposes its `web_time` clock as `time::wall_clock_now`, and the
+    manifest reads it.
+
+  Verified:
+  - pandect and mere-kernel check for `wasm32-unknown-unknown` with the
+    `wasm_js` getrandom backend, and pandect for `wasm32-wasip2`;
+  - getrandom 0.2 has left pandect's browser graph, where it was before;
+  - mere-kernel 301 of 301 and pandect 298 of 298;
+  - pandect's six workspace dependents check;
+  - clippy finds no new warning in pandect, which carries 48 older ones.
+
+  Not yet verified: Graphshell's browser build with pandect in its cone, which
+  comes with the host change.
+- 2026-09-25: the kernel writes an import as edits (§7 item 27):
+  `import_edits(live, incoming)` in `graph/merge.rs`.
+  - A node the live graph lacks arrives through undo's node recreation, with
+    its images.
+  - A node both hold keeps its fields and takes the incoming facets.
+  - The incoming relations join the live ones between the same two nodes,
+    worked out on a scratch pair as a snapshot load restores them.
+
+  Tests:
+  - on a fixture with shared, new and linked nodes, an image, and three kinds
+    of relation, the edits give the graph the old rebuild gave, apart from the
+    rebuild's empty facets for legacy columns, which the test checks are all
+    empty;
+  - dropping the images, or the joined relations, fails the comparison;
+  - importing what a graph already holds writes nothing;
+  - mere-kernel 303 of 303.
+
+  No codicil carries legacy column data: canonical saves have written the
+  columns empty since 2026-07-27 (`62a3aff6`), and the first engram schema
+  arrived on 2026-07-28 (`10d1b29b`). An import therefore loads a codicil's
+  facet store whole, as a session loads its own.
+- 2026-09-25: pandect's session core now writes the way a host needs:
+  - `GraphSession::new` begins a session in memory, and its first flush
+    stores the manifest and baseline with everything since;
+  - `edit_now` and `apply_now` journal an edit synchronously, stored at the
+    next flush;
+  - `pending(at)` and `stored(pending)` let a host write through a batch of
+    its own, and the session's cursors move only once that batch commits.
+    `flush(at)` does both;
+  - every store with new changes stamps the manifest's `updated_at` (§7 item
+    28), and `MereSessions::latest_live` picks the live session changed last
+    (§7 item 24);
+  - a view change writes what the session has pending in the same batch, so
+    no stored view names an unstored cursor;
+  - a checkpoint lands in the batch whose entries reach the interval.
+
+  Three new session tests: a session begun in memory writes nothing until its
+  first flush, then reopens as the same whole graph; a batch that never
+  commits stays pending, and the retry carries it; the latest live session
+  follows stored edits and skips the trash. pandect 301 of 301; it still
+  builds for the browser and `wasm32-wasip2`, its dependents check, and clippy
+  finds nothing new.
+- 2026-09-25: Graphshell's `MereHost` runs on a `GraphSession` (§7 items 23 to
+  27).
+  - The host's truth is one session in the store it is given, and `open`
+    takes the live session changed last. A store from before sessions has its
+    `graphshell/mere-host/v1` slot read into a first session's baseline,
+    stored at once, and left in place. The slot is read only while the store
+    holds no session at all, so a store whose sessions are all trashed begins
+    an empty one.
+  - Every edit is the selected persona's: via `graphshell` for intents,
+    product edits, imports and the fixture, and via
+    `browser.extension.<source>` for a captured visit.
+  - Edits are journaled as they happen and stored by `persist`. Capture puts
+    them into its own batch and marks them stored only once that batch
+    commits, so a failed delivery leaves them pending for the retry.
+  - An import is one change of `import_edits`. "Open codicil" begins a new
+    session and keeps the old one until its last changes are stored.
+  - Each open advances the projection epoch, kept in
+    `graphshell/projection-epoch/v1`, so an intent observed before a restart
+    reads as stale.
+  - pandect joins Graphshell's portable dependencies and its `web` feature.
+
+  Tests:
+  - graphshell's lib tests with `personal-sync`, which carries the `web` cone:
+    295 of 296. The failure, `distillery_w1`'s receipt comparison, is a
+    checkout artifact: `core.autocrlf` turns the committed LF receipt into
+    CRLF, and the test compares bytes.
+  - The H1 test's byte-equivalence claim is restated for sessions: the
+    reopened graph and facets encode to the same bytes as the live ones, and
+    reopening leaves nothing to store.
+  - New assertions: the old slot is read once, stored at once and left in
+    place, and is not read again after it is rewritten or after every session
+    is trashed; each open is a new epoch; the fixture's edits are the
+    persona's via `graphshell`, and a captured visit's via the extension; an
+    import is one change; opening a codicil begins a new session.
+  - The capture batch test still passes: a rejected batch stores no session,
+    and the retry stores the fixture's session with the visit.
+  - Graphshell checks for `wasm32-unknown-unknown` with `web` and
+    `webrtc-browser`, pandect in its tree and no getrandom 0.2.
+
+  Not verified: the browser runtime. `graphshell-web` does not build in this
+  environment, with or without this change. Its restated genet and netrender
+  pins lag the workspace's, so a fresh resolution holds two revisions of
+  each, reached through `cambium` and `mere`'s `pictograph`, and doubles
+  `ScriptedDom` and `Scene`. The machine-local path patch that reconciled
+  them points at a `worktrees/genet-head` that no longer exists. Inside that
+  graph Graphshell, pandect included, compiles; all seven errors are in
+  `graphshell-web`'s own files.
+
+  Unchanged: the browser stores at open and at capture, as before, so an
+  intent between them stays unsaved until the next capture batch.
+- 2026-09-25: step 4 rebased onto origin's main, which had repinned genet to
+  `5621ca05768`, re-verified with `--locked`, and pushed with Mark's approval.
+  The gate ran on `6a206411`; main then moved one commit (`e8f83f89`, three
+  cambium files), and `check --workspace --all-targets --locked` passed again
+  on it. The gate, all `--locked`:
+  - `check --workspace --all-targets`;
+  - mere-kernel 303 of 303 and pandect 301 of 301;
+  - graphshell's lib tests with `personal-sync` 295 of 296, the one failure
+    being `distillery_w1`'s CRLF artifact;
+  - graphshell's every target with all features;
+  - pandect, the kernel and Graphshell's browser cone for
+    `wasm32-unknown-unknown`, and pandect for `wasm32-wasip2`.
+- 2026-09-25: `graphshell-web` builds again, and step 4 runs in a browser (§7
+  item 29).
+  - Its genet pins follow the workspace to `5621ca05768`, netrender to
+    `aba7d837` and `genet-scripted-dom` to `=0.1.2`, and the dead
+    `ipc-channel` row goes. No source change was needed.
+  - In the in-app Chromium, over IndexedDB, as the receipt
+    `ports/graphshell/docs/2026-09-25_reservoir_step4_browser_session_receipt.md`
+    records: a fresh origin seeds one session of 92 journal entries and 12
+    changes, all the persona's via `graphshell`, and reopens it unchanged with
+    a new epoch. An origin holding only the old slot reads it once into a
+    session's baseline, leaves the slot byte-identical, continues its epoch,
+    and does not read it again after the slot is rewritten.
+  - The receipt's three scenarios gave no verdict: the pane was hidden, so the
+    frame pump never ticked. The facts were read from the DOM and IndexedDB
+    directly.
+- 2026-09-25: the receipt's scenario verdicts wait for Mark's next visit with
+  the Browser pane open (his call); the servers are in
+  `Code/.claude/launch.json`.
+- 2026-09-25: step 5 began with the door (§7 item 20).
+  - `AppRouteGrants` shares a door's grants with its host, which can grant
+    more while the door serves. Each connection is admitted against the
+    grants as they stand when its hello arrives.
+  - `AppEndpointCatalog::update` registers a route while the door serves.
+  - The admitted endpoint context names the application the door admitted,
+    so an endpoint attributes work to it without taking the client's word.
+
+  Tests:
+  - over the real transport, a door that opened without a route refuses it;
+    once the host grants and registers the route while serving, the next
+    connection on it opens, and its endpoint is told `turnstone`;
+  - a grant added later admits the next request, and not an earlier
+    connection's grants;
+  - graphshell's door tests 20 of 20 and lifecycle tests 15 of 15; djinn
+    checks.
+- 2026-09-25: `MereHost` can serve a resident (step 5, ruling 21).
+  - `open_session` opens a named session of a store, and
+    `with_projection_session` serves the graph under the resident's own
+    projection name.
+  - `through` and `apply_edits` are public, so a resident applies an attached
+    application's edits under that application's name; `undo`, `redo` and
+    `set_view` take the channel they act for.
+  - pandect re-exports `SessionId` and `GraphId`, so a host names sessions
+    through pandect.
+
+  Tests: a resident opens the older of two sessions by name under its own
+  projection; an attached application's edit, undo and view carry its name,
+  and another application's undo finds nothing of its own. graphshell's lib
+  tests with `personal-sync` 299 of 300, the one failure being
+  `distillery_w1`'s CRLF artifact; pandect 301 of 301; the browser cone and
+  djinn check.
+- 2026-09-25: the session item (§7 items 31 and 32).
+  - `graphshell::session_item` holds its vocabulary: apply edits, undo, redo
+    and change a view, each with its payload schema, and the item's card.
+  - `MereHost::with_session_item` shows it in the graph projection, after the
+    nodes, and `session_instance` names it for a resident to recognise;
+    Graphshell's own view does not show it.
+
+  Tests: a resident graph shows its nodes and the session item with the four
+  actions in order, and Graphshell's shows only its nodes. graphshell's lib
+  tests with `personal-sync` 300 of 301 (the CRLF artifact); the browser cone
+  and djinn check.
+- 2026-09-25: djinn serves each mere on its own route (§7 items 20 to 22 and
+  30 to 32).
+  - `resident_mere::MereRoutes` serves `mere/<domain>`. The lane serves the
+    meres the reservoir holds at startup, and the reservoir route serves each
+    one it ensures; each route is registered in the door's catalog and granted
+    to turnstone and knot-editor while the door serves.
+  - An admitted connection attaches to the live session changed last, minting
+    one if there is none, and sees two projections: the mere's sessions, with
+    mint, attach, fork, trash and restore, and the attached session's graph,
+    served by `MereHost` in resident mode.
+  - Applications attached to one session share one host, so an edit from one
+    rings the others, and none is rung for its own change. Edits, undo, redo
+    and view changes come through the session item as the admitted
+    application's, and are stored at once.
+  - The session item now keeps instance 0, ahead of the nodes, so an edit made
+    from an older snapshot, which is accepted by id, still names it. The first
+    test found this.
+  - pandect re-exports `Author`, `AuthorKind` and `CapturedDelta`.
+
+  Tests:
+  - two applications on one session: each is granted the route as the mere is
+    ensured, hears the other's edit and is not rung for its own, edits by id
+    from an older revision, and undoes only its own change; the stored changes
+    name each application;
+  - the lifecycle through the sessions projection: fork, mint, a stale
+    revision refused, attach to the fork, which starts from the parent and
+    diverges from it, then trash and restore;
+  - djinn's lib tests 80 of 80, with its integration tests; pandect 301 of
+    301; the browser cone checks; graphshell's lib tests 300 of 301 (the CRLF
+    artifact). One full graphshell run also failed
+    `carrier::tests::p2panda_murm_grant_is_refused_before_projection_bytes`,
+    which passed three times alone and in the next full run.
+- 2026-09-25: the two-process receipt, `ports/djinn/tests/mere_two_process.rs`.
+  The parent serves djinn's door with the reservoir route and the mere routes
+  over one catalog, and ensures `divination`. Two children, this test binary
+  re-run, attach through the door on `mere/divination`:
+  - the Knot editor, attached first, hears Turnstone's edit at revision 2,
+    sees the node and adds its own;
+  - Turnstone hears that at revision 3 and sees both nodes, with no stale
+    copy;
+  - the stored changes name both applications.
+
+  djinn's tests pass: 80 of 80 in the library, and its integration tests.
+- 2026-09-25: V2's done-conditions, with their evidence.
+  - Two processes through djinn, each seeing the other's edits by bell with no
+    stale copy: the receipt above.
+  - Replay from the baseline, and the checkpoint plus the tail, give the same
+    graph: pandect's
+    `a_checkpoint_and_its_tail_load_the_same_graph_as_the_baseline_and_journal`,
+    which compares whole graphs, facets included.
+  - The streams survive a restart, and a batch lands whole or not at all:
+    pandect's reopen tests, and muniment's directory backend tests (step 1).
+  - Every entry names its author and the application, supplied by the
+    resident: the door names the admitted application (step 5), and the
+    receipt reads both from the stored changes.
+  - Undo reverts the author's own latest change and leaves another's later
+    edit: pandect's undo tests, and djinn's
+    `two_applications_edit_one_session_and_hear_each_other`.
+  - A fork is independent, starts from its fork point, and records its parent
+    and cursor: pandect's
+    `a_fork_at_a_cursor_starts_from_the_parent_there_and_diverges`, and
+    djinn's `the_sessions_projection_runs_the_lifecycle`.
+  - Trash leaves the live set and restore brings the session back: pandect's
+    `trash_marks_the_manifest_and_restore_clears_it`, and the same djinn test.
+  - A session can be scrubbed, graph and views by journal cursor: pandect's
+    `graph_at` and `view_at`, tested in
+    `a_view_keeps_its_own_stream_scrubbable_by_journal_cursor`.
+  - Graphshell's reference host runs on `GraphSession`: step 4, and its
+    browser receipt.
+- 2026-09-25: lifecycle steps name their session (§7 item 33). The sessions
+  projection's intents carry the session's id and are taken at any revision
+  of the list; a step lands when the named session's card offers it as the
+  session stands now. This replaces the stale-revision refusal in the entry
+  for djinn's routes above. djinn's `the_sessions_projection_runs_the_lifecycle`
+  now attaches from a list the mint has moved past, and checks each refusal's
+  reason: a step the session's card no longer offers, a session the mere does
+  not hold, and a step naming no session.
+- 2026-09-25: step 5 and ruling 33 re-verified with `--locked` and pushed with
+  Mark's approval. Origin's main had not moved from `5cb6e65b`. The gate:
+  - `check --workspace --all-targets`, and Graphshell's every target with all
+    features;
+  - mere-kernel 303 of 303 and pandect 301 of 301;
+  - graphshell's lib tests with `personal-sync` 300 of 301, the one failure
+    being `distillery_w1`'s CRLF artifact;
+  - djinn 80 of 80 in the library, both two-process receipts, and its other
+    integration tests;
+  - the kernel, pandect and Graphshell's browser cone for
+    `wasm32-unknown-unknown`, the `graphshell-web` app, and pandect for
+    `wasm32-wasip2`.

@@ -23,6 +23,7 @@ use std::time::SystemTime;
 
 pub use identity::PersonaId;
 use incipit::{GraphId, SessionId};
+use kernel::time::wall_clock_now;
 use serde::{Deserialize, Serialize};
 
 /// Current manifest schema version. Bump on incompatible changes
@@ -179,7 +180,7 @@ impl GraphSessionManifest {
     /// and `updated_at` are stamped now; everything else takes its
     /// default. `persona_id` defaults to the v0 single persona.
     pub fn new(session_id: SessionId, root_graph_id: GraphId) -> Self {
-        let now = SystemTime::now();
+        let now = wall_clock_now();
         Self {
             schema_version: MANIFEST_SCHEMA_VERSION,
             session_id,
@@ -205,7 +206,7 @@ impl GraphSessionManifest {
     /// Called by the manifest store on any mutation that should
     /// reset idle-consolidation timers.
     pub fn touch(&mut self) {
-        self.updated_at = SystemTime::now();
+        self.updated_at = wall_clock_now();
     }
 
     /// Record a fork relationship — this session was created by
@@ -219,7 +220,7 @@ impl GraphSessionManifest {
     /// to now.
     pub fn record_consolidation(&mut self, codicil: CodicilId) {
         self.consolidated_codicils.push(codicil);
-        self.last_consolidated_at = Some(SystemTime::now());
+        self.last_consolidated_at = Some(wall_clock_now());
     }
 }
 

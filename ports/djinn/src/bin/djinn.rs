@@ -25,6 +25,7 @@ use djinn::resident::DjinnResident;
 #[cfg(feature = "personal-sync")]
 use djinn::resident_distillery::ResidentDistillery;
 #[cfg(feature = "personal-sync")]
+use djinn::resident_mere::MereRoutes;
 use djinn::resident_reservoir::ReservoirLane;
 #[cfg(feature = "personal-sync")]
 use djinn::settings::{self as owner_settings, SyncOverrides};
@@ -32,7 +33,9 @@ use graphshell::browser_carrier::AllowedExtensions;
 use graphshell::identity::VaultProtectionView;
 #[cfg(feature = "personal-sync")]
 use graphshell::native::app_admission::AppId;
-use graphshell::native::app_admission::{AllowedAppRoutes, configured_app_endpoint};
+use graphshell::native::app_admission::{
+    AllowedAppRoutes, AppRouteGrants, configured_app_endpoint,
+};
 use graphshell::native::app_broker::{AppEndpointCatalog, serve_app_broker};
 #[cfg(feature = "personal-sync")]
 use graphshell::native::device_broker::serve_browser_broker_with_cards;
@@ -719,37 +722,70 @@ async fn run(args: Args) -> Result<(), Box<dyn std::error::Error>> {
         let app_surface = supplemental_cards.clone();
         #[cfg(not(feature = "personal-sync"))]
         let app_surface: Option<graphshell::native::device_broker::DeviceSurfaceHandle> = None;
+        // The catalog and grants are shared with the door, so a mere ensured
+        // while it serves gets its route then (reservoir plan §7 item 20).
         #[cfg(feature = "personal-sync")]
         let (allowed_app_routes, app_catalog) = {
-            let mut catalog = ResidentEndpointCatalog::new();
-            let mut grants = vec![(
+            let catalog = AppEndpointCatalog::new(ResidentEndpointCatalog::new());
+            let grants = AppRouteGrants::new(AllowedAppRoutes::new([(
                 AppId::new("turnstone"),
                 ResidentEndpointRoute::new("identity", Duration::from_millis(50))?,
-            )];
-            if let Some(route) = resident.register_knot_route(&mut catalog)? {
-                grants.push((AppId::new("turnstone"), route));
+            )]));
+            if let Some(route) = catalog
+                .update(|catalog| resident.register_knot_route(catalog))
+                .await?
+            {
+                grants.grant(AppId::new("turnstone"), route);
             }
-            let route = resident.register_published_site_route(&mut catalog)?;
-            grants.push((AppId::new("knot-editor"), route));
+            let route = catalog
+                .update(|catalog| resident.register_published_site_route(catalog))
+                .await?;
+            grants.grant(AppId::new("knot-editor"), route);
             // V1 grants the reservoir to the first-party clients this door
-            // already knows; V4 makes it default-on for every one of them.
-            if let Some(route) = resident.register_reservoir_route(&mut catalog)? {
-                for app in ["turnstone", "knot-editor"] {
-                    grants.push((AppId::new(app), route.clone()));
+            // already knows; V4 makes it default-on for every one of them. Each
+            // mere goes to the same clients on its own route (V2, step 5):
+            // those the reservoir holds now, and each one ensured later.
+            let first_party = vec![AppId::new("turnstone"), AppId::new("knot-editor")];
+            let routes = resident.reservoir().reservoir().map(|reservoir| {
+                MereRoutes::new(
+                    pandect::shared_root::shared_root(),
+                    reservoir.persona(),
+                    catalog.clone(),
+                    grants.clone(),
+                    first_party.clone(),
+                )
+            });
+            if let Some(route) = catalog
+                .update(|catalog| resident.register_reservoir_route(catalog, routes.clone()))
+                .await?
+            {
+                for app in &first_party {
+                    grants.grant(app.clone(), route.clone());
+                }
+            }
+            if let (Some(routes), Some(reservoir)) = (&routes, resident.reservoir().reservoir()) {
+                for mere in reservoir.meres().await {
+                    match routes.serve(&mere).await {
+                        Ok(route) => tracing::info!(route = route.id(), "mere route open"),
+                        Err(reason) => {
+                            tracing::warn!(domain = %mere.domain, %reason, "mere route unavailable")
+                        },
+                    }
                 }
             }
             if let Some(observer) = distillery_chronicle {
-                let route = ResidentDistillery::register_chronicle_route(observer, &mut catalog)?;
-                grants.push((AppId::new("turnstone"), route));
+                let route = catalog
+                    .update(|catalog| {
+                        ResidentDistillery::register_chronicle_route(observer, catalog)
+                    })
+                    .await?;
+                grants.grant(AppId::new("turnstone"), route);
             }
-            (
-                AllowedAppRoutes::new(grants),
-                AppEndpointCatalog::new(catalog),
-            )
+            (grants, catalog)
         };
         #[cfg(not(feature = "personal-sync"))]
         let (allowed_app_routes, app_catalog) =
-            (AllowedAppRoutes::default(), AppEndpointCatalog::default());
+            (AppRouteGrants::default(), AppEndpointCatalog::default());
         let apps = serve_app_broker(
             &args.app_endpoint,
             Arc::clone(&personae),
