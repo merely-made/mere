@@ -34,13 +34,127 @@ use muniment::{Journal, LogId, Provenance, Seq};
 use rkyv::{Archive, Deserialize, Serialize};
 
 use super::Graph;
-use super::capture::{CapturedDelta, replay_captured_deltas, replay_captured_deltas_onto};
+use super::capture::{
+    CapturedDelta, DeltaRecorder, replay_captured_deltas, replay_captured_deltas_onto,
+};
 use super::source_time::{SourceExtent, SourceTime};
 
-/// The author every trusted-UI edit records under. Participant runs scope their
-/// own author (the subject's hex) via [`GraphJournal::set_author`]; entries
-/// migrated from pre-envelope logs carry `pre-gate` (chartulary's convention).
+/// The id the trusted UI's person records under when the host has no persona
+/// to name: see [`Author::user`].
 pub const USER_AUTHOR: &str = "user";
+
+/// What kind of author made a change: a person, or a rule, script or engine
+/// acting at some version (the ambiance design's moves between keeping levels
+/// record the same four).
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    Archive,
+    Serialize,
+    Deserialize,
+    serde::Serialize,
+    serde::Deserialize,
+)]
+#[serde(rename_all = "snake_case")]
+pub enum AuthorKind {
+    Person,
+    Rule,
+    Script,
+    Engine,
+}
+
+/// Who or what made a journal entry, and through which application.
+///
+/// Every field is always written, since a positional codec cannot read back a
+/// field written conditionally.
+#[derive(
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    Archive,
+    Serialize,
+    Deserialize,
+    serde::Serialize,
+    serde::Deserialize,
+)]
+pub struct Author {
+    pub kind: AuthorKind,
+    /// A persona or subject id for a person; the rule's, script's or engine's
+    /// name otherwise.
+    pub id: String,
+    /// The rule's, script's or engine's version. A person has none.
+    pub version: Option<String>,
+    /// The application the change came through. A resident fills this in
+    /// from the admitted route rather than taking the client's word for it.
+    pub via: Option<String>,
+}
+
+impl Author {
+    /// A person, by persona or subject id.
+    pub fn person(id: impl Into<String>) -> Self {
+        Self::new(AuthorKind::Person, id, None)
+    }
+
+    /// The person at the trusted UI, when the host has no persona to name.
+    pub fn user() -> Self {
+        Self::person(USER_AUTHOR)
+    }
+
+    /// A rule at a version.
+    pub fn rule(id: impl Into<String>, version: impl Into<String>) -> Self {
+        Self::new(AuthorKind::Rule, id, Some(version.into()))
+    }
+
+    /// A script at a version.
+    pub fn script(id: impl Into<String>, version: impl Into<String>) -> Self {
+        Self::new(AuthorKind::Script, id, Some(version.into()))
+    }
+
+    /// An engine at a version.
+    pub fn engine(id: impl Into<String>, version: impl Into<String>) -> Self {
+        Self::new(AuthorKind::Engine, id, Some(version.into()))
+    }
+
+    fn new(kind: AuthorKind, id: impl Into<String>, version: Option<String>) -> Self {
+        Self {
+            kind,
+            id: id.into(),
+            version,
+            via: None,
+        }
+    }
+
+    /// The same author, arriving through `application`.
+    pub fn via(mut self, application: impl Into<String>) -> Self {
+        self.via = Some(application.into());
+        self
+    }
+}
+
+impl std::fmt::Display for Author {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let kind = match self.kind {
+            AuthorKind::Person => "person",
+            AuthorKind::Rule => "rule",
+            AuthorKind::Script => "script",
+            AuthorKind::Engine => "engine",
+        };
+        write!(f, "{kind} {}", self.id)?;
+        if let Some(version) = &self.version {
+            write!(f, " {version}")?;
+        }
+        if let Some(via) = &self.via {
+            write!(f, " via {via}")?;
+        }
+        Ok(())
+    }
+}
 
 /// One journal entry: a captured delta in the attribution envelope — the
 /// participant-gate plan's B1 adoption of chartulary's `Batch { author, edits }`
@@ -50,9 +164,7 @@ pub const USER_AUTHOR: &str = "user";
     Debug, Clone, PartialEq, Archive, Serialize, Deserialize, serde::Serialize, serde::Deserialize,
 )]
 pub struct AttributedDelta {
-    /// `user` for the trusted UI path, a participant subject's hex for gated runs,
-    /// `pre-gate` for entries migrated from bare logs.
-    pub author: String,
+    pub author: Author,
     pub delta: CapturedDelta,
 }
 
@@ -63,23 +175,23 @@ pub struct AttributedDelta {
 #[derive(Clone, Debug)]
 pub struct GraphJournal {
     log: Journal<AttributedDelta>,
-    /// The author the next [`record`](Self::record) attributes — `user` by
-    /// default; a host scopes a participant run with [`set_author`](Self::set_author)
-    /// and restores afterwards.
-    author: String,
+    /// The author the next [`record`](Self::record) attributes: [`Author::user`]
+    /// by default; a host scopes a participant run with
+    /// [`set_author`](Self::set_author) and restores afterwards.
+    author: Author,
 }
 
 impl Default for GraphJournal {
     fn default() -> Self {
         Self {
             log: Journal::default(),
-            author: USER_AUTHOR.to_string(),
+            author: Author::user(),
         }
     }
 }
 
 impl GraphJournal {
-    /// A fresh, empty journal (author `user`).
+    /// A fresh, empty journal, recording as [`Author::user`].
     pub fn new() -> Self {
         Self::default()
     }
@@ -89,8 +201,15 @@ impl GraphJournal {
     pub fn with_id(id: LogId) -> Self {
         Self {
             log: Journal::with_id(id),
-            author: USER_AUTHOR.to_string(),
+            author: Author::user(),
         }
+    }
+
+    /// An empty journal that starts where `provenance` says another left off,
+    /// without copying its entries: the keeper holds the graph they built as a
+    /// snapshot. A session forked at a cursor starts this way.
+    pub fn starting_from(id: LogId, provenance: Provenance) -> Self {
+        Self::from_log(Journal::starting_from(id, provenance))
     }
 
     /// Adopt an existing journal of attributed deltas (e.g. one just loaded
@@ -98,19 +217,19 @@ impl GraphJournal {
     pub fn from_log(log: Journal<AttributedDelta>) -> Self {
         Self {
             log,
-            author: USER_AUTHOR.to_string(),
+            author: Author::user(),
         }
     }
 
     /// The author subsequent [`record`](Self::record)s attribute.
-    pub fn author(&self) -> &str {
+    pub fn author(&self) -> &Author {
         &self.author
     }
 
-    /// Scope the recording author (a participant run); the host restores `user`
-    /// when the run ends.
-    pub fn set_author(&mut self, author: impl Into<String>) {
-        self.author = author.into();
+    /// Scope the recording author (a participant run); the host restores the
+    /// previous one when the run ends.
+    pub fn set_author(&mut self, author: Author) {
+        self.author = author;
     }
 
     /// Append one captured edit under the current author, returning the [`Seq`]
@@ -122,11 +241,8 @@ impl GraphJournal {
     }
 
     /// Append one captured edit under an explicit author (the gate path).
-    pub fn record_as(&mut self, author: impl Into<String>, delta: CapturedDelta) -> Seq {
-        self.log.append(AttributedDelta {
-            author: author.into(),
-            delta,
-        })
+    pub fn record_as(&mut self, author: Author, delta: CapturedDelta) -> Seq {
+        self.log.append(AttributedDelta { author, delta })
     }
 
     /// The underlying journal, for cursors, replication, and persistence.
@@ -256,17 +372,6 @@ impl GraphJournal {
     ) -> Result<Self, StoreError> {
         Ok(Self::from_log(Journal::load(slots, key).await?))
     }
-
-    /// Adopt a pre-envelope journal of bare [`CapturedDelta`]s, attributing
-    /// every entry `pre-gate` (chartulary's migration convention): the one-way
-    /// load-time migration for logs recorded before attribution existed.
-    pub fn migrate_bare_log(log: Journal<CapturedDelta>) -> Self {
-        let mut journal = GraphJournal::new();
-        for delta in log.entries() {
-            journal.record_as("pre-gate", delta.clone());
-        }
-        journal
-    }
 }
 
 impl SourceTime for GraphJournal {
@@ -303,13 +408,10 @@ impl SourceTime for GraphJournal {
 ///
 /// The capture hook is one per-thread slot, so this replaces any previously
 /// installed hook. It is offered as the host's journal-backed persistence path.
-pub fn journal_capture_hook() -> (
-    Arc<Mutex<GraphJournal>>,
-    Arc<dyn Fn(&CapturedDelta) + Send + Sync + 'static>,
-) {
+pub fn journal_capture_hook() -> (Arc<Mutex<GraphJournal>>, DeltaRecorder) {
     let journal = Arc::new(Mutex::new(GraphJournal::new()));
     let sink = Arc::clone(&journal);
-    let hook: Arc<dyn Fn(&CapturedDelta) + Send + Sync + 'static> = Arc::new(move |delta| {
+    let hook: DeltaRecorder = Arc::new(move |delta| {
         if let Ok(mut journal) = sink.lock() {
             journal.record(delta.clone());
         }
@@ -357,24 +459,35 @@ mod tests {
         (nodes, edges)
     }
 
-    /// The envelope: entries carry their author; the default is `user`, a
-    /// scoped author attributes a participant run, and replay strips the envelope.
+    /// The envelope: entries carry their author; the default is the trusted
+    /// UI's person, a scoped author attributes a participant run, and replay
+    /// strips the envelope.
     #[test]
     fn entries_are_attributed_and_author_scoping_works() {
         let mut journal = GraphJournal::new();
         journal.record(add(1, "https://a.test/"));
-        journal.set_author("aa11");
+        journal.set_author(Author::person("aa11"));
         journal.record(add(2, "https://b.test/"));
-        journal.set_author(USER_AUTHOR);
-        journal.record_as("gate", add(3, "https://c.test/"));
+        journal.set_author(Author::user());
+        journal.record_as(
+            Author::engine("tarot-shuffle", "1.2").via("cleromancy"),
+            add(3, "https://c.test/"),
+        );
 
-        let authors: Vec<&str> = journal
+        let authors: Vec<String> = journal
             .entries()
             .iter()
-            .map(|e| e.author.as_str())
+            .map(|e| e.author.to_string())
             .collect();
-        assert_eq!(authors, ["user", "aa11", "gate"]);
-        assert_eq!(journal.author(), USER_AUTHOR, "scoping restored");
+        assert_eq!(
+            authors,
+            [
+                "person user",
+                "person aa11",
+                "engine tarot-shuffle 1.2 via cleromancy"
+            ]
+        );
+        assert_eq!(journal.author(), &Author::user(), "scoping restored");
         assert_eq!(
             journal.replay().node_count(),
             3,
@@ -411,15 +524,117 @@ mod tests {
         );
     }
 
-    /// A pre-envelope bare log migrates one-way with the `pre-gate` author.
+    /// Every author field is written, so the record reads back through any
+    /// codec, positional ones included.
     #[test]
-    fn a_bare_log_migrates_as_pre_gate() {
-        let mut bare = Journal::<CapturedDelta>::default();
-        bare.append(add(1, "https://a.test/"));
-        bare.append(add(2, "https://b.test/"));
-        let journal = GraphJournal::migrate_bare_log(bare);
-        assert!(journal.entries().iter().all(|e| e.author == "pre-gate"));
-        assert_eq!(journal.replay().node_count(), 2);
+    fn an_author_writes_every_field() {
+        let author = Author::rule("promote-on-tag", "3").via("turnstone");
+        let json = serde_json::to_string(&author).unwrap();
+        assert_eq!(
+            json,
+            r#"{"kind":"rule","id":"promote-on-tag","version":"3","via":"turnstone"}"#
+        );
+        assert_eq!(serde_json::from_str::<Author>(&json).unwrap(), author);
+        let person = serde_json::to_string(&Author::user()).unwrap();
+        assert_eq!(
+            person,
+            r#"{"kind":"person","id":"user","version":null,"via":null}"#
+        );
+    }
+
+    /// A graph that opted in records its own deltas; a clone of it records
+    /// nothing, and neither does a graph that never opted in.
+    #[test]
+    fn a_graph_records_its_own_deltas_and_a_clone_does_not() {
+        let seen = Arc::new(Mutex::new(Vec::new()));
+        let sink = Arc::clone(&seen);
+        let mut session = Graph::new();
+        session.set_recorder(Some(Arc::new(move |delta: &CapturedDelta| {
+            sink.lock().unwrap().push(delta.clone());
+        })));
+        assert!(session.is_recording());
+        let add_node = |graph: &mut Graph, id: u128| {
+            apply_graph_delta(
+                graph,
+                GraphDelta::AddNode {
+                    id: Some(Uuid::from_u128(id)),
+                    url: format!("https://{id}.test/"),
+                    position: Point2D::new(0.0, 0.0),
+                },
+            )
+        };
+        add_node(&mut session, 1);
+        let mut copy = session.clone();
+        assert!(!copy.is_recording());
+        add_node(&mut copy, 2);
+        add_node(&mut Graph::new(), 3);
+        assert_eq!(
+            seen.lock().unwrap().as_slice(),
+            &[add(1, "https://1.test/")]
+        );
+    }
+
+    /// Replay records nothing: a scrub or a catch-up re-applies history, it
+    /// does not make new history. The same run first proves both instruments
+    /// see a live edit, so the silence after is the replay's.
+    #[test]
+    fn replay_records_nothing() {
+        let (hooked, hook) = journal_capture_hook();
+        set_captured_delta_hook(Some(hook));
+        let seen = Arc::new(Mutex::new(0usize));
+        let sink = Arc::clone(&seen);
+        let mut session = Graph::new();
+        session.set_recorder(Some(Arc::new(move |_: &CapturedDelta| {
+            *sink.lock().unwrap() += 1;
+        })));
+        apply_graph_delta(
+            &mut session,
+            GraphDelta::AddNode {
+                id: Some(Uuid::from_u128(1)),
+                url: "https://a.test/".to_string(),
+                position: Point2D::new(0.0, 0.0),
+            },
+        );
+        assert_eq!(
+            hooked.lock().unwrap().len(),
+            1,
+            "the thread hook sees live edits"
+        );
+        assert_eq!(
+            *seen.lock().unwrap(),
+            1,
+            "the graph's recorder sees live edits"
+        );
+
+        let history = hooked.lock().unwrap().clone();
+        let scrubbed = history.snapshot_at(history.live_cursor()).unwrap();
+        replay_captured_deltas_onto(&mut session, [add(2, "https://b.test/")]);
+        assert_eq!(scrubbed.node_count(), 1);
+        assert_eq!(session.node_count(), 2);
+        assert_eq!(
+            hooked.lock().unwrap().len(),
+            1,
+            "replay reached the thread hook"
+        );
+        assert_eq!(
+            *seen.lock().unwrap(),
+            1,
+            "replay reached the graph's recorder"
+        );
+
+        // Both instruments are back once the replay ends.
+        assert!(session.is_recording());
+        apply_graph_delta(
+            &mut session,
+            GraphDelta::AddNode {
+                id: Some(Uuid::from_u128(3)),
+                url: "https://c.test/".to_string(),
+                position: Point2D::new(0.0, 0.0),
+            },
+        );
+        assert_eq!(hooked.lock().unwrap().len(), 2);
+        assert_eq!(*seen.lock().unwrap(), 2);
+        set_captured_delta_hook(None);
     }
 
     #[test]

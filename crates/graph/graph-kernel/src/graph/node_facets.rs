@@ -13,7 +13,7 @@
 use serde::{Serialize, de::DeserializeOwned};
 use uuid::Uuid;
 
-use super::capture::{CapturedDelta, record_captured_delta};
+use super::capture::CapturedDelta;
 use super::{Graph, NodeKey};
 use crate::types::{NodeClassification, NodeProperty, NodeTagPresentationState};
 
@@ -155,7 +155,7 @@ impl Graph {
             self.set_node_facet(key, PRESENTATION_TAGS, &presentation);
         }
         for tag in accepted {
-            record_captured_delta(&CapturedDelta::ReplayInsertNodeTagById {
+            self.record_delta(&CapturedDelta::ReplayInsertNodeTagById {
                 node_id: node_id.to_string(),
                 tag,
             });
@@ -198,7 +198,7 @@ impl Graph {
         let changed = self.set_node_facet(key, SEMANTIC_PROPERTIES, &properties);
         if changed {
             for property in accepted {
-                record_captured_delta(&CapturedDelta::ReplayAppendNodePropertyById {
+                self.record_delta(&CapturedDelta::ReplayAppendNodePropertyById {
                     node_id: node_id.to_string(),
                     property,
                 });
@@ -238,7 +238,7 @@ impl Graph {
         let changed = self.set_node_facet(key, SEMANTIC_CLASSIFICATIONS, &classifications);
         if changed {
             for classification in &classifications[first_appended..] {
-                record_captured_delta(&CapturedDelta::ReplayAddNodeClassificationById {
+                self.record_delta(&CapturedDelta::ReplayAddNodeClassificationById {
                     node_id: node_id.to_string(),
                     classification: classification.clone(),
                 });

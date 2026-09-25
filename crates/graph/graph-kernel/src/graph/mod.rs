@@ -118,10 +118,12 @@ pub use history::{
 // `EdgeKind`; reads go through [`RelationKind`] + [`RelationSelector`], writes
 // through [`EdgeAssertion`].
 pub use capture::{
-    CapturedDelta, GraphTableStats, replay_captured_deltas, replay_captured_deltas_onto,
-    set_captured_delta_hook,
+    CapturedDelta, DeltaRecorder, GraphTableStats, replay_captured_deltas,
+    replay_captured_deltas_onto, set_captured_delta_hook,
 };
-pub use journal::{AttributedDelta, GraphJournal, USER_AUTHOR, journal_capture_hook};
+pub use journal::{
+    AttributedDelta, Author, AuthorKind, GraphJournal, USER_AUTHOR, journal_capture_hook,
+};
 pub use source_time::{SourceExtent, SourceTime};
 // The borne-graph identity type (`Node.nested`): part of the node's public
 // surface, re-exported so consumers name it without a direct muniment dep.
@@ -321,6 +323,11 @@ pub struct Graph {
     /// host opts in. Not part of the persisted snapshot: it is per-launch host state, not
     /// graph truth. (Alembic B5 — by-sessions eviction.)
     current_session: u64,
+
+    /// Where this graph sends its own captured deltas, once a host opts it in
+    /// with [`set_recorder`](Self::set_recorder). Not graph truth, and not
+    /// carried by a clone.
+    pub(crate) recorder: capture::Recorder,
 }
 
 impl Graph {
@@ -337,7 +344,21 @@ impl Graph {
             revision: 0,
             url_grouping_revision: 0,
             current_session: 0,
+            recorder: capture::Recorder::default(),
         }
+    }
+
+    /// Send every delta this graph applies through `apply_graph_delta` to
+    /// `recorder`, or stop with `None`. The per-graph twin of the thread's
+    /// capture hook: a host holding many session graphs records each into its
+    /// own journal. A clone of this graph, and a replay onto it, record nothing.
+    pub fn set_recorder(&mut self, recorder: Option<DeltaRecorder>) {
+        self.recorder.0 = recorder;
+    }
+
+    /// Whether this graph records its deltas.
+    pub fn is_recording(&self) -> bool {
+        self.recorder.0.is_some()
     }
 
     /// Set the current app-launch session number (Alembic B5). The host calls this once,

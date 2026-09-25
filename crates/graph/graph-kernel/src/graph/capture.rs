@@ -725,18 +725,39 @@ where
 /// after it. Live editing and replay both funnel through `apply_graph_delta`, so a
 /// replayed graph cannot diverge from the one the edits were captured from — the
 /// edit-spine invariant. (See `graph/journal.rs`.)
+///
+/// Replay records nothing, to the graph's recorder or the thread's hook: the
+/// entries replayed are already history, not new edits.
 pub fn replay_captured_deltas_onto<I>(graph: &mut Graph, deltas: I)
 where
     I: IntoIterator<Item = CapturedDelta>,
 {
+    let _quiet = QuietThread::begin();
+    let recorder = graph.recorder.0.take();
     for delta in deltas {
         if let Some(delta) = delta.replay_delta() {
             let _ = apply_graph_delta(graph, delta);
         }
     }
+    graph.recorder.0 = recorder;
 }
 
 type CaptureHook = dyn Fn(&CapturedDelta) + Send + Sync + 'static;
+
+/// Where a graph that opted in sends its own captured deltas: see
+/// [`Graph::set_recorder`].
+pub type DeltaRecorder = Arc<CaptureHook>;
+
+/// A graph's recorder. A clone starts without one, so a scratch copy of a
+/// session's graph never writes into that session's journal.
+#[derive(Default)]
+pub(crate) struct Recorder(pub(crate) Option<DeltaRecorder>);
+
+impl Clone for Recorder {
+    fn clone(&self) -> Self {
+        Self(None)
+    }
+}
 
 thread_local! {
     static CAPTURE_HOOK: RefCell<Option<Arc<CaptureHook>>> = RefCell::new(None);
@@ -747,12 +768,36 @@ pub fn set_captured_delta_hook(hook: Option<Arc<CaptureHook>>) {
     CAPTURE_HOOK.with(|slot| *slot.borrow_mut() = hook);
 }
 
-pub(crate) fn record_captured_delta(delta: &CapturedDelta) {
-    CAPTURE_HOOK.with(|slot| {
-        if let Some(hook) = slot.borrow().as_ref() {
-            hook(delta);
+/// Clears the thread's capture hook for a replay and puts it back after,
+/// even if the replay panics.
+struct QuietThread(Option<Arc<CaptureHook>>);
+
+impl QuietThread {
+    fn begin() -> Self {
+        Self(CAPTURE_HOOK.with(|slot| slot.borrow_mut().take()))
+    }
+}
+
+impl Drop for QuietThread {
+    fn drop(&mut self) {
+        let hook = self.0.take();
+        CAPTURE_HOOK.with(|slot| *slot.borrow_mut() = hook);
+    }
+}
+
+impl Graph {
+    /// Emit a delta this graph just applied: to its own recorder, if it opted
+    /// in, and to the thread's hook.
+    pub(crate) fn record_delta(&self, delta: &CapturedDelta) {
+        if let Some(recorder) = &self.recorder.0 {
+            recorder(delta);
         }
-    });
+        CAPTURE_HOOK.with(|slot| {
+            if let Some(hook) = slot.borrow().as_ref() {
+                hook(delta);
+            }
+        });
+    }
 }
 
 #[cfg(test)]
@@ -1696,6 +1741,9 @@ mod tests {
                 body: Some("body".into()),
             },
         );
+        // Creating a node stamps its visit time, and a touch records only when
+        // the millisecond has moved on, which this test can otherwise outrun.
+        std::thread::sleep(std::time::Duration::from_millis(2));
         let _ = crate::graph::apply::apply_graph_delta(
             &mut graph,
             GraphDelta::TouchNodeLastVisited { key: a },
