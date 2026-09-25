@@ -13,7 +13,7 @@ use tabard::{
     LAGRANGE_V1_21_1_IGNORED_LABELS, LagrangePaletteDiagnostic, LagrangePaletteMode,
     TABARD_EXTENSION_KEY, Theme,
 };
-use tinct::{Seeds, Srgb, color_to_hex, contrast};
+use tinct::{Seeds, Srgb, SyntaxRole, color_to_hex, contrast};
 
 fn theme() -> Theme {
     Theme::new(
@@ -152,6 +152,63 @@ fn livery_resolves_the_emitted_custom_properties() {
     assert_eq!(
         computed.background_color,
         color_to_hex(palette.surface).parse::<Color>().unwrap()
+    );
+}
+
+#[test]
+fn tokens_and_stylesheet_carry_every_syntax_role() {
+    let theme = theme();
+    let syntax = theme.syntax_palette();
+    let document = theme.design_tokens();
+    let css = theme.css_custom_properties();
+    assert_eq!(document.color.syntax.roles.len(), SyntaxRole::ALL.len());
+    for role in SyntaxRole::ALL {
+        let expected = color_to_hex(syntax.role(role));
+        let token = &document.color.syntax.roles[role.name()];
+        assert_eq!(token.token_type, DtcgTokenType::Color);
+        assert_eq!(token.value.hex, expected, "DTCG token for {}", role.name());
+        let declaration = format!("--tabard-syntax-{}: {expected};", role.name());
+        assert!(
+            css.lines().any(|line| line.trim() == declaration),
+            "{declaration}"
+        );
+    }
+    let json = theme.design_tokens_json().expect("DTCG JSON");
+    let back: DtcgDocument = serde_json::from_str(&json).expect("typed DTCG JSON");
+    let hexes = |document: &DtcgDocument| {
+        document
+            .color
+            .syntax
+            .roles
+            .iter()
+            .map(|(name, token)| (name.clone(), token.value.hex.clone()))
+            .collect::<Vec<_>>()
+    };
+    assert_eq!(hexes(&back), hexes(&document));
+
+    // Livery resolves a syntax property like any other.
+    let stylesheet = format!("{css}\n.probe {{ color: var(--tabard-syntax-keyword); }}");
+    let styles = StyleSet::cambium(&[&stylesheet]);
+    assert!(
+        styles.diagnostics().is_empty(),
+        "{:?}",
+        styles.diagnostics()
+    );
+    let page = StaticDocument::parse("<html><body><p class=\"probe\">fn</p></body></html>");
+    let probe = page
+        .first_with_class(page.document(), "probe")
+        .expect("probe element");
+    let plane = resolve_styles(
+        &page,
+        &styles,
+        &Device::screen(320.0, 200.0),
+        &InteractionStates::default(),
+    );
+    assert_eq!(
+        plane.get(probe).expect("computed probe style").color,
+        color_to_hex(syntax.role(SyntaxRole::Keyword))
+            .parse::<Color>()
+            .unwrap()
     );
 }
 

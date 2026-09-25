@@ -64,6 +64,28 @@ impl SyntaxRole {
         Self::Mention,
         Self::Tag,
     ];
+
+    /// The role's lowercase key, as token and stylesheet names use it.
+    pub const fn name(self) -> &'static str {
+        match self {
+            Self::Heading => "heading",
+            Self::Emphasis => "emphasis",
+            Self::Strong => "strong",
+            Self::Link => "link",
+            Self::Quote => "quote",
+            Self::Verbatim => "verbatim",
+            Self::Keyword => "keyword",
+            Self::Type => "type",
+            Self::Function => "function",
+            Self::String => "string",
+            Self::Number => "number",
+            Self::Comment => "comment",
+            Self::Punctuation => "punctuation",
+            Self::Url => "url",
+            Self::Mention => "mention",
+            Self::Tag => "tag",
+        }
+    }
 }
 
 /// A themed colour per [`SyntaxRole`], plus the surface it was gated against (so a
