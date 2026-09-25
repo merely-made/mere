@@ -16,8 +16,6 @@ use crate::wallet_store::*;
 
 use super::*;
 
-use p2panda_core::cbor::{decode_cbor, encode_cbor};
-
 pub fn build_remote_auth_enrollment_bundle(
     data_root: &Path,
     device_id: DeviceId,

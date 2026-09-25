@@ -26,13 +26,13 @@ use identity::PersonaId;
 use identity::carry::ACTION_PRIVATE_READ;
 use identity::carry::{DeviceGrantSet, WALLET_SCHEMA_VERSION};
 use identity::delegation::{DelegationId, SignedDelegationCertificate};
-use p2panda_core::cbor::{decode_cbor, encode_cbor};
 use serde::{Deserialize, Serialize};
 
 use crate::wallet_store::identity_grants_dir;
 
 use super::{
     CarryRef, DeviceGrantError, DeviceId, KeyEpochId, WrappedEpochMaterial, blinded_epoch_index,
+    decode_cbor, encode_cbor,
 };
 
 /// The wrapped private-lane material one device grant carries.

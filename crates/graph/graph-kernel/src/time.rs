@@ -59,6 +59,15 @@ pub(crate) fn unix_epoch_seconds() -> u64 {
         .unwrap_or(0)
 }
 
+/// The wall clock as a `std::time::SystemTime`, for crates that persist one
+/// and may run in a browser, where `SystemTime::now()` panics.
+pub fn wall_clock_now() -> std::time::SystemTime {
+    let since = web_time::SystemTime::now()
+        .duration_since(web_time::UNIX_EPOCH)
+        .unwrap_or_default();
+    std::time::UNIX_EPOCH + since
+}
+
 /// Host-provided monotonic timestamp, measured in milliseconds from a
 /// host-chosen origin.
 ///
@@ -197,5 +206,15 @@ mod tests {
         assert_eq!(json, "1234567890");
         let decoded: PortableInstant = serde_json::from_str(&json).unwrap();
         assert_eq!(decoded, original);
+    }
+
+    // Native only: there `web_time` is std's clock, so the two must agree.
+    #[cfg(not(target_arch = "wasm32"))]
+    #[test]
+    fn wall_clock_now_reads_the_platform_clock() {
+        let before = web_time::SystemTime::now();
+        let now = wall_clock_now();
+        let after = web_time::SystemTime::now();
+        assert!(before <= now && now <= after);
     }
 }
