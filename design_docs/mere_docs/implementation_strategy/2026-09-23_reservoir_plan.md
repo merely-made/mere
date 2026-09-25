@@ -12,7 +12,8 @@ and reached origin on 2026-09-25, and a browser receipt the same day shows it
 running in Chromium over IndexedDB (§7 item 29); the receipt's scenario verdicts
 await a headed run. Step 5, djinn's routes, landed on 2026-09-25 with its
 two-process receipt, meeting V2's done-conditions (§8), and reached origin the
-same day. V2b, the mere view, is next.
+same day. V2b, the mere view, was assessed and ruled the same day (§7 items 34
+to 38); its step 1, the component, is next.
 **Scope:** give each data domain one mere, and make every mere of an identity
 openable by any of that identity's applications. The meres are held by the
 device resident, with sessions, a graph journal and an Eidetic archive.
@@ -203,6 +204,46 @@ sessions.
   a browser, and minting or forking a session calls `new`. A build cannot catch
   it. The kernel forbids that call for this reason and reads the clock through
   `web_time` (`crates/graph/graph-kernel/src/lib.rs`).
+
+### V2b findings (verified 2026-09-25)
+
+- **The consumers' embeddings are their own plans' steps.** Knot's is step 8
+  of its slice 1 plan
+  (`repos/knot-editor/design_docs/2026-09-23_knot_workspace_slice1_plan.md`),
+  which says whether Knot shows an interim view or waits for V2b is Mark's call
+  when step 8 comes up; Knot's last recorded step is 4c. Cleromancy's is C1
+  (`repos/cleromancy/design_docs/2026-09-23_divination_mere_plan.md`), which
+  waits for V1 to V5. V2b's done-conditions as first written could not be met
+  from this repository.
+- **Knot's catalog is not in a mere.** Knot's step 8 hands the view its
+  catalog: documents as nodes, extracted links as edges, and each document's
+  state. Moving Knot's notes into the reservoir is tracked, not scheduled. The
+  view cannot be only a client of a mere's route.
+- **Cambium has most of the graph.** `cambium::graph_canvas` (2,563 lines)
+  draws a graph as one paint leaf with a native button per node. Each node
+  has a label that is its accessible name and an optional stable `data-key`,
+  and each relation is its own cell with an id and a kind, fanned rather than
+  merged when two share endpoints. It covers Knot's requirements 5 and 7.
+  `workbench` holds tiles in presentation vocabulary only, and a host lenses
+  its state into a child view (`cambium::workspace`).
+- **Layout is already a strategy id.** Cartography's `LayoutStrategy` projects
+  a kernel graph in one call, `spectral.default` among the strategies, and
+  pictograph's `cartography_scene` picks strategies by id for its canvas.
+- **The graph projection carries what an adapter needs.** `MereHost` serves
+  each node as an item whose source is `mere.graph` and the node's id, with a
+  portable card naming it, and each relation as its own routed relation with
+  its kind (`semantic`, `traversal`, `containment`, `arrangement`, `imported`
+  or `provenance`). The sessions projection's cards carry each session's id,
+  name, state and offered steps.
+- **Graphshell's browser surface is not a Cambium view tree.** `web.rs` draws
+  pictograph's canvas through WebGPU and updates its panels in the DOM
+  directly. `cambium-genet-web-host` exists, a canvas surface with DOM
+  accessibility for a Cambium application, but nothing uses it yet.
+  Graphshell has no session list or lifecycle controls of its own; its
+  `ActiveSession` is local or remote co-op.
+- **The instrument exists.** `cambium-genet-winit-host` has a scenario lane
+  (`ScenarioLane`, `LaneApp`, `CaptureRecord`) from Knot's step 1: it drives
+  a Cambium application headed, asserts on its snapshot and captures frames.
 
 ## 3. Target shape
 
@@ -442,13 +483,68 @@ consumer:
 9. Theming through host tokens (CSS custom properties), with no hard-coded
    colours.
 
+**Shape** (ruled 2026-09-25; §7 items 34 to 38):
+- **The mere side, then the consumers.** This plan builds the component,
+  presents it in Graphshell and proves Knot's requirements in a headed harness.
+  Knot's step 8 and Cleromancy's C1 embed it and record that against the
+  conditions below.
+- **The host feeds it.** The component is a view over a model the host
+  fills: the mere's sessions, each with its name, its state and the lifecycle
+  steps it offers; the graph shown, as nodes with host states and relations
+  with their kind; the host's layout preference; the host's actions; and the
+  view's status, where anything but ready carries a host-offered action. It
+  asks for things the host carries out or declines: activate a node, mint,
+  switch, fork, trash, restore, a host action, another layout. A declined
+  request is shown with the host's reason.
+- **Its own crate**, `crates/cambium/mere-view`, beside `workbench`, so
+  cambium's core takes on no layout or storage crates.
+- **One adapter for routes**, `graphshell::mere_route`. It fills the model
+  from a mere route's two projections and turns requests into the route's
+  intents. The sessions vocabulary moves from djinn into
+  `graphshell::session_item`, so djinn and every application share it.
+- **Graphshell's panel sits beside its canvas.** The canvas stays
+  Graphshell's editing surface.
+
+**Steps:**
+1. The component. The graph is drawn with `graph_canvas` and laid out by the
+   host's strategy through pictograph, with positions keyed by node id so a
+   switch keeps identity. Relations are cells by kind, node states are words
+   as well as style, and every node is a labelled native target with a stable
+   key. It is themed through host custom properties, sized to its tile, and
+   embedded behind a keyed lens.
+   *Done when* unit tests show, from the view tree, each of Knot's
+   requirements a view tree can show: roles, labels and keys, states in
+   words, relations by kind with parallel ones distinct, the action slot, the
+   empty and error states, requests out and a refusal shown.
+2. The headed harness: an example application in `mere-view` on the scenario
+   lane, with a catalog like Knot's and a session list as fixtures.
+   *Done when* a scenario for each of Knot's nine requirements passes headed
+   at the full centre and in a 280 px side tile, and its frames are reviewed
+   whole under `Code/testing/mere/`.
+3. The route adapter, with the vocabulary's move.
+   *Done when* a test through djinn's door takes mint, switch, fork, trash
+   and restore through the adapter, each recorded with the admitted
+   application, and the adapter's model matches the route's sessions and
+   graph.
+4. Graphshell's panel: `graphshell-web` mounts the component through
+   `cambium-genet-web-host`, fed from its `MereHost`. Switching sessions
+   reopens the canvas on the chosen one, and the panel can hide its own graph
+   where the canvas shows it.
+   *Done when* a page scenario reads the panel's sessions, steps and node
+   targets from the DOM, a step taken from the panel is recorded with
+   `graphshell`, and a headed Chromium capture shows the panel beside the
+   canvas.
+
 **Done when:**
-- Graphshell, Knot and Cleromancy each show the same component over the same
-  mere;
-- Knot's nine requirements above hold in Knot's embedding;
-- a lifecycle action taken from any of them is recorded in the session journal
-  with the application that made it;
-- no application keeps a mere view of its own.
+- the component is in Cambium, and Graphshell presents it beside its canvas
+  over its own mere;
+- Knot's nine requirements above hold in the headed harness, at the full
+  centre and in a 280 px side tile;
+- a lifecycle step taken through the component, from Graphshell or through
+  the route adapter, is recorded with the application that took it;
+- no application keeps a mere view of its own. Graphshell has none but the
+  component; Knot's step 8 and Cleromancy's C1 embed it, and their plans
+  record the embedding against these conditions.
 
 ### V3. The Eidetic archive
 
@@ -677,6 +773,35 @@ V2's rulings. Items 6 to 8 were ruled on 2026-09-23 and the rest on
     session the connection holds are refused, as the cards refused them
     before. The epoch is still checked. The alternative kept the stale
     refusal, with the application re-reading the list and retrying.
+
+V2b's rulings, all 2026-09-25:
+
+34. **What finishes V2b.** Its done-conditions needed Knot and Cleromancy to
+    show the view, but those embeddings are Knot's step 8 and Cleromancy's C1,
+    which waits for V1 to V5. Mark chose "Mere side, then hand off": build the
+    component, present it in Graphshell, prove Knot's requirements headed in a
+    harness, and amend the conditions so the consumers' plans record their
+    embeddings. The alternatives were to embed it in all three here, or to
+    keep the conditions and leave V2 open until both consumers land.
+35. **Where the view's data comes from.** "Host-fed, plus a route adapter": a
+    pure view over a model the host fills, asking for what the host carries
+    out or declines, with one adapter that fills the model from a mere route.
+    Knot can then feed its catalog before its notes move into a mere. The
+    alternative was a component that is itself a client of a route.
+36. **Where the component lives.** "Own crate, `crates/cambium/mere-view`",
+    beside `workbench`. The alternatives were a `mere` feature of `cambium`,
+    as nematic became, or a module inside graphshell.
+37. **Where the route adapter lives.** "In graphshell, beside the door", with
+    the sessions vocabulary moved from djinn into `graphshell::session_item`.
+    The alternatives were `mere-view` behind a feature, with djinn depending
+    on a UI crate, or a small crate of its own.
+38. **How Graphshell presents it.** "Beside the canvas": a panel mounted
+    through `cambium-genet-web-host` and fed from `MereHost`, with the canvas
+    kept as Graphshell's editing surface. Asked the difference, Mark was told
+    that replacing the canvas would rebuild its lens, physics, transitions,
+    projection editor, history and co-op features inside the component and
+    turn V2b into a Graphshell rewrite. The alternative was to replace the
+    canvas.
 
 ## 8. Progress
 
@@ -1121,3 +1246,8 @@ V2's rulings. Items 6 to 8 were ruled on 2026-09-23 and the rest on
   - the kernel, pandect and Graphshell's browser cone for
     `wasm32-unknown-unknown`, the `graphshell-web` app, and pandect for
     `wasm32-wasip2`.
+- 2026-09-25: V2b assessed (§2, V2b findings) and ruled (§7 items 34 to 38).
+  The consumers' embeddings are their own plans' steps, so this plan builds
+  the component, presents it in Graphshell beside the canvas, proves Knot's
+  requirements in a headed harness and hands off. The shape and four steps
+  are in §4, V2b.
