@@ -22,11 +22,12 @@ use std::path::{Path, PathBuf};
 use identity::carry::{DeviceGrantSet, revoke_device_grant_set};
 use identity::delegation::SignedDelegationRevocation;
 use notochord::RevocationLedger;
-use p2panda_core::cbor::{decode_cbor, encode_cbor};
 
 use crate::wallet_store::identity_grants_dir;
 
-use super::{CarryRef, DeviceGrantError, DeviceId, load_device_grant_set};
+use super::{
+    CarryRef, DeviceGrantError, DeviceId, decode_cbor, encode_cbor, load_device_grant_set,
+};
 
 /// `<data_root>/identity/grants/revocations.cbor`
 pub fn revocation_ledger_path(data_root: &Path) -> PathBuf {

@@ -20,7 +20,6 @@ use std::path::Path;
 use chacha20poly1305::aead::{Aead, KeyInit, Payload};
 use chacha20poly1305::{Key, XChaCha20Poly1305, XNonce};
 use eidetic::{Hash, PayloadSealer, SealEpochId, SealedBlobRef};
-use rand_core::{OsRng, RngCore};
 
 use crate::manifest::PersonaId;
 use crate::wallet_store::{KeyEpochId, load_current_private_epoch};
@@ -113,7 +112,7 @@ impl PayloadSealer for WalletEpochSealer {
         let cipher =
             XChaCha20Poly1305::new(&Key::try_from(&key[..]).expect("fixed-length key material"));
         let mut nonce = [0u8; 24];
-        OsRng.fill_bytes(&mut nonce);
+        getrandom::fill(&mut nonce).expect("the platform supplies entropy");
         let ciphertext = cipher
             .encrypt(
                 &XNonce::try_from(&nonce[..]).expect("fixed-length key material"),

@@ -27,8 +27,6 @@ use chacha20poly1305::{Key, XChaCha20Poly1305, XNonce};
 use identity::{
     Ed25519Keypair, Ed25519PublicKey, Ed25519Signature, IdentityProvider, InMemoryProvider,
 };
-use p2panda_core::cbor::{decode_cbor, encode_cbor};
-use rand_core::{OsRng, RngCore};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -44,6 +42,19 @@ use crate::wallet_store::{
     save_identity_wallet, save_persona_wallet, save_remote_auth_wrapping_key_bridge,
     stage_persona_private_epoch,
 };
+
+/// Canonical CBOR, byte for byte what p2panda-core's helpers wrote.
+fn encode_cbor<T: Serialize>(value: &T) -> Result<Vec<u8>, ciborium::ser::Error<io::Error>> {
+    let mut bytes = Vec::new();
+    ciborium::ser::into_writer(value, &mut bytes)?;
+    Ok(bytes)
+}
+
+fn decode_cbor<T: serde::de::DeserializeOwned>(
+    reader: impl io::Read,
+) -> Result<T, ciborium::de::Error<io::Error>> {
+    ciborium::from_reader(reader)
+}
 
 mod certificate;
 mod enroll;

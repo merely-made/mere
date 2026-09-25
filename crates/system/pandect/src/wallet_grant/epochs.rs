@@ -9,7 +9,6 @@
 
 use chacha20poly1305::aead::{Aead, KeyInit, Payload};
 use chacha20poly1305::{Key, XChaCha20Poly1305, XNonce};
-use rand_core::{OsRng, RngCore};
 
 use identity::PersonaId;
 
@@ -104,7 +103,7 @@ pub fn wrap_private_epoch_material(
     wrapping_key: [u8; 32],
 ) -> Result<WrappedEpochMaterial, WrappedEpochError> {
     let mut nonce_bytes = [0u8; 24];
-    OsRng.fill_bytes(&mut nonce_bytes);
+    getrandom::fill(&mut nonce_bytes).expect("the platform supplies entropy");
     let cipher = XChaCha20Poly1305::new(
         &Key::try_from(&wrapping_key[..]).expect("fixed-length key material"),
     );

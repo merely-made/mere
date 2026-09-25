@@ -6,8 +6,9 @@ wallet-persona resolution, djinn's reservoir lane and route, and a real
 two-process receipt. It reached origin with `5364dfa0` on 2026-09-24. V2's
 shape was ruled on 2026-09-23 and 2026-09-24 (§7). Steps 1 to 3
 (muniment, graph-kernel, pandect) landed on 2026-09-24 and reached origin on
-2026-09-25; step 3b, undo with exact replay, landed on 2026-09-25 and reached origin the
-same day. Step 4, `MereHost` on `GraphSession` in Graphshell, is next.
+2026-09-25; step 3b, undo with exact replay, landed on 2026-09-25 and reached
+origin the same day. Step 4, `MereHost` on `GraphSession` in Graphshell, is in
+progress: pandect's session core became browser-safe first (§7 item 26).
 **Scope:** give each data domain one mere, and make every mere of an identity
 openable by any of that identity's applications. The meres are held by the
 device resident, with sessions, a graph journal and an Eidetic archive.
@@ -180,6 +181,25 @@ sessions.
   `woodshed/scenarios/woodshed_musical_comparison.json` by a relative path
   that resolves only from `repos/mere`, not from `worktrees/`.
 
+### Step 4 findings (verified 2026-09-25)
+
+- **pandect did not build for the browser.** Graphshell's browser build
+  (`ports/graphshell/web`, `wasm32-unknown-unknown`) runs `MereHost` over
+  IndexedDB, but Graphshell declares pandect native-only, and pandect fails
+  that target. getrandom 0.2 entered through two sources:
+  - pandect's own `rand_core 0.6`, for three nonce and secret draws;
+  - `p2panda-core`, whose `rand` dependency is unconditional. pandect used it
+    only for two CBOR helpers, each one `ciborium` call.
+
+  The crate doc's "compiles wasm32-clean" held for `wasm32-wasip2` only.
+  Graphshell's join had already moved to getrandom 0.3 for the same reason
+  (`ports/graphshell/src/webrtc_join.rs`).
+- **The manifest read std's clock.** `GraphSessionManifest::new`, `touch` and
+  `record_consolidation` called `std::time::SystemTime::now()`, which panics in
+  a browser, and minting or forking a session calls `new`. A build cannot catch
+  it. The kernel forbids that call for this reason and reads the clock through
+  `web_time` (`crates/graph/graph-kernel/src/lib.rs`).
+
 ## 3. Target shape
 
 ```text
@@ -337,6 +357,14 @@ and projection changes, replayable for the Timeline and for undo (ruled, §7).
    the schema. It comes before djinn's routes, because a route projects a
    session's graph with `MereHost`'s projection (ruled, §7 item 21); this was
    step 5 until 2026-09-25.
+   - pandect first becomes browser-safe, so the browser build can hold a
+     `GraphSession` too (ruled, §7 item 26).
+   - Edits are the selected persona's, via `graphshell` or via the browser
+     extension that captured them (ruled, §7 item 23).
+   - The host opens the live session updated last, and mints one if there is
+     none (ruled, §7 item 24).
+   - The old slot is read once into the first session's baseline and left in
+     place (ruled, §7 item 25).
 5. djinn:
    - each mere on its own route, registered at startup and whenever a mere is
      ensured; graphshell's door learns to add routes and grants at runtime
@@ -474,7 +502,7 @@ Per phase, as the done-conditions state. Each receipt names the Mere revision
 it measured. Two-process receipts use real processes, not an in-memory
 composition presented as two.
 
-## 7. Decisions (ruled 2026-09-23 and 2026-09-24)
+## 7. Decisions (ruled 2026-09-23 to 2026-09-25)
 
 1. **Where the reservoir lives on disk.** Under the shared root, per persona:
    `<shared root>/personas/<persona>/reservoir/`.
@@ -561,6 +589,32 @@ V2's rulings. Items 6 to 8 were ruled on 2026-09-23 and the rest on
     mere's sessions, for the V2b mere view, and the attached session's graph,
     for editing. The alternative projected the graph only and left the session
     list on the reservoir route.
+23. **Who Graphshell's edits are by** (2026-09-25). "Person via the channel":
+    the selected persona as a person, via `graphshell` for intents and fixture
+    edits, and via `browser.extension.<source>` for captured visits, so a
+    capture reads as coming through the browser. The alternative named
+    `graphshell` for everything.
+24. **Which session the reference host opens** (2026-09-25). "Most recently
+    updated": the live session whose manifest changed last, minting one if
+    there are none, with no new record to keep. The alternative kept a
+    current-session record, as Turnstone's `record_current_session` does.
+25. **The old slot** (2026-09-25). "Leave it in place": once
+    `graphshell/mere-host/v1` has been read into a new session's baseline it is
+    never read again, but no code path deletes it. The alternative removed it
+    in the batch that writes the new session.
+26. **How the browser build reaches the session core** (2026-09-25). Step 4
+    found that pandect could not build for the browser (§2, step 4 findings).
+    Mark chose "Fix pandect":
+    - nonces and secrets come from getrandom 0.3 directly, as Graphshell's
+      join draws them;
+    - the wallet's CBOR calls `ciborium` directly, the same two calls
+      p2panda-core's helpers made, so the bytes are unchanged;
+    - the manifest reads the kernel's `web_time` clock.
+
+    The alternatives were to turn on getrandom 0.2's browser support (a third
+    getrandom major in the browser build, which Graphshell avoids on purpose),
+    to split the session core into a crate below pandect, or to keep the
+    browser on the single slot.
 
 ## 8. Progress
 
@@ -731,3 +785,23 @@ V2's rulings. Items 6 to 8 were ruled on 2026-09-23 and the rest on
     - mere-kernel 300 of 300 and pandect 298 of 298.
   - One kernel run straight after restoring the disabled captures failed one
     test; eleven runs since have passed, and the failure did not recur.
+- 2026-09-25: step 4 found that pandect could not reach Graphshell's browser
+  build (§2, step 4 findings), and Mark ruled "Fix pandect" (§7 item 26).
+  Rulings 23 to 25 record his earlier answers for the host. pandect's session
+  core is now browser-safe:
+  - its three nonce and secret draws take getrandom 0.3 directly;
+  - the wallet's CBOR calls `ciborium` directly, and pandect no longer depends
+    on p2panda-core;
+  - the kernel exposes its `web_time` clock as `time::wall_clock_now`, and the
+    manifest reads it.
+
+  Verified:
+  - pandect and mere-kernel check for `wasm32-unknown-unknown` with the
+    `wasm_js` getrandom backend, and pandect for `wasm32-wasip2`;
+  - getrandom 0.2 has left pandect's browser graph, where it was before;
+  - mere-kernel 301 of 301 and pandect 298 of 298;
+  - pandect's six workspace dependents check;
+  - clippy finds no new warning in pandect, which carries 48 older ones.
+
+  Not yet verified: Graphshell's browser build with pandect in its cone, which
+  comes with the host change.
