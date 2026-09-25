@@ -17,6 +17,7 @@ use tinct::{Seeds, Srgb, color_to_hex, contrast};
 
 fn theme() -> Theme {
     Theme::new(
+        "test:ink",
         "Ink",
         Seeds {
             primary: Srgb::rgb(0x33, 0x66, 0xC8),
@@ -247,7 +248,7 @@ fn lagrange_palette_orders_neutrals_and_accent_variants_for_adversarial_seeds() 
     let mut seeds = theme().seeds;
     seeds.text_header = Some(Srgb::rgb(0xF8, 0x10, 0x10));
     seeds.text_body = Some(Srgb::rgb(0xF0, 0xF0, 0xF0));
-    let export = Theme::new("Adversarial", seeds).lagrange_palette_txt();
+    let export = Theme::new("test:adversarial", "Adversarial", seeds).lagrange_palette_txt();
 
     for section in export.text.split("# ").skip(1) {
         let mut lines = section.lines().skip(1);
@@ -275,7 +276,8 @@ fn lagrange_palette_falls_back_for_non_semantic_status_hues() {
     let mut seeds = theme().seeds;
     seeds.danger = Srgb::rgb(0x20, 0x60, 0xE0);
     seeds.success = Srgb::rgb(0xDC, 0x28, 0xC8);
-    let export = Theme::new("Status fallback", seeds).lagrange_palette_txt();
+    let export =
+        Theme::new("test:status_fallback", "Status fallback", seeds).lagrange_palette_txt();
 
     assert!(export.text.contains("red:        #FF4040"));
     assert!(export.text.contains("green:      #00C800"));
@@ -311,7 +313,7 @@ fn lagrange_palette_falls_back_for_non_semantic_status_hues() {
 fn lagrange_palette_reports_rgb_alpha_loss() {
     let mut seeds = theme().seeds;
     seeds.danger = Srgb::rgba(0xD5, 0x4E, 0x4E, 0x80);
-    let export = Theme::new("Alpha", seeds).lagrange_palette_txt();
+    let export = Theme::new("test:alpha", "Alpha", seeds).lagrange_palette_txt();
     for mode in [LagrangePaletteMode::Dark, LagrangePaletteMode::Light] {
         assert!(
             export
