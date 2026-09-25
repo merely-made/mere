@@ -1044,6 +1044,19 @@ impl<B: Backend + Clone> MereSessions<B> {
         GraphSession::open(self.backend.clone(), id).await
     }
 
+    /// Begin a new session in memory, from `baseline` or empty. Its first
+    /// flush stores it.
+    pub fn begin(&self, author: Author, baseline: Option<Graph>) -> GraphSession<B> {
+        let manifest = GraphSessionManifest::new(SessionId::new(), GraphId::new());
+        GraphSession::new(
+            self.backend.clone(),
+            manifest,
+            baseline,
+            author,
+            ChangeKind::Minted,
+        )
+    }
+
     /// Mint an empty session.
     pub async fn mint(
         &self,
