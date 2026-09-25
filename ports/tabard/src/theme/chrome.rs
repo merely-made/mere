@@ -15,7 +15,7 @@
 //! comms pane all draw from the same dozen-and-change colors, so a theme reads as
 //! one coherent surface rather than a pile of one-off hex values.
 
-pub use tincture::Srgb;
+pub use tinct::Srgb;
 
 /// Color tokens for the host's chrome band (the shell around the graph canvas).
 ///

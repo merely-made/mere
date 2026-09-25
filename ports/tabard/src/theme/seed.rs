@@ -6,11 +6,11 @@
 
 //! Seed-palette derivation — a few seed colours to the full [`ThemeTokenSet`].
 //!
-//! A theme is authored as a [`tincture::Seeds`] set (a primary/secondary/
+//! A theme is authored as a [`tinct::Seeds`] set (a primary/secondary/
 //! tertiary brand triad + a neutral surface hue + a light/dark mode); this
 //! module derives Mere's full token set from it. The base palette (surface
 //! ladder, text hierarchy, contrast-picked `on_*`) comes from
-//! [`tincture::derive_palette`]; the long-tail (chrome surface tiers, radial
+//! [`tinct::derive_palette`]; the long-tail (chrome surface tiers, radial
 //! menu, graph-node chrome) is refined from that base via the OKLCH
 //! primitives. Role intent (from the shared Merely theme doc):
 //!
@@ -23,15 +23,15 @@
 //! them. Every derived set clears `validate_theme_tokens` (the contrast-gated
 //! pairs use [`ensure_contrast`]).
 
-use crate::lens::ThemeData;
-use tincture::oklch::Oklch;
-use tincture::{ModeProfile, Seeds, Srgb, best_on, contrast, derive_palette_with, mix};
+use crate::theme::data::ThemeData;
+use tinct::oklch::Oklch;
+use tinct::{ModeProfile, Seeds, Srgb, best_on, contrast, derive_palette_with, mix};
 
 use crate::theme::chrome::ChromeTheme;
 use crate::theme::edge_style::{
     EdgeAccessibilityMode, ThemeAccessibilitySupport, ThemeContract, ThemeEdgeTokens,
 };
-use crate::theme::theme::{
+use crate::theme::registry::{
     GraphNodeChromeTheme, Harmony, THEME_ID_DARK, THEME_ID_DEFAULT, THEME_ID_HIGH_CONTRAST,
     THEME_ID_LIGHT, ThemeDef, ThemeSource, ThemeTokenSet,
 };
@@ -338,12 +338,15 @@ pub fn derive_from_def(def: &ThemeDef) -> ThemeTokenSet {
 }
 
 /// Derive a [`ThemeTokenSet`] from a [`ThemeDef`] under an explicit
-/// [`Mode`](crate::theme::theme::Mode) — the theme-modes derivation entry point. The
+/// [`Mode`](crate::theme::registry::Mode) — the theme-modes derivation entry point. The
 /// mode, not the def's own `seeds.dark` / `high_contrast`, decides the ladder
 /// direction + contrast spread, so one theme derives all four canonical modes.
 /// `Custom` modes are not derivable here (they are sheet calculators, T5);
 /// they fall back to the dark canonical derivation via [`Mode::dark`].
-pub fn derive_from_def_for_mode(def: &ThemeDef, mode: &crate::theme::theme::Mode) -> ThemeTokenSet {
+pub fn derive_from_def_for_mode(
+    def: &ThemeDef,
+    mode: &crate::theme::registry::Mode,
+) -> ThemeTokenSet {
     let mut seeds = harmonized_seeds(def);
     seeds.dark = mode.dark();
     let hc = mode.high_contrast();
@@ -353,8 +356,8 @@ pub fn derive_from_def_for_mode(def: &ThemeDef, mode: &crate::theme::theme::Mode
 /// The mode a def encodes as authored — what the pre-modes registry derived.
 /// Activating a theme re-seeds the presentation mode from this, so the four
 /// legacy built-ins (Default/Dark/Light/High Contrast) keep their meaning.
-pub fn default_mode_for_def(def: &ThemeDef) -> crate::theme::theme::Mode {
-    crate::theme::theme::Mode::from_flags(def.seeds.dark, def.high_contrast)
+pub fn default_mode_for_def(def: &ThemeDef) -> crate::theme::registry::Mode {
+    crate::theme::registry::Mode::from_flags(def.seeds.dark, def.high_contrast)
 }
 
 /// The def's seeds after applying its [`Harmony`] — the *effective* triad (the

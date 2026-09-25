@@ -4,10 +4,11 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! Theme registry — `registry::theme` / `unregister_theme` / `resolve_theme`
-//! over a `HashMap<String, ThemeTokenSet>` keyed by `theme:*` ids. Token
+//! Theme registry — [`ThemeRegistry`] keeps the derived token sets and the
+//! authored defs behind them, keyed by lowercased `theme:*` id: built-ins
+//! first, then user themes, with resolution, forks and modes. Token
 //! validation delegates to `crate::theme::edge_style::validate_theme_edge_tokens`
-//! (the bundled-in vocabulary, see [`crate`] for the bundling rationale).
+//! (the bundled-in vocabulary, see [`crate::theme`] for the bundling rationale).
 //!
 //! Cross-crate retargets vs. the original shell-side `theme.rs`:
 //! - `crate::theme::graph::edge_style_registry::*` → `crate::theme::edge_style::*`
@@ -17,20 +18,21 @@
 //!   `egui-host` is an empty no-op feature in root `Cargo.toml:96` and egui
 //!   is no longer in the dep graph
 //! - `pub` → `pub` throughout (items are now this crate's public API)
+//!
+//! Moved from mere-registry into tabard on 2026-09-24; lens's theme items are
+//! now `crate::theme::data`.
 
 use std::collections::HashMap;
 
-pub use tincture::Srgb;
+pub use tinct::Srgb;
 
-use crate::lens::{
-    THEME_ID_DARK as LEGACY_THEME_ID_DARK, THEME_ID_DEFAULT as LEGACY_THEME_ID_DEFAULT, ThemeData,
-};
 use crate::theme::chrome::ChromeTheme;
+use crate::theme::data::ThemeData;
 use crate::theme::edge_style::{
     EdgeAccessibilityMode, ThemeAccessibilitySupport, ThemeContract, ThemeEdgeTokens,
     validate_theme_edge_tokens,
 };
-use tincture::Seeds;
+use tinct::Seeds;
 
 /// Color tokens for graph-node chrome (badges, pinned fill, rings, default stroke).
 ///
@@ -67,9 +69,9 @@ impl Default for GraphNodeChromeTheme {
     }
 }
 
-pub const THEME_ID_DEFAULT: &str = LEGACY_THEME_ID_DEFAULT;
+pub const THEME_ID_DEFAULT: &str = "theme:default";
 pub const THEME_ID_LIGHT: &str = "theme:light";
-pub const THEME_ID_DARK: &str = LEGACY_THEME_ID_DARK;
+pub const THEME_ID_DARK: &str = "theme:dark";
 pub const THEME_ID_HIGH_CONTRAST: &str = "theme:high_contrast";
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
@@ -505,7 +507,7 @@ pub fn set_user_theme_seed_channel(
         "neutral" => &mut def.seeds.neutral,
         _ => return false,
     };
-    let (mut h, mut s, mut l) = tincture::color_to_hsl(*target);
+    let (mut h, mut s, mut l) = tinct::color_to_hsl(*target);
     let f = fraction.clamp(0.0, 1.0);
     match channel {
         'h' => h = (f * 360.0).rem_euclid(360.0),
@@ -513,13 +515,13 @@ pub fn set_user_theme_seed_channel(
         'l' => l = f,
         _ => return false,
     }
-    *target = tincture::color_from_hsl(h, s, l);
+    *target = tinct::color_from_hsl(h, s, l);
     true
 }
 
 /// Set a user theme's accent harmony by key. Returns whether the edit applied.
 pub fn set_user_theme_harmony(def: &mut ThemeDef, key: &str) -> bool {
-    use tincture::oklch::Oklch;
+    use tinct::oklch::Oklch;
 
     if def.source != ThemeSource::User {
         return false;

@@ -6,10 +6,9 @@
 
 use serde::Deserialize;
 
-pub const THEME_ID_DEFAULT: &str = "theme:default";
-pub const THEME_ID_LIGHT: &str = "theme:light";
-pub const THEME_ID_DARK: &str = "theme:dark";
-pub const THEME_ID_HIGH_CONTRAST: &str = "theme:high_contrast";
+use crate::theme::registry::{
+    THEME_ID_DARK, THEME_ID_DEFAULT, THEME_ID_HIGH_CONTRAST, THEME_ID_LIGHT,
+};
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct ThemeData {

@@ -170,7 +170,7 @@ impl Camera {
 }
 
 /// Visual knobs for the scene paint. Public so the host can theme it (the
-/// `registry::theme` wiring lands later).
+/// `tabard::theme` wiring lands later).
 #[derive(Clone, Copy, Debug)]
 pub struct ScenePaintStyle {
     pub node_color: ColorF,

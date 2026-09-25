@@ -31,7 +31,7 @@ canvas = [
     "pictograph/canvas",
     "dep:inker",
     "dep:netrender",
-    "dep:registry",
+    "dep:tabard",
     "dep:tracing",
     "dep:uxtree",
 ]
@@ -54,9 +54,9 @@ fixtures = ["graph", "kernel/fixtures"]
 [dependencies]
 accesskit = { workspace = true, optional = true }
 netrender = { workspace = true, optional = true }
-registry = { workspace = true, features = ["theme"], optional = true }
 serde = { workspace = true, optional = true }
 serde_json = { workspace = true, optional = true }
+tabard = { workspace = true, optional = true }
 tracing = { workspace = true, optional = true }
 uuid = { workspace = true, optional = true }
 uxtree = { workspace = true, optional = true }

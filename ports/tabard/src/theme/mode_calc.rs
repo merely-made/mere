@@ -25,8 +25,8 @@
 
 use std::collections::BTreeMap;
 
-use tincture::oklch::Oklch;
-use tincture::{Seeds, Srgb, best_on};
+use tinct::oklch::Oklch;
+use tinct::{Seeds, Srgb, best_on};
 
 /// A custom mode definition — one file in the host's `modes/` directory.
 #[derive(Clone, Debug, PartialEq, serde::Serialize, serde::Deserialize)]

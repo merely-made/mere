@@ -17,7 +17,7 @@ use inker::{Block, EngineDocument, inline_text};
 use kernel::graph::Graph;
 use netrender::Scene;
 use pictograph::canvas::NodeState;
-use registry::theme::chrome::{ChromeTheme, Srgb};
+use tabard::theme::chrome::{ChromeTheme, Srgb};
 use uxtree::{UxTree, node_id_for_path};
 
 /// Crate version.

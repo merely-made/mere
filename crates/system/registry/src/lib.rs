@@ -9,8 +9,9 @@
 //! These were nine `register-*` crates until 2026-09-23. They are components
 //! of one registry system, so they are modules of one crate: a consumer turns
 //! off the default features and enables the registries it uses, and pays for
-//! nothing else. `mod-loader` pulls in `diagnostics` and `viewer`, `theme`
-//! pulls in `lens`, and `viewer` pulls in `layout`.
+//! nothing else. `mod-loader` pulls in `diagnostics` and `viewer`, and
+//! `viewer` pulls in `layout`. The theme registry moved to tabard on
+//! 2026-09-24.
 
 #[cfg(feature = "diagnostics")]
 pub mod diagnostics;
@@ -26,7 +27,5 @@ pub mod lens;
 pub mod mod_loader;
 #[cfg(feature = "protocol")]
 pub mod protocol;
-#[cfg(feature = "theme")]
-pub mod theme;
 #[cfg(feature = "viewer")]
 pub mod viewer;
