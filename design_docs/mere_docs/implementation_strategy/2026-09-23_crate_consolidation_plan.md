@@ -145,7 +145,8 @@ Phases, each gated like C3:
 
 Finding: pandect's `atomic_file::write_bytes_with_backup` and Pelt's
 replace-file writer are two atomic-write implementations; T4 moves Pelt's into
-tabard, and unifying the two is recorded rather than done here.
+tabard, and unifying the two is recorded rather than done here. After T4 both
+are safe temp-and-rename writers; pandect's also keeps a backup.
 
 ### C3. Components folded
 
@@ -319,3 +320,16 @@ crate inventory at the Code root.
   2026-09-04, when errand's `FeedEntry` gained podcast fields, and were fixed
   first (`4b33a963`). tabard 38, cambium-nematic 7, document-lanes 8 (33 with
   `smolweb`); Pelt builds with `smolweb`; the portable gate passes. Next: T4.
+- 2026-09-24. T4 landed (`d1f9df18`): `tabard::theme::choice` holds
+  `ThemeChoice` (a theme id and an optional mode, where `None` is the theme's
+  default), the `ThemeChoiceStore` seam and the in-memory and file stores.
+  Mark ruled the mode optional and the default `theme:default` in dark mode.
+  The file store writes JSON through a synced temp file and `fs::rename`, so
+  Pelt's `ReplaceFileW` FFI and its `unsafe` are gone, and an existing
+  one-line Pelt file still reads. Pelt keeps `AppearanceTheme` as its
+  presentation, with `choice()` and `of()` mapping to and from the stored
+  choice. pandect's settings record flattens an `Option<ThemeChoice>` under
+  the same field names, and the null-valued records written before still
+  read. tabard 43, pelt-desktop 63 (it builds without default features and
+  with each preview and smolweb feature), pandect 285, and the portable gate
+  passes. Next: T5.
