@@ -4,8 +4,8 @@
 **Status:** in progress. V1 is complete and on main: the pandect index,
 wallet-persona resolution, djinn's reservoir lane and route, and a real
 two-process receipt. It reached origin with `5364dfa0` on 2026-09-24. V2's
-shape was ruled on 2026-09-23 and 2026-09-24 (§7). Steps 1 (muniment)
-and 2 (graph-kernel) landed on 2026-09-24; step 3, in pandect, is next.
+shape was ruled on 2026-09-23 and 2026-09-24 (§7). Steps 1 to 3
+(muniment, graph-kernel, pandect) landed on 2026-09-24; step 3b, undo, is next.
 **Scope:** give each data domain one mere, and make every mere of an identity
 openable by any of that identity's applications. The meres are held by the
 device resident, with sessions, a graph journal and an Eidetic archive.
@@ -622,3 +622,29 @@ V2's rulings. Items 6 to 8 were ruled on 2026-09-23 and the rest on
     and pictograph checks.
 - 2026-09-24: undo ruled (§7 items 17 and 18). Undo's revert engine moves to
   step 3b, after the session types.
+- 2026-09-24: V2 step 3 landed in pandect (`102da3db`).
+  - `pandect::graph_session` keeps a mere's sessions under `sessions/<id>/`:
+    - `manifest.json` and `baseline.json`;
+    - the latest checkpoint as `graph.json`, `facets.json` and
+      `checkpoint.json`;
+    - `journal.jsonl` and `changes.jsonl`, one entry per key;
+    - per application view, `views/<app>/<view>.json` with its `.jsonl`
+      stream.
+  - `GraphSession` opens from the checkpoint plus the journal tail, or from
+    the baseline plus the whole journal. It records its own graph's deltas
+    and journals each `apply` as one change under its author, persisted with
+    the change record in one batch. It checkpoints every 1,000 entries and on
+    `checkpoint_if_behind`. It answers `graph_at` and `view_at` for the
+    Timeline, keeps view changes in their own streams, and trashes or restores
+    by marking its manifest.
+  - `MereSessions` lists, mints, opens, forks at a cursor and forks a
+    component. `fork_component_graph` is the product-neutral half of
+    Turnstone's tear-out, native only as the kernel's component copy is. Each
+    new session's first change says how it began.
+  - `GraphSessionManifest` gains `forked_at` and `trashed` (who and when),
+    both defaulted.
+  - `pandect::reservoir` places each mere's store at
+    `<reservoir>/meres/<mere id>/`, where the directory backend's lock refuses
+    a second owner too.
+  - pandect: 294 of 294 tests, ten of them new. It builds for
+    `wasm32-wasip2`, and djinn checks.
