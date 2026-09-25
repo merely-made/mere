@@ -515,6 +515,7 @@ mod tests {
                     link: Some("gemini://x.test/1".into()),
                     date: Some("2026-01-01".into()),
                     summary: Some("A summary.".into()),
+                    ..FeedEntry::default()
                 },
                 FeedEntry {
                     title: Some("Second".into()),
