@@ -943,6 +943,7 @@ struct TabardPreviewBaseline {
 #[cfg(any(feature = "tabard-preview", feature = "tabard-reader-preview"))]
 fn tabard_preview_theme() -> tabard::Theme {
     tabard::Theme::new(
+        "pelt:tabard_preview",
         "Pelt Tabard preview",
         tinct::Seeds {
             primary: tinct::Srgb::rgb(0x33, 0x66, 0xc8),

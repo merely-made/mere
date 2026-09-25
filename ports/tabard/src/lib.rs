@@ -21,6 +21,8 @@ pub mod theme;
 use std::collections::BTreeMap;
 
 use serde::{Deserialize, Serialize};
+
+use crate::theme::registry::{Harmony, Mode, ThemeSource};
 use tinct::{Palette, Seeds, Srgb, color_to_hex, derive_palette};
 
 /// DTCG's stable Design Tokens Format Module schema for this output.
@@ -47,24 +49,64 @@ pub const LAGRANGE_PALETTE_LABELS: [&str; 14] = [
 /// compatibility artifact so the output preserves the documented shape.
 pub const LAGRANGE_V1_21_1_IGNORED_LABELS: [&str; 2] = ["yellow", "magenta"];
 
-/// An authored theme: the small Tinct seed set plus a human-facing name.
+/// An authored theme: an id, a human-facing name and the small Tinct seed
+/// set, plus how the registry derives from them. The full
+/// [`ThemeTokenSet`](theme::registry::ThemeTokenSet) is derived from this
+/// (see [`theme::seed::derive_from_def`]). User themes persist as this (a
+/// theme file or settings entry); built-ins carry it too, so editing one can
+/// fork a user copy from its seeds.
 ///
-/// Tabard derives the normal-contrast palette selected by Seeds::dark.
-/// High-contrast profiles, syntax palettes, and product-specific roles remain
-/// separate follow-on work.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+/// The exports below derive the normal-contrast palette selected by
+/// `Seeds::dark`; high-contrast profiles, syntax palettes and product roles
+/// in the exports remain follow-on work.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Theme {
+    pub id: String,
     pub name: String,
+    /// Defaults to `User` so a loaded theme file is a user theme without
+    /// needing the field.
+    #[serde(default)]
+    pub source: ThemeSource,
     pub seeds: Seeds,
+    /// High-contrast derivation mode (forced extremes + max-contrast text).
+    #[serde(default)]
+    pub high_contrast: bool,
+    /// How the accents relate to the primary (default `Custom` = independent).
+    #[serde(default)]
+    pub harmony: Harmony,
+    /// Per-mode CUSTOM STYLESHEET overrides (theme-modes T4): CSS rule lists
+    /// keyed by [`Mode::as_key`] (`"dark"`, `"hc_light"`, …). When a mode has
+    /// an entry, the host renders that sheet for (theme, mode) instead of the
+    /// palette-derived one; modes without an entry keep deriving. Authored by
+    /// hand in the theme file today (the mod-distribution path); empty = fully
+    /// derived. The host's scheme-pair baking only applies when BOTH scheme
+    /// counterparts are derived — an override on either side of the pair
+    /// routes that theme through the sheet-swap path (correctness first).
+    #[serde(default)]
+    pub mode_sheets: BTreeMap<String, Vec<String>>,
 }
 
 impl Theme {
-    /// Create a theme from its authored Tinct seed set.
-    pub fn new(name: impl Into<String>, seeds: Seeds) -> Self {
+    /// A user theme from its id, name and authored Tinct seed set, with the
+    /// derivation settings at their defaults.
+    pub fn new(id: impl Into<String>, name: impl Into<String>, seeds: Seeds) -> Self {
         Self {
+            id: id.into(),
             name: name.into(),
+            source: ThemeSource::default(),
             seeds,
+            high_contrast: false,
+            harmony: Harmony::default(),
+            mode_sheets: BTreeMap::new(),
         }
+    }
+
+    /// This theme's custom stylesheet for `mode`, if one is attached. Empty
+    /// rule lists count as absent (a stray empty entry can't blank the shell).
+    pub fn mode_sheet(&self, mode: &Mode) -> Option<&Vec<String>> {
+        self.mode_sheets
+            .get(&mode.as_key())
+            .filter(|rules| !rules.is_empty())
     }
 
     /// Derive the base palette owned by the current Tabard artifact.

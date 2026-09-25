@@ -26,13 +26,13 @@ use std::collections::HashMap;
 
 pub use tinct::Srgb;
 
+use crate::Theme;
 use crate::theme::chrome::ChromeTheme;
 use crate::theme::data::ThemeData;
 use crate::theme::edge_style::{
     EdgeAccessibilityMode, ThemeAccessibilitySupport, ThemeContract, ThemeEdgeTokens,
     validate_theme_edge_tokens,
 };
-use tinct::Seeds;
 
 /// Color tokens for graph-node chrome (badges, pinned fill, rings, default stroke).
 ///
@@ -243,54 +243,13 @@ pub enum Harmony {
     },
 }
 
-/// A theme's authored definition: its seeds + name + mode. The full
-/// [`ThemeTokenSet`] is *derived* from this (see `crate::theme::seed::derive_from_def`).
-/// User themes persist as this (a theme file / settings entry); built-ins carry
-/// it too, so editing one can fork a user copy from its seeds.
-#[derive(Clone, Debug, PartialEq, serde::Serialize, serde::Deserialize)]
-pub struct ThemeDef {
-    pub id: String,
-    pub name: String,
-    /// Defaults to `User` so a loaded theme file is a user theme without
-    /// needing the field.
-    #[serde(default)]
-    pub source: ThemeSource,
-    pub seeds: Seeds,
-    /// High-contrast derivation mode (forced extremes + max-contrast text).
-    #[serde(default)]
-    pub high_contrast: bool,
-    /// How the accents relate to the primary (default `Custom` = independent).
-    #[serde(default)]
-    pub harmony: Harmony,
-    /// Per-mode CUSTOM STYLESHEET overrides (theme-modes T4): CSS rule lists
-    /// keyed by [`Mode::as_key`] (`"dark"`, `"hc_light"`, …). When a mode has
-    /// an entry, the host renders that sheet for (theme, mode) instead of the
-    /// palette-derived one; modes without an entry keep deriving. Authored by
-    /// hand in the theme file today (the mod-distribution path); empty = fully
-    /// derived. The host's scheme-pair baking only applies when BOTH scheme
-    /// counterparts are derived — an override on either side of the pair
-    /// routes that theme through the sheet-swap path (correctness first).
-    #[serde(default)]
-    pub mode_sheets: std::collections::BTreeMap<String, Vec<String>>,
-}
-
-impl ThemeDef {
-    /// This theme's custom stylesheet for `mode`, if one is attached. Empty
-    /// rule lists count as absent (a stray empty entry can't blank the shell).
-    pub fn mode_sheet(&self, mode: &Mode) -> Option<&Vec<String>> {
-        self.mode_sheets
-            .get(&mode.as_key())
-            .filter(|rules| !rules.is_empty())
-    }
-}
-
 pub struct ThemeRegistry {
     /// Derived, resolvable token sets (built-ins + user themes), keyed by
     /// lowercased id.
     themes: HashMap<String, ThemeTokenSet>,
     /// The authored def behind each theme — enables listing, forking, and
     /// re-deriving after an edit.
-    defs: HashMap<String, ThemeDef>,
+    defs: HashMap<String, Theme>,
     /// Listing order: built-ins first (registration order), then user themes.
     order: Vec<String>,
     active: String,
@@ -319,7 +278,7 @@ impl Default for ThemeRegistry {
 impl ThemeRegistry {
     /// Derive + validate a def, then register it (or replace an existing entry
     /// of the same id, preserving its order slot).
-    fn insert_def(&mut self, def: ThemeDef) -> Result<(), String> {
+    fn insert_def(&mut self, def: Theme) -> Result<(), String> {
         let tokens = crate::theme::seed::derive_from_def(&def);
         validate_theme_tokens(&tokens)?;
         let key = def.id.trim().to_ascii_lowercase();
@@ -334,7 +293,7 @@ impl ThemeRegistry {
     /// Add (or replace) a user theme from its def. Forces `source = User` and
     /// validates the derived tokens (a malformed seed set is rejected, not
     /// registered).
-    pub fn add_user_theme(&mut self, mut def: ThemeDef) -> Result<(), String> {
+    pub fn add_user_theme(&mut self, mut def: Theme) -> Result<(), String> {
         def.source = ThemeSource::User;
         self.insert_def(def)
     }
@@ -376,7 +335,7 @@ impl ThemeRegistry {
     /// Fork any theme (built-in or user) into a new **user** theme seeded from
     /// the source's seeds. The non-destructive "edit a built-in" path. Returns
     /// the new def, or `None` if `source_id` is unknown / the new id collides.
-    pub fn fork(&mut self, source_id: &str, new_id: &str, new_name: &str) -> Option<ThemeDef> {
+    pub fn fork(&mut self, source_id: &str, new_id: &str, new_name: &str) -> Option<Theme> {
         let src = self
             .defs
             .get(&source_id.trim().to_ascii_lowercase())?
@@ -385,7 +344,7 @@ impl ThemeRegistry {
         if self.defs.contains_key(&new_key) {
             return None;
         }
-        let def = ThemeDef {
+        let def = Theme {
             id: new_id.to_string(),
             name: new_name.to_string(),
             source: ThemeSource::User,
@@ -401,12 +360,12 @@ impl ThemeRegistry {
     }
 
     /// All themes in listing order (built-ins first, then user).
-    pub fn list(&self) -> Vec<&ThemeDef> {
+    pub fn list(&self) -> Vec<&Theme> {
         self.order.iter().filter_map(|k| self.defs.get(k)).collect()
     }
 
     /// The authored def for a theme id (for editing / export).
-    pub fn theme_def(&self, theme_id: &str) -> Option<&ThemeDef> {
+    pub fn theme_def(&self, theme_id: &str) -> Option<&Theme> {
         self.defs.get(&theme_id.trim().to_ascii_lowercase())
     }
 
@@ -481,7 +440,7 @@ impl ThemeRegistry {
 }
 
 /// Toggle a user theme's light/dark mode in place. Returns whether the edit applied.
-pub fn toggle_user_theme_mode(def: &mut ThemeDef) -> bool {
+pub fn toggle_user_theme_mode(def: &mut Theme) -> bool {
     if def.source != ThemeSource::User {
         return false;
     }
@@ -492,7 +451,7 @@ pub fn toggle_user_theme_mode(def: &mut ThemeDef) -> bool {
 /// Set one HSL channel of one seed of a user theme to `fraction` of its range.
 /// Returns whether the edit applied.
 pub fn set_user_theme_seed_channel(
-    def: &mut ThemeDef,
+    def: &mut Theme,
     seed: &str,
     channel: char,
     fraction: f64,
@@ -520,7 +479,7 @@ pub fn set_user_theme_seed_channel(
 }
 
 /// Set a user theme's accent harmony by key. Returns whether the edit applied.
-pub fn set_user_theme_harmony(def: &mut ThemeDef, key: &str) -> bool {
+pub fn set_user_theme_harmony(def: &mut Theme, key: &str) -> bool {
     use tinct::oklch::Oklch;
 
     if def.source != ThemeSource::User {

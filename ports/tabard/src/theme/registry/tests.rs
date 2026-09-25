@@ -89,7 +89,7 @@ fn user_theme_crud_fork_rename_remove_add() {
     assert!(reg.resolve_theme(Some("user:test")).fallback_used);
 
     // Add a fresh user theme from seeds — derivation must pass validation.
-    let def = ThemeDef {
+    let def = Theme {
         id: "user:green".into(),
         name: "Green".into(),
         source: ThemeSource::User,
@@ -118,7 +118,7 @@ fn locked_harmony_rotates_accents_to_primary_plus_offset_and_validates() {
     use tinct::oklch::Oklch;
     use tinct::{Seeds, Srgb};
     // Saturated seeds so OKLCH hue is well-defined (low-chroma greys have no hue).
-    let def = ThemeDef {
+    let def = Theme {
         id: "user:harmony".into(),
         name: "Harmony".into(),
         source: ThemeSource::User,
@@ -165,10 +165,10 @@ fn locked_harmony_rotates_accents_to_primary_plus_offset_and_validates() {
 
 #[test]
 fn theme_def_round_trips_through_serde() {
-    // Theme files (T4) are serde ThemeDefs — confirm a def round-trips.
+    // Theme files (T4) are serialized `Theme`s — confirm one round-trips.
     let def = crate::theme::seed::builtin_defs().swap_remove(0);
     let json = serde_json::to_string(&def).expect("serialize");
-    let back: ThemeDef = serde_json::from_str(&json).expect("deserialize");
+    let back: Theme = serde_json::from_str(&json).expect("deserialize");
     assert_eq!(def, back);
 }
 
@@ -267,7 +267,7 @@ fn default_mode_for_def_matches_legacy_builtins() {
 
 #[test]
 fn mode_sheets_roundtrip_and_gate_on_non_empty() {
-    // T4: per-mode custom sheets ride the ThemeDef serde (the theme-file
+    // T4: per-mode custom sheets ride the Theme serde (the theme-file
     // persistence path), old files without the field still parse, and an
     // empty rule list counts as no override.
     let mut def = crate::theme::seed::builtin_defs().swap_remove(0);
@@ -279,7 +279,7 @@ fn mode_sheets_roundtrip_and_gate_on_non_empty() {
     def.mode_sheets.insert(Mode::Light.as_key(), Vec::new());
 
     let json = serde_json::to_string(&def).unwrap();
-    let back: ThemeDef = serde_json::from_str(&json).unwrap();
+    let back: Theme = serde_json::from_str(&json).unwrap();
     assert_eq!(back, def, "mode_sheets survive the theme-file roundtrip");
     assert!(back.mode_sheet(&Mode::Dark).is_some());
     assert!(
@@ -289,7 +289,7 @@ fn mode_sheets_roundtrip_and_gate_on_non_empty() {
     assert!(back.mode_sheet(&Mode::HcDark).is_none());
 
     // A pre-T4 file (no mode_sheets field) parses with no overrides.
-    let legacy: ThemeDef = serde_json::from_str(
+    let legacy: Theme = serde_json::from_str(
         &serde_json::to_string(&crate::theme::seed::builtin_defs().swap_remove(0)).unwrap(),
     )
     .unwrap();
@@ -302,4 +302,28 @@ fn mode_sheets_roundtrip_and_gate_on_non_empty() {
         .fork(&def.id, "user:fork-t4", "Fork")
         .expect("fork succeeds");
     assert_eq!(fork.mode_sheets, def.mode_sheets);
+}
+
+#[test]
+fn a_theme_file_saved_before_the_merge_still_reads() {
+    // User theme files were saved as `ThemeDef` until it merged into `Theme`
+    // (2026-09-24); a file holding only the required fields must still read.
+    let saved = r#"{"id":"user:saved","name":"Saved","seeds":{
+        "primary":{"r":51,"g":102,"b":200,"a":255},
+        "secondary":{"r":46,"g":157,"b":166,"a":255},
+        "tertiary":{"r":224,"g":168,"b":70,"a":255},
+        "neutral":{"r":16,"g":20,"b":34,"a":255},
+        "text_header":null,"text_body":null,
+        "success":{"r":79,"g":179,"b":110,"a":255},
+        "danger":{"r":213,"g":78,"b":78,"a":255},
+        "dark":true}}"#;
+    let theme: Theme = serde_json::from_str(saved).expect("a saved theme file reads");
+    assert_eq!(
+        (theme.id.as_str(), theme.name.as_str()),
+        ("user:saved", "Saved")
+    );
+    assert_eq!(theme.source, ThemeSource::User);
+    assert_eq!(theme.harmony, Harmony::Custom);
+    assert!(!theme.high_contrast && theme.mode_sheets.is_empty());
+    assert!(ThemeRegistry::default().add_user_theme(theme).is_ok());
 }

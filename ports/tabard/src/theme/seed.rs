@@ -27,13 +27,14 @@ use crate::theme::data::ThemeData;
 use tinct::oklch::Oklch;
 use tinct::{ModeProfile, Seeds, Srgb, best_on, contrast, derive_palette_with, mix};
 
+use crate::Theme;
 use crate::theme::chrome::ChromeTheme;
 use crate::theme::edge_style::{
     EdgeAccessibilityMode, ThemeAccessibilitySupport, ThemeContract, ThemeEdgeTokens,
 };
 use crate::theme::registry::{
     GraphNodeChromeTheme, Harmony, THEME_ID_DARK, THEME_ID_DEFAULT, THEME_ID_HIGH_CONTRAST,
-    THEME_ID_LIGHT, ThemeDef, ThemeSource, ThemeTokenSet,
+    THEME_ID_LIGHT, ThemeSource, ThemeTokenSet,
 };
 
 // =============================================================================
@@ -325,9 +326,9 @@ fn profile_for(dark: bool, high_contrast: bool) -> ThemeProfile {
     }
 }
 
-/// Derive a [`ThemeTokenSet`] from a [`ThemeDef`] — the single path for both
+/// Derive a [`ThemeTokenSet`] from a [`Theme`] — the single path for both
 /// built-ins and user themes. The profile is computed from the def's mode.
-pub fn derive_from_def(def: &ThemeDef) -> ThemeTokenSet {
+pub fn derive_from_def(def: &Theme) -> ThemeTokenSet {
     let seeds = harmonized_seeds(def);
     derive_token_set(
         &def.id,
@@ -337,16 +338,13 @@ pub fn derive_from_def(def: &ThemeDef) -> ThemeTokenSet {
     )
 }
 
-/// Derive a [`ThemeTokenSet`] from a [`ThemeDef`] under an explicit
+/// Derive a [`ThemeTokenSet`] from a [`Theme`] under an explicit
 /// [`Mode`](crate::theme::registry::Mode) — the theme-modes derivation entry point. The
 /// mode, not the def's own `seeds.dark` / `high_contrast`, decides the ladder
 /// direction + contrast spread, so one theme derives all four canonical modes.
 /// `Custom` modes are not derivable here (they are sheet calculators, T5);
 /// they fall back to the dark canonical derivation via [`Mode::dark`].
-pub fn derive_from_def_for_mode(
-    def: &ThemeDef,
-    mode: &crate::theme::registry::Mode,
-) -> ThemeTokenSet {
+pub fn derive_from_def_for_mode(def: &Theme, mode: &crate::theme::registry::Mode) -> ThemeTokenSet {
     let mut seeds = harmonized_seeds(def);
     seeds.dark = mode.dark();
     let hc = mode.high_contrast();
@@ -356,7 +354,7 @@ pub fn derive_from_def_for_mode(
 /// The mode a def encodes as authored — what the pre-modes registry derived.
 /// Activating a theme re-seeds the presentation mode from this, so the four
 /// legacy built-ins (Default/Dark/Light/High Contrast) keep their meaning.
-pub fn default_mode_for_def(def: &ThemeDef) -> crate::theme::registry::Mode {
+pub fn default_mode_for_def(def: &Theme) -> crate::theme::registry::Mode {
     crate::theme::registry::Mode::from_flags(def.seeds.dark, def.high_contrast)
 }
 
@@ -364,7 +362,7 @@ pub fn default_mode_for_def(def: &ThemeDef) -> crate::theme::registry::Mode {
 /// accents possibly hue-locked to the primary). The derivation and the editor's
 /// colour display both read this, so what you see matches what renders.
 /// (Seed-palette harmony.)
-pub fn harmonized_seeds(def: &ThemeDef) -> Seeds {
+pub fn harmonized_seeds(def: &Theme) -> Seeds {
     let mut seeds = def.seeds;
     apply_harmony(&mut seeds, def.harmony);
     seeds
@@ -409,10 +407,10 @@ pub fn builtin_token_sets() -> Vec<ThemeTokenSet> {
 /// share the Slate triad (Dark pulled toward black); Light is the triad shifted
 /// for light surfaces; High Contrast is a yellow accent over forced-black
 /// surfaces (high-contrast derivation mode).
-pub fn builtin_defs() -> Vec<ThemeDef> {
+pub fn builtin_defs() -> Vec<Theme> {
     let (pr, se, te, ok, no) = slate_triad();
     vec![
-        ThemeDef {
+        Theme {
             id: THEME_ID_DEFAULT.to_string(),
             name: "Default".to_string(),
             source: ThemeSource::BuiltIn,
@@ -431,7 +429,7 @@ pub fn builtin_defs() -> Vec<ThemeDef> {
             harmony: Harmony::Custom,
             mode_sheets: Default::default(),
         },
-        ThemeDef {
+        Theme {
             id: THEME_ID_DARK.to_string(),
             name: "Dark".to_string(),
             source: ThemeSource::BuiltIn,
@@ -450,7 +448,7 @@ pub fn builtin_defs() -> Vec<ThemeDef> {
             harmony: Harmony::Custom,
             mode_sheets: Default::default(),
         },
-        ThemeDef {
+        Theme {
             id: THEME_ID_LIGHT.to_string(),
             name: "Light".to_string(),
             source: ThemeSource::BuiltIn,
@@ -469,7 +467,7 @@ pub fn builtin_defs() -> Vec<ThemeDef> {
             harmony: Harmony::Custom,
             mode_sheets: Default::default(),
         },
-        ThemeDef {
+        Theme {
             id: THEME_ID_HIGH_CONTRAST.to_string(),
             name: "High Contrast".to_string(),
             source: ThemeSource::BuiltIn,
