@@ -355,16 +355,20 @@ impl OwnedLayout {
     }
 
     /// Keep a caret that moved in view on both axes: across its field, and
-    /// down the nearest plane that scrolls vertically. The vertical target
-    /// when both moved; `None` when neither did.
+    /// down the planes that scroll vertically. The planes that moved, the
+    /// horizontal one first.
     pub(crate) fn caret_into_view<D: LayoutDom<NodeId = NodeId>>(
         &mut self,
         dom: &D,
         node: NodeId,
         caret: VisualCaret,
-    ) -> Option<ScrollTarget> {
-        let across = self.caret_across_into_view(dom, node, caret);
-        self.caret_down_into_view(dom, node, caret).or(across)
+    ) -> Vec<ScrollTarget> {
+        let mut moved: Vec<_> = self
+            .caret_across_into_view(dom, node, caret)
+            .into_iter()
+            .collect();
+        moved.extend(self.caret_down_into_view(dom, node, caret));
+        moved
     }
 
     /// Scroll the nearest box that scrolls horizontally, `node` itself first,
@@ -414,63 +418,32 @@ impl OwnedLayout {
         Some(ScrollTarget::Element(container))
     }
 
-    /// Scroll one plane just far enough to show the caret's line: `node`
-    /// itself when it scrolls vertically, else the nearest ancestor that
-    /// scrolls and has room to, else the document viewport. This keeps
-    /// typing in view in a field that grows with its text inside a scrolling
-    /// pane, as well as in one that scrolls its own text.
+    /// Scroll just far enough to show the caret's line: `node` itself when it
+    /// scrolls vertically, else the nearest ancestor that scrolls and has
+    /// room to, else the document viewport, and then the planes outside it
+    /// (see [`follow_out`](Self::follow_out)). This keeps typing in view in a
+    /// field that grows with its text inside a scrolling pane, as well as in
+    /// one that scrolls its own text.
     fn caret_down_into_view<D: LayoutDom<NodeId = NodeId>>(
         &mut self,
         dom: &D,
         node: NodeId,
         caret: VisualCaret,
-    ) -> Option<ScrollTarget> {
-        let rect = self.caret_rect_at(dom, node, caret.byte)?;
-        let top = rect.y - self.content_scroll(dom, node).1;
-        let bottom = top + rect.height.max(1.0);
-        let own = scroll_axes(&self.styles, node).1
-            && element_scroll_range(dom, &self.styles, &self.fragments, node).1 > 0.0;
-        let container = if own {
-            let range = element_scroll_range(dom, &self.styles, &self.fragments, node).1;
-            Some((node, range))
-        } else {
-            self.vertical_scroll_container(dom, node)
+    ) -> Vec<ScrollTarget> {
+        let own = scroll_axes(&self.styles, node)
+            .1
+            .then(|| element_scroll_range(dom, &self.styles, &self.fragments, node).1)
+            .filter(|range| *range > 0.0);
+        let first = match own {
+            Some(range) => Some((node, range)),
+            None => self.vertical_scroll_container(dom, node),
         };
-        let (area_top, area_height, current, range) = match container {
-            Some((container, range)) => {
-                let (_, y, _, height) = self
-                    .content_clip(dom, container)
-                    .or_else(|| self.painted_rect(dom, container))?;
-                let current = self.element_scroll.get(&container).map_or(0.0, |s| s.1);
-                (y, height, current, range)
-            },
-            None => (
-                0.0,
-                self.viewport.1,
-                self.viewport_scroll.1,
-                (self.content_extent.1 - self.viewport.1).max(0.0),
-            ),
-        };
-        let delta = if top < area_top {
-            top - area_top
-        } else if bottom > area_top + area_height {
-            (bottom - (area_top + area_height)).min(top - area_top)
-        } else {
-            0.0
-        };
-        let next = (current + delta).clamp(0.0, range);
-        if next == current {
-            return None;
-        }
-        Some(match container {
-            Some((container, _)) => {
-                self.element_scroll.entry(container).or_default().1 = next;
-                ScrollTarget::Element(container)
-            },
-            None => {
-                self.viewport_scroll.1 = next;
-                ScrollTarget::Document
-            },
+        self.follow_out(dom, first, ScrollAlign::Nearest, |layout, dom| {
+            let rect = layout.caret_rect_at(dom, node, caret.byte)?;
+            Some((
+                rect.y - layout.content_scroll(dom, node).1,
+                rect.height.max(1.0),
+            ))
         })
     }
 
@@ -724,48 +697,73 @@ impl OwnedLayout {
         (self.viewport_scroll != before).then_some(ScrollTarget::Document)
     }
 
-    /// Bring `node` into view on the vertical axis. The nearest plane that can
-    /// move (an ancestor that scrolls vertically and has room to, otherwise
-    /// the document viewport) moves by `align`; each plane outside it, out to
-    /// the viewport, then moves only as far as the node needs, so a node in a
-    /// scroller that is itself out of sight comes into view. Each plane is
-    /// clamped to its range. Returns the planes that moved, innermost first:
-    /// none for a node that is gone or does not paint.
+    /// Bring `node` into view on the vertical axis: the nearest ancestor that
+    /// scrolls vertically and has room to, otherwise the document viewport,
+    /// moves by `align`, and the planes outside it follow (see
+    /// [`follow_out`](Self::follow_out)). Returns the planes that moved,
+    /// innermost first: none for a node that is gone or does not paint.
     pub(crate) fn scroll_into_view<D: LayoutDom<NodeId = NodeId>>(
         &mut self,
         dom: &D,
         node: NodeId,
         align: ScrollAlign,
     ) -> Vec<ScrollTarget> {
-        let mut moved = Vec::new();
         // Before any walk: a retired node has no parent to ask for.
         if self.painted_rect(dom, node).is_none() {
-            return moved;
+            return Vec::new();
         }
-        let (mut from, mut align) = (node, align);
+        let first = self.vertical_scroll_container(dom, node);
+        self.follow_out(dom, first, align, |layout, dom| {
+            let (_, top, _, height) = layout.painted_rect(dom, node)?;
+            Some((top, height))
+        })
+    }
+
+    /// Walk the vertical planes out from `first`, a scroller or else the
+    /// document viewport: `first` moves by `align` to show the span `target`
+    /// reports (its painted top and height), then each plane outside it, out
+    /// to the viewport, moves only as far as the span needs, so a span in a
+    /// scroller that is itself out of sight comes into view. The span is read
+    /// again after every move. The planes that moved, innermost first.
+    fn follow_out<D: LayoutDom<NodeId = NodeId>>(
+        &mut self,
+        dom: &D,
+        first: Option<(NodeId, f32)>,
+        align: ScrollAlign,
+        target: impl Fn(&Self, &D) -> Option<(f32, f32)>,
+    ) -> Vec<ScrollTarget> {
+        let mut moved = Vec::new();
+        let (mut plane, mut align) = (first, align);
         loop {
-            let container = self.vertical_scroll_container(dom, from);
-            moved.extend(self.scroll_plane(dom, node, container, align));
-            let Some((container, _)) = container else {
+            let Some((top, height)) = target(self, dom) else {
                 return moved;
             };
-            (from, align) = (container, ScrollAlign::Nearest);
+            moved.extend(self.move_plane(dom, plane, top, height, align));
+            let Some((container, _)) = plane else {
+                return moved;
+            };
+            plane = self.vertical_scroll_container(dom, container);
+            align = ScrollAlign::Nearest;
         }
     }
 
-    /// Move one plane, `container` or else the document viewport, so `node`
-    /// sits in it by `align`. `None` when the plane did not move.
-    fn scroll_plane<D: LayoutDom<NodeId = NodeId>>(
+    /// Move one plane, `container` or else the document viewport, so the span
+    /// from `top` down `height` sits in its scrollport by `align`, clamped to
+    /// the plane's range. A container's scrollport is its padding box, inside
+    /// its border. `None` when the plane did not move.
+    fn move_plane<D: LayoutDom<NodeId = NodeId>>(
         &mut self,
         dom: &D,
-        node: NodeId,
         container: Option<(NodeId, f32)>,
+        top: f32,
+        height: f32,
         align: ScrollAlign,
     ) -> Option<ScrollTarget> {
-        let (_, top, _, height) = self.painted_rect(dom, node)?;
         let (area_top, area_height, current, range) = match container {
             Some((container, range)) => {
-                let (_, y, _, h) = self.painted_rect(dom, container)?;
+                let (_, y, _, h) = self
+                    .content_clip(dom, container)
+                    .or_else(|| self.painted_rect(dom, container))?;
                 let current = self.element_scroll.get(&container).map_or(0.0, |s| s.1);
                 (y, h, current, range)
             },

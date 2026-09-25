@@ -48,6 +48,8 @@ fn block(id: &'static str, style: String) -> Child {
 /// |-------------|--------------------------------------------------------|
 /// | `#scroller` | (0, 100, 200, 100), `overflow:auto` over 600px         |
 /// | `#inner`    | 300px down inside it, 40px tall: laid out at y=400     |
+/// | `#framed`   | (250, 100, 100, 100) under a 10px top border, scrolls  |
+/// | `#framed-in`| 300px down inside it: laid out at y=410                |
 /// | `#top`      | (0, 250, 100, 40), visible without scrolling           |
 /// | `#mid`      | (0, 600, 100, 40)                                      |
 /// | `#gone`     | (0, 800, 100, 40), until `removed`                     |
@@ -76,6 +78,29 @@ fn root(state: &App) -> Child {
                 .attr(
                     "style",
                     format!("{}overflow:auto;", place(0, 100, 200, 100)),
+                ),
+            ),
+        ),
+        (
+            8,
+            Box::new(
+                el(
+                    "div",
+                    (
+                        el("div", ()).attr("style", "height:300px;"),
+                        el("div", ())
+                            .attr("id", "framed-in")
+                            .attr("style", "height:40px;"),
+                        el("div", ()).attr("style", "height:260px;"),
+                    ),
+                )
+                .attr("id", "framed")
+                .attr(
+                    "style",
+                    format!(
+                        "{}overflow:auto;border-top:10px solid black;",
+                        place(250, 100, 100, 100)
+                    ),
                 ),
             ),
         ),
@@ -234,6 +259,27 @@ fn inside_a_nested_scroll_container_the_container_scrolls_not_the_window() {
         "#inner's top against the container's",
     );
     near(host.element_scroll_total(), 300.0, "the container's offset");
+}
+
+/// A container is measured by its scrollport, inside its border: `Start` puts
+/// the element under the border, not beneath it.
+#[test]
+fn start_aligns_to_the_scrollport_inside_a_border() {
+    let (mut host, queue) = harness();
+    let framed = node(&host, "framed");
+    let inner = node(&host, "framed-in");
+
+    request(&mut host, &queue, &[(inner, ScrollAlign::Start)]);
+    near(
+        top(&host, inner),
+        top(&host, framed) + 10.0,
+        "#framed-in's top against the scrollport's",
+    );
+    near(
+        host.element_scroll(framed).1,
+        300.0,
+        "the container's offset",
+    );
 }
 
 /// The container moves by the request's alignment, and the window then moves
