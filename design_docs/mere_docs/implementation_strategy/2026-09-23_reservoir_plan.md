@@ -6,8 +6,8 @@ wallet-persona resolution, djinn's reservoir lane and route, and a real
 two-process receipt. It reached origin with `5364dfa0` on 2026-09-24. V2's
 shape was ruled on 2026-09-23 and 2026-09-24 (§7). Steps 1 to 3
 (muniment, graph-kernel, pandect) landed on 2026-09-24 and reached origin on
-2026-09-25; step 3b, undo with exact replay, landed on 2026-09-25. Step 4, in
-djinn, is next.
+2026-09-25; step 3b, undo with exact replay, landed on 2026-09-25 and reached origin the
+same day. Step 4, `MereHost` on `GraphSession` in Graphshell, is next.
 **Scope:** give each data domain one mere, and make every mere of an identity
 openable by any of that identity's applications. The meres are held by the
 device resident, with sessions, a graph journal and an Eidetic archive.
@@ -333,14 +333,20 @@ and projection changes, replayable for the Timeline and for undo (ruled, §7).
     comparison above) and the session's undo and redo order. It follows step 3
     so the session types reach their consumers first; step 2 had carried it as
     "the inverse of a captured delta" before the undo rulings.
-4. djinn:
-   - open a mere by id on its own route;
-   - list its sessions, with mint, open, fork, trash and restore as intents;
-   - attach to a session;
-   - apply edits and view changes with the route's application as author;
+4. Graphshell: `MereHost` on `GraphSession`, reading its stored slot once into
+   the schema. It comes before djinn's routes, because a route projects a
+   session's graph with `MereHost`'s projection (ruled, §7 item 21); this was
+   step 5 until 2026-09-25.
+5. djinn:
+   - each mere on its own route, registered at startup and whenever a mere is
+     ensured; graphshell's door learns to add routes and grants at runtime
+     (ruled, §7 item 20);
+   - each route projects the mere's sessions, for the mere view, and the
+     attached session's graph, for editing (ruled, §7 item 22);
+   - mint, open, fork, trash, restore, undo and redo as intents;
+   - attach to a session, apply edits and view changes with the route's
+     application as author;
    - ring a revision bell for every attached session.
-5. Graphshell: `MereHost` on `GraphSession`, reading its stored slot once into
-   the schema.
 
 Turnstone adopts in its own plan, and Cleromancy in its C1.
 
@@ -543,6 +549,18 @@ V2's rulings. Items 6 to 8 were ruled on 2026-09-23 and the rest on
     exact edge follows each minted statement id, using existing entry kinds.
     The alternatives were to extend the add-node and assert entries, or to
     have undo and the Timeline ignore those values.
+20. **How an application reaches a mere** (2026-09-25). "A route per mere":
+    each mere gets its own route, registered at startup and when a mere is
+    ensured, and djinn's door learns to add routes and grants at runtime. This
+    keeps V4's denial at the route. The alternative was one route with an
+    attach-by-id intent.
+21. **Step order** (2026-09-25). "Step 5, then 4": `MereHost` moves onto
+    `GraphSession` first, so djinn serves `MereHost`'s projection instead of a
+    projection of its own. The steps are renumbered to match.
+22. **What a mere's route projects** (2026-09-25). "Sessions and graph": the
+    mere's sessions, for the V2b mere view, and the attached session's graph,
+    for editing. The alternative projected the graph only and left the session
+    list on the reservoir route.
 
 ## 8. Progress
 
