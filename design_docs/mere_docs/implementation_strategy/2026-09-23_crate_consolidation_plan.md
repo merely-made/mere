@@ -98,6 +98,15 @@ atomically with `ReplaceFileW` on Windows) and pandect's `ApplicationSettings`
 - *pandect:* `ApplicationSettings` adopts tabard's choice type with the same
   serialized field names, so stored records read unchanged.
 - *Compatibility:* Pelt's existing one-line appearance file keeps reading.
+- *Writer and format (Mark, 2026-09-24):* tabard forbids `unsafe`, and Pelt's
+  store replaced its file with `ReplaceFileW` through FFI. std's
+  `fs::rename` on Windows is already a one-step replace (`MoveFileExW` with
+  `MOVEFILE_REPLACE_EXISTING`, falling back to a POSIX-semantics
+  `FileRenameInfoEx`), so the store writes and syncs a temp file and renames
+  it over the target, with no `unsafe`. The file holds
+  `{"theme_id": …, "theme_mode": …}` in pandect's names; a legacy `dark` or
+  `light` line reads as `theme:dark` in dark mode or `theme:light` in light
+  mode.
 
 Phases, each gated like C3:
 
