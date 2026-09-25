@@ -490,3 +490,39 @@ fn the_embedded_merge_places_both_producers_identically() {
     assert!((first.x + 200.0).abs() < EPSILON, "{first:?}");
     assert!((first.y - 100.0).abs() < EPSILON, "{first:?}");
 }
+
+#[test]
+fn the_graph_only_table_dispatches_each_strategy_it_lists_and_no_other() {
+    let (graph, keys) = fixture();
+    let signals = IntelligenceSignals::default();
+    let request = ProjectionRequest {
+        graph: &graph,
+        signals: &signals,
+        intent: intent(None, None),
+    };
+    for id in GRAPH_ONLY_STRATEGIES {
+        let projection = project_graph_only(id, &request).expect(id);
+        assert_eq!(projection.metadata.strategy_id.as_deref(), Some(*id));
+        assert_eq!(projection.nodes.len(), keys.len(), "{id} places every node");
+    }
+    // The same placement the adapter gives when called directly; a projection
+    // lists its nodes in no fixed order, so compare them by node.
+    let placed = |projection: &Projection| -> HashMap<NodeKey, PortablePoint> {
+        projection
+            .nodes
+            .iter()
+            .map(|node| (node.node, node.position))
+            .collect()
+    };
+    let direct = GridAdapter::default().project(&request);
+    let tabled = project_graph_only(GridAdapter::PROJECTION_ID, &request).expect("grid");
+    assert_eq!(placed(&tabled), placed(&direct));
+    for other in [
+        "radial.default",
+        "kanban.default",
+        "timeline.default",
+        "nope",
+    ] {
+        assert!(project_graph_only(other, &request).is_none(), "{other}");
+    }
+}
