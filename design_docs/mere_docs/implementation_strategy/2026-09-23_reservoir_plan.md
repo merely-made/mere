@@ -10,9 +10,9 @@ shape was ruled on 2026-09-23 and 2026-09-24 (§7). Steps 1 to 3
 origin the same day. Step 4, `MereHost` on `GraphSession` in Graphshell, landed
 and reached origin on 2026-09-25, and a browser receipt the same day shows it
 running in Chromium over IndexedDB (§7 item 29); the receipt's scenario verdicts
-await a headed run. Step 5, djinn's routes, landed on 2026-09-25 on the
-`reservoir-v2` branch with its two-process receipt, meeting V2's done-conditions
-(§8); it is not yet on origin. V2b, the mere view, is next.
+await a headed run. Step 5, djinn's routes, landed on 2026-09-25 with its
+two-process receipt, meeting V2's done-conditions (§8), and reached origin the
+same day. V2b, the mere view, is next.
 **Scope:** give each data domain one mere, and make every mere of an identity
 openable by any of that identity's applications. The meres are held by the
 device resident, with sessions, a graph journal and an Eidetic archive.
@@ -1109,3 +1109,15 @@ V2's rulings. Items 6 to 8 were ruled on 2026-09-23 and the rest on
   now attaches from a list the mint has moved past, and checks each refusal's
   reason: a step the session's card no longer offers, a session the mere does
   not hold, and a step naming no session.
+- 2026-09-25: step 5 and ruling 33 re-verified with `--locked` and pushed with
+  Mark's approval. Origin's main had not moved from `5cb6e65b`. The gate:
+  - `check --workspace --all-targets`, and Graphshell's every target with all
+    features;
+  - mere-kernel 303 of 303 and pandect 301 of 301;
+  - graphshell's lib tests with `personal-sync` 300 of 301, the one failure
+    being `distillery_w1`'s CRLF artifact;
+  - djinn 80 of 80 in the library, both two-process receipts, and its other
+    integration tests;
+  - the kernel, pandect and Graphshell's browser cone for
+    `wasm32-unknown-unknown`, the `graphshell-web` app, and pandect for
+    `wasm32-wasip2`.
