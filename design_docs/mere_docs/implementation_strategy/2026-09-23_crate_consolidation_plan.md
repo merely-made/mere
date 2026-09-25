@@ -104,11 +104,27 @@ Phases, each gated like C3:
 - **T1. `Color32` merged into `Srgb`.** *Done when:* the nine files use
   tinct's `Srgb`, graph-kernel's `color` module is gone, and their suites
   pass.
-- **T2. The theme module and `ThemeData` into tabard.** *Done when:* tabard
-  owns them, registry has no `theme` feature, gloss and lens import from
-  tabard, and every moved test passes. tabard then holds two theme models, its
-  DTCG `Theme` and `ThemeTokenSet`; unifying them is the next design question,
-  for Mark.
+- **T2. The theme module and `ThemeData` into tabard, as one model.** Mark
+  ruled the layout and the unification on 2026-09-24. Three steps, each gated
+  on its own:
+  - **T2a. Move.** Registry's tree becomes `tabard::theme` with the same
+    submodules; the inner `theme` file, which holds `ThemeRegistry`, is
+    renamed `registry`, and lens's file becomes `tabard::theme::data`. The two
+    identical sets of theme ids become one. *Done when:* tabard owns the tree,
+    registry has no `theme` feature, gloss and lens import from tabard, and
+    every moved test passes.
+  - **T2b. One authored theme.** tabard's `Theme` (`name`, `seeds`) is a
+    strict subset of registry's `ThemeDef` (`id`, `name`, `source`, `seeds`,
+    `high_contrast`, `harmony`, per-mode stylesheets). They become one type,
+    `Theme` at tabard's root, with `ThemeDef`'s fields and the DTCG, CSS and
+    Lagrange exports; `ThemeDef` retires and `ThemeTokenSet` stays the derived
+    set. *Done when:* saved theme files read unchanged and Pelt's preview
+    builds with an id.
+  - **T2c. Lens themes from the token sets.** Lens's four hard-coded
+    `ThemeData` values and their resolver retire; a lens's theme comes from
+    the token set's derived `theme_data`, so lens colours become the
+    seed-derived ones. *Done when:* saved lens files still read, by theme id
+    and by value, and the lens tests assert against the token sets.
 - **T3. One smolweb palette, in tabard.** *Done when:* both crates and Pelt
   use tabard's definition and their suites pass.
 - **T4. Persistence into tabard.** *Done when:* Pelt's choice and stores live
