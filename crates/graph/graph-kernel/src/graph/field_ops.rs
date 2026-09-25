@@ -37,6 +37,13 @@ impl Graph {
         self.set_field_lifecycle(id, FieldLifecycle::Active)
     }
 
+    /// Remove a field outright: undo's inverse of adding one, where retiring
+    /// would keep it. Couplings that target it stay, each its own part to
+    /// revert. Returns whether the field existed.
+    pub(crate) fn remove_field(&mut self, id: FieldId) -> bool {
+        self.fields.remove(&id).is_some()
+    }
+
     fn set_field_lifecycle(&mut self, id: FieldId, lifecycle: FieldLifecycle) -> bool {
         match self.fields.get_mut(&id) {
             Some(field) => {

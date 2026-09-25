@@ -72,6 +72,8 @@ pub mod import_records;
 pub mod node;
 pub mod node_facets;
 pub mod node_props;
+/// Reverting one change: undo's edits and the parts it keeps (reservoir plan V2).
+pub mod revert;
 pub mod source_time;
 // chartulary capability-trait impls for `Node` (graph re-base, G5).
 mod chart;
@@ -124,6 +126,7 @@ pub use capture::{
 pub use journal::{
     AttributedDelta, Author, AuthorKind, GraphJournal, USER_AUTHOR, journal_capture_hook,
 };
+pub use revert::{Part, Revert, Touched, revert_change};
 pub use source_time::{SourceExtent, SourceTime};
 // The borne-graph identity type (`Node.nested`): part of the node's public
 // surface, re-exported so consumers name it without a direct muniment dep.

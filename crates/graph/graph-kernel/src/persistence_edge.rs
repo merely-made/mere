@@ -423,7 +423,9 @@ pub enum PersistedNavigationTrigger {
 }
 
 /// Persisted edge.
-#[derive(Archive, Serialize, Deserialize, Clone, Debug, serde::Serialize, serde::Deserialize)]
+#[derive(
+    Archive, Serialize, Deserialize, Clone, Debug, PartialEq, serde::Serialize, serde::Deserialize,
+)]
 pub struct PersistedEdge {
     pub from_node_id: String,
     pub to_node_id: String,
