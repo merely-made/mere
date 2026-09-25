@@ -20,7 +20,7 @@ document and are not counted again here.
 ## mere_docs/implementation_strategy/2026-09-23_reservoir_plan.md
 
 - disposition: current
-- status line: "Status: in progress. V1 is complete and on main … V2's shape was ruled on 2026-09-23 and 2026-09-24 (§7). Steps 1 to 3 (muniment, graph-kernel, pandect) landed on 2026-09-24 and reached origin on 2026-09-25; step 3b, undo with exact replay, landed on 2026-09-25 and reached origin the same day. Step 4, `MereHost` on `GraphSession` in Graphshell, landed on 2026-09-25 on the `reservoir-v2` branch, not yet on origin; its browser runtime is unproven (§8). Step 5, djinn's routes, is next." — accurate: yes
+- status line: "Status: in progress. V1 is complete and on main … V2's shape was ruled on 2026-09-23 and 2026-09-24 (§7). Steps 1 to 3 (muniment, graph-kernel, pandect) landed on 2026-09-24 and reached origin on 2026-09-25; step 3b, undo with exact replay, landed on 2026-09-25 and reached origin the same day. Step 4, `MereHost` on `GraphSession` in Graphshell, landed and reached origin on 2026-09-25. Its browser runtime is unproven: updating `graphshell-web`'s genet and netrender and a browser receipt come next (§7 item 29), then step 5, djinn's routes." — accurate: yes
 - claims checked: 43 — holds: 43, stale: 0, unverifiable: 0
 
 ### Stale claims
