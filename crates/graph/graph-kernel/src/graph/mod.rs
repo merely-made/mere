@@ -69,6 +69,7 @@ pub mod fixtures;
 pub mod history;
 pub mod identity;
 pub mod import_records;
+pub mod merge;
 pub mod node;
 pub mod node_facets;
 pub mod node_props;
@@ -126,6 +127,7 @@ pub use capture::{
 pub use journal::{
     AttributedDelta, Author, AuthorKind, GraphJournal, USER_AUTHOR, journal_capture_hook,
 };
+pub use merge::import_edits;
 pub use revert::{Part, Revert, Touched, revert_change};
 pub use source_time::{SourceExtent, SourceTime};
 // The borne-graph identity type (`Node.nested`): part of the node's public

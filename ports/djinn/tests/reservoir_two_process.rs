@@ -129,7 +129,7 @@ async fn child_attempts_to_own_the_reservoir() {
         },
         ("opened", Ok(reservoir)) => {
             let mut catalog = ResidentEndpointCatalog::new();
-            reservoir.register(&mut catalog).unwrap();
+            reservoir.register(&mut catalog, None).unwrap();
             let context =
                 AdmittedEndpointContext::new(ProjectionSession("v1:receipt".into()), [0x2b; 32]);
             let mut session = catalog.open(RESIDENT_RESERVOIR_ROUTE, &context).unwrap();

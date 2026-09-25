@@ -45,6 +45,7 @@ use sceno::{
 use scenotime::{Revision, SceneEpoch, SceneSnapshot};
 use serde::{Deserialize, Serialize};
 
+use crate::resident_mere::MereRoutes;
 use crate::settings::ReservoirLaneSettings;
 
 /// The stable first-party route an admitted application requests.
@@ -161,15 +162,18 @@ impl ResidentReservoir {
     }
 
     /// Register the reservoir route. Every admitted open receives its own
-    /// session over the one shared reservoir.
+    /// session over the one shared reservoir. With `routes`, each mere the
+    /// route ensures is served on its own route (reservoir plan V2, step 5).
     pub fn register(
         &self,
         catalog: &mut ResidentEndpointCatalog,
+        routes: Option<MereRoutes>,
     ) -> Result<(), ResidentEndpointCatalogError> {
         let shared = Arc::clone(&self.shared);
         catalog.register(RESIDENT_RESERVOIR_ROUTE, "Reservoir", move |_| {
             Ok(ReservoirEndpoint {
                 shared: Arc::clone(&shared),
+                routes: routes.clone(),
             })
         })
     }
@@ -184,6 +188,7 @@ impl ResidentReservoir {
 /// One admitted session's view of the shared reservoir.
 struct ReservoirEndpoint {
     shared: Arc<Shared>,
+    routes: Option<MereRoutes>,
 }
 
 /// A card and the bytes it is served as.
@@ -438,9 +443,20 @@ impl IntentSink for ReservoirEndpoint {
                         .await
                 });
                 match result {
-                    Ok((_, created)) => {
+                    Ok((mere, created)) => {
                         if created {
                             self.shared.revision.fetch_add(1, Ordering::SeqCst);
+                        }
+                        // Serving is idempotent, so an ensure always leaves the
+                        // mere on its own route.
+                        if let Some(routes) = &self.routes
+                            && let Err(error) = self.run(routes.serve(&mere))
+                        {
+                            return Ok(IntentResult::Rejected {
+                                reason: format!(
+                                    "the mere is kept but its route did not open: {error}"
+                                ),
+                            });
                         }
                         Ok(IntentResult::Accepted)
                     },
@@ -484,7 +500,7 @@ mod tests {
             .await
             .unwrap();
         let mut catalog = ResidentEndpointCatalog::new();
-        reservoir.register(&mut catalog).unwrap();
+        reservoir.register(&mut catalog, None).unwrap();
         let context = AdmittedEndpointContext::new(
             chirograph::ProjectionSession("v1:cleromancy".into()),
             [0xa7; 32],
@@ -532,7 +548,7 @@ mod tests {
             .await
             .unwrap();
         let mut catalog = ResidentEndpointCatalog::new();
-        reservoir.register(&mut catalog).unwrap();
+        reservoir.register(&mut catalog, None).unwrap();
         let context =
             AdmittedEndpointContext::new(chirograph::ProjectionSession("v1:test".into()), [1; 32]);
         let mut session = catalog.open(RESIDENT_RESERVOIR_ROUTE, &context).unwrap();
