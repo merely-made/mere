@@ -381,7 +381,9 @@ and projection changes, replayable for the Timeline and for undo (ruled, §7).
      attached session's graph, for editing (ruled, §7 item 22);
    - mint, open, fork, trash, restore, undo and redo as intents;
    - attach to a session, apply edits and view changes with the route's
-     application as author;
+     application as author, through a session item the graph projection shows
+     in resident mode (ruled, §7 item 31), each accepted by id at any revision
+     (ruled, §7 item 32);
    - ring a revision bell for every attached session.
 
 Turnstone adopts in its own plan, and Cleromancy in its C1.
@@ -648,6 +650,20 @@ V2's rulings. Items 6 to 8 were ruled on 2026-09-23 and the rest on
     exactly one mere, so a client names the route from the domain it just
     ensured, without reading the mere's id from the reservoir listing first.
     The alternative was `mere/<mere id>`.
+31. **Where an attached application edits** (2026-09-25). Every intent
+    targets an item in one projection and names that projection's revision.
+    Mark chose "A session item in the graph": in resident mode the graph
+    projection shows one extra item, the session itself, carrying apply
+    edits, undo, redo and view changes, so an edit names the graph's revision
+    and works on an empty graph. Graphshell's own view never shows it. The
+    alternative put them on the session's card in the sessions projection.
+32. **Stale edits** (2026-09-25). Mark chose "Accept by id": edits name nodes
+    and relations by stable id, so they are well-defined at any revision, and
+    they apply in arrival order, with the journal recording who did what and
+    undo keeping what another author changed; on one field the later write
+    wins. The alternative refused an edit made against an older revision.
+    The session item's intents still check the epoch, which names another
+    session, not the revision.
 
 ## 8. Progress
 
@@ -992,3 +1008,14 @@ V2's rulings. Items 6 to 8 were ruled on 2026-09-23 and the rest on
   tests with `personal-sync` 299 of 300, the one failure being
   `distillery_w1`'s CRLF artifact; pandect 301 of 301; the browser cone and
   djinn check.
+- 2026-09-25: the session item (§7 items 31 and 32).
+  - `graphshell::session_item` holds its vocabulary: apply edits, undo, redo
+    and change a view, each with its payload schema, and the item's card.
+  - `MereHost::with_session_item` shows it in the graph projection, after the
+    nodes, and `session_instance` names it for a resident to recognise;
+    Graphshell's own view does not show it.
+
+  Tests: a resident graph shows its nodes and the session item with the four
+  actions in order, and Graphshell's shows only its nodes. graphshell's lib
+  tests with `personal-sync` 300 of 301 (the CRLF artifact); the browser cone
+  and djinn check.
