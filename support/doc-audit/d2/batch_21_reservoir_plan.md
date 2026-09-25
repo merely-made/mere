@@ -121,12 +121,12 @@ The V2 findings (§2, added 2026-09-24), 15 claims:
   carry, `parent_session`, admissions and nested worlds.
 
 The step 3b findings (§2, added 2026-09-25), 3 claims, checked against the
-branch that became `301c847b`:
+branch that became `ea8059b9`:
 
 - node creation stamps its visit time from the clock
   (`crates/graph/graph-kernel/src/graph/mod.rs`), and statement ids are
   minted from time, salt and counter (`crates/graph/graph-kernel/src/types.rs`);
-  both were unjournaled until `301c847b`, shown by a kernel test that fails
+  both were unjournaled until `ea8059b9`, shown by a kernel test that fails
   when either capture is disabled;
 - `Graph::from_snapshot` plus `overlay_facets` kept default-valued facets
   imported from snapshot columns, shown by the session checkpoint test's

@@ -616,7 +616,7 @@ V2's rulings. Items 6 to 8 were ruled on 2026-09-23 and the rest on
   §7 items 6 to 16, and V2's phase text above is rewritten to match. V2
   continues on branch `reservoir-v2` in `worktrees/mere-reservoir`, from
   `bb709523`. No V2 code yet.
-- 2026-09-24: V2 step 1 landed in muniment (`80540b98`).
+- 2026-09-24: V2 step 1 landed in muniment (`95bd3aca`).
   - `Journal::append_entries`, `entry_writes` and `load_entries` keep one
     entry per key, with its causes. `entry_writes` hands a caller the writes to
     commit beside a checkpoint. `Journal::starting_from` begins a fork empty,
@@ -635,7 +635,7 @@ V2's rulings. Items 6 to 8 were ruled on 2026-09-23 and the rest on
     file like a multi-file batch.
   - muniment: 73 of 73 tests with the directory and redb features. Clippy is
     clean for the crate, and it still builds for `wasm32-unknown-unknown`.
-- 2026-09-24: V2 step 2 landed in the graph kernel (`ba09cccd`).
+- 2026-09-24: V2 step 2 landed in the graph kernel (`c39d67a9`).
   - `Graph::set_recorder` gives a graph its own recorder; capture sites call
     `graph.record_delta`, which feeds that recorder and then the thread hook
     Turnstone still uses. A clone starts without a recorder.
@@ -655,7 +655,7 @@ V2's rulings. Items 6 to 8 were ruled on 2026-09-23 and the rest on
     and pictograph checks.
 - 2026-09-24: undo ruled (§7 items 17 and 18). Undo's revert engine moves to
   step 3b, after the session types.
-- 2026-09-24: V2 step 3 landed in pandect (`102da3db`).
+- 2026-09-24: V2 step 3 landed in pandect (`7bde1436`).
   - `pandect::graph_session` keeps a mere's sessions under `sessions/<id>/`:
     - `manifest.json` and `baseline.json`;
     - the latest checkpoint as `graph.json`, `facets.json` and
@@ -686,7 +686,7 @@ V2's rulings. Items 6 to 8 were ruled on 2026-09-23 and the rest on
   workspace gate (`check --workspace --all-targets --locked`) was green on
   that tree.
 - 2026-09-25: step 3b, undo, landed.
-  - The kernel's revert engine (`9316e557`): `revert_change` compares the graph
+  - The kernel's revert engine (`08e56181`): `revert_change` compares the graph
     before a change, after it and now, part by part. It puts back each part
     nobody touched since and names the rest as kept `Part`s; reverting an undo
     is the redo. Two new edits make it exact:
@@ -694,7 +694,7 @@ V2's rulings. Items 6 to 8 were ruled on 2026-09-23 and the rest on
       persisted form, through `restore_persisted_edge` and `persisted_edge`,
       extracted from the snapshot code;
     - `ReplayRemoveFieldById` removes a field outright.
-  - Exact replay and session undo (`301c847b`):
+  - Exact replay and session undo (`ea8059b9`):
     - the kernel journals each new node's visit stamp and, after a minted
       statement id, the exact edge (ruled, §7 item 19);
     - `GraphSession::undo` and `redo` rebuild each author's order from the
