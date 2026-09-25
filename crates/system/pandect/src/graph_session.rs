@@ -37,8 +37,8 @@ use kernel::graph::apply::{GraphDelta, apply_graph_delta};
 #[cfg(not(target_arch = "wasm32"))]
 use kernel::graph::node_facets::{PROVENANCE_DERIVATIONS, PROVENANCE_IMPORT};
 use kernel::graph::{
-    AttributedDelta, Author, CapturedDelta, Graph, GraphJournal, LogId, Seq,
-    replay_captured_deltas_onto,
+    AttributedDelta, Author, CapturedDelta, Graph, GraphJournal, LogId, Part, Seq, Touched,
+    replay_captured_deltas_onto, revert_change,
 };
 use kernel::persistence::GraphSnapshot;
 use muniment::{Backend, Journal, JsonCodec, JsonSlots, Provenance, StoreError, WriteOp};
@@ -200,6 +200,23 @@ pub struct Applied {
     pub revision: u64,
 }
 
+/// What an undo or redo did: the change it reverted or re-applied, what it
+/// wrote, and the parts it kept because another author changed them since.
+#[derive(Clone, Debug, PartialEq)]
+pub struct Reverted {
+    /// The change undone, or the undo redone, as an index into the change log.
+    pub of: Seq,
+    pub applied: Applied,
+    pub kept: Vec<Kept>,
+}
+
+/// A part an undo or redo left as it is, and who changed it since.
+#[derive(Clone, Debug, PartialEq)]
+pub struct Kept {
+    pub part: Part,
+    pub by: Vec<Author>,
+}
+
 #[derive(Serialize, Deserialize)]
 struct Baseline {
     graph: GraphSnapshot,
@@ -255,9 +272,13 @@ async fn read<B: Backend, T: DeserializeOwned>(
     }
 }
 
+/// A stored graph and its facets, exactly as written. The facets replace
+/// rather than overlay what the snapshot's columns import: a session stores
+/// its whole facet store, and an overlay would add default-valued facets the
+/// graph never held.
 fn graph_of(snapshot: &GraphSnapshot, facets: NodeFacetStore) -> Graph {
     let mut graph = Graph::from_snapshot(snapshot);
-    graph.overlay_facets(facets);
+    *graph.facets_mut() = facets;
     graph
 }
 
@@ -473,7 +494,7 @@ impl<B: Backend> GraphSession<B> {
             self.journal.record_as(author.clone(), delta);
         }
         let end = self.journal.live_cursor();
-        if end > first {
+        if end > first || kind != ChangeKind::Edit {
             self.changes.append(Change {
                 author,
                 kind,
@@ -530,6 +551,117 @@ impl<B: Backend> GraphSession<B> {
         self.saved = self.journal.live_cursor();
         self.changes_saved = self.changes.next_seq();
         Ok(())
+    }
+
+    /// Undo `author`'s latest change still in effect. Every part nobody has
+    /// changed since goes back; the rest is kept and reported with who changed
+    /// it (reservoir plan §7 item 17). `None` when there is nothing to undo.
+    pub async fn undo(&mut self, author: Author) -> Result<Option<Reverted>, SessionError> {
+        let Some(of) = self.stacks(&author).0.last().copied() else {
+            return Ok(None);
+        };
+        self.revert(author, of, ChangeKind::Undo { of })
+            .await
+            .map(Some)
+    }
+
+    /// Redo `author`'s most recent undo, unless an edit of theirs since has
+    /// cleared it (§7 item 18). `None` when there is nothing to redo.
+    pub async fn redo(&mut self, author: Author) -> Result<Option<Reverted>, SessionError> {
+        let Some(of) = self.stacks(&author).1.last().copied() else {
+            return Ok(None);
+        };
+        self.revert(author, of, ChangeKind::Redo { of })
+            .await
+            .map(Some)
+    }
+
+    /// `author`'s undo and redo stacks, rebuilt from the change log: an edit
+    /// goes on the undo stack and clears redo; an undo moves its change to
+    /// redo; a redo moves it back.
+    fn stacks(&self, author: &Author) -> (Vec<Seq>, Vec<Seq>) {
+        let (mut undo, mut redo) = (Vec::new(), Vec::new());
+        for (index, change) in self.changes.entries().iter().enumerate() {
+            if &change.author != author {
+                continue;
+            }
+            let index = Seq(index as u64);
+            match &change.kind {
+                ChangeKind::Edit => {
+                    undo.push(index);
+                    redo.clear();
+                },
+                ChangeKind::Undo { of } => {
+                    undo.retain(|seq| seq != of);
+                    redo.push(index);
+                },
+                ChangeKind::Redo { of } => {
+                    redo.retain(|seq| seq != of);
+                    undo.push(index);
+                },
+                _ => {},
+            }
+        }
+        (undo, redo)
+    }
+
+    /// The edits change `of` wrote.
+    fn edits_of(&self, change: &Change) -> Vec<CapturedDelta> {
+        self.journal.entries()[change.first.index()..change.end.index()]
+            .iter()
+            .map(|entry| entry.delta.clone())
+            .collect()
+    }
+
+    /// Revert change `of` as `kind`, recording what was kept and by whom.
+    async fn revert(
+        &mut self,
+        author: Author,
+        of: Seq,
+        kind: ChangeKind,
+    ) -> Result<Reverted, SessionError> {
+        let change = self
+            .changes
+            .get(of)
+            .cloned()
+            .expect("a stacked change exists");
+        let (before, after) = (
+            self.graph_at(change.first)
+                .expect("a change lies within its journal"),
+            self.graph_at(change.end)
+                .expect("a change lies within its journal"),
+        );
+        let revert = revert_change(&self.edits_of(&change), &before, &after, &self.graph);
+        let kept = revert
+            .kept
+            .into_iter()
+            .map(|part| Kept {
+                by: self.changed_since(of, &part),
+                part,
+            })
+            .collect();
+        let deltas = revert
+            .edits
+            .iter()
+            .map(|edit| {
+                edit.replay_delta()
+                    .ok_or_else(|| SessionError::NotReplayable(format!("{edit:?}")))
+            })
+            .collect::<Result<Vec<_>, _>>()?;
+        let applied = self.apply_as(author, kind, deltas).await?;
+        Ok(Reverted { of, applied, kept })
+    }
+
+    /// Who, after change `of`, made a change that reached `part`.
+    fn changed_since(&self, of: Seq, part: &Part) -> Vec<Author> {
+        let mut by: Vec<Author> = Vec::new();
+        for change in &self.changes.entries()[of.index() + 1..] {
+            let edits = self.edits_of(change);
+            if Touched::of(&edits).reaches(part) && !by.contains(&change.author) {
+                by.push(change.author.clone());
+            }
+        }
+        by
     }
 
     /// Write a checkpoint: the graph, its facets and the cursor they reflect,
@@ -842,6 +974,13 @@ mod tests {
         }
     }
 
+    fn tag(id: u128, tag: &str) -> CapturedDelta {
+        CapturedDelta::ReplayInsertNodeTagById {
+            node_id: Uuid::from_u128(id).to_string(),
+            tag: tag.to_string(),
+        }
+    }
+
     fn relate(from: u128, to: u128) -> CapturedDelta {
         CapturedDelta::ReplayAssertRelationByIds {
             from_id: Uuid::from_u128(from).to_string(),
@@ -887,7 +1026,8 @@ mod tests {
 
             let mut session = mere.open(id).await.unwrap();
             let first = session.apply(person(), vec![add(1), add(2)]).await.unwrap();
-            assert_eq!((first.first, first.end), (Seq(0), Seq(2)));
+            // Each new node journals its visit stamp beside the add.
+            assert_eq!((first.first, first.end), (Seq(0), Seq(4)));
             session
                 .apply(knot(), vec![relate(1, 2), retitle(1, "The Tower")])
                 .await
@@ -904,6 +1044,9 @@ mod tests {
                 [
                     "person persona-a via turnstone",
                     "person persona-a via turnstone",
+                    "person persona-a via turnstone",
+                    "person persona-a via turnstone",
+                    "person persona-a via knot-editor",
                     "person persona-a via knot-editor",
                     "person persona-a via knot-editor",
                 ]
@@ -921,12 +1064,12 @@ mod tests {
             let session_dir = dir.path().join("sessions").join(id.as_uuid().to_string());
             assert!(session_dir.join("manifest.json").is_file());
             let journal = std::fs::read_to_string(session_dir.join("journal.jsonl")).unwrap();
-            assert_eq!(journal.lines().count(), 4);
+            assert_eq!(journal.lines().count(), 7);
 
             let store = DirectoryBackend::open(dir.path()).unwrap();
             let reopened = GraphSession::open(store, id).await.unwrap();
             assert_eq!(fingerprint(reopened.graph()), live);
-            assert_eq!(reopened.journal().len(), 4);
+            assert_eq!(reopened.journal().len(), 7);
             assert_eq!(reopened.changes().len(), 3);
             assert_eq!(
                 reopened.manifest().display_name.as_deref(),
@@ -942,11 +1085,11 @@ mod tests {
             let mere = MereSessions::new(store.clone());
             let id = mere.mint(person(), None).await.unwrap().session_id;
             let mut session = mere.open(id).await.unwrap();
-            session.set_checkpoint_interval(3);
+            session.set_checkpoint_interval(4);
             for n in 0..3 {
                 session.apply(person(), vec![add(n)]).await.unwrap();
             }
-            // The third entry reached the interval; the fourth is the tail.
+            // The second node's entries reach the interval; the rest is the tail.
             session
                 .apply(person(), vec![retitle(2, "Three")])
                 .await
@@ -956,16 +1099,27 @@ mod tests {
                 .await
                 .unwrap()
                 .expect("a checkpoint was written");
-            assert_eq!(checkpoint.cursor, Seq(3));
-            assert_eq!(session.journal().len(), 4);
-            let live = fingerprint(session.graph());
+            assert_eq!(checkpoint.cursor, Seq(4));
+            assert_eq!(session.journal().len(), 7);
+            let live = whole(session.graph());
             drop(session);
 
+            // Whole graphs, facets and visit stamps included: replay is exact.
             let reopened = GraphSession::open(store.clone(), id).await.unwrap();
-            assert_eq!(fingerprint(reopened.graph()), live, "checkpoint plus tail");
+            assert_eq!(whole(reopened.graph()), live, "checkpoint plus tail");
             let replayed = reopened.graph_at(reopened.journal().live_cursor()).unwrap();
-            assert_eq!(fingerprint(&replayed), live, "baseline plus whole journal");
+            assert_eq!(whole(&replayed), live, "baseline plus whole journal");
         });
+    }
+
+    /// A graph's whole persisted state: its snapshot, undated, and its facets.
+    fn whole(graph: &Graph) -> (serde_json::Value, serde_json::Value) {
+        let mut snapshot = graph.to_snapshot();
+        snapshot.timestamp_secs = 0;
+        (
+            serde_json::to_value(&snapshot).unwrap(),
+            serde_json::to_value(graph.facets()).unwrap(),
+        )
     }
 
     #[test]
@@ -1010,6 +1164,119 @@ mod tests {
             assert_eq!(parent.graph().node_count(), 2, "the parent is untouched");
             assert!(parent.graph().get_node_by_id(Uuid::from_u128(3)).is_none());
             assert!(mere.fork_at(&parent, Seq(9), knot()).await.is_err());
+        });
+    }
+
+    #[test]
+    fn undo_steps_back_through_an_author_s_own_changes_and_redo_returns() {
+        pollster::block_on(async {
+            let mere = MereSessions::new(MemoryBackend::new());
+            let id = mere.mint(person(), None).await.unwrap().session_id;
+            let mut session = mere.open(id).await.unwrap();
+            session.apply(person(), vec![add(1)]).await.unwrap();
+            session.apply(knot(), vec![add(2)]).await.unwrap();
+            session
+                .apply(person(), vec![retitle(1, "One")])
+                .await
+                .unwrap();
+            let title = |session: &GraphSession<MemoryBackend>| {
+                session
+                    .graph()
+                    .get_node_by_id(Uuid::from_u128(1))
+                    .map(|(_, node)| node.title.clone())
+            };
+
+            let undone = session.undo(person()).await.unwrap().unwrap();
+            assert!(undone.kept.is_empty());
+            assert_ne!(title(&session).as_deref(), Some("One"));
+            session.undo(person()).await.unwrap().unwrap();
+            assert!(session.graph().get_node_by_id(Uuid::from_u128(1)).is_none());
+            assert!(
+                session.graph().get_node_by_id(Uuid::from_u128(2)).is_some(),
+                "the other author's change stays"
+            );
+            assert!(
+                session.undo(person()).await.unwrap().is_none(),
+                "nothing left to undo"
+            );
+
+            session.redo(person()).await.unwrap().unwrap();
+            assert!(session.graph().get_node_by_id(Uuid::from_u128(1)).is_some());
+            session.redo(person()).await.unwrap().unwrap();
+            assert_eq!(title(&session).as_deref(), Some("One"));
+            assert!(session.redo(person()).await.unwrap().is_none());
+            assert!(
+                session.redo(knot()).await.unwrap().is_none(),
+                "stacks are per author"
+            );
+        });
+    }
+
+    #[test]
+    fn undo_keeps_what_another_author_changed_and_says_who() {
+        pollster::block_on(async {
+            let mere = MereSessions::new(MemoryBackend::new());
+            let id = mere.mint(person(), None).await.unwrap().session_id;
+            let mut session = mere.open(id).await.unwrap();
+            session
+                .apply(person(), vec![add(1), retitle(1, "Start")])
+                .await
+                .unwrap();
+            session
+                .apply(person(), vec![retitle(1, "Mine"), tag(1, "mine")])
+                .await
+                .unwrap();
+            session
+                .apply(knot(), vec![retitle(1, "Theirs")])
+                .await
+                .unwrap();
+
+            let undone = session.undo(person()).await.unwrap().unwrap();
+            assert_eq!(
+                undone.kept,
+                [Kept {
+                    part: Part::Title(Uuid::from_u128(1)),
+                    by: vec![knot()],
+                }]
+            );
+            let (_, node) = session.graph().get_node_by_id(Uuid::from_u128(1)).unwrap();
+            assert_eq!(node.title, "Theirs", "their later edit stays");
+            assert!(
+                !node.tags.contains("mine"),
+                "the rest of the change went back"
+            );
+            assert_eq!(
+                session.changes().last().unwrap().kind,
+                ChangeKind::Undo { of: Seq(2) }
+            );
+        });
+    }
+
+    #[test]
+    fn undo_and_redo_order_survives_a_reopen() {
+        pollster::block_on(async {
+            let store = MemoryBackend::new();
+            let mere = MereSessions::new(store.clone());
+            let id = mere.mint(person(), None).await.unwrap().session_id;
+            let mut session = mere.open(id).await.unwrap();
+            session.apply(person(), vec![add(1)]).await.unwrap();
+            session.undo(person()).await.unwrap().unwrap();
+            drop(session);
+
+            let mut reopened = mere.open(id).await.unwrap();
+            assert!(
+                reopened
+                    .graph()
+                    .get_node_by_id(Uuid::from_u128(1))
+                    .is_none()
+            );
+            reopened.redo(person()).await.unwrap().unwrap();
+            assert!(
+                reopened
+                    .graph()
+                    .get_node_by_id(Uuid::from_u128(1))
+                    .is_some()
+            );
         });
     }
 
@@ -1103,10 +1370,10 @@ mod tests {
 
             assert_eq!(session.view(&key), Some(&focused));
             assert_eq!(session.view_at(&key, Seq(0)), Some(&spectral));
-            assert_eq!(session.view_at(&key, Seq(1)), Some(&focused));
+            assert_eq!(session.view_at(&key, Seq(2)), Some(&focused));
             assert_eq!(
                 session.journal().len(),
-                1,
+                2,
                 "view changes stay out of the journal"
             );
             drop(session);
@@ -1182,7 +1449,7 @@ mod tests {
                 )
                 .await
                 .unwrap();
-            assert_eq!(result.end, Seq(2));
+            assert_eq!(result.end, Seq(3));
             assert_eq!(session.graph().get_node(key).unwrap().title, "Seven");
         });
     }

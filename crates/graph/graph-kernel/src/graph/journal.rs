@@ -12,7 +12,9 @@
 //! gives that stream its principled home: a [`muniment::Journal`] of captured
 //! deltas, the append-only log primitive shared across the Merely apps. The
 //! materialized graph is the *replay* of the journal, and because live editing and
-//! replay both funnel through `apply_graph_delta`, the two cannot diverge.
+//! replay both funnel through `apply_graph_delta`, the two cannot diverge. What an
+//! edit reads from the clock or mints (a new node's visit stamp, a statement id)
+//! is journaled beside it, so replay reproduces those too.
 //!
 //! This is the edit spine over the substrate. mere keeps its own rich edit
 //! vocabulary — `CapturedDelta` carries content edits (title, tags, body,
@@ -568,10 +570,92 @@ mod tests {
         assert!(!copy.is_recording());
         add_node(&mut copy, 2);
         add_node(&mut Graph::new(), 3);
-        assert_eq!(
-            seen.lock().unwrap().as_slice(),
-            &[add(1, "https://1.test/")]
+        let seen = seen.lock().unwrap();
+        assert_eq!(seen.len(), 2, "node 1 and its visit stamp, nothing else");
+        assert_eq!(seen[0], add(1, "https://1.test/"));
+        assert!(matches!(
+            seen[1],
+            CapturedDelta::ReplayTouchNodeLastVisitedById { .. }
+        ));
+    }
+
+    /// Replay reproduces the live graph exactly, clock-read visit stamps and
+    /// minted statement ids included: the journal keeps what was read or
+    /// minted (reservoir plan V2).
+    #[test]
+    fn replay_reproduces_visit_stamps_and_statement_ids() {
+        let (journal, hook) = journal_capture_hook();
+        set_captured_delta_hook(Some(hook));
+        let mut live = Graph::new();
+        let key = |graph: &mut Graph, id: u128| match apply_graph_delta(
+            graph,
+            GraphDelta::AddNode {
+                id: Some(Uuid::from_u128(id)),
+                url: format!("https://{id}.test/"),
+                position: Point2D::new(0.0, 0.0),
+            },
+        ) {
+            GraphDeltaResult::NodeAdded(key) => key,
+            other => panic!("expected NodeAdded, got {other:?}"),
+        };
+        let a = key(&mut live, 1);
+        // Let the clock move, so a replay's own stamp would differ.
+        std::thread::sleep(std::time::Duration::from_millis(2));
+        let b = key(&mut live, 2);
+        apply_graph_delta(
+            &mut live,
+            GraphDelta::AssertRelation {
+                from: a,
+                to: b,
+                assertion: EdgeAssertion::Semantic {
+                    sub_kind: SemanticSubKind::Cites,
+                    label: None,
+                    decay_progress: None,
+                },
+            },
         );
+        apply_graph_delta(
+            &mut live,
+            GraphDelta::AssertSemanticPredicate {
+                from: b,
+                to: a,
+                predicate: "https://schema.org/about".into(),
+            },
+        );
+        set_captured_delta_hook(None);
+
+        std::thread::sleep(std::time::Duration::from_millis(2));
+        let replayed = journal.lock().unwrap().replay();
+        for id in [1u128, 2] {
+            let visited = |graph: &Graph| {
+                let (key, _) = graph.get_node_by_id(Uuid::from_u128(id)).unwrap();
+                graph.node_last_visited(key)
+            };
+            assert!(
+                visited(&live).is_some(),
+                "creating node {id} stamped a visit"
+            );
+            assert_eq!(
+                visited(&replayed),
+                visited(&live),
+                "node {id}'s visit stamp"
+            );
+        }
+        let key_of = |graph: &Graph, key| {
+            let id = live.get_node(key).unwrap().id;
+            graph.get_node_key_by_id(id).unwrap()
+        };
+        for (from, to) in [(a, b), (b, a)] {
+            assert!(
+                !live.persisted_edges_between(from, to).is_empty(),
+                "the live graph holds a minted statement there"
+            );
+            assert_eq!(
+                replayed.persisted_edges_between(key_of(&replayed, from), key_of(&replayed, to)),
+                live.persisted_edges_between(from, to),
+                "statement ids survive replay"
+            );
+        }
     }
 
     /// Replay records nothing: a scrub or a catch-up re-applies history, it
@@ -595,14 +679,15 @@ mod tests {
                 position: Point2D::new(0.0, 0.0),
             },
         );
+        // A new node is two entries: the add and its visit stamp.
         assert_eq!(
             hooked.lock().unwrap().len(),
-            1,
+            2,
             "the thread hook sees live edits"
         );
         assert_eq!(
             *seen.lock().unwrap(),
-            1,
+            2,
             "the graph's recorder sees live edits"
         );
 
@@ -613,12 +698,12 @@ mod tests {
         assert_eq!(session.node_count(), 2);
         assert_eq!(
             hooked.lock().unwrap().len(),
-            1,
+            2,
             "replay reached the thread hook"
         );
         assert_eq!(
             *seen.lock().unwrap(),
-            1,
+            2,
             "replay reached the graph's recorder"
         );
 
@@ -632,8 +717,8 @@ mod tests {
                 position: Point2D::new(0.0, 0.0),
             },
         );
-        assert_eq!(hooked.lock().unwrap().len(), 2);
-        assert_eq!(*seen.lock().unwrap(), 2);
+        assert_eq!(hooked.lock().unwrap().len(), 4);
+        assert_eq!(*seen.lock().unwrap(), 4);
         set_captured_delta_hook(None);
     }
 
