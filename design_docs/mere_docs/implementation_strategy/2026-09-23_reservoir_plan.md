@@ -372,9 +372,11 @@ and projection changes, replayable for the Timeline and for undo (ruled, §7).
    - Every stored change advances the session manifest's `updated_at` (ruled,
      §7 item 28).
 5. djinn:
-   - each mere on its own route, registered at startup and whenever a mere is
-     ensured; graphshell's door learns to add routes and grants at runtime
-     (ruled, §7 item 20);
+   - each mere on its own route, `mere/<domain>` (ruled, §7 item 30),
+     registered at startup and whenever a mere is ensured; graphshell's door
+     learns to add routes and grants at runtime (ruled, §7 item 20), and hands
+     the endpoint the application it admitted, so the resident, not the
+     client, names it in each author;
    - each route projects the mere's sessions, for the mere view, and the
      attached session's graph, for editing (ruled, §7 item 22);
    - mint, open, fork, trash, restore, undo and redo as intents;
@@ -642,6 +644,10 @@ V2's rulings. Items 6 to 8 were ruled on 2026-09-23 and the rest on
     seeded session reloading from IndexedDB. The alternatives were to defer
     the proof to whoever moves genet next, or to rebuild the machine-local
     path patch.
+30. **A mere's route name** (2026-09-25). "`mere/<domain>`": a domain has
+    exactly one mere, so a client names the route from the domain it just
+    ensured, without reading the mere's id from the reservoir listing first.
+    The alternative was `mere/<mere id>`.
 
 ## 8. Progress
 
@@ -951,3 +957,22 @@ V2's rulings. Items 6 to 8 were ruled on 2026-09-23 and the rest on
   - The receipt's three scenarios gave no verdict: the pane was hidden, so the
     frame pump never ticked. The facts were read from the DOM and IndexedDB
     directly.
+- 2026-09-25: the receipt's scenario verdicts wait for Mark's next visit with
+  the Browser pane open (his call); the servers are in
+  `Code/.claude/launch.json`.
+- 2026-09-25: step 5 began with the door (§7 item 20).
+  - `AppRouteGrants` shares a door's grants with its host, which can grant
+    more while the door serves. Each connection is admitted against the
+    grants as they stand when its hello arrives.
+  - `AppEndpointCatalog::update` registers a route while the door serves.
+  - The admitted endpoint context names the application the door admitted,
+    so an endpoint attributes work to it without taking the client's word.
+
+  Tests:
+  - over the real transport, a door that opened without a route refuses it;
+    once the host grants and registers the route while serving, the next
+    connection on it opens, and its endpoint is told `turnstone`;
+  - a grant added later admits the next request, and not an earlier
+    connection's grants;
+  - graphshell's door tests 20 of 20 and lifecycle tests 15 of 15; djinn
+    checks.
