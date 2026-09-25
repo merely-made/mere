@@ -4,8 +4,8 @@
 **Status:** in progress. V1 is complete and on main: the pandect index,
 wallet-persona resolution, djinn's reservoir lane and route, and a real
 two-process receipt. It reached origin with `5364dfa0` on 2026-09-24. V2's
-shape was ruled on 2026-09-23 and 2026-09-24 (§7). Step 1, in muniment,
-landed on 2026-09-24; step 2, in graph-kernel, is next.
+shape was ruled on 2026-09-23 and 2026-09-24 (§7). Steps 1 (muniment)
+and 2 (graph-kernel) landed on 2026-09-24; step 3, in pandect, is next.
 **Scope:** give each data domain one mere, and make every mere of an identity
 openable by any of that identity's applications. The meres are held by the
 device resident, with sessions, a graph journal and an Eidetic archive.
@@ -264,8 +264,17 @@ and projection changes, replayable for the Timeline and for undo (ruled, §7).
   its inverse under their name.
   - Other authors' later edits stay, and nothing is truncated.
   - The Timeline shows the undo.
-  - The inverse is derived by replaying the journal to just before the change,
-    so entries need not carry old values.
+  - A change is one application call's batch of entries. Undo compares the
+    graph just before the change, just after it, and now, field by field. It
+    puts back each field nobody has changed since, and reports what it kept and
+    who changed it (ruled, §7 item 17). Entries need not carry old values,
+    since replaying the journal yields the graph before any change.
+  - Undo writes ordinary edits (a retitle, a retracted relation), so the
+    Timeline reads an undo like any other change.
+  - Previews (node images) are experience, not truth, and undo leaves them.
+  - Undo again steps further back; redo re-applies the latest undo; both are
+    appended under the author's name (ruled, §7 item 18). The session keeps
+    each author's undo and redo order, derived from its record of changes.
   - "Restore from here" stays a separate, confirmable action on the same
     mechanism.
 - **View state lives in the session**, per application and view. It holds
@@ -290,10 +299,13 @@ and projection changes, replayable for the Timeline and for undo (ruled, §7).
 **Steps, in order:**
 1. muniment: the per-entry journal form over any backend, then the directory
    backend with its redo file.
-2. graph-kernel: per-graph recording, the structured author, and the inverse of
-   a captured delta against the graph it was applied to.
+2. graph-kernel: per-graph recording and the structured author.
 3. pandect: the session schema, `GraphSession`, and the lifecycle over a mere's
    store.
+3b. graph-kernel and pandect: undo's revert engine (the field-by-field
+    comparison above) and the session's undo and redo order. It follows step 3
+    so the session types reach their consumers first; step 2 had carried it as
+    "the inverse of a captured delta" before the undo rulings.
 4. djinn:
    - open a mere by id on its own route;
    - list its sessions, with mint, open, fork, trash and restore as intents;
@@ -489,6 +501,15 @@ V2's rulings. Items 6 to 8 were ruled on 2026-09-23 and the rest on
 16. **Checkpoints.** "Detach + every 1,000": when the last application
     detaches from a session, and every 1,000 journal entries. The count is a
     setting.
+17. **Undo against later edits** (2026-09-24). Asked what undo does when another
+    author has since edited part of what the change touched, Mark chose "Undo
+    the rest, say so": revert every part nobody touched since, leave the parts
+    another author changed, and report what was kept and why. The alternative
+    refused the whole undo.
+18. **Repeated undo** (2026-09-24). "Steps back twice": each undo reverts the
+    author's next-older change still in effect, and redo re-applies the most
+    recent undo, both appended under the author's name. The alternative made a
+    second undo revert the first.
 
 ## 8. Progress
 
@@ -581,3 +602,23 @@ V2's rulings. Items 6 to 8 were ruled on 2026-09-23 and the rest on
     file like a multi-file batch.
   - muniment: 73 of 73 tests with the directory and redb features. Clippy is
     clean for the crate, and it still builds for `wasm32-unknown-unknown`.
+- 2026-09-24: V2 step 2 landed in the graph kernel (`ba09cccd`).
+  - `Graph::set_recorder` gives a graph its own recorder; capture sites call
+    `graph.record_delta`, which feeds that recorder and then the thread hook
+    Turnstone still uses. A clone starts without a recorder.
+  - Replay is now silent. Before, a host with the thread hook installed
+    recorded every delta that `snapshot_at` or a catch-up replayed back into
+    its live journal. The new test proves both instruments see a live edit in
+    the same run.
+  - `AttributedDelta.author` is an `Author`: kind, id, version, and the
+    application it came through. `GraphJournal::starting_from` begins a fork
+    empty at its parent's cursor. `migrate_bare_log` was removed, since nothing
+    ever persisted a bare log.
+  - A timing-bound kernel test, `capture_hook_receives_replayable_apply_events`,
+    failed whenever it ran inside one millisecond (node creation stamps a visit
+    time, and a touch records only on a new millisecond). It now waits 2 ms.
+  - Turnstone pins an older mere. When it repins, it adapts to `Author`.
+  - mere-kernel: 292 of 292, repeated; it builds for `wasm32-unknown-unknown`,
+    and pictograph checks.
+- 2026-09-24: undo ruled (§7 items 17 and 18). Undo's revert engine moves to
+  step 3b, after the session types.
