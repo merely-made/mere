@@ -11,8 +11,9 @@
 //! stylesheet and a Lagrange palette; Pelt previews it. The [`theme`] module
 //! holds the host theme model: `ThemeTokenSet`, its registry, seed derivation,
 //! custom modes, and the user's theme choice with its stores. The [`smolweb`]
-//! module holds the smolweb document palettes. Icon policy and the syntax
-//! palette are not here yet.
+//! module holds the smolweb document palettes. The DTCG tokens and the
+//! stylesheet carry Tinct's syntax palette beside the base palette. Icon
+//! policy is not here yet.
 
 #![doc(html_no_source)]
 #![forbid(unsafe_code)]
@@ -25,7 +26,10 @@ use std::collections::BTreeMap;
 use serde::{Deserialize, Serialize};
 
 use crate::theme::registry::{Harmony, Mode, ThemeSource};
-use tinct::{Palette, Seeds, Srgb, color_to_hex, derive_palette};
+use tinct::{
+    Palette, Seeds, Srgb, SyntaxPalette, SyntaxRole, color_to_hex, derive_palette,
+    derive_syntax_palette,
+};
 
 /// DTCG's stable Design Tokens Format Module schema for this output.
 pub const DTCG_2025_10_SCHEMA: &str = "https://www.designtokens.org/schemas/2025.10/format.json";
@@ -116,6 +120,12 @@ impl Theme {
         derive_palette(&self.seeds)
     }
 
+    /// Derive Tinct's syntax-highlight palette, contrast-gated against the
+    /// base palette's surface.
+    pub fn syntax_palette(&self) -> SyntaxPalette {
+        derive_syntax_palette(&self.seeds)
+    }
+
     /// Emit the typed DTCG 2025.10 document for this theme.
     ///
     /// Every color token carries an explicit color type. The source seed set
@@ -137,8 +147,9 @@ impl Theme {
     /// Emit a Livery author stylesheet with the derived palette at :root.
     ///
     /// The property names intentionally mirror the owned Tinct base roles:
-    /// --tabard-color-bg, --tabard-color-surface-2, and so on. A host may
-    /// append ordinary author rules which use them through var().
+    /// --tabard-color-bg, --tabard-color-surface-2, and so on, then the syntax
+    /// roles as --tabard-syntax-keyword and the like. A host may append
+    /// ordinary author rules which use them through var().
     pub fn css_custom_properties(&self) -> String {
         let mut stylesheet = String::from(":root {\n");
         for role in color_roles(self.palette()) {
@@ -146,6 +157,14 @@ impl Theme {
             stylesheet.push_str(role.name);
             stylesheet.push_str(": ");
             stylesheet.push_str(&css_color(role.value));
+            stylesheet.push_str(";\n");
+        }
+        let syntax = self.syntax_palette();
+        for role in SyntaxRole::ALL {
+            stylesheet.push_str("  --tabard-syntax-");
+            stylesheet.push_str(role.name());
+            stylesheet.push_str(": ");
+            stylesheet.push_str(&css_color(syntax.role(role)));
             stylesheet.push_str(";\n");
         }
         stylesheet.push_str("}\n");
@@ -600,6 +619,30 @@ pub struct DtcgColorGroup {
     pub on_tertiary: DtcgColorToken,
     pub success: DtcgColorToken,
     pub danger: DtcgColorToken,
+    pub syntax: DtcgSyntaxGroup,
+}
+
+/// Tinct's syntax-highlight palette as a DTCG group: one color token per
+/// [`SyntaxRole`], keyed by [`SyntaxRole::name`] and contrast-gated against
+/// the palette surface.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct DtcgSyntaxGroup {
+    #[serde(rename = "$description")]
+    pub description: String,
+    #[serde(flatten)]
+    pub roles: BTreeMap<String, DtcgColorToken>,
+}
+
+impl From<SyntaxPalette> for DtcgSyntaxGroup {
+    fn from(palette: SyntaxPalette) -> Self {
+        Self {
+            description: "Tinct-derived syntax palette (derive_syntax_palette).".to_owned(),
+            roles: SyntaxRole::ALL
+                .into_iter()
+                .map(|role| (role.name().to_owned(), palette.role(role).into()))
+                .collect(),
+        }
+    }
 }
 
 impl DtcgColorGroup {
@@ -639,6 +682,7 @@ impl DtcgColorGroup {
             on_tertiary: palette.on_tertiary.into(),
             success: palette.success.into(),
             danger: palette.danger.into(),
+            syntax: theme.syntax_palette().into(),
         }
     }
 }
