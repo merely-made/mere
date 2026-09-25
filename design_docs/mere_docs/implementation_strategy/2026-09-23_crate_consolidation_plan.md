@@ -280,3 +280,19 @@ crate inventory at the Code root.
   `mere` facade no longer depends on registry. tabard's golden Lagrange test
   had been failing on Windows checkouts, where autocrlf rewrote its fixture;
   the fixtures are pinned to LF (`b7ed0bdc`). Next: T2b.
+- 2026-09-24. T2b landed (`22ffe681`): tabard's `Theme` carries `ThemeDef`'s
+  fields, serde defaults and `mode_sheet()` beside its exports, and `ThemeDef`
+  is gone. `Theme::new` takes an id (Pelt's preview is `pelt:tabard_preview`),
+  and `Theme` drops `Eq`, since `Harmony` carries floats. A new test reads a
+  theme file in the shape saved before the merge; the older "legacy" check
+  serialized a current built-in, so it never parsed a file missing a field.
+  tabard 34, Pelt builds with both preview features, and the portable gate
+  passes.
+- 2026-09-24. T2c landed (`d70fa9cc`): lens themes resolve from the built-in
+  token sets' derived `theme_data`. Default's lens accent goes from cyan
+  (80,220,255) to the seeds' blue (51,102,200) and its background from
+  (20,20,25) to (9,12,26); light darkens slightly; dark keeps its accent;
+  high contrast is unchanged. The four derived values are distinct, so
+  `theme_data_id` still round-trips, and saved lenses read by id and by
+  value. tabard 35, registry 115 with 2 ignored, mere 47, and the portable
+  gate passes. T2 is complete; next: T3.
