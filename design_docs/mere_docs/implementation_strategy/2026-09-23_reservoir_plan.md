@@ -7,8 +7,9 @@ two-process receipt. It reached origin with `5364dfa0` on 2026-09-24. V2's
 shape was ruled on 2026-09-23 and 2026-09-24 (§7). Steps 1 to 3
 (muniment, graph-kernel, pandect) landed on 2026-09-24 and reached origin on
 2026-09-25; step 3b, undo with exact replay, landed on 2026-09-25 and reached
-origin the same day. Step 4, `MereHost` on `GraphSession` in Graphshell, is in
-progress: pandect's session core became browser-safe first (§7 item 26).
+origin the same day. Step 4, `MereHost` on `GraphSession` in Graphshell, landed
+on 2026-09-25 on the `reservoir-v2` branch, not yet on origin; its browser
+runtime is unproven (§8). Step 5, djinn's routes, is next.
 **Scope:** give each data domain one mere, and make every mere of an identity
 openable by any of that identity's applications. The meres are held by the
 device resident, with sessions, a graph journal and an Eidetic archive.
@@ -865,3 +866,53 @@ V2's rulings. Items 6 to 8 were ruled on 2026-09-23 and the rest on
   follows stored edits and skips the trash. pandect 301 of 301; it still
   builds for the browser and `wasm32-wasip2`, its dependents check, and clippy
   finds nothing new.
+- 2026-09-25: Graphshell's `MereHost` runs on a `GraphSession` (§7 items 23 to
+  27).
+  - The host's truth is one session in the store it is given, and `open`
+    takes the live session changed last. A store from before sessions has its
+    `graphshell/mere-host/v1` slot read into a first session's baseline,
+    stored at once, and left in place. The slot is read only while the store
+    holds no session at all, so a store whose sessions are all trashed begins
+    an empty one.
+  - Every edit is the selected persona's: via `graphshell` for intents,
+    product edits, imports and the fixture, and via
+    `browser.extension.<source>` for a captured visit.
+  - Edits are journaled as they happen and stored by `persist`. Capture puts
+    them into its own batch and marks them stored only once that batch
+    commits, so a failed delivery leaves them pending for the retry.
+  - An import is one change of `import_edits`. "Open codicil" begins a new
+    session and keeps the old one until its last changes are stored.
+  - Each open advances the projection epoch, kept in
+    `graphshell/projection-epoch/v1`, so an intent observed before a restart
+    reads as stale.
+  - pandect joins Graphshell's portable dependencies and its `web` feature.
+
+  Tests:
+  - graphshell's lib tests with `personal-sync`, which carries the `web` cone:
+    295 of 296. The failure, `distillery_w1`'s receipt comparison, is a
+    checkout artifact: `core.autocrlf` turns the committed LF receipt into
+    CRLF, and the test compares bytes.
+  - The H1 test's byte-equivalence claim is restated for sessions: the
+    reopened graph and facets encode to the same bytes as the live ones, and
+    reopening leaves nothing to store.
+  - New assertions: the old slot is read once, stored at once and left in
+    place, and is not read again after it is rewritten or after every session
+    is trashed; each open is a new epoch; the fixture's edits are the
+    persona's via `graphshell`, and a captured visit's via the extension; an
+    import is one change; opening a codicil begins a new session.
+  - The capture batch test still passes: a rejected batch stores no session,
+    and the retry stores the fixture's session with the visit.
+  - Graphshell checks for `wasm32-unknown-unknown` with `web` and
+    `webrtc-browser`, pandect in its tree and no getrandom 0.2.
+
+  Not verified: the browser runtime. `graphshell-web` does not build in this
+  environment, with or without this change. Its restated genet and netrender
+  pins lag the workspace's, so a fresh resolution holds two revisions of
+  each, reached through `cambium` and `mere`'s `pictograph`, and doubles
+  `ScriptedDom` and `Scene`. The machine-local path patch that reconciled
+  them points at a `worktrees/genet-head` that no longer exists. Inside that
+  graph Graphshell, pandect included, compiles; all seven errors are in
+  `graphshell-web`'s own files.
+
+  Unchanged: the browser stores at open and at capture, as before, so an
+  intent between them stays unsaved until the next capture batch.
