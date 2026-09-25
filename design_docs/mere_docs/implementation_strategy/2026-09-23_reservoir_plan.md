@@ -1296,3 +1296,20 @@ V2b's rulings, all 2026-09-25:
   without pictograph's renderer. `graph_canvas`'s relation cells carry
   `data-kind`, so a host's sheet can give each kind its own line style.
   Cartography's tests pass, 44 of 44, as do `graph_canvas`'s and pictograph's.
+- 2026-09-25: V2b step 1, the component, landed on `reservoir-v2` as
+  `crates/cambium/mere-view` (881 lines, and 437 of tests).
+  - The host fills a `MereViewModel` and hears `MereViewRequest`s: activate,
+    mint, a session step, a host action, a layout. A declined request comes
+    back as the model's notice, shown in a polite live region.
+  - The graph is `graph_canvas`'s swatch. Nodes carry their host state in
+    words, keyed by the host; relations are cells marked with their provenance.
+    The layout comes from cartography's graph-only table, and positions are
+    keyed by node, so a switch keeps every key. The paint leaf is built from
+    the same swatch.
+  - The tile decides the shape: at 560 px and wider the sessions sit in a
+    column beside the graph, and below that they stack above it.
+
+  Its ten tests show, from the view tree, each of Knot's requirements a tree
+  can show. The crate builds for `wasm32-unknown-unknown`. Painting, sizing
+  on screen and theming are the headed harness's, step 2.
+

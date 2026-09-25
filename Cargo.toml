@@ -118,6 +118,8 @@ members = [
     "crates/cambium/mesquite",
     # Retained application chrome over Cambium, so it sits under the umbrella.
     "crates/cambium/workbench",
+    # The mere view every application embeds (reservoir plan V2b).
+    "crates/cambium/mere-view",
     # The application host contract genet's P1 split out of genet-host-api. A
     # host contract rather than a widget, so it lands beside `fetch`.
     "crates/system/surface-api",
@@ -339,6 +341,7 @@ genet-static-dom = { git = "https://github.com/merely-made/genet.git", rev = "56
 # consume. The plan moved it here on 2026-09-03; it is a workspace member now.
 mere-surface-api = { version = "0.1.0", path = "crates/system/surface-api" }
 workbench = { version = "=0.1.0", path = "crates/cambium/workbench" }
+mere-view = { version = "0.1.0", path = "crates/cambium/mere-view" }
 errand = { version = "0.3.4", path = "crates/system/errand" }
 # Errand's wire layer: one spec-faithful crate per protocol, published under
 # names that belong to the protocols' communities rather than to the engine
