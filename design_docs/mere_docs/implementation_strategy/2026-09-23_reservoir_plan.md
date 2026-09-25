@@ -976,3 +976,19 @@ V2's rulings. Items 6 to 8 were ruled on 2026-09-23 and the rest on
     connection's grants;
   - graphshell's door tests 20 of 20 and lifecycle tests 15 of 15; djinn
     checks.
+- 2026-09-25: `MereHost` can serve a resident (step 5, ruling 21).
+  - `open_session` opens a named session of a store, and
+    `with_projection_session` serves the graph under the resident's own
+    projection name.
+  - `through` and `apply_edits` are public, so a resident applies an attached
+    application's edits under that application's name; `undo`, `redo` and
+    `set_view` take the channel they act for.
+  - pandect re-exports `SessionId` and `GraphId`, so a host names sessions
+    through pandect.
+
+  Tests: a resident opens the older of two sessions by name under its own
+  projection; an attached application's edit, undo and view carry its name,
+  and another application's undo finds nothing of its own. graphshell's lib
+  tests with `personal-sync` 299 of 300, the one failure being
+  `distillery_w1`'s CRLF artifact; pandect 301 of 301; the browser cone and
+  djinn check.
