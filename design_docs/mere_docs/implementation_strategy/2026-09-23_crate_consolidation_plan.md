@@ -242,8 +242,8 @@ crate inventory at the Code root.
 - 2026-09-24. tabard's directory carries `LICENSE-MIT` and `LICENSE-APACHE`
   from its 2026-08-10 reservation, while its manifest, source headers and
   README say MPL-2.0, and the published 0.0.1 package ships both files. Mark
-  ruled them deleted the same day. tinct carries the same mismatch (a
-  `LICENSE-MIT` beside an MPL-2.0 manifest), put to Mark separately.
+  ruled them deleted the same day. tinct carried the same pair beside an
+  MPL-2.0 manifest; Mark ruled those deleted too.
 - 2026-09-24. cambium-nematic is published (0.3.1) but no crate in any
   repository depends on it: its smolweb views have no consumer here. A
   consolidation candidate for Mark, not acted on.
