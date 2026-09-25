@@ -16,7 +16,7 @@
 //!
 //! v1 ships [`gemtext_view`]; gopher and feed views follow.
 
-use cambium::{
+use crate::{
     AnyView, ElementView, GenetCtx, GenetElement, PointerClick, a, clickable, div, el, h1, h2, h3,
     li, p, span, text, ul,
 };
@@ -60,7 +60,7 @@ where
     State: 'static,
     // The host's action type opts into bubbling via `cambium::Action`; a link
     // click emits `on_navigate(url)` as that action.
-    Action: cambium::Action + 'static,
+    Action: crate::Action + 'static,
     N: Fn(&str) -> Action + Clone + 'static,
 {
     let mut builder = Builder::new(on_navigate);
@@ -83,7 +83,7 @@ struct Builder<State, Action, N> {
 impl<State, Action, N> Builder<State, Action, N>
 where
     State: 'static,
-    Action: cambium::Action + 'static,
+    Action: crate::Action + 'static,
     N: Fn(&str) -> Action + Clone + 'static,
 {
     fn new(on_navigate: N) -> Self {
@@ -210,7 +210,7 @@ pub fn gopher_view<State, Action, N>(
 ) -> SmolwebView<State, Action>
 where
     State: 'static,
-    Action: cambium::Action + 'static,
+    Action: crate::Action + 'static,
     N: Fn(&str) -> Action + Clone + 'static,
 {
     let mut children: Vec<SmolwebView<State, Action>> = Vec::new();
@@ -248,7 +248,7 @@ pub fn nex_view<State, Action, N>(
 ) -> SmolwebView<State, Action>
 where
     State: 'static,
-    Action: cambium::Action + 'static,
+    Action: crate::Action + 'static,
     N: Fn(&str) -> Action + Clone + 'static,
 {
     let base = nex::base_url(address);
@@ -298,7 +298,7 @@ fn gopher_link<State, Action, N>(
 ) -> SmolwebView<State, Action>
 where
     State: 'static,
-    Action: cambium::Action + 'static,
+    Action: crate::Action + 'static,
     N: Fn(&str) -> Action + Clone + 'static,
 {
     let (marker, kind_name) = kind_marker(kind);
@@ -328,7 +328,7 @@ where
 pub fn feed_view<State, Action, N>(feed: &Feed, on_navigate: N) -> SmolwebView<State, Action>
 where
     State: 'static,
-    Action: cambium::Action + 'static,
+    Action: crate::Action + 'static,
     N: Fn(&str) -> Action + Clone + 'static,
 {
     let mut children: Vec<SmolwebView<State, Action>> = Vec::new();
@@ -354,7 +354,7 @@ fn feed_entry_card<State, Action, N>(
 ) -> SmolwebView<State, Action>
 where
     State: 'static,
-    Action: cambium::Action + 'static,
+    Action: crate::Action + 'static,
     N: Fn(&str) -> Action + Clone + 'static,
 {
     let mut parts: Vec<SmolwebView<State, Action>> = Vec::new();
@@ -406,7 +406,7 @@ fn kind_marker(kind: &GopherKind) -> (&'static str, &'static str) {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use cambium::GenetAppRunner;
+    use crate::GenetAppRunner;
     use errand::parse::gemtext::parse as parse_gemtext;
     use genet_scripted_dom::ScriptedDom;
     use layout_dom_api::{LayoutDom, LocalName, Namespace, NodeKind};
@@ -416,7 +416,7 @@ mod tests {
     /// A test action type the link handler can emit (the marker opts it in).
     #[derive(Debug)]
     struct Nav(#[allow(dead_code)] String);
-    impl cambium::Action for Nav {}
+    impl crate::Action for Nav {}
 
     /// A gemtext document builds the expected element tree: a `div.gemtext` whose
     /// children are a heading, a paragraph, a link line, and a grouped list.

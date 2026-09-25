@@ -13,9 +13,9 @@
 //! `Light` and `Dark`, the host application's palette (`App`), or the OS scheme
 //! (`System`).
 //!
-//! Hosts render the palette their own way: cambium-nematic as a stylesheet for
-//! its view classes, document-lanes as a document style sheet. Until
-//! 2026-09-24 each defined these types and palettes itself.
+//! Hosts render the palette their own way: cambium's `nematic` views as a
+//! stylesheet for their classes, document-lanes as a document style sheet.
+//! Until 2026-09-24 each defined these types and palettes itself.
 
 /// How a smolweb document is coloured.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]

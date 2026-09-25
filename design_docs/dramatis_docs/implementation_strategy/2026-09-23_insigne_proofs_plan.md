@@ -170,7 +170,7 @@ plain core. `CapabilityScope::attenuates` stays plain.
 `scripts/cargo_mode.py verify` runs `cargo check --workspace` without
 `--all-targets`. With it, graphshell's lib tests (`ports/graphshell/src/app.rs:387`,
 a match missing `RelationKind::OpenPredicate`) and cambium-nematic's
-(`crates/cambium/cambium-nematic/src/views.rs:513`, a `FeedEntry` missing six
+(`crates/cambium/cambium-nematic/src/views.rs:513` *(historical citation)* <!-- doc-audit: historical-path -->, a `FeedEntry` missing six
 fields) fail to compile, both before this move and after it. So graphshell's
 own unit tests could not run for phase A. They compile through type checking,
 which covers their imports.

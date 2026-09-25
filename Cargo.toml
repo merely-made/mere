@@ -111,7 +111,6 @@ members = [
     "crates/cambium/cambium-winit-a11y",
     "crates/cambium/cambium-genet-winit-host",
     "crates/cambium/cambium-genet-web-host",
-    "crates/cambium/cambium-nematic",
     "crates/cambium/meristem",
     "crates/cambium/sprigging",
     # The scenario lane over a Cambium document host. Landed 2026-09-14 from
@@ -313,7 +312,6 @@ mesquite = { version = "0.1.0", path = "crates/cambium/mesquite" }
 cambium-winit = { version = "0.3.0", path = "crates/cambium/cambium-winit" }
 cambium-winit-a11y = { version = "0.3.0", path = "crates/cambium/cambium-winit-a11y" }
 cambium-genet-web-host = { version = "0.1.0", path = "crates/cambium/cambium-genet-web-host" }
-cambium-nematic = { version = "0.3.1", path = "crates/cambium/cambium-nematic" }
 meristem = { version = "0.2.0", path = "crates/cambium/meristem" }
 sprigging = { version = "0.2.1", path = "crates/cambium/sprigging" }
 # The three engine adapters, unpublished. Their version was genet's

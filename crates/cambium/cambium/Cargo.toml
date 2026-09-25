@@ -10,6 +10,8 @@ publish = true
 
 [features]
 highlight = ["dep:illume", "dep:tinct"]
+# Reactive views over Errand's smolweb ASTs; formerly the cambium-nematic crate.
+nematic = ["dep:errand", "dep:tabard"]
 
 [dependencies]
 meristem = { version = "0.2.0", path = "../meristem" }
@@ -26,3 +28,7 @@ layout_dom_api = { workspace = true }
 unicode-segmentation = "1.13.2"
 illume = { workspace = true, optional = true }
 tinct = { workspace = true, optional = true }
+# `workspace = true`, not a bare version: a bare errand version resolved to
+# the published crate rather than this workspace's copy.
+errand = { workspace = true, optional = true }
+tabard = { workspace = true, optional = true }
