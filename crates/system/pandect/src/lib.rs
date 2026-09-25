@@ -185,8 +185,10 @@ pub use graph_session::{
     Pending, Reverted, SESSIONS_PREFIX, SessionError, ViewEntry, ViewKey,
 };
 pub use identity::{StartupUnlockMode, auto_unlock_backend_available};
-// The ids the session schema names, so a host can name them through pandect.
+// The ids and author the session schema names, so a host can name them
+// through pandect.
 pub use incipit::{GraphId, SessionId};
+pub use kernel::graph::{Author, AuthorKind, CapturedDelta};
 pub use live_view::{
     LIVE_VIEW_RECORD_SCHEMA_ID, LIVE_VIEW_RECORD_VERSION, LiveViewCursor, LiveViewRecord,
     LiveViewRecordError, LiveViewSource, LiveViewSourceError, LiveViewSourceResolver,
