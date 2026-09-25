@@ -5,7 +5,9 @@
 wallet-persona resolution, djinn's reservoir lane and route, and a real
 two-process receipt. It reached origin with `5364dfa0` on 2026-09-24. V2's
 shape was ruled on 2026-09-23 and 2026-09-24 (§7). Steps 1 to 3
-(muniment, graph-kernel, pandect) landed on 2026-09-24; step 3b, undo, is next.
+(muniment, graph-kernel, pandect) landed on 2026-09-24 and reached origin on
+2026-09-25; step 3b, undo with exact replay, landed on 2026-09-25. Step 4, in
+djinn, is next.
 **Scope:** give each data domain one mere, and make every mere of an identity
 openable by any of that identity's applications. The meres are held by the
 device resident, with sessions, a graph journal and an Eidetic archive.
@@ -158,6 +160,26 @@ sessions.
   also carries Turnstone's resident admissions and nested participant worlds,
   which stay Turnstone's dressing (`repos/turnstone/src/app/session_lifecycle.rs`).
 
+### Step 3b findings (verified 2026-09-25)
+
+- **Replay was not exact.** Creating a node stamps its visit time from the
+  clock (`Graph::add_node_with_id` in `crates/graph/graph-kernel/src/graph/mod.rs`),
+  and every semantic relation mints its statement id from the time, a device
+  salt and a counter (`mint_local_statement_id` in
+  `crates/graph/graph-kernel/src/types.rs`). Neither was journaled, so a replay
+  re-stamped and re-minted. The journal's own doc claimed replay "cannot
+  diverge". Undo's first session test failed on it, since undo compares a
+  replayed graph with the live one.
+- **Loading a checkpoint was not exact either.** `Graph::from_snapshot` imports
+  a snapshot's node columns as facets, default values included, and
+  `overlay_facets` keeps them where `facets.json` has no key. A reloaded session
+  held facets its live graph never had. The session core now replaces the facet
+  store with the one it saved, which the kernel names "the single live
+  authority".
+- **graphshell's lib tests do not build from a worktree.** Two of them include
+  `woodshed/scenarios/woodshed_musical_comparison.json` by a relative path
+  that resolves only from `repos/mere`, not from `worktrees/`.
+
 ## 3. Target shape
 
 ```text
@@ -260,6 +282,11 @@ and projection changes, replayable for the Timeline and for undo (ruled, §7).
   free string while nothing persists it yet.
 - **Recording per graph.** Each session's graph records its own mutations, as
   the event-log plan proposed, instead of going through the per-thread hook.
+- **Exact replay.** What an edit reads from the clock or mints is journaled
+  beside it: a new node's visit stamp as a touch, and the exact edge after a
+  statement id is minted (ruled, §7 item 19). Replaying a session from its
+  baseline, or from its checkpoint and tail, yields the whole live graph,
+  facets and statement ids included.
 - **Undo.** Undo reverts the undoing author's own latest change by appending
   its inverse under their name.
   - Other authors' later edits stay, and nothing is truncated.
@@ -510,6 +537,12 @@ V2's rulings. Items 6 to 8 were ruled on 2026-09-23 and the rest on
     author's next-older change still in effect, and redo re-applies the most
     recent undo, both appended under the author's name. The alternative made a
     second undo revert the first.
+19. **Exact replay** (2026-09-25). Asked how to make replay reproduce what
+    an edit reads from the clock or mints, Mark chose "Journal what was
+    minted": a touch after each new node carries its visit stamp, and the
+    exact edge follows each minted statement id, using existing entry kinds.
+    The alternatives were to extend the add-node and assert entries, or to
+    have undo and the Timeline ignore those values.
 
 ## 8. Progress
 
@@ -648,3 +681,35 @@ V2's rulings. Items 6 to 8 were ruled on 2026-09-23 and the rest on
     a second owner too.
   - pandect: 294 of 294 tests, ten of them new. It builds for
     `wasm32-wasip2`, and djinn checks.
+- 2026-09-25: steps 1 to 3 rebased onto `b38afd96`, re-verified and pushed
+  with Mark's approval: origin moved `b38afd96..d0cc3fba`. A peer session's full
+  workspace gate (`check --workspace --all-targets --locked`) was green on
+  that tree.
+- 2026-09-25: step 3b, undo, landed.
+  - The kernel's revert engine (`9316e557`): `revert_change` compares the graph
+    before a change, after it and now, part by part. It puts back each part
+    nobody touched since and names the rest as kept `Part`s; reverting an undo
+    is the redo. Two new edits make it exact:
+    - `ReplaySetEdgesByIds` sets every relation between two nodes from their
+      persisted form, through `restore_persisted_edge` and `persisted_edge`,
+      extracted from the snapshot code;
+    - `ReplayRemoveFieldById` removes a field outright.
+  - Exact replay and session undo (`301c847b`):
+    - the kernel journals each new node's visit stamp and, after a minted
+      statement id, the exact edge (ruled, §7 item 19);
+    - `GraphSession::undo` and `redo` rebuild each author's order from the
+      change log, apply the revert as an `Undo` or `Redo` change (recorded
+      even when every part was kept), and name who changed each kept part;
+    - a session's checkpoint load now replaces the facet store rather than
+      overlaying it.
+  - Tests:
+    - a kernel test proves replay reproduces visit stamps and statement ids,
+      and fails when either capture is disabled;
+    - the session test compares whole graphs, facets included, for checkpoint
+      plus tail and for baseline plus the whole journal;
+    - three session tests cover undo and redo order per author, a kept part
+      attributed to the author who changed it, and the order surviving a
+      reopen;
+    - mere-kernel 300 of 300 and pandect 298 of 298.
+  - One kernel run straight after restoring the disabled captures failed one
+    test; eleven runs since have passed, and the failure did not recur.
