@@ -156,6 +156,22 @@ pub struct GraphSessionManifest {
     /// its host directory.
     #[serde(default)]
     pub storage_path: Option<PathBuf>,
+    /// For a fork, the journal cursor in [`parent_session`](Self::parent_session)
+    /// it started from. The fork's journal starts empty there, over a baseline
+    /// of the parent's graph at that cursor (reservoir plan V2).
+    #[serde(default)]
+    pub forked_at: Option<u64>,
+    /// Set while the session is in the trash: who put it there, and when.
+    /// Its keys stay where they are; restoring clears the mark.
+    #[serde(default)]
+    pub trashed: Option<TrashMark>,
+}
+
+/// Who put a session in the trash, and when.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct TrashMark {
+    pub by: kernel::graph::Author,
+    pub at: SystemTime,
 }
 
 impl GraphSessionManifest {
@@ -180,6 +196,8 @@ impl GraphSessionManifest {
             engine_profile: EngineProfileBinding::default(),
             policy: SessionPolicy::default(),
             storage_path: None,
+            forked_at: None,
+            trashed: None,
         }
     }
 

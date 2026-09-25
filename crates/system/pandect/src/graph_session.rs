@@ -1,0 +1,1189 @@
+// Copyright 2026 Mark Alan Boykin
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// SPDX-License-Identifier: MPL-2.0
+
+//! A mere's sessions: their schema over one muniment store, the live session
+//! ([`GraphSession`]) and the lifecycle ([`MereSessions`]).
+//!
+//! Reservoir plan V2 (`design_docs/mere_docs/implementation_strategy/2026-09-23_reservoir_plan.md`).
+//! A mere is one muniment store, and each of its sessions lives at keys under
+//! `sessions/<id>/`:
+//!
+//! ```text
+//! manifest.json                    the session's manifest
+//! baseline.json                    the graph its journal starts from (absent: empty)
+//! graph.json, facets.json          the latest checkpoint's graph and node facets
+//! checkpoint.json                  the journal cursor that checkpoint reflects
+//! journal.jsonl/<seq>              one attributed graph edit per entry
+//! changes.jsonl/<seq>              one change per entry: who made which edits, and how
+//! views/<app>/<view>.json          one view's current state
+//! views/<app>/<view>.jsonl/<seq>   that view's changes, each at a journal cursor
+//! ```
+//!
+//! On muniment's directory backend the keys are Turnstone's files, and each
+//! `.jsonl` log is one file with a line per entry; on redb or IndexedDB they are
+//! rows. The journal is the authority: a session is its baseline plus its
+//! journal, and a checkpoint only makes loading cheap. View changes run as their
+//! own streams beside the journal, never merged into it (Alembic decision #5).
+
+use std::collections::BTreeMap;
+use std::sync::{Arc, Mutex};
+use std::time::SystemTime;
+
+use incipit::{GraphId, SessionId};
+use kernel::graph::apply::{GraphDelta, apply_graph_delta};
+#[cfg(not(target_arch = "wasm32"))]
+use kernel::graph::node_facets::{PROVENANCE_DERIVATIONS, PROVENANCE_IMPORT};
+use kernel::graph::{
+    AttributedDelta, Author, CapturedDelta, Graph, GraphJournal, LogId, Seq,
+    replay_captured_deltas_onto,
+};
+use kernel::persistence::GraphSnapshot;
+use muniment::{Backend, Journal, JsonCodec, JsonSlots, Provenance, StoreError, WriteOp};
+use serde::{Deserialize, Serialize, de::DeserializeOwned};
+use uuid::Uuid;
+
+#[cfg(not(target_arch = "wasm32"))]
+use crate::facet_store::{AcceptAll, FacetId, copy_node_facets};
+use crate::facet_store::{NODE_FACETS_FILE, NodeFacetStore};
+use crate::manifest::{GraphSessionManifest, TrashMark};
+#[cfg(not(target_arch = "wasm32"))]
+use crate::scene_facets::copy_scene_facets;
+use crate::view_intent_store::ViewIntent;
+
+/// Where a mere keeps its sessions.
+pub const SESSIONS_PREFIX: &str = "sessions";
+/// How many journal entries may accrue before the session writes a
+/// checkpoint (reservoir plan §7 item 16).
+pub const DEFAULT_CHECKPOINT_INTERVAL: u64 = 1_000;
+
+const MANIFEST: &str = "manifest.json";
+const BASELINE: &str = "baseline.json";
+const GRAPH: &str = "graph.json";
+const CHECKPOINT: &str = "checkpoint.json";
+const JOURNAL: &str = "journal.jsonl";
+const CHANGES: &str = "changes.jsonl";
+const VIEWS: &str = "views";
+
+/// Why a session operation failed.
+#[derive(Debug)]
+pub enum SessionError {
+    /// The mere holds no session with this id.
+    Missing(SessionId),
+    /// A stored document or log did not read back as what was written.
+    Corrupt(String),
+    /// An edit has no stable-id replay form, so it cannot be journaled.
+    NotReplayable(String),
+    /// A view key is not a portable name.
+    InvalidViewKey(String),
+    /// A fork's cursor lies past the parent's journal.
+    CursorOutOfRange {
+        cursor: Seq,
+        live: Seq,
+    },
+    /// A component fork's seed names no node.
+    NoSuchNode(Uuid),
+    Store(StoreError),
+}
+
+impl std::fmt::Display for SessionError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Missing(id) => write!(f, "no session {} in this mere", id.as_uuid()),
+            Self::Corrupt(what) => write!(f, "a stored session does not read back: {what}"),
+            Self::NotReplayable(what) => write!(f, "an edit has no replay form: {what}"),
+            Self::InvalidViewKey(what) => write!(f, "invalid view key: {what}"),
+            Self::CursorOutOfRange { cursor, live } => {
+                write!(f, "cursor {} lies past the journal's {}", cursor.0, live.0)
+            },
+            Self::NoSuchNode(id) => write!(f, "no node {id} to fork from"),
+            Self::Store(error) => write!(f, "store: {error}"),
+        }
+    }
+}
+
+impl std::error::Error for SessionError {}
+
+impl From<StoreError> for SessionError {
+    fn from(error: StoreError) -> Self {
+        Self::Store(error)
+    }
+}
+
+/// One change to a session: who made it, what kind it was, and the journal
+/// entries it wrote, `[first, end)`. A lifecycle change writes none.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct Change {
+    pub author: Author,
+    pub kind: ChangeKind,
+    pub first: Seq,
+    pub end: Seq,
+}
+
+/// What a change did.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ChangeKind {
+    /// Edits made through [`GraphSession::apply`].
+    Edit,
+    /// Reverted change `of` (an index into the change log).
+    Undo {
+        of: Seq,
+    },
+    /// Re-applied what undo `of` reverted.
+    Redo {
+        of: Seq,
+    },
+    Minted,
+    /// Forked from session `from` at its journal cursor `at`.
+    Forked {
+        from: SessionId,
+        at: Seq,
+    },
+    Trashed,
+    Restored,
+}
+
+/// One view of one application over a session: `views/<app>/<view>`.
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct ViewKey {
+    app: String,
+    view: String,
+}
+
+impl ViewKey {
+    /// A view key. Both parts become key segments, so each is 1 to 64 of
+    /// `a-z`, `0-9`, `-`, `_` and `.`, not starting or ending with `.`.
+    pub fn new(app: impl Into<String>, view: impl Into<String>) -> Result<Self, SessionError> {
+        let (app, view) = (app.into(), view.into());
+        for part in [&app, &view] {
+            let portable = (1..=64).contains(&part.len())
+                && !part.starts_with('.')
+                && !part.ends_with('.')
+                && part
+                    .bytes()
+                    .all(|byte| matches!(byte, b'a'..=b'z' | b'0'..=b'9' | b'-' | b'_' | b'.'));
+            if !portable {
+                return Err(SessionError::InvalidViewKey(format!("{app}/{view}")));
+            }
+        }
+        Ok(Self { app, view })
+    }
+
+    pub fn app(&self) -> &str {
+        &self.app
+    }
+
+    pub fn view(&self) -> &str {
+        &self.view
+    }
+}
+
+/// One entry of a view's stream: who changed the view, the journal cursor it
+/// was changed at, and the state it changed to.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct ViewEntry {
+    pub author: Author,
+    pub cursor: Seq,
+    pub state: ViewIntent,
+}
+
+/// What [`GraphSession::apply`] wrote.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct Applied {
+    /// The journal entries the change wrote, `[first, end)`.
+    pub first: Seq,
+    pub end: Seq,
+    /// The session's revision after the change.
+    pub revision: u64,
+}
+
+#[derive(Serialize, Deserialize)]
+struct Baseline {
+    graph: GraphSnapshot,
+    facets: NodeFacetStore,
+}
+
+#[derive(Serialize, Deserialize)]
+struct Checkpoint {
+    cursor: Seq,
+}
+
+#[derive(Default)]
+struct View {
+    current: ViewIntent,
+    log: Journal<ViewEntry>,
+    saved: Seq,
+}
+
+/// Where a session's keys live.
+struct Keys(String);
+
+impl Keys {
+    fn new(id: SessionId) -> Self {
+        Self(format!("{SESSIONS_PREFIX}/{}", id.as_uuid()))
+    }
+
+    fn at(&self, name: &str) -> String {
+        format!("{}/{name}", self.0)
+    }
+
+    fn view(&self, key: &ViewKey) -> String {
+        format!("{}/{VIEWS}/{}/{}.json", self.0, key.app, key.view)
+    }
+
+    fn view_log(&self, key: &ViewKey) -> String {
+        format!("{}/{VIEWS}/{}/{}.jsonl", self.0, key.app, key.view)
+    }
+}
+
+fn pretty<T: Serialize>(key: String, value: &T) -> Result<WriteOp, SessionError> {
+    let value =
+        serde_json::to_vec_pretty(value).map_err(|error| StoreError::Codec(error.to_string()))?;
+    Ok(WriteOp::Put { key, value })
+}
+
+async fn read<B: Backend, T: DeserializeOwned>(
+    slots: &JsonSlots<B>,
+    key: &str,
+) -> Result<Option<T>, SessionError> {
+    match slots.load(key).await {
+        Err(StoreError::Codec(error)) => Err(SessionError::Corrupt(format!("{key}: {error}"))),
+        loaded => Ok(loaded?),
+    }
+}
+
+fn graph_of(snapshot: &GraphSnapshot, facets: NodeFacetStore) -> Graph {
+    let mut graph = Graph::from_snapshot(snapshot);
+    graph.overlay_facets(facets);
+    graph
+}
+
+fn baseline_of(graph: &Graph) -> Baseline {
+    Baseline {
+        graph: graph.to_snapshot(),
+        facets: graph.facets().clone(),
+    }
+}
+
+/// The provenance a session's journal was recorded with: a fork's starts at
+/// its parent's cursor.
+fn provenance(manifest: &GraphSessionManifest) -> Option<Provenance> {
+    Some(Provenance {
+        source: Some(LogId::new(manifest.parent_session?.as_uuid().to_string())),
+        at: Seq(manifest.forked_at?),
+    })
+}
+
+/// One session, open: its graph, journal, changes and views, with every edit
+/// recorded under its author and persisted as it is made.
+pub struct GraphSession<B> {
+    slots: JsonSlots<B>,
+    keys: Keys,
+    manifest: GraphSessionManifest,
+    baseline: Graph,
+    graph: Graph,
+    journal: GraphJournal,
+    pending: Arc<Mutex<Vec<CapturedDelta>>>,
+    changes: Journal<Change>,
+    views: BTreeMap<ViewKey, View>,
+    saved: Seq,
+    changes_saved: Seq,
+    checkpointed: Seq,
+    checkpoint_interval: u64,
+    revision: u64,
+}
+
+impl<B: Backend> GraphSession<B> {
+    /// Open session `id` from a mere's store: the latest checkpoint and the
+    /// journal past it, or the baseline and the whole journal.
+    pub async fn open(backend: B, id: SessionId) -> Result<Self, SessionError> {
+        let slots = JsonSlots::new(backend);
+        let keys = Keys::new(id);
+        let manifest: GraphSessionManifest = read(&slots, &keys.at(MANIFEST))
+            .await?
+            .ok_or(SessionError::Missing(id))?;
+        let baseline = read::<B, Baseline>(&slots, &keys.at(BASELINE))
+            .await?
+            .map(|baseline| graph_of(&baseline.graph, baseline.facets))
+            .unwrap_or_default();
+        let journal = GraphJournal::from_log(
+            Journal::<AttributedDelta>::load_entries(
+                &slots,
+                &keys.at(JOURNAL),
+                Some(LogId::new(id.as_uuid().to_string())),
+                provenance(&manifest),
+            )
+            .await?,
+        );
+        let changes = Journal::load_entries(&slots, &keys.at(CHANGES), None, None).await?;
+        let live = journal.live_cursor();
+
+        let checkpoint: Option<Checkpoint> = read(&slots, &keys.at(CHECKPOINT)).await?;
+        let (mut graph, checkpointed) = match checkpoint {
+            Some(checkpoint) if checkpoint.cursor <= live => {
+                let snapshot: GraphSnapshot = read(&slots, &keys.at(GRAPH))
+                    .await?
+                    .ok_or_else(|| SessionError::Corrupt(keys.at(GRAPH)))?;
+                let facets: NodeFacetStore = read(&slots, &keys.at(NODE_FACETS_FILE))
+                    .await?
+                    .unwrap_or_default();
+                (graph_of(&snapshot, facets), checkpoint.cursor)
+            },
+            _ => (baseline.clone(), Seq(0)),
+        };
+        replay_captured_deltas_onto(
+            &mut graph,
+            journal
+                .log()
+                .from(checkpointed)
+                .iter()
+                .map(|entry| entry.delta.clone()),
+        );
+
+        let mut session = Self {
+            slots,
+            keys,
+            manifest,
+            baseline,
+            graph,
+            journal,
+            pending: Arc::default(),
+            changes_saved: changes.next_seq(),
+            changes,
+            views: BTreeMap::new(),
+            saved: live,
+            checkpointed,
+            checkpoint_interval: DEFAULT_CHECKPOINT_INTERVAL,
+            revision: 1,
+        };
+        session.load_views().await?;
+        let pending = Arc::clone(&session.pending);
+        session
+            .graph
+            .set_recorder(Some(Arc::new(move |delta: &CapturedDelta| {
+                pending.lock().expect("recorder buffer").push(delta.clone());
+            })));
+        Ok(session)
+    }
+
+    async fn load_views(&mut self) -> Result<(), SessionError> {
+        let prefix = format!("{}/{VIEWS}/", self.keys.0);
+        for key in self.slots.keys(&prefix).await? {
+            let Some(name) = key.strip_prefix(&prefix) else {
+                continue;
+            };
+            let Some((app, file)) = name.split_once('/') else {
+                continue;
+            };
+            let Some(view) = file.strip_suffix(".json") else {
+                continue;
+            };
+            let view_key = ViewKey::new(app, view)?;
+            let current = read(&self.slots, &key).await?.unwrap_or_default();
+            let log =
+                Journal::load_entries(&self.slots, &self.keys.view_log(&view_key), None, None)
+                    .await?;
+            let saved = log.next_seq();
+            self.views.insert(
+                view_key,
+                View {
+                    current,
+                    log,
+                    saved,
+                },
+            );
+        }
+        Ok(())
+    }
+
+    pub fn id(&self) -> SessionId {
+        self.manifest.session_id
+    }
+
+    pub fn manifest(&self) -> &GraphSessionManifest {
+        &self.manifest
+    }
+
+    /// The live graph. Edits go through [`apply`](Self::apply), so every one is
+    /// journaled.
+    pub fn graph(&self) -> &Graph {
+        &self.graph
+    }
+
+    pub fn journal(&self) -> &GraphJournal {
+        &self.journal
+    }
+
+    /// Every change, oldest first.
+    pub fn changes(&self) -> &[Change] {
+        self.changes.entries()
+    }
+
+    /// Advances with every change, so an attached application knows to look.
+    pub fn revision(&self) -> u64 {
+        self.revision
+    }
+
+    pub fn set_checkpoint_interval(&mut self, entries: u64) {
+        self.checkpoint_interval = entries.max(1);
+    }
+
+    /// Apply edits in stable-id form, as an application sends them.
+    pub async fn apply(
+        &mut self,
+        author: Author,
+        edits: Vec<CapturedDelta>,
+    ) -> Result<Applied, SessionError> {
+        let deltas = edits
+            .iter()
+            .map(|edit| {
+                edit.replay_delta()
+                    .ok_or_else(|| SessionError::NotReplayable(format!("{edit:?}")))
+            })
+            .collect::<Result<Vec<_>, _>>()?;
+        self.apply_deltas(author, deltas).await
+    }
+
+    /// Apply edits as one change under `author`, journal what they did, and
+    /// persist it before returning. A change that alters nothing records
+    /// nothing.
+    pub async fn apply_deltas(
+        &mut self,
+        author: Author,
+        deltas: Vec<GraphDelta>,
+    ) -> Result<Applied, SessionError> {
+        self.apply_as(author, ChangeKind::Edit, deltas).await
+    }
+
+    async fn apply_as(
+        &mut self,
+        author: Author,
+        kind: ChangeKind,
+        deltas: Vec<GraphDelta>,
+    ) -> Result<Applied, SessionError> {
+        let first = self.journal.live_cursor();
+        for delta in deltas {
+            let _ = apply_graph_delta(&mut self.graph, delta);
+        }
+        let recorded = std::mem::take(&mut *self.pending.lock().expect("recorder buffer"));
+        for delta in recorded {
+            self.journal.record_as(author.clone(), delta);
+        }
+        let end = self.journal.live_cursor();
+        if end > first {
+            self.changes.append(Change {
+                author,
+                kind,
+                first,
+                end,
+            });
+            self.revision += 1;
+        }
+        self.persist(Vec::new()).await?;
+        if end.0 - self.checkpointed.0 >= self.checkpoint_interval {
+            self.checkpoint().await?;
+        }
+        Ok(Applied {
+            first,
+            end,
+            revision: self.revision,
+        })
+    }
+
+    /// Record a change that writes no edits (a lifecycle step), with `extra`
+    /// writes landing in the same batch.
+    async fn record(
+        &mut self,
+        author: Author,
+        kind: ChangeKind,
+        extra: Vec<WriteOp>,
+    ) -> Result<(), SessionError> {
+        let at = self.journal.live_cursor();
+        self.changes.append(Change {
+            author,
+            kind,
+            first: at,
+            end: at,
+        });
+        self.revision += 1;
+        self.persist(extra).await
+    }
+
+    /// Write every edit and change not yet stored, with `extra`, as one batch.
+    async fn persist(&mut self, extra: Vec<WriteOp>) -> Result<(), SessionError> {
+        let mut ops = self
+            .journal
+            .log()
+            .entry_writes::<JsonCodec>(&self.keys.at(JOURNAL), self.saved)?;
+        ops.extend(
+            self.changes
+                .entry_writes::<JsonCodec>(&self.keys.at(CHANGES), self.changes_saved)?,
+        );
+        ops.extend(extra);
+        if ops.is_empty() {
+            return Ok(());
+        }
+        self.slots.backend().apply(&ops).await?;
+        self.saved = self.journal.live_cursor();
+        self.changes_saved = self.changes.next_seq();
+        Ok(())
+    }
+
+    /// Write a checkpoint: the graph, its facets and the cursor they reflect,
+    /// with any unsaved entries, in one batch.
+    pub async fn checkpoint(&mut self) -> Result<(), SessionError> {
+        let cursor = self.journal.live_cursor();
+        let extra = vec![
+            pretty(self.keys.at(GRAPH), &self.graph.to_snapshot())?,
+            pretty(self.keys.at(NODE_FACETS_FILE), self.graph.facets())?,
+            pretty(self.keys.at(CHECKPOINT), &Checkpoint { cursor })?,
+        ];
+        self.persist(extra).await?;
+        self.checkpointed = cursor;
+        Ok(())
+    }
+
+    /// Checkpoint if the journal has moved since the last one: what the
+    /// resident calls when the last application detaches.
+    pub async fn checkpoint_if_behind(&mut self) -> Result<(), SessionError> {
+        if self.checkpointed < self.journal.live_cursor() {
+            self.checkpoint().await?;
+        }
+        Ok(())
+    }
+
+    /// The graph as it stood at journal cursor `cursor`: the baseline with the
+    /// first `cursor` entries replayed. `None` past the live cursor.
+    pub fn graph_at(&self, cursor: Seq) -> Option<Graph> {
+        let entries = self.journal.entries().get(..cursor.index())?;
+        let mut graph = self.baseline.clone();
+        replay_captured_deltas_onto(&mut graph, entries.iter().map(|entry| entry.delta.clone()));
+        Some(graph)
+    }
+
+    /// Every view with state, in key order.
+    pub fn views(&self) -> impl Iterator<Item = (&ViewKey, &ViewIntent)> {
+        self.views.iter().map(|(key, view)| (key, &view.current))
+    }
+
+    /// A view's current state.
+    pub fn view(&self, key: &ViewKey) -> Option<&ViewIntent> {
+        self.views.get(key).map(|view| &view.current)
+    }
+
+    /// A view's state as it stood at journal cursor `cursor`: its latest
+    /// change made at or before that cursor.
+    pub fn view_at(&self, key: &ViewKey, cursor: Seq) -> Option<&ViewIntent> {
+        self.views
+            .get(key)?
+            .log
+            .entries()
+            .iter()
+            .rev()
+            .find(|entry| entry.cursor <= cursor)
+            .map(|entry| &entry.state)
+    }
+
+    /// Change a view's state under `author`, stamped with the journal cursor it
+    /// was made at, and persist it with the view's current state.
+    pub async fn set_view(
+        &mut self,
+        author: Author,
+        key: ViewKey,
+        state: ViewIntent,
+    ) -> Result<(), SessionError> {
+        let cursor = self.journal.live_cursor();
+        let current = self.keys.view(&key);
+        let log_key = self.keys.view_log(&key);
+        let view = self.views.entry(key).or_default();
+        view.log.append(ViewEntry {
+            author,
+            cursor,
+            state: state.clone(),
+        });
+        let mut ops = vec![pretty(current, &state)?];
+        ops.extend(view.log.entry_writes::<JsonCodec>(&log_key, view.saved)?);
+        self.slots.backend().apply(&ops).await?;
+        view.current = state;
+        view.saved = view.log.next_seq();
+        Ok(())
+    }
+
+    /// Put the session in the trash: its manifest is marked, its keys stay.
+    pub async fn trash(&mut self, author: Author, at: SystemTime) -> Result<(), SessionError> {
+        self.manifest.trashed = Some(TrashMark {
+            by: author.clone(),
+            at,
+        });
+        self.manifest.updated_at = at;
+        let extra = vec![pretty(self.keys.at(MANIFEST), &self.manifest)?];
+        self.record(author, ChangeKind::Trashed, extra).await
+    }
+
+    /// Take the session back out of the trash.
+    pub async fn restore(&mut self, author: Author, at: SystemTime) -> Result<(), SessionError> {
+        self.manifest.trashed = None;
+        self.manifest.updated_at = at;
+        let extra = vec![pretty(self.keys.at(MANIFEST), &self.manifest)?];
+        self.record(author, ChangeKind::Restored, extra).await
+    }
+}
+
+/// The graph a component fork starts from: the connected component around
+/// `seed`, copied with its facets through the id remap, and the donor
+/// container's scene settings carried to the fork's container. The
+/// product-neutral half of Turnstone's tear-out; nested worlds and resident
+/// admissions stay Turnstone's to carry. Native only, as the kernel's
+/// component copy is.
+#[cfg(not(target_arch = "wasm32"))]
+pub fn fork_component_graph(
+    donor: &Graph,
+    donor_container: Uuid,
+    seed: Uuid,
+    fork_container: Uuid,
+) -> Option<Graph> {
+    let mut fork = Graph::new();
+    let copy = fork.copy_component_from(donor, seed, Some(donor_container.to_string()));
+    if copy.new_keys.is_empty() {
+        return None;
+    }
+    let mut facets = NodeFacetStore::new();
+    copy_node_facets(donor.facets(), &mut facets, &copy.id_remap);
+    copy_scene_facets(donor.facets(), &mut facets, donor_container, fork_container);
+    // The copy stamped each minted node's derivation from its donor; the
+    // overlay below would drop it, so keep it aside and set it again.
+    let derivation = FacetId::new(PROVENANCE_DERIVATIONS);
+    let derivations: Vec<(Uuid, serde_json::Value)> = copy
+        .id_remap
+        .iter()
+        .filter_map(|(_, minted)| {
+            fork.facets()
+                .get(minted, &derivation)
+                .cloned()
+                .map(|value| (*minted, value))
+        })
+        .collect();
+    fork.overlay_facets(facets);
+    let import = FacetId::new(PROVENANCE_IMPORT);
+    for (_, minted) in &copy.id_remap {
+        fork.facets_mut().remove(minted, &import);
+    }
+    for (minted, value) in derivations {
+        fork.facets_mut()
+            .set(minted, derivation.clone(), value, &AcceptAll)
+            .expect("AcceptAll admits every value");
+    }
+    Some(fork)
+}
+
+/// A mere's sessions, over its one store.
+pub struct MereSessions<B> {
+    backend: B,
+}
+
+impl<B: Backend + Clone> MereSessions<B> {
+    pub fn new(backend: B) -> Self {
+        Self { backend }
+    }
+
+    fn slots(&self) -> JsonSlots<B> {
+        JsonSlots::new(self.backend.clone())
+    }
+
+    /// Every session's manifest, trashed ones included, oldest first.
+    pub async fn list(&self) -> Result<Vec<GraphSessionManifest>, SessionError> {
+        let slots = self.slots();
+        let mut manifests = Vec::new();
+        for key in slots.keys(&format!("{SESSIONS_PREFIX}/")).await? {
+            if key.ends_with(&format!("/{MANIFEST}"))
+                && let Some(manifest) = read::<B, GraphSessionManifest>(&slots, &key).await?
+            {
+                manifests.push(manifest);
+            }
+        }
+        manifests.sort_by_key(|manifest| (manifest.created_at, *manifest.session_id.as_uuid()));
+        Ok(manifests)
+    }
+
+    /// Open a session.
+    pub async fn open(&self, id: SessionId) -> Result<GraphSession<B>, SessionError> {
+        GraphSession::open(self.backend.clone(), id).await
+    }
+
+    /// Mint an empty session.
+    pub async fn mint(
+        &self,
+        author: Author,
+        display_name: Option<String>,
+    ) -> Result<GraphSessionManifest, SessionError> {
+        let mut manifest = GraphSessionManifest::new(SessionId::new(), GraphId::new());
+        manifest.display_name = display_name;
+        self.create(manifest, None, author, ChangeKind::Minted)
+            .await
+    }
+
+    /// Fork `parent` at journal cursor `at`: a new session whose baseline is
+    /// the parent's graph there and whose journal starts empty.
+    pub async fn fork_at(
+        &self,
+        parent: &GraphSession<B>,
+        at: Seq,
+        author: Author,
+    ) -> Result<GraphSessionManifest, SessionError> {
+        let live = parent.journal().live_cursor();
+        let graph = parent
+            .graph_at(at)
+            .ok_or(SessionError::CursorOutOfRange { cursor: at, live })?;
+        self.create_fork(parent, at, &graph, author).await
+    }
+
+    /// Fork the connected component around node `seed` out of `parent`
+    /// (Turnstone's tear-out), as a new session.
+    #[cfg(not(target_arch = "wasm32"))]
+    pub async fn fork_component(
+        &self,
+        parent: &GraphSession<B>,
+        seed: Uuid,
+        author: Author,
+    ) -> Result<GraphSessionManifest, SessionError> {
+        let fork_graph_id = GraphId::new();
+        let graph = fork_component_graph(
+            parent.graph(),
+            *parent.manifest().root_graph_id.as_uuid(),
+            seed,
+            *fork_graph_id.as_uuid(),
+        )
+        .ok_or(SessionError::NoSuchNode(seed))?;
+        let at = parent.journal().live_cursor();
+        let mut manifest = GraphSessionManifest::new(SessionId::new(), fork_graph_id);
+        manifest.parent_session = Some(parent.id());
+        manifest.forked_at = Some(at.0);
+        let kind = ChangeKind::Forked {
+            from: parent.id(),
+            at,
+        };
+        self.create(manifest, Some(&graph), author, kind).await
+    }
+
+    async fn create_fork(
+        &self,
+        parent: &GraphSession<B>,
+        at: Seq,
+        graph: &Graph,
+        author: Author,
+    ) -> Result<GraphSessionManifest, SessionError> {
+        let mut manifest = GraphSessionManifest::new(SessionId::new(), GraphId::new());
+        manifest.parent_session = Some(parent.id());
+        manifest.forked_at = Some(at.0);
+        manifest.display_name = parent.manifest().display_name.clone();
+        let kind = ChangeKind::Forked {
+            from: parent.id(),
+            at,
+        };
+        self.create(manifest, Some(graph), author, kind).await
+    }
+
+    /// Write a new session's manifest, baseline and first change as one batch.
+    async fn create(
+        &self,
+        manifest: GraphSessionManifest,
+        baseline: Option<&Graph>,
+        author: Author,
+        kind: ChangeKind,
+    ) -> Result<GraphSessionManifest, SessionError> {
+        let keys = Keys::new(manifest.session_id);
+        let mut ops = vec![pretty(keys.at(MANIFEST), &manifest)?];
+        if let Some(graph) = baseline {
+            ops.push(pretty(keys.at(BASELINE), &baseline_of(graph))?);
+        }
+        let mut changes = Journal::new();
+        changes.append(Change {
+            author,
+            kind,
+            first: Seq(0),
+            end: Seq(0),
+        });
+        ops.extend(changes.entry_writes::<JsonCodec>(&keys.at(CHANGES), Seq(0))?);
+        self.backend.apply(&ops).await?;
+        Ok(manifest)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    use euclid::default::Point2D;
+    use muniment::{DirectoryBackend, MemoryBackend};
+
+    fn person() -> Author {
+        Author::person("persona-a").via("turnstone")
+    }
+
+    fn knot() -> Author {
+        Author::person("persona-a").via("knot-editor")
+    }
+
+    fn add(id: u128) -> CapturedDelta {
+        CapturedDelta::ReplayAddNodeWithIdIfMissing {
+            id: Uuid::from_u128(id).to_string(),
+            url: format!("https://{id}.test/"),
+            position: [0.0, 0.0],
+        }
+    }
+
+    fn retitle(id: u128, title: &str) -> CapturedDelta {
+        CapturedDelta::ReplaySetNodeTitleById {
+            node_id: Uuid::from_u128(id).to_string(),
+            title: title.to_string(),
+        }
+    }
+
+    fn relate(from: u128, to: u128) -> CapturedDelta {
+        CapturedDelta::ReplayAssertRelationByIds {
+            from_id: Uuid::from_u128(from).to_string(),
+            to_id: Uuid::from_u128(to).to_string(),
+            assertion: kernel::graph::EdgeAssertion::Semantic {
+                sub_kind: kernel::graph::SemanticSubKind::Cites,
+                label: None,
+                decay_progress: None,
+            },
+        }
+    }
+
+    /// Sorted node ids with titles, and sorted relation endpoints: equal
+    /// graphs regardless of petgraph keys.
+    type Pairs = Vec<(String, String)>;
+
+    fn fingerprint(graph: &Graph) -> (Pairs, Pairs) {
+        let mut nodes: Vec<_> = graph
+            .nodes()
+            .map(|(_, node)| (node.id.to_string(), node.title.clone()))
+            .collect();
+        nodes.sort();
+        let mut edges: Vec<_> = graph
+            .relations()
+            .map(|relation| {
+                let from = graph.get_node(relation.from).unwrap().id.to_string();
+                let to = graph.get_node(relation.to).unwrap().id.to_string();
+                (from, to)
+            })
+            .collect();
+        edges.sort();
+        (nodes, edges)
+    }
+
+    #[test]
+    fn a_session_journals_its_edits_under_their_authors_and_reopens() {
+        pollster::block_on(async {
+            let dir = tempfile::tempdir().unwrap();
+            let store = DirectoryBackend::open(dir.path()).unwrap();
+            let mere = MereSessions::new(store.clone());
+            let manifest = mere.mint(person(), Some("readings".into())).await.unwrap();
+            let id = manifest.session_id;
+
+            let mut session = mere.open(id).await.unwrap();
+            let first = session.apply(person(), vec![add(1), add(2)]).await.unwrap();
+            assert_eq!((first.first, first.end), (Seq(0), Seq(2)));
+            session
+                .apply(knot(), vec![relate(1, 2), retitle(1, "The Tower")])
+                .await
+                .unwrap();
+            let live = fingerprint(session.graph());
+            let authors: Vec<String> = session
+                .journal()
+                .entries()
+                .iter()
+                .map(|entry| entry.author.to_string())
+                .collect();
+            assert_eq!(
+                authors,
+                [
+                    "person persona-a via turnstone",
+                    "person persona-a via turnstone",
+                    "person persona-a via knot-editor",
+                    "person persona-a via knot-editor",
+                ]
+            );
+            let kinds: Vec<&ChangeKind> = session.changes().iter().map(|c| &c.kind).collect();
+            assert_eq!(
+                kinds,
+                [&ChangeKind::Minted, &ChangeKind::Edit, &ChangeKind::Edit]
+            );
+            drop(session);
+            drop(mere);
+            drop(store);
+
+            // The folder is Turnstone's layout, with a line per journal entry.
+            let session_dir = dir.path().join("sessions").join(id.as_uuid().to_string());
+            assert!(session_dir.join("manifest.json").is_file());
+            let journal = std::fs::read_to_string(session_dir.join("journal.jsonl")).unwrap();
+            assert_eq!(journal.lines().count(), 4);
+
+            let store = DirectoryBackend::open(dir.path()).unwrap();
+            let reopened = GraphSession::open(store, id).await.unwrap();
+            assert_eq!(fingerprint(reopened.graph()), live);
+            assert_eq!(reopened.journal().len(), 4);
+            assert_eq!(reopened.changes().len(), 3);
+            assert_eq!(
+                reopened.manifest().display_name.as_deref(),
+                Some("readings")
+            );
+        });
+    }
+
+    #[test]
+    fn a_checkpoint_and_its_tail_load_the_same_graph_as_the_baseline_and_journal() {
+        pollster::block_on(async {
+            let store = MemoryBackend::new();
+            let mere = MereSessions::new(store.clone());
+            let id = mere.mint(person(), None).await.unwrap().session_id;
+            let mut session = mere.open(id).await.unwrap();
+            session.set_checkpoint_interval(3);
+            for n in 0..3 {
+                session.apply(person(), vec![add(n)]).await.unwrap();
+            }
+            // The third entry reached the interval; the fourth is the tail.
+            session
+                .apply(person(), vec![retitle(2, "Three")])
+                .await
+                .unwrap();
+            let checkpoint: Checkpoint = JsonSlots::new(store.clone())
+                .load(&Keys::new(id).at(CHECKPOINT))
+                .await
+                .unwrap()
+                .expect("a checkpoint was written");
+            assert_eq!(checkpoint.cursor, Seq(3));
+            assert_eq!(session.journal().len(), 4);
+            let live = fingerprint(session.graph());
+            drop(session);
+
+            let reopened = GraphSession::open(store.clone(), id).await.unwrap();
+            assert_eq!(fingerprint(reopened.graph()), live, "checkpoint plus tail");
+            let replayed = reopened.graph_at(reopened.journal().live_cursor()).unwrap();
+            assert_eq!(fingerprint(&replayed), live, "baseline plus whole journal");
+        });
+    }
+
+    #[test]
+    fn a_fork_at_a_cursor_starts_from_the_parent_there_and_diverges() {
+        pollster::block_on(async {
+            let store = MemoryBackend::new();
+            let mere = MereSessions::new(store.clone());
+            let parent_id = mere
+                .mint(person(), Some("parent".into()))
+                .await
+                .unwrap()
+                .session_id;
+            let mut parent = mere.open(parent_id).await.unwrap();
+            parent.apply(person(), vec![add(1)]).await.unwrap();
+            parent.apply(person(), vec![add(2)]).await.unwrap();
+
+            let fork = mere.fork_at(&parent, Seq(1), knot()).await.unwrap();
+            assert_eq!(fork.parent_session, Some(parent_id));
+            assert_eq!(fork.forked_at, Some(1));
+            let mut fork = mere.open(fork.session_id).await.unwrap();
+            assert_eq!(
+                fork.graph().node_count(),
+                1,
+                "the parent's graph at cursor 1"
+            );
+            assert!(
+                fork.journal().is_empty(),
+                "the fork's journal starts at the fork point"
+            );
+            let provenance = fork.journal().provenance().unwrap().clone();
+            assert_eq!(provenance.at, Seq(1));
+            assert_eq!(
+                fork.changes()[0].kind,
+                ChangeKind::Forked {
+                    from: parent_id,
+                    at: Seq(1)
+                }
+            );
+
+            fork.apply(knot(), vec![add(3)]).await.unwrap();
+            assert_eq!(fork.graph().node_count(), 2);
+            assert_eq!(parent.graph().node_count(), 2, "the parent is untouched");
+            assert!(parent.graph().get_node_by_id(Uuid::from_u128(3)).is_none());
+            assert!(mere.fork_at(&parent, Seq(9), knot()).await.is_err());
+        });
+    }
+
+    #[cfg(not(target_arch = "wasm32"))]
+    #[test]
+    fn a_component_fork_takes_only_the_seed_s_component() {
+        pollster::block_on(async {
+            let store = MemoryBackend::new();
+            let mere = MereSessions::new(store.clone());
+            let id = mere.mint(person(), None).await.unwrap().session_id;
+            let mut parent = mere.open(id).await.unwrap();
+            parent
+                .apply(person(), vec![add(1), add(2), add(3), relate(1, 2)])
+                .await
+                .unwrap();
+            let fork = mere
+                .fork_component(&parent, Uuid::from_u128(1), knot())
+                .await
+                .unwrap();
+            let fork = mere.open(fork.session_id).await.unwrap();
+            assert_eq!(
+                fork.graph().node_count(),
+                2,
+                "nodes 1 and 2, not the lone 3"
+            );
+            assert!(
+                mere.fork_component(&parent, Uuid::from_u128(9), knot())
+                    .await
+                    .is_err()
+            );
+        });
+    }
+
+    #[test]
+    fn trash_marks_the_manifest_and_restore_clears_it() {
+        pollster::block_on(async {
+            let store = MemoryBackend::new();
+            let mere = MereSessions::new(store.clone());
+            let id = mere.mint(person(), None).await.unwrap().session_id;
+            let mut session = mere.open(id).await.unwrap();
+            let at = SystemTime::UNIX_EPOCH + std::time::Duration::from_secs(1_800_000_000);
+            session.trash(knot(), at).await.unwrap();
+
+            let listed = mere.list().await.unwrap();
+            assert_eq!(listed.len(), 1);
+            let mark = listed[0].trashed.clone().expect("trashed");
+            assert_eq!(mark.by, knot());
+            assert_eq!(mark.at, at);
+
+            session.restore(person(), at).await.unwrap();
+            assert!(mere.list().await.unwrap()[0].trashed.is_none());
+            let kinds: Vec<&ChangeKind> = session.changes().iter().map(|c| &c.kind).collect();
+            assert_eq!(
+                kinds,
+                [
+                    &ChangeKind::Minted,
+                    &ChangeKind::Trashed,
+                    &ChangeKind::Restored
+                ]
+            );
+            // The session still opens: trash never moved its keys.
+            assert_eq!(mere.open(id).await.unwrap().changes().len(), 3);
+        });
+    }
+
+    #[test]
+    fn a_view_keeps_its_own_stream_scrubbable_by_journal_cursor() {
+        pollster::block_on(async {
+            let store = MemoryBackend::new();
+            let mere = MereSessions::new(store.clone());
+            let id = mere.mint(person(), None).await.unwrap().session_id;
+            let mut session = mere.open(id).await.unwrap();
+            let key = ViewKey::new("knot-editor", "main").unwrap();
+            let spectral = ViewIntent {
+                strategy: Some("spectral".into()),
+                ..ViewIntent::default()
+            };
+            session
+                .set_view(knot(), key.clone(), spectral.clone())
+                .await
+                .unwrap();
+            session.apply(person(), vec![add(1)]).await.unwrap();
+            let focused = ViewIntent {
+                focus: Some(Uuid::from_u128(1).to_string()),
+                ..spectral.clone()
+            };
+            session
+                .set_view(knot(), key.clone(), focused.clone())
+                .await
+                .unwrap();
+
+            assert_eq!(session.view(&key), Some(&focused));
+            assert_eq!(session.view_at(&key, Seq(0)), Some(&spectral));
+            assert_eq!(session.view_at(&key, Seq(1)), Some(&focused));
+            assert_eq!(
+                session.journal().len(),
+                1,
+                "view changes stay out of the journal"
+            );
+            drop(session);
+
+            let reopened = mere.open(id).await.unwrap();
+            assert_eq!(reopened.view(&key), Some(&focused));
+            assert_eq!(reopened.view_at(&key, Seq(0)), Some(&spectral));
+            assert!(ViewKey::new("Knot", "main").is_err());
+            assert!(ViewKey::new("knot", "../main").is_err());
+        });
+    }
+
+    #[test]
+    fn an_edit_without_a_replay_form_is_refused_whole() {
+        pollster::block_on(async {
+            let store = MemoryBackend::new();
+            let mere = MereSessions::new(store.clone());
+            let id = mere.mint(person(), None).await.unwrap().session_id;
+            let mut session = mere.open(id).await.unwrap();
+            let legacy = CapturedDelta::ReplaySetNodeThumbnailById {
+                node_id: Uuid::from_u128(1).to_string(),
+                png_bytes: Vec::new(),
+                width: 0,
+                height: 0,
+            };
+            assert!(session.apply(person(), vec![add(1), legacy]).await.is_err());
+            assert_eq!(
+                session.graph().node_count(),
+                0,
+                "nothing of the batch applied"
+            );
+            assert!(session.journal().is_empty());
+        });
+    }
+
+    #[test]
+    fn a_session_opens_only_if_its_mere_holds_it() {
+        pollster::block_on(async {
+            let mere = MereSessions::new(MemoryBackend::new());
+            let missing = SessionId::new();
+            assert!(matches!(
+                mere.open(missing).await,
+                Err(SessionError::Missing(id)) if id == missing
+            ));
+        });
+    }
+
+    #[test]
+    fn in_process_hosts_apply_graph_deltas_by_key() {
+        pollster::block_on(async {
+            let mere = MereSessions::new(MemoryBackend::new());
+            let id = mere.mint(person(), None).await.unwrap().session_id;
+            let mut session = mere.open(id).await.unwrap();
+            session
+                .apply_deltas(
+                    person(),
+                    vec![GraphDelta::AddNode {
+                        id: Some(Uuid::from_u128(7)),
+                        url: "https://seven.test/".into(),
+                        position: Point2D::new(1.0, 2.0),
+                    }],
+                )
+                .await
+                .unwrap();
+            let (key, _) = session.graph().get_node_by_id(Uuid::from_u128(7)).unwrap();
+            let result = session
+                .apply_deltas(
+                    person(),
+                    vec![GraphDelta::SetNodeTitle {
+                        key,
+                        title: "Seven".into(),
+                    }],
+                )
+                .await
+                .unwrap();
+            assert_eq!(result.end, Seq(2));
+            assert_eq!(session.graph().get_node(key).unwrap().title, "Seven");
+        });
+    }
+}
