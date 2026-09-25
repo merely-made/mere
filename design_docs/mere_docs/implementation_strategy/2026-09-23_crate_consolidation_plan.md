@@ -236,6 +236,13 @@ crate inventory at the Code root.
   custom mode files keep seed references and lightness. Nothing inside the
   kernel used its `Color32`, so the module was deleted rather than moved; the
   kernel's f32 `Color` in `paint.rs` is the renderer-side type and stays.
+- 2026-09-24. Lens's `ThemeData` keeps its `(u8, u8, u8)` tuples rather
+  than `Srgb`: saved lens files store them, and a map-shaped colour would stop
+  them reading.
+- 2026-09-24. tabard's directory carries `LICENSE-MIT` and `LICENSE-APACHE`
+  from its 2026-08-10 reservation, while its manifest, source headers and
+  README say MPL-2.0, and the published 0.0.1 package ships both files. Left
+  for Mark.
 
 ## Progress
 
@@ -265,3 +272,11 @@ crate inventory at the Code root.
   (tinct 15, kernel 290, registry 139 with 2 ignored, mere 47); registry
   checks with `knowledge`, `lens` and `theme` each alone; the portable gate
   passes. Next: T2.
+- 2026-09-24. T2a landed (`7f133433`): registry's theme tree is
+  `tabard::theme`, lens's theme file is `tabard::theme::data`, and one set of
+  theme ids replaces two. 24 tests moved (registry 141 -> 117, tabard
+  9 -> 33); tabard 33, registry 115 with 2 ignored and mere 47 pass, registry
+  checks with `lens` and `knowledge` alone, and the portable gate passes. The
+  `mere` facade no longer depends on registry. tabard's golden Lagrange test
+  had been failing on Windows checkouts, where autocrlf rewrote its fixture;
+  the fixtures are pinned to LF (`b7ed0bdc`). Next: T2b.
