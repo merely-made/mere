@@ -32,7 +32,9 @@ use graphshell::browser_carrier::AllowedExtensions;
 use graphshell::identity::VaultProtectionView;
 #[cfg(feature = "personal-sync")]
 use graphshell::native::app_admission::AppId;
-use graphshell::native::app_admission::{AllowedAppRoutes, configured_app_endpoint};
+use graphshell::native::app_admission::{
+    AllowedAppRoutes, AppRouteGrants, configured_app_endpoint,
+};
 use graphshell::native::app_broker::{AppEndpointCatalog, serve_app_broker};
 #[cfg(feature = "personal-sync")]
 use graphshell::native::device_broker::serve_browser_broker_with_cards;
@@ -743,13 +745,13 @@ async fn run(args: Args) -> Result<(), Box<dyn std::error::Error>> {
                 grants.push((AppId::new("turnstone"), route));
             }
             (
-                AllowedAppRoutes::new(grants),
+                AppRouteGrants::new(AllowedAppRoutes::new(grants)),
                 AppEndpointCatalog::new(catalog),
             )
         };
         #[cfg(not(feature = "personal-sync"))]
         let (allowed_app_routes, app_catalog) =
-            (AllowedAppRoutes::default(), AppEndpointCatalog::default());
+            (AppRouteGrants::default(), AppEndpointCatalog::default());
         let apps = serve_app_broker(
             &args.app_endpoint,
             Arc::clone(&personae),
