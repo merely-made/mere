@@ -2012,6 +2012,7 @@ dependencies = [
  "errand",
  "genet-scripted-dom",
  "layout-dom-api 0.1.1 (git+https://github.com/merely-made/genet.git?rev=3e8d797fda58132dfe519a1f99a50b2db705a6a5)",
+ "tabard",
 ]
 
 [[package]]
@@ -8863,6 +8864,7 @@ dependencies = [
  "pollster",
  "serde",
  "serde_json",
+ "tabard",
  "tempfile",
  "tokio",
  "url",

@@ -16,6 +16,7 @@ cambium = { version = "0.3.0", path = "../cambium" }
 # errand never reached these views and the tests here silently exercised
 # crates.io instead.
 errand = { workspace = true }
+tabard = { workspace = true }
 
 [dev-dependencies]
 layout_dom_api = { workspace = true }
