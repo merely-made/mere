@@ -173,7 +173,8 @@ def main():
                     raise ValueError(f"Outside path package: {package['name']} at {path}")
                 run(["git", "-C", str(repo), "ls-files", "--error-unmatch", str(path)], stdout=subprocess.DEVNULL)
         if not metadata_only:
-            run(cargo + ["check", "--workspace", "--locked"] + allowed, cwd=root)
+            # All targets, so a test or example that stops compiling fails the gate.
+            run(cargo + ["check", "--workspace", "--all-targets", "--locked"] + allowed, cwd=root)
     finally:
         if digest(lock) != before:
             raise ValueError(f"Portable lock changed: {lock}")
