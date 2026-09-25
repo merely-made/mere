@@ -38,6 +38,7 @@
 //! this crate always used `graphshell_core::color::Color32`, which has since
 //! merged into tinct's `Srgb`.
 
+pub mod choice;
 pub mod chrome;
 pub mod data;
 pub mod edge_style;

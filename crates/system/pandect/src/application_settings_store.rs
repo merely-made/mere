@@ -16,6 +16,7 @@ use std::io;
 use std::path::{Path, PathBuf};
 
 use serde::{Deserialize, Serialize};
+use tabard::theme::choice::ThemeChoice;
 
 fn default_tab_cap() -> usize {
     12
@@ -51,12 +52,11 @@ pub struct ApplicationSettings {
     /// scope=application; movement=local-only; mutability=live; security=ordinary.
     #[serde(default = "default_tab_cap")]
     pub tab_cap: usize,
-    /// scope=application; movement=persona-synced opt-in; mutability=live;
-    /// security=ordinary.
-    pub theme_id: Option<String>,
-    /// scope=application; movement=persona-synced opt-in; mutability=live;
-    /// security=ordinary.
-    pub theme_mode: Option<String>,
+    /// The chosen theme, stored as `theme_id` and `theme_mode` (tabard's
+    /// choice). scope=application; movement=persona-synced opt-in;
+    /// mutability=live; security=ordinary.
+    #[serde(flatten)]
+    pub theme: Option<ThemeChoice>,
     /// scope=application; movement=local-only; mutability=live; security=ordinary.
     pub shellbar_edge: ShellbarEdge,
     /// scope=application; movement=local-only; mutability=live; security=ordinary.
@@ -109,8 +109,7 @@ impl Default for ApplicationSettings {
     fn default() -> Self {
         Self {
             tab_cap: default_tab_cap(),
-            theme_id: None,
-            theme_mode: None,
+            theme: None,
             shellbar_edge: ShellbarEdge::default(),
             shellbar_hidden: false,
             disabled_engines: Vec::new(),
@@ -182,6 +181,27 @@ mod tests {
     }
 
     #[test]
+    fn stored_theme_fields_read_into_the_choice() {
+        use tabard::theme::registry::Mode;
+        // Records from before the choice type held two optional strings,
+        // written as nulls when unset.
+        let unset: ApplicationSettings =
+            serde_json::from_str(r#"{"tab_cap":24,"theme_id":null,"theme_mode":null}"#).unwrap();
+        assert_eq!(unset.theme, None);
+        let set: ApplicationSettings =
+            serde_json::from_str(r#"{"theme_id":"theme:dark","theme_mode":"dark"}"#).unwrap();
+        assert_eq!(
+            set.theme,
+            Some(ThemeChoice::new("theme:dark", Some(Mode::Dark)))
+        );
+        let id_only: ApplicationSettings =
+            serde_json::from_str(r#"{"theme_id":"theme:light"}"#).unwrap();
+        assert_eq!(id_only.theme, Some(ThemeChoice::new("theme:light", None)));
+        let absent: ApplicationSettings = serde_json::from_str("{}").unwrap();
+        assert_eq!(absent.theme, None);
+    }
+
+    #[test]
     fn save_then_load_round_trips() {
         let root = std::env::temp_dir().join(format!(
             "mere-application-settings-{}-{}",
@@ -190,8 +210,10 @@ mod tests {
         ));
         let original = ApplicationSettings {
             tab_cap: 24,
-            theme_id: Some("theme:dark".into()),
-            theme_mode: Some("dark".into()),
+            theme: Some(ThemeChoice::new(
+                "theme:dark",
+                Some(tabard::theme::registry::Mode::Dark),
+            )),
             shellbar_edge: ShellbarEdge::Right,
             shellbar_hidden: true,
             disabled_engines: vec!["scrying.web".into()],

@@ -82,8 +82,7 @@ mod smoke_webgl;
 mod smoke_windows;
 
 pub use appearance::{
-    APPEARANCE_REFERENCE, AppearanceSettingsProvider, AppearanceStore, AppearanceTheme,
-    CHROME_THEME_SETTING, FileAppearanceStore, InMemoryAppearanceStore,
+    APPEARANCE_REFERENCE, AppearanceSettingsProvider, AppearanceTheme, CHROME_THEME_SETTING,
 };
 #[cfg(any(feature = "scripted", feature = "smolweb"))]
 pub use href::resolve_href;
@@ -115,6 +114,9 @@ pub use static_viewer::run_reader_viewer;
 pub use static_viewer::{
     ProductReceipt, ProductReceiptOutcome, StaticProductReceipt, StaticProductReceiptOutcome,
     StaticViewerConfig, StaticViewerOutcome, run_static_viewer,
+};
+pub use tabard::theme::choice::{
+    FileThemeChoiceStore, InMemoryThemeChoiceStore, ThemeChoice, ThemeChoiceStore,
 };
 #[cfg(feature = "livery")]
 pub use workspace_viewer::{

@@ -5,7 +5,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 use super::*;
-use crate::FileAppearanceStore;
+use crate::FileThemeChoiceStore;
 use inker::SurfaceError;
 #[cfg(feature = "reader")]
 use std::sync::Mutex;
@@ -1215,7 +1215,7 @@ fn file_appearance_store_restores_theme_after_workspace_recreation() {
     ));
     let _ = std::fs::remove_file(&path);
 
-    let make_app = |store: FileAppearanceStore| {
+    let make_app = |store: FileThemeChoiceStore| {
         let tree = tree_from_urls(&[fixture.clone()]);
         #[cfg(target_os = "windows")]
         let registries = workspace_registries(None);
@@ -1259,7 +1259,7 @@ fn file_appearance_store_restores_theme_after_workspace_recreation() {
         app.workspace.mark_visible_documents_presented();
     };
 
-    let mut app = make_app(FileAppearanceStore::load(&path).unwrap());
+    let mut app = make_app(FileThemeChoiceStore::load(&path).unwrap());
     compose(&mut app);
     let tile = TileId(1);
     let baseline_content = app
@@ -1290,7 +1290,7 @@ fn file_appearance_store_restores_theme_after_workspace_recreation() {
     assert!(app.chrome_appearance().persistent);
     drop(app);
 
-    let mut restored = make_app(FileAppearanceStore::load(&path).unwrap());
+    let mut restored = make_app(FileThemeChoiceStore::load(&path).unwrap());
     assert_eq!(restored.chrome_theme(), AppearanceTheme::Light);
     compose(&mut restored);
     assert_eq!(restored.chrome_theme(), AppearanceTheme::Light);

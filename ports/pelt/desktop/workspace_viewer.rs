@@ -51,8 +51,7 @@ use workbench::{
 };
 
 use crate::appearance::{
-    APPEARANCE_REFERENCE, AppearanceSettingsProvider, AppearanceStore, AppearanceTheme,
-    CHROME_THEME_SETTING, InMemoryAppearanceStore,
+    APPEARANCE_REFERENCE, AppearanceSettingsProvider, AppearanceTheme, CHROME_THEME_SETTING,
 };
 #[cfg(target_os = "windows")]
 use crate::dx12_surface::Dx12SurfaceCache;
@@ -64,6 +63,7 @@ use crate::frisket_surface::{
 #[cfg(target_os = "windows")]
 use crate::scrying_receipt::{ScryingReceiptEngine, ScryingReceiptHost};
 use crate::{WindowingMode, static_viewer};
+use tabard::theme::choice::{InMemoryThemeChoiceStore, ThemeChoiceStore};
 
 mod accessibility;
 mod receipts;
@@ -352,7 +352,7 @@ pub struct WorkspaceViewerConfig {
     pub route_overrides: HashMap<u64, String>,
     /// Caller-owned Pelt appearance storage. Without it Chrome selection stays
     /// in this process only; Pelt does not invent a config-directory owner.
-    pub appearance_store: Option<Box<dyn AppearanceStore>>,
+    pub appearance_store: Option<Box<dyn ThemeChoiceStore>>,
     /// Caller-owned cap and cadence for polling composited surface producers.
     pub surface_resource_policy: SurfaceResourcePolicy,
 }
@@ -407,7 +407,7 @@ impl WorkspaceViewerConfig {
     }
 
     /// Keep Pelt Chrome appearance in a caller-selected store.
-    pub fn with_appearance_store(mut self, store: impl AppearanceStore + 'static) -> Self {
+    pub fn with_appearance_store(mut self, store: impl ThemeChoiceStore + 'static) -> Self {
         self.appearance_store = Some(Box::new(store));
         self
     }
@@ -1174,7 +1174,7 @@ struct WorkspaceApp {
     chrome_address: Option<ChromeAddressInput>,
     chrome_engine_menu: Option<ChromeEngineMenu>,
     chrome_inspector_open: bool,
-    appearance: AppearanceSettingsProvider<Box<dyn AppearanceStore>>,
+    appearance: AppearanceSettingsProvider<Box<dyn ThemeChoiceStore>>,
     chrome_appearance_open: bool,
     appearance_receipt_baseline: Option<AppearanceReceiptBaseline>,
     #[cfg(feature = "tabard-preview")]
@@ -1521,7 +1521,7 @@ impl WorkspaceApp {
             config
                 .appearance_store
                 .take()
-                .unwrap_or_else(|| Box::new(InMemoryAppearanceStore::default())),
+                .unwrap_or_else(|| Box::new(InMemoryThemeChoiceStore::default())),
         );
         Self {
             config,
@@ -1580,7 +1580,7 @@ impl WorkspaceApp {
     }
 
     fn chrome_theme(&self) -> AppearanceTheme {
-        self.appearance.store().theme()
+        AppearanceTheme::of(self.appearance.store().choice())
     }
 
     fn chrome_appearance(&self) -> ChromeAppearance {
