@@ -20,6 +20,7 @@
 //! | [`Surface`] | [`WebSurface`], a canvas | a winit window's surface |
 //! | [`HostWindow`] | [`WebWindow`] | the winit window |
 //! | [`Accessibility`] | [`DomAccessibility`], a DOM mirror with ARIA | an AccessKit tree |
+//! | [`FileChooser`] | [`WebFileChooser`], a file input in the page | the platform's open dialog |
 //!
 //! ## Off wasm, only the mirror's plan compiles
 //!
@@ -39,6 +40,8 @@ pub mod mirror;
 #[cfg(target_arch = "wasm32")]
 mod a11y;
 #[cfg(target_arch = "wasm32")]
+mod files;
+#[cfg(target_arch = "wasm32")]
 mod input;
 #[cfg(target_arch = "wasm32")]
 mod mount;
@@ -47,6 +50,8 @@ mod surface;
 
 #[cfg(target_arch = "wasm32")]
 pub use a11y::DomAccessibility;
+#[cfg(target_arch = "wasm32")]
+pub use files::WebFileChooser;
 #[cfg(target_arch = "wasm32")]
 pub use input::{
     CompositionKind, composition_from_dom, key_press_from_dom, modifiers_from_dom,

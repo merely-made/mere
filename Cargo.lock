@@ -1997,6 +1997,7 @@ dependencies = [
  "genet-scripted-dom",
  "genet-winit-host",
  "layout-dom-api 0.1.1 (git+https://github.com/merely-made/genet.git?rev=1b62fd0b21893d87c864c735aed7e0bfc1c9942e)",
+ "light-file-dialog",
  "meristem",
  "netrender",
  "objc2-app-kit 0.3.2",

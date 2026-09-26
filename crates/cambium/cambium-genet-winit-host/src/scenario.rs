@@ -38,7 +38,9 @@ use std::collections::BTreeSet;
 use std::path::{Path, PathBuf};
 use std::rc::Rc;
 
+use cambium::{FileEvent, FileRequest};
 use cambium_rootstock::meristem_bounds::RootView;
+use cambium_rootstock::{FileAnswer, FileChooser};
 use taproot::{
     Automatable, Driveable, Hit, Outcome, ProbeSurface, Progress, Scenario, Selector,
     SelectorTarget,
@@ -166,6 +168,22 @@ pub struct ScenarioLane<A> {
     errors: Vec<String>,
     pending: Option<PendingCapture>,
     finished: bool,
+    /// A file request waiting for the script's `file` verb.
+    parked_file: Rc<RefCell<Option<FileAnswer>>>,
+    files_installed: bool,
+}
+
+/// The lane's file chooser: it parks a request until a `file` verb answers
+/// it, so a scenario supplies a file without a dialog. A second request
+/// answers the first with nothing chosen.
+struct ParkedFiles(Rc<RefCell<Option<FileAnswer>>>);
+
+impl FileChooser for ParkedFiles {
+    fn open(&mut self, _request: &FileRequest, answer: FileAnswer) {
+        if let Some(earlier) = self.0.borrow_mut().replace(answer) {
+            earlier.send(FileEvent::default());
+        }
+    }
 }
 
 impl<A> ScenarioLane<A> {
@@ -181,6 +199,8 @@ impl<A> ScenarioLane<A> {
             scenario: Some(scenario),
             config,
             captures: Vec::new(),
+            parked_file: Rc::default(),
+            files_installed: false,
             errors: Vec::new(),
             pending: None,
             finished: false,
@@ -215,6 +235,10 @@ impl<A> ScenarioLane<A> {
     {
         if self.finished {
             return;
+        }
+        if !self.files_installed {
+            *ctx.files = Some(Box::new(ParkedFiles(self.parked_file.clone())));
+            self.files_installed = true;
         }
         self.collect_capture::<State, Logic, V>();
         // Hold the steps while a capture is in flight, so the frame read back
@@ -446,8 +470,14 @@ where
     }
 
     /// `resize <width> <height>` in logical px, through the host's window-verb
-    /// queue like every other window verb. Anything else is the application's.
+    /// queue like every other window verb. `file <path>` answers the file
+    /// request waiting with that file, its path taken from the scenario's
+    /// directory, and `file cancel` answers it with nothing chosen. Anything
+    /// else is the application's.
     fn app_step(&mut self, line: &str) -> Result<(), String> {
+        if let Some(argument) = line.strip_prefix("file ") {
+            return self.lane.answer_file(argument.trim());
+        }
         let mut parts = line.split_whitespace();
         if parts.next() == Some("resize") {
             let mut size = || parts.next().and_then(|value| value.parse::<f64>().ok());
@@ -460,6 +490,28 @@ where
             return Ok(());
         }
         self.lane.app.app_step(self.ctx, line)
+    }
+}
+
+impl<A> ScenarioLane<A> {
+    /// Answer the file request waiting, with the file at `argument` or with
+    /// nothing when it is `cancel`.
+    fn answer_file(&mut self, argument: &str) -> Result<(), String> {
+        let answer = self
+            .parked_file
+            .borrow_mut()
+            .take()
+            .ok_or_else(|| "no file request is waiting".to_string())?;
+        if argument == "cancel" {
+            answer.send(FileEvent::default());
+            return Ok(());
+        }
+        let base = self.config.scenario.parent().unwrap_or(Path::new("."));
+        let path = base.join(argument);
+        let file =
+            crate::read_file(&path).ok_or_else(|| format!("file {} unreadable", path.display()))?;
+        answer.send(FileEvent { files: vec![file] });
+        Ok(())
     }
 }
 

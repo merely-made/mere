@@ -673,6 +673,30 @@ where
         cambium_rootstock::document_projection(&dom_ref, layout, core.s.last_focus)
     }
 
+    /// Answer the application's file requests with `files`, a test's own
+    /// chooser. Without one, a request is answered with nothing chosen.
+    pub fn set_file_chooser(&mut self, files: Box<dyn cambium_rootstock::FileChooser>) {
+        self.host.core.s.files = Some(files);
+    }
+
+    /// Deliver the answers a chooser has given, as a frame would, and lay out.
+    /// Returns whether there were any.
+    pub fn deliver_files(&mut self) -> bool {
+        let delivered = self.host.deliver_files();
+        self.relayout();
+        delivered
+    }
+
+    /// Dispatch `event` to `node` as a chooser's answer would arrive, with no
+    /// chooser: how a test or scenario supplies a file.
+    pub fn supply_files(&mut self, node: NodeId, event: cambium::FileEvent) {
+        if let Some(runner) = self.host.core.s.runner.as_mut() {
+            runner.dispatch_file(node, event);
+        }
+        self.after_dispatch();
+        self.relayout();
+    }
+
     /// The DOM node a projected AccessKit node came from.
     pub fn a11y_dom_node(&mut self, id: accesskit::NodeId) -> Option<NodeId> {
         let (_, map) = self.a11y_tree();
@@ -735,6 +759,7 @@ where
 
     /// Run the application's `after_frame` hook, as a presented frame would.
     pub fn after_frame(&mut self) {
+        self.host.deliver_files();
         self.host.with_ctx(crate::Hook::AfterFrame);
     }
 }

@@ -81,6 +81,9 @@ where
     /// cell). Read via `default_prevented` after dispatch to gate the host's
     /// own default action.
     last_default_prevented: bool,
+    /// A file request a view filed in the latest build or rebuild, waiting
+    /// for the host to take it.
+    file_request: Option<crate::FileRequest>,
     phantom: PhantomData<fn() -> (State, Action)>,
 }
 
@@ -123,6 +126,9 @@ where
             Some(FocusRequest::Focus(node)) if dom.borrow().is_live(node) => Some(node),
             _ => None,
         };
+        let file_request = ctx
+            .take_file_request()
+            .filter(|request| dom.borrow().is_live(request.node));
 
         Self {
             dom,
@@ -134,6 +140,7 @@ where
             focus,
             pointer_capture: None,
             last_default_prevented: false,
+            file_request,
             phantom: PhantomData,
         }
     }
@@ -202,6 +209,56 @@ where
                 _ => {},
             }
         }
+        if let Some(request) = self.ctx.take_file_request()
+            && self.node_is_live(request.node)
+        {
+            self.file_request = Some(request);
+        }
+    }
+
+    /// The file request a view filed, once, for the host to answer.
+    pub(crate) fn take_file_request(&mut self) -> Option<crate::FileRequest> {
+        self.file_request.take()
+    }
+
+    /// Route a host's file answer to the [`open_file`](crate::open_file) view
+    /// on `node`. A node that is gone or asked for nothing is ignored.
+    pub(crate) fn dispatch_file(
+        &mut self,
+        logic: &mut impl FnMut(&State) -> V,
+        state: &mut State,
+        node: NodeId,
+        event: crate::FileEvent,
+    ) -> Vec<Action> {
+        if !self.node_is_live(node) {
+            return Vec::new();
+        }
+        let Some(path) = self.ctx.file_handler(node).map(<[ViewId]>::to_vec) else {
+            return Vec::new();
+        };
+        let mut actions = Vec::new();
+        {
+            let Self {
+                view,
+                view_state,
+                root,
+                dom,
+                ..
+            } = self;
+            let mut message = MessageCtx::new(path, DynMessage::new(event));
+            let element = GenetElementMut {
+                node: &mut root.node,
+                dom: dom.clone(),
+                parent: Some(dom.borrow().document()),
+            };
+            if let MessageResult::Action(action) =
+                view.message(view_state, &mut message, element, state)
+            {
+                actions.push(action);
+            }
+        }
+        self.rebuild(logic, state);
+        actions
     }
 
     fn node_is_live(&self, node: NodeId) -> bool {
@@ -1086,6 +1143,20 @@ where
     pub fn dispatch_value(&mut self, target: NodeId, event: ValueEvent) -> Vec<Action> {
         self.tree
             .dispatch_value(&mut self.logic, &mut self.state, target, event)
+    }
+
+    /// The file request a view filed since the host last asked, if any. The
+    /// host shows its chooser for it and answers with
+    /// [`dispatch_file`](Self::dispatch_file).
+    pub fn take_file_request(&mut self) -> Option<crate::FileRequest> {
+        self.tree.take_file_request()
+    }
+
+    /// Dispatch a host's answer to a file request: the chosen files, or none
+    /// when the person cancelled. A test or scenario supplies one the same way.
+    pub fn dispatch_file(&mut self, target: NodeId, event: crate::FileEvent) -> Vec<Action> {
+        self.tree
+            .dispatch_file(&mut self.logic, &mut self.state, target, event)
     }
 
     /// Whether the most recent dispatch had its default action prevented by a

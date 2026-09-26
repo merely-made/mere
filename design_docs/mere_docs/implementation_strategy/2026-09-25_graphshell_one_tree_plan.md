@@ -2,8 +2,8 @@
 
 **Date:** 2026-09-25
 **Status:** in progress, ruled 2026-09-25 (reservoir plan §7 items 39 and
-40). Phase 1, accessibility in the browser, was done on 2026-09-26; phase 2,
-the file seam, is next.
+40). Phases 1 and 2, accessibility in the browser and the file seam, were
+done on 2026-09-26; phase 3, the canvas as a producer, is next.
 **Scope:** Graphshell's browser page becomes one retained Cambium tree. Its
 HTML controls become Cambium components, its display-only Cambium chrome
 joins them, pictograph's canvas renders into the tree as a texture producer,
@@ -61,6 +61,17 @@ Phase 1's rulings, 2026-09-25 and 2026-09-26:
 - **A text field's name.** The test page showed genet naming a text field by
   what was typed in it. Mark chose to fix it in genet's projection over
   reshaping Cambium's field or only recording it.
+
+Phase 2's rulings, 2026-09-26:
+- **Which hosts answer.** "Both hosts now": the winit host answers the same
+  request with the platform's open dialog, so one seam serves the desktop and
+  the browser. The alternative scoped the phase to the web host and left
+  desktop apps on their own dialogs.
+- **The Chrome instrument.** "Claude in Chrome sets it": the test page runs in
+  Mark's Chrome, driven through Claude in Chrome, whose upload tool sets a
+  file on the chooser's input. Everything after the choice is exercised, but
+  not the dialog. The alternatives were Mark choosing a file himself, the one
+  path through the real dialog, or the injected event alone.
 
 ## 2. Findings (verified 2026-09-25)
 
@@ -133,6 +144,15 @@ Phase 1's rulings, 2026-09-25 and 2026-09-26:
   other two, a change of its own.
 - **Five pages mount the view.** `index.html`, `embed.html`, `practice.html`,
   `practice-embed.html` and `co_op.html` all load it through `loader.js`.
+- **A hidden Chrome tab draws no frames** (verified 2026-09-26). Through
+  phase 2's run, the test page's tab in Mark's Chrome read
+  `document.visibilityState` "hidden". A chosen file's answer waited 13
+  seconds undelivered, since the web host's frame loop runs on
+  `requestAnimationFrame` (`schedule_frames` in
+  `cambium-genet-web-host/src/mount.rs`). A screenshot request timed out
+  after 30 seconds but made Chrome run a frame, and the answer landed on it.
+  Scripts and the mirror read throughout. Phase 3's frame times need the
+  window in front.
 
 ## 3. Target shape
 
@@ -250,3 +270,31 @@ this tree.
   - The pages were built from the bump worktree beside test pages under
     `Code/testing/cambium/` with fixed-size canvases, since the hidden
     pane's viewport is 0 by 0.
+- 2026-09-26: phase 2 is done: the file seam, on both hosts.
+  - A component wraps its control in `cambium::open_file(child, requested,
+    filter, handler)`. When `requested` turns true, the tree files a
+    `FileRequest` for that node, as `request_focus` files focus. The answer
+    comes back to the node as a `FileEvent` holding each file's name, media
+    type, modified time and bytes.
+  - Rootstock gives a request to the host's `FileChooser` after dispatch and
+    delivers answers at the start of the next frame. A host with no chooser
+    answers with no files, and `AppCtx.files` lets a hook swap the chooser.
+  - The web host's `WebFileChooser` keeps a hidden file input beside the
+    canvas. A request clicks it, `change` reads the chosen files' bytes and
+    answers, and `cancel` answers with none. The winit host's
+    `DialogFileChooser` opens the platform dialog through
+    `light-file-dialog`, which Graphshell already uses.
+  - The scenario lane parks a request and answers it with `file <path>`,
+    relative to the scenario, or `file cancel`. A `file` step with nothing
+    waiting fails. The winit host's four `files` tests and three new scenario
+    tests cover the seam.
+  - In Mark's Chrome, through Claude in Chrome, the test page's "Open a file"
+    button was pressed through the mirror from page script, with
+    `navigator.userActivation.isActive` false, where the browser's rule is to
+    show no chooser. The upload tool set `chrome-proof.txt` on the input, and
+    the status line then read "File: chrome-proof.txt (42 bytes)", the
+    file's size. A second request took `second-run.txt` (11 bytes) the same
+    way. The Browser pane had shown the same path earlier with `hello.txt`
+    set from script.
+  - Both done-conditions are met, the first by the ruled instrument, which
+    leaves the dialog itself unexercised.
