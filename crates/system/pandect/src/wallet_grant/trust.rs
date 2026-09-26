@@ -132,6 +132,8 @@ pub fn assess_device_grant(
     let roots = wallet_trusted_roots(data_root, master_public_key)?;
     let ledger = load_revocation_ledger(data_root)?;
 
+    // The standing outlives the set it was loaded from, so it keeps the
+    // verdict, not the borrowed conclusion.
     let assess = |certificate: &identity::delegation::SignedDelegationCertificate| {
         validate_chain(
             std::slice::from_ref(certificate),
@@ -141,6 +143,7 @@ pub fn assess_device_grant(
             DEVICE_GRANT_DEPTH,
             now_ms,
         )
+        .map(|_| ())
     };
 
     Ok(GrantStanding {

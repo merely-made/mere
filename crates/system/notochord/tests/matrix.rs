@@ -309,7 +309,7 @@ fn revoking_a_parent_cascades_to_its_child() {
         ),
     )
     .expect("issue revocation");
-    assert!(ledger.fold(&statement));
+    ledger.fold(statement.check().expect("an issued revocation checks"));
     assert_eq!(
         denial(policy.evaluate(&facts(), &request(chain), &ledger, NOW_MS, 0)),
         DenyReason::Delegation(ChainFault::Revoked)

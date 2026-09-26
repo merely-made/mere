@@ -229,7 +229,7 @@ impl LocalNetworkPolicy {
                 .limits
                 .max_delegation_depth
                 .min(self.limits.max_certificates);
-            if let Err(fault) = validate_chain(
+            let leaf = match validate_chain(
                 &claims.delegations,
                 claims.subject,
                 &self.trusted_roots,
@@ -237,9 +237,9 @@ impl LocalNetworkPolicy {
                 depth,
                 now_ms,
             ) {
-                return deny(DenyReason::Delegation(fault));
-            }
-            let leaf = &claims.delegations[claims.delegations.len() - 1].certificate;
+                Ok(leaf) => leaf.certificate(),
+                Err(fault) => return deny(DenyReason::Delegation(fault)),
+            };
             let covered = leaf.scope.domain == claims.action.domain
                 && leaf.scope.resource == claims.network.0
                 && leaf.covers(&claims.action.path, &claims.action.action, now_ms);
