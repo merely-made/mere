@@ -700,10 +700,14 @@ where
     ///
     /// Resolved on the host's next layout against the node's painted rect
     /// there, so a node this dispatch created, or a request made before the
-    /// first layout, is found. One plane moves: the nearest ancestor that
-    /// scrolls vertically and has room to, otherwise the window viewport,
-    /// clamped to its range. Vertical only. A node that no longer exists or
-    /// does not paint is a no-op; requests queued together resolve in order.
+    /// first layout, is found. The nearest plane that can move (an ancestor
+    /// that scrolls vertically and has room to, otherwise the window viewport)
+    /// moves by `align`; each plane outside it, out to the window, then moves
+    /// only as far as the node needs. A container is measured by its
+    /// scrollport, inside its border, and each plane is clamped to its range.
+    /// Caret follow walks the same planes. Vertical only. A node that no
+    /// longer exists or does not paint is a no-op; requests queued together
+    /// resolve in order.
     pub fn scroll_into_view(&mut self, node: NodeId, align: ScrollAlign) {
         self.scroll.push(ScrollIntoView { node, align });
     }
