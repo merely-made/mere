@@ -1,8 +1,9 @@
 # Graphshell on one Cambium tree
 
 **Date:** 2026-09-25
-**Status:** plan, ruled 2026-09-25 (reservoir plan §7 items 39 and 40).
-Nothing implemented. Phase 1 is first.
+**Status:** in progress, ruled 2026-09-25 (reservoir plan §7 items 39 and
+40). Phase 1's mirror landed on `reservoir-v2` on 2026-09-26; its last
+condition, woodshed-web and Redshank's web port, waits on their pin bumps.
 **Scope:** Graphshell's browser page becomes one retained Cambium tree. Its
 HTML controls become Cambium components, its display-only Cambium chrome
 joins them, pictograph's canvas renders into the tree as a texture producer,
@@ -40,6 +41,26 @@ file seam and a browser-proven producer come before any control moves, so
 the page never loses accessibility. The alternatives were to start the move
 with the projection built alongside, or to let the mere panel start the tree
 and plan the full move after V2.
+
+Phase 1's rulings, 2026-09-25 and 2026-09-26:
+- **What the mirror is built from.** Asked which option was more standards
+  compliant, Mark was told genet's neutral projection is. Its roles and
+  states are read from the tree's own ARIA and HTML, so lowering it back to
+  ARIA is close to an identity. AccessKit's roles follow Chromium's internal
+  model, and no standard maps them back. He chose "Neutral, with a leaf
+  bridge": the web host lowers `document_a11y_projection` to ARIA, and a
+  leaf's role and label come from its AccessKit hook, mapped to ARIA's
+  Graphics Module. The alternatives were a document-vocabulary hook on
+  sprigging's Leaf trait, or AccessKit shared through rootstock.
+- **Focus.** "DOM focus follows the tree": a node's element takes DOM focus
+  when the application's focus moves while it holds the page's focus, and
+  keys that reach the mirror go where the canvas's go. The alternative kept
+  focus on the canvas with `aria-activedescendant`.
+- **woodshed and Redshank.** "Bump woodshed, bump redshank": the phase's third
+  condition is met by moving their mere pins, not by a patched local build.
+- **A text field's name.** The test page showed genet naming a text field by
+  what was typed in it. Mark chose to fix it in genet's projection over
+  reshaping Cambium's field or only recording it.
 
 ## 2. Findings (verified 2026-09-25)
 
@@ -98,6 +119,18 @@ and plan the full move after V2.
 
   A Cambium tree also has no `html` or `body`, so a page's base styles go
   on `:root`.
+- **The Browser pane runs a mount while hidden** (verified 2026-09-26).
+  WebGPU has an adapter there, and a canvas sized in CSS pixels lays out,
+  but `requestAnimationFrame` never ticks and Chromium dispatches no focus
+  events. `read_page` with the `all` filter reads the accessibility tree. So
+  the mirror is written at mount and on a reader's action, not only on a
+  frame.
+- **Cambium's checkbox names itself "Checkbox"** unless its author sets
+  `aria-label` (`cambium/src/controls/toggle.rs`), so unlabelled checkboxes
+  all read alike.
+- **woodshed-web predates `Init`'s `fonts` and `images`.** It builds `Init`
+  with three fields at its pinned mere `691f9a0b`, so its pin bump needs the
+  other two, a change of its own.
 - **Five pages mount the view.** `index.html`, `embed.html`, `practice.html`,
   `practice-embed.html` and `co_op.html` all load it through `loader.js`.
 
@@ -175,3 +208,31 @@ this tree.
   The reservoir plan records them as §7 items 39 and 40.
 - 2026-09-25: the mere view's headed proof met three Genet traits the move
   will meet too; §2 records them.
+- 2026-09-26: phase 1's mirror landed on `reservoir-v2` (`c19e1120`), with
+  genet's text-field fix (genet `1b62fd0b218`) and mere's repin to it
+  (`685c830e`).
+  - `cambium_rootstock::document_projection` gives a frame's layout as
+    genet's neutral projection. `cambium-genet-web-host::mirror` lowers it to
+    ARIA, and `a11y` writes one element per node over the canvas, changing
+    only what moved. The canvas is `aria-hidden`, and the mirror is a region
+    named for the application.
+  - The example `a11y_page` mounts one of each control. In the Browser pane,
+    hidden, `read_page` listed the region "Accessibility page" and in it the
+    heading, button "Press", textbox "Name", checkbox "Subscribe", combobox
+    "Colour", tablist "Sections" with tabs One, Two and Three, list items
+    Alpha, Beta and Gamma, and the status line.
+  - Clicks on mirror elements pressed the button, ticked the checkbox, picked
+    tab Two and chose Green, and the mirror showed each before the click
+    returned. A focus moved Cambium's focus to the field, and typed text
+    reached it; the hidden pane fired no focus events, so that path took a
+    dispatched `focusin`.
+  - Typing "Hi" first renamed the field "Hi", with an empty value: genet
+    named every element from its own text before its label, and read a text
+    control's value only from a `value` attribute, while Cambium's field
+    holds its text as children. After the fix and repin, the field keeps the
+    name "Name" and reads "Hi" as its value.
+  - The mirror's six native tests lay the page out through the winit
+    harness and check each control's role, name and states, and each box
+    against where layout painted it.
+  - Left for the phase: woodshed-web and Redshank's web port, by their pin
+    bumps.
