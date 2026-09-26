@@ -87,13 +87,6 @@ impl DerivedKeyAttestation {
         }
         Ok(CheckedAttestation { attestation: self })
     }
-
-    /// Whether the master's signature checks under `salt`.
-    #[cfg(feature = "verify")]
-    #[deprecated(note = "use `check`, which returns the conclusion (insigne proofs plan, phase B)")]
-    pub fn verify(&self, salt: &[u8]) -> bool {
-        self.check(salt).is_ok()
-    }
 }
 
 /// An attestation whose master signature checked: the master vouches for the
