@@ -16,8 +16,9 @@ same day. V2b, the mere view, was assessed and ruled the same day (§7 items 34
 to 40): Graphshell first moves onto one Cambium tree, in its own plan. V2b's
 steps 1 to 3, the component, its headed proof and the route adapter, landed
 and reached origin the same day. Step 4, Graphshell on one Cambium tree, is
-under way: its plan's phase 1, accessibility in the browser, was done on
-2026-09-26, and phase 2, the file seam, is next.
+under way: its plan's phases 1 and 2, accessibility in the browser and the
+file seam, were done on 2026-09-26, and phase 3, the canvas as a producer, is
+next.
 **Scope:** give each data domain one mere, and make every mere of an identity
 openable by any of that identity's applications. The meres are held by the
 device resident, with sessions, a graph journal and an Eidetic archive.
@@ -1404,3 +1405,8 @@ V2b's rulings, all 2026-09-25:
 - 2026-09-26: the one-tree plan's phase 1 is done: woodshed-web and
   Redshank's web port gained the mirror by their pin bumps (woodshed
   `a0910d5`, `d721a80`).
+- 2026-09-26: the one-tree plan's phase 2, the file seam, is done. A
+  component asks for files through `cambium::open_file`. The web host answers
+  from the browser's file chooser, the winit host from the platform dialog,
+  and the scenario lane from a `file` step. A test page read a file set on
+  its chooser in Mark's Chrome.

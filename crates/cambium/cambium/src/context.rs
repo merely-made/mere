@@ -101,6 +101,9 @@ pub struct GenetCtx {
     pointer_handlers: HashMap<NodeId, Vec<ViewId>>,
     /// `NodeId → routing path` for accessible numeric value handlers.
     value_handlers: HashMap<NodeId, Vec<ViewId>>,
+    /// `NodeId → routing path` for [`OpenFile`](crate::OpenFile) views, where
+    /// a host's [`FileEvent`](crate::FileEvent) is dispatched.
+    file_handlers: HashMap<NodeId, Vec<ViewId>>,
     /// `NodeId → routing path` for pointer-hover handlers
     /// ([`OnHover`](crate::OnHover)). Hover routes directly to the nearest
     /// registered ancestor selected by the host's hit-test transition.
@@ -116,6 +119,9 @@ pub struct GenetCtx {
     /// The runner consumes this after the DOM mutation pass, once the target is
     /// attached and its liveness can be checked.
     focus_request: Option<FocusRequest>,
+    /// A file request a view filed during build/rebuild, for the runner to
+    /// hand its host. The latest wins.
+    file_request: Option<crate::FileRequest>,
     /// The portable-child nursery (moveBefore plan S5, cross-parent): children a
     /// [`PortableKeyed`](crate::PortableKeyed) parked because their key left its
     /// list, waiting within the same rebuild pass to be claimed by the sequence
@@ -203,9 +209,11 @@ impl GenetCtx {
             focus_handlers: HashMap::new(),
             pointer_handlers: HashMap::new(),
             value_handlers: HashMap::new(),
+            file_handlers: HashMap::new(),
             hover_handlers: HashMap::new(),
             wheel_handlers: HashMap::new(),
             focus_request: None,
+            file_request: None,
             nursery: HashMap::new(),
         }
     }
@@ -222,6 +230,15 @@ impl GenetCtx {
 
     pub(crate) fn take_focus_request(&mut self) -> Option<FocusRequest> {
         self.focus_request.take()
+    }
+
+    /// File a request for the host's file chooser.
+    pub fn request_file(&mut self, request: crate::FileRequest) {
+        self.file_request = Some(request);
+    }
+
+    pub(crate) fn take_file_request(&mut self) -> Option<crate::FileRequest> {
+        self.file_request.take()
     }
 
     /// Park a portable child whose key left its [`PortableKeyed`](crate::PortableKeyed)
@@ -468,6 +485,21 @@ impl GenetCtx {
     /// Drop the accessible numeric-value handler for `node`.
     pub fn unregister_value(&mut self, node: NodeId) {
         self.value_handlers.remove(&node);
+    }
+
+    /// Register `path` as where a file answer for `node` is dispatched.
+    pub fn register_file(&mut self, node: NodeId, path: Vec<ViewId>) {
+        self.file_handlers.insert(node, path);
+    }
+
+    /// Drop the file-answer route for `node`.
+    pub fn unregister_file(&mut self, node: NodeId) {
+        self.file_handlers.remove(&node);
+    }
+
+    /// The file-answer routing path on `node`, if registered.
+    pub fn file_handler(&self, node: NodeId) -> Option<&[ViewId]> {
+        self.file_handlers.get(&node).map(Vec::as_slice)
     }
 
     /// The accessible numeric-value routing path on `node`, if registered.

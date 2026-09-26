@@ -39,6 +39,7 @@ mod disclosure;
 mod editor;
 mod element;
 mod event;
+mod file;
 mod focus;
 mod focus_request;
 mod focusable;
@@ -184,6 +185,9 @@ pub use summary_body::{SummaryBody, summary_body};
 // Per-tag element-view helpers: `div`, `span`, `p`, `input`, `label`, `a`,
 // `h1`/`h2`/`h3`, `ul`/`ol`/`li`. (No `button` here — `controls::button` is the
 // button view, with a handler.)
+pub use file::{
+    FileEvent, FileFilter, FileRequest, OpenFile, OpenFileState, OpenedFile, open_file,
+};
 pub use frisket::{
     DividerTarget, FRISKET_CSS, FRISKET_TILE_ATTR, PaneView, Slot, SlotKind, close_target,
     content_target, decode_pane_path, divider_target, encode_pane_path, frisket, frisket_with,

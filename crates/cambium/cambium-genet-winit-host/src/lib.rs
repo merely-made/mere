@@ -41,6 +41,7 @@ use genet_scripted_dom::ScriptedDom;
 use std::{cell::RefCell, rc::Rc};
 
 mod decorations;
+mod files;
 mod harness;
 pub mod scenario;
 #[cfg(target_os = "windows")]
@@ -58,6 +59,7 @@ pub use cambium_rootstock::{
     Runner, ScrollAlign, ScrollIntoView, Surface, WindowCommand, WindowCommands, WindowFrame,
     WindowGeometry, ZOOM_LADDER, fit_zoom, ladder_step, read_frame,
 };
+pub use files::{DialogFileChooser, read_file};
 pub use harness::{Harness, inert_hooks};
 pub use scenario::{CaptureRecord, LaneApp, LaneConfig, ProbeSnapshot, ScenarioLane};
 
@@ -803,6 +805,7 @@ where
         let mut a11y = A11yHost::new(self.a11y_waker());
         a11y.attach(window.clone());
         self.s.a11y = Some(Box::new(a11y));
+        self.s.files = Some(Box::new(DialogFileChooser));
         self.s.sheet = sheet;
         self.s.set_resources(fonts, images);
         self.native_window = Some(window.clone());

@@ -76,6 +76,7 @@ where
                 ui_zoom,
                 zoom_changed,
                 leaves: &mut self.s.leaves,
+                files: &mut self.s.files,
                 producers: &mut self.s.producers,
                 set_sheet: &mut self.s.pending_sheet,
                 set_ui_zoom: &mut self.s.pending_ui_zoom,
@@ -488,6 +489,7 @@ where
     }
 
     pub fn redraw(&mut self) {
+        self.deliver_files();
         let frame_started = crate::Instant::now();
         let mut profile = FrameProfile::default();
         // The application's frame hook first: animation drives, leaf syncs,

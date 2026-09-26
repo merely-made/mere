@@ -76,7 +76,10 @@ fn each_control_on_the_page_lowers_to_its_aria_role_and_name() {
             .collect()
     };
     assert_eq!(named("heading"), [Some("Accessibility page".into())]);
-    assert_eq!(named("button"), [Some("Press".into())]);
+    assert_eq!(
+        named("button"),
+        [Some("Press".into()), Some("Open a file".into())]
+    );
     assert_eq!(named("textbox"), [Some("Name".into())]);
     assert_eq!(named("checkbox"), [Some("Subscribe".into())]);
     assert_eq!(named("combobox"), [Some("Colour".into())]);

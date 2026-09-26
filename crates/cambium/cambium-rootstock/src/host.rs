@@ -649,6 +649,9 @@ where
     pub set_ui_zoom: &'a mut Option<f32>,
     /// The custom-paint leaf registry the paint pass renders from.
     pub leaves: &'a mut sprigging::LeafRegistry<u64>,
+    /// The file chooser that answers views' file requests. A hook may put its
+    /// own in, as a scenario lane does to answer from its script.
+    pub files: &'a mut Option<Box<dyn crate::FileChooser>>,
     /// Same-device viewport producers, keyed to existing custom-leaf slots.
     pub producers: &'a mut crate::ProducerRegistry,
     /// Set to swap the stylesheet; the host relayouts under the new sheet.
@@ -888,6 +891,10 @@ where
     /// supplies a projection onto the live document instead.
     pub a11y: Option<Box<dyn Accessibility>>,
     pub(crate) a11y_wake: Arc<AtomicBool>,
+    /// The platform's file chooser, which answers a view's file request.
+    pub files: Option<Box<dyn crate::FileChooser>>,
+    /// File answers waiting for the next frame.
+    pub(crate) file_answers: crate::files::FileAnswers,
     /// Whether presentation is suspended: a close policy hid the root window,
     /// or, on a future browser source, the tab went background. Portable fact;
     /// only *how* a host hides (set_visible, document.hidden) is platform.
@@ -974,6 +981,8 @@ where
             last_hover_hit: None,
             anim_base: crate::Instant::now(),
             a11y: None,
+            files: None,
+            file_answers: Default::default(),
             a11y_wake: Arc::new(AtomicBool::new(false)),
             hidden: false,
             commands: WindowCommands::new(),
@@ -1269,6 +1278,7 @@ where
                 ui_zoom,
                 zoom_changed,
                 leaves: &mut self.s.leaves,
+                files: &mut self.s.files,
                 producers: &mut self.s.producers,
                 set_sheet: &mut self.s.pending_sheet,
                 set_ui_zoom: &mut self.s.pending_ui_zoom,
@@ -1356,6 +1366,7 @@ where
                 ui_zoom,
                 zoom_changed,
                 leaves: &mut self.s.leaves,
+                files: &mut self.s.files,
                 producers: &mut self.s.producers,
                 set_sheet: &mut self.s.pending_sheet,
                 set_ui_zoom: &mut self.s.pending_ui_zoom,
@@ -1418,6 +1429,7 @@ where
     /// host-owned IME and repaint policy.
     pub fn after_dispatch(&mut self) {
         self.with_ctx(Hook::AfterDispatch);
+        self.open_requested_file();
         let Some(window) = self.s.window.as_ref() else {
             return;
         };
@@ -1435,6 +1447,51 @@ pub enum Hook {
     AfterDispatch,
     AfterFrame,
     AfterWake,
+}
+
+impl<State, Logic, V> Host<State, Logic, V>
+where
+    State: 'static,
+    Logic: FnMut(&State) -> V + 'static,
+    V: RootView<State>,
+{
+    /// Hand a file request a view filed in the latest dispatch to the
+    /// platform's chooser. With no chooser, answer at once with nothing chosen.
+    fn open_requested_file(&mut self) {
+        let Some(request) = self
+            .s
+            .runner
+            .as_mut()
+            .and_then(|runner| runner.take_file_request())
+        else {
+            return;
+        };
+        let answer =
+            crate::FileAnswer::new(request.node, self.s.file_answers.clone(), self.wake.clone());
+        match self.s.files.as_mut() {
+            Some(files) => files.open(&request, answer),
+            None => answer.send(cambium::FileEvent::default()),
+        }
+    }
+
+    /// Dispatch every file answer waiting, each to the element that asked, as
+    /// an input dispatch. Returns whether there were any.
+    pub fn deliver_files(&mut self) -> bool {
+        let answers = match self.s.file_answers.lock() {
+            Ok(mut answers) => std::mem::take(&mut *answers),
+            Err(_) => return false,
+        };
+        if answers.is_empty() {
+            return false;
+        }
+        if let Some(runner) = self.s.runner.as_mut() {
+            for (node, event) in answers {
+                runner.dispatch_file(node, event);
+            }
+        }
+        self.after_dispatch();
+        true
+    }
 }
 
 impl<State, Logic, V> Host<State, Logic, V>

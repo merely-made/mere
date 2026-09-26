@@ -24,6 +24,7 @@ use wasm_bindgen::prelude::Closure;
 use web_sys::HtmlCanvasElement;
 
 use crate::a11y::{DomAccessibility, MirrorHandle};
+use crate::files::WebFileChooser;
 use crate::input::{
     CompositionKind, composition_from_dom, key_press_from_dom, wheel_delta_from_dom,
 };
@@ -117,6 +118,7 @@ where
     let a11y = DomAccessibility::new(canvas.clone(), label)?;
     let mirror = a11y.handle();
     s.a11y = Some(Box::new(a11y));
+    s.files = Some(Box::new(WebFileChooser::new(&canvas)?));
     s.window = Some(Box::new(window.clone()));
     s.surface = Some(Box::new(surface));
 

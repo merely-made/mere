@@ -12,10 +12,13 @@
 //! the lost-capture path testable, and leaves real captures to the headed smoke.
 
 use std::cell::RefCell;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::rc::Rc;
 
-use cambium::{AnyView, GenetCtx, GenetElement, clickable, el, focusable, text};
+use cambium::{
+    AnyView, FileEvent, FileFilter, GenetCtx, GenetElement, PointerClick, button, clickable, el,
+    focusable, open_file, text,
+};
 use cambium_genet_winit_host::{
     AppCtx, Harness, HostHooks, Init, LaneApp, LaneConfig, ProbeSnapshot, ScenarioLane,
     WindowCommand, inert_hooks,
@@ -25,23 +28,43 @@ use cambium_genet_winit_host::{
 struct App {
     count: usize,
     events: Vec<String>,
+    asking: bool,
+    opened: String,
 }
 
 type Child = Box<dyn AnyView<App, (), GenetCtx, GenetElement>>;
 type Logic = fn(&App) -> Child;
 
 fn root(state: &App) -> Child {
-    Box::new(focusable(clickable(
-        el("button", text(format!("Count {}", state.count))).attr("class", "count"),
-        |s: &mut App, _| {
-            s.count += 1;
-            let n = s.count;
-            s.events.push(format!("count {n}"));
-        },
-    )))
+    Box::new(el(
+        "main",
+        (
+            focusable(clickable(
+                el("button", text(format!("Count {}", state.count))).attr("class", "count"),
+                |s: &mut App, _| {
+                    s.count += 1;
+                    let n = s.count;
+                    s.events.push(format!("count {n}"));
+                },
+            )),
+            open_file(
+                button("Open", |s: &mut App, _: PointerClick| s.asking = true)
+                    .attr("class", "open"),
+                state.asking,
+                FileFilter::extensions(["txt"]),
+                |s: &mut App, event: FileEvent| {
+                    s.asking = false;
+                    s.opened = event
+                        .files
+                        .first()
+                        .map_or_else(|| "nothing".to_string(), |file| file.name.clone());
+                },
+            ),
+        ),
+    ))
 }
 
-const SHEET: &str = ".count { display: block; width: 120px; height: 32px; }";
+const SHEET: &str = ".count, .open { display: block; width: 120px; height: 32px; }";
 
 struct TestLane;
 
@@ -51,7 +74,9 @@ impl LaneApp<App, Logic, Child> for TestLane {
     }
 
     fn snapshot(&self, ctx: &AppCtx<'_, App, Logic, Child>) -> ProbeSnapshot {
-        ProbeSnapshot::default().with_field("count", ctx.runner.state().count.to_string())
+        ProbeSnapshot::default()
+            .with_field("count", ctx.runner.state().count.to_string())
+            .with_field("opened", ctx.runner.state().opened.clone())
     }
 
     fn drain_events(&mut self, ctx: &mut AppCtx<'_, App, Logic, Child>) -> Vec<String> {
@@ -76,7 +101,12 @@ fn scratch(test: &str) -> PathBuf {
 /// Run `scenario` to its receipt and return the receipt text, with the harness
 /// for the assertions the receipt cannot make.
 fn run(test: &str, scenario: &str) -> (String, Harness<App, Logic, Child>) {
-    let dir = scratch(test);
+    run_in(&scratch(test), scenario)
+}
+
+/// [`run`], in a directory the test has already put files in.
+fn run_in(dir: &Path, scenario: &str) -> (String, Harness<App, Logic, Child>) {
+    let dir = dir.to_path_buf();
     let path = dir.join("test.scn");
     std::fs::write(&path, scenario).expect("scenario file");
     let config = LaneConfig {
@@ -163,6 +193,37 @@ fn a_capture_that_never_lands_fails_rather_than_hangs() {
     let (receipt, _) = run("capture", "capture never\n");
     assert!(receipt.starts_with("RESULT fail"), "{receipt}");
     assert!(receipt.contains("capture never never landed"), "{receipt}");
+}
+
+#[test]
+fn a_scenario_supplies_a_file_through_the_same_event_without_a_dialog() {
+    // The file sits beside the scenario, whose directory the path is read from.
+    let dir = scratch("file");
+    std::fs::write(dir.join("hello.txt"), "hi").expect("fixture file");
+    let (receipt, h) = run_in(
+        &dir,
+        "click role:button Open\nsettle 1\nfile hello.txt\nsettle 1\nassert snap opened == hello.txt\n",
+    );
+    assert!(receipt.starts_with("RESULT ok"), "{receipt}");
+    assert_eq!(h.state().opened, "hello.txt");
+    assert!(!h.state().asking);
+}
+
+#[test]
+fn a_cancelled_file_request_answers_with_nothing() {
+    let (receipt, h) = run(
+        "file-cancel",
+        "click role:button Open\nsettle 1\nfile cancel\nsettle 1\nassert snap opened == nothing\n",
+    );
+    assert!(receipt.starts_with("RESULT ok"), "{receipt}");
+    assert!(!h.state().asking);
+}
+
+#[test]
+fn a_file_with_no_request_waiting_is_loud() {
+    let (receipt, _) = run("file-unasked", "file hello.txt\n");
+    assert!(receipt.starts_with("RESULT fail"), "{receipt}");
+    assert!(receipt.contains("no file request is waiting"), "{receipt}");
 }
 
 #[test]

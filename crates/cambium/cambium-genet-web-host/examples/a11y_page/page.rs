@@ -2,13 +2,14 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-//! The accessibility page: one of each control the one-tree plan's phase 1
-//! names, and a status line that says what a reader's last action did. The
-//! browser example mounts it, and the mirror's native tests lay it out.
+//! The test page for the one-tree plan's phases 1 and 2: one of each control
+//! phase 1 names, a button that opens a file, and a status line that says what
+//! the last action did. The browser example mounts it, and the mirror's native
+//! tests lay it out.
 
 use cambium::{
-    AnyView, GenetCtx, GenetElement, PointerClick, SelectState, TabStrip, TextInput, button,
-    checkbox, el, lens, select, tab_strip, text_field,
+    AnyView, FileEvent, FileFilter, GenetCtx, GenetElement, PointerClick, SelectState, TabStrip,
+    TextInput, button, checkbox, el, lens, open_file, select, tab_strip, text_field,
 };
 
 pub const COLOURS: [&str; 3] = ["Red", "Green", "Blue"];
@@ -20,6 +21,10 @@ pub struct Page {
     pub subscribed: bool,
     pub colour: SelectState,
     pub tabs: TabStrip,
+    /// Whether the page is asking its host for a file.
+    pub asking: bool,
+    /// The last file opened, with its size.
+    pub opened: Option<String>,
 }
 
 impl Default for Page {
@@ -32,6 +37,8 @@ impl Default for Page {
             subscribed: false,
             colour: SelectState::new(0).with_label("Colour"),
             tabs,
+            asking: false,
+            opened: None,
         }
     }
 }
@@ -56,6 +63,21 @@ pub fn page(page: &Page) -> Child {
                 page.presses += 1
             })
             .attr("id", "press"),
+            open_file(
+                button("Open a file", |page: &mut Page, _: PointerClick| {
+                    page.asking = true
+                })
+                .attr("id", "open-file"),
+                page.asking,
+                FileFilter::default(),
+                |page: &mut Page, event: FileEvent| {
+                    page.asking = false;
+                    page.opened = event
+                        .files
+                        .first()
+                        .map(|file| format!("{} ({} bytes)", file.name, file.bytes.len()));
+                },
+            ),
             el(
                 "label",
                 (
@@ -90,10 +112,11 @@ pub fn page(page: &Page) -> Child {
 /// What the page says of itself, so a reader's action shows in the mirror.
 pub fn status(page: &Page) -> String {
     format!(
-        "Pressed {} times. Subscribed: {}. Colour: {}. Tab: {}.",
+        "Pressed {} times. Subscribed: {}. Colour: {}. Tab: {}. File: {}.",
         page.presses,
         if page.subscribed { "yes" } else { "no" },
         COLOURS.get(page.colour.selected).unwrap_or(&""),
         TABS.get(page.tabs.selected).unwrap_or(&""),
+        page.opened.as_deref().unwrap_or("none"),
     )
 }
