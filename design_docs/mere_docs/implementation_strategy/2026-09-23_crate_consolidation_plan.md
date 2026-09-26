@@ -5,7 +5,9 @@
 **Status:** in progress, 2026-09-23. C1-C3's clear-cut moves are landed and
 pushed. Mark ruled every open question the same day (see Rulings): C4's folds
 are in progress in this session, insigne's delegation split is the dramatis
-session's, and chatelaine waits on a CXF-shaped taxonomy.
+session's (phase A landed 2026-09-24 as `5364dfa0`; phases B to D follow in
+the [insigne proofs plan](../../dramatis_docs/implementation_strategy/2026-09-23_insigne_proofs_plan.md)),
+and chatelaine waits on a CXF-shaped taxonomy.
 
 ## The ruling this serves
 
@@ -46,7 +48,7 @@ the direction that makes no dependency cycle.
 | `mere-alembic` | the three memory levels, behind its `recall` feature | `pandect::memory_levels` | landed `1bda73d5` |
 | `mien` | standing (event grammar, ledger, persona chains and vault, gate, wire, store) and the composite reputation lens | `gemot::moot::standing`, `moothold::concord` | landed `a1551086` |
 | `chatelaine` | the secret-item taxonomy, shaped against CXF's credential kinds | castellan's secret-free OTP item types, once the taxonomy exists | ruled: design first |
-| `insigne` | presentable proofs: typed keys, delegation certificates and revocations, derived-key attestations | gaz's `TypedKey`; personae's delegation data types | `TypedKey` landed `0f3f854f`; delegation split ruled, in progress (dramatis session) |
+| `insigne` | presentable proofs: typed keys, delegation certificates and revocations, derived-key attestations | gaz's `TypedKey`; personae's delegation data types | `TypedKey` landed `0f3f854f`; the delegation types landed `5364dfa0` (insigne proofs plan, phase A); phases B to D open (dramatis session) |
 | `tabard` | theme and stylesheet authoring over tinct, illume and CSS | registry's theme module, the smolweb palettes, Pelt's theme persistence | ruled 2026-09-24; see C2a |
 | `dramatis` | the tier facade | none misplaced | nothing to move |
 | `mere-apparatus` | the inspector pane | already its own code | nothing to move |
@@ -189,6 +191,10 @@ taxonomy), so those crates publish once with their real contents; genet's forks 
 `genet-parley` and `genet-fontique` 0.10.0) keep their upstream-derived
 numbers and are listed with their own republish rule; lockstep
 `version.workspace` follows at the first release.
+
+Clarified 2026-09-26: insigne's part of the dramatis tier lands with its
+proofs plan's phase B, when a check returns a local conclusion instead of a
+`bool`, so insigne publishes its settled API once (Mark: "after B").
 
 ### C6. Registry names
 
@@ -348,3 +354,12 @@ crate inventory at the Code root.
   (`cambium::nematic`, errand and tabard optional behind it); `git mv` keeps
   its history. cambium tests 229 without the feature and 236 with it (the
   moved 7); the lock drops the crate's package. Its crates.io name joins C6.
+- 2026-09-26. insigne's phase A landed 2026-09-24 (`5364dfa0`): personae's
+  delegation and attestation types are in insigne's core, the checks behind
+  its `verify` feature, and issuing stays in personae as the `Issue` trait.
+  Mark ruled that the C5 baseline waits for its phase B. The dramatis session
+  also moved djinn's knot pin from `c6d5b9e` to knot's main (`5ad3f67`), which
+  no longer names `graphshell-stdio`. The lock drops that git-sourced copy and
+  genet `532f1fad`'s second `fleece` and `layout-dom-api`, leaving one genet
+  rev and no mere package from git. The portable gate passes at 1,521
+  packages.
