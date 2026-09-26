@@ -16,8 +16,9 @@
 //! so nothing is measured and the bar works wherever it is docked; Escape and a
 //! click outside close it and return focus to the chip. The chips sit above an
 //! open popover's click-outside layer, so a click on another chip opens that
-//! one in one step. A long message gives way first: it is cut with an ellipsis,
-//! and the chips keep their size, each label on one line.
+//! one in one step. A long message gives way first: it is cut, and the chips
+//! keep their size, each label on one line. The sheet asks for an ellipsis at
+//! the cut, which Genet does not paint yet.
 //!
 //! Severity rides as `data-severity` (`quiet`, `warning`, `refused`) on the
 //! message and on each chip, for the host's sheet to weight. The message is a
