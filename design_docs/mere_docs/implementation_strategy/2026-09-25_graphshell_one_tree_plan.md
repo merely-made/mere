@@ -74,6 +74,24 @@ Phase 2's rulings, 2026-09-26:
   not the dialog. The alternatives were Mark choosing a file himself, the one
   path through the real dialog, or the injected event alone.
 
+Phase 3's rulings, 2026-09-26:
+- **The scene path.** "Lend the host renderer": `ProducerContext` gains the
+  host's `RenderCore`, and the canvas's producer rasterizes pictograph's
+  `Scene` under its own key, as `GpuPresenter` does today. The alternatives
+  were a `SceneProducer` kind that rootstock rasterizes, or a second netrender
+  renderer booted by the producer.
+- **The proof page.** "A Graphshell page": a new page in
+  `ports/graphshell/web` mounts a Cambium tree with the canvas as a producer.
+  It is built into the same bundle, run by the same headed runner and lane,
+  and takes `nodes` and `seed` parameters. The alternative was a Cambium
+  web-host example.
+- **Frame times.** "Add GPU timestamps": for each path and graph, while the
+  layout moves and again idle, record rAF-to-rAF intervals (p50, p95, max),
+  per-frame CPU time (p50, p95), the producer's render and stage
+  microseconds, and WebGPU timestamp queries around the raster work. Every
+  run records visibility and fails if the page was hidden. The alternatives
+  were pacing and CPU work alone, or pacing only.
+
 ## 2. Findings (verified 2026-09-25)
 
 - **The page has three layers.**
@@ -158,6 +176,26 @@ Phase 2's rulings, 2026-09-26:
   after 30 seconds but made Chrome run a frame, and the answer landed on it.
   Scripts and the mirror read throughout. Phase 3's frame times need the
   window in front.
+- **Pictograph hands over a scene; a producer returns a texture** (verified
+  2026-09-26). `Canvas::frame(w, h)` returns a netrender `Scene` and whether
+  the layout moves (`pictograph/src/canvas/frame.rs`), and `GpuPresenter`
+  rasterizes it with genet's `RenderCore`. A `TextureProducer` gets only the
+  host's device and queue, built in one place
+  (`cambium-rootstock/src/producer/registry.rs`), while the web host's
+  `WebSurface` holds the same kind of `RenderCore`. Input and picking are
+  pictograph's own: `pointer_down`, `pointer_up`, `wheel` and
+  `node_at_screen` (`pictograph/src/canvas/input.rs`).
+- **GPU timestamps need a device feature and pass markers** (verified
+  2026-09-26). This machine's Chrome 153, on an NVIDIA Lovelace adapter,
+  offers `timestamp-query`. Genet's `RenderCore` asked for no optional
+  features until genet `0cf4f30ba0f`. WebGPU writes timestamps only at pass
+  boundaries, and netrender's passes take none, so the GPU span is bracketed
+  by marker passes around the raster work and includes any GPU idle between
+  submissions.
+- **The headed runner shows its page** (verified 2026-09-26).
+  `run-graphshell-web-scenario.ps1` launches the same Chrome with a profile
+  of its own in a new 1,400 by 900 window. Before phase 3 nothing timed
+  Graphshell's frames, and nothing generated a large graph.
 
 ## 3. Target shape
 
@@ -306,3 +344,7 @@ this tree.
 - 2026-09-26: the D2 audit of this plan and the mere view's receipt
   (`support/doc-audit/d2/batch_23_one_tree_plan_and_receipt.md`) found five
   stale claims, four here and one in the receipt, and corrected them.
+- 2026-09-26: phase 3 was assessed and ruled (§1). For its GPU timestamps,
+  netrender `c8c09f16b` adds `NetrenderOptions::optional_features`, and
+  genet `0cf4f30ba0f` forwards it into `RenderCore`'s boot, with a test that
+  fails when the forwarding is removed. Mere repinned to both.
