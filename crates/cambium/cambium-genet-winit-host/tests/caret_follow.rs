@@ -9,7 +9,8 @@
 //! window, and a caret that has not moved leaves the reader's scroll alone.
 //!
 //! Sixty lines of 20px make the field 1200px tall, in a 300px window or a
-//! 200px pane.
+//! 200px pane. A lead block above the pane is empty unless a test gives it
+//! height.
 
 use cambium::{
     AnyView, CaretPosition, CaretSelection, GenetCtx, GenetElement, TextCommand, TextInput, el,
@@ -36,21 +37,28 @@ const IN_WINDOW: &str = "";
 /// The field grows with its text inside a pane that scrolls.
 const IN_PANE: &str = "#pane { height:200px; overflow:auto; }";
 
+/// The same pane, itself below the 300px window.
+const IN_PANE_BELOW: &str = "#lead { height:400px; } #pane { height:200px; overflow:auto; }";
+
 fn source() -> String {
     (0..60).map(|line| format!("line {line}\n")).collect()
 }
 
 fn root(_: &Doc) -> Child {
-    Box::new(
-        el(
-            "div",
-            lens(
-                |text: &mut TextInput| textarea_typed(text),
-                |doc: &mut Doc| &mut doc.text,
-            ),
-        )
-        .attr("id", "pane"),
-    )
+    Box::new(el(
+        "div",
+        (
+            el("div", ()).attr("id", "lead"),
+            el(
+                "div",
+                lens(
+                    |text: &mut TextInput| textarea_typed(text),
+                    |doc: &mut Doc| &mut doc.text,
+                ),
+            )
+            .attr("id", "pane"),
+        ),
+    ))
 }
 
 fn host(layout: &str) -> Host {
@@ -103,14 +111,19 @@ fn by_id(host: &Host, id: &str) -> NodeId {
 fn caret_to_end(host: &mut Host) {
     host.click_at(20.0, 10.0);
     assert!(host.focus().is_some(), "the click focused the field");
-    let end = CaretPosition {
-        byte: source().len(),
+    caret_at(host, source().len());
+}
+
+/// Put the caret at `byte` of the field's text.
+fn caret_at(host: &mut Host, byte: usize) {
+    let at = CaretPosition {
+        byte,
         ..CaretPosition::default()
     };
     host.update(|doc| {
         doc.text.apply(TextCommand::SetSelection(CaretSelection {
-            anchor: end,
-            focus: end,
+            anchor: at,
+            focus: at,
         }));
     });
 }
@@ -145,6 +158,37 @@ fn a_moved_caret_scrolls_its_pane_and_not_the_window() {
     assert!(
         y >= 0.0 && y + height <= 200.0,
         "the caret at {y}..{} shows in the 200px pane",
+        y + height
+    );
+}
+
+/// The pane is itself below the window: scrolling it alone would leave the
+/// caret out of sight, so the window follows.
+#[test]
+fn a_moved_caret_brings_a_pane_below_the_window_along() {
+    let mut host = host(IN_PANE_BELOW);
+    host.tab(true);
+    assert!(host.focus().is_some(), "Tab focused the field");
+    // Tab leaves the caret at the end and follows it there; start again from
+    // the first line, with the window back at its top.
+    caret_at(&mut host, 0);
+    host.move_to(100.0, 50.0);
+    host.wheel(0.0, -1000.0);
+    assert_eq!(host.viewport_scroll(), (0.0, 0.0));
+    caret_at(&mut host, source().len());
+    let pane = by_id(&host, "pane");
+    assert!(
+        host.element_scroll(pane).1 > 0.0,
+        "the pane scrolled to the caret"
+    );
+    assert!(
+        host.viewport_scroll().1 > 0.0,
+        "the window scrolled to the pane"
+    );
+    let (_, y, _, height) = host.caret_rect().expect("the caret paints");
+    assert!(
+        y >= 0.0 && y + height <= 300.0,
+        "the caret at {y}..{} shows in the 300px window",
         y + height
     );
 }
