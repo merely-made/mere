@@ -661,6 +661,18 @@ where
         cambium_winit_a11y::project_tree(&dom_ref, layout, &mut core.s.leaves, core.s.last_focus)
     }
 
+    /// Project this frame's layout into genet's neutral accessibility
+    /// projection, as the browser host does before lowering it to ARIA.
+    pub fn a11y_projection(&self) -> cambium_rootstock::DocumentA11yProjection {
+        let core = &self.host.core;
+        let (Some(runner), Some(layout)) = (core.s.runner.as_ref(), core.s.layout.as_ref()) else {
+            panic!("a11y_projection needs a laid-out harness: call layout_at first");
+        };
+        let dom = runner.dom();
+        let dom_ref = dom.borrow();
+        cambium_rootstock::document_projection(&dom_ref, layout, core.s.last_focus)
+    }
+
     /// The DOM node a projected AccessKit node came from.
     pub fn a11y_dom_node(&mut self, id: accesskit::NodeId) -> Option<NodeId> {
         let (_, map) = self.a11y_tree();

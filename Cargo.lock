@@ -1967,13 +1967,19 @@ dependencies = [
 name = "cambium-genet-web-host"
 version = "0.1.0"
 dependencies = [
+ "accesskit",
  "cambium",
+ "cambium-genet-winit-host",
  "cambium-rootstock",
+ "console_error_panic_hook",
+ "document-session-api",
  "genet-render-host",
  "genet-scripted-dom",
  "js-sys",
+ "layout-dom-api 0.1.1 (git+https://github.com/merely-made/genet.git?rev=18e41e44c369426b1566c45a91850e54f11f277a)",
  "netrender",
  "wasm-bindgen",
+ "wasm-bindgen-futures",
  "web-sys",
  "wgpu",
 ]
@@ -2012,6 +2018,7 @@ version = "0.1.0"
 dependencies = [
  "cambium",
  "cambium-winit",
+ "document-session-api",
  "genet-livery",
  "genet-render",
  "genet-render-host",
@@ -2604,6 +2611,16 @@ checksum = "4ca0197aee26d1ae37445ee532fefce43251d24cc7c166799f4d46817f1d3973"
 dependencies = [
  "crossbeam-utils",
  "portable-atomic",
+]
+
+[[package]]
+name = "console_error_panic_hook"
+version = "0.1.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a06aeb73f470f66dcdbf7223caeebb85984942f22f1adb2a088cf9668146bbbc"
+dependencies = [
+ "cfg-if",
+ "wasm-bindgen",
 ]
 
 [[package]]

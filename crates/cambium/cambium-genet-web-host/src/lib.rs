@@ -19,32 +19,42 @@
 //! |---|---|---|
 //! | [`Surface`] | [`WebSurface`], a canvas | a winit window's surface |
 //! | [`HostWindow`] | [`WebWindow`] | the winit window |
-//! | [`Accessibility`] | [`DomAccessibility`] | an AccessKit tree |
+//! | [`Accessibility`] | [`DomAccessibility`], a DOM mirror with ARIA | an AccessKit tree |
 //!
-//! ## The crate compiles to nothing off wasm
+//! ## Off wasm, only the mirror's plan compiles
 //!
-//! Its lib root is `#![cfg(target_arch = "wasm32")]`, so a native
-//! `cargo check --workspace` sees an empty crate rather than a red one. That
-//! is deliberate and it has a cost worth stating: a green workspace check says
-//! nothing about this crate, because a target cargo never builds cannot fail.
-//! Check it for the target it is for:
+//! Everything that touches the browser is `#[cfg(target_arch = "wasm32")]`,
+//! so a native `cargo check --workspace` sees only [`mirror`], the pure
+//! lowering of the accessibility projection, whose tests run natively. That
+//! has a cost worth stating: a green workspace check says nothing about the
+//! rest of this crate, because a target cargo never builds cannot fail. Check
+//! it for the target it is for:
 //!
 //! ```text
 //! cargo check -p cambium-genet-web-host --target wasm32-unknown-unknown
 //! ```
-#![cfg(target_arch = "wasm32")]
 
+pub mod mirror;
+
+#[cfg(target_arch = "wasm32")]
 mod a11y;
+#[cfg(target_arch = "wasm32")]
 mod input;
+#[cfg(target_arch = "wasm32")]
 mod mount;
+#[cfg(target_arch = "wasm32")]
 mod surface;
 
+#[cfg(target_arch = "wasm32")]
 pub use a11y::DomAccessibility;
+#[cfg(target_arch = "wasm32")]
 pub use input::{
     CompositionKind, composition_from_dom, key_press_from_dom, modifiers_from_dom,
     wheel_delta_from_dom,
 };
+#[cfg(target_arch = "wasm32")]
 pub use mount::{Mounted, mount};
+#[cfg(target_arch = "wasm32")]
 pub use surface::{WebSurface, WebWindow};
 
 /// How far one wheel line scrolls, in logical pixels.

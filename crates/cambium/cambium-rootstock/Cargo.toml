@@ -20,6 +20,9 @@ cambium = { version = "0.3.3", path = "../cambium" }
 # machinery, not an event-source concern.
 genet-livery = { workspace = true }
 genet-render = { workspace = true }
+# genet's renderer-neutral accessibility projection, which a host without an
+# AccessKit adapter lowers to its own platform's tree.
+document-session-api = { workspace = true }
 # The DOM the host lays out and routes against, and the leaf registry a
 # custom-paint leaf describes itself through. Both are host machinery, not
 # event-source concerns.
