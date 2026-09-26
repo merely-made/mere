@@ -14,7 +14,7 @@ await a headed run. Step 5, djinn's routes, landed on 2026-09-25 with its
 two-process receipt, meeting V2's done-conditions (§8), and reached origin the
 same day. V2b, the mere view, was assessed and ruled the same day (§7 items 34
 to 40): Graphshell first moves onto one Cambium tree, in its own plan. V2b's
-steps 1 and 2, the component and its headed proof, landed on `reservoir-v2`
+steps 1 and 2, the component and its headed proof, landed and reached origin
 the same day; step 3, the route adapter, is next.
 **Scope:** give each data domain one mere, and make every mere of an identity
 openable by any of that identity's applications. The meres are held by the
@@ -1338,3 +1338,13 @@ V2b's rulings, all 2026-09-25:
   `tests/host_routing.rs` now presses nodes through the host's real routing
   without a window. The crate's 13 tests, cambium's 231 and sprigging's 28
   pass.
+- 2026-09-25: V2b steps 1 and 2 reached origin. Main had taken two genet
+  repins meanwhile, to `6afb472a0c6` and `18e41e44c36`, and was merged in
+  twice (`aff71f1f`, `fc3f3c3f`); each merge also moved mere-view's lock
+  entry onto the repinned `layout-dom-api`. The repins had left
+  `graphshell-web` at `5621ca05768`, so the page linked two genets and no
+  longer compiled. Its genet rows moved to `18e41e44c36` (`065c2336`), and it
+  checks, builds and binds for wasm32 again. On `18e41e44c36` the nine
+  scenarios pass again; the frames changed only where buttons sit on their
+  line boxes, and were reviewed whole
+  ([receipt](../testing/2026-09-25_mere_view_headed_receipt.md)).
