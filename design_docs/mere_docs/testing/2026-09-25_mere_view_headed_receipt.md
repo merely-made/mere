@@ -86,6 +86,17 @@ Each of these was fixed before this revision, by the commits named.
    has no clip. This is a renderer fault at netrender `aba7d837`; it is
    avoided here, not fixed.
 
+## Re-run on genet 18e41e44c36
+
+At mere `065c2336`, after main's two genet repins were merged in
+(`6afb472a0c6`, then `18e41e44c36`), all nine scenarios pass again with 21
+captures. Every frame changed, and only where Genet now aligns a button on
+its last line box. The bar and the sessions list are shorter by the strut's
+descent, and in the side tile the graph sits about 9 px higher with the same
+layout. In `r2_side_declined`, Session 4's steps, which the list's scroll
+edge had cut off, now nearly all show. The frames at `5c1905b3` are kept
+under `Code/testing/mere/scenarios/mere-view-at-5c1905b3/`.
+
 ## Boundary
 
 - **Only the native winit host, on Windows at 2× scale.** The browser host
@@ -97,5 +108,9 @@ Each of these was fixed before this revision, by the commits named.
   log), but no reader was run.
 - **Culling estimates widths:** 5.6 px per character at the labels' 10 px
   size.
+- **A focused label can cover another node.** Culling weighs labels against
+  labels, not against node dots. In `r4_side` the focused Archive 2025's label
+  takes the left side and runs across Index's dot, at `5c1905b3` as on the
+  re-run.
 - **Two scenario lanes exist for one job:** `mesquite` and the winit host's.
   This uses the latter, as Knot does.
