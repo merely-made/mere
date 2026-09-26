@@ -56,21 +56,25 @@ pub fn save_revocation_ledger(data_root: &Path, ledger: &RevocationLedger) -> io
     Ok(CarryRef::of(bytes.as_slice()))
 }
 
-/// Fold verified revocation statements into the wallet's ledger.
+/// Fold checked revocation statements into the wallet's ledger.
 ///
-/// Returns how many were accepted. `RevocationLedger::fold` verifies each
-/// signature and records nothing for a statement that fails, so a rejected
-/// count is a real signal rather than a rounding error: statements arriving
-/// from a peer are exactly as trustworthy as their signatures.
+/// Returns how many were accepted. Each statement is checked first and only
+/// a checked one folds, so a rejected count is a real signal rather than a
+/// rounding error: statements arriving from a peer are exactly as
+/// trustworthy as their signatures.
 pub fn fold_revocations(
     data_root: &Path,
     statements: &[SignedDelegationRevocation],
 ) -> io::Result<usize> {
     let mut ledger = load_revocation_ledger(data_root)?;
-    let accepted = statements
+    let mut accepted = 0;
+    for checked in statements
         .iter()
-        .filter(|statement| ledger.fold(statement))
-        .count();
+        .filter_map(|statement| statement.check().ok())
+    {
+        ledger.fold(checked);
+        accepted += 1;
+    }
     if accepted > 0 {
         save_revocation_ledger(data_root, &ledger)?;
     }

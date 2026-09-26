@@ -4,16 +4,17 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! The personae adapter: delegation-chain validation and the local
-//! revocation ledger.
+//! The delegation adapter: chain validation and the local revocation ledger.
 //!
-//! Personae supplies the statement grammar (certificates, attenuation,
-//! revocations); this module walks a presented chain against the owner's
-//! accepted roots, depth budget, clock, and revocation ledger. It creates no
-//! statements of its own.
+//! insigne supplies the statement grammar (certificates, attenuation,
+//! revocations) and its checks, and personae issues statements; this module
+//! walks a presented chain against the owner's accepted roots, depth budget,
+//! clock, and revocation ledger. It works on checked statements only, and
+//! creates none of its own.
 
 use std::collections::BTreeMap;
 
+use insigne::{CheckedCertificate, CheckedRevocation};
 use personae::delegation::{
     DelegationCertificate, DelegationId, DelegationParent, SignedDelegationCertificate,
     SignedDelegationRevocation,
@@ -89,17 +90,14 @@ impl RevocationLedger {
         Self::default()
     }
 
-    /// Verify one revocation statement and record it. Returns whether the
-    /// statement verified; an unverifiable statement changes nothing.
-    pub fn fold(&mut self, statement: &SignedDelegationRevocation) -> bool {
-        if !statement.verify() {
-            return false;
-        }
-        self.revoked.insert(
-            statement.revocation.certificate,
-            statement.revocation.issuer,
-        );
-        true
+    /// Record one checked revocation statement.
+    ///
+    /// Only a checked statement folds: check it first with
+    /// [`SignedDelegationRevocation::check`], so the ledger never holds a
+    /// withdrawal whose signature did not check.
+    pub fn fold(&mut self, revocation: CheckedRevocation<'_>) {
+        let statement = revocation.revocation();
+        self.revoked.insert(statement.certificate, statement.issuer);
     }
 
     /// Whether this ledger revokes the given certificate.
@@ -129,28 +127,28 @@ impl RevocationLedger {
 /// validity window of every member at `now_ms`, and finally that the leaf
 /// names `subject`. Whether the leaf covers a concrete path and action is
 /// the caller's question, asked afterwards via
-/// [`DelegationCertificate::covers`].
-pub fn validate_chain(
-    chain: &[SignedDelegationCertificate],
+/// [`DelegationCertificate::covers`] of the checked leaf this returns.
+pub fn validate_chain<'a>(
+    chain: &'a [SignedDelegationCertificate],
     subject: [u8; 32],
     trusted_roots: &[TrustedRoot],
     ledger: &RevocationLedger,
     max_depth: u16,
     now_ms: u64,
-) -> Result<(), ChainFault> {
+) -> Result<CheckedCertificate<'a>, ChainFault> {
     if chain.is_empty() {
         return Err(ChainFault::Empty);
     }
     if chain.len() > usize::from(max_depth) {
         return Err(ChainFault::DepthExceeded);
     }
-    for signed in chain {
-        if !signed.verify() {
-            return Err(ChainFault::BadSignature);
-        }
-    }
+    let checked = chain
+        .iter()
+        .map(SignedDelegationCertificate::check)
+        .collect::<Result<Vec<_>, _>>()
+        .map_err(|_| ChainFault::BadSignature)?;
 
-    let first = &chain[0].certificate;
+    let first = checked[0].certificate();
     let anchored = match first.parent {
         DelegationParent::Root(authority) => trusted_roots
             .iter()
@@ -161,9 +159,9 @@ pub fn validate_chain(
         return Err(ChainFault::UntrustedRoot);
     }
 
-    for pair in chain.windows(2) {
-        let parent = &pair[0].certificate;
-        let child = &pair[1].certificate;
+    for pair in checked.windows(2) {
+        let parent = pair[0].certificate();
+        let child = pair[1].certificate();
         if child.parent != DelegationParent::Certificate(parent.id())
             || child.issuer != parent.subject
         {
@@ -174,8 +172,8 @@ pub fn validate_chain(
         }
     }
 
-    for signed in chain {
-        let certificate = &signed.certificate;
+    for link in &checked {
+        let certificate = link.certificate();
         if ledger.revokes(certificate) {
             return Err(ChainFault::Revoked);
         }
@@ -190,11 +188,11 @@ pub fn validate_chain(
         }
     }
 
-    let leaf = &chain[chain.len() - 1].certificate;
-    if leaf.subject != subject {
+    let leaf = checked[checked.len() - 1];
+    if leaf.certificate().subject != subject {
         return Err(ChainFault::SubjectMismatch);
     }
-    Ok(())
+    Ok(leaf)
 }
 
 #[cfg(test)]
@@ -215,7 +213,7 @@ mod tests {
     }
 
     #[test]
-    fn an_unverifiable_revocation_is_not_folded() {
+    fn only_a_checked_revocation_folds() {
         let issuer = InMemoryProvider::from_seed([1; 32]);
         let signed = SignedDelegationRevocation::issue(
             &issuer,
@@ -229,12 +227,13 @@ mod tests {
         )
         .unwrap();
 
+        // A tampered statement yields no conclusion, so there is nothing to fold.
         let mut tampered = signed.clone();
         tampered.revocation.at_ms = 51;
+        assert_eq!(tampered.check(), Err(insigne::CheckFault::BadSignature));
+
         let mut ledger = RevocationLedger::new();
-        assert!(!ledger.fold(&tampered));
-        assert!(ledger.is_empty());
-        assert!(ledger.fold(&signed));
+        ledger.fold(signed.check().expect("an issued revocation checks"));
         assert_eq!(ledger.len(), 1);
     }
 
@@ -266,7 +265,7 @@ mod tests {
         .unwrap();
 
         let mut ledger = RevocationLedger::new();
-        assert!(ledger.fold(&signed));
+        ledger.fold(signed.check().expect("a stranger's own revocation checks"));
         assert!(
             !ledger.revokes(&certificate),
             "a stranger cannot withdraw authority they did not grant"
