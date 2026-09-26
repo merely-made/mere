@@ -14,7 +14,9 @@
 //! detail popover's mode: the bar renders it and reports [`StatusBarEvent`]s.
 //! Each chip is a [`popover`](crate::popover) whose panel opens above its end,
 //! so nothing is measured and the bar works wherever it is docked; Escape and a
-//! click outside close it and return focus to the chip.
+//! click outside close it and return focus to the chip. The chips sit above an
+//! open popover's click-outside layer, so a click on another chip opens that
+//! one in one step.
 //!
 //! Severity rides as `data-severity` (`quiet`, `warning`, `refused`) on the
 //! message and on each chip, for the host's sheet to weight. The message is a
@@ -36,7 +38,8 @@ pub type StatusView<State, Action> = Box<dyn AnyView<State, Action, GenetCtx, Ge
 pub const STATUS_BAR_CSS: &str = "\
     .status-bar { display: flex; align-items: center; min-width: 0; } \
     .status-message { flex-grow: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; } \
-    .status-chips { display: flex; align-items: center; }";
+    .status-chips { display: flex; align-items: center; } \
+    .status-chip { position: relative; z-index: 52; }";
 
 /// How much weight a message or chip carries.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
