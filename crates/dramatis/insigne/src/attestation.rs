@@ -13,6 +13,8 @@
 
 use serde::{Deserialize, Serialize};
 
+#[cfg(feature = "verify")]
+use crate::check::CheckFault;
 use crate::key::TypedKey;
 
 const ATTESTATION_VERSION: u16 = 1;
@@ -70,15 +72,66 @@ impl DerivedKeyAttestation {
         &self.signature
     }
 
-    /// Verify the master signature and the supplied derivation salt.
+    /// Check the master's signature over this attestation under `salt`.
+    ///
+    /// A pass yields a [`CheckedAttestation`], which holds for the salt it was
+    /// checked against.
     #[cfg(feature = "verify")]
+    pub fn check(&self, salt: &[u8]) -> Result<CheckedAttestation<'_>, CheckFault> {
+        if self.format_version != ATTESTATION_VERSION {
+            return Err(CheckFault::Malformed);
+        }
+        let message = message(self.format_version, &self.master, &self.derived, salt);
+        if !crate::check::ed25519(&self.master, &self.signature, &message) {
+            return Err(CheckFault::BadSignature);
+        }
+        Ok(CheckedAttestation { attestation: self })
+    }
+
+    /// Whether the master's signature checks under `salt`.
+    #[cfg(feature = "verify")]
+    #[deprecated(note = "use `check`, which returns the conclusion (insigne proofs plan, phase B)")]
     pub fn verify(&self, salt: &[u8]) -> bool {
-        self.format_version == ATTESTATION_VERSION
-            && crate::check::ed25519(
-                &self.master,
-                &self.signature,
-                &message(self.format_version, &self.master, &self.derived, salt),
-            )
+        self.check(salt).is_ok()
+    }
+}
+
+/// An attestation whose master signature checked: the master vouches for the
+/// derived key under the salt it was checked against.
+///
+/// A local conclusion: only [`DerivedKeyAttestation::check`] makes one, and it
+/// is not serializable, so it never travels as one.
+#[cfg(feature = "verify")]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct CheckedAttestation<'a> {
+    attestation: &'a DerivedKeyAttestation,
+}
+
+#[cfg(feature = "verify")]
+impl<'a> CheckedAttestation<'a> {
+    /// The attestation that checked.
+    pub fn attestation(&self) -> &'a DerivedKeyAttestation {
+        self.attestation
+    }
+
+    /// The master's Ed25519 public key bytes.
+    pub fn master(&self) -> &'a [u8; 32] {
+        &self.attestation.master
+    }
+
+    /// The derived Ed25519 public key bytes the master vouches for.
+    pub fn derived(&self) -> &'a [u8; 32] {
+        &self.attestation.derived
+    }
+
+    /// The master key, typed.
+    pub fn master_key(&self) -> TypedKey {
+        self.attestation.master_key()
+    }
+
+    /// The derived key, typed.
+    pub fn derived_key(&self) -> TypedKey {
+        self.attestation.derived_key()
     }
 }
 

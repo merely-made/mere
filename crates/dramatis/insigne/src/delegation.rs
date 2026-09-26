@@ -21,7 +21,11 @@ use std::collections::BTreeSet;
 
 use serde::{Deserialize, Serialize};
 
+#[cfg(feature = "verify")]
+use crate::attestation::CheckedAttestation;
 use crate::attestation::DerivedKeyAttestation;
+#[cfg(feature = "verify")]
+use crate::check::CheckFault;
 
 const CERTIFICATE_VERSION: u16 = 1;
 const REVOCATION_VERSION: u16 = 1;
@@ -233,19 +237,68 @@ impl SignedDelegationCertificate {
         &self.signature
     }
 
-    /// Verify payload, issuer binding, derived-key attestation, and signature.
+    /// Check the certificate: its fields, its signer's attestation under its
+    /// scope, that the attesting master is its issuer, and its signature.
     #[cfg(feature = "verify")]
+    pub fn check(&self) -> Result<CheckedCertificate<'_>, CheckFault> {
+        let certificate = &self.certificate;
+        let signer = check_signed(
+            certificate.is_well_formed(),
+            &certificate.scope,
+            &certificate.issuer,
+            &self.signer,
+            &self.signature,
+            &certificate.signing_bytes(),
+        )?;
+        Ok(CheckedCertificate {
+            signed: self,
+            signer,
+        })
+    }
+
+    /// Whether the certificate checks.
+    #[cfg(feature = "verify")]
+    #[deprecated(note = "use `check`, which returns the conclusion (insigne proofs plan, phase B)")]
     pub fn verify(&self) -> bool {
-        self.certificate.is_well_formed()
-            && self
-                .signer
-                .verify(&delegation_signing_salt(&self.certificate.scope))
-            && self.signer.master() == &self.certificate.issuer
-            && crate::check::ed25519(
-                self.signer.derived(),
-                &self.signature,
-                &self.certificate.signing_bytes(),
-            )
+        self.check().is_ok()
+    }
+}
+
+/// A certificate whose fields, signer and signature checked: its issuer's
+/// master vouched for the key that signed it, under its scope.
+///
+/// Authenticity, not authority: whether the certificate is in force (its
+/// window, its chain, any revocation) is the holder's question, which
+/// notochord's `validate_chain` answers. A local conclusion: only
+/// [`SignedDelegationCertificate::check`] makes one, and it is not
+/// serializable.
+#[cfg(feature = "verify")]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct CheckedCertificate<'a> {
+    signed: &'a SignedDelegationCertificate,
+    signer: CheckedAttestation<'a>,
+}
+
+#[cfg(feature = "verify")]
+impl<'a> CheckedCertificate<'a> {
+    /// The signed certificate that checked.
+    pub fn signed(&self) -> &'a SignedDelegationCertificate {
+        self.signed
+    }
+
+    /// The certificate's statement.
+    pub fn certificate(&self) -> &'a DelegationCertificate {
+        &self.signed.certificate
+    }
+
+    /// The attestation that bound the signing key to the issuer.
+    pub fn signer(&self) -> CheckedAttestation<'a> {
+        self.signer
+    }
+
+    /// The certificate's content id.
+    pub fn id(&self) -> DelegationId {
+        self.signed.certificate.id()
     }
 }
 
@@ -334,20 +387,88 @@ impl SignedDelegationRevocation {
         &self.signature
     }
 
-    /// Verify payload, issuer binding, derived-key attestation, and signature.
+    /// Check the revocation: its fields, its signer's attestation under its
+    /// scope, that the attesting master is its issuer, and its signature.
     #[cfg(feature = "verify")]
-    pub fn verify(&self) -> bool {
-        self.revocation.is_well_formed()
-            && self
-                .signer
-                .verify(&delegation_signing_salt(&self.revocation.scope))
-            && self.signer.master() == &self.revocation.issuer
-            && crate::check::ed25519(
-                self.signer.derived(),
-                &self.signature,
-                &self.revocation.signing_bytes(),
-            )
+    pub fn check(&self) -> Result<CheckedRevocation<'_>, CheckFault> {
+        let revocation = &self.revocation;
+        let signer = check_signed(
+            revocation.is_well_formed(),
+            &revocation.scope,
+            &revocation.issuer,
+            &self.signer,
+            &self.signature,
+            &revocation.signing_bytes(),
+        )?;
+        Ok(CheckedRevocation {
+            signed: self,
+            signer,
+        })
     }
+
+    /// Whether the revocation checks.
+    #[cfg(feature = "verify")]
+    #[deprecated(note = "use `check`, which returns the conclusion (insigne proofs plan, phase B)")]
+    pub fn verify(&self) -> bool {
+        self.check().is_ok()
+    }
+}
+
+/// A revocation whose fields, signer and signature checked: the certificate's
+/// issuer withdrew it.
+///
+/// A local conclusion: only [`SignedDelegationRevocation::check`] makes one,
+/// and it is not serializable.
+#[cfg(feature = "verify")]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct CheckedRevocation<'a> {
+    signed: &'a SignedDelegationRevocation,
+    signer: CheckedAttestation<'a>,
+}
+
+#[cfg(feature = "verify")]
+impl<'a> CheckedRevocation<'a> {
+    /// The signed revocation that checked.
+    pub fn signed(&self) -> &'a SignedDelegationRevocation {
+        self.signed
+    }
+
+    /// The revocation's statement.
+    pub fn revocation(&self) -> &'a DelegationRevocation {
+        &self.signed.revocation
+    }
+
+    /// The attestation that bound the signing key to the issuer.
+    pub fn signer(&self) -> CheckedAttestation<'a> {
+        self.signer
+    }
+}
+
+/// The steps both signed statements share, in the order the old `verify`
+/// took them: fields, the signer's attestation under the scope's salt, the
+/// issuer binding, then the signature.
+#[cfg(feature = "verify")]
+fn check_signed<'a>(
+    well_formed: bool,
+    scope: &CapabilityScope,
+    issuer: &[u8; 32],
+    signer: &'a DerivedKeyAttestation,
+    signature: &[u8],
+    signing_bytes: &[u8],
+) -> Result<CheckedAttestation<'a>, CheckFault> {
+    if !well_formed {
+        return Err(CheckFault::Malformed);
+    }
+    let signer = signer
+        .check(&delegation_signing_salt(scope))
+        .map_err(|_| CheckFault::BadAttestation)?;
+    if signer.master() != issuer {
+        return Err(CheckFault::WrongIssuer);
+    }
+    if !crate::check::ed25519(signer.derived(), signature, signing_bytes) {
+        return Err(CheckFault::BadSignature);
+    }
+    Ok(signer)
 }
 
 /// Deterministic salt for the signing key assigned to one authority resource.
