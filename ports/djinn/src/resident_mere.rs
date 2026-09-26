@@ -12,11 +12,12 @@
 //! session attaches to one of the mere's sessions, the live one changed last
 //! unless it asks for another (§7 item 24), and sees two projections: the
 //! mere's sessions, with the lifecycle as intents that name their session by
-//! id (§7 item 33), and the attached session's graph, served through
-//! `MereHost` with its session item (§7 items 21, 22 and 31). Every
-//! application attached to one session shares one host, so each sees the
-//! others' edits, told by a revision bell. The application an edit comes
-//! through is the one the door admitted, never the client's claim.
+//! id (§7 item 33) in `graphshell::session_item`'s vocabulary (§7 item 37),
+//! and the attached session's graph, served through `MereHost` with its
+//! session item (§7 items 21, 22 and 31). Every application attached to one
+//! session shares one host, so each sees the others' edits, told by a
+//! revision bell. The application an edit comes through is the one the door
+//! admitted, never the client's claim.
 
 use std::collections::{BTreeMap, HashMap};
 use std::path::PathBuf;
@@ -39,7 +40,11 @@ use graphshell::mere_host::{MereHost, SelectedPersonaRef};
 use graphshell::native::app_admission::{AppId, AppRouteGrants};
 use graphshell::native::app_broker::AppEndpointCatalog;
 use graphshell::native::endpoint_catalog::ResidentEndpointRoute;
-use graphshell::session_item::{self, ApplyEditsV1, SetViewV1, StepV1};
+use graphshell::session_item::{
+    self, ATTACH_SESSION_INTENT, ApplyEditsV1, FORK_SESSION_INTENT, MERE_GRAPH, MERE_SESSIONS,
+    MINT_SESSION_INTENT, RESTORE_SESSION_INTENT, SESSIONS_SCHEMA, SESSIONS_SOURCE,
+    SessionsActionV1, SetViewV1, StepV1, TRASH_SESSION_INTENT,
+};
 use graphshell_endpoint::{
     IntentSink, PresentationSource, ProjectionCatalog, ProjectionNoticeSource, ProjectionSource,
 };
@@ -53,67 +58,16 @@ use sceno::{
     SourceRef, Transform2,
 };
 use scenotime::{Revision, SceneEpoch, SceneSnapshot};
-use serde::{Deserialize, Serialize};
 use tokio::sync::Mutex;
 
 /// How often a granted client polls a mere's route for bells.
 pub const MERE_NOTICE_POLL: Duration = Duration::from_millis(50);
-/// The projection of a mere's sessions: the mere view.
-pub const MERE_SESSIONS: &str = "djinn.mere/v1/sessions";
-/// The projection of the attached session's graph.
-pub const MERE_GRAPH: &str = "djinn.mere/v1/graph";
-/// Mint a new, empty session.
-pub const MINT_SESSION_INTENT: &str = "mere.sessions.mint";
-/// Attach this connection to another session.
-pub const ATTACH_SESSION_INTENT: &str = "mere.sessions.attach";
-/// Fork a session at its live cursor.
-pub const FORK_SESSION_INTENT: &str = "mere.sessions.fork";
-/// Put a session in the trash.
-pub const TRASH_SESSION_INTENT: &str = "mere.sessions.trash";
-/// Take a session back out of the trash.
-pub const RESTORE_SESSION_INTENT: &str = "mere.sessions.restore";
-/// Schema of [`SessionsActionV1`].
-pub const SESSIONS_SCHEMA: &str = "mere.sessions/v1";
 
 const SESSIONS_EPOCH: SceneEpoch = SceneEpoch(1);
-const SESSIONS_SOURCE: &str = "mere.sessions";
 
 /// The route a mere is served on (§7 item 30).
 pub fn mere_route_id(domain: &str) -> String {
     format!("mere/{domain}")
-}
-
-/// Payload of the sessions projection's intents. A step on a session names
-/// it by id, so it lands however the list has moved since the application
-/// looked (§7 item 33); minting names none, and only minting reads the name.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct SessionsActionV1 {
-    pub schema: String,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub session: Option<SessionId>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub display_name: Option<String>,
-}
-
-impl SessionsActionV1 {
-    /// A step on session `id`: attach, fork, trash or restore.
-    pub fn on(id: SessionId) -> Self {
-        Self {
-            schema: SESSIONS_SCHEMA.to_string(),
-            session: Some(id),
-            display_name: None,
-        }
-    }
-
-    /// Mint a session, named or not.
-    pub fn mint(display_name: Option<String>) -> Self {
-        Self {
-            schema: SESSIONS_SCHEMA.to_string(),
-            session: None,
-            display_name,
-        }
-    }
 }
 
 /// Run `operation` to completion from the synchronous endpoint traits.
@@ -819,9 +773,12 @@ impl ProjectionNoticeSource for MereEndpoint {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use graphshell::mere_route;
     use graphshell::native::app_admission::{AllowedAppRoutes, AppHello, AppRouteId};
     use graphshell::native::endpoint_catalog::{ResidentEndpointCatalog, ResidentEndpointSession};
-    use pandect::mere_dir;
+    use kernel::graph::{ContainmentSubKind, EdgeAssertion, SemanticSubKind};
+    use mere_view::{MereViewModel, MereViewRequest, SessionStep};
+    use pandect::{Change, ChangeKind, mere_dir};
     use uuid::Uuid;
 
     use crate::resident_reservoir::{
@@ -1166,5 +1123,266 @@ mod tests {
             knot.invoke(across).unwrap(),
             IntentResult::Stale { .. }
         ));
+    }
+
+    fn relate(from: u128, to: u128, assertion: EdgeAssertion) -> pandect::CapturedDelta {
+        pandect::CapturedDelta::ReplayAssertRelationByIds {
+            from_id: Uuid::from_u128(from).to_string(),
+            to_id: Uuid::from_u128(to).to_string(),
+            assertion,
+        }
+    }
+
+    fn semantic(sub_kind: SemanticSubKind) -> EdgeAssertion {
+        EdgeAssertion::Semantic {
+            sub_kind,
+            label: None,
+            decay_progress: None,
+        }
+    }
+
+    /// The route as the adapter reads it: both projections, the cards they
+    /// name, and the model they fill.
+    struct RouteRead {
+        sessions: ProjectionSnapshot,
+        model: MereViewModel,
+    }
+
+    fn read_route(session: &mut ResidentEndpointSession) -> RouteRead {
+        let (sessions, graph) =
+            mere_route::requests(&session.describe()).expect("a mere's route offers both");
+        let sessions = session.snapshot(sessions).unwrap();
+        let graph = session.snapshot(graph).unwrap();
+        let cards: HashMap<_, _> = mere_route::card_requests(&sessions)
+            .into_iter()
+            .map(|request| (request.resource, session.resource(request).unwrap().bytes))
+            .collect();
+        let mut model = MereViewModel::default();
+        mere_route::fill(&mut model, &sessions, &graph, &cards);
+        RouteRead { sessions, model }
+    }
+
+    /// Take `request` through the adapter, from what `read` saw.
+    fn take(
+        session: &mut ResidentEndpointSession,
+        read: &RouteRead,
+        request: MereViewRequest,
+    ) -> IntentResult {
+        let intent = mere_route::intent(&request, &read.sessions).expect("a step is the route's");
+        session.invoke(intent).unwrap()
+    }
+
+    /// The one session `now` lists that `before` did not.
+    fn new_session(before: &RouteRead, now: &RouteRead) -> SessionId {
+        let known: Vec<SessionId> = before.model.sessions.iter().map(|entry| entry.id).collect();
+        let fresh: Vec<SessionId> = now
+            .model
+            .sessions
+            .iter()
+            .map(|entry| entry.id)
+            .filter(|id| !known.contains(id))
+            .collect();
+        assert_eq!(fresh.len(), 1, "{fresh:?}");
+        fresh[0]
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn the_route_adapter_takes_the_lifecycle_and_shows_the_route() {
+        let fixture = fixture(23, "notes").await;
+        let mut knot = fixture.attach("knot-editor").await;
+        let start = graph(&mut knot);
+        let edits = vec![
+            node(1),
+            node(2),
+            retitle(1, "Alpha"),
+            relate(1, 2, semantic(SemanticSubKind::Hyperlink)),
+            relate(1, 2, semantic(SemanticSubKind::UserGrouped)),
+            relate(
+                1,
+                2,
+                EdgeAssertion::Containment {
+                    sub_kind: ContainmentSubKind::UserFolder,
+                },
+            ),
+        ];
+        assert_eq!(
+            knot.invoke(apply(&start, edits)).unwrap(),
+            IntentResult::Accepted
+        );
+
+        // The model shows the route: the mere, its one session attached, and
+        // that session's graph. Three relations share one pair and stay
+        // apart, each by its family (§7 item 43).
+        let first = read_route(&mut knot);
+        assert_eq!(first.model.title, "notes");
+        assert!(first.model.can_mint);
+        let [parent] = first.model.sessions.as_slice() else {
+            panic!("{:?}", first.model.sessions)
+        };
+        assert!(parent.attached && !parent.trashed);
+        assert_eq!(parent.steps, [SessionStep::Fork, SessionStep::Trash]);
+        let parent = parent.id;
+        let (one, two) = (
+            Uuid::from_u128(1).to_string(),
+            Uuid::from_u128(2).to_string(),
+        );
+        let mut nodes: Vec<(&str, &str)> = first
+            .model
+            .graph
+            .nodes
+            .iter()
+            .map(|node| (node.key.as_str(), node.label.as_str()))
+            .collect();
+        nodes.sort();
+        assert_eq!(nodes.len(), 2);
+        assert!(nodes.contains(&(one.as_str(), "Alpha")), "{nodes:?}");
+        let relations = &first.model.graph.relations;
+        assert!(
+            relations
+                .iter()
+                .all(|relation| relation.from == one && relation.to == two)
+        );
+        let mut kinds: Vec<&str> = relations
+            .iter()
+            .map(|relation| relation.provenance.token())
+            .collect();
+        kinds.sort();
+        assert_eq!(kinds, ["containment", "semantic", "semantic"]);
+        let mut keys: Vec<&str> = relations
+            .iter()
+            .map(|relation| relation.key.as_str())
+            .collect();
+        keys.sort();
+        keys.dedup();
+        assert_eq!(keys.len(), 3, "each relation keeps its own key");
+
+        // Mint, then fork the attached session from the first list, which the
+        // mint has moved past (§7 item 33).
+        assert_eq!(
+            take(&mut knot, &first, MereViewRequest::Mint),
+            IntentResult::Accepted
+        );
+        let minted = read_route(&mut knot);
+        let fresh = new_session(&first, &minted);
+        let fork_parent = MereViewRequest::Session(parent, SessionStep::Fork);
+        assert_eq!(take(&mut knot, &first, fork_parent), IntentResult::Accepted);
+        let forked = read_route(&mut knot);
+        let fork = new_session(&minted, &forked);
+
+        // Switch to the fork: the model shows it attached, over the graph it
+        // took from its parent.
+        let switch = MereViewRequest::Session(fork, SessionStep::Switch);
+        assert_eq!(take(&mut knot, &forked, switch), IntentResult::Accepted);
+        let switched = read_route(&mut knot);
+        let attached: Vec<SessionId> = switched
+            .model
+            .sessions
+            .iter()
+            .filter(|entry| entry.attached)
+            .map(|entry| entry.id)
+            .collect();
+        assert_eq!(attached, [fork]);
+        assert_eq!(switched.model.graph.nodes.len(), 2);
+        assert_eq!(switched.model.graph.relations.len(), 3);
+
+        // Trash the minted session and restore it. A step its card does not
+        // offer now is declined with the route's reason.
+        let trash = MereViewRequest::Session(fresh, SessionStep::Trash);
+        assert_eq!(
+            take(&mut knot, &switched, trash.clone()),
+            IntentResult::Accepted
+        );
+        let trashed = read_route(&mut knot);
+        let entry = trashed
+            .model
+            .sessions
+            .iter()
+            .find(|entry| entry.id == fresh)
+            .unwrap();
+        assert!(entry.trashed && entry.steps.contains(&SessionStep::Restore));
+        let reason = mere_route::declined(&take(&mut knot, &trashed, trash))
+            .expect("the route declines a second trash");
+        assert!(reason.contains("does not offer"), "{reason}");
+        let restore = MereViewRequest::Session(fresh, SessionStep::Restore);
+        assert_eq!(take(&mut knot, &trashed, restore), IntentResult::Accepted);
+        let restored = read_route(&mut knot);
+
+        // Opening a node, a host action and a layout are the host's own.
+        for own in [
+            MereViewRequest::Activate(one.clone()),
+            MereViewRequest::Host("new".into()),
+            MereViewRequest::Layout("grid.default".into()),
+        ] {
+            assert!(mere_route::intent(&own, &restored.sessions).is_none());
+        }
+
+        // The model lists the mere's sessions as stored, oldest first, as
+        // `MereSessions::list` orders them. djinn holds the store open alone,
+        // so its files are read directly.
+        #[derive(serde::Deserialize)]
+        struct StoredChange {
+            entry: Change,
+        }
+        let mere = fixture.reservoir.meres().await.remove(0);
+        let sessions = mere_dir(fixture._root.path(), persona(23), mere.id).join("sessions");
+        let read = |path: std::path::PathBuf| std::fs::read_to_string(path).unwrap();
+        let mut stored: Vec<(GraphSessionManifest, Vec<Change>)> = std::fs::read_dir(sessions)
+            .unwrap()
+            .map(|entry| {
+                let dir = entry.unwrap().path();
+                let manifest = serde_json::from_str(&read(dir.join("manifest.json"))).unwrap();
+                let changes = read(dir.join("changes.jsonl"))
+                    .lines()
+                    .map(|line| serde_json::from_str::<StoredChange>(line).unwrap().entry)
+                    .collect();
+                (manifest, changes)
+            })
+            .collect();
+        stored.sort_by_key(|(manifest, _)| (manifest.created_at, *manifest.session_id.as_uuid()));
+        let listed: Vec<(SessionId, String, bool)> = stored
+            .iter()
+            .map(|(manifest, _)| {
+                let name = manifest.display_name.clone();
+                (
+                    manifest.session_id,
+                    name.unwrap_or_else(|| "Session".into()),
+                    manifest.trashed.is_some(),
+                )
+            })
+            .collect();
+        let shown: Vec<(SessionId, String, bool)> = restored
+            .model
+            .sessions
+            .iter()
+            .map(|entry| (entry.id, entry.name.clone(), entry.trashed))
+            .collect();
+        assert_eq!(shown, listed);
+
+        // Mint, fork, trash and restore are recorded with the admitted
+        // application; the switch changed nothing stored (§7 item 41).
+        let via = |id: SessionId| -> Vec<(ChangeKind, Option<String>)> {
+            let (_, changes) = stored
+                .iter()
+                .find(|(manifest, _)| manifest.session_id == id)
+                .expect("the session is stored");
+            changes
+                .iter()
+                .map(|change| (change.kind.clone(), change.author.via.clone()))
+                .collect()
+        };
+        let knot_editor = Some("knot-editor".to_string());
+        assert_eq!(
+            via(fresh),
+            [
+                (ChangeKind::Minted, knot_editor.clone()),
+                (ChangeKind::Trashed, knot_editor.clone()),
+                (ChangeKind::Restored, knot_editor.clone()),
+            ]
+        );
+        let fork_log = via(fork);
+        let [(ChangeKind::Forked { from, .. }, forked_via)] = fork_log.as_slice() else {
+            panic!("{fork_log:?}")
+        };
+        assert_eq!((*from, forked_via), (parent, &knot_editor));
     }
 }

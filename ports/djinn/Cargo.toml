@@ -140,7 +140,12 @@ required-features = ["distillery-chronicle-receipt-host"]
 # `src/resident_distillery.rs` speaks only `muniment::RedbBackend` and
 # distillery's own re-exported trainer vocabulary.
 eidetic.workspace = true
+# The route adapter's test in `resident_mere`: graphshell's `mere_route`, the
+# mere view's model it fills, and the kernel's relations to fill it with.
+graphshell = { version = "0.0.2", path = "../graphshell", features = ["personal-sync", "mere-route"] }
 graphshell-endpoint.workspace = true
+kernel.workspace = true
+mere-view.workspace = true
 p2panda-core = "0.7.0"
 safetensors = "0.4"
 scenotime.workspace = true
