@@ -2,7 +2,8 @@
 
 **Date**: 2026-09-23
 **Status**: phase A landed 2026-09-24; phases B–D open. Mark agreed the split
-and ruled how issuing is expressed (§2, option (a)) on 2026-09-23.
+and ruled how issuing is expressed (§2, option (a)) on 2026-09-23. The Mere
+0.4 release baseline waits for phase B (Mark, 2026-09-26).
 **Scope**: move personae's delegation and attestation data types into insigne's
 plain-data core and their checks behind an insigne feature, with issuing kept in
 personae; then let gaz keep the proofs it receives.
@@ -118,7 +119,9 @@ communicate to 'em". Built as two traits rather than one: `Issue` in
 - **B — conclusions, not booleans.** A passing check returns a local,
   non-`Serialize` conclusion, notochord's `AdmittedPrincipal` rule. Callers
   migrate crate by crate. Done when no caller reads a `bool` from a check and
-  `verify() -> bool` is gone.
+  `verify() -> bool` is gone. The Mere 0.4 release baseline (crate
+  consolidation plan, C5) waits for this phase, so insigne publishes its
+  settled API once (Mark, 2026-09-26: "after B").
 - **C — re-exports removed.** Consumers import from insigne and personae's
   re-exports go (DOC_POLICY §3), timed to the other repos' repins. Done when no
   crate names the types through personae.
@@ -173,7 +176,9 @@ a match missing `RelationKind::OpenPredicate`) and cambium-nematic's
 (`crates/cambium/cambium-nematic/src/views.rs:513` *(historical citation)* <!-- doc-audit: historical-path -->, a `FeedEntry` missing six
 fields) fail to compile, both before this move and after it. So graphshell's
 own unit tests could not run for phase A. They compile through type checking,
-which covers their imports.
+which covers their imports. Resolved since: graphshell's test by `bc7121ae`,
+cambium-nematic's by `4b33a963`, and the gate has checked every target since
+`67ebef3a` (Mark's ruling).
 
 ## 5. Progress
 
@@ -197,3 +202,9 @@ repos' sessions were offline when this landed, so this note is the handoff.
 
 `AttestationKeys` is needed wherever an attestation's `master_public_key` or
 `derived_public_key` is read; none of these repos does today. Next: phase B.
+
+**2026-09-26.** Mark ruled that the Mere 0.4 baseline waits for phase B.
+mere's djinn moved its knot pin from `c6d5b9e` to knot's main (`5ad3f67`).
+That drops the git-sourced `graphshell-stdio` and a second genet
+(`532f1fad`'s `fleece` and `layout-dom-api`) that the old pin kept in the
+graph.
