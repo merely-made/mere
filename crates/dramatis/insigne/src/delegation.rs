@@ -255,13 +255,6 @@ impl SignedDelegationCertificate {
             signer,
         })
     }
-
-    /// Whether the certificate checks.
-    #[cfg(feature = "verify")]
-    #[deprecated(note = "use `check`, which returns the conclusion (insigne proofs plan, phase B)")]
-    pub fn verify(&self) -> bool {
-        self.check().is_ok()
-    }
 }
 
 /// A certificate whose fields, signer and signature checked: its issuer's
@@ -404,13 +397,6 @@ impl SignedDelegationRevocation {
             signed: self,
             signer,
         })
-    }
-
-    /// Whether the revocation checks.
-    #[cfg(feature = "verify")]
-    #[deprecated(note = "use `check`, which returns the conclusion (insigne proofs plan, phase B)")]
-    pub fn verify(&self) -> bool {
-        self.check().is_ok()
     }
 }
 
