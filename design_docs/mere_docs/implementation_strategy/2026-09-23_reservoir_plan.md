@@ -13,8 +13,9 @@ running in Chromium over IndexedDB (§7 item 29); the receipt's scenario verdict
 await a headed run. Step 5, djinn's routes, landed on 2026-09-25 with its
 two-process receipt, meeting V2's done-conditions (§8), and reached origin the
 same day. V2b, the mere view, was assessed and ruled the same day (§7 items 34
-to 40): Graphshell first moves onto one Cambium tree, in its own plan, and
-V2b's step 1, the component, is in progress.
+to 40): Graphshell first moves onto one Cambium tree, in its own plan. V2b's
+steps 1 and 2, the component and its headed proof, landed on `reservoir-v2`
+the same day; step 3, the route adapter, is next.
 **Scope:** give each data domain one mere, and make every mere of an identity
 openable by any of that identity's applications. The meres are held by the
 device resident, with sessions, a graph journal and an Eidetic archive.
@@ -1312,4 +1313,28 @@ V2b's rulings, all 2026-09-25:
   Its ten tests show, from the view tree, each of Knot's requirements a tree
   can show. The crate builds for `wasm32-unknown-unknown`. Painting, sizing
   on screen and theming are the headed harness's, step 2.
+- 2026-09-25: V2b step 2, the headed proof, landed on `reservoir-v2`
+  (`53f625fc`, `5c1905b3`). The
+  [receipt](../testing/2026-09-25_mere_view_headed_receipt.md) runs a harness
+  of its own around the view on the winit host's scenario lane: nine
+  scenarios, one per Knot requirement, pass at the full centre and in a
+  280 px side tile, and every frame was reviewed whole.
 
+  The frames found nine faults, fixed before the receipt's revision:
+  - a node press reached a relation cell, which in `graph_canvas` spanned
+    its segment above the node targets;
+  - equal nodes shared a point;
+  - the narrow bar overflowed;
+  - the notice hid behind a control;
+  - provenance never drew, since Genet paints no pseudo-element content on
+    those cells, so sprigging now paints relation kinds as lines;
+  - labels drifted from their nodes, since Genet ignored `text-align` in their
+    fixed-width boxes;
+  - labels crowded the side tile, answered by opt-in culling;
+  - the harness's text stayed black in the dark theme, because a Cambium tree
+    has no `html` or `body`;
+  - a clipping wrapper blanked the whole frame, a renderer fault avoided here.
+
+  `tests/host_routing.rs` now presses nodes through the host's real routing
+  without a window. The crate's 13 tests, cambium's 231 and sprigging's 28
+  pass.

@@ -87,6 +87,17 @@ and plan the full move after V2.
     surface.
   - There are 35 scenario files under `ports/graphshell/web/scenarios/`, and
     29 recorded run directories under `testing/mere/scenarios/graphshell-web/`.
+- **Three Genet traits the mere view's proof met**, each a trap for the move
+  (the [receipt](../testing/2026-09-25_mere_view_headed_receipt.md), verified
+  2026-09-25 at netrender `aba7d837`):
+  - `::before` and `::after` content drew nothing on the cells tried;
+  - `text-align` did not apply inside the fixed-width box of an absolutely
+    placed span, so text sat at the box's left;
+  - a box with `overflow: hidden` around a self-clipping child and a
+    positioned sibling blanked the whole frame.
+
+  A Cambium tree also has no `html` or `body`, so a page's base styles go
+  on `:root`.
 - **Five pages mount the view.** `index.html`, `embed.html`, `practice.html`,
   `practice-embed.html` and `co_op.html` all load it through `loader.js`.
 
@@ -162,3 +173,5 @@ this tree.
 
 - 2026-09-25: plan written from the assessment in §2 and Mark's rulings in §1.
   The reservoir plan records them as §7 items 39 and 40.
+- 2026-09-25: the mere view's headed proof met three Genet traits the move
+  will meet too; §2 records them.
