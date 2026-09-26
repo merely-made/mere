@@ -1,0 +1,24 @@
+# Knot requirement 6: layout is a host preference, a cartography strategy,
+# switchable without losing node identity.
+log requirement 6: a layout switch moves nodes and keeps every key
+settle 2
+assert snap layout == spectral.default
+capture r6_centre_spectral
+click role:button @data-layout=grid.default
+settle 2
+assert snap layout == grid.default
+assert snap layouts_laid == 2
+assert snap placements == 2
+assert snap key_sets == 1
+assert snap node_targets == 12
+capture r6_centre_grid
+resize 280 700
+settle 3
+click role:button @data-layout=phyllotaxis.default
+settle 2
+assert snap layout == phyllotaxis.default
+assert snap layouts_laid == 3
+assert snap placements == 3
+assert snap key_sets == 1
+assert snap node_targets == 12
+capture r6_side_spiral

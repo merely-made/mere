@@ -1,0 +1,21 @@
+# Knot requirement 7: every node is a native, labelled hit target reachable by
+# keyboard, with a stable data-key an automation scenario can target.
+log requirement 7: nodes are keyboard-reachable targets with stable keys
+settle 2
+key tab-until data-key=garden
+settle 1
+assert snap focus == data-key=garden
+key enter
+settle 1
+assert event request open garden
+assert snap open ~ garden
+capture r7_centre_focused
+resize 280 700
+settle 3
+key tab-until data-key=journal
+settle 1
+assert snap focus == data-key=journal
+key space
+settle 1
+assert event request open journal
+capture r7_side_focused

@@ -22,6 +22,15 @@ pub const DEFAULT_LAYOUT: &str = "spectral.default";
 /// The share of the graph's area left clear at each edge.
 const MARGIN: f32 = 0.08;
 
+/// Pixels between two nodes' centres, and the side of each node's square
+/// target. Centres this far apart lie outside each other's targets, so every
+/// press lands on the node meant, and labels do not print over each other.
+pub const SEPARATION: f32 = 44.0;
+
+/// Past this many nodes the pairwise separation pass is skipped, and nodes
+/// keep the strategy's placement.
+const SEPARATE_UP_TO: usize = 2000;
+
 /// Every node's position, normalized to `0..=1` within a graph area of
 /// `width` by `height`, keyed by the node's key.
 ///
@@ -106,14 +115,77 @@ pub fn lay_out(
         _ => 0.5,
     };
     let (xs, ys) = (span(|at| at.0), span(|at| at.1));
-    graph
+    let (width, height) = (width.max(1) as f32, height.max(1) as f32);
+    let mut points: Vec<(f32, f32)> = graph
         .nodes
         .iter()
         .map(|node| {
-            let at = placed
+            let (x, y) = placed
                 .get(node.key.as_str())
                 .map_or((0.5, 0.5), |&(x, y)| (fit(x, xs), fit(y, ys)));
-            (node.key.clone(), at)
+            (x * width, y * height)
         })
+        .collect();
+    separate(&mut points, width, height);
+    graph
+        .nodes
+        .iter()
+        .zip(points)
+        .map(|(node, (x, y))| (node.key.clone(), (x / width, y / height)))
         .collect()
+}
+
+/// Push apart, in pixels, every pair of nodes closer than [`SEPARATION`].
+/// A strategy may place structurally equal nodes on one point; a coincident
+/// pair parts along an angle fixed by its index, so the same graph always
+/// comes out the same.
+fn separate(points: &mut [(f32, f32)], width: f32, height: f32) {
+    if points.len() > SEPARATE_UP_TO {
+        return;
+    }
+    const GOLDEN_ANGLE: f32 = 2.399_963;
+    // Clamped inside every pass, so a node held at the edge stays put and its
+    // neighbour keeps moving until the pair is apart.
+    let (left, right) = (width * MARGIN, (width * (1.0 - MARGIN)).max(width * MARGIN));
+    let (top, bottom) = (
+        height * MARGIN,
+        (height * (1.0 - MARGIN)).max(height * MARGIN),
+    );
+    let inside = |point: &mut (f32, f32)| {
+        point.0 = point.0.clamp(left, right);
+        point.1 = point.1.clamp(top, bottom);
+    };
+    for _ in 0..96 {
+        let mut moved = false;
+        for i in 0..points.len() {
+            for j in (i + 1)..points.len() {
+                let (dx, dy) = (points[j].0 - points[i].0, points[j].1 - points[i].1);
+                let distance = (dx * dx + dy * dy).sqrt();
+                if distance >= SEPARATION {
+                    continue;
+                }
+                let (ux, uy) = if distance > 0.01 {
+                    (dx / distance, dy / distance)
+                } else {
+                    let angle = j as f32 * GOLDEN_ANGLE;
+                    (angle.cos(), angle.sin())
+                };
+                // A quarter pixel past even, so a pair held at an edge settles.
+                let push = (SEPARATION - distance) / 2.0 + 0.25;
+                points[i].0 -= ux * push;
+                points[i].1 -= uy * push;
+                points[j].0 += ux * push;
+                points[j].1 += uy * push;
+                inside(&mut points[i]);
+                inside(&mut points[j]);
+                moved = true;
+            }
+        }
+        if !moved {
+            break;
+        }
+    }
+    for point in points {
+        inside(point);
+    }
 }

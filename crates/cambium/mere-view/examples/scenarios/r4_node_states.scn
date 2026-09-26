@@ -1,0 +1,18 @@
+# Knot requirement 4: host-supplied node states (available, unavailable, open,
+# dirty), dimmed and labelled in words, never by colour alone. A side tile
+# cannot hold every label; one it leaves out returns when its node is
+# focused, and every node keeps its state in its accessible name.
+log requirement 4: node states in words as well as paint
+settle 2
+assert text Moon phases, unavailable
+assert text Tarot notes, unsaved
+assert text Index, open
+assert text Archive 2025, unavailable
+capture r4_centre
+resize 280 700
+settle 3
+key tab-until data-key=archive
+settle 1
+assert snap focus == data-key=archive
+assert text Archive 2025, unavailable
+capture r4_side

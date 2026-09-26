@@ -390,7 +390,8 @@ fn the_view_fits_its_tile_from_the_full_centre_to_a_side_stack() {
         width: 280,
         height: 600,
     };
-    assert_eq!(narrow.graph_size(), (280, 336));
+    // Two bar rows when narrow: (600 - 64) * 0.6.
+    assert_eq!(narrow.graph_size(), (280, 321));
 }
 
 #[test]
@@ -434,4 +435,108 @@ fn hover_and_focus_are_the_views_own_state() {
     let swatch = view.swatch();
     assert_eq!(swatch.hovered.as_deref(), Some("a"));
     assert_eq!(swatch.focus.as_deref(), Some("b"));
+}
+
+#[test]
+fn the_structural_sheet_names_no_colour() {
+    // Requirement 9: colour is the host's, through its own sheet and tokens.
+    // The only colour the sheet may name is the host's current one.
+    let sheet = MERE_VIEW_CSS.to_ascii_lowercase();
+    for colour in ["#", "rgb(", "rgba(", "hsl(", "hsla("] {
+        assert!(!sheet.contains(colour), "the sheet names {colour:?}");
+    }
+    for (at, _) in sheet.match_indices("color:") {
+        let value = sheet[at + "color:".len()..]
+            .split([';', '}'])
+            .next()
+            .unwrap_or_default()
+            .trim();
+        assert_eq!(value, "currentcolor", "a colour the host did not give");
+    }
+}
+
+#[test]
+fn nodes_a_strategy_puts_on_one_point_are_parted() {
+    // Beta and Gamma relate to Alpha alike, so Spectral gives them one point.
+    let graph = GraphModel {
+        nodes: vec![
+            node("a", "Alpha", NodeState::Available),
+            node("b", "Beta", NodeState::Available),
+            node("c", "Gamma", NodeState::Available),
+        ],
+        relations: vec![
+            relation("ab", "a", "b", Provenance::Extracted),
+            relation("ac", "a", "c", Provenance::Extracted),
+        ],
+    };
+    let (width, height) = (680.0, 560.0);
+    let laid = lay_out(&graph, "spectral.default", width as u32, height as u32);
+    let pixels = |key: &str| {
+        let (x, y) = laid[key];
+        (x * width, y * height)
+    };
+    let (b, c) = (pixels("b"), pixels("c"));
+    let apart = ((b.0 - c.0).powi(2) + (b.1 - c.1).powi(2)).sqrt();
+    let separation = crate::layout::SEPARATION;
+    assert!(
+        apart >= separation - 0.1,
+        "Beta and Gamma are {apart} px apart"
+    );
+
+    // A catalog like Knot's, where equal nodes also sit at the area's edge:
+    // every pair stays apart, in the full centre and in a side tile.
+    let keys = ["i", "g", "s", "p", "t", "m", "j", "r", "l", "d", "x", "k"];
+    let catalog = GraphModel {
+        nodes: keys
+            .iter()
+            .map(|key| node(key, key, NodeState::Available))
+            .collect(),
+        relations: [
+            ("i", "g"),
+            ("i", "s"),
+            ("i", "p"),
+            ("i", "j"),
+            ("i", "k"),
+            ("g", "s"),
+            ("p", "x"),
+            ("t", "m"),
+            ("j", "t"),
+            ("r", "k"),
+            ("d", "x"),
+            ("d", "r"),
+        ]
+        .iter()
+        .map(|(from, to)| relation(&format!("{from}{to}"), from, to, Provenance::Extracted))
+        .collect(),
+    };
+    for (w, h) in [(880_u32, 660_u32), (280, 381)] {
+        let laid = lay_out(&catalog, "spectral.default", w, h);
+        let at = |key: &str| (laid[key].0 * w as f32, laid[key].1 * h as f32);
+        for (n, first) in keys.iter().enumerate() {
+            for second in &keys[n + 1..] {
+                let (a, b) = (at(first), at(second));
+                let apart = ((a.0 - b.0).powi(2) + (a.1 - b.1).powi(2)).sqrt();
+                assert!(
+                    apart >= separation - 0.1,
+                    "{first} and {second} are {apart} px apart at {w}x{h}"
+                );
+            }
+        }
+    }
+    assert_eq!(
+        lay_out(&graph, "spectral.default", 680, 560),
+        laid,
+        "the same every time"
+    );
+}
+
+#[test]
+fn minting_heads_the_sessions_list() {
+    let (dom, runner) = runner(Host::new(model(), 900, 600));
+    let dom = dom.borrow();
+    let root = runner.root();
+    let sessions = find(&dom, root, "aria-label", "Sessions").expect("sessions list");
+    assert!(find(&dom, sessions, "data-request", "mint").is_some());
+    let bar = find(&dom, root, "class", "mere-view-bar").expect("bar");
+    assert!(find(&dom, bar, "data-request", "mint").is_none());
 }

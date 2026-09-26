@@ -1,0 +1,16 @@
+# Knot requirement 1: the view embeds as a tile and sizes itself to it, from
+# the full centre down to a side stack of about 280 px.
+log requirement 1: the view sizes itself to its tile
+settle 2
+assert snap tile == 1100x700
+assert snap width == wide
+assert snap graph == 880x660
+assert snap node_targets == 12
+capture r1_centre
+resize 280 700
+settle 3
+assert snap tile == 280x700
+assert snap width == narrow
+assert snap graph == 280x381
+assert snap node_targets == 12
+capture r1_side

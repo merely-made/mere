@@ -1,0 +1,35 @@
+# Knot requirement 2: activation is the host's. Activating a node hands the
+# host an id; mint, switch, fork and trash are requests the host may decline,
+# and a refusal is shown as the host worded it.
+log requirement 2: the host acts, and a refusal is shown truthfully
+settle 2
+click .graph-canvas-swatch-node @data-key=garden
+settle 1
+assert event request open garden
+assert event opened garden
+assert snap open ~ garden
+act decline-next
+click role:button @aria-label=Trash Evening notes
+settle 1
+assert event declined: The host declined to trash Evening notes.
+assert snap trashed == 1
+assert snap notice == The host declined to trash Evening notes.
+capture r2_centre_declined
+click .graph-canvas-swatch-node @data-key=moon
+settle 1
+assert snap notice == Moon phases is unavailable: its file is missing.
+click role:button @aria-label=Switch to Evening notes
+settle 1
+assert snap attached == Evening notes
+assert snap notice == none
+resize 280 700
+settle 3
+click role:button @data-request=mint
+settle 1
+assert snap sessions == 4
+act decline-next
+click role:button @aria-label=Fork Evening notes
+settle 1
+assert snap sessions == 4
+assert snap notice == The host declined to fork Evening notes.
+capture r2_side_declined
