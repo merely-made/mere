@@ -301,9 +301,9 @@ is monotonic, so a replayed or late event cannot rewind a record.
         `SignedDelegationCertificate`, a PLC operation) as plain data from
         insigne's core, so it can be checked again later, for instance against
         a newer revocation list, which is why notochord retains its session
-        claims. Waits on personae's delegation data types moving into insigne,
-        which Mark ruled the same day and this session is executing (crate
-        consolidation plan, insigne row).
+        claims. The data types moved into insigne in the
+        [insigne proofs plan](2026-09-23_insigne_proofs_plan.md)'s phase A
+        (`5364dfa0`, 2026-09-24); gaz keeping them is that plan's phase D.
   - [ ] Intake adds endpoints as `TrustState::Unverified` and never downgrades
         or duplicates an endpoint already held at a stronger state; replaying
         the same intake is a no-op.
