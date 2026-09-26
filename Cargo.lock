@@ -5205,9 +5205,9 @@ dependencies = [
 [[package]]
 name = "fleece"
 version = "0.5.0"
-source = "git+https://github.com/merely-made/genet.git?rev=532f1fadc53486d60ac4f02835732e8dabd9f62b#532f1fadc53486d60ac4f02835732e8dabd9f62b"
+source = "git+https://github.com/merely-made/genet.git?rev=1b62fd0b21893d87c864c735aed7e0bfc1c9942e#1b62fd0b21893d87c864c735aed7e0bfc1c9942e"
 dependencies = [
- "layout-dom-api 0.1.1 (git+https://github.com/merely-made/genet.git?rev=532f1fadc53486d60ac4f02835732e8dabd9f62b)",
+ "layout-dom-api 0.1.1 (git+https://github.com/merely-made/genet.git?rev=1b62fd0b21893d87c864c735aed7e0bfc1c9942e)",
  "sha2 0.10.9",
  "unicode-bidi",
  "unicode-segmentation",
@@ -6342,16 +6342,6 @@ dependencies = [
  "serde",
  "serde_json",
  "tokio",
-]
-
-[[package]]
-name = "graphshell-stdio"
-version = "0.0.2"
-source = "git+https://github.com/merely-made/mere.git?rev=250fd238a9595dde04eea3582e1b3cc5ec6e1715#250fd238a9595dde04eea3582e1b3cc5ec6e1715"
-dependencies = [
- "chirograph",
- "graphshell-endpoint",
- "serde_json",
 ]
 
 [[package]]
@@ -7966,7 +7956,7 @@ checksum = "e2db585e1d738fc771bf08a151420d3ed193d9d895a36df7f6f8a9456b911ddc"
 [[package]]
 name = "knot-capture"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?rev=c6d5b9e4af27c5a7bb6314a943d13dac366dca1a#c6d5b9e4af27c5a7bb6314a943d13dac366dca1a"
+source = "git+https://github.com/merely-made/knot-editor.git?rev=5ad3f67927faa2fd4aca243ac1ad2fd2a8498f96#5ad3f67927faa2fd4aca243ac1ad2fd2a8498f96"
 dependencies = [
  "knot-file-catalog",
 ]
@@ -7974,7 +7964,7 @@ dependencies = [
 [[package]]
 name = "knot-document"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?rev=c6d5b9e4af27c5a7bb6314a943d13dac366dca1a#c6d5b9e4af27c5a7bb6314a943d13dac366dca1a"
+source = "git+https://github.com/merely-made/knot-editor.git?rev=5ad3f67927faa2fd4aca243ac1ad2fd2a8498f96#5ad3f67927faa2fd4aca243ac1ad2fd2a8498f96"
 dependencies = [
  "cambium",
  "illume",
@@ -7990,7 +7980,7 @@ dependencies = [
 [[package]]
 name = "knot-editor"
 version = "0.0.3"
-source = "git+https://github.com/merely-made/knot-editor.git?rev=c6d5b9e4af27c5a7bb6314a943d13dac366dca1a#c6d5b9e4af27c5a7bb6314a943d13dac366dca1a"
+source = "git+https://github.com/merely-made/knot-editor.git?rev=5ad3f67927faa2fd4aca243ac1ad2fd2a8498f96#5ad3f67927faa2fd4aca243ac1ad2fd2a8498f96"
 dependencies = [
  "base64 0.22.1",
  "blake3",
@@ -7998,9 +7988,8 @@ dependencies = [
  "chirograph",
  "eidetic",
  "esp",
- "fleece 0.5.0 (git+https://github.com/merely-made/genet.git?rev=532f1fadc53486d60ac4f02835732e8dabd9f62b)",
+ "fleece 0.5.0 (git+https://github.com/merely-made/genet.git?rev=1b62fd0b21893d87c864c735aed7e0bfc1c9942e)",
  "graphshell-endpoint",
- "graphshell-stdio",
  "inker",
  "jotdown",
  "knot-capture",
@@ -8057,7 +8046,7 @@ dependencies = [
 [[package]]
 name = "knot-file-catalog"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?rev=c6d5b9e4af27c5a7bb6314a943d13dac366dca1a#c6d5b9e4af27c5a7bb6314a943d13dac366dca1a"
+source = "git+https://github.com/merely-made/knot-editor.git?rev=5ad3f67927faa2fd4aca243ac1ad2fd2a8498f96#5ad3f67927faa2fd4aca243ac1ad2fd2a8498f96"
 dependencies = [
  "muniment",
  "pollster",
@@ -8140,7 +8129,7 @@ dependencies = [
 [[package]]
 name = "layout-dom-api"
 version = "0.1.1"
-source = "git+https://github.com/merely-made/genet.git?rev=532f1fadc53486d60ac4f02835732e8dabd9f62b#532f1fadc53486d60ac4f02835732e8dabd9f62b"
+source = "git+https://github.com/merely-made/genet.git?rev=1b62fd0b21893d87c864c735aed7e0bfc1c9942e#1b62fd0b21893d87c864c735aed7e0bfc1c9942e"
 dependencies = [
  "markup5ever",
 ]
