@@ -16,8 +16,8 @@ same day. V2b, the mere view, was assessed and ruled the same day (§7 items 34
 to 40): Graphshell first moves onto one Cambium tree, in its own plan. V2b's
 steps 1 to 3, the component, its headed proof and the route adapter, landed
 and reached origin the same day. Step 4, Graphshell on one Cambium tree, is
-under way: its plan's phase 1, accessibility in the browser, landed on
-`reservoir-v2` on 2026-09-26.
+under way: its plan's phase 1, accessibility in the browser, was done on
+2026-09-26, and phase 2, the file seam, is next.
 **Scope:** give each data domain one mere, and make every mere of an identity
 openable by any of that identity's applications. The meres are held by the
 device resident, with sessions, a graph journal and an Eidetic archive.
@@ -1401,3 +1401,6 @@ V2b's rulings, all 2026-09-25:
   mere's repin (`685c830e`). The
   [one-tree plan](2026-09-25_graphshell_one_tree_plan.md) records the
   rulings and the receipt.
+- 2026-09-26: the one-tree plan's phase 1 is done: woodshed-web and
+  Redshank's web port gained the mirror by their pin bumps (woodshed
+  `a0910d5`, `d721a80`).
