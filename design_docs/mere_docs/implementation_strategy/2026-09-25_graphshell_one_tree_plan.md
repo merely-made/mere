@@ -13,8 +13,9 @@ plan's V2b then places the mere view in that tree.
 **Related:**
 - [Reservoir plan](2026-09-23_reservoir_plan.md), V2b, whose Graphshell step
   waits on this plan.
-- `crates/cambium/cambium-genet-web-host/src/a11y.rs`, the module doc that
-  records the web host's accessibility gap.
+- `crates/cambium/cambium-genet-web-host/src/a11y.rs`, whose module doc
+  recorded the web host's accessibility gap and, since phase 1, describes the
+  mirror.
 - [Platform boundary and repository topology plan](2026-09-02_platform_boundary_and_repository_topology_plan.md),
   whose `p2_cambium_h3_boot` receipt first showed the chrome and the graph
   scene through Genet on the web target.
@@ -85,12 +86,14 @@ Phase 2's rulings, 2026-09-26:
     retained Cambium view in a `ScriptedDom` that Genet paints. It is rebuilt
     from a `ChromeModel` on each change and takes no input.
   - The interactive UI is HTML. `ports/graphshell/web/component.html` (337
-    lines) holds about 100 controls, driven by `web.rs` (2,248 lines):
+    lines) holds 89 form controls and a link, driven by `web.rs` (2,248 lines):
     - a mounted-sessions header;
     - a graph-controls bar (select, edit, pan, zoom);
-    - an aside of six sections: browser history, add an object, the
-      projection editor's seven tabs, find and arrange, scene and transfer,
-      and the node detail.
+    - an aside of five sections: browser history, add an object, the
+      projection editor's seven tabs, find and arrange, and scene and
+      transfer;
+    - the node detail, a surface of its own after the aside. (The control
+      count and this list were corrected on 2026-09-26.)
 - **Cambium runs in a browser.** `cambium_genet_web_host::mount` puts an
   application on a canvas and feeds it DOM input. `woodshed-web` and
   Redshank's web port use it.
@@ -107,7 +110,9 @@ Phase 2's rulings, 2026-09-26:
     renders an application-owned texture into a custom-leaf slot, after
     layout and before paint. The application owns the scene state, the
     rendering and the picking.
-  - Pelt's desktop workspace viewer and the scrying engine use it.
+  - Isometry's crates use it: isomere's host, isometer and eponym's client.
+    Pelt's workspace and the scrying engine implement inker's
+    `SurfaceProducer` instead, a different trait (corrected 2026-09-26).
   - The web host's frame loop calls rootstock's shared `redraw`, which
     prepares producers, so the path exists in a browser. Nothing has run it
     there.
@@ -158,8 +163,8 @@ Phase 2's rulings, 2026-09-26:
 
 - **One mount per page.** Each page puts Graphshell's application on the page
   canvas with a single `mount` call.
-- **One tree.** It holds the graph controls, the six sections and the chrome
-  as Cambium components.
+- **One tree.** It holds the graph controls, the aside's sections, the node
+  detail and the chrome as Cambium components.
 - **The graph is a producer** in its slot. Pointer, wheel and keyboard input
   reach it, and picking stays pictograph's.
 - **The web host mirrors the tree to DOM**, with ARIA roles, names, states and
@@ -298,3 +303,6 @@ this tree.
     set from script.
   - Both done-conditions are met, the first by the ruled instrument, which
     leaves the dialog itself unexercised.
+- 2026-09-26: the D2 audit of this plan and the mere view's receipt
+  (`support/doc-audit/d2/batch_23_one_tree_plan_and_receipt.md`) found five
+  stale claims, four here and one in the receipt, and corrected them.
