@@ -10,6 +10,8 @@ became the first product tactile consumer (terrarium picking over
 per-brick patches, tracer-validated read epochs, and allocator-observed
 bytes (V1b), and `conatus-brick` — the shared sparse-brick ABI both game
 vessels pin — advanced on `codex/conatus-brick-lift` to `bd8f0044`.
+2026-09-26: `modulus`'s shrinking-retarget defect fixed and its atlas sized
+to the card by `AtlasLimits`, ruled by Mark (brick-atlas pass below).
 **Scope:** Build the shared spatial runtime. Mesocosm, Paredros, Isometry,
 and Mere projections consume it through product-owned runtime profiles
 instead of incubating spatial machinery in product-local probes.
@@ -500,3 +502,53 @@ kernel is taken.
   incremental `ResidentChunk` publication into this ABI, not moving the DDA
   into Quint or inventing a universal voxel renderer. Raymarch depth and
   Renderling occlusion remain the next presentation boundary.
+
+## Progress (2026-09-26 brick-atlas pass)
+
+Two changes to `modulus`, from Isometry's board-paging lane and ruled by Mark
+in the wing design record (rulings 288 and 289,
+`repos/isometry/mesocosm/design_docs/2026-09-18_wing_design_plan.md`).
+
+- **Finding: a shrinking retarget broke the kept bricks' reads.** A retarget
+  keeps each retained brick's atlas slot, so after one that shrinks the
+  selection a kept brick can hold a slot past the number of resident keys.
+  `atlas_slot_origin` refused any slot above that count, which looked like a
+  bound only because `from_keys` packs slots densely. For such a brick
+  `material_at` read air under ground the tracer still drew, so a pick passed
+  through it; `slot_texels` returned `None`; and `refresh` panicked in
+  `write_slot`. Loaded keys take the lowest free slots, so only retained
+  bricks could trip it. Fixed in `406aafb2`: slots are bounded by
+  `capacity()`, the geometric question every caller asks. The regression
+  tests in `crates/conatus/modulus/src/tests.rs` fail on the old bound: the
+  kept brick's refresh, a pick checked voxel for voxel against a mirror of
+  the shader's `brick_material_at`, and every slot up to capacity owning its
+  own box.
+- **The atlas is sized to the card** (ruling 289, "Card-sized cap").
+  `MAX_BRICKS`, 2,047, was a 1 MiB budget constant from Eponym's residency
+  experiment read as a limit, while a 256-tile board with relief needs 5,282
+  resident bricks at 1920 by 1080. `AtlasLimits`
+  (`crates/conatus/modulus/src/limits.rs`) holds plain numbers a host fills
+  from `device.limits()`, the limits its device enforces, and from its own
+  budget, 8 MiB recommended, so the crate stays GPU-free.
+  `BrickMap::with_limits` takes a brick count, rounds it up to whole atlas
+  rows, refuses more bricks than the limits allow and any pointer axis past
+  the texture edge, and allocates fallibly. The 16 by 16 slot plane stays
+  and rows grow: 8 MiB holds 16,383 bricks at wgpu's default 2,048-texel
+  edge, and the 256-texel web tier holds 8,191 whatever the budget.
+  `AtlasLimits::DEFAULT` is the old cap, so `MAX_BRICKS`, `from_keys` and
+  `with_capacity` behave as before; `from_keys` has no limits-aware twin
+  yet. Landed in `0ec498f0`.
+- **Verified facts behind that shape.** The pointer encoding needed no
+  widening: slots are `u32` in the map, `texture_3d<u32>` in the WGSL and
+  `R32Uint` in isometer's tracer. The shader reads the slot plane from
+  `BrickTraceSpace.atlas_slots`, so a taller atlas needs no shader change.
+  The atlas stays under 4 GiB because its texel offsets are 32-bit in this
+  crate and in isometer's slot uploads; widening the plane past 16 by 16
+  would need that arithmetic widened first.
+- To stay under the 600-line ceiling, the crate's tests and its error type
+  moved to sibling files (`076d503e`, `ed0ef4aa`).
+- **Consumers adopt it when they repin** (ruling 292). isometer's
+  `bricks.rs` wraps `with_limits` beside `with_capacity` and re-exports
+  `AtlasLimits`, its tracer fills the limits from the device it owns, and
+  Eponym's `StableResidency` can drop its copied `16 * 16 * 512` row
+  arithmetic.
