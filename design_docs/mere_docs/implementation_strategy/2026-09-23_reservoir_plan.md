@@ -14,9 +14,10 @@ await a headed run. Step 5, djinn's routes, landed on 2026-09-25 with its
 two-process receipt, meeting V2's done-conditions (§8), and reached origin the
 same day. V2b, the mere view, was assessed and ruled the same day (§7 items 34
 to 40): Graphshell first moves onto one Cambium tree, in its own plan. V2b's
-steps 1 and 2, the component and its headed proof, landed and reached origin
-the same day, and step 3, the route adapter, landed on `reservoir-v2`; step
-4, Graphshell on one Cambium tree, is next.
+steps 1 to 3, the component, its headed proof and the route adapter, landed
+and reached origin the same day. Step 4, Graphshell on one Cambium tree, is
+under way: its plan's phase 1, accessibility in the browser, landed on
+`reservoir-v2` on 2026-09-26.
 **Scope:** give each data domain one mere, and make every mere of an identity
 openable by any of that identity's applications. The meres are held by the
 device resident, with sessions, a graph journal and an Eidetic archive.
@@ -1393,3 +1394,10 @@ V2b's rulings, all 2026-09-25:
     hold mint, fork, trash and restore under `knot-editor`, and nothing for
     the switch. With the place taken out of relation keys the test fails,
     which is its positive control.
+- 2026-09-26: V2b step 4 began. The one-tree plan's phase 1, accessibility in
+  the browser, landed on `reservoir-v2` (`c19e1120`): the web host mirrors
+  the tree into DOM elements with ARIA. Its test page found genet naming a
+  text field by its content, fixed in genet `1b62fd0b218` and taken by
+  mere's repin (`685c830e`). The
+  [one-tree plan](2026-09-25_graphshell_one_tree_plan.md) records the
+  rulings and the receipt.
