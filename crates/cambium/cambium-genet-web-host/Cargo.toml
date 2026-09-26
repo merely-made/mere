@@ -19,6 +19,12 @@ genet-render-host = { workspace = true }
 genet-scripted-dom = { workspace = true }
 netrender = { workspace = true }
 wgpu = { workspace = true }
+# The accessibility mirror: genet's neutral projection, lowered to ARIA, and
+# AccessKit only to read what a leaf says of itself.
+document-session-api = { workspace = true }
+accesskit = "0.24"
+# Walking the laid-out DOM for the mirror's targets and a leaf's key.
+layout_dom_api = { workspace = true }
 
 # The browser itself. Declared for wasm32 only, so a native build of the
 # workspace resolves none of it.
@@ -33,10 +39,28 @@ web-sys = { version = "0.3", features = [
     "Element",
     "Event",
     "EventTarget",
+    "FocusEvent",
     "HtmlCanvasElement",
     "HtmlElement",
     "KeyboardEvent",
+    "MouseEvent",
+    "Node",
     "PointerEvent",
+    "Text",
     "WheelEvent",
     "Window",
 ] }
+
+# The mirror's tests lay the example page out without a window.
+[target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies]
+cambium-genet-winit-host = { version = "0.1.0", path = "../cambium-genet-winit-host" }
+
+# The accessibility page, mounted in a browser.
+[target.'cfg(target_arch = "wasm32")'.dev-dependencies]
+console_error_panic_hook = "0.1"
+wasm-bindgen-futures = "0.4"
+
+[[example]]
+name = "a11y_page"
+path = "examples/a11y_page/main.rs"
+crate-type = ["cdylib"]

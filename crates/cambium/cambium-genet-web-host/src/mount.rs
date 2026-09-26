@@ -16,14 +16,14 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use cambium_rootstock::{
-    Host, HostHooks, HostOptions, HostState, HostWake, HostWindow, Init, Runner, ScriptedDom,
-    meristem_bounds::RootView,
+    A11yAction, A11yRequest, Host, HostHooks, HostOptions, HostState, HostWake, HostWindow, Init,
+    Runner, ScriptedDom, meristem_bounds::RootView,
 };
 use wasm_bindgen::JsCast;
 use wasm_bindgen::prelude::Closure;
 use web_sys::HtmlCanvasElement;
 
-use crate::a11y::DomAccessibility;
+use crate::a11y::{DomAccessibility, MirrorHandle};
 use crate::input::{
     CompositionKind, composition_from_dom, key_press_from_dom, wheel_delta_from_dom,
 };
@@ -114,17 +114,20 @@ where
     s.sheet = sheet;
     s.set_resources(fonts, images);
     s.runner = Some(Runner::new(dom, logic, state));
-    s.a11y = Some(Box::new(DomAccessibility::new(canvas.clone(), label)));
+    let a11y = DomAccessibility::new(canvas.clone(), label)?;
+    let mirror = a11y.handle();
+    s.a11y = Some(Box::new(a11y));
     s.window = Some(Box::new(window.clone()));
     s.surface = Some(Box::new(surface));
 
     let host = Rc::new(RefCell::new(Host::new(options, None, hooks, s, wake)));
 
     // The first frame, before any event: a canvas that has never painted shows
-    // whatever was behind it.
-    host.borrow_mut().redraw();
+    // whatever was behind it. The mirror is written with it, so a page whose
+    // frame callback never runs, as in a background tab, is still read.
+    draw(&mut host.borrow_mut());
 
-    install_listeners(&canvas, &host, &window)?;
+    install_listeners(&canvas, &mirror, &host, &window)?;
     schedule_frames(&host, &window)?;
 
     Ok(Mounted { host, window })
@@ -170,10 +173,7 @@ where
             window.request_redraw();
         }
         if window.take_pending_frame() {
-            let mut h = host.borrow_mut();
-            h.redraw();
-            h.sync_a11y();
-            h.with_ctx(cambium_rootstock::Hook::AfterFrame);
+            draw(&mut host.borrow_mut());
         }
         if let Some(browser) = web_sys::window()
             && let Some(callback) = frame.borrow().as_ref()
@@ -190,6 +190,55 @@ where
     Ok(())
 }
 
+/// Draw a frame and mirror it for a reader.
+fn draw<State, Logic, V>(host: &mut Host<State, Logic, V>)
+where
+    State: 'static,
+    Logic: FnMut(&State) -> V + 'static,
+    V: RootView<State>,
+{
+    host.redraw();
+    host.sync_a11y();
+    host.with_ctx(cambium_rootstock::Hook::AfterFrame);
+}
+
+/// Carry out what a reader asked of a mirror element, and draw the result
+/// before returning, so the reader hears it without waiting on a frame.
+fn reader_act<State, Logic, V>(host: &Rc<RefCell<Host<State, Logic, V>>>, request: A11yRequest)
+where
+    State: 'static,
+    Logic: FnMut(&State) -> V + 'static,
+    V: RootView<State>,
+{
+    let mut host = host.borrow_mut();
+    host.apply_a11y_requests(&[request]);
+    draw(&mut host);
+}
+
+/// A key, from the canvas or from a mirror element a reader focused.
+fn on_key<State, Logic, V>(
+    host: &Rc<RefCell<Host<State, Logic, V>>>,
+    window: &WebWindow,
+) -> impl FnMut(web_sys::KeyboardEvent) + 'static
+where
+    State: 'static,
+    Logic: FnMut(&State) -> V + 'static,
+    V: RootView<State>,
+{
+    let h = host.clone();
+    let w = window.clone();
+    move |e: web_sys::KeyboardEvent| {
+        let press = key_press_from_dom(&e);
+        // Tab moves focus inside the application, not out of it; the arrows
+        // and Space scroll the page unless claimed.
+        if !press.modifiers.is_command_chord() {
+            e.prevent_default();
+        }
+        h.borrow_mut().key(&press);
+        w.request_redraw();
+    }
+}
+
 /// Attach the DOM listeners that drive the host.
 ///
 /// Every one of these is the same shape: read the event, say what happened in
@@ -198,6 +247,7 @@ where
 /// get them subtly wrong.
 fn install_listeners<State, Logic, V>(
     canvas: &HtmlCanvasElement,
+    mirror: &MirrorHandle,
     host: &Rc<RefCell<Host<State, Logic, V>>>,
     window: &WebWindow,
 ) -> Result<(), String>
@@ -296,43 +346,87 @@ where
         }
     );
 
-    let h = host.clone();
-    let w = window.clone();
+    // Keys reach the host from the canvas, or from the mirror element that
+    // holds focus for a reader.
+    let root = &mirror.root;
     listen!(
         canvas,
         "keydown",
         web_sys::KeyboardEvent,
-        move |e: web_sys::KeyboardEvent| {
-            let press = key_press_from_dom(&e);
-            // Tab moves focus inside the application, not out of it; the arrows
-            // and Space scroll the page unless claimed.
-            if !press.modifiers.is_command_chord() {
-                e.prevent_default();
+        on_key(host, window)
+    );
+    listen!(
+        root,
+        "keydown",
+        web_sys::KeyboardEvent,
+        on_key(host, window)
+    );
+
+    let targets: [&web_sys::EventTarget; 2] = [canvas.as_ref(), root.as_ref()];
+    for target in targets {
+        for (name, kind) in [
+            ("compositionstart", CompositionKind::Start),
+            ("compositionupdate", CompositionKind::Update),
+            ("compositionend", CompositionKind::End),
+        ] {
+            let h = host.clone();
+            let w = window.clone();
+            let closure = Closure::<dyn FnMut(web_sys::CompositionEvent)>::new(
+                move |e: web_sys::CompositionEvent| {
+                    h.borrow_mut()
+                        .ime(composition_from_dom(kind, e.data().unwrap_or_default()));
+                    w.request_redraw();
+                },
+            );
+            target
+                .add_event_listener_with_callback(name, closure.as_ref().unchecked_ref())
+                .map_err(|_| format!("could not attach {name}"))?;
+            closure.forget();
+        }
+    }
+
+    // A reader's click on a mirror element activates its node, and a
+    // reader's focus on one focuses it.
+    let h = host.clone();
+    let m = mirror.clone();
+    listen!(
+        root,
+        "click",
+        web_sys::MouseEvent,
+        move |e: web_sys::MouseEvent| {
+            if let Some(node) = m.target_of(e.target()) {
+                let action = A11yAction::Click;
+                reader_act(&h, A11yRequest { action, node });
             }
-            h.borrow_mut().key(&press);
-            w.request_redraw();
+        }
+    );
+    let h = host.clone();
+    let m = mirror.clone();
+    listen!(
+        root,
+        "focusin",
+        web_sys::FocusEvent,
+        move |e: web_sys::FocusEvent| {
+            // The mirror moving focus to follow the tree is not a reader asking.
+            if m.moving.get() {
+                return;
+            }
+            if let Some(node) = m.target_of(e.target()) {
+                let action = A11yAction::Focus;
+                reader_act(&h, A11yRequest { action, node });
+            }
         }
     );
 
-    for (name, kind) in [
-        ("compositionstart", CompositionKind::Start),
-        ("compositionupdate", CompositionKind::Update),
-        ("compositionend", CompositionKind::End),
-    ] {
-        let h = host.clone();
-        let w = window.clone();
-        let closure = Closure::<dyn FnMut(web_sys::CompositionEvent)>::new(
-            move |e: web_sys::CompositionEvent| {
-                h.borrow_mut()
-                    .ime(composition_from_dom(kind, e.data().unwrap_or_default()));
-                w.request_redraw();
-            },
-        );
-        canvas
-            .add_event_listener_with_callback(name, closure.as_ref().unchecked_ref())
-            .map_err(|_| format!("could not attach {name}"))?;
-        closure.forget();
-    }
+    // The canvas takes focus from Tab or a press, and hands it to the mirror,
+    // where a reader hears what has it.
+    let m = mirror.clone();
+    listen!(
+        canvas,
+        "focus",
+        web_sys::FocusEvent,
+        move |_: web_sys::FocusEvent| m.take_focus()
+    );
 
     // The canvas has to be focusable to receive keys at all.
     let _ = canvas.set_attribute("tabindex", "0");

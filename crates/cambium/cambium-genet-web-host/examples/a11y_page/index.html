@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cambium accessibility page</title>
+<style>
+  body { margin: 0; background: #fafaf7; }
+  #page { display: block; width: 800px; height: 600px; }
+</style>
+</head>
+<body>
+<canvas id="page"></canvas>
+<script type="module">
+  import init, { start } from './a11y_page.js';
+  try {
+    await init();
+    await start('page');
+    document.body.dataset.mounted = 'yes';
+  } catch (error) {
+    document.body.dataset.mounted = 'failed';
+    document.body.dataset.error = String(error);
+    console.error(error);
+  }
+</script>
+</body>
+</html>

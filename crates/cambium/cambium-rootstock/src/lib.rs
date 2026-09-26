@@ -32,6 +32,7 @@
 
 // The types an event source implements the seams against, re-exported so a
 // source names this crate rather than four.
+pub use document_session_api::DocumentA11yProjection;
 pub use genet_scripted_dom::{NodeId, ScriptedDom};
 pub use sprigging::LeafRegistry;
 
@@ -229,9 +230,9 @@ pub struct A11yRequest {
 /// This is the seam where the two event sources differ most, and the only one
 /// that is not a translation. AccessKit builds a *parallel* tree that the
 /// platform queries through a handle bound to a native window. A browser has no
-/// such handle, and needs no parallel tree: the document the host already
-/// rendered is the accessible tree, so the same duty is discharged by keeping
-/// ARIA state on nodes that exist.
+/// such handle, but needs a parallel tree all the same: Cambium presents onto a
+/// canvas, which a reader sees as one graphic, so the browser host mirrors
+/// [`document_projection`] into DOM elements carrying ARIA.
 ///
 /// The signature is what both can honestly implement. Notably absent is the
 /// window: the winit implementation holds its own, and a browser has none to
@@ -260,6 +261,29 @@ pub trait Accessibility {
         focus: Option<u64>,
         layout_scale: f64,
     ) -> Vec<A11yRequest>;
+}
+
+/// This frame's layout as genet's renderer-neutral accessibility projection,
+/// which a host without an AccessKit adapter lowers to its platform's tree:
+/// the browser host lowers it to ARIA. `focus` is the focused node's opaque id,
+/// as [`Accessibility::sync`] receives it.
+pub fn document_projection(
+    dom: &ScriptedDom,
+    layout: &OwnedLayout,
+    focus: Option<u64>,
+) -> DocumentA11yProjection {
+    use layout_dom_api::LayoutDom as _;
+    let focus = focus.and_then(|opaque| find_opaque(dom, dom.document(), opaque));
+    genet_render::document_a11y_projection(dom, layout.fragments(), focus, 0)
+}
+
+fn find_opaque(dom: &ScriptedDom, node: NodeId, opaque: u64) -> Option<NodeId> {
+    use layout_dom_api::LayoutDom as _;
+    if dom.opaque_id(node) == opaque {
+        return Some(node);
+    }
+    dom.dom_children(node)
+        .find_map(|child| find_opaque(dom, child, opaque))
 }
 
 /// A logical key, after the platform applied layout and modifiers.
