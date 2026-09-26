@@ -258,7 +258,7 @@ mod tests {
             material: wrapped,
         }];
         let grant = issue_remote_auth_device_grant(&root, &spec).unwrap();
-        assert!(all_certificates_verify(&grant));
+        assert_all_certificates_check(&grant);
         assert_eq!(
             unwrap_private_epoch_material(
                 &stored_epochs_for(&root, &grant, fixture_persona())[0],
@@ -382,7 +382,7 @@ mod tests {
 
         let spec = sample_paired_remote_auth_spec();
         let (grant, pairing) = issue_remote_auth_device_grant_from_pairing(&root, &spec).unwrap();
-        assert!(all_certificates_verify(&grant));
+        assert_all_certificates_check(&grant);
         assert_eq!(pairing.short_auth_string.len(), 6);
         assert_eq!(
             unwrap_private_epoch_material(
@@ -442,7 +442,7 @@ mod tests {
         }];
         let (grant, pairing) =
             issue_remote_auth_device_grant_from_ticket(&root, &ticket, &response, epochs).unwrap();
-        assert!(all_certificates_verify(&grant));
+        assert_all_certificates_check(&grant);
         assert_eq!(
             parse_remote_auth_pairing_code(&format_remote_auth_pairing_code(ticket.pairing_secret))
                 .unwrap(),

@@ -155,11 +155,11 @@ mod tests {
             ),
         )
         .unwrap();
-        assert!(signed.verify());
+        signed.check().expect("an issued certificate checks");
 
         let mut tampered = signed.clone();
         tampered.certificate.scope.path_prefix = "moot/secret".into();
-        assert!(!tampered.verify());
+        assert_eq!(tampered.check(), Err(insigne::CheckFault::BadSignature));
     }
 
     #[test]
@@ -210,10 +210,10 @@ mod tests {
             ),
         )
         .unwrap();
-        assert!(signed.verify());
+        signed.check().expect("an issued revocation checks");
 
         let mut tampered = signed;
         tampered.revocation.certificate = DelegationId([9; 32]);
-        assert!(!tampered.verify());
+        assert_eq!(tampered.check(), Err(insigne::CheckFault::BadSignature));
     }
 }

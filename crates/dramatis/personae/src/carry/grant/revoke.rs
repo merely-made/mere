@@ -111,7 +111,11 @@ mod tests {
             3,
             "one device certificate and two personas"
         );
-        assert!(statements.iter().all(|statement| statement.verify()));
+        for statement in &statements {
+            statement
+                .check()
+                .expect("every revocation statement checks");
+        }
     }
 
     /// The ledger refuses a statement whose declared issuer does not match the
@@ -141,6 +145,8 @@ mod tests {
         let statements = revoke_device_grant_set(MASTER_SEED, &set, NOW_MS + 1).unwrap();
 
         assert_eq!(statements.len(), 1);
-        assert!(statements[0].verify());
+        statements[0]
+            .check()
+            .expect("the revocation statement checks");
     }
 }

@@ -411,7 +411,7 @@ mod tests {
             .unwrap()
             .expect("the certificate should be stored");
         assert_eq!(back, certificate);
-        assert!(back.verify());
+        back.check().expect("the stored certificate checks");
     }
 
     #[test]
@@ -545,7 +545,11 @@ mod tests {
         let back = load_device_grant_set(root.path(), device()).unwrap();
         assert_eq!(back, set);
         assert_eq!(back.personas.len(), 2);
-        assert!(back.certificates().all(|c| c.verify()));
+        for certificate in back.certificates() {
+            certificate
+                .check()
+                .expect("every stored certificate checks");
+        }
     }
 
     #[test]
