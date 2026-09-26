@@ -363,3 +363,7 @@ crate inventory at the Code root.
   genet `532f1fad`'s second `fleece` and `layout-dom-api`, leaving one genet
   rev and no mere package from git. The portable gate passes at 1,521
   packages.
+- 2026-09-26. insigne's phase B landed (`538226a3`): a check returns a
+  conclusion or a `CheckFault`, and `verify() -> bool` is gone. insigne's
+  API is settled, which meets the C5 baseline's insigne condition. Of the
+  dramatis tier, chatelaine's CXF-shaped taxonomy remains.
