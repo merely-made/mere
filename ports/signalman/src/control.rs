@@ -15,9 +15,9 @@
 use std::fmt;
 
 use castellan::reticulum::grant::{SitedStationGrant, SitedStationGrantError};
+use insigne::CheckFault;
 use p2panda_core::cbor::{decode_cbor, encode_cbor};
 use pandect::{DeviceGrantError, DeviceId, decode_device_grant_set, encode_device_grant_set};
-use insigne::CheckFault;
 use personae::{
     DerivedKeyAttestation, Ed25519Keypair, Ed25519PublicKey, Ed25519Signature, IdentityError,
     IdentityProvider,
