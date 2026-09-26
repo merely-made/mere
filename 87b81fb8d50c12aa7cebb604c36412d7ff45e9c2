@@ -1,0 +1,7 @@
+Correction: this commit's message says the message is "cut with the
+ellipsis it already had". That describes the sheet, not what renders.
+Genet does not paint text-overflow: ellipsis at 1b62fd0b218, so where
+Genet lays the bar out, the message is clipped mid-glyph with no
+ellipsis. The module doc made the same claim; 518ca1dc ("Say that Genet
+does not paint the status message's ellipsis") corrects it, and the gap
+is reported to the Genet roadmap.
