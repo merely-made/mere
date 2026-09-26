@@ -174,7 +174,7 @@ pub use slider::{Slider, slider};
 pub use splice::GenetChildrenSplice;
 pub use sprigging::{
     AngleStrip, AngleStripMark, DimensionLine, DimensionLineTraversal, GraphCanvas, GraphViewport,
-    GridColumn, GridSpec,
+    GridColumn, GridSpec, RelationLine,
 };
 pub use styled_field::{
     FIELD_CARET_CLASS, FIELD_PREEDIT_CLASS, FieldChild, StyleRange, caret_field_children,
