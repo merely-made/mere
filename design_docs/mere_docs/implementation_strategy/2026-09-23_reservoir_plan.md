@@ -15,7 +15,8 @@ two-process receipt, meeting V2's done-conditions (§8), and reached origin the
 same day. V2b, the mere view, was assessed and ruled the same day (§7 items 34
 to 40): Graphshell first moves onto one Cambium tree, in its own plan. V2b's
 steps 1 and 2, the component and its headed proof, landed and reached origin
-the same day; step 3, the route adapter, is next.
+the same day, and step 3, the route adapter, landed on `reservoir-v2`; step
+4, Graphshell on one Cambium tree, is next.
 **Scope:** give each data domain one mere, and make every mere of an identity
 openable by any of that identity's applications. The meres are held by the
 device resident, with sessions, a graph journal and an Eidetic archive.
@@ -510,7 +511,9 @@ consumer:
 - **One adapter for routes**, `graphshell::mere_route`. It fills the model
   from a mere route's two projections and turns requests into the route's
   intents. The sessions vocabulary moves from djinn into
-  `graphshell::session_item`, so djinn and every application share it.
+  `graphshell::session_item`, so djinn and every application share it. The
+  adapter is behind graphshell's `mere-route` feature, and a relation shows
+  its kernel family as its kind (§7 items 42 and 43).
 - **Graphshell moves onto one Cambium tree first**, in
   [its own plan](2026-09-25_graphshell_one_tree_plan.md), and the panel is one
   component in that tree, beside the canvas, which stays Graphshell's editing
@@ -534,9 +537,10 @@ consumer:
    whole under `Code/testing/mere/`.
 3. The route adapter, with the vocabulary's move.
    *Done when* a test through djinn's door takes mint, switch, fork, trash
-   and restore through the adapter, each recorded with the admitted
-   application, and the adapter's model matches the route's sessions and
-   graph.
+   and restore through the adapter; mint, fork, trash and restore are each
+   recorded with the admitted application, and the switch shows in the
+   adapter's model (§7 item 41); and the adapter's model matches the route's
+   sessions and graph.
 4. Graphshell on one Cambium tree, per
    [its plan](2026-09-25_graphshell_one_tree_plan.md): accessibility in the
    browser, a file seam and the canvas as a producer come first, then the
@@ -546,17 +550,18 @@ consumer:
    `MereHost`. Switching sessions reopens the canvas on the chosen one, and
    the panel can hide its own graph where the canvas shows it.
    *Done when* the Browser pane's `read_page` lists the panel's sessions,
-   steps and node targets, a step taken from the panel is recorded with
-   `graphshell`, and a headed Chromium capture shows the panel beside the
-   canvas.
+   steps and node targets, a step taken from the panel that changes the mere
+   is recorded with `graphshell`, and a headed Chromium capture shows the
+   panel beside the canvas.
 
 **Done when:**
 - the component is in Cambium, and Graphshell presents it in its one
   Cambium tree, beside its canvas, over its own mere;
 - Knot's nine requirements above hold in the headed harness, at the full
   centre and in a 280 px side tile;
-- a lifecycle step taken through the component, from Graphshell or through
-  the route adapter, is recorded with the application that took it;
+- a lifecycle step that changes the mere, taken through the component from
+  Graphshell or through the route adapter, is recorded with the application
+  that took it (a switch changes nothing stored, §7 item 41);
 - no application keeps a mere view of its own. Graphshell has none but the
   component; Knot's step 8 and Cleromancy's C1 embed it, and their plans
   record the embedding against these conditions.
@@ -836,6 +841,28 @@ V2b's rulings, all 2026-09-25:
     seam and a producer proven in a browser come before any control moves, so
     Graphshell never loses accessibility. The alternatives were to start the
     move with the projection built alongside, or to rethink the order.
+41. **A switch is not recorded.** Step 3's done-condition had mint, switch,
+    fork, trash and restore each recorded with the admitted application, but
+    attaching writes nothing. Pandect's change log has kinds for minting,
+    forking, trashing and restoring, and any change it records stamps the
+    session's `updated_at`, which picks the session every application
+    attaches to by default. Mark chose "Stays unrecorded": a switch moves only
+    the connection, the step's test shows it through the adapter's model, and
+    the conditions record the steps that change the mere. The alternatives
+    were an attach kind that moves the default, or one that does not.
+42. **How graphshell takes the view's types.** "Optional, behind a feature":
+    graphshell's `mere-route` feature brings in `mere-view`, and with it
+    Cambium, cartography and sprigging. Default builds are unchanged; djinn's
+    tests and the applications that embed the view turn it on. The
+    alternative split `mere-view`'s model from its view behind a default
+    feature.
+43. **Relation kinds from a route.** The route serves each relation with its
+    kernel family alone, so a hyperlink, a person's grouping and an agent's
+    suggestion all arrive as `semantic`. Mark chose "Families as they come":
+    a relation's kind is its family, and it draws as a plain line. Telling
+    extracted, authored and suggested apart waits until a mere holds Knot's
+    catalog. The alternative added sub-kinds to the route's labels and mapped
+    them onto the three.
 
 ## 8. Progress
 
@@ -1348,3 +1375,21 @@ V2b's rulings, all 2026-09-25:
   scenarios pass again; the frames changed only where buttons sit on their
   line boxes, and were reviewed whole
   ([receipt](../testing/2026-09-25_mere_view_headed_receipt.md)).
+- 2026-09-25: V2b step 3, the route adapter, landed on `reservoir-v2`. Mark
+  ruled three things on the way (§7 items 41 to 43): a switch stays
+  unrecorded, graphshell takes the view's types behind a `mere-route`
+  feature, and a relation from a route shows its kernel family.
+  - The sessions vocabulary moved from djinn into `graphshell::session_item`:
+    the two projections' names, the lifecycle intents and `SessionsActionV1`.
+  - `graphshell::mere_route` holds no connection. `requests` finds the
+    route's two projections in its descriptor, `card_requests` names the cards
+    to read, `fill` fills a `MereViewModel` from the snapshots and the cards,
+    `intent` turns a view request into the route's intent, and `declined`
+    words a refusal.
+  - djinn's `the_route_adapter_takes_the_lifecycle_and_shows_the_route` takes
+    mint, fork, switch, trash and restore through the adapter at djinn's door.
+    It checks the model against the route's graph, where three relations on
+    one pair stay apart, and against the sessions as stored. The change logs
+    hold mint, fork, trash and restore under `knot-editor`, and nothing for
+    the switch. With the place taken out of relation keys the test fails,
+    which is its positive control.
