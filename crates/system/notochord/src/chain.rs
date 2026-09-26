@@ -17,7 +17,6 @@ use std::collections::BTreeMap;
 use insigne::{CheckedCertificate, CheckedRevocation};
 use personae::delegation::{
     DelegationCertificate, DelegationId, DelegationParent, SignedDelegationCertificate,
-    SignedDelegationRevocation,
 };
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
@@ -93,7 +92,7 @@ impl RevocationLedger {
     /// Record one checked revocation statement.
     ///
     /// Only a checked statement folds: check it first with
-    /// [`SignedDelegationRevocation::check`], so the ledger never holds a
+    /// [`insigne::SignedDelegationRevocation::check`], so the ledger never holds a
     /// withdrawal whose signature did not check.
     pub fn fold(&mut self, revocation: CheckedRevocation<'_>) {
         let statement = revocation.revocation();
@@ -198,7 +197,7 @@ pub fn validate_chain<'a>(
 #[cfg(test)]
 mod tests {
     use personae::delegation::Issue;
-    use personae::delegation::{CapabilityScope, DelegationRevocation};
+    use personae::delegation::{CapabilityScope, DelegationRevocation, SignedDelegationRevocation};
     use personae::{IdentityProvider, InMemoryProvider};
 
     use super::*;

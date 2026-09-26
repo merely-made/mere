@@ -92,16 +92,7 @@ pub(crate) fn validate_remote_auth_enrollment_bundle(
             "remote-auth enrollment bundle carries no grant certificates",
         ));
     }
-    if !bundle
-        .grant
-        .certificates()
-        .all(|certificate| certificate.verify())
-    {
-        return Err(io::Error::new(
-            io::ErrorKind::InvalidData,
-            "remote-auth enrollment bundle grant failed signature verification",
-        ));
-    }
+    check_grant_set(&bundle.grant, "remote-auth enrollment bundle grant")?;
 
     let local = load_local_device_identity(data_root)?.ok_or_else(|| {
         io::Error::new(
