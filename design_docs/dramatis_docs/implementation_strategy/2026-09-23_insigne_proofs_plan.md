@@ -193,7 +193,7 @@ Done when (landed 2026-09-26):
       checked leaf, which notochord's admission asks `covers` of
       (`e4471b93`);
 - [x] no caller in mere, signalman included, reads a `bool` from a check
-      (`87aae7ab`), with one exception for Mark to confirm. castellan's
+      (`87aae7ab`), with one exception, which Mark confirmed on 2026-09-26. castellan's
       `DeviceGrantView` reports "verified" or "invalid" in a serialized
       view: it can carry the outcome, but never the conclusion. Functions
       whose own contract is a `bool` or an `Option` keep it, built on the
