@@ -1,7 +1,8 @@
 # Insigne Proofs Plan
 
 **Date**: 2026-09-23
-**Status**: phase A landed 2026-09-24; phases B–D open. Mark agreed the split
+**Status**: phase A landed 2026-09-24; phase B in progress (design ruled
+2026-09-26, §3); C and D open. Mark agreed the split
 and ruled how issuing is expressed (§2, option (a)) on 2026-09-23. The Mere
 0.4 release baseline waits for phase B (Mark, 2026-09-26).
 **Scope**: move personae's delegation and attestation data types into insigne's
@@ -129,6 +130,73 @@ communicate to 'em". Built as two traits rather than one: `Issue` in
   `AttestedKey` carry the artifact that proved them. Done when a gaz record
   round-trips a stored attestation and it checks again after reload.
 
+### B, as ruled 2026-09-26
+
+Mark chose both options below from named alternatives.
+
+**The conclusion is borrowed and unforgeable.** Each statement gets a
+`check`, behind `verify`. It returns `Result<Checked…<'_>, CheckFault>` and
+leaves the old `verify` in place, deprecated, until no caller needs it:
+
+- `DerivedKeyAttestation::check(salt)` returns `CheckedAttestation`;
+- `SignedDelegationCertificate::check()` returns `CheckedCertificate`;
+- `SignedDelegationRevocation::check()` returns `CheckedRevocation`.
+
+A conclusion borrows the statement it was drawn from and has private
+fields, so only a passing check makes one. It is not serializable. It
+exposes the statement and, for the signed kinds, the checked signer.
+`CheckFault` says which step failed: `Malformed`, `BadAttestation`,
+`WrongIssuer` or `BadSignature`. The steps run in the order the old
+`verify` ran them, so exactly the same statements pass. "Check" is
+insigne's own word: its crate docs say a check that passes yields a local
+conclusion. The alternatives were owned copies of the facts, keeping the
+name `verify` in one breaking step, or public fields as `AdmittedPrincipal`
+has, which anyone could forge.
+
+**The conclusion travels to the first decision, and through notochord.**
+Every `if !x.verify()` becomes a `check` whose fault the caller keeps.
+notochord's `RevocationLedger::fold` takes a `CheckedRevocation`, so a ledger
+cannot fold an unchecked statement. `validate_chain` returns the checked
+leaf, so admission asks `covers` of a checked certificate. The alternatives
+were call sites only, or demanding conclusions in every API that receives a
+statement (pandect's wallet grants, gemot's store, graphshell's carriers).
+
+**The census, by compiler.** The three `verify` functions were marked
+deprecated in a scratch tree, and the workspace was built with every target.
+That found 60 call sites in 29 files across 11 crates: personae 19, insigne
+itself 10, pandect 8, gemot 7, graphshell, commons, servitor and notochord 3
+each, stickleback 2, mere-mesh and castellan 1 each. signalman adds 1: it is
+its own workspace, which the workspace build never reaches (§4, 2026-09-26).
+
+Outside mere, by pattern:
+
+- turnstone: 1 `verify` and 2 `fold` calls;
+- hocket: 1 `verify`, with the same code vendored in woodshed;
+- knot-editor: 2 test assertions and 1 `fold` in an example.
+
+mere compiles only knot-editor's library, which calls neither, so this
+phase needs no knot lockstep. Each of those repos migrates at its next repin.
+
+**Order.** Each step keeps the workspace green:
+
+1. insigne gains `check` and the conclusions, and deprecates `verify`.
+2. notochord changes `fold` and `validate_chain`, updating their callers in
+   the same commit.
+3. The remaining call sites move crate by crate.
+4. `verify` goes.
+
+Done when:
+
+- [ ] insigne's three `check` functions and their conclusions exist, and
+      `verify() -> bool` is gone;
+- [ ] `fold` takes a `CheckedRevocation`, and `validate_chain` returns the
+      checked leaf;
+- [ ] no caller in mere, signalman included, reads a `bool` from a check;
+- [ ] the portable gate passes, signalman checks with its own command, and
+      the moved crates' tests pass, the pre-move fixture tests included;
+- [ ] the handoff for turnstone, hocket, woodshed and knot-editor is
+      recorded here.
+
 ## 4. Findings
 
 **2026-09-23: the blast radius, counted.** Searched with ripgrep over
@@ -179,6 +247,16 @@ own unit tests could not run for phase A. They compile through type checking,
 which covers their imports. Resolved since: graphshell's test by `bc7121ae`,
 cambium-nematic's by `4b33a963`, and the gate has checked every target since
 `67ebef3a` (Mark's ruling).
+
+**2026-09-26: phase A missed a nested workspace.** `ports/signalman` is its
+own workspace, excluded from mere's, but it path-depends on personae. So
+neither the portable gate nor phase A's workspace check compiled it. It
+reads an attestation's `master_public_key` and `derived_public_key`, and it
+failed with E0599 from `5364dfa0` until `aacf39c7` imported
+`AttestationKeys`. One other nested workspace depends on the proof crates,
+`ports/distillery/probe/remote-fixture`, and it calls none of the moved
+APIs. From here on, each nested workspace that depends on these crates is
+checked with its own command.
 
 ## 5. Progress
 
