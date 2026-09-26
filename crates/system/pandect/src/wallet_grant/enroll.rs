@@ -34,12 +34,7 @@ pub fn build_remote_auth_enrollment_bundle(
             legacy_grant_hint(data_root, device_id),
         ));
     }
-    if !grant.certificates().all(|certificate| certificate.verify()) {
-        return Err(io::Error::new(
-            io::ErrorKind::InvalidData,
-            "device grant certificate failed signature verification",
-        ));
-    }
+    check_grant_set(&grant, "device grant certificate")?;
     let granted_personas: Vec<PersonaId> = grant.personas.keys().copied().collect();
     let mut epochs = Vec::new();
     for certificate in grant.personas.values() {

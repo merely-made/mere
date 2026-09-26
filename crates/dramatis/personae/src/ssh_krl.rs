@@ -74,12 +74,12 @@ impl RevocationLedger {
     /// Record a signed revocation, returning whether it was accepted.
     ///
     /// The signature is checked here rather than trusted: a ledger that
-    /// folds unverified statements is a ledger anyone can write to.
+    /// folds unchecked statements is a ledger anyone can write to.
     pub fn fold(&mut self, revocation: &SignedDelegationRevocation, label: &str) -> bool {
-        if !revocation.verify() {
+        let Ok(checked) = revocation.check() else {
             return false;
-        }
-        let statement = &revocation.revocation;
+        };
+        let statement = checked.revocation();
         let serial = device_serial(&statement.scope.resource);
         let entry = self.devices.entry(serial).or_insert_with(|| RevokedDevice {
             serial,

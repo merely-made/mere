@@ -17,8 +17,9 @@ use std::fmt;
 use castellan::reticulum::grant::{SitedStationGrant, SitedStationGrantError};
 use p2panda_core::cbor::{decode_cbor, encode_cbor};
 use pandect::{DeviceGrantError, DeviceId, decode_device_grant_set, encode_device_grant_set};
+use insigne::CheckFault;
 use personae::{
-    AttestationKeys, DerivedKeyAttestation, Ed25519Keypair, Ed25519Signature, IdentityError,
+    DerivedKeyAttestation, Ed25519Keypair, Ed25519PublicKey, Ed25519Signature, IdentityError,
     IdentityProvider,
 };
 use retinue::identity::{Identity, PrivateIdentity};
@@ -202,21 +203,15 @@ impl SitedStationControl {
         expected_issuer: [u8; 32],
         device_id: DeviceId,
     ) -> Result<(), SitedStationControlError> {
-        if !self.body.attestation.verify(&control_salt(device_id)) {
-            return Err(SitedStationControlError::InvalidControlAttestation);
-        }
-        let master = self
+        let checked = self
             .body
             .attestation
-            .master_public_key()
-            .map_err(SitedStationControlError::Identity)?;
-        if master.to_bytes() != expected_issuer {
+            .check(&control_salt(device_id))
+            .map_err(SitedStationControlError::InvalidControlAttestation)?;
+        if checked.master() != &expected_issuer {
             return Err(SitedStationControlError::ControlIssuerMismatch);
         }
-        let derived = self
-            .body
-            .attestation
-            .derived_public_key()
+        let derived = Ed25519PublicKey::from_bytes(checked.derived())
             .map_err(SitedStationControlError::Identity)?;
         let signature: [u8; 64] = self
             .signature
@@ -694,8 +689,9 @@ pub enum SitedStationControlError {
     FrameTooLarge { actual: usize },
     /// A Personae attestation could not expose one of its public keys.
     Identity(IdentityError),
-    /// The control child was not attested for this station id.
-    InvalidControlAttestation,
+    /// The control child was not attested for this station id; the fault
+    /// says which step of the check failed.
+    InvalidControlAttestation(CheckFault),
     /// The attested control child was not authorized by the current grant issuer.
     ControlIssuerMismatch,
     /// The command signature did not have the required Ed25519 length.
@@ -764,9 +760,10 @@ impl fmt::Display for SitedStationControlError {
                 "sited-station control frame is {actual} bytes, over the {MAX_CONTROL_FRAME_BYTES}-byte carrier limit"
             ),
             Self::Identity(error) => write!(f, "sited-station control identity failed: {error}"),
-            Self::InvalidControlAttestation => {
-                f.write_str("sited-station control key is not attested for this device")
-            }
+            Self::InvalidControlAttestation(fault) => write!(
+                f,
+                "sited-station control key is not attested for this device: {fault}"
+            ),
             Self::ControlIssuerMismatch => f.write_str(
                 "sited-station control key was not authorized by this station's grant issuer",
             ),

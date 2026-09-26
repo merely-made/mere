@@ -61,15 +61,10 @@ pub(crate) fn refresh_remote_auth_private_read_grant(
     if grant.is_empty() {
         return Ok(None);
     }
-    if !grant.certificates().all(|certificate| certificate.verify()) {
-        return Err(io::Error::new(
-            io::ErrorKind::InvalidData,
-            format!(
-                "device grant certificates for {} failed signature verification",
-                device_id.as_uuid()
-            ),
-        ));
-    }
+    check_grant_set(
+        &grant,
+        &format!("device grant certificates for {}", device_id.as_uuid()),
+    )?;
 
     let mut changed = false;
     for &persona in rotated_personas {
