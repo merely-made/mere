@@ -10,6 +10,7 @@
 //! DOM siblings, interaction in the view layer over the leaf.
 
 use paint_list_api::ColorF;
+use paint_list_api::items::DashPattern;
 
 use crate::path::Path;
 use crate::{Leaf, PaintCx, Size, SizeHint, round_stroke};
@@ -32,6 +33,19 @@ pub struct GraphGlyphNode {
 pub struct GraphGlyphRelation {
     pub points: Vec<(f32, f32)>,
     pub emphasized: bool,
+    pub line: RelationLine,
+}
+
+/// How a relation's line is drawn, so kinds of relation differ by more than
+/// colour.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub enum RelationLine {
+    #[default]
+    Solid,
+    /// Twice the edge width.
+    Heavy,
+    Dashed,
+    Dotted,
 }
 
 /// A fixed leaf-local atlas polygon painted beneath graph routes and nodes.
@@ -317,21 +331,30 @@ impl Leaf for GraphCanvas {
                 .iter()
                 .map(|point| self.viewport.project(*point, s, inset))
                 .collect::<Vec<_>>();
-            cx.stroke_path(
-                Path::polyline(&points),
-                round_stroke(
-                    if relation.emphasized {
-                        self.selection_color
-                    } else {
-                        self.edge_color
-                    },
-                    if relation.emphasized {
-                        self.edge_width * 2.0
-                    } else {
-                        self.edge_width
-                    },
-                ),
+            let heavy = relation.emphasized || relation.line == RelationLine::Heavy;
+            let mut stroke = round_stroke(
+                if relation.emphasized {
+                    self.selection_color
+                } else {
+                    self.edge_color
+                },
+                if heavy {
+                    self.edge_width * 2.0
+                } else {
+                    self.edge_width
+                },
             );
+            // Round caps turn the dotted pattern's short dashes into dots.
+            stroke.dash = match relation.line {
+                RelationLine::Dashed => Some(vec![6.0, 4.0]),
+                RelationLine::Dotted => Some(vec![0.5, 3.5]),
+                RelationLine::Solid | RelationLine::Heavy => None,
+            }
+            .map(|intervals| DashPattern {
+                intervals,
+                offset: 0.0,
+            });
+            cx.stroke_path(Path::polyline(&points), stroke);
         }
         for (index, n) in self.nodes.iter().enumerate() {
             let (x, y) = place(n);
@@ -716,10 +739,12 @@ mod tests {
             GraphGlyphRelation {
                 points: vec![(0.1, 0.5), (0.5, 0.25), (0.9, 0.5)],
                 emphasized: false,
+                line: RelationLine::Dashed,
             },
             GraphGlyphRelation {
                 points: vec![(0.1, 0.5), (0.5, 0.75), (0.9, 0.5)],
                 emphasized: true,
+                line: RelationLine::Solid,
             },
         ]);
 
@@ -732,6 +757,15 @@ mod tests {
             2,
             "each relation remains a separately painted route"
         );
+        // A line style reaches the stroke: one dashed route, one solid.
+        let dashes: Vec<bool> = cmds
+            .iter()
+            .filter_map(|cmd| match cmd {
+                PaintCmd::DrawPath(path) => path.stroke.as_ref().map(|s| s.dash.is_some()),
+                _ => None,
+            })
+            .collect();
+        assert_eq!(dashes, [true, false]);
     }
 
     #[test]

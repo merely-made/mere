@@ -12,7 +12,7 @@
 use sceno::Vec2;
 use sprigging::{
     ColorF, GraphAtlasCompoundPath, GraphAtlasPolygon, GraphCanvas, GraphGlyphNode,
-    GraphGlyphRelation, GraphViewport, Size,
+    GraphGlyphRelation, GraphViewport, RelationLine, Size,
 };
 
 use crate::GraphCanvasAtlas;
@@ -80,6 +80,12 @@ pub const GRAPH_CANVAS_SWATCH_CSS: &str = r#"
 .graph-canvas-swatch-relation-targets,
 .graph-canvas-swatch-targets {
     pointer-events: none;
+}
+/* A relation cell spans its whole segment and its rotation makes it a
+   stacking context, so it would win the press at both endpoint nodes. Node
+   targets stack above the cells; a press on a node's centre is the node's. */
+.graph-canvas-swatch-targets {
+    z-index: 1;
 }
 .graph-canvas-swatch-relation,
 .graph-canvas-swatch-node {
@@ -204,6 +210,9 @@ pub struct GraphCanvasSwatch<Id, Kind> {
     /// Relation cells rendered in preference to the legacy endpoint-only
     /// [`GraphCanvasSubgraph::edges`] when nonempty.
     pub relations: Vec<GraphCanvasRelation<Id>>,
+    /// The line each relation kind is painted with; see
+    /// [`with_relation_lines`](Self::with_relation_lines).
+    pub relation_lines: Vec<(String, RelationLine)>,
     /// App-owned rectangular overlays currently occupying graph nodes.
     pub node_footprints: Vec<GraphCanvasNodeFootprint<Id>>,
     /// Optional fixed-world atlas beneath the graph labels and callouts.
@@ -233,6 +242,11 @@ pub struct GraphCanvasSwatch<Id, Kind> {
     /// modifiers as the node buttons, so a consumer can emphasize the label of
     /// the node that matters without hand-rolling a parallel label layer.
     pub show_labels: bool,
+    /// With labels shown, leave out a label whose box would print over one
+    /// already shown: the selected, focused and hovered nodes' first and always,
+    /// then the rest in node order. A node without a shown label keeps its
+    /// accessible name. Defaults off, which keeps every label.
+    pub cull_labels: bool,
     /// Let captured `Move` events update the model used by the custom leaf
     /// without rebuilding the retained DOM until release. Defaults off because
     /// the consumer must refresh that leaf independently each presented frame.
@@ -247,6 +261,7 @@ impl<Id, Kind> GraphCanvasSwatch<Id, Kind> {
             leaf_key,
             graph,
             relations: Vec::new(),
+            relation_lines: Vec::new(),
             node_footprints: Vec::new(),
             atlas: None,
             selected: None,
@@ -264,6 +279,7 @@ impl<Id, Kind> GraphCanvasSwatch<Id, Kind> {
             label: "Related graph".to_string(),
             show_expand: true,
             show_labels: false,
+            cull_labels: false,
             defer_drag_rebuild: false,
         }
     }
@@ -295,6 +311,14 @@ impl<Id, Kind> GraphCanvasSwatch<Id, Kind> {
         self
     }
 
+    /// Leave out a visible label that would print over one already shown
+    /// (see [`Self::cull_labels`]).
+    #[must_use]
+    pub fn with_label_culling(mut self, on: bool) -> Self {
+        self.cull_labels = on;
+        self
+    }
+
     /// Paint live drag positions through the custom leaf and settle native hit
     /// targets on release instead of rebuilding them for every sampled move.
     #[must_use]
@@ -318,6 +342,21 @@ impl<Id, Kind> GraphCanvasSwatch<Id, Kind> {
     pub fn with_relations(mut self, relations: Vec<GraphCanvasRelation<Id>>) -> Self {
         self.relations = relations;
         self
+    }
+
+    /// Paint relations of each named kind with their own line, so kinds differ
+    /// by more than colour. A kind not listed is painted solid.
+    #[must_use]
+    pub fn with_relation_lines(mut self, lines: Vec<(String, RelationLine)>) -> Self {
+        self.relation_lines = lines;
+        self
+    }
+
+    fn relation_line(&self, kind: &str) -> RelationLine {
+        self.relation_lines
+            .iter()
+            .find(|(named, _)| named == kind)
+            .map_or(RelationLine::Solid, |(_, line)| *line)
     }
 }
 
@@ -401,6 +440,7 @@ impl<Id: PartialEq, Kind> GraphCanvasSwatch<Id, Kind> {
                     .map(|(relation, points)| GraphGlyphRelation {
                         points,
                         emphasized: relation.emphasized,
+                        line: self.relation_line(&relation.kind),
                     })
                     .collect(),
             );
@@ -503,6 +543,66 @@ impl<Id: PartialEq, Kind> GraphCanvasSwatch<Id, Kind> {
     /// labels beside it. This avoids the old failure where every label sat to
     /// the right and a right-going relation was therefore painted through its
     /// source label.
+    /// Which nodes' labels show, in node order: all of them unless
+    /// [`Self::cull_labels`] is on. Label boxes are estimated from the label's
+    /// length at the label's 10 px size.
+    fn shown_labels(&self) -> Vec<bool> {
+        let count = self.graph.nodes.len();
+        if !self.cull_labels {
+            return vec![true; count];
+        }
+        const HEIGHT: f32 = 14.0;
+        let clearance = self.node_radius + 7.0;
+        let canvas_width = self.width as f32;
+        let positions: Vec<(f32, f32)> = self
+            .projected_positions()
+            .into_iter()
+            .map(|(_, at)| at)
+            .collect();
+        // The boxes `GraphLabelPlacement::style` lays out.
+        let rect = |index: usize| {
+            let (x, y) = positions[index];
+            let width = label_text_width(&self.graph.nodes[index].label);
+            match self.label_placement(index) {
+                placement @ (GraphLabelPlacement::Above | GraphLabelPlacement::Below) => {
+                    let top = if placement == GraphLabelPlacement::Above {
+                        y - clearance - HEIGHT
+                    } else {
+                        y + clearance
+                    };
+                    let left = (x - width * 0.5).clamp(0.0, (canvas_width - width).max(0.0));
+                    (left, top, width, HEIGHT)
+                },
+                GraphLabelPlacement::Left => {
+                    (x - clearance - width, y - HEIGHT * 0.5, width, HEIGHT)
+                },
+                GraphLabelPlacement::Right => (x + clearance, y - HEIGHT * 0.5, width, HEIGHT),
+            }
+        };
+        let overlaps = |a: (f32, f32, f32, f32), b: (f32, f32, f32, f32)| {
+            a.0 < b.0 + b.2 && b.0 < a.0 + a.2 && a.1 < b.1 + b.3 && b.1 < a.1 + a.3
+        };
+        let pinned = |index: usize| {
+            let id = &self.graph.nodes[index].id;
+            [&self.selected, &self.focus, &self.hovered]
+                .into_iter()
+                .any(|marked| marked.as_ref() == Some(id))
+        };
+        let order = (0..count)
+            .filter(|&index| pinned(index))
+            .chain((0..count).filter(|&index| !pinned(index)));
+        let mut shown = vec![false; count];
+        let mut kept = Vec::new();
+        for index in order {
+            let boxed = rect(index);
+            if pinned(index) || !kept.iter().any(|&other| overlaps(boxed, other)) {
+                shown[index] = true;
+                kept.push(boxed);
+            }
+        }
+        shown
+    }
+
     fn label_placement(&self, index: usize) -> GraphLabelPlacement {
         let Some(node) = self.graph.nodes.get(index) else {
             return GraphLabelPlacement::Right;
@@ -547,13 +647,17 @@ impl<Id: PartialEq, Kind> GraphCanvasSwatch<Id, Kind> {
             } else {
                 GraphLabelPlacement::Below
             }
-        } else if vertical > 0.0 {
-            if position.0 <= self.width as f32 * 0.72 {
-                GraphLabelPlacement::Right
-            } else {
-                GraphLabelPlacement::Left
-            }
-        } else if position.0 <= self.width as f32 * 0.72 {
+        } else {
+            self.side_with_room(position.0)
+        }
+    }
+
+    /// Right when a whole label fits there or the right has the more room;
+    /// otherwise left. A narrow canvas then clips fewer labels than a fixed
+    /// share of its width would.
+    fn side_with_room(&self, x: f32) -> GraphLabelPlacement {
+        let right = self.width as f32 - x;
+        if right >= GRAPH_LABEL_WIDTH || right >= x {
             GraphLabelPlacement::Right
         } else {
             GraphLabelPlacement::Left
@@ -792,6 +896,17 @@ fn rectangle_ray_exit(
     )
 }
 
+/// The width a node label is laid out at, before it is clamped to the room its
+/// side leaves.
+const GRAPH_LABEL_WIDTH: f32 = 160.0;
+
+/// A label's width estimated from its length at the labels' 10 px size, no
+/// wider than [`GRAPH_LABEL_WIDTH`].
+fn label_text_width(label: &str) -> f32 {
+    const CHAR_WIDTH: f32 = 5.6;
+    (label.chars().count() as f32 * CHAR_WIDTH + 2.0).min(GRAPH_LABEL_WIDTH)
+}
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 enum GraphLabelPlacement {
     Above,
@@ -810,27 +925,31 @@ impl GraphLabelPlacement {
         }
     }
 
-    fn style(self, x: f32, y: f32, clearance: f32, canvas: Size) -> String {
-        const LABEL_WIDTH: f32 = 160.0;
+    /// A label box anchored to its node. The box hugs the node without
+    /// relying on `text-align` inside a fixed width, which Genet did not honour
+    /// for these absolutely placed spans: a left label is anchored by its
+    /// right edge, and an above or below label is centred from `text_width`,
+    /// the estimate [`label_text_width`] gives.
+    fn style(self, x: f32, y: f32, clearance: f32, canvas: Size, text_width: f32) -> String {
+        const LABEL_WIDTH: f32 = GRAPH_LABEL_WIDTH;
         const LABEL_HEIGHT: f32 = 14.0;
-        let centred_left =
-            (x - LABEL_WIDTH * 0.5).clamp(0.0, (canvas.width - LABEL_WIDTH).max(0.0));
+        let centred_left = (x - text_width * 0.5).clamp(0.0, (canvas.width - text_width).max(0.0));
         let centred_top =
             (y - LABEL_HEIGHT * 0.5).clamp(0.0, (canvas.height - LABEL_HEIGHT).max(0.0));
         match self {
             Self::Above => format!(
-                "position:absolute;left:{centred_left}px;top:{}px;width:{LABEL_WIDTH}px;text-align:center;overflow:hidden;text-overflow:ellipsis;",
+                "position:absolute;left:{centred_left}px;top:{}px;width:{text_width}px;text-align:center;overflow:hidden;text-overflow:ellipsis;",
                 (y - clearance - LABEL_HEIGHT).max(0.0)
             ),
             Self::Below => format!(
-                "position:absolute;left:{centred_left}px;top:{}px;width:{LABEL_WIDTH}px;text-align:center;overflow:hidden;text-overflow:ellipsis;",
+                "position:absolute;left:{centred_left}px;top:{}px;width:{text_width}px;text-align:center;overflow:hidden;text-overflow:ellipsis;",
                 (y + clearance).min((canvas.height - LABEL_HEIGHT).max(0.0))
             ),
             Self::Left => {
-                let width = (x - clearance).clamp(0.0, LABEL_WIDTH);
+                let room = (x - clearance).clamp(0.0, LABEL_WIDTH);
                 format!(
-                    "position:absolute;left:{}px;top:{centred_top}px;width:{width}px;text-align:right;overflow:hidden;text-overflow:ellipsis;",
-                    (x - clearance - width).max(0.0)
+                    "position:absolute;right:{}px;top:{centred_top}px;max-width:{room}px;text-align:right;overflow:hidden;text-overflow:ellipsis;",
+                    (canvas.width - (x - clearance)).max(0.0)
                 )
             },
             Self::Right => {
@@ -1234,12 +1353,14 @@ where
     // aria-hidden (the button already carries the accessible name) and
     // pointer-transparent (they must not steal the node's clicks).
     let labels: Vec<_> = if swatch.show_labels {
+        let shown = swatch.shown_labels();
         swatch
             .graph
             .nodes
             .iter()
             .zip(swatch.projected_positions())
             .enumerate()
+            .filter(|(index, _)| shown[*index])
             .map(|(index, (node, (_, (x, y))))| {
                 // Same state modifiers the node buttons carry. A label layer
                 // that cannot say which node is selected forces a consumer to
@@ -1263,7 +1384,13 @@ where
                     .attr("data-label-placement", placement.name())
                     .attr(
                         "style",
-                        placement.style(x, y, swatch.node_radius + 7.0, size),
+                        placement.style(
+                            x,
+                            y,
+                            swatch.node_radius + 7.0,
+                            size,
+                            label_text_width(&node.label),
+                        ),
                     )
             })
             .collect()
@@ -1985,6 +2112,62 @@ mod tests {
         let swatch = model(None, None).with_node_labels(true);
         assert_eq!(swatch.label_placement(0), GraphLabelPlacement::Above);
         assert_eq!(swatch.label_placement(1), GraphLabelPlacement::Above);
+
+        // On a narrow canvas a node two thirds across has no room for a whole
+        // label on its right, and more on its left.
+        let lone = |x: f32| {
+            GraphCanvasSwatch::new(
+                7,
+                GraphCanvasSubgraph {
+                    nodes: vec![GraphCanvasNode {
+                        id: 1,
+                        kind: "document",
+                        position: (x, 0.5),
+                        label: "Archive 2025, unavailable".into(),
+                        key: None,
+                    }],
+                    edges: Vec::new(),
+                },
+            )
+            .with_size(280, 400)
+        };
+        assert_eq!(lone(0.68).label_placement(0), GraphLabelPlacement::Left);
+        assert_eq!(lone(0.30).label_placement(0), GraphLabelPlacement::Right);
+        // A left label is held by its right edge beside the node, so it hugs
+        // the node whatever width its text takes.
+        let size = Size {
+            width: 280.0,
+            height: 400.0,
+        };
+        let style = GraphLabelPlacement::Left.style(190.0, 200.0, 12.0, size, 100.0);
+        assert!(style.contains("right:102px"), "{style}");
+        assert!(!style.contains("left:"), "{style}");
+
+        // Three nodes stacked closer than a label's height: culling keeps the
+        // first, and a focused node keeps its label whatever it covers.
+        let crowded = GraphCanvasSwatch::new(
+            8,
+            GraphCanvasSubgraph {
+                nodes: (1..=3)
+                    .map(|id| GraphCanvasNode {
+                        id,
+                        kind: "document",
+                        position: (0.3, 0.5 + id as f32 * 0.01),
+                        label: format!("A long label for node {id}"),
+                        key: None,
+                    })
+                    .collect(),
+                edges: Vec::new(),
+            },
+        )
+        .with_size(280, 400)
+        .with_node_labels(true);
+        assert_eq!(crowded.shown_labels(), [true, true, true], "culling is off");
+        let culled = crowded.with_label_culling(true);
+        assert_eq!(culled.shown_labels(), [true, false, false]);
+        let mut focused = culled;
+        focused.focus = Some(3);
+        assert_eq!(focused.shown_labels(), [false, false, true]);
         assert!(
             find_attr(&dom.borrow(), root, "data-label-placement", "above").is_some(),
             "a horizontal graph publishes its label-clear placement"

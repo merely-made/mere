@@ -42,7 +42,7 @@ pub use arrange::{Placement, VirtualWindow};
 pub use dimension::{DimensionLine, DimensionLineTraversal};
 pub use glyphs::{
     GraphAtlasCompoundPath, GraphAtlasPolygon, GraphCanvas, GraphGlyph, GraphGlyphNode,
-    GraphGlyphRelation, GraphViewport, Knob, Meter,
+    GraphGlyphRelation, GraphViewport, Knob, Meter, RelationLine,
 };
 pub use grid::{GridColumn, GridSpec};
 pub use path::Path;
