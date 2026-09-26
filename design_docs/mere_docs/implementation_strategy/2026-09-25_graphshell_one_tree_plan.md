@@ -2,8 +2,8 @@
 
 **Date:** 2026-09-25
 **Status:** in progress, ruled 2026-09-25 (reservoir plan §7 items 39 and
-40). Phase 1's mirror landed on `reservoir-v2` on 2026-09-26; its last
-condition, woodshed-web and Redshank's web port, waits on their pin bumps.
+40). Phase 1, accessibility in the browser, was done on 2026-09-26; phase 2,
+the file seam, is next.
 **Scope:** Graphshell's browser page becomes one retained Cambium tree. Its
 HTML controls become Cambium components, its display-only Cambium chrome
 joins them, pictograph's canvas renders into the tree as a texture producer,
@@ -236,3 +236,17 @@ this tree.
     against where layout painted it.
   - Left for the phase: woodshed-web and Redshank's web port, by their pin
     bumps.
+- 2026-09-26: phase 1 is done. woodshed moved to mere `149b8053` and genet
+  `1b62fd0b218` (woodshed `a0910d5`, Redshank `d721a80`).
+  - Redshank needed no change of its own. woodshed needed four, all drift
+    from its pin being 335 commits old: two patch-table version
+    requirements, the obsolete `parley` patch row, the `genet-probe` →
+    `taproot` rename, and `Init`'s `fonts` and `images`.
+  - In the Browser pane, woodshed-web's mirror, the region "Woodshed",
+    reads its S0 sheet's text. Redshank's web port lists its tablist, tabs,
+    status, panel buttons, Seek slider, transport buttons and Capture
+    group. Choosing Library through the mirror switched Redshank's
+    destination.
+  - The pages were built from the bump worktree beside test pages under
+    `Code/testing/cambium/` with fixed-size canvases, since the hidden
+    pane's viewport is 0 by 0.
