@@ -104,8 +104,8 @@ under `Code/testing/mere/scenarios/mere-view-at-5c1905b3/`.
   [one-tree plan](../implementation_strategy/2026-09-25_graphshell_one_tree_plan.md).
 - **A catalog like Knot's, not Knot's.** Knot's step 8 re-proves the
   requirements in its own embedding.
-- **Screen readers:** AccessKit projected the tree (65 nodes, from the host's
-  log), but no reader was run.
+- **Screen readers:** AccessKit projected the tree (67 nodes, from the host's
+  log; corrected on 2026-09-26 from 65), but no reader was run.
 - **Culling estimates widths:** 5.6 px per character at the labels' 10 px
   size.
 - **A focused label can cover another node.** Culling weighs labels against
