@@ -1,0 +1,12 @@
+# Knot requirement 5: edge provenance stays visible. Extracted links, authored
+# relations and suggestions are distinct, and two relations with the same
+# endpoints never collapse into one: fourteen relations, two of them on
+# Index and Garden notes, make fourteen cells.
+log requirement 5: relations keep their provenance and stay apart
+settle 2
+assert snap relation_cells == 14
+capture r5_centre
+resize 280 700
+settle 3
+assert snap relation_cells == 14
+capture r5_side

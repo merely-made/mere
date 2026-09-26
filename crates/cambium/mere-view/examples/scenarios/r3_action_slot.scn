@@ -1,0 +1,19 @@
+# Knot requirement 3: a host action slot beside the graph, for New, Open and
+# recent, since the view takes over the start tile's job when the last
+# document closes.
+log requirement 3: the host's action slot
+settle 2
+click role:button @data-action=open
+settle 1
+assert event request run open
+click role:button @data-action=recent
+settle 1
+assert event request run recent
+capture r3_centre
+resize 280 700
+settle 3
+click role:button @data-action=new
+settle 1
+assert event request run new
+assert snap requests == 3
+capture r3_side

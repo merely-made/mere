@@ -1,0 +1,12 @@
+# Knot requirement 9: theming through host tokens (CSS custom properties),
+# with no hard-coded colours. The harness swaps only its tokens; the frames
+# must change with them.
+log requirement 9: the host themes the view by its tokens alone
+settle 2
+capture r9_centre_light
+act theme-dark
+settle 2
+capture r9_centre_dark
+resize 280 700
+settle 3
+capture r9_side_dark

@@ -8,14 +8,16 @@ use std::collections::HashMap;
 
 use cambium::{
     AnyView, GenetCtx, GenetElement, GraphCanvas, GraphCanvasNode, GraphCanvasNodeDrag,
-    GraphCanvasRelation, GraphCanvasSubgraph, GraphCanvasSwatch, PointerEvent, WheelEvent, button,
-    el, graph_canvas_swatch_with_focus_and_drag_and_relations,
+    GraphCanvasRelation, GraphCanvasSubgraph, GraphCanvasSwatch, PointerEvent, RelationLine,
+    WheelEvent, button, el, graph_canvas_swatch_with_focus_and_drag_and_relations,
 };
 use incipit::SessionId;
 use sprigging::ColorF;
 
-use crate::layout::{DEFAULT_LAYOUT, lay_out};
-use crate::model::{GraphModel, MereViewModel, NodeState, SessionEntry, SessionStep, StatusNote};
+use crate::layout::{DEFAULT_LAYOUT, SEPARATION, lay_out};
+use crate::model::{
+    GraphModel, MereViewModel, NodeState, Provenance, SessionEntry, SessionStep, StatusNote,
+};
 
 /// The erased view the component and its parts are made of.
 pub type MereViewElement<State, Action> = Box<dyn AnyView<State, Action, GenetCtx, GenetElement>>;
@@ -24,29 +26,38 @@ pub type MereViewElement<State, Action> = Box<dyn AnyView<State, Action, GenetCt
 const WIDE_AT: u32 = 560;
 /// The sessions column's width beside the graph.
 const SESSIONS_WIDTH: u32 = 220;
-/// The bar's height above the body.
+/// The bar's height above the body: one row, or two when narrow.
 const BAR_HEIGHT: u32 = 40;
+const NARROW_BAR_HEIGHT: u32 = 64;
 /// The body's share the graph takes when the sessions stack above it.
 const NARROW_GRAPH_SHARE: f32 = 0.6;
 
-/// The structural sheet, over [`cambium::GRAPH_CANVAS_SWATCH_CSS`]. No colour:
-/// the host's sheet adds it, keyed on the `data-*` tokens the view sets. Each
-/// relation kind gets its own line style, so kinds differ by more than colour.
+/// The structural sheet, over [`cambium::GRAPH_CANVAS_SWATCH_CSS`]. It holds
+/// the bar to the height the graph's size assumes, lays the notice over the
+/// top of the graph's area rather than beside the controls, and fits the
+/// graph to that area without a border of its own. Relation kinds are told
+/// apart by the lines the paint leaf draws, not by this sheet. No colour: the
+/// host's sheet adds it, keyed on the `data-*` tokens the view sets.
+///
+/// `.mere-view-main` carries no overflow clip: under the renderer pinned at
+/// netrender `aba7d837`, a clipped box holding the self-clipping graph and the
+/// positioned notice blanked the whole frame.
 pub const MERE_VIEW_CSS: &str = "\
-    .mere-view { display: flex; flex-direction: column; min-width: 0; min-height: 0; } \
-    .mere-view-bar { display: flex; flex-wrap: wrap; align-items: center; } \
-    .mere-view-title { flex-grow: 1; margin: 0; font-size: 1em; } \
-    .mere-view-actions, .mere-view-layouts { display: flex; flex-wrap: wrap; } \
-    .mere-view-notice { margin: 0; } \
-    .mere-view-body { display: flex; flex-direction: row; min-height: 0; } \
+    .mere-view { display: flex; flex-direction: column; overflow: hidden; } \
+    .mere-view-bar { display: flex; flex-wrap: nowrap; align-items: center; height: 40px; overflow-x: auto; overflow-y: hidden; white-space: nowrap; box-sizing: border-box; flex-shrink: 0; } \
+    .mere-view-title { flex-grow: 1; min-width: 0; margin: 0; font-size: 1em; overflow: hidden; text-overflow: ellipsis; } \
+    .mere-view-actions, .mere-view-layouts { display: flex; flex-wrap: nowrap; flex-shrink: 0; } \
+    .mere-view-body { position: relative; display: flex; flex-direction: row; min-height: 0; } \
+    .mere-view[data-width=\"narrow\"] .mere-view-bar { flex-wrap: wrap; align-content: center; height: 64px; } \
+    .mere-view[data-width=\"narrow\"] .mere-view-layouts { flex-basis: 100%; } \
     .mere-view[data-width=\"narrow\"] .mere-view-body { flex-direction: column; } \
-    .mere-view-sessions { list-style: none; margin: 0; padding: 0; overflow: auto; flex-shrink: 0; } \
+    .mere-view-main { position: relative; flex-shrink: 0; } \
+    .mere-view-notice { position: absolute; left: 8px; right: 8px; top: 8px; margin: 0; z-index: 2; } \
+    .mere-view-sessions { list-style: none; margin: 0; padding: 0; overflow: auto; flex-shrink: 0; box-sizing: border-box; } \
     .mere-view-session { display: flex; flex-direction: column; } \
     .mere-view-session-steps { display: flex; flex-wrap: wrap; } \
-    .mere-view-graph { position: relative; flex-shrink: 0; } \
-    .mere-view .graph-canvas-swatch-relation::after { content: \"\"; position: absolute; left: 30%; right: 30%; top: 9px; border-top: 2px solid; } \
-    .mere-view .graph-canvas-swatch-relation[data-kind=\"extracted\"]::after { border-top-style: dotted; } \
-    .mere-view .graph-canvas-swatch-relation[data-kind=\"suggested\"]::after { border-top-style: dashed; }";
+    .mere-view-graph { position: relative; } \
+    .mere-view .graph-canvas-swatch { border: 0; border-radius: 0; }";
 
 /// What the person asked for. The host carries it out or declines it.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -135,9 +146,19 @@ fn wide(width: u32) -> bool {
     width >= WIDE_AT
 }
 
+/// The height left below the bar.
+fn body_height(width: u32, height: u32) -> u32 {
+    let bar = if wide(width) {
+        BAR_HEIGHT
+    } else {
+        NARROW_BAR_HEIGHT
+    };
+    height.saturating_sub(bar).max(1)
+}
+
 /// The graph's area, in pixels, inside a tile of `width` by `height`.
 fn graph_size(width: u32, height: u32) -> (u32, u32) {
-    let body = height.saturating_sub(BAR_HEIGHT).max(1);
+    let body = body_height(width, height);
     if wide(width) {
         (width.saturating_sub(SESSIONS_WIDTH).max(1), body)
     } else {
@@ -223,7 +244,23 @@ impl MereView<'_> {
         .with_label(format!("Graph of {}", self.model.title))
         .with_expand(false)
         .with_node_labels(true)
-        .with_relations(relations);
+        // A narrow tile cannot hold every label; the focused and hovered keep
+        // theirs, and every node keeps its accessible name.
+        .with_label_culling(true)
+        .with_relations(relations)
+        .with_relation_lines(
+            [
+                (Provenance::Extracted, RelationLine::Solid),
+                (Provenance::Authored, RelationLine::Heavy),
+                (Provenance::Suggested, RelationLine::Dashed),
+            ]
+            .into_iter()
+            .map(|(kind, line)| (kind.token().to_string(), line))
+            .collect(),
+        );
+        // Targets as wide as the layout keeps nodes apart, so none holds
+        // another's centre.
+        swatch.hit_size = SEPARATION;
         swatch.focus = self.state.focused.clone();
         swatch.hovered = self.state.hovered.clone();
         swatch
@@ -256,15 +293,25 @@ where
         .attr("class", "mere-view-notice")
         .attr("role", "status")
         .attr("aria-live", "polite");
-    let graph = match model.status.note() {
+    let content = match model.status.note() {
         None => graph(&view, on_change, on_request.clone()),
         Some(note) => status_panel(model.status.token(), note, on_request.clone()),
     };
-    let body = el::<_, State, Action>("div", (sessions(&view, on_request.clone()), graph))
+    // The notice rides over the top of the graph's area, where it covers no
+    // control and needs no room of its own.
+    let (width, height) = view.graph_size();
+    let main = el::<_, State, Action>("div", (notice, content))
+        .attr("class", "mere-view-main")
+        .attr("style", format!("width:{width}px;height:{height}px"));
+    let body = el::<_, State, Action>("div", (sessions(&view, on_request.clone()), main))
         .attr("class", "mere-view-body");
     Box::new(
-        el::<_, State, Action>("section", (bar(&view, on_request), notice, body))
+        el::<_, State, Action>("section", (bar(&view, on_request), body))
             .attr("class", "mere-view")
+            .attr(
+                "style",
+                format!("width:{}px;height:{}px", view.width, view.height),
+            )
             .attr("role", "region")
             .attr("aria-label", format!("Mere: {}", model.title))
             .attr(
@@ -309,14 +356,6 @@ where
     let title = el::<_, State, Action>("h2", model.title.clone()).attr("class", "mere-view-title");
 
     let mut actions: Vec<MereViewElement<State, Action>> = Vec::new();
-    if model.can_mint {
-        actions.push(request_button(
-            "New session",
-            MereViewRequest::Mint,
-            on_request.clone(),
-            vec![("data-request", "mint".into())],
-        ));
-    }
     for action in &model.actions {
         actions.push(request_button(
             action.label.clone(),
@@ -365,16 +404,34 @@ where
     Action: 'static,
     Request: Fn(&mut State, MereViewRequest) + Clone + 'static,
 {
-    let items: Vec<MereViewElement<State, Action>> = view
-        .model
-        .sessions
-        .iter()
-        .map(|session| session_item(session, on_request.clone()))
+    // Minting heads the list, beside the other lifecycle steps.
+    let mint: Option<MereViewElement<State, Action>> = view.model.can_mint.then(|| {
+        Box::new(
+            el::<_, State, Action>(
+                "li",
+                request_button(
+                    "New session",
+                    MereViewRequest::Mint,
+                    on_request.clone(),
+                    vec![("data-request", "mint".into())],
+                ),
+            )
+            .attr("class", "mere-view-mint"),
+        ) as MereViewElement<State, Action>
+    });
+    let items: Vec<MereViewElement<State, Action>> = mint
+        .into_iter()
+        .chain(
+            view.model
+                .sessions
+                .iter()
+                .map(|session| session_item(session, on_request.clone())),
+        )
         .collect();
     let size = if wide(view.width) {
         format!("width:{SESSIONS_WIDTH}px")
     } else {
-        let body = view.height.saturating_sub(BAR_HEIGHT);
+        let body = body_height(view.width, view.height);
         let graph = graph_size(view.width, view.height).1;
         format!("max-height:{}px", body.saturating_sub(graph))
     };
@@ -466,12 +523,7 @@ where
         |_: &mut State, _: PointerEvent| {},
         |_: &mut State, _: WheelEvent| {},
     );
-    let (width, height) = view.graph_size();
-    Box::new(
-        el::<_, State, Action>("div", canvas)
-            .attr("class", "mere-view-graph")
-            .attr("style", format!("width:{width}px;height:{height}px")),
-    )
+    Box::new(el::<_, State, Action>("div", canvas).attr("class", "mere-view-graph"))
 }
 
 fn status_panel<State, Action, Request>(

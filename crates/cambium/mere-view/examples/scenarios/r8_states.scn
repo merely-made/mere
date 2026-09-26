@@ -1,0 +1,31 @@
+# Knot requirement 8: plain empty and error states, each with a host-offered
+# action: no mere or catalog configured, the reservoir locked or unavailable,
+# a reading still building.
+log requirement 8: empty, unavailable and building say so plainly
+settle 2
+act empty
+settle 1
+assert snap status == empty
+assert text No catalog is configured.
+assert snap node_targets == 0
+capture r8_centre_empty
+click role:button @data-action=configure
+settle 1
+assert snap status == ready
+act unavailable
+settle 1
+assert text The reservoir is locked by another resident.
+capture r8_centre_unavailable
+click role:button @data-action=retry
+settle 1
+assert snap status == ready
+resize 280 700
+settle 3
+act building
+settle 1
+assert text Still reading links.
+capture r8_side_building
+click role:button @data-action=cancel
+settle 1
+assert snap status == ready
+assert snap node_targets == 12
