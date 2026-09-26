@@ -280,7 +280,7 @@ mod tests {
 
         assert_eq!(grant.certificate.issuer, master);
         assert_eq!(grant.certificate.subject, master);
-        assert!(grant.verify());
+        grant.check().expect("the issued grant checks");
     }
 
     #[test]
@@ -300,7 +300,7 @@ mod tests {
         assert_eq!(grant.certificate.issuer, master);
         assert_eq!(grant.certificate.subject, holder().0);
         assert_ne!(grant.certificate.subject, master);
-        assert!(grant.verify());
+        grant.check().expect("the issued grant checks");
     }
 
     /// The whole point of `RemoteAuth`: a stolen station cannot hand its
@@ -390,7 +390,7 @@ mod tests {
             master.master_public_key().to_bytes()
         );
         assert_eq!(grant.certificate.subject, holder().0);
-        assert!(grant.verify());
+        grant.check().expect("the issued grant checks");
     }
 
     /// The independence the per-persona split exists to buy: two personas
@@ -421,8 +421,8 @@ mod tests {
 
         assert_ne!(first.certificate.issuer, second.certificate.issuer);
         assert_ne!(first.certificate.id(), second.certificate.id());
-        assert!(first.verify());
-        assert!(second.verify());
+        first.check().expect("the first persona's grant checks");
+        second.check().expect("the second persona's grant checks");
     }
 
     /// A persona's authority is reproducible from the master seed, which is
@@ -465,7 +465,9 @@ mod tests {
 
         let device_certificate = set.device.as_ref().expect("a device certificate");
         assert!(set.personas.is_empty());
-        assert!(device_certificate.verify());
+        device_certificate
+            .check()
+            .expect("the device certificate checks");
         assert!(
             device_certificate
                 .certificate
@@ -522,6 +524,10 @@ mod tests {
             set.personas[&persona(1)].certificate.issuer,
             set.personas[&persona(2)].certificate.issuer
         );
-        assert!(set.certificates().all(|c| c.verify()));
+        for certificate in set.certificates() {
+            certificate
+                .check()
+                .expect("every certificate in the set checks");
+        }
     }
 }

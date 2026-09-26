@@ -100,6 +100,20 @@ pub(crate) fn is_expired(expires_at_ms: Option<u64>, now_ms: u64) -> bool {
     matches!(expires_at_ms, Some(expires_at_ms) if expires_at_ms <= now_ms)
 }
 
+/// Check every certificate in a grant set, keeping the first fault in the
+/// error so a refusal says which step failed.
+fn check_grant_set(set: &identity::carry::DeviceGrantSet, context: &str) -> io::Result<()> {
+    for certificate in set.certificates() {
+        certificate.check().map_err(|fault| {
+            io::Error::new(
+                io::ErrorKind::InvalidData,
+                format!("{context} failed signature verification: {fault}"),
+            )
+        })?;
+    }
+    Ok(())
+}
+
 /// The capability-slot id a remote-auth device occupies in a persona wallet.
 ///
 /// The `device-grant:` prefix is a persisted key: it is matched when slots are

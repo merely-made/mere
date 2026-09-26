@@ -174,7 +174,7 @@ mod tests {
         )
         .expect("issue revocation");
         let mut ledger = RevocationLedger::new();
-        assert!(ledger.fold(&statement));
+        ledger.fold(statement.check().expect("an issued revocation checks"));
         ledger
     }
 
