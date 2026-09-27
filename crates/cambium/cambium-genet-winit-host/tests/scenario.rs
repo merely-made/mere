@@ -491,3 +491,102 @@ fn product_acceptance_can_fail_either_receipt_format() {
         }
     }
 }
+
+/// Completion receives capture failures as well as script failures, and can
+/// retain an interactive trial without continuing to drive it.
+#[test]
+fn product_completion_runs_once_and_preserves_failures_when_kept_open() {
+    struct Completion {
+        calls: Rc<Cell<usize>>,
+        saw_failure: Rc<Cell<bool>>,
+        reject: bool,
+    }
+    impl mesquite::Product for Completion {
+        type State = App;
+        type Logic = Logic;
+        type View = Child;
+        const KIND: &'static str = "completion-test";
+        const SURFACE: &'static str = "app";
+        const LOG_PREFIX: &'static str = "completion-test";
+        fn sheet(&self) -> &str {
+            SHEET
+        }
+        fn snapshot(&self, ctx: &mesquite::Ctx<'_, Self>, _: usize, _: f32) -> ProbeSnapshot {
+            TestLane.snapshot(ctx, 0, 1.0)
+        }
+        fn complete(
+            &mut self,
+            _: &mut mesquite::Ctx<'_, Self>,
+            outcome: &taproot::Outcome,
+        ) -> Result<(), String> {
+            self.calls.set(self.calls.get() + 1);
+            self.saw_failure
+                .set(!outcome.ok && outcome.log.iter().any(|line| line.contains("FAIL")));
+            if self.reject {
+                Err("durable receipt unavailable".into())
+            } else {
+                Ok(())
+            }
+        }
+        fn close_on_completion(&self) -> bool {
+            false
+        }
+    }
+    for (name, script, reject, expected_failure) in [
+        ("complete-ok", "settle 1\n", false, false),
+        ("complete-capture-failure", "capture lost\n", false, true),
+        ("complete-product-failure", "settle 1\n", true, false),
+    ] {
+        let dir = scratch(name);
+        let path = dir.join("test.scn");
+        std::fs::write(&path, script).unwrap();
+        let calls = Rc::new(Cell::new(0));
+        let saw_failure = Rc::new(Cell::new(false));
+        let mut lane = mesquite::Lane::from_config(
+            LaneConfig {
+                scenario: path,
+                capture_dir: Some(dir.clone()),
+                receipt: None,
+            },
+            Completion {
+                calls: calls.clone(),
+                saw_failure: saw_failure.clone(),
+                reject,
+            },
+            cambium_genet_winit_host::read_file,
+        )
+        .unwrap();
+        let mut h = Harness::with_hooks(
+            Init {
+                state: App::default(),
+                logic: root as Logic,
+                sheet: SHEET.into(),
+                fonts: vec![],
+                images: vec![],
+            },
+            HostHooks {
+                after_frame: Box::new(move |ctx| lane.after_frame(ctx)),
+                ..inert_hooks()
+            },
+        );
+        for _ in 0..160 {
+            h.layout_at(300.0, 200.0);
+            h.after_frame();
+        }
+        assert_eq!(calls.get(), 1);
+        assert_eq!(saw_failure.get(), expected_failure);
+        assert!(!h.close_requested(), "interactive trial was closed");
+        let receipt = std::fs::read_to_string(dir.join("scenario.done")).unwrap();
+        assert!(
+            receipt.starts_with(if reject || expected_failure {
+                "RESULT fail"
+            } else {
+                "RESULT ok"
+            }),
+            "{receipt}"
+        );
+        if reject {
+            assert!(receipt.contains("durable receipt unavailable"));
+        }
+    }
+}

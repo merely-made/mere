@@ -237,7 +237,17 @@ across workspace, standalone document and retention gates. Its native site run
 passes with three nonblank frames; the final image confirms the site and pages
 closed. Mere's embedded Knot pins follow `f14f9ef`; `cargo tree --offline -p djinn`
 checks dependency lockstep separately from runtime acceptance.
-Other products' independent runners remain a separate migration task.
+Other products' independent runners are being migrated separately.
+
+**Consumer completion policy (2026-09-27).** `Product::complete` receives the
+aggregate scenario and lane outcome after capture collection and acceptance
+checks. Products can retain typed durable receipts without owning a second
+frame pump. A completion error fails the shared receipt and exit code.
+`close_on_completion` defaults to closing; interactive trials can keep the
+finished window open without restarting the scenario. Explicit host close
+requests remain respected. The focused gate passes 49 tests (17 Mesquite,
+16 host, 16 scenario), including missing readback propagation, failing product
+completion, and exactly-once completion while the window remains open.
 
 **Which plane moves.** Exactly one: the nearest ancestor whose computed `overflow-y`
 scrolls *and* whose vertical range is positive, otherwise the window viewport. The range

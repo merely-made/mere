@@ -464,6 +464,18 @@ impl<P: Product> Lane<P> {
             self.errors.push(format!("scene producer: {error}"));
         }
         let outcome = self.outcome.as_ref().expect("completion requested");
+        let completion = Outcome {
+            ok: outcome.ok && self.errors.is_empty() && self.exit_code.get() == 0,
+            log: outcome
+                .log
+                .iter()
+                .cloned()
+                .chain(self.errors.iter().map(|error| format!("FAIL: {error}")))
+                .collect(),
+        };
+        if let Err(error) = self.product.complete(ctx, &completion) {
+            self.errors.push(format!("product completion: {error}"));
+        }
         let mut ok = outcome.ok && self.errors.is_empty() && self.exit_code.get() == 0;
         let receipt = if self.script_files.is_some() {
             Ok(self.text_receipt(ok).into_bytes())
@@ -496,7 +508,7 @@ impl<P: Product> Lane<P> {
         if !ok {
             self.exit_code.set(1);
         }
-        *ctx.close = true;
+        *ctx.close |= self.product.close_on_completion();
     }
 }
 
