@@ -179,6 +179,26 @@ A view wrapper in the shape of `request_focus` would name the element structural
 would put a layout-dependent request into `GenetAppRunner`, which stays free of layout
 and presentation. Such a wrapper could later be sugar over this request.
 
+**Scenario clicks (2026-09-27).** `AppCtx::visible_rect` exposes the same clipped
+geometry the harness reads. Taproot's optional `Automatable::click_target` hook
+lets a host accept selector delivery without changing the grammar or its default
+pointer path. Mesquite's `Clicks` supplies the shared implementation for its own
+`Lane` and the older winit `ScenarioLane`: a fully visible target clicks immediately;
+a clipped target queues `scroll_into_view(Nearest)` and retains its `NodeId`.
+The next frame clicks the visible portion, then holds scenario ticks until that
+pointer dispatch has completed. A target still invisible after the scroll frame
+fails the receipt, including when the click was the scenario's last step.
+Mesquite continues to apply the product's `target_point` transform. Rootstock
+owns clipping and scrolling; it does not depend on Taproot or scenario state.
+
+The below-fold `Far` regression failed before the fix (`count` stayed `0`).
+Afterward, the scenario suite passes 13 tests, including both runners' tall
+and unrevealable targets and Mesquite's transformed pointer delivery. The
+existing click-scroll suite passes 3 tests, scroll-request suite passes 10, and
+Mesquite's unit suite passes 17.
+These are headless host receipts; native Knot acceptance is recorded in its
+workspace slice plan. Taproot's additive hook is Genet `34626a6c82e` (21 tests).
+
 **Which plane moves.** Exactly one: the nearest ancestor whose computed `overflow-y`
 scrolls *and* whose vertical range is positive, otherwise the window viewport. The range
 condition is load-bearing. Knot's `.knot-scroll-preview` and `.knot-workspace` are both

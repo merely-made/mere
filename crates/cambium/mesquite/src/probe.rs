@@ -11,9 +11,7 @@
 //! `zoom`, `opacity`, `resize`, `input-text`, `cost-begin`/`cost-end`).
 
 use cambium_rootstock::{HostPointer, WindowCommand};
-use taproot::{
-    Automatable, Driveable, Hit, ProbeSnapshot, ProbeSurface, Selector, SelectorTarget,
-};
+use taproot::{Automatable, Driveable, Hit, ProbeSnapshot, ProbeSurface, Selector, SelectorTarget};
 
 use crate::{Checkpoints, Ctx, Lane, Product, pixels};
 
@@ -62,6 +60,22 @@ impl<P: Product> Automatable for Probe<'_, '_, P> {
         self.lane
             .product
             .snapshot(self.ctx, self.lane.captures.len(), self.lane.opacity)
+    }
+
+    fn click_target(&mut self, selector: &Selector) -> Option<bool> {
+        let accepted = self
+            .lane
+            .clicks
+            .click(self.ctx, selector, |ctx, node, rect| {
+                self.lane.product.target_point(ctx, node, rect)
+            });
+        if !accepted {
+            self.lane
+                .misses
+                .borrow_mut()
+                .push(format!("no current DOM target for {selector:?}"));
+        }
+        Some(accepted)
     }
 
     fn drain_events(&mut self) -> Vec<String> {

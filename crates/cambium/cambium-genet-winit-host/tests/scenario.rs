@@ -11,7 +11,7 @@
 //! A headless run presents no frames, so no capture can land here. That makes
 //! the lost-capture path testable, and leaves real captures to the headed smoke.
 
-use std::cell::RefCell;
+use std::cell::Cell;
 use std::path::{Path, PathBuf};
 use std::rc::Rc;
 
@@ -30,6 +30,8 @@ struct App {
     events: Vec<String>,
     asking: bool,
     opened: String,
+    target_calls: Cell<usize>,
+    target_point: Cell<Option<(f32, f32)>>,
 }
 
 type Child = Box<dyn AnyView<App, (), GenetCtx, GenetElement>>;
@@ -60,11 +62,20 @@ fn root(state: &App) -> Child {
                         .map_or_else(|| "nothing".to_string(), |file| file.name.clone());
                 },
             ),
+            el(
+                "div",
+                (
+                    el("div", ()).attr("class", "spacer"),
+                    button("Far", |s: &mut App, _| s.count += 1),
+                ),
+            )
+            .attr("class", "scroller"),
         ),
     ))
 }
 
-const SHEET: &str = ".count, .open { display: block; width: 120px; height: 32px; }";
+const SHEET: &str = "button { display: block; width: 120px; height: 32px; }
+    .scroller { height: 64px; overflow: auto; } .spacer { height: 300px; }";
 
 struct TestLane;
 
@@ -106,6 +117,52 @@ fn run(test: &str, scenario: &str) -> (String, Harness<App, Logic, Child>) {
 
 /// [`run`], in a directory the test has already put files in.
 fn run_in(dir: &Path, scenario: &str) -> (String, Harness<App, Logic, Child>) {
+    run_lane(dir, scenario, SHEET, false)
+}
+
+struct TestProduct(&'static str);
+
+impl mesquite::Product for TestProduct {
+    type State = App;
+    type Logic = Logic;
+    type View = Child;
+    const KIND: &'static str = "scenario-test";
+    const SURFACE: &'static str = "app";
+    const LOG_PREFIX: &'static str = "scenario-test";
+
+    fn sheet(&self) -> &'static str {
+        self.0
+    }
+    fn snapshot(&self, ctx: &mesquite::Ctx<'_, Self>, _: usize, _: f32) -> ProbeSnapshot {
+        TestLane.snapshot(ctx)
+    }
+    fn drain_events(&mut self, ctx: &mut mesquite::Ctx<'_, Self>) -> Vec<String> {
+        TestLane.drain_events(ctx)
+    }
+    fn default_capture_path(&self) -> PathBuf {
+        PathBuf::from("unused.png")
+    }
+    fn target_point(
+        &self,
+        ctx: &mesquite::Ctx<'_, Self>,
+        _: cambium_rootstock::NodeId,
+        rect: [f32; 4],
+    ) -> (f32, f32) {
+        let calls = &ctx.runner.state().target_calls;
+        calls.set(calls.get() + 1);
+        // Deliberately use an off-centre point inside the button.
+        let point = (rect[0] + rect[2] * 0.25, rect[1] + rect[3] * 0.25);
+        ctx.runner.state().target_point.set(Some(point));
+        point
+    }
+}
+
+fn run_lane(
+    dir: &Path,
+    scenario: &str,
+    sheet: &'static str,
+    use_mesquite: bool,
+) -> (String, Harness<App, Logic, Child>) {
     let dir = dir.to_path_buf();
     let path = dir.join("test.scn");
     std::fs::write(&path, scenario).expect("scenario file");
@@ -115,19 +172,30 @@ fn run_in(dir: &Path, scenario: &str) -> (String, Harness<App, Logic, Child>) {
         receipt: None,
     };
     let receipt = config.receipt_path().expect("receipt path");
-    let lane = Rc::new(RefCell::new(
-        ScenarioLane::new(config, TestLane).expect("scenario parses"),
-    ));
-    let driven = lane.clone();
-    let hooks: HostHooks<App, Logic, Child> = HostHooks {
-        after_frame: Box::new(move |ctx| driven.borrow_mut().drive(ctx)),
-        ..inert_hooks()
+    let hooks: HostHooks<App, Logic, Child> = if use_mesquite {
+        let mut lane = mesquite::Lane::new(
+            TestProduct(sheet),
+            Some(taproot::Scenario::parse(scenario).unwrap()),
+            Some(receipt.clone()),
+            None,
+            Rc::new(Cell::new(0)),
+        );
+        HostHooks {
+            after_frame: Box::new(move |ctx| lane.after_frame(ctx)),
+            ..inert_hooks()
+        }
+    } else {
+        let mut lane = ScenarioLane::new(config, TestLane).expect("scenario parses");
+        HostHooks {
+            after_frame: Box::new(move |ctx| lane.drive(ctx)),
+            ..inert_hooks()
+        }
     };
     let mut h = Harness::with_hooks(
         Init {
             state: App::default(),
             logic: root as Logic,
-            sheet: SHEET.into(),
+            sheet: sheet.into(),
             fonts: Vec::new(),
             images: Vec::new(),
         },
@@ -142,7 +210,7 @@ fn run_in(dir: &Path, scenario: &str) -> (String, Harness<App, Logic, Child>) {
             break;
         }
     }
-    assert!(lane.borrow().finished(), "the lane never wrote its receipt");
+    assert!(h.close_requested(), "the lane never wrote its receipt");
     let text = std::fs::read_to_string(&receipt).expect("receipt written");
     (text, h)
 }
@@ -160,6 +228,62 @@ fn a_click_by_label_reaches_the_app_and_the_receipt_says_ok() {
         h.close_requested(),
         "a finished lane asks the host to close"
     );
+}
+
+#[test]
+fn a_click_scrolls_a_below_the_fold_button_before_the_next_assertion() {
+    let (receipt, h) = run("far", "click role:button Far\nassert snap count == 1\n");
+    assert!(receipt.starts_with("RESULT ok"), "{receipt}");
+    assert_eq!(h.state().count, 1);
+}
+
+#[test]
+fn both_runners_click_the_visible_part_of_an_oversized_button() {
+    for mesquite in [false, true] {
+        let (receipt, h) = run_lane(
+            &scratch(&format!("tall-{mesquite}")),
+            "click role:button Far\nassert snap count == 1\n",
+            "button { display:block; width:120px; height:32px; }
+             .scroller { height:64px; overflow:auto; }
+             .scroller button { height:300px; }",
+            mesquite,
+        );
+        assert_eq!(h.state().count, 1, "{receipt}");
+        assert!(!receipt.contains("FAIL:"), "{receipt}");
+    }
+}
+
+#[test]
+fn both_runners_fail_an_unrevealable_target_even_without_an_assertion() {
+    for mesquite in [false, true] {
+        let (receipt, h) = run_lane(
+            &scratch(&format!("clipped-{mesquite}")),
+            "click role:button Far\n",
+            "button { display:block; width:120px; height:32px; }
+             .scroller { height:0; overflow:hidden; }",
+            mesquite,
+        );
+        assert_eq!(h.state().count, 0);
+        assert!(receipt.contains("never came into view"), "{receipt}");
+        assert!(
+            receipt.starts_with("RESULT fail") || receipt.contains("\"ok\": false"),
+            "{receipt}"
+        );
+    }
+}
+
+#[test]
+fn mesquite_scrolls_then_uses_the_product_target_point_before_advancing() {
+    let (receipt, h) = run_lane(
+        &scratch("mesquite-far"),
+        "click role:button Count\nassert snap count == 1\nclick role:button Far\nassert snap count == 2\n",
+        SHEET,
+        true,
+    );
+    assert!(receipt.contains("\"ok\": true"), "{receipt}");
+    assert_eq!(h.state().count, 2);
+    assert_eq!(h.state().target_calls.get(), 2);
+    assert_eq!(Some(h.cursor()), h.state().target_point.get());
 }
 
 #[test]

@@ -15,8 +15,8 @@ use std::{
 };
 
 use cambium_rootstock::{Frame, read_frame};
-use taproot::{Outcome, Progress, Scenario};
 use serde::Serialize;
+use taproot::{Outcome, Progress, Scenario};
 
 use crate::{
     Ctx, Product,
@@ -63,6 +63,7 @@ pub struct Lane<P: Product> {
     pub(crate) checkpoints: BTreeMap<String, BTreeMap<String, String>>,
     pub(crate) errors: Vec<String>,
     pub(crate) misses: RefCell<Vec<String>>,
+    pub(crate) clicks: crate::Clicks,
     exit_code: Rc<Cell<i32>>,
     frame_limit: Option<u32>,
     frames: u64,
@@ -95,6 +96,7 @@ impl<P: Product> Lane<P> {
             checkpoints: BTreeMap::new(),
             errors: Vec::new(),
             misses: RefCell::new(Vec::new()),
+            clicks: crate::Clicks::default(),
             exit_code,
             frame_limit: None,
             frames: 0,
@@ -178,7 +180,17 @@ impl<P: Product> Lane<P> {
             self.errors.push(why);
         }
         self.collect_capture(ctx);
-        if self.pending.is_none()
+        let clicked = match self.clicks.after_frame(ctx, |ctx, node, rect| {
+            self.product.target_point(ctx, node, rect)
+        }) {
+            Ok(clicked) => clicked,
+            Err(error) => {
+                self.errors.push(error);
+                true
+            },
+        };
+        if !clicked
+            && self.pending.is_none()
             && let Some(mut scenario) = self.scenario.take()
         {
             let progress = scenario.tick(&mut Probe { ctx, lane: self });

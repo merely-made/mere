@@ -24,7 +24,9 @@
 //! Selectors resolve through the host's own layout, as
 //! [`Harness::resolve`](crate::Harness::resolve) does, never through taproot's
 //! independent re-layout, whose font resolution can disagree with the one that
-//! painted the window. A click lands where the control actually is.
+//! painted the window. Mesquite's shared click handler reveals clipped targets
+//! through the host's scroll queue and holds the scenario until the click is
+//! delivered on the next frame's visible geometry.
 //!
 //! Evidence: each `capture <name>` writes `<name>.png` into the capture
 //! directory when one is configured and records its size and digest. The
@@ -167,6 +169,7 @@ pub struct ScenarioLane<A> {
     captures: Vec<CaptureRecord>,
     errors: Vec<String>,
     pending: Option<PendingCapture>,
+    clicks: mesquite::Clicks,
     finished: bool,
     /// A file request waiting for the script's `file` verb.
     parked_file: Rc<RefCell<Option<FileAnswer>>>,
@@ -203,6 +206,7 @@ impl<A> ScenarioLane<A> {
             files_installed: false,
             errors: Vec::new(),
             pending: None,
+            clicks: mesquite::Clicks::default(),
             finished: false,
         })
     }
@@ -241,10 +245,21 @@ impl<A> ScenarioLane<A> {
             self.files_installed = true;
         }
         self.collect_capture::<State, Logic, V>();
+        let clicked = match self
+            .clicks
+            .after_frame(ctx, |_, _, [x, y, w, h]| (x + w / 2.0, y + h / 2.0))
+        {
+            Ok(clicked) => clicked,
+            Err(error) => {
+                self.errors.push(error);
+                true
+            },
+        };
         // Hold the steps while a capture is in flight, so the frame read back
         // is the state the scenario captured and a second capture cannot
         // replace the first.
-        if self.pending.is_none()
+        if !clicked
+            && self.pending.is_none()
             && let Some(mut scenario) = self.scenario.take()
         {
             let progress = scenario.tick(&mut Probe { ctx, lane: self });
@@ -422,6 +437,16 @@ where
             .app
             .snapshot(self.ctx)
             .with_field("captures", self.lane.captures.len().to_string())
+    }
+
+    fn click_target(&mut self, selector: &Selector) -> Option<bool> {
+        Some(
+            self.lane
+                .clicks
+                .click(self.ctx, selector, |_, _, [x, y, w, h]| {
+                    (x + w / 2.0, y + h / 2.0)
+                }),
+        )
     }
 
     fn drain_events(&mut self) -> Vec<String> {
