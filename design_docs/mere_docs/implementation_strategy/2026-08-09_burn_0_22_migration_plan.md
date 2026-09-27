@@ -2,6 +2,13 @@
 
 **Date**: 2026-08-09
 
+**Checkpoint annotation (2026-09-27, after ruling 378):** the pre.2 fixture
+prerequisite and bounded pre.4 guard checkpoint are verified (§13.16).
+Nine guard tests pass; removing the service comparison makes both service
+tests fail, and byte restoration returns all nine to passing. Root/product
+manifests and the production lock remain pre.2. S5–S18 and consumer
+persistence-absence acceptance remain pending coordinator review.
+
 **Status annotation (2026-09-27, ruling 378):** needed crates.io downloads
 are authorized with versions/integrity recorded and Git pins preserved.
 The original offline failure in §13.14 remains evidence; §13.15 records
@@ -1784,3 +1791,63 @@ with persistence removed from the runtime's defaults. The retained
 prove turso absent from Mere's consumer feature matrix, whose burn/cubecl
 edges disable defaults. The consumer graph and lock absence gate remains S8;
 do not widen the runtime patch or claim its full acceptance from this test.
+
+### 13.16 Verified guard checkpoint (2026-09-27)
+
+**Status:** bounded S3/S4 source and guard acceptance verified, pending
+coordinator review before S5–S18. Source commits remain on `burn-pre4-repin`:
+fixture prerequisite `43c50fc6`, runtime `29646154`, guard `e9012d72`, and
+tested standalone lock `65129b98`. Main receives documentation only.
+
+On Rust 1.98.1, four jobs and the stable Mere target, the exact command was:
+
+```text
+cargo test --manifest-path support/patches/burn-cubecl/Cargo.toml --offline --locked --lib kernel::same_view::tests
+```
+
+The initial run passed all nine guard tests (21 unrelated tests filtered),
+exit 0, compiling the actual patched crate and all three launchers. In one
+supervised control sequence, removing only `&& a.service == b.service`
+produced exit 101: the two service tests failed and the other seven passed.
+The same-device/different-service-type failure rules out a device-only check.
+The original source bytes were restored in `finally`, then the identical
+command passed all nine again, exit 0. These are CPU predicate controls;
+forged handles were never submitted to a GPU. Earlier cache failures are not
+counted as fault controls.
+
+Original/restored helper SHA256:
+`de7f79a4c0eceacbbb5302de395ea26c7d093e8ef0b836cf755bd5e9dd89b127`.
+The service-only mutant's SHA256:
+`309a56e2541081839d0cc0de2c0615f3c996a209cc4342e1fc2f67ffb3e2ef30`.
+The tested standalone lock stayed unchanged through all three runs, SHA256
+`6e4c3d8c52be44fdc58e013b536395885a5e1c1efcd7c20228cd2742a8d173df`.
+Independent review recomputed these hashes, checked the sole-line mutation,
+and verified the failing and restored logs without rerunning the gate.
+
+Fresh pristine-source comparison confirms every runtime Rust file is
+unchanged from published pre.4; only its manifest and provenance note differ.
+Burn-cubecl differs in its standalone manifest/lock, provenance note, three
+guard blocks, module declaration and actual helper/tests. Unrelated upstream
+formatting remains intact. The standalone lock moved from 524 to 523 package
+identities (14 added, 15 removed); its exact classified delta is retained.
+It has no Git source identities before or after. This is not the 1,710/1,655
+historical consumer-lock measurement and does not prove consumer turso
+absence; the default-feature qualification in §13.15 still applies.
+
+Seven exact crates.io archives were fetched by Cargo and SHA256-checked
+against the selected lock: cubecl-spirv 0.11.0-pre.4, tracel-ash
+0.39.5+sdk1.4.357, pliron-spirv 0.15.0+sdk-1.4.357.0, tracel-rspirv
+0.15.0+sdk-1.4.357.0, c2rust-bitfields 0.20.0,
+c2rust-bitfields-derive 0.20.0 and ordered-float 4.6.0. No Git ref changed,
+no upstream communication occurred, and every compiling/test gate ran offline
+and locked after the concrete cache fills.
+
+The existing external receipt directory retains full raw outputs:
+`guard-test-attempt-2.log`, `guard-missing-service-control.log`,
+`guard-restored-tests.log`, `guard-control-result.json`, original/mutant
+source bytes, `verified-guard-source.json`, pristine diffs,
+`guard-standalone-lock-delta.json`, `guard-tested.Cargo.lock`, and the package
+download logs/integrity records. `guard-checkpoint-receipt.json` inventories
+this completed checkpoint separately from the earlier uncompiled receipt.
+No new target, Cargo home or worktree was created; Lane M retains the existing
+worktree and stable target for the next reviewed slice.
