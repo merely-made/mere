@@ -2004,7 +2004,6 @@ dependencies = [
  "objc2-app-kit 0.3.2",
  "paint_list_api",
  "paint_list_render",
- "png 0.18.1",
  "raw-window-handle",
  "serde_json",
  "sprigging",
@@ -7951,7 +7950,7 @@ checksum = "e2db585e1d738fc771bf08a151420d3ed193d9d895a36df7f6f8a9456b911ddc"
 [[package]]
 name = "knot-capture"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?rev=fb09475bfdc579f177cef06a9498437ce4e06de1#fb09475bfdc579f177cef06a9498437ce4e06de1"
+source = "git+https://github.com/merely-made/knot-editor.git?rev=f14f9ef324817f455a2ef57992d2f66c4dd813f0#f14f9ef324817f455a2ef57992d2f66c4dd813f0"
 dependencies = [
  "knot-file-catalog",
 ]
@@ -7959,7 +7958,7 @@ dependencies = [
 [[package]]
 name = "knot-document"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?rev=fb09475bfdc579f177cef06a9498437ce4e06de1#fb09475bfdc579f177cef06a9498437ce4e06de1"
+source = "git+https://github.com/merely-made/knot-editor.git?rev=f14f9ef324817f455a2ef57992d2f66c4dd813f0#f14f9ef324817f455a2ef57992d2f66c4dd813f0"
 dependencies = [
  "cambium",
  "illume",
@@ -7975,7 +7974,7 @@ dependencies = [
 [[package]]
 name = "knot-editor"
 version = "0.0.3"
-source = "git+https://github.com/merely-made/knot-editor.git?rev=fb09475bfdc579f177cef06a9498437ce4e06de1#fb09475bfdc579f177cef06a9498437ce4e06de1"
+source = "git+https://github.com/merely-made/knot-editor.git?rev=f14f9ef324817f455a2ef57992d2f66c4dd813f0#f14f9ef324817f455a2ef57992d2f66c4dd813f0"
 dependencies = [
  "base64 0.22.1",
  "blake3",
@@ -8041,7 +8040,7 @@ dependencies = [
 [[package]]
 name = "knot-file-catalog"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?rev=fb09475bfdc579f177cef06a9498437ce4e06de1#fb09475bfdc579f177cef06a9498437ce4e06de1"
+source = "git+https://github.com/merely-made/knot-editor.git?rev=f14f9ef324817f455a2ef57992d2f66c4dd813f0#f14f9ef324817f455a2ef57992d2f66c4dd813f0"
 dependencies = [
  "muniment",
  "pollster",
