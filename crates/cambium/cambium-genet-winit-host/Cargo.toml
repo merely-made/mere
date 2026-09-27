@@ -31,6 +31,7 @@ sprigging = { version = "0.2.1", path = "../sprigging" }
 # so a host test targets a control by role and label rather than by pixel.
 # Named genet-probe until genet 7baa554c (2026-09-14).
 taproot = { workspace = true }
+mesquite = { version = "0.1.0", path = "../mesquite" }
 genet-scripted-dom = { workspace = true }
 genet-winit-host = { workspace = true }
 # The scenario lane writes its captures as PNG; already in the lock through

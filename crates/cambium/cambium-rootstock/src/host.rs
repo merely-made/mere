@@ -699,6 +699,15 @@ where
         layout.painted_rect(&*dom, node)
     }
 
+    /// The part of `node` inside the viewport and every ancestor content clip,
+    /// in logical pointer coordinates. `None` when no part is visible.
+    pub fn visible_rect(&self, node: NodeId) -> Option<(f32, f32, f32, f32)> {
+        let layout = self.layout?;
+        let dom = self.runner.dom();
+        let dom = dom.borrow();
+        layout.visible_rect(&*dom, node)
+    }
+
     /// Ask the host to scroll `node` into view.
     ///
     /// Resolved on the host's next layout against the node's painted rect

@@ -36,6 +36,8 @@ use cambium_rootstock::{AppCtx, NodeId, meristem_bounds::RootView};
 use taproot::ProbeSnapshot;
 
 mod checkpoints;
+mod clicks;
+pub use clicks::Clicks;
 mod cost;
 mod lane;
 mod pixels;
@@ -113,9 +115,10 @@ pub trait Product: Sized {
         None
     }
 
-    /// Where a click on a matched element should land, given its painted rect
-    /// `[x, y, w, h]`. The default is the rect's centre; a product whose
-    /// viewport is CSS-transformed maps the centre through that transform.
+    /// Where a click on a matched element should land, given its rect
+    /// `[x, y, w, h]`. After scrolling, this is the visible portion of the
+    /// element. The default is the rect's centre; a product whose viewport is
+    /// CSS-transformed maps the centre through that transform.
     fn target_point(&self, ctx: &Ctx<'_, Self>, node: NodeId, rect: [f32; 4]) -> (f32, f32) {
         let _ = (ctx, node);
         (rect[0] + rect[2] * 0.5, rect[1] + rect[3] * 0.5)
