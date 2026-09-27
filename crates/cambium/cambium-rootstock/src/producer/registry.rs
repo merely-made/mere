@@ -228,6 +228,7 @@ impl ProducerRegistry {
                 device: surface.device(),
                 queue: surface.queue(),
                 frame: &frame,
+                core: surface.core(),
             });
             stats.render_us += micros(phase.elapsed());
             stats.render_calls += 1;

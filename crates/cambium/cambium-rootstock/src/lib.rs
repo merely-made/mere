@@ -802,6 +802,7 @@ mod capture;
 mod frame;
 mod host;
 mod input;
+pub mod scenario;
 mod spatial;
 mod wake;
 mod window_verbs;

@@ -91,6 +91,28 @@ Phase 3's rulings, 2026-09-26:
   microseconds, and WebGPU timestamp queries around the raster work. Every
   run records visibility and fails if the page was hidden. The alternatives
   were pacing and CPU work alone, or pacing only.
+- **Timestamps' plumbing.** "Through NetrenderOptions": netrender's options
+  gain `optional_features` and genet's `RenderCore` forwards them. The
+  alternatives were an additive boot entry in genet alone, or dropping GPU
+  timestamps.
+- **The Knot copies.** The genet repin returns two old-genet copies, fleece
+  and layout-dom-api, that knot-editor `5ad3f67` pins. Mark first chose
+  "Knot session does it first"; the alternatives were keeping the copies
+  until Knot moved, or repinning knot-editor from this session. The Knot
+  session then found knot-editor cannot move first: knot-desktop broke,
+  because its mere pin still supplies Cambium on the old genet. Mark ruled
+  mere first, confirmed here: mere carries djinn's two copies until
+  knot-editor repins its mere and genet together, and djinn's pin then moves.
+- **wasm-bindgen.** "Install CLI 0.2.127 too": graphshell-web moves to
+  `=0.2.127`, the family the web host and mere's lock use, and the installed
+  CLI matches it. The alternatives were the same move on the 0.2.126 CLI, or
+  loosening the web host's pin.
+- **The lane.** "Lift the lane into rootstock": one host-neutral scenario
+  lane in rootstock, each host supplying its capture and receipt parts, the
+  winit host re-exporting it so Knot and mere-view keep their API. The tree
+  page uses it, and phase 4 moves Graphshell's scenarios onto it. The
+  alternatives were extending Graphshell's page lane with a tree probe, or a
+  browser copy of the winit host's lane.
 
 ## 2. Findings (verified 2026-09-25)
 
@@ -348,3 +370,15 @@ this tree.
   netrender `c8c09f16b` adds `NetrenderOptions::optional_features`, and
   genet `0cf4f30ba0f` forwards it into `RenderCore`'s boot, with a test that
   fails when the forwarding is removed. Mere repinned to both.
+- 2026-09-26: mere `0418391f` on main carries genet `0cf4f30ba0f` and
+  netrender `c8c09f16b`, with djinn's two interim copies until knot-editor
+  moves.
+- 2026-09-26: the scenario lane moved into rootstock
+  (`cambium_rootstock::scenario`): `ScenarioLane<A, H>`, with a `LaneHost`
+  half per host. The winit host keeps `LaneConfig` and wraps the lane over
+  `NativeLane` under its old name, so Knot and mere-view build unchanged, and
+  its nine scenario and four file tests pass. The web host gains
+  `capture_into` and `PendingFrame`, an asynchronous frame readback, and
+  `WebLane`, the browser's half. `ProducerContext` gains `core`, the host's
+  `RenderCore`. graphshell-web takes the web host and rootstock on
+  wasm-bindgen 0.2.127, with the CLI installed to match.
