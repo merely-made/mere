@@ -232,6 +232,11 @@ Validation: 15 scenario integration tests, 17 Mesquite unit tests and 16 host
 unit tests pass. Headed smoke and Mere View theme runs each captured three
 nonblank, distinct frames. Evidence is under
 `testing/knot-editor/images/2026-09-27_7c/unification/` in the workspace.
+Knot `f14f9ef` consumes Mere `8fce5365` and passes 426 tests with 3 ignored
+across workspace, standalone document and retention gates. Its native site run
+passes with three nonblank frames; the final image confirms the site and pages
+closed. Mere's embedded Knot pins follow `f14f9ef`; `cargo tree --offline -p djinn`
+checks dependency lockstep separately from runtime acceptance.
 Other products' independent runners remain a separate migration task.
 
 **Which plane moves.** Exactly one: the nearest ancestor whose computed `overflow-y`
