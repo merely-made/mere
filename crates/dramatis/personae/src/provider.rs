@@ -249,8 +249,13 @@ mod tests {
         let provider = InMemoryProvider::from_seed([0x31; 32]);
         let attestation = provider.attest_derived_key(b"strophe/session/one").unwrap();
 
-        assert!(attestation.verify(b"strophe/session/one"));
-        assert!(!attestation.verify(b"strophe/session/two"));
+        attestation
+            .check(b"strophe/session/one")
+            .expect("checks under its own salt");
+        assert_eq!(
+            attestation.check(b"strophe/session/two"),
+            Err(insigne::CheckFault::BadSignature)
+        );
         assert_eq!(
             attestation.master_public_key().unwrap(),
             provider.master_public_key()
@@ -276,6 +281,9 @@ mod tests {
             attestation.signature().to_vec(),
         );
 
-        assert!(!tampered.verify(b"strophe/session/one"));
+        assert_eq!(
+            tampered.check(b"strophe/session/one"),
+            Err(insigne::CheckFault::BadSignature)
+        );
     }
 }

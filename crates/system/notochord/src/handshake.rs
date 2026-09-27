@@ -24,7 +24,6 @@
 //! minted for one connection does not verify on another. That is what makes a
 //! captured hello useless when replayed over a different link.
 
-use personae::AttestationKeys;
 use personae::delegation::SignedDelegationCertificate;
 use personae::{DerivedKeyAttestation, Ed25519PublicKey, Ed25519Signature, IdentityProvider};
 use serde::{Deserialize, Serialize};
@@ -250,16 +249,13 @@ impl SessionHello {
     /// Checks the derived-key attestation, that the attested master is the
     /// claimed subject, and the transcript signature over `binding`.
     pub fn verify_proof(&self, binding: &ProofBinding) -> bool {
-        if !self.session_signer.verify(SESSION_SIGNING_SALT) {
-            return false;
-        }
-        let Ok(master) = self.session_signer.master_public_key() else {
+        let Ok(signer) = self.session_signer.check(SESSION_SIGNING_SALT) else {
             return false;
         };
-        if master.to_bytes() != self.subject {
+        if signer.master() != &self.subject {
             return false;
         }
-        let Ok(derived) = self.session_signer.derived_public_key() else {
+        let Ok(derived) = Ed25519PublicKey::from_bytes(signer.derived()) else {
             return false;
         };
         verify_signature(

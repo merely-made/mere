@@ -2167,6 +2167,7 @@ dependencies = [
  "blake3",
  "chirograph",
  "hmac 0.13.0",
+ "insigne",
  "notochord",
  "pandect",
  "personae",
@@ -2513,6 +2514,7 @@ dependencies = [
  "chartulary",
  "gemot",
  "hex",
+ "insigne",
  "mere-moot",
  "mere-p2panda-net",
  "mere-proofs",
@@ -5694,6 +5696,7 @@ dependencies = [
  "chartulary",
  "errand",
  "gemini-protocol",
+ "insigne",
  "mere-p2panda-net",
  "mere-proofs",
  "mere-transport",
@@ -6279,6 +6282,7 @@ dependencies = [
  "getrandom 0.3.4",
  "graphshell-client",
  "graphshell-endpoint",
+ "insigne",
  "light-file-dialog",
  "mere",
  "mere-mesh",
@@ -10191,6 +10195,7 @@ name = "notochord"
 version = "0.1.0"
 dependencies = [
  "blake3",
+ "insigne",
  "personae",
  "postcard",
  "serde",
@@ -14532,6 +14537,7 @@ name = "servitor"
 version = "0.0.2"
 dependencies = [
  "chartulary",
+ "insigne",
  "personae",
 ]
 
@@ -15259,6 +15265,7 @@ dependencies = [
  "blake3",
  "futures-util",
  "hex",
+ "insigne",
  "mere-p2panda-net",
  "mere-proofs",
  "muniment",
