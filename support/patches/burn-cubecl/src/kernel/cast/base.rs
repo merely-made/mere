@@ -1,5 +1,4 @@
 use crate::{
-    CubeRuntime,
     kernel::utils::address_type,
     ops::{max_vector_size, numeric::empty_device_dtype},
     tensor::CubeTensor,
@@ -13,7 +12,7 @@ use cubecl::{calculate_cube_count_elemwise, prelude::*};
 pub(crate) fn cast_element<I: Numeric, O: Numeric, N: Size>(
     input: LinearView<'_, Vector<I, N>>,
     mut output: LinearViewMut<'_, Vector<O, N>>,
-    #[define(I, O)] _dtypes: [StorageType; 2],
+    #[define(I, O)] _dtypes: [ElemType; 2],
 ) {
     if !output.is_in_bounds(ABSOLUTE_POS) {
         terminate!();
@@ -25,7 +24,7 @@ pub(crate) fn cast_element<I: Numeric, O: Numeric, N: Size>(
 /// Cast a tensor to the given element type.
 ///
 /// Note: When input element is semantically a boolean, prefer bool_cast function.
-pub fn cast<R: CubeRuntime>(input: CubeTensor<R>, dtype: DType) -> CubeTensor<R> {
+pub fn cast(input: CubeTensor, dtype: DType) -> CubeTensor {
     let dtype_output = match dtype {
         DType::Flex32 => DType::F32,
         _ => dtype,
