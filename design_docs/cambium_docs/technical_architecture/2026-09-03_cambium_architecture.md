@@ -317,3 +317,15 @@ coordination. Diagnostics should correlate product state and semantic action
 results with the existing UX event sinks and scenario receipts; avoid inventing
 a second application state model. Consumer acceptance and physical AT receipts
 must remain separately recorded.
+
+Consumer receipts on Mere `8106c7c2` / Genet `34626a6c`: Woodshed migration
+`0f0cdf1` passes 223 product tests and the unchanged `stage_clipping` and
+`nearby_candidates` native scenarios. The former now scrolls its arrangement
+controls into view at requested width 1100; broader Stage layout remains open.
+Cleromancy migration `32a4b94` passes 16 focused tests, an all-target check with
+`analytic-ephemeris`, and native first/reopen with matching durable IDs and card
+content. Mesquite owns captures and completion while each product retains its
+semantic commands and observations. Evidence is under
+`Code/testing/cambium/mesquite-migration`, with captures under the corresponding
+Woodshed and Cleromancy testing directories. These are native automation
+receipts, not new manual screen-reader acceptance.
