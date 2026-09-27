@@ -90,6 +90,26 @@ impl mesquite::Product for TestLane {
         SHEET
     }
 
+    fn app_step_with_clicks(
+        &mut self,
+        ctx: &mut mesquite::Ctx<'_, Self>,
+        _: mesquite::Checkpoints<'_>,
+        clicks: &mut mesquite::Clicks,
+        line: &str,
+    ) -> Result<(), String> {
+        if line != "select-far" {
+            return Err(format!("unknown scenario step: {line}"));
+        }
+        let selector = taproot::Selector::role("button").containing("Far");
+        if clicks.click(ctx, &selector, |_, _, r| {
+            (r[0] + r[2] * 0.5, r[1] + r[3] * 0.5)
+        }) {
+            Ok(())
+        } else {
+            Err("Far target missing".into())
+        }
+    }
+
     fn snapshot(
         &self,
         ctx: &AppCtx<'_, App, Logic, Child>,
@@ -246,6 +266,13 @@ fn a_click_by_label_reaches_the_app_and_the_receipt_says_ok() {
 #[test]
 fn a_click_scrolls_a_below_the_fold_button_before_the_next_assertion() {
     let (receipt, h) = run("far", "click role:button Far\nassert snap count == 1\n");
+    assert!(receipt.starts_with("RESULT ok"), "{receipt}");
+    assert_eq!(h.state().count, 1);
+}
+
+#[test]
+fn product_click_verbs_share_the_lanes_scroll_and_dispatch_wait() {
+    let (receipt, h) = run("product-far", "select-far\nassert snap count == 1\n");
     assert!(receipt.starts_with("RESULT ok"), "{receipt}");
     assert_eq!(h.state().count, 1);
 }

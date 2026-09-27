@@ -197,6 +197,18 @@ pub trait Product: Sized {
         let _ = (ctx, checkpoints);
         Err(format!("unknown scenario step: {line}"))
     }
+
+    /// Product verbs that resolve to a selector click use the lane's own held
+    /// click queue, so scrolling still blocks the next scenario step.
+    fn app_step_with_clicks(
+        &mut self,
+        ctx: &mut Ctx<'_, Self>,
+        checkpoints: Checkpoints<'_>,
+        _clicks: &mut Clicks,
+        line: &str,
+    ) -> Result<(), String> {
+        self.app_step(ctx, checkpoints, line)
+    }
 }
 
 #[cfg(test)]
