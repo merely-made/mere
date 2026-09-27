@@ -2030,6 +2030,7 @@ dependencies = [
  "paint_list_api",
  "paint_list_render",
  "sprigging",
+ "taproot",
  "web-time",
  "wgpu",
 ]
