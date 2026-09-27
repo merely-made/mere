@@ -138,6 +138,23 @@ pub trait Product: Sized {
         Vec::new()
     }
 
+    /// Write product-specific receipts once, after all captures and acceptance
+    /// checks complete. The outcome includes lane failures, not just script
+    /// assertions. An error here also fails the shared receipt and exit code.
+    fn complete(
+        &mut self,
+        _ctx: &mut Ctx<'_, Self>,
+        _outcome: &taproot::Outcome,
+    ) -> Result<(), String> {
+        Ok(())
+    }
+
+    /// Whether completion closes the window. Interactive trials can retain
+    /// their finished state while the lane stops driving it.
+    fn close_on_completion(&self) -> bool {
+        true
+    }
+
     /// The product's rendered viewport, as a pixel mask for capture
     /// comparison. `None` disables pixel checks for that capture.
     fn viewport(&self, ctx: &Ctx<'_, Self>) -> Option<Viewport> {
