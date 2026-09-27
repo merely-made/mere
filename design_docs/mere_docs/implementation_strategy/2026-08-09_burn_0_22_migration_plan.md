@@ -2,6 +2,12 @@
 
 **Date**: 2026-08-09
 
+**Status annotation (2026-09-27, ruling 378):** needed crates.io downloads
+are authorized with versions/integrity recorded and Git pins preserved.
+The original offline failure in §13.14 remains evidence; §13.15 records
+resumption. The bounded guard checkpoint is in progress, with root/product
+manifests still on pre.2 and broader migration acceptance still pending.
+
 **Status annotation (2026-09-27, rulings 375–377):** production remains on
 `0.22.0-pre.2`; no production manifest or lock has moved. Pre.4 will disable
 CubeCL persistence with a manifest-only runtime patch and require the complete
@@ -1744,3 +1750,37 @@ Full raw outputs and provenance are retained under
 `guard-pre4-lock-update.log`/JSON and `missing-cubecl-spirv-cache.json`.
 The stable target remains owned by Lane M for the pending checkpoint; no new
 target, Cargo home or worktree was created.
+
+### 13.15 Download authorization and guard execution (2026-09-27)
+
+**Status:** bounded guard checkpoint in progress; production migration has
+not been accepted. Canonical ruling 378 is in
+isometry/mesocosm/design_docs/2026-09-18_wing_design_plan.md, committed there
+as `a59189a`. The final question was "May I download the crates.io
+dependencies needed for this pinned migration?" with the recommendation
+"I recommend allowing that, recording downloads and preserving Git pins."
+Mark answered verbatim: "Ok."
+
+This settles S0-9 and supersedes §13.13's return-for-each-miss restriction:
+download required crates.io dependencies for this pinned migration, record
+versions and integrity evidence, and keep existing Git revisions fixed.
+Unrelated upgrades and upstream communication remain outside this answer.
+The working approach is Cargo-managed exact-package cache fills from outside
+the workspace, then offline locked gates; the original failures remain.
+
+The first resumed standalone lock resolution passed after exact cached-lock
+packages were downloaded and verified. The gate's lock has no Git source
+identities, before or after. Its helper tests run against the actual private
+guard used by the launchers, not a copied predicate. Full commands, package
+versions, expected/observed archive SHA256 values and outputs are retained
+under the receipt directory named in §13.14, including
+`guard-cache-resolution.json` and `guard-test-attempts.json`.
+
+**Feature-scope qualification:** the standalone burn-cubecl default-feature
+test explicitly enables cubecl-wgpu/default, then cubecl-server/default and
+cubecl-runtime/persistence. Its compiled turso is therefore expected even
+with persistence removed from the runtime's defaults. The retained
+`guard-turso-feature-tree.log` exposes this chain. This guard test does not
+prove turso absent from Mere's consumer feature matrix, whose burn/cubecl
+edges disable defaults. The consumer graph and lock absence gate remains S8;
+do not widen the runtime patch or claim its full acceptance from this test.
