@@ -43,7 +43,6 @@ use std::{cell::RefCell, rc::Rc};
 mod decorations;
 mod files;
 mod harness;
-pub mod scenario;
 #[cfg(target_os = "windows")]
 mod windows_snap;
 #[cfg(target_os = "windows")]
@@ -61,7 +60,7 @@ pub use cambium_rootstock::{
 };
 pub use files::{DialogFileChooser, read_file};
 pub use harness::{Harness, inert_hooks};
-pub use scenario::{CaptureRecord, LaneApp, LaneConfig, ProbeSnapshot, ScenarioLane};
+// Scenario execution lives in Mesquite; applications implement mesquite::Product.
 
 pub use cambium_rootstock::Instant;
 use cambium_rootstock::meristem_bounds::RootView;

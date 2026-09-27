@@ -11,18 +11,17 @@
 //! A headless run presents no frames, so no capture can land here. That makes
 //! the lost-capture path testable, and leaves real captures to the headed smoke.
 
+use mesquite::LaneConfig;
 use std::cell::Cell;
 use std::path::{Path, PathBuf};
 use std::rc::Rc;
+use taproot::ProbeSnapshot;
 
 use cambium::{
     AnyView, FileEvent, FileFilter, GenetCtx, GenetElement, PointerClick, button, clickable, el,
     focusable, open_file, text,
 };
-use cambium_genet_winit_host::{
-    AppCtx, Harness, HostHooks, Init, LaneApp, LaneConfig, ProbeSnapshot, ScenarioLane,
-    WindowCommand, inert_hooks,
-};
+use cambium_genet_winit_host::{AppCtx, Harness, HostHooks, Init, WindowCommand, inert_hooks};
 
 #[derive(Default)]
 struct App {
@@ -79,12 +78,24 @@ const SHEET: &str = "button { display: block; width: 120px; height: 32px; }
 
 struct TestLane;
 
-impl LaneApp<App, Logic, Child> for TestLane {
+impl mesquite::Product for TestLane {
+    type State = App;
+    type Logic = Logic;
+    type View = Child;
+    const KIND: &'static str = "scenario-test";
+    const SURFACE: &'static str = "app";
+    const LOG_PREFIX: &'static str = "scenario-test";
+
     fn sheet(&self) -> &str {
         SHEET
     }
 
-    fn snapshot(&self, ctx: &AppCtx<'_, App, Logic, Child>) -> ProbeSnapshot {
+    fn snapshot(
+        &self,
+        ctx: &AppCtx<'_, App, Logic, Child>,
+        _captures: usize,
+        _: f32,
+    ) -> ProbeSnapshot {
         ProbeSnapshot::default()
             .with_field("count", ctx.runner.state().count.to_string())
             .with_field("opened", ctx.runner.state().opened.clone())
@@ -134,7 +145,7 @@ impl mesquite::Product for TestProduct {
         self.0
     }
     fn snapshot(&self, ctx: &mesquite::Ctx<'_, Self>, _: usize, _: f32) -> ProbeSnapshot {
-        TestLane.snapshot(ctx)
+        TestLane.snapshot(ctx, 0, 1.0)
     }
     fn drain_events(&mut self, ctx: &mut mesquite::Ctx<'_, Self>) -> Vec<String> {
         TestLane.drain_events(ctx)
@@ -185,9 +196,11 @@ fn run_lane(
             ..inert_hooks()
         }
     } else {
-        let mut lane = ScenarioLane::new(config, TestLane).expect("scenario parses");
+        let mut lane =
+            mesquite::Lane::from_config(config, TestLane, cambium_genet_winit_host::read_file)
+                .expect("scenario parses");
         HostHooks {
-            after_frame: Box::new(move |ctx| lane.drive(ctx)),
+            after_frame: Box::new(move |ctx| lane.after_frame(ctx)),
             ..inert_hooks()
         }
     };
@@ -238,7 +251,7 @@ fn a_click_scrolls_a_below_the_fold_button_before_the_next_assertion() {
 }
 
 #[test]
-fn both_runners_click_the_visible_part_of_an_oversized_button() {
+fn both_receipt_modes_click_the_visible_part_of_an_oversized_button() {
     for mesquite in [false, true] {
         let (receipt, h) = run_lane(
             &scratch(&format!("tall-{mesquite}")),
@@ -254,7 +267,7 @@ fn both_runners_click_the_visible_part_of_an_oversized_button() {
 }
 
 #[test]
-fn both_runners_fail_an_unrevealable_target_even_without_an_assertion() {
+fn both_receipt_modes_fail_an_unrevealable_target_even_without_an_assertion() {
     for mesquite in [false, true] {
         let (receipt, h) = run_lane(
             &scratch(&format!("clipped-{mesquite}")),
@@ -296,7 +309,10 @@ fn a_failed_assertion_fails_the_receipt() {
 fn an_unknown_verb_is_loud() {
     let (receipt, _) = run("verb", "frobnicate the widget\n");
     assert!(receipt.starts_with("RESULT fail"), "{receipt}");
-    assert!(receipt.contains("unknown verb: frobnicate"), "{receipt}");
+    assert!(
+        receipt.contains("unknown scenario step: frobnicate"),
+        "{receipt}"
+    );
 }
 
 #[test]
@@ -370,4 +386,108 @@ fn the_receipt_goes_to_its_own_path_or_the_capture_directory() {
         receipt: None,
     };
     assert_eq!(neither.receipt_path(), None);
+}
+
+#[test]
+fn text_and_json_runs_use_the_same_checkpoint_commands() {
+    for json in [false, true] {
+        let (receipt, h) = run_lane(
+            &scratch(&format!("checkpoint-{json}")),
+            "remember before\nclick role:button Count\nassert snap count == 1\nmore before count\n",
+            SHEET,
+            json,
+        );
+        if json {
+            let value: serde_json::Value = serde_json::from_str(&receipt).unwrap();
+            assert_eq!(value["ok"], true, "{receipt}");
+            assert_eq!(value["checkpoints"]["before"]["count"], "0");
+        } else {
+            assert!(receipt.starts_with("RESULT ok"), "{receipt}");
+        }
+        assert_eq!(h.state().count, 1);
+    }
+}
+
+struct RefusingProduct;
+impl mesquite::Product for RefusingProduct {
+    type State = App;
+    type Logic = Logic;
+    type View = Child;
+    const KIND: &'static str = "refusing-test";
+    const SURFACE: &'static str = "app";
+    const LOG_PREFIX: &'static str = "refusing-test";
+    fn sheet(&self) -> &str {
+        SHEET
+    }
+    fn snapshot(&self, _: &mesquite::Ctx<'_, Self>, _: usize, _: f32) -> ProbeSnapshot {
+        ProbeSnapshot::default()
+    }
+    fn receipt_checks(&self, _: &[mesquite::CaptureRecord]) -> Vec<String> {
+        vec!["product acceptance failed".into()]
+    }
+    fn receipt_lines(&self) -> Vec<String> {
+        vec!["product diagnostic".into()]
+    }
+}
+
+#[test]
+fn product_acceptance_can_fail_either_receipt_format() {
+    for json in [false, true] {
+        let dir = scratch(&format!("acceptance-{json}"));
+        let scenario_path = dir.join("run.scn");
+        std::fs::write(&scenario_path, "log done\n").unwrap();
+        let receipt = dir.join("receipt");
+        let mut lane = if json {
+            mesquite::Lane::new(
+                RefusingProduct,
+                Some(taproot::Scenario::parse("log done\n").unwrap()),
+                Some(receipt.clone()),
+                None,
+                Rc::new(Cell::new(0)),
+            )
+        } else {
+            mesquite::Lane::from_config(
+                LaneConfig {
+                    scenario: scenario_path,
+                    capture_dir: None,
+                    receipt: Some(receipt.clone()),
+                },
+                RefusingProduct,
+                cambium_genet_winit_host::read_file,
+            )
+            .unwrap()
+        };
+        let mut h = Harness::with_hooks(
+            Init {
+                state: App::default(),
+                logic: root as Logic,
+                sheet: SHEET.into(),
+                fonts: vec![],
+                images: vec![],
+            },
+            HostHooks {
+                after_frame: Box::new(move |ctx| lane.after_frame(ctx)),
+                ..inert_hooks()
+            },
+        );
+        for _ in 0..10 {
+            h.layout_at(300.0, 200.0);
+            h.after_frame();
+            if h.close_requested() {
+                break;
+            }
+        }
+        assert!(h.close_requested());
+        let text = std::fs::read_to_string(receipt).unwrap();
+        if json {
+            let value: serde_json::Value = serde_json::from_str(&text).unwrap();
+            assert_eq!(value["ok"], false);
+            assert_eq!(value["errors"][0], "product acceptance failed");
+            assert_eq!(value["product_log"][0], "product diagnostic");
+        } else {
+            assert!(text.starts_with("RESULT fail"), "{text}");
+            assert!(text.contains("FAIL: product acceptance failed"), "{text}");
+            assert!(text.contains("product diagnostic"), "{text}");
+        }
+    }
 }

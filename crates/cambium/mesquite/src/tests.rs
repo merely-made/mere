@@ -136,6 +136,7 @@ fn the_receipt_carries_every_named_section_and_its_kind() {
             "kind",
             "ok",
             "pixel_checks",
+            "product_log",
             "scenario",
             "scenario_log"
         ]

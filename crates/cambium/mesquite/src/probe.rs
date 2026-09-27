@@ -57,9 +57,15 @@ impl<P: Product> Automatable for Probe<'_, '_, P> {
     }
 
     fn snapshot(&self) -> ProbeSnapshot {
-        self.lane
-            .product
-            .snapshot(self.ctx, self.lane.captures.len(), self.lane.opacity)
+        let snapshot =
+            self.lane
+                .product
+                .snapshot(self.ctx, self.lane.captures.len(), self.lane.opacity);
+        if self.lane.script_files.is_some() {
+            snapshot.with_field("captures", self.lane.captures.len().to_string())
+        } else {
+            snapshot
+        }
     }
 
     fn click_target(&mut self, selector: &Selector) -> Option<bool> {
@@ -100,7 +106,7 @@ impl<P: Product> Automatable for Probe<'_, '_, P> {
 
     fn busy(&mut self) -> Option<bool> {
         let pending = self.lane.capture_pending();
-        self.lane.product.busy(self.ctx, pending)
+        self.lane.product.busy_mut(self.ctx, pending)
     }
 }
 
@@ -117,6 +123,11 @@ impl<P: Product> Driveable for Probe<'_, '_, P> {
     }
 
     fn app_step(&mut self, line: &str) -> Result<(), String> {
+        if let Some(argument) = line.strip_prefix("file ")
+            && let Some(files) = &mut self.lane.script_files
+        {
+            return files.answer(argument.trim());
+        }
         let words: Vec<_> = line.split_whitespace().collect();
         match words.as_slice() {
             ["cost-begin", name] => self.lane.costs.begin(name)?,

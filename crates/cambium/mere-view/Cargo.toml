@@ -21,6 +21,7 @@ sprigging = { workspace = true }
 uuid = { workspace = true }
 
 [dev-dependencies]
+mesquite = { workspace = true }
 # The headed harness (examples/harness.rs) and its scenario lane.
 cambium-genet-winit-host = { workspace = true }
 genet-scripted-dom = { workspace = true }
