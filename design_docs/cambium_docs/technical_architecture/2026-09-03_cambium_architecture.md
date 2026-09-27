@@ -182,8 +182,8 @@ and presentation. Such a wrapper could later be sugar over this request.
 **Scenario clicks (2026-09-27).** `AppCtx::visible_rect` exposes the same clipped
 geometry the harness reads. Taproot's optional `Automatable::click_target` hook
 lets a host accept selector delivery without changing the grammar or its default
-pointer path. Mesquite's `Clicks` supplies the shared implementation for its own
-`Lane` and the older winit `ScenarioLane`: a fully visible target clicks immediately;
+pointer path. Mesquite's `Clicks` supplies its `Lane` implementation: a fully
+visible target clicks immediately;
 a clipped target queues `scroll_into_view(Nearest)` and retains its `NodeId`.
 The next frame clicks the visible portion, then holds scenario ticks until that
 pointer dispatch has completed. A target still invisible after the scroll frame
@@ -192,8 +192,8 @@ Mesquite continues to apply the product's `target_point` transform. Rootstock
 owns clipping and scrolling; it does not depend on Taproot or scenario state.
 
 The below-fold `Far` regression failed before the fix (`count` stayed `0`).
-Afterward, the scenario suite passes 13 tests, including both runners' tall
-and unrevealable targets and Mesquite's transformed pointer delivery. The
+The original fix passed 13 scenario tests, including tall and unrevealable
+targets and Mesquite's transformed pointer delivery. The
 existing click-scroll suite passes 3 tests, scroll-request suite passes 10, and
 Mesquite's unit suite passes 17.
 These are headless host receipts; native Knot acceptance is recorded in its
@@ -204,6 +204,35 @@ receipt shows the below-fold Close site action closing the site and its pages.
 Mere's embedded editor/document pins follow that Knot revision; the resolved
 Genet source is again singular. This dependency-graph check is recorded by
 `cargo tree --offline -p djinn`, separately from the host tests above.
+
+**Runner unification (2026-09-27).** Taproot owns the grammar, selectors and
+assertions. Mesquite owns the single `Lane::after_frame` loop, deferred clicks,
+readback collection, completion, checks and receipts. The winit host supplies
+native input, frame capture and `read_file`; its duplicate `scenario.rs` is
+removed. Knot, the host smoke example and the Mere View harness implement
+`mesquite::Product` directly, including dynamically owned stylesheets.
+
+`Lane::from_config(config, product, host_read_file)` keeps the existing
+`PREFIX_SCENARIO`, `PREFIX_CAPTURE_DIR`, `PREFIX_RECEIPT`, relative `file` and
+`file cancel` commands, sanitized named PNGs, optional capture persistence and
+`RESULT ok`/`RESULT fail` text sentinel. It preserves the 120-frame capture
+patience and nonblank-frame check. `Lane::new` retains JSON receipts, eight-frame
+capture patience and strict detail checks. These are compatibility policies
+inside one lifecycle, not two execution loops. Both routes now share checkpoint,
+resize and capture-comparison commands. Pixel comparisons explain when a capture
+was not saved instead of trying to read a fabricated path.
+
+`Product::inspect`, `receipt_checks` and `receipt_lines` preserve native alpha
+inspection, product acceptance and diagnostics; JSON includes diagnostics in
+`product_log`. `busy_mut` defaults to the existing read-only `busy` hook, so
+current Mesquite products need no migration. `sheet` borrows from the product
+rather than requiring a static string. Native smoke and theme receipts verify
+these hooks; the native Knot site scenario verifies the below-fold closure.
+Validation: 15 scenario integration tests, 17 Mesquite unit tests and 16 host
+unit tests pass. Headed smoke and Mere View theme runs each captured three
+nonblank, distinct frames. Evidence is under
+`testing/knot-editor/images/2026-09-27_7c/unification/` in the workspace.
+Other products' independent runners remain a separate migration task.
 
 **Which plane moves.** Exactly one: the nearest ancestor whose computed `overflow-y`
 scrolls *and* whose vertical range is positive, otherwise the window viewport. The range
