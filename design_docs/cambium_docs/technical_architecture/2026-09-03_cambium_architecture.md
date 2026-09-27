@@ -198,6 +198,12 @@ existing click-scroll suite passes 3 tests, scroll-request suite passes 10, and
 Mesquite's unit suite passes 17.
 These are headless host receipts; native Knot acceptance is recorded in its
 workspace slice plan. Taproot's additive hook is Genet `34626a6c82e` (21 tests).
+Knot `fb09475` consumes this change, with 426 tests passing and 3 ignored across
+its workspace, standalone document and retention gates. Its native step 7c
+receipt shows the below-fold Close site action closing the site and its pages.
+Mere's embedded editor/document pins follow that Knot revision; the resolved
+Genet source is again singular. This dependency-graph check is recorded by
+`cargo tree --offline -p djinn`, separately from the host tests above.
 
 **Which plane moves.** Exactly one: the nearest ancestor whose computed `overflow-y`
 scrolls *and* whose vertical range is positive, otherwise the window viewport. The range
