@@ -2,6 +2,11 @@
 
 **Date**: 2026-08-09
 
+**Baseline comparison annotation (2026-09-27):** the same hardened Seiche
+release gate also fails on preserved pre.2 with the same two assertions and
+reported error. §13.19 records the bounded comparison and exact restoration.
+The observed failure predates migration; numerical acceptance remains open.
+
 **Numerical stop annotation (2026-09-27, S9–S12):** the nine native and
 19 wasm rows, Distillery, Djinn and portable whole-workspace checks pass.
 Numen's release GPU suite passes, but Seiche's two GPU parity tests fail with
@@ -2048,3 +2053,48 @@ The source-reviewed test changes and five tracked nested locks remain prepared
 WIP rather than accepted implementation. Existing Lane M worktree and stable
 `C:/t/cargo-targets/mere` remain retained for this migration; the GPU slot is
 released and no new worktree, target or Cargo home was created.
+
+### 13.19 Fresh pre.2 Seiche comparison (2026-09-27)
+
+The coordinator released one bounded diagnostic on primary `f4f61d6c`, using
+only the identical Seiche finite/length test hunk from Lane M. The target
+source was clean and matched baseline Git blob
+`39b7e3d47f2a2a46e6ba5181c58d509740706ec4`. Primary LF line endings were
+preserved; Lane M's CRLF bytes normalize to identical tested Rust source.
+There were no active Cargo source redirects or competing compiler/test owner.
+The pre.2 lock remained
+`da0822f516010218b3b163234d9826955add552002cffadf7250b5932add13d4`.
+
+The command matched the failed pre.4 gate exactly:
+`cargo test --release --offline --locked -p seiche --features tensor-burn-wgpu
+-- --test-threads=1 --nocapture`, with Rust 1.98.1, four jobs and the stable
+Mere target. Both sources select discrete GPU 0; neither run sets WGPU backend
+or adapter-name overrides. Current hardware/driver inventory is retained as
+supporting provenance, not a new device-selection claim.
+
+Pre.2 also exits 101 with **85 passed, two failed, one ignored**. The same two
+GPU parity assertions fail, with node-exclusion x relative error
+`1.9973466e0` against `1.0e-3`. All three finite/length controls pass, including
+six non-finite and two unequal-length rejections. Thus the observed failure
+exists in the preserved pre.2 baseline under the same checks; this does not
+prove every output value identical across versions or close numerical
+acceptance. Production algorithms and tolerances remain unchanged.
+
+The wrapper restored the original Seiche bytes in `finally`. Every recorded
+source hash matches its pre-run value, including the original root lock and
+unrelated dirty `document-lanes/src/reader.rs`; primary status returned to
+that reader WIP alone. No dependency download, source redirect or new target,
+Cargo home or worktree was needed. No broader matrix or S13 gate resumed.
+
+External evidence is `s9-seiche-pre2-baseline.log/.json`, its original/tested
+source copies, patch, manifest/lock copies, adapter inventory and
+`s9-seiche-pre2-pre4-comparison.json` in the existing receipt directory. The
+pre.2 raw log SHA-256 is
+`dc875500fdc44d8f13487d9742eb754f39afd5b8eff2c1084d7ccc6a4fb15a1a`.
+
+**Proposed next diagnostic, not executed:** compare the common column-minus-row
+broadcast displacement stage on NdArray and WGPU for the existing 257 positions
+and an asymmetric three-point analytic control. Record complete arrays and
+first mismatch before instrumenting later arithmetic/reduction stages. This
+localizes the shared failure without changing either law or its thresholds.
+The coordinator retains the next release decision.
