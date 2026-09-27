@@ -2,6 +2,13 @@
 
 **Date**: 2026-08-09
 
+**Numerical stop annotation (2026-09-27, S9–S12):** the nine native and
+19 wasm rows, Distillery, Djinn and portable whole-workspace checks pass.
+Numen's release GPU suite passes, but Seiche's two GPU parity tests fail with
+finite output under unchanged thresholds. The sequence stopped before Conatus
+and ESP release gates. §13.18 records the exact failure, controls and resolved
+nested locks; migration acceptance and main integration remain blocked.
+
 **Continuation annotation (2026-09-27, S5–S8):** the coordinator accepted the
 guard checkpoint and released the remaining patch rebases, exact consumer
 pins, root lock and mechanical §13.4 adapters in the existing Lane M worktree.
@@ -1944,3 +1951,100 @@ and stable Mere target remain owned by this ongoing migration.
 Separable Lane M source commits: `e2f335d7` (Remote rebase), `ed513bcb`
 (Reduce rebase), and `439a3585` (exact consumer pins, root lock and adapters).
 All remain outside main pending the complete migration acceptance gates.
+
+### 13.18 S9–S12 numerical stop and partial matrix (2026-09-27)
+
+The coordinator accepted `5accdcb8` and released S9–S12 in the existing Lane M
+worktree, with S13 still closed. This annotation supersedes the pending-state
+summary in §13.17 only for the gates actually completed below. Main remains
+pre.2; the lane retains the pre.4 root lock from §13.17 unchanged.
+
+**Completed checks.** All nine native test commands and all 19 wasm matrix
+rows pass. Native passing counts, per command rather than unique tests, are:
+ESP default 92, BERT 158, index WGPU 99, decoder WGPU 136, decoder training
+160, model-session 103, persistence 100, Numen 75 and Seiche 91. Existing
+ignored tests remain separately enumerated in the raw logs. Distillery's full
+`remote,trainer-gpu,trainer-autodiff,flora` check, Djinn's
+`trainer-gpu,trainer-autodiff` check and `cargo_mode.py verify` all exit 0.
+The latter includes the portable `cargo check --workspace --all-targets
+--locked`; its 1,530 selected metadata packages are not the full lock's 1,657
+package identities. The earlier two focused lease tests remain valid.
+
+**Numerical stop.** Numen's release `field-burn-wgpu` suite passes 77 tests,
+including both scalar and vector NdArray/WGPU parity tests; its timing test
+is ignored. Seiche's release `tensor-burn-wgpu` suite exits 101: 85 pass,
+two fail, one timing test is ignored. Both
+`tensor_forces::tests_wgpu::parity_ndarray_wgpu` and
+`node_exclusion_parity_ndarray_wgpu` fail. The latter reports x relative error
+`1.9973466e0` against its unchanged `1.0e-3` limit. The former reports
+`fx diverged` against its unchanged absolute `1.0e-3` limit. This is a finite
+numerical mismatch, not an adapter skip or a non-finite-value rejection.
+No cause or equivalence to the fresh pre.2 baseline is claimed yet.
+
+Before this run, source review found that `f32::max` could hide NaN in ESP's
+synthetic BERT and both Seiche parity tests; Seiche's `zip` could also truncate
+unequal outputs. Prepared test-only helpers assert equal lengths and finite
+values on both sides before the existing folds. Production algorithms and
+tolerances are unchanged. Seiche's three new controls passed in the same run:
+finite inputs accepted, NaN and both infinities rejected on either side, and
+both unequal-length directions rejected. The six non-finite and two length
+rejections are retained in stdout. The corresponding ESP helper/controls are
+source-reviewed but have not been compiled or run yet. Earlier native/wasm
+and workspace receipts precede these two test-only changes; no claim extends
+the old receipts to the new ESP tests.
+
+The GPU sequence stopped here under the numerical stop rule. Conatus's nine
+resident tests, ESP's release BERT/MiniLM gates, all eight nested/standalone
+builds and S13 headed/lifecycle receipts remain pending. Fresh pre.2 comparison
+must preserve the lane's prepared changes and primary `reader.rs` WIP; neither
+an arbitrary old snapshot nor an assumed baseline pass closes this failure.
+
+**Resolved locks and selected graphs.** Targeted offline resolution passed
+for all six nested workspaces and the two standalone patch crates. Counts are:
+
+| Root | Before | After | Selected graph qualification |
+|---|---:|---:|---|
+| probe | 600 | 585 | Patched runtime; no Turso/persistence |
+| native-fixture | no prior lock | 626 | NdArray only; no runtime/Turso selected |
+| remote-fixture | 969 | 982 | Patched runtime; no Turso/persistence |
+| session-fixture | 577 | 662 | NdArray only; no runtime/Turso selected |
+| burn_browser_embedding | 570 | 552 | Patched runtime; no Turso/persistence |
+| cubek_browser_extrema | 570 | 552 | Patched runtime; no Turso/persistence |
+| standalone burn-remote | 679 | 761 | Upstream default/dev closure retains Turso |
+| standalone cubek-reduce | 491 | 491 | Upstream default/dev closure retains Turso |
+
+This is five tracked nested locks plus native-fixture's generated ignored lock,
+with standalone locks inventoried separately. A dated clarification to §13.17:
+the standalone Remote/Reduce starting locks were the published pre.4 lock bytes
+copied during pristine-source rebasing, not the former pre.2 standalone locks.
+Their previous-content wording must not be read as a pre.2 receipt.
+
+All prior Git source identities remain fixed. Every root has one wgpu and no
+pre.2 or duplicate Burn/CubeCL/Cubek family. Probe and both repros retain their
+existing wgpu 30.0.0; the other roots use 30.0.1. CPU-only native/session roots
+have no historical patch table and retain optional Turso lock entries; their
+exact selected feature trees contain neither runtime nor Turso. One fresh
+detector invocation checks all six selected trees against the retained
+standalone-default positive graph, which detects Turso and three runtime
+persistence feature occurrences. This proves selected-graph absence, not
+universal absence from optional lock closures. Independent read-only review
+recomputed all eight lock hashes, deltas, graph hashes and fixed Git identities.
+Build acceptance remains pending.
+
+Ruling 378 covered three needed registry cache fills: burn-communication
+`0.22.0-pre.4`, thread-tree `0.3.3` and cubek-test-utils `0.3.0-pre.4`.
+Cargo-managed downloads and archive checksums match their retained lock
+provenance. Missing-cache exits are retained and are not negative controls.
+
+**Evidence and ownership.** Full command, compiler, source and lock provenance
+is external under `Code/testing/mere/receipts/2026-09-27/burn-pre4`, including
+`s9-matrix-commands.json`, `s9-s12-matrix-summary.json`, `s9-gpu-numen.json`,
+`s9-gpu-seiche.json`, `s9-seiche-numerical-stop.json`, the S10/S11 logs,
+`s12-nested-lock-deltas.json`, before/after lock bytes and
+`s12-feature-absence-control.json`. Each completed gate retains complete raw
+stdout/stderr. Source maps are unchanged during the failed Seiche run; its log
+SHA-256 is `1c6721bbcfd21eef52f9c6663a3ee461f01563133e90e6fd86de195b7828f52f`.
+The source-reviewed test changes and five tracked nested locks remain prepared
+WIP rather than accepted implementation. Existing Lane M worktree and stable
+`C:/t/cargo-targets/mere` remain retained for this migration; the GPU slot is
+released and no new worktree, target or Cargo home was created.
