@@ -2,6 +2,14 @@
 
 **Date**: 2026-08-09
 
+**Continuation annotation (2026-09-27, S5–S8):** the coordinator accepted the
+guard checkpoint and released the remaining patch rebases, exact consumer
+pins, root lock and mechanical §13.4 adapters in the existing Lane M worktree.
+The root production lock there is pre.4; main remains pre.2. Source review,
+portable metadata and the Conatus resident compile pass. §13.17 records this
+bounded checkpoint; broader matrices, nested lock migration, headed receipts,
+two-peer lifecycle acceptance and main integration remain pending.
+
 **Checkpoint annotation (2026-09-27, after ruling 378):** the pre.2 fixture
 prerequisite and bounded pre.4 guard checkpoint are verified (§13.16).
 Nine guard tests pass; removing the service comparison makes both service
@@ -1851,3 +1859,88 @@ download logs/integrity records. `guard-checkpoint-receipt.json` inventories
 this completed checkpoint separately from the earlier uncompiled receipt.
 No new target, Cargo home or worktree was created; Lane M retains the existing
 worktree and stable target for the next reviewed slice.
+
+### 13.17 S5–S8 bounded checkpoint (2026-09-27)
+
+After root and independent acceptance of §13.16, the coordinator released
+S5–S8 and the necessary mechanical §13.4 adapters. This section supersedes
+the earlier pending-continuation status without altering those dated records.
+Implementation is confined to `burn-pre4-repin`; main integration is not
+authorized by this checkpoint.
+
+**Patch rebases.** The preserved `610a32c5` pre.3 changes were compared with
+pristine published pre.3 and applied to pristine pre.4. Burn Remote has 11
+changed files against its 48-file published source: the two manifests,
+provenance, and eight source files. Seven source deltas applied directly;
+the two exports in `server/mod.rs` were inserted beside pre.4's new logging
+export. The server feature keeps upstream `tracing-subscriber` and adds
+`tokio/macros`. Cubek Reduce has five differences against its 93-file
+inventory: the extrema helper/two call sites, manifest workspace, two retained
+licenses and provenance. An independent reviewer recomputed both inventories
+and found no source correctness issue. Upstream trailing whitespace in three
+lines of Cubek's unit-test fixture is retained to keep its source delta exact.
+The source rebase is not a headed extrema or remote lifecycle receipt.
+
+**Pins and adapters.** All ten consumer manifests now use exact pre.4 family
+requirements. The runtime patch remains under ruling 375. The three Conatus
+files and remote-fixture allocator snapshot take §13.4's dynamic client and
+plain memory-usage API, without changing numerical work or device ownership.
+Conatus `--features resident --all-targets` compiles offline and locked,
+exit 0. The nested snapshot has not yet been compiled against a pre.4 nested
+lock. Nested and standalone Remote/Reduce locks retain their previous content
+until their respective gates; root-lock acceptance does not cover them.
+
+The focused Distillery `remote::tests` gate also passes offline and locked:
+two tests pass, 24 are filtered out, exit 0. They exercise a live lease and
+client termination on reclaim, and closing a session before authoring owner
+reclaim. They use the Flex backend and do not replace the full WGPU two-peer
+MiniLM lifecycle/allocator receipt required by ruling 376.
+
+**Root graph.** The exact targeted S8 command resolves offline. The current
+portable baseline has 1,648 packages and the resulting root lock 1,657:
+92 identities added, 83 removed, 22 existing package blocks changed. This is
+the live baseline, not Lane H's older package count. Every Git source identity
+is unchanged; there is one wgpu 30.0.1 and no pre.2 family or Turso package.
+The new non-family dependencies follow the pre.4 compiler/backend needs:
+Pliron/LLVM and awint replace the MLIR closure, `buildid` serves the runtime,
+and sysinfo advances with CubeCL CPU. The additional spin 0.12.3 and ureq
+3.4.2 versions are required by pre.4 and its LLVM bundler; existing versions
+remain for their other consumers. Existing-package edge convergence includes
+Windows-sys 0.61.2, data-encoding-macro-internal's permitted syn 3.0.6 edge,
+and feature-selected rand/HTTP edges. No existing package takes an unrelated
+major-version upgrade, and no Git revision moves.
+
+`cargo_mode.py verify --metadata-only` exits 0. The complete Distillery
+`remote,trainer-gpu,trainer-autodiff,flora` and Conatus `resident` feature trees
+both contain the patched runtime and omit Turso and runtime persistence.
+ESP with defaults disabled contains neither Burn nor tokenizers. A single
+detector invocation also detects Turso in the retained standalone-default
+guard graph/lock, providing a positive control for the absence checks; it is
+explicitly a fresh comparison of retained raw evidence, not a new standalone
+Cargo run. Three tree commands exited 0 and retained complete logs/provenance
+before their wrapper's console-only cp1252 rendering error; the wrapper now
+uses UTF-8. No Cargo result or raw output was lost.
+
+Full raw command output, source hashes, exact deltas and controls remain in
+the external `Code/testing/mere/receipts/2026-09-27/burn-pre4` receipt directory:
+`burn-remote-pre4-pristine-delta.json`, `cubek-reduce-pre4-pristine-delta.json`,
+`s8-targeted-lock.json`, `s8-root-lock-delta.json`, `s8-graph-findings.json`,
+`s8-absence-control.json`, `s8-portable-metadata.json` and
+`s8-conatus-check.json`, with their raw logs. The root lock SHA-256 is
+`2e85b0eac6c5f878d29c0a2487fb38c3767190926985dc3f5f4096814945f4b5`.
+The only additional download was pristine Burn Remote pre.3 as a rebase
+reference, with matching crates.io/archive checksum retained. It changes no
+production pin. S9–S13 broader matrices and behavioral receipts remain subject
+to the coordinator's next release.
+
+`s5-distillery-lease-tests.json` retains the full focused-test log and source
+provenance. `s8-final-source.json` explicitly distinguishes source hashes from
+the two removed Cargo-cache metadata files in the Remote vendor directory;
+the earlier gate inventories record those tracked deletions as null. No source
+changed during graph review. `s8-checkpoint-receipt.json` inventories this
+checkpoint separately from the guard receipt. The existing Lane M worktree
+and stable Mere target remain owned by this ongoing migration.
+
+Separable Lane M source commits: `e2f335d7` (Remote rebase), `ed513bcb`
+(Reduce rebase), and `439a3585` (exact consumer pins, root lock and adapters).
+All remain outside main pending the complete migration acceptance gates.
