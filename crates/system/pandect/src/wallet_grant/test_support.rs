@@ -138,6 +138,11 @@ pub(super) fn stored_epochs_for(
 }
 
 #[cfg(test)]
-pub(super) fn all_certificates_verify(set: &identity::carry::DeviceGrantSet) -> bool {
-    !set.is_empty() && set.certificates().all(|certificate| certificate.verify())
+pub(super) fn assert_all_certificates_check(set: &identity::carry::DeviceGrantSet) {
+    assert!(!set.is_empty(), "the grant set holds certificates");
+    for certificate in set.certificates() {
+        certificate
+            .check()
+            .expect("every certificate in the set checks");
+    }
 }
