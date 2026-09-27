@@ -43,7 +43,9 @@
 //! a feature, and a check that passes yields a local conclusion that is
 //! deliberately not serializable, the rule notochord's `AdmittedPrincipal`
 //! already follows: a conclusion drawn from a verified artifact never travels
-//! as one.
+//! as one. insigne's conclusions go one step further: their fields are
+//! private, so only a passing check makes one, and holding one is the proof
+//! that the check ran.
 //!
 //! ## Built today
 //!
@@ -54,12 +56,15 @@
 //!   its own, and the [`delegation`] grammar: certificates, revocations and
 //!   their canonical signing bytes. Both moved here from personae on
 //!   2026-09-24, formats unchanged; issuing stays in personae.
+//! - Behind `verify`, each statement's `check`, which returns its conclusion
+//!   (`CheckedAttestation`, `CheckedCertificate`, `CheckedRevocation`) or the
+//!   `CheckFault` that stopped it.
 //!
 //! ## Features
 //!
 //! - `digest`: certificate ids and attenuation, which hash with BLAKE3.
 //! - `verify`: signature checks on ed25519-dalek, in the lax mode personae
-//!   always used; implies `digest`.
+//!   always used, and the conclusions they yield; implies `digest`.
 
 #![warn(missing_docs)]
 #![doc(html_no_source)]
@@ -71,9 +76,15 @@ pub mod delegation;
 mod encoding;
 pub mod key;
 
+#[cfg(feature = "verify")]
+pub use attestation::CheckedAttestation;
 pub use attestation::DerivedKeyAttestation;
+#[cfg(feature = "verify")]
+pub use check::CheckFault;
 pub use delegation::{
     CapabilityScope, DelegationCertificate, DelegationId, DelegationParent, DelegationRevocation,
     SignedDelegationCertificate, SignedDelegationRevocation,
 };
+#[cfg(feature = "verify")]
+pub use delegation::{CheckedCertificate, CheckedRevocation};
 pub use key::{KeyAlgorithm, KeyParseError, TypedKey};

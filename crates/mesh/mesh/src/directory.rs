@@ -83,10 +83,12 @@ impl DeviceDirectory {
 /// Public because the store checks it before a mutation, and the fold checks it
 /// again on the way in — one rule, two doors.
 pub fn attests(author: [u8; 32], attestation: &DerivedKeyAttestation) -> bool {
-    attestation
-        .derived_public_key()
-        .is_ok_and(|derived| derived.to_bytes() == author)
-        && attestation.verify(MESH_AUTHOR_SALT)
+    attestation.check(MESH_AUTHOR_SALT).is_ok_and(|checked| {
+        checked
+            .attestation()
+            .derived_public_key()
+            .is_ok_and(|derived| derived.to_bytes() == author)
+    })
 }
 
 #[cfg(test)]

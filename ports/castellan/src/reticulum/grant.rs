@@ -19,6 +19,7 @@
 use std::fmt;
 use std::path::Path;
 
+use insigne::CheckFault;
 use pandect::{
     DeviceExposure, DeviceGrantError, DeviceId, DeviceMode, DevicePublicKey, RemoteAuthGrantSpec,
     certificate_device_id, device_grant_set_ref, device_is_fully_revoked,
@@ -264,9 +265,9 @@ impl SitedStationGrant {
         let Some(certificate) = self.grant.device.as_ref() else {
             return Err(SitedStationGrantError::ScopeViolation);
         };
-        if !certificate.verify() {
-            return Err(SitedStationGrantError::InvalidSignature);
-        }
+        certificate
+            .check()
+            .map_err(SitedStationGrantError::InvalidSignature)?;
         // A station holds device authority and nothing else. A persona
         // certificate in the set would mean some persona had delegated to an
         // unattended radio, which is exactly what this port refuses.
@@ -372,8 +373,8 @@ pub enum SitedStationGrantError {
         /// The affected device.
         device_id: DeviceId,
     },
-    /// Signature verification of the signed envelope failed.
-    InvalidSignature,
+    /// The signed envelope did not check; the fault says which step failed.
+    InvalidSignature(CheckFault),
     /// The envelope grants any Persona authority.
     PersonaAuthority,
     /// The envelope carries private-lane epoch material.
@@ -473,7 +474,9 @@ impl fmt::Display for SitedStationGrantError {
                 "sited station roster reference does not match device {} grant",
                 device_id.as_uuid()
             ),
-            Self::InvalidSignature => f.write_str("sited station grant signature is invalid"),
+            Self::InvalidSignature(fault) => {
+                write!(f, "sited station grant signature is invalid: {fault}")
+            },
             Self::PersonaAuthority => {
                 f.write_str("sited station grants must not authorize any persona")
             },

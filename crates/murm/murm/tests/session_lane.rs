@@ -18,7 +18,7 @@ use std::collections::BTreeMap;
 use std::sync::Arc;
 
 use identity::delegation::{
-    CapabilityScope, DelegationCertificate, DelegationParent, SignedDelegationCertificate,
+    CapabilityScope, DelegationCertificate, DelegationParent, Issue, SignedDelegationCertificate,
 };
 use identity::{IdentityProvider, InMemoryProvider};
 use murm::{

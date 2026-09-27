@@ -32,12 +32,7 @@ pub fn revoke_remote_auth_device(
             legacy_grant_hint(data_root, device_id),
         ));
     }
-    if !grant.certificates().all(|certificate| certificate.verify()) {
-        return Err(io::Error::new(
-            io::ErrorKind::InvalidData,
-            "device grant certificate failed signature verification",
-        ));
-    }
+    check_grant_set(&grant, "device grant certificate")?;
 
     let mut roster = load_device_roster(data_root)?.unwrap_or_else(DeviceRoster::new);
     let device = roster
@@ -277,12 +272,11 @@ mod tests {
         let outcome = revoke_remote_auth_device(&root, spec.device_id).unwrap();
 
         assert_eq!(outcome.statements.len(), set.certificates().count());
-        assert!(
-            outcome
-                .statements
-                .iter()
-                .all(|statement| statement.verify())
-        );
+        for statement in &outcome.statements {
+            statement
+                .check()
+                .expect("every revocation statement checks");
+        }
         assert!(
             crate::wallet_grant::device_is_fully_revoked(&root, spec.device_id).unwrap(),
             "the wallet's own ledger should already carry them"
