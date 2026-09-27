@@ -10,8 +10,8 @@ pub struct ReduceStrategy {
     /// The autotune level this launch's selection is cached under. Kernel
     /// selection is cached per *anchored* key everywhere below
     /// [`AutotuneLevel::Full`], so comptime fast paths derived from raw
-    /// divisibility (unchecked bounds, no idle guards) are only stable — and
-    /// only taken — at `Full`, where every raw shape is its own key. Callers
+    /// divisibility (unchecked bounds, no idle guards) are only stable, and only
+    /// taken, at `Full`, where every raw shape is its own key. Callers
     /// benchmarking a specific variant outside autotune set it directly.
     pub autotune_level: AutotuneLevel,
 }
@@ -33,6 +33,6 @@ pub struct VectorizationStrategy {
     pub parallel_output_vectorization: bool,
 }
 
-pub(crate) fn support_plane<R: Runtime>(client: &ComputeClient<R>) -> bool {
+pub(crate) fn support_plane(client: &Client) -> bool {
     client.properties().features.plane.contains(Plane::Ops)
 }
