@@ -174,8 +174,13 @@ pub fn load_carry_view(data_root: &Path) -> io::Result<CarryView> {
             let grant = load_device_grant_set(data_root, device.device_id)?;
             match grant.is_empty() {
                 false => {
-                    let signature_valid =
-                        Some(grant.certificates().all(|certificate| certificate.verify()));
+                    // A report of the checks' outcome for display: the view is
+                    // serialized, so it carries the verdict, never a conclusion.
+                    let signature_valid = Some(
+                        grant
+                            .certificates()
+                            .all(|certificate| certificate.check().is_ok()),
+                    );
                     let mut scopes: Vec<String> = grant
                         .certificates()
                         .flat_map(|certificate| certificate.certificate.scope.actions.iter())

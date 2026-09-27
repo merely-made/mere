@@ -11,19 +11,25 @@
 //! caller-supplied ray. Products still own working-set selection, source
 //! revision, camera construction, material appearance, and final composition.
 
-use std::{
-    collections::{BTreeMap, BTreeSet},
-    error::Error,
-    fmt,
-};
+use std::collections::{BTreeMap, BTreeSet};
 
 use bytemuck::{Pod, Zeroable};
+
+mod error;
+mod limits;
+
+pub use error::BrickMapError;
+pub use limits::AtlasLimits;
 
 pub const BRICK_EDGE: u32 = 8;
 pub const ATLAS_SLOTS_X: u32 = 16;
 pub const ATLAS_SLOTS_Z: u32 = 16;
+/// Atlas rows under [`AtlasLimits::DEFAULT`].
 pub const MAX_ATLAS_SLOTS_Y: u32 = 8;
-pub const MAX_BRICKS: usize = (ATLAS_SLOTS_X * ATLAS_SLOTS_Z * MAX_ATLAS_SLOTS_Y - 1) as usize;
+/// The brick cap of [`AtlasLimits::DEFAULT`], which [`BrickMap::from_keys`]
+/// and [`BrickMap::with_capacity`] keep; [`BrickMap::with_limits`] sizes an
+/// atlas to the host's card instead.
+pub const MAX_BRICKS: usize = AtlasLimits::DEFAULT.max_bricks();
 
 /// The shared WGSL module for pointer lookup, ray-box clipping, and voxel DDA.
 ///
@@ -114,13 +120,7 @@ impl BrickMap {
             .into_iter()
             .try_fold(1usize, |total, axis| total.checked_mul(axis as usize))
             .ok_or(BrickMapError::PointerVolumeOverflow { pointer_extent })?;
-        let mut pointers = Vec::new();
-        pointers
-            .try_reserve_exact(pointer_len)
-            .map_err(|_| BrickMapError::AllocationFailed {
-                entries: pointer_len,
-            })?;
-        pointers.resize(pointer_len, 0);
+        let pointers = zeroed(pointer_len)?;
 
         let slot_count = keys.len() as u32 + 1;
         let slots = [
@@ -188,44 +188,79 @@ impl BrickMap {
     /// spots (one of which is the reserved air slot), and `pointer_extent`
     /// fixes the pointer volume; a retarget moves the volume's origin but
     /// never its extent. A consumer keying texture identity to these
-    /// extents therefore never reallocates while the map lives.
+    /// extents therefore never reallocates while the map lives. Rows past
+    /// [`AtlasLimits::DEFAULT`]'s eight are refused; [`Self::with_limits`]
+    /// sizes the atlas to the host's card instead.
     pub fn with_capacity(
         projection_revision: BrickProjectionRevision,
         capacity_rows: u32,
         pointer_extent: [u32; 3],
     ) -> Result<Self, BrickMapError> {
-        let slots = [ATLAS_SLOTS_X, capacity_rows.max(1), ATLAS_SLOTS_Z];
-        let usable = (slots[0] * slots[1] * slots[2] - 1) as usize;
-        if usable > MAX_BRICKS {
+        let rows = capacity_rows.max(1);
+        if rows > AtlasLimits::DEFAULT.max_rows() {
             return Err(BrickMapError::TooManyBricks {
-                actual: usable,
+                actual: limits::bricks_in(rows),
                 maximum: MAX_BRICKS,
             });
         }
+        Self::capacity_fixed(projection_revision, rows, pointer_extent)
+    }
+
+    /// Builds an empty capacity-fixed map sized to the host's card, holding
+    /// at least `bricks`: the count rounds up to whole atlas rows, so
+    /// [`Self::capacity`] can exceed it.
+    ///
+    /// Refuses more bricks than `limits` allow and any pointer axis past
+    /// their texture edge, and allocates fallibly, so an oversized budget is
+    /// an error rather than an abort. As with [`Self::with_capacity`], the
+    /// extents stay fixed for the map's life.
+    pub fn with_limits(
+        projection_revision: BrickProjectionRevision,
+        bricks: usize,
+        pointer_extent: [u32; 3],
+        limits: AtlasLimits,
+    ) -> Result<Self, BrickMapError> {
+        let rows = limits
+            .rows_for(bricks)
+            .ok_or(BrickMapError::TooManyBricks {
+                actual: bricks,
+                maximum: limits.max_bricks(),
+            })?;
+        let maximum = limits.max_texture_dimension_3d;
+        if pointer_extent.iter().any(|axis| *axis > maximum) {
+            return Err(BrickMapError::TextureDimensionExceeded {
+                pointer_extent,
+                maximum,
+            });
+        }
+        Self::capacity_fixed(projection_revision, rows, pointer_extent)
+    }
+
+    /// An empty map of `rows` atlas rows over a fixed pointer volume, its
+    /// limits already checked.
+    fn capacity_fixed(
+        projection_revision: BrickProjectionRevision,
+        rows: u32,
+        pointer_extent: [u32; 3],
+    ) -> Result<Self, BrickMapError> {
         let pointer_len = pointer_extent
             .into_iter()
             .try_fold(1usize, |total, axis| {
                 total.checked_mul(axis as usize).filter(|_| axis > 0)
             })
             .ok_or(BrickMapError::PointerVolumeOverflow { pointer_extent })?;
-        let mut pointers = Vec::new();
-        pointers
-            .try_reserve_exact(pointer_len)
-            .map_err(|_| BrickMapError::AllocationFailed {
-                entries: pointer_len,
-            })?;
-        pointers.resize(pointer_len, 0);
+        let slots = [ATLAS_SLOTS_X, rows, ATLAS_SLOTS_Z];
         let atlas_len = atlas_extent(slots)
             .into_iter()
             .try_fold(1usize, |total, axis| total.checked_mul(axis as usize))
-            .expect("the fixed atlas bounds fit usize");
+            .expect("checked limits keep the atlas under 4 GiB");
         Ok(Self {
             projection_revision,
             origin: [0; 3],
             pointer_extent,
             slots,
-            pointers,
-            atlas: vec![0; atlas_len],
+            pointers: zeroed(pointer_len)?,
+            atlas: zeroed(atlas_len)?,
             key_slots: BTreeMap::new(),
         })
     }
@@ -383,6 +418,8 @@ impl BrickMap {
             .find_map(|(key, found)| (*found == slot).then(|| self.key_coord(*key)))
     }
 
+    /// `slot`'s atlas bytes in Z-Y-X order, X contiguous, for any slot
+    /// [`Self::atlas_slot_origin`] places; a free slot holds what it last did.
     pub fn slot_texels(&self, slot: u32) -> Option<Vec<u8>> {
         let [base_x, base_y, base_z] = self.atlas_slot_origin(slot)?;
         let [width, height, _] = self.atlas_extent();
@@ -421,8 +458,12 @@ impl BrickMap {
             + local[0]) as usize]
     }
 
+    /// The texel origin of `slot`'s box in the atlas, for any slot from 1
+    /// through [`Self::capacity`], held or free. Slot numbers are not bounded
+    /// by the resident count: a shrinking retarget keeps a retained brick's
+    /// slot. Slot 0 is air.
     pub fn atlas_slot_origin(&self, slot: u32) -> Option<[u32; 3]> {
-        if slot == 0 || slot as usize > self.key_slots.len() {
+        if slot == 0 || slot as usize > self.capacity() {
             return None;
         }
         let index = slot - 1;
@@ -469,92 +510,6 @@ pub struct RetargetDelta {
     pub retained: usize,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub enum BrickMapError {
-    TooManyBricks {
-        actual: usize,
-        maximum: usize,
-    },
-    PointerVolumeOverflow {
-        pointer_extent: [u32; 3],
-    },
-    /// A retargeted selection's bounding box outgrew the fixed pointer
-    /// volume.
-    ExtentExceeded {
-        extent: [u32; 3],
-        maximum: [u32; 3],
-    },
-    /// A changed selection was offered without advancing the projection
-    /// revision.
-    ProjectionNotAdvanced {
-        current: u64,
-        offered: u64,
-    },
-    AllocationFailed {
-        entries: usize,
-    },
-    UnknownKey {
-        key: BrickKey,
-    },
-    MissingBrick {
-        key: BrickKey,
-    },
-    InvalidBrickLength {
-        key: BrickKey,
-        actual: usize,
-        expected: usize,
-    },
-}
-
-impl fmt::Display for BrickMapError {
-    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::TooManyBricks { actual, maximum } => {
-                write!(
-                    formatter,
-                    "brick map has {actual} bricks; maximum is {maximum}"
-                )
-            },
-            Self::PointerVolumeOverflow { pointer_extent } => {
-                write!(
-                    formatter,
-                    "pointer volume overflows usize: {pointer_extent:?}"
-                )
-            },
-            Self::ExtentExceeded { extent, maximum } => {
-                write!(
-                    formatter,
-                    "selection bounds {extent:?} exceed the fixed pointer extent {maximum:?}"
-                )
-            },
-            Self::ProjectionNotAdvanced { current, offered } => {
-                write!(
-                    formatter,
-                    "a changed selection needs a projection revision past {current}; offered {offered}"
-                )
-            },
-            Self::AllocationFailed { entries } => {
-                write!(
-                    formatter,
-                    "pointer volume could not allocate {entries} entries"
-                )
-            },
-            Self::UnknownKey { key } => write!(formatter, "brick key is not selected: {key:?}"),
-            Self::MissingBrick { key } => write!(formatter, "selected brick is missing: {key:?}"),
-            Self::InvalidBrickLength {
-                key,
-                actual,
-                expected,
-            } => write!(
-                formatter,
-                "brick {key:?} has {actual} bytes; expected {expected}"
-            ),
-        }
-    }
-}
-
-impl Error for BrickMapError {}
-
 fn bounds(keys: &[BrickKey]) -> (BrickKey, [u32; 3]) {
     let mut min = [0; 3];
     let mut max = [0; 3];
@@ -576,202 +531,15 @@ fn atlas_extent(slots: [u32; 3]) -> [u32; 3] {
     slots.map(|axis| axis * BRICK_EDGE)
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    fn solid(material: u8) -> [u8; BRICK_EDGE.pow(3) as usize] {
-        [material; BRICK_EDGE.pow(3) as usize]
-    }
-
-    #[test]
-    fn map_order_and_atlas_layout_are_source_order_independent() {
-        let low = solid(2);
-        let high = solid(3);
-        let source = |key: BrickKey| match key {
-            [-1, 0, 0] => Some(low.as_slice()),
-            [1, 0, 0] => Some(high.as_slice()),
-            _ => None,
-        };
-        let first = BrickMap::from_keys(
-            BrickProjectionRevision(7),
-            [[1, 0, 0], [-1, 0, 0], [1, 0, 0]],
-            source,
-        )
-        .unwrap();
-        let second =
-            BrickMap::from_keys(BrickProjectionRevision(7), [[-1, 0, 0], [1, 0, 0]], source)
-                .unwrap();
-
-        assert_eq!(first.origin(), [-1, 0, 0]);
-        assert_eq!(first.pointer_extent(), [3, 1, 1]);
-        assert_eq!(first.pointers(), second.pointers());
-        assert_eq!(first.atlas(), second.atlas());
-        assert_eq!(first.material_at([-8, 0, 0]), 2);
-        assert_eq!(first.material_at([8, 0, 0]), 3);
-        assert_eq!(first.material_at([0, 0, 0]), 0);
-        assert_eq!(
-            BrickTraceSpace::from_map(&first).world_min,
-            [-8.0, 0.0, 0.0, 0.0]
-        );
-    }
-
-    #[test]
-    fn missing_and_malformed_bricks_are_refused() {
-        assert!(matches!(
-            BrickMap::from_keys(BrickProjectionRevision(0), [[0, 0, 0]], |_| None),
-            Err(BrickMapError::MissingBrick { .. })
-        ));
-        let malformed = [1u8; 8];
-        assert!(matches!(
-            BrickMap::from_keys(BrickProjectionRevision(0), [[0, 0, 0]], |_| {
-                Some(malformed.as_slice())
-            }),
-            Err(BrickMapError::InvalidBrickLength { .. })
-        ));
-    }
-
-    #[test]
-    fn refused_refresh_writes_nothing() {
-        let first = solid(1);
-        let replacement = solid(2);
-        let mut map = BrickMap::from_keys(BrickProjectionRevision(0), [[0, 0, 0]], |_| {
-            Some(first.as_slice())
-        })
-        .unwrap();
-        let pointers = map.pointers.clone();
-        let atlas = map.atlas.clone();
-
-        assert!(matches!(
-            map.refresh([[0, 0, 0], [1, 0, 0]], |_| Some(replacement.as_slice())),
-            Err(BrickMapError::UnknownKey { .. })
-        ));
-        assert_eq!(map.pointers, pointers);
-        assert_eq!(map.atlas, atlas);
-    }
-
-    #[test]
-    fn a_retarget_retains_slots_and_recycles_evictions_deterministically() {
-        let a = solid(2);
-        let b = solid(3);
-        let c = solid(4);
-        let source = |key: BrickKey| match key {
-            [0, 0, 0] => Some(a.as_slice()),
-            [1, 0, 0] => Some(b.as_slice()),
-            [2, 0, 0] => Some(c.as_slice()),
-            _ => None,
-        };
-        let mut map = BrickMap::with_capacity(BrickProjectionRevision(0), 1, [4, 1, 4]).unwrap();
-        assert_eq!(map.capacity(), 255);
-        let first = map
-            .retarget(BrickProjectionRevision(1), [[0, 0, 0], [1, 0, 0]], source)
-            .unwrap();
-        assert_eq!(first.loaded_slots, vec![1, 2]);
-        let b_slot = map.key_slots[&[1, 0, 0]];
-
-        let second = map
-            .retarget(BrickProjectionRevision(2), [[1, 0, 0], [2, 0, 0]], source)
-            .unwrap();
-        assert_eq!(
-            map.key_slots[&[1, 0, 0]],
-            b_slot,
-            "a kept brick keeps its slot"
-        );
-        assert_eq!(second.evicted, 1);
-        assert_eq!(second.retained, 1);
-        assert_eq!(
-            second.loaded_slots,
-            vec![map.key_slots[&[2, 0, 0]]],
-            "only the loaded brick's slot was written"
-        );
-        assert_eq!(
-            map.key_slots[&[2, 0, 0]],
-            1,
-            "the evicted slot recycles to the loaded key"
-        );
-        assert_eq!(map.material_at([8, 0, 0]), 3);
-        assert_eq!(map.material_at([16, 0, 0]), 4);
-        assert_eq!(map.material_at([0, 0, 0]), 0, "the evicted brick is gone");
-        assert_eq!(map.pointer_extent(), [4, 1, 4], "the extent never moves");
-
-        // The same sequence from scratch lands byte-identically.
-        let mut again = BrickMap::with_capacity(BrickProjectionRevision(0), 1, [4, 1, 4]).unwrap();
-        again
-            .retarget(BrickProjectionRevision(1), [[0, 0, 0], [1, 0, 0]], source)
-            .unwrap();
-        again
-            .retarget(BrickProjectionRevision(2), [[1, 0, 0], [2, 0, 0]], source)
-            .unwrap();
-        assert_eq!(map.pointers(), again.pointers());
-        assert_eq!(map.atlas(), again.atlas());
-    }
-
-    #[test]
-    fn a_refused_retarget_writes_nothing() {
-        let a = solid(2);
-        let source = |_: BrickKey| Some(a.as_slice());
-        let mut map = BrickMap::with_capacity(BrickProjectionRevision(0), 1, [2, 1, 2]).unwrap();
-        map.retarget(BrickProjectionRevision(1), [[0, 0, 0]], source)
-            .unwrap();
-        let pointers = map.pointers.clone();
-        let atlas = map.atlas.clone();
-        let held_origin = map.origin();
-
-        assert!(matches!(
-            map.retarget(BrickProjectionRevision(2), [[0, 0, 0], [4, 0, 0]], source),
-            Err(BrickMapError::ExtentExceeded { .. })
-        ));
-        assert!(matches!(
-            map.retarget(BrickProjectionRevision(1), [[1, 0, 0]], source),
-            Err(BrickMapError::ProjectionNotAdvanced { .. })
-        ));
-        assert!(matches!(
-            map.retarget(BrickProjectionRevision(2), [[1, 0, 0]], |_| None),
-            Err(BrickMapError::MissingBrick { .. })
-        ));
-        assert_eq!(map.pointers, pointers);
-        assert_eq!(map.atlas, atlas);
-        assert_eq!(map.origin(), held_origin);
-
-        // An unchanged selection is a no-op that needs no revision advance.
-        let unchanged = map
-            .retarget(BrickProjectionRevision(1), [[0, 0, 0]], source)
-            .unwrap();
-        assert!(unchanged.loaded_slots.is_empty());
-        assert_eq!(unchanged.retained, 1);
-    }
-
-    #[test]
-    fn a_retargeted_map_reads_like_a_rebuilt_one() {
-        let low = solid(2);
-        let high = solid(3);
-        let source = |key: BrickKey| match key {
-            [-1, 0, 0] => Some(low.as_slice()),
-            [1, 0, 1] => Some(high.as_slice()),
-            _ => None,
-        };
-        let mut travelled =
-            BrickMap::with_capacity(BrickProjectionRevision(0), 1, [4, 1, 4]).unwrap();
-        travelled
-            .retarget(BrickProjectionRevision(1), [[-1, 0, 0]], source)
-            .unwrap();
-        travelled
-            .retarget(BrickProjectionRevision(2), [[-1, 0, 0], [1, 0, 1]], source)
-            .unwrap();
-        let rebuilt =
-            BrickMap::from_keys(BrickProjectionRevision(2), [[-1, 0, 0], [1, 0, 1]], source)
-                .unwrap();
-        for at in [[-8, 0, 0], [-1, 7, 7], [8, 0, 8], [15, 7, 15], [0, 0, 0]] {
-            assert_eq!(travelled.material_at(at), rebuilt.material_at(at), "{at:?}");
-        }
-        assert_eq!(travelled.origin(), rebuilt.origin());
-    }
-
-    #[test]
-    fn shared_shader_stops_before_product_policy() {
-        assert!(BRICK_DDA_WGSL.contains("fn brick_dda"));
-        for forbidden in ["camera", "fog", "light", "material_colour", "critter"] {
-            assert!(!BRICK_DDA_WGSL.contains(forbidden), "found {forbidden}");
-        }
-    }
+/// A zeroed buffer, refused rather than aborting when it cannot be allocated.
+fn zeroed<T: Clone + Default>(len: usize) -> Result<Vec<T>, BrickMapError> {
+    let mut buffer = Vec::new();
+    buffer
+        .try_reserve_exact(len)
+        .map_err(|_| BrickMapError::AllocationFailed { entries: len })?;
+    buffer.resize(len, T::default());
+    Ok(buffer)
 }
+
+#[cfg(test)]
+mod tests;

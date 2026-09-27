@@ -160,7 +160,7 @@ fn revoke(ledger: &mut RevocationLedger, certificate: &SignedDelegationCertifica
         ),
     )
     .unwrap();
-    assert!(ledger.fold(&statement));
+    ledger.fold(statement.check().expect("an issued revocation checks"));
 }
 
 #[test]

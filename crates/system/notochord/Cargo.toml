@@ -20,6 +20,8 @@ path = "src/lib.rs"
 
 [dependencies]
 personae = { workspace = true }
+# The checked conclusions validation returns and the ledger folds.
+insigne = { workspace = true, features = ["verify"] }
 blake3 = { workspace = true }
 postcard = { version = "1", features = ["alloc"] }
 serde = { version = "1", features = ["derive"] }

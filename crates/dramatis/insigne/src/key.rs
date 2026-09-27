@@ -353,8 +353,8 @@ mod tests {
     // A live P-256 signing key from a 2026-08-01 PLC export sample.
     const PLC_P256: &str = "did:key:zDnaeyxJYdUvhr4FR6YwqWXutZp6YzQP4wisXUFaftZpyB4wY";
     const PLC_P256_HEX: &str = "03f217243a9bb95f6c851b406f50c5a167b9fe81de8d470abbee15801120449cb7";
-    // prns's public identity for the RNS 1.4.2 fixture, as rnid would export it.
-    const RNS_IDENTITY: &str = "0faa684ed28867b97f4a6a2dee5df8ce974e76b7018e3f22a1c4cf2678570f20d04ab232742bb4ab3a1368bd4615e4e6d0224ab71a016baf8520a332c9778737";
+    // Project-selected 64-byte parser fixture; not an identity ownership proof.
+    const RNS_IDENTITY: &str = "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f";
 
     fn from_hex<const N: usize>(text: &str) -> [u8; N] {
         hex_decode(text).unwrap()

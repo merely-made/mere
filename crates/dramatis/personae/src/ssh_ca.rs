@@ -25,6 +25,7 @@
 //!
 //! Feature `ssh`.
 
+use insigne::CheckFault;
 use ssh_key::certificate::{Builder, CertType, Certificate};
 use ssh_key::private::{Ed25519Keypair as SshEd25519Keypair, PrivateKey};
 use ssh_key::public::PublicKey;
@@ -59,9 +60,9 @@ pub fn ssh_ca_salt() -> Vec<u8> {
 /// Failure while minting a certificate.
 #[derive(Clone, Debug, PartialEq, Eq, thiserror::Error)]
 pub enum CertMintError {
-    /// The grant's signature, attestation, or issuer binding did not verify.
-    #[error("the delegation grant does not verify")]
-    UnverifiedGrant,
+    /// The grant did not check; the fault says which step failed.
+    #[error("the delegation grant does not check: {0}")]
+    UnverifiedGrant(CheckFault),
     /// The grant belongs to some other application's action vocabulary.
     #[error("expected a {DEVICE_AUTHORITY_DOMAIN} grant, found domain {0:?}")]
     WrongDomain(String),
@@ -354,15 +355,13 @@ pub fn key_id_for(grant: &DelegationId) -> String {
     out
 }
 
-/// Verify a grant is a usable SSH authority at `now_ms`, returning its id.
+/// Check a grant is a usable SSH authority at `now_ms`, returning its id.
 fn check_grant(
     grant: &SignedDelegationCertificate,
     now_ms: u64,
 ) -> Result<DelegationId, CertMintError> {
-    if !grant.verify() {
-        return Err(CertMintError::UnverifiedGrant);
-    }
-    let certificate = &grant.certificate;
+    let checked = grant.check().map_err(CertMintError::UnverifiedGrant)?;
+    let certificate = checked.certificate();
     if certificate.scope.domain != DEVICE_AUTHORITY_DOMAIN {
         return Err(CertMintError::WrongDomain(certificate.scope.domain.clone()));
     }
@@ -374,7 +373,7 @@ fn check_grant(
     if !certificate.covers(&certificate.scope.path_prefix, ACTION_SSH_LOGIN, now_ms) {
         return Err(CertMintError::OutsideGrantWindow { at_ms: now_ms });
     }
-    Ok(certificate.id())
+    Ok(checked.id())
 }
 
 /// The certificate's validity window in Unix seconds.
@@ -500,7 +499,10 @@ mod tests {
         let first = SshCertAuthority::derive(&provider).unwrap();
         let second = SshCertAuthority::derive(&provider).unwrap();
         assert_eq!(first.fingerprint(), second.fingerprint());
-        assert!(first.attestation().verify(&ssh_ca_salt()));
+        first
+            .attestation()
+            .check(&ssh_ca_salt())
+            .expect("the CA key's attestation checks");
         assert_eq!(
             first.attestation().master_public_key().unwrap().to_bytes(),
             provider.master_public_key().to_bytes()
@@ -584,7 +586,8 @@ mod tests {
             Err(CertMintError::OutsideGrantWindow { at_ms: NOW_MS })
         );
 
-        // Tampered: verify() fails, so the projection never begins.
+        // Tampered: the check fails at the signature, so the projection never
+        // begins.
         let mut tampered = grant_with(&provider, &[ACTION_SSH_LOGIN], None);
         tampered
             .certificate
@@ -593,7 +596,7 @@ mod tests {
             .insert(ACTION_SSH_PTY.into());
         assert_eq!(
             ca.mint_user_cert(&request(&tampered, &subject, &clean()), NOW_MS),
-            Err(CertMintError::UnverifiedGrant)
+            Err(CertMintError::UnverifiedGrant(CheckFault::BadSignature))
         );
 
         // No principals is OpenSSH's "golden ticket": valid everywhere.

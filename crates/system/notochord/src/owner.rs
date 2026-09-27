@@ -13,7 +13,7 @@
 //! [`crate::AdmittedPrincipal`], and [`crate::AdmittedSession`] cannot enter
 //! it by construction.
 
-use personae::delegation::SignedDelegationRevocation;
+use insigne::CheckedRevocation;
 use serde::{Deserialize, Deserializer, Serialize, de::Error as _};
 
 use crate::{
@@ -194,9 +194,9 @@ impl OwnerNetworkPolicy {
         }
     }
 
-    /// Verify and retain one revocation statement.
-    pub fn fold_revocation(&mut self, statement: &SignedDelegationRevocation) -> bool {
-        self.revocations.fold(statement)
+    /// Retain one checked revocation statement.
+    pub fn fold_revocation(&mut self, revocation: CheckedRevocation<'_>) {
+        self.revocations.fold(revocation);
     }
 }
 
@@ -325,7 +325,7 @@ mod tests {
         )
         .expect("revocation signs");
         let mut network = OwnerNetworkPolicy::closed(NETWORK);
-        assert!(network.fold_revocation(&statement));
+        network.fold_revocation(statement.check().expect("an issued revocation checks"));
         let mut settings = OwnerPolicySet::new();
         settings.upsert(network);
 

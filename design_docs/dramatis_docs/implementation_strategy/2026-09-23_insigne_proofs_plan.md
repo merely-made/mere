@@ -1,7 +1,8 @@
 # Insigne Proofs Plan
 
 **Date**: 2026-09-23
-**Status**: phase A landed 2026-09-24; phases B–D open. Mark agreed the split
+**Status**: phase A landed 2026-09-24 and phase B on 2026-09-26 (§3); C and
+D open. Mark agreed the split
 and ruled how issuing is expressed (§2, option (a)) on 2026-09-23. The Mere
 0.4 release baseline waits for phase B (Mark, 2026-09-26).
 **Scope**: move personae's delegation and attestation data types into insigne's
@@ -129,6 +130,85 @@ communicate to 'em". Built as two traits rather than one: `Issue` in
   `AttestedKey` carry the artifact that proved them. Done when a gaz record
   round-trips a stored attestation and it checks again after reload.
 
+### B, as ruled 2026-09-26
+
+Mark chose both options below from named alternatives.
+
+**The conclusion is borrowed and unforgeable.** Each statement gets a
+`check`, behind `verify`. It returns `Result<Checked…<'_>, CheckFault>` and
+leaves the old `verify` in place, deprecated, until no caller needs it:
+
+- `DerivedKeyAttestation::check(salt)` returns `CheckedAttestation`;
+- `SignedDelegationCertificate::check()` returns `CheckedCertificate`;
+- `SignedDelegationRevocation::check()` returns `CheckedRevocation`.
+
+A conclusion borrows the statement it was drawn from and has private
+fields, so only a passing check makes one. It is not serializable. It
+exposes the statement and, for the signed kinds, the checked signer.
+`CheckFault` says which step failed: `Malformed`, `BadAttestation`,
+`WrongIssuer` or `BadSignature`. The steps run in the order the old
+`verify` ran them, so exactly the same statements pass. "Check" is
+insigne's own word: its crate docs say a check that passes yields a local
+conclusion. The alternatives were owned copies of the facts, keeping the
+name `verify` in one breaking step, or public fields as `AdmittedPrincipal`
+has, which anyone could forge.
+
+**The conclusion travels to the first decision, and through notochord.**
+Every `if !x.verify()` becomes a `check` whose fault the caller keeps.
+notochord's `RevocationLedger::fold` takes a `CheckedRevocation`, so a ledger
+cannot fold an unchecked statement. `validate_chain` returns the checked
+leaf, so admission asks `covers` of a checked certificate. The alternatives
+were call sites only, or demanding conclusions in every API that receives a
+statement (pandect's wallet grants, gemot's store, graphshell's carriers).
+
+**The census, by compiler.** The three `verify` functions were marked
+deprecated in a scratch tree, and the workspace was built with every target.
+That found 60 call sites in 29 files across 11 crates: personae 19, insigne
+itself 10, pandect 8, gemot 7, graphshell, commons, servitor and notochord 3
+each, stickleback 2, mere-mesh and castellan 1 each. signalman adds 1: it is
+its own workspace, which the workspace build never reaches (§4, 2026-09-26).
+
+Outside mere, by pattern:
+
+- turnstone: 1 `verify` and 2 `fold` calls;
+- hocket: 1 `verify`, with the same code vendored in woodshed;
+- knot-editor: 2 test assertions and 1 `fold` in an example.
+
+mere compiles only knot-editor's library, which calls neither, so this
+phase needs no knot lockstep. Each of those repos migrates at its next repin.
+
+**Order.** Each step keeps the workspace green:
+
+1. insigne gains `check` and the conclusions, and deprecates `verify`.
+2. notochord changes `fold` and `validate_chain`, updating their callers in
+   the same commit.
+3. The remaining call sites move crate by crate.
+4. `verify` goes.
+
+Done when (landed 2026-09-26):
+
+- [x] insigne's three `check` functions and their conclusions exist
+      (`bd6b8c4b`), and `verify() -> bool` is gone (`538226a3`);
+- [x] `fold` takes a `CheckedRevocation`, and `validate_chain` returns the
+      checked leaf, which notochord's admission asks `covers` of
+      (`e4471b93`);
+- [x] no caller in mere, signalman included, reads a `bool` from a check
+      (`87aae7ab`), with one exception, which Mark confirmed on 2026-09-26. castellan's
+      `DeviceGrantView` reports "verified" or "invalid" in a serialized
+      view: it can carry the outcome, but never the conclusion. Functions
+      whose own contract is a `bool` or an `Option` keep it, built on the
+      conclusion: notochord's `verify_proof`, graphshell's
+      `verify_derived` and `verify_session_key`, mesh's `attests`, and
+      personae's SSH ledger `fold`;
+- [x] the portable gate passes (1,521 packages), and the workspace checks
+      with every target and every feature. signalman checks and tests
+      with its own command. The moved crates' tests pass, the pre-move
+      fixture tests included: insigne 16 + 7, ten crates with all
+      features 1,086, signalman 22, and graphshell's library 190. One
+      graphshell golden test fails on Windows checkouts regardless (§4);
+- [x] the handoff for turnstone, hocket, woodshed and knot-editor is
+      recorded here (§5, 2026-09-26).
+
 ## 4. Findings
 
 **2026-09-23: the blast radius, counted.** Searched with ripgrep over
@@ -180,6 +260,40 @@ which covers their imports. Resolved since: graphshell's test by `bc7121ae`,
 cambium-nematic's by `4b33a963`, and the gate has checked every target since
 `67ebef3a` (Mark's ruling).
 
+**2026-09-26: phase A missed a nested workspace.** `ports/signalman` is its
+own workspace, excluded from mere's, but it path-depends on personae. So
+neither the portable gate nor phase A's workspace check compiled it. It
+reads an attestation's `master_public_key` and `derived_public_key`, and it
+failed with E0599 from `5364dfa0` until `aacf39c7` imported
+`AttestationKeys`. One other nested workspace depends on the proof crates,
+`ports/distillery/probe/remote-fixture`, and it calls none of the moved
+APIs. From here on, each nested workspace that depends on these crates is
+checked with its own command.
+
+**2026-09-26: a census needs every feature.** Phase B's first compiler
+census built default features. `--all-features` found two more sites:
+castellan's `reticulum` grant check called `verify`, and murm's
+`session-lane` test had lacked phase A's `Issue` import since `5364dfa0`
+(fixed in `b2677e15`). Like a gate, a census proves nothing about code
+behind a feature it did not enable.
+
+**2026-09-26: the nested workspaces, checked.** signalman checks and tests
+with its own command. `ports/distillery/probe/remote-fixture` does not
+resolve at all, locked or not: mere-mesh requires
+`mere-p2panda-net = "=0.7.4"`, which only mere's root patch table
+supplies. That breakage predates both phases. Its tracked lock is also
+stale: it has had no `insigne` entry since phase A.
+
+**2026-09-26: two unrelated failures met on the way.**
+
+- graphshell's `distillery_w1::…_mount_resumes_by_diff…` test compares
+  its receipt with a golden JSON, and a Windows checkout gives that file
+  CRLF endings. The values are identical. Git Bash's grep strips the
+  `\r` before matching, so only a byte-level read (Python) shows it.
+  tabard's goldens had the same fault, fixed with `eol=lf` (`b7ed0bdc`).
+- `mere-linked-data`'s tests name `Node.properties`, which the graph
+  kernel no longer has. Only an all-features build reaches them.
+
 ## 5. Progress
 
 **2026-09-23.** Plan drafted the day Mark agreed the split. Waits on §2.
@@ -202,6 +316,28 @@ repos' sessions were offline when this landed, so this note is the handoff.
 
 `AttestationKeys` is needed wherever an attestation's `master_public_key` or
 `derived_public_key` is read; none of these repos does today. Next: phase B.
+
+**2026-09-26.** Phase B landed (§3): `0f9eaa52` (plan), `bd6b8c4b`,
+`e4471b93`, `87aae7ab`, `538226a3`, plus two forward fixes for phase A,
+`aacf39c7` (signalman) and `b2677e15` (murm). Its API is now the one
+insigne publishes, so the Mere 0.4 baseline's insigne condition is met.
+
+Repin handoff for phase B, adding to phase A's. `x.verify()` becomes
+`x.check()`, which returns the conclusion or a `CheckFault`, and
+notochord's `ledger.fold(&statement)` becomes
+`ledger.fold(statement.check()?)`, or a match on the fault.
+
+- turnstone: `turnstone/src/place/worker.rs:1294` (`grant.verify()`),
+  `turnstone/src/publish_service.rs:390` (`fold`) and
+  `turnstone/src/place/worker.rs:3801` (a test's `fold`);
+- hocket: `hocket/crates/hocket-engine/src/handoff.rs:233`
+  (`self.sender.verify(&salt)`). woodshed carries the same file under
+  `ports/hocket/`;
+- knot-editor: two test assertions in
+  `knot-editor/crates/knot-editor/src/publish.rs` and the `fold` in
+  `knot-editor/crates/knot-editor/examples/knot_publish_peer.rs`.
+
+Next: phase C.
 
 **2026-09-26.** Mark ruled that the Mere 0.4 baseline waits for phase B.
 mere's djinn moved its knot pin from `c6d5b9e` to knot's main (`5ad3f67`).
