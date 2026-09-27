@@ -1678,3 +1678,69 @@ Consequences for execution:
 makes persistence optional without the forcing edge. No upstream issue, PR,
 or other communication was authorized by this answer. This documentation
 integration runs no Cargo gate and changes no production manifest or lock.
+
+### 13.14 First checkpoint, prepared source and offline stop (2026-09-27)
+
+**Status:** prerequisite verified; S3/S4 prepared but uncompiled. No root
+pre.4 manifest migration, production acceptance or S5–S18 continuation.
+
+The documentation integration is Mere `844affce` (parents `211b456e` and
+`02603e09`); Lane M fast-forwarded onto it before implementation. The clean
+portable baseline's root lock working-byte SHA256 is
+`da0822f516010218b3b163234d9826955add552002cffadf7250b5932add13d4`,
+on Rust 1.98.1. Its offline locked `esp --features bert-wgpu` tree passed and
+showed Burn pre.2. All Cargo work used `C:/t/cargo-targets/mere`, four jobs,
+offline, after an owner check; the root manifest and lock remain unchanged.
+
+**Remote-fixture prerequisite, commit `43c50fc6`:** the original offline
+locked check reproduced the missing `mere-p2panda-net = "=0.7.4"` error.
+Restating the root's eight p2panda patch rows resolved it. The nested lock
+changed from 883 to 969 packages: 95 added identities and nine removed, while
+the Burn/CubeCL/Cubek families remained pre.2. Current Distillery's path/GUI
+dependencies explain this baseline closure; these additions are not a pre.4
+migration cost. The `h2` change from 0.4.18 to 0.4.19 matches the root lock.
+The auth/stream rows remain unused optional mirrors; no fake dependencies
+were added to suppress their warnings.
+
+The first complete `cargo build --manifest-path
+ports/distillery/probe/remote-fixture/Cargo.toml --offline --locked` passed.
+After its compiler exited, the exact root Vello patch was mirrored too. A
+targeted update swapped Vello and vello_encoding 0.10.0 from the registry to
+git `4354955e` and changed data-encoding-macro-internal 0.1.19's `syn` edge
+from 3.0.4 to 1.0.109, allowed by its `>=1,<4` requirement and matching the
+root lock. The total stayed 969. The affected locked build also passed.
+These are compilation receipts; the two-peer lifecycle run remains a later
+gate, and its script's limited `dirty=false` field is not graph provenance.
+
+**Prepared S3/S4, lane commits `29646154` and `e9012d72`:** freshly copied published pre.4 sources carry the
+manifest-only runtime default-feature change and a private burn-cubecl
+`same_view` guard called by all three launchers. Nine authored unit tests
+cover matching views, allocation identity, both service-identity axes,
+separate slice offsets, None versus Some(0), stream and underlying size.
+Static comparison finds no runtime Rust differences from pristine pre.4.
+Burn-cubecl differs only in its manifest, provenance note, the three guards,
+module declaration and new helper/tests. The standalone manifest's two new
+dev-dependencies name the already-transitive common/environment crates for
+constructing public test handles. Independent read-only review found no
+remaining source correctness issue; this is not execution evidence.
+
+**Actual stop:** `cargo update --manifest-path
+support/patches/burn-cubecl/Cargo.toml --offline -p cubecl-runtime` exited
+101 before compilation: no matching `cubecl-spirv` package in the offline
+index. Cached cubecl-wgpu pre.4 requires exactly `0.11.0-pre.4` on an optional
+edge; the normal Cargo index entry, archive and source directory are all
+absent. The published lock records expected archive SHA256
+`7c59ad637ad702bd1fd929b4e69ac560c9719dae8c31329c50cbf1fad5168b4b`.
+No network request was made and no dependency edge was removed to bypass
+resolution. The nine tests and deliberate missing-service negative control
+have not run. Prepared vendor changes remain separate from the verified
+pre.2 prerequisite; continuation requires the bounded network decision.
+
+Full raw outputs and provenance are retained under
+`Code/testing/mere/receipts/2026-09-27/burn-pre4`: `baseline.json`,
+`baseline-gates.json`, both pre.2 build logs/JSON, the 496-file
+`remote-fixture-pre2-aligned-source.json`, lock-delta classification,
+`prepared-patch-source.json`, pristine diffs, published source hashes,
+`guard-pre4-lock-update.log`/JSON and `missing-cubecl-spirv-cache.json`.
+The stable target remains owned by Lane M for the pending checkpoint; no new
+target, Cargo home or worktree was created.
