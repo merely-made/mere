@@ -2,6 +2,10 @@
 
 **Date**: 2026-08-09
 
+**Status (2026-09-27):** production is still `0.22.0-pre.2`. The pre.4
+exact-pin repin is planned in §13, with S0 open and no manifest moved; the
+pre.3 repin in §12 is superseded. The 2026-08-20 status follows.
+
 **Status: PRERELEASE MIGRATION EXECUTED 2026-08-20; stable closure remains
 release-gated.** On the 0.22.0-pre.2 row Mark chose, both production roots
 migrated (esp then quint, the plan's order), the vendored
@@ -427,7 +431,24 @@ Stop on any of these conditions:
   tree. A grounded execution plan with done-conditions is appended below
   before any manifest moves.
 
+- **2026-09-27 — Mark ruled the pre.4 repin (353–356, Isometry wing design
+  record).** Burn `0.22.0-pre.4`, CubeCL `0.11.0-pre.4` and cubek
+  `0.3.0-pre.4` were published together on 2026-09-22, still with no stable
+  0.22. Exact pins supersede the parked pre.3 repin and D1. The
+  `cubecl-runtime` patch retires, because pre.4 exposes allocation identity.
+  turso, which pre.4 brings in through CubeCL's default `persistence`, is
+  settled inside this migration. Lane H's scratch assessment found conatus
+  the only Mere crate that fails (nine mechanical errors), and Distillery's
+  lease tests passing on a rebased burn-remote. §13 is the execution plan; S0
+  is open and no manifest has moved.
+
 ## 12. Pre.3 repin execution plan (2026-09-16)
+
+**Superseded 2026-09-27 by ruling 353** (pre.4, exact pins; §13). This
+repin never merged. Its branch `burn-pre3-repin` stays parked with four
+rebase commits (`276608d5`, `e1c0cb44`, `31102555`, `610a32c5`), which guide
+§13's rebases, and D1's caret requirements no longer hold. The rest of this
+section records how the pre.3 attempt was grounded and where it stopped.
 
 **Status:** S0 answered 2026-09-16; execution begins in the worktree. Main
 has not moved. Grounded by a read-only assessment against the registry sources for
@@ -448,12 +469,12 @@ every pre.2 and pre.3 crate involved, with each source rebase checked by
 - **D3, downloads permitted and done.** `wasm-bindgen-0.2.122-x86_64-pc-windows-msvc.tar.gz`
   (7,556,076 bytes, sha256 `03ba3056eb0c2ad2d0d30a0c0edefb590656a1e237596226804abb87b71b77ad`)
   from the wasm-bindgen GitHub release, extracted to
-  `C:	\wasm-bindgen-0.2.122\wasm-bindgen-0.2.122-x86_64-pc-windows-msvc\wasm-bindgen.exe`,
+  `C:\t\wasm-bindgen-0.2.122\wasm-bindgen-0.2.122-x86_64-pc-windows-msvc\wasm-bindgen.exe`,
   which reports `wasm-bindgen 0.2.122`. `burn-remote-0.22.0-pre.2.crate`
   (111,186 bytes, sha256 matching crates.io
   `fa8db206a100d838eeb100b8525ff8e3051958ee822fcfecd736fe58eddaeeaa`) extracted
-  to `C:	urn-remote-0.22.0-pre.2urn-remote-0.22.0-pre.2`, enabling the
-  three-way burn-remote check. Both are under `C:	`, which the 2026-09-15
+  to `C:\t\burn-remote-0.22.0-pre.2\burn-remote-0.22.0-pre.2`, enabling the
+  three-way burn-remote check. Both are under `C:\t`, which the 2026-09-15
   reclaim script clears after 24 idle hours; it runs only by hand, so do not
   run it during the repin.
 - **D4, coordinate via idle notices.** At S16, message the busy Mere
@@ -478,7 +499,7 @@ cubecl-runtime committed before burn-cubecl so no commit leaves burn-cubecl
 calling a missing helper. Each patch's standalone check could not run offline
 (dev-dependencies absent from the cache, and burn-cubecl's upstream lock pins a
 `cubecl-hip-sys` not cached), so each was compiled as a path dependency of a
-throwaway crate under `C:	\mere-burn-pre3-checks` with rustc 1.97.1; all four
+throwaway crate under `C:\t\mere-burn-pre3-checks` with rustc 1.97.1; all four
 built, and `cargo tree` confirmed the worktree patches were used. Mere's two new
 burn-remote session-close tests were not compiled; S9 and S10 cover them.
 
@@ -520,7 +541,7 @@ p2panda unchanged), moved those sources to git at the same pinned revisions
 **Rulings (Mark, 2026-09-16).**
 
 - **Baseline:** the normalized lock,
-  `C:	\mere-burn-pre3-baseline-normalized-pre2.lock`, sha256
+  `C:\t\mere-burn-pre3-baseline-normalized-pre2.lock`, sha256
   `6055022d3433481918b70a86243a8e3fca10a99bfc2c3a43c443d32916657f88`. It is
   what a clean checkout of committed Mere resolves, which is what the
   worktree builds.
@@ -843,3 +864,690 @@ interpreting the control), S16 timing. Machine time roughly half a day at
 `-j 4` into a cold target, a full day at `-j 1`. Total about one to one and a
 half working days with no stop rule firing; add half a day to two days if the
 extrema or same-allocation receipts behave differently on pre.3.
+
+## 13. Pre.4 repin execution plan (2026-09-27)
+
+**Status (2026-09-27):** plan; S0 open. No manifest has moved. Branch
+`burn-pre4-repin` in `Code/worktrees/mere-burn-pre4`, from `origin/main` at
+`a464dc2a` with its upstream unset, carries only this section and the notes in
+§11 and §12. Grounded by Lane H's scratch assessment of pre.4 (2026-09-26, no
+repository edits) and a re-check against `a464dc2a`: registry sources for every
+pre.2, pre.3 and pre.4 crate involved, the parked pre.3 branch read through git
+only, `patch --dry-run` of each pre.3 delta onto pristine pre.4, and resolution
+experiments in throwaway copies of the tree. Code here is illustrative.
+
+### Rulings (Mark, 2026-09-27, Isometry wing design record)
+
+- **353, "Pre.4, exact pins."** `=0.22.0-pre.4` for the burn family,
+  `=0.11.0-pre.4` for cubecl, `=0.3.0-pre.4` for cubek. Supersedes the parked
+  pre.3 repin and D1's caret requirements. The pre.3 branch's commits
+  (`276608d5`, `e1c0cb44`, `31102555`, `610a32c5`) guide the rebases.
+- **354, "No stopgap"** in Isometry's isometer-lens. It adapts when it repins to
+  this repin's revision, not before (13.10).
+- **355, "Retire it."** The `cubecl-runtime` patch retires. burn-cubecl's
+  same-allocation guard compares pre.4's public, doc-hidden allocation id,
+  `Handle.memory.descriptor().id`, directly. Knot's need to patch
+  `cubecl-runtime` goes with it.
+- **356, "Settle it in the migration."** Pre.4 brings turso in through
+  CubeCL's default `persistence` feature. Whether that can be turned off is
+  answered in 13.3; nothing about it is committed before Mark rules.
+
+### 13.0 What changed since §12
+
+1. **The root lock is tracked again.** `68f78873` (2026-09-20, "Separate local
+   and portable Cargo graphs") made the root `Cargo.lock` the portable lock,
+   gated by `cargo check --workspace --locked` and `python
+   scripts/cargo_mode.py verify` (README, "Portable and local dependencies").
+   §12's Phase A correction and the 2026-09-16 baseline ruling rested on there
+   being no committed lock. The ruled file still exists unchanged
+   (`C:\t\mere-burn-pre3-baseline-normalized-pre2.lock`, sha256 `6055022d…`,
+   re-hashed 2026-09-27), but it fails `--locked` against `a464dc2a`'s
+   manifests (exit 101): it records genet `5ae30cad`, netrender `3961aca9` and
+   knot-editor `ec97d458`, all of which main has left. The committed lock passes
+   the same command. S0-4.
+2. **Toolchain 1.98.1** (`rust-toolchain.toml`). Pre.4's MSRV stays 1.95.
+3. **The root patch rows moved:** `cubecl-runtime` to `Cargo.toml:663` (comment
+   658–662), `burn-cubecl` to `:670` (664–669), `burn-remote` to `:677`
+   (671–676).
+4. **Knot never took 12.8, and D1's drift happened there.** Knot at `d265f03`
+   (djinn's pin) and at Knot's `main` (`7d78141`) resolves `burn`,
+   `burn-cubecl` 0.22.0-pre.3 and `cubecl-runtime` 0.11.0-pre.3 from the
+   registry, and its root `[patch.crates-io]` names no burn crate. Exact pins
+   close this: once Knot's mere pin passes this repin, its lock must take pre.4.
+5. **remote-fixture has not resolved since `0db9d10d`** (2026-09-14, "Pin
+   mere-p2panda-net 0.7.4"). That commit moved the root patch table and five
+   member manifests. `crates/mesh/mesh/Cargo.toml:43` now requires
+   `mere-p2panda-net = "=0.7.4"`, which exists only as the git tag the root
+   table names (`Cargo.toml:692`). remote-fixture's own `[patch.crates-io]`
+   still names tag `mere-p2panda-net-0.7.3` and has no `mere-p2panda-net` row,
+   so it fails identically on pre.2 and pre.4 (Lane H's `rf-pre2.err`,
+   `rf-pre4.err`). §12's S12 note that it "keeps its older p2panda 0.7.3 pins"
+   was already stale when written, and S13 (c) could not have run on pre.3.
+   S0-6.
+6. **Five `C:\t` paths in §12 were byte-corrupted:** a TAB and a backspace had
+   replaced `\t` and `\b` in D3, Phase A and Phase B. They are repaired in the
+   commit that adds this section; no other §12 text changed.
+
+### 13.1 Scope
+
+Recounted at `a464dc2a` by `git grep` for the three pre.2 versions over every
+tracked `Cargo.toml` outside `support/patches`, then checked against reverse
+dependencies in a pre.4 scratch resolve (only `conatus`, `esp`, `numen` and
+`seiche` depend on `burn`; only `distillery` on `burn-remote`). Ten manifests,
+the same set as §12.0 item 3. Every burn, cubecl and cubek requirement in them
+becomes exact; today only Distillery's four rows and remote-fixture's
+`burn-wgpu` and `cubecl` are.
+
+| File | Lines | Change |
+| --- | --- | --- |
+| `crates/conatus/conatus/Cargo.toml` | 18–20 | cubecl `=0.11.0-pre.4`; burn, burn-wgpu `=0.22.0-pre.4` |
+| `crates/conatus/numen/Cargo.toml` | 20–21 | burn, burn-wgpu |
+| `crates/conatus/seiche/Cargo.toml` | 34–35 | burn, burn-wgpu |
+| `crates/intel/esp/Cargo.toml` | 25 (comment 70–73) | burn |
+| `ports/distillery/Cargo.toml` | 35–37, 58 | burn-backend, burn-ir, burn-remote, burn-flex |
+| `ports/distillery/probe/Cargo.toml` | 21; patch 36–39 | burn; drop the `cubecl-runtime` row (38) |
+| `ports/distillery/probe/native-fixture/Cargo.toml` | 12 | burn |
+| `ports/distillery/probe/remote-fixture/Cargo.toml` | 12–14; patch 31–40 | burn, burn-wgpu, cubecl; drop `cubecl-runtime` (34); p2panda rows per S0-6 |
+| `ports/distillery/probe/repros/burn_browser_embedding/Cargo.toml` | 19, 27; patch 29–32 | burn twice; drop `cubecl-runtime` (31) |
+| `ports/distillery/probe/repros/cubek_browser_extrema/Cargo.toml` | 19; patch 26–28 | burn; drop `cubecl-runtime` (27) |
+
+Also: the root `Cargo.toml` loses the `cubecl-runtime` row and its comment
+(658–663) and gets pre.4 comments on the other two rows (664–677);
+`support/patches/burn-cubecl/Cargo.toml` loses its inner `[patch.crates-io]
+cubecl-runtime` row (169); `support/patches/cubecl-runtime/` is deleted. The
+S0-3 ruling may add one row.
+
+Tracked lockfiles that regenerate: the root, `probe`, `remote-fixture`,
+`session-fixture` and both repros. `session-fixture` names no burn crate; it
+moves through esp. native-fixture's lock is untracked.
+`support/patches/burn-cubecl/Cargo.lock` becomes upstream's pre.4 lock, and
+`support/patches/cubecl-runtime/Cargo.lock` leaves with its directory.
+
+Out of scope: the six burn 0.21 probes under `crates/probes`, which are
+untracked local workspaces in the main checkout (the directory is gitignored,
+and no tracked probe names burn); `support/patches/cubecl-wgpu`, the retired
+0.10.0 archive nothing patches in (but see 13.3, option C); and Knot and
+Isometry, which move after this lands (13.10).
+
+### 13.2 The patches against pre.4
+
+Upstream: Burn `d3c8d7c6` (burn-remote, burn-backend) and `9147c11a`
+(burn-cubecl), CubeCL `9d1314c0`, cubek `648520b6`, all published 2026-09-22.
+Each pre.3 delta is `diff -ruN --strip-trailing-cr` of pristine pre.3 against
+the pre.3 branch's patch (checked-out files are CRLF under `core.autocrlf`),
+dry-run onto pristine pre.4 with `patch --dry-run`. The deltas match §12's
+Phase A: burn-cubecl 5 files, burn-remote 11, cubek-reduce 5, cubecl-runtime 4.
+
+**`cubecl-runtime`: retires (355).** Pre.4 exposes every value the pre.3
+helper compared. `Handle.memory`, `offset_start`, `offset_end` and `stream` are
+public fields (`cubecl-runtime-0.11.0-pre.4/src/server/handle.rs:11-27`). The
+size is `pub(crate)` but has a public accessor, `size()` (`:140`).
+`ManagedMemoryHandle::descriptor()` (`memory_management/handle.rs:203`) and
+`ManagedMemoryDescriptor.id` (`:46-49`, `PartialEq`) are public but
+doc-hidden.
+The packaging fixes have been upstream since pre.3. Delete the directory, the
+root row, burn-cubecl's inner row and the four nested rows.
+
+**`burn-cubecl`: hand rebase, same logic.** Pre.4 wraps `launch_binop` and
+`launch_binop_float` in `in_memory_order([lhs, rhs], output_shape, |[lhs, rhs],
+shape_out| { … })` (`kernel/binary.rs:228`, `kernel/binary_float.rs:58`),
+which presents both operands permuted into memory order and permutes the
+result back. `launch_binop_int` is not wrapped (`kernel/binary_int.rs:131`).
+`launch_unchecked` lost its runtime parameter (`::<O>`, was `::<O, R>`). The
+guard goes first in each `unsafe` block, ahead of `if
+lhs.can_mut_broadcast(&rhs)` (`binary.rs:249`, `binary_float.rs:79`,
+`binary_int.rs:156`), and acts on the presented operands inside the closure.
+Permutation changes metadata, not handles. `Handle::is_same_allocation` becomes
+a private helper in the patched crate that keeps the pre.3 semantics (S0-2):
+
+```rust
+// illustrative
+fn same_view(a: &Handle, b: &Handle) -> bool {
+    a.memory.descriptor().id == b.memory.descriptor().id
+        && a.offset_start == b.offset_start
+        && a.offset_end == b.offset_end
+        && a.stream == b.stream
+        && a.size() == b.size()
+}
+```
+
+Allocation ids come from one process-wide counter
+(`memory_management/handle.rs:224-231`), so equal ids already mean the same
+service, and pre.4's new `Handle.service` is not compared (S0-1). The manifest
+reduces to `[workspace]`. The defect path persists: pre.4's `layer_norm` still
+squares `B::float_mul(centered.clone(), centered.clone())`
+(`burn-backend-0.22.0-pre.4/src/backend/ops/modules/base.rs:993`, and `:191`).
+Dry run: `Cargo.toml` applies at offset 42; the three launcher hunks fail, as
+expected.
+
+**`burn-remote`: diff rebase, never a file copy.** Upstream changed `lib.rs`,
+`server/mod.rs`, `server/worker.rs` and `transport/iroh/protocol.rs` between
+pre.3 and pre.4, along with the client files, `server/builder.rs`,
+`shared/task.rs` and a new `server/logging.rs`. Copying Mere's pre.3 files would
+silently revert that work. Mere's pre.3 delta dry-runs onto pristine pre.4 with
+every source hunk applying (`lib.rs` at offset 37, `protocol.rs` at offset 5)
+except `server/mod.rs`, where pre.4's `mod logging;` and `pub use
+logging::ServerLogging;` moved the context. Re-insert Mere's two exports, `pub
+use crate::shared::SessionId;` and `pub use session::ServedSession;`, by hand.
+The manifest edits are re-derived on pre.4's manifest: `server` adds
+`tokio/macros`, dev-dependencies are restored at `=0.22.0-pre.4`, plus the self
+`[patch]` and `[workspace]`. The patch is still required: pre.4's `close()`
+still only removes the map entry
+(`burn-remote-0.22.0-pre.4/src/server/session.rs:214-221`). One new upstream
+behaviour: `IrohRemoteProtocol::new` now calls
+`burn_std::set_runtime_kind(RuntimeKind::Async)` (`transport/iroh/protocol.rs:91`),
+so a session's tensor reads materialize eagerly. S13 (c)'s in-flight reclaim is
+the behavioural check. Lane H's `patched/burn-remote` compiled and passed both
+lease tests; S5 regenerates it in the worktree and compares with that candidate.
+
+**`cubek-reduce`: carries.** Both `extrema.rs` hunks apply to pristine pre.4;
+only the manifest tail (the version) is re-derived. Pre.4 still builds
+±infinity from literal bits
+(`cubek-reduce-0.3.0-pre.4/src/components/instructions/extrema.rs:24`, `:34`).
+Whether the runtime-value trick survives pre.4's WGSL path is decided only by
+the headed extrema receipt.
+
+### 13.3 turso and `persistence` (356): the answer
+
+**No consumer-side switch exists.** Every edge from burn, cubek and cubecl
+into `cubecl-runtime`, `cubecl-server` and `cubecl-environment` sets
+`default-features = false` (a scan of every cached pre.4 manifest), and so do
+Mere's own rows. Pre.2's forcing target table is gone: the desktop edge to
+`cubecl-environment` requests no features
+(`cubecl-runtime-0.11.0-pre.4/Cargo.toml:215-217`). One edge turns
+`persistence` on, inside CubeCL. `cubecl-wgpu` declares its optional
+`cubecl-cpp` dependency without `default-features = false`
+(`cubecl-wgpu-0.11.0-pre.4/Cargo.toml:114-117`), and its `std` feature names
+`"cubecl-cpp/std"` without `?`, which enables that dependency:
+
+`cubecl-wgpu/std` → `cubecl-cpp/default` → `cubecl-runtime/default` (directly
+and through `cubecl-core/default`) → `cubecl-runtime/persistence` →
+`cubecl-environment/persistence` → `dep:turso`.
+
+Evidence: a pre.4 scratch resolve of `a464dc2a` with exact pins and the pre.2
+patch rows set aside, traced per row with `cargo tree -e features -i turso`.
+The positive control is the same instrument showing `libsqlite3-sys` under
+`conatus/resident` on the committed pre.2 lock.
+
+- Every WGPU row carries turso, through that chain and no other: esp
+  `bert-wgpu`, `index-burn-wgpu`, `decoder-wgpu`; numen `field-burn-wgpu`;
+  seiche `tensor-burn-wgpu`; conatus `resident`; Distillery
+  `trainer-gpu,trainer-autodiff,flora`, with and without dev edges; djinn
+  `trainer-gpu,trainer-autodiff`.
+- No CPU row does: esp `bert`, `index-burn`, `decoder-lora,decoder-autodiff`;
+  numen `field-burn`; seiche `tensor-burn`; Distillery `remote`.
+- Nothing in Mere's graph names `cubecl/persistence`, `cubecl-server/default`
+  or any other `…/persistence` directly.
+- Lane H's wasm32 checks of `probe` and both repros compiled `turso` and
+  `turso_core` for `wasm32-unknown-unknown` (fingerprints in its scratch
+  target).
+
+**Four options.** Every way to turn `persistence` off is a patch; each patch
+shape was resolved in a scratch copy.
+
+- **(A) Keep it.** No patch. turso 0.8.0-pre.13 stays, pinned by the tracked
+  lock. The caret `^0.8.0-pre.8`
+  (`cubecl-environment-0.11.0-pre.4/Cargo.toml:188-191`) moves only on an
+  explicit `cargo update`, so stop rule 7 gains turso.
+- **(B) `cubecl-runtime`: drop `persistence` from `default`.** A one-line
+  manifest change. No build compiles turso and the lock no longer lists it: the
+  lock falls from 1,710 to 1,655 packages (turso's nine crates and 46 transitive
+  ones, among them `bindgen 0.69`, `io-uring`, `shuttle`, `antithesis_sdk` and
+  `prost`), and the graph holds no SQLite of any kind. Cost: it re-vendors the
+  crate 355 just retired, for a different reason. Knot must carry the same row
+  or keep turso, because `[patch]` is not inherited. It rebases every
+  prerelease.
+- **(C) `cubecl-wgpu`: `default-features = false` on its `cubecl-cpp` edge.**
+  One line. `cargo tree --workspace --all-features --target all -e
+  normal,dev,build,features -i turso` then finds nothing, so no build compiles
+  turso. The lock still lists it (1,710 packages): Cargo's lockfile resolver
+  also pulls in optional dependencies named through weak `dep?/feature` edges
+  (`cubecl-metal?/std` in `cubecl`'s `std`), and `cubecl-metal` has the same
+  defaults-on `cubecl-cpp` edge. In the build it changes only `persistence`:
+  the other `cubecl-runtime` defaults it drops (`channel-mpsc`,
+  `channel-cell`) gate no code in pre.4, and `cubecl-common`'s and
+  `cubecl-ir`'s defaults are requested anyway.
+  `support/patches/cubecl-wgpu` is occupied by the 0.10.0 archive.
+- **(D) Upstream.** The edge looks like an oversight, since every other
+  internal CubeCL edge sets `default-features = false`. The durable fix is a PR
+  adding it to `cubecl-wgpu`'s and `cubecl-metal`'s `cubecl-cpp` edges, or one
+  making `persistence` opt-in. Mere carries A, B or C until a release has it.
+
+**What autotune loses with `persistence` off:** memory across processes, not
+within one. `persistence` gates three stores: the write-through store behind
+the autotune cache, with its `TuneRecord` trials
+(`cubecl-runtime-0.11.0-pre.4/src/tune/tune_cache.rs:112-120`,
+`tune/mod.rs:38-39`); the throughput-probe cache (`throughput/cache.rs:21-27`);
+and compiled-kernel caching (`cubecl-server`'s `compilation_cache`, native
+only, used by CubeCL's SPIR-V path and not by Mere's WGSL path). Without it,
+`Store` falls back to memory, and each process re-tunes each (kernel, shape,
+device) key once, on first use.
+
+The database lives at `<outermost Cargo.toml>/target/environment/default.db`,
+chosen from the working directory rather than `CARGO_TARGET_DIR`; an installed
+app falls back to the user cache directory
+(`cubecl-environment-0.11.0-pre.4/src/persistence/root.rs`). In the browser the
+store serves memory unless a page awaits
+`cubecl_environment::environment::open()`, which is new in pre.4 and which no
+Mere page calls, so there turso costs compile time and nothing else.
+
+Pre.2 kept these stores in rusqlite, and did write on this machine. The only
+such database here (`%LOCALAPPDATA%\cubecl\default.db`, written 2026-08-25 by
+a process outside any workspace, WAL mode) holds two throughput-probe entries
+(`throughput/0.11.0-pre.2/wgpu<wgsl>_dev0`) and no autotune entries.
+
+**Measured 2026-09-27** on this machine (Windows 11, RTX 4060 Laptop GPU),
+with release builds of the scratch pre.4 tree, wall time per process:
+
+- **Only three rows turn autotune on at all:** conatus `resident`, numen
+  `field-burn-wgpu` and seiche `tensor-burn-wgpu` name `burn-wgpu/autotune`.
+  esp's WGPU rows and Distillery's trainer rows do not, because burn's `wgpu`
+  feature leaves it off.
+- **esp's `timing_bert_cpu_vs_gpu`** (MiniLM dimensions): with `persistence`
+  on, 4.4–4.8 s per run whether `target/environment` was fresh or not; with
+  option B's build, 4.6–4.9 s. The first run of each new binary took 7.1–7.2 s
+  either way, and deleting the cache did not bring that back, so that cost is
+  not CubeCL's. GPU forward times were identical, about 52 ms at batch 32 × seq
+  128.
+- **seiche's `timing_repulsion_cpu_vs_gpu`** (autotune on, `sum_dim`
+  reductions): 3.9–4.4 s, cold or warm. CubeCL's decision log shows two keys
+  tuned per process, with 9.0 ms and 5.6 ms of tuning steps. About 15 ms per
+  process is everything autotune can lose here.
+- **conatus `resident` and Isometry's resident-ground runs** (Lane H) left
+  0-byte databases: nothing was stored.
+- **On Windows, pre.4's `persistence` cannot work at all.** cubecl-environment
+  opens turso with `experimental_multiprocess_wal(true)`
+  (`cubecl-environment-0.11.0-pre.4/src/persistence/turso.rs:530`). turso's
+  default Windows IO backend does not support shared-WAL coordination: it
+  takes the trait default, `false` (`turso_core-0.8.0-pre.13/io/mod.rs:435`),
+  and only Unix (`io/unix.rs:46`) and the opt-in `experimental_win_iocp`
+  backend return `true`. So the open falls back to read-only, fails on the
+  empty file ("no such table: meta"), and the store serves memory behind a
+  warning. A scratch probe of `environment::store` reproduces this, and every
+  0-byte `default.db` above is its leftover. Unix should persist; that was not
+  verified here.
+
+**Recommendation:** (B), with (D). No Mere row measured loses anything measurable
+without `persistence`: at most about 15 ms of tuning per process, and on Windows
+pre.4 already serves memory. Keeping it compiles turso's nine prerelease crates
+and their dependencies into every WGPU build, native and wasm, and creates a
+`default.db` wherever GPU code runs (an empty one, on Windows).
+
+B is a one-line manifest patch with a plain removal condition: delete it when a
+CubeCL release makes `persistence` opt-in or fixes the `cubecl-wgpu` edge. Its
+cost is the tension with 355. S4 then rewrites `support/patches/cubecl-runtime`
+instead of deleting it: a new `MERE-PATCH.md` and no identity helpers, while the
+root row and the four nested rows stay. Knot needs the same row only if it
+wants turso out of its own builds, which work either way.
+
+(D) is an issue or PR on tracel-ai/cubecl, covering the defaults-on
+`cubecl-cpp` edges and the Windows memory fallback; only Mark can file or
+authorize it. If one more vendored crate weighs more than a prerelease database
+in the graph, (A) is safe on this evidence: the lock pins turso, and on Windows
+it never opens.
+
+### 13.4 API changes
+
+From Lane H's scratch diff, compile-checked there:
+
+- **conatus** (nine errors; 16 changed lines and two now-unused `WgpuRuntime`
+  imports, in `crates/conatus/conatus/src/resident.rs`,
+  `crates/conatus/conatus/src/resident/chunk.rs` and
+  `crates/conatus/conatus/tests/resident_chunk.rs`). `ComputeClient<WgpuRuntime>`
+  becomes `cubecl::client::Client`. `launch_unchecked::<WgpuRuntime>` and
+  `CubeTensor::<WgpuRuntime>` lose the parameter, and `new_contiguous` takes
+  `device.clone().into()`. `WgpuRuntime::client(&device)` becomes
+  `cubecl::Device::from(device.clone()).client()`. `get_resource(handle)` names
+  the server:
+  `get_resource::<cubecl::wgpu::WgpuServer<cubecl::wgpu::AutoCompiler>>(handle)`.
+- **remote-fixture** (`ports/distillery/probe/remote-fixture/src/main.rs:92`).
+  `AllocatorSnapshot::capture` uses both removed shapes,
+  `<WgpuRuntime<AutoCompiler> as Runtime>::client(device)` and a `Result` from
+  `memory_usage()`. It was not compiled, because resolution fails first (13.0
+  item 5).
+- **Isometry's isometer-lens**
+  (`isometry/shared/isometer/crates/isometer-lens/examples/resident_ground.rs:422`,
+  `:440`). `memory_usage()` returns `MemoryUsage`, not a `Result`, so both
+  `.expect(..)` calls go. That change lands with Isometry's repin (354).
+- **esp, numen, seiche, Distillery and djinn compile unchanged**, with
+  deprecation warnings. Lane H's check logs count 110 for `Device::ndarray`,
+  113 for `TensorData::to_vec` and 4 for `TrainerDevice::ndarray`. These are not
+  stops; the follow-up is the same as §12.2's.
+- **Not yet built on pre.4:** esp's `decoder-lora`, `decoder-autodiff`,
+  `model-session` and `persistence` rows, and every wasm matrix row outside the
+  Distillery probes. S9 builds them.
+
+### 13.5 Receipts and how they are produced
+
+- **(a) Same-allocation and BERT-width LayerNorm, headed.**
+  `repros/burn_browser_embedding/run-repro.ps1 -WasmBindgen
+  C:\t\wasm-bindgen-0.2.122\wasm-bindgen-0.2.122-x86_64-pc-windows-msvc\wasm-bindgen.exe
+  -TargetDir C:\t\mere-burn-pre4-embedding`. It builds `--locked --release
+  --target wasm32-unknown-unknown` and serves `web/` with `python -m
+  http.server`. Open the page in headed Chromium and call
+  `window.burnEmbeddingRepro.run()`. Save the JSON verbatim as
+  `receipts/<date>_binary_alias_pre4_iab.json`, with the native control
+  `shared_binary_and_layer_norm_pass_native_wgpu`. *Done:* `passed: true`,
+  eleven embedding controls pass, four graph cases `matches_expected: true`,
+  `gpu_errors: []`.
+- **(a') Unpatched control.** Drop only the `burn-cubecl` row, build into a
+  separate target, record, restore. *Done:* `burn-unit-raw-mul-shared` false
+  and both LayerNorm cases `output_matches_input_bits: true`.
+- **(b) Extrema, headed.** `repros/cubek_browser_extrema/run-repro.ps1`, then
+  `window.cubekExtremaRepro.run()`. *Done:* four cases pass, `gpu_errors: []`.
+- **(c) Two-peer remote run.** `ports/distillery/probe/run-remote-minilm.ps1
+  -TargetDir C:\t\mere-burn-pre4-remote -ModelDir
+  <main tree>\models\all-MiniLM-L6-v2`. It needs remote-fixture resolving
+  (S0-6) and adapted (13.4). *Done:* receipt `dirty=false`; 384 values match
+  ESP native within the pre.2 receipt's `1.4901161e-7`; the 512-row in-flight
+  request fails on reclaim without hanging; CubeCL allocations and bytes return
+  to baseline; a fresh lease reproduces the output. The Fusion/autotune matrix
+  is not required.
+- **(d) Existing device.** `cargo test -p conatus --release --features
+  resident --test resident --test resident_chunk`. *Done:* nine pass in
+  release; Lane H's nine were a debug run.
+- **(e) esp WGPU parity.** `bert_sentence_parity_ndarray_wgpu`, and
+  `real_minilm_fixture_wgpu` with `ESP_MINILM_DIR`. *Done:* under `2.0e-3`,
+  and the fixture's first eight values within the validation tolerance.
+- **Tooling.** The 0.2.122 CLI is on disk and prints `wasm-bindgen 0.2.122`
+  (checked 2026-09-27). `~/.cargo/bin/wasm-bindgen` is now 0.2.127, which the
+  scripts reject, because 0.2.123 and later break wgpu 30's `popErrorScope`
+  (`ports/distillery/probe/Cargo.toml:24`). Pre.4 still names wgpu `^30`.
+  The 2026-08-22 receipts record Chromium 151 on NVIDIA Lovelace; their `_iab`
+  suffix presumably names the in-app browser. WebGPU compute and readback involve
+  no canvas compositing, the Browser pane's known gap, so the pane can produce the
+  receipt if it exposes a WebGPU adapter. Real Chromium through Claude in Chrome
+  is the fallback.
+
+### 13.6 Isolation
+
+- Worktree `Code/worktrees/mere-burn-pre4`, branch `burn-pre4-repin`, from
+  `origin/main` at `a464dc2a`, upstream unset. It has only
+  `.cargo/config.toml.example`, so it resolves the portable graph; there is no
+  local config to rewrite the lock.
+- Every step uses `CARGO_TARGET_DIR=C:\t\mere-burn-pre4-target` and
+  `CARGO_NET_OFFLINE=true`; scripts get `-TargetDir C:\t\mere-burn-pre4-<name>`.
+  All pre.4 burn, cubecl and cubek crates are already in the cache. Never run
+  `cargo generate-lockfile` or a bare `cargo update`.
+- `-j 4`. Rust 1.98.1.
+- With `persistence` on, every GPU test creates
+  `target/environment/default.db` under the worktree, whatever
+  `CARGO_TARGET_DIR` says; on Windows the file stays empty. `target/` is
+  gitignored.
+- Models are gitignored. Pass `-ModelDir` or `ESP_MINILM_DIR` pointing at the
+  main tree's `models/all-MiniLM-L6-v2`, which is present.
+- The reclaim script (`Code/testing/_scripts_reclaim_stale_2026-09-15.ps1`)
+  deletes idle directories under `C:\t` and idle session temp folders, not loose
+  files. The baseline lock is safe from it. `C:\t\wasm-bindgen-0.2.122` and
+  `C:\t\burn-remote-0.22.0-pre.2` are directories, and so is Lane H's scratch.
+  Do not run it during the repin. S2 rebuilds every delta from registry sources,
+  so nothing here depends on Lane H's scratch surviving.
+
+### 13.7 Steps and done-conditions
+
+- **S0. Decisions (Mark).** 13.12. *Done:* each answered and recorded here
+  under "S0 rulings" before any manifest moves.
+- **S1. Worktree.** Done 2026-09-27. *Done:* no `.cargo\config.toml` or
+  `config.local.toml` in the worktree; `cargo tree --offline --locked -p esp
+  --features bert-wgpu -e normal --depth 1` exits 0 on the committed lock, with
+  only the three pre-existing unused-patch warnings (`boa_engine`, `boa_gc`,
+  `iroh-mdns-address-lookup`).
+- **S2. Capture deltas.** `git archive 610a32c5 support/patches/…`, then
+  `diff -ruN --strip-trailing-cr` against pristine pre.3 from the registry
+  cache, into `C:\t\mere-burn-pre4-deltas`. *Done:* four deltas with the file
+  counts in 13.2.
+- **S3. Rebase burn-cubecl.** Pristine pre.4 plus the guard in the three
+  launchers, the private helper, `[workspace]` and `MERE-PATCH.md`. *Done:*
+  against pristine pre.4 the diff is three guard blocks, one helper, the
+  manifest tail and `MERE-PATCH.md`; it builds as a path dependency of a
+  throwaway crate (§12 Phase A's method), and `cargo tree` shows the patch used.
+- **S4. Retire cubecl-runtime** (13.1). *Done:* `git grep
+  "patches/cubecl-runtime"` matches no manifest.
+- **S5. Rebase burn-remote.** Apply the pre.3 delta to pristine pre.4,
+  hand-insert the two `server/mod.rs` exports and re-derive the manifest.
+  *Done:* against pristine pre.4 the diff lists only `Cargo.toml`,
+  `Cargo.toml.orig`, `MERE-PATCH.md`, `src/lib.rs` and the seven server,
+  shared and transport files, and matches Lane H's candidate or each
+  difference is explained.
+- **S6. Rebase cubek-reduce.** *Done:* the diff is one helper, two call sites,
+  `[workspace]`, the licenses and `MERE-PATCH.md`.
+- **S7. Move the manifests** (13.1), apply the S0-3 ruling, and rewrite the
+  root comments. *Done:* `git grep` for `0.22.0-pre.2`, `0.11.0-pre.2` and
+  `0.3.0-pre.2` in manifests matches only comments and
+  `support/patches/*/Cargo.toml.orig`, and every burn, cubecl and cubek
+  requirement in the ten manifests begins with `=`.
+- **S8. Regenerate the root lock, offline and targeted:** `cargo update
+  --offline -p burn -p burn-wgpu -p cubecl -p burn-backend -p burn-ir -p
+  burn-flex`. Do not pass `-p burn-remote`: the committed lock records it as a
+  path package, so the spec fails, and the manifest change re-resolves it
+  anyway. *Done:* no `pre.2"` in the lock; `burn-cubecl` and `burn-remote` at
+  pre.4 with no `source`; no "patch was not used" for them; the lock diff
+  touches only the burn, cubecl and cubek families and their needs, with turso
+  as S0-3 rules; one wgpu 30.x; esp with no default features has no burn and no
+  tokenizers; `python scripts/cargo_mode.py verify --metadata-only` passes. For
+  reference, the scratch resolve changed 109 entries outside the three
+  families, every one a new or dropped need of pre.4: turso's tree; CubeCL's
+  CPU backend trading its MLIR tree (`tracel-mlir-*`) for a pliron/LLVM one;
+  `sysinfo` 0.39; and rusqlite's tree leaving. wgpu 30.0.1, tokio 1.53.1,
+  iroh 1.2.0 and the p2panda crates did not move.
+- **S9. conatus and the build/test matrix.** Apply 13.4's conatus change.
+  Native: esp default, `bert,bert-validation`, `index-burn-wgpu`,
+  `decoder-wgpu`, `decoder-lora,decoder-autodiff`, `model-session`,
+  `persistence`; numen `field-burn`; seiche `tensor-burn`. GPU release: numen
+  `field-burn-wgpu`, seiche `tensor-burn-wgpu`, and receipts (d) and (e). wasm,
+  each with `--target wasm32-unknown-unknown --no-default-features`: esp's
+  eleven matrix rows; numen `""`, `field-burn`, `field-burn-wgpu`,
+  `field-rhai`; seiche `""`, `tensor-burn`, `tensor-burn-wgpu`; conatus
+  `resident`. *Done:* every suite passes, (d) and (e) meet their conditions,
+  and every wasm row exits 0. Rerun ambiguous failures on a detached `a464dc2a`
+  worktree.
+- **S10. Distillery and djinn.** `cargo check --offline -p distillery
+  --all-targets --features remote,trainer-gpu,trainer-autodiff,flora`; `cargo
+  test --offline -p distillery --features remote --lib remote::tests`; `cargo
+  check --offline -p djinn --features trainer-gpu,trainer-autodiff`. *Done:*
+  all exit 0 and both lease tests pass. Lane H's scratch run passed, with
+  djinn's knot-editor at `5ad3f67`; this run is at `d265f033`.
+- **S11. Whole workspace.** `cargo check --offline --workspace --all-targets
+  --locked`, then `python scripts/cargo_mode.py verify`. *Done:* both exit 0,
+  or a failure lies outside burn's graph and fails identically on `a464dc2a`.
+- **S12. Nested workspaces.** First apply S0-6 to remote-fixture's p2panda
+  rows. Then update the five tracked nested locks offline and targeted, adapt
+  remote-fixture's snapshot (13.4), and check each workspace with its own
+  command: `probe` and both repros for `wasm32-unknown-unknown`, the fixtures
+  natively. *Done:* no pre.2 entries, no unused-patch warnings, and every
+  command exits 0. Commit patches, manifests and locks before receipts, so the
+  receipts record a clean commit.
+- **S13. Receipts** (13.5).
+- **S14. Commits on the branch:** one per patch change (burn-cubecl, the
+  cubecl-runtime retirement, burn-remote, cubek-reduce); remote-fixture's
+  p2panda repair on its own; manifests and locks; the conatus change; receipts;
+  docs. No attribution trailers. Pushing is S16.
+- **S15. Docs.** This plan's status and progress. The closure doc's production
+  row and patch table
+  (`design_docs/mere_docs/testing/2026-08-20_burn_0_22_prerelease_closure.md`).
+  `MERE-PATCH.md` in the three remaining patches and esp's manifest comment.
+  The probe and repro READMEs and the `UPSTREAM_ISSUE.md` files. The
+  feature/target matrix
+  (`design_docs/intel_docs/technical_architecture/2026-08-09_feature_target_matrix.md`).
+  `DOC_README.md`'s lines for this plan and the closure doc; the plan's line
+  has been stale since 2026-09-16 and still reads "pre.3 audited 2026-08-26".
+  The file header's SQLite sentence, per S0-3. *Done:* no current-state doc
+  says pre.2 is production, and `python scripts/mere_doc_audit.py` reports no
+  new finding in the files touched.
+- **S16. Merge back.** Rebase onto `origin/main`. The root lock is tracked now,
+  so a conflict there is a real merge conflict: take `origin/main`'s lock, rerun
+  S8's targeted update, then S8's done-condition. Smoke `esp --features
+  bert-wgpu`, `distillery --features remote` and conatus `resident_chunk`.
+  Fast-forward push to `main` with Mark's authorization in the S0-7 window, and
+  record the pushed revision R. Do not merge into the main working tree beneath
+  a live session. *Done:* `origin/main` is R, and a doc commit records it.
+- **S17. Knot handoff** (13.10).
+- **S18. Isometry handoff** (13.10).
+
+### 13.8 Stop rules (halt and return to Mark)
+
+1. A patch needs different logic, not new context: pre.4 changed
+   `can_mut_broadcast`, `Handle`'s fields beyond the `service` field S0-1
+   rules on, or `SessionManager`'s structure.
+2. The unpatched control (S13 a') passes the shared-input cases: the patch may
+   be removable, and carrying or dropping it is Mark's call.
+3. A patched same-allocation or extrema case fails, or `gpu_errors` is
+   non-empty.
+4. The remote run hangs on reclaim, allocations miss baseline, or numbers
+   differ from the pre.2 receipt without an upstream explanation.
+5. Any numeric or parity result moves without an explained upstream change.
+6. A compile fix would change an esp public contract, a feature name, device
+   ownership or the burn-remote patch API. Mechanical renames and deprecation
+   warnings are not stops.
+7. Lock regeneration moves wgpu off 30.x; adds a second burn, cubecl, wgpu or
+   turso; moves turso off 0.8.0-pre.13 or brings it back against the S0-3
+   ruling; or moves unrelated majors (iroh, tokio, p2panda).
+8. esp with no default features pulls burn or tokenizers.
+9. Rebasing onto `main` conflicts in a manifest.
+10. Cargo insists on a network fetch while offline, beyond what S0-9 allows.
+11. "patch was not used" names `burn-cubecl`, `burn-remote`, `cubek-reduce`,
+    or a patch row added under S0-3. The pre-existing `boa_engine`, `boa_gc` and
+    `iroh-mdns-address-lookup` warnings are recorded, not stops (§12, Phase B
+    ruling).
+
+### 13.9 Risks, highest first
+
+1. CubeCL's WGSL path changed again between pre.3 and pre.4: the extrema trick
+   may stop yielding a runtime value, and the same-allocation defect may worsen
+   or vanish. Only S13 a, a' and b decide it.
+2. remote-fixture: the pre-existing p2panda failure, the pre.4 API change, and
+   upstream's new `set_runtime_kind(Async)` all sit in front of S13 (c), the
+   only behavioural check of the burn-remote rebase.
+3. The guard now runs inside `in_memory_order`, on operands that may have been
+   presented permuted. Identity is unaffected, because presentation clones
+   handles, and the aliased operand keeps its own layout, as in pre.3. But no
+   receipt exercises a permuted same-allocation pair: S13 (a) covers
+   LayerNorm's logical-order shape only.
+4. turso, if kept: a prerelease database engine compiled into every WGPU row,
+   native and wasm, held in place only by the tracked lock, and inert on
+   Windows (13.3).
+5. Headed tooling: the 0.2.122 CLI is a directory the reclaim script can take,
+   newer CLIs break wgpu 30's error scopes, and a headed Chromium session is
+   required.
+6. Live sessions: the tracked root lock turns S16 conflicts into real merges,
+   and every session rebuilds the burn stack after it lands.
+7. esp's LoRA and autodiff rows were built on neither pre.3 nor pre.4.
+8. Deprecation noise, and burn-ndarray's announced removal: follow-up.
+
+### 13.10 Knot and Isometry handoffs
+
+**Knot (S17).** After S16, `origin/main` at R holds
+`support/patches/burn-cubecl` at `0.22.0-pre.4` and no `cubecl-runtime`
+patch. Knot moves every mere pin to R together and regenerates its lock; esp's
+exact pin forces its burn family from pre.3 to pre.4. Nothing Knot calls
+changes, because esp's source compiles unchanged on pre.4. djinn compiled
+against the pre.4 tree in Lane H's scratch with knot-editor `5ad3f67`, and S10
+repeats that at `d265f033`. So the knot-first procedure is not needed: mere
+lands, then Knot repins. Knot needs no
+`cubecl-runtime` row, ever. It needs a `burn-cubecl` row only if it runs BERT
+on BrowserWebGpu; it is desktop-only today, and the native control passes
+without the patch:
+
+```toml
+# only if Knot ever runs BERT on BrowserWebGpu:
+# burn-cubecl  = { version = "=0.22.0-pre.4", git = "https://github.com/merely-made/mere.git", rev = "<R>" }
+# cubek-reduce = { version = "=0.3.0-pre.4", git = "https://github.com/merely-made/mere.git", rev = "<R>" }
+```
+
+If S0-3 picks option B or C, Knot carries that row as well, or its WGPU builds
+keep turso. *Done in Knot:* no unused-patch warning, and `cargo tree -p
+knot-editor --features embed-bert-wgpu -i burn` shows only `0.22.0-pre.4`.
+
+**Isometry (S18, ruling 354).** Isometry's isometer pins mere by rev
+(`0418391f` on Isometry's `main`) and reaches conatus through git. After S16 it
+moves that pin to R and, in the same commit, drops the two `.expect(..)` calls
+(13.4). Nothing lands before that. *Done in Isometry:* isometer-lens's
+`resident_ground` receipt passes on the RTX 4060. Lane H's scratch run passed
+with `burn_raw_same_allocation: true` and `replay_matches: true`.
+
+### 13.11 Effort
+
+Mechanical: S1, S2, S4, S6–S8, the lock half of S12, S14, S15, S17 and S18.
+Investigation: S3 (the guard in its new position), S5 (the hand-inserted
+exports and the new runtime-kind behaviour), S9's wasm rows and esp's LoRA and
+autodiff rows, remote-fixture's repair in S12, and S13 a, a', b and c.
+
+Machine cost, measured on this machine at `-j 4` (Lane H's figures are debug
+builds into warm targets): a cold release build of esp's `bert-wgpu` tests took 19m47s. A
+second feature set on the same target (option B's patch, or seiche's
+`tensor-burn-wgpu` tests) took about 17 minutes more, because the burn and
+CubeCL families rebuild whenever their features change. Lane H's debug builds
+took between 1m11s and 6m13s each. The plan needs roughly a dozen
+such builds: the native matrix, the GPU release rows, the wasm matrix, five
+nested workspaces, three headed wasm builds, the unpatched control, and the
+remote fixture.
+
+### 13.12 S0 questions
+
+Each question needs an answer before S7 moves a manifest, except S0-8, which
+can wait for S16.
+
+- **S0-1. `Handle.service` and stop rule 1.** §12.6 rule 1 makes a change to
+  `Handle`'s fields a stop, and pre.4's `Handle` gained `pub service:
+  ServiceId` (`server/handle.rs:14-18`). The guard's logic does not change:
+  allocation ids come from one process-wide counter, so equal ids already
+  imply the same service. Options: (a) treat it as new context and proceed
+  without comparing `service`; (b) proceed and compare `service` too, which is
+  harmless today and robust if upstream ever makes ids per-service; (c) treat
+  it as new logic, stop and redesign. **Recommend (a).**
+- **S0-2. What 355's comparison covers.** 355 names the allocation id. Pre.3's
+  helper also required equal `offset_start`, `offset_end`, `stream` and size,
+  so it matched only the same view of one allocation. That still matters on
+  pre.4: an aligned `slice` is a zero-copy view on the same handle at new
+  offsets (`burn-cubecl-0.22.0-pre.4/src/kernel/index/slice.rs:34-47`), so an
+  id-only guard would bind `x.slice(a) * x.slice(b)` once and compute lhs·lhs.
+  Options: (a) the id plus the four view fields, all public in pre.4, which are
+  the pre.3 semantics; (b) the id only, as worded. **Recommend (a).**
+- **S0-3. turso (356).** Options A–D in 13.3: (A) keep `persistence`, with
+  turso pinned by the tracked lock and stop rule 7 guarding it; (B) patch
+  `cubecl-runtime`'s `default` (no turso in any build or in the lock; one
+  re-vendored crate, which Knot must also carry); (C) patch `cubecl-wgpu`'s
+  `cubecl-cpp` edge (no turso in any build, but still in the lock); (D) an
+  upstream PR, alongside A, B or C. **Recommend (B) with (D).** No Mere row
+  measured loses anything measurable, and on Windows pre.4's `persistence`
+  already runs from memory. B cuts against 355's retirement of the
+  `cubecl-runtime` directory; (A) is the no-patch alternative if that weighs
+  more.
+- **S0-4. The lock baseline for pre.4.** Options: (a) the committed portable
+  lock at `a464dc2a` (blob sha256
+  `9cf2136bfee2c08d63d4a9308131e26d5f81ec268490519cfeb48f777f2b62cf`; the CRLF
+  working copy hashes to `5eb4eb0a…`), which passes `--locked` offline in the
+  worktree; (b) the 2026-09-16 ruling's normalized pre.2 lock
+  (`C:\t\mere-burn-pre3-baseline-normalized-pre2.lock`, sha256 `6055022d…`,
+  still present), which fails `--locked` against today's manifests (exit 101).
+  **Recommend (a)**, leaving the `C:\t` file as history.
+- **S0-5. Distillery's scope in this repin.** Options: (a) full: S10, the five
+  nested workspaces in S12, and S13 a, a', b and c; (b) S10 and the headed
+  receipts (a, a', b), with the two-peer run (c) deferred until remote-fixture
+  is repaired elsewhere; (c) S10 only. **Recommend (a):** (c) is the only
+  behavioural check of the burn-remote rebase, and its prerequisite is small
+  (S0-6).
+- **S0-6. Where remote-fixture's pre-existing failure is fixed.** It has been
+  broken since `0db9d10d` (2026-09-14), on pre.2 as well. Options: (a) on this
+  branch, as its own commit ahead of the pre.4 manifest move: restate the root's
+  eight `mere-p2panda-net-0.7.4` rows (`mere-p2panda-net`, `p2panda-auth`,
+  `-core`, `-discovery`, `-encryption`, `-store`, `-stream`, `-sync`) in its
+  `[patch.crates-io]`, and prove it resolves and builds on pre.2 first; (b) a
+  separate fix on `main` first, which this branch rebases onto; (c) leave it,
+  and skip S13 c. **Recommend (a).** The commit stays separable, so (b) remains
+  possible at merge.
+- **S0-7. The merge window.** Options: (a) §12's D4: at S16, message the busy
+  Mere sessions, wait for each idle notice, fast-forward push, and tell them to
+  pull; (b) a window Mark names. **Recommend (a).** With the root lock tracked,
+  every session rebuilds the burn stack on its next pull.
+- **S0-8. The parked pre.3 lane, at S16.** `Code/worktrees/mere-burn-pre3`
+  holds another session's superseded uncommitted edits, and `burn-pre3-repin`
+  has four unmerged commits that §12 records. Options: (a) leave both until
+  Mark says otherwise; (b) after S16, remove the worktree and delete the branch;
+  (c) keep the branch as archaeology and remove only the worktree. **Recommend
+  (a) for now**, and decide at S16.
+- **S0-9. Network during execution.** Every pre.4 burn, cubecl and cubek crate
+  is already cached, and so is the 0.2.122 CLI; a nested workspace may still
+  want an uncached crate. Options: (a) allow crates.io crate downloads when an
+  offline step needs one, but never a git fetch; (b) stay strictly offline, so
+  stop rule 10 halts on any download. **Recommend (a).**
