@@ -292,3 +292,28 @@ fail. Validated on Rust 1.97.1, `--offline --locked`: rootstock's 40 tests, the 
 host's 88 across ten suites, cambium's 216, mere-document-lanes with `smolweb` 33, the
 web host checked natively and for wasm32, the format check on the three host crates,
 and the workspace check.
+
+
+## Consumer automation and semantic parity follow-up (2026-09-27)
+
+Accepted order: repin existing Mesquite consumers (Mesocosm native bench,
+Eponym and their Isomere host), migrate Woodshed/Redshank/Cleromancy lifecycle
+code, then reconcile automation selectors with Genet's computed accessible
+names. Isometry's domain self-tests remain product-owned. Turnstone's multiple
+surfaces and Graphshell's browser DOM require separate host adapters.
+
+The shared completion hook is published at Mere `55f5ac62`; the custom-command
+held-click adapter passes the focused 50-test gate (17 Mesquite, 16 host,
+17 scenario integration). `Product::app_step_with_clicks` shares
+the lane queue with product-specific selector verbs, preserving the scroll /
+layout / pointer-dispatch ordering. Existing products default through
+`app_step` and need no method change.
+
+The remaining semantic parity gate must compare names and roles from the same
+owner-computed projection, including referenced labels, without turning a
+passing scenario into a claim of physical screen-reader acceptance. Genet's
+uncommitted accessible-name work remains with its existing owner pending
+coordination. Diagnostics should correlate product state and semantic action
+results with the existing UX event sinks and scenario receipts; avoid inventing
+a second application state model. Consumer acceptance and physical AT receipts
+must remain separately recorded.

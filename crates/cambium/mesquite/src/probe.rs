@@ -221,9 +221,15 @@ impl<P: Product> Driveable for Probe<'_, '_, P> {
                 let Lane {
                     product,
                     checkpoints,
+                    clicks,
                     ..
                 } = &mut *self.lane;
-                return product.app_step(self.ctx, Checkpoints(checkpoints), line);
+                return product.app_step_with_clicks(
+                    self.ctx,
+                    Checkpoints(checkpoints),
+                    clicks,
+                    line,
+                );
             },
         }
         Ok(())
