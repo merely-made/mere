@@ -11,8 +11,7 @@ use std::sync::Arc;
 use std::time::{Duration, Instant};
 
 use burn::tensor::Device;
-use burn_wgpu::{AutoCompiler, Wgpu, WgpuDevice, WgpuRuntime};
-use cubecl::Runtime;
+use burn_wgpu::{Wgpu, WgpuDevice};
 use distillery::{
     BURN_REMOTE_RESOURCE, BlobCustody, Distillery, RemoteSessionService, RemoteSessionSettings,
     RetentionSettings,
@@ -90,9 +89,7 @@ struct AllocatorSnapshot {
 
 impl AllocatorSnapshot {
     fn capture(device: &WgpuDevice) -> Result<Self, String> {
-        let usage = <WgpuRuntime<AutoCompiler> as Runtime>::client(device)
-            .memory_usage()
-            .map_err(|error| format!("read CubeCL allocator telemetry: {error}"))?;
+        let usage = cubecl::Device::from(device.clone()).client().memory_usage();
         Ok(Self {
             number_allocs: usage.number_allocs,
             bytes_in_use: usage.bytes_in_use,
