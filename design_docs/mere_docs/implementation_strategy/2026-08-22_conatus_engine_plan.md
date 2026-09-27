@@ -12,6 +12,9 @@ bytes (V1b), and `conatus-brick` — the shared sparse-brick ABI both game
 vessels pin — advanced on `codex/conatus-brick-lift` to `bd8f0044`.
 2026-09-26: `modulus`'s shrinking-retarget defect fixed and its atlas sized
 to the card by `AtlasLimits`, ruled by Mark (brick-atlas pass below).
+2026-09-27: `modulus`'s `brick_dda` takes each voxel crossing afresh from the
+eye instead of accumulating it, ruled by Mark (brick-traversal precision
+pass below); on branch `dda-precision`, not yet merged.
 **Scope:** Build the shared spatial runtime. Mesocosm, Paredros, Isometry,
 and Mere projections consume it through product-owned runtime profiles
 instead of incubating spatial machinery in product-local probes.
@@ -552,3 +555,113 @@ in the wing design record (rulings 288 and 289,
   `AtlasLimits`, its tracer fills the limits from the device it owns, and
   Eponym's `StableResidency` can drop its copied `16 * 16 * 512` row
   arithmetic.
+
+## Progress (2026-09-27 brick-traversal precision pass)
+
+One change to `modulus`'s shared traversal, ruled by Mark on 2026-09-26 in
+the wing design record (ruling 336, "Fix it in mere";
+`repos/isometry/mesocosm/design_docs/2026-09-18_wing_design_plan.md`), from
+the third round of Isometry's board-paging lane
+(`testing/scene-board-paging/bands.md` on its `lane-e-paging` branch).
+Ruling 337 holds that lane's merge until this lands. Branch `dda-precision`.
+
+- **Finding: the walk's crossings drifted.** `brick_dda` measured each
+  axis's first crossing from the start point and then added
+  `1 / |direction|` per step, in f32. Isometry's board starts its rays about
+  1,380 units behind the ground, so the crossings sit near t = 1,700, where
+  an f32 ulp is 1.2e-4. There each addition of 1 / 0.612 rounds down by
+  about 6e-5, while the y crossings, stepping by exactly 2, do not. A ray
+  that passes a y and an x boundary within 5e-4 to 8e-4 of each other steps
+  x first once enough steps have passed. Headroom lengthens the walk, so one
+  spare layer moved 330 texels and two moved 660, and against an exact walk
+  neither picture was right.
+- **The instrument, landed before any fix** (`5c8379d4`,
+  `crates/conatus/modulus/src/traversal_tests.rs` and its
+  `traversal_tests/` files). `mirror.rs` is the shader in f32 on the CPU,
+  operation for operation. `exact.rs` walks the same f32 ray in f64 with
+  every crossing taken from the eye, keeping the shader's rules (the 1e-4
+  start offset, the 1e-6 parallel threshold, the x-then-y-then-z tie order
+  and the 1,024-cell budget), and records each ray's closest call to a tie
+  in f32 ulps. `scenes.rs` rebuilds the probe's 890 by 752 frame bit for bit
+  from its camera, over the probe's pointer box at zero to two spare
+  layers, and seeds a spread of 48 boxes and 98,304 rays from the origin to
+  240,000 voxels out: eyes near, far and inside, grazing rays, rays nearly
+  parallel to an axis, and orthographic bundles. A landing unlike the exact
+  walk's is a *fault* when the ray never came within 3 ulps of a tie, and a
+  *tie* otherwise. On the old shader it reproduces the probe exactly: texel
+  (445, 153) lands one voxel over in x at headroom 1, and 330 texels move at
+  one spare layer and 660 at two.
+- **Candidates measured**, each on the CPU and through its own WGSL on the
+  GPU, over the whole board frame at headroom 0, 1 and 2 and the whole
+  spread. Cost is a board frame at headroom 1 against the old shader, the
+  range over an RTX 4060 and a Radeon 780M through wgpu on Vulkan and DX12.
+  Between runs these timings wander by about ten percent.
+
+  | Crossings | Board faults, headroom 0 / 1 / 2 | Texels moved by 1 / 2 layers | Spread faults | Cost |
+  |---|---|---|---|---|
+  | Accumulated (the old shader) | 2 / 332 / 662 | 330 / 660 | 47 | — |
+  | First crossing plus n steps | 0 / 0 / 0 | 21 / 40 | 44 | −2 to +8% |
+  | **Taken from the eye: `(boundary − eye) / direction`** | **0 / 0 / 0** | **0 / 0** | **0** | **+1.5 to +12%** |
+  | From the eye, times a reciprocal | 0 / 0 / 0 | 0 / 0 | 0 | +1 to +18% |
+  | Re-based at the box entry, accumulated | 0 / 0 / 0 | 8 / 30 | 44 | −1 to +1% |
+  | Re-based at the box entry, from there | 0 / 0 / 0 | 8 / 30 | 44 | +6 to +12% |
+  | From the eye, compared cross-multiplied | 0 / 0 / 0 | 0 / 0 | 0 | +9 to +18% |
+
+  Only crossings taken from the eye leave the walk independent of where it
+  starts. A crossing anchored to the start point or to the box entry still
+  moves texels with headroom, and a re-based origin carries its own
+  rounding, a fault source once the box is 24,000 voxels out. The two
+  re-based candidates start 1e-4 past a rounded entry point, which resolves
+  the start offset near the origin but not far out; the rest keep the old
+  start voxel. None fixes the start offset everywhere (the finding below).
+  Only the three taken from the eye pass the headroom test, and of those
+  the plain division is the simplest and costs least. The re-based,
+  accumulated walk costs nothing but still moves texels, so what the fix
+  costs is the price of passing that test, not a choice between exact
+  candidates.
+- **Landed in `a404cd48`: each crossing is taken from the eye.**
+  `brick_crossing` in `crates/conatus/modulus/src/brick_dda.wgsl` computes
+  `(boundary - eye) / direction` when the walk enters a voxel, and the
+  `delta` vector and `brick_initial_crossing` are gone. Over the whole frame
+  and the whole spread, the new walk has no faults at any headroom and no
+  texel moves with headroom. Every ray it lands differently from the exact
+  walk is within 2 ulps of a tie, all but 2 of them within 1: 46 on the
+  board, 7,640 in the spread. On all four GPU configurations the shipped
+  WGSL lands every board texel where its CPU mirror does, at every
+  headroom. It costs 1.5 to 12 percent more a board frame, 0.02 to 0.08 ms
+  for 669,280 rays. The old walk stays in the mirror as
+  `Crossings::Accumulated`, the tests' positive control: it asserts the
+  probe's 330 and 660 in the same run that asserts 0 and 0 for the shader's
+  walk. The GPU arm is a scratch probe outside the repository, since
+  `modulus` keeps no GPU dependency. `BRICK_DDA_WGSL`'s rustdoc states the
+  crossing rule a CPU mirror must follow.
+- **Finding: the start offset is below f32's resolution past t of about a
+  thousand.** `start_t = enter + 0.0001` lands within an ulp of `enter`
+  once the entry is past about a thousand units, and on `enter` itself past
+  2,048. The walk then starts on the far side of its entry face and steps
+  in through it. It reaches the same voxels, but a ray that hits the voxel
+  just inside the face reports that face instead of the default
+  `(0, 1, 0)`. The GPU fuses `eye + direction * start_t` and so picks the
+  side differently from a CPU mirror: 3,754 (NVIDIA) and 4,093 (AMD) of the
+  spread's 98,304 rays, nearly all of them first-voxel hits and every one a
+  tie against the exact walk, and none on the board. A trial variant that
+  clamps the start voxel into the pointer box, and treats an interval
+  shorter than the offset as empty (as isometer's CPU mirror already does),
+  took those to 10 on every adapter, each a tie, with its cost inside the
+  timings' noise. It is not landed: it goes beyond ruling 336, and it
+  settles which face a first-voxel hit reports.
+- **Consumers.** isometer's tracer prepends `BRICK_DDA_WGSL`, so its
+  pictures take the fix at the repin, and every product's pictures move
+  toward the exact walk; their picture receipts are re-recorded then
+  (ruling 336). isometer's CPU mirror, `trace_ray` in `bricks/ray.rs`,
+  copies the walk. At the same repin it must take each crossing as
+  `((voxel + 1) as f32 - eye) / direction` (or `voxel as f32` for a
+  negative direction) when it enters a voxel, and drop its `delta`, or its
+  picks leave the pixels. Within this repository no crate consumes the
+  shader, and no existing test's expected values changed.
+- **Open for Mark.** Whether isometer keeps mirroring the walk or calls a
+  CPU traversal that `modulus` owns: the mirror here already walks
+  `BrickMap`'s pointer volume and atlas, and would only need making public.
+  Whether to clamp the start voxel. And cross-multiplied comparisons, which
+  let no division decide a step, if a GPU turns up whose division
+  disagrees with the CPU mirror; none of the four here did.
