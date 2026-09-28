@@ -1,6 +1,8 @@
 # Burn 0.22 Migration Plan
 
 
+**2026-09-27 continuation:** remaining Conatus/ESP/Numen GPU and all eight S12 builds pass at the source-qualified `8d308572` checkpoint plus a remote-fixture API adapter; see §13.23. Current pins and seven prepared files are preserved; review precedes their commit.
+
 **2026-09-27 carry update:** ruling 380 pre.2 repair is published; its bounded pre.4 carry passed direct/control, identity and full-force gates (§13.22). Broader migration acceptance remains open.
 **Date**: 2026-08-09
 
@@ -2297,3 +2299,119 @@ fixture API adaptation, lock/source hashes and preservation checks in the existi
 external receipt directory. This bounded checkpoint does not repeat or accept
 the broader migration matrices, nested builds or S13. Keep the existing Lane M
 worktree and stable Mere target for those separately released gates.
+
+### 13.23 Remaining S9 GPU and S12 builds resumed (2026-09-27)
+
+Following the user's "Let’s proceed," the coordinator released Conatus's nine
+resident GPU cases, ESP synthetic/real-MiniLM parity and the eight prepared
+nested/standalone builds at Lane M `8d308572`. Read the dated overrides to the
+older target-path and baseline instructions: reuse `C:/t/cargo-targets/mere`,
+four jobs, offline builds, and the exact existing closure. No new worktree,
+Cargo home, rebase or renderer-pin absorption is part of this release. Primary
+Mere's later capture-hook commit does not change this lane's source baseline.
+
+Tests retain full output, compiler/source/lock context and model hashes. Native
+GPU runs are correctness checks with possible unrelated device-host activity,
+not timing receipts. Conatus adapter-skip messages must be detected explicitly;
+ESP's real-model test is selected with `--ignored` and the existing external
+MiniLM artifact. Preserve the finite/length controls and all current tolerances.
+Stop on numerical failures or substantive forks. Return an independently reviewed
+checkpoint before committing the seven prepared files or entering S13.
+
+Status: running; previous native/wasm, Distillery/Djinn/workspace and Numen
+receipts remain source-qualified as recorded. This release does not silently
+repeat or upgrade them to final integration acceptance.
+
+#### Focused refresh and first result (2026-09-27)
+
+The coordinator also released a fresh Numen GPU suite on the corrected alias
+source: its earlier 77-pass receipt predates the three production binary-path
+changes. This is a focused behavioral refresh, not a repeat of the whole matrix.
+Conatus's four resident and five chunk tests passed with the actual CubeCL kernel
+marker and zero adapter-skip messages. The same log detector finds one planted
+skip line; that is a parser control, not a forced adapter failure. Successful
+tests do not print their numerical values, so the receipt claims their tested
+bounds and lease/allocation assertions rather than invented measured errors.
+See `s9-remaining-conatus.json`, its complete log and
+`s9-remaining-conatus-execution-control.json` in the existing receipt directory.
+
+ESP's release synthetic CPU/WGPU parity and three actual finite/length helper
+controls passed (four tests; real-model and timing tests ignored in that run).
+The real MiniLM fixture was then explicitly selected with `--ignored` and passed
+with its 384-component finite output, original `1e-4` fixture/norm tolerance and
+stage-trace assertions. Six local model files match the recorded hashes. These
+are `s9-remaining-esp-synthetic` and `s9-remaining-esp-minilm` JSON/raw-log pairs;
+the timing test was not run. All gate source maps are unchanged before/after.
+
+The focused final-source Numen refresh passed 77 tests, including scalar and
+vector GPU parity, with the timing test ignored. Receipt:
+`s9-remaining-numen-alias.json` and its raw log. S12 build attempts now proceed
+serially. Initial standalone Remote cache misses are retained separately;
+ruling 378 cache fills use Cargo for exact locked crates.io versions and compare
+downloaded archive checksums with the unchanged lockfile. They are not test
+failures or deliberately broken correctness controls.
+
+The remote fixture build exposed two mechanical pre.4 API adaptations: replace
+the removed `WgpuDevice::DiscreteGpu(0)` constructor with
+`WgpuDevice::new(WgpuDeviceKind::DiscreteGpu(0))`, and wrap the same cloned device
+as `cubecl::Device::Wgpu` when mounting the server. Its emitted backend version
+now truthfully says pre.4. The original and intermediate compiler failures,
+exact source diff and before/after bytes are retained; the corrected build
+`s12-remaining-remote-fixture-api2` passes. No device-selection policy, tolerance,
+production algorithm, manifest or lock changed. This fixture-only difference
+does not require repeating the already source-qualified production GPU gates.
+File-only formatting checks reproduce an existing import-order suggestion on
+the exact pre-edit bytes; it is preserved rather than mixed into this adapter.
+
+#### Boundaries for the next checkpoint (2026-09-27)
+
+Earlier native/wasm compile matrices and S10/S11 commands retain their recorded
+source closure; their passing results do not silently verify the later alias
+correction or primary's newer rendering pins. The fresh Seiche, Conatus, ESP,
+Numen and S12 receipts identify their tested source separately. Before final
+integration, a planned reconciliation with current primary must inspect exact
+manifest/lock/source deltas, repeat S8 graph/identity/absence checks and S11
+whole-workspace verification, and select affected S9/S10/nested consumer rows
+from those actual deltas. Any changed numerical backend requires its affected
+parity gates again. This paragraph identifies the review boundary; it does not
+authorize a rebase or claim a new closure already passed.
+
+S13 remains unreleased. Its older scripts' arbitrary/default target locations
+do not override workspace hygiene: any later authorized run must explicitly
+reuse `C:/t/cargo-targets/mere` and the pinned `wasm-bindgen` CLI `0.2.122`.
+Headed, mutation and full two-peer lifecycle evidence remains pending.
+
+#### Completed remaining S9/S12 checkpoint (2026-09-27)
+
+All twelve commands exit 0: four GPU test commands (Conatus 9, ESP synthetic
+and rejection controls 4, explicit real MiniLM 1, Numen 77) and eight builds.
+The builds are standalone Remote/Reduce libraries; the probe and both browser
+repros for Wasm; and native, remote and session fixtures for the host. The
+complete commands and successful retry labels are in
+`s12-remaining-build-commands.json` and `s12-remaining-build-results.json`.
+`remaining-gates-summary.json` checks every raw log hash, exit, before/after
+source map, current-source difference and preserved model/manifest/lock byte.
+
+All eight nested/standalone manifests and locks match their earlier reviewed
+resolution. The seven prepared paths and root lock remain byte-identical.
+The only later source difference in the early GPU/build receipts is the
+remote fixture adapter described above, with its own successful rebuild.
+The four exact cache fills were `axum 0.8.9`, `axum-core 0.5.6`, `matchit 0.8.4`
+and `serde_path_to_error 0.1.20`; each downloaded archive matches the unchanged
+standalone Remote lock checksum. All failed cache and compiler attempts remain.
+
+Keep graph qualifications intact: standalone Reduce defaults select Turso;
+that is not a production persistence-absence gate. Production selected graphs
+retain the earlier positive-control evidence. Probe and both repro locks use
+WGPU 30.0.0; other reviewed roots use 30.0.1. Remote's unused `p2panda-auth` and
+`p2panda-stream` patch warnings are the previously recorded mirrored optional
+rows, not a reason to invent dependencies. Other gates retain their existing
+upstream deprecation/dead-code warnings; no warning-free claim is made.
+
+`remaining-s9-s12-checkpoint.json` seals this bounded result and the final
+source/docs inventory under `Code/testing/mere/receipts/2026-09-27/burn-pre4`.
+Independent review is requested before committing the seven prepared paths,
+fixture adapter and owning docs. No new source acceptance, S13, renderer
+reconciliation or main integration follows automatically. The existing Lane M
+worktree remains needed; the stable Mere target is released to the waiting
+consumer lane. No isolated Cargo home or alternate target was created.

@@ -12,6 +12,7 @@ use std::time::{Duration, Instant};
 
 use burn::tensor::Device;
 use burn_wgpu::{Wgpu, WgpuDevice};
+use cubecl::wgpu::WgpuDeviceKind;
 use distillery::{
     BURN_REMOTE_RESOURCE, BlobCustody, Distillery, RemoteSessionService, RemoteSessionSettings,
     RetentionSettings,
@@ -434,7 +435,7 @@ async fn run_remote(
     cancellation_batch: usize,
 ) -> Result<(), String> {
     report_stage("allocator-baseline");
-    let server_device = WgpuDevice::DiscreteGpu(0);
+    let server_device = WgpuDevice::new(WgpuDeviceKind::DiscreteGpu(0));
     let allocator_baseline = AllocatorSnapshot::capture(&server_device)?;
     report_stage("bind-peers");
     let poster_provider = InMemoryProvider::from_seed([31; 32]);
@@ -473,7 +474,7 @@ async fn run_remote(
     let clock = Arc::new(ManualClock::at(NOW_MS));
     let service = RemoteSessionService::<Wgpu>::mount(
         &server_transport,
-        vec![server_device.clone()],
+        vec![cubecl::Device::Wgpu(server_device.clone())],
         MESH,
         server_key.public_key().to_bytes(),
         clock.clone(),
@@ -736,7 +737,7 @@ async fn run_remote(
                 "server_peer": server_endpoint.id().to_string(),
                 "client_peer": client_endpoint.id().to_string(),
                 "same_endpoint": false,
-                "server_backend": format!("burn-wgpu 0.22.0-pre.2 Wgpu/AutoCompiler DiscreteGpu(0), {}", backend_profile()),
+                "server_backend": format!("burn-wgpu 0.22.0-pre.4 Wgpu/AutoCompiler DiscreteGpu(0), {}", backend_profile()),
                 "client_backend": "Burn Dispatch Remote over authorized Iroh"
             },
             "first_run": {
