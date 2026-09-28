@@ -469,3 +469,13 @@ this tree.
   The live 2,000-node run timed out. The
   [controls and physics receipt](../testing/2026-09-27_graphshell_controls_physics_receipt.md)
   records the evidence and open gates. This does not complete phase 4.
+- 2026-09-27: approved Genet motion commit `27d20d3f` is pushed and the
+  worktree repins to it. All 298 targeted native tests, the locked wasm build
+  and the headed controls scenario pass. Quiet live medians fall from
+  141.7 to 96.0 ms (128 nodes) and 872.0 to 595.0 ms (512 nodes), with the
+  remaining cost dominated by mutation/restyle. Genet `f2e2850f` separately
+  removes repeated batch preparation; 302 tests and a deliberate failing
+  work-count control support it, but it is local pending push approval.
+  The controls/physics receipt records exact pins, artifact hashes and
+  qualifications. The inventory records bounded elapsed-time physics as
+  proposed follow-on work, distinct from these rendering measurements.
