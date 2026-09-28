@@ -22,6 +22,42 @@ This batch exists because both documents are new and had no record. They come
 from the reservoir plan's V2b work, and Mark asked on 2026-09-26 for this
 workstream's two to be covered.
 
+## 2026-09-27 phase-3 follow-up
+
+The totals above remain the original 2026-09-26 audit, not a new full census.
+The plan's status now records phase 3 under headed verification and preserves
+Mark's timing ruling as the gate before phase 4. The clean dependency repin
+was pushed as `815279cf`; phase-3 source and evidence live on `reservoir-v2`.
+
+Checked in this follow-up:
+
+- Published Vello 0.10.1 reaches both the root and standalone web graph through
+  netrender `9607d16f1` and Genet `92b249af5b2`; the locked wasm build succeeds.
+- A correctly sized custom leaf can still retain a blank first texture when
+  the producer stops rasterizing before asynchronous buffer recovery. The
+  comparison page now renders continuously, matching the presenter. This is
+  not a completion contract for event-driven consumers.
+- The camera fit previously read stale positions before the analytic layout
+  reached the view. `95cd5f27` fixes that ordering and adds a regression.
+- `c190bcb6` culls offscreen paint in pictograph, preserving crossing edges and
+  each caption's own bounds. It does not eliminate DOM layout work. The GPU
+  comparison matches pixels and rejects a deliberately lost crossing edge;
+  254 unit tests and two existing GPU tests pass.
+- The analytic layout is paused. The new window names are `startup` and
+  `steady`; prior `moving` and `idle` labels do not establish physics motion.
+- Rootstock's generic screenshot check counted the heading on the failed
+  large-tree run. The successful recovery captures were inspected for the
+  graph itself and the pointer-path pick succeeded.
+- Current main has since moved shared scenario execution to Mesquite. The
+  branch's earlier rootstock lane lift is unpublished and must be reconciled
+  before integration; a second generic runner must not be silently added.
+
+All four final headed scenarios passed. The eight captures were checked for
+visible graph content, including both pointer-path picks. The final timing
+table, physical-size difference and pacing outliers are recorded in
+`design_docs/mere_docs/testing/2026-09-27_graphshell_producer_receipt.md`.
+Evidence is under `Code/testing/mere/scenarios/graphshell-web/p3_culling/`.
+
 ## mere_docs/implementation_strategy/2026-09-25_graphshell_one_tree_plan.md
 
 - disposition: current
