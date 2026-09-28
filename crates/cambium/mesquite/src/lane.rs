@@ -315,7 +315,9 @@ impl<P: Product> Lane<P> {
         if self.capture_paint
             && path
                 .as_ref()
-                .is_some_and(|path| path.with_extension("paintlist") == *path)
+                .and_then(|path| path.extension())
+                .and_then(|extension| extension.to_str())
+                .is_some_and(|extension| extension.eq_ignore_ascii_case("paintlist"))
         {
             return Err("PNG and paint capture paths must differ".into());
         }
