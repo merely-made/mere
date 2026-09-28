@@ -158,6 +158,7 @@ pub use canvas_search::CanvasSearchSurface;
 pub use field_bridge::{build_query_similarity_field, register_query_similarity_field};
 pub mod fold_projection;
 mod frame;
+mod cull;
 mod input;
 mod resolved_image_cache;
 pub use resolved_image_cache::DEFAULT_RESOLVED_IMAGE_CACHE_BYTES;

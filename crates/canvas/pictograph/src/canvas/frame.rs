@@ -421,6 +421,10 @@ impl Canvas {
         // scene and below the graph. (Physics scenes P4c.)
         let fluid_cmds = self.fluid_cmds();
 
+        let viewport_bounds =
+            LayoutRect::new(LayoutPoint::zero(), LayoutPoint::new(w as f32, h as f32));
+        let underlay_commands = super::cull::visible_commands(underlay.commands(), viewport_bounds);
+        let node_commands = super::cull::visible_commands(nodes_plist.commands(), viewport_bounds);
         let mut layers = vec![CompositeLayer::commands_only(&bg_cmds)];
         if !ambient_cmds.is_empty() {
             layers.push(CompositeLayer::commands_only(&ambient_cmds));
@@ -438,7 +442,7 @@ impl Canvas {
         if !fluid_cmds.is_empty() {
             layers.push(CompositeLayer::commands_only(&fluid_cmds));
         }
-        layers.push(CompositeLayer::commands_only(underlay.commands()));
+        layers.push(CompositeLayer::commands_only(&underlay_commands));
         // The on-screen gnode + face layers, unless the host renders these gnodes as
         // chrome DOM elements instead (canvas-as-element); then only edges + demoted
         // dots remain as the underlay. (Canvas-as-element — Phase 2.)
@@ -448,7 +452,7 @@ impl Canvas {
                 layers.push(CompositeLayer::commands_only(&stem_cmds));
             }
             layers.push(CompositeLayer {
-                commands: nodes_plist.commands(),
+                commands: &node_commands,
                 fonts: nodes_plist.fonts(),
                 images: nodes_plist.images(),
             });
