@@ -27,3 +27,25 @@ helper controls are not the full headed numerical or two-peer acceptance
 receipts, which remain migration plan section 13 gates. Remove the launcher
 patch when a released unpatched Burn/CubeCL row passes the headed shared-input
 reproducer and its applicable controls.
+
+## 2026-09-27: verified alias-broadcast correction carried from pre.2
+
+After the separate pre.2 fix `a016f86f`, ruling 380 carries the same alias-aware
+broadcast helper and three guarded RHS calls into this pre.4 patch. The helper
+combines input-zero alias binding with the output reference shape. It preserves
+the six-field identity predicate, fresh output, zero-output returns and each
+launcher's existing memory-order behavior. The fixture uses pre.4's non-generic
+CubeTensor/CubeDevice API, the actual same_view predicate and allocation descriptor
+IDs. Existing test-runtime dependencies suffice; no manifest change was needed.
+
+Nine direct cases passed, the mapping-only fault failed exactly three broadcast
+cases while six controls passed, and restoration passed all nine. The nine
+identity tests and full Seiche gate (96 passing tests, one ignored) also passed.
+Detailed binary/source and concurrency qualifications are in canonical plan
+§13.22 and external `Code/testing/mere/receipts/2026-09-27/burn-pre4/pre4-carry-checkpoint.json`.
+These native correctness receipts do not expand historical headed acceptance.
+
+The earlier statement about root/product manifests remaining pre.2 describes
+the initial S3/S4 checkpoint. Lane M subsequently moved its root graph to exact
+pre.4 in S5–S8; this carry preserves those pins and the parked nested-lock work.
+Broader migration acceptance and S13 remain open.

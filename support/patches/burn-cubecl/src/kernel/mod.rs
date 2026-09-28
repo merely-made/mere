@@ -1,3 +1,5 @@
+#[cfg(test)]
+mod alias_broadcast_tests;
 mod same_view;
 #[cfg(feature = "autotune")]
 mod autotune_bounds;

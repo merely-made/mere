@@ -1,5 +1,7 @@
 # Burn 0.22 Migration Plan
 
+
+**2026-09-27 carry update:** ruling 380 pre.2 repair is published; its bounded pre.4 carry passed direct/control, identity and full-force gates (§13.22). Broader migration acceptance remains open.
 **Date**: 2026-08-09
 
 **Localization annotation (2026-09-27):** the bounded displacement capture
@@ -2171,3 +2173,127 @@ source, four complete array files, comparator controls and source hashes are
 external as `s9-displacement-*`, `s9-localization-pre2-*` and
 `s9-alias-broadcast-source-localization.json` in the existing receipt directory.
 The GPU slot is released; prepared lane changes and stable target are retained.
+
+### 13.21 Ruling 380: repair pre.2 first (2026-09-27)
+
+The user selected **A**, verbatim: `A`. The accepted option was: "Fix pre.2
+separately, then carry the verified correction into pre.4 (recommended). The
+existing bug gets its own tested commit." Authority is Isometry's canonical
+wing design record, ruling 380, on commit `e6583a8`. This supersedes the pending
+repair-order question in §13.20; the historical diagnostic qualification stands.
+
+Implementation starts on primary Mere `be2e710a`, including its published
+rendering closure. The older `f4f61d6c` diagnostic remains evidence for that
+source only. Preserve concurrent `document-lanes/src/reader.rs`, Lane M's
+prepared migration files, all five pre.2 allocation comparisons, separate output
+allocation and existing numerical tolerances. The bounded correction adds an
+alias view with the output reference shape and uses it in the three guarded
+launchers. Nine direct, unfused cases cover subtraction, float atan2 and integer
+XOR, each with broadcast alias, equal-shape alias and separate allocations.
+Verify real handle identity, scalar expected values, output shape/length/finite
+values, fresh output and preserved inputs. An old-layout-only fault must fail
+regression, and the original full Seiche force gates must pass with the finite
+and length checks retained. Independent review precedes the separate pre.2 fix
+commit; carrying it to pre.4 and further migration gates await coordinator release.
+
+Status: authorized, implementation and numerical acceptance pending. Reuse
+`C:/t/cargo-targets/mere`, four jobs, and the existing external receipt directory.
+
+#### Verified pre.2 checkpoint (2026-09-27, ruling 380)
+
+The correction and tests passed independent source/receipt review and coordinator
+acceptance before the separate source commit. `as_linear_view_alias_like` preserves
+input-zero alias binding while supplying the output reference shape; exactly the
+three guarded RHS calls use it. All five pre.2 identity comparisons, separate
+output allocation, force formulas and four existing `1e-3` assertions are unchanged.
+
+Nine direct private-launcher cases passed, with actual logical-view identity,
+output allocation identity, shape, length, finite float values, scalar expected
+values and input-preservation checks. Replacing only the new helper's
+`from_reference_shape(reference.shape())` with `new()` caused exactly the three
+broadcast-alias cases to fail and the other six to pass. Exact byte restoration
+then passed all nine again. This final sequence includes the strengthened
+allocation-identity assertions. Commands use the patched crate's standalone
+manifest, release mode, `--no-default-features --features std,fusion --lib
+kernel::alias_broadcast_tests -- --ignored --test-threads=1 --nocapture`. The
+dev-only dependency is `burn-backend =0.22.0-pre.2` with `cubecl-wgpu,std`.
+
+The current primary root command `cargo test --release --offline --locked -p
+seiche --features tensor-burn-wgpu -- --test-threads=1 --nocapture` passed 87 unit
+and 9 integration tests, with one ignored test. Both formerly failing force
+comparisons executed and passed. The finite/length rejection controls passed.
+After this run, only the direct fixture's fresh-allocation assertions and the
+ordering of its `cfg(test)` module declaration changed; its final direct/control
+sequence was rerun. Production operations and Seiche test bytes stayed identical.
+Exact Seiche-time fixture/module copies were recovered and checked against the
+recorded hashes, preserving this qualification.
+
+Baseline is primary `be2e710a`, root lock SHA-256 `f00fbbfa8207f694e9d9d22edbe3a71d400de1c97a4483e1cf2ed3a0592acb08`.
+The standalone lock remained byte-identical at 417 packages, SHA-256
+`95771a4e7767f993df7f12aa4c18aac2e2d161751428a7f8bdecb0c9ab011a27`.
+Reader WIP retained SHA-256 `69bf981ddc67688327a07488c6ff6485fd0f61c08169b0052a5e622b2ec0f42f`.
+Five exact missing cached crates were downloaded under ruling 378 with archive
+checksums recorded. Failed cache/fixture-compilation attempts remain in receipts
+and are not counted as fault controls. Changed-file formatting was checked;
+five comma suggestions reproduce on pristine HEAD and were preserved.
+
+Full stdout, commands, compiler/device/process context, source hashes, old-layout
+bytes and restoration are sealed by `pre2-repair-checkpoint.json` in the existing
+external receipt directory. Other renderer/headed work could run concurrently:
+these are correctness gates, with no exclusive-GPU or timing claim. The stable
+Mere target remains shared and reusable. Lane M remains parked with its prepared
+files; carrying this accepted correction into pre.4 awaits coordinator release.
+
+### 13.22 Bounded pre.4 carry (2026-09-27)
+
+The coordinator verified the published pre.2 commit `a016f86f9b47459425b6f10dded7982853b9bd6b`
+and released only its alias-layout correction and direct regressions into existing
+Lane M `1f5a7319`. This is not a merge or rebase onto primary's newer renderer
+closure. Seven prepared files and current root/standalone lock bytes are retained.
+The non-generic pre.4 tensor/launch APIs and CubeDevice are used; the fixture calls
+the actual six-field `same_view` helper and checks allocation descriptor IDs.
+Existing test-runtime dependencies suffice, so no manifest adaptation is needed.
+
+Status: direct pass/fault/restoration, nine unchanged identity tests and the full
+Seiche release gate are running or pending. The six-field helper remains exactly
+`de7f79a4c0eceacbbb5302de395ea26c7d093e8ef0b836cf755bd5e9dd89b127`;
+output allocation, zero-size returns, memory-order handling and tolerances are
+unchanged. Independent review precedes any carry commit. Broader matrices, S13
+and renderer reconciliation remain outside this release.
+
+#### Completed bounded carry gates (2026-09-27)
+
+The nine adapted direct launcher cases passed. Removing only the alias helper's
+broadcast-reference construction produced exactly three broadcast-alias failures
+with six passing controls; exact restoration passed all nine again. Generic
+subtraction, float atan2 and integer XOR retain the pre.2 scalar expectations,
+length/finite checks, output shape, input preservation and fresh-allocation checks.
+No new manifests, lock updates, downloads, renderer pins or numerical thresholds
+were needed. All six production identity predicates remain byte-identical.
+
+All nine identity-helper tests also passed from the existing corrected-source
+test binary while Cargo waited on another owner's active package-cache resolver.
+The receipt records the binary hash, precise filter and build-source receipt.
+This is historical binary evidence: the subsequent fault/restoration rebuild
+replaced the executable. Source identity for the guard remained unchanged, and
+the coordinator independently checked that binary before replacement.
+
+The complete Seiche release command passed 87 unit and 9 integration tests, with
+one ignored test, on the final corrected source. Both original GPU force parity
+tests and finite/length rejection controls passed at their original tolerances.
+Direct and full-force runs retained complete stdout, before/after source maps,
+compiler, device and concurrent-process context. Correctness was checked with
+possible unrelated renderer/headed work; no timing or residency claim is made.
+
+Root lock remains `2e85b0eac6c5f878d29c0a2487fb38c3767190926985dc3f5f4096814945f4b5`;
+standalone lock remains `6e4c3d8c52be44fdc58e013b536395885a5e1c1efcd7c20228cd2742a8d173df`.
+All seven prepared WIP paths are byte-preserved, including the Seiche/ESP test
+hardening and five nested locks. They are outside the carry's source commit.
+Changed-file formatting was checked: seven old match-arm commas and the existing
+`same_view` module ordering reproduce on HEAD and remain unchanged.
+
+`pre4-carry-checkpoint.json` seals commands, raw logs, exact mutation/restoration,
+fixture API adaptation, lock/source hashes and preservation checks in the existing
+external receipt directory. This bounded checkpoint does not repeat or accept
+the broader migration matrices, nested builds or S13. Keep the existing Lane M
+worktree and stable Mere target for those separately released gates.
