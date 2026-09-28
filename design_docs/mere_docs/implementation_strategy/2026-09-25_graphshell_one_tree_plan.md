@@ -366,3 +366,19 @@ this tree.
   The previous blank 2,000-node frames provide no valid timing receipt.
   The two 2,000-node scenarios and the presenter's smaller idle capture still
   need headed reruns. Pictograph viewport culling remains the next ruled step.
+- 2026-09-27: bounded Genet text-bounds publication is in progress. Root and
+  standalone Graphshell web manifests select accepted Genet `7b48f94d7a7`,
+  preserving NetRender `9607d16`, netrender-vello 0.10.1, wgpu 30 and pre.2.
+  This takes the owner-verified text/inline-decoration fixes and retained
+  motion/restyle source, not a new phase-3 policy. Portable dependency
+  classification and focused consumer checks precede publication; see
+  `design_docs/cambium_docs/technical_architecture/genet-compatibility.md`.
+- 2026-09-28: the bounded publication gates above pass with published Genet
+  `7b48f94d`: native host/Cambium/Sprigging all-target checks and standalone
+  Graphshell web Wasm check. Locked metadata and deliberately faulty source
+  controls qualify 1,524 native packages and 527 unfiltered web packages;
+  only the accepted Genet revision and its exact documents/text edge change.
+  Native wgpu 30.0.1 and web wgpu 30.0.0 retain their respective prior locks.
+  NetRender/Vello and pre.2 remain unchanged. This is compile/source evidence;
+  the headed work above remains open. Exact raw/provenance and interrupted
+  checkout-preparation qualifications are linked from the compatibility note.
