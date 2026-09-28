@@ -617,3 +617,13 @@ fn product_completion_runs_once_and_preserves_failures_when_kept_open() {
         }
     }
 }
+
+#[test]
+fn scenario_keys_use_retained_focus_and_button_activation() {
+    let (receipt, h) = run(
+        "keys",
+        "click role:button Count\nkey Enter\nkey Space\nassert snap count == 3\n",
+    );
+    assert!(receipt.starts_with("RESULT ok"), "{receipt}");
+    assert_eq!(h.state().count, 3);
+}
