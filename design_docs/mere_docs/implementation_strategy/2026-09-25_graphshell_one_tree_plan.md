@@ -135,6 +135,15 @@ Phase 3 follow-up rulings, 2026-09-27:
   and settling, with frame pacing and simulation cost recorded separately.
   Paused rendering already takes about 1.5 seconds at 2,000 nodes, so that
   cost must be investigated independently of physics.
+- **Pause freezes visible positions.** Mark chose a separate Restore
+  arrangement action. Pausing must not snap a relaxed graph back to stored
+  arrangement slots. Resume starts from the held positions; preserving
+  velocity is not established by this ruling.
+
+The [phase-4 migration inventory](2026-09-27_graphshell_tree_migration_inventory.md)
+maps the actual application state, controls, shared-input gaps and remaining
+page/scenario obligations. The fixture toolbar is the first slice, not the
+completed application migration.
 
 ## 2. Findings (verified 2026-09-25)
 
@@ -448,3 +457,15 @@ this tree.
   unpublished rootstock runner.
   Mark has since approved Mesquite and proceeding to phase 4, with
   performance and live physics explicitly open (see the follow-up rulings).
+- 2026-09-27: the first phase-4 slice adds shared canvas commands and a
+  Cambium toolbar, captured dragging, graph-scoped keys, position-freezing
+  pause and explicit arrangement restoration. Its headed scenario passes
+  with named accessibility controls and inspected captures. Native tests
+  cover held motion, membership changes and actor snapshot barriers.
+  Equal DOM writes were invalidating retained layout every paused frame;
+  skipping them reduces the 2,000-node paused median from 1603.3 to 107.6 ms
+  in the instrumented dev comparison. Moving graphs remain slow: 512 nodes
+  take 872 ms, primarily in DOM restyle/layout, while physics takes 2.6 ms.
+  The live 2,000-node run timed out. The
+  [controls and physics receipt](../testing/2026-09-27_graphshell_controls_physics_receipt.md)
+  records the evidence and open gates. This does not complete phase 4.
