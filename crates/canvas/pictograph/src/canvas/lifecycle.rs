@@ -262,6 +262,11 @@ impl Canvas {
     /// natural size, not blown up to fill the window). An empty graph (or one
     /// with no finite positions) falls back to `recenter`.
     pub fn fit_to_content(&mut self) {
+        // A host may fit immediately after applying an analytic layout, before
+        // the next frame publishes its buffered positions. Fit those same
+        // positions that the next frame will paint. Running physics keeps its
+        // current view because apply_strategy_to_view only overlays when paused.
+        self.apply_strategy_to_view();
         let mut min = (f32::INFINITY, f32::INFINITY);
         let mut max = (f32::NEG_INFINITY, f32::NEG_INFINITY);
         let mut any = false;
