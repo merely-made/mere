@@ -3,7 +3,8 @@
 **Date:** 2026-09-25
 **Status:** in progress, ruled 2026-09-25 (reservoir plan §7 items 39 and
 40). Phases 1 and 2, accessibility in the browser and the file seam, were
-done on 2026-09-26; phase 3, the canvas as a producer, is next.
+done on 2026-09-26; phase 3, the canvas as a producer, is under headed
+verification. Mark's ruling on its timings still gates phase 4.
 **Scope:** Graphshell's browser page becomes one retained Cambium tree. Its
 HTML controls become Cambium components, its display-only Cambium chrome
 joins them, pictograph's canvas renders into the tree as a texture producer,
@@ -113,6 +114,11 @@ Phase 3's rulings, 2026-09-26:
   page uses it, and phase 4 moves Graphshell's scenarios onto it. The
   alternatives were extending Graphshell's page lane with a tree probe, or a
   browser copy of the winit host's lane.
+- **The build timed.** "Debug, shorter windows": the side-by-side runs on the
+  headed runner's debug build, which optimizes only five physics crates, and
+  the 2,000-node scenarios time 30-frame windows with 60 frames to settle,
+  the same on both pages. The alternatives were a release build, or the dev
+  build with pictograph, netrender, Vello, genet and Cambium optimized.
 
 ## 2. Findings (verified 2026-09-25)
 
@@ -382,3 +388,45 @@ this tree.
   `WebLane`, the browser's half. `ProducerContext` gains `core`, the host's
   `RenderCore`. graphshell-web takes the web host and rootstock on
   wasm-bindgen 0.2.127, with the CLI installed to match.
+- 2026-09-27: the phase-3 worktree now selects published `netrender-vello`
+  0.10.1 through netrender `9607d16f1` and Genet `92b249af5b2`, in both
+  the root and standalone web manifests and locks. The locked wasm build
+  (`CARGO_PROFILE_DEV_DEBUG=0`, `getrandom_backend="wasm_js"`) and
+  wasm-bindgen 0.2.127 bundle generation passed. The receipt and artifact
+  hashes are in `Code/testing/mere/mere-reservoir-web-vello-repin-build.json`.
+  The clean main-line repin was pushed with approval as `815279cf`.
+  The earlier blank 2,000-node timings are invalid.
+- 2026-09-27: headed reruns exposed two phase-3 faults. The tree cached its
+  incomplete first texture when the analytic layout was paused, preventing
+  Vello's asynchronous buffer recovery. It now rasterizes continuously, as
+  the presenter does. Setup also fitted the camera before buffered analytic
+  positions reached the canvas view; `fit_to_content` now publishes those
+  paused positions before finding bounds, with a regression test.
+  `tree_recovery/p3_tree_health` draws the full 2,000-node graph and picks
+  node 0 through the host pointer path. The full tree scenario then passed.
+  A generic nonblank screenshot check had counted the heading as content;
+  captures must also be inspected for the graph itself.
+- 2026-09-27: pictograph culls offscreen underlay and node paint before
+  scene lowering. Crossing edges survive even with both endpoints outside,
+  and captions use their own bounds. Transform stacks and uncertain
+  filter/shadow/fragment extents are retained. DOM layout and physics are
+  unchanged. The GPU comparison produces identical pixels before and after
+  culling and detects a deliberately removed crossing edge. All 254 unit
+  tests and two existing GPU tests pass; the standalone wasm build passes.
+  An event-driven producer still needs a renderer-completion signal before
+  caching textures; the continuously rendered comparison page does not
+  establish that contract.
+  The analytic layout is paused on both pages: the timing windows are
+  startup and steady rendering, not moving physics. Earlier receipts retain
+  their misleading `moving`/`idle` labels as historical evidence.
+- 2026-09-27: all four final headed scenarios pass, with every capture
+  checked for visible graph content and both tree picks passing. Steady
+  frame interval medians are 10.3 ms (presenter fixture), 24.1 ms (tree
+  fixture), 1493.8 ms (presenter 2,000 nodes), and 1553.3 ms (tree 2,000
+  nodes). These are debug, paused-layout measurements. The tree uses 2x
+  device pixels while the presenter uses 1x, and the tree fixture has pacing
+  outliers. The [full receipt](../testing/2026-09-27_graphshell_producer_receipt.md)
+  records p95, dimensions, artifact hashes and limitations.
+  Current main now uses Mesquite for shared scenario execution; the
+  unpublished rootstock lane lift must be reconciled before integration.
+  Mark's ruling on performance still gates phase 4, which has not begun.
