@@ -25,12 +25,15 @@ use crate::{
     probe::Probe,
 };
 
+type PaintReadback = Rc<RefCell<Option<Result<Vec<u8>, String>>>>;
+
 struct PendingCapture {
     name: String,
     path: Option<PathBuf>,
     armed: u64,
     readback: Readback,
     viewport: Option<Viewport>,
+    paint: Option<PaintReadback>,
 }
 
 /// One completed capture, as it appears in the receipt.
@@ -43,6 +46,8 @@ pub struct Capture {
     pub(crate) digest: String,
     pub(crate) fields: BTreeMap<String, String>,
     pub(crate) viewport: Option<Viewport>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) paint_path: Option<PathBuf>,
 }
 
 /// The scenario lane, generic over one [`Product`].
@@ -70,6 +75,7 @@ pub struct Lane<P: Product> {
     pub(crate) script_files: Option<crate::scenario::ScriptFiles>,
     records: Vec<crate::CaptureRecord>,
     capture_backend: Box<dyn CaptureBackend>,
+    capture_paint: bool,
 }
 
 impl<P: Product> Lane<P> {
@@ -106,7 +112,17 @@ impl<P: Product> Lane<P> {
             script_files: None,
             records: Vec::new(),
             capture_backend: Box::new(NativeCapture),
+            capture_paint: std::env::var_os("MESQUITE_CAPTURE_PAINT")
+                .is_some_and(|value| value == "1"),
         }
+    }
+
+    /// Opt into a resource-preserving `.paintlist` beside each saved PNG.
+    /// Defaults to `MESQUITE_CAPTURE_PAINT=1`. This is a capture/replay aid,
+    /// not a timing run: full font bytes are serialized without elision.
+    /// External GPU images remain references, not portable pixel payloads.
+    pub fn set_paint_capture(&mut self, enabled: bool) {
+        self.capture_paint = enabled;
     }
 
     /// Read a scenario using the established environment/path conventions and
@@ -297,6 +313,21 @@ impl<P: Product> Lane<P> {
         if self.pending.is_some() || ctx.capture.is_some() {
             return Err("another capture is still pending".into());
         }
+        if self.capture_paint && ctx.capture_paint.is_some() {
+            return Err("another paint capture is still pending".into());
+        }
+        if self.capture_paint && path.is_none() {
+            return Err("paint capture requires a saved PNG path".into());
+        }
+        if self.capture_paint
+            && path
+                .as_ref()
+                .and_then(|path| path.extension())
+                .and_then(|extension| extension.to_str())
+                .is_some_and(|extension| extension.eq_ignore_ascii_case("paintlist"))
+        {
+            return Err("PNG and paint capture paths must differ".into());
+        }
         if let Some(path) = &path
             && self
                 .records
@@ -307,12 +338,22 @@ impl<P: Product> Lane<P> {
         }
         let viewport = self.product.viewport(ctx);
         let readback = self.capture_backend.arm(ctx.capture);
+        let paint = self.capture_paint.then(|| {
+            let sink: PaintReadback = Rc::new(RefCell::new(None));
+            let callback_sink = sink.clone();
+            *ctx.capture_paint = Some(Box::new(move |envelope| {
+                *callback_sink.borrow_mut() =
+                    Some(postcard::to_allocvec(&envelope).map_err(|error| error.to_string()));
+            }));
+            sink
+        });
         self.pending = Some(PendingCapture {
             name,
             path,
             armed: self.frames,
             readback,
             viewport,
+            paint,
         });
         Ok(())
     }
@@ -360,6 +401,15 @@ impl<P: Product> Lane<P> {
             return;
         }
         self.product.inspect(&pending.name, &frame);
+        let paint_path = match write_paint_sidecar(pending.path.as_deref(), pending.paint.as_ref())
+        {
+            Ok(path) => path,
+            Err(why) => {
+                self.errors
+                    .push(format!("capture {} paint: {why}", pending.name));
+                return;
+            },
+        };
         if let Some(path) = &pending.path
             && let Err(why) = write_png(path, &frame)
         {
@@ -399,6 +449,7 @@ impl<P: Product> Lane<P> {
             digest: format!("{:016x}", frame.digest()),
             fields,
             viewport: pending.viewport,
+            paint_path,
         });
     }
 
@@ -553,4 +604,33 @@ pub fn capture_path(
         })
         .collect();
     base.with_file_name(format!("{stem}-{name}.png"))
+}
+
+fn write_paint_sidecar(
+    png_path: Option<&Path>,
+    readback: Option<&PaintReadback>,
+) -> Result<Option<PathBuf>, String> {
+    use std::io::Write;
+
+    let Some(readback) = readback else {
+        return Ok(None);
+    };
+    let bytes = readback
+        .borrow_mut()
+        .take()
+        .ok_or_else(|| "presented frame has no paired paint envelope".to_owned())??;
+    let path = png_path
+        .ok_or("paint capture requires a saved PNG path")?
+        .with_extension("paintlist");
+    create_parent(&path)?;
+    // A failed/repeated run must not silently replace a previously captured
+    // resource packet. Its PNG is written only after this succeeds.
+    let mut file = std::fs::OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .open(&path)
+        .map_err(|error| format!("{}: {error}", path.display()))?;
+    file.write_all(&bytes)
+        .map_err(|error| format!("{}: {error}", path.display()))?;
+    Ok(Some(path))
 }

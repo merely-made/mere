@@ -97,3 +97,66 @@ compatibility alias for older documents.
 Cambium may depend on Genet seam crates. Genet engine crates must remain free
 of Cambium, Meristem, and Sprigging dependencies. Reference applications such as
 Pelt may depend on all three.
+
+## 2026-09-27 accepted text bounds publication
+
+The owning Genet fix under Isocosm rulings 329/379 is accepted at exact commit
+`7b48f94d7a742840b527205d82a37da958240d73`. It separates font-content bounds
+from formatting line boxes and anchors wrapped inline decorations to their
+own font/baseline. Main's retained motion and restyle preparation are included;
+the combined owner receipt passes 876 affected tests (6 existing ignored),
+200 boundary tests and a current-family local Isometry detector pair of
+187/0 short rows against the published baseline's 187/39. That local pair was
+not a committed portable consumer repin. Source and evidence qualifications
+live in `genet/design_docs/2026-09-25_line_box_model_plan.md`.
+
+Mere is preparing publication of that exact Genet commit in its 27 root and
+7 standalone Graphshell web manifest rows. NetRender remains `9607d16`,
+netrender-vello 0.10.1, wgpu 30 and the accepted pre.2 compute patches remain
+unchanged. Direct Cargo uses published sources; inactive machine-local configs
+are not supplied. Portable graph/lock classification and the bounded host,
+Cambium, Sprigging and standalone-web checks are pending. The separately
+pinned old Fleece/layout-dom-api lineage through Knot is pre-existing and
+outside this pin's acceptance claim. Downstream Isometry publication follows
+only after Mere's reviewed commit is pushed.
+
+**Preparation note, 2026-09-28:** a long first metadata invocation was initially
+misidentified as dependency-solving cost. The trace had reached patch
+registration while the new Git checkout still lacked Cargo's `.cargo-ok`
+marker. Its files carried the current attempt's timestamps; the prior cached
+revision's manifest-to-marker interval was eight minutes and forty-five seconds.
+That supports unfinished checkout preparation, not a dependency conflict.
+Interrupted attempts remain recorded as interrupted preparation. Compare this
+phase/progress before diagnosing a resolver failure; acceptance still requires
+completed locked metadata and the consumer checks. The external candidate lock
+is an unvalidated, source-backed input until Cargo accepts it unchanged.
+
+**Publication gates, 2026-09-28:** Cargo 1.98.1 completed `metadata --offline
+--locked` and accepted the external source-backed lock unchanged; that exact
+lock is now the primary lock. The graph has 1,524 packages (previously 1,523),
+including 24 current Genet packages. After the exact revision substitution,
+the only node/feature/dependency-edge changes are the new `genet-text` 0.1.0
+package and the source-declared `genet-documents` edge through it. The two
+old `34626a6` Fleece/layout-dom-api packages remain. Both copied-metadata
+controls reject an outside path and an old current-family Genet source.
+
+The all-target checks for `cambium-genet-winit-host`, `cambium` and `sprigging`
+pass using the primary published lock. Standalone Graphshell web's Wasm check
+also passes with its separately validated ignored lock and only the required
+`getrandom_backend="wasm_js"` target cfg. That lock has exactly the revision
+substitution from the preserved prior portable lock; current unfiltered
+metadata has 527 nodes and 18 Genet packages, with no documents/text package.
+The historical provenance's 432-package count has no recorded filter/command
+and is not reused as a current count. Native wgpu remains 30.0.1; the independent
+web lock retains 30.0.0. Both retain NetRender `9607d16` and netrender-vello
+0.10.1. Web source-detector controls also reject both deliberate faults.
+
+Raw commands, compiler identity, original and accepted locks, source audits,
+controls and logs are in `testing/mere/receipts/2026-09-27/genet-text-publication`
+under the shared Code root. An initial direct-Cargo compile invocation selected
+rustc 1.97.1 for dependencies and failed on existing 1.98.1 artifacts; the
+retained successful commands explicitly select the repository's 1.98.1
+toolchain throughout. No target cleanup or source adjustment was needed.
+The pre-existing `reader.rs` bytes remain unchanged. These are native/Wasm
+compile and dependency-source gates, not new headed, browser or WPT receipts.
+Isometry's published-pin text-row gate remains downstream work.
