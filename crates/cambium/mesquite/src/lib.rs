@@ -28,6 +28,12 @@
 //! preserves its 120-frame capture grace and accepts uniform nonblank frames;
 //! the JSON constructor retains its eight-frame grace and detail checks.
 //!
+//! `MESQUITE_CAPTURE_PAINT=1` or [`Lane::set_paint_capture`] adds a postcard
+//! `.paintlist` beside each saved PNG, with full font/image payloads and a
+//! `paint_path` in JSON receipts. Both come from the same presented frame.
+//! Existing sidecars and export errors fail the receipt. External GPU images
+//! remain references; this mode is for resource capture, not frame timing.
+//!
 //! ```ignore
 //! let mut lane = Lane::new(MyProduct, scenario, receipt, capture, exit_code)
 //!     .with_frame_limit(Some(1800));

@@ -53,6 +53,12 @@ pub type Runner<State, Logic, V> = GenetAppRunner<State, Logic, V, ()>;
 /// rasterized view is still alive (scenario screenshots).
 pub type CaptureFn = Box<dyn FnOnce(&dyn Surface, &wgpu::TextureView, u32, u32) + 'static>;
 
+/// The paint commands and inline font/image resources of the next presented
+/// frame, before renderer translation. External GPU texture commands retain
+/// references only: this does not read back their pixels. The envelope's
+/// viewport is in layout coordinates, before device scale and UI zoom.
+pub type PaintCaptureFn = Box<dyn FnOnce(paint_list_api::PaintEnvelope) + 'static>;
+
 /// Which layer draws the window frame.
 ///
 /// This is the application-visible boundary. A [`Host`](Self::Host) frame may
@@ -664,6 +670,10 @@ where
     pub wake: &'a HostWake,
     /// Arm a capture of the next presented frame.
     pub capture: &'a mut Option<CaptureFn>,
+    /// Arm a one-shot paint-envelope capture. When armed with `capture`, both
+    /// callbacks receive the same presented frame. Failed presentation keeps
+    /// the request pending; no envelope is cloned while this is unarmed.
+    pub capture_paint: &'a mut Option<PaintCaptureFn>,
     /// Pointer events for the host to deliver to itself once this hook
     /// returns, in order. See [`HostPointer`].
     pub pointer: &'a mut Vec<HostPointer>,
@@ -928,6 +938,7 @@ where
     /// the same deferral `pending_sheet` gets, and for the same reason.
     pub pending_ui_zoom: Option<f32>,
     pub pending_capture: Option<CaptureFn>,
+    pub pending_paint_capture: Option<PaintCaptureFn>,
     /// Pointer events an application hook asked the host to deliver to itself,
     /// drained through the real input path once the hook returns.
     pub pending_pointer: Vec<HostPointer>,
@@ -1002,6 +1013,7 @@ where
             pending_sheet: None,
             pending_ui_zoom: None,
             pending_capture: None,
+            pending_paint_capture: None,
             pending_pointer: Vec::new(),
             pending_scroll: Vec::new(),
             caret_followed: None,
@@ -1294,6 +1306,7 @@ where
                 close: &mut self.s.close_requested,
                 wake: &self.wake,
                 capture: &mut self.s.pending_capture,
+                capture_paint: &mut self.s.pending_paint_capture,
                 pointer: &mut self.s.pending_pointer,
                 scroll: &mut self.s.pending_scroll,
                 window_commands: &commands,
@@ -1382,6 +1395,7 @@ where
                 close: &mut self.s.close_requested,
                 wake: &self.wake,
                 capture: &mut self.s.pending_capture,
+                capture_paint: &mut self.s.pending_paint_capture,
                 pointer: &mut self.s.pending_pointer,
                 scroll: &mut self.s.pending_scroll,
                 window_commands: &commands,
