@@ -165,5 +165,10 @@ invalid_html_tags = "deny"
 
 [workspace]
 
+[dev-dependencies.burn-backend]
+version = "=0.22.0-pre.2"
+features = ["cubecl-wgpu", "std"]
+default-features = false
+
 [patch.crates-io]
 cubecl-runtime = { path = "../cubecl-runtime" }
