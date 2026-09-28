@@ -95,6 +95,29 @@ impl Canvas {
     /// scene plus whether the host should request another frame (sim still
     /// settling, pan still gliding, or a node being dragged). Does not present.
     pub fn frame(&mut self, w: u32, h: u32) -> (Scene, bool) {
+        self.frame_observed(w, h, &mut super::frame_profile::Unprofiled)
+    }
+
+    /// Advance and compose a frame while measuring its CPU stages. The host
+    /// supplies a monotonic clock in milliseconds (for example browser
+    /// `performance.now`). Ordinary [`Self::frame`] does not read any clock.
+    pub fn frame_profiled(
+        &mut self,
+        w: u32,
+        h: u32,
+        now_ms: impl FnMut() -> f64,
+    ) -> (Scene, bool, super::CanvasFrameProfile) {
+        let mut observer = super::frame_profile::Profiled::new(now_ms);
+        let (scene, moving) = self.frame_observed(w, h, &mut observer);
+        (scene, moving, observer.profile)
+    }
+
+    fn frame_observed(
+        &mut self,
+        w: u32,
+        h: u32,
+        observer: &mut impl super::frame_profile::Observer,
+    ) -> (Scene, bool) {
         let (w, h) = (w.max(1), h.max(1));
         self.view_w = w;
         self.view_h = h;
@@ -104,6 +127,7 @@ impl Canvas {
         // into the read model, and learn whether the layout is still settling.
         // Everything below reprojects from the view — never the rapier world.
         let settling = self.physics.advance_frame(&mut self.view);
+        observer.mark(0);
         // Advance the ambient backdrop sim (it paces itself internally - GoL accumulates toward its
         // generation interval, a continuous sim integrates). A fixed ~frame dt is fine for a
         // backdrop. (Physics scenes P5.)
@@ -207,6 +231,7 @@ impl Canvas {
             (None, None) => identity_arrangement(&self.graph),
             _ => crate::canvas::underlay::arrangement_of_keys(&self.graph, &visible_keys),
         };
+        observer.mark(1);
         let mut underlay = canvas_paint_list_demoted_from_arrangement(
             &self.graph,
             &arrangement,
@@ -278,6 +303,7 @@ impl Canvas {
             underlay.splice_world_overlays(rings);
         }
 
+        observer.mark(2);
         // The node-children layer is one retained Livery document. Compute the
         // host-owned placements first, then publish one DOM mutation batch so
         // Livery can classify and retain the frame coherently.
@@ -372,6 +398,7 @@ impl Canvas {
             gnode_updates.push((gnode, style, Some(class)));
         }
         let stage_node = self.stage_node;
+        observer.mark(3);
         let (_, restyle) = self.node_document.mutate_dom(|dom| {
             set_style(dom, stage_node, "transform: translate(0px, 0px) scale(1);");
             for (gnode, style, class) in &gnode_updates {
@@ -382,14 +409,17 @@ impl Canvas {
             }
         });
         tracing::debug!(?restyle, "canvas pool: Livery mutation batch");
+        observer.mark(4);
         let nodes_plist = self
             .node_document
             .frame(w, h)
             .expect("canvas Livery/Buckram node frame");
+        observer.mark(5);
 
         // Face layer: either a palette-decoded derived vector or a resolved favicon over each
         // on-screen tile, above the colored body and below the marquee.
         let (face_cmds, face_images) = self.face_layer(&on_screen, &positions);
+        observer.mark(6);
 
         // P3 fake height: a stem from each raised node's ground anchor up to its
         // floating gnode. (Isometric camera P3.)
@@ -420,11 +450,13 @@ impl Canvas {
         // Liquid pool: the PBF particles as soft watery orbs, above the backdrop
         // scene and below the graph. (Physics scenes P4c.)
         let fluid_cmds = self.fluid_cmds();
+        observer.mark(7);
 
         let viewport_bounds =
             LayoutRect::new(LayoutPoint::zero(), LayoutPoint::new(w as f32, h as f32));
         let underlay_commands = super::cull::visible_commands(underlay.commands(), viewport_bounds);
         let node_commands = super::cull::visible_commands(nodes_plist.commands(), viewport_bounds);
+        observer.mark(8);
         let mut layers = vec![CompositeLayer::commands_only(&bg_cmds)];
         if !ambient_cmds.is_empty() {
             layers.push(CompositeLayer::commands_only(&ambient_cmds));
@@ -469,7 +501,22 @@ impl Canvas {
         }
         let scene = composite_paint_layers(viewport, &layers).scene;
 
+        let after_cull = layers.iter().map(|layer| layer.commands.len()).sum::<usize>();
+        let culled = underlay.commands().len() - underlay_commands.len()
+            + if self.render_gnodes_as_dom {
+                0
+            } else {
+                nodes_plist.commands().len() - node_commands.len()
+            };
+        observer.counts(
+            self.graph.node_count(),
+            on_screen.len(),
+            after_cull + culled,
+            after_cull,
+        );
+
         let needs_redraw = settling || gliding || dragging || self.ambient.is_some();
+        observer.mark(9);
         (scene, needs_redraw)
     }
 

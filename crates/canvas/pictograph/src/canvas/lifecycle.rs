@@ -77,6 +77,8 @@ impl Canvas {
         self.projection_score = None;
         self.projection_representations.clear();
         self.restored_score_hold = None;
+        self.strategy_positions = None;
+        self.paused_positions = None;
         self.community_cache = None;
         self.drag = None;
         self.pinned_nodes.clear();
@@ -198,6 +200,7 @@ impl Canvas {
             view_h: 600,
             active_strategy: None,
             strategy_positions: None,
+            paused_positions: None,
             projection_score: None,
             projection_representations: HashMap::new(),
             arrangement_pull: seiche::DEFAULT_ANCHOR_STIFFNESS,
@@ -347,6 +350,12 @@ impl Canvas {
             .sync_edges(visible_relation_edges(&self.graph, &self.hidden_edges));
         self.pinned_nodes
             .retain(|key| self.graph.get_node(*key).is_some());
+        for positions in [&mut self.strategy_positions, &mut self.paused_positions]
+            .into_iter()
+            .flatten()
+        {
+            positions.retain(|(key, _)| self.graph.get_node(*key).is_some());
+        }
         // Re-resolve field couplings against the new node set, so a field gathers
         // nodes added after it was placed (its targets snapshot at build time).
         // (Field regions — rebuild-on-mutation / new-node capture.)
