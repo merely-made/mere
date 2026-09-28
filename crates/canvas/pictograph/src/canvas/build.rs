@@ -252,14 +252,20 @@ pub(crate) fn build_pool_dom(
     (dom, gnode_of, stage)
 }
 
-/// Set an element's inline `style` (records an attribute mutation for `apply`).
+/// Set a changed inline `style`, leaving retained layout intact for equal values.
 pub(crate) fn set_style(dom: &mut ScriptedDom, node: DomNodeId, style: &str) {
-    dom.set_attribute(node, qual("style"), style);
+    let name = qual("style");
+    if dom.attribute(node, &name.ns, &name.local) != Some(style) {
+        dom.set_attribute(node, name, style);
+    }
 }
 
-/// Set an element's `class` (records an attribute mutation for `apply`).
+/// Set a changed `class`, leaving retained paint intact for equal values.
 pub(crate) fn set_class(dom: &mut ScriptedDom, node: DomNodeId, class: &str) {
-    dom.set_attribute(node, qual("class"), class);
+    let name = qual("class");
+    if dom.attribute(node, &name.ns, &name.local) != Some(class) {
+        dom.set_attribute(node, name, class);
+    }
 }
 
 /// A `QualName` in the null namespace (the shape `ScriptedDom` builders take).
