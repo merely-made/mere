@@ -148,6 +148,7 @@ fn blank(id: u64, role: DocumentA11yRole) -> DocumentA11yNode {
         parent: None,
         children: Vec::new(),
         role,
+        description: None,
         name: None,
         value: None,
         numeric_value: None,

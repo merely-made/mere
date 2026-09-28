@@ -8,9 +8,11 @@ checkout. The standalone Graphshell web host and Cambium web smoke also restate
 these pins and the engine's vendored patches; update them in the same change.
 
 To test unpublished Genet seam changes, redirect that git source to a local
-Genet checkout in the uncommitted `.cargo/config.toml` at mere's root; copy
-`.cargo/config.toml.example` and edit from there. Two standing rules that file
-records, both learned the hard way:
+Genet checkout in the uncommitted `.cargo/config.local.toml` at Mere's root;
+copy `.cargo/config.toml.example` and edit from there. Invoke it explicitly
+through `python scripts/cargo_mode.py local <cargo arguments>`, which uses a
+separate `.cargo/local/Cargo.lock`. Ordinary Cargo must not inherit these
+machine-local redirects. Two standing rules still apply:
 
 - a patch table that redirects a git source must name **every** package the
   graph pulls from it, or half the family resolves from the git checkout and
@@ -27,9 +29,13 @@ Genet seam release is on the pinned revision.
 The crates.io `parley` patch must also point at the selected Genet checkout's
 `support/patches/parley` during local engine work. A Git-source redirect alone
 does not replace this separate patch entry. For shipping verification, invoke
-Cargo from outside the repository with `--manifest-path` so its ignored local
-config is not inherited, and inspect resolved package sources. A successful local
-patch build cannot establish that the committed Genet and Netrender pins agree.
+ordinary Cargo from the owning workspace with redirect-free automatic configs
+and inspect resolved package sources. `python scripts/cargo_mode.py verify --metadata-only`
+checks that portable configuration and the tracked lock;
+without `--metadata-only` it also checks all workspace targets. Running outside
+the repository is not a substitute for inspecting inherited parent/Cargo-home
+configuration. A local patch build cannot establish that committed Genet and
+Netrender pins agree.
 
 ## 2026-09-16 — netrender T4 receipt: the retained-fragment path is dead code in Cambium
 
