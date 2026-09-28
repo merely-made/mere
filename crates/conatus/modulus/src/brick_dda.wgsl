@@ -77,17 +77,16 @@ fn brick_ray_box(
     return vec2(enter, exit);
 }
 
-fn brick_initial_crossing(
-    position: f32,
-    direction: f32,
-    voxel: i32,
-    start_t: f32,
-) -> f32 {
+// When the ray leaves `voxel` along one axis, measured from the eye. Each
+// crossing is taken afresh rather than added to the one before, so its error
+// is one subtraction's and one division's however long the walk, and the
+// walk steps the same way from a voxel wherever it began.
+fn brick_crossing(origin: f32, direction: f32, voxel: i32) -> f32 {
     if (direction > 1e-6) {
-        return start_t + (f32(voxel + 1) - position) / direction;
+        return (f32(voxel + 1) - origin) / direction;
     }
     if (direction < -1e-6) {
-        return start_t + (f32(voxel) - position) / direction;
+        return (f32(voxel) - origin) / direction;
     }
     return 1e30;
 }
@@ -99,26 +98,27 @@ fn brick_dda(
     direction: vec3<f32>,
 ) -> BrickHit {
     let interval = brick_ray_box(space, far, eye, direction);
-    if (interval.x > interval.y || interval.y < 0.0) {
+    let start_t = max(interval.x, 0.0) + 0.0001;
+    if (interval.x > interval.y || start_t > interval.y) {
         return BrickHit(0u, far, vec3(0.0, 1.0, 0.0), false);
     }
-    let start_t = max(interval.x, 0.0) + 0.0001;
-    let start = eye + direction * start_t;
-    var voxel = vec3<i32>(floor(start));
+    // The walk starts the offset past where the ray enters. Far from the
+    // eye that offset is below f32's resolution and the start can round
+    // onto or past the entry face, so the first voxel is clamped into the
+    // pointer volume; a ray whose path through it is shorter than the
+    // offset has missed it.
+    let low = vec3<i32>(space.world_min.xyz);
+    let high = low + vec3<i32>(space.pointer_extent.xyz) * 8 - vec3(1);
+    var voxel = clamp(vec3<i32>(floor(eye + direction * start_t)), low, high);
     let step = vec3<i32>(
         select(-1, 1, direction.x >= 0.0),
         select(-1, 1, direction.y >= 0.0),
         select(-1, 1, direction.z >= 0.0),
     );
     var crossing = vec3(
-        brick_initial_crossing(start.x, direction.x, voxel.x, start_t),
-        brick_initial_crossing(start.y, direction.y, voxel.y, start_t),
-        brick_initial_crossing(start.z, direction.z, voxel.z, start_t),
-    );
-    let delta = vec3(
-        select(1e30, 1.0 / abs(direction.x), abs(direction.x) > 1e-6),
-        select(1e30, 1.0 / abs(direction.y), abs(direction.y) > 1e-6),
-        select(1e30, 1.0 / abs(direction.z), abs(direction.z) > 1e-6),
+        brick_crossing(eye.x, direction.x, voxel.x),
+        brick_crossing(eye.y, direction.y, voxel.y),
+        brick_crossing(eye.z, direction.z, voxel.z),
     );
     var t = start_t;
     var normal = vec3(0.0, 1.0, 0.0);
@@ -129,18 +129,18 @@ fn brick_dda(
         }
         if (crossing.x <= crossing.y && crossing.x <= crossing.z) {
             t = crossing.x;
-            crossing.x = crossing.x + delta.x;
             voxel.x = voxel.x + step.x;
+            crossing.x = brick_crossing(eye.x, direction.x, voxel.x);
             normal = vec3(-f32(step.x), 0.0, 0.0);
         } else if (crossing.y <= crossing.z) {
             t = crossing.y;
-            crossing.y = crossing.y + delta.y;
             voxel.y = voxel.y + step.y;
+            crossing.y = brick_crossing(eye.y, direction.y, voxel.y);
             normal = vec3(0.0, -f32(step.y), 0.0);
         } else {
             t = crossing.z;
-            crossing.z = crossing.z + delta.z;
             voxel.z = voxel.z + step.z;
+            crossing.z = brick_crossing(eye.z, direction.z, voxel.z);
             normal = vec3(0.0, 0.0, -f32(step.z));
         }
         if (t > interval.y || t > far) {

@@ -234,3 +234,12 @@ The claims checked:
   wrapper blanking the frame at netrender `aba7d837`, and how each frame
   changed on the re-run. These are renderer behaviour seen in captures; the
   fixes were checked.
+
+
+### 2026-09-27 ruling follow-up
+
+Mark approved Mesquite ownership and proceeding to phase 4. The one-tree
+plan and producer receipt now distinguish that architectural acceptance from
+open stack performance and live physics. The Mesquite integration receipt
+adds 51 native tests and two headed browser passes; its four captures were
+inspected. The earlier audit counts remain historical.

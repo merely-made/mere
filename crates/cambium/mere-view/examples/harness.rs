@@ -21,15 +21,16 @@
 //! `act` one of `decline-next`, `empty`, `unavailable`, `building`, `ready`
 //! and `theme-dark`.
 
+use mesquite::{CaptureRecord, LaneConfig};
 use std::cell::RefCell;
 use std::collections::{BTreeMap, BTreeSet};
 use std::hash::{DefaultHasher, Hash, Hasher};
 use std::rc::Rc;
+use taproot::ProbeSnapshot;
 
 use cambium::{GRAPH_CANVAS_SWATCH_CSS, Key, KeyEvent, NamedKey};
 use cambium_genet_winit_host::{
-    AppCtx, CaptureRecord, CloseDisposition, HostHooks, HostOptions, Init, LaneApp, LaneConfig,
-    ProbeSnapshot, Runner, ScenarioLane, WindowFrame, run,
+    AppCtx, CloseDisposition, HostHooks, HostOptions, Init, Runner, WindowFrame, run,
 };
 use incipit::SessionId;
 use layout_dom_api::{LayoutDom, LocalName, Namespace};
@@ -417,12 +418,24 @@ fn count_attr(runner: &Runner<Harness, Logic, Child>, name: &str) -> usize {
     walk(&dom, runner.root(), &LocalName::from(name))
 }
 
-impl LaneApp<Harness, Logic, Child> for HarnessLane {
+impl mesquite::Product for HarnessLane {
+    type State = Harness;
+    type Logic = Logic;
+    type View = Child;
+    const KIND: &'static str = "mere-view";
+    const SURFACE: &'static str = "app";
+    const LOG_PREFIX: &'static str = "mere-view";
+
     fn sheet(&self) -> &str {
         &self.sheet
     }
 
-    fn snapshot(&self, ctx: &AppCtx<'_, Harness, Logic, Child>) -> ProbeSnapshot {
+    fn snapshot(
+        &self,
+        ctx: &AppCtx<'_, Harness, Logic, Child>,
+        _captures: usize,
+        _: f32,
+    ) -> ProbeSnapshot {
         let harness = ctx.runner.state();
         let model = &harness.model;
         let open: Vec<&str> = model
@@ -530,6 +543,7 @@ impl LaneApp<Harness, Logic, Child> for HarnessLane {
     fn app_step(
         &mut self,
         ctx: &mut AppCtx<'_, Harness, Logic, Child>,
+        _checkpoints: mesquite::Checkpoints<'_>,
         line: &str,
     ) -> Result<(), String> {
         let mut parts = line.split_whitespace();
@@ -564,7 +578,11 @@ impl LaneApp<Harness, Logic, Child> for HarnessLane {
         Ok(())
     }
 
-    fn busy(&mut self, _ctx: &mut AppCtx<'_, Harness, Logic, Child>) -> Option<bool> {
+    fn busy_mut(
+        &mut self,
+        _ctx: &mut AppCtx<'_, Harness, Logic, Child>,
+        _capture_pending: bool,
+    ) -> Option<bool> {
         Some(false)
     }
 
@@ -585,11 +603,12 @@ impl LaneApp<Harness, Logic, Child> for HarnessLane {
 fn main() {
     let lane = LaneConfig::from_env("MERE_VIEW").map(|config| {
         let path = config.scenario.display().to_string();
-        let lane = ScenarioLane::new(
+        let lane = mesquite::Lane::from_config(
             config,
             HarnessLane {
                 sheet: sheet(LIGHT),
             },
+            cambium_genet_winit_host::read_file,
         )
         .unwrap_or_else(|error| panic!("{error}"));
         eprintln!("[mere-view] scenario armed: {path}");
@@ -618,7 +637,7 @@ fn main() {
         after_dispatch: Box::new(|_ctx| {}),
         after_frame: Box::new(move |ctx: &mut AppCtx<'_, Harness, Logic, Child>| {
             if let Some(lane) = after_frame_lane.borrow_mut().as_mut() {
-                lane.drive(ctx);
+                lane.after_frame(ctx);
             }
         }),
         after_wake: Box::new(|_ctx| {}),

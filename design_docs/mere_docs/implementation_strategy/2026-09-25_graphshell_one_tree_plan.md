@@ -3,8 +3,9 @@
 **Date:** 2026-09-25
 **Status:** in progress, ruled 2026-09-25 (reservoir plan §7 items 39 and
 40). Phases 1 and 2, accessibility in the browser and the file seam, were
-done on 2026-09-26; phase 3, the canvas as a producer, is under headed
-verification. Mark's ruling on its timings still gates phase 4.
+done on 2026-09-26. Phase 3 has headed correctness receipts. On 2026-09-27
+Mark approved proceeding to phase 4, with stack performance and live physics
+explicitly open.
 **Scope:** Graphshell's browser page becomes one retained Cambium tree. Its
 HTML controls become Cambium components, its display-only Cambium chrome
 joins them, pictograph's canvas renders into the tree as a texture producer,
@@ -119,6 +120,21 @@ Phase 3's rulings, 2026-09-26:
   the 2,000-node scenarios time 30-frame windows with 60 frames to settle,
   the same on both pages. The alternatives were a release build, or the dev
   build with pictograph, netrender, Vello, genet and Cambium optimized.
+
+Phase 3 follow-up rulings, 2026-09-27:
+- **The shared runner.** Mark approved Mesquite as the owner, superseding
+  the unpublished rootstock lift above. The browser supplies asynchronous
+  readback; Mesquite owns driving, captures, checks and completion.
+- **Proceed to Cambium.** Mark accepts the proof as grounds to begin phase 4.
+  This is architectural acceptance, not performance acceptance: Cambium,
+  Mere and Genet still need work. The earlier requirement to wait for a
+  ruling on the numbers is now satisfied.
+- **Physics remains live work.** The recorded windows use paused analytic
+  layouts. They prove neither simulation cost nor moving-graph behavior.
+  Phase 4 must exercise live stepping, dragging while moving, pause/resume,
+  and settling, with frame pacing and simulation cost recorded separately.
+  Paused rendering already takes about 1.5 seconds at 2,000 nodes, so that
+  cost must be investigated independently of physics.
 
 ## 2. Findings (verified 2026-09-25)
 
@@ -427,6 +443,8 @@ this tree.
   device pixels while the presenter uses 1x, and the tree fixture has pacing
   outliers. The [full receipt](../testing/2026-09-27_graphshell_producer_receipt.md)
   records p95, dimensions, artifact hashes and limitations.
-  Current main now uses Mesquite for shared scenario execution; the
-  unpublished rootstock lane lift must be reconciled before integration.
-  Mark's ruling on performance still gates phase 4, which has not begun.
+  Current main uses Mesquite for shared scenario execution. The follow-up
+  integrates its lane with browser asynchronous captures and removes the
+  unpublished rootstock runner.
+  Mark has since approved Mesquite and proceeding to phase 4, with
+  performance and live physics explicitly open (see the follow-up rulings).

@@ -28,13 +28,15 @@
 //! as size + digest, which is how the receipt can claim a frame was really
 //! drawn (and, after a resize, really redrawn at the new size).
 //!
-//! The scenario runs on the host's [`ScenarioLane`]; this file supplies only
-//! the smoke's own half through [`LaneApp`], and is the reference for how an
+//! The scenario runs on the shared [`mesquite::Lane`]; this file supplies only
+//! the smoke's own half through [`mesquite::Product`], and is the reference for how an
 //! application does that.
 
+use mesquite::{CaptureRecord, LaneConfig};
 use std::cell::RefCell;
 use std::collections::BTreeSet;
 use std::rc::Rc;
+use taproot::ProbeSnapshot;
 
 use cambium::{
     AnyView, GenetCtx, GenetElement, PointerEvent, PointerPhase, WheelEvent, clickable, el,
@@ -43,8 +45,7 @@ use cambium::{
 #[cfg(not(target_os = "macos"))]
 use cambium_genet_winit_host::WindowCommands;
 use cambium_genet_winit_host::{
-    AppCtx, AppFrameInsets, CaptureRecord, Frame, HostHooks, HostOptions, Init, LaneApp,
-    LaneConfig, ProbeSnapshot, Runner, ScenarioLane, WindowFrame, run,
+    AppCtx, AppFrameInsets, Frame, HostHooks, HostOptions, Init, Runner, WindowFrame, run,
 };
 
 // ------------------------------------------------------------------ state
@@ -251,12 +252,24 @@ struct SmokeLane {
     release_file: Option<std::path::PathBuf>,
 }
 
-impl LaneApp<Smoke, Logic, Child> for SmokeLane {
+impl mesquite::Product for SmokeLane {
+    type State = Smoke;
+    type Logic = Logic;
+    type View = Child;
+    const KIND: &'static str = "host-smoke";
+    const SURFACE: &'static str = "app";
+    const LOG_PREFIX: &'static str = "host-smoke";
+
     fn sheet(&self) -> &str {
         SHEET
     }
 
-    fn snapshot(&self, ctx: &AppCtx<'_, Smoke, Logic, Child>) -> ProbeSnapshot {
+    fn snapshot(
+        &self,
+        ctx: &AppCtx<'_, Smoke, Logic, Child>,
+        _captures: usize,
+        _: f32,
+    ) -> ProbeSnapshot {
         let state = ctx.runner.state();
         ProbeSnapshot::default()
             .with_field("clicks", state.clicks.to_string())
@@ -304,6 +317,7 @@ impl LaneApp<Smoke, Logic, Child> for SmokeLane {
     fn app_step(
         &mut self,
         _ctx: &mut AppCtx<'_, Smoke, Logic, Child>,
+        _checkpoints: mesquite::Checkpoints<'_>,
         line: &str,
     ) -> Result<(), String> {
         match line.split_whitespace().next() {
@@ -318,7 +332,11 @@ impl LaneApp<Smoke, Logic, Child> for SmokeLane {
         }
     }
 
-    fn busy(&mut self, _ctx: &mut AppCtx<'_, Smoke, Logic, Child>) -> Option<bool> {
+    fn busy_mut(
+        &mut self,
+        _ctx: &mut AppCtx<'_, Smoke, Logic, Child>,
+        _capture_pending: bool,
+    ) -> Option<bool> {
         Some(
             self.release_file
                 .as_ref()
@@ -420,7 +438,7 @@ fn main() {
     // HOST_SMOKE_SCENARIO, HOST_SMOKE_CAPTURE_DIR and HOST_SMOKE_RECEIPT.
     let lane = LaneConfig::from_env("HOST_SMOKE").map(|config| {
         let path = config.scenario.display().to_string();
-        let lane = ScenarioLane::new(
+        let lane = mesquite::Lane::from_config(
             config,
             SmokeLane {
                 alpha: Vec::new(),
@@ -428,6 +446,7 @@ fn main() {
                 frame_inset: app_frame_inset,
                 release_file: None,
             },
+            cambium_genet_winit_host::read_file,
         )
         .unwrap_or_else(|error| panic!("{error}"));
         eprintln!("[host-smoke] scenario armed: {path}");
@@ -441,7 +460,7 @@ fn main() {
         after_dispatch: Box::new(|_ctx| {}),
         after_frame: Box::new(move |ctx: &mut AppCtx<'_, Smoke, Logic, Child>| {
             if let Some(lane) = after_frame_lane.borrow_mut().as_mut() {
-                lane.drive(ctx);
+                lane.after_frame(ctx);
             }
         }),
         after_wake: Box::new(|_ctx| {}),

@@ -2,7 +2,9 @@
 
 Date: 2026-09-27. Phase 3 of the [one-tree plan](../implementation_strategy/2026-09-25_graphshell_one_tree_plan.md).
 This receipt describes the `reservoir-v2` branch. Integration with main's
-Mesquite runner and Mark's decision on the timings remain separate gates.
+Mesquite integration is separate from these historical measurements. Mark
+approved proceeding to phase 4 on 2026-09-27; performance and live physics
+remain open.
 
 ## Source and build
 
@@ -86,8 +88,9 @@ accounts for 1552.0 ms of CPU work. Culling does not eliminate DOM layout.
 The tree fixture has pacing outliers (steady maximum 460.6 ms despite CPU
 p95 13.7 ms); the receipt does not establish their cause. These are single
 headed runs on the shared machine, not a statistically isolated overhead
-benchmark. The source/runtime correctness gates pass; performance acceptance
-belongs to Mark's phase-3 ruling.
+benchmark. The source/runtime correctness gates pass. Mark accepted this structural
+proof to proceed to Cambium, while explicitly retaining stack performance
+and live physics as work to do.
 
 ## Earlier evidence
 
@@ -100,6 +103,34 @@ pre-culling tree run passed at startup/steady interval medians of
 1499.0/1494.0 ms. Those earlier window labels say `moving`/`idle` despite
 the paused layout; the files are retained as historical evidence.
 
-Current main has moved shared scenario execution to Mesquite. This branch's
-unpublished rootstock scenario lift needs reconciliation before integration;
-this receipt does not claim an integrated main build. Phase 4 has not begun.
+These measurements preceded the Mesquite integration below.
+They do not claim a main-branch build. Phase 4 is now
+authorized; these paused measurements do not establish physics readiness.
+
+
+## Mesquite integration, 2026-09-27
+
+With Mark's approval, `reservoir-v2` integrates main at `815279cf` and
+replaces its unpublished rootstock scenario runner with Mesquite. Mesquite
+owns capture scheduling, validation and completion. The web host supplies
+nonblocking readback; Graphshell publishes pixels and the finished receipt.
+`ProducerContext.core` remains the shared renderer access for the canvas.
+
+Native verification passed 51 tests: 16 winit-host unit tests, 17 scenario
+integration tests, 17 Mesquite tests, and the new delayed-capture regression.
+The regression waits beyond the native eight-frame default and proves that
+completion waits for pixels, happens once, and fails on an injected map
+error. The complete standalone wasm build and bundle generation passed.
+
+Headed `p3_tree_health` (2,000 nodes) and `p3_tree_fixture` both pass under
+Mesquite, with zero page errors, visible pages and two captures each. All
+four images were inspected for graph content; both node picks pass. Fixture
+startup/steady frame interval medians are 18.1/18.3 ms, p95 50.6/58.4 ms.
+These are integration checks, not a new isolated overhead comparison.
+The large health run does not collect timing windows. Physics stays paused.
+
+Evidence is under `Code/testing/mere/scenarios/graphshell-web/p3_mesquite`.
+`mesquite-browser-build.json` records artifact/scenario hashes;
+`mesquite-browser-native.log`, `mesquite-browser-async.log` and
+`mesquite-browser-wasm.log` record build/test results. Existing dependency
+warnings remain. The browser sinks and test instances closed after the runs.
