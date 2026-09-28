@@ -147,7 +147,7 @@ pub(crate) fn launch_binop_int<R: CubeRuntime, O: BinaryOpIntFamily>(
                 address_type!(lhs, rhs, output),
                 vector_size,
                 lhs.into_linear_view_like(&output),
-                rhs.as_linear_view_alias(0),
+                rhs.as_linear_view_alias_like(0, &output),
                 output.clone().into_linear_view(),
                 dtype_to_storage_type(dtype),
             );
