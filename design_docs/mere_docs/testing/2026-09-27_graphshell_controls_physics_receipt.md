@@ -105,16 +105,66 @@ its captures/interaction steps introduce pacing outliers and are not a steady
 performance comparison. GPU timestamp spans include queue idle and must not
 be interpreted as isolated GPU execution cost.
 
+## Genet motion adoption
+
+Genet `27d20d3fc51ac5fcd2a2db231e035a3e06013ae1` was pushed with approval
+and adopted in both Mere manifests and local locks. The root lock is tracked;
+the standalone web lock remains ignored by the existing repository policy.
+The repin includes earlier Genet generated-text, accessibility and positioned
+layout commits. Reader accessibility nodes now supply the new optional
+description field. Unrelated primary-checkout work was preserved.
+
+All 298 targeted native tests pass after the repin: 261 Pictograph unit,
+two headless Vello, 16 host unit, 18 scenario and one asynchronous capture.
+The real Canvas camera test now also checks retained layout generation across
+pan and zoom. The offline locked wasm build passes. Logs are
+`Code/testing/mere/p4-repin-tests.log` and `p4-retained-motion-locked.log`.
+
+`p4_motion_repin_controls/` passes every headed behavior assertion. All three
+whole-frame captures were inspected. The restored capture is byte-identical
+to the earlier `p4_controls_focus/` capture; the moving/held captures are not
+byte-identical and are supported by their behavioral assertions. Bundle SHA256:
+`af8ae8d19b5ce9804d8a53b3b83bafb41721911dcf5d4a485dd5d1ac43f6ae8c`.
+Artifact/lock hashes and capture comparisons are in
+`Code/testing/mere/p4-retained-motion-adoption.json`. Another release build
+was active during this functional run, so its timings are not a comparable
+performance receipt.
+
+After the other jobs exited, separate 14-frame live runs passed at 128 and
+512 nodes. No Cargo/compiler/test job was observed before or after those
+windows; both remained visible and reported no page errors. Captures were
+inspected whole-frame. Counts remain 128/128 and 512/512 total/visible, with
+900 and 3588 paint commands, matching the earlier workload.
+
+| Moving nodes | Earlier interval p50 / p95 ms | Repinned interval p50 / p95 ms | DOM frame p50 before / after | Mutation/restyle p50 after | Physics p50 after |
+| --- | --- | --- | --- | --- | --- |
+| 128 | 141.7 / 158.0 | 96.0 / 98.9 | 66.1 / 24.8 | 61.0 | 0.4 |
+| 512 | 872.0 / 947.5 | 595.0 / 622.9 | 235.5 / 76.6 | 491.6 | 2.1 |
+
+Receipts: `p4_motion_repin_128/` and `p4_motion_repin_512/`, under the same
+scenario evidence directory. Artifact and timing data are also in the adoption
+JSON. These single dev runs show about a 32% lower median interval after the
+Genet repin. They do not isolate the motion commit from the earlier Genet
+changes included in that pin. The majority of remaining time is mutation and
+restyling. The separate restyle fix below is not in these measurements.
+
 ## Open gates
 
 - Genet commit `27d20d3fc51ac5fcd2a2db231e035a3e06013ae1` admits safe retained
   layout for already transformed positioned boxes changing only 2D transform
   or numeric z-index. All 283 Livery tests pass, including four new regressions;
-  disabling the fast path makes its unchanged-layout assertion fail. It has
-  not been pushed or measured downstream in these browser receipts.
-- Restyle code repeatedly computes sibling counts for dirty sibling roots and
-  scans existing invalidation roots. These are possible quadratic costs found
-  in source, not yet isolated by measurement.
+  disabling the fast path makes its unchanged-layout assertion fail. The
+  adoption and bounded downstream timings are recorded above; acceptable
+  large-graph responsiveness remains open.
+- Genet `f2e2850fcc49ade2a00a40c9aef220013336aa0b` is a separate local,
+  unpushed restyle fix. It shares immutable hints, scopes and sibling counts
+  across the batch, coalesces roots once and deduplicates sibling enumeration.
+  All 283 unit and 19 focused integration tests pass, including full-style,
+  mixed mutation, shadow-scope and HTML-hint comparisons. At 64/256 siblings,
+  child visits are 514/2050 and parent lookups 642/2562. Restoring repeated
+  parent-count walks makes the work regression fail (4546/67330 child visits).
+  Independent review is clear. Push approval and browser adoption are pending;
+  traversal counts do not establish a browser frame-time improvement.
 - Browser physics advances one fixed step per rendered frame on the rendering
   thread. Slow rendering therefore slows simulated time and input response.
   Default pairwise exclusion is quadratic. GPU force parity is a separate

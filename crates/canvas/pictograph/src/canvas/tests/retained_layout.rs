@@ -68,9 +68,10 @@ fn real_camera_size_and_class_changes_invalidate_retained_paint() {
     let _ = canvas.frame(800, 600);
     let mut style = node_attr(&canvas, key, "style");
     let mut paint = canvas.node_document.generation();
+    let retained_layout = canvas.node_document.layout_generation();
 
-    // Camera changes affect paint even if a future layout backend can retain
-    // geometry for them. Do not require a full geometry pass for transforms.
+    // The pinned Genet motion path must also admit the real canvas DOM,
+    // including its caption and numeric stacking level.
     for camera in [
         CameraView {
             offset: (425.0, 310.0),
@@ -89,6 +90,7 @@ fn real_camera_size_and_class_changes_invalidate_retained_paint() {
             "a real camera change reaches the node DOM"
         );
         assert!(canvas.node_document.generation() > paint);
+        assert_eq!(canvas.node_document.layout_generation(), retained_layout);
         style = next_style;
         paint = canvas.node_document.generation();
     }
