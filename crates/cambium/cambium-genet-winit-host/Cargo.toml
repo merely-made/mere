@@ -33,9 +33,6 @@ sprigging = { version = "0.2.1", path = "../sprigging" }
 taproot = { workspace = true }
 genet-scripted-dom = { workspace = true }
 genet-winit-host = { workspace = true }
-# The scenario lane writes its captures as PNG; already in the lock through
-# the image stack.
-png = "0.18"
 layout_dom_api = { workspace = true }
 netrender = { workspace = true }
 paint_list_api = { workspace = true }
@@ -47,6 +44,9 @@ genet-render-host = { workspace = true }
 winit = { workspace = true }
 
 [dev-dependencies]
+serde_json = { workspace = true }
+mesquite = { version = "0.1.0", path = "../mesquite" }
+
 # The tests drive the harness by role/label, and read the DOM directly for the
 # assertions the state does not carry.
 layout_dom_api = { workspace = true }

@@ -11,9 +11,7 @@
 //! `zoom`, `opacity`, `resize`, `input-text`, `cost-begin`/`cost-end`).
 
 use cambium_rootstock::{HostPointer, WindowCommand};
-use taproot::{
-    Automatable, Driveable, Hit, ProbeSnapshot, ProbeSurface, Selector, SelectorTarget,
-};
+use taproot::{Automatable, Driveable, Hit, ProbeSnapshot, ProbeSurface, Selector, SelectorTarget};
 
 use crate::{Checkpoints, Ctx, Lane, Product, pixels};
 
@@ -59,9 +57,31 @@ impl<P: Product> Automatable for Probe<'_, '_, P> {
     }
 
     fn snapshot(&self) -> ProbeSnapshot {
-        self.lane
-            .product
-            .snapshot(self.ctx, self.lane.captures.len(), self.lane.opacity)
+        let snapshot =
+            self.lane
+                .product
+                .snapshot(self.ctx, self.lane.captures.len(), self.lane.opacity);
+        if self.lane.script_files.is_some() {
+            snapshot.with_field("captures", self.lane.captures.len().to_string())
+        } else {
+            snapshot
+        }
+    }
+
+    fn click_target(&mut self, selector: &Selector) -> Option<bool> {
+        let accepted = self
+            .lane
+            .clicks
+            .click(self.ctx, selector, |ctx, node, rect| {
+                self.lane.product.target_point(ctx, node, rect)
+            });
+        if !accepted {
+            self.lane
+                .misses
+                .borrow_mut()
+                .push(format!("no current DOM target for {selector:?}"));
+        }
+        Some(accepted)
     }
 
     fn drain_events(&mut self) -> Vec<String> {
@@ -86,7 +106,7 @@ impl<P: Product> Automatable for Probe<'_, '_, P> {
 
     fn busy(&mut self) -> Option<bool> {
         let pending = self.lane.capture_pending();
-        self.lane.product.busy(self.ctx, pending)
+        self.lane.product.busy_mut(self.ctx, pending)
     }
 }
 
@@ -103,6 +123,11 @@ impl<P: Product> Driveable for Probe<'_, '_, P> {
     }
 
     fn app_step(&mut self, line: &str) -> Result<(), String> {
+        if let Some(argument) = line.strip_prefix("file ")
+            && let Some(files) = &mut self.lane.script_files
+        {
+            return files.answer(argument.trim());
+        }
         let words: Vec<_> = line.split_whitespace().collect();
         match words.as_slice() {
             ["cost-begin", name] => self.lane.costs.begin(name)?,
@@ -196,9 +221,15 @@ impl<P: Product> Driveable for Probe<'_, '_, P> {
                 let Lane {
                     product,
                     checkpoints,
+                    clicks,
                     ..
                 } = &mut *self.lane;
-                return product.app_step(self.ctx, Checkpoints(checkpoints), line);
+                return product.app_step_with_clicks(
+                    self.ctx,
+                    Checkpoints(checkpoints),
+                    clicks,
+                    line,
+                );
             },
         }
         Ok(())

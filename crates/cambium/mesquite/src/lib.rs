@@ -21,6 +21,16 @@
 //! grammar adds. That is the [`Product`] trait — a small set of hooks a
 //! consumer implements once, after which [`Lane`] runs the lifecycle.
 //!
+//! [`Lane::from_config`] also supports the established environment variables,
+//! named PNG files, scripted file chooser and `RESULT ok` text sentinel. Native
+//! file reading is supplied by the host. Both formats use the same frame pump,
+//! deferred clicks, capture collection and product acceptance hooks. Text mode
+//! preserves its 120-frame capture grace and accepts uniform nonblank frames;
+//! the JSON constructor defaults to eight frames and detail checks.
+//! `Lane::with_capture_backend` lets a browser supply nonblocking readback
+//! and its own bounded grace period. The product receives pixels through
+//! `Product::inspect` and publishes its receipt through `Product::complete`.
+//!
 //! ```ignore
 //! let mut lane = Lane::new(MyProduct, scenario, receipt, capture, exit_code)
 //!     .with_frame_limit(Some(1800));
@@ -35,7 +45,13 @@ use std::path::PathBuf;
 use cambium_rootstock::{AppCtx, NodeId, meristem_bounds::RootView};
 use taproot::ProbeSnapshot;
 
+mod capture;
+mod scenario;
+pub use capture::{CaptureBackend, Readback};
+pub use scenario::{CaptureRecord, LaneConfig};
 mod checkpoints;
+mod clicks;
+pub use clicks::Clicks;
 mod cost;
 mod lane;
 mod pixels;
@@ -54,10 +70,8 @@ pub type Ctx<'a, P> =
 /// handful of readings that are about the product rather than about driving a
 /// document host.
 ///
-/// Every method except [`snapshot`](Product::snapshot),
-/// [`drain_events`](Product::drain_events) and
-/// [`default_capture_path`](Product::default_capture_path) has a defensible
-/// default, so a new consumer starts with three implementations.
+/// Implement `sheet` and `snapshot` to describe a surface. Other hooks have
+/// defaults and can be added as the product's scenarios need them.
 pub trait Product: Sized {
     /// The host application state the Cambium runner holds.
     type State: 'static;
@@ -74,7 +88,7 @@ pub trait Product: Sized {
     const LOG_PREFIX: &'static str;
 
     /// The stylesheet the retained surface lays out under.
-    fn sheet(&self) -> &'static str;
+    fn sheet(&self) -> &str;
 
     /// A typed read of product state for assertions the DOM cannot express.
     /// `captures` is how many captures have completed; `opacity` is the value
@@ -82,11 +96,15 @@ pub trait Product: Sized {
     fn snapshot(&self, ctx: &Ctx<'_, Self>, captures: usize, opacity: f32) -> ProbeSnapshot;
 
     /// Drain the semantic events emitted since the last call.
-    fn drain_events(&mut self, ctx: &mut Ctx<'_, Self>) -> Vec<String>;
+    fn drain_events(&mut self, _ctx: &mut Ctx<'_, Self>) -> Vec<String> {
+        Vec::new()
+    }
 
     /// Where captures land when a scenario names one without a path. Its file
     /// stem is also the fallback stem for generated capture names.
-    fn default_capture_path(&self) -> PathBuf;
+    fn default_capture_path(&self) -> PathBuf {
+        PathBuf::from("capture.png")
+    }
 
     /// Run one product-named command (the `act <label>` verb). `false` when no
     /// such command exists, so the driver fails loudly. The default refuses
@@ -106,6 +124,42 @@ pub trait Product: Sized {
         None
     }
 
+    /// Mutable quiescence hook for products that advance their own pending work.
+    /// Existing read-only implementations continue through `busy`.
+    fn busy_mut(&mut self, ctx: &mut Ctx<'_, Self>, capture_pending: bool) -> Option<bool> {
+        self.busy(ctx, capture_pending)
+    }
+
+    /// Inspect pixels before the lane releases the native readback.
+    fn inspect(&mut self, _name: &str, _frame: &cambium_rootstock::Frame) {}
+
+    /// Product-specific acceptance checks, applied to either receipt format.
+    fn receipt_checks(&self, _captures: &[CaptureRecord]) -> Vec<String> {
+        Vec::new()
+    }
+
+    /// Product diagnostics included in the text receipt and JSON `product_log`.
+    fn receipt_lines(&self) -> Vec<String> {
+        Vec::new()
+    }
+
+    /// Write product-specific receipts once, after all captures and acceptance
+    /// checks complete. The outcome includes lane failures, not just script
+    /// assertions. An error here also fails the shared receipt and exit code.
+    fn complete(
+        &mut self,
+        _ctx: &mut Ctx<'_, Self>,
+        _outcome: &taproot::Outcome,
+    ) -> Result<(), String> {
+        Ok(())
+    }
+
+    /// Whether completion closes the window. Interactive trials can retain
+    /// their finished state while the lane stops driving it.
+    fn close_on_completion(&self) -> bool {
+        true
+    }
+
     /// The product's rendered viewport, as a pixel mask for capture
     /// comparison. `None` disables pixel checks for that capture.
     fn viewport(&self, ctx: &Ctx<'_, Self>) -> Option<Viewport> {
@@ -113,9 +167,10 @@ pub trait Product: Sized {
         None
     }
 
-    /// Where a click on a matched element should land, given its painted rect
-    /// `[x, y, w, h]`. The default is the rect's centre; a product whose
-    /// viewport is CSS-transformed maps the centre through that transform.
+    /// Where a click on a matched element should land, given its rect
+    /// `[x, y, w, h]`. After scrolling, this is the visible portion of the
+    /// element. The default is the rect's centre; a product whose viewport is
+    /// CSS-transformed maps the centre through that transform.
     fn target_point(&self, ctx: &Ctx<'_, Self>, node: NodeId, rect: [f32; 4]) -> (f32, f32) {
         let _ = (ctx, node);
         (rect[0] + rect[2] * 0.5, rect[1] + rect[3] * 0.5)
@@ -146,6 +201,18 @@ pub trait Product: Sized {
     ) -> Result<(), String> {
         let _ = (ctx, checkpoints);
         Err(format!("unknown scenario step: {line}"))
+    }
+
+    /// Product verbs that resolve to a selector click use the lane's own held
+    /// click queue, so scrolling still blocks the next scenario step.
+    fn app_step_with_clicks(
+        &mut self,
+        ctx: &mut Ctx<'_, Self>,
+        checkpoints: Checkpoints<'_>,
+        _clicks: &mut Clicks,
+        line: &str,
+    ) -> Result<(), String> {
+        self.app_step(ctx, checkpoints, line)
     }
 }
 

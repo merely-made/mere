@@ -24,7 +24,7 @@
 //!
 //! A capture hook reads a presented frame back as a [`PendingFrame`] through
 //! [`capture_into`], where the desktop reads it at once with `read_frame`.
-//! [`WebLane`] is the browser's half of rootstock's scenario lane, built on it.
+//! [`WebCapture`] supplies asynchronous readback to Mesquite's scenario lane.
 //!
 //! ## Off wasm, only the mirror's plan compiles
 //!
@@ -68,7 +68,7 @@ pub use input::{
     wheel_delta_from_dom,
 };
 #[cfg(target_arch = "wasm32")]
-pub use lane::WebLane;
+pub use lane::WebCapture;
 #[cfg(target_arch = "wasm32")]
 pub use mount::{Mounted, mount};
 #[cfg(target_arch = "wasm32")]

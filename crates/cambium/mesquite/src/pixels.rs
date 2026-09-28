@@ -170,7 +170,13 @@ pub fn compare(
     let viewport = a
         .viewport
         .ok_or("pixel check requires a visible product viewport")?;
-    let (a, b) = (read_png(&a.path)?, read_png(&b.path)?);
+    fn saved_path(capture: &Capture) -> Result<&Path, String> {
+        capture
+            .path
+            .as_deref()
+            .ok_or_else(|| format!("capture {} was not saved", capture.name))
+    }
+    let (a, b) = (read_png(saved_path(a)?)?, read_png(saved_path(b)?)?);
     if (a.width, a.height) != (b.width, b.height) {
         return Err("decoded captures have different dimensions".into());
     }

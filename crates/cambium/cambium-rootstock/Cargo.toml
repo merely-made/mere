@@ -41,9 +41,6 @@ cambium-winit = { version = "0.3.0", path = "../cambium-winit" }
 paint_list_api = { workspace = true }
 paint_list_render = { workspace = true }
 layout_dom_api = { workspace = true }
-# The scenario lane's grammar and driver (`src/scenario.rs`), shared by every
-# host so a scenario runs the same on the desktop and in a browser.
-taproot = { workspace = true }
 # The host clock. `std::time::Instant::now()` compiles for
 # wasm32-unknown-unknown and panics when called, so a browser host built on
 # std time would pass every type check and die on its first frame. web_time

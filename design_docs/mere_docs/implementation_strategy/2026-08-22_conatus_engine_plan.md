@@ -12,6 +12,11 @@ bytes (V1b), and `conatus-brick` — the shared sparse-brick ABI both game
 vessels pin — advanced on `codex/conatus-brick-lift` to `bd8f0044`.
 2026-09-26: `modulus`'s shrinking-retarget defect fixed and its atlas sized
 to the card by `AtlasLimits`, ruled by Mark (brick-atlas pass below).
+2026-09-27: `modulus`'s `brick_dda` takes each voxel crossing afresh from the
+eye instead of accumulating it and clamps its first voxel into the pointer
+volume, and the same walk is public on the CPU as `BrickMap::trace`, all
+ruled by Mark (brick-traversal precision pass below); on branch
+`dda-precision`, not yet merged.
 **Scope:** Build the shared spatial runtime. Mesocosm, Paredros, Isometry,
 and Mere projections consume it through product-owned runtime profiles
 instead of incubating spatial machinery in product-local probes.
@@ -552,3 +557,174 @@ in the wing design record (rulings 288 and 289,
   `AtlasLimits`, its tracer fills the limits from the device it owns, and
   Eponym's `StableResidency` can drop its copied `16 * 16 * 512` row
   arithmetic.
+
+## Progress (2026-09-27 brick-traversal precision pass)
+
+Three changes to `modulus`'s shared traversal, ruled by Mark in the wing
+design record (`repos/isometry/mesocosm/design_docs/2026-09-18_wing_design_plan.md`):
+ruling 336 on 2026-09-26 ("Fix it in mere"), from the third round of
+Isometry's board-paging lane (`testing/scene-board-paging/bands.md` on its
+`lane-e-paging` branch), and rulings 361 and 362 on 2026-09-27, from this
+pass's findings. Ruling 337 holds that lane's merge until this lands. Branch
+`dda-precision`.
+
+- **Finding: the walk's crossings drifted.** `brick_dda` measured each
+  axis's first crossing from the start point and then added
+  `1 / |direction|` per step, in f32. Isometry's board starts its rays about
+  1,380 units behind the ground, so the crossings sit near t = 1,700, where
+  an f32 ulp is 1.2e-4. There each addition of 1 / 0.612 rounds down by
+  about 6e-5, while the y crossings, stepping by exactly 2, do not. A ray
+  that passes a y and an x boundary within 5e-4 to 8e-4 of each other steps
+  x first once enough steps have passed. Headroom lengthens the walk, so one
+  spare layer moved 330 texels and two moved 660, and against an exact walk
+  neither picture was right.
+- **The instrument, landed before any fix** (`5c8379d4`,
+  `crates/conatus/modulus/src/traversal_tests.rs` and its
+  `traversal_tests/` files). `mirror.rs` was the shader in f32 on the CPU,
+  operation for operation; since `5e46956a` that walk is the public
+  `BrickMap::trace` (ruling 361, below), and the old walk is frozen in
+  `traversal_tests/accumulated.rs`. `exact.rs` walks the same f32 ray in f64 with
+  every crossing taken from the eye, keeping the shader's rules (the 1e-4
+  start offset, the 1e-6 parallel threshold, the x-then-y-then-z tie order
+  and the 1,024-cell budget), and records each ray's closest call to a tie
+  in f32 ulps. `scenes.rs` rebuilds the probe's 890 by 752 frame bit for bit
+  from its camera, over the probe's pointer box at zero to two spare
+  layers, and seeds a spread of 48 boxes and 98,304 rays from the origin to
+  240,000 voxels out: eyes near, far and inside, grazing rays, rays nearly
+  parallel to an axis, and orthographic bundles. A landing unlike the exact
+  walk's is a *fault* when the ray never came within 3 ulps of a tie, and a
+  *tie* otherwise. On the old shader it reproduces the probe exactly: texel
+  (445, 153) lands one voxel over in x at headroom 1, and 330 texels move at
+  one spare layer and 660 at two.
+- **Candidates measured**, each on the CPU and through its own WGSL on the
+  GPU, over the whole board frame at headroom 0, 1 and 2 and the whole
+  spread. Cost is a board frame at headroom 1 against the old shader, the
+  range over an RTX 4060 and a Radeon 780M through wgpu on Vulkan and DX12.
+  Between runs these timings wander by about ten percent.
+
+  | Crossings | Board faults, headroom 0 / 1 / 2 | Texels moved by 1 / 2 layers | Spread faults | Cost |
+  |---|---|---|---|---|
+  | Accumulated (the old shader) | 2 / 332 / 662 | 330 / 660 | 47 | — |
+  | First crossing plus n steps | 0 / 0 / 0 | 21 / 40 | 44 | −2 to +8% |
+  | **Taken from the eye: `(boundary − eye) / direction`** | **0 / 0 / 0** | **0 / 0** | **0** | **+1.5 to +12%** |
+  | From the eye, times a reciprocal | 0 / 0 / 0 | 0 / 0 | 0 | +1 to +18% |
+  | Re-based at the box entry, accumulated | 0 / 0 / 0 | 8 / 30 | 44 | −1 to +1% |
+  | Re-based at the box entry, from there | 0 / 0 / 0 | 8 / 30 | 44 | +6 to +12% |
+  | From the eye, compared cross-multiplied | 0 / 0 / 0 | 0 / 0 | 0 | +9 to +18% |
+
+  Only crossings taken from the eye leave the walk independent of where it
+  starts. A crossing anchored to the start point or to the box entry still
+  moves texels with headroom, and a re-based origin carries its own
+  rounding, a fault source once the box is 24,000 voxels out. The two
+  re-based candidates start 1e-4 past a rounded entry point, which resolves
+  the start offset near the origin but not far out; the rest keep the old
+  start voxel. None fixes the start offset everywhere (the finding below).
+  Only the three taken from the eye pass the headroom test, and of those
+  the plain division is the simplest and costs least. The re-based,
+  accumulated walk costs nothing but still moves texels, so what the fix
+  costs is the price of passing that test, not a choice between exact
+  candidates.
+- **Landed in `a404cd48`: each crossing is taken from the eye.**
+  `brick_crossing` in `crates/conatus/modulus/src/brick_dda.wgsl` computes
+  `(boundary - eye) / direction` when the walk enters a voxel, and the
+  `delta` vector and `brick_initial_crossing` are gone. Over the whole frame
+  and the whole spread, the new walk has no faults at any headroom and no
+  texel moves with headroom. Every ray it lands differently from the exact
+  walk is within 2 ulps of a tie, all but 2 of them within 1: 46 on the
+  board, 7,640 in the spread. On all four GPU configurations the shipped
+  WGSL lands every board texel where its CPU mirror does, at every
+  headroom. It costs 1.5 to 12 percent more a board frame, 0.02 to 0.08 ms
+  for 669,280 rays. The old walk stays in the tests as their positive
+  control: it asserts the probe's 330 and 660 in the same run that asserts
+  0 and 0 for the shader's walk. The GPU arm runs outside the repository,
+  since `modulus` keeps no GPU dependency; its source and logs are kept as
+  receipts (below). `BRICK_DDA_WGSL`'s rustdoc states the crossing rule.
+- **Finding: the start offset is below f32's resolution past t of about a
+  thousand.** `start_t = enter + 0.0001` lands within an ulp of `enter`
+  once the entry is past about a thousand units, and on `enter` itself past
+  2,048. The walk then starts on the far side of its entry face and steps
+  in through it. It reaches the same voxels, but a ray that hits the voxel
+  just inside the face reports that face instead of the default
+  `(0, 1, 0)`. The GPU fuses `eye + direction * start_t` and so picks the
+  side differently from a CPU mirror: 3,754 (NVIDIA) and 4,093 (AMD) of the
+  spread's 98,304 rays, nearly all of them first-voxel hits and every one a
+  tie against the exact walk, and none on the board. A trial variant that
+  clamps the start voxel into the pointer box, and treats an interval
+  shorter than the offset as empty (as isometer's CPU mirror already does),
+  took those to 10 on every adapter, each a tie, with its cost inside the
+  timings' noise. It went beyond ruling 336 and settles which face a
+  first-voxel hit reports, so it went to Mark, who ruled it in (362,
+  below).
+- **Ruling 361, "Call modulus's walk"** (2026-09-27; landed in
+  `5e46956a`). `modulus` makes its exact CPU mirror of the shader public,
+  and isometer wraps it instead of keeping its own copy.
+  `BrickMap::trace(eye, direction, far) -> BrickTrace`
+  (`crates/conatus/modulus/src/trace.rs`) walks the map's pointer volume
+  and atlas as `brick_dda` walks their textures, in f32 and in the
+  shader's order. `BrickTrace` is `Hit(BrickHit)`, `Clear`, or `Exhausted`
+  when the 1,024-cell budget runs out first, which the shader draws as a
+  miss but a pick should not take for clear air. `BrickHit` is the
+  shader's `BrickHit` (`material`, `t`, `normal`) plus the `voxel`. The ray
+  is taken as the shader takes it, unnormalised and unchecked, so
+  normalisation, error mapping (`Exhausted` to isometer's
+  `TraversalLimit`) and the hit point stay with the product. The move
+  changed no behaviour: the instrument, now driving the public method,
+  gave the numbers of `a404cd48`. `crates/conatus/modulus/tests/trace.rs`
+  tests the walk through the public surface alone.
+- **Ruling 362, "Adopt the clamp"** (2026-09-27; landed in `c3e054d6`).
+  `brick_dda` and `BrickMap::trace` clamp the first voxel into the pointer
+  volume, together, and treat a path through it shorter than the start
+  offset as a miss; without that rule the clamp would turn such a grazing
+  ray into a hit. The exact walk takes the same rule and no longer excuses
+  a first-voxel face difference as a tie, so the instrument counts one as
+  a fault. The board frame is unchanged: no faults, no texel moved by
+  headroom, 46 rays within an ulp of a tie. Over the spread the shader's
+  walk has no faults and lands differently from the exact walk on 146 rays
+  instead of 7,640, every one within an ulp of a tie, while the frozen
+  accumulated walk, which never had the clamp, shows 7,280 faults. On all
+  four GPU configurations the committed shader and `BrickMap::trace` part
+  on none of the board's 2,007,840 rays over the three headrooms and on 10
+  of the spread's 98,304, each within 0.73 ulps of a tie, where before the
+  clamp they parted on 3,754 to 4,093; the harness asserts that every
+  parting is a tie. Against origin/main's shader the recorded runs cost
+  +9.1% (RTX 4060, Vulkan), +13.5% (780M, Vulkan), −1.1% (RTX 4060, DX12)
+  and +14.2% (780M, DX12) a board frame, at most 0.26 ms for 669,280 rays.
+  Repeated runs of the same code on the 780M gave +0.5% to +21.5%, so read
+  that as a few percent to about fourteen, of which the clamp adds nothing
+  measurable.
+- **Cross-multiplied comparisons: not adopted**, as recommended. None of
+  the four GPU configurations divided differently from the CPU walk.
+- **Consumers.** isometer's tracer prepends `BRICK_DDA_WGSL`, so its
+  pictures take both changes at the repin, and every product's pictures
+  move toward the exact walk; their picture receipts are re-recorded then
+  (ruling 336). At the same repin isometer's `trace_ray` in `bricks/ray.rs`
+  drops its copy of the walk for `BrickMap::trace`, keeping only its
+  wrapping (ruling 361). Within this repository no crate consumes the
+  shader, and no existing test's expected values changed.
+- **Receipts, kept out of tree** in
+  `Code/testing/mere/receipts/2026-09-27/dda-precision/`. The five survey
+  logs came from the harness in `survey/`, whose `#[path]` includes name
+  this worktree; `survey/included/` holds those files as they stood when it
+  ran (`mirror.rs` and `scenes.rs` at `5c8379d4`, `exact.rs` at
+  `a404cd48`). `survey2.log` predates its adapter listing and interleaved
+  timing, and `survey3.log` is adapter 0. The clamp logs came from the
+  harness in `clamp/` (its includes in `clamp/included/`, at `c3e054d6`),
+  and each opens with its commit, command and compiler, as does the
+  release run of the ignored `receipt` test. Adapters 0 to 3 are the RTX
+  4060 on Vulkan, the 780M on Vulkan, the RTX 4060 on DX12 and the 780M on
+  DX12. `SHA256SUMS` covers every file there, both harnesses' sources
+  included.
+
+  | File | Bytes | SHA-256 |
+  |---|---|---|
+  | `survey2.log` | 10,311 | `a2aded3b94c102740a1c6307247e24d5c478ac0408746165c723a0d95fcf1c57` |
+  | `survey3.log` | 11,294 | `55481766e56bff75630176ba55234725b11b2c24bd8ead0dd16ee8eedd62d89f` |
+  | `survey-adapter1.log` | 11,312 | `272dc96e03ba5502d79d5e6b6043605d9fc14477a93f916798639e7831394215` |
+  | `survey-adapter2.log` | 11,291 | `d838b2380bf9ee6691124c9ffdd1f56cd5611afb106d1a2e7abd797a2eb5c211` |
+  | `survey-adapter3.log` | 11,282 | `e4e5a864c616da6b5b02af468c367ce2cdc53fdf59a90cfbbaa0a19eba4c0d4f` |
+  | `clamp-adapter0.log` | 1,242 | `e5bdeed49464a81bb03c183772112034275a2e41f8534e470d46ef85480eb209` |
+  | `clamp-adapter1.log` | 1,261 | `9a93d66dfbe13ca5b8de2ff85a8da4e11453a173b7bfcd44b404e7174ded22ec` |
+  | `clamp-adapter2.log` | 1,240 | `1ff0178adafb5aa96b8f52c1342a08a4204750ece9959fc0e8c6184655ed4773` |
+  | `clamp-adapter3.log` | 1,234 | `e87cc1a976398233154d8ee6b15f9e61ab8026d2dd2ed52525cf6015e76d2ed8` |
+  | `modulus-receipt-release.log` | 2,353 | `f3e6436ab7ebe20be2eb793ffa8ff785a152b158e1d68989b8200ff4b88771ed` |
+  | `SHA256SUMS` | 2,612 | `df10dc7594331a5ac3b9d694dc2c83915af3f1dcb767afc3c608428203be4d3f` |

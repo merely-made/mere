@@ -9,14 +9,14 @@
 
 use std::{
     cell::{Cell, RefCell},
-    collections::BTreeMap,
+    collections::{BTreeMap, BTreeSet},
     path::{Path, PathBuf},
     rc::Rc,
 };
 
-use cambium_rootstock::{Frame, read_frame};
-use taproot::{Outcome, Progress, Scenario};
+use crate::{CaptureBackend, Readback, capture::NativeCapture};
 use serde::Serialize;
+use taproot::{Outcome, Progress, Scenario};
 
 use crate::{
     Ctx, Product,
@@ -25,11 +25,9 @@ use crate::{
     probe::Probe,
 };
 
-type Readback = Rc<RefCell<Option<Result<Frame, String>>>>;
-
 struct PendingCapture {
     name: String,
-    path: PathBuf,
+    path: Option<PathBuf>,
     armed: u64,
     readback: Readback,
     viewport: Option<Viewport>,
@@ -39,7 +37,7 @@ struct PendingCapture {
 #[derive(Serialize)]
 pub struct Capture {
     pub(crate) name: String,
-    pub(crate) path: PathBuf,
+    pub(crate) path: Option<PathBuf>,
     pub(crate) width: u32,
     pub(crate) height: u32,
     pub(crate) digest: String,
@@ -63,11 +61,15 @@ pub struct Lane<P: Product> {
     pub(crate) checkpoints: BTreeMap<String, BTreeMap<String, String>>,
     pub(crate) errors: Vec<String>,
     pub(crate) misses: RefCell<Vec<String>>,
+    pub(crate) clicks: crate::Clicks,
     exit_code: Rc<Cell<i32>>,
     frame_limit: Option<u32>,
     frames: u64,
     finished: bool,
     pub(crate) costs: Costs,
+    pub(crate) script_files: Option<crate::scenario::ScriptFiles>,
+    records: Vec<crate::CaptureRecord>,
+    capture_backend: Box<dyn CaptureBackend>,
 }
 
 impl<P: Product> Lane<P> {
@@ -95,12 +97,59 @@ impl<P: Product> Lane<P> {
             checkpoints: BTreeMap::new(),
             errors: Vec::new(),
             misses: RefCell::new(Vec::new()),
+            clicks: crate::Clicks::default(),
             exit_code,
             frame_limit: None,
             frames: 0,
             finished: false,
             costs: Costs::default(),
+            script_files: None,
+            records: Vec::new(),
+            capture_backend: Box::new(NativeCapture),
         }
+    }
+
+    /// Read a scenario using the established environment/path conventions and
+    /// text receipt format. The host supplies native file access; Mesquite owns
+    /// scripted chooser answers, capture timing, and completion.
+    pub fn from_config(
+        config: crate::LaneConfig,
+        product: P,
+        reader: crate::scenario::FileReader,
+    ) -> Result<Self, String> {
+        let text = std::fs::read_to_string(&config.scenario).map_err(|error| {
+            format!("scenario {} unreadable: {error}", config.scenario.display())
+        })?;
+        let scenario = Scenario::parse(&text)
+            .map_err(|error| format!("scenario {} rejected: {error}", config.scenario.display()))?;
+        let mut lane = Self::new(
+            product,
+            Some(scenario),
+            config.receipt_path(),
+            None,
+            Rc::new(Cell::new(0)),
+        );
+        lane.script_files = Some(crate::scenario::ScriptFiles::new(config, reader));
+        Ok(lane)
+    }
+
+    /// Use the host's readback mechanism with the shared capture lifecycle.
+    pub fn with_capture_backend(mut self, backend: impl CaptureBackend + 'static) -> Self {
+        self.capture_backend = Box::new(backend);
+        self
+    }
+
+    pub fn product(&self) -> &P {
+        &self.product
+    }
+    pub fn product_mut(&mut self) -> &mut P {
+        &mut self.product
+    }
+    pub fn captures(&self) -> &[crate::CaptureRecord] {
+        &self.records
+    }
+    pub fn finished(&self) -> bool {
+        self.finished
     }
 
     /// Bounds scenario work. An already requested readback/final capture may
@@ -157,6 +206,7 @@ impl<P: Product> Lane<P> {
             "checkpoints": self.checkpoints, "captures": self.captures,
             "pixel_checks": self.pixel_checks,
             "cost": self.costs.report(),
+            "product_log": self.product.receipt_lines(),
         })
     }
 
@@ -164,6 +214,9 @@ impl<P: Product> Lane<P> {
     pub fn after_frame(&mut self, ctx: &mut Ctx<'_, P>) {
         if self.finished {
             return;
+        }
+        if let Some(files) = &mut self.script_files {
+            files.install(ctx.files);
         }
         self.frames += 1;
         let observation = self.product.cost_observation(ctx);
@@ -178,7 +231,17 @@ impl<P: Product> Lane<P> {
             self.errors.push(why);
         }
         self.collect_capture(ctx);
-        if self.pending.is_none()
+        let clicked = match self.clicks.after_frame(ctx, |ctx, node, rect| {
+            self.product.target_point(ctx, node, rect)
+        }) {
+            Ok(clicked) => clicked,
+            Err(error) => {
+                self.errors.push(error);
+                true
+            },
+        };
+        if !clicked
+            && self.pending.is_none()
             && let Some(mut scenario) = self.scenario.take()
         {
             let progress = scenario.tick(&mut Probe { ctx, lane: self });
@@ -205,7 +268,7 @@ impl<P: Product> Lane<P> {
             if !self.final_armed {
                 self.final_armed = true;
                 if let Some(path) = self.final_capture.clone()
-                    && let Err(why) = self.arm_capture(ctx, "final".into(), path)
+                    && let Err(why) = self.arm_capture(ctx, "final".into(), Some(path))
                 {
                     self.errors.push(why);
                 }
@@ -229,23 +292,21 @@ impl<P: Product> Lane<P> {
         &mut self,
         ctx: &mut Ctx<'_, P>,
         name: String,
-        path: PathBuf,
+        path: Option<PathBuf>,
     ) -> Result<(), String> {
         if self.pending.is_some() || ctx.capture.is_some() {
-            return Err("another native capture is still pending".into());
+            return Err("another capture is still pending".into());
         }
-        if self.captures.iter().any(|capture| capture.path == path) {
+        if let Some(path) = &path
+            && self
+                .records
+                .iter()
+                .any(|capture| capture.file.as_ref() == Some(path))
+        {
             return Err(format!("capture path already used: {}", path.display()));
         }
         let viewport = self.product.viewport(ctx);
-        let readback = Rc::new(RefCell::new(None));
-        let sink = readback.clone();
-        *ctx.capture = Some(Box::new(move |surface, view, width, height| {
-            *sink.borrow_mut() = Some(
-                read_frame(surface, view, width, height)
-                    .ok_or_else(|| "native frame readback failed".to_owned()),
-            );
-        }));
+        let readback = self.capture_backend.arm(ctx.capture);
         self.pending = Some(PendingCapture {
             name,
             path,
@@ -257,16 +318,25 @@ impl<P: Product> Lane<P> {
     }
 
     fn collect_capture(&mut self, ctx: &Ctx<'_, P>) {
-        let Some(pending) = self.pending.take() else {
+        let Some(mut pending) = self.pending.take() else {
             return;
         };
-        let result = pending.readback.borrow_mut().take();
+        let result = (pending.readback)();
         let Some(result) = result else {
-            if self.frames.saturating_sub(pending.armed) > 8 {
-                self.errors.push(format!(
-                    "capture {} never reached a presented frame",
-                    pending.name
-                ));
+            let patience = if self.script_files.is_some() {
+                120
+            } else {
+                self.capture_backend.patience()
+            };
+            if self.frames.saturating_sub(pending.armed) > patience {
+                self.errors.push(if self.script_files.is_some() {
+                    format!(
+                        "capture {} never landed after {patience} frames",
+                        pending.name
+                    )
+                } else {
+                    format!("capture {} never reached a presented frame", pending.name)
+                });
             } else {
                 self.pending = Some(pending);
             }
@@ -289,15 +359,19 @@ impl<P: Product> Lane<P> {
             ));
             return;
         }
-        if let Err(why) = write_png(&pending.path, &frame) {
+        self.product.inspect(&pending.name, &frame);
+        if let Some(path) = &pending.path
+            && let Err(why) = write_png(path, &frame)
+        {
             self.errors.push(format!("capture {}: {why}", pending.name));
             return;
         }
         if frame.is_blank()
-            || !frame
-                .rgba
-                .chunks_exact(4)
-                .any(|pixel| pixel != &frame.rgba[..4])
+            || (self.script_files.is_none()
+                && !frame
+                    .rgba
+                    .chunks_exact(4)
+                    .any(|pixel| pixel != &frame.rgba[..4]))
         {
             self.errors.push(format!(
                 "capture {} contains no visible {} detail",
@@ -309,6 +383,14 @@ impl<P: Product> Lane<P> {
             .product
             .snapshot(ctx, self.captures.len() + 1, self.opacity)
             .fields;
+        self.records.push(crate::CaptureRecord {
+            name: pending.name.clone(),
+            width: frame.width,
+            height: frame.height,
+            digest: frame.digest(),
+            blank: frame.is_blank(),
+            file: pending.path.clone(),
+        });
         self.captures.push(Capture {
             name: pending.name,
             path: pending.path,
@@ -320,13 +402,55 @@ impl<P: Product> Lane<P> {
         });
     }
 
-    pub(crate) fn named_capture(&self, name: &str) -> PathBuf {
-        capture_path(
+    pub(crate) fn named_capture(&self, name: &str) -> Option<PathBuf> {
+        if !self.capture_backend.writes_files() {
+            return None;
+        }
+        if let Some(files) = &self.script_files {
+            return files.capture_path(name);
+        }
+        Some(capture_path(
             name,
             self.final_capture.as_deref(),
             self.receipt.as_deref(),
             &self.product.default_capture_path(),
-        )
+        ))
+    }
+
+    fn text_receipt(&self, ok: bool) -> String {
+        let mut lines = vec![if ok { "RESULT ok" } else { "RESULT fail" }.to_string()];
+        lines.extend(
+            self.outcome
+                .as_ref()
+                .expect("completion requested")
+                .log
+                .iter()
+                .cloned(),
+        );
+        for c in &self.records {
+            lines.push(format!(
+                "capture {} {}x{} digest={:016x}{}{}",
+                c.name,
+                c.width,
+                c.height,
+                c.digest,
+                c.file
+                    .as_ref()
+                    .map(|p| format!(" file={}", p.display()))
+                    .unwrap_or_default(),
+                if c.blank { " BLANK" } else { "" }
+            ));
+        }
+        let blanks = self.records.iter().filter(|c| c.blank).count();
+        let distinct: BTreeSet<_> = self.records.iter().map(|c| c.digest).collect();
+        lines.push(format!(
+            "frames: {} captured, {blanks} blank, {} distinct digests",
+            self.records.len(),
+            distinct.len()
+        ));
+        lines.extend(self.product.receipt_lines());
+        lines.extend(self.errors.iter().map(|e| format!("FAIL: {e}")));
+        lines.join("\n") + "\n"
     }
 
     fn finish(&mut self, ctx: &mut Ctx<'_, P>) {
@@ -335,23 +459,39 @@ impl<P: Product> Lane<P> {
             self.errors.push(why);
         }
         self.errors.extend(self.misses.borrow_mut().drain(..));
+        self.errors
+            .extend(self.product.receipt_checks(&self.records));
         let final_state = self
             .product
             .snapshot(ctx, self.captures.len(), self.opacity);
-        if let Some(error) = final_state.field("error").filter(|value| *value != "none") {
+        if self.script_files.is_none()
+            && let Some(error) = final_state.field("error").filter(|value| *value != "none")
+        {
             self.errors.push(format!("scene producer: {error}"));
         }
         let outcome = self.outcome.as_ref().expect("completion requested");
+        let completion = Outcome {
+            ok: outcome.ok && self.errors.is_empty() && self.exit_code.get() == 0,
+            log: outcome
+                .log
+                .iter()
+                .cloned()
+                .chain(self.errors.iter().map(|error| format!("FAIL: {error}")))
+                .collect(),
+        };
+        if let Err(error) = self.product.complete(ctx, &completion) {
+            self.errors.push(format!("product completion: {error}"));
+        }
         let mut ok = outcome.ok && self.errors.is_empty() && self.exit_code.get() == 0;
-        let receipt = self.receipt_value(ok, &final_state.fields);
-        if let Some(path) = &self.receipt {
-            let result = create_parent(path).and_then(|()| {
-                std::fs::write(
-                    path,
-                    serde_json::to_vec_pretty(&receipt).map_err(|e| e.to_string())?,
-                )
+        let receipt = if self.script_files.is_some() {
+            Ok(self.text_receipt(ok).into_bytes())
+        } else {
+            serde_json::to_vec_pretty(&self.receipt_value(ok, &final_state.fields))
                 .map_err(|e| e.to_string())
-            });
+        };
+        if let Some(path) = &self.receipt {
+            let result = create_parent(path)
+                .and_then(|()| std::fs::write(path, receipt?).map_err(|e| e.to_string()));
             if let Err(why) = result {
                 ok = false;
                 self.errors
@@ -374,7 +514,7 @@ impl<P: Product> Lane<P> {
         if !ok {
             self.exit_code.set(1);
         }
-        *ctx.close = true;
+        *ctx.close |= self.product.close_on_completion();
     }
 }
 

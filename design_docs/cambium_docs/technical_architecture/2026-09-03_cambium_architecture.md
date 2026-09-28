@@ -179,6 +179,76 @@ A view wrapper in the shape of `request_focus` would name the element structural
 would put a layout-dependent request into `GenetAppRunner`, which stays free of layout
 and presentation. Such a wrapper could later be sugar over this request.
 
+**Scenario clicks (2026-09-27).** `AppCtx::visible_rect` exposes the same clipped
+geometry the harness reads. Taproot's optional `Automatable::click_target` hook
+lets a host accept selector delivery without changing the grammar or its default
+pointer path. Mesquite's `Clicks` supplies its `Lane` implementation: a fully
+visible target clicks immediately;
+a clipped target queues `scroll_into_view(Nearest)` and retains its `NodeId`.
+The next frame clicks the visible portion, then holds scenario ticks until that
+pointer dispatch has completed. A target still invisible after the scroll frame
+fails the receipt, including when the click was the scenario's last step.
+Mesquite continues to apply the product's `target_point` transform. Rootstock
+owns clipping and scrolling; it does not depend on Taproot or scenario state.
+
+The below-fold `Far` regression failed before the fix (`count` stayed `0`).
+The original fix passed 13 scenario tests, including tall and unrevealable
+targets and Mesquite's transformed pointer delivery. The
+existing click-scroll suite passes 3 tests, scroll-request suite passes 10, and
+Mesquite's unit suite passes 17.
+These are headless host receipts; native Knot acceptance is recorded in its
+workspace slice plan. Taproot's additive hook is Genet `34626a6c82e` (21 tests).
+Knot `fb09475` consumes this change, with 426 tests passing and 3 ignored across
+its workspace, standalone document and retention gates. Its native step 7c
+receipt shows the below-fold Close site action closing the site and its pages.
+Mere's embedded editor/document pins follow that Knot revision; the resolved
+Genet source is again singular. This dependency-graph check is recorded by
+`cargo tree --offline -p djinn`, separately from the host tests above.
+
+**Runner unification (2026-09-27).** Taproot owns the grammar, selectors and
+assertions. Mesquite owns the single `Lane::after_frame` loop, deferred clicks,
+readback collection, completion, checks and receipts. The winit host supplies
+native input, frame capture and `read_file`; its duplicate `scenario.rs` is
+removed. Knot, the host smoke example and the Mere View harness implement
+`mesquite::Product` directly, including dynamically owned stylesheets.
+
+`Lane::from_config(config, product, host_read_file)` keeps the existing
+`PREFIX_SCENARIO`, `PREFIX_CAPTURE_DIR`, `PREFIX_RECEIPT`, relative `file` and
+`file cancel` commands, sanitized named PNGs, optional capture persistence and
+`RESULT ok`/`RESULT fail` text sentinel. It preserves the 120-frame capture
+patience and nonblank-frame check. `Lane::new` retains JSON receipts, eight-frame
+capture patience and strict detail checks. These are compatibility policies
+inside one lifecycle, not two execution loops. Both routes now share checkpoint,
+resize and capture-comparison commands. Pixel comparisons explain when a capture
+was not saved instead of trying to read a fabricated path.
+
+`Product::inspect`, `receipt_checks` and `receipt_lines` preserve native alpha
+inspection, product acceptance and diagnostics; JSON includes diagnostics in
+`product_log`. `busy_mut` defaults to the existing read-only `busy` hook, so
+current Mesquite products need no migration. `sheet` borrows from the product
+rather than requiring a static string. Native smoke and theme receipts verify
+these hooks; the native Knot site scenario verifies the below-fold closure.
+Validation: 15 scenario integration tests, 17 Mesquite unit tests and 16 host
+unit tests pass. Headed smoke and Mere View theme runs each captured three
+nonblank, distinct frames. Evidence is under
+`testing/knot-editor/images/2026-09-27_7c/unification/` in the workspace.
+Knot `f14f9ef` consumes Mere `8fce5365` and passes 426 tests with 3 ignored
+across workspace, standalone document and retention gates. Its native site run
+passes with three nonblank frames; the final image confirms the site and pages
+closed. Mere's embedded Knot pins follow `f14f9ef`; `cargo tree --offline -p djinn`
+checks dependency lockstep separately from runtime acceptance.
+Other products' independent runners are being migrated separately.
+
+**Consumer completion policy (2026-09-27).** `Product::complete` receives the
+aggregate scenario and lane outcome after capture collection and acceptance
+checks. Products can retain typed durable receipts without owning a second
+frame pump. A completion error fails the shared receipt and exit code.
+`close_on_completion` defaults to closing; interactive trials can keep the
+finished window open without restarting the scenario. Explicit host close
+requests remain respected. The focused gate passes 49 tests (17 Mesquite,
+16 host, 16 scenario), including missing readback propagation, failing product
+completion, and exactly-once completion while the window remains open.
+
 **Which plane moves.** Exactly one: the nearest ancestor whose computed `overflow-y`
 scrolls *and* whose vertical range is positive, otherwise the window viewport. The range
 condition is load-bearing. Knot's `.knot-scroll-preview` and `.knot-workspace` are both
@@ -222,3 +292,40 @@ fail. Validated on Rust 1.97.1, `--offline --locked`: rootstock's 40 tests, the 
 host's 88 across ten suites, cambium's 216, mere-document-lanes with `smolweb` 33, the
 web host checked natively and for wasm32, the format check on the three host crates,
 and the workspace check.
+
+
+## Consumer automation and semantic parity follow-up (2026-09-27)
+
+Accepted order: repin existing Mesquite consumers (Mesocosm native bench,
+Eponym and their Isomere host), migrate Woodshed/Redshank/Cleromancy lifecycle
+code, then reconcile automation selectors with Genet's computed accessible
+names. Isometry's domain self-tests remain product-owned. Turnstone's multiple
+surfaces and Graphshell's browser DOM require separate host adapters.
+
+The shared completion hook is published at Mere `55f5ac62`; the custom-command
+held-click adapter passes the focused 50-test gate (17 Mesquite, 16 host,
+17 scenario integration). `Product::app_step_with_clicks` shares
+the lane queue with product-specific selector verbs, preserving the scroll /
+layout / pointer-dispatch ordering. Existing products default through
+`app_step` and need no method change.
+
+The remaining semantic parity gate must compare names and roles from the same
+owner-computed projection, including referenced labels, without turning a
+passing scenario into a claim of physical screen-reader acceptance. Genet's
+uncommitted accessible-name work remains with its existing owner pending
+coordination. Diagnostics should correlate product state and semantic action
+results with the existing UX event sinks and scenario receipts; avoid inventing
+a second application state model. Consumer acceptance and physical AT receipts
+must remain separately recorded.
+
+Consumer receipts on Mere `8106c7c2` / Genet `34626a6c`: Woodshed migration
+`0f0cdf1` passes 223 product tests and the unchanged `stage_clipping` and
+`nearby_candidates` native scenarios. The former now scrolls its arrangement
+controls into view at requested width 1100; broader Stage layout remains open.
+Cleromancy migration `32a4b94` passes 16 focused tests, an all-target check with
+`analytic-ephemeris`, and native first/reopen with matching durable IDs and card
+content. Mesquite owns captures and completion while each product retains its
+semantic commands and observations. Evidence is under
+`Code/testing/cambium/mesquite-migration`, with captures under the corresponding
+Woodshed and Cleromancy testing directories. These are native automation
+receipts, not new manual screen-reader acceptance.
