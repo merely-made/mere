@@ -239,6 +239,24 @@ closed. Mere's embedded Knot pins follow `f14f9ef`; `cargo tree --offline -p dji
 checks dependency lockstep separately from runtime acceptance.
 Other products' independent runners are being migrated separately.
 
+**Paint capture (2026-09-27).** Rootstock's one-shot `AppCtx::capture_paint`
+returns the final pre-translation `PaintEnvelope` after that frame is presented.
+It includes caret/selection and scrollbar overlays, positioned glyphs and full
+font/image payloads. Failed presentation retains the request for the next frame;
+an unarmed hook does not clone the paint list. Paired pixel and paint callbacks
+receive the same frame. The paint viewport is in layout coordinates; the PNG is
+in physical pixels. External GPU texture commands retain references only.
+
+Mesquite enables paired `.paintlist` sidecars with `MESQUITE_CAPTURE_PAINT=1`
+or `Lane::set_paint_capture(true)`. Each saved PNG receives a postcard-encoded
+`PaintEnvelope` beside it and a `paint_path` in its JSON capture record. Fonts
+are never elided. Missing paired output, serialization/write errors, or an
+existing sidecar fail the receipt; a prior resource packet is never overwritten.
+This opt-in serializes large resources and is excluded from timing acceptance.
+The consumer's scenario and capture provenance establish which real document
+was captured. Rasterizing a packet with external GPU references still needs
+the separate producer import/capture contract.
+
 **Consumer completion policy (2026-09-27).** `Product::complete` receives the
 aggregate scenario and lane outcome after capture collection and acceptance
 checks. Products can retain typed durable receipts without owning a second

@@ -483,3 +483,31 @@ this tree.
   native tests, the locked wasm build and headed controls pass. Seiche's
   bounded elapsed-time core is implemented and tested; Canvas/browser host
   adoption remains pending, distinct from these rendering measurements.
+
+- 2026-09-27: bounded Genet text-bounds publication is in progress. Root and
+  standalone Graphshell web manifests select accepted Genet `7b48f94d7a7`,
+  preserving NetRender `9607d16`, netrender-vello 0.10.1, wgpu 30 and pre.2.
+  This takes the owner-verified text/inline-decoration fixes and retained
+  motion/restyle source, not a new phase-3 policy. Portable dependency
+  classification and focused consumer checks precede publication; see
+  `design_docs/cambium_docs/technical_architecture/genet-compatibility.md`.
+- 2026-09-28: the bounded publication gates above pass with published Genet
+  `7b48f94d`: native host/Cambium/Sprigging all-target checks and standalone
+  Graphshell web Wasm check. Locked metadata and deliberately faulty source
+  controls qualify 1,524 native packages and 527 unfiltered web packages;
+  only the accepted Genet revision and its exact documents/text edge change.
+  Native wgpu 30.0.1 and web wgpu 30.0.0 retain their respective prior locks.
+  NetRender/Vello and pre.2 remain unchanged. This is compile/source evidence;
+  the headed work above remains open. Exact raw/provenance and interrupted
+  checkout-preparation qualifications are linked from the compatibility note.
+- 2026-09-28: integrate `reservoir-v2` with main `5ce144ff`, keeping accepted
+  Genet `7b48f94d` (which includes the motion/restyle fixes). Mesquite retains
+  both asynchronous browser readback and main's paired paint-envelope capture.
+  All 403 native tests, the locked wasm build and headed controls pass on the
+  combined tree. The three control captures are byte-identical to the
+  inspected restyle-adoption captures. Vello compilation was concurrent, so
+  this is functional evidence, not a new performance measurement. Logs,
+  bundle and hashes are under `Code/testing/mere/reservoir-integration*`.
+  The earlier worktree's held phase-3/4 changes are now integrated; product
+  migration, large-graph responsiveness and elapsed-time host adoption remain
+  open. The active primary checkout is left untouched for its current owner.

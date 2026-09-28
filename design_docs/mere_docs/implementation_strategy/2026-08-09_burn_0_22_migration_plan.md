@@ -1,6 +1,13 @@
 # Burn 0.22 Migration Plan
 
+
+**2026-09-27 ruling 380:** the separate pre.2 alias-broadcast repair passed source/control/full-force review; pre.4 carry awaits release. See §13.21.
 **Date**: 2026-08-09
+
+**Baseline comparison annotation (2026-09-27):** the same hardened Seiche
+release gate also fails on preserved pre.2 with the same two assertions and
+reported error. §13.19 records the bounded comparison and exact restoration.
+The observed failure predates migration; numerical acceptance remains open.
 
 **Numerical stop annotation (2026-09-27, S9–S12):** the nine native and
 19 wasm rows, Distillery, Djinn and portable whole-workspace checks pass.
@@ -2048,3 +2055,185 @@ The source-reviewed test changes and five tracked nested locks remain prepared
 WIP rather than accepted implementation. Existing Lane M worktree and stable
 `C:/t/cargo-targets/mere` remain retained for this migration; the GPU slot is
 released and no new worktree, target or Cargo home was created.
+
+### 13.19 Fresh pre.2 Seiche comparison (2026-09-27)
+
+The coordinator released one bounded diagnostic on primary `f4f61d6c`, using
+only the identical Seiche finite/length test hunk from Lane M. The target
+source was clean and matched baseline Git blob
+`39b7e3d47f2a2a46e6ba5181c58d509740706ec4`. Primary LF line endings were
+preserved; Lane M's CRLF bytes normalize to identical tested Rust source.
+There were no active Cargo source redirects or competing compiler/test owner.
+The pre.2 lock remained
+`da0822f516010218b3b163234d9826955add552002cffadf7250b5932add13d4`.
+
+The command matched the failed pre.4 gate exactly:
+`cargo test --release --offline --locked -p seiche --features tensor-burn-wgpu
+-- --test-threads=1 --nocapture`, with Rust 1.98.1, four jobs and the stable
+Mere target. Both sources select discrete GPU 0; neither run sets WGPU backend
+or adapter-name overrides. Current hardware/driver inventory is retained as
+supporting provenance, not a new device-selection claim.
+
+Pre.2 also exits 101 with **85 passed, two failed, one ignored**. The same two
+GPU parity assertions fail, with node-exclusion x relative error
+`1.9973466e0` against `1.0e-3`. All three finite/length controls pass, including
+six non-finite and two unequal-length rejections. Thus the observed failure
+exists in the preserved pre.2 baseline under the same checks; this does not
+prove every output value identical across versions or close numerical
+acceptance. Production algorithms and tolerances remain unchanged.
+
+The wrapper restored the original Seiche bytes in `finally`. Every recorded
+source hash matches its pre-run value, including the original root lock and
+unrelated dirty `document-lanes/src/reader.rs`; primary status returned to
+that reader WIP alone. No dependency download, source redirect or new target,
+Cargo home or worktree was needed. No broader matrix or S13 gate resumed.
+
+External evidence is `s9-seiche-pre2-baseline.log/.json`, its original/tested
+source copies, patch, manifest/lock copies, adapter inventory and
+`s9-seiche-pre2-pre4-comparison.json` in the existing receipt directory. The
+pre.2 raw log SHA-256 is
+`dc875500fdc44d8f13487d9742eb754f39afd5b8eff2c1084d7ccc6a4fb15a1a`.
+
+**Proposed next diagnostic, not executed:** compare the common column-minus-row
+broadcast displacement stage on NdArray and WGPU for the existing 257 positions
+and an asymmetric three-point analytic control. Record complete arrays and
+first mismatch before instrumenting later arithmetic/reduction stages. This
+localizes the shared failure without changing either law or its thresholds.
+The coordinator retains the next release decision.
+
+### 13.20 Displacement capture and alias-layout localization (2026-09-27)
+
+The coordinator released only the displacement-stage diagnostic and read-only
+source localization. Lane M remained at `4673fe30` and root lock `2e85b0ea…`;
+no new rendering closure from primary was absorbed. Temporary test code used
+the same clone/reshape/consume subtraction expression, the existing 257-point
+positions, and an asymmetric three-point analytic control. It recorded every
+input, scalar expected, NdArray and WGPU value for both axes, with n² length
+and finite checks. The prepared Seiche bytes were restored exactly afterward.
+
+NdArray matches scalar expected values bit-for-bit in all four cases. For
+three x coordinates `[-2, 1, 5]`, expected row-major differences are
+`[0,-3,-7, 3,0,-4, 7,4,0]`; WGPU returns
+`[0,-3,-7, 1,1,1, 5,5,5]`. Each three-point axis has six of nine mismatches.
+For 257 points, x has 65,536 of 66,049 mismatches (first row 1, column 1),
+and y has 65,792 (first row 1, column 0). All values are finite. The capture
+test exits 0 because it records rather than asserts parity; this is not an
+acceptance pass. The comparison parser independently rounds logged decimals
+back to f32, checks host subtraction, and detects a planted single-value error
+and a matching control in the same invocation. Independent review recomputed
+all arrays, mismatches, hashes and restoration.
+
+**Source finding.** Pre.4 `ops/tensor.rs::float_sub` delegates to
+`numeric::sub`, then generic `launch_binop::<SubOp>`. Broadcast shape is
+`[n,n]`; neither `[n,1]` nor `[1,n]` votes for a memory-order permutation, so
+logical order remains. The ordinary contiguous reshape path updates metadata,
+while cloning retains the shared handle and copies metadata. The same-view
+predicate examines the handle's six identity/view fields, not tensor shape.
+
+In all three patched same-view arms, output allocation and launch work count
+already use the broadcast shape. The LHS receives
+`into_linear_view_like(&output)`, but RHS receives
+`as_linear_view_alias(0)`. `tensor/base.rs` constructs the latter with
+`LinearViewLayoutLaunch::new()`, omitting a reference shape. CubeCL's linear
+layout chooses broadcast coordinate mapping when a differing reference shape
+is supplied; a contiguous RHS without it uses its own plain indexing.
+Pristine pre.2/pre.4 fresh-output arms broadcast both inputs. Our patched
+pre.2 has the same missing-reference alias construction as patched pre.4.
+This identifies a source defect in the existing local alias branch, not in
+the broadcast output allocation or the six-field identity predicate.
+
+**Candidate, not implemented:** add an alias-aware broadcast-view helper that
+combines `self.as_tensor_alias(input_pos)` with
+`LinearViewLayoutLaunch::from_reference_shape(reference.shape())`, then use
+it for RHS in all three same-view arms. Keep identity comparisons, separate
+output allocation, zero-output handling, memory-order placement and numerical
+thresholds unchanged. Regress actual generic subtraction, float atan2 and an
+integer operation through their respective launchers, including same-buffer
+broadcast, equal-shape alias and independent-allocation controls. Restoring the
+old RHS layout must fail the new regression; unchanged full-force gates must
+then pass before acceptance.
+
+The diagnostic preserves the source-level clone/consume pattern but immediate
+`into_data()` may change materialization/fusion relative to full force laws.
+It does not directly observe handle IDs, reference counts or the executed
+launcher. The source defect and observed pattern are strong localization,
+not proof that every full-force failure is resolved by the candidate.
+No later arithmetic stage or production correction was executed.
+
+The repair-order question is pending: repair pre.2 separately and carry the
+verified correction into pre.4, or repair only the migration lane. This entry
+records no new ruling. Full raw capture/provenance, original/instrumented
+source, four complete array files, comparator controls and source hashes are
+external as `s9-displacement-*`, `s9-localization-pre2-*` and
+`s9-alias-broadcast-source-localization.json` in the existing receipt directory.
+The GPU slot is released; prepared lane changes and stable target are retained.
+
+### 13.21 Ruling 380: repair pre.2 first (2026-09-27)
+
+The user selected **A**, verbatim: `A`. The accepted option was: "Fix pre.2
+separately, then carry the verified correction into pre.4 (recommended). The
+existing bug gets its own tested commit." Authority is Isometry's canonical
+wing design record, ruling 380, on commit `e6583a8`. This supersedes the pending
+repair-order question in §13.20; the historical diagnostic qualification stands.
+
+Implementation starts on primary Mere `be2e710a`, including its published
+rendering closure. The older `f4f61d6c` diagnostic remains evidence for that
+source only. Preserve concurrent `document-lanes/src/reader.rs`, Lane M's
+prepared migration files, all five pre.2 allocation comparisons, separate output
+allocation and existing numerical tolerances. The bounded correction adds an
+alias view with the output reference shape and uses it in the three guarded
+launchers. Nine direct, unfused cases cover subtraction, float atan2 and integer
+XOR, each with broadcast alias, equal-shape alias and separate allocations.
+Verify real handle identity, scalar expected values, output shape/length/finite
+values, fresh output and preserved inputs. An old-layout-only fault must fail
+regression, and the original full Seiche force gates must pass with the finite
+and length checks retained. Independent review precedes the separate pre.2 fix
+commit; carrying it to pre.4 and further migration gates await coordinator release.
+
+Status: authorized, implementation and numerical acceptance pending. Reuse
+`C:/t/cargo-targets/mere`, four jobs, and the existing external receipt directory.
+
+#### Verified pre.2 checkpoint (2026-09-27, ruling 380)
+
+The correction and tests passed independent source/receipt review and coordinator
+acceptance before the separate source commit. `as_linear_view_alias_like` preserves
+input-zero alias binding while supplying the output reference shape; exactly the
+three guarded RHS calls use it. All five pre.2 identity comparisons, separate
+output allocation, force formulas and four existing `1e-3` assertions are unchanged.
+
+Nine direct private-launcher cases passed, with actual logical-view identity,
+output allocation identity, shape, length, finite float values, scalar expected
+values and input-preservation checks. Replacing only the new helper's
+`from_reference_shape(reference.shape())` with `new()` caused exactly the three
+broadcast-alias cases to fail and the other six to pass. Exact byte restoration
+then passed all nine again. This final sequence includes the strengthened
+allocation-identity assertions. Commands use the patched crate's standalone
+manifest, release mode, `--no-default-features --features std,fusion --lib
+kernel::alias_broadcast_tests -- --ignored --test-threads=1 --nocapture`. The
+dev-only dependency is `burn-backend =0.22.0-pre.2` with `cubecl-wgpu,std`.
+
+The current primary root command `cargo test --release --offline --locked -p
+seiche --features tensor-burn-wgpu -- --test-threads=1 --nocapture` passed 87 unit
+and 9 integration tests, with one ignored test. Both formerly failing force
+comparisons executed and passed. The finite/length rejection controls passed.
+After this run, only the direct fixture's fresh-allocation assertions and the
+ordering of its `cfg(test)` module declaration changed; its final direct/control
+sequence was rerun. Production operations and Seiche test bytes stayed identical.
+Exact Seiche-time fixture/module copies were recovered and checked against the
+recorded hashes, preserving this qualification.
+
+Baseline is primary `be2e710a`, root lock SHA-256 `f00fbbfa8207f694e9d9d22edbe3a71d400de1c97a4483e1cf2ed3a0592acb08`.
+The standalone lock remained byte-identical at 417 packages, SHA-256
+`95771a4e7767f993df7f12aa4c18aac2e2d161751428a7f8bdecb0c9ab011a27`.
+Reader WIP retained SHA-256 `69bf981ddc67688327a07488c6ff6485fd0f61c08169b0052a5e622b2ec0f42f`.
+Five exact missing cached crates were downloaded under ruling 378 with archive
+checksums recorded. Failed cache/fixture-compilation attempts remain in receipts
+and are not counted as fault controls. Changed-file formatting was checked;
+five comma suggestions reproduce on pristine HEAD and were preserved.
+
+Full stdout, commands, compiler/device/process context, source hashes, old-layout
+bytes and restoration are sealed by `pre2-repair-checkpoint.json` in the existing
+external receipt directory. Other renderer/headed work could run concurrently:
+these are correctness gates, with no exclusive-GPU or timing claim. The stable
+Mere target remains shared and reusable. Lane M remains parked with its prepared
+files; carrying this accepted correction into pre.4 awaits coordinator release.
