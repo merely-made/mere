@@ -54,9 +54,9 @@ pub use cambium_rootstock::{
     AppCtx, AppFrameInsets, AppHook, AppRegion, CaptureFn, CloseDisposition, CloseRequest,
     CloseRequestHook, Direction, FocusedTextHook, FocusedTextSlot, Frame, FrameHook, FrameProfile,
     Host, HostFont, HostHooks, HostImage, HostOptions, HostPointer, HostWake, HostWindow,
-    IdlePolicy, Init, Key, KeyInterceptHook, KeyPress, Modifiers, NamedKey, RelayoutProfile,
-    Runner, ScrollAlign, ScrollIntoView, Surface, WindowCommand, WindowCommands, WindowFrame,
-    WindowGeometry, ZOOM_LADDER, fit_zoom, ladder_step, read_frame,
+    IdlePolicy, Init, Key, KeyInterceptHook, KeyPress, Modifiers, NamedKey, PaintCaptureFn,
+    RelayoutProfile, Runner, ScrollAlign, ScrollIntoView, Surface, WindowCommand, WindowCommands,
+    WindowFrame, WindowGeometry, ZOOM_LADDER, fit_zoom, ladder_step, read_frame,
 };
 pub use files::{DialogFileChooser, read_file};
 pub use harness::{Harness, inert_hooks};

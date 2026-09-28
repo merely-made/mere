@@ -3129,7 +3129,7 @@ checksum = "edd0f118536f44f5ccd48bcb8b111bdc3de888b58c74639dfb034a357d0f206d"
 [[package]]
 name = "engine-observables-api"
 version = "0.2.0"
-source = "git+https://github.com/merely-made/genet.git?rev=34626a6c82ee19f78609b8ebad8d513d3cc9c4cd#34626a6c82ee19f78609b8ebad8d513d3cc9c4cd"
+source = "git+https://github.com/merely-made/genet.git?rev=7b48f94d7a742840b527205d82a37da958240d73#7b48f94d7a742840b527205d82a37da958240d73"
 dependencies = [
  "genet-paint-types",
  "serde",
@@ -3764,7 +3764,7 @@ dependencies = [
 [[package]]
 name = "genet-paint-types"
 version = "0.2.0"
-source = "git+https://github.com/merely-made/genet.git?rev=34626a6c82ee19f78609b8ebad8d513d3cc9c4cd#34626a6c82ee19f78609b8ebad8d513d3cc9c4cd"
+source = "git+https://github.com/merely-made/genet.git?rev=7b48f94d7a742840b527205d82a37da958240d73#7b48f94d7a742840b527205d82a37da958240d73"
 dependencies = [
  "app_units",
  "euclid",
@@ -3774,7 +3774,7 @@ dependencies = [
 [[package]]
 name = "genet-scripted-dom"
 version = "0.1.2"
-source = "git+https://github.com/merely-made/genet.git?rev=34626a6c82ee19f78609b8ebad8d513d3cc9c4cd#34626a6c82ee19f78609b8ebad8d513d3cc9c4cd"
+source = "git+https://github.com/merely-made/genet.git?rev=7b48f94d7a742840b527205d82a37da958240d73#7b48f94d7a742840b527205d82a37da958240d73"
 dependencies = [
  "engine-observables-api",
  "genet-static-dom",
@@ -3787,7 +3787,7 @@ dependencies = [
 [[package]]
 name = "genet-static-dom"
 version = "0.1.1"
-source = "git+https://github.com/merely-made/genet.git?rev=34626a6c82ee19f78609b8ebad8d513d3cc9c4cd#34626a6c82ee19f78609b8ebad8d513d3cc9c4cd"
+source = "git+https://github.com/merely-made/genet.git?rev=7b48f94d7a742840b527205d82a37da958240d73#7b48f94d7a742840b527205d82a37da958240d73"
 dependencies = [
  "html5ever",
  "layout-dom-api",
@@ -5253,7 +5253,7 @@ dependencies = [
 [[package]]
 name = "layout-dom-api"
 version = "0.1.1"
-source = "git+https://github.com/merely-made/genet.git?rev=34626a6c82ee19f78609b8ebad8d513d3cc9c4cd#34626a6c82ee19f78609b8ebad8d513d3cc9c4cd"
+source = "git+https://github.com/merely-made/genet.git?rev=7b48f94d7a742840b527205d82a37da958240d73#7b48f94d7a742840b527205d82a37da958240d73"
 dependencies = [
  "markup5ever",
  "serde",
@@ -6749,7 +6749,7 @@ dependencies = [
 [[package]]
 name = "paint_list_api"
 version = "0.1.2"
-source = "git+https://github.com/merely-made/netrender.git?rev=c8c09f16bbd729ce932589334eb81f58e418c1bd#c8c09f16bbd729ce932589334eb81f58e418c1bd"
+source = "git+https://github.com/merely-made/netrender.git?rev=9607d16f1907f6c2085648ae96abcaa30d7c3d41#9607d16f1907f6c2085648ae96abcaa30d7c3d41"
 dependencies = [
  "euclid",
  "serde",

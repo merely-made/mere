@@ -1,9 +1,17 @@
 # Burn 0.22 Migration Plan
 
+**2026-09-28 reconciliation checkpoint:** merge of committed main `5ce144ff`
+into Lane M `a7c477e7` is prepared but uncommitted. Graph, workspace, Distillery,
+Djinn, remote-fixture and web checks pass after three optional-field API
+adoptions. A rootstock scroll assertion fails identically on untouched main;
+acceptance and S13 remain held. See §13.24. This dated status supersedes the
+earlier continuation banners without changing their historical words.
+
 
 **2026-09-27 continuation:** remaining Conatus/ESP/Numen GPU and all eight S12 builds pass at the source-qualified `8d308572` checkpoint plus a remote-fixture API adapter; see §13.23. Current pins and seven prepared files are preserved; review precedes their commit.
 
 **2026-09-27 carry update:** ruling 380 pre.2 repair is published; its bounded pre.4 carry passed direct/control, identity and full-force gates (§13.22). Broader migration acceptance remains open.
+**2026-09-27 ruling 380:** the separate pre.2 alias-broadcast repair passed source/control/full-force review; pre.4 carry awaits release. See §13.21.
 **Date**: 2026-08-09
 
 **Localization annotation (2026-09-27):** the bounded displacement capture
@@ -1422,6 +1430,9 @@ From Lane H's scratch diff, compile-checked there:
   row and patch table
   (`design_docs/mere_docs/testing/2026-08-20_burn_0_22_prerelease_closure.md`).
   `MERE-PATCH.md` in the three remaining patches and esp's manifest comment.
+  **2026-09-28 checklist correction:** ruling 375 retains four patch documents,
+  including the manifest-only persistence-off `cubecl-runtime` patch; the
+  historical count of three and S14 retirement wording no longer govern.
   The probe and repro READMEs and the `UPSTREAM_ISSUE.md` files. The
   feature/target matrix
   (`design_docs/intel_docs/technical_architecture/2026-08-09_feature_target_matrix.md`).
@@ -2415,3 +2426,94 @@ fixture adapter and owning docs. No new source acceptance, S13, renderer
 reconciliation or main integration follows automatically. The existing Lane M
 worktree remains needed; the stable Mere target is released to the waiting
 consumer lane. No isolated Cargo home or alternate target was created.
+
+### 13.24 Current-main reconciliation checkpoint (2026-09-28; held)
+
+The accepted §13.23 checkpoint was committed and pushed as `a7c477e7`.
+The next authorized slice merges exact committed main
+`5ce144ffe58945746b7dabc21de499725219beaf`, retaining history and excluding
+primary's raw `reader.rs` work. The merge is prepared in the existing Lane M
+worktree and is not committed or accepted. Evidence lives under
+`Code/testing/mere/receipts/2026-09-28/burn-pre4-reconcile`.
+
+The overlapping pre.2 repair on main is already represented by the verified
+pre.4 carry. All Lane M patch bytes, including the six-field identity helper
+`de7f79a4…`, are preserved. Twelve incoming renderer, capture and publication
+paths match committed main after newline normalization. The root manifest's
+three-way semantic merge is checked leaf by leaf. Both dated documentation
+histories are retained.
+
+The root lock grows from 1,657 to 1,660 packages: 38 identities enter, 35 leave,
+and 22 retained package blocks change. The new identities comprise 33 Genet,
+four NetRender and registry `netrender-vello 0.10.1`; the latter replaces
+0.10.0. Current workspace Genet is `7b48f94d` and NetRender `9607d16f`.
+The old Genet Fleece/layout API identities remain under the unchanged Knot
+pin, as they do on accepted main; they are not an extra workspace repin.
+There is one root WGPU (30.0.1), 62 unique Burn/CubeCL/Cubek packages, and no
+pre.2 family or root-lock Turso. Production Distillery, Conatus and ESP BERT
+feature trees select the patched runtime without persistence or Turso. The
+same detector finds Turso and three persistence occurrences in the fresh
+standalone WGPU positive-control tree. The standalone default forward tree
+alone did not expose runtime persistence and is not used as that control.
+
+Numen, Seiche and Conatus complete lock cones are unchanged. Conatus's selected
+feature tree is identical to its earlier accepted tree. ESP's changed optional
+Genet nodes are absent from the selected BERT GPU graph; its minimal graph
+still selects neither Burn nor tokenizers. The numerical implementation and
+patch bytes are unchanged, so the prior source-qualified numerical receipts
+remain applicable without repeating those runs. This is a selected-graph
+qualification, not a claim that every feature combination is unchanged.
+
+Two initial whole-workspace attempts exposed the new optional accessibility
+description field. Lane M adopts exactly the Genet owner's committed
+`mere-adoption.patch` in its 2026-09-26 accessible-name receipt: two
+`description: None` reader initializers. One web-host blank test initializer
+needs the same field. `api-adaptation-verification.json` proves the exact
+three-line delta and owner patch identity. The primary reader's raw hash
+`69bf981d…` remains untouched; it does not contain these fields. Earlier
+wording that attributed the adoption to primary WIP was incorrect.
+The focused reader all-targets check, all six web-host tests and changed-file
+format check pass. The final whole-workspace `cargo_mode.py verify` passes.
+
+Distillery's four-feature all-targets check, both remote lease tests, Djinn's
+trainer check, and all 17 Mesquite tests pass. The affected remote fixture
+build passes. Only its lock among the eight previous S12 roots contains the
+changed renderer identities: exactly five Genet and one NetRender source
+substitution, with the count unchanged at 982. The initial targeted solver
+also moved `data-encoding-macro-internal`'s edge from `syn 3.0.4` to 1.0.109.
+That unnecessary variant is retained externally, not accepted. The narrower
+candidate preserves the original 3.0.4 edge and passes unchanged offline,
+locked metadata. The earlier claim that 1.0.109 matched root was incorrect;
+current root uses 3.0.6. All seven unaffected nested/standalone locks retain
+their accepted bytes and qualifications.
+
+The ignored Graphshell web lock is copied byte-for-byte from the accepted main
+publication (`be471fff…`) after checking identical manifests. Fresh locked
+metadata resolves 527 packages, including 18 current Genet packages and no
+Burn family or outside path. The Wasm check passes with the recorded
+`getrandom_backend="wasm_js"` configuration. The remote feature tree contains
+the patched runtime and excludes persistence/Turso. Full command, compiler,
+environment, source, lock and separate stdout/stderr evidence is retained.
+Every command uses explicit Rust 1.98.1, four jobs, offline mode and
+`C:/t/cargo-targets/mere`; no cache download, alternate target or home is added.
+
+**Unresolved acceptance gate:** the complete rootstock suite reports 40 passes
+and one failure in
+`equal_hover_cascade_retains_geometry_text_generation_and_scroll`: the element
+offset is `(0, 0)` instead of the unchanged expected `(0, 12)`. Both GPU
+producer tests pass, but this does not waive the scroll failure. A focused run
+on untouched exact primary `5ce144ff` reproduces the same assertion. Its full
+before/after source and lock maps match, including primary reader raw bytes.
+This locates the failure on the already-published main closure; it does not
+make the behavior acceptable or prove a repair. No assertion, tolerance or
+production behavior is changed. Owner diagnosis and a separately reviewed
+repair remain pending.
+
+`reconciliation-verification.json` verifies 21 passing commands, four preserved
+failed commands, their log hashes and source stability. The failures are the
+two earlier API compile attempts, the rootstock suite and its primary
+comparison; they are not deliberate negative controls. The checkpoint seal
+records final source/docs, locks and receipts. The stable target is released;
+the existing Lane M worktree remains necessary for this held merge. A clean,
+reviewed reconciliation commit must precede S13. No merge acceptance, S13
+execution or integration follows from the independent passing gates.
