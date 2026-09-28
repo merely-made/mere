@@ -475,7 +475,11 @@ this tree.
   141.7 to 96.0 ms (128 nodes) and 872.0 to 595.0 ms (512 nodes), with the
   remaining cost dominated by mutation/restyle. Genet `f2e2850f` separately
   removes repeated batch preparation; 302 tests and a deliberate failing
-  work-count control support it, but it is local pending push approval.
+  work-count control support it. It is now pushed with approval and adopted.
   The controls/physics receipt records exact pins, artifact hashes and
-  qualifications. The inventory records bounded elapsed-time physics as
-  proposed follow-on work, distinct from these rendering measurements.
+  qualifications. After adoption, live medians are 73.8 ms at 128 nodes and
+  251.4 ms at 512 nodes. The 2,000-node live run now completes with a visible
+  graph at 1365.0 ms median; acceptable responsiveness remains open. All 403
+  native tests, the locked wasm build and headed controls pass. Seiche's
+  bounded elapsed-time core is implemented and tested; Canvas/browser host
+  adoption remains pending, distinct from these rendering measurements.

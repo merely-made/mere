@@ -148,6 +148,50 @@ Genet repin. They do not isolate the motion commit from the earlier Genet
 changes included in that pin. The majority of remaining time is mutation and
 restyling. The separate restyle fix below is not in these measurements.
 
+## Genet restyle adoption and elapsed-time core
+
+Genet `f2e2850fcc49ade2a00a40c9aef220013336aa0b` is pushed and adopted in
+both manifests and locks. The native gate passes 403 tests: 261 Pictograph,
+two headless Vello, 88 Seiche and 52 host/Mesquite tests. The offline locked
+wasm build passes. Logs: `Code/testing/mere/p4-restyle-tests.log` and
+`p4-restyle-locked.log`. The initial native run regenerated the root lock;
+the subsequent wasm verification used its existing lock.
+
+The latest headed controls run, `p4_restyle_controls/`, passes every behavior
+assertion, exposes all nine named toolbar buttons and reports no page errors.
+Its held, paused and restored captures were inspected whole-frame. Separate
+14-frame live windows pass at 128, 512 and 2,000 nodes, with all graph captures
+inspected. No concurrent compiler/test job was observed during these timing
+windows. These retain the same dev-build and viewport qualifications above.
+
+| Moving nodes | Interval p50 / p95 ms | Physics p50 | Mutation/restyle p50 | DOM frame p50 |
+| --- | --- | --- | --- | --- |
+| 128 | 73.8 / 78.1 | 0.4 | 39.5 | 24.7 |
+| 512 | 251.4 / 261.2 | 2.0 | 151.1 | 76.4 |
+| 2,000 | 1365.0 / 1428.1 | 21.6 | 960.8 | 287.8 |
+
+The 512-node median falls about 58% from the preceding 595.0 ms run. DOM
+frame cost is almost unchanged; mutation/restyle falls from 491.6 to 151.1 ms.
+The 2,000-node live run now completes and draws the graph, but 1.365 seconds
+per frame remains too slow. Its previous timeout supplies no valid timing
+ratio. Total/visible node counts match at each size; paint counts are 900,
+3588 and 14003, unchanged by culling because the graphs are fitted.
+
+Receipts are `p4_restyle_128/`, `p4_restyle_512/`, `p4_restyle_2000/` and
+`p4_restyle_controls/` under `Code/testing/mere/scenarios/graphshell-web/`.
+Hashes, locks, timing data and build provenance are recorded in
+`Code/testing/mere/p4-restyle-adoption.json`. Bundle SHA256:
+`ce13a33fdbcfa6668470790f3a8451f36af205e9d2639cac819d98995e9606c5`.
+
+Seiche also gains the additive, caller-timed `Physics::advance_elapsed` API.
+Configurable elapsed and step caps discard excess whole-step debt and retain
+only a substep fraction. Seed, halt and suspension reset that fraction;
+actors retain their own pacing. Twelve focused runtime tests pass with
+default features, eight without default features. Canvas/browser callers
+still use deterministic `advance_frame`, so these browser results do not
+claim elapsed-time physics adoption. The migration inventory records the
+remaining host timestamp, visibility and scenario work.
+
 ## Open gates
 
 - Genet commit `27d20d3fc51ac5fcd2a2db231e035a3e06013ae1` admits safe retained
@@ -156,19 +200,22 @@ restyling. The separate restyle fix below is not in these measurements.
   disabling the fast path makes its unchanged-layout assertion fail. The
   adoption and bounded downstream timings are recorded above; acceptable
   large-graph responsiveness remains open.
-- Genet `f2e2850fcc49ade2a00a40c9aef220013336aa0b` is a separate local,
-  unpushed restyle fix. It shares immutable hints, scopes and sibling counts
+- Genet `f2e2850fcc49ade2a00a40c9aef220013336aa0b` is a separate restyle
+  fix, pushed with approval along with Mere `reservoir-v2` at `68b7c060`.
+  It shares immutable hints, scopes and sibling counts
   across the batch, coalesces roots once and deduplicates sibling enumeration.
   All 283 unit and 19 focused integration tests pass, including full-style,
   mixed mutation, shadow-scope and HTML-hint comparisons. At 64/256 siblings,
   child visits are 514/2050 and parent lookups 642/2562. Restoring repeated
   parent-count walks makes the work regression fail (4546/67330 child visits).
-  Independent review is clear. Push approval and browser adoption are pending;
-  traversal counts do not establish a browser frame-time improvement.
+  Independent review is clear. Browser adoption measurements above confirm
+  a frame-time improvement, while large-graph responsiveness remains open.
 - Browser physics advances one fixed step per rendered frame on the rendering
   thread. Slow rendering therefore slows simulated time and input response.
-  Default pairwise exclusion is quadratic. GPU force parity is a separate
-  unresolved lane; these browser runs use the CPU path.
+  Default pairwise exclusion is quadratic. GPU force parity is outside these
+  browser receipts, which use the CPU path. At 2,000 nodes a single step
+  already exceeds a nominal 16.7 ms frame budget; catch-up caps alone cannot
+  solve that cost.
 - Actual IndexedDB application state, remote sessions and product panels still
   belong to the old presenter. Ctrl+wheel modifiers and middle-button parity,
   all five public wrappers and their product scenarios remain migration work.
