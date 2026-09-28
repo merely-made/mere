@@ -348,3 +348,21 @@ this tree.
   netrender `c8c09f16b` adds `NetrenderOptions::optional_features`, and
   genet `0cf4f30ba0f` forwards it into `RenderCore`'s boot, with a test that
   fails when the forwarding is removed. Mere repinned to both.
+- 2026-09-27: the Vello buffer fix is published as `netrender-vello` 0.10.1.
+  The Mere workspace and standalone graphshell-web manifest now select Genet
+  `92b249af5b200f78d036d8e9b0cb4fe025610740` and netrender
+  `9607d16f1907f6c2085648ae96abcaa30d7c3d41`; pictograph's direct Vello
+  dependency also requires 0.10.1. Portable dependency verification passed;
+  the root lock updates only the relevant Genet/netrender packages and Vello.
+  Pictograph's 247 unit tests and two GPU pixel tests passed with `canvas,vello`.
+  The complete standalone graphshell-web wasm check passed. The separate,
+  uncommitted phase-3 worktree also built for wasm, and wasm-bindgen 0.2.127
+  regenerated its browser bundle. These are compile/test receipts, not headed
+  timing receipts. Logs and resolved lockfiles are under `Code/testing/mere`
+  with the `mere-vello-repin` and `mere-web-vello-repin` prefixes; the phase-3
+  build uses `mere-reservoir-web-vello-repin`. Existing warnings remain.
+  Dynamic buffers grow from asynchronous GPU allocation counts, so an
+  overflowing scene needs later frames to recover and remains device-limited.
+  The previous blank 2,000-node frames provide no valid timing receipt.
+  The two 2,000-node scenarios and the presenter's smaller idle capture still
+  need headed reruns. Pictograph viewport culling remains the next ruled step.
