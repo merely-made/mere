@@ -5,9 +5,16 @@
 **Status:** first diagnostics implementation qualified by focused Mere tests.
 The bounded Apparatus core, optional Mesquite attachment and zero-capacity UX
 recorder repairs are implemented. Turnstone's separate redacted observation copy
-and Gloss/Inspector migration are written but unverified pending dependency pins.
-Worker correlation, exact presented-frame correlation and human accessibility
-acceptance remain open. The June design and receipts are historical evidence.
+and Gloss/Inspector migration are published at Turnstone `d6b62adbd2929e46bde5611bf11f01a34eeeaceb`
+and qualified on the sealed dependency graph.
+Redshank's real persistence worker now qualifies dispatch, execution and
+save-reply correlation, including failed IO and retry. Its 63 desktop tests,
+strict Clippy, deliberate early-durability negative control and bounded native
+receipt passed; code is published at Woodshed `a57085b`. Turnstone passes 612
+workspace tests with nine ignores, five participant checks, 33 UI checks and
+fresh/restarted native migration. Exact presented-frame correlation,
+other worker families and human accessibility acceptance remain open. The June
+design and receipts are historical evidence.
 
 Share bounded observations and causal references across applications, using their
 existing state and event producers. Do not introduce a universal application-event
@@ -21,18 +28,20 @@ attachments, qualified by two different consumers.
 existing `mere-apparatus` package (library `apparatus`).** Reuse that home for
 bounded observations and inspection beneath product-owned views. The name and
 crate home are settled; the core and Mesquite attachment are implemented as
-recorded below, with product qualification still outstanding.
+recorded below, with Turnstone and Redshank qualifying the bounded core.
 The [September consolidation ruling](2026-09-23_crate_consolidation_plan.md)
 requires components to remain modules and reserved homes to receive their actual
-capabilities; two consumers must still qualify the shared contract and dependencies.
+capabilities; these two consumers qualify the bounded contract and dependencies,
+while two complete action/worker/pixel causal receipts remain a later gate.
 
 **Gloss takes the operational overview.** Turnstone's configurable sections can
 combine its minimap and recent visits with downloads, background work, sync and
 items needing attention. Trail retains browsing history, recall and recovery;
-Gloss may compose summaries from those sources. Migrate Steward's useful content
-and then retire its separate pane. Operational actions remain product-owned;
-the current section activation vocabulary needs extending for controls such as
-retry/cancel. This is an accepted direction, not a completed UI migration.
+Gloss may compose summaries from those sources. Turnstone's default is the
+minimap plus Downloads, with configurable sections. Steward's download facts
+move there and its separate runtime pane retires. Operational actions remain
+product-owned; the current Downloads section is read-only. Background/sync
+sections and retry/cancel actions are future extensions with their own gates.
 
 This supersedes the operational-status assignment in the July 18 taxonomy
 (`turnstone/design_docs/2026-07-18_meerkat_harvest.md`). At the naming ruling,
@@ -43,7 +52,8 @@ shows the fields and controls appropriate to the selected subject; graph facets,
 provenance and handling controls retain their product-owned sources and write
 paths. Migrate those capabilities into Inspector before retiring the object-analysis
 Apparatus pane. Application Settings remains separate. Both migrations now have
-source changes, but dependency pins and verification remain pending.
+qualified source changes and native restart receipts. Within-document selection
+inspection and background/sync controls remain later work.
 
 Mere's [Apparatus crate](../../../crates/domain/apparatus/src/lib.rs) now exposes
 a renderer-independent observation store. Its older empty diagnostic groups
@@ -70,7 +80,7 @@ name explicit repository paths; links stay within Mere.
 |---|---|---|
 | [UX events](../../../crates/system/ux-events/src/ux_observability.rs), [registry](../../../crates/system/registry/src/diagnostics/emit.rs) | Observers, probes, channel bridge, schemas and trace/message events | Reuse adapters; graph-specific action/node/surface types are not a universal app vocabulary. |
 | [Cambium/Mesquite](../../../crates/cambium/mesquite/src/lib.rs), [receipt](../../../crates/cambium/mesquite/src/lane.rs) | Snapshots, string events, captures, failures, frame costs | Add optional typed attachments; CPU wall-time costs are not GPU timings. |
-| Turnstone (`turnstone/src/observe.rs`), fanout (`turnstone/src/shell/effects.rs`) | Typed snapshot/AppEvent and existing 128-entry automation copy | A separate Apparatus copy records fixed redacted categories at fanout; automation strings and Trail authority remain preserved. Source written, pins/tests pending. Existing automation omission remains unreported. |
+| Turnstone (`turnstone/src/observe.rs`), fanout (`turnstone/src/shell/effects.rs`) | Typed snapshot/AppEvent and existing 128-entry automation copy | A separate Apparatus copy records fixed redacted categories at fanout; automation strings and Trail authority remain preserved. Sealed pins, product tests and bounded native restart pass. Existing automation omission remains unreported. |
 | Knot (`knot-editor/apps/desktop/src/scenario.rs`), snapshot (`knot-editor/apps/desktop/src/workspace.rs`) | Mesquite document/format/dirty/appearance/message snapshot | Document authority and save/site acceptance remain product-owned; the current adapter is a state projection, not a causal outcome stream. |
 | Woodshed (`woodshed/crates/woodshed-genet/src/scenario.rs`) | Stage/gesture snapshots, string events, drag metrics | Preserve arrangement and gesture meaning; capture-pending busy is not an operation model. |
 | Redshank (`woodshed/ports/redshank/desktop/src/scenario.rs`) | Playback/transcript snapshots, seek requests, worker state | Workers report execution outcomes; desktop/session own stale-result acceptance and model application; persistence owns durable acknowledgment. |
@@ -215,13 +225,27 @@ copy. Count/byte/age settings are configurable per run; one bounded
 `diagnostics.json` is exported only for an explicit shared scenario receipt,
 and export failure changes `scenario.done` to `RESULT fail`. The existing
 automation event stream and Trail remain separate. This adapter and the
-Gloss/Inspector pane migration await dependency pins and verification.
+Gloss/Inspector pane migration pass on Mere `ca2351b3`, Genet `19c20687`, Knot
+`c92ad044` and Woodshed `752c920e`. Turnstone's full workspace/all-target gate
+passes 612 tests with nine ignores; five optional participant and 33 UI checks
+also pass. The normal native binary and fresh/restarted scenarios pass with
+three inspected nonblank captures. Initial retention of two records reports
+eight evictions and gap `[1,9)`; restart retains one record without loss. Saved
+Downloads/Recent order and Inspector's requested viewer override are checked.
+The consumer's `turnstone/design_docs/2026-09-29_shared_diagnostics_gloss_inspector_receipt.md`
+records the source graph, hashes, failures and open gates. Counts overlap and
+must not be summed; requested viewer selection does not qualify Reader completion.
 
-The actual-worker pilot is deferred until Redshank's active owner finishes its
-podcast/task commit. Its later implementation must observe request, execution,
-product acceptance and durable acknowledgment at their owning boundaries.
-Two consumer qualification, rejected/failed/cancelled/stale worker paths, exact
-frame correlation, custom-leaf semantic parity and human AT remain open.
+Redshank's published persistence pilot at Woodshed `a57085b` observes a real
+save request, worker start/outcome and desktop reply handling. Successful
+execution does not advance durability before the existing reply adjudication.
+Its 63 desktop tests, strict Clippy, deliberate early-durability negative
+control and opt-in/default/invalid-setting native receipts pass. The opt-in
+native batch retains two records, reports 16 evictions and a `[1,17)` gap, and
+links execution to reply handling at durable revision 3. See the consumer's
+`woodshed/design_docs/2026-09-29_redshank_persistence_diagnostics_receipt.md`.
+Other worker families, cancelled/stale storage paths,
+exact frame correlation, custom-leaf semantic parity and human AT remain open.
 
 ### Semantic implementation progress, 2026-09-29
 
@@ -265,7 +289,9 @@ the earlier pending source-integration and machine-verification gates. The
 human AT check and custom-leaf parity remain open; the first diagnostics
 implementation and remaining qualification gates are recorded above.
 The Apparatus name/crate home and Gloss operational overview are now ruled above;
-the Gloss and Inspector pane migrations remain outstanding.
+the Gloss and Inspector pane migrations are qualified above. Contributed-pane
+semantic automation is the next designed slice in Turnstone's pane registry plan;
+its scoped retained-layout and admission-generation work is not implemented here.
 
 ---
 
