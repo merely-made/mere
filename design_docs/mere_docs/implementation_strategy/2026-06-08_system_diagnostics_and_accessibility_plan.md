@@ -14,22 +14,37 @@ attachments, qualified by two different consumers.
 
 ### Name and ownership
 
-**Steward is the proposed name, pending Mark's answer**, for shared operational
-observations and inspection beneath product-owned views. It is an existing pane
-name, not a reserved crate. No new package or rename is authorized by this proposal.
+**Ruled by Mark, 2026-09-29: Apparatus is the shared diagnostics library, in the
+existing `mere-apparatus` package (library `apparatus`).** Reuse that home for
+bounded observations and inspection beneath product-owned views. The name and
+crate home are settled; the storage contract and adapters below remain unimplemented.
 The [September consolidation ruling](2026-09-23_crate_consolidation_plan.md)
 requires components to remain modules and reserved homes to receive their actual
-capabilities; placement follows the consumer/dependency proof.
+capabilities; two consumers must still qualify the shared contract and dependencies.
 
-The July 18 taxonomy ruling (`turnstone/design_docs/2026-07-18_meerkat_harvest.md`)
-supersedes June's split: Apparatus analyzes selected graph-object facets and
-handling controls; Inspector examines addressed content and supports clipping;
-Steward owns all operational readouts, synchronous and asynchronous; application
-Settings is separate. The current Apparatus implementation (`turnstone/src/apparatus_pane.rs`)
-follows this ruling. Mere's [Apparatus crate](../../../crates/domain/apparatus/src/lib.rs)
-still emits empty diagnostic groups, without production consumers. Its old scope
-is drift, not evidence of a working shared diagnostics system; the consolidation
-plan now records the unresolved boundary. [Alembic](../../../ports/distillery/alembic/src/lib.rs)
+**Gloss takes the operational overview.** Turnstone's configurable sections can
+combine its minimap and recent visits with downloads, background work, sync and
+items needing attention. Trail retains browsing history, recall and recovery;
+Gloss may compose summaries from those sources. Migrate Steward's useful content
+and then retire its separate pane. Operational actions remain product-owned;
+the current section activation vocabulary needs extending for controls such as
+retry/cancel. This is an accepted direction, not a completed UI migration.
+
+This supersedes the operational-status assignment in the July 18 taxonomy
+(`turnstone/design_docs/2026-07-18_meerkat_harvest.md`). The existing Turnstone
+Apparatus pane still analyzes selected graph-object facets and handling controls.
+**Mark's follow-up assigns that object analysis to Inspector**, alongside its
+inspection of documents and content within them, metadata and clipping. Inspector
+shows the fields and controls appropriate to the selected subject; graph facets,
+provenance and handling controls retain their product-owned sources and write
+paths. Migrate those capabilities into Inspector before retiring the object-analysis
+Apparatus pane. Application Settings remains separate. Both pane migrations are
+pending; these rulings settle their destinations, not their implementation.
+
+Mere's [Apparatus crate](../../../crates/domain/apparatus/src/lib.rs) still emits
+empty diagnostic groups, without production consumers. That skeleton is not
+evidence of a working shared diagnostics system.
+[Alembic](../../../ports/distillery/alembic/src/lib.rs)
 already owns Distillery recall/workshop scope; Eidetic owns retained artifacts;
 [Armillary](../../../crates/armillary/README.md) owns actor execution and messaging.
 
@@ -198,8 +213,9 @@ Rootstock/winit-host/Mesquite tests and the standalone Wasm check passed again.
 Both locks retain every incoming package/version after the Genet substitution;
 the only added dependency edge is Taproot to document-session-api. This closes
 the earlier pending source-integration and machine-verification gates. The
-Steward name, human AT check, custom-leaf parity and diagnostics implementation
-remain open as described above.
+human AT check, custom-leaf parity and diagnostics implementation remain open.
+The Apparatus name/crate home and Gloss operational overview are now ruled above;
+the Gloss and Inspector pane migrations remain outstanding.
 
 ---
 
