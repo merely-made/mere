@@ -40,6 +40,21 @@ the record and a message signed with a retired key still finds its owner.
 **Attested keys** are concurrent: one per protocol and one per device, each
 vouched for by a root.
 
+Both kinds of key retain an optional `KeyProof`, rather than only a method
+label: an Insigne `DerivedKeyAttestation` with its exact salt, a
+`SignedDelegationCertificate`, or caller-owned evidence bytes with a format
+identifier and `ProofMethod` (for example, a PLC operation). The display
+scope is separate from an attestation's signed salt. Typed artifacts must name
+the recorded key and its root on insertion and reload; a rotation names the
+immediately preceding root. Opaque evidence is interpreted by its caller.
+
+`rotate_to` and `attest` take `Option<KeyProof>` and return `Result<bool, _>`.
+A mismatch leaves the contact unchanged; replaying a known key preserves its
+original evidence. The caller must check authenticity again after reload and
+apply current authority, expiry and revocation policy. A delegation certificate
+proves a capability grant, so its use as an identity binding also needs the
+caller's policy. Gaz stores the artifact, never a `Checked*` conclusion.
+
 Every key and anchor is written in its own family's standard text form:
 `did:key` for the multicodec families, `rnid`'s hex for a Reticulum identity,
 `did:plc` and `urn:uuid` for the rest.
@@ -64,8 +79,9 @@ monotonic, so a replayed or late event can never rewind a record.
 
 ## Status
 
-Pre-1.0. The data model exists and is tested; persistence over `muniment` and
-the adapters that turn resolver output into records are the next lifts. See
+Pre-1.0. The data model retains proof artifacts and is tested with JSON and
+postcard reload followed by real signature checks. Persistence over `muniment`
+and the adapters that turn resolver output into records are the next lifts. See
 `design_docs/` for the founding plan.
 
 ## License

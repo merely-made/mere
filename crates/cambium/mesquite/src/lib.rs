@@ -26,7 +26,16 @@
 //! file reading is supplied by the host. Both formats use the same frame pump,
 //! deferred clicks, capture collection and product acceptance hooks. Text mode
 //! preserves its 120-frame capture grace and accepts uniform nonblank frames;
-//! the JSON constructor retains its eight-frame grace and detail checks.
+//! the JSON constructor defaults to eight frames and detail checks.
+//! `Lane::with_capture_backend` lets a browser supply nonblocking readback
+//! and its own bounded grace period. The product receives pixels through
+//! `Product::inspect` and publishes its receipt through `Product::complete`.
+//!
+//! `MESQUITE_CAPTURE_PAINT=1` or [`Lane::set_paint_capture`] adds a postcard
+//! `.paintlist` beside each saved PNG, with full font/image payloads and a
+//! `paint_path` in JSON receipts. Both come from the same presented frame.
+//! Existing sidecars and export errors fail the receipt. External GPU images
+//! remain references; this mode is for resource capture, not frame timing.
 //!
 //! ```ignore
 //! let mut lane = Lane::new(MyProduct, scenario, receipt, capture, exit_code)
@@ -42,7 +51,9 @@ use std::path::PathBuf;
 use cambium_rootstock::{AppCtx, NodeId, meristem_bounds::RootView};
 use taproot::ProbeSnapshot;
 
+mod capture;
 mod scenario;
+pub use capture::{CaptureBackend, Readback};
 pub use scenario::{CaptureRecord, LaneConfig};
 mod checkpoints;
 mod clicks;
@@ -56,6 +67,11 @@ pub use checkpoints::{Checkpoint, Checkpoints};
 pub use cost::{CostObservation, Costs, Totals};
 pub use lane::{Capture, Lane, capture_path};
 pub use pixels::{PixelCheck, Viewport, ViewportTransform, create_parent, write_png};
+
+/// A bounded, product-redacted diagnostics batch for a requested run receipt.
+/// The product chooses its reader and correlation references. Sampling at the
+/// lane's completion does not establish that every record caused a captured frame.
+pub type DiagnosticBatch = apparatus::Batch<serde_json::Value>;
 
 /// The host context a [`Product`]'s hooks are handed, spelled once.
 pub type Ctx<'a, P> =
@@ -138,6 +154,36 @@ pub trait Product: Sized {
         Vec::new()
     }
 
+    /// Optional bounded diagnostics, sampled once after `complete`. Return a
+    /// batch from an independent Apparatus cursor so this receipt does not
+    /// consume another inspector's records. Products redact before recording
+    /// and explicitly enable export under their run policy. `None` preserves
+    /// the existing receipt format; an error fails the requested receipt.
+    /// This hook reports observations, not product success or pixel causality.
+    fn diagnostic_attachment(
+        &mut self,
+        _ctx: &mut Ctx<'_, Self>,
+    ) -> Result<Option<DiagnosticBatch>, String> {
+        Ok(None)
+    }
+
+    /// Write product-specific receipts once, after all captures and acceptance
+    /// checks complete. The outcome includes lane failures, not just script
+    /// assertions. An error here also fails the shared receipt and exit code.
+    fn complete(
+        &mut self,
+        _ctx: &mut Ctx<'_, Self>,
+        _outcome: &taproot::Outcome,
+    ) -> Result<(), String> {
+        Ok(())
+    }
+
+    /// Whether completion closes the window. Interactive trials can retain
+    /// their finished state while the lane stops driving it.
+    fn close_on_completion(&self) -> bool {
+        true
+    }
+
     /// The product's rendered viewport, as a pixel mask for capture
     /// comparison. `None` disables pixel checks for that capture.
     fn viewport(&self, ctx: &Ctx<'_, Self>) -> Option<Viewport> {
@@ -179,6 +225,18 @@ pub trait Product: Sized {
     ) -> Result<(), String> {
         let _ = (ctx, checkpoints);
         Err(format!("unknown scenario step: {line}"))
+    }
+
+    /// Product verbs that resolve to a selector click use the lane's own held
+    /// click queue, so scrolling still blocks the next scenario step.
+    fn app_step_with_clicks(
+        &mut self,
+        ctx: &mut Ctx<'_, Self>,
+        checkpoints: Checkpoints<'_>,
+        _clicks: &mut Clicks,
+        line: &str,
+    ) -> Result<(), String> {
+        self.app_step(ctx, checkpoints, line)
     }
 }
 

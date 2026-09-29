@@ -239,6 +239,17 @@ where
         LinearViewLaunch::new_tensor::<LinearViewLayout>(buffer, layout)
     }
 
+    /// Return an aliased linear view broadcast to the reference tensor's shape.
+    pub fn as_linear_view_alias_like(
+        &self,
+        input_pos: usize,
+        reference: &Self,
+    ) -> LinearViewLaunch<R> {
+        let layout = LinearViewLayoutLaunch::from_reference_shape(reference.shape());
+        let buffer = self.as_tensor_alias(input_pos);
+        LinearViewLaunch::new_tensor::<LinearViewLayout>(buffer, layout)
+    }
+
     /// Return a linear view broadcast to the reference tensor's shape
     pub fn into_linear_view_like(self, reference: &Self) -> LinearViewLaunch<R> {
         let layout = LinearViewLayoutLaunch::from_reference_shape(reference.shape());

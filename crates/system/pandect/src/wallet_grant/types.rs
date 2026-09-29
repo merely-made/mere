@@ -8,7 +8,7 @@
 //! responses, enrollment bundles, and the specs the flows take as input.
 
 use identity::carry::DeviceGrantSet;
-use identity::delegation::SignedDelegationRevocation;
+use insigne::delegation::SignedDelegationRevocation;
 
 use super::{BlindedEpochIndex, WrappedEpochRecord};
 use identity::{Ed25519Signature, PersonaId};

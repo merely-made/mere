@@ -21,13 +21,14 @@ use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
+use insigne::DerivedKeyAttestation;
 use pandect::{DeviceId, PersonaId, WalletEpochSealer, revoke_remote_auth_device};
 use personae::agent::VaultAgent;
 use personae::signing::{ApprovalBroker, DecisionError, RememberApproval, SigningDecision};
 use personae::ssh_slot;
 use personae::{
-    CredentialLineage, DerivedKeyAttestation, Ed25519Keypair, Ed25519PublicKey, IdentityError,
-    IdentityProvider, IdentityStorage, IdentityVault, ProfileId, ProtocolKey, UnlockTier, roster,
+    CredentialLineage, Ed25519Keypair, Ed25519PublicKey, IdentityError, IdentityProvider,
+    IdentityStorage, IdentityVault, ProfileId, ProtocolKey, UnlockTier, roster,
 };
 use serde::{Deserialize, Serialize};
 use ssh_key::{Algorithm, PrivateKey, PublicKey};

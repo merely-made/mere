@@ -133,8 +133,12 @@ fn root(state: &Smoke) -> Child {
                         s.note(format!("clicks {n}"));
                     },
                 )),
+                el("span", text("Reset all controls")).attr("id", "reset-label"),
                 focusable(clickable(
-                    el("button", text("Reset")).attr("class", "button"),
+                    el("button", text("Restore defaults"))
+                        .attr("class", "button")
+                        .attr("aria-label", "Superseded reset label")
+                        .attr("aria-labelledby", "reset-label"),
                     |s: &mut Smoke, _| {
                         s.clicks = 0;
                         s.level = 0.0;

@@ -55,9 +55,8 @@ use std::path::PathBuf;
 use serde::{Deserialize, Serialize};
 use zeroize::{Zeroize, ZeroizeOnDrop};
 
-use crate::{
-    DerivedKeyAttestation, Ed25519Keypair, Ed25519PublicKey, IdentityError, IdentityProvider,
-};
+use crate::{Ed25519Keypair, Ed25519PublicKey, IdentityError, IdentityProvider};
+use insigne::DerivedKeyAttestation;
 
 /// Stable identifier for a profile within a vault.
 ///

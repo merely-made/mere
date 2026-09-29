@@ -6,7 +6,15 @@
 
 use super::*;
 use crate::endpoint::EndpointKind;
-use crate::trust::TrustState;
+use crate::trust::{ProofMethod, TrustState};
+
+fn proof(method: ProofMethod) -> crate::KeyProof {
+    crate::KeyProof::Other {
+        method,
+        format: "gaz-test-evidence/v1".into(),
+        bytes: vec![1, 2, 3],
+    }
+}
 
 fn key(seed: u8) -> TypedKey {
     TypedKey::ed25519([seed; 32])
@@ -33,7 +41,11 @@ fn a_new_contact_is_kith_and_anchored_on_its_first_root() {
 #[test]
 fn rotation_keeps_the_anchor_and_records_its_proof() {
     let mut contact = alice();
-    assert!(contact.rotate_to(key(2), Some(ProofMethod::Signature)));
+    assert!(
+        contact
+            .rotate_to(key(2), Some(proof(ProofMethod::Signature)))
+            .unwrap()
+    );
 
     assert_eq!(
         contact.anchor(),
@@ -41,27 +53,35 @@ fn rotation_keeps_the_anchor_and_records_its_proof() {
         "the anchor must never move"
     );
     assert_eq!(contact.root(), Some(&key(2)));
-    assert_eq!(contact.root_line()[1].proof, Some(ProofMethod::Signature));
+    assert_eq!(
+        contact.root_line()[1].proof,
+        Some(proof(ProofMethod::Signature))
+    );
     assert!(contact.knows_key(&key(1)), "a retired key still resolves");
 }
 
 #[test]
 fn rotating_to_a_known_key_is_a_no_op() {
     let mut contact = alice();
-    contact.rotate_to(key(2), None);
-    assert!(!contact.rotate_to(key(2), None));
-    assert!(!contact.rotate_to(key(1), None));
+    contact.rotate_to(key(2), None).unwrap();
+    assert!(!contact.rotate_to(key(2), None).unwrap());
+    assert!(!contact.rotate_to(key(1), None).unwrap());
     assert_eq!(contact.root_line().len(), 2);
 }
 
 #[test]
 fn a_plc_account_keeps_its_did_while_its_signing_key_moves() {
     let mut contact = Contact::new_plc("Bluesky", bsky(), key(1));
-    contact.rotate_to(key(2), Some(ProofMethod::DidAuth));
+    contact
+        .rotate_to(key(2), Some(proof(ProofMethod::DidAuth)))
+        .unwrap();
 
     assert_eq!(contact.anchor(), &Anchor::Plc(bsky()));
     assert_eq!(contact.root(), Some(&key(2)));
-    assert_eq!(contact.root_line()[1].proof, Some(ProofMethod::DidAuth));
+    assert_eq!(
+        contact.root_line()[1].proof,
+        Some(proof(ProofMethod::DidAuth))
+    );
 }
 
 #[test]
@@ -70,7 +90,11 @@ fn a_local_contact_starts_keyless_and_pins_its_first_key() {
     let mut contact = Contact::new_local("Mum", id);
     assert_eq!(contact.root(), None);
 
-    assert!(contact.rotate_to(key(3), Some(ProofMethod::OutOfBand)));
+    assert!(
+        contact
+            .rotate_to(key(3), Some(proof(ProofMethod::OutOfBand)))
+            .unwrap()
+    );
     assert_eq!(
         contact.anchor(),
         &Anchor::Local(id),
@@ -83,7 +107,12 @@ fn a_local_contact_starts_keyless_and_pins_its_first_key() {
 fn attested_keys_are_concurrent_under_a_root() {
     let mut contact = alice();
     assert_eq!(
-        contact.attest(key(10), "mesh-author", key(1), Some(ProofMethod::Signature)),
+        contact.attest(
+            key(10),
+            "mesh-author",
+            key(1),
+            Some(proof(ProofMethod::Signature))
+        ),
         Ok(true)
     );
     assert_eq!(
@@ -91,7 +120,7 @@ fn attested_keys_are_concurrent_under_a_root() {
             key(11),
             "station/north",
             key(1),
-            Some(ProofMethod::Signature)
+            Some(proof(ProofMethod::Signature))
         ),
         Ok(true)
     );
@@ -131,7 +160,7 @@ fn an_attested_key_cannot_become_a_root() {
     contact
         .attest(key(10), "mesh-author", key(1), None)
         .unwrap();
-    assert!(!contact.rotate_to(key(10), None));
+    assert!(!contact.rotate_to(key(10), None).unwrap());
     assert_eq!(contact.root(), Some(&key(1)));
 }
 
@@ -253,17 +282,26 @@ fn full_records() -> Vec<Contact> {
         .with_handle(Handle::acct("alice@example.org"))
         .with_endpoint(Endpoint::new(EndpointKind::Murm, "ff00"))
         .with_note("met at the moot");
-    alice.rotate_to(key(2), Some(ProofMethod::Signature));
     alice
-        .attest(key(10), "mesh-author", key(2), Some(ProofMethod::Signature))
+        .rotate_to(key(2), Some(proof(ProofMethod::Signature)))
+        .unwrap();
+    alice
+        .attest(
+            key(10),
+            "mesh-author",
+            key(2),
+            Some(proof(ProofMethod::Signature)),
+        )
         .unwrap();
     alice.mark_contacted(1234);
 
     let mut bluesky = Contact::new_plc("Bluesky", bsky(), key(20));
-    bluesky.rotate_to(key(21), Some(ProofMethod::DidAuth));
+    bluesky
+        .rotate_to(key(21), Some(proof(ProofMethod::DidAuth)))
+        .unwrap();
 
     let mut mum = Contact::new_local("Mum", LocalId::from_random([7; 16]));
-    mum.rotate_to(key(30), None);
+    mum.rotate_to(key(30), None).unwrap();
 
     vec![alice, bluesky, mum]
 }

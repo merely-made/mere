@@ -33,6 +33,8 @@ struct App {
     opened: String,
     target_calls: Cell<usize>,
     target_point: Cell<Option<(f32, f32)>>,
+    semantic_hidden: bool,
+    semantic_name: Option<&'static str>,
 }
 
 type Child = Box<dyn AnyView<App, (), GenetCtx, GenetElement>>;
@@ -68,6 +70,16 @@ fn root(state: &App) -> Child {
                 (
                     el("div", ()).attr("class", "spacer"),
                     button("Far", |s: &mut App, _| s.count += 1),
+                    el("span", text(state.semantic_name.unwrap_or("Shared action")))
+                        .attr("id", "semantic-name"),
+                    focusable(clickable(
+                        el("button", text("Visual label"))
+                            .attr("class", "semantic-control")
+                            .attr("aria-hidden", state.semantic_hidden.to_string())
+                            .attr("aria-label", "Superseded label")
+                            .attr("aria-labelledby", "semantic-name"),
+                        |s: &mut App, _| s.count += 1,
+                    )),
                 ),
             )
             .attr("class", "scroller"),
@@ -90,6 +102,26 @@ impl mesquite::Product for TestLane {
 
     fn sheet(&self) -> &str {
         SHEET
+    }
+
+    fn app_step_with_clicks(
+        &mut self,
+        ctx: &mut mesquite::Ctx<'_, Self>,
+        _: mesquite::Checkpoints<'_>,
+        clicks: &mut mesquite::Clicks,
+        line: &str,
+    ) -> Result<(), String> {
+        if line != "select-far" {
+            return Err(format!("unknown scenario step: {line}"));
+        }
+        let selector = taproot::Selector::role("button").containing("Far");
+        if clicks.click(ctx, &selector, |_, _, r| {
+            (r[0] + r[2] * 0.5, r[1] + r[3] * 0.5)
+        }) {
+            Ok(())
+        } else {
+            Err("Far target missing".into())
+        }
     }
 
     fn snapshot(
@@ -256,6 +288,138 @@ fn a_click_scrolls_a_below_the_fold_button_before_the_next_assertion() {
     );
 }
 
+#[test]
+fn product_click_verbs_share_the_lanes_scroll_and_dispatch_wait() {
+    let (receipt, h) = run("product-far", "select-far\nassert snap count == 1\n");
+    assert!(receipt.starts_with("RESULT ok"), "{receipt}");
+    assert_eq!(h.state().count, 1);
+}
+
+#[test]
+fn semantic_click_and_accessibility_action_reach_the_same_named_control() {
+    for json_receipt in [false, true] {
+        let (receipt, mut h) = run_lane(
+            &scratch(&format!("semantic-name-{json_receipt}")),
+            "click role:button Shared action\nassert snap count == 1\n",
+            SHEET,
+            json_receipt,
+        );
+        assert!(
+            receipt.starts_with("RESULT ok") || receipt.contains("\"ok\": true"),
+            "{receipt}",
+        );
+        let (tree, map) = h.a11y_tree();
+        let (id, node) = tree
+            .nodes
+            .iter()
+            .find(|(_, node)| {
+                node.role() == accesskit::Role::Button && node.label() == Some("Shared action")
+            })
+            .expect("the accessible name selected by automation is published to AccessKit");
+        assert!(node.bounds().is_some(), "the control has real host bounds");
+        let target = map[id];
+        h.a11y_request(cambium_winit_a11y::A11yAction::Focus, target);
+        assert_eq!(h.state().count, 1, "reader focus must not activate");
+        assert_eq!(h.focus(), Some(target));
+        h.a11y_request(cambium_winit_a11y::A11yAction::Click, target);
+        assert_eq!(
+            h.state().count,
+            2,
+            "the accessibility action reaches the same handler"
+        );
+    }
+}
+
+#[test]
+fn semantic_name_precedence_does_not_change_explicit_class_text_selectors() {
+    let (receipt, h) = run(
+        "semantic-class",
+        "click .semantic-control Visual label\nassert snap count == 1\n",
+    );
+    assert!(receipt.starts_with("RESULT ok"), "{receipt}");
+    assert_eq!(h.state().count, 1);
+    for label in ["Visual label", "Superseded label"] {
+        let (receipt, h) = run(
+            "semantic-no-fallback",
+            &format!("click role:button {label}\n"),
+        );
+        assert!(receipt.starts_with("RESULT fail"), "{receipt}");
+        assert_eq!(
+            h.state().count,
+            0,
+            "semantic names do not fall back to stale DOM labels"
+        );
+    }
+}
+
+#[test]
+fn a_held_semantic_click_rejects_a_hidden_or_renamed_target_without_retargeting() {
+    for hide in [false, true] {
+        let result = Rc::new(std::cell::RefCell::new(None));
+        let observed = result.clone();
+        let mut clicks = mesquite::Clicks::default();
+        let mut requested = false;
+        let hooks = HostHooks {
+            after_frame: Box::new(move |ctx: &mut AppCtx<'_, App, Logic, Child>| {
+                let center = |_: &AppCtx<'_, App, Logic, Child>, _, r: [f32; 4]| {
+                    (r[0] + r[2] * 0.5, r[1] + r[3] * 0.5)
+                };
+                if !requested {
+                    assert!(clicks.click(
+                        ctx,
+                        &taproot::Selector::role("button").containing("Shared action"),
+                        center
+                    ));
+                    requested = true;
+                } else {
+                    *observed.borrow_mut() = Some(clicks.after_frame(ctx, center));
+                }
+            }),
+            ..inert_hooks()
+        };
+        let mut h = Harness::with_hooks(
+            Init {
+                state: App::default(),
+                logic: root as Logic,
+                sheet: SHEET.into(),
+                fonts: Vec::new(),
+                images: Vec::new(),
+            },
+            hooks,
+        );
+        h.layout_at(300.0, 200.0);
+        h.after_frame();
+        h.drain_pointer();
+        assert_eq!(
+            h.state().count,
+            0,
+            "the clipped control must wait for scrolling"
+        );
+        h.update(|state| {
+            state.semantic_hidden = hide;
+            if !hide {
+                state.semantic_name = Some("Changed action");
+            }
+        });
+        h.layout_at(300.0, 200.0);
+        h.after_frame();
+        h.drain_pointer();
+        assert_eq!(
+            h.state().count,
+            0,
+            "stale semantic targets must not activate"
+        );
+        assert!(
+            result
+                .borrow()
+                .as_ref()
+                .unwrap()
+                .as_ref()
+                .unwrap_err()
+                .contains("no longer matches")
+        );
+    }
+}
 #[test]
 fn both_receipt_modes_click_the_visible_part_of_an_oversized_button() {
     for mesquite in [false, true] {
@@ -648,4 +812,113 @@ fn product_acceptance_can_fail_either_receipt_format() {
             assert!(text.contains("product diagnostic"), "{text}");
         }
     }
+}
+
+/// Completion receives capture failures as well as script failures, and can
+/// retain an interactive trial without continuing to drive it.
+#[test]
+fn product_completion_runs_once_and_preserves_failures_when_kept_open() {
+    struct Completion {
+        calls: Rc<Cell<usize>>,
+        saw_failure: Rc<Cell<bool>>,
+        reject: bool,
+    }
+    impl mesquite::Product for Completion {
+        type State = App;
+        type Logic = Logic;
+        type View = Child;
+        const KIND: &'static str = "completion-test";
+        const SURFACE: &'static str = "app";
+        const LOG_PREFIX: &'static str = "completion-test";
+        fn sheet(&self) -> &str {
+            SHEET
+        }
+        fn snapshot(&self, ctx: &mesquite::Ctx<'_, Self>, _: usize, _: f32) -> ProbeSnapshot {
+            TestLane.snapshot(ctx, 0, 1.0)
+        }
+        fn complete(
+            &mut self,
+            _: &mut mesquite::Ctx<'_, Self>,
+            outcome: &taproot::Outcome,
+        ) -> Result<(), String> {
+            self.calls.set(self.calls.get() + 1);
+            self.saw_failure
+                .set(!outcome.ok && outcome.log.iter().any(|line| line.contains("FAIL")));
+            if self.reject {
+                Err("durable receipt unavailable".into())
+            } else {
+                Ok(())
+            }
+        }
+        fn close_on_completion(&self) -> bool {
+            false
+        }
+    }
+    for (name, script, reject, expected_failure) in [
+        ("complete-ok", "settle 1\n", false, false),
+        ("complete-capture-failure", "capture lost\n", false, true),
+        ("complete-product-failure", "settle 1\n", true, false),
+    ] {
+        let dir = scratch(name);
+        let path = dir.join("test.scn");
+        std::fs::write(&path, script).unwrap();
+        let calls = Rc::new(Cell::new(0));
+        let saw_failure = Rc::new(Cell::new(false));
+        let mut lane = mesquite::Lane::from_config(
+            LaneConfig {
+                scenario: path,
+                capture_dir: Some(dir.clone()),
+                receipt: None,
+            },
+            Completion {
+                calls: calls.clone(),
+                saw_failure: saw_failure.clone(),
+                reject,
+            },
+            cambium_genet_winit_host::read_file,
+        )
+        .unwrap();
+        let mut h = Harness::with_hooks(
+            Init {
+                state: App::default(),
+                logic: root as Logic,
+                sheet: SHEET.into(),
+                fonts: vec![],
+                images: vec![],
+            },
+            HostHooks {
+                after_frame: Box::new(move |ctx| lane.after_frame(ctx)),
+                ..inert_hooks()
+            },
+        );
+        for _ in 0..160 {
+            h.layout_at(300.0, 200.0);
+            h.after_frame();
+        }
+        assert_eq!(calls.get(), 1);
+        assert_eq!(saw_failure.get(), expected_failure);
+        assert!(!h.close_requested(), "interactive trial was closed");
+        let receipt = std::fs::read_to_string(dir.join("scenario.done")).unwrap();
+        assert!(
+            receipt.starts_with(if reject || expected_failure {
+                "RESULT fail"
+            } else {
+                "RESULT ok"
+            }),
+            "{receipt}"
+        );
+        if reject {
+            assert!(receipt.contains("durable receipt unavailable"));
+        }
+    }
+}
+
+#[test]
+fn scenario_keys_use_retained_focus_and_button_activation() {
+    let (receipt, h) = run(
+        "keys",
+        "click role:button Count\nkey Enter\nkey Space\nassert snap count == 3\n",
+    );
+    assert!(receipt.starts_with("RESULT ok"), "{receipt}");
+    assert_eq!(h.state().count, 3);
 }

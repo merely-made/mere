@@ -35,8 +35,9 @@ use crate::carry::{
     ACTION_SSH_AGENT_FORWARD, ACTION_SSH_LOGIN, ACTION_SSH_PORT_FORWARD, ACTION_SSH_PTY,
     DEVICE_AUTHORITY_DOMAIN,
 };
-use crate::delegation::{DelegationId, SignedDelegationCertificate};
-use crate::{DerivedKeyAttestation, IdentityError, IdentityProvider};
+use crate::{IdentityError, IdentityProvider};
+use insigne::DerivedKeyAttestation;
+use insigne::delegation::{DelegationId, SignedDelegationCertificate};
 
 /// The `mod_id` under which the CA's own key would be stored.
 pub const SSH_CA_MOD_ID: &str = "ssh-ca";
@@ -411,8 +412,8 @@ mod tests {
     use crate::InMemoryProvider;
     use crate::carry::{DeviceId, device_capability_scope};
     use crate::delegation::Issue;
-    use crate::delegation::{DelegationCertificate, DelegationParent};
     use crate::provider::AttestationKeys;
+    use insigne::delegation::{DelegationCertificate, DelegationParent};
     use ssh_key::Algorithm;
 
     const NOW_MS: u64 = 1_760_000_000_000;

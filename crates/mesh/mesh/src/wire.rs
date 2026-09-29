@@ -22,7 +22,7 @@ use p2panda_core::prune::PruneFlag;
 use p2panda_core::{Body, Hash, Header, Operation, SigningKey};
 use serde::{Deserialize, Serialize};
 
-use identity::DerivedKeyAttestation;
+use insigne::DerivedKeyAttestation;
 
 use crate::lease::{LeaseProgress, ReclaimReason, ReleaseReason};
 use crate::retention::RetentionCheckpoint;

@@ -3,7 +3,9 @@
 **Date:** 2026-09-25
 **Status:** in progress, ruled 2026-09-25 (reservoir plan §7 items 39 and
 40). Phases 1 and 2, accessibility in the browser and the file seam, were
-done on 2026-09-26; phase 3, the canvas as a producer, is next.
+done on 2026-09-26. Phase 3 has headed correctness receipts. On 2026-09-27
+Mark approved proceeding to phase 4, with stack performance and live physics
+explicitly open.
 **Scope:** Graphshell's browser page becomes one retained Cambium tree. Its
 HTML controls become Cambium components, its display-only Cambium chrome
 joins them, pictograph's canvas renders into the tree as a texture producer,
@@ -91,6 +93,57 @@ Phase 3's rulings, 2026-09-26:
   microseconds, and WebGPU timestamp queries around the raster work. Every
   run records visibility and fails if the page was hidden. The alternatives
   were pacing and CPU work alone, or pacing only.
+- **Timestamps' plumbing.** "Through NetrenderOptions": netrender's options
+  gain `optional_features` and genet's `RenderCore` forwards them. The
+  alternatives were an additive boot entry in genet alone, or dropping GPU
+  timestamps.
+- **The Knot copies.** The genet repin returns two old-genet copies, fleece
+  and layout-dom-api, that knot-editor `5ad3f67` pins. Mark first chose
+  "Knot session does it first"; the alternatives were keeping the copies
+  until Knot moved, or repinning knot-editor from this session. The Knot
+  session then found knot-editor cannot move first: knot-desktop broke,
+  because its mere pin still supplies Cambium on the old genet. Mark ruled
+  mere first, confirmed here: mere carries djinn's two copies until
+  knot-editor repins its mere and genet together, and djinn's pin then moves.
+- **wasm-bindgen.** "Install CLI 0.2.127 too": graphshell-web moves to
+  `=0.2.127`, the family the web host and mere's lock use, and the installed
+  CLI matches it. The alternatives were the same move on the 0.2.126 CLI, or
+  loosening the web host's pin.
+- **The lane.** "Lift the lane into rootstock": one host-neutral scenario
+  lane in rootstock, each host supplying its capture and receipt parts, the
+  winit host re-exporting it so Knot and mere-view keep their API. The tree
+  page uses it, and phase 4 moves Graphshell's scenarios onto it. The
+  alternatives were extending Graphshell's page lane with a tree probe, or a
+  browser copy of the winit host's lane.
+- **The build timed.** "Debug, shorter windows": the side-by-side runs on the
+  headed runner's debug build, which optimizes only five physics crates, and
+  the 2,000-node scenarios time 30-frame windows with 60 frames to settle,
+  the same on both pages. The alternatives were a release build, or the dev
+  build with pictograph, netrender, Vello, genet and Cambium optimized.
+
+Phase 3 follow-up rulings, 2026-09-27:
+- **The shared runner.** Mark approved Mesquite as the owner, superseding
+  the unpublished rootstock lift above. The browser supplies asynchronous
+  readback; Mesquite owns driving, captures, checks and completion.
+- **Proceed to Cambium.** Mark accepts the proof as grounds to begin phase 4.
+  This is architectural acceptance, not performance acceptance: Cambium,
+  Mere and Genet still need work. The earlier requirement to wait for a
+  ruling on the numbers is now satisfied.
+- **Physics remains live work.** The recorded windows use paused analytic
+  layouts. They prove neither simulation cost nor moving-graph behavior.
+  Phase 4 must exercise live stepping, dragging while moving, pause/resume,
+  and settling, with frame pacing and simulation cost recorded separately.
+  Paused rendering already takes about 1.5 seconds at 2,000 nodes, so that
+  cost must be investigated independently of physics.
+- **Pause freezes visible positions.** Mark chose a separate Restore
+  arrangement action. Pausing must not snap a relaxed graph back to stored
+  arrangement slots. Resume starts from the held positions; preserving
+  velocity is not established by this ruling.
+
+The [phase-4 migration inventory](2026-09-27_graphshell_tree_migration_inventory.md)
+maps the actual application state, controls, shared-input gaps and remaining
+page/scenario obligations. The fixture toolbar is the first slice, not the
+completed application migration.
 
 ## 2. Findings (verified 2026-09-25)
 
@@ -348,3 +401,113 @@ this tree.
   netrender `c8c09f16b` adds `NetrenderOptions::optional_features`, and
   genet `0cf4f30ba0f` forwards it into `RenderCore`'s boot, with a test that
   fails when the forwarding is removed. Mere repinned to both.
+- 2026-09-26: mere `0418391f` on main carries genet `0cf4f30ba0f` and
+  netrender `c8c09f16b`, with djinn's two interim copies until knot-editor
+  moves.
+- 2026-09-26: the scenario lane moved into rootstock
+  (`cambium_rootstock::scenario`): `ScenarioLane<A, H>`, with a `LaneHost`
+  half per host. The winit host keeps `LaneConfig` and wraps the lane over
+  `NativeLane` under its old name, so Knot and mere-view build unchanged, and
+  its nine scenario and four file tests pass. The web host gains
+  `capture_into` and `PendingFrame`, an asynchronous frame readback, and
+  `WebLane`, the browser's half. `ProducerContext` gains `core`, the host's
+  `RenderCore`. graphshell-web takes the web host and rootstock on
+  wasm-bindgen 0.2.127, with the CLI installed to match.
+- 2026-09-27: the phase-3 worktree now selects published `netrender-vello`
+  0.10.1 through netrender `9607d16f1` and Genet `92b249af5b2`, in both
+  the root and standalone web manifests and locks. The locked wasm build
+  (`CARGO_PROFILE_DEV_DEBUG=0`, `getrandom_backend="wasm_js"`) and
+  wasm-bindgen 0.2.127 bundle generation passed. The receipt and artifact
+  hashes are in `Code/testing/mere/mere-reservoir-web-vello-repin-build.json`.
+  The clean main-line repin was pushed with approval as `815279cf`.
+  The earlier blank 2,000-node timings are invalid.
+- 2026-09-27: headed reruns exposed two phase-3 faults. The tree cached its
+  incomplete first texture when the analytic layout was paused, preventing
+  Vello's asynchronous buffer recovery. It now rasterizes continuously, as
+  the presenter does. Setup also fitted the camera before buffered analytic
+  positions reached the canvas view; `fit_to_content` now publishes those
+  paused positions before finding bounds, with a regression test.
+  `tree_recovery/p3_tree_health` draws the full 2,000-node graph and picks
+  node 0 through the host pointer path. The full tree scenario then passed.
+  A generic nonblank screenshot check had counted the heading as content;
+  captures must also be inspected for the graph itself.
+- 2026-09-27: pictograph culls offscreen underlay and node paint before
+  scene lowering. Crossing edges survive even with both endpoints outside,
+  and captions use their own bounds. Transform stacks and uncertain
+  filter/shadow/fragment extents are retained. DOM layout and physics are
+  unchanged. The GPU comparison produces identical pixels before and after
+  culling and detects a deliberately removed crossing edge. All 254 unit
+  tests and two existing GPU tests pass; the standalone wasm build passes.
+  An event-driven producer still needs a renderer-completion signal before
+  caching textures; the continuously rendered comparison page does not
+  establish that contract.
+  The analytic layout is paused on both pages: the timing windows are
+  startup and steady rendering, not moving physics. Earlier receipts retain
+  their misleading `moving`/`idle` labels as historical evidence.
+- 2026-09-27: all four final headed scenarios pass, with every capture
+  checked for visible graph content and both tree picks passing. Steady
+  frame interval medians are 10.3 ms (presenter fixture), 24.1 ms (tree
+  fixture), 1493.8 ms (presenter 2,000 nodes), and 1553.3 ms (tree 2,000
+  nodes). These are debug, paused-layout measurements. The tree uses 2x
+  device pixels while the presenter uses 1x, and the tree fixture has pacing
+  outliers. The [full receipt](../testing/2026-09-27_graphshell_producer_receipt.md)
+  records p95, dimensions, artifact hashes and limitations.
+  Current main uses Mesquite for shared scenario execution. The follow-up
+  integrates its lane with browser asynchronous captures and removes the
+  unpublished rootstock runner.
+  Mark has since approved Mesquite and proceeding to phase 4, with
+  performance and live physics explicitly open (see the follow-up rulings).
+- 2026-09-27: the first phase-4 slice adds shared canvas commands and a
+  Cambium toolbar, captured dragging, graph-scoped keys, position-freezing
+  pause and explicit arrangement restoration. Its headed scenario passes
+  with named accessibility controls and inspected captures. Native tests
+  cover held motion, membership changes and actor snapshot barriers.
+  Equal DOM writes were invalidating retained layout every paused frame;
+  skipping them reduces the 2,000-node paused median from 1603.3 to 107.6 ms
+  in the instrumented dev comparison. Moving graphs remain slow: 512 nodes
+  take 872 ms, primarily in DOM restyle/layout, while physics takes 2.6 ms.
+  The live 2,000-node run timed out. The
+  [controls and physics receipt](../testing/2026-09-27_graphshell_controls_physics_receipt.md)
+  records the evidence and open gates. This does not complete phase 4.
+- 2026-09-27: approved Genet motion commit `27d20d3f` is pushed and the
+  worktree repins to it. All 298 targeted native tests, the locked wasm build
+  and the headed controls scenario pass. Quiet live medians fall from
+  141.7 to 96.0 ms (128 nodes) and 872.0 to 595.0 ms (512 nodes), with the
+  remaining cost dominated by mutation/restyle. Genet `f2e2850f` separately
+  removes repeated batch preparation; 302 tests and a deliberate failing
+  work-count control support it. It is now pushed with approval and adopted.
+  The controls/physics receipt records exact pins, artifact hashes and
+  qualifications. After adoption, live medians are 73.8 ms at 128 nodes and
+  251.4 ms at 512 nodes. The 2,000-node live run now completes with a visible
+  graph at 1365.0 ms median; acceptable responsiveness remains open. All 403
+  native tests, the locked wasm build and headed controls pass. Seiche's
+  bounded elapsed-time core is implemented and tested; Canvas/browser host
+  adoption remains pending, distinct from these rendering measurements.
+
+- 2026-09-27: bounded Genet text-bounds publication is in progress. Root and
+  standalone Graphshell web manifests select accepted Genet `7b48f94d7a7`,
+  preserving NetRender `9607d16`, netrender-vello 0.10.1, wgpu 30 and pre.2.
+  This takes the owner-verified text/inline-decoration fixes and retained
+  motion/restyle source, not a new phase-3 policy. Portable dependency
+  classification and focused consumer checks precede publication; see
+  `design_docs/cambium_docs/technical_architecture/genet-compatibility.md`.
+- 2026-09-28: the bounded publication gates above pass with published Genet
+  `7b48f94d`: native host/Cambium/Sprigging all-target checks and standalone
+  Graphshell web Wasm check. Locked metadata and deliberately faulty source
+  controls qualify 1,524 native packages and 527 unfiltered web packages;
+  only the accepted Genet revision and its exact documents/text edge change.
+  Native wgpu 30.0.1 and web wgpu 30.0.0 retain their respective prior locks.
+  NetRender/Vello and pre.2 remain unchanged. This is compile/source evidence;
+  the headed work above remains open. Exact raw/provenance and interrupted
+  checkout-preparation qualifications are linked from the compatibility note.
+- 2026-09-28: integrate `reservoir-v2` with main `5ce144ff`, keeping accepted
+  Genet `7b48f94d` (which includes the motion/restyle fixes). Mesquite retains
+  both asynchronous browser readback and main's paired paint-envelope capture.
+  All 403 native tests, the locked wasm build and headed controls pass on the
+  combined tree. The three control captures are byte-identical to the
+  inspected restyle-adoption captures. Vello compilation was concurrent, so
+  this is functional evidence, not a new performance measurement. Logs,
+  bundle and hashes are under `Code/testing/mere/reservoir-integration*`.
+  The earlier worktree's held phase-3/4 changes are now integrated; product
+  migration, large-graph responsiveness and elapsed-time host adoption remain
+  open. The active primary checkout is left untouched for its current owner.

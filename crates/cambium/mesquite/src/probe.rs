@@ -34,7 +34,16 @@ impl<P: Product> Automatable for Probe<'_, '_, P> {
     }
 
     fn selector_target(&self, selector: &Selector) -> SelectorTarget {
-        let nodes = taproot::matching(&self.ctx.runner.dom().borrow(), selector);
+        let nodes = self
+            .ctx
+            .a11y_projection()
+            .map_or_else(Vec::new, |projection| {
+                taproot::matching_with_projection(
+                    &self.ctx.runner.dom().borrow(),
+                    selector,
+                    &projection,
+                )
+            });
         for node in nodes {
             if let Some((x, y, width, height)) = self.ctx.painted_rect(node)
                 && width > 0.0
@@ -132,6 +141,24 @@ impl<P: Product> Driveable for Probe<'_, '_, P> {
         match words.as_slice() {
             ["cost-begin", name] => self.lane.costs.begin(name)?,
             ["cost-end"] => self.lane.costs.end()?,
+            ["key", name] => {
+                use cambium::{Key, KeyEvent, NamedKey};
+                let key = match *name {
+                    "Tab" | "Shift+Tab" => Key::Named(NamedKey::Tab),
+                    "Enter" => Key::Named(NamedKey::Enter),
+                    "Space" => Key::Named(NamedKey::Space),
+                    "Escape" => Key::Named(NamedKey::Escape),
+                    "ArrowLeft" => Key::Named(NamedKey::ArrowLeft),
+                    "ArrowRight" => Key::Named(NamedKey::ArrowRight),
+                    "ArrowUp" => Key::Named(NamedKey::ArrowUp),
+                    "ArrowDown" => Key::Named(NamedKey::ArrowDown),
+                    name if name.chars().count() == 1 => Key::Character(name.into()),
+                    _ => return Err(format!("unsupported scenario key {name}")),
+                };
+                let mut event = KeyEvent::new(key);
+                event.mods.shift = *name == "Shift+Tab";
+                self.ctx.runner.dispatch_key(event);
+            },
             ["input-text", value] => {
                 let mut select = cambium::KeyEvent::new(cambium::Key::Character("a".into()));
                 select.mods.ctrl = true;
@@ -221,9 +248,15 @@ impl<P: Product> Driveable for Probe<'_, '_, P> {
                 let Lane {
                     product,
                     checkpoints,
+                    clicks,
                     ..
                 } = &mut *self.lane;
-                return product.app_step(self.ctx, Checkpoints(checkpoints), line);
+                return product.app_step_with_clicks(
+                    self.ctx,
+                    Checkpoints(checkpoints),
+                    clicks,
+                    line,
+                );
             },
         }
         Ok(())

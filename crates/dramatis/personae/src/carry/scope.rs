@@ -13,7 +13,7 @@
 
 use std::collections::BTreeSet;
 
-use crate::delegation::CapabilityScope;
+use insigne::delegation::CapabilityScope;
 
 use super::DeviceId;
 
@@ -30,7 +30,7 @@ pub const DEVICE_AUTHORITY_DOMAIN: &str = "mere.device";
 /// the action set carries the whole capability. This is a fixed placeholder
 /// so the scope satisfies `CapabilityScope`'s well-formedness rule.
 ///
-/// It is a leaf rather than a root. `personae::delegation::path_covers` only
+/// It is a leaf rather than a root. `insigne::delegation::path_covers` only
 /// extends a prefix when the remainder begins with `/`, so this value covers
 /// itself and nothing beneath it. Giving device capabilities a real path
 /// dimension later means choosing a different prefix, not nesting under this
@@ -109,7 +109,7 @@ where
 
 #[cfg(test)]
 mod tests {
-    use crate::delegation::path_covers;
+    use insigne::delegation::path_covers;
 
     use super::*;
 

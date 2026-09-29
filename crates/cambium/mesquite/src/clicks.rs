@@ -15,9 +15,10 @@ pub struct Clicks {
 }
 
 impl Clicks {
-    /// Match against the retained DOM. Click a fully visible target, or a
-    /// substantial visible part of a tall textbox, now. Otherwise ask the host
-    /// to reveal it and retain its identity for the next frame.
+    /// Match roles/names against the host's semantic projection; explicit
+    /// class/text selectors keep their DOM meaning. Click a visible target or
+    /// substantial visible part of a tall textbox. Otherwise reveal it and
+    /// retain its identity for the next frame.
     /// `point` preserves the product's coordinate transform, if it has one.
     pub fn click<State, Logic, V>(
         &mut self,
@@ -30,7 +31,11 @@ impl Clicks {
         Logic: FnMut(&State) -> V,
         V: RootView<State>,
     {
-        let nodes = taproot::matching(&ctx.runner.dom().borrow(), selector);
+        let Some(projection) = ctx.a11y_projection() else {
+            return false;
+        };
+        let nodes =
+            taproot::matching_with_projection(&ctx.runner.dom().borrow(), selector, &projection);
         let Some((node, rect)) = nodes.into_iter().find_map(|node| {
             ctx.painted_rect(node)
                 .filter(|r| r.2 > 0.0 && r.3 > 0.0)
@@ -39,11 +44,14 @@ impl Clicks {
             return false;
         };
         let visible = ctx.visible_rect(node);
-        let is_textbox = taproot::matching(&ctx.runner.dom().borrow(), &Selector::role("textbox"))
-            .contains(&node);
-        // Revealing the full height of a large text editor can scroll its
-        // toolbar away even when there is ample visible space to focus it.
-        // Other controls retain the existing reveal behavior.
+        let is_textbox = taproot::matching_with_projection(
+            &ctx.runner.dom().borrow(),
+            &Selector::role("textbox"),
+            &projection,
+        )
+        .contains(&node);
+        // A tall editor already has enough visible space to focus without
+        // scrolling its toolbar away. Other controls retain reveal behavior.
         const USABLE_HEIGHT: f32 = 44.0;
         if let Some(visible) = visible.filter(|visible| {
             *visible == rect
@@ -78,6 +86,21 @@ impl Clicks {
         let Some((node, selector)) = self.pending.take() else {
             return Ok(false);
         };
+        if matches!(selector.matcher, taproot::Match::Role(_)) {
+            let still_matches = ctx.a11y_projection().is_some_and(|projection| {
+                taproot::matching_with_projection(
+                    &ctx.runner.dom().borrow(),
+                    &selector,
+                    &projection,
+                )
+                .contains(&node)
+            });
+            if !still_matches {
+                return Err(format!(
+                    "click {selector:?}: held target no longer matches the semantic projection"
+                ));
+            }
+        }
         let rect = ctx.visible_rect(node).ok_or_else(|| {
             format!("click {selector:?}: target never came into view after scrolling")
         })?;
