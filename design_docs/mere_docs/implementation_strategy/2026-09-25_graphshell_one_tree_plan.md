@@ -533,3 +533,6 @@ this tree.
   mounted accessibility mirror is observed, but no save/reopen, visibility
   resume or new performance receipt is claimed. The controls receipt records
   this distinction; the primary checkout is untouched.
+  Four focused storage/editor tests also pass, for 606 native tests in total.
+  The reviewed source is published on `canvas-elapsed-host`; integration into
+  main and worktree retirement await the headed gates.
