@@ -465,12 +465,7 @@ impl OwnedLayout {
         dom: &D,
         node: NodeId,
     ) -> Option<(f32, f32, f32, f32)> {
-        let clips = |property| {
-            self.styles
-                .computed_style(node, property)
-                .is_some_and(|value| value != "visible")
-        };
-        if !clips("overflow-x") && !clips("overflow-y") {
+        if !clips_content(&self.styles, node) {
             return None;
         }
         let (x, y, width, height) = self.painted_rect(dom, node)?;
@@ -850,6 +845,16 @@ impl OwnedLayout {
     }
 }
 
+/// Whether the node clips content, using the existing paint policy on either axis.
+fn clips_content(styles: &StylePlane<NodeId>, node: NodeId) -> bool {
+    let clips = |property| {
+        styles
+            .computed_style(node, property)
+            .is_some_and(|value| value != "visible")
+    };
+    clips("overflow-x") || clips("overflow-y")
+}
+
 /// Whether the node's computed overflow scrolls, per axis.
 fn scroll_axes(styles: &StylePlane<NodeId>, node: NodeId) -> (bool, bool) {
     let scrolls = |property| {
@@ -883,18 +888,44 @@ fn element_scroll_range<D: LayoutDom<NodeId = NodeId>>(
         container.x + container.width,
         container.y + container.height,
     );
+    if let Some(lines) = fragments.inline_scroll_bounds(node) {
+        extent.0 = extent.0.max(lines.x + lines.width + end.0);
+        extent.1 = extent.1.max(lines.y + lines.height + end.1);
+    }
     for child in dom.dom_children(node) {
-        walk(dom, child, &mut |descendant| {
-            if let Some(fragment) = fragments.get(descendant) {
-                extent.0 = extent.0.max(fragment.x + fragment.width + end.0);
-                extent.1 = extent.1.max(fragment.y + fragment.height + end.1);
-            }
-        });
+        extend_element_scroll_extent(dom, styles, fragments, child, end, &mut extent);
     }
     (
         (extent.0 - container.x - container.width).max(0.0),
         (extent.1 - container.y - container.height).max(0.0),
     )
+}
+
+/// Descendant border boxes contribute before their clipping boundary. Lines
+/// and deeper fragments contribute only while that content remains visible.
+/// All bounds stay in layout coordinates, unlike `content_clip`'s painted box.
+fn extend_element_scroll_extent<D: LayoutDom<NodeId = NodeId>>(
+    dom: &D,
+    styles: &StylePlane<NodeId>,
+    fragments: &LiveryLayout<NodeId>,
+    node: NodeId,
+    end: (f32, f32),
+    extent: &mut (f32, f32),
+) {
+    for fragment in fragments.fragments_for_node(node) {
+        extent.0 = extent.0.max(fragment.x + fragment.width + end.0);
+        extent.1 = extent.1.max(fragment.y + fragment.height + end.1);
+    }
+    if clips_content(styles, node) {
+        return;
+    }
+    if let Some(lines) = fragments.inline_scroll_bounds(node) {
+        extent.0 = extent.0.max(lines.x + lines.width + end.0);
+        extent.1 = extent.1.max(lines.y + lines.height + end.1);
+    }
+    for child in dom.dom_children(node) {
+        extend_element_scroll_extent(dom, styles, fragments, child, end, extent);
+    }
 }
 
 /// A computed length in pixels, `0` for anything else.
