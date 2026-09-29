@@ -49,5 +49,6 @@ tokio-stream = "0.1"
 thiserror = "1"
 
 [dev-dependencies]
+insigne = { workspace = true, features = ["verify"] }
 tokio = { version = "1", features = ["io-util", "macros", "rt", "rt-multi-thread", "time"] }
 tempfile = "3"

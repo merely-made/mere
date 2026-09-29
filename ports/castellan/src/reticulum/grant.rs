@@ -220,7 +220,7 @@ impl SitedStationGrant {
     /// `validate_policy` guarantees it is present, so the accessors below may
     /// rely on it. A station carries device authority and nothing else: no
     /// persona ever delegates to it.
-    fn certificate(&self) -> &personae::delegation::SignedDelegationCertificate {
+    fn certificate(&self) -> &insigne::delegation::SignedDelegationCertificate {
         self.grant
             .device
             .as_ref()

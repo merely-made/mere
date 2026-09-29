@@ -37,11 +37,11 @@ use std::collections::BTreeMap;
 use serde::{Deserialize, Serialize};
 
 use crate::IdentityError;
-use crate::delegation::{DelegationId, SignedDelegationRevocation};
 use crate::ssh_ca::{device_serial, key_id_for};
 use crate::vault::{
     CredentialLineage, IdentitySlot, Profile, ProtocolKey, SecretBytes, UnlockTier,
 };
+use insigne::delegation::{DelegationId, SignedDelegationRevocation};
 
 /// The `mod_id` the revocation ledger is stored under.
 pub const REVOCATION_MOD_ID: &str = "ssh-revocations";
@@ -165,10 +165,10 @@ mod tests {
     use super::*;
     use crate::carry::{ACTION_SSH_LOGIN, DeviceId, device_capability_scope};
     use crate::delegation::Issue;
-    use crate::delegation::{DelegationRevocation, SignedDelegationCertificate};
     use crate::ssh_ca::{self, serial_for_device};
     use crate::vault::ProfileId;
     use crate::{Ed25519Keypair, IdentityProvider, InMemoryProvider};
+    use insigne::delegation::{DelegationRevocation, SignedDelegationCertificate};
 
     const NOW_MS: u64 = 1_760_000_000_000;
 
