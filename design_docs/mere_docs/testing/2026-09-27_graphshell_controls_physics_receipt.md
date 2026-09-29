@@ -246,6 +246,13 @@ qualified scroll failure now passes on this baseline. Logs are
 `Code/testing/mere/elapsed-integrated-native.log` and
 `elapsed-integrated-scenario.log`.
 
+Four focused local-editor tests also pass, bringing the native total to 606.
+They verify reopening the same session/member with normalized metadata,
+rejecting a stale selection without changing graph or stored bytes, retaining
+durable prior values on a refused write and retrying successfully, and
+refreshing Canvas metadata without changing geometry, camera, selection or
+play state. Their log is `Code/testing/mere/saved-edit-native.log`.
+
 The standalone Wasm build passes offline and locked. Updating its ignored
 lock for the current manifests adds the existing `genet-text` and
 `mere-apparatus` edges; it also re-resolves several Windows dependency edges
@@ -305,7 +312,8 @@ first draw while requiring its preexisting accessibility mirror.
   solve that cost.
 - The local IndexedDB graph and Title/Tags editor have an opt-in tree route;
   its headed save/reopen gate remains open. Remote sessions and the other
-  product panels still belong to the old presenter. Ctrl+wheel modifiers and middle-button parity,
+  product panels still belong to the old presenter. Ctrl+wheel modifiers and
+  middle-button parity,
   all five public wrappers and their product scenarios remain migration work.
   Continuous rasterization still protects asynchronous Vello buffer recovery.
 
