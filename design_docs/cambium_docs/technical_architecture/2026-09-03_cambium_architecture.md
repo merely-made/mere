@@ -374,6 +374,8 @@ source passed all 21 scenario tests. The native smoke passed 32 frames with
 AccessKit installed (15 nodes), three nonblank distinct captures and two sizes;
 the resize capture was visually inspected. Human AT remains pending. These are
 isolated-branch receipts; publication follows the concurrent Mere integration.
+The standalone Graphshell manifest also passed `cargo check --target
+wasm32-unknown-unknown` with the same Genet pin and its required `wasm_js` cfg.
 
 This is DOM semantic parity. Sprigging custom-leaf contributions and complete
 HTML/CSS visibility/role conformance remain outside it. The document projection
