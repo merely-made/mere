@@ -8787,6 +8787,7 @@ name = "mere-apparatus"
 version = "0.0.1"
 dependencies = [
  "accesskit",
+ "serde",
  "tracing",
  "uxtree",
 ]
@@ -9160,6 +9161,7 @@ dependencies = [
  "cambium",
  "cambium-rootstock",
  "genet-scripted-dom",
+ "mere-apparatus",
  "paint_list_api",
  "png 0.17.16",
  "postcard",
