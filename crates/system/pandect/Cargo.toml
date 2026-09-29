@@ -13,6 +13,7 @@ categories = ["data-structures"]
 description = "Pandect: everything a Mere session gathers under one cover. Session manifests, graph and view sidecars, worker declarations, content and facet stores, settings, and the persona wallet carry lane -- a complete digest of one running session's record."
 
 [dependencies]
+insigne = { workspace = true, features = ["verify"] }
 # Certificate filenames are hex-encoded ids, so this is production code,
 # not a test helper: wallet_grant/certificate.rs encodes on the write path.
 hex = "0.4"

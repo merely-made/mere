@@ -20,7 +20,8 @@ use crate::mesh_host::{HostConfig, MeshHost};
 use muniment::Backend;
 use personae::bootstrap::{self, Unlock};
 use personae::vault::{IdentityStorage, IdentityVault, ProfileId};
-use personae::{DerivedKeyAttestation, Ed25519Keypair, IdentityError, IdentityProvider};
+use personae::{Ed25519Keypair, IdentityError, IdentityProvider};
+use insigne::DerivedKeyAttestation;
 use serde::{Deserialize, Serialize};
 use transport::{P2pandaTransport, TransportError};
 
