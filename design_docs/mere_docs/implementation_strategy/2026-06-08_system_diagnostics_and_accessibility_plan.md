@@ -182,6 +182,16 @@ revision is currently zero, and current DOM plus retained layout is not an
 immutable presented-frame snapshot. Neither full semantic parity nor the later
 correlated diagnostics acceptance is established by this slice.
 
+The isolated integration subsequently merged the sealed Rootstock repair
+`8eca3e4c` as `ced161f1`. Independent review confirmed both sides' source was
+preserved. The combined Rootstock, winit host and Mesquite gate passed 199 tests
+with no failures or skips; the native smoke repeated the same three capture
+digests. The standalone Wasm check passed against the primary owner's accepted
+web-lock baseline, with every package/version retained and only Taproot's new
+document-session-api dependency added after mapping the Genet revision. Final
+publication still waits for the concurrent main integration, including the
+incoming Insigne migration; its broader acceptance is a separate owner's gate.
+
 ---
 
 ## Historical June design and implementation record
