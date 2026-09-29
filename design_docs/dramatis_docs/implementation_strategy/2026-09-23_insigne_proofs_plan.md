@@ -489,7 +489,9 @@ Gaz at the older Mere pin `d82afa17` and still imports the pre-M0.5
 `ContactKey`; its broader model repin is separate downstream work. The current
 Mere tree has no production calls to the changed key mutation methods.
 
-Phase D meets its done-condition. Next: Gaz M1 backend persistence, then the
-remaining M2 resolver intake and trust/alarm gates. Sibling phase-C repins
+Phase D meets its done-condition. Gaz M1's storage gate is implemented
+2026-09-29 in the founding plan: persona-scoped Muniment save/load and
+JSON/postcard disk reopening. Host sealing and JSContact exchange remain M1
+gates before the remaining M2 resolver intake and trust/alarm work. Sibling phase-C repins
 remain open. The scoped `C:\t\cargo-targets\mere\gaz` build output is removed
 after recording its gates; receipts are retained.
