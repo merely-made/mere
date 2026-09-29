@@ -11,11 +11,12 @@
 //! are the portable form, verifiable by anyone holding the issuer's public
 //! key, which is what revoking a stolen station has to mean.
 
+use crate::delegation::DelegationError;
 use crate::delegation::Issue;
-use crate::delegation::{
-    DelegationError, DelegationRevocation, SignedDelegationCertificate, SignedDelegationRevocation,
-};
 use crate::{IdentityProvider, InMemoryProvider};
+use insigne::delegation::{
+    DelegationRevocation, SignedDelegationCertificate, SignedDelegationRevocation,
+};
 
 use super::DeviceGrantSet;
 

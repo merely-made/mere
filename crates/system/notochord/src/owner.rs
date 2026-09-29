@@ -229,10 +229,10 @@ pub enum OwnerPolicyEdit {
 
 #[cfg(test)]
 mod tests {
-    use personae::delegation::Issue;
-    use personae::delegation::{
+    use insigne::delegation::{
         CapabilityScope, DelegationId, DelegationRevocation, SignedDelegationRevocation,
     };
+    use personae::delegation::Issue;
     use personae::{IdentityProvider, InMemoryProvider};
 
     use super::*;

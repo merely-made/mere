@@ -134,6 +134,7 @@ path = "src/bin/distillery_chronicle_receipt_host.rs"
 required-features = ["distillery-chronicle-receipt-host"]
 
 [dev-dependencies]
+insigne = { workspace = true, features = ["verify"] }
 # The trainer receipt (`tests/distillery_trainer.rs`) authors the synthetic
 # base model and reads the published artifacts back out of the model library,
 # so the *test* names eidetic and safetensors. Production djinn does not:

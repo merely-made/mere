@@ -14,7 +14,7 @@ use std::{
     rc::Rc,
 };
 
-use cambium_rootstock::{Frame, read_frame};
+use crate::{CaptureBackend, Readback, capture::NativeCapture};
 use serde::Serialize;
 use taproot::{Outcome, Progress, Scenario};
 
@@ -25,7 +25,6 @@ use crate::{
     probe::Probe,
 };
 
-type Readback = Rc<RefCell<Option<Result<Frame, String>>>>;
 type PaintReadback = Rc<RefCell<Option<Result<Vec<u8>, String>>>>;
 
 struct PendingCapture {
@@ -75,6 +74,7 @@ pub struct Lane<P: Product> {
     pub(crate) costs: Costs,
     pub(crate) script_files: Option<crate::scenario::ScriptFiles>,
     records: Vec<crate::CaptureRecord>,
+    capture_backend: Box<dyn CaptureBackend>,
     capture_paint: bool,
 }
 
@@ -111,6 +111,7 @@ impl<P: Product> Lane<P> {
             costs: Costs::default(),
             script_files: None,
             records: Vec::new(),
+            capture_backend: Box::new(NativeCapture),
             capture_paint: std::env::var_os("MESQUITE_CAPTURE_PAINT")
                 .is_some_and(|value| value == "1"),
         }
@@ -146,6 +147,12 @@ impl<P: Product> Lane<P> {
         );
         lane.script_files = Some(crate::scenario::ScriptFiles::new(config, reader));
         Ok(lane)
+    }
+
+    /// Use the host's readback mechanism with the shared capture lifecycle.
+    pub fn with_capture_backend(mut self, backend: impl CaptureBackend + 'static) -> Self {
+        self.capture_backend = Box::new(backend);
+        self
     }
 
     pub fn product(&self) -> &P {
@@ -304,7 +311,7 @@ impl<P: Product> Lane<P> {
         path: Option<PathBuf>,
     ) -> Result<(), String> {
         if self.pending.is_some() || ctx.capture.is_some() {
-            return Err("another native capture is still pending".into());
+            return Err("another capture is still pending".into());
         }
         if self.capture_paint && ctx.capture_paint.is_some() {
             return Err("another paint capture is still pending".into());
@@ -330,7 +337,7 @@ impl<P: Product> Lane<P> {
             return Err(format!("capture path already used: {}", path.display()));
         }
         let viewport = self.product.viewport(ctx);
-        let readback = Rc::new(RefCell::new(None));
+        let readback = self.capture_backend.arm(ctx.capture);
         let paint = self.capture_paint.then(|| {
             let sink: PaintReadback = Rc::new(RefCell::new(None));
             let callback_sink = sink.clone();
@@ -340,13 +347,6 @@ impl<P: Product> Lane<P> {
             }));
             sink
         });
-        let sink = readback.clone();
-        *ctx.capture = Some(Box::new(move |surface, view, width, height| {
-            *sink.borrow_mut() = Some(
-                read_frame(surface, view, width, height)
-                    .ok_or_else(|| "native frame readback failed".to_owned()),
-            );
-        }));
         self.pending = Some(PendingCapture {
             name,
             path,
@@ -359,12 +359,16 @@ impl<P: Product> Lane<P> {
     }
 
     fn collect_capture(&mut self, ctx: &Ctx<'_, P>) {
-        let Some(pending) = self.pending.take() else {
+        let Some(mut pending) = self.pending.take() else {
             return;
         };
-        let result = pending.readback.borrow_mut().take();
+        let result = (pending.readback)();
         let Some(result) = result else {
-            let patience = if self.script_files.is_some() { 120 } else { 8 };
+            let patience = if self.script_files.is_some() {
+                120
+            } else {
+                self.capture_backend.patience()
+            };
             if self.frames.saturating_sub(pending.armed) > patience {
                 self.errors.push(if self.script_files.is_some() {
                     format!(
@@ -450,6 +454,9 @@ impl<P: Product> Lane<P> {
     }
 
     pub(crate) fn named_capture(&self, name: &str) -> Option<PathBuf> {
+        if !self.capture_backend.writes_files() {
+            return None;
+        }
         if let Some(files) = &self.script_files {
             return files.capture_path(name);
         }

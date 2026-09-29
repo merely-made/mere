@@ -33,11 +33,11 @@ use std::path::Path;
 use std::process::{Child, Command, Stdio};
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
-use personae::carry::{ACTION_SSH_LOGIN, ACTION_SSH_PTY, DeviceId, device_capability_scope};
-use personae::delegation::{
+use insigne::delegation::{
     DelegationCertificate, DelegationParent, DelegationRevocation, SignedDelegationCertificate,
     SignedDelegationRevocation,
 };
+use personae::carry::{ACTION_SSH_LOGIN, ACTION_SSH_PTY, DeviceId, device_capability_scope};
 use personae::ssh_ca::{SshCertAuthority, UserCertRequest, serial_for_device};
 use personae::ssh_krl::RevocationLedger;
 use personae::{IdentityProvider, InMemoryProvider};

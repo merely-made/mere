@@ -31,10 +31,9 @@
 use crate::delegation::Issue;
 use std::collections::BTreeMap;
 
-use crate::delegation::{
-    DelegationCertificate, DelegationError, DelegationParent, SignedDelegationCertificate,
-};
+use crate::delegation::DelegationError;
 use crate::{IdentityProvider, InMemoryProvider, PersonaId};
+use insigne::delegation::{DelegationCertificate, DelegationParent, SignedDelegationCertificate};
 
 use super::{DeviceId, DevicePublicKey, device_capability_scope};
 

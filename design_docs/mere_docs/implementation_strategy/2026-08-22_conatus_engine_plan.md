@@ -17,6 +17,11 @@ eye instead of accumulating it and clamps its first voxel into the pointer
 volume, and the same walk is public on the CPU as `BrickMap::trace`, all
 ruled by Mark (brick-traversal precision pass below); on branch
 `dda-precision`, not yet merged.
+2026-09-28: body-binding shape and the T2 voxel-store lane carried from the
+wing's existing rulings into §1 and §2. Both are planned, not implemented;
+body bindings remain document-only under ruling 346, and T2 waits for the
+accepted pre.4 migration under ruling 363. This documentation pass neither
+implements nor certifies the separate query-refresh API.
 **Scope:** Build the shared spatial runtime. Mesocosm, Paredros, Isometry,
 and Mere projections consume it through product-owned runtime profiles
 instead of incubating spatial machinery in product-local probes.
@@ -188,17 +193,75 @@ intent; only the product decides whether the request is allowed. Conatus does
 not invent a universal provenance field before that consumer names what it
 needs.
 
-**Source bindings stay profile-owned.** `BodyId` is generational and
-runtime-only, and `BodyDesc` deliberately carries no durable source
-reference. One durable product source may materialize as several bodies,
-scene instances, resident slots, and audio voices, so the binding table
-(`ProductSourceId -> RuntimeBindings { bodies, scene instances, resident
-slots, audio voices }`) belongs to the runtime profile, not to Conatus and
-not inside `BodyDesc`. Sceno's `SourceRef` is the pattern reference, not
-automatically the universal type: it belongs to semantic scenes and lacks
-revision and materialization information. The first Isometry profile
-defines a neutral-shaped binding table locally; the shared minimum is
-extracted when Paredros or Mesocosm needs the same vocabulary.
+**What a source means stays profile-owned; its body table will be a Conatus
+module.** `BodyId` is generational and runtime-only, and `BodyDesc`
+deliberately carries no durable source reference. One durable product
+source may materialize as several bodies, scene instances, resident slots,
+and audio voices, so what a source is, when it binds, and what it becomes
+belong to the runtime profile, not inside `BodyDesc`. Sceno's `SourceRef`
+is the pattern reference, not automatically the universal type: it belongs
+to semantic scenes and lacks revision and materialization information.
+Isometry's retired accepted-map profile and Mesocosm's `TactileWorld`
+provided the two compared consumers. Mark ruled the common minimum a
+Conatus module generic over the product's key, documented now and built
+when he says (wing rulings 346 and 348). Until then each product keeps its
+own table. The dated 2026-08-23 ownership correction above remains history;
+this paragraph refines the mechanism's home without moving source meaning.
+
+#### Body bindings (ruled 2026-09-26; documented, not built)
+
+The comparison and complete adoption conditions are in
+`isometry/mesocosm/design_docs/2026-09-26_body_binding_plan.md`, §2 and §6.
+Rulings 346 to 352 are recorded in
+`isometry/mesocosm/design_docs/2026-09-18_wing_design_plan.md`.
+This section carries Appendix A's module shape into its owning plan;
+it does not open implementation. Mesocosm keeps its `TactileWorld` table;
+the VTT has none after retiring `isometry-runtime`.
+
+When authorized and built, the module works as follows:
+
+- **Bodies only, on the caller's world** (349). Calls borrow the caller's
+  `BodyWorld`, available through `Engine::bodies_mut`, so bound bodies and
+  T2's terrain collider share one world. The module owns no terrain, clock,
+  or durable state, and never serializes a `BodyId`.
+- **The table** (348). A product key maps to one `BodyId` and the caller's
+  shape revision, with a corresponding reverse map. The product supplies
+  map-qualified token keys or critter identities. Several bodies for one
+  source use a compound key such as `(source, part)`.
+- **Accepted state, whole or per key** (350). Reconcile accepts a complete
+  set, spawning new keys, moving changed poses, and despawning absent keys.
+  Reconcile on an empty table is the cold rebuild. Per-key set and remove
+  apply incremental changes; both routes must agree. Only authorized
+  product code calls these operations after accepting state; no intent
+  enters the module.
+- **Stable identity on movement** (351). A new pose preserves `BodyId`;
+  changing the caller's shape revision respawns the body.
+- **Refusals before mutation.** Duplicate keys and a bound body removed
+  behind the module are refused before any world call. If a later Conatus
+  operation fails partway through applying an accepted set, the table must
+  still name exactly the bodies actually held by the world.
+- **Queries stay Conatus's.** The reverse map names bodies returned by
+  rays, overlaps, movement and frame updates. Unbound bodies, including
+  terrain, have no product key. The planned query-refresh call (352) makes
+  topology changes query-visible without a settle step. Pointer picks on
+  a drawn frame belong to isometer (347).
+
+Source meaning, admission, collider lowering, scene instances, resident
+slots and audio voices remain product-owned. Eponym's per-move query world
+can use a cold reconcile; that is an adoption target, not a current shared
+consumer receipt.
+
+**Implementation done-conditions, still gated by ruling 346.** The module
+names no product type and adds no Conatus dependency; it meets the body
+binding plan's size and failure conditions. Seeded accepted sets and edits
+must give equivalent cold and incremental keys, shapes and transforms.
+Removal/recreation must invalidate the old body and reverse lookup; moved
+bodies retain their IDs; duplicate keys and lost bodies refuse safely.
+Product adoption preserves caller lowering and uses the shared query-refresh
+API after its own verification and product repin. Mesocosm's critter half
+may then adopt the table; its terrain half belongs to T2. The VTT adopts
+only when accepted tokens actually require Conatus bodies, using the scene
+board's coordinate convention rather than reviving the retired runtime.
 
 The remaining runtime work is parallel system access declarations, enforcing
 the intent-lowering command boundary at the first product profile, and the
@@ -218,8 +281,8 @@ Promote the generic parts already present across Mesocosm and Quint:
 - streaming budgets and explicit residency states;
 - body volumes using the same plane and product vocabulary as ground volumes.
 
-The first CPU mechanics slice now lives in the Rapier-free `conatus-voxel`
-package: Euclidean world cell addressing; dense opaque chunks in the incumbent
+The first CPU mechanics slice landed as the Rapier-free `conatus-voxel`
+package (now `nisus`): Euclidean world cell addressing; dense opaque chunks in the incumbent
 Mesocosm Y/Z/X order; validated serialization; revision-gated, caller-bounded
 patch batches; effective changes; disposable dirty boxes; and lowering of
 material changes into backend-neutral occupancy edits. The full `conatus`
@@ -234,6 +297,56 @@ revision, locality, and derived spatial products.
 Feature complete when terrain edits, body-volume edits, collision, queries,
 and mesh/SDF preparation use one chunk/revision path and game crates carry no
 second voxel cache protocol.
+
+#### T2. One edit, all spatial consumers (planned; after pre.4)
+
+**Status, 2026-09-28:** the shape below carries wing rulings 330 to 335 and
+363 into this owning section. Nisus currently supplies chunk value
+mechanics; this world-store and consumer-revision path is not built.
+Implementation waits for acceptance of the pre.4 migration (363), whose
+Conatus changes must land before T2. No migration acceptance is inferred
+from this documentation update. The source rulings live in
+`isometry/mesocosm/design_docs/2026-09-18_wing_design_plan.md`;
+`isometry/eponym/design_docs/2026-09-09_functional_loops_plan.md` retains the
+product receipt and adoption dependencies.
+
+1. **Nisus becomes the voxel world store** (330): a chunk map, world
+   revision, revision log and additive writes extend its revision-gated
+   chunk patches. `Ground` becomes a thin product layer over that store or
+   retires. Existing saves and hashes require an explicit migration or
+   preservation of the existing wire format. Product material meaning and
+   admission remain product-owned.
+2. **Each consumer reads a revision log** (331). Changes are recorded at
+   8³-brick grain. Each consumer retains its own last-read revision and
+   reads changes since then; a consumer older than retained history rebuilds
+   from the current store. The log replaces a single destructive dirty
+   queue as the means of serving several consumers.
+3. **Conatus carries the source stamp** (332). Voxel edits take an optional
+   source stamp which spatial queries can report. The product holds
+   dependent simulation until required colliders reach the source revision.
+   That barrier stays product-local until a second consumer proves a shared
+   mechanism. Conatus's current internal revision counter is not evidence
+   that a collider reflects a particular source revision.
+4. **Navigation remains a stamped search per query** (333). Each result
+   records the terrain revision it read. A cached walkability product is
+   deferred until measured query cost warrants it.
+5. **Verify inside Mere, then adopt in Mesocosm** (334). The first integration
+   exercises the Nisus store, Conatus collider updates and modulus refresh.
+   After a product repin, Mesocosm proves both carving and additive writes
+   update collider queries, routing and render slots at one source revision.
+   Eponym's crossing/adoption follows its own E2 dependencies; T2 does not
+   open the broader T1 material transaction or T3 work-consequence lanes.
+
+**Done-conditions.** After the migration gate is met, accepted patches
+advance the shared source revision and refused stale patches mutate nothing.
+Independent consumers neither consume each other's changes nor silently
+miss edits; an out-of-retention consumer rebuilds correctly. The Mere
+integration verifies removal and addition across storage, collider queries
+and modulus, including source stamps. Mesocosm's adoption verifies render,
+route and collision agreement and holds dependent simulation while a
+required projection is behind. Its old terrain mirror/dirty protocol is
+then removed or reduced to the thin layer, with save compatibility recorded.
+Body binding may share this `BodyWorld` but is a separate module and gate.
 
 ### 3. Resident spatial world
 
@@ -370,6 +483,10 @@ specific. The extraction rule is split (ruled 2026-08-23):
   game proves them. The first implementation uses a neutral-shaped seam in
   its profile; the second consumer tests that shape before it becomes stack
   law.
+
+The body-table comparison in §1 has satisfied that comparison requirement;
+its implementation remains separately gated by ruling 346. It does not
+promote a universal source identity, conductor or projection barrier.
 
 This reconciles the plan with the wing's two-consumer law (mesocosm
 `CLAUDE.md`): no deliberate duplication of machinery, and no cross-product
@@ -728,3 +845,27 @@ pass's findings. Ruling 337 holds that lane's merge until this lands. Branch
   | `clamp-adapter3.log` | 1,234 | `e87cc1a976398233154d8ee6b15f9e61ab8026d2dd2ed52525cf6015e76d2ed8` |
   | `modulus-receipt-release.log` | 2,353 | `f3e6436ab7ebe20be2eb793ffa8ff785a152b158e1d68989b8200ff4b88771ed` |
   | `SHA256SUMS` | 2,612 | `df10dc7594331a5ac3b9d694dc2c83915af3f1dcb767afc3c608428203be4d3f` |
+
+## Findings and progress (2026-09-28 ownership preparation)
+
+Read-only source verification at Mere `5ce144ff` preceded this documentation
+change; the previously recorded implementation and hardware receipts above
+were not rerun.
+
+- `crates/conatus/nisus/src/lib.rs:97` defines `VoxelPatch`, with occupancy
+  lowering at line 107; `VoxelChunk` starts at line 143 and revision-gated
+  `apply_edits` at line 234. This is the existing chunk-mechanics foundation,
+  not T2's world chunk map and retained revision log.
+- `crates/conatus/conatus/src/engine.rs:166` exposes `bodies_mut`.
+  `crates/conatus/conatus/src/world.rs:430` exposes `edit_voxels`, line 468
+  `raycast`, line 501 `overlaps`, and line 515 `step`. No public body-binding
+  module or query-refresh API is present in the inspected checkout.
+- `isometry/mesocosm/crates/mesocosm-runtime/src/tactile.rs:151` still uses
+  `step(1e-6)` to refresh queries. Replacing it depends on the separate
+  Conatus refresh implementation, verification and product repin; this
+  documentation update does not claim that adoption.
+- §1 now carries the body-binding shape from the wing's Appendix A; §2
+  carries the T2 rulings and migration gate. No binding, refresh, storage,
+  or product code changed. The `Engine` source comment and the separate
+  runtime-composition acceptance ledger still need their corresponding
+  reconciliation; they were outside this preparation lane's file ownership.

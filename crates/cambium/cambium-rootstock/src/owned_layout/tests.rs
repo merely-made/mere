@@ -140,3 +140,115 @@ fn a_caret_paints_in_its_fields_text_colour() {
     );
     assert_eq!(layout.caret_color(&dom, field), Some([1.0, 0.0, 0.0, 1.0]));
 }
+
+#[test]
+fn formatting_lines_supply_own_and_visible_descendant_scroll_range() {
+    for descendant in [false, true] {
+        let mut dom = ScriptedDom::new();
+        let root = dom.document();
+        let scroller = div(
+            &mut dom,
+            root,
+            "width:220px;height:180px;overflow:auto;line-height:200px;",
+        );
+        let owner = if descendant {
+            div(&mut dom, scroller, "height:180px;overflow:visible;")
+        } else {
+            scroller
+        };
+        let text = dom.create_text("Hg");
+        dom.append_child(owner, text);
+        let mut layout = OwnedLayout::new(
+            &dom,
+            &[""],
+            VIEWPORT.0,
+            VIEWPORT.1,
+            &[],
+            &Default::default(),
+        );
+        assert_eq!(
+            element_scroll_range(&dom, &layout.styles, &layout.fragments, scroller).1,
+            20.0
+        );
+        layout.set_element_scroll(&dom, HashMap::from([(scroller, (0.0, 12.0))]));
+        assert_eq!(layout.element_scroll()[&scroller], (0.0, 12.0));
+    }
+}
+
+#[test]
+fn clipped_descendant_lines_do_not_expand_the_outer_scroll_range() {
+    for overflow in ["hidden", "clip", "auto", "scroll"] {
+        let mut dom = ScriptedDom::new();
+        let root = dom.document();
+        let scroller = div(&mut dom, root, "width:220px;height:180px;overflow:auto;");
+        let child = div(
+            &mut dom,
+            scroller,
+            &format!("height:180px;line-height:200px;overflow:{overflow};"),
+        );
+        let text = dom.create_text("Hg");
+        dom.append_child(child, text);
+        let mut layout = OwnedLayout::new(
+            &dom,
+            &[""],
+            VIEWPORT.0,
+            VIEWPORT.1,
+            &[],
+            &Default::default(),
+        );
+        assert_eq!(
+            layout.fragments.inline_scroll_bounds(child).unwrap().height,
+            200.0
+        );
+        assert_eq!(
+            element_scroll_range(&dom, &layout.styles, &layout.fragments, scroller).1,
+            0.0,
+            "overflow:{overflow}"
+        );
+        layout.set_element_scroll(&dom, HashMap::from([(scroller, (0.0, 12.0))]));
+        assert_eq!(layout.element_scroll()[&scroller], (0.0, 0.0));
+    }
+}
+
+#[test]
+fn later_text_fragments_contribute_beyond_short_formatting_lines() {
+    let mut dom = ScriptedDom::new();
+    let root = dom.document();
+    let scroller = div(
+        &mut dom,
+        root,
+        "width:150px;height:20px;overflow:auto;font-size:80px;line-height:10px;",
+    );
+    let text = dom.create_text("Hg Hg Hg");
+    dom.append_child(scroller, text);
+    let mut layout = OwnedLayout::new(
+        &dom,
+        &[""],
+        VIEWPORT.0,
+        VIEWPORT.1,
+        &[],
+        &Default::default(),
+    );
+    let container = layout.fragments.get(scroller).unwrap();
+    let first = layout.fragments.get(text).unwrap();
+    let all: Vec<_> = layout.fragments.fragments_for_node(text).collect();
+    assert!(all.len() > 1, "the text must span retained fragments");
+    let bottom = all
+        .iter()
+        .map(|fragment| fragment.y + fragment.height)
+        .fold(f32::NEG_INFINITY, f32::max);
+    let lines = layout.fragments.inline_scroll_bounds(scroller).unwrap();
+    assert!(bottom > first.y + first.height);
+    assert!(
+        bottom > lines.y + lines.height,
+        "font content must exceed the short line boxes"
+    );
+    let expected = bottom - container.y - container.height;
+    assert!(expected > 0.0);
+    assert_eq!(
+        element_scroll_range(&dom, &layout.styles, &layout.fragments, scroller).1,
+        expected
+    );
+    layout.set_element_scroll(&dom, HashMap::from([(scroller, (0.0, 10_000.0))]));
+    assert_eq!(layout.element_scroll()[&scroller], (0.0, expected));
+}
