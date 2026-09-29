@@ -301,6 +301,9 @@ impl Canvas {
         for &(key, pos) in &seeds {
             self.view.set_position(key, pos);
         }
+        if self.physics_paused {
+            self.paused_positions = Some(seeds.clone());
+        }
         self.physics.seed(seeds);
         self.settle_physics(SETTLE_TICKS);
         true
@@ -373,6 +376,11 @@ impl Canvas {
         self.physics.pin(node, world);
         self.view.set_position(node, world);
         if let Some(positions) = self.strategy_positions.as_mut()
+            && let Some((_, position)) = positions.iter_mut().find(|(key, _)| *key == node)
+        {
+            *position = PortablePoint::new(world.x, world.y);
+        }
+        if let Some(positions) = self.paused_positions.as_mut()
             && let Some((_, position)) = positions.iter_mut().find(|(key, _)| *key == node)
         {
             *position = PortablePoint::new(world.x, world.y);
@@ -580,11 +588,20 @@ impl Canvas {
     /// Pause or run the layout physics. **Global and orthogonal to the
     /// arrangement**: physics is a capability of the whole graph (like the size
     /// or shape channels), not a property of one layout mode. Every arrangement
-    /// composes with either state — a paused Spiral holds its analytic
-    /// placement exactly, a running Spiral seeds the sim and lets forces relax
+    /// composes with either state — pause freezes the visible placement, while
+    /// a running Spiral lets forces relax
     /// from there, and "force-directed" is simply *no* analytic arrangement
     /// with physics running. (Physics as a capability.)
     pub fn set_physics_paused(&mut self, paused: bool) {
+        if paused != self.physics_paused {
+            // Publish a pending paused placement before resuming. Seed both
+            // transitions from what the user sees, never from stored arrangement
+            // slots or a newer, not-yet-displayed actor snapshot.
+            self.apply_strategy_to_view();
+            let positions: Vec<_> = self.view.positions().collect();
+            self.physics.seed(positions.clone());
+            self.paused_positions = paused.then_some(positions);
+        }
         self.physics_paused = paused;
         // The arrangement's anchor springs only exist while playing (paused, the
         // buffered positions are asserted directly), so the pull follows the

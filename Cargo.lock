@@ -1977,6 +1977,7 @@ dependencies = [
  "genet-scripted-dom",
  "js-sys",
  "layout-dom-api 0.1.1 (git+https://github.com/merely-made/genet.git?rev=7a60ad7965a1ae81292211b405a53210c554f70c)",
+ "mesquite",
  "netrender",
  "wasm-bindgen",
  "wasm-bindgen-futures",

@@ -122,3 +122,21 @@ changes. Keep this checkpoint intact, integrate those changes explicitly, and
 establish fresh combined-graph and affected-test evidence before publication.
 The earlier 527-package web graph cannot stand in for the combined graph.
 Pre.4 and S13 remain gated independently.
+
+## 2026-09-29 a31b9a14 combined verification
+
+The pending `8eca3e4c` plus `a31b9a14` merge passes the combined runtime,
+workspace, native and Wasm checks described in
+[Genet compatibility](../technical_architecture/genet-compatibility.md).
+Its reconciled standalone lock, full dependency classification, detector controls
+and failed cache attempt are retained under
+`testing/mere/receipts/2026-09-29/scroll-main-integration`.
+Commands retain the explicit toolchain/environment and shared stable target.
+Later receipts record source mtimes as well as hashes; the earlier host suite
+records hashes only. A changed timestamp requires classification even when
+final bytes match. No isolated home, target or worktree was created.
+
+Remote `ee77bf23` arrived during verification. Keep this a31b9a14 checkpoint,
+compare dependency cones after the follow-on merge, and refresh affected tests
+and native/web graphs before publication. Unchanged source alone does not
+establish an unchanged dependency cone.

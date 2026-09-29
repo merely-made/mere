@@ -89,6 +89,28 @@ fn fit_to_content_frames_a_far_restored_graph() {
 }
 
 #[test]
+fn fit_to_content_uses_a_buffered_layout_before_the_first_frame() {
+    let mut canvas = Canvas::new();
+    let left = canvas.visit("https://left.example");
+    let right = canvas.visit("https://right.example");
+    canvas.resize(800, 600);
+    canvas.set_layout_strategy(Some("test.grid".to_string()));
+    canvas.apply_strategy_positions(&[
+        (left, PortablePoint::new(4000.0, -2600.0)),
+        (right, PortablePoint::new(6000.0, -2000.0)),
+    ]);
+    canvas.fit_to_content();
+    // This is what the next render does. Fitting the old view would leave both
+    // nodes outside the viewport once the buffered positions become visible.
+    canvas.apply_strategy_to_view();
+    for key in [left, right] {
+        let (x, y) = canvas.screen_position_of(key).unwrap();
+        assert!((0.0..800.0).contains(&x), "node outside fitted width: {x}");
+        assert!((0.0..600.0).contains(&y), "node outside fitted height: {y}");
+    }
+}
+
+#[test]
 fn fit_to_content_on_an_empty_graph_recenters() {
     let mut canvas = Canvas::new();
     canvas.resize(800, 600);

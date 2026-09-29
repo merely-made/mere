@@ -257,3 +257,37 @@ and rerun the affected tests and native/web graph checks on the combined tree.
 Pre.4 reconciliation, S13, headed/browser receipts and downstream Isometry
 publication remain separate gates. `resumed-checkpoint.json` in the same receipt
 directory seals this outcome without altering `blocked-checkpoint.json`.
+
+## 2026-09-29 combined checkpoint with a31b9a14
+
+The pending merge combines local scroll adoption `8eca3e4c` with incoming main
+`a31b9a14`, preserving upstream runtime work and the tested Genet `7a60ad79` pin.
+Native metadata remains 1,524 packages with 24 current Genet packages and the
+two existing Knot-owned identities; its only added edge is web-host to Mesquite
+under `cfg(target_arch = "wasm32")`. The root lock retains 1,651 identities and
+all 385 recorded pre.2 patch files retain their bytes.
+
+Web metadata/lock grows from 527 to 636 packages: seven required Wasm-family
+updates and 109 additions reachable from the three approved local host roots.
+Nineteen existing nodes gain features/edges without losing prior ones, including
+the requested `Location` and `UrlSearchParams` features. The filtered Wasm graph
+has 445 reachable nodes; these are graph counts, not payload measurements.
+An incidental offline `libredox` downgrade was rejected and prior 0.1.25 restored.
+The accepted ignored web lock and all attempts are preserved. Native/web WGPU
+stay 30.0.1/30.0.0, NetRender stays `9607d16f`, and netrender-vello stays 0.10.1.
+Both fresh source detectors reject an outside path and an old Genet revision.
+
+Tests pass: 202 Rootstock/host/Mesquite tests with four ignored doctests;
+261 Pictograph unit plus two headless Vello tests; 88 Seiche default-library
+and eight no-default runtime tests. Both retained-layout cases and the GPU
+lost-crossing-edge control pass. Workspace verification, Reader all-target,
+native and standalone Wasm checks pass. These are correctness results on a
+shared device; pre.4 tensor/release and S13 acceptance remain separate.
+All commands preserve 3,034 tracked-file/ignored-lock hashes. The earlier host
+wrapper has hashes only; seven later runtime/check runs also preserve mtimes.
+
+Evidence: `testing/mere/receipts/2026-09-29/scroll-main-integration/combined-checkpoint.json`
+under the shared Code root. This accepts only the a31b9a14 checkpoint, pending
+independent review and local commit. Remote main advanced to `ee77bf23` during
+verification; its Personae/Insigne migration must be integrated and the affected
+dependency checks refreshed before publication or downstream adoption.

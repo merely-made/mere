@@ -22,6 +22,10 @@
 //! | [`Accessibility`] | [`DomAccessibility`], a DOM mirror with ARIA | an AccessKit tree |
 //! | [`FileChooser`] | [`WebFileChooser`], a file input in the page | the platform's open dialog |
 //!
+//! A capture hook reads a presented frame back as a [`PendingFrame`] through
+//! [`capture_into`], where the desktop reads it at once with `read_frame`.
+//! [`WebCapture`] supplies asynchronous readback to Mesquite's scenario lane.
+//!
 //! ## Off wasm, only the mirror's plan compiles
 //!
 //! Everything that touches the browser is `#[cfg(target_arch = "wasm32")]`,
@@ -40,9 +44,13 @@ pub mod mirror;
 #[cfg(target_arch = "wasm32")]
 mod a11y;
 #[cfg(target_arch = "wasm32")]
+mod capture;
+#[cfg(target_arch = "wasm32")]
 mod files;
 #[cfg(target_arch = "wasm32")]
 mod input;
+#[cfg(target_arch = "wasm32")]
+mod lane;
 #[cfg(target_arch = "wasm32")]
 mod mount;
 #[cfg(target_arch = "wasm32")]
@@ -51,12 +59,16 @@ mod surface;
 #[cfg(target_arch = "wasm32")]
 pub use a11y::DomAccessibility;
 #[cfg(target_arch = "wasm32")]
+pub use capture::{PendingFrame, capture_into};
+#[cfg(target_arch = "wasm32")]
 pub use files::WebFileChooser;
 #[cfg(target_arch = "wasm32")]
 pub use input::{
     CompositionKind, composition_from_dom, key_press_from_dom, modifiers_from_dom,
     wheel_delta_from_dom,
 };
+#[cfg(target_arch = "wasm32")]
+pub use lane::WebCapture;
 #[cfg(target_arch = "wasm32")]
 pub use mount::{Mounted, mount};
 #[cfg(target_arch = "wasm32")]
