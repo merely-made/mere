@@ -38,8 +38,14 @@ fn equal_hover_cascade_retains_geometry_text_generation_and_scroll() {
         "div { width: 220px; height: 180px; line-height: 200px; overflow: auto; \
          color: black !important; } div:hover { color: red; }",
     );
+    let initial_range = element_scroll_range(&dom, &layout.styles, &layout.fragments, a);
+    assert!(
+        initial_range.1 >= 12.0,
+        "the fixture must have a real scroll range: {initial_range:?}"
+    );
     layout.set_viewport_scroll((0.0, 40.0));
     layout.set_element_scroll(&dom, HashMap::from([(a, (0.0, 12.0))]));
+    assert_eq!(layout.element_scroll()[&a], (0.0, 12.0));
     let generation = layout.generation;
     let rect = layout.painted_rect(&dom, a);
     for hovered in [Some(a), Some(b), None, Some(a)] {
