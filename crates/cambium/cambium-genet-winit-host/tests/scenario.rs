@@ -18,10 +18,12 @@ use std::rc::Rc;
 use taproot::ProbeSnapshot;
 
 use cambium::{
-    AnyView, FileEvent, FileFilter, GenetCtx, GenetElement, PointerClick, button, clickable, el,
-    focusable, open_file, text,
+    AnyView, FileEvent, FileFilter, GenetCtx, GenetElement, PointerClick, TextInput, button,
+    clickable, el, focusable, lens, open_file, text, textarea_typed,
 };
-use cambium_genet_winit_host::{AppCtx, Harness, HostHooks, Init, WindowCommand, inert_hooks};
+use cambium_genet_winit_host::{
+    AppCtx, FocusedTextSlot, Harness, HostHooks, Init, WindowCommand, inert_hooks,
+};
 
 #[derive(Default)]
 struct App {
@@ -280,6 +282,10 @@ fn a_click_scrolls_a_below_the_fold_button_before_the_next_assertion() {
     let (receipt, h) = run("far", "click role:button Far\nassert snap count == 1\n");
     assert!(receipt.starts_with("RESULT ok"), "{receipt}");
     assert_eq!(h.state().count, 1);
+    assert!(
+        h.element_scroll_total() > 0.0,
+        "the offscreen button was revealed"
+    );
 }
 
 #[test]
@@ -464,6 +470,157 @@ fn mesquite_scrolls_then_uses_the_product_target_point_before_advancing() {
     assert_eq!(Some(h.cursor()), h.state().target_point.get());
 }
 
+#[test]
+fn a_partly_visible_tall_editor_focuses_without_scrolling_its_toolbar() {
+    for selector in [
+        taproot::Selector::role("textbox"),
+        taproot::Selector::class("editor-textbox"),
+    ] {
+        exercise_editor_click(selector);
+    }
+}
+
+fn exercise_editor_click(selector: taproot::Selector) {
+    struct Editor {
+        text: TextInput,
+    }
+    type EditorView = Box<dyn AnyView<Editor, (), GenetCtx, GenetElement>>;
+    type EditorLogic = fn(&Editor) -> EditorView;
+    fn editor_root(_: &Editor) -> EditorView {
+        Box::new(el(
+            "main",
+            (
+                el("div", text("Toolbar")).attr("class", "toolbar"),
+                el(
+                    "div",
+                    lens(
+                        |text: &mut TextInput| textarea_typed(text),
+                        |editor: &mut Editor| &mut editor.text,
+                    ),
+                )
+                .attr("class", "editor-textbox")
+                .attr("role", "textbox"),
+            ),
+        ))
+    }
+    fn center(
+        _: &AppCtx<'_, Editor, EditorLogic, EditorView>,
+        _: cambium_rootstock::NodeId,
+        rect: [f32; 4],
+    ) -> (f32, f32) {
+        (rect[0] + rect[2] / 2.0, rect[1] + rect[3] / 2.0)
+    }
+
+    let mut clicks = mesquite::Clicks::default();
+    let mut started = false;
+    let hooks: HostHooks<Editor, EditorLogic, EditorView> = HostHooks {
+        after_frame: Box::new(move |ctx| {
+            if started {
+                clicks.after_frame(ctx, center).expect("deferred click");
+            } else {
+                started = true;
+                assert!(clicks.click(ctx, &selector, center));
+            }
+        }),
+        focused_text: Box::new(|runner| {
+            let node = runner.focus()?;
+            let dom = runner.dom();
+            let dom = dom.borrow();
+            (layout_dom_api::LayoutDom::element_name(&*dom, node)?
+                .local
+                .as_ref()
+                == "textarea")
+                .then(|| FocusedTextSlot {
+                    node,
+                    get: Box::new(|editor: &Editor| &editor.text),
+                    get_mut: Box::new(|editor: &mut Editor| &mut editor.text),
+                })
+        }),
+        ..inert_hooks()
+    };
+    let mut host = Harness::with_hooks(
+        Init {
+            state: Editor {
+                text: TextInput::new("start"),
+            },
+            logic: editor_root as EditorLogic,
+            sheet: "body { margin:0; } .toolbar { height:40px; } \
+                .editor { margin-top:110px; } textarea { display:block; width:300px; height:360px; }"
+                .into(),
+            fonts: vec![],
+            images: vec![],
+        },
+        hooks,
+    );
+    host.layout_at(400.0, 300.0);
+    let toolbar = taproot::Selector::class("toolbar");
+    let before = host.resolve(&toolbar).expect("toolbar is laid out");
+    let textbox = host
+        .with_dom(|dom| taproot::matching(dom, &taproot::Selector::role("textbox")))
+        .into_iter()
+        .next()
+        .expect("textbox is in the DOM");
+    let painted = host.painted_rect(textbox).expect("textbox paints");
+    let visible = host
+        .visible_rect(textbox)
+        .expect("textbox is partly visible");
+    assert!(
+        visible.3 < painted.3,
+        "the textbox is clipped by the viewport"
+    );
+    for _ in 0..2 {
+        host.after_frame();
+        host.drain_pointer();
+        host.after_dispatch();
+        host.layout_at(400.0, 300.0);
+    }
+    assert_eq!(
+        host.resolve(&toolbar),
+        Some(before),
+        "toolbar stayed in place"
+    );
+    assert_eq!(host.viewport_scroll(), (0.0, 0.0));
+    assert!(host.focus().is_some(), "click focused the visible editor");
+    host.key_injected("x");
+    assert!(
+        host.state().text.text().contains('x'),
+        "typing reached the editor"
+    );
+}
+
+#[test]
+fn mesquite_reveals_a_partly_clipped_small_control() {
+    let (receipt, host) = run_lane(
+        &scratch("partly-clipped-small"),
+        "click role:button Far\nassert snap count == 1\n",
+        "button { display:block; width:120px; height:32px; } \
+         .scroller { height:64px; overflow:auto; } .spacer { height:48px; }",
+        true,
+    );
+    assert!(receipt.contains("\"ok\": true"), "{receipt}");
+    assert_eq!(host.state().count, 1);
+    assert!(
+        host.element_scroll_total() > 0.0,
+        "the clipped button was revealed"
+    );
+}
+
+#[test]
+fn mesquite_reveals_a_partly_clipped_large_non_text_control() {
+    let (receipt, host) = run_lane(
+        &scratch("partly-clipped-large"),
+        "click role:button Far\nassert snap count == 1\n",
+        "button { display:block; width:120px; height:300px; } \
+         .scroller { height:64px; overflow:auto; } .spacer { height:8px; }",
+        true,
+    );
+    assert!(receipt.contains("\"ok\": true"), "{receipt}");
+    assert_eq!(host.state().count, 1);
+    assert!(
+        host.element_scroll_total() > 0.0,
+        "the large button was revealed"
+    );
+}
 #[test]
 fn a_failed_assertion_fails_the_receipt() {
     let (receipt, _) = run("assert", "assert snap count == 7\n");
