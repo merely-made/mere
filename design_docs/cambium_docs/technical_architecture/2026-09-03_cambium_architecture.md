@@ -377,6 +377,13 @@ isolated-branch receipts; publication follows the concurrent Mere integration.
 The standalone Graphshell manifest also passed `cargo check --target
 wasm32-unknown-unknown` with the same Genet pin and its required `wasm_js` cfg.
 
+After merging the sealed formatting-line repair `8eca3e4c`, branch checkpoint
+`ced161f1` passed all 199 Rootstock/winit-host/Mesquite tests, repeated the native
+smoke's three capture digests, and passed Wasm checking against the primary
+owner's accepted standalone lock. No package/version changed in that web lock;
+the only new dependency edge is Taproot to document-session-api. Publication
+still waits for the primary integration of the newer Insigne changes.
+
 This is DOM semantic parity. Sprigging custom-leaf contributions and complete
 HTML/CSS visibility/role conformance remain outside it. The document projection
 still uses revision zero; it is not an immutable presentation-qualified snapshot.
