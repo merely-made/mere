@@ -38,11 +38,24 @@ The README example was not registered as a library doctest: its command ran zero
 tests and contributes no additional receipt.
 
 Turnstone's separate redacted event-copy adapter and Gloss/Inspector pane
-migration are written but await dependency pins and their own tests. The actual
-worker pilot waits for Redshank's active owner to finish its podcast/task commit.
-No new headed diagnostics or human AT evidence was produced by these gates.
-Exact captured-frame/state correlation, worker acceptance versus execution
-versus durability, and two-consumer qualification remain open.
+migration are published at Turnstone `d6b62adbd2929e46bde5611bf11f01a34eeeaceb`
+and qualified on the sealed graph: 612 workspace tests with nine ignores,
+five participant checks, 33 UI checks, a normal native build and final fresh/
+restarted scenarios pass. Initial retention of two records reports eight evictions
+and gap `[1,9)`; configured Downloads/Recent order and Inspector persist. The
+consumer receipt records all three inspected nonblank captures and source/binary
+hashes at `turnstone/design_docs/2026-09-29_shared_diagnostics_gloss_inspector_receipt.md`.
+Separately, Redshank's persistence pilot
+is published at Woodshed `a57085b`: 63 desktop tests, strict Clippy, a restored
+early-durability negative control and native opt-in/default/invalid-setting
+receipts pass. Its bounded native batch retains two records, reports 16 evictions
+and a `[1,17)` gap, and links successful execution to the save reply that advances
+durable revision to 3. See
+`woodshed/design_docs/2026-09-29_redshank_persistence_diagnostics_receipt.md`.
+These are separate consumer gates, not additional coverage from the Mere commands
+above. Human AT, exact captured-frame/state correlation, other worker families
+remain open. These two products qualify the bounded core; they do not establish
+two complete action/worker/exact-pixel causal receipts.
 
 See the [canonical diagnostics plan](../implementation_strategy/2026-06-08_system_diagnostics_and_accessibility_plan.md)
 for current ownership and remaining acceptance conditions. June receipts remain
