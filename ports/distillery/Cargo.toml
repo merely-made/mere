@@ -10,6 +10,7 @@ keywords = ["inference", "embedding", "mesh", "harness", "compute"]
 categories = ["concurrency"]
 
 [dependencies]
+insigne.workspace = true
 mesh.workspace = true
 incipit.workspace = true
 muniment.workspace = true

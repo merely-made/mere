@@ -25,7 +25,7 @@ use std::path::{Path, PathBuf};
 use identity::PersonaId;
 use identity::carry::ACTION_PRIVATE_READ;
 use identity::carry::{DeviceGrantSet, WALLET_SCHEMA_VERSION};
-use identity::delegation::{DelegationId, SignedDelegationCertificate};
+use insigne::delegation::{DelegationId, SignedDelegationCertificate};
 use serde::{Deserialize, Serialize};
 
 use crate::wallet_store::identity_grants_dir;

@@ -134,7 +134,7 @@ pub fn assess_device_grant(
 
     // The standing outlives the set it was loaded from, so it keeps the
     // verdict, not the borrowed conclusion.
-    let assess = |certificate: &identity::delegation::SignedDelegationCertificate| {
+    let assess = |certificate: &insigne::delegation::SignedDelegationCertificate| {
         validate_chain(
             std::slice::from_ref(certificate),
             holder.0,

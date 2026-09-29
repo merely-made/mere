@@ -77,7 +77,7 @@ impl std::fmt::Debug for BlindedSlotId {
 
 /// The carriage slot addressing one certificate's leased record.
 pub fn blinded_slot_id(
-    certificate: identity::delegation::DelegationId,
+    certificate: insigne::delegation::DelegationId,
     wrapping_key: [u8; 32],
 ) -> BlindedSlotId {
     let blinding_key = blake3::derive_key(BLIND_SLOT_CONTEXT, &wrapping_key);
@@ -172,7 +172,7 @@ mod tests {
 
     #[test]
     fn blinded_slots_do_not_link_devices_and_stay_stable_per_device() {
-        let certificate = identity::delegation::DelegationId([0x42; 32]);
+        let certificate = insigne::delegation::DelegationId([0x42; 32]);
         // Two devices holding the same certificate's material produce
         // different slots, because each has its own pairing-derived key.
         // That is the unlinkability the lane inherits from the record.

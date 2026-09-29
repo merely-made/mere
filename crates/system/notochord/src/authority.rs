@@ -10,7 +10,7 @@
 //! handshake must retain the verified delegation chain so it can observe a
 //! later revocation or expiry without decoding application bytes again.
 
-use personae::delegation::SignedDelegationCertificate;
+use insigne::delegation::SignedDelegationCertificate;
 
 use crate::{AdmittedPrincipal, AdmittedSession, RevocationLedger};
 
@@ -100,13 +100,13 @@ impl RetainedAuthority {
 mod tests {
     use super::*;
     use crate::{NetworkId, ProfileRef, RequestedAction, SessionClaims, TrafficClass};
-    use personae::IdentityProvider;
-    use personae::InMemoryProvider;
-    use personae::delegation::Issue;
-    use personae::delegation::{
+    use insigne::delegation::{
         CapabilityScope, DelegationCertificate, DelegationParent, DelegationRevocation,
         SignedDelegationCertificate, SignedDelegationRevocation,
     };
+    use personae::IdentityProvider;
+    use personae::InMemoryProvider;
+    use personae::delegation::Issue;
 
     const ROOT_AUTHORITY: [u8; 32] = [7; 32];
     const NETWORK: [u8; 32] = [3; 32];

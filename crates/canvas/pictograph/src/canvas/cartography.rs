@@ -163,6 +163,9 @@ impl Canvas {
         for &(key, pos) in &resolved {
             self.view.set_position(key, pos);
         }
+        if self.physics_paused {
+            self.paused_positions = Some(self.view.positions().collect());
+        }
         self.physics.seed(resolved);
         self.physics.halt();
     }

@@ -6,15 +6,13 @@
 
 //! Portable, signed capability delegation: issuing.
 //!
-//! The statements and their checks moved to insigne on 2026-09-24 (the insigne
-//! proofs plan) and are re-exported here at their old paths until every
-//! consumer imports them from insigne. Issuing stays here because it needs a
-//! persona's keys: bring [`Issue`] into scope to call
+//! Import statements and their checks from insigne. Issuing stays here
+//! because it needs a persona's keys: bring [`Issue`] into scope to call
 //! `SignedDelegationCertificate::issue` and `SignedDelegationRevocation::issue`.
 
-pub use insigne::delegation::{
-    CapabilityScope, DelegationCertificate, DelegationId, DelegationParent, DelegationRevocation,
-    SignedDelegationCertificate, SignedDelegationRevocation, delegation_signing_salt, path_covers,
+use insigne::delegation::{
+    CapabilityScope, DelegationCertificate, DelegationRevocation, SignedDelegationCertificate,
+    SignedDelegationRevocation, delegation_signing_salt,
 };
 use thiserror::Error;
 
@@ -76,7 +74,7 @@ fn sign_scoped<P: IdentityProvider>(
     provider: &P,
     scope: &CapabilityScope,
     message: &[u8],
-) -> Result<(crate::DerivedKeyAttestation, Vec<u8>), DelegationError> {
+) -> Result<(insigne::DerivedKeyAttestation, Vec<u8>), DelegationError> {
     let salt = delegation_signing_salt(scope);
     let signer = provider
         .attest_derived_key(&salt)
@@ -108,6 +106,7 @@ pub enum DelegationError {
 mod tests {
     use super::*;
     use crate::InMemoryProvider;
+    use insigne::delegation::{DelegationId, DelegationParent};
 
     fn scope(path: &str, actions: &[&str]) -> CapabilityScope {
         CapabilityScope {

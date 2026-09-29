@@ -24,8 +24,9 @@
 //! minted for one connection does not verify on another. That is what makes a
 //! captured hello useless when replayed over a different link.
 
-use personae::delegation::SignedDelegationCertificate;
-use personae::{DerivedKeyAttestation, Ed25519PublicKey, Ed25519Signature, IdentityProvider};
+use insigne::DerivedKeyAttestation;
+use insigne::delegation::SignedDelegationCertificate;
+use personae::{Ed25519PublicKey, Ed25519Signature, IdentityProvider};
 use serde::{Deserialize, Serialize};
 
 use crate::chain::RevocationLedger;

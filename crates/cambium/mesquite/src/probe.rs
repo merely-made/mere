@@ -132,6 +132,24 @@ impl<P: Product> Driveable for Probe<'_, '_, P> {
         match words.as_slice() {
             ["cost-begin", name] => self.lane.costs.begin(name)?,
             ["cost-end"] => self.lane.costs.end()?,
+            ["key", name] => {
+                use cambium::{Key, KeyEvent, NamedKey};
+                let key = match *name {
+                    "Tab" | "Shift+Tab" => Key::Named(NamedKey::Tab),
+                    "Enter" => Key::Named(NamedKey::Enter),
+                    "Space" => Key::Named(NamedKey::Space),
+                    "Escape" => Key::Named(NamedKey::Escape),
+                    "ArrowLeft" => Key::Named(NamedKey::ArrowLeft),
+                    "ArrowRight" => Key::Named(NamedKey::ArrowRight),
+                    "ArrowUp" => Key::Named(NamedKey::ArrowUp),
+                    "ArrowDown" => Key::Named(NamedKey::ArrowDown),
+                    name if name.chars().count() == 1 => Key::Character(name.into()),
+                    _ => return Err(format!("unsupported scenario key {name}")),
+                };
+                let mut event = KeyEvent::new(key);
+                event.mods.shift = *name == "Shift+Tab";
+                self.ctx.runner.dispatch_key(event);
+            },
             ["input-text", value] => {
                 let mut select = cambium::KeyEvent::new(cambium::Key::Character("a".into()));
                 select.mods.ctrl = true;

@@ -24,12 +24,13 @@ use graphshell::carrier::projection_policy;
 use graphshell::network_carrier::{
     CarrierRuntime, NetworkCarrier, dial_projection_session, projection_binding,
 };
+use insigne::delegation::{
+    CapabilityScope, DelegationCertificate, DelegationParent, SignedDelegationCertificate,
+};
 use mesh::ResourceId;
 use mesh::spec::{DeterminismClass, JobSpec};
 use notochord::{LocalNetworkPolicy, NetworkId, ProfileRef, TrafficClass, TrustedRoot};
-use personae::delegation::{
-    CapabilityScope, DelegationCertificate, DelegationParent, Issue, SignedDelegationCertificate,
-};
+use personae::delegation::Issue;
 use personae::{IdentityProvider, InMemoryProvider};
 use tokio::sync::Notify;
 use transport::PeerID;

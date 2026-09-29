@@ -68,3 +68,90 @@ Receipt directory: `C:\Users\mark_\Code\testing\mere\cambium_t4_receipt_20260916
 netrender's `netrender-notes/2026-09-04_wgpu_execution_graph_plan.md`,
 "Retained placements inside layer scopes" and "Filter texture slots: key/handle
 reuse".
+
+## 2026-09-28 published-source inline scroll adoption
+
+The current primary worktree prepares Genet `7a60ad7965a1ae81292211b405a53210c554f70c`
+in both the root and standalone Graphshell web manifests. Rootstock's new
+formatting-line query consumption is covered by the bounded source controls
+and status in [Genet compatibility](../technical_architecture/genet-compatibility.md).
+The owning repair plan is `genet/design_docs/2026-09-25_line_box_model_plan.md`.
+The revision is published by Genet; Mere's adoption remains uncommitted until
+its remaining consumer checks and independent review complete.
+
+Keep `RUSTUP_TOOLCHAIN=1.98.1`, `CARGO_TARGET_DIR=C:/t/cargo-targets/mere` and
+`CARGO_BUILD_JOBS=4` explicit. The current bounded run also sets
+`CARGO_INCREMENTAL=0` because disk headroom is limited. These environment
+choices do not permit a different graph or weaker check. Root and web lock
+candidates contain only the exact old-to-new Genet revision substitution;
+locked metadata must accept them unchanged. The root graph retains the two
+older Knot-owned Genet identities. Four copied-metadata controls verify that
+both native and web source detectors reject unintended local paths and old
+current-family revisions. Machine-local redirects remain outside the
+published-source proof.
+
+Do not confuse a long Git checkout preparation with failed resolution.
+This revision contains 187,580 tracked files; Cargo's completed `.cargo-ok`
+marker and subsequent locked metadata established completion. Retain attempts
+and source provenance, and let a progressing preparation finish. Broader
+compile gates are currently held for disk headroom; passing metadata and
+Rootstock tests alone do not close them.
+
+## 2026-09-29 continuation result and integration boundary
+
+The five consumer checks previously held for disk space now pass with the
+explicit environment above. The source and locks remain byte-identical to the
+accepted restored Rootstock checkpoint. Exact cache restoration used a recorded
+`cargo fetch --locked`; the failed initial offline attempt is preserved. The
+stable target was recreated through ordinary builds after the user's cleanup.
+Shared package-cache and target locks were allowed to finish normally.
+
+A concurrent task briefly changed four shared source files during the first
+workspace check, then restored them. That run remains qualified even though
+its before/after hashes match and it exited successfully. Once it ended, the
+restored files were checked against HEAD and the accepted hashes, and only
+their mtimes were advanced. The accepted repeat is
+`workspace-verify-restored-selector`; its log shows the affected crates being
+checked again. This avoids treating final hashes alone as proof that source
+was stable throughout a build. Details and the owner-reported interval are in
+`restored-selector-invalidation.json`, including its provenance correction.
+
+These receipts establish the bounded pre-integration adoption. Newer
+`origin/main` contains separately owned web dependencies/features and runtime
+changes. Keep this checkpoint intact, integrate those changes explicitly, and
+establish fresh combined-graph and affected-test evidence before publication.
+The earlier 527-package web graph cannot stand in for the combined graph.
+Pre.4 and S13 remain gated independently.
+
+## 2026-09-29 a31b9a14 combined verification
+
+The pending `8eca3e4c` plus `a31b9a14` merge passes the combined runtime,
+workspace, native and Wasm checks described in
+[Genet compatibility](../technical_architecture/genet-compatibility.md).
+Its reconciled standalone lock, full dependency classification, detector controls
+and failed cache attempt are retained under
+`testing/mere/receipts/2026-09-29/scroll-main-integration`.
+Commands retain the explicit toolchain/environment and shared stable target.
+Later receipts record source mtimes as well as hashes; the earlier host suite
+records hashes only. A changed timestamp requires classification even when
+final bytes match. No isolated home, target or worktree was created.
+
+Remote `ee77bf23` arrived during verification. Keep this a31b9a14 checkpoint,
+compare dependency cones after the follow-on merge, and refresh affected tests
+and native/web graphs before publication. Unchanged source alone does not
+establish an unchanged dependency cone.
+
+## 2026-09-29 ee77bf23 follow-on verification
+
+The combined source passes fresh Pictograph (263) and proof (233) tests plus
+native and Wasm all-target/all-feature checks. The native check excludes only
+the existing `mere-linked-data` failure. Exact unchanged dependency cones carry
+the earlier Rootstock/host/Mesquite/Seiche tests; classified locked default and
+all-feature graphs and deliberate source faults cover the follow-on merge.
+Every new gate preserves source hashes and mtimes with the same explicit Rust
+1.98.1 environment and stable target. See
+`testing/mere/receipts/2026-09-29/scroll-insigne-integration/final-checkpoint.json`
+and [Genet compatibility](../technical_architecture/genet-compatibility.md).
+Pre.4, S13 and downstream adoption retain their separate gates. No isolated
+home or worktree was created, and `C:\t\cargo-targets\mere` remains the reusable
+Mere build output.
