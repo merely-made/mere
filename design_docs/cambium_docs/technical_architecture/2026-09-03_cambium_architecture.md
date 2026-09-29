@@ -327,11 +327,11 @@ the lane queue with product-specific selector verbs, preserving the scroll /
 layout / pointer-dispatch ordering. Existing products default through
 `app_step` and need no method change.
 
-The remaining semantic parity gate must compare names and roles from the same
+The semantic parity gate must compare names and roles from the same
 owner-computed projection, including referenced labels, without turning a
 passing scenario into a claim of physical screen-reader acceptance. Genet's
-uncommitted accessible-name work remains with its existing owner pending
-coordination. Diagnostics should correlate product state and semantic action
+accessible-name work was published at `c858738c`; the projection matcher is
+published at `19c20687` (25 Taproot tests passed). Diagnostics should correlate product state and semantic action
 results with the existing UX event sinks and scenario receipts; avoid inventing
 a second application state model. Consumer acceptance and physical AT receipts
 must remain separately recorded.
@@ -347,3 +347,38 @@ semantic commands and observations. Evidence is under
 `Code/testing/cambium/mesquite-migration`, with captures under the corresponding
 Woodshed and Cleromancy testing directories. These are native automation
 receipts, not new manual screen-reader acceptance.
+
+### DOM selector parity (2026-09-29, integration pending)
+
+`AppCtx::a11y_projection` exposes the host's retained Genet document semantics.
+Mesquite uses `taproot::matching_with_projection` for role/name targets and
+retains explicit class/text/attribute matching. A role target absent from the
+projection is an authoritative miss. A held scrolling click revalidates the
+same DOM identity before delivery; a changed or hidden semantic target fails
+instead of activating or selecting a replacement. Pointer coordinates still
+come from host geometry and product coordinate transforms.
+
+The shared-host fixture names a below-fold button through `aria-labelledby`,
+overriding conflicting raw text and `aria-label`, then routes an accessibility
+focus and click through the same DOM target. The native smoke's Restore defaults
+button is named Reset all controls through the same referenced-label rule.
+Manual acceptance must verify that spoken name, focus without activation, and
+activation's visible state change; automated and native receipts alone cannot
+establish this.
+
+At Mere base `a31b9a14` with Genet `19c20687`, the focused gate passed 60
+tests (16 host unit, 6 accessibility, 21 scenario, 17 Mesquite unit). Replacing
+only the initial click matcher with the old raw-DOM matcher failed the new
+referenced-name test with count zero and a missing target. Restoring the exact
+source passed all 21 scenario tests. The native smoke passed 32 frames with
+AccessKit installed (15 nodes), three nonblank distinct captures and two sizes;
+the resize capture was visually inspected. Human AT remains pending. These are
+isolated-branch receipts; publication follows the concurrent Mere integration.
+
+This is DOM semantic parity. Sprigging custom-leaf contributions and complete
+HTML/CSS visibility/role conformance remain outside it. The document projection
+still uses revision zero; it is not an immutable presentation-qualified snapshot.
+The [current diagnostics design](../../mere_docs/implementation_strategy/2026-06-08_system_diagnostics_and_accessibility_plan.md)
+requires producer-supplied identity/revision references rather than inventing
+correlation from this limitation. No shared diagnostics store is implemented by
+the selector work.
