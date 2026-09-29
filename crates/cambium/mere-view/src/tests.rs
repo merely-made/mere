@@ -395,6 +395,81 @@ fn the_view_fits_its_tile_from_the_full_centre_to_a_side_stack() {
 }
 
 #[test]
+fn an_empty_sessions_list_leaves_the_full_graph_area_available() {
+    let mut empty = model();
+    empty.sessions.clear();
+    empty.can_mint = false;
+
+    for (width, height, expected) in [(900, 600, (900, 560)), (280, 600, (280, 536))] {
+        let host = Host::new(empty.clone(), width, height);
+        let (dom, runner) = runner(host);
+        let root = runner.root();
+        let dom = dom.borrow();
+
+        let view = MereView {
+            model: &runner.state().model,
+            state: &runner.state().view,
+            leaf_key: 7,
+            width,
+            height,
+        };
+        assert_eq!(view.graph_size(), expected);
+        let swatch = view.swatch();
+        assert_eq!((swatch.width, swatch.height), expected);
+
+        let sessions = find(&dom, root, "class", "mere-view-sessions").expect("sessions list");
+        assert_eq!(attr(&dom, sessions, "style"), Some("display:none"));
+        let main = find(&dom, root, "class", "mere-view-main").expect("graph area");
+        let expected_style = format!("width:{}px;height:{}px", expected.0, expected.1);
+        assert_eq!(attr(&dom, main, "style"), Some(expected_style.as_str()));
+    }
+}
+
+#[test]
+fn the_new_session_action_keeps_the_sessions_area_when_the_list_is_empty() {
+    let mut empty = model();
+    empty.sessions.clear();
+    empty.can_mint = true;
+
+    let host = Host::new(empty, 900, 600);
+    let (dom, runner) = runner(host);
+    let dom = dom.borrow();
+    let root = runner.root();
+
+    let sessions = find(&dom, root, "class", "mere-view-sessions").expect("sessions list");
+    assert_eq!(attr(&dom, sessions, "style"), Some("width:220px"));
+    assert!(find(&dom, sessions, "data-request", "mint").is_some());
+    let view = MereView {
+        model: &runner.state().model,
+        state: &runner.state().view,
+        leaf_key: 7,
+        width: 900,
+        height: 600,
+    };
+    assert_eq!(view.graph_size(), (680, 560));
+}
+
+#[test]
+fn the_layout_tracks_session_area_changes() {
+    let mut empty = model();
+    empty.sessions.clear();
+    empty.can_mint = false;
+    let mut populated = empty.clone();
+    populated.sessions.push(session(1, "Reading", false, false));
+
+    let mut state = MereViewState::default();
+    state.lay_out(&empty, 900, 600);
+    let empty_position = state.position("a").expect("empty-layout node");
+
+    state.lay_out(&populated, 900, 600);
+    let populated_position = state.position("a").expect("populated-layout node");
+    assert_ne!(empty_position, populated_position);
+
+    state.lay_out(&empty, 900, 600);
+    assert_eq!(state.position("a"), Some(empty_position));
+}
+
+#[test]
 fn a_layout_switch_moves_nodes_and_keeps_every_key() {
     let graph = model().graph;
     let spectral = lay_out(&graph, "spectral.default", 680, 560);

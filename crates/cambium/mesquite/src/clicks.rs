@@ -15,8 +15,9 @@ pub struct Clicks {
 }
 
 impl Clicks {
-    /// Match against the retained DOM. Click a fully visible target now, or
-    /// ask the host to reveal it and retain its identity for the next frame.
+    /// Match against the retained DOM. Click a fully visible target, or a
+    /// substantial visible part of a tall textbox, now. Otherwise ask the host
+    /// to reveal it and retain its identity for the next frame.
     /// `point` preserves the product's coordinate transform, if it has one.
     pub fn click<State, Logic, V>(
         &mut self,
@@ -37,8 +38,21 @@ impl Clicks {
         }) else {
             return false;
         };
-        if ctx.visible_rect(node) == Some(rect) {
-            let (x, y) = point(ctx, node, [rect.0, rect.1, rect.2, rect.3]);
+        let visible = ctx.visible_rect(node);
+        let is_textbox = taproot::matching(&ctx.runner.dom().borrow(), &Selector::role("textbox"))
+            .contains(&node);
+        // Revealing the full height of a large text editor can scroll its
+        // toolbar away even when there is ample visible space to focus it.
+        // Other controls retain the existing reveal behavior.
+        const USABLE_HEIGHT: f32 = 44.0;
+        if let Some(visible) = visible.filter(|visible| {
+            *visible == rect
+                || (is_textbox
+                    && rect.3 >= USABLE_HEIGHT * 2.0
+                    && visible.2 >= USABLE_HEIGHT
+                    && visible.3 >= USABLE_HEIGHT)
+        }) {
+            let (x, y) = point(ctx, node, [visible.0, visible.1, visible.2, visible.3]);
             ctx.pointer
                 .extend([HostPointer::Press(x, y), HostPointer::Release(x, y)]);
         } else {
