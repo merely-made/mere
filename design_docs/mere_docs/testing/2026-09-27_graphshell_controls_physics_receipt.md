@@ -235,6 +235,50 @@ Real browser hide/show and background-tab initialization have not received a
 headed scenario receipt; the lifecycle contract is also tested at the host
 and Canvas boundaries.
 
+## Current-main integration and local editor (2026-09-29)
+
+The elapsed host slice is rebased onto published Mere `ca2351b3`, preserving
+Genet `19c206873ab08ae227217892d9e74d0df18b349a`, the shared text-boundary
+changes and Apparatus/Mesquite observations. The native library gate passes
+578 tests: Cambium 232, winit host 16, Rootstock 45, Mesquite 19 and Pictograph
+266. The separate winit scenario suite passes 24 tests. The previously
+qualified scroll failure now passes on this baseline. Logs are
+`Code/testing/mere/elapsed-integrated-native.log` and
+`elapsed-integrated-scenario.log`.
+
+The standalone Wasm build passes offline and locked. Updating its ignored
+lock for the current manifests adds the existing `genet-text` and
+`mere-apparatus` edges; it also re-resolves several Windows dependency edges
+without changing the Genet revision. The primary checkout and its ignored
+lock remain untouched. Bundle SHA256:
+`d433cd0ab2b1c3ea1025ccfdebe0d37575322f5975e303d5c5185476f89e4045`.
+Build logs are `elapsed-integrated-wasm.log` and
+`elapsed-integrated-wasm-locked.log` under `Code/testing/mere/`.
+
+The opt-in `tree.html?app=local` editor reopens the existing IndexedDB graph,
+selects a stable member and provides Cambium Title/Tags fields with host caret
+and IME routing. Save awaits storage acknowledgement; metadata-only canvas
+refresh preserves geometry, camera, selection and play state. The migration
+inventory records its bounded scope. Paired browser scripts export session
+and member IDs for an independent-load comparison.
+
+Current headed checks are **unverified**. The Chrome profile mounted the
+11-node saved graph and its accessibility mirror while `document.hidden`
+was true, with no recorded page errors. Frame withholding prevented the
+scenario from advancing; the initial 120-second attempts timed out.
+`tree_local_edit/progress.json` under the browser receipt directory records
+that state. Windows Computer Use then stopped because it could not establish
+the browser URL with sufficient confidence for its policy. No actual tab
+hide/show, background-to-visible resume, completed save/reopen or new live
+performance receipt is claimed.
+
+The visibility probe and intentional hidden-timing failure scenario are
+implemented, but require a real visible browser window to finish. A hidden
+event counter now invalidates timing windows even when no hidden frame was
+rendered. The active hide/show probe requires preserved geometry and zero
+first-resume steps; an initially hidden mount permits analytic resize on its
+first draw while requiring its preexisting accessibility mirror.
+
 ## Open gates
 
 - Genet commit `27d20d3fc51ac5fcd2a2db231e035a3e06013ae1` admits safe retained
@@ -259,8 +303,9 @@ and Canvas boundaries.
   browser receipts, which use the CPU path. At 2,000 nodes a single step
   already exceeds a nominal 16.7 ms frame budget; catch-up caps alone cannot
   solve that cost.
-- Actual IndexedDB application state, remote sessions and product panels still
-  belong to the old presenter. Ctrl+wheel modifiers and middle-button parity,
+- The local IndexedDB graph and Title/Tags editor have an opt-in tree route;
+  its headed save/reopen gate remains open. Remote sessions and the other
+  product panels still belong to the old presenter. Ctrl+wheel modifiers and middle-button parity,
   all five public wrappers and their product scenarios remain migration work.
   Continuous rasterization still protects asynchronous Vello buffer recovery.
 

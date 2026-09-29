@@ -522,3 +522,14 @@ this tree.
   The [controls receipt](../testing/2026-09-27_graphshell_controls_physics_receipt.md)
   records the exact scope and evidence. Product migration and large-graph
   responsiveness remain open. The primary checkout is untouched.
+- 2026-09-29: rebase the elapsed host slice onto published `ca2351b3`, keeping
+  Genet `19c20687`, shared text boundaries and Apparatus/Mesquite work. All
+  578 targeted library tests and 24 native scenario tests pass, including the
+  formerly failing scroll check; the offline locked Wasm build passes. Add
+  `tree.html?app=local` for the existing saved graph and a retained Title/Tags
+  editor, with typed storage/retry and metadata-only canvas refresh. Headed
+  verification is open: the test window is hidden and Windows Computer Use
+  stopped because it could not verify its URL for policy enforcement. The
+  mounted accessibility mirror is observed, but no save/reopen, visibility
+  resume or new performance receipt is claimed. The controls receipt records
+  this distinction; the primary checkout is untouched.
