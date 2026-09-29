@@ -21,10 +21,10 @@ use std::collections::BTreeMap;
 
 #[cfg(feature = "reticulum")]
 use identity::Ed25519Keypair;
-use identity::delegation::{
+use identity::{IdentityProvider, InMemoryProvider};
+use insigne::delegation::{
     CapabilityScope, DelegationCertificate, DelegationParent, SignedDelegationCertificate,
 };
-use identity::{IdentityProvider, InMemoryProvider};
 use notochord::{
     DenyReason, LocalNetworkPolicy, NetworkId, ProfileRef, ProofBinding, RequestedAction,
     RevocationLedger, ServiceAccess, ServiceRule, SessionDecision, SessionHello, TrafficClass,

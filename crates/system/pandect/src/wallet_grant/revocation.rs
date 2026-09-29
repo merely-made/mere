@@ -20,7 +20,7 @@ use std::io;
 use std::path::{Path, PathBuf};
 
 use identity::carry::{DeviceGrantSet, revoke_device_grant_set};
-use identity::delegation::SignedDelegationRevocation;
+use insigne::delegation::SignedDelegationRevocation;
 use notochord::RevocationLedger;
 
 use crate::wallet_store::identity_grants_dir;

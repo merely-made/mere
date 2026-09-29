@@ -7,6 +7,13 @@ W3 ruling. Related: the
 the [castellan OTP plan](../implementation_strategy/2026-08-10_castellan_otp_plan.md),
 `personae::delegation`, `session_runtime::wallet_grant`.
 
+**Ownership update (2026-09-29).** The reconciliation below remains the
+grammar ruling. Under the [Insigne proofs plan](../../dramatis_docs/implementation_strategy/2026-09-23_insigne_proofs_plan.md),
+statements, attenuation and checks now live in `insigne`; `personae::delegation`
+keeps `Issue` and `DelegationError`. Consumers import the proof data from
+Insigne directly. The following account describes the original 2026-08-11
+layout.
+
 ## The question
 
 W3 ruled that the device-grant CBOR envelope stays in the session-runtime

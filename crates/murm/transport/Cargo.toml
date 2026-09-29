@@ -87,6 +87,7 @@ name = "notochord"
 required-features = ["notochord"]
 
 [dev-dependencies]
+insigne = { workspace = true, features = ["verify"] }
 notochord = { workspace = true, features = ["tokio"] }
 # A scratch root for the disk-backed blob store's reopen test.
 tempfile = "3"

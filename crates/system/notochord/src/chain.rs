@@ -14,10 +14,10 @@
 
 use std::collections::BTreeMap;
 
-use insigne::{CheckedCertificate, CheckedRevocation};
-use personae::delegation::{
+use insigne::delegation::{
     DelegationCertificate, DelegationId, DelegationParent, SignedDelegationCertificate,
 };
+use insigne::{CheckedCertificate, CheckedRevocation};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
 use crate::types::ChainFault;
@@ -196,8 +196,8 @@ pub fn validate_chain<'a>(
 
 #[cfg(test)]
 mod tests {
+    use insigne::delegation::{CapabilityScope, DelegationRevocation, SignedDelegationRevocation};
     use personae::delegation::Issue;
-    use personae::delegation::{CapabilityScope, DelegationRevocation, SignedDelegationRevocation};
     use personae::{IdentityProvider, InMemoryProvider};
 
     use super::*;

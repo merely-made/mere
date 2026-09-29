@@ -291,3 +291,31 @@ under the shared Code root. This accepts only the a31b9a14 checkpoint, pending
 independent review and local commit. Remote main advanced to `ee77bf23` during
 verification; its Personae/Insigne migration must be integrated and the affected
 dependency checks refreshed before publication or downstream adoption.
+
+## 2026-09-29 ee77bf23 follow-on verification
+
+The verified merge of `ee77bf23` into `14f5f9c9` retains tested Genet `7a60ad79`
+and upstream's Insigne migration. Default native metadata keeps 1,524 packages:
+four Knot identities move to `855cb75d` and eight nodes gain Insigne edges.
+Web keeps 636 packages (445 in the filtered Wasm graph), adding only the
+Pandect-to-Insigne edge. Registry identities/checksums and all 385 pre.2 patch
+files remain unchanged. Existing legacy Genet and Knot-site identities remain
+explicitly classified. Five default-graph fault controls reject the wrong source
+or an outside local path.
+
+Exact package, feature, dependency and local-file comparisons preserve the five
+Rootstock/host/Mesquite/Seiche runtime cones, carrying their a31b9a14 receipts.
+Pictograph reaches changed Personae files, so its 263 tests were rerun and pass,
+including retained-layout cases and the headless crossing-edge control. The
+Insigne/Personae/Notochord all-feature suite passes 233 tests. Native workspace
+and standalone Wasm all-target/all-feature checks pass; only the existing
+`mere-linked-data` native failure is excluded. All-feature metadata selects
+1,651 native and 636 web packages within the unchanged locks; four additional
+source controls reject both faults. Metadata includes `mere-linked-data` and
+does not establish compilation of that excluded package.
+
+Every follow-on gate retains 3,034 source/lock hashes and unchanged mtimes.
+Shared-device rendering establishes correctness, not performance. Evidence is
+`testing/mere/receipts/2026-09-29/scroll-insigne-integration/final-checkpoint.json`
+under the shared Code root. Pre.4, S13 and downstream adoption retain their
+separate gates.
