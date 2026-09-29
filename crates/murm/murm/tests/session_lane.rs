@@ -17,10 +17,11 @@
 use std::collections::BTreeMap;
 use std::sync::Arc;
 
-use identity::delegation::{
-    CapabilityScope, DelegationCertificate, DelegationParent, Issue, SignedDelegationCertificate,
-};
+use identity::delegation::Issue;
 use identity::{IdentityProvider, InMemoryProvider};
+use insigne::delegation::{
+    CapabilityScope, DelegationCertificate, DelegationParent, SignedDelegationCertificate,
+};
 use murm::{
     Admission, CabalKey, ConversationEngine, Post, SessionOutcome, lane_binding, push_posts,
     serve_accepted_session, serve_session,

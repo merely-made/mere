@@ -15,7 +15,7 @@ use std::io::Write;
 use std::process::{Command, Stdio};
 use std::time::{SystemTime, UNIX_EPOCH};
 
-use personae::delegation::{DelegationRevocation, SignedDelegationRevocation};
+use insigne::delegation::{DelegationRevocation, SignedDelegationRevocation};
 use personae::enroll::{self, device_id_for_host};
 use personae::ssh_ca::{SshCertAuthority, UserCertRequest};
 use personae::ssh_face::{self, FacePolicy};

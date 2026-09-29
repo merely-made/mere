@@ -1,10 +1,11 @@
 # Insigne Proofs Plan
 
 **Date**: 2026-09-23
-**Status**: phase A landed 2026-09-24 and phase B on 2026-09-26 (§3); C and
-D open. Mark agreed the split
+**Status (2026-09-29)**: phase A landed 2026-09-24 and phase B on 2026-09-26
+(§3); C landed in Mere and Knot on 2026-09-29; sibling repins remain open.
+D is next. Mark agreed the split
 and ruled how issuing is expressed (§2, option (a)) on 2026-09-23. The Mere
-0.4 release baseline waits for phase B (Mark, 2026-09-26).
+0.4 release baseline's Insigne prerequisite was phase B, met on 2026-09-26.
 **Scope**: move personae's delegation and attestation data types into insigne's
 plain-data core and their checks behind an insigne feature, with issuing kept in
 personae; then let gaz keep the proofs it receives.
@@ -47,8 +48,8 @@ format versions move unchanged, so every signature issued so far still checks.
 **Moves behind insigne's features**, two as built: `digest` (`blake3`) carries
 `DelegationCertificate::id`, a blake3 hash of the signing bytes, and
 `DelegationCertificate::attenuates`; `verify` (`ed25519-dalek` 3, the version
-personae already uses) carries the three `verify` functions and implies
-`digest`.
+personae already uses) carries the three statement `check` methods and their
+conclusions, and implies `digest`.
 
 **Stays in personae**: issuing, which needs `IdentityProvider` and the persona's
 keys, and `IdentityProvider::attest_derived_key`, which signs with the master.
@@ -125,7 +126,9 @@ communicate to 'em". Built as two traits rather than one: `Issue` in
   settled API once (Mark, 2026-09-26: "after B").
 - **C — re-exports removed.** Consumers import from insigne and personae's
   re-exports go (DOC_POLICY §3), timed to the other repos' repins. Done when no
-  crate names the types through personae.
+  crate names the types through personae. The Mere/Knot graph meets this
+  condition at `7926d3a8`/`855cb75`; the sibling pins listed in §5 still await
+  their own adoption gates.
 - **D — gaz keeps the proofs** (gaz founding plan, M2). `RootKey` and
   `AttestedKey` carry the artifact that proved them. Done when a gaz record
   round-trips a stored attestation and it checks again after reload.
@@ -210,6 +213,21 @@ Done when (landed 2026-09-26):
       recorded here (§5, 2026-09-26).
 
 ## 4. Findings
+
+**2026-09-29: phase C starts from current consumers.** Knot now pins Mere
+`8fce5365` and has adopted phase B. Insigne already exposes the replacement
+imports at that pin, so Knot can move its imports before Mere removes the
+re-exports without deliberately breaking its standalone build. Mere must
+also patch Knot's new `insigne` dependency to the local workspace package,
+as it does for the other shared contracts. The primary Mere checkout has an
+active Genet repin in its manifest and lock, so this phase uses the isolated
+`mere-insigne-phase-c` worktree; that repin remains outside this change.
+
+The tracked `crates/probes/murm-direct-phy` probe still names obsolete
+Personae and sibling Retinue paths. Updating its proof import does not make
+its existing standalone build reproducible. Native `--all-features` also
+does not reach Graphshell's `cfg(wasm32)` imports; the browser check is a
+separate gate.
 
 **2026-09-23: the blast radius, counted.** Searched with ripgrep over
 `Code/repos`, build output excluded. 787 references in 97 files name the moved
@@ -344,3 +362,84 @@ mere's djinn moved its knot pin from `c6d5b9e` to knot's main (`5ad3f67`).
 That drops the git-sourced `graphshell-stdio` and a second genet
 (`532f1fad`'s `fleece` and `layout-dom-api`) that the old pin kept in the
 graph.
+
+
+**2026-09-29.** Phase C implementation: native compiler census used temporary
+warnings on all ten proof types/helpers and
+`cargo check --workspace --all-targets --all-features --keep-going`. It reported
+2,440 diagnostics in 90 files across 16 packages, including uses through
+local aliases and inferred values. The temporary warnings were removed;
+Insigne's implementation and serialized formats are unchanged. The source
+rewrite also covers wasm-only imports, Signalman, and the force-tracked probe.
+
+Knot's six affected files now import Insigne directly. `855cb75` is pushed to
+Knot's main; `cargo check -p knot-editor --all-targets --all-features` passed
+at its existing Mere `8fce5365` and Genet `34626a6c` pins. No red standalone
+interval was necessary. Mere consumes that Knot revision and supplies the
+new local Insigne patch.
+
+Remaining sibling repin handoff (source census, not compiler receipts):
+
+- Turnstone: `src/denizen.rs`, `src/identity.rs`, `src/place/lanes.rs`,
+  `src/place/projection_host.rs`, `src/place/worker.rs`, and
+  `src/remote_projection.rs`.
+- Hocket: `crates/hocket-engine/src/handoff.rs` and
+  `crates/hocket-genet/src/identity.rs`. Woodshed carries the same two paths
+  under `ports/hocket/`.
+- mer3ly: `crates/repo-graph/src/lib.rs` (test dependency).
+- Cleromancy has no proof-type import to migrate in the tracked Rust source.
+
+At each repin, add Insigne from the exact same Mere revision as Personae.
+Import `DerivedKeyAttestation` from `insigne` and the delegation data/helpers
+from `insigne::delegation`; retain `Issue`, `DelegationError`,
+`AttestationKeys`, and providers in Personae (under `identity` where aliased).
+Enable `verify` where checks are called, and `digest` where only certificate
+ids or attenuation are needed. Keep Turnstone's Knot/Mere source identities
+aligned. These pinned consumers remain adoption gates; they have not been
+repinned by this phase.
+
+Validation boundary: the clean `4fbcb727` baseline already fails its native
+all-features check on missing `DocumentA11yNode::description` fields in
+Reader and the web-host test fixture, and four linked-data test accesses to
+removed `Node.properties`. The compiler census borrowed only the two Reader
+field initializers already present in the concurrent primary WIP so it could
+reach downstream consumers. That prerequisite is outside the phase C patch.
+Mere's implementation is `7926d3a8`, rebased onto published `a31b9a14` rather
+than publishing the unrelated local `4fbcb727` commit. That upstream base
+already includes the Reader fields, so the final gates need no overlay.
+
+Final automated receipts on the rebased code:
+
+- Native workspace: `cargo check --workspace --all-targets --all-features
+  --exclude mere-linked-data --exclude cambium-genet-web-host --locked
+  --offline` passes. The pre-rebase unfiltered run reported only the already-recorded
+  web-host test initializer and four linked-data test errors. These exclusions
+  are explicit baseline limitations, not a claim that the full workspace is green.
+- `cargo test -p insigne -p personae -p notochord --all-features --locked
+  --offline`: **233 passed**, zero failed or ignored, including the pre-move
+  signature fixtures and doctests.
+- Signalman's separate workspace: every target and feature checks, and its
+  tests pass **22**, zero failed or ignored. Its generated lock is retained
+  with the raw receipts.
+- Browser: `cargo check --manifest-path ports/graphshell/web/Cargo.toml
+  --target wasm32-unknown-unknown --all-targets --all-features --offline`
+  passes with `--cfg getrandom_backend="wasm_js"` in the target rustflags.
+  This is a compiler receipt, not a headed browser run. Its generated lock
+  was refreshed after the upstream rebase and retained with the receipts.
+- `scripts/cargo_mode.py verify --metadata-only` passes; the lock resolves
+  one workspace Insigne, including Knot's new direct dependency.
+- `ports/distillery/probe/remote-fixture` still fails resolution, including
+  online: it requires `mere-p2panda-net = "=0.7.4"`, while the registry
+  offers only 0.7.2 and 0.7.1. Its root patch-table gap predates this phase.
+- A final tracked-source scan finds no old proof import paths. Review of all
+  **82 changed Rust files** found only imports, proof-qualified paths and
+  documentation changed; the proof implementation and test logic are unchanged.
+
+Raw command logs, source fingerprints and the two generated nested locks are
+retained at `C:\t\cargo-targets\mere\insigne-phase-c-receipts`. The final
+tracked source fingerprint stayed unchanged during the final compiler and
+proof-test gates. The phase's isolated build output and worktree are removed
+once the changes reach origin/main; the primary checkout's concurrent WIP is
+left untouched.
+
+Next: phase D. The sibling repins above remain explicit downstream work.

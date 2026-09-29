@@ -93,8 +93,7 @@ pub use crate::passphrase_root::{
 };
 pub use crate::passphrase_storage::PassphraseEncryptedStorage;
 pub use crate::provider::{
-    AttestationKeys, DerivedKeyAttestation, IdentityProvider, InMemoryProvider,
-    SealedIdentityProvider,
+    AttestationKeys, IdentityProvider, InMemoryProvider, SealedIdentityProvider,
 };
 pub use crate::roster::{OpenedVault, Roster, RosterEntry, open_shared};
 pub use crate::seal::{seal_bytes, unseal_bytes};

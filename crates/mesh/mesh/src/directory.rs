@@ -29,7 +29,7 @@
 use identity::AttestationKeys;
 use std::collections::BTreeMap;
 
-use identity::DerivedKeyAttestation;
+use insigne::DerivedKeyAttestation;
 use serde::{Deserialize, Serialize};
 
 /// The derivation salt a mesh authoring key is minted under. A host that signs
