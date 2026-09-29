@@ -51,6 +51,7 @@ name explicit repository paths; links stay within Mere.
 | [UX events](../../../crates/system/ux-events/src/ux_observability.rs), [registry](../../../crates/system/registry/src/diagnostics/emit.rs) | Observers, probes, channel bridge, schemas and trace/message events | Reuse adapters; graph-specific action/node/surface types are not a universal app vocabulary. |
 | [Cambium/Mesquite](../../../crates/cambium/mesquite/src/lib.rs), [receipt](../../../crates/cambium/mesquite/src/lane.rs) | Snapshots, string events, captures, failures, frame costs | Add optional typed attachments; CPU wall-time costs are not GPU timings. |
 | Turnstone (`turnstone/src/observe.rs`), fanout (`turnstone/src/shell/effects.rs`) | Typed snapshot/AppEvent and 128-entry automation copy | Replace observation storage, preserve domain fold and trail; currently omission is unreported. |
+| Knot (`knot-editor/apps/desktop/src/scenario.rs`), snapshot (`knot-editor/apps/desktop/src/workspace.rs`) | Mesquite document/format/dirty/appearance/message snapshot | Document authority and save/site acceptance remain product-owned; the current adapter is a state projection, not a causal outcome stream. |
 | Woodshed (`woodshed/crates/woodshed-genet/src/scenario.rs`) | Stage/gesture snapshots, string events, drag metrics | Preserve arrangement and gesture meaning; capture-pending busy is not an operation model. |
 | Redshank (`woodshed/ports/redshank/desktop/src/scenario.rs`) | Playback/transcript snapshots, seek requests, worker state | Workers report execution outcomes; desktop/session own stale-result acceptance and model application; persistence owns durable acknowledgment. |
 | Cleromancy (`cleromancy/src/ui/native/scenario_driver.rs`) | Consultation/catalog state and durable first/reopen receipts | Preserve consultation authority and acceptance; useful worker-outcome pilot. |
@@ -169,7 +170,8 @@ matching retains its existing behavior. The shared host fixture compares
 selection and accessibility activation of the same referenced-name button and
 rejects targets hidden or renamed while a click waits.
 
-Mere's isolated integration passed 60 focused tests and the native smoke
+Mere's isolated integration passed the standalone Graphshell Wasm check,
+60 focused tests and the native smoke
 (32 frames, three distinct nonblank captures, AccessKit installed with 15 nodes).
 A raw-DOM negative control failed the referenced-name test, then all 21 scenario
 tests passed with the exact source restored. Publication and integration with
