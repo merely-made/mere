@@ -49,3 +49,18 @@ The earlier statement about root/product manifests remaining pre.2 describes
 the initial S3/S4 checkpoint. Lane M subsequently moved its root graph to exact
 pre.4 in S5–S8; this carry preserves those pins and the parked nested-lock work.
 Broader migration acceptance and S13 remain open.
+
+## 2026-09-29: selector retired under ruling 410
+
+This vendored copy is retained for provenance and historical regression evidence.
+The migration branch's root, probe, remote fixture and embedding fixture now
+select pristine registry burn-cubecl 0.22.0-pre.4. The old pre.2 failure was
+reproduced in the same browser where upstream pre.4 passed all 21 cases; nine
+native unfused launcher controls passed identically on patched and upstream
+rows, including broadcast aliases and retained-input/fresh-output checks.
+
+The six-field same_view helper and its service rejection test describe this
+retained implementation, not upstream. Ruling 410 conditionally supersedes the
+requirement to carry that guard for the tested pre.4 migration. Other patches
+remain independent. Plan §13.28 records four locked graph checks and the
+remaining runtime/lifecycle/integration gates; main promotion is still pending.

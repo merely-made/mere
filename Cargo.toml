@@ -661,11 +661,10 @@ vello = { git = "https://github.com/mark-ik/vello.git", tag = "vello-0.10.0" }
 # cache in Mere's defaults-disabled GPU graph. Remove when upstream makes
 # persistence opt-in or fixes the defaults-on edge in cubecl-wgpu.
 cubecl-runtime = { path = "support/patches/cubecl-runtime" }
-# burn-cubecl 0.22.0-pre.4: binary launchers bind a shared tensor allocation
-# once only when allocation ID, both slice offsets, stream, raw size and
-# service ID match (ruling 377). Remove when an upstream release passes the
-# headed same-allocation and BERT-width LayerNorm receipts without this guard.
-burn-cubecl = { path = "support/patches/burn-cubecl" }
+# burn-cubecl 0.22.0-pre.4: the selector was retired under ruling 410 after
+# the old pre.2 browser failure reproduced while upstream pre.4 passed all 21
+# cases, plus nine unfused native launcher controls. Vendored patch source
+# remains for provenance; current consumers select the registry crate.
 # burn-remote 0.22.0-pre.4: pump-observed targeted close and session receipts
 # let owner reclaim stop one admitted lease without dropping the protocol.
 # Remove when upstream provides equivalent control and passes the lifecycle

@@ -187,3 +187,17 @@ fix. Exact source restoration and fresh served-asset checks are recorded.
 Nine native unfused launcher controls are now prepared in the embedding fixture
 for patched/upstream comparison. Selectors remain patched and retirement,
 remaining headed/lifecycle gates and main promotion are not accepted yet.
+
+## 2026-09-29: burn-cubecl retirement on the migration branch
+
+Ruling 410's condition is satisfied by the same-browser pre.2/pre.4 comparison
+and nine native unfused launcher cases passing identically with and without
+the patch. Plan §13.28 records independent source, numerical and fault-control
+review. Four selectors now choose pristine registry pre.4, preserving all lock
+versions/edges and the root's distinct-source duplicate name/version entries.
+The vendored source and its six-field guard receipts remain historical evidence.
+
+Three independent patch selectors remain: cubecl-runtime persistence policy,
+cubek-reduce extrema handling and burn-remote lifecycle control. Earlier tables
+retain their dated counts. Affected production checks, remaining S13 and main
+promotion still require acceptance; this is not stable-release closure.
