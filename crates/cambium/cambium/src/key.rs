@@ -232,6 +232,14 @@ impl<V, State, Action, F> OnKey<V, State, Action, F> {
     }
 }
 
+impl<Seq, State, Action, F> OnKey<crate::El<Seq, State, Action>, State, Action, F> {
+    /// Set an attribute on the wrapped element, including a field's accessible name.
+    pub fn attr(mut self, name: impl Into<String>, value: impl Into<String>) -> Self {
+        self.child = self.child.attr(name, value);
+        self
+    }
+}
+
 /// Attach a native key handler to `child`, making `child`'s element focusable
 /// by default.
 ///
