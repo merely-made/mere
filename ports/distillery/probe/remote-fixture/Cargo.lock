@@ -3130,7 +3130,7 @@ checksum = "edd0f118536f44f5ccd48bcb8b111bdc3de888b58c74639dfb034a357d0f206d"
 [[package]]
 name = "engine-observables-api"
 version = "0.2.0"
-source = "git+https://github.com/merely-made/genet.git?rev=7a60ad7965a1ae81292211b405a53210c554f70c#7a60ad7965a1ae81292211b405a53210c554f70c"
+source = "git+https://github.com/merely-made/genet.git?rev=19c206873ab08ae227217892d9e74d0df18b349a#19c206873ab08ae227217892d9e74d0df18b349a"
 dependencies = [
  "genet-paint-types",
  "serde",
@@ -3765,7 +3765,7 @@ dependencies = [
 [[package]]
 name = "genet-paint-types"
 version = "0.2.0"
-source = "git+https://github.com/merely-made/genet.git?rev=7a60ad7965a1ae81292211b405a53210c554f70c#7a60ad7965a1ae81292211b405a53210c554f70c"
+source = "git+https://github.com/merely-made/genet.git?rev=19c206873ab08ae227217892d9e74d0df18b349a#19c206873ab08ae227217892d9e74d0df18b349a"
 dependencies = [
  "app_units",
  "euclid",
@@ -3775,7 +3775,7 @@ dependencies = [
 [[package]]
 name = "genet-scripted-dom"
 version = "0.1.2"
-source = "git+https://github.com/merely-made/genet.git?rev=7a60ad7965a1ae81292211b405a53210c554f70c#7a60ad7965a1ae81292211b405a53210c554f70c"
+source = "git+https://github.com/merely-made/genet.git?rev=19c206873ab08ae227217892d9e74d0df18b349a#19c206873ab08ae227217892d9e74d0df18b349a"
 dependencies = [
  "engine-observables-api",
  "genet-static-dom",
@@ -3788,7 +3788,7 @@ dependencies = [
 [[package]]
 name = "genet-static-dom"
 version = "0.1.1"
-source = "git+https://github.com/merely-made/genet.git?rev=7a60ad7965a1ae81292211b405a53210c554f70c#7a60ad7965a1ae81292211b405a53210c554f70c"
+source = "git+https://github.com/merely-made/genet.git?rev=19c206873ab08ae227217892d9e74d0df18b349a#19c206873ab08ae227217892d9e74d0df18b349a"
 dependencies = [
  "html5ever",
  "layout-dom-api",
@@ -5254,7 +5254,7 @@ dependencies = [
 [[package]]
 name = "layout-dom-api"
 version = "0.1.1"
-source = "git+https://github.com/merely-made/genet.git?rev=7a60ad7965a1ae81292211b405a53210c554f70c#7a60ad7965a1ae81292211b405a53210c554f70c"
+source = "git+https://github.com/merely-made/genet.git?rev=19c206873ab08ae227217892d9e74d0df18b349a#19c206873ab08ae227217892d9e74d0df18b349a"
 dependencies = [
  "markup5ever",
  "serde",

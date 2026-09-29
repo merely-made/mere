@@ -718,6 +718,21 @@ where
         layout.visible_rect(&*dom, node)
     }
 
+    /// Names and roles from the same retained document projection the host
+    /// exposes to accessibility. No layout means no semantic observation yet.
+    /// This observes the current DOM and layout without computing another layout
+    /// or inferring names for nodes absent from the projection.
+    /// Custom leaf contributions are separate; this is not an immutable,
+    /// presentation-revision-qualified frame snapshot.
+    pub fn a11y_projection(&self) -> Option<crate::DocumentA11yProjection> {
+        use layout_dom_api::LayoutDom as _;
+        let layout = self.layout?;
+        let dom = self.runner.dom();
+        let dom = dom.borrow();
+        let focus = self.runner.focus().map(|node| dom.opaque_id(node));
+        Some(crate::document_projection(&dom, layout, focus))
+    }
+
     /// Ask the host to scroll `node` into view.
     ///
     /// Resolved on the host's next layout against the node's painted rect
