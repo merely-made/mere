@@ -1,5 +1,11 @@
 # Burn 0.22 Migration Plan
 
+**2026-09-29 S13 stop:** native and patched browser comparisons pass, but
+pristine upstream pre.4 also passes all ten graph and eleven embedding cases.
+Stop rule 13.8(2) applies: carrying or retiring the patch awaits Mark's ruling.
+Exact source restoration is verified; extrema, remote lifecycle and main
+promotion remain held. See §13.26; earlier dated checkpoints retain their scope.
+
 **2026-09-29 reconciliation verification:** the held pre.4 branch now includes
 the accepted scroll/Insigne and semantic-projection sources through Mere
 `99e44853`, using current Genet `19c20687`. Fresh graph, workspace, host,
@@ -2613,3 +2619,53 @@ receipt must also report error no greater than the exact pre.2 baseline
 S13 has not run at this checkpoint. Independent review and a clean
 reconciliation commit still precede its release; migration acceptance, S15
 closure and primary promotion remain separate gates.
+
+
+### 13.26 Unpatched browser pass; retirement fork (2026-09-29)
+
+The independently reviewed reconciliation was committed locally as
+`6b52297f5852059735dff6073f20741e67ce1b81`, with clean sources and all 33
+accepted graph/runtime gates. Nothing was promoted to main. S13 then ran
+against that exact commit and source/config map.
+
+The native shared-multiply/LayerNorm comparison passes exactly one qualified
+test. An initial unqualified `--exact` selector ran zero tests; that attempt
+is preserved and rejected as evidence. The corrected test and its source,
+timestamp and output hashes were independently reviewed.
+
+The visible in-app browser passes all ten graph and eleven embedding cases
+with the backport, with `gpu_errors: []`. The unpatched build also passes all
+21 cases with no GPU errors. Shared multiplication is correct; scalar and
+independent-tensor multiplication pass in the same run; both LayerNorm
+results differ from their input bits and match expected values. Its raw
+result is byte-identical to the patched result. Thus the expected-failure
+control is **not satisfied**, despite the successful computation.
+
+Provenance was checked independently: only the `burn-cubecl` manifest patch
+row and its registry source/checksum changed; all 552 package versions and
+dependency edges remain. All 122 upstream files match the checksum-verified
+registry archive. Patched and unpatched Wasm hashes differ. A fresh localhost
+origin served the unpatched worker, generated JavaScript and Wasm with HTTP
+200 after its build; the worker executes the fixture, without stored results.
+The source/config/timestamp maps and served-asset hashes remained stable.
+No stale-asset or source explanation was found.
+
+Raw browser JSON, screenshots and a portable comparison manifest are under
+`ports/distillery/probe/repros/burn_browser_embedding/receipts/`, named
+`2026-09-29_pre4_*`. Full commands, logs, admission, registry comparison,
+detector controls and restoration are in
+`Code/testing/mere/receipts/2026-09-29/pre4-s13`.
+
+Stop rule 13.8(2) now applies. Exact patched manifest/lock bytes and all
+released source/config hashes were restored; both servers stopped and both
+temporary browser tabs closed. Ignored generated browser assets still name
+the unpatched build and must be rebuilt before a patched rerun.
+
+**Reading, not ruled:** first compare historical unpatched pre.2 under this
+same current browser. August's pre.2 receipt failed shared multiplication
+and both LayerNorm cases. This new receipt does not distinguish a Burn/CubeCL
+change from a browser/backend change, nor establish every guarded launcher
+shape. The pending choice is to make that comparison first, retire the patch
+on current evidence, or retain it as a precaution with an explicit control
+amendment. No new ruling has been allocated. Extrema, remote lifecycle,
+S15 closure, main promotion and downstream handoffs remain held.

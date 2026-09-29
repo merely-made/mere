@@ -1,5 +1,12 @@
 # Burn 0.22 prerelease closure receipt
 
+**2026-09-29 later S13 annotation:** the native comparison and all 21 patched
+browser cases pass. Pristine upstream pre.4 also passes all 21 cases, with no
+GPU errors. This triggers migration-plan §13.8(2), rather than satisfying the
+expected-failure control. See §13.26 and the committed `2026-09-29_pre4_*`
+browser receipts. Source bytes were restored exactly; patch retirement or
+retention awaits Mark. Extrema, remote lifecycle and main promotion remain held.
+
 **2026-09-29 pre.4 reconciliation annotation:** migration plan §13.25 records
 the exact published-main integration through `99e44853` / Genet `19c20687`,
 coherent locked graphs and fresh affected compile/runtime verification.

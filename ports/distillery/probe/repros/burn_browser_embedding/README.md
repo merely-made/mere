@@ -1,5 +1,13 @@
 # Burn browser shared-input binary reproducer
 
+**2026-09-29 pre.4 comparison:** the native comparison passes. In the current
+in-app browser, all ten graph and eleven embedding cases pass both with Mere's
+backport and with pristine upstream `burn-cubecl 0.22.0-pre.4`. The upstream
+pass triggers the migration plan's retirement/retention fork; no decision has
+been made. [The comparison receipt](receipts/2026-09-29_pre4_comparison.json)
+links exact raw JSON and screenshots. The failure description and experiments
+below describe the historical pre.2/browser result from 2026-08-22.
+
 This headed harness extracts Distillery's MiniLM BrowserWebGpu failure from the
 artifact, tokenizer, storage, and ESP graph. It retains the eleven embedding
 controls that already pass and adds a model-free causal ladder:
