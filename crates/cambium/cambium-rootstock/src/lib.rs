@@ -276,7 +276,14 @@ pub fn document_projection(
 ) -> DocumentA11yProjection {
     use layout_dom_api::LayoutDom as _;
     let focus = focus.and_then(|opaque| find_opaque(dom, dom.document(), opaque));
-    genet_render::document_a11y_projection(dom, layout.fragments(), focus, 0)
+    genet_render::document_a11y_projection_with_generated_text(
+        dom,
+        layout.fragments(),
+        focus,
+        0,
+        None,
+        &|node| layout.generated_text(dom, node),
+    )
 }
 
 fn find_opaque(dom: &ScriptedDom, node: NodeId, opaque: u64) -> Option<NodeId> {

@@ -183,6 +183,15 @@ impl OwnedLayout {
         &self.fragments
     }
 
+    /// Inline generated name text resolved by this retained layout's style owner.
+    pub fn generated_text<D: LayoutDom<NodeId = NodeId>>(
+        &self,
+        dom: &D,
+        node: NodeId,
+    ) -> (String, String) {
+        genet_livery::rendered_generated_text(dom, &self.styles, node)
+    }
+
     /// Font instances this session's text system has materialised. The
     /// observable end of the host font seam.
     pub fn retained_font_count(&self) -> usize {

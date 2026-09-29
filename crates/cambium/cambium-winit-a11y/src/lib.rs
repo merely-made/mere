@@ -208,7 +208,12 @@ pub fn project_tree(
     let root = dom.document();
     let id_of = |d: &ScriptedDom, n: NodeId| A11yNodeId(d.opaque_id(n));
     let focused = focus.and_then(|opaque| find_opaque(dom, root, opaque));
-    let mut tree = genet_render::accesskit_tree(dom, layout.fragments(), focused);
+    let mut tree = genet_render::accesskit_tree_with_generated_text(
+        dom,
+        layout.fragments(),
+        focused,
+        &|node| layout.generated_text(dom, node),
+    );
     let mut action_map = HashMap::new();
     walk(dom, root, &mut |node| {
         let id = id_of(dom, node);
