@@ -24,6 +24,107 @@ fn pair() -> (Canvas, Vec<NodeKey>) {
     (canvas, keys)
 }
 
+#[test]
+fn elapsed_frames_match_motion_across_render_rates() {
+    use std::time::Duration;
+    let run = |interval: u64| {
+        let (mut canvas, keys) = pair();
+        canvas.set_physics_paused(false);
+        let mut steps = 0;
+        for millis in (0..=1000).step_by(interval as usize) {
+            canvas.frame_at(800, 600, Duration::from_millis(millis), Default::default());
+            steps += canvas.elapsed_step_report().unwrap().steps;
+        }
+        (positions(&canvas, &keys), steps)
+    };
+    let fast = run(10);
+    let slow = run(20);
+    assert_eq!(fast.1, 59);
+    assert_eq!(fast, slow);
+}
+
+#[test]
+fn elapsed_wake_from_idle_does_not_integrate_the_quiet_interval() {
+    use std::time::Duration;
+    let (mut canvas, keys) = pair();
+    canvas.set_physics_paused(false);
+    canvas.park_physics();
+    canvas.frame_at(800, 600, Duration::ZERO, Default::default());
+    assert!(!canvas.elapsed_step_report().unwrap().settling);
+    let held = positions(&canvas, &keys);
+    canvas.set_physics_damping(0.5);
+    canvas.frame_at(800, 600, Duration::from_secs(20), Default::default());
+    let report = canvas.elapsed_step_report().unwrap();
+    assert_eq!(report.steps, 0);
+    assert_eq!(report.discarded_elapsed, Duration::ZERO);
+    assert_eq!(positions(&canvas, &keys), held);
+    assert!(report.settling);
+    canvas.frame_at(800, 600, Duration::from_millis(20_025), Default::default());
+    assert_eq!(canvas.elapsed_step_report().unwrap().steps, 1);
+}
+
+#[test]
+fn elapsed_idle_wake_preserves_the_timestamp_high_water_mark() {
+    use std::time::Duration;
+    let (mut canvas, _) = pair();
+    canvas.set_physics_paused(false);
+    canvas.park_physics();
+    canvas.frame_at(800, 600, Duration::from_millis(100), Default::default());
+    assert!(!canvas.elapsed_step_report().unwrap().settling);
+    canvas.set_physics_damping(0.5);
+    canvas.frame_at(800, 600, Duration::from_millis(90), Default::default());
+    canvas.frame_at(800, 600, Duration::from_millis(110), Default::default());
+    let report = canvas.elapsed_step_report().unwrap();
+    assert_eq!(report.steps, 0);
+    assert_eq!(report.carried_elapsed, Duration::from_millis(10));
+}
+
+#[test]
+fn elapsed_frames_bound_stalls_and_do_not_recount_old_timestamps() {
+    use std::time::Duration;
+    let (mut canvas, _) = pair();
+    canvas.set_physics_paused(false);
+    let config = super::super::ElapsedStepConfig {
+        max_elapsed: Duration::from_millis(50),
+        max_steps: 1,
+    };
+    canvas.frame_at(800, 600, Duration::ZERO, config);
+    canvas.frame_at(800, 600, Duration::from_secs(3), config);
+    let report = canvas.elapsed_step_report().unwrap();
+    assert_eq!(report.steps, 1);
+    assert!(report.discarded_elapsed > Duration::from_millis(2950));
+    canvas.frame_at(800, 600, Duration::from_secs(2), config);
+    assert_eq!(canvas.elapsed_step_report().unwrap().steps, 0);
+    canvas.frame_at(800, 600, Duration::from_secs(3), config);
+    assert_eq!(canvas.elapsed_step_report().unwrap().steps, 0);
+}
+
+#[test]
+fn elapsed_pause_resume_suspend_and_restore_never_catch_up() {
+    use std::time::Duration;
+    let (mut canvas, keys) = pair();
+    canvas.set_physics_paused(false);
+    canvas.frame_at(800, 600, Duration::ZERO, Default::default());
+    canvas.frame_at(800, 600, Duration::from_millis(25), Default::default());
+    assert!(canvas.elapsed_step_report().unwrap().steps > 0);
+    canvas.set_physics_paused(true);
+    let held = positions(&canvas, &keys);
+    canvas.frame_at(800, 600, Duration::from_secs(20), Default::default());
+    assert_eq!(positions(&canvas, &keys), held);
+    canvas.set_physics_paused(false);
+    canvas.frame_at(800, 600, Duration::from_secs(40), Default::default());
+    assert_eq!(canvas.elapsed_step_report().unwrap().steps, 0);
+    assert_eq!(positions(&canvas, &keys), held);
+    canvas.reset_frame_time();
+    canvas.frame_at(800, 600, Duration::from_secs(100), Default::default());
+    assert_eq!(canvas.elapsed_step_report().unwrap().steps, 0);
+    assert_eq!(positions(&canvas, &keys), held);
+    assert!(canvas.restore_arrangement());
+    canvas.frame_at(800, 600, Duration::from_secs(200), Default::default());
+    assert_eq!(canvas.elapsed_step_report().unwrap().steps, 0);
+    assert_eq!(positions(&canvas, &keys)[0], PortablePoint::new(-80.0, 0.0));
+}
+
 fn positions(canvas: &Canvas, keys: &[NodeKey]) -> Vec<PortablePoint> {
     keys.iter()
         .map(|&key| {

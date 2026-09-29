@@ -124,9 +124,24 @@ where
 
     let host = Rc::new(RefCell::new(Host::new(options, None, hooks, s, wake)));
 
-    // The first frame, before any event: a canvas that has never painted shows
-    // whatever was behind it. The mirror is written with it, so a page whose
-    // frame callback never runs, as in a background tab, is still read.
+    let document = web_sys::window()
+        .and_then(|w| w.document())
+        .ok_or("no document")?;
+    host.borrow_mut().set_hidden(document.hidden());
+    let visibility_host = host.clone();
+    let visibility_document = document.clone();
+    let visibility = Closure::<dyn FnMut(web_sys::Event)>::new(move |_| {
+        visibility_host
+            .borrow_mut()
+            .set_hidden(visibility_document.hidden());
+    });
+    document
+        .add_event_listener_with_callback("visibilitychange", visibility.as_ref().unchecked_ref())
+        .map_err(|_| "could not attach visibilitychange")?;
+    visibility.forget();
+
+    // Visible mounts paint immediately. Hidden mounts still lay out and publish
+    // their accessibility mirror, without advancing texture producers.
     draw(&mut host.borrow_mut());
 
     install_listeners(&canvas, &mirror, &host, &window)?;
@@ -157,7 +172,7 @@ where
     let window = window.clone();
     let mut last_size = window.physical_size();
 
-    *next.borrow_mut() = Some(Closure::new(move |_: f64| {
+    *next.borrow_mut() = Some(Closure::new(move |timestamp_ms: f64| {
         // A CSS-driven resize has no event of its own that also covers zoom
         // and device-pixel-ratio changes, so the frame loop watches the one
         // number that captures all three.
@@ -174,8 +189,8 @@ where
             h.relayout(lw, lh);
             window.request_redraw();
         }
-        if window.take_pending_frame() {
-            draw(&mut host.borrow_mut());
+        if !host.borrow().s.hidden && window.take_pending_frame() {
+            draw_at(&mut host.borrow_mut(), timestamp_ms);
         }
         if let Some(browser) = web_sys::window()
             && let Some(callback) = frame.borrow().as_ref()
@@ -199,7 +214,27 @@ where
     Logic: FnMut(&State) -> V + 'static,
     V: RootView<State>,
 {
-    host.redraw();
+    let timestamp_ms = web_sys::window()
+        .and_then(|w| w.performance())
+        .map_or(0.0, |performance| performance.now());
+    draw_at(host, timestamp_ms);
+}
+
+fn draw_at<State, Logic, V>(host: &mut Host<State, Logic, V>, timestamp_ms: f64)
+where
+    State: 'static,
+    Logic: FnMut(&State) -> V + 'static,
+    V: RootView<State>,
+{
+    if host.s.hidden {
+        let (width, height) = host.logical_size();
+        host.relayout(width, height);
+        host.sync_a11y();
+        return;
+    }
+    let timestamp =
+        std::time::Duration::try_from_secs_f64(timestamp_ms / 1000.0).unwrap_or_default();
+    host.redraw_at(timestamp);
     host.sync_a11y();
     host.with_ctx(cambium_rootstock::Hook::AfterFrame);
 }

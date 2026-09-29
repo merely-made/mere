@@ -98,7 +98,9 @@ impl Canvas {
         for &(key, pos) in &positions {
             self.view.set_position(key, pos);
         }
+        self.reset_frame_time();
         self.physics.seed(positions);
+        self.reset_frame_time();
         self.physics.halt();
         self.generation += 1;
     }
@@ -120,6 +122,8 @@ impl Canvas {
         Self {
             graph,
             physics,
+            frame_timestamp: None,
+            elapsed_step: None,
             physics_paused: false,
             view,
             node_document,
@@ -528,6 +532,7 @@ impl Canvas {
     /// session must not re-scramble), and any later interaction resumes the settle.
     /// (Window composition P1, OQ2 park.)
     pub fn park_physics(&mut self) {
+        self.reset_frame_time();
         self.physics.halt();
     }
 
@@ -571,6 +576,7 @@ impl Canvas {
         for &(key, pos) in &seeds {
             self.view.set_position(key, pos);
         }
+        self.reset_frame_time();
         self.physics.seed(seeds);
         self.settle_physics(SETTLE_TICKS);
         true

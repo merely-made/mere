@@ -511,3 +511,14 @@ this tree.
   The earlier worktree's held phase-3/4 changes are now integrated; product
   migration, large-graph responsiveness and elapsed-time host adoption remain
   open. The active primary checkout is left untouched for its current owner.
+- 2026-09-29: the tree producer adopts bounded elapsed-time physics through
+  Canvas and host timestamps. Configurable caps, discarded-time telemetry,
+  idle/pause/reseed resets and visibility suspension now connect the tested
+  Seiche core to the browser. All 266 Pictograph tests and 41 Rootstock tests
+  pass; one pre-existing scroll-retention failure reproduces on unchanged
+  Rootstock sources. The locked wasm build and both headed controls/elapsed
+  scenarios pass, with visible graph captures. Concurrent builds exclude a
+  performance comparison. Actual browser hide/show remains a headed gate.
+  The [controls receipt](../testing/2026-09-27_graphshell_controls_physics_receipt.md)
+  records the exact scope and evidence. Product migration and large-graph
+  responsiveness remain open. The primary checkout is untouched.
