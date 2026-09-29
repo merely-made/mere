@@ -106,6 +106,10 @@ pub enum NamedKey {
     Home,
     /// Move the cursor to the end of the line.
     End,
+    /// Enter the application menu bar on Windows and Linux.
+    F10,
+    /// The Alt key by itself, used to enter an application menu bar.
+    Alt,
     /// Move by a larger semantic increment.
     PageUp,
     /// Move by a larger semantic decrement.
