@@ -478,6 +478,8 @@ name = "burn-browser-embedding-repro"
 version = "0.0.1"
 dependencies = [
  "burn",
+ "burn-backend",
+ "burn-cubecl",
  "getrandom 0.4.3",
  "js-sys",
  "serde",

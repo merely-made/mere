@@ -174,3 +174,16 @@ composition, and on-demand Burnpack tensor streaming. These justify a fresh
 native LoRA receipt and a bounded `burn-pack` streaming probe when portable
 checkpoint export becomes an active requirement. They do not change the
 current ModelSession/ordinary PEFT claim or authorize a production repin.
+
+## 2026-09-29: historical control supports conditional patch retirement
+
+Ruling 410 authorizes the historical comparison, then retirement if supported.
+Migration plan §13.27 records reconstructed pre.2 failing five graph cases while
+all eleven embedding controls pass; upstream pre.4 passes all 21 cases in the
+same current browser session. GPU errors are empty in both. Historical source
+provenance is qualified explicitly; this does not identify a specific upstream
+fix. Exact source restoration and fresh served-asset checks are recorded.
+
+Nine native unfused launcher controls are now prepared in the embedding fixture
+for patched/upstream comparison. Selectors remain patched and retirement,
+remaining headed/lifecycle gates and main promotion are not accepted yet.

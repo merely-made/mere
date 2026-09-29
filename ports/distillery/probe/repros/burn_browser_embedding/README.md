@@ -47,3 +47,20 @@ From this directory, with wasm-bindgen CLI 0.2.122 installed:
 Open the printed URL in headed Chromium and choose **Run graph cases**. For
 automation, call `window.burnEmbeddingRepro.run()` and inspect both `result`
 and `gpu_errors`.
+
+## 2026-09-29 follow-up: ruling 410 and the historical control
+
+Mark chose "I suppose A, then B if we can": compare historical pre.2 first,
+then retire the patch if supported. The reconstructed pre.2 dependency row
+reproduces shared multiplication and both LayerNorm failures in the same current
+browser where upstream pre.4 passes all 21 cases. See the
+[same-browser comparison](receipts/2026-09-29_pre2_pre4_same_browser_comparison.json)
+for raw results, screenshots and the historical source qualification.
+
+`tests/launcher_retirement.rs` adds nine explicitly requested native GPU cases
+through public, unfused CubeBackend APIs. Run `cargo test --release --test
+launcher_retirement -- --ignored --test-threads=1 --nocapture` from this fixture
+with the workspace-approved target environment. The tests preserve real-handle,
+fresh-output and unchanged-input checks. They are prepared but not yet executed
+at this documentation checkpoint; the burn-cubecl selector still uses Mere's
+patch. The earlier pending-choice paragraph is superseded by ruling 410.
