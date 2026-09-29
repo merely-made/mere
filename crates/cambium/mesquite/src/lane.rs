@@ -50,6 +50,13 @@ pub struct Capture {
     pub(crate) paint_path: Option<PathBuf>,
 }
 
+#[derive(Serialize)]
+pub(crate) struct Diagnostics {
+    /// Observation point in this lane, not the source's frame identity.
+    sampled_at_lane_frame: u64,
+    batch: crate::DiagnosticBatch,
+}
+
 /// The scenario lane, generic over one [`Product`].
 pub struct Lane<P: Product> {
     pub(crate) product: P,
@@ -76,6 +83,7 @@ pub struct Lane<P: Product> {
     records: Vec<crate::CaptureRecord>,
     capture_backend: Box<dyn CaptureBackend>,
     capture_paint: bool,
+    pub(crate) diagnostics: Option<Diagnostics>,
 }
 
 impl<P: Product> Lane<P> {
@@ -114,6 +122,7 @@ impl<P: Product> Lane<P> {
             capture_backend: Box::new(NativeCapture),
             capture_paint: std::env::var_os("MESQUITE_CAPTURE_PAINT")
                 .is_some_and(|value| value == "1"),
+            diagnostics: None,
         }
     }
 
@@ -215,7 +224,7 @@ impl<P: Product> Lane<P> {
             .outcome
             .as_ref()
             .map_or(&[] as &[String], |o| o.log.as_slice());
-        serde_json::json!({
+        let mut receipt = serde_json::json!({
             "ok": ok, "kind": P::KIND, "frames": self.frames,
             "scenario": self.had_scenario, "scenario_log": log,
             "errors": self.errors, "final": final_fields,
@@ -223,7 +232,11 @@ impl<P: Product> Lane<P> {
             "pixel_checks": self.pixel_checks,
             "cost": self.costs.report(),
             "product_log": self.product.receipt_lines(),
-        })
+        });
+        if let Some(diagnostics) = &self.diagnostics {
+            receipt["diagnostics"] = serde_json::json!(diagnostics);
+        }
+        receipt
     }
 
     /// Call once per presented frame, from the host's `after_frame` hook.
@@ -500,6 +513,11 @@ impl<P: Product> Lane<P> {
             distinct.len()
         ));
         lines.extend(self.product.receipt_lines());
+        if let Some(diagnostics) = &self.diagnostics {
+            // Value payloads and integer timing fields have a JSON encoding;
+            // the shared write path reports actual export/I/O failures.
+            lines.push(format!("diagnostics {}", serde_json::json!(diagnostics)));
+        }
         lines.extend(self.errors.iter().map(|e| format!("FAIL: {e}")));
         lines.join("\n") + "\n"
     }
@@ -533,6 +551,9 @@ impl<P: Product> Lane<P> {
         if let Err(error) = self.product.complete(ctx, &completion) {
             self.errors.push(format!("product completion: {error}"));
         }
+        let attachment = self.product.diagnostic_attachment(ctx);
+        self.collect_diagnostics(attachment);
+        let outcome = self.outcome.as_ref().expect("completion requested");
         let mut ok = outcome.ok && self.errors.is_empty() && self.exit_code.get() == 0;
         let receipt = if self.script_files.is_some() {
             Ok(self.text_receipt(ok).into_bytes())
@@ -566,6 +587,22 @@ impl<P: Product> Lane<P> {
             self.exit_code.set(1);
         }
         *ctx.close |= self.product.close_on_completion();
+    }
+
+    pub(crate) fn collect_diagnostics(
+        &mut self,
+        attachment: Result<Option<crate::DiagnosticBatch>, String>,
+    ) {
+        match attachment {
+            Ok(Some(batch)) => {
+                self.diagnostics = Some(Diagnostics {
+                    sampled_at_lane_frame: self.frames,
+                    batch,
+                });
+            },
+            Ok(None) => {},
+            Err(error) => self.errors.push(format!("diagnostic attachment: {error}")),
+        }
     }
 }
 

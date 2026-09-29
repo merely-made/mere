@@ -68,6 +68,11 @@ pub use cost::{CostObservation, Costs, Totals};
 pub use lane::{Capture, Lane, capture_path};
 pub use pixels::{PixelCheck, Viewport, ViewportTransform, create_parent, write_png};
 
+/// A bounded, product-redacted diagnostics batch for a requested run receipt.
+/// The product chooses its reader and correlation references. Sampling at the
+/// lane's completion does not establish that every record caused a captured frame.
+pub type DiagnosticBatch = apparatus::Batch<serde_json::Value>;
+
 /// The host context a [`Product`]'s hooks are handed, spelled once.
 pub type Ctx<'a, P> =
     AppCtx<'a, <P as Product>::State, <P as Product>::Logic, <P as Product>::View>;
@@ -147,6 +152,19 @@ pub trait Product: Sized {
     /// Product diagnostics included in the text receipt and JSON `product_log`.
     fn receipt_lines(&self) -> Vec<String> {
         Vec::new()
+    }
+
+    /// Optional bounded diagnostics, sampled once after `complete`. Return a
+    /// batch from an independent Apparatus cursor so this receipt does not
+    /// consume another inspector's records. Products redact before recording
+    /// and explicitly enable export under their run policy. `None` preserves
+    /// the existing receipt format; an error fails the requested receipt.
+    /// This hook reports observations, not product success or pixel causality.
+    fn diagnostic_attachment(
+        &mut self,
+        _ctx: &mut Ctx<'_, Self>,
+    ) -> Result<Option<DiagnosticBatch>, String> {
+        Ok(None)
     }
 
     /// Write product-specific receipts once, after all captures and acceptance

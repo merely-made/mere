@@ -2,9 +2,12 @@
 
 ## Current design: shared observations, 2026-09-29
 
-**Status:** design proposal. Semantic-selector integration is a separate active
-implementation lane; the diagnostics slices below are not implemented by this
-document. The June design and receipts are retained below as historical evidence.
+**Status:** first diagnostics implementation qualified by focused Mere tests.
+The bounded Apparatus core, optional Mesquite attachment and zero-capacity UX
+recorder repairs are implemented. Turnstone's separate redacted observation copy
+and Gloss/Inspector migration are written but unverified pending dependency pins.
+Worker correlation, exact presented-frame correlation and human accessibility
+acceptance remain open. The June design and receipts are historical evidence.
 
 Share bounded observations and causal references across applications, using their
 existing state and event producers. Do not introduce a universal application-event
@@ -17,7 +20,8 @@ attachments, qualified by two different consumers.
 **Ruled by Mark, 2026-09-29: Apparatus is the shared diagnostics library, in the
 existing `mere-apparatus` package (library `apparatus`).** Reuse that home for
 bounded observations and inspection beneath product-owned views. The name and
-crate home are settled; the storage contract and adapters below remain unimplemented.
+crate home are settled; the core and Mesquite attachment are implemented as
+recorded below, with product qualification still outstanding.
 The [September consolidation ruling](2026-09-23_crate_consolidation_plan.md)
 requires components to remain modules and reserved homes to receive their actual
 capabilities; two consumers must still qualify the shared contract and dependencies.
@@ -31,19 +35,20 @@ the current section activation vocabulary needs extending for controls such as
 retry/cancel. This is an accepted direction, not a completed UI migration.
 
 This supersedes the operational-status assignment in the July 18 taxonomy
-(`turnstone/design_docs/2026-07-18_meerkat_harvest.md`). The existing Turnstone
-Apparatus pane still analyzes selected graph-object facets and handling controls.
+(`turnstone/design_docs/2026-07-18_meerkat_harvest.md`). At the naming ruling,
+Turnstone's Apparatus pane analyzed selected graph-object facets and handling controls.
 **Mark's follow-up assigns that object analysis to Inspector**, alongside its
 inspection of documents and content within them, metadata and clipping. Inspector
 shows the fields and controls appropriate to the selected subject; graph facets,
 provenance and handling controls retain their product-owned sources and write
 paths. Migrate those capabilities into Inspector before retiring the object-analysis
-Apparatus pane. Application Settings remains separate. Both pane migrations are
-pending; these rulings settle their destinations, not their implementation.
+Apparatus pane. Application Settings remains separate. Both migrations now have
+source changes, but dependency pins and verification remain pending.
 
-Mere's [Apparatus crate](../../../crates/domain/apparatus/src/lib.rs) still emits
-empty diagnostic groups, without production consumers. That skeleton is not
-evidence of a working shared diagnostics system.
+Mere's [Apparatus crate](../../../crates/domain/apparatus/src/lib.rs) now exposes
+a renderer-independent observation store. Its older empty diagnostic groups
+remain behind the default `projection` feature; those placeholders do not
+establish a working inspection interface.
 [Alembic](../../../ports/distillery/alembic/src/lib.rs)
 already owns Distillery recall/workshop scope; Eidetic owns retained artifacts;
 [Armillary](../../../crates/armillary/README.md) owns actor execution and messaging.
@@ -65,7 +70,7 @@ name explicit repository paths; links stay within Mere.
 |---|---|---|
 | [UX events](../../../crates/system/ux-events/src/ux_observability.rs), [registry](../../../crates/system/registry/src/diagnostics/emit.rs) | Observers, probes, channel bridge, schemas and trace/message events | Reuse adapters; graph-specific action/node/surface types are not a universal app vocabulary. |
 | [Cambium/Mesquite](../../../crates/cambium/mesquite/src/lib.rs), [receipt](../../../crates/cambium/mesquite/src/lane.rs) | Snapshots, string events, captures, failures, frame costs | Add optional typed attachments; CPU wall-time costs are not GPU timings. |
-| Turnstone (`turnstone/src/observe.rs`), fanout (`turnstone/src/shell/effects.rs`) | Typed snapshot/AppEvent and 128-entry automation copy | Replace observation storage, preserve domain fold and trail; currently omission is unreported. |
+| Turnstone (`turnstone/src/observe.rs`), fanout (`turnstone/src/shell/effects.rs`) | Typed snapshot/AppEvent and existing 128-entry automation copy | A separate Apparatus copy records fixed redacted categories at fanout; automation strings and Trail authority remain preserved. Source written, pins/tests pending. Existing automation omission remains unreported. |
 | Knot (`knot-editor/apps/desktop/src/scenario.rs`), snapshot (`knot-editor/apps/desktop/src/workspace.rs`) | Mesquite document/format/dirty/appearance/message snapshot | Document authority and save/site acceptance remain product-owned; the current adapter is a state projection, not a causal outcome stream. |
 | Woodshed (`woodshed/crates/woodshed-genet/src/scenario.rs`) | Stage/gesture snapshots, string events, drag metrics | Preserve arrangement and gesture meaning; capture-pending busy is not an operation model. |
 | Redshank (`woodshed/ports/redshank/desktop/src/scenario.rs`) | Playback/transcript snapshots, seek requests, worker state | Workers report execution outcomes; desktop/session own stale-result acceptance and model application; persistence owns durable acknowledgment. |
@@ -82,7 +87,7 @@ do not install the shared UX observer/registry sender as a stack-wide pipeline.
 
 ### Small contract over product payloads
 
-Proposed `Observation<P>` carries schema version, run/source identity, monotonically
+`Observation<P>` carries schema version, run/source identity, monotonically
 increasing record sequence, receipt time, optional source time, optional operation
 identity and causal record reference, optional subject reference, and optional semantic
 revision/presented-frame reference. `P` remains the producer's versioned, redacted
@@ -134,10 +139,11 @@ Expose retained range/bytes plus cumulative rejected, evicted, expired and dropp
 counts. Independent cursors or immutable batches prevent competing destructive
 drains; a slow cursor receives an explicit gap and next available sequence.
 Neither missing records nor an empty disabled store means “nothing happened.”
-The existing [RecordingObserver](../../../crates/system/ux-events/src/ux_observability.rs)
+The [RecordingObserver](../../../crates/system/ux-events/src/ux_observability.rs)
 and [RecordingChannelSink](../../../crates/system/ux-events/src/ux_diagnostics.rs)
-currently append indefinitely at capacity zero; the first slice must repair this
-and test it. The registry emitter also silently drops without a receiver and uses
+formerly appended indefinitely at capacity zero. They now return before locking
+or cloning, with disabled-retention and bounded-eviction regression tests.
+The registry emitter still silently drops without a receiver and uses
 an unbounded sender; adapters must report their actual coverage/loss limits.
 
 Products project and redact before buffering. Turnstone's credential-omitting
@@ -171,8 +177,51 @@ absence is never silently reported as success.
    without diagnostic attachments remain compatible.
 
 Done means owner-specific code and recorded gates satisfy those slices, with
-native and human evidence labeled separately. This pass supplies the design only;
-the bounded store and receipt attachment implementation follow later.
+native and human evidence labeled separately. The first storage and receipt
+slice below does not close the real-worker or exact-frame acceptance gates.
+
+### Bounded diagnostics implementation, 2026-09-29
+
+`ObservationStore<P>` now enforces configured count, accounted encoded bytes and
+monotonic age. Rejected and known dropped records consume scoped sequence
+positions; independent readers receive copied batches, unavailable ranges,
+per-run loss totals and explicit reset boundaries. Any zero limit disables
+retention. Backward time fails before state changes. The storage core uses only
+`std`, with optional serialization; renderer dependencies belong to `projection`.
+Products supply already redacted payloads and truthful encoded payload lengths.
+Deterministic envelope accounting is added by the store; this bounds accounted
+encoding, not allocator memory or JSON export size. Payload mapping preserves
+original admission accounting.
+
+Mesquite adds default optional `Product::diagnostic_attachment`, sampled once
+after `complete`. A supplied bounded `Batch<serde_json::Value>` carries retained
+records, gaps and loss in the JSON receipt or text receipt line; absent hooks
+preserve the existing format. Attachment errors fail the requested receipt.
+`sampled_at_lane_frame` names the receipt observation point. It does not identify
+the captured pixel frame or invent a causal revision: current capture fields are
+sampled when asynchronous readback lands, and exact pixel/state pairing remains
+open. No worker lifecycle is inferred from `act` or quiescence.
+
+The [focused gate receipt](../testing/2026-09-29_apparatus_diagnostics_receipt.md)
+records 74 passing all-feature library tests (17 Apparatus, 19 Mesquite, 38 UX),
+14 passing core tests without default features and with serialization, and 75
+passing host integration tests (16 host library, 24 scenario, 16 mere-view,
+19 Mesquite). These are automated tests; this pass produced no new headed
+diagnostics or human screen-reader receipt.
+
+Turnstone's source adds a separate fixed-category observation store at existing
+app-event fanout. URL, path, title, prompt and error fields never enter that
+copy. Count/byte/age settings are configurable per run; one bounded
+`diagnostics.json` is exported only for an explicit shared scenario receipt,
+and export failure changes `scenario.done` to `RESULT fail`. The existing
+automation event stream and Trail remain separate. This adapter and the
+Gloss/Inspector pane migration await dependency pins and verification.
+
+The actual-worker pilot is deferred until Redshank's active owner finishes its
+podcast/task commit. Its later implementation must observe request, execution,
+product acceptance and durable acknowledgment at their owning boundaries.
+Two consumer qualification, rejected/failed/cancelled/stale worker paths, exact
+frame correlation, custom-leaf semantic parity and human AT remain open.
 
 ### Semantic implementation progress, 2026-09-29
 
@@ -213,7 +262,8 @@ Rootstock/winit-host/Mesquite tests and the standalone Wasm check passed again.
 Both locks retain every incoming package/version after the Genet substitution;
 the only added dependency edge is Taproot to document-session-api. This closes
 the earlier pending source-integration and machine-verification gates. The
-human AT check, custom-leaf parity and diagnostics implementation remain open.
+human AT check and custom-leaf parity remain open; the first diagnostics
+implementation and remaining qualification gates are recorded above.
 The Apparatus name/crate home and Gloss operational overview are now ruled above;
 the Gloss and Inspector pane migrations remain outstanding.
 
