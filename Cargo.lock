@@ -5538,6 +5538,7 @@ name = "gaz"
 version = "0.0.1"
 dependencies = [
  "insigne",
+ "personae",
  "postcard",
  "serde",
  "serde_json",
