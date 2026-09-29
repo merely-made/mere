@@ -53,7 +53,32 @@ At that table's date, consumers followed a git-first family rule through
 boundary was Cambium plus the protocol AST package, without Genet's layout or
 rendering engine.
 
-## Current Mere-owned compatibility (2026-09-13)
+## Current Mere-owned compatibility
+
+### 2026-09-29 semantic selector adoption
+
+Mere now pins Genet `19c206873ab08ae227217892d9e74d0df18b349a` coherently in
+the root and standalone web manifests. Relative to the verified scroll-repair
+revision `7a60ad79`, only Taproot code and documentation change: role/name
+selectors can consume Genet's existing computed accessibility projection.
+Rootstock exposes that projection; Mesquite uses it and rechecks a held target
+after scrolling. Class/text matching and product coordinate transforms remain
+compatible. Custom-leaf semantics and human AT acceptance remain separate.
+
+The final integration preserves primary `32edc2ad`, including Insigne, Knot
+`855cb75d` and the formatting-line repair. All 199 Rootstock/winit-host/Mesquite
+tests and standalone Graphshell Wasm checking pass. Both locks preserve every
+incoming package/version/source tuple after mapping the Genet revision; only
+Taproot's dependency on document-session-api is added. Existing Knot-owned
+legacy Genet identities remain separately qualified. The old-matcher negative
+control fails the referenced-name test; restored source passes. Native smoke
+evidence and current limitations are recorded in the
+[Cambium architecture](2026-09-03_cambium_architecture.md#dom-selector-parity-2026-09-29-implemented-and-verified)
+and the [diagnostics plan](../../mere_docs/implementation_strategy/2026-06-08_system_diagnostics_and_accessibility_plan.md).
+Raw receipts live under `testing/cambium/semantic-observation` in the shared Code
+root. The dated compatibility checkpoints below retain their original scope.
+
+### Historical September 13 boundary
 
 Cambium is now a Mere workspace family under `crates/cambium/`; it is not a
 Genet workspace subtree. Mere owns the current `cambium`, `meristem`,

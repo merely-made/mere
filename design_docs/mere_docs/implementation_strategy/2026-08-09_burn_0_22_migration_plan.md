@@ -1,5 +1,13 @@
 # Burn 0.22 Migration Plan
 
+**2026-09-29 reconciliation verification:** the held pre.4 branch now includes
+the accepted scroll/Insigne and semantic-projection sources through Mere
+`99e44853`, using current Genet `19c20687`. Fresh graph, workspace, host,
+remote-build, Wasm and affected numerical checks pass; see §13.25. Only Numen
+carries its earlier execution proof. S13, migration acceptance and main
+promotion remain held. Earlier dated entries retain their historical scope.
+
+
 **2026-09-28 reconciliation checkpoint:** merge of committed main `5ce144ff`
 into Lane M `a7c477e7` is prepared but uncommitted. Graph, workspace, Distillery,
 Djinn, remote-fixture and web checks pass after three optional-field API
@@ -2517,3 +2525,91 @@ records final source/docs, locks and receipts. The stable target is released;
 the existing Lane M worktree remains necessary for this held merge. A clean,
 reviewed reconciliation commit must precede S13. No merge acceptance, S13
 execution or integration follows from the independent passing gates.
+
+
+### 13.25 Published-main reconciliation verification (2026-09-29)
+
+The held checkpoint `387a8dd2` first received exact published main
+`32edc2ad`. Its source/graph-only integration was independently reviewed and
+committed locally as `0ea65fb6`, explicitly PRE-BUILD, NOT ACCEPTED, S13 HELD.
+Exact published `99e448535985b7b8f4908c95fbedbba79bf76d03` then joined that
+history before the final affected tests. Both merges preserved all 374
+tracked pre.4 patch files, including the six-field identity guard
+`de7f79a4…`; no pre.2 patch replacement or S13 fault edit occurred.
+
+Evidence is split into immutable `pre4-before-metadata`,
+`pre4-published-main-reconcile` and final `pre4-semantic-reconcile` folders
+under `Code/testing/mere/receipts/2026-09-29`. Each gate records its exact
+command, Rust 1.98.1 environment, separate logs, source/lock hashes and source
+modification times. All 3,026 source/lock inputs remain stable during every
+accepted gate. The stable `C:/t/cargo-targets/mere` target is reused with four
+jobs and incremental compilation disabled; no isolated Cargo home is added.
+
+All eleven locked metadata roots and the selected feature controls pass.
+Unfiltered metadata contains 1,533 packages at root, 636 in Graphshell web
+and 982 in the remote fixture; these are not browser payload sizes. Current
+workspace Genet is `19c20687`, and the accepted Knot source is `855cb75d`.
+The first integration added the approved host/Wasm 0.2.127 and Insigne graph
+changes. The final semantic integration changes source identities and adds
+only the selected Taproot → document-session-api edge in root and web.
+Taproot also declares a dev-only genet-render dependency, which is absent
+from those consumer resolutions. The web resolve graph matches accepted
+primary while five inactive optional Burn declarations retain pre.4.
+
+The remote lock retains all 982 package identities and its original
+`data-encoding-macro-internal` → `syn 3.0.4` edge. It adds exactly three
+required Insigne edges (Distillery, Mere Mesh and Pandect). The initial
+source-only candidate failed locked metadata; the four-edge candidate also
+failed because Mere Transport's Insigne dependency is dev-only here. Both
+attempts and the bounded solver probe are retained. The accepted candidate
+removes only that extra dev edge, preserves all other fields, and passes
+locked metadata. Eight unaffected roots keep identical locks and graphs.
+
+Every root's source/path detector rejects planted bad input. Production
+Distillery, Conatus, ESP BERT, minimal ESP and remote feature trees exclude
+Turso and runtime persistence. The same-run standalone WGPU control detects
+Turso and three persistence occurrences. This is scoped dependency evidence,
+not a blanket SQLite-free claim.
+
+Fresh affected gates pass:
+
+- Whole-workspace `cargo_mode.py verify`; Distillery all-targets with
+  `remote,trainer-gpu,trainer-autodiff,flora`; both remote lease tests; Djinn
+  all-target trainer check; Reader all-target check; remote-fixture build;
+  and Graphshell Wasm all-target/all-feature check with
+  `getrandom_backend="wasm_js"`.
+- Rootstock, both native/web hosts and Mesquite: 205 passing tests and four
+  existing ignored doctests, including all 44 Rootstock tests and 21 scenario tests, including the semantic cases. Pictograph canvas/Vello: 263 passing tests, including its
+  headless crossing control.
+- Seiche runtime: 12 default and eight no-default tests. Full release
+  tensor/WGPU suite: 107 passing
+  tests, with the existing timing comparison ignored. Both WGPU force parity
+  tests and their finite-input rejection tests pass.
+- Conatus release resident/resident-chunk: nine passing tests, with a positive
+  GPU kernel marker and zero adapter-skip messages. The same skip detector
+  finds its planted message.
+- ESP release synthetic parity/controls: four passing tests and two existing
+  ignored tests in that invocation. The explicit real-MiniLM test passes separately using the same six model-file
+  hashes. No assertion or tolerance is widened.
+
+**Carry correction:** unchanged crate files and dependency selection alone
+did not prove unchanged dependency source. Conatus's lock closure includes
+the changed Seiche runtime. ESP's selected test cone includes changed
+Personae library source through Eidetic's default pack-signing path. The
+initial carry audits are preserved as qualified attempts; both consumers
+were freshly tested above. Only Numen carries earlier execution evidence:
+its complete 584-package lock closure and local source closure are unchanged.
+GPU runs establish correctness, without an exclusive-device or performance
+claim. The local ESP MiniLM test does not satisfy S13's remote lifecycle gate.
+
+**S13 checklist clarification, dated 2026-09-29:** the current browser fixture
+contains ten graph cases (eight initial cases plus two LayerNorm cases), and
+eleven embedding cases (eight initial cases plus three grouped cases).
+Require all ten plus eleven; the earlier four-graph-case wording is
+historical. The named unpatched raw shared multiply failure and both
+LayerNorm input-bit-identity failure conditions remain unchanged. The remote
+receipt must also report error no greater than the exact pre.2 baseline
+`1.4901161193847656e-7`; its built-in `1e-4` test tolerance alone is insufficient.
+S13 has not run at this checkpoint. Independent review and a clean
+reconciliation commit still precede its release; migration acceptance, S15
+closure and primary promotion remain separate gates.

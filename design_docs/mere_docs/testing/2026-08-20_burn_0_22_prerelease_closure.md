@@ -1,5 +1,17 @@
 # Burn 0.22 prerelease closure receipt
 
+**2026-09-29 pre.4 reconciliation annotation:** migration plan §13.25 records
+the exact published-main integration through `99e44853` / Genet `19c20687`,
+coherent locked graphs and fresh affected compile/runtime verification.
+Conatus and ESP were rerun after dependency-source review invalidated their
+initial carry assumption; only Numen carries unchanged-closure execution
+evidence. This does not change the historical pre.2 production receipts below.
+S13 (all ten graph plus eleven embedding cases, native comparison, unpatched
+control, extrema and remote lifecycle), S15 closure and main promotion remain
+held behind their own gates. See `pre4-semantic-reconcile` under
+`Code/testing/mere/receipts/2026-09-29` for commands, logs and source seals.
+
+
 **Date:** 2026-08-20
 
 **Status:** The explicitly chosen `0.22.0-pre.2` migration remains the production

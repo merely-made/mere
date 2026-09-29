@@ -34,7 +34,16 @@ impl<P: Product> Automatable for Probe<'_, '_, P> {
     }
 
     fn selector_target(&self, selector: &Selector) -> SelectorTarget {
-        let nodes = taproot::matching(&self.ctx.runner.dom().borrow(), selector);
+        let nodes = self
+            .ctx
+            .a11y_projection()
+            .map_or_else(Vec::new, |projection| {
+                taproot::matching_with_projection(
+                    &self.ctx.runner.dom().borrow(),
+                    selector,
+                    &projection,
+                )
+            });
         for node in nodes {
             if let Some((x, y, width, height)) = self.ctx.painted_rect(node)
                 && width > 0.0
