@@ -4,12 +4,12 @@
 
 //! Word motion (Ctrl/Alt + ←/→, Backspace, Delete).
 //!
-//! Word boundaries are UAX#29 (`unicode-segmentation`), computed over the buffer
+//! Word boundaries are UAX#29 (`genet-text`), computed over the buffer
 //! here — the buffer owns segmentation; the host only routes the modified key. A
 //! "word" is any non-whitespace segment, so motion stops at the edges of words and
 //! of punctuation runs (e.g. djot `**`, backticks), skipping the whitespace between.
 
-use unicode_segmentation::UnicodeSegmentation;
+use genet_text::{BoundaryKind, segments};
 
 use super::TextInput;
 
@@ -24,7 +24,9 @@ impl TextInput {
     /// Byte offset one word right of byte `from`: skip whitespace at/after `from`, then
     /// land at the end of the next non-whitespace segment. Buffer end when none remains.
     fn word_boundary_right(&self, from: usize) -> usize {
-        for (start, seg) in self.text.split_word_bound_indices() {
+        for segment in segments(&self.text, BoundaryKind::Word) {
+            let start = segment.start.utf8_bytes;
+            let seg = segment.text;
             let end = start + seg.len();
             if end <= from || seg.chars().all(char::is_whitespace) {
                 continue;
@@ -38,7 +40,9 @@ impl TextInput {
     /// segment beginning before `from`. `0` when none precedes it.
     fn word_boundary_left(&self, from: usize) -> usize {
         let mut target = 0;
-        for (start, seg) in self.text.split_word_bound_indices() {
+        for segment in segments(&self.text, BoundaryKind::Word) {
+            let start = segment.start.utf8_bytes;
+            let seg = segment.text;
             if start >= from {
                 break;
             }

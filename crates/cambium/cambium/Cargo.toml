@@ -25,7 +25,7 @@ mere-surface-api = { workspace = true }
 # embedding shell to interpret, while the component owns one vocabulary.
 workbench = { workspace = true }
 layout_dom_api = { workspace = true }
-unicode-segmentation = "1.13.2"
+genet-text = { workspace = true }
 illume = { workspace = true, optional = true }
 tinct = { workspace = true, optional = true }
 # `workspace = true`, not a bare version: a bare errand version resolved to

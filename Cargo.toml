@@ -297,6 +297,7 @@ document-canvas = { version = "0.1.0", path = "crates/inker/document-canvas" }
 # so does the external knot-editor.
 nematic = { version = "0.1.1", path = "crates/nematic/nematic", default-features = false }
 fleece = { version = "0.5.0", git = "https://github.com/merely-made/genet.git", rev = "19c206873ab08ae227217892d9e74d0df18b349a" }
+genet-text = { version = "0.1.0", git = "https://github.com/merely-made/genet.git", rev = "19c206873ab08ae227217892d9e74d0df18b349a" }
 # Landed here from genet 2026-09-03 (platform boundary plan, P3): a workspace
 # member now, so it is a path dep and must NOT appear in .cargo/config.toml's
 # genet patch table — patching a git source at a path that is also a workspace
