@@ -51,7 +51,7 @@ the direction that makes no dependency cycle.
 | `insigne` | presentable proofs: typed keys, delegation certificates and revocations, derived-key attestations | gaz's `TypedKey`; personae's delegation data types | `TypedKey` landed `0f3f854f`; the delegation types landed `5364dfa0` (insigne proofs plan, phase A); phases B to D open (dramatis session) |
 | `tabard` | theme and stylesheet authoring over tinct, illume and CSS | registry's theme module, the smolweb palettes, Pelt's theme persistence | ruled 2026-09-24; see C2a |
 | `dramatis` | the tier facade | none misplaced | nothing to move |
-| `mere-apparatus` | reserved Apparatus home; current code is an empty legacy system-inspector skeleton | Turnstone's July 18 ruling now assigns object analysis to Apparatus and operational readouts to Steward | naming/consumer boundary needs reconciliation; see the [September diagnostics design](2026-06-08_system_diagnostics_and_accessibility_plan.md); no crate rename or capability move has landed |
+| `mere-apparatus` | shared diagnostics: bounded observations and inspection beneath product-owned views | existing skeleton receives the shared store and adapters, qualified by two consumers | ruled September 29; see the [diagnostics design](2026-06-08_system_diagnostics_and_accessibility_plan.md); Gloss takes the operational overview, Inspector takes object analysis; Steward and the object-analysis Apparatus pane retire after migration; implementation pending |
 
 *Done when:* every row is landed, ruled out by Mark, or found to have
 nothing misplaced, and each landed move carries its tests with it.
