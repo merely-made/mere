@@ -232,7 +232,40 @@ Validation: 15 scenario integration tests, 17 Mesquite unit tests and 16 host
 unit tests pass. Headed smoke and Mere View theme runs each captured three
 nonblank, distinct frames. Evidence is under
 `testing/knot-editor/images/2026-09-27_7c/unification/` in the workspace.
-Other products' independent runners remain a separate migration task.
+Knot `f14f9ef` consumes Mere `8fce5365` and passes 426 tests with 3 ignored
+across workspace, standalone document and retention gates. Its native site run
+passes with three nonblank frames; the final image confirms the site and pages
+closed. Mere's embedded Knot pins follow `f14f9ef`; `cargo tree --offline -p djinn`
+checks dependency lockstep separately from runtime acceptance.
+Other products' independent runners are being migrated separately.
+
+**Paint capture (2026-09-27).** Rootstock's one-shot `AppCtx::capture_paint`
+returns the final pre-translation `PaintEnvelope` after that frame is presented.
+It includes caret/selection and scrollbar overlays, positioned glyphs and full
+font/image payloads. Failed presentation retains the request for the next frame;
+an unarmed hook does not clone the paint list. Paired pixel and paint callbacks
+receive the same frame. The paint viewport is in layout coordinates; the PNG is
+in physical pixels. External GPU texture commands retain references only.
+
+Mesquite enables paired `.paintlist` sidecars with `MESQUITE_CAPTURE_PAINT=1`
+or `Lane::set_paint_capture(true)`. Each saved PNG receives a postcard-encoded
+`PaintEnvelope` beside it and a `paint_path` in its JSON capture record. Fonts
+are never elided. Missing paired output, serialization/write errors, or an
+existing sidecar fail the receipt; a prior resource packet is never overwritten.
+This opt-in serializes large resources and is excluded from timing acceptance.
+The consumer's scenario and capture provenance establish which real document
+was captured. Rasterizing a packet with external GPU references still needs
+the separate producer import/capture contract.
+
+**Consumer completion policy (2026-09-27).** `Product::complete` receives the
+aggregate scenario and lane outcome after capture collection and acceptance
+checks. Products can retain typed durable receipts without owning a second
+frame pump. A completion error fails the shared receipt and exit code.
+`close_on_completion` defaults to closing; interactive trials can keep the
+finished window open without restarting the scenario. Explicit host close
+requests remain respected. The focused gate passes 49 tests (17 Mesquite,
+16 host, 16 scenario), including missing readback propagation, failing product
+completion, and exactly-once completion while the window remains open.
 
 **Which plane moves.** Exactly one: the nearest ancestor whose computed `overflow-y`
 scrolls *and* whose vertical range is positive, otherwise the window viewport. The range
@@ -277,3 +310,90 @@ fail. Validated on Rust 1.97.1, `--offline --locked`: rootstock's 40 tests, the 
 host's 88 across ten suites, cambium's 216, mere-document-lanes with `smolweb` 33, the
 web host checked natively and for wasm32, the format check on the three host crates,
 and the workspace check.
+
+
+## Consumer automation and semantic parity follow-up (2026-09-27)
+
+Accepted order: repin existing Mesquite consumers (Mesocosm native bench,
+Eponym and their Isomere host), migrate Woodshed/Redshank/Cleromancy lifecycle
+code, then reconcile automation selectors with Genet's computed accessible
+names. Isometry's domain self-tests remain product-owned. Turnstone's multiple
+surfaces and Graphshell's browser DOM require separate host adapters.
+
+The shared completion hook is published at Mere `55f5ac62`; the custom-command
+held-click adapter passes the focused 50-test gate (17 Mesquite, 16 host,
+17 scenario integration). `Product::app_step_with_clicks` shares
+the lane queue with product-specific selector verbs, preserving the scroll /
+layout / pointer-dispatch ordering. Existing products default through
+`app_step` and need no method change.
+
+The semantic parity gate must compare names and roles from the same
+owner-computed projection, including referenced labels, without turning a
+passing scenario into a claim of physical screen-reader acceptance. Genet's
+accessible-name work was published at `c858738c`; the projection matcher is
+published at `19c20687` (25 Taproot tests passed). Diagnostics should correlate product state and semantic action
+results with the existing UX event sinks and scenario receipts; avoid inventing
+a second application state model. Consumer acceptance and physical AT receipts
+must remain separately recorded.
+
+Consumer receipts on Mere `8106c7c2` / Genet `34626a6c`: Woodshed migration
+`0f0cdf1` passes 223 product tests and the unchanged `stage_clipping` and
+`nearby_candidates` native scenarios. The former now scrolls its arrangement
+controls into view at requested width 1100; broader Stage layout remains open.
+Cleromancy migration `32a4b94` passes 16 focused tests, an all-target check with
+`analytic-ephemeris`, and native first/reopen with matching durable IDs and card
+content. Mesquite owns captures and completion while each product retains its
+semantic commands and observations. Evidence is under
+`Code/testing/cambium/mesquite-migration`, with captures under the corresponding
+Woodshed and Cleromancy testing directories. These are native automation
+receipts, not new manual screen-reader acceptance.
+
+### DOM selector parity (2026-09-29, implemented and verified)
+
+`AppCtx::a11y_projection` exposes the host's retained Genet document semantics.
+Mesquite uses `taproot::matching_with_projection` for role/name targets and
+retains explicit class/text/attribute matching. A role target absent from the
+projection is an authoritative miss. A held scrolling click revalidates the
+same DOM identity before delivery; a changed or hidden semantic target fails
+instead of activating or selecting a replacement. Pointer coordinates still
+come from host geometry and product coordinate transforms.
+
+The shared-host fixture names a below-fold button through `aria-labelledby`,
+overriding conflicting raw text and `aria-label`, then routes an accessibility
+focus and click through the same DOM target. The native smoke's Restore defaults
+button is named Reset all controls through the same referenced-label rule.
+Manual acceptance must verify that spoken name, focus without activation, and
+activation's visible state change; automated and native receipts alone cannot
+establish this.
+
+At Mere base `a31b9a14` with Genet `19c20687`, the focused gate passed 60
+tests (16 host unit, 6 accessibility, 21 scenario, 17 Mesquite unit). Replacing
+only the initial click matcher with the old raw-DOM matcher failed the new
+referenced-name test with count zero and a missing target. Restoring the exact
+source passed all 21 scenario tests. The native smoke passed 32 frames with
+AccessKit installed (15 nodes), three nonblank distinct captures and two sizes;
+the resize capture was visually inspected. Human AT remains pending. These are
+isolated-branch receipts; publication follows the concurrent Mere integration.
+The standalone Graphshell manifest also passed `cargo check --target
+wasm32-unknown-unknown` with the same Genet pin and its required `wasm_js` cfg.
+
+After merging the sealed formatting-line repair `8eca3e4c`, branch checkpoint
+`ced161f1` passed all 199 Rootstock/winit-host/Mesquite tests, repeated the native
+smoke's three capture digests, and passed Wasm checking against the primary
+owner's accepted standalone lock. No package/version changed in that web lock;
+the only new dependency edge is Taproot to document-session-api. Publication
+still waits for the primary integration of the newer Insigne changes.
+
+Final integration merged published primary `32edc2ad`, preserving the Insigne
+migration and Knot pin. All 199 affected tests and the standalone Wasm check
+passed again. Root and standalone locks retain their accepted package/version
+sets after substituting the Genet revision; only the Taproot-to-document-session-api
+edge is added. This supersedes the earlier integration-pending status.
+
+This is DOM semantic parity. Sprigging custom-leaf contributions and complete
+HTML/CSS visibility/role conformance remain outside it. The document projection
+still uses revision zero; it is not an immutable presentation-qualified snapshot.
+The [current diagnostics design](../../mere_docs/implementation_strategy/2026-06-08_system_diagnostics_and_accessibility_plan.md)
+requires producer-supplied identity/revision references rather than inventing
+correlation from this limitation. No shared diagnostics store is implemented by
+the selector work.

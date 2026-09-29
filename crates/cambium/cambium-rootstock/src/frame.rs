@@ -21,7 +21,7 @@ use genet_render::VisualCaret;
 use genet_scripted_dom::NodeId;
 use layout_dom_api::{DomMutation, LayoutDomMut as _};
 use netrender::{ColorLoad, ExternalTexturePlacement};
-use paint_list_api::{ColorF, DeviceIntSize, PaintList as _};
+use paint_list_api::{ColorF, DeviceIntSize, PaintEnvelope, PaintList as _};
 
 use crate::input::to_visual_caret;
 use crate::meristem_bounds::RootView;
@@ -47,6 +47,11 @@ impl SpriggingSource<'_> {
 /// The focused text field's paint inputs for this frame: which node, where the
 /// caret is, and the selection byte range when one should be drawn.
 type FocusedOverlay = (NodeId, VisualCaret, Option<(usize, usize)>);
+
+type EmittedScene = (
+    paint_list_render::TranslatedDisplayList,
+    Option<PaintEnvelope>,
+);
 
 impl<State, Logic, V> Host<State, Logic, V>
 where
@@ -83,6 +88,7 @@ where
                 close: &mut self.s.close_requested,
                 wake: &self.wake,
                 capture: &mut self.s.pending_capture,
+                capture_paint: &mut self.s.pending_paint_capture,
                 pointer: &mut self.s.pending_pointer,
                 scroll: &mut self.s.pending_scroll,
                 window_commands: &commands,
@@ -415,7 +421,7 @@ where
     /// Emit this frame's paint list — content, then the caret/selection
     /// overlay, then whatever overlay scrollbars are mid-hold or mid-fade — and
     /// lower it to a netrender scene plus the GPU resources that scene names.
-    fn emit_scene(&mut self, lw: f32, lh: f32) -> Option<paint_list_render::TranslatedDisplayList> {
+    fn emit_scene(&mut self, lw: f32, lh: f32) -> Option<EmittedScene> {
         let focused_overlay = self.focused_overlay();
         let runner = self.s.runner.as_ref()?;
         let layout = self.s.layout.as_mut()?;
@@ -479,13 +485,18 @@ where
         let now = crate::Instant::now();
         let fade = &self.s.scrollbar_fade;
         layout.append_scrollbars(&*dom_ref, &mut list, &|t| fade.alpha(t, now));
+        let paint_capture = self
+            .s
+            .pending_paint_capture
+            .as_ref()
+            .map(|_| PaintEnvelope::from_list(&list));
         let translated = paint_list_render::translate_paint_cmd_stream(
             list.viewport(),
             list.commands(),
             list.fonts(),
             list.images(),
         );
-        Some(translated)
+        Some((translated, paint_capture))
     }
 
     pub fn redraw(&mut self) {
@@ -545,7 +556,7 @@ where
         self.sync_ime_area();
         profile.ime_us = elapsed_us(phase.elapsed());
         let phase = crate::Instant::now();
-        let Some(translated) = self.emit_scene(lw, lh) else {
+        let Some((translated, paint_capture)) = self.emit_scene(lw, lh) else {
             profile.emit_scene_us = elapsed_us(phase.elapsed());
             profile.total_us = elapsed_us(frame_started.elapsed());
             self.s.last_frame_profile = Some(profile);
@@ -656,6 +667,11 @@ where
         // A capture armed by the application: run it while the rasterized
         // view is still alive.
         let phase = crate::Instant::now();
+        if let Some(envelope) = paint_capture
+            && let Some(capture) = self.s.pending_paint_capture.take()
+        {
+            capture(envelope);
+        }
         if let Some(capture) = self.s.pending_capture.take() {
             capture(&**surface, &view, pw, ph);
         }

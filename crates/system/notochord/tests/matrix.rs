@@ -10,14 +10,14 @@
 use personae::delegation::Issue;
 use std::collections::BTreeMap;
 
+use insigne::delegation::{
+    CapabilityScope, DelegationCertificate, DelegationParent, DelegationRevocation,
+    SignedDelegationCertificate, SignedDelegationRevocation,
+};
 use notochord::{
     CarrierKind, ChainFault, DenyReason, HandshakeLimits, LocalNetworkPolicy, NetworkId,
     ProfileRef, RequestedAction, RevocationLedger, ServiceAccess, ServiceRule, SessionClaims,
     SessionDecision, SessionFacts, TrafficClass, TrustedRoot,
-};
-use personae::delegation::{
-    CapabilityScope, DelegationCertificate, DelegationParent, DelegationRevocation,
-    SignedDelegationCertificate, SignedDelegationRevocation,
 };
 use personae::{IdentityProvider, InMemoryProvider};
 

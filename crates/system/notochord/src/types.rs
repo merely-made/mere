@@ -6,7 +6,7 @@
 
 //! Versioned, serializable vocabulary shared by policy owners and evaluators.
 
-use personae::delegation::SignedDelegationCertificate;
+use insigne::delegation::SignedDelegationCertificate;
 use serde::{Deserialize, Serialize};
 
 /// The session-admission wire version this evaluator understands.

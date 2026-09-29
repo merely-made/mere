@@ -146,6 +146,9 @@ impl Canvas {
     pub fn apply_strategy_positions(&mut self, positions: &[(NodeKey, PortablePoint)]) {
         if self.active_strategy.is_some() {
             self.strategy_positions = Some(positions.to_vec());
+            if self.physics_paused {
+                self.paused_positions = Some(positions.to_vec());
+            }
             // Seed the *world*, not just the read model, so the arrangement is
             // a real initial condition: paused, the bodies hold exactly here;
             // running, the sim relaxes from here instead of snapping back to
@@ -170,7 +173,27 @@ impl Canvas {
     pub fn preview_strategy_positions(&mut self, positions: &[(NodeKey, PortablePoint)]) {
         if self.active_strategy.is_some() {
             self.strategy_positions = Some(positions.to_vec());
+            if self.physics_paused {
+                self.paused_positions = Some(positions.to_vec());
+            }
         }
+    }
+
+    /// Pause and return to the active arrangement's stored placement. Ordinary
+    /// pause only freezes the current view. This does not replace the saved
+    /// projection score or recalculate the arrangement from changed inputs.
+    /// Returns false when there is no active arrangement with stored positions.
+    pub fn restore_arrangement(&mut self) -> bool {
+        if self.active_strategy.is_none() {
+            return false;
+        }
+        let Some(positions) = self.strategy_positions.clone() else {
+            return false;
+        };
+        self.set_physics_paused(true);
+        self.apply_strategy_positions(&positions);
+        self.apply_strategy_to_view();
+        true
     }
 
     /// Install the active arrangement's slots as anchor springs, so a *playing*
@@ -305,6 +328,7 @@ impl Canvas {
         // via the visible global pause rather than a hidden halt.
         self.set_physics_paused(true);
         self.strategy_positions = Some(positions.clone());
+        self.paused_positions = Some(positions.clone());
         self.physics.seed(
             positions
                 .iter()
@@ -593,24 +617,21 @@ impl Canvas {
         }
     }
 
-    /// Overlay the buffered strategy positions onto `view` — called by
+    /// Overlay the frozen visible positions onto `view` — called by
     /// [`frame`](Canvas::frame) right after the physics snapshot, so the underlay,
     /// DOM nodes, cull, and edges (all reading `view`) stay consistent in one write.
-    /// A no-op under force-directed. (Layout picker.)
+    /// The stored arrangement remains independent from this paused view.
     pub(crate) fn apply_strategy_to_view(&mut self) {
-        let Some(positions) = self.strategy_positions.take() else {
+        let Some(positions) = self.paused_positions.as_ref() else {
             return;
         };
-        // Hold the analytic placement only while physics is paused. With physics
-        // running the world was seeded from these same positions and the sim now
-        // owns the motion — re-asserting them every frame would pin the nodes and
-        // make play look broken. (Physics as a capability.)
         if self.physics_paused {
-            for &(key, p) in &positions {
-                self.view.set_position(key, Point2D::new(p.x, p.y));
+            for &(key, p) in positions {
+                if self.graph.get_node(key).is_some() {
+                    self.view.set_position(key, Point2D::new(p.x, p.y));
+                }
             }
         }
-        self.strategy_positions = Some(positions);
     }
 }
 

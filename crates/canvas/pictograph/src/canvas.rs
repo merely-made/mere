@@ -158,6 +158,9 @@ pub use canvas_search::CanvasSearchSurface;
 pub use field_bridge::{build_query_similarity_field, register_query_similarity_field};
 pub mod fold_projection;
 mod frame;
+mod frame_profile;
+pub use frame_profile::CanvasFrameProfile;
+mod cull;
 mod input;
 mod resolved_image_cache;
 pub use resolved_image_cache::DEFAULT_RESOLVED_IMAGE_CACHE_BYTES;
@@ -597,10 +600,12 @@ pub struct Canvas {
     /// Persisted per pane via view-intent; the host pushes positions for it via
     /// [`apply_strategy_positions`](Canvas::apply_strategy_positions). (Layout picker.)
     active_strategy: Option<String>,
-    /// Buffered positions for the active non-seiche strategy, applied into `view` each
-    /// frame **after** the physics snapshot (so they win over seiche regardless of the
-    /// off-thread actor's timing). `None` under force-directed. (Layout picker.)
+    /// Stored positions for the active arrangement, used by anchor springs and
+    /// explicit restoration. Pausing physics does not replace these slots.
     strategy_positions: Option<Vec<(NodeKey, PortablePoint)>>,
+    /// The visible placement frozen by pause, independent of the stored arrangement.
+    /// Reapplied after actor snapshots so a late update cannot undo a pause.
+    paused_positions: Option<Vec<(NodeKey, PortablePoint)>>,
     /// The persisted product-free score that drove the current analytic view.
     /// This is view state, not graph truth. (Projection proofs — P3.)
     projection_score: Option<sceno::Score>,

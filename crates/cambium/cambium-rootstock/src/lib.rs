@@ -848,8 +848,8 @@ pub use host::{
     AppCtx, AppFrameInsets, AppHook, CaptureFn, CloseDisposition, CloseRequest, CloseRequestHook,
     FocusedTextHook, FocusedTextSlot, FrameHook, FrameProfile, Hook, Host, HostFont, HostHooks,
     HostImage, HostOptions, HostPointer, HostState, IdlePolicy, Init, KeyInterceptHook,
-    RelayoutProfile, Runner, ScrollIntoView, WindowFrame, ZOOM_LADDER, env_size, fit_zoom,
-    ladder_step,
+    PaintCaptureFn, RelayoutProfile, Runner, ScrollIntoView, WindowFrame, ZOOM_LADDER, env_size,
+    fit_zoom, ladder_step,
 };
 pub use wake::HostWake;
 pub use window_verbs::{AppRegion, WindowCommand, WindowCommands, WindowGeometry};

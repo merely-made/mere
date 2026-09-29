@@ -12,6 +12,7 @@ name = "mesh"
 path = "src/lib.rs"
 
 [dependencies]
+insigne = { workspace = true, features = ["verify"] }
 # The operation/signing substrate the job ops ride (the same signed
 # Operation<Ext> wire as Standing and Murm posts; mirrors Gemot's pin).
 p2panda-core = "0.7.0"

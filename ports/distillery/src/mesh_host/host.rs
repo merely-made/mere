@@ -9,7 +9,8 @@
 use std::collections::BTreeMap;
 use std::sync::Arc;
 
-use personae::{DerivedKeyAttestation, Ed25519Keypair};
+use personae::Ed25519Keypair;
+use insigne::DerivedKeyAttestation;
 use mesh::{
     BlobSink, BlobSource, DevicePolicy, HostFacts, HostOffer, JobControl, JobId, LeaseId,
     LeasePolicy, LeaseProgress, MeshEvent, MeshStoreError, MeshSyncError, ReclaimReason,

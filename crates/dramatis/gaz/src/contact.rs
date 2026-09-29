@@ -15,7 +15,7 @@ use serde::{Deserialize, Serialize};
 use crate::anchor::{Anchor, LocalId, PlcDid};
 use crate::endpoint::Endpoint;
 use crate::handle::Handle;
-use crate::trust::ProofMethod;
+use crate::proof::KeyProof;
 
 /// How close a contact is.
 ///
@@ -38,11 +38,12 @@ pub enum ContactTier {
 pub struct RootKey {
     /// The key.
     pub key: TypedKey,
-    /// What the caller checked before recording it: for a rotation, a
-    /// signature by the previous root; for a `did:plc` account, a valid PLC
+    /// What the caller checked before recording it, retained for rechecking:
+    /// for a rotation, a signature by the previous root; for a `did:plc`
+    /// account, a valid PLC
     /// operation. `None` for the key a record was started with, and for a
     /// change nobody proved.
-    pub proof: Option<ProofMethod>,
+    pub proof: Option<KeyProof>,
 }
 
 /// A key that speaks for a root without being one: derived per protocol, or
@@ -55,8 +56,8 @@ pub struct AttestedKey {
     pub scope: String,
     /// The root key that attested it, which is on this contact's root line.
     pub root: TypedKey,
-    /// How the caller checked the attestation.
-    pub proof: Option<ProofMethod>,
+    /// The artifact and context the caller checked, retained for rechecking.
+    pub proof: Option<KeyProof>,
 }
 
 /// The local rollup that says these addresses and keys are all the same
@@ -75,7 +76,9 @@ pub struct AttestedKey {
 /// The rules are enforced rather than documented, on construction and on
 /// load: a key anchor is the first key of its root line, a key or `did:plc`
 /// anchor always holds a key, every attested key names a root this record
-/// holds, and no key appears twice.
+/// holds, no key appears twice, and typed proof artifacts name the recorded
+/// key and its attesting root. These are structural rules, not signature
+/// checks: the caller owns authenticity and current authority.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(try_from = "ContactRecord")]
 pub struct Contact {
@@ -189,6 +192,24 @@ impl Contact {
         {
             return Err(ContactError::UnknownRoot);
         }
+        for (index, root) in self.root_line.iter().enumerate() {
+            let previous = index.checked_sub(1).map(|i| &self.root_line[i].key);
+            if root
+                .proof
+                .as_ref()
+                .is_some_and(|proof| !proof.binds(&root.key, previous))
+            {
+                return Err(ContactError::ProofMismatch);
+            }
+        }
+        if self.attested.iter().any(|attested| {
+            attested
+                .proof
+                .as_ref()
+                .is_some_and(|proof| !proof.binds(&attested.key, Some(&attested.root)))
+        }) {
+            return Err(ContactError::ProofMismatch);
+        }
         Ok(())
     }
 
@@ -241,23 +262,39 @@ impl Contact {
     ///
     /// Returns whether anything changed. A key they already hold is a no-op
     /// rather than an error, so replaying an event stream is safe.
-    pub fn rotate_to(&mut self, key: TypedKey, proof: Option<ProofMethod>) -> bool {
+    ///
+    /// A typed proof must name this key and the immediately preceding root.
+    /// A mismatch is refused without changing the record. Signatures are not
+    /// checked here; the caller still owns verification.
+    pub fn rotate_to(
+        &mut self,
+        key: TypedKey,
+        proof: Option<KeyProof>,
+    ) -> Result<bool, ContactError> {
         if self.knows_key(&key) {
-            return false;
+            return Ok(false);
+        }
+        if proof
+            .as_ref()
+            .is_some_and(|proof| !proof.binds(&key, self.root()))
+        {
+            return Err(ContactError::ProofMismatch);
         }
         self.root_line.push(RootKey { key, proof });
-        true
+        Ok(true)
     }
 
     /// Record a key that one of their roots vouched for.
     ///
     /// Returns whether anything changed; recording a key twice is a no-op.
+    /// Typed evidence must name this key and the supplied root; a mismatch
+    /// leaves the record unchanged. This does not check signatures.
     pub fn attest(
         &mut self,
         key: TypedKey,
         scope: impl Into<String>,
         root: TypedKey,
-        proof: Option<ProofMethod>,
+        proof: Option<KeyProof>,
     ) -> Result<bool, AttestError> {
         if !self.on_root_line(&root) {
             return Err(AttestError::UnknownRoot);
@@ -267,6 +304,12 @@ impl Contact {
         }
         if self.attested.iter().any(|attested| attested.key == key) {
             return Ok(false);
+        }
+        if proof
+            .as_ref()
+            .is_some_and(|proof| !proof.binds(&key, Some(&root)))
+        {
+            return Err(AttestError::ProofMismatch);
         }
         self.attested.push(AttestedKey {
             key,
@@ -356,6 +399,8 @@ pub enum ContactError {
     UnknownRoot,
     /// The same key recorded twice.
     DuplicateKey,
+    /// A typed proof names a different key or attesting root.
+    ProofMismatch,
 }
 
 impl fmt::Display for ContactError {
@@ -365,6 +410,7 @@ impl fmt::Display for ContactError {
             Self::AnchorNotFirst => "a key-anchored contact's root line must start with its anchor",
             Self::UnknownRoot => "an attested key names a root this contact does not hold",
             Self::DuplicateKey => "a key appears twice in one contact",
+            Self::ProofMismatch => "a retained proof names a different key or root",
         })
     }
 }
@@ -378,6 +424,8 @@ pub enum AttestError {
     UnknownRoot,
     /// The key is already one of their roots.
     IsRoot,
+    /// A typed proof names a different key or attesting root.
+    ProofMismatch,
 }
 
 impl fmt::Display for AttestError {
@@ -385,6 +433,7 @@ impl fmt::Display for AttestError {
         f.write_str(match self {
             Self::UnknownRoot => "the attesting key is not one of this contact's roots",
             Self::IsRoot => "the key is already one of this contact's roots",
+            Self::ProofMismatch => "a retained proof names a different key or root",
         })
     }
 }

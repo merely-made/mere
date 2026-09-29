@@ -272,6 +272,14 @@ mod tests {
     use crate::handle::Handle;
     use crate::trust::{ProofMethod, TrustState};
 
+    fn proof(method: ProofMethod) -> crate::KeyProof {
+        crate::KeyProof::Other {
+            method,
+            format: "gaz-test-evidence/v1".into(),
+            bytes: vec![1, 2, 3],
+        }
+    }
+
     fn key(seed: u8) -> TypedKey {
         TypedKey::ed25519([seed; 32])
     }
@@ -309,7 +317,9 @@ mod tests {
     fn a_rotated_or_attested_key_still_finds_its_owner() {
         let mut book = book();
         let mut alice = Contact::new("Alice", key(1));
-        alice.rotate_to(key(2), Some(ProofMethod::Signature));
+        alice
+            .rotate_to(key(2), Some(proof(ProofMethod::Signature)))
+            .unwrap();
         alice.attest(key(10), "mesh-author", key(2), None).unwrap();
         book.insert(alice);
 
@@ -342,7 +352,10 @@ mod tests {
         let mut book = book();
         book.insert(Contact::new("Alice", key(1)));
 
-        book.get_mut(&anchor(1)).unwrap().rotate_to(key(2), None);
+        book.get_mut(&anchor(1))
+            .unwrap()
+            .rotate_to(key(2), None)
+            .unwrap();
 
         assert_eq!(book.len(), 1, "rotation must not create a second record");
         assert!(

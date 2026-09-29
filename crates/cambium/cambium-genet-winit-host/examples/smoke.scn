@@ -41,8 +41,9 @@ settle 4
 capture resized
 assert text cambium-genet-winit-host smoke
 
-# The Reset button restores the start state, by label.
-click role:button Reset
+# The referenced accessible name wins over raw text and aria-label. Narrator
+# should announce the same name when it focuses the Restore defaults button.
+click role:button Reset all controls
 settle 1
 assert snap clicks == 0
 assert event reset

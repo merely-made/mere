@@ -30,6 +30,10 @@
 //! Keys come in two shapes. The root line holds the keys that have stood for
 //! the person as a whole, each succeeding the last. Attested keys are
 //! concurrent: one per protocol and one per device, each vouched for by a root.
+//! Both retain their [`KeyProof`]: an Insigne attestation with its salt, a
+//! signed delegation certificate, or caller-owned evidence bytes with their
+//! format and proof method. Reloading validates the typed key relationships;
+//! it never turns a stored artifact into a successful cryptographic check.
 //!
 //! ## What this crate is not
 //!
@@ -86,6 +90,7 @@ pub mod book;
 pub mod contact;
 pub mod endpoint;
 pub mod handle;
+pub mod proof;
 pub mod trust;
 
 pub use anchor::{Anchor, AnchorParseError, LocalId, PlcDid};
@@ -94,6 +99,7 @@ pub use contact::{AttestError, AttestedKey, Contact, ContactError, ContactTier, 
 pub use endpoint::{Endpoint, EndpointKind};
 pub use handle::{Handle, HandleKind};
 pub use insigne::{KeyAlgorithm, KeyParseError, TypedKey};
+pub use proof::KeyProof;
 pub use trust::{ProofMethod, TrustState};
 
 /// Crate version.

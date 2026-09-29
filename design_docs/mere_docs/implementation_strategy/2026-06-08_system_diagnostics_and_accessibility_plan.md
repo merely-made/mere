@@ -1,5 +1,280 @@
 # System Diagnostics and Accessibility Plan
 
+## Current design: shared observations, 2026-09-29
+
+**Status:** first diagnostics implementation qualified by focused Mere tests.
+The bounded Apparatus core, optional Mesquite attachment and zero-capacity UX
+recorder repairs are implemented. Turnstone's separate redacted observation copy
+and Gloss/Inspector migration are written but unverified pending dependency pins.
+Worker correlation, exact presented-frame correlation and human accessibility
+acceptance remain open. The June design and receipts are historical evidence.
+
+Share bounded observations and causal references across applications, using their
+existing state and event producers. Do not introduce a universal application-event
+enum, replace domain journals, or rewrite the runtime. The first implementation
+priorities are a shared bounded record store and correlated Mesquite receipt
+attachments, qualified by two different consumers.
+
+### Name and ownership
+
+**Ruled by Mark, 2026-09-29: Apparatus is the shared diagnostics library, in the
+existing `mere-apparatus` package (library `apparatus`).** Reuse that home for
+bounded observations and inspection beneath product-owned views. The name and
+crate home are settled; the core and Mesquite attachment are implemented as
+recorded below, with product qualification still outstanding.
+The [September consolidation ruling](2026-09-23_crate_consolidation_plan.md)
+requires components to remain modules and reserved homes to receive their actual
+capabilities; two consumers must still qualify the shared contract and dependencies.
+
+**Gloss takes the operational overview.** Turnstone's configurable sections can
+combine its minimap and recent visits with downloads, background work, sync and
+items needing attention. Trail retains browsing history, recall and recovery;
+Gloss may compose summaries from those sources. Migrate Steward's useful content
+and then retire its separate pane. Operational actions remain product-owned;
+the current section activation vocabulary needs extending for controls such as
+retry/cancel. This is an accepted direction, not a completed UI migration.
+
+This supersedes the operational-status assignment in the July 18 taxonomy
+(`turnstone/design_docs/2026-07-18_meerkat_harvest.md`). At the naming ruling,
+Turnstone's Apparatus pane analyzed selected graph-object facets and handling controls.
+**Mark's follow-up assigns that object analysis to Inspector**, alongside its
+inspection of documents and content within them, metadata and clipping. Inspector
+shows the fields and controls appropriate to the selected subject; graph facets,
+provenance and handling controls retain their product-owned sources and write
+paths. Migrate those capabilities into Inspector before retiring the object-analysis
+Apparatus pane. Application Settings remains separate. Both migrations now have
+source changes, but dependency pins and verification remain pending.
+
+Mere's [Apparatus crate](../../../crates/domain/apparatus/src/lib.rs) now exposes
+a renderer-independent observation store. Its older empty diagnostic groups
+remain behind the default `projection` feature; those placeholders do not
+establish a working inspection interface.
+[Alembic](../../../ports/distillery/alembic/src/lib.rs)
+already owns Distillery recall/workshop scope; Eidetic owns retained artifacts;
+[Armillary](../../../crates/armillary/README.md) owns actor execution and messaging.
+
+Products retain state, permissions, operation completion, persistence, redaction
+and actionable controls. Genet owns computed DOM accessibility semantics; hosts
+own surface mappings and presentation revisions. Taproot selects/drives those
+semantics; Mesquite owns scenario scheduling and aggregate receipts. Registry
+owns channel descriptors, configuration and invariant vocabulary. The proposed
+shared store observes these owners; it neither dispatches actions nor recomputes
+their truth.
+
+### Present supply and consumers
+
+This is a source inventory, not a new test receipt. Cross-repository references
+name explicit repository paths; links stay within Mere.
+
+| Owner and source | Existing evidence surface | Shared opportunity and limit |
+|---|---|---|
+| [UX events](../../../crates/system/ux-events/src/ux_observability.rs), [registry](../../../crates/system/registry/src/diagnostics/emit.rs) | Observers, probes, channel bridge, schemas and trace/message events | Reuse adapters; graph-specific action/node/surface types are not a universal app vocabulary. |
+| [Cambium/Mesquite](../../../crates/cambium/mesquite/src/lib.rs), [receipt](../../../crates/cambium/mesquite/src/lane.rs) | Snapshots, string events, captures, failures, frame costs | Add optional typed attachments; CPU wall-time costs are not GPU timings. |
+| Turnstone (`turnstone/src/observe.rs`), fanout (`turnstone/src/shell/effects.rs`) | Typed snapshot/AppEvent and existing 128-entry automation copy | A separate Apparatus copy records fixed redacted categories at fanout; automation strings and Trail authority remain preserved. Source written, pins/tests pending. Existing automation omission remains unreported. |
+| Knot (`knot-editor/apps/desktop/src/scenario.rs`), snapshot (`knot-editor/apps/desktop/src/workspace.rs`) | Mesquite document/format/dirty/appearance/message snapshot | Document authority and save/site acceptance remain product-owned; the current adapter is a state projection, not a causal outcome stream. |
+| Woodshed (`woodshed/crates/woodshed-genet/src/scenario.rs`) | Stage/gesture snapshots, string events, drag metrics | Preserve arrangement and gesture meaning; capture-pending busy is not an operation model. |
+| Redshank (`woodshed/ports/redshank/desktop/src/scenario.rs`) | Playback/transcript snapshots, seek requests, worker state | Workers report execution outcomes; desktop/session own stale-result acceptance and model application; persistence owns durable acknowledgment. |
+| Cleromancy (`cleromancy/src/ui/native/scenario_driver.rs`) | Consultation/catalog state and durable first/reopen receipts | Preserve consultation authority and acceptance; useful worker-outcome pilot. |
+| Mesocosm (`isometry/mesocosm/crates/mesocosm-genet/src/app/bench/probe.rs`), Eponym (`isometry/eponym/crates/eponym-client/src/bin/session/probe.rs`), Isomere host | Mesquite world snapshots, event cursors and cost observations | Keep world replay journals, rules and accepted-game-event history product-owned. |
+| Hocket (`woodshed/ports/hocket/crates/hocket-genet/src/scenario.rs`) | Older local scenario/capture loop | Future Mesquite adoption; not a prerequisite for this design. |
+| Signalman (`retinue/apps/signalman/src/observation.rs`), retention (`retinue/apps/signalman/src/observation/persistence.rs`) | Admission, source boot/sequence/gaps, bounded disk captures | Reuse limit/loss distinctions; radio schemas, authentication and physical receipts remain local. |
+
+Historical [Graphshell watchdog design](../research/2026-05-17_graphshell_harvest_brief.md)
+and Meerkat's bounded `HostObservability` are donors. Meerkat's cache survives in
+git at `6f8e6903:crates/meerkat/src/observability/mod.rs`; its host was deleted in
+`c5f01064`. Do not describe it as current Turnstone wiring. Current apps inspected
+do not install the shared UX observer/registry sender as a stack-wide pipeline.
+
+### Small contract over product payloads
+
+`Observation<P>` carries schema version, run/source identity, monotonically
+increasing record sequence, receipt time, optional source time, optional operation
+identity and causal record reference, optional subject reference, and optional semantic
+revision/presented-frame reference. `P` remains the producer's versioned, redacted
+payload. References are scoped by run/source; sequence numbers are not globally
+unique. Wall clocks do not establish causality. Keep source time, source boot,
+host receipt time and monotonic elapsed time distinct; unavailable values stay
+unavailable. Object, revision and causal links exist only when the producer supplies
+them; absent correlation is explicit, never inferred from timing or matching text.
+[Armillary correlation](../../../crates/armillary/src/message.rs)
+can map into these references without making actors mandatory.
+
+Redshank illustrates why these boundaries matter: its playback worker replaces
+a latest-value snapshot and throttles position wakeups
+(`woodshed/ports/redshank/playback/src/worker.rs`). `Desktop::poll` accepts or
+rejects replies against current product state, while `Persistence::acknowledge`
+separately advances durable revision (`woodshed/ports/redshank/desktop/src/main.rs`).
+The pilot needs hooks at those actual reply, adjudication and acknowledgment
+boundaries. A snapshot-difference adapter cannot recover every outcome; missing
+pre-instrumentation coverage is not a counted dropped event. Reuse real request,
+load and revision identities; an item ID alone is not an operation ID.
+
+An event records an occurrence. A snapshot describes state at a revision. A
+diagnostic is an observation or validation result, not a second authoritative
+event journal. A state difference may be recorded as an observed change, but must
+not invent a command or cause. Action accepted, operation started, terminal
+outcome, state observed, and frame presented are distinct milestones. `act = true`
+or `busy = false` proves neither success nor presentation. Rejected, failed,
+cancelled and stale-discarded outcomes remain distinguishable. Terminal records
+come from the operation owner; generation checks remain there. Stale targets
+cannot be retargeted merely because a node identifier was reused.
+
+Registry [descriptors](../../../crates/system/registry/src/diagnostics/descriptor/types.rs)
+describe schemas, retention and sampling; they do not enforce buffering or validate
+every payload. Its [current invariant matcher](../../../crates/system/registry/src/diagnostics/descriptor/registry.rs)
+pairs starts and terminals FIFO per channel, so concurrent out-of-order operations
+require correlation-keyed tracking rather than claiming this already exists.
+
+### Bounds, loss and privacy
+
+Configure count, accounted encoded bytes and maximum age at each store/queue
+boundary; expose defaults as product settings/policy. Zero count/bytes or zero
+retention age disables retention. Reject an oversized record before admission;
+evict oldest records until all enabled bounds hold; age uses host monotonic time.
+Bound producer payload construction and ingress too: a bounded ring behind an
+unbounded sender is not bounded end to end. Define and test accounting for envelope
+and payload bytes rather than claiming a precise allocator-memory ceiling.
+
+Expose retained range/bytes plus cumulative rejected, evicted, expired and dropped
+counts. Independent cursors or immutable batches prevent competing destructive
+drains; a slow cursor receives an explicit gap and next available sequence.
+Neither missing records nor an empty disabled store means “nothing happened.”
+The [RecordingObserver](../../../crates/system/ux-events/src/ux_observability.rs)
+and [RecordingChannelSink](../../../crates/system/ux-events/src/ux_diagnostics.rs)
+formerly appended indefinitely at capacity zero. They now return before locking
+or cloning, with disabled-retention and bounded-eviction regression tests.
+The registry emitter still silently drops without a receiver and uses
+an unbounded sender; adapters must report their actual coverage/loss limits.
+
+Products project and redact before buffering. Turnstone's credential-omitting
+authentication observations provide a precedent, not proof that arbitrary URLs, titles or logs
+are safe. Diagnostic collection does not enable screenshots, export or durable
+capture. Each requires existing explicit product/run policy; secret-bearing raw
+inputs must not be captured automatically. Retention, persistence and export are
+separate policies. Export failure is visible and fails a requested receipt;
+absence is never silently reported as success.
+
+### Sequencing and acceptance
+
+1. **Semantic parity first:** automated fixtures prove Taproot role/name matching
+   uses the authoritative Genet computation while explicit text/class selectors
+   retain their meanings. Exercise referenced/native labels, hidden/offscreen
+   controls, disabled actions and disappeared/stale targets. Then native receipts
+   identify the same object/revision across selector, accessibility action and
+   diagnostic projection. A human Narrator/VoiceOver/Orca session is a separate
+   acceptance level; neither unit tests nor native capture establishes it.
+2. **Bounded records:** Turnstone's observation copy and one Mesquite worker app,
+   preferably Redshank or Cleromancy, consume the same storage contract. Tests
+   cover zero, byte/count/age overflow, oversized payload, slow independent readers,
+   reset/new run, sequence gaps and concurrent out-of-order outcomes. Loss must be
+   visible in both product inspection and receipts. Signalman informs the contract
+   without migrating its evidence format.
+3. **Correlated receipts:** attach optional records/loss summary to Mesquite's
+   existing outcome, frame ordinal, capture and paint evidence. In two consumers,
+   follow action dispatch through a real worker request/outcome to observed state
+   and the exact presented frame. Prove rejected, failed, cancelled and stale
+   paths, including capture/export failure. Existing product receipts and apps
+   without diagnostic attachments remain compatible.
+
+Done means owner-specific code and recorded gates satisfy those slices, with
+native and human evidence labeled separately. The first storage and receipt
+slice below does not close the real-worker or exact-frame acceptance gates.
+
+### Bounded diagnostics implementation, 2026-09-29
+
+`ObservationStore<P>` now enforces configured count, accounted encoded bytes and
+monotonic age. Rejected and known dropped records consume scoped sequence
+positions; independent readers receive copied batches, unavailable ranges,
+per-run loss totals and explicit reset boundaries. Any zero limit disables
+retention. Backward time fails before state changes. The storage core uses only
+`std`, with optional serialization; renderer dependencies belong to `projection`.
+Products supply already redacted payloads and truthful encoded payload lengths.
+Deterministic envelope accounting is added by the store; this bounds accounted
+encoding, not allocator memory or JSON export size. Payload mapping preserves
+original admission accounting.
+
+Mesquite adds default optional `Product::diagnostic_attachment`, sampled once
+after `complete`. A supplied bounded `Batch<serde_json::Value>` carries retained
+records, gaps and loss in the JSON receipt or text receipt line; absent hooks
+preserve the existing format. Attachment errors fail the requested receipt.
+`sampled_at_lane_frame` names the receipt observation point. It does not identify
+the captured pixel frame or invent a causal revision: current capture fields are
+sampled when asynchronous readback lands, and exact pixel/state pairing remains
+open. No worker lifecycle is inferred from `act` or quiescence.
+
+The [focused gate receipt](../testing/2026-09-29_apparatus_diagnostics_receipt.md)
+records 74 passing all-feature library tests (17 Apparatus, 19 Mesquite, 38 UX),
+14 passing core tests without default features and with serialization, and 75
+passing host integration tests (16 host library, 24 scenario, 16 mere-view,
+19 Mesquite). These are automated tests; this pass produced no new headed
+diagnostics or human screen-reader receipt.
+
+Turnstone's source adds a separate fixed-category observation store at existing
+app-event fanout. URL, path, title, prompt and error fields never enter that
+copy. Count/byte/age settings are configurable per run; one bounded
+`diagnostics.json` is exported only for an explicit shared scenario receipt,
+and export failure changes `scenario.done` to `RESULT fail`. The existing
+automation event stream and Trail remain separate. This adapter and the
+Gloss/Inspector pane migration await dependency pins and verification.
+
+The actual-worker pilot is deferred until Redshank's active owner finishes its
+podcast/task commit. Its later implementation must observe request, execution,
+product acceptance and durable acknowledgment at their owning boundaries.
+Two consumer qualification, rejected/failed/cancelled/stale worker paths, exact
+frame correlation, custom-leaf semantic parity and human AT remain open.
+
+### Semantic implementation progress, 2026-09-29
+
+**Status: in progress.** Genet published Taproot's projection-aware matcher at
+`19c206873ab08ae227217892d9e74d0df18b349a`; all 25 Taproot library tests passed.
+Mere's integration exposes the existing Genet document projection through
+`AppCtx`, uses it in Mesquite's role/name selectors, and revalidates a retained
+node after scrolling before dispatching its held click. Explicit class/text
+matching retains its existing behavior. The shared host fixture compares
+selection and accessibility activation of the same referenced-name button and
+rejects targets hidden or renamed while a click waits.
+
+Mere's isolated integration passed the standalone Graphshell Wasm check,
+60 focused tests and the native smoke
+(32 frames, three distinct nonblank captures, AccessKit installed with 15 nodes).
+A raw-DOM negative control failed the referenced-name test, then all 21 scenario
+tests passed with the exact source restored. Publication and integration with
+concurrent Mere work remain pending; a human screen-reader follow-up is still
+required. The current projection covers DOM semantics: Sprigging custom-leaf
+contributions are subsequently merged by the native accessibility host. Its
+revision is currently zero, and current DOM plus retained layout is not an
+immutable presented-frame snapshot. Neither full semantic parity nor the later
+correlated diagnostics acceptance is established by this slice.
+
+The isolated integration subsequently merged the sealed Rootstock repair
+`8eca3e4c` as `ced161f1`. Independent review confirmed both sides' source was
+preserved. The combined Rootstock, winit host and Mesquite gate passed 199 tests
+with no failures or skips; the native smoke repeated the same three capture
+digests. The standalone Wasm check passed against the primary owner's accepted
+web-lock baseline, with every package/version retained and only Taproot's new
+document-session-api dependency added after mapping the Genet revision. Final
+publication still waits for the concurrent main integration, including the
+incoming Insigne migration; its broader acceptance is a separate owner's gate.
+
+**Final integration:** the published primary baseline `32edc2ad` was subsequently
+merged, preserving the Insigne migration and Knot `855cb75d` adoption. All 199
+Rootstock/winit-host/Mesquite tests and the standalone Wasm check passed again.
+Both locks retain every incoming package/version after the Genet substitution;
+the only added dependency edge is Taproot to document-session-api. This closes
+the earlier pending source-integration and machine-verification gates. The
+human AT check and custom-leaf parity remain open; the first diagnostics
+implementation and remaining qualification gates are recorded above.
+The Apparatus name/crate home and Gloss operational overview are now ruled above;
+the Gloss and Inspector pane migrations remain outstanding.
+
+---
+
+## Historical June design and implementation record
+
+The following text records the retired Meerkat host and its June priorities.
+Its status, ownership labels, future work and test claims are historical, not the
+current plan. Preserve it as evidence; use the September design above for new work.
+
 **Date**: 2026-06-08
 **Status**: Planning. Follow-on to the apparatus pane/theme switcher pass.
 **Related**: [apparatus pane + runtime theme switcher](2026-06-08_apparatus_pane_and_theme_switcher_plan.md), [frame tree in meerkat](../../archive_docs/2026-06-09_completed_plans/2026-06-08_frame_tree_in_meerkat_plan.md), [peripheral panes architecture](../technical_architecture/2026-06-06_peripheral_panes_architecture.md), [Graphshell harvest brief](../research/2026-05-17_graphshell_harvest_brief.md), [Graphshell docs full harvest](../research/2026-05-27_graphshell_docs_full_harvest.md), [spatial chrome IR brief](../../archive_docs/2026-06-09_pivot_superseded/2026-05-15_spatial_chrome_ir_brief.md), [spatial chrome modular adoption plan](../../archive_docs/2026-06-09_pivot_superseded/2026-05-15_spatial_chrome_modular_adoption_plan.md).

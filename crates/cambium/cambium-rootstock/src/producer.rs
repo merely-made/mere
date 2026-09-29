@@ -69,6 +69,11 @@ pub struct ProducerContext<'a> {
     pub device: &'a wgpu::Device,
     pub queue: &'a wgpu::Queue,
     pub frame: &'a ProducerFrameInfo,
+    /// The host's render core, on the same device. A producer whose content
+    /// is a netrender scene rasterizes it here under a key of its own
+    /// (`RenderCore::rasterize_scaled_for`), sharing the host's renderer and
+    /// glyph cache instead of booting another.
+    pub core: &'a genet_render_host::RenderCore,
 }
 
 /// A full-size, single-layer, non-multisampled base-mip view. Its texture must

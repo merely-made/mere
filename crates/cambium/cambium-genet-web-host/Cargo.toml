@@ -29,6 +29,7 @@ layout_dom_api = { workspace = true }
 # The browser itself. Declared for wasm32 only, so a native build of the
 # workspace resolves none of it.
 [target.'cfg(target_arch = "wasm32")'.dependencies]
+mesquite = { path = "../mesquite" }
 js-sys = "0.3"
 wasm-bindgen = "=0.2.127"
 # Reading a chosen file's bytes, which the browser hands over asynchronously.

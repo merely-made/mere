@@ -6,7 +6,7 @@
 //! basic (non-line-aware) caret motion. [`super::multiline`] and
 //! [`super::word_motion`] add more `impl TextInput` blocks over this same type.
 
-use unicode_segmentation::UnicodeSegmentation;
+use genet_text::{BoundaryKind, segments};
 
 use crate::editor::EditHistory;
 
@@ -64,7 +64,7 @@ pub(crate) struct TextSnapshot {
 /// insertion point.
 ///
 /// `caret` is an **extended grapheme-cluster** index in
-/// `0..=text.graphemes(true).count()` — it can sit before the first grapheme
+/// `0..=grapheme_count()` — it can sit before the first grapheme
 /// (`0`) or after the last. Combining sequences and emoji ZWJ families are
 /// therefore indivisible under arrows, Backspace, and Delete. Layout-aware
 /// hosts cross the boundary through [`caret_position`](Self::caret_position)
@@ -115,7 +115,7 @@ impl TextInput {
     /// A field holding `text`, with the caret collapsed at the end.
     pub fn new(text: impl Into<String>) -> Self {
         let text = text.into();
-        let caret = text.graphemes(true).count();
+        let caret = segments(&text, BoundaryKind::ExtendedGrapheme).count();
         Self {
             text,
             caret,
@@ -338,16 +338,15 @@ impl TextInput {
 
     /// The number of grapheme clusters in the buffer (the caret's upper bound).
     pub(super) fn grapheme_count(&self) -> usize {
-        self.text.graphemes(true).count()
+        segments(&self.text, BoundaryKind::ExtendedGrapheme).count()
     }
 
     /// Byte offset of the `i`-th grapheme boundary, or the buffer end when
     /// `i == grapheme_count` (the past-the-last-grapheme insertion point).
     pub(super) fn byte_of(&self, i: usize) -> usize {
-        self.text
-            .grapheme_indices(true)
+        segments(&self.text, BoundaryKind::ExtendedGrapheme)
             .nth(i)
-            .map(|(byte, _)| byte)
+            .map(|segment| segment.start.utf8_bytes)
             .unwrap_or(self.text.len())
     }
 
@@ -355,7 +354,9 @@ impl TextInput {
     /// boundary. This is the inverse of [`byte_of`](Self::byte_of).
     pub(super) fn grapheme_of_byte(&self, byte: usize) -> usize {
         let byte = byte.min(self.text.len());
-        self.text[..byte].graphemes(true).count()
+        segments(&self.text, BoundaryKind::ExtendedGrapheme)
+            .take_while(|segment| segment.end.utf8_bytes <= byte)
+            .count()
     }
 
     /// Delete the selected range and collapse the caret to its start. No-op when
@@ -381,7 +382,7 @@ impl TextInput {
         self.delete_selection();
         let at = self.byte_of(self.caret);
         self.text.insert_str(at, s);
-        self.caret += s.graphemes(true).count();
+        self.caret += segments(s, BoundaryKind::ExtendedGrapheme).count();
         self.caret_affinity = CaretAffinity::Downstream;
         self.anchor = self.caret;
         self.anchor_affinity = self.caret_affinity;
@@ -507,9 +508,8 @@ impl TextInput {
         let byte = if byte == self.text.len() {
             byte
         } else {
-            self.text
-                .grapheme_indices(true)
-                .map(|(candidate, _)| candidate)
+            segments(&self.text, BoundaryKind::ExtendedGrapheme)
+                .map(|segment| segment.start.utf8_bytes)
                 .take_while(|candidate| *candidate <= byte)
                 .last()
                 .unwrap_or(0)
@@ -567,5 +567,34 @@ impl TextInput {
         let mut shown = self.text.clone();
         shown.insert(at, CARET_MARKER);
         shown
+    }
+}
+
+#[cfg(test)]
+mod boundary_tests {
+    use super::TextInput;
+
+    #[test]
+    fn byte_positions_snap_to_complete_graphemes() {
+        let mut input = TextInput::new("🇺🇸e\u{301}👩‍🚀");
+        assert_eq!(input.caret(), 3);
+        for byte in 0..8 {
+            assert_eq!(input.grapheme_of_byte(byte), 0);
+            input.set_caret_byte(byte, false);
+            assert_eq!(input.caret(), 0, "byte {byte} is within the flag");
+        }
+        for byte in 8..11 {
+            assert_eq!(input.grapheme_of_byte(byte), 1);
+            input.set_caret_byte(byte, false);
+            assert_eq!(
+                input.caret(),
+                1,
+                "byte {byte} is within the combining cluster"
+            );
+        }
+        input.set_caret_byte(11, false);
+        assert_eq!(input.caret(), 2);
+        input.set_caret_byte(usize::MAX, false);
+        assert_eq!(input.caret(), 3);
     }
 }
