@@ -22,7 +22,7 @@ struct SealedIdentityRecord {
     master_seed: [u8; 32],
 }
 
-pub use insigne::attestation::DerivedKeyAttestation;
+use insigne::DerivedKeyAttestation;
 
 /// Read an attestation's keys as personae's key type.
 ///

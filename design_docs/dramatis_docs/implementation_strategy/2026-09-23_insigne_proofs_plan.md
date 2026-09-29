@@ -1,8 +1,8 @@
 # Insigne Proofs Plan
 
 **Date**: 2026-09-23
-**Status**: phase A landed 2026-09-24 and phase B on 2026-09-26 (§3); C and
-D open. Mark agreed the split
+**Status (2026-09-29)**: phase A landed 2026-09-24 and phase B on 2026-09-26
+(§3); C in progress, D open. Mark agreed the split
 and ruled how issuing is expressed (§2, option (a)) on 2026-09-23. The Mere
 0.4 release baseline waits for phase B (Mark, 2026-09-26).
 **Scope**: move personae's delegation and attestation data types into insigne's
@@ -211,6 +211,21 @@ Done when (landed 2026-09-26):
 
 ## 4. Findings
 
+**2026-09-29: phase C starts from current consumers.** Knot now pins Mere
+`8fce5365` and has adopted phase B. Insigne already exposes the replacement
+imports at that pin, so Knot can move its imports before Mere removes the
+re-exports without deliberately breaking its standalone build. Mere must
+also patch Knot's new `insigne` dependency to the local workspace package,
+as it does for the other shared contracts. The primary Mere checkout has an
+active Genet repin in its manifest and lock, so this phase uses the isolated
+`mere-insigne-phase-c` worktree; that repin remains outside this change.
+
+The tracked `crates/probes/murm-direct-phy` probe still names obsolete
+Personae and sibling Retinue paths. Updating its proof import does not make
+its existing standalone build reproducible. Native `--all-features` also
+does not reach Graphshell's `cfg(wasm32)` imports; the browser check is a
+separate gate.
+
 **2026-09-23: the blast radius, counted.** Searched with ripgrep over
 `Code/repos`, build output excluded. 787 references in 97 files name the moved
 types; 120 call sites in 60 files call `issue` or read an attestation's keys; 11
@@ -344,3 +359,47 @@ mere's djinn moved its knot pin from `c6d5b9e` to knot's main (`5ad3f67`).
 That drops the git-sourced `graphshell-stdio` and a second genet
 (`532f1fad`'s `fleece` and `layout-dom-api`) that the old pin kept in the
 graph.
+
+
+**2026-09-29.** Phase C implementation: native compiler census used temporary
+warnings on all ten proof types/helpers and
+`cargo check --workspace --all-targets --all-features --keep-going`. It reported
+2,440 diagnostics in 90 files across 16 packages, including uses through
+local aliases and inferred values. The temporary warnings were removed;
+Insigne's implementation and serialized formats are unchanged. The source
+rewrite also covers wasm-only imports, Signalman, and the force-tracked probe.
+
+Knot's six affected files now import Insigne directly. `855cb75` is pushed to
+Knot's main; `cargo check -p knot-editor --all-targets --all-features` passed
+at its existing Mere `8fce5365` and Genet `34626a6c` pins. No red standalone
+interval was necessary. Mere consumes that Knot revision and supplies the
+new local Insigne patch.
+
+Remaining sibling repin handoff (source census, not compiler receipts):
+
+- Turnstone: `src/denizen.rs`, `src/identity.rs`, `src/place/lanes.rs`,
+  `src/place/projection_host.rs`, `src/place/worker.rs`, and
+  `src/remote_projection.rs`.
+- Hocket: `crates/hocket-engine/src/handoff.rs` and
+  `crates/hocket-genet/src/identity.rs`. Woodshed carries the same two paths
+  under `ports/hocket/`.
+- mer3ly: `crates/repo-graph/src/lib.rs` (test dependency).
+- Cleromancy has no proof-type import to migrate in the tracked Rust source.
+
+At each repin, add Insigne from the exact same Mere revision as Personae.
+Import `DerivedKeyAttestation` from `insigne` and the delegation data/helpers
+from `insigne::delegation`; retain `Issue`, `DelegationError`,
+`AttestationKeys`, and providers in Personae (under `identity` where aliased).
+Enable `verify` where checks are called, and `digest` where only certificate
+ids or attenuation are needed. Keep Turnstone's Knot/Mere source identities
+aligned. These pinned consumers remain adoption gates; they have not been
+repinned by this phase.
+
+Validation boundary: the clean `4fbcb727` baseline already fails its native
+all-features check on missing `DocumentA11yNode::description` fields in
+Reader and the web-host test fixture, and four linked-data test accesses to
+removed `Node.properties`. The compiler census borrowed only the two Reader
+field initializers already present in the concurrent primary WIP so it could
+reach downstream consumers. That prerequisite is outside the phase C patch.
+Mere's post-migration compiler, proof-test, nested-workspace, and browser
+receipts are pending below; phase C is not yet marked complete.

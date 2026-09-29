@@ -17,13 +17,13 @@
 use personae::delegation::Issue;
 use std::collections::BTreeMap;
 
+use insigne::delegation::{
+    CapabilityScope, DelegationCertificate, DelegationParent, SignedDelegationCertificate,
+};
 use notochord::{
     CarrierKind, DenyReason, LocalNetworkPolicy, NetworkId, ProfileRef, ProofBinding,
     RequestedAction, RevocationLedger, ServiceAccess, ServiceRule, SessionDecision, SessionFacts,
     SessionHello, TrafficClass, TrustedRoot, accept_session, initiate_session,
-};
-use personae::delegation::{
-    CapabilityScope, DelegationCertificate, DelegationParent, SignedDelegationCertificate,
 };
 use personae::{IdentityProvider, InMemoryProvider};
 use tokio::io::{AsyncReadExt, AsyncWriteExt};

@@ -4270,6 +4270,7 @@ dependencies = [
  "genet-scripted-dom",
  "graphshell-endpoint",
  "incipit",
+ "insigne",
  "iroh",
  "layout-dom-api 0.1.1 (git+https://github.com/merely-made/genet.git?rev=7b48f94d7a742840b527205d82a37da958240d73)",
  "mere-mesh",
@@ -4308,6 +4309,7 @@ dependencies = [
  "graphshell",
  "graphshell-endpoint",
  "incipit",
+ "insigne",
  "knot-editor",
  "knot-site",
  "libc",
@@ -7970,7 +7972,7 @@ checksum = "e2db585e1d738fc771bf08a151420d3ed193d9d895a36df7f6f8a9456b911ddc"
 [[package]]
 name = "knot-capture"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?rev=f14f9ef324817f455a2ef57992d2f66c4dd813f0#f14f9ef324817f455a2ef57992d2f66c4dd813f0"
+source = "git+https://github.com/merely-made/knot-editor.git?rev=855cb75d939fbfbb2af847bda8f5e6a5d3b8b764#855cb75d939fbfbb2af847bda8f5e6a5d3b8b764"
 dependencies = [
  "knot-file-catalog",
 ]
@@ -7978,7 +7980,7 @@ dependencies = [
 [[package]]
 name = "knot-document"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?rev=f14f9ef324817f455a2ef57992d2f66c4dd813f0#f14f9ef324817f455a2ef57992d2f66c4dd813f0"
+source = "git+https://github.com/merely-made/knot-editor.git?rev=855cb75d939fbfbb2af847bda8f5e6a5d3b8b764#855cb75d939fbfbb2af847bda8f5e6a5d3b8b764"
 dependencies = [
  "cambium",
  "illume",
@@ -7994,7 +7996,7 @@ dependencies = [
 [[package]]
 name = "knot-editor"
 version = "0.0.3"
-source = "git+https://github.com/merely-made/knot-editor.git?rev=f14f9ef324817f455a2ef57992d2f66c4dd813f0#f14f9ef324817f455a2ef57992d2f66c4dd813f0"
+source = "git+https://github.com/merely-made/knot-editor.git?rev=855cb75d939fbfbb2af847bda8f5e6a5d3b8b764#855cb75d939fbfbb2af847bda8f5e6a5d3b8b764"
 dependencies = [
  "base64 0.22.1",
  "blake3",
@@ -8005,6 +8007,7 @@ dependencies = [
  "fleece 0.5.0 (git+https://github.com/merely-made/genet.git?rev=34626a6c82ee19f78609b8ebad8d513d3cc9c4cd)",
  "graphshell-endpoint",
  "inker",
+ "insigne",
  "jotdown",
  "knot-capture",
  "knot-document",
@@ -8060,7 +8063,7 @@ dependencies = [
 [[package]]
 name = "knot-file-catalog"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?rev=f14f9ef324817f455a2ef57992d2f66c4dd813f0#f14f9ef324817f455a2ef57992d2f66c4dd813f0"
+source = "git+https://github.com/merely-made/knot-editor.git?rev=855cb75d939fbfbb2af847bda8f5e6a5d3b8b764#855cb75d939fbfbb2af847bda8f5e6a5d3b8b764"
 dependencies = [
  "muniment",
  "pollster",
@@ -8975,6 +8978,7 @@ version = "0.0.1"
 dependencies = [
  "blake3",
  "esp",
+ "insigne",
  "mere-p2panda-net",
  "mere-proofs",
  "mere-transport",
@@ -9084,6 +9088,7 @@ version = "0.0.2"
 dependencies = [
  "bytes",
  "hkdf 0.13.0",
+ "insigne",
  "iroh",
  "iroh-blobs",
  "iroh-tickets",
@@ -9166,6 +9171,7 @@ dependencies = [
 name = "mien"
 version = "0.0.1"
 dependencies = [
+ "insigne",
  "mere-p2panda-net",
  "mere-transport",
  "muniment",
@@ -9480,6 +9486,7 @@ dependencies = [
  "async-trait",
  "blake3",
  "hex",
+ "insigne",
  "mere-transport",
  "muniment",
  "notochord",
@@ -11697,6 +11704,7 @@ dependencies = [
  "getrandom 0.3.4",
  "hex",
  "incipit",
+ "insigne",
  "mere-alembic",
  "mere-forme",
  "mere-kernel",
