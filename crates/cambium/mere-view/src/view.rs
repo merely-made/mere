@@ -110,7 +110,7 @@ impl MereViewState {
     /// nodes, its relations, the layout and the size are the ones last laid
     /// out. Call it before rendering whenever any of them may have changed.
     pub fn lay_out(&mut self, model: &MereViewModel, width: u32, height: u32) {
-        let size = graph_size(width, height);
+        let size = graph_size(width, height, has_session_content(model));
         let nodes: Vec<String> = model.graph.nodes.iter().map(|n| n.key.clone()).collect();
         let relations: Vec<(String, String)> = model
             .graph
@@ -156,15 +156,30 @@ fn body_height(width: u32, height: u32) -> u32 {
     height.saturating_sub(bar).max(1)
 }
 
+fn has_session_content(model: &MereViewModel) -> bool {
+    model.can_mint || !model.sessions.is_empty()
+}
+
 /// The graph's area, in pixels, inside a tile of `width` by `height`.
-fn graph_size(width: u32, height: u32) -> (u32, u32) {
+fn graph_size(width: u32, height: u32, has_sessions: bool) -> (u32, u32) {
     let body = body_height(width, height);
     if wide(width) {
-        (width.saturating_sub(SESSIONS_WIDTH).max(1), body)
+        (
+            if has_sessions {
+                width.saturating_sub(SESSIONS_WIDTH).max(1)
+            } else {
+                width.max(1)
+            },
+            body,
+        )
     } else {
         (
             width.max(1),
-            ((body as f32 * NARROW_GRAPH_SHARE) as u32).max(1),
+            if has_sessions {
+                ((body as f32 * NARROW_GRAPH_SHARE) as u32).max(1)
+            } else {
+                body
+            },
         )
     }
 }
@@ -183,7 +198,11 @@ pub struct MereView<'a> {
 impl MereView<'_> {
     /// The graph's area, in pixels.
     pub fn graph_size(&self) -> (u32, u32) {
-        graph_size(self.width, self.height)
+        graph_size(
+            self.width,
+            self.height,
+            has_session_content(self.model),
+        )
     }
 
     /// The layout in force: the host's, or the default when it names none.
@@ -428,11 +447,13 @@ where
                 .map(|session| session_item(session, on_request.clone())),
         )
         .collect();
-    let size = if wide(view.width) {
+    let size = if !has_session_content(view.model) {
+        "display:none".to_string()
+    } else if wide(view.width) {
         format!("width:{SESSIONS_WIDTH}px")
     } else {
         let body = body_height(view.width, view.height);
-        let graph = graph_size(view.width, view.height).1;
+        let graph = graph_size(view.width, view.height, true).1;
         format!("max-height:{}px", body.saturating_sub(graph))
     };
     Box::new(
