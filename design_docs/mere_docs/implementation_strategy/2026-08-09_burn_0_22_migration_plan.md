@@ -2719,3 +2719,44 @@ guard. Only two already-selected direct dev-dependency edges were added to the
 fixture lock. These controls are prepared, not yet accepted at this checkpoint.
 All four selectors remain patched. Remaining S13, S15 and main promotion stay
 gated; the old sealed release baseline is preserved unchanged.
+
+### 13.28 Burn-CubeCL selector retirement under ruling 410 (2026-09-29)
+
+The nine native public-API controls from §13.27 passed on both the patched and
+pristine upstream pre.4 rows: 9 passed, 0 failed, 0 ignored each. All printed
+numeric outputs are identical across rows. They cover subtraction, atan2 and
+XOR for broadcast aliases, same-shape aliases and separate allocations, while
+checking real-handle construction, fresh output and retained-input preservation.
+Each receipt audit independently recomputes the outputs and rejects empty,
+zero-test, wrong-name and corrupted-number controls. Source/config/mtime maps
+remain stable during both commands; distinct test executables are recorded.
+All 122 registry source files match the checksum-verified archive before and
+after execution. Independent review accepts the results and exact restoration.
+
+Ruling 410's conditional retirement now removes four selectors: root, browser
+probe, remote fixture and embedding fixture. Four offline `--locked` metadata
+gates select the exact upstream `burn-cubecl 0.22.0-pre.4` registry crate.
+Each lock changes only that package's source/checksum; every existing version
+and dependency edge remains. Root has 1,660 full package identities, including
+four legitimate same-name/version pairs from distinct sources. They are kept.
+Probe, remote and embedding locks retain 585, 982 and 552 entries respectively.
+
+An earlier automatic-resolution attempt tried to deduplicate `spin 0.10.1`
+into 0.12.3 through Pliron's broad requirement. It was rejected and restored.
+The accepted change edits only the exact source/checksum and validates the
+unchanged graph with `--locked`; no such unrelated dependency update was taken.
+
+The vendored burn-cubecl source, standalone lock, licenses and historical tests
+remain as provenance. Its former six-predicate guard is no longer selected by
+these consumers. Ruling 377's service-identity rejection receipt remains valid
+for that archived implementation; it is not claimed as upstream behavior.
+The new test predicate only verifies fixture construction. Runtime persistence,
+reduction and remote lifecycle patches retain their independent selectors.
+
+Portable raw native results and the comparison manifest are in the embedding
+fixture's `receipts/2026-09-29_launcher_*` files. External gates, source maps and
+reviews remain in `Code/testing/mere/receipts/2026-09-29/pre4-s13` under
+`launcher-retirement` and `selector-retirement`. This is a migration-branch
+retirement, not main promotion. Affected-consumer runtime/build checks must now
+use the upstream source. Remaining S13 extrema and plain two-peer lifecycle
+receipts, S15 final documentation and S16 integration remain open.

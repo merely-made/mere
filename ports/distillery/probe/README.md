@@ -149,3 +149,14 @@ This completes D2c's configured embedding phase and establishes one decoder
 ceiling. Physical GPU-memory release remains unobservable because the browser
 exposes no allocation telemetry; host-controlled device teardown is proven. A
 product default remains open. Trainers remain outside this ceiling probe.
+
+## 2026-09-29 migration annotation: upstream Burn-CubeCL
+
+Ruling 410 retires the burn-cubecl selector on the pre.4 migration branch after
+the reconstructed pre.2 browser failure and upstream pre.4 success in the same
+browser, plus nine matching native unfused launcher controls. Root, this probe,
+the remote fixture and embedding fixture now select pristine registry pre.4.
+Other patch policies remain independently selected. The migration plan §13.28
+and embedding reproducer receipts preserve the evidence and qualifications.
+The remaining model, extrema, two-peer lifecycle and integration gates remain
+open at this annotation; this does not turn historical receipts into new ones.

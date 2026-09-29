@@ -64,3 +64,13 @@ with the workspace-approved target environment. The tests preserve real-handle,
 fresh-output and unchanged-input checks. They are prepared but not yet executed
 at this documentation checkpoint; the burn-cubecl selector still uses Mere's
 patch. The earlier pending-choice paragraph is superseded by ruling 410.
+
+## 2026-09-29: selector retired after both comparisons
+
+The nine native controls passed against patched and upstream pre.4, with all
+printed numbers identical and retained inputs unchanged. The four owning
+workspaces now select the registry burn-cubecl crate on the migration branch.
+See [the native comparison](receipts/2026-09-29_launcher_retirement.json).
+The historical same-view guard remains in vendored source for provenance;
+the test's six-field predicate checks fixture construction only. Remaining
+migration gates and main promotion are separate from this bounded acceptance.
