@@ -31,6 +31,8 @@ struct App {
     opened: String,
     target_calls: Cell<usize>,
     target_point: Cell<Option<(f32, f32)>>,
+    semantic_hidden: bool,
+    semantic_name: Option<&'static str>,
 }
 
 type Child = Box<dyn AnyView<App, (), GenetCtx, GenetElement>>;
@@ -66,6 +68,16 @@ fn root(state: &App) -> Child {
                 (
                     el("div", ()).attr("class", "spacer"),
                     button("Far", |s: &mut App, _| s.count += 1),
+                    el("span", text(state.semantic_name.unwrap_or("Shared action")))
+                        .attr("id", "semantic-name"),
+                    focusable(clickable(
+                        el("button", text("Visual label"))
+                            .attr("class", "semantic-control")
+                            .attr("aria-hidden", state.semantic_hidden.to_string())
+                            .attr("aria-label", "Superseded label")
+                            .attr("aria-labelledby", "semantic-name"),
+                        |s: &mut App, _| s.count += 1,
+                    )),
                 ),
             )
             .attr("class", "scroller"),
@@ -275,6 +287,132 @@ fn product_click_verbs_share_the_lanes_scroll_and_dispatch_wait() {
     let (receipt, h) = run("product-far", "select-far\nassert snap count == 1\n");
     assert!(receipt.starts_with("RESULT ok"), "{receipt}");
     assert_eq!(h.state().count, 1);
+}
+
+#[test]
+fn semantic_click_and_accessibility_action_reach_the_same_named_control() {
+    for json_receipt in [false, true] {
+        let (receipt, mut h) = run_lane(
+            &scratch(&format!("semantic-name-{json_receipt}")),
+            "click role:button Shared action\nassert snap count == 1\n",
+            SHEET,
+            json_receipt,
+        );
+        assert!(
+            receipt.starts_with("RESULT ok") || receipt.contains("\"ok\": true"),
+            "{receipt}",
+        );
+        let (tree, map) = h.a11y_tree();
+        let (id, node) = tree
+            .nodes
+            .iter()
+            .find(|(_, node)| {
+                node.role() == accesskit::Role::Button && node.label() == Some("Shared action")
+            })
+            .expect("the accessible name selected by automation is published to AccessKit");
+        assert!(node.bounds().is_some(), "the control has real host bounds");
+        let target = map[id];
+        h.a11y_request(cambium_winit_a11y::A11yAction::Focus, target);
+        assert_eq!(h.state().count, 1, "reader focus must not activate");
+        assert_eq!(h.focus(), Some(target));
+        h.a11y_request(cambium_winit_a11y::A11yAction::Click, target);
+        assert_eq!(
+            h.state().count,
+            2,
+            "the accessibility action reaches the same handler"
+        );
+    }
+}
+
+#[test]
+fn semantic_name_precedence_does_not_change_explicit_class_text_selectors() {
+    let (receipt, h) = run(
+        "semantic-class",
+        "click .semantic-control Visual label\nassert snap count == 1\n",
+    );
+    assert!(receipt.starts_with("RESULT ok"), "{receipt}");
+    assert_eq!(h.state().count, 1);
+    for label in ["Visual label", "Superseded label"] {
+        let (receipt, h) = run(
+            "semantic-no-fallback",
+            &format!("click role:button {label}\n"),
+        );
+        assert!(receipt.starts_with("RESULT fail"), "{receipt}");
+        assert_eq!(
+            h.state().count,
+            0,
+            "semantic names do not fall back to stale DOM labels"
+        );
+    }
+}
+
+#[test]
+fn a_held_semantic_click_rejects_a_hidden_or_renamed_target_without_retargeting() {
+    for hide in [false, true] {
+        let result = Rc::new(std::cell::RefCell::new(None));
+        let observed = result.clone();
+        let mut clicks = mesquite::Clicks::default();
+        let mut requested = false;
+        let hooks = HostHooks {
+            after_frame: Box::new(move |ctx: &mut AppCtx<'_, App, Logic, Child>| {
+                let center = |_: &AppCtx<'_, App, Logic, Child>, _, r: [f32; 4]| {
+                    (r[0] + r[2] * 0.5, r[1] + r[3] * 0.5)
+                };
+                if !requested {
+                    assert!(clicks.click(
+                        ctx,
+                        &taproot::Selector::role("button").containing("Shared action"),
+                        center
+                    ));
+                    requested = true;
+                } else {
+                    *observed.borrow_mut() = Some(clicks.after_frame(ctx, center));
+                }
+            }),
+            ..inert_hooks()
+        };
+        let mut h = Harness::with_hooks(
+            Init {
+                state: App::default(),
+                logic: root as Logic,
+                sheet: SHEET.into(),
+                fonts: Vec::new(),
+                images: Vec::new(),
+            },
+            hooks,
+        );
+        h.layout_at(300.0, 200.0);
+        h.after_frame();
+        h.drain_pointer();
+        assert_eq!(
+            h.state().count,
+            0,
+            "the clipped control must wait for scrolling"
+        );
+        h.update(|state| {
+            state.semantic_hidden = hide;
+            if !hide {
+                state.semantic_name = Some("Changed action");
+            }
+        });
+        h.layout_at(300.0, 200.0);
+        h.after_frame();
+        h.drain_pointer();
+        assert_eq!(
+            h.state().count,
+            0,
+            "stale semantic targets must not activate"
+        );
+        assert!(
+            result
+                .borrow()
+                .as_ref()
+                .unwrap()
+                .as_ref()
+                .unwrap_err()
+                .contains("no longer matches")
+        );
+    }
 }
 
 #[test]
