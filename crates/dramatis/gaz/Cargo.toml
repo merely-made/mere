@@ -11,7 +11,7 @@ categories = ["data-structures"]
 exclude = ["design_docs/"]
 
 [dependencies]
-# The typed public key is insigne's bare-key grade; its core is plain data,
+# Typed public keys and retained proof artifacts are plain data in insigne,
 # so gaz takes on no cryptography by depending on it.
 insigne.workspace = true
 serde.workspace = true
@@ -20,6 +20,10 @@ serde.workspace = true
 uuid = { version = "1", default-features = false }
 
 [dev-dependencies]
+# Real issuers and signature checks exercise retained proofs after reload;
+# neither is part of gaz's production dependency graph.
+personae.workspace = true
+insigne = { workspace = true, features = ["verify"] }
 # The binary codec muniment stores with, so the binary serde path is tested
 # against the format M1 persists in.
 postcard = { version = "1", features = ["alloc"] }

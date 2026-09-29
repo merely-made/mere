@@ -9,7 +9,9 @@ attested keys held concurrently, a whole-identity Reticulum key (verified
 against Reticulum's reference implementation), and `Anchor::Local` for keyless
 contacts. JSContact is ruled *an* exchange format (M1). M0.5 landed the same
 day, and `TypedKey` then moved to insigne, as Mark ruled. M1 (at-rest sealing
-ruled: gaz stays crypto-free) and M2 are drafted with done-conditions.
+ruled: gaz stays crypto-free) and M2 are drafted with done-conditions. The
+retained-proof slice of M2 landed on 2026-09-29 under Insigne phase D;
+backend persistence and resolver intake remain open.
 **Scope**: the contact layer, standalone. The record model, the persona-scoped
 book, then storage over muniment, then the adapters that turn resolver output
 into records, then mere reconciliation.
@@ -295,7 +297,7 @@ is monotonic, so a replayed or late event cannot rewind a record.
         `DidAuth` (a valid PLC operation). A key change the caller reports
         without a proof is stored and marks the contact `Mismatched`, so it
         surfaces in `alarms()`.
-  - [ ] **Ruled 2026-09-23 — gaz keeps the proofs themselves**, not only the
+  - [x] **Ruled 2026-09-23 — gaz keeps the proofs themselves**, not only the
         `ProofMethod` that names them. A key recorded with a proof also keeps
         the artifact that proved it (a `DerivedKeyAttestation`, a
         `SignedDelegationCertificate`, a PLC operation) as plain data from
@@ -303,7 +305,13 @@ is monotonic, so a replayed or late event cannot rewind a record.
         a newer revocation list, which is why notochord retains its session
         claims. The data types moved into insigne in the
         [insigne proofs plan](2026-09-23_insigne_proofs_plan.md)'s phase A
-        (`5364dfa0`, 2026-09-24); gaz keeping them is that plan's phase D.
+        (`5364dfa0`, 2026-09-24); gaz keeping them is that plan's phase D,
+        landed 2026-09-29. `KeyProof` retains attestations with their salt,
+        signed certificates, or opaque protocol evidence with its format and
+        method. Typed key relationships are checked on insertion and load;
+        cryptographic checks and current authority remain the caller's.
+        JSON/postcard reload and recheck are proven. PLC decoding/checking,
+        backend persistence, and the other intake rules below remain open.
   - [ ] Intake adds endpoints as `TrustState::Unverified` and never downgrades
         or duplicates an endpoint already held at a stronger state; replaying
         the same intake is a no-op.
