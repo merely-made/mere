@@ -187,10 +187,53 @@ Seiche also gains the additive, caller-timed `Physics::advance_elapsed` API.
 Configurable elapsed and step caps discard excess whole-step debt and retain
 only a substep fraction. Seed, halt and suspension reset that fraction;
 actors retain their own pacing. Twelve focused runtime tests pass with
-default features, eight without default features. Canvas/browser callers
-still use deterministic `advance_frame`, so these browser results do not
-claim elapsed-time physics adoption. The migration inventory records the
-remaining host timestamp, visibility and scenario work.
+default features, eight without default features. Those browser measurements
+used deterministic `advance_frame`; elapsed-time adoption is recorded below.
+
+## Elapsed-time host adoption (2026-09-29)
+
+Graphshell's tree producer now uses the host's monotonic timestamp through
+Pictograph `frame_at` / `frame_profiled_at`. The web host supplies animation
+timestamps and uses the same performance clock for immediate input draws.
+Document hiding suspends producers immediately; resuming starts a fresh
+Canvas baseline. Hidden mounts still publish their accessibility mirror.
+Pause, resume, reseed, restore and idle-to-active transitions cannot accumulate
+catch-up debt. Backward timestamps retain the previous high-water mark.
+
+The tree page accepts `physics_max_steps` and `physics_max_elapsed_ms`, with
+defaults of three steps and 50 ms. Excess debt is discarded and reported;
+one bounded physics advance is followed by one composition. The old presenter
+and deterministic Canvas methods keep their existing behavior. Camera and
+ambient animation pacing are outside this physics change.
+
+The locked wasm build passes. Headed Chrome scenarios `p4_tree_controls` and
+`p4_tree_elapsed?nodes=128&seed=7&physics_max_steps=1` both pass, without page
+errors. Captures were inspected for graph content. The elapsed scenario
+checks live motion, the selected step cap, frozen Pause and exact Restore.
+Its 14-frame window reports exactly one physics step per frame and discards
+92,433–110,633 microseconds per frame. This is functional evidence under
+concurrent builds, not a controlled performance comparison. The recorded
+121.0 ms median interval is not a responsiveness claim.
+
+Raw receipts: `Code/testing/mere/scenarios/graphshell-web/elapsed_host_controls/`
+and `elapsed_host_timing/`; build log: `Code/testing/mere/elapsed-host-wasm.log`.
+Bundle SHA256: `cc4a0dbc5ce607dc87bb56788bc9171c0b20b64cb93cbe98d563059e1361feb7`.
+All 266 Pictograph tests pass. Rootstock passes 41 tests, including the new
+timestamp delivery, untimed redraw and visibility lifecycle test. Its existing
+`equal_hover_cascade_retains_geometry_text_generation_and_scroll` test fails
+with a zero element-scroll offset instead of 12 px. Replacing every changed
+rootstock source with its unchanged `a31b9a14` version reproduces the same
+failure; all saved changes were then restored. This is not a fully green
+Rootstock suite. Logs are `elapsed-host-final-native.log`,
+`elapsed-host-pictograph-final.log` and `elapsed-host-baseline-scroll.log` under
+`Code/testing/mere/`; `scripts/elapsed-host-baseline-control.py` records the
+comparison procedure. No dependency pins or lock files changed.
+The final restored-source run, `elapsed-host-qualified-native.log`, passes
+307 tests with only that demonstrated baseline failure explicitly filtered.
+
+Real browser hide/show and background-tab initialization have not received a
+headed scenario receipt; the lifecycle contract is also tested at the host
+and Canvas boundaries.
 
 ## Open gates
 
@@ -210,8 +253,8 @@ remaining host timestamp, visibility and scenario work.
   parent-count walks makes the work regression fail (4546/67330 child visits).
   Independent review is clear. Browser adoption measurements above confirm
   a frame-time improvement, while large-graph responsiveness remains open.
-- Browser physics advances one fixed step per rendered frame on the rendering
-  thread. Slow rendering therefore slows simulated time and input response.
+- Tree-page physics now advances bounded elapsed steps on the rendering
+  thread. When rendering exceeds the caps, discarded time still slows motion.
   Default pairwise exclusion is quadratic. GPU force parity is outside these
   browser receipts, which use the CPU path. At 2,000 nodes a single step
   already exceeds a nominal 16.7 ms frame budget; catch-up caps alone cannot
@@ -221,6 +264,9 @@ remaining host timestamp, visibility and scenario work.
   all five public wrappers and their product scenarios remain migration work.
   Continuous rasterization still protects asynchronous Vello buffer recovery.
 
-The existing Mere worktree and stable native targets are retained for this
-unintegrated work. The existing web target is reused. No new Cargo home,
-worktree or build-target directory was created for this slice.
+The elapsed-time slice is isolated in `worktrees/mere-canvas-elapsed` because
+the primary checkout has concurrent work. The reusable web target is
+`C:/t/cargo-targets/mere/web`. No isolated Cargo home was created.
+After verification, `cargo clean` removed the slice's isolated native output
+at `C:/t/cargo-targets/mere/canvas-elapsed` (3.2 GiB). Logs and browser receipts
+remain outside that target.
