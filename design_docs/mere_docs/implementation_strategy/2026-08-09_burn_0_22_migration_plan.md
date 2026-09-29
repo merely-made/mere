@@ -2669,3 +2669,53 @@ shape. The pending choice is to make that comparison first, retire the patch
 on current evidence, or retain it as a precaution with an explicit control
 amendment. No new ruling has been allocated. Extrema, remote lifecycle,
 S15 closure, main promotion and downstream handoffs remain held.
+
+### 13.27 Ruling 410: historical comparison, then conditional retirement (2026-09-29)
+
+Mark answered the three-way question from §13.26: **"I suppose A, then B if we can"**.
+Canonical ruling 410, with the question and all options, is recorded in Isometry's
+`mesocosm/design_docs/2026-09-18_wing_design_plan.md`. A compares historical
+unpatched pre.2 in the same browser; B retires the patch and completes the gates.
+**Reading, not ruled:** retirement is authorized when the evidence supports it;
+an unresolved numerical failure remains a stop, not permission to remove a guard.
+
+The reconstructed historical dependency control reproduces the old failure in
+the same current Codex IAB session where upstream pre.4 passes. Pre.2 has five
+passing and five failing graph cases, all eleven embedding controls passing,
+and no GPU errors. Shared multiplication fails, both LayerNorm outputs equal
+their inputs bit-for-bit, and scalar/independent multiplication pass. Upstream
+pre.4 passes all ten graph and eleven embedding cases with no GPU errors.
+Both result auditors reject injected missing/error/wrong-case/name controls.
+
+The current Rust/browser fixture bodies match `ac87a236` after license headers
+and line-ending normalization. The historical lock and runtime/reduce patches
+come from `28ed6a4f`: 570 packages, Burn/CubeCL pre.2 and wgpu 30.0.0. The August
+receipt names that commit, but its committed fixture lacks the full graph
+ladder it reports. This is therefore a reconstructed dependency control, not an
+exact reconstruction of the August executable. Five missing crates.io archives
+were fetched under ruling 378 and verified against the unchanged lock; no Git
+source was fetched. All 178 historical patch files and 120 upstream burn-cubecl
+files were verified. The failed first offline preparation was preserved and
+restored before the successful attempt.
+
+The pre.4 replay uses the exact previously verified upstream build assets from
+`6b52297f`, with a fresh origin and successful worker/JS/Wasm HTTP requests.
+Its raw result is byte-identical to the prior pre.4 run. Both runs use the same
+IAB session; pre.4's 552-package row has wgpu 30.0.1. This establishes a tested
+dependency-stack difference, not which upstream component fixed it.
+
+Original source/config bytes were restored to clean `34d29269`; both temporary
+servers and tabs were closed. Portable JSON, screenshots and the comparison
+manifest are under the embedding fixture's `receipts/2026-09-29_*` paths.
+External build, source, archive, server and restoration receipts are retained in
+`Code/testing/mere/receipts/2026-09-29/pre4-s13/pre2-comparison-resolved`.
+
+Before selector retirement, the embedding fixture now contains nine native
+public-API controls for subtraction, atan2 and XOR, each with broadcast aliases,
+same-shape aliases and separate inputs. They use explicit unfused CubeBackend
+operations, real handles, fresh output and retained-input checks. The six-field
+predicate verifies fixture construction; it does not assert upstream has our
+guard. Only two already-selected direct dev-dependency edges were added to the
+fixture lock. These controls are prepared, not yet accepted at this checkpoint.
+All four selectors remain patched. Remaining S13, S15 and main promotion stay
+gated; the old sealed release baseline is preserved unchanged.

@@ -26,6 +26,9 @@ web-sys = "=0.3.99"
 [target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies]
 burn = { version = "=0.22.0-pre.4", default-features = false, features = ["std", "wgpu"] }
 
+burn-backend = { version = "=0.22.0-pre.4", default-features = false, features = ["std"] }
+burn-cubecl = { version = "=0.22.0-pre.4", default-features = false, features = ["std", "wgpu"] }
+
 [patch.crates-io]
 burn-cubecl = { path = "../../../../../support/patches/burn-cubecl" }
 cubecl-runtime = { path = "../../../../../support/patches/cubecl-runtime" }
