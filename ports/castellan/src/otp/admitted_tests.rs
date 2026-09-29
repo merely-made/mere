@@ -7,14 +7,14 @@
 use personae::delegation::Issue;
 use std::time::{SystemTime, UNIX_EPOCH};
 
+use insigne::delegation::{
+    CapabilityScope, DelegationCertificate, DelegationParent, DelegationRevocation,
+    SignedDelegationCertificate, SignedDelegationRevocation,
+};
 use notochord::{
     AdmittedPrincipal, AdmittedSession, CarrierKind, HandshakeLimits, NetworkId, ProfileRef,
     ProofBinding, RequestedAction, RevocationLedger, SessionClaims, SessionFacts, SessionHello,
     TrafficClass, TrustedRoot,
-};
-use personae::delegation::{
-    CapabilityScope, DelegationCertificate, DelegationParent, DelegationRevocation,
-    SignedDelegationCertificate, SignedDelegationRevocation,
 };
 use personae::{IdentityProvider, InMemoryProvider, PersonaId, SealedRecordStorage};
 use tempfile::{TempDir, tempdir};

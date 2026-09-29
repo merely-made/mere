@@ -14,13 +14,13 @@
 use personae::delegation::Issue;
 use std::collections::BTreeMap;
 
+use insigne::delegation::{
+    CapabilityScope, DelegationCertificate, DelegationParent, SignedDelegationCertificate,
+};
 use notochord::{
     CarrierKind, ChainFault, DenyReason, HandshakeLimits, LocalNetworkPolicy, NetworkId,
     ProfileRef, ProofBinding, RequestedAction, RevocationLedger, ServiceAccess, ServiceRule,
     SessionDecision, SessionFacts, SessionHello, SessionReply, TrafficClass, TrustedRoot, respond,
-};
-use personae::delegation::{
-    CapabilityScope, DelegationCertificate, DelegationParent, SignedDelegationCertificate,
 };
 use personae::{IdentityProvider, InMemoryProvider};
 

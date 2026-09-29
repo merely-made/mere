@@ -53,7 +53,32 @@ At that table's date, consumers followed a git-first family rule through
 boundary was Cambium plus the protocol AST package, without Genet's layout or
 rendering engine.
 
-## Current Mere-owned compatibility (2026-09-13)
+## Current Mere-owned compatibility
+
+### 2026-09-29 semantic selector adoption
+
+Mere now pins Genet `19c206873ab08ae227217892d9e74d0df18b349a` coherently in
+the root and standalone web manifests. Relative to the verified scroll-repair
+revision `7a60ad79`, only Taproot code and documentation change: role/name
+selectors can consume Genet's existing computed accessibility projection.
+Rootstock exposes that projection; Mesquite uses it and rechecks a held target
+after scrolling. Class/text matching and product coordinate transforms remain
+compatible. Custom-leaf semantics and human AT acceptance remain separate.
+
+The final integration preserves primary `32edc2ad`, including Insigne, Knot
+`855cb75d` and the formatting-line repair. All 199 Rootstock/winit-host/Mesquite
+tests and standalone Graphshell Wasm checking pass. Both locks preserve every
+incoming package/version/source tuple after mapping the Genet revision; only
+Taproot's dependency on document-session-api is added. Existing Knot-owned
+legacy Genet identities remain separately qualified. The old-matcher negative
+control fails the referenced-name test; restored source passes. Native smoke
+evidence and current limitations are recorded in the
+[Cambium architecture](2026-09-03_cambium_architecture.md#dom-selector-parity-2026-09-29-implemented-and-verified)
+and the [diagnostics plan](../../mere_docs/implementation_strategy/2026-06-08_system_diagnostics_and_accessibility_plan.md).
+Raw receipts live under `testing/cambium/semantic-observation` in the shared Code
+root. The dated compatibility checkpoints below retain their original scope.
+
+### Historical September 13 boundary
 
 Cambium is now a Mere workspace family under `crates/cambium/`; it is not a
 Genet workspace subtree. Mere owns the current `cambium`, `meristem`,
@@ -257,3 +282,65 @@ and rerun the affected tests and native/web graph checks on the combined tree.
 Pre.4 reconciliation, S13, headed/browser receipts and downstream Isometry
 publication remain separate gates. `resumed-checkpoint.json` in the same receipt
 directory seals this outcome without altering `blocked-checkpoint.json`.
+
+## 2026-09-29 combined checkpoint with a31b9a14
+
+The pending merge combines local scroll adoption `8eca3e4c` with incoming main
+`a31b9a14`, preserving upstream runtime work and the tested Genet `7a60ad79` pin.
+Native metadata remains 1,524 packages with 24 current Genet packages and the
+two existing Knot-owned identities; its only added edge is web-host to Mesquite
+under `cfg(target_arch = "wasm32")`. The root lock retains 1,651 identities and
+all 385 recorded pre.2 patch files retain their bytes.
+
+Web metadata/lock grows from 527 to 636 packages: seven required Wasm-family
+updates and 109 additions reachable from the three approved local host roots.
+Nineteen existing nodes gain features/edges without losing prior ones, including
+the requested `Location` and `UrlSearchParams` features. The filtered Wasm graph
+has 445 reachable nodes; these are graph counts, not payload measurements.
+An incidental offline `libredox` downgrade was rejected and prior 0.1.25 restored.
+The accepted ignored web lock and all attempts are preserved. Native/web WGPU
+stay 30.0.1/30.0.0, NetRender stays `9607d16f`, and netrender-vello stays 0.10.1.
+Both fresh source detectors reject an outside path and an old Genet revision.
+
+Tests pass: 202 Rootstock/host/Mesquite tests with four ignored doctests;
+261 Pictograph unit plus two headless Vello tests; 88 Seiche default-library
+and eight no-default runtime tests. Both retained-layout cases and the GPU
+lost-crossing-edge control pass. Workspace verification, Reader all-target,
+native and standalone Wasm checks pass. These are correctness results on a
+shared device; pre.4 tensor/release and S13 acceptance remain separate.
+All commands preserve 3,034 tracked-file/ignored-lock hashes. The earlier host
+wrapper has hashes only; seven later runtime/check runs also preserve mtimes.
+
+Evidence: `testing/mere/receipts/2026-09-29/scroll-main-integration/combined-checkpoint.json`
+under the shared Code root. This accepts only the a31b9a14 checkpoint, pending
+independent review and local commit. Remote main advanced to `ee77bf23` during
+verification; its Personae/Insigne migration must be integrated and the affected
+dependency checks refreshed before publication or downstream adoption.
+
+## 2026-09-29 ee77bf23 follow-on verification
+
+The verified merge of `ee77bf23` into `14f5f9c9` retains tested Genet `7a60ad79`
+and upstream's Insigne migration. Default native metadata keeps 1,524 packages:
+four Knot identities move to `855cb75d` and eight nodes gain Insigne edges.
+Web keeps 636 packages (445 in the filtered Wasm graph), adding only the
+Pandect-to-Insigne edge. Registry identities/checksums and all 385 pre.2 patch
+files remain unchanged. Existing legacy Genet and Knot-site identities remain
+explicitly classified. Five default-graph fault controls reject the wrong source
+or an outside local path.
+
+Exact package, feature, dependency and local-file comparisons preserve the five
+Rootstock/host/Mesquite/Seiche runtime cones, carrying their a31b9a14 receipts.
+Pictograph reaches changed Personae files, so its 263 tests were rerun and pass,
+including retained-layout cases and the headless crossing-edge control. The
+Insigne/Personae/Notochord all-feature suite passes 233 tests. Native workspace
+and standalone Wasm all-target/all-feature checks pass; only the existing
+`mere-linked-data` native failure is excluded. All-feature metadata selects
+1,651 native and 636 web packages within the unchanged locks; four additional
+source controls reject both faults. Metadata includes `mere-linked-data` and
+does not establish compilation of that excluded package.
+
+Every follow-on gate retains 3,034 source/lock hashes and unchanged mtimes.
+Shared-device rendering establishes correctness, not performance. Evidence is
+`testing/mere/receipts/2026-09-29/scroll-insigne-integration/final-checkpoint.json`
+under the shared Code root. Pre.4, S13 and downstream adoption retain their
+separate gates.

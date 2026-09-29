@@ -192,6 +192,15 @@ document-session-api dependency added after mapping the Genet revision. Final
 publication still waits for the concurrent main integration, including the
 incoming Insigne migration; its broader acceptance is a separate owner's gate.
 
+**Final integration:** the published primary baseline `32edc2ad` was subsequently
+merged, preserving the Insigne migration and Knot `855cb75d` adoption. All 199
+Rootstock/winit-host/Mesquite tests and the standalone Wasm check passed again.
+Both locks retain every incoming package/version after the Genet substitution;
+the only added dependency edge is Taproot to document-session-api. This closes
+the earlier pending source-integration and machine-verification gates. The
+Steward name, human AT check, custom-leaf parity and diagnostics implementation
+remain open as described above.
+
 ---
 
 ## Historical June design and implementation record

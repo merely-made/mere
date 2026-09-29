@@ -8,7 +8,7 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
-use personae::delegation::path_covers;
+use insigne::delegation::path_covers;
 use serde::{Deserialize, Serialize};
 
 use crate::chain::{RevocationLedger, TrustedRoot, validate_chain};

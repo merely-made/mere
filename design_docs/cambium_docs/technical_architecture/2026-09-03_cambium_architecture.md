@@ -348,7 +348,7 @@ semantic commands and observations. Evidence is under
 Woodshed and Cleromancy testing directories. These are native automation
 receipts, not new manual screen-reader acceptance.
 
-### DOM selector parity (2026-09-29, integration pending)
+### DOM selector parity (2026-09-29, implemented and verified)
 
 `AppCtx::a11y_projection` exposes the host's retained Genet document semantics.
 Mesquite uses `taproot::matching_with_projection` for role/name targets and
@@ -383,6 +383,12 @@ smoke's three capture digests, and passed Wasm checking against the primary
 owner's accepted standalone lock. No package/version changed in that web lock;
 the only new dependency edge is Taproot to document-session-api. Publication
 still waits for the primary integration of the newer Insigne changes.
+
+Final integration merged published primary `32edc2ad`, preserving the Insigne
+migration and Knot pin. All 199 affected tests and the standalone Wasm check
+passed again. Root and standalone locks retain their accepted package/version
+sets after substituting the Genet revision; only the Taproot-to-document-session-api
+edge is added. This supersedes the earlier integration-pending status.
 
 This is DOM semantic parity. Sprigging custom-leaf contributions and complete
 HTML/CSS visibility/role conformance remain outside it. The document projection
