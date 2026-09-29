@@ -1951,6 +1951,7 @@ version = "0.3.3"
 dependencies = [
  "errand",
  "genet-scripted-dom",
+ "genet-text",
  "illume",
  "layout-dom-api 0.1.1 (git+https://github.com/merely-made/genet.git?rev=19c206873ab08ae227217892d9e74d0df18b349a)",
  "mere-surface-api",
@@ -1959,7 +1960,6 @@ dependencies = [
  "sprigging",
  "tabard",
  "tinct",
- "unicode-segmentation",
  "workbench",
 ]
 
@@ -4630,6 +4630,7 @@ version = "0.0.1"
 dependencies = [
  "eidetic",
  "esp",
+ "genet-text",
  "import",
  "muniment",
  "pollster",
@@ -4637,7 +4638,6 @@ dependencies = [
  "serde_json",
  "tempfile",
  "thiserror 1.0.69",
- "unicode-segmentation",
 ]
 
 [[package]]
