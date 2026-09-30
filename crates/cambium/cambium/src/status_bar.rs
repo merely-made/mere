@@ -44,7 +44,7 @@ pub const STATUS_BAR_CSS: &str = "\
     .status-chip { position: relative; z-index: 52; white-space: nowrap; } \
     .status-bar[data-status-collapsed=true] .status-chip { max-width:calc(100vw - 84px); overflow:hidden; } \
     .status-chips .popover { max-width:calc(100vw - 24px); box-sizing:border-box; } \
-    .status-overflow-content { max-height:70vh; overflow:auto; white-space:normal; min-width:0; }";
+    .status-overflow-content { max-height:70vh; overflow:auto; white-space:normal; min-width:0; padding:8px; border:1px solid currentColor; box-sizing:border-box; }";
 
 // Reserved for the component's controlled overflow popover, never a fact key.
 const OVERFLOW_KEY: &str = "__status-overflow";

@@ -17,6 +17,7 @@ use workbench::{
 struct App {
     tree: TileTree,
     presentation: WorkbenchPresentation,
+    frame_height: f32,
 }
 type Child = Box<dyn AnyView<App, (), GenetCtx, GenetElement>>;
 type TestHost = Harness<App, fn(&App) -> Child, Child>;
@@ -54,7 +55,10 @@ fn root(app: &App) -> Child {
                 },
             ),
         )
-        .attr("style", "width:100vw;height:100vh;min-width:0;"),
+        .attr(
+            "style",
+            format!("width:100vw;height:{}px;min-width:0;", app.frame_height),
+        ),
     )
 }
 
@@ -62,6 +66,7 @@ fn host() -> TestHost {
     let mut host = Harness::with_hooks(
         Init {
             state: App {
+                frame_height: 480.0,
                 tree: TileTree::Split {
                     axis: SplitAxis::Row,
                     children: vec![
@@ -111,6 +116,61 @@ fn host() -> TestHost {
     );
     host.layout_at(320.0, 480.0);
     host
+}
+
+#[test]
+fn a_narrow_rail_keeps_its_full_vertical_label_within_painted_bounds() {
+    let host = host();
+    let rails = host.with_dom(|dom| dom.all_with_class(dom.document(), "frisket-rail"));
+    let labels = host.with_dom(|dom| dom.all_with_class(dom.document(), "frisket-rail-label"));
+    assert_eq!(rails.len(), 1);
+    assert_eq!(labels.len(), 1);
+    let (rx, ry, rw, rh) = host.painted_rect(rails[0]).unwrap();
+    let (x, y, width, height) = host.painted_rect(labels[0]).unwrap();
+    assert!(
+        width < height,
+        "rail label remains horizontal: ({x}, {y}, {width}, {height})"
+    );
+    assert!(width > 0.0 && height > 28.0, "full label must be painted");
+    assert!(
+        x >= rx - 0.5 && x + width <= rx + rw + 0.5 && y >= ry - 0.5 && y + height <= ry + rh + 0.5,
+        "label outside rail: label=({x}, {y}, {width}, {height}); rail=({rx}, {ry}, {rw}, {rh})"
+    );
+    assert_eq!(
+        host.with_dom(|dom| taproot::matching(
+            dom,
+            &Selector::role("button").containing("Open Reading")
+        )
+        .len()),
+        1
+    );
+}
+
+#[test]
+fn rail_label_remains_bounded_and_actionable_in_a_short_reflow_frame() {
+    let mut host = host();
+    host.update(|app| {
+        app.frame_height = 80.0;
+        let collapsed = app.presentation.stacks[0].collapsed.as_mut().unwrap();
+        collapsed.label = "Navigator".into();
+        let drawer = collapsed.drawer.as_mut().unwrap();
+        drawer.bounds = (0.0, 0.0, 320.0, 175.0);
+    });
+    host.layout_at(320.0, 175.0);
+    let labels = host.with_dom(|dom| dom.all_with_class(dom.document(), "frisket-rail-label"));
+    let (x, y, width, height) = host.painted_rect(labels[0]).unwrap();
+    assert!(
+        x >= 0.0 && x + width <= 320.5 && y >= -0.5 && y + height <= 80.5,
+        "short rail label outside frame: ({x}, {y}, {width}, {height})"
+    );
+    assert!(host.click_on(&Selector::role("button").containing("Open Navigator")));
+    assert!(
+        host.state().presentation.stacks[0]
+            .collapsed
+            .as_ref()
+            .unwrap()
+            .open
+    );
 }
 
 #[test]

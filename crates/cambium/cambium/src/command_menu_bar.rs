@@ -27,6 +27,8 @@ pub const COMMAND_MENU_BAR_CSS: &str = r#"
 .command-menu-bar-shortcut { margin-left: auto; opacity: .72; }
 .command-menu-bar-reason { font-size: .85em; opacity: .72; }
 .command-menu-bar-submenu { left: 100%; top: 0; }
+.command-menu-bar-compact { box-sizing: border-box; width: 198px; min-width: 0; max-width: calc(100vw - 24px); max-height: 70vh; overflow: auto; }
+.command-menu-bar-compact .command-menu-bar-row { white-space: normal; }
 "#;
 
 /// Retained focus and disclosure state. `open_path` addresses the parent whose
@@ -175,7 +177,11 @@ pub fn command_menu_bar(
             index == effective_active(items, state.active)
         };
         let open = state.open && active;
-        let popup_path = if compact { Vec::new() } else { vec![index] };
+        let popup_path = if compact {
+            state.open_path.clone()
+        } else {
+            vec![index]
+        };
         let popup = open.then(|| menu_view(state, items, compact, &popup_path));
         let mut top_item =
             el::<_, CommandMenuBarState, CommandEvent>("div", (label.to_owned(), popup))
@@ -260,10 +266,28 @@ fn menu_view(
         .unwrap_or(0)
         .min(menu.len().saturating_sub(1));
     let mut rows: Vec<BarView> = Vec::new();
+    // Compact menus navigate one level at the same anchor. Sideways flyouts
+    // would escape a narrow viewport after the first disclosure.
+    if compact && !path.is_empty() {
+        rows.push(Box::new(on_click(
+            el::<_, CommandMenuBarState, CommandEvent>("div", "‹ Back")
+                .attr("class", "command-menu-bar-row command-menu-bar-back")
+                .attr("role", "menuitem")
+                .attr("aria-label", "Back to parent menu")
+                .attr("tabindex", "-1"),
+            |state: &mut CommandMenuBarState, click: PointerClick| {
+                click.stop_propagation();
+                state.open_path.pop();
+                state.selected_path.pop();
+                state.focus_active = true;
+            },
+        )));
+    }
     for (index, item) in menu.iter().enumerate() {
         let mut item_path = path.to_vec();
         item_path.push(index);
-        let submenu = (state.open_path.len() > path.len()
+        let submenu = (!compact
+            && state.open_path.len() > path.len()
             && state.open_path.starts_with(&item_path))
         .then(|| menu_view(state, items, compact, &item_path));
         let reason = item.disabled_reason.as_ref().map(|reason| {
@@ -300,6 +324,7 @@ fn menu_view(
             },
         )
         .attr("role", "menuitem")
+        .attr("aria-label", item.label.clone())
         .attr("tabindex", "-1")
         .attr(
             "aria-disabled",
@@ -351,7 +376,9 @@ fn menu_view(
     let menu = el::<_, CommandMenuBarState, CommandEvent>("div", rows)
         .attr(
             "class",
-            if depth == 0 {
+            if compact {
+                "command-menu-bar-menu command-menu-bar-compact"
+            } else if depth == 0 {
                 "command-menu-bar-menu"
             } else {
                 "command-menu-bar-menu command-menu-bar-submenu"
