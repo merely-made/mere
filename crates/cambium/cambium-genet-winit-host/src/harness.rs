@@ -757,6 +757,12 @@ where
         self.host.drain_pointer();
     }
 
+    /// Exercise the production state-sealing seam with a synthetic presentation.
+    /// This supplies no pixels and is not evidence of GPU presentation.
+    pub fn observe_presentation(&mut self, frame: cambium_rootstock::PresentedFrame) {
+        self.host.observe_presentation(frame);
+    }
+
     /// Run the application's `after_frame` hook, as a presented frame would.
     pub fn after_frame(&mut self) {
         self.host.deliver_files();

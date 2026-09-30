@@ -81,8 +81,9 @@ monotonic, so a replayed or late event can never rewind a record.
 
 Pre-1.0. The data model retains proof artifacts and is tested with JSON and
 postcard reload followed by real signature checks. Persona-scoped persistence
-is available behind `muniment`. Host sealing, JSContact exchange and resolver
-intake remain in the founding plan under `design_docs/`.
+is available behind `muniment`, with host sealing through Castellan/Pandect.
+JSContact exchange is available behind `jscontact`. M1 library gates are complete;
+M2 resolver intake and application wiring remain in the founding plan.
 
 ## Persistence
 
@@ -113,6 +114,50 @@ The contact model is validated on load, and retained signatures still need the
 caller's checks. At-rest sealing belongs to the host's supplied backend. The
 JSON/postcard tests use memory and real redb reopen, proving persona isolation,
 overwrite behavior, malformed-record refusal and artifact rechecking.
+
+Hosts composing Castellan's `keeper` feature can require sealing with
+`PersonaeHost::sealed_backend(persona, backend)` before constructing the
+`SlotStore`. It refuses a missing wallet epoch; it never selects cleartext.
+Pandect supplies the adapter, so Gaz gains no cryptographic dependency. The
+host maps its persona to Gaz's opaque scope and owns historical epoch loading
+and rollback policy. The host receipt also checks the entire closed redb file
+for cleartext petnames and refuses damaged or transplanted ciphertext.
+
+## JSContact exchange
+
+Enable `jscontact` and construct `JsContactFormat` with a domain controlled by
+the host (for example, `JsContactFormat::new("example.org")` in documentation).
+Gaz keeps its own Contact model at rest. The format is a bounded RFC 9553
+projection, not a complete schema validator or vCard converter.
+
+- `publish(&PublicCard)` builds a persona card from explicitly selected public
+  name, identity artifacts, handles and endpoints. Its input cannot carry local
+  notes, trust, tier or recency. Publication here means constructing bytes for a
+  host to share; Gaz does not fetch or publish on the network.
+- `import(&Card, local_id)` returns unverified kith claims and the preserved
+  source Card. It ignores private state from peers, performs structural identity
+  validation, and leaves cryptographic checking and book updates to the caller.
+  Foreign free-text/URI identifiers need a caller-selected local anchor; bare
+  UUIDs and Gaz anchors parse directly. A PLC claim needs a root key.
+- `export_contact` / `restore_contact` are lossless PRIVATE backup operations.
+  Restoration includes notes and trust and must only read the caller's trusted
+  backup. Public fields must agree with the validated private record.
+
+`uid` keeps the anchor's standard text, including Reticulum's free-text rnid.
+`cryptoKeys` contains root and attested resources; Reticulum carries all 64
+public bytes in a data URI. Domain-prefixed `gazIdentity` retains root history,
+attested keys and proof artifacts; `gazHandleKind` and `gazEndpointKind` retain
+protocol roles. Private `gazLocal` stores Contact JSON as a string so u64
+history remains exact. No stored proof becomes a successful signature check.
+
+Parse untrusted bytes with `Card::parse`, which refuses duplicate object names
+and invalid mapped shapes without dereferencing URIs. `ImportedCard::source`
+retains original map IDs and unmapped fields; hosts must retain it separately
+when re-exchanging those fields. Regenerating from Contact alone does not
+preserve foreign fields. Generated map IDs stay stable across reordering and
+unrelated insertions; duplicate public entries collapse while private backups
+preserve original arrays. The optional feature adds JSON and URI validation,
+without crypto, storage, network, clock or random-source dependencies.
 
 ## License
 

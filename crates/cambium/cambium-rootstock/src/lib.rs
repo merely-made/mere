@@ -341,6 +341,8 @@ pub enum NamedKey {
     Delete,
     Home,
     End,
+    F10,
+    Alt,
     PageUp,
     PageDown,
     /// A named key this vocabulary does not special-case.
@@ -362,6 +364,8 @@ impl From<NamedKey> for cambium::NamedKey {
             NamedKey::Delete => Self::Delete,
             NamedKey::Home => Self::Home,
             NamedKey::End => Self::End,
+            NamedKey::F10 => Self::F10,
+            NamedKey::Alt => Self::Alt,
             NamedKey::PageUp => Self::PageUp,
             NamedKey::PageDown => Self::PageDown,
             NamedKey::Other => Self::Other,
@@ -731,6 +735,24 @@ mod tests {
     }
 
     #[test]
+    fn menu_entry_keys_lower_without_losing_identity_or_modifiers() {
+        let f10 = KeyPress::named(NamedKey::F10)
+            .to_runner_key()
+            .expect("F10 reaches the runner");
+        assert!(matches!(f10.key, cambium::Key::Named(cambium::NamedKey::F10)));
+
+        let alt = KeyPress::named(NamedKey::Alt)
+            .with_modifiers(Modifiers {
+                alt: true,
+                ..Modifiers::NONE
+            })
+            .to_runner_key()
+            .expect("Alt reaches the runner");
+        assert!(matches!(alt.key, cambium::Key::Named(cambium::NamedKey::Alt)));
+        assert!(alt.mods.alt);
+    }
+
+    #[test]
     fn an_unidentified_key_with_no_text_is_dropped() {
         let bare = KeyPress {
             key: Key::Unidentified,
@@ -833,8 +855,8 @@ pub use host::{
     AppCtx, AppFrameInsets, AppHook, CaptureFn, CloseDisposition, CloseRequest, CloseRequestHook,
     FocusedTextHook, FocusedTextSlot, FrameHook, FrameProfile, Hook, Host, HostFont, HostHooks,
     HostImage, HostOptions, HostPointer, HostState, IdlePolicy, Init, KeyInterceptHook,
-    PaintCaptureFn, RelayoutProfile, Runner, ScrollIntoView, WindowFrame, ZOOM_LADDER, env_size,
-    fit_zoom, ladder_step,
+    PaintCaptureFn, PresentationObserver, PresentedFrame, RelayoutProfile, Runner, ScrollIntoView,
+    StampedCaptureFn, WindowFrame, ZOOM_LADDER, env_size, fit_zoom, ladder_step,
 };
 pub use wake::HostWake;
 pub use window_verbs::{AppRegion, WindowCommand, WindowCommands, WindowGeometry};

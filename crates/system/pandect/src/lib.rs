@@ -143,6 +143,8 @@ pub mod view_intent_store;
 // for the carry layer. Storage only; pairing and crypto semantics layer on top.
 pub mod wallet_grant;
 pub mod wallet_store;
+/// Wallet-sealed mutable slots over a caller-selected Muniment backend.
+pub mod wallet_sealed_backend;
 
 pub use application_settings_store::{
     APPLICATION_SETTINGS_DIR, APPLICATION_SETTINGS_FILENAME, ApplicationSettings, ShellbarEdge,
@@ -160,6 +162,7 @@ pub use arrangement_facets::{
 };
 pub use atomic_file::write_bytes_with_backup;
 pub use codicil_seal::WalletEpochSealer;
+pub use wallet_sealed_backend::WalletSealedBackend;
 pub use denizen_facets::{
     DENIZEN_BINDING, DenizenBinding, DenizenKind, is_denizen, read_denizen_binding,
     read_denizen_bindings, remove_denizen_binding, write_denizen_binding,

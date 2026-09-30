@@ -8,11 +8,12 @@ proposals from that day's critical pass: anchoring on a peer's root with
 attested keys held concurrently, a whole-identity Reticulum key (verified
 against Reticulum's reference implementation), and `Anchor::Local` for keyless
 contacts. JSContact is ruled *an* exchange format (M1). M0.5 landed the same
-day, and `TypedKey` then moved to insigne, as Mark ruled. M1 (at-rest sealing
-ruled: gaz stays crypto-free) and M2 are drafted with done-conditions. The
+day, and `TypedKey` then moved to insigne, as Mark ruled. M1 keeps sealing at the host and JSContact at the exchange boundary. M2 is
+drafted with done-conditions. The
 retained-proof slice of M2 landed on 2026-09-29 under Insigne phase D;
-M1's storage gate is implemented on 2026-09-29; host sealing, JSContact
-exchange and resolver intake remain open.
+M1's storage gate is implemented on 2026-09-29 and its host sealing gate on
+2026-09-30; JSContact exchange landed 2026-09-30, completing the M1 library
+gates. M2 resolver intake and application wiring remain open.
 **Scope**: the contact layer, standalone. The record model, the persona-scoped
 book, then storage over muniment, then the adapters that turn resolver output
 into records, then mere reconciliation.
@@ -263,13 +264,17 @@ is monotonic, so a replayed or late event cannot rewind a record.
   - [x] Round-trip tests over `MemoryBackend` and redb, both a JSON and a
         binary codec, and a two-persona test proving one persona's load
         cannot return the other's contacts.
-  - [ ] **Ruled 2026-09-23 — at-rest sealing is the host's.** This file holds
+  - [x] **Ruled 2026-09-23 — at-rest sealing is the host's.** This file holds
         who a person knows. Access records are sealed at rest through
         castellan's `PersonaeHost::payload_sealer`; muniment itself has no
         sealing layer. Mark accepted the proposal: gaz stays plain and
         crypto-free, and the host supplies a sealed backend. Done when a
         host-side receipt shows the stored bytes carry no cleartext petname.
-  - [ ] **Ruled 2026-09-23 — JSContact is *an* exchange format** (Mark: "the"
+        Implemented 2026-09-30 through Pandect's `WalletSealedBackend` and
+        Castellan's required `PersonaeHost::sealed_backend` supply point;
+        `ports/castellan/tests/sealed_contacts.rs` checks JSON and postcard
+        books in the entire closed redb file, then reopens and rechecks proofs.
+  - [x] **Ruled 2026-09-23 — JSContact is *an* exchange format** (Mark: "the"
         was too strong). The standards survey grades
         JSContact (RFC 9553) ADOPT with "gaz (the contact store)" as consumer,
         though its §7 calls consumer assignments "a starting point, not a
@@ -282,12 +287,34 @@ is monotonic, so a replayed or late event cannot rewind a record.
         property, so a stored Card would be mostly vendor properties that no
         other reader understands, while gaz took on JSContact's shapes as
         internal constraints. In an exported Card, `uid` is the anchor as a
-        URI: `did:key:…`, `did:plc:…`, or `urn:uuid:…` for `Local`. Verified
-        against RFC 9553 on 2026-09-23: `uid` is mandatory and SHOULD be a
-        `urn:uuid` but MAY be any URI; keys go in `cryptoKeys`, handles and
-        service URIs in `onlineServices`, gaz's own state in domain-prefixed
-        vendor properties (§1.8.1), which makes a gaz → Card → gaz round-trip
-        lossless.
+        standard identifier: `did:key:…`, `did:plc:…`, `urn:uuid:…` for
+        `Local`, or Reticulum's bare rnid hex. Corrected against RFC 9553
+        §2.1.9 on 2026-09-30: mandatory `uid` permits a URN, URI or free text;
+        a version-4 UUID is preferred. Keys go in `cryptoKeys`, handles and
+        service addresses in `onlineServices`, Gaz-specific state in host-domain
+        vendor properties (§1.8.1). Implemented behind optional `jscontact`:
+        `publish(&PublicCard)` accepts only explicitly selected public fields;
+        peer `import` always makes unverified kith claims and ignores local
+        state. Separate `export_contact` / `restore_contact` preserve the whole
+        PRIVATE Contact, including u64 history encoded as JSON text, and refuse
+        disagreement with public projections. Only the host's trusted backups
+        may use restoration. Typed artifacts remain unchecked claims.
+        Reticulum crypto resources are data URIs containing all 64 public bytes.
+        The host supplies its controlled extension domain; other domains remain
+        opaque. Imported source Cards retain unknown properties and original
+        map IDs separately from Contact. Generated IDs survive reordering and
+        unrelated additions. Foreign non-anchor uids require a caller-selected
+        local id; PLC imports require a root-bearing identity claim. This is
+        bounded exchange support, not full RFC validation, vCard conversion,
+        resolver merging, Ledger UI or network publication.
+        Receipt: 82 unit tests plus three doctests, scoped Clippy with warnings
+        denied, and a Wasm production check. A deliberately inserted peer
+        restore path makes the trust-isolation test fail; restoring the source
+        returns the full suite to green. The JSContact-only production graph excludes
+        Personae and cryptography, and the default graph excludes the optional
+        JSON/URI exchange dependencies. Raw logs and the mutation receipt are
+        retained in `C:\t\cargo-targets\mere\gaz-jscontact-receipts`.
+        Next: M2 resolver intake.
 - **M2 — resolver intake.** The seam where resolution meets storage. Gazette
   will depend on gaz, not the reverse (gazette was promoted to a port on
   2026-08-23 and "composes gaz rather than replaces it"), so gaz cannot consume
@@ -313,8 +340,8 @@ is monotonic, so a replayed or late event cannot rewind a record.
         signed certificates, or opaque protocol evidence with its format and
         method. Typed key relationships are checked on insertion and load;
         cryptographic checks and current authority remain the caller's.
-        JSON/postcard reload and recheck are proven. PLC decoding/checking,
-        backend persistence, and the other intake rules below remain open.
+        JSON/postcard reload and recheck are proven. PLC decoding/checking
+        and the other intake rules below remain open; M1 persistence is complete.
   - [ ] Intake adds endpoints as `TrustState::Unverified` and never downgrades
         or duplicates an endpoint already held at a stronger state; replaying
         the same intake is a no-op.
@@ -582,3 +609,65 @@ The first four M1 done-conditions are met. **M1 remains open** for the host-side
 sealed-backend receipt and JSContact import/export/published-card exchange.
 Gazette intake and its trust/alarm behavior remain M2, with no live Gaz host
 integration claimed by this storage gate.
+
+**2026-09-30, M1 host sealing gate.** Pandect owns `WalletSealedBackend<B>`
+over the backend the host selects. Castellan's keeper supplies it through
+`PersonaeHost::sealed_backend(persona, backend)`, refusing when a carry root
+or staged private epoch is unavailable. Gaz's dependency graph is unchanged;
+the host applies sealing below its existing `SlotStore` and `save_book` /
+`load_book` calls.
+
+The adapter reuses the real `WalletEpochSealer`. A versioned envelope retains
+the epoch marker and ciphertext; the authenticated inner value binds the
+logical slot key and carries a fresh random salt, so its exposed content digest
+does not reveal equality or permit guessing a small record. Reads authenticate,
+check the plaintext hash, and check the slot key before returning bytes.
+Plaintext, corrupted envelopes, wrong personas/keys/epochs, and copies at
+another key are errors. Refused bytes remain intact. All puts in a batch are
+sealed before the underlying backend receives any writes.
+
+The host receipt stages actual wallet state, obtains the adapter from
+Castellan, saves two persona books, closes every redb and keeper handle,
+checks the entire durable file for cleartext petnames, and reopens both books.
+The encoded JSON and postcard inputs each contain the tested petname, so the
+absence check is not merely an encoding artifact. A retained attestation checks
+again after reopening. Wrong-persona reads, damaged ciphertext, plaintext
+substitution, and slot transplantation refuse without erasing stored bytes;
+clearing one persona preserves the other. Adapter tests separately exercise
+ordered scans, listing, write batches, repeated writes, and explicit historical
+epoch loading after rotation.
+
+Validation on Rust 1.98.1, with raw logs and source hashes retained under
+`C:\t\cargo-targets\mere\gaz-sealing-receipts`:
+
+- `cargo test -p pandect --lib wallet_sealed_backend --locked --offline -j 4`:
+  **three adapter tests pass**.
+- `cargo test -p castellan --features keeper --locked --offline -j 4`:
+  **76 unit tests, three host receipts, and one doctest pass**.
+- Temporarily bypassing sealing in `Backend::put` makes both durable-petname
+  tests fail at the cleartext assertion (exit 101). Sealed writes are restored,
+  and the complete Castellan suite passes again.
+- `cargo clippy -p pandect -p castellan --lib --tests --features castellan/keeper
+  --no-deps --locked --offline -j 4 --message-format=json`: **completes with
+  no diagnostics in the four added Rust files**. Existing diagnostics in
+  Pandect, Castellan, and Kernel remain; this is not a whole-crate `-D warnings`
+  receipt.
+- `cargo check -p gaz --lib --no-default-features --locked --offline -j 4
+  --message-format=json`: **pass**, with Gaz and Insigne featureless and no
+  Muniment, Personae, or cryptographic library in the production artifacts.
+- `cargo check -p pandect --lib --target wasm32-unknown-unknown --locked
+  --offline -j 4 --message-format=json`, with the existing getrandom 0.3
+  browser selector `--cfg getrandom_backend="wasm_js"`: **pass**. The adapter
+  preserves Muniment's native `Send` / browser `?Send` future seam, requiring
+  `Sync` only on native. This is a compilation receipt, not browser storage
+  execution.
+
+This slice reuses the primary `C:\t\cargo-targets\mere` output. It creates no
+isolated worktree, target, or Cargo home.
+
+This meets M1's at-rest host receipt, not a claim that an application has wired
+Gaz into its contact UI. Keys remain visible, read/write transactions explicitly
+return `NotTransactional`, and replay of an older authenticated value at the
+same key is outside this adapter. Historical epoch supply and freshness remain
+host responsibilities. **M1 remains open for JSContact import, export, and
+published-card exchange.** M2 resolver intake follows that remaining gate.
