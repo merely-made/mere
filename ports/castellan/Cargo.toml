@@ -69,6 +69,7 @@ zbus = { version = "5.19", default-features = false, features = ["tokio"], optio
 
 [dev-dependencies]
 gaz = { workspace = true, features = ["muniment"] }
+gazette.workspace = true
 muniment = { workspace = true, features = ["postcard", "redb"] }
 pollster = "0.4"
 tempfile = "3"

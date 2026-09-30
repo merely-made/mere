@@ -69,6 +69,13 @@ real redb reopening, and retained-proof rechecking. Keys stay visible, epoch
 history must be supplied for old records, and replay of an authenticated value
 at its original key is outside this adapter's freshness guarantee.
 
+The address-intake receipt at `tests/sealed_webfinger_intake.rs` also composes
+Gazette's supplied WebFinger adapter with this backend. JSON/postcard reopen and
+replay preserve private names, notes, Kin, address trust/usage and root/device
+artifacts. Fresh claims start Unverified; a new contact requires the host's
+LocalId. The receipt proves native sealed composition and persona isolation;
+live resolver transport and application contact UI remain separate work.
+
 Graphshell composes all three and re-exports them at its pre-founding paths,
 so it is the first host rather than the owner. The intent wire strings keep
 their `castellan.*` values for now; renaming the wire vocabulary is
