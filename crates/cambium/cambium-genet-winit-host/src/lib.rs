@@ -234,6 +234,8 @@ fn named_from_winit(named: &winit::keyboard::NamedKey) -> NamedKey {
         N::Delete => NamedKey::Delete,
         N::Home => NamedKey::Home,
         N::End => NamedKey::End,
+        N::F10 => NamedKey::F10,
+        N::Alt => NamedKey::Alt,
         N::PageUp => NamedKey::PageUp,
         N::PageDown => NamedKey::PageDown,
         _ => NamedKey::Other,
@@ -271,6 +273,25 @@ fn key_press_from_winit(event: &winit::event::KeyEvent, modifiers: Modifiers) ->
         text: event.text.as_ref().map(|t| t.to_string()),
         modifiers,
         repeat: event.repeat,
+    }
+}
+
+#[cfg(test)]
+mod menu_entry_key_tests {
+    use super::*;
+
+    #[test]
+    fn winit_menu_entry_keys_reach_the_runner_through_host_press() {
+        for (source, expected) in [
+            (winit::keyboard::NamedKey::F10, cambium::NamedKey::F10),
+            (winit::keyboard::NamedKey::Alt, cambium::NamedKey::Alt),
+        ] {
+            let key = key_from_winit(&winit::keyboard::Key::Named(source));
+            let press = KeyPress::new(key);
+            assert_eq!(press.key, Key::Named(named_from_winit(&source)));
+            let lowered = press.to_runner_key().expect("host press reaches runner");
+            assert!(matches!(lowered.key, cambium::Key::Named(actual) if actual == expected));
+        }
     }
 }
 /// The winit event source: the host, plus everything only a desktop window

@@ -134,3 +134,35 @@ subsequent locked/offline Wasm check pass (`graphshell-web-7bf-resolve.log` and
 `graphshell-web-7bf.log`); `containing-context.json` records both lock hashes.
 Compilation does not
 qualify browser runtime or human accessibility.
+
+### Combined Commands/fonts integration, September 30
+
+Knot's concurrent Commands, links and typography line used forked shared pins,
+rather than descendants of the diagnostics cohort. Genet's clean merge is
+`69a2383b2ad777b884a72f31f8f8fb7ece275c0b`: two font-backed host length tests,
+28 Taproot tests and 40 render tests pass. Its four semantic source files remain
+byte-identical to the preceding semantic receipt and its lock is unchanged.
+Mere merges the command menu/key route and adopts that combined Genet identity
+while retaining Gaz, Registry, Apparatus and presentation seals. The root lock
+changes only Genet source identity, preserving all packages and dependency edges.
+
+The broader containing all-targets gate passes 210 tests, followed by seven
+command-menu tests and five platform-key tests. The containing locked/offline
+rerun passes after Cargo materializes the fresh Git checkout. The earlier two
+offline attempts stopped at an uncached source, before compiling; their logs
+remain beside the locked online cache/build and passing offline receipt. Actual
+web-host and standalone Graphshell Wasm checks also pass locked/offline.
+
+Scoped Clippy retains explicit baseline qualifications. The broader host
+all-targets check adds one unchanged `input_routing.rs` type-complexity fixture
+to the preceding three baseline allowances. The Cambium/platform library check
+reports 17 warnings in five byte-identical baseline files, requiring six
+additional lint allowances. No warning site is in the incoming menu/key code.
+Failure logs and Git-blob comparisons are retained; these are qualified scoped
+passes, not unqualified strict all-target passes. Logs and source/lock hashes
+are under `Code/testing/cambium/capture-pairing/combined/`.
+
+Knot and Redshank must qualify the combined pins before Turnstone's containing
+gate. Their earlier native captures retain their original source/binary hashes.
+New Windows Knot receipts must exercise the actual client-menu default; legacy
+plain-row harnesses cannot establish that default's native behavior.
