@@ -216,6 +216,7 @@ fn pixel(
     let list = layout.emit_paint_list_with_leaves(
         dom,
         DeviceIntSize::new(160, 120),
+        None,
         |key| registry.commands(key),
         |_| None,
     );

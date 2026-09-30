@@ -9,19 +9,27 @@
 use std::collections::HashMap;
 
 use genet_livery::{
-    Device, InteractionStates, LiveryLayout, LiveryPaintList, StylePlane, StyleSet, TextRange,
-    TextSystem, ViewportSizes, emit_paint_list_with_text_system_scrolled_with_images,
+    Device, InteractionStates, LiveryLayout, LiveryPaintList, StylePlane, StyleSet, TextPaintPhase,
+    TextRange, TextSystem, ViewportSizes, emit_paint_list_with_text_system_scrolled_with_images,
     hit_test_with_scroll, layout_with_text_system, resolve_styles,
 };
 use genet_render::{VisualAffinity, VisualCaret, VisualMovement, VisualSelection};
 use genet_scripted_dom::NodeId;
 use layout_dom_api::{LayoutDom, LocalName, Namespace, NodeKind};
-use paint_list_api::{ColorF, DeviceIntSize, LayoutPoint, LayoutRect, LayoutSize};
+use paint_list_api::{
+    ColorF, CommonPlacement, DeviceIntSize, LayoutPoint, LayoutRect, LayoutSize, PaintCmd, RectItem,
+};
 
 mod interaction;
 mod producer;
 #[cfg(test)]
 mod tests;
+#[cfg(test)]
+mod text_paint_tests;
+
+/// Host-owned focus inputs. Paint emission resolves their geometry in layout
+/// coordinates; viewport-space caret APIs remain separate for IME and input.
+pub(crate) type FocusedTextPaint = (NodeId, VisualCaret, Option<(usize, usize)>);
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum ScrollTarget {
@@ -518,6 +526,28 @@ impl OwnedLayout {
     ) -> Vec<genet_livery::TextRect> {
         let (scroll_x, scroll_y) = self.content_scroll(dom, node);
         let clip = self.content_clip(dom, node);
+        self.selection_rects_at(dom, node, start, end)
+            .into_iter()
+            .filter_map(|mut rect| {
+                rect.x -= scroll_x;
+                rect.y -= scroll_y;
+                match clip {
+                    Some(clip) => clip_text_rect(rect, clip),
+                    None => Some(rect),
+                }
+            })
+            .collect()
+    }
+
+    /// Unscrolled layout geometry for insertion inside the field's CSS paint
+    /// context. That context applies every ancestor clip, scroll and transform.
+    fn selection_rects_at<D: LayoutDom<NodeId = NodeId>>(
+        &self,
+        dom: &D,
+        node: NodeId,
+        start: usize,
+        end: usize,
+    ) -> Vec<genet_livery::TextRect> {
         // The selection starts where a caret at `start` would, and ends at
         // the close of the text before `end`.
         let (Some((anchor_node, anchor_offset)), Some((focus_node, focus_offset))) = (
@@ -533,20 +563,7 @@ impl OwnedLayout {
                 focus_node,
                 focus_offset,
             })
-            .map(|selection| {
-                selection
-                    .rects
-                    .into_iter()
-                    .filter_map(|mut rect| {
-                        rect.x -= scroll_x;
-                        rect.y -= scroll_y;
-                        match clip {
-                            Some(clip) => clip_text_rect(rect, clip),
-                            None => Some(rect),
-                        }
-                    })
-                    .collect()
-            })
+            .map(|selection| selection.rects)
             .unwrap_or_default()
     }
 
@@ -614,6 +631,7 @@ impl OwnedLayout {
         &mut self,
         dom: &D,
         viewport: DeviceIntSize,
+        focused: Option<FocusedTextPaint>,
         mut commands: F,
         mut fragment: G,
     ) -> LiveryPaintList
@@ -622,6 +640,47 @@ impl OwnedLayout {
         F: FnMut(u64) -> Option<Vec<paint_list_api::PaintCmd>>,
         G: FnMut(u64) -> Option<u64>,
     {
+        let text_paint = focused.map(|(node, caret, selection)| {
+            let selection_color = self
+                .selection_style(dom, node)
+                .map(|(bg, _)| ColorF {
+                    r: bg[0],
+                    g: bg[1],
+                    b: bg[2],
+                    a: bg[3],
+                })
+                .unwrap_or(ColorF {
+                    r: 0.20,
+                    g: 0.45,
+                    b: 0.90,
+                    a: 0.35,
+                });
+            let selection = selection
+                .map(|(start, end)| self.selection_rects_at(dom, node, start, end))
+                .unwrap_or_default()
+                .into_iter()
+                .map(|rect| text_rect_command(rect, selection_color))
+                .collect::<Vec<_>>();
+            let caret_color = self
+                .caret_color(dom, node)
+                .map(|rgba| ColorF {
+                    r: rgba[0],
+                    g: rgba[1],
+                    b: rgba[2],
+                    a: rgba[3],
+                })
+                .unwrap_or(ColorF {
+                    r: 0.92,
+                    g: 0.94,
+                    b: 0.98,
+                    a: 1.0,
+                });
+            let caret = self.caret_rect_at(dom, node, caret.byte).map(|mut rect| {
+                rect.width = 2.0;
+                text_rect_command(rect, caret_color)
+            });
+            (dom.opaque_id(node), selection, caret)
+        });
         let mut list = emit_paint_list_with_text_system_scrolled_with_images(
             dom,
             &self.styles,
@@ -636,21 +695,27 @@ impl OwnedLayout {
         // the document viewport transform is added so their indices and their
         // CSS paint context stay aligned.
         list.splice_host_leaf_slots(&mut commands, &mut fragment);
+        // These commands belong to the field, not to a window-wide overlay.
+        // The recorded slots retain its CSS clipping, opacity and transforms;
+        // raw coordinates avoid subtracting any scroll a second time.
+        list.splice_text_paint_slots(|owner, phase| {
+            let (focused_owner, selection, caret) = text_paint.as_ref()?;
+            if owner != *focused_owner {
+                return None;
+            }
+            Some(match phase {
+                // Keep the existing translucent selection over the field's
+                // glyphs and syntax backgrounds, followed by its caret. Both
+                // stay below DOM surfaces painted after the field.
+                TextPaintPhase::BeforeContent => Vec::new(),
+                TextPaintPhase::AfterContent => selection
+                    .iter()
+                    .cloned()
+                    .chain(caret.iter().cloned())
+                    .collect(),
+            })
+        });
         list.translated(-self.viewport_scroll.0, -self.viewport_scroll.1)
-    }
-
-    pub(crate) fn push_rect(
-        list: &mut LiveryPaintList,
-        rect: genet_livery::TextRect,
-        color: ColorF,
-    ) {
-        list.push_overlay_rect(
-            LayoutRect::from_origin_and_size(
-                LayoutPoint::new(rect.x, rect.y),
-                LayoutSize::new(rect.width, rect.height),
-            ),
-            color,
-        );
     }
 
     pub(crate) fn append_scrollbars<D: LayoutDom<NodeId = NodeId>>(
@@ -993,6 +1058,16 @@ fn register_fonts(text: &mut TextSystem, fonts: &[crate::HostFont]) {
             None => text.register_font_bytes(font.bytes.clone()),
         }
     }
+}
+
+fn text_rect_command(rect: genet_livery::TextRect, color: ColorF) -> PaintCmd {
+    PaintCmd::DrawRect(RectItem {
+        placement: CommonPlacement::new(LayoutRect::from_origin_and_size(
+            LayoutPoint::new(rect.x, rect.y),
+            LayoutSize::new(rect.width, rect.height),
+        )),
+        color,
+    })
 }
 
 fn content_extent<D: LayoutDom<NodeId = NodeId>>(
