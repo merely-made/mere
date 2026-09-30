@@ -498,6 +498,8 @@ Gaz's optional `jscontact` feature: explicit public persona cards, unverified
 peer import, preserved source Cards and separate lossless private restoration.
 The founding plan records 82 tests, three doctests, scoped Clippy, crypto-free
 Wasm compilation and a peer-trust leak control. M1 library gates are complete;
-next is M2 resolver intake and trust/alarm work. Sibling phase-C repins
+M2 unverified address intake and a supplied WebFinger adapter landed
+2026-09-30, with sealed reload and replay preserving existing trust and proofs.
+Checked key/PLC intake, key-change alarms and back-claims remain open. Sibling phase-C repins
 remain open. The scoped `C:\t\cargo-targets\mere\gaz` build output is removed
 after recording its gates; receipts are retained.

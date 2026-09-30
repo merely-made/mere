@@ -12,10 +12,10 @@
 //!
 //! - **personae** — the trust-plane spine: master keypair, per-protocol
 //!   derivation, vault, sealed records, carry.
-//! - **gaz** — stored contacts: key-rooted records, petnames, per-endpoint
+//! - **gaz** — stored contacts: anchored records, petnames, per-endpoint
 //!   trust, kith/kin tiers.
 //! - **gazette** — handle resolution: turning a name into reachable,
-//!   trust-stated endpoints.
+//!   unverified address claims.
 //!
 //! The boundaries are the point:
 //!

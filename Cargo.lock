@@ -2169,6 +2169,7 @@ dependencies = [
  "blake3",
  "chirograph",
  "gaz",
+ "gazette",
  "hmac 0.13.0",
  "insigne",
  "muniment",
@@ -5559,8 +5560,10 @@ version = "0.0.1"
 dependencies = [
  "chirograph",
  "fleece 0.5.0 (git+https://github.com/merely-made/genet.git?rev=b1eb3af197111ecde34421bbe1bad2e6024ca564)",
+ "gaz",
  "genet-static-dom",
  "incipit",
+ "iri-string",
  "reqwest 0.12.28",
  "sceno",
  "serde",

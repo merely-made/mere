@@ -24,7 +24,8 @@ afterthought.
 
 ## State
 
-**Built:** the embeddable contact Ledger projection and WebFinger resolution.
+**Built:** the embeddable contact Ledger projection, WebFinger resolution, and
+supplied WebFinger address intake into Gaz.
 The Ledger reads contacts × selected facets, carries contributor provenance,
 addresses repeated list/row/detail instances, composes recipient-picker and
 Ledger clauses through `chirograph::CoordinatedSelection`, emits a semantic
@@ -38,6 +39,27 @@ peer-discovery endpoints (gemini capsules, gopher resources, misfin mailboxes,
 ActivityPub actors, HTTP profile pages, and a typed catch-all). NIP-05,
 atproto-did, and the moot web-of-trust directory land beside it behind the
 same facade.
+
+`intake::WebFingerIntake::from_import` accepts a queried account and an existing
+`WebFingerImport`, retains that resolver result, and exposes unverified address
+claims for `gaz::ContactBook::intake_addresses`. The query selects the contact;
+aliases never select or refile it. Valid account and generic DID aliases become
+names, including `did:key` and `did:plc` strings, without supplying keys or
+authenticated identity. Unmapped or malformed targets remain in the source.
+The host retains that source if it needs resolver provenance; Gaz's contact
+record remains its own model, and `WebFingerImport` is a classified result
+rather than a complete JRD archive.
+
+This adapter deliberately requires the returned subject to match the queried
+account under Gaz's normalization. RFC 7033 permits a different subject, but
+account migration needs a separate checked path. Returned subject and account
+aliases require an explicit `acct:` scheme. Account user case is retained,
+host case folds, and percent encodings normalize through Gaz's shared parser.
+The bounded input accepts ASCII DNS/A-label hosts and bracketed IPv6; Unicode
+account construction belongs to the host. The adapter does not fetch or mutate
+a book. Repeated intake adds only missing addresses and preserves existing
+trust and use history. Actual authenticated resolution, live host/store wiring,
+NIP-05 and checked PLC resolution remain open.
 
 **Unbuilt:** attaching the Ledger and recipient picker to the live
 [gaz](https://crates.io/crates/gaz) store in a host, feed polling (whose engine is
