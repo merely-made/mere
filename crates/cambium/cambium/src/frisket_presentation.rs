@@ -11,7 +11,8 @@ use workbench::{
 use crate::frisket::render_stack;
 use crate::{
     GenetCtx, GenetElement, Key, NamedKey, OverlayRole, OverlaySurface, PaneView, Placement, Slot,
-    TabMark, View, button, el, encode_pane_path, on_key, overlay_surface, request_focus,
+    TabMark, View, button, button_with, el, encode_pane_path, on_key, overlay_surface,
+    request_focus,
 };
 
 /// Render a canonical tree with separately controlled rails, minimum widths,
@@ -394,7 +395,22 @@ where
                 }
                 let open = collapsed.open;
                 let open_change = change.clone();
-                let rail = button(collapsed.label.clone(), move |state: &mut State, _| {
+                // A column of ordinary text boxes keeps the whole name visible
+                // even on renderers that do not implement CSS writing-mode.
+                let letters: Vec<_> = collapsed
+                    .label
+                    .chars()
+                    .map(|letter| {
+                        el::<_, State, Action>("span", letter.to_string())
+                            .attr("class", "frisket-rail-letter")
+                            .attr("style", "flex:0 0 auto;line-height:1.1;text-align:center;")
+                    })
+                    .collect();
+                let label = el::<_, State, Action>("span", letters)
+                    .attr("class", "frisket-rail-label")
+                    .attr("aria-hidden", "true")
+                    .attr("style", "display:flex;flex-direction:column;align-items:center;flex:0 1 auto;min-height:0;max-height:100%;overflow:auto;white-space:nowrap;");
+                let rail = button_with(label, move |state: &mut State, _| {
                     open_change(
                         state,
                         if open {
@@ -418,7 +434,7 @@ where
                 .attr("data-rail", anchor.0.to_string())
                 .attr(
                     "style",
-                    "box-sizing:border-box;width:100%;height:100%;min-width:0;padding:0;border-radius:0;overflow:hidden;writing-mode:vertical-rl;",
+                    "display:flex;align-items:center;justify-content:center;box-sizing:border-box;width:100%;height:100%;min-width:0;padding:0;border-radius:0;overflow:hidden;",
                 );
                 return Box::new(request_focus(
                     rail,
