@@ -1,5 +1,13 @@
 # Burn 0.22 Migration Plan
 
+**2026-09-30 allocator diagnosis, ruling 411:** four `burn-cubecl` selectors
+were retired locally at `124fc42b` after ruling 410's controls. Remote reclaim
+then left ten active allocations / 5,323,776 bytes against zero. A bounded
+diagnostic releases them after explicit GPU completion polling; this is not a
+repaired lifecycle pass. The zero baseline remains. A patch-design fork now
+asks where completion belongs. Browser extrema, migration acceptance, main
+promotion and downstream repins remain held. See §13.29.
+
 **2026-09-29 S13 stop:** native and patched browser comparisons pass, but
 pristine upstream pre.4 also passes all ten graph and eleven embedding cases.
 Stop rule 13.8(2) applies: carrying or retiring the patch awaits Mark's ruling.
@@ -2760,3 +2768,56 @@ reviews remain in `Code/testing/mere/receipts/2026-09-29/pre4-s13` under
 retirement, not main promotion. Affected-consumer runtime/build checks must now
 use the upstream source. Remaining S13 extrema and plain two-peer lifecycle
 receipts, S15 final documentation and S16 integration remain open.
+
+
+### 13.29 Allocator stop and bounded diagnosis (2026-09-30)
+
+The post-retirement source `124fc42bb4809dd27f9029d91e966915c97d5fd3`
+passed the recorded numerical, affected matrix and build checks, including
+remote release, extrema Wasm and bindgen. Build results do not stand for a
+headed extrema run. The plain two-peer lifecycle exited 1 after 17.922 seconds,
+without timing out: first reclaim left ten active allocations / 5,323,776 active
+bytes against zero after 400 cleanup polls. Source/configuration, executable
+and six model hashes stayed unchanged. Empty stdout means the strict prior
+numerical ceiling and fresh-session recovery were not established. The
+41,943,040 reserved bytes are cache accounting, not physical VRAM.
+Stop rule 13.8(4) applies.
+
+**Ruling 411:** Mark answered **"A!"** to bounded diagnosis with zero baseline
+preserved and ownership or patch-design changes returned as forks. The exact
+question/options/answer are in Isometry's wing design record, ruling 411,
+published at `052ee05`. **Reading, not ruled:** acceptance and integration
+remain held because the failed condition has not been repaired and reverified.
+
+A fixture-only diagnostic preserved the original gate and error. Its control
+reproduced ten allocations / 5,323,776 active bytes. Four additional samples
+without explicit sync retained those amounts. Existing `client.sync().await`
+returned `Ok` in 1.9222 ms; immediate and 100 ms later samples showed zero active
+allocations/bytes. Subsequent cleanup reduced reserved bytes from 41,943,040 to
+zero. Both processes deliberately exited 1, without timeout. Exact source
+bytes/timestamps and clean status were restored. Independent review verified
+source, executable/model/log hashes and rejected nine corrupted inputs.
+
+**Reading, not ruled:** the observations support completion callbacks retaining
+buffers after the worker's earlier wait. All-stream cleanup can submit work
+after current-stream synchronization, while native WGPU polling needs an active
+polling owner. The test does not identify every retained handle or rule out all
+detached readback/transfer lifetime defects. The old pre.2 receipt did not
+measure allocator counters, so this does not establish a pre.2 regression.
+
+The pending patch-design fork recommends fixing the existing burn-remote close
+path to await cleanup completion and propagate failures honestly. Alternatives
+are a broader CubeCL completion-polling change or parking the migration. No
+repair is selected by this annotation. A repair must retain zero-baseline and
+strict numerical/recovery gates, preserve a second live lease's identity and
+tensor values, and reject an injected synchronization failure. A device-wide
+wait may wait on other queued work; isolated scheduling is not established.
+
+See [the diagnosis receipt](../testing/2026-09-30_pre4_allocator_diagnosis.md)
+for measurements and raw logs. Sealed external evidence remains under
+`Code/testing/mere/receipts/2026-09-29/pre4-s13/allocator-diagnosis`.
+The decoder and remote-native-reference verifier candidates and three main
+reconciliation lock candidates remain unapplied. Browser extrema, S15 closure,
+S16 promotion and downstream repins remain held. The existing migration worktree
+is retained for this gate. The shared Mere target holds a diagnostic executable;
+rebuild it before using it for acceptance. No new target or Cargo home was made.

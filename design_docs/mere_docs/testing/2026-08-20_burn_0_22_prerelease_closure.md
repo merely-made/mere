@@ -1,5 +1,16 @@
 # Burn 0.22 prerelease closure receipt
 
+**2026-09-30 allocator stop:** four local `burn-cubecl` selectors were retired
+at `124fc42b` after ruling 410's controls. Remaining numerical/matrix/build
+checks passed, but remote reclaim left ten allocations / 5,323,776 active bytes
+against zero. Ruling 411 authorized bounded diagnosis. Explicit post-failure
+GPU completion polling released active allocations; both diagnostic runs kept
+the original failure, and source bytes/timestamps were restored. This is not a
+repaired lifecycle pass. See migration plan §13.29 and
+[the diagnosis receipt](2026-09-30_pre4_allocator_diagnosis.md).
+The patch-design fork, zero-baseline requirement and remaining acceptance/main
+promotion holds remain. Historical text below retains its original scope.
+
 **2026-09-29 later S13 annotation:** the native comparison and all 21 patched
 browser cases pass. Pristine upstream pre.4 also passes all 21 cases, with no
 GPU errors. This triggers migration-plan §13.8(2), rather than satisfying the
