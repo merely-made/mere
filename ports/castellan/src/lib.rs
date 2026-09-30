@@ -66,6 +66,8 @@
 
 #[cfg(feature = "keeper")]
 pub mod authority;
+#[cfg(feature = "keeper")]
+mod sealed_storage;
 pub mod otp;
 #[cfg(feature = "keeper")]
 pub mod projection;

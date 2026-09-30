@@ -63,7 +63,12 @@ pub fn capture_into(slot: Rc<RefCell<Option<PendingFrame>>>) -> CaptureFn {
     })
 }
 
-fn start(surface: &dyn Surface, view: &wgpu::TextureView, width: u32, height: u32) -> PendingFrame {
+pub(crate) fn start(
+    surface: &dyn Surface,
+    view: &wgpu::TextureView,
+    width: u32,
+    height: u32,
+) -> PendingFrame {
     let width = width.max(1);
     let height = height.max(1);
     let device = surface.device();
