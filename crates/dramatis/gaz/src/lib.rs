@@ -79,9 +79,11 @@
 //!
 //! ## Status
 //!
-//! Pre-1.0. The data model exists and is tested. Persistence over `muniment`
-//! and the adapters that turn resolver output into records are the next
-//! lifts; see the founding plan in `design_docs/`.
+//! Pre-1.0. The data model and optional persona-scoped persistence over
+//! Muniment exist. Enable `muniment` for its `persistence` module, and let the host
+//! choose its backend and codec; Castellan/Pandect supply host sealing. Enable
+//! `jscontact` for public persona cards, unverified peer imports and explicit
+//! private backups. Resolver intake remains in the founding plan in `design_docs/`.
 
 #![warn(missing_docs)]
 
@@ -90,6 +92,10 @@ pub mod book;
 pub mod contact;
 pub mod endpoint;
 pub mod handle;
+#[cfg(feature = "jscontact")]
+pub mod jscontact;
+#[cfg(feature = "muniment")]
+pub mod persistence;
 pub mod proof;
 pub mod trust;
 
@@ -99,6 +105,8 @@ pub use contact::{AttestError, AttestedKey, Contact, ContactError, ContactTier, 
 pub use endpoint::{Endpoint, EndpointKind};
 pub use handle::{Handle, HandleKind};
 pub use insigne::{KeyAlgorithm, KeyParseError, TypedKey};
+#[cfg(feature = "muniment")]
+pub use persistence::{PersistenceError, load_book, save_book};
 pub use proof::KeyProof;
 pub use trust::{ProofMethod, TrustState};
 

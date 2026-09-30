@@ -276,7 +276,14 @@ pub fn document_projection(
 ) -> DocumentA11yProjection {
     use layout_dom_api::LayoutDom as _;
     let focus = focus.and_then(|opaque| find_opaque(dom, dom.document(), opaque));
-    genet_render::document_a11y_projection(dom, layout.fragments(), focus, 0)
+    genet_render::document_a11y_projection_with_generated_text(
+        dom,
+        layout.fragments(),
+        focus,
+        0,
+        None,
+        &|node| layout.generated_text(dom, node),
+    )
 }
 
 fn find_opaque(dom: &ScriptedDom, node: NodeId, opaque: u64) -> Option<NodeId> {
@@ -848,8 +855,8 @@ pub use host::{
     AppCtx, AppFrameInsets, AppHook, CaptureFn, CloseDisposition, CloseRequest, CloseRequestHook,
     FocusedTextHook, FocusedTextSlot, FrameHook, FrameProfile, Hook, Host, HostFont, HostHooks,
     HostImage, HostOptions, HostPointer, HostState, IdlePolicy, Init, KeyInterceptHook,
-    PaintCaptureFn, RelayoutProfile, Runner, ScrollIntoView, WindowFrame, ZOOM_LADDER, env_size,
-    fit_zoom, ladder_step,
+    PaintCaptureFn, PresentationObserver, PresentedFrame, RelayoutProfile, Runner, ScrollIntoView,
+    StampedCaptureFn, WindowFrame, ZOOM_LADDER, env_size, fit_zoom, ladder_step,
 };
 pub use wake::HostWake;
 pub use window_verbs::{AppRegion, WindowCommand, WindowCommands, WindowGeometry};

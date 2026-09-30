@@ -4,38 +4,22 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! Portable emit scaffold for the registrar layer.
+//! Portable diagnostic producers and a bounded, nonblocking staging queue.
 //!
-//! Slice 59 ("Option A" per the diagnostics-emit DI design choice).
-//! Registries extracted as their own crates need a way to emit
-//! diagnostic events without depending on the shell-side runtime.
-//! This module provides:
-//!
-//! - [`DiagnosticEvent`] — the *portable subset* of the diagnostic
-//!   event taxonomy (Span + Message variants). Rich shell-side
-//!   variants (CompositorFrame, IntentBatch) carry shell-only
-//!   payload types and stay in tree.
-//! - [`SpanPhase`], [`StructuredPayloadField`] — the value types
-//!   the portable variants reference.
-//! - [`install_global_sender`] / [`emit_event`] — the same
-//!   thread_local-aware global sender pattern that ran in the
-//!   shell-side runtime, lifted here so registry crates can
-//!   `use registry::diagnostics::emit_event` directly.
-//!
-//! ## Bridging to the shell-side runtime
-//!
-//! The shell-side runtime maintains its own richer DiagnosticEvent +
-//! ring buffer for events it cares about (CompositorFrame batches,
-//! IntentBatch records). Bridging is straightforward: at startup the
-//! shell-side calls [`install_global_sender`] with a Sender whose
-//! receiver translates each `registry::diagnostics::DiagnosticEvent`
-//! into the shell-side's own variant (mapping is field-for-field
-//! since the variant shapes match). This bridging lands per-registry
-//! as register-mod-loader, register-identity, etc. extract and start
-//! emitting through this scaffold.
+//! Hosts explicitly install a configurable bounded sender. Existing producers
+//! keep `emit_event`; callers needing admission results use `try_emit_event`.
+//! No sink, disabled collection, contention, disconnection and rejection have
+//! observable counters. Producers must redact and bound payload construction
+//! before emission; already allocated strings are not retroactively bounded.
+//! A receiver feeds product-owned collectors. It is not an independent-reader
+//! store: Apparatus supplies independent cursors after product projection.
 
 use std::sync::OnceLock;
-use std::sync::mpsc::Sender;
+use std::{marker::PhantomData, rc::Rc};
+
+mod queue;
+use crate::diagnostics::DiagnosticCorrelation;
+pub use queue::*;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum SpanPhase {
@@ -91,59 +75,83 @@ pub enum DiagnosticEvent {
     },
 }
 
-static GLOBAL_DIAGNOSTICS_TX: OnceLock<Sender<DiagnosticEvent>> = OnceLock::new();
+static GLOBAL_DIAGNOSTICS_TX: OnceLock<DiagnosticSender> = OnceLock::new();
+static UNINSTALLED_LOSS: queue::Counters = queue::Counters::new();
 
 thread_local! {
-    /// Per-thread sender override. Writes via `install_global_sender`;
-    /// `emit_event` checks this first and falls back to the global
-    /// `OnceLock` when absent. Lets each test inject its own sender
-    /// (the OnceLock is one-shot, so multi-test isolation needs a
-    /// per-thread channel). Production code that only calls
-    /// `install_global_sender` once at startup writes both the
-    /// thread-local (for the calling thread) and the global (for all
-    /// other threads).
-    ///
-    /// Slice 68c-fix: was `#[cfg(test)]`-gated so it only activated
-    /// for register-diagnostics' own tests. Cross-crate callers
-    /// (register-mod-loader tests) bypassed it and saw OnceLock
-    /// staleness across tests. The gate was removed; the thread-local
-    /// state is a few bytes per thread and benign in production.
-    static THREAD_LOCAL_DIAGNOSTICS_TX: std::cell::RefCell<Option<Sender<DiagnosticEvent>>> =
+    /// Scoped thread-local injection for isolated callers and tests. The
+    /// global sender is used only when the current thread has no override.
+    static THREAD_LOCAL_DIAGNOSTICS_TX: std::cell::RefCell<Option<DiagnosticSender>> =
         const { std::cell::RefCell::new(None) };
 }
 
-/// Install the global sender. Hosts call this once at startup. Tests
-/// call it per-test to set up isolated channels — the per-thread
-/// override (see [`THREAD_LOCAL_DIAGNOSTICS_TX`]) makes per-test
-/// isolation work despite the global being a one-shot `OnceLock`.
-pub fn install_global_sender(sender: Sender<DiagnosticEvent>) {
-    let _ = GLOBAL_DIAGNOSTICS_TX.set(sender.clone());
-    THREAD_LOCAL_DIAGNOSTICS_TX.with(|slot| {
-        *slot.borrow_mut() = Some(sender);
-    });
+/// Install once at host startup. A second installation returns an error,
+/// never pretending to replace the already installed sink. Tests use the
+/// explicitly scoped thread-local injection instead.
+pub fn install_global_sender(sender: DiagnosticSender) -> Result<(), SenderAlreadyInstalled> {
+    GLOBAL_DIAGNOSTICS_TX
+        .set(sender)
+        .map_err(|_| SenderAlreadyInstalled)
 }
 
-/// Emit a diagnostic event. Routes to the per-thread sender override
-/// if set, else to the global sender if installed, else drops
-/// silently (matches the shell-side runtime's pre-startup tolerance).
-pub fn emit_event(event: DiagnosticEvent) {
-    let mut event = Some(event);
-    let mut handled = false;
-    THREAD_LOCAL_DIAGNOSTICS_TX.with(|slot| {
-        if let Some(tx) = slot.borrow().as_ref() {
-            if let Some(payload) = event.take() {
-                let _ = tx.send(payload);
-            }
-            handled = true;
-        }
-    });
-    if handled {
-        return;
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct SenderAlreadyInstalled;
+
+/// Thread-local scope, restored on drop. The guard cannot move to another
+/// thread. Spawned workers require explicit sender injection or the global sink.
+pub struct ThreadSenderGuard {
+    previous: Option<DiagnosticSender>,
+    _thread_bound: PhantomData<Rc<()>>,
+}
+pub fn scoped_thread_sender(sender: DiagnosticSender) -> ThreadSenderGuard {
+    let previous = THREAD_LOCAL_DIAGNOSTICS_TX.with(|slot| slot.replace(Some(sender)));
+    ThreadSenderGuard {
+        previous,
+        _thread_bound: PhantomData,
     }
-    if let Some(tx) = GLOBAL_DIAGNOSTICS_TX.get() {
-        if let Some(payload) = event.take() {
-            let _ = tx.send(payload);
-        }
+}
+impl Drop for ThreadSenderGuard {
+    fn drop(&mut self) {
+        THREAD_LOCAL_DIAGNOSTICS_TX.with(|slot| {
+            slot.replace(self.previous.take());
+        });
+    }
+}
+
+pub fn uninstalled_loss() -> EmissionLoss {
+    UNINSTALLED_LOSS.snapshot()
+}
+
+/// Compatibility producer entry point. Admission outcomes remain observable
+/// through the sender's loss counters even when the producer ignores them.
+pub fn emit_event(event: DiagnosticEvent) {
+    let _ = try_emit_event(event);
+}
+
+pub fn try_emit_event(event: DiagnosticEvent) -> EmitOutcome {
+    route(event, None)
+}
+
+pub fn try_emit_correlated(event: DiagnosticEvent, key: DiagnosticCorrelation) -> EmitOutcome {
+    route(event, Some(key))
+}
+
+fn route(event: DiagnosticEvent, key: Option<DiagnosticCorrelation>) -> EmitOutcome {
+    let sender = THREAD_LOCAL_DIAGNOSTICS_TX
+        .with(|slot| slot.borrow().clone())
+        .or_else(|| GLOBAL_DIAGNOSTICS_TX.get().cloned());
+    match sender {
+        Some(sender) => match key {
+            Some(key) => sender.try_send_correlated(event, key),
+            None => sender.try_send(event),
+        },
+        None => {
+            UNINSTALLED_LOSS.reject(EmissionRejection::NoSink);
+            EmitOutcome::Rejected {
+                sequence: None,
+                reason: EmissionRejection::NoSink,
+            }
+        },
     }
 }
 
@@ -161,7 +169,6 @@ pub fn emit_span_duration(name: &'static str, duration_us: u64) {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::sync::mpsc;
 
     #[test]
     fn emit_with_no_sender_is_silent() {
@@ -174,17 +181,15 @@ mod tests {
 
     #[test]
     fn emit_routes_to_thread_local_sender() {
-        let (tx, rx) = mpsc::channel();
-        THREAD_LOCAL_DIAGNOSTICS_TX.with(|slot| {
-            *slot.borrow_mut() = Some(tx);
-        });
+        let (tx, rx) = diagnostic_channel(IngressLimits::default());
+        let _scope = scoped_thread_sender(tx);
 
         emit_event(DiagnosticEvent::MessageSent {
             channel_id: "test.routed",
             byte_len: 7,
         });
 
-        let received = rx.try_recv().expect("event should arrive");
+        let received = rx.try_drain(1).unwrap().packets.remove(0).event;
         match received {
             DiagnosticEvent::MessageSent {
                 channel_id,
@@ -204,14 +209,12 @@ mod tests {
 
     #[test]
     fn emit_span_duration_helper_produces_exit_span() {
-        let (tx, rx) = mpsc::channel();
-        THREAD_LOCAL_DIAGNOSTICS_TX.with(|slot| {
-            *slot.borrow_mut() = Some(tx);
-        });
+        let (tx, rx) = diagnostic_channel(IngressLimits::default());
+        let _scope = scoped_thread_sender(tx);
 
         emit_span_duration("test.span", 1234);
 
-        let received = rx.try_recv().expect("span should arrive");
+        let received = rx.try_drain(1).unwrap().packets.remove(0).event;
         match received {
             DiagnosticEvent::Span {
                 name,
