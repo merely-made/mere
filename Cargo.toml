@@ -28,6 +28,7 @@ members = [
     "crates/intel/esp",
     "crates/intel/eidetic-search",
     "crates/intel/mora-cmudict",
+    "crates/intel/reference-data",
     "crates/stickleback",
     "crates/murm/murm",
     "crates/murm/transport",
@@ -224,6 +225,7 @@ numen = { version = "0.2.0", path = "crates/conatus/numen" }
 esp = { version = "0.1.0", path = "crates/intel/esp" }
 mora = "0.1.0"
 mora-cmudict = { version = "0.0.1", path = "crates/intel/mora-cmudict" }
+reference-data = { version = "0.0.1", path = "crates/intel/reference-data" }
 # The projection contract, executed in duplicate (was graphshell-protocol;
 # renamed 2026-08-14 because the contract is the family's, not the portal's).
 chirograph = { version = "0.0.2", path = "crates/chirograph" }
@@ -604,6 +606,7 @@ mere-proofs = { path = "crates/system/proofs" }
 mere-surface-api = { path = "crates/system/surface-api" }
 mere-transport = { path = "crates/murm/transport" }
 mora-cmudict = { path = "crates/intel/mora-cmudict" }
+reference-data = { path = "crates/intel/reference-data" }
 muniment = { path = "crates/eidetic/muniment" }
 nematic = { path = "crates/nematic/nematic" }
 notochord = { path = "crates/system/notochord" }

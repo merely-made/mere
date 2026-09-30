@@ -13499,6 +13499,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "reference-data"
+version = "0.0.1"
+dependencies = [
+ "blake3",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "reflink-copy"
 version = "0.1.30"
 source = "registry+https://github.com/rust-lang/crates.io-index"
