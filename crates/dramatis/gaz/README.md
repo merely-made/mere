@@ -114,6 +114,14 @@ caller's checks. At-rest sealing belongs to the host's supplied backend. The
 JSON/postcard tests use memory and real redb reopen, proving persona isolation,
 overwrite behavior, malformed-record refusal and artifact rechecking.
 
+Hosts composing Castellan's `keeper` feature can require sealing with
+`PersonaeHost::sealed_backend(persona, backend)` before constructing the
+`SlotStore`. It refuses a missing wallet epoch; it never selects cleartext.
+Pandect supplies the adapter, so Gaz gains no cryptographic dependency. The
+host maps its persona to Gaz's opaque scope and owns historical epoch loading
+and rollback policy. The host receipt also checks the entire closed redb file
+for cleartext petnames and refuses damaged or transplanted ciphertext.
+
 ## License
 
 MPL-2.0 (see LICENSE).

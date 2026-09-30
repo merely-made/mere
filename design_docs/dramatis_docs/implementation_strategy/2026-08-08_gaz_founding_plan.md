@@ -11,8 +11,8 @@ contacts. JSContact is ruled *an* exchange format (M1). M0.5 landed the same
 day, and `TypedKey` then moved to insigne, as Mark ruled. M1 (at-rest sealing
 ruled: gaz stays crypto-free) and M2 are drafted with done-conditions. The
 retained-proof slice of M2 landed on 2026-09-29 under Insigne phase D;
-M1's storage gate is implemented on 2026-09-29; host sealing, JSContact
-exchange and resolver intake remain open.
+M1's storage gate is implemented on 2026-09-29 and its host sealing gate on
+2026-09-30; JSContact exchange and resolver intake remain open.
 **Scope**: the contact layer, standalone. The record model, the persona-scoped
 book, then storage over muniment, then the adapters that turn resolver output
 into records, then mere reconciliation.
@@ -263,12 +263,16 @@ is monotonic, so a replayed or late event cannot rewind a record.
   - [x] Round-trip tests over `MemoryBackend` and redb, both a JSON and a
         binary codec, and a two-persona test proving one persona's load
         cannot return the other's contacts.
-  - [ ] **Ruled 2026-09-23 — at-rest sealing is the host's.** This file holds
+  - [x] **Ruled 2026-09-23 — at-rest sealing is the host's.** This file holds
         who a person knows. Access records are sealed at rest through
         castellan's `PersonaeHost::payload_sealer`; muniment itself has no
         sealing layer. Mark accepted the proposal: gaz stays plain and
         crypto-free, and the host supplies a sealed backend. Done when a
         host-side receipt shows the stored bytes carry no cleartext petname.
+        Implemented 2026-09-30 through Pandect's `WalletSealedBackend` and
+        Castellan's required `PersonaeHost::sealed_backend` supply point;
+        `ports/castellan/tests/sealed_contacts.rs` checks JSON and postcard
+        books in the entire closed redb file, then reopens and rechecks proofs.
   - [ ] **Ruled 2026-09-23 — JSContact is *an* exchange format** (Mark: "the"
         was too strong). The standards survey grades
         JSContact (RFC 9553) ADOPT with "gaz (the contact store)" as consumer,
@@ -582,3 +586,65 @@ The first four M1 done-conditions are met. **M1 remains open** for the host-side
 sealed-backend receipt and JSContact import/export/published-card exchange.
 Gazette intake and its trust/alarm behavior remain M2, with no live Gaz host
 integration claimed by this storage gate.
+
+**2026-09-30, M1 host sealing gate.** Pandect owns `WalletSealedBackend<B>`
+over the backend the host selects. Castellan's keeper supplies it through
+`PersonaeHost::sealed_backend(persona, backend)`, refusing when a carry root
+or staged private epoch is unavailable. Gaz's dependency graph is unchanged;
+the host applies sealing below its existing `SlotStore` and `save_book` /
+`load_book` calls.
+
+The adapter reuses the real `WalletEpochSealer`. A versioned envelope retains
+the epoch marker and ciphertext; the authenticated inner value binds the
+logical slot key and carries a fresh random salt, so its exposed content digest
+does not reveal equality or permit guessing a small record. Reads authenticate,
+check the plaintext hash, and check the slot key before returning bytes.
+Plaintext, corrupted envelopes, wrong personas/keys/epochs, and copies at
+another key are errors. Refused bytes remain intact. All puts in a batch are
+sealed before the underlying backend receives any writes.
+
+The host receipt stages actual wallet state, obtains the adapter from
+Castellan, saves two persona books, closes every redb and keeper handle,
+checks the entire durable file for cleartext petnames, and reopens both books.
+The encoded JSON and postcard inputs each contain the tested petname, so the
+absence check is not merely an encoding artifact. A retained attestation checks
+again after reopening. Wrong-persona reads, damaged ciphertext, plaintext
+substitution, and slot transplantation refuse without erasing stored bytes;
+clearing one persona preserves the other. Adapter tests separately exercise
+ordered scans, listing, write batches, repeated writes, and explicit historical
+epoch loading after rotation.
+
+Validation on Rust 1.98.1, with raw logs and source hashes retained under
+`C:\t\cargo-targets\mere\gaz-sealing-receipts`:
+
+- `cargo test -p pandect --lib wallet_sealed_backend --locked --offline -j 4`:
+  **three adapter tests pass**.
+- `cargo test -p castellan --features keeper --locked --offline -j 4`:
+  **76 unit tests, three host receipts, and one doctest pass**.
+- Temporarily bypassing sealing in `Backend::put` makes both durable-petname
+  tests fail at the cleartext assertion (exit 101). Sealed writes are restored,
+  and the complete Castellan suite passes again.
+- `cargo clippy -p pandect -p castellan --lib --tests --features castellan/keeper
+  --no-deps --locked --offline -j 4 --message-format=json`: **completes with
+  no diagnostics in the four added Rust files**. Existing diagnostics in
+  Pandect, Castellan, and Kernel remain; this is not a whole-crate `-D warnings`
+  receipt.
+- `cargo check -p gaz --lib --no-default-features --locked --offline -j 4
+  --message-format=json`: **pass**, with Gaz and Insigne featureless and no
+  Muniment, Personae, or cryptographic library in the production artifacts.
+- `cargo check -p pandect --lib --target wasm32-unknown-unknown --locked
+  --offline -j 4 --message-format=json`, with the existing getrandom 0.3
+  browser selector `--cfg getrandom_backend="wasm_js"`: **pass**. The adapter
+  preserves Muniment's native `Send` / browser `?Send` future seam, requiring
+  `Sync` only on native. This is a compilation receipt, not browser storage
+  execution.
+
+This slice reuses the primary `C:\t\cargo-targets\mere` output. It creates no
+isolated worktree, target, or Cargo home.
+
+This meets M1's at-rest host receipt, not a claim that an application has wired
+Gaz into its contact UI. Keys remain visible, read/write transactions explicitly
+return `NotTransactional`, and replay of an older authenticated value at the
+same key is outside this adapter. Historical epoch supply and freshness remain
+host responsibilities. **M1 remains open for JSContact import, export, and
+published-card exchange.** M2 resolver intake follows that remaining gate.
