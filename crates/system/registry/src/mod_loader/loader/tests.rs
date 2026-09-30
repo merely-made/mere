@@ -15,7 +15,9 @@ use crate::diagnostics::channels::{
     CHANNEL_MOD_QUARANTINED, CHANNEL_MOD_ROLLBACK_FAILED, CHANNEL_MOD_ROLLBACK_SUCCEEDED,
     CHANNEL_MOD_UNLOAD_FAILED,
 };
-use crate::diagnostics::{DiagnosticEvent, install_global_sender};
+use crate::diagnostics::{
+    DiagnosticEvent, IngressLimits, diagnostic_channel, scoped_thread_sender,
+};
 
 fn test_manifest(id: &str, provides: &[&str], requires: &[&str]) -> ModManifest {
     ModManifest::new(
@@ -426,8 +428,8 @@ fn load_mod_rejects_unknown_capabilities() {
 
 #[test]
 fn load_all_rolls_back_applied_records_on_activation_failure() {
-    let (diag_tx, diag_rx) = std::sync::mpsc::channel();
-    install_global_sender(diag_tx);
+    let (diag_tx, diag_rx) = diagnostic_channel(IngressLimits::default());
+    let _diagnostic_scope = scoped_thread_sender(diag_tx);
 
     let protocol = test_manifest("mod:protocol", &["ProtocolRegistry"], &[]);
     let failing = test_manifest("mod:failing", &["protocol:test"], &["ProtocolRegistry"]);
@@ -458,17 +460,25 @@ fn load_all_rolls_back_applied_records_on_activation_failure() {
     assert_eq!(loaded, vec!["mod:protocol".to_string()]);
     assert_eq!(registry.get_status("mod:failing"), Some(ModStatus::Failed));
     assert_eq!(registry.extension_records_for("mod:failing"), None);
-    assert!(diag_rx.try_iter().any(|event| matches!(
-        event,
-        DiagnosticEvent::MessageSent { channel_id, .. }
-            if channel_id == CHANNEL_MOD_ROLLBACK_SUCCEEDED
-    )));
+    assert!(
+        diag_rx
+            .try_drain(usize::MAX)
+            .unwrap()
+            .packets
+            .into_iter()
+            .map(|packet| packet.event)
+            .any(|event| matches!(
+                event,
+                DiagnosticEvent::MessageSent { channel_id, .. }
+                    if channel_id == CHANNEL_MOD_ROLLBACK_SUCCEEDED
+            ))
+    );
 }
 
 #[test]
 fn load_all_quarantines_when_rollback_fails() {
-    let (diag_tx, diag_rx) = std::sync::mpsc::channel();
-    install_global_sender(diag_tx);
+    let (diag_tx, diag_rx) = diagnostic_channel(IngressLimits::default());
+    let _diagnostic_scope = scoped_thread_sender(diag_tx);
 
     let protocol = test_manifest("mod:protocol", &["ProtocolRegistry"], &[]);
     let failing = test_manifest("mod:failing", &["protocol:test"], &["ProtocolRegistry"]);
@@ -514,7 +524,13 @@ fn load_all_quarantines_when_rollback_fails() {
             }][..]
         )
     );
-    let emitted = diag_rx.try_iter().collect::<Vec<_>>();
+    let emitted = diag_rx
+        .try_drain(usize::MAX)
+        .unwrap()
+        .packets
+        .into_iter()
+        .map(|packet| packet.event)
+        .collect::<Vec<_>>();
     assert!(emitted.iter().any(|event| matches!(
         event,
         DiagnosticEvent::MessageSent { channel_id, .. }
@@ -529,8 +545,8 @@ fn load_all_quarantines_when_rollback_fails() {
 
 #[test]
 fn unload_mod_quarantines_and_preserves_records_on_removal_failure() {
-    let (diag_tx, diag_rx) = std::sync::mpsc::channel();
-    install_global_sender(diag_tx);
+    let (diag_tx, diag_rx) = diagnostic_channel(IngressLimits::default());
+    let _diagnostic_scope = scoped_thread_sender(diag_tx);
 
     let protocol = test_manifest("mod:protocol", &["ProtocolRegistry"], &[]);
     let target = test_manifest("mod:target", &["protocol:test"], &["ProtocolRegistry"]);
@@ -547,7 +563,13 @@ fn unload_mod_quarantines_and_preserves_records_on_removal_failure() {
         },
         |_record| Ok(()),
     );
-    let _ = diag_rx.try_iter().collect::<Vec<_>>();
+    let _ = diag_rx
+        .try_drain(usize::MAX)
+        .unwrap()
+        .packets
+        .into_iter()
+        .map(|packet| packet.event)
+        .collect::<Vec<_>>();
 
     let error = registry
         .unload_mod_with("mod:target", |record| match record {
@@ -575,7 +597,13 @@ fn unload_mod_quarantines_and_preserves_records_on_removal_failure() {
             }][..]
         )
     );
-    let emitted = diag_rx.try_iter().collect::<Vec<_>>();
+    let emitted = diag_rx
+        .try_drain(usize::MAX)
+        .unwrap()
+        .packets
+        .into_iter()
+        .map(|packet| packet.event)
+        .collect::<Vec<_>>();
     assert!(emitted.iter().any(|event| matches!(
         event,
         DiagnosticEvent::MessageSent { channel_id, .. }

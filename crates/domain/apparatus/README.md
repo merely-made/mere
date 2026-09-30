@@ -3,11 +3,13 @@
 Shared diagnostics home for [mere](https://crates.io/crates/mere).
 Package `mere-apparatus`, library `apparatus`. The September 29 ruling assigns
 bounded observations and inspection to this crate; the current implementation
-provides a renderer-independent bounded record store and retains the earlier
+provides a renderer-independent bounded record store and read-only inspection
+data, and retains the earlier
 peripheral system-inspector skeleton behind its default `projection` feature.
 
 See the [diagnostics plan](../../../design_docs/mere_docs/implementation_strategy/2026-06-08_system_diagnostics_and_accessibility_plan.md)
-for the accepted ownership boundaries and pending two-consumer qualification.
+for the accepted ownership boundaries, qualified bounded-core consumers and
+remaining worker/image and human accessibility gates.
 
 ## API
 
@@ -18,6 +20,8 @@ for the accepted ownership boundaries and pending two-consumer qualification.
 | `RetentionLimits` | Product-configured count, byte and age limits; any zero disables retention. |
 | `Cursor`, `Batch<P>`, `Gap`, `RunBoundary` | Independent non-destructive readers, copied batches, explicit unavailable ranges and reset boundaries. |
 | `StoreStats`, `LossSummary` | Retained range/bytes and cumulative per-run rejected, evicted, expired and known dropped counts. |
+| `inspect_batch`, `Inspection`, `InspectionLine`, `InspectionLimits` | Bounded read-only rows over an independent batch, with loss/gaps, producer-supplied labels, scoped causes and explicit unavailable correlation. |
+| `project_inspection` | Structural accessibility projection of those same rows when `projection` is enabled; the product supplies layout/focus and any separately authorized actions. |
 | `project_skeleton() -> uxtree::UxTree` | Emits the v0 skeleton subtree when `projection` is enabled. Takes no input. |
 | `VERSION`, `STAGE` | Crate version string and lifecycle marker (`"pre-alpha"`). |
 
@@ -73,6 +77,16 @@ storage is installed. Products retain operation and persistence authority.
 
 ## Skeleton node shape
 
+The current `inspect_batch` interface is independent of the legacy skeleton.
+Products supply borrowed, already redacted payload labels; arbitrary payload
+fields are never formatted by the shared crate. Configured record/gap/text
+limits bound display construction, with text capped at Unicode scalar
+boundaries. Summary counters distinguish store loss from omitted display rows.
+Missing instrumentation remains unknown; absent operation/cause/revision/frame
+references remain unavailable. Cause references keep their run/source scope.
+Rows are read-only and do not resolve or dispatch actions. `project_inspection`
+supplies structural labels without claiming painted bounds or human AT acceptance.
+
 ```text
 apparatus (Role::Group, label "Apparatus")
   ├─ tracing events               (Role::Group, empty)
@@ -94,6 +108,9 @@ cursors cannot be deserialized/restored into another store.
 
 ## Status
 
-Pre-1.0. Core storage has focused contract tests. Two product consumers and
-correlated native receipt qualification remain separate gates. Skeleton sections
-are empty placeholders; a working diagnostics interface is not implied.
+Pre-1.0. Storage and inspection have focused contract tests. Turnstone and
+Redshank qualify the bounded storage/receipt contract; exact action/worker/image
+correlation and human AT remain separate gates. The inspection API's focused
+all-feature library gate passes 22 tests on 2026-09-30. Product view adoption
+and native qualification are in progress. Skeleton sections remain empty
+placeholders; they do not imply a working diagnostics interface.
