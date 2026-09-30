@@ -19,11 +19,10 @@
 //! through the shell-side runtime mod.
 
 pub mod channels;
+mod correlation;
 pub mod descriptor;
 pub mod emit;
+pub use correlation::DiagnosticCorrelation;
 
 pub use descriptor::*;
-pub use emit::{
-    DiagnosticEvent, SpanPhase, StructuredPayloadField, emit_event, emit_span_duration,
-    install_global_sender,
-};
+pub use emit::*;
