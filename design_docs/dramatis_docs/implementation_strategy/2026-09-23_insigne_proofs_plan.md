@@ -493,7 +493,11 @@ Phase D meets its done-condition. Gaz M1's storage gate is implemented
 2026-09-29 in the founding plan: persona-scoped Muniment save/load and
 JSON/postcard disk reopening. Host sealing landed 2026-09-30 through
 Castellan and Pandect, with durable-byte concealment, authentication refusal,
-and retained-proof rechecking. JSContact exchange remains the M1 gate before
-the remaining M2 resolver intake and trust/alarm work. Sibling phase-C repins
+and retained-proof rechecking. JSContact exchange landed 2026-09-30 behind
+Gaz's optional `jscontact` feature: explicit public persona cards, unverified
+peer import, preserved source Cards and separate lossless private restoration.
+The founding plan records 82 tests, three doctests, scoped Clippy, crypto-free
+Wasm compilation and a peer-trust leak control. M1 library gates are complete;
+next is M2 resolver intake and trust/alarm work. Sibling phase-C repins
 remain open. The scoped `C:\t\cargo-targets\mere\gaz` build output is removed
 after recording its gates; receipts are retained.

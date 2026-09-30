@@ -8,11 +8,12 @@ proposals from that day's critical pass: anchoring on a peer's root with
 attested keys held concurrently, a whole-identity Reticulum key (verified
 against Reticulum's reference implementation), and `Anchor::Local` for keyless
 contacts. JSContact is ruled *an* exchange format (M1). M0.5 landed the same
-day, and `TypedKey` then moved to insigne, as Mark ruled. M1 (at-rest sealing
-ruled: gaz stays crypto-free) and M2 are drafted with done-conditions. The
+day, and `TypedKey` then moved to insigne, as Mark ruled. M1 keeps sealing at the host and JSContact at the exchange boundary. M2 is
+drafted with done-conditions. The
 retained-proof slice of M2 landed on 2026-09-29 under Insigne phase D;
 M1's storage gate is implemented on 2026-09-29 and its host sealing gate on
-2026-09-30; JSContact exchange and resolver intake remain open.
+2026-09-30; JSContact exchange landed 2026-09-30, completing the M1 library
+gates. M2 resolver intake and application wiring remain open.
 **Scope**: the contact layer, standalone. The record model, the persona-scoped
 book, then storage over muniment, then the adapters that turn resolver output
 into records, then mere reconciliation.
@@ -273,7 +274,7 @@ is monotonic, so a replayed or late event cannot rewind a record.
         Castellan's required `PersonaeHost::sealed_backend` supply point;
         `ports/castellan/tests/sealed_contacts.rs` checks JSON and postcard
         books in the entire closed redb file, then reopens and rechecks proofs.
-  - [ ] **Ruled 2026-09-23 — JSContact is *an* exchange format** (Mark: "the"
+  - [x] **Ruled 2026-09-23 — JSContact is *an* exchange format** (Mark: "the"
         was too strong). The standards survey grades
         JSContact (RFC 9553) ADOPT with "gaz (the contact store)" as consumer,
         though its §7 calls consumer assignments "a starting point, not a
@@ -286,12 +287,34 @@ is monotonic, so a replayed or late event cannot rewind a record.
         property, so a stored Card would be mostly vendor properties that no
         other reader understands, while gaz took on JSContact's shapes as
         internal constraints. In an exported Card, `uid` is the anchor as a
-        URI: `did:key:…`, `did:plc:…`, or `urn:uuid:…` for `Local`. Verified
-        against RFC 9553 on 2026-09-23: `uid` is mandatory and SHOULD be a
-        `urn:uuid` but MAY be any URI; keys go in `cryptoKeys`, handles and
-        service URIs in `onlineServices`, gaz's own state in domain-prefixed
-        vendor properties (§1.8.1), which makes a gaz → Card → gaz round-trip
-        lossless.
+        standard identifier: `did:key:…`, `did:plc:…`, `urn:uuid:…` for
+        `Local`, or Reticulum's bare rnid hex. Corrected against RFC 9553
+        §2.1.9 on 2026-09-30: mandatory `uid` permits a URN, URI or free text;
+        a version-4 UUID is preferred. Keys go in `cryptoKeys`, handles and
+        service addresses in `onlineServices`, Gaz-specific state in host-domain
+        vendor properties (§1.8.1). Implemented behind optional `jscontact`:
+        `publish(&PublicCard)` accepts only explicitly selected public fields;
+        peer `import` always makes unverified kith claims and ignores local
+        state. Separate `export_contact` / `restore_contact` preserve the whole
+        PRIVATE Contact, including u64 history encoded as JSON text, and refuse
+        disagreement with public projections. Only the host's trusted backups
+        may use restoration. Typed artifacts remain unchecked claims.
+        Reticulum crypto resources are data URIs containing all 64 public bytes.
+        The host supplies its controlled extension domain; other domains remain
+        opaque. Imported source Cards retain unknown properties and original
+        map IDs separately from Contact. Generated IDs survive reordering and
+        unrelated additions. Foreign non-anchor uids require a caller-selected
+        local id; PLC imports require a root-bearing identity claim. This is
+        bounded exchange support, not full RFC validation, vCard conversion,
+        resolver merging, Ledger UI or network publication.
+        Receipt: 82 unit tests plus three doctests, scoped Clippy with warnings
+        denied, and a Wasm production check. A deliberately inserted peer
+        restore path makes the trust-isolation test fail; restoring the source
+        returns the full suite to green. The JSContact-only production graph excludes
+        Personae and cryptography, and the default graph excludes the optional
+        JSON/URI exchange dependencies. Raw logs and the mutation receipt are
+        retained in `C:\t\cargo-targets\mere\gaz-jscontact-receipts`.
+        Next: M2 resolver intake.
 - **M2 — resolver intake.** The seam where resolution meets storage. Gazette
   will depend on gaz, not the reverse (gazette was promoted to a port on
   2026-08-23 and "composes gaz rather than replaces it"), so gaz cannot consume
@@ -317,8 +340,8 @@ is monotonic, so a replayed or late event cannot rewind a record.
         signed certificates, or opaque protocol evidence with its format and
         method. Typed key relationships are checked on insertion and load;
         cryptographic checks and current authority remain the caller's.
-        JSON/postcard reload and recheck are proven. PLC decoding/checking,
-        backend persistence, and the other intake rules below remain open.
+        JSON/postcard reload and recheck are proven. PLC decoding/checking
+        and the other intake rules below remain open; M1 persistence is complete.
   - [ ] Intake adds endpoints as `TrustState::Unverified` and never downgrades
         or duplicates an endpoint already held at a stronger state; replaying
         the same intake is a no-op.

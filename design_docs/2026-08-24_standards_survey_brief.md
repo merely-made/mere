@@ -473,8 +473,11 @@ Three more cross-cutting items:
 ## 5. The other ports, briefly
 
 - **gazette.** **RFC 9553 JSContact** (with RFC 9554/9555 for vCard conversion)
-  supersedes the vCard/jCard question: a modern JSON data model rather than a
-  line-folded 1998 format. ADOPT over vCard 4.0's PULL. WebFinger (RFC 7033)
+  provides an exchange format for Gaz, which keeps its own model at rest
+  (Mark's 2026-09-23 ruling). Optional Gaz exchange landed 2026-09-30 with
+  distinct public cards, unverified peer imports and private restoration;
+  vCard conversion and Gazette application wiring remain open. ADOPT over
+  vCard 4.0's PULL. WebFinger (RFC 7033)
   stays ADOPT. **Verifiable Credentials 2.0** is the standard the house "insigne"
   concept most closely already is — graded public-key presentations made to be
   shown — and is worth reading before insigne's own shape is fixed. **DIDs,
