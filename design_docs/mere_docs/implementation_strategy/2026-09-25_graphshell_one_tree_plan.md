@@ -536,3 +536,22 @@ this tree.
   Four focused storage/editor tests also pass, for 606 native tests in total.
   The reviewed source is published on `canvas-elapsed-host`; integration into
   main and worktree retirement await the headed gates.
+- 2026-09-30: merge published main `da2940b6` into the elapsed-host branch at
+  `650f8541`, preserving newer Gaz, Apparatus and generated-text work and
+  adopting Genet `c5470fcb` with its published standalone web lock. All 578
+  targeted library, 25 winit scenario and four local-editor tests pass, for
+  607 native tests; the offline locked Wasm build passes. Headed saved edit
+  and independent reopening retain the same session/member and edited
+  metadata. Controls, elapsed physics and an initially hidden real background
+  tab's first resume pass. Moving-graph hide/show and the intentional
+  hidden-timing rejection remain pending. The new 512-node live diagnostic
+  completes; 2,000 nodes are still running at this checkpoint. The
+  [controls receipt](../testing/2026-09-27_graphshell_controls_physics_receipt.md)
+  records artifact hashes and measurements. Integration into main and
+  retirement of this collision worktree remain pending; the shared primary
+  checkout is untouched.
+- 2026-09-30: Mark finds the current physics slightly laggy but acceptable,
+  and points out that layout, physics law and scale can change the result.
+  Record this separately from timings. A comparison must identify the
+  layout/law, graph size and density, visible count and elapsed-step settings;
+  the present generated-graph receipts do not settle all configurations.
