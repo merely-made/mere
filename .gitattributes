@@ -60,3 +60,6 @@ ports/tabard/tests/fixtures/** text eol=lf
 # captures byte for byte; autocrlf must not rewrite them on checkout (2026-09-03).
 design_docs/cambium_docs/testing/receipts/*.html text eol=lf
 crates/cambium/cambium/examples/component_catalog.css text eol=lf
+
+# Preserve the exact tested standalone dependency receipt across checkouts.
+design_docs/cambium_docs/testing/receipts/generated-names/graphshell-web-Cargo.lock.txt text eol=lf

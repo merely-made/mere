@@ -11,7 +11,8 @@ contacts. JSContact is ruled *an* exchange format (M1). M0.5 landed the same
 day, and `TypedKey` then moved to insigne, as Mark ruled. M1 (at-rest sealing
 ruled: gaz stays crypto-free) and M2 are drafted with done-conditions. The
 retained-proof slice of M2 landed on 2026-09-29 under Insigne phase D;
-backend persistence and resolver intake remain open.
+M1's storage gate is implemented on 2026-09-29; host sealing, JSContact
+exchange and resolver intake remain open.
 **Scope**: the contact layer, standalone. The record model, the persona-scoped
 book, then storage over muniment, then the adapters that turn resolver output
 into records, then mere reconciliation.
@@ -249,16 +250,17 @@ is monotonic, so a replayed or late event cannot rewind a record.
         warnings` green; lib docs and quick-start rewritten to the new types.
 - **M1 — persistence.** An optional `muniment` feature; the core stays
   serde-only and default-featureless. Done when:
-  - [ ] `save_book` / `load_book` are generic over muniment's `Backend` and
+  - [x] `save_book` / `load_book` are generic over muniment's `Backend` and
         `Codec` (`SlotStore<B, C>`, async, as muniment is), at slot key
         `personas/<scope>/contacts`, where `<scope>` is the opaque
-        `PersonaScope` string.
-  - [ ] `load_book(slots, &expected_scope)` runs `verify_scope` and refuses a
+        `PersonaScope` string. Implemented 2026-09-29 behind `muniment`;
+        the host selects Muniment's codec/backend features separately.
+  - [x] `load_book(slots, &expected_scope)` runs `verify_scope` and refuses a
         mis-filed book by name; a missing slot returns an empty book for that
         scope, not an error.
-  - [ ] A malformed or rootless stored book fails to load; it never arrives as
+  - [x] A malformed or rootless stored book fails to load; it never arrives as
         a partial book.
-  - [ ] Round-trip tests over `MemoryBackend` and redb, both a JSON and a
+  - [x] Round-trip tests over `MemoryBackend` and redb, both a JSON and a
         binary codec, and a two-persona test proving one persona's load
         cannot return the other's contacts.
   - [ ] **Ruled 2026-09-23 — at-rest sealing is the host's.** This file holds
@@ -287,10 +289,11 @@ is monotonic, so a replayed or late event cannot rewind a record.
         vendor properties (§1.8.1), which makes a gaz → Card → gaz round-trip
         lossless.
 - **M2 — resolver intake.** The seam where resolution meets storage. Gazette
-  now depends on gaz, not the reverse (gazette was promoted to a port on
+  will depend on gaz, not the reverse (gazette was promoted to a port on
   2026-08-23 and "composes gaz rather than replaces it"), so gaz cannot consume
   gazette's types. Proposed split: gaz owns the intake *rules* and their
-  input types; gazette converts its resolver output into them. Done when:
+  input types; gazette converts its resolver output into them. That dependency
+  is not implemented as of 2026-09-29. Done when:
   - [ ] Every key after the first is recorded with the `ProofMethod` that
         justified it: for `Key` anchors, `Signature` by the previous root for
         a rotation and by the root for an attested key; for `Plc` anchors,
@@ -529,3 +532,53 @@ personae, and checking goes behind an insigne feature that returns local,
 non-`Serialize` conclusions. He also ruled that gaz keeps the proofs themselves
 (M2), which is why this session takes the move. The standards survey's PULL
 grade was redefined the same day ("design for it now, implement in order").
+
+**2026-09-29, M1 storage gate.** `gaz::save_book` and `gaz::load_book` persist
+the complete own-model book through a caller's `SlotStore<B, C>`. Saving uses
+the book's scope. Loading validates the whole model and then the expected
+scope, returning an empty book only for a missing slot. `PersistenceError`
+distinguishes store/codec failure from a `ScopeMismatch` naming both personas.
+Neither malformed records nor an I/O failure are absorbed as empty history.
+The `muniment` feature adds the floor without selecting a codec or backend;
+the default data model has no persistence or crypto dependency.
+
+Five new tests include four memory/redb × JSON/postcard matrix cases. Each
+proves missing-slot behavior, separate persona slots, overwrite isolation,
+mis-filed book refusal, rootless/mismatched-proof/duplicate-anchor refusal,
+retention of refused bytes, and clearing one book without clearing the other.
+The redb cases drop the database and reopen it before loading and rechecking
+the real retained attestation. The unchecked test record's wire layout is
+compared to the valid book before introducing malformations. Postcard erases
+serde's custom error text; its portable refusal is a codec error. Scope errors
+still carry both persona names under either codec. A fifth test proves opaque
+scope labels are preserved rather than normalized.
+
+Temporarily removing `load_book`'s scope check makes all four matrix cases fail
+(exit 101); it is restored before the final complete suite. Gates are recorded
+under `C:\t\cargo-targets\mere\gaz-m1-receipts` with source hashes and raw logs:
+
+- `cargo test -p gaz --all-features --locked --offline -j 4`: **66 tests plus
+  two doctests pass**.
+- `cargo clippy -p gaz --all-targets --all-features --no-deps --locked --offline
+  -j 4 -- -D warnings`: **pass**, scoped to Gaz as in Insigne phase D.
+- `cargo check -p gaz --lib --no-default-features --locked --offline -j 4
+  --message-format=json`: **pass**, showing the default core excludes Muniment and
+  cryptographic dependencies.
+- `cargo check -p gaz --lib --all-features --target wasm32-unknown-unknown
+  --locked --offline -j 4 --message-format=json`: **pass**, showing portable persistence
+  with no default Muniment codec or Insigne verification feature. Muniment's
+  BLAKE3 storage hashing belongs to the optional floor.
+
+Isolation was required after another build took the shared target and a
+concurrent root-manifest repin selected uncached Genet `c5470fcb`. Gates use
+committed Mere `ca2351b3` plus this owned Gaz patch in
+`Code\worktrees\mere-gaz-persistence`, with
+`C:\t\cargo-targets\mere\gaz` as the build output. The cache wait was a live
+`cargo fetch --locked`, which was preserved. The gate worktree and output are
+removed after integration; receipts remain. The concurrent Genet repin and
+its Cambium changes are outside this receipt.
+
+The first four M1 done-conditions are met. **M1 remains open** for the host-side
+sealed-backend receipt and JSContact import/export/published-card exchange.
+Gazette intake and its trust/alarm behavior remain M2, with no live Gaz host
+integration claimed by this storage gate.

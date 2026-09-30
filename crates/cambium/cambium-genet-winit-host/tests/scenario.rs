@@ -35,6 +35,7 @@ struct App {
     target_point: Cell<Option<(f32, f32)>>,
     semantic_hidden: bool,
     semantic_name: Option<&'static str>,
+    generated_prefix: Option<&'static str>,
 }
 
 type Child = Box<dyn AnyView<App, (), GenetCtx, GenetElement>>;
@@ -45,7 +46,9 @@ fn root(state: &App) -> Child {
         "main",
         (
             focusable(clickable(
-                el("button", text(format!("Count {}", state.count))).attr("class", "count"),
+                el("button", text(format!("Count {}", state.count)))
+                    .attr("class", "count")
+                    .attr("data-prefix", state.generated_prefix.unwrap_or("[")),
                 |s: &mut App, _| {
                     s.count += 1;
                     let n = s.count;
@@ -921,4 +924,51 @@ fn scenario_keys_use_retained_focus_and_button_activation() {
     );
     assert!(receipt.starts_with("RESULT ok"), "{receipt}");
     assert_eq!(h.state().count, 3);
+}
+
+#[test]
+fn generated_names_agree_for_mesquite_native_accessibility_and_attribute_updates() {
+    const GENERATED_SHEET: &str = "button { display: block; width: 180px; height: 32px; }
+        .count::before { content: attr(data-prefix); } .count::after { content: ']'; }";
+    let (receipt, mut h) = run_lane(
+        &scratch("generated-name"),
+        "click role:button [Count 0]\nassert snap count == 1\n",
+        GENERATED_SHEET,
+        true,
+    );
+    assert!(receipt.contains("\"ok\": true"), "{receipt}");
+    h.layout_at(300.0, 200.0);
+    let projection = h.a11y_projection();
+    let button = projection
+        .nodes()
+        .iter()
+        .find(|node| node.name.as_deref() == Some("[Count 1]"))
+        .expect("generated name");
+    let id = button.id;
+    let (tree, _) = h.a11y_tree();
+    assert!(
+        tree.nodes
+            .iter()
+            .any(|(_, node)| node.label() == Some("[Count 1]")),
+        "native tree uses the same generated name"
+    );
+    h.update(|state| state.generated_prefix = Some("<"));
+    h.layout_at(300.0, 200.0);
+    let projection = h.a11y_projection();
+    assert_eq!(
+        projection
+            .nodes()
+            .iter()
+            .find(|node| node.id == id)
+            .unwrap()
+            .name
+            .as_deref(),
+        Some("<Count 1]")
+    );
+    let (tree, _) = h.a11y_tree();
+    assert!(
+        tree.nodes
+            .iter()
+            .any(|(_, node)| node.label() == Some("<Count 1]"))
+    );
 }

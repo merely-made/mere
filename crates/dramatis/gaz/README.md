@@ -80,9 +80,39 @@ monotonic, so a replayed or late event can never rewind a record.
 ## Status
 
 Pre-1.0. The data model retains proof artifacts and is tested with JSON and
-postcard reload followed by real signature checks. Persistence over `muniment`
-and the adapters that turn resolver output into records are the next lifts. See
-`design_docs/` for the founding plan.
+postcard reload followed by real signature checks. Persona-scoped persistence
+is available behind `muniment`. Host sealing, JSContact exchange and resolver
+intake remain in the founding plan under `design_docs/`.
+
+## Persistence
+
+Enable Gaz's `muniment` feature to use `save_book` and `load_book`. Both take a
+host-supplied `muniment::SlotStore<B, C>`, generic over its backend and codec.
+The host enables its chosen Muniment features, such as `json`, `postcard` or
+`redb`; Gaz's optional dependency selects none of them.
+
+```rust
+use gaz::{PersonaScope, load_book, save_book};
+use muniment::{JsonCodec, SlotStore};
+
+// The host chooses and opens the backend.
+let slots = SlotStore::<_, JsonCodec>::new(backend);
+let scope = PersonaScope::new("work");
+let book = load_book(&slots, &scope).await?;
+save_book(&slots, &book).await?;
+```
+
+Books live at `personas/<scope>/contacts`, using the opaque scope label exactly
+as supplied. Saving replaces that persona's book. A missing slot loads as an
+empty book for the requested persona; malformed data and mis-filed books are
+errors, never empty or partial success. `PersistenceError::Scope` carries both
+the expected and stored persona names, while `PersistenceError::Store` retains
+the backend or codec failure.
+
+The contact model is validated on load, and retained signatures still need the
+caller's checks. At-rest sealing belongs to the host's supplied backend. The
+JSON/postcard tests use memory and real redb reopen, proving persona isolation,
+overwrite behavior, malformed-record refusal and artifact rechecking.
 
 ## License
 

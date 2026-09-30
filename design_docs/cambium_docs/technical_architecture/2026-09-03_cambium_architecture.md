@@ -397,3 +397,22 @@ The [current diagnostics design](../../mere_docs/implementation_strategy/2026-06
 requires producer-supplied identity/revision references rather than inventing
 correlation from this limitation. No shared diagnostics store is implemented by
 the selector work.
+
+### Generated accessible names (2026-09-29, implemented and verified)
+
+Rootstock's `OwnedLayout` now exposes rendered generated text through Genet's
+shared style-owned helper. Its document projection and native AccessKit tree
+both pass that callback to Genet's accessible-name computation. Mesquite keeps
+consuming the resulting document projection, so selector matching and the native
+adapter share names containing admitted `::before`/`::after` text and counters.
+No DOM text nodes or source selection offsets are synthesized by this adapter.
+
+The focused fixture clicks a button by `[Count 0]`, verifies the native tree and
+document projection both expose `[Count 1]`, then changes its `data-prefix`
+attribute and verifies both expose `<Count 1]` after relayout. The source gate
+uses published Genet `c5470fcbc12805f0369c70f34a18178158fbe2d5`; its raw receipts
+and lock/source classification live at `Code/testing/cambium/generated-names`.
+All 207 focused native consumer tests and the standalone Graphshell Wasm check
+pass against that source. See the [reproduction receipt](../testing/local-genet-development.md#2026-09-29-generated-name-adoption).
+Headed screen-reader behavior and the existing revision-zero projection limit
+remain separate. Product state and custom-leaf authority remain Mere-owned.
