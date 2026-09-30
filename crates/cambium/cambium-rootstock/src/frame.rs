@@ -88,6 +88,8 @@ where
                 close: &mut self.s.close_requested,
                 wake: &self.wake,
                 capture: &mut self.s.pending_capture,
+                presentation_observer: &mut self.s.pending_presentation_observer,
+                capture_stamped: &mut self.s.pending_stamped_capture,
                 capture_paint: &mut self.s.pending_paint_capture,
                 pointer: &mut self.s.pending_pointer,
                 scroll: &mut self.s.pending_scroll,
@@ -664,6 +666,22 @@ where
         let phase = crate::Instant::now();
         surface.queue().present(frame);
         profile.present_us = elapsed_us(phase.elapsed());
+        let Some(sequence) = self.s.presentation_sequence.checked_add(1) else {
+            eprintln!("[cambium-host] presentation sequence exhausted");
+            return;
+        };
+        self.s.presentation_sequence = sequence;
+        let presented = crate::PresentedFrame {
+            host: self.s.presentation_host,
+            sequence,
+            width: pw,
+            height: ph,
+            layout_scale: scale,
+        };
+        // Freeze product state before any capture callback, queued pointer
+        // dispatch or platform accessibility action can change the product.
+        self.observe_presentation(presented);
+        let surface = self.s.surface.as_ref().expect("presented surface exists");
         // A capture armed by the application: run it while the rasterized
         // view is still alive.
         let phase = crate::Instant::now();
@@ -674,6 +692,9 @@ where
         }
         if let Some(capture) = self.s.pending_capture.take() {
             capture(&**surface, &view, pw, ph);
+        }
+        if let Some(capture) = self.s.pending_stamped_capture.take() {
+            capture(&**surface, &view, presented);
         }
         profile.capture_us = elapsed_us(phase.elapsed());
         if (animating || anim_active)

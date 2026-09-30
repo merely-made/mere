@@ -131,9 +131,10 @@ cannot be retargeted merely because a node identifier was reused.
 
 Registry [descriptors](../../../crates/system/registry/src/diagnostics/descriptor/types.rs)
 describe schemas, retention and sampling; they do not enforce buffering or validate
-every payload. Its [current invariant matcher](../../../crates/system/registry/src/diagnostics/descriptor/registry.rs)
-pairs starts and terminals FIFO per channel, so concurrent out-of-order operations
-require correlation-keyed tracking rather than claiming this already exists.
+every payload. Its [invariant matcher](../../../crates/system/registry/src/diagnostics/descriptor/registry.rs)
+now supplies bounded run/source/operation matching alongside the explicitly
+uncorrelated FIFO API. The September 30 keyed and deadline controls qualify
+matching mechanics; each product still supplies its actual operation identity.
 
 ### Bounds, loss and privacy
 
@@ -153,8 +154,10 @@ The [RecordingObserver](../../../crates/system/ux-events/src/ux_observability.rs
 and [RecordingChannelSink](../../../crates/system/ux-events/src/ux_diagnostics.rs)
 formerly appended indefinitely at capacity zero. They now return before locking
 or cloning, with disabled-retention and bounded-eviction regression tests.
-The registry emitter still silently drops without a receiver and uses
-an unbounded sender; adapters must report their actual coverage/loss limits.
+The September 30 registry emitter replaces the unbounded sender with bounded
+nonblocking ingress and observable admission/loss. Adapters must preserve its
+explicit unsequenced-loss distinction; registry catalog growth and producer
+allocation remain outside this bound.
 
 Products project and redact before buffering. Turnstone's credential-omitting
 authentication observations provide a precedent, not proof that arbitrary URLs, titles or logs
@@ -292,6 +295,72 @@ The Apparatus name/crate home and Gloss operational overview are now ruled above
 the Gloss and Inspector pane migrations are qualified above. Contributed-pane
 semantic automation is the next designed slice in Turnstone's pane registry plan;
 its scoped retained-layout and admission-generation work is not implemented here.
+
+---
+
+## Remaining work orchestration, 2026-09-30
+
+**Status: in progress, authorized by Mark.** The September core and consumer
+receipts remain the baseline. Research lanes inspect current code before each
+bounded implementation is promoted. Unrelated Gaz, transcript and allocator
+migration work remains with its existing owners. New consumer pins are sealed
+only after the shared source gates pass; the September receipts keep their
+original source identities.
+
+| Lane | Owner seam and done condition | Current state |
+| --- | --- | --- |
+| Contributed semantics | Genet/Taproot generic surface filter; Turnstone retained projection, visible geometry and pane/admission/node identity. Referenced-name, ambiguous, disabled, scroll and stale-target controls plus native receipt pass. | Genet `7bf0e448` published with 28 Taproot/40 render tests and failing preflight control. Turnstone source awaits coherent consumer gates; built-in/live-document coverage follows separately. |
+| Diagnostic delivery | Registry bounded configurable ingress with explicit disabled/full/disconnected/no-sink accounting; correlation-keyed, bounded pending outcomes and deadline handling. Concurrent out-of-order and late-terminal controls pass without an unbounded compatibility route. | Implemented; 135 tests/one existing ignore, restored lean 36 and two expected failing controls. No application pipeline or bounded catalog claim. |
+| Exact capture correlation | Seal a product-owned immutable reading and actual host frame identity at the render/capture boundary; carry both through asynchronous readback. Two consumers qualify worker/state/image links and failure paths. | Shared 108 containing native tests, actual web-backend and standalone Graphshell port Wasm compilation pass at published Genet `7bf0e448`; late-field failure control restored. Knot/Redshank native gates are pending. Knot catalog refresh is promoted as the second worker family; its source is in qualification. |
+| Product inspection | Independent non-destructive readers show retained records, explicit unavailable correlation and gaps/loss. Shared projections do not format raw product inputs or create operation authority. | Shared inspection passes 22 all-feature/18 lean tests. Optional Gloss Diagnostics source and restart scenarios await consumer/native gates; default minimap plus Downloads stays unchanged. |
+| Broader adoption | Qualify additional worker families and built-in/custom/document surfaces against the same contracts; preserve each product's stale, cancellation and durability adjudication. | Depends on the preceding shared and first-consumer gates; inventory is above. |
+| Human accessibility | Prepare a reproducible keyboard/screen-reader checklist against the qualified native binary, then record the human observations and defects separately from machine receipts. | Turnstone checklist prepared in its existing diagnostics receipt. First-product preference question remains optional; actual human observations are required and no pass is claimed. |
+
+### Findings, 2026-09-30
+
+These are the research baseline before the implementation slices above.
+
+- Registry's installed `Sender<DiagnosticEvent>` is unbounded and ignores
+  delivery failures. Its current source installers and invariant matcher
+  consumers are tests/helpers rather than an installed stack-wide pipeline.
+- Mesquite currently records capture viewport when arming, but reads product
+  snapshot fields when pixels are collected. Rootstock can dispatch queued
+  pointers after paint, and native/web hosts can dispatch accessibility actions
+  before the lane's after-frame collection. Neither current timing establishes
+  that the fields describe the captured pixels.
+- Turnstone contributed panes already supply retained provider DOM, layout and
+  platform accessibility routes. Their scenario resolution still uses the raw
+  fresh-layout route; the bounded scoped slice can use the retained owner seam.
+
+Each lane records source identity, focused and deliberately broken controls,
+restored passing gates and native evidence where required. Unavailable causes,
+semantic revisions and exact image correlation remain explicitly unavailable
+until their producer supplies and qualifies them. Human participation is a
+separate acceptance requirement and cannot be inferred from automation.
+
+### Progress, 2026-09-30
+
+The renderer-independent `apparatus::inspect_batch` now projects an independent
+batch into bounded read-only rows, including explicit gaps/loss and unavailable
+correlation. Scoped references are retained; arbitrary payload fields are not
+formatted. The optional `project_inspection` lowers those same readings to
+structural accessibility labels, with no invented bounds or actions. Its focused
+all-feature library gate passes 22 tests, including five inspection controls.
+Turnstone's optional Gloss Diagnostics section and read-only App mirror are in
+progress; these source changes do not yet qualify a native or human view.
+The existing minimap-plus-Downloads default remains the accepted default.
+The shared lean inspection gate passes 18 tests. Registry and capture evidence,
+negative controls and exact acceptance limits are recorded in the
+[current gate receipt](../testing/2026-09-29_apparatus_diagnostics_receipt.md).
+
+The next worker family is Knot's existing catalog reader. A successful Save
+supplies the cause for its refresh request. Worker admission, execution,
+superseded queued requests, stale completions and accepted read outcomes remain
+Knot decisions; diagnostics observe those decisions. A superseded queued request
+is not a cancelled worker, and an accepted catalog containing read errors is not
+whole-job or durability success. Generation exhaustion must refuse further
+requests rather than wrap and admit stale results. Native evidence and restored
+negative controls remain required before this slice is marked qualified.
 
 ---
 

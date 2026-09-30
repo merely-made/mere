@@ -17,6 +17,8 @@
 
 mod observation;
 pub use observation::*;
+mod inspection;
+pub use inspection::*;
 
 #[cfg(feature = "projection")]
 use accesskit::{Node, Role};

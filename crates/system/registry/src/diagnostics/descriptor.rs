@@ -27,6 +27,9 @@ pub use catalog::*;
 pub mod registry;
 pub use registry::*;
 
+mod invariant;
+pub use invariant::*;
+
 #[cfg(test)]
 mod tests;
 
@@ -38,7 +41,7 @@ fn normalize_channel_config(config: ChannelConfig) -> ChannelConfig {
     ChannelConfig {
         enabled: config.enabled,
         sample_rate: config.sample_rate.clamp(0.0, 1.0),
-        retention_count: config.retention_count.max(1),
+        retention_count: config.retention_count,
     }
 }
 

@@ -60,3 +60,77 @@ two complete action/worker/exact-pixel causal receipts.
 See the [canonical diagnostics plan](../implementation_strategy/2026-06-08_system_diagnostics_and_accessibility_plan.md)
 for current ownership and remaining acceptance conditions. June receipts remain
 historical evidence.
+
+## September 30 bounded continuation
+
+The shared inspection data now projects independent batches into bounded
+read-only rows, showing retention, each loss class, omitted display rows,
+scoped supplied causes and explicitly unavailable correlation. Products supply
+already-redacted borrowed payload labels. The structural UX projection does
+not invent layout bounds, focus or actions. The all-feature Apparatus library
+gate passes 22 tests; its no-default-feature serialization gate passes 18.
+
+Registry ingress now uses a bounded nonblocking staging channel. Count,
+accounted encoding bytes and age are configurable; any zero disables buffering.
+Full queues reject newest attempts. Contention, poisoning, disconnection and
+no-sink emissions have observable loss. Unsequenced attempts are reported as
+unsequenced loss rather than fabricated Apparatus gaps. The keyed invariant
+matcher bounds its combined pending pool and uses supplied run/source/operation
+identity. Deadlines are swept before terminal matching, so a late completion
+cannot erase a timeout. Legacy uncorrelated matching remains explicitly FIFO.
+
+Registry's default all-targets gate passes 135 tests with one existing ignore;
+the restored diagnostics-only feature gate passes 36. Replacing keyed matching
+with FIFO, and moving deadline sweep after terminal delivery, each fail the
+regression with exit 101. Both source controls are restored. Logs are under
+`Code/testing/mere/receipts/registry-*.log`. These bounds cover staging and
+pending tracking, not producer allocation, runtime descriptor/orphan catalogs
+or an installed application pipeline.
+
+Mesquite can opt into an immutable product reading taken after queue presentation
+and before queued pointer/platform accessibility delivery. A separate backend
+packet carries the run/request and host/frame/dimensions/scale identity with
+the pixels; receipt collection requires an exact match. Legacy no-observer
+products retain their receipt shape. Metadata limits default to 128 requests,
+64 KiB per projection and 1 MiB total, with one pending projection. Products
+retain redaction, bounded construction and revision/cause authority. These
+limits do not cover pixel storage, PNG files or legacy receipt fields.
+
+The focused native/shared gate passes 64 tests (host library 16, existing async
+capture one, three new pairing suites, scenario 25 and Mesquite 19). Synthetic
+delayed pixels establish pairing mechanics, not a GPU receipt. Restoring the
+late-state sampling defect changes the captured count from 11 to 66 and fails
+with exit 101; the source is restored and the full focused gate passes again.
+The actual WebCapture backend compiles for `wasm32-unknown-unknown`; browser
+interaction is not claimed. Logs and hashes live under
+`Code/testing/cambium/capture-pairing/`. These commands use Rust 1.98.1,
+locked/offline dependencies, two jobs, zero dev/test debug and the reused
+`C:/t/cargo-targets/mere`. Final containing pins and product native qualification
+follow separately; no completed consumer receipt is claimed by this section.
+
+Presentation stamps identify the rasterized source queued for presentation.
+They do not certify GPU completion, compositor visibility or physical display
+acknowledgement. Turnstone's custom compositor requires its own capture
+adoption. Human AT, broader live-document/custom-leaf semantics and a second
+real-worker causal flow remain open.
+
+### Containing Genet pin, September 30
+
+Genet `7bf0e448a5c395cb5e205b73bcb277c73472e8c6` is published with 28
+Taproot tests, 40 render tests and a restored scope-preflight failure control.
+Mere's root and standalone Graphshell web manifests now name that revision.
+Genet changed no manifest or lock between Mere's previous `c5470fcb` pin and
+this revision. The root Mere lock is byte-identical to its saved baseline after
+only substituting that Git identity; package versions and dependency edges are
+preserved. Locked/offline containing execution validates this lock.
+
+The containing native gate passes 108 tests: the same 64 host/Mesquite tests
+plus all 44 Rootstock library tests, including existing GPU producer checks.
+`containing-7bf.log` records the command and results. The actual web host again
+passes Wasm compilation at this revision (`web-wasm-7bf.log`). Standalone
+Graphshell's ignored lock needs its existing Gazette `async-trait` dependency
+edge in addition to the Genet identity substitution. Its actual port check and
+subsequent locked/offline Wasm check pass (`graphshell-web-7bf-resolve.log` and
+`graphshell-web-7bf.log`); `containing-context.json` records both lock hashes.
+Compilation does not
+qualify browser runtime or human accessibility.

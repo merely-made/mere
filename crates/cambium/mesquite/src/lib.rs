@@ -54,6 +54,12 @@ use taproot::ProbeSnapshot;
 mod capture;
 mod scenario;
 pub use capture::{CaptureBackend, Readback};
+pub use capture::{StampedFrame, StampedReadback};
+mod pairing;
+pub use pairing::{
+    CaptureObserver, CapturePairing, CaptureProjection, CaptureProjectionLimits, CaptureRequest,
+    Presentation,
+};
 pub use scenario::{CaptureRecord, LaneConfig};
 mod checkpoints;
 mod clicks;
@@ -87,7 +93,7 @@ pub trait Product: Sized {
     /// The host application state the Cambium runner holds.
     type State: 'static;
     /// The view logic the runner diffs into a DOM.
-    type Logic: FnMut(&Self::State) -> Self::View;
+    type Logic: FnMut(&Self::State) -> Self::View + 'static;
     /// The root view type that logic produces.
     type View: RootView<Self::State>;
 
@@ -105,6 +111,15 @@ pub trait Product: Sized {
     /// `captures` is how many captures have completed; `opacity` is the value
     /// the `opacity` verb last set.
     fn snapshot(&self, ctx: &Ctx<'_, Self>, captures: usize, opacity: f32) -> ProbeSnapshot;
+
+    /// Optional owned observer for a requested capture. The host evaluates it
+    /// on the successful presentation's state/layout before pointer or AT
+    /// dispatch. Return a fresh run identity and a bounded, product-redacted
+    /// projection; absent revision/causal facts must remain absent. Returning
+    /// `None` preserves the established uncorrelated receipt shape and timing.
+    fn capture_observer(&self) -> Option<CaptureObserver<Self>> {
+        None
+    }
 
     /// Drain the semantic events emitted since the last call.
     fn drain_events(&mut self, _ctx: &mut Ctx<'_, Self>) -> Vec<String> {
