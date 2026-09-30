@@ -60,6 +60,15 @@ Implemented:
   (`PersonaeHost`, the resident keeper that holds the vault, serves the SSH
   agent, and brokers approvals).
 
+For private mutable slots, `PersonaeHost::sealed_backend(persona, backend)`
+loads the wallet epoch and supplies Pandect's `WalletSealedBackend`. An absent
+carry root or epoch returns `PermissionDenied`. There is no cleartext fallback.
+The host still chooses the Muniment backend, codec, and persona-to-scope mapping.
+The Gaz receipt at `tests/sealed_contacts.rs` uses JSON and postcard books,
+real redb reopening, and retained-proof rechecking. Keys stay visible, epoch
+history must be supplied for old records, and replay of an authenticated value
+at its original key is outside this adapter's freshness guarantee.
+
 Graphshell composes all three and re-exports them at its pre-founding paths,
 so it is the first host rather than the owner. The intent wire strings keep
 their `castellan.*` values for now; renaming the wire vocabulary is
