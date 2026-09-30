@@ -43,13 +43,13 @@
 use layout_dom_api::{LayoutDom, LocalName, Namespace};
 use workbench::{
     FloatSizeConstraints, FloatingTile, RelativeRect, Tile, TileEvent, TileId, Workspace,
-    WorkspaceEvent,
+    WorkspaceEvent, PresentationEvent, WorkbenchPresentation,
 };
 
 use crate::pod::GenetElement;
 use crate::{
     FRISKET_TILE_ATTR, GenetCtx, PaneView, Slot, SlotKind, TabAccentColors, TabBar, TabBarNames,
-    TabItem, TabMark, View, el, frisket_with_marks, slot_kind, tab_bar_view,
+    TabItem, TabMark, View, el, frisket_presented_with, frisket_with_marks, slot_kind, tab_bar_view,
 };
 
 /// `data-slot`: which of [`SlotKind`]'s three a content element carries. The
@@ -149,6 +149,37 @@ where
     el::<_, State, AppAction>("div", (frame, layer))
         .attr("class", "workspace")
         .attr("style", "position: relative; width: 100%; height: 100%;")
+}
+
+/// [`workspace_view_with_marks`] with transient tiled rails and drawers.
+/// The workspace and its float content custody remain the host's authority.
+pub fn workspace_view_presented_with_marks<State, AppAction, Ev, Change, Fill>(
+    model: &WorkspaceModel<'_>,
+    marks: &dyn Fn(TileId) -> Option<TabMark>,
+    presentation: &WorkbenchPresentation,
+    on_event: Ev,
+    on_presentation_event: Change,
+    fill: Fill,
+) -> impl View<State, AppAction, GenetCtx, Element = GenetElement>
+where
+    State: 'static,
+    AppAction: 'static,
+    Ev: Fn(&mut State, WorkspaceEvent) + Clone + 'static,
+    Change: Fn(&mut State, PresentationEvent) + Clone + 'static,
+    Fill: Fn(&Tile) -> Slot<State, AppAction> + Clone + 'static,
+{
+    let tile_event = on_event.clone();
+    let frame = frisket_presented_with(
+        model.workspace.tiled(), model.current, marks, presentation,
+        move |state: &mut State, event| tile_event(state, WorkspaceEvent::Tile(event)),
+        on_presentation_event, fill.clone(),
+    );
+    let floats: Vec<PaneView<State, AppAction>> = model.workspace
+        .visible_floating(model.float_layer_visible).into_iter()
+        .map(|float| render_float(float, model.current, marks, &on_event, &fill)).collect();
+    let layer = el::<_, State, AppAction>("div", floats).attr("class", "workspace-floats");
+    el::<_, State, AppAction>("div", (frame, layer)).attr("class", "workspace")
+        .attr("style", "position:relative;width:100%;height:100%;")
 }
 
 fn render_float<State, AppAction, Ev, Fill>(

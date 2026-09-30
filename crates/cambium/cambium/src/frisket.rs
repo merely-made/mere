@@ -428,7 +428,7 @@ where
     }
 }
 
-fn render_stack<State, AppAction, Ev, Fill>(
+pub(super) fn render_stack<State, AppAction, Ev, Fill>(
     stack: &TabStack,
     path: &[usize],
     current: Option<TileId>,

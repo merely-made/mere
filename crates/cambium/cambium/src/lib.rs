@@ -60,6 +60,7 @@ pub mod nematic;
 mod optional_action;
 mod overlay;
 mod overlay_surface;
+mod frisket_presentation;
 mod pod;
 mod pointer;
 mod popover;
@@ -195,6 +196,7 @@ pub use frisket::{
     content_target, decode_pane_path, divider_target, encode_pane_path, frisket, frisket_with,
     frisket_with_current, frisket_with_marks, slot_kind, stack_target, tab_drop_index, tab_target,
 };
+pub use frisket_presentation::frisket_presented_with;
 pub use popover::{
     POPOVER_CSS, Popover, PopoverEvent, PopoverPlacement, PopoverState, PopoverView, popover,
 };
@@ -218,6 +220,7 @@ pub use value::{OnValue, OnValueState, ValueEvent, on_value};
 pub use wheel::{OnWheel, WheelEvent, on_wheel};
 pub use workspace::{
     WORKSPACE_CSS, WorkspaceModel, composited_slots, workspace_view, workspace_view_with_marks,
+    workspace_view_presented_with_marks,
 };
 
 // Compatibility aliases for consumers that still use the pre-extraction
