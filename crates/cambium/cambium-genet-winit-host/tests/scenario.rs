@@ -423,7 +423,6 @@ fn a_held_semantic_click_rejects_a_hidden_or_renamed_target_without_retargeting(
         );
     }
 }
-
 #[test]
 fn both_receipt_modes_click_the_visible_part_of_an_oversized_button() {
     for mesquite in [false, true] {

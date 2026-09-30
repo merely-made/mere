@@ -30,6 +30,7 @@ mod action_list;
 mod arrangement;
 mod atlas;
 mod command_surface;
+mod command_menu_bar;
 mod component;
 mod context;
 mod controls;
@@ -101,6 +102,7 @@ pub use command_surface::{
     CommandEvent, CommandItem, CommandState, CommandSurfaceKind, command_menu, command_palette,
     command_picker, command_surface,
 };
+pub use command_menu_bar::{CommandMenuBarState, COMMAND_MENU_BAR_CSS, command_menu_bar};
 pub use component::{COMPONENT_PROBE_ATTR, Component, ComponentView, component};
 pub use context::GenetCtx;
 pub use detail_panel::{DetailRow, DetailSection, detail_panel};

@@ -28,6 +28,17 @@ The published seam crates use Genet package names. Cambium's public backend
 types use `Genet*` names; deprecated `Serval*` aliases are temporary source
 compatibility shims.
 
+## Command menus (2026-09-30)
+
+Cambium's [`CommandMenuBar`](../../../crates/cambium/cambium/src/command_menu_bar.rs)
+supplies retained menu views, open/selection state and pointer/key delivery.
+The product supplies its command catalog, enabled descriptions and dispatch
+callback. Menu structure does not establish permission or application authority.
+Native Cambium and Rootstock hosts preserve F10 and Alt through their key
+vocabularies to reach the same runner. Menu role/name computation remains Genet's
+semantic owner. The combined diagnostics/Commands gate passes seven menu tests,
+five platform-key tests and the containing native host checks.
+
 ## Surface lifetime (2026-09-08)
 
 Application leaf identity and renderer-issued fragment identity have different
