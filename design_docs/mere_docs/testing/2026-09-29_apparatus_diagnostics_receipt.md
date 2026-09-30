@@ -1,7 +1,9 @@
 # Apparatus core and Mesquite attachment gate
 
-**Date:** 2026-09-29
-**Evidence level:** automated source tests, reported by the coordinating lane.
+**Date:** 2026-09-29; combined consumer continuation 2026-09-30.
+**Evidence level:** original focused source tests below, followed by qualified
+shared/consumer source tests, actual Wasm compilation and reviewed native
+captures in the dated continuations. Human AT acceptance remains open.
 
 The shared primary Mere source passed these focused Cargo gates using the
 existing `C:\t\cargo-targets\mere` target. The core-only gate used its
@@ -111,8 +113,10 @@ follow separately; no completed consumer receipt is claimed by this section.
 Presentation stamps identify the rasterized source queued for presentation.
 They do not certify GPU completion, compositor visibility or physical display
 acknowledgement. Turnstone's custom compositor requires its own capture
-adoption. Human AT, broader live-document/custom-leaf semantics and a second
-real-worker causal flow remain open.
+adoption. Human AT and broader live-document/custom-leaf semantics remain open.
+At this shared-core stage the second real-worker domain was still pending;
+the combined consumer receipts below qualify Knot's catalog domain without
+establishing whole-application causal authority.
 
 ### Containing Genet pin, September 30
 
@@ -162,7 +166,89 @@ Failure logs and Git-blob comparisons are retained; these are qualified scoped
 passes, not unqualified strict all-target passes. Logs and source/lock hashes
 are under `Code/testing/cambium/capture-pairing/combined/`.
 
-Knot and Redshank must qualify the combined pins before Turnstone's containing
+The published containing Mere revision is `bd5912fbbb8f468defc3bbeee7eac5a4f7d2b2f3`.
+Knot and Redshank now qualify these combined pins before Turnstone's containing
 gate. Their earlier native captures retain their original source/binary hashes.
-New Windows Knot receipts must exercise the actual client-menu default; legacy
-plain-row harnesses cannot establish that default's native behavior.
+
+Knot `3dfb70b01e79dadfcbd1e615ded43b34f01802da` preserves Commands, links,
+typography and diagnostics. Its desktop all-target gate passes 260 with one
+existing ignore; standalone document all-features passes 63 with one existing
+ignore. Production Clippy is strict-clean; the all-target pass retains its six
+verified test-baseline allowances and archived strict failures. A deliberately
+bypassed stale-result acceptance guard fails 101, then exact source restoration,
+seven graph-module tests and the build pass. Five native runs exercise actual
+client menus and produce nine reviewed images: accepted Save, explicit partial
+read errors, count-one loss and paired/default light/dark/light. Schema v2 seals
+the actual measure enum. Source, binary and receipt hashes are in
+`Code/testing/knot-editor/catalog-diagnostics/combined/final-audit.json`.
+
+Redshank is repinned at Woodshed `cefc903dcd7f506803acfe2ee52cad7693787188`.
+All 45 tracked Redshank Rust source blobs remain identical to `2479dc9`; only
+manifests/lock changed, with all existing package versions and dependency edges
+preserved. Its 68 desktop tests, strict production Clippy, native build and
+actual Wasm compilation pass. Six new paired/default native images were reviewed;
+paired frames 22/25/28 seal dirty and durable revisions 3/4/5, with explicit
+two-record loss. Three corrupted metadata controls reject the mismatch. The
+primary's 11 transcript WIP files are preserved, and the collision worktree and
+branch were removed after publication. Evidence is in
+`Code/testing/redshank/capture-pairing/combined/`.
+
+Knot seals supplied accepted-catalog references only when that graph is visible.
+Redshank seals rendered UI facts alongside separately named persistence owner-time
+state and admission context; it does not assert that a Save caused those pixels.
+These qualify product-owned catalog and persistence domains alongside submitted
+frame/readback pairing. They do not establish whole-application causality,
+semantic revisions, human AT or compositor/physical-display acknowledgement.
+
+### Published combined Turnstone consumer, September 30
+
+Turnstone `b2ead70a448948a1e8a9bde10b34f01524119606` consumes Mere `bd5912fb`,
+Genet `69a2383b`, Knot `3dfb70b` and Woodshed `cefc903`. The final lock preserves
+preceding registry package versions; intended Git identities and the direct
+document-session-api edge change. Locked/offline all-target tests pass 635 with
+nine existing ignores; four additional harnesses run zero tests. Five exact
+optional Piccolo/Wasm participant tests each pass, independently of the default
+native build. These are native runtime-feature tests, not a Turnstone browser or
+Wasm-target receipt. Focused groups overlap the workspace and must not be summed.
+Turnstone strict Clippy is not claimed.
+
+Scoped contributed automation and platform actions use the same provider-owned
+computed semantics and retained rectangles. Targets carry pane/admission/node
+identity; the held pointer revalidates after scrolling and rendering. The real
+Sky scenario passes: Calculate request 3 moves from painted y=839 with no visible
+rectangle to the full 30-pixel visible rectangle at y=570, before the following
+applied-state assertion. Three 1024×600 images were reviewed. Its final scrolled
+background is black and field values are unreadable; product state is established
+by the scenario observation, not screenshot text.
+
+Final source review discovered an independent platform admission bug: a surface
+could refuse hidden/disabled/unsupported actions while the helper reported true,
+allowing rejected Focus to move Shell focus/stacking. The real-runner regression
+fails before repair (101); after returning `Option<SurfaceRequest>` and using
+`.is_some()`, all eight contributed AT tests pass. A test-provider wrapper
+qualifies admitted no-host-effect actions; production Runner redraw is preserved.
+Dropping the final generation predicate fails 101, then exact source SHA-256
+`6E4DCB660590EB17BAE88BF6668363134319E73AFDBDDDC7C6787273FA3FB3AE` is restored.
+Removing the Gloss platform arm also fails its control and restores exact bytes.
+
+Optional Gloss Diagnostics fresh and restored scenarios pass with two further
+reviewed 1024×600 images. Fresh retains two records/266 accounted bytes, four
+evictions and gap `[1,5)`; restart retains one record/133 bytes with no loss/gaps.
+Saved Diagnostics, Downloads order survives restart. Explicit display limits
+16/4/256 are recorded in both launches; readonly rows show unknown coverage and
+unavailable correlation. Default Gloss remains minimap plus Downloads.
+
+The final audit verifies 254 input hashes unchanged through qualification and
+publication, with all native processes closed. Binary SHA-256:
+`DFBE44B79470C2C32EF0A2EDD0BBCCF78EAE4D3861B876D8E91B29AAAFD7A09F`.
+Lock SHA-256:
+`7C45B1754D9C3A9557A1BB56882F5CB481F514F1228F2EFD3E3E2CC0D94BBD94`.
+Evidence lives in `Code/testing/turnstone/contributed-semantics/` and
+`Code/testing/turnstone/diagnostic-inspection/final/`; publication.json records
+the remote identity and root review. The unrelated `.github/` tree is preserved.
+
+These captures qualify behavior/visible readings, not an immutable Turnstone
+diagnostic-state/pixel seal. The custom compositor, Inspector source/endpoint
+binding repairs, broader built-in/custom/live-document surfaces, additional
+worker families and human AT retain owner-specific gates. The recorded Windows/
+Narrator baseline is preparation only and supplies no human acceptance evidence.
