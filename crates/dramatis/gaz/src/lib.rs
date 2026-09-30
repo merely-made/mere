@@ -81,8 +81,9 @@
 //!
 //! Pre-1.0. The data model and optional persona-scoped persistence over
 //! Muniment exist. Enable `muniment` for its `persistence` module, and let the host
-//! choose its backend and codec. Host sealing, JSContact exchange and resolver
-//! intake remain in the founding plan in `design_docs/`.
+//! choose its backend and codec; Castellan/Pandect supply host sealing. Enable
+//! `jscontact` for public persona cards, unverified peer imports and explicit
+//! private backups. Resolver intake remains in the founding plan in `design_docs/`.
 
 #![warn(missing_docs)]
 
@@ -91,6 +92,8 @@ pub mod book;
 pub mod contact;
 pub mod endpoint;
 pub mod handle;
+#[cfg(feature = "jscontact")]
+pub mod jscontact;
 #[cfg(feature = "muniment")]
 pub mod persistence;
 pub mod proof;

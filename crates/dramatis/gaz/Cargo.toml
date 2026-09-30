@@ -14,6 +14,8 @@ exclude = ["design_docs/"]
 # The host supplies both the backend and codec. The data model has no default
 # features and no persistence dependency until this is selected.
 muniment = ["dep:muniment"]
+# JSContact is an exchange boundary, not the stored ContactBook model.
+jscontact = ["dep:serde_json", "dep:iri-string"]
 
 [dependencies]
 # Typed public keys and retained proof artifacts are plain data in insigne,
@@ -26,6 +28,8 @@ uuid = { version = "1", default-features = false }
 # Direct declaration permits disabling muniment's default JSON codec without
 # changing the workspace's default for other consumers.
 muniment = { version = "0.1.2", path = "../../eidetic/muniment", default-features = false, optional = true }
+serde_json = { version = "1", optional = true }
+iri-string = { version = "0.7", default-features = false, optional = true }
 
 [dev-dependencies]
 # Real issuers and signature checks exercise retained proofs after reload;
