@@ -19,6 +19,14 @@ chatelaine is the item taxonomy kept there).
 Lives in the [mere](https://github.com/merely-made/mere) workspace under
 `crates/dramatis/`. No implementation yet.
 
+Ruled 2026-10-01: chatelaine becomes a plain taxonomy, like insigne's core.
+It holds CXF-shaped item kinds and secret-free metadata (ids, labels, persona
+scope, origin), with no secret bytes, no storage and no cryptography.
+Castellan keeps the sealed store and exercises the items. The CXF import
+policy for all 17 credential types, including which ones are quarantined for
+the user's review, is in the dramatis tier architecture in mere's
+`design_docs`.
+
 ## License
 
 MPL-2.0

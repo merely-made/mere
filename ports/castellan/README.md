@@ -81,7 +81,11 @@ live resolver transport and application contact UI remain separate work.
 Graphshell composes all three and re-exports them at its pre-founding paths,
 so it is the first host rather than the owner. The intent wire strings keep
 their `castellan.*` values for now; renaming the wire vocabulary is
-a separate decision. CXF import remains follow-on work. The file freshness
+a separate decision. CXF import remains follow-on work; its policy was ruled
+on 2026-10-01. The everyday credentials are stored and SSH keys go through
+the native SSH import. Identity documents, payment cards, passkeys, files and
+unknown types are quarantined: sealed, never exercised, and accepted one at a
+time by the user. The secret-free item taxonomy moves to chatelaine. The file freshness
 ledger detects rollback of the credential-record root only when its separate
 root was not restored with it; stronger platform monotonic storage remains a
 host deployment choice. See the keeper founding plan and the credential port
