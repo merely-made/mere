@@ -1,7 +1,8 @@
 # chatelaine
 
-Name reservation for **chatelaine**, the secret half of the Mere platform's
-credential model.
+**chatelaine** is the item taxonomy for the secret half of the Mere
+platform's credential model: plain data that describes what is kept, with no
+secrets in it.
 
 Named for the waist-worn chain that held the household's keys, and by
 extension the keeper of them. The chatelaine holds what must never be shown:
@@ -17,7 +18,9 @@ substrate (that is [personae](https://crates.io/crates/personae)'s vault; the
 chatelaine is the item taxonomy kept there).
 
 Lives in the [mere](https://github.com/merely-made/mere) workspace under
-`crates/dramatis/`. No implementation yet.
+`crates/dramatis/`. Built: the item taxonomy (items, credentials of every CXF
+v1.0 kind, collections, links, the import disposition per kind, and the OTP
+display enums), plain serde data depending only on serde and uuid.
 
 Ruled 2026-10-01: chatelaine becomes a plain taxonomy, like insigne's core.
 It holds CXF-shaped item kinds and secret-free metadata (ids, labels, persona

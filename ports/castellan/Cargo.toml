@@ -43,6 +43,8 @@ insigne = { workspace = true, features = ["verify"] }
 # HMAC + the three hashes RFC 6238 allows. RustCrypto, and sha2 is already a
 # workspace pin, so this adds one lineage rather than three.
 base64.workspace = true
+# The secret-free item taxonomy; the OTP display enums are defined there.
+chatelaine.workspace = true
 hmac = "0.13"
 notochord.workspace = true
 personae.workspace = true
