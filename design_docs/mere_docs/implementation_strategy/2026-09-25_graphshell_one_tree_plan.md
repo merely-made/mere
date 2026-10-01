@@ -598,3 +598,24 @@ this tree.
   Record this separately from timings. A comparison must identify the
   layout/law, graph size and density, visible count and elapsed-step settings;
   the present generated-graph receipts do not settle all configurations.
+- 2026-10-01: the physics panel lane (`tree-physics-panel`, from `d91a49f0`)
+  builds the docked "Graph tools" region with its "Arrangement and physics"
+  section, on both the fixture and `app=local` routes.
+  - The typed Apply actions live in `graphshell::canvas_physics`, and the old
+    page's form handlers now call them. Pictograph's
+    `Canvas::set_physics_choice` gives one rebuild per apply, in source →
+    overlays → law order.
+  - The standalone web manifest's Genet pins follow root's `b1eb3af1`, which
+    main `c6707958` had missed.
+  - Native gates pass 261 (merge gate), 228 (graphshell `web` lib) and 260
+    (pictograph `canvas` lib), and the locked wasm build passes.
+  - Headed on the tree: the 11 per-law receipts, profiles and add pass, and
+    Springs and profiles pass on `app=local`. A positive control fails as it
+    should.
+  - `p4_tree_physics_drag` fails its one-frame release-window threshold
+    intermittently (Stress 21–31 against ≤ 20; Anneal 61–292 against ≤ 60).
+    Its reclaim and hold assertions pass. This is returned as a fork.
+  - The region's width at narrow viewports is not ruled.
+  - The [controls receipt](../testing/2026-09-27_graphshell_controls_physics_receipt.md)
+    records the evidence. The remote board scenarios belong to the separate
+    remote-session slice.
