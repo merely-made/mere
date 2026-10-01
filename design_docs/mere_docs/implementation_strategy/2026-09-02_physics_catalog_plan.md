@@ -535,6 +535,33 @@ home still open, and `PhysicsBoard::offload` uncalled:
   readback panics on wasm), that no native host constructs a Canvas, and
   that its helper boots its own device; the ruling is reopened with Mark on
   that evidence.
+  *Reopened (2026-10-01):* Mark answered: "The ingredients individually
+  would work in native, web, and mobile… so the cook or the recipe are the
+  issue. Consider your (3); no native hosts, why's that?" The premise was
+  wrong: turnstone is the native host and builds a `Canvas` per graph
+  runtime (`turnstone/src/app/runtime_pool.rs`, `session_lifecycle.rs`),
+  with `physics_native.scn`; the assessment searched only mere. The
+  remaining findings are recipe faults (own device, synchronous readback,
+  `[N,N]` tensors), not limits of the ingredients. The ruling stands open
+  until the recipe is put back to him.
+
+Ruled 2026-10-01, the GPU-tier law lane's first forks:
+- **What earns a law id.** Asked whether only distinct dynamics get new ids
+  or GPU variants do too, Mark said: "I don't mind tunings. Don't present
+  alt tunings as alt instruments. You need both novel layout algorithms and
+  arrangements/scenes with physics configs of those layout algorithms. So i
+  guess 1?" So new law ids are for novel dynamics only; scale versions of
+  an existing law stay under its id as a backend tier; tunings are welcome
+  as profiles, arrangements and scenes over the laws, never presented as
+  laws.
+- **The first GPU-tier law.** "Density": a Gastner–Newman density-equalizing
+  layout, nodes advecting along the density gradient of a diffused grid
+  until area follows mass. The alternatives were Scent (chemotaxis), Current
+  (SPH-carried) and Sheet (elastic membrane).
+- **The integrator.** Asked hybrid (rapier nodes, GPU medium) or a resident
+  GPU backend, Mark asked: "You are allowed to consider nexus. Would that
+  help?" Open until Nexus is assessed for it; the conatus plan's "Nexus is
+  decomposed, never adopted" ruling is the frame.
 - **A GPU-tier law lane.** Asked whether the catalog's 2D, rapier-only bound
   holds, Mark chose "Add a GPU-tier law lane": a follow-on for laws that only
   make sense at GPU scale, still 2D. The alternatives were keeping the bound,
