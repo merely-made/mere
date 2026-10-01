@@ -156,10 +156,12 @@ pub mod field_bridge;
 mod fields;
 pub use canvas_search::CanvasSearchSurface;
 pub use field_bridge::{build_query_similarity_field, register_query_similarity_field};
+mod elapsed;
 pub mod fold_projection;
 mod frame;
 mod frame_profile;
 pub use frame_profile::CanvasFrameProfile;
+pub use seiche::{ElapsedStepConfig, ElapsedStepReport};
 mod cull;
 mod input;
 mod resolved_image_cache;
@@ -275,6 +277,8 @@ pub struct Canvas {
     /// off-thread armillary actor (native always-offload). The canvas never reads
     /// it directly; it feeds positions into `view` each frame.
     physics: Physics,
+    frame_timestamp: Option<std::time::Duration>,
+    elapsed_step: Option<ElapsedStepReport>,
     /// Whether the layout physics is paused (the user froze the graph with Space /
     /// the pause button). While paused the sim is halted and settle requests are
     /// suppressed, so the graph holds still through mutations until resumed.

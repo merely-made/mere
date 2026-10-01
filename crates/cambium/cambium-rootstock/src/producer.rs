@@ -60,6 +60,8 @@ pub struct ProducerFrameInfo {
     /// No prior image is usable: return a frame even if application data is
     /// unchanged. Set after resize, suspension, removal/recreation or a new device.
     pub needs_frame: bool,
+    /// Host monotonic time for this draw. None preserves deterministic callers.
+    pub timestamp: Option<std::time::Duration>,
     pub appearance: ResolvedAppearance,
 }
 
