@@ -658,3 +658,10 @@ home still open, and `PhysicsBoard::offload` uncalled:
   node within the release frame itself, so the "released where it was
   dropped" check needs sixty pixels of tolerance there against twenty for
   a resting law.
+- 2026-10-01: Anneal no longer moves pinned (kinematic) bodies, per Mark's
+  "Seiche: skip non-dynamic bodies". Its `set_translation` had overwritten
+  a dragged node's kinematic target, so a released node snapped back. No
+  other law, overlay or Hold writes positions. The new seiche test fails
+  without the fix and passes with it. The tree drag receipt now passes three
+  runs in a row
+  ([one-tree plan](2026-09-25_graphshell_one_tree_plan.md) §6).
