@@ -1,10 +1,10 @@
 # Chatelaine and CXF Import Plan
 
 **Date**: 2026-10-01
-**Status (2026-10-01)**: plan. Shape ruled by Mark on 2026-10-01 (rulings 7
-and 10 to 15 in the dramatis tier architecture; rulings 16 to 38 below). P0
-met; P1 built and verified, with a ruled follow-up pass before it merges;
-P2 and P3 next; the run stops after P3 for Mark's review (ruling 28).
+**Status (2026-10-01)**: in progress. Shape ruled by Mark on 2026-10-01
+(rulings 7 and 10 to 15 in the dramatis tier architecture; rulings 16 to 38
+below). P0 met; P1 landed on `main` (`da3c50bc`); P2 next, then P3; the run
+stops after P3 for Mark's review (ruling 28).
 **Scope**: found `chatelaine` as the tier's plain secret-item taxonomy; move
 castellan's OTP items and its Secret Service store onto it; then import
 (and finally export) the FIDO Credential Exchange Format through castellan.
@@ -264,24 +264,24 @@ build.
 
 - **P1 — the taxonomy.** `crates/dramatis/chatelaine` gains real code.
   Done when:
-  - [ ] items, credentials, collections and links (`item-reference`) exist as
+  - [x] items, credentials, collections and links (`item-reference`) exist as
         plain serde types; `CredentialKind` is `#[non_exhaustive]` and covers
         CXF v1.0's 17 kinds, the Secret Service generic secret, and
         `Unknown` with its preserved type string;
-  - [ ] `disposition(kind)` returns the ruled import treatment (stored,
+  - [x] `disposition(kind)` returns the ruled import treatment (stored,
         quarantined, routed to SSH import, kept as a link), with a test per
         row of the tier architecture's §7 table;
-  - [ ] the OTP display enums live here, gaining serde; castellan's `otp`
+  - [x] the OTP display enums live here, gaining serde; castellan's `otp`
         module re-exports them from chatelaine, so there is one definition
         from P1 on, and that re-export is P1's only castellan change;
-  - [ ] the production graph is serde plus `uuid` without default features:
+  - [x] the production graph is serde plus `uuid` without default features:
         no `personae`, no hashing, no signing, no randomness. Proven by a
         `cargo tree` receipt and a `wasm32-unknown-unknown` check, the gaz
         and insigne precedent;
-  - [ ] each kind carries exactly §1's metadata (rulings 23 and 24), no more,
+  - [x] each kind carries exactly §1's metadata (rulings 23 and 24), no more,
         and the crate docs state the line; a test per kind constructs its
         metadata, and no kind has a field for a sealed value;
-  - [ ] JSON and postcard round-trips for every kind.
+  - [x] JSON and postcard round-trips for every kind.
 
 - **P2 — castellan's item store on chatelaine; OTP moves.** Done when:
   - [ ] castellan holds persona-scoped sealed item records whose metadata is
@@ -490,6 +490,20 @@ as 34 to 38, and the lane is making the two type changes they require
 (source ids, the `Otp` and `OtpMode` names) before P1 merges. The Fedora
 ThinkPad did not answer mDNS in three rounds while both iMacs did, so P3's
 receipt needs it woken first.
+
+**2026-10-01, P1 landed.** The follow-up pass (`f0141e3a`) added `SourceId`
+(unpadded url-safe base64url, 1 to 64 bytes, kept verbatim) on items and
+collections, and the `Otp` and `OtpMode` names; its control (accepting 65
+bytes) failed two named tests. Two consequences of ruling 37 the lane
+applied, *reading, not ruled*: chatelaine's own serialized tag for the kind
+is `otp` (its CXF type stays `totp`), and the field holding the mode is
+`mode`. Merged onto `main` in a normal-depth worktree and verified there
+(`da3c50bc`): chatelaine 53 tests, castellan 90 with every feature, the tree
+(serde and `uuid` only), wasm32, clippy, and the portable gate, all exit 0;
+the three "patch was not used" warnings are lock-wide and predate P1 (the
+root `Cargo.toml` is unchanged). The chatelaine README now says the crate
+holds identifying metadata and that persona scope lives on castellan's
+store. `main` fast-forwarded; nothing pushed. Next: P2.
 
 ## 6. Running it
 

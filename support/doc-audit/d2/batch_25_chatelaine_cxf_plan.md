@@ -17,7 +17,7 @@ here.
 ## dramatis_docs/implementation_strategy/2026-10-01_chatelaine_cxf_plan.md
 
 - disposition: current
-- status line: "Status (2026-10-01): plan. Shape ruled by Mark on 2026-10-01 … P0 met; P1 built and verified, with a ruled follow-up pass before it merges; P2 and P3 next; the run stops after P3 for Mark's review (ruling 28)." — accurate: yes
+- status line: "Status (2026-10-01): in progress. Shape ruled by Mark on 2026-10-01 … P0 met; P1 landed on `main` (`da3c50bc`); P2 next, then P3; the run stops after P3 for Mark's review (ruling 28)." — accurate: yes
 - claims checked: 12 — holds: 12, stale: 0, unverifiable: 0
 
 ### Stale claims
