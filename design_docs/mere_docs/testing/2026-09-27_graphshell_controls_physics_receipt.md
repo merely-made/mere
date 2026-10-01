@@ -569,6 +569,48 @@ a fork, as the ruling directs.
 `drag-return-step >= 50` and `drag-return-steps == 0`. It failed on both,
 reading 0.8 and 1 (`p4_tree_physics_stepcontrol/`). The file was removed.
 
+### Anneal leaves pinned bodies alone (2026-10-01)
+
+Mark ruled "Seiche: skip non-dynamic bodies". The coordinator confirmed the
+cause. `Anneal::apply` called `set_translation` on every accepted body,
+including one that `Simulation::pin` had made kinematic. In rapier 0.33 that
+call also rewrites `next_position`, the kinematic target, so a dragged node's
+body never followed the drag.
+
+**The fix.** `Anneal::apply` now skips bodies that are not dynamic. They
+remain in the energy as neighbours.
+
+**The audit.** In `seiche/src/laws`, `seiche/src/overlays` and Hold, no
+other position write exists.
+- Every other law and overlay uses `add_force`, which rapier applies to
+  dynamic bodies only.
+- Orbit's one-time kick, Hold and Anneal's velocity reset use `set_linvel`,
+  which rapier ignores on kinematic position-based bodies.
+- Outside the audit, `CouplingForce`'s FlowAdvect response
+  (`seiche/src/coupling_force.rs`) has the same `set_translation` pattern.
+  It is recorded, not changed. `sync.rs` writes authority positions by
+  design.
+
+**Tests.** Logs are under `Code/testing/mere/tree-physics/`.
+- `a_pinned_body_stays_at_its_kinematic_target` pins one of eight nodes and
+  runs 120 ticks. Run before the fix, it failed: the pinned body was at
+  (58.4, 93.9) against a target of (400, −300)
+  (`seiche-anneal-before-fix.log`). It passes with the fix.
+- Seiche passes 98 tests with default features (`seiche-default.log`) and 94
+  with `--no-default-features` (`seiche-no-default.log`).
+- Pictograph `--features canvas --lib` passes 260
+  (`pictograph-canvas-anneal.log`).
+- All runs were offline and locked. The wasm bundle builds
+  (`wasm-build-anneal.log`).
+
+**Headed runs.** `p4_tree_physics_drag` passes three runs in a row
+(`p4_tree_physics_drag_pinned_run{1,2,3}/`). Across all eleven laws the
+first-step release readings are 0.0–3.0 px. Anneal reads 0.7, 0.0 and 0.0 px,
+with the node about 220 px from the press point, where it was dropped. Every
+300-frame check passes. `p4_tree_physics_anneal` passes
+(`p4_tree_physics_anneal_pinned/`), and its cooling capture was inspected
+whole-frame.
+
 ## Open gates
 
 - Genet commit `27d20d3fc51ac5fcd2a2db231e035a3e06013ae1` admits safe retained

@@ -703,3 +703,20 @@ this tree.
   - Per the ruling, the threshold is unchanged and the case returns to Mark
     as a fork. A positive control fails the new observation as it should.
     The receipt doc records the numbers.
+- 2026-10-01: Mark ruled "Seiche: skip non-dynamic bodies".
+  - `Anneal::apply` now leaves non-dynamic (kinematic) bodies unmoved; they
+    still count in the energy as neighbours. An audit of every law,
+    overlay and Hold found no other position write. The rest use
+    `add_force`, which rapier 0.33 applies only to dynamic bodies, or
+    `set_linvel`, which it ignores on kinematic position-based ones.
+  - Outside that audit, `CouplingForce`'s FlowAdvect response
+    (`coupling_force.rs`) has the same `set_translation` pattern. It is
+    noted, not changed.
+  - A new seiche test pins a node under Anneal. Without the fix it fails,
+    with the pinned body at (58.4, 93.9) against a target of (400, −300).
+    With the fix it passes.
+  - Seiche passes 98 tests with default features and 94 without; pictograph
+    `canvas` passes 260. The wasm bundle builds.
+  - `p4_tree_physics_drag` passes headed three runs in a row. Anneal's
+    first-step reading is 0.7, 0.0 and 0.0 px, and the 300-frame checks pass.
+    `p4_tree_physics_anneal` passes.
