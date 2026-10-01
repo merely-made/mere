@@ -471,3 +471,63 @@ fn a_living_law_runs_until_paused_and_a_graph_bound_law_survives_a_reconcile() {
     canvas.set_graph(Graph::new());
     assert_eq!(canvas.physics_law(), PhysicsLaw::Stress);
 }
+
+#[test]
+fn a_whole_choice_applies_with_one_rebuild_and_reads_back() {
+    use crate::canvas::PhysicsChoice;
+    let mut canvas = Canvas::with_sample_graph();
+    let choice = PhysicsChoice {
+        law: PhysicsLaw::Kinds,
+        overlays: vec![
+            PhysicsOverlay::DepthGravity,
+            PhysicsOverlay::HubGravity,
+            PhysicsOverlay::DepthGravity,
+        ],
+        kind: PhysicsKindSource::Cluster,
+        mass: PhysicsMassSource::PageRank,
+        depth: PhysicsDepthSource::Layers,
+    };
+    let before = canvas.law_rebuilds();
+    canvas.set_physics_choice(&choice);
+    assert_eq!(
+        canvas.law_rebuilds() - before,
+        1,
+        "one apply is one rebuild, whatever the sources"
+    );
+    let live = canvas.physics_choice();
+    assert_eq!(live.law, PhysicsLaw::Kinds);
+    assert_eq!(live.kind, PhysicsKindSource::Cluster);
+    assert_eq!(live.mass, PhysicsMassSource::PageRank);
+    assert_eq!(live.depth, PhysicsDepthSource::Layers);
+    assert_eq!(
+        live.overlays,
+        [PhysicsOverlay::DepthGravity, PhysicsOverlay::HubGravity],
+        "duplicates collapse, order is kept"
+    );
+    assert!(canvas.is_settling(), "the apply earns a settle");
+    // The same choice, built through the separate setters law-last, gives the
+    // same force set: the one rebuild read the sources it was handed.
+    let mut stepwise = Canvas::with_sample_graph();
+    stepwise.set_physics_kind_source(choice.kind);
+    stepwise.set_physics_mass_source(choice.mass);
+    stepwise.set_physics_depth_source(choice.depth);
+    stepwise.set_physics_overlays(choice.overlays.clone());
+    let rebuilds = stepwise.law_rebuilds();
+    stepwise.set_physics_law(choice.law);
+    assert!(stepwise.law_rebuilds() > rebuilds);
+    assert_eq!(stepwise.physics_choice(), live);
+    assert_eq!(stepwise.law_force_count(), canvas.law_force_count());
+    // A choice naming a profile's pair names that profile; any other is custom.
+    canvas.set_physics_choice(&PhysicsChoice {
+        law: PhysicsLaw::Springs,
+        overlays: vec![PhysicsOverlay::GravityLocus],
+        ..PhysicsChoice::default()
+    });
+    assert_eq!(canvas.physics_profile_id(), Some("liquid"));
+    canvas.set_physics_choice(&PhysicsChoice {
+        law: PhysicsLaw::Still,
+        overlays: vec![PhysicsOverlay::Skeleton],
+        ..PhysicsChoice::default()
+    });
+    assert_eq!(canvas.physics_profile_id(), None);
+}

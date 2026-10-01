@@ -213,6 +213,8 @@ impl Canvas {
             physics_kind_source: crate::canvas::PhysicsKindSource::Site,
             physics_mass_source: crate::canvas::PhysicsMassSource::Degree,
             physics_depth_source: crate::canvas::PhysicsDepthSource::Roots,
+            #[cfg(test)]
+            law_rebuilds: 0,
             restored_score_hold: None,
             scope: None,
             fold: None,
