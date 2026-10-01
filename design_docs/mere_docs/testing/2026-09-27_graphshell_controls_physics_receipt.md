@@ -516,6 +516,59 @@ and is part of the same review.
 - **Not ruled.** The region is a fixed 300 px (279 px content plus padding).
   Its narrow-viewport behaviour is not ruled.
 
+### Release window measured in physics steps (2026-10-01)
+
+Mark ruled "Measure in physics steps" (plan §1, follow-up rulings).
+
+**What changed.**
+- `release-at` arms a watch at the drop point, in canvas-local px.
+- The producer records the focused node's distance from that point on the
+  first frame where the node is no longer held and the elapsed report shows
+  at least one executed step. It also records how many steps that frame ran.
+- The lane exposes the result as `drag-return-steps` and `drag-return-step`.
+- Each recording also goes into the receipt log, with the distance from the
+  press point and the zoom.
+- `p4_tree_physics_drag` now asserts `drag-return-step <= 20` for resting
+  laws and `<= 60` for moving laws, the original thresholds. Its 300-frame
+  checks are unchanged.
+
+The bundle was built with the same wasm settings
+(`Code/testing/mere/tree-physics/wasm-build-steps.log`). Receipts are under
+`Code/testing/mere/scenarios/graphshell-web/` in
+`p4_tree_physics_drag_steps_run{1,2,3}/`.
+
+| Law | Run 1 (px / steps) | Run 2 | Run 3 |
+| --- | --- | --- | --- |
+| Springs | 0.8 / 1 | 0.8 / 1 | 0.8 / 1 |
+| Charge | 0.8 / 1 | 0.7 / 1 | 0.7 / 1 |
+| Stress | 2.6 / 1 | 2.5 / 1 | 8.2 / 2 |
+| Energy | 0.5 / 1 | 1.2 / 2 | 1.1 / 1 |
+| Orbit, Kinds, Flock | ≤ 0.1 / 1 | ≤ 0.1 / 1 | ≤ 0.1 / 1 |
+| Sync | 1.1 / 1 | 0.5 / 1 | 1.1 / 1 |
+| Flow | 2.1 / 1 | 2.1 / 1 | 2.1 / 1 |
+| **Anneal** (≤ 60) | **255.2 / 1** | **190.8 / 1** | 0.0 / 1 |
+| Still | 0.0 / 2 | 0.0 / 1 | 0.0 / 1 |
+
+Runs 1 and 2 fail only the Anneal check. Run 3 passes. Every 300-frame
+reclaim, hold and overlap check passed in all three runs.
+
+**Why Anneal is not noise.** In run 2, one step after release, the node was
+190.8 px from the drop but 48.1 px from the point where it was pressed, at
+zoom 1.00. Run 1 has no press-point reading: that diagnostic was added after
+it. Anneal's walk moves a body at most 80 px per tick
+(`seiche/src/laws/anneal.rs`, `step` 80 scaled by temperature). A
+190 px jump in one tick is therefore not the walk: the node is snapping back
+to where the walk left its body. The likely mechanism is that `Anneal::apply`
+writes `set_translation` for every body, the held one included. The body
+would then never follow the drag, and the released node returns to it.
+
+This is not isolated. The threshold is unchanged and the case is returned as
+a fork, as the ruling directs.
+
+**Positive control.** A temporary scenario released Springs and asserted
+`drag-return-step >= 50` and `drag-return-steps == 0`. It failed on both,
+reading 0.8 and 1 (`p4_tree_physics_stepcontrol/`). The file was removed.
+
 ## Open gates
 
 - Genet commit `27d20d3fc51ac5fcd2a2db231e035a3e06013ae1` admits safe retained
