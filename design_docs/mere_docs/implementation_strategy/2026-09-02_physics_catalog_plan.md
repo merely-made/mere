@@ -562,6 +562,41 @@ Ruled 2026-10-01, the GPU-tier law lane's first forks:
   GPU backend, Mark asked: "You are allowed to consider nexus. Would that
   help?" Open until Nexus is assessed for it; the conatus plan's "Nexus is
   decomposed, never adopted" ruling is the frame.
+
+Ruled 2026-10-01, after the Nexus assessment. Verified in the checkout
+(`crates/nexus` `3bf7c6d`): its rigid-body solver applies gravity only ("no
+user forces yet", `src_rbd_shaders/dynamics/solver.rs:290`), it has no
+repulsion force, it takes a host's device through `WebGpu::from_device`, its
+step reads back without blocking, and linking it adds about 164 crates with
+a second rapier/parry. Its MPM particle↔grid transfer, radix sort and cell
+binning are the useful patterns.
+- **GPU repulsion recipe.** Mark chose "CubeCL on the host device, async":
+  `NodeExclusion`'s exact law with its cutoff as a CubeCL kernel on the
+  host's `WgpuHandles`, tiled all-pairs below a threshold and a cell list
+  above it (ported from Nexus's radix sort and binning), one-frame-lagged
+  non-blocking readback, and an `Err` to the CPU path when no adapter or a
+  failure. Hosts: turnstone (native) and the web tree; mobile when a host
+  exists. This settles the reopened scale ruling above. The alternatives
+  were a CPU cutoff grid first, or repairing the Burn hook's recipe.
+- **Density's integrator.** "Resident CubeCL now": conatus's CubeCL
+  `integrate` gains a kinematic (pin) mask and a grid-gradient force, with
+  Nexus MPM's transfer ported by hand. This lifts "seiche stays rapier" for
+  the GPU-tier lane only. The alternatives were rapier nodes over a GPU
+  grid, or patching Nexus's solver.
+- **The Nexus build blocker.** "Fix now": the Windows failure is
+  `cargo-gpu-install` removing `Cargo.lock` when spirv-std comes from
+  crates.io (`crates/cargo-gpu/crates/cargo-gpu-install/src/install.rs:311`),
+  a different step from the version gate the local fork fixed. The
+  alternative deferred it until a vessel gate needs GPU dynamic bodies.
+- **Licensing.** Mark said: "Doublecheck. Otherwise, 1". Double-checked:
+  every Nexus crate declares `MIT OR Apache-2.0`, but the repository ships
+  only the Apache-2.0 text and GitHub detects Apache-2.0, unchanged on
+  upstream main `1cfbd76` (2026-10-01); its radix sort is copied from brush
+  (Apache-2.0); `vortx` is Apache-2.0 only. So Nexus-derived code is treated
+  as Apache-2.0: a close port is a retained-license entry in `LICENSES.md`
+  with upstream notices, and code merely informed by it stays MPL-2.0 with a
+  credit line, as `crates/intel/esp/src/infer/decoder/attention.rs` does.
+  Per-file calls are made at decomposition time.
 - **A GPU-tier law lane.** Asked whether the catalog's 2D, rapier-only bound
   holds, Mark chose "Add a GPU-tier law lane": a follow-on for laws that only
   make sense at GPU scale, still 2D. The alternatives were keeping the bound,
