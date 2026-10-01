@@ -2,9 +2,9 @@
 
 **Date**: 2026-10-01
 **Status (2026-10-01)**: in progress. Shape ruled by Mark on 2026-10-01
-(rulings 7 and 10 to 15 in the dramatis tier architecture; rulings 16 to 38
-below). P0 met; P1 landed on `main` (`da3c50bc`); P2 next, then P3; the run
-stops after P3 for Mark's review (ruling 28).
+(rulings 7 and 10 to 15 in the dramatis tier architecture; rulings 16 to 42
+below). P0 met; P1 landed on `main` (`da3c50bc`); P2 in progress, then P3;
+the run stops after P3 for Mark's review (ruling 28).
 **Scope**: found `chatelaine` as the tier's plain secret-item taxonomy; move
 castellan's OTP items and its Secret Service store onto it; then import
 (and finally export) the FIDO Credential Exchange Format through castellan.
@@ -241,6 +241,36 @@ codes are uppercase; SSH fingerprint and file hash are required; `uuid` is
 declared directly, because the workspace entry enables random v4 ids.)
 Options: accept all; name changes. Mark: **"Accept all (Recommended)"**.
 
+Rulings 39 to 42 answer P2's layout checkpoint (§4, 2026-10-01).
+
+**Ruling 39.** *How are castellan's chatelaine items laid out as sealed
+records?* Options: split metadata and payload records; one record per item;
+a metadata book plus payload records. Mark: **"Split: metadata + payload
+records (Recommended)"**. Follows: `items/<item>` (persona label and
+chatelaine `Item`), `payloads/<credential>` (persona label, owning item, the
+sealed payload) and a per-persona index, written payloads first, then
+metadata, then index, under a per-persona transaction lock. The ruled
+metadata line (23, 24) becomes the line on disk: listing, search and the
+quarantine list never decrypt a secret, and an HOTP release rewrites only
+its payload.
+
+**Ruling 40.** *What does the OTP release gate address?* Options: the
+credential; the item. Mark: **"The credential (Recommended)"**. Follows:
+grant paths `…/otp/<persona>/<item>/<credential>`; an item-level grant still
+covers its credentials (insigne's `path_covers` matches whole segments).
+
+**Ruling 41.** *Build the per-persona item index in P2?* Options: in P2; in
+P3. Mark: **"Build it in P2 (Recommended)"**.
+
+**Ruling 42.** *Accept P2's readings?* (Every record carries the store's
+persona, and a mismatch is refused naming both; an imported OTP item is
+titled by its issuer, else its account; the gate refuses any item not in the
+vault from P2 on; the HOTP counter leaves what hosts see; new records live
+under `castellan/items/v1/<persona>/` and old `otp/v1` files are never read;
+tests reading an item's account read the credential's metadata, with the
+same asserted values.) Options: accept all; name changes. Mark: **"Accept
+all (Recommended)"**.
+
 ## 3. Phases
 
 Each phase lands with its own tests and gates and keeps the workspace green.
@@ -312,7 +342,11 @@ build.
         separate catalog/collection/item records are removed, with no decoder
         (ruling 20);
   - [ ] the resource limits (`SecretServiceLimits`) hold as before, by their
-        existing tests;
+        existing tests; *amended 2026-10-01*: there are none (P2's finding:
+        `store_tests.rs` only asserts the defaults), so P3 adds a refusal
+        test per limit, each with a control;
+  - [ ] a replace-by-attributes cannot tear (new bytes under old metadata),
+        held by the per-persona transaction lock of ruling 39;
   - [ ] the README's `secret-tool` store/lookup/clear receipt passes under a
         disposable session bus **on a Linux machine** (the D-Bus server is
         `cfg(target_os = "linux")`, so a Windows build proves nothing about
@@ -505,6 +539,17 @@ root `Cargo.toml` is unchanged). The chatelaine README now says the crate
 holds identifying metadata and that persona scope lives on castellan's
 store. `main` fast-forwarded; nothing pushed. Next: P2.
 
+**2026-10-01, P2 checkpoint.** The P2 lane stopped before writing the store,
+as briefed: personae's sealed records are one path each, the path bound into
+the encryption (`sealed_record_storage.rs:85`), with no listing and no
+cross-record transaction (`update_record` is single-path), and the Secret
+Service's item records hold their secret bytes (`StoredItem.secret`), so
+every property read and search decrypts the secret. Its measurements:
+personae's envelope writes plaintext and ciphertext as JSON number arrays,
+so a sealed file is 12.7 to 23 times what it seals (a 1 MiB secret makes a
+~13.4 MB file), worth knowing for the personae tier, outside this plan.
+Mark ruled its forks as 39 to 42; the lane is implementing.
+
 ## 6. Running it
 
 As ruled (26 to 29), with the workspace's lane rules:
@@ -512,6 +557,9 @@ As ruled (26 to 29), with the workspace's lane rules:
 - **Lanes.** P0 (Sonnet) and P1 (Opus) run together; P0 reads and reports,
   P1 writes code, and neither depends on the other. P2 and P3 follow in
   order on Opus. The run stops after P3 for Mark's review; P4a onward waits.
+- **Base.** A lane first confirms its worktree is based on `main`'s tip:
+  P2's was created at an older commit, before P1 and rulings 30 to 38, and
+  its lane caught it by fast-forwarding.
 - **Isolation.** Each lane works in its own git worktree on its own branch,
   with its own `CARGO_TARGET_DIR` under `C:\t\cargo-targets\mere\`. Nothing a
   lane produces reaches `main` until it is verified there: the phase's
