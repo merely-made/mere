@@ -736,3 +736,27 @@ this tree.
   - `p4_tree_physics_drag` passes headed three runs in a row. Anneal's
     first-step reading is 0.7, 0.0 and 0.0 px, and the 300-frame checks pass.
     `p4_tree_physics_anneal` passes.
+- 2026-10-01: the three follow-ups ruled at `ea604bf4` are carried out.
+  - **FlowAdvect.** `CouplingForce` FlowAdvect skips non-dynamic bodies. Its
+    new test failed without the fix, holding the pinned body at (120, 0)
+    against a target of (−200, 50), and passes with it. Seiche passes 99
+    tests with default features and 95 without.
+  - **Narrow viewports.** `TOOLS_DOCK_MIN_WIDTH` in `web_tree.rs` is 900
+    logical px: the 300 px region plus a 600 px minimum canvas. A centred
+    node dragged 220 px needs 476 px, and the fitted fixture spans about
+    320 px.
+    - Below that width the region is not rendered. A "Graph tools" toggle
+      with `aria-expanded` appears at the end of the Graph controls row and
+      opens the region as an absolute overlay over the canvas row.
+    - *Reading, not ruled:* the toggle sits in the controls row rather than
+      over the canvas, so the open overlay never covers its own toggle.
+  - **Storage line.** On `app=local` the storage line now leads the Graph
+    tools region as a status named "Storage: …". The floating line on the
+    canvas shows only save feedback.
+  - **Structure.** `physics.rs` now returns only its section, and
+    `web_tree.rs` builds the region around it, so another section can join.
+  - **Results.** Graphshell's `web` lib passes 228 tests and the wasm build
+    passes. Headed, `p4_tree_physics_springs`, `_springs` on `app=local` and
+    the new `p4_tree_tools_narrow` (700 px window) pass, all inspected
+    whole-frame. The mirror lists button "Graph tools" (`aria-expanded`
+    false) and the "Storage" status.
