@@ -74,6 +74,8 @@ gaz = { workspace = true, features = ["muniment"] }
 gazette.workspace = true
 muniment = { workspace = true, features = ["postcard", "redb"] }
 pollster = "0.4"
+# The read-model tests serialize chatelaine values to look for secrets.
+serde_json.workspace = true
 tempfile = "3"
 # The moved authority tests exercise the real SSH agent session and, on
 # Windows, the named-pipe wire.
