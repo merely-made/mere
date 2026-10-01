@@ -712,6 +712,12 @@ receipts plan, and that is what makes it authority-grade; what it is not is
 evidence of product demand for the features its receipts prove. Whether that
 qualifies the consumer ruling's "its asks open gates" is not settled here; it
 is raised in Progress for Mark.
+*Settled 2026-09-30.* Mark, when opening the mer3ly.net canvas assessment:
+"my feeling is, the site counts as a consumer, but it should be consuming or
+creating stack capabilities, not special exceptions." mer3ly's asks open gates,
+but only for capabilities that another consumer could use unchanged. Recorded
+as Ruling 1 of mer3ly's `docs/2026-09-30_graphshell_site_canvas_plan.md`, which
+is that objective's assessment.
 
 ## Progress
 
