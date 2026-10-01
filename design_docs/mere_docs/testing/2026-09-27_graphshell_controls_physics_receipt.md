@@ -611,6 +611,58 @@ with the node about 220 px from the press point, where it was dropped. Every
 (`p4_tree_physics_anneal_pinned/`), and its cooling capture was inspected
 whole-frame.
 
+### FlowAdvect, narrow viewports and the storage line (2026-10-01)
+
+These carry out the rulings at `ea604bf4`.
+
+**FlowAdvect.** `CouplingForce`'s FlowAdvect response now skips non-dynamic
+bodies (commit `a3a455db`). The test
+`flow_advect_leaves_a_pinned_body_at_its_kinematic_target` failed before the
+fix, with the pinned body held at (120, 0) against a target of (−200, 50)
+(`seiche-flowadvect-before-fix.log`). It passes after. Seiche passes 99
+tests with default features and 95 with `--no-default-features`
+(`seiche-default-flow.log`, `seiche-no-default-flow.log`).
+
+**Narrow viewports.** The breakpoint is `TOOLS_DOCK_MIN_WIDTH`, 900
+logical px: the 300 px region plus a 600 px minimum canvas. That minimum
+comes from two measurements:
+- a node centred by `center-node` and dragged 220 px needs 476 px;
+- the fitted fixture spans about 320 px.
+
+Below the breakpoint the region is not rendered. A "Graph tools" button with
+`aria-expanded` joins the Graph controls row, and opening it puts the region
+in an absolute overlay on the right of the canvas row, with the canvas taking
+the full width.
+
+`p4_tree_tools_narrow` runs in a 700 by 900 window, giving a 687 px logical
+tree, and passes:
+- the region starts collapsed;
+- the toggle opens it;
+- Charge applies through the overlay;
+- clicking the toggle closes it;
+- Enter on the focused toggle opens and closes it.
+
+The collapsed and overlay captures were inspected whole-frame. The overlay
+box ends at its content height rather than stretching to the bottom inset,
+the Genet trait already noted for absolutely placed boxes.
+
+**Storage line.** On `app=local` the region begins with a status line,
+"Storage: IndexedDB reopened · persistent". The floating panel over the canvas
+shows only save feedback, and only after a save.
+
+**Runs and checks.**
+- The wide fixture run `p4_tree_physics_springs_tools/` passes, docked.
+- The wide `app=local` run `p4_tree_physics_springs_local_tools/` passes,
+  with the storage line in the region and none on the canvas. Both were
+  inspected whole-frame.
+- The mirror, read through `find` in the Browser pane, lists button "Graph
+  tools" with `aria-expanded="false"` at 700 px, where the region is absent,
+  and status "Storage: IndexedDB reopened · …" at 1400 px. The pane's
+  profile reported not persistent.
+- Graphshell `--features web --lib` passes 228
+  (`native-graphshell-web-tools.log`). The wasm build passes
+  (`wasm-build-narrow.log`).
+
 ## Open gates
 
 - Genet commit `27d20d3fc51ac5fcd2a2db231e035a3e06013ae1` admits safe retained
