@@ -169,6 +169,19 @@ find/arrange/physics panel, and the newest phase-4 work sat unmerged on
   during design. You feel free to orchestrate using opus and/or sonnet."
   Design forks come back to him one round at a time; implementation runs as
   Opus/Sonnet lanes in their own worktrees, verified before they reach main.
+- **Placement.** Told the tree has one toolbar row over a full-size canvas,
+  that `app=local` floats its detail panel over the canvas, and that the old
+  page stacks its tools in one "Graph tools" aside, Mark chose "Docked 'Graph
+  tools' side region": a region beside the canvas whose first section is
+  Arrangement + Physics, into which step 3's later panels stack. The
+  alternatives were a tabbed side region, or selects inline in the toolbar.
+- **Apply.** "Keep explicit Apply": Apply arrangement, Apply physics and
+  Apply profile buttons as on the old page, one rebuild per apply in
+  source → overlays → law order. The alternatives were applying on every
+  change, or a hybrid with live law/profile and batched details.
+- *Merge gate (2026-10-01):* on `3270cac2`, `cargo test --locked -p
+  pictograph -p cambium-rootstock -p graphshell` exited 0. Native only; the
+  wasm build and headed scenarios run in the panel lane.
 
 The [phase-4 migration inventory](2026-09-27_graphshell_tree_migration_inventory.md)
 maps the actual application state, controls, shared-input gaps and remaining
