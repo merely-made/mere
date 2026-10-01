@@ -376,3 +376,10 @@ crate inventory at the Code root.
   baseline still waits on chatelaine's taxonomy landing (C5, above); with
   its shape ruled, that condition is now buildable rather than waiting on
   design. The facade is not a C5 condition.
+- 2026-10-01, later. The
+  [chatelaine and CXF plan](../../dramatis_docs/implementation_strategy/2026-10-01_chatelaine_cxf_plan.md)
+  is drafted. Mark ruled that chatelaine subsumes castellan's Secret Service
+  store as part of founding (its ruling 17), so C5's chatelaine condition is
+  met at that plan's P3: the taxonomy, OTP on it, and the Secret Service on
+  it, with a Linux `secret-tool` receipt. CXF import (P4 onward) is not a C5
+  condition.

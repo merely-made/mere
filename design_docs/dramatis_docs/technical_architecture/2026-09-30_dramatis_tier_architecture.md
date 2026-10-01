@@ -305,7 +305,10 @@ Quarantine, as ruled: sealed on import, never exercised or autofilled,
 listed for review, and accepted into the vault or deleted by the user one
 item at a time (invariant 12). CXP is still a working draft, so a `.cxf`
 file is plaintext on disk, and every import path treats it as burning
-(standards survey §2.3).
+(standards survey §2.3). The work, and rulings 16 to 22 on the item model,
+the Secret Service store, the parser, live data, personae per account and
+export, are in the
+[chatelaine and CXF plan](../implementation_strategy/2026-10-01_chatelaine_cxf_plan.md).
 
 **The dramatis facade is real, for sibling repos (ruling 8).** `dramatis`
 re-exports personae, insigne and gaz behind features, so a repo outside mere
@@ -429,4 +432,6 @@ preserved verbatim; drop with a report. Mark: **"Quarantine, preserved
 verbatim (Recommended)"**.
 
 Rulings 10 to 15 answer the standards survey's open decision 5 (CXF import
-policy), which had been open since 2026-08-24.
+policy), which had been open since 2026-08-24. Rulings 16 to 22, the same
+day, belong to chatelaine's implementation and are recorded in the
+[chatelaine and CXF plan](../implementation_strategy/2026-10-01_chatelaine_cxf_plan.md) §2.
