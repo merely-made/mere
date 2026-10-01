@@ -17,7 +17,7 @@ here.
 ## dramatis_docs/implementation_strategy/2026-10-01_chatelaine_cxf_plan.md
 
 - disposition: current
-- status line: "Status (2026-10-01): plan. Shape ruled by Mark on 2026-10-01 … Nothing has moved yet. P0 is the first step." — accurate: yes
+- status line: "Status (2026-10-01): plan. Shape ruled by Mark on 2026-10-01 … Nothing has moved yet. P0 and P1 start together (ruling 26); the run stops after P3 for Mark's review (ruling 28)." — accurate: yes
 - claims checked: 12 — holds: 12, stale: 0, unverifiable: 0
 
 ### Stale claims
@@ -32,8 +32,10 @@ here.
 
 ### Recommended action
 
-- none for this record. Two forks are recorded as Mark's, not settled: the
-  per-kind metadata line (P1 checkpoint) and RSA/ECDSA SSH keys (P4 start).
+- none for this record. The two forks first recorded as Mark's (the
+  per-kind metadata line, RSA/ECDSA SSH keys) were ruled the same day as
+  rulings 23 to 25. Rows of §1's table marked *(reading)* remain open to his
+  correction before P1 lands.
 
 ### Notes
 
