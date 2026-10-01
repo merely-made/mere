@@ -1,7 +1,8 @@
 # chatelaine
 
-Name reservation for **chatelaine**, the secret half of the Mere platform's
-credential model.
+**chatelaine** is the item taxonomy for the secret half of the Mere
+platform's credential model: plain data that describes what is kept, with no
+secrets in it.
 
 Named for the waist-worn chain that held the household's keys, and by
 extension the keeper of them. The chatelaine holds what must never be shown:

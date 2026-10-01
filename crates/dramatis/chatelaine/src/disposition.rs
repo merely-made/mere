@@ -38,7 +38,7 @@ pub fn disposition(kind: &CredentialKind) -> Disposition {
         // Ruling 10; totp lands on castellan's RFC 6238 items.
         K::BasicAuth { .. }
         | K::GeneratedPassword
-        | K::Totp { .. }
+        | K::Otp { .. }
         | K::ApiKey { .. }
         | K::Wifi { .. } => Disposition::Stored,
         // Ruling 10, every algorithm since ruling 25.

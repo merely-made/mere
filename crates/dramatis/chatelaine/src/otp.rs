@@ -7,9 +7,9 @@
 //! What a one-time password looks like, without the seed that makes one.
 //!
 //! [`OtpAlgorithm`] and [`OtpCodeStyle`] moved here from castellan, which
-//! re-exports them. [`OtpKind`] is the shape alone: an HOTP counter is
-//! mutable, freshness-critical state, so it stays with castellan's sealed
-//! record.
+//! re-exports them. [`OtpMode`] is the shape alone: an HOTP counter is
+//! mutable, freshness-critical state, so it stays in castellan's own
+//! `OtpKind` and its sealed record.
 
 use core::fmt;
 
@@ -71,7 +71,7 @@ impl OtpCodeStyle {
 /// Whether codes advance on a clock or on a counter.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
-pub enum OtpKind {
+pub enum OtpMode {
     /// Time-based (RFC 6238), stepping every `period` seconds from `t0`.
     Totp {
         /// Seconds per step.
@@ -119,9 +119,9 @@ mod tests {
             "\"steam-guard\""
         );
         assert_eq!(
-            serde_json::to_string(&OtpKind::Totp { period: 30, t0: 0 }).unwrap(),
+            serde_json::to_string(&OtpMode::Totp { period: 30, t0: 0 }).unwrap(),
             r#"{"totp":{"period":30,"t0":0}}"#
         );
-        assert_eq!(serde_json::to_string(&OtpKind::Hotp).unwrap(), "\"hotp\"");
+        assert_eq!(serde_json::to_string(&OtpMode::Hotp).unwrap(), "\"hotp\"");
     }
 }

@@ -14,6 +14,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::id::{CollectionId, CredentialId, ItemId};
 use crate::kind::CredentialKind;
+use crate::value::SourceId;
 
 /// A titled container of typed credentials.
 ///
@@ -23,6 +24,8 @@ use crate::kind::CredentialKind;
 pub struct Item {
     /// The item's id.
     pub id: ItemId,
+    /// Its id in the CXF file it was imported from, if it came from one.
+    pub source_id: Option<SourceId>,
     /// The name the user knows it by.
     pub title: String,
     /// A further description.
@@ -107,6 +110,8 @@ pub struct Link {
 pub struct Collection {
     /// The collection's id.
     pub id: CollectionId,
+    /// Its id in the CXF file it was imported from, if it came from one.
+    pub source_id: Option<SourceId>,
     /// Its name.
     pub title: String,
     /// A further description.
@@ -157,8 +162,17 @@ mod tests {
     }
 
     #[test]
-    fn an_item_without_scope_or_timestamps_round_trips() {
+    fn an_item_keeps_its_cxf_source_id() {
+        let item = samples::item(vec![samples::note()]);
+        let json = serde_json::to_value(&item).unwrap();
+        assert_eq!(json["source_id"], "ZmllbGQx");
+        round_trip(&item);
+    }
+
+    #[test]
+    fn an_item_without_source_scope_or_timestamps_round_trips() {
         let mut item = samples::item(vec![samples::note()]);
+        item.source_id = None;
         item.scope = None;
         item.subtitle = None;
         item.created_at = None;
@@ -170,6 +184,7 @@ mod tests {
     fn collections_nest_and_round_trip() {
         let leaf = Collection {
             id: CollectionId::from_random([3; 16]),
+            source_id: None,
             title: "Banking".to_string(),
             subtitle: None,
             created_at: None,
@@ -181,6 +196,7 @@ mod tests {
         };
         let root = Collection {
             id: CollectionId::from_random([4; 16]),
+            source_id: Some(SourceId::parse("Y29sbGVjdGlvbi0x").unwrap()),
             title: "Household".to_string(),
             subtitle: Some("Bills and accounts".to_string()),
             created_at: Some(1_790_000_000),
@@ -192,5 +208,8 @@ mod tests {
         };
         round_trip(&root);
         assert_eq!(root.sub_collections[0], leaf);
+        let json = serde_json::to_value(&root).unwrap();
+        assert_eq!(json["source_id"], "Y29sbGVjdGlvbi0x");
+        assert!(json["sub_collections"][0]["source_id"].is_null());
     }
 }

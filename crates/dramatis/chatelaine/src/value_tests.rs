@@ -116,6 +116,37 @@ fn ssh_fingerprints_are_the_sha256_form() {
 }
 
 #[test]
+fn source_ids_are_unpadded_base64url_of_1_to_64_bytes() {
+    let longest = "A".repeat(86);
+    for (text, bytes) in [
+        ("AQ", 1),
+        ("-_8", 2),
+        ("ZmllbGQx", 6),
+        (longest.as_str(), 64),
+    ] {
+        let id = SourceId::parse(text).unwrap();
+        assert_eq!((id.as_str(), id.decoded_len()), (text, bytes));
+    }
+    let one_over = "A".repeat(87);
+    let two_over = "A".repeat(88);
+    for bad in [
+        "",
+        "A",     // no encoding is one character long
+        "AAAAA", // nor five
+        "AQ==",  // padded
+        "AQ=",
+        "a+bc", // standard base64, not url-safe
+        "a/bc",
+        "ab c",
+        "é1",              // three bytes, so the length alone would pass
+        one_over.as_str(), // 65 bytes
+        two_over.as_str(), // 66 bytes
+    ] {
+        assert_eq!(SourceId::parse(bad), Err(ValueError::SourceId), "{bad:?}");
+    }
+}
+
+#[test]
 fn every_value_is_text_in_json_and_in_postcard() {
     fn round_trip<T>(value: T, text: &str)
     where
@@ -136,6 +167,7 @@ fn every_value_is_text_in_json_and_in_postcard() {
     round_trip(YearMonth::parse("2031-10").unwrap(), "2031-10");
     let fingerprint = "SHA256:47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU";
     round_trip(SshFingerprint::parse(fingerprint).unwrap(), fingerprint);
+    round_trip(SourceId::parse("ZmllbGQx").unwrap(), "ZmllbGQx");
 }
 
 #[test]
@@ -146,4 +178,8 @@ fn a_value_that_fails_its_check_does_not_load() {
     assert!(postcard::from_bytes::<LastFour>(&bytes).is_err());
     let bytes = postcard::to_allocvec("2029-13").unwrap();
     assert!(postcard::from_bytes::<YearMonth>(&bytes).is_err());
+    let over = "A".repeat(87);
+    assert!(serde_json::from_str::<SourceId>(&format!("\"{over}\"")).is_err());
+    let bytes = postcard::to_allocvec(over.as_str()).unwrap();
+    assert!(postcard::from_bytes::<SourceId>(&bytes).is_err());
 }

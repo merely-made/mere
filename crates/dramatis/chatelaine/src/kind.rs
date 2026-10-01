@@ -15,7 +15,7 @@ use std::collections::BTreeMap;
 use serde::{Deserialize, Serialize};
 
 use crate::item::Link;
-use crate::otp::{OtpAlgorithm, OtpCodeStyle, OtpKind};
+use crate::otp::{OtpAlgorithm, OtpCodeStyle, OtpMode};
 use crate::value::{CountryCode, Date, LastFour, SshFingerprint, SubdivisionCode, YearMonth};
 
 /// The 17 credential types of CXF v1.0 (Proposed Standard with errata,
@@ -48,6 +48,10 @@ pub const CXF_V1_TYPES: [&str; 17] = [
 /// CXF's 17 kinds come first, in the specification's order, then the two
 /// kinds CXF does not define. Variant order is the binary wire format: add
 /// new kinds at the end.
+///
+/// Each CXF kind is named for its CXF type except [`CredentialKind::Otp`],
+/// CXF's `totp`, which holds HOTP too; [`CredentialKind::cxf_type`] gives the
+/// CXF name of every kind.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
 #[non_exhaustive]
@@ -159,9 +163,9 @@ pub enum CredentialKind {
         comment: Option<String>,
     },
     /// A one-time password: CXF's `totp`, and everything castellan's OTP
-    /// items describe, HOTP and Steam Guard included. Sealed: the secret,
-    /// and an HOTP item's counter.
-    Totp {
+    /// items describe, HOTP and Steam Guard included (ruling 37). Sealed:
+    /// the secret, and an HOTP item's counter.
+    Otp {
         /// The account the codes are for.
         account: String,
         /// The issuing service.
@@ -171,7 +175,7 @@ pub enum CredentialKind {
         /// How a code is written; decimal styles carry the digit count.
         code_style: OtpCodeStyle,
         /// Time-based with its period, or counter-based.
-        kind: OtpKind,
+        mode: OtpMode,
     },
     /// A Wi-Fi network. Sealed: the passphrase and the hidden flag.
     Wifi {
@@ -216,7 +220,7 @@ impl CredentialKind {
             Self::Passport { .. } => "passport",
             Self::PersonName => "person-name",
             Self::SshKey { .. } => "ssh-key",
-            Self::Totp { .. } => "totp",
+            Self::Otp { .. } => "totp",
             Self::Wifi { .. } => "wifi",
             Self::Secret { .. } => return None,
             Self::Unknown { cxf_type } => cxf_type,
