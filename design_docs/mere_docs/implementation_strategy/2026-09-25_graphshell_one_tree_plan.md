@@ -210,6 +210,25 @@ assessment returned:
   graphshell-client": the op sequencing lifts beside `SessionDriver`, so
   native hosts get it too, and both browser pages consume it. The
   alternatives were a shared module in the web crate, or a tree-only copy.
+- **Which remote link crosses.** The old page has two realizations, the
+  in-process canary `FixtureEndpoint` and the WebRTC link; the two ruled
+  scenarios use only WebRTC. Mark chose "WebRTC only": the canary stays on
+  the old page until the H3/C4 scenarios move. The alternative carried both,
+  keeping a `GraphshellApp` alive on the fixture route.
+- **Drawing the remote board.** Today 86 lines of Graphshell code
+  (`remote_scene`, over `ProjectionLayoutView` and `Satisfaction`) draw it on
+  the old presenter path. Mark chose "Pictograph board scene": pictograph
+  gains a generic board scene, growing the footprint and backdrop types it
+  lacks. The alternatives were a second producer leaf drawing the moved
+  Graphshell code, or the canvas producer switching its content.
+- **Where the remote controls show.** Mark chose "Section in Graph tools": a
+  "Remote session" section in the docked region holds the session switch,
+  the active-session line, the actions group (one button per intent) and the
+  action status, on both routes. The alternatives were a detail surface on
+  both routes opened by invoke-action, or a region shown only while remote.
+- **Routes for the remote scenarios.** Mark chose "Both routes": they run
+  over `?signal=` on the fixture route and on `app=local`. The alternatives
+  were the fixture route only, or `app=local` only.
 
 The [phase-4 migration inventory](2026-09-27_graphshell_tree_migration_inventory.md)
 maps the actual application state, controls, shared-input gaps and remaining
