@@ -21,6 +21,7 @@ use tempfile::{TempDir, tempdir};
 
 use super::*;
 use crate::otp::{OtpItemStore, OtpReleaseParticipantProof};
+use chatelaine::{CredentialId, ItemId};
 
 const ROOT_AUTHORITY: [u8; 32] = [0x31; 32];
 const NETWORK: [u8; 32] = [0x47; 32];
@@ -66,13 +67,14 @@ fn grant(path: String, expires_at_ms: Option<u64>) -> SignedDelegationCertificat
 
 fn admitted(
     persona: PersonaId,
-    item: OtpItemId,
+    item: ItemId,
+    credential: CredentialId,
     session_id: [u8; 32],
     certificate: SignedDelegationCertificate,
 ) -> AdmittedSession<Vec<u8>> {
     let action = RequestedAction {
         domain: OTP_RELEASE_DOMAIN.into(),
-        path: otp_item_path(persona, item),
+        path: otp_item_path(persona, item, credential),
         action: OTP_RELEASE_ACTION.into(),
     };
     let subject = participant().master_public_key().to_bytes();
@@ -109,7 +111,8 @@ struct Fixture {
     _dir: TempDir,
     gate: OtpReleaseGate,
     persona: PersonaId,
-    item: OtpItemId,
+    item: ItemId,
+    credential: CredentialId,
 }
 
 fn fixture() -> Fixture {
@@ -128,7 +131,8 @@ fn fixture() -> Fixture {
         _dir: dir,
         gate: OtpReleaseGate::new(items),
         persona,
-        item: item.id,
+        item: item.item_id(),
+        credential: item.credential_id(),
     }
 }
 
@@ -140,7 +144,13 @@ fn open(
     at_ms: u64,
 ) -> OtpAdmittedSession<Vec<u8>> {
     OtpAdmittedSession::from_admitted(
-        admitted(fixture.persona, fixture.item, session_id, certificate),
+        admitted(
+            fixture.persona,
+            fixture.item,
+            fixture.credential,
+            session_id,
+            certificate,
+        ),
         fixture.gate.clone(),
         ledger,
         at_ms,
@@ -187,14 +197,17 @@ fn policy_requires_member_authority_and_transport_identity() {
 fn a_signed_notochord_admission_flows_into_the_release_adapter() {
     let fixture = fixture();
     let at_ms = now_ms();
-    let certificate = grant(otp_item_path(fixture.persona, fixture.item), None);
+    let certificate = grant(
+        otp_item_path(fixture.persona, fixture.item, fixture.credential),
+        None,
+    );
     let subject = participant().master_public_key().to_bytes();
     let protocol = b"mere/castellan-otp-test/v1";
     let facts = SessionFacts::authenticated(protocol.to_vec(), CarrierKind::Memory, subject);
     let binding = ProofBinding::initiator(protocol.to_vec(), Some(subject), None);
     let action = RequestedAction {
         domain: OTP_RELEASE_DOMAIN.into(),
-        path: otp_item_path(fixture.persona, fixture.item),
+        path: otp_item_path(fixture.persona, fixture.item, fixture.credential),
         action: OTP_RELEASE_ACTION.into(),
     };
     let profile = ProfileRef {
@@ -254,7 +267,10 @@ fn a_signed_notochord_admission_flows_into_the_release_adapter() {
 fn petition_identity_comes_from_the_admitted_transcript() {
     let fixture = fixture();
     let at_ms = now_ms();
-    let certificate = grant(otp_item_path(fixture.persona, fixture.item), None);
+    let certificate = grant(
+        otp_item_path(fixture.persona, fixture.item, fixture.credential),
+        None,
+    );
     let mut session = open(
         &fixture,
         [0x81; 32],
@@ -293,7 +309,10 @@ fn approval_is_opaque_until_the_same_carrier_begins_delivery() {
     let mut session = open(
         &fixture,
         [0x82; 32],
-        grant(otp_item_path(fixture.persona, fixture.item), None),
+        grant(
+            otp_item_path(fixture.persona, fixture.item, fixture.credential),
+            None,
+        ),
         &ledger,
         at_ms,
     );
@@ -319,14 +338,20 @@ fn another_session_cannot_take_an_approved_value() {
     let mut left = open(
         &fixture,
         [0x83; 32],
-        grant(otp_item_path(fixture.persona, fixture.item), None),
+        grant(
+            otp_item_path(fixture.persona, fixture.item, fixture.credential),
+            None,
+        ),
         &ledger,
         at_ms,
     );
     let mut right = open(
         &fixture,
         [0x84; 32],
-        grant(otp_item_path(fixture.persona, fixture.item), None),
+        grant(
+            otp_item_path(fixture.persona, fixture.item, fixture.credential),
+            None,
+        ),
         &ledger,
         at_ms,
     );
@@ -344,7 +369,10 @@ fn revocation_is_rechecked_before_approval_and_delivery() {
     let fixture = fixture();
     let at_ms = now_ms();
     let mut ledger = RevocationLedger::default();
-    let certificate = grant(otp_item_path(fixture.persona, fixture.item), None);
+    let certificate = grant(
+        otp_item_path(fixture.persona, fixture.item, fixture.credential),
+        None,
+    );
     let mut session = open(&fixture, [0x85; 32], certificate.clone(), &ledger, at_ms);
     let request = session.petition(&ledger, at_ms).unwrap();
     revoke(&mut ledger, &certificate, at_ms);
@@ -357,7 +385,10 @@ fn revocation_is_rechecked_before_approval_and_delivery() {
     ));
 
     let mut ledger = RevocationLedger::default();
-    let certificate = grant(otp_item_path(fixture.persona, fixture.item), None);
+    let certificate = grant(
+        otp_item_path(fixture.persona, fixture.item, fixture.credential),
+        None,
+    );
     let mut session = open(&fixture, [0x86; 32], certificate.clone(), &ledger, at_ms);
     let request = session.petition(&ledger, at_ms).unwrap();
     let approved = session.approve(request.id, &ledger, at_ms).unwrap();
@@ -375,9 +406,18 @@ fn revocation_is_rechecked_before_approval_and_delivery() {
 fn expiry_and_wrong_scope_are_refused_at_the_adapter_boundary() {
     let fixture = fixture();
     let at_ms = now_ms();
-    let expired = grant(otp_item_path(fixture.persona, fixture.item), Some(at_ms));
+    let expired = grant(
+        otp_item_path(fixture.persona, fixture.item, fixture.credential),
+        Some(at_ms),
+    );
     let result = OtpAdmittedSession::from_admitted(
-        admitted(fixture.persona, fixture.item, [0x87; 32], expired),
+        admitted(
+            fixture.persona,
+            fixture.item,
+            fixture.credential,
+            [0x87; 32],
+            expired,
+        ),
         fixture.gate.clone(),
         &RevocationLedger::default(),
         at_ms + 1,
@@ -389,10 +429,19 @@ fn expiry_and_wrong_scope_are_refused_at_the_adapter_boundary() {
         )) if deadline == at_ms
     ));
 
-    let neighbour = OtpItemId::from_uuid(uuid::Uuid::new_v4());
-    let wrong_scope = grant(otp_item_path(fixture.persona, neighbour), None);
+    let neighbour = ItemId::from_random(uuid::Uuid::new_v4().into_bytes());
+    let wrong_scope = grant(
+        otp_item_path(fixture.persona, neighbour, fixture.credential),
+        None,
+    );
     let result = OtpAdmittedSession::from_admitted(
-        admitted(fixture.persona, fixture.item, [0x88; 32], wrong_scope),
+        admitted(
+            fixture.persona,
+            fixture.item,
+            fixture.credential,
+            [0x88; 32],
+            wrong_scope,
+        ),
         fixture.gate.clone(),
         &RevocationLedger::default(),
         at_ms,
@@ -403,9 +452,18 @@ fn expiry_and_wrong_scope_are_refused_at_the_adapter_boundary() {
     ));
 
     let other_persona = PersonaId::new();
-    let wrong_persona = grant(otp_item_path(other_persona, fixture.item), None);
+    let wrong_persona = grant(
+        otp_item_path(other_persona, fixture.item, fixture.credential),
+        None,
+    );
     let result = OtpAdmittedSession::from_admitted(
-        admitted(other_persona, fixture.item, [0x8a; 32], wrong_persona),
+        admitted(
+            other_persona,
+            fixture.item,
+            fixture.credential,
+            [0x8a; 32],
+            wrong_persona,
+        ),
         fixture.gate.clone(),
         &RevocationLedger::default(),
         at_ms,
@@ -416,13 +474,15 @@ fn expiry_and_wrong_scope_are_refused_at_the_adapter_boundary() {
     ));
 
     let alias = format!(
-        "{OTP_RELEASE_SERVICE}/{}/{item}",
+        "{OTP_RELEASE_SERVICE}/{}/{item}/{credential}",
         fixture.persona.as_uuid().to_string().to_uppercase(),
-        item = fixture.item
+        item = fixture.item,
+        credential = fixture.credential
     );
     let mut aliased = admitted(
         fixture.persona,
         fixture.item,
+        fixture.credential,
         [0x8b; 32],
         grant(alias.clone(), None),
     );
@@ -448,7 +508,10 @@ fn dropping_a_session_cancels_its_unresolved_petitions() {
     let mut session = open(
         &fixture,
         [0x89; 32],
-        grant(otp_item_path(fixture.persona, fixture.item), None),
+        grant(
+            otp_item_path(fixture.persona, fixture.item, fixture.credential),
+            None,
+        ),
         &ledger,
         at_ms,
     );
@@ -458,4 +521,25 @@ fn dropping_a_session_cancels_its_unresolved_petitions() {
     drop(session);
 
     assert!(fixture.gate.pending().unwrap().is_empty());
+}
+
+#[test]
+fn an_item_level_grant_covers_each_of_its_credentials() {
+    let fixture = fixture();
+    let at_ms = now_ms();
+    let ledger = RevocationLedger::default();
+    let item_grant = grant(
+        format!(
+            "{OTP_RELEASE_SERVICE}/{}/{}",
+            fixture.persona.as_uuid(),
+            fixture.item
+        ),
+        None,
+    );
+    let mut session = open(&fixture, [0x8c; 32], item_grant, &ledger, at_ms);
+
+    let request = session.petition(&ledger, at_ms).unwrap();
+
+    assert_eq!(session.credential(), fixture.credential);
+    assert_eq!(request.credential.credential_id(), fixture.credential);
 }

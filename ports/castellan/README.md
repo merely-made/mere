@@ -36,7 +36,7 @@ Implemented:
   items sealed through Personae's record store. `OtpReleaseGate` returns a
   redacted-debug `OtpCodeTile` only after a participant-bound petition receives
   an explicit approval; its time facts leave ring geometry to the host.
-  `OtpAdmittedSession` consumes Notochord admission for one exact item, derives
+  `OtpAdmittedSession` consumes Notochord admission for one exact credential, derives
   the participant from the signed transcript, rechecks expiry and revocation at
   approval and delivery, and exposes the tile only beside the original carrier.
   It leaves byte encoding to the composing host's existing protocol. Steam
