@@ -10,8 +10,8 @@ use std::collections::BTreeMap;
 
 use crate::{
     AndroidApp, AppCertificate, CountryCode, Credential, CredentialId, CredentialKind, Date, Item,
-    ItemId, ItemState, LastFour, Link, OtpAlgorithm, OtpCodeStyle, OtpKind, Scope, SshFingerprint,
-    SubdivisionCode, WifiSecurity, YearMonth,
+    ItemId, ItemState, LastFour, Link, OtpAlgorithm, OtpCodeStyle, OtpMode, Scope, SourceId,
+    SshFingerprint, SubdivisionCode, WifiSecurity, YearMonth,
 };
 
 pub fn item_id(n: u8) -> ItemId {
@@ -116,32 +116,32 @@ pub fn ssh_key() -> CredentialKind {
 }
 
 pub fn totp() -> CredentialKind {
-    CredentialKind::Totp {
+    CredentialKind::Otp {
         account: "mark".to_string(),
         issuer: Some("Merely".to_string()),
         algorithm: OtpAlgorithm::Sha256,
         code_style: OtpCodeStyle::Decimal { digits: 8 },
-        kind: OtpKind::Totp { period: 30, t0: 0 },
+        mode: OtpMode::Totp { period: 30, t0: 0 },
     }
 }
 
 pub fn hotp() -> CredentialKind {
-    CredentialKind::Totp {
+    CredentialKind::Otp {
         account: "mark".to_string(),
         issuer: None,
         algorithm: OtpAlgorithm::Sha1,
         code_style: OtpCodeStyle::Decimal { digits: 6 },
-        kind: OtpKind::Hotp,
+        mode: OtpMode::Hotp,
     }
 }
 
 pub fn steam_guard() -> CredentialKind {
-    CredentialKind::Totp {
+    CredentialKind::Otp {
         account: "mark".to_string(),
         issuer: Some("Steam".to_string()),
         algorithm: OtpAlgorithm::Sha1,
         code_style: OtpCodeStyle::SteamGuard,
-        kind: OtpKind::Totp { period: 30, t0: 0 },
+        mode: OtpMode::Totp { period: 30, t0: 0 },
     }
 }
 
@@ -198,6 +198,7 @@ pub fn every_kind() -> Vec<CredentialKind> {
 pub fn item(kinds: Vec<CredentialKind>) -> Item {
     Item {
         id: item_id(1),
+        source_id: Some(SourceId::parse("ZmllbGQx").unwrap()),
         title: "Everything".to_string(),
         subtitle: Some("one of each".to_string()),
         scope: Some(Scope {

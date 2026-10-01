@@ -39,7 +39,9 @@
 //! tags, a favorite flag and timestamps, and an [`ItemState`]: in the vault,
 //! or quarantined for the user's review. A [`Collection`] groups items and
 //! nests. A [`Link`] refers to an item, as an `item-reference` credential and
-//! a collection's members do.
+//! a collection's members do. An item or collection imported from CXF keeps
+//! its id in that file as a [`SourceId`], so an export can write it back
+//! (ruling 36); chatelaine's own ids are UUIDs.
 //!
 //! [`CredentialKind`] covers CXF v1.0's 17 types ([`CXF_V1_TYPES`]), the
 //! Freedesktop Secret Service's generic secret, and `Unknown`, which keeps the
@@ -59,7 +61,7 @@
 //! |---|---|---|
 //! | basic-auth | username | password |
 //! | generated-password | nothing | password |
-//! | totp | account, issuer, algorithm, code style (digits), period and t0, or HOTP | secret, HOTP counter |
+//! | totp (the `Otp` kind) | account, issuer, algorithm, code style (digits), period and t0, or HOTP | secret, HOTP counter |
 //! | api-key | username, key type, URL | key, validity dates |
 //! | wifi | SSID, security type | passphrase, hidden flag |
 //! | passkey | rpId, username, user display name | key, credential id, user handle, extensions |
@@ -80,15 +82,16 @@
 //! by castellan, which holds the secret they come from; chatelaine only
 //! checks their form. Values with a closed form are checked when made and
 //! when loaded: [`LastFour`], [`CountryCode`], [`SubdivisionCode`], [`Date`],
-//! [`YearMonth`] and [`SshFingerprint`].
+//! [`YearMonth`], [`SshFingerprint`] and [`SourceId`].
 //!
 //! ## One-time passwords
 //!
-//! [`OtpAlgorithm`] and [`OtpCodeStyle`] moved here from castellan, which
-//! re-exports them, so each has one definition. [`OtpKind`] is the shape
-//! only: time-based with its period and t0, or counter-based. The HOTP
-//! counter is mutable, freshness-critical state, so castellan's own `OtpKind`
-//! keeps it.
+//! CXF's `totp` is the [`CredentialKind::Otp`] kind, which also describes
+//! HOTP and Steam Guard items (ruling 37). [`OtpAlgorithm`] and
+//! [`OtpCodeStyle`] moved here from castellan, which re-exports them, so each
+//! has one definition. [`OtpMode`] is the shape only: time-based with its
+//! period and t0, or counter-based. The HOTP counter is mutable,
+//! freshness-critical state, so castellan's own `OtpKind` keeps it.
 //!
 //! ## Wire formats
 //!
@@ -113,7 +116,7 @@ pub use disposition::{Disposition, disposition};
 pub use id::{CollectionId, CredentialId, IdParseError, ItemId};
 pub use item::{AndroidApp, AppCertificate, Collection, Credential, Item, ItemState, Link, Scope};
 pub use kind::{CXF_V1_TYPES, CredentialKind, WifiSecurity};
-pub use otp::{OtpAlgorithm, OtpCodeStyle, OtpKind};
+pub use otp::{OtpAlgorithm, OtpCodeStyle, OtpMode};
 pub use value::{
-    CountryCode, Date, LastFour, SshFingerprint, SubdivisionCode, ValueError, YearMonth,
+    CountryCode, Date, LastFour, SourceId, SshFingerprint, SubdivisionCode, ValueError, YearMonth,
 };

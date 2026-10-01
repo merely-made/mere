@@ -33,9 +33,14 @@ fn shape(kind: &CredentialKind) -> (String, BTreeSet<String>) {
 fn check(kind: CredentialKind, cxf_type: Option<&str>, fields: &[&str], sealed: &[&str]) {
     assert_eq!(kind.cxf_type(), cxf_type);
     let (name, actual) = shape(&kind);
-    if let Some(cxf_type) = cxf_type.filter(|_| !matches!(kind, CredentialKind::Unknown { .. })) {
-        assert_eq!(name, cxf_type, "the variant is named for its CXF type");
-    }
+    // A CXF kind's tag is its CXF type, except Otp's (ruling 37).
+    let tag = match &kind {
+        CredentialKind::Otp { .. } => "otp",
+        CredentialKind::Secret { .. } => "secret",
+        CredentialKind::Unknown { .. } => "unknown",
+        _ => cxf_type.unwrap(),
+    };
+    assert_eq!(name, tag, "the variant's tag");
     let expected: BTreeSet<String> = fields.iter().map(|f| f.to_string()).collect();
     assert_eq!(actual, expected, "{name} carries exactly its metadata");
     for field in sealed {
@@ -243,17 +248,17 @@ fn ssh_key_carries_type_fingerprint_and_comment() {
 }
 
 #[test]
-fn totp_carries_what_castellans_otp_items_describe() {
-    let fields = ["account", "issuer", "algorithm", "code_style", "kind"];
+fn otp_carries_what_castellans_otp_items_describe() {
+    let fields = ["account", "issuer", "algorithm", "code_style", "mode"];
     for kind in [samples::totp(), samples::hotp(), samples::steam_guard()] {
         check(kind, Some("totp"), &fields, &["secret", "counter"]);
     }
 }
 
 #[test]
-fn an_hotp_kind_holds_no_counter() {
+fn an_hotp_credential_holds_no_counter() {
     let json = serde_json::to_value(samples::hotp()).unwrap();
-    assert_eq!(json["totp"]["kind"], "hotp");
+    assert_eq!(json["otp"]["mode"], "hotp");
 }
 
 #[test]

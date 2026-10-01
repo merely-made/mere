@@ -31,6 +31,8 @@ pub enum ValueError {
     YearMonth,
     /// Not `SHA256:` and 43 characters of unpadded base64.
     SshFingerprint,
+    /// Not unpadded base64url encoding 1 to 64 bytes.
+    SourceId,
 }
 
 impl fmt::Display for ValueError {
@@ -46,6 +48,7 @@ impl fmt::Display for ValueError {
             Self::SshFingerprint => {
                 "an SSH fingerprint is SHA256: and 43 unpadded base64 characters"
             },
+            Self::SourceId => "a source id is unpadded base64url encoding 1 to 64 bytes",
         })
     }
 }
@@ -349,6 +352,63 @@ impl fmt::Display for SshFingerprint {
 }
 
 text_value!(SshFingerprint);
+
+/// The id an item or collection had in the CXF file it was imported from
+/// (ruling 36), kept verbatim so an export can write it back.
+///
+/// CXF ids are opaque bytes, at most 64, written as unpadded base64url. The
+/// text is checked, not decoded: the url-safe alphabet only, no padding, and
+/// a length that encodes 1 to 64 bytes.
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct SourceId(String);
+
+impl SourceId {
+    /// The most bytes a CXF id may hold.
+    pub const MAX_BYTES: usize = 64;
+
+    /// Accept unpadded base64url text encoding 1 to 64 bytes.
+    pub fn parse(text: &str) -> Result<Self, ValueError> {
+        let url_safe = text
+            .bytes()
+            .all(|c| c.is_ascii_alphanumeric() || c == b'-' || c == b'_');
+        let size_ok = decoded_len(text.len()).is_some_and(|n| (1..=Self::MAX_BYTES).contains(&n));
+        if url_safe && size_ok {
+            Ok(Self(text.to_string()))
+        } else {
+            Err(ValueError::SourceId)
+        }
+    }
+
+    /// The id as the file wrote it.
+    pub fn as_str(&self) -> &str {
+        &self.0
+    }
+
+    /// How many bytes the id encodes.
+    pub fn decoded_len(&self) -> usize {
+        decoded_len(self.0.len()).expect("checked on parse")
+    }
+}
+
+/// The bytes `len` characters of unpadded base64 decode to, or `None` for a
+/// length no encoding produces.
+fn decoded_len(len: usize) -> Option<usize> {
+    let tail = match len % 4 {
+        0 => 0,
+        2 => 1,
+        3 => 2,
+        _ => return None,
+    };
+    Some(len / 4 * 3 + tail)
+}
+
+impl fmt::Display for SourceId {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(&self.0)
+    }
+}
+
+text_value!(SourceId);
 
 #[cfg(test)]
 #[path = "value_tests.rs"]
