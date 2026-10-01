@@ -173,3 +173,11 @@ to the IconVG decoder (`repos/emblem`, formerly `repos/iconvg` *(historical cita
   the other, and the losing side has no implementation and no dependents — has
   to be written down, or the ledger's record of what is spent stops being
   trustworthy.
+- 2026-09-30: the tier's architecture of record is written as the
+  [dramatis tier architecture](../../dramatis_docs/technical_architecture/2026-09-30_dramatis_tier_architecture.md):
+  the three axes, the cross-person lifecycle and eleven invariants, synthesised
+  from this plan and its successors. One new ruling there: **castellan issues,
+  gazette announces**. Serving a persona's own well-known documents had no
+  owner. castellan's authority half signs the presentation, and gazette serves
+  it, so the directory is two-way. Where the announcing process runs is open,
+  inside gazette's still-unplanned resident slot.

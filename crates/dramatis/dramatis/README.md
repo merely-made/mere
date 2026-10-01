@@ -11,7 +11,8 @@ cast list rather than any one role:
 - **[gaz](https://crates.io/crates/gaz)** — stored contacts: anchored
   records, petnames, per-endpoint trust, kith/kin tiers.
 - **[gazette](https://crates.io/crates/gazette)** — handle resolution: turning a name into reachable,
-  unverified address claims.
+  unverified address claims; and announcing the presentations castellan
+  issues, so your own handles resolve (ruled 2026-09-30).
 
 The boundaries are the point:
 
