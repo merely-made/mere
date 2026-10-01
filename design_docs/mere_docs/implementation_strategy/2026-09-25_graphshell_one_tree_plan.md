@@ -183,6 +183,34 @@ find/arrange/physics panel, and the newest phase-4 work sat unmerged on
   pictograph -p cambium-rootstock -p graphshell` exited 0. Native only; the
   wasm build and headed scenarios run in the panel lane.
 
+Phase 4 physics-panel follow-up rulings, 2026-10-01, after the panel lane
+(`6279ca31`) passed 13 of its 14 tree scenarios headed and the remote-session
+assessment returned:
+- **The drag release window.** The tree's one-frame-after-release checks
+  flipped between runs (Stress ≤ 20 px read 21, 31 and a pass; Anneal ≤ 60
+  read 61, 68, a pass, and 292 at one step per frame), while every 300-frame
+  reclaim, hold and overlap check passed. The tree advances bounded elapsed
+  time, up to three physics steps a frame; the old page took one. Mark chose
+  "Measure in physics steps": the lane records the drop distance on the first
+  stepped frame after release. The alternatives were pinning one step per
+  frame, widening the tree's thresholds, or keeping the check on the old page
+  only.
+- **center-node.** Energy flings the dragged node off-screen, where the
+  tree's real pointer path cannot press it. Mark chose "Keep center-node": a
+  camera-only pan before each press, zoom unchanged. The alternatives were
+  Fit graph, which changes zoom, or a non-pointer select-and-press.
+- **When it merges.** The branch also carried the standalone web manifest's
+  Genet repin from `69a2383b` to root's `b1eb3af1`, without which main's web
+  build failed `--locked`. Mark chose "Now, drag pending": merged as
+  `8ff96d2b`, drag following as its own commit. The alternatives were
+  merging after the drag fix, or cherry-picking the repin alone.
+- **The remote session's home.** Its op state machine (about 437 lines of
+  `web_remote.rs`) is welded to the old page's `BrowserHost`, and its
+  asynchronous pumps need shared ownership. Mark chose "Into
+  graphshell-client": the op sequencing lifts beside `SessionDriver`, so
+  native hosts get it too, and both browser pages consume it. The
+  alternatives were a shared module in the web crate, or a tree-only copy.
+
 The [phase-4 migration inventory](2026-09-27_graphshell_tree_migration_inventory.md)
 maps the actual application state, controls, shared-input gaps and remaining
 page/scenario obligations. The fixture toolbar is the first slice, not the
