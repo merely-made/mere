@@ -12,14 +12,17 @@
 //! remains usable for its time step, and an HOTP remains usable until its
 //! verifier consumes the matching counter.
 //!
-//! The core accepts an imported URI. [`OtpItemStore`] seals the configured
-//! generator under one persona and gives callers no way to retrieve its seed.
-//! [`OtpReleaseGate`] turns an explicit approval into an [`OtpCodeTile`], whose
-//! timing facts let any host render its own remaining-seconds ring. Direct
-//! petitions are marked unverified. [`OtpAdmittedSession`] instead derives the
-//! participant and exact item scope from Notochord, rechecks retained authority
-//! at approval and delivery, and pairs the opaque approval only with its
-//! original carrier. The host keeps its own application encoding.
+//! The core accepts an imported URI. [`OtpItemStore`] files it in the
+//! persona's [`crate::items::ItemStore`] as a chatelaine item holding one
+//! `Otp` credential, whose seed is that credential's sealed payload, and gives
+//! callers no way to retrieve the seed. [`OtpCredential`] is the secret-free
+//! item and credential a host sees. [`OtpReleaseGate`] turns an explicit
+//! approval into an [`OtpCodeTile`], whose timing facts let any host render
+//! its own remaining-seconds ring. Direct petitions are marked unverified.
+//! [`OtpAdmittedSession`] instead derives the participant and exact credential
+//! scope from Notochord, rechecks retained authority at approval and delivery,
+//! and pairs the opaque approval only with its original carrier. The host
+//! keeps its own application encoding.
 //!
 //! ```
 //! use castellan::otp::{Otp, OtpAlgorithm};
@@ -38,6 +41,7 @@
 
 mod admitted;
 pub mod base32;
+mod credential;
 mod item;
 mod participant;
 mod release;
@@ -64,8 +68,9 @@ pub use admitted::{
 pub use base32::Base32Error;
 // The display enums are chatelaine's, one definition for the taxonomy and
 // castellan. `OtpKind` stays here: it carries the live HOTP counter.
-pub use chatelaine::{OtpAlgorithm, OtpCodeStyle};
-pub use item::{OtpItem, OtpItemError, OtpItemId, OtpItemStore};
+pub use chatelaine::{OtpAlgorithm, OtpCodeStyle, OtpMode};
+pub use credential::OtpCredential;
+pub use item::{OtpItemError, OtpItemStore};
 pub use participant::{OtpReleaseParticipantClaim, OtpReleaseParticipantProof};
 pub use release::{
     OtpReleaseDenied, OtpReleaseError, OtpReleaseGate, OtpReleaseId, OtpReleasePolicy,

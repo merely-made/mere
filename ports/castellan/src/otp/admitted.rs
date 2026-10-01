@@ -16,6 +16,7 @@
 use std::collections::BTreeSet;
 use std::fmt;
 
+use chatelaine::{CredentialId, ItemId};
 use notochord::{
     AdmittedSession, AuthorityLapse, LocalNetworkPolicy, NetworkId, ProfileRef, RetainedAuthority,
     RevocationLedger, ServiceAccess, ServiceRule, TrustedRoot,
@@ -23,25 +24,33 @@ use notochord::{
 use personae::PersonaId;
 
 use super::{
-    OtpCodeTile, OtpItemId, OtpReleaseDenied, OtpReleaseError, OtpReleaseGate, OtpReleaseId,
+    OtpCodeTile, OtpReleaseDenied, OtpReleaseError, OtpReleaseGate, OtpReleaseId,
     OtpReleaseParticipantClaim, OtpReleaseRequest, OtpReleasedCode,
 };
 
 /// Notochord application domain for code release.
 pub const OTP_RELEASE_DOMAIN: &str = "mere.castellan";
-/// Structural root for persona-scoped OTP release items.
+/// Structural root for persona-scoped OTP release credentials.
 pub const OTP_RELEASE_SERVICE: &str = "/services/castellan/otp";
-/// Capability action required to exercise one OTP item.
+/// Capability action required to exercise one OTP credential.
 pub const OTP_RELEASE_ACTION: &str = "release";
 
-/// The exact Notochord resource path for one persona-scoped OTP item.
-pub fn otp_item_path(persona: PersonaId, item: OtpItemId) -> String {
-    format!("{OTP_RELEASE_SERVICE}/{}/{item}", persona.as_uuid())
+/// The exact Notochord resource path for one OTP credential of one
+/// persona's item (ruling 40).
+///
+/// A grant may name the item alone: Insigne's whole-segment prefix rule then
+/// covers each of the item's credentials.
+pub fn otp_item_path(persona: PersonaId, item: ItemId, credential: CredentialId) -> String {
+    format!(
+        "{OTP_RELEASE_SERVICE}/{}/{item}/{credential}",
+        persona.as_uuid()
+    )
 }
 
 /// Owner policy for session-bound OTP release.
 ///
-/// Each admission must name a persona and item below [`OTP_RELEASE_SERVICE`]. The rule
+/// Each admission must name a persona, item and credential below
+/// [`OTP_RELEASE_SERVICE`]. The rule
 /// requires both a valid Personae delegation and transport-authenticated peer
 /// identity; Notochord also requires that peer identity to equal the claimed
 /// subject.
@@ -70,9 +79,11 @@ pub fn otp_release_policy(
 /// Failure while binding, approving, or delivering an admitted OTP release.
 #[derive(Debug)]
 pub enum OtpAdmittedReleaseError {
-    /// The session was admitted for another service, action, or item path.
+    /// The session was admitted for another service, action, or credential
+    /// path.
     ActionNotServed,
-    /// The admitted chain did not cover its claimed OTP item at this check.
+    /// The admitted chain did not cover its claimed OTP credential at this
+    /// check.
     ActionNotCovered,
     /// Authority expired or was revoked before the operation could finish.
     AuthorityLapsed(AuthorityLapse),
@@ -89,11 +100,11 @@ pub enum OtpAdmittedReleaseError {
 impl fmt::Display for OtpAdmittedReleaseError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::ActionNotServed => {
-                f.write_str("the admitted session does not name one Castellan OTP release item")
-            },
+            Self::ActionNotServed => f.write_str(
+                "the admitted session does not name one Castellan OTP release credential",
+            ),
             Self::ActionNotCovered => {
-                f.write_str("the admitted authority does not cover its OTP release item")
+                f.write_str("the admitted authority does not cover its OTP release credential")
             },
             Self::AuthorityLapsed(AuthorityLapse::Expired { at_ms }) => {
                 write!(f, "the admitted authority expired at {at_ms}")
@@ -129,7 +140,7 @@ impl From<OtpReleaseError> for OtpAdmittedReleaseError {
 }
 
 /// One Notochord-admitted session allowed to petition for one exact
-/// persona-scoped OTP item.
+/// persona-scoped OTP credential.
 ///
 /// The carrier stays private until [`Self::begin_delivery`] pairs it with a
 /// same-session approval. Dropping this object cancels its unresolved local
@@ -139,14 +150,16 @@ pub struct OtpAdmittedSession<S> {
     authority: RetainedAuthority,
     participant: OtpReleaseParticipantClaim,
     persona: PersonaId,
-    item: OtpItemId,
+    item: ItemId,
+    credential: CredentialId,
     session_id: [u8; 32],
     gate: OtpReleaseGate,
     pending: BTreeSet<OtpReleaseId>,
 }
 
 impl<S> OtpAdmittedSession<S> {
-    /// Consume one admitted carrier session and bind it to its exact OTP item.
+    /// Consume one admitted carrier session and bind it to its exact OTP
+    /// credential.
     pub fn from_admitted(
         session: AdmittedSession<S>,
         gate: OtpReleaseGate,
@@ -157,7 +170,7 @@ impl<S> OtpAdmittedSession<S> {
         if action.domain != OTP_RELEASE_DOMAIN || action.action != OTP_RELEASE_ACTION {
             return Err(OtpAdmittedReleaseError::ActionNotServed);
         }
-        let (persona, item) =
+        let (persona, item, credential) =
             parse_item_path(&action.path).ok_or(OtpAdmittedReleaseError::ActionNotServed)?;
         if gate.persona() != persona {
             return Err(OtpAdmittedReleaseError::ActionNotServed);
@@ -176,15 +189,21 @@ impl<S> OtpAdmittedSession<S> {
             participant,
             persona,
             item,
+            credential,
             session_id,
             gate,
             pending: BTreeSet::new(),
         })
     }
 
-    /// The single item named by this session's admitted action.
-    pub fn item(&self) -> OtpItemId {
+    /// The item named by this session's admitted action.
+    pub fn item(&self) -> ItemId {
         self.item
+    }
+
+    /// The single credential named by this session's admitted action.
+    pub fn credential(&self) -> CredentialId {
+        self.credential
     }
 
     /// The persona namespace named by this session's admitted action.
@@ -192,14 +211,16 @@ impl<S> OtpAdmittedSession<S> {
         self.persona
     }
 
-    /// Petition the resident for the one admitted item.
+    /// Petition the resident for the one admitted credential.
     pub fn petition(
         &mut self,
         ledger: &RevocationLedger,
         now_ms: u64,
     ) -> Result<OtpReleaseRequest, OtpAdmittedReleaseError> {
         check_authority(&self.authority, ledger, now_ms)?;
-        let request = self.gate.petition(self.item, self.participant.clone())?;
+        let request = self
+            .gate
+            .petition(self.item, self.credential, self.participant.clone())?;
         self.pending.insert(request.id);
         Ok(request)
     }
@@ -313,12 +334,15 @@ impl<'a, S> OtpSessionDelivery<'a, S> {
     }
 }
 
-fn parse_item_path(path: &str) -> Option<(PersonaId, OtpItemId)> {
+fn parse_item_path(path: &str) -> Option<(PersonaId, ItemId, CredentialId)> {
     let suffix = path.strip_prefix(OTP_RELEASE_SERVICE)?.strip_prefix('/')?;
-    let (persona, item) = suffix.split_once('/')?;
+    let (persona, rest) = suffix.split_once('/')?;
+    let (item, credential) = rest.split_once('/')?;
     let persona = PersonaId::from_uuid(uuid::Uuid::parse_str(persona).ok()?);
-    let item = OtpItemId::from_uuid(uuid::Uuid::parse_str(item).ok()?);
-    (otp_item_path(persona, item) == path).then_some((persona, item))
+    let item = ItemId::parse(item).ok()?;
+    let credential = CredentialId::parse(credential).ok()?;
+    // Only the canonical spelling is served, so one credential has one path.
+    (otp_item_path(persona, item, credential) == path).then_some((persona, item, credential))
 }
 
 fn check_authority(
