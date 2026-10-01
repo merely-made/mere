@@ -35,8 +35,12 @@ fn independent_gates_over_one_open_store_serialize_hotp() {
     };
     let left = OtpReleaseGate::with_clock(items.clone(), OtpReleasePolicy::default(), clock());
     let right = OtpReleaseGate::with_clock(items, OtpReleasePolicy::default(), clock());
-    let left_request = left.petition(item.id, participant()).unwrap();
-    let right_request = right.petition(item.id, participant()).unwrap();
+    let left_request = left
+        .petition(item.item_id(), item.credential_id(), participant())
+        .unwrap();
+    let right_request = right
+        .petition(item.item_id(), item.credential_id(), participant())
+        .unwrap();
 
     let left_thread = std::thread::spawn(move || {
         left.approve(left_request.id)
