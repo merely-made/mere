@@ -1,7 +1,7 @@
 # Physics Catalog Plan
 
 **Date:** 2026-09-02
-**Status:** in progress (P1 landed 2026-09-02; P1b, P2 on both hosts and P3 the remote board 2026-09-03; the runtime extraction 2026-09-04; P4 next).
+**Status:** in progress (P1 landed 2026-09-02; P1b, P2 on both hosts and P3 the remote board 2026-09-03; the runtime extraction 2026-09-04; P4 web half 2026-09-04, closing with the Graphshell tree port per the 2026-10-01 rulings in §5).
 **Scope:** A catalog of *distinct physics layout laws* — dynamical systems
 over the graph's bodies that produce different layouts because they are
 different physics — as a lever beside the arrangement catalog, plus the
@@ -508,6 +508,31 @@ dominators, the Skeleton overlay + weighted Stress), landed before the
 pickers as P1b so P2 exposes every source in one pass. Not taken:
 matching, a Steiner tree over the selection, cliques as groups — no
 inference carried.
+
+Ruled 2026-10-01, after a status review found P4's web half green since
+2026-09-04 but its native "by hand" condition unrecorded, the native picker's
+home still open, and `PhysicsBoard::offload` uncalled:
+- **P4 closes after the tree port.** Asked how to close P4, Mark chose
+  "Close only after the tree port": the Graphshell one-tree plan's physics
+  panel scenarios (§1 there, "Phase 4 physics-panel rulings") are P4's
+  close-out, and P4 stays open until they land. The alternatives were a
+  recorded native receipt then close, or closing on the web evidence alone.
+- **Scale: wire the GPU repulsion hook.** Told that nine of the eleven laws
+  carry `NodeExclusion`'s all-pairs scan (`seiche/src/forces.rs:36`, sized in
+  its own comment for "dozens–hundreds of nodes"), that Gravity, LinLog and
+  Stress are all-pairs as well, that only Charge uses Barnes–Hut, and that
+  seiche's `set_repulsion_solver` has no product caller, Mark chose "Wire the
+  GPU repulsion hook": hosts turn on the solver above a node threshold. The
+  alternatives were measuring each law at size first, routing every
+  repulsion through Barnes–Hut, or leaving scale out of scope. *Reading, not
+  ruled:* which hosts (native, WebGPU), the threshold, and what the
+  all-pairs laws other than `NodeExclusion` do are open for the lane's
+  assessment.
+- **A GPU-tier law lane.** Asked whether the catalog's 2D, rapier-only bound
+  holds, Mark chose "Add a GPU-tier law lane": a follow-on for laws that only
+  make sense at GPU scale, still 2D. The alternatives were keeping the bound,
+  or opening 3D layouts. This amends the scope line above ("Not in scope:
+  ... GPU tiers") for that lane only; it needs its own assessment.
 
 ## Progress
 
