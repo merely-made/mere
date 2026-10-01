@@ -27,8 +27,10 @@ The identity/contact crates and this reservation live in the
 Gazette is the directory port at `ports/gazette`. Gaz owns contact intake rules,
 and Gazette adapts resolver output into those rules. Castellan supplies custody
 and sealed backend composition; Personae supplies identity and carry.
-If a facade over them ever earns its existence, it lives here. No
-implementation yet.
+Ruled 2026-10-01: this crate becomes the facade that repos outside mere pin.
+It re-exports personae, insigne and gaz behind features, so a sibling takes
+one dependency at one revision instead of matching several by hand. Mere's own
+crates keep their direct dependencies. No implementation yet.
 
 ## License
 

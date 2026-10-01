@@ -4,7 +4,9 @@
 **Status:** current. The tier's architecture of record: one account of identity
 across the six crates and two ports that carry it. It synthesises the plans
 listed in §8 and does not replace them; each plan stays the authority for its
-own phases and state. One ruling is new here (§6, who announces you).
+own phases and state. Rulings new here: who announces you (§6, 2026-09-30),
+and on 2026-10-01 the three seams this document first left open, WebFinger,
+and chatelaine's CXF import policy (§7).
 **Audit base:** Mere `3fd2b147` (2026-09-30), which includes gaz M2's first
 intake slice (`c388babb`).
 
@@ -26,18 +28,19 @@ identity: your faces, and the other players.
 |---|---|---|---|
 | [personae](https://crates.io/crates/personae) | crate | the master keypair, per-protocol derivation, vault, sealed records, the carry model, issuing | me |
 | [insigne](https://crates.io/crates/insigne) | crate | proofs: typed keys, delegation certificates and revocations, derived-key attestations, as plain data; checking behind `verify` | between |
-| [chatelaine](https://crates.io/crates/chatelaine) | crate (reservation) | secrets: passwords, 2FA seeds, tokens, foreign key material | me |
+| [chatelaine](https://crates.io/crates/chatelaine) | crate (reservation; ruled a plain taxonomy, §7) | secrets: passwords, 2FA seeds, tokens, foreign key material | me |
 | [gaz](https://crates.io/crates/gaz) | crate | stored contacts: anchored records, per-endpoint trust, kith and kin, retained proofs | them, kept |
 | [castellan](https://crates.io/crates/castellan) | port | guards and presents you: the secret-free views, and the authority that exercises secrets and signs | me, outward |
 | [gazette](https://crates.io/crates/gazette) | port | the directory: resolves them, reads what they publish, and (§6) announces you | them, inward; you, outward |
-| [dramatis](https://crates.io/crates/dramatis) | crate (reservation) | the tier facade, if one earns its existence | — |
+| [dramatis](https://crates.io/crates/dramatis) | crate (reservation; ruled a facade, §7) | the one dependency sibling repos pin for the tier | — |
 | `mere-persona-picker` | crate | the Cambium view over the roster | me |
 
 All live in this repository: the crates under `crates/dramatis/`, the ports at
 `ports/castellan` and `ports/gazette`. The resident that runs the authority
 halves is djinn (`ports/djinn`), which owns one `CastellanResident` as the
 single record authority behind every Castellan view
-(`ports/djinn/src/resident.rs`).
+(`ports/djinn/src/resident.rs`). Gazette's authority half joins it as a
+djinn-composed service (ruled 2026-10-01, §7; unbuilt).
 
 ## 2. Three axes
 
@@ -185,6 +188,10 @@ breaks one is an architecture change and comes to Mark first.
     plain.
 11. **No clock in the model.** gaz takes every timestamp from the caller, so
     recency is monotonic and a replayed event cannot rewind a record.
+12. **An import never widens what is exercised without the user.** A
+    quarantined item is sealed and is never filled, released or shown until
+    the user accepts it into the vault, one item at a time (rulings 11, 13
+    and 15, §7). Ruled 2026-10-01; unbuilt, so not yet enforced in code.
 
 ## 5. What each side is for
 
@@ -230,32 +237,87 @@ What follows, as *Reading, not ruled*:
   "gazette reads what is already public, and announces what castellan has
   issued". Carried into gazette's, castellan's and the dramatis reservation's
   READMEs, the tier plan and the credential brief on 2026-09-30.
-- *Where* the announcing process runs (djinn, a separate listener, an
-  external web host the user already has) is not decided by this ruling. It
-  falls inside the first open seam below.
+- *Where* the announcing process runs was left open by this ruling and
+  settled the next day by ruling 6 (§7): a djinn service, exporting static
+  files first.
 
-## 7. Open seams
+## 7. The seams, resolved
 
-Named, not resolved (ruling 5).
+This section named three seams as open on 2026-09-30 (ruling 5). Mark
+resolved them on 2026-10-01, together with WebFinger, which ruling 5 had left
+out, and the CXF import policy that founding chatelaine raised. All of it is
+unbuilt; the rulings say where the work goes.
 
-**Gazette's resident slot.** gazette's README puts its authority half
-(resolution, feed fetching, trust state) "with the resident, which is the
-always-on party and therefore the natural poller". djinn's resident services
-plan names Personae and Castellan as "local caller identity and durable secret
-authority" and has no slot for gazette. With ruling 3, the slot now has three
-jobs: polling, trust state, and announcing. Blocking `reqwest` in gazette is
-the known entry ticket (the credential brief's first open question for the
-gazette).
+**Gazette's authority half is a djinn service (ruling 6).** Djinn composes it
+beside `CastellanResident`, on the djinn plan's own split: djinn owns process
+lifetime and scheduling, gazette owns resolution, contact intake and
+announcing policy. Feed polling becomes a job on djinn's resident scheduler,
+whose extraction that plan wants driven by real jobs. Announcing exports
+static files first: gazette writes a persona's well-known documents (the
+WebFinger JRD, `nostr.json`, the JSContact card) for any HTTPS host to serve.
+That order is forced: a WebFinger document must be served over HTTPS at the
+handle's own domain, and djinn's resident site service
+(`ports/djinn/src/resident_site.rs`) binds loopback Gemini only today. When
+that service gains public binding, it carries the same documents as a
+published snapshot. *Reading, not ruled*: a static file answers every
+`resource` query with one document, which suits a single-persona domain; a
+domain announcing several personae needs a server that reads the query, which
+is the djinn listener's job once it exists.
 
-**chatelaine.** Still a reservation. The crate consolidation plan rules it
-"design first": a secret-item taxonomy shaped against CXF's credential kinds,
-which castellan's secret-free OTP item types move into once it exists.
-castellan's sealed OTP store stays in castellan either way, because it is
-castellan's code.
+**Gazette's WebFinger moves to finger-protocol (ruling 9).** Compared
+2026-10-01:
 
-**The dramatis facade.** Still a reservation, and it stays empty until
-something imports it. Nothing found as of this date wants one: every
-consumer names the member crates directly.
+| | finger-protocol `webfinger` (smolweb) | gazette's own |
+|---|---|---|
+| I/O | none: `request_url` and `parse`; the caller does the GET | `reqwest::blocking` inside the fetch functions |
+| wasm32 | compiles (checked 2026-10-01) | cannot: reqwest 0.12.28 compiles `blocking` out on wasm32 (its `if_hyper!` gate) |
+| JRD model | all of RFC 7033 §4.4, nullable properties and link titles included | requires `subject`; keeps a link's `rel`, `type` and `href` only |
+| direction | parses and serializes, which announcing needs | parses only |
+| resources | `acct(user, host)`; the caller supplies the host | normalizes a bare `user@host`, an `acct:` URI or a URL, origin and port included |
+
+Gazette adopts finger-protocol for the request URL and the JRD in both
+directions, keeps its endpoint classification and intake (domain logic, not
+wire code), and drops the blocking fetch: the caller supplies HTTP. Gazette's
+resource normalization moves upstream into finger-protocol in smolweb, so the
+spec crate carries all of the wire. errand still takes finger-protocol without
+`webfinger`, because errand does not speak HTTP (smolweb's home decision).
+
+**chatelaine is a plain taxonomy crate (ruling 7).** Shaped like insigne's
+core: CXF-shaped item kinds and secret-free metadata (ids, labels, persona
+scope, origin), with no secret bytes, no storage and no cryptography.
+castellan's `OtpItemId` and its `OtpItem` read model move in; the sealed
+store, the release gate and exercising stay in castellan, as the crate
+consolidation plan established on 2026-09-23. Import policy for CXF v1.0's 17
+credential types (Proposed Standard, 2026-03-09), rulings 10 to 15:
+
+| CXF types | On import |
+|---|---|
+| basic-auth, generated-password, totp, api-key, wifi | stored as chatelaine kinds; totp onto castellan's existing RFC 6238 items |
+| ssh-key | through castellan's native SSH import (`ImportSshKeyNativeIntentV1`) into personae's SSH slots, so SSH has one home |
+| address, person-name | stored as chatelaine autofill kinds, exercised only by filling forms |
+| note, custom-fields | stored as chatelaine kinds |
+| item-reference | kept as a link between items, not an item; a dangling one is reported |
+| passport, drivers-license, identity-document, credit-card | quarantined |
+| passkey, file | quarantined until a passkey provider or blob custody exists |
+| types newer than CXF v1.0 | quarantined, original fields preserved verbatim |
+
+Quarantine, as ruled: sealed on import, never exercised or autofilled,
+listed for review, and accepted into the vault or deleted by the user one
+item at a time (invariant 12). CXP is still a working draft, so a `.cxf`
+file is plaintext on disk, and every import path treats it as burning
+(standards survey §2.3).
+
+**The dramatis facade is real, for sibling repos (ruling 8).** `dramatis`
+re-exports personae, insigne and gaz behind features, so a repo outside mere
+pins one crate at one revision. The evidence, 2026-10-01: eight sibling repos
+consume the tier at four mere revisions (`d82afa17`: mer3ly, hocket and
+retinue's signalman desktop; `8106c7c2`: cleromancy and woodshed;
+`bd5912fb`: turnstone and knot-editor; `32edc2ad`: isometry). Turnstone and
+knot-editor match personae and insigne to one revision by hand, the hazard
+the insigne proofs plan's phase C handoff spells out. Mere's own crates keep
+their direct dependencies. *Reading, not ruled*: the facade covers the
+crates, not the two ports, which hosts compose rather than import as a tier;
+chatelaine joins it once founded.
 
 ## 8. Where each piece's state lives
 
@@ -278,8 +340,8 @@ This document carries no phase status, which goes stale; the plans carry it.
 
 ## 9. Rulings
 
-Mark's answers on 2026-09-30, from multiple-choice rounds. Each answer was an
-option label, quoted verbatim.
+Mark's answers on 2026-09-30 (rulings 1 to 5) and 2026-10-01 (6 to 15), from
+multiple-choice rounds. Each answer was an option label, quoted verbatim.
 
 **Ruling 1.** *What should thinking about dramatis / castellan / gazette
 produce first?* Options: gazette's next plan; a seam design round; a
@@ -310,4 +372,61 @@ consumer version spread; chatelaine and the facade. Mark: **"Gazette's
 resident slot, Chatelaine and the facade"**. Follows: §7 names those two.
 *Reading, not ruled*: the two unselected items are left out of this document
 rather than declared settled. The consumer version spread is already
-recorded in the insigne proofs plan's phase C handoff.
+recorded in the insigne proofs plan's phase C handoff. *Amended 2026-10-01*:
+Mark then asked for the WebFinger comparison ("i imagine the sans-io version
+is more portable... shall we compare the webfingers?"), which ruling 9
+settles, and the facade ruling (8) answers the version spread for sibling
+repos.
+
+**Ruling 6.** *Where does gazette's authority half (polling, trust intake,
+announcing) live?* Options: a djinn service, exporting static files first;
+its own resident process; in the host, with no resident. Mark: **"Djinn
+service, static export first (Recommended)"**. Follows: §7.
+
+**Ruling 7.** *What is chatelaine as code?* Options: a plain taxonomy crate;
+a castellan module; stay reserved. Mark: **"Plain taxonomy crate
+(Recommended)"**. Follows: §7, and the CXF import rounds (rulings 10 to 15).
+
+**Ruling 8.** *What becomes of the dramatis facade?* Options: a real facade
+for sibling repos; retire the reservation; keep it empty. Mark: **"Real
+facade for sibling repos (Recommended)"**. Follows: §7.
+
+**Ruling 9.** *Should gazette adopt finger-protocol's sans-io WebFinger?*
+Options: adopt and move gazette's resource normalization upstream into
+finger-protocol; adopt and keep normalization in gazette; keep gazette's own.
+Mark: **"Adopt; upstream normalization (Recommended)"**. Follows: §7; the
+upstream move touches smolweb, which Mark brought into scope with this
+answer.
+
+**Ruling 10.** *CXF core credentials (basic-auth, generated-password, totp,
+api-key, wifi, ssh-key): how are they imported?* Options: store, with ssh-key
+through castellan's SSH import; store all six as chatelaine kinds; store
+five and drop wifi. Mark: **"Store; ssh-key via SSH import (Recommended)"**.
+
+**Ruling 11.** *Identity documents and payment cards (passport,
+drivers-license, identity-document, credit-card): store, quarantine or
+drop?* Options: quarantine; store as chatelaine kinds; drop with a report.
+Mark: **"Quarantine (Recommended)"**.
+
+**Ruling 12.** *Autofill personal data (address, person-name): where does it
+go?* Options: chatelaine autofill kinds; drafts on the persona's JSContact
+card; drop with a report. Mark: **"Chatelaine autofill kinds
+(Recommended)"**.
+
+**Ruling 13.** *Types castellan can't use yet, passkey (no WebAuthn provider
+exists) and file (castellan holds no blobs): what happens on import?*
+Options: quarantine both; drop with a report; quarantine passkey and drop
+file. Mark: **"Quarantine both (Recommended)"**.
+
+**Ruling 14.** *Freeform types (note, custom-fields, item-reference): how
+are they imported?* Options: notes and fields stored with references kept as
+links; all three stored as kinds; notes and fields quarantined. Mark:
+**"Notes and fields stored; references as links (Recommended)"**.
+
+**Ruling 15.** *Credential types CXF adds after v1.0, which this importer
+won't recognize: what happens?* Options: quarantine with original fields
+preserved verbatim; drop with a report. Mark: **"Quarantine, preserved
+verbatim (Recommended)"**.
+
+Rulings 10 to 15 answer the standards survey's open decision 5 (CXF import
+policy), which had been open since 2026-08-24.

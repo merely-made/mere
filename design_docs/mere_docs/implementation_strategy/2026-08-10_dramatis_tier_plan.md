@@ -3,7 +3,8 @@
 **Date:** 2026-08-10
 **Status:** ratified by Mark 2026-08-10; D1-D3 complete 2026-08-10; D4's wallet
 fold-in (2026-08-10) and credential port (castellan C1-C2, 2026-08-21) done;
-the `dramatis` facade reservation stays empty until something imports it
+the `dramatis` facade was ruled real on 2026-10-01 (for repos outside mere)
+and is unbuilt
 **Authority for gaz internals:** `design_docs/dramatis_docs/implementation_strategy/2026-08-08_gaz_founding_plan.md` (travels with the crate)
 
 ## What was ratified
@@ -93,7 +94,11 @@ tulpa pattern, MIT/Apache, ed2024), local repo `repos/dramatis` *(historical cit
       release gate, admitted-session consumer, Linux Secret Service, Steam
       Guard) complete 2026-08-21; product hosting open.
 - [ ] Any facade content in the `dramatis` crate. The reservation stays empty
-      until something imports it.
+      until something imports it. **Superseded 2026-10-01** by Mark's
+      ruling 8 in the [dramatis tier architecture](../../dramatis_docs/technical_architecture/2026-09-30_dramatis_tier_architecture.md):
+      the facade re-exports personae, insigne and gaz for repos outside
+      mere, where eight repos pin the tier at four mere revisions. It wants
+      its own plan when taken up.
 
 ## Direction: the credential surface is a port
 
@@ -181,3 +186,9 @@ to the IconVG decoder (`repos/emblem`, formerly `repos/iconvg` *(historical cita
   owner. castellan's authority half signs the presentation, and gazette serves
   it, so the directory is two-way. Where the announcing process runs is open,
   inside gazette's still-unplanned resident slot.
+- 2026-10-01: the architecture document's open seams were ruled, all unbuilt.
+  Gazette's authority half becomes a djinn service, with announcing exported
+  as static files first. Gazette adopts finger-protocol's sans-io WebFinger,
+  and its normalization moves upstream to smolweb. chatelaine becomes a plain
+  taxonomy crate, with CXF import policy ruled for all 17 types. dramatis
+  becomes the facade sibling repos pin. Rulings 6 to 15 are recorded there.

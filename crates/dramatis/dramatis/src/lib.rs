@@ -25,7 +25,8 @@
 //! - **Not a product.** *Persona* is an in-product term for a face; dramatis
 //!   names the tier so the term stays free.
 //!
-//! If a facade over the member crates ever earns its existence, it lives here.
-//! No implementation yet.
+//! Ruled 2026-10-01: this becomes the facade that repos outside mere pin,
+//! re-exporting personae, insigne and gaz behind features, so one dependency
+//! at one revision carries the tier. No implementation yet.
 
 #![doc(html_no_source)]

@@ -23,6 +23,7 @@
 //! - **Not the substrate.** Storage and sealing are personae's vault; the
 //!   chatelaine is the item taxonomy kept there.
 //!
-//! No implementation yet.
+//! No implementation yet. Ruled 2026-10-01: a plain taxonomy, CXF-shaped item
+//! kinds and secret-free metadata, with no secret bytes, storage or crypto.
 
 #![doc(html_no_source)]

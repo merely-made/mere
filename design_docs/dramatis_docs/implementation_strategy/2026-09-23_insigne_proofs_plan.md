@@ -503,3 +503,11 @@ M2 unverified address intake and a supplied WebFinger adapter landed
 Checked key/PLC intake, key-change alarms and back-claims remain open. Sibling phase-C repins
 remain open. The scoped `C:\t\cargo-targets\mere\gaz` build output is removed
 after recording its gates; receipts are retained.
+
+**2026-10-01.** Mark ruled the `dramatis` facade real for repos outside mere
+(ruling 8 in the
+[dramatis tier architecture](../technical_architecture/2026-09-30_dramatis_tier_architecture.md)):
+it re-exports personae, insigne and gaz, so a sibling pins one crate at one
+revision. Once it exists, the handoff above ("add Insigne from the exact same
+Mere revision as Personae") becomes one dependency instead of two hand-matched
+pins. Until then the handoff stands as written.
