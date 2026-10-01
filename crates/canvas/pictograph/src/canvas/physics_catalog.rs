@@ -1215,6 +1215,37 @@ impl Canvas {
         }
     }
 
+    /// The live law, overlays and sources as one choice.
+    pub fn physics_choice(&self) -> crate::canvas::PhysicsChoice {
+        crate::canvas::PhysicsChoice {
+            law: self.physics_law,
+            overlays: self.physics_overlays.clone(),
+            kind: self.physics_kind_source,
+            mass: self.physics_mass_source,
+            depth: self.physics_depth_source,
+        }
+    }
+
+    /// Replace the whole choice with one rebuild and one settle. Sources are
+    /// set first and the law last, so the law's build reads the new sources
+    /// and overlays. Overlay duplicates collapse, as in
+    /// [`set_physics_overlays`](Self::set_physics_overlays).
+    pub fn set_physics_choice(&mut self, choice: &crate::canvas::PhysicsChoice) {
+        self.physics_kind_source = choice.kind;
+        self.physics_mass_source = choice.mass;
+        self.physics_depth_source = choice.depth;
+        let mut seen = HashSet::new();
+        self.physics_overlays = choice
+            .overlays
+            .iter()
+            .copied()
+            .filter(|o| seen.insert(*o))
+            .collect();
+        self.physics_law = choice.law;
+        self.rebuild_law_forces();
+        self.settle_for_law();
+    }
+
     /// Apply a named profile: its law and its overlays. `false` for an unknown id.
     pub fn apply_physics_profile(&mut self, id: &str) -> bool {
         let Some(profile) = physics_profile(id) else {
@@ -1265,6 +1296,10 @@ impl Canvas {
     /// Rebuild the law + overlay force set against the current graph and hand it
     /// to the physics backend. Position-preserving.
     pub(crate) fn rebuild_law_forces(&mut self) {
+        #[cfg(test)]
+        {
+            self.law_rebuilds += 1;
+        }
         let wants_clusters = self.physics_law == PhysicsLaw::Kinds
             && self.physics_kind_source == PhysicsKindSource::Cluster;
         if wants_clusters {
@@ -1368,6 +1403,12 @@ impl Canvas {
     #[cfg(test)]
     pub(crate) fn law_force_count(&self) -> usize {
         self.physics.force_count()
+    }
+
+    /// How many force-set rebuilds have run. Test introspection.
+    #[cfg(test)]
+    pub(crate) fn law_rebuilds(&self) -> usize {
+        self.law_rebuilds
     }
 
     /// The attribute builders over the current graph. Test introspection.

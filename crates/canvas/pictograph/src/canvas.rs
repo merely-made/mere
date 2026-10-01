@@ -642,6 +642,9 @@ pub struct Canvas {
     /// Where the Depth overlay reads a node's depth from (roots, layers, the
     /// focus). (Physics catalog — P1b.)
     physics_depth_source: PhysicsDepthSource,
+    /// How many times the law + overlay force set was rebuilt. Test only.
+    #[cfg(test)]
+    law_rebuilds: usize,
     /// A restored score's `(strategy id, graph revision, URL-authority revision, footprint revision)`
     /// claim on the layout.
     /// [`restore_projection_score`](Self::restore_projection_score) buffers the

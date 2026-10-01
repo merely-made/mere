@@ -367,6 +367,155 @@ different scales remains untested here. Future comparisons should identify
 layout/law, node and edge counts, visible count and elapsed-step settings
 before drawing broader conclusions.
 
+## Physics panel on the tree (2026-10-01)
+
+Branch `tree-physics-panel` in `worktrees/mere-tree-physics`, based on main
+`d91a49f0`. This carries out the plan's §1 phase-4 physics-panel rulings for
+14 of the 16 scenarios; `physics_remote_board` and `c4b1_live_board` belong to
+the separate remote-session slice and are not covered here.
+
+### What changed
+
+- Pictograph `Canvas::set_physics_choice` applies sources, overlays and law
+  with one rebuild and one settle, sources first and the law last;
+  `Canvas::physics_choice` reads the live choice back as the existing
+  `PhysicsChoice`. A test-only rebuild counter shows one rebuild per apply,
+  the same force set as the old law-last setter sequence, and custom
+  detection.
+- `graphshell::canvas_physics` (beside `canvas_controls.rs`, DOM-free) holds
+  the typed actions: `apply_arrangement`, `advance_arrangement`,
+  `apply_physics`, `apply_profile`, `profile_id` (`custom` when no profile
+  names the pair), `ticked_overlays` and `arrangement_choices`, which is
+  `CANVAS_LAYOUT_STRATEGIES` plus free. The arrangement transition moved here
+  from `web.rs`. The old page's `apply_arrangement_from_form`,
+  `apply_physics_from_form` and `apply_profile_from_form` now read the DOM
+  and call these, so there is one implementation of each Apply.
+- The tree has a docked "Graph tools" region beside the canvas whose first
+  section is "Arrangement and physics": Cambium selects for Arrangement,
+  Physics law, Kinds, Mass, Depth and Profile, an "Overlays" group of eight
+  labelled checkboxes, and the Apply arrangement, Apply physics and Apply
+  profile buttons, with a status line. After each Apply the controls follow
+  the canvas; the profile picker shows "Custom (no profile)" when the pair
+  names none. The same component mounts on the fixture route and on
+  `tree.html?app=local`. The law choice is not persisted.
+- New tree-lane observations: `ready`, `layout`, `physics-law`,
+  `physics-overlays`, `physics-profile`, the three `physics-*-source` fields,
+  `panel-law`, `panel-overlays`, `panel-profile`, `panel-status`,
+  `checked-overlays` (read from the rendered checkboxes' `aria-checked`),
+  `canvas-nodes`, `dragging-node` and `drag-return`. The `layout-spread`,
+  `layout-overlaps` and `layout-stretch` fields are computed only up to 512
+  nodes, because they are pairwise. New verbs: `add-node x y url`,
+  `press-focused`, `center-node url` (a camera pan that keeps zoom) and
+  `release-at`, which now records the drop point.
+- The standalone web manifest's seven Genet pins moved from `69a2383b` to
+  root's `b1eb3af1`. Main `c6707958` had repinned root and left this
+  manifest behind, so the web graph resolved two Genet copies and the locked
+  build could not use main's lock. The re-resolved ignored lock has one Genet
+  revision (SHA256 `c8cdb567…`, copied to
+  `Code/testing/mere/tree-physics/web-Cargo.lock`).
+
+### Native gates
+
+All runs were offline and locked, with target `C:/t/cargo-targets/mere/tree-physics`.
+Logs are under `Code/testing/mere/tree-physics/`.
+
+- `cargo test -p pictograph -p cambium-rootstock -p graphshell` (the merge
+  gate): 261 passed, 0 failed (`native-merge-gate.log`).
+- `cargo test -p graphshell --features web --lib`: 228 passed, including the
+  four `canvas_physics` tests for ordering, profile sync and custom detection
+  (`native-graphshell-web.log`).
+- `cargo test -p pictograph --features canvas --lib`: 260 passed, including
+  `a_whole_choice_applies_with_one_rebuild_and_reads_back`
+  (`native-pictograph-canvas.log`).
+- The standalone wasm build (`CARGO_PROFILE_DEV_DEBUG=0`,
+  `getrandom_backend="wasm_js"`) and wasm-bindgen 0.2.127 passed
+  (`wasm-build-final.log`). Bundle SHA256:
+  `8d7849a4ec716dc519e9cf2df5057f7d059506f0bbf4024900cf616a5cd28b1f`.
+
+### Headed scenarios
+
+The runner is a copy of `run-graphshell-web-scenario.ps1` with its own Chrome
+profile (`.tree-physics-browser`), port 8761, and a sink sweep limited to that
+port, so it cannot stop a concurrent lane's browser or sink. The page is
+`tree.html`, the window 1400 by 900, and every run used the bundle above.
+Receipts are in `Code/testing/mere/scenarios/graphshell-web/<name>/` and the
+run log is `Code/testing/mere/tree-physics/run-final.log`.
+
+| Scenario (fixture route) | Result |
+| --- | --- |
+| `p4_tree_physics_springs`, `_charge`, `_stress`, `_energy`, `_orbit`, `_kinds`, `_flock`, `_sync`, `_flow`, `_anneal`, `_still` | all 11 ok |
+| `p4_tree_physics_profiles` | ok |
+| `p4_tree_physics_add` | ok |
+| `p4_tree_physics_drag` | **fail**: one release-window assertion (see below) |
+| `p4_tree_physics_keys` (supplementary keyboard receipt) | ok |
+| `p4_tree_physics_springs_local`, `p4_tree_physics_profiles_local` (`app=local`) | both ok, on the saved graph ("IndexedDB reopened") |
+
+The tree scenarios keep the originals' assertions and thresholds. Controls are
+chosen through `click role:combobox <name>` and `click role:option <label>`.
+The old `capture; wait` became `capture; settle 2`, because the tree's `wait`
+also holds for motion while the old page's held only for the capture.
+`assert title` and `assert attr` became `assert snap ready`,
+`checked-overlays` and `panel-*`, and `assert dom` became `assert text`.
+
+The old page still passes `physics_drag`, `physics_profiles` and
+`physics_springs` on this bundle (`p4_tree_physics_oldpage_*`).
+
+**Drag release window (open).** The drag scenario's assertions one frame after
+release (`drag-return <= 20` for resting laws, `<= 60` for moving ones) are
+unstable on the tree:
+
+| Run | Stress (≤ 20) | Anneal (≤ 60) |
+| --- | --- | --- |
+| Default elapsed stepping, run 1 | pass | 61 |
+| Default elapsed stepping, run 2 | 31 | 68 |
+| Default elapsed stepping, final bundle | 21 | pass |
+| `physics_max_steps=1` | pass | 292 |
+
+Every 300-frame reclaim, hold and overlap assertion passed in each run. The
+tree advances bounded elapsed time (up to 3 steps per frame) on a 982-px
+canvas, where the old page took one step per frame on a full-width canvas.
+Anneal writes positions through a seeded random walk whose step shrinks with a
+temperature reset at each apply. The cause is not isolated. The threshold
+choice is returned to Mark; this receipt does not resolve it.
+
+Earlier, Energy carried the web node off-screen, where the host pointer path
+cannot press it (the old page pressed off-screen coordinates directly). The
+tree scenario now runs `center-node` before each press. This was not ruled
+and is part of the same review.
+
+### Inspection, accessibility and controls
+
+- **A first passing receipt was wrong.** The first Springs run passed every
+  assertion, but its captures showed the tools region laid out about 1,100 px
+  wide over the canvas. The producer drew at 982 by 627, yet no graph was
+  visible. After the region received an explicit width, the graph and the
+  docked panel both draw. Every capture of the final runs was inspected
+  whole-frame. Energy, Stress, Kinds and Sync carry nodes out of the fitted
+  view, which the old page's Energy capture also shows.
+- **Positive control.** A temporary scenario chose Orbit and then asserted
+  `physics-law == spring.rapier` and, after 300 frames,
+  `physics-energy <= 1`. It failed on both, reading `orbit.gravity` and
+  82479.62 (`p4_tree_physics_control/`). The scenario file was removed.
+- **Accessibility mirror.** `read_page` in the Browser pane (1400 by 900,
+  hidden) lists:
+  - region "Graph tools";
+  - section "Arrangement and physics" with its heading;
+  - comboboxes Arrangement, Physics law, Kinds, Mass, Depth and Profile,
+    each showing its chosen value;
+  - group "Overlays" with checkboxes Hub room, Group pull, Hub pull, Depth,
+    Grid, Centre, Tide and Skeleton;
+  - the three Apply buttons and the status.
+- **Keyboard.** `p4_tree_physics_keys` uses Cambium key dispatch:
+  - ArrowDown/Enter on Physics law selects Charge;
+  - Tab reaches Hub room and Space ticks it;
+  - eleven Tabs reach Apply physics, and Enter applies Charge with Hub room
+    (`physics-profile == custom`).
+- **Status line.** The page status keeps the boot node count after `add-node`
+  (it reads "11 nodes" with 22 on the canvas). This is cosmetic: the
+  `canvas-nodes` observation is correct.
+- **Not ruled.** The region is a fixed 300 px (279 px content plus padding).
+  Its narrow-viewport behaviour is not ruled.
+
 ## Open gates
 
 - Genet commit `27d20d3fc51ac5fcd2a2db231e035a3e06013ae1` admits safe retained
