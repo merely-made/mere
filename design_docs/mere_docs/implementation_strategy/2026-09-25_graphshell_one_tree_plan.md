@@ -229,6 +229,29 @@ assessment returned:
 - **Routes for the remote scenarios.** Mark chose "Both routes": they run
   over `?signal=` on the fixture route and on `app=local`. The alternatives
   were the fixture route only, or `app=local` only.
+- **Anneal overrides a held node.** With the release window in physics steps
+  (`4344f138`), ten laws read at most 8.2 px; Anneal read 255.2 and 190.8 px
+  in two of three runs. Verified cause: `Anneal::apply`
+  (`seiche/src/laws/anneal.rs:153-157`) calls `set_translation` on every body
+  whose move it accepts, including the one `pin` made kinematic
+  (`seiche/src/lib.rs:837`). Mark chose "Seiche: skip non-dynamic bodies":
+  laws that write positions leave kinematic bodies alone, with a test that
+  fails without the fix. The alternatives were re-seating the body on release
+  in pictograph, or exempting Anneal from the check.
+- **The session switch.** "Two aria-pressed buttons", as on the old page. The
+  alternatives were Cambium tabs or a radio group.
+- **Remote scope.** Told the two scenarios need no draft form, reconnect,
+  disconnect or nudge UI, Mark chose "Carry their UI now": their logic lifts
+  into graphshell-client and their tree UI is built in the same slice, with
+  `c4b3_reconnect` ported too. The alternative deferred their UI.
+- **What busy means.** Mark chose "Moving counts only when local is shown":
+  a scenario `wait` holds for a pending capture, a remote operation in
+  flight, or the local canvas moving while the local session is shown. The
+  alternative kept the rule and accepted wait-timeouts under restless laws.
+- *Reading, not ruled:* the remote scenarios follow the panel lane's
+  precedent of tree copies (`p4_tree_*`) with the originals kept for the old
+  page, and the physics panel stays operable during a remote session, since
+  `physics_remote_board` applies Orbit while remote.
 
 The [phase-4 migration inventory](2026-09-27_graphshell_tree_migration_inventory.md)
 maps the actual application state, controls, shared-input gaps and remaining

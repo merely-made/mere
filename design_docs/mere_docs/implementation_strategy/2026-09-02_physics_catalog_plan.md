@@ -528,6 +528,13 @@ home still open, and `PhysicsBoard::offload` uncalled:
   ruled:* which hosts (native, WebGPU), the threshold, and what the
   all-pairs laws other than `NodeExclusion` do are open for the lane's
   assessment.
+  *Correction (2026-10-01, same day):* `NodeExclusion` is in eight laws,
+  not nine (Springs, Stress, Energy, Orbit, Kinds, Flock, Sync, Flow;
+  `physics_catalog.rs:1012-1071`). The question put to Mark said nine. The
+  assessment also found the solver cannot run in a browser (synchronous
+  readback panics on wasm), that no native host constructs a Canvas, and
+  that its helper boots its own device; the ruling is reopened with Mark on
+  that evidence.
 - **A GPU-tier law lane.** Asked whether the catalog's 2D, rapier-only bound
   holds, Mark chose "Add a GPU-tier law lane": a follow-on for laws that only
   make sense at GPU scale, still 2D. The alternatives were keeping the bound,
