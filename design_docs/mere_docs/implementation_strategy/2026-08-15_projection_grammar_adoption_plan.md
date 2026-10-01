@@ -718,6 +718,18 @@ creating stack capabilities, not special exceptions." mer3ly's asks open gates,
 but only for capabilities that another consumer could use unchanged. Recorded
 as Ruling 1 of mer3ly's `docs/2026-09-30_graphshell_site_canvas_plan.md`, which
 is that objective's assessment.
+*Added 2026-10-01.* Rulings in that assessment that land in mere:
+- A typed fold is promoted onto sceno's 0.0.4 line, with mer3ly as the forcing
+  consumer. Mere's native canvas, through pictograph's existing
+  `forme::FoldRecord` projection plus a product trigger and folds in
+  `MereHost` scenes, is the second (Ruling 11).
+- The two-reading matrix's contract types go into cartography, and its
+  derivation into a cartography sibling crate. Both mer3ly's copy and
+  `ports/gazette/src/ledger.rs` retire, as the catalog's
+  removal-on-promotion rule requires (Rulings 10 and 12).
+- Separately, A4's text here runs together two histories that the assessment
+  separates: authority-revision history, the site's checkpoint slider, and
+  scene-edit history, `projection-proof`'s chained trace.
 
 ## Progress
 
