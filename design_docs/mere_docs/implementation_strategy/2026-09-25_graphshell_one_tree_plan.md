@@ -140,6 +140,36 @@ Phase 3 follow-up rulings, 2026-09-27:
   arrangement slots. Resume starts from the held positions; preserving
   velocity is not established by this ruling.
 
+Phase 4 physics-panel rulings, 2026-10-01. Mark asked for the physics law
+picker to reach the tree. The inventory had placed it in step 3's
+find/arrange/physics panel, and the newest phase-4 work sat unmerged on
+`canvas-elapsed-host`, which edits the same tree files.
+- **The base.** Asked what the panel should build on, Mark chose "Merge that
+  branch to main first". `canvas-elapsed-host` (`74ee42ff`, its receipts
+  headed-passing on 2026-09-30) merged into main as `3270cac2`, and the
+  panel branches from there. The alternatives were branching off the
+  unmerged branch, building on main and reconciling later, or waiting for
+  the branch's owner.
+- **Done means.** Mark chose "Panel + all 16, migrating what they need". The
+  panel carries law, overlays, the three sources and profiles, and all 16
+  physics-side scenarios pass headed on the tree: the eleven per-law
+  receipts, `physics_profiles`, `physics_drag`, `physics_add`,
+  `physics_remote_board` and `c4b1_live_board`. Whatever those scenarios
+  need comes across with them. The alternatives were the panel plus the 13
+  scenarios that need nothing else, or the panel alone with receipts later.
+  *Reading, not ruled:* "what they need" includes the arrangement picker
+  (every law scenario first selects `free`), an `add-node` lane verb, and the
+  WebRTC remote session with its session switch and remote actions, which
+  today live on the old page's `BrowserHost` (`web_remote.rs`).
+- **Routes.** "Both fixture and app=local": one panel component on the
+  default fixture route and on `tree.html?app=local`. The law choice is not
+  persisted until saved-scene restoration crosses. The alternatives were
+  `app=local` only, or the fixture only.
+- **Execution.** Asked how to run it, Mark said: "Buddy, i like it sequential
+  during design. You feel free to orchestrate using opus and/or sonnet."
+  Design forks come back to him one round at a time; implementation runs as
+  Opus/Sonnet lanes in their own worktrees, verified before they reach main.
+
 The [phase-4 migration inventory](2026-09-27_graphshell_tree_migration_inventory.md)
 maps the actual application state, controls, shared-input gaps and remaining
 page/scenario obligations. The fixture toolbar is the first slice, not the
