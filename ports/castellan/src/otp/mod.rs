@@ -62,6 +62,9 @@ pub use admitted::{
     OtpAdmittedSession, OtpApprovedRelease, OtpSessionDelivery, otp_item_path, otp_release_policy,
 };
 pub use base32::Base32Error;
+// The display enums are chatelaine's, one definition for the taxonomy and
+// castellan. `OtpKind` stays here: it carries the live HOTP counter.
+pub use chatelaine::{OtpAlgorithm, OtpCodeStyle};
 pub use item::{OtpItem, OtpItemError, OtpItemId, OtpItemStore};
 pub use participant::{OtpReleaseParticipantClaim, OtpReleaseParticipantProof};
 pub use release::{
@@ -81,35 +84,6 @@ pub const MIN_SECRET_BYTES: usize = 16;
 /// A deliberately small upper bound for a caller-selected comparison window.
 pub const MAX_SKEW_STEPS: u64 = 10;
 
-/// The HMAC hash behind a code.
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
-pub enum OtpAlgorithm {
-    /// SHA-1. The RFC 4226 original and what essentially every issuer uses.
-    #[default]
-    Sha1,
-    /// SHA-256.
-    Sha256,
-    /// SHA-512.
-    Sha512,
-}
-
-impl OtpAlgorithm {
-    /// The spelling used in an `otpauth://` URI.
-    pub fn as_uri_str(self) -> &'static str {
-        match self {
-            OtpAlgorithm::Sha1 => "SHA1",
-            OtpAlgorithm::Sha256 => "SHA256",
-            OtpAlgorithm::Sha512 => "SHA512",
-        }
-    }
-}
-
-impl fmt::Display for OtpAlgorithm {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str(self.as_uri_str())
-    }
-}
-
 /// Whether codes advance on a clock or on a stored counter.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum OtpKind {
@@ -125,28 +99,6 @@ pub enum OtpKind {
         /// The next counter value to use.
         counter: u64,
     },
-}
-
-/// Characters used to present a generated code.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum OtpCodeStyle {
-    /// RFC-style decimal output with an explicit width.
-    Decimal {
-        /// Number of decimal digits in the code.
-        digits: u32,
-    },
-    /// Valve's five-character Steam Guard compatibility alphabet.
-    SteamGuard,
-}
-
-impl OtpCodeStyle {
-    /// Number of visible characters in a code of this style.
-    pub fn character_count(self) -> u32 {
-        match self {
-            Self::Decimal { digits } => digits,
-            Self::SteamGuard => 5,
-        }
-    }
 }
 
 /// Why a generator could not be built or a code could not be produced.
