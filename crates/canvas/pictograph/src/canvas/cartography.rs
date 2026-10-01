@@ -166,6 +166,7 @@ impl Canvas {
         if self.physics_paused {
             self.paused_positions = Some(self.view.positions().collect());
         }
+        self.reset_frame_time();
         self.physics.seed(resolved);
         self.physics.halt();
     }

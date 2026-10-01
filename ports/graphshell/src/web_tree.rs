@@ -65,7 +65,15 @@ const SHEET: &str = "\
     .tree-status { margin: 4px 12px 8px; } \
     .tree-controls { display:flex; gap:6px; padding:6px 12px; flex-wrap:wrap; } \
     .tree-controls button { background:#263640; color:#dce3e8; padding:5px 10px; border:1px solid #637581; } \
-    .tree-canvas { display: block; flex: 1 1 auto; min-height: 0; }";
+    .tree-canvas { display: block; flex: 1 1 auto; min-height: 0; } \
+    .tree-product { position:absolute;top:112px;left:12px;max-width:360px;z-index:5; } \
+    .tree-product p { margin:4px 0; } \
+    .tree-detail { background:#17232b;border:1px solid #637581;padding:12px; } \
+    .tree-detail label { display:block;margin:8px 0; } \
+    .tree-detail .detail-key { display:block; } \
+    .tree-detail .detail-value { display:block;margin:2px 0 8px;overflow-wrap:anywhere; } \
+    .tree-detail input { display:block;width:280px;height:26px;color:#dce3e8;background:#263640;border:1px solid #637581; } \
+    .tree-product button { background:#263640;color:#dce3e8;padding:5px 10px;border:1px solid #637581; }";
 
 /// What the page, its producer and its hooks share.
 struct Shared {
@@ -81,6 +89,8 @@ struct Shared {
     /// timing marks are written on them.
     gpu: RefCell<Option<(wgpu::Device, wgpu::Queue)>>,
     timing: RefCell<FrameTiming>,
+    physics_config: mere::canvas::ElapsedStepConfig,
+    visibility: Option<RefCell<visibility::Visibility>>,
 }
 
 impl Shared {
@@ -101,6 +111,7 @@ struct CanvasProducer {
 impl TextureProducer for CanvasProducer {
     fn render(&mut self, cx: &ProducerContext<'_>) -> Option<ProducedTexture> {
         let shared = &self.shared;
+        let visibility_before = visibility::before(shared);
         if shared.gpu.borrow().is_none() {
             *shared.gpu.borrow_mut() = Some((cx.device.clone(), cx.queue.clone()));
         }
@@ -116,7 +127,16 @@ impl TextureProducer for CanvasProducer {
         }
         let profile = shared.timing.borrow().active();
         let (scene, moving) = if profile {
-            let (scene, moving, sample) = canvas.frame_profiled(size.0, size.1, now_ms);
+            let (scene, moving, sample) = match cx.frame.timestamp {
+                Some(timestamp) => canvas.frame_profiled_at(
+                    size.0,
+                    size.1,
+                    timestamp,
+                    shared.physics_config,
+                    now_ms,
+                ),
+                None => canvas.frame_profiled(size.0, size.1, now_ms),
+            };
             shared.timing.borrow_mut().stages(
                 mere::canvas::CanvasFrameProfile::STAGES
                     .into_iter()
@@ -130,9 +150,28 @@ impl TextureProducer for CanvasProducer {
             ]);
             (scene, moving)
         } else {
-            canvas.frame(size.0, size.1)
+            match cx.frame.timestamp {
+                Some(timestamp) => {
+                    canvas.frame_at(size.0, size.1, timestamp, shared.physics_config)
+                },
+                None => canvas.frame(size.0, size.1),
+            }
         };
+        if profile && let Some(report) = canvas.elapsed_step_report() {
+            shared.timing.borrow_mut().counts([
+                ("physics_steps", report.steps as usize),
+                (
+                    "physics_discarded_us",
+                    report.discarded_elapsed.as_micros().min(usize::MAX as u128) as usize,
+                ),
+                (
+                    "physics_carried_us",
+                    report.carried_elapsed.as_micros() as usize,
+                ),
+            ]);
+        }
         shared.moving.set(moving);
+        visibility::after(shared, &canvas, visibility_before, cx.frame.timestamp);
         shared.dirty.set(false);
         // Rasterize every requested frame, as the presenter does. A settled
         // layout does not prove the first texture was complete: Vello can need
@@ -163,6 +202,10 @@ impl TextureProducer for CanvasProducer {
             encoding: SourceEncoding::Srgb,
         })
     }
+    fn suspend(&mut self) {
+        self.shared.canvas.borrow_mut().reset_frame_time();
+        self.texture = None;
+    }
 }
 
 /// The application state the tree renders.
@@ -173,6 +216,7 @@ pub(crate) struct TreePage {
     nodes: usize,
     /// The address of the node the last click picked.
     picked: Option<String>,
+    product: Option<product::SavedProduct>,
     /// The tree's logical size, followed from the host each frame. Genet sizes
     /// a custom leaf's cross axis from its intrinsic size and does not stretch
     /// an absolutely placed box between its insets, so the view is told its
@@ -213,6 +257,7 @@ fn view(page: &TreePage) -> Child {
                     .attr("class", "tree-status")
                     .attr("role", "status"),
                 controls::toolbar(page),
+                product::controls(page),
                 on_wheel(
                     on_key(
                         on_pointer(
@@ -223,7 +268,7 @@ fn view(page: &TreePage) -> Child {
                             |page: &mut TreePage, event: cambium::PointerEvent| page.pointer(event),
                         ),
                         |page: &mut TreePage, event: cambium::KeyEvent| {
-                            if keys(&page.shared, &event.key) {
+                            if keys(page, &event.key) {
                                 event.prevent_default();
                             }
                         },
@@ -237,7 +282,21 @@ fn view(page: &TreePage) -> Child {
 }
 
 /// Arrows pan and plus or minus zoom, as on the main page.
-fn keys(shared: &Shared, key: &Key) -> bool {
+fn keys(page: &mut TreePage, key: &Key) -> bool {
+    if let Some(product) = &mut page.product {
+        match key {
+            Key::Named(NamedKey::Enter) if product.selected.is_some() => {
+                product.detail_open = true;
+                return true;
+            },
+            Key::Named(NamedKey::Escape) if product.detail_open => {
+                product.detail_open = false;
+                return true;
+            },
+            _ => {},
+        }
+    }
+    let shared = &page.shared;
     let command = match key {
         Key::Named(NamedKey::ArrowLeft) => CanvasCommand::Pan {
             dx: -PAN_STEP,
@@ -317,12 +376,17 @@ async fn boot(root: Element) -> Result<(), String> {
     let width = canvas.client_width().max(1) as u32;
     let height = canvas.client_height().max(1) as u32;
 
-    let (graph, source) = match web_graphs::requested() {
-        Some((nodes, seed)) => (
-            web_graphs::generated(nodes, seed),
-            format!("generated, seed {seed}"),
-        ),
-        None => (fixture_graph()?, "fixture".to_string()),
+    let product = product::open().await?;
+    let (graph, source) = if let Some(product) = &product {
+        (product.graph(), "saved graph".to_string())
+    } else {
+        match web_graphs::requested() {
+            Some((nodes, seed)) => (
+                web_graphs::generated(nodes, seed),
+                format!("generated, seed {seed}"),
+            ),
+            None => (fixture_graph()?, "fixture".to_string()),
+        }
     };
     let nodes = graph.node_count();
     let shared = Rc::new(Shared {
@@ -333,7 +397,10 @@ async fn boot(root: Element) -> Result<(), String> {
         physical_size: Cell::new([0, 0]),
         gpu: RefCell::new(None),
         timing: RefCell::new(FrameTiming::default()),
+        physics_config: controls::physics_config()?,
+        visibility: visibility::requested()?,
     });
+    visibility::install(&shared, &document)?;
     let options = HostOptions {
         title: "Graphshell, one tree".into(),
         netrender: Box::new(|| NetrenderOptions {
@@ -354,6 +421,7 @@ async fn boot(root: Element) -> Result<(), String> {
                 source,
                 nodes,
                 picked: None,
+                product,
                 size: (width, height),
             },
             logic: view as Logic,
@@ -400,6 +468,20 @@ fn hooks(shared: Rc<Shared>) -> HostHooks<TreePage, Logic, Child> {
     let after_shared = shared.clone();
     HostHooks {
         frame: Box::new(move |ctx| {
+            if ctx
+                .runner
+                .state()
+                .product
+                .as_ref()
+                .is_some_and(|product| product.ready())
+            {
+                ctx.runner.update(|page| {
+                    if let Some(product) = &mut page.product {
+                        product.poll(&mut frame_shared.canvas.borrow_mut());
+                    }
+                });
+                frame_shared.dirty.set(true);
+            }
             let size = (
                 ctx.logical_size.0.round().max(1.0) as u32,
                 ctx.logical_size.1.round().max(1.0) as u32,
@@ -446,7 +528,7 @@ fn hooks(shared: Rc<Shared>) -> HostHooks<TreePage, Logic, Child> {
         }),
         after_wake: Box::new(|_ctx| {}),
         close_request: Box::new(|_ctx, _request| CloseDisposition::KeepVisible),
-        focused_text: Box::new(|_runner| None),
+        focused_text: Box::new(product::focused_text),
         key_intercept: Box::new(|_runner, _press| false),
     }
 }
@@ -479,7 +561,7 @@ pub(crate) fn run(text: &str) -> Result<(), String> {
 }
 
 /// Write the receipt where `loader.js` collects it, and say the run is done.
-fn publish(ok: bool, text: &str, shared: &Shared) {
+fn publish(ok: bool, text: &str, shared: &Shared, saved: Option<serde_json::Value>) {
     let result = if ok { "ok" } else { "fail" };
     // The sink writes its own RESULT line from `result`.
     let log: Vec<&str> = text.lines().skip(1).collect();
@@ -489,6 +571,7 @@ fn publish(ok: bool, text: &str, shared: &Shared) {
         "timings": shared.timing.borrow().json(),
         "canvas_logical_size": shared.size.get(),
         "canvas_physical_size": shared.physical_size.get(),
+        "saved_graph": saved,
     });
     let outcome = super::document().and_then(|document| {
         if let Ok(element) = web_scenario::page_element(&document, "scenario-log") {
@@ -509,4 +592,6 @@ fn publish(ok: bool, text: &str, shared: &Shared) {
 
 mod controls;
 mod lane;
+mod product;
+mod visibility;
 use lane::TreeLane;

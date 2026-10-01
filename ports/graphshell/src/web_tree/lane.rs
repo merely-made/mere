@@ -69,13 +69,20 @@ impl Product for TreeLane {
     }
     fn complete(
         &mut self,
-        _: &mut mesquite::Ctx<'_, Self>,
+        ctx: &mut mesquite::Ctx<'_, Self>,
         outcome: &taproot::Outcome,
     ) -> Result<(), String> {
         let mut lines = vec![format!("RESULT {}", if outcome.ok { "ok" } else { "fail" })];
         lines.extend(outcome.log.iter().cloned());
         lines.extend(self.receipt_lines());
-        publish(outcome.ok, &lines.join("\n"), &self.shared);
+        let saved = ctx.runner.state().product.as_ref().map(|product| {
+            json!({
+                "session": product.session, "selected": product.selected,
+                "title": product.title.text(), "tags": product.tags.text(),
+                "save_state": product.save_state, "reopened": product.reopened,
+            })
+        });
+        publish(outcome.ok, &lines.join("\n"), &self.shared, saved);
         Ok(())
     }
 
@@ -133,7 +140,17 @@ impl Product for TreeLane {
                 let (left, top, _, _) = ctx.painted_rect(leaf)?;
                 Some((left + x - px).hypot(top + y - py))
             });
-        ProbeSnapshot::default()
+        let step = canvas.elapsed_step_report().unwrap_or_default();
+        let snapshot = ProbeSnapshot::default()
+            .with_field("physics-steps", step.steps.to_string())
+            .with_field(
+                "physics-dropped-us",
+                step.discarded_elapsed.as_micros().to_string(),
+            )
+            .with_field(
+                "physics-step-cap",
+                self.shared.physics_config.max_steps.to_string(),
+            )
             .with_field("focus", format!("{focus:?}"))
             .with_field("focus-kind", focus_kind)
             .with_field("physics-paused", canvas.physics_paused().to_string())
@@ -159,7 +176,25 @@ impl Product for TreeLane {
             .with_field(
                 "gpu-timed",
                 self.shared.timing.borrow().gpu_timed().to_string(),
-            )
+            );
+        if let Some(product) = &page.product {
+            snapshot
+                .with_field("graph-session", product.session.clone())
+                .with_field("storage-reopened", product.reopened.to_string())
+                .with_field("save-state", product.save_state)
+                .with_field("detail-open", product.detail_open.to_string())
+                .with_field(
+                    "detail-member",
+                    product
+                        .selected
+                        .map(|id| id.to_string())
+                        .unwrap_or_default(),
+                )
+                .with_field("detail-title", product.title.text())
+                .with_field("detail-tags", product.tags.text())
+        } else {
+            snapshot
+        }
     }
 
     /// `timing start <label>` and `timing stop`, and `click-node <url>`.
@@ -222,11 +257,21 @@ impl Product for TreeLane {
     /// `wait` holds for a settled frame and a finished report.
     fn busy_mut(
         &mut self,
-        _ctx: &mut AppCtx<'_, TreePage, Logic, Child>,
+        ctx: &mut AppCtx<'_, TreePage, Logic, Child>,
         capture_pending: bool,
     ) -> Option<bool> {
         let pending = self.shared.timing.borrow_mut().poll();
-        Some(capture_pending || pending || self.shared.moving.get())
+        Some(
+            capture_pending
+                || pending
+                || self.shared.moving.get()
+                || ctx
+                    .runner
+                    .state()
+                    .product
+                    .as_ref()
+                    .is_some_and(|product| product.saving),
+        )
     }
 
     fn receipt_lines(&self) -> Vec<String> {

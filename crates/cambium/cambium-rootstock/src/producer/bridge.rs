@@ -48,6 +48,27 @@ where
     Logic: FnMut(&State) -> V + 'static,
     V: RootView<State>,
 {
+    /// Draw with a caller-supplied monotonic timestamp. Ordinary redraw remains
+    /// untimed for deterministic callers; timestamps never leak into later draws.
+    pub fn redraw_at(&mut self, timestamp: std::time::Duration) {
+        self.s.producers.timestamp = Some(timestamp);
+        self.redraw();
+        self.s.producers.timestamp = None;
+    }
+
+    /// Update platform visibility immediately, even if no frame will be delivered.
+    pub fn set_hidden(&mut self, hidden: bool) {
+        if self.s.hidden == hidden {
+            return;
+        }
+        self.s.hidden = hidden;
+        if hidden {
+            self.suspend_producers();
+        } else if let Some(window) = &self.s.window {
+            window.request_redraw();
+        }
+    }
+
     /// Retire staged images before a platform drops/replaces its surface, or
     /// suspend transient targets while the containing window is hidden.
     pub fn suspend_producers(&mut self) {

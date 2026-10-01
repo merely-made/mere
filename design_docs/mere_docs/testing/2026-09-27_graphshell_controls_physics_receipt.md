@@ -187,10 +187,185 @@ Seiche also gains the additive, caller-timed `Physics::advance_elapsed` API.
 Configurable elapsed and step caps discard excess whole-step debt and retain
 only a substep fraction. Seed, halt and suspension reset that fraction;
 actors retain their own pacing. Twelve focused runtime tests pass with
-default features, eight without default features. Canvas/browser callers
-still use deterministic `advance_frame`, so these browser results do not
-claim elapsed-time physics adoption. The migration inventory records the
-remaining host timestamp, visibility and scenario work.
+default features, eight without default features. Those browser measurements
+used deterministic `advance_frame`; elapsed-time adoption is recorded below.
+
+## Elapsed-time host adoption (2026-09-29)
+
+Graphshell's tree producer now uses the host's monotonic timestamp through
+Pictograph `frame_at` / `frame_profiled_at`. The web host supplies animation
+timestamps and uses the same performance clock for immediate input draws.
+Document hiding suspends producers immediately; resuming starts a fresh
+Canvas baseline. Hidden mounts still publish their accessibility mirror.
+Pause, resume, reseed, restore and idle-to-active transitions cannot accumulate
+catch-up debt. Backward timestamps retain the previous high-water mark.
+
+The tree page accepts `physics_max_steps` and `physics_max_elapsed_ms`, with
+defaults of three steps and 50 ms. Excess debt is discarded and reported;
+one bounded physics advance is followed by one composition. The old presenter
+and deterministic Canvas methods keep their existing behavior. Camera and
+ambient animation pacing are outside this physics change.
+
+The locked wasm build passes. Headed Chrome scenarios `p4_tree_controls` and
+`p4_tree_elapsed?nodes=128&seed=7&physics_max_steps=1` both pass, without page
+errors. Captures were inspected for graph content. The elapsed scenario
+checks live motion, the selected step cap, frozen Pause and exact Restore.
+Its 14-frame window reports exactly one physics step per frame and discards
+92,433–110,633 microseconds per frame. This is functional evidence under
+concurrent builds, not a controlled performance comparison. The recorded
+121.0 ms median interval is not a responsiveness claim.
+
+Raw receipts: `Code/testing/mere/scenarios/graphshell-web/elapsed_host_controls/`
+and `elapsed_host_timing/`; build log: `Code/testing/mere/elapsed-host-wasm.log`.
+Bundle SHA256: `cc4a0dbc5ce607dc87bb56788bc9171c0b20b64cb93cbe98d563059e1361feb7`.
+All 266 Pictograph tests pass. Rootstock passes 41 tests, including the new
+timestamp delivery, untimed redraw and visibility lifecycle test. Its existing
+`equal_hover_cascade_retains_geometry_text_generation_and_scroll` test fails
+with a zero element-scroll offset instead of 12 px. Replacing every changed
+rootstock source with its unchanged `a31b9a14` version reproduces the same
+failure; all saved changes were then restored. This is not a fully green
+Rootstock suite. Logs are `elapsed-host-final-native.log`,
+`elapsed-host-pictograph-final.log` and `elapsed-host-baseline-scroll.log` under
+`Code/testing/mere/`; `scripts/elapsed-host-baseline-control.py` records the
+comparison procedure. No dependency pins or lock files changed.
+The final restored-source run, `elapsed-host-qualified-native.log`, passes
+307 tests with only that demonstrated baseline failure explicitly filtered.
+
+Real browser hide/show and background-tab initialization have not received a
+headed scenario receipt; the lifecycle contract is also tested at the host
+and Canvas boundaries.
+
+## Current-main integration and local editor (2026-09-29)
+
+The elapsed host slice is rebased onto published Mere `ca2351b3`, preserving
+Genet `19c206873ab08ae227217892d9e74d0df18b349a`, the shared text-boundary
+changes and Apparatus/Mesquite observations. The native library gate passes
+578 tests: Cambium 232, winit host 16, Rootstock 45, Mesquite 19 and Pictograph
+266. The separate winit scenario suite passes 24 tests. The previously
+qualified scroll failure now passes on this baseline. Logs are
+`Code/testing/mere/elapsed-integrated-native.log` and
+`elapsed-integrated-scenario.log`.
+
+Four focused local-editor tests also pass, bringing the native total to 606.
+They verify reopening the same session/member with normalized metadata,
+rejecting a stale selection without changing graph or stored bytes, retaining
+durable prior values on a refused write and retrying successfully, and
+refreshing Canvas metadata without changing geometry, camera, selection or
+play state. Their log is `Code/testing/mere/saved-edit-native.log`.
+
+The standalone Wasm build passes offline and locked. Updating its ignored
+lock for the current manifests adds the existing `genet-text` and
+`mere-apparatus` edges; it also re-resolves several Windows dependency edges
+without changing the Genet revision. The primary checkout and its ignored
+lock remain untouched. Bundle SHA256:
+`d433cd0ab2b1c3ea1025ccfdebe0d37575322f5975e303d5c5185476f89e4045`.
+Build logs are `elapsed-integrated-wasm.log` and
+`elapsed-integrated-wasm-locked.log` under `Code/testing/mere/`.
+
+The opt-in `tree.html?app=local` editor reopens the existing IndexedDB graph,
+selects a stable member and provides Cambium Title/Tags fields with host caret
+and IME routing. Save awaits storage acknowledgement; metadata-only canvas
+refresh preserves geometry, camera, selection and play state. The migration
+inventory records its bounded scope. Paired browser scripts export session
+and member IDs for an independent-load comparison.
+
+At this 2026-09-29 checkpoint, headed checks were **unverified**. The Chrome profile mounted the
+11-node saved graph and its accessibility mirror while `document.hidden`
+was true, with no recorded page errors. Frame withholding prevented the
+scenario from advancing; the initial 120-second attempts timed out.
+`tree_local_edit/progress.json` under the browser receipt directory records
+that state. Windows Computer Use then stopped because it could not establish
+the browser URL with sufficient confidence for its policy. No actual tab
+hide/show, background-to-visible resume, completed save/reopen or new live
+performance receipt is claimed.
+
+The visibility probe and intentional hidden-timing failure scenario are
+implemented, but require a real visible browser window to finish. A hidden
+event counter now invalidates timing windows even when no hidden frame was
+rendered. The active hide/show probe requires preserved geometry and zero
+first-resume steps; an initially hidden mount permits analytic resize on its
+first draw while requiring its preexisting accessibility mirror.
+
+## Current-main refresh and headed local editor (2026-09-30)
+
+Published Mere main `da2940b6` is merged into the elapsed-host branch at
+`650f8541`, preserving the newer Gaz, Apparatus and generated-name changes.
+Both manifests use Genet `c5470fcbc12805f0369c70f34a18178158fbe2d5`.
+NetRender `9607d16f1907f6c2085648ae96abcaa30d7c3d41` and Vello 0.10.1
+remain the rendering dependencies. The standalone web build uses the exact
+published generated-name lock receipt, copied into this worktree's ignored
+lock; the primary checkout's lock remains untouched.
+
+Fresh offline locked gates pass 578 library tests, 25 winit scenarios and
+four focused local-editor tests, for **607 native tests**. The formerly
+qualified scroll failure remains green. Logs are
+`Code/testing/mere/tree-final-native.log`, `tree-final-scenario.log` and
+`tree-final-storage.log`. The standalone Wasm build passes; its log is
+`Code/testing/mere/tree-final-wasm.log`.
+
+The tested bundle includes the merged source plus the detail-panel key/value
+spacing correction and `scenarios/visibility_entry.html` fixture. Bundle SHA256:
+`a0fa9dbcf2bdf4b97208d7f18702457cf2e10861bd69a096e269ec3f68cd654b`.
+Standalone web-lock SHA256:
+`f9aaf5929ecf9dc37157d641d09a17384b22d34bc7abbaafa16fa6614c264560`.
+These hashes identify the browser artifact at this checkpoint; they do not
+claim that the remaining integration commit has already been published.
+
+### Saved metadata and controls
+
+The rendered `p4_tree_saved_edit` and separate-load `p4_tree_saved_reopen`
+both pass with no page errors. They retain session
+`a6c5e37f-1f15-482e-8dbb-9374feada441` and selected member
+`81b91a6b-52ef-5751-b497-15f711cf9c70`, title `TreeSavedTitle`, and tags
+`alpha, beta`. The save reports durable success, and the new load reports
+reopening the existing graph. Receipts are `tree_local_edit/` and
+`tree_local_reopen/` under `Code/testing/mere/scenarios/graphshell-web/`.
+This closes the bounded headed Title/Tags persistence gate; it does not
+complete the broader product migration.
+
+Fresh `p4_tree_controls` and `p4_tree_elapsed` scenarios pass with no page
+errors, in `tree_final_controls/` and `tree_final_elapsed/`. Their behavioral
+checks cover captured dragging, focused keyboard controls, frozen Pause,
+explicit Restore and bounded elapsed stepping. The small detail-panel spacing
+correction was also checked in the rendered editor.
+
+### Actual background-tab initialization
+
+The visibility entry fixture opens the graph in a real background tab. After
+32,004.3 ms hidden, the probe reports zero hidden producer calls, a preexisting
+accessibility mirror, and a first resumed draw with zero physics steps and
+zero discarded time. The next 12 producer frames complete successfully.
+This paused initial-mount case requires the mirror and baseline reset; it
+permits first-draw analytic resizing. It does not establish moving-graph
+geometry preservation through hide/show. Raw receipt: `tree_visibility_initial/`.
+Moving-graph hide/show and the intentional hidden-timing failure remain
+pending at this checkpoint.
+
+### Fresh live diagnostic
+
+The 512-node generated graph, seed 7, completes a visible 14-frame live
+window with no page errors. Logical graph size is 1282 by 627, physical
+2564 by 1254. All 512 nodes are visible; paint counts remain 3,588 before
+and after culling. The elapsed configuration permits three steps per frame,
+and every measured frame uses three steps. Discarded debt ranges from
+216,600 to 428,900 microseconds per frame.
+
+| Moving nodes | Interval p50 / p95 ms | Physics p50 ms | Mutation/restyle p50 ms | DOM frame p50 ms |
+| --- | --- | --- | --- | --- |
+| 512 | 312.5 / 416.0 | 6.6 | 179.5 | 99.9 |
+
+Raw receipt: `tree_final_live_512/`. The 2,000-node run is still in progress.
+This dev-build diagnostic records the present workload. It is not a
+controlled improvement/regression comparison against the earlier runs, which
+used different physics advancement and earlier stack revisions. GPU timestamp
+spans continue to include queue idle.
+
+Mark reports that current physics feels slightly laggy but acceptable. His
+observation is separate from the generated-graph timings above. His hypothesis
+that different layouts and physics laws can yield different results at
+different scales remains untested here. Future comparisons should identify
+layout/law, node and edge counts, visible count and elapsed-step settings
+before drawing broader conclusions.
 
 ## Open gates
 
@@ -210,17 +385,22 @@ remaining host timestamp, visibility and scenario work.
   parent-count walks makes the work regression fail (4546/67330 child visits).
   Independent review is clear. Browser adoption measurements above confirm
   a frame-time improvement, while large-graph responsiveness remains open.
-- Browser physics advances one fixed step per rendered frame on the rendering
-  thread. Slow rendering therefore slows simulated time and input response.
+- Tree-page physics now advances bounded elapsed steps on the rendering
+  thread. When rendering exceeds the caps, discarded time still slows motion.
   Default pairwise exclusion is quadratic. GPU force parity is outside these
   browser receipts, which use the CPU path. At 2,000 nodes a single step
   already exceeds a nominal 16.7 ms frame budget; catch-up caps alone cannot
   solve that cost.
-- Actual IndexedDB application state, remote sessions and product panels still
-  belong to the old presenter. Ctrl+wheel modifiers and middle-button parity,
+- The local IndexedDB graph and Title/Tags editor have a passing opt-in tree
+  save/reopen receipt. Remote sessions and the other
+  product panels still belong to the old presenter. Ctrl+wheel modifiers and
+  middle-button parity,
   all five public wrappers and their product scenarios remain migration work.
   Continuous rasterization still protects asynchronous Vello buffer recovery.
 
-The existing Mere worktree and stable native targets are retained for this
-unintegrated work. The existing web target is reused. No new Cargo home,
-worktree or build-target directory was created for this slice.
+The elapsed-time slice is isolated in `worktrees/mere-canvas-elapsed` because
+the primary checkout has concurrent work. The reusable web target is
+`C:/t/cargo-targets/mere/web`. No isolated Cargo home was created.
+After verification, `cargo clean` removed the slice's isolated native output
+at `C:/t/cargo-targets/mere/canvas-elapsed` (3.2 GiB). Logs and browser receipts
+remain outside that target.

@@ -38,6 +38,7 @@ pub struct ProducerRegistry {
     pending_retire: Vec<u64>,
     device: Option<wgpu::Device>,
     next_stamp: u64,
+    pub(super) timestamp: Option<std::time::Duration>,
 }
 
 impl ProducerRegistry {
@@ -218,6 +219,7 @@ impl ProducerRegistry {
             entry.logical_size = logical_size;
             let frame = ProducerFrameInfo {
                 logical_size,
+                timestamp: self.timestamp,
                 physical_size: size,
                 layout_scale: scale,
                 needs_frame,

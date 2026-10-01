@@ -511,3 +511,47 @@ this tree.
   The earlier worktree's held phase-3/4 changes are now integrated; product
   migration, large-graph responsiveness and elapsed-time host adoption remain
   open. The active primary checkout is left untouched for its current owner.
+- 2026-09-29: the tree producer adopts bounded elapsed-time physics through
+  Canvas and host timestamps. Configurable caps, discarded-time telemetry,
+  idle/pause/reseed resets and visibility suspension now connect the tested
+  Seiche core to the browser. All 266 Pictograph tests and 41 Rootstock tests
+  pass; one pre-existing scroll-retention failure reproduces on unchanged
+  Rootstock sources. The locked wasm build and both headed controls/elapsed
+  scenarios pass, with visible graph captures. Concurrent builds exclude a
+  performance comparison. Actual browser hide/show remains a headed gate.
+  The [controls receipt](../testing/2026-09-27_graphshell_controls_physics_receipt.md)
+  records the exact scope and evidence. Product migration and large-graph
+  responsiveness remain open. The primary checkout is untouched.
+- 2026-09-29: rebase the elapsed host slice onto published `ca2351b3`, keeping
+  Genet `19c20687`, shared text boundaries and Apparatus/Mesquite work. All
+  578 targeted library tests and 24 native scenario tests pass, including the
+  formerly failing scroll check; the offline locked Wasm build passes. Add
+  `tree.html?app=local` for the existing saved graph and a retained Title/Tags
+  editor, with typed storage/retry and metadata-only canvas refresh. Headed
+  verification is open: the test window is hidden and Windows Computer Use
+  stopped because it could not verify its URL for policy enforcement. The
+  mounted accessibility mirror is observed, but no save/reopen, visibility
+  resume or new performance receipt is claimed. The controls receipt records
+  this distinction; the primary checkout is untouched.
+  Four focused storage/editor tests also pass, for 606 native tests in total.
+  The reviewed source is published on `canvas-elapsed-host`; integration into
+  main and worktree retirement await the headed gates.
+- 2026-09-30: merge published main `da2940b6` into the elapsed-host branch at
+  `650f8541`, preserving newer Gaz, Apparatus and generated-text work and
+  adopting Genet `c5470fcb` with its published standalone web lock. All 578
+  targeted library, 25 winit scenario and four local-editor tests pass, for
+  607 native tests; the offline locked Wasm build passes. Headed saved edit
+  and independent reopening retain the same session/member and edited
+  metadata. Controls, elapsed physics and an initially hidden real background
+  tab's first resume pass. Moving-graph hide/show and the intentional
+  hidden-timing rejection remain pending. The new 512-node live diagnostic
+  completes; 2,000 nodes are still running at this checkpoint. The
+  [controls receipt](../testing/2026-09-27_graphshell_controls_physics_receipt.md)
+  records artifact hashes and measurements. Integration into main and
+  retirement of this collision worktree remain pending; the shared primary
+  checkout is untouched.
+- 2026-09-30: Mark finds the current physics slightly laggy but acceptable,
+  and points out that layout, physics law and scale can change the result.
+  Record this separately from timings. A comparison must identify the
+  layout/law, graph size and density, visible count and elapsed-step settings;
+  the present generated-graph receipts do not settle all configurations.
