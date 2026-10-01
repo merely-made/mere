@@ -597,6 +597,23 @@ binning are the useful patterns.
   with upstream notices, and code merely informed by it stays MPL-2.0 with a
   credit line, as `crates/intel/esp/src/infer/decoder/attention.rs` does.
   Per-file calls are made at decomposition time.
+- **Home of GPU-tier laws.** "Law in seiche, kernels in conatus":
+  `seiche/laws/` holds each law and its CPU tier; `conatus::resident` holds
+  the kernels and grid buffers; seiche gains an optional
+  `conatus[resident]` dependency, minding conatus's existing dev-dependency
+  on seiche. The alternatives were everything in `conatus::resident`, or the
+  medium as a numen grid field.
+- **The picker.** "Ordinary laws with a CPU tier": GPU-tier laws append to
+  `PhysicsLaw` and each has a CPU tier, so every host shows them; GPU is a
+  backend, not a separate list. The alternatives were a separate GPU catalog,
+  or a `needs_device` filter.
+- **Density in the browser.** "GPU on both, after P5": Density's GPU tier
+  lands on turnstone and the web tree, reusing the repulsion work's
+  non-blocking readback; the CPU tier serves hosts with no device. The
+  alternative ran the web on the CPU tier first.
+- **The repulsion lag.** Asked whether a one-step force lag is accepted, kept
+  synchronous on native, or avoided by keeping the nodes resident, Mark
+  asked: "What would rapier do if 3? Elaborate". Open until answered.
 - **A GPU-tier law lane.** Asked whether the catalog's 2D, rapier-only bound
   holds, Mark chose "Add a GPU-tier law lane": a follow-on for laws that only
   make sense at GPU scale, still 2D. The alternatives were keeping the bound,
