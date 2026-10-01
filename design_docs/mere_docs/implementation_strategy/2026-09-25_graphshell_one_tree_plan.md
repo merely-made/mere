@@ -248,6 +248,22 @@ assessment returned:
   a scenario `wait` holds for a pending capture, a remote operation in
   flight, or the local canvas moving while the local session is shown. The
   alternative kept the rule and accepted wait-timeouts under restless laws.
+- **FlowAdvect.** The Anneal audit (`df4ede41`) found `FlowAdvect` in
+  `seiche/src/coupling_force.rs` also calls `set_translation`, so it could
+  override a pinned body. Mark chose "Fix it the same way": skip
+  non-dynamic bodies, with a test that fails without it. The alternative
+  recorded it only.
+- **Narrow viewports.** The Graph tools region was a fixed 300 px. Mark
+  chose "Collapse below a width": below a breakpoint it becomes a toggle
+  button opening the region as an overlay; above it, docked. The
+  alternatives were stacking it under the canvas, or always docked with a
+  resize handle.
+- **The storage status line.** On `app=local` the floating "IndexedDB
+  reopened · persistent" line covered a node. Mark chose "Into Graph
+  tools": a storage line in the docked region. The alternatives were the
+  header status line, or leaving it.
+- **Push.** Mark chose "Push now" for main, carrying this session's merges
+  and rulings with other sessions' local commits already on it.
 - *Reading, not ruled:* the remote scenarios follow the panel lane's
   precedent of tree copies (`p4_tree_*`) with the originals kept for the old
   page, and the physics panel stays operable during a remote session, since
