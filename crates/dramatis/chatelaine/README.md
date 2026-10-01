@@ -17,7 +17,9 @@ substrate (that is [personae](https://crates.io/crates/personae)'s vault; the
 chatelaine is the item taxonomy kept there).
 
 Lives in the [mere](https://github.com/merely-made/mere) workspace under
-`crates/dramatis/`. No implementation yet.
+`crates/dramatis/`. Built: the item taxonomy (items, credentials of every CXF
+v1.0 kind, collections, links, the import disposition per kind, and the OTP
+display enums), plain serde data depending only on serde and uuid.
 
 Ruled 2026-10-01: chatelaine becomes a plain taxonomy, like insigne's core.
 It holds CXF-shaped item kinds and secret-free metadata (ids, labels, persona
