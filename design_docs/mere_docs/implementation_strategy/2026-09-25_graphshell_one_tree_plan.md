@@ -647,3 +647,17 @@ this tree.
   - The [controls receipt](../testing/2026-09-27_graphshell_controls_physics_receipt.md)
     records the evidence. The remote board scenarios belong to the separate
     remote-session slice.
+- 2026-10-01: following the "Measure in physics steps" ruling, the tree lane
+  records the release window on the first frame after a release that executed
+  physics steps (`drag-return-step`, `drag-return-steps`).
+  `p4_tree_physics_drag` reads it, with the thresholds unchanged.
+  - In three headed runs, ten laws read 0.0–8.2 px after one or two steps.
+  - Anneal read 255.2, 190.8 and 0.0 px after one step, against ≤ 60.
+  - In the 190.8 px run the node sat 48.1 px from where it was pressed, at
+    zoom 1.00. Anneal moves a body at most 80 px a tick, so this is a
+    snap-back, not walk noise. A likely cause is that Anneal writes every
+    body's translation, the held one included, so the body never follows
+    the drag. This is not isolated.
+  - Per the ruling, the threshold is unchanged and the case returns to Mark
+    as a fork. A positive control fails the new observation as it should.
+    The receipt doc records the numbers.
