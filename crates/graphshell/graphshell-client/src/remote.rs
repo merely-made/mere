@@ -81,6 +81,30 @@ impl ActionForm {
         self.target = None;
     }
 
+    /// Open `action` as a draft against `target` at the observed position.
+    /// Returns whether it waits for values (a bounded form); a plain action
+    /// is ready to submit as it stands.
+    pub fn open_action(
+        &mut self,
+        session: ProjectionSession,
+        target: InstanceId,
+        action: AdvertisedAction,
+        observed: (scenotime::SceneEpoch, scenotime::Revision),
+    ) -> bool {
+        let bounded = action.input_form.is_some();
+        if bounded {
+            self.status = format!("Choose values · {}", action.label);
+        }
+        self.draft = Some(ActionDraft::new(action));
+        self.target = Some(ActionDraftTarget {
+            session,
+            target,
+            observed_epoch: observed.0,
+            observed_revision: observed.1,
+        });
+        bounded
+    }
+
     /// Open the first bounded form `session` advertises, at its mounted
     /// position. Plain actions are not drafts; when none is bounded the status
     /// says how many actions are on offer.
@@ -455,18 +479,10 @@ impl RemoteSession {
             self.form.status = "Failed · remote projection is not acknowledged".to_string();
             return;
         };
-        let bounded = action.input_form.is_some();
-        let label = action.label.clone();
-        self.form.draft = Some(ActionDraft::new(action));
-        self.form.target = Some(ActionDraftTarget {
-            session,
-            target,
-            observed_epoch: ack.epoch,
-            observed_revision: ack.revision,
-        });
-        if bounded {
-            self.form.status = format!("Choose values · {label}");
-        } else {
+        if !self
+            .form
+            .open_action(session, target, action, (ack.epoch, ack.revision))
+        {
             self.submit_draft();
         }
     }
