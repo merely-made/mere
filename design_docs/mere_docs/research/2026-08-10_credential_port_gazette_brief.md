@@ -15,6 +15,13 @@ the 2026-07-22 vault/agent plan, the participant gate + packs plan.
 > across the whole stack, including the vault gaps this brief did not reach, are
 > surveyed in the [standards survey brief](../../2026-08-24_standards_survey_brief.md).
 
+> **Amended 2026-09-30.** "The gazette carries discovery *inward*" below stays
+> true but is no longer the whole of it: Mark ruled that castellan issues a
+> persona's public presentation and gazette *announces* it at that persona's
+> handle, so gazette also faces outward. Recorded with its reasoning in the
+> [dramatis tier architecture](../../dramatis_docs/technical_architecture/2026-09-30_dramatis_tier_architecture.md) §6,
+> which now holds the tier's architecture of record.
+
 The dramatis tier holds the cast list: personae (me), gaz (them, kept),
 gazette (them, found). This brief maps its two growth fronts, which point in
 opposite directions and share one spine. The credential port carries authority

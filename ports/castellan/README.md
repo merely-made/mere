@@ -21,7 +21,9 @@ The vocabulary it keeps, per the dramatis tier model:
 The boundaries are the point: not [personae](https://crates.io/crates/personae)
 (the faces and vault substrate castellan serves), and not
 [gaz](https://crates.io/crates/gaz) or gazette (which keep and find the other
-players; castellan guards and presents you).
+players; castellan guards and presents you). Castellan issues a persona's
+public presentation and gazette announces it (ruled 2026-09-30), so the port
+that holds secrets never grows a public listener.
 
 Lives in the [mere](https://github.com/merely-made/mere) workspace at
 `ports/castellan`.

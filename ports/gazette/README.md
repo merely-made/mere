@@ -79,8 +79,16 @@ The boundaries are the point: not
 dramatis tier pointing opposite ways), not [gaz](https://crates.io/crates/gaz)
 (the contact store this port composes rather than replaces), not a delivery
 layer (private grants, cross-service posting, and inboxes are moot and murm
-territory — gazette reads what is already public), and not the highlights
-(what you keep is Knot's; what memory makes of it is alembic's).
+territory — gazette reads what is already public, and announces what
+castellan has issued), and not the highlights (what you keep is Knot's; what
+memory makes of it is alembic's).
+
+Announcing is the one place gazette faces outward (ruled 2026-09-30):
+castellan signs a persona's presentation and picks its grade, and gazette
+serves it at that persona's handle (its WebFinger document, `nostr.json`, its
+card) so other people's gazettes can resolve it. Gazette holds no key and
+signs nothing. Unbuilt, and where the announcing process runs is open; see
+the dramatis tier architecture in mere's `design_docs`.
 
 Lives in the [mere](https://github.com/merely-made/mere) workspace at
 `ports/gazette`.
