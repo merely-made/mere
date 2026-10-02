@@ -364,3 +364,20 @@ fn boxes_are_relative_to_their_parent_and_hidden_nodes_are_left_out() {
     assert_eq!(mirror[0].children[0].rect, Some([10.0, 20.0, 100.0, 20.0]));
     assert_eq!(ids(&mirror), [2, 3]);
 }
+
+#[test]
+fn a_description_lowers_to_aria_description_and_an_empty_one_is_left_out() {
+    let mut described = blank(2, DocumentA11yRole::Button);
+    described.name = Some("Append a card".into());
+    described.description = Some("Adds one card and advances the revision.".into());
+    let mut empty = blank(3, DocumentA11yRole::Button);
+    empty.name = Some("Forbidden action".into());
+    empty.description = Some("  ".into());
+    let mirror = plan(&projection(&[2, 3], vec![described, empty]), 1.0, |_, _| None);
+    assert_eq!(
+        attr(&mirror[0], "aria-description"),
+        Some("Adds one card and advances the revision.")
+    );
+    assert_eq!(name(&mirror[0]), Some("Append a card"));
+    assert_eq!(attr(&mirror[1], "aria-description"), None);
+}
