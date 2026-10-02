@@ -423,4 +423,23 @@ async fn the_peer_directory_separates_a_known_address_from_a_live_path() {
         parsed, bob_id,
         "the ticket names the peer it was cached for"
     );
+
+    // The readable route a directory reports: the live path is a direct
+    // address (no relay is configured), marked active, and carried by the hint.
+    let paths = alice.peer_paths(bob_id).await.expect("path query");
+    let active: Vec<_> = paths.iter().filter(|path| path.active).collect();
+    assert!(
+        active
+            .iter()
+            .any(|path| matches!(path.addr, crate::PeerAddr::Direct(_))),
+        "a connected peer reports its active direct path: {paths:?}"
+    );
+    let (named, carried) = crate::decode_peer_ticket(&ticket).expect("decode the hint");
+    assert_eq!(named, bob_id, "the decoded hint names the same peer");
+    for path in &active {
+        assert!(
+            carried.contains(&path.addr),
+            "the live path {path:?} is one of the hint's addresses {carried:?}"
+        );
+    }
 }
