@@ -788,6 +788,23 @@ the scene; and the eleven law receipts plus Density's stay green.
   Jacobi and a central-difference gradient are written from the textbook, so
   `LICENSES.md` gains nothing. Nexus's gather-style P2G (one thread per grid
   node over sorted particles) is the pattern for P6b's kernels.
+- 2026-10-02 (P6a, third round): at the ruled defaults (64², one-second
+  passes, blur 0.25) the 200-node graph's mass/area rank does not settle:
+  over ninety passes it wanders between 0.73 and 0.79 (degree; PageRank 0.60
+  to 0.70), and each pass still moves the nodes about a twentieth of a
+  spacing on average. The 12-node sample (0.84 by pass 3, then 0.74 to 0.88)
+  and gen-50 (0.78 to 0.87) wander too, more narrowly. A per-pass test on
+  the layout therefore stops at different places by its kind: a field-CV
+  test (the fresh splat's CV changing under 1–5%) stops every graph by pass
+  4–9, the 200-node graph at 0.69–0.75; a shift test under 0.05 spacings for
+  three passes stops it at pass 18 (0.76), under 0.02 never (the cap ends
+  it). Trace: `Code/testing/mere/density/probe-convergence.log`.
+- 2026-10-02 (P6a, third round): explicit Play sets the settle budget to
+  `u32::MAX` (`canvas/input.rs:622`, "run so I can watch"), so after Play the
+  canvas never rests under any law and the tree's `wait` cannot see a law
+  stop; Density's own demand for ticks (`physics-continuous` on the tree)
+  is what drops when its passes end. On the fixture graph it dropped near
+  frame 3 700 after Apply.
 
 ## 5. Decisions
 
@@ -1120,7 +1137,10 @@ binning are the useful patterns.
   Receipts at named settings, since the defaults are open: the sample graph
   at eight 4-second passes (128², 900 ticks), and the 200-node graph at one-
   second passes (64², 3 600 ticks), degree mass, each ≥ 0.8 with Springs
-  failing it; uniform mass from a clump to CV < 0.25 with no overlaps. With
+  failing it; *(Corrected 2026-10-02, third round: the 200-node
+  figure was one sample of a trace that wanders between 0.73 and 0.79 over
+  ninety passes; at the ruled defaults that receipt does not hold. See the
+  third-round entry.)* uniform mass from a clump to CV < 0.25 with no overlaps. With
   the gradient term removed all three fail (rank −0.395, −0.241, CV 0.310;
   `fault-no-gradient.log`). PageRank, recorded: 0.66 to 0.67 on the
   200-node graph at 30 one-second passes. Open, put to Mark: how drags,
@@ -1133,3 +1153,53 @@ binning are the useful patterns.
   features; pictograph `--features canvas --lib` 274 passed, 2 ignored
   (the probes); graphshell `--features web --lib` 230/230. Logs and probe
   tables in `Code/testing/mere/density/`.
+- 2026-10-02 (P6a, third round, after the second-round rulings; main
+  `64f3351a` merged): repeated passes, the overlay refusal and the ruled
+  defaults landed; the stop test is a fork. Each pass re-splats where the
+  nodes stand; a law rebuild (topology, mass source) starts a fresh flow; a
+  held (kinematic) body re-arms a stopped flow and keeps passes running
+  while held. `Density` gains `DensityStop` (`Shift`, `FieldCv`, `Cap`),
+  `patience` and `max_passes`, the per-pass `pass_history`, and seiche's
+  `Force` gains a defaulted `wants_tick` that `wants_continuous_tick` reads,
+  so the law keeps the host ticking past its settle budget until its passes
+  stop. The catalog builds Density at 64², one-second passes, blur 0.25, and,
+  pending the test, the cap alone: 120 passes. `PhysicsLaw::overlay_refusal`
+  and `OverlayRefusal`: `set_physics_overlays`, `set_physics_law` and
+  `set_physics_choice` return `Result` (turnstone will see an unused-result
+  warning at its next repin); adding overlays to Density is refused with a
+  reason and nothing changed, switching to Density drops the live ones and
+  names them, a whole choice applies law and sources and refuses the
+  overlays; the tree greys the eight boxes with the reason beneath
+  (`disabled-overlays`), the old page disables the fieldset and shows the
+  note. Tests: the stop by test, by cap, and the drag re-arm (seiche); the
+  refusal through every setter with Springs as the control; Density running
+  past the settle budget while Springs rests (pictograph). Receipts at a
+  named candidate stop (`Shift(0.05)`, three passes): the sample graph 0.837
+  at its stop, Springs 0.116; uniform mass CV 0.063 with no overlaps; the
+  200-node receipt stays ignored, 0.737 at that stop. The gradient fault
+  fails all three (−0.395, −0.241, CV 0.310 with 13 overlaps); without the
+  dynamic-body skip the pinned body ends at (12.0, 14.4) against (30, −20).
+  Web, bundle built offline and locked (`wasm-build.log`): headed
+  `p4_tree_physics_springs`, `_stress`, `_still` ok; `p4_tree_physics_density`
+  ok on the fixture (Springs control ≤ 0.79, the overlays greyed with the
+  reason, then Density past the cap: the law's tick demand gone, rank ≥ 0.8,
+  CV ≤ 0.35, no overlaps; a trace read 0.86 by frame 180, 0.68–0.75 around
+  frames 960–1 260, 0.93 at the stop); the old page's `physics_density` ok
+  (7 300 frames). All six headed runs ok again on the final bundle (SHA256
+  `1061b48e…`, `bundle.sha256`; `headed-final.log`). Step cost at n = 200
+  on the web tree, from the profiler's physics stage, three steps every
+  frame: p50 8.5 ms, p95 14.6, max 17.1 a frame (about 2.8 ms a step)
+  against Springs' 2.1 ms on the same graph, in the final run; an earlier
+  run on the pre-format bundle, the machine less loaded, read 7.3 / 8.9 /
+  10.1 against 1.6. Frames run 100 to 155 ms, mostly DOM mutation. Captures inspected
+  whole-frame: the fixture settles into a compact, evenly filled square with
+  the two hubs holding the open middle, the effect modest at eleven nodes;
+  at 200 nodes the walls' box overflows the unfitted camera (111–134 of 200
+  visible). The runner, `Code/testing/mere/density/run-density-scenario.ps1`
+  (port 8805, its own profile), launches Chrome with native occlusion and
+  background throttling off: two runs had stalled with the window covered
+  and the document hidden. The shared cargo download cache was emptied
+  around 18:00 by something outside this lane; the root workspace's locked
+  crates were fetched again online (`cargo-fetch.log`, 729 crates). Gates (offline, debug): seiche 97/97 and 93/93 without default features; pictograph `--features canvas --lib` 276 passed, 2 ignored (the 200-node receipt and the convergence probe); graphshell `--features web --lib` 230/230.
+  Open, put to Mark: the stop test (field CV, shift, or the cap alone), and
+  the 0.8 bar on the 200-node graph, which no stop meets at these defaults.
