@@ -406,6 +406,36 @@ scores, `strategy.rs:534-616`) and anchor slots. An assessment of the
 composition space (weighted, partitioned, multi-integrator and sequenced
 laws; Burn-computed semantic grouping as force) comes back to him before
 P6's composition fork (pure Density or Density with edges) is put.
+*Assessed and ruled, 2026-10-02.* Findings: forces sum through rapier's
+`add_force` in `Simulation::tick` (`seiche/src/lib.rs:723-775`: law and
+overlays, then coupling, affinity and anchor) with no per-law weights; three
+laws write state instead of adding force (Hold, Anneal, Density's CPU tier);
+ESP's Burn `affinity_pairs_over_index` (`esp/src/embed/index_burn.rs:144`)
+emits exactly the triples the affinity slot takes, but nothing calls
+`set_content_affinity` (`strategy.rs:520`) outside tests, and affinity is not
+in `PhysicsChoice`; Density with `EdgeSpring` read −0.54 against 0.77 alone
+(316 overlaps).
+- **Currencies.** "Laws declare currency; catalog adapts or refuses":
+  forces compose freely; a kinematic law takes forces converted to its
+  currency (overdamped, v = F/γ); a resident law takes only forces with
+  resident kernels or the lagged upload; the picker greys out the rest with
+  the reason. The alternatives were forbidding every mix with a non-force
+  law, or allowing anything.
+- **Composition tier.** Mark chose three: "Grouping overlays: semantic +
+  partitioned" (a `Grouped` outer law on group centroids with an inner law
+  per group, and a semantic overlay, each with a source and weight, saved in
+  `PhysicsChoice`), "Weighted multi-law lists" (`law` becomes a weighted
+  list, strengths first brought to a common scale), and "Sequenced blends"
+  (profiles with a schedule, and capturing positions as anchors). The
+  alternative left composition as is.
+- **Meaning.** "'Meaning' as a source": beside site and cluster, feeding
+  affinity pairs, `DomainCluster` groups, Kinds' kinds and the partition for
+  grouped laws. The alternatives were affinity pairs only, or a Semantic law.
+- **Density with edges.** "Pure Density now, Bonds later": edges may join as
+  a "Bonds" overlay in Density's currency, accepted only if rank stays at
+  least 0.8. The alternatives were today's `EdgeSpring`, or holding the fork.
+Open: the embedding device and cadence, and whether a per-step semantic
+field exists; then the composition work becomes its own phase.
 
 *P6a rulings, 2026-10-02* (after `3e477143` on `density-cpu`: the CPU tier
 with re-splat flow, walls, Voronoi area share; a 12-node sample at Spearman
