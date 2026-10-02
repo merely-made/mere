@@ -1006,8 +1006,8 @@ binning are the useful patterns.
   `Canvas::layout_stats_without_stretch` (a grid, same definition).
   Receipts, bundle `89b75bb4`: the eleven law receipts plus profiles, add and
   drag green at the default threshold, and the eleven again at threshold 0
-  with the device asserted on (the eight `NodeExclusion` laws served 77 to 425
-  steps on the device). `p5_tree_cpu_settle_2000` (2,000 unlinked nodes) and
+  with the device asserted on (the eight `NodeExclusion` laws served 99 to 447
+  steps on the device; logs `Code/testing/mere/gpu-repulsion/law-receipts-*.log`). `p5_tree_cpu_settle_2000` (2,000 unlinked nodes) and
   `p5_tree_gpu_settle_2000` meet the same bounds (0 overlaps, spread 1,071
   against 1,074, energy 441k against 426k) with 413 of 418 steps on the device
   at N = 9 and the physics stage at 6.1 ms a frame against 81.9; at the ruled
