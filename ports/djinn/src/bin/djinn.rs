@@ -23,6 +23,8 @@ use djinn::pairing;
 use djinn::personal_sync as device_sync;
 use djinn::resident::DjinnResident;
 #[cfg(feature = "personal-sync")]
+use djinn::resident_devices::{self, DeviceDirectoryEndpoint, DeviceDirectorySource};
+#[cfg(feature = "personal-sync")]
 use djinn::resident_distillery::ResidentDistillery;
 #[cfg(feature = "personal-sync")]
 use djinn::resident_mere::MereRoutes;
@@ -703,7 +705,7 @@ async fn run(args: Args) -> Result<(), Box<dyn std::error::Error>> {
             .with_additional(&std::env::var(EXTRA_EXTENSIONS_ENV).unwrap_or_default());
         let agent = listen(agent_listener, personae.agent_session());
         #[cfg(feature = "personal-sync")]
-        let supplemental_cards = device_sync::start(
+        let (supplemental_cards, device_directory) = match device_sync::start(
             personae.as_ref(),
             &app_dir,
             &args.vault_dir,
@@ -715,7 +717,11 @@ async fn run(args: Args) -> Result<(), Box<dyn std::error::Error>> {
             args.blob_actions,
             resident.blobs(),
         )
-        .await?;
+        .await?
+        {
+            Some(started) => (Some(started.surface), started.directory),
+            None => (None, DeviceDirectorySource::sync_off()),
+        };
         // Both doors are served from the same surface handle, so an application
         // and a browser on this device see one set of cards rather than two.
         #[cfg(feature = "personal-sync")]
@@ -741,6 +747,11 @@ async fn run(args: Args) -> Result<(), Box<dyn std::error::Error>> {
                 .update(|catalog| resident.register_published_site_route(catalog))
                 .await?;
             grants.grant(AppId::new("knot-editor"), route);
+            // Owner-only and read-only: where each paired device is now.
+            let route = catalog
+                .update(|catalog| DeviceDirectoryEndpoint::register(device_directory, catalog))
+                .await?;
+            resident_devices::grant(&grants, route);
             // V1 grants the reservoir to the first-party clients this door
             // already knows; V4 makes it default-on for every one of them. Each
             // mere goes to the same clients on its own route (V2, step 5):
