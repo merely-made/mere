@@ -1,10 +1,11 @@
 # Chatelaine and CXF Import Plan
 
 **Date**: 2026-10-01
-**Status (2026-10-01)**: in progress. Shape ruled by Mark on 2026-10-01
-(rulings 7 and 10 to 15 in the dramatis tier architecture; rulings 16 to 42
-below). P0 met; P1 landed on `main` (`da3c50bc`); P2 landed (`3e4992ec`);
-P3 next; the run stops after P3 for Mark's review (ruling 28).
+**Status (2026-10-02)**: paused for Mark's review (ruling 28). Shape ruled
+by Mark on 2026-10-01 (rulings 7 and 10 to 15 in the dramatis tier
+architecture; rulings 16 to 50 below). P0 met; P1 landed on `main`
+(`da3c50bc`); P2 landed (`3e4992ec`); P3 landed (`ff68e86c`), meeting the
+Mere 0.4 baseline's chatelaine condition. P4a onward waits.
 **Scope**: found `chatelaine` as the tier's plain secret-item taxonomy; move
 castellan's OTP items and its Secret Service store onto it; then import
 (and finally export) the FIDO Credential Exchange Format through castellan.
@@ -290,6 +291,36 @@ public for reads and delete; `get` requires indexing; delete removes the
 index entry first.) Options: accept all; name changes. Mark: **"Accept all
 (Recommended)"**.
 
+Rulings 46 to 50 answer P3's checkpoint (§5, 2026-10-01).
+
+**Ruling 46.** *How are Secret Service collections and membership laid
+out?* Options: the single index, as P2 built it; per-collection membership
+records; the single index plus a resident cache now. Mark: **"Single index,
+as P2 built it (Recommended)"**. Follows: membership and aliases live in the
+per-persona index, one commit point, rulings 39, 41 and 45 as written; a
+resident cache can come later without a disk-format change.
+
+**Ruling 47.** *Keep or lower the default limits?* Options: keep, recording
+the degradation; lower them. Mark: **"Keep, and record the degradation
+(Recommended)"**.
+
+**Ruling 48.** *How is a torn replace closed?* Options: copy-on-write; the
+lock only, accepting the crash window. Mark: **"Copy-on-write
+(Recommended)"**. Follows: a replace or `SetSecret` writes the new payload
+under a fresh credential id, then the metadata naming it (the commit point),
+then deletes the old payload.
+
+**Ruling 49.** *Where does the `max_sessions` refusal test live?* Options:
+move the session table to a portable module; a Linux-only test on the
+ThinkPad. Mark: **"Move the table to a portable module (Recommended)"**.
+
+**Ruling 50.** *Payload encoding, and P3's readings* (the item id is the
+chatelaine `ItemId`, so D-Bus paths keep their form; `SecretItemId` and
+`SecretCollectionId` stay newtypes; a collection's label is its title;
+timestamps map to `Some(seconds)`; search covers only `Secret` credentials).
+Options: keep bytes and accept the readings; base64 payloads; name changes.
+Mark: **"Keep bytes; accept readings (Recommended)"**.
+
 ## 3. Phases
 
 Each phase lands with its own tests and gates and keeps the workspace green.
@@ -354,23 +385,31 @@ build.
         (`ports/castellan/src/resident.rs`), kept.
 
 - **P3 — the Secret Service on chatelaine (ruling 17).** Done when:
-  - [ ] Secret Service collections are chatelaine collections and its items
+  - [x] Secret Service collections are chatelaine collections and its items
         are items holding one `Secret` credential (content type and lookup
         attributes as metadata, the bytes sealed by castellan);
-  - [ ] the D-Bus objects project from the item store; `SecretServiceStore`'s
+  - [x] the D-Bus objects project from the item store; `SecretServiceStore`'s
         separate catalog/collection/item records are removed, with no decoder
         (ruling 20);
-  - [ ] the resource limits (`SecretServiceLimits`) hold as before, by their
+  - [x] the resource limits (`SecretServiceLimits`) hold as before, by their
         existing tests; *amended 2026-10-01*: there are none (P2's finding:
         `store_tests.rs` only asserts the defaults), so P3 adds a refusal
         test per limit, each with a control;
-  - [ ] a replace-by-attributes cannot tear (new bytes under old metadata),
-        held by the per-persona transaction lock of ruling 39;
-  - [ ] the README's `secret-tool` store/lookup/clear receipt passes under a
+  - [x] a replace-by-attributes cannot tear (new bytes under old metadata),
+        held by the per-persona transaction lock of ruling 39; *amended
+        2026-10-01*: the lock alone does not cover a crash between the
+        payload and metadata writes, so replace and `SetSecret` are
+        copy-on-write (ruling 48), proven by crash-point tests;
+  - [x] the `max_sessions` refusal test runs on every platform, its session
+        table moved out of the Linux-only D-Bus module (ruling 49);
+  - [x] the secret bytes handed to zbus (`dbus/objects.rs:369`,
+        `dbus/service.rs:192`, plain `to_vec()` copies today) are zeroized on
+        our side, with what remains outside our reach stated;
+  - [x] the README's `secret-tool` store/lookup/clear receipt passes under a
         disposable session bus **on a Linux machine** (the D-Bus server is
         `cfg(target_os = "linux")`, so a Windows build proves nothing about
         it), with the machine and commit recorded;
-  - [ ] **C5's chatelaine condition is met here**: chatelaine has its real
+  - [x] **C5's chatelaine condition is met here**: chatelaine has its real
         contents and can publish once, at the Mere 0.4 baseline.
 
 - **P4a — the agent learns RSA and ECDSA (ruling 25).** personae's SSH slots
@@ -612,6 +651,76 @@ on its branch and clean. Under 1.98.1 (installed there by rustup),
 --test secret_service_linux --locked -- --ignored` passed
 `secret_tool_store_lookup_and_clear` (1 test). This is P3's positive control:
 the receipt works on that machine before P3 changes anything.
+
+**2026-10-01, P3 checkpoint.** The P3 lane (Opus) stopped before
+collections, as briefed, and landed only layout-independent work: a refusal
+test per store-enforced limit on the pre-P3 store, each with a control that
+failed only its own test (`e7c8acbd`, lane branch). Its measurements
+(release build, resident storage with the freshness ledger, this laptop): at
+the limits (32 × 4,096 = 131,072 items), an index holding ids and membership
+is 11.4 MB plaintext and 40.7 MB on disk, 534 ms to load and 1,233 ms to
+save; ids alone are 5.1 MB and 18.3 MB (so P2's "about 5 MB" counted ids
+only); a realistic 200-item index is 17.7 KB, about 1 ms to load; one item
+metadata record loads in 0.27 ms, so a metadata-only search at the limits is
+about 39 s under any uncached layout; every save costs at least ~28 ms
+(three fsyncs). Today's store makes a 1 MiB secret's item record 15 MB on
+disk and loads it on every D-Bus property read (95 ms). Mark ruled its
+forks as 46 to 50, keeping the defaults with this degradation recorded; the
+lane is implementing.
+
+**2026-10-02, P3 landed.** Built as `e7c8acbd` (the limit tests) and
+`0891771f` (lane, Opus); merged onto `main` as `ff68e86c` after verification
+on Windows in the normal-depth worktree and on the ThinkPad. The Secret
+Service now runs on chatelaine items: `SecretServiceStore` is `{ items:
+ItemStore, limits }`; collections and aliases live in the per-persona index
+(ruling 46); an item is a chatelaine item holding one `Secret` credential;
+metadata reads and search never open a payload, and only `secret()` does,
+through `exercise`; replace and `SetSecret` are copy-on-write under a held
+per-persona `Transaction` (ruling 48); the old `castellan/secret-service/v1`
+records and code are gone with no decoder (ruling 20); the session table is
+portable (ruling 49); public signatures and the D-Bus surface are unchanged,
+the `Secret` struct still `(oayays)`. Inbound and outbound secret bytes are
+held in a zeroizing `SecretBytes` and moved without copies; what remains
+outside castellan's reach is zbus's own message buffers, kernel and bus
+buffers, the client process, and heap fragments freed when serde grows a
+buffer (personae's JSON payload load and save do this for OTP too, a
+personae-tier finding). Verified:
+
+- Windows: castellan 102 unit tests with every feature (97 before; nothing
+  removed, 13 added: 6 limit refusals, 5 replace and metadata-only, 2
+  sessions), 3 + 4 integration and the doctest; 66 with default features;
+  chatelaine 53; clippy 122, unchanged; signalman; the portable gate; the
+  Linux library cross-check;
+- **the ThinkPad**, natively, every feature, under a disposable session bus
+  with ignored tests included: 102 unit tests, among them the first build and
+  pass of the Linux-only `secret_bytes_keep_the_secret_struct_signature`;
+  3 + 4 integration; `secret_tool_store_lookup_and_clear`, the receipt that
+  passed on `main` before P3; the doctest; the machine's own checkout left
+  on its branch and clean;
+- the lane's nine controls each failed only their target: an in-place
+  payload write (two replace tests), search opening payloads, and each of
+  the seven limit checks removed.
+
+Measured at the limits (ruling 47; Windows 11 laptop, release build, resident
+storage with the freshness ledger, medians of 3 to 5 runs except single runs
+for create, delete and search; the laptop varied about 2.5× between days, so
+these are ranges): an index load 208 to 534 ms; a property read 199 to 211 ms
+(95 to 113 ms per read before P3 for a 1 MiB secret, which it decrypted);
+`items(collection)` 0.9 to 1.2 s; `secret()` 203 to 282 ms; `set_secret` 235
+to 333 ms; `create_item` 0.9 to 1.4 s; `delete_item` 0.9 to 1.2 s; a search
+of 131,072 metadata records 19.8 to 23.7 s. At a realistic 200 items an index
+loads in 0.55 to 0.88 ms. Over D-Bus, `CreateItem` with `replace` first runs
+a full search to choose its signal, a pre-P3 behaviour kept as is.
+
+The lane's readings, *reading, not ruled*: a collection's non-`Secret`
+members are skipped by `items()` and `search` and counted by the
+per-collection limit (none can exist before P4); `collections()` lists
+top-level collections only; item-store refusals surface as a new
+`SecretServiceError::Items` variant, mapped to D-Bus `Failed`; a replace
+changes the credential id, which the Secret Service never exposes.
+
+**The run stops here for Mark's review** (ruling 28). P4a, the agent's RSA
+and ECDSA, waits.
 
 ## 6. Running it
 

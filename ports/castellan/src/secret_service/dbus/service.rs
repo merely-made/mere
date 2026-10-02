@@ -14,8 +14,9 @@ use zbus::zvariant::{OwnedObjectPath, OwnedValue, Value};
 
 use super::state::{SecretServiceOperation, ServiceState};
 use super::{
-    COLLECTION_LABEL_PROPERTY, DbusSecret, SecretDbusError, alias_path, collection_path,
-    now_unix_secs, property_string, register_alias, register_collection, root_path,
+    COLLECTION_LABEL_PROPERTY, DbusSecret, SecretBytes, SecretDbusError, alias_path,
+    collection_path, now_unix_secs, property_string, register_alias, register_collection,
+    root_path,
 };
 
 pub(super) struct ServiceInterface {
@@ -189,7 +190,7 @@ impl ServiceInterface {
                 (
                     session.clone(),
                     Vec::new(),
-                    secret.bytes.to_vec(),
+                    SecretBytes::new(secret.bytes),
                     secret.content_type,
                 ),
             );

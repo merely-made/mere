@@ -298,6 +298,24 @@ assessment returned:
   per card into the accessibility mirror, and the Remote session section
   lists the titles too; the top margin is fixed. The alternatives were
   painted titles with mirror names alone, or a list alone.
+- **Per-card mirror nodes** (2026-10-02, after `5d77aeb2` passed the draft,
+  overflow and title work headed). The mirror lets a custom leaf fill one
+  node with no children, and the board is a `TextureProducer`. Mark chose
+  "Producers expose semantics": `TextureProducer` gains a defaulted
+  semantics method (role, name, child nodes with rectangles) that the web
+  mirror writes under the leaf, changing `Accessibility::sync` for the winit
+  host too. The alternatives were children on sprigging's `Leaf` beside the
+  producer, or Graphshell overlaying named items.
+- **Remote session starts collapsed.** Mark chose "Remote starts collapsed":
+  the Remote session section is closed until a remote link exists. The
+  alternatives were both sections open (as built), or the switch moved
+  outside the disclosure.
+- **Genet gaps.** Genet's Cambium UA sheet lacks `[hidden] { display: none }`
+  (Cambium set `display: none` itself on closed panels), and Livery ignored
+  `text-align: center` for card titles. Mark chose "Fix in Genet now,
+  separate lane": add the UA rule and drop Cambium's workaround, honour
+  `text-align` in Livery's standalone layout, and repin mere. The
+  alternative recorded both for later.
 - *Reading, not ruled:* the remote scenarios follow the panel lane's
   precedent of tree copies (`p4_tree_*`) with the originals kept for the old
   page, and the physics panel stays operable during a remote session, since

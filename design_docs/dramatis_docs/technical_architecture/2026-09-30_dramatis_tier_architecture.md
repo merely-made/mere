@@ -246,7 +246,10 @@ What follows, as *Reading, not ruled*:
 This section named three seams as open on 2026-09-30 (ruling 5). Mark
 resolved them on 2026-10-01, together with WebFinger, which ruling 5 had left
 out, and the CXF import policy that founding chatelaine raised. All of it is
-unbuilt; the rulings say where the work goes.
+unbuilt; the rulings say where the work goes. *Amended 2026-10-02*: chatelaine
+is built through its plan's P3 (the taxonomy, castellan's OTP items and its
+Secret Service store on it); CXF import, the gazette service, WebFinger's move
+and the facade remain unbuilt.
 
 **Gazette's authority half is a djinn service (ruling 6).** Djinn composes it
 beside `CastellanResident`, on the djinn plan's own split: djinn owns process
