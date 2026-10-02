@@ -77,19 +77,48 @@ pub(super) fn run(canvas: &mut Canvas, ticks: u32) {
     }
 }
 
-/// Settle `graph` under Density and under Springs from one seed, and read
-/// both rank correlations.
-fn density_and_springs_ranks(graph: Graph, ticks: u32) -> (f32, f32) {
+/// The setting a receipt runs the law at, while the catalog's defaults are
+/// an open fork (plan, P6 progress 2026-10-02): passes, seconds per pass,
+/// grid resolution.
+#[derive(Clone, Copy, Debug)]
+pub(super) struct Run {
+    pub passes: u32,
+    pub seconds: f32,
+    pub resolution: usize,
+}
+
+/// Several four-second passes on the full grid: the sample graph's setting.
+pub(super) const SAMPLE_RUN: Run = Run {
+    passes: 8,
+    seconds: 4.0,
+    resolution: 128,
+};
+
+/// Install Density at `setting` over the canvas's degree masses.
+pub(super) fn install(canvas: &mut Canvas, setting: Run) {
+    canvas.set_physics_law(PhysicsLaw::Density);
+    let masses = canvas.law_inputs().masses(PhysicsMassSource::Degree);
+    let mut law = seiche::Density::new(masses, setting.resolution);
+    law.passes = setting.passes;
+    law.seconds = setting.seconds;
+    canvas.physics.set_forces(vec![Box::new(law)]);
+}
+
+/// Settle `graph` under Density (at `setting`) and under Springs from one
+/// seed, and read both rank correlations.
+fn density_and_springs_ranks(graph: Graph, setting: Run, ticks: u32) -> (f32, f32) {
     let mut density = seeded(graph.clone(), 40.0);
-    density.set_physics_law(PhysicsLaw::Density);
+    install(&mut density, setting);
     run(&mut density, ticks);
     let mut springs = seeded(graph, 40.0);
     springs.set_physics_law(PhysicsLaw::Springs);
     run(&mut springs, ticks);
-    (
-        density.layout_stats().mass_area_rank,
-        springs.layout_stats().mass_area_rank,
-    )
+    let (d, s) = (density.layout_stats(), springs.layout_stats());
+    eprintln!(
+        "density rank {:.3} cv {:.3} overlaps {}; springs rank {:.3} overlaps {}",
+        d.mass_area_rank, d.density_cv, d.overlaps, s.mass_area_rank, s.overlaps
+    );
+    (d.mass_area_rank, s.mass_area_rank)
 }
 
 /// The law's claim on the canvas sample graph: settled Density gives the
@@ -97,7 +126,8 @@ fn density_and_springs_ranks(graph: Graph, ticks: u32) -> (f32, f32) {
 /// does not (the negative control).
 #[test]
 fn settled_density_gives_room_by_mass_and_springs_does_not() {
-    let (density, springs) = density_and_springs_ranks(crate::canvas::build::sample_graph(), 900);
+    let (density, springs) =
+        density_and_springs_ranks(crate::canvas::build::sample_graph(), SAMPLE_RUN, 900);
     assert!(density >= 0.8, "density rank {density:.3}");
     assert!(
         springs < 0.8,
@@ -105,13 +135,18 @@ fn settled_density_gives_room_by_mass_and_springs_does_not() {
     );
 }
 
-/// The same claim on the web pages' 200-node generated graph. At the
-/// current defaults it reads about 0.70 after 900 ticks and 0.77 after 1800
-/// (the probe's table); which defaults to take is a fork put to Mark.
+/// The same claim on the web pages' 200-node generated graph, degree mass.
+/// One pass reads about 0.60; one-second passes, repeated, cross 0.8 near
+/// 3 600 ticks on a 64² grid (the probe's tables). The setting is named
+/// here because the settle and the defaults are open forks.
 #[test]
-#[ignore = "Density's defaults are an open fork (physics catalog plan, P6 progress 2026-10-02)"]
 fn settled_density_gives_room_by_mass_on_the_generated_graph() {
-    let (density, springs) = density_and_springs_ranks(generated(200, 7), 900);
+    let setting = Run {
+        passes: 120,
+        seconds: 1.0,
+        resolution: 64,
+    };
+    let (density, springs) = density_and_springs_ranks(generated(200, 7), setting, 3_600);
     assert!(density >= 0.8, "density rank {density:.3}");
     assert!(
         springs < 0.8,
@@ -133,18 +168,20 @@ fn uniform_mass_spreads_evenly() {
         );
     }
     let mut canvas = seeded(graph, 14.0);
-    canvas.set_physics_mass_source(PhysicsMassSource::Degree);
-    canvas.set_physics_law(PhysicsLaw::Density);
+    install(&mut canvas, SAMPLE_RUN);
     run(&mut canvas, 2);
     let before = canvas.layout_stats().density_cv;
     run(&mut canvas, 900);
-    let after = canvas.layout_stats().density_cv;
+    let after = canvas.layout_stats();
     assert!(
-        after < 0.25,
-        "uniform mass cv {after:.3} (seed {before:.3})"
+        after.density_cv < 0.25,
+        "uniform mass cv {:.3} (seed {before:.3})",
+        after.density_cv
     );
     assert!(
-        after < before,
-        "evener than the clump: {after:.3} vs {before:.3}"
+        after.density_cv < before,
+        "evener than the clump: {:.3} vs {before:.3}",
+        after.density_cv
     );
+    assert_eq!(after.overlaps, 0, "no overlaps once spread");
 }

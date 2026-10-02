@@ -624,7 +624,31 @@ eleven existing receipts stay green.
   never re-splat) was prototyped beside the re-splat law: for point masses at
   frame-rate steps it is unstable (78–1 153 overlaps on the generated graphs,
   rank ≤ 0.55). It stays in the code as `DensityFlow::Gastner` only as a
-  probe option.
+  probe option. *(Annotated 2026-10-02, second round: Mark chose this
+  field; with CFL substeps it is stable, and it is now the only flow. The
+  re-splat flow, the Sea boundary and the coarse working level were
+  removed.)*
+- 2026-10-02 (P6a, second round): stable for point masses once each tick is
+  cut into substeps no longer than it takes the fastest node to cross half
+  a cell, the field diffusing by the same substep; no tick in any probe hit
+  the 64-substep cap. A truncated Jacobi solve drifts the field's total
+  (0.6% over 400 steps on a 32² test), so the grid rescales to the total
+  the walls conserve. The settled overlaps are 0 to 10 on the generated
+  graphs, against Springs' 38 to 173 from the same seed.
+- 2026-10-02 (P6a, second round): one pass of the evolving field is a map of
+  the seed. It cannot correct what it did not start with: on the 200-node
+  graph it settles by tick 60 at Spearman 0.60 (degree), whatever the
+  seconds (2, 4, 6), initial blur (0.1 to 0.5 spacings), grid (64², 128²)
+  or CFL fraction (0.25, 0.5); and from a clumped uniform seed, where
+  rapier's contacts move bodies off the flow, it rests at density CV 0.34
+  with 44 overlaps. Repeated passes, each splatting the nodes where the
+  last left them, close both gaps: one-second passes reach 0.81 at 3 600
+  ticks (64²), and the clump CV 0.05 to 0.07 with 0 to 1 overlaps.
+- 2026-10-02 (P6a, second round): the cost is set by `D·dt/h²`, which the
+  seconds-per-pass rule makes independent of graph size: about 190 Jacobi
+  sweeps a tick at 128² and 4-second passes (10 to 17 ms native at n = 200),
+  and four times that at 1-second passes (36 to 59 ms); 64² is 2.3 to
+  4.3 ms at the same settings with the same ranks.
 - 2026-10-02 (P6a): no Nexus code is in the CPU tier: cloud-in-cell splat,
   Jacobi and a central-difference gradient are written from the textbook, so
   `LICENSES.md` gains nothing. Nexus's gather-style P2G (one thread per grid
@@ -946,3 +970,31 @@ binning are the useful patterns.
   200-node receipt), the source-time clock flake passing on rerun;
   graphshell `--features web --lib` 228/228. Logs and probe tables in
   `Code/testing/mere/density/`.
+- 2026-10-02 (P6a, second round, after the field, boundary, area and bar
+  rulings; main `f02d9d35` merged into `density-cpu`): Density is
+  Gastner–Newman's evolving field, walled. A flow splats the nodes once,
+  smooths them by `initial_blur`, then each tick diffuses the field and
+  carries the nodes in CFL-bounded substeps (`DensityFlowState` reports
+  substeps, cap hits and the fastest speed); `passes` repeats the flow from
+  where the last left the nodes. `density.rs` is 476 lines with its tests in
+  `laws/density/tests.rs`. Tests: the Jacobi field against the
+  cosine-transform solution (1e-4), the evolving field conserving mass and
+  evening, no self flow, a crowd's heavy node with 1.4 times the median
+  room and no cap hit, and the pinned body held (with the skip removed it
+  ends at (7.8, 9.7) against (30, −20), `seiche-density-pin-control.log`).
+  Receipts at named settings, since the defaults are open: the sample graph
+  at eight 4-second passes (128², 900 ticks), and the 200-node graph at one-
+  second passes (64², 3 600 ticks), degree mass, each ≥ 0.8 with Springs
+  failing it; uniform mass from a clump to CV < 0.25 with no overlaps. With
+  the gradient term removed all three fail (rank −0.395, −0.241, CV 0.310;
+  `fault-no-gradient.log`). PageRank, recorded: 0.66 to 0.67 on the
+  200-node graph at 30 one-second passes. Open, put to Mark: how drags,
+  added nodes and mass-source changes re-enter the field (today a law
+  rebuild, on a topology or mass-source change, starts a fresh flow; a drag
+  is not re-entered); whether passes repeat, how many, and the settle that
+  follows (F4); and the defaults: grid, seconds per pass, blur, sweeps
+  (F6). Composition with edges waits on the composition assessment.
+  Gates (offline, debug): seiche 96/96 and 92/92 without default
+  features; pictograph `--features canvas --lib` 274 passed, 2 ignored
+  (the probes); graphshell `--features web --lib` 230/230. Logs and probe
+  tables in `Code/testing/mere/density/`.
