@@ -383,3 +383,9 @@ crate inventory at the Code root.
   met at that plan's P3: the taxonomy, OTP on it, and the Secret Service on
   it, with a Linux `secret-tool` receipt. CXF import (P4 onward) is not a C5
   condition.
+- 2026-10-02. **C5's chatelaine condition is met.** The chatelaine plan's P1
+  to P3 landed on `main` (`da3c50bc`, `3e4992ec`, `ff68e86c`): the taxonomy,
+  OTP on it, and the Secret Service on it, with the ThinkPad's `secret-tool`
+  receipt passing natively. chatelaine has its real contents for its one
+  publish at the baseline; castellan now depends on it, so chatelaine
+  publishes first.

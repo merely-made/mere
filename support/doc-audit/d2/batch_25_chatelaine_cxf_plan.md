@@ -17,7 +17,7 @@ here.
 ## dramatis_docs/implementation_strategy/2026-10-01_chatelaine_cxf_plan.md
 
 - disposition: current
-- status line: "Status (2026-10-01): in progress. Shape ruled by Mark on 2026-10-01 … P0 met; P1 landed on `main` (`da3c50bc`); P2 landed (`3e4992ec`); P3 in progress; the run stops after P3 for Mark's review (ruling 28)." — accurate: yes
+- status line: "Status (2026-10-02): paused for Mark's review (ruling 28). Shape ruled by Mark on 2026-10-01 … P3 landed (`ff68e86c`), meeting the Mere 0.4 baseline's chatelaine condition. P4a onward waits." — accurate: yes
 - claims checked: 12 — holds: 12, stale: 0, unverifiable: 0
 
 ### Stale claims
