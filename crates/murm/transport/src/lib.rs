@@ -59,6 +59,7 @@ pub mod notochord;
 mod p2panda_host;
 pub mod p2panda_transport;
 mod peer_id;
+mod peer_route;
 #[cfg(feature = "reticulum")]
 pub mod reticulum_transport;
 mod transport;
@@ -76,6 +77,7 @@ pub use crate::p2panda_transport::{P2pandaStream, P2pandaTransport, sync_overlay
 #[cfg(feature = "notochord")]
 pub use crate::notochord::{initiator_binding, initiator_link_binding};
 pub use crate::peer_id::PeerID;
+pub use crate::peer_route::{PeerAddr, PeerPath, decode_peer_ticket, encode_peer_ticket};
 #[cfg(feature = "reticulum")]
 pub use crate::reticulum_transport::{
     ReticulumInterface, ReticulumStream, ReticulumTransport, ReticulumTransportBuilder,

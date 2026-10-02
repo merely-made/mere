@@ -51,6 +51,40 @@ pub struct MirrorNode {
 pub struct LeafSemantics {
     pub role: Option<&'static str>,
     pub name: Option<String>,
+    /// What the leaf draws, each with its ARIA role, its name and where it is
+    /// drawn (`[x, y, width, height]` in the leaf's layout pixels).
+    pub children: Vec<LeafChild>,
+    /// Whether this name replaces the author's. A producer speaks for its
+    /// slot; a sprigging leaf's own label yields to an author's name.
+    pub names_itself: bool,
+}
+
+/// One thing a leaf draws, as the mirror places it.
+#[derive(Clone, Debug, PartialEq)]
+pub struct LeafChild {
+    pub role: &'static str,
+    pub name: String,
+    pub rect: [f32; 4],
+}
+
+impl LeafSemantics {
+    /// A producer's own account of its slot.
+    pub fn from_producer(semantics: cambium_rootstock::ProducerSemantics) -> Self {
+        Self {
+            role: semantics.role.map(cambium_rootstock::ProducerRole::aria),
+            name: semantics.name,
+            children: semantics
+                .children
+                .into_iter()
+                .map(|child| LeafChild {
+                    role: child.role.aria(),
+                    name: child.name,
+                    rect: child.rect,
+                })
+                .collect(),
+            names_itself: true,
+        }
+    }
 }
 
 /// A leaf's AccessKit account of itself, in ARIA. A graphic keeps its role
@@ -67,6 +101,8 @@ pub fn leaf_semantics(node: &accesskit::Node) -> LeafSemantics {
     LeafSemantics {
         role,
         name: node.label().map(str::to_owned),
+        children: Vec::new(),
+        names_itself: false,
     }
 }
 
@@ -114,16 +150,29 @@ fn lower(
     leaf: &mut impl FnMut(u64, Option<&str>) -> Option<LeafSemantics>,
 ) -> MirrorNode {
     let id = node.id.get();
-    let semantics = leaf(id, node.name.as_deref());
+    let mut semantics = leaf(id, node.name.as_deref());
+    let drawn = semantics
+        .as_mut()
+        .map(|semantics| std::mem::take(&mut semantics.children))
+        .unwrap_or_default();
     let role = semantics
         .as_ref()
         .and_then(|semantics| semantics.role)
         .or_else(|| aria_role(node.role));
-    let name = node
-        .name
-        .clone()
-        .or_else(|| semantics.and_then(|semantics| semantics.name))
-        .filter(|name| !name.trim().is_empty());
+    // A producer names its slot; otherwise the author's name wins.
+    let names_itself = semantics
+        .as_ref()
+        .is_some_and(|semantics| semantics.names_itself);
+    let name = if !names_itself {
+        node.name
+            .clone()
+            .or_else(|| semantics.and_then(|semantics| semantics.name))
+    } else {
+        semantics
+            .and_then(|semantics| semantics.name)
+            .or_else(|| node.name.clone())
+    }
+    .filter(|name| !name.trim().is_empty());
 
     let mut attrs = Vec::new();
     if let Some(role) = role {
@@ -134,6 +183,14 @@ fn lower(
         (Placement::Label | Placement::Value, Some(name)) => attrs.push(("aria-label", name)),
         (Placement::Content, Some(name)) => text = Some(name),
         (_, None) => {},
+    }
+    // A description says more than the name: what a control does, say.
+    if let Some(description) = node
+        .description
+        .clone()
+        .filter(|description| !description.trim().is_empty())
+    {
+        attrs.push(("aria-description", description));
     }
     // A text control's content is its value, which is where a reader reads it.
     if matches!(
@@ -156,13 +213,41 @@ fn lower(
         ),
         None => (None, origin),
     };
+    let mut children = lower_children(nodes, node, child_origin, scale, leaf);
+    children.extend(
+        drawn
+            .into_iter()
+            .enumerate()
+            .map(|(ordinal, child)| drawn_node(id, ordinal, child, scale)),
+    );
     MirrorNode {
         id,
         attrs,
         text,
         rect,
         focusable: node.actions.contains(&DocumentA11yAction::Focus),
-        children: lower_children(nodes, node, child_origin, scale, leaf),
+        children,
+    }
+}
+
+/// One thing a leaf draws, as a mirror element over where it is drawn. Its
+/// id sits in a range a DOM node's opaque id never reaches.
+fn drawn_node(leaf: u64, ordinal: usize, child: LeafChild, scale: f32) -> MirrorNode {
+    let [x, y, width, height] = child.rect;
+    let mut attrs = vec![("role", child.role.to_string())];
+    let text = if child.role == "listitem" {
+        Some(child.name)
+    } else {
+        attrs.push(("aria-label", child.name));
+        None
+    };
+    MirrorNode {
+        id: (1 << 63) | (leaf << 20) | (ordinal as u64 & 0xF_FFFF),
+        attrs,
+        text,
+        rect: Some([x * scale, y * scale, width * scale, height * scale]),
+        focusable: false,
+        children: Vec::new(),
     }
 }
 

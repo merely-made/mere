@@ -56,6 +56,23 @@ certificate rotation, additional protocols, public binding and governed moot
 hosting remain separate integration work. Exporting Tabard's Lagrange palette
 does not change Gemini page content or this listener's policy.
 
+## Paired devices
+
+`djinn-devices` asks the running resident where each paired device is now,
+through the same owner-only application broker. For every device paired in
+this profile's personal sync it prints the node id, label, root, pairing id and
+time added; whether the device is connected now; every address the transport
+holds for it, the live ones marked active; and the last saved dial hint,
+decoded into its direct addresses and relay.
+
+```text
+djinn-devices
+djinn-devices --json
+```
+
+The directory is read-only and lists paired devices only. The broker endpoint
+follows `GRAPHSHELL_APP_ENDPOINT`, as `djinn-site` does.
+
 ## Publishing
 
 `0.0.2` is the source version of this workspace resident, not a crates.io
