@@ -353,16 +353,19 @@ fn a_bounded_action_waits_for_its_values() {
 }
 
 #[test]
-fn an_incomplete_draft_fails_before_anything_is_sent() {
+fn an_incomplete_draft_is_refused_locally_and_stays_open() {
     let (mut remote, _board) = mounted();
     remote.invoke_action(index_of(&remote, CHOOSE));
     remote.submit_draft();
-    assert!(remote.take_outgoing().is_empty());
+    assert!(remote.take_outgoing().is_empty(), "nothing is sent");
     assert!(
-        remote.form.status.starts_with("Failed · remote: could not compose"),
+        remote.form.status.starts_with("Choose required values ·"),
         "{}",
         remote.form.status
     );
+    assert_eq!(remote.status(), "open", "the link is not at fault");
+    assert!(remote.form.draft.is_some(), "the draft stays open");
+    assert_eq!(remote.form.count, 0, "nothing was invoked");
     assert_eq!(remote.pending(), None);
 }
 
