@@ -589,6 +589,20 @@ contract declared in advance.
     rust-gpu 0.10": spirv-std 0.10 and nightly 1.98, one toolchain with
     Nexus. The alternatives were an older naga for build.rs, gating build.rs
     off for shader builds, or leaving it until a shader changes.
+  - **The renderling port's blocker** (2026-10-02). cargo-gpu 0.10.0 is now
+    the installed default and the unused caches are gone. A throwaway trial
+    ported renderling's shaders to spirv-std 0.10 with version and toolchain
+    moves only: 95 of 95 tests, WGSL byte-identical, 44 of 45 `.spv` rebuilt.
+    It is blocked by crabslab (`crates/crabslab`, `mark-ik/wgpu-30`
+    `a1ffc17`), which requires `spirv-std = "0.9.0"`; eponym builds against
+    the live crabslab and renderling checkouts. Mark chose "Sync crabslab
+    upstream first" (13 behind, upstream `f990323` on wgpu 26 and spirv-std
+    git `b3eda4df`); the alternatives were widening the range on
+    `mark-ik/wgpu-30`, or a new 0.10-only branch. The port runs in the
+    **live checkout** (eponym follows it), the rebuilt `.spv` are
+    **committed**, and renderling's build.rs running `cargo +nightly fmt` on
+    every host build is **recorded only**. *Reading, not ruled:* the crabslab
+    sync merges upstream in, as renderling's did.
   - **The logged token.** Four build logs captured this session's
     environment, including its messaging token and account IDs; redacted on
     Mark's choice.
