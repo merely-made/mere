@@ -321,6 +321,23 @@ assessment returned:
   chose "Land codex/knot-text-paint on main first": verified, it
   fast-forwards Genet main, and the fix branches from there. The
   alternatives were branching from the pin, or from the older main.
+  *Outcome and follow-up (2026-10-02):* Genet main fast-forwarded to
+  `b1eb3af1971` after 627 genet-livery passes; the `[hidden]` rule landed as
+  `4ac56bbbe0b` on `fix/hidden-ua-text-align` (fails without, passes with;
+  628 + 124 + 40 passes). Text-align turned out general: every
+  non-wrapping line ignores it, because Livery breaks it as one unbounded
+  Parley line (the K3p contract) and Parley aligns within the longest line.
+  A Livery-only re-break wraps no-wrap lines at inline boxes (1 line to 5);
+  a prototype Parley patch adding an alignment width (`84701e00dd3`) fixes
+  it. Mark said: "Is it possible to reach spec correctness while treating
+  parley like a lib (much as we're doing with taffy…?) and building our
+  implementations…? I lean to b but would accept c if the rationale were
+  proven out by prototyping b", and on patching genet-parley: "I would
+  prefer a livery only solution. So what's the path to css conformation
+  look like and necessitate?" Open: an assessment of a Livery-owned inline
+  layout over Parley used as a library, with option B (inline boxes
+  honouring no-wrap) prototyped, comes back to him. On pushes, once
+  text-align lands: "Push Genet main + fix, repin mere, push mere".
 - *Reading, not ruled:* the remote scenarios follow the panel lane's
   precedent of tree copies (`p4_tree_*`) with the originals kept for the old
   page, and the physics panel stays operable during a remote session, since
