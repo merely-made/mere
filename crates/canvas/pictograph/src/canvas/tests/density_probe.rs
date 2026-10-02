@@ -258,3 +258,33 @@ fn density_uniform_probe() {
         }
     }
 }
+
+/// Each overlay composed onto Density through the catalog (the catalog's
+/// defaults): what the force-currency overlays do to the reading.
+#[test]
+#[ignore = "fork probe: prints Density under each overlay"]
+fn density_overlay_probe() {
+    use crate::canvas::physics_catalog::PhysicsOverlay;
+    let mut rows: Vec<Option<PhysicsOverlay>> = vec![None];
+    rows.extend(PhysicsOverlay::ALL.into_iter().map(Some));
+    for (name, graph) in [("gen-50", generated(50, 3)), ("gen-200", generated(200, 7))] {
+        for overlay in &rows {
+            let mut canvas = seeded(graph.clone(), 40.0);
+            canvas.set_physics_law(PhysicsLaw::Density);
+            if let Some(overlay) = overlay {
+                canvas.set_physics_overlays(vec![*overlay]);
+            }
+            run(&mut canvas, 900);
+            let stats = canvas.layout_stats();
+            println!(
+                "overlay {name} | {} | rank {:.2} | cv {:.3} | overlaps {} | spread {:.0} | forces {}",
+                overlay.map_or("none", |o| o.id()),
+                stats.mass_area_rank,
+                stats.density_cv,
+                stats.overlaps,
+                stats.spread,
+                canvas.law_force_count()
+            );
+        }
+    }
+}

@@ -679,6 +679,15 @@ eleven existing receipts stay green.
   sweeps a tick at 128² and 4-second passes (10 to 17 ms native at n = 200),
   and four times that at 1-second passes (36 to 59 ms); 64² is 2.3 to
   4.3 ms at the same settings with the same ranks.
+- 2026-10-02 (P6a, after the pure-Density ruling): the catalog lets any of
+  the eight overlays join Density today, and they mix silently: each is a
+  force rapier integrates as velocity in the same step Density writes
+  translations. At the catalog's defaults over 900 ticks on the 200-node
+  graph (Density alone: rank 0.60, 4 overlaps): Hub pull −0.33 with 510
+  overlaps, Centre −0.21 / 410, Tide −0.26 / 409, Skeleton −0.21 / 362,
+  Depth −0.04 / 230, Grid 0.32 / 80, Hub room 0.57 with density CV 7.3;
+  Group pull changes nothing there (every generated node is its own site).
+  Nothing refuses or marks the mix yet (`density_overlay_probe`).
 - 2026-10-02 (P6a): no Nexus code is in the CPU tier: cloud-in-cell splat,
   Jacobi and a central-difference gradient are written from the textbook, so
   `LICENSES.md` gains nothing. Nexus's gather-style P2G (one thread per grid
