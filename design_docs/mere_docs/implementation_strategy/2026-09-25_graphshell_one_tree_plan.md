@@ -816,3 +816,21 @@ this tree.
     fixture has no intent with inputs, so the draft form is untested headed.
   - The [controls receipt](../testing/2026-09-27_graphshell_controls_physics_receipt.md)
     records the evidence.
+- 2026-10-02: the overflow, draft-proof and card-label rulings
+  (`bbc89994`) are carried out on `tree-remote-session`.
+  - Graph tools sections are Cambium disclosures in a region that scrolls.
+    Cambium's closed panels now also carry `display: none`, because Genet's
+    UA sheet has no `[hidden]` rule.
+  - `LiveEndpoint` has a bounded "Append a coloured card". An incomplete
+    draft is refused locally rather than failing the session.
+  - Pictograph paints card titles in the page's font. The section lists
+    them, and the tree's board frames the cards' edges. The old page keeps
+    its framing.
+  - Gates pass: the merge gate 263, Cambium 244, pictograph 269. The wasm
+    build passes.
+  - Headed, `p4_tree_remote_draft` and the three tree copies pass on both
+    routes. The old page's three originals pass with the third action.
+  - Open as a fork: one mirror node per board card. Cambium's leaf
+    semantics have no children.
+  - The [controls receipt](../testing/2026-09-27_graphshell_controls_physics_receipt.md)
+    records the evidence.
