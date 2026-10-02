@@ -591,3 +591,7 @@ impl SecretServiceStore {
 #[cfg(test)]
 #[path = "store_tests.rs"]
 mod tests;
+
+#[cfg(test)]
+#[path = "store_limit_tests.rs"]
+mod limit_tests;
