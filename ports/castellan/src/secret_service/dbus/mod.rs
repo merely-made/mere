@@ -8,10 +8,12 @@ use std::collections::HashMap;
 use std::fmt;
 use std::sync::Arc;
 
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use zbus::message::{Header, Message};
 use zbus::names::ErrorName;
-use zbus::zvariant::{OwnedObjectPath, OwnedValue};
+use zbus::zvariant::{OwnedObjectPath, OwnedValue, Signature, Type};
 use zbus::{Connection, DBusError};
+use zeroize::Zeroizing;
 
 use super::{
     SecretCollectionId, SecretItemId, SecretServiceError, SecretServiceLimits, SecretServiceStore,
@@ -34,8 +36,41 @@ pub(super) const COLLECTION_LABEL_PROPERTY: &str = "org.freedesktop.Secret.Colle
 pub(super) const ITEM_LABEL_PROPERTY: &str = "org.freedesktop.Secret.Item.Label";
 pub(super) const ITEM_ATTRIBUTES_PROPERTY: &str = "org.freedesktop.Secret.Item.Attributes";
 
-pub(super) type DbusSecret = (OwnedObjectPath, Vec<u8>, Vec<u8>, String);
+/// The spec's `Secret` struct: session, parameters, value, content type.
+pub(super) type DbusSecret = (OwnedObjectPath, Vec<u8>, SecretBytes, String);
 pub(super) type DbusResult<T> = Result<T, SecretDbusError>;
+
+/// A secret's bytes on their way to or from the bus, zeroized when dropped.
+/// Encoded as `ay`, exactly as the `Vec<u8>` it replaces. zbus's own message
+/// buffers, which hold the encoded bytes, are outside its reach.
+pub(super) struct SecretBytes(Zeroizing<Vec<u8>>);
+
+impl SecretBytes {
+    pub(super) fn new(bytes: Zeroizing<Vec<u8>>) -> Self {
+        Self(bytes)
+    }
+
+    /// Move the bytes out without copying; the caller zeroizes them from here.
+    pub(super) fn take(&mut self) -> Vec<u8> {
+        std::mem::take(&mut *self.0)
+    }
+}
+
+impl Type for SecretBytes {
+    const SIGNATURE: &'static Signature = <Vec<u8> as Type>::SIGNATURE;
+}
+
+impl Serialize for SecretBytes {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        self.0.as_slice().serialize(serializer)
+    }
+}
+
+impl<'de> Deserialize<'de> for SecretBytes {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        Vec::<u8>::deserialize(deserializer).map(|bytes| Self(Zeroizing::new(bytes)))
+    }
+}
 
 /// Running Secret Service name and object tree.
 pub struct SecretServiceServer {
@@ -313,5 +348,17 @@ impl From<SecretServiceError> for zbus::fdo::Error {
 impl From<SecretDbusError> for zbus::Error {
     fn from(error: SecretDbusError) -> Self {
         Self::FDO(Box::new(error.into()))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // Compiled and run on Linux only, where zbus is.
+    #[test]
+    fn secret_bytes_keep_the_secret_struct_signature() {
+        assert_eq!(<SecretBytes as Type>::SIGNATURE.to_string(), "ay");
+        assert_eq!(<DbusSecret as Type>::SIGNATURE.to_string(), "(oayays)");
     }
 }
