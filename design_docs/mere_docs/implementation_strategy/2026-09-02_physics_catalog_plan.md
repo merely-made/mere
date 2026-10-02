@@ -550,6 +550,31 @@ composition tier, meaning as a source, embeddings and snapshots stand as
 inputs to the brief. *Brief written 2026-10-02:* the
 [dynamics grammar brief](../research/2026-10-02_dynamics_grammar_brief.md)
 (its §11 holds the forks, including a draft rewrite of P7).
+*The brief's first forks, ruled 2026-10-02.* The hypothesis held for the
+energy class only (6 of 12 laws, 5 of 8 overlays, the anchor and affinity
+slots, Spectral alone among the arrangements) and failed for dynamics-only
+laws (Kinds, Flock, Flow's needle; Orbit and Sync, whose minimisers are
+collapse and total synchrony) and for generator arrangements.
+- **F1, the model.** "Terms and targets": one specification model of
+  energy, dynamics and target terms; arrangements stay `Score`-recorded
+  generators referenced as targets; optimizer realizations are gated on
+  class and metric. The alternatives were an energy-only grammar with the
+  living laws outside it, or separate grammars sharing only sources.
+- **F2, P7's home.** "P7 moves into the grammar plan": P7 becomes the
+  grammar plan's build tracks (the brief's G1 to G6), and this section closes
+  with a pointer once that plan exists; P5 and P6 stay here. The alternatives
+  were P7 rewritten here, or P7 as written.
+- **F3, first tracks.** "Declarations and instruments first": G1, every term
+  declaring topology, kernel, state, currency, class and observable, with an
+  energy-descent test and a reciprocity test that agree with each declared
+  class and Kinds failing descent as the positive control; then G2 to G6.
+  The alternatives were the spec artifact first, or the combinators first.
+- **F4, the spec's home.** "Portable shape now, in seiche": a
+  `DynamicsSpec` in seiche, sources resolved host-side, `PhysicsChoice` the
+  binding, carried in `SavedSceneV1` now and as a shelfmark delta section
+  when a citing consumer asks. The alternatives were growing `PhysicsChoice`
+  in the canvas, or placing it in sceno beside the `Score`.
+F5 to F10 are still open.
 - *P7a, currencies.* Every law declares its currency (force, kinematic,
   resident). The catalog composes forces freely, converts forces into a
   kinematic law's currency (overdamped, v = F/γ, the rule Hold already
