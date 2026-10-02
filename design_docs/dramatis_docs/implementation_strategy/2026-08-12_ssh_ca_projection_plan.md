@@ -5,6 +5,17 @@
 Progress for what the building of it corrected. Drafted the evening the
 wgpu-weld parity sweep ran its Intel-iMac leg over SSH and paid the
 bilateral toll three ways in one afternoon.
+**Corrected 2026-10-02**: host certificates were never built. Nothing
+outside tests calls `SshCertAuthority::mint_host_cert` (`ssh_ca.rs:276`),
+and `enroll-host` writes only an `authorized_keys` `cert-authority` line and
+prints "host-key prompts still apply" (`bin/personae-vault/certs.rs:185`),
+so T2's "zero host-key prompts" and the design's "retires TOFU fleet-wide"
+are unmet. The fleet authority is not one master either: each vault derives
+its own CA from its own random master (`certs.rs:34`, `bootstrap.rs:135`).
+On 2026-10-02 only the Windows laptop's agent offered a certificate. Mark
+ruled the follow-on (per-machine CAs approved by the Windows laptop's
+master, host certificates finished now) in the
+[device pairing by key plan](../../mere_docs/implementation_strategy/2026-10-02_device_pairing_by_key_plan.md), phase D4.
 **Related**:
 [personae founding](../technical_architecture/2026-07-08_personae_founding.md),
 [device_grant_delegation_reconciliation](../../mere_docs/technical_architecture/2026-08-11_device_grant_delegation_reconciliation.md),

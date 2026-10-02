@@ -576,6 +576,72 @@ contract declared in advance.
     reflowed expression as the only non-comment change: "Commit as a
     formatting commit" first. The three codegen caches Nexus no longer uses:
     "Delete after renderling's check".
+  - **Renderling's check, and the binary** (2026-10-02). Renderling's
+    formatting commit (`e14b737`) and upstream merge (`260e2c2`) landed on
+    `mark-ik/wgpu-30`. Our branch's shaders build with neither cargo-gpu
+    0.1.0 nor 0.10.0: `naga` 30, a build-dependency since our wgpu-30 port,
+    needs rustc 1.87, and the shader toolchain is nightly-2025-02-16 (1.86).
+    Upstream renderling (`46bf54c`) builds with 0.10.0, all 45 `.spv`
+    byte-identical to the committed ones, which our branch shares; renderling's
+    95 library tests pass run serially. Mark chose "Replace now, fix the
+    branch separately": cargo-gpu 0.10.0 becomes the installed default and
+    the three unused codegen caches go. For the branch, "Port shaders to
+    rust-gpu 0.10": spirv-std 0.10 and nightly 1.98, one toolchain with
+    Nexus. The alternatives were an older naga for build.rs, gating build.rs
+    off for shader builds, or leaving it until a shader changes.
+  - **The renderling port's blocker** (2026-10-02). cargo-gpu 0.10.0 is now
+    the installed default and the unused caches are gone. A throwaway trial
+    ported renderling's shaders to spirv-std 0.10 with version and toolchain
+    moves only: 95 of 95 tests, WGSL byte-identical, 44 of 45 `.spv` rebuilt.
+    It is blocked by crabslab (`crates/crabslab`, `mark-ik/wgpu-30`
+    `a1ffc17`), which requires `spirv-std = "0.9.0"`; eponym builds against
+    the live crabslab and renderling checkouts. Mark chose "Sync crabslab
+    upstream first" (13 behind, upstream `f990323` on wgpu 26 and spirv-std
+    git `b3eda4df`); the alternatives were widening the range on
+    `mark-ik/wgpu-30`, or a new 0.10-only branch. The port runs in the
+    **live checkout** (eponym follows it), the rebuilt `.spv` are
+    **committed**, and renderling's build.rs running `cargo +nightly fmt` on
+    every host build is **recorded only**. *Reading, not ruled:* the crabslab
+    sync merges upstream in, as renderling's did.
+    *Reopened (2026-10-02):* the sync is not mechanical. Upstream's 13
+    commits rewrite craballoc (0.4.0 / crabslab 0.7.0, unreleased), deleting
+    `slab.rs`, `value.rs` and `wgpu_slab.rs`, the files our three wgpu-30
+    commits port; a merge conflicts in five files, three modify/delete.
+    Upstream is on wgpu 26 and spirv-std git `b3eda4df` (still 0.9.0). Both
+    upstream renderling and ours require craballoc 0.3.1 / crabslab 0.6.6 and
+    use the deleted API, so a merged checkout would stop matching their patch
+    and Cargo would silently take crates.io 0.3.1 on wgpu 26. Asked how
+    crabslab should move, Mark said: "Full adoption, or consider what would
+    suit the stack best… how could we make renderling the ideal for us?"
+    Open: an assessment of renderling's role in the stack comes back to him
+    first.
+    *Assessed and answered (2026-10-02):* renderling is already ruled out by
+    the presentation plan's L7 (`isometry/mesocosm/design_docs/
+    2026-09-11_orthographic_voxel_presentation_plan.md:418-426`, done-condition
+    unmet), ruling 27 keeps the renderer swappable (kiss3d first, renderling
+    "far later"), and ruling 442's recommendation retires it before the mode
+    host; only `eponym-client`'s `Tenant` and two probes use it. Upstream
+    craballoc 0.4 is unadopted by renderling and superseded by crabslab's
+    `feat/wgsl-rs` (crabslab 1.0 / craballoc 0.5, wgpu 28). Mark's answers:
+    - On reopening L7: "Hmm. Kiss is the straightforward choice for both 2d
+      and 3d. Renderling, the five things we'd get from it, how's that
+      compare to kiss, or other alternative prospective pieces of game engine
+      that would compose into the stack? Consider that in all cases, I am
+      willing to reshape a good candidate into an excellent stack
+      component/module/crate; i don't mind renderling, kiss, or another option
+      as long as they compose well and improve the whole stack with their
+      capabilities. Whether that's rendering, entity management systems, etc.
+      etc. i don't even mind measuring both, or considering wgsl-rs or
+      rust-gpu or whatever". Open: a comparative assessment of candidate
+      engine components comes back to him.
+    - Allocator and shader lane, if renderling is kept: "Residency via
+      conatus/CubeCL": slab residency is replaced by conatus buffers bound
+      directly, one allocator.
+    - Harvesting renderling's lighting: "Compare to what would suit the stack
+      and wing": folded into the comparative assessment.
+    - The R2 receipt: "Re-prove in isometer-render": `isometer-render` binds
+      conatus's CubeCL buffers directly, testing whether the copy and the
+      second allocator disappear.
   - **The logged token.** Four build logs captured this session's
     environment, including its messaging token and account IDs; redacted on
     Mark's choice.
