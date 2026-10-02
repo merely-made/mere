@@ -502,7 +502,27 @@ this machine; the CPU tier passes at n = 200 and 128² on the web; and the
 eleven existing receipts stay green.
 
 **P7 — composition: several layouts at once (proposed 2026-10-02 from the
-same day's rulings; for Mark to reject or amend).**
+same day's rulings; held the same day, see below).**
+*Held for a dynamics grammar (2026-10-02).* Mark said: "in the way we've
+managed to describe projection grammar, we should probably think about an
+overarching model of physics; combinatorial, algorithmically diverse...
+more thoughts?" Told that the projection grammar's move (factored
+dimensions, a portable artifact, ensure/encourage satisfaction, effectiveness
+knowledge beside the grammar) maps onto physics as terms (interaction
+topology, kernel, state moved), sources as channels, scope as selection,
+combinators (sum, scope, sequence, level-of-detail condition, constraint),
+currencies as the type system, potential against non-conservative terms, and
+observables as receipts, and that this would subsume P7, he ruled: "Research
+brief first, P7 held" (a prior-art shelf with one-line transfers, and every
+current law, overlay and slot decomposed, before P7 is rewritten from it;
+the alternatives were the brief alongside P7a, or extending P7 directly);
+"Its own doc beside projection grammar" for the grammar's plan (the
+alternatives were inside this plan, or inside the projection grammar plan);
+and on treating arrangements and laws as two realizations of one objective
+model, "Yes, as a hypothesis the brief tests" (the alternatives were adopting
+it now, or keeping them separate). The rulings above on currencies, the
+composition tier, meaning as a source, embeddings and snapshots stand as
+inputs to the brief.
 - *P7a, currencies.* Every law declares its currency (force, kinematic,
   resident). The catalog composes forces freely, converts forces into a
   kinematic law's currency (overdamped, v = F/γ, the rule Hold already
