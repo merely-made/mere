@@ -248,6 +248,36 @@ assessment returned:
   a scenario `wait` holds for a pending capture, a remote operation in
   flight, or the local canvas moving while the local session is shown. The
   alternative kept the rule and accepted wait-timeouts under restless laws.
+- **FlowAdvect.** The Anneal audit (`df4ede41`) found `FlowAdvect` in
+  `seiche/src/coupling_force.rs` also calls `set_translation`, so it could
+  override a pinned body. Mark chose "Fix it the same way": skip
+  non-dynamic bodies, with a test that fails without it. The alternative
+  recorded it only.
+- **Narrow viewports.** The Graph tools region was a fixed 300 px. Mark
+  chose "Collapse below a width": below a breakpoint it becomes a toggle
+  button opening the region as an overlay; above it, docked. The
+  alternatives were stacking it under the canvas, or always docked with a
+  resize handle.
+- **The storage status line.** On `app=local` the floating "IndexedDB
+  reopened · persistent" line covered a node. Mark chose "Into Graph
+  tools": a storage line in the docked region. The alternatives were the
+  header status line, or leaving it.
+- **Push.** Mark chose "Push now" for main, carrying this session's merges
+  and rulings with other sessions' local commits already on it.
+- **The board on the tree.** After checkpoint 1 (`840c63de`, `acc8920c`,
+  `02a58aad`: the old page delegates to `graphshell_client::remote` and draws
+  through pictograph's `BoardScene`; `c4b1_live_board`,
+  `physics_remote_board` and `c4b3_reconnect` pass unchanged), Mark chose
+  "One leaf, producer picks the scene": the tree's one canvas leaf
+  rasterizes the canvas scene or the board scene by the session switch. Both
+  scenes are pictograph's, so this is not the rejected option of switching
+  Graphshell's own drawing. The alternative was a second leaf.
+- **Board margins.** "Symmetric, e.g. 24 px" on the tree; the old page keeps
+  its 50/50/116/64 fit. The alternative was the old page's fit on both.
+- **The panel lane's two calls.** "Keep both": the narrow-width "Graph
+  tools" toggle sits at the end of the controls row, and the breakpoint is
+  900 px (the 300 px region plus a 600 px minimum canvas). The alternatives
+  were a toggle over the canvas, or another breakpoint.
 - *Reading, not ruled:* the remote scenarios follow the panel lane's
   precedent of tree copies (`p4_tree_*`) with the originals kept for the old
   page, and the physics panel stays operable during a remote session, since
@@ -703,3 +733,44 @@ this tree.
   - Per the ruling, the threshold is unchanged and the case returns to Mark
     as a fork. A positive control fails the new observation as it should.
     The receipt doc records the numbers.
+- 2026-10-01: Mark ruled "Seiche: skip non-dynamic bodies".
+  - `Anneal::apply` now leaves non-dynamic (kinematic) bodies unmoved; they
+    still count in the energy as neighbours. An audit of every law,
+    overlay and Hold found no other position write. The rest use
+    `add_force`, which rapier 0.33 applies only to dynamic bodies, or
+    `set_linvel`, which it ignores on kinematic position-based ones.
+  - Outside that audit, `CouplingForce`'s FlowAdvect response
+    (`coupling_force.rs`) has the same `set_translation` pattern. It is
+    noted, not changed.
+  - A new seiche test pins a node under Anneal. Without the fix it fails,
+    with the pinned body at (58.4, 93.9) against a target of (400, −300).
+    With the fix it passes.
+  - Seiche passes 98 tests with default features and 94 without; pictograph
+    `canvas` passes 260. The wasm bundle builds.
+  - `p4_tree_physics_drag` passes headed three runs in a row. Anneal's
+    first-step reading is 0.7, 0.0 and 0.0 px, and the 300-frame checks pass.
+    `p4_tree_physics_anneal` passes.
+- 2026-10-01: the three follow-ups ruled at `ea604bf4` are carried out.
+  - **FlowAdvect.** `CouplingForce` FlowAdvect skips non-dynamic bodies. Its
+    new test failed without the fix, holding the pinned body at (120, 0)
+    against a target of (−200, 50), and passes with it. Seiche passes 99
+    tests with default features and 95 without.
+  - **Narrow viewports.** `TOOLS_DOCK_MIN_WIDTH` in `web_tree.rs` is 900
+    logical px: the 300 px region plus a 600 px minimum canvas. A centred
+    node dragged 220 px needs 476 px, and the fitted fixture spans about
+    320 px.
+    - Below that width the region is not rendered. A "Graph tools" toggle
+      with `aria-expanded` appears at the end of the Graph controls row and
+      opens the region as an absolute overlay over the canvas row.
+    - *Reading, not ruled:* the toggle sits in the controls row rather than
+      over the canvas, so the open overlay never covers its own toggle.
+  - **Storage line.** On `app=local` the storage line now leads the Graph
+    tools region as a status named "Storage: …". The floating line on the
+    canvas shows only save feedback.
+  - **Structure.** `physics.rs` now returns only its section, and
+    `web_tree.rs` builds the region around it, so another section can join.
+  - **Results.** Graphshell's `web` lib passes 228 tests and the wasm build
+    passes. Headed, `p4_tree_physics_springs`, `_springs` on `app=local` and
+    the new `p4_tree_tools_narrow` (700 px window) pass, all inspected
+    whole-frame. The mirror lists button "Graph tools" (`aria-expanded`
+    false) and the "Storage" status.

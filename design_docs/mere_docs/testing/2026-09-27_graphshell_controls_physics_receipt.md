@@ -569,6 +569,100 @@ a fork, as the ruling directs.
 `drag-return-step >= 50` and `drag-return-steps == 0`. It failed on both,
 reading 0.8 and 1 (`p4_tree_physics_stepcontrol/`). The file was removed.
 
+### Anneal leaves pinned bodies alone (2026-10-01)
+
+Mark ruled "Seiche: skip non-dynamic bodies". The coordinator confirmed the
+cause. `Anneal::apply` called `set_translation` on every accepted body,
+including one that `Simulation::pin` had made kinematic. In rapier 0.33 that
+call also rewrites `next_position`, the kinematic target, so a dragged node's
+body never followed the drag.
+
+**The fix.** `Anneal::apply` now skips bodies that are not dynamic. They
+remain in the energy as neighbours.
+
+**The audit.** In `seiche/src/laws`, `seiche/src/overlays` and Hold, no
+other position write exists.
+- Every other law and overlay uses `add_force`, which rapier applies to
+  dynamic bodies only.
+- Orbit's one-time kick, Hold and Anneal's velocity reset use `set_linvel`,
+  which rapier ignores on kinematic position-based bodies.
+- Outside the audit, `CouplingForce`'s FlowAdvect response
+  (`seiche/src/coupling_force.rs`) has the same `set_translation` pattern.
+  It is recorded, not changed. `sync.rs` writes authority positions by
+  design.
+
+**Tests.** Logs are under `Code/testing/mere/tree-physics/`.
+- `a_pinned_body_stays_at_its_kinematic_target` pins one of eight nodes and
+  runs 120 ticks. Run before the fix, it failed: the pinned body was at
+  (58.4, 93.9) against a target of (400, −300)
+  (`seiche-anneal-before-fix.log`). It passes with the fix.
+- Seiche passes 98 tests with default features (`seiche-default.log`) and 94
+  with `--no-default-features` (`seiche-no-default.log`).
+- Pictograph `--features canvas --lib` passes 260
+  (`pictograph-canvas-anneal.log`).
+- All runs were offline and locked. The wasm bundle builds
+  (`wasm-build-anneal.log`).
+
+**Headed runs.** `p4_tree_physics_drag` passes three runs in a row
+(`p4_tree_physics_drag_pinned_run{1,2,3}/`). Across all eleven laws the
+first-step release readings are 0.0–3.0 px. Anneal reads 0.7, 0.0 and 0.0 px,
+with the node about 220 px from the press point, where it was dropped. Every
+300-frame check passes. `p4_tree_physics_anneal` passes
+(`p4_tree_physics_anneal_pinned/`), and its cooling capture was inspected
+whole-frame.
+
+### FlowAdvect, narrow viewports and the storage line (2026-10-01)
+
+These carry out the rulings at `ea604bf4`.
+
+**FlowAdvect.** `CouplingForce`'s FlowAdvect response now skips non-dynamic
+bodies (commit `a3a455db`). The test
+`flow_advect_leaves_a_pinned_body_at_its_kinematic_target` failed before the
+fix, with the pinned body held at (120, 0) against a target of (−200, 50)
+(`seiche-flowadvect-before-fix.log`). It passes after. Seiche passes 99
+tests with default features and 95 with `--no-default-features`
+(`seiche-default-flow.log`, `seiche-no-default-flow.log`).
+
+**Narrow viewports.** The breakpoint is `TOOLS_DOCK_MIN_WIDTH`, 900
+logical px: the 300 px region plus a 600 px minimum canvas. That minimum
+comes from two measurements:
+- a node centred by `center-node` and dragged 220 px needs 476 px;
+- the fitted fixture spans about 320 px.
+
+Below the breakpoint the region is not rendered. A "Graph tools" button with
+`aria-expanded` joins the Graph controls row, and opening it puts the region
+in an absolute overlay on the right of the canvas row, with the canvas taking
+the full width.
+
+`p4_tree_tools_narrow` runs in a 700 by 900 window, giving a 687 px logical
+tree, and passes:
+- the region starts collapsed;
+- the toggle opens it;
+- Charge applies through the overlay;
+- clicking the toggle closes it;
+- Enter on the focused toggle opens and closes it.
+
+The collapsed and overlay captures were inspected whole-frame. The overlay
+box ends at its content height rather than stretching to the bottom inset,
+the Genet trait already noted for absolutely placed boxes.
+
+**Storage line.** On `app=local` the region begins with a status line,
+"Storage: IndexedDB reopened · persistent". The floating panel over the canvas
+shows only save feedback, and only after a save.
+
+**Runs and checks.**
+- The wide fixture run `p4_tree_physics_springs_tools/` passes, docked.
+- The wide `app=local` run `p4_tree_physics_springs_local_tools/` passes,
+  with the storage line in the region and none on the canvas. Both were
+  inspected whole-frame.
+- The mirror, read through `find` in the Browser pane, lists button "Graph
+  tools" with `aria-expanded="false"` at 700 px, where the region is absent,
+  and status "Storage: IndexedDB reopened · …" at 1400 px. The pane's
+  profile reported not persistent.
+- Graphshell `--features web --lib` passes 228
+  (`native-graphshell-web-tools.log`). The wasm build passes
+  (`wasm-build-narrow.log`).
+
 ## Open gates
 
 - Genet commit `27d20d3fc51ac5fcd2a2db231e035a3e06013ae1` admits safe retained

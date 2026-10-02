@@ -527,6 +527,20 @@ contract declared in advance.
   build reaches `nexus_rbd3d`, then the Khal build script's `cargo-gpu 0.1.0`
   invocation fails while removing `Cargo.lock`. No Nexus kernel executed, so
   Nexus remains outside Conatus and shared buffer ownership remains unproven.
+  *Annotation (2026-10-01):* diagnosed and cleared after Mark ruled "Fix now"
+  (physics catalog plan §5). The failure was a race, not a missing-file bug:
+  two Nexus build scripts (vortx's and `nexus_rbd2d`'s) each run `cargo gpu
+  build`, and cargo-gpu 0.1.0 has no lock around its shared codegen install,
+  so one process's `Cargo.lock` removal or `target\` cleanup lands under the
+  other (os errors 2, 145 and 3; all three cold concurrent runs failed). The
+  rust-gpu fork's cargo-gpu 0.10.0-alpha.1 already takes a `FileLock` on the
+  install; with it unpatched, the same cold runs passed 2 of 2, `nexus_rbd2d`'s
+  five GPU radix-sort tests passed, and `nexus_rbd3d`'s `test_stacks_1_tiny`
+  ran 250 GPU steps on the RTX 4060 (Vulkan). Logs:
+  `Code/testing/nexus-build/`. No patch was made; whether to patch anyway,
+  replace the installed 0.1.0 binary, and pin the codegen version are open.
+  This proves Nexus kernels execute here; shared buffer ownership with the
+  host's device is still unproven.
 
 ## Progress (2026-08-25 resident-position pass)
 

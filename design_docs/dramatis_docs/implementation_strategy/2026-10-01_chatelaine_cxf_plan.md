@@ -1,10 +1,10 @@
 # Chatelaine and CXF Import Plan
 
 **Date**: 2026-10-01
-**Status (2026-10-01)**: plan. Shape ruled by Mark on 2026-10-01 (rulings 7
-and 10 to 15 in the dramatis tier architecture; rulings 16 to 29 below).
-Nothing has moved yet. P0 and P1 start together (ruling 26); the run stops
-after P3 for Mark's review (ruling 28).
+**Status (2026-10-01)**: in progress. Shape ruled by Mark on 2026-10-01
+(rulings 7 and 10 to 15 in the dramatis tier architecture; rulings 16 to 42
+below). P0 met; P1 landed on `main` (`da3c50bc`); P2 landed (`3e4992ec`);
+P3 next; the run stops after P3 for Mark's review (ruling 28).
 **Scope**: found `chatelaine` as the tier's plain secret-item taxonomy; move
 castellan's OTP items and its Secret Service store onto it; then import
 (and finally export) the FIDO Credential Exchange Format through castellan.
@@ -31,7 +31,11 @@ container of typed credentials, with scope (sites and apps), tags, a
 favorite flag, timestamps and collections; the credential kinds; and the
 import disposition the rulings assign each kind. The OTP display enums
 (`OtpAlgorithm`, `OtpKind`, `OtpCodeStyle`) move here, since they describe a
-totp credential without being one.
+totp credential without being one. *Amended 2026-10-01*: two move whole.
+castellan's `OtpKind::Hotp` carries the HOTP counter, which is mutable,
+freshness-critical state and not an identifying field, so under ruling 23 it
+stays sealed in castellan; chatelaine carries only the shape, named
+`OtpMode` by ruling 37. *Reading, not ruled*, taken in P1's brief.
 
 **Is not**: secret bytes, storage, sealing, generation or any cryptography.
 A chatelaine value can be shown to any host view without harm, which is
@@ -175,6 +179,98 @@ Options: through P3; P0 and P1, then review; all phases. Mark: **"Through P3
 ThinkPad over SSH; the Mint machine; Mark runs it. Mark: **"The Fedora
 ThinkPad over SSH (Recommended)"**.
 
+Rulings 30 to 33 answer P0's report (§4, 2026-10-01); rulings 34 to 38
+answer P1's.
+
+**Ruling 30.** *How exact must ruling 15's "verbatim" be?* Options:
+byte-exact via raw slices; JSON-value-equal is enough; workspace-wide
+`serde_json` features (`preserve_order`, `arbitrary_precision`). Mark:
+**"Byte-exact via raw slices (Recommended)"**. Follows: P4 pre-scans the
+document with `serde_json`'s `RawValue` and seals each unknown credential's
+original bytes; `RawValue` is additive and changes nothing else in the
+workspace.
+
+**Ruling 31.** *Keep unknown fields on a known credential type?* Options:
+follow the spec and ignore them; keep them sealed too. Mark: **"Follow the
+spec: ignore (Recommended)"**. Follows: CXF §3.1.1's "MUST ignore unknown
+fields" stands.
+
+**Ruling 32.** *How are the crate's gaps handled?* Options: local handling
+only; local handling plus drafted upstream patches; a vendored patched copy.
+Mark: **"Local handling only (Recommended)"**. Follows: P4's mapping layer
+re-parses the affected cases from the preserved raw JSON and reads documents
+only with `from_slice`; no upstream dependency.
+
+**Ruling 33.** *Which decoder reads CXF TOTP secrets?* Options: castellan's
+own decoder; accept the crate's normalisation. Mark: **"Castellan's own
+decoder (Recommended)"**. Follows: P4 decodes the raw secret string with
+`ports/castellan/src/otp/base32.rs` (case, padding and spacing tolerated,
+any stray character refused); a refused secret is quarantined with its
+reason shown.
+
+**Ruling 34.** *Where does an item's persona live?* Options: on the store,
+checked on load; on each item. Mark: **"On the store, checked on load
+(Recommended)"**. Follows: P2's item store carries one persona scope label
+and refuses a mis-filed load by name, the gaz `verify_scope` precedent;
+items carry no persona field. Ruling 7's "persona scope" is met by the store,
+its "origin" by each item's scope.
+
+**Ruling 35.** *What happens to an item mixing stored and quarantined
+credentials?* Options: split, linked back; quarantine the whole item;
+per-credential state. Mark: **"Split, linked back (Recommended)"**. Follows:
+P4 moves quarantined credentials into their own quarantined item linked to
+the original (CXF allows importers to split items), and routes an item's
+SSH keys the same way.
+
+**Ruling 36.** *Keep the original CXF ids?* Options: as metadata; sealed;
+not at all. Mark: **"Keep as metadata (Recommended)"**. Follows: an optional
+source id on items and collections, so P6 can reproduce ids and P4 can
+resolve links.
+
+**Ruling 37.** *Naming of the OTP kind and its shape.* Options: rename to
+`Otp` and `OtpMode`; keep `Totp` and rename the shape only; keep both names.
+Mark: **"Rename to Otp and OtpMode (Recommended)"**. Follows: the kind is
+`CredentialKind::Otp` (its CXF type stays `totp`) and chatelaine's shape is
+`OtpMode`; castellan's counter-bearing `OtpKind` keeps its name.
+
+**Ruling 38.** *Accept P1's smaller readings?* (Item references live in an
+item's credentials; a Secret Service secret is stored; a card's issuer is
+CXF's `cardType` and a passport's document kind its `passportType`;
+custom-fields keeps its section label; timestamps are optional; country
+codes are uppercase; SSH fingerprint and file hash are required; `uuid` is
+declared directly, because the workspace entry enables random v4 ids.)
+Options: accept all; name changes. Mark: **"Accept all (Recommended)"**.
+
+Rulings 39 to 42 answer P2's layout checkpoint (§4, 2026-10-01).
+
+**Ruling 39.** *How are castellan's chatelaine items laid out as sealed
+records?* Options: split metadata and payload records; one record per item;
+a metadata book plus payload records. Mark: **"Split: metadata + payload
+records (Recommended)"**. Follows: `items/<item>` (persona label and
+chatelaine `Item`), `payloads/<credential>` (persona label, owning item, the
+sealed payload) and a per-persona index, written payloads first, then
+metadata, then index, under a per-persona transaction lock. The ruled
+metadata line (23, 24) becomes the line on disk: listing, search and the
+quarantine list never decrypt a secret, and an HOTP release rewrites only
+its payload.
+
+**Ruling 40.** *What does the OTP release gate address?* Options: the
+credential; the item. Mark: **"The credential (Recommended)"**. Follows:
+grant paths `…/otp/<persona>/<item>/<credential>`; an item-level grant still
+covers its credentials (insigne's `path_covers` matches whole segments).
+
+**Ruling 41.** *Build the per-persona item index in P2?* Options: in P2; in
+P3. Mark: **"Build it in P2 (Recommended)"**.
+
+**Ruling 42.** *Accept P2's readings?* (Every record carries the store's
+persona, and a mismatch is refused naming both; an imported OTP item is
+titled by its issuer, else its account; the gate refuses any item not in the
+vault from P2 on; the HOTP counter leaves what hosts see; new records live
+under `castellan/items/v1/<persona>/` and old `otp/v1` files are never read;
+tests reading an item's account read the credential's metadata, with the
+same asserted values.) Options: accept all; name changes. Mark: **"Accept
+all (Recommended)"**.
+
 ## 3. Phases
 
 Each phase lands with its own tests and gates and keeps the workspace green.
@@ -186,48 +282,53 @@ build.
   published 2026-06-11, unchanged since the standards survey flagged it as
   tracking the March 2025 review draft) against CXF v1.0 Proposed Standard
   with errata, 2026-03-09. Done when:
-  - [ ] every type and field difference is listed in §4 with its CDDL
+  - [x] every type and field difference is listed in §4 with its CDDL
         reference;
-  - [ ] each is classed: harmless, fixable by a local newtype or an upstream
+  - [x] each is classed: harmless, fixable by a local newtype or an upstream
         patch, or blocking;
-  - [ ] if anything blocks, the choice between waiting, patching upstream and
+  - [x] if anything blocks, the choice between waiting, patching upstream and
         ruling 19's alternative comes back to Mark as a fork before P4.
+        Nothing blocks; the four decisions P0 raised are rulings 30 to 33.
+        **P0 met 2026-10-01.**
         P1 to P3 do not depend on P0's outcome; they run after it, in order.
 
 - **P1 — the taxonomy.** `crates/dramatis/chatelaine` gains real code.
   Done when:
-  - [ ] items, credentials, collections and links (`item-reference`) exist as
+  - [x] items, credentials, collections and links (`item-reference`) exist as
         plain serde types; `CredentialKind` is `#[non_exhaustive]` and covers
         CXF v1.0's 17 kinds, the Secret Service generic secret, and
         `Unknown` with its preserved type string;
-  - [ ] `disposition(kind)` returns the ruled import treatment (stored,
+  - [x] `disposition(kind)` returns the ruled import treatment (stored,
         quarantined, routed to SSH import, kept as a link), with a test per
         row of the tier architecture's §7 table;
-  - [ ] the OTP display enums live here, gaining serde; castellan's `otp`
+  - [x] the OTP display enums live here, gaining serde; castellan's `otp`
         module re-exports them from chatelaine, so there is one definition
         from P1 on, and that re-export is P1's only castellan change;
-  - [ ] the production graph is serde plus `uuid` without default features:
+  - [x] the production graph is serde plus `uuid` without default features:
         no `personae`, no hashing, no signing, no randomness. Proven by a
         `cargo tree` receipt and a `wasm32-unknown-unknown` check, the gaz
         and insigne precedent;
-  - [ ] each kind carries exactly §1's metadata (rulings 23 and 24), no more,
+  - [x] each kind carries exactly §1's metadata (rulings 23 and 24), no more,
         and the crate docs state the line; a test per kind constructs its
         metadata, and no kind has a field for a sealed value;
-  - [ ] JSON and postcard round-trips for every kind.
+  - [x] JSON and postcard round-trips for every kind.
 
 - **P2 — castellan's item store on chatelaine; OTP moves.** Done when:
-  - [ ] castellan holds persona-scoped sealed item records whose metadata is
+  - [x] castellan holds persona-scoped sealed item records whose metadata is
         chatelaine's and whose secret payloads, one per credential, never
         appear in a chatelaine type;
-  - [ ] `OtpItem` and `OtpItemId` are gone; an OTP is an item with one totp
+  - [x] the item store carries its persona scope label and refuses a load
+        filed under another persona by name, with a two-persona test
+        (ruling 34);
+  - [x] `OtpItem` and `OtpItemId` are gone; an OTP is an item with one totp
         credential, and `OtpReleaseGate` and `OtpAdmittedSession` exercise
         that credential;
-  - [ ] the `castellan/otp/v1` record formats and their legacy reader are
+  - [x] the `castellan/otp/v1` record formats and their legacy reader are
         removed, with no decoder (ruling 20);
-  - [ ] the OTP suite passes unchanged in what it asserts: the RFC 6238 and
+  - [x] the OTP suite passes unchanged in what it asserts: the RFC 6238 and
         4226 vectors, the release gate, the admitted session, HOTP freshness,
         Steam Guard; test edits limited to construction and imports;
-  - [ ] the resident still refuses restored HOTP state and still never
+  - [x] the resident still refuses restored HOTP state and still never
         repeats a counter across independent gates, by its existing tests
         `resident_rejects_restored_hotp_state_before_releasing_it_again` and
         `independent_gates_under_one_resident_cannot_repeat_an_hotp_counter`
@@ -241,7 +342,11 @@ build.
         separate catalog/collection/item records are removed, with no decoder
         (ruling 20);
   - [ ] the resource limits (`SecretServiceLimits`) hold as before, by their
-        existing tests;
+        existing tests; *amended 2026-10-01*: there are none (P2's finding:
+        `store_tests.rs` only asserts the defaults), so P3 adds a refusal
+        test per limit, each with a control;
+  - [ ] a replace-by-attributes cannot tear (new bytes under old metadata),
+        held by the per-persona transaction lock of ruling 39;
   - [ ] the README's `secret-tool` store/lookup/clear receipt passes under a
         disposable session bus **on a Linux machine** (the D-Bus server is
         `cfg(target_os = "linux")`, so a Windows build proves nothing about
@@ -272,7 +377,31 @@ build.
         takes a persona per account;
   - [ ] every kind lands per the ruled table, proven by a fixture holding all
         17 kinds plus one unknown type, each asserted;
-  - [ ] a multi-credential CXF item stays one item (ruling 16);
+  - [ ] a multi-credential CXF item stays one item (ruling 16), unless its
+        credentials' treatments differ: then the quarantined credentials
+        move to their own quarantined item linked back to the original, and
+        its SSH keys route to SSH import (ruling 35);
+  - [ ] documents are read whole with `from_slice` only, never a reader or a
+        `Value`, since the crate's base64url strings deserialize only when
+        borrowed; each credential's `type` is checked to be a string before
+        the typed parse (ruling 32);
+  - [ ] a known type that fails its typed parse, which the crate demotes to
+        `Unknown` with the known type string, is re-parsed locally from the
+        raw JSON (TOTP `period` and `digits` up to 65,535; custom-fields
+        element by element) and, if that still fails, quarantined with its
+        reason, never treated as an unknown type (ruling 32);
+  - [ ] unknown credentials are sealed as their original bytes, taken from a
+        `RawValue` pre-scan (ruling 30); unknown fields on known types are
+        ignored, as CXF §3.1.1 requires (ruling 31);
+  - [ ] TOTP secrets are decoded from the raw string by castellan's own
+        Base32 decoder, never the crate's normalising `B32`; a refused
+        secret is quarantined with the reason shown (ruling 33);
+  - [ ] the spec's ignore rules are applied in the mapping layer: an unknown
+        TOTP algorithm, an unknown HMAC algorithm, and sharing accessors with
+        an unknown type or permission; and a document whose major version is
+        not 1 is refused;
+  - [ ] no crate type is ever logged or formatted with `{:?}`: the crate
+        derives `Debug` on secrets and has no zeroize;
   - [ ] `item-reference` becomes a link; a dangling one is reported, not
         stored as an item;
   - [ ] unknown types are quarantined with their fields preserved verbatim,
@@ -324,6 +453,55 @@ quarantined, or the agent gains algorithms, is a fork for Mark at P4's
 start, not a decision this plan makes. *Resolved the same day by ruling 25:
 the agent gains them, as P4a.*
 
+**2026-10-01: P0, the CDDL diff (Sonnet lane; claims re-checked in the crate
+source).** `credential-exchange-format` 0.4.0's README still claims the
+March 2025 review draft (`README.md:5-7`), but its wire shapes match the
+2026-03-09 Proposed Standard: all 17 types, every enum, the Shared extension,
+and Appendix A, which parses and re-serializes JSON-equal. MIT; dependencies
+`chrono` (no clock), `data-encoding`, `serde`, `serde_json`; no `unsafe`;
+compiles for `wasm32-unknown-unknown`. Unknown types arrive as
+`Credential::Unknown { ty, content }` (`src/lib.rs:187-193`, an untagged
+fallback), with raw JSON kept value-equal, not byte-equal. The differences
+that can bite a conforming document, all fixable locally and none losing
+data:
+
+- TOTP `period` and `digits` are `u8` (`src/login.rs:108,112`) where the spec
+  allows 16 bits, so larger values fall to `Unknown { ty: "totp" }`;
+- `B32` uppercases a TOTP secret and then *drops* every character outside the
+  alphabet (`src/b64url.rs:128-129`), so a mangled secret can decode to a
+  different valid one;
+- one unknown field type or bad value demotes a whole custom-fields
+  credential to `Unknown`;
+- base64url strings deserialize only borrowed (`try_from = "&str"`,
+  `src/b64url.rs:6,81`), so `from_reader` and `from_value` fail;
+- a known type whose typed parse fails is demoted to `Unknown` with the
+  known type string, so `Unknown` does not mean "unrecognised";
+- unknown fields on known types are dropped, as CXF §3.1.1 requires;
+- `Debug` is derived on everything, secrets included, and there is no
+  zeroize.
+
+The spec's own Appendix A covers 15 of the 17 types (custom-fields and
+item-reference are missing), and §3.4.2 contradicts itself on unknown field
+types. Rulings 30 to 33 settle the four decisions P0 raised.
+
+**2026-10-01: P1, the taxonomy (Opus lane).** Built as `71a91267` on its
+lane branch; verified by a merge onto `main` in a worktree at normal depth
+(`f8734195`): chatelaine 51 tests, castellan 90 with every feature, the
+production tree serde and `uuid` only (no `v4`, `std` or getrandom),
+wasm32, clippy, and the portable gate. The lane's own gate run failed only
+because graphshell's `practice_disclosure.rs:220` and
+`practice_workspace.rs:591` `include_str!` a woodshed file by a relative path
+that assumes `Code/repos/mere`, which a deeper worktree misses; any clone not
+beside woodshed fails the same way. Its control broke one disposition and one
+validation, and three named tests failed. Castellan's change was the enum
+re-export and the dependency line only. Findings carried to later phases:
+castellan now depends on chatelaine, so chatelaine must publish before
+castellan's next publish (C5's baseline does both); CXF ids are opaque
+strings, not UUIDs (ruling 36); a CXF `LinkedItem` may point into another
+account, which ruling 21 may map to another persona, which is a P4 fork;
+CXF totp's `username` is optional while castellan's OTP account is required,
+and CXF digits can fall outside castellan's 6 to 10, both P4 forks.
+
 **2026-10-01: CXF's shape.** A Header holds Accounts ("a credential owner's
 account in the exporting provider"); an Account holds Collections and Items;
 a Collection lists `LinkedItem`s and nests sub-collections; an Item holds a
@@ -340,6 +518,71 @@ P0, then P1.
 and ECDSA for the agent (P4a), and how the run goes (§6). Next: P0 and P1
 lanes.
 
+**2026-10-01, P0 and P1.** P0 met (§4); Mark ruled its four decisions as 30
+to 33. P1 built and verified green (§4); Mark ruled its forks and readings
+as 34 to 38, and the lane is making the two type changes they require
+(source ids, the `Otp` and `OtpMode` names) before P1 merges. The Fedora
+ThinkPad did not answer mDNS in three rounds while both iMacs did, so P3's
+receipt needs it woken first.
+
+**2026-10-01, P1 landed.** The follow-up pass (`f0141e3a`) added `SourceId`
+(unpadded url-safe base64url, 1 to 64 bytes, kept verbatim) on items and
+collections, and the `Otp` and `OtpMode` names; its control (accepting 65
+bytes) failed two named tests. Two consequences of ruling 37 the lane
+applied, *reading, not ruled*: chatelaine's own serialized tag for the kind
+is `otp` (its CXF type stays `totp`), and the field holding the mode is
+`mode`. Merged onto `main` in a normal-depth worktree and verified there
+(`da3c50bc`): chatelaine 53 tests, castellan 90 with every feature, the tree
+(serde and `uuid` only), wasm32, clippy, and the portable gate, all exit 0;
+the three "patch was not used" warnings are lock-wide and predate P1 (the
+root `Cargo.toml` is unchanged). The chatelaine README now says the crate
+holds identifying metadata and that persona scope lives on castellan's
+store. `main` fast-forwarded; nothing pushed. Next: P2.
+
+**2026-10-01, P2 checkpoint.** The P2 lane stopped before writing the store,
+as briefed: personae's sealed records are one path each, the path bound into
+the encryption (`sealed_record_storage.rs:85`), with no listing and no
+cross-record transaction (`update_record` is single-path), and the Secret
+Service's item records hold their secret bytes (`StoredItem.secret`), so
+every property read and search decrypts the secret. Its measurements:
+personae's envelope writes plaintext and ciphertext as JSON number arrays,
+so a sealed file is 12.7 to 23 times what it seals (a 1 MiB secret makes a
+~13.4 MB file), worth knowing for the personae tier, outside this plan.
+Mark ruled its forks as 39 to 42; the lane is implementing.
+
+**2026-10-01, P2 landed.** Built as `23e2b43b` (lane, Opus) and merged onto
+`main` as `3e4992ec` after verification in the normal-depth worktree.
+`castellan::items::ItemStore` keeps one persona's items under
+`castellan/items/v1/<persona>/` as `items/<item>`, `payloads/<credential>`
+and `index` records (ruling 39), each carrying the persona label; an item is
+visible only once indexed; inserts write payloads, metadata, index under the
+per-persona transaction lock, now shared with the Secret Service store;
+`Payload` has no `Debug` and zeroizes on drop; `list` and `get` never open a
+payload; `exercise` refuses a non-vault item and advances an HOTP counter
+through one `update_record` on the payload. OTP is items holding one `Otp`
+credential, exposed to hosts as `OtpCredential` (item plus credential id);
+the gate is credential-addressed (ruling 40); `castellan/otp/v1` and its
+legacy reader are gone with no decoder (ruling 20). Verified:
+
+- castellan 89 unit tests with every feature (82 before, 7 new), 3 + 4
+  integration and the doctest; 66 with default features; chatelaine 53;
+- castellan's test names on `main` and merged compared by listing: nothing
+  removed, the 7 additions only (the doctest moved from line 24 to 27);
+- clippy 122 warnings, the same as before, none in a touched file;
+- signalman's separate workspace checks; the portable gate passes;
+- the lane's four controls each failed only their target: the persona check
+  made always-true, the freshness ledger bypassed, the index written before
+  the payloads, and metadata reads opening payloads.
+
+The lane's choices, *reading, not ruled*: the names `OtpCredential`,
+`OtpReleaseRequest.credential` and `OtpCodeTile::credential()`; `ItemStore`
+public for reads and delete, with `insert` and `exercise` crate-private;
+`get` also requires the item to be indexed; a delete removes the index entry,
+then payloads, then metadata, so an interrupted delete leaves only an
+invisible orphan. Carried to P3: `get` and `exercise` load the whole index on
+every call, which at `SecretServiceLimits` scale (32 collections of 4,096
+items, an index of about 5 MB) a D-Bus property read would repeat.
+
 ## 6. Running it
 
 As ruled (26 to 29), with the workspace's lane rules:
@@ -347,6 +590,9 @@ As ruled (26 to 29), with the workspace's lane rules:
 - **Lanes.** P0 (Sonnet) and P1 (Opus) run together; P0 reads and reports,
   P1 writes code, and neither depends on the other. P2 and P3 follow in
   order on Opus. The run stops after P3 for Mark's review; P4a onward waits.
+- **Base.** A lane first confirms its worktree is based on `main`'s tip:
+  P2's was created at an older commit, before P1 and rulings 30 to 38, and
+  its lane caught it by fast-forwarding.
 - **Isolation.** Each lane works in its own git worktree on its own branch,
   with its own `CARGO_TARGET_DIR` under `C:\t\cargo-targets\mere\`. Nothing a
   lane produces reaches `main` until it is verified there: the phase's
