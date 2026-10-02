@@ -321,6 +321,35 @@ assessment returned:
   chose "Land codex/knot-text-paint on main first": verified, it
   fast-forwards Genet main, and the fix branches from there. The
   alternatives were branching from the pin, or from the older main.
+  *Outcome and follow-up (2026-10-02):* Genet main fast-forwarded to
+  `b1eb3af1971` after 627 genet-livery passes; the `[hidden]` rule landed as
+  `4ac56bbbe0b` on `fix/hidden-ua-text-align` (fails without, passes with;
+  628 + 124 + 40 passes). Text-align turned out general: every
+  non-wrapping line ignores it, because Livery breaks it as one unbounded
+  Parley line (the K3p contract) and Parley aligns within the longest line.
+  A Livery-only re-break wraps no-wrap lines at inline boxes (1 line to 5);
+  a prototype Parley patch adding an alignment width (`84701e00dd3`) fixes
+  it. Mark said: "Is it possible to reach spec correctness while treating
+  parley like a lib (much as we're doing with taffy…?) and building our
+  implementations…? I lean to b but would accept c if the rationale were
+  proven out by prototyping b", and on patching genet-parley: "I would
+  prefer a livery only solution. So what's the path to css conformation
+  look like and necessitate?" Open: an assessment of a Livery-owned inline
+  layout over Parley used as a library, with option B (inline boxes
+  honouring no-wrap) prototyped, comes back to him. On pushes, once
+  text-align lands: "Push Genet main + fix, repin mere, push mere".
+  *Ruled (2026-10-02), after three prototypes on one 14-directory WPT
+  reftest run:* L (Livery-only per-line shift, no Parley patch) and C (a
+  Parley alignment-width seam) each fix `text-align-end-015`, `-017` and
+  `text-align-start-014` with no regressions; B (Parley inline boxes honour
+  no-wrap) regresses `line-breaking-031`/`-032` and cannot be right without
+  changing Parley's public `InlineBox`. Mark chose "L, if we can address the
+  gaps later. if not, C"; L's gaps (a pre-existing break inside a no-wrap
+  span at an inline box, and no-wrap `justify-all`) are both inside Stage 1's
+  scope, so L lands. On the path to conformance, "Plan Stage 1 now": a Genet
+  plan doc for a Livery-owned line breaker over Parley's shaped clusters,
+  Parley used as a library as taffy is, gated on that WPT set. The
+  alternatives were patching case by case, or upstream first.
 - *Reading, not ruled:* the remote scenarios follow the panel lane's
   precedent of tree copies (`p4_tree_*`) with the originals kept for the old
   page, and the physics panel stays operable during a remote session, since
@@ -817,3 +846,59 @@ this tree.
     the new `p4_tree_tools_narrow` (700 px window) pass, all inspected
     whole-frame. The mirror lists button "Graph tools" (`aria-expanded`
     false) and the "Storage" status.
+- 2026-10-01: the remote-session slice (`tree-remote-session`, from
+  `f7c5873c`, with main `f4e4726c` merged) carries out the remote-session
+  rulings.
+  - The op sequencing lives in `graphshell_client::remote`, and the old
+    page delegates to it. The WebRTC transport is shared by both pages.
+    Pictograph draws the board as a `BoardScene`. The tree's one canvas leaf
+    paints it with 24 px margins while "Remote mount" is pressed.
+  - Graph tools gains a "Remote session" section: the switch, the
+    active-session line, one described button per intent, the draft form,
+    the link's Disconnect, Reconnect and Nudge host, and the action status.
+  - Cambium's web-host mirror now writes `aria-description`, which it had
+    dropped.
+  - Native gates pass: graphshell-client 59, the merge gate 262. The wasm
+    build passes.
+  - Headed, the old page passes the three originals unchanged. The tree
+    copies pass on the fixture route and on `app=local`, and a positive
+    control fails.
+  - Two forks are open. On `app=local` at 1400 by 900 the region overflows
+    the window, clipping the Link group and the action status. The live
+    fixture has no intent with inputs, so the draft form is untested headed.
+  - The [controls receipt](../testing/2026-09-27_graphshell_controls_physics_receipt.md)
+    records the evidence.
+- 2026-10-02: the overflow, draft-proof and card-label rulings
+  (`bbc89994`) are carried out on `tree-remote-session`.
+  - Graph tools sections are Cambium disclosures in a region that scrolls.
+    Cambium's closed panels now also carry `display: none`, because Genet's
+    UA sheet has no `[hidden]` rule.
+  - `LiveEndpoint` has a bounded "Append a coloured card". An incomplete
+    draft is refused locally rather than failing the session.
+  - Pictograph paints card titles in the page's font. The section lists
+    them, and the tree's board frames the cards' edges. The old page keeps
+    its framing.
+  - Gates pass: the merge gate 263, Cambium 244, pictograph 269. The wasm
+    build passes.
+  - Headed, `p4_tree_remote_draft` and the three tree copies pass on both
+    routes. The old page's three originals pass with the third action.
+  - Open as a fork: one mirror node per board card. Cambium's leaf
+    semantics have no children.
+  - The [controls receipt](../testing/2026-09-27_graphshell_controls_physics_receipt.md)
+    records the evidence.
+- 2026-10-02: the per-card mirror and collapsed-remote rulings
+  (`7248e74d`) are carried out on `tree-remote-session`.
+  - `TextureProducer::semantics` lets a producer name its slot and the
+    things drawn in it. Both the web mirror and the winit a11y host write
+    them, and `Accessibility::sync` takes the producer registry.
+  - The board's slot is list "Remote board · N cards", with one named item
+    per card at its painted rectangle. Mirror boxes match the captures on
+    both routes.
+  - Remote session starts closed and opens with the link.
+  - Gates pass: Cambium 244, winit host 153, merge gate 263. The wasm build
+    passes.
+  - Headed, the four tree scenarios and the new `p4_tree_remote_absent`
+    pass on both routes, and the old page's three pass. A positive control
+    fails.
+  - The [controls receipt](../testing/2026-09-27_graphshell_controls_physics_receipt.md)
+    records the evidence.

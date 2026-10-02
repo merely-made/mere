@@ -685,6 +685,12 @@ contract declared in advance.
       the "Isometric game engine architecture" session told first; it was
       mid-round (rulings 457 to 466 that night), so the carry waits on its
       reply to avoid a numbering collision.
+    *Carried (2026-10-02):* the engine rulings are wing record rulings 471
+    to 476 (isometry `36f6f69`), and the ECS, ruled the same day, is 481 to
+    484 (isometry `b4a0387`): hecs stays; the mode host and armillary
+    schedule, the ECS is storage; the projection's diff comes from the
+    record's receipts; a boundary crate in Mere holds the ECS. The wing
+    record is their authority.
   - **The logged token.** Four build logs captured this session's
     environment, including its messaging token and account IDs; redacted on
     Mark's choice.

@@ -363,6 +363,71 @@ other role and the CPU scan as the fallback.
   at 2,000, 10,000 and 50,000 nodes on both hosts, and bring Mark the numbers
   for "resident above a threshold" or "resident by default where a device
   exists".
+*P5 rulings, 2026-10-02* (after P5a's tiled kernel, `438187cb` on
+`gpu-repulsion`, matched the CPU law to 2.9e-6 at 1k and 1.2e-5 at 10k and
+ran 1.58 ms against 212 ms at 10k):
+- **Staleness.** A browser readback resolves only between JS turns, and the
+  web tree runs up to three physics steps a frame, so the literal one-step
+  rule would put about one step in three on the GPU. Mark chose "Newest
+  result for up to N steps": the newest completed result applies for up to N
+  steps (configurable; 1 native, 3 web), the CPU scan only past N. This
+  amends the one-step lag above. The alternatives were the literal rule, the
+  lag counted in frames, or one step per frame while the GPU is on.
+- **The seam.** "LaggedRepulsion trait beside the closure": submit/poll,
+  the Simulation holding either, `ForceContext`'s solver and threshold
+  becoming one `repulsion` field, `Force` unchanged, `NodeExclusion` checking
+  body order and applying the staleness rule, in a seiche `gpu` feature. The
+  alternatives were the lane inside `NodeExclusion`, or a general deferred
+  force.
+- **The cell list.** Mark chose "Port GPU binning now" against the
+  recommendation (CPU binning for the lagged mode, GPU binning only for the
+  resident mode): Nexus's count/scan/scatter binning is ported now, with a
+  `LICENSES.md` entry. The alternatives were that split, or deferring.
+- **The device.** "Setters with a shared PhysicsDevice":
+  `Canvas`/`PhysicsBoard::set_physics_device` take a cheap clone the host
+  builds once from its `WgpuHandles`; a `PhysicsCommand` delivers it to
+  offloaded physics. The alternatives were setters taking `&WgpuHandles`
+  (one CubeCL server per canvas), or a constructor argument.
+- **Feature gating.** "mere `canvas-gpu` feature": `mere` gains `canvas-gpu`,
+  chaining to pictograph `gpu`, seiche `gpu` and `conatus[resident]`, opt-in
+  per consumer. The alternatives were graphshell-web naming pictograph
+  directly, or GPU on by default under `canvas`.
+- **Threshold.** "Node count per host, measured": configurable per host,
+  each host's default its measured lagged-mode crossover, 0 meaning always
+  GPU. The alternatives were a pair-count or density threshold, or
+  calibration at install.
+
+*Open, 2026-10-02: more than one layout at once.* Mark asked: "consider the
+situation where more than one physics layout is active... for example, a
+barnes hut layout but then burn tensors determining semantic grouping and
+expressing that with physics too." Today a Canvas composes one law plus
+overlays, with separate coupling, affinity (an `AffinitySpring` from
+scores, `strategy.rs:534-616`) and anchor slots. An assessment of the
+composition space (weighted, partitioned, multi-integrator and sequenced
+laws; Burn-computed semantic grouping as force) comes back to him before
+P6's composition fork (pure Density or Density with edges) is put.
+
+*P6a rulings, 2026-10-02* (after `3e477143` on `density-cpu`: the CPU tier
+with re-splat flow, walls, Voronoi area share; a 12-node sample at Spearman
+0.83 to 0.88, Springs 0.07, the gradient fault failing every receipt):
+- **The field.** Mark chose "Gastner–Newman evolving field", against the
+  recommendation (re-splat every tick, a live law reacting to drags, which
+  plateaued near 0.82 with degree mass): splat once, diffuse, nodes ride the
+  evolving field, made stable for point masses by adaptive substeps (the
+  prototype gave 78 to 1,153 overlaps and rank at most 0.55 at frame-rate
+  steps). *Reading, not ruled:* how a drag or an added node re-enters the
+  field returns as a fork if the lane finds more than one way.
+- **Boundary.** "Walls": a box sized to the target area. The alternative
+  was a sea following the graph (0.32 against 0.77).
+- **Area share.** "Raster Voronoi, bbox + margin", positions only, readable
+  for any law. The alternatives were clipping to Density's walls, or a
+  smoothed volume.
+- **The bar.** "Bar on degree mass, PageRank recorded": the receipt asserts
+  Spearman ≥ 0.8 with degree mass; PageRank's figure is recorded. The
+  alternatives were 0.8 for both, or a lower PageRank bar.
+Open: the settle budget and defaults (they move with the field choice), and
+the composition with edges (waiting on the composition assessment).
+
 *Done when:* GPU and CPU forces agree to 1e-3 relative at 1k and 10k nodes;
 a sign-flipped kernel fails the overlap check (positive control); a forced
 adapter failure falls back and still passes; the eleven law receipts stay

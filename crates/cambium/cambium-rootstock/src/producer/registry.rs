@@ -88,6 +88,11 @@ impl ProducerRegistry {
         true
     }
 
+    /// The registered producer's description of its slot, if it gives one.
+    pub fn semantics(&mut self, key: u64) -> Option<ProducerSemantics> {
+        self.entries.get_mut(&key)?.producer.semantics()
+    }
+
     pub fn error(&self, key: u64) -> Option<ProducerError> {
         self.entries.get(&key)?.error
     }
