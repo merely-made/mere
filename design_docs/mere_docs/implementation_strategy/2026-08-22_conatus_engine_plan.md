@@ -670,6 +670,21 @@ contract declared in advance.
       L7 or eponym breaks; put back to Mark.
     These are games-wing decisions; their canonical home is the wing design
     record in `isometry/mesocosm`, where they have not yet been carried.
+    Further, the same day:
+    - **Archive timing:** "L7 first, then archive": eponym-client's Tenant
+      and lighting move off renderling, its two probes are archived and the
+      patch rows dropped, then both forks move to `archive/`. This resolves
+      the reading above.
+    - **ECS:** "Not bevy, but can we compare the potential of the other
+      two?": hecs and shipyard are being compared; open.
+    - **2D:** "vello for documents, kiss3d 2D for lit games": kiss3d's 2D
+      only behind the scene contract for a lit 2D game. The alternative was
+      vello only.
+    - **Where they live:** "You can do 1, but let the wing session know":
+      they are carried into the wing design record as numbered rulings, with
+      the "Isometric game engine architecture" session told first; it was
+      mid-round (rulings 457 to 466 that night), so the carry waits on its
+      reply to avoid a numbering collision.
   - **The logged token.** Four build logs captured this session's
     environment, including its messaging token and account IDs; redacted on
     Mark's choice.
