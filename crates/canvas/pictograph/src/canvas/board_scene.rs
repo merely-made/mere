@@ -142,6 +142,10 @@ pub struct BoardFit {
     pub right: f32,
     pub top: f32,
     pub bottom: f32,
+    /// Frame the cards' edges ([`BoardScene::frame`]), so the margins are
+    /// measured from them; `false` frames the scene's bounds alone, which for
+    /// a scene whose bounds cover card centres lets cards cross the margins.
+    pub frame_edges: bool,
 }
 
 impl BoardFit {
@@ -151,7 +155,14 @@ impl BoardFit {
             right,
             top,
             bottom,
+            frame_edges: true,
         }
+    }
+
+    /// The scene's bounds alone are framed; see [`frame_edges`](Self::frame_edges).
+    pub fn framing_bounds(mut self) -> Self {
+        self.frame_edges = false;
+        self
     }
 
     /// Score units to viewport px for `bounds` in a `width` × `height`
@@ -271,6 +282,10 @@ impl BoardScene {
         BoardRect::new(x0, y0, x1 - x0, y1 - y0)
     }
 
+    fn framed(&self, fit: BoardFit) -> BoardRect {
+        if fit.frame_edges { self.frame() } else { self.bounds }
+    }
+
     /// Each card's body in viewport px, at the board's positions, in card
     /// order: its id, its title and its rectangle. What a host names in its
     /// accessibility tree, and where the titles are painted.
@@ -281,7 +296,7 @@ impl BoardScene {
         height: u32,
         fit: BoardFit,
     ) -> Vec<(String, String, BoardRect)> {
-        let transform = fit.transform(self.frame(), width as f32, height as f32);
+        let transform = fit.transform(self.framed(fit), width as f32, height as f32);
         self.cards
             .iter()
             .map(|card| {
@@ -308,7 +323,7 @@ impl BoardScene {
         if self.cards.is_empty() && self.backdrops.is_empty() {
             return fills;
         }
-        let transform = fit.transform(self.frame(), width as f32, height as f32);
+        let transform = fit.transform(self.framed(fit), width as f32, height as f32);
         let scale = transform.scale;
         for backdrop in &self.backdrops {
             let (x0, y0) = transform.to_viewport((backdrop.rect.x, backdrop.rect.y));
@@ -728,6 +743,10 @@ mod tests {
             "both cards start at the top margin: {rects:?}"
         );
         assert_eq!(rects[1].1, "Card 1");
+        // Framing the bounds alone, as the old page does, the cards cross the
+        // top margin by half their height.
+        let old = scene_desc.card_rects(&PhysicsBoard::new(), 982, 627, fit.framing_bounds());
+        assert!(old.iter().all(|(_, _, rect)| (rect.y - (24.0 - 40.0)).abs() < 0.01), "{old:?}");
     }
 
     #[test]
