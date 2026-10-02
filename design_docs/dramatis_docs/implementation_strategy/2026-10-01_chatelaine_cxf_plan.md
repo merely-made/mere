@@ -3,8 +3,8 @@
 **Date**: 2026-10-01
 **Status (2026-10-01)**: in progress. Shape ruled by Mark on 2026-10-01
 (rulings 7 and 10 to 15 in the dramatis tier architecture; rulings 16 to 42
-below). P0 met; P1 landed on `main` (`da3c50bc`); P2 in progress, then P3;
-the run stops after P3 for Mark's review (ruling 28).
+below). P0 met; P1 landed on `main` (`da3c50bc`); P2 landed (`3e4992ec`);
+P3 next; the run stops after P3 for Mark's review (ruling 28).
 **Scope**: found `chatelaine` as the tier's plain secret-item taxonomy; move
 castellan's OTP items and its Secret Service store onto it; then import
 (and finally export) the FIDO Credential Exchange Format through castellan.
@@ -314,21 +314,21 @@ build.
   - [x] JSON and postcard round-trips for every kind.
 
 - **P2 — castellan's item store on chatelaine; OTP moves.** Done when:
-  - [ ] castellan holds persona-scoped sealed item records whose metadata is
+  - [x] castellan holds persona-scoped sealed item records whose metadata is
         chatelaine's and whose secret payloads, one per credential, never
         appear in a chatelaine type;
-  - [ ] the item store carries its persona scope label and refuses a load
+  - [x] the item store carries its persona scope label and refuses a load
         filed under another persona by name, with a two-persona test
         (ruling 34);
-  - [ ] `OtpItem` and `OtpItemId` are gone; an OTP is an item with one totp
+  - [x] `OtpItem` and `OtpItemId` are gone; an OTP is an item with one totp
         credential, and `OtpReleaseGate` and `OtpAdmittedSession` exercise
         that credential;
-  - [ ] the `castellan/otp/v1` record formats and their legacy reader are
+  - [x] the `castellan/otp/v1` record formats and their legacy reader are
         removed, with no decoder (ruling 20);
-  - [ ] the OTP suite passes unchanged in what it asserts: the RFC 6238 and
+  - [x] the OTP suite passes unchanged in what it asserts: the RFC 6238 and
         4226 vectors, the release gate, the admitted session, HOTP freshness,
         Steam Guard; test edits limited to construction and imports;
-  - [ ] the resident still refuses restored HOTP state and still never
+  - [x] the resident still refuses restored HOTP state and still never
         repeats a counter across independent gates, by its existing tests
         `resident_rejects_restored_hotp_state_before_releasing_it_again` and
         `independent_gates_under_one_resident_cannot_repeat_an_hotp_counter`
@@ -549,6 +549,39 @@ personae's envelope writes plaintext and ciphertext as JSON number arrays,
 so a sealed file is 12.7 to 23 times what it seals (a 1 MiB secret makes a
 ~13.4 MB file), worth knowing for the personae tier, outside this plan.
 Mark ruled its forks as 39 to 42; the lane is implementing.
+
+**2026-10-01, P2 landed.** Built as `23e2b43b` (lane, Opus) and merged onto
+`main` as `3e4992ec` after verification in the normal-depth worktree.
+`castellan::items::ItemStore` keeps one persona's items under
+`castellan/items/v1/<persona>/` as `items/<item>`, `payloads/<credential>`
+and `index` records (ruling 39), each carrying the persona label; an item is
+visible only once indexed; inserts write payloads, metadata, index under the
+per-persona transaction lock, now shared with the Secret Service store;
+`Payload` has no `Debug` and zeroizes on drop; `list` and `get` never open a
+payload; `exercise` refuses a non-vault item and advances an HOTP counter
+through one `update_record` on the payload. OTP is items holding one `Otp`
+credential, exposed to hosts as `OtpCredential` (item plus credential id);
+the gate is credential-addressed (ruling 40); `castellan/otp/v1` and its
+legacy reader are gone with no decoder (ruling 20). Verified:
+
+- castellan 89 unit tests with every feature (82 before, 7 new), 3 + 4
+  integration and the doctest; 66 with default features; chatelaine 53;
+- castellan's test names on `main` and merged compared by listing: nothing
+  removed, the 7 additions only (the doctest moved from line 24 to 27);
+- clippy 122 warnings, the same as before, none in a touched file;
+- signalman's separate workspace checks; the portable gate passes;
+- the lane's four controls each failed only their target: the persona check
+  made always-true, the freshness ledger bypassed, the index written before
+  the payloads, and metadata reads opening payloads.
+
+The lane's choices, *reading, not ruled*: the names `OtpCredential`,
+`OtpReleaseRequest.credential` and `OtpCodeTile::credential()`; `ItemStore`
+public for reads and delete, with `insert` and `exercise` crate-private;
+`get` also requires the item to be indexed; a delete removes the index entry,
+then payloads, then metadata, so an interrupted delete leaves only an
+invisible orphan. Carried to P3: `get` and `exercise` load the whole index on
+every call, which at `SecretServiceLimits` scale (32 collections of 4,096
+items, an index of about 5 MB) a D-Bus property read would repeat.
 
 ## 6. Running it
 
