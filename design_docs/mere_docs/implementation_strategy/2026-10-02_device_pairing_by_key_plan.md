@@ -2,9 +2,9 @@
 
 **Date**: 2026-10-02
 **Status (2026-10-02)**: in progress. Assessed and ruled by Mark on 2026-10-01
-and 2026-10-02 (rulings 1 to 21 below). D1 landed (`4963b489`), proven
-locally; D1b's cause is found, its mere fix (M1) in progress and its fork fix (F1)
-being merged onto upstream p2panda; then D2.
+and 2026-10-02 (rulings 1 to 25 below). D1 landed (`4963b489`); D1b's mere fix (M1)
+landed (`177b927c`), its fork fix (F1) is merged onto upstream p2panda in
+scratch awaiting the repin, and `connected` is being fixed; then D2.
 **Scope**: Mark's machines find, reach and trust each other by device
 identity, not by address: the stack's own peers already do on one network;
 SSH, the path Mark uses daily, does not. Pairing a device becomes one
@@ -219,6 +219,30 @@ pushing the fork stay Mark's.
 **Ruling 21.** *Offer the fix to p2panda upstream?* Options: I draft and Mark
 files; not now. Mark: **"Not now"**.
 
+**Ruling 22.** *`connected` can read false on a working link when both sides
+dial at once (the duplicate connection closes and iroh marks the shared
+address inactive for about 5 s while gossip keeps delivering); fix it?*
+Options: count a gossip neighbour as connected; debounce; leave it and make
+the test dial one way. Mark: **"Count a gossip neighbour as connected
+(Recommended)"**.
+
+**Ruling 23.** *The fork merge compiles everywhere except stickleback, where
+upstream renamed `StreamItem` to `LogEntry`; how does the fork lane finish
+its check?* Options: a scratch-only rename; a `StreamItem` alias in the fork;
+leave it to the repin. Mark: **"Scratch-only rename (Recommended)"**.
+
+**Ruling 24.** *Upstream made `p2panda_core::cbor::decode_cbor` lenient
+(`decode_cbor_strict` keeps the old behaviour); mere calls it in about 40
+files.* Options: accept and audit strict sites; keep strict in the fork;
+accept with no audit. Mark: **"Accept, and audit strict sites
+(Recommended)"**. Follows: the repin moves every call that feeds a hash,
+signature, content address or wire validation to `decode_cbor_strict`.
+
+**Ruling 25.** *mere's per-interface mDNS fork (H10's fix for multi-homed
+Windows hosts) has been an unused patch; what now?* Options: bring the fork
+to 0.6.0 with the repin; check upstream first; leave it. Mark: **"Bring the
+fork to 0.6.0, with the repin (Recommended)"**.
+
 Also given in the same conversation (2026-10-01, Mark: "You can edit known
 hosts"): `known_hosts` entries may be updated, which was done for the
 ThinkPad (`.32`) and Q-PC (`.68`, `q-pc.local`), each key added only after
@@ -277,9 +301,9 @@ Mark SSHes into his machines.
   lands now; F1, in the fork, lands with a fork release built on upstream
   p2panda's main (its 54 new commits merged first), tagged and pushed only on
   Mark's word, and nothing goes upstream for now. Done when:
-  - [ ] the cause is shown in the code and reproduced, with the evidence
+  - [x] the cause is shown in the code and reproduced, with the evidence
         recorded in §6;
-  - [ ] two residents on one machine, paired with no ticket and with mDNS
+  - [x] two residents on one machine, paired with no ticket and with mDNS
         their only way to meet, connect, and keep doing so across restarts
         (a control without the fix fails the same run);
   - [ ] the same holds between two real machines, which D2 makes possible.
@@ -412,6 +436,55 @@ unpatched and passes in 0.16 s) gave first contact 2.19 s after spawn; M1
 cleanly to `0a54ab82`. The comment at
 `ports/graphshell/src/native/personal_sync_host.rs:240-243`, which says
 `g5_peer` proved this path, is wrong and is fixed with M1.
+
+**2026-10-02: M1 landed.** Built as `8a8d8fc2` on the reproduction test
+`c73e6082` (lane, Opus); merged onto `main` as `177b927c` after verification
+in the normal-depth worktree. `set_topics` and `add_topics` give a paired
+peer an empty address-book record before tagging it, written through a new
+stickleback `insert_node_info_if_absent` that checks and writes inside one
+muniment transaction, so a record mDNS writes first is kept and one written
+later builds on it. The directory says "not connected (no address known)"
+for a device not yet seen; djinn's warning classifier gives an info line
+when no paired device has an address and keeps the firewall warning for
+when one does and nothing connects. Verified: djinn, `mere-transport`,
+stickleback and graphshell's library tests, the portable gate; D1b's
+ticketless receipt, run again by me, connected on first contact 2.61 s
+after the second resident started and reconnected after each side
+restarted without its hint (2.17 s, 2.30 s); D1's ticketed receipt still
+passes; the lane's control (M1's two calls disabled) found no contact in
+90 s. The installed resident stayed on PID 53336.
+
+**2026-10-02: a flaky `connected`.** The transport test
+`the_peer_directory_separates_a_known_address_from_a_live_path` fails 4 of 30
+runs on `main` without M1 and 5 of 30 with it (my runs; the lane measured 11
+of 80 and 5 of 80), so it predates M1. The lane's instrumentation tied it to
+simultaneous dials: a one-sided copy failed 0 of 80 against 7 of 80. Ruling
+22 is the fix; a lane is on it.
+
+**2026-10-02: the fork merge, in scratch.** In a clone at `C:\t\p2panda-merge`
+(branch `mere-merge-upstream-2026-10-02`), upstream's main merged into the
+fork as `8efae5ff`, with one textual conflict (`sync/log_sync/builder.rs`:
+the fork's `protocol_id` kept beside upstream's hooks) and one semantic one
+(a test's `StreamItem`, renamed upstream to `LogEntry`); no fork patch is
+made redundant. F1 applied unchanged as `d532713f`; its test failed 40 of
+40 on the merged tree without the fix and never at the join with it. The
+fork's suite is flaky on this machine in every tree; repeated interleaved
+runs show no failure attributable to the merge or to F1. Building mere
+against it: one compile error (stickleback's `StreamItem`); iroh, iroh-base
+and iroh-relay move 1.2.0 to 1.3.0 and `iroh-mdns-address-lookup` 0.5.0 to
+0.6.0, one copy each; six manifests and knot pin `=0.7.4`, so the release
+follows the knot-first lockstep. Nothing is tagged or pushed.
+
+**2026-10-02: H10's per-interface mDNS fix has not been in effect.** mere's
+patch for `iroh-mdns-address-lookup` (its fork at 0.4.0, carrying upstream
+PR #7's per-interface multicast sockets) is `[[patch.unused]]` in the lock;
+the live crate is crates.io's 0.5.0, required by `mere-p2panda-net` 0.7.4,
+which has no per-interface sockets. This laptop is multi-homed (its WSL
+adapter address appears in saved hints). Cargo has warned "patch was not
+used" on every build; in chatelaine P1's verification I recorded that
+warning as harmless and lock-wide, which was wrong. Ruling 25 brings the
+fork to 0.6.0 with the repin. The `boa_engine` and `boa_gc` patches are
+reported unused on the same line and were not examined here.
 
 ## 7. Progress
 

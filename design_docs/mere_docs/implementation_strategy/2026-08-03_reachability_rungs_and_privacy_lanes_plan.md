@@ -77,7 +77,11 @@ configures discovery through this type, not the builder.
   in sync through netwatch. The real fix. 0.4.0 joins only the default-route
   interface, so a multi-homed Windows host whose WSL/Hyper-V adapter holds the
   multicast route never hears LAN mDNS. Drop the patch when a release contains
-  it.
+  it. *Corrected 2026-10-02*: the patch is not in effect. `mere-p2panda-net`
+  0.7.4 requires `iroh-mdns-address-lookup` 0.5.0, so the 0.4.0 fork is
+  `[[patch.unused]]` and the live crate has no per-interface sockets; see the
+  [device pairing by key plan](2026-10-02_device_pairing_by_key_plan.md) §6
+  and its ruling 25.
 - `swarm-discovery`, `mere` branch: rebuilds a socket after three consecutive
   send failures. A dead theory (H10 final, `dfe95f3e`). The macOS stall is
   policy, not sockets: an unsigned binary with no responsible GUI app is denied
