@@ -603,6 +603,18 @@ contract declared in advance.
     **committed**, and renderling's build.rs running `cargo +nightly fmt` on
     every host build is **recorded only**. *Reading, not ruled:* the crabslab
     sync merges upstream in, as renderling's did.
+    *Reopened (2026-10-02):* the sync is not mechanical. Upstream's 13
+    commits rewrite craballoc (0.4.0 / crabslab 0.7.0, unreleased), deleting
+    `slab.rs`, `value.rs` and `wgpu_slab.rs`, the files our three wgpu-30
+    commits port; a merge conflicts in five files, three modify/delete.
+    Upstream is on wgpu 26 and spirv-std git `b3eda4df` (still 0.9.0). Both
+    upstream renderling and ours require craballoc 0.3.1 / crabslab 0.6.6 and
+    use the deleted API, so a merged checkout would stop matching their patch
+    and Cargo would silently take crates.io 0.3.1 on wgpu 26. Asked how
+    crabslab should move, Mark said: "Full adoption, or consider what would
+    suit the stack best… how could we make renderling the ideal for us?"
+    Open: an assessment of renderling's role in the stack comes back to him
+    first.
   - **The logged token.** Four build logs captured this session's
     environment, including its messaging token and account IDs; redacted on
     Mark's choice.
