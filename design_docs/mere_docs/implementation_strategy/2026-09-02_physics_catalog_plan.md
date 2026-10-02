@@ -543,7 +543,9 @@ and on treating arrangements and laws as two realizations of one objective
 model, "Yes, as a hypothesis the brief tests" (the alternatives were adopting
 it now, or keeping them separate). The rulings above on currencies, the
 composition tier, meaning as a source, embeddings and snapshots stand as
-inputs to the brief.
+inputs to the brief. *Brief written 2026-10-02:* the
+[dynamics grammar brief](../research/2026-10-02_dynamics_grammar_brief.md)
+(its §11 holds the forks, including a draft rewrite of P7).
 - *P7a, currencies.* Every law declares its currency (force, kinematic,
   resident). The catalog composes forces freely, converts forces into a
   kinematic law's currency (overdamped, v = F/γ, the rule Hold already
