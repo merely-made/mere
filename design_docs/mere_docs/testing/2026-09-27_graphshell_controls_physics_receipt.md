@@ -847,6 +847,79 @@ The receipts' semantic tree, from the browser mirror, lists:
 - group Link;
 - the statuses.
 
+### The board's cards in the mirror, and Remote session closed at start (2026-10-02)
+
+These carry out the rulings at `7248e74d`, merged as `b690a907`. Final
+bundle SHA256 `7d1b4a0e…`; headed log `run-round4.log`.
+
+**Producer semantics** (`52f6a1ec`).
+- `TextureProducer` gains a defaulted `semantics()` returning
+  `ProducerSemantics`: an optional role and name for the slot, and child
+  `ProducerNode`s (role, name, rectangle in the slot's layout pixels).
+- Roles are a small neutral set (list, listitem, group, img,
+  graphics-object) that each host lowers itself.
+- `ProducerRegistry::semantics` reads it by key. `Accessibility::sync` takes
+  the producer registry; its call site and the winit harness follow.
+- The web mirror names the slot from the producer and writes its children
+  as elements placed where they are drawn.
+- The winit a11y host sets the slot's role and name, and appends AccessKit
+  children with bounds offset from the slot.
+- Drawn nodes take ids outside the DOM's range. The graph canvas returns
+  none for now.
+
+**The board** (`9adc4415`). While the board is shown, the canvas producer
+describes its slot as list "Remote board · N cards", with one list item per
+card from `BoardScene::card_rects`. Remote session starts closed and opens
+once when a link is established, or when remote is shown.
+
+**Found headed.** The Browser pane's mirror first named the empty board's
+slot "Graph": the producer's name only replaced the author's when it drew
+children. A producer now always names its slot. A native test covers the
+empty case.
+
+**Gates** (offline, locked, `native-*-r4.log`):
+
+| Gate | Passed |
+| --- | --- |
+| cambium-rootstock | 52 |
+| cambium-winit-a11y, including "a producer's children reach the tree" | 3 |
+| cambium-genet-web-host | 8 |
+| cambium-genet-winit-host | 153 |
+| cambium | 244 |
+| graphshell-client | 59 |
+| graphshell `web` lib | 230 |
+| pictograph `canvas` | 269 |
+| merge gate | 263 |
+| live endpoint plus join loopback | 4 |
+
+The wasm build passes.
+
+**Headed** (1400 by 900; all ok; no page errors):
+
+| Scenario | Fixture route | `app=local` |
+| --- | --- | --- |
+| `p4_tree_remote_draft`, `p4_tree_c4b1_live_board`, `p4_tree_physics_remote_board`, `p4_tree_c4b3_reconnect` | all ok | all ok |
+| `p4_tree_remote_absent` (no link: section closed) | ok | ok |
+| old page `c4b1_live_board`, `physics_remote_board`, `c4b3_reconnect` | all ok, unchanged | — |
+
+- A positive control asserting a "Card 9" in the slot failed, reading
+  `Card 0@431,24,120,80`.
+- On every receipt ending with the board shown, on both routes, the
+  semantic tree lists list "Remote board · N cards" with one named item
+  per card.
+- Each item's mirror box was checked against the capture. All four inner
+  corners are card colour, and just outside the left and top edges is not.
+  Every receipt matches.
+- In `c4b1_appended` the cards are painted at CSS x 361–480 and 501–620,
+  y 119–198. The mirror boxes are [361, 119, 120, 80] and
+  [501, 119, 120, 80].
+- `read_page` in the Browser pane lists list "Remote board · 0 cards" at the
+  canvas slot. The pane cannot join, because its Chromium hides host
+  candidates behind mDNS, so the joined state is verified through the
+  headed receipts.
+- The Genet gaps (`[hidden]`, `text-align`) belong to a separate Genet lane.
+  Cambium's `display: none` and left-aligned titles stay meanwhile.
+
 ## Open gates
 
 - Genet commit `27d20d3fc51ac5fcd2a2db231e035a3e06013ae1` admits safe retained
