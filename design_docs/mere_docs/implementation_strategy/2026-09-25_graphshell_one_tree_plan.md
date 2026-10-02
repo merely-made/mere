@@ -350,6 +350,11 @@ assessment returned:
   plan doc for a Livery-owned line breaker over Parley's shaped clusters,
   Parley used as a library as taffy is, gated on that WPT set. The
   alternatives were patching case by case, or upstream first.
+  *Carried out (2026-10-02), on `genet-repin`:* Genet main is pushed at
+  `bd3e8861b29`. Mere repins every Genet row to it (`7a0950da`), drops
+  Cambium's inline `display: none` (`1182f642`), and centres the board
+  titles with no style change (`de115df8`). §6 has the evidence. The lane
+  neither pushes mere nor merges it to main; "push mere" is still to do.
 - *Reading, not ruled:* the remote scenarios follow the panel lane's
   precedent of tree copies (`p4_tree_*`) with the originals kept for the old
   page, and the physics panel stays operable during a remote session, since
@@ -418,6 +423,18 @@ completed application migration.
     placed span, so text sat at the box's left;
   - a box with `overflow: hidden` around a self-clipping child and a
     positioned sibling blanked the whole frame.
+
+  *Annotation (2026-10-02):* the `text-align` trait was a non-wrapping
+  line. The labels' `.graph-canvas-swatch-label` set `white-space: nowrap`,
+  and Genet `6fca091dc26` fixes that case.
+  - A probe of the label style before `53f625fc` (absolute, 160 px wide,
+    nowrap), left, centre and right, put all three at the box's left edge
+    under Genet `b1eb3af1971`.
+  - Under `bd3e8861b29` the centre label had gaps of 56.1 and 58.3 px, and
+    the right label ended 2.2 px from the right edge.
+  - `text-overflow: ellipsis` was not exercised.
+  - The labels still anchor by edge, as `53f625fc` made them, unchanged
+    here.
 
   A Cambium tree also has no `html` or `body`, so a page's base styles go
   on `:root`.
@@ -900,5 +917,40 @@ this tree.
   - Headed, the four tree scenarios and the new `p4_tree_remote_absent`
     pass on both routes, and the old page's three pass. A positive control
     fails.
+  - The [controls receipt](../testing/2026-09-27_graphshell_controls_physics_receipt.md)
+    records the evidence.
+- 2026-10-02: the "Genet gaps" ruling is carried out on `genet-repin`
+  (from main `f02d9d35`).
+  - **Repin** (`7a0950da`). Every Genet row moves from `b1eb3af1971` to
+    `bd3e8861b29`: 28 in the root manifest and 7 in the standalone web
+    manifest. A whole-tree sweep found no other manifest naming the old
+    SHA; `genet_web_smoke` keeps its documented older pin. Both locks move
+    their Genet entries and nothing else.
+  - Each gate crate's graph resolves one Genet revision. The workspace's
+    second, Genet `34626a6c` through djinn's `knot-editor` `855cb75d` pin,
+    predates this change.
+  - **`[hidden]`** (`1182f642`). Cambium's closed panels carry `hidden`
+    alone again. New rootstock layout tests check that a closed disclosure,
+    accordion panel or tree group has no box. At the old pin they failed
+    without the inline style (18 px boxes), and at the new one they pass.
+  - **Titles** (`de115df8`). No style change was needed. A pictograph test
+    checks titles are centred in their cards; it failed at the old pin with
+    a 6 px left gap.
+  - §2's `text-align` finding was a nowrap case, and `6fca091dc26` fixes
+    it (annotated there).
+  - Gates pass:
+    - Cambium 245, rootstock 55, web host 8, winit host 153;
+    - pictograph `canvas` 270, graphshell `web` 230, graphshell-client 59,
+      and the merge gate 266;
+    - `cargo check --workspace --all-targets`.
+
+    The wasm build passes.
+  - Headed on `tree.html`, five scenarios pass: `p4_tree_physics_springs`,
+    `p4_tree_tools_narrow` (700 px), `p4_tree_remote_absent`, and over the
+    fixture `p4_tree_c4b1_live_board` and `p4_tree_remote_draft`.
+  - The closed-section capture is pixel-identical to the tree-remote lane's.
+    The board captures differ from it only in the title band, and the titles
+    are centred.
+  - Not run: the `app=local` route, and the old page's originals.
   - The [controls receipt](../testing/2026-09-27_graphshell_controls_physics_receipt.md)
     records the evidence.
