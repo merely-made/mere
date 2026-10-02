@@ -6,13 +6,17 @@
 
 //! [Freedesktop Secret Service 0.2] over Castellan's resident sealed storage.
 //!
-//! The portable types and collection store live on every target so their
-//! policy and persistence can be tested without a bus. [`serve`] is the Linux
+//! The portable types, the collection store and the transfer-session table
+//! live on every target so their policy and persistence can be tested without
+//! a bus. The store is a view of the persona's chatelaine items
+//! ([`crate::items::ItemStore`], ruling 17). [`serve`] is the Linux
 //! session-bus adapter. It implements the standard `org.freedesktop.secrets`
 //! object tree and the strongly recommended `plain` transfer session.
 //!
 //! [Freedesktop Secret Service 0.2]: https://specifications.freedesktop.org/secret-service/latest/
 
+#[cfg(any(test, target_os = "linux"))]
+mod sessions;
 mod store;
 
 #[cfg(target_os = "linux")]

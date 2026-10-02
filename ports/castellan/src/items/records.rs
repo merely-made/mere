@@ -18,8 +18,9 @@ use super::{ItemStore, ItemStoreError};
 const RECORD_DIRECTORY: &str = "castellan/items/v1";
 const RECORD_VERSION: u8 = 1;
 
-/// The item ids a persona's store shows, in insertion order. Collections and
-/// aliases are kept for the Secret Service, which fills them.
+/// The item ids a persona's store shows, in insertion order, and its
+/// collections with their members, and their aliases (ruling 46). One sealed
+/// write changes all three, so it is the one commit point.
 #[derive(Serialize, Deserialize)]
 pub(crate) struct StoredIndex {
     pub(crate) version: u8,
@@ -88,12 +89,16 @@ pub(crate) enum Payload {
         secret: Vec<u8>,
         counter: Option<u64>,
     },
+    /// A Secret Service secret's bytes (ruling 50: bytes, as OTP's are).
+    Secret { bytes: Vec<u8> },
 }
 
 impl Drop for Payload {
     fn drop(&mut self) {
-        let Payload::Otp { secret, .. } = self;
-        secret.zeroize();
+        match self {
+            Payload::Otp { secret, .. } => secret.zeroize(),
+            Payload::Secret { bytes } => bytes.zeroize(),
+        }
     }
 }
 
