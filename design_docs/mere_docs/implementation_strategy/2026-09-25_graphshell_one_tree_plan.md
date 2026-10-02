@@ -817,3 +817,59 @@ this tree.
     the new `p4_tree_tools_narrow` (700 px window) pass, all inspected
     whole-frame. The mirror lists button "Graph tools" (`aria-expanded`
     false) and the "Storage" status.
+- 2026-10-01: the remote-session slice (`tree-remote-session`, from
+  `f7c5873c`, with main `f4e4726c` merged) carries out the remote-session
+  rulings.
+  - The op sequencing lives in `graphshell_client::remote`, and the old
+    page delegates to it. The WebRTC transport is shared by both pages.
+    Pictograph draws the board as a `BoardScene`. The tree's one canvas leaf
+    paints it with 24 px margins while "Remote mount" is pressed.
+  - Graph tools gains a "Remote session" section: the switch, the
+    active-session line, one described button per intent, the draft form,
+    the link's Disconnect, Reconnect and Nudge host, and the action status.
+  - Cambium's web-host mirror now writes `aria-description`, which it had
+    dropped.
+  - Native gates pass: graphshell-client 59, the merge gate 262. The wasm
+    build passes.
+  - Headed, the old page passes the three originals unchanged. The tree
+    copies pass on the fixture route and on `app=local`, and a positive
+    control fails.
+  - Two forks are open. On `app=local` at 1400 by 900 the region overflows
+    the window, clipping the Link group and the action status. The live
+    fixture has no intent with inputs, so the draft form is untested headed.
+  - The [controls receipt](../testing/2026-09-27_graphshell_controls_physics_receipt.md)
+    records the evidence.
+- 2026-10-02: the overflow, draft-proof and card-label rulings
+  (`bbc89994`) are carried out on `tree-remote-session`.
+  - Graph tools sections are Cambium disclosures in a region that scrolls.
+    Cambium's closed panels now also carry `display: none`, because Genet's
+    UA sheet has no `[hidden]` rule.
+  - `LiveEndpoint` has a bounded "Append a coloured card". An incomplete
+    draft is refused locally rather than failing the session.
+  - Pictograph paints card titles in the page's font. The section lists
+    them, and the tree's board frames the cards' edges. The old page keeps
+    its framing.
+  - Gates pass: the merge gate 263, Cambium 244, pictograph 269. The wasm
+    build passes.
+  - Headed, `p4_tree_remote_draft` and the three tree copies pass on both
+    routes. The old page's three originals pass with the third action.
+  - Open as a fork: one mirror node per board card. Cambium's leaf
+    semantics have no children.
+  - The [controls receipt](../testing/2026-09-27_graphshell_controls_physics_receipt.md)
+    records the evidence.
+- 2026-10-02: the per-card mirror and collapsed-remote rulings
+  (`7248e74d`) are carried out on `tree-remote-session`.
+  - `TextureProducer::semantics` lets a producer name its slot and the
+    things drawn in it. Both the web mirror and the winit a11y host write
+    them, and `Accessibility::sync` takes the producer registry.
+  - The board's slot is list "Remote board · N cards", with one named item
+    per card at its painted rectangle. Mirror boxes match the captures on
+    both routes.
+  - Remote session starts closed and opens with the link.
+  - Gates pass: Cambium 244, winit host 153, merge gate 263. The wasm build
+    passes.
+  - Headed, the four tree scenarios and the new `p4_tree_remote_absent`
+    pass on both routes, and the old page's three pass. A positive control
+    fails.
+  - The [controls receipt](../testing/2026-09-27_graphshell_controls_physics_receipt.md)
+    records the evidence.
