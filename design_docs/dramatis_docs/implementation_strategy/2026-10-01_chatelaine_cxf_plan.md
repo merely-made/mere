@@ -602,6 +602,17 @@ invisible orphan. Carried to P3: `get` and `exercise` load the whole index on
 every call, which at `SecretServiceLimits` scale (32 collections of 4,096
 items, an index of about 5 MB) a D-Bus property read would repeat.
 
+**2026-10-01, the Linux receipt proven before P3.** On the ThinkPad
+(`thinkpad-l14-f`, Fedora 44, now at `192.168.4.32` and recorded in
+`known_hosts` by matching fingerprints, with Mark's go-ahead), `main` at
+`f7b31b9a` arrived as a git bundle into a separate worktree,
+`~/Code/repos/mere-receipt`, beside the machine's own checkout, which stayed
+on its branch and clean. Under 1.98.1 (installed there by rustup),
+`dbus-run-session -- cargo test -p castellan --features secret-service
+--test secret_service_linux --locked -- --ignored` passed
+`secret_tool_store_lookup_and_clear` (1 test). This is P3's positive control:
+the receipt works on that machine before P3 changes anything.
+
 ## 6. Running it
 
 As ruled (26 to 29), with the workspace's lane rules:
