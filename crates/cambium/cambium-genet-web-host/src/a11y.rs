@@ -315,6 +315,7 @@ impl Accessibility for DomAccessibility {
         dom: &ScriptedDom,
         layout: &OwnedLayout,
         leaves: &mut LeafRegistry<u64>,
+        producers: &mut cambium_rootstock::ProducerRegistry,
         focus: Option<u64>,
         layout_scale: f64,
     ) -> Vec<A11yRequest> {
@@ -329,6 +330,10 @@ impl Accessibility for DomAccessibility {
         let projection = document_projection(dom, layout, focus);
         let plan = mirror::plan(&projection, scale, |id, name| {
             let key = leaf_keys.get(&id)?;
+            // A producer that describes its slot speaks for it.
+            if let Some(semantics) = producers.semantics(*key) {
+                return Some(mirror::LeafSemantics::from_producer(semantics));
+            }
             let leaf = leaves.get_mut(key)?;
             let mut scratch = accesskit::Node::new(accesskit::Role::Unknown);
             if let Some(name) = name {
