@@ -560,6 +560,22 @@ contract declared in advance.
     question: the forks were last synced in August and September, and
     spirv-std 0.10.0 was released on 2026-10-01, so alpha.1 was current
     until that day.
+  - **The sync, carried out and ruled further.** Nexus fast-forwarded to
+    upstream `1cfbd76`; spirv-std now resolves to 0.10.0 and the codegen to
+    0.10.0, and both GPU proofs pass again (`Code/testing/fork-sync/`).
+    rust-gpu's version-gate bug has no upstream fix but is latent (upstream
+    pins nightly-2026-07-03, 1.98). Mark chose "cargo-gpu 0.10.0 from
+    crates.io": the binary comes from the published release, the fork branch
+    stays as the record, and the standalone `crates/cargo-gpu` fork is no
+    longer used. The alternatives were building from tag v0.10.0, rebasing
+    and carrying the patch, or rebasing and filing it upstream. Renderling's
+    one upstream commit (`46bf54c`, manual chapters and a
+    `Stage::tonemapping()` accessor): "Merge upstream in" to
+    `mark-ik/wgpu-30`, keeping our four commits' hashes. Its 26 uncommitted
+    files, rustfmt output from the repo's nightly-only options with one
+    reflowed expression as the only non-comment change: "Commit as a
+    formatting commit" first. The three codegen caches Nexus no longer uses:
+    "Delete after renderling's check".
   - **The logged token.** Four build logs captured this session's
     environment, including its messaging token and account IDs; redacted on
     Mark's choice.
