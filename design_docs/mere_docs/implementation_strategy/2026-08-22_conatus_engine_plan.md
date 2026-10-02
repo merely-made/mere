@@ -541,6 +541,28 @@ contract declared in advance.
   replace the installed 0.1.0 binary, and pin the codegen version are open.
   This proves Nexus kernels execute here; shared buffer ownership with the
   host's device is still unproven.
+  Ruled the same day:
+  - **The fork patch.** Mark chose no patch ("1"), and added: "also make sure
+    we're up to date for, rust-gpu, renderling, and nexus. they develop fast.
+    let's get what we can from their respective upstreams". At that check,
+    nexus was 2 commits behind upstream main (`1cfbd76`), the rust-gpu fork
+    branch 27 behind (`0a9d096f32`, the v0.10.0 release) with our two
+    version-gate commits on top, renderling 1 behind with our four wgpu-30
+    commits plus 26 uncommitted files last touched 2026-09-15, and the
+    standalone cargo-gpu archived upstream (merged into rust-gpu).
+  - **The installed cargo-gpu.** "Replace, after checking renderling": build
+    renderling's shaders with the new cargo-gpu first; replace
+    `~/.cargo/bin/cargo-gpu` 0.1.0 only if they pass.
+  - **The codegen version.** Told the cache held `rustc_codegen_spirv` 0.10.0
+    while Nexus used spirv-std 0.10.0-alpha.1, Mark asked "wait. why aren't
+    we on the most up to date...? sure, 3": move Nexus to the 0.10.0 line
+    (upstream main) rather than pinning the codegen back. The answer to his
+    question: the forks were last synced in August and September, and
+    spirv-std 0.10.0 was released on 2026-10-01, so alpha.1 was current
+    until that day.
+  - **The logged token.** Four build logs captured this session's
+    environment, including its messaging token and account IDs; redacted on
+    Mark's choice.
 
 ## Progress (2026-08-25 resident-position pass)
 
