@@ -13,12 +13,6 @@ use crate::{
     request_focus,
 };
 
-/// What a closed panel carries beside `hidden`. HTML's rendering section
-/// gives `[hidden]` `display: none`, but Genet's Cambium UA sheet has no such
-/// rule, so a panel marked only `hidden` still took up its space; the inline
-/// style removes it from layout on any engine.
-const HIDDEN_STYLE: &str = "display: none";
-
 /// Controlled state for a single disclosure.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct DisclosureState {
@@ -120,7 +114,7 @@ where
         .attr("class", "disclosure-panel")
         .attr("aria-labelledby", trigger_id);
     if !state.expanded {
-        panel = panel.attr("hidden", "true").attr("style", HIDDEN_STYLE);
+        panel = panel.attr("hidden", "true");
     }
     el::<_, State, Action>("div", (control, panel))
         .attr("id", state.id.clone())
@@ -349,7 +343,7 @@ where
                 panel = panel.attr("role", "region");
             }
             if !expanded {
-                panel = panel.attr("hidden", "true").attr("style", HIDDEN_STYLE);
+                panel = panel.attr("hidden", "true");
             }
             let section =
                 el::<_, State, Action>("section", (heading, panel)).attr("class", "accordion-item");
@@ -658,7 +652,7 @@ where
                     .attr("class", "tree-group")
                     .attr("role", "group");
                 if !expanded {
-                    group = group.attr("hidden", "true").attr("style", HIDDEN_STYLE);
+                    group = group.attr("hidden", "true");
                 }
                 group
             });
@@ -831,13 +825,11 @@ mod tests {
         let panel = find_attr(&dom.borrow(), runner.root(), "id", "details-panel")
             .expect("disclosure panel");
         assert_eq!(attr(&dom.borrow(), panel, "hidden"), Some("true"));
-        assert_eq!(attr(&dom.borrow(), panel, "style"), Some(HIDDEN_STYLE));
 
         runner.dispatch_click(trigger, PointerClick::at((4.0, 4.0)));
         assert!(runner.state().expanded);
         assert_eq!(attr(&dom.borrow(), trigger, "aria-expanded"), Some("true"));
         assert_eq!(attr(&dom.borrow(), panel, "hidden"), None);
-        assert_eq!(attr(&dom.borrow(), panel, "style"), None);
 
         runner.set_focus(Some(trigger));
         runner.dispatch_key(KeyEvent::new(Key::Named(NamedKey::Space)));
