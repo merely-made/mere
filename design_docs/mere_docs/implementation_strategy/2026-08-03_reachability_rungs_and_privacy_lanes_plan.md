@@ -107,7 +107,12 @@ device-list accessor is the seam both need first.
 
 **Done when** (met for peer discovery): ticketless connect across two physical
 machines, proven Fedora-to-Windows and Windows-to-Fedora under H10 and
-Q-PC-to-Windows for Knot's K2. Open: macOS as a discoverable peer waits on a
+Q-PC-to-Windows for Knot's K2. *Corrected 2026-10-02*: the H10 receipts dialled
+a known peer id explicitly in a retry loop (`g5_peer --discover`), and K2 ran
+"over an explicit endpoint ticket" (the Knot-in-Graphshell plan, K2 receipt),
+so neither proved first contact through gossip bootstrap, which fails: see
+the [device pairing by key plan](2026-10-02_device_pairing_by_key_plan.md),
+phase D1b. Open: macOS as a discoverable peer waits on a
 signed bundle, and cross-LAN discovery stays convenience coverage by G5's own
 terms.
 
