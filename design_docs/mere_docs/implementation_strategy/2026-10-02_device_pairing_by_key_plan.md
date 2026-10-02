@@ -1,8 +1,9 @@
 # Device Pairing by Key Plan
 
 **Date**: 2026-10-02
-**Status (2026-10-02)**: plan. Assessed and ruled by Mark on 2026-10-01 and
-2026-10-02 (rulings 1 to 13 below). Nothing is built.
+**Status (2026-10-02)**: in progress. Assessed and ruled by Mark on 2026-10-01
+and 2026-10-02 (rulings 1 to 15 below). D1 is being built and proven
+locally; nothing else is built.
 **Scope**: Mark's machines find, reach and trust each other by device
 identity, not by address: the stack's own peers already do on one network;
 SSH, the path Mark uses daily, does not. Pairing a device becomes one
@@ -160,6 +161,21 @@ feature (an administrator step), and D3 and D4 include it.
 plan in mere_docs (Recommended)"**. Follows: this file, linked from the
 reachability and SSH CA plans.
 
+**Ruling 14.** *No machine runs djinn yet, so D1's directory has no paired
+peers to list on real machines. How does D1 proceed?* Options: build D1 now
+and prove it locally; do D2 first. Mark: **"Build D1 now, prove it locally
+(Recommended)"**. Follows: D1 is proven with two djinn instances on one
+machine; its real-machine receipt moves after D2.
+
+**Ruling 15.** *On Windows, moving to djinn retires the legacy
+`graphshell-device-host`, which serves Mark's SSH agent today. How?*
+Options: side by side, then Mark switches; I switch it in D2; leave Windows
+on the legacy host. Mark: **"Side by side, then you switch
+(Recommended)"**. Follows: D2 tests djinn on its own pipe beside the legacy
+host until its agent signs a real SSH login; then Mark runs djinn's
+installer, which retires the legacy task; rolling back re-enables that
+task.
+
 Also given in the same conversation (2026-10-01, Mark: "You can edit known
 hosts"): `known_hosts` entries may be updated, which was done for the
 ThinkPad (`.32`) and Q-PC (`.68`, `q-pc.local`), each key added only after
@@ -197,11 +213,14 @@ Mark SSHes into his machines.
 
 - **D1 — the directory.** A djinn app-door route lists each paired device:
   its node id, label, whether it is connected, its current path and its last
-  hint; a CLI reads it (ruling 11). Done when:
-  - [ ] the output matches the resident's peer directory, and a device whose
-        address moves shows its new path within one poll;
+  hint; a CLI reads it (ruling 11). Proven locally first (ruling 14). Done
+  when:
+  - [ ] with two djinn instances on one machine (separate profiles, paired to
+        each other), the output matches the resident's peer directory, and a
+        peer restarted on a new endpoint shows its new path within one poll;
   - [ ] a stopped peer shows as not connected (a negative control);
-  - [ ] only the owner's processes are admitted to the route.
+  - [ ] only the owner's processes are admitted to the route;
+  - [ ] after D2, the same holds across real machines when a lease moves.
 
 - **D2 — a resident on every machine.** djinn runs as a systemd user unit on
   Fedora and a launchd agent on macOS (ruling 9), beside its existing Windows
@@ -211,7 +230,10 @@ Mark SSHes into his machines.
   - [ ] each of the four machines runs the resident at login, its personal
         sync paired with the others;
   - [ ] the M4's agent is the current one (its agent predates certificates),
-        with Mark's own SSH into each machine unaffected throughout.
+        with Mark's own SSH into each machine unaffected throughout;
+  - [ ] on Windows, djinn runs beside the legacy `graphshell-device-host` on
+        its own pipe until its agent signs a real SSH login, and then Mark
+        switches with djinn's installer (ruling 15).
 
 - **D3 — SSH by key.** `ssh <device>` runs a `ProxyCommand` helper that asks
   the local resident to dial the device's node id on its own ALPN; the
@@ -259,6 +281,16 @@ runs with no service files; firewalld's `FedoraWorkstation` zone opens UDP
 1025-65535, which includes 5353, so its firewall is not the block. Q-PC's
 lease moved too. Both were confirmed by host-key fingerprint before any
 `known_hosts` change.
+
+**2026-10-02: no machine runs djinn.** The Windows laptop's SSH agent is
+served by the legacy `graphshell-device-host.exe` (built 2026-08-16, in
+`AppData\Local\Graphshell\bin`, its log showing the session's signing
+requests), the resident djinn's installer is written to retire
+(`ports/djinn/install-windows.ps1:18`). The ThinkPad, M4 and Q-PC run no
+djinn. A first check reported djinn running on the ThinkPad: `pgrep -f djinn`
+had matched its own command line, which contained the word; `pgrep -a` and
+`systemctl --user` showed nothing. Instruments that match on command lines
+need a control that excludes themselves.
 
 ## 7. Progress
 
