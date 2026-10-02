@@ -852,3 +852,19 @@ this tree.
     semantics have no children.
   - The [controls receipt](../testing/2026-09-27_graphshell_controls_physics_receipt.md)
     records the evidence.
+- 2026-10-02: the per-card mirror and collapsed-remote rulings
+  (`7248e74d`) are carried out on `tree-remote-session`.
+  - `TextureProducer::semantics` lets a producer name its slot and the
+    things drawn in it. Both the web mirror and the winit a11y host write
+    them, and `Accessibility::sync` takes the producer registry.
+  - The board's slot is list "Remote board · N cards", with one named item
+    per card at its painted rectangle. Mirror boxes match the captures on
+    both routes.
+  - Remote session starts closed and opens with the link.
+  - Gates pass: Cambium 244, winit host 153, merge gate 263. The wasm build
+    passes.
+  - Headed, the four tree scenarios and the new `p4_tree_remote_absent`
+    pass on both routes, and the old page's three pass. A positive control
+    fails.
+  - The [controls receipt](../testing/2026-09-27_graphshell_controls_physics_receipt.md)
+    records the evidence.
