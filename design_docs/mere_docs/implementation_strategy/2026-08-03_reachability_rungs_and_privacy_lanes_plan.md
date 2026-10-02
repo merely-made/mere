@@ -113,6 +113,12 @@ terms.
 
 ## R1. Cached dial hints (the workhorse rung)
 
+*Corrected 2026-10-02*: `PairedDevice` now lives in djinn
+(`ports/djinn/src/settings.rs:468`), not Graphshell's `device_sync`. SSH
+does not use these hints; the
+[device pairing by key plan](2026-10-02_device_pairing_by_key_plan.md) is
+this ladder's SSH and pairing rung.
+
 `PairedDevice` gains two optional fields, one schema migration for both since
 the H6 addendum already specs the second:
 
@@ -211,6 +217,12 @@ are stable across restarts, so no receipt yet isolates whether the direct
 address or the relay component carried a dial.
 
 ## R2. Announce-carried dial hints (the sovereign discovery rung)
+
+*Corrected 2026-10-02*: the announce sends no app data now, deliberately:
+the 96-byte binding made an announce 263 bytes, too large for a 255-byte
+LoRa frame, and the signed Retinue identity already carries the Mere key
+(`reticulum_transport/announce.rs:38-51`). Any `EndpointAddr` payload below
+meets that same limit.
 
 The retinue announce already binds authenticated app data (peer id plus
 master-key signature, see `reticulum_transport/announce.rs`). Extend that app
