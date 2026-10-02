@@ -78,6 +78,7 @@ use tokio::io::{AsyncRead, AsyncWrite, ReadBuf};
 use tokio::sync::{Mutex as TokioMutex, mpsc};
 
 use crate::blobs::{BlobHash, BlobPeerAuthorizer, BlobReadAuthorizer, BlobScope, BlobStore};
+use crate::peer_route::{PeerPath, peer_addr};
 use crate::{AcceptedSession, Alpn, IngressContext, PeerID, Transport, TransportError};
 
 /// A bidirectional p2panda-net QUIC stream presented as `AsyncRead + AsyncWrite`.
@@ -1038,6 +1039,33 @@ impl P2pandaTransport {
         addrs.sort_by_key(|addr| format!("{addr:?}"));
         let addr = EndpointAddr::from_parts(id, addrs);
         Ok(Some(EndpointTicket::from(addr).to_string()))
+    }
+
+    /// Every address the endpoint holds for `peer`, each marked active when it
+    /// carries traffic now. Empty when the peer is only a name.
+    ///
+    /// The readable form of [`peer_ticket`](Self::peer_ticket)'s address set,
+    /// plus the one fact a ticket drops: which address is the live path.
+    pub async fn peer_paths(&self, peer: PeerID) -> Result<Vec<PeerPath>, TransportError> {
+        let endpoint = self
+            .endpoint
+            .endpoint()
+            .await
+            .map_err(|e| TransportError::Backend(format!("endpoint: {e}")))?;
+        let id = iroh::PublicKey::from_bytes(&peer.to_bytes())
+            .map_err(|e| TransportError::Backend(format!("peer key: {e}")))?;
+        let Some(info) = endpoint.remote_info(id).await else {
+            return Ok(Vec::new());
+        };
+        let mut paths: Vec<PeerPath> = info
+            .addrs()
+            .map(|addr| PeerPath {
+                addr: peer_addr(addr.addr()),
+                active: matches!(addr.usage(), iroh::endpoint::TransportAddrUsage::Active),
+            })
+            .collect();
+        paths.sort_by(|a, b| a.addr.cmp(&b.addr));
+        Ok(paths)
     }
 
     /// Open a raw iroh `Connection` to a peer for an arbitrary ALPN.
