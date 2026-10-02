@@ -588,6 +588,37 @@ eleven existing receipts stay green.
   pairs under the CPU law) and a spring lattice buckles (1-5); unlinked bodies
   under exclusion and the boundary settle with none, and the sign-flipped
   kernel then leaves 520-544.
+- 2026-10-02 (P5b): with one submission in flight, an answer that takes d
+  steps to arrive is d to 2d-1 steps old while it serves, so N = 3 on the web
+  tree's three-step frames would still put one step in three on the GPU. The
+  lane keeps up to N submissions in flight, answered in order; every web step
+  submits and the first step of a frame gets an answer one step old. Cost: up
+  to N device calls a frame. This is how the ruled "newest result for up to N
+  steps" is met, not a change to it.
+- 2026-10-02 (P5b): CubeCL's poll thread delivers map callbacks late to a
+  caller that sleeps between looks: submit-to-ready was 14 ms at the median
+  (p90 25-27 ms) against 1 ms for a spinning caller. A non-blocking
+  `device.poll(Poll)` on the host's device before each look
+  (`ResidentClient::poll_device`) brings it to the second look, about 2 ms.
+  Without it a 60 Hz loop got 131 of 600 steps on the device at 200 nodes.
+- 2026-10-02 (P5b): dropping a CubeCL read before it finishes releases its
+  staging buffer while mapped, and the next submit that reuses it fails wgpu
+  validation ("Buffer ... is still mapped"). A law switch, a rebuilt
+  simulation or a closed canvas drops in-flight answers, so a dropped
+  `PendingExclusion` is now adopted by its `ResidentClient` and polled to the
+  end. The receipt fails with the adoption disabled.
+- 2026-10-02 (P5b): an unpaced native loop (ticks back to back) outruns the
+  readback even with the poll: 200 of 600 steps on the device at 2,000 nodes
+  before the poll fix. A native actor paces at 60 Hz, so the receipts pace too.
+- 2026-10-02 (P5b): two CPU-only `Simulation`s with the same seed are not
+  bit-identical; `NodeExclusion` sums over `bodies_by_node`, a `HashMap` whose
+  order is per instance, so positions differ in the sixth significant digit.
+  The refused-device receipt compares against the CPU-to-CPU spread.
+- 2026-10-02 (P5b, native, F6): lagged-mode busy time per tick at 60 Hz,
+  CPU law / device lane, in ms: 100 0.06 / 1.04; 200 0.23 / 1.02; 300 0.66 /
+  1.09; 500 1.73 / 1.12; 750 3.74 / 1.98; 1,000 5.67 / 1.39; 2,000 15.2 /
+  3.25; 5,000 66.7 / 3.67; 10,000 191 / 6.76. The device lane has about 1 ms
+  of fixed cost a tick; the crossover on this machine is about 400 nodes.
 - 2026-10-02: a cargo run without `--locked` re-serializes the root lock,
   swapping the order of the two genet revisions' `fleece` and
   `layout-dom-api` rows; the committed lock passes `--locked` as it stands, so
@@ -903,3 +934,25 @@ binning are the useful patterns.
   in ms: 2,000 0.69 / 0.75 / 14.7; 4,096 0.87 / 0.79 / 43.6; 10,000 1.38 /
   0.93 / 159; 50,000 10.5 / 3.9 / 2,302; 100,000 57.7 / 7.5 / not run. So the
   4,096 default is this machine's measured crossover.
+- 2026-10-02 (P5b): the lagged seam landed in seiche. `LaggedRepulsion`
+  (submit / poll / in-flight count) sits beside the synchronous closure;
+  `LaggedLane` holds the bookkeeping (body order and step per submission, the
+  newest answer, the limit N, and `LaggedStats`: device steps, CPU steps,
+  submissions, failures, mismatches); `ForceContext` carries one `repulsion`
+  field and the step clock; `NodeExclusion` uses the lane and runs its CPU law
+  whenever the lane returns nothing. `Simulation::set_lagged_repulsion` and
+  `repulsion_stats`, `PhysicsCommand::SetLaggedRepulsion` and
+  `Physics::set_lagged_repulsion` reach inline and offloaded simulations. The
+  `gpu` feature (`conatus[resident]`) adds `seiche::gpu::PhysicsDevice` (one
+  CubeCL client per host device, cloned; threshold, N and the cell threshold
+  ride on it; shared counters readable across an actor) and
+  `DeviceRepulsion`. Receipts: six seam tests on timed mock evaluators (an
+  answer applies from the next step; N = 1 refuses a three-step-old answer and
+  N = 3 takes it; a refused device stays on the CPU path; failed answers are
+  counted and covered; a changed body set discards its answer; lagged forces
+  reach the bodies and respect the threshold), and three on the device: a
+  2,000-node settle at threshold 0 meets the CPU's bounds (0 overlaps, spread
+  1511.1 against 1511.2, energy within 0.1%) with 591 of 600 steps on the
+  device at 2.86 ms busy a tick against 14.5; the sign-flipped device law
+  leaves 536 overlaps; a device lost after 100 submissions hands every later
+  step to the CPU with the CPU's spread. seiche 96/96 (92 without `actor`).
