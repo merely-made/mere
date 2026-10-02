@@ -642,6 +642,34 @@ contract declared in advance.
     - The R2 receipt: "Re-prove in isometer-render": `isometer-render` binds
       conatus's CubeCL buffers directly, testing whether the copy and the
       second allocator disappear.
+    *Engine-component comparison ruled (2026-10-02).* kiss3d 0.46 (wgpu 30,
+    WGSL, BSD-3) covers renderling's five features (shadow maps, clustered
+    lights, PBR/IBL, glTF animation, skinning with morphs on web) plus SSAO,
+    OIT, transmission and 2D lighting; it takes the host's device but keeps a
+    thread-local `Context` singleton (`kiss3d-0.46.0/src/context/context.rs:12`)
+    and wants a window. Renderling's edge is GPU-driven slab instancing. The
+    wing's terrain is traced and its bodies rasterised, joined by depth (L3).
+    - **Renderer tenant:** "kiss3d, reshaped": an explicit context handle in
+      place of the thread-local, a render-into-caller-targets entry with no
+      window, the tracer's depth as a pre-pass, its shadow atlas and light
+      buffer exported. The alternatives were growing isometer-render with
+      both as donors, re-adopting renderling, or measuring both first.
+    - **Lighting:** "Stack-owned light/environment block": sun and
+      day/night from sim fields, the point-light list and the water field
+      live in the scene contract, read by the tracer and the rasteriser; the
+      renderer exports shadow atlas, light buffer and depth. The alternative
+      let the renderer own lighting.
+    - **Shader lane:** "WGSL/WESL for raster, CubeCL for compute", amending
+      the 2026-08-16 "author in CubeCL, the brick renderer included" line to
+      match what ships (all five wing render shaders are WGSL); rust-gpu stays
+      for Nexus-derived compute. The alternatives were wgsl-rs, or rust-gpu
+      0.10 for raster.
+    - **The renderling fork:** "Archive the fork now". The renderling port to
+      rust-gpu 0.10 and the crabslab sync stop. *Reading, not ruled:* eponym
+      still path-depends on the live checkouts, so the archive move waits on
+      L7 or eponym breaks; put back to Mark.
+    These are games-wing decisions; their canonical home is the wing design
+    record in `isometry/mesocosm`, where they have not yet been carried.
   - **The logged token.** Four build logs captured this session's
     environment, including its messaging token and account IDs; redacted on
     Mark's choice.
