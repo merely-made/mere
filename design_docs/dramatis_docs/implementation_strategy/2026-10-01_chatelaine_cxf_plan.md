@@ -271,6 +271,25 @@ tests reading an item's account read the credential's metadata, with the
 same asserted values.) Options: accept all; name changes. Mark: **"Accept
 all (Recommended)"**.
 
+**Ruling 43.** *P3's D-Bus server is Linux-only and the ThinkPad did not
+answer: build now with a cross-check and run the receipt later, or wait?*
+Mark: **"is the thinkpad not reachable? it's on, open, ready to go afaik"**.
+Follows: he was right. It had moved from `.28` to `192.168.4.32` and does not
+advertise over mDNS, so the earlier probes looked in the wrong place; `.28`
+is now an iOS device (port 62078 open). `.32`'s ED25519 host key matched the
+ThinkPad's recorded `SHA256:9kM6Rp…B7o`, and it is reached with
+`HostKeyAlias=thinkpad-l14-f.local` rather than by editing `known_hosts`.
+
+**Ruling 44.** *Install Rust's Linux target for cross-checks?* Options: yes;
+no. Mark: **"Yes, install it (Recommended)"**. Follows: `x86_64-unknown-linux-gnu`
+is installed for the pinned 1.98.1 toolchain on the Windows box.
+
+**Ruling 45.** *Accept P2's minor choices?* (The names `OtpCredential`,
+`OtpReleaseRequest.credential` and `OtpCodeTile::credential()`; `ItemStore`
+public for reads and delete; `get` requires indexing; delete removes the
+index entry first.) Options: accept all; name changes. Mark: **"Accept all
+(Recommended)"**.
+
 ## 3. Phases
 
 Each phase lands with its own tests and gates and keeps the workspace green.
@@ -610,4 +629,14 @@ As ruled (26 to 29), with the workspace's lane rules:
   waits for Mark.
 - **Linux.** P3's `secret-tool` receipt runs on the Fedora ThinkPad
   (`thinkpad-l14-f`) over SSH under a disposable session bus, with the
-  commit tested and the machine recorded.
+  commit tested and the machine recorded. The commit travels as a git
+  bundle, so an unverified lane branch is never pushed; the ThinkPad's own
+  checkout is restored to its branch afterwards. Lanes iterate on
+  Linux-only code with `cargo check --target x86_64-unknown-linux-gnu`
+  (ruling 44), which is evidence about compiling only, never a receipt.
+  Proven 2026-10-01: `cargo check -p castellan --features secret-service
+  --lib --target x86_64-unknown-linux-gnu` exits 0, and its dep-info lists
+  all four `secret_service/dbus/*.rs` files, which a Windows build never
+  compiles. `--tests` and `--all-features` fail on `ring`'s C build script,
+  reached only through castellan's dev-dependency on gazette (`reqwest`,
+  `rustls`), so tests are compiled on the ThinkPad.
