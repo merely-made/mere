@@ -2,8 +2,9 @@
 
 **Date**: 2026-10-02
 **Status (2026-10-02)**: in progress. Assessed and ruled by Mark on 2026-10-01
-and 2026-10-02 (rulings 1 to 18 below). D1 landed (`4963b489`), proven
-locally; D1b, mDNS-only first contact, is next, then D2.
+and 2026-10-02 (rulings 1 to 21 below). D1 landed (`4963b489`), proven
+locally; D1b's cause is found, its mere fix (M1) in progress and its fork fix (F1)
+being merged onto upstream p2panda; then D2.
 **Scope**: Mark's machines find, reach and trust each other by device
 identity, not by address: the stack's own peers already do on one network;
 SSH, the path Mark uses daily, does not. Pairing a device becomes one
@@ -183,6 +184,14 @@ across two physical machines. What is first contact?* Options: the pairing
 ceremony's ticket, measuring mDNS in D2; fix mDNS-only first contact before
 D2. Mark: **"Fix mDNS-only first contact before D2"**. Follows: phase D1b.
 
+*Amended 2026-10-02*: the question's premise was wrong. August's
+cross-machine receipts never exercised this path: the Fedora and Windows ones
+dialled a known peer id explicitly in a retry loop (`g5_peer --discover`,
+`ports/graphshell/src/bin/g5_peer/connect.rs:167-176`), and Knot's K2 and
+personal sync's first contact carried a ticket. Devices that have never met
+have always needed a ticket on this path, so D1b is a fix, not a regression,
+and the ruling's direction stands.
+
 **Ruling 17.** *Keep D1's names, route `device-directory-v1` and CLI
 `djinn-devices`?* Options: keep them; `paired-devices-v1` and `djinn-peers`.
 Mark: **"Keep device-directory-v1 / djinn-devices (Recommended)"**.
@@ -190,6 +199,25 @@ Mark: **"Keep device-directory-v1 / djinn-devices (Recommended)"**.
 **Ruling 18.** *Which app label may read the directory?* Options: a new
 `djinn` label only; also grant turnstone; reuse `knot-editor` as djinn-site
 does. Mark: **"A new `djinn` label only (Recommended)"**.
+
+**Ruling 19.** *Where does the first-contact fix go?* Options: F1, in the
+p2panda fork (refresh topic watchers when a node's record is written); M1, in
+mere-transport (give a paired peer a bare record before tagging it); both.
+Mark: **"Both"**. Follows: M1 lands now, F1 with the fork release of ruling
+20; M1's side effect (a paired device not yet seen appears with
+`reachable = false`) is accepted with it.
+
+**Ruling 20.** *If the fork is patched, what does the new release build on?*
+Options: the pinned tag `0a54ab82`, released as `mere-p2panda-net-0.7.5`; the
+fork's current main; upstream p2panda's main. Mark: **"Upstream p2panda's
+main"**. Follows: upstream's 54 commits since the fork's last merge
+(2026-09-10 to 2026-09-30: iroh 1.0.3 to 1.3.0, authorisers renamed to
+allow and block lists, a new `SyncHook`, stream orderer changes; 70 files,
+13 in p2panda-net) are merged into the fork first, F1 on top. Tagging and
+pushing the fork stay Mark's.
+
+**Ruling 21.** *Offer the fix to p2panda upstream?* Options: I draft and Mark
+files; not now. Mark: **"Not now"**.
 
 Also given in the same conversation (2026-10-01, Mark: "You can edit known
 hosts"): `known_hosts` entries may be updated, which was done for the
@@ -245,7 +273,10 @@ Mark SSHes into his machines.
   changes, not when a known node gains an address. A fix inside the
   `mark-ik/p2panda` fork (pinned by tag, `mere-p2panda-net-0.7.4`) means a
   new tag and a workspace repin, so where the fix lives comes to Mark first.
-  Done when:
+  *Ruled 2026-10-02* (rulings 19 to 21): both fixes. M1, in mere-transport,
+  lands now; F1, in the fork, lands with a fork release built on upstream
+  p2panda's main (its 54 new commits merged first), tagged and pushed only on
+  Mark's word, and nothing goes upstream for now. Done when:
   - [ ] the cause is shown in the code and reproduced, with the evidence
         recorded in §6;
   - [ ] two residents on one machine, paired with no ticket and with mDNS
@@ -358,6 +389,29 @@ Findings from D1, for D1b and D2:
   receipts (reference host plan, reachability plan R1), so it is most likely
   the installed legacy resident's own sync identity on this laptop
   (*reading, not verified*).
+
+**2026-10-02: D1b's cause, found and checked.** A paired device id is tagged
+onto the gossip overlay (`P2pandaOverlayHost::seed_peers`,
+`crates/murm/transport/src/p2panda_host.rs:103-125`) before the address book
+holds any record for it; topic membership means "has a record and the topic"
+(stickleback's store and upstream's SQLite store alike), so gossip's one-time
+bootstrap query returns nobody and joins with nobody. When mDNS later writes
+the record, the fork's address book never tells the healer: it recomputes
+topic watchers only on topic writes (`p2panda-net/src/address_book/actor.rs:131-145`),
+while `InsertNodeInfo` and `InsertTransportInfo`, where mDNS writes, notify
+only per-node watchers (checked at `0a54ab82`). A ticket works because it
+writes the record before the join. The lane's instrumentation showed each
+side's record arriving by the first poll and the healer's view staying
+empty. It is not single-host: mDNS succeeded on one host, and two machines
+meeting for the first time with no ticket would fail the same way.
+Reproduced by a new ignored test, `ports/djinn/tests/mdns_first_contact_two_instance.rs`
+(no contact in 90 s on the clean tree). Both fixes passed it end to end:
+F1 (about 20 lines in the fork, with a fork test that fails in 10 s
+unpatched and passes in 0.16 s) gave first contact 2.19 s after spawn; M1
+(mere only) 2.25 s; each with a control that fails. The fork patch applies
+cleanly to `0a54ab82`. The comment at
+`ports/graphshell/src/native/personal_sync_host.rs:240-243`, which says
+`g5_peer` proved this path, is wrong and is fixed with M1.
 
 ## 7. Progress
 
