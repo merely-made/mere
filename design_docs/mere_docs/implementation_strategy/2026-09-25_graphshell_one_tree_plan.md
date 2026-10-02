@@ -278,6 +278,26 @@ assessment returned:
   tools" toggle sits at the end of the controls row, and the breakpoint is
   900 px (the 300 px region plus a 600 px minimum canvas). The alternatives
   were a toggle over the canvas, or another breakpoint.
+- **Graph tools overflow** (2026-10-01, after the remote lane's tree slice,
+  `e9d95554`, passed all six headed runs). On `app=local` at 1400×900 the
+  region ran past the window: the Link buttons on the bottom edge, the action
+  status about 25 px below it, an open draft about 160 px more. Mark chose
+  "Both": each section becomes a collapsible Cambium disclosure inside a
+  region that scrolls vertically. The alternatives were scrolling alone, or
+  disclosures alone.
+- **Proving the draft form.** The live fixture's two intents take no input,
+  so the draft form had never run headed. Mark chose "Third bounded intent in
+  the fixture": `LiveEndpoint` gains a bounded intent, a tree draft scenario
+  runs it, and the old page's three remote scenarios are re-run with the
+  third button present. The alternatives were a separate flagged endpoint,
+  or native tests only.
+- **The board's card labels.** The tree's board drew bare rectangles, where
+  the old page names each card ("Job 1 · Card 1") in DOM chrome, and the
+  cards touched the leaf's top edge. Mark chose "Both": pictograph's
+  `BoardScene` paints each card's title, the board projects one named node
+  per card into the accessibility mirror, and the Remote session section
+  lists the titles too; the top margin is fixed. The alternatives were
+  painted titles with mirror names alone, or a list alone.
 - *Reading, not ruled:* the remote scenarios follow the panel lane's
   precedent of tree copies (`p4_tree_*`) with the originals kept for the old
   page, and the physics panel stays operable during a remote session, since
