@@ -507,6 +507,12 @@ impl RemoteSession {
             self.form.status = "Failed · no remote action draft is open".to_string();
             return;
         };
+        // A value the person has not chosen yet is theirs to fix, not the
+        // link's failure: the draft stays open and says what it needs.
+        if let Err(error) = draft.invocation(&target) {
+            self.form.status = format!("Choose required values · {error}");
+            return;
+        }
         let Some(core) = self.driver.core_mut() else {
             self.form.status = "Failed · remote link is not discovered".to_string();
             return;
