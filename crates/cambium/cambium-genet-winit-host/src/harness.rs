@@ -658,7 +658,13 @@ where
         };
         let dom = runner.dom();
         let dom_ref = dom.borrow();
-        cambium_winit_a11y::project_tree(&dom_ref, layout, &mut core.s.leaves, core.s.last_focus)
+        cambium_winit_a11y::project_tree(
+            &dom_ref,
+            layout,
+            &mut core.s.leaves,
+            &mut core.s.producers,
+            core.s.last_focus,
+        )
     }
 
     /// Project this frame's layout into genet's neutral accessibility

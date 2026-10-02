@@ -28,7 +28,8 @@
 
 use std::collections::HashMap;
 
-use accesskit::{Action, ActionData, Affine, NodeId as A11yNodeId, TreeUpdate};
+use accesskit::{Action, ActionData, Affine, NodeId as A11yNodeId, Rect, Role, TreeUpdate};
+use cambium_rootstock::{ProducerRegistry, ProducerRole, ProducerSemantics};
 use genet_scripted_dom::{NodeId, ScriptedDom};
 use genet_winit_host::{AccessKitBridge, BridgeStatus};
 use layout_dom_api::{LayoutDom as _, LocalName, Namespace, NodeKind};
@@ -48,10 +49,11 @@ impl Accessibility for A11yHost {
         dom: &ScriptedDom,
         layout: &cambium_rootstock::OwnedLayout,
         leaves: &mut LeafRegistry<u64>,
+        producers: &mut ProducerRegistry,
         focus: Option<u64>,
         layout_scale: f64,
     ) -> Vec<A11yRequest> {
-        self.sync_inner(dom, layout, leaves, focus, layout_scale)
+        self.sync_inner(dom, layout, leaves, producers, focus, layout_scale)
     }
 }
 
@@ -110,6 +112,7 @@ impl A11yHost {
         dom: &ScriptedDom,
         layout: &cambium_rootstock::OwnedLayout,
         leaves: &mut LeafRegistry<u64>,
+        producers: &mut ProducerRegistry,
         focus: Option<u64>,
         layout_scale: f64,
     ) -> Vec<A11yRequest> {
@@ -117,7 +120,7 @@ impl A11yHost {
             // No window yet: nothing to install against, and no reader to ask.
             return Vec::new();
         };
-        let (mut tree, action_map) = project_tree(dom, layout, leaves, focus);
+        let (mut tree, action_map) = project_tree(dom, layout, leaves, producers, focus);
         self.action_map = action_map;
         scale_tree_to_window(&mut tree, dom, layout_scale);
         let node_count = tree.nodes.len();
@@ -203,6 +206,7 @@ pub fn project_tree(
     dom: &ScriptedDom,
     layout: &cambium_rootstock::OwnedLayout,
     leaves: &mut LeafRegistry<u64>,
+    producers: &mut ProducerRegistry,
     focus: Option<u64>,
 ) -> (TreeUpdate, HashMap<A11yNodeId, NodeId>) {
     let root = dom.document();
@@ -215,6 +219,7 @@ pub fn project_tree(
         &|node| layout.generated_text(dom, node),
     );
     let mut action_map = HashMap::new();
+    let mut produced = Vec::new();
     walk(dom, root, &mut |node| {
         let id = id_of(dom, node);
         action_map.insert(id, node);
@@ -226,6 +231,11 @@ pub fn project_tree(
                 .find(|(candidate, _)| *candidate == id)
         {
             leaf.accessibility(access);
+        }
+        if let Some(key) = custom_leaf_key(dom, node)
+            && let Some(semantics) = producers.semantics(key)
+        {
+            produced.push((id, semantics));
         }
         if dom.attribute(
             node,
@@ -240,7 +250,63 @@ pub fn project_tree(
             access.add_action(Action::SetValue);
         }
     });
+    for (slot, semantics) in produced {
+        add_producer_semantics(&mut tree, slot, semantics);
+    }
     (tree, action_map)
+}
+
+/// Write a producer's own semantics onto its slot's node, and what it draws
+/// as child nodes placed where it draws them.
+fn add_producer_semantics(tree: &mut TreeUpdate, slot: A11yNodeId, semantics: ProducerSemantics) {
+    let Some(index) = tree.nodes.iter().position(|(id, _)| *id == slot) else {
+        return;
+    };
+    let origin = {
+        let access = &mut tree.nodes[index].1;
+        if let Some(role) = semantics.role {
+            access.set_role(accesskit_role(role));
+        }
+        if let Some(name) = semantics.name {
+            access.set_label(name);
+        }
+        access.bounds().map_or((0.0, 0.0), |bounds| (bounds.x0, bounds.y0))
+    };
+    let mut children = Vec::new();
+    for (ordinal, child) in semantics.children.into_iter().enumerate() {
+        let id = produced_node_id(slot, ordinal);
+        let mut access = accesskit::Node::new(accesskit_role(child.role));
+        access.set_label(child.name);
+        let [x, y, width, height] = child.rect.map(f64::from);
+        access.set_bounds(Rect {
+            x0: origin.0 + x,
+            y0: origin.1 + y,
+            x1: origin.0 + x + width,
+            y1: origin.1 + y + height,
+        });
+        children.push((id, access));
+    }
+    let ids: Vec<A11yNodeId> = children.iter().map(|(id, _)| *id).collect();
+    for id in &ids {
+        tree.nodes[index].1.push_child(*id);
+    }
+    tree.nodes.extend(children);
+}
+
+/// A drawn node's id: the slot's id and its ordinal, in a range DOM ids never
+/// reach.
+fn produced_node_id(slot: A11yNodeId, ordinal: usize) -> A11yNodeId {
+    A11yNodeId((1 << 63) | (slot.0 << 20) | (ordinal as u64 & 0xF_FFFF))
+}
+
+fn accesskit_role(role: ProducerRole) -> Role {
+    match role {
+        ProducerRole::List => Role::List,
+        ProducerRole::ListItem => Role::ListItem,
+        ProducerRole::Group => Role::Group,
+        ProducerRole::Image => Role::Image,
+        ProducerRole::GraphicsObject => Role::GraphicsObject,
+    }
 }
 
 /// Stamp the host's layout scale on the tree root.
@@ -337,5 +403,75 @@ mod dpi_tests {
             host.map_request(&request(Some(ActionData::NumericValue(f64::NAN)))),
             None,
         );
+    }
+
+    /// A producer's slot is named by the producer, and each thing it draws
+    /// is a child node placed where it is drawn.
+    #[test]
+    fn a_producers_children_reach_the_tree() {
+        use cambium_rootstock::{
+            ProducedTexture, ProducerContext, ProducerNode, ProducerRegistry, TextureProducer,
+        };
+        struct Board;
+        impl TextureProducer for Board {
+            fn render(&mut self, _: &ProducerContext<'_>) -> Option<ProducedTexture> {
+                None
+            }
+            fn semantics(&mut self) -> Option<ProducerSemantics> {
+                Some(ProducerSemantics {
+                    role: Some(ProducerRole::List),
+                    name: Some("Remote board".into()),
+                    children: vec![
+                        ProducerNode {
+                            role: ProducerRole::ListItem,
+                            name: "Card 0".into(),
+                            rect: [24.0, 24.0, 120.0, 80.0],
+                        },
+                        ProducerNode {
+                            role: ProducerRole::ListItem,
+                            name: "Card 1".into(),
+                            rect: [164.0, 24.0, 120.0, 80.0],
+                        },
+                    ],
+                })
+            }
+        }
+        let slot = A11yNodeId(7);
+        let mut tree = TreeUpdate {
+            nodes: vec![(slot, {
+                let mut node = Node::new(Role::Image);
+                node.set_bounds(Rect {
+                    x0: 10.0,
+                    y0: 100.0,
+                    x1: 1000.0,
+                    y1: 700.0,
+                });
+                node
+            })],
+            tree: Some(Tree::new(slot)),
+            tree_id: TreeId::ROOT,
+            focus: slot,
+        };
+        let mut producers = ProducerRegistry::new();
+        producers.register(1, Board, &[]).unwrap();
+        let semantics = producers.semantics(1).expect("the board describes itself");
+        add_producer_semantics(&mut tree, slot, semantics);
+
+        let (_, board) = tree.nodes.iter().find(|(id, _)| *id == slot).unwrap();
+        assert_eq!(board.role(), Role::List);
+        assert_eq!(board.label(), Some("Remote board"));
+        assert_eq!(board.children().len(), 2);
+        let card = |id: A11yNodeId| tree.nodes.iter().find(|(n, _)| *n == id).unwrap().1.clone();
+        let first = card(board.children()[0]);
+        assert_eq!(first.role(), Role::ListItem);
+        assert_eq!(first.label(), Some("Card 0"));
+        assert_eq!(
+            first.bounds(),
+            Some(Rect { x0: 34.0, y0: 124.0, x1: 154.0, y1: 204.0 }),
+            "placed where it is drawn, from the slot's corner"
+        );
+        assert_eq!(card(board.children()[1]).label(), Some("Card 1"));
+        // A producer without semantics leaves its slot alone.
+        assert_eq!(producers.semantics(2), None);
     }
 }

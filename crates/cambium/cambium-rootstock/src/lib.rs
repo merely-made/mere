@@ -45,8 +45,8 @@ pub use owned_layout::{OwnedLayout, ScrollAlign, ScrollTarget};
 pub mod producer;
 pub use producer::{
     ProducedTexture, ProducerContext, ProducerError, ProducerFrameInfo, ProducerFrameStats,
-    ProducerRegistrationError, ProducerRegistry, ResolvedAppearance, SourceAlpha, SourceEncoding,
-    TextureProducer,
+    ProducerNode, ProducerRegistrationError, ProducerRegistry, ProducerRole, ProducerSemantics,
+    ResolvedAppearance, SourceAlpha, SourceEncoding, TextureProducer,
 };
 
 /// The host's clock.
@@ -255,11 +255,16 @@ pub trait Accessibility {
     /// and is what the projected boxes ride into the platform's physical client
     /// coordinates. It is passed rather than read off a window because the zoom
     /// half of it is the host's, not the window's.
+    ///
+    /// `producers` is asked for each texture-producer slot's own semantics
+    /// ([`TextureProducer::semantics`]), which a host writes under the slot.
+    #[allow(clippy::too_many_arguments)]
     fn sync(
         &mut self,
         dom: &ScriptedDom,
         layout: &OwnedLayout,
         leaves: &mut LeafRegistry<u64>,
+        producers: &mut ProducerRegistry,
         focus: Option<u64>,
         layout_scale: f64,
     ) -> Vec<A11yRequest>;
