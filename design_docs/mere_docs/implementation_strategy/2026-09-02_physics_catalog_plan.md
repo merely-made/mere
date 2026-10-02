@@ -407,6 +407,27 @@ composition space (weighted, partitioned, multi-integrator and sequenced
 laws; Burn-computed semantic grouping as force) comes back to him before
 P6's composition fork (pure Density or Density with edges) is put.
 
+*P6a rulings, 2026-10-02* (after `3e477143` on `density-cpu`: the CPU tier
+with re-splat flow, walls, Voronoi area share; a 12-node sample at Spearman
+0.83 to 0.88, Springs 0.07, the gradient fault failing every receipt):
+- **The field.** Mark chose "Gastner–Newman evolving field", against the
+  recommendation (re-splat every tick, a live law reacting to drags, which
+  plateaued near 0.82 with degree mass): splat once, diffuse, nodes ride the
+  evolving field, made stable for point masses by adaptive substeps (the
+  prototype gave 78 to 1,153 overlaps and rank at most 0.55 at frame-rate
+  steps). *Reading, not ruled:* how a drag or an added node re-enters the
+  field returns as a fork if the lane finds more than one way.
+- **Boundary.** "Walls": a box sized to the target area. The alternative
+  was a sea following the graph (0.32 against 0.77).
+- **Area share.** "Raster Voronoi, bbox + margin", positions only, readable
+  for any law. The alternatives were clipping to Density's walls, or a
+  smoothed volume.
+- **The bar.** "Bar on degree mass, PageRank recorded": the receipt asserts
+  Spearman ≥ 0.8 with degree mass; PageRank's figure is recorded. The
+  alternatives were 0.8 for both, or a lower PageRank bar.
+Open: the settle budget and defaults (they move with the field choice), and
+the composition with edges (waiting on the composition assessment).
+
 *Done when:* GPU and CPU forces agree to 1e-3 relative at 1k and 10k nodes;
 a sign-flipped kernel fails the overlap check (positive control); a forced
 adapter failure falls back and still passes; the eleven law receipts stay
