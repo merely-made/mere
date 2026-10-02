@@ -337,7 +337,9 @@ fields (`data-dragging`, `data-drag-return`, `data-canvas-nodes`).
 `physics_drag` and `physics_add` are green over all eleven laws.
 
 **P5 — repulsion on the host's GPU (proposed 2026-10-01, from §5's rulings
-of the same day; for Mark to reject or amend).** `NodeExclusion` (eight
+of the same day; approved as written by Mark 2026-10-02, with P6: "Approve
+as written" for both; order "P5a–c and P6a in parallel, then P6b"; turnstone
+wired by "the P5 lane, after mere lands").** `NodeExclusion` (eight
 laws) gains a GPU path on the host's own device, with rapier keeping every
 other role and the CPU scan as the fallback.
 - *P5a, the kernel.* `NodeExclusion`'s exact law (inverse square,
