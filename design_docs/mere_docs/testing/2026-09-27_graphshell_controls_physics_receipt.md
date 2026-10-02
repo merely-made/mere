@@ -663,6 +663,111 @@ shows only save feedback, and only after a save.
   (`native-graphshell-web-tools.log`). The wasm build passes
   (`wasm-build-narrow.log`).
 
+### The remote session on the tree (2026-10-01)
+
+Branch `tree-remote-session` in `worktrees/mere-tree-remote`, from main
+`f7c5873c`, with main `f4e4726c` merged in as `fcf74f47`. This carries out
+the plan's §1 remote-session rulings, through the follow-up rulings of
+`f4e4726c` (one leaf whose producer picks the scene; 24 px board margins).
+Logs, receipts and the runner copy's output are under
+`Code/testing/mere/tree-remote/`.
+
+**What moved.**
+- `graphshell_client::remote` holds the op sequencing that was the old
+  page's `BrowserHost`: `RemoteSession` (the op in flight, accept → poll,
+  reject → resnapshot, bells → resume by diff, the disconnect, reconnect
+  and nudge lifecycle) and `ActionForm` (status, count, draft, target). It
+  never sends; the host drains its outbox and its receipt events. The
+  existing `SessionDriver` API is unchanged (`840c63de`).
+- Pictograph gains `canvas::board_scene` (`acc8920c`): `BoardScene`,
+  `BoardCard`, `BoardFootprint` (from sceno's), `BoardBackdrop`, `BoardFit`.
+  It paints the board at the `PhysicsBoard`'s positions; slots are read,
+  never written.
+- `graphshell::remote_board` maps a mounted scene to a `BoardScene` and
+  keeps the board, for both pages. `web_rtc_link.rs` is the WebRTC join,
+  pumps, rejoin and nudge, generic over a `RemoteHost` trait (`02a58aad`).
+- The old page delegates. `web_remote.rs` went from 1152 to 438 lines and
+  `web.rs` from 2117 to 1947. Its board is painted with a 50/50/116/64 fit,
+  the old formula.
+- Cambium's web-host mirror now writes a node's description as
+  `aria-description`. Before, Genet computed it and the mirror dropped it
+  (`78745a40`).
+- The tree's Graph tools region gains a "Remote session" section after
+  Arrangement and physics (`e9d95554`). It holds:
+  - the session switch, two `aria-pressed` buttons, "Local Mere" and
+    "Remote mount";
+  - the active-session line, a status reading "Remote projection · N
+    objects · revision R" or "Local Mere · N objects";
+  - one button per advertised intent, named by its label and described by
+    its explanation;
+  - the draft form for an intent with inputs: one select per field, with
+    "Choose…" unset, then submit and Cancel;
+  - while a link exists, a "Link" group with Disconnect, Reconnect and
+    Nudge host;
+  - the action status.
+- The one canvas leaf's producer paints the board instead of the graph
+  while remote is shown, with even 24 px margins. The local law does not
+  step meanwhile, as on the old page, and its frame clock resets on return.
+- The tree lane busy rule follows "Moving counts only when local is
+  shown": a pending capture, a remote answer in flight (join, request,
+  queued bell, or link step), or local motion while local is shown.
+
+**Native gates.** All offline and locked, target
+`C:/t/cargo-targets/mere/tree-remote`, rerun after the merge (`*-merged.log`):
+- graphshell-client 59, including 13 new tests driving the session against a
+  scripted board endpoint. Dropping the poll after an acceptance or the
+  resnapshot after a refusal fails two of them.
+- Graphshell `--features web --lib` 230; pictograph `--features canvas
+  --lib` 267.
+- The merge gate (`-p pictograph -p cambium-rootstock -p graphshell`) 262.
+- `remote_session_live` drives `RemoteSession` against the real
+  `LiveEndpoint` along the c4b1 and c4b3 path.
+- `cambium-genet-web-host --lib` passes 7, including the description test.
+- The standalone wasm build passes with the existing lock (SHA256
+  `c8cdb567…`), seeded from `tree-physics/web-Cargo.lock`.
+
+**Headed runs.** A runner copy with its own Chrome profile
+(`.tree-remote-browser`) and sink port 8741 uses the host fixture built from
+the branch. The host binds 192.168.4.36 and signals on 8788. Each scenario
+ran in a 1400 by 900 window.
+
+| Scenario | Route | Result |
+| --- | --- | --- |
+| `c4b1_live_board`, `physics_remote_board`, `c4b3_reconnect` | old page, unchanged | all ok |
+| `p4_tree_c4b1_live_board`, `p4_tree_physics_remote_board`, `p4_tree_c4b3_reconnect` | `tree.html?signal=` | all ok |
+| the same three | `tree.html?app=local&signal=` | all ok |
+| positive control (the forbidden intent asserted accepted) | `tree.html?signal=` | fails, as it should |
+
+- The tree copies keep the originals' assertions. `act` and `dom click`
+  became `click role:button <label>`, and `assert dom` became `assert text`.
+- The old page's board geometry matches its 2026-09-02 receipt at the same
+  frame size.
+- On the tree the board draws in the leaf, Charge pushes the pair apart,
+  and the reconnect shows three cards.
+- The positive control read "Rejected · this endpoint advertises the action
+  and refuses it · revision after 1" and revision 1.
+- Each receipt's semantic tree, collected from the browser mirror, lists:
+  - group "Session" with both buttons and their pressed state;
+  - the active-session status;
+  - group "Remote actions" with both intents and their descriptions;
+  - group "Link" with its three buttons;
+  - the action status.
+
+**Open.**
+- On `app=local` at 1400 by 900 the region is taller than the window.
+  The storage line pushes the Link group's buttons against the bottom edge,
+  and the action status falls below it. The scenarios still pass; the
+  captures do not meet "nothing clipped". How the region handles height is
+  returned as a fork.
+- The live fixture advertises no intent with inputs, so the tree's draft
+  form is built but not exercised headed over WebRTC. This is returned as a
+  fork.
+- In the Browser pane, whose Chromium hides host candidates behind mDNS, the
+  join fails as expected ("offer has no usable ICE candidates"). A data
+  channel closure in `webrtc_carrier` then throws "closure invoked
+  recursively or after being dropped". This path predates the slice. The
+  headed Chrome receipts record no page errors.
+
 ## Open gates
 
 - Genet commit `27d20d3fc51ac5fcd2a2db231e035a3e06013ae1` admits safe retained
@@ -688,7 +793,8 @@ shows only save feedback, and only after a save.
   already exceeds a nominal 16.7 ms frame budget; catch-up caps alone cannot
   solve that cost.
 - The local IndexedDB graph and Title/Tags editor have a passing opt-in tree
-  save/reopen receipt. Remote sessions and the other
+  save/reopen receipt. The WebRTC remote session reached the tree on
+  2026-10-01 (section above); the in-process canary and the other
   product panels still belong to the old presenter. Ctrl+wheel modifiers and
   middle-button parity,
   all five public wrappers and their product scenarios remain migration work.

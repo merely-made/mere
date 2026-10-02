@@ -774,3 +774,25 @@ this tree.
     the new `p4_tree_tools_narrow` (700 px window) pass, all inspected
     whole-frame. The mirror lists button "Graph tools" (`aria-expanded`
     false) and the "Storage" status.
+- 2026-10-01: the remote-session slice (`tree-remote-session`, from
+  `f7c5873c`, with main `f4e4726c` merged) carries out the remote-session
+  rulings.
+  - The op sequencing lives in `graphshell_client::remote`, and the old
+    page delegates to it. The WebRTC transport is shared by both pages.
+    Pictograph draws the board as a `BoardScene`. The tree's one canvas leaf
+    paints it with 24 px margins while "Remote mount" is pressed.
+  - Graph tools gains a "Remote session" section: the switch, the
+    active-session line, one described button per intent, the draft form,
+    the link's Disconnect, Reconnect and Nudge host, and the action status.
+  - Cambium's web-host mirror now writes `aria-description`, which it had
+    dropped.
+  - Native gates pass: graphshell-client 59, the merge gate 262. The wasm
+    build passes.
+  - Headed, the old page passes the three originals unchanged. The tree
+    copies pass on the fixture route and on `app=local`, and a positive
+    control fails.
+  - Two forks are open. On `app=local` at 1400 by 900 the region overflows
+    the window, clipping the Link group and the action status. The live
+    fixture has no intent with inputs, so the draft form is untested headed.
+  - The [controls receipt](../testing/2026-09-27_graphshell_controls_physics_receipt.md)
+    records the evidence.
