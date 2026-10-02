@@ -13,27 +13,38 @@
 //! - `items/<item>.json`: the persona label and the chatelaine [`Item`];
 //! - `payloads/<credential>.json`: the persona label, the owning item id and
 //!   the credential's secret;
-//! - `index.json`: the persona label and the item ids, with collections and
-//!   aliases kept for the Secret Service.
+//! - `index.json`: the persona label, the item ids, and the collections with
+//!   their members and aliases (ruling 46: one index, one commit point).
 //!
 //! Listing and metadata reads never open a payload. A new item is written
 //! payloads first, then metadata, then the index, so an interrupted write
 //! leaves only records no read reaches; an item is visible only once indexed.
-//! Deletion runs the other way. Every record carries the persona it was filed
-//! for, and a load refuses one filed for another by name (ruling 34, gaz's
-//! `verify_scope`). Exercising a credential is crate-private: the OTP release
-//! gate is its only caller.
+//! Deletion runs the other way. A payload is replaced copy-on-write: the new
+//! payload under a fresh credential id, then the metadata naming it, then the
+//! old payload's removal (ruling 48), so a replace never tears. Every record
+//! carries the persona it was filed for, and a load refuses one filed for
+//! another by name (ruling 34, gaz's `verify_scope`). Exercising a credential
+//! is crate-private: the OTP release gate and the Secret Service are its
+//! callers.
 
 use std::fmt;
 use std::sync::{Arc, Mutex, MutexGuard};
 
-use chatelaine::{Credential, CredentialId, Item, ItemId, ItemState};
-use personae::{IdentityError, PersonaId, SealedRecordChange, SealedRecordStorage};
+use chatelaine::{CollectionId, Credential, CredentialId, Item, ItemId};
+use personae::{IdentityError, PersonaId, SealedRecordStorage};
 
 mod records;
+mod transaction;
 
 pub(crate) use records::Payload;
-use records::{StoredIndex, StoredItem, StoredPayload};
+#[cfg(any(test, feature = "secret-service"))]
+pub(crate) use records::StoredIndex;
+pub(crate) use transaction::Transaction;
+#[cfg(test)]
+use {
+    chatelaine::ItemState,
+    records::{StoredItem, StoredPayload},
+};
 
 /// Failure while reading, writing or exercising a persona's sealed items.
 #[derive(Debug)]
@@ -58,6 +69,8 @@ pub enum ItemStoreError {
         /// The credential it does not hold.
         credential: CredentialId,
     },
+    /// The collection is not in this persona's index.
+    CollectionNotFound(CollectionId),
     /// The item is quarantined, so it is never exercised (invariant 12).
     Quarantined(ItemId),
     /// Stored records disagree with one another.
@@ -83,6 +96,7 @@ impl fmt::Display for ItemStoreError {
             Self::CredentialNotFound { item, credential } => {
                 write!(f, "item {item} holds no credential {credential}")
             },
+            Self::CollectionNotFound(id) => write!(f, "no collection {id} for this persona"),
             Self::Quarantined(id) => {
                 write!(f, "item {id} is quarantined and cannot be exercised")
             },
@@ -107,8 +121,8 @@ impl From<IdentityError> for ItemStoreError {
     }
 }
 
-/// The points between an insertion's writes, where a test may stop it as a
-/// crash would.
+/// The points between a multi-record write's steps, where a test may stop it
+/// as a crash would: after the payloads, and after the metadata.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum WriteStep {
     Payloads,
@@ -156,20 +170,13 @@ impl ItemStore {
 
     /// Every visible item's metadata, in the order stored. No payload is read.
     pub fn list(&self) -> Result<Vec<Item>, ItemStoreError> {
-        let _guard = self.lock();
-        let index = self.load_index()?;
-        index
-            .items
-            .iter()
-            .map(|id| self.require_indexed(*id))
-            .collect()
+        self.begin().list()
     }
 
     /// One item's metadata, or `None` when it is not visible. No payload is
     /// read.
     pub fn get(&self, id: ItemId) -> Result<Option<Item>, ItemStoreError> {
-        let _guard = self.lock();
-        self.get_locked(id)
+        self.begin().get(id)
     }
 
     /// Remove one item and its payloads. Removing an absent item succeeds.
@@ -177,29 +184,7 @@ impl ItemStore {
     /// The index entry goes first, so an interrupted delete leaves only
     /// records no read reaches.
     pub fn delete(&self, id: ItemId) -> Result<(), ItemStoreError> {
-        let _guard = self.lock();
-        self.storage.update_record(
-            self.index_path(),
-            |index: Option<StoredIndex>| -> Result<_, ItemStoreError> {
-                let mut index = self.checked_index(index)?;
-                let before = index.items.len();
-                index.items.retain(|candidate| *candidate != id);
-                let change = if index.items.len() == before {
-                    SealedRecordChange::Keep
-                } else {
-                    SealedRecordChange::Replace(index)
-                };
-                Ok(((), change))
-            },
-        )?;
-        if let Some(item) = self.load_item(id)? {
-            for credential in &item.credentials {
-                self.storage
-                    .delete_record(self.payload_path(credential.id))?;
-            }
-        }
-        self.storage.delete_record(self.item_path(id))?;
-        Ok(())
+        self.begin().delete(id)
     }
 
     /// Seal a new item: payloads, then metadata, then the index entry.
@@ -208,33 +193,9 @@ impl ItemStore {
         item: Item,
         payloads: Vec<(CredentialId, Payload)>,
     ) -> Result<Item, ItemStoreError> {
-        validate(&item, &payloads)?;
-        let _guard = self.lock();
-        if self.load_index()?.items.contains(&item.id) {
-            return Err(ItemStoreError::InvalidItem(
-                "an item with this id is stored",
-            ));
-        }
-        for (credential, payload) in payloads {
-            let record = StoredPayload::new(self.persona, item.id, payload);
-            self.storage
-                .save_record(self.payload_path(credential), &record)?;
-        }
-        self.crash_point(WriteStep::Payloads)?;
-        let record = StoredItem::new(self.persona, item);
-        self.storage
-            .save_record(self.item_path(record.item.id), &record)?;
-        self.crash_point(WriteStep::Metadata)?;
-        let id = record.item.id;
-        self.storage.update_record(
-            self.index_path(),
-            |index: Option<StoredIndex>| -> Result<_, ItemStoreError> {
-                let mut index = self.checked_index(index)?;
-                index.items.push(id);
-                Ok(((), SealedRecordChange::Replace(index)))
-            },
-        )?;
-        Ok(record.item)
+        let transaction = self.begin();
+        let index = transaction.index()?;
+        transaction.insert(&index, item, payloads, |_| Ok(()))
     }
 
     /// Exercise one credential's payload, replacing it when `exercise` says
@@ -252,67 +213,21 @@ impl ItemStore {
     where
         E: From<ItemStoreError> + From<IdentityError>,
     {
-        let _guard = self.lock();
-        let stored = self
-            .get_locked(item)?
+        let transaction = self.begin();
+        let stored = transaction
+            .get(item)?
             .ok_or(ItemStoreError::ItemNotFound(item))?;
-        if stored.state != ItemState::Vault {
-            return Err(ItemStoreError::Quarantined(item).into());
-        }
-        let held = stored
-            .credentials
-            .iter()
-            .find(|candidate| candidate.id == credential)
-            .ok_or(ItemStoreError::CredentialNotFound { item, credential })?;
-        self.storage.update_record(
-            self.payload_path(credential),
-            |record: Option<StoredPayload>| {
-                let mut record = record.ok_or_else(|| {
-                    ItemStoreError::Inconsistent(format!(
-                        "credential {credential} of item {item} has no payload"
-                    ))
-                })?;
-                self.check_payload(item, credential, &record)?;
-                let (result, changed) = exercise(&stored, held, &mut record.payload)?;
-                let change = if changed {
-                    SealedRecordChange::Replace(record)
-                } else {
-                    SealedRecordChange::Keep
-                };
-                Ok((result, change))
-            },
-        )
+        transaction.exercise(&stored, credential, exercise)
     }
 
-    fn get_locked(&self, id: ItemId) -> Result<Option<Item>, ItemStoreError> {
-        if !self.load_index()?.items.contains(&id) {
-            return Ok(None);
-        }
-        self.require_indexed(id).map(Some)
-    }
-
-    fn require_indexed(&self, id: ItemId) -> Result<Item, ItemStoreError> {
-        self.load_item(id)?.ok_or_else(|| {
-            ItemStoreError::Inconsistent(format!("item {id} is indexed but has no record"))
-        })
-    }
-
-    fn load_index(&self) -> Result<StoredIndex, ItemStoreError> {
-        let index = self.storage.load_record(self.index_path())?;
-        self.checked_index(index)
-    }
-
-    fn load_item(&self, id: ItemId) -> Result<Option<Item>, ItemStoreError> {
-        self.storage
-            .load_record(self.item_path(id))?
-            .map(|record| self.checked_item(id, record))
-            .transpose()
-    }
-
-    fn lock(&self) -> MutexGuard<'_, ()> {
-        self.transaction
+    /// Hold this persona's transaction lock until the returned value drops.
+    /// Every read and write of the store runs inside one.
+    pub(crate) fn begin(&self) -> Transaction<'_> {
+        let guard = self
+            .transaction
             .lock()
-            .unwrap_or_else(std::sync::PoisonError::into_inner)
+            .unwrap_or_else(std::sync::PoisonError::into_inner);
+        Transaction::new(self, guard)
     }
 
     #[cfg(test)]
@@ -337,6 +252,11 @@ impl ItemStore {
     }
 }
 
+/// Sixteen random bytes for a new item, credential or collection id.
+pub(crate) fn random_id_bytes() -> [u8; 16] {
+    uuid::Uuid::new_v4().into_bytes()
+}
+
 fn validate(item: &Item, payloads: &[(CredentialId, Payload)]) -> Result<(), ItemStoreError> {
     for (index, (credential, _)) in payloads.iter().enumerate() {
         if !item
@@ -359,6 +279,9 @@ fn validate(item: &Item, payloads: &[(CredentialId, Payload)]) -> Result<(), Ite
     }
     Ok(())
 }
+
+/// The held transaction lock.
+type Guard<'a> = MutexGuard<'a, ()>;
 
 #[cfg(test)]
 mod tests;
