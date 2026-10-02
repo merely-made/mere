@@ -122,6 +122,8 @@ impl Canvas {
         Self {
             graph,
             physics,
+            #[cfg(feature = "gpu")]
+            physics_device: None,
             frame_timestamp: None,
             elapsed_step: None,
             physics_paused: false,
