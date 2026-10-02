@@ -614,6 +614,18 @@ binning are the useful patterns.
 - **The repulsion lag.** Asked whether a one-step force lag is accepted, kept
   synchronous on native, or avoided by keeping the nodes resident, Mark
   asked: "What would rapier do if 3? Elaborate". Open until answered.
+  *Answered and ruled (2026-10-01):* told that under a resident mode rapier
+  stops advancing the nodes, so node–node hard contacts, per-node materials,
+  node joints and two-way scene contact are lost for those laws and drag
+  needs a GPU pin mask, while under the lag rapier keeps all of it and only
+  repulsion arrives one step late, Mark said: "Rapier seems the fallback in
+  any case, so 1 is necessary; i would like to see 2, or 3 if there's some
+  benefit to defaulting to the gpu, in addition to 1". So the one-step lag
+  with rapier keeping its role is built first and is the fallback
+  everywhere; a resident mode follows on top of it, either above a node
+  threshold (2) or as the default where a device exists (3), chosen on
+  measured benefit. *Reading, not ruled:* the 2-or-3 choice returns to Mark
+  with numbers.
 - **A GPU-tier law lane.** Asked whether the catalog's 2D, rapier-only bound
   holds, Mark chose "Add a GPU-tier law lane": a follow-on for laws that only
   make sense at GPU scale, still 2D. The alternatives were keeping the bound,
