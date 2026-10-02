@@ -338,6 +338,18 @@ assessment returned:
   layout over Parley used as a library, with option B (inline boxes
   honouring no-wrap) prototyped, comes back to him. On pushes, once
   text-align lands: "Push Genet main + fix, repin mere, push mere".
+  *Ruled (2026-10-02), after three prototypes on one 14-directory WPT
+  reftest run:* L (Livery-only per-line shift, no Parley patch) and C (a
+  Parley alignment-width seam) each fix `text-align-end-015`, `-017` and
+  `text-align-start-014` with no regressions; B (Parley inline boxes honour
+  no-wrap) regresses `line-breaking-031`/`-032` and cannot be right without
+  changing Parley's public `InlineBox`. Mark chose "L, if we can address the
+  gaps later. if not, C"; L's gaps (a pre-existing break inside a no-wrap
+  span at an inline box, and no-wrap `justify-all`) are both inside Stage 1's
+  scope, so L lands. On the path to conformance, "Plan Stage 1 now": a Genet
+  plan doc for a Livery-owned line breaker over Parley's shaped clusters,
+  Parley used as a library as taffy is, gated on that WPT set. The
+  alternatives were patching case by case, or upstream first.
 - *Reading, not ruled:* the remote scenarios follow the panel lane's
   precedent of tree copies (`p4_tree_*`) with the originals kept for the old
   page, and the physics panel stays operable during a remote session, since

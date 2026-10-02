@@ -388,6 +388,14 @@ ran 1.58 ms against 212 ms at 10k):
   builds once from its `WgpuHandles`; a `PhysicsCommand` delivers it to
   offloaded physics. The alternatives were setters taking `&WgpuHandles`
   (one CubeCL server per canvas), or a constructor argument.
+- **Feature gating.** "mere `canvas-gpu` feature": `mere` gains `canvas-gpu`,
+  chaining to pictograph `gpu`, seiche `gpu` and `conatus[resident]`, opt-in
+  per consumer. The alternatives were graphshell-web naming pictograph
+  directly, or GPU on by default under `canvas`.
+- **Threshold.** "Node count per host, measured": configurable per host,
+  each host's default its measured lagged-mode crossover, 0 meaning always
+  GPU. The alternatives were a pair-count or density threshold, or
+  calibration at install.
 
 *Done when:* GPU and CPU forces agree to 1e-3 relative at 1k and 10k nodes;
 a sign-flipped kernel fails the overlap check (positive control); a forced
