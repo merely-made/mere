@@ -533,6 +533,37 @@ eleven existing receipts stay green.
   other lane (`7f4bb8c7` → `ca47d6ef`, and P1/P1b likewise); the plan's
   earlier hashes name commits that no longer exist on main. Subjects are
   the durable handle.
+- 2026-10-02 (P6a): the canvas settle is a tick budget (`SETTLE_TICKS`,
+  360), not a rest test, so a law that converges slower than six seconds is
+  cut off mid-way unless it is a living law. Density advects by writing
+  translations (FlowAdvect's pattern, and the only one a pin control can
+  fail: rapier ignores `set_linvel` and `add_force` on a kinematic body), so
+  its bodies carry almost no velocity and `physics-energy` does not read its
+  motion.
+- 2026-10-02 (P6a): re-splatting every tick, Density's rest is zero gradient
+  *at the nodes*, not an even field: node j pushes node i with weight `m_j`
+  through the diffusion kernel, so room grows with mass but compressed
+  (logarithmically past one diffusion length), and a mixed-mass rest keeps a
+  density CV near 0.25 where uniform mass reaches 0.05. On the 200-node
+  generated graph the mass/area Spearman plateaus near 0.82 (degree mass)
+  and 0.72 (PageRank) whatever the diffusion length (0.5, 1, 2 spacings),
+  diffusivity (12k to 100k) or Jacobi count (24, 64).
+- 2026-10-02 (P6a): at a fixed diffusion length the 128² grid's `α` in cells²
+  scales as `(128·L/side)²`. On the 12-node sample (side 330, L 96) it is
+  about 1 360, 24 Jacobi sweeps a tick leave the field about a second behind
+  the nodes, and a diffusivity above 12k oscillates (overlaps, rank swinging
+  to −0.6). Working at a coarser level (L ≤ 4 cells) cures the lag and cuts
+  the 200-node step from about 1.6 to 0.3 ms, but drops the sample to an 8²
+  grid where it reads 0.57.
+- 2026-10-02 (P6a): Gastner–Newman's own evolving field (splat once, diffuse,
+  never re-splat) was prototyped beside the re-splat law: for point masses at
+  frame-rate steps it is unstable (78–1 153 overlaps on the generated graphs,
+  rank ≤ 0.55). It stays in the code as `DensityFlow::Gastner` only as a
+  probe option.
+- 2026-10-02 (P6a): no Nexus code is in the CPU tier: cloud-in-cell splat,
+  Jacobi and a central-difference gradient are written from the textbook, so
+  `LICENSES.md` gains nothing. Nexus's gather-style P2G (one thread per grid
+  node over sorted particles) is the pattern for P6b's kernels.
 
 ## 5. Decisions
 
@@ -814,3 +845,39 @@ binning are the useful patterns.
   without the fix and passes with it. The tree drag receipt now passes three
   runs in a row
   ([one-tree plan](2026-09-25_graphshell_one_tree_plan.md) §6).
+- 2026-10-02 (P6a, first round, branch `density-cpu`): the CPU tier and the
+  catalog entry landed; the defaults stop at forks. `seiche/laws/density.rs`
+  holds `Density` (mass per node from the host, state behind a mutex),
+  `DensityGrid` (cloud-in-cell splat, Jacobi sweeps of `(I − α∇²)u = ρ`
+  warm-started from the last field, central-difference gradient sampled with
+  the splat's weights) and the `DensityMedium` trait the GPU tier replaces;
+  every contested choice is a field (`bounds` Walls or Sea, `flow` Resplat or
+  Gastner, diffusion length, diffusivity, area per mass, the grid's working
+  level). The advection skips non-dynamic bodies. Pictograph appends
+  `PhysicsLaw::Density` (`density.gastner-newman`, "Density") to `ALL`, the
+  law catalog and a bare `law.density` profile, reads the mass source
+  (rebuilt on a mass-source change, graph-bound like Orbit), and
+  `LayoutStats` gains `mass_area_rank` (Spearman of mass against discrete
+  Voronoi area) and `density_cv` (CV of mass / area), shown on both
+  Graphshell pages as `layout-mass-area-rank` and `layout-density-cv`.
+  Tests: the Jacobi field matches the cosine-transform solution of the
+  implicit step on a three-mass splat to 1e-4; a lone node feels no flow of
+  its own; a pinned body never leaves its target, and with the skip removed
+  the same test fails (pinned body at (9.6, 10.6) against (30, −20),
+  `Code/testing/mere/density/seiche-density-pin-control.log`). On the
+  12-node sample settled Density reads Spearman 0.83–0.88 and Springs 0.07;
+  uniform mass from a clump reaches density CV 0.079 at 360 ticks and 0.050
+  at 1 800 (n = 200; Springs 0.30); with the gradient term removed all three
+  receipts fail (rank −0.395, −0.241, CV 0.310;
+  `fault-no-gradient.log`), restored after. The 200-node receipt is ignored
+  pending the forks: it reads 0.70 at 900 ticks, 0.77 at 1 800. Open, put to
+  Mark: the field (re-splat or Gastner's evolving field), the boundary (walls
+  or a sea), composition with edge springs, the settle (360 ticks is short of
+  the plateau), the area measure, the defaults and grid level, and whether
+  the 0.8 bar holds for PageRank mass. Not done this round: the wasm build,
+  the headed receipts and the web step cost. Gates (offline, debug):
+  seiche 96/96 default and 92/92 without default features; pictograph
+  `--features canvas --lib` 263 passed, 3 ignored (the probes and the
+  200-node receipt), the source-time clock flake passing on rerun;
+  graphshell `--features web --lib` 228/228. Logs and probe tables in
+  `Code/testing/mere/density/`.
