@@ -436,6 +436,18 @@ in `PhysicsChoice`; Density with `EdgeSpring` read −0.54 against 0.77 alone
   least 0.8. The alternatives were today's `EdgeSpring`, or holding the fork.
 Open: the embedding device and cadence, and whether a per-step semantic
 field exists; then the composition work becomes its own phase.
+- **Embeddings.** "Burn on the host device, off-path": ESP's
+  `bert::load_wgpu` (`provider.rs:544-550`), which boots its own device, is
+  fixed to take the host's; embeddings are computed on content change in an
+  actor or async task; lexical embeddings on the CPU are the fallback and the
+  wasm default until ESP's wasm build is verified. The alternatives were CPU
+  only, or keeping `load_wgpu`'s own device.
+- **No per-step semantic field.** "Snapshots only for now": meaning enters
+  as pairs, groups and kinds snapshots through the existing rebuild path, so
+  the `LaggedRepulsion` seam ruling stands. The alternatives were
+  generalising it to deferred forces, or a second trait when a field law
+  exists.
+The composition work is P7 below.
 
 *P6a rulings, 2026-10-02* (after `3e477143` on `density-cpu`: the CPU tier
 with re-splat flow, walls, Voronoi area share; a 12-node sample at Spearman
@@ -457,6 +469,27 @@ with re-splat flow, walls, Voronoi area share; a 12-node sample at Spearman
   alternatives were 0.8 for both, or a lower PageRank bar.
 Open: the settle budget and defaults (they move with the field choice), and
 the composition with edges (waiting on the composition assessment).
+*Second round, ruled 2026-10-02* (after `746b6902` on `density-cpu`: the
+evolving field with CFL substeps is stable, 0 to 10 overlaps against
+Springs' 38 to 173, but one pass settles at Spearman 0.60 on the 200-node
+graph; repeated passes reach 0.81 at 60 one-second passes and bring uniform
+mass to CV 0.05; at the catalog defaults overlays mixed in silently, Hub
+pull reading −0.33 with 510 overlaps):
+- **Re-entry.** "Repeated passes": each pass re-splats where the nodes are,
+  absorbing drags, contacts and additions, and a structural change still
+  starts a fresh flow. The alternatives were restarting on drag release and
+  structural change, or a local re-splat or field blend.
+- **Settle.** Mark chose "Stop on convergence", against the recommendation
+  (a per-law budget of passes times seconds): passes end when a convergence
+  test says the layout has stopped changing. *Reading, not ruled:* the test
+  and its threshold come from measurement and return to Mark if more than one
+  is defensible. The alternatives were that budget, or never resting.
+- **Defaults.** "64², 1-s passes", blur 0.25: the same ranks as 128² at about
+  a sixteenth of the cost. The alternatives were 128² as planned, or 128²
+  with fewer sweeps.
+- **Overlays on Density.** "Refuse overlays on Density now": the catalog
+  refuses them with a reason until the currency work. The alternatives were
+  dropping them silently, or allowing and marking the mix.
 
 *Done when:* GPU and CPU forces agree to 1e-3 relative at 1k and 10k nodes;
 a sign-flipped kernel fails the overlap check (positive control); a forced
@@ -488,6 +521,69 @@ removing the gradient term fails it too (fault injection); a dragged node
 holds under the GPU tier; n = 1,000 at 512² steps within 16 ms resident on
 this machine; the CPU tier passes at n = 200 and 128² on the web; and the
 eleven existing receipts stay green.
+
+**P7 — composition: several layouts at once (proposed 2026-10-02 from the
+same day's rulings; held the same day, see below).**
+*Held for a dynamics grammar (2026-10-02).* Mark said: "in the way we've
+managed to describe projection grammar, we should probably think about an
+overarching model of physics; combinatorial, algorithmically diverse...
+more thoughts?" Told that the projection grammar's move (factored
+dimensions, a portable artifact, ensure/encourage satisfaction, effectiveness
+knowledge beside the grammar) maps onto physics as terms (interaction
+topology, kernel, state moved), sources as channels, scope as selection,
+combinators (sum, scope, sequence, level-of-detail condition, constraint),
+currencies as the type system, potential against non-conservative terms, and
+observables as receipts, and that this would subsume P7, he ruled: "Research
+brief first, P7 held" (a prior-art shelf with one-line transfers, and every
+current law, overlay and slot decomposed, before P7 is rewritten from it;
+the alternatives were the brief alongside P7a, or extending P7 directly);
+"Its own doc beside projection grammar" for the grammar's plan (the
+alternatives were inside this plan, or inside the projection grammar plan);
+and on treating arrangements and laws as two realizations of one objective
+model, "Yes, as a hypothesis the brief tests" (the alternatives were adopting
+it now, or keeping them separate). The rulings above on currencies, the
+composition tier, meaning as a source, embeddings and snapshots stand as
+inputs to the brief.
+- *P7a, currencies.* Every law declares its currency (force, kinematic,
+  resident). The catalog composes forces freely, converts forces into a
+  kinematic law's currency (overdamped, v = F/γ, the rule Hold already
+  follows), admits into a resident law only forces with resident kernels or
+  the lagged upload, and greys out anything else in both pickers with the
+  reason. `PhysicsChoice` gains the composition fields below and the
+  affinity toggle, so a composition is picked and saved like a law.
+- *P7b, meaning as a source.* A "Meaning" source beside site and cluster:
+  ESP embeddings (Burn on the host device through a fixed `load_wgpu`,
+  lexical on the CPU as fallback and wasm default), computed off-path on
+  content change, yielding top-k pairs (`affinity_pairs_over_index`),
+  cluster assignments and kinds. It feeds the affinity slot (finally
+  wired through `set_content_affinity`), `DomainCluster` groups, Kinds'
+  kinds and P7c's partition.
+- *P7c, grouped laws.* A `Grouped` composition: an outer law over group
+  centroids (seiche's Barnes–Hut is already a pure function over points,
+  `barnes_hut.rs:57`), each centroid's force spread over its members, and an
+  inner law per group under a membership mask. The first instance is the one
+  Mark named: Charge (Barnes–Hut) between meaning clusters, springs within.
+- *P7d, weighted law lists.* `law` becomes a weighted list. First, the
+  laws' strengths are brought to a common scale (each calibrated alone today,
+  e.g. Charge at 6,000), so a weight means the same thing across laws; then
+  mixes are allowed within one currency.
+- *P7e, sequenced blends.* A profile may carry a schedule of compositions,
+  and "capture positions as anchors" freezes one layout as the attractor for
+  the next (the anchor slot already does this for the remote board).
+*Done when:* every law reports its currency and the pickers refuse an
+incompatible mix with its reason (a test per currency pair); a Meaning
+source built from real ESP embeddings on a fixture graph with known topics
+yields clusters whose purity against the topics is recorded, on native GPU
+and on the CPU fallback, and the GPU path shares the host's device (asserted
+single device); the grouped Charge-between, springs-within layout separates
+meaning clusters (between-cluster gap greater than within-cluster spread,
+stated as a ratio) while keeping edge structure inside each cluster (a
+within-cluster stress figure no worse than Springs alone), with Springs
+alone as the negative control and a shuffled-meaning control failing the
+separation; a weighted mix of two force laws at common scale matches each
+pure law at weights 1/0 and 0/1; a sequenced blend reproduces the captured
+anchor layout within a stated tolerance; compositions save and reopen with
+the scene; and the eleven law receipts plus Density's stay green.
 
 ## 4. Findings
 
