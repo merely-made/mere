@@ -363,6 +363,32 @@ other role and the CPU scan as the fallback.
   at 2,000, 10,000 and 50,000 nodes on both hosts, and bring Mark the numbers
   for "resident above a threshold" or "resident by default where a device
   exists".
+*P5 rulings, 2026-10-02* (after P5a's tiled kernel, `438187cb` on
+`gpu-repulsion`, matched the CPU law to 2.9e-6 at 1k and 1.2e-5 at 10k and
+ran 1.58 ms against 212 ms at 10k):
+- **Staleness.** A browser readback resolves only between JS turns, and the
+  web tree runs up to three physics steps a frame, so the literal one-step
+  rule would put about one step in three on the GPU. Mark chose "Newest
+  result for up to N steps": the newest completed result applies for up to N
+  steps (configurable; 1 native, 3 web), the CPU scan only past N. This
+  amends the one-step lag above. The alternatives were the literal rule, the
+  lag counted in frames, or one step per frame while the GPU is on.
+- **The seam.** "LaggedRepulsion trait beside the closure": submit/poll,
+  the Simulation holding either, `ForceContext`'s solver and threshold
+  becoming one `repulsion` field, `Force` unchanged, `NodeExclusion` checking
+  body order and applying the staleness rule, in a seiche `gpu` feature. The
+  alternatives were the lane inside `NodeExclusion`, or a general deferred
+  force.
+- **The cell list.** Mark chose "Port GPU binning now" against the
+  recommendation (CPU binning for the lagged mode, GPU binning only for the
+  resident mode): Nexus's count/scan/scatter binning is ported now, with a
+  `LICENSES.md` entry. The alternatives were that split, or deferring.
+- **The device.** "Setters with a shared PhysicsDevice":
+  `Canvas`/`PhysicsBoard::set_physics_device` take a cheap clone the host
+  builds once from its `WgpuHandles`; a `PhysicsCommand` delivers it to
+  offloaded physics. The alternatives were setters taking `&WgpuHandles`
+  (one CubeCL server per canvas), or a constructor argument.
+
 *Done when:* GPU and CPU forces agree to 1e-3 relative at 1k and 10k nodes;
 a sign-flipped kernel fails the overlap check (positive control); a forced
 adapter failure falls back and still passes; the eleven law receipts stay
