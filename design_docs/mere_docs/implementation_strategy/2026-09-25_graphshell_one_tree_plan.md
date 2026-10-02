@@ -315,7 +315,12 @@ assessment returned:
   `text-align: center` for card titles. Mark chose "Fix in Genet now,
   separate lane": add the UA rule and drop Cambium's workaround, honour
   `text-align` in Livery's standalone layout, and repin mere. The
-  alternative recorded both for later.
+  alternative recorded both for later. Asked what the fix branches from,
+  since mere pins Genet `b1eb3af1`, which lived only on the unmerged
+  `codex/knot-text-paint` (one commit ahead of Genet main `69a2383b`), Mark
+  chose "Land codex/knot-text-paint on main first": verified, it
+  fast-forwards Genet main, and the fix branches from there. The
+  alternatives were branching from the pin, or from the older main.
 - *Reading, not ruled:* the remote scenarios follow the panel lane's
   precedent of tree copies (`p4_tree_*`) with the originals kept for the old
   page, and the physics panel stays operable during a remote session, since
