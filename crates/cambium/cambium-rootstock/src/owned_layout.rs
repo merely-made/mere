@@ -23,6 +23,8 @@ use paint_list_api::{
 mod interaction;
 mod producer;
 #[cfg(test)]
+mod hidden_panel_tests;
+#[cfg(test)]
 mod tests;
 #[cfg(test)]
 mod text_paint_tests;
