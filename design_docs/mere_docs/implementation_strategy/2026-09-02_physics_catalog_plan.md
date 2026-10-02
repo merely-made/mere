@@ -336,6 +336,62 @@ web host gained the three-step gesture verbs (`press-focused`, `move-by`,
 fields (`data-dragging`, `data-drag-return`, `data-canvas-nodes`).
 `physics_drag` and `physics_add` are green over all eleven laws.
 
+**P5 — repulsion on the host's GPU (proposed 2026-10-01, from §5's rulings
+of the same day; for Mark to reject or amend).** `NodeExclusion` (eight
+laws) gains a GPU path on the host's own device, with rapier keeping every
+other role and the CPU scan as the fallback.
+- *P5a, the kernel.* `NodeExclusion`'s exact law (inverse square,
+  `min_distance` floor, `cutoff`) as a CubeCL kernel in `conatus::resident`
+  beside `repulse` (`kernels.rs:47`, which is softened and cutoff-free, so
+  not reused as is): tiled all-pairs below a node threshold, a cell list
+  above it (radix sort and binning ported by hand from Nexus, per the
+  licensing ruling). Built through `ResidentClient::init(WgpuSetup)` from the
+  host's netrender `WgpuHandles`, never a device of its own.
+- *P5b, the seam.* Seiche's `RepulsionSolver` gains a lagged mode: positions
+  submitted at step k, forces applied at step k+1, readback non-blocking on
+  every host. No adapter, a failed submit or a late result falls back to the
+  CPU scan for that step. The synchronous closure stays for tests.
+- *P5c, the hosts.* Pictograph's `Canvas` and `PhysicsBoard` take an optional
+  device; the web tree passes `ProducerContext.core`'s handles, turnstone
+  its own. The actor path installs the solver before offload. The threshold
+  is measured per host (the unrecorded `settle_timing_naive_vs_gpu_solver`
+  bench, `seiche/src/tests.rs:149`), configurable.
+- *P5d, resident mode (after P5a–c).* Measure lagged against resident
+  (integration on the GPU, rapier's contacts, joints and materials dropped)
+  at 2,000, 10,000 and 50,000 nodes on both hosts, and bring Mark the numbers
+  for "resident above a threshold" or "resident by default where a device
+  exists".
+*Done when:* GPU and CPU forces agree to 1e-3 relative at 1k and 10k nodes;
+a sign-flipped kernel fails the overlap check (positive control); a forced
+adapter failure falls back and still passes; the eleven law receipts stay
+green at the default threshold; a 2,000-node settle at threshold 0 passes the
+same energy, overlap and spread bounds as the CPU path on the web tree and in
+turnstone, with the call count proving the GPU ran; physics cost per frame is
+recorded beside the CPU figures; and P5d's numbers are in front of Mark.
+
+**P6 — Density, the first GPU-tier law (proposed 2026-10-01, same
+standing).** `density.gastner-newman`, label "Density": nodes advect along
+`-∇ρ/ρ` of a diffused density grid until area follows mass (the mass source
+is the existing one, PageRank or degree).
+- *P6a, the CPU tier.* `seiche/laws/density.rs`: splat mass onto a grid,
+  Jacobi diffusion, bilinear gradient, advection; 128² by default. Appended
+  to `PhysicsLaw` and the catalogs; visible on every host.
+- *P6b, the GPU tier.* Grid splat, diffusion and gradient kernels in
+  `conatus::resident` (fixed-point atomics or gather for the splat, MPM's
+  particle↔grid transfer ported by hand), and `integrate` (`kernels.rs:177`)
+  gains a kinematic mask so drag pins hold. Nodes run resident under this law
+  (ruled), with readback through P5b's non-blocking path; 512² by default.
+- *P6c, receipts.* `physics_density` on the old page and the tree, native in
+  turnstone, and the GPU tier on both hosts after P5.
+*Done when:* the GPU grid matches the CPU reference field to 1e-3 mean
+relative error; settled area share correlates with mass at Spearman ≥ 0.8
+(a new `LayoutStats` field) and uniform mass gives a low coefficient of
+variation of density; Springs fails that correlation (negative control) and
+removing the gradient term fails it too (fault injection); a dragged node
+holds under the GPU tier; n = 1,000 at 512² steps within 16 ms resident on
+this machine; the CPU tier passes at n = 200 and 128² on the web; and the
+eleven existing receipts stay green.
+
 ## 4. Findings
 
 - 2026-09-02: `BarnesHutRepulsion` has been one `add_force` from live since
