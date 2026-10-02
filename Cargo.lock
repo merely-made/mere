@@ -2610,6 +2610,7 @@ dependencies = [
  "burn-wgpu",
  "bytemuck",
  "cubecl",
+ "euclid",
  "getrandom 0.4.3",
  "nisus",
  "pollster",
