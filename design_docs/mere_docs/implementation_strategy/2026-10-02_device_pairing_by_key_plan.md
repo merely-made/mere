@@ -2,8 +2,8 @@
 
 **Date**: 2026-10-02
 **Status (2026-10-02)**: in progress. Assessed and ruled by Mark on 2026-10-01
-and 2026-10-02 (rulings 1 to 15 below). D1 is being built and proven
-locally; nothing else is built.
+and 2026-10-02 (rulings 1 to 18 below). D1 landed (`4963b489`), proven
+locally; D1b, mDNS-only first contact, is next, then D2.
 **Scope**: Mark's machines find, reach and trust each other by device
 identity, not by address: the stack's own peers already do on one network;
 SSH, the path Mark uses daily, does not. Pairing a device becomes one
@@ -176,6 +176,21 @@ host until its agent signs a real SSH login; then Mark runs djinn's
 installer, which retires the legacy task; rolling back re-enables that
 task.
 
+**Ruling 16.** *Two residents on one machine never made first contact by
+mDNS alone (each learned the other's address and neither dialled; a ticket
+connected them in 3.45 s), while in August mDNS-only first contact worked
+across two physical machines. What is first contact?* Options: the pairing
+ceremony's ticket, measuring mDNS in D2; fix mDNS-only first contact before
+D2. Mark: **"Fix mDNS-only first contact before D2"**. Follows: phase D1b.
+
+**Ruling 17.** *Keep D1's names, route `device-directory-v1` and CLI
+`djinn-devices`?* Options: keep them; `paired-devices-v1` and `djinn-peers`.
+Mark: **"Keep device-directory-v1 / djinn-devices (Recommended)"**.
+
+**Ruling 18.** *Which app label may read the directory?* Options: a new
+`djinn` label only; also grant turnstone; reuse `knot-editor` as djinn-site
+does. Mark: **"A new `djinn` label only (Recommended)"**.
+
 Also given in the same conversation (2026-10-01, Mark: "You can edit known
 hosts"): `known_hosts` entries may be updated, which was done for the
 ThinkPad (`.32`) and Q-PC (`.68`, `q-pc.local`), each key added only after
@@ -215,12 +230,28 @@ Mark SSHes into his machines.
   its node id, label, whether it is connected, its current path and its last
   hint; a CLI reads it (ruling 11). Proven locally first (ruling 14). Done
   when:
-  - [ ] with two djinn instances on one machine (separate profiles, paired to
+  - [x] with two djinn instances on one machine (separate profiles, paired to
         each other), the output matches the resident's peer directory, and a
         peer restarted on a new endpoint shows its new path within one poll;
-  - [ ] a stopped peer shows as not connected (a negative control);
-  - [ ] only the owner's processes are admitted to the route;
+  - [x] a stopped peer shows as not connected (a negative control);
+  - [x] only the owner's processes are admitted to the route;
   - [ ] after D2, the same holds across real machines when a lease moves.
+
+- **D1b — mDNS-only first contact (ruling 16).** Two paired residents that
+  share a network find and connect to each other with no ticket, the way
+  R0's August receipts did across two machines, including two residents on
+  one machine. Diagnosed before it is fixed: the first evidence points at
+  p2panda's gossip healer re-joining only when a topic's set of nodes
+  changes, not when a known node gains an address. A fix inside the
+  `mark-ik/p2panda` fork (pinned by tag, `mere-p2panda-net-0.7.4`) means a
+  new tag and a workspace repin, so where the fix lives comes to Mark first.
+  Done when:
+  - [ ] the cause is shown in the code and reproduced, with the evidence
+        recorded in §6;
+  - [ ] two residents on one machine, paired with no ticket and with mDNS
+        their only way to meet, connect, and keep doing so across restarts
+        (a control without the fix fails the same run);
+  - [ ] the same holds between two real machines, which D2 makes possible.
 
 - **D2 — a resident on every machine.** djinn runs as a systemd user unit on
   Fedora and a launchd agent on macOS (ruling 9), beside its existing Windows
@@ -291,6 +322,42 @@ djinn. A first check reported djinn running on the ThinkPad: `pgrep -f djinn`
 had matched its own command line, which contained the word; `pgrep -a` and
 `systemctl --user` showed nothing. Instruments that match on command lines
 need a control that excludes themselves.
+
+**2026-10-02: D1 landed.** Built as `e15b8fcb` (lane, Opus) and merged onto
+`main` as `4963b489` after verification in the normal-depth worktree. The
+transport gained `peer_paths` (every address the endpoint holds for a peer,
+each marked active or not) and a ticket decoder, so nothing outside it parses
+an iroh ticket; djinn serves `device-directory-v1`, a read-only route listing
+each paired device (node id, label, root, pairing id, time added, connected,
+reachable, current path, the saved hint decoded), granted to the `djinn`
+label only; `djinn-devices [--json]` reads it. Verified: djinn 84 unit tests
+plus its integration targets, `mere-transport` 49, graphshell's library 191,
+the portable gate; and the two-instance live receipt, run again by me
+(temporary profiles and pipes, the installed resident PID 53336 before and
+after): first contact 2.2 s after the second resident started, given a
+ticket; a restarted peer's new path in 56 ms and its saved hint 1.6 s later;
+a stopped peer shown not connected after 73.5 s, the transport's path
+timeout. The lane's refusal test admits the granted label and refuses
+Turnstone, an unknown app and an old protocol hello; its three controls each
+failed their target.
+
+Findings from D1, for D1b and D2:
+
+- **mDNS alone made no first contact between two residents on one machine**:
+  each learned the other's address and neither dialled for 45 s; with a
+  ticket they connected in 3.45 s. Ruling 16 makes this D1b.
+- **Saved hints accumulate**: after a restart a hint holds the old and new
+  ports, and includes the laptop's WSL/Hyper-V adapter address
+  (`172.28.32.1`) and global IPv6 addresses; existing R1 behaviour.
+- **A local djinn cannot share the standard agent pipe** with the installed
+  resident: its listener accepts only `\\.\pipe\openssh-ssh-agent`, so local
+  instances need `--receipt-agent-endpoint`; D2's side-by-side run on
+  Windows (ruling 15) needs the same.
+- **A third node on the LAN**, `9b662f09…`, sends transport info the current
+  p2panda rejects. That id is the supplier in August's personal-sync
+  receipts (reference host plan, reachability plan R1), so it is most likely
+  the installed legacy resident's own sync identity on this laptop
+  (*reading, not verified*).
 
 ## 7. Progress
 
