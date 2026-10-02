@@ -615,6 +615,33 @@ contract declared in advance.
     suit the stack best… how could we make renderling the ideal for us?"
     Open: an assessment of renderling's role in the stack comes back to him
     first.
+    *Assessed and answered (2026-10-02):* renderling is already ruled out by
+    the presentation plan's L7 (`isometry/mesocosm/design_docs/
+    2026-09-11_orthographic_voxel_presentation_plan.md:418-426`, done-condition
+    unmet), ruling 27 keeps the renderer swappable (kiss3d first, renderling
+    "far later"), and ruling 442's recommendation retires it before the mode
+    host; only `eponym-client`'s `Tenant` and two probes use it. Upstream
+    craballoc 0.4 is unadopted by renderling and superseded by crabslab's
+    `feat/wgsl-rs` (crabslab 1.0 / craballoc 0.5, wgpu 28). Mark's answers:
+    - On reopening L7: "Hmm. Kiss is the straightforward choice for both 2d
+      and 3d. Renderling, the five things we'd get from it, how's that
+      compare to kiss, or other alternative prospective pieces of game engine
+      that would compose into the stack? Consider that in all cases, I am
+      willing to reshape a good candidate into an excellent stack
+      component/module/crate; i don't mind renderling, kiss, or another option
+      as long as they compose well and improve the whole stack with their
+      capabilities. Whether that's rendering, entity management systems, etc.
+      etc. i don't even mind measuring both, or considering wgsl-rs or
+      rust-gpu or whatever". Open: a comparative assessment of candidate
+      engine components comes back to him.
+    - Allocator and shader lane, if renderling is kept: "Residency via
+      conatus/CubeCL": slab residency is replaced by conatus buffers bound
+      directly, one allocator.
+    - Harvesting renderling's lighting: "Compare to what would suit the stack
+      and wing": folded into the comparative assessment.
+    - The R2 receipt: "Re-prove in isometer-render": `isometer-render` binds
+      conatus's CubeCL buffers directly, testing whether the copy and the
+      second allocator disappear.
   - **The logged token.** Four build logs captured this session's
     environment, including its messaging token and account IDs; redacted on
     Mark's choice.
