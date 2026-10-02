@@ -1,7 +1,7 @@
 # Physics Catalog Plan
 
 **Date:** 2026-09-02
-**Status:** in progress (P1 landed 2026-09-02; P1b, P2 on both hosts and P3 the remote board 2026-09-03; the runtime extraction 2026-09-04; P4 web half 2026-09-04, closing with the Graphshell tree port per the 2026-10-01 rulings in §5).
+**Status:** in progress (P1 landed 2026-09-02; P1b, P2 on both hosts and P3 the remote board 2026-09-03; the runtime extraction 2026-09-04; P4 web half 2026-09-04, closing with the Graphshell tree port per the 2026-10-01 rulings in §5; P5a's tiled kernel 2026-10-02 on branch `gpu-repulsion`, P5b-c waiting on forks).
 **Scope:** A catalog of *distinct physics layout laws* — dynamical systems
 over the graph's bodies that produce different layouts because they are
 different physics — as a lever beside the arrangement catalog, plus the
@@ -533,6 +533,39 @@ eleven existing receipts stay green.
   other lane (`7f4bb8c7` → `ca47d6ef`, and P1/P1b likewise); the plan's
   earlier hashes name commits that no longer exist on main. Subjects are
   the durable handle.
+- 2026-10-02 (P5a): the tiled all-pairs kernel (`conatus::resident::kernels::exclude`)
+  matches `node_exclusion_reference` at a worst per-body relative error of
+  2.9e-6 (n = 1,000) and 1.2e-5 (n = 10,000), mean 1.6e-7 and 1.8e-7, on a
+  scatter at settled density (one body per 140² px, a twin every twentieth body
+  inside the floor, most pairs past the cutoff). RTX 4060 Laptop, Vulkan.
+- 2026-10-02 (P5a): cost per call on that machine, upload + dispatch +
+  blocking readback against the single-threaded CPU law: 500 nodes 0.69 vs
+  1.61 ms; 1,000 0.60 vs 7.35; 2,000 1.24 vs 18.3; 5,000 1.02 vs 77; 10,000
+  1.58 vs 212; 20,000 3.15 vs 679; 50,000 10.1 vs 3,035. Tiled all-pairs alone
+  stays under a frame to 50,000 here; the cell list is a large-n and
+  weak-device matter, not a 10,000-node one.
+- 2026-10-02 (P5a): CubeCL's readback is `ComputeClient::read_async`, a future
+  that is safe to poll with a no-op waker: on native CubeCL's own poll thread
+  drives the map (`cubecl-wgpu` `compute/poll.rs`), in a browser the event loop
+  does, so a result is ready no earlier than the next JS turn. The blocking
+  `read_one` the resident lane uses goes through `read_sync` and is native-only.
+  `init_device` from a host's `WgpuSetup` is synchronous on wasm as well; the
+  async setup path (`init_setup_async`) is only for a device CubeCL boots.
+- 2026-10-02 (P5a): `conatus --features resident` checks for
+  `wasm32-unknown-unknown` (burn and rapier3d included). A release wasm probe
+  that links the exclusion lane through `ResidentClient` is 2,580,991 bytes; the
+  same lane on bare CubeCL is 2,544,749, so Burn is dead-stripped and costs
+  build time, not bundle. The graphshell-web graph carries no CubeCL, Burn or
+  rapier3d today; its dev bundle was about 72 MB on 2026-09-08.
+- 2026-10-02 (P5a): the positive control needs a fixture the CPU law does not
+  overlap on its own. A ring seeded by golden angle tangles (482 overlapping
+  pairs under the CPU law) and a spring lattice buckles (1-5); unlinked bodies
+  under exclusion and the boundary settle with none, and the sign-flipped
+  kernel then leaves 520-544.
+- 2026-10-02: a cargo run without `--locked` re-serializes the root lock,
+  swapping the order of the two genet revisions' `fleece` and
+  `layout-dom-api` rows; the committed lock passes `--locked` as it stands, so
+  lane commands run locked.
 
 ## 5. Decisions
 
@@ -814,3 +847,16 @@ binning are the useful patterns.
   without the fix and passes with it. The tree drag receipt now passes three
   runs in a row
   ([one-tree plan](2026-09-25_graphshell_one_tree_plan.md) §6).
+- 2026-10-02 (P5a, branch `gpu-repulsion`): the tiled half of the kernel
+  landed. `kernels::exclude` is `NodeExclusion`'s law (inverse square, hard
+  floor, cutoff) over every pair through shared-memory tiles;
+  `conatus::resident::Exclusion` uploads padded positions, launches it and
+  returns a `PendingExclusion` whose `try_take` never blocks (`wait` is the
+  native-only blocking form for tests). Receipts in `conatus/tests/exclusion.rs`:
+  agreement at 1k and 10k (Findings), and the positive control, where 200
+  unlinked bodies settle with 0 overlaps on the CPU and on the device (600 of
+  600 ticks dispatched, spread 623.0 both) and 520-544 overlaps with the
+  strength's sign flipped on the device side. The existing resident receipts
+  stay green (4/4). Logs: `Code/testing/mere/gpu-repulsion/`. Not built: the
+  cell list, the lagged seam (P5b) and the host wiring (P5c), which wait on the
+  forks put to Mark the same day.
