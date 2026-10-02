@@ -64,8 +64,14 @@ const SKELETON_STIFFNESS: f32 = 60.0;
 /// (`220_000 / 36² ≈ 170`): the seiche default of 2 400 left bodies
 /// touching under the edge springs. (Physics catalog — the Charge receipt.)
 const CHARGE_STRENGTH: f32 = 6_000.0;
-/// Density's grid resolution on the CPU tier (cells per side).
-pub const DENSITY_RESOLUTION: usize = 128;
+/// Density's grid resolution on the CPU tier (cells per side): 64², ruled
+/// 2026-10-02 (the same ranks as 128² at about a sixteenth of the cost).
+pub const DENSITY_RESOLUTION: usize = 64;
+/// Density's convergence test, how many passes in a row must meet it, and
+/// the pass cap that ends the passes if the test never does.
+pub const DENSITY_STOP: seiche::DensityStop = seiche::DensityStop::Cap;
+pub const DENSITY_PATIENCE: u32 = 1;
+pub const DENSITY_MAX_PASSES: u32 = 120;
 
 /// The physics law: which dynamics the graph moves under. Ids are technical
 /// (`family.method`), labels plain, as the arrangement catalog does it.
@@ -185,6 +191,33 @@ impl PhysicsLaw {
     /// Whether the law reads the mass source (and so is rebuilt when it changes).
     pub fn weighted(self) -> bool {
         matches!(self, PhysicsLaw::Orbit | PhysicsLaw::Density)
+    }
+
+    /// Why the law takes no overlays, if it refuses them. Density moves nodes
+    /// by its flow alone, and an overlay's force would mix into it (ruled
+    /// 2026-10-02, until laws declare their currency).
+    pub fn overlay_refusal(self) -> Option<&'static str> {
+        match self {
+            PhysicsLaw::Density => Some(
+                "Density takes no overlays: it moves nodes by its flow alone, \
+                 and an overlay's force would mix into it.",
+            ),
+            _ => None,
+        }
+    }
+}
+
+/// Overlays a law refused: which, and why. The law itself was applied.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct OverlayRefusal {
+    pub law: PhysicsLaw,
+    pub refused: Vec<PhysicsOverlay>,
+    pub reason: &'static str,
+}
+
+impl std::fmt::Display for OverlayRefusal {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.reason)
     }
 }
 
@@ -620,6 +653,19 @@ pub fn physics_profile(id: &str) -> Option<&'static PhysicsProfile> {
     CANVAS_PHYSICS_PROFILES
         .iter()
         .find(|profile| profile.id == id)
+}
+
+/// Density at the catalog's defaults (ruled 2026-10-02): 64², one-second
+/// passes, blur 0.25 spacings, passes repeated until the convergence test
+/// stops them, the pass cap as the fallback.
+pub(crate) fn density_law(masses: Vec<(NodeKey, f32)>) -> Density {
+    let mut law = Density::new(masses, DENSITY_RESOLUTION);
+    law.seconds = 1.0;
+    law.initial_blur = 0.25;
+    law.stop = DENSITY_STOP;
+    law.patience = DENSITY_PATIENCE;
+    law.max_passes = DENSITY_MAX_PASSES;
+    law
 }
 
 /// The sources a build reads attributes through.
@@ -1097,10 +1143,7 @@ impl<'a> LawInputs<'a> {
             // Held, not empty: with no force at all rapier's contact solver
             // blasts an overlapping seed apart (the Still receipt found it).
             PhysicsLaw::Still => vec![Box::new(Hold)],
-            PhysicsLaw::Density => vec![Box::new(Density::new(
-                self.masses(sources.mass),
-                DENSITY_RESOLUTION,
-            ))],
+            PhysicsLaw::Density => vec![Box::new(density_law(self.masses(sources.mass)))],
         }
     }
 
@@ -1186,22 +1229,40 @@ impl Canvas {
     /// Switch the law. The force set is replaced wholesale; no body moves until
     /// the next tick, then a settle (or, for a law that never rests, a
     /// continuous run) lets the new dynamics express themselves. Physics stays
-    /// paused if it was paused. (Physics catalog — P1.)
-    pub fn set_physics_law(&mut self, law: PhysicsLaw) {
+    /// paused if it was paused. A law that refuses overlays takes none: the
+    /// live ones are dropped and returned in the refusal. (Physics catalog — P1.)
+    pub fn set_physics_law(&mut self, law: PhysicsLaw) -> Result<(), OverlayRefusal> {
         self.physics_law = law;
+        let refused = self.refuse_overlays();
         self.rebuild_law_forces();
         self.settle_for_law();
+        refused
     }
 
     /// Replace the overlay set (order is run order; duplicates collapse).
-    pub fn set_physics_overlays(&mut self, overlays: Vec<PhysicsOverlay>) {
+    /// Refused, with nothing changed, while the law takes no overlays.
+    pub fn set_physics_overlays(
+        &mut self,
+        overlays: Vec<PhysicsOverlay>,
+    ) -> Result<(), OverlayRefusal> {
+        if let Some(reason) = self.physics_law.overlay_refusal()
+            && !overlays.is_empty()
+        {
+            return Err(OverlayRefusal {
+                law: self.physics_law,
+                refused: overlays,
+                reason,
+            });
+        }
         let mut seen = HashSet::new();
         self.physics_overlays = overlays.into_iter().filter(|o| seen.insert(*o)).collect();
         self.rebuild_law_forces();
         self.settle_for_law();
+        Ok(())
     }
 
-    /// Toggle one overlay on or off, returning whether it is now on.
+    /// Toggle one overlay on or off, returning whether it is now on (off,
+    /// and unchanged, while the law refuses overlays).
     pub fn toggle_physics_overlay(&mut self, overlay: PhysicsOverlay) -> bool {
         let mut overlays = self.physics_overlays.clone();
         let on = if let Some(i) = overlays.iter().position(|o| *o == overlay) {
@@ -1211,8 +1272,19 @@ impl Canvas {
             overlays.push(overlay);
             true
         };
-        self.set_physics_overlays(overlays);
-        on
+        self.set_physics_overlays(overlays).is_ok() && on
+    }
+
+    /// Drop the live overlays if the law refuses them, saying which.
+    fn refuse_overlays(&mut self) -> Result<(), OverlayRefusal> {
+        match self.physics_law.overlay_refusal() {
+            Some(reason) if !self.physics_overlays.is_empty() => Err(OverlayRefusal {
+                law: self.physics_law,
+                refused: std::mem::take(&mut self.physics_overlays),
+                reason,
+            }),
+            _ => Ok(()),
+        }
     }
 
     /// Choose where the Kinds law reads kinds from; rebuilds only if Kinds is live.
@@ -1260,8 +1332,12 @@ impl Canvas {
     /// Replace the whole choice with one rebuild and one settle. Sources are
     /// set first and the law last, so the law's build reads the new sources
     /// and overlays. Overlay duplicates collapse, as in
-    /// [`set_physics_overlays`](Self::set_physics_overlays).
-    pub fn set_physics_choice(&mut self, choice: &crate::canvas::PhysicsChoice) {
+    /// [`set_physics_overlays`](Self::set_physics_overlays). A law that
+    /// refuses overlays is applied without them, and the refusal returned.
+    pub fn set_physics_choice(
+        &mut self,
+        choice: &crate::canvas::PhysicsChoice,
+    ) -> Result<(), OverlayRefusal> {
         self.physics_kind_source = choice.kind;
         self.physics_mass_source = choice.mass;
         self.physics_depth_source = choice.depth;
@@ -1273,8 +1349,10 @@ impl Canvas {
             .filter(|o| seen.insert(*o))
             .collect();
         self.physics_law = choice.law;
+        let refused = self.refuse_overlays();
         self.rebuild_law_forces();
         self.settle_for_law();
+        refused
     }
 
     /// Apply a named profile: its law and its overlays. `false` for an unknown id.
