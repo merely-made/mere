@@ -10,7 +10,7 @@
 Audit base: Mere `792967f8` (2026-10-01), plus the four machines read over
 SSH on 2026-10-02. `archive_docs/` is excluded.
 
-This batch exists because the plan is new. Its rulings (1 to 15) are recorded
+This batch exists because the plan is new. Its rulings (1 to 18) are recorded
 in its §3, and its three corrections are carried as dated notes into the SSH
 CA projection plan and the reachability rungs plan (R1, R2); they are not
 counted again here.
@@ -18,7 +18,7 @@ counted again here.
 ## mere_docs/implementation_strategy/2026-10-02_device_pairing_by_key_plan.md
 
 - disposition: current
-- status line: "Status (2026-10-02): in progress. Assessed and ruled by Mark on 2026-10-01 and 2026-10-02 (rulings 1 to 15 below). D1 is being built and proven locally; nothing else is built." — accurate: yes
+- status line: "Status (2026-10-02): in progress. Assessed and ruled by Mark on 2026-10-01 and 2026-10-02 (rulings 1 to 18 below). D1 landed (`4963b489`), proven locally; D1b, mDNS-only first contact, is next, then D2." — accurate: yes
 - claims checked: 14 — holds: 14, stale: 0, unverifiable: 0
 
 ### Stale claims

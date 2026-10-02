@@ -16,6 +16,7 @@ use std::sync::Arc;
 use personae::{IdentityProvider, ProfileId};
 
 use crate::resident_blobs::{LEGACY_PERSONAL_LEASE, LegacyBlobMigration, ResidentBlobCustody};
+use crate::resident_devices::DeviceDirectorySource;
 use crate::settings::{
     self as owner_settings, DataRootMigration, OwnerSettings, OwnerSettingsError, SyncOverrides,
 };
@@ -113,6 +114,14 @@ pub fn resolve_data_root(
     Ok(current)
 }
 
+/// What started personal sync hands the resident's doors.
+pub struct PersonalSyncStarted {
+    /// The cards both doors serve.
+    pub surface: DeviceSurfaceHandle,
+    /// The paired-device directory, read live from this host.
+    pub directory: DeviceDirectorySource,
+}
+
 /// Start personal sync for a profile, or return `None` when the owner has not
 /// enabled it.
 pub async fn start<P: IdentityProvider + ?Sized>(
@@ -126,7 +135,7 @@ pub async fn start<P: IdentityProvider + ?Sized>(
     seed_notes: Vec<SeedNote>,
     blob_actions: Vec<BlobAction>,
     blob_custody: ResidentBlobCustody,
-) -> Result<Option<DeviceSurfaceHandle>, DeviceSyncError> {
+) -> Result<Option<PersonalSyncStarted>, DeviceSyncError> {
     let settings_file = owner_settings::settings_path(app_dir, profile);
     let stored = OwnerSettings::load(&settings_file)?;
     tracing::info!(
@@ -289,6 +298,7 @@ pub async fn start<P: IdentityProvider + ?Sized>(
     // advertisement is authored in the same quiet window.
     run_blob_actions(&host, blob_actions).await;
 
+    let directory = DeviceDirectorySource::live(Arc::clone(&host), settings_file.clone());
     spawn_pairing_watch(
         Arc::clone(&host),
         settings_file,
@@ -324,7 +334,7 @@ pub async fn start<P: IdentityProvider + ?Sized>(
         graphshell::receipts::inbox_dir(&data_root),
     );
     spawn_accept_watch(host, Arc::clone(&surface));
-    Ok(Some(surface))
+    Ok(Some(PersonalSyncStarted { surface, directory }))
 }
 
 /// Run the one-shot blob operations the operator asked for on this start.
