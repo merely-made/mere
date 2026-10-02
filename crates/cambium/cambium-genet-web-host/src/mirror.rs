@@ -135,6 +135,14 @@ fn lower(
         (Placement::Content, Some(name)) => text = Some(name),
         (_, None) => {},
     }
+    // A description says more than the name: what a control does, say.
+    if let Some(description) = node
+        .description
+        .clone()
+        .filter(|description| !description.trim().is_empty())
+    {
+        attrs.push(("aria-description", description));
+    }
     // A text control's content is its value, which is where a reader reads it.
     if matches!(
         node.role,
