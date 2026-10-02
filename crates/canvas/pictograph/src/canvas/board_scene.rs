@@ -786,4 +786,49 @@ mod tests {
         let untitled = nameless.paint_titled(&board, 800, 400, page_fit(), &mut text);
         assert_eq!(glyphs(&untitled), 0);
     }
+
+    /// A title is one non-wrapping line, centred in its card. Livery ignored
+    /// `text-align` on a nowrap line until genet `6fca091dc26`, and the titles
+    /// sat at the card's left padding.
+    #[test]
+    fn titles_are_centred_in_their_cards() {
+        let scene_desc = BoardScene {
+            bounds: BoardRect::new(-140.0, -78.0, 560.0, 156.0),
+            backdrops: Vec::new(),
+            cards: vec![card("0", 0.0, 0.0), card("1", 280.0, 0.0)],
+        };
+        let board = PhysicsBoard::new();
+        let mut text = BoardText::new();
+        let titled = scene_desc.paint_titled(&board, 800, 400, page_fit(), &mut text);
+        let glyphs: Vec<(f32, f32)> = titled
+            .ops
+            .iter()
+            .filter_map(|op| match op {
+                SceneOp::GlyphRun(run) => Some(run),
+                _ => None,
+            })
+            .flat_map(|run| run.glyphs.iter().map(|glyph| (glyph.x, glyph.y)))
+            .collect();
+        for (id, _, rect) in scene_desc.card_rects(&board, 800, 400, page_fit()) {
+            let xs: Vec<f32> = glyphs
+                .iter()
+                .filter(|(x, y)| {
+                    (rect.x..rect.x + rect.width).contains(x)
+                        && (rect.y..rect.y + rect.height).contains(y)
+                })
+                .map(|(x, _)| *x)
+                .collect();
+            assert!(!xs.is_empty(), "card {id} has its title's glyphs");
+            let first = xs.iter().copied().fold(f32::INFINITY, f32::min);
+            let last = xs.iter().copied().fold(f32::NEG_INFINITY, f32::max);
+            // The last origin stops one advance short of the text's end, so
+            // the right gap reads up to one glyph wider than the left.
+            let left_gap = first - rect.x;
+            let right_gap = rect.x + rect.width - last;
+            assert!(
+                right_gap - left_gap >= 0.0 && right_gap - left_gap <= 14.0,
+                "card {id}'s title is centred: left gap {left_gap}, right gap {right_gap} in {rect:?}",
+            );
+        }
+    }
 }
