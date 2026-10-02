@@ -541,6 +541,44 @@ contract declared in advance.
   replace the installed 0.1.0 binary, and pin the codegen version are open.
   This proves Nexus kernels execute here; shared buffer ownership with the
   host's device is still unproven.
+  Ruled the same day:
+  - **The fork patch.** Mark chose no patch ("1"), and added: "also make sure
+    we're up to date for, rust-gpu, renderling, and nexus. they develop fast.
+    let's get what we can from their respective upstreams". At that check,
+    nexus was 2 commits behind upstream main (`1cfbd76`), the rust-gpu fork
+    branch 27 behind (`0a9d096f32`, the v0.10.0 release) with our two
+    version-gate commits on top, renderling 1 behind with our four wgpu-30
+    commits plus 26 uncommitted files last touched 2026-09-15, and the
+    standalone cargo-gpu archived upstream (merged into rust-gpu).
+  - **The installed cargo-gpu.** "Replace, after checking renderling": build
+    renderling's shaders with the new cargo-gpu first; replace
+    `~/.cargo/bin/cargo-gpu` 0.1.0 only if they pass.
+  - **The codegen version.** Told the cache held `rustc_codegen_spirv` 0.10.0
+    while Nexus used spirv-std 0.10.0-alpha.1, Mark asked "wait. why aren't
+    we on the most up to date...? sure, 3": move Nexus to the 0.10.0 line
+    (upstream main) rather than pinning the codegen back. The answer to his
+    question: the forks were last synced in August and September, and
+    spirv-std 0.10.0 was released on 2026-10-01, so alpha.1 was current
+    until that day.
+  - **The sync, carried out and ruled further.** Nexus fast-forwarded to
+    upstream `1cfbd76`; spirv-std now resolves to 0.10.0 and the codegen to
+    0.10.0, and both GPU proofs pass again (`Code/testing/fork-sync/`).
+    rust-gpu's version-gate bug has no upstream fix but is latent (upstream
+    pins nightly-2026-07-03, 1.98). Mark chose "cargo-gpu 0.10.0 from
+    crates.io": the binary comes from the published release, the fork branch
+    stays as the record, and the standalone `crates/cargo-gpu` fork is no
+    longer used. The alternatives were building from tag v0.10.0, rebasing
+    and carrying the patch, or rebasing and filing it upstream. Renderling's
+    one upstream commit (`46bf54c`, manual chapters and a
+    `Stage::tonemapping()` accessor): "Merge upstream in" to
+    `mark-ik/wgpu-30`, keeping our four commits' hashes. Its 26 uncommitted
+    files, rustfmt output from the repo's nightly-only options with one
+    reflowed expression as the only non-comment change: "Commit as a
+    formatting commit" first. The three codegen caches Nexus no longer uses:
+    "Delete after renderling's check".
+  - **The logged token.** Four build logs captured this session's
+    environment, including its messaging token and account IDs; redacted on
+    Mark's choice.
 
 ## Progress (2026-08-25 resident-position pass)
 
