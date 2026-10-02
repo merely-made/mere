@@ -9,25 +9,23 @@
 //! A desktop host keeps one resident alive and gives applications admitted
 //! views or protocol adapters over it. Sandboxed applications may embed the
 //! same type. Either shape retains one OS file lock and one external freshness
-//! ledger for the lifetime of every clone.
+//! ledger for the lifetime of every clone, and one transaction lock per
+//! persona for every multi-record write.
 
-use std::path::PathBuf;
-
-#[cfg(feature = "secret-service")]
 use std::collections::BTreeMap;
-#[cfg(feature = "secret-service")]
+use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
 
 use personae::{IdentityError, PersonaId, SealedRecordStorage};
 
+use crate::items::ItemStore;
 use crate::otp::OtpItemStore;
 
 /// Exclusive authority over one Castellan credential-record directory.
 #[derive(Clone)]
 pub struct CastellanResident {
     records: SealedRecordStorage,
-    #[cfg(feature = "secret-service")]
-    secret_service_transactions: Arc<Mutex<BTreeMap<PersonaId, Arc<Mutex<()>>>>>,
+    transactions: Arc<Mutex<BTreeMap<PersonaId, Arc<Mutex<()>>>>>,
 }
 
 impl CastellanResident {
@@ -50,14 +48,18 @@ impl CastellanResident {
                 freshness_root,
                 freshness_key,
             )?,
-            #[cfg(feature = "secret-service")]
-            secret_service_transactions: Arc::new(Mutex::new(BTreeMap::new())),
+            transactions: Arc::new(Mutex::new(BTreeMap::new())),
         })
     }
 
-    /// Open the persona-scoped OTP namespace under this authority.
+    /// Open one persona's sealed items under this authority.
+    pub fn items(&self, persona: PersonaId) -> ItemStore {
+        ItemStore::with_transaction(self.records.clone(), persona, self.transaction(persona))
+    }
+
+    /// Open one persona's OTP credentials under this authority.
     pub fn otp_items(&self, persona: PersonaId) -> OtpItemStore {
-        OtpItemStore::new(self.records.clone(), persona)
+        OtpItemStore::over(self.items(persona))
     }
 
     /// Open the persona-scoped Freedesktop Secret Service store.
@@ -67,19 +69,22 @@ impl CastellanResident {
         persona: PersonaId,
         limits: crate::secret_service::SecretServiceLimits,
     ) -> crate::secret_service::SecretServiceStore {
-        let transaction = self
-            .secret_service_transactions
-            .lock()
-            .unwrap_or_else(std::sync::PoisonError::into_inner)
-            .entry(persona)
-            .or_insert_with(|| Arc::new(Mutex::new(())))
-            .clone();
         crate::secret_service::SecretServiceStore::new(
             self.records.clone(),
             persona,
             limits,
-            transaction,
+            self.transaction(persona),
         )
+    }
+
+    /// The one transaction lock every store for `persona` shares.
+    fn transaction(&self, persona: PersonaId) -> Arc<Mutex<()>> {
+        self.transactions
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner)
+            .entry(persona)
+            .or_insert_with(|| Arc::new(Mutex::new(())))
+            .clone()
     }
 }
 
@@ -117,9 +122,13 @@ mod tests {
         let participant =
             || OtpReleaseParticipantClaim::unverified("local:test", "resident:test").unwrap();
 
-        let first = left.petition(item.id, participant()).unwrap();
+        let first = left
+            .petition(item.item_id(), item.credential_id(), participant())
+            .unwrap();
         let first = left.approve(first.id).unwrap();
-        let second = right.petition(item.id, participant()).unwrap();
+        let second = right
+            .petition(item.item_id(), item.credential_id(), participant())
+            .unwrap();
         let second = right.approve(second.id).unwrap();
 
         assert_eq!(first.tile().code_at_unix_time(0), Some("755224"));
@@ -138,21 +147,27 @@ mod tests {
                 "otpauth://hotp/Steam:mark?secret={RFC4226_SECRET_BASE32}&issuer=Steam&counter=0"
             ))
             .unwrap();
+        // The HOTP counter lives in the credential's payload record alone.
         let record = records
-            .join("castellan/otp/v1")
+            .join("castellan/items/v1")
             .join(persona.as_uuid().to_string())
-            .join(format!("{}.json", item.id));
+            .join("payloads")
+            .join(format!("{}.json", item.credential_id()));
         let counter_zero = std::fs::read(&record).unwrap();
         let gate = OtpReleaseGate::new(items);
         let participant =
             || OtpReleaseParticipantClaim::unverified("local:test", "rollback:test").unwrap();
 
-        let first = gate.petition(item.id, participant()).unwrap();
+        let first = gate
+            .petition(item.item_id(), item.credential_id(), participant())
+            .unwrap();
         assert_eq!(
             gate.approve(first.id).unwrap().tile().code_at_unix_time(0),
             Some("755224")
         );
-        let second = gate.petition(item.id, participant()).unwrap();
+        let second = gate
+            .petition(item.item_id(), item.credential_id(), participant())
+            .unwrap();
         std::fs::write(&record, counter_zero).unwrap();
 
         let error = gate.approve(second.id).unwrap_err();

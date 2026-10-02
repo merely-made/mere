@@ -727,6 +727,12 @@ is that objective's assessment.
   derivation into a cartography sibling crate. Both mer3ly's copy and
   `ports/gazette/src/ledger.rs` retire, as the catalog's
   removal-on-promotion rule requires (Rulings 10 and 12).
+- *Amended 2026-10-01 (Rulings 19-20 there):* there is no sibling crate. The
+  matrix's types and a thin adapter go in cartography beside `src/adapters/`,
+  and the cell derivation goes in the scenes family, after the adapters' own
+  pattern. Cartography's "stays contract-only" comment (`Cargo.toml:18`)
+  predates `graph-layout`'s retirement at `739c87f4` and is stale. The fold
+  fact names its stand-in: either a member or a synthetic summary.
 - Separately, A4's text here runs together two histories that the assessment
   separates: authority-revision history, the site's checkpoint slider, and
   scene-edit history, `projection-proof`'s chained trace.
