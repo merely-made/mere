@@ -397,6 +397,16 @@ ran 1.58 ms against 212 ms at 10k):
   GPU. The alternatives were a pair-count or density threshold, or
   calibration at install.
 
+*Open, 2026-10-02: more than one layout at once.* Mark asked: "consider the
+situation where more than one physics layout is active... for example, a
+barnes hut layout but then burn tensors determining semantic grouping and
+expressing that with physics too." Today a Canvas composes one law plus
+overlays, with separate coupling, affinity (an `AffinitySpring` from
+scores, `strategy.rs:534-616`) and anchor slots. An assessment of the
+composition space (weighted, partitioned, multi-integrator and sequenced
+laws; Burn-computed semantic grouping as force) comes back to him before
+P6's composition fork (pure Density or Density with edges) is put.
+
 *Done when:* GPU and CPU forces agree to 1e-3 relative at 1k and 10k nodes;
 a sign-flipped kernel fails the overlap check (positive control); a forced
 adapter failure falls back and still passes; the eleven law receipts stay
