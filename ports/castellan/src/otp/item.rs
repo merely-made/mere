@@ -30,7 +30,7 @@ use super::{
     Otp, OtpCodeTile, OtpCredential, OtpError, OtpKind, OtpUriError, SteamGuard, SteamGuardError,
     parse_otpauth_uri,
 };
-use crate::items::{ItemStore, ItemStoreError, Payload};
+use crate::items::{ItemStore, ItemStoreError, Payload, random_id_bytes};
 
 /// The issuer every Steam Guard item is filed under.
 const STEAM_ISSUER: &str = "Steam";
@@ -231,7 +231,9 @@ impl OtpItemStore {
             .exercise(item, credential, |stored, held, payload| {
                 let fields =
                     OtpFields::of(held).ok_or(OtpItemError::NotFound { item, credential })?;
-                let Payload::Otp { secret, counter } = payload;
+                let Payload::Otp { secret, counter } = payload else {
+                    return Err(OtpItemError::PayloadMismatch);
+                };
                 let code = match (fields.mode, counter.as_mut()) {
                     (OtpMode::Hotp, Some(counter)) => {
                         if *counter == u64::MAX {
@@ -341,11 +343,6 @@ fn code_at(
     };
     let otp = otp.with_digits(digits)?.with_algorithm(fields.algorithm);
     Ok(otp.code_at_unix_time(unix_secs)?)
-}
-
-/// Sixteen random bytes for a new item or credential id.
-fn random_id_bytes() -> [u8; 16] {
-    uuid::Uuid::new_v4().into_bytes()
 }
 
 #[cfg(test)]

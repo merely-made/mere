@@ -62,19 +62,15 @@ impl CastellanResident {
         OtpItemStore::over(self.items(persona))
     }
 
-    /// Open the persona-scoped Freedesktop Secret Service store.
+    /// Open the persona-scoped Freedesktop Secret Service store, a view of
+    /// the persona's items.
     #[cfg(feature = "secret-service")]
     pub fn secret_service(
         &self,
         persona: PersonaId,
         limits: crate::secret_service::SecretServiceLimits,
     ) -> crate::secret_service::SecretServiceStore {
-        crate::secret_service::SecretServiceStore::new(
-            self.records.clone(),
-            persona,
-            limits,
-            self.transaction(persona),
-        )
+        crate::secret_service::SecretServiceStore::new(self.items(persona), limits)
     }
 
     /// The one transaction lock every store for `persona` shares.

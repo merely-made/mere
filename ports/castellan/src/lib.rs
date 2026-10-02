@@ -52,7 +52,7 @@
 //! any other host embeds the subset it needs without inheriting graphshell.
 //! [`items::ItemStore`] keeps one persona's chatelaine items, each
 //! credential's secret in its own sealed payload record. OTP imports land
-//! there through [`otp::OtpItemStore`]. [`otp::OtpReleaseGate`] returns an
+//! there through [`otp::OtpItemStore`], and the Secret Service's items too. [`otp::OtpReleaseGate`] returns an
 //! [`otp::OtpCodeTile`] only after a participant-bound petition receives a
 //! resident approval. [`otp::OtpAdmittedSession`] binds remote petitions to one
 //! exact credential and the Notochord transcript that admitted their carrier.
