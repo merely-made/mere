@@ -886,3 +886,20 @@ binning are the useful patterns.
   stay green (4/4). Logs: `Code/testing/mere/gpu-repulsion/`. Not built: the
   cell list, the lagged seam (P5b) and the host wiring (P5c), which wait on the
   forks put to Mark the same day.
+- 2026-10-02 (P5a, after the rulings): the cell list landed. Nexus's binning
+  is ported by hand to CubeCL in `conatus::resident::binning` (Apache-2.0, a
+  retained-license row in `LICENSES.md`): a count pass, the Blelloch exclusive
+  scan with its auxiliary levels, the cursor copy and the atomic-slot scatter,
+  over a dense grid of cells a hair wider than the cutoff whose bounds the host
+  takes from the positions it uploads. `kernels::exclude_cells` (ours) walks
+  the three-by-three block around each body. `Exclusion` takes the cells at or
+  above `DEFAULT_CELL_THRESHOLD` (4,096, settable) unless the grid would
+  exceed four cells a body, when it stays on every pair. Receipts: the scan
+  is exact at 1, 255, 256, 257, 4,097 and 70,001 elements (three levels); both
+  passes agree with the CPU law at 1k, 10k and 50k (cells worst 1.7e-5,
+  5.4e-5, 9.0e-5; pairs 2.9e-6, 1.2e-5, 1.8e-5); the positive control holds on
+  both (0 overlaps against 541-544 sign-flipped); a four-body layout a
+  million units wide stays on every pair. Cost per call, pairs / cells / CPU
+  in ms: 2,000 0.69 / 0.75 / 14.7; 4,096 0.87 / 0.79 / 43.6; 10,000 1.38 /
+  0.93 / 159; 50,000 10.5 / 3.9 / 2,302; 100,000 57.7 / 7.5 / not run. So the
+  4,096 default is this machine's measured crossover.
