@@ -414,6 +414,10 @@ ESP's Burn `affinity_pairs_over_index` (`esp/src/embed/index_burn.rs:144`)
 emits exactly the triples the affinity slot takes, but nothing calls
 `set_content_affinity` (`strategy.rs:520`) outside tests, and affinity is not
 in `PhysicsChoice`; Density with `EdgeSpring` read −0.54 against 0.77 alone
+(*annotation 2026-10-02:* this figure came from the Density lane's
+first-round probe, whose log was overwritten by its second-round runs, so
+no log now backs it; the second-round overlay probe, `probe-overlays.log`,
+shows the same failure class for force overlays on Density)
 (316 overlaps).
 - **Currencies.** "Laws declare currency; catalog adapts or refuses":
   forces compose freely; a kinematic law takes forces converted to its
