@@ -43,9 +43,9 @@ use petgraph::data::Element;
 use petgraph::graph::{DiGraph, EdgeIndex, NodeIndex, UnGraph};
 use petgraph::visit::EdgeRef;
 use seiche::{
-    Anneal, BarnesHutRepulsion, Boids, Boundary, DegreeRepulsion, DepthGravity, DomainCluster,
-    EdgeSpring, Force, Gravity, GravityLocus, GridSnap, Hold, HubGravity, Kuramoto, LinLogForce,
-    MagneticSpring, NodeExclusion, ParticleLife, StressSpring,
+    Anneal, BarnesHutRepulsion, Boids, Boundary, DegreeRepulsion, Density, DepthGravity,
+    DomainCluster, EdgeSpring, Force, Gravity, GravityLocus, GridSnap, Hold, HubGravity, Kuramoto,
+    LinLogForce, MagneticSpring, NodeExclusion, ParticleLife, StressSpring,
 };
 
 use crate::canvas::seiche_bridge::visible_relation_edges;
@@ -64,6 +64,8 @@ const SKELETON_STIFFNESS: f32 = 60.0;
 /// (`220_000 / 36² ≈ 170`): the seiche default of 2 400 left bodies
 /// touching under the edge springs. (Physics catalog — the Charge receipt.)
 const CHARGE_STRENGTH: f32 = 6_000.0;
+/// Density's grid resolution on the CPU tier (cells per side).
+pub const DENSITY_RESOLUTION: usize = 128;
 
 /// The physics law: which dynamics the graph moves under. Ids are technical
 /// (`family.method`), labels plain, as the arrangement catalog does it.
@@ -102,10 +104,13 @@ pub enum PhysicsLaw {
     /// No law: bodies hold where the arrangement (or a hand) put them
     /// (velocity zeroed each tick, so contacts can only nudge).
     Still,
+    /// Gastner–Newman density equalizing: nodes flow down the gradient of a
+    /// diffused mass density until it is even, so room follows mass.
+    Density,
 }
 
 impl PhysicsLaw {
-    pub const ALL: [PhysicsLaw; 11] = [
+    pub const ALL: [PhysicsLaw; 12] = [
         PhysicsLaw::Springs,
         PhysicsLaw::Charge,
         PhysicsLaw::Stress,
@@ -117,6 +122,7 @@ impl PhysicsLaw {
         PhysicsLaw::Flow,
         PhysicsLaw::Anneal,
         PhysicsLaw::Still,
+        PhysicsLaw::Density,
     ];
 
     pub fn id(self) -> &'static str {
@@ -132,6 +138,7 @@ impl PhysicsLaw {
             PhysicsLaw::Flow => "flow.magnetic",
             PhysicsLaw::Anneal => "anneal.davidson-harel",
             PhysicsLaw::Still => "still.default",
+            PhysicsLaw::Density => "density.gastner-newman",
         }
     }
 
@@ -148,6 +155,7 @@ impl PhysicsLaw {
             PhysicsLaw::Flow => "Flow",
             PhysicsLaw::Anneal => "Anneal",
             PhysicsLaw::Still => "Still",
+            PhysicsLaw::Density => "Density",
         }
     }
 
@@ -165,12 +173,18 @@ impl PhysicsLaw {
     }
 
     /// Whether the law snapshots graph structure at build (and so is rebuilt on
-    /// a topology change): Stress's distances, Orbit's masses, Kinds' kinds.
+    /// a topology change): Stress's distances, Orbit's and Density's masses,
+    /// Kinds' kinds.
     pub fn graph_bound(self) -> bool {
         matches!(
             self,
-            PhysicsLaw::Stress | PhysicsLaw::Orbit | PhysicsLaw::Kinds
+            PhysicsLaw::Stress | PhysicsLaw::Orbit | PhysicsLaw::Kinds | PhysicsLaw::Density
         )
+    }
+
+    /// Whether the law reads the mass source (and so is rebuilt when it changes).
+    pub fn weighted(self) -> bool {
+        matches!(self, PhysicsLaw::Orbit | PhysicsLaw::Density)
     }
 }
 
@@ -401,6 +415,13 @@ pub struct LayoutStats {
     /// reads near the diameter in hops, a local one well under it. Zero
     /// without edges.
     pub stretch: f32,
+    /// Spearman rank correlation between each node's mass (the mass source)
+    /// and its area share (discrete Voronoi cell): Density's signature,
+    /// near one when room follows mass. Zero under uniform mass.
+    pub mass_area_rank: f32,
+    /// Coefficient of variation of `mass / area share` over the nodes: how
+    /// uneven the layout's density is, zero when perfectly even.
+    pub density_cv: f32,
 }
 
 /// A named (law, overlays) pair: what a picker offers as one choice.
@@ -425,6 +446,7 @@ pub const CANVAS_PHYSICS_LAWS: &[(&str, &str)] = &[
     ("flow.magnetic", "Flow"),
     ("anneal.davidson-harel", "Anneal"),
     ("still.default", "Still"),
+    ("density.gastner-newman", "Density"),
 ];
 
 /// The overlay catalog for the toggles: `(id, label)`.
@@ -584,6 +606,12 @@ pub const CANVAS_PHYSICS_PROFILES: &[PhysicsProfile] = &[
         label: "Skeleton",
         law: PhysicsLaw::Charge,
         overlays: &[PhysicsOverlay::Skeleton],
+    },
+    PhysicsProfile {
+        id: "law.density",
+        label: "Density",
+        law: PhysicsLaw::Density,
+        overlays: &[],
     },
 ];
 
@@ -801,8 +829,9 @@ impl<'a> LawInputs<'a> {
             .collect()
     }
 
-    /// Masses for Orbit: `1 + degree`, or `1 + rank` with the mean rank one.
-    fn masses(&self, source: PhysicsMassSource) -> Vec<(NodeKey, f32)> {
+    /// Masses for Orbit and Density: `1 + degree`, or `1 + rank` with the
+    /// mean rank one.
+    pub(crate) fn masses(&self, source: PhysicsMassSource) -> Vec<(NodeKey, f32)> {
         match source {
             PhysicsMassSource::Degree => {
                 let degree = self.degrees();
@@ -1068,6 +1097,10 @@ impl<'a> LawInputs<'a> {
             // Held, not empty: with no force at all rapier's contact solver
             // blasts an overlapping seed apart (the Still receipt found it).
             PhysicsLaw::Still => vec![Box::new(Hold)],
+            PhysicsLaw::Density => vec![Box::new(Density::new(
+                self.masses(sources.mass),
+                DENSITY_RESOLUTION,
+            ))],
         }
     }
 
@@ -1195,9 +1228,7 @@ impl Canvas {
     /// or a weighted overlay is live.
     pub fn set_physics_mass_source(&mut self, source: PhysicsMassSource) {
         self.physics_mass_source = source;
-        if self.physics_law == PhysicsLaw::Orbit
-            || self.physics_overlays.iter().any(|o| o.weighted())
-        {
+        if self.physics_law.weighted() || self.physics_overlays.iter().any(|o| o.weighted()) {
             self.rebuild_law_forces();
             self.settle_for_law();
         }
@@ -1368,6 +1399,19 @@ impl Canvas {
                 }
             }
         }
+        let (mass_area_rank, density_cv) = {
+            let masses: HashMap<NodeKey, f32> = self
+                .law_inputs_now()
+                .masses(self.physics_mass_source)
+                .into_iter()
+                .collect();
+            let points: Vec<(f32, f32)> = positions.iter().map(|(_, p)| (p.x, p.y)).collect();
+            let weights: Vec<f32> = positions
+                .iter()
+                .map(|(k, _)| masses.get(k).copied().unwrap_or(1.0))
+                .collect();
+            crate::canvas::area_share::mass_area_stats(&points, &weights)
+        };
         let at: HashMap<NodeKey, euclid::default::Point2D<f32>> = positions.into_iter().collect();
         let edges = visible_relation_edges(&self.graph, &self.hidden_edges);
         let lengths: Vec<f32> = edges
@@ -1396,7 +1440,14 @@ impl Canvas {
             spread,
             overlaps,
             stretch,
+            mass_area_rank,
+            density_cv,
         }
+    }
+
+    /// The attribute builders over the current graph and visible edges.
+    fn law_inputs_now(&self) -> LawInputs<'_> {
+        LawInputs::new(&self.graph, &self.hidden_edges, None)
     }
 
     /// The number of forces in the live law slot (inline backend only). Test introspection.

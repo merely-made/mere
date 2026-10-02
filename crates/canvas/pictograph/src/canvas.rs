@@ -151,6 +151,7 @@ pub use palette::DerivedFacePalette;
 /// they are canvas glue (numen fields over placed nodes) that had been parked
 /// in the intel tier, where nothing consumed them.
 pub mod canvas_search;
+mod area_share;
 mod edge_cells;
 pub mod field_bridge;
 mod fields;
