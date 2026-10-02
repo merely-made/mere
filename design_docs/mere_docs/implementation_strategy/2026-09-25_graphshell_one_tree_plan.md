@@ -264,6 +264,20 @@ assessment returned:
   header status line, or leaving it.
 - **Push.** Mark chose "Push now" for main, carrying this session's merges
   and rulings with other sessions' local commits already on it.
+- **The board on the tree.** After checkpoint 1 (`840c63de`, `acc8920c`,
+  `02a58aad`: the old page delegates to `graphshell_client::remote` and draws
+  through pictograph's `BoardScene`; `c4b1_live_board`,
+  `physics_remote_board` and `c4b3_reconnect` pass unchanged), Mark chose
+  "One leaf, producer picks the scene": the tree's one canvas leaf
+  rasterizes the canvas scene or the board scene by the session switch. Both
+  scenes are pictograph's, so this is not the rejected option of switching
+  Graphshell's own drawing. The alternative was a second leaf.
+- **Board margins.** "Symmetric, e.g. 24 px" on the tree; the old page keeps
+  its 50/50/116/64 fit. The alternative was the old page's fit on both.
+- **The panel lane's two calls.** "Keep both": the narrow-width "Graph
+  tools" toggle sits at the end of the controls row, and the breakpoint is
+  900 px (the 300 px region plus a 600 px minimum canvas). The alternatives
+  were a toggle over the canvas, or another breakpoint.
 - *Reading, not ruled:* the remote scenarios follow the panel lane's
   precedent of tree copies (`p4_tree_*`) with the originals kept for the old
   page, and the physics panel stays operable during a remote session, since
