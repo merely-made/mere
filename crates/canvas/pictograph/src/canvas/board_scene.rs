@@ -16,6 +16,12 @@
 //! overlapping footprints ([`BoardScene::overlaps`]).
 
 use netrender::Scene;
+use paint_list_api::{
+    ColorF, CommonPlacement, DeviceIntSize, LayoutPoint, LayoutRect, PaintCmd, PaintList, RectItem,
+};
+use paint_list_render::{CompositeLayer, composite_paint_layers};
+
+use crate::canvas::build::qual;
 
 use crate::canvas::physics_board::{BoardItem, PhysicsBoard};
 
@@ -91,12 +97,14 @@ impl From<&sceno::Footprint> for BoardFootprint {
     }
 }
 
-/// One card: its stable id, its slot (the score position), its site (the
-/// grouping the Kinds law reads), its footprint, whether a person holds it
-/// where it is, and whether it is the lead card.
+/// One card: its stable id, its title, its slot (the score position), its
+/// site (the grouping the Kinds law reads), its footprint, whether a person
+/// holds it where it is, and whether it is the lead card.
 #[derive(Clone, Debug, PartialEq)]
 pub struct BoardCard {
     pub id: String,
+    /// What the card is called: painted in it, and its accessible name.
+    pub title: String,
     pub slot: (f32, f32),
     pub site: String,
     pub footprint: BoardFootprint,
@@ -229,65 +237,279 @@ impl BoardScene {
             .sum()
     }
 
-    /// Paint the ground, the backdrops and the cards at the board's
-    /// positions into a `width` × `height` viewport.
-    pub fn paint(&self, board: &PhysicsBoard, width: u32, height: u32, fit: BoardFit) -> Scene {
-        let mut scene = Scene::new(width, height);
-        scene.push_rect(0.0, 0.0, width as f32, height as f32, BOARD_GROUND);
-        if self.cards.is_empty() && self.backdrops.is_empty() {
-            return scene;
+    /// The region the fit frames: the scene's bounds, grown to take in every
+    /// card's footprint at its slot, so a margin is a margin from the cards'
+    /// edges rather than from their centres.
+    pub fn frame(&self) -> BoardRect {
+        let mut extents: Vec<BoardRect> = self
+            .cards
+            .iter()
+            .filter_map(|card| {
+                let local = card.footprint.bounds()?;
+                Some(BoardRect::new(
+                    card.slot.0 + local.x,
+                    card.slot.1 + local.y,
+                    local.width,
+                    local.height,
+                ))
+            })
+            .collect();
+        if self.bounds.width > 0.0 || self.bounds.height > 0.0 {
+            extents.push(self.bounds);
         }
-        let transform = fit.transform(self.bounds, width as f32, height as f32);
+        let Some(first) = extents.first().copied() else {
+            return self.bounds;
+        };
+        let (mut x0, mut y0) = (first.x, first.y);
+        let (mut x1, mut y1) = (first.x + first.width, first.y + first.height);
+        for rect in &extents[1..] {
+            x0 = x0.min(rect.x);
+            y0 = y0.min(rect.y);
+            x1 = x1.max(rect.x + rect.width);
+            y1 = y1.max(rect.y + rect.height);
+        }
+        BoardRect::new(x0, y0, x1 - x0, y1 - y0)
+    }
+
+    /// Each card's body in viewport px, at the board's positions, in card
+    /// order: its id, its title and its rectangle. What a host names in its
+    /// accessibility tree, and where the titles are painted.
+    pub fn card_rects(
+        &self,
+        board: &PhysicsBoard,
+        width: u32,
+        height: u32,
+        fit: BoardFit,
+    ) -> Vec<(String, String, BoardRect)> {
+        let transform = fit.transform(self.frame(), width as f32, height as f32);
+        self.cards
+            .iter()
+            .map(|card| {
+                let (center_x, center_y) = transform.to_viewport(self.position(card, board));
+                let (card_w, card_h) = card_size(card, transform.scale);
+                (
+                    card.id.clone(),
+                    card.title.clone(),
+                    BoardRect::new(
+                        center_x - card_w * 0.5,
+                        center_y - card_h * 0.5,
+                        card_w,
+                        card_h,
+                    ),
+                )
+            })
+            .collect()
+    }
+
+    /// The ground, the backdrops and the cards as filled rectangles in
+    /// viewport px, back to front.
+    fn fills(&self, board: &PhysicsBoard, width: u32, height: u32, fit: BoardFit) -> Vec<Fill> {
+        let mut fills = vec![Fill([0.0, 0.0, width as f32, height as f32], BOARD_GROUND)];
+        if self.cards.is_empty() && self.backdrops.is_empty() {
+            return fills;
+        }
+        let transform = fit.transform(self.frame(), width as f32, height as f32);
         let scale = transform.scale;
         for backdrop in &self.backdrops {
             let (x0, y0) = transform.to_viewport((backdrop.rect.x, backdrop.rect.y));
             let x1 = x0 + backdrop.rect.width * scale;
             let y1 = y0 + backdrop.rect.height * scale;
-            scene.push_rect(x0, y0, x1, y1, backdrop_color(&backdrop.kind));
+            fills.push(Fill([x0, y0, x1, y1], backdrop_color(&backdrop.kind)));
             if backdrop.collidable {
                 let stroke = 2.0;
-                scene.push_rect(x0, y0, x1, y0 + stroke, COLLIDABLE_EDGE);
-                scene.push_rect(x0, y1 - stroke, x1, y1, COLLIDABLE_EDGE);
-                scene.push_rect(x0, y0, x0 + stroke, y1, COLLIDABLE_EDGE);
-                scene.push_rect(x1 - stroke, y0, x1, y1, COLLIDABLE_EDGE);
+                fills.push(Fill([x0, y0, x1, y0 + stroke], COLLIDABLE_EDGE));
+                fills.push(Fill([x0, y1 - stroke, x1, y1], COLLIDABLE_EDGE));
+                fills.push(Fill([x0, y0, x0 + stroke, y1], COLLIDABLE_EDGE));
+                fills.push(Fill([x1 - stroke, y0, x1, y1], COLLIDABLE_EDGE));
             }
         }
         for card in &self.cards {
             let (center_x, center_y) = transform.to_viewport(self.position(card, board));
-            let (card_w, card_h) = match card.footprint {
-                BoardFootprint::Rect { width, height } => (width * scale, height * scale),
-                BoardFootprint::Other { .. } => UNSIZED_CARD,
-            };
+            let (card_w, card_h) = card_size(card, scale);
             let (half_w, half_h) = (card_w * 0.5, card_h * 0.5);
             if card.pinned {
                 // Outside the card, so it reads as something done to the
                 // item rather than part of it.
-                scene.push_rect(
-                    center_x - half_w - 3.0,
-                    center_y - half_h - 3.0,
-                    center_x + half_w + 3.0,
-                    center_y + half_h + 3.0,
+                fills.push(Fill(
+                    [
+                        center_x - half_w - 3.0,
+                        center_y - half_h - 3.0,
+                        center_x + half_w + 3.0,
+                        center_y + half_h + 3.0,
+                    ],
                     HELD_EDGE,
-                );
+                ));
             }
-            scene.push_rect(
-                center_x - half_w - 5.0,
-                center_y - half_h + 6.0,
-                center_x + half_w + 5.0,
-                center_y + half_h + 11.0,
+            fills.push(Fill(
+                [
+                    center_x - half_w - 5.0,
+                    center_y - half_h + 6.0,
+                    center_x + half_w + 5.0,
+                    center_y + half_h + 11.0,
+                ],
                 SHADOW,
-            );
-            scene.push_rect(
-                center_x - half_w,
-                center_y - half_h,
-                center_x + half_w,
-                center_y + half_h,
+            ));
+            fills.push(Fill(
+                [
+                    center_x - half_w,
+                    center_y - half_h,
+                    center_x + half_w,
+                    center_y + half_h,
+                ],
                 if card.lead { LEAD_CARD } else { CARD },
-            );
+            ));
+        }
+        fills
+    }
+
+    /// Paint the ground, the backdrops and the cards at the board's
+    /// positions into a `width` × `height` viewport.
+    pub fn paint(&self, board: &PhysicsBoard, width: u32, height: u32, fit: BoardFit) -> Scene {
+        let mut scene = Scene::new(width, height);
+        for Fill([x0, y0, x1, y1], color) in self.fills(board, width, height, fit) {
+            scene.push_rect(x0, y0, x1, y1, color);
         }
         scene
     }
+
+    /// [`paint`](Self::paint), with each card's title set in the card in
+    /// `text`'s faces.
+    pub fn paint_titled(
+        &self,
+        board: &PhysicsBoard,
+        width: u32,
+        height: u32,
+        fit: BoardFit,
+        text: &mut BoardText,
+    ) -> Scene {
+        let rects: Vec<PaintCmd> = self
+            .fills(board, width, height, fit)
+            .into_iter()
+            .map(|Fill([x0, y0, x1, y1], [r, g, b, a])| {
+                PaintCmd::DrawRect(RectItem {
+                    placement: CommonPlacement::new(LayoutRect::new(
+                        LayoutPoint::new(x0, y0),
+                        LayoutPoint::new(x1, y1),
+                    )),
+                    color: ColorF::new(r, g, b, a),
+                })
+            })
+            .collect();
+        let viewport = DeviceIntSize::new(width as i32, height as i32);
+        let titles = text.titles(&self.card_rects(board, width, height, fit), width, height);
+        let mut layers = vec![CompositeLayer::commands_only(&rects)];
+        if let Some(titles) = titles.as_ref() {
+            layers.push(CompositeLayer {
+                commands: titles.commands(),
+                fonts: titles.fonts(),
+                images: titles.images(),
+            });
+        }
+        composite_paint_layers(viewport, &layers).scene
+    }
 }
+
+/// A card's drawn size: its footprint scaled, or the unsized default.
+fn card_size(card: &BoardCard, scale: f32) -> (f32, f32) {
+    match card.footprint {
+        BoardFootprint::Rect { width, height } => (width * scale, height * scale),
+        BoardFootprint::Other { .. } => UNSIZED_CARD,
+    }
+}
+
+/// One filled rectangle, `[x0, y0, x1, y1]` in viewport px, and its colour.
+struct Fill([f32; 4], [f32; 4]);
+
+/// The faces a board sets its card titles in, and the retained shaping state.
+/// A browser lends no system faces, so a host registers the ones it ships.
+pub struct BoardText {
+    text: genet_livery::TextSystem,
+    generation: u64,
+}
+
+impl Default for BoardText {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl BoardText {
+    pub fn new() -> Self {
+        Self {
+            text: genet_livery::TextSystem::new(),
+            generation: 0,
+        }
+    }
+
+    /// Register one face, by its bytes.
+    pub fn register_font(&mut self, bytes: Vec<u8>) {
+        self.text.register_font_bytes(bytes);
+    }
+
+    /// Lay the titles out over their card rectangles and paint them.
+    fn titles(
+        &mut self,
+        cards: &[(String, String, BoardRect)],
+        width: u32,
+        height: u32,
+    ) -> Option<genet_livery::LiveryPaintList> {
+        use layout_dom_api::{LayoutDom, LayoutDomMut};
+        if cards.iter().all(|(_, title, _)| title.is_empty()) {
+            return None;
+        }
+        let mut dom = genet_scripted_dom::ScriptedDom::new();
+        let root = dom.document();
+        for (_, title, rect) in cards.iter().filter(|(_, title, _)| !title.is_empty()) {
+            let line = dom.create_element(qual("div"));
+            dom.set_attribute(line, qual("class"), "board-title");
+            dom.set_attribute(
+                line,
+                qual("style"),
+                &format!(
+                    "left: {:.1}px; top: {:.1}px; width: {:.1}px;",
+                    rect.x,
+                    rect.y + (rect.height - TITLE_LINE) * 0.5,
+                    rect.width
+                ),
+            );
+            let words = dom.create_text(title);
+            dom.append_child(line, words);
+            dom.append_child(root, line);
+        }
+        let styles = genet_livery::resolve_styles(
+            &dom,
+            &genet_livery::StyleSet::cambium(&[TITLE_SHEET]),
+            &genet_livery::Device::screen(width as f32, height as f32),
+            &genet_livery::InteractionStates::default(),
+        );
+        let (styles, layout) = genet_livery::layout_with_text_system(
+            &dom,
+            &styles,
+            width as f32,
+            height as f32,
+            genet_livery::ViewportSizes::uniform(width as f32, height as f32),
+            &mut self.text,
+            &std::collections::HashMap::new(),
+        )
+        .ok()?;
+        self.generation += 1;
+        Some(genet_livery::emit_paint_list_with_text_system(
+            &dom,
+            &styles,
+            &layout,
+            DeviceIntSize::new(width as i32, height as i32),
+            self.generation,
+            &mut self.text,
+        ))
+    }
+}
+
+/// A title's line height, px; it is centred in its card.
+const TITLE_LINE: f32 = 16.0;
+const TITLE_SHEET: &str = "\
+    .board-title { position: absolute; margin: 0; padding: 0 6px; box-sizing: border-box; \
+      font-family: Roboto, sans-serif; font-size: 13px; line-height: 16px; \
+      color: #f0dfb8; text-align: center; white-space: nowrap; overflow: hidden; }";
 
 /// A stable fallback paint for an open backdrop kind: an unfamiliar scene
 /// still gets a distinct, deterministic face from its own data. Hosts with
@@ -314,6 +536,7 @@ mod tests {
     fn card(id: &str, x: f32, y: f32) -> BoardCard {
         BoardCard {
             id: id.into(),
+            title: format!("Card {id}"),
             slot: (x, y),
             site: "fixture".into(),
             footprint: BoardFootprint::Rect {
@@ -374,7 +597,7 @@ mod tests {
         let mut board = PhysicsBoard::new();
         // Before the board knows the cards, they are drawn at their slots.
         let before = rects(&scene_desc.paint(&board, 1400, 900, page_fit()));
-        let transform = page_fit().transform(scene_desc.bounds, 1400.0, 900.0);
+        let transform = page_fit().transform(scene_desc.frame(), 1400.0, 900.0);
         let (cx, cy) = transform.to_viewport((140.0, 0.0));
         let body = before.last().unwrap().0;
         assert_eq!([(body[0] + body[2]) / 2.0, (body[1] + body[3]) / 2.0], [cx, cy]);
@@ -478,5 +701,70 @@ mod tests {
             circle.bounds(),
             Some(BoardRect::new(-5.0, -5.0, 10.0, 10.0))
         );
+    }
+
+    /// The live board's bounds cover the cards' centres only. Framed by those
+    /// alone, a card centred on the top edge hangs half outside the margin.
+    #[test]
+    fn the_fit_frames_the_cards_edges_so_the_top_margin_holds() {
+        let mut first = card("0", 0.0, 0.0);
+        first.footprint = BoardFootprint::Rect {
+            width: 120.0,
+            height: 80.0,
+        };
+        let mut second = card("1", 140.0, 0.0);
+        second.footprint = first.footprint.clone();
+        let scene_desc = BoardScene {
+            bounds: BoardRect::new(0.0, 0.0, 140.0, 0.0),
+            backdrops: Vec::new(),
+            cards: vec![first, second],
+        };
+        assert_eq!(scene_desc.frame(), BoardRect::new(-60.0, -40.0, 260.0, 80.0));
+        let fit = BoardFit::new(24.0, 24.0, 24.0, 24.0);
+        let rects = scene_desc.card_rects(&PhysicsBoard::new(), 982, 627, fit);
+        assert_eq!(rects.len(), 2);
+        assert!(
+            rects.iter().all(|(_, _, rect)| (rect.y - 24.0).abs() < 0.01),
+            "both cards start at the top margin: {rects:?}"
+        );
+        assert_eq!(rects[1].1, "Card 1");
+    }
+
+    #[test]
+    fn titled_paint_sets_each_title_and_untitled_paint_sets_none() {
+        let scene_desc = BoardScene {
+            bounds: BoardRect::new(-140.0, -78.0, 560.0, 156.0),
+            backdrops: Vec::new(),
+            cards: vec![card("0", 0.0, 0.0), card("1", 280.0, 0.0)],
+        };
+        let board = PhysicsBoard::new();
+        let glyphs = |scene: &Scene| {
+            scene
+                .ops
+                .iter()
+                .filter(|op| matches!(op, SceneOp::GlyphRun(_)))
+                .count()
+        };
+        let plain = scene_desc.paint(&board, 800, 400, page_fit());
+        assert_eq!(glyphs(&plain), 0);
+        let mut text = BoardText::new();
+        let titled = scene_desc.paint_titled(&board, 800, 400, page_fit(), &mut text);
+        assert!(glyphs(&titled) >= 2, "one run per title at least");
+        // The rectangles underneath are the same ones.
+        let rect_count = |scene: &Scene| {
+            scene
+                .ops
+                .iter()
+                .filter(|op| matches!(op, SceneOp::Rect(_)))
+                .count()
+        };
+        assert_eq!(rect_count(&titled), rect_count(&plain));
+        // No titles, no text layer.
+        let mut nameless = scene_desc.clone();
+        for card in &mut nameless.cards {
+            card.title.clear();
+        }
+        let untitled = nameless.paint_titled(&board, 800, 400, page_fit(), &mut text);
+        assert_eq!(glyphs(&untitled), 0);
     }
 }

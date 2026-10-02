@@ -187,7 +187,8 @@ pub mod physics_board;
 /// onto them, and the named profiles. (Physics catalog — P1.)
 pub mod physics_catalog;
 pub use board_scene::{
-    BoardBackdrop, BoardCard, BoardFit, BoardFootprint, BoardRect, BoardScene, BoardTransform,
+    BoardBackdrop, BoardCard, BoardFit, BoardFootprint, BoardRect, BoardScene, BoardText,
+    BoardTransform,
     backdrop_color,
 };
 pub use physics_board::{BoardItem, PhysicsBoard, PhysicsChoice};
