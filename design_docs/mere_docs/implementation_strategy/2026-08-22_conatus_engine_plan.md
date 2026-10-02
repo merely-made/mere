@@ -576,6 +576,19 @@ contract declared in advance.
     reflowed expression as the only non-comment change: "Commit as a
     formatting commit" first. The three codegen caches Nexus no longer uses:
     "Delete after renderling's check".
+  - **Renderling's check, and the binary** (2026-10-02). Renderling's
+    formatting commit (`e14b737`) and upstream merge (`260e2c2`) landed on
+    `mark-ik/wgpu-30`. Our branch's shaders build with neither cargo-gpu
+    0.1.0 nor 0.10.0: `naga` 30, a build-dependency since our wgpu-30 port,
+    needs rustc 1.87, and the shader toolchain is nightly-2025-02-16 (1.86).
+    Upstream renderling (`46bf54c`) builds with 0.10.0, all 45 `.spv`
+    byte-identical to the committed ones, which our branch shares; renderling's
+    95 library tests pass run serially. Mark chose "Replace now, fix the
+    branch separately": cargo-gpu 0.10.0 becomes the installed default and
+    the three unused codegen caches go. For the branch, "Port shaders to
+    rust-gpu 0.10": spirv-std 0.10 and nightly 1.98, one toolchain with
+    Nexus. The alternatives were an older naga for build.rs, gating build.rs
+    off for shader builds, or leaving it until a shader changes.
   - **The logged token.** Four build logs captured this session's
     environment, including its messaging token and account IDs; redacted on
     Mark's choice.
