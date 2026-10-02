@@ -106,6 +106,64 @@ pub trait TextureProducer {
     fn retire(&mut self) {
         self.suspend();
     }
+
+    /// What the slot means to an assistive technology: a role and name for
+    /// the slot itself, and the things drawn in it as child nodes with their
+    /// rectangles. Read when the host publishes its accessibility tree, not
+    /// per frame. `None`, the default, leaves the slot's DOM semantics alone.
+    fn semantics(&mut self) -> Option<ProducerSemantics> {
+        None
+    }
+}
+
+/// A producer's accessible description of its slot. See
+/// [`TextureProducer::semantics`].
+#[derive(Clone, Debug, Default, PartialEq)]
+pub struct ProducerSemantics {
+    /// The slot's role, or `None` to keep its DOM role.
+    pub role: Option<ProducerRole>,
+    /// The slot's name, or `None` to keep its DOM name.
+    pub name: Option<String>,
+    /// What is drawn in the slot, in reading order.
+    pub children: Vec<ProducerNode>,
+}
+
+/// One thing drawn in a producer's slot.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ProducerNode {
+    pub role: ProducerRole,
+    pub name: String,
+    /// Where it is drawn, `[x, y, width, height]` in the slot's own logical
+    /// (layout) pixels, from the slot's top-left corner.
+    pub rect: [f32; 4],
+}
+
+/// The roles a producer's slot and its nodes can take. A small, neutral set
+/// that each host lowers to its own vocabulary (ARIA, AccessKit).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum ProducerRole {
+    /// A collection whose items are its children.
+    List,
+    ListItem,
+    /// A generic grouping.
+    Group,
+    /// A picture with a name.
+    Image,
+    /// A drawn object inside a graphic (a node on a canvas).
+    GraphicsObject,
+}
+
+impl ProducerRole {
+    /// The WAI-ARIA role this lowers to.
+    pub fn aria(self) -> &'static str {
+        match self {
+            ProducerRole::List => "list",
+            ProducerRole::ListItem => "listitem",
+            ProducerRole::Group => "group",
+            ProducerRole::Image => "img",
+            ProducerRole::GraphicsObject => "graphics-object",
+        }
+    }
 }
 
 impl<P: TextureProducer> TextureProducer for Rc<RefCell<P>> {
@@ -117,6 +175,9 @@ impl<P: TextureProducer> TextureProducer for Rc<RefCell<P>> {
     }
     fn retire(&mut self) {
         self.borrow_mut().retire();
+    }
+    fn semantics(&mut self) -> Option<ProducerSemantics> {
+        self.borrow_mut().semantics()
     }
 }
 

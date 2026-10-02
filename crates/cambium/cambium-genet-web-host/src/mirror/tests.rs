@@ -313,6 +313,8 @@ fn a_leaf_describes_itself_and_an_author_name_wins() {
         Some(LeafSemantics {
             role: Some("graphics-object"),
             name: Some("graph: 3 nodes, 2 links".into()),
+            children: Vec::new(),
+            names_itself: false,
         })
     });
     assert_eq!(asked, [(2, None), (3, Some("Reading map".into()))]);
@@ -335,6 +337,8 @@ fn a_leaf_describes_itself_and_an_author_name_wins() {
         LeafSemantics {
             role: Some("graphics-object"),
             name: Some("graph: 3 nodes, 2 links".into()),
+            children: Vec::new(),
+            names_itself: false,
         }
     );
 }
@@ -380,4 +384,64 @@ fn a_description_lowers_to_aria_description_and_an_empty_one_is_left_out() {
     );
     assert_eq!(name(&mirror[0]), Some("Append a card"));
     assert_eq!(attr(&mirror[1], "aria-description"), None);
+}
+
+#[test]
+fn what_a_leaf_draws_lowers_to_named_boxes_under_it() {
+    let mut leaf = blank(2, DocumentA11yRole::Unknown);
+    leaf.name = Some("Graph".into());
+    leaf.bounds = Some(DocumentA11yBounds {
+        x: 10.0,
+        y: 100.0,
+        width: 900.0,
+        height: 600.0,
+    });
+    let mirror = plan(&projection(&[2], vec![leaf]), 2.0, |id, _| {
+        (id == 2).then(|| {
+            LeafSemantics::from_producer(cambium_rootstock::ProducerSemantics {
+                role: Some(cambium_rootstock::ProducerRole::List),
+                name: Some("Remote board".into()),
+                children: vec![
+                    cambium_rootstock::ProducerNode {
+                        role: cambium_rootstock::ProducerRole::ListItem,
+                        name: "Card 0".into(),
+                        rect: [24.0, 24.0, 120.0, 80.0],
+                    },
+                    cambium_rootstock::ProducerNode {
+                        role: cambium_rootstock::ProducerRole::Image,
+                        name: "Card 1".into(),
+                        rect: [164.0, 24.0, 120.0, 80.0],
+                    },
+                ],
+            })
+        })
+    });
+    let board = &mirror[0];
+    assert_eq!(attr(board, "role"), Some("list"));
+    assert_eq!(name(board), Some("Remote board"), "the producer names its slot");
+    assert_eq!(board.children.len(), 2);
+    let (first, second) = (&board.children[0], &board.children[1]);
+    assert_eq!(attr(first, "role"), Some("listitem"));
+    assert_eq!(name(first), Some("Card 0"));
+    assert_eq!(
+        first.rect,
+        Some([48.0, 48.0, 240.0, 160.0]),
+        "relative to the leaf, in CSS pixels"
+    );
+    assert_eq!(attr(second, "role"), Some("img"));
+    assert_eq!(name(second), Some("Card 1"));
+    assert_ne!(first.id, second.id);
+    assert!(first.id >= 1 << 63, "outside the DOM's id range");
+
+    // With nothing drawn, the producer still names its slot.
+    let mut empty = blank(2, DocumentA11yRole::Unknown);
+    empty.name = Some("Graph".into());
+    let mirror = plan(&projection(&[2], vec![empty]), 1.0, |_, _| {
+        Some(LeafSemantics::from_producer(cambium_rootstock::ProducerSemantics {
+            role: Some(cambium_rootstock::ProducerRole::List),
+            name: Some("Remote board · 0 cards".into()),
+            children: Vec::new(),
+        }))
+    });
+    assert_eq!(name(&mirror[0]), Some("Remote board · 0 cards"));
 }

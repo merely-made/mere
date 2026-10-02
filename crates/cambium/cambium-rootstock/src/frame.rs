@@ -704,6 +704,7 @@ where
                 &dom_ref,
                 layout,
                 &mut self.s.leaves,
+                &mut self.s.producers,
                 self.s.last_focus,
                 layout_scale,
             )
