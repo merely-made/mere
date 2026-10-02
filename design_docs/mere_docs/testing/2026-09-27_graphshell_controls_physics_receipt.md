@@ -768,6 +768,85 @@ ran in a 1400 by 900 window.
   recursively or after being dropped". This path predates the slice. The
   headed Chrome receipts record no page errors.
 
+### Graph tools overflow, the draft proof and card titles (2026-10-02)
+
+These carry out the rulings at `bbc89994`, merged into `tree-remote-session`
+as `c9145545`. The runs used the final bundle, SHA256 `1ba3905d…`. The
+headed log is `Code/testing/mere/tree-remote/run-round3-final.log`.
+
+**Draft proof.**
+- `LiveEndpoint` advertises a third intent, "Append a coloured card", with
+  one required choice of colour (Red, Blue, Gold). Accepted, it appends a
+  card titled with the colour, "Card 1 · Blue" (`b8d56626`).
+- `RemoteSession::submit_draft` now checks a draft composes before asking.
+  An unset required value reads "Choose required values · …" and keeps the
+  draft open. Before, it failed the whole session as a link error.
+- `p4_tree_remote_draft` opens the draft and submits it unset, which is
+  refused before the endpoint is asked. It cancels, opens the draft again,
+  chooses Blue and submits, which is accepted. Revision, cards and the
+  "Card 1 · Blue" title move.
+- The form's button reads "Submit", because the action's own label is on
+  its button in the actions group.
+
+**Overflow.**
+- Arrangement and physics and Remote session are each a Cambium disclosure,
+  both open at first, inside a Graph tools region that scrolls vertically.
+- Showing the remote board opens its section. The storage line stays at
+  the top of the region.
+- The draft scenario closes and reopens Arrangement and physics.
+- Captures follow a new tree-lane verb, `reveal <role:name|.class> [text]`,
+  which scrolls the match into view as a click would. Each capture shows
+  the state it records.
+- The first closed-section capture showed the section's whole content
+  still laid out. Genet's Cambium UA sheet has no `[hidden] { display:
+  none }`. Cambium's closed disclosure, accordion and tree panels now also
+  carry an inline `display: none` (`00d695df`). The rule's proper home is
+  Genet's UA sheet.
+
+**Card titles.**
+- `BoardCard` carries a title, taken from the card's presentation
+  semantics. `BoardScene::paint_titled` sets it in the card through Livery's
+  standalone layout and paint, over a `BoardText` holding the page's own
+  font (`6005ea08`).
+- The Remote session section lists the titles as list "Cards".
+- The fit now frames the cards' edges: the live board's bounds cover card
+  centres only, so cards hung half outside the top margin. The old page
+  keeps framing centres (`frame_edges: false`), so its board stays where
+  its chrome expects it. Its receipts confirm the geometry is unchanged.
+- The board leaf does not yet project one node per card into the mirror.
+  It is returned as a fork: Cambium's leaf semantics carry one role and one
+  name, with no children.
+
+**Gates.** All offline and locked, logs `native-*-r3.log`:
+- graphshell-client 59; graphshell `web` lib 230; pictograph `canvas` 269;
+- the merge gate 263; Cambium 244; `cambium-genet-web-host` 7;
+- `remote_session_live` with the WebRTC join loopback, 4.
+
+The wasm build passes. The host fixture was rebuilt from the branch.
+
+**Headed** (1400 by 900, all ok, no page errors recorded):
+
+| Scenario | Fixture route | `app=local` |
+| --- | --- | --- |
+| `p4_tree_remote_draft` | ok | ok |
+| `p4_tree_c4b1_live_board` | ok | ok |
+| `p4_tree_physics_remote_board` | ok | ok |
+| `p4_tree_c4b3_reconnect` | ok | ok |
+| old page `c4b1_live_board`, `physics_remote_board`, `c4b3_reconnect` | ok, unchanged, third action present | — |
+
+No old-page assertion counts actions. The captures were inspected
+whole-frame:
+- titles sit in every card, with the top margin held;
+- the open draft and its status are in view on `app=local`;
+- a closed physics section leaves the remote section unscrolled.
+
+The receipts' semantic tree, from the browser mirror, lists:
+- the two section triggers with `aria-expanded`;
+- list "Cards" with each title;
+- the three described actions;
+- group Link;
+- the statuses.
+
 ## Open gates
 
 - Genet commit `27d20d3fc51ac5fcd2a2db231e035a3e06013ae1` admits safe retained
