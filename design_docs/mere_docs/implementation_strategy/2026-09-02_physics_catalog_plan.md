@@ -1,7 +1,7 @@
 # Physics Catalog Plan
 
 **Date:** 2026-09-02
-**Status:** in progress (P1 landed 2026-09-02; P1b, P2 on both hosts and P3 the remote board 2026-09-03; the runtime extraction 2026-09-04; P4 web half 2026-09-04, closing with the Graphshell tree port per the 2026-10-01 rulings in §5; P5a's tiled kernel 2026-10-02 on branch `gpu-repulsion`, P5b-c waiting on forks).
+**Status:** in progress (P1 landed 2026-09-02; P1b, P2 on both hosts and P3 the remote board 2026-09-03; the runtime extraction 2026-09-04; P4 web half 2026-09-04, closing with the Graphshell tree port per the 2026-10-01 rulings in §5; P5a-c 2026-10-02 on branch `gpu-repulsion`: kernel, cell list, lagged seam, setters and the web tree wired; the web staleness limit and threshold, and a cambium edit, back with Mark).
 **Scope:** A catalog of *distinct physics layout laws* — dynamical systems
 over the graph's bodies that produce different layouts because they are
 different physics — as a lever beside the arrangement catalog, plus the
@@ -619,6 +619,41 @@ eleven existing receipts stay green.
   1.09; 500 1.73 / 1.12; 750 3.74 / 1.98; 1,000 5.67 / 1.39; 2,000 15.2 /
   3.25; 5,000 66.7 / 3.67; 10,000 191 / 6.76. The device lane has about 1 ms
   of fixed cost a tick; the crossover on this machine is about 400 nodes.
+- 2026-10-02 (P5c, web): Chrome answers a readback about two frames after the
+  submit whatever the frame's length: the newest answer was 6 steps old at
+  every size from 128 to 2,000 nodes (three steps a frame, frames 78 ms to
+  2 s). At the ruled N = 3 the lane served 1 to 15 steps in 139 to 418; at
+  N = 9 it served all but the first five. Physics stage per frame (p50,
+  unlinked bodies), CPU / N = 3 / N = 9, in ms: 128 0.3 / 1.2 / 1.3; 256
+  1.1 / 1.8 / 3.1; 512 4.5 / 4.0 / 1.5; 1,000 16.1 / 17.8 / 2.1; 2,000
+  81.9 / 94.3 / 6.1. So at N = 3 the device never wins on the web and at
+  N = 9 it wins from about 400 nodes. Put to Mark (the web N and threshold).
+- 2026-10-02 (P5c, web): `cubecl-wgpu` 0.11.0-pre.2 turns on wgpu's
+  `fragile-send-sync-non-atomic-wasm` unconditionally; feature unification
+  puts it on the page's one wgpu, which then requires a `Send` callback for
+  every wasm `map_async`. Three readbacks captured `Rc<Cell<bool>>`:
+  `ports/graphshell/src/web_gpu.rs` and `web_timing.rs` (now
+  `Arc<AtomicBool>`) and `crates/cambium/cambium-genet-web-host/src/capture.rs`,
+  outside this lane's crates (the same change, uncommitted, put to Mark).
+- 2026-10-02 (P5c, web): a generated graph with links packs into a jammed ball
+  under Springs (its random long edges pull inward): at 2,000 nodes the CPU
+  run itself ended with 11,733 overlapping pairs and spread 323, and the end
+  energy varied 53k to 767k between runs differing by a handful of steps. The
+  spanning tree alone did the same (9,829 overlaps). The settle receipt uses
+  `links=none`, unlinked bodies, where Springs is exclusion and the boundary.
+- 2026-10-02 (P5c, web): the headed runs found the receipt window occluded
+  (`visibilityState` hidden, no frames); this lane's runner copy adds Chrome's
+  `CalculateNativeWinOcclusion` disable and the two backgrounding switches.
+- 2026-10-02: `~/.cargo/registry/cache` was emptied and recreated at 18:00
+  by another process (not this lane); offline web builds then failed for
+  missing `.crate` files although the extracted sources remained. This lane
+  re-fetched the web graph's locked crates (`cargo fetch --locked`, 772
+  crates, lock unchanged).
+- 2026-10-02 (pre-existing, seiche runtime): an offloaded simulation under a
+  law that never rests holds a `u32::MAX` settle budget, and the actor exits
+  on a closed channel only when the budget reaches zero, so dropping such a
+  canvas leaves its actor thread ticking. Seen as device answers counted by a
+  dropped canvas's actor in the offload receipt. Not fixed here.
 - 2026-10-02: a cargo run without `--locked` re-serializes the root lock,
   swapping the order of the two genet revisions' `fleece` and
   `layout-dom-api` rows; the committed lock passes `--locked` as it stands, so
@@ -956,3 +991,27 @@ binning are the useful patterns.
   device at 2.86 ms busy a tick against 14.5; the sign-flipped device law
   leaves 536 overlaps; a device lost after 100 submissions hands every later
   step to the CPU with the CPU's spread. seiche 96/96 (92 without `actor`).
+- 2026-10-02 (P5c): the hosts. Pictograph feature `gpu` adds
+  `Canvas::set_physics_device` and `PhysicsBoard::set_physics_device` (a
+  device set before `offload_physics` rides the simulation onto the actor,
+  one set after arrives by command; a law switch keeps the lane) and
+  `physics_device_for(&WgpuHandles)`; mere gains `canvas-gpu` (pictograph
+  `gpu`, opt-in, per the F5 ruling), graphshell gains `canvas-gpu`
+  (`RemoteBoard::set_physics_device`), and graphshell-web turns both on. The
+  web tree builds one device from `ProducerContext.core`'s handles on the
+  producer's first frame and hands it to the canvas and the remote board;
+  `gpu=off`, `gpu_threshold` and `gpu_max_stale_steps` are page options; the
+  tree snapshot gains `physics-device` and the lane's counts; `log-physics`
+  writes them into the receipt; past 512 nodes spread and overlaps come from
+  `Canvas::layout_stats_without_stretch` (a grid, same definition).
+  Receipts, bundle `89b75bb4`: the eleven law receipts plus profiles, add and
+  drag green at the default threshold, and the eleven again at threshold 0
+  with the device asserted on (the eight `NodeExclusion` laws served 77 to 425
+  steps on the device). `p5_tree_cpu_settle_2000` (2,000 unlinked nodes) and
+  `p5_tree_gpu_settle_2000` meet the same bounds (0 overlaps, spread 1,071
+  against 1,074, energy 441k against 426k) with 413 of 418 steps on the device
+  at N = 9 and the physics stage at 6.1 ms a frame against 81.9; at the ruled
+  N = 3 the device served 9 steps and the receipt fails its count. pictograph
+  3/3 device receipts. The web threshold default is left at 1,000 and N at 3
+  pending Mark's call on the readback finding above; the native crossover
+  (about 400, N = 1) is turnstone's to set when it is wired.
