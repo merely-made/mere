@@ -469,6 +469,27 @@ with re-splat flow, walls, Voronoi area share; a 12-node sample at Spearman
   alternatives were 0.8 for both, or a lower PageRank bar.
 Open: the settle budget and defaults (they move with the field choice), and
 the composition with edges (waiting on the composition assessment).
+*Second round, ruled 2026-10-02* (after `746b6902` on `density-cpu`: the
+evolving field with CFL substeps is stable, 0 to 10 overlaps against
+Springs' 38 to 173, but one pass settles at Spearman 0.60 on the 200-node
+graph; repeated passes reach 0.81 at 60 one-second passes and bring uniform
+mass to CV 0.05; at the catalog defaults overlays mixed in silently, Hub
+pull reading −0.33 with 510 overlaps):
+- **Re-entry.** "Repeated passes": each pass re-splats where the nodes are,
+  absorbing drags, contacts and additions, and a structural change still
+  starts a fresh flow. The alternatives were restarting on drag release and
+  structural change, or a local re-splat or field blend.
+- **Settle.** Mark chose "Stop on convergence", against the recommendation
+  (a per-law budget of passes times seconds): passes end when a convergence
+  test says the layout has stopped changing. *Reading, not ruled:* the test
+  and its threshold come from measurement and return to Mark if more than one
+  is defensible. The alternatives were that budget, or never resting.
+- **Defaults.** "64², 1-s passes", blur 0.25: the same ranks as 128² at about
+  a sixteenth of the cost. The alternatives were 128² as planned, or 128²
+  with fewer sweeps.
+- **Overlays on Density.** "Refuse overlays on Density now": the catalog
+  refuses them with a reason until the currency work. The alternatives were
+  dropping them silently, or allowing and marking the mix.
 
 *Done when:* GPU and CPU forces agree to 1e-3 relative at 1k and 10k nodes;
 a sign-flipped kernel fails the overlap check (positive control); a forced
