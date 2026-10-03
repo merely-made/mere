@@ -346,6 +346,15 @@ plan's G7 builds it. The Progress entries below keep their words: their
   back as seeded, through the alias. Which role those pins should take
   returns to Mark with mer3ly's mobility move, which G7 lists outside its
   track.
+  *2026-10-03, ruled:* a manual pin records as `Hold::Pinned` in either
+  motion, once mer3ly takes up the roles. Mark: "A pin is a pin
+  (Recommended)" (mer3ly's site canvas plan, Ruling 103). Both mapping sites
+  drop the motion check.
+- **The alias, as F25 is written.** A serde alias `"Anchored"` on `Seeded`
+  also catches the new `Anchored` on read. In a scratch probe,
+  `Hold::Anchored` serialized as `"Anchored"` and read back as `Seeded`, with
+  only an `unreachable_patterns` warning. How old saves are read is G7's
+  question, and it has gone to the dynamics grammar session.
 
 **A2. Selection clauses: coordination as data — CLOSED 2026-08-23.**
 Context: release ruling D1 stands (sceno ships no intent vocabulary; the
