@@ -373,6 +373,7 @@ impl Canvas {
             // Inline path (wasm / tests / physics not offloaded): compute synchronously.
             self.community_cache = Some(crate::signals::community_louvain(&self.graph));
             self.community_cache_revision = revision;
+            self.community_runs += 1;
             return;
         };
         // Off-thread path: spin up the worker lazily on first need, then dispatch this revision.
@@ -397,10 +398,33 @@ impl Canvas {
             None => return,
         };
         let Some(update) = update else { return };
-        if update.revision == self.graph.revision() {
+        let fresh =
+            self.community_cache.is_some() && self.community_cache_revision == update.revision;
+        if update.revision == self.graph.revision() && !fresh {
             self.community_cache = Some(update.clusters);
             self.community_cache_revision = update.revision;
+            self.community_runs += 1;
         }
+    }
+
+    /// The partition for the current revision, now: computed inline when the
+    /// cache is stale, even on an offloaded canvas, because an arrangement
+    /// that lays it out needs it this frame. (Dynamics grammar plan, G2.)
+    pub(crate) fn ensure_community_now(&mut self) {
+        let revision = self.graph.revision();
+        if self.community_cache.is_none() || self.community_cache_revision != revision {
+            self.community_cache = Some(crate::signals::community_louvain(&self.graph));
+            self.community_cache_revision = revision;
+            self.community_runs += 1;
+        }
+    }
+
+    /// How many partitions the registry has computed: one per structural
+    /// revision that something read, shared by the cluster arrangement, Kinds
+    /// and Group pull. (Dynamics grammar plan, G2; F21, "Two slots, one
+    /// binding".)
+    pub fn community_runs(&self) -> u64 {
+        self.community_runs
     }
 
     /// The cached community partition, or `None` if none has been computed (no cluster strategy has

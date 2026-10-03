@@ -540,6 +540,7 @@ fn a_whole_choice_applies_with_one_rebuild_and_reads_back() {
             PhysicsOverlay::DepthGravity,
         ],
         kind: PhysicsKindSource::Cluster,
+        groups: PhysicsKindSource::Component,
         mass: PhysicsMassSource::PageRank,
         depth: PhysicsDepthSource::Layers,
     };
@@ -553,6 +554,7 @@ fn a_whole_choice_applies_with_one_rebuild_and_reads_back() {
     let live = canvas.physics_choice();
     assert_eq!(live.law, PhysicsLaw::Kinds);
     assert_eq!(live.kind, PhysicsKindSource::Cluster);
+    assert_eq!(live.groups, PhysicsKindSource::Component);
     assert_eq!(live.mass, PhysicsMassSource::PageRank);
     assert_eq!(live.depth, PhysicsDepthSource::Layers);
     assert_eq!(
@@ -565,6 +567,7 @@ fn a_whole_choice_applies_with_one_rebuild_and_reads_back() {
     // same force set: the one rebuild read the sources it was handed.
     let mut stepwise = Canvas::with_sample_graph();
     stepwise.set_physics_kind_source(choice.kind);
+    stepwise.set_physics_group_source(choice.groups);
     stepwise.set_physics_mass_source(choice.mass);
     stepwise.set_physics_depth_source(choice.depth);
     stepwise.set_physics_overlays(choice.overlays.clone());

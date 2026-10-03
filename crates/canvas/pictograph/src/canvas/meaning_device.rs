@@ -1,0 +1,103 @@
+// Copyright 2026 Mark Alan Boykin
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// SPDX-License-Identifier: MPL-2.0
+
+//! A sentence model on the host's own device for the Meaning channel
+//! (feature `meaning-gpu`; dynamics grammar plan, G2: "Burn on the host
+//! device, off-path").
+//!
+//! The model runs on the CubeCL device the host's [`PhysicsDevice`] already
+//! registered from its renderer's handles, so physics, embeddings and the
+//! renderer share one wgpu device and one CubeCL client. Native hosts only:
+//! the wasm web build leaves the feature off and takes the lexical fallback.
+
+use std::path::Path;
+
+use esp::embed::bert::Device;
+use esp::embed::index_burn::{AFFINITY_GPU_MIN_ENTRIES, affinity_pairs_over_index};
+use esp::embed::{EmbedError, EmbeddingProvider, VectorIndex};
+use kernel::graph::NodeKey;
+
+use super::PhysicsDevice;
+use super::meaning::{MeaningBackend, MeaningEngine, MeaningParams};
+
+/// The Burn device a host's physics device registered: the same CubeCL
+/// client, never a new one.
+pub fn host_meaning_device(device: &PhysicsDevice) -> Device {
+    Device::new(device.client().device().clone())
+}
+
+/// A sentence model on a Burn wgpu device, with the pair search on the
+/// device from [`AFFINITY_GPU_MIN_ENTRIES`] entries up (ESP's measured
+/// crossover) and on the CPU below it.
+pub struct DeviceMeaning {
+    provider: Box<dyn EmbeddingProvider>,
+    device: Device,
+    params: MeaningParams,
+    pair_threshold: usize,
+}
+
+impl DeviceMeaning {
+    /// Load the model in `model_dir` (a HuggingFace layout) on the host's
+    /// device.
+    pub fn load(model_dir: impl AsRef<Path>, device: &PhysicsDevice) -> Result<Self, EmbedError> {
+        Self::load_on(model_dir, host_meaning_device(device))
+    }
+
+    /// Load the model on any Burn wgpu device.
+    pub fn load_on(model_dir: impl AsRef<Path>, device: Device) -> Result<Self, EmbedError> {
+        let provider = esp::embed::bert::load_wgpu(model_dir, device.clone())?;
+        Ok(Self {
+            provider,
+            device,
+            params: MeaningParams::MODEL,
+            pair_threshold: AFFINITY_GPU_MIN_ENTRIES,
+        })
+    }
+
+    /// Entry count at or above which pairs are found on the device (`0`:
+    /// always).
+    pub fn with_pair_threshold(mut self, threshold: usize) -> Self {
+        self.pair_threshold = threshold;
+        self
+    }
+
+    pub fn with_params(mut self, params: MeaningParams) -> Self {
+        self.params = params;
+        self
+    }
+
+    /// The device the model's tensors live on.
+    pub fn device(&self) -> &Device {
+        &self.device
+    }
+}
+
+impl MeaningEngine for DeviceMeaning {
+    fn backend(&self) -> MeaningBackend {
+        MeaningBackend::ModelGpu
+    }
+
+    fn params(&self) -> MeaningParams {
+        self.params
+    }
+
+    fn embed(&self, texts: &[&str]) -> Result<Vec<Vec<f32>>, EmbedError> {
+        self.provider.embed(texts)
+    }
+
+    fn pairs(
+        &self,
+        index: &VectorIndex<NodeKey>,
+        params: MeaningParams,
+    ) -> Vec<(NodeKey, NodeKey, f32)> {
+        if index.len() >= self.pair_threshold {
+            affinity_pairs_over_index(index, params.top_k, params.min_similarity, &self.device)
+        } else {
+            esp::embed::affinity_pairs(index, params.top_k, params.min_similarity)
+                .unwrap_or_default()
+        }
+    }
+}

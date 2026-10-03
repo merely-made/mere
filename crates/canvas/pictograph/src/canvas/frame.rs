@@ -160,6 +160,9 @@ impl Canvas {
         if self.show_bridge_rings {
             self.ensure_bridges_fresh();
         }
+        // Take a finished Meaning run, start one when the content moved, and hand a new snapshot
+        // to Kinds, Group pull and the affinity signal, before the affinity sync reads it. (G2.)
+        self.sync_meaning();
         // Keep the affinity-clustering force in step with the toggle + the current affinity signal
         // (installs / rebuilds / clears once per real change, with a settle so it takes; a no-op when
         // the toggle is off and no force is installed). (Graph signals — P4.)
