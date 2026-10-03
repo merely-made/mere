@@ -3566,3 +3566,91 @@ GPU-on A/B and the headed reruns wait for the helper (§13.35).
 - This plan's header annotates the pre.2 SQLite sentence.
 - Main stays pre.2 until S16, which waits on ruling 534's quiet GPU-on A/B
   and on the helper.
+
+### 13.37 Ruling 537: the newest wasm-bindgen (2026-10-03)
+
+**Ruling 537** (Isometry wing record, `2c69d25`). Question, as the
+coordinator put it to Mark with §13.35's finding: the probe pins
+`wasm-bindgen = "=0.2.122"` because newer releases are said to break wgpu 30's
+`popErrorScope`, while `cambium-genet-web-host` and graphshell-web pin
+`=0.2.127`. graphshell-web already runs 0.2.127 on wgpu 30.0.0 with its
+receipts passing, so the probe's stated reason may be stale. Options were
+§13.35's:
+
+- (A) feature-gate the crate's browser dependencies so the probe takes only
+  the helper;
+- (B) move the probe to the 0.2.127 family;
+- (C) the probe keeps a local start function.
+
+Mark: **"Take the newest ya can"**. *The migration session's reading, not
+ruled:* take the newest wasm-bindgen that works. The probe depends on
+`cambium-genet-web-host` (ruling 536), so the probe, that crate and
+graphshell-web all move to that one version: option B at the newest release.
+The wing session added a rule: if the newest release fails anything that can
+be shown, gather evidence for each older step tried, commit no older version,
+and stop.
+
+**Finding: the break is real, current, and present in graphshell-web.** The
+newest release is wasm-bindgen 0.2.129 (2026-09-25), with CLI 0.2.129,
+`js-sys`/`web-sys` 0.3.106 and `wasm-bindgen-futures` 0.4.79.
+
+- **The wgpu side.** wgpu 30.0.0 decodes an error-scope result through
+  `JsOption<GpuError>` (`src/backend/webgpu.rs`, `future_pop_error_scope`). Its
+  `from_js` panics with "Unexpected error" (`:85`) on anything that is not a
+  validation or out-of-memory error.
+- **The wasm-bindgen side.** `JsOption::into_option` returns `None` for null
+  or undefined in 0.2.122, but for undefined only in 0.2.126 through 0.2.129.
+  So a successful pop, which the browser resolves as `null`, becomes
+  `Some(null)` and panics.
+- **The fix exists.** wgpu 30.0.1 decodes through `JsNullable`, which treats
+  null as `None`. It requires wasm-bindgen 0.2.127 or later. The root lock
+  already holds 30.0.1; the web and probe locks hold 30.0.0.
+- **Who pops.** cubecl-wgpu pre.4 pushes and pops an error scope on every
+  shader compile and every `sync`. On wasm it awaits the compile-time pop in
+  a spawned task.
+- **What the receipts hold.** 21 GPU-on graphshell-web receipts on 0.2.127
+  with wgpu 30.0.0, pre.2 and pre.4 bundles alike, already record the panic
+  (`webgpu.rs:85:13`) once per page. They passed because no receipt asserts
+  zero page errors.
+
+Same session, one GPU-forced scenario per arm (`p4_tree_physics_kinds`,
+`gpu_threshold=0`), scratch exports of `dd9819c4` that differ only in pins and
+locks:
+
+| Arm | Bundle | Page errors |
+| --- | --- | --- |
+| 0.2.127 + wgpu 30.0.0 (committed) | `7a409182` | the panic, then `RuntimeError: unreachable` |
+| 0.2.129 + wgpu 30.0.0 | `f8a3515c` | the same panic |
+| 0.2.129 + wgpu 30.0.1 | `962ba60e` | none, in two runs |
+
+On the last arm, `p5_tree_gpu_settle_2000` also records no page error and
+meets its bounds: 413 of 418 device steps, spread 1,075, 0 overlaps, energy
+425,342.
+
+Each arm's lock differs from the committed web lock only in the wasm-bindgen
+family, plus wgpu and wgpu-types in the last. Two runs posted no receipt (a
+runner launch flake) and are not counted.
+
+**Older steps.** 0.2.128, 0.2.127 and 0.2.126 carry the same
+undefined-only `into_option`. 0.2.127 is shown failing above and 0.2.126 in
+the 2026-08-21 receipt. No older version was built or committed.
+
+**Returned as a fork.** The newest release works only with wgpu 30.0.1,
+which no ruling covers. Options:
+
+- (A, recommended) wasm-bindgen 0.2.129 with wgpu 30.0.1 in graphshell-web,
+  `cambium-genet-web-host` and the probe. That is one wgpu across the root,
+  web and probe graphs. It removes the silent panic graphshell-web has on
+  main today, and the helper and the probe dependency proceed as ruled.
+- (B) wasm-bindgen 0.2.129 with wgpu 30.0.0. Every GPU-on page keeps
+  panicking once, and the probe's rows would fail on the worker error.
+- (C) all three at 0.2.122. That is an older version, and wgpu 30.0.1 cannot
+  take it, so the root lock would have to drop to 30.0.0 as well.
+
+**Downloads.** `js-sys` 0.3.106, `web-sys` 0.3.106 and
+`wasm-bindgen-futures` 0.4.79 came into the cache, each matching its lock
+checksum. `wasm-bindgen-cli` 0.2.129 was built by `cargo install --locked` from
+crates.io into `C:/t/wasm-bindgen-0.2.129`. Its crate sha256 `5fd044ed…`
+equals crates.io's published checksum, and the binary is `87664ac7…`.
+Evidence: `Code/testing/mere/receipts/2026-10-03/pre4-bindgen`
+(`ruling-537-evidence.json`, arm locks, builds, scenario receipts).
