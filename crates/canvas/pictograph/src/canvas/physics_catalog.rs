@@ -16,9 +16,11 @@
 //! ten, and a bare profile per law puts every law one pick away.
 //!
 //! A **source** is where a law or overlay reads a node attribute from: the
-//! Kinds law's kind (site, cluster, colouring, island, degree), Orbit's mass
-//! and the hub overlays' weight (degree, PageRank), the Depth overlay's depth
-//! (roots, layers, the focus). Sources are tunables, not laws.
+//! Kinds law's kind and Group pull's groups (site, cluster, colouring, island,
+//! degree, meaning), Orbit's mass and the hub overlays' weight (degree,
+//! PageRank), the Depth overlay's depth (roots, layers, the focus). Sources
+//! are tunables, not laws; each is a channel of the registry in
+//! [`channels`](crate::canvas::channels).
 //!
 //! The canvas builds the seiche force set from the chosen law + overlays
 //! against the current graph and hands it to the physics backend wholesale —
@@ -184,7 +186,8 @@ impl PhysicsLaw {
 pub enum PhysicsOverlay {
     /// Hubs push their surroundings apart, by weight.
     DegreeRepulsion,
-    /// Nodes drift toward the centroid of their group (by site).
+    /// Nodes drift toward the centroid of their group (by the groups channel,
+    /// site by default).
     DomainCluster,
     /// Everything is drawn toward the hubs, by weight.
     HubGravity,
@@ -266,7 +269,8 @@ impl PhysicsOverlay {
     }
 }
 
-/// Where the Kinds law reads a node's kind from — the host's choice per scene.
+/// Where the Kinds law reads a node's kind from, and Group pull its groups —
+/// the host's choice per scene, one selector each.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum PhysicsKindSource {
     /// The URL host: every site a kind.
@@ -280,15 +284,20 @@ pub enum PhysicsKindSource {
     Component,
     /// Degree bands: isolated, leaf, connected, hub.
     Degree,
+    /// What the nodes say: their titles embedded, and the clusters of the
+    /// similarity pairs between them (the Meaning channel, dynamics grammar
+    /// plan, G2). Site until the first snapshot lands.
+    Meaning,
 }
 
 impl PhysicsKindSource {
-    pub const ALL: [PhysicsKindSource; 5] = [
+    pub const ALL: [PhysicsKindSource; 6] = [
         PhysicsKindSource::Site,
         PhysicsKindSource::Cluster,
         PhysicsKindSource::Coloring,
         PhysicsKindSource::Component,
         PhysicsKindSource::Degree,
+        PhysicsKindSource::Meaning,
     ];
 
     pub fn id(self) -> &'static str {
@@ -298,6 +307,7 @@ impl PhysicsKindSource {
             PhysicsKindSource::Coloring => "coloring",
             PhysicsKindSource::Component => "component",
             PhysicsKindSource::Degree => "degree",
+            PhysicsKindSource::Meaning => "meaning",
         }
     }
 
@@ -308,6 +318,7 @@ impl PhysicsKindSource {
             PhysicsKindSource::Coloring => "By colouring",
             PhysicsKindSource::Component => "By island",
             PhysicsKindSource::Degree => "By degree",
+            PhysicsKindSource::Meaning => "By meaning",
         }
     }
 
@@ -451,6 +462,7 @@ pub const CANVAS_PHYSICS_KIND_SOURCES: &[(&str, &str)] = &[
     ("coloring", "By colouring"),
     ("component", "By island"),
     ("degree", "By degree"),
+    ("meaning", "By meaning"),
 ];
 
 /// The mass-source catalog: `(id, label)`.
@@ -603,6 +615,8 @@ pub fn physics_profile(id: &str) -> Option<&'static PhysicsProfile> {
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) struct LawSources {
     pub kind: PhysicsKindSource,
+    /// Group pull's groups: any kind channel, unfolded.
+    pub groups: PhysicsKindSource,
     pub mass: PhysicsMassSource,
     pub depth: PhysicsDepthSource,
     /// The focused node, for the Focus depth source.
@@ -662,7 +676,7 @@ impl TopologyView {
 
 /// The graph inputs a law or overlay snapshots at build: the node set, the
 /// visible spring edges, and (on demand) degree, the site grouping, the
-/// Louvain partition and the petgraph view.
+/// Louvain partition, the Meaning snapshot and the petgraph view.
 pub(crate) struct LawInputs<'a> {
     nodes: Vec<NodeKey>,
     edges: Vec<(NodeKey, NodeKey)>,
@@ -670,6 +684,7 @@ pub(crate) struct LawInputs<'a> {
     /// board's host names), the Kinds law's and the group overlay's default.
     sites: HashMap<NodeKey, String>,
     clusters: Option<&'a crate::signals::ClusterSet>,
+    meaning: Option<&'a crate::canvas::meaning::MeaningSnapshot>,
 }
 
 impl<'a> LawInputs<'a> {
@@ -680,7 +695,7 @@ impl<'a> LawInputs<'a> {
     ) -> Self {
         let sites = graph
             .nodes()
-            .map(|(key, node)| (key, Graph::url_grouping_key(node.url()).to_string()))
+            .map(|(key, node)| (key, crate::canvas::channels::site_of(node).to_string()))
             .collect();
         let mut inputs = Self::from_parts(
             graph.nodes().map(|(key, _)| key).collect(),
@@ -704,7 +719,17 @@ impl<'a> LawInputs<'a> {
             edges,
             sites,
             clusters: None,
+            meaning: None,
         }
+    }
+
+    /// Read Meaning groups from `snapshot` (site until one exists).
+    pub(crate) fn with_meaning(
+        mut self,
+        snapshot: Option<&'a crate::canvas::meaning::MeaningSnapshot>,
+    ) -> Self {
+        self.meaning = snapshot;
+        self
     }
 
     pub(crate) fn topology(&self) -> TopologyView {
@@ -743,6 +768,59 @@ impl<'a> LawInputs<'a> {
             }
         }
         Some(groups)
+    }
+
+    /// Every node's Meaning cluster (`None` without a snapshot). A node the
+    /// snapshot does not know yet (added since it was taken) joins one extra
+    /// group until the next snapshot lands.
+    fn meaning_groups(&self) -> Option<Vec<(NodeKey, u32)>> {
+        let snapshot = self.meaning?;
+        let of: HashMap<NodeKey, u32> = snapshot.groups.iter().copied().collect();
+        let unknown = snapshot.clusters.clusters.len() as u32;
+        Some(
+            self.nodes
+                .iter()
+                .map(|&key| (key, of.get(&key).copied().unwrap_or(unknown)))
+                .collect(),
+        )
+    }
+
+    /// Degree bands: isolated, leaf, connected, hub.
+    fn degree_groups(&self) -> Vec<(NodeKey, u32)> {
+        let degree = self.degrees();
+        self.nodes
+            .iter()
+            .map(|&key| {
+                let d = degree.get(&key).copied().unwrap_or(0);
+                (
+                    key,
+                    match d {
+                        0 => 0,
+                        1 => 1,
+                        2..=4 => 2,
+                        _ => 3,
+                    },
+                )
+            })
+            .collect()
+    }
+
+    /// The groups channel: every node's group from any kind channel, as a
+    /// dense id, unfolded. Cluster and Meaning read site until their
+    /// partition exists.
+    pub(crate) fn groups(&self, source: PhysicsKindSource) -> Vec<(NodeKey, u32)> {
+        match source {
+            PhysicsKindSource::Site => self.site_groups(),
+            PhysicsKindSource::Cluster => {
+                self.cluster_groups().unwrap_or_else(|| self.site_groups())
+            },
+            PhysicsKindSource::Coloring => self.coloring_groups(),
+            PhysicsKindSource::Component => self.component_groups(),
+            PhysicsKindSource::Degree => self.degree_groups(),
+            PhysicsKindSource::Meaning => {
+                self.meaning_groups().unwrap_or_else(|| self.site_groups())
+            },
+        }
     }
 
     /// A proper colouring of the visible graph (DSATUR): adjacent nodes never
@@ -806,6 +884,31 @@ impl<'a> LawInputs<'a> {
             .collect()
     }
 
+    /// The mass channel's values before any reader's transform: degree, or
+    /// PageRank with the mean rank one. Orbit reads `1 +` these; the hub
+    /// overlays read `ln(1 + degree)` (seiche's default) or the rank itself.
+    pub(crate) fn mass_values(&self, source: PhysicsMassSource) -> Vec<(NodeKey, f32)> {
+        match source {
+            PhysicsMassSource::Degree => {
+                let degree = self.degrees();
+                self.nodes
+                    .iter()
+                    .map(|&key| (key, degree.get(&key).copied().unwrap_or(0) as f32))
+                    .collect()
+            },
+            PhysicsMassSource::PageRank => self.page_rank_weights(),
+        }
+    }
+
+    /// The depth channel's values.
+    pub(crate) fn depth_values(
+        &self,
+        source: PhysicsDepthSource,
+        focus: Option<NodeKey>,
+    ) -> Vec<(NodeKey, u32)> {
+        self.depths(source, focus)
+    }
+
     /// Masses for Orbit: `1 + degree`, or `1 + rank` with the mean rank one.
     fn masses(&self, source: PhysicsMassSource) -> Vec<(NodeKey, f32)> {
         match source {
@@ -827,32 +930,7 @@ impl<'a> LawInputs<'a> {
     /// A kind per node for the Kinds law, from the chosen source, plus how many
     /// kinds there are.
     pub(crate) fn kinds(&self, source: PhysicsKindSource) -> (Vec<(NodeKey, u8)>, usize) {
-        let groups: Vec<(NodeKey, u32)> = match source {
-            PhysicsKindSource::Site => self.site_groups(),
-            PhysicsKindSource::Cluster => {
-                self.cluster_groups().unwrap_or_else(|| self.site_groups())
-            },
-            PhysicsKindSource::Coloring => self.coloring_groups(),
-            PhysicsKindSource::Component => self.component_groups(),
-            PhysicsKindSource::Degree => {
-                let degree = self.degrees();
-                self.nodes
-                    .iter()
-                    .map(|&key| {
-                        let d = degree.get(&key).copied().unwrap_or(0);
-                        (
-                            key,
-                            match d {
-                                0 => 0,
-                                1 => 1,
-                                2..=4 => 2,
-                                _ => 3,
-                            },
-                        )
-                    })
-                    .collect()
-            },
-        };
+        let groups = self.groups(source);
         // Particle life reads best with a handful of kinds; fold a long tail of
         // sites into eight, keeping a small catalog its own size.
         let distinct = groups
@@ -1089,7 +1167,9 @@ impl<'a> LawInputs<'a> {
                     Box::new(DegreeRepulsion::default().with_weights(self.page_rank_weights()))
                 },
             },
-            PhysicsOverlay::DomainCluster => Box::new(DomainCluster::new(self.site_groups())),
+            PhysicsOverlay::DomainCluster => {
+                Box::new(DomainCluster::new(self.groups(sources.groups)))
+            },
             PhysicsOverlay::HubGravity => match sources.mass {
                 PhysicsMassSource::Degree => Box::new(HubGravity::default()),
                 PhysicsMassSource::PageRank => {
@@ -1155,6 +1235,11 @@ impl Canvas {
         self.physics_depth_source
     }
 
+    /// Where Group pull reads its groups from.
+    pub fn physics_group_source(&self) -> PhysicsKindSource {
+        self.physics_group_source
+    }
+
     /// Switch the law. The force set is replaced wholesale; no body moves until
     /// the next tick, then a settle (or, for a law that never rests, a
     /// continuous run) lets the new dynamics express themselves. Physics stays
@@ -1196,6 +1281,20 @@ impl Canvas {
         }
     }
 
+    /// Choose where Group pull reads its groups from; rebuilds only if Group
+    /// pull is live. By cluster, it reads the partition Columns (by cluster)
+    /// lays out, so the overlay is that arrangement's law-form twin.
+    pub fn set_physics_group_source(&mut self, source: PhysicsKindSource) {
+        self.physics_group_source = source;
+        if self
+            .physics_overlays
+            .contains(&PhysicsOverlay::DomainCluster)
+        {
+            self.rebuild_law_forces();
+            self.settle_for_law();
+        }
+    }
+
     /// Choose where masses and hub weights come from; rebuilds only if Orbit
     /// or a weighted overlay is live.
     pub fn set_physics_mass_source(&mut self, source: PhysicsMassSource) {
@@ -1226,6 +1325,7 @@ impl Canvas {
             law: self.physics_law,
             overlays: self.physics_overlays.clone(),
             kind: self.physics_kind_source,
+            groups: self.physics_group_source,
             mass: self.physics_mass_source,
             depth: self.physics_depth_source,
         }
@@ -1237,6 +1337,7 @@ impl Canvas {
     /// [`set_physics_overlays`](Self::set_physics_overlays).
     pub fn set_physics_choice(&mut self, choice: &crate::canvas::PhysicsChoice) {
         self.physics_kind_source = choice.kind;
+        self.physics_group_source = choice.groups;
         self.physics_mass_source = choice.mass;
         self.physics_depth_source = choice.depth;
         let mut seen = HashSet::new();
@@ -1292,6 +1393,7 @@ impl Canvas {
     fn law_sources(&self) -> LawSources {
         LawSources {
             kind: self.physics_kind_source,
+            groups: self.physics_group_source,
             mass: self.physics_mass_source,
             depth: self.physics_depth_source,
             focus: self.focused_key(),
@@ -1305,10 +1407,12 @@ impl Canvas {
         {
             self.law_rebuilds += 1;
         }
-        let wants_clusters = self.physics_law == PhysicsLaw::Kinds
-            && self.physics_kind_source == PhysicsKindSource::Cluster;
+        let wants_clusters = self.physics_reads(PhysicsKindSource::Cluster);
         if wants_clusters {
             self.ensure_community_fresh();
+        }
+        if self.physics_reads(PhysicsKindSource::Meaning) {
+            self.refresh_meaning();
         }
         let sources = self.law_sources();
         let forces = {
@@ -1320,15 +1424,30 @@ impl Canvas {
                 } else {
                     None
                 },
-            );
+            )
+            .with_meaning(self.meaning.snapshot());
             inputs.forces(self.physics_law, &self.physics_overlays, sources)
         };
+        #[cfg(test)]
+        if self.physics_reads(PhysicsKindSource::Meaning) {
+            self.meaning.built_from = self.meaning.snapshot().map(|s| s.run);
+        }
         self.physics.set_forces(forces);
+    }
+
+    /// Whether the live law or overlays read `source` through the kind or the
+    /// groups channel.
+    pub(crate) fn physics_reads(&self, source: PhysicsKindSource) -> bool {
+        (self.physics_law == PhysicsLaw::Kinds && self.physics_kind_source == source)
+            || (self.physics_group_source == source
+                && self
+                    .physics_overlays
+                    .contains(&PhysicsOverlay::DomainCluster))
     }
 
     /// The settle a law switch earns: a living law runs until paused, the rest
     /// settle for the usual budget.
-    fn settle_for_law(&mut self) {
+    pub(crate) fn settle_for_law(&mut self) {
         if self.physics_never_rests() {
             self.settle_physics(u32::MAX);
         } else {

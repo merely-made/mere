@@ -207,7 +207,7 @@ fn project_canvas_dispatch(
                 .map(|(key, node)| {
                     (
                         key,
-                        AxisValue::Categorical(Graph::url_grouping_key(node.url()).to_string()),
+                        AxisValue::Categorical(crate::canvas::channels::site_of(node).to_string()),
                     )
                 })
                 .collect::<HashMap<_, _>>();
@@ -481,6 +481,42 @@ pub fn project_canvas_strategy_with_score(
         1.0,
         None,
     )
+}
+
+impl crate::canvas::Canvas {
+    /// Project arrangement `id` over this canvas's graph with the facts its
+    /// channel registry holds: Columns (by cluster) lays out the registry's
+    /// Louvain partition, the one Kinds and Group pull by cluster read,
+    /// computed once per structural revision; Columns (by site) keys its
+    /// columns by the site channel's function. The host's entry for an
+    /// arrangement, so a scene's arrangement and its dynamics read one
+    /// binding. (Dynamics grammar plan, G2; F21, "Two slots, one binding".)
+    pub fn project_arrangement_for_view(
+        &mut self,
+        id: &str,
+        width: u32,
+        height: u32,
+        extents: Option<&HashMap<NodeKey, (f32, f32)>>,
+        recent_first: bool,
+        zoom_level: f32,
+        previous_score: Option<&sceno::Score>,
+    ) -> CanvasStrategyProjection {
+        if id == "kanban.community" {
+            self.ensure_community_now();
+        }
+        project_canvas_strategy_with_score_for_view(
+            id,
+            &self.graph,
+            self.focused_key(),
+            width,
+            height,
+            self.community_cache.as_ref(),
+            extents,
+            recent_first,
+            zoom_level,
+            previous_score,
+        )
+    }
 }
 
 /// Like [`project_canvas_strategy_with_score`], evaluated for the host's

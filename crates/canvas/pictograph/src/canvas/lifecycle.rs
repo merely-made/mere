@@ -171,6 +171,7 @@ impl Canvas {
             importance_dirty: true,
             community_cache: None,
             community_cache_revision: 0,
+            community_runs: 0,
             last_strategy_inputs: None,
             strategy_footprint_revision: 0,
             strategy_footprints: HashMap::new(),
@@ -213,6 +214,8 @@ impl Canvas {
             physics_law: crate::canvas::PhysicsLaw::Springs,
             physics_overlays: Vec::new(),
             physics_kind_source: crate::canvas::PhysicsKindSource::Site,
+            physics_group_source: crate::canvas::PhysicsKindSource::Site,
+            meaning: Default::default(),
             physics_mass_source: crate::canvas::PhysicsMassSource::Degree,
             physics_depth_source: crate::canvas::PhysicsDepthSource::Roots,
             #[cfg(test)]

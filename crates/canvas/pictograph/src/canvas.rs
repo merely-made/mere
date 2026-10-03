@@ -71,7 +71,7 @@ fn build_affinity_spring(scores: &crate::signals::AffinityScores) -> AffinitySpr
 /// **content** (cosine over node embeddings) — when both are available under the
 /// [`cluster_by_affinity`](Canvas::set_cluster_by_affinity) toggle. (burn brief Lane 5 — P6,
 /// blended affinity.)
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
 pub enum AffinityBlend {
     /// Draw a pair together if *either* signal likes it, harder if both — a noisy-OR of the two
     /// weights (`1 − (1−s)(1−c)`, bounded to `0..=1`). Topology and meaning as complementary
@@ -203,6 +203,17 @@ pub use physics_catalog::{
     PhysicsDepthSource, PhysicsKindSource, PhysicsLaw, PhysicsMassSource, PhysicsOverlay,
     PhysicsProfile,
 };
+/// The channel registry: every source the laws, overlays and slots read, by
+/// id. (Dynamics grammar plan, G2.)
+pub mod channels;
+/// The Meaning channel: what the nodes say, as one snapshot. (G2.)
+pub mod meaning;
+/// A sentence model on the host's own device for the Meaning channel.
+#[cfg(feature = "meaning-gpu")]
+pub mod meaning_device;
+mod meaning_lane;
+pub use channels::{Channel, ChannelFamily, ChannelValues};
+pub use meaning::{MeaningBackend, MeaningEngine, MeaningParams, MeaningSnapshot, ProviderMeaning};
 
 /// Force-directed settle length (frames) after a (re)seed, ~6s at 60fps.
 const SETTLE_TICKS: u32 = 360;
@@ -472,6 +483,9 @@ pub struct Canvas {
     /// The [`Graph::revision`](kernel::graph::Graph::revision) [`community_cache`](Self::community_cache)
     /// was computed at, so a stale partition is recomputed and a fresh one reused. (Graph signals.)
     community_cache_revision: u64,
+    /// How many partitions the registry has computed for the cache: one per
+    /// structural revision, whoever reads it. (Dynamics grammar plan, G2.)
+    community_runs: u64,
     /// The inputs the active analytic layout was last computed for: strategy id, structural graph
     /// revision, URL-authority grouping revision, Canvas footprint revision, viewport, and focus. The
     /// host gates its per-frame `project_canvas_strategy` call on these via
@@ -652,6 +666,11 @@ pub struct Canvas {
     /// Where the Kinds law reads a node's kind from (site, cluster, degree) —
     /// the host's choice per scene. (Physics catalog — P1.)
     physics_kind_source: PhysicsKindSource,
+    /// Where Group pull reads its groups from: any kind channel, site by
+    /// default. (Dynamics grammar plan, G2.)
+    physics_group_source: PhysicsKindSource,
+    /// The Meaning channel's engine, snapshot and lane. (G2.)
+    meaning: meaning::MeaningState,
     /// Where Orbit's masses and the hub overlays' weights come from (degree,
     /// PageRank). (Physics catalog — P1b.)
     physics_mass_source: PhysicsMassSource,

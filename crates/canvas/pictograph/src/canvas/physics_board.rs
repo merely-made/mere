@@ -44,11 +44,15 @@ use crate::canvas::physics_catalog::{
 pub const DEFAULT_BOARD_PULL: f32 = DEFAULT_ANCHOR_STIFFNESS / 24.0;
 
 /// The physics choice a board runs: what the host's own canvas runs, mirrored.
+/// A board has no partition and no Meaning snapshot of its own, so its
+/// cluster and meaning sources read site.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PhysicsChoice {
     pub law: PhysicsLaw,
     pub overlays: Vec<PhysicsOverlay>,
     pub kind: PhysicsKindSource,
+    /// Group pull's groups channel.
+    pub groups: PhysicsKindSource,
     pub mass: PhysicsMassSource,
     pub depth: PhysicsDepthSource,
 }
@@ -59,6 +63,7 @@ impl Default for PhysicsChoice {
             law: PhysicsLaw::Springs,
             overlays: Vec::new(),
             kind: PhysicsKindSource::Site,
+            groups: PhysicsKindSource::Site,
             mass: PhysicsMassSource::Degree,
             depth: PhysicsDepthSource::Roots,
         }
@@ -331,6 +336,7 @@ impl PhysicsBoard {
         let inputs = LawInputs::from_parts(nodes, Vec::new(), sites);
         let sources = LawSources {
             kind: self.choice.kind,
+            groups: self.choice.groups,
             mass: self.choice.mass,
             depth: self.choice.depth,
             focus: None,

@@ -212,7 +212,13 @@ fn load_provider(model_dir: &str, backend: &str) -> Result<Box<dyn EmbeddingProv
     let t = std::time::Instant::now();
     let provider: Box<dyn EmbeddingProvider> = match backend {
         "cpu" => esp::embed::bert::load_cpu(model_dir),
-        "wgpu" => esp::embed::bert::load_wgpu(model_dir),
+        // A command-line tool owns no renderer, so it boots a device of its
+        // own: the first discrete GPU, as `load_wgpu` itself did before it
+        // took the caller's device.
+        "wgpu" => esp::embed::bert::load_wgpu(
+            model_dir,
+            esp::embed::bert::Device::wgpu(esp::embed::bert::DeviceKind::DiscreteGpu(0)),
+        ),
         other => return Err(format!("--backend must be cpu or wgpu, got {other:?}")),
     }
     .map_err(|e| format!("load embedding model from {model_dir}: {e}"))?;

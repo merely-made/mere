@@ -52,6 +52,35 @@ impl CommunitySnapshot {
             .collect();
         Self { nodes, adjacency }
     }
+
+    /// A weighted similarity graph over `nodes`: one undirected edge per pair
+    /// (weights of a repeated pair summed, self-pairs and unknown keys
+    /// dropped). Louvain over it partitions by similarity rather than by
+    /// topology, as the Meaning channel does with embedding pairs.
+    pub fn from_weighted_pairs(nodes: Vec<NodeKey>, pairs: &[(NodeKey, NodeKey, f32)]) -> Self {
+        let index: HashMap<NodeKey, usize> =
+            nodes.iter().enumerate().map(|(i, &k)| (k, i)).collect();
+        let mut adj: Vec<HashMap<usize, f64>> = vec![HashMap::new(); nodes.len()];
+        for &(a, b, w) in pairs {
+            let (Some(&i), Some(&j)) = (index.get(&a), index.get(&b)) else {
+                continue;
+            };
+            if i == j || w <= 0.0 {
+                continue;
+            }
+            *adj[i].entry(j).or_insert(0.0) += f64::from(w);
+            *adj[j].entry(i).or_insert(0.0) += f64::from(w);
+        }
+        let adjacency = adj
+            .into_iter()
+            .map(|row| {
+                let mut row: Vec<(usize, f64)> = row.into_iter().collect();
+                row.sort_unstable_by_key(|&(j, _)| j);
+                row
+            })
+            .collect();
+        Self { nodes, adjacency }
+    }
 }
 
 /// One pass of Louvain **local moving** on a weighted graph with self-loops: each node starts in its
@@ -173,6 +202,8 @@ fn louvain_aggregate(
 /// singleton). Deterministic (sorted tie-breaks + first-seen compaction) and `Graph`-independent, so
 /// it runs inline or on the background worker. (Graph signals — community detection, P3 + multi-level.)
 pub fn community_louvain_on_snapshot(snapshot: &CommunitySnapshot) -> ClusterSet {
+    #[cfg(test)]
+    LOUVAIN_RUNS.with(|runs| runs.set(runs.get() + 1));
     let nodes = &snapshot.nodes;
     let n = nodes.len();
     if n == 0 {
@@ -240,6 +271,18 @@ pub fn community_louvain_on_snapshot(snapshot: &CommunitySnapshot) -> ClusterSet
             })
             .collect(),
     }
+}
+
+#[cfg(test)]
+thread_local! {
+    static LOUVAIN_RUNS: std::cell::Cell<u64> = const { std::cell::Cell::new(0) };
+}
+
+/// Every Louvain run on this thread, wherever it was called from. Test
+/// instrument: inline runs happen on the test's own thread.
+#[cfg(test)]
+pub(crate) fn louvain_runs_on_this_thread() -> u64 {
+    LOUVAIN_RUNS.with(std::cell::Cell::get)
 }
 
 /// Community detection on `graph`: extract a [`CommunitySnapshot`] then run Louvain inline. The
