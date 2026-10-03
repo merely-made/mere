@@ -42,6 +42,8 @@ pub(super) struct Form {
     pub inset: f32,
     pub relax: f32,
     pub renew: Option<f32>,
+    /// The walls' centre moved this far along x, world units.
+    pub shift: f32,
 }
 
 pub(super) const BASE: Form = Form {
@@ -53,6 +55,7 @@ pub(super) const BASE: Form = Form {
     inset: 18.0,
     relax: 1.0,
     renew: None,
+    shift: 0.0,
 };
 
 pub(super) fn law(canvas: &Canvas, form: Form, stop: DensityStop, passes: u32) -> Arc<Density> {
@@ -65,6 +68,7 @@ pub(super) fn law(canvas: &Canvas, form: Form, stop: DensityStop, passes: u32) -
     d.wall_inset = form.inset;
     d.relax = form.relax;
     d.renew = form.renew;
+    d.centre = (form.shift, 0.0);
     d.stop = stop;
     d.patience = 3;
     d.max_passes = passes;
@@ -385,5 +389,217 @@ fn density_start_probe() {
                     .collect::<Vec<_>>()
             );
         }
+    }
+}
+
+/// A seed spiral turned by `turn` radians with the nodes dealt onto its
+/// points in a seeded order (`deal` 0 keeps key order): starts that no
+/// symmetry of the square grid maps onto one another.
+fn seeded_dealt(graph: Graph, turn: f32, deal: u64) -> Canvas {
+    let mut canvas = Canvas::with_graph(graph);
+    canvas.set_layout_strategy(None);
+    let mut keys: Vec<NodeKey> = canvas.graph().nodes().map(|(k, _)| k).collect();
+    keys.sort_by_key(|k| k.index());
+    if deal != 0 {
+        // Fisher–Yates on xorshift64, seeded per start.
+        let mut state = deal.wrapping_mul(0x9E37_79B9_7F4A_7C15) | 1;
+        for i in (1..keys.len()).rev() {
+            state ^= state << 13;
+            state ^= state >> 7;
+            state ^= state << 17;
+            keys.swap(i, (state % (i as u64 + 1)) as usize);
+        }
+    }
+    canvas.physics.seed(
+        keys.iter()
+            .enumerate()
+            .map(|(i, &k)| {
+                let a = i as f32 * 2.399_963 + turn;
+                let r = 40.0 * (i as f32 + 0.5).sqrt();
+                (k, Point2D::new(r * a.cos(), r * a.sin()))
+            })
+            .collect(),
+    );
+    canvas.physics.refresh(&mut canvas.view);
+    canvas
+}
+
+fn rank_at_stop(mut canvas: Canvas, form: Form) -> (f32, u32) {
+    let law = law(&canvas, form, DensityStop::Shift(0.05), 120);
+    install(&mut canvas, &law);
+    super::density::until_settled(&mut canvas, 60 * 122);
+    let passes = law.pass_history().len() as u32;
+    (canvas.layout_stats().mass_area_rank, passes)
+}
+
+/// The rank where the ruled stop lands over sixteen inequivalent starts:
+/// golden-angle turns (no multiple of a quarter turn) and a seeded deal of
+/// the nodes onto the spiral per start.
+#[test]
+#[ignore = "wander probe: rank at the stop over sixteen inequivalent starts"]
+fn density_start_probe_inequivalent() {
+    let graphs = [
+        ("sample-12", crate::canvas::build::sample_graph()),
+        ("gen-50", generated(50, 3)),
+        ("gen-200", generated(200, 7)),
+    ];
+    for form in forms() {
+        for (name, graph) in &graphs {
+            let ranks: Vec<f32> = (0..16u64)
+                .map(|k| {
+                    rank_at_stop(
+                        seeded_dealt(graph.clone(), k as f32 * 2.399_963, k + 1),
+                        form,
+                    )
+                    .0
+                })
+                .collect();
+            let pass = ranks.iter().filter(|r| **r >= 0.8).count();
+            let (lo, hi) = ranks
+                .iter()
+                .fold((f32::MAX, f32::MIN), |(lo, hi), r| (lo.min(*r), hi.max(*r)));
+            let mean = ranks.iter().sum::<f32>() / ranks.len() as f32;
+            println!(
+                "STARTS16 {name} | {} | mean {mean:.3} range {lo:.3}..{hi:.3} | >= 0.8 in {pass}/16 | {:?}",
+                form.name,
+                ranks
+                    .iter()
+                    .map(|r| (r * 100.0).round() / 100.0)
+                    .collect::<Vec<_>>()
+            );
+        }
+    }
+}
+
+/// The orientation control: one deal, the turn swept across a quarter turn
+/// in nine steps. A smooth curve in the turn is the grid's or the walls'
+/// anisotropy; a two-valued jump is two basins.
+#[test]
+#[ignore = "wander probe: rank against the seed's turn over a quarter turn"]
+fn density_orientation_probe() {
+    let graphs = [
+        ("sample-12", crate::canvas::build::sample_graph()),
+        ("gen-200", generated(200, 7)),
+    ];
+    for form in forms() {
+        for (name, graph) in &graphs {
+            let rows: Vec<String> = (0..9)
+                .map(|j| {
+                    let turn = j as f32 * std::f32::consts::FRAC_PI_2 / 8.0;
+                    let (rank, passes) = rank_at_stop(seeded_dealt(graph.clone(), turn, 0), form);
+                    format!("{:.1}°:{rank:.3}(p{passes})", turn.to_degrees())
+                })
+                .collect();
+            println!("TURN {name} | {} | {}", form.name, rows.join(" "));
+        }
+    }
+}
+
+fn rank_under(canvas: Canvas, form: Form, stop: DensityStop) -> (f32, u32) {
+    let mut canvas = canvas;
+    let law = law(&canvas, form, stop, 120);
+    install(&mut canvas, &law);
+    super::density::until_settled(&mut canvas, 60 * 122);
+    (
+        canvas.layout_stats().mass_area_rank,
+        law.pass_history().len() as u32,
+    )
+}
+
+/// One cheap check per anisotropy candidate on the 200-node graph, the
+/// aligned start (0°) against a turned one (22.5°): a finer grid, the
+/// domain moved half a cell under the same seed, and a wider blur. Then,
+/// on four dealt starts, the rank where the ruled stop lands against the
+/// rank under the pass cap alone: an early stop, or the law's own rest.
+#[test]
+#[ignore = "wander probe: anisotropy checks and stop against cap"]
+fn density_anisotropy_checks() {
+    let graph = generated(200, 7);
+    let checks = [
+        BASE,
+        Form {
+            name: "grid128",
+            resolution: 128,
+            ..BASE
+        },
+        Form {
+            name: "half-cell",
+            shift: 11.0,
+            ..BASE
+        },
+        Form {
+            name: "blur0.5",
+            blur: 0.5,
+            ..BASE
+        },
+    ];
+    for form in checks {
+        let row: Vec<String> = [0.0f32, 22.5]
+            .iter()
+            .map(|deg| {
+                let canvas = seeded_dealt(graph.clone(), deg.to_radians(), 0);
+                let (rank, passes) = rank_under(canvas, form, DensityStop::Shift(0.05));
+                format!("{deg}°:{rank:.3}(p{passes})")
+            })
+            .collect();
+        println!("ANISO gen-200 | {} | {}", form.name, row.join(" "));
+    }
+    for (name, graph) in [("gen-50", generated(50, 3)), ("gen-200", generated(200, 7))] {
+        for form in [
+            BASE,
+            Form {
+                name: "renew-L2",
+                renew: Some(2.0),
+                ..BASE
+            },
+        ] {
+            let row: Vec<String> = (1..=4u64)
+                .map(|k| {
+                    let start = || seeded_dealt(graph.clone(), k as f32 * 2.399_963, k);
+                    let (stop, p) = rank_under(start(), form, DensityStop::Shift(0.05));
+                    let (cap, _) = rank_under(start(), form, DensityStop::Cap);
+                    format!("start {k}: stop {stop:.3}(p{p}) cap {cap:.3}")
+                })
+                .collect();
+            println!("STOPCAP {name} | {} | {}", form.name, row.join(" | "));
+        }
+    }
+}
+
+/// The 12-node sample over eight dealt starts: the rank where the ruled stop
+/// lands against the rank under the pass cap alone.
+#[test]
+#[ignore = "wander probe: the sample's stop against its cap over dealt starts"]
+fn density_sample_stop_against_cap() {
+    let graph = crate::canvas::build::sample_graph();
+    for form in [
+        BASE,
+        Form {
+            name: "renew-L2",
+            renew: Some(2.0),
+            ..BASE
+        },
+    ] {
+        let (mut stops, mut caps) = (Vec::new(), Vec::new());
+        for k in 1..=8u64 {
+            let start = || seeded_dealt(graph.clone(), k as f32 * 2.399_963, k);
+            stops.push(rank_under(start(), form, DensityStop::Shift(0.05)).0);
+            caps.push(rank_under(start(), form, DensityStop::Cap).0);
+        }
+        let mean = |v: &[f32]| v.iter().sum::<f32>() / v.len() as f32;
+        let r = |v: &[f32]| {
+            v.iter()
+                .map(|x| (x * 100.0).round() / 100.0)
+                .collect::<Vec<_>>()
+        };
+        println!(
+            "SAMPLECAP {} | stop mean {:.3} {:?} | cap mean {:.3} {:?} | cap >= 0.8 in {}/8",
+            form.name,
+            mean(&stops),
+            r(&stops),
+            mean(&caps),
+            r(&caps),
+            caps.iter().filter(|c| **c >= 0.8).count()
+        );
     }
 }
