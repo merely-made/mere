@@ -1826,3 +1826,35 @@ binning are the useful patterns.
   passed, 12 ignored, `physics_terms` 4/4 at twelve laws; graphshell
   `--features web --lib` 232 passed, 1 ignored, single-threaded. Logs
   `gate-r8-*.log`.
+- 2026-10-03 (P6a, ninth round, after "Release bars, quick default"; main
+  `9dd866e4` merged as `b7b26048`, docs only, so no headed rerun): the
+  default suite now runs one Density check,
+  `density_on_the_sample_rises_and_evens_past_the_settle_budget`. It takes
+  the sample from dealt start 0 past the settle budget by frames alone (390
+  ticks) and asserts that the law still asks for ticks, that the rank has
+  risen above the seed's (0.175 from −0.427) and that the CV has fallen
+  (0.207 from 0.414). Springs from the same start rests at its budget (the
+  control). It takes 16.7 s in a debug build. It replaces the eighth
+  round's default subset and the 200-node past-budget test, whose claim it
+  carries. The release receipts are ignored tests: the three
+  `_from_all_sixteen_starts` and `uniform_mass_spreads_evenly`, which now
+  runs its 60 passes. One line runs them all (also in the module doc of
+  `pictograph/src/canvas/tests/density.rs`):
+
+  `cargo test --release -p pictograph --features canvas --lib tests::density:: -- --ignored --nocapture`
+
+  They pass in 193 s, four at a time, after a 91 s build
+  (`receipts-r9-release.log`). Density's 48 per-start lines match the
+  eighth round's to the digit: gen-50 min 0.713, mean 0.790, 9 of 16 at
+  0.8; 200 nodes min 0.703, mean 0.777, 7 of 16; the sample's rank rises
+  on all sixteen (least gain 0.084) and its CV falls on all sixteen;
+  uniform mass stops at CV 0.055 with no overlaps. Springs does not repeat
+  between runs of the same code: −0.32 to −0.72 on gen-50 and −0.39 to
+  −0.50 on 200 nodes here, against −0.32 to −0.72 and −0.35 to −0.51 in
+  the eighth round, all below zero. The pictograph suite takes 134 s (401 s
+  in the eighth round, 110 s before Density's receipts); its slowest test
+  is now `physics_terms`' instrument agreement. Gates (offline, locked,
+  debug): seiche 109/109, 105/105 without default features, 109/109 with
+  `gpu`; pictograph `--features canvas --lib` 279 passed, 13 ignored;
+  graphshell `--features web --lib` 232 passed, 1 ignored, single-threaded.
+  Logs `gate-r9-*.log`, `r9-quick-check.raw`.
