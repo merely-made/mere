@@ -294,12 +294,10 @@ fn expected_classes(row: &str) -> Option<&'static [Class]> {
 }
 
 /// Every row of the brief's §5.1–5.3 declares its terms: the eleven laws
-/// (Density joins as the twelfth when `density-cpu` lands, declared on
-/// seiche's `Density` as Medium, Diffusion, Field then Position, Kinematic,
-/// class K in the Wasserstein metric, observable MassAreaRank), the eight
-/// overlays, the anchor, affinity and coupling slots, and the always-on terms
-/// rapier realizes. The repulsion solver seam is a rung of `NodeExclusion`,
-/// not a term, so it has no row.
+/// (Density is the twelfth when `density-cpu` lands; the plan's Findings
+/// sketch its declaration), the eight overlays, the slots, and the always-on
+/// terms rapier realizes. The repulsion solver seam is a rung of
+/// `NodeExclusion`, not a term, so it has no row.
 #[test]
 fn every_catalog_term_declares_itself() {
     assert_eq!(
@@ -468,11 +466,11 @@ fn print(fixture: &str, name: &str, r: &Reading) {
 }
 
 /// The instruments agree with every declared class on both fixtures:
-/// energy, gradient, balance and velocity for every term, and
-/// conservativeness by loop work and by Jacobian symmetry, the two
-/// position-only candidates. Persistent motion's verdicts and the catalog's
-/// Barnes–Hut rung are printed, not asserted (the plan's §3, question 3, and
-/// the rung's finding). The full table goes to the test's output.
+/// energy, gradient, balance, Jacobian symmetry as the descent test for a
+/// term with no energy (F14) and the velocity check beside it (F15). Loop
+/// work's and persistent motion's verdicts are printed as diagnostics, and so
+/// is Charge's Barnes–Hut θ 0.5 beside its law at θ 0 (F16). The full table
+/// goes to the test's output.
 #[test]
 fn the_instruments_agree_with_every_declared_class() {
     let mut disagreements: HashMap<Candidate, Vec<String>> = HashMap::new();
@@ -480,7 +478,7 @@ fn the_instruments_agree_with_every_declared_class() {
         for (name, reading) in readings(&fixture) {
             print(fixture.name, &name, &reading);
             for candidate in Candidate::ALL {
-                if let Err(why) = reading.agrees(candidate) {
+                if let Err(why) = reading.agrees_by(candidate) {
                     disagreements
                         .entry(candidate)
                         .or_default()
@@ -503,21 +501,20 @@ fn the_instruments_agree_with_every_declared_class() {
             println!("  {}", line.split(": Reading").next().unwrap_or(line));
         }
     }
-    for candidate in [Candidate::LoopWork, Candidate::Jacobian] {
-        let wrong: Vec<&String> = disagreements
-            .get(&candidate)
-            .into_iter()
-            .flatten()
-            .filter(|line| !line.contains(APPROXIMATE_CHARGE))
-            .collect();
-        assert!(wrong.is_empty(), "{candidate:?} disagrees: {wrong:#?}");
-    }
+    let wrong: Vec<&String> = disagreements
+        .get(&Candidate::Jacobian)
+        .into_iter()
+        .flatten()
+        .filter(|line| !line.contains(APPROXIMATE_CHARGE))
+        .collect();
+    assert!(wrong.is_empty(), "the instruments disagree: {wrong:#?}");
 }
 
 /// The positive control, in one run on both fixtures: Kinds with the
-/// catalog's seeded matrix fails descent (it has no energy, and every
-/// conservativeness candidate calls it non-conservative) and reciprocity;
-/// the same law with its matrix symmetrized passes both.
+/// catalog's seeded matrix fails descent (it has no energy, and Jacobian
+/// symmetry calls it non-conservative) and reciprocity; the same law with its
+/// matrix symmetrized passes both. Both readings, diagnostics included, are
+/// printed.
 #[test]
 fn kinds_seeded_fails_both_instruments_and_symmetrized_passes_both() {
     for fixture in [Fixture::p2(), Fixture::generated()] {
@@ -536,20 +533,18 @@ fn kinds_seeded_fails_both_instruments_and_symmetrized_passes_both() {
         print(fixture.name, "kinds seeded", &fails);
         print(fixture.name, "kinds symmetrized", &passes);
         assert_eq!((fails.term.class, passes.term.class), (Class::N, Class::E));
-        // Descent: no energy to descend, and non-conservative by every candidate.
+        // Descent: no energy to descend, and not symmetric.
         assert!(fails.rise.is_none() && fails.gradient.is_none());
-        for candidate in Candidate::ALL {
-            assert!(!fails.conservative(candidate), "{candidate:?}: {fails:?}");
-            assert!(passes.conservative(candidate), "{candidate:?}: {passes:?}");
-        }
+        assert!(!fails.conservative(Candidate::Jacobian), "{fails:?}");
+        assert!(passes.conservative(Candidate::Jacobian), "{passes:?}");
         // Reciprocity.
         assert!(
             fails.balance.unwrap() > instruments::tolerance::BALANCE,
             "{fails:?}"
         );
-        // The symmetrized law agrees with E on everything.
-        passes.agrees(Candidate::LoopWork).unwrap();
-        passes.agrees(Candidate::Jacobian).unwrap();
+        // Both agree with their declared classes.
+        fails.agrees().unwrap();
+        passes.agrees().unwrap();
     }
 }
 
