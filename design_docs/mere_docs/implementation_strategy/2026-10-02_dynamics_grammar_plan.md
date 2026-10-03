@@ -218,6 +218,19 @@ Constraints report whether they were satisfied, the physics counterpart of `scen
 
 ## 3. Open questions
 
+*Ruled 2026-10-02, on putting the plan to Mark:* "Approve; start G1" (the
+alternatives were waiting for P5 and P6 to merge first, or amending), so G1
+runs now and the order of G2 to G6 returns to him after G1. Questions 1 to
+3 below are settled: F7's relabel covers "Docs and descriptions only" (the
+picker label stays "Energy"; the alternative also renamed the label); F10
+uses "P2's floor, energy ≥ 1" (the alternatives were a fraction of the
+first second's energy, or visible motion); and the descent test for terms
+with no energy is "Lane picks by the positive control": loop-work,
+Jacobian-symmetry and persistent-motion checks are tried, the one where
+seeded Kinds fails and symmetrized Kinds passes is kept, and the lane
+returns if more than one discriminates (the alternatives named loop work or
+Jacobian symmetry outright).
+
 These are *Reading, not ruled*. Each returns to Mark at the named track's checkpoint, with evidence, if more than one answer is defensible.
 
 1. **G1: what "relabel" covers.** This plan reads F7 as correcting docs and descriptive text. The picker label "Energy" stays plain under the 2026-09-02 ruling, "labels plain, ids technical". If the ruling meant the picker label, that is a change to put back.
