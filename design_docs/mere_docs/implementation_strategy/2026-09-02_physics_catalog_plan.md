@@ -1034,8 +1034,33 @@ P5 and P6 stay in this plan.
   and on the sample, whose masses take three values, a 1–2% area change that
   flips pairs across tied mass groups. Over eight starts the sample settles
   into one of two equilibria (the stop reading 0.84 or 0.53–0.59, half and
-  half) under every formulation tried. Logs: `probe-wander-*.raw`,
+  half) under every formulation tried. *(Corrected 2026-10-03: those eight
+  starts were quarter-turn copies of two, the probe turning the seed by
+  π/4 under a square's symmetry; see the sixth-round finding.)* Logs: `probe-wander-*.raw`,
   `probe-starts.raw` under `Code/testing/mere/density/`.
+- 2026-10-03 (P6a, sixth round): every Density probe and receipt so far
+  seeded the spiral in key order, which on these graphs puts the
+  highest-degree nodes at its centre, and the round-five start probe turned
+  that seed by π/4, two classes under the square's symmetry. From sixteen
+  inequivalent starts (golden-angle turns, each with its own seeded deal of
+  nodes onto the spiral), the rank where the ruled stop lands is, base
+  passes: the sample 0.458 (0.00–0.877), gen-50 0.722 (0.618–0.856), the
+  200-node graph 0.754 (0.684–0.844), with 2, 1 and 1 of 16 at or over 0.8;
+  renewal 0.291 / 0.736 / 0.768; decay 0.453 / 0.725 / 0.726; 128² 0.457 /
+  0.729 / 0.717. On dealt starts the stop fires early: gen-50 under the
+  passes stops at pass 6 at 0.636–0.775 where the 120-pass cap reads
+  0.820–0.863, and the 200-node graph 0.726–0.804 against 0.781–0.819; the
+  sample's cap reads 0.661 (0.35–0.86, 2 of 8), so a small graph's rest
+  itself depends on its start. The field's domain does not: it is a square
+  sized by total mass about a fixed centre (`seiche/src/laws/density.rs`
+  256–261, centre at 215). Turning the key-order seed through a quarter
+  turn gives no smooth curve: on the 200-node graph the axis-aligned
+  starts read 0.737 and 0.747 (stopping at pass 18) and every other turn
+  0.786–0.807, and the gap tracks when the stop fires (128² 0.706 / 0.748,
+  both at pass 7; the domain moved half a cell 0.755 / 0.772, the aligned
+  start's stop moving from pass 18 to 34; blur 0.5 0.698 / 0.713). Logs:
+  `probe-orientation.raw`, `probe-starts-16*.raw`, `probe-anisotropy.raw`,
+  `probe-sample-cap.raw` under `Code/testing/mere/density/`.
 
 ## 5. Decisions
 
@@ -1577,4 +1602,16 @@ binning are the useful patterns.
   lane's worktree, whose manifest matches main's. Gates (offline, debug): seiche 103/103 and 99/99 without default features; pictograph `--features canvas --lib` 277 passed, 5 ignored (the gen-50 receipt and the probes); graphshell `--features web --lib` 230 passed, 1 ignored, single-threaded, after two parallel runs lost `session_notices::tests::the_endpoint_is_asked_even_while_no_request_is_in_flight` and `carrier::tests::p2panda_murm_grant_is_refused_before_projection_bytes` to timing under load, in code this lane does not touch (each passes alone; `gate-graphshell-web-flake*.log`).
   Open, put to Mark: which formulation, if any, replaces the passes; and
   what the bar means on a small, symmetric graph whose stop lands in one of
-  two equilibria by its start.
+  two equilibria by its start. *(Corrected 2026-10-03: the eight starts
+  were two classes, and every probe and receipt seeded the spiral in key
+  order, a favourable start; the sixth-round entry restates both questions
+  from inequivalent starts.)*
+- 2026-10-03 (P6a, sixth round): the start probe re-run from inequivalent
+  starts, an orientation sweep, one cheap check per anisotropy candidate,
+  and the stop against the cap on dealt starts (Findings). No formulation
+  changed and no default changed; the probes are ignored tests in
+  `pictograph/src/canvas/tests/density_wander.rs`. Open, put to Mark again
+  from these numbers: whether the stop, not the formulation, is the thing
+  to change (the passes' cap meets 0.8 on gen-50 from every dealt start
+  measured); and what the bar is on the 12-node sample, whose rest itself
+  ranges 0.35 to 0.86 by start.
