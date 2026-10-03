@@ -349,7 +349,9 @@ plan's G7 builds it. The Progress entries below keep their words: their
   *2026-10-03, ruled:* a manual pin records as `Hold::Pinned` in either
   motion, once mer3ly takes up the roles. Mark: "A pin is a pin
   (Recommended)" (mer3ly's site canvas plan, Ruling 103). Both mapping sites
-  drop the motion check.
+  drop the motion check. *Landed the same day,* ahead of mer3ly's repin
+  (mer3ly `f0fc678`), at Mark's "make the move". mer3ly no longer writes
+  `Hold::Anchored` anywhere, so G7 changes no meaning for it.
 - **The alias, as F25 is written.** A serde alias `"Anchored"` on `Seeded`
   also catches the new `Anchored` on read. In a scratch probe,
   `Hold::Anchored` serialized as `"Anchored"` and read back as `Seeded`, with
