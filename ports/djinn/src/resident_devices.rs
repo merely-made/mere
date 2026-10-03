@@ -50,6 +50,10 @@ pub const DEVICE_DIRECTORY_ROUTE: &str = "device-directory-v1";
 /// credential: the door's owner-only endpoint is the boundary, and this route
 /// is granted to this label alone.
 pub const DEVICE_DIRECTORY_APP: &str = "djinn";
+/// What the card and `djinn-devices` say when gossip has dropped a device that
+/// iroh still lists an active path to (pairing plan ruling 39).
+pub const NOT_CONNECTED_PATH_ACTIVE: &str =
+    "not connected (no gossip neighbour; a path is still active)";
 const SESSION: &str = "djinn.device-directory/v1";
 const RESOURCE_LABEL: &str = "djinn.device-directory/v1";
 
@@ -389,9 +393,7 @@ fn card_value(device: &PairedDeviceV1) -> CardValueV1 {
             (true, _) => format!("connected via {}", live.join(", ")),
             // Off the overlay while iroh still lists a path, as for about a
             // minute after a peer closes.
-            (false, _) if !live.is_empty() => {
-                "not connected (a path is still marked active)".into()
-            },
+            (false, _) if !live.is_empty() => NOT_CONNECTED_PATH_ACTIVE.into(),
             (false, true) => "not connected (an address is known)".into(),
             (false, false) => "not connected (no address known)".into(),
         },

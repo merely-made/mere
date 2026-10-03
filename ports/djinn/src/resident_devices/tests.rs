@@ -154,7 +154,7 @@ fn the_card_says_when_gossip_and_the_path_disagree() {
     assert!(!stale.connected);
     assert_eq!(
         card_value(&stale).value,
-        "not connected (a path is still marked active)"
+        "not connected (no gossip neighbour; a path is still active)"
     );
 }
 
