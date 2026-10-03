@@ -2,14 +2,14 @@
 
 **Date**: 2026-10-02
 **Status (2026-10-03)**: in progress. Assessed and ruled by Mark from 2026-10-01
-to 2026-10-03 (rulings 1 to 47 below). D1 landed (`4963b489`); D1b's mere fix (M1)
+to 2026-10-03 (rulings 1 to 51 below). D1 landed (`4963b489`); D1b's mere fix (M1)
 landed (`177b927c`), its fork fix (F1) is released as
 `mere-p2panda-net-0.7.5` (`1bec457e`, pushed), with knot and mere repinned
-locally; `connected` follows the gossip overlay (ruling 31, landed
-`fdb02bd3`). Before knot's and mere's pushes, the release branch takes
-`main` and connection-event liveness is built for peers off the overlay
-(rulings 45, 47); the overlay's gap after restarts has its own lane (ruling
-36); then D2.
+locally and `main` merged into the repin (`259f2741`); `connected` follows
+the gossip overlay (ruling 31, landed `fdb02bd3`). Before knot's and mere's
+pushes, connection-event liveness for peers off the overlay is built on
+`main` (rulings 47 to 51) and the release branch takes `main` again; the
+overlay's gap after restarts has its own lane (ruling 36); then D2.
 **Scope**: Mark's machines find, reach and trust each other by device
 identity, not by address: the stack's own peers already do on one network;
 SSH, the path Mark uses daily, does not. Pairing a device becomes one
@@ -450,6 +450,40 @@ now"**. Follows: a lane assesses and builds connection-event liveness for
 peers off the overlay before knot's and mere's pushes, its design forks
 coming to Mark.
 
+**Ruling 48.** *Ruling 47's signal: an iroh endpoint hook (`after_handshake`)
+sees every connection on the endpoint, whoever opens it, and its weak
+handle's `closed()` fires when that connection ends; in a probe both
+connections to a killed peer closed 12.0 to 12.2 s after the kill, while the
+path rule cleared at 72 s. Off the overlay a peer would read connected while
+at least one connection to it is open. Count which connections?* Options:
+every open connection; exclude short-lived ones. Mark: **"Every open
+connection (Recommended)"**. Follows: a brief fetch, or a handshake later
+rejected, counts while open; an idle peer with no open connection reads not
+connected.
+
+**Ruling 49.** *Should an open connection ever make a peer on a subscribed
+overlay read connected (an SSH session to a device with no gossip neighbour,
+as in ruling 36's half-state)?* Options: gossip alone, as ruled; gossip or an
+open connection. Mark: **"Gossip alone, as ruled (Recommended)"**. Follows:
+ruling 31 stands; the count serves only peers off the overlay.
+
+**Ruling 50.** *When a peer reads not connected while iroh still shows an
+active path, the card says "not connected (no gossip neighbour; a path is
+still active)" (ruling 39); off the overlay the reason is no open
+connection. Wording?* Options: two wordings, off the overlay "not connected
+(no open connection; a path is still active)"; one wording, "not connected
+(a path is still active)". Mark: **"Two wordings (Recommended)"**.
+
+**Ruling 51.** *Where does the hook go, and where does the build land? The
+API is identical in iroh 1.2 and 1.3 and in p2panda 0.7.4 and 0.7.5
+(checked), and hooks stack beside p2panda's own authoriser hook.* Options:
+always on, landing on `main`; always on, landing on the release branch; opt
+in through the builder, landing on `main`. Mark: **"Always on; land on main
+(Recommended)"**. Follows: the hook is installed in
+`P2pandaTransport::bind_inner`; the build lands on `main`, and the release
+branch merges `main` again and reruns its checks on iroh 1.3 before the
+pushes.
+
 Also given in the same conversation (2026-10-01, Mark: "You can edit known
 hosts"): `known_hosts` entries may be updated, which was done for the
 ThinkPad (`.32`) and Q-PC (`.68`, `q-pc.local`), each key added only after
@@ -876,6 +910,46 @@ earlier unexplained hang (the test now logs the stall and moves on).
   `carrier::tests::p2panda_murm_grant_is_refused_before_projection_bytes`
   hit its 10 s timeout in several of its runs, twice when run alone, and
   passed single-threaded in its latest run; load is a candidate.
+
+**2026-10-03: the liveness assessment (ruling 47) and the release merge.**
+
+- **What iroh offers.** No per-remote connection count or connection event
+  stream; `RemoteInfo` carries only addresses with their usage. The
+  endpoint hook `EndpointHooks::after_handshake` (iroh 1.3.0
+  `endpoint/hooks.rs:87-107`) runs in the single constructor for accepted
+  and dialled connections, and `Builder::hooks` appends rather than replaces
+  (`endpoint.rs:780-791`, checked). `WeakConnectionHandle::closed()`
+  (`connection.rs:1352`) reports the close without keeping the connection
+  alive. p2panda's builder appends hooks the same way
+  (`p2panda-net/src/iroh_endpoint/builder.rs:85-94`, checked) and installs
+  its own authoriser hook. The hook code is identical in iroh 1.2.0 and
+  1.3.0, and p2panda's builder and hooks are unchanged between 0.7.4 and
+  0.7.5 (checked). p2panda hashes ALPNs with its network id, so a hook sees
+  no protocol names.
+- **The probe** (iroh 1.2.0, 4 runs, possibly load-affected): the hook saw
+  both connections to a child-process peer, which closed 12.02 to 12.16 s
+  after its kill. The path rule cleared at 72.19 and 72.12 s, the last close
+  plus 60 s, whether polled every 200 ms or not. One poller did not extend
+  it, so the release lane's long tails need messages to queue, which load
+  supplies (*reading*).
+- **Who reads `connected`:** in production only personal sync (djinn's
+  directory and poll loop). Peers off the overlay today are the startup
+  window before LogSync subscribes, transports without gossip, and topics
+  left; a D3 ALPN-only peer would be the first deliberate one.
+- **The release merge.** `259f2741` merges `c64b834b` into the repin:
+  - Retinue comes through the workspace (ruling 44). outrider, postilion and
+    radio-hand are pinned exactly in the root table (`=0.2.0`, `=0.2.0`,
+    `=0.0.1`), as the brief wrote them, while `main`'s retinue row is caret
+    `0.2.0` (*reading, not ruled*).
+  - knot-site at Knot `ea3e99e` names no p2panda package.
+  - The lock goes from 1653 to 1669 packages, with one retinue and one copy
+    each of iroh's and p2panda's packages.
+  - Passing: the gate, transport 52, stickleback 91, signalman 22, djinn
+    100, and graphshell's library 191 (one first-run timeout of the carrier
+    test, then 5 of 5 alone and the whole library). The CBOR control fails
+    when lenient.
+  - D1's stopped peer read not connected after 10.48 s; D1b fails at its
+    second restart (ruling 36). PID 53336 throughout.
 
 ## 7. Progress
 
