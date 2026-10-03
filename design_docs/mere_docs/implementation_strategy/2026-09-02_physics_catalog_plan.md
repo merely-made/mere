@@ -1,7 +1,7 @@
 # Physics Catalog Plan
 
 **Date:** 2026-09-02
-**Status:** in progress (P1 landed 2026-09-02; P1b, P2 on both hosts and P3 the remote board 2026-09-03; the runtime extraction 2026-09-04; P4 web half 2026-09-04, closing with the Graphshell tree port per the 2026-10-01 rulings in §5).
+**Status:** in progress (P1 landed 2026-09-02; P1b, P2 on both hosts and P3 the remote board 2026-09-03; the runtime extraction 2026-09-04; P4 web half 2026-09-04, closing with the Graphshell tree port per the 2026-10-01 rulings in §5; P7 moved to the [dynamics grammar plan](2026-10-02_dynamics_grammar_plan.md) 2026-10-02).
 **Scope:** A catalog of *distinct physics layout laws* — dynamical systems
 over the graph's bodies that produce different layouts because they are
 different physics — as a lever beside the arrangement catalog, plus the
@@ -667,6 +667,16 @@ separation; a weighted mix of two force laws at common scale matches each
 pure law at weights 1/0 and 0/1; a sequenced blend reproduces the captured
 anchor layout within a stated tolerance; compositions save and reopen with
 the scene; and the eleven law receipts plus Density's stay green.
+*Closed here, 2026-10-02: moved to the
+[dynamics grammar plan](2026-10-02_dynamics_grammar_plan.md) as its tracks*,
+per F2 ("P7 moves into the grammar plan"). The text above stays as history.
+The grammar plan carries it:
+- P7a's currency declarations go to G1, their enforcement to G3, and its
+  `PhysicsChoice` fields and affinity toggle to G4;
+- P7b becomes G2;
+- P7c, P7d and P7e become G3's Groups, weighted sum and Schedule;
+- each done-condition above goes to the track that carries its part.
+P5 and P6 stay in this plan.
 
 ## 4. Findings
 
@@ -1088,3 +1098,7 @@ binning are the useful patterns.
   without the fix and passes with it. The tree drag receipt now passes three
   runs in a row
   ([one-tree plan](2026-09-25_graphshell_one_tree_plan.md) §6).
+- 2026-10-02: the dynamics grammar brief was written and its ten forks
+  ruled (§3, P7). P7 moved to the
+  [dynamics grammar plan](2026-10-02_dynamics_grammar_plan.md) as its
+  tracks G1 to G6 (F2), and P7's text here is kept as history.
