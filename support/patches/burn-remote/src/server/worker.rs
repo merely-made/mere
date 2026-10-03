@@ -92,7 +92,8 @@ where
     T: TensorTransfer<B>,
 {
     /// Start the session worker; the worker runs until every clone of the returned sender is
-    /// dropped, then flushes, releases its backend allocations, and signals completion.
+    /// dropped, then flushes, releases its backend allocations, and signals completion: `Ok` once
+    /// the release has completed on the device, or the first teardown failure.
     pub(crate) fn spawn(
         session_id: SessionId,
         runner: TensorInterpreter<B>,
@@ -100,7 +101,7 @@ where
         transfer: Arc<T>,
         local_comm: Arc<LocalCommService<B>>,
         probe: TelemetryProbe,
-    ) -> (mpsc::Sender<Task>, oneshot::Receiver<()>) {
+    ) -> (mpsc::Sender<Task>, oneshot::Receiver<Result<(), String>>) {
         let handler = SessionHandler {
             session_id,
             runner,
@@ -118,29 +119,30 @@ where
 
     // Must be called from within the runtime that owns the endpoint: it captures `Handle::current`.
     #[cfg(not(target_family = "wasm"))]
-    fn drive(self, receiver: mpsc::Receiver<Task>, finished: oneshot::Sender<()>) {
+    fn drive(self, receiver: mpsc::Receiver<Task>, finished: oneshot::Sender<Result<(), String>>) {
         let handle = Handle::current();
         let session_id = self.session_id;
         std::thread::Builder::new()
             .name(format!("burn-remote-session-{session_id}"))
             .spawn(move || {
-                handle.block_on(self.run(receiver));
-                let _ = finished.send(());
+                let teardown = handle.block_on(self.run(receiver));
+                let _ = finished.send(teardown);
             })
             .expect("Failed to spawn session worker thread");
     }
 
     #[cfg(target_family = "wasm")]
-    fn drive(self, receiver: mpsc::Receiver<Task>, finished: oneshot::Sender<()>) {
+    fn drive(self, receiver: mpsc::Receiver<Task>, finished: oneshot::Sender<Result<(), String>>) {
         spawn_detached(async move {
-            self.run(receiver).await;
-            let _ = finished.send(());
+            let teardown = self.run(receiver).await;
+            let _ = finished.send(teardown);
         });
     }
 
     /// Drain the task channel, running each task to completion in arrival order, then tear the
-    /// session down in an order that releases its memory.
-    async fn run(mut self, mut receiver: mpsc::Receiver<Task>) {
+    /// session down in an order that releases its memory. Returns the first teardown failure, so
+    /// close reports it rather than acknowledging a clean release.
+    async fn run(mut self, mut receiver: mpsc::Receiver<Task>) -> Result<(), String> {
         let session_id = self.session_id;
 
         log::debug!("Session {session_id} worker started");
@@ -166,14 +168,21 @@ where
         // its task.
         let SessionHandler { runner, .. } = self;
         let device = runner.device();
+        let mut failure: Option<String> = None;
+        let mut fail = |step: &str, err: String| {
+            log::warn!("{step} at session {session_id} close failed: {err}");
+            failure.get_or_insert_with(|| {
+                format!("{step} at session {session_id} close failed: {err}")
+            });
+        };
 
         // Flush outstanding backend work before dropping the runner so the session's tensors aren't
         // freed with GPU work still queued against them.
         if let Err(err) = runner.sync() {
-            log::warn!("runner.sync() at session {session_id} close failed: {err:?}");
+            fail("runner.sync()", format!("{err:?}"));
         }
         if let Err(err) = B::sync(&device) {
-            log::warn!("B::sync(device) at session {session_id} close failed: {err:?}");
+            fail("B::sync(device)", format!("{err:?}"));
         }
 
         // Drop the runner: this frees every tensor handle the session held back to the backend's
@@ -186,6 +195,18 @@ where
         // default), but on cubecl backends (wgpu/cuda) this returns the session's device memory so
         // a long-lived server doesn't accumulate it across session churn.
         B::memory_cleanup(&device);
+
+        // Mere: the frees above complete on the device only after their completion callbacks
+        // run, so wait for the device here. Without this wait, close is acknowledged while the
+        // session's allocations are still live (pre.4 remote gate: 10 allocations retained).
+        // The wait is device-wide and may also wait on other sessions' queued work.
+        if let Err(err) = teardown_sync::<B>(session_id, &device) {
+            fail("B::sync(device) after release", err);
+        }
+        // Return the now-released pages too.
+        B::memory_cleanup(&device);
+
+        failure.map_or(Ok(()), Err)
     }
 
     /// Execute a single [`Task`] against this session's state.
@@ -495,5 +516,48 @@ where
         self.probe.emit(|| {
             TelemetryEvent::graph_executed(self.session_id, graph, stream, serialized_len(bindings))
         });
+    }
+}
+
+/// The completion wait after a session's release (Mere). Errors are rendered here so the
+/// teardown can report them through the worker's completion.
+fn teardown_sync<B: BackendIr>(
+    session_id: SessionId,
+    device: &burn_backend::tensor::Device<B>,
+) -> Result<(), String> {
+    #[cfg(test)]
+    if teardown_fault::armed(session_id) {
+        return Err("injected teardown sync failure".into());
+    }
+    #[cfg(not(test))]
+    let _ = session_id;
+    B::sync(device).map_err(|err| format!("{err:?}"))
+}
+
+/// Test-only fault injection for [`teardown_sync`], keyed by session so parallel tests don't
+/// interfere. Compiled only into this crate's own unit tests.
+#[cfg(test)]
+pub(crate) mod teardown_fault {
+    use std::collections::HashSet;
+    use std::sync::Mutex;
+
+    use crate::shared::SessionId;
+
+    static ARMED: Mutex<Option<HashSet<SessionId>>> = Mutex::new(None);
+
+    pub(crate) fn arm(session_id: SessionId) {
+        ARMED
+            .lock()
+            .expect("teardown fault registry")
+            .get_or_insert_with(HashSet::new)
+            .insert(session_id);
+    }
+
+    pub(crate) fn armed(session_id: SessionId) -> bool {
+        ARMED
+            .lock()
+            .expect("teardown fault registry")
+            .as_ref()
+            .is_some_and(|armed| armed.contains(&session_id))
     }
 }
