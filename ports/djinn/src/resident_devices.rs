@@ -379,10 +379,12 @@ fn card_value(device: &PairedDeviceV1) -> CardValueV1 {
         } else {
             device.label.clone()
         },
-        value: if device.connected {
-            format!("connected via {}", live.join(", "))
-        } else {
-            "not connected".into()
+        // A paired device is listed before discovery finds it, so say which
+        // of the two not-connected states this is, as `djinn-devices` does.
+        value: match (device.connected, device.reachable) {
+            (true, _) => format!("connected via {}", live.join(", ")),
+            (false, true) => "not connected (an address is known)".into(),
+            (false, false) => "not connected (no address known)".into(),
         },
     }
 }

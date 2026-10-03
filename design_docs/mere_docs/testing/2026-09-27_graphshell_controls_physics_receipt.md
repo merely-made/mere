@@ -920,6 +920,111 @@ The wasm build passes.
 - The Genet gaps (`[hidden]`, `text-align`) belong to a separate Genet lane.
   Cambium's `display: none` and left-aligned titles stay meanwhile.
 
+### Genet `bd3e8861b29`: `[hidden]` in the UA sheet, centred titles (2026-10-02)
+
+Branch `genet-repin` in `worktrees/mere-genet-repin`, from main `f02d9d35`.
+This carries out the one-tree plan's "Genet gaps" ruling: "Fix in Genet now,
+separate lane". Logs, locks, the runner copy and receipts are under
+`Code/testing/mere/genet-repin/`, and the target is
+`C:/t/cargo-targets/mere/genet-repin`.
+
+**Repin** (`7a0950da`).
+- Genet main `bd3e8861b29` carries `4ac56bbbe0b` (`[hidden]` generates no
+  box in the Cambium UA sheet) and `6fca091dc26` (non-wrapping lines follow
+  `text-align`) on top of `b1eb3af1971`. Between the two only
+  genet-livery's source changed; no manifest did.
+- 28 root rows and the standalone web manifest's 7 rows moved. A sweep of the
+  whole worktree for the old SHA found no other manifest naming it.
+  `genet_web_smoke` keeps its older `5ae30cad` pin, as
+  `cambium_docs/testing/local-genet-development.md` records.
+- The root lock moved its 64 Genet entries and nothing else (SHA256
+  `17c6f3ee…`). The ignored web lock, seeded from `c8cdb567…`, moved its 19
+  entries and nothing else (SHA256 `2e28ea2f…`, copied to
+  `genet-repin/web-Cargo.lock`).
+- `cargo tree` finds one Genet revision in each gate crate's graph:
+  cambium, cambium-rootstock, both hosts, pictograph, graphshell and
+  graphshell-client. The workspace still holds a second, from before this
+  change: djinn's `knot-editor` `855cb75d` pin brings `fleece` and
+  `layout-dom-api` in at Genet `34626a6c`.
+- The unused-patch warnings name only `boa_engine`, `boa_gc` and
+  `iroh-mdns-address-lookup`, exactly as before the repin. The web build
+  reports none.
+
+**Closed panels** (`1182f642`).
+- `disclosure.rs` is back to its content before `00d695df`. Closed
+  disclosure, accordion and tree panels carry `hidden` alone.
+- New `cambium-rootstock` tests (`owned_layout/hidden_panel_tests.rs`) lay
+  each component out through the host's own Livery session. A closed panel
+  must have no fragment, and the open one beside it is the positive control.
+- At Genet `b1eb3af1971` they passed with the inline style and failed without
+  it: each closed panel had an 18 px box. At `bd3e8861b29` they pass without
+  it.
+
+**Card titles** (`de115df8`).
+- The title sheet has said `text-align: center` since `6005ea08`, so no
+  style change was needed.
+- `titles_are_centred_in_their_cards` reads each title's glyph origins from
+  `paint_titled`. At `b1eb3af1971` it failed, with a left gap of 6 (the
+  padding) against a right gap of 242 in a 280 px card. At `bd3e8861b29` it
+  passes.
+
+**The §2 label finding.** The mere view's labels before `53f625fc` were the
+same shape as the titles: `.graph-canvas-swatch-label` set
+`white-space: nowrap`, inside an absolute, 160 px box with `text-align`. A
+temporary rootstock probe laid out that exact style, left, centre and right,
+and was not committed (`genet-repin/label_align_probe.rs.txt`).
+- At `b1eb3af1971` all three began at the box's left edge.
+- At `bd3e8861b29` the centre label had gaps of 56.1 and 58.3 px, and the
+  right label ended 2.2 px from the right edge.
+- The probe's text fits its box, so `text-overflow: ellipsis` was not
+  exercised.
+
+**Native gates** (all offline and locked, `gate-*.log`):
+
+| Gate | Passed |
+| --- | --- |
+| cambium | 245 |
+| cambium-rootstock | 55 |
+| cambium-genet-web-host | 8 |
+| cambium-genet-winit-host | 153 |
+| pictograph `canvas` lib | 270 |
+| graphshell `web` lib | 230 |
+| graphshell-client | 59 |
+| merge gate | 266 |
+
+`c4_webrtc_host` builds from the branch, and `cargo check --workspace
+--all-targets` passes.
+
+The standalone wasm build passes with `CARGO_PROFILE_DEV_DEBUG=0`,
+`getrandom_backend="wasm_js"` and wasm-bindgen 0.2.127. Bundle SHA256:
+`d9d7f5dab0db8f848be6fec7655dcde2970bc12daeba0a86722784f67f5ac4c6`.
+
+**Headed** (`tree.html`). The runner copy uses its own Chrome profile
+(`.genet-repin-browser`), sink 8771 and fixture signal port 8798. The log is
+`run-headed.log`.
+
+| Scenario | Window | Result |
+| --- | --- | --- |
+| `p4_tree_physics_springs` | 1400 by 900 | ok |
+| `p4_tree_tools_narrow` | 700 by 900 | ok |
+| `p4_tree_remote_absent` | 1400 by 900 | ok |
+| `p4_tree_c4b1_live_board` (fixture over WebRTC) | 1400 by 900 | ok |
+| `p4_tree_remote_draft` (fixture over WebRTC) | 1400 by 900 | ok |
+
+Every capture was inspected whole-frame:
+- `remote_absent_closed` is pixel-identical to the tree-remote lane's
+  capture, which had the inline style. The UA rule reproduces it exactly.
+- In `remote_physics_closed` the closed physics section shows only its
+  trigger.
+- Against the tree-remote lane's five board captures, every changed pixel
+  lies in the title text band (capture y 306–327). The titles moved, and
+  nothing else did.
+- In `c4b1_appended`, "Card 0" is centred in its card. Measured in capture
+  pixels, the card spans x 722–960 and the title's ink 805–877, so both
+  centres are at 841.
+
+**Not run here:** the `app=local` route, and the old page's three originals.
+
 ## Open gates
 
 - Genet commit `27d20d3fc51ac5fcd2a2db231e035a3e06013ae1` admits safe retained

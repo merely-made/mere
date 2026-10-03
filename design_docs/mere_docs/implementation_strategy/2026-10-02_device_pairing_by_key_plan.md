@@ -2,8 +2,10 @@
 
 **Date**: 2026-10-02
 **Status (2026-10-02)**: in progress. Assessed and ruled by Mark on 2026-10-01
-and 2026-10-02 (rulings 1 to 18 below). D1 landed (`4963b489`), proven
-locally; D1b, mDNS-only first contact, is next, then D2.
+and 2026-10-02 (rulings 1 to 31 below). D1 landed (`4963b489`); D1b's mere fix (M1)
+landed (`177b927c`), its fork fix (F1) is being released as
+`mere-p2panda-net-0.7.5` with knot and mere repinned, and `connected` is
+being fixed; then D2.
 **Scope**: Mark's machines find, reach and trust each other by device
 identity, not by address: the stack's own peers already do on one network;
 SSH, the path Mark uses daily, does not. Pairing a device becomes one
@@ -183,6 +185,14 @@ across two physical machines. What is first contact?* Options: the pairing
 ceremony's ticket, measuring mDNS in D2; fix mDNS-only first contact before
 D2. Mark: **"Fix mDNS-only first contact before D2"**. Follows: phase D1b.
 
+*Amended 2026-10-02*: the question's premise was wrong. August's
+cross-machine receipts never exercised this path: the Fedora and Windows ones
+dialled a known peer id explicitly in a retry loop (`g5_peer --discover`,
+`ports/graphshell/src/bin/g5_peer/connect.rs:167-176`), and Knot's K2 and
+personal sync's first contact carried a ticket. Devices that have never met
+have always needed a ticket on this path, so D1b is a fix, not a regression,
+and the ruling's direction stands.
+
 **Ruling 17.** *Keep D1's names, route `device-directory-v1` and CLI
 `djinn-devices`?* Options: keep them; `paired-devices-v1` and `djinn-peers`.
 Mark: **"Keep device-directory-v1 / djinn-devices (Recommended)"**.
@@ -190,6 +200,87 @@ Mark: **"Keep device-directory-v1 / djinn-devices (Recommended)"**.
 **Ruling 18.** *Which app label may read the directory?* Options: a new
 `djinn` label only; also grant turnstone; reuse `knot-editor` as djinn-site
 does. Mark: **"A new `djinn` label only (Recommended)"**.
+
+**Ruling 19.** *Where does the first-contact fix go?* Options: F1, in the
+p2panda fork (refresh topic watchers when a node's record is written); M1, in
+mere-transport (give a paired peer a bare record before tagging it); both.
+Mark: **"Both"**. Follows: M1 lands now, F1 with the fork release of ruling
+20; M1's side effect (a paired device not yet seen appears with
+`reachable = false`) is accepted with it.
+
+**Ruling 20.** *If the fork is patched, what does the new release build on?*
+Options: the pinned tag `0a54ab82`, released as `mere-p2panda-net-0.7.5`; the
+fork's current main; upstream p2panda's main. Mark: **"Upstream p2panda's
+main"**. Follows: upstream's 54 commits since the fork's last merge
+(2026-09-10 to 2026-09-30: iroh 1.0.3 to 1.3.0, authorisers renamed to
+allow and block lists, a new `SyncHook`, stream orderer changes; 70 files,
+13 in p2panda-net) are merged into the fork first, F1 on top. Tagging and
+pushing the fork stay Mark's.
+
+**Ruling 21.** *Offer the fix to p2panda upstream?* Options: I draft and Mark
+files; not now. Mark: **"Not now"**.
+
+**Ruling 22.** *`connected` can read false on a working link when both sides
+dial at once (the duplicate connection closes and iroh marks the shared
+address inactive for about 5 s while gossip keeps delivering); fix it?*
+Options: count a gossip neighbour as connected; debounce; leave it and make
+the test dial one way. Mark: **"Count a gossip neighbour as connected
+(Recommended)"**.
+
+**Ruling 23.** *The fork merge compiles everywhere except stickleback, where
+upstream renamed `StreamItem` to `LogEntry`; how does the fork lane finish
+its check?* Options: a scratch-only rename; a `StreamItem` alias in the fork;
+leave it to the repin. Mark: **"Scratch-only rename (Recommended)"**.
+
+**Ruling 24.** *Upstream made `p2panda_core::cbor::decode_cbor` lenient
+(`decode_cbor_strict` keeps the old behaviour); mere calls it in about 40
+files.* Options: accept and audit strict sites; keep strict in the fork;
+accept with no audit. Mark: **"Accept, and audit strict sites
+(Recommended)"**. Follows: the repin moves every call that feeds a hash,
+signature, content address or wire validation to `decode_cbor_strict`.
+
+**Ruling 25.** *mere's per-interface mDNS fork (H10's fix for multi-homed
+Windows hosts) has been an unused patch; what now?* Options: bring the fork
+to 0.6.0 with the repin; check upstream first; leave it. Mark: **"Bring the
+fork to 0.6.0, with the repin (Recommended)"**. *Superseded by ruling 26 on
+new evidence.*
+
+**Ruling 26.** *The per-interface mDNS port (upstream PR #7, now on 0.6.0)
+works as intended but fails upstream's own `mdns_subscribe` test on this
+laptop every time, the failure it fixes is absent here today, and first
+contact was about 0.6 s slower; ruling 25 adopted it with the repin. Now?*
+Options: keep it out and diagnose first; adopt it as ruled; stock, and drop
+the fork. Mark: **"Keep it out; diagnose first (Recommended)"**.
+
+**Ruling 27.** *The dead `=0.4.0` patch row reads like an active fix;
+meanwhile?* Options: drop it with the repin; leave it. Mark: **"Drop it with
+the repin (Recommended)"**.
+
+**Ruling 28.** *Tag `mere-p2panda-net-0.7.5`, push it to `mark-ik/p2panda`,
+then repin knot first and mere second, with the stickleback rename and the
+strict CBOR sites?* Options: go (tag, push, repin, with mere's and knot's
+pushes coming back to Mark); tag locally only; wait for the `connected`
+fix. Mark: **"Go: tag, push, repin (Recommended)"**.
+
+**Ruling 29.** *Four strict sites decode plaintext that encryption already
+authenticated; strict anyway?* Options: strict anyway; lenient for those
+four. Mark: **"Strict anyway (Recommended)"**.
+
+**Ruling 30.** *With gossip neighbours counted as connected, the old
+transport test still fails at its assertion that iroh shows an active direct
+path, because iroh drops that path state during simultaneous dials (its
+abandon check looks only at the closing connection's paths, unchanged in
+iroh 1.3.0). What should the test assert?* Options: dial one way in that
+test; patch iroh's abandon check; relax the assertion. Mark: **"Dial one way
+in that test (Recommended)"**.
+
+**Ruling 31.** *Under the OR rule a closed peer reads connected for about
+60 s, because iroh keeps its path active after gossip drops the neighbour in
+about 0.1 s. Should `connected` fall when the neighbour goes down?* Options:
+gossip decides while the overlay is up; keep the OR rule. Mark: **"Gossip
+decides while the overlay is up (Recommended)"**. Follows: for a peer on the
+overlay, the gossip neighbour state is authoritative; iroh's path counts
+only for peers not on it. Amends ruling 22.
 
 Also given in the same conversation (2026-10-01, Mark: "You can edit known
 hosts"): `known_hosts` entries may be updated, which was done for the
@@ -245,10 +336,13 @@ Mark SSHes into his machines.
   changes, not when a known node gains an address. A fix inside the
   `mark-ik/p2panda` fork (pinned by tag, `mere-p2panda-net-0.7.4`) means a
   new tag and a workspace repin, so where the fix lives comes to Mark first.
-  Done when:
-  - [ ] the cause is shown in the code and reproduced, with the evidence
+  *Ruled 2026-10-02* (rulings 19 to 21): both fixes. M1, in mere-transport,
+  lands now; F1, in the fork, lands with a fork release built on upstream
+  p2panda's main (its 54 new commits merged first), tagged and pushed only on
+  Mark's word, and nothing goes upstream for now. Done when:
+  - [x] the cause is shown in the code and reproduced, with the evidence
         recorded in §6;
-  - [ ] two residents on one machine, paired with no ticket and with mDNS
+  - [x] two residents on one machine, paired with no ticket and with mDNS
         their only way to meet, connect, and keep doing so across restarts
         (a control without the fix fails the same run);
   - [ ] the same holds between two real machines, which D2 makes possible.
@@ -358,6 +452,110 @@ Findings from D1, for D1b and D2:
   receipts (reference host plan, reachability plan R1), so it is most likely
   the installed legacy resident's own sync identity on this laptop
   (*reading, not verified*).
+
+**2026-10-02: D1b's cause, found and checked.** A paired device id is tagged
+onto the gossip overlay (`P2pandaOverlayHost::seed_peers`,
+`crates/murm/transport/src/p2panda_host.rs:103-125`) before the address book
+holds any record for it; topic membership means "has a record and the topic"
+(stickleback's store and upstream's SQLite store alike), so gossip's one-time
+bootstrap query returns nobody and joins with nobody. When mDNS later writes
+the record, the fork's address book never tells the healer: it recomputes
+topic watchers only on topic writes (`p2panda-net/src/address_book/actor.rs:131-145`),
+while `InsertNodeInfo` and `InsertTransportInfo`, where mDNS writes, notify
+only per-node watchers (checked at `0a54ab82`). A ticket works because it
+writes the record before the join. The lane's instrumentation showed each
+side's record arriving by the first poll and the healer's view staying
+empty. It is not single-host: mDNS succeeded on one host, and two machines
+meeting for the first time with no ticket would fail the same way.
+Reproduced by a new ignored test, `ports/djinn/tests/mdns_first_contact_two_instance.rs`
+(no contact in 90 s on the clean tree). Both fixes passed it end to end:
+F1 (about 20 lines in the fork, with a fork test that fails in 10 s
+unpatched and passes in 0.16 s) gave first contact 2.19 s after spawn; M1
+(mere only) 2.25 s; each with a control that fails. The fork patch applies
+cleanly to `0a54ab82`. The comment at
+`ports/graphshell/src/native/personal_sync_host.rs:240-243`, which says
+`g5_peer` proved this path, is wrong and is fixed with M1.
+
+**2026-10-02: M1 landed.** Built as `8a8d8fc2` on the reproduction test
+`c73e6082` (lane, Opus); merged onto `main` as `177b927c` after verification
+in the normal-depth worktree. `set_topics` and `add_topics` give a paired
+peer an empty address-book record before tagging it, written through a new
+stickleback `insert_node_info_if_absent` that checks and writes inside one
+muniment transaction, so a record mDNS writes first is kept and one written
+later builds on it. The directory says "not connected (no address known)"
+for a device not yet seen; djinn's warning classifier gives an info line
+when no paired device has an address and keeps the firewall warning for
+when one does and nothing connects. Verified: djinn, `mere-transport`,
+stickleback and graphshell's library tests, the portable gate; D1b's
+ticketless receipt, run again by me, connected on first contact 2.61 s
+after the second resident started and reconnected after each side
+restarted without its hint (2.17 s, 2.30 s); D1's ticketed receipt still
+passes; the lane's control (M1's two calls disabled) found no contact in
+90 s. The installed resident stayed on PID 53336.
+
+**2026-10-02: a flaky `connected`.** The transport test
+`the_peer_directory_separates_a_known_address_from_a_live_path` fails 4 of 30
+runs on `main` without M1 and 5 of 30 with it (my runs; the lane measured 11
+of 80 and 5 of 80), so it predates M1. The lane's instrumentation tied it to
+simultaneous dials: a one-sided copy failed 0 of 80 against 7 of 80. Ruling
+22 is the fix; a lane is on it.
+
+**2026-10-02: the fork merge, in scratch.** In a clone at `C:\t\p2panda-merge`
+(branch `mere-merge-upstream-2026-10-02`), upstream's main merged into the
+fork as `8efae5ff`, with one textual conflict (`sync/log_sync/builder.rs`:
+the fork's `protocol_id` kept beside upstream's hooks) and one semantic one
+(a test's `StreamItem`, renamed upstream to `LogEntry`); no fork patch is
+made redundant. F1 applied unchanged as `d532713f`; its test failed 40 of
+40 on the merged tree without the fix and never at the join with it. The
+fork's suite is flaky on this machine in every tree; repeated interleaved
+runs show no failure attributable to the merge or to F1. Building mere
+against it: one compile error (stickleback's `StreamItem`); iroh, iroh-base
+and iroh-relay move 1.2.0 to 1.3.0 and `iroh-mdns-address-lookup` 0.5.0 to
+0.6.0, one copy each; six manifests and knot pin `=0.7.4`, so the release
+follows the knot-first lockstep. Nothing is tagged or pushed.
+
+**2026-10-02: H10's per-interface mDNS fix has not been in effect.** mere's
+patch for `iroh-mdns-address-lookup` (its fork at 0.4.0, carrying upstream
+PR #7's per-interface multicast sockets) is `[[patch.unused]]` in the lock;
+the live crate is crates.io's 0.5.0, required by `mere-p2panda-net` 0.7.4,
+which has no per-interface sockets. This laptop is multi-homed (its WSL
+adapter address appears in saved hints). Cargo has warned "patch was not
+used" on every build; in chatelaine P1's verification I recorded that
+warning as harmless and lock-wide, which was wrong. Ruling 25 brings the
+fork to 0.6.0 with the repin. The `boa_engine` and `boa_gc` patches are
+reported unused on the same line and were not examined here.
+
+**2026-10-02: the fork lane's second round.** With a scratch-only rename of
+stickleback's `StreamItem`, mere's whole workspace checks against the merged
+fork, mere-transport, stickleback and djinn pass, and knot compiles through
+djinn. The CBOR audit covers 73 calls: 39 strict (36 in mere, 3 in knot:
+everything decoding a peer's data, a signature or a round-tripped canonical
+form; signalman's shared control-frame decoder needs a strict variant for
+its frames while its local snapshot stays lenient) and 33 lenient (local
+data, tests, examples); the table is `C:\t\cbor-decode-audit-177b927c.tsv`.
+Upstream's PR #7 is still unmerged (last activity 2026-07-28); ported onto
+0.6.0 unchanged, the patch becomes used (`cargo tree` resolves the fork's
+path, no `[[patch.unused]]`), and djinn then binds mDNS on the WSL adapter
+too, but the port and the original PR both fail upstream's `mdns_subscribe`
+test on this laptop (stock passes), Wi-Fi already holds the multicast route
+here (metric 35 against WSL's 5000), and first contact was about 0.6 s
+slower; hence ruling 26. The installed legacy resident already binds 5353
+per interface, so some earlier build carried the fix.
+
+**2026-10-02: iroh's abandon check, unchanged in 1.3.0.** The `connected`
+lane traced the path gaps during simultaneous dials to iroh's
+`NoqPathEvent::Abandoned` handler, which marks an address abandoned when the
+closing connection's own paths no longer reach it, although its comment says
+"once no connections have any path". The handler is byte-identical in iroh
+1.2.0 (`remote_state.rs:595-613`) and 1.3.0 (`:600-618`), so the repin does
+not remove it; ruling 30 keeps the old test one-sided and ruling 31 makes
+gossip authoritative for peers on the overlay.
+
+**Sibling pins at the release.** turnstone (root `Cargo.toml:342-349`),
+cleromancy (`:97-102`) and isometry (`:112`, `:246-264`) pin the fork's
+0.7.4 tag beside older mere revisions, which require `=0.7.4`; each moves to
+0.7.5 at its own next mere repin, as the insigne proofs plan's phase C
+handoff did.
 
 ## 7. Progress
 
