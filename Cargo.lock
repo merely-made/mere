@@ -8109,7 +8109,7 @@ dependencies = [
  "getrandom 0.2.17",
  "language-tags",
  "rcgen 0.13.2",
- "retinue",
+ "retinue 0.1.1",
  "rustls",
  "scroll-protocol",
  "serde",
@@ -9125,7 +9125,7 @@ dependencies = [
  "notochord",
  "p2panda-core",
  "personae",
- "retinue",
+ "retinue 0.2.0",
  "sha2 0.11.0",
  "snow",
  "stickleback",
@@ -13680,6 +13680,24 @@ dependencies = [
 name = "retinue"
 version = "0.1.1"
 source = "git+https://github.com/merely-made/retinue.git?rev=85e716c7f06dac0a5253effe5ef06d05b266f02f#85e716c7f06dac0a5253effe5ef06d05b266f02f"
+dependencies = [
+ "aes 0.9.3",
+ "bzip2 0.6.1",
+ "cbc 0.2.1",
+ "ed25519-dalek 3.0.0",
+ "getrandom 0.2.17",
+ "heapless 0.9.3",
+ "hkdf 0.13.0",
+ "hmac 0.13.0",
+ "sha2 0.11.0",
+ "tokio",
+ "x25519-dalek 3.0.0",
+]
+
+[[package]]
+name = "retinue"
+version = "0.2.0"
+source = "git+https://github.com/merely-made/retinue.git?rev=fa4f925059cc698058cb21fecc1c825d095741a9#fa4f925059cc698058cb21fecc1c825d095741a9"
 dependencies = [
  "aes 0.9.3",
  "bzip2 0.6.1",
