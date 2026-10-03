@@ -466,6 +466,20 @@ fn a_living_law_runs_until_paused_and_a_graph_bound_law_survives_a_reconcile() {
     canvas.set_physics_law(PhysicsLaw::Orbit);
     assert!(canvas.physics_never_rests());
     assert!(canvas.is_settling(), "orbit keeps ticking");
+    // Kinds is living too (F10's figures on the P2 fixture).
+    let living: Vec<PhysicsLaw> = PhysicsLaw::ALL
+        .into_iter()
+        .filter(|law| law.never_rests())
+        .collect();
+    assert_eq!(
+        living,
+        [
+            PhysicsLaw::Orbit,
+            PhysicsLaw::Kinds,
+            PhysicsLaw::Flock,
+            PhysicsLaw::Sync
+        ]
+    );
     canvas.set_physics_law(PhysicsLaw::Stress);
     assert!(!canvas.physics_never_rests());
     let count = canvas.law_force_count();
@@ -483,6 +497,35 @@ fn a_living_law_runs_until_paused_and_a_graph_bound_law_survives_a_reconcile() {
     // A graph swap keeps the choice too: the scene restore re-applies it afterwards anyway.
     canvas.set_graph(Graph::new());
     assert_eq!(canvas.physics_law(), PhysicsLaw::Stress);
+}
+
+/// What `never_rests` changes: switched to from rest, a living law (Kinds,
+/// since F10) ticks on past the settle budget, where a resting law (Stress)
+/// stops at it.
+#[test]
+fn from_rest_a_living_law_ticks_on_and_a_resting_one_stops() {
+    use std::time::Duration;
+    for (law, living) in [(PhysicsLaw::Kinds, true), (PhysicsLaw::Stress, false)] {
+        let mut canvas = Canvas::with_sample_graph();
+        canvas.resize(800, 600);
+        canvas.park_physics();
+        assert!(!canvas.is_settling(), "at rest before the switch");
+        canvas.set_physics_law(law);
+        for frame in 0..=u64::from(SETTLE_TICKS) + 60 {
+            canvas.frame_at(
+                800,
+                600,
+                Duration::from_micros(frame * 1_000_000 / 60),
+                Default::default(),
+            );
+        }
+        assert_eq!(
+            canvas.is_settling(),
+            living,
+            "{} after the budget",
+            law.id()
+        );
+    }
 }
 
 #[test]

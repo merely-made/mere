@@ -411,6 +411,13 @@ registry.
   `a_playing_arrangement_pulls_as_a_field_not_an_override`; canvas 143 green.
   Receipt: the played Spiral now keeps its recognizable shape while relaxing,
   where the seed-only version dissolved into an unrelated blob.
+  *Annotation, 2026-10-03:* reopened by the dynamics grammar plan's ruling
+  F11. Mark: "Physics acts on an arrangement. Physics is not assigning
+  coordinates that nodes are pseudo pinned to return to once a force acts on
+  them. Arrangements are positions, not motion." The arrangement pull, swatch
+  relax's pull toward slots, and the physics board's slot pull go to that
+  design (`research/2026-10-03_arrangement_and_dynamics_brief.md`); the code
+  is unchanged until it rules.
   **Build-topology finding (cost of the sibling split)**: turnstone could not see
   the new force at all — mere patches numen/quint/seiche to the local conatus
   checkout, turnstone patched none of them, so it silently built against the

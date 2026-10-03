@@ -50,6 +50,10 @@ pub const DEVICE_DIRECTORY_ROUTE: &str = "device-directory-v1";
 /// credential: the door's owner-only endpoint is the boundary, and this route
 /// is granted to this label alone.
 pub const DEVICE_DIRECTORY_APP: &str = "djinn";
+/// What the card and `djinn-devices` say when gossip has dropped a device that
+/// iroh still lists an active path to (pairing plan ruling 39).
+pub const NOT_CONNECTED_PATH_ACTIVE: &str =
+    "not connected (no gossip neighbour; a path is still active)";
 const SESSION: &str = "djinn.device-directory/v1";
 const RESOURCE_LABEL: &str = "djinn.device-directory/v1";
 
@@ -73,7 +77,9 @@ pub struct PairedDeviceV1 {
     pub root: Option<String>,
     pub pairing_id: Option<String>,
     pub added_ms: u64,
-    /// The endpoint holds an active path to it now.
+    /// This device is talking to it now: while on the graph's overlay, it is
+    /// a gossip neighbour there; otherwise there is an active path. `path` is
+    /// iroh's own view, so it can show none active, or one, either way.
     pub connected: bool,
     /// The transport holds an address for it. Not a live link.
     pub reachable: bool,
@@ -380,9 +386,14 @@ fn card_value(device: &PairedDeviceV1) -> CardValueV1 {
             device.label.clone()
         },
         // A paired device is listed before discovery finds it, so say which
-        // of the two not-connected states this is, as `djinn-devices` does.
+        // not-connected state this is, as `djinn-devices` does. iroh's path
+        // can disagree with gossip either way, so say that too.
         value: match (device.connected, device.reachable) {
+            (true, _) if live.is_empty() => "connected, no active path right now".into(),
             (true, _) => format!("connected via {}", live.join(", ")),
+            // Off the overlay while iroh still lists a path, as for about a
+            // minute after a peer closes.
+            (false, _) if !live.is_empty() => NOT_CONNECTED_PATH_ACTIVE.into(),
             (false, true) => "not connected (an address is known)".into(),
             (false, false) => "not connected (no address known)".into(),
         },

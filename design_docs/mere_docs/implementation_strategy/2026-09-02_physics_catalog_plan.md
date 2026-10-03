@@ -531,6 +531,78 @@ pull reading −0.33 with 510 overlaps):
   stop with a wider plateau bar, or a stricter shift. *Reading, not ruled:*
   the lane measures the wander's cause and brings formulations back as
   options with numbers; the shift stop stays the default meanwhile.
+- **Density's stop, fifth and sixth rounds (2026-10-03, `density-cpu`
+  `824ac8cb`, `76623e15`).** The wander's measured causes: rapier adds
+  nothing after pass 1; on 200 nodes the 64² grid moves every node about 0.05
+  spacings a pass without decay. Five formulations were prototyped, all off
+  by default. Continuous renewal at 2 spacings first looked best (gen-50 at
+  0.8 on "8 of 8" starts), but those eight starts were quarter-turn copies of
+  two, and every earlier probe and receipt seeded the spiral in key order,
+  which puts the highest-degree nodes at the centre. Over 16 inequivalent
+  dealt starts the rank where the ruled stop lands is: base passes 0.722
+  (gen-50) and 0.754 (200 nodes), renewal 0.736 and 0.768. The stop fires
+  early: gen-50 stops at pass 6 reading 0.64 to 0.78, and the 120-pass cap
+  reads 0.82 to 0.86 on all 4 dealt starts tried; on 200 nodes the stop reads
+  0.73 to 0.80 and the cap 0.78 to 0.82. The 12-node sample's rest depends on
+  its start (0.35 to 0.86 at the cap over 8 starts, mean 0.66, 2 of 8 at
+  0.8). An axis-aligned seed meets cell-centred splat cells and shifts the
+  stop's timing (200 nodes: 0° 0.737 at pass 18 against 0.79 to 0.81 at
+  passes 32 to 53 for other turns), small beside the start's own effect.
+  Asked what changes, Mark chose **"Later stop, measured"**: the passes stay,
+  and a lane compares a stricter shift (0.01 to 0.02 for 3 passes) and a
+  minimum pass count against the 120-pass cap over 16 dealt starts and brings
+  the cheapest that meets the bars. The alternatives were always running to
+  the cap, renewal anyway, or keeping the stop with lower bars. This amends
+  the fourth round's "Change the law", whose premise (a wander the law must
+  lose) the dealt starts did not bear out. Asked what the 0.8 bar means on
+  small graphs, Mark chose **"0.8 from 50 nodes up"**: the rank bar applies
+  from 50 nodes, and the sample and the headed fixture receipts check the
+  flow qualitatively (rank rises above the seed's, CV falls), recording
+  per-start values. The alternatives were a mean over a fixed set of dealt
+  starts, or one pinned start per receipt. *Reading, not ruled:* receipts
+  move from the key-order seed to dealt starts; the decay, quench,
+  wall-inset, relax and renewal knobs leave the code once the stop lands,
+  with their evidence kept in the logs.
+- **Density's stop, seventh round (2026-10-03, `density-cpu` `73965233`,
+  `e303e58b`).** Over the same 16 dealt starts (50 nodes / 200 nodes): the
+  120-pass cap reads min 0.699 / 0.732, mean 0.796 / 0.780, 9 of 16 at 0.8 or
+  above on 50 nodes; a minimum of 60 passes before the shift test reads min
+  0.713 / 0.703, mean 0.790 / 0.777, 9 of 16, stopping at about 60 s; shifts
+  of 0.02 and 0.01 still stop early on 50 nodes (6 and 5 of 16) and never by
+  test on 200; the ruled stop reads mean 0.722 / 0.754. No variant puts every
+  50-node start at 0.8. Density CV falls on every start under every variant,
+  and Springs reads −0.44 to −0.55 on the same starts (the control). Asked
+  which stop and bar, Mark chose **"Min 60, bar: all ≥ 0.7"**: the default
+  becomes a minimum of 60 passes before the shift test, and the bar becomes
+  every dealt start at 0.7 or above on both graphs, with the mean and the
+  count at 0.8 or above recorded. The alternatives were the 120-pass cap with
+  a mean bar near 0.8, or keeping every start at 0.8, which no stop meets.
+  This amends the third round's 0.8 bar on gen-50 and the plateau bar of 0.7
+  at 200 nodes into one bar over dealt starts.
+- **Density's declaration (2026-10-03).** After G1, `Force` requires
+  `Declared::terms()`; the lane wrote the grammar plan's sketch. Options: one
+  K term with its density field as state in the Wasserstein metric weighted
+  by node mass; K with position state, as Anneal and FlowAdvect; Em with an
+  exposed energy ∫ρ ln ρ (amending the rule that a kinematic term is K); two
+  terms, field diffusion and position advection. Mark chose **"Keep: K,
+  field, Wasserstein"**. *Reading, not ruled:* G1's instruments skip K terms,
+  so nothing measures Density's declaration; that is G5's concern.
+- **Density's experimental knobs (2026-10-03).** Measured: quench and the wall
+  inset had no effect, relax at 1.5 never stops and at 1.8 collapses, decay
+  was worse everywhere, and renewal gained nothing from dealt starts but lets
+  the field follow drags and contacts continuously. Options: keep renewal,
+  drop the other four; drop all five; keep all five off by default. Mark
+  chose **"Keep renewal, drop four"**: renewal stays as an option, and quench,
+  wall inset, relax and decay leave the code, their evidence kept in the logs
+  and here.
+- **P5's web defaults, undercut by pre.4 (2026-10-03).** On `burn-pre4-repin`
+  the web page's frames take 557 ms against pre.2's 12.1 ms, GPU on or off,
+  because the wasm module re-runs its static constructors (pliron's
+  `inventory` registrations, which pre.4's `cubecl-core` pulls in) on every
+  call into wasm. "Web N = 9, web threshold 400" was ruled on pre.2's frame
+  times, so the crossover is re-measured once the constructors run once
+  (burn migration plan, the pre.4 rulings of 2026-10-03). Main stays on pre.2
+  until then; native is unaffected.
 
 *Done when:* GPU and CPU forces agree to 1e-3 relative at 1k and 10k nodes;
 a sign-flipped kernel fails the overlap check (positive control); a forced
@@ -944,6 +1016,16 @@ P5 and P6 stay in this plan.
   swapping the order of the two genet revisions' `fleece` and
   `layout-dom-api` rows; the committed lock passes `--locked` as it stands, so
   lane commands run locked.
+- 2026-10-02 (dynamics grammar G1, F10): the 2026-09-02 finding that Kinds
+  never rests holds. On the P2 fixture under continuous ticking its kinetic
+  energy is about 18 300 at 6 s and 140 500 at 30 s, against the floor of 1,
+  and Kinds joined `PhysicsLaw::never_rests`. The receipts' Play preamble
+  had already kept every law ticking, since a settle keeps the larger budget
+  (the [dynamics grammar plan](2026-10-02_dynamics_grammar_plan.md),
+  Findings).
+- 2026-10-02 (dynamics grammar G1, F7): the laws table's Energy row ("LinLog /
+  ForceAtlas2") describes ForceAtlas2's (1, −1) force model; LinLog proper is
+  the law's attraction exponent 0, a tuning, and the id stays `energy.linlog`.
 
 ## 5. Decisions
 
