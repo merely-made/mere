@@ -1,5 +1,15 @@
 # Burn 0.22 Migration Plan
 
+**2026-10-03 main reconciliation and P5 gates (§13.30):** main `a924f380`
+and `f62581c7` are merged (`bcb57356`, `b73695da`), with conatus's P5 lanes
+adapted to pre.4. Root and web graphs hold one pre.4 family and no Turso.
+Native GPU gates pass, S13 (b) extrema passes headed, and the P5 2,000-node
+web settle meets its bounds. Two stops are held as forks. S13 (c) still
+leaves 10 allocations against zero (ruling 411's unanswered repair fork).
+The pre.4 wasm bundle also runs about fifty times slower per frame than
+pre.2, because its static constructors re-run on each call. No push, main
+promotion or downstream repin.
+
 **2026-09-30 allocator diagnosis, ruling 411:** four `burn-cubecl` selectors
 were retired locally at `124fc42b` after ruling 410's controls. Remote reclaim
 then left ten active allocations / 5,323,776 bytes against zero. A bounded
@@ -523,6 +533,12 @@ Stop on any of these conditions:
   the only Mere crate that fails (nine mechanical errors), and Distillery's
   lease tests passing on a rebased burn-remote. §13 is the execution plan; S0
   is open and no manifest has moved.
+
+- **2026-10-03**: Mark's "Finish pre.4 now, no interim pin" (physics
+  catalog plan, ruled 2026-10-02) is carried to its gates on this branch.
+  §13.30 records two main merges, 169 checksum-verified downloads under
+  ruling 378, the native, headed and graph gates, and two forks held: the
+  ruling 411 repair, and the pre.4 wasm constructor cost.
 
 ## 12. Pre.3 repin execution plan (2026-09-16)
 
@@ -2821,3 +2837,231 @@ reconciliation lock candidates remain unapplied. Browser extrema, S15 closure,
 S16 promotion and downstream repins remain held. The existing migration worktree
 is retained for this gate. The shared Mere target holds a diagnostic executable;
 rebuild it before using it for acceptance. No new target or Cargo home was made.
+
+
+### 13.30 Main reconciliation and the P5 gates on pre.4 (2026-10-02 to 03)
+
+**Authority.** Mere's physics catalog plan records, in P5's findings, the
+question whether conatus's caret `cubecl = "0.11.0-pre.2"` / Burn
+`0.22.0-pre.2` should be pinned exactly. Mark replied "Wait. Those should be
+bumped, no?", then chose "Finish pre.4 now, no interim pin" (main
+`a924f380`). This lane takes pre.4 to its gates on this branch. Ruling 411
+still governs the allocator gate, and its repair fork remains unanswered. No
+merge to main, push or downstream repin follows from this entry.
+
+**Merges.** `bcb57356` merges main `a924f380` (162 commits: Genet
+`bd3e8861`, P5's conatus binning/exclusion kernels, seiche `gpu`, pictograph
+`gpu`, mere and graphshell `canvas-gpu`, Density, pairing). Three conflicts
+keep both sides: `.gitattributes`, seiche's manifest (main's conatus/wgpu
+`gpu` rows with the branch's `=0.22.0-pre.4` pins) and conatus `chunk.rs`
+(main's `ResidentClient` fields with the pre.4 client constructor). Weave
+reordered entities in conatus `resident.rs` and `chunk.rs`: it moved `pub
+mod binning;` and `from_wgpu`, dropped `chunk.rs`'s `std` imports and
+misplaced its header. The first conatus check failed on that header.
+Both files are rebuilt from main's blobs plus the branch's recorded pre.4
+replacements. The root and conatus manifests and `DOC_README.md` equal a
+plain three-way merge byte for byte. The root lock is the exact three-way
+union of package identities, with no block changed on both sides.
+
+`a147e6ad` gives main's new `binning/mod.rs` and `exclusion.rs` the same
+mechanical renames as 13.4 (`Client`, launchers without the runtime
+parameter): 9 and 19 lines. `cebcf94d` restates only the pre.4
+persistence-off `cubecl-runtime` row in graphshell-web. Main's P5c lane had
+restated the pre.2 `burn-cubecl` row there too; it goes, so the web graph
+takes the registry `burn-cubecl` as the root does. *Reading, not ruled:*
+ruling 410's retirement covers this fifth selector, which main added after
+the retirement for the old pre.2 reason. The same commit moves the remote
+fixture's lock with Genet `bd3e8861` through its path dependencies. That is
+five Genet source substitutions, `genet-text` added, and two edges from
+main's manifests: 982 to 983 packages, locked metadata passing.
+
+At the coordinator's request, `b73695da` merges main `f62581c7`: Retinue
+0.2.0 (`fa4f925`) at the root and in signalman, djinn's knot-site at
+knot-editor `ea3e99e`, and two pairing-plan doc commits. Manifest and lock
+equal a plain three-way merge. Locked metadata passes at the root, in
+graphshell-web and in all five nested Distillery roots.
+
+**Downloads under ruling 378.** The shared registry cache was emptied at
+2026-10-02 18:00 by an outside process, and no pre.4 archive was cached.
+Each fill was `cargo fetch --locked` against an unchanged lock. A recorder
+listed every missing archive with the lock's checksum beforehand and hashed
+each one afterwards. All 169 match: root 89 (the pre.4 Burn/CubeCL/Cubek
+family plus Pliron/LLVM, awint, buildid, sysinfo 0.39.6, spin 0.12.3, ureq
+3.4.2 and their needs), remote fixture 14, extrema repro 11, session fixture
+55. The session fixture's 55 include its optional Turso lock entries, which
+§13.18 records as lock-only for that CPU root. The recorder rejects a
+planted wrong checksum. No Git fetch: every Git revision the merged locks
+name, including Genet `bd3e8861`, knot-editor `ea3e99e` and Retinue
+`fa4f925`, was already checked out.
+
+**Graphs at `b73695da`.**
+
+- **Root lock** (`114ab762…`, 1,662 packages): no pre.2. One version per
+  Burn/CubeCL/Cubek crate. One wgpu (30.0.1). No Turso and no SQLite.
+  iroh 1.2.0 and tokio 1.53.1 unmoved.
+- **graphshell-web lock** (gitignored; exact bytes `b002ad3d…` retained in
+  the receipt directory, 875 packages): resolved offline from main's
+  recorded P5 lock `a915fa23` with only pre.4-forced moves. It holds the
+  same pre.4 family as the root, from the registry except the path
+  `cubecl-runtime`; one wgpu (30.0.0, as on main's web lock); no Turso. Its
+  wasm feature tree shows no runtime `persistence`, while the same detector
+  finds three in the retained §13.24 positive tree. Every other web-to-root
+  version difference already existed on main. One compiled edge differs:
+  Pliron 0.18.0, a normal dependency of pre.4 `cubecl-core`, takes spin
+  0.12.3 in the web graph and 0.10.1 at the root.
+- **ESP with no default features** has neither Burn nor tokenizers.
+- `cargo_mode.py verify` passes both `--metadata-only` and full (1,535
+  metadata packages).
+
+**Gates.** Offline and locked, Rust 1.98.1, four jobs, no incremental, target
+`C:/t/cargo-targets/mere/burn-pre4`. GPU logs are audited for zero
+`no wgpu adapter` lines plus a positive adapter or CubeCL kernel marker; the
+auditor rejects a planted skip, a missing marker and a failure.
+
+| Gate | Result |
+| --- | --- |
+| conatus `resident --all-targets` check | pass |
+| conatus release `--test resident --test exclusion --test resident_chunk` | 14 pass, 2 timing ignored, 0 skips |
+| seiche release `gpu --test gpu_repulsion` | 3 pass, 1 timing ignored |
+| seiche release `tensor-burn-wgpu` (13.21 force parity included) | 115 pass, 1 ignored |
+| seiche `--lib` / `--no-default-features --lib` / `gpu --lib` | 96 / 92 / 96 (P5c: same) |
+| pictograph `canvas --lib` | 270 (P5c: same) |
+| pictograph `gpu --lib --test physics_device` | first attempt 272 + 1 fail; repeat 273 pass |
+| mere `graph,canvas-gpu` and graphshell `canvas-gpu` checks | pass |
+| cambium-genet-web-host | 8 pass (first attempt could not start rustc) |
+| graphshell `web --lib` | 228 + 2 fail; main-equivalent cone, see below |
+| ESP release synthetic parity + controls / real MiniLM | 4 pass, 2 ignored / 1 pass |
+| Distillery four-feature check; both lease tests; Djinn trainer check | pass; 2 pass; pass (repeated after `f62581c7`) |
+| graphshell-web wasm, `canvas-gpu`, dev, bindgen 0.2.127 | pass; bundle `db4ec90f…`, 110.8 MB (P5's pre.2 bundle: 85.2 MB) |
+
+Numen's `field-burn-wgpu` cone is identity-unchanged across both merges, so
+§13.25's 77-test receipt carries. The others were rerun because a selected
+cone changed. The cone checker flags seiche's changed `gpu` cone as its
+positive control. Every migration cone is identity-unchanged across the
+`f62581c7` merge (djinn's control changes), so receipts taken at `cebcf94d`
+carry to `b73695da`.
+
+Three first attempts died on Windows `STATUS_DLL_INIT_FAILED` (0xC0000142)
+starting `rustc` or `git` while more than twenty other sessions' compilers
+held the CPU at 100%. ESP synthetic, cambium-genet-web-host and the
+post-merge verify each passed on repeat. These are environmental, not
+negative controls.
+
+**Numbers against pre.2.** The conatus pairs pass prints the same relative
+errors as P5's pre.2 receipt at 1k, 10k and 50k (worst 2.89e-6, 1.16e-5,
+1.82e-5). The cells pass and the sign-flipped positive controls vary run to
+run on one pre.4 binary: four runs gave cells worst 1.52e-5 to 2.20e-5 at
+1k and 6.45e-5 to 1.05e-4 at 50k, and sign-flipped overlaps 442 to 544. The
+pairs statistics stayed fixed. That fits the binning's atomic scatter order.
+Pre.2's single samples fall inside these ranges except the 1k cells worst
+error (1.11e-5), below all four pre.4 samples. One sample neither
+establishes nor excludes a shift, and the test bound is 1e-3. Seiche's
+lagged lane matches pre.2's lost-device receipt exactly. Its 2,000-node
+device settle reads spread 1511.1 against 1511.0. Which steps fall back to
+the CPU depends on machine load (stale 4 against 0) by design.
+
+**Unresolved.**
+
+- **pictograph `an_offloaded_canvas_uses_the_device_set_before_or_after_offload`**
+  failed once with 0 device answers ("the actor never used the device").
+  That was its gated run, the binary's first execution after a fresh build.
+  Seventeen further executions pass (62 to 144 answers; P5c pre.2: 73/76),
+  including the repeated gate. Cause not found; not claimed green.
+- **graphshell `--features web --lib`** failures are
+  `carrier::p2panda_murm_grant_is_refused_before_projection_bytes`
+  ("projection accept timeout"; 3 of 5 when run alone) and
+  `session_notices` polling-count tests (pass alone, fail under parallel
+  load). The cone holds no Burn or CubeCL. Against main, it has no new
+  package identity, and its only path differences are this branch's
+  manifest pins and probe files. This binary is main's code; the failures
+  are main's load-sensitive network/timing tests, outside this migration.
+
+**S13 (b), extrema, headed: passes.** Built at `b73695da` with the pinned
+wasm-bindgen 0.2.122, selecting the patched `cubek-reduce` and
+`cubecl-runtime` and registry `burn-cubecl`. Run in a separate headed Chrome
+154 instance, own profile, on NVIDIA Lovelace with the page visible. All
+four cases match their expected bits, with `gpu_errors: []`. The JSON is
+value-identical to the 2026-08-22 pre.2 receipt and is kept as
+`ports/distillery/probe/repros/cubek_browser_extrema/receipts/2026-10-03_pre4_chrome.json`.
+
+**S13 (c), two-peer lifecycle: still stops, unchanged.** The plain gate at
+`b73695da` exits 1 in 17.8 s without timing out. After first reclaim it
+leaves 10 active allocations / 5,323,776 bytes, reserved 41,943,040, against
+the zero baseline, with stdout empty. That is §13.29's failure byte for
+byte, so stop rule 13.8(4) still applies. Ruling 411's fixture-only
+diagnostic was rerun; the retained candidate source was swapped in and its
+original bytes and mtime restored and verified afterwards. The
+completion-poll row reproduces §13.29: four samples without sync unchanged,
+`client.sync().await` `Ok(())` in 2.2 ms, then zero active allocations and
+bytes, and cleanup takes reserved to zero. New: the same diagnostic
+executable's control row retained 6 allocations / 4,729,344 bytes, not 10.
+The retained amount varies run to run. *Reading, not ruled:* that fits the
+completion-ordering explanation, since it depends on how many completion
+callbacks ran before the sample. The zero baseline is reached only through
+the explicit completion wait. Where that wait belongs is the unanswered
+fork in `repair-fork-pending-question.json`: (A) the burn-remote close
+path, (B) general CubeCL polling, (C) park.
+
+**P5 web receipts, headed.** Lane copies of P5's runners: own port 8823,
+own Chrome profile, this worktree's page.
+
+- **`p5_tree_gpu_settle_2000` at the web defaults (no `gpu_*` options):
+  RESULT ok.** 413 of 418 steps on the device, spread 1,075, 0 overlaps,
+  energy 424,849. P5's pre.2 receipt read 413 of 418, 1,075, 0 and 425,160.
+- **CPU twin: RESULT ok.** Spread 1,071, energy 440,992.8 (pre.2 440,993.3).
+- **Physics stage per frame (p50):** device 54.1 ms, CPU 68.3 ms. P5's pre.2
+  figures were 4.9 ms and 89.3 ms.
+- **Law receipts at the defaults:** 11 of 14 RESULT ok at the runner's
+  300 s limit (springs, charge, energy, orbit, kinds, flock, sync, flow,
+  anneal, still, profiles), taking 58 to 255 s against P5's 9 to 26 s.
+  stress passes at 444 s under a 900 s limit. add and drag posted no
+  receipt within 900 s (P5: 153 and 155 s), so they have no verdict.
+
+The CPU path is not slower, and the device lane's web cost per frame is
+about eleven times pre.2's. The web defaults rest on pre.2's crossover:
+ruled third round, "Web N = 9, web threshold 400". Neither cause nor fix is
+established here. Both bundles are dev builds whose CubeCL crates are
+unoptimized (graphshell-web's dev overrides name only rapier, parry,
+nalgebra, simba and seiche).
+
+**Same-session A/B and the cause.** A pre.2 control bundle was built from a
+`git archive` export of main `a924f380` in the session scratchpad with P5's
+recorded web lock `a915fa23`. All its archives were cached; bundle
+`c6b52d2d…`, 85.8 MB. Same runner, port, profile and options, alternating:
+
+| | pre.2 | pre.4 |
+| --- | --- | --- |
+| GPU settle physics p50 | 3.1 ms | 55.5 ms |
+| GPU settle frame interval p50 | 1,244 ms | 1,852 ms |
+| GPU settle wall | 196 s | 293 s |
+| GPU settle bounds | 413/418, 1,075, 0 overlaps | 413/418, 1,075, 0 overlaps |
+| kinds wall | 8 s | 82 s |
+| Idle tree, time to ready | 1.35 s | 3.2 s |
+| Idle tree, frame p50, `gpu=off` too | 12.1 ms | 557 to 612 ms |
+
+`gpu=off` does not help pre.4 (kinds 77 s; idle frames 558 ms), so the
+device lane is not the cost. A 3 s DevTools CPU profile of the idle pre.4
+page finds the main thread in wasm static constructors: `__wasm_call_ctors`
+412 ms, `inventory::Registry::submit` 501 ms, Pliron's `inventory`
+trait-cast and `InventoryWrapper` registrations 389 and 361 ms, a
+`cubecl_ir::dialect::math … __ctor`, and the
+`__externref_table_alloc/dealloc.command_export` wrappers 436 ms. The pre.2
+profile has none of these: 19% idle, with livery style and layout on top.
+*Reading, not ruled:* pre.4 `cubecl-core` depends on Pliron, which
+registers through `inventory`, and cubecl-ir adds constructors of its own.
+wasm-ld then links the module command-style, and its `.command_export`
+wrappers run every constructor around each JS-to-wasm call, so every
+registration is redone per call. Native code runs constructors once. The
+probe and repro receipts are one-shot correctness runs and do not measure
+this cost. Every web consumer of pre.4 CubeCL is affected, not only
+`canvas-gpu`'s device lane. The fix is a build or patch-design choice and
+returns as a fork.
+
+**Held.** The ruling 411 repair fork (S13 (c)). The pre.4 wasm
+constructor cost, returned as a fork; until it is settled, pre.4 cannot be
+promoted to the web. S15 closure docs, S16 integration, and the Knot and
+Isometry handoffs. Evidence: `Code/testing/mere/receipts/2026-10-02/burn-pre4`
+(gate JSON/logs, audits, cone checks, fetch records, web-lock bytes,
+remote/, extrema/, web/). The lane target is `C:/t/cargo-targets/mere/burn-pre4`,
+and its remote fixture executable is the diagnostic build; rebuild it
+before any acceptance run.
