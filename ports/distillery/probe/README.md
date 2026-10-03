@@ -160,3 +160,16 @@ Other patch policies remain independently selected. The migration plan §13.28
 and embedding reproducer receipts preserve the evidence and qualifications.
 The remaining model, extrema, two-peer lifecycle and integration gates remain
 open at this annotation; this does not turn historical receipts into new ones.
+
+## 2026-10-03 migration annotation: repaired close path (ruling 508)
+
+On the pre.4 branch, burn-remote's close now waits for the device to finish
+releasing a session's allocations, and reports a failed wait instead of
+acknowledging a clean close (`support/patches/burn-remote/MERE-PATCH.md`).
+The remote fixture also guards its native-reference comparison against
+non-finite values. It adds a second-live-lease stage: one lease closes through
+its holder's revoke while another stays live on the same device and must keep
+its lease, its session, identical output and its share of the allocator. The
+first passing receipt of this fixture on pre.4 is
+[`receipts/2026-10-03_pre4_remote_minilm_repaired.json`](receipts/2026-10-03_pre4_remote_minilm_repaired.json).
+Migration plan §13.32 records its commands, controls and qualifications.
