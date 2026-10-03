@@ -73,6 +73,9 @@ pub const DENSITY_RESOLUTION: usize = 64;
 pub const DENSITY_STOP: seiche::DensityStop = seiche::DensityStop::Shift(0.05);
 pub const DENSITY_PATIENCE: u32 = 3;
 pub const DENSITY_MAX_PASSES: u32 = 120;
+/// The fewest passes before the stop test may end them (ruled 2026-10-03,
+/// "Min 60, bar: all >= 0.7").
+pub const DENSITY_MIN_PASSES: u32 = 60;
 
 /// The physics law: which dynamics the graph moves under. Ids are technical
 /// (`family.method`), labels plain, as the arrangement catalog does it.
@@ -661,9 +664,9 @@ pub fn physics_profile(id: &str) -> Option<&'static PhysicsProfile> {
         .find(|profile| profile.id == id)
 }
 
-/// Density at the catalog's defaults (ruled 2026-10-02): 64², one-second
-/// passes, blur 0.25 spacings, passes repeated until the convergence test
-/// stops them, the pass cap as the fallback.
+/// Density at the catalog's defaults (ruled 2026-10-02 and 2026-10-03): 64²,
+/// one-second passes, blur 0.25 spacings, at least 60 passes, then passes
+/// repeated until the shift test stops them, the pass cap as the fallback.
 pub(crate) fn density_law(masses: Vec<(NodeKey, f32)>) -> Density {
     let mut law = Density::new(masses, DENSITY_RESOLUTION);
     law.seconds = 1.0;
@@ -671,6 +674,7 @@ pub(crate) fn density_law(masses: Vec<(NodeKey, f32)>) -> Density {
     law.stop = DENSITY_STOP;
     law.patience = DENSITY_PATIENCE;
     law.max_passes = DENSITY_MAX_PASSES;
+    law.min_passes = DENSITY_MIN_PASSES;
     law
 }
 

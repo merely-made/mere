@@ -12,7 +12,7 @@
 use std::collections::HashMap;
 use std::sync::Arc;
 
-use super::density::{generated, run, seeded};
+use super::density::{generated, run, seeded, seeded_dealt};
 use super::*;
 use crate::canvas::physics_catalog::{
     DENSITY_RESOLUTION, LawSources, PhysicsLaw, PhysicsMassSource,
@@ -47,10 +47,6 @@ pub(super) struct Form {
     pub name: &'static str,
     pub resolution: usize,
     pub blur: f32,
-    pub decay: f32,
-    pub quench: bool,
-    pub inset: f32,
-    pub relax: f32,
     pub renew: Option<f32>,
     /// The walls' centre moved this far along x, world units.
     pub shift: f32,
@@ -60,10 +56,6 @@ pub(super) const BASE: Form = Form {
     name: "base",
     resolution: DENSITY_RESOLUTION,
     blur: 0.25,
-    decay: 1.0,
-    quench: false,
-    inset: 18.0,
-    relax: 1.0,
     renew: None,
     shift: 0.0,
 };
@@ -73,10 +65,6 @@ pub(super) fn law(canvas: &Canvas, form: Form, stop: DensityStop, passes: u32) -
     let mut d = Density::with_medium(masses, Box::new(DensityGrid::new(form.resolution)));
     d.seconds = 1.0;
     d.initial_blur = form.blur;
-    d.decay = form.decay;
-    d.quench = form.quench;
-    d.wall_inset = form.inset;
-    d.relax = form.relax;
     d.renew = form.renew;
     d.centre = (form.shift, 0.0);
     d.stop = stop;
@@ -212,21 +200,6 @@ fn forms() -> Vec<Form> {
     let all = vec![
         BASE,
         Form {
-            name: "quench",
-            quench: true,
-            ..BASE
-        },
-        Form {
-            name: "decay0.9",
-            decay: 0.9,
-            ..BASE
-        },
-        Form {
-            name: "decay0.8",
-            decay: 0.8,
-            ..BASE
-        },
-        Form {
             name: "grid128",
             resolution: 128,
             ..BASE
@@ -234,51 +207,6 @@ fn forms() -> Vec<Form> {
         Form {
             name: "blur0.5",
             blur: 0.5,
-            ..BASE
-        },
-        Form {
-            name: "decay0.9+quench",
-            decay: 0.9,
-            quench: true,
-            ..BASE
-        },
-        Form {
-            name: "inset0",
-            inset: 0.0,
-            ..BASE
-        },
-        Form {
-            name: "inset0+blur0.5",
-            inset: 0.0,
-            blur: 0.5,
-            ..BASE
-        },
-        Form {
-            name: "inset0+decay0.9",
-            inset: 0.0,
-            decay: 0.9,
-            ..BASE
-        },
-        Form {
-            name: "relax1.5",
-            relax: 1.5,
-            ..BASE
-        },
-        Form {
-            name: "relax1.8",
-            relax: 1.8,
-            ..BASE
-        },
-        Form {
-            name: "inset0+relax1.8",
-            inset: 0.0,
-            relax: 1.8,
-            ..BASE
-        },
-        Form {
-            name: "grid128+relax1.8",
-            resolution: 128,
-            relax: 1.8,
             ..BASE
         },
         Form {
@@ -400,38 +328,6 @@ fn density_start_probe() {
             );
         }
     }
-}
-
-/// A seed spiral turned by `turn` radians with the nodes dealt onto its
-/// points in a seeded order (`deal` 0 keeps key order): starts that no
-/// symmetry of the square grid maps onto one another.
-fn seeded_dealt(graph: Graph, turn: f32, deal: u64) -> Canvas {
-    let mut canvas = Canvas::with_graph(graph);
-    canvas.set_layout_strategy(None);
-    let mut keys: Vec<NodeKey> = canvas.graph().nodes().map(|(k, _)| k).collect();
-    keys.sort_by_key(|k| k.index());
-    if deal != 0 {
-        // Fisher–Yates on xorshift64, seeded per start.
-        let mut state = deal.wrapping_mul(0x9E37_79B9_7F4A_7C15) | 1;
-        for i in (1..keys.len()).rev() {
-            state ^= state << 13;
-            state ^= state >> 7;
-            state ^= state << 17;
-            keys.swap(i, (state % (i as u64 + 1)) as usize);
-        }
-    }
-    canvas.physics.seed(
-        keys.iter()
-            .enumerate()
-            .map(|(i, &k)| {
-                let a = i as f32 * 2.399_963 + turn;
-                let r = 40.0 * (i as f32 + 0.5).sqrt();
-                (k, Point2D::new(r * a.cos(), r * a.sin()))
-            })
-            .collect(),
-    );
-    canvas.physics.refresh(&mut canvas.view);
-    canvas
 }
 
 fn rank_at_stop(mut canvas: Canvas, form: Form) -> (f32, u32) {
@@ -615,7 +511,8 @@ fn density_sample_stop_against_cap() {
 }
 
 /// A stop under test: the shift test, its patience, and the passes before it
-/// may end them, all under the 120-pass cap.
+/// may end them, all under the 120-pass cap. `min60` became the catalog's
+/// default (ruled 2026-10-03); `shift0.05` is the stop before it.
 #[derive(Clone, Copy, Debug)]
 struct StopVariant {
     name: &'static str,
@@ -625,7 +522,7 @@ struct StopVariant {
 
 const STOP_VARIANTS: [StopVariant; 7] = [
     StopVariant {
-        name: "ruled",
+        name: "shift0.05",
         stop: DensityStop::Shift(0.05),
         min_passes: 0,
     },

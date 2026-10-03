@@ -1738,3 +1738,57 @@ binning are the useful patterns.
   features, 109/109 with `gpu`; pictograph `--features canvas --lib` 282
   passed, 10 ignored; graphshell `--features web --lib` 231 passed, 1
   ignored, single-threaded. Logs `gate-g1-*.log`, `physics-terms.log`.
+- 2026-10-03 (P6a, eighth round, after "Min 60, bar: all ≥ 0.7", "Keep:
+  K, field, Wasserstein" and "Keep renewal, drop four"; main `df55ae2b`
+  merged as `86bb5c84`): the catalog's Density runs at least 60 passes
+  before the shift test (`DENSITY_MIN_PASSES`). `decay`, `quench`,
+  `wall_inset` and `relax` are gone from `seiche::Density`, the walls hold a
+  node a body radius in, `renew` stays an option, and the declaration cites
+  its ruling. The receipts moved to the dealt starts (`seeded_dealt`, now in
+  `tests/density.rs`, shared with the probes). A start costs 105 to 130 s in
+  a debug build (60 passes are 3,600 ticks of the 64² flow, and Springs'
+  900 control ticks come on top), so the default suite runs a fixed subset,
+  dealt starts 0 and 1 of the sixteen. The sixteen run as ignored
+  `_from_all_sixteen_starts` receipts: 133 s in release, three at a time,
+  after a 212 s build (`receipts-r8-all-sixteen-release.log`). On gen-50 and
+  200 nodes every start is asserted at 0.7 or above and Springs below zero,
+  with the mean and the count at 0.8 recorded. On the sample the rank must
+  rise above the seed's and the CV fall. Over the sixteen, gen-50 reads min
+  0.713 (start 4), mean 0.790, 9 at 0.8; 200 nodes min 0.703 (start 2), mean
+  0.777, 7 at 0.8; Springs −0.32 to −0.72 and −0.35 to −0.51. The sample's
+  rank rises on all sixteen (least gain 0.084, start 3) and its CV falls on
+  all sixteen, the same numbers the probe read. The default subset reads
+  gen-50 0.823 and 0.844, 200 nodes 0.731 and 0.814, sample 0.702 and 0.877
+  from seeds −0.427 and −0.004. Density's ranks agree to the digit between
+  debug and release; Springs' do not quite (gen-50 start 0: −0.445 debug,
+  −0.466 release). The pictograph suite takes 401 s (110 s before); the
+  200-node receipt finishes last, and the uniform-mass test now runs its 60
+  passes too. Both pages record the layout where a law was applied
+  (`canvas_physics::LawStart`) and expose `law-start-mass-area-rank`,
+  `law-start-density-cv`, `layout-rank-rose` and `layout-cv-fell`. A
+  `log-layout <label>` verb writes rank, CV, overlaps, spread and the start
+  into the receipt. Density's headed receipts and a new control scenario on
+  each page (`p4_tree_physics_density_control`, `physics_density_control`)
+  apply their law while the boot arrangement holds the canvas paused, then
+  return to Free, so both start from the boot layout: rank 0.574, CV 0.336,
+  3 overlaps. A first sequence applied Density after Free and the overlay
+  checks, and its start (0.370) was not the control's (−0.058), because the
+  live law ran in between (`headed-r8-summary-seq1.log`). From the shared
+  start, Density reads rank 0.856, CV 0.155, no overlaps, identical on both
+  pages, and Springs reads −0.029 with CV 0.559 / 0.560. *Reading, not
+  ruled:* the headed seed is the boot layout; the control is its own
+  scenario from that start, not a run before Density's; the control asserts
+  rank ≤ 0 (a margin of 0.03 on this start), no rise and no evening; the
+  default subset is the first two dealt starts; and Springs is not asserted
+  on the sample, where it reads −0.40, 0.31, 0.004 and −0.22 on starts 0 to
+  3. Fresh bundle `2c72f96b…` (`bundle-r8.sha256`): the Density pair and
+  their controls ok on both pages, the twelve tree law receipts ok, and the
+  200-node cost run's physics stage reads p50 8.7 ms, p95 15.7, max 22.5 a
+  frame against Springs' 1.5 / 1.9 / 2.2, its frames about 117 ms, mostly
+  DOM (`headed-r8-*.log`). Captures inspected whole-frame; Energy's settled
+  frame shows the fixture flown off screen, as in G1's and P5's captures.
+  Gates (offline, locked, debug): seiche 109/109, 105/105 without default
+  features, 109/109 with `gpu`; pictograph `--features canvas --lib` 283
+  passed, 12 ignored, `physics_terms` 4/4 at twelve laws; graphshell
+  `--features web --lib` 232 passed, 1 ignored, single-threaded. Logs
+  `gate-r8-*.log`.
