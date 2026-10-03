@@ -1435,3 +1435,70 @@ binning are the useful patterns.
   spread 1,071, energy 441k. A `git archive` export of `13910c40` builds for
   wasm offline both with a freshly generated web lock (4 m 06 s; the CubeCL
   family resolved to pre.2, see Findings) and with the recorded lock.
+- 2026-10-03 (seiche's speed, branch `seiche-speed`, Part 1: the dial, as
+  ruled, "Ticks per frame, fixed dt"). Where a frame's ticks were decided:
+  `Physics::advance_frame` (one a call), `Physics::advance_elapsed` (elapsed
+  time over `TICK_DURATION`, capped at 50 ms and three steps) and the actor's
+  `run` (a tick, then `sleep(TICK_DT)`); the canvas's `frame_observed` picks
+  the first two, the web tree passes the animation timestamp, turnstone calls
+  `frame()` with physics offloaded, and the remote board `tick()`s. Settle
+  budgets (`SETTLE_TICKS` 360, `SIZE_RESETTLE_TICKS` 90), `never_rests` (a
+  `u32::MAX` budget), Anneal's cooling, the lagged lane's staleness
+  (`now - answer.step`) and Density's passes (`seconds` of `dt`, 60 ticks a
+  pass) already count ticks; only the ambient backdrop counts frames, and it
+  is not seiche's. Built: seiche's `Speed` (thousandths, 0.2 to 50) owes wall
+  time times the speed in integer units on all three drivers, so 0.2x is one
+  tick every five frame-equivalents exactly; `StepBudget` bounds fast-forward
+  on the host's clock and never cuts a call below what real time would run in
+  it; `PaceStats` reports ticks, the effective speed over 32 frames and
+  whether the budget bound; below real time the simulation leads by one tick
+  and the snapshot is drawn between the last two (draw only). The canvas and
+  the board carry it, and the web tree takes it as page options
+  (`physics_speed`, `physics_budget_ms`, 8 ms provisional); the visible
+  control is a fork. Receipts: one trajectory, bit for bit, at 0.2x, 1x, 3.7x
+  and 50x on both drivers, the actor and the canvas (LinLog and Anneal; two 1x
+  runs agree first; dt 1/30 and one tick more differ); settles of exactly 600
+  (seiche) and 360 (canvas) ticks at every speed; slow motion drawn every
+  frame and stepped about a fifth as often (web: 0.202x, 30 of 30 frames
+  drawn, 7 stepped); the budget binding (virtual clock exact; canvas on the
+  real clock within one tick's variation; web, 300 nodes at 50x, stepping at
+  most 8.1 ms on the browser clock's 0.1 ms grain and reaching 1.6x against
+  the page's 166 ms frames, with 24 nodes unbound at 39.6x as the control).
+  The eleven law receipts plus profiles, add and drag are green at 1x on
+  bundle `aa0041d9`, and `p5_tree_gpu_settle_2000` at 1x and at 50x (366 of
+  389 steps on the device). seiche 111/111 (105/105 without `actor`),
+  pictograph 279/279. Found on the way: `NodeExclusion` and
+  `BarnesHutRepulsion` sum in `HashMap` order and are not reproducible run to
+  run (24 of 24 bodies differ after 600 ticks, up to 33,559 and 69,959 ULP;
+  every other law term, and `NodeExclusion` summed in key order, is). Nine of
+  the eleven laws carry one of the two, so today a run is bit-reproducible,
+  and the dial's identity provable, only under Anneal and Still. At 50x under
+  the budget the 2,000-node page ran 244 ticks in 120 frames against 1x's 418
+  until the budget's floor went in (the receipt fails without it). The actor
+  now sleeps out the rest of its interval rather than a whole `TICK_DT` after
+  each tick, so native 1x runs at real time instead of a tick's cost slower
+  (not measured in turnstone). Logs: `Code/testing/mere/seiche-speed/`.
+- 2026-10-03 (seiche's speed, Part 2: dev and test build speed, measured
+  only). On a `git archive` export of `density-cpu` `dad99fde`, every variant
+  passed as `--config` (no profile changed), one dealt start (`gen-50`, start
+  0, 3,601 ticks) and pictograph's default suite, quiet machine, two samples:
+  dev 146.5 s and 102.5 s; release 4.3 s and 8.7 s (34x on one start, not
+  the 14x recorded above, which timed starts three to a core); seiche alone at
+  opt-level 1, 2, 3: 97 s, 8.0 s, 7.7 s, the suite 81, 53, 63 s; seiche with
+  rapier2d, parry2d, nalgebra, simba and glamx at 1, 2, 3: 30 s, 7.2 s, 6.0 s,
+  the suite 24.7, 12.7, 12.6 s; `[profile.test]` at opt-level 1 for every
+  crate 9.8 s and 9.7 s, after rebuilding every crate once (388 s); the test profile's registry crates at 2 with seiche
+  at 0 147 s and 50.6 s, and with seiche at 2 7.3 s and 10.1 s. The rebuild
+  after a one-line seiche edit stays 12 to 19 s at every dev and test level
+  (release 38.6 s), and backtraces from inside `Simulation::tick` keep every
+  frame with file and line at every dev and test level (release loses the
+  inlined frames). Where debug's time goes: Density's force is 99.4% of a
+  tick (rapier's step 0.6%); its Jacobi sweep runs 49 ns a cell in debug
+  against 1.2 in release, of which overflow checks and debug assertions are
+  about a fifth and the `Index` call chain with its bounds checks about two
+  fifths (raw pointers: 28 ns); allocation is 14 a tick at every level. In
+  release the bounds checks block vectorisation (indexed 1.2 ns, raw 0.24).
+  The profile choice goes to Mark as a fork. Not verified: locals and
+  stepping in a debugger (lldb lacks its Python DLL here); a sampling profile
+  (the shell is not elevated, so the Windows profilers cannot run; the split
+  above is by timers, opt-levels and a microbenchmark instead).
