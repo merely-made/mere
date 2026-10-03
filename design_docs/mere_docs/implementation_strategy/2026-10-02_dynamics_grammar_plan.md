@@ -274,6 +274,28 @@ Constraints report whether they were satisfied, the physics counterpart of `scen
 - the reports reach the web snapshot and turnstone's observe snapshot;
 - the eleven law receipts stay green.
 
+### G7 — arrangement roles (proposed 2026-10-03, awaiting Mark's approval)
+
+Carries out F18 to F30: an arrangement's coordinates play one of three roles, and physics acts on them rather than being one of them. Evidence and inventory: `research/2026-10-03_arrangement_and_dynamics_brief.md` (36 meeting points; 10 in conflict, mostly the anchor pull in five places).
+
+- **Roles.** Each item's arrangement position is seeded, pinned or anchored (F18, F19, F26). A recipe sets the default, a group or kind may override it, and an item may override that (F22). The default is seeded (F23): the canvas's `arrangement_pull` default of 12 (`pictograph/src/canvas/lifecycle.rs:212`, `strategy.rs:208-228`) gives way to a role, and the board's slot pull (0.5) and swatch relax's pull (0.25) follow onto the roles.
+- **Anchored** returns to its position by the anchor term (`seiche::AnchorSpring`) while physics runs, and jumps back when a drag ends with physics off (F19). **Pinned** stays and is honoured, reporting through G6. **Seeded** only starts the motion.
+- **Handoffs.** A pick while playing runs its transition and physics continues from the landed positions; on stop, anchored items return by a transition while seeded and pinned items stay (F24). Restore stays explicit.
+- **Encoded axes.** An axis bound to a data field is pinned on that axis, declared from the encoding; the practice board's pull of 120 retires (F28).
+- **Settled.** An arrangement source holding the latest settle's positions, replaced at each new settle, picked like any other (F30).
+- **Formats.** `sceno::Hold` gains `Seeded` (the old `Anchored`'s meaning, read from old saves by a serde alias), `Anchored` (returns) and `Pinned` (F25). `SavedSceneV1`'s `arrangement_pull` (no serde default today) becomes role fields with a default that reads old saves as they behaved. "Encourage" and "ensure" leave comments, docs and `scenotime`'s error strings (F26).
+- **Outside this track.** The projection grammar catalog's §6 row and its policies (F29), carried by the Projection grammar session; mer3ly's Anchored/Free mobility, which follows when mer3ly consumes the board; capture in schedules (F27), which is G3's.
+
+*Done when:*
+- the brief's probe, rerun through the canvas: seeded lets the Spiral's order fall (about 0.30 at 6 s), anchored holds it (about 0.79), and pinned holds every pinned item exactly, with a seeded control in the same run;
+- per-item roles override a recipe default and a group default, each with a test;
+- a dragged anchored item returns with physics on and jumps back with physics off, and a dragged seeded item stays where it was dropped;
+- a pick while playing keeps playing from the landed positions, and a stop returns anchored items while seeded and pinned stay;
+- an encoded axis stays fixed while the free axis separates overlaps, and the practice board reads unchanged in its encoded values;
+- Settled holds the last settle and replaces it on the next, and a `never_rests` law leaves it unchanged;
+- old saves and old scores read with their old behaviour (fixtures of each), and new ones round-trip the three roles;
+- the eleven law receipts stay green.
+
 ## 3. Open questions
 
 *Ruled 2026-10-02, on putting the plan to Mark:* "Approve; start G1" (the
