@@ -503,3 +503,241 @@ async fn a_peer_tagged_before_its_address_is_joined_once_the_address_arrives() {
     .await
     .expect("alice joined bob once his address arrived");
 }
+
+async fn within<T>(what: &str, limit: Duration, future: impl Future<Output = T>) -> T {
+    tokio::time::timeout(limit, future)
+        .await
+        .unwrap_or_else(|_| panic!("{what} took over {limit:?}"))
+}
+
+/// Two gossip transports that know and tag each other, joined at the same
+/// moment so that each dials the other.
+async fn dialled_at_once(
+    seed: u8,
+    topic: [u8; 32],
+) -> (
+    P2pandaTransport,
+    GossipHandle,
+    P2pandaTransport,
+    GossipHandle,
+) {
+    let (alice_kp, alice_id) = make_inputs(seed);
+    let (bob_kp, bob_id) = make_inputs(seed + 1);
+    let alice = P2pandaTransport::builder(&alice_kp).gossip().bind();
+    let alice = within("bind", Duration::from_secs(10), alice)
+        .await
+        .unwrap();
+    let bob = P2pandaTransport::builder(&bob_kp).gossip().bind();
+    let bob = within("bind", Duration::from_secs(10), bob).await.unwrap();
+    alice
+        .add_peer(bob.endpoint_addr().await.unwrap())
+        .await
+        .unwrap();
+    alice.set_topics(bob_id, &[topic]).await.unwrap();
+    bob.add_peer(alice.endpoint_addr().await.unwrap())
+        .await
+        .unwrap();
+    bob.set_topics(alice_id, &[topic]).await.unwrap();
+    let (alice_handle, bob_handle) = within("subscribe", Duration::from_secs(10), async {
+        tokio::join!(alice.subscribe(topic), bob.subscribe(topic))
+    })
+    .await;
+    (alice, alice_handle.unwrap(), bob, bob_handle.unwrap())
+}
+
+/// Publishes a fresh payload every 100 ms one way and records when the other
+/// side last received one. Fresh and tagged with its sender, because gossip
+/// drops a payload it has seen, its own included.
+struct Traffic {
+    started: std::time::Instant,
+    last: Arc<std::sync::atomic::AtomicU64>,
+    tasks: [tokio::task::JoinHandle<()>; 2],
+}
+
+impl Traffic {
+    fn start(sender: PeerID, from: &GossipHandle, to: &GossipHandle) -> Self {
+        use std::sync::atomic::Ordering;
+        use tokio_stream::StreamExt;
+        let started = std::time::Instant::now();
+        let last = Arc::new(std::sync::atomic::AtomicU64::new(0));
+        let (seen, mut incoming) = (Arc::clone(&last), to.subscribe());
+        let receive = tokio::spawn(async move {
+            while let Some(message) = incoming.next().await {
+                if message.is_ok() {
+                    seen.store(started.elapsed().as_millis() as u64 + 1, Ordering::SeqCst);
+                }
+            }
+        });
+        let from = from.clone();
+        let publish = tokio::spawn(async move {
+            let mut sequence = 0u64;
+            loop {
+                sequence += 1;
+                let payload = [sender.to_bytes().as_slice(), &sequence.to_le_bytes()].concat();
+                let _ = from.publish(payload).await;
+                tokio::time::sleep(Duration::from_millis(100)).await;
+            }
+        });
+        Self {
+            started,
+            last,
+            tasks: [receive, publish],
+        }
+    }
+
+    /// A payload arrived within the last second.
+    fn delivering(&self) -> bool {
+        let last = self.last.load(std::sync::atomic::Ordering::SeqCst);
+        last > 0 && (self.started.elapsed().as_millis() as u64) < last + 1000
+    }
+}
+
+impl Drop for Traffic {
+    fn drop(&mut self) {
+        self.tasks.iter().for_each(|task| task.abort());
+    }
+}
+
+/// Whether `me` reads `other` as connected, with or without the gossip half.
+async fn reads_connected(
+    me: &P2pandaTransport,
+    other: PeerID,
+    topic: [u8; 32],
+    count_neighbours: bool,
+) -> bool {
+    within(
+        "directory",
+        Duration::from_secs(5),
+        me.peers_for_topic_counting(topic, count_neighbours),
+    )
+    .await
+    .expect("directory")
+    .iter()
+    .any(|peer| peer.peer == other && peer.connected)
+}
+
+/// Both sides dialling at once must not read as a dead link while it delivers.
+///
+/// iroh then marks every address of the peer inactive for seconds at a time,
+/// from its 5 s holepunch on or from the start, while gossip keeps carrying
+/// traffic; that is why `connected` counts a gossip neighbour. The gap comes in
+/// about a third of pairs, so pairs are made until the control, the same
+/// directory with the gossip half off, has read the delivering link dead.
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn both_sides_dialling_at_once_stays_connected_while_the_link_delivers() {
+    const PAIRS: u8 = 16;
+    const WINDOW: Duration = Duration::from_secs(7);
+    let mut control = None;
+    for pair in 0..PAIRS {
+        let topic = [0xd0 ^ pair; 32];
+        let (alice, alice_handle, bob, bob_handle) = dialled_at_once(200 + 2 * pair, topic).await;
+        let (alice_id, bob_id) = (alice.local_peer_id(), bob.local_peer_id());
+        let to_bob = Traffic::start(alice_id, &alice_handle, &bob_handle);
+        let to_alice = Traffic::start(bob_id, &bob_handle, &alice_handle);
+        let joined = std::time::Instant::now();
+        while !(to_bob.delivering() && to_alice.delivering()) {
+            assert!(
+                joined.elapsed() < Duration::from_secs(20),
+                "pair {pair}: no delivery both ways in 20 s (to bob {}, to alice {})",
+                to_bob.delivering(),
+                to_alice.delivering()
+            );
+            tokio::time::sleep(Duration::from_millis(50)).await;
+        }
+        let delivering = std::time::Instant::now();
+        while delivering.elapsed() < WINDOW {
+            tokio::time::sleep(Duration::from_millis(100)).await;
+            let at = delivering.elapsed();
+            assert!(
+                to_bob.delivering() && to_alice.delivering(),
+                "pair {pair}: the link stopped delivering at {at:?}"
+            );
+            for (me, other) in [(&alice, bob_id), (&bob, alice_id)] {
+                assert!(
+                    reads_connected(me, other, topic, true).await,
+                    "pair {pair}: a delivering link read not connected at {at:?}"
+                );
+                if control.is_none() && !reads_connected(me, other, topic, false).await {
+                    control = Some((pair, at));
+                }
+            }
+        }
+        println!("pair {pair}: connected throughout {WINDOW:?}; control so far {control:?}");
+        drop((to_bob, to_alice, alice_handle, bob_handle));
+        within("close", Duration::from_secs(10), alice.close())
+            .await
+            .unwrap();
+        within("close", Duration::from_secs(10), bob.close())
+            .await
+            .unwrap();
+        if control.is_some() {
+            break;
+        }
+    }
+    let (pair, at) = control.unwrap_or_else(|| {
+        panic!(
+            "the path half never read a delivering link dead in {PAIRS} pairs: \
+             this run proves nothing"
+        )
+    });
+    println!("control: pair {pair}'s path half read the delivering link dead {at:?} in");
+}
+
+/// Counting a neighbour must not keep a stopped peer connected: it reads not
+/// connected once gossip reports it down and its path is gone. Prints how long
+/// each half took, against the pairing plan's D1 figure for a killed resident.
+/// About a minute: gossip drops a closed peer at once, iroh's path after 60 s.
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn a_stopped_peer_reads_not_connected_once_its_neighbour_goes_down() {
+    let topic = [0xe1; 32];
+    let (alice, alice_handle, bob, bob_handle) = dialled_at_once(240, topic).await;
+    let bob_id = bob.local_peer_id();
+    let to_bob = Traffic::start(alice.local_peer_id(), &alice_handle, &bob_handle);
+    within("connected", Duration::from_secs(20), async {
+        while !(to_bob.delivering() && reads_connected(&alice, bob_id, topic, true).await) {
+            tokio::time::sleep(Duration::from_millis(100)).await;
+        }
+    })
+    .await;
+
+    drop((to_bob, bob_handle));
+    let stopped = std::time::Instant::now();
+    within("close", Duration::from_secs(10), bob.close())
+        .await
+        .unwrap();
+    drop(bob);
+    let (mut neighbour_down, mut path_down) = (None, None);
+    let not_connected = within("not connected", Duration::from_secs(120), async {
+        loop {
+            tokio::time::sleep(Duration::from_millis(100)).await;
+            if neighbour_down.is_none()
+                && !alice
+                    .gossip_neighbours(topic)
+                    .await
+                    .contains(&bob_id.to_bytes())
+            {
+                neighbour_down = Some(stopped.elapsed());
+            }
+            if path_down.is_none() && !reads_connected(&alice, bob_id, topic, false).await {
+                path_down = Some(stopped.elapsed());
+            }
+            if !reads_connected(&alice, bob_id, topic, true).await {
+                break stopped.elapsed();
+            }
+        }
+    })
+    .await;
+    println!(
+        "stopped peer: neighbour down {neighbour_down:?}, path down {path_down:?}, \
+         not connected {not_connected:?}"
+    );
+    assert!(
+        neighbour_down.is_some() && path_down.is_some(),
+        "not connected only once both halves are down: \
+         neighbour {neighbour_down:?}, path {path_down:?}"
+    );
+    drop(alice_handle);
+    within("close", Duration::from_secs(10), alice.close())
+        .await
+        .unwrap();
+}
