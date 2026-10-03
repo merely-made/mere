@@ -53,7 +53,7 @@ use crate::canvas::{Canvas, SETTLE_TICKS};
 
 /// The seed every seeded law (Kinds' rule matrix, Anneal's walk) starts from,
 /// so a scene reopens to the same rules.
-const LAW_SEED: u64 = 0x5EED_CA7A_1064;
+pub(crate) const LAW_SEED: u64 = 0x5EED_CA7A_1064;
 /// PageRank's damping and iteration budget.
 const PAGE_RANK_DAMPING: f32 = 0.85;
 const PAGE_RANK_ITERATIONS: usize = 50;
@@ -63,7 +63,7 @@ const SKELETON_STIFFNESS: f32 = 60.0;
 /// the `1/d` push matches `NodeExclusion`'s inverse-square one
 /// (`220_000 / 36² ≈ 170`): the seiche default of 2 400 left bodies
 /// touching under the edge springs. (Physics catalog — the Charge receipt.)
-const CHARGE_STRENGTH: f32 = 6_000.0;
+pub(crate) const CHARGE_STRENGTH: f32 = 6_000.0;
 /// Density's grid resolution on the CPU tier (cells per side): 64², ruled
 /// 2026-10-02 (the same ranks as 128² at about a sixteenth of the cost).
 pub const DENSITY_RESOLUTION: usize = 64;
@@ -87,14 +87,16 @@ pub enum PhysicsLaw {
     /// shortest-path distance (relation multiplicity shortens a hop), so the
     /// picture is a metric map of the graph.
     Stress,
-    /// LinLog energy: linear attraction along edges, logarithmic repulsion, so
-    /// communities separate and hubs sit central.
+    /// ForceAtlas2's force model: attraction linear in distance along edges,
+    /// repulsion falling as `1/d`, degree-weighted, so communities separate
+    /// and hubs sit central. LinLog proper is its attraction exponent `0`, a
+    /// tuning; the id stays `energy.linlog`.
     Energy,
     /// Newtonian gravity with an orbital kick: hubs are suns, leaves circle them,
     /// and it never rests.
     Orbit,
     /// Particle life: nodes carry a kind, and a kind-by-kind rule matrix says who
-    /// chases and who flees.
+    /// chases and who flees, and it never rests.
     Kinds,
     /// Boids: separation, alignment, cohesion, and a cruising speed; the graph
     /// moves as a flock.
@@ -171,11 +173,14 @@ impl PhysicsLaw {
     }
 
     /// Whether the law is a living display that never comes to rest (Orbit,
-    /// Flock, Sync), so the host keeps ticking rather than settling.
+    /// Kinds, Flock, Sync), so the host keeps ticking rather than settling.
+    /// Kinds joined on the P2 fixture's figures: kinetic energy about 18 300
+    /// at 6 s and 140 500 at 30 s under continuous ticking, against the floor
+    /// of 1 (dynamics grammar plan, G1, F10).
     pub fn never_rests(self) -> bool {
         matches!(
             self,
-            PhysicsLaw::Orbit | PhysicsLaw::Flock | PhysicsLaw::Sync
+            PhysicsLaw::Orbit | PhysicsLaw::Kinds | PhysicsLaw::Flock | PhysicsLaw::Sync
         )
     }
 
