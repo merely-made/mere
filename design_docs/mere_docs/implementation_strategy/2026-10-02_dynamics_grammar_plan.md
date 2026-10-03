@@ -121,6 +121,12 @@ Mark's words are quoted as the physics catalog plan records them (§3, P7, and �
 
 **F35, Meaning's cost at scale (2026-10-03; G2's ninth fork).** Question: the dense lexical pair search takes 19 ms, 4.2 s and 66 s at 32, 500 and 2,000 nodes (debug, native), and on wasm it runs inline on the frame. Options: a sparse lexical search with the wasm run moved off the frame; a node ceiling on wasm; accept the cost. Mark: **"Sparse search + off-frame"**. *Follows:* lexical pairs use ESP's sparse index, with `affinity_pairs` made generic over the vector type, and the wasm run leaves the frame.
 
+**F36, Meaning into Affinity (2026-10-03; G2's sixth fork).** Question: G2 built Meaning's pairs into Affinity opt-in and off by default, joining `PhysicsChoice` in G4; automatic under the default Blend would change today's affinity output and two tests' premises. Options: opt-in; automatic in Blend. Mark: **"Opt-in"**. *Follows:* as built; the choice is saved with the spec in G4.
+
+**F37, surfacing Group pull's channel (2026-10-03; G2's seventh fork).** Question: Group pull reads any group channel, but only through the API and `PhysicsChoice`. Options: a Group pull source picker in both web UIs plus `physics_group_source` in `SavedSceneV1` now, defaulting to site; leave both to G4. Mark: **"Surface it now"**. *Follows:* both web UIs gain the picker, and `SavedSceneV1` gains `physics_group_source` with a serde default of site, so old saves read the same.
+
+**F38, cartography's disclosures (2026-10-03; G2's eighth fork).** Question: G2 moved the facts both sides read today (cluster, site) into the registry, leaving spectral coordinates, radial rings, spiral recency, timeline order and the importance weight in cartography until a physics term reads them, with arrangement ids unchanged. Options: move each disclosure on its first shared read; move every disclosure producer into the registry now, a much larger cross-crate refactor; also re-id the arrangements by channel. Mark: **"Move them all now"**. *Follows:* every disclosure producer moves into the registry in G2, and cartography reads them from it; arrangement ids stay as they are. *Reading, not ruled:* this is the larger refactor the lane named, crossing pictograph and cartography; a lane plans it with its own done-conditions (each disclosure read from the registry, one computation per revision, cartography's arrangements unchanged in output) before building.
+
 ### 1.2 Earlier rulings that are this plan's inputs
 
 From the physics catalog plan, §3 P5–P7 and §5:
