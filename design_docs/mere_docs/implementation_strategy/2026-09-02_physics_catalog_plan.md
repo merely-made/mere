@@ -563,6 +563,38 @@ pull reading −0.33 with 510 overlaps):
   move from the key-order seed to dealt starts; the decay, quench,
   wall-inset, relax and renewal knobs leave the code once the stop lands,
   with their evidence kept in the logs.
+- **Density's stop, seventh round (2026-10-03, `density-cpu` `73965233`,
+  `e303e58b`).** Over the same 16 dealt starts (50 nodes / 200 nodes): the
+  120-pass cap reads min 0.699 / 0.732, mean 0.796 / 0.780, 9 of 16 at 0.8 or
+  above on 50 nodes; a minimum of 60 passes before the shift test reads min
+  0.713 / 0.703, mean 0.790 / 0.777, 9 of 16, stopping at about 60 s; shifts
+  of 0.02 and 0.01 still stop early on 50 nodes (6 and 5 of 16) and never by
+  test on 200; the ruled stop reads mean 0.722 / 0.754. No variant puts every
+  50-node start at 0.8. Density CV falls on every start under every variant,
+  and Springs reads −0.44 to −0.55 on the same starts (the control). Asked
+  which stop and bar, Mark chose **"Min 60, bar: all ≥ 0.7"**: the default
+  becomes a minimum of 60 passes before the shift test, and the bar becomes
+  every dealt start at 0.7 or above on both graphs, with the mean and the
+  count at 0.8 or above recorded. The alternatives were the 120-pass cap with
+  a mean bar near 0.8, or keeping every start at 0.8, which no stop meets.
+  This amends the third round's 0.8 bar on gen-50 and the plateau bar of 0.7
+  at 200 nodes into one bar over dealt starts.
+- **Density's declaration (2026-10-03).** After G1, `Force` requires
+  `Declared::terms()`; the lane wrote the grammar plan's sketch. Options: one
+  K term with its density field as state in the Wasserstein metric weighted
+  by node mass; K with position state, as Anneal and FlowAdvect; Em with an
+  exposed energy ∫ρ ln ρ (amending the rule that a kinematic term is K); two
+  terms, field diffusion and position advection. Mark chose **"Keep: K,
+  field, Wasserstein"**. *Reading, not ruled:* G1's instruments skip K terms,
+  so nothing measures Density's declaration; that is G5's concern.
+- **Density's experimental knobs (2026-10-03).** Measured: quench and the wall
+  inset had no effect, relax at 1.5 never stops and at 1.8 collapses, decay
+  was worse everywhere, and renewal gained nothing from dealt starts but lets
+  the field follow drags and contacts continuously. Options: keep renewal,
+  drop the other four; drop all five; keep all five off by default. Mark
+  chose **"Keep renewal, drop four"**: renewal stays as an option, and quench,
+  wall inset, relax and decay leave the code, their evidence kept in the logs
+  and here.
 - **P5's web defaults, undercut by pre.4 (2026-10-03).** On `burn-pre4-repin`
   the web page's frames take 557 ms against pre.2's 12.1 ms, GPU on or off,
   because the wasm module re-runs its static constructors (pliron's
