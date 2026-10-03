@@ -2,7 +2,7 @@
 
 **Date**: 2026-10-02
 **Status (2026-10-02)**: in progress. Assessed and ruled by Mark on 2026-10-01
-and 2026-10-02 (rulings 1 to 31 below). D1 landed (`4963b489`); D1b's mere fix (M1)
+and 2026-10-02 (rulings 1 to 34 below). D1 landed (`4963b489`); D1b's mere fix (M1)
 landed (`177b927c`), its fork fix (F1) is being released as
 `mere-p2panda-net-0.7.5` with knot and mere repinned, and `connected` is
 being fixed; then D2.
@@ -281,6 +281,29 @@ gossip decides while the overlay is up; keep the OR rule. Mark: **"Gossip
 decides while the overlay is up (Recommended)"**. Follows: for a peer on the
 overlay, the gossip neighbour state is authoritative; iroh's path counts
 only for peers not on it. Amends ruling 22.
+
+**Ruling 32.** *Which meaning of "on the overlay" for ruling 31?* Options:
+subscribed (this node has subscribed to the topic, read exactly from the
+address book's self record); joined (from gossip's `Joined` to `Left`, not
+readable through the fork's API); per peer (gossip-authoritative once the
+peer has been a neighbour since this node joined). Mark: **"Subscribed
+(Recommended)"**. Follows: before the first neighbour comes up, every peer
+reads not connected; a device reachable only over a later SSH channel would
+too.
+
+**Ruling 33.** *GitHub's fork `main` had moved to `94947fd1` (Mark's
+2026-09-28 sync merge of upstream, adding no files beyond the release's own
+tree), so the release would not fast-forward. How should it sit?* Options:
+rebuild the release on top; merge on top of the release; push only the tag.
+Mark: **"Rebuild the release on top (Recommended)"**.
+
+**Ruling 34.** *Signalman's own workspace resolves `p2panda-core` from
+crates.io 0.7.1, where the audited CBOR split cannot compile. Which?*
+Options: patch it onto the fork tag; leave it on crates.io 0.7.1. Mark:
+**"Patch it onto the fork tag (Recommended)"**. Follows: a `[patch.crates-io]`
+row in `ports/signalman`; its graph drops the dalek-2 family (287 to 278
+packages, measured). A desktop workspace outside mere that patches retinue
+will need the same row.
 
 Also given in the same conversation (2026-10-01, Mark: "You can edit known
 hosts"): `known_hosts` entries may be updated, which was done for the

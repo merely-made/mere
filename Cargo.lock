@@ -2610,6 +2610,7 @@ dependencies = [
  "burn-wgpu",
  "bytemuck",
  "cubecl",
+ "euclid",
  "getrandom 0.4.3",
  "nisus",
  "pollster",
@@ -14419,13 +14420,16 @@ dependencies = [
  "armillary",
  "burn",
  "burn-wgpu",
+ "conatus",
  "euclid",
  "getrandom 0.4.3",
  "numen",
  "petgraph 0.8.3",
+ "pollster",
  "rapier2d",
  "tracing",
  "uuid",
+ "wgpu",
 ]
 
 [[package]]
