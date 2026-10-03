@@ -3423,10 +3423,10 @@ pre.2's while `gpu=off` matches. Evidence:
 
 §13.33's three forks went to Mark on 2026-10-03, after the coordinator
 re-read the fix, the run counts (5,441 at ready before, 1 after, GPU on and
-off) and the pooled A/B. Their Isometry wing numbers are being assigned
-with the wing session and are added here when known.
+off) and the pooled A/B. They are Isometry wing rulings 532, 533 and 534
+(`fe82a8b`).
 
-**The fix's form.** Question: graphshell-web's start function calls
+**Ruling 532: the fix's form.** Question: graphshell-web's start function calls
 `__wasm_call_ctors` (one run per page, link line unchanged); three other
 pre.4 web modules still run their constructors on every call, and Knot's
 and Isometry's web builds will once they take pre.4. Options: one helper in
@@ -3439,14 +3439,14 @@ wasm-bindgen that also calls the constructors) would make each `inventory`
 node point at itself, so iterating a registry would never end; the
 one-run test is the guard against that.
 
-**The other pre.4 web modules.** Question: Distillery's model probe (which
+**Ruling 533: the other pre.4 web modules.** Question: Distillery's model probe (which
 records browser timings against bounds) and two minimal repros (burn
 browser embedding; extrema, 3,648 wrapped exports) are still
 command-linked; S13(b) extrema passes either way. Options: the probe takes
 the fix and the repros stay minimal; all three; none. Mark: **"Probe yes,
 repros no"**.
 
-**Whether the A/B shows it.** Question: pooled medians on a busy machine
+**Ruling 534: whether the A/B shows it.** Question: pooled medians on a busy machine
 (other sessions up to 96% CPU): GPU off, fixed pre.4 12.2 ms against pre.2
 12.2 ms; GPU on, 21.2 ms against 15.2 ms, one vsync above, ranges
 overlapping (12.1 to 30.2 against 12.1 to 30.3), the profiles showing no
