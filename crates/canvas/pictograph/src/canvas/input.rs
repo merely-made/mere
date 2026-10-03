@@ -304,6 +304,7 @@ impl Canvas {
         if self.physics_paused {
             self.paused_positions = Some(seeds.clone());
         }
+        self.reset_frame_time();
         self.physics.seed(seeds);
         self.settle_physics(SETTLE_TICKS);
         true
@@ -593,12 +594,14 @@ impl Canvas {
     /// from there, and "force-directed" is simply *no* analytic arrangement
     /// with physics running. (Physics as a capability.)
     pub fn set_physics_paused(&mut self, paused: bool) {
+        self.reset_frame_time();
         if paused != self.physics_paused {
             // Publish a pending paused placement before resuming. Seed both
             // transitions from what the user sees, never from stored arrangement
             // slots or a newer, not-yet-displayed actor snapshot.
             self.apply_strategy_to_view();
             let positions: Vec<_> = self.view.positions().collect();
+            self.reset_frame_time();
             self.physics.seed(positions.clone());
             self.paused_positions = paused.then_some(positions);
         }
@@ -608,6 +611,7 @@ impl Canvas {
         // pause. (Arrangement as attractor.)
         self.sync_anchor_force();
         if self.physics_paused {
+            self.reset_frame_time();
             self.physics.halt();
         } else {
             // Resuming via the pause/play control means "run so I can watch": settle
@@ -667,6 +671,7 @@ impl Canvas {
         self.graph.derive_containment_for(key);
         self.reconcile_derived();
         self.view.set_position(key, seed);
+        self.reset_frame_time();
         self.physics.seed(vec![(key, seed)]);
         self.select_only(key);
         self.settle_physics(SETTLE_TICKS);
@@ -732,6 +737,7 @@ impl Canvas {
         self.graph.derive_containment_for(key);
         self.reconcile_derived();
         self.view.set_position(key, seed);
+        self.reset_frame_time();
         self.physics.seed(vec![(key, seed)]);
         self.select_only(key);
         self.settle_physics(SETTLE_TICKS);

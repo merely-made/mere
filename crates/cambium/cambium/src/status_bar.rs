@@ -41,7 +41,13 @@ pub const STATUS_BAR_CSS: &str = "\
     .status-bar { display: flex; align-items: center; min-width: 0; } \
     .status-message { flex-grow: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; } \
     .status-chips { display: flex; align-items: center; flex: none; } \
-    .status-chip { position: relative; z-index: 52; white-space: nowrap; }";
+    .status-chip { position: relative; z-index: 52; white-space: nowrap; } \
+    .status-bar[data-status-collapsed=true] .status-chip { max-width:calc(100vw - 84px); overflow:hidden; } \
+    .status-chips .popover { max-width:calc(100vw - 24px); box-sizing:border-box; } \
+    .status-overflow-content { max-height:70vh; overflow:auto; white-space:normal; min-width:0; padding:8px; border:1px solid currentColor; box-sizing:border-box; }";
+
+// Reserved for the component's controlled overflow popover, never a fact key.
+const OVERFLOW_KEY: &str = "__status-overflow";
 
 /// How much weight a message or chip carries.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
@@ -95,6 +101,8 @@ pub struct StatusBar<'a> {
     pub severity: StatusSeverity,
     pub chips: &'a [StatusChip],
     pub label: &'a str,
+    /// Host-chosen visible fact slots. `None` retains the original full row.
+    pub chip_limit: Option<usize>,
 }
 
 impl<'a> StatusBar<'a> {
@@ -104,6 +112,7 @@ impl<'a> StatusBar<'a> {
             severity: StatusSeverity::Quiet,
             chips,
             label: "Status",
+            chip_limit: None,
         }
     }
 
@@ -118,6 +127,36 @@ impl<'a> StatusBar<'a> {
         self.label = label;
         self
     }
+
+    /// Keep the most severe facts visible, with stable ties, and expose the
+    /// remaining facts through one `+N` popover. At least one slot is retained
+    /// when chips exist, so a refusal can never be displaced by quiet facts.
+    #[must_use]
+    pub fn with_chip_limit(mut self, limit: usize) -> Self {
+        self.chip_limit = Some(limit.max(1));
+        self
+    }
+}
+
+fn partition_chips(bar: StatusBar<'_>) -> (Vec<&StatusChip>, Vec<&StatusChip>) {
+    let mut priority: Vec<_> = bar.chips.iter().enumerate().collect();
+    let limit = bar.chip_limit.unwrap_or(priority.len()).max(1);
+    if priority.len() <= limit {
+        return (bar.chips.iter().collect(), Vec::new());
+    }
+    priority.sort_by_key(|(index, chip)| {
+        let severity = match chip.severity {
+            StatusSeverity::Refused => 0,
+            StatusSeverity::Warning => 1,
+            StatusSeverity::Quiet => 2,
+        };
+        (severity, *index)
+    });
+    let hidden = priority.split_off(limit);
+    (
+        priority.into_iter().map(|(_, chip)| chip).collect(),
+        hidden.into_iter().map(|(_, chip)| chip).collect(),
+    )
 }
 
 /// Which chip's popover is open, and which chip gets focus back once it
@@ -179,11 +218,71 @@ where
         .attr("aria-live", "polite")
         .attr("data-severity", bar.severity.token());
 
-    let chips: Vec<StatusView<State, Action>> = bar
-        .chips
-        .iter()
+    let (visible, hidden) = partition_chips(bar);
+    let collapsed = !hidden.is_empty();
+    let mut chips: Vec<StatusView<State, Action>> = visible
+        .into_iter()
         .map(|chip| chip_view(chip, state, on_change.clone(), &content))
         .collect();
+
+    if collapsed {
+        // A resize may move the currently open chip into overflow. Keep its
+        // details reachable and return focus to the surviving +N trigger on
+        // dismissal, without rewriting the caller's controlled state.
+        let mut overflow_state = state.clone();
+        if hidden
+            .iter()
+            .any(|chip| state.open.as_deref() == Some(chip.key.as_str()))
+        {
+            overflow_state.open = Some(OVERFLOW_KEY.to_owned());
+        }
+        if hidden
+            .iter()
+            .any(|chip| state.return_focus.as_deref() == Some(chip.key.as_str()))
+        {
+            overflow_state.return_focus = Some(OVERFLOW_KEY.to_owned());
+        }
+        let overflow = StatusChip::new(OVERFLOW_KEY, format!("+{}", hidden.len()));
+        let displaced = hidden
+            .iter()
+            .find(|chip| state.open.as_deref() == Some(chip.key.as_str()))
+            .map(|chip| chip.key.clone());
+        let overflow_change = move |app: &mut State, event| {
+            let event = match event {
+                StatusBarEvent::Toggle(key) if key == OVERFLOW_KEY && displaced.is_some() => {
+                    StatusBarEvent::Toggle(displaced.clone().expect("displaced open chip"))
+                },
+                event => event,
+            };
+            on_change(app, event);
+        };
+        chips.push(chip_view(
+            &overflow,
+            &overflow_state,
+            overflow_change,
+            &|_| {
+                let facts: Vec<StatusView<State, Action>> = hidden
+                    .iter()
+                    .map(|chip| {
+                        Box::new(
+                            el::<_, State, Action>(
+                                "section",
+                                (
+                                    el::<_, State, Action>("h3", chip.label.clone()),
+                                    content(&chip.key),
+                                ),
+                            )
+                            .attr("data-status-detail", chip.key.clone())
+                            .attr("data-severity", chip.severity.token()),
+                        ) as StatusView<State, Action>
+                    })
+                    .collect();
+                Some(Box::new(
+                    el::<_, State, Action>("div", facts).attr("class", "status-overflow-content"),
+                ) as StatusView<State, Action>)
+            },
+        ));
+    }
 
     Box::new(
         el::<_, State, Action>(
@@ -194,6 +293,10 @@ where
             ),
         )
         .attr("class", "status-bar")
+        .attr(
+            "data-status-collapsed",
+            if collapsed { "true" } else { "false" },
+        )
         .attr("role", "region")
         .attr("aria-label", bar.label.to_string()),
     )
@@ -252,6 +355,7 @@ mod tests {
     struct State {
         bar: StatusBarState,
         retried: usize,
+        limit: Option<usize>,
     }
 
     fn chips() -> Vec<StatusChip> {
@@ -262,9 +366,19 @@ mod tests {
     }
 
     fn view(state: &State) -> StatusView<State, ()> {
-        let chips = chips();
+        let mut chips = chips();
+        if state.limit.is_some() {
+            chips.push(
+                StatusChip::new("save", "Save refused").with_severity(StatusSeverity::Refused),
+            );
+        }
+        let mut bar =
+            StatusBar::new("Catalog lookup failed.", &chips).with_severity(StatusSeverity::Warning);
+        if let Some(limit) = state.limit {
+            bar = bar.with_chip_limit(limit);
+        }
         status_bar(
-            StatusBar::new("Catalog lookup failed.", &chips).with_severity(StatusSeverity::Warning),
+            bar,
             &state.bar,
             |app: &mut State, event| app.bar.apply(event),
             |key| {
@@ -389,5 +503,70 @@ mod tests {
         state.apply(StatusBarEvent::Toggle("format".into()));
         assert_eq!(state.open.as_deref(), Some("format"));
         assert_eq!(state.return_focus, None);
+    }
+
+    #[test]
+    fn limited_slots_prioritize_refusals_then_warnings_with_stable_ties() {
+        let chips = vec![
+            StatusChip::new("quiet", "Quiet"),
+            StatusChip::new("warning-one", "Warning").with_severity(StatusSeverity::Warning),
+            StatusChip::new("warning-two", "Warning").with_severity(StatusSeverity::Warning),
+            StatusChip::new("refused", "Refused").with_severity(StatusSeverity::Refused),
+        ];
+        let (visible, hidden) = partition_chips(StatusBar::new("", &chips).with_chip_limit(2));
+        assert_eq!(
+            visible
+                .iter()
+                .map(|chip| chip.key.as_str())
+                .collect::<Vec<_>>(),
+            vec!["refused", "warning-one"]
+        );
+        assert_eq!(
+            hidden
+                .iter()
+                .map(|chip| chip.key.as_str())
+                .collect::<Vec<_>>(),
+            vec!["warning-two", "quiet"]
+        );
+        let (visible, hidden) = partition_chips(StatusBar::new("", &chips).with_chip_limit(0));
+        assert_eq!(visible[0].key, "refused");
+        assert_eq!(hidden.len(), 3);
+    }
+
+    #[test]
+    fn overflow_exposes_hidden_details_and_actions_then_returns_focus_on_escape() {
+        let (dom, mut runner) = runner();
+        runner.update(|state| state.limit = Some(1));
+        let root = runner.root();
+        assert!(find(&dom.borrow(), root, "data-status-key", "save").is_some());
+        assert!(find(&dom.borrow(), root, "data-status-key", "catalog").is_none());
+        assert!(find(&dom.borrow(), root, "id", "retry").is_none());
+        let overflow = find(&dom.borrow(), root, "data-status-key", OVERFLOW_KEY).unwrap();
+        runner.dispatch_click(overflow, PointerClick::at((1.0, 1.0)));
+        let retry = find(&dom.borrow(), root, "id", "retry").expect("hidden action exposed by +N");
+        runner.dispatch_click(retry, PointerClick::at((1.0, 1.0)));
+        assert_eq!(runner.state().retried, 1);
+        runner.set_focus(Some(retry));
+        runner.dispatch_key(KeyEvent::new(Key::Named(NamedKey::Escape)));
+        assert_eq!(runner.state().bar.open, None);
+        let overflow = find(&dom.borrow(), root, "data-status-key", OVERFLOW_KEY).unwrap();
+        assert_eq!(runner.focus(), Some(overflow));
+        assert!(find(&dom.borrow(), root, "id", "retry").is_none());
+    }
+
+    #[test]
+    fn resize_moves_an_open_chip_to_overflow_without_losing_its_details() {
+        let (dom, mut runner) = runner();
+        let root = runner.root();
+        let catalog = find(&dom.borrow(), root, "data-status-key", "catalog").unwrap();
+        runner.dispatch_click(catalog, PointerClick::at((1.0, 1.0)));
+        runner.update(|state| state.limit = Some(1));
+        assert!(find(&dom.borrow(), root, "id", "retry").is_some());
+        let overflow = find(&dom.borrow(), root, "data-status-key", OVERFLOW_KEY).unwrap();
+        runner.dispatch_click(overflow, PointerClick::at((1.0, 1.0)));
+        assert_eq!(runner.state().bar.open, None);
+        let overflow = find(&dom.borrow(), root, "data-status-key", OVERFLOW_KEY).unwrap();
+        assert_eq!(runner.focus(), Some(overflow));
+        assert!(find(&dom.borrow(), root, "id", "retry").is_none());
     }
 }

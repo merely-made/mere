@@ -4,7 +4,7 @@ version.workspace = true
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
-description = "Gazette is the Mere platform's directory port: it resolves who someone is into where they can be reached, keeps what you know about them, and reads what they publish. Built today: an embeddable contact Ledger projection plus WebFinger (RFC 7033) resolution. Live gaz-store hosting, NIP-05, atproto-did, the moot web-of-trust directory, feed polling, and the reading room remain. Not castellan, which guards and presents you."
+description = "Gazette is the Mere platform's directory port: it resolves who someone is into where they can be reached, hands what it learns to gaz to keep, reads what they publish, and announces the presentations castellan issues. Built today: an embeddable contact Ledger projection, WebFinger (RFC 7033) resolution and unverified Gaz address intake. Live gaz-store hosting, NIP-05, atproto-did, the moot web-of-trust directory, feed polling, and the reading room remain. Not castellan, which guards and presents you."
 readme = "README.md"
 keywords = ["webfinger", "contacts", "directory", "feeds", "p2p"]
 categories = ["network-programming"]
@@ -15,6 +15,8 @@ categories = ["network-programming"]
 test-support = []
 
 [dependencies]
+gaz.workspace = true
+iri-string = { version = "0.7", default-features = false }
 chirograph.workspace = true
 incipit.workspace = true
 sceno.workspace = true

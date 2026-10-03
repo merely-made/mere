@@ -712,6 +712,30 @@ receipts plan, and that is what makes it authority-grade; what it is not is
 evidence of product demand for the features its receipts prove. Whether that
 qualifies the consumer ruling's "its asks open gates" is not settled here; it
 is raised in Progress for Mark.
+*Settled 2026-09-30.* Mark, when opening the mer3ly.net canvas assessment:
+"my feeling is, the site counts as a consumer, but it should be consuming or
+creating stack capabilities, not special exceptions." mer3ly's asks open gates,
+but only for capabilities that another consumer could use unchanged. Recorded
+as Ruling 1 of mer3ly's `docs/2026-09-30_graphshell_site_canvas_plan.md`, which
+is that objective's assessment.
+*Added 2026-10-01.* Rulings in that assessment that land in mere:
+- A typed fold is promoted onto sceno's 0.0.4 line, with mer3ly as the forcing
+  consumer. Mere's native canvas, through pictograph's existing
+  `forme::FoldRecord` projection plus a product trigger and folds in
+  `MereHost` scenes, is the second (Ruling 11).
+- The two-reading matrix's contract types go into cartography, and its
+  derivation into a cartography sibling crate. Both mer3ly's copy and
+  `ports/gazette/src/ledger.rs` retire, as the catalog's
+  removal-on-promotion rule requires (Rulings 10 and 12).
+- *Amended 2026-10-01 (Rulings 19-20 there):* there is no sibling crate. The
+  matrix's types and a thin adapter go in cartography beside `src/adapters/`,
+  and the cell derivation goes in the scenes family, after the adapters' own
+  pattern. Cartography's "stays contract-only" comment (`Cargo.toml:18`)
+  predates `graph-layout`'s retirement at `739c87f4` and is stale. The fold
+  fact names its stand-in: either a member or a synthetic summary.
+- Separately, A4's text here runs together two histories that the assessment
+  separates: authority-revision history, the site's checkpoint slider, and
+  scene-edit history, `projection-proof`'s chained trace.
 
 ## Progress
 

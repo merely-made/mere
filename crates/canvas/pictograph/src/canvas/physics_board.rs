@@ -87,6 +87,9 @@ pub struct PhysicsBoard {
     /// The item currently held by the pointer. This is transient view state;
     /// score slots and `items` remain the arrangement authority.
     dragging: Option<NodeKey>,
+    /// The host's device, when the board's repulsion is staged on it.
+    #[cfg(feature = "gpu")]
+    physics_device: Option<crate::canvas::PhysicsDevice>,
 }
 
 impl Default for PhysicsBoard {
@@ -106,6 +109,8 @@ impl PhysicsBoard {
             choice: PhysicsChoice::default(),
             pull: DEFAULT_BOARD_PULL,
             dragging: None,
+            #[cfg(feature = "gpu")]
+            physics_device: None,
         }
     }
 
@@ -113,6 +118,20 @@ impl PhysicsBoard {
     /// no-op once offloaded). `wake` pokes the host's event loop.
     pub fn offload(&mut self, wake: armillary::Wake) {
         self.physics.offload(wake);
+    }
+
+    /// Stage the board's repulsion on the host's device, or (`None`) return
+    /// it to the CPU; see [`crate::canvas::Canvas::set_physics_device`].
+    #[cfg(feature = "gpu")]
+    pub fn set_physics_device(&mut self, device: Option<crate::canvas::PhysicsDevice>) {
+        crate::canvas::physics_device::install(&mut self.physics, device.as_ref());
+        self.physics_device = device;
+    }
+
+    /// The lane's counts (inline backend).
+    #[cfg(feature = "gpu")]
+    pub fn repulsion_stats(&self) -> Option<seiche::LaggedStats> {
+        self.physics.repulsion_stats()
     }
 
     /// The live choice.

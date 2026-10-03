@@ -50,11 +50,12 @@
 //!
 //! Graphshell composes all three (and re-exports them at their old paths);
 //! any other host embeds the subset it needs without inheriting graphshell.
-//! OTP items seal their imported configuration under a Persona through
-//! [`otp::OtpItemStore`]. [`otp::OtpReleaseGate`] returns an
+//! [`items::ItemStore`] keeps one persona's chatelaine items, each
+//! credential's secret in its own sealed payload record. OTP imports land
+//! there through [`otp::OtpItemStore`], and the Secret Service's items too. [`otp::OtpReleaseGate`] returns an
 //! [`otp::OtpCodeTile`] only after a participant-bound petition receives a
 //! resident approval. [`otp::OtpAdmittedSession`] binds remote petitions to one
-//! exact item and the Notochord transcript that admitted their carrier.
+//! exact credential and the Notochord transcript that admitted their carrier.
 //! [`resident::CastellanResident`] retains the process-wide sealed-record
 //! authority. Feature `secret-service` adds the Linux desktop adapter, and
 //! [`otp::SteamGuard`] is an explicitly nonstandard Valve compatibility shape.
@@ -66,6 +67,9 @@
 
 #[cfg(feature = "keeper")]
 pub mod authority;
+#[cfg(feature = "keeper")]
+mod sealed_storage;
+pub mod items;
 pub mod otp;
 #[cfg(feature = "keeper")]
 pub mod projection;

@@ -26,12 +26,24 @@ use crate::{
 };
 
 type PaintReadback = Rc<RefCell<Option<Result<Vec<u8>, String>>>>;
+type SealReadback = Rc<RefCell<Option<Result<crate::pairing::SealedProjection, String>>>>;
+
+enum PendingReadback {
+    Legacy(Readback),
+    Stamped(crate::StampedReadback),
+}
+struct PendingPairing {
+    run: String,
+    request: u64,
+    seal: SealReadback,
+}
 
 struct PendingCapture {
     name: String,
     path: Option<PathBuf>,
     armed: u64,
-    readback: Readback,
+    readback: PendingReadback,
+    pairing: Option<PendingPairing>,
     viewport: Option<Viewport>,
     paint: Option<PaintReadback>,
 }
@@ -48,6 +60,23 @@ pub struct Capture {
     pub(crate) viewport: Option<Viewport>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) paint_path: Option<PathBuf>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) pairing: Option<crate::CapturePairing>,
+}
+impl Capture {
+    pub fn fields(&self) -> &BTreeMap<String, String> {
+        &self.fields
+    }
+    pub fn pairing(&self) -> Option<&crate::CapturePairing> {
+        self.pairing.as_ref()
+    }
+}
+
+#[derive(Serialize)]
+pub(crate) struct Diagnostics {
+    /// Observation point in this lane, not the source's frame identity.
+    sampled_at_lane_frame: u64,
+    batch: crate::DiagnosticBatch,
 }
 
 /// The scenario lane, generic over one [`Product`].
@@ -76,6 +105,13 @@ pub struct Lane<P: Product> {
     records: Vec<crate::CaptureRecord>,
     capture_backend: Box<dyn CaptureBackend>,
     capture_paint: bool,
+    pub(crate) diagnostics: Option<Diagnostics>,
+    projection_limits: crate::CaptureProjectionLimits,
+    projection_bytes: usize,
+    paired_requests: usize,
+    pairing_run: Option<String>,
+    last_presentation: Option<cambium_rootstock::PresentedFrame>,
+    next_capture_request: u64,
 }
 
 impl<P: Product> Lane<P> {
@@ -114,6 +150,13 @@ impl<P: Product> Lane<P> {
             capture_backend: Box::new(NativeCapture),
             capture_paint: std::env::var_os("MESQUITE_CAPTURE_PAINT")
                 .is_some_and(|value| value == "1"),
+            diagnostics: None,
+            projection_limits: crate::CaptureProjectionLimits::default(),
+            projection_bytes: 0,
+            paired_requests: 0,
+            pairing_run: None,
+            last_presentation: None,
+            next_capture_request: 1,
         }
     }
 
@@ -155,6 +198,15 @@ impl<P: Product> Lane<P> {
         self
     }
 
+    /// Bound copied correlated metadata; a zero refuses requested pairing.
+    pub fn with_capture_projection_limits(
+        mut self,
+        limits: crate::CaptureProjectionLimits,
+    ) -> Self {
+        self.projection_limits = limits;
+        self
+    }
+
     pub fn product(&self) -> &P {
         &self.product
     }
@@ -163,6 +215,10 @@ impl<P: Product> Lane<P> {
     }
     pub fn captures(&self) -> &[crate::CaptureRecord] {
         &self.records
+    }
+    /// Immutable receipts; observing them does not consume another reader.
+    pub fn capture_receipts(&self) -> &[Capture] {
+        &self.captures
     }
     pub fn finished(&self) -> bool {
         self.finished
@@ -215,7 +271,7 @@ impl<P: Product> Lane<P> {
             .outcome
             .as_ref()
             .map_or(&[] as &[String], |o| o.log.as_slice());
-        serde_json::json!({
+        let mut receipt = serde_json::json!({
             "ok": ok, "kind": P::KIND, "frames": self.frames,
             "scenario": self.had_scenario, "scenario_log": log,
             "errors": self.errors, "final": final_fields,
@@ -223,7 +279,11 @@ impl<P: Product> Lane<P> {
             "pixel_checks": self.pixel_checks,
             "cost": self.costs.report(),
             "product_log": self.product.receipt_lines(),
-        })
+        });
+        if let Some(diagnostics) = &self.diagnostics {
+            receipt["diagnostics"] = serde_json::json!(diagnostics);
+        }
+        receipt
     }
 
     /// Call once per presented frame, from the host's `after_frame` hook.
@@ -310,7 +370,11 @@ impl<P: Product> Lane<P> {
         name: String,
         path: Option<PathBuf>,
     ) -> Result<(), String> {
-        if self.pending.is_some() || ctx.capture.is_some() {
+        if self.pending.is_some()
+            || ctx.capture.is_some()
+            || ctx.capture_stamped.is_some()
+            || ctx.presentation_observer.is_some()
+        {
             return Err("another capture is still pending".into());
         }
         if self.capture_paint && ctx.capture_paint.is_some() {
@@ -336,8 +400,92 @@ impl<P: Product> Lane<P> {
         {
             return Err(format!("capture path already used: {}", path.display()));
         }
-        let viewport = self.product.viewport(ctx);
-        let readback = self.capture_backend.arm(ctx.capture);
+        let observer = self.product.capture_observer();
+        let viewport = if observer.is_none() {
+            self.product.viewport(ctx)
+        } else {
+            None
+        };
+        let (readback, pairing) = if let Some(observer) = observer {
+            let limits = self.projection_limits;
+            if limits.max_projection_bytes == 0
+                || limits.max_total_bytes == 0
+                || self.paired_requests >= limits.max_captures
+            {
+                return Err("capture projection retention limit exceeded".into());
+            }
+            if observer.run.is_empty() || observer.run.len() > 128 {
+                return Err("capture pairing requires a bounded fresh product run identity".into());
+            }
+            if self
+                .pairing_run
+                .as_ref()
+                .is_some_and(|run| run != &observer.run)
+            {
+                return Err("capture pairing run changed inside a lane".into());
+            }
+            let request = self.next_capture_request;
+            let next_request = request
+                .checked_add(1)
+                .ok_or("capture request sequence exhausted")?;
+            let readback = match self.capture_backend.arm_stamped(
+                ctx.capture_stamped,
+                crate::CaptureRequest {
+                    run: observer.run.clone(),
+                    request,
+                },
+            ) {
+                Ok(readback) => readback,
+                Err(error) => {
+                    *ctx.capture_stamped = None;
+                    return Err(error);
+                },
+            };
+            let seal: SealReadback = Rc::new(RefCell::new(None));
+            let sink = seal.clone();
+            let run = observer.run;
+            let measured_run = run.clone();
+            *ctx.presentation_observer = Some(Box::new(move |ctx, presentation| {
+                *sink.borrow_mut() = Some((observer.observe)(ctx, presentation).and_then(
+                    |projection| {
+                        // Include run/request/frame identity as well as the frozen
+                        // projection in admission accounting.
+                        #[derive(Serialize)]
+                        struct Admission<'a> {
+                            run: &'a str,
+                            request: u64,
+                            presentation: crate::Presentation,
+                            projection: &'a crate::CaptureProjection,
+                        }
+                        let metadata = Admission {
+                            run: &measured_run,
+                            request,
+                            presentation: presentation.into(),
+                            projection: &projection,
+                        };
+                        let encoded_bytes =
+                            crate::pairing::encoded_size(&metadata, limits.max_projection_bytes)?;
+                        Ok(crate::pairing::SealedProjection {
+                            presentation,
+                            projection,
+                            encoded_bytes,
+                        })
+                    },
+                ));
+            }));
+            self.next_capture_request = next_request;
+            self.paired_requests += 1;
+            self.pairing_run = Some(run.clone());
+            (
+                PendingReadback::Stamped(readback),
+                Some(PendingPairing { run, request, seal }),
+            )
+        } else {
+            (
+                PendingReadback::Legacy(self.capture_backend.arm(ctx.capture)),
+                None,
+            )
+        };
         let paint = self.capture_paint.then(|| {
             let sink: PaintReadback = Rc::new(RefCell::new(None));
             let callback_sink = sink.clone();
@@ -352,6 +500,7 @@ impl<P: Product> Lane<P> {
             path,
             armed: self.frames,
             readback,
+            pairing,
             viewport,
             paint,
         });
@@ -362,7 +511,14 @@ impl<P: Product> Lane<P> {
         let Some(mut pending) = self.pending.take() else {
             return;
         };
-        let result = (pending.readback)();
+        let result = match &mut pending.readback {
+            PendingReadback::Legacy(readback) => {
+                readback().map(|result| result.map(|pixels| (pixels, None)))
+            },
+            PendingReadback::Stamped(readback) => readback().map(|result| {
+                result.map(|frame| (frame.pixels, Some((frame.presentation, frame.identity))))
+            }),
+        };
         let Some(result) = result else {
             let patience = if self.script_files.is_some() {
                 120
@@ -383,7 +539,7 @@ impl<P: Product> Lane<P> {
             }
             return;
         };
-        let frame = match result {
+        let (frame, presentation) = match result {
             Ok(frame) => frame,
             Err(why) => {
                 self.errors.push(format!("capture {}: {why}", pending.name));
@@ -400,6 +556,14 @@ impl<P: Product> Lane<P> {
             ));
             return;
         }
+        let sealed = match self.collect_pairing(&pending, presentation, &frame) {
+            Ok(sealed) => sealed,
+            Err(error) => {
+                self.errors
+                    .push(format!("capture {}: {error}", pending.name));
+                return;
+            },
+        };
         self.product.inspect(&pending.name, &frame);
         let paint_path = match write_paint_sidecar(pending.path.as_deref(), pending.paint.as_ref())
         {
@@ -429,10 +593,29 @@ impl<P: Product> Lane<P> {
                 P::LOG_PREFIX
             ));
         }
-        let fields = self
-            .product
-            .snapshot(ctx, self.captures.len() + 1, self.opacity)
-            .fields;
+        let (fields, viewport, pairing) = if let Some(sealed) = sealed {
+            self.projection_bytes += sealed.encoded_bytes;
+            self.last_presentation = Some(sealed.presentation);
+            let identity = pending.pairing.as_ref().expect("validated pairing");
+            (
+                sealed.projection.fields,
+                sealed.projection.viewport,
+                Some(crate::CapturePairing {
+                    run: identity.run.clone(),
+                    request: identity.request,
+                    presentation: sealed.presentation.into(),
+                    product_projection: sealed.projection.product,
+                }),
+            )
+        } else {
+            (
+                self.product
+                    .snapshot(ctx, self.captures.len() + 1, self.opacity)
+                    .fields,
+                pending.viewport,
+                None,
+            )
+        };
         self.records.push(crate::CaptureRecord {
             name: pending.name.clone(),
             width: frame.width,
@@ -448,9 +631,58 @@ impl<P: Product> Lane<P> {
             height: frame.height,
             digest: format!("{:016x}", frame.digest()),
             fields,
-            viewport: pending.viewport,
+            viewport,
             paint_path,
+            pairing,
         });
+    }
+
+    fn collect_pairing(
+        &self,
+        pending: &PendingCapture,
+        frame_id: Option<(cambium_rootstock::PresentedFrame, crate::CaptureRequest)>,
+        pixels: &cambium_rootstock::Frame,
+    ) -> Result<Option<crate::pairing::SealedProjection>, String> {
+        let Some(pairing) = &pending.pairing else {
+            return if frame_id.is_none() {
+                Ok(None)
+            } else {
+                Err("unexpected stamped readback".into())
+            };
+        };
+        let sealed = pairing
+            .seal
+            .borrow_mut()
+            .take()
+            .ok_or("presented product projection is missing")??;
+        let (frame_id, identity) = frame_id.ok_or("presented readback identity is missing")?;
+        if identity.run != pairing.run || identity.request != pairing.request {
+            return Err("readback run or request identity does not match capture".into());
+        }
+        if frame_id != sealed.presentation
+            || frame_id.sequence == 0
+            || frame_id.host == 0
+            || frame_id.width != pixels.width
+            || frame_id.height != pixels.height
+            || !frame_id.layout_scale.is_finite()
+            || frame_id.layout_scale <= 0.0
+        {
+            return Err("readback does not match sealed presentation".into());
+        }
+        if self
+            .last_presentation
+            .is_some_and(|last| last.host != frame_id.host || last.sequence >= frame_id.sequence)
+        {
+            return Err("stale or foreign presentation readback".into());
+        }
+        if self
+            .projection_bytes
+            .checked_add(sealed.encoded_bytes)
+            .is_none_or(|total| total > self.projection_limits.max_total_bytes)
+        {
+            return Err("capture projection total byte limit exceeded".into());
+        }
+        Ok(Some(sealed))
     }
 
     pub(crate) fn named_capture(&self, name: &str) -> Option<PathBuf> {
@@ -492,6 +724,18 @@ impl<P: Product> Lane<P> {
                 if c.blank { " BLANK" } else { "" }
             ));
         }
+        for capture in &self.captures {
+            if let Some(pairing) = &capture.pairing {
+                lines.push(format!(
+                    "capture-pairing {} {}",
+                    capture.name,
+                    serde_json::json!({
+                        "pairing": pairing, "fields": capture.fields, "viewport": capture.viewport,
+                        "digest": capture.digest, "width": capture.width, "height": capture.height
+                    })
+                ));
+            }
+        }
         let blanks = self.records.iter().filter(|c| c.blank).count();
         let distinct: BTreeSet<_> = self.records.iter().map(|c| c.digest).collect();
         lines.push(format!(
@@ -500,6 +744,11 @@ impl<P: Product> Lane<P> {
             distinct.len()
         ));
         lines.extend(self.product.receipt_lines());
+        if let Some(diagnostics) = &self.diagnostics {
+            // Value payloads and integer timing fields have a JSON encoding;
+            // the shared write path reports actual export/I/O failures.
+            lines.push(format!("diagnostics {}", serde_json::json!(diagnostics)));
+        }
         lines.extend(self.errors.iter().map(|e| format!("FAIL: {e}")));
         lines.join("\n") + "\n"
     }
@@ -533,6 +782,9 @@ impl<P: Product> Lane<P> {
         if let Err(error) = self.product.complete(ctx, &completion) {
             self.errors.push(format!("product completion: {error}"));
         }
+        let attachment = self.product.diagnostic_attachment(ctx);
+        self.collect_diagnostics(attachment);
+        let outcome = self.outcome.as_ref().expect("completion requested");
         let mut ok = outcome.ok && self.errors.is_empty() && self.exit_code.get() == 0;
         let receipt = if self.script_files.is_some() {
             Ok(self.text_receipt(ok).into_bytes())
@@ -566,6 +818,22 @@ impl<P: Product> Lane<P> {
             self.exit_code.set(1);
         }
         *ctx.close |= self.product.close_on_completion();
+    }
+
+    pub(crate) fn collect_diagnostics(
+        &mut self,
+        attachment: Result<Option<crate::DiagnosticBatch>, String>,
+    ) {
+        match attachment {
+            Ok(Some(batch)) => {
+                self.diagnostics = Some(Diagnostics {
+                    sampled_at_lane_frame: self.frames,
+                    batch,
+                });
+            },
+            Ok(None) => {},
+            Err(error) => self.errors.push(format!("diagnostic attachment: {error}")),
+        }
     }
 }
 

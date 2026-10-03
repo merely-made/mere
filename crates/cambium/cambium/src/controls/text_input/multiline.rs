@@ -14,14 +14,14 @@
 //! not a column.
 
 use super::TextInput;
-use unicode_segmentation::UnicodeSegmentation;
+use genet_text::{BoundaryKind, segments};
 
 impl TextInput {
     /// Grapheme offsets where each line begins: 0, then one past each `\n`.
     fn line_starts(&self) -> Vec<usize> {
         let mut starts = vec![0];
-        for (i, grapheme) in self.text.graphemes(true).enumerate() {
-            if grapheme == "\n" {
+        for (i, grapheme) in segments(&self.text, BoundaryKind::ExtendedGrapheme).enumerate() {
+            if grapheme.text == "\n" {
                 starts.push(i + 1);
             }
         }

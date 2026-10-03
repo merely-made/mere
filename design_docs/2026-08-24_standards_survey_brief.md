@@ -473,8 +473,11 @@ Three more cross-cutting items:
 ## 5. The other ports, briefly
 
 - **gazette.** **RFC 9553 JSContact** (with RFC 9554/9555 for vCard conversion)
-  supersedes the vCard/jCard question: a modern JSON data model rather than a
-  line-folded 1998 format. ADOPT over vCard 4.0's PULL. WebFinger (RFC 7033)
+  provides an exchange format for Gaz, which keeps its own model at rest
+  (Mark's 2026-09-23 ruling). Optional Gaz exchange landed 2026-09-30 with
+  distinct public cards, unverified peer imports and private restoration;
+  vCard conversion and Gazette application wiring remain open. ADOPT over
+  vCard 4.0's PULL. WebFinger (RFC 7033)
   stays ADOPT. **Verifiable Credentials 2.0** is the standard the house "insigne"
   concept most closely already is — graded public-key presentations made to be
   shown — and is worth reading before insigne's own shape is fixed. **DIDs,
@@ -1091,7 +1094,13 @@ answer and the choice is Mark's.
    `Passport`, `DriversLicense` and `CreditCard`. Which does castellan store,
    which does it drop on the floor, and which does it quarantine and tell the
    user about? This is a product decision that blocks the parser, not a
-   consequence of it.
+   consequence of it. **Ruled 2026-10-01** (Mark, rulings 10 to 15 in the
+   [dramatis tier architecture](dramatis_docs/technical_architecture/2026-09-30_dramatis_tier_architecture.md)
+   §7): the everyday credentials, notes, custom fields, addresses and names
+   are stored as chatelaine kinds; SSH keys go through castellan's SSH import;
+   item references become links. Identity documents, payment cards, passkeys,
+   files and types newer than v1.0 are quarantined: sealed, never exercised,
+   accepted one at a time. Nothing is dropped.
 6. **Whether a `dtcg` crate gets founded (§3.2).** There is no Rust
    implementation of a now-stable W3C-CG format that tabard needs anyway. That
    is either a small well-scoped piece of leverage or a distraction from tabard

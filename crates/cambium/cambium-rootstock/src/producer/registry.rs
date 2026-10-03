@@ -38,6 +38,7 @@ pub struct ProducerRegistry {
     pending_retire: Vec<u64>,
     device: Option<wgpu::Device>,
     next_stamp: u64,
+    pub(super) timestamp: Option<std::time::Duration>,
 }
 
 impl ProducerRegistry {
@@ -85,6 +86,11 @@ impl ProducerRegistry {
         entry.producer.retire();
         self.pending_retire.push(key);
         true
+    }
+
+    /// The registered producer's description of its slot, if it gives one.
+    pub fn semantics(&mut self, key: u64) -> Option<ProducerSemantics> {
+        self.entries.get_mut(&key)?.producer.semantics()
     }
 
     pub fn error(&self, key: u64) -> Option<ProducerError> {
@@ -218,6 +224,7 @@ impl ProducerRegistry {
             entry.logical_size = logical_size;
             let frame = ProducerFrameInfo {
                 logical_size,
+                timestamp: self.timestamp,
                 physical_size: size,
                 layout_scale: scale,
                 needs_frame,

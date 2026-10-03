@@ -78,6 +78,7 @@ use tokio::io::{AsyncRead, AsyncWrite, ReadBuf};
 use tokio::sync::{Mutex as TokioMutex, mpsc};
 
 use crate::blobs::{BlobHash, BlobPeerAuthorizer, BlobReadAuthorizer, BlobScope, BlobStore};
+use crate::peer_route::{PeerPath, peer_addr};
 use crate::{AcceptedSession, Alpn, IngressContext, PeerID, Transport, TransportError};
 
 /// A bidirectional p2panda-net QUIC stream presented as `AsyncRead + AsyncWrite`.
@@ -354,6 +355,8 @@ impl ProtocolHandler for AuthorizedBlobsProtocol {
 type AlpnQueues =
     Arc<StdMutex<HashMap<Alpn, Arc<TokioMutex<mpsc::UnboundedReceiver<QueuedStream>>>>>>;
 
+type AddressStore = MunimentAddressBook<MemoryBackend, JsonCodec>;
+
 /// A peer the address book associates with a topic.
 ///
 /// Identity and reachability are separate facts and this type keeps them so. A
@@ -523,6 +526,9 @@ impl<'a> P2pandaTransportBuilder<'a> {
 pub struct P2pandaTransport {
     endpoint: Endpoint,
     address_book: AddressBook,
+    /// The store under `address_book`, for the one write its actor cannot
+    /// make atomically: a record only if none exists.
+    address_store: AddressStore,
     peer_id: PeerID,
     queues: AlpnQueues,
     /// mDNS discovery handle, held so the service keeps running while the
@@ -631,9 +637,8 @@ impl P2pandaTransport {
         // same lifetime over muniment instead, which keeps sqlx out of the graph.
         // A caller wanting the address book to survive a restart hands a durable
         // muniment backend in place of `MemoryBackend`.
-        let store = AddressBookStoreHandle::new(MunimentAddressBook::<_, JsonCodec>::new(
-            MemoryBackend::new(),
-        ));
+        let address_store = AddressStore::new(MemoryBackend::new());
+        let store = AddressBookStoreHandle::new(address_store.clone());
         let address_book = AddressBook::builder()
             .store(store)
             .spawn()
@@ -748,6 +753,7 @@ impl P2pandaTransport {
         Ok(Self {
             endpoint,
             address_book,
+            address_store,
             peer_id,
             queues,
             _mdns: mdns_handle,
@@ -954,10 +960,29 @@ impl P2pandaTransport {
     ) -> Result<(), TransportError> {
         let node_id = VerifyingKey::from_bytes(&peer.to_bytes())
             .map_err(|e| TransportError::Backend(format!("peer key: {e}")))?;
+        self.ensure_record(node_id).await?;
         self.address_book
             .set_topics(node_id, topics.iter().map(|t| Topic::from(*t)))
             .await
             .map_err(|e| TransportError::Backend(format!("set_topics: {e}")))
+    }
+
+    /// Give a peer an address-book record before tagging it.
+    ///
+    /// A topic's members are the nodes holding both a record and the topic. A
+    /// peer tagged by id alone is left out of gossip's bootstrap set, and the
+    /// record mDNS writes later never re-joins it (pairing plan D1b). A bare
+    /// record makes it a member now, and gossip's dial waits for its address.
+    ///
+    /// Written straight to the store, in one transaction, because the actor
+    /// offers only an overwrite: an address discovered between a check and
+    /// that overwrite would be lost.
+    async fn ensure_record(&self, node_id: VerifyingKey) -> Result<(), TransportError> {
+        self.address_store
+            .insert_node_info_if_absent(NodeInfo::new(node_id))
+            .await
+            .map(|_| ())
+            .map_err(|e| TransportError::Backend(format!("address record: {e}")))
     }
 
     /// Tag `peer` with additional overlay topics, keeping its existing set.
@@ -973,6 +998,7 @@ impl P2pandaTransport {
     ) -> Result<(), TransportError> {
         let node_id = VerifyingKey::from_bytes(&peer.to_bytes())
             .map_err(|e| TransportError::Backend(format!("peer key: {e}")))?;
+        self.ensure_record(node_id).await?;
         for topic in topics {
             self.address_book
                 .add_topic(node_id, Topic::from(*topic))
@@ -1038,6 +1064,33 @@ impl P2pandaTransport {
         addrs.sort_by_key(|addr| format!("{addr:?}"));
         let addr = EndpointAddr::from_parts(id, addrs);
         Ok(Some(EndpointTicket::from(addr).to_string()))
+    }
+
+    /// Every address the endpoint holds for `peer`, each marked active when it
+    /// carries traffic now. Empty when the peer is only a name.
+    ///
+    /// The readable form of [`peer_ticket`](Self::peer_ticket)'s address set,
+    /// plus the one fact a ticket drops: which address is the live path.
+    pub async fn peer_paths(&self, peer: PeerID) -> Result<Vec<PeerPath>, TransportError> {
+        let endpoint = self
+            .endpoint
+            .endpoint()
+            .await
+            .map_err(|e| TransportError::Backend(format!("endpoint: {e}")))?;
+        let id = iroh::PublicKey::from_bytes(&peer.to_bytes())
+            .map_err(|e| TransportError::Backend(format!("peer key: {e}")))?;
+        let Some(info) = endpoint.remote_info(id).await else {
+            return Ok(Vec::new());
+        };
+        let mut paths: Vec<PeerPath> = info
+            .addrs()
+            .map(|addr| PeerPath {
+                addr: peer_addr(addr.addr()),
+                active: matches!(addr.usage(), iroh::endpoint::TransportAddrUsage::Active),
+            })
+            .collect();
+        paths.sort_by(|a, b| a.addr.cmp(&b.addr));
+        Ok(paths)
     }
 
     /// Open a raw iroh `Connection` to a peer for an arbitrary ALPN.

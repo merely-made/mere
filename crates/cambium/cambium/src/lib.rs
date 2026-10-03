@@ -30,6 +30,7 @@ mod action_list;
 mod arrangement;
 mod atlas;
 mod command_surface;
+mod command_menu_bar;
 mod component;
 mod context;
 mod controls;
@@ -59,6 +60,7 @@ pub mod nematic;
 mod optional_action;
 mod overlay;
 mod overlay_surface;
+mod frisket_presentation;
 mod pod;
 mod pointer;
 mod popover;
@@ -101,6 +103,7 @@ pub use command_surface::{
     CommandEvent, CommandItem, CommandState, CommandSurfaceKind, command_menu, command_palette,
     command_picker, command_surface,
 };
+pub use command_menu_bar::{CommandMenuBarState, COMMAND_MENU_BAR_CSS, command_menu_bar};
 pub use component::{COMPONENT_PROBE_ATTR, Component, ComponentView, component};
 pub use context::GenetCtx;
 pub use detail_panel::{DetailRow, DetailSection, detail_panel};
@@ -193,6 +196,7 @@ pub use frisket::{
     content_target, decode_pane_path, divider_target, encode_pane_path, frisket, frisket_with,
     frisket_with_current, frisket_with_marks, slot_kind, stack_target, tab_drop_index, tab_target,
 };
+pub use frisket_presentation::frisket_presented_with;
 pub use popover::{
     POPOVER_CSS, Popover, PopoverEvent, PopoverPlacement, PopoverState, PopoverView, popover,
 };
@@ -216,6 +220,7 @@ pub use value::{OnValue, OnValueState, ValueEvent, on_value};
 pub use wheel::{OnWheel, WheelEvent, on_wheel};
 pub use workspace::{
     WORKSPACE_CSS, WorkspaceModel, composited_slots, workspace_view, workspace_view_with_marks,
+    workspace_view_presented_with_marks,
 };
 
 // Compatibility aliases for consumers that still use the pre-extraction

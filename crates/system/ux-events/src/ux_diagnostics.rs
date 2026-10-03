@@ -251,6 +251,7 @@ impl DiagnosticsChannelSink for NoopChannelSink {
 /// assert mapping; can also back a "recent UX channel emissions"
 /// view in the diagnostics pane until the host's real registry is
 /// wired.
+/// A zero capacity disables retention.
 pub struct RecordingChannelSink {
     capacity: usize,
     emissions: Mutex<std::collections::VecDeque<ChannelEmission>>,
@@ -279,8 +280,11 @@ impl RecordingChannelSink {
 
 impl DiagnosticsChannelSink for RecordingChannelSink {
     fn record(&self, emission: &ChannelEmission) {
+        if self.capacity == 0 {
+            return;
+        }
         let mut buf = self.emissions.lock().unwrap();
-        if buf.len() == self.capacity && self.capacity > 0 {
+        if buf.len() == self.capacity {
             buf.pop_front();
         }
         buf.push_back(emission.clone());
@@ -353,6 +357,35 @@ mod tests {
             node_key: NodeKey::new(3),
         });
         assert_eq!(emission.channel_id, "ux.open_node.dispatched");
+    }
+
+    #[test]
+    fn zero_capacity_disables_channel_recording() {
+        let sink = RecordingChannelSink::with_capacity(0);
+        let emission = event_channel(&UxEvent::SurfaceOpened {
+            surface: SurfaceId::NodeFinder,
+        });
+        for _ in 0..256 {
+            sink.record(&emission);
+        }
+        assert!(sink.snapshot().is_empty());
+        assert_eq!(sink.len(), 0);
+        assert!(sink.is_empty());
+    }
+
+    #[test]
+    fn channel_recorder_retains_the_newest_emissions_at_capacity() {
+        let sink = RecordingChannelSink::with_capacity(1);
+        sink.record(&event_channel(&UxEvent::SurfaceOpened {
+            surface: SurfaceId::NodeFinder,
+        }));
+        sink.record(&event_channel(&UxEvent::SurfaceDismissed {
+            surface: SurfaceId::NodeFinder,
+            reason: DismissReason::Cancelled,
+        }));
+        let emissions = sink.snapshot();
+        assert_eq!(emissions.len(), 1);
+        assert_eq!(emissions[0].channel_id, "ux.node_finder.dismissed");
     }
 
     #[test]

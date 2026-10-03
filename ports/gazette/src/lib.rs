@@ -19,16 +19,16 @@
 //! Like `castellan`, the port splits in two. The **embeddable half** is what
 //! any host composes: contact cards, and the one recipient picker Knot, Moot,
 //! and Signalman all draw instead of three private lists. The **authority
-//! half** lives with the resident, which is the always-on party and therefore
-//! the natural poller: resolution, feed fetching, and trust state. Reading a
+//! half** is a service djinn composes, since djinn is the always-on party:
+//! resolution, feed fetching, contact intake, and announcing. Reading a
 //! friend's feed reveals your interest to their host, so which persona's
 //! network face does the fetching is a first-class setting, not an
 //! afterthought.
 //!
-//! **Built today:** the embeddable contact Ledger projection and WebFinger
-//! resolution. `ledger` reads contacts × selected facets, keeps contributor
-//! provenance and repeated instance addresses, composes coordinated selection,
-//! emits a semantic table, and cites its two authorities independently.
+//! **Built today:** contact Ledger projection, WebFinger resolution and supplied
+//! WebFinger address intake into Gaz. The Ledger reads contacts × selected facets,
+//! keeps contributor provenance and repeated instance addresses, composes
+//! coordinated selection, emits a semantic table, and cites both authorities.
 //!
 //! WebFinger resolution
 //! ([RFC 7033](https://www.rfc-editor.org/rfc/rfc7033)) — an `acct:user@host`
@@ -40,16 +40,23 @@
 //! lookups, and the moot web-of-trust directory (member lists as vouched
 //! handle-to-key bindings).
 //!
+//! [`intake::WebFingerIntake`] retains a supplied resolver result and projects
+//! unverified address claims for Gaz. The queried account selects the contact;
+//! aliases supply names and never anchors or keys. The adapter deliberately
+//! refuses a differing normalized subject, even though RFC 7033 permits account
+//! migration in that field. It does not fetch or mutate a contact book.
+//!
 //! **Unbuilt:** hosting the Ledger and recipient picker over live `gaz`, feed polling
 //! (whose engine is `mere-crawl`), and the reading room over fleeced
-//! articles. The blocking `reqwest` below needs an async port before a
-//! resident polls with it.
+//! articles. The blocking `reqwest` fetch below gives way to
+//! `finger-protocol`'s sans-io WebFinger, with the caller supplying HTTP.
 //!
 //! The boundaries are the point:
 //!
 //! - **Not `castellan`.** Castellan guards and presents *you*; gazette finds
-//!   and keeps *the other players*. Two outward faces of the dramatis tier,
-//!   pointing opposite ways.
+//!   *the other players* and hands what it learns to `gaz`, which keeps them.
+//!   The dramatis tier's two ports, pointing opposite ways; gazette faces
+//!   outward only to announce what castellan has issued.
 //! - **Not `gaz`.** Gaz is the contact store — your records about other
 //!   people, petnames, per-endpoint trust, kith and kin. This port composes
 //!   it; it does not replace it.
@@ -61,6 +68,7 @@
 
 use std::time::Duration;
 
+pub mod intake;
 pub mod ledger;
 
 use reqwest::header::ACCEPT;

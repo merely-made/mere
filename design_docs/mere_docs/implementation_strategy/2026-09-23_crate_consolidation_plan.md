@@ -47,11 +47,11 @@ the direction that makes no dependency cycle.
 | `mere-athanor` | the furnace passes: forgetting, image cleanup, consolidation, retirement | `pandect::athanor` | landed `1bda73d5` |
 | `mere-alembic` | the three memory levels, behind its `recall` feature | `pandect::memory_levels` | landed `1bda73d5` |
 | `mien` | standing (event grammar, ledger, persona chains and vault, gate, wire, store) and the composite reputation lens | `gemot::moot::standing`, `moothold::concord` | landed `a1551086` |
-| `chatelaine` | the secret-item taxonomy, shaped against CXF's credential kinds | castellan's secret-free OTP item types, once the taxonomy exists | ruled: design first |
+| `chatelaine` | the secret-item taxonomy, shaped against CXF's credential kinds | castellan's secret-free OTP item types (`OtpItemId`, the `OtpItem` read model), once the taxonomy exists | ruled: design first; shape ruled 2026-10-01 (plain taxonomy, no secret bytes, storage or crypto; CXF import policy for all 17 types), unbuilt |
 | `insigne` | presentable proofs: typed keys, delegation certificates and revocations, derived-key attestations | gaz's `TypedKey`; personae's delegation data types | `TypedKey` landed `0f3f854f`; the delegation types landed `5364dfa0` (insigne proofs plan, phase A); phases B to D open (dramatis session) |
 | `tabard` | theme and stylesheet authoring over tinct, illume and CSS | registry's theme module, the smolweb palettes, Pelt's theme persistence | ruled 2026-09-24; see C2a |
-| `dramatis` | the tier facade | none misplaced | nothing to move |
-| `mere-apparatus` | reserved Apparatus home; current code is an empty legacy system-inspector skeleton | Turnstone's July 18 ruling now assigns object analysis to Apparatus and operational readouts to Steward | naming/consumer boundary needs reconciliation; see the [September diagnostics design](2026-06-08_system_diagnostics_and_accessibility_plan.md); no crate rename or capability move has landed |
+| `dramatis` | the tier facade | none misplaced | nothing to move; ruled 2026-10-01 a real facade re-exporting personae, insigne and gaz for repos outside mere, unbuilt |
+| `mere-apparatus` | shared diagnostics: bounded observations beneath product-owned views | renderer-independent store and optional Mesquite attachment; projection skeleton retained; product state and redaction stay local | Core published at Mere `ca2351b3`; focused gates pass. Redshank's real save-worker pilot at Woodshed `a57085b` passes 63 desktop tests and bounded native receipts. Turnstone `d6b62ad` passes the sealed-graph 612-test workspace gate with nine ignores, focused participant/UI checks and final native migration/restart with bounded loss. See the [diagnostics design](2026-06-08_system_diagnostics_and_accessibility_plan.md). Exact presented frame, broader worker qualification and human AT remain open |
 
 *Done when:* every row is landed, ruled out by Mark, or found to have
 nothing misplaced, and each landed move carries its tests with it.
@@ -367,3 +367,25 @@ crate inventory at the Code root.
   conclusion or a `CheckFault`, and `verify() -> bool` is gone. insigne's
   API is settled, which meets the C5 baseline's insigne condition. Of the
   dramatis tier, chatelaine's CXF-shaped taxonomy remains.
+- 2026-10-01. Mark ruled the shapes of the two remaining dramatis
+  reservations, recorded with the evidence in the
+  [dramatis tier architecture](../../dramatis_docs/technical_architecture/2026-09-30_dramatis_tier_architecture.md)
+  §7. chatelaine is a plain taxonomy like insigne's core, and castellan's OTP
+  read model moves in; its CXF import policy is ruled for all 17 types.
+  dramatis is a real facade for repos outside mere. Both are unbuilt. C5's
+  baseline still waits on chatelaine's taxonomy landing (C5, above); with
+  its shape ruled, that condition is now buildable rather than waiting on
+  design. The facade is not a C5 condition.
+- 2026-10-01, later. The
+  [chatelaine and CXF plan](../../dramatis_docs/implementation_strategy/2026-10-01_chatelaine_cxf_plan.md)
+  is drafted. Mark ruled that chatelaine subsumes castellan's Secret Service
+  store as part of founding (its ruling 17), so C5's chatelaine condition is
+  met at that plan's P3: the taxonomy, OTP on it, and the Secret Service on
+  it, with a Linux `secret-tool` receipt. CXF import (P4 onward) is not a C5
+  condition.
+- 2026-10-02. **C5's chatelaine condition is met.** The chatelaine plan's P1
+  to P3 landed on `main` (`da3c50bc`, `3e4992ec`, `ff68e86c`): the taxonomy,
+  OTP on it, and the Secret Service on it, with the ThinkPad's `secret-tool`
+  receipt passing natively. chatelaine has its real contents for its one
+  publish at the baseline; castellan now depends on it, so chatelaine
+  publishes first.

@@ -26,6 +26,8 @@ pub mod canary;
 #[cfg(feature = "web")]
 pub mod canvas_controls;
 #[cfg(feature = "web")]
+pub mod canvas_physics;
+#[cfg(feature = "web")]
 pub mod capture;
 #[cfg(all(feature = "personal-sync", not(target_arch = "wasm32")))]
 pub mod carriage;
@@ -45,6 +47,8 @@ pub mod identity_projection;
 pub mod lifecycle;
 pub mod live_endpoint;
 #[cfg(feature = "web")]
+pub mod local_edit;
+#[cfg(feature = "web")]
 pub mod mere_host;
 #[cfg(feature = "web")]
 mod mere_host_fixture;
@@ -60,6 +64,8 @@ pub mod personal_sync;
 pub mod policy_projection;
 #[cfg(feature = "web")]
 pub mod product;
+#[cfg(feature = "web")]
+pub mod remote_board;
 #[cfg(all(feature = "native", not(target_arch = "wasm32")))]
 pub mod profile;
 #[cfg(feature = "web")]

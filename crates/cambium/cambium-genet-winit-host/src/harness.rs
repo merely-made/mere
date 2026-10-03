@@ -658,7 +658,13 @@ where
         };
         let dom = runner.dom();
         let dom_ref = dom.borrow();
-        cambium_winit_a11y::project_tree(&dom_ref, layout, &mut core.s.leaves, core.s.last_focus)
+        cambium_winit_a11y::project_tree(
+            &dom_ref,
+            layout,
+            &mut core.s.leaves,
+            &mut core.s.producers,
+            core.s.last_focus,
+        )
     }
 
     /// Project this frame's layout into genet's neutral accessibility
@@ -755,6 +761,12 @@ where
     /// through the real input path.
     pub fn drain_pointer(&mut self) {
         self.host.drain_pointer();
+    }
+
+    /// Exercise the production state-sealing seam with a synthetic presentation.
+    /// This supplies no pixels and is not evidence of GPU presentation.
+    pub fn observe_presentation(&mut self, frame: cambium_rootstock::PresentedFrame) {
+        self.host.observe_presentation(frame);
     }
 
     /// Run the application's `after_frame` hook, as a presented frame would.

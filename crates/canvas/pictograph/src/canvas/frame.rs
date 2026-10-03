@@ -95,7 +95,8 @@ impl Canvas {
     /// scene plus whether the host should request another frame (sim still
     /// settling, pan still gliding, or a node being dragged). Does not present.
     pub fn frame(&mut self, w: u32, h: u32) -> (Scene, bool) {
-        self.frame_observed(w, h, &mut super::frame_profile::Unprofiled)
+        self.reset_frame_time();
+        self.frame_observed(w, h, None, &mut super::frame_profile::Unprofiled)
     }
 
     /// Advance and compose a frame while measuring its CPU stages. The host
@@ -107,15 +108,17 @@ impl Canvas {
         h: u32,
         now_ms: impl FnMut() -> f64,
     ) -> (Scene, bool, super::CanvasFrameProfile) {
+        self.reset_frame_time();
         let mut observer = super::frame_profile::Profiled::new(now_ms);
-        let (scene, moving) = self.frame_observed(w, h, &mut observer);
+        let (scene, moving) = self.frame_observed(w, h, None, &mut observer);
         (scene, moving, observer.profile)
     }
 
-    fn frame_observed(
+    pub(super) fn frame_observed(
         &mut self,
         w: u32,
         h: u32,
+        elapsed: Option<(std::time::Duration, seiche::ElapsedStepConfig)>,
         observer: &mut impl super::frame_profile::Observer,
     ) -> (Scene, bool) {
         let (w, h) = (w.max(1), h.max(1));
@@ -126,7 +129,15 @@ impl Canvas {
         // Advance physics (the in-thread tick, or the freshest actor snapshot)
         // into the read model, and learn whether the layout is still settling.
         // Everything below reprojects from the view — never the rapier world.
-        let settling = self.physics.advance_frame(&mut self.view);
+        let settling = if let Some((elapsed, config)) = elapsed {
+            let report = self
+                .physics
+                .advance_elapsed(&mut self.view, elapsed, config);
+            self.elapsed_step = Some(report);
+            report.settling
+        } else {
+            self.physics.advance_frame(&mut self.view)
+        };
         observer.mark(0);
         // Advance the ambient backdrop sim (it paces itself internally - GoL accumulates toward its
         // generation interval, a continuous sim integrates). A fixed ~frame dt is fine for a
@@ -501,7 +512,10 @@ impl Canvas {
         }
         let scene = composite_paint_layers(viewport, &layers).scene;
 
-        let after_cull = layers.iter().map(|layer| layer.commands.len()).sum::<usize>();
+        let after_cull = layers
+            .iter()
+            .map(|layer| layer.commands.len())
+            .sum::<usize>();
         let culled = underlay.commands().len() - underlay_commands.len()
             + if self.render_gnodes_as_dom {
                 0
@@ -561,9 +575,13 @@ impl Canvas {
                         crate::derive(address.as_bytes())
                             .expect("pictograph must encode every canonical node address")
                     });
-                let commands =
-                    crate::canvas::derived_face::commands(file, self.derived_face_palette, side, bounds)
-                        .expect("pictograph output must decode into flat paint-list paths");
+                let commands = crate::canvas::derived_face::commands(
+                    file,
+                    self.derived_face_palette,
+                    side,
+                    bounds,
+                )
+                .expect("pictograph output must decode into flat paint-list paths");
                 face_cmds.extend(commands);
                 continue;
             }

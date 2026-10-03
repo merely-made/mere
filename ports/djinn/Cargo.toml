@@ -129,6 +129,11 @@ path = "src/bin/djinn_site.rs"
 required-features = ["personal-sync"]
 
 [[bin]]
+name = "djinn-devices"
+path = "src/bin/djinn_devices.rs"
+required-features = ["personal-sync"]
+
+[[bin]]
 name = "distillery_chronicle_receipt_host"
 path = "src/bin/distillery_chronicle_receipt_host.rs"
 required-features = ["distillery-chronicle-receipt-host"]

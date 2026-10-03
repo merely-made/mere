@@ -43,6 +43,8 @@ pub fn key_event_from_winit(key: &WinitKey, mods: Modifiers) -> Option<KeyEvent>
             WinitNamedKey::Delete => NamedKey::Delete,
             WinitNamedKey::Home => NamedKey::Home,
             WinitNamedKey::End => NamedKey::End,
+            WinitNamedKey::F10 => NamedKey::F10,
+            WinitNamedKey::Alt => NamedKey::Alt,
             WinitNamedKey::PageUp => NamedKey::PageUp,
             WinitNamedKey::PageDown => NamedKey::PageDown,
             _ => NamedKey::Other,
@@ -121,6 +123,13 @@ mod tests {
             key_event_from_winit(&WinitKey::Named(WinitNamedKey::Enter), Modifiers::default())
                 .expect("Enter should map");
         assert!(matches!(enter.key, Key::Named(NamedKey::Enter)));
+
+        let f10 = key_event_from_winit(&WinitKey::Named(WinitNamedKey::F10), Modifiers::default())
+            .expect("F10 should map for menubar entry");
+        assert!(matches!(f10.key, Key::Named(NamedKey::F10)));
+        let alt = key_event_from_winit(&WinitKey::Named(WinitNamedKey::Alt), Modifiers::default())
+            .expect("Alt should map for menubar entry");
+        assert!(matches!(alt.key, Key::Named(NamedKey::Alt)));
 
         assert!(
             key_event_from_winit(

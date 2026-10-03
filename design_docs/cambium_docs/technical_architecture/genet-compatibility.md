@@ -55,9 +55,37 @@ rendering engine.
 
 ## Current Mere-owned compatibility
 
+### 2026-09-29 generated accessible-name adoption
+
+**Status:** implemented and verified against the published source. All 207 tests
+in the Rootstock, native host, native accessibility and Mesquite gate pass; the
+standalone Graphshell Wasm check passes. Locked offline metadata audits verify
+26 root and 19 web Genet package identities, with no local source substitution.
+
+The current-family root and standalone Graphshell web manifests now pin Genet
+`c5470fcbc12805f0369c70f34a18178158fbe2d5`. Rootstock's retained style owner supplies
+generated before/after text to both the document accessibility projection and
+the native AccessKit adapter. Mesquite therefore sees the same generated names
+as native accessibility, including attribute-driven changes after relayout.
+Genet owns generated text and named decimal counter evaluation; Mere consumes
+the resulting text rather than reimplementing CSS or accessible-name rules.
+
+The root lock is the exact current-family revision substitution over the incoming
+working lock, preserving unrelated Gaz changes. The standalone lock additionally
+adopts already-landed text-boundary and diagnostics dependencies: it adds
+`genet-text`, swaps Cambium's direct unicode-segmentation edge, and adds workspace
+`mere-apparatus` plus Mesquite's dependency on it. There is no other
+package/version/source drift. Package/source classification
+is recorded under `Code/testing/cambium/generated-names`. Older Knot-owned Genet
+identities and the separately qualified legacy `genet_web_smoke` manifest remain
+unchanged. A native-adapter/Mesquite fixture checks generated names and attribute
+updates; this is automated coverage, not human screen-reader acceptance. The
+[testing receipt](../testing/local-genet-development.md#2026-09-29-generated-name-adoption)
+records exact commands and the archived ignored standalone lock.
+
 ### 2026-09-29 semantic selector adoption
 
-Mere now pins Genet `19c206873ab08ae227217892d9e74d0df18b349a` coherently in
+That checkpoint pinned Genet `19c206873ab08ae227217892d9e74d0df18b349a` coherently in
 the root and standalone web manifests. Relative to the verified scroll-repair
 revision `7a60ad79`, only Taproot code and documentation change: role/name
 selectors can consume Genet's existing computed accessibility projection.
