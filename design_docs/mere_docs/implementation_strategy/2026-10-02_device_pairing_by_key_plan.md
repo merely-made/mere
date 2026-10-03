@@ -2,9 +2,10 @@
 
 **Date**: 2026-10-02
 **Status (2026-10-02)**: in progress. Assessed and ruled by Mark on 2026-10-01
-and 2026-10-02 (rulings 1 to 25 below). D1 landed (`4963b489`); D1b's mere fix (M1)
-landed (`177b927c`), its fork fix (F1) is merged onto upstream p2panda in
-scratch awaiting the repin, and `connected` is being fixed; then D2.
+and 2026-10-02 (rulings 1 to 34 below). D1 landed (`4963b489`); D1b's mere fix (M1)
+landed (`177b927c`), its fork fix (F1) is being released as
+`mere-p2panda-net-0.7.5` with knot and mere repinned, and `connected` is
+being fixed; then D2.
 **Scope**: Mark's machines find, reach and trust each other by device
 identity, not by address: the stack's own peers already do on one network;
 SSH, the path Mark uses daily, does not. Pairing a device becomes one
@@ -241,7 +242,68 @@ signature, content address or wire validation to `decode_cbor_strict`.
 **Ruling 25.** *mere's per-interface mDNS fork (H10's fix for multi-homed
 Windows hosts) has been an unused patch; what now?* Options: bring the fork
 to 0.6.0 with the repin; check upstream first; leave it. Mark: **"Bring the
-fork to 0.6.0, with the repin (Recommended)"**.
+fork to 0.6.0, with the repin (Recommended)"**. *Superseded by ruling 26 on
+new evidence.*
+
+**Ruling 26.** *The per-interface mDNS port (upstream PR #7, now on 0.6.0)
+works as intended but fails upstream's own `mdns_subscribe` test on this
+laptop every time, the failure it fixes is absent here today, and first
+contact was about 0.6 s slower; ruling 25 adopted it with the repin. Now?*
+Options: keep it out and diagnose first; adopt it as ruled; stock, and drop
+the fork. Mark: **"Keep it out; diagnose first (Recommended)"**.
+
+**Ruling 27.** *The dead `=0.4.0` patch row reads like an active fix;
+meanwhile?* Options: drop it with the repin; leave it. Mark: **"Drop it with
+the repin (Recommended)"**.
+
+**Ruling 28.** *Tag `mere-p2panda-net-0.7.5`, push it to `mark-ik/p2panda`,
+then repin knot first and mere second, with the stickleback rename and the
+strict CBOR sites?* Options: go (tag, push, repin, with mere's and knot's
+pushes coming back to Mark); tag locally only; wait for the `connected`
+fix. Mark: **"Go: tag, push, repin (Recommended)"**.
+
+**Ruling 29.** *Four strict sites decode plaintext that encryption already
+authenticated; strict anyway?* Options: strict anyway; lenient for those
+four. Mark: **"Strict anyway (Recommended)"**.
+
+**Ruling 30.** *With gossip neighbours counted as connected, the old
+transport test still fails at its assertion that iroh shows an active direct
+path, because iroh drops that path state during simultaneous dials (its
+abandon check looks only at the closing connection's paths, unchanged in
+iroh 1.3.0). What should the test assert?* Options: dial one way in that
+test; patch iroh's abandon check; relax the assertion. Mark: **"Dial one way
+in that test (Recommended)"**.
+
+**Ruling 31.** *Under the OR rule a closed peer reads connected for about
+60 s, because iroh keeps its path active after gossip drops the neighbour in
+about 0.1 s. Should `connected` fall when the neighbour goes down?* Options:
+gossip decides while the overlay is up; keep the OR rule. Mark: **"Gossip
+decides while the overlay is up (Recommended)"**. Follows: for a peer on the
+overlay, the gossip neighbour state is authoritative; iroh's path counts
+only for peers not on it. Amends ruling 22.
+
+**Ruling 32.** *Which meaning of "on the overlay" for ruling 31?* Options:
+subscribed (this node has subscribed to the topic, read exactly from the
+address book's self record); joined (from gossip's `Joined` to `Left`, not
+readable through the fork's API); per peer (gossip-authoritative once the
+peer has been a neighbour since this node joined). Mark: **"Subscribed
+(Recommended)"**. Follows: before the first neighbour comes up, every peer
+reads not connected; a device reachable only over a later SSH channel would
+too.
+
+**Ruling 33.** *GitHub's fork `main` had moved to `94947fd1` (Mark's
+2026-09-28 sync merge of upstream, adding no files beyond the release's own
+tree), so the release would not fast-forward. How should it sit?* Options:
+rebuild the release on top; merge on top of the release; push only the tag.
+Mark: **"Rebuild the release on top (Recommended)"**.
+
+**Ruling 34.** *Signalman's own workspace resolves `p2panda-core` from
+crates.io 0.7.1, where the audited CBOR split cannot compile. Which?*
+Options: patch it onto the fork tag; leave it on crates.io 0.7.1. Mark:
+**"Patch it onto the fork tag (Recommended)"**. Follows: a `[patch.crates-io]`
+row in `ports/signalman`; its graph drops the dalek-2 family (287 to 278
+packages, measured). A desktop workspace outside mere that patches retinue
+will need the same row.
 
 Also given in the same conversation (2026-10-01, Mark: "You can edit known
 hosts"): `known_hosts` entries may be updated, which was done for the
@@ -485,6 +547,38 @@ used" on every build; in chatelaine P1's verification I recorded that
 warning as harmless and lock-wide, which was wrong. Ruling 25 brings the
 fork to 0.6.0 with the repin. The `boa_engine` and `boa_gc` patches are
 reported unused on the same line and were not examined here.
+
+**2026-10-02: the fork lane's second round.** With a scratch-only rename of
+stickleback's `StreamItem`, mere's whole workspace checks against the merged
+fork, mere-transport, stickleback and djinn pass, and knot compiles through
+djinn. The CBOR audit covers 73 calls: 39 strict (36 in mere, 3 in knot:
+everything decoding a peer's data, a signature or a round-tripped canonical
+form; signalman's shared control-frame decoder needs a strict variant for
+its frames while its local snapshot stays lenient) and 33 lenient (local
+data, tests, examples); the table is `C:\t\cbor-decode-audit-177b927c.tsv`.
+Upstream's PR #7 is still unmerged (last activity 2026-07-28); ported onto
+0.6.0 unchanged, the patch becomes used (`cargo tree` resolves the fork's
+path, no `[[patch.unused]]`), and djinn then binds mDNS on the WSL adapter
+too, but the port and the original PR both fail upstream's `mdns_subscribe`
+test on this laptop (stock passes), Wi-Fi already holds the multicast route
+here (metric 35 against WSL's 5000), and first contact was about 0.6 s
+slower; hence ruling 26. The installed legacy resident already binds 5353
+per interface, so some earlier build carried the fix.
+
+**2026-10-02: iroh's abandon check, unchanged in 1.3.0.** The `connected`
+lane traced the path gaps during simultaneous dials to iroh's
+`NoqPathEvent::Abandoned` handler, which marks an address abandoned when the
+closing connection's own paths no longer reach it, although its comment says
+"once no connections have any path". The handler is byte-identical in iroh
+1.2.0 (`remote_state.rs:595-613`) and 1.3.0 (`:600-618`), so the repin does
+not remove it; ruling 30 keeps the old test one-sided and ruling 31 makes
+gossip authoritative for peers on the overlay.
+
+**Sibling pins at the release.** turnstone (root `Cargo.toml:342-349`),
+cleromancy (`:97-102`) and isometry (`:112`, `:246-264`) pin the fork's
+0.7.4 tag beside older mere revisions, which require `=0.7.4`; each moves to
+0.7.5 at its own next mere repin, as the insigne proofs plan's phase C
+handoff did.
 
 ## 7. Progress
 

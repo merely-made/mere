@@ -157,6 +157,19 @@ fn layout_stats_carry_the_laws_signatures() {
     assert_eq!(folded.overlaps, 6);
     assert_eq!(folded.stretch, 0.0);
     assert_eq!(folded.spread, 0.0);
+    // The linear form agrees on spread and overlaps, both ways folded.
+    let linear = canvas.layout_stats_without_stretch();
+    assert_eq!((linear.overlaps, linear.spread), (6, 0.0));
+    for (i, &key) in keys.iter().enumerate() {
+        // Two touching pairs: 0-1 at 20 apart, 2-3 at 35, the pairs far apart.
+        let x = [0.0, 20.0, 900.0, 935.0][i];
+        canvas.view.set_position(key, Point2D::new(x, 0.0));
+    }
+    let (full, linear) = (canvas.layout_stats(), canvas.layout_stats_without_stretch());
+    assert_eq!(full.overlaps, 2);
+    assert_eq!(linear.overlaps, full.overlaps);
+    assert!((linear.spread - full.spread).abs() < 1e-3);
+    assert_eq!(linear.stretch, 0.0);
 }
 
 /// A proper colouring never puts a kind beside itself; islands each get one.
