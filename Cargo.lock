@@ -2610,6 +2610,7 @@ dependencies = [
  "burn-wgpu",
  "bytemuck",
  "cubecl",
+ "euclid",
  "getrandom 0.4.3",
  "nisus",
  "pollster",
@@ -8101,7 +8102,7 @@ dependencies = [
 [[package]]
 name = "knot-site"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?rev=4d880910fd8b6ffa6e4227b65ea65278f3e8011b#4d880910fd8b6ffa6e4227b65ea65278f3e8011b"
+source = "git+https://github.com/merely-made/knot-editor.git?rev=ea3e99ef4a88c347b11b1e05fe7281334c0eea50#ea3e99ef4a88c347b11b1e05fe7281334c0eea50"
 dependencies = [
  "blake3",
  "gemini-protocol",
@@ -13677,8 +13678,8 @@ dependencies = [
 
 [[package]]
 name = "retinue"
-version = "0.1.1"
-source = "git+https://github.com/merely-made/retinue.git?rev=85e716c7f06dac0a5253effe5ef06d05b266f02f#85e716c7f06dac0a5253effe5ef06d05b266f02f"
+version = "0.2.0"
+source = "git+https://github.com/merely-made/retinue.git?rev=fa4f925059cc698058cb21fecc1c825d095741a9#fa4f925059cc698058cb21fecc1c825d095741a9"
 dependencies = [
  "aes 0.9.3",
  "bzip2 0.6.1",
@@ -14419,13 +14420,16 @@ dependencies = [
  "armillary",
  "burn",
  "burn-wgpu",
+ "conatus",
  "euclid",
  "getrandom 0.4.3",
  "numen",
  "petgraph 0.8.3",
+ "pollster",
  "rapier2d",
  "tracing",
  "uuid",
+ "wgpu",
 ]
 
 [[package]]

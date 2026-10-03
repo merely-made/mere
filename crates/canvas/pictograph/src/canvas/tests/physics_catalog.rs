@@ -157,6 +157,19 @@ fn layout_stats_carry_the_laws_signatures() {
     assert_eq!(folded.overlaps, 6);
     assert_eq!(folded.stretch, 0.0);
     assert_eq!(folded.spread, 0.0);
+    // The linear form agrees on spread and overlaps, both ways folded.
+    let linear = canvas.layout_stats_without_stretch();
+    assert_eq!((linear.overlaps, linear.spread), (6, 0.0));
+    for (i, &key) in keys.iter().enumerate() {
+        // Two touching pairs: 0-1 at 20 apart, 2-3 at 35, the pairs far apart.
+        let x = [0.0, 20.0, 900.0, 935.0][i];
+        canvas.view.set_position(key, Point2D::new(x, 0.0));
+    }
+    let (full, linear) = (canvas.layout_stats(), canvas.layout_stats_without_stretch());
+    assert_eq!(full.overlaps, 2);
+    assert_eq!(linear.overlaps, full.overlaps);
+    assert!((linear.spread - full.spread).abs() < 1e-3);
+    assert_eq!(linear.stretch, 0.0);
 }
 
 /// A proper colouring never puts a kind beside itself; islands each get one.
@@ -453,6 +466,20 @@ fn a_living_law_runs_until_paused_and_a_graph_bound_law_survives_a_reconcile() {
     canvas.set_physics_law(PhysicsLaw::Orbit);
     assert!(canvas.physics_never_rests());
     assert!(canvas.is_settling(), "orbit keeps ticking");
+    // Kinds is living too (F10's figures on the P2 fixture).
+    let living: Vec<PhysicsLaw> = PhysicsLaw::ALL
+        .into_iter()
+        .filter(|law| law.never_rests())
+        .collect();
+    assert_eq!(
+        living,
+        [
+            PhysicsLaw::Orbit,
+            PhysicsLaw::Kinds,
+            PhysicsLaw::Flock,
+            PhysicsLaw::Sync
+        ]
+    );
     canvas.set_physics_law(PhysicsLaw::Stress);
     assert!(!canvas.physics_never_rests());
     let count = canvas.law_force_count();
@@ -470,6 +497,35 @@ fn a_living_law_runs_until_paused_and_a_graph_bound_law_survives_a_reconcile() {
     // A graph swap keeps the choice too: the scene restore re-applies it afterwards anyway.
     canvas.set_graph(Graph::new());
     assert_eq!(canvas.physics_law(), PhysicsLaw::Stress);
+}
+
+/// What `never_rests` changes: switched to from rest, a living law (Kinds,
+/// since F10) ticks on past the settle budget, where a resting law (Stress)
+/// stops at it.
+#[test]
+fn from_rest_a_living_law_ticks_on_and_a_resting_one_stops() {
+    use std::time::Duration;
+    for (law, living) in [(PhysicsLaw::Kinds, true), (PhysicsLaw::Stress, false)] {
+        let mut canvas = Canvas::with_sample_graph();
+        canvas.resize(800, 600);
+        canvas.park_physics();
+        assert!(!canvas.is_settling(), "at rest before the switch");
+        canvas.set_physics_law(law);
+        for frame in 0..=u64::from(SETTLE_TICKS) + 60 {
+            canvas.frame_at(
+                800,
+                600,
+                Duration::from_micros(frame * 1_000_000 / 60),
+                Default::default(),
+            );
+        }
+        assert_eq!(
+            canvas.is_settling(),
+            living,
+            "{} after the budget",
+            law.id()
+        );
+    }
 }
 
 #[test]

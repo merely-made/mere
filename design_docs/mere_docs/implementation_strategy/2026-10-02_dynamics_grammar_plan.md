@@ -1,0 +1,315 @@
+# Dynamics Grammar Plan
+
+**Date:** 2026-10-02
+**Status (2026-10-03):** G1 done on branch `grammar-g1`, ready to merge: the declarations, the instruments, F7's relabel and exponent, and F10's measurement and change, with the four questions G1 returned ruled as F14 to F17 (§1.1) and carried out. G2 starts once G1 is merged; G3 to G6 wait for the arrangement design (F11, F17). Written from the [dynamics grammar brief](../research/2026-10-02_dynamics_grammar_brief.md) and Mark's rulings of 2026-10-02.
+**Scope:** turn the physics catalog's laws, overlays and slots into one specification model of *terms and targets*. Every term declares what it is, and two instruments check each declaration. Sources become one channel registry. Composition gets declared semantics (a weighted sum at a common scale, groups, schedules, currencies). Choices travel as a portable `DynamicsSpec`. Annealing and one optimizer join integration as realizations, gated on each term's class. Pins, anchors and contacts report whether they were satisfied. This plan is P7 of the physics catalog plan, moved here by ruling F2.
+
+Not in scope:
+- P5 (repulsion on the host's GPU) and P6 (Density), which stay in the physics catalog plan. This plan consumes them as rungs and as a law.
+- New laws or arrangements.
+- 3D.
+- Any change to `sceno::Score`.
+
+**Related:**
+- [dynamics grammar brief](../research/2026-10-02_dynamics_grammar_brief.md): the evidence, the decomposition tables (§5) and the hypothesis test (§6) this plan builds on.
+- [physics catalog plan](2026-09-02_physics_catalog_plan.md): the catalog, P5 and P6, and the record of every ruling below.
+- [projection grammar adoption plan](2026-08-15_projection_grammar_adoption_plan.md): the sibling this plan stands beside, and its discipline, "Solver proposes, the score records".
+- [projection grammar catalog](../research/2026-08-15_projection_grammar_catalog.md): the grammar this one parallels, and its promotion rules.
+- [the cartography–gyre layout seam](../technical_architecture/2026-05-29_cartography_aether_layout_seam.md): arrangements compute, physics simulates. Under F1 that split stands: arrangements produce targets, terms are realized.
+
+*Reading, not ruled* marks this plan's own inference. Everything else is a ruling, a quotation, or a file and line.
+
+## 1. Rulings
+
+Mark's words are quoted as the physics catalog plan records them (§3, P7, and §5); that plan is the primary record. Each fork's question and evidence are in the brief's §11. The "Options" lines list the recommendation first, as the forks were put.
+
+### 1.1 The grammar's own rulings (2026-10-02)
+
+**Held for a grammar.** Mark: "in the way we've managed to describe projection grammar, we should probably think about an overarching model of physics; combinatorial, algorithmically diverse... more thoughts?"
+- **Order.** "Research brief first, P7 held". Alternatives: the brief alongside P7a, or extending P7 directly. *Follows:* the brief, written 2026-10-02.
+- **This plan's home.** "Its own doc beside projection grammar". Alternatives: inside the physics catalog plan, or inside the projection grammar plan. *Follows:* this document.
+- **The hypothesis.** "Yes, as a hypothesis the brief tests". Alternatives: adopting it now, or keeping them separate. *Follows:* the brief found that the hypothesis holds for the energy class only (6 of 12 laws, 5 of 8 overlays, the anchor and affinity slots, Spectral alone among the arrangements). It fails for dynamics-only laws (Kinds, Flock, Flow's needle; Orbit and Sync, whose minimizers are collapse and total synchrony) and for generator arrangements.
+
+**F1, the model.** Question: what shape the model takes, given the hypothesis's partial result. Options: terms and targets; an energy-only grammar with the living laws outside it; separate grammars sharing only sources. Mark: **"Terms and targets"**. *Follows:*
+- One specification model of energy, dynamics and target terms.
+- Arrangements stay `Score`-recorded generators, referenced as targets.
+- Optimizer realizations are gated on class and metric.
+
+**F2, P7's home.** Question: where P7 lives, and how it is rewritten. Options: P7 moves into the grammar plan; P7 rewritten in the physics plan; P7 as written. Mark: **"P7 moves into the grammar plan"**. *Follows:*
+- P7 becomes this plan's tracks, G1 to G6.
+- The physics catalog plan's P7 closes with a pointer here; P5 and P6 stay there.
+- P7's done-conditions are carried into the tracks: currency pairs and composition in G3, Meaning in G2, save and reopen in G4.
+
+**F3, first tracks.** Question: which track comes first. Options: declarations and instruments first; the spec artifact first; the combinators first. Mark: **"Declarations and instruments first"**. *Follows:*
+- G1 comes first. Every term declares topology, kernel, state, currency, class and observable.
+- An energy-descent test and a reciprocity test must agree with each declared class, and Kinds must fail descent as the positive control.
+- Then G2 to G6.
+
+**F4, the spec's home.** Question: where the portable spec lives. Options: portable shape now, in seiche; grow `PhysicsChoice` in the canvas; place it in sceno beside the `Score`. Mark: **"Portable shape now, in seiche"**. *Follows:*
+- A `DynamicsSpec` in seiche, with sources resolved host-side and `PhysicsChoice` as the binding.
+- It is carried in `SavedSceneV1` now, and as a shelfmark delta section when a citing consumer asks.
+
+**F5, the common scale.** Question: how strengths are brought to one scale, the prerequisite for weighted lists. Options: reference-configuration normalization; energy normalization; per-pair calibration. Mark: **"Reference-configuration normalization"**. *Follows:* a term's weight-1 strength is its force at a declared reference:
+- contact distance 36 for repulsions, as Charge's calibration did;
+- one rest length of stretch for springs;
+- one rest length of offset for unary pulls.
+
+**F6, Anneal.** Question: Anneal's energy has Springs' functional form, so is it a law or a realization? Options: annealing becomes a realization; keep it a law with an edge-crossing term; leave it. Mark: **"Annealing becomes a realization"**. *Follows:*
+- Any energy composition may settle by annealing.
+- `anneal.davidson-harel` keeps opening, as Springs' terms under annealing, so saved scenes reopen.
+
+**F7, Energy's kernel.** Question: the code runs ForceAtlas2's (1, −1) force model under a LinLog id and doc. Options: keep (1, −1) and relabel ForceAtlas2; switch to true LinLog; both as laws. Mark: **"Keep (1, −1), relabel ForceAtlas2"**. *Follows:*
+- The code's ForceAtlas2 model stays, and its docs and label are corrected.
+- The attraction exponent becomes a kernel parameter, so true LinLog is a tuning.
+- The id `energy.linlog` stays.
+
+**F8, accidental non-conservatism.** Question: what to do with Hub room, Hub pull and Flow's needle, which are non-conservative by accident. Options: declare them as they are; make them gradients now; offer both forms. Mark: **"Declare them as they are"**. *Follows:*
+- They are classed honestly, and the class gates realizations.
+- This is revisited when an optimizer rung is built (G5).
+
+**F9, the grouped spread rule.** Question: how a group centroid's force reaches the members. Options: weight share; full force per member. Mark: **"Weight share"**. *Follows:* each member takes its weight share of its group's centroid force, which is the true gradient.
+
+**F10, Kinds.** Question: `never_rests` excludes Kinds, against the physics plan's finding. Options: measure first; add it now; correct the finding now. Mark: **"Measure first"**. *Follows:* Kinds' energy at 6 s and 30 s under continuous ticking on the P2 fixture decides whether it joins `never_rests` or the plan's finding is corrected (G1).
+
+**F11, physics and arrangement (2026-10-03).** Question: how the physics side's three tiers (grammar, recipe, binding) relate to the projection grammar's (projection grammar, scene recipe, domain binding), given that the projection grammar catalog lists "Force and constraint" as an arrangement family (§6) and G2's channel registry is shared with cartography's disclosures. Options: nested (the dynamics grammar inside the force-and-constraint arrangement family, a dynamics recipe filling a scene recipe's arrangement slot, one binding); parallel peers that meet only at the canvas; one grammar, with motion as one more operation. Mark: **"Here is what I think. Physics acts on an arrangement. Physics is not assigning coordinates that nodes are pseudo pinned to return to once a force acts on them. Arrangements are positions, not motion. Physics layouts are about the rules by which things' movement is simmed/computed. Meaning can be encoded in the physics, too, like semantic grouping."** Then: **"I suspect this concept needs designing."** *Follows:* none of the three options was taken; the concept gets its own design, starting from an assessment brief (`research/2026-10-03_arrangement_and_dynamics_brief.md`). *Reading, not ruled:* the answer runs against the landed arrangement-as-attractor design (projection proofs plan, 2026-07-23: "arrangements, fields, and physics are now one mechanism"), in which a playing graph is pulled toward its arrangement's slots by anchor springs at `DEFAULT_ANCHOR_STIFFNESS` (`pictograph/src/canvas/strategy.rs:208`). That design, the anchor target term (brief, line 173) and capture-as-anchor in G3's schedules are reopened by the design, and nothing changes in code until it rules.
+
+**F12, the middle tier's name (2026-10-03).** Question: what the physics side's middle tier is called. Options: dynamics recipe; layout recipe; physics recipe. Mark: **"Dynamics recipe"**. *Follows:* the physics side's tiers are the dynamics grammar, a dynamics recipe (a `DynamicsSpec` saved, edited and reused, G4) and a domain binding (`PhysicsChoice`'s successor). *Reading, not ruled:* the binding's name follows the projection side's "domain binding" until F11's design says whether the two bindings are one.
+
+**F13, where the vocabulary is written (2026-10-03).** Question: where the vocabulary is recorded. Options: README and plans; plans only; README only. Mark: **"README + plans"**. *Follows:* a short design-vocabulary section in mere's README carrying both sides' tiers and Mark's timeline and relationship examples, this plan, and a pointer from the projection grammar catalog's §6; the README is coordinated with the Projection grammar session so only one edit lands. *Reading, not ruled:* the README's physics half waits on F11's design, since that design decides how the two sides relate.
+
+**F14, the descent test for terms with no energy (2026-10-03).** §3's third question was settled as "Lane picks by the positive control", but all three candidates separated seeded Kinds from symmetrized Kinds, so G1 returned the choice. Evidence (P2 fixture, then the 40-node generated graph): Jacobian asymmetry 0.29 / 0.30 against 1.2e-4 / 1.2e-4 (tolerance 2e-2); loop work 3.9e-2 / 6.6e-2 against 6.8e-7 / 2.5e-7 (tolerance 1e-3), with Flow's needle at only 1.26e-3 and at 8.8e-5 on a 20-step loop; persistent motion disagreeing with 57 declared readings. Options: Jacobian symmetry; loop work; both, flagging a term if either does; persistent motion. Mark: **"Jacobian symmetry"**. *Follows:* the class-agreement test asserts Jacobian symmetry for terms with no energy; loop work and persistent motion stay as printed diagnostics.
+
+**F15, velocity-driven terms (2026-10-03).** Question: Jacobian symmetry and loop work read positions only, so they read 0 for Boids' alignment and cruise and Orbit's counter-damping, while a velocity check reads 0.85–1.0 for those three and exactly 0 for every position-only term. Options: keep the velocity check beside the descent test; exempt velocity-reading terms by declaration. Mark: **"Keep velocity check"**. *Follows:* the velocity check runs beside the descent test, and a velocity-reading term declares N and is measured as such.
+
+**F16, approximations (2026-10-03).** Question: Barnes–Hut at θ 0.5 is not reciprocal (balance 1.3e-3 / 3.2e-3 against 1e-4, gradient error about 5.8e-3, one Jacobian start at 0.67), while θ 0 passes everything (balance about 1e-8). Options: a class describes the law, and an approximation's fidelity is tracked in G5; a per-approximation tolerance in the declaration now; declare Charge non-conservative as realized. Mark: **"Class is the law's"**. *Follows:* the test checks Charge at θ 0 and prints θ 0.5 beside it; approximation fidelity joins G5's realizations.
+
+**F17, the order of G2–G6 (2026-10-03).** Question: F11 reopens the arrangement pull, which touches G3 (capture-as-anchor in schedules), G4 (what the spec saves) and G6 (anchor satisfaction reports), while G2 is only an input to that design. Options: G2 now and the rest after the arrangement design rules; plan order now, reworking what the design changes; G6 first, then G2–G5. Mark: **"G2 now, rest after"**. *Follows:* G2 starts once G1 is merged; G3–G6 wait for the arrangement design's rulings.
+
+**F18, what "physics acts on an arrangement" means (2026-10-03; the arrangement brief's A1).** Question, from `research/2026-10-03_arrangement_and_dynamics_brief.md` §8: with no pull the Spiral's recency order falls from 0.999 to 0.30 in 6 s; the canvas's default pull (12) holds 0.79 but presses 11 pairs into overlap and stretches edges to 235 against 178; an untuned rule reading recency as radial depth keeps 0.61 with no overlaps. Options: a seed plus rules over the arrangement's disclosed facts, the anchor pull retired; a seed plus constraints derived from the arrangement; seed only; the pull kept as an opt-in tunable at default 0. Mark: **"I think of it as a seeded set of computed coordinates that conform to the viewport and that can operate as an initial position, a pin (not moved), or an anchor (moveable, returns to position according to some rules). So you could arrange nodes for a script but then let the physics/scripting do its thing, instead of constantly asserting the arrangement, or you could make nodes stay pinned in their arrangement while props move according to your chosen physics, or you could perturb the graph and let it return to its anchored arrangement. Depends on the use. Those terms make sense? Maybe anchor for "can't move" and pin for "return to position?" Idk"**. *Follows:* none of the four options as put. An arrangement's coordinates play one of three roles, chosen by use: an initial position, a pin, or an anchor. The anchor is not retired; it is one role among three rather than what physics does to every arrangement. The naming is settled by F19. *Reading, not ruled:* this restates F1's target class (encourage as the anchor, ensure as the pin) plus the seed, and the projection grammar catalog's Free, Anchored and Pinned policies (catalog, lines 63–65). F11's objection then lands on the anchor as the default and identity of physics (the canvas's pull of 12 whenever an arrangement plays), not on anchoring as a chosen role. Where a role is chosen and which is the default return to Mark. Arrangement-derived rules (recency as depth) were neither taken nor refused, and meaning keeps reaching physics through G2's channels.
+
+**F19, drag and the role names (2026-10-03; the brief's A4).** Question: the canvas writes a drop into the node's slot and the anchor holds it there, while the board pulls an item back to its slot; the catalog defines anchored as returning toward home, sceno as "relaxation may carry it away", and mer3ly offers Anchored (pull 13) beside Free. Options: a drop is where the node now is, with anchored meaning a seeded home with no return; a drop pins until released; a per-item return as a host-clocked transition outside physics. Mark: **"Well that clears it up. Anchored for "returns to arrangement", pinned for "stays in arrangement." And if you want anchored with no physics, then things just jump back to their position after you drag them."** *Follows:* anchored means returns to the arrangement, and pinned means stays in it; this supersedes the swapped names Mark floated in F18. With physics running, an anchored item displaced by a drag or a force returns by the anchor's rule; with no physics, it jumps back to its position when the drag ends. *Reading, not ruled:* the catalog's and mer3ly's Anchored already mean this; sceno's `Hold::Anchored` ("best effort ... relaxation may carry it away", `sceno/src/score.rs:86-88`) names the initial-position role instead, and its name returns to Mark.
+
+**F20, the handoffs (2026-10-03; the brief's A6).** Question: a pick pauses physics, pausing leaves bodies where motion left them, Restore is explicit, and a switch is a transition run while paused whose final slots seed physics; all fit F11. Options: keep them as they are; a pick keeps the play state (the transition runs, then physics continues from the landed positions); stopping returns by a transition (Restore implicit). Mark: **"Those two other options, I like 'em! Would make the graph feel more responsive. Can they be positioned as optional?"** *Follows:* both alternatives become options beside today's behaviour; their defaults return to Mark.
+
+**F21, recipe slots and the binding (2026-10-03; the brief's A7).** Question: a scene recipe has no motion slot, and physics lives in host state and `SavedSceneV1`; physics channels and cartography's disclosures read the same facts, though physics also reads some no arrangement does. Options: two slots, one binding; dynamics beside the scene with its own binding; two slots, two bindings. Mark: **"Two slots, one binding"**. *Follows:* a scene recipe names an arrangement and, optionally, a dynamics recipe; one domain binding supplies the facts both read and the actions both honour (drag, pin). G2's registry produces cartography's disclosures and the physics channels from one computation, which settles §3's fourth question.
+
+**F22, where a role is chosen (2026-10-03).** Question: F18's examples mix scopes ("arrange nodes for a script" and "perturb and return" are whole-arrangement; "nodes pinned while props move" is per kind). Options: per item, with a recipe default that groups or kinds can override and an item can override in turn; per recipe only; per group or kind. Mark: **"Per item, recipe default"**. *Follows:* a recipe sets a default role, groups and kinds may override it, and an item may override that; the drag pin is the existing per-item case.
+
+**F23, the default role (2026-10-03).** Question: what role an arrangement takes when nothing chooses one, given that the canvas anchors at pull 12 whenever an arrangement plays, the board at 0.5, swatch relax at 0.25, and mer3ly defaults to Anchored at 13. Options: initial position; anchored, as today; every recipe must choose. Mark: **"Initial position"**. *Follows:* physics runs from the arrangement and nothing returns unless a recipe, group or item says anchored. The canvas's default moves from pull 12 to the initial position, and the board's, swatch relax's and mer3ly's defaults follow as each moves onto the roles.
+
+**F24, the handoff defaults (2026-10-03).** Question: the defaults for F20's two optional handoffs, given that "stopping returns by a transition" overlaps with anchored. Options: a pick keeps the play state, and stopping follows each item's role; both as opt-in toggles; both on by default. Mark: **"Pick keeps play; stop by role"**. *Follows:* picking an arrangement while playing runs its transition, then physics continues from the landed positions; on stop, anchored items return by a transition while initial-position and pinned items stay. Stopping needs no toggle of its own.
+
+**F25, sceno's holds (2026-10-03).** Question: sceno's portable `Hold` has `Anchored` ("best effort; relaxation may carry it away") and `Pinned` ("must be honored"); under F19 that `Anchored` is the initial-position role, and saved scores serialize it (8 code sites). Options: three holds; rename `Anchored` to `Seeded` only; keep the name and document the clash. Mark: **"Three holds"**. *Follows:* `Hold` names all three roles: `Seeded` (the old `Anchored`'s meaning, with a serde alias so old saves still read), `Anchored` (returns) and `Pinned`. The Projection grammar session carries it into the catalog and the adoption plan.
+
+### 1.2 Earlier rulings that are this plan's inputs
+
+From the physics catalog plan, §3 P5–P7 and §5:
+
+| Ruling | Mark's words | What it binds here |
+|---|---|---|
+| Currencies (2026-10-02) | "Laws declare currency; catalog adapts or refuses" | Forces compose freely. A kinematic law takes forces converted to its currency (overdamped, `v = F/γ`). A resident law takes only forces with resident kernels or the lagged upload. The picker greys out the rest with the reason. Declared in G1, enforced in G3. |
+| Composition tier (2026-10-02) | "Grouping overlays: semantic + partitioned"; "Weighted multi-law lists"; "Sequenced blends" | A `Grouped` outer law on centroids with an inner law per group, plus a semantic overlay, each with a source and weight. `law` becomes a weighted list at a common scale. Profiles carry a schedule, with capture-as-anchor. All in G3. |
+| Meaning (2026-10-02) | "'Meaning' as a source" | Beside site and cluster, feeding affinity pairs, `DomainCluster` groups, Kinds' kinds and the partition for grouped laws (G2). |
+| Embeddings (2026-10-02) | "Burn on the host device, off-path" | ESP's `bert::load_wgpu` is fixed to take the host's device. Embeddings are computed on content change in an actor or async task. Lexical embeddings on the CPU are the fallback, and the wasm default until ESP's wasm build is verified (G2). |
+| Semantic field (2026-10-02) | "Snapshots only for now" | Meaning enters as pairs, groups and kinds snapshots through the existing rebuild path; no per-step semantic field (G2). |
+| Density with edges (2026-10-02) | "Pure Density now, Bonds later" | Edges may join Density as a "Bonds" overlay in Density's currency, accepted only if rank stays at least 0.8 (G3). |
+| Overlays on Density (2026-10-02) | "Refuse overlays on Density now" | The catalog refuses overlays on Density with a reason "until the currency work", which is G3. |
+| What earns a law id (2026-10-01) | "I don't mind tunings. Don't present alt tunings as alt instruments." | New law ids are for novel dynamics only. Scale versions stay under the law's id as a backend tier. This underlies F6 and F7. |
+| Home of GPU-tier laws (2026-10-01) | "Law in seiche, kernels in conatus" | Terms are declared in seiche. Resident rungs live in `conatus::resident`. |
+| The picker (2026-10-01) | "Ordinary laws with a CPU tier" | Every term keeps a CPU rung, so every host can realize every spec. |
+| Rapier's role (2026-10-01) | "Rapier seems the fallback in any case" | Integration under rapier remains the default realization, and every other realization falls back to it. |
+| Licensing (2026-10-01) | "Doublecheck. Otherwise, 1" | Nexus-derived code is treated as Apache-2.0. A close port gets a `LICENSES.md` entry; code merely informed by it stays MPL-2.0 with a credit line. |
+
+**Rules for lanes on this plan** (*Reading, not ruled*, gathered from current policy):
+- **Licensing.** The licence posture brief's ruling is "MPL-2.0 by default, with correct provenance", and "there are no exceptions" (`design_docs/2026-08-22_license_posture_brief.md`). Algorithms are written from the literature where possible, as P6a's CPU tier was. Any close port gets a `LICENSES.md` entry under the licensing ruling above.
+- **Instruments.** Every negative receipt carries a positive control in the same run.
+- **Forks.** A lane stops at any choice with more than one defensible answer and returns it as a fork. The open questions in §3 are those already visible.
+
+## 2. Tracks
+
+G1 runs first (F3). After it, *Reading, not ruled*: G2 and G6 depend only on G1; G3 needs G1 and, for the Meaning instance, G2; G4 needs G1 and G3's combinator shapes; G5 needs G1's energies and G4's spec. Where two tracks could run side by side, the order goes back to Mark.
+
+### G1 — declarations and instruments
+
+Every term declares what it is, and two instruments check the declarations. This is P7a's "every law declares its currency", widened to the whole declaration.
+
+- **Declarations.** Every law term, overlay, slot and always-on term (the rows of the brief's §5.1–5.3) declares:
+  - its topology: unary, edges, pair list, all-pairs with an optional cutoff, groups, kind matrix, or medium;
+  - its kernel family;
+  - its state moved;
+  - its currency;
+  - its class: E, Em, H, N or K, as the brief defines them;
+  - its metric channel, for Em terms;
+  - its signature observable.
+  
+  An E or Em term also exposes its energy function, so G5 can optimize it. *Reading, not ruled:* the declarations sit on the seiche term types, since F4 puts the spec in seiche. The canvas catalogs read them rather than restating them.
+- **The descent instrument.** Under overdamped flow, an energy-declaring term's energy must never rise beyond tolerance, from seeded starts on the P2 fixture and on one generated graph. Em terms are run in their declared metric.
+- **The reciprocity instrument.** For a pair term, the metric-weighted force sum `Σ m_i F_i` must be zero, with `m = 1` for E terms and the declared weights for Em terms. Unary terms are excluded as external.
+- **The positive control.** Kinds, with its seeded asymmetric matrix, must fail descent and reciprocity. The same harness with a symmetrized matrix must pass both, which proves the instrument can say yes as well as no.
+- **F7's relabel.** `LinLogForce`'s doc (`crates/conatus/seiche/src/laws/linlog.rs`, lines 7–17) and `PhysicsLaw::Energy`'s doc (`crates/canvas/pictograph/src/canvas/physics_catalog.rs`, lines 81–83) say ForceAtlas2's (1, −1) model. The attraction exponent becomes a kernel parameter: 1 by default, 0 for LinLog proper. `degree_weighted: false` is no longer described as "LinLog's reading". The id `energy.linlog` stays.
+- **F10's measurement.** Kinds' energy at 6 s and 30 s under continuous ticking on the P2 fixture is recorded here. If it stays above the floor, Kinds joins `PhysicsLaw::never_rests` (`physics_catalog.rs`, lines 160–165). Otherwise the physics catalog plan's 2026-09-02 finding is corrected with a dated note.
+
+*Done when:*
+- every term in the brief's §5.1–5.3 has a declaration, and a catalog test proves none is missing;
+- the descent and reciprocity instruments agree with every declared class, including Hub room and Hub pull as Em and Flow's needle as N (F8);
+- Kinds' seeded matrix fails both instruments and the symmetrized matrix passes both, in the same run;
+- the Energy law's P1 test and P2 receipt are unchanged at the default exponent, and exponent 0 runs (true LinLog as a tuning);
+- F10's two figures are recorded, with the resulting change applied;
+- the eleven law receipts stay green.
+
+### G2 — one channel registry, Meaning included
+
+Sources become one registry of channels, which laws and arrangements both read. This is P7b, plus the brief's finding F-g.
+
+- **Channels.** Kind (site, cluster, colouring, island, degree, meaning), mass (degree, PageRank), depth (roots, layers, focus), groups (any kind channel), pairs (structural, content, blend), and distances.
+  - The kind, mass and depth channels are `LawSources` today (`physics_catalog.rs`, line 599).
+  - The pairs channel is the affinity signal and its blend (`crates/canvas/pictograph/src/canvas/strategy.rs`, lines 520–616).
+  - Group pull takes any group channel, no longer site alone (the brief's finding F-g; `physics_catalog.rs`, line 1087).
+- **Where it lives.** F4 says sources resolve host-side, so the registry lives in the canvas, and seiche's spec names channels by id. *Reading, not ruled:* the registry also produces cartography's disclosures (categorical and numeric axis, weight, embedding), so Columns-by-cluster and Kinds-by-cluster read one computation.
+- **Meaning.** ESP embeddings run on the host device, off-path, recomputed on content change. `load_wgpu` is fixed to take the host's device. Lexical embeddings on the CPU are the fallback and the wasm default. One snapshot yields top-k pairs (`affinity_pairs_over_index`, `crates/intel/esp/src/embed/index_burn.rs`, line 144), cluster assignments and kinds. It feeds Affinity, which gives `set_content_affinity` its first non-test caller, plus Group pull, Kinds and G3's Groups partition.
+
+*Done when:*
+- Group pull by cluster exists, giving "Columns (by cluster)" a law-form twin, with a with/without test;
+- one Meaning snapshot feeds Affinity, Group pull, Kinds and Groups, with one embedding run per content revision asserted;
+- P7's Meaning condition holds: on a fixture graph with known topics, cluster purity against the topics is recorded on native GPU and on the CPU fallback, and the GPU path shares the host's device (a single device asserted);
+- the wasm build takes the lexical fallback;
+- the eleven law receipts stay green.
+
+### G3 — combinators and currencies
+
+The combinators get declared semantics, and currencies are enforced. This is P7a's enforcement plus P7c, P7d and P7e.
+
+- **Weighted sum at the common scale (F5).** Each term's weight-1 strength is its force at its declared reference. Repulsions use contact distance 36, Charge's calibration (`physics_catalog.rs`, lines 62–65). Springs use one rest length of stretch, and unary pulls one rest length of offset. Today's calibrated strengths are re-expressed as weights, so the default compositions reproduce today's forces (*Reading, not ruled*: that compatibility requirement). `law` becomes a weighted list, mixed within one currency.
+- **Groups (F9).** An outer law over group centroids, each member taking its weight share of its group's centroid force, plus an inner law per group under a membership mask. The first instance is the one Mark named: Charge (Barnes–Hut) between meaning clusters, springs within.
+- **Schedule.** A profile may carry a schedule of compositions with stage stop conditions. Density's ruled stop test, "Shift < 0.05 for 3 passes", is the precedent for a stop condition. "Capture positions as anchors" freezes one stage's layout as the next stage's target, through the anchor slot.
+- **Currencies.** Forces compose freely. A kinematic law takes forces converted to `v = F/γ` before its own write. A resident law takes only forces with resident kernels or the lagged upload. Everything else is refused, and both pickers grey it out with the reason.
+- **Density.** The interim "Refuse overlays on Density now" builds on the refusal seam already on `density-cpu` (`PhysicsLaw::overlay_refusal`, `5f529c64`). Once the conversion lands, the brief's §7.2 *Reading* is that converting a force into Density's velocity is the free-energy sum. Which overlays Density then admits, and at what bars (Bonds' rank ≥ 0.8 is the ruled one), goes back to Mark with measurements.
+
+*Done when* (P7's conditions, carried):
+- every law reports its currency, and the pickers refuse an incompatible mix with its reason, with a test per currency pair;
+- each term at weight 1 produces unit force at its reference within 1e-3 (the scale receipt);
+- a weighted mix of two force laws matches each pure law at weights 1/0 and 0/1;
+- the grouped Charge-between, springs-within layout separates meaning clusters: the between-cluster gap exceeds the within-cluster spread, stated as a ratio. It keeps edge structure inside each cluster, with a within-cluster stress figure no worse than Springs alone. Springs alone is the negative control, and a shuffled-meaning control fails the separation;
+- the grouped composition built from energy terms passes G1's descent and reciprocity instruments, and the full-force variant (F9's rejected option) fails reciprocity on groups of unequal size (positive control);
+- a sequenced blend reproduces the captured anchor layout within a stated tolerance;
+- the eleven law receipts and Density's stay green.
+
+### G4 — the `DynamicsSpec`
+
+The portable artifact lands in seiche (F4).
+
+- **The type.** `DynamicsSpec` in seiche: a version, terms (kind, scope, parameters at the common scale, weight, channel ids, an optional pinned rung), a target reference (arrangement plus satisfaction class), combinators, realization, seed, and observables with bars. This is the shape of the brief's §9, which is illustrative.
+- **Derived fields.** Currency, class and metric are derived from G1's declarations, never authored.
+- **The binding.** `PhysicsChoice` (`crates/canvas/pictograph/src/canvas/physics_board.rs`, line 48) becomes the binding: host-side channel resolution, plus the affinity toggle P7a named.
+- **The carrier.** `SavedSceneV1` (`ports/graphshell/src/product.rs`, lines 216–243) carries the spec, with a serde default so a legacy scene opens as it does today. The remote board mirrors the canvas's spec, as it mirrors the choice today (physics catalog plan, P3).
+- **Not built now.** The shelfmark delta section, until a citing consumer asks (F4). mer3ly's citation carries no physics today (brief, finding F-h).
+
+*Done when:*
+- every current choice (law × overlays × the three sources, and every profile) maps to a spec and back without loss;
+- a spec saves and reopens byte-for-byte with the scene, and compositions save and reopen (P7's condition);
+- a legacy `SavedSceneV1` with no spec opens identically;
+- an unknown term kind or channel fails explicitly, never silently substituted, as Graphshell's projection compiler does;
+- the remote board's receipt (`physics_remote_board.scn`) stays green;
+- the eleven law receipts stay green.
+
+### G5 — realizations
+
+Integration, annealing and one optimizer become realization choices, gated on class (F1, F6, F8).
+
+- **Integration.** Rapier stays the default and the fallback.
+- **Annealing (F6).** Annealing becomes a realization of any composition whose terms are all E under one metric: Metropolis moves over the composition's declared energy (G1), with the cooling schedule as a realization parameter. `anneal.davidson-harel` reopens as Springs' terms under annealing, and its private energy copy (`crates/conatus/seiche/src/laws/anneal.rs`, lines 66–91) is retired in favour of the declared one (*Reading, not ruled*: the retirement).
+- **One optimizer rung.** It is gated the same way, and is refused with the reason for any composition containing an H, N, K or mixed-metric term.
+- **Rungs.** P5's repulsion rungs and Density's tiers are recorded as rungs of their terms (no rework). A rung must reproduce its term's law to a stated tolerance.
+- **F8's revisit.** When the optimizer rung exists, the figures for making Hub room, Hub pull and Flow's needle gradients go back to Mark.
+
+*Done when:*
+- annealing is selectable for every all-E composition and refused with its reason otherwise, with a test per class;
+- `anneal.davidson-harel` reopens from a saved scene and its P2 receipt (energy ≤ 5) stays green;
+- on the P2 fixture, the optimizer rung reaches an energy no higher than integration's (within a stated tolerance) for Springs, Stress and Energy, and each law's signature receipt passes on its result;
+- compositions with Orbit, Sync, Kinds, Flock, Flow or a hub overlay mixed with identity-metric terms are refused, with their reasons;
+- F8's figures are in front of Mark;
+- the eleven law receipts stay green.
+
+### G6 — satisfaction reports
+
+Constraints report whether they were satisfied, the physics counterpart of `sceno`'s honored and unmet holds (`crates/cambium/scenes/sceno/src/score.rs`, lines 107–120).
+
+- **Pins** (ensure-class, kinematic bodies, `crates/conatus/seiche/src/lib.rs`, lines 829–838) report honored or unmet against a tolerance.
+- **Anchors** (encourage-class) report their residual RMS.
+- **Contacts** keep reporting overlaps.
+- The figures appear in `LayoutStats` and in both hosts' snapshots. *Reading, not ruled:* when a spec travels with a score, an unmet pin maps to `unmet_holds`.
+
+*Done when:*
+- a pinned node reports honored;
+- a planted unsatisfiable pair of pins (two bodies pinned to one point against contacts) reports unmet, the positive control;
+- the anchor residual falls monotonically as `arrangement_pull` rises across a sweep;
+- the reports reach the web snapshot and turnstone's observe snapshot;
+- the eleven law receipts stay green.
+
+## 3. Open questions
+
+*Ruled 2026-10-02, on putting the plan to Mark:* "Approve; start G1" (the
+alternatives were waiting for P5 and P6 to merge first, or amending), so G1
+runs now and the order of G2 to G6 returns to him after G1. Questions 1 to
+3 below are settled: F7's relabel covers "Docs and descriptions only" (the
+picker label stays "Energy"; the alternative also renamed the label); F10
+uses "P2's floor, energy ≥ 1" (the alternatives were a fraction of the
+first second's energy, or visible motion); and the descent test for terms
+with no energy is "Lane picks by the positive control": loop-work,
+Jacobian-symmetry and persistent-motion checks are tried, the one where
+seeded Kinds fails and symmetrized Kinds passes is kept, and the lane
+returns if more than one discriminates (the alternatives named loop work or
+Jacobian symmetry outright).
+
+*Annotation, 2026-10-03:* all three discriminated, so G1 returned the choice
+and the order of G2 to G6 with it. They are settled by rulings F14 to F17 in
+§1.1 (Jacobian symmetry; keep the velocity check; a class is the law's; G2
+now and G3 to G6 after the arrangement design).
+
+These are *Reading, not ruled*. Each returns to Mark at the named track's checkpoint, with evidence, if more than one answer is defensible.
+
+1. **G1: what "relabel" covers.** This plan reads F7 as correcting docs and descriptive text. The picker label "Energy" stays plain under the 2026-09-02 ruling, "labels plain, ids technical". If the ruling meant the picker label, that is a change to put back.
+2. **G1: the floor for F10.** This plan reads P2's floor, `energy >= 1`, as the measure.
+3. **G1: the descent instrument's form** for terms that declare no energy (N). A loop-work check in joint configuration space, a Jacobian-symmetry check on small fixtures, or a persistent-motion check would each serve. The lane picks, or returns, with Kinds' positive control deciding which actually discriminates.
+   *G1, 2026-10-02:* all three discriminate, so the lane returned it to Mark with the figures (Findings, "G1: the descent form"); ruled 2026-10-03 as F14, "Jacobian symmetry".
+4. **G2: the registry and cartography's disclosures.** Whether the registry produces the disclosures too, or only shares channel ids with them.
+5. **G3: the unit length for unary pulls.** `EdgeSpring`'s rest length, 170, is the obvious candidate. A per-term rest length is the other.
+6. **G3: which overlays Density admits** after the conversion, and their bars.
+7. **G5: which optimizer.** L-BFGS over the declared energy (OpenMM's minimizer, Penrose) or stress majorization (Graphviz's default for stress).
+8. **The effectiveness record's home.** The brief, §8, argues for a table versioned beside the spec. This plan's Findings section is where it is seeded until a home is ruled.
+
+## 4. Findings
+
+- 2026-10-02 (planning): P5's rungs and Density's tiers are unmerged. `gpu-repulsion` is at `60a990a5`, and `density-cpu` is at `c402d5e7`, a merge of main over `5f529c64`. Density's overlay refusal is `PhysicsLaw::overlay_refusal` on that branch (`density-cpu:crates/canvas/pictograph/src/canvas/physics_catalog.rs`, line 199). G3 and G5 build on these once they land.
+- 2026-10-02 (planning): `set_content_affinity` has no caller outside tests, and affinity is not in `PhysicsChoice` (physics catalog plan, the 2026-10-02 composition assessment; re-checked against main `d3874ff3`). G2 and G4 close both.
+- 2026-10-02 (planning): the plan figure "0.77 alone … −0.54" for Density with `EdgeSpring` has no surviving log. The Density lane's first-round log was overwritten (the physics catalog plan's annotation of 2026-10-02). `probe-overlays.log` shows the same failure class for force overlays on Density, and is the one to cite.
+- 2026-10-02 (planning): a correction to the brief's F9 evidence and §7.2, recorded here rather than in the brief's dated text. The brief called giving every member its group's full centroid force "not a gradient". More precisely, it is a gradient in a group-size metric: member forces are `n_g` times the true gradient, so it is class Em. It still descends the outer energy, but the total force on two groups of unequal size no longer cancels. It therefore fails reciprocity, which is what G3's positive control tests. The ruling (weight share) is unaffected. The rejected option is Em rather than N, and it mixes badly with identity-metric inner laws for the reason the brief gives for mixed metrics (§6.5).
+- 2026-10-02 (planning): the brief's findings F-a to F-i stand as recorded there (brief, §5.7); G1 acts on F-a and F-f, G2 on F-g, and G5 on F-b.
+- 2026-10-02 (G1, declarations): the vocabulary is `seiche::terms` (`crates/conatus/seiche/src/terms.rs`). A `Term` carries topology, kernel family, state moved, currency, class, metric channel and signature observable. `Declared` is a supertrait of `Force` with `terms()` required, so a force that declares nothing does not compile. A force bundling several terms (`LinLogForce`, `ParticleLife`, `Boids`, `Gravity`, `Kuramoto`, `MagneticSpring`) isolates each with `isolate`; an E or Em term exposes `energy`, and a metric-weighted term its `metric` weights. What rapier realizes outside the force list is declared as the constants `CONTACTS`, `DAMPING` and `PIN`, and `SceneField::terms` declares the vortex (swirl N, inward pull E). The eleven laws carry 36 terms, the eight overlays one each, and the anchor, affinity and six coupling responses one each (the open tail none). The catalog reads them: `canvas::tests::physics_terms::every_catalog_term_declares_itself` builds every law, overlay and slot on the P2 fixture and checks each row's classes against the brief's tables, and that `PhysicsOverlay::weighted` names exactly the overlays with the mass metric. Two classes depend on the instance: Kinds' kind matrix is N while the matrix is asymmetric and E once symmetric (`ParticleLife::symmetrized`, `is_symmetric`), and a still `GravityLocus` is E where the tide is H. *Reading, not ruled:* `Currency::Integrator` for contacts and damping (the brief's "inside the integrator"); Anneal declared as one K term, "annealing", exposing the energy it realizes, with its split into Springs' terms left to G5.
+- 2026-10-02 (G1, Density's spot): Density is not on main. Because `terms()` is required, `density-cpu`'s `impl Force for Density` stops compiling at its merge until it declares itself, so the declaration cannot be missed. The vocabulary already holds what it needs: `Topology::Medium`, `Kernel::Diffusion`, `State::Field`, `Metric::Wasserstein` and `Observable::MassAreaRank`. Illustrative, not compile-checked: `Term::force("density", Topology::Medium, Kernel::Diffusion, Class::K, Observable::MassAreaRank).in_metric(Metric::Wasserstein).moving(State::Field, Currency::Kinematic)`. The catalog test asserts eleven laws and names the twelfth's row in its doc.
+- 2026-10-02 (G1, the instruments): `seiche::instruments` (`crates/conatus/seiche/src/instruments.rs`) reads one force at a time in a `Probe`, which holds the fixture's bodies and edges and every clock at `dt = 0`. `descent` runs overdamped flow, `x ← x + h·F`, no body moving more than 0.5 a step, for 300 steps. `gradient_error` is `‖M·F + ∇U‖/‖∇U‖` by central differences. `balance` is `|Σ wᵢFᵢ|/Σ wᵢ|Fᵢ|` for internal terms. Then come the three candidates and `velocity_read`. Tolerances: a rise of at most 1e-3 of the fall, gradient error 1e-2, balance 1e-4, loop work 1e-3, Jacobian asymmetry 2e-2, motion 1e-3, velocity 1e-6. The fixtures are the P2 fixture (the eleven nodes and ten relations of `ports/graphshell/src/mere_host_fixture.rs`, copied into the test with their sites) and a generated graph of forty nodes on five sites (a seeded tree plus twenty chords), three seeded starts each. The instruments' own receipts show a curl and a mislabelled energy failing where a spring and `NodeExclusion` pass (`crates/conatus/seiche/src/instruments/tests.rs`).
+- 2026-10-02 (G1, the positive control): on both fixtures, with the catalog's seed and its kinds by site, the seeded matrix fails both instruments and the symmetrized one passes both, in one run (`physics_terms::kinds_seeded_fails_both_instruments_and_symmetrized_passes_both`). Seeded: no energy, balance 0.31 (P2) and 0.16 (generated) against 1e-4, and non-conservative by every candidate. Symmetrized: class E, rise 0, gradient error 1.2e-6 and 8.4e-6, balance 3.8e-8 and 1.4e-8, conservative by every candidate.
+- 2026-10-02 (G1, the descent form): all three candidates discriminate the positive control, so the choice went back to Mark (§3, question 3), who ruled F14, "Jacobian symmetry" (2026-10-03): the test asserts it, and the other two are printed diagnostics. Each is judged by its median over the three starts: a start that puts a pair across a cutoff or a quadtree cell boundary reads that kink, not the term. Figures as seeded against symmetrized, P2 then generated:
+  - Jacobian symmetry (central differences of 0.02): 0.29 and 0.30 against 1.2e-4 and 1.2e-4. It agrees with every declared class on both fixtures; Flow's needle reads 0.26 and 0.17, and the E, Em and H terms read at most 5.4e-4 (Stress on the generated graph).
+  - Loop work (one loop of 40 per body in joint configuration space, 720 samples): 3.9e-2 and 6.6e-2 against 6.8e-7 and 2.5e-7. It also agrees with every class, but Flow's needle on the generated graph reads 1.26e-3 against the 1e-3 tolerance; at a loop of 20 it read 8.8e-5 and called the needle conservative (`Code/testing/mere/grammar-g1/loop-work-amplitude-20.log`, a temporary run). Its full table at 40 is in `gate-pictograph-canvas.log`. The E terms read at most 3.6e-4 (Grid).
+  - Persistent motion (30 s under rapier, the late mean kinetic energy over the early peak): 0.75 and 0.17 against 5.8e-12 and 5.9e-10. It disagrees with 57 term readings: weak centrings still moving at 30 s (Boundary 8e-2), moving targets (Tide 2.47, Sync's ring draw 2e-2), and Flow's needle at rest (1e-13).
+- 2026-10-02 (G1, velocity-driven terms): no position-only candidate can see a force that reads velocity. Boids' alignment and cruise and Orbit's counter-damping read 0 on loop work and Jacobian symmetry. `velocity_read` (`‖F(x, v) − F(x, 0)‖` relative, at seeded speeds of 30) reads 0.85 to 1.0 for them and exactly 0 for every position-only term, so the class-agreement test counts an N term as agreeing when Jacobian symmetry or the velocity read flags it, and fails an E, Em or H term that reads velocity. Ruled 2026-10-03 as F15, "Keep velocity check".
+- 2026-10-02 (G1, agreement): with Jacobian symmetry or loop work as the descent form, every declared class agrees on both fixtures; since F14 the test asserts Jacobian symmetry (`physics_terms::the_instruments_agree_with_every_declared_class`). E and Em terms rise at most 5.2e-5 of their fall, with gradient error at most 7.6e-3 (the coupling, whose force is numen's finite-difference gradient). Internal terms balance to at most 6.8e-8 in their declared metric. Per F8, Hub room and Hub pull balance only in their metric (about 1e-8, against 0.11 to 0.32 at unit weight), as do Boids' cohesion (0.17 to 0.25) and Orbit's gravitation (0.16 to 0.19), and Flow's needle reads non-conservative. Sync's phase step never raises `−K·Σ cos(θᵢ − θⱼ)` and balances in the degree metric (`kuramoto::tests::the_phase_step_descends_and_balances_in_the_degree_metric`). Anneal, the one K term with an energy, lowers it over its schedule: 3.4e5 to 1.0e5 on P2 and 4.9e6 to 1.5e6 on the generated graph.
+- 2026-10-02 (G1, a rung that is not exact): Charge's Barnes–Hut quadtree at θ 0.5 is not reciprocal to the instruments' tolerance. Its balance is 3.2e-3 (P2) and 1.3e-3 (generated) against 1e-4, its gradient error 5.9e-3 and 5.6e-3, and its Jacobian asymmetry 1.4e-2 at the median with 0.67 at one start. On the exact rung (θ 0, every cell opened) the same term passes everything: balance 3.5e-8 and 9.9e-9, gradient error 3.5e-6 and 1.8e-6. The catalog test reads Charge's term on the exact rung and prints the θ 0.5 rung beside it. Ruled 2026-10-03 as F16, "Class is the law's": the class describes the kernel, and an approximation's fidelity joins G5.
+- 2026-10-02 (G1, F7): the relabel is done in `crates/conatus/seiche/src/laws/linlog.rs`, `crates/conatus/seiche/src/laws/mod.rs`, `PhysicsLaw::Energy`'s doc and the two Energy scenarios' comments, with the picker label "Energy" and the id unchanged. `LinLogForce::attraction_exponent` defaults to 1. At exponent 1 the pull is `delta · (a · d⁰)`, which is the old `delta · a` exactly, and the P1 test is unchanged. At exponent 0 the law runs and descends its own energy (`instruments::tests::linlog_at_exponent_zero_runs_and_descends_its_own_energy`). With the default coefficient of 4 it separates the P1 test's cliques by a ratio of 1.48 against ForceAtlas2's 4.65, because the coefficient is a pull at unit distance; which coefficient a LinLog tuning carries is G3's reference-configuration question (F5).
+- 2026-10-02 (G1, F10): on the P2 fixture, reached as its receipt reaches it (Play, Free, Kinds by site) and run frame by frame at 60 Hz, one step a frame, Kinds' kinetic energy is about 577 000 at 1 s, 18 300 at 6 s and 140 500 at 30 s, against P2's floor of 1 (`graphshell::canvas_physics::tests::kinds_never_rests_on_the_p2_fixture`, log `Code/testing/mere/grammar-g1/gate-graphshell-web.log`; on the web host, see Progress). So Kinds joined `PhysicsLaw::never_rests`, and the 2026-09-02 finding stands. Repeated runs differ by about 1e-3, because `NodeExclusion` sums over `bodies_by_node`'s hash order.
+- 2026-10-02 (G1, what `never_rests` changes): `Physics::settle` keeps the larger budget (`crates/conatus/seiche/src/runtime.rs`, line 598). The receipts' preamble starts with Play, the play control's unbounded run, so every P2 and P4 law receipt has run under continuous ticking whatever `never_rests` says. A probe that left Springs under that preamble for 600 frames found it still stepping (Progress, 2026-10-03). The flag decides only a switch from rest, and the remote board's settle. `physics_catalog::from_rest_a_living_law_ticks_on_and_a_resting_one_stops` shows Kinds ticking past the budget where Stress stops, and it fails with Kinds out of `never_rests` (log `Code/testing/mere/grammar-g1/never-rests-control.log`). The physics catalog plan's pre-existing actor finding (an offloaded canvas under a living law keeps its actor ticking after it is dropped) now covers Kinds too.
+- 2026-10-02 (G1): to isolate Boids' cruise, its steering gain became a parameter, `Boids::cruise`, replacing the literal 0.5. The default is 0.5, so the force is bitwise the same.
+- Effectiveness record, seeded (*Reading, not ruled* on its home; open question 8). The P2 receipts (`Code/testing/mere/physics_p2_receipt.md`), the P4 drag rows, and the density overlay probe (`Code/testing/mere/density/probe-overlays.log`; Density alone rank 0.60, with Hub pull −0.33 and 510 overlaps) are its first rows.
+
+## Progress
+
+- 2026-10-02: plan written from the brief and Mark's rulings F1 to F10, after merging main at `d3874ff3` into the brief's worktree. The physics catalog plan's P7 closed with a pointer here. No track started.
+- 2026-10-03 (G1): declarations, instruments, F7 and F10 landed in `f1691793` on branch `grammar-g1`, from main `8022cedd`, unmerged.
+  - Native gates, offline and locked, target `C:/t/cargo-targets/mere/grammar-g1`, logs `Code/testing/mere/grammar-g1/gate-*.log` with a summary in `gates.log`: seiche 102 (default), 98 (no default features) and 102 (`gpu`); pictograph `canvas` 275, including the four `physics_terms` receipts and the never-rests effect test; pictograph `gpu` device receipts 3; `cargo check` of `mere` (`graph,canvas-gpu`) and of graphshell (`canvas-gpu`); clippy on seiche reports nothing in the lane's code.
+  - graphshell `web`: 231 of 231 in the lane's first full gate run, before a file split inside seiche (that log was overwritten by the final run). Later runs, with other builds and the virus scanner loading the machine, failed one or two wall-clock and network tests that touch no physics: `session_notices`' polling count, and `carrier`'s p2panda refusal, a 10 s accept timeout that fails even run alone. F10's receipt passed in every run. The final log is `gate-graphshell-web.log` (230 of 231), and the earlier failures are kept as `gate-graphshell-web-flake.log`, `gate-graphshell-web-flake-2.log` and `gate-graphshell-web-timing-alone.log`. The density lane's log records the same `session_notices` failure on its branch.
+  - The standalone wasm build passes offline and locked on the web lock seeded from main's (SHA256 `a915fa23…`, unchanged by the build). Bundle SHA256 `92d3f8f2…` (`wasm-build.log`).
+  - Headed, on that bundle (fixture route, port 8813, this lane's Chrome profile and runner copies): the eleven law receipts `p4_tree_physics_*` all ok (`law-receipts.log`).
+  - Two temporary scenarios ran on the same bundle and were then removed (`diagnostics.log`). F10 on the web host under the receipt's preamble: Kinds' kinetic energy 8 640 at 360 frames after the apply and 309 063 at 1 800, with the page taking 2 to 3 physics steps a frame, so the frames are not physics seconds. The preamble probe, Springs under the same Play and Free then 600 frames on, was still stepping (`physics-steps >= 1` held), which is the finding on what `never_rests` changes.
+  - Returned to Mark, and ruled 2026-10-03 (§1.1): the descent form for terms with no energy (F14, "Jacobian symmetry"), velocity-driven terms (F15, "Keep velocity check"), a kernel against its rung (F16, "Class is the law's"), and the order of G2 to G6 (F17, "G2 now, rest after").
+- 2026-10-03 (G1, the rulings carried out): `66058f61` makes the class-agreement test assert Jacobian symmetry as the descent test for terms with no energy (F14), with the velocity check beside it (F15): `Reading::agrees` judges by Jacobian symmetry and `Reading::agrees_by` keeps the other candidates' view, so loop work and persistent motion are printed diagnostics only, in pictograph's receipts and in seiche's own. Charge stays checked at θ 0 with θ 0.5 printed beside it (F16). Main `76f5d78e` (F11 to F17, the retinue 0.2.0 repin) then merged into the branch. Gates after the merge, offline and locked, logs `Code/testing/mere/grammar-g1/merge-gate-*.log` with a summary in `merge-gates.log`: seiche 102 (default), 98 (no default features) and 102 (`gpu`); pictograph `canvas` 275; graphshell `web` 231 of 231 single-threaded, the p2panda refusal test passing this time. F10's receipt read 577 233, 18 312 and 140 548 at 1, 6 and 30 s. Its positive control, Kinds taken out of `never_rests` for one run, fails the effect test as it should (`merge-never-rests-control.log`). The web build was not rebuilt: since bundle `92d3f8f2…` the lane changed only seiche's test code, an instruments method the page never calls, and doc text.
