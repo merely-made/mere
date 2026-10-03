@@ -1691,3 +1691,18 @@ binning are the useful patterns.
   rest. Springs on the same dealt starts reads −0.44 to −0.55 on both
   generated graphs. No default changed: the cap itself puts 9 of 16 gen-50
   starts at 0.8, so which statistic the bar is goes back to Mark.
+- 2026-10-03 (P6a, after G1 landed; main `39254463` merged): Density
+  declares its terms as the dynamics grammar plan's Findings sketched it —
+  one term, `Topology::Medium`, `Kernel::Diffusion`, class K, kinematic,
+  `State::Field`, `Metric::Wasserstein` weighted by each node's mass,
+  observed by `MassAreaRank` (*Reading, not ruled*; returned to Mark as a
+  fork with the alternatives). `physics_terms` counts twelve laws and
+  passes all four tests: the declaration test accepts Density's row; the
+  class-agreement table reads no Density row, because it reads K terms by
+  no instrument (the probe reads `user_force` at `dt = 0`, and Density
+  writes positions), while the same probe reads every force-currency row
+  (its only disagreements are Charge's Barnes–Hut θ 0.5 rung, as before).
+  Gates (offline, locked, debug): seiche 109/109, 105/105 without default
+  features, 109/109 with `gpu`; pictograph `--features canvas --lib` 282
+  passed, 10 ignored; graphshell `--features web --lib` 231 passed, 1
+  ignored, single-threaded. Logs `gate-g1-*.log`, `physics-terms.log`.
