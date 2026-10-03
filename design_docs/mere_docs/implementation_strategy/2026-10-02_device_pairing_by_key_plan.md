@@ -2,7 +2,7 @@
 
 **Date**: 2026-10-02
 **Status (2026-10-02)**: in progress. Assessed and ruled by Mark on 2026-10-01
-and 2026-10-02 (rulings 1 to 34 below). D1 landed (`4963b489`); D1b's mere fix (M1)
+and 2026-10-02 (rulings 1 to 35 below). D1 landed (`4963b489`); D1b's mere fix (M1)
 landed (`177b927c`), its fork fix (F1) is being released as
 `mere-p2panda-net-0.7.5` with knot and mere repinned, and `connected` is
 being fixed; then D2.
@@ -303,7 +303,19 @@ Options: patch it onto the fork tag; leave it on crates.io 0.7.1. Mark:
 **"Patch it onto the fork tag (Recommended)"**. Follows: a `[patch.crates-io]`
 row in `ports/signalman`; its graph drops the dalek-2 family (287 to 278
 packages, measured). A desktop workspace outside mere that patches retinue
-will need the same row.
+will need the same row. *Superseded by ruling 35.*
+
+**Ruling 35.** *Mark asked "why not just align signalman with the rest of
+the stack?" Make it a member of mere's workspace?* The evidence: mere's root
+excluded it because "it consumes the neighboring Retinue checkout", but its
+Retinue dependencies are now git pins (rev `6af5c0ff`), and Retinue at that
+rev names no mere package, so joining creates no second lockstep. Options:
+join mere's workspace; keep ruling 34's patch row. Mark: **"Join mere's
+workspace (Recommended)"**. Follows: signalman drops its empty `[workspace]`
+table and its exclude entry, inherits the root patch table and lock, and is
+covered by the portable gate and every compiler census (insigne's phase A
+missed it as a nested workspace); mere's lock gains Retinue's crates at that
+rev.
 
 Also given in the same conversation (2026-10-01, Mark: "You can edit known
 hosts"): `known_hosts` entries may be updated, which was done for the
@@ -579,6 +591,14 @@ cleromancy (`:97-102`) and isometry (`:112`, `:246-264`) pin the fork's
 0.7.4 tag beside older mere revisions, which require `=0.7.4`; each moves to
 0.7.5 at its own next mere repin, as the insigne proofs plan's phase C
 handoff did.
+
+**2026-10-02: rulings 32 to 34 landed in another session's merge.** They were
+staged in the shared primary checkout while another session's merge was in
+progress (`MERGE_HEAD` set, a conflict open in the physics catalog plan), so
+that session's merge commit `8022cedd` ("Merge gpu-repulsion…") carries
+them; a `git notes` entry on `8022cedd` says so. The content is as intended.
+From here, staging in the shared checkout first checks that no merge,
+rebase or cherry-pick is in progress.
 
 ## 7. Progress
 
