@@ -77,6 +77,14 @@ Mark's words are quoted as the physics catalog plan records them (§3, P7, and �
 
 **F13, where the vocabulary is written (2026-10-03).** Question: where the vocabulary is recorded. Options: README and plans; plans only; README only. Mark: **"README + plans"**. *Follows:* a short design-vocabulary section in mere's README carrying both sides' tiers and Mark's timeline and relationship examples, this plan, and a pointer from the projection grammar catalog's §6; the README is coordinated with the Projection grammar session so only one edit lands. *Reading, not ruled:* the README's physics half waits on F11's design, since that design decides how the two sides relate.
 
+**F14, the descent test for terms with no energy (2026-10-03).** §3's third question was settled as "Lane picks by the positive control", but all three candidates separated seeded Kinds from symmetrized Kinds, so G1 returned the choice. Evidence (P2 fixture, then the 40-node generated graph): Jacobian asymmetry 0.29 / 0.30 against 1.2e-4 / 1.2e-4 (tolerance 2e-2); loop work 3.9e-2 / 6.6e-2 against 6.8e-7 / 2.5e-7 (tolerance 1e-3), with Flow's needle at only 1.26e-3 and at 8.8e-5 on a 20-step loop; persistent motion disagreeing with 57 declared readings. Options: Jacobian symmetry; loop work; both, flagging a term if either does; persistent motion. Mark: **"Jacobian symmetry"**. *Follows:* the class-agreement test asserts Jacobian symmetry for terms with no energy; loop work and persistent motion stay as printed diagnostics.
+
+**F15, velocity-driven terms (2026-10-03).** Question: Jacobian symmetry and loop work read positions only, so they read 0 for Boids' alignment and cruise and Orbit's counter-damping, while a velocity check reads 0.85–1.0 for those three and exactly 0 for every position-only term. Options: keep the velocity check beside the descent test; exempt velocity-reading terms by declaration. Mark: **"Keep velocity check"**. *Follows:* the velocity check runs beside the descent test, and a velocity-reading term declares N and is measured as such.
+
+**F16, approximations (2026-10-03).** Question: Barnes–Hut at θ 0.5 is not reciprocal (balance 1.3e-3 / 3.2e-3 against 1e-4, gradient error about 5.8e-3, one Jacobian start at 0.67), while θ 0 passes everything (balance about 1e-8). Options: a class describes the law, and an approximation's fidelity is tracked in G5; a per-approximation tolerance in the declaration now; declare Charge non-conservative as realized. Mark: **"Class is the law's"**. *Follows:* the test checks Charge at θ 0 and prints θ 0.5 beside it; approximation fidelity joins G5's realizations.
+
+**F17, the order of G2–G6 (2026-10-03).** Question: F11 reopens the arrangement pull, which touches G3 (capture-as-anchor in schedules), G4 (what the spec saves) and G6 (anchor satisfaction reports), while G2 is only an input to that design. Options: G2 now and the rest after the arrangement design rules; plan order now, reworking what the design changes; G6 first, then G2–G5. Mark: **"G2 now, rest after"**. *Follows:* G2 starts once G1 is merged; G3–G6 wait for the arrangement design's rulings.
+
 ### 1.2 Earlier rulings that are this plan's inputs
 
 From the physics catalog plan, §3 P5–P7 and §5:
@@ -236,6 +244,11 @@ Jacobian-symmetry and persistent-motion checks are tried, the one where
 seeded Kinds fails and symmetrized Kinds passes is kept, and the lane
 returns if more than one discriminates (the alternatives named loop work or
 Jacobian symmetry outright).
+
+*Annotation, 2026-10-03:* all three discriminated, so G1 returned the choice
+and the order of G2 to G6 with it. They are settled by rulings F14 to F17 in
+§1.1 (Jacobian symmetry; keep the velocity check; a class is the law's; G2
+now and G3 to G6 after the arrangement design).
 
 These are *Reading, not ruled*. Each returns to Mark at the named track's checkpoint, with evidence, if more than one answer is defensible.
 
