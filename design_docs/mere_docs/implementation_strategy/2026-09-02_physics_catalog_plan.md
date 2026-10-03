@@ -1018,6 +1018,24 @@ P5 and P6 stay in this plan.
   stop; Density's own demand for ticks (`physics-continuous` on the tree)
   is what drops when its passes end. On the fixture graph it dropped near
   frame 3 700 after Apply.
+- 2026-10-03 (P6a, the wander): rapier is not in it. Per pass the law now
+  records the flow's own net displacement of each node beside the observed
+  one, and after the first pass the remainder is 0.0000 spacings on every
+  graph, with no overlaps or near contacts; zeroing velocities after each
+  write leaves the traces identical, and holding nodes at the walls instead
+  of a radius inside them changes the 200-node graph little (final 0.771,
+  last two thirds 0.709 to 0.802). Two things move instead. On the 200-node
+  graph at 64² every pass moves the nodes about 0.05 spacings (5 px) and
+  never decays, the rim twice the interior and light nodes most; at 128² that
+  falls to 0.01–0.02 and the plateau rises to 0.82, so the grid's resolution
+  (a 22-px cell against a 25-px blur) is the large graph's cause. On the
+  small graphs the motion does decay (the 12-node sample to 0.0006 spacings
+  by pass 90) while the rank keeps moving: slow creep after an early stop,
+  and on the sample, whose masses take three values, a 1–2% area change that
+  flips pairs across tied mass groups. Over eight starts the sample settles
+  into one of two equilibria (the stop reading 0.84 or 0.53–0.59, half and
+  half) under every formulation tried. Logs: `probe-wander-*.raw`,
+  `probe-starts.raw` under `Code/testing/mere/density/`.
 
 ## 5. Decisions
 
@@ -1530,3 +1548,33 @@ binning are the useful patterns.
   removed every receipt fails (sample −0.395, gen-50 −0.246, 200 nodes
   −0.241, uniform CV 0.310 with 13 overlaps); restored. Bundle `71d48984…`.
   Gates (offline, debug): seiche 97/97 and 93/93 without default features; pictograph `--features canvas --lib` 277 passed, 2 ignored (the gen-50 receipt and the convergence probe); graphshell `--features web --lib` 230/230 on a rerun, the first run losing `carrier::tests::p2panda_murm_grant_is_refused_before_projection_bytes` to a projection-accept timeout in code this lane does not touch (`gate-graphshell-web-flake.log`); it passed twice alone.
+- 2026-10-03 (P6a, fifth round, after "Change the law"; main `ac75982d`
+  merged, two concurrent-append conflicts in this plan and one in the tree
+  lane resolved): the wander diagnosed (Findings) and five formulations
+  prototyped as Density fields, all off by default, the shift stop and the
+  passes still the catalog's: `decay` (each pass's diffusivity a fraction of
+  the last), `quench` (velocities zeroed after each write), `wall_inset`,
+  `relax` (over-relaxation at each pass's end) and `renew` (continuous
+  renewal: no passes, the field pulled every tick toward the nodes' current
+  splat, its steady smoothing set in spacings). The grid moved to
+  `laws/density/grid.rs` (density.rs 497 lines). Results, rank where the
+  shift stop lands over eight starts (12-node / gen-50 / 200-node, share at
+  or over 0.8): base passes 0.691 / 0.797 / 0.769 (4, 4, 2 of 8); `renew`
+  at two spacings 0.554 / 0.819 / 0.799 (0, 8, 4 of 8; the 200-node range
+  0.780–0.819, its shift decaying to 0.0016 by pass 90 and the rim no longer
+  leading); `decay` 0.9 0.708 / 0.784 / 0.739 (it freezes the transient);
+  128² 0.689 / 0.782 / 0.739 at 16 times the step cost (64–82 ms a tick
+  native against 3–4); `relax` 1.5 never stops and 1.8 collapses the rank;
+  `quench` and `wall_inset` change nothing. `renew` below about one spacing
+  freezes the nodes outright (its time constant falls under a tick, the
+  field becomes the raw splat, and a lone splat has no gradient). The
+  fixture, headed, on a diagnostic bundle with `renew` at two spacings (not
+  committed): the old page 0.82 at the stop; the tree, whose ticks per frame
+  vary run to run, ≥ 0.8, 0.40, 0.93 and 0.82 over four runs, against 0.71
+  and 0.53 under the passes. The gradient fault fails base and `renew` alike
+  (the seed's −0.395 / −0.246 / −0.241 held); Springs stays negative (−0.47
+  and −0.62 on the generated graphs). The web lock was taken from the P5
+  lane's worktree, whose manifest matches main's. Gates (offline, debug): seiche 103/103 and 99/99 without default features; pictograph `--features canvas --lib` 277 passed, 5 ignored (the gen-50 receipt and the probes); graphshell `--features web --lib` 230 passed, 1 ignored, single-threaded, after two parallel runs lost `session_notices::tests::the_endpoint_is_asked_even_while_no_request_is_in_flight` and `carrier::tests::p2panda_murm_grant_is_refused_before_projection_bytes` to timing under load, in code this lane does not touch (each passes alone; `gate-graphshell-web-flake*.log`).
+  Open, put to Mark: which formulation, if any, replaces the passes; and
+  what the bar means on a small, symmetric graph whose stop lands in one of
+  two equilibria by its start.

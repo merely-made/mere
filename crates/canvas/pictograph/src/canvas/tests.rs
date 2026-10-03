@@ -22,6 +22,7 @@ mod affinity;
 mod camera;
 mod density;
 mod density_probe;
+mod density_wander;
 mod fold_and_source_time;
 mod gloss;
 mod layout_and_drag;
