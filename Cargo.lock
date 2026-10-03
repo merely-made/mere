@@ -8102,14 +8102,14 @@ dependencies = [
 [[package]]
 name = "knot-site"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?rev=4d880910fd8b6ffa6e4227b65ea65278f3e8011b#4d880910fd8b6ffa6e4227b65ea65278f3e8011b"
+source = "git+https://github.com/merely-made/knot-editor.git?rev=ea3e99ef4a88c347b11b1e05fe7281334c0eea50#ea3e99ef4a88c347b11b1e05fe7281334c0eea50"
 dependencies = [
  "blake3",
  "gemini-protocol",
  "getrandom 0.2.17",
  "language-tags",
  "rcgen 0.13.2",
- "retinue 0.1.1",
+ "retinue",
  "rustls",
  "scroll-protocol",
  "serde",
@@ -9125,7 +9125,7 @@ dependencies = [
  "notochord",
  "p2panda-core",
  "personae",
- "retinue 0.2.0",
+ "retinue",
  "sha2 0.11.0",
  "snow",
  "stickleback",
@@ -13674,24 +13674,6 @@ dependencies = [
  "wasm-bindgen-futures",
  "wasm-streams",
  "web-sys",
-]
-
-[[package]]
-name = "retinue"
-version = "0.1.1"
-source = "git+https://github.com/merely-made/retinue.git?rev=85e716c7f06dac0a5253effe5ef06d05b266f02f#85e716c7f06dac0a5253effe5ef06d05b266f02f"
-dependencies = [
- "aes 0.9.3",
- "bzip2 0.6.1",
- "cbc 0.2.1",
- "ed25519-dalek 3.0.0",
- "getrandom 0.2.17",
- "heapless 0.9.3",
- "hkdf 0.13.0",
- "hmac 0.13.0",
- "sha2 0.11.0",
- "tokio",
- "x25519-dalek 3.0.0",
 ]
 
 [[package]]
