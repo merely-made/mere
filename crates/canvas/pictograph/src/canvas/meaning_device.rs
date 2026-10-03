@@ -12,6 +12,13 @@
 //! registered from its renderer's handles, so physics, embeddings and the
 //! renderer share one wgpu device and one CubeCL client. Native hosts only:
 //! the wasm web build leaves the feature off and takes the lexical fallback.
+//!
+//! A host enabling this boots its device greedy (`netrender::TenantNeeds {
+//! greedy: true }`, F31). CubeCL times kernels on the device whenever the
+//! **adapter** offers `TIMESTAMP_QUERY` (cubecl-wgpu `runtime.rs`), so on a
+//! device booted without it the model's first autotuned launch fails
+//! validation on CubeCL's own thread and the run never lands. [`DeviceMeaning::load`]
+//! refuses such a device with that reason rather than let it hang.
 
 use std::path::Path;
 
@@ -21,7 +28,26 @@ use esp::embed::{EmbedError, EmbeddingProvider, VectorIndex};
 use kernel::graph::NodeKey;
 
 use super::PhysicsDevice;
-use super::meaning::{MeaningBackend, MeaningEngine, MeaningParams};
+use super::meaning::{Embedded, MeaningBackend, MeaningEngine, MeaningParams};
+
+/// Whether `device` can carry the model, and why not: CubeCL times kernels
+/// on the device whenever the adapter offers `TIMESTAMP_QUERY`, so a device
+/// that lacks a feature its adapter has fails the model's first launch.
+pub fn check_meaning_device(device: &PhysicsDevice) -> Result<(), EmbedError> {
+    let Some(features) = device.features() else {
+        return Ok(());
+    };
+    if features.lacks_adapter_timestamps() {
+        return Err(EmbedError::InvalidConfig(
+            "the host's device lacks TIMESTAMP_QUERY, which its adapter offers; CubeCL times \
+             kernels on the device whenever the adapter has it, so the model's first launch \
+             would fail validation and never land. Boot the host device greedy \
+             (netrender::TenantNeeds { greedy: true }; dynamics grammar plan, F31)"
+                .to_string(),
+        ));
+    }
+    Ok(())
+}
 
 /// The Burn device a host's physics device registered: the same CubeCL
 /// client, never a new one.
@@ -42,7 +68,10 @@ pub struct DeviceMeaning {
 impl DeviceMeaning {
     /// Load the model in `model_dir` (a HuggingFace layout) on the host's
     /// device.
+    ///
+    /// Refuses a device the model cannot run on ([`check_meaning_device`]).
     pub fn load(model_dir: impl AsRef<Path>, device: &PhysicsDevice) -> Result<Self, EmbedError> {
+        check_meaning_device(device)?;
         Self::load_on(model_dir, host_meaning_device(device))
     }
 
@@ -84,20 +113,19 @@ impl MeaningEngine for DeviceMeaning {
         self.params
     }
 
-    fn embed(&self, texts: &[&str]) -> Result<Vec<Vec<f32>>, EmbedError> {
-        self.provider.embed(texts)
+    fn embed(&self, texts: &[&str]) -> Result<Embedded, EmbedError> {
+        self.provider.embed(texts).map(Embedded::Dense)
     }
 
-    fn pairs(
+    /// The device's batched search from the threshold up; below it, the
+    /// resumable row scan on the CPU.
+    fn index_pairs(
         &self,
         index: &VectorIndex<NodeKey>,
         params: MeaningParams,
-    ) -> Vec<(NodeKey, NodeKey, f32)> {
-        if index.len() >= self.pair_threshold {
+    ) -> Option<Vec<(NodeKey, NodeKey, f32)>> {
+        (index.len() >= self.pair_threshold).then(|| {
             affinity_pairs_over_index(index, params.top_k, params.min_similarity, &self.device)
-        } else {
-            esp::embed::affinity_pairs(index, params.top_k, params.min_similarity)
-                .unwrap_or_default()
-        }
+        })
     }
 }

@@ -8,39 +8,49 @@
 //! and kinds. (Dynamics grammar plan, G2: "'Meaning' as a source".)
 //!
 //! Each node's text (its title, or its URL when untitled) is embedded once
-//! per **content key**, a digest of every node's identity and text. A
-//! structural change re-reads the same snapshot; a title edit earns exactly
-//! one new run. The snapshot holds the top-k similarity pairs, a Louvain
-//! partition over them, and every node's cluster. Kinds, Group pull and the
-//! partition G3's grouped laws will read take the clusters; the affinity
-//! force takes the pairs, through [`Canvas::set_content_affinity`]. Meaning
-//! enters the physics through the ordinary rebuild path ("Snapshots only for
-//! now"): no per-step semantic field.
+//! per **content revision**, the graph kernel's counter of node-text changes
+//! (`Graph::content_revision`, F33). A structural change re-reads the same
+//! snapshot; a title edit earns exactly one new run. The snapshot holds the
+//! top-k similarity pairs, a Louvain partition over them, and every node's
+//! cluster. Kinds, Group pull and the partition G3's grouped laws will read
+//! take the clusters; the affinity force takes the pairs, through
+//! [`Canvas::set_content_affinity`]. Meaning enters the physics through the
+//! ordinary rebuild path ("Snapshots only for now"): no per-step semantic
+//! field.
 //!
-//! The embedder is a [`MeaningEngine`]. The default is lexical feature
-//! hashing on the CPU, which is the fallback everywhere and the wasm default.
-//! A native host with a renderer installs a sentence model on its own device
-//! (feature `meaning-gpu`). On a native, offloaded canvas each run happens on
-//! an actor thread ("Burn on the host device, off-path"); otherwise inline, as
-//! the community lane does.
+//! The embedder is a [`MeaningEngine`]. The default, [`LexicalMeaning`], is
+//! feature hashing on the CPU searched through ESP's sparse index (F35): the
+//! fallback everywhere and the wasm default. A native host with a renderer
+//! installs a sentence model on its own device (feature `meaning-gpu`). Where
+//! a run happens:
+//!
+//! - on a native, offloaded canvas, on the Meaning actor ("Burn on the host
+//!   device, off-path");
+//! - on wasm, in slices across frames, a bounded amount of work each frame
+//!   ([`Canvas::set_meaning_slice`], F35's "off-frame");
+//! - otherwise (tests, an unoffloaded native canvas) inline, whole.
 
-use std::collections::hash_map::DefaultHasher;
-use std::hash::{Hash, Hasher};
 use std::sync::Arc;
 use std::sync::atomic::{AtomicU64, Ordering};
 
 use esp::embed::{
-    EmbedError, EmbeddingProvider, LexicalEmbeddingProvider, SimilarityMetric, VectorIndex,
+    EmbedError, EmbeddingProvider, LexicalEmbeddingProvider, SparseVector, VectorIndex,
 };
-use kernel::graph::{Graph, NodeKey};
+use kernel::graph::NodeKey;
 
 use super::Canvas;
+pub(crate) use super::meaning_job::{MeaningJob, MeaningRequest, compute_meaning};
 use super::meaning_lane::MeaningActor;
 use super::physics_catalog::PhysicsKindSource;
-use crate::signals::{ClusterSet, CommunitySnapshot, community_louvain_on_snapshot};
+use crate::signals::ClusterSet;
 
 /// The lexical fallback's vector size: the top of ESP's range for short texts.
 pub const LEXICAL_DIMENSIONS: usize = 512;
+
+/// The wasm default for [`Canvas::set_meaning_slice`]: pair scores a frame
+/// may spend. Lexical vectors are sparse, so a score is a merge of a few
+/// dozen entries.
+pub const DEFAULT_MEANING_SLICE: usize = 40_000;
 
 /// What computed a snapshot.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
@@ -74,20 +84,49 @@ pub struct MeaningParams {
 }
 
 impl MeaningParams {
-    /// The lexical fallback's tuning, the best of a sweep on the topic
-    /// fixture (dynamics grammar plan, Findings, G2): at a floor of 0.2 most
-    /// titles find no pair and the clusters score no better than chance.
+    /// The lexical fallback's tuning, the best F of a sweep on the topic
+    /// fixture (F34; dynamics grammar plan, Findings, G2): at a floor of 0.2
+    /// most titles find no pair and the clusters score no better than chance.
     pub const LEXICAL: MeaningParams = MeaningParams {
         top_k: 4,
         min_similarity: 0.1,
     };
-    /// A sentence model's tuning, the best of a sweep of MiniLM on the topic
-    /// fixture (dynamics grammar plan, Findings, G2): at a floor of 0.3 the
-    /// clusters stay pure but each topic splits in four.
+    /// A sentence model's tuning, the best F of a sweep of MiniLM on the
+    /// topic fixture (F34): at a floor of 0.3 the clusters stay pure but each
+    /// topic splits in four.
     pub const MODEL: MeaningParams = MeaningParams {
         top_k: 4,
         min_similarity: 0.15,
     };
+}
+
+/// One embedding run's vectors.
+#[derive(Clone, Debug)]
+pub enum Embedded {
+    Dense(Vec<Vec<f32>>),
+    Sparse(Vec<SparseVector>),
+}
+
+impl Embedded {
+    pub(crate) fn len(&self) -> usize {
+        match self {
+            Embedded::Dense(vectors) => vectors.len(),
+            Embedded::Sparse(vectors) => vectors.len(),
+        }
+    }
+
+    pub(crate) fn extend(&mut self, more: Embedded) -> Result<(), EmbedError> {
+        match (self, more) {
+            (Embedded::Dense(a), Embedded::Dense(b)) => a.extend(b),
+            (Embedded::Sparse(a), Embedded::Sparse(b)) => a.extend(b),
+            _ => {
+                return Err(EmbedError::Backend(
+                    "an engine returned dense and sparse vectors in one run".to_string(),
+                ));
+            },
+        }
+        Ok(())
+    }
 }
 
 /// What embeds the nodes' texts and finds their pairs.
@@ -97,20 +136,67 @@ pub trait MeaningEngine: Send + Sync {
     fn params(&self) -> MeaningParams;
 
     /// One vector per text, in order.
-    fn embed(&self, texts: &[&str]) -> Result<Vec<Vec<f32>>, EmbedError>;
+    fn embed(&self, texts: &[&str]) -> Result<Embedded, EmbedError>;
 
-    /// Each entry's top-k neighbours above the floor, every unordered pair
-    /// once. The CPU scan by default; a device engine may override it.
-    fn pairs(
+    /// The pairs of a whole dense index at once, when this engine has a
+    /// faster path than the resumable row scan (a device kernel); `None`
+    /// takes the scan.
+    fn index_pairs(
         &self,
-        index: &VectorIndex<NodeKey>,
-        params: MeaningParams,
-    ) -> Vec<(NodeKey, NodeKey, f32)> {
-        esp::embed::affinity_pairs(index, params.top_k, params.min_similarity).unwrap_or_default()
+        _index: &VectorIndex<NodeKey>,
+        _params: MeaningParams,
+    ) -> Option<Vec<(NodeKey, NodeKey, f32)>> {
+        None
     }
 }
 
-/// Any embedding provider as an engine, with the CPU pair scan.
+/// The lexical fallback: hashed words, searched through the sparse index.
+pub struct LexicalMeaning {
+    provider: LexicalEmbeddingProvider,
+    params: MeaningParams,
+}
+
+impl LexicalMeaning {
+    pub fn new() -> Self {
+        Self {
+            provider: LexicalEmbeddingProvider::new(LEXICAL_DIMENSIONS)
+                .expect("a positive lexical dimension"),
+            params: MeaningParams::LEXICAL,
+        }
+    }
+
+    pub fn with_params(mut self, params: MeaningParams) -> Self {
+        self.params = params;
+        self
+    }
+}
+
+impl Default for LexicalMeaning {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl MeaningEngine for LexicalMeaning {
+    fn backend(&self) -> MeaningBackend {
+        MeaningBackend::Lexical
+    }
+
+    fn params(&self) -> MeaningParams {
+        self.params
+    }
+
+    fn embed(&self, texts: &[&str]) -> Result<Embedded, EmbedError> {
+        Ok(Embedded::Sparse(
+            texts
+                .iter()
+                .map(|text| self.provider.embed_sparse_one(text))
+                .collect(),
+        ))
+    }
+}
+
+/// Any embedding provider as an engine, with the CPU row scan.
 pub struct ProviderMeaning {
     provider: Box<dyn EmbeddingProvider>,
     backend: MeaningBackend,
@@ -134,13 +220,6 @@ impl ProviderMeaning {
         self.params = params;
         self
     }
-
-    /// The lexical fallback.
-    pub fn lexical() -> Self {
-        let provider = LexicalEmbeddingProvider::new(LEXICAL_DIMENSIONS)
-            .expect("a positive lexical dimension");
-        Self::new(Box::new(provider), MeaningBackend::Lexical)
-    }
 }
 
 impl MeaningEngine for ProviderMeaning {
@@ -152,21 +231,23 @@ impl MeaningEngine for ProviderMeaning {
         self.params
     }
 
-    fn embed(&self, texts: &[&str]) -> Result<Vec<Vec<f32>>, EmbedError> {
-        self.provider.embed(texts)
+    fn embed(&self, texts: &[&str]) -> Result<Embedded, EmbedError> {
+        self.provider.embed(texts).map(Embedded::Dense)
     }
 }
 
 /// One Meaning snapshot: what every consumer of the channel reads.
 #[derive(Clone, Debug)]
 pub struct MeaningSnapshot {
-    /// The content key it was computed for.
-    pub content_key: u64,
-    /// The engine generation it was computed under.
+    /// The graph's content revision it was computed for.
+    pub content_revision: u64,
+    /// The engine and graph generation it was computed under.
     pub generation: u64,
     pub backend: MeaningBackend,
     /// Which embedding run produced it, counting from one.
     pub run: u64,
+    /// How many slices the run took (one when it ran whole).
+    pub steps: u32,
     /// Similarity pairs, sorted, each unordered pair once.
     pub pairs: Vec<(NodeKey, NodeKey, f32)>,
     /// The Louvain partition of the pairs.
@@ -184,106 +265,24 @@ pub(crate) fn meaning_text(node: &kernel::graph::Node) -> &str {
     }
 }
 
-/// The digest a snapshot is keyed to: every node's identity and text, in key
-/// order. Structure, positions and anything else a node carries are out.
-pub fn content_key(graph: &Graph) -> u64 {
-    let mut hasher = DefaultHasher::new();
-    let mut nodes: Vec<_> = graph.nodes().collect();
-    nodes.sort_by_key(|(key, _)| key.index());
-    for (_, node) in nodes {
-        node.id.hash(&mut hasher);
-        meaning_text(node).hash(&mut hasher);
-    }
-    hasher.finish()
-}
-
-/// One run's inputs, `Send` so it can cross to the actor.
-pub(crate) struct MeaningRequest {
-    pub content_key: u64,
-    pub generation: u64,
-    pub keys: Vec<NodeKey>,
-    pub texts: Vec<String>,
-    pub engine: Arc<dyn MeaningEngine>,
-    pub runs: Arc<AtomicU64>,
-}
-
-impl MeaningRequest {
-    fn from_graph(graph: &Graph, state: &MeaningState, content_key: u64) -> Self {
-        let mut nodes: Vec<_> = graph.nodes().collect();
-        nodes.sort_by_key(|(key, _)| key.index());
-        Self {
-            content_key,
-            generation: state.generation,
-            keys: nodes.iter().map(|(key, _)| *key).collect(),
-            texts: nodes
-                .iter()
-                .map(|(_, node)| meaning_text(node).to_string())
-                .collect(),
-            engine: state.engine.clone(),
-            runs: state.runs.clone(),
-        }
-    }
-}
-
-/// Embed, pair and partition: one embedding run.
-pub(crate) fn compute_meaning(request: &MeaningRequest) -> Result<MeaningSnapshot, EmbedError> {
-    let run = request.runs.fetch_add(1, Ordering::SeqCst) + 1;
-    let engine = &request.engine;
-    let texts: Vec<&str> = request.texts.iter().map(String::as_str).collect();
-    let vectors = if texts.is_empty() {
-        Vec::new()
-    } else {
-        engine.embed(&texts)?
-    };
-    let dimensions = vectors.first().map_or(1, Vec::len);
-    let mut index = VectorIndex::new(dimensions, SimilarityMetric::Cosine);
-    for (key, vector) in request.keys.iter().zip(vectors) {
-        index
-            .insert(*key, vector)
-            .map_err(|error| EmbedError::Backend(format!("meaning index: {error:?}")))?;
-    }
-    let mut pairs = engine.pairs(&index, engine.params());
-    for pair in &mut pairs {
-        if pair.1 < pair.0 {
-            *pair = (pair.1, pair.0, pair.2);
-        }
-    }
-    pairs.sort_by_key(|(a, b, _)| (a.index(), b.index()));
-    let clusters = community_louvain_on_snapshot(&CommunitySnapshot::from_weighted_pairs(
-        request.keys.clone(),
-        &pairs,
-    ));
-    let mut groups: Vec<(NodeKey, u32)> = clusters
-        .clusters
-        .iter()
-        .enumerate()
-        .flat_map(|(i, cluster)| cluster.members.iter().map(move |&key| (key, i as u32)))
-        .collect();
-    groups.sort_by_key(|(key, _)| key.index());
-    Ok(MeaningSnapshot {
-        content_key: request.content_key,
-        generation: request.generation,
-        backend: engine.backend(),
-        run,
-        pairs,
-        clusters,
-        groups,
-    })
-}
-
 /// The canvas's Meaning state: the engine, the accepted snapshot, the run
-/// count, and the actor when runs go off-thread.
+/// count, and where a run happens.
 pub(crate) struct MeaningState {
-    engine: Arc<dyn MeaningEngine>,
-    /// Bumped when the engine changes, so an older engine's snapshot is stale.
-    generation: u64,
+    pub(crate) engine: Arc<dyn MeaningEngine>,
+    /// Bumped when the engine or the whole graph changes, so a snapshot of
+    /// the old one is stale whatever its content revision reads.
+    pub(crate) generation: u64,
     snapshot: Option<MeaningSnapshot>,
-    runs: Arc<AtomicU64>,
+    pub(crate) runs: Arc<AtomicU64>,
     actor: Option<MeaningActor>,
+    /// A sliced run in progress (wasm, or a host that asked for slices).
+    pending: Option<MeaningJob>,
+    /// Pair scores a frame may spend on a run; `None` runs it whole.
+    slice: Option<usize>,
     /// Whether the snapshot's pairs feed the affinity force's content signal.
     feeds_affinity: bool,
-    /// The `(content key, generation)` whose run failed, not retried until
-    /// either moves, and the error.
+    /// The `(content revision, generation)` whose run failed, not retried
+    /// until either moves, and the error.
     failed: Option<(u64, u64, String)>,
     /// The run the last law build read Meaning from. Test introspection.
     #[cfg(test)]
@@ -293,11 +292,13 @@ pub(crate) struct MeaningState {
 impl Default for MeaningState {
     fn default() -> Self {
         Self {
-            engine: Arc::new(ProviderMeaning::lexical()),
+            engine: Arc::new(LexicalMeaning::new()),
             generation: 0,
             snapshot: None,
             runs: Arc::new(AtomicU64::new(0)),
             actor: None,
+            pending: None,
+            slice: cfg!(target_arch = "wasm32").then_some(DEFAULT_MEANING_SLICE),
             feeds_affinity: false,
             failed: None,
             #[cfg(test)]
@@ -311,13 +312,23 @@ impl MeaningState {
         self.snapshot.as_ref()
     }
 
-    fn is_fresh(&self, content_key: u64) -> bool {
+    fn is_fresh(&self, tag: (u64, u64)) -> bool {
         self.snapshot
             .as_ref()
-            .is_some_and(|s| s.content_key == content_key && s.generation == self.generation)
-            || self.failed.as_ref().is_some_and(|(key, generation, _)| {
-                *key == content_key && *generation == self.generation
-            })
+            .is_some_and(|s| (s.content_revision, s.generation) == tag)
+            || self
+                .failed
+                .as_ref()
+                .is_some_and(|(revision, generation, _)| (*revision, *generation) == tag)
+    }
+
+    /// The whole graph was replaced: its content revision counts from its own
+    /// origin, so nothing computed for the old graph stands.
+    pub(crate) fn forget_graph(&mut self) {
+        self.generation += 1;
+        self.snapshot = None;
+        self.pending = None;
+        self.failed = None;
     }
 }
 
@@ -327,6 +338,7 @@ impl Canvas {
     pub fn set_meaning_engine(&mut self, engine: Arc<dyn MeaningEngine>) {
         self.meaning.engine = engine;
         self.meaning.generation += 1;
+        self.meaning.pending = None;
         self.meaning.failed = None;
     }
 
@@ -340,7 +352,7 @@ impl Canvas {
         self.meaning.snapshot.as_ref()
     }
 
-    /// How many embedding runs this canvas has made.
+    /// How many embedding runs this canvas has started.
     pub fn meaning_runs(&self) -> u64 {
         self.meaning.runs.load(Ordering::SeqCst)
     }
@@ -353,10 +365,27 @@ impl Canvas {
             .map(|(_, _, error)| error.as_str())
     }
 
+    /// Spread an inline run over frames, at most `scores` pair scores a frame
+    /// (`None`: run it whole when it starts). Wasm defaults to
+    /// [`DEFAULT_MEANING_SLICE`], so a large graph's run leaves the frame
+    /// (F35); an offloaded native canvas runs on its actor either way.
+    pub fn set_meaning_slice(&mut self, scores: Option<usize>) {
+        self.meaning.slice = scores.map(|scores| scores.max(1));
+    }
+
+    pub fn meaning_slice(&self) -> Option<usize> {
+        self.meaning.slice
+    }
+
+    /// Whether a sliced run is in progress.
+    pub fn meaning_pending(&self) -> bool {
+        self.meaning.pending.is_some()
+    }
+
     /// Feed the affinity force's content signal from the Meaning snapshot's
     /// pairs (under the [`cluster_by_affinity`](Self::set_cluster_by_affinity)
     /// toggle and its [`AffinityBlend`](crate::canvas::AffinityBlend)). Off
-    /// by default; turning it off clears the content signal.
+    /// by default (F36); turning it off clears the content signal.
     pub fn set_meaning_affinity(&mut self, on: bool) {
         if self.meaning.feeds_affinity == on {
             return;
@@ -381,49 +410,67 @@ impl Canvas {
             || (self.meaning.feeds_affinity && self.cluster_by_affinity())
     }
 
-    /// Bring the snapshot up to the graph's content: inline, or by a request
-    /// to the actor on a native offloaded canvas. Returns whether a new
-    /// snapshot was accepted now (inline only).
+    /// Bring the snapshot up to the graph's content revision: a request to
+    /// the actor on a native offloaded canvas, one slice of a sliced run, or
+    /// the whole run inline. Returns whether a new snapshot was accepted now.
     pub(crate) fn refresh_meaning(&mut self) -> bool {
-        let key = content_key(&self.graph);
-        if self.meaning.is_fresh(key) {
+        let tag = (self.graph.content_revision(), self.meaning.generation);
+        if self.meaning.is_fresh(tag) {
+            self.meaning.pending = None;
             return false;
         }
-        let generation = self.meaning.generation;
-        match self.offthread_wake.clone() {
-            Some(wake) => {
-                if self
-                    .meaning
-                    .actor
-                    .as_ref()
-                    .is_some_and(|actor| actor.inflight() == Some((key, generation)))
-                {
-                    return false;
-                }
-                let request = MeaningRequest::from_graph(&self.graph, &self.meaning, key);
-                self.meaning
-                    .actor
-                    .get_or_insert_with(|| MeaningActor::spawn(wake))
-                    .request(request);
-                false
+        if let Some(wake) = self.offthread_wake.clone() {
+            if self
+                .meaning
+                .actor
+                .as_ref()
+                .is_some_and(|actor| actor.inflight() == Some(tag))
+            {
+                return false;
+            }
+            let request = MeaningRequest::from_graph(&self.graph, &self.meaning);
+            self.meaning
+                .actor
+                .get_or_insert_with(|| MeaningActor::spawn(wake))
+                .request(request);
+            return false;
+        }
+        let Some(budget) = self.meaning.slice else {
+            let request = MeaningRequest::from_graph(&self.graph, &self.meaning);
+            return self.accept_meaning(tag, compute_meaning(request));
+        };
+        if self
+            .meaning
+            .pending
+            .as_ref()
+            .is_none_or(|job| job.tag() != tag)
+        {
+            let request = MeaningRequest::from_graph(&self.graph, &self.meaning);
+            self.meaning.pending = Some(MeaningJob::start(request));
+        }
+        let finished = self
+            .meaning
+            .pending
+            .as_mut()
+            .and_then(|job| job.advance(Some(budget)));
+        match finished {
+            Some(result) => {
+                self.meaning.pending = None;
+                self.accept_meaning(tag, result)
             },
-            None => {
-                let request = MeaningRequest::from_graph(&self.graph, &self.meaning, key);
-                let result = compute_meaning(&request);
-                self.accept_meaning(key, generation, result)
-            },
+            None => false,
         }
     }
 
     /// Keep the channel in step, once a frame: take a finished off-thread
-    /// run, start one when the content moved, and hand a new snapshot to its
-    /// consumers.
+    /// run, start or continue one when the content moved, and hand a new
+    /// snapshot to its consumers.
     pub(crate) fn sync_meaning(&mut self) {
         let mut landed = false;
         if let Some(update) = self.meaning.actor.as_mut().and_then(MeaningActor::drain) {
-            let key = content_key(&self.graph);
-            if update.content_key == key && update.generation == self.meaning.generation {
-                landed = self.accept_meaning(key, update.generation, update.result);
+            let tag = (self.graph.content_revision(), self.meaning.generation);
+            if (update.content_revision, update.generation) == tag {
+                landed = self.accept_meaning(tag, update.result);
             }
         }
         if self.wants_meaning() {
@@ -436,8 +483,7 @@ impl Canvas {
 
     fn accept_meaning(
         &mut self,
-        key: u64,
-        generation: u64,
+        (revision, generation): (u64, u64),
         result: Result<MeaningSnapshot, EmbedError>,
     ) -> bool {
         match result {
@@ -451,7 +497,7 @@ impl Canvas {
                 true
             },
             Err(error) => {
-                self.meaning.failed = Some((key, generation, error.to_string()));
+                self.meaning.failed = Some((revision, generation, error.to_string()));
                 false
             },
         }

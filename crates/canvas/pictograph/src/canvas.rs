@@ -211,9 +211,13 @@ pub mod meaning;
 /// A sentence model on the host's own device for the Meaning channel.
 #[cfg(feature = "meaning-gpu")]
 pub mod meaning_device;
+mod meaning_job;
 mod meaning_lane;
 pub use channels::{Channel, ChannelFamily, ChannelValues};
-pub use meaning::{MeaningBackend, MeaningEngine, MeaningParams, MeaningSnapshot, ProviderMeaning};
+pub use meaning::{
+    Embedded, LexicalMeaning, MeaningBackend, MeaningEngine, MeaningParams, MeaningSnapshot,
+    ProviderMeaning,
+};
 
 /// Force-directed settle length (frames) after a (re)seed, ~6s at 60fps.
 const SETTLE_TICKS: u32 = 360;

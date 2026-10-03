@@ -532,7 +532,10 @@ impl Canvas {
             after_cull,
         );
 
-        let needs_redraw = settling || gliding || dragging || self.ambient.is_some();
+        // A sliced Meaning run advances once a frame, so it asks for the next
+        // one until it lands. (Dynamics grammar plan, G2, F35.)
+        let needs_redraw =
+            settling || gliding || dragging || self.ambient.is_some() || self.meaning_pending();
         observer.mark(9);
         (scene, needs_redraw)
     }

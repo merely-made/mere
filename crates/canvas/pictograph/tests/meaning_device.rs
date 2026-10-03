@@ -5,9 +5,10 @@
 // SPDX-License-Identifier: MPL-2.0
 
 //! The Meaning channel's sentence model on the host's device (dynamics
-//! grammar plan, G2, P7's Meaning condition): on the topic fixture, cluster
-//! purity is recorded on the native GPU, on the CPU with the same model, and
-//! on the lexical fallback, and the GPU path shares the host's device.
+//! grammar plan, G2, P7's Meaning condition): on the arXiv fixture (900
+//! titles, six categories; F42, F43), cluster purity is recorded on the native
+//! GPU, on the CPU with the same model, and on the lexical fallback, F34's bar
+//! is asserted, and the GPU path shares the host's device.
 //!
 //! "A single device" is asserted three ways: the engine's device is the one
 //! the host's `PhysicsDevice` registered; loading the model raises that
@@ -22,7 +23,8 @@
 //! launch fails validation (the first run of this receipt, kept in the lane's
 //! `meaning-device.log`).
 //!
-//! Ignored by default: it needs the local MiniLM artifact and an adapter.
+//! The purity receipt is ignored by default: it needs the local MiniLM
+//! artifact and an adapter. The boot receipt needs an adapter only.
 //!
 //! `ESP_MINILM_DIR=<repo>/models/all-MiniLM-L6-v2 cargo test -p pictograph
 //! --features meaning-gpu --test meaning_device -- --ignored --nocapture
@@ -41,11 +43,16 @@ use std::time::{Duration, Instant};
 
 use esp::embed::bert::{Device, DeviceKind};
 use kernel::graph::NodeKey;
-use meaning_topics::{f_measure, inverse_purity, partition, purity, shuffled_topics, topic_graph};
-use pictograph::canvas::meaning_device::{DeviceMeaning, host_meaning_device};
+use meaning_topics::{
+    ARXIV_CATEGORIES, arxiv_graph, confusion, f_measure, inverse_purity, partition, purity,
+    shuffled,
+};
+use pictograph::canvas::meaning_device::{
+    DeviceMeaning, check_meaning_device, host_meaning_device,
+};
 use pictograph::canvas::{
-    Canvas, MeaningBackend, MeaningEngine, MeaningSnapshot, PhysicsKindSource, PhysicsLaw,
-    ProviderMeaning, physics_device_for,
+    Canvas, Embedded, LexicalMeaning, MeaningBackend, MeaningEngine, MeaningParams,
+    MeaningSnapshot, PhysicsKindSource, PhysicsLaw, ProviderMeaning, physics_device_for,
 };
 
 const MEBIBYTE: u64 = 1 << 20;
@@ -59,7 +66,7 @@ fn model_dir() -> PathBuf {
 /// One snapshot on `engine`, through the canvas's ordinary path: Kinds by
 /// meaning, inline.
 fn snapshot_on(engine: Arc<dyn MeaningEngine>) -> (MeaningSnapshot, u64) {
-    let (graph, _, _) = topic_graph();
+    let (graph, _, _) = arxiv_graph();
     let mut canvas = Canvas::with_graph(graph);
     canvas.set_meaning_engine(engine);
     canvas.set_physics_kind_source(PhysicsKindSource::Meaning);
@@ -159,12 +166,12 @@ fn the_model_on_the_host_device_shares_it_and_records_purity() {
     );
     drop(control);
 
-    let (_, keys, topics) = topic_graph();
-    let shuffled = shuffled_topics(&keys);
+    let (_, keys, topics) = arxiv_graph();
+    let shuffled = shuffled(&keys, &topics);
 
     // Off-path: on an offloaded canvas the run happens on the Meaning actor,
     // and no frame waits for it.
-    let (graph, _, _) = topic_graph();
+    let (graph, _, _) = arxiv_graph();
     let mut canvas = Canvas::with_graph(graph);
     canvas.offload_physics(Arc::new(|| {}));
     canvas.set_physics_device(Some(device.clone()));
@@ -175,7 +182,7 @@ fn the_model_on_the_host_device_shares_it_and_records_purity() {
     // The build dispatched the run; frames go on while it is in flight.
     let dispatched = Instant::now();
     let mut in_flight: Vec<Duration> = Vec::new();
-    let deadline = Instant::now() + Duration::from_secs(120);
+    let deadline = Instant::now() + Duration::from_secs(600);
     while canvas.meaning().is_none() {
         assert!(Instant::now() < deadline, "the actor's run landed");
         let frame = Instant::now();
@@ -209,11 +216,10 @@ fn the_model_on_the_host_device_shares_it_and_records_purity() {
     );
 
     // A second content, on warm kernels: one more run, off-path again.
-    let (_, keys_now, _) = topic_graph();
     canvas.ingest_graph(|g| {
         use kernel::graph::fixtures::GraphFixtures;
         g.set_node_title(
-            keys_now[3],
+            keys[3],
             "Watching meteor showers from a dark site".to_string(),
         )
     });
@@ -221,7 +227,7 @@ fn the_model_on_the_host_device_shares_it_and_records_purity() {
     let mut frames = 0;
     while canvas.meaning().is_some_and(|s| s.run == 1) {
         assert!(
-            edited.elapsed() < Duration::from_secs(120),
+            edited.elapsed() < Duration::from_secs(600),
             "the second run landed"
         );
         canvas.frame(1024, 600);
@@ -251,7 +257,7 @@ fn the_model_on_the_host_device_shares_it_and_records_purity() {
     println!("model on the CPU: load and run {:?}", started.elapsed());
     assert_eq!(cpu_runs, 1);
     let cpu_row = row("model on the CPU", &cpu.groups, &topics, &shuffled);
-    let (lexical, _) = snapshot_on(Arc::new(ProviderMeaning::lexical()));
+    let (lexical, _) = snapshot_on(Arc::new(LexicalMeaning::new()));
     assert_eq!(lexical.backend, MeaningBackend::Lexical);
     let lexical_row = row(
         "lexical fallback on the CPU",
@@ -267,6 +273,43 @@ fn the_model_on_the_host_device_shares_it_and_records_purity() {
         partition(&gpu.groups) == partition(&cpu.groups)
     );
 
+    print_confusion("model on the host's GPU", &gpu.groups, &topics);
+    print_confusion("lexical fallback", &lexical.groups, &topics);
+
+    // The model's tuning neighbourhood, over the GPU's vectors embedded once,
+    // for the record (the search and partition run per tuning).
+    let texts: Vec<String> = {
+        let (graph, _, _) = arxiv_graph();
+        keys.iter()
+            .map(|k| graph.get_node(*k).unwrap().title.clone())
+            .collect()
+    };
+    let text_refs: Vec<&str> = texts.iter().map(String::as_str).collect();
+    let vectors = engine.embed(&text_refs).expect("the GPU embeds the corpus");
+    let mut best = (0.0, MeaningParams::MODEL);
+    for top_k in [2, 4, 8, 16] {
+        for min_similarity in [0.1, 0.15, 0.2, 0.25, 0.3, 0.4] {
+            let params = MeaningParams {
+                top_k,
+                min_similarity,
+            };
+            let (swept, _) = snapshot_on(Arc::new(Fixed {
+                vectors: vectors.clone(),
+                params,
+            }));
+            let (f, _) = row(
+                &format!("model sweep top_k {top_k} min {min_similarity}"),
+                &swept.groups,
+                &topics,
+                &shuffled,
+            );
+            if f > best.0 {
+                best = (f, params);
+            }
+        }
+    }
+    println!("model sweep best: F {:.3} at {:?}", best.0, best.1);
+
     // The measure says no to shuffled topics on every backend, and the model
     // knows more than the lexical fallback.
     for (name, (f, control)) in [("GPU", gpu_row), ("CPU", cpu_row), ("lexical", lexical_row)] {
@@ -280,24 +323,91 @@ fn the_model_on_the_host_device_shares_it_and_records_purity() {
         (gpu_row.0 - cpu_row.0).abs() < 0.05,
         "{gpu_row:?} against {cpu_row:?}"
     );
+    // F34's bar: the model at F >= 0.9 on GPU and CPU.
+    assert!(gpu_row.0 >= 0.9, "the model on the GPU: F {:.3}", gpu_row.0);
+    assert!(cpu_row.0 >= 0.9, "the model on the CPU: F {:.3}", cpu_row.0);
+}
 
-    // The model's tuning neighbourhood, on the host's device, for the record.
-    for top_k in [2, 4, 8] {
-        for min_similarity in [0.15, 0.2, 0.25, 0.3, 0.4] {
-            let params = pictograph::canvas::MeaningParams {
-                top_k,
-                min_similarity,
-            };
-            let engine = DeviceMeaning::load(&model, &device)
-                .expect("the model loads")
-                .with_params(params);
-            let (swept, _) = snapshot_on(Arc::new(engine));
-            row(
-                &format!("model sweep top_k {top_k} min {min_similarity}"),
-                &swept.groups,
-                &topics,
-                &shuffled,
-            );
-        }
+/// Each large group's counts by category.
+fn print_confusion(name: &str, groups: &[(NodeKey, u32)], topics: &HashMap<NodeKey, usize>) {
+    println!(
+        "{name}: groups holding at least 2% of the titles, counts by category {ARXIV_CATEGORIES:?}"
+    );
+    for (size, counts) in confusion(groups, topics, ARXIV_CATEGORIES.len(), 0.02) {
+        println!("  group of {size:>3}: {counts:?}");
     }
+}
+
+/// Vectors embedded once, replayed for a sweep's tunings.
+struct Fixed {
+    vectors: Embedded,
+    params: MeaningParams,
+}
+
+impl MeaningEngine for Fixed {
+    fn backend(&self) -> MeaningBackend {
+        MeaningBackend::ModelGpu
+    }
+
+    fn params(&self) -> MeaningParams {
+        self.params
+    }
+
+    fn embed(&self, texts: &[&str]) -> Result<Embedded, esp::embed::EmbedError> {
+        assert_eq!(texts.len(), 900, "a sweep replays the whole corpus at once");
+        Ok(self.vectors.clone())
+    }
+}
+
+/// F31: a host enabling the model boots its device greedy. A device booted
+/// the default way, on an adapter that offers timestamp queries, is refused
+/// with the reason before any model is read (the model path here does not
+/// exist); the greedy boot passes the same check. Skips without an adapter;
+/// says so when the adapter has no timestamps to miss.
+#[test]
+fn a_default_boot_is_refused_with_its_reason_and_a_greedy_boot_passes() {
+    let Ok(plain) = netrender::boot() else {
+        eprintln!("no wgpu adapter: skipping the boot receipt");
+        return;
+    };
+    let info = plain.adapter.get_info();
+    let default_device = physics_device_for(&plain);
+    let features = default_device
+        .features()
+        .expect("built from the host's handles");
+    println!(
+        "adapter {} ({:?}): default boot lacks the adapter's timestamps: {}",
+        info.name,
+        info.backend,
+        features.lacks_adapter_timestamps()
+    );
+    if !features.lacks_adapter_timestamps() {
+        eprintln!("this adapter offers no timestamp queries: nothing for a default boot to lack");
+        return;
+    }
+    let refused = DeviceMeaning::load("no/such/model", &default_device)
+        .err()
+        .expect("a default boot is refused");
+    println!("refused: {refused}");
+    assert!(refused.to_string().contains("TIMESTAMP_QUERY"), "{refused}");
+    assert!(refused.to_string().contains("greedy"), "{refused}");
+    drop(default_device);
+    drop(plain);
+
+    let needs = netrender::TenantNeeds {
+        greedy: true,
+        ..Default::default()
+    };
+    let greedy = netrender::boot_shared(info.backend.into(), None, &needs).expect("a greedy boot");
+    let device = physics_device_for(&greedy);
+    assert!(!device.features().unwrap().lacks_adapter_timestamps());
+    check_meaning_device(&device).expect("a greedy boot carries the model");
+    // Past the check, a missing model is a load error, not the boot refusal.
+    let missing = DeviceMeaning::load("no/such/model", &device)
+        .err()
+        .expect("no model at that path");
+    assert!(
+        !missing.to_string().contains("TIMESTAMP_QUERY"),
+        "{missing}"
+    );
 }

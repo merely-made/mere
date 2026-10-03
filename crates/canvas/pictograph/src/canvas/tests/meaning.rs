@@ -11,13 +11,12 @@
 //! lexical fallback's purity on the topic fixture is recorded here; the
 //! sentence model's, on the host's device, in `tests/meaning_device.rs`.
 
-use super::meaning_topics::{
-    community, f_measure, inverse_purity, partition, purity, shuffled_topics, topic_graph,
-};
+use super::meaning_topics::{community, f_measure, inverse_purity, partition, purity, topic_graph};
 use super::*;
 use crate::canvas::channels::{Channel, ChannelFamily, ChannelValues};
 use crate::canvas::meaning::{
-    MeaningBackend, MeaningParams, MeaningRequest, ProviderMeaning, compute_meaning, content_key,
+    LexicalMeaning, MeaningBackend, MeaningEngine, MeaningParams, MeaningRequest, ProviderMeaning,
+    compute_meaning,
 };
 use crate::canvas::physics_catalog::{PhysicsKindSource, PhysicsLaw, PhysicsOverlay};
 
@@ -431,7 +430,7 @@ fn one_meaning_snapshot_feeds_kinds_group_pull_affinity_and_groups() {
     assert_eq!(canvas.meaning_runs(), 1, "one run for one content");
     let snapshot = canvas.meaning().expect("a snapshot").clone();
     assert_eq!(snapshot.run, 1);
-    assert_eq!(snapshot.content_key, content_key(canvas.graph()));
+    assert_eq!(snapshot.content_revision, canvas.graph().content_revision());
     assert_eq!(
         canvas.meaning.built_from,
         Some(1),
@@ -522,9 +521,32 @@ pub(crate) fn purity_row(
     (f, control)
 }
 
+/// Print each large group's counts by category: where a partition puts each
+/// category, for the receipts.
+pub(crate) fn print_confusion(
+    name: &str,
+    groups: &[(NodeKey, u32)],
+    topics: &HashMap<NodeKey, usize>,
+) {
+    use super::meaning_topics::{ARXIV_CATEGORIES, confusion};
+    println!(
+        "{name}: groups holding at least 2% of the titles, counts by category {ARXIV_CATEGORIES:?}"
+    );
+    for (size, counts) in confusion(groups, topics, ARXIV_CATEGORIES.len(), 0.02) {
+        println!("  group of {size:>3}: {counts:?}");
+    }
+}
+
+/// F34's lexical bar on the arXiv fixture (F42, F43): the lexical fallback
+/// beats the shuffled-topic control, site and structure. On a flat title list
+/// site and structure are the two degenerate partitions: every title is on
+/// `arxiv.org` (one group) and no title links another (Louvain leaves every
+/// title alone), so each stands for a channel that knows nothing of topics.
 #[test]
-fn the_lexical_fallback_records_its_purity_on_the_topic_fixture() {
-    let (mut canvas, keys, topics) = topic_canvas();
+fn the_lexical_fallback_records_its_purity_on_the_arxiv_fixture() {
+    use super::meaning_topics::{arxiv_graph, shuffled};
+    let (graph, keys, topics) = arxiv_graph();
+    let mut canvas = Canvas::with_graph(graph);
     canvas.set_physics_kind_source(PhysicsKindSource::Meaning);
     canvas.set_physics_law(PhysicsLaw::Kinds);
     let snapshot = canvas
@@ -533,61 +555,261 @@ fn the_lexical_fallback_records_its_purity_on_the_topic_fixture() {
         .clone();
     assert_eq!(snapshot.backend, MeaningBackend::Lexical);
     canvas.refresh_community_cache("kanban.community");
-    let shuffled = shuffled_topics(&keys);
-    let meaning = purity_row("lexical meaning", &snapshot.groups, &topics, &shuffled);
-    let site = purity_row(
-        "site",
-        &canvas.channel_groups(PhysicsKindSource::Site),
+    let shuffled = shuffled(&keys, &topics);
+    let meaning = purity_row(
+        "arxiv lexical meaning",
+        &snapshot.groups,
         &topics,
         &shuffled,
     );
+    let site_groups = canvas.channel_groups(PhysicsKindSource::Site);
+    assert_eq!(
+        partition(&site_groups).len(),
+        1,
+        "every title is on arxiv.org"
+    );
+    let site = purity_row("arxiv site (one group)", &site_groups, &topics, &shuffled);
+    let cluster_groups = canvas.channel_groups(PhysicsKindSource::Cluster);
+    assert_eq!(
+        partition(&cluster_groups).len(),
+        keys.len(),
+        "no title links another"
+    );
     let cluster = purity_row(
-        "cluster",
-        &canvas.channel_groups(PhysicsKindSource::Cluster),
+        "arxiv structure (every title alone)",
+        &cluster_groups,
         &topics,
         &shuffled,
     );
     println!(
-        "lexical meaning: {} pairs, mean weight {:.3}, params {:?}",
+        "arxiv lexical meaning: {} pairs, mean weight {:.3}, params {:?}",
         snapshot.pairs.len(),
         snapshot.pairs.iter().map(|p| p.2).sum::<f32>() / snapshot.pairs.len().max(1) as f32,
         MeaningParams::LEXICAL,
     );
+    print_confusion("arxiv lexical meaning", &snapshot.groups, &topics);
     // The tuning's neighbourhood, for the record.
     let texts: Vec<String> = keys
         .iter()
         .map(|k| canvas.graph().get_node(*k).unwrap().title.clone())
         .collect();
-    for top_k in [2, 4, 8] {
-        for min_similarity in [0.05, 0.1, 0.2, 0.3] {
+    for top_k in [2, 4, 8, 16] {
+        for min_similarity in [0.05, 0.1, 0.15, 0.2, 0.3] {
             let params = MeaningParams {
                 top_k,
                 min_similarity,
             };
             let request = MeaningRequest {
-                content_key: 0,
+                content_revision: 0,
                 generation: 0,
                 keys: keys.clone(),
                 texts: texts.clone(),
-                engine: std::sync::Arc::new(ProviderMeaning::lexical().with_params(params)),
+                engine: std::sync::Arc::new(LexicalMeaning::new().with_params(params)),
                 runs: Default::default(),
             };
-            let swept = compute_meaning(&request).unwrap();
+            let swept = compute_meaning(request).unwrap();
             purity_row(
-                &format!("lexical sweep top_k {top_k} min {min_similarity}"),
+                &format!("arxiv lexical sweep top_k {top_k} min {min_similarity}"),
                 &swept.groups,
                 &topics,
                 &shuffled,
             );
         }
     }
-    // The measure says no where it should: neither site nor structure knows
-    // the topics, and the shuffled topics are unknowable.
-    assert!(site.0 < 0.5 && cluster.0 < 0.5, "{site:?} {cluster:?}");
+    // F34: the lexical fallback beats the controls.
+    assert!(meaning.0 > meaning.1, "beats shuffled topics: {meaning:?}");
     assert!(
-        meaning.1 < meaning.0,
-        "shuffled topics score lower: {meaning:?}"
+        meaning.0 > site.0,
+        "beats site: {meaning:?} against {site:?}"
     );
-    // And yes where it should: lexical meaning knows more than either.
-    assert!(meaning.0 > site.0 && meaning.0 > cluster.0, "{meaning:?}");
+    assert!(
+        meaning.0 > cluster.0,
+        "beats structure: {meaning:?} against {cluster:?}"
+    );
+}
+
+/// The request every engine-comparison receipt runs: the topic fixture's
+/// titles, in key order.
+fn topic_request(engine: std::sync::Arc<dyn MeaningEngine>) -> MeaningRequest {
+    let (graph, keys, _) = topic_graph();
+    MeaningRequest {
+        content_revision: graph.content_revision(),
+        generation: 0,
+        keys: keys.clone(),
+        texts: keys
+            .iter()
+            .map(|k| graph.get_node(*k).unwrap().title.clone())
+            .collect(),
+        engine,
+        runs: Default::default(),
+    }
+}
+
+/// F35: lexical pairs come from ESP's sparse index, and they are the dense
+/// index's pairs exactly (the same hashed vectors, bit-identical scores), so
+/// the recorded purity stands; the control is the dense run itself.
+#[test]
+fn the_sparse_lexical_search_matches_the_dense_one() {
+    let sparse =
+        compute_meaning(topic_request(std::sync::Arc::new(LexicalMeaning::new()))).unwrap();
+    let dense_engine = ProviderMeaning::new(
+        Box::new(
+            esp::embed::LexicalEmbeddingProvider::new(crate::canvas::meaning::LEXICAL_DIMENSIONS)
+                .unwrap(),
+        ),
+        MeaningBackend::Lexical,
+    );
+    let dense = compute_meaning(topic_request(std::sync::Arc::new(dense_engine))).unwrap();
+    assert!(!sparse.pairs.is_empty());
+    assert_eq!(
+        sparse.pairs, dense.pairs,
+        "the same pairs, the same weights"
+    );
+    assert_eq!(sparse.groups, dense.groups);
+}
+
+/// F35's off-frame run: sliced, a run spreads over frames, a bounded number
+/// of pair scores each, and lands with the snapshot a whole run gives; it
+/// counts once. While it is in flight Kinds by meaning reads site.
+#[test]
+fn a_sliced_run_lands_over_frames_with_the_whole_runs_snapshot() {
+    let (mut whole, _, _) = topic_canvas();
+    whole.set_physics_kind_source(PhysicsKindSource::Meaning);
+    whole.set_physics_law(PhysicsLaw::Kinds);
+    let expected = whole.meaning().expect("inline: whole at build").clone();
+    assert_eq!(expected.steps, 1);
+
+    let (mut canvas, _, _) = topic_canvas();
+    // 32 nodes: 64 scores is two rows a frame, so the scan alone is 16 slices.
+    canvas.set_meaning_slice(Some(64));
+    canvas.set_physics_kind_source(PhysicsKindSource::Meaning);
+    canvas.set_physics_law(PhysicsLaw::Kinds);
+    assert!(
+        canvas.meaning().is_none(),
+        "the build did one slice, not the run"
+    );
+    assert!(canvas.meaning_pending());
+    let mut frames = 0;
+    while canvas.meaning().is_none() {
+        canvas.frame(800, 600);
+        frames += 1;
+        assert!(frames < 100, "the sliced run landed");
+    }
+    let sliced = canvas.meaning().unwrap();
+    println!("sliced run: {} steps, {frames} frames", sliced.steps);
+    assert!(
+        sliced.steps >= 17,
+        "embed, sixteen scan slices, partition: {}",
+        sliced.steps
+    );
+    assert_eq!(sliced.pairs, expected.pairs);
+    assert_eq!(sliced.groups, expected.groups);
+    assert_eq!(canvas.meaning_runs(), 1, "a sliced run counts once");
+    assert!(!canvas.meaning_pending());
+    assert_eq!(
+        canvas.meaning.built_from,
+        Some(1),
+        "the landing rebuilt the law"
+    );
+}
+
+/// F33's key is the graph's own counter, so a different graph can read the
+/// same value: replacing the graph forgets the snapshot (the control: the
+/// counters match, yet the run happens).
+#[test]
+fn a_replaced_graph_earns_its_own_run_whatever_its_revision_reads() {
+    let (mut canvas, _, _) = topic_canvas();
+    canvas.set_physics_kind_source(PhysicsKindSource::Meaning);
+    canvas.set_physics_law(PhysicsLaw::Kinds);
+    assert_eq!(canvas.meaning_runs(), 1);
+    let before = canvas.meaning().unwrap().generation;
+    let (other, _, _) = topic_graph();
+    assert_eq!(
+        other.content_revision(),
+        canvas.graph().content_revision(),
+        "the counters agree"
+    );
+    canvas.set_graph(other);
+    // The swap rebuilds the graph-bound law, which runs Meaning for the new
+    // graph at once rather than reading the old graph's snapshot.
+    for _ in 0..3 {
+        canvas.frame(800, 600);
+    }
+    assert_eq!(canvas.meaning_runs(), 2, "the new graph's own run");
+    let after = canvas.meaning().expect("the new graph's snapshot");
+    assert_eq!(after.run, 2);
+    assert!(
+        after.generation > before,
+        "computed under the new graph's generation"
+    );
+}
+
+/// F35's cost receipt: a lexical run's time by graph size, whole through the
+/// sparse search, beside the dense search it replaced, and the slowest slice
+/// at the wasm default. Run in release:
+/// `cargo test --release -p pictograph --features canvas --lib -- --ignored meaning_cost --nocapture`
+#[test]
+#[ignore = "a timing receipt: run in release"]
+fn meaning_cost_by_graph_size() {
+    use std::time::{Duration, Instant};
+
+    use super::meaning_topics::TITLES;
+    use crate::canvas::meaning::{DEFAULT_MEANING_SLICE, LEXICAL_DIMENSIONS, MeaningJob};
+    println!(
+        "profile: {}",
+        if cfg!(debug_assertions) {
+            "debug"
+        } else {
+            "release"
+        }
+    );
+    for n in [32usize, 500, 2000] {
+        let keys: Vec<NodeKey> = (0..n).map(NodeKey::new).collect();
+        let texts: Vec<String> = (0..n)
+            .map(|i| format!("{} {i}", TITLES[(i / 8) % 4][i % 8]))
+            .collect();
+        let request = |engine: std::sync::Arc<dyn MeaningEngine>| MeaningRequest {
+            content_revision: 0,
+            generation: 0,
+            keys: keys.clone(),
+            texts: texts.clone(),
+            engine,
+            runs: Default::default(),
+        };
+        let started = Instant::now();
+        let sparse = compute_meaning(request(std::sync::Arc::new(LexicalMeaning::new()))).unwrap();
+        let sparse_time = started.elapsed();
+        let dense_engine = ProviderMeaning::new(
+            Box::new(esp::embed::LexicalEmbeddingProvider::new(LEXICAL_DIMENSIONS).unwrap()),
+            MeaningBackend::Lexical,
+        );
+        let started = Instant::now();
+        let dense = compute_meaning(request(std::sync::Arc::new(dense_engine))).unwrap();
+        let dense_time = started.elapsed();
+        assert_eq!(sparse.pairs, dense.pairs, "{n} nodes: the same pairs");
+        let mut job = MeaningJob::start(request(std::sync::Arc::new(LexicalMeaning::new())));
+        let mut slices: Vec<Duration> = Vec::new();
+        loop {
+            let started = Instant::now();
+            let done = job.advance(Some(DEFAULT_MEANING_SLICE));
+            slices.push(started.elapsed());
+            if let Some(result) = done {
+                assert_eq!(result.unwrap().pairs, sparse.pairs);
+                break;
+            }
+        }
+        let partition = slices.last().copied().unwrap_or_default();
+        let mut sorted = slices.clone();
+        sorted.sort();
+        println!(
+            "lexical cost, {n} nodes: sparse whole {sparse_time:?}, dense whole {dense_time:?}; \
+             sliced at {DEFAULT_MEANING_SLICE} scores: {} slices, p95 {:?}, slowest {:?}, the \
+             partition slice {partition:?}; {} pairs, {} groups",
+            slices.len(),
+            sorted[(sorted.len() * 95 / 100).min(sorted.len() - 1)],
+            sorted.last().unwrap(),
+            sparse.pairs.len(),
+            sparse.clusters.clusters.len(),
+        );
+    }
 }
