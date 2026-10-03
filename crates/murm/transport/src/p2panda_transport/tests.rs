@@ -323,7 +323,7 @@ async fn the_peer_directory_separates_a_known_address_from_a_live_path() {
     use tokio_stream::StreamExt;
 
     let topic = [0x5b; 32];
-    let (alice_kp, alice_id) = make_inputs(90);
+    let (alice_kp, _) = make_inputs(90);
     let (bob_kp, bob_id) = make_inputs(91);
 
     let alice = P2pandaTransport::builder(&alice_kp)
@@ -361,11 +361,12 @@ async fn the_peer_directory_separates_a_known_address_from_a_live_path() {
 
     // Now actually talk to him, over the gossip overlay rather than a
     // hand-rolled ALPN: a dial to a protocol the peer does not serve is
-    // refused, which produces no path and would prove nothing.
+    // refused, which produces no path and would prove nothing. Bob does not
+    // tag Alice, so only Alice dials: when both dial at once, iroh can mark a
+    // live path inactive, and that case has its own test below.
     bob.add_peer(alice.endpoint_addr().await.unwrap())
         .await
         .unwrap();
-    bob.set_topics(alice_id, &[topic]).await.unwrap();
     let alice_handle = alice.subscribe(topic).await.expect("alice subscribe");
     let bob_handle = bob.subscribe(topic).await.expect("bob subscribe");
     let mut bob_rx = bob_handle.subscribe();
