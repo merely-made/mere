@@ -1615,3 +1615,22 @@ binning are the useful patterns.
   to change (the passes' cap meets 0.8 on gen-50 from every dealt start
   measured); and what the bar is on the 12-node sample, whose rest itself
   ranges 0.35 to 0.86 by start.
+- 2026-10-03 (P6a, seventh round, after "Later stop, measured" and "0.8
+  from 50 nodes up"): `Density.min_passes` (zero by default: the stop test
+  may end the passes only from that pass on) and the stop variants measured
+  over the sixteen dealt starts (`density_stop_variants`; logs
+  `probe-stop-variants-*.raw`). Rank where each stop lands, min / mean /
+  count at the bar / mean passes (one pass is a second of flow): gen-50 at
+  0.8 — ruled shift 0.05 0.618 / 0.722 / 1 / 6; the 120-pass cap 0.699 /
+  0.796 / 9 / 120; shift 0.02 0.638 / 0.756 / 6 / 10.5; shift 0.01 0.655 /
+  0.770 / 5 / 20.7; at least 20 passes 0.639 / 0.769 / 5 / 20; 40 passes
+  0.671 / 0.789 / 7 / 40; 60 passes 0.713 / 0.790 / 9 / 60. The 200-node
+  graph at 0.7 — ruled 0.684 / 0.754 / 14 / 29.5; cap 0.732 / 0.780 / 16 /
+  120; shift 0.02 and 0.01 never stop before the cap there; 20 passes 0.700 /
+  0.766 / 15 / 30.2; 40 passes 0.703 / 0.773 / 16 / 44.2; 60 passes 0.703 /
+  0.777 / 16 / 63.8. The sample: density CV falls on all sixteen starts under
+  every variant; the rank rises over the seed's on all sixteen under the cap
+  (least gain 0.128) and the 60-pass minimum (0.084), on 14 or 15 under the
+  rest. Springs on the same dealt starts reads −0.44 to −0.55 on both
+  generated graphs. No default changed: the cap itself puts 9 of 16 gen-50
+  starts at 0.8, so which statistic the bar is goes back to Mark.
