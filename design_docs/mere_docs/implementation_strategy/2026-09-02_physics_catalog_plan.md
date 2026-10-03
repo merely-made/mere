@@ -605,6 +605,22 @@ pull reading −0.33 with 510 overlaps):
   dev and possibly otherwise. Let's consider how we might go from x0.20 to
   x50?"** *Follows:* none of the options as put; seiche's speed goes to its
   own design, put back to Mark. Density's merge waits on the interim choice.
+  *Put back the same day:* asked whether he meant a simulation-speed dial
+  (simulated seconds per wall second, 0.2x to 50x), seiche's compute speed in
+  dev and test builds (a debug build runs about 14x slower than release; one
+  Density start is ~115 s debug against ~8 s release), or both, Mark chose
+  **"Both"**. Asked how the dial changes a run (ticks per frame at a fixed
+  dt; a scaled dt; fixed dt up to a budget, then dt), he chose **"Ticks per
+  frame, fixed dt"**: the trajectory is the same at every speed, fast-forward
+  runs more ticks a frame up to a compute budget and reports when it cannot
+  keep up, and slow motion steps less often and interpolates what is drawn
+  between ticks. Asked what Density's merge carries meanwhile (release bars
+  with a quick default; keep 401 s; hold the merge), he chose **"Release
+  bars, quick default"**: all sixteen dealt starts are asserted in release as
+  ignored receipts that Density-touching lanes and merges run, and the
+  default suite keeps one quick sample check. *Reading, not ruled:* the dev
+  build's speed is measured before any profile change, since an opt-level
+  override touches every dev build of the crates it names.
 - **Energy's receipt passes off screen (2026-10-03).** In
   `p4_tree_physics_energy`'s settled capture one node and one edge are in
   view and the rest of the 11-node fixture has left it; the start frame
