@@ -336,9 +336,13 @@ plan's G7 builds it. The Progress entries below keep their words: their
 - **A finding for mer3ly.** `PlacementDelta::holds`
   (`mer3ly/crates/repo-graph/src/lib.rs`, line 1878) records a pin placed
   under mer3ly's `anchored` motion as `Hold::Anchored`, "best effort by the
-  visitor's own choice", and a test at line 3034 asserts it. Under F25 that
-  line keeps compiling but changes meaning, from best effort to returning,
-  the next time mer3ly repins mere. Scores mer3ly has already shared read
+  visitor's own choice", and a test at line 3034 asserts it. The sandbox's
+  `shelfmarkPlacement` (`mer3ly/assets/graph-sandbox.js`, line 1521) makes
+  the same choice in JS. The live path itself hard-pins a manual pin in
+  either motion (`pinNode`, `mer3ly/crates/repo-graph/src/lib.rs`, line 399),
+  so the recorded class already differs from the live behaviour under
+  `anchored`. Under F25 the Rust line keeps compiling but changes meaning,
+  from best effort to returning, the next time mer3ly repins mere. Scores mer3ly has already shared read
   back as seeded, through the alias. Which role those pins should take
   returns to Mark with mer3ly's mobility move, which G7 lists outside its
   track.
