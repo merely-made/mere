@@ -495,6 +495,33 @@ pull reading −0.33 with 510 overlaps):
   refuses them with a reason until the currency work. The alternatives were
   dropping them silently, or allowing and marking the mix.
 
+*Third round, ruled 2026-10-02* (P5 checkpoint `60a990a5` and Density
+`5f529c64`):
+- **P5 web staleness, reopened.** Chrome answers a readback about two frames
+  after submit, so the newest answer was six steps old at every size from 128
+  to 2,000 nodes; at the ruled N = 3 the 2,000-node web run used the GPU for
+  9 of 418 steps (physics 94 ms a frame against the CPU's 82), at N = 9 for
+  413 of 418 (6.1 ms) within the CPU twin's bounds. Mark chose "Web N = 9,
+  web threshold 400", amending the staleness ruling's web default. The
+  alternatives were deriving N from the step cap, or keeping N = 3.
+- **P5's Cambium change.** cubecl-wgpu 0.11-pre.2 always enables wgpu's
+  `fragile-send-sync-non-atomic-wasm`, which feature unification puts on the
+  page's one wgpu, so wasm `map_async` callbacks must be `Send`. Mark chose
+  "Commit Arc<AtomicBool>" for the readback flag in
+  `cambium-genet-web-host/src/capture.rs`. The alternatives were vendoring
+  cubecl-wgpu without the feature, or keeping `canvas-gpu` off on the web.
+- **Density's stop test.** "Shift < 0.05 for 3 passes": passes end when the
+  mean node shift stays under 0.05 spacings for three passes, the 120-pass
+  cap the fallback, a drag re-arming it (the sample stops at pass 5 at 0.84,
+  gen-50 at 6 at 0.78, the 200-node graph at 18 at 0.76). The alternatives
+  were a field-CV test, or the cap alone.
+- **Density's bar at 200 nodes.** Over 90 one-second passes at 64² the rank
+  wanders 0.73 to 0.79; round two's 0.81 was one sample of that trace. Mark
+  chose "Accept a plateau bar for large graphs": 0.8 holds on the sample and
+  gen-50; the 200-node receipt asserts at least 0.7 with its plateau
+  recorded, revisited with P6b's 512² GPU grid. The alternatives were
+  searching for other defaults, or changing the law.
+
 *Done when:* GPU and CPU forces agree to 1e-3 relative at 1k and 10k nodes;
 a sign-flipped kernel fails the overlap check (positive control); a forced
 adapter failure falls back and still passes; the eleven law receipts stay
