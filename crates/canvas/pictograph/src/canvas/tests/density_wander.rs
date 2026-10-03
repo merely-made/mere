@@ -603,3 +603,126 @@ fn density_sample_stop_against_cap() {
         );
     }
 }
+
+/// A stop under test: the shift test, its patience, and the passes before it
+/// may end them, all under the 120-pass cap.
+#[derive(Clone, Copy, Debug)]
+struct StopVariant {
+    name: &'static str,
+    stop: DensityStop,
+    min_passes: u32,
+}
+
+const STOP_VARIANTS: [StopVariant; 7] = [
+    StopVariant {
+        name: "ruled",
+        stop: DensityStop::Shift(0.05),
+        min_passes: 0,
+    },
+    StopVariant {
+        name: "cap",
+        stop: DensityStop::Cap,
+        min_passes: 0,
+    },
+    StopVariant {
+        name: "shift0.02",
+        stop: DensityStop::Shift(0.02),
+        min_passes: 0,
+    },
+    StopVariant {
+        name: "shift0.01",
+        stop: DensityStop::Shift(0.01),
+        min_passes: 0,
+    },
+    StopVariant {
+        name: "min20",
+        stop: DensityStop::Shift(0.05),
+        min_passes: 20,
+    },
+    StopVariant {
+        name: "min40",
+        stop: DensityStop::Shift(0.05),
+        min_passes: 40,
+    },
+    StopVariant {
+        name: "min60",
+        stop: DensityStop::Shift(0.05),
+        min_passes: 60,
+    },
+];
+
+/// The later stops measured: every variant over sixteen dealt starts, the
+/// rank, CV and overlaps where it stops against the seed's, and the passes
+/// (seconds of flow) it took. `DENSITY_GRAPH` picks one graph.
+#[test]
+#[ignore = "wander probe: later stops over sixteen dealt starts"]
+fn density_stop_variants() {
+    let only = std::env::var("DENSITY_GRAPH").unwrap_or_default();
+    let graphs = [
+        ("sample-12", crate::canvas::build::sample_graph()),
+        ("gen-50", generated(50, 3)),
+        ("gen-200", generated(200, 7)),
+    ];
+    for (name, graph) in graphs.iter().filter(|(n, _)| only.is_empty() || *n == only) {
+        for variant in STOP_VARIANTS {
+            let mut rows = Vec::new();
+            for k in 0..16u64 {
+                let mut canvas = seeded_dealt(graph.clone(), k as f32 * 2.399_963, k + 1);
+                let seed = canvas.layout_stats();
+                let masses = canvas.law_inputs().masses(PhysicsMassSource::Degree);
+                let mut law = crate::canvas::physics_catalog::density_law(masses);
+                law.stop = variant.stop;
+                law.patience = 3;
+                law.min_passes = variant.min_passes;
+                law.max_passes = 120;
+                let law = Arc::new(law);
+                install(&mut canvas, &law);
+                super::density::until_settled(&mut canvas, 60 * 122);
+                let end = canvas.layout_stats();
+                let passes = law.pass_history().len() as u32;
+                rows.push((seed, end, passes));
+            }
+            let ranks: Vec<f32> = rows.iter().map(|(_, e, _)| e.mass_area_rank).collect();
+            let gain: Vec<f32> = rows
+                .iter()
+                .map(|(s, e, _)| e.mass_area_rank - s.mass_area_rank)
+                .collect();
+            let cv_fall = rows
+                .iter()
+                .filter(|(s, e, _)| e.density_cv < s.density_cv)
+                .count();
+            let passes: Vec<u32> = rows.iter().map(|(_, _, p)| *p).collect();
+            let mean = |v: &[f32]| v.iter().sum::<f32>() / v.len() as f32;
+            let min = ranks.iter().cloned().fold(f32::MAX, f32::min);
+            let overlaps: usize = rows.iter().map(|(_, e, _)| e.overlaps).sum();
+            println!(
+                "STOPV {name} | {} | rank min {min:.3} mean {:.3} >=0.8 {}/16 >=0.7 {}/16 | gain over seed min {:.3} mean {:.3} (rose {}/16) | cv fell {}/16 | passes mean {:.1} max {} (seconds of flow) | overlaps {overlaps} | ranks {:?} | passes {:?}",
+                variant.name,
+                mean(&ranks),
+                ranks.iter().filter(|r| **r >= 0.8).count(),
+                ranks.iter().filter(|r| **r >= 0.7).count(),
+                gain.iter().cloned().fold(f32::MAX, f32::min),
+                mean(&gain),
+                gain.iter().filter(|g| **g > 0.0).count(),
+                cv_fall,
+                passes.iter().sum::<u32>() as f32 / 16.0,
+                passes.iter().max().unwrap_or(&0),
+                ranks
+                    .iter()
+                    .map(|r| (r * 100.0).round() / 100.0)
+                    .collect::<Vec<_>>(),
+                passes,
+            );
+        }
+        // The negative control on the same dealt starts: Springs' rank.
+        let springs: Vec<f32> = (0..4u64)
+            .map(|k| {
+                let mut canvas = seeded_dealt(graph.clone(), k as f32 * 2.399_963, k + 1);
+                canvas.set_physics_law(PhysicsLaw::Springs).unwrap();
+                run(&mut canvas, 900);
+                canvas.layout_stats().mass_area_rank
+            })
+            .collect();
+        println!("STOPV {name} | springs control | ranks {springs:?}");
+    }
+}
