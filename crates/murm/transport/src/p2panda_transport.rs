@@ -44,7 +44,7 @@
 //! [`endpoint_addr`]: P2pandaTransport::endpoint_addr
 //! [`add_peer`]: P2pandaTransport::add_peer
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::future::Future;
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr};
 use std::pin::Pin;
@@ -376,7 +376,9 @@ pub struct KnownPeer {
     pub reachable: bool,
     /// Whether this node is configured as a discovery bootstrap locally.
     pub bootstrap: bool,
-    /// Whether the endpoint currently holds an ACTIVE path to this peer.
+    /// Whether this node is talking to the peer now: the endpoint holds an
+    /// ACTIVE path to it, OR it is a direct gossip neighbour on this topic's
+    /// overlay (a `NeighbourUp` not yet followed by a `NeighbourDown`).
     ///
     /// The honest answer to "are we talking to it", as opposed to "do we know
     /// where it lives". Distinguishing these is not pedantry: a firewall rule
@@ -384,6 +386,12 @@ pub struct KnownPeer {
     /// hours, and because the address book still held an address, the host
     /// reported the peer as reachable throughout and looked healthy while
     /// nothing whatsoever replicated (2026-08-03).
+    ///
+    /// Either signal suffices because the path signal alone reads false on
+    /// working links: when both sides dial at once, iroh can report every
+    /// address inactive for seconds while gossip keeps delivering. iroh's own
+    /// view stays readable, unmixed, in
+    /// [`peer_paths`](P2pandaTransport::peer_paths).
     pub connected: bool,
 }
 
@@ -888,6 +896,16 @@ impl P2pandaTransport {
     /// against its own subscribed topics, so the raw query returns self as a
     /// reachable peer, which every caller would have to filter out.
     pub async fn peers_for_topic(&self, topic: [u8; 32]) -> Result<Vec<KnownPeer>, TransportError> {
+        self.peers_for_topic_counting(topic, true).await
+    }
+
+    /// [`peers_for_topic`](Self::peers_for_topic) with the gossip half of
+    /// `connected` switchable, so a test can show what the path half says alone.
+    async fn peers_for_topic_counting(
+        &self,
+        topic: [u8; 32],
+        count_neighbours: bool,
+    ) -> Result<Vec<KnownPeer>, TransportError> {
         let infos = self
             .address_book
             .node_infos_by_topics([Topic::from(topic)])
@@ -900,6 +918,11 @@ impl P2pandaTransport {
         // cannot tell "not connected" from "could not ask" is exactly the
         // problem this field exists to end.
         let endpoint = self.endpoint.endpoint().await.ok();
+        let neighbours = if count_neighbours {
+            self.gossip_neighbours(topic).await
+        } else {
+            HashSet::new()
+        };
         let mut peers = Vec::new();
         for info in infos {
             if info.node_id.as_bytes() == &local {
@@ -907,7 +930,7 @@ impl P2pandaTransport {
             }
             let peer = PeerID::from_bytes(info.node_id.as_bytes())
                 .map_err(|e| TransportError::Backend(format!("peer id: {e}")))?;
-            let connected = match &endpoint {
+            let path_active = match &endpoint {
                 Some(endpoint) => endpoint
                     .remote_info(
                         iroh::PublicKey::from_bytes(info.node_id.as_bytes()).map_err(|e| {
@@ -927,10 +950,27 @@ impl P2pandaTransport {
                 peer,
                 reachable: info.transports.is_some(),
                 bootstrap: info.bootstrap,
-                connected,
+                connected: path_active || neighbours.contains(info.node_id.as_bytes()),
             });
         }
         Ok(peers)
+    }
+
+    /// Direct gossip neighbours on `topic`'s overlay, from the gossip
+    /// manager's own record of its `NeighbourUp` and `NeighbourDown` events,
+    /// the record LogSync reads too.
+    ///
+    /// Empty without gossip, or when the overlay cannot be asked, the same
+    /// fallback as the endpoint in [`peers_for_topic`](Self::peers_for_topic).
+    async fn gossip_neighbours(&self, topic: [u8; 32]) -> HashSet<[u8; 32]> {
+        let Some(gossip) = &self.gossip else {
+            return HashSet::new();
+        };
+        gossip
+            .events_with_neighbours(Topic::from(topic))
+            .await
+            .map(|(_, neighbours)| neighbours.iter().map(|node| *node.as_bytes()).collect())
+            .unwrap_or_default()
     }
 
     /// Stop treating `peer` as a member of `topic`'s overlay: the inverse of
@@ -1071,6 +1111,9 @@ impl P2pandaTransport {
     ///
     /// The readable form of [`peer_ticket`](Self::peer_ticket)'s address set,
     /// plus the one fact a ticket drops: which address is the live path.
+    ///
+    /// iroh's path state alone, so a gossip neighbour can be
+    /// [`connected`](KnownPeer::connected) with no address active here.
     pub async fn peer_paths(&self, peer: PeerID) -> Result<Vec<PeerPath>, TransportError> {
         let endpoint = self
             .endpoint

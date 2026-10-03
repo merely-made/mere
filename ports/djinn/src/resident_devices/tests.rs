@@ -122,6 +122,32 @@ fn an_unlisted_device_is_not_connected_and_a_bad_hint_says_why() {
     );
 }
 
+/// A gossip neighbour is connected while iroh marks no path active, and the
+/// card says so rather than naming an empty path.
+#[test]
+fn a_connected_device_with_no_active_path_says_so() {
+    let thinkpad = peer(0x54);
+    let live = KnownPeer {
+        peer: thinkpad,
+        reachable: true,
+        bootstrap: false,
+        connected: true,
+    };
+    let mut path = [PeerPath {
+        addr: direct("192.168.1.32:51234"),
+        active: false,
+    }];
+    let idle = directory_entry(&paired(thinkpad, None), Some(&live), &path);
+    assert!(idle.connected);
+    assert_eq!(
+        card_value(&idle).value,
+        "connected, no active path right now"
+    );
+    path[0].active = true;
+    let busy = directory_entry(&paired(thinkpad, None), Some(&live), &path);
+    assert_eq!(card_value(&busy).value, "connected via 192.168.1.32:51234");
+}
+
 /// The directory moves under a reader; the snapshot it took stays whole.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn a_snapshot_keeps_its_resources_while_the_directory_moves() {
