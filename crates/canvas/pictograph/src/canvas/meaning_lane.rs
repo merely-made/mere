@@ -74,10 +74,10 @@ impl MeaningActor {
         while let Ok(update) = self.updates.try_recv() {
             latest = Some(update);
         }
-        if let Some(update) = &latest {
-            if self.inflight == Some((update.content_key, update.generation)) {
-                self.inflight = None;
-            }
+        if let Some(update) = &latest
+            && self.inflight == Some((update.content_key, update.generation))
+        {
+            self.inflight = None;
         }
         latest
     }
