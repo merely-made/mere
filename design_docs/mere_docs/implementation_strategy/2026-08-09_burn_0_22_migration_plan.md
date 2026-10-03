@@ -5,7 +5,8 @@ and `f62581c7` are merged (`bcb57356`, `b73695da`), with conatus's P5 lanes
 adapted to pre.4. Root and web graphs hold one pre.4 family and no Turso.
 Native GPU gates pass, S13 (b) extrema passes headed, and the P5 2,000-node
 web settle meets its bounds. Two stops are held as forks. S13 (c) still
-leaves 10 allocations against zero (ruling 411's unanswered repair fork).
+leaves 10 allocations against zero (ruling 411's unanswered repair fork)
+(answered by ruling 508).
 The pre.4 wasm bundle also runs about fifty times slower per frame than
 pre.2, because its static constructors re-run on each call. No push, main
 promotion or downstream repin.
@@ -3069,11 +3070,10 @@ before any acceptance run.
 ### 13.31 The two held forks ruled (2026-10-03)
 
 Both of §13.30's held forks went to Mark on 2026-10-03, after the
-coordinator re-read the gate and A/B records. Their numbers in Isometry's
-wing design record, which holds rulings 410 and 411, are being assigned
-with the wing session and are added here when known.
+coordinator re-read the gate and A/B records. They are Isometry wing
+rulings 508 and 509 (`f702f0a`).
 
-**The allocator repair (ruling 411's pending fork).** Question: pre.4's
+**Ruling 508: the allocator repair (ruling 411's pending fork).** Question: pre.4's
 remote lifecycle gate holds 10 allocations (5,323,776 bytes) after reclaim
 until an explicit `client.sync()`, which takes it to zero in 2.2 ms; where
 does the repair go? Options: the burn-remote close path awaits cleanup
@@ -3084,7 +3084,7 @@ strict numerical and recovery gates, preserves a second live lease's
 identity and tensor values, and rejects an injected synchronization
 failure.
 
-**The wasm constructors.** Question: pre.4 frames take 557 ms against
+**Ruling 509: the wasm constructors.** Question: pre.4 frames take 557 ms against
 pre.2's 12.1 ms, GPU on or off, because the module re-runs its static
 constructors on every JS-to-wasm call (pliron's `inventory` registrations
 via `cubecl-core`, upstream, not our patches); native is unaffected, and
