@@ -54,6 +54,12 @@ use taproot::ProbeSnapshot;
 mod capture;
 mod scenario;
 pub use capture::{CaptureBackend, Readback};
+pub use capture::{StampedFrame, StampedReadback};
+mod pairing;
+pub use pairing::{
+    CaptureObserver, CapturePairing, CaptureProjection, CaptureProjectionLimits, CaptureRequest,
+    Presentation,
+};
 pub use scenario::{CaptureRecord, LaneConfig};
 mod checkpoints;
 mod clicks;
@@ -67,6 +73,11 @@ pub use checkpoints::{Checkpoint, Checkpoints};
 pub use cost::{CostObservation, Costs, Totals};
 pub use lane::{Capture, Lane, capture_path};
 pub use pixels::{PixelCheck, Viewport, ViewportTransform, create_parent, write_png};
+
+/// A bounded, product-redacted diagnostics batch for a requested run receipt.
+/// The product chooses its reader and correlation references. Sampling at the
+/// lane's completion does not establish that every record caused a captured frame.
+pub type DiagnosticBatch = apparatus::Batch<serde_json::Value>;
 
 /// The host context a [`Product`]'s hooks are handed, spelled once.
 pub type Ctx<'a, P> =
@@ -82,7 +93,7 @@ pub trait Product: Sized {
     /// The host application state the Cambium runner holds.
     type State: 'static;
     /// The view logic the runner diffs into a DOM.
-    type Logic: FnMut(&Self::State) -> Self::View;
+    type Logic: FnMut(&Self::State) -> Self::View + 'static;
     /// The root view type that logic produces.
     type View: RootView<Self::State>;
 
@@ -100,6 +111,15 @@ pub trait Product: Sized {
     /// `captures` is how many captures have completed; `opacity` is the value
     /// the `opacity` verb last set.
     fn snapshot(&self, ctx: &Ctx<'_, Self>, captures: usize, opacity: f32) -> ProbeSnapshot;
+
+    /// Optional owned observer for a requested capture. The host evaluates it
+    /// on the successful presentation's state/layout before pointer or AT
+    /// dispatch. Return a fresh run identity and a bounded, product-redacted
+    /// projection; absent revision/causal facts must remain absent. Returning
+    /// `None` preserves the established uncorrelated receipt shape and timing.
+    fn capture_observer(&self) -> Option<CaptureObserver<Self>> {
+        None
+    }
 
     /// Drain the semantic events emitted since the last call.
     fn drain_events(&mut self, _ctx: &mut Ctx<'_, Self>) -> Vec<String> {
@@ -147,6 +167,19 @@ pub trait Product: Sized {
     /// Product diagnostics included in the text receipt and JSON `product_log`.
     fn receipt_lines(&self) -> Vec<String> {
         Vec::new()
+    }
+
+    /// Optional bounded diagnostics, sampled once after `complete`. Return a
+    /// batch from an independent Apparatus cursor so this receipt does not
+    /// consume another inspector's records. Products redact before recording
+    /// and explicitly enable export under their run policy. `None` preserves
+    /// the existing receipt format; an error fails the requested receipt.
+    /// This hook reports observations, not product success or pixel causality.
+    fn diagnostic_attachment(
+        &mut self,
+        _ctx: &mut Ctx<'_, Self>,
+    ) -> Result<Option<DiagnosticBatch>, String> {
+        Ok(None)
     }
 
     /// Write product-specific receipts once, after all captures and acceptance

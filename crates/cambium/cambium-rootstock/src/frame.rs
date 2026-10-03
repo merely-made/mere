@@ -21,7 +21,7 @@ use genet_render::VisualCaret;
 use genet_scripted_dom::NodeId;
 use layout_dom_api::{DomMutation, LayoutDomMut as _};
 use netrender::{ColorLoad, ExternalTexturePlacement};
-use paint_list_api::{ColorF, DeviceIntSize, PaintEnvelope, PaintList as _};
+use paint_list_api::{DeviceIntSize, PaintEnvelope, PaintList as _};
 
 use crate::input::to_visual_caret;
 use crate::meristem_bounds::RootView;
@@ -88,6 +88,8 @@ where
                 close: &mut self.s.close_requested,
                 wake: &self.wake,
                 capture: &mut self.s.pending_capture,
+                presentation_observer: &mut self.s.pending_presentation_observer,
+                capture_stamped: &mut self.s.pending_stamped_capture,
                 capture_paint: &mut self.s.pending_paint_capture,
                 pointer: &mut self.s.pending_pointer,
                 scroll: &mut self.s.pending_scroll,
@@ -418,8 +420,8 @@ where
         );
     }
 
-    /// Emit this frame's paint list — content, then the caret/selection
-    /// overlay, then whatever overlay scrollbars are mid-hold or mid-fade — and
+    /// Emit this frame's paint list with selection and caret inside the text
+    /// field's CSS paint context, then any active overlay scrollbars, and
     /// lower it to a netrender scene plus the GPU resources that scene names.
     fn emit_scene(&mut self, lw: f32, lh: f32) -> Option<EmittedScene> {
         let focused_overlay = self.focused_overlay();
@@ -434,6 +436,7 @@ where
         let mut list = layout.emit_paint_list_with_leaves(
             &*dom_ref,
             DeviceIntSize::new(lw as i32, lh as i32),
+            focused_overlay,
             |key| source.leaf_commands(key),
             // A retained fragment has no CSS clip or layer identity in the
             // renderer yet. Keep custom leaves in the recorded Livery slot as
@@ -441,45 +444,6 @@ where
             // This preserves their stacking relation to DOM overlays.
             |_| None,
         );
-        if let Some((node, caret, selection)) = focused_overlay {
-            if let Some((start, end)) = selection {
-                let rects = layout.selection_rects(&*dom_ref, node, start, end);
-                let color = layout
-                    .selection_style(&*dom_ref, node)
-                    .map(|(bg, _)| ColorF {
-                        r: bg[0],
-                        g: bg[1],
-                        b: bg[2],
-                        a: bg[3],
-                    })
-                    .unwrap_or(ColorF {
-                        r: 0.20,
-                        g: 0.45,
-                        b: 0.90,
-                        a: 0.35,
-                    });
-                for rect in rects {
-                    crate::OwnedLayout::push_rect(&mut list, rect, color);
-                }
-            }
-            if let Some(rect) = layout.caret_rect_for_position(&*dom_ref, node, caret, 2.0) {
-                let color = layout
-                    .caret_color(&*dom_ref, node)
-                    .map(|rgba| ColorF {
-                        r: rgba[0],
-                        g: rgba[1],
-                        b: rgba[2],
-                        a: rgba[3],
-                    })
-                    .unwrap_or(ColorF {
-                        r: 0.92,
-                        g: 0.94,
-                        b: 0.98,
-                        a: 1.0,
-                    });
-                crate::OwnedLayout::push_rect(&mut list, rect, color);
-            }
-        }
         // Overlay scrollbar thumbs mid-hold/mid-fade: the engine draws the
         // geometry, the shared fade clock supplies alpha.
         let now = crate::Instant::now();
@@ -664,6 +628,22 @@ where
         let phase = crate::Instant::now();
         surface.queue().present(frame);
         profile.present_us = elapsed_us(phase.elapsed());
+        let Some(sequence) = self.s.presentation_sequence.checked_add(1) else {
+            eprintln!("[cambium-host] presentation sequence exhausted");
+            return;
+        };
+        self.s.presentation_sequence = sequence;
+        let presented = crate::PresentedFrame {
+            host: self.s.presentation_host,
+            sequence,
+            width: pw,
+            height: ph,
+            layout_scale: scale,
+        };
+        // Freeze product state before any capture callback, queued pointer
+        // dispatch or platform accessibility action can change the product.
+        self.observe_presentation(presented);
+        let surface = self.s.surface.as_ref().expect("presented surface exists");
         // A capture armed by the application: run it while the rasterized
         // view is still alive.
         let phase = crate::Instant::now();
@@ -674,6 +654,9 @@ where
         }
         if let Some(capture) = self.s.pending_capture.take() {
             capture(&**surface, &view, pw, ph);
+        }
+        if let Some(capture) = self.s.pending_stamped_capture.take() {
+            capture(&**surface, &view, presented);
         }
         profile.capture_us = elapsed_us(phase.elapsed());
         if (animating || anim_active)
@@ -721,6 +704,7 @@ where
                 &dom_ref,
                 layout,
                 &mut self.s.leaves,
+                &mut self.s.producers,
                 self.s.last_focus,
                 layout_scale,
             )

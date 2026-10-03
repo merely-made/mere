@@ -156,10 +156,12 @@ pub mod field_bridge;
 mod fields;
 pub use canvas_search::CanvasSearchSurface;
 pub use field_bridge::{build_query_similarity_field, register_query_similarity_field};
+mod elapsed;
 pub mod fold_projection;
 mod frame;
 mod frame_profile;
 pub use frame_profile::CanvasFrameProfile;
+pub use seiche::{ElapsedStepConfig, ElapsedStepReport};
 mod cull;
 mod input;
 mod resolved_image_cache;
@@ -175,12 +177,25 @@ pub use ambient::{AmbientSim, GameOfLife, NBody, ParticleLife, SandFall, Tinctur
 /// the remote board and any other host share one inline/actor implementation.
 use seiche::Physics;
 
+/// A board scene: the cards and backdrops of a scene that is not a graph,
+/// painted where the physics board holds them.
+pub mod board_scene;
 /// The physics catalog over a scene's items that are not a graph: the
 /// remote board's physics. (Physics catalog — P3.)
 pub mod physics_board;
+/// The host's device for the canvas's and the board's repulsion (P5c).
+#[cfg(feature = "gpu")]
+pub mod physics_device;
+#[cfg(feature = "gpu")]
+pub use physics_device::{PhysicsDevice, physics_device_for};
 /// The physics catalog: the laws a graph can move under, the overlays composed
 /// onto them, and the named profiles. (Physics catalog — P1.)
 pub mod physics_catalog;
+pub use board_scene::{
+    BoardBackdrop, BoardCard, BoardFit, BoardFootprint, BoardRect, BoardScene, BoardText,
+    BoardTransform,
+    backdrop_color,
+};
 pub use physics_board::{BoardItem, PhysicsBoard, PhysicsChoice};
 pub use physics_catalog::{
     CANVAS_PHYSICS_DEPTH_SOURCES, CANVAS_PHYSICS_KIND_SOURCES, CANVAS_PHYSICS_LAWS,
@@ -275,6 +290,11 @@ pub struct Canvas {
     /// off-thread armillary actor (native always-offload). The canvas never reads
     /// it directly; it feeds positions into `view` each frame.
     physics: Physics,
+    /// The host's device, when the repulsion is staged on it (P5c).
+    #[cfg(feature = "gpu")]
+    physics_device: Option<PhysicsDevice>,
+    frame_timestamp: Option<std::time::Duration>,
+    elapsed_step: Option<ElapsedStepReport>,
     /// Whether the layout physics is paused (the user froze the graph with Space /
     /// the pause button). While paused the sim is halted and settle requests are
     /// suppressed, so the graph holds still through mutations until resumed.
@@ -638,6 +658,9 @@ pub struct Canvas {
     /// Where the Depth overlay reads a node's depth from (roots, layers, the
     /// focus). (Physics catalog — P1b.)
     physics_depth_source: PhysicsDepthSource,
+    /// How many times the law + overlay force set was rebuilt. Test only.
+    #[cfg(test)]
+    law_rebuilds: usize,
     /// A restored score's `(strategy id, graph revision, URL-authority revision, footprint revision)`
     /// claim on the layout.
     /// [`restore_projection_score`](Self::restore_projection_score) buffers the

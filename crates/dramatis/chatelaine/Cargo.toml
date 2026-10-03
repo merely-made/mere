@@ -4,9 +4,20 @@ version = "0.0.2"
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
-description = "Name reservation. The chatelaine is the secret half of the Mere platform's credential model: passwords, 2FA seeds, tokens, and foreign key material, exercised but never shown, kept by castellan in trust for your personae. Named for the waist-worn chain that held the household's keys. Not the proofs (that is insigne)."
+description = "The item taxonomy of the Mere platform's credential model: CXF-shaped items, every credential kind, collections, and the secret-free metadata of each, as plain data with no secrets, storage or cryptography. The chatelaine is the secret half (passwords, 2FA seeds, tokens, foreign key material), exercised but never shown, kept sealed by castellan in trust for your personae; this crate describes it without holding it. Named for the waist-worn chain that held the household's keys. Not the proofs (that is insigne)."
 readme = "README.md"
 keywords = ["credentials", "secrets", "vault", "passwords", "totp"]
 categories = ["authentication"]
 
 [dependencies]
+serde.workspace = true
+# Ids are UUIDs built from caller-supplied bytes. Declared directly because
+# the workspace entry enables `v4`, which reads a random source; `serde` is
+# the only feature, and it adds no crate beyond serde itself.
+uuid = { version = "1", default-features = false, features = ["serde"] }
+
+[dev-dependencies]
+# The binary codec muniment stores with, so the binary serde path is tested
+# beside JSON, as gaz and insigne test theirs.
+postcard = { version = "1", features = ["alloc"] }
+serde_json = "1"

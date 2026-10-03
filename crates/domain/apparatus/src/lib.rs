@@ -6,13 +6,23 @@
 
 //! # apparatus
 //!
-//! Apparatus domain layer — peripheral system-inspector strip. v0
-//! emits a placeholder skeleton subtree; each section grows real
-//! content as the corresponding host bridge lands.
+//! Bounded diagnostic observations beneath product-owned inspection views.
+//!
+//! The storage core has no renderer or runtime dependency. Producers supply
+//! redacted payloads and monotonic receipt times; products retain authority over
+//! operation outcomes, persistence and actionable controls. The default
+//! `projection` feature preserves the earlier placeholder inspection tree.
 
-#![doc(html_root_url = "https://docs.rs/apparatus/0.0.1")]
+#![doc(html_root_url = "https://docs.rs/mere-apparatus/0.0.1")]
 
+mod observation;
+pub use observation::*;
+mod inspection;
+pub use inspection::*;
+
+#[cfg(feature = "projection")]
 use accesskit::{Node, Role};
+#[cfg(feature = "projection")]
 use uxtree::{UxTree, node_id_for_path};
 
 /// Crate version.
@@ -23,6 +33,7 @@ pub const STAGE: &str = "pre-alpha";
 
 /// Inspector lanes that the apparatus panel will eventually populate.
 /// v0 emits each as an empty group; real content lands per lane.
+#[cfg(feature = "projection")]
 const SECTIONS: &[&str] = &[
     "tracing events",
     "registry diagnostics channels",
@@ -32,6 +43,7 @@ const SECTIONS: &[&str] = &[
 
 /// Emit the v0 apparatus skeleton: a root labeled "Apparatus" with one
 /// empty group per inspector lane.
+#[cfg(feature = "projection")]
 pub fn project_skeleton() -> UxTree {
     let mut nodes = Vec::new();
     let root_path = "apparatus".to_string();
@@ -63,7 +75,7 @@ pub fn project_skeleton() -> UxTree {
     }
 }
 
-#[cfg(test)]
+#[cfg(all(test, feature = "projection"))]
 mod tests {
     use super::*;
 

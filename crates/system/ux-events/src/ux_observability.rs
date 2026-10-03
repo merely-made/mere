@@ -214,6 +214,7 @@ impl UxObserver for CountingObserver {
 
 /// Append-only event recorder. Stores up to `capacity` events; older
 /// events are dropped from the front when the buffer fills.
+/// A zero capacity disables retention.
 ///
 /// Use this for tests (assert event order / shape after a sequence
 /// of host messages), for the diagnostics pane's "recent events"
@@ -252,8 +253,11 @@ impl RecordingObserver {
 
 impl UxObserver for RecordingObserver {
     fn observe(&self, event: &UxEvent) {
+        if self.capacity == 0 {
+            return;
+        }
         let mut buf = self.events.lock().unwrap();
-        if buf.len() == self.capacity && self.capacity > 0 {
+        if buf.len() == self.capacity {
             buf.pop_front();
         }
         buf.push_back(event.clone());
@@ -291,6 +295,28 @@ mod tests {
         assert_eq!(counts.surfaces_dismissed(), 1);
         assert_eq!(counts.actions_dispatched(), 1);
         assert_eq!(counts.open_nodes_dispatched(), 0);
+    }
+
+    #[test]
+    fn zero_capacity_disables_recording_without_disabling_other_observers() {
+        let recorder = Arc::new(RecordingObserver::with_capacity(0));
+        let counter = Arc::new(CountingObserver::new());
+        let mut observers = UxObservers::new();
+        observers.register(Box::new(RecordingObserverProxy(Arc::clone(&recorder))));
+        observers.register(Box::new(CountingObserverProxy(Arc::clone(&counter))));
+
+        for _ in 0..256 {
+            observers.emit(UxEvent::SurfaceOpened {
+                surface: SurfaceId::CommandPalette,
+            });
+        }
+
+        assert!(recorder.snapshot().is_empty());
+        assert_eq!(recorder.len(), 0);
+        assert!(recorder.is_empty());
+        assert_eq!(counter.surfaces_opened(), 256);
+        recorder.clear();
+        assert!(recorder.is_empty());
     }
 
     #[test]

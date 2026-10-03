@@ -216,6 +216,7 @@ fn pixel(
     let list = layout.emit_paint_list_with_leaves(
         dom,
         DeviceIntSize::new(160, 120),
+        None,
         |key| registry.commands(key),
         |_| None,
     );
@@ -241,13 +242,82 @@ fn pixel(
 }
 
 #[test]
+fn gpu_host_timestamps_and_visibility_reach_the_producer() {
+    use crate::{Host, HostHooks, HostOptions, HostState, HostWake, HostWindow};
+    use std::{cell::Cell, sync::Arc, time::Duration};
+
+    struct Window(Rc<Cell<usize>>);
+    impl HostWindow for Window {
+        fn request_redraw(&self) {
+            self.0.set(self.0.get() + 1);
+        }
+        fn inner_size(&self) -> (u32, u32) {
+            (160, 120)
+        }
+        fn scale_factor(&self) -> f64 {
+            1.0
+        }
+        fn set_ime_allowed(&self, _: bool) {}
+        fn set_ime_cursor_area(&self, _: f64, _: f64, _: f64, _: f64) {}
+    }
+
+    let requests = Rc::new(Cell::new(0));
+    let mut state = HostState::new();
+    state.sheet = SHEET.into();
+    state.set_resources(vec![], vec![]);
+    state.window = Some(Box::new(Window(requests.clone())));
+    state.surface = Some(Box::new(surface()));
+    state.runner = Some(crate::Runner::new(
+        Rc::new(RefCell::new(ScriptedDom::new())),
+        |_: &()| cambium::custom_leaf::<(), ()>(7, 8, 6),
+        (),
+    ));
+    let producer = Rc::new(RefCell::new(Producer::default()));
+    state
+        .producers
+        .register(7, producer.clone(), &["color"])
+        .unwrap();
+    let wake = HostWake::new(state.wake_pending.clone(), Arc::new(|| {}));
+    let hooks = HostHooks {
+        frame: Box::new(|_| false),
+        after_dispatch: Box::new(|_| {}),
+        after_frame: Box::new(|_| {}),
+        after_wake: Box::new(|_| {}),
+        close_request: Box::new(|_, _| crate::CloseDisposition::Exit),
+        focused_text: Box::new(|_| None),
+        key_intercept: Box::new(|_, _| false),
+    };
+    let mut host = Host::new(HostOptions::default(), None, hooks, state, wake);
+    host.redraw_at(Duration::from_millis(125));
+    assert_eq!(
+        producer.borrow().frames.last().unwrap().timestamp,
+        Some(Duration::from_millis(125))
+    );
+    host.redraw();
+    assert_eq!(producer.borrow().frames.last().unwrap().timestamp, None);
+    host.set_hidden(true);
+    host.set_hidden(true);
+    assert_eq!(producer.borrow().suspended, 1);
+    let before = requests.get();
+    host.set_hidden(false);
+    assert_eq!(requests.get(), before + 1);
+    host.redraw_at(Duration::from_secs(5));
+    assert!(producer.borrow().frames.last().unwrap().needs_frame);
+}
+#[test]
 fn gpu_producer_refresh_resize_suspend_remove_and_recreate_use_fresh_images() {
     let surface = surface();
     let (mut dom, mut layout, node) = fixture(SHEET);
     let producer = Rc::new(RefCell::new(Producer::default()));
     let mut registry = ProducerRegistry::new();
     registry.register(7, producer.clone(), &["color"]).unwrap();
+    registry.timestamp = Some(std::time::Duration::from_millis(125));
     assert_eq!(registry.prepare(&surface, &layout, &dom, 1.0).stages, 1);
+    assert_eq!(
+        producer.borrow().frames.last().unwrap().timestamp,
+        registry.timestamp
+    );
+    registry.timestamp = None;
     assert_eq!(
         pixel(&surface, &registry, &dom, &mut layout),
         [64, 128, 192, 255]

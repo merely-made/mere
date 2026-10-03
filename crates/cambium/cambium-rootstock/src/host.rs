@@ -12,7 +12,7 @@
 //! crate's vocabulary and drives the methods below.
 
 use std::sync::Arc;
-use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
 use cambium::{GenetAppRunner, TextInput};
 use cambium_winit::ScrollbarFade;
@@ -52,6 +52,34 @@ pub type Runner<State, Logic, V> = GenetAppRunner<State, Logic, V, ()>;
 /// A capture armed by the application, run inside the next frame while the
 /// rasterized view is still alive (scenario screenshots).
 pub type CaptureFn = Box<dyn FnOnce(&dyn Surface, &wgpu::TextureView, u32, u32) + 'static>;
+
+/// Identity of one successful queue presentation in this host/window lifetime.
+/// Host numbers are process-local; a receipt must also carry its product run.
+/// This certifies submission of the rasterized source, not compositor visibility.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct PresentedFrame {
+    pub host: u64,
+    pub sequence: u64,
+    pub width: u32,
+    pub height: u32,
+    pub layout_scale: f32,
+}
+
+/// A readback of that exact rasterized source, branded at presentation.
+pub type StampedCaptureFn =
+    Box<dyn FnOnce(&dyn Surface, &wgpu::TextureView, PresentedFrame) + 'static>;
+
+/// One-shot read-only observation, before capture callbacks and pointer/AT input.
+pub type PresentationObserver<State, Logic, V> =
+    Box<dyn FnOnce(&AppCtx<'_, State, Logic, V>, PresentedFrame)>;
+
+fn next_host_identity() -> u64 {
+    static NEXT: AtomicUsize = AtomicUsize::new(1);
+    NEXT.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |next| {
+        next.checked_add(1)
+    })
+    .expect("host identity exhausted") as u64
+}
 
 /// The paint commands and inline font/image resources of the next presented
 /// frame, before renderer translation. External GPU texture commands retain
@@ -670,6 +698,10 @@ where
     pub wake: &'a HostWake,
     /// Arm a capture of the next presented frame.
     pub capture: &'a mut Option<CaptureFn>,
+    /// Optional one-shot state seal for the next successful presentation.
+    pub presentation_observer: &'a mut Option<PresentationObserver<State, Logic, V>>,
+    /// Optional branded readback of the same presentation as the state seal.
+    pub capture_stamped: &'a mut Option<StampedCaptureFn>,
     /// Arm a one-shot paint-envelope capture. When armed with `capture`, both
     /// callbacks receive the same presented frame. Failed presentation keeps
     /// the request pending; no envelope is cloned while this is unarmed.
@@ -953,6 +985,10 @@ where
     /// the same deferral `pending_sheet` gets, and for the same reason.
     pub pending_ui_zoom: Option<f32>,
     pub pending_capture: Option<CaptureFn>,
+    pub pending_presentation_observer: Option<PresentationObserver<State, Logic, V>>,
+    pub pending_stamped_capture: Option<StampedCaptureFn>,
+    pub presentation_host: u64,
+    pub presentation_sequence: u64,
     pub pending_paint_capture: Option<PaintCaptureFn>,
     /// Pointer events an application hook asked the host to deliver to itself,
     /// drained through the real input path once the hook returns.
@@ -1028,6 +1064,10 @@ where
             pending_sheet: None,
             pending_ui_zoom: None,
             pending_capture: None,
+            pending_presentation_observer: None,
+            pending_stamped_capture: None,
+            presentation_host: next_host_identity(),
+            presentation_sequence: 0,
             pending_paint_capture: None,
             pending_pointer: Vec::new(),
             pending_scroll: Vec::new(),
@@ -1321,6 +1361,8 @@ where
                 close: &mut self.s.close_requested,
                 wake: &self.wake,
                 capture: &mut self.s.pending_capture,
+                presentation_observer: &mut self.s.pending_presentation_observer,
+                capture_stamped: &mut self.s.pending_stamped_capture,
                 capture_paint: &mut self.s.pending_paint_capture,
                 pointer: &mut self.s.pending_pointer,
                 scroll: &mut self.s.pending_scroll,
@@ -1335,6 +1377,45 @@ where
             }
         }
         self.apply_pending();
+    }
+
+    /// Seal a read-only projection of the source just submitted. Deliberately
+    /// does not apply pending requests, consume zoom edges or dispatch input.
+    pub fn observe_presentation(&mut self, frame: PresentedFrame) {
+        let Some(observer) = self.s.pending_presentation_observer.take() else {
+            return;
+        };
+        let logical_size = self.logical_size();
+        let ui_zoom = self.ui_zoom();
+        let commands = self.s.commands.clone();
+        let Some(runner) = self.s.runner.as_mut() else {
+            return;
+        };
+        let ctx = AppCtx {
+            runner,
+            layout: self.s.layout.as_ref(),
+            window: self.s.window.as_deref(),
+            logical_size,
+            ui_zoom,
+            zoom_changed: false,
+            leaves: &mut self.s.leaves,
+            files: &mut self.s.files,
+            producers: &mut self.s.producers,
+            set_sheet: &mut self.s.pending_sheet,
+            set_ui_zoom: &mut self.s.pending_ui_zoom,
+            close: &mut self.s.close_requested,
+            wake: &self.wake,
+            capture: &mut self.s.pending_capture,
+            presentation_observer: &mut self.s.pending_presentation_observer,
+            capture_stamped: &mut self.s.pending_stamped_capture,
+            capture_paint: &mut self.s.pending_paint_capture,
+            pointer: &mut self.s.pending_pointer,
+            scroll: &mut self.s.pending_scroll,
+            window_commands: &commands,
+            geometry: self.s.geometry,
+            frame_profile: self.s.last_frame_profile,
+        };
+        observer(&ctx, frame);
     }
 
     /// Apply requests a hook made after its temporary borrows of the runner and
@@ -1410,6 +1491,8 @@ where
                 close: &mut self.s.close_requested,
                 wake: &self.wake,
                 capture: &mut self.s.pending_capture,
+                presentation_observer: &mut self.s.pending_presentation_observer,
+                capture_stamped: &mut self.s.pending_stamped_capture,
                 capture_paint: &mut self.s.pending_paint_capture,
                 pointer: &mut self.s.pending_pointer,
                 scroll: &mut self.s.pending_scroll,

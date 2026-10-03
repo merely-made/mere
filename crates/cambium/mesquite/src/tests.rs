@@ -153,6 +153,70 @@ fn the_receipt_carries_every_named_section_and_its_kind() {
 }
 
 #[test]
+fn diagnostic_export_carries_loss_without_inventing_success_or_frame_causality() {
+    use apparatus::{ObservationMetadata, ObservationStore, RetentionLimits, RunId, SourceId};
+    use std::time::Duration;
+
+    let mut store = ObservationStore::new(
+        RunId::from("worker-run"),
+        SourceId::from("storage"),
+        RetentionLimits {
+            max_records: 1,
+            max_bytes: 4096,
+            max_age: Duration::from_secs(60),
+        },
+    );
+    let mut cursor = store.cursor();
+    for phase in ["worker-succeeded", "stale-discarded"] {
+        let payload = serde_json::json!({"phase": phase});
+        let bytes = serde_json::to_vec(&payload).unwrap().len();
+        store
+            .record(
+                payload,
+                bytes,
+                ObservationMetadata::default(),
+                Duration::ZERO,
+            )
+            .unwrap();
+    }
+    let batch = store.read(&mut cursor, Duration::ZERO, 1).unwrap();
+    let mut lane = lane(None, None);
+    lane.collect_diagnostics(Ok(Some(batch)));
+    let value = lane.receipt_value(true, &BTreeMap::new());
+    let diagnostics = &value["diagnostics"];
+    assert_eq!(diagnostics["sampled_at_lane_frame"], 0);
+    assert_eq!(
+        diagnostics["batch"]["records"][0]["payload"]["phase"],
+        "stale-discarded"
+    );
+    assert!(
+        diagnostics["batch"]["records"][0]["envelope"]["metadata"]["presented_frame"].is_null()
+    );
+    assert_eq!(diagnostics["batch"]["stats"]["loss"]["evicted"], 1);
+    assert!(!diagnostics["batch"]["gaps"].as_array().unwrap().is_empty());
+    assert_eq!(
+        value["ok"], true,
+        "diagnostics do not decide domain outcomes"
+    );
+}
+
+#[test]
+fn requested_diagnostic_failure_is_visible_and_absent_hook_preserves_receipt_shape() {
+    let mut lane = lane(None, None);
+    lane.collect_diagnostics(Ok(None));
+    assert!(
+        lane.receipt_value(true, &BTreeMap::new())
+            .get("diagnostics")
+            .is_none()
+    );
+    lane.collect_diagnostics(Err("bounded batch unavailable".into()));
+    assert_eq!(
+        lane.errors,
+        ["diagnostic attachment: bounded batch unavailable"]
+    );
+}
+
+#[test]
 fn the_frame_limit_decides_only_once_and_only_after_the_limit() {
     let lane = lane(None, None).with_frame_limit(Some(3));
     assert!(!lane.frame_limit_reached(2));

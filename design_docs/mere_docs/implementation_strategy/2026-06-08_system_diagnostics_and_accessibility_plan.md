@@ -2,9 +2,24 @@
 
 ## Current design: shared observations, 2026-09-29
 
-**Status:** design proposal. Semantic-selector integration is a separate active
-implementation lane; the diagnostics slices below are not implemented by this
-document. The June design and receipts are retained below as historical evidence.
+**Status:** first diagnostics implementation qualified by focused Mere tests.
+The bounded Apparatus core, optional Mesquite attachment and zero-capacity UX
+recorder repairs are implemented. Turnstone's separate redacted observation copy
+and Gloss/Inspector migration were published at Turnstone `d6b62adb`.
+The combined consumer cohort is now published at Turnstone
+`b2ead70a448948a1e8a9bde10b34f01524119606`, with optional Diagnostics inspection
+and contributed semantic automation/platform actions qualified.
+Redshank's real persistence worker now qualifies dispatch, execution and
+save-reply correlation, including failed IO and retry. Its later presentation
+adapter is requalified and published at Woodshed `cefc903`, with 68 desktop tests, strict
+Clippy, Wasm compilation and paired/default native captures. The earlier
+early-durability negative control remains qualified. Turnstone now passes 635
+workspace tests with nine ignores, five exact optional participant checks and
+five reviewed native Sky/Diagnostics images. Its preceding 612-test migration
+cohort retains its original source identities. The September
+30 continuation below separates shared presentation stamps, consumer readings,
+remaining whole-application causal links and human accessibility acceptance. The June
+design and receipts are historical evidence.
 
 Share bounded observations and causal references across applications, using their
 existing state and event producers. Do not introduce a universal application-event
@@ -14,22 +29,42 @@ attachments, qualified by two different consumers.
 
 ### Name and ownership
 
-**Steward is the proposed name, pending Mark's answer**, for shared operational
-observations and inspection beneath product-owned views. It is an existing pane
-name, not a reserved crate. No new package or rename is authorized by this proposal.
+**Ruled by Mark, 2026-09-29: Apparatus is the shared diagnostics library, in the
+existing `mere-apparatus` package (library `apparatus`).** Reuse that home for
+bounded observations and inspection beneath product-owned views. The name and
+crate home are settled; the core and Mesquite attachment are implemented as
+recorded below, with Turnstone and Redshank qualifying the bounded core.
 The [September consolidation ruling](2026-09-23_crate_consolidation_plan.md)
 requires components to remain modules and reserved homes to receive their actual
-capabilities; placement follows the consumer/dependency proof.
+capabilities; these two consumers qualify the bounded contract and dependencies,
+while two complete action/worker/pixel causal receipts remain a later gate.
 
-The July 18 taxonomy ruling (`turnstone/design_docs/2026-07-18_meerkat_harvest.md`)
-supersedes June's split: Apparatus analyzes selected graph-object facets and
-handling controls; Inspector examines addressed content and supports clipping;
-Steward owns all operational readouts, synchronous and asynchronous; application
-Settings is separate. The current Apparatus implementation (`turnstone/src/apparatus_pane.rs`)
-follows this ruling. Mere's [Apparatus crate](../../../crates/domain/apparatus/src/lib.rs)
-still emits empty diagnostic groups, without production consumers. Its old scope
-is drift, not evidence of a working shared diagnostics system; the consolidation
-plan now records the unresolved boundary. [Alembic](../../../ports/distillery/alembic/src/lib.rs)
+**Gloss takes the operational overview.** Turnstone's configurable sections can
+combine its minimap and recent visits with downloads, background work, sync and
+items needing attention. Trail retains browsing history, recall and recovery;
+Gloss may compose summaries from those sources. Turnstone's default is the
+minimap plus Downloads, with configurable sections. Steward's download facts
+move there and its separate runtime pane retires. Operational actions remain
+product-owned; the current Downloads section is read-only. Background/sync
+sections and retry/cancel actions are future extensions with their own gates.
+
+This supersedes the operational-status assignment in the July 18 taxonomy
+(`turnstone/design_docs/2026-07-18_meerkat_harvest.md`). At the naming ruling,
+Turnstone's Apparatus pane analyzed selected graph-object facets and handling controls.
+**Mark's follow-up assigns that object analysis to Inspector**, alongside its
+inspection of documents and content within them, metadata and clipping. Inspector
+shows the fields and controls appropriate to the selected subject; graph facets,
+provenance and handling controls retain their product-owned sources and write
+paths. Migrate those capabilities into Inspector before retiring the object-analysis
+Apparatus pane. Application Settings remains separate. Both migrations now have
+qualified source changes and native restart receipts. Within-document selection
+inspection and background/sync controls remain later work.
+
+Mere's [Apparatus crate](../../../crates/domain/apparatus/src/lib.rs) now exposes
+a renderer-independent observation store. Its older empty diagnostic groups
+remain behind the default `projection` feature; those placeholders do not
+establish a working inspection interface.
+[Alembic](../../../ports/distillery/alembic/src/lib.rs)
 already owns Distillery recall/workshop scope; Eidetic owns retained artifacts;
 [Armillary](../../../crates/armillary/README.md) owns actor execution and messaging.
 
@@ -50,8 +85,8 @@ name explicit repository paths; links stay within Mere.
 |---|---|---|
 | [UX events](../../../crates/system/ux-events/src/ux_observability.rs), [registry](../../../crates/system/registry/src/diagnostics/emit.rs) | Observers, probes, channel bridge, schemas and trace/message events | Reuse adapters; graph-specific action/node/surface types are not a universal app vocabulary. |
 | [Cambium/Mesquite](../../../crates/cambium/mesquite/src/lib.rs), [receipt](../../../crates/cambium/mesquite/src/lane.rs) | Snapshots, string events, captures, failures, frame costs | Add optional typed attachments; CPU wall-time costs are not GPU timings. |
-| Turnstone (`turnstone/src/observe.rs`), fanout (`turnstone/src/shell/effects.rs`) | Typed snapshot/AppEvent and 128-entry automation copy | Replace observation storage, preserve domain fold and trail; currently omission is unreported. |
-| Knot (`knot-editor/apps/desktop/src/scenario.rs`), snapshot (`knot-editor/apps/desktop/src/workspace.rs`) | Mesquite document/format/dirty/appearance/message snapshot | Document authority and save/site acceptance remain product-owned; the current adapter is a state projection, not a causal outcome stream. |
+| Turnstone (`turnstone/src/observe.rs`), fanout (`turnstone/src/shell/effects.rs`) | Typed snapshot/AppEvent and existing 128-entry automation copy | A separate Apparatus copy records fixed redacted categories at fanout; automation strings and Trail authority remain preserved. Sealed pins, product tests and bounded native restart pass. Existing automation omission remains unreported. |
+| Knot (`knot-editor/apps/desktop/src/scenario.rs`), catalog (`knot-editor/apps/desktop/src/graph/diagnostics.rs`) | Mesquite redacted document/appearance seal and optional actual Save/catalog records | Save dispatch, file-write return, request, execution, outcome and accepted catalog references remain Knot-owned. Other application domains do not acquire those causal links. |
 | Woodshed (`woodshed/crates/woodshed-genet/src/scenario.rs`) | Stage/gesture snapshots, string events, drag metrics | Preserve arrangement and gesture meaning; capture-pending busy is not an operation model. |
 | Redshank (`woodshed/ports/redshank/desktop/src/scenario.rs`) | Playback/transcript snapshots, seek requests, worker state | Workers report execution outcomes; desktop/session own stale-result acceptance and model application; persistence owns durable acknowledgment. |
 | Cleromancy (`cleromancy/src/ui/native/scenario_driver.rs`) | Consultation/catalog state and durable first/reopen receipts | Preserve consultation authority and acceptance; useful worker-outcome pilot. |
@@ -67,7 +102,7 @@ do not install the shared UX observer/registry sender as a stack-wide pipeline.
 
 ### Small contract over product payloads
 
-Proposed `Observation<P>` carries schema version, run/source identity, monotonically
+`Observation<P>` carries schema version, run/source identity, monotonically
 increasing record sequence, receipt time, optional source time, optional operation
 identity and causal record reference, optional subject reference, and optional semantic
 revision/presented-frame reference. `P` remains the producer's versioned, redacted
@@ -101,9 +136,10 @@ cannot be retargeted merely because a node identifier was reused.
 
 Registry [descriptors](../../../crates/system/registry/src/diagnostics/descriptor/types.rs)
 describe schemas, retention and sampling; they do not enforce buffering or validate
-every payload. Its [current invariant matcher](../../../crates/system/registry/src/diagnostics/descriptor/registry.rs)
-pairs starts and terminals FIFO per channel, so concurrent out-of-order operations
-require correlation-keyed tracking rather than claiming this already exists.
+every payload. Its [invariant matcher](../../../crates/system/registry/src/diagnostics/descriptor/registry.rs)
+now supplies bounded run/source/operation matching alongside the explicitly
+uncorrelated FIFO API. The September 30 keyed and deadline controls qualify
+matching mechanics; each product still supplies its actual operation identity.
 
 ### Bounds, loss and privacy
 
@@ -119,11 +155,14 @@ Expose retained range/bytes plus cumulative rejected, evicted, expired and dropp
 counts. Independent cursors or immutable batches prevent competing destructive
 drains; a slow cursor receives an explicit gap and next available sequence.
 Neither missing records nor an empty disabled store means “nothing happened.”
-The existing [RecordingObserver](../../../crates/system/ux-events/src/ux_observability.rs)
+The [RecordingObserver](../../../crates/system/ux-events/src/ux_observability.rs)
 and [RecordingChannelSink](../../../crates/system/ux-events/src/ux_diagnostics.rs)
-currently append indefinitely at capacity zero; the first slice must repair this
-and test it. The registry emitter also silently drops without a receiver and uses
-an unbounded sender; adapters must report their actual coverage/loss limits.
+formerly appended indefinitely at capacity zero. They now return before locking
+or cloning, with disabled-retention and bounded-eviction regression tests.
+The September 30 registry emitter replaces the unbounded sender with bounded
+nonblocking ingress and observable admission/loss. Adapters must preserve its
+explicit unsequenced-loss distinction; registry catalog growth and producer
+allocation remain outside this bound.
 
 Products project and redact before buffering. Turnstone's credential-omitting
 authentication observations provide a precedent, not proof that arbitrary URLs, titles or logs
@@ -156,8 +195,65 @@ absence is never silently reported as success.
    without diagnostic attachments remain compatible.
 
 Done means owner-specific code and recorded gates satisfy those slices, with
-native and human evidence labeled separately. This pass supplies the design only;
-the bounded store and receipt attachment implementation follow later.
+native and human evidence labeled separately. The first storage and receipt
+slice below does not close the real-worker or exact-frame acceptance gates.
+
+### Bounded diagnostics implementation, 2026-09-29
+
+`ObservationStore<P>` now enforces configured count, accounted encoded bytes and
+monotonic age. Rejected and known dropped records consume scoped sequence
+positions; independent readers receive copied batches, unavailable ranges,
+per-run loss totals and explicit reset boundaries. Any zero limit disables
+retention. Backward time fails before state changes. The storage core uses only
+`std`, with optional serialization; renderer dependencies belong to `projection`.
+Products supply already redacted payloads and truthful encoded payload lengths.
+Deterministic envelope accounting is added by the store; this bounds accounted
+encoding, not allocator memory or JSON export size. Payload mapping preserves
+original admission accounting.
+
+Mesquite adds default optional `Product::diagnostic_attachment`, sampled once
+after `complete`. A supplied bounded `Batch<serde_json::Value>` carries retained
+records, gaps and loss in the JSON receipt or text receipt line; absent hooks
+preserve the existing format. Attachment errors fail the requested receipt.
+`sampled_at_lane_frame` names the receipt observation point. It does not identify
+the captured pixel frame or invent a causal revision: current capture fields are
+sampled when asynchronous readback lands, and exact pixel/state pairing remains
+open. No worker lifecycle is inferred from `act` or quiescence.
+
+The [focused gate receipt](../testing/2026-09-29_apparatus_diagnostics_receipt.md)
+records 74 passing all-feature library tests (17 Apparatus, 19 Mesquite, 38 UX),
+14 passing core tests without default features and with serialization, and 75
+passing host integration tests (16 host library, 24 scenario, 16 mere-view,
+19 Mesquite). These are automated tests; this pass produced no new headed
+diagnostics or human screen-reader receipt.
+
+Turnstone's source adds a separate fixed-category observation store at existing
+app-event fanout. URL, path, title, prompt and error fields never enter that
+copy. Count/byte/age settings are configurable per run; one bounded
+`diagnostics.json` is exported only for an explicit shared scenario receipt,
+and export failure changes `scenario.done` to `RESULT fail`. The existing
+automation event stream and Trail remain separate. This adapter and the
+Gloss/Inspector pane migration pass on Mere `ca2351b3`, Genet `19c20687`, Knot
+`c92ad044` and Woodshed `752c920e`. Turnstone's full workspace/all-target gate
+passes 612 tests with nine ignores; five optional participant and 33 UI checks
+also pass. The normal native binary and fresh/restarted scenarios pass with
+three inspected nonblank captures. Initial retention of two records reports
+eight evictions and gap `[1,9)`; restart retains one record without loss. Saved
+Downloads/Recent order and Inspector's requested viewer override are checked.
+The consumer's `turnstone/design_docs/2026-09-29_shared_diagnostics_gloss_inspector_receipt.md`
+records the source graph, hashes, failures and open gates. Counts overlap and
+must not be summed; requested viewer selection does not qualify Reader completion.
+
+Redshank's published persistence pilot at Woodshed `a57085b` observes a real
+save request, worker start/outcome and desktop reply handling. Successful
+execution does not advance durability before the existing reply adjudication.
+Its 63 desktop tests, strict Clippy, deliberate early-durability negative
+control and opt-in/default/invalid-setting native receipts pass. The opt-in
+native batch retains two records, reports 16 evictions and a `[1,17)` gap, and
+links execution to reply handling at durable revision 3. See the consumer's
+`woodshed/design_docs/2026-09-29_redshank_persistence_diagnostics_receipt.md`.
+Other worker families, cancelled/stale storage paths,
+exact frame correlation, custom-leaf semantic parity and human AT remain open.
 
 ### Semantic implementation progress, 2026-09-29
 
@@ -198,8 +294,160 @@ Rootstock/winit-host/Mesquite tests and the standalone Wasm check passed again.
 Both locks retain every incoming package/version after the Genet substitution;
 the only added dependency edge is Taproot to document-session-api. This closes
 the earlier pending source-integration and machine-verification gates. The
-Steward name, human AT check, custom-leaf parity and diagnostics implementation
-remain open as described above.
+human AT check and custom-leaf parity remain open; the first diagnostics
+implementation and remaining qualification gates are recorded above.
+The Apparatus name/crate home and Gloss operational overview are now ruled above;
+the Gloss and Inspector pane migrations are qualified above. Contributed-pane
+semantic automation is the next designed slice in Turnstone's pane registry plan;
+its scoped retained-layout and admission-generation work is not implemented here.
+
+---
+
+## Remaining work orchestration, 2026-09-30
+
+**Status: first remaining-work batch published, authorized by Mark.** Shared
+delivery, inspection, presentation pairing and the bounded contributed-consumer
+gates below are qualified. Broader owner gates and human acceptance remain open.
+The September core and consumer receipts remain the baseline. Research lanes inspect current code before each
+bounded implementation is promoted. Unrelated Gaz, transcript and allocator
+migration work remains with its existing owners. New consumer pins are sealed
+only after the shared source gates pass; the September receipts keep their
+original source identities.
+
+| Lane | Owner seam and done condition | Current state |
+| --- | --- | --- |
+| Contributed semantics | Genet/Taproot generic surface filter; Turnstone retained projection, visible geometry and pane/admission/node identity. Referenced-name, ambiguous, disabled, scroll and stale-target controls plus native receipt pass. | Combined Genet `69a2383b` passes 28 Taproot/40 render and two font checks. Turnstone `b2ead70` passes 635 workspace tests/nine existing ignores, five exact optional native participant tests and three reviewed Sky images. Actual Calculate request 3 is held while clipped, scrolled and delivered before the following assertion. Admission refusal fails before repair; generation and Gloss platform-arm controls fail deliberately and exact restoration passes. Built-in/live-document coverage and human AT follow separately. |
+| Diagnostic delivery | Registry bounded configurable ingress with explicit disabled/full/disconnected/no-sink accounting; correlation-keyed, bounded pending outcomes and deadline handling. Concurrent out-of-order and late-terminal controls pass without an unbounded compatibility route. | Implemented; 135 tests/one existing ignore, restored lean 36 and two expected failing controls. No application pipeline or bounded catalog claim. |
+| Presentation pairing | Seal a product-owned immutable reading and actual host frame identity at the render/capture boundary; carry both through asynchronous readback. Two products qualify UI state/pixel pairing and mismatch controls. Supplied worker references remain scoped to their product domain. | Mere `bd5912fb` qualifies 222 containing host/menu/key tests and actual web/Graphshell Wasm compilation; late-field failure control restored. Woodshed `cefc903` qualifies 68 desktop tests, strict Clippy, Wasm and six paired/default native images: rendered UI facts are distinct from persistence owner-time state and admission context. Knot `3dfb70b` qualifies 260 desktop/63 document tests, a restored stale-result control and nine reviewed worker/theme native images; only its visible accepted catalog carries supplied Save/outcome references. Whole-UI causal/revision authority remains unavailable. |
+| Product inspection | Independent non-destructive readers show retained records, explicit unavailable correlation and gaps/loss. Shared projections do not format raw product inputs or create operation authority. | Shared inspection passes 22 all-feature/18 lean tests. Turnstone `b2ead70` qualifies optional read-only Gloss Diagnostics and two reviewed fresh/restart native images. Fresh retains two records/266 bytes with four evictions and gap `[1,5)`; restart retains one/133 without loss. Saved Diagnostics, Downloads order survives restart; default minimap plus Downloads stays unchanged. |
+| Broader adoption | Qualify additional worker families and built-in/custom/document surfaces against the same contracts; preserve each product's stale, cancellation and durability adjudication. | Depends on the preceding shared and first-consumer gates; inventory is above. |
+| Human accessibility | Prepare a reproducible keyboard/screen-reader checklist against the qualified native binary, then record the human observations and defects separately from machine receipts. | Turnstone checklist and Windows/Narrator preparation baseline recorded. Optional human-availability prompt is pending; actual human observations are required and no pass is claimed. |
+
+### Findings, 2026-09-30
+
+These are the research baseline before the implementation slices above.
+
+- Registry's installed `Sender<DiagnosticEvent>` is unbounded and ignores
+  delivery failures. Its current source installers and invariant matcher
+  consumers are tests/helpers rather than an installed stack-wide pipeline.
+- Mesquite currently records capture viewport when arming, but reads product
+  snapshot fields when pixels are collected. Rootstock can dispatch queued
+  pointers after paint, and native/web hosts can dispatch accessibility actions
+  before the lane's after-frame collection. Neither current timing establishes
+  that the fields describe the captured pixels.
+- Turnstone contributed panes already supply retained provider DOM, layout and
+  platform accessibility routes. Their scenario resolution still uses the raw
+  fresh-layout route; the bounded scoped slice can use the retained owner seam.
+
+Each lane records source identity, focused and deliberately broken controls,
+restored passing gates and native evidence where required. Unavailable causes,
+semantic revisions and exact image correlation remain explicitly unavailable
+until their producer supplies and qualifies them. Human participation is a
+separate acceptance requirement and cannot be inferred from automation.
+
+Final source review also found an admission/result mismatch in Turnstone's
+contributed delivery helper: hidden, disabled or unsupported actions could be
+refused by the surface while still reported landed to Shell, allowing a rejected
+Focus to change pane focus and stacking. The repaired surface returns
+`Option<SurfaceRequest>` and the helper tests admission, separately from redraw.
+The actual-runner refusal regression fails before repair (101), then all eight
+contributed AT tests pass. A test-provider wrapper qualifies admitted actions
+without host effects; the shipping Runner itself requests redraw. The final
+generation failure control restores exact source bytes before the containing gate.
+
+### Progress, 2026-09-30
+
+The renderer-independent `apparatus::inspect_batch` now projects an independent
+batch into bounded read-only rows, including explicit gaps/loss and unavailable
+correlation. Scoped references are retained; arbitrary payload fields are not
+formatted. The optional `project_inspection` lowers those same readings to
+structural accessibility labels, with no invented bounds or actions. Its focused
+all-feature library gate passes 22 tests, including five inspection controls.
+Turnstone's optional Gloss Diagnostics section and read-only App mirror are
+published and machine/native qualified at `b2ead70`; human acceptance remains open.
+The existing minimap-plus-Downloads default remains the accepted default.
+The shared lean inspection gate passes 18 tests. Registry and capture evidence,
+negative controls and exact acceptance limits are recorded in the
+[current gate receipt](../testing/2026-09-29_apparatus_diagnostics_receipt.md).
+
+The next worker family is Knot's existing catalog reader. A successful Save
+supplies the cause for its refresh request. Worker admission, execution,
+superseded queued requests, stale completions and accepted read outcomes remain
+Knot decisions; diagnostics observe those decisions. A superseded queued request
+is not a cancelled worker, and an accepted catalog containing read errors is not
+whole-job or durability success. Generation exhaustion must refuse further
+requests rather than wrap and admit stale results. Knot's published combined
+cohort at `3dfb70b` now qualifies this worker domain: actual Save and partial
+read-error outcomes, count-one loss, paired/default themes and a restored
+stale-acceptance failure control. Original and combined Commands/fonts receipts
+retain separate source and binary hashes in the consumer plan. Other workers
+do not acquire this qualification.
+
+Turnstone's combined consumer pins are Mere `bd5912fb`, Genet `69a2383b`, Knot
+`3dfb70b` and Woodshed `cefc903`. The final source audit verifies all 254
+source/scenario/manifest/wrapper inputs through qualification and publication;
+five native images were reviewed. Sky's lower scrolled background is black and
+field values are unreadable in its final image; applied values are proved by the
+scenario observation, not screenshot text. The optional native Piccolo/Wasm
+checks do not qualify a Turnstone Wasm target or browser runtime. Source/binary,
+failure-control, loss and publication evidence lives in
+`Code/testing/turnstone/contributed-semantics/` and
+`Code/testing/turnstone/diagnostic-inspection/final/`. Turnstone's custom compositor
+has no immutable diagnostic-state/pixel seal yet; its behavioral captures do not
+close that gate. The existing root docs were updated without a functional repin.
+
+### Remaining owner gates after the first consumers
+
+The current inventory finds real seams, rather than a need for another universal
+runner or event model. Turnstone's optional Diagnostics rows are the first
+built-in subtree promoted here: producer IDs, actual retained bounds, clipping
+and read-only roles must pass composed-tree tests and native restart checks.
+Those rows do not qualify Downloads, minimap or other built-in action routes.
+
+The next bounded surface candidate is Inspector's viewer/handling controls.
+Its existing followed-member authority and mutation path must supply semantic
+identity, retained bounds and enabled actions to both automation and AT.
+Switching the followed member or replacing its source must reject old requests.
+Trail and active Gloss controls follow under their own product owners. Custom
+paint interiors need meaningful child projections beyond Sprigging's current
+single-node fallback. Chrome menus, forms and review surfaces need actual
+action-route and focus checks, not just named regions.
+
+The Inspector review found an existing Clip ownership mismatch:
+`turnstone/src/shell/render.rs` checks availability against the followed member,
+while `InspectorIntent::ClipToKnot` carries no member and both pointer drains
+call the globally focused-document helper. Before exposing Clip through shared
+semantics, bind the intent to its displayed member and revalidate the source at
+dispatch, or leave Clip out of the initial semantic route. Mark has been asked
+which next-slice scope he prefers; this finding is not a completed repair.
+Viewer overrides have a second ownership seam: `app/node_arms.rs` writes the
+member-keyed sidecar but finds the live URL in the active legacy graph. A
+cross-graph follower therefore needs its own runtime lookup and respawn check.
+Rows without a live member must expose disabled/no-action state. Inspector
+keyboard delivery is currently absent; keyboard parity requires real runner
+focus/key plumbing and tests, rather than merely focusable radio roles.
+
+Live documents need Turnstone to consume document-session-api's engine-supplied
+neutral projections and revision-guarded nonpointer actions. Genet's Livery,
+scripted and reader capabilities differ; a mirrored outline cannot establish
+full document accessibility or automation. Within-document selection inspection
+remains an Inspector gate. Each unavailable capability must remain explicit.
+
+Registry catalog growth and producer allocation are outside the new bounded
+ingress contract. Installing a product pipeline, adding other real workers and
+supplying missing operation/semantic references require separate owner gates.
+Turnstone's custom compositor currently captures composed layer pixels without
+a sealed product/frame token. Its finite next gate is an immutable reading at
+the actual render boundary, checked run/request/frame identity through readback,
+and deliberate failure, missing/mismatched token and delayed-readback controls.
+A failed requested capture must propagate into the scenario result; the current
+render path computes `capture_composed` success without applying that result.
+The current native scenarios qualify behavior and visual output, not a causal
+or diagnostic snapshot paired to those pixels.
+
+Compilation of a Wasm host is not browser-runtime acceptance. Queue presentation
+and readback do not establish compositor or physical-display acknowledgement.
+Human Narrator/VoiceOver/Orca observations remain necessary for human acceptance.
 
 ---
 

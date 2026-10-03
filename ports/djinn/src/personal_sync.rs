@@ -16,6 +16,7 @@ use std::sync::Arc;
 use personae::{IdentityProvider, ProfileId};
 
 use crate::resident_blobs::{LEGACY_PERSONAL_LEASE, LegacyBlobMigration, ResidentBlobCustody};
+use crate::resident_devices::DeviceDirectorySource;
 use crate::settings::{
     self as owner_settings, DataRootMigration, OwnerSettings, OwnerSettingsError, SyncOverrides,
 };
@@ -113,6 +114,14 @@ pub fn resolve_data_root(
     Ok(current)
 }
 
+/// What started personal sync hands the resident's doors.
+pub struct PersonalSyncStarted {
+    /// The cards both doors serve.
+    pub surface: DeviceSurfaceHandle,
+    /// The paired-device directory, read live from this host.
+    pub directory: DeviceDirectorySource,
+}
+
 /// Start personal sync for a profile, or return `None` when the owner has not
 /// enabled it.
 pub async fn start<P: IdentityProvider + ?Sized>(
@@ -126,7 +135,7 @@ pub async fn start<P: IdentityProvider + ?Sized>(
     seed_notes: Vec<SeedNote>,
     blob_actions: Vec<BlobAction>,
     blob_custody: ResidentBlobCustody,
-) -> Result<Option<DeviceSurfaceHandle>, DeviceSyncError> {
+) -> Result<Option<PersonalSyncStarted>, DeviceSyncError> {
     let settings_file = owner_settings::settings_path(app_dir, profile);
     let stored = OwnerSettings::load(&settings_file)?;
     tracing::info!(
@@ -289,6 +298,7 @@ pub async fn start<P: IdentityProvider + ?Sized>(
     // advertisement is authored in the same quiet window.
     run_blob_actions(&host, blob_actions).await;
 
+    let directory = DeviceDirectorySource::live(Arc::clone(&host), settings_file.clone());
     spawn_pairing_watch(
         Arc::clone(&host),
         settings_file,
@@ -324,7 +334,7 @@ pub async fn start<P: IdentityProvider + ?Sized>(
         graphshell::receipts::inbox_dir(&data_root),
     );
     spawn_accept_watch(host, Arc::clone(&surface));
-    Ok(Some(surface))
+    Ok(Some(PersonalSyncStarted { surface, directory }))
 }
 
 /// Run the one-shot blob operations the operator asked for on this start.
@@ -410,23 +420,36 @@ async fn fetch_blob(host: &PersonalSyncHost, blob: [u8; 32]) {
 /// to its peer: no relay configured, and mDNS not announcing. Those need
 /// opposite fixes, so guessing between them is worse than saying nothing.
 ///
-/// `known_peers` reports address-book membership rather than a live connection,
-/// so it cannot promise reachability; it can still separate "no peer is even
-/// configured" from "a peer is configured and told us nothing".
+/// `known_peers` lists every paired device, whether or not an address is known,
+/// so it separates "none is paired", "none has been found" and "one has been
+/// found and is not talking"; only the last is a firewall question.
 async fn report_unadvertised_blob(host: &PersonalSyncHost, blob: [u8; 32]) {
     let peers = host.known_peers().await.unwrap_or_default();
+    let addressed = peers.iter().filter(|peer| peer.reachable).count();
     let connected = peers.iter().filter(|peer| peer.connected).count();
     let waited_s = BLOB_FETCH_WAIT_TICKS * BLOB_FETCH_WAIT_TICK.as_secs();
+    let blob = owner_settings::hex32(&blob);
     if peers.is_empty() {
         tracing::error!(
-            blob = %owner_settings::hex32(&blob),
+            %blob,
             waited_s,
             "no device is paired onto this graph's overlay, so \
              nothing could advertise this blob"
         );
-    } else if connected == 0 {
-        tracing::error!(
-            blob = %owner_settings::hex32(&blob),
+        return;
+    }
+    match silence(peers.len(), addressed, connected) {
+        Some(Silence::Unfound) => tracing::error!(
+            %blob,
+            waited_s,
+            peers = peers.len(),
+            "no paired device has an address, so no advertisement \
+             could arrive: local discovery has not found one on this \
+             network, and no saved hint or relay names one. Check \
+             that the holder is on, and on this network"
+        ),
+        Some(Silence::Unanswered) => tracing::error!(
+            %blob,
             waited_s,
             peers = peers.len(),
             "no paired device has a live path, so no \
@@ -434,17 +457,16 @@ async fn report_unadvertised_blob(host: &PersonalSyncHost, blob: [u8; 32]) {
              failure, not a missing blob: check a firewall on \
              either end, then whether a relay is configured and \
              reachable"
-        );
-    } else {
-        tracing::error!(
-            blob = %owner_settings::hex32(&blob),
+        ),
+        None => tracing::error!(
+            %blob,
             waited_s,
             peers = peers.len(),
             connected,
             "a device is connected but none advertised this \
              blob. The holder most likely never staged it, or \
              staged it with the blob-availability lane disabled"
-        );
+        ),
     }
 }
 
@@ -826,20 +848,49 @@ async fn refresh_peer_directory(
         detail = ?current,
         "personal sync peer directory changed"
     );
-    // The state that looks fine and is not: peers exist, every one has an
-    // address, and not one is talking. Say it plainly rather than leaving it to
-    // be inferred from a count nobody reads as connectivity.
-    if connected == 0 && !current.is_empty() {
-        tracing::warn!(
+    match silence(current.len(), addressed, connected) {
+        // Every paired device is listed from the start, address or not, so
+        // this is how a start reads before discovery has found anyone, and
+        // how any start reads while the others are off. Not a fault.
+        Some(Silence::Unfound) => tracing::info!(
+            peers = current.len(),
+            "no paired device has an address yet: local discovery has not \
+             found one on this network, and no saved hint or relay names one"
+        ),
+        // The state that looks fine and is not: an address is known and not
+        // one device is talking. Say it plainly rather than leaving it to be
+        // inferred from a count nobody reads as connectivity.
+        Some(Silence::Unanswered) => tracing::warn!(
             peers = current.len(),
             addressed,
             "no paired device has a live path: this host is \
              replicating nothing. Check a firewall on either \
              end, then whether a relay is configured and \
              reachable"
-        );
+        ),
+        None => {},
     }
     *reported = Some(current);
+}
+
+/// Why nothing replicates, when nothing does.
+#[derive(Debug, PartialEq, Eq)]
+enum Silence {
+    /// Devices are paired, and none has an address yet.
+    Unfound,
+    /// An address is known for at least one, and none is connected.
+    Unanswered,
+}
+
+/// `None` while a device is connected, or while none is paired.
+fn silence(peers: usize, addressed: usize, connected: usize) -> Option<Silence> {
+    if peers == 0 || connected > 0 {
+        None
+    } else if addressed == 0 {
+        Some(Silence::Unfound)
+    } else {
+        Some(Silence::Unanswered)
+    }
 }
 
 async fn refresh_dial_hint(
@@ -1141,6 +1192,16 @@ mod tests {
     fn a_graph_name_maps_to_one_id_and_different_names_do_not_collide() {
         assert_eq!(personal_graph_id("personal"), personal_graph_id("personal"));
         assert_ne!(personal_graph_id("personal"), personal_graph_id("scratch"));
+    }
+
+    /// A paired device with no address is listed from the start (pairing plan
+    /// D1b), so "none found yet" must not read as the firewall warning.
+    #[test]
+    fn silence_names_unfound_apart_from_unanswered() {
+        assert_eq!(silence(0, 0, 0), None, "nothing paired is not silence");
+        assert_eq!(silence(2, 2, 1), None, "one connected device is enough");
+        assert_eq!(silence(2, 0, 0), Some(Silence::Unfound));
+        assert_eq!(silence(2, 1, 0), Some(Silence::Unanswered));
     }
 
     /// The pairing watcher starts from this value. Losing the root here means

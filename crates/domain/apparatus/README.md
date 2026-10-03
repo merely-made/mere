@@ -1,17 +1,91 @@
 # apparatus
 
-Apparatus domain layer for the [mere](https://crates.io/crates/mere) browser:
-the peripheral system-inspector strip. Package `mere-apparatus`, library
-`apparatus`.
+Shared diagnostics home for [mere](https://crates.io/crates/mere).
+Package `mere-apparatus`, library `apparatus`. The September 29 ruling assigns
+bounded observations and inspection to this crate; the current implementation
+provides a renderer-independent bounded record store and read-only inspection
+data, and retains the earlier
+peripheral system-inspector skeleton behind its default `projection` feature.
+
+See the [diagnostics plan](../../../design_docs/mere_docs/implementation_strategy/2026-06-08_system_diagnostics_and_accessibility_plan.md)
+for the accepted ownership boundaries, qualified bounded-core consumers and
+remaining worker/image and human accessibility gates.
 
 ## API
 
 | Item | Role |
 | --- | --- |
-| `project_skeleton() -> uxtree::UxTree` | Emits the v0 skeleton subtree. Takes no input. |
+| `ObservationStore<P>` | Retains already redacted product payloads under count, accounted byte and age bounds. |
+| `ObservationMetadata`, `Envelope`, `RecordRef` | Optional producer-supplied causal/subject/revision/frame links, scoped run/source sequences and distinct source/receipt times. |
+| `RetentionLimits` | Product-configured count, byte and age limits; any zero disables retention. |
+| `Cursor`, `Batch<P>`, `Gap`, `RunBoundary` | Independent non-destructive readers, copied batches, explicit unavailable ranges and reset boundaries. |
+| `StoreStats`, `LossSummary` | Retained range/bytes and cumulative per-run rejected, evicted, expired and known dropped counts. |
+| `inspect_batch`, `Inspection`, `InspectionLine`, `InspectionLimits` | Bounded read-only rows over an independent batch, with loss/gaps, producer-supplied labels, scoped causes and explicit unavailable correlation. |
+| `project_inspection` | Structural accessibility projection of those same rows when `projection` is enabled; the product supplies layout/focus and any separately authorized actions. |
+| `project_skeleton() -> uxtree::UxTree` | Emits the v0 skeleton subtree when `projection` is enabled. Takes no input. |
 | `VERSION`, `STAGE` | Crate version string and lifecycle marker (`"pre-alpha"`). |
 
-## Node shape
+## Storage example
+
+```rust
+use apparatus::{ObservationStore, ObservationMetadata, RetentionLimits};
+use std::time::Duration;
+
+let mut store = ObservationStore::new("unique-run".into(), "desktop".into(),
+    RetentionLimits {
+        max_records: 128,
+        max_bytes: 256 * 1024,
+        max_age: Duration::from_secs(300),
+    });
+let mut inspector = store.cursor();
+let mut receipt = store.cursor();
+let payload = "redacted product observation";
+store.record(payload, payload.len(), ObservationMetadata::default(), Duration::ZERO)?;
+let visible = store.read(&mut inspector, Duration::ZERO, 64)?;
+let evidence = store.read(&mut receipt, Duration::ZERO, 64)?;
+assert_eq!(visible.records, evidence.records);
+# Ok::<(), apparatus::StoreError>(())
+```
+
+The example limits are product policy choices, not crate defaults. Supply host
+monotonic elapsed time on every record, read, expiry or limit update. A backward
+time fails without changing store/cursor state. Age equality expires a record.
+`stats()` observes the last enforced state; `expire(now)` refreshes it without
+reading. `tail_cursor()` explicitly starts after existing records. `read` with a
+zero record limit leaves the cursor untouched; positive limits never skip a
+retained successor. Batches copy payloads and remain valid after store eviction.
+
+Rejected and known dropped observations consume sequence positions, so cursors
+see unavailable ranges even when retention is disabled. `note_dropped` accepts
+only actual known ingress loss. Missing instrumentation is not counted loss.
+Counters saturate at `u64::MAX`. `reset` returns prior run statistics, clears
+retention/counters and starts the new monotonic clock; use a unique run identity
+that was never used before. Existing readers receive an explicit run boundary.
+Resetting with the immediately previous run identity is rejected; Apparatus
+does not retain an unbounded identity history to check all earlier runs.
+
+Products must redact and bound payload construction before recording. The payload
+byte argument declares the length of the product's chosen encoded payload; generic
+`P` prevents Apparatus from independently validating this number. The store adds
+deterministic envelope accounting for every ID, option and time field, and rejects
+oversized records before admission. This is an accounted encoded-byte bound,
+not an allocator-memory bound or a JSON export-size bound. `map_payload` preserves
+original admission accounting when adapting a batch to a receipt payload.
+
+No action dispatcher, terminal-outcome matcher, ingress queue, exporter or durable
+storage is installed. Products retain operation and persistence authority.
+
+## Skeleton node shape
+
+The current `inspect_batch` interface is independent of the legacy skeleton.
+Products supply borrowed, already redacted payload labels; arbitrary payload
+fields are never formatted by the shared crate. Configured record/gap/text
+limits bound display construction, with text capped at Unicode scalar
+boundaries. Summary counters distinguish store loss from omitted display rows.
+Missing instrumentation remains unknown; absent operation/cause/revision/frame
+references remain unavailable. Cause references keep their run/source scope.
+Rows are read-only and do not resolve or dispatch actions. `project_inspection`
+supplies structural labels without claiming painted bounds or human AT acceptance.
 
 ```text
 apparatus (Role::Group, label "Apparatus")
@@ -26,11 +100,17 @@ Node ids come from `uxtree::node_id_for_path`: `apparatus` for the root,
 
 ## Dependencies
 
-`accesskit`, `uxtree`, `tracing`.
+The storage core uses only `std`. Disable default features for core-only consumers.
+`projection` enables `accesskit`, `uxtree`, `tracing` and `project_skeleton`;
+it is enabled by default to preserve the earlier API. Optional `serde` enables
+envelope, metadata, payload batch, statistics and cursor serialization; opaque
+cursors cannot be deserialized/restored into another store.
 
 ## Status
 
-Pre-1.0. Sections are empty placeholders. Each fills in as its host bridge
-lands: a tracing-subscriber bridge for events, `register_diagnostics`
-channel taps, a snapshot of the running uxtree, and a walk of the current
-accesskit tree.
+Pre-1.0. Storage and inspection have focused contract tests. Turnstone and
+Redshank qualify the bounded storage/receipt contract; exact action/worker/image
+correlation and human AT remain separate gates. The inspection API's focused
+all-feature library gate passes 22 tests on 2026-09-30. Product view adoption
+and native qualification are in progress. Skeleton sections remain empty
+placeholders; they do not imply a working diagnostics interface.

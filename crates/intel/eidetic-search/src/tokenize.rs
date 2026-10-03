@@ -6,17 +6,14 @@
 
 //! One tokenizer, used for indexing and for querying.
 //!
-//! **Stand-in.** This is a placeholder for genet's UAX #29 segmentation
-//! component — the platform primitive Mark ruled to found, which Selection,
-//! find-in-page, `Intl.Segmenter`, this index and `esp`'s lexical embedder all
-//! want (lighter-recall brief §3.4). The swap point is
-//! [`Tokenizer::segment`]: replace its body with the genet call and every
-//! consumer of [`Tokenizer::tokens`] follows. Nothing else here is
-//! segmentation — the rest is normalization.
+//! Genet supplies the versioned UAX #29 default word boundaries. Everything
+//! after that seam is search policy: connector splitting, lowercasing and
+//! optional stemming. Locale dictionaries remain a separate future profile.
 //!
 //! Public so `esp` can share it rather than grow a second token stream.
 
-use unicode_segmentation::UnicodeSegmentation;
+/// Boundary profile used before search-specific normalization.
+pub const SEGMENTATION_PROFILE: &str = genet_text::PROFILE;
 
 /// The tokenizer's name, recorded in the index spec.
 pub const TOKENIZER_NAME: &str = "unicode-words";
@@ -44,9 +41,9 @@ impl Tokenizer {
         Self { stem: Some(stem) }
     }
 
-    /// The segmentation seam — the only part genet's component replaces.
+    /// The shared boundary seam; search normalization follows separately.
     fn segment(text: &str) -> impl Iterator<Item = &str> {
-        text.unicode_words()
+        genet_text::words(text)
     }
 
     /// Tokens for one field of text, in order.
@@ -102,6 +99,16 @@ mod tests {
     }
 
     #[test]
+    fn shared_boundaries_keep_the_existing_index_token_stream() {
+        assert_eq!(
+            Tokenizer::new().tokens("don't 3.14 foo_bar café"),
+            ["don", "t", "3", "14", "foo", "bar", "café"]
+        );
+        assert_eq!(TOKENIZER_NAME, "unicode-words");
+        assert_eq!(SEGMENTATION_PROFILE, "uax29-default-unicode-17.0.0");
+    }
+
+    #[test]
     fn the_stemmer_seam_is_a_no_op_until_installed() {
         assert_eq!(Tokenizer::new().tokens("Running"), ["running"]);
         fn chop(word: &str) -> String {
@@ -116,7 +123,7 @@ mod tests {
         assert_eq!(tokenizer.tokens("Grüße, Welt"), ["grüße", "welt"]);
         // UAX #29 alone has no dictionary, so unspaced scripts fall to one
         // token per ideograph. Recall still works, precision does not — the
-        // genet component behind `segment` is where a dictionary lands.
+        // default profile makes no dictionary-segmentation claim.
         assert_eq!(tokenizer.tokens("東京 tower"), ["東", "京", "tower"]);
     }
 }

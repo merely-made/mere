@@ -1,7 +1,9 @@
 # Graphshell tree migration inventory
 
 **Date:** 2026-09-27
-**Status:** implementation inventory for phase 4, not a completion receipt.
+**Status (2026-09-30):** phase 4 in progress; saved-graph Title/Tags migration
+has native and headed reopening receipts. Remaining product migration and
+large-graph responsiveness are open.
 **Parent:** [Graphshell on one Cambium tree](2026-09-25_graphshell_one_tree_plan.md).
 
 Mark approved proceeding to Cambium while treating rendering performance and
@@ -29,12 +31,12 @@ arrangement slots remain separate; Restore arrangement explicitly reapplies
 them and pauses. Resume seeds from the frozen positions and currently clears
 velocity. This establishes position continuity, not momentum continuity.
 
-This remains the first migration slice. `TreePage` currently opens a fixture
-with `GraphshellApp<MemoryBackend>` and retains only its graph. The main browser
-page retains `GraphshellApp<IndexedDbBackend>`, product state and integrations.
-Adding controls to the fixture does not migrate that application's persistence,
-remote sessions, editors, or practice workspace. Keep existing pages available
-until those behaviors have crossed the boundary and passed their receipts.
+The default `TreePage` opens a fixture with `GraphshellApp<MemoryBackend>` and
+retains only its graph. The opt-in `app=local` route now retains the existing
+IndexedDB application and its Title/Tags editor, as recorded below. The main
+browser page still owns the broader product state and integrations. Keep
+existing pages available until each remaining behavior has crossed the
+boundary and passed its receipt.
 
 ## Owners and seams
 
@@ -89,6 +91,11 @@ profile synchronization. Do not copy the form handler into the tree.
    has moved. Remove the old scenario pump when its product semantics and
    observations have migrated to Mesquite.
 
+**Annotation (2026-10-01):** Mark ruled the physics panel next, ahead of the
+rest of step 3, together with the remote session from step 2 that two of its
+scenarios need. The rulings (base, done-condition, routes, execution) are in
+the parent plan's §1, "Phase 4 physics-panel rulings".
+
 Each panel is done when its existing product effect, keyboard operation,
 accessibility projection and relevant scenario pass on the tree. Full phase 4
 also requires the parent plan's entire receipt and five-page gates.
@@ -123,9 +130,9 @@ restless laws, drag return/hold semantics, pause/resume and the remote-board
 boundary. Their existence is not a current passing tree receipt or a performance
 acceptance result.
 
-## Next physics slice (proposal, not a new ruling)
+## Elapsed-time physics slice
 
-**Core implemented; host adoption pending.** Following approval to continue,
+**Core implemented; host adoption added 2026-09-29.** Following approval to continue,
 Seiche now exposes opt-in `Physics::advance_elapsed`, `ElapsedStepConfig` and
 `ElapsedStepReport`. It accepts caller-supplied elapsed time, runs bounded
 fixed steps, publishes one snapshot, reports discarded time, and carries only
@@ -139,25 +146,28 @@ The focused runtime gate passes 12 tests with default features and eight with
 `--no-default-features`, both offline and locked. These cover render-rate
 equivalence, long stalls, zero limits, rounding boundaries, idle/pause/reseed/
 suspension resets, deterministic one-step compatibility, and actor isolation.
-The full native gate also passes all 88 Seiche tests. Canvas and browser
-callers remain on the existing deterministic path so this core addition does
-not change the current rendering measurements. The host work below remains
-pending, including visibility wiring, host timestamp reset and headed evidence.
+The original full native gate also passed all 88 Seiche tests. Those earlier
+rendering measurements used deterministic advancement and remain historical.
+Pictograph now offers `frame_at` and `frame_profiled_at`: they accept monotonic
+host timestamps, compose once after the bounded steps, and expose the last
+`ElapsedStepReport`. The first call after reset establishes a baseline.
+Backwards/repeated timestamps do not accrue time. Pause/resume, explicit seeds,
+restore and producer suspension clear the timestamp and fractional debt.
 
-Rendering currently advances inline physics once per Canvas frame. Reuse the
-bounded elapsed-time accumulator in `web_practice.rs::PracticeHost::frame`
-(50 ms contribution cap, fixed 60 Hz steps), rather than adding a scheduler.
-Seiche should own configurable maximum elapsed contribution and steps per
-frame; Canvas should compose once after those steps. Keep `advance_frame` as
-the deterministic receipt/test path. The actor branch must remain a snapshot
-drain because its simulation already runs independently.
+Rootstock's `Host::redraw_at` scopes the supplied timestamp to one draw and
+passes it in `ProducerFrameInfo`. Untimed redraw remains available. The web
+host forwards animation timestamps, uses the same performance clock for
+immediate input draws, and routes document visibility through `set_hidden`.
+Hidden pages stop drawing; suspension resets the Canvas clock and visibility
+requests a fresh frame. Actor simulation retains its independent pacing.
 
-Reset accumulated time on pause, reseed, restore and suspension. The web host
-currently discards the animation-frame timestamp and does not wire document
-visibility to host hidden state; use the existing producer suspension path
-when making that connection. Record executed steps and discarded elapsed time
-beside physics cost. The current practice cap is a starting configuration,
-not a latency guarantee: one expensive step can still block input.
+The Graphshell tree opts into timed advancement, with configurable caps from
+`physics_max_steps` and `physics_max_elapsed_ms` page parameters. Defaults are
+three steps and 50 ms. Timing receipts include executed steps, discarded
+microseconds and carried microseconds beside physics cost. Existing native
+Canvas callers, the old presenter, camera inertia and backdrop pacing are
+unchanged. One expensive physics step can still block input; the caps are not
+a latency guarantee.
 
 Done means equivalent visible elapsed time produces equivalent fixed-step
 motion at different render rates; stalls have bounded work; pause and hidden
@@ -165,3 +175,47 @@ time never trigger catch-up; restore and dragging still pass; actor progress
 remains independent of rendering; and a headed moving-graph receipt records
 step counts, dropped time and input response. This is separate from the
 rendering optimizations measured in the current slice.
+
+## Local saved-graph slice (2026-09-29)
+
+`tree.html?app=local` mounts the portable `GraphshellApp` over the existing
+`graphshell-reference-host-h5` / `muniment` IndexedDB store and the same
+`profile:graphshell-h3` selection. It reopens the saved graph instead of
+constructing a separate comparison fixture. Generated-graph parameters cannot
+be combined with this route.
+
+Selecting an object exposes Open details; Enter on the focused graph also
+opens the selected object's panel. Cambium's named Title and Tags fields edit
+a draft, with host caret and IME routing. Save changes validates the member,
+normalizes metadata and awaits persistence. A refused write reports failure
+and keeps edits available for retry. The asynchronous task owns the app, and
+selection and draft editing are held while the save is in flight.
+
+Successful saves update canvas metadata through its existing title/tag seams.
+They preserve geometry, camera, selection and physics state. A projection
+refresh error after persistence is described as a refresh failure after a
+successful save, rather than a failed storage write.
+
+The paired `p4_tree_saved_edit` and `p4_tree_saved_reopen` scenarios exercise
+the rendered fields and a separate load of the same browser profile. Their
+receipts export session and member IDs for comparison across loads. This
+bounded route does not complete phase 4: remote sessions, saved-scene
+restoration, other product panels and the five public wrappers remain open.
+
+Four focused native tests pass for durable identity/metadata reopening,
+stale-selection rejection without writes, refused-write retry and Canvas
+state preservation. On 2026-09-30, the paired headed edit/reopen scenarios pass
+on the merged current-main bundle. The independent load retains the same
+session and member UUIDs, `TreeSavedTitle` and normalized `alpha, beta` tags.
+Controls and elapsed-physics scenarios also pass. A real background-tab mount
+passes its first visible resume after about 32 seconds hidden, with a
+preexisting accessibility mirror and no hidden producer calls. Moving-graph
+hide/show and intentional hidden-timing rejection remain pending. The
+[controls receipt](../testing/2026-09-27_graphshell_controls_physics_receipt.md)
+records the exact baseline, hashes and qualified diagnostic timings.
+
+Mark describes current physics as slightly laggy but acceptable, while leaving
+room for different layouts and physics laws to behave differently at different
+scales. This is a user observation and a comparison hypothesis. Current
+generated-graph timing receipts do not establish the performance of other
+layouts, laws, graph densities or hardware.

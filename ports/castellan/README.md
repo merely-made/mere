@@ -21,7 +21,9 @@ The vocabulary it keeps, per the dramatis tier model:
 The boundaries are the point: not [personae](https://crates.io/crates/personae)
 (the faces and vault substrate castellan serves), and not
 [gaz](https://crates.io/crates/gaz) or gazette (which keep and find the other
-players; castellan guards and presents you).
+players; castellan guards and presents you). Castellan issues a persona's
+public presentation and gazette announces it (ruled 2026-09-30), so the port
+that holds secrets never grows a public listener.
 
 Lives in the [mere](https://github.com/merely-made/mere) workspace at
 `ports/castellan`.
@@ -34,7 +36,7 @@ Implemented:
   items sealed through Personae's record store. `OtpReleaseGate` returns a
   redacted-debug `OtpCodeTile` only after a participant-bound petition receives
   an explicit approval; its time facts leave ring geometry to the host.
-  `OtpAdmittedSession` consumes Notochord admission for one exact item, derives
+  `OtpAdmittedSession` consumes Notochord admission for one exact credential, derives
   the participant from the signed transcript, rechecks expiry and revocation at
   approval and delivery, and exposes the tile only beside the original carrier.
   It leaves byte encoding to the composing host's existing protocol. Steam
@@ -60,10 +62,30 @@ Implemented:
   (`PersonaeHost`, the resident keeper that holds the vault, serves the SSH
   agent, and brokers approvals).
 
+For private mutable slots, `PersonaeHost::sealed_backend(persona, backend)`
+loads the wallet epoch and supplies Pandect's `WalletSealedBackend`. An absent
+carry root or epoch returns `PermissionDenied`. There is no cleartext fallback.
+The host still chooses the Muniment backend, codec, and persona-to-scope mapping.
+The Gaz receipt at `tests/sealed_contacts.rs` uses JSON and postcard books,
+real redb reopening, and retained-proof rechecking. Keys stay visible, epoch
+history must be supplied for old records, and replay of an authenticated value
+at its original key is outside this adapter's freshness guarantee.
+
+The address-intake receipt at `tests/sealed_webfinger_intake.rs` also composes
+Gazette's supplied WebFinger adapter with this backend. JSON/postcard reopen and
+replay preserve private names, notes, Kin, address trust/usage and root/device
+artifacts. Fresh claims start Unverified; a new contact requires the host's
+LocalId. The receipt proves native sealed composition and persona isolation;
+live resolver transport and application contact UI remain separate work.
+
 Graphshell composes all three and re-exports them at its pre-founding paths,
 so it is the first host rather than the owner. The intent wire strings keep
 their `castellan.*` values for now; renaming the wire vocabulary is
-a separate decision. CXF import remains follow-on work. The file freshness
+a separate decision. CXF import remains follow-on work; its policy was ruled
+on 2026-10-01. The everyday credentials are stored and SSH keys go through
+the native SSH import. Identity documents, payment cards, passkeys, files and
+unknown types are quarantined: sealed, never exercised, and accepted one at a
+time by the user. The secret-free item taxonomy moves to chatelaine. The file freshness
 ledger detects rollback of the credential-record root only when its separate
 root was not restored with it; stronger platform monotonic storage remains a
 host deployment choice. See the keeper founding plan and the credential port

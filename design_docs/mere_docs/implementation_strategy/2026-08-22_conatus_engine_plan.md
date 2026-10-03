@@ -527,6 +527,173 @@ contract declared in advance.
   build reaches `nexus_rbd3d`, then the Khal build script's `cargo-gpu 0.1.0`
   invocation fails while removing `Cargo.lock`. No Nexus kernel executed, so
   Nexus remains outside Conatus and shared buffer ownership remains unproven.
+  *Annotation (2026-10-01):* diagnosed and cleared after Mark ruled "Fix now"
+  (physics catalog plan §5). The failure was a race, not a missing-file bug:
+  two Nexus build scripts (vortx's and `nexus_rbd2d`'s) each run `cargo gpu
+  build`, and cargo-gpu 0.1.0 has no lock around its shared codegen install,
+  so one process's `Cargo.lock` removal or `target\` cleanup lands under the
+  other (os errors 2, 145 and 3; all three cold concurrent runs failed). The
+  rust-gpu fork's cargo-gpu 0.10.0-alpha.1 already takes a `FileLock` on the
+  install; with it unpatched, the same cold runs passed 2 of 2, `nexus_rbd2d`'s
+  five GPU radix-sort tests passed, and `nexus_rbd3d`'s `test_stacks_1_tiny`
+  ran 250 GPU steps on the RTX 4060 (Vulkan). Logs:
+  `Code/testing/nexus-build/`. No patch was made; whether to patch anyway,
+  replace the installed 0.1.0 binary, and pin the codegen version are open.
+  This proves Nexus kernels execute here; shared buffer ownership with the
+  host's device is still unproven.
+  Ruled the same day:
+  - **The fork patch.** Mark chose no patch ("1"), and added: "also make sure
+    we're up to date for, rust-gpu, renderling, and nexus. they develop fast.
+    let's get what we can from their respective upstreams". At that check,
+    nexus was 2 commits behind upstream main (`1cfbd76`), the rust-gpu fork
+    branch 27 behind (`0a9d096f32`, the v0.10.0 release) with our two
+    version-gate commits on top, renderling 1 behind with our four wgpu-30
+    commits plus 26 uncommitted files last touched 2026-09-15, and the
+    standalone cargo-gpu archived upstream (merged into rust-gpu).
+  - **The installed cargo-gpu.** "Replace, after checking renderling": build
+    renderling's shaders with the new cargo-gpu first; replace
+    `~/.cargo/bin/cargo-gpu` 0.1.0 only if they pass.
+  - **The codegen version.** Told the cache held `rustc_codegen_spirv` 0.10.0
+    while Nexus used spirv-std 0.10.0-alpha.1, Mark asked "wait. why aren't
+    we on the most up to date...? sure, 3": move Nexus to the 0.10.0 line
+    (upstream main) rather than pinning the codegen back. The answer to his
+    question: the forks were last synced in August and September, and
+    spirv-std 0.10.0 was released on 2026-10-01, so alpha.1 was current
+    until that day.
+  - **The sync, carried out and ruled further.** Nexus fast-forwarded to
+    upstream `1cfbd76`; spirv-std now resolves to 0.10.0 and the codegen to
+    0.10.0, and both GPU proofs pass again (`Code/testing/fork-sync/`).
+    rust-gpu's version-gate bug has no upstream fix but is latent (upstream
+    pins nightly-2026-07-03, 1.98). Mark chose "cargo-gpu 0.10.0 from
+    crates.io": the binary comes from the published release, the fork branch
+    stays as the record, and the standalone `crates/cargo-gpu` fork is no
+    longer used. The alternatives were building from tag v0.10.0, rebasing
+    and carrying the patch, or rebasing and filing it upstream. Renderling's
+    one upstream commit (`46bf54c`, manual chapters and a
+    `Stage::tonemapping()` accessor): "Merge upstream in" to
+    `mark-ik/wgpu-30`, keeping our four commits' hashes. Its 26 uncommitted
+    files, rustfmt output from the repo's nightly-only options with one
+    reflowed expression as the only non-comment change: "Commit as a
+    formatting commit" first. The three codegen caches Nexus no longer uses:
+    "Delete after renderling's check".
+  - **Renderling's check, and the binary** (2026-10-02). Renderling's
+    formatting commit (`e14b737`) and upstream merge (`260e2c2`) landed on
+    `mark-ik/wgpu-30`. Our branch's shaders build with neither cargo-gpu
+    0.1.0 nor 0.10.0: `naga` 30, a build-dependency since our wgpu-30 port,
+    needs rustc 1.87, and the shader toolchain is nightly-2025-02-16 (1.86).
+    Upstream renderling (`46bf54c`) builds with 0.10.0, all 45 `.spv`
+    byte-identical to the committed ones, which our branch shares; renderling's
+    95 library tests pass run serially. Mark chose "Replace now, fix the
+    branch separately": cargo-gpu 0.10.0 becomes the installed default and
+    the three unused codegen caches go. For the branch, "Port shaders to
+    rust-gpu 0.10": spirv-std 0.10 and nightly 1.98, one toolchain with
+    Nexus. The alternatives were an older naga for build.rs, gating build.rs
+    off for shader builds, or leaving it until a shader changes.
+  - **The renderling port's blocker** (2026-10-02). cargo-gpu 0.10.0 is now
+    the installed default and the unused caches are gone. A throwaway trial
+    ported renderling's shaders to spirv-std 0.10 with version and toolchain
+    moves only: 95 of 95 tests, WGSL byte-identical, 44 of 45 `.spv` rebuilt.
+    It is blocked by crabslab (`crates/crabslab`, `mark-ik/wgpu-30`
+    `a1ffc17`), which requires `spirv-std = "0.9.0"`; eponym builds against
+    the live crabslab and renderling checkouts. Mark chose "Sync crabslab
+    upstream first" (13 behind, upstream `f990323` on wgpu 26 and spirv-std
+    git `b3eda4df`); the alternatives were widening the range on
+    `mark-ik/wgpu-30`, or a new 0.10-only branch. The port runs in the
+    **live checkout** (eponym follows it), the rebuilt `.spv` are
+    **committed**, and renderling's build.rs running `cargo +nightly fmt` on
+    every host build is **recorded only**. *Reading, not ruled:* the crabslab
+    sync merges upstream in, as renderling's did.
+    *Reopened (2026-10-02):* the sync is not mechanical. Upstream's 13
+    commits rewrite craballoc (0.4.0 / crabslab 0.7.0, unreleased), deleting
+    `slab.rs`, `value.rs` and `wgpu_slab.rs`, the files our three wgpu-30
+    commits port; a merge conflicts in five files, three modify/delete.
+    Upstream is on wgpu 26 and spirv-std git `b3eda4df` (still 0.9.0). Both
+    upstream renderling and ours require craballoc 0.3.1 / crabslab 0.6.6 and
+    use the deleted API, so a merged checkout would stop matching their patch
+    and Cargo would silently take crates.io 0.3.1 on wgpu 26. Asked how
+    crabslab should move, Mark said: "Full adoption, or consider what would
+    suit the stack best… how could we make renderling the ideal for us?"
+    Open: an assessment of renderling's role in the stack comes back to him
+    first.
+    *Assessed and answered (2026-10-02):* renderling is already ruled out by
+    the presentation plan's L7 (`isometry/mesocosm/design_docs/
+    2026-09-11_orthographic_voxel_presentation_plan.md:418-426`, done-condition
+    unmet), ruling 27 keeps the renderer swappable (kiss3d first, renderling
+    "far later"), and ruling 442's recommendation retires it before the mode
+    host; only `eponym-client`'s `Tenant` and two probes use it. Upstream
+    craballoc 0.4 is unadopted by renderling and superseded by crabslab's
+    `feat/wgsl-rs` (crabslab 1.0 / craballoc 0.5, wgpu 28). Mark's answers:
+    - On reopening L7: "Hmm. Kiss is the straightforward choice for both 2d
+      and 3d. Renderling, the five things we'd get from it, how's that
+      compare to kiss, or other alternative prospective pieces of game engine
+      that would compose into the stack? Consider that in all cases, I am
+      willing to reshape a good candidate into an excellent stack
+      component/module/crate; i don't mind renderling, kiss, or another option
+      as long as they compose well and improve the whole stack with their
+      capabilities. Whether that's rendering, entity management systems, etc.
+      etc. i don't even mind measuring both, or considering wgsl-rs or
+      rust-gpu or whatever". Open: a comparative assessment of candidate
+      engine components comes back to him.
+    - Allocator and shader lane, if renderling is kept: "Residency via
+      conatus/CubeCL": slab residency is replaced by conatus buffers bound
+      directly, one allocator.
+    - Harvesting renderling's lighting: "Compare to what would suit the stack
+      and wing": folded into the comparative assessment.
+    - The R2 receipt: "Re-prove in isometer-render": `isometer-render` binds
+      conatus's CubeCL buffers directly, testing whether the copy and the
+      second allocator disappear.
+    *Engine-component comparison ruled (2026-10-02).* kiss3d 0.46 (wgpu 30,
+    WGSL, BSD-3) covers renderling's five features (shadow maps, clustered
+    lights, PBR/IBL, glTF animation, skinning with morphs on web) plus SSAO,
+    OIT, transmission and 2D lighting; it takes the host's device but keeps a
+    thread-local `Context` singleton (`kiss3d-0.46.0/src/context/context.rs:12`)
+    and wants a window. Renderling's edge is GPU-driven slab instancing. The
+    wing's terrain is traced and its bodies rasterised, joined by depth (L3).
+    - **Renderer tenant:** "kiss3d, reshaped": an explicit context handle in
+      place of the thread-local, a render-into-caller-targets entry with no
+      window, the tracer's depth as a pre-pass, its shadow atlas and light
+      buffer exported. The alternatives were growing isometer-render with
+      both as donors, re-adopting renderling, or measuring both first.
+    - **Lighting:** "Stack-owned light/environment block": sun and
+      day/night from sim fields, the point-light list and the water field
+      live in the scene contract, read by the tracer and the rasteriser; the
+      renderer exports shadow atlas, light buffer and depth. The alternative
+      let the renderer own lighting.
+    - **Shader lane:** "WGSL/WESL for raster, CubeCL for compute", amending
+      the 2026-08-16 "author in CubeCL, the brick renderer included" line to
+      match what ships (all five wing render shaders are WGSL); rust-gpu stays
+      for Nexus-derived compute. The alternatives were wgsl-rs, or rust-gpu
+      0.10 for raster.
+    - **The renderling fork:** "Archive the fork now". The renderling port to
+      rust-gpu 0.10 and the crabslab sync stop. *Reading, not ruled:* eponym
+      still path-depends on the live checkouts, so the archive move waits on
+      L7 or eponym breaks; put back to Mark.
+    These are games-wing decisions; their canonical home is the wing design
+    record in `isometry/mesocosm`, where they have not yet been carried.
+    Further, the same day:
+    - **Archive timing:** "L7 first, then archive": eponym-client's Tenant
+      and lighting move off renderling, its two probes are archived and the
+      patch rows dropped, then both forks move to `archive/`. This resolves
+      the reading above.
+    - **ECS:** "Not bevy, but can we compare the potential of the other
+      two?": hecs and shipyard are being compared; open.
+    - **2D:** "vello for documents, kiss3d 2D for lit games": kiss3d's 2D
+      only behind the scene contract for a lit 2D game. The alternative was
+      vello only.
+    - **Where they live:** "You can do 1, but let the wing session know":
+      they are carried into the wing design record as numbered rulings, with
+      the "Isometric game engine architecture" session told first; it was
+      mid-round (rulings 457 to 466 that night), so the carry waits on its
+      reply to avoid a numbering collision.
+    *Carried (2026-10-02):* the engine rulings are wing record rulings 471
+    to 476 (isometry `36f6f69`), and the ECS, ruled the same day, is 481 to
+    484 (isometry `b4a0387`): hecs stays; the mode host and armillary
+    schedule, the ECS is storage; the projection's diff comes from the
+    record's receipts; a boundary crate in Mere holds the ECS. The wing
+    record is their authority.
+  - **The logged token.** Four build logs captured this session's
+    environment, including its messaging token and account IDs; redacted on
+    Mark's choice.
 
 ## Progress (2026-08-25 resident-position pass)
 

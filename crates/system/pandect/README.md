@@ -22,6 +22,14 @@ here is the adapter: the on-disk layout under the data root, the unlock ladder,
 sealed-record wiring, grant envelopes, and the epoch seal. That split was ruled
 deliberate on 2026-08-10, so this is a home rather than a way-station.
 
+`WalletSealedBackend<B>` wraps the host's selected Muniment backend with the
+persona's `WalletEpochSealer`. It seals each slot value and binds the logical
+key inside the authenticated payload. Its envelope contains an epoch marker
+and a digest salted inside the ciphertext. Keys remain visible for listing.
+Write batches seal fully before reaching the backend; read/write transactions
+return `NotTransactional`. The host supplies historical epochs and any rollback
+protection. Plain or damaged values are refused, without rewriting the record.
+
 Part of the [mere](https://github.com/merely-made/mere) workspace.
 
 Written with AI assistance (Claude).

@@ -77,7 +77,11 @@ configures discovery through this type, not the builder.
   in sync through netwatch. The real fix. 0.4.0 joins only the default-route
   interface, so a multi-homed Windows host whose WSL/Hyper-V adapter holds the
   multicast route never hears LAN mDNS. Drop the patch when a release contains
-  it.
+  it. *Corrected 2026-10-02*: the patch is not in effect. `mere-p2panda-net`
+  0.7.4 requires `iroh-mdns-address-lookup` 0.5.0, so the 0.4.0 fork is
+  `[[patch.unused]]` and the live crate has no per-interface sockets; see the
+  [device pairing by key plan](2026-10-02_device_pairing_by_key_plan.md) §6
+  and its ruling 25.
 - `swarm-discovery`, `mere` branch: rebuilds a socket after three consecutive
   send failures. A dead theory (H10 final, `dfe95f3e`). The macOS stall is
   policy, not sockets: an unsigned binary with no responsible GUI app is denied
@@ -107,11 +111,22 @@ device-list accessor is the seam both need first.
 
 **Done when** (met for peer discovery): ticketless connect across two physical
 machines, proven Fedora-to-Windows and Windows-to-Fedora under H10 and
-Q-PC-to-Windows for Knot's K2. Open: macOS as a discoverable peer waits on a
+Q-PC-to-Windows for Knot's K2. *Corrected 2026-10-02*: the H10 receipts dialled
+a known peer id explicitly in a retry loop (`g5_peer --discover`), and K2 ran
+"over an explicit endpoint ticket" (the Knot-in-Graphshell plan, K2 receipt),
+so neither proved first contact through gossip bootstrap, which fails: see
+the [device pairing by key plan](2026-10-02_device_pairing_by_key_plan.md),
+phase D1b. Open: macOS as a discoverable peer waits on a
 signed bundle, and cross-LAN discovery stays convenience coverage by G5's own
 terms.
 
 ## R1. Cached dial hints (the workhorse rung)
+
+*Corrected 2026-10-02*: `PairedDevice` now lives in djinn
+(`ports/djinn/src/settings.rs:468`), not Graphshell's `device_sync`. SSH
+does not use these hints; the
+[device pairing by key plan](2026-10-02_device_pairing_by_key_plan.md) is
+this ladder's SSH and pairing rung.
 
 `PairedDevice` gains two optional fields, one schema migration for both since
 the H6 addendum already specs the second:
@@ -211,6 +226,12 @@ are stable across restarts, so no receipt yet isolates whether the direct
 address or the relay component carried a dial.
 
 ## R2. Announce-carried dial hints (the sovereign discovery rung)
+
+*Corrected 2026-10-02*: the announce sends no app data now, deliberately:
+the 96-byte binding made an announce 263 bytes, too large for a 255-byte
+LoRa frame, and the signed Retinue identity already carries the Mere key
+(`reticulum_transport/announce.rs:38-51`). Any `EndpointAddr` payload below
+meets that same limit.
 
 The retinue announce already binds authenticated app data (peer id plus
 master-key signature, see `reticulum_transport/announce.rs`). Extend that app

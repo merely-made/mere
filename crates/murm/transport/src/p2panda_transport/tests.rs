@@ -423,4 +423,83 @@ async fn the_peer_directory_separates_a_known_address_from_a_live_path() {
         parsed, bob_id,
         "the ticket names the peer it was cached for"
     );
+
+    // The readable route a directory reports: the live path is a direct
+    // address (no relay is configured), marked active, and carried by the hint.
+    let paths = alice.peer_paths(bob_id).await.expect("path query");
+    let active: Vec<_> = paths.iter().filter(|path| path.active).collect();
+    assert!(
+        active
+            .iter()
+            .any(|path| matches!(path.addr, crate::PeerAddr::Direct(_))),
+        "a connected peer reports its active direct path: {paths:?}"
+    );
+    let (named, carried) = crate::decode_peer_ticket(&ticket).expect("decode the hint");
+    assert_eq!(named, bob_id, "the decoded hint names the same peer");
+    for path in &active {
+        assert!(
+            carried.contains(&path.addr),
+            "the live path {path:?} is one of the hint's addresses {carried:?}"
+        );
+    }
+}
+
+/// Pairing plan D1b: a peer tagged by id before any address is known is joined
+/// once its address arrives. Before, the tag left it out of gossip's bootstrap
+/// set and the late address never re-joined it, so neither side ever dialled.
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn a_peer_tagged_before_its_address_is_joined_once_the_address_arrives() {
+    use tokio_stream::StreamExt;
+
+    let topic = [0x6c; 32];
+    let (alice_kp, _) = make_inputs(120);
+    let (bob_kp, bob_id) = make_inputs(121);
+    let alice = P2pandaTransport::builder(&alice_kp)
+        .gossip()
+        .bind()
+        .await
+        .expect("bind alice");
+    let bob = P2pandaTransport::builder(&bob_kp)
+        .gossip()
+        .bind()
+        .await
+        .expect("bind bob");
+
+    // Paired by id alone: listed at once, with no address and no path.
+    alice.set_topics(bob_id, &[topic]).await.unwrap();
+    let listed = alice
+        .peers_for_topic(topic)
+        .await
+        .expect("directory")
+        .into_iter()
+        .find(|peer| peer.peer == bob_id)
+        .expect("a peer tagged by id is listed before any address is known");
+    assert!(!listed.reachable && !listed.connected, "{listed:?}");
+
+    // Both join before Alice learns where Bob is; Bob knows nobody.
+    let alice_handle = alice.subscribe(topic).await.expect("alice subscribe");
+    let bob_handle = bob.subscribe(topic).await.expect("bob subscribe");
+    let mut bob_rx = bob_handle.subscribe();
+    alice
+        .add_peer(bob.endpoint_addr().await.unwrap())
+        .await
+        .unwrap();
+
+    let payload = b"joined after the address arrived".to_vec();
+    tokio::time::timeout(std::time::Duration::from_secs(20), async {
+        loop {
+            alice_handle
+                .publish(payload.clone())
+                .await
+                .expect("publish");
+            tokio::select! {
+                msg = bob_rx.next() => {
+                    if let Some(Ok(bytes)) = msg && bytes == payload { break }
+                }
+                _ = tokio::time::sleep(std::time::Duration::from_millis(250)) => {}
+            }
+        }
+    })
+    .await
+    .expect("alice joined bob once his address arrived");
 }

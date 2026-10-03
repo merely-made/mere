@@ -45,8 +45,8 @@ pub use owned_layout::{OwnedLayout, ScrollAlign, ScrollTarget};
 pub mod producer;
 pub use producer::{
     ProducedTexture, ProducerContext, ProducerError, ProducerFrameInfo, ProducerFrameStats,
-    ProducerRegistrationError, ProducerRegistry, ResolvedAppearance, SourceAlpha, SourceEncoding,
-    TextureProducer,
+    ProducerNode, ProducerRegistrationError, ProducerRegistry, ProducerRole, ProducerSemantics,
+    ResolvedAppearance, SourceAlpha, SourceEncoding, TextureProducer,
 };
 
 /// The host's clock.
@@ -255,11 +255,16 @@ pub trait Accessibility {
     /// and is what the projected boxes ride into the platform's physical client
     /// coordinates. It is passed rather than read off a window because the zoom
     /// half of it is the host's, not the window's.
+    ///
+    /// `producers` is asked for each texture-producer slot's own semantics
+    /// ([`TextureProducer::semantics`]), which a host writes under the slot.
+    #[allow(clippy::too_many_arguments)]
     fn sync(
         &mut self,
         dom: &ScriptedDom,
         layout: &OwnedLayout,
         leaves: &mut LeafRegistry<u64>,
+        producers: &mut ProducerRegistry,
         focus: Option<u64>,
         layout_scale: f64,
     ) -> Vec<A11yRequest>;
@@ -276,7 +281,14 @@ pub fn document_projection(
 ) -> DocumentA11yProjection {
     use layout_dom_api::LayoutDom as _;
     let focus = focus.and_then(|opaque| find_opaque(dom, dom.document(), opaque));
-    genet_render::document_a11y_projection(dom, layout.fragments(), focus, 0)
+    genet_render::document_a11y_projection_with_generated_text(
+        dom,
+        layout.fragments(),
+        focus,
+        0,
+        None,
+        &|node| layout.generated_text(dom, node),
+    )
 }
 
 fn find_opaque(dom: &ScriptedDom, node: NodeId, opaque: u64) -> Option<NodeId> {
@@ -334,6 +346,8 @@ pub enum NamedKey {
     Delete,
     Home,
     End,
+    F10,
+    Alt,
     PageUp,
     PageDown,
     /// A named key this vocabulary does not special-case.
@@ -355,6 +369,8 @@ impl From<NamedKey> for cambium::NamedKey {
             NamedKey::Delete => Self::Delete,
             NamedKey::Home => Self::Home,
             NamedKey::End => Self::End,
+            NamedKey::F10 => Self::F10,
+            NamedKey::Alt => Self::Alt,
             NamedKey::PageUp => Self::PageUp,
             NamedKey::PageDown => Self::PageDown,
             NamedKey::Other => Self::Other,
@@ -724,6 +740,24 @@ mod tests {
     }
 
     #[test]
+    fn menu_entry_keys_lower_without_losing_identity_or_modifiers() {
+        let f10 = KeyPress::named(NamedKey::F10)
+            .to_runner_key()
+            .expect("F10 reaches the runner");
+        assert!(matches!(f10.key, cambium::Key::Named(cambium::NamedKey::F10)));
+
+        let alt = KeyPress::named(NamedKey::Alt)
+            .with_modifiers(Modifiers {
+                alt: true,
+                ..Modifiers::NONE
+            })
+            .to_runner_key()
+            .expect("Alt reaches the runner");
+        assert!(matches!(alt.key, cambium::Key::Named(cambium::NamedKey::Alt)));
+        assert!(alt.mods.alt);
+    }
+
+    #[test]
     fn an_unidentified_key_with_no_text_is_dropped() {
         let bare = KeyPress {
             key: Key::Unidentified,
@@ -826,8 +860,8 @@ pub use host::{
     AppCtx, AppFrameInsets, AppHook, CaptureFn, CloseDisposition, CloseRequest, CloseRequestHook,
     FocusedTextHook, FocusedTextSlot, FrameHook, FrameProfile, Hook, Host, HostFont, HostHooks,
     HostImage, HostOptions, HostPointer, HostState, IdlePolicy, Init, KeyInterceptHook,
-    PaintCaptureFn, RelayoutProfile, Runner, ScrollIntoView, WindowFrame, ZOOM_LADDER, env_size,
-    fit_zoom, ladder_step,
+    PaintCaptureFn, PresentationObserver, PresentedFrame, RelayoutProfile, Runner, ScrollIntoView,
+    StampedCaptureFn, WindowFrame, ZOOM_LADDER, env_size, fit_zoom, ladder_step,
 };
 pub use wake::HostWake;
 pub use window_verbs::{AppRegion, WindowCommand, WindowCommands, WindowGeometry};

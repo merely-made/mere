@@ -106,6 +106,10 @@ pub enum NamedKey {
     Home,
     /// Move the cursor to the end of the line.
     End,
+    /// Enter the application menu bar on Windows and Linux.
+    F10,
+    /// The Alt key by itself, used to enter an application menu bar.
+    Alt,
     /// Move by a larger semantic increment.
     PageUp,
     /// Move by a larger semantic decrement.
@@ -228,6 +232,14 @@ impl<V, State, Action, F> OnKey<V, State, Action, F> {
     /// focused descendants, such as Escape dismissal on an overlay container.
     pub fn focusable(mut self, value: bool) -> Self {
         self.focusable = value;
+        self
+    }
+}
+
+impl<Seq, State, Action, F> OnKey<crate::El<Seq, State, Action>, State, Action, F> {
+    /// Set an attribute on the wrapped element, including a field's accessible name.
+    pub fn attr(mut self, name: impl Into<String>, value: impl Into<String>) -> Self {
+        self.child = self.child.attr(name, value);
         self
     }
 }

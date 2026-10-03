@@ -3,7 +3,8 @@
 **Date**: 2026-09-23
 **Status (2026-09-29)**: phase A landed 2026-09-24 and phase B on 2026-09-26
 (§3); C landed in Mere and Knot on 2026-09-29; sibling repins remain open.
-D is next. Mark agreed the split
+D landed in Gaz on 2026-09-29: stored artifacts reload and check again.
+Mark agreed the split
 and ruled how issuing is expressed (§2, option (a)) on 2026-09-23. The Mere
 0.4 release baseline's Insigne prerequisite was phase B, met on 2026-09-26.
 **Scope**: move personae's delegation and attestation data types into insigne's
@@ -15,7 +16,7 @@ personae; then let gaz keep the proofs it receives.
 - [crate consolidation plan](../../mere_docs/implementation_strategy/2026-09-23_crate_consolidation_plan.md),
   insigne row: the move this plan executes.
 - [gaz founding plan](2026-08-08_gaz_founding_plan.md), M2: gaz keeps the
-  proofs themselves (Mark, 2026-09-23), which waits on this plan.
+  proofs themselves (Mark, 2026-09-23), implemented by phase D of this plan.
 - [device-grant delegation reconciliation](../../mere_docs/technical_architecture/2026-08-11_device_grant_delegation_reconciliation.md):
   it put the delegation grammar in personae. This plan changes where the
   grammar lives, not what it says.
@@ -131,7 +132,8 @@ communicate to 'em". Built as two traits rather than one: `Issue` in
   their own adoption gates.
 - **D — gaz keeps the proofs** (gaz founding plan, M2). `RootKey` and
   `AttestedKey` carry the artifact that proved them. Done when a gaz record
-  round-trips a stored attestation and it checks again after reload.
+  round-trips a stored attestation and it checks again after reload. Met
+  2026-09-29 by JSON and postcard book reloads followed by real signature checks.
 
 ### B, as ruled 2026-09-26
 
@@ -443,3 +445,69 @@ once the changes reach origin/main; the primary checkout's concurrent WIP is
 left untouched.
 
 Next: phase D. The sibling repins above remain explicit downstream work.
+
+### Phase D (2026-09-29)
+
+Gaz's `RootKey::proof` and `AttestedKey::proof` now hold `Option<KeyProof>`.
+The variants retain a `DerivedKeyAttestation` with its exact salt, a boxed
+`SignedDelegationCertificate` (whose signing context is already present), or
+caller-owned evidence bytes with their format identifier and `ProofMethod`.
+The display scope is independent of the signed salt. Opaque evidence provides
+storage for future PLC intake; it does not implement a PLC checker.
+
+Typed artifacts must name the recorded key and root on insertion and load.
+A rotation must name the immediately preceding root. Both mutation methods
+take `Option<KeyProof>` and return `Result<bool, _>`; mismatches leave the
+record unchanged, and replay preserves the original evidence. These are
+structural rules only. Stored evidence never creates a checked conclusion or
+establishes current authority: signature checks, delegation chains, expiry,
+revocation, and any interpretation of a capability grant as an identity
+binding remain the caller's responsibility. Gaz's production graph remains
+crypto-free; Personae issuing and Insigne verification are test dependencies.
+
+Validation on Rust 1.98.1, recorded under
+`C:\t\cargo-targets\mere\gaz-receipts`:
+
+- `cargo test -p gaz --all-features --locked --offline -j 4`: **61 tests and
+  one doctest pass**, including seven new retained-proof tests. Both codecs
+  reload root and attested artifacts, which then check again. Changed salts
+  and corrupted signatures still fail their checks after reload.
+- Temporarily removing both typed root comparisons makes the reload-refusal
+  test fail with an incorrectly accepted record (exit 101). The comparisons
+  were restored, and the full test suite passed again.
+- `cargo clippy -p gaz --all-targets --all-features --no-deps --locked
+  --offline -j 4 -- -D warnings`: **pass**. The earlier dependency-inclusive
+  run found seven existing `redundant_slicing` warnings in Personae's
+  passphrase/seal code on this toolchain; those files remain outside this slice.
+- `cargo check -p gaz --lib --all-features --target wasm32-unknown-unknown
+  --locked --offline -j 4 --message-format=json`: **pass**. Compiler artifacts
+  show Insigne with no features and no Personae, dalek or BLAKE3 in this
+  production graph.
+
+There is no Gaz dependency in Gazette yet. Retinue's Signalman desktop uses
+Gaz at the older Mere pin `d82afa17` and still imports the pre-M0.5
+`ContactKey`; its broader model repin is separate downstream work. The current
+Mere tree has no production calls to the changed key mutation methods.
+
+Phase D meets its done-condition. Gaz M1's storage gate is implemented
+2026-09-29 in the founding plan: persona-scoped Muniment save/load and
+JSON/postcard disk reopening. Host sealing landed 2026-09-30 through
+Castellan and Pandect, with durable-byte concealment, authentication refusal,
+and retained-proof rechecking. JSContact exchange landed 2026-09-30 behind
+Gaz's optional `jscontact` feature: explicit public persona cards, unverified
+peer import, preserved source Cards and separate lossless private restoration.
+The founding plan records 82 tests, three doctests, scoped Clippy, crypto-free
+Wasm compilation and a peer-trust leak control. M1 library gates are complete;
+M2 unverified address intake and a supplied WebFinger adapter landed
+2026-09-30, with sealed reload and replay preserving existing trust and proofs.
+Checked key/PLC intake, key-change alarms and back-claims remain open. Sibling phase-C repins
+remain open. The scoped `C:\t\cargo-targets\mere\gaz` build output is removed
+after recording its gates; receipts are retained.
+
+**2026-10-01.** Mark ruled the `dramatis` facade real for repos outside mere
+(ruling 8 in the
+[dramatis tier architecture](../technical_architecture/2026-09-30_dramatis_tier_architecture.md)):
+it re-exports personae, insigne and gaz, so a sibling pins one crate at one
+revision. Once it exists, the handoff above ("add Insigne from the exact same
+Mere revision as Personae") becomes one dependency instead of two hand-matched
+pins. Until then the handoff stands as written.

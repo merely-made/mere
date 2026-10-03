@@ -1215,6 +1215,37 @@ impl Canvas {
         }
     }
 
+    /// The live law, overlays and sources as one choice.
+    pub fn physics_choice(&self) -> crate::canvas::PhysicsChoice {
+        crate::canvas::PhysicsChoice {
+            law: self.physics_law,
+            overlays: self.physics_overlays.clone(),
+            kind: self.physics_kind_source,
+            mass: self.physics_mass_source,
+            depth: self.physics_depth_source,
+        }
+    }
+
+    /// Replace the whole choice with one rebuild and one settle. Sources are
+    /// set first and the law last, so the law's build reads the new sources
+    /// and overlays. Overlay duplicates collapse, as in
+    /// [`set_physics_overlays`](Self::set_physics_overlays).
+    pub fn set_physics_choice(&mut self, choice: &crate::canvas::PhysicsChoice) {
+        self.physics_kind_source = choice.kind;
+        self.physics_mass_source = choice.mass;
+        self.physics_depth_source = choice.depth;
+        let mut seen = HashSet::new();
+        self.physics_overlays = choice
+            .overlays
+            .iter()
+            .copied()
+            .filter(|o| seen.insert(*o))
+            .collect();
+        self.physics_law = choice.law;
+        self.rebuild_law_forces();
+        self.settle_for_law();
+    }
+
     /// Apply a named profile: its law and its overlays. `false` for an unknown id.
     pub fn apply_physics_profile(&mut self, id: &str) -> bool {
         let Some(profile) = physics_profile(id) else {
@@ -1265,6 +1296,10 @@ impl Canvas {
     /// Rebuild the law + overlay force set against the current graph and hand it
     /// to the physics backend. Position-preserving.
     pub(crate) fn rebuild_law_forces(&mut self) {
+        #[cfg(test)]
+        {
+            self.law_rebuilds += 1;
+        }
         let wants_clusters = self.physics_law == PhysicsLaw::Kinds
             && self.physics_kind_source == PhysicsKindSource::Cluster;
         if wants_clusters {
@@ -1364,10 +1399,73 @@ impl Canvas {
         }
     }
 
+    /// [`Self::layout_stats`] without `stretch` (zero here), for graphs too
+    /// big for its all-pairs passes: overlaps by the same definition, found
+    /// through a uniform grid of diameter-wide cells, so the cost is linear.
+    pub fn layout_stats_without_stretch(&self) -> LayoutStats {
+        let positions: Vec<euclid::default::Point2D<f32>> =
+            self.view.positions().map(|(_, p)| p).collect();
+        let n = positions.len();
+        if n == 0 {
+            return LayoutStats {
+                energy: self.physics_energy(),
+                ..LayoutStats::default()
+            };
+        }
+        let centroid = positions
+            .iter()
+            .fold(euclid::default::Vector2D::<f32>::zero(), |acc, p| {
+                acc + p.to_vector()
+            })
+            / n as f32;
+        let spread = (positions
+            .iter()
+            .map(|p| (p.to_vector() - centroid).square_length())
+            .sum::<f32>()
+            / n as f32)
+            .sqrt();
+        let diameter = 2.0 * crate::canvas::NODE_HALF;
+        let cell_of = |p: &euclid::default::Point2D<f32>| {
+            (
+                (p.x / diameter).floor() as i64,
+                (p.y / diameter).floor() as i64,
+            )
+        };
+        let mut grid: HashMap<(i64, i64), Vec<usize>> = HashMap::new();
+        for (i, p) in positions.iter().enumerate() {
+            grid.entry(cell_of(p)).or_default().push(i);
+        }
+        let mut overlaps = 0;
+        for (i, p) in positions.iter().enumerate() {
+            let (cx, cy) = cell_of(p);
+            for dx in -1..=1 {
+                for dy in -1..=1 {
+                    for &j in grid.get(&(cx + dx, cy + dy)).into_iter().flatten() {
+                        if j > i && (positions[j] - *p).length() < diameter {
+                            overlaps += 1;
+                        }
+                    }
+                }
+            }
+        }
+        LayoutStats {
+            energy: self.physics_energy(),
+            spread,
+            overlaps,
+            stretch: 0.0,
+        }
+    }
+
     /// The number of forces in the live law slot (inline backend only). Test introspection.
     #[cfg(test)]
     pub(crate) fn law_force_count(&self) -> usize {
         self.physics.force_count()
+    }
+
+    /// How many force-set rebuilds have run. Test introspection.
+    #[cfg(test)]
+    pub(crate) fn law_rebuilds(&self) -> usize {
+        self.law_rebuilds
     }
 
     /// The attribute builders over the current graph. Test introspection.

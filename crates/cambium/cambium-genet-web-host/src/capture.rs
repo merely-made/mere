@@ -11,8 +11,10 @@
 //! capture hook starts the same composition and copy, and the frame arrives as
 //! a [`PendingFrame`] some frames later.
 
-use std::cell::{Cell, RefCell};
+use std::cell::RefCell;
 use std::rc::Rc;
+use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, Ordering};
 
 use cambium_rootstock::{CaptureFn, Frame, Surface};
 use netrender::ExternalTexturePlacement;
@@ -24,13 +26,13 @@ pub struct PendingFrame {
     width: u32,
     height: u32,
     padded_bytes_per_row: u32,
-    done: Rc<Cell<bool>>,
+    done: Arc<AtomicBool>,
 }
 
 impl PendingFrame {
     /// Whether the browser has mapped the frame's bytes.
     pub fn ready(&self) -> bool {
-        self.done.get()
+        self.done.load(Ordering::Acquire)
     }
 
     /// Tightly packed RGBA8 rows, top-down. Call once [`ready`](Self::ready).
@@ -63,7 +65,12 @@ pub fn capture_into(slot: Rc<RefCell<Option<PendingFrame>>>) -> CaptureFn {
     })
 }
 
-fn start(surface: &dyn Surface, view: &wgpu::TextureView, width: u32, height: u32) -> PendingFrame {
+pub(crate) fn start(
+    surface: &dyn Surface,
+    view: &wgpu::TextureView,
+    width: u32,
+    height: u32,
+) -> PendingFrame {
     let width = width.max(1);
     let height = height.max(1);
     let device = surface.device();
@@ -123,13 +130,16 @@ fn start(surface: &dyn Surface, view: &wgpu::TextureView, width: u32, height: u3
         },
     );
     surface.queue().submit([encoder.finish()]);
-    let done = Rc::new(Cell::new(false));
+    // An atomic flag, not `Rc<Cell<bool>>`: with wgpu's
+    // `fragile-send-sync-non-atomic-wasm` on (cubecl-wgpu enables it, and
+    // features unify) a wasm `map_async` callback must be `Send`.
+    let done = Arc::new(AtomicBool::new(false));
     let flag = done.clone();
     // The browser calls this from its event loop once the copy has run; there
     // is nothing to poll on the main thread.
-    buffer
-        .slice(..)
-        .map_async(wgpu::MapMode::Read, move |_| flag.set(true));
+    buffer.slice(..).map_async(wgpu::MapMode::Read, move |_| {
+        flag.store(true, Ordering::Release)
+    });
     PendingFrame {
         buffer,
         width,

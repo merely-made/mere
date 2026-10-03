@@ -10,17 +10,39 @@ keywords = ["contacts", "petname", "identity", "persona", "kith"]
 categories = ["data-structures"]
 exclude = ["design_docs/"]
 
+[features]
+# The host supplies both the backend and codec. The data model has no default
+# features and no persistence dependency until this is selected.
+muniment = ["dep:muniment"]
+# JSContact is an exchange boundary, not the stored ContactBook model.
+jscontact = ["dep:serde_json", "dep:iri-string"]
+
 [dependencies]
-# The typed public key is insigne's bare-key grade; its core is plain data,
+# Typed public keys and retained proof artifacts are plain data in insigne,
 # so gaz takes on no cryptography by depending on it.
 insigne.workspace = true
 serde.workspace = true
 # The stack's UUID type, for local anchors. No default features: gaz reads no
 # random source, so it never needs uuid's generators.
 uuid = { version = "1", default-features = false }
+# Direct declaration permits disabling muniment's default JSON codec without
+# changing the workspace's default for other consumers.
+muniment = { version = "0.1.2", path = "../../eidetic/muniment", default-features = false, optional = true }
+serde_json = { version = "1", optional = true }
+iri-string = { version = "0.7", default-features = false, optional = true }
 
 [dev-dependencies]
+# Real issuers and signature checks exercise retained proofs after reload;
+# neither is part of gaz's production dependency graph.
+personae.workspace = true
+insigne = { workspace = true, features = ["verify"] }
 # The binary codec muniment stores with, so the binary serde path is tested
 # against the format M1 persists in.
 postcard = { version = "1", features = ["alloc"] }
 serde_json = "1"
+muniment = { version = "0.1.2", path = "../../eidetic/muniment", default-features = false, features = ["json", "postcard"] }
+pollster = "0.4"
+
+[target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies]
+muniment = { version = "0.1.2", path = "../../eidetic/muniment", default-features = false, features = ["redb"] }
+tempfile = "3"

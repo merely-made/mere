@@ -2,7 +2,9 @@
 
 **Status:** planned, gated on the `djinn 0.0.2` release
 **Date:** 2026-08-22
-**Amended:** 2026-09-04, notification ownership name corrected
+**Amended:** 2026-09-04, notification ownership name corrected; 2026-10-01,
+Gazette row added (Mark's ruling 6 in the
+[dramatis tier architecture](../../dramatis_docs/technical_architecture/2026-09-30_dramatis_tier_architecture.md))
 
 **Related:**
 
@@ -28,6 +30,7 @@ The resident composes domain crates rather than absorbing their semantics:
 | Notification records and delivery rules | Notification domain (`notifications` is the working package name) |
 | Authenticated streams and DNS-SD mechanics | Murm |
 | Local caller identity and durable secret authority | Personae and Castellan |
+| Directory resolution, feed polling, contact intake, announcing a persona's well-known documents | Gazette (ruled 2026-10-01; unbuilt) |
 | Firmware compatibility and flashing | Linkboy |
 
 Djinn contains the scheduler. Athanor is one scheduled service and remains a
@@ -348,7 +351,9 @@ Done conditions:
 ## 8. Phase E: extract the resident scheduler through real jobs
 
 Extract a small scheduler only after the update resident is working. Its first
-two consumers are family updates and one Athanor maintenance pass.
+two consumers are family updates and one Athanor maintenance pass. Gazette's
+feed polling is a later consumer (ruled 2026-10-01); it does not change the
+first two.
 
 The common contract is limited to:
 

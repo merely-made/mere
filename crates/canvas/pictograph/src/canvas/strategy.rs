@@ -154,6 +154,7 @@ impl Canvas {
             // running, the sim relaxes from here instead of snapping back to
             // wherever the force layout had left them. This is what lets any
             // arrangement compose with physics. (Physics as a capability.)
+            self.reset_frame_time();
             self.physics.seed(
                 positions
                     .iter()
@@ -329,6 +330,7 @@ impl Canvas {
         self.set_physics_paused(true);
         self.strategy_positions = Some(positions.clone());
         self.paused_positions = Some(positions.clone());
+        self.reset_frame_time();
         self.physics.seed(
             positions
                 .iter()
@@ -455,7 +457,11 @@ impl Canvas {
         if self.bridge_cache.is_some() && self.bridge_cache_revision == revision {
             return;
         }
-        self.bridge_cache = Some(crate::signals::bridges(&self.graph, self.bridge_metric, 0.5));
+        self.bridge_cache = Some(crate::signals::bridges(
+            &self.graph,
+            self.bridge_metric,
+            0.5,
+        ));
         self.bridge_cache_revision = revision;
     }
 

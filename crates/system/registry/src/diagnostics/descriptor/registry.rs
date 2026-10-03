@@ -4,16 +4,12 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-use std::collections::{HashMap, VecDeque};
+use super::invariant::InvariantTracker;
+use crate::diagnostics::DiagnosticCorrelation;
+use std::{collections::HashMap, time::Duration};
 
 use super::*;
 use crate::diagnostics::channels::*;
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-struct PendingInvariantToken {
-    start_channel: String,
-    deadline_unix_ms: u64,
-}
 
 #[derive(Debug, Clone)]
 pub struct ChannelConfig {
@@ -38,7 +34,7 @@ pub struct DiagnosticsRegistry {
     sample_counters: HashMap<String, u64>,
     orphan_channels: HashMap<String, u64>,
     pub(crate) invariants: HashMap<String, DiagnosticsInvariant>,
-    pending_invariants: HashMap<String, VecDeque<PendingInvariantToken>>,
+    pending_invariants: InvariantTracker,
 }
 
 impl Default for DiagnosticsRegistry {
@@ -49,7 +45,7 @@ impl Default for DiagnosticsRegistry {
             sample_counters: HashMap::new(),
             orphan_channels: HashMap::new(),
             invariants: HashMap::new(),
-            pending_invariants: HashMap::new(),
+            pending_invariants: InvariantTracker::default(),
         };
 
         registry.register_batch(phase0_required_channels());
@@ -289,67 +285,56 @@ impl DiagnosticsRegistry {
         Ok(true)
     }
 
+    /// Legacy uncorrelated FIFO mode. Epoch time is independent of the keyed
+    /// monotonic API; this does not infer concurrency correlation.
     pub fn observe_channel_event(
         &mut self,
         channel_id: &str,
         now_unix_ms: u64,
     ) -> Vec<DiagnosticsInvariantViolation> {
-        let normalized = super::normalize_channel_id(channel_id);
-
-        for invariant in self.invariants.values() {
-            if !invariant.enabled {
-                continue;
-            }
-
-            if invariant.start_channel == normalized {
-                self.pending_invariants
-                    .entry(invariant.invariant_id.clone())
-                    .or_default()
-                    .push_back(PendingInvariantToken {
-                        start_channel: normalized.clone(),
-                        deadline_unix_ms: now_unix_ms.saturating_add(invariant.timeout_ms),
-                    });
-            }
-
-            if invariant
-                .terminal_channels
-                .iter()
-                .any(|entry| entry == &normalized)
-                && let Some(queue) = self.pending_invariants.get_mut(&invariant.invariant_id)
-            {
-                let _ = queue.pop_front();
-            }
-        }
-
-        self.sweep_invariants(now_unix_ms)
+        let channel = super::normalize_channel_id(channel_id);
+        let report = self.pending_invariants.observe(
+            self.invariants.values(),
+            &channel,
+            None,
+            Duration::from_millis(now_unix_ms),
+        );
+        legacy_violations(report)
     }
 
     pub fn sweep_invariants(&mut self, now_unix_ms: u64) -> Vec<DiagnosticsInvariantViolation> {
-        let mut violations = Vec::new();
+        legacy_violations(
+            self.pending_invariants
+                .sweep(false, Duration::from_millis(now_unix_ms)),
+        )
+    }
 
-        for invariant in self.invariants.values() {
-            if !invariant.enabled {
-                continue;
-            }
+    /// Match producer-supplied run/source/operation keys, using a supplied
+    /// monotonic clock. No key means no access to this keyed API.
+    pub fn observe_correlated_channel_event(
+        &mut self,
+        channel_id: &str,
+        key: &DiagnosticCorrelation,
+        now: Duration,
+    ) -> Result<InvariantReport, InvariantTimeError> {
+        let channel = super::normalize_channel_id(channel_id);
+        self.pending_invariants
+            .observe(self.invariants.values(), &channel, Some(key), now)
+    }
 
-            let Some(queue) = self.pending_invariants.get_mut(&invariant.invariant_id) else {
-                continue;
-            };
+    pub fn sweep_correlated_invariants(
+        &mut self,
+        now: Duration,
+    ) -> Result<InvariantReport, InvariantTimeError> {
+        self.pending_invariants.sweep(true, now)
+    }
 
-            while let Some(front) = queue.front() {
-                if front.deadline_unix_ms > now_unix_ms {
-                    break;
-                }
-                let expired = queue.pop_front().expect("queue front just checked");
-                violations.push(DiagnosticsInvariantViolation {
-                    invariant_id: invariant.invariant_id.clone(),
-                    start_channel: expired.start_channel,
-                    deadline_unix_ms: expired.deadline_unix_ms,
-                });
-            }
-        }
+    pub fn invariant_stats(&self) -> InvariantStats {
+        self.pending_invariants.stats()
+    }
 
-        violations
+    pub fn set_invariant_limits(&mut self, limits: InvariantLimits) -> InvariantStats {
+        self.pending_invariants.set_limits(limits)
     }
 
     fn register_default_invariants(&mut self) {
@@ -398,4 +383,24 @@ impl DiagnosticsRegistry {
             &[DiagnosticsCapability::RegisterInvariants],
         );
     }
+}
+
+fn legacy_violations(
+    report: Result<InvariantReport, InvariantTimeError>,
+) -> Vec<DiagnosticsInvariantViolation> {
+    report.map_or_else(
+        |_| Vec::new(),
+        |report| {
+            report
+                .violations
+                .into_iter()
+                .map(|violation| DiagnosticsInvariantViolation {
+                    invariant_id: violation.invariant_id,
+                    start_channel: violation.start_channel,
+                    deadline_unix_ms: u64::try_from(violation.deadline.as_millis())
+                        .unwrap_or(u64::MAX),
+                })
+                .collect()
+        },
+    )
 }

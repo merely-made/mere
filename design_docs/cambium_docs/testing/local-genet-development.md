@@ -4,8 +4,10 @@ Cambium landed in mere on 2026-09-03 (the platform boundary plan's P2). Its
 manifests now name the Genet seam crates through mere's root
 `[workspace.dependencies]`, which pins `genet.git` at one revision for the
 whole repository — not crates.io, and not a relative path into a sibling
-checkout. The standalone Graphshell web host and Cambium web smoke also restate
-these pins and the engine's vendored patches; update them in the same change.
+checkout. The current standalone Graphshell web host restates these pins and
+the engine's vendored patches; update it in the same change. The separately
+qualified legacy `genet_web_smoke` example retains its older pin until an explicit
+requalification of that fixture; it is outside the current-family adoption.
 
 To test unpublished Genet seam changes, redirect that git source to a local
 Genet checkout in the uncommitted `.cargo/config.local.toml` at Mere's root;
@@ -155,3 +157,48 @@ and [Genet compatibility](../technical_architecture/genet-compatibility.md).
 Pre.4, S13 and downstream adoption retain their separate gates. No isolated
 home or worktree was created, and `C:\t\cargo-targets\mere` remains the reusable
 Mere build output.
+
+## 2026-09-29 generated-name adoption
+
+Current root and standalone Graphshell pins select published Genet
+`c5470fcbc12805f0369c70f34a18178158fbe2d5`. All 207 focused native consumer tests
+and the standalone Graphshell Wasm check pass against that immutable source,
+with Rust 1.98.1, explicit `C:/t/cargo-targets/mere`, four
+build jobs and incremental compilation disabled. No machine-local Genet redirect
+is part of this gate. Raw command logs, lock classification and source hashes /
+mtimes are retained under `Code/testing/cambium/generated-names`.
+
+The root lock preserves unrelated incoming Gaz work; the standalone lock also
+adopts the previously landed Cambium-to-genet-text and Mesquite-to-mere-apparatus
+dependencies. See the current
+[compatibility boundary](../technical_architecture/genet-compatibility.md#2026-09-29-generated-accessible-name-adoption).
+The legacy web smoke and older Knot identities remain separately qualified.
+
+Locked offline metadata audits verify 26 root and 19 web Genet package identities
+against the locks, with zero local/wrong-source substitutions. The recorded
+source hashes and mtimes remain stable for both tested graphs. The native gate's
+broader snapshot records the independently reconciled web lock changing during
+that run; that ignored standalone lock is outside the native dependency graph.
+The initial web `--locked` metadata refusal is retained alongside its classified
+offline reconciliation: only the already-landed text and diagnostics edges above
+were missing, with no other package/version/source drift.
+
+The standalone web lock remains ignored by repository policy. Its exact tested
+bytes are archived as [graphshell-web-Cargo.lock.txt](receipts/generated-names/graphshell-web-Cargo.lock.txt)
+with SHA-256 `f9aaf5929ecf9dc37157d641d09a17384b22d34bc7abbaafa16fa6614c264560`.
+Copy that file to `ports/graphshell/web/Cargo.lock` before reproducing the web gate.
+From the Code root, the commands are:
+
+```powershell
+$env:CARGO_TARGET_DIR = 'C:/t/cargo-targets/mere'
+$env:CARGO_INCREMENTAL = '0'
+$env:CARGO_BUILD_JOBS = '4'
+cargo +1.98.1 test --manifest-path repos/mere/Cargo.toml --locked --offline -p cambium-rootstock -p cambium-winit-a11y -p cambium-genet-winit-host -p mesquite --lib --tests -- --test-threads=1
+$env:RUSTFLAGS = '--cfg getrandom_backend="wasm_js"'
+cargo +1.98.1 check --manifest-path repos/mere/ports/graphshell/web/Cargo.toml --target wasm32-unknown-unknown --locked --offline
+```
+
+Offline reproduction requires the published dependency sources already cached.
+These are automated consumer and compile gates; human screen-reader acceptance
+and browser-hosted interaction remain separate. The stable Mere target is reused;
+this work creates no isolated Cargo home or worktree.

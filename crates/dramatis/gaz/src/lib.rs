@@ -30,6 +30,10 @@
 //! Keys come in two shapes. The root line holds the keys that have stood for
 //! the person as a whole, each succeeding the last. Attested keys are
 //! concurrent: one per protocol and one per device, each vouched for by a root.
+//! Both retain their [`KeyProof`]: an Insigne attestation with its salt, a
+//! signed delegation certificate, or caller-owned evidence bytes with their
+//! format and proof method. Reloading validates the typed key relationships;
+//! it never turns a stored artifact into a successful cryptographic check.
 //!
 //! ## What this crate is not
 //!
@@ -75,9 +79,12 @@
 //!
 //! ## Status
 //!
-//! Pre-1.0. The data model exists and is tested. Persistence over `muniment`
-//! and the adapters that turn resolver output into records are the next
-//! lifts; see the founding plan in `design_docs/`.
+//! Pre-1.0. The data model and optional persona-scoped persistence over
+//! Muniment exist. Enable `muniment` for its `persistence` module, and let the host
+//! choose its backend and codec; Castellan/Pandect supply host sealing. Enable
+//! `jscontact` for public persona cards, unverified peer imports and explicit
+//! private backups. `intake` adds unverified resolver addresses without replacing
+//! local state. Checked key/PLC intake and live host wiring remain in the founding plan.
 
 #![warn(missing_docs)]
 
@@ -86,6 +93,12 @@ pub mod book;
 pub mod contact;
 pub mod endpoint;
 pub mod handle;
+pub mod intake;
+#[cfg(feature = "jscontact")]
+pub mod jscontact;
+#[cfg(feature = "muniment")]
+pub mod persistence;
+pub mod proof;
 pub mod trust;
 
 pub use anchor::{Anchor, AnchorParseError, LocalId, PlcDid};
@@ -94,6 +107,9 @@ pub use contact::{AttestError, AttestedKey, Contact, ContactError, ContactTier, 
 pub use endpoint::{Endpoint, EndpointKind};
 pub use handle::{Handle, HandleKind};
 pub use insigne::{KeyAlgorithm, KeyParseError, TypedKey};
+#[cfg(feature = "muniment")]
+pub use persistence::{PersistenceError, load_book, save_book};
+pub use proof::KeyProof;
 pub use trust::{ProofMethod, TrustState};
 
 /// Crate version.

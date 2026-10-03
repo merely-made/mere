@@ -23,6 +23,7 @@ relicensed, and nothing here receives a Merely copyright line.
 | `support/patches/burn-cubecl` | MIT OR Apache-2.0 | [tracel-ai/burn](https://github.com/tracel-ai/burn) | upstream's |
 | `support/patches/burn-remote` | MIT OR Apache-2.0 | [tracel-ai/burn](https://github.com/tracel-ai/burn) | upstream's |
 | `ports/pelt/examples/resources` | MPL-2.0 | [servo/servo](https://github.com/servo/servo) (`resources/`), by way of genet | Servo's |
+| `crates/conatus/conatus/src/resident/binning` | Apache-2.0 | [dimforge/nexus](https://github.com/dimforge/nexus) at `1cfbd76`, by Sébastien Crozet / Dimforge | `LICENSE-APACHE` in-tree; port and change notice in `mod.rs` |
 
 `ports/pelt/examples/resources` holds two Servo logo images that Pelt's
 example documents reference by URLs that climb to the repository root and
@@ -34,6 +35,17 @@ carries the house header.
 
 384 tracked files. These are vendored patch trees consumed through
 `[patch]`; they are upstream's work carrying upstream's terms.
+
+`crates/conatus/conatus/src/resident/binning` is a close hand port, to CubeCL,
+of Nexus's exclusive scan (`src_rbd_shaders/utils/prefix_sum.rs` and its
+staging in `src_rbd/utils/prefix_sum.rs`) and of the count / cursor / finalize
+pattern of its MPM particle sort (`src_mpm_shaders/grid/sort.rs`), made on
+2026-10-02 for the physics catalog plan's P5a cell list. Nexus declares `MIT
+OR Apache-2.0` but ships only the Apache-2.0 text, so the port is treated as
+Apache-2.0 per the 2026-10-01 licensing ruling; the module header names the
+upstream, the author and the changes, and the license text sits beside it. The
+cell-walking force kernel that reads the bins (`kernels::exclude_cells`) and
+the host code that calls them are Mark's and stay MPL-2.0.
 
 ## Derivatives carrying MPL-2.0 with an upstream notice retained
 
