@@ -1419,3 +1419,39 @@ binning are the useful patterns.
   spread 1,071, energy 441k. A `git archive` export of `13910c40` builds for
   wasm offline both with a freshly generated web lock (4 m 06 s; the CubeCL
   family resolved to pre.2, see Findings) and with the recorded lock.
+- 2026-10-03 (Energy's off-screen receipt, branch `energy-frame` `629968cf`,
+  per "Diagnose and gate"): diagnosed and gated; the fix is put back as forks.
+  *Cause.* Two parts. The law's scale: on the P2 fixture (11 nodes, two
+  components of 5 and 6, 10 relations) Energy's centring alone holds the
+  components against the all-pairs repulsion, so they settle near
+  √(r·ΣW/g) = √(60,000 · 31 / 0.02) ≈ 9,600 world units apart. It converges,
+  slowly: 3,882 apart at 6 s, 7,232 at 20 s, 9,289 at 60 s (seiche replica,
+  kinetic energy 368 at 60 s); edges settle at 524 against Springs' 171. The
+  tree page read the same course from its own state: extent 1,692 × 1,771 by
+  frame 30 (10 of 11 off), 5,701 × 9,174 at frame 1,800; the old page
+  3,405 × 9,121. And the view: the page fits only at boot (to the Spiral,
+  119 × 115), on a non-Free arrangement and on Fit graph, never after a law
+  switch, so every law is read at zoom 1 against a 982 × 627 (tree) or
+  1,282 × 722 (old page) world box. Even Fit graph cannot frame Energy: it
+  needs zoom 0.064 and the canvas stops at 0.1. Springs on the same path stays
+  inside, 457 × 470 at frame 1,800. *The gate.* `Canvas::layout_framing`
+  counts node centres off the viewport through the canvas's own camera; both
+  pages publish `layout-outside`, `layout-extent` and `view-extent`; the
+  eleven law receipts and the profiles assert `layout-outside == 0` on the
+  frame each second capture shows, and resting laws again after the final
+  settle. The control (`*_framing_control`, both pages) plants a node 4,000 px
+  off the canvas under Still: counted exactly, and an `== 0` assert fails on
+  it with `got '1'`. *Reading, not ruled:* the margin is 0 (a centre inside
+  the canvas rectangle; panels the old page overlays on its canvas are not
+  subtracted), and those two moments are the stated ones for living laws too.
+  *Before any fix* (bundle `10ac4316`, two rounds): Energy
+  fails on both pages (11 of 11 on the tree; 8, then 11 on the old page),
+  Kinds (4-5 tree, 1 old), Anneal (2-3 tree, 4-5 old), Orbit (4, tree), the
+  tree profiles (1-5); Charge (one node, both rounds), Stress and Flow (one
+  node, first round only) sit at the tree's edge and pass on the old page;
+  Springs, Flock, Sync and Still pass everywhere. Orbit, met
+  on the way, expands without bound: 25,107 units at 60 s, linear, energy flat,
+  because exclusion outweighs gravity while counter-damping removes friction
+  (1,026 at 60 s without exclusion). Gates on the instrument: seiche
+  102/98/102, pictograph canvas 276, graphshell web 231 single-threaded. Logs
+  and the sweep of candidate tunings: `Code/testing/mere/energy-frame/`.
