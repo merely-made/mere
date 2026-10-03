@@ -113,7 +113,9 @@ fn blend_affinity_pairs(
 
 mod types;
 pub use crate::signals::{BridgeMetric, ImportanceMetric};
-pub use types::{CameraView, EdgeCell, Face, NodeShape, NodeState, PointerButton, Viewport};
+pub use types::{
+    CameraView, EdgeCell, Face, LayoutFraming, NodeShape, NodeState, PointerButton, Viewport,
+};
 
 // The graph-scene paint lane, merged from platen in the 2026-07-09
 // decomposition (platen is the pane home now; the canvas is the graph-truth

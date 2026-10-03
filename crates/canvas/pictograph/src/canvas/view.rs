@@ -260,6 +260,39 @@ impl Canvas {
         }
         Box2D::new(min, max)
     }
+
+    /// Whether every node's centre is on screen: each position through the
+    /// camera against the viewport inset by `margin` px, and the layout's
+    /// world extent beside the viewport's.
+    pub fn layout_framing(&self, margin: f32) -> LayoutFraming {
+        let (w, h) = (self.view_w as f32, self.view_h as f32);
+        let view = self.world_viewport();
+        let mut framing = LayoutFraming {
+            view: [view.min.x, view.min.y, view.max.x, view.max.y],
+            extent: [f32::INFINITY, f32::INFINITY, f32::NEG_INFINITY, f32::NEG_INFINITY],
+            ..LayoutFraming::default()
+        };
+        for (_, p) in self.view.positions() {
+            framing.nodes += 1;
+            if !p.x.is_finite() || !p.y.is_finite() {
+                framing.outside += 1;
+                continue;
+            }
+            let e = &mut framing.extent;
+            *e = [e[0].min(p.x), e[1].min(p.y), e[2].max(p.x), e[3].max(p.y)];
+            let (x, y) = self
+                .camera
+                .to_screen(kernel::geometry::PortablePoint::new(p.x, p.y));
+            if x < margin || y < margin || x > w - margin || y > h - margin {
+                framing.outside += 1;
+            }
+        }
+        if framing.extent[0] > framing.extent[2] {
+            // No finite position: an empty extent, not an inverted one.
+            framing.extent = [0.0; 4];
+        }
+        framing
+    }
 }
 
 #[cfg(test)]
@@ -304,6 +337,32 @@ mod tests {
         assert_eq!(canvas.viewport(), primary);
         assert_eq!(primary.view, (800, 600));
         assert_eq!(lens.view, (400, 900));
+    }
+
+    /// The framing instrument: a fitted graph has every centre on screen, and
+    /// a camera panned one viewport-width past it (the planted off-screen
+    /// case) has none; a margin wider than half the view counts every node.
+    #[test]
+    fn layout_framing_counts_centres_off_the_viewport() {
+        let mut canvas = Canvas::with_sample_graph();
+        canvas.resize(800, 600);
+        canvas.fit_to_content();
+        let fitted = canvas.layout_framing(0.0);
+        assert!(fitted.nodes > 0, "the sample graph has nodes");
+        assert_eq!(fitted.outside, 0, "fitted: {fitted:?}");
+        let [x0, y0, x1, y1] = fitted.extent;
+        let [v0, w0, v1, w1] = fitted.view;
+        assert!(x0 >= v0 && y0 >= w0 && x1 <= v1 && y1 <= w1, "{fitted:?}");
+
+        let mut camera = canvas.camera();
+        camera.offset.0 += 800.0 + (x1 - x0) * camera.zoom;
+        canvas.set_camera(camera);
+        let planted = canvas.layout_framing(0.0);
+        assert_eq!(planted.outside, planted.nodes, "panned away: {planted:?}");
+        assert_eq!(planted.extent, fitted.extent, "the layout did not move");
+
+        canvas.fit_to_content();
+        assert_eq!(canvas.layout_framing(301.0).outside, fitted.nodes);
     }
 
     /// `resize` still re-centres: a genuine window resize holds whatever sits
