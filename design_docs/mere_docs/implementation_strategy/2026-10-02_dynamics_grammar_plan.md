@@ -129,6 +129,10 @@ Mark's words are quoted as the physics catalog plan records them (§3, P7, and �
 
 **F39, Meaning's topic fixture (2026-10-03; G2's third fork).** Question: the bar of F34 is measured on 32 titles in four topics, written by the lane and crossed against site and structure. Options: keep the 32 titles; a larger curated in-tree fixture (about 200 titles, eight topics); a public labelled corpus, which needs a download approved per file and its licence checked. Mark: **"Public labelled corpus"**. *Follows:* the coordinator researches candidate corpora (licence, size, how a small sample is fetched) without downloading, and brings Mark a named file to approve; the 32 titles stay as the fixture until then. *Reading, not ruled:* a corpus committed beside MPL-2.0 code needs a licence the posture accepts, with a `LICENSES.md` entry; CC0 or public-domain data would need nothing beyond provenance.
 
+**F40, G7 (2026-10-03).** Question: approve G7, arrangement roles (§2, proposed at `784ce5b5`), which carries out F18 to F30, and place it. Options: approve, with G7 before G3; approve, after G2; amend first. Mark: **"Approve; G7 before G3"**. *Follows:* G7 starts now beside G2's open work, and G3 follows it, since G3's schedules use captures with a role (F27).
+
+**F41, the README's text (2026-10-03).** Question: the design-vocabulary section F13 placed in the README, its projection half in Mark's words and its dynamics half drafted from the rulings, placed after Status. Options: use the text as shown; the projection half only; edit the wording. Mark: **"Use this text"**. *Follows:* the section is committed as shown.
+
 ### 1.2 Earlier rulings that are this plan's inputs
 
 From the physics catalog plan, §3 P5–P7 and §5:
@@ -274,7 +278,7 @@ Constraints report whether they were satisfied, the physics counterpart of `scen
 - the reports reach the web snapshot and turnstone's observe snapshot;
 - the eleven law receipts stay green.
 
-### G7 — arrangement roles (proposed 2026-10-03, awaiting Mark's approval)
+### G7 — arrangement roles (approved 2026-10-03, F40)
 
 Carries out F18 to F30: an arrangement's coordinates play one of three roles, and physics acts on them rather than being one of them. Evidence and inventory: `research/2026-10-03_arrangement_and_dynamics_brief.md` (36 meeting points; 10 in conflict, mostly the anchor pull in five places).
 
