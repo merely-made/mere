@@ -624,18 +624,18 @@ impl Drop for Traffic {
     }
 }
 
-/// Whether `me` reads `other` as connected, by the gossip rule or, with
-/// `gossip_decides` false, by iroh's path alone.
+/// Whether `me` reads `other` as connected, by the live rule or, with `live`
+/// false, by iroh's path alone.
 async fn reads_connected(
     me: &P2pandaTransport,
     other: PeerID,
     topic: [u8; 32],
-    gossip_decides: bool,
+    live: bool,
 ) -> bool {
     within(
         "directory",
         Duration::from_secs(5),
-        me.peers_for_topic_counting(topic, gossip_decides),
+        me.peers_for_topic_by(topic, live),
     )
     .await
     .expect("directory")
@@ -787,4 +787,365 @@ async fn a_stopped_peer_reads_not_connected_once_its_neighbour_goes_down() {
     );
     drop(alice_handle);
     close_quietly(&alice, "alice").await;
+}
+
+/// Holds an accepted connection open until the peer closes it.
+#[derive(Debug, Clone)]
+struct HoldOpen;
+
+impl ProtocolHandler for HoldOpen {
+    async fn accept(&self, connection: Connection) -> Result<(), AcceptError> {
+        let _ = connection.closed().await;
+        Ok(())
+    }
+}
+
+/// Connections the transport did not open are counted too: one through
+/// `protocol_endpoint()`, as distillery's remote mounts its protocol, and one
+/// gossip opened (rulings 47, 48).
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn connections_the_transport_did_not_open_are_counted() {
+    let mounted = b"mere/test/mounted/v1";
+    let (alice_kp, alice_id) = make_inputs(142);
+    let (bob_kp, bob_id) = make_inputs(143);
+    let alice = P2pandaTransport::bind(&alice_kp, Vec::new()).await.unwrap();
+    let bob = P2pandaTransport::bind(&bob_kp, Vec::new()).await.unwrap();
+    bob.protocol_endpoint()
+        .accept(mounted, HoldOpen)
+        .await
+        .unwrap();
+    alice
+        .add_peer(bob.endpoint_addr().await.unwrap())
+        .await
+        .unwrap();
+    let (alice_key, bob_key) = (alice_id.to_bytes(), bob_id.to_bytes());
+    assert_eq!(alice.open.count(&bob_key), 0, "nothing open yet");
+    let conn = alice
+        .protocol_endpoint()
+        .connect(VerifyingKey::from_bytes(&bob_key).unwrap(), mounted)
+        .await
+        .unwrap();
+    within("counted at both ends", Duration::from_secs(5), async {
+        while !(alice.open.count(&bob_key) == 1 && bob.open.count(&alice_key) == 1) {
+            tokio::time::sleep(Duration::from_millis(20)).await;
+        }
+    })
+    .await;
+    conn.close(0u32.into(), b"done");
+    within("uncounted on close", Duration::from_secs(5), async {
+        while alice.open.count(&bob_key) != 0 {
+            tokio::time::sleep(Duration::from_millis(20)).await;
+        }
+    })
+    .await;
+    close_quietly(&alice, "alice").await;
+    close_quietly(&bob, "bob").await;
+
+    // Gossip opens its own connections; Bob joins first and only Alice dials.
+    let topic = [0x8e; 32];
+    let (alice, alice_handle, bob, bob_handle) =
+        joined_pair(([146; 32], [147; 32]), topic, false).await;
+    let bob_key = bob.local_peer_id().to_bytes();
+    let to_bob = Traffic::start(alice.local_peer_id(), &alice_handle, &bob_handle);
+    within("gossip delivers", Duration::from_secs(20), async {
+        while !to_bob.delivering() {
+            tokio::time::sleep(Duration::from_millis(50)).await;
+        }
+    })
+    .await;
+    assert!(
+        alice.open.count(&bob_key) >= 1,
+        "gossip's connection is counted, and no other is open"
+    );
+    drop((to_bob, alice_handle, bob_handle));
+    close_quietly(&alice, "alice").await;
+    close_quietly(&bob, "bob").await;
+}
+
+/// Off the overlay, a peer that closes reads not connected within a second.
+/// The control is iroh's path, still active then, so the count decided.
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn a_peer_off_the_overlay_that_closes_reads_not_connected_within_a_second() {
+    let alpn = Alpn::new("mere/test/held/v1");
+    let topic = [0x8d; 32];
+    let (alice_kp, _) = make_inputs(148);
+    let (bob_kp, bob_id) = make_inputs(149);
+    let alice = P2pandaTransport::bind(&alice_kp, Vec::new()).await.unwrap();
+    let bob = P2pandaTransport::bind(&bob_kp, vec![alpn.clone()])
+        .await
+        .unwrap();
+    alice
+        .add_peer(bob.endpoint_addr().await.unwrap())
+        .await
+        .unwrap();
+    alice.set_topics(bob_id, &[topic]).await.unwrap();
+    let mut stream = alice.connect(bob_id, alpn).await.unwrap();
+    stream.write_all(b"held").await.unwrap();
+    stream.flush().await.unwrap();
+    within("connected by both rules", Duration::from_secs(10), async {
+        while !(reads_connected(&alice, bob_id, topic, true).await
+            && reads_connected(&alice, bob_id, topic, false).await)
+        {
+            tokio::time::sleep(Duration::from_millis(50)).await;
+        }
+    })
+    .await;
+
+    let closing = std::time::Instant::now();
+    within("close", Duration::from_secs(10), bob.close())
+        .await
+        .unwrap();
+    drop(bob);
+    let not_connected = within("not connected", Duration::from_secs(5), async {
+        while reads_connected(&alice, bob_id, topic, true).await {
+            tokio::time::sleep(Duration::from_millis(20)).await;
+        }
+        closing.elapsed()
+    })
+    .await;
+    let path = reads_connected(&alice, bob_id, topic, false).await;
+    println!(
+        "closed peer off the overlay: not connected {not_connected:?}; path still active {path}"
+    );
+    assert!(
+        not_connected < Duration::from_secs(1),
+        "a closed peer reads not connected within a second: {not_connected:?}"
+    );
+    assert!(
+        path,
+        "the control: iroh still lists the closed peer's path active, so the count decided"
+    );
+    drop(stream);
+    close_quietly(&alice, "alice").await;
+}
+
+const KILLED_PEER_SEED: &str = "MERE_TRANSPORT_KILLED_PEER_SEED";
+const KILLED_PEER_ALPN: &str = "mere/test/killed/v1";
+
+/// The killed peer of the tests below, run by them as a child of this test
+/// binary: binds, prints its ticket, and waits to be killed.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+#[ignore = "a child process of the killed-peer tests"]
+async fn killed_peer_child() {
+    let Ok(seed) = std::env::var(KILLED_PEER_SEED) else {
+        return;
+    };
+    let (keypair, _) = make_inputs(seed.parse().expect("seed"));
+    let child = P2pandaTransport::bind(&keypair, vec![Alpn::new(KILLED_PEER_ALPN)])
+        .await
+        .expect("bind the child");
+    println!("CHILD_TICKET {}", child.ticket().await.expect("ticket"));
+    use std::io::Write as _;
+    std::io::stdout().flush().expect("flush");
+    loop {
+        tokio::time::sleep(Duration::from_secs(3600)).await;
+    }
+}
+
+/// Kills the child when dropped, so a failing test leaves nothing running.
+struct ChildPeer(std::process::Child);
+
+impl ChildPeer {
+    async fn spawn(seed: u8) -> (Self, String) {
+        let mut child = std::process::Command::new(std::env::current_exe().expect("test binary"))
+            .args([
+                "p2panda_transport::tests::killed_peer_child",
+                "--exact",
+                "--ignored",
+                "--nocapture",
+            ])
+            .env(KILLED_PEER_SEED, seed.to_string())
+            .stdout(std::process::Stdio::piped())
+            .stderr(std::process::Stdio::null())
+            .spawn()
+            .expect("spawn the child");
+        let stdout = child.stdout.take().expect("child stdout");
+        let peer = ChildPeer(child);
+        let reader = tokio::task::spawn_blocking(move || {
+            use std::io::BufRead as _;
+            std::io::BufReader::new(stdout)
+                .lines()
+                .map_while(Result::ok)
+                .find_map(|line| line.strip_prefix("CHILD_TICKET ").map(str::to_string))
+        });
+        let ticket = within("child ticket", Duration::from_secs(60), reader)
+            .await
+            .expect("ticket reader")
+            .expect("the child printed its ticket");
+        (peer, ticket)
+    }
+}
+
+impl Drop for ChildPeer {
+    fn drop(&mut self) {
+        let _ = self.0.kill();
+        let _ = self.0.wait();
+    }
+}
+
+/// When each rule let go of a killed child, measured from the kill.
+#[derive(Debug)]
+struct KilledPeer {
+    /// The held connection's close event.
+    closed: Duration,
+    /// The live rule's first "not connected".
+    not_connected: Duration,
+    /// iroh's path rule, read once at 59 s. Not at 60 s: iroh drops the path
+    /// 60 s after the peer's actor last stirred, which can be the kill itself.
+    path_at_59_s: bool,
+    /// iroh's path rule's first "not connected" from 59 s, if within 150 s.
+    path_cleared: Option<Duration>,
+}
+
+/// A child off the overlay holding one own-ALPN connection, killed and read by
+/// both rules, while `pollers` tasks read the directory and the child's paths
+/// every 200 ms, as djinn's directory does.
+async fn killed_peer_off_the_overlay(
+    seed: u8,
+    hooked: bool,
+    pollers: usize,
+) -> Result<KilledPeer, String> {
+    use std::sync::atomic::{AtomicBool, Ordering};
+    let topic = [seed; 32];
+    let (keypair, _) = make_inputs(seed);
+    let mut builder = P2pandaTransport::builder(&keypair);
+    if !hooked {
+        builder = builder.without_connection_hook();
+    }
+    let parent = Arc::new(builder.bind().await.map_err(|e| e.to_string())?);
+    let (mut child, ticket) = ChildPeer::spawn(seed + 1).await;
+    let child_id = parent
+        .add_peer_ticket(&ticket)
+        .await
+        .map_err(|e| e.to_string())?;
+    parent
+        .set_topics(child_id, &[topic])
+        .await
+        .map_err(|e| e.to_string())?;
+    let connect = parent.connect(child_id, Alpn::new(KILLED_PEER_ALPN));
+    let mut stream = within("connect", Duration::from_secs(20), connect)
+        .await
+        .map_err(|e| e.to_string())?;
+    stream.write_all(b"held").await.map_err(|e| e.to_string())?;
+    stream.flush().await.map_err(|e| e.to_string())?;
+    let held = stream._connection.clone();
+    let settling = std::time::Instant::now();
+    loop {
+        let live = reads_connected(&parent, child_id, topic, true).await;
+        let path = reads_connected(&parent, child_id, topic, false).await;
+        if live && path {
+            break;
+        }
+        if settling.elapsed() > Duration::from_secs(10) {
+            return Err(format!(
+                "a live child off the overlay read not connected before the kill \
+                 (live rule {live}, path rule {path})"
+            ));
+        }
+        tokio::time::sleep(Duration::from_millis(100)).await;
+    }
+
+    let stop = Arc::new(AtomicBool::new(false));
+    let polling: Vec<_> = (0..pollers)
+        .map(|_| {
+            let (parent, stop) = (Arc::clone(&parent), Arc::clone(&stop));
+            tokio::spawn(async move {
+                while !stop.load(Ordering::SeqCst) {
+                    let _ = parent.peers_for_topic(topic).await;
+                    let _ = parent.peer_paths(child_id).await;
+                    tokio::time::sleep(Duration::from_millis(200)).await;
+                }
+            })
+        })
+        .collect();
+    let killed = std::time::Instant::now();
+    let close_event = tokio::spawn(async move {
+        held.closed().await;
+        killed.elapsed()
+    });
+    child.0.kill().map_err(|e| e.to_string())?;
+    let _ = child.0.wait();
+    let not_connected = loop {
+        if !reads_connected(&parent, child_id, topic, true).await {
+            break killed.elapsed();
+        }
+        if killed.elapsed() > Duration::from_secs(60) {
+            return Err("the live rule still read the killed child connected at 60 s".into());
+        }
+        tokio::time::sleep(Duration::from_millis(100)).await;
+    };
+    let closed = within("close event", Duration::from_secs(60), close_event)
+        .await
+        .map_err(|e| e.to_string())?;
+    tokio::time::sleep(Duration::from_secs(59).saturating_sub(killed.elapsed())).await;
+    let path_at_59_s = reads_connected(&parent, child_id, topic, false).await;
+    let mut path_cleared = None;
+    while killed.elapsed() < Duration::from_secs(150) {
+        if !reads_connected(&parent, child_id, topic, false).await {
+            path_cleared = Some(killed.elapsed());
+            break;
+        }
+        tokio::time::sleep(Duration::from_secs(1)).await;
+    }
+    stop.store(true, Ordering::SeqCst);
+    for task in polling {
+        let _ = task.await;
+    }
+    drop(stream);
+    close_quietly(&parent, "parent").await;
+    Ok(KilledPeer {
+        closed,
+        not_connected,
+        path_at_59_s,
+        path_cleared,
+    })
+}
+
+/// Off the overlay, a killed peer reads not connected when its last connection
+/// closes, and three directory pollers do not move that; iroh's path takes 60 s
+/// or more (rulings 47, 48).
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn a_killed_peer_off_the_overlay_reads_not_connected_when_its_connection_closes() {
+    let (quiet, polled) = tokio::join!(
+        killed_peer_off_the_overlay(130, true, 0),
+        killed_peer_off_the_overlay(134, true, 3)
+    );
+    let (quiet, polled) = (quiet.unwrap(), polled.unwrap());
+    for (name, run) in [("quiet", &quiet), ("three pollers", &polled)] {
+        println!(
+            "killed peer, {name}: close event {:?}, live rule not connected {:?}, \
+             path rule at 59 s {}, path rule cleared {:?}",
+            run.closed, run.not_connected, run.path_at_59_s, run.path_cleared
+        );
+    }
+    for (name, run) in [("quiet", &quiet), ("polled", &polled)] {
+        assert!(
+            run.not_connected + Duration::from_millis(250) >= run.closed
+                && run.not_connected <= run.closed + Duration::from_secs(2),
+            "{name}: not connected within 2 s of the close event: {run:?}"
+        );
+        assert!(
+            run.path_at_59_s
+                && run
+                    .path_cleared
+                    .is_none_or(|cleared| cleared >= Duration::from_secs(60)),
+            "{name}: the control, iroh's path, reads the killed peer connected for 60 s or \
+             more: {run:?}"
+        );
+    }
+    let moved = quiet.not_connected.abs_diff(polled.not_connected);
+    assert!(
+        moved <= Duration::from_secs(2),
+        "polling moved the live rule by {moved:?}"
+    );
+}
+
+/// The killed-peer scenario fails without the hook: off the overlay, only the
+/// count says a live peer is connected.
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn without_the_hook_the_killed_peer_scenario_fails() {
+    let failed = killed_peer_off_the_overlay(138, false, 0)
+        .await
+        .expect_err("without the hook, the scenario must fail");
+    assert!(failed.contains("before the kill"), "{failed}");
 }
