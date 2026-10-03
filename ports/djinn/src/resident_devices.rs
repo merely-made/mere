@@ -73,8 +73,9 @@ pub struct PairedDeviceV1 {
     pub root: Option<String>,
     pub pairing_id: Option<String>,
     pub added_ms: u64,
-    /// This device is talking to it now: an active path, or a gossip
-    /// neighbour on the graph's overlay. `path` may then show none active.
+    /// This device is talking to it now: while on the graph's overlay, it is
+    /// a gossip neighbour there; otherwise there is an active path. `path` is
+    /// iroh's own view, so it can show none active, or one, either way.
     pub connected: bool,
     /// The transport holds an address for it. Not a live link.
     pub reachable: bool,
@@ -381,11 +382,16 @@ fn card_value(device: &PairedDeviceV1) -> CardValueV1 {
             device.label.clone()
         },
         // A paired device is listed before discovery finds it, so say which
-        // of the two not-connected states this is, as `djinn-devices` does.
+        // not-connected state this is, as `djinn-devices` does. iroh's path
+        // can disagree with gossip either way, so say that too.
         value: match (device.connected, device.reachable) {
-            // Connected as a gossip neighbour while iroh marks no path active.
             (true, _) if live.is_empty() => "connected, no active path right now".into(),
             (true, _) => format!("connected via {}", live.join(", ")),
+            // Off the overlay while iroh still lists a path, as for about a
+            // minute after a peer closes.
+            (false, _) if !live.is_empty() => {
+                "not connected (a path is still marked active)".into()
+            },
             (false, true) => "not connected (an address is known)".into(),
             (false, false) => "not connected (no address known)".into(),
         },

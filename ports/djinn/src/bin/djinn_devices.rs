@@ -66,8 +66,10 @@ fn render_device(device: &PairedDeviceV1) -> String {
     } else {
         &device.label
     };
+    let marked_active = device.path.iter().any(|addr| addr.active);
     let state = match (device.connected, device.reachable) {
         (true, _) => "connected",
+        (false, _) if marked_active => "not connected (a path is still marked active)",
         (false, true) => "not connected (an address is known)",
         (false, false) => "not connected (no address known)",
     };

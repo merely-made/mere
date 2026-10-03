@@ -122,10 +122,10 @@ fn an_unlisted_device_is_not_connected_and_a_bad_hint_says_why() {
     );
 }
 
-/// A gossip neighbour is connected while iroh marks no path active, and the
-/// card says so rather than naming an empty path.
+/// Gossip and iroh's path can disagree either way, and the card says which:
+/// connected with no path active, or not connected with one still active.
 #[test]
-fn a_connected_device_with_no_active_path_says_so() {
+fn the_card_says_when_gossip_and_the_path_disagree() {
     let thinkpad = peer(0x54);
     let live = KnownPeer {
         peer: thinkpad,
@@ -146,6 +146,16 @@ fn a_connected_device_with_no_active_path_says_so() {
     path[0].active = true;
     let busy = directory_entry(&paired(thinkpad, None), Some(&live), &path);
     assert_eq!(card_value(&busy).value, "connected via 192.168.1.32:51234");
+    let gone = KnownPeer {
+        connected: false,
+        ..live
+    };
+    let stale = directory_entry(&paired(thinkpad, None), Some(&gone), &path);
+    assert!(!stale.connected);
+    assert_eq!(
+        card_value(&stale).value,
+        "not connected (a path is still marked active)"
+    );
 }
 
 /// The directory moves under a reader; the snapshot it took stays whole.
