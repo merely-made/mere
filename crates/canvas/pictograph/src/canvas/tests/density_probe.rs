@@ -13,12 +13,21 @@
 use std::sync::Arc;
 
 use super::density::{generated, run, seeded, uniform};
-use super::*;
 use crate::canvas::physics_catalog::{PhysicsLaw, PhysicsMassSource};
 use seiche::{Density, DensityGrid, DensityStop, Force, ForceContext};
 
 /// Shares a law with the canvas so the probe can read its pass history.
 struct Shared(Arc<Density>);
+
+impl seiche::Declared for Shared {
+    fn terms(&self) -> Vec<seiche::Term> {
+        self.0.terms()
+    }
+
+    fn metric(&self, term: usize, layout: &seiche::Layout<'_>) -> Option<Vec<f64>> {
+        self.0.metric(term, layout)
+    }
+}
 
 impl Force for Shared {
     fn apply(&self, ctx: &mut ForceContext<'_>, dt: f32) {

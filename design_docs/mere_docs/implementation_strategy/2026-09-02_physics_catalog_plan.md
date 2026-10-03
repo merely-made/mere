@@ -531,6 +531,46 @@ pull reading −0.33 with 510 overlaps):
   stop with a wider plateau bar, or a stricter shift. *Reading, not ruled:*
   the lane measures the wander's cause and brings formulations back as
   options with numbers; the shift stop stays the default meanwhile.
+- **Density's stop, fifth and sixth rounds (2026-10-03, `density-cpu`
+  `824ac8cb`, `76623e15`).** The wander's measured causes: rapier adds
+  nothing after pass 1; on 200 nodes the 64² grid moves every node about 0.05
+  spacings a pass without decay. Five formulations were prototyped, all off
+  by default. Continuous renewal at 2 spacings first looked best (gen-50 at
+  0.8 on "8 of 8" starts), but those eight starts were quarter-turn copies of
+  two, and every earlier probe and receipt seeded the spiral in key order,
+  which puts the highest-degree nodes at the centre. Over 16 inequivalent
+  dealt starts the rank where the ruled stop lands is: base passes 0.722
+  (gen-50) and 0.754 (200 nodes), renewal 0.736 and 0.768. The stop fires
+  early: gen-50 stops at pass 6 reading 0.64 to 0.78, and the 120-pass cap
+  reads 0.82 to 0.86 on all 4 dealt starts tried; on 200 nodes the stop reads
+  0.73 to 0.80 and the cap 0.78 to 0.82. The 12-node sample's rest depends on
+  its start (0.35 to 0.86 at the cap over 8 starts, mean 0.66, 2 of 8 at
+  0.8). An axis-aligned seed meets cell-centred splat cells and shifts the
+  stop's timing (200 nodes: 0° 0.737 at pass 18 against 0.79 to 0.81 at
+  passes 32 to 53 for other turns), small beside the start's own effect.
+  Asked what changes, Mark chose **"Later stop, measured"**: the passes stay,
+  and a lane compares a stricter shift (0.01 to 0.02 for 3 passes) and a
+  minimum pass count against the 120-pass cap over 16 dealt starts and brings
+  the cheapest that meets the bars. The alternatives were always running to
+  the cap, renewal anyway, or keeping the stop with lower bars. This amends
+  the fourth round's "Change the law", whose premise (a wander the law must
+  lose) the dealt starts did not bear out. Asked what the 0.8 bar means on
+  small graphs, Mark chose **"0.8 from 50 nodes up"**: the rank bar applies
+  from 50 nodes, and the sample and the headed fixture receipts check the
+  flow qualitatively (rank rises above the seed's, CV falls), recording
+  per-start values. The alternatives were a mean over a fixed set of dealt
+  starts, or one pinned start per receipt. *Reading, not ruled:* receipts
+  move from the key-order seed to dealt starts; the decay, quench,
+  wall-inset, relax and renewal knobs leave the code once the stop lands,
+  with their evidence kept in the logs.
+- **P5's web defaults, undercut by pre.4 (2026-10-03).** On `burn-pre4-repin`
+  the web page's frames take 557 ms against pre.2's 12.1 ms, GPU on or off,
+  because the wasm module re-runs its static constructors (pliron's
+  `inventory` registrations, which pre.4's `cubecl-core` pulls in) on every
+  call into wasm. "Web N = 9, web threshold 400" was ruled on pre.2's frame
+  times, so the crossover is re-measured once the constructors run once
+  (burn migration plan, the pre.4 rulings of 2026-10-03). Main stays on pre.2
+  until then; native is unaffected.
 
 *Done when:* GPU and CPU forces agree to 1e-3 relative at 1k and 10k nodes;
 a sign-flipped kernel fails the overlap check (positive control); a forced
@@ -932,11 +972,28 @@ P5 and P6 stay in this plan.
   offline only because this machine's cache held no other; online it would
   likely take pre.4, and the root's pre.2 `cubecl-runtime` patch (the wasm
   fix) would go unused. Pinning `=` in conatus, or recording the web lock,
-  closes it; open for Mark.
+  closes it; open for Mark. *Ruled 2026-10-02:* asked first, Mark replied
+  "Wait. Those should be bumped, no?"; told that pre.4 was published
+  2026-09-22 and that branch `burn-pre4-repin` (23 commits ahead of main, last
+  2026-09-30) holds the migration with ruling 411's allocator diagnosis open,
+  he chose "Finish pre.4 now, no interim pin": a lane takes the pre.4
+  migration to its gates and merge, and main is not exact-pinned meanwhile.
+  The alternatives were an interim `=` pin while the migration finished, or
+  bumping conatus alone.
 - 2026-10-02: a cargo run without `--locked` re-serializes the root lock,
   swapping the order of the two genet revisions' `fleece` and
   `layout-dom-api` rows; the committed lock passes `--locked` as it stands, so
   lane commands run locked.
+- 2026-10-02 (dynamics grammar G1, F10): the 2026-09-02 finding that Kinds
+  never rests holds. On the P2 fixture under continuous ticking its kinetic
+  energy is about 18 300 at 6 s and 140 500 at 30 s, against the floor of 1,
+  and Kinds joined `PhysicsLaw::never_rests`. The receipts' Play preamble
+  had already kept every law ticking, since a settle keeps the larger budget
+  (the [dynamics grammar plan](2026-10-02_dynamics_grammar_plan.md),
+  Findings).
+- 2026-10-02 (dynamics grammar G1, F7): the laws table's Energy row ("LinLog /
+  ForceAtlas2") describes ForceAtlas2's (1, −1) force model; LinLog proper is
+  the law's attraction exponent 0, a tuning, and the id stays `energy.linlog`.
 - 2026-10-02 (P6a): the canvas settle is a tick budget (`SETTLE_TICKS`,
   360), not a rest test, so a law that converges slower than six seconds is
   cut off mid-way unless it is a living law. Density advects by writing

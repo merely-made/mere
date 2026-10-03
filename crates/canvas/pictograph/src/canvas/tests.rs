@@ -31,6 +31,7 @@ mod node_face;
 mod node_minting;
 mod node_state;
 mod physics_catalog;
+mod physics_terms;
 mod relations;
 mod restore_and_queries;
 mod retained_layout;

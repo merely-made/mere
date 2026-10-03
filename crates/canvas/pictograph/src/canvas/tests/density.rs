@@ -9,7 +9,7 @@
 //! and Springs does not show the correlation (the negative control).
 
 use super::*;
-use crate::canvas::physics_catalog::{PhysicsLaw, PhysicsMassSource};
+use crate::canvas::physics_catalog::PhysicsLaw;
 use kernel::graph::apply::{add_node, assert_relation};
 
 /// The web pages' generated graph (`web_graphs::generated`): each node links
