@@ -9,6 +9,9 @@
 //! alone, and meet again after either side restarts with its saved dial hints
 //! removed, so mDNS stays the only way in.
 //!
+//! Its second restart fails until a separate overlay fix lands (pairing plan
+//! ruling 36).
+//!
 //! Ignored by default: it runs two real residents for a few minutes.
 //! Everything it starts lives under `DJINN_D1B_ROOT` (a fresh temporary
 //! directory when unset), on endpoint names unique to the run.
