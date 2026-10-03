@@ -64,3 +64,7 @@ retained implementation, not upstream. Ruling 410 conditionally supersedes the
 requirement to carry that guard for the tested pre.4 migration. Other patches
 remain independent. Plan §13.28 records four locked graph checks and the
 remaining runtime/lifecycle/integration gates; main promotion is still pending.
+
+2026-10-02: graphshell-web's own `burn-cubecl` row, which main added for P5,
+was dropped on the migration branch too (`cebcf94d`). No consumer selects this
+copy.

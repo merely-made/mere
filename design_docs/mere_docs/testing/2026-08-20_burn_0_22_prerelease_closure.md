@@ -1,5 +1,14 @@
 # Burn 0.22 prerelease closure receipt
 
+**2026-10-03 S15 closure annotation:** on the pre.4 migration branch the
+row is Burn `=0.22.0-pre.4`, CubeCL `=0.11.0-pre.4` and Cubek `=0.3.0-pre.4`,
+exact-pinned in every consumer manifest, with one version per crate in the root
+and graphshell-web graphs and no Turso or SQLite. Every S13 receipt passes on
+that branch; the 2026-10-03 section below has the patch table and receipt
+index. Main stays on pre.2 until S16, which waits on ruling 534's quiet GPU-on
+A/B, and stable publication remains gated as before. Earlier annotations and
+the dated text below keep their original scope.
+
 **2026-09-30 allocator stop:** four local `burn-cubecl` selectors were retired
 at `124fc42b` after ruling 410's controls. Remaining numerical/matrix/build
 checks passed, but remote reclaim left ten allocations / 5,323,776 active bytes
@@ -212,3 +221,36 @@ Three independent patch selectors remain: cubecl-runtime persistence policy,
 cubek-reduce extrema handling and burn-remote lifecycle control. Earlier tables
 retain their dated counts. Affected production checks, remaining S13 and main
 promotion still require acceptance; this is not stable-release closure.
+
+## 2026-10-03: the pre.4 row at S15
+
+The branch's selected patches against published pre.4 (migration plan §13):
+
+| Patch | Selected by | What it changes | Remove when |
+| --- | --- | --- | --- |
+| `cubecl-runtime` | root, graphshell-web, probe, remote fixture, both repros | manifest only: `persistence` leaves the default features (ruling 375) | upstream makes persistence opt-in or drops the defaults-on `cubecl-cpp` edge |
+| `burn-remote` | root, remote fixture | lease-bound targeted close (§13.17); close waits for teardown completion and reports failures (ruling 508, §13.32) | an upstream release has equivalent session control and passes the lifecycle receipt |
+| `cubek-reduce` | probe, extrema repro | extrema identities as runtime values, not literal infinity bits | a released row passes the headed extrema receipt without it |
+| `burn-cubecl` | none | vendored pre.4 source kept as provenance; selectors retired under ruling 410 (§13.28, and graphshell-web's row in §13.30) | delete with the provenance it documents |
+
+graphshell-web's start function runs the module's static constructors once
+(ruling 509, §13.33). Ruling 532 moves that into one shared stack helper,
+ruling 536 puts it in `cambium-genet-web-host`, and ruling 533 adds
+Distillery's model probe. The probe cannot yet depend on that crate because
+of conflicting exact `wasm-bindgen` pins (§13.35). The repros stay
+command-linked.
+
+Receipts on the branch:
+
+| Gate | Result | Record |
+| --- | --- | --- |
+| S13 (a)/(a') same-allocation and LayerNorm | upstream pre.4 passes all 21; patch retired (ruling 410) | §13.26 to §13.28 |
+| S13 (b) extrema, headed | four cases, `gpu_errors: []` | §13.30, §13.33 |
+| S13 (c) two-peer lifecycle | zero baseline, strict ceiling, exact recovery, second live lease | §13.32 |
+| S13 (d) existing device, conatus resident | pass in release | §13.30 |
+| S13 (e) ESP WGPU parity and real MiniLM | pass | §13.30 |
+| Native, wasm, Distillery, Djinn, workspace | pass | §13.25, §13.30 |
+| P5 web settle and 14 law receipts | pass on the constructor-fixed bundle | §13.33 |
+
+Stable 0.22 is still unpublished, so ESP publication and the stable closure
+named in this receipt's first sections remain gated.

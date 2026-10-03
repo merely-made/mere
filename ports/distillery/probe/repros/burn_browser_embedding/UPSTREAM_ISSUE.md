@@ -1,5 +1,10 @@
 # BrowserWebGpu silently corrupts binary ops with the same tensor as both inputs
 
+**2026-10-03, not to be filed for pre.4:** upstream Burn/CubeCL pre.4 passes
+all ten graph and eleven embedding cases in the same browser where the
+reconstructed pre.2 row still fails (Mere migration plan §13.27). This draft
+describes the pre.2 row only. No upstream communication has been authorized.
+
 ## Summary
 
 On Burn `0.22.0-pre.2` / CubeCL `0.11.0-pre.2`, BrowserWebGpu returns stale or

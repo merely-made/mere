@@ -16,3 +16,7 @@ makes persistence optional without the forcing default dependency edge.
 The root and product manifests still name pre.2 during the bounded patch
 checkpoint. Integration and full consumer receipts remain in migration plan
 section 13; this source rebase alone is not production acceptance.
+
+2026-10-03: the consumer manifests now pin pre.4 exactly, and this patch is
+selected by the root, graphshell-web, the probe, the remote fixture and both
+repros. The paragraph above describes the 2026-09-27 checkpoint.

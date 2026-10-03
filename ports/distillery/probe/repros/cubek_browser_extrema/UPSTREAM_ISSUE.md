@@ -1,5 +1,10 @@
 # Released 0.11.0-pre.2 WGSL infinity bitcast breaks BrowserWebGpu extrema reductions
 
+**2026-10-03:** pre.4, released with the Pliron lowering, passes with Mere's
+`cubek-reduce` patch. Pristine pre.4 has not been run, so whether this report
+still applies to a released row is unknown. Do not file it before that run.
+No upstream communication has been authorized.
+
 ## Summary
 
 `cubek-reduce 0.3.0-pre.2` constructs floating-point max/min identities by
