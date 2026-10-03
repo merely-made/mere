@@ -211,7 +211,7 @@ impl Canvas {
                     }
                 });
                 let content = (blend != AffinityBlend::StructuralOnly)
-                    .then(|| self.content_affinity.as_deref())
+                    .then_some(self.content_affinity.as_deref())
                     .flatten();
                 ChannelValues::Pairs(blend_affinity_pairs(structural.as_ref(), content))
             },

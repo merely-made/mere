@@ -23,10 +23,9 @@ use kernel::geometry::PortablePoint;
 use kernel::graph::fixtures::GraphFixtures;
 use kernel::graph::{Graph, NodeKey};
 
-pub const TOPICS: [&str; 4] = ["astronomy", "cooking", "gardening", "programming"];
-
 pub const SITES: [&str; 4] = ["news", "wiki", "blog", "forum"];
 
+/// The titles by topic: astronomy, cooking, gardening, programming.
 pub const TITLES: [[&str; 8]; 4] = [
     [
         "Jupiter's moons through a backyard telescope",
