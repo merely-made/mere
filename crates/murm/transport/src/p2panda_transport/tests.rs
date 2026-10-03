@@ -367,8 +367,10 @@ async fn the_peer_directory_separates_a_known_address_from_a_live_path() {
     bob.add_peer(alice.endpoint_addr().await.unwrap())
         .await
         .unwrap();
-    let alice_handle = alice.subscribe(topic).await.expect("alice subscribe");
+    // Bob subscribes first: gossip drops a join for a topic its receiver has
+    // not subscribed to yet, and with one dialler nothing would retry it.
     let bob_handle = bob.subscribe(topic).await.expect("bob subscribe");
+    let alice_handle = alice.subscribe(topic).await.expect("alice subscribe");
     let mut bob_rx = bob_handle.subscribe();
     let payload = b"traffic that forms a real path".to_vec();
     tokio::time::timeout(std::time::Duration::from_secs(20), async {
@@ -511,11 +513,25 @@ async fn within<T>(what: &str, limit: Duration, future: impl Future<Output = T>)
         .unwrap_or_else(|_| panic!("{what} took over {limit:?}"))
 }
 
-/// Two gossip transports that know and tag each other, joined at the same
-/// moment so that each dials the other.
-async fn dialled_at_once(
+/// Close an endpoint without failing on iroh's close: it has stalled past
+/// 10 s after a both-sides dial, and no test here depends on it finishing.
+async fn close_quietly(transport: &P2pandaTransport, who: &str) {
+    if tokio::time::timeout(Duration::from_secs(10), transport.close())
+        .await
+        .is_err()
+    {
+        println!("{who}: close stalled past 10 s; dropping the endpoint");
+    }
+}
+
+/// Two gossip transports that know each other's address, joined to `topic`.
+/// With `both_dial`, each tags the other and both join at the same moment, so
+/// each dials the other. Without it only Alice tags Bob, and Bob joins first:
+/// gossip drops a join for a topic its receiver has not subscribed to yet.
+async fn joined_pair(
     seed: u8,
     topic: [u8; 32],
+    both_dial: bool,
 ) -> (
     P2pandaTransport,
     GossipHandle,
@@ -538,9 +554,14 @@ async fn dialled_at_once(
     bob.add_peer(alice.endpoint_addr().await.unwrap())
         .await
         .unwrap();
-    bob.set_topics(alice_id, &[topic]).await.unwrap();
     let (alice_handle, bob_handle) = within("subscribe", Duration::from_secs(10), async {
-        tokio::join!(alice.subscribe(topic), bob.subscribe(topic))
+        if both_dial {
+            bob.set_topics(alice_id, &[topic]).await.unwrap();
+            tokio::join!(alice.subscribe(topic), bob.subscribe(topic))
+        } else {
+            let bob_handle = bob.subscribe(topic).await;
+            (alice.subscribe(topic).await, bob_handle)
+        }
     })
     .await;
     (alice, alice_handle.unwrap(), bob, bob_handle.unwrap())
@@ -599,17 +620,18 @@ impl Drop for Traffic {
     }
 }
 
-/// Whether `me` reads `other` as connected, with or without the gossip half.
+/// Whether `me` reads `other` as connected, by the gossip rule or, with
+/// `gossip_decides` false, by iroh's path alone.
 async fn reads_connected(
     me: &P2pandaTransport,
     other: PeerID,
     topic: [u8; 32],
-    count_neighbours: bool,
+    gossip_decides: bool,
 ) -> bool {
     within(
         "directory",
         Duration::from_secs(5),
-        me.peers_for_topic_counting(topic, count_neighbours),
+        me.peers_for_topic_counting(topic, gossip_decides),
     )
     .await
     .expect("directory")
@@ -621,9 +643,9 @@ async fn reads_connected(
 ///
 /// iroh then marks every address of the peer inactive for seconds at a time,
 /// from its 5 s holepunch on or from the start, while gossip keeps carrying
-/// traffic; that is why `connected` counts a gossip neighbour. The gap comes in
-/// about a third of pairs, so pairs are made until the control, the same
-/// directory with the gossip half off, has read the delivering link dead.
+/// traffic; that is why gossip decides on a subscribed overlay. The gap comes
+/// in about a third of pairs, so pairs are made until the control, the same
+/// directory with iroh's path deciding, has read the delivering link dead.
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
 async fn both_sides_dialling_at_once_stays_connected_while_the_link_delivers() {
     const PAIRS: u8 = 16;
@@ -631,7 +653,7 @@ async fn both_sides_dialling_at_once_stays_connected_while_the_link_delivers() {
     let mut control = None;
     for pair in 0..PAIRS {
         let topic = [0xd0 ^ pair; 32];
-        let (alice, alice_handle, bob, bob_handle) = dialled_at_once(200 + 2 * pair, topic).await;
+        let (alice, alice_handle, bob, bob_handle) = joined_pair(200 + 2 * pair, topic, true).await;
         let (alice_id, bob_id) = (alice.local_peer_id(), bob.local_peer_id());
         let to_bob = Traffic::start(alice_id, &alice_handle, &bob_handle);
         let to_alice = Traffic::start(bob_id, &bob_handle, &alice_handle);
@@ -645,9 +667,10 @@ async fn both_sides_dialling_at_once_stays_connected_while_the_link_delivers() {
             );
             tokio::time::sleep(Duration::from_millis(50)).await;
         }
+        // Sampled from the moment both ways deliver: iroh often marks the
+        // path active only after the first delivery, and later drops it.
         let delivering = std::time::Instant::now();
         while delivering.elapsed() < WINDOW {
-            tokio::time::sleep(Duration::from_millis(100)).await;
             let at = delivering.elapsed();
             assert!(
                 to_bob.delivering() && to_alice.delivering(),
@@ -662,43 +685,48 @@ async fn both_sides_dialling_at_once_stays_connected_while_the_link_delivers() {
                     control = Some((pair, at));
                 }
             }
+            tokio::time::sleep(Duration::from_millis(100)).await;
         }
         println!("pair {pair}: connected throughout {WINDOW:?}; control so far {control:?}");
         drop((to_bob, to_alice, alice_handle, bob_handle));
-        within("close", Duration::from_secs(10), alice.close())
-            .await
-            .unwrap();
-        within("close", Duration::from_secs(10), bob.close())
-            .await
-            .unwrap();
+        close_quietly(&alice, "alice").await;
+        close_quietly(&bob, "bob").await;
         if control.is_some() {
             break;
         }
     }
     let (pair, at) = control.unwrap_or_else(|| {
         panic!(
-            "the path half never read a delivering link dead in {PAIRS} pairs: \
+            "iroh's path never read a delivering link dead in {PAIRS} pairs: \
              this run proves nothing"
         )
     });
-    println!("control: pair {pair}'s path half read the delivering link dead {at:?} in");
+    println!("control: pair {pair}'s path read the delivering link dead {at:?} in");
 }
 
-/// Counting a neighbour must not keep a stopped peer connected: it reads not
-/// connected once gossip reports it down and its path is gone. Prints how long
-/// each half took, against the pairing plan's D1 figure for a killed resident.
-/// About a minute: gossip drops a closed peer at once, iroh's path after 60 s.
+/// A peer that closes reads not connected as soon as gossip reports it down,
+/// though iroh keeps its path active for about a minute: on a subscribed
+/// overlay the path does not decide. The control is that path, which must
+/// still read the closed peer connected when the directory says it is not.
+/// One-way dial, so the path is honestly active before the close.
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
 async fn a_stopped_peer_reads_not_connected_once_its_neighbour_goes_down() {
     let topic = [0xe1; 32];
-    let (alice, alice_handle, bob, bob_handle) = dialled_at_once(240, topic).await;
+    let (alice, alice_handle, bob, bob_handle) = joined_pair(240, topic, false).await;
     let bob_id = bob.local_peer_id();
     let to_bob = Traffic::start(alice.local_peer_id(), &alice_handle, &bob_handle);
-    within("connected", Duration::from_secs(20), async {
-        while !(to_bob.delivering() && reads_connected(&alice, bob_id, topic, true).await) {
-            tokio::time::sleep(Duration::from_millis(100)).await;
-        }
-    })
+    within(
+        "connected by gossip and path",
+        Duration::from_secs(20),
+        async {
+            while !(to_bob.delivering()
+                && reads_connected(&alice, bob_id, topic, true).await
+                && reads_connected(&alice, bob_id, topic, false).await)
+            {
+                tokio::time::sleep(Duration::from_millis(100)).await;
+            }
+        },
+    )
     .await;
 
     drop((to_bob, bob_handle));
@@ -706,39 +734,37 @@ async fn a_stopped_peer_reads_not_connected_once_its_neighbour_goes_down() {
     within("close", Duration::from_secs(10), bob.close())
         .await
         .unwrap();
+    let closed = stopped.elapsed();
     drop(bob);
-    let (mut neighbour_down, mut path_down) = (None, None);
-    let not_connected = within("not connected", Duration::from_secs(120), async {
-        loop {
-            tokio::time::sleep(Duration::from_millis(100)).await;
-            if neighbour_down.is_none()
-                && !alice
-                    .gossip_neighbours(topic)
-                    .await
-                    .contains(&bob_id.to_bytes())
-            {
-                neighbour_down = Some(stopped.elapsed());
-            }
-            if path_down.is_none() && !reads_connected(&alice, bob_id, topic, false).await {
-                path_down = Some(stopped.elapsed());
-            }
-            if !reads_connected(&alice, bob_id, topic, true).await {
-                break stopped.elapsed();
-            }
+    let not_connected = within("not connected", Duration::from_secs(10), async {
+        while reads_connected(&alice, bob_id, topic, true).await {
+            tokio::time::sleep(Duration::from_millis(20)).await;
         }
+        stopped.elapsed()
     })
     .await;
+    let neighbour = alice
+        .gossip_neighbours(topic)
+        .await
+        .contains(&bob_id.to_bytes());
+    let path = reads_connected(&alice, bob_id, topic, false).await;
     println!(
-        "stopped peer: neighbour down {neighbour_down:?}, path down {path_down:?}, \
-         not connected {not_connected:?}"
+        "stopped peer: close returned in {closed:?}; not connected {not_connected:?} \
+         after close began; still a neighbour {neighbour}; path still active {path}"
     );
     assert!(
-        neighbour_down.is_some() && path_down.is_some(),
-        "not connected only once both halves are down: \
-         neighbour {neighbour_down:?}, path {path_down:?}"
+        !neighbour,
+        "not connected because gossip reports the peer down"
+    );
+    assert!(
+        not_connected < Duration::from_secs(2),
+        "a closed peer reads not connected within a second or so: {not_connected:?}"
+    );
+    assert!(
+        path,
+        "the control: iroh still holds the closed peer's path active, so the \
+         directory's answer came from gossip"
     );
     drop(alice_handle);
-    within("close", Duration::from_secs(10), alice.close())
-        .await
-        .unwrap();
+    close_quietly(&alice, "alice").await;
 }
