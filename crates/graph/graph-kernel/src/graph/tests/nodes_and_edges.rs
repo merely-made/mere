@@ -97,6 +97,59 @@ fn revision_advances_on_structural_change_only() {
 }
 
 #[test]
+fn content_revision_advances_on_node_text_and_membership_only() {
+    let mut graph = Graph::new();
+    assert_eq!(graph.content_revision(), 0);
+    let a = graph.add_node("https://a.example".to_string(), Point2D::new(0.0, 0.0));
+    let b = graph.add_node("https://b.example".to_string(), Point2D::new(1.0, 0.0));
+    let added = graph.content_revision();
+    assert!(added >= 2, "each added node is new text");
+
+    // An edge is structure: the structural revision moves, content holds
+    // (and the structural counter moving shows the edge registered).
+    let structure = graph.revision();
+    graph.assert_relation(a, b, hyperlink());
+    assert!(graph.revision() > structure, "the edge is structure");
+    assert_eq!(graph.content_revision(), added, "an edge is not content");
+
+    // A title edit is content, and leaves structure alone.
+    let structure = graph.revision();
+    assert!(graph.set_node_title(a, "Saturn's rings".to_string()));
+    let titled = graph.content_revision();
+    assert!(titled > added, "a title edit is content");
+    assert_eq!(graph.revision(), structure, "a title edit is not structure");
+    // The same title again changes nothing.
+    assert!(!graph.set_node_title(a, "Saturn's rings".to_string()));
+    assert_eq!(
+        graph.content_revision(),
+        titled,
+        "an unchanged title is not an edit"
+    );
+
+    // A primary URL move is content; the same URL again is not.
+    graph.update_node_url(b, "https://b.example/page".to_string());
+    let moved = graph.content_revision();
+    assert!(moved > titled, "a URL move is content");
+    graph.update_node_url(b, "https://b.example/page".to_string());
+    assert_eq!(
+        graph.content_revision(),
+        moved,
+        "the same URL is not a move"
+    );
+
+    // Tags are not the text the revision covers.
+    assert!(graph.insert_node_tag(a, "astronomy".to_string()));
+    assert_eq!(graph.content_revision(), moved, "a tag is not title or URL");
+
+    // A node leaving takes its text with it.
+    graph.remove_node(b);
+    assert!(
+        graph.content_revision() > moved,
+        "removing a node is content"
+    );
+}
+
+#[test]
 fn url_grouping_key_matches_site_kanban_authority() {
     assert_eq!(
         Graph::url_grouping_key("https://example.test:8443/a?b#c"),

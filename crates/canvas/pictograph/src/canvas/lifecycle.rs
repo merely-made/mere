@@ -56,6 +56,7 @@ impl Canvas {
     /// This is the Model-A graph swap the multi-graph switch drives. (Multi-graph MG2.)
     pub fn set_graph(&mut self, graph: Graph) {
         self.graph = graph;
+        self.meaning.forget_graph();
         self.selected.clear();
         self.selected_edges.clear();
         self.hidden_edges.clear();

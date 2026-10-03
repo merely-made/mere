@@ -1,0 +1,130 @@
+{
+ "source": "arXiv API, https://export.arxiv.org/api/query",
+ "licence": "CC0 1.0: 'You are free to use descriptive metadata about arXiv e-prints under the terms of the Creative Commons Universal (CC0 1.0) Public Domain Declaration.' (https://info.arxiv.org/help/api/tou.html)",
+ "ruling": "mere dynamics grammar plan F42, F43 (2026-10-03)",
+ "retrieved_utc": "2026-10-03T19:01:43+00:00",
+ "window": "[202501010000 TO 202512312359]",
+ "kept_fields": [
+  "arxiv_id",
+  "title",
+  "primary_category"
+ ],
+ "requests": [
+  {
+   "category": "astro-ph.GA",
+   "url": "https://export.arxiv.org/api/query?search_query=cat%3Aastro-ph.GA+AND+submittedDate%3A%5B202501010000+TO+202512312359%5D&start=0&max_results=150&sortBy=submittedDate&sortOrder=ascending",
+   "bytes": 468505,
+   "sha256": "02bff9edbf55bb6750d906db5df1e57fa8b072c79079aa71077f77c340e814e0",
+   "entries": 150,
+   "kept_with_primary_in_set": 89
+  },
+  {
+   "category": "cs.CL",
+   "url": "https://export.arxiv.org/api/query?search_query=cat%3Acs.CL+AND+submittedDate%3A%5B202501010000+TO+202512312359%5D&start=0&max_results=150&sortBy=submittedDate&sortOrder=ascending",
+   "bytes": 348292,
+   "sha256": "397f6828e6caeb68418ea87fc8c7d448af021eae35ef1ad8c97da1360e9b62a8",
+   "entries": 150,
+   "kept_with_primary_in_set": 109
+  },
+  {
+   "category": "q-bio.NC",
+   "url": "https://export.arxiv.org/api/query?search_query=cat%3Aq-bio.NC+AND+submittedDate%3A%5B202501010000+TO+202512312359%5D&start=0&max_results=150&sortBy=submittedDate&sortOrder=ascending",
+   "bytes": 369121,
+   "sha256": "2e8276796ac8772f9ca262c9756c07a725bfc24630837c5af422d2ae04fef643",
+   "entries": 150,
+   "kept_with_primary_in_set": 97
+  },
+  {
+   "category": "econ.GN",
+   "url": "https://export.arxiv.org/api/query?search_query=cat%3Aecon.GN+AND+submittedDate%3A%5B202501010000+TO+202512312359%5D&start=0&max_results=150&sortBy=submittedDate&sortOrder=ascending",
+   "bytes": 307198,
+   "sha256": "2ab3e49cde27c0267f37799f18eeef3befe43060acfd4947f4dd573fbf9fe9a2",
+   "entries": 150,
+   "kept_with_primary_in_set": 123
+  },
+  {
+   "category": "cond-mat.mes-hall",
+   "url": "https://export.arxiv.org/api/query?search_query=cat%3Acond-mat.mes-hall+AND+submittedDate%3A%5B202501010000+TO+202512312359%5D&start=0&max_results=150&sortBy=submittedDate&sortOrder=ascending",
+   "bytes": 364992,
+   "sha256": "376455387e2c3030f02d6aa362edee4841cebdb1cc0cdf744c5aa16719b0ca94",
+   "entries": 150,
+   "kept_with_primary_in_set": 84
+  },
+  {
+   "category": "math.PR",
+   "url": "https://export.arxiv.org/api/query?search_query=cat%3Amath.PR+AND+submittedDate%3A%5B202501010000+TO+202512312359%5D&start=0&max_results=150&sortBy=submittedDate&sortOrder=ascending",
+   "bytes": 250338,
+   "sha256": "26d88164f8e01733c00097b2fb8f29fc73483733634bac64868666d8196a2cd5",
+   "entries": 150,
+   "kept_with_primary_in_set": 91
+  },
+  {
+   "category": "astro-ph.GA",
+   "url": "https://export.arxiv.org/api/query?search_query=cat%3Aastro-ph.GA+AND+submittedDate%3A%5B202501010000+TO+202512312359%5D&start=150&max_results=150&sortBy=submittedDate&sortOrder=ascending",
+   "bytes": 483202,
+   "sha256": "f4cb049ee5d4cd5ac185bd1c8fbc8a8e2ae29af3a039d2e440bc85492979a7d0",
+   "entries": 150,
+   "kept_with_primary_in_set": 107
+  },
+  {
+   "category": "cs.CL",
+   "url": "https://export.arxiv.org/api/query?search_query=cat%3Acs.CL+AND+submittedDate%3A%5B202501010000+TO+202512312359%5D&start=150&max_results=150&sortBy=submittedDate&sortOrder=ascending",
+   "bytes": 343661,
+   "sha256": "8d7eeddbd7285e906afeab59c24b49e703ac1fab3089fc6a7980e3932ef05e55",
+   "entries": 150,
+   "kept_with_primary_in_set": 99
+  },
+  {
+   "category": "q-bio.NC",
+   "url": "https://export.arxiv.org/api/query?search_query=cat%3Aq-bio.NC+AND+submittedDate%3A%5B202501010000+TO+202512312359%5D&start=150&max_results=150&sortBy=submittedDate&sortOrder=ascending",
+   "bytes": 364550,
+   "sha256": "8461f74093d5001958402eff536f906766efc3406581a9abdae12ae9d156fe0f",
+   "entries": 150,
+   "kept_with_primary_in_set": 97
+  },
+  {
+   "category": "econ.GN",
+   "url": "https://export.arxiv.org/api/query?search_query=cat%3Aecon.GN+AND+submittedDate%3A%5B202501010000+TO+202512312359%5D&start=150&max_results=150&sortBy=submittedDate&sortOrder=ascending",
+   "bytes": 298182,
+   "sha256": "e64e541ca8ead62b16b1e86e78e50effe130159b9fe436ea9f0279d886013db8",
+   "entries": 150,
+   "kept_with_primary_in_set": 117
+  },
+  {
+   "category": "cond-mat.mes-hall",
+   "url": "https://export.arxiv.org/api/query?search_query=cat%3Acond-mat.mes-hall+AND+submittedDate%3A%5B202501010000+TO+202512312359%5D&start=150&max_results=150&sortBy=submittedDate&sortOrder=ascending",
+   "bytes": 358060,
+   "sha256": "572a2fcdecd500f964ff703bae5d7384a0a33ecf7d1d49dcbc2e3d859f98d738",
+   "entries": 150,
+   "kept_with_primary_in_set": 90
+  },
+  {
+   "category": "math.PR",
+   "url": "https://export.arxiv.org/api/query?search_query=cat%3Amath.PR+AND+submittedDate%3A%5B202501010000+TO+202512312359%5D&start=150&max_results=150&sortBy=submittedDate&sortOrder=ascending",
+   "bytes": 253413,
+   "sha256": "390997a33912378de9ccba8bee5de180b3682245ce68e5d0ac5c62586537f80f",
+   "entries": 150,
+   "kept_with_primary_in_set": 88
+  }
+ ],
+ "rows": 900,
+ "rows_per_category": {
+  "astro-ph.GA": 150,
+  "cs.CL": 150,
+  "q-bio.NC": 150,
+  "econ.GN": 150,
+  "cond-mat.mes-hall": 150,
+  "math.PR": 150
+ },
+ "tsv_sha256": "942a771655d1029ef4f3806c2fb8faeddfde6913561d516eec3427cb16e31f9d",
+ "retrieved_utc_page2": "2026-10-03T19:04:05+00:00",
+ "selection": "first 150 per primary category by arXiv id (submission order), after merging both pages",
+ "available_per_category": {
+  "astro-ph.GA": 196,
+  "cs.CL": 219,
+  "q-bio.NC": 185,
+  "econ.GN": 238,
+  "cond-mat.mes-hall": 174,
+  "math.PR": 178
+ }
+}

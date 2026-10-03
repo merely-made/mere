@@ -19,7 +19,7 @@ use super::meaning::{MeaningRequest, MeaningSnapshot, compute_meaning};
 
 /// A finished run, with what it was computed for.
 pub(crate) struct MeaningUpdate {
-    pub content_key: u64,
+    pub content_revision: u64,
     pub generation: u64,
     pub result: Result<MeaningSnapshot, EmbedError>,
 }
@@ -28,23 +28,27 @@ pub(crate) struct MeaningUpdate {
 pub(crate) struct MeaningActor {
     handle: ActorHandle<MeaningRequest>,
     updates: Receiver<MeaningUpdate>,
-    /// The `(content key, generation)` in flight, so a stable graph is not
+    /// The `(content revision, generation)` in flight, so a stable graph is not
     /// re-dispatched while its run is pending.
     inflight: Option<(u64, u64)>,
 }
 
 impl MeaningActor {
     pub fn spawn(wake: Wake) -> Self {
-        let (handle, updates) = spawn(wake, |commands, out: Emitter<MeaningUpdate>| {
-            while let Ok(request) = commands.recv() {
-                let result = compute_meaning(&request);
-                out.emit(MeaningUpdate {
-                    content_key: request.content_key,
-                    generation: request.generation,
-                    result,
-                });
-            }
-        });
+        let (handle, updates) = spawn(
+            wake,
+            |commands: Receiver<MeaningRequest>, out: Emitter<MeaningUpdate>| {
+                while let Ok(request) = commands.recv() {
+                    let (content_revision, generation) = request.tag();
+                    let result = compute_meaning(request);
+                    out.emit(MeaningUpdate {
+                        content_revision,
+                        generation,
+                        result,
+                    });
+                }
+            },
+        );
         Self {
             handle,
             updates,
@@ -54,7 +58,7 @@ impl MeaningActor {
 
     /// Dispatch a run, unless one for the same content and engine is pending.
     pub fn request(&mut self, request: MeaningRequest) {
-        let tag = (request.content_key, request.generation);
+        let tag = request.tag();
         if self.inflight == Some(tag) {
             return;
         }
@@ -75,7 +79,7 @@ impl MeaningActor {
             latest = Some(update);
         }
         if let Some(update) = &latest
-            && self.inflight == Some((update.content_key, update.generation))
+            && self.inflight == Some((update.content_revision, update.generation))
         {
             self.inflight = None;
         }

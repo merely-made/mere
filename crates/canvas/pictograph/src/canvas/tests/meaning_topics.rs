@@ -4,10 +4,18 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! A fixture graph with known topics, for the Meaning channel's purity
-//! receipts (dynamics grammar plan, G2). Shared by the lib tests and the
-//! device receipt (`tests/meaning_device.rs`, through `#[path]`).
+//! Fixtures with known topics for the Meaning channel (dynamics grammar plan,
+//! G2). Shared by the lib tests and the device receipt
+//! (`tests/meaning_device.rs`, through `#[path]`).
 //!
+//! **The purity receipt's fixture** is [`arxiv_graph`]: 900 arXiv titles,
+//! 150 in each of six disjoint primary categories (F39, F42, F43), CC0
+//! metadata in `data/arxiv_topics.tsv` with its provenance beside it. A flat
+//! title list: every node is on `arxiv.org` and no node links another.
+//!
+//! **The quick fixture** is [`topic_graph`], kept for the wiring receipts
+//! that need structure and sites the corpus lacks (Group pull's twin, one
+//! partition for Columns and Kinds, the run counts, the sliced run):
 //! Thirty-two page titles, eight on each of four topics, written for the
 //! receipt. The topics are crossed by everything else a channel could read:
 //! node `i` has topic `i / 8`, site `i % 4` (two of every topic per site), and
@@ -74,7 +82,74 @@ pub fn community(i: usize) -> usize {
     (i / 2) % 4
 }
 
-/// The fixture: the graph, its keys in index order, and each key's topic.
+/// The six categories, in the corpus's order.
+pub const ARXIV_CATEGORIES: [&str; 6] = [
+    "astro-ph.GA",
+    "cs.CL",
+    "q-bio.NC",
+    "econ.GN",
+    "cond-mat.mes-hall",
+    "math.PR",
+];
+
+/// The corpus, read at compile time so no test touches the filesystem.
+const ARXIV_TSV: &str = include_str!("data/arxiv_topics.tsv");
+
+/// The arXiv fixture: a node per title (URL `https://arxiv.org/abs/<id>`,
+/// title as given), keys in row order, and each key's category index into
+/// [`ARXIV_CATEGORIES`].
+pub fn arxiv_graph() -> (Graph, Vec<NodeKey>, HashMap<NodeKey, usize>) {
+    let mut graph = Graph::new();
+    let mut keys = Vec::new();
+    let mut topics = HashMap::new();
+    for (row, line) in ARXIV_TSV.lines().skip(1).enumerate() {
+        let mut fields = line.split('\t');
+        let (Some(id), Some(title), Some(category)) = (fields.next(), fields.next(), fields.next())
+        else {
+            panic!("row {row}: three tab-separated fields");
+        };
+        let topic = ARXIV_CATEGORIES
+            .iter()
+            .position(|c| *c == category)
+            .unwrap_or_else(|| panic!("row {row}: unknown category {category}"));
+        let key = graph.add_node(
+            format!("https://arxiv.org/abs/{id}"),
+            PortablePoint::new(0.0, 0.0),
+        );
+        assert!(graph.set_node_title(key, title.to_string()));
+        keys.push(key);
+        topics.insert(key, topic);
+    }
+    assert_eq!(keys.len(), 900, "the corpus holds 900 titles");
+    for topic in 0..ARXIV_CATEGORIES.len() {
+        assert_eq!(topics.values().filter(|t| **t == topic).count(), 150);
+    }
+    (graph, keys, topics)
+}
+
+/// Each group's share of each label, for the groups holding at least
+/// `min_share` of the nodes: `(group size, counts by label)`, largest first.
+pub fn confusion(
+    groups: &[(NodeKey, u32)],
+    labels: &HashMap<NodeKey, usize>,
+    label_count: usize,
+    min_share: f64,
+) -> Vec<(usize, Vec<usize>)> {
+    let mut by: HashMap<u32, Vec<usize>> = HashMap::new();
+    for (key, group) in groups {
+        by.entry(*group).or_insert_with(|| vec![0; label_count])[labels[key]] += 1;
+    }
+    let floor = (groups.len() as f64 * min_share).ceil() as usize;
+    let mut rows: Vec<(usize, Vec<usize>)> = by
+        .into_values()
+        .map(|counts| (counts.iter().sum(), counts))
+        .filter(|(size, _)| *size >= floor)
+        .collect();
+    rows.sort_by(|a, b| b.0.cmp(&a.0).then_with(|| b.1.cmp(&a.1)));
+    rows
+}
+
+/// The quick fixture: the graph, its keys in index order, and each key's topic.
 pub fn topic_graph() -> (Graph, Vec<NodeKey>, HashMap<NodeKey, usize>) {
     let mut graph = Graph::new();
     let mut keys = Vec::new();
@@ -135,10 +210,10 @@ pub fn inverse_purity(groups: &[(NodeKey, u32)], labels: &HashMap<NodeKey, usize
     purity(&as_groups, &as_labels)
 }
 
-/// The fixture's topics dealt out again by a fixed shuffle, eight of each: a
-/// labelling no embedding can know, for the purity measure's control.
-pub fn shuffled_topics(keys: &[NodeKey]) -> HashMap<NodeKey, usize> {
-    let mut labels: Vec<usize> = (0..keys.len()).map(|i| i / 8).collect();
+/// `labels` dealt out again over `keys` by a fixed shuffle, each label as
+/// often as before: a labelling no embedding can know.
+pub fn shuffled(keys: &[NodeKey], labels: &HashMap<NodeKey, usize>) -> HashMap<NodeKey, usize> {
+    let mut labels: Vec<usize> = keys.iter().map(|k| labels[k]).collect();
     let mut state: u64 = 0x5EED;
     for i in (1..labels.len()).rev() {
         state = state
