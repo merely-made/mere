@@ -984,6 +984,16 @@ P5 and P6 stay in this plan.
   swapping the order of the two genet revisions' `fleece` and
   `layout-dom-api` rows; the committed lock passes `--locked` as it stands, so
   lane commands run locked.
+- 2026-10-02 (dynamics grammar G1, F10): the 2026-09-02 finding that Kinds
+  never rests holds. On the P2 fixture under continuous ticking its kinetic
+  energy is about 18 300 at 6 s and 140 500 at 30 s, against the floor of 1,
+  and Kinds joined `PhysicsLaw::never_rests`. The receipts' Play preamble
+  had already kept every law ticking, since a settle keeps the larger budget
+  (the [dynamics grammar plan](2026-10-02_dynamics_grammar_plan.md),
+  Findings).
+- 2026-10-02 (dynamics grammar G1, F7): the laws table's Energy row ("LinLog /
+  ForceAtlas2") describes ForceAtlas2's (1, −1) force model; LinLog proper is
+  the law's attraction exponent 0, a tuning, and the id stays `energy.linlog`.
 
 ## 5. Decisions
 
