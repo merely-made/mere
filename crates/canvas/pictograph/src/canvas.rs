@@ -161,7 +161,7 @@ pub mod fold_projection;
 mod frame;
 mod frame_profile;
 pub use frame_profile::CanvasFrameProfile;
-pub use seiche::{ElapsedStepConfig, ElapsedStepReport};
+pub use seiche::{ElapsedStepConfig, ElapsedStepReport, PaceStats, Speed, StepBudget};
 mod cull;
 mod input;
 mod resolved_image_cache;

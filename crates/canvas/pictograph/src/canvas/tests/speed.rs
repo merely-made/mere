@@ -1,0 +1,229 @@
+// Copyright 2026 Mark Alan Boykin
+// SPDX-License-Identifier: MPL-2.0
+
+//! The speed dial through the canvas's own frame loop: one trajectory at
+//! every speed, slow motion drawn every frame, and fast-forward under a real
+//! clock's budget reporting the speed it reached. Seiche's receipts prove the
+//! stepping; these prove the canvas adds nothing between frames that depends
+//! on how many there are.
+
+use std::time::Duration;
+
+use super::*;
+use crate::canvas::physics_catalog::PhysicsLaw;
+use crate::canvas::{ElapsedStepConfig, Speed, StepBudget};
+use kernel::graph::apply::{add_node, assert_relation};
+
+const W: u32 = 800;
+const H: u32 = 600;
+
+/// `nodes` on a golden-angle spiral, each linked to the one before and to a
+/// chord seven along: a connected graph whose every body interacts.
+fn chorded(nodes: usize) -> Graph {
+    let mut graph = Graph::new();
+    let keys: Vec<_> = (0..nodes)
+        .map(|i| {
+            add_node(
+                &mut graph,
+                Some(uuid::Uuid::from_u128(0x5eed_0000 + i as u128)),
+                format!("https://speed-{i}.test/"),
+                PortablePoint::new(0.0, 0.0),
+            )
+        })
+        .collect();
+    for i in 1..nodes {
+        assert_relation(&mut graph, keys[i], keys[i - 1], hyperlink());
+        assert_relation(&mut graph, keys[i], keys[(i * 7) % i], hyperlink());
+    }
+    graph
+}
+
+/// A free canvas (no arrangement) seeded in key order, under `law`.
+fn canvas(nodes: usize, law: PhysicsLaw) -> Canvas {
+    let mut canvas = Canvas::with_graph(chorded(nodes));
+    canvas.set_layout_strategy(None);
+    canvas.resize(W, H);
+    let mut keys: Vec<NodeKey> = canvas.graph().nodes().map(|(k, _)| k).collect();
+    keys.sort_by_key(|k| k.index());
+    canvas.physics.seed(
+        keys.iter()
+            .enumerate()
+            .map(|(i, &k)| {
+                let a = i as f32 * 2.399_963;
+                let r = 40.0 * (i as f32 + 0.5).sqrt();
+                (k, Point2D::new(r * a.cos(), r * a.sin()))
+            })
+            .collect(),
+    );
+    canvas.set_physics_law(law);
+    canvas
+}
+
+fn bits(canvas: &Canvas) -> Vec<(usize, u32, u32)> {
+    let mut out: Vec<_> = canvas
+        .view
+        .positions()
+        .map(|(k, p)| (k.index(), p.x.to_bits(), p.y.to_bits()))
+        .collect();
+    out.sort_unstable();
+    out
+}
+
+/// Frame the canvas at `speed` until its settle ends; the frames, the ticks,
+/// and where it came to rest.
+fn settle(speed: f32, extra_ticks: u32) -> (u32, u64, Vec<(usize, u32, u32)>) {
+    let mut canvas = canvas(30, PhysicsLaw::Anneal);
+    canvas.set_physics_speed(Speed::from_factor(speed));
+    if extra_ticks > 0 {
+        canvas.settle_physics(SETTLE_TICKS + extra_ticks);
+    }
+    let mut frames = 0;
+    loop {
+        frames += 1;
+        let (_, moving) = canvas.frame(W, H);
+        if !moving {
+            break;
+        }
+        assert!(frames < 20 * SETTLE_TICKS, "the settle never ended");
+    }
+    (frames, canvas.physics_pace().ticks, bits(&canvas))
+}
+
+/// Anneal, because it is the catalog law with no `NodeExclusion` (whose
+/// HashMap-order sum differs run to run) and whose seeded walk changes on
+/// any extra or missing tick.
+#[test]
+fn the_canvas_keeps_one_trajectory_at_every_speed() {
+    let (frames_1x, ticks_1x, at_1x) = settle(1.0, 0);
+    assert_eq!(settle(1.0, 0).2, at_1x, "1x twice");
+    let (frames_slow, ticks_slow, slow) = settle(0.2, 0);
+    let (frames_fast, ticks_fast, fast) = settle(50.0, 0);
+    let budget = u64::from(SETTLE_TICKS);
+    assert_eq!((ticks_1x, ticks_slow, ticks_fast), (budget, budget, budget));
+    assert_eq!(frames_1x, SETTLE_TICKS);
+    assert_eq!(frames_slow, 5 * (SETTLE_TICKS - 1));
+    assert_eq!(frames_fast, SETTLE_TICKS.div_ceil(50));
+    assert_eq!(slow, at_1x, "0.2x left the 1x trajectory");
+    assert_eq!(fast, at_1x, "50x left the 1x trajectory");
+    // Positive control: one tick more lands elsewhere, so the comparison
+    // resolves a single tick.
+    let (_, ticks_more, more) = settle(1.0, 1);
+    assert_eq!(ticks_more, budget + 1);
+    assert_ne!(more, at_1x, "one more tick matched");
+}
+
+#[test]
+fn slow_motion_on_the_canvas_draws_every_frame_and_steps_every_fifth() {
+    let mut canvas = canvas(30, PhysicsLaw::Springs);
+    canvas.set_physics_speed(Speed::from_factor(0.2));
+    let mut last = bits(&canvas);
+    let mut stepped = 0;
+    for frame in 1..=60 {
+        let before = canvas.physics_pace().ticks;
+        let (_, moving) = canvas.frame(W, H);
+        assert!(moving);
+        stepped += u32::from(canvas.physics_pace().ticks > before);
+        let drawn = bits(&canvas);
+        assert_ne!(drawn, last, "frame {frame} drew nothing new");
+        last = drawn;
+    }
+    assert_eq!(stepped, 13, "the lead tick, then one every fifth frame");
+    assert_eq!(canvas.physics_pace().ticks, 13);
+}
+
+/// The canvas's timed path at `speed` under a `budget` on the real clock:
+/// per frame the steps run, the compute spent, and whether the budget bound.
+fn timed(
+    nodes: usize,
+    speed: f32,
+    budget: Duration,
+    frames: u32,
+) -> (Canvas, Vec<(u32, Duration, bool)>) {
+    let mut canvas = canvas(nodes, PhysicsLaw::Springs);
+    canvas.set_physics_speed(Speed::from_factor(speed));
+    canvas.set_physics_step_budget(Some(StepBudget {
+        per_frame: budget,
+        clock: seiche::monotonic_clock,
+    }));
+    let mut out = Vec::new();
+    for frame in 0..=frames {
+        let at = seiche::TICK_DURATION * frame;
+        canvas.frame_at(W, H, at, ElapsedStepConfig::default());
+        let report = canvas.elapsed_step_report().unwrap();
+        if frame > 0 {
+            out.push((report.steps, report.compute.unwrap(), report.budget_bound));
+        }
+    }
+    (canvas, out)
+}
+
+#[test]
+fn fast_forward_on_the_canvas_stops_at_the_budget_and_reports_the_speed() {
+    // Measure a tick on this build and machine, then give 50x a budget of
+    // about four: the graph is too large for fifty ticks a frame.
+    let (_, at_1x) = timed(240, 1.0, Duration::from_secs(1), 20);
+    let mut costs: Vec<Duration> = at_1x.iter().map(|f| f.1).collect();
+    costs.sort();
+    let tick = costs[costs.len() / 2];
+    let budget = (tick * 4).max(Duration::from_millis(2));
+    let (canvas, fast) = timed(240, 50.0, budget, 30);
+    let worst_tick = costs[costs.len() - 1];
+    for (frame, &(steps, compute, bound)) in fast.iter().enumerate() {
+        assert!(bound, "frame {frame}: {steps} steps did not hit the budget");
+        assert!((1..50).contains(&steps), "frame {frame}: {steps} steps");
+        // The forecast can be wrong by at most one tick's variation.
+        assert!(
+            compute <= budget + worst_tick,
+            "frame {frame}: {compute:?} against {budget:?} (+{worst_tick:?})"
+        );
+    }
+    let reached = canvas.physics_pace().effective_speed.unwrap();
+    assert!((1.0..50.0).contains(&reached), "reached {reached}");
+    let inside = fast.iter().filter(|f| f.1 <= budget).count();
+    println!(
+        "tick {tick:?} (worst {worst_tick:?}), budget {budget:?}: reached {reached:.1}x, \
+         {inside} of {} frames inside the budget, worst {:?}",
+        fast.len(),
+        fast.iter().map(|f| f.1).max().unwrap()
+    );
+
+    // Control: six nodes, with a budget twice what fifty of their slowest
+    // ticks cost, run every tick owed and reach the speed asked while they
+    // settle.
+    let (_, small_1x) = timed(6, 1.0, Duration::from_secs(1), 20);
+    let small_worst = small_1x.iter().map(|f| f.1).max().unwrap();
+    let roomy = small_worst * 100;
+    let (small, cheap) = timed(6, 50.0, roomy, 6);
+    let settling: Vec<_> = cheap.iter().filter(|f| f.0 > 0).collect();
+    assert!(settling.len() >= 5, "{cheap:?}");
+    assert!(
+        settling.iter().all(|f| !f.2 && f.0 == 50),
+        "{settling:?} under {roomy:?}"
+    );
+    let reached = small.physics_pace().effective_speed.unwrap();
+    assert!(
+        (reached - 50.0).abs() < 0.5,
+        "the small graph reached {reached}"
+    );
+}
+
+#[test]
+fn the_board_runs_at_its_speed() {
+    let mut board = PhysicsBoard::new();
+    let item = |id: &str, slot| BoardItem {
+        id: id.to_string(),
+        slot,
+        site: "fixture".to_string(),
+    };
+    board.sync(vec![
+        item("a", (0.0, 0.0)),
+        item("b", (10.0, 0.0)),
+        item("c", (0.0, 10.0)),
+    ]);
+    board.set_speed(Speed::from_factor(50.0));
+    let before = board.pace().ticks;
+    for _ in 0..3 {
+        board.tick();
+    }
+    assert_eq!(board.pace().ticks - before, 150);
+}
