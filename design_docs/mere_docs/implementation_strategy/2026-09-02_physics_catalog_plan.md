@@ -595,6 +595,24 @@ pull reading −0.33 with 510 overlaps):
   chose **"Keep renewal, drop four"**: renewal stays as an option, and quench,
   wall inset, relax and decay leave the code, their evidence kept in the logs
   and here.
+- **Density's suite cost, and seiche's speed (2026-10-03, `density-cpu`
+  `0e1c745f`).** The dealt-start receipts take pictograph's default suite
+  from 110 s to 401 s; one dealt start costs 105 to 130 s in a debug build,
+  while all sixteen run in 133 s in release (three tests in parallel). Asked
+  how to carry the cost (the bars in release with a quick default check; an
+  opt-level override for seiche in dev builds; one start per graph; keep 401
+  s), Mark answered: **"Changing the speed of seiche is a useful feature for
+  dev and possibly otherwise. Let's consider how we might go from x0.20 to
+  x50?"** *Follows:* none of the options as put; seiche's speed goes to its
+  own design, put back to Mark. Density's merge waits on the interim choice.
+- **Energy's receipt passes off screen (2026-10-03).** In
+  `p4_tree_physics_energy`'s settled capture one node and one edge are in
+  view and the rest of the 11-node fixture has left it; the start frame
+  already runs past the edges; G1's, P5's and Density's captures match, so it
+  predates them. Options: a lane diagnoses whether the law's scale or the
+  view's fit is the cause, fixes it, and adds a framing assertion to every
+  law receipt with a positive control; the framing assertion only; a note.
+  Mark chose **"Diagnose and gate"**.
 - **P5's web defaults, undercut by pre.4 (2026-10-03).** On `burn-pre4-repin`
   the web page's frames take 557 ms against pre.2's 12.1 ms, GPU on or off,
   because the wasm module re-runs its static constructors (pliron's
