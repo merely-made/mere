@@ -521,6 +521,16 @@ pull reading −0.33 with 510 overlaps):
   gen-50; the 200-node receipt asserts at least 0.7 with its plateau
   recorded, revisited with P6b's 512² GPU grid. The alternatives were
   searching for other defaults, or changing the law.
+- **Density's stop, reopened (2026-10-02, fourth round, `65ff1b11`).** The
+  shift stop, recommended in the third round, ends the flow on a dip: the
+  rank wanders pass to pass (sample 0.84 at pass 3, 0.745 at 15 to 30, 0.877
+  at 60 to 90), so at that stop gen-50 read 0.786 against its 0.8 bar and the
+  headed fixtures 0.71 (tree) and 0.53 (old page). Under the 120-pass cap
+  every bar was met. Mark chose "Change the law": reduce the wander itself so
+  any stop reads true. The alternatives were the cap alone, keeping the shift
+  stop with a wider plateau bar, or a stricter shift. *Reading, not ruled:*
+  the lane measures the wander's cause and brings formulations back as
+  options with numbers; the shift stop stays the default meanwhile.
 
 *Done when:* GPU and CPU forces agree to 1e-3 relative at 1k and 10k nodes;
 a sign-flipped kernel fails the overlap check (positive control); a forced
@@ -922,7 +932,14 @@ P5 and P6 stay in this plan.
   offline only because this machine's cache held no other; online it would
   likely take pre.4, and the root's pre.2 `cubecl-runtime` patch (the wasm
   fix) would go unused. Pinning `=` in conatus, or recording the web lock,
-  closes it; open for Mark.
+  closes it; open for Mark. *Ruled 2026-10-02:* asked first, Mark replied
+  "Wait. Those should be bumped, no?"; told that pre.4 was published
+  2026-09-22 and that branch `burn-pre4-repin` (23 commits ahead of main, last
+  2026-09-30) holds the migration with ruling 411's allocator diagnosis open,
+  he chose "Finish pre.4 now, no interim pin": a lane takes the pre.4
+  migration to its gates and merge, and main is not exact-pinned meanwhile.
+  The alternatives were an interim `=` pin while the migration finished, or
+  bumping conatus alone.
 - 2026-10-02: a cargo run without `--locked` re-serializes the root lock,
   swapping the order of the two genet revisions' `fleece` and
   `layout-dom-api` rows; the committed lock passes `--locked` as it stands, so
