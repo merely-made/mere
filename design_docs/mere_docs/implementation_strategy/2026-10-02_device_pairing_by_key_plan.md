@@ -2,10 +2,11 @@
 
 **Date**: 2026-10-02
 **Status (2026-10-02)**: in progress. Assessed and ruled by Mark on 2026-10-01
-and 2026-10-02 (rulings 1 to 35 below). D1 landed (`4963b489`); D1b's mere fix (M1)
+and 2026-10-02 (rulings 1 to 39 below). D1 landed (`4963b489`); D1b's mere fix (M1)
 landed (`177b927c`), its fork fix (F1) is being released as
-`mere-p2panda-net-0.7.5` with knot and mere repinned, and `connected` is
-being fixed; then D2.
+`mere-p2panda-net-0.7.5` with knot and mere repinned; `connected` follows
+the gossip overlay (ruling 31) and is being finished, and the overlay's gap
+after restarts goes to its own lane (ruling 36); then D2.
 **Scope**: Mark's machines find, reach and trust each other by device
 identity, not by address: the stack's own peers already do on one network;
 SSH, the path Mark uses daily, does not. Pairing a device becomes one
@@ -317,6 +318,41 @@ covered by the portable gate and every compiler census (insigne's phase A
 missed it as a nested workspace); mere's lock gains Retinue's crates at that
 rev.
 
+**Ruling 36.** *After a crash-restart the restarted resident gets no gossip
+neighbour (12 of 12 runs, the same on `main` and on ruling 31's branch; §6):
+the surviving side's iroh-gossip can hold a stale pending neighbour request
+and never answers the restarted side's `Join`, whichever restart comes
+second. Data from the restarted side reaches the survivor 17 to 113 s late,
+through LogSync retries; `main`'s directory reads connected meanwhile, ruling
+31's reads not connected. What now?* Options: keep ruling 31, merge it now,
+and fix the overlay in its own lane; keep ruling 31 and hold it until the
+fix; loosen D1b's check; revisit ruling 31. Mark: **"Keep 31, merge now, fix
+lane (Recommended)"**. Follows: ruling 31 merges onto `main` with D1b's
+receipt failing at its second restart, recorded as expected until the
+overlay fix; that lane assesses where the fix lives (an iroh-gossip patch,
+the p2panda fork, or a rejoin in mere-transport) and brings it to Mark.
+
+**Ruling 37.** *The simultaneous-dial control passes 8 of 8 run alone but
+failed 1 of 10 parallel suites (no trip in 16 pairs), and suites take 11 to
+202 s, mostly in it. How should it run?* Options: ignore it in the default
+suite and run it alone; raise the pair budget; leave it. Mark: **"Raise the
+pair budget"**. Follows: it stays in the default suite. *Reading, not ruled:*
+the new budget is set from trips measured in parallel suites, recorded with
+the change.
+
+**Ruling 38.** *Beyond ruling 30's wording, the one-way tests now have the
+receiver subscribe before the dialler joins: iroh-gossip drops a `Join` for a
+topic the receiver has not subscribed to (`proto/state.rs:247-275`) and
+nothing retries it. Keep that order?* Options: keep receiver-first; revert.
+Mark: **"Keep Bob-first (Recommended)"**.
+
+**Ruling 39.** *A peer on the overlay with no gossip neighbour, while iroh
+still marks a path active, reads "not connected (a path is still marked
+active)" on the resident card and in `djinn-devices`. Keep that wording?*
+Options: keep it; plain "not connected"; name the overlay ("something like
+not connected (no gossip neighbour; a path is still active)"). Mark: **"Name
+the overlay"**. Follows: that wording, on both.
+
 Also given in the same conversation (2026-10-01, Mark: "You can edit known
 hosts"): `known_hosts` entries may be updated, which was done for the
 ThinkPad (`.32`) and Q-PC (`.68`, `q-pc.local`), each key added only after
@@ -380,6 +416,13 @@ Mark SSHes into his machines.
   - [x] two residents on one machine, paired with no ticket and with mDNS
         their only way to meet, connect, and keep doing so across restarts
         (a control without the fix fails the same run);
+        *2026-10-02 annotation:* ticked on `connected` under ruling 22's
+        rule, which counted iroh's path; after a restart that signal hid an
+        overlay gap (§6, ruling 36), so the restart half is reopened by the
+        next item;
+  - [ ] (added 2026-10-02, ruling 36) at every restart, in either order, the
+        restarted side gets a gossip neighbour and data moves both ways within
+        one poll, `connected` following the overlay (ruling 31);
   - [ ] the same holds between two real machines, which D2 makes possible.
 
 - **D2 — a resident on every machine.** djinn runs as a systemd user unit on
@@ -599,6 +642,49 @@ that session's merge commit `8022cedd` ("Merge gpu-repulsion…") carries
 them; a `git notes` entry on `8022cedd` says so. The content is as intended.
 From here, staging in the shared checkout first checks that no merge,
 rebase or cherry-pick is in progress.
+
+**2026-10-02: ruling 31 built, and a gap after restarts.** The `connected`
+lane built it as `8eb08a84` on ruling 30's `f212bd63`. "Subscribed" is read
+from the address book's self record: the gossip manager tags this node with
+the topic when it subscribes and untags it when it leaves (probed before,
+during and after). While subscribed, `connected` is membership in the gossip
+manager's neighbour set, the record LogSync reads; otherwise it is iroh's
+active path. A stopped peer read not connected 92 to 398 ms after its close
+(20 of 20), iroh still marking its path active each time; D1's ticketed
+receipt passes, and gossip marked a killed resident down at 17.66 s against
+the path's 74.7 s.
+
+D1b's receipt failed 3 of 3 at its second restart. Measured over 12 runs
+(`main` `177b927c` and `8eb08a84`, both restart orders, 3 each; logs in
+`C:\t\pairing-d1b\halfstate`):
+
+- At first contact both sides send `Join` and every `Neighbor` is answered.
+- At the first restart the survivor answers the fresh `Join` with a
+  `Neighbor`; the restarted side takes it as a request and answers with its
+  own, which the survivor counts as the reply, so the restarted side keeps a
+  pending entry that nothing clears.
+- At the second restart the survivor is the side holding that entry, and
+  `send_neighbor` (iroh-gossip 0.101.0, `proto/hyparview.rs:745-753`) sends
+  only when its pending insert succeeds, so the fresh `Join` gets no answer
+  and the restarted side never gains a neighbour. The failure follows the
+  second restart in either order, not a name.
+- Data from the restarted side reached the survivor 16.7 to 113.0 s after the
+  restart, carried by whichever of the survivor's LogSync retries was
+  accepted (one every 15 s: `RETRY_RATE`, 5 s, at
+  `p2panda-net/src/sync/actors/topic_manager.rs:35`, plus a 10 s timeout);
+  the restarted side starts no session without a neighbour. The other
+  direction needs a runtime write the resident lacks (`--seed-node` runs only
+  at start).
+- `main` shows the same gossip trace in 6 of 6 while its directory read
+  connected within 0.17 to 2.26 s, so the gap predates ruling 31 and the OR
+  rule hid it. The survivor reading the restarted peer connected throughout
+  fits `accept_conn` swapping the connection silently (`net.rs:772-801`;
+  *reading, not instrumented*).
+
+Also from the lane: the simultaneous-dial control flaked in 1 of 10 parallel
+suites (ruling 37); and iroh's endpoint `close()` stalled past 10 s after
+simultaneous dials three times in one suite run, the likely cause of an
+earlier unexplained hang (the test now logs the stall and moves on).
 
 ## 7. Progress
 
