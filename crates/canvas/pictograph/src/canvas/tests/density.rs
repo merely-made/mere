@@ -102,71 +102,176 @@ pub(super) fn until_settled(canvas: &mut Canvas, limit: u32) -> u32 {
     limit
 }
 
-/// Settle `graph` under the catalog's Density until its flow reports it has
-/// stopped, and under Springs from the same seed; read both ranks.
-fn density_and_springs_ranks(graph: Graph) -> (f32, f32) {
-    let mut density = seeded(graph.clone(), 40.0);
-    density.set_physics_law(PhysicsLaw::Density).unwrap();
-    let ticks = until_settled(&mut density, 60 * 122);
+/// A seed spiral turned by `turn` radians with the nodes dealt onto its
+/// points in a seeded order (`deal` 0 keeps key order): starts no symmetry
+/// of the square grid maps onto one another, and none that puts the hubs at
+/// the centre (the round-six correction).
+pub(super) fn seeded_dealt(graph: Graph, turn: f32, deal: u64) -> Canvas {
+    let mut canvas = Canvas::with_graph(graph);
+    canvas.set_layout_strategy(None);
+    let mut keys: Vec<NodeKey> = canvas.graph().nodes().map(|(k, _)| k).collect();
+    keys.sort_by_key(|k| k.index());
+    if deal != 0 {
+        // Fisher–Yates on xorshift64, seeded per start.
+        let mut state = deal.wrapping_mul(0x9E37_79B9_7F4A_7C15) | 1;
+        for i in (1..keys.len()).rev() {
+            state ^= state << 13;
+            state ^= state >> 7;
+            state ^= state << 17;
+            keys.swap(i, (state % (i as u64 + 1)) as usize);
+        }
+    }
+    canvas.physics.seed(
+        keys.iter()
+            .enumerate()
+            .map(|(i, &k)| {
+                let a = i as f32 * 2.399_963 + turn;
+                let r = 40.0 * (i as f32 + 0.5).sqrt();
+                (k, Point2D::new(r * a.cos(), r * a.sin()))
+            })
+            .collect(),
+    );
+    canvas.physics.refresh(&mut canvas.view);
+    canvas
+}
+
+/// Dealt start `k` of the sixteen the bars were measured on.
+pub(super) fn dealt(graph: &Graph, k: u64) -> Canvas {
+    seeded_dealt(graph.clone(), k as f32 * 2.399_963, k + 1)
+}
+
+/// The dealt starts the default suite runs, a fixed subset of the sixteen
+/// the bar was measured on (`density_stop_variants`): a start costs about
+/// two minutes in a debug build, so the sixteen run as the ignored
+/// `_from_all_sixteen_starts` receipts.
+const RECEIPT_STARTS: std::ops::Range<u64> = 0..2;
+const ALL_STARTS: std::ops::Range<u64> = 0..16;
+
+/// One start under the catalog's Density, run until its flow reports
+/// stopped: the seed's stats, the stop's, and the ticks it took.
+struct Settled {
+    seed: crate::canvas::physics_catalog::LayoutStats,
+    end: crate::canvas::physics_catalog::LayoutStats,
+    ticks: u32,
+}
+
+fn settle_from(mut canvas: Canvas) -> Settled {
+    let seed = canvas.layout_stats();
+    canvas.set_physics_law(PhysicsLaw::Density).unwrap();
+    let ticks = until_settled(&mut canvas, 60 * 122);
     assert!(
-        !density.physics_tick_demand().0,
+        !canvas.physics_tick_demand().0,
         "the flow reports stopped before the rank is read"
     );
-    let mut springs = seeded(graph, 40.0);
-    springs.set_physics_law(PhysicsLaw::Springs).unwrap();
-    run(&mut springs, ticks.max(360));
-    let (d, s) = (density.layout_stats(), springs.layout_stats());
+    Settled {
+        seed,
+        end: canvas.layout_stats(),
+        ticks,
+    }
+}
+
+/// Springs from the same start: the negative control's rank.
+fn springs_from(mut canvas: Canvas) -> f32 {
+    canvas.set_physics_law(PhysicsLaw::Springs).unwrap();
+    run(&mut canvas, 900);
+    canvas.layout_stats().mass_area_rank
+}
+
+/// The bar ruled 2026-10-03 ("Min 60, bar: all >= 0.7") on a generated graph:
+/// every dealt start at 0.7 or more where the stop lands, with the mean and
+/// the count at 0.8 recorded; Springs reads negative on the same starts.
+fn holds_the_bar(name: &str, graph: Graph, starts: std::ops::Range<u64>) {
+    let mut ranks = Vec::new();
+    for k in starts.clone() {
+        let run = settle_from(dealt(&graph, k));
+        let springs = springs_from(dealt(&graph, k));
+        eprintln!(
+            "{name} start {k}: rank {:.3} (seed {:.3}) cv {:.3} (seed {:.3}) overlaps {} after {} ticks; springs {springs:.3}",
+            run.end.mass_area_rank,
+            run.seed.mass_area_rank,
+            run.end.density_cv,
+            run.seed.density_cv,
+            run.end.overlaps,
+            run.ticks
+        );
+        assert!(
+            springs < 0.0,
+            "{name} start {k}: springs reads {springs:.3}"
+        );
+        ranks.push(run.end.mass_area_rank);
+    }
+    let mean = ranks.iter().sum::<f32>() / ranks.len() as f32;
+    let at_eight = ranks.iter().filter(|r| **r >= 0.8).count();
     eprintln!(
-        "stopped after {ticks} ticks: density rank {:.3} cv {:.3} overlaps {}; springs rank {:.3} overlaps {}",
-        d.mass_area_rank, d.density_cv, d.overlaps, s.mass_area_rank, s.overlaps
+        "{name}: mean {mean:.3}, {at_eight} of {} at 0.8 or more",
+        ranks.len()
     );
-    (d.mass_area_rank, s.mass_area_rank)
+    for (k, rank) in starts.zip(&ranks) {
+        assert!(*rank >= 0.7, "{name} start {k}: rank {rank:.3} under 0.7");
+    }
 }
 
-/// The law's claim on the canvas sample graph: settled Density gives the
-/// heavy nodes the room (Spearman >= 0.8), and Springs on the same seed
-/// does not (the negative control).
 #[test]
-fn settled_density_gives_room_by_mass_and_springs_does_not() {
-    let (density, springs) = density_and_springs_ranks(crate::canvas::build::sample_graph());
-    assert!(density >= 0.8, "density rank {density:.3}");
-    assert!(
-        springs < 0.8,
-        "springs must fail the correlation, read {springs:.3}"
-    );
+fn density_holds_the_bar_on_fifty_nodes() {
+    holds_the_bar("gen-50", generated(50, 3), RECEIPT_STARTS);
 }
 
-/// The same claim on a 50-node generated graph (seed 3), degree mass. The
-/// ruled stop ends it at pass 6 reading 0.786, under the 0.8 the same ruling
-/// set for it; reopened with Mark (plan, P6 progress 2026-10-02, fourth
-/// round).
 #[test]
-#[ignore = "reopened: the ruled stop ends gen-50 at 0.786, under its ruled 0.8 bar"]
-fn settled_density_gives_room_by_mass_on_fifty_nodes() {
-    let (density, springs) = density_and_springs_ranks(generated(50, 3));
-    assert!(density >= 0.8, "density rank {density:.3}");
-    assert!(
-        springs < 0.8,
-        "springs must fail the correlation, read {springs:.3}"
-    );
+fn density_holds_the_bar_on_the_generated_graph() {
+    holds_the_bar("gen-200", generated(200, 7), RECEIPT_STARTS);
 }
 
-/// The web pages' 200-node generated graph, degree mass, under the plateau
-/// bar ruled 2026-10-02: the rank does not settle above 0.8 at 64² (over
-/// ninety one-second passes it wanders 0.73 to 0.79, and the stop test ends
-/// it near pass 18 at about 0.76), so the bar here is 0.7, to be revisited
-/// with P6b's 512² grid.
 #[test]
-fn settled_density_holds_the_plateau_bar_on_the_generated_graph() {
-    let (density, springs) = density_and_springs_ranks(generated(200, 7));
-    assert!(
-        density >= 0.7,
-        "density rank {density:.3} under the plateau bar 0.7 (measured plateau 0.73 to 0.79)"
-    );
-    assert!(
-        springs < 0.7,
-        "springs must fail the correlation, read {springs:.3}"
-    );
+#[ignore = "sixteen starts, about half an hour in a debug build; run --release"]
+fn density_holds_the_bar_on_fifty_nodes_from_all_sixteen_starts() {
+    holds_the_bar("gen-50", generated(50, 3), ALL_STARTS);
+}
+
+#[test]
+#[ignore = "sixteen starts, about half an hour in a debug build; run --release"]
+fn density_holds_the_bar_on_the_generated_graph_from_all_sixteen_starts() {
+    holds_the_bar("gen-200", generated(200, 7), ALL_STARTS);
+}
+
+/// The sample, qualitatively (ruled 2026-10-03, "0.8 from 50 nodes up"): from
+/// every dealt start the rank rises above the seed's and the density CV
+/// falls; the per-start values go to the output.
+fn rises_and_evens(starts: std::ops::Range<u64>) {
+    let graph = crate::canvas::build::sample_graph();
+    for k in starts {
+        let run = settle_from(dealt(&graph, k));
+        eprintln!(
+            "sample start {k}: rank {:.3} (seed {:.3}) cv {:.3} (seed {:.3}) after {} ticks",
+            run.end.mass_area_rank,
+            run.seed.mass_area_rank,
+            run.end.density_cv,
+            run.seed.density_cv,
+            run.ticks
+        );
+        assert!(
+            run.end.mass_area_rank > run.seed.mass_area_rank,
+            "sample start {k}: rank {:.3} not above the seed's {:.3}",
+            run.end.mass_area_rank,
+            run.seed.mass_area_rank
+        );
+        assert!(
+            run.end.density_cv < run.seed.density_cv,
+            "sample start {k}: cv {:.3} not under the seed's {:.3}",
+            run.end.density_cv,
+            run.seed.density_cv
+        );
+    }
+}
+
+#[test]
+fn density_on_the_sample_rises_and_evens() {
+    rises_and_evens(RECEIPT_STARTS);
+}
+
+#[test]
+#[ignore = "sixteen starts, about half an hour in a debug build; run --release"]
+fn density_on_the_sample_rises_and_evens_from_all_sixteen_starts() {
+    rises_and_evens(ALL_STARTS);
 }
 
 /// Uniform mass from a clump: Density spreads it evenly (a low CV of
