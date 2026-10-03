@@ -3065,3 +3065,34 @@ Isometry handoffs. Evidence: `Code/testing/mere/receipts/2026-10-02/burn-pre4`
 remote/, extrema/, web/). The lane target is `C:/t/cargo-targets/mere/burn-pre4`,
 and its remote fixture executable is the diagnostic build; rebuild it
 before any acceptance run.
+
+### 13.31 The two held forks ruled (2026-10-03)
+
+Both of §13.30's held forks went to Mark on 2026-10-03, after the
+coordinator re-read the gate and A/B records. Their numbers in Isometry's
+wing design record, which holds rulings 410 and 411, are being assigned
+with the wing session and are added here when known.
+
+**The allocator repair (ruling 411's pending fork).** Question: pre.4's
+remote lifecycle gate holds 10 allocations (5,323,776 bytes) after reclaim
+until an explicit `client.sync()`, which takes it to zero in 2.2 ms; where
+does the repair go? Options: the burn-remote close path awaits cleanup
+completion and propagates failures honestly; CubeCL's general completion
+polling changes for every consumer; park the migration. Mark: **"burn-remote
+close path"**. *Follows:* the repair keeps the zero-baseline gate and the
+strict numerical and recovery gates, preserves a second live lease's
+identity and tensor values, and rejects an injected synchronization
+failure.
+
+**The wasm constructors.** Question: pre.4 frames take 557 ms against
+pre.2's 12.1 ms, GPU on or off, because the module re-runs its static
+constructors on every JS-to-wasm call (pliron's `inventory` registrations
+via `cubecl-core`, upstream, not our patches); native is unaffected, and
+the physics plan's P5 web defaults (N = 9, threshold 400) were ruled on
+pre.2's frame times. Options: a bounded lane makes the constructors run
+once (a different wasm link model, or a bindgen-side fix), proves it with
+the same A/B, then re-measures P5's web crossover; the same lane plus an
+upstream issue; vendor-patch the constructor sources for wasm; park web
+promotion with native on pre.4. Mark: **"Bounded fix lane"**. *Follows:* no
+upstream issue is filed; pre.4 is not promoted to the web, and main is not
+merged, until the constructors run once and the A/B shows it.
