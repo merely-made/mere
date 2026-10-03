@@ -414,6 +414,10 @@ ESP's Burn `affinity_pairs_over_index` (`esp/src/embed/index_burn.rs:144`)
 emits exactly the triples the affinity slot takes, but nothing calls
 `set_content_affinity` (`strategy.rs:520`) outside tests, and affinity is not
 in `PhysicsChoice`; Density with `EdgeSpring` read −0.54 against 0.77 alone
+(*annotation 2026-10-02:* this figure came from the Density lane's
+first-round probe, whose log was overwritten by its second-round runs, so
+no log now backs it; the second-round overlay probe, `probe-overlays.log`,
+shows the same failure class for force overlays on Density)
 (316 overlaps).
 - **Currencies.** "Laws declare currency; catalog adapts or refuses":
   forces compose freely; a kinematic law takes forces converted to its
@@ -491,6 +495,33 @@ pull reading −0.33 with 510 overlaps):
   refuses them with a reason until the currency work. The alternatives were
   dropping them silently, or allowing and marking the mix.
 
+*Third round, ruled 2026-10-02* (P5 checkpoint `60a990a5` and Density
+`5f529c64`):
+- **P5 web staleness, reopened.** Chrome answers a readback about two frames
+  after submit, so the newest answer was six steps old at every size from 128
+  to 2,000 nodes; at the ruled N = 3 the 2,000-node web run used the GPU for
+  9 of 418 steps (physics 94 ms a frame against the CPU's 82), at N = 9 for
+  413 of 418 (6.1 ms) within the CPU twin's bounds. Mark chose "Web N = 9,
+  web threshold 400", amending the staleness ruling's web default. The
+  alternatives were deriving N from the step cap, or keeping N = 3.
+- **P5's Cambium change.** cubecl-wgpu 0.11-pre.2 always enables wgpu's
+  `fragile-send-sync-non-atomic-wasm`, which feature unification puts on the
+  page's one wgpu, so wasm `map_async` callbacks must be `Send`. Mark chose
+  "Commit Arc<AtomicBool>" for the readback flag in
+  `cambium-genet-web-host/src/capture.rs`. The alternatives were vendoring
+  cubecl-wgpu without the feature, or keeping `canvas-gpu` off on the web.
+- **Density's stop test.** "Shift < 0.05 for 3 passes": passes end when the
+  mean node shift stays under 0.05 spacings for three passes, the 120-pass
+  cap the fallback, a drag re-arming it (the sample stops at pass 5 at 0.84,
+  gen-50 at 6 at 0.78, the 200-node graph at 18 at 0.76). The alternatives
+  were a field-CV test, or the cap alone.
+- **Density's bar at 200 nodes.** Over 90 one-second passes at 64² the rank
+  wanders 0.73 to 0.79; round two's 0.81 was one sample of that trace. Mark
+  chose "Accept a plateau bar for large graphs": 0.8 holds on the sample and
+  gen-50; the 200-node receipt asserts at least 0.7 with its plateau
+  recorded, revisited with P6b's 512² GPU grid. The alternatives were
+  searching for other defaults, or changing the law.
+
 *Done when:* GPU and CPU forces agree to 1e-3 relative at 1k and 10k nodes;
 a sign-flipped kernel fails the overlap check (positive control); a forced
 adapter failure falls back and still passes; the eleven law receipts stay
@@ -543,7 +574,59 @@ and on treating arrangements and laws as two realizations of one objective
 model, "Yes, as a hypothesis the brief tests" (the alternatives were adopting
 it now, or keeping them separate). The rulings above on currencies, the
 composition tier, meaning as a source, embeddings and snapshots stand as
-inputs to the brief.
+inputs to the brief. *Brief written 2026-10-02:* the
+[dynamics grammar brief](../research/2026-10-02_dynamics_grammar_brief.md)
+(its §11 holds the forks, including a draft rewrite of P7).
+*The brief's first forks, ruled 2026-10-02.* The hypothesis held for the
+energy class only (6 of 12 laws, 5 of 8 overlays, the anchor and affinity
+slots, Spectral alone among the arrangements) and failed for dynamics-only
+laws (Kinds, Flock, Flow's needle; Orbit and Sync, whose minimisers are
+collapse and total synchrony) and for generator arrangements.
+- **F1, the model.** "Terms and targets": one specification model of
+  energy, dynamics and target terms; arrangements stay `Score`-recorded
+  generators referenced as targets; optimizer realizations are gated on
+  class and metric. The alternatives were an energy-only grammar with the
+  living laws outside it, or separate grammars sharing only sources.
+- **F2, P7's home.** "P7 moves into the grammar plan": P7 becomes the
+  grammar plan's build tracks (the brief's G1 to G6), and this section closes
+  with a pointer once that plan exists; P5 and P6 stay here. The alternatives
+  were P7 rewritten here, or P7 as written.
+- **F3, first tracks.** "Declarations and instruments first": G1, every term
+  declaring topology, kernel, state, currency, class and observable, with an
+  energy-descent test and a reciprocity test that agree with each declared
+  class and Kinds failing descent as the positive control; then G2 to G6.
+  The alternatives were the spec artifact first, or the combinators first.
+- **F4, the spec's home.** "Portable shape now, in seiche": a
+  `DynamicsSpec` in seiche, sources resolved host-side, `PhysicsChoice` the
+  binding, carried in `SavedSceneV1` now and as a shelfmark delta section
+  when a citing consumer asks. The alternatives were growing `PhysicsChoice`
+  in the canvas, or placing it in sceno beside the `Score`.
+The rest, ruled the same day:
+- **F5, the common scale.** "Reference-configuration normalization": a
+  term's weight-1 strength is its force at a declared reference (contact
+  distance 36 for repulsions, as Charge's calibration did; one rest length of
+  stretch for springs; one rest length of offset for unary pulls). The
+  alternatives were energy normalization, or per-pair calibration.
+- **F6, Anneal.** "Annealing becomes a realization": any energy composition
+  may settle by annealing; `anneal.davidson-harel` keeps opening as Springs'
+  terms under annealing, so saved scenes reopen. The alternatives were
+  keeping it a law with an edge-crossing term, or leaving it.
+- **F7, Energy's kernel.** "Keep (1, −1), relabel ForceAtlas2": the code's
+  ForceAtlas2 model stays, its docs and label are corrected, and the
+  attraction exponent becomes a kernel parameter so true LinLog is a tuning;
+  the id stays. The alternatives were switching to true LinLog, or both as
+  laws.
+- **F8, accidental non-conservatism.** "Declare them as they are": Hub
+  room, Hub pull and Flow's needle are classed honestly and the class gates
+  realizations; revisited when an optimizer rung is built. The alternatives
+  were making them gradients now, or offering both forms.
+- **F9, the grouped spread rule.** "Weight share": each member takes its
+  weight share of its group's centroid force, the true gradient. The
+  alternative gave every member the full force.
+- **F10, Kinds.** "Measure first": Kinds' energy at 6 s and 30 s under
+  continuous ticking on the P2 fixture decides whether it joins
+  `never_rests` or the plan's finding is corrected. The alternatives were
+  adding it now, or correcting the finding now.
 - *P7a, currencies.* Every law declares its currency (force, kinematic,
   resident). The catalog composes forces freely, converts forces into a
   kinematic law's currency (overdamped, v = F/γ, the rule Hold already

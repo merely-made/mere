@@ -593,7 +593,9 @@ is `otp` (its CXF type stays `totp`), and the field holding the mode is
 (`da3c50bc`): chatelaine 53 tests, castellan 90 with every feature, the tree
 (serde and `uuid` only), wasm32, clippy, and the portable gate, all exit 0;
 the three "patch was not used" warnings are lock-wide and predate P1 (the
-root `Cargo.toml` is unchanged). The chatelaine README now says the crate
+root `Cargo.toml` is unchanged). *Amended 2026-10-02*: predating P1 did not make them
+harmless. The `iroh-mdns-address-lookup` one means H10's per-interface
+mDNS fix is not in effect; see the device pairing by key plan's §6. The chatelaine README now says the crate
 holds identifying metadata and that persona scope lives on castellan's
 store. `main` fast-forwarded; nothing pushed. Next: P2.
 
