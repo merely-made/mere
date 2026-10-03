@@ -177,6 +177,16 @@ fn the_model_on_the_host_device_shares_it_and_records_purity() {
     canvas.set_physics_device(Some(device.clone()));
     let engine: Arc<dyn MeaningEngine> = Arc::new(engine);
     canvas.set_meaning_engine(engine.clone());
+    // Warm the canvas first: its first frame over 900 nodes builds the node
+    // pool and is slow, and a run that lands inside it would hide whether
+    // frames go on while a run is in flight.
+    let mut warm = Vec::new();
+    for _ in 0..3 {
+        let frame = Instant::now();
+        canvas.frame(1024, 600);
+        warm.push(frame.elapsed());
+    }
+    println!("warm-up frames before the dispatch: {warm:?}");
     canvas.set_physics_kind_source(PhysicsKindSource::Meaning);
     canvas.set_physics_law(PhysicsLaw::Kinds);
     // The build dispatched the run; frames go on while it is in flight.
@@ -287,7 +297,7 @@ fn the_model_on_the_host_device_shares_it_and_records_purity() {
     let text_refs: Vec<&str> = texts.iter().map(String::as_str).collect();
     let vectors = engine.embed(&text_refs).expect("the GPU embeds the corpus");
     let mut best = (0.0, MeaningParams::MODEL);
-    for top_k in [2, 4, 8, 16] {
+    for top_k in [2, 4, 8, 16, 32, 64] {
         for min_similarity in [0.1, 0.15, 0.2, 0.25, 0.3, 0.4] {
             let params = MeaningParams {
                 top_k,
