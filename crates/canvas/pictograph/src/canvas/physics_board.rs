@@ -9,15 +9,18 @@
 //! A remote projection arrives as a scene — items with positions the
 //! endpoint's arrangement produced — and is drawn from that score. This is
 //! the seam that lets the physics catalog move those items too: a seiche
-//! simulation with one body per item, the score's positions as **anchor
-//! slots** (the arrangement as attractor, [`seiche::AnchorSpring`] at the
-//! board's pull), and the chosen law and overlays built through the same
-//! attribute builders the canvas uses, graph-free. The host syncs the board
-//! whenever the scene changes (a new item spawns at its slot and enters
-//! with a settle burst; existing items keep their simulated positions and
-//! only their slots move), ticks it each frame, and reads positions back
-//! for drawing. The score itself is never written: the board is the
-//! viewer's physics over the endpoint's truth. (Physics catalog — P3.)
+//! simulation with one body per item, the score's positions as the items'
+//! **arrangement positions**, each playing a role ([`seiche::Role`]: seeded
+//! by default, anchored items returning on [`seiche::AnchorSpring`], pinned
+//! items held; dynamics grammar plan, G7), and the chosen law and overlays
+//! built through the same attribute builders the canvas uses, graph-free. An
+//! axis the recipe encodes from a data field is held on that axis (F28). The
+//! host syncs the board whenever the scene changes (a new item spawns at its
+//! slot and enters with a settle burst; existing items keep their simulated
+//! positions, save on an encoded axis, and only their slots move), ticks it
+//! each frame, and reads positions back for drawing. The score itself is
+//! never written: the board is the viewer's physics over the endpoint's
+//! truth. (Physics catalog — P3.)
 //!
 //! The simulation runs behind [`seiche::Physics`], the stack's inline/actor
 //! backend, so a board ticks in the frame loop on wasm and can be
@@ -28,7 +31,9 @@ use std::collections::HashMap;
 
 use euclid::default::Point2D;
 use kernel::graph::NodeKey;
-use seiche::{AnchorSpring, DEFAULT_ANCHOR_STIFFNESS, LayoutView, Physics, Simulation};
+use seiche::{
+    AnchorSpring, Axes, DEFAULT_ANCHOR_STIFFNESS, LayoutView, Physics, Role, RoleTable, Simulation,
+};
 
 use crate::canvas::SETTLE_TICKS;
 use crate::canvas::physics_catalog::{
@@ -36,12 +41,11 @@ use crate::canvas::physics_catalog::{
     PhysicsOverlay,
 };
 
-/// The board's anchor pull toward the score's slots. Gentle by design — a
-/// twenty-fourth of the canvas's [`DEFAULT_ANCHOR_STIFFNESS`] — so the
-/// score is a seed and a soft attractor and the chosen law is what the
-/// viewer sees; the canvas's default would hold every card at its slot and
-/// mask the law. A tunable.
-pub const DEFAULT_BOARD_PULL: f32 = DEFAULT_ANCHOR_STIFFNESS / 24.0;
+/// How firmly an anchored card returns to its slot. Gentle by design, a
+/// twenty-fourth of the canvas's [`DEFAULT_ANCHOR_STIFFNESS`] (the board's
+/// former pull), so an anchored score still shows the chosen law. A tunable;
+/// cards are seeded unless a role says otherwise (F23).
+pub const DEFAULT_BOARD_ANCHOR_STIFFNESS: f32 = DEFAULT_ANCHOR_STIFFNESS / 24.0;
 
 /// The physics choice a board runs: what the host's own canvas runs, mirrored.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -83,7 +87,11 @@ pub struct PhysicsBoard {
     next_key: usize,
     items: Vec<BoardItem>,
     choice: PhysicsChoice,
-    pull: f32,
+    /// The roles the slots play; groups are sites.
+    roles: RoleTable,
+    anchor_stiffness: f32,
+    /// The axes the recipe encodes from data fields, held on every card.
+    encoded: Axes,
     /// The item currently held by the pointer. This is transient view state;
     /// score slots and `items` remain the arrangement authority.
     dragging: Option<NodeKey>,
@@ -107,7 +115,9 @@ impl PhysicsBoard {
             next_key: 0,
             items: Vec::new(),
             choice: PhysicsChoice::default(),
-            pull: DEFAULT_BOARD_PULL,
+            roles: RoleTable::default(),
+            anchor_stiffness: DEFAULT_BOARD_ANCHOR_STIFFNESS,
+            encoded: Axes::NONE,
             dragging: None,
             #[cfg(feature = "gpu")]
             physics_device: None,
@@ -139,16 +149,86 @@ impl PhysicsBoard {
         &self.choice
     }
 
-    /// The anchor pull toward the score's slots.
-    pub fn pull(&self) -> f32 {
-        self.pull
+    /// The roles the slots play.
+    pub fn roles(&self) -> &RoleTable {
+        &self.roles
     }
 
-    /// Set the pull toward the slots: `0.0` makes the score an initial
-    /// condition only, the default holds its shape against the law.
-    pub fn set_pull(&mut self, pull: f32) {
-        self.pull = pull.max(0.0);
-        self.sync_anchors();
+    /// Set the roles (recipe default and site groups; items by id through
+    /// [`Self::set_item_role`]); the anchors and pins follow.
+    pub fn set_roles(&mut self, roles: RoleTable) {
+        self.roles = roles;
+        self.sync_roles();
+        self.settle_for_choice();
+    }
+
+    /// One card's role by id (`None` clears it). Returns whether it exists.
+    pub fn set_item_role(&mut self, id: &str, role: Option<Role>) -> bool {
+        let Some(&key) = self.keys.get(id) else {
+            return false;
+        };
+        match role {
+            Some(role) => self.roles.items.insert(key, role),
+            None => self.roles.items.remove(&key),
+        };
+        self.sync_roles();
+        self.settle_for_choice();
+        true
+    }
+
+    /// The role a card plays.
+    pub fn role_of(&self, id: &str) -> Option<Role> {
+        let key = self.keys.get(id)?;
+        let item = self.items.iter().find(|item| item.id == id)?;
+        Some(self.roles.role(*key, Some(&item.site)))
+    }
+
+    /// How firmly an anchored card returns.
+    pub fn anchor_stiffness(&self) -> f32 {
+        self.anchor_stiffness
+    }
+
+    pub fn set_anchor_stiffness(&mut self, stiffness: f32) {
+        self.anchor_stiffness = stiffness.max(0.0);
+        self.sync_roles();
+        self.settle_for_choice();
+    }
+
+    /// The axes the recipe encodes from data fields.
+    pub fn encoded_axes(&self) -> Axes {
+        self.encoded
+    }
+
+    /// The largest distance any card sits from its value on an encoded axis:
+    /// zero while the encoding holds. A receipt asserts it.
+    pub fn encoded_drift(&self) -> f32 {
+        self.items
+            .iter()
+            .filter(|item| self.dragging != Some(self.keys[&item.id]))
+            .filter_map(|item| {
+                let at = self.view.position_of(self.keys[&item.id])?;
+                let x = if self.encoded.x {
+                    (at.x - item.slot.0).abs()
+                } else {
+                    0.0
+                };
+                let y = if self.encoded.y {
+                    (at.y - item.slot.1).abs()
+                } else {
+                    0.0
+                };
+                Some(x.max(y))
+            })
+            .fold(0.0, f32::max)
+    }
+
+    /// Declare the encoded axes (F28): a card is held on each, and physics
+    /// moves only the others. With both encoded no law acts, and only an
+    /// exclusion at contact range separates overlapping cards.
+    pub fn set_encoded_axes(&mut self, axes: Axes) {
+        self.encoded = axes;
+        self.sync_roles();
+        self.rebuild_forces();
         self.settle_for_choice();
     }
 
@@ -204,8 +284,34 @@ impl PhysicsBoard {
                 .collect(),
         );
         self.physics.sync_edges(Vec::new());
+        // An encoded axis is pinned to its value (F28), so a card whose value
+        // moved goes there on that axis; its free axes keep what physics gave
+        // them, as every axis of an unencoded card does.
+        if self.encoded.any() {
+            let old: HashMap<&str, (f32, f32)> = self
+                .items
+                .iter()
+                .map(|item| (item.id.as_str(), item.slot))
+                .collect();
+            let moved: Vec<_> = items
+                .iter()
+                .filter_map(|item| {
+                    let was = *old.get(item.id.as_str())?;
+                    let key = live[item.id.as_str()];
+                    let at = self.view.position_of(key)?;
+                    (was != item.slot && self.dragging != Some(key)).then(|| {
+                        let x = if self.encoded.x { item.slot.0 } else { at.x };
+                        let y = if self.encoded.y { item.slot.1 } else { at.y };
+                        (key, Point2D::new(x, y))
+                    })
+                })
+                .collect();
+            if !moved.is_empty() {
+                self.physics.seed(moved);
+            }
+        }
         self.items = items;
-        self.sync_anchors();
+        self.sync_roles();
         self.rebuild_forces();
         self.settle_for_choice();
         // So a host that syncs and draws in one frame sees the fresh item.
@@ -223,12 +329,13 @@ impl PhysicsBoard {
 
     /// Begin a transient drag of an item. The body is pinned at its current
     /// simulated position so the first pointer move cannot jump it, while the
-    /// other bodies continue responding to the board's forces.
+    /// other bodies continue responding to the board's forces. A pinned card
+    /// stays in its arrangement and refuses the drag.
     pub fn drag_start(&mut self, id: &str) -> bool {
         let Some(&key) = self.keys.get(id) else {
             return false;
         };
-        if self.dragging.is_some() {
+        if self.dragging.is_some() || self.role_of(id) == Some(Role::Pinned) {
             return false;
         }
         let Some(position) = self.position(id) else {
@@ -253,14 +360,25 @@ impl PhysicsBoard {
         true
     }
 
-    /// Release the held item back to the dynamic solver. Existing anchor slots
-    /// remain intact, so the item eases back toward its arrangement slot.
+    /// Release the held item back to the dynamic solver, by its role: a
+    /// seeded card stays where it was dropped, an anchored card eases back to
+    /// its slot. An encoded axis goes back to its value at once, since the
+    /// data, not the drop, says where the card is on it.
     pub fn drag_end(&mut self) -> bool {
         let Some(key) = self.dragging.take() else {
             return false;
         };
         self.physics.unpin(key);
         self.physics.set_dragging(false);
+        // Dropped at rest: the pointer's last step is not a throw.
+        if let Some(item) = self.items.iter().find(|item| self.keys[&item.id] == key)
+            && let Some(at) = self.view.position_of(key)
+        {
+            let x = if self.encoded.x { item.slot.0 } else { at.x };
+            let y = if self.encoded.y { item.slot.1 } else { at.y };
+            self.physics.seed(vec![(key, Point2D::new(x, y))]);
+        }
+        self.sync_roles();
         self.settle_for_choice();
         true
     }
@@ -309,16 +427,43 @@ impl PhysicsBoard {
         self.items.is_empty()
     }
 
-    fn sync_anchors(&mut self) {
-        let anchors = (self.pull > 0.0 && !self.items.is_empty()).then(|| {
-            AnchorSpring::new(
-                self.items
-                    .iter()
-                    .map(|item| (self.keys[&item.id], item.slot)),
-            )
-            .with_stiffness(self.pull)
-        });
-        self.physics.set_anchor_force(anchors);
+    /// The axes a card is held on: the encoded ones, except with both
+    /// encoded, where only overlap separation moves it.
+    fn held_axes(&self) -> Axes {
+        if self.encoded == Axes::BOTH {
+            Axes::NONE
+        } else {
+            self.encoded
+        }
+    }
+
+    /// Realize the roles: anchored cards on springs, pinned cards kinematic
+    /// at their slots, seeded cards free; and the encoded axes held.
+    fn sync_roles(&mut self) {
+        let mut anchors = Vec::new();
+        let mut locks = Vec::new();
+        let held = self.held_axes();
+        for item in &self.items {
+            let key = self.keys[&item.id];
+            if self.dragging == Some(key) {
+                continue;
+            }
+            match self.roles.role(key, Some(&item.site)) {
+                Role::Seeded => self.physics.unpin(key),
+                Role::Anchored => {
+                    self.physics.unpin(key);
+                    anchors.push((key, item.slot));
+                },
+                Role::Pinned => self
+                    .physics
+                    .pin(key, Point2D::new(item.slot.0, item.slot.1)),
+            }
+            locks.push((key, held));
+        }
+        self.physics.set_axis_locks(locks);
+        let force = (self.anchor_stiffness > 0.0 && !anchors.is_empty())
+            .then(|| AnchorSpring::new(anchors).with_stiffness(self.anchor_stiffness));
+        self.physics.set_anchor_force(force);
     }
 
     fn rebuild_forces(&mut self) {
@@ -328,6 +473,16 @@ impl PhysicsBoard {
             .iter()
             .map(|item| (self.keys[&item.id], item.site.clone()))
             .collect();
+        if self.encoded == Axes::BOTH {
+            // Both axes encoded: physics only separates overlaps (F28), by an
+            // exclusion that reaches no further than contact.
+            self.physics
+                .set_forces(vec![Box::new(seiche::NodeExclusion {
+                    cutoff: 2.0 * seiche::NODE_BODY_RADIUS,
+                    ..Default::default()
+                })]);
+            return;
+        }
         let inputs = LawInputs::from_parts(nodes, Vec::new(), sites);
         let sources = LawSources {
             kind: self.choice.kind,
@@ -362,26 +517,38 @@ mod tests {
         }
     }
 
-    /// Under Springs at the canvas's anchor stiffness, items sit at their
-    /// slots; a later item spawns at its slot and the earlier ones are not
-    /// re-seeded. Under the board's gentle default pull the boundary force
-    /// bends the shape a little (a body 300 units out drifts about thirty
-    /// toward the origin), and no further.
+    fn settle(board: &mut PhysicsBoard) {
+        for _ in 0..SETTLE_TICKS {
+            board.tick();
+        }
+    }
+
+    /// Anchored at the canvas's stiffness, items sit at their slots; a later
+    /// item spawns at its slot and the earlier ones are not re-seeded. Anchored
+    /// at the board's gentle stiffness the boundary force bends the shape a
+    /// little (a body 300 units out drifts about thirty toward the origin), and
+    /// seeded, the default, it bends further (the control).
     #[test]
     fn items_hold_their_slots_and_a_new_one_joins_without_reseeding() {
+        let pair = || vec![item("a", 0.0, 0.0), item("b", 300.0, 0.0)];
         let mut gentle = PhysicsBoard::new();
-        gentle.sync(vec![item("a", 0.0, 0.0), item("b", 300.0, 0.0)]);
-        for _ in 0..SETTLE_TICKS {
-            gentle.tick();
-        }
+        gentle.set_roles(RoleTable::uniform(Role::Anchored));
+        gentle.sync(pair());
+        settle(&mut gentle);
         let b = gentle.position("b").unwrap();
         assert!(
             (b.0 - 300.0).abs() < 60.0 && b.0 > 200.0,
-            "the gentle pull keeps the shape within a fifth: {b:?}"
+            "the gentle anchor keeps the shape within a fifth: {b:?}"
         );
+        let mut seeded = PhysicsBoard::new();
+        seeded.sync(pair());
+        settle(&mut seeded);
+        let free = seeded.position("b").unwrap();
+        assert!(free.0 < b.0 - 1.0, "seeded drifts further: {free:?} {b:?}");
 
         let mut board = PhysicsBoard::new();
-        board.set_pull(DEFAULT_ANCHOR_STIFFNESS);
+        board.set_roles(RoleTable::uniform(Role::Anchored));
+        board.set_anchor_stiffness(DEFAULT_ANCHOR_STIFFNESS);
         assert_eq!(
             board.sync(vec![item("a", 0.0, 0.0), item("b", 300.0, 0.0)]),
             2
@@ -425,7 +592,8 @@ mod tests {
     #[test]
     fn drag_pins_one_item_and_release_returns_toward_its_slot() {
         let mut board = PhysicsBoard::new();
-        board.set_pull(DEFAULT_ANCHOR_STIFFNESS);
+        board.set_roles(RoleTable::uniform(Role::Anchored));
+        board.set_anchor_stiffness(DEFAULT_ANCHOR_STIFFNESS);
         board.sync(vec![item("a", 0.0, 0.0), item("b", 220.0, 0.0)]);
         for _ in 0..SETTLE_TICKS {
             board.tick();
@@ -468,12 +636,12 @@ mod tests {
         assert!(!board.drag_end());
     }
 
-    /// Under Charge with a weak pull, two items whose slots overlap settle
+    /// Under Charge with a gentle anchor, two items whose slots overlap settle
     /// apart; under Orbit the board keeps moving.
     #[test]
     fn charge_separates_overlapping_slots_and_orbit_never_rests() {
         let mut board = PhysicsBoard::new();
-        board.set_pull(0.5);
+        board.set_roles(RoleTable::uniform(Role::Anchored));
         board.sync(vec![item("a", 0.0, 0.0), item("b", 4.0, 2.0)]);
         board.set_choice(PhysicsChoice {
             law: PhysicsLaw::Charge,
