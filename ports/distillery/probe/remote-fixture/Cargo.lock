@@ -1310,12 +1310,12 @@ name = "cambium"
 version = "0.3.3"
 dependencies = [
  "genet-scripted-dom",
+ "genet-text",
  "layout-dom-api",
  "mere-surface-api",
  "meristem",
  "sceno",
  "sprigging",
- "unicode-segmentation",
  "workbench",
 ]
 
@@ -3132,7 +3132,7 @@ checksum = "edd0f118536f44f5ccd48bcb8b111bdc3de888b58c74639dfb034a357d0f206d"
 [[package]]
 name = "engine-observables-api"
 version = "0.2.0"
-source = "git+https://github.com/merely-made/genet.git?rev=19c206873ab08ae227217892d9e74d0df18b349a#19c206873ab08ae227217892d9e74d0df18b349a"
+source = "git+https://github.com/merely-made/genet.git?rev=bd3e8861b2932d62b73c9936ac3a317f1df3ffdb#bd3e8861b2932d62b73c9936ac3a317f1df3ffdb"
 dependencies = [
  "genet-paint-types",
  "serde",
@@ -3767,7 +3767,7 @@ dependencies = [
 [[package]]
 name = "genet-paint-types"
 version = "0.2.0"
-source = "git+https://github.com/merely-made/genet.git?rev=19c206873ab08ae227217892d9e74d0df18b349a#19c206873ab08ae227217892d9e74d0df18b349a"
+source = "git+https://github.com/merely-made/genet.git?rev=bd3e8861b2932d62b73c9936ac3a317f1df3ffdb#bd3e8861b2932d62b73c9936ac3a317f1df3ffdb"
 dependencies = [
  "app_units",
  "euclid",
@@ -3777,7 +3777,7 @@ dependencies = [
 [[package]]
 name = "genet-scripted-dom"
 version = "0.1.2"
-source = "git+https://github.com/merely-made/genet.git?rev=19c206873ab08ae227217892d9e74d0df18b349a#19c206873ab08ae227217892d9e74d0df18b349a"
+source = "git+https://github.com/merely-made/genet.git?rev=bd3e8861b2932d62b73c9936ac3a317f1df3ffdb#bd3e8861b2932d62b73c9936ac3a317f1df3ffdb"
 dependencies = [
  "engine-observables-api",
  "genet-static-dom",
@@ -3790,11 +3790,19 @@ dependencies = [
 [[package]]
 name = "genet-static-dom"
 version = "0.1.1"
-source = "git+https://github.com/merely-made/genet.git?rev=19c206873ab08ae227217892d9e74d0df18b349a#19c206873ab08ae227217892d9e74d0df18b349a"
+source = "git+https://github.com/merely-made/genet.git?rev=bd3e8861b2932d62b73c9936ac3a317f1df3ffdb#bd3e8861b2932d62b73c9936ac3a317f1df3ffdb"
 dependencies = [
  "html5ever",
  "layout-dom-api",
  "xml5ever",
+]
+
+[[package]]
+name = "genet-text"
+version = "0.1.0"
+source = "git+https://github.com/merely-made/genet.git?rev=bd3e8861b2932d62b73c9936ac3a317f1df3ffdb#bd3e8861b2932d62b73c9936ac3a317f1df3ffdb"
+dependencies = [
+ "unicode-segmentation",
 ]
 
 [[package]]
@@ -5256,7 +5264,7 @@ dependencies = [
 [[package]]
 name = "layout-dom-api"
 version = "0.1.1"
-source = "git+https://github.com/merely-made/genet.git?rev=19c206873ab08ae227217892d9e74d0df18b349a#19c206873ab08ae227217892d9e74d0df18b349a"
+source = "git+https://github.com/merely-made/genet.git?rev=bd3e8861b2932d62b73c9936ac3a317f1df3ffdb#bd3e8861b2932d62b73c9936ac3a317f1df3ffdb"
 dependencies = [
  "markup5ever",
  "serde",
@@ -6763,6 +6771,7 @@ dependencies = [
 name = "pandect"
 version = "0.1.1"
 dependencies = [
+ "async-trait",
  "blake3",
  "chacha20poly1305 0.11.0",
  "chartulary",
