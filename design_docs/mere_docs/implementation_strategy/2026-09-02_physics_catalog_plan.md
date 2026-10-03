@@ -574,7 +574,32 @@ collapse and total synchrony) and for generator arrangements.
   binding, carried in `SavedSceneV1` now and as a shelfmark delta section
   when a citing consumer asks. The alternatives were growing `PhysicsChoice`
   in the canvas, or placing it in sceno beside the `Score`.
-F5 to F10 are still open.
+The rest, ruled the same day:
+- **F5, the common scale.** "Reference-configuration normalization": a
+  term's weight-1 strength is its force at a declared reference (contact
+  distance 36 for repulsions, as Charge's calibration did; one rest length of
+  stretch for springs; one rest length of offset for unary pulls). The
+  alternatives were energy normalization, or per-pair calibration.
+- **F6, Anneal.** "Annealing becomes a realization": any energy composition
+  may settle by annealing; `anneal.davidson-harel` keeps opening as Springs'
+  terms under annealing, so saved scenes reopen. The alternatives were
+  keeping it a law with an edge-crossing term, or leaving it.
+- **F7, Energy's kernel.** "Keep (1, −1), relabel ForceAtlas2": the code's
+  ForceAtlas2 model stays, its docs and label are corrected, and the
+  attraction exponent becomes a kernel parameter so true LinLog is a tuning;
+  the id stays. The alternatives were switching to true LinLog, or both as
+  laws.
+- **F8, accidental non-conservatism.** "Declare them as they are": Hub
+  room, Hub pull and Flow's needle are classed honestly and the class gates
+  realizations; revisited when an optimizer rung is built. The alternatives
+  were making them gradients now, or offering both forms.
+- **F9, the grouped spread rule.** "Weight share": each member takes its
+  weight share of its group's centroid force, the true gradient. The
+  alternative gave every member the full force.
+- **F10, Kinds.** "Measure first": Kinds' energy at 6 s and 30 s under
+  continuous ticking on the P2 fixture decides whether it joins
+  `never_rests` or the plan's finding is corrected. The alternatives were
+  adding it now, or correcting the finding now.
 - *P7a, currencies.* Every law declares its currency (force, kinematic,
   resident). The catalog composes forces freely, converts forces into a
   kinematic law's currency (overdamped, v = F/γ, the rule Hold already
