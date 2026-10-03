@@ -148,6 +148,8 @@ impl Canvas {
         // A non-seiche layout strategy overrides the physics snapshot: write its buffered
         // positions into the view before anything reads it. (Layout picker.)
         self.apply_strategy_to_view();
+        // A playing graph come to rest replaces Settled (G7, F30).
+        self.note_settle(settling);
         // Pick up any finished off-thread community partition (a no-op when computing inline), so a
         // result dispatched on an earlier frame lands before the rings paint. (Graph signals — P3.)
         self.drain_community();

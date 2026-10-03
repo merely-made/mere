@@ -13,16 +13,18 @@
 //! only in the one surface that happens to own a rapier world.
 //!
 //! So relaxation is deliberately dependency-free and deterministic: repulsion
-//! between placed items, springs along routed relations, and a pull back toward
-//! the arrangement's own slots. That last term is the same idea as an anchor
-//! spring — the arrangement participates rather than dictating — so a swatch
-//! reads with the identical vocabulary as the canvas, at a fraction of the cost.
+//! between placed items and springs along routed relations, acting on the
+//! arrangement's positions in their roles (dynamics grammar plan, G7): a
+//! seeded item, the default, only starts there; an anchored item is drawn
+//! back, the canvas's anchor spring at swatch scale; a pinned item stays. A
+//! swatch reads with the identical vocabulary as the canvas, at a fraction of
+//! the cost.
 //!
 //! Cost is `O(steps · n²)` in placed items, which is the right trade at swatch
 //! scale (tens of nodes) and the wrong one at canvas scale (thousands). A
 //! surface with a real sim should keep using it.
 
-use sceno::{Footprint, InstanceId, Rect, Scene, Transform2, Vec2};
+use sceno::{Footprint, Hold, InstanceId, Rect, Scene, Transform2, Vec2};
 
 /// How a scene loosens up. All terms are optional: zero any of them out and it
 /// simply stops contributing.
@@ -36,10 +38,11 @@ pub struct Relaxation {
     pub spring: f32,
     /// The separation a related pair settles toward.
     pub rest_length: f32,
-    /// Pull back toward where the arrangement placed each item. High holds the
-    /// arrangement's shape; `0.0` lets the graph's own forces win entirely,
-    /// making the arrangement a pure initial condition.
-    pub arrangement_pull: f32,
+    /// The role an item's arrangement position plays unless the call names
+    /// another: seeded by default (F23).
+    pub role: Hold,
+    /// How firmly an anchored item is drawn back toward its position.
+    pub anchor_pull: f32,
     /// Velocity retained per step (`0.0`..=`1.0`).
     pub damping: f32,
     /// Step size.
@@ -53,7 +56,8 @@ impl Default for Relaxation {
             repulsion: 900.0,
             spring: 0.6,
             rest_length: 40.0,
-            arrangement_pull: 0.25,
+            role: Hold::Seeded,
+            anchor_pull: 0.25,
             damping: 0.82,
             dt: 0.1,
         }
@@ -63,7 +67,13 @@ impl Default for Relaxation {
 impl Relaxation {
     /// A pure loosening: the arrangement seeds the scene and then stops acting.
     pub fn untethered(mut self) -> Self {
-        self.arrangement_pull = 0.0;
+        self.role = Hold::Seeded;
+        self
+    }
+
+    /// Every item drawn back toward its position, at the anchor pull.
+    pub fn anchored(mut self) -> Self {
+        self.role = Hold::Anchored;
         self
     }
 }
@@ -129,8 +139,8 @@ fn separating_shift(item: Rect, obstacle: Rect) -> Option<Vec2> {
     })
 }
 
-/// Loosen `scene` in place: items push apart, related items pull together, and
-/// each item is drawn back toward the slot its arrangement chose.
+/// Loosen `scene` in place: items push apart and related items pull together,
+/// each in the role [`Relaxation::role`] gives it, and recorded pins hold.
 ///
 /// Deterministic — no randomness, so the same scene and settings always relax
 /// the same way and a receipt can be compared frame to frame.
@@ -145,25 +155,34 @@ pub fn relax(scene: &mut Scene, settings: &Relaxation) {
 /// wins, and the rest of the scene accommodates it, rather than the pin being
 /// averaged away into a position nobody asked for.
 ///
-/// Anchored holds are deliberately absent here. Anchored means best effort, so
-/// it relaxes like anything else and the arrangement pull carries it home.
+/// Seeded and anchored items are deliberately absent here: both relax, and an
+/// anchored one is drawn home ([`relax_roles`] names them per item).
 pub fn relax_holding(scene: &mut Scene, settings: &Relaxation, immovable: &[InstanceId]) {
+    let roles: Vec<_> = immovable.iter().map(|i| (*i, Hold::Pinned)).collect();
+    relax_roles(scene, settings, &roles);
+}
+
+/// Loosen `scene` with per-item roles, which override [`Relaxation::role`]:
+/// pinned items do not integrate, anchored items are drawn back to where the
+/// arrangement placed them, seeded items only start there (F22).
+pub fn relax_roles(scene: &mut Scene, settings: &Relaxation, roles: &[(InstanceId, Hold)]) {
     if settings.steps == 0 || scene.items.is_empty() {
         return;
     }
-    let mut held = vec![false; scene.items.len()];
+    let mut role = vec![settings.role; scene.items.len()];
+    for (instance, hold) in roles {
+        if let Some(slot) = role.get_mut(instance.0 as usize) {
+            *slot = *hold;
+        }
+    }
+    let mut held: Vec<bool> = role.iter().map(|r| *r == Hold::Pinned).collect();
     // A scene that records its own honored pins does not need a caller to
     // remember them. This is the difference between an invariant and a
     // convention: before it, calling `relax` instead of `relax_holding` dragged
-    // an ensure-class placement away in silence, and nothing in the types said
-    // so. The explicit list still adds to this; it never subtracts.
+    // a pinned placement away in silence, and nothing in the types said so.
+    // The explicit roles still add to this; they never subtract.
     for honored in &scene.honored_holds {
         if let Some(slot) = held.get_mut(honored.instance.0 as usize) {
-            *slot = true;
-        }
-    }
-    for instance in immovable {
-        if let Some(slot) = held.get_mut(instance.0 as usize) {
             *slot = true;
         }
     }
@@ -269,11 +288,14 @@ pub fn relax_holding(scene: &mut Scene, settings: &Relaxation, immovable: &[Inst
             }
         }
 
-        // The arrangement's own pull — the swatch-scale anchor spring.
-        if settings.arrangement_pull > 0.0 {
+        // Anchored items are drawn home: the swatch-scale anchor spring.
+        if settings.anchor_pull > 0.0 {
             for (index, anchor) in anchors.iter().enumerate() {
-                forces[index].x += (anchor.x - positions[index].x) * settings.arrangement_pull;
-                forces[index].y += (anchor.y - positions[index].y) * settings.arrangement_pull;
+                if role[index] != Hold::Anchored {
+                    continue;
+                }
+                forces[index].x += (anchor.x - positions[index].x) * settings.anchor_pull;
+                forces[index].y += (anchor.y - positions[index].y) * settings.anchor_pull;
             }
         }
 
@@ -355,8 +377,8 @@ mod tests {
     #[test]
     fn plain_relax_no_longer_drags_a_recorded_pin() {
         // The footgun this closes: a caller who reaches for `relax` rather than
-        // `relax_holding` used to move an ensure-class placement in silence,
-        // and nothing in the types objected.
+        // `relax_holding` used to move a pinned placement in silence, and
+        // nothing in the types objected.
         let mut scene = scene_with(&[(0.0, 0.0), (1.0, 0.0), (-1.0, 0.5)]);
         scene.honored_holds.push(sceno::HonoredHold {
             instance: InstanceId(0),
@@ -381,14 +403,40 @@ mod tests {
     }
 
     #[test]
-    fn an_anchored_hold_still_relaxes() {
-        // Anchored is best effort by design, so it is not in honored_holds and
-        // must keep moving. A scene where anchoring silently pinned would be
-        // the same silent-soft failure wearing the other face.
-        let mut scene = scene_with(&[(0.0, 0.0), (1.0, 0.0)]);
-        let before = scene.items[0].transform.translate;
-        relax(&mut scene, &Relaxation::default());
-        assert_ne!(scene.items[0].transform.translate, before);
+    fn seeded_and_anchored_items_still_relax() {
+        // Neither is in honored_holds, so both keep moving. A scene where
+        // either silently pinned would be the same silent-soft failure
+        // wearing the other face.
+        for settings in [Relaxation::default(), Relaxation::default().anchored()] {
+            let mut scene = scene_with(&[(0.0, 0.0), (1.0, 0.0)]);
+            let before = scene.items[0].transform.translate;
+            relax(&mut scene, &settings);
+            assert_ne!(scene.items[0].transform.translate, before);
+        }
+    }
+
+    /// F22 at swatch scale: an item's role overrides the recipe's. The pinned
+    /// item holds exactly, the anchored one stays nearer home than the seeded
+    /// one beside it.
+    #[test]
+    fn per_item_roles_override_the_recipe_role() {
+        let points = [(0.0, 0.0), (10.0, 0.0), (20.0, 0.0), (30.0, 0.0)];
+        let mut scene = scene_with(&points);
+        let settings = Relaxation {
+            anchor_pull: 4.0,
+            ..Relaxation::default().anchored()
+        };
+        relax_roles(
+            &mut scene,
+            &settings,
+            &[(InstanceId(0), Hold::Pinned), (InstanceId(3), Hold::Seeded)],
+        );
+        let drift = |i: usize| {
+            let at = scene.items[i].transform.translate;
+            (at.x - points[i].0).hypot(at.y - points[i].1)
+        };
+        assert_eq!(drift(0), 0.0, "pinned holds");
+        assert!(drift(2) < drift(3), "anchored nearer home than seeded");
     }
 
     #[test]
@@ -493,15 +541,15 @@ mod tests {
     }
 
     #[test]
-    fn the_arrangement_pull_holds_its_shape() {
+    fn an_anchored_arrangement_holds_its_shape() {
         let points = [(0.0, 0.0), (10.0, 0.0), (20.0, 0.0)];
         let mut tethered = scene_with(&points);
         let mut free = scene_with(&points);
         relax(
             &mut tethered,
             &Relaxation {
-                arrangement_pull: 4.0,
-                ..Default::default()
+                anchor_pull: 4.0,
+                ..Relaxation::default().anchored()
             },
         );
         relax(&mut free, &Relaxation::default().untethered());
@@ -521,7 +569,7 @@ mod tests {
         };
         assert!(
             drift(&tethered) < drift(&free),
-            "a pulled arrangement stays nearer its slots: {} vs {}",
+            "an anchored arrangement stays nearer its slots: {} vs {}",
             drift(&tethered),
             drift(&free)
         );

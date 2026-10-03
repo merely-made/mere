@@ -75,16 +75,23 @@ impl Score {
     }
 }
 
-/// How firmly an authored placement must be honored.
+/// The role an authored placement plays once anything moves the scene: the
+/// three arrangement roles (dynamics grammar plan, F18, F19, F25).
 ///
-/// The two classes are deliberately unequal, and naming them is the point: a
-/// solver that treats both as suggestions produces the silent-soft failure
+/// The classes are deliberately unequal, and naming them is the point: a
+/// solver that treats a pin as a suggestion produces the silent-soft failure
 /// where a person pins something, the layout quietly moves it, and nothing
-/// anywhere says so.
+/// anywhere says so. Only [`Hold::Pinned`] is reported honored or unmet.
+//
+// F25's serde mapping is held for Mark's ruling: a score saved before the
+// three holds wrote "Anchored" for what is now `Seeded`, and an alias would
+// make a new `Anchored` read back as `Seeded`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum Hold {
     /// Best effort. The arrangement seeds from here and relaxation may carry
-    /// it away; moving an anchored item is correct behaviour, not a failure.
+    /// it away; moving a seeded item is correct behaviour, not a failure.
+    Seeded,
+    /// Returns. Displaced by relaxation or a drag, the item goes back here.
     Anchored,
     /// Must be honored. The arrangement does not get a vote, and a solver that
     /// cannot honor it reports rather than repositions.
@@ -110,7 +117,7 @@ pub struct HeldPlacement {
 /// The negative half of this record lives on [`crate::Scene::unmet_holds`]. The
 /// positive half is here for two reasons that arrived together: a consumer that
 /// wants to state "3 pins honored" should read it rather than recompute it, and
-/// a scene that knows which of its instances are ensure-class can stop a
+/// a scene that knows which of its instances are pinned can stop a
 /// relaxation pass from quietly dragging one away.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct HonoredHold {
@@ -128,6 +135,16 @@ impl HeldPlacement {
         }
     }
 
+    /// A placement that seeds the arrangement and may be carried away.
+    pub fn seeded(source: SourceRef, at: Vec2) -> Self {
+        Self {
+            source,
+            at,
+            hold: Hold::Seeded,
+        }
+    }
+
+    /// A placement the item returns to.
     pub fn anchored(source: SourceRef, at: Vec2) -> Self {
         Self {
             source,
@@ -827,6 +844,54 @@ mod tests {
         assert!(score.hold_for(&SourceRef::new("fixture", "east")).is_none());
         // Same id, different adapter, is a different source.
         assert!(score.hold_for(&SourceRef::new("other", "north")).is_none());
+    }
+
+    /// F25: the three holds round-trip, and a score saved before them reads
+    /// its "Anchored" (then best effort) as `Seeded`. The second half waits on
+    /// Mark's ruling on the wire format (a version gate, or a distinct wire
+    /// name for the returning hold); until then it fails, run with --ignored.
+    #[test]
+    fn three_holds_round_trip() {
+        let mut score = Score::new(Arrangement::Spiral(Spiral::default()));
+        for (id, hold) in [
+            ("seeded", Hold::Seeded),
+            ("anchored", Hold::Anchored),
+            ("pinned", Hold::Pinned),
+        ] {
+            score.holds.push(HeldPlacement {
+                source: SourceRef::new("fixture", id),
+                at: Vec2::new(1.0, 2.0),
+                hold,
+            });
+        }
+        let json = serde_json::to_string(&score).unwrap();
+        let back: Score = serde_json::from_str(&json).unwrap();
+        assert_eq!(back, score);
+        assert_eq!(
+            back.holds[1].hold,
+            Hold::Anchored,
+            "a new anchored hold returns"
+        );
+    }
+
+    #[test]
+    #[ignore = "F25's wire format awaits Mark's ruling"]
+    fn an_old_scores_anchored_hold_reads_as_seeded() {
+        let json = r#"{
+            "version": 4,
+            "arrangement": {"Spiral": {"center": {"x": 0.0, "y": 0.0},
+                "spacing": 40.0, "angle_radians": 2.399963, "curve": "SquareRoot"}},
+            "items": [],
+            "holds": [{"source": {"adapter": "fixture", "id": "old"},
+                "at": {"x": 1.0, "y": 2.0}, "hold": "Anchored"}],
+            "generation": 3
+        }"#;
+        let score: Score = serde_json::from_str(json).unwrap();
+        assert_eq!(
+            score.holds[0].hold,
+            Hold::Seeded,
+            "a v4 anchored hold was best effort, the seeded role"
+        );
     }
 
     #[test]

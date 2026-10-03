@@ -209,7 +209,7 @@ impl Canvas {
             paused_positions: None,
             projection_score: None,
             projection_representations: HashMap::new(),
-            arrangement_pull: seiche::DEFAULT_ANCHOR_STIFFNESS,
+            roles: Default::default(),
             physics_law: crate::canvas::PhysicsLaw::Springs,
             physics_overlays: Vec::new(),
             physics_kind_source: crate::canvas::PhysicsKindSource::Site,
