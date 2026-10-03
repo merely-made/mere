@@ -2,15 +2,15 @@
 
 | doc | disposition | status accurate | claims | holds | stale | unverifiable |
 |---|---|---:|---:|---:|---:|---:|
-| mere_docs/implementation_strategy/2026-10-02_device_pairing_by_key_plan.md | current | yes | 17 | 17 | 0 | 0 |
-| **Totals** |  |  | **17** | **17** | **0** | **0** |
+| mere_docs/implementation_strategy/2026-10-02_device_pairing_by_key_plan.md | current | yes | 18 | 18 | 0 | 0 |
+| **Totals** |  |  | **18** | **18** | **0** | **0** |
 
-**Totals: 1 doc, 17 claims checked (17 holds, 0 stale, 0 unverifiable), 0 contradictions.**
+**Totals: 1 doc, 18 claims checked (18 holds, 0 stale, 0 unverifiable), 0 contradictions.**
 
 Audit base: Mere `792967f8` (2026-10-01), plus the four machines read over
 SSH on 2026-10-02. `archive_docs/` is excluded.
 
-This batch exists because the plan is new. Its rulings (1 to 39) are recorded
+This batch exists because the plan is new. Its rulings (1 to 43) are recorded
 in its §3, and its three corrections are carried as dated notes into the SSH
 CA projection plan and the reachability rungs plan (R1, R2); they are not
 counted again here.
@@ -18,8 +18,8 @@ counted again here.
 ## mere_docs/implementation_strategy/2026-10-02_device_pairing_by_key_plan.md
 
 - disposition: current
-- status line: "Status (2026-10-02): in progress. Assessed and ruled by Mark on 2026-10-01 and 2026-10-02 (rulings 1 to 39 below). D1 landed (`4963b489`); D1b's mere fix (M1) landed (`177b927c`), its fork fix (F1) is being released as `mere-p2panda-net-0.7.5` with knot and mere repinned; `connected` follows the gossip overlay (ruling 31) and is being finished, and the overlay's gap after restarts goes to its own lane (ruling 36); then D2." — accurate: yes
-- claims checked: 17 — holds: 17, stale: 0, unverifiable: 0
+- status line: "Status (2026-10-03): in progress. Assessed and ruled by Mark from 2026-10-01 to 2026-10-03 (rulings 1 to 43 below). D1 landed (`4963b489`); D1b's mere fix (M1) landed (`177b927c`), its fork fix (F1) is released as `mere-p2panda-net-0.7.5` (`1bec457e`, pushed), with knot and mere repinned locally and their pushes waiting on why iroh 1.3.0 holds a dead path longer (ruling 40); `connected` follows the gossip overlay (ruling 31) and is being finished, and the overlay's gap after restarts goes to its own lane (ruling 36); then D2." — accurate: yes
+- claims checked: 18 — holds: 18, stale: 0, unverifiable: 0
 
 ### Stale claims
 
@@ -59,3 +59,8 @@ succeeds (iroh-gossip 0.101.0 `proto/hyparview.rs:745-753`); a `Join` for a
 topic with no state dropped (`proto/state.rs:247-275`); and `RETRY_RATE` at
 5 s (`p2panda-net/src/sync/actors/topic_manager.rs:35`, the same at the
 pinned `0a54ab82`).
+
+Added 2026-10-03 with rulings 40 to 43, one claim of the release finding,
+read in the source: Isometry's lenient decode of a peer operation body
+(`crates/isonetry/src/campaign_space/space.rs:77`, at Isometry `cb9f89b`). The
+release's pushed refs were read with `git ls-remote`.
