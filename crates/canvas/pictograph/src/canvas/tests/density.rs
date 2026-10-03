@@ -91,22 +91,6 @@ pub(super) fn uniform(n: u128) -> Graph {
     graph
 }
 
-/// A candidate stop for the receipts, named here because the catalog's stop
-/// test is an open fork (plan, P6 progress 2026-10-02, third round): three
-/// passes in a row under a twentieth of a spacing of mean shift.
-pub(super) const CANDIDATE_STOP: seiche::DensityStop = seiche::DensityStop::Shift(0.05);
-
-/// Install the catalog's Density (its defaults) with `stop` over the
-/// canvas's degree masses.
-pub(super) fn install(canvas: &mut Canvas, stop: seiche::DensityStop) {
-    canvas.set_physics_law(PhysicsLaw::Density).unwrap();
-    let masses = canvas.law_inputs().masses(PhysicsMassSource::Degree);
-    let mut law = crate::canvas::physics_catalog::density_law(masses);
-    law.stop = stop;
-    law.patience = 3;
-    canvas.physics.set_forces(vec![Box::new(law)]);
-}
-
 /// Tick until the law stops asking for ticks (its passes stopped) or
 /// `limit` ticks pass; returns the ticks run.
 pub(super) fn until_settled(canvas: &mut Canvas, limit: u32) -> u32 {
@@ -118,12 +102,16 @@ pub(super) fn until_settled(canvas: &mut Canvas, limit: u32) -> u32 {
     limit
 }
 
-/// Settle `graph` under Density (stopping on `stop`) and under Springs from
-/// one seed, and read both rank correlations.
-fn density_and_springs_ranks(graph: Graph, stop: seiche::DensityStop) -> (f32, f32) {
+/// Settle `graph` under the catalog's Density until its flow reports it has
+/// stopped, and under Springs from the same seed; read both ranks.
+fn density_and_springs_ranks(graph: Graph) -> (f32, f32) {
     let mut density = seeded(graph.clone(), 40.0);
-    install(&mut density, stop);
-    let ticks = until_settled(&mut density, 60 * 121);
+    density.set_physics_law(PhysicsLaw::Density).unwrap();
+    let ticks = until_settled(&mut density, 60 * 122);
+    assert!(
+        !density.physics_tick_demand().0,
+        "the flow reports stopped before the rank is read"
+    );
     let mut springs = seeded(graph, 40.0);
     springs.set_physics_law(PhysicsLaw::Springs).unwrap();
     run(&mut springs, ticks.max(360));
@@ -140,8 +128,7 @@ fn density_and_springs_ranks(graph: Graph, stop: seiche::DensityStop) -> (f32, f
 /// does not (the negative control).
 #[test]
 fn settled_density_gives_room_by_mass_and_springs_does_not() {
-    let (density, springs) =
-        density_and_springs_ranks(crate::canvas::build::sample_graph(), CANDIDATE_STOP);
+    let (density, springs) = density_and_springs_ranks(crate::canvas::build::sample_graph());
     assert!(density >= 0.8, "density rank {density:.3}");
     assert!(
         springs < 0.8,
@@ -149,18 +136,35 @@ fn settled_density_gives_room_by_mass_and_springs_does_not() {
     );
 }
 
-/// The same claim on the web pages' 200-node generated graph, degree mass.
-/// At the ruled defaults the rank does not settle above 0.8: over ninety
-/// one-second passes it wanders between 0.73 and 0.79, and the mean shift a
-/// pass stays near a twentieth of a spacing (the convergence probe). Kept as
-/// the evidence for the stop fork.
+/// The same claim on a 50-node generated graph (seed 3), degree mass. The
+/// ruled stop ends it at pass 6 reading 0.786, under the 0.8 the same ruling
+/// set for it; reopened with Mark (plan, P6 progress 2026-10-02, fourth
+/// round).
 #[test]
-#[ignore = "the 200-node graph does not reach 0.8 at the ruled defaults; the stop test is an open fork"]
-fn settled_density_gives_room_by_mass_on_the_generated_graph() {
-    let (density, springs) = density_and_springs_ranks(generated(200, 7), CANDIDATE_STOP);
+#[ignore = "reopened: the ruled stop ends gen-50 at 0.786, under its ruled 0.8 bar"]
+fn settled_density_gives_room_by_mass_on_fifty_nodes() {
+    let (density, springs) = density_and_springs_ranks(generated(50, 3));
     assert!(density >= 0.8, "density rank {density:.3}");
     assert!(
         springs < 0.8,
+        "springs must fail the correlation, read {springs:.3}"
+    );
+}
+
+/// The web pages' 200-node generated graph, degree mass, under the plateau
+/// bar ruled 2026-10-02: the rank does not settle above 0.8 at 64² (over
+/// ninety one-second passes it wanders 0.73 to 0.79, and the stop test ends
+/// it near pass 18 at about 0.76), so the bar here is 0.7, to be revisited
+/// with P6b's 512² grid.
+#[test]
+fn settled_density_holds_the_plateau_bar_on_the_generated_graph() {
+    let (density, springs) = density_and_springs_ranks(generated(200, 7));
+    assert!(
+        density >= 0.7,
+        "density rank {density:.3} under the plateau bar 0.7 (measured plateau 0.73 to 0.79)"
+    );
+    assert!(
+        springs < 0.7,
         "springs must fail the correlation, read {springs:.3}"
     );
 }
@@ -170,10 +174,11 @@ fn settled_density_gives_room_by_mass_on_the_generated_graph() {
 #[test]
 fn uniform_mass_spreads_evenly() {
     let mut canvas = seeded(uniform(60), 14.0);
-    install(&mut canvas, CANDIDATE_STOP);
+    canvas.set_physics_law(PhysicsLaw::Density).unwrap();
     run(&mut canvas, 2);
     let before = canvas.layout_stats().density_cv;
-    let ticks = until_settled(&mut canvas, 60 * 121);
+    let ticks = until_settled(&mut canvas, 60 * 122);
+    assert!(!canvas.physics_tick_demand().0, "the flow reports stopped");
     let after = canvas.layout_stats();
     eprintln!(
         "uniform stopped after {ticks} ticks: cv {:.3} (seed {before:.3}), overlaps {}",
@@ -190,10 +195,10 @@ fn uniform_mass_spreads_evenly() {
 
 /// The catalog's Density keeps the host ticking past the settle budget
 /// while its passes run (the law asks for ticks), so convergence, not the
-/// budget, ends it.
+/// budget, ends it. The 200-node graph converges well past the budget.
 #[test]
 fn density_runs_past_the_settle_budget_until_its_passes_stop() {
-    let mut canvas = seeded(crate::canvas::build::sample_graph(), 40.0);
+    let mut canvas = seeded(generated(200, 7), 40.0);
     canvas.set_physics_law(PhysicsLaw::Density).unwrap();
     // Frames only: no settle is asked for beyond the law switch's own.
     for _ in 0..crate::canvas::SETTLE_TICKS + 30 {

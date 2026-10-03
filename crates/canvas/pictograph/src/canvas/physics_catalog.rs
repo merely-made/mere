@@ -67,10 +67,11 @@ const CHARGE_STRENGTH: f32 = 6_000.0;
 /// Density's grid resolution on the CPU tier (cells per side): 64², ruled
 /// 2026-10-02 (the same ranks as 128² at about a sixteenth of the cost).
 pub const DENSITY_RESOLUTION: usize = 64;
-/// Density's convergence test, how many passes in a row must meet it, and
-/// the pass cap that ends the passes if the test never does.
-pub const DENSITY_STOP: seiche::DensityStop = seiche::DensityStop::Cap;
-pub const DENSITY_PATIENCE: u32 = 1;
+/// Density's convergence test (ruled 2026-10-02): passes end once the mean
+/// node shift stays under a twentieth of a spacing for three passes in a
+/// row; the pass cap ends them if the test never does.
+pub const DENSITY_STOP: seiche::DensityStop = seiche::DensityStop::Shift(0.05);
+pub const DENSITY_PATIENCE: u32 = 3;
 pub const DENSITY_MAX_PASSES: u32 = 120;
 
 /// The physics law: which dynamics the graph moves under. Ids are technical

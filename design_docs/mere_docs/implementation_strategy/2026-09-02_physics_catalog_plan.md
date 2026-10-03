@@ -1286,3 +1286,23 @@ binning are the useful patterns.
   crates were fetched again online (`cargo-fetch.log`, 729 crates). Gates (offline, debug): seiche 97/97 and 93/93 without default features; pictograph `--features canvas --lib` 276 passed, 2 ignored (the 200-node receipt and the convergence probe); graphshell `--features web --lib` 230/230.
   Open, put to Mark: the stop test (field CV, shift, or the cap alone), and
   the 0.8 bar on the 200-node graph, which no stop meets at these defaults.
+- 2026-10-02 (P6a, fourth round, after the third-round rulings; main
+  `d3874ff3` merged): the stop test is the catalog default
+  (`DENSITY_STOP` `Shift(0.05)`, `DENSITY_PATIENCE` 3, the 120-pass cap
+  behind it), and the receipts read the rank only after the flow reports
+  stopped (`physics_tick_demand`; on both pages the `physics-continuous`
+  observation, new on the old page). Native, at the catalog default: the
+  12-node sample stops at pass 5 at 0.837 (Springs 0.116); the 200-node
+  graph stops at pass 18 at 0.737 and holds the plateau bar of 0.7, its
+  plateau (0.73 to 0.79 over ninety passes) in the test's message; uniform
+  mass from a clump stops at CV 0.063 with no overlaps. **Two results
+  contradict the ruling and go back to Mark.** gen-50 stops at pass 6 at
+  0.786, under the 0.8 the same ruling set for it (its own measurement said
+  0.78); the receipt is written and ignored with that reason. And the
+  headed receipts at the new default fail on rank after the flow reports
+  stopped: the fixture graph reads 0.71 on the tree and 0.53 on the old page
+  against 0.8 (under the cap alone the tree had read 0.93, and its trace
+  had climbed to 0.86 by frame 180 before dipping). With the gradient term
+  removed every receipt fails (sample −0.395, gen-50 −0.246, 200 nodes
+  −0.241, uniform CV 0.310 with 13 overlaps); restored. Bundle `71d48984…`.
+  Gates (offline, debug): seiche 97/97 and 93/93 without default features; pictograph `--features canvas --lib` 277 passed, 2 ignored (the gen-50 receipt and the convergence probe); graphshell `--features web --lib` 230/230 on a rerun, the first run losing `carrier::tests::p2panda_murm_grant_is_refused_before_projection_bytes` to a projection-accept timeout in code this lane does not touch (`gate-graphshell-web-flake.log`); it passed twice alone.
