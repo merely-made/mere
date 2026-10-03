@@ -3098,6 +3098,149 @@ upstream issue is filed; pre.4 is not promoted to the web, and main is not
 merged, until the constructors run once and the A/B shows it.
 
 
+### 13.32 Allocator repair (2026-10-03, ruling 508)
+
+**Authority.** Ruling 508 (Isometry `f702f0a`, §13.31) puts the repair in
+burn-remote's close path. Close waits for cleanup to complete and reports
+failures honestly. Acceptance needs four things: the zero-baseline
+lifecycle gate, the strict numerical and recovery gates, a second live
+lease that keeps its identity and tensor values, and a rejected injected
+synchronization failure that fails when the repair is removed. Ruling 509's
+constructor lane is separate and owns the web build; nothing here touches
+it.
+
+**Where the patch lives.** The existing vendored
+`support/patches/burn-remote` clearly fits. The close path being repaired is
+Mere's already-patched targeted close. The root, the probe and the remote
+fixture already select this source. Its `MERE-PATCH.md` already carries the
+upstream commit, licence and removal condition that §2 requires. A mark-ik
+fork would give one crate a second home. An upstream PR needs communication
+that no ruling authorizes. This is not a new home, so no fork was raised.
+
+**The repair, `88fd392f`.**
+
+- `server/worker.rs`: after dropping the session's interpreter and running
+  `memory_cleanup`, the worker waits for the device (`B::sync`), then runs
+  `memory_cleanup` once more. The two existing pre-drop syncs no longer only
+  log: every teardown failure is kept, and the worker's completion carries
+  `Result<(), String>`.
+- `server/session.rs`: `finish_session` turns a teardown error into
+  `SessionCompletion::Failed`. The session stays registered and is never
+  acknowledged clean, so `close_session` returns the error. Distillery's
+  `close_run` already propagates it, so Distillery is unchanged.
+- The wait is device-wide, as the 2026-09-30 review anticipated. It may
+  also wait on other sessions' queued work; per-session isolated scheduling
+  is not established.
+- A `cfg(test)`-only hook, `worker::teardown_fault`, fails the post-release
+  wait for one session. It exists only in burn-remote's own test build, and
+  the public API is unchanged. `MERE-PATCH.md` records all of this and its
+  removal condition.
+- Changed files are rustfmt-clean under upstream's default style. Mere's
+  family `rustfmt.toml` would reformat untouched upstream code, so it was not
+  applied there.
+
+**The fixture, `cf7103d8`.** Two changes:
+
+- The reviewed 2026-09-29 verifier candidate (patch `368c183c` on source
+  `cfa40321`) is applied unchanged: non-finite values are rejected and six
+  CPU verifier tests cover it. Its four rustfmt suggestions are its own and
+  are kept as reviewed.
+- A second-live-lease stage runs after the zero-baseline reclaim and
+  recovery stages. Two more jobs run concurrently on the same device. The
+  host now allows three runs, for these two plus a re-grant of the first
+  job; the earlier stages post one job at a time.
+  - The kept lease executes, and one device sync from the fixture settles
+    its baseline. The close under test gets no fixture sync.
+  - The other lease executes, then its holder authors `LeaseRevokedByOwner`.
+    The host loses that lease and cancels its run, and Distillery closes its
+    sessions through burn-remote's targeted close.
+  - The kept lease must not be disturbed. It must stay active with its one
+    session and re-execute to bit-identical output, and the allocator must
+    return to its baseline.
+  - A final owner reclaim must reach zero. That reclaim does not repeat the
+    stop-before-fact ordering assertion, which the first reclaim already
+    proves.
+
+A first development run failed exactly there: the fixture dropped the kept
+provider before the shutdown reclaim, which closed its session first. That
+was a fixture-design error, fixed before acceptance; the record is
+`dev2-second-lease`.
+
+**Acceptance at clean `cf7103d8`.** Offline and locked, Rust 1.98.1, four
+jobs, lane targets under `C:/t/cargo-targets/mere/burn-pre4`.
+
+- **Two-peer gate: exit 0 in 8.2 s, no timeout.** Executable `0984596f…`,
+  the six model hashes match, sources stable.
+  - Active allocations and bytes are 0 immediately after both owner
+    reclaims (waits of 0.004 and 0.006 ms), against §13.29's 10
+    allocations. The final cleanup also takes reserved bytes to 0; that is
+    recorded, not gated.
+  - All five numerical blocks read native error `1.4901161193847656e-7`,
+    equal to the pre.2 ceiling. Recovery is bit-identical to the first run.
+    The in-flight 512-row request fails on reclaim.
+- **Second live lease.**
+
+  | Point | Allocations / bytes |
+  | --- | --- |
+  | Kept baseline | 101 / 90,261,504 |
+  | Both leases live | 202 / 180,523,008 |
+  | Immediately after the close | 101 / 90,261,504 (0.013 ms) |
+  | After the final reclaim | 0 / 0 |
+
+  The kept lease was not disturbed, is still active with one session, and
+  its re-run differs by 0. The closed lease ends with 0 sessions.
+- **Auditor.** `audit_remote_repair.py` extends the 2026-09-29 auditor with
+  the immediate-zero and second-lease requirements. It accepts receipt
+  `ccc247ba…` against the 2026-08-23 baseline `56820c09…`, and rejects all 11
+  planted faults: two weaker numerical results, three kinds of retained
+  allocation, a disturbed kept lease, changed kept values, a lost kept
+  session, a dirty receipt, a wrong head and an empty receipt. The receipt is
+  kept as
+  `ports/distillery/probe/receipts/2026-10-03_pre4_remote_minilm_repaired.json`.
+- **Injected failure.** The unit test
+  `server::session::teardown_tests::a_failed_teardown_sync_is_reported_and_never_acknowledged_clean`
+  passes: an unarmed session closes `Ok` and leaves the registry, while an
+  armed one fails with the injected error, stays registered, and fails a
+  later `close_session`. Mutant A (post-release wait removed) and mutant B
+  (failure discarded) each fail it; the restored source rebuilds and passes.
+- **Other suites.** burn-remote's full lib suite passes 29 of 29 at default
+  threading (twice) and its iroh tests 4 of 4. The fixture verifier passes
+  6 of 6. Distillery's four-feature all-targets check, its two lease tests,
+  Djinn's trainer check and `cargo_mode.py verify` pass. The tree is clean
+  afterwards.
+
+**Qualifications.**
+
+- With `--test-threads=1`, burn-remote's upstream
+  `tests::test_to_device_local_to_remote` fails. Its `Device::default()`
+  resolves to a remote at `127.0.0.1:3000` under the `remote-websocket` dev
+  feature, so it passes only while another test's server listens there. It
+  fails identically alone on the pre-repair source (from a `git archive` of
+  `f560c3b1`); this is not a repair result.
+- Restoring a source file's older mtime after a mutation defeats Cargo's
+  fingerprint and reruns the stale binary. The first mutant sequence's
+  restored step failed that way; it is kept under `attempt-1-stale-restore`
+  and is not counted. The repeat restores bytes with a fresh mtime. The same
+  trap applied to §13.30's diagnostic restoration; this lane's next fixture
+  edit forced the rebuild.
+- The standalone burn-remote lock is gitignored by the root `Cargo.lock`
+  rule. Its bytes (`c75388de…`) were unchanged by this work.
+
+**Downloads under ruling 378.** Ten archives for the standalone burn-remote
+lock, each checked against the lock's checksum, all matching: axum 0.8.9,
+axum-core 0.5.6, burn-communication 0.22.0-pre.4, js-sys 0.3.105, matchit
+0.8.4, ordered-float 4.6.0, serde_path_to_error 0.1.20, thread-tree 0.3.3,
+wasm-bindgen-futures 0.4.78, web-sys 0.3.105. No Git fetch.
+
+**Gate status.** S13 (c) passes on this branch. S13's (a)/(a') were
+resolved by ruling 410's selector retirement; (b), (d) and (e) passed at
+§13.30, and burn-remote is in none of their cones. Still open: S15 closure documents; S16 integration, which ruling 509
+also holds until the wasm constructors run once and the A/B shows it; and the
+Knot and Isometry handoffs. Evidence:
+`Code/testing/mere/receipts/2026-10-02/burn-pre4/repair` (gate and audit
+JSON, unit and mutant logs, fault controls, fetch record, development
+runs).
+
 ### 13.33 wasm constructors (2026-10-03)
 
 **Authority.** §13.31: Mark chose **"Bounded fix lane"** for the pre.4 wasm
@@ -3275,145 +3418,42 @@ pre.2's while `gpu=off` matches. Evidence:
 `Code/testing/mere/receipts/2026-10-03/pre4-ctors` (`inspect/`,
 `control/`, `probe/`, `web/`, `ab/`). The lane target is
 `C:/t/cargo-targets/mere/pre4-ctors`.
-### 13.32 Allocator repair (2026-10-03, ruling 508)
 
-**Authority.** Ruling 508 (Isometry `f702f0a`, §13.31) puts the repair in
-burn-remote's close path. Close waits for cleanup to complete and reports
-failures honestly. Acceptance needs four things: the zero-baseline
-lifecycle gate, the strict numerical and recovery gates, a second live
-lease that keeps its identity and tensor values, and a rejected injected
-synchronization failure that fails when the repair is removed. Ruling 509's
-constructor lane is separate and owns the web build; nothing here touches
-it.
+### 13.34 The constructor lane's three forks ruled (2026-10-03)
 
-**Where the patch lives.** The existing vendored
-`support/patches/burn-remote` clearly fits. The close path being repaired is
-Mere's already-patched targeted close. The root, the probe and the remote
-fixture already select this source. Its `MERE-PATCH.md` already carries the
-upstream commit, licence and removal condition that §2 requires. A mark-ik
-fork would give one crate a second home. An upstream PR needs communication
-that no ruling authorizes. This is not a new home, so no fork was raised.
+§13.33's three forks went to Mark on 2026-10-03, after the coordinator
+re-read the fix, the run counts (5,441 at ready before, 1 after, GPU on and
+off) and the pooled A/B. Their Isometry wing numbers are being assigned
+with the wing session and are added here when known.
 
-**The repair, `88fd392f`.**
+**The fix's form.** Question: graphshell-web's start function calls
+`__wasm_call_ctors` (one run per page, link line unchanged); three other
+pre.4 web modules still run their constructors on every call, and Knot's
+and Isometry's web builds will once they take pre.4. Options: one helper in
+a stack crate, called first from every web module's start, with a run-once
+guard and a test counting exactly one constructor run; the per-module start
+call as committed; the link arg plus a post-bindgen glue edit. Mark:
+**"Shared stack helper"**. *Reading, not ruled:* the coordinator's reason
+for recommending it was that a second run (for example a future
+wasm-bindgen that also calls the constructors) would make each `inventory`
+node point at itself, so iterating a registry would never end; the
+one-run test is the guard against that.
 
-- `server/worker.rs`: after dropping the session's interpreter and running
-  `memory_cleanup`, the worker waits for the device (`B::sync`), then runs
-  `memory_cleanup` once more. The two existing pre-drop syncs no longer only
-  log: every teardown failure is kept, and the worker's completion carries
-  `Result<(), String>`.
-- `server/session.rs`: `finish_session` turns a teardown error into
-  `SessionCompletion::Failed`. The session stays registered and is never
-  acknowledged clean, so `close_session` returns the error. Distillery's
-  `close_run` already propagates it, so Distillery is unchanged.
-- The wait is device-wide, as the 2026-09-30 review anticipated. It may
-  also wait on other sessions' queued work; per-session isolated scheduling
-  is not established.
-- A `cfg(test)`-only hook, `worker::teardown_fault`, fails the post-release
-  wait for one session. It exists only in burn-remote's own test build, and
-  the public API is unchanged. `MERE-PATCH.md` records all of this and its
-  removal condition.
-- Changed files are rustfmt-clean under upstream's default style. Mere's
-  family `rustfmt.toml` would reformat untouched upstream code, so it was not
-  applied there.
+**The other pre.4 web modules.** Question: Distillery's model probe (which
+records browser timings against bounds) and two minimal repros (burn
+browser embedding; extrema, 3,648 wrapped exports) are still
+command-linked; S13(b) extrema passes either way. Options: the probe takes
+the fix and the repros stay minimal; all three; none. Mark: **"Probe yes,
+repros no"**.
 
-**The fixture, `cf7103d8`.** Two changes:
-
-- The reviewed 2026-09-29 verifier candidate (patch `368c183c` on source
-  `cfa40321`) is applied unchanged: non-finite values are rejected and six
-  CPU verifier tests cover it. Its four rustfmt suggestions are its own and
-  are kept as reviewed.
-- A second-live-lease stage runs after the zero-baseline reclaim and
-  recovery stages. Two more jobs run concurrently on the same device. The
-  host now allows three runs, for these two plus a re-grant of the first
-  job; the earlier stages post one job at a time.
-  - The kept lease executes, and one device sync from the fixture settles
-    its baseline. The close under test gets no fixture sync.
-  - The other lease executes, then its holder authors `LeaseRevokedByOwner`.
-    The host loses that lease and cancels its run, and Distillery closes its
-    sessions through burn-remote's targeted close.
-  - The kept lease must not be disturbed. It must stay active with its one
-    session and re-execute to bit-identical output, and the allocator must
-    return to its baseline.
-  - A final owner reclaim must reach zero. That reclaim does not repeat the
-    stop-before-fact ordering assertion, which the first reclaim already
-    proves.
-
-A first development run failed exactly there: the fixture dropped the kept
-provider before the shutdown reclaim, which closed its session first. That
-was a fixture-design error, fixed before acceptance; the record is
-`dev2-second-lease`.
-
-**Acceptance at clean `cf7103d8`.** Offline and locked, Rust 1.98.1, four
-jobs, lane targets under `C:/t/cargo-targets/mere/burn-pre4`.
-
-- **Two-peer gate: exit 0 in 8.2 s, no timeout.** Executable `0984596f…`,
-  the six model hashes match, sources stable.
-  - Active allocations and bytes are 0 immediately after both owner
-    reclaims (waits of 0.004 and 0.006 ms), against §13.29's 10
-    allocations. The final cleanup also takes reserved bytes to 0; that is
-    recorded, not gated.
-  - All five numerical blocks read native error `1.4901161193847656e-7`,
-    equal to the pre.2 ceiling. Recovery is bit-identical to the first run.
-    The in-flight 512-row request fails on reclaim.
-- **Second live lease.**
-
-  | Point | Allocations / bytes |
-  | --- | --- |
-  | Kept baseline | 101 / 90,261,504 |
-  | Both leases live | 202 / 180,523,008 |
-  | Immediately after the close | 101 / 90,261,504 (0.013 ms) |
-  | After the final reclaim | 0 / 0 |
-
-  The kept lease was not disturbed, is still active with one session, and
-  its re-run differs by 0. The closed lease ends with 0 sessions.
-- **Auditor.** `audit_remote_repair.py` extends the 2026-09-29 auditor with
-  the immediate-zero and second-lease requirements. It accepts receipt
-  `ccc247ba…` against the 2026-08-23 baseline `56820c09…`, and rejects all 11
-  planted faults: two weaker numerical results, three kinds of retained
-  allocation, a disturbed kept lease, changed kept values, a lost kept
-  session, a dirty receipt, a wrong head and an empty receipt. The receipt is
-  kept as
-  `ports/distillery/probe/receipts/2026-10-03_pre4_remote_minilm_repaired.json`.
-- **Injected failure.** The unit test
-  `server::session::teardown_tests::a_failed_teardown_sync_is_reported_and_never_acknowledged_clean`
-  passes: an unarmed session closes `Ok` and leaves the registry, while an
-  armed one fails with the injected error, stays registered, and fails a
-  later `close_session`. Mutant A (post-release wait removed) and mutant B
-  (failure discarded) each fail it; the restored source rebuilds and passes.
-- **Other suites.** burn-remote's full lib suite passes 29 of 29 at default
-  threading (twice) and its iroh tests 4 of 4. The fixture verifier passes
-  6 of 6. Distillery's four-feature all-targets check, its two lease tests,
-  Djinn's trainer check and `cargo_mode.py verify` pass. The tree is clean
-  afterwards.
-
-**Qualifications.**
-
-- With `--test-threads=1`, burn-remote's upstream
-  `tests::test_to_device_local_to_remote` fails. Its `Device::default()`
-  resolves to a remote at `127.0.0.1:3000` under the `remote-websocket` dev
-  feature, so it passes only while another test's server listens there. It
-  fails identically alone on the pre-repair source (from a `git archive` of
-  `f560c3b1`); this is not a repair result.
-- Restoring a source file's older mtime after a mutation defeats Cargo's
-  fingerprint and reruns the stale binary. The first mutant sequence's
-  restored step failed that way; it is kept under `attempt-1-stale-restore`
-  and is not counted. The repeat restores bytes with a fresh mtime. The same
-  trap applied to §13.30's diagnostic restoration; this lane's next fixture
-  edit forced the rebuild.
-- The standalone burn-remote lock is gitignored by the root `Cargo.lock`
-  rule. Its bytes (`c75388de…`) were unchanged by this work.
-
-**Downloads under ruling 378.** Ten archives for the standalone burn-remote
-lock, each checked against the lock's checksum, all matching: axum 0.8.9,
-axum-core 0.5.6, burn-communication 0.22.0-pre.4, js-sys 0.3.105, matchit
-0.8.4, ordered-float 4.6.0, serde_path_to_error 0.1.20, thread-tree 0.3.3,
-wasm-bindgen-futures 0.4.78, web-sys 0.3.105. No Git fetch.
-
-**Gate status.** S13 (c) passes on this branch. S13's (a)/(a') were
-resolved by ruling 410's selector retirement; (b), (d) and (e) passed at
-§13.30, and burn-remote is in none of their cones. Still open: S15 closure documents; S16 integration, which ruling 509
-also holds until the wasm constructors run once and the A/B shows it; and the
-Knot and Isometry handoffs. Evidence:
-`Code/testing/mere/receipts/2026-10-02/burn-pre4/repair` (gate and audit
-JSON, unit and mutant logs, fault controls, fetch record, development
-runs).
+**Whether the A/B shows it.** Question: pooled medians on a busy machine
+(other sessions up to 96% CPU): GPU off, fixed pre.4 12.2 ms against pre.2
+12.2 ms; GPU on, 21.2 ms against 15.2 ms, one vsync above, ranges
+overlapping (12.1 to 30.2 against 12.1 to 30.3), the profiles showing no
+pre.4 code; the 2,000-node settle 6.8 against 6.3 ms; P5's crossover still
+between 256 and 512 nodes. Options: accept that ruling 509's condition is
+met for graphshell-web; rerun the GPU-on boot A/B on a quieter machine
+before promotion. Mark: **"Rerun GPU-on quieter"**. *Follows:* promotion
+(S16) waits on a GPU-on A/B taken with the machine quiet. *Reading, not
+ruled:* "quiet" is shown by recording CPU load beside each repetition; the
+GPU-off result and the crossover stand.
