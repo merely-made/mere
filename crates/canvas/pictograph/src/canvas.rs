@@ -184,6 +184,11 @@ pub mod board_scene;
 /// The physics catalog over a scene's items that are not a graph: the
 /// remote board's physics. (Physics catalog — P3.)
 pub mod physics_board;
+/// The host's device for the canvas's and the board's repulsion (P5c).
+#[cfg(feature = "gpu")]
+pub mod physics_device;
+#[cfg(feature = "gpu")]
+pub use physics_device::{PhysicsDevice, physics_device_for};
 /// The physics catalog: the laws a graph can move under, the overlays composed
 /// onto them, and the named profiles. (Physics catalog — P1.)
 pub mod physics_catalog;
@@ -287,6 +292,9 @@ pub struct Canvas {
     /// off-thread armillary actor (native always-offload). The canvas never reads
     /// it directly; it feeds positions into `view` each frame.
     physics: Physics,
+    /// The host's device, when the repulsion is staged on it (P5c).
+    #[cfg(feature = "gpu")]
+    physics_device: Option<PhysicsDevice>,
     frame_timestamp: Option<std::time::Duration>,
     elapsed_step: Option<ElapsedStepReport>,
     /// Whether the layout physics is paused (the user froze the graph with Space /

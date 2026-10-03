@@ -1546,4 +1546,63 @@ impl Canvas {
     pub(crate) fn law_inputs(&self) -> LawInputs<'_> {
         LawInputs::new(&self.graph, &self.hidden_edges, None)
     }
+
+    /// [`Self::layout_stats`] without `stretch` (zero here), for graphs too
+    /// big for its all-pairs passes: overlaps by the same definition, found
+    /// through a uniform grid of diameter-wide cells, so the cost is linear.
+    pub fn layout_stats_without_stretch(&self) -> LayoutStats {
+        let positions: Vec<euclid::default::Point2D<f32>> =
+            self.view.positions().map(|(_, p)| p).collect();
+        let n = positions.len();
+        if n == 0 {
+            return LayoutStats {
+                energy: self.physics_energy(),
+                ..LayoutStats::default()
+            };
+        }
+        let centroid = positions
+            .iter()
+            .fold(euclid::default::Vector2D::<f32>::zero(), |acc, p| {
+                acc + p.to_vector()
+            })
+            / n as f32;
+        let spread = (positions
+            .iter()
+            .map(|p| (p.to_vector() - centroid).square_length())
+            .sum::<f32>()
+            / n as f32)
+            .sqrt();
+        let diameter = 2.0 * crate::canvas::NODE_HALF;
+        let cell_of = |p: &euclid::default::Point2D<f32>| {
+            (
+                (p.x / diameter).floor() as i64,
+                (p.y / diameter).floor() as i64,
+            )
+        };
+        let mut grid: HashMap<(i64, i64), Vec<usize>> = HashMap::new();
+        for (i, p) in positions.iter().enumerate() {
+            grid.entry(cell_of(p)).or_default().push(i);
+        }
+        let mut overlaps = 0;
+        for (i, p) in positions.iter().enumerate() {
+            let (cx, cy) = cell_of(p);
+            for dx in -1..=1 {
+                for dy in -1..=1 {
+                    for &j in grid.get(&(cx + dx, cy + dy)).into_iter().flatten() {
+                        if j > i && (positions[j] - *p).length() < diameter {
+                            overlaps += 1;
+                        }
+                    }
+                }
+            }
+        }
+        LayoutStats {
+            energy: self.physics_energy(),
+            spread,
+            overlaps,
+            stretch: 0.0,
+            // Mass against area is all-pairs as well: zero here.
+            ..LayoutStats::default()
+        }
+    }
 }
