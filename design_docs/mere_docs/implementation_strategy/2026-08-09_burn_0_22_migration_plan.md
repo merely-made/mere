@@ -1,5 +1,11 @@
 # Burn 0.22 Migration Plan
 
+**2026-10-03 S15 annotation:** the 2026-08-20 status below describes the pre.2
+row, including its "one `libsqlite3-sys` 0.38.2" sentence. On the pre.4 branch
+the root and graphshell-web locks hold no Turso and no SQLite of any kind,
+because ruling 375's patch removes `persistence` from `cubecl-runtime`'s
+defaults (§13.30). Current status is in the dated annotations that follow.
+
 **2026-10-03 main reconciliation and P5 gates (§13.30):** main `a924f380`
 and `f62581c7` are merged (`bcb57356`, `b73695da`), with conatus's P5 lanes
 adapted to pre.4. Root and web graphs hold one pre.4 family and no Turso.
@@ -3457,3 +3463,106 @@ before promotion. Mark: **"Rerun GPU-on quieter"**. *Follows:* promotion
 (S16) waits on a GPU-on A/B taken with the machine quiet. *Reading, not
 ruled:* "quiet" is shown by recording CPU load beside each repetition; the
 GPU-off result and the crossover stand.
+
+
+### 13.35 Ruling 536: the helper's home (2026-10-03)
+
+**Ruling 536** (Isometry wing record, `d10c32e`; its Source paragraph points
+here). Question, as put: ruling 532's shared helper needs a home that every
+pre.4 web module reaches. Today those modules are graphshell-web and
+Distillery's model probe; neither Isometry nor knot-editor has one. The Mere
+crates in both wasm graphs are `esp`, `eidetic` and `muniment`, none of which
+is about how a wasm module links. `cambium-genet-web-host` is the existing
+web-boundary crate. graphshell-web already depends on it, but the probe would
+gain about 159 packages (its graph is 273), and every future web module would
+need Cambium's web host. Options:
+
+- (A) a new zero-dependency crate at the web boundary (recommended);
+- (B) `cambium-genet-web-host`;
+- (C) `esp`, already in both graphs but with an unrelated job, and not how
+  graphshell-web gets CubeCL.
+
+Mark: **"cambium-genet-web-host"**. *Follows:* the helper lives in
+`cambium-genet-web-host`. graphshell-web calls it from its start function.
+Distillery's model probe takes `cambium-genet-web-host` as a dependency and
+gains a start function that calls it.
+
+**Finding, 2026-10-03: the probe cannot take the crate as it stands.**
+Resolution fails before any build. Evidence: a scratch export of `cc91e3e8`
+with only the probe dependency added, resolved offline (receipt
+`pre4-helper/probe-cgwh-resolve.stderr`):
+
+- The probe pins `wasm-bindgen = "=0.2.122"`. Its manifest records why:
+  0.2.123 and later turn a successful null `popErrorScope` result into an
+  object that wgpu 30's BrowserWebGpu treats as a GPU error (also §13.5).
+- `cambium-genet-web-host` and graphshell-web pin `=0.2.127` for wasm32.
+- Cargo allows one `wasm-bindgen` 0.2.x per graph, so "failed to select a
+  version for `wasm-bindgen`". The probe also pins `js-sys`, `web-sys` and
+  `wasm-bindgen-futures` to the 0.2.122 family.
+
+Ruling 536 stands; this finding changes how the probe can depend on the crate,
+and that comes back as a fork. Options:
+
+- (A) Keep the helper in `cambium-genet-web-host` and put the crate's browser
+  dependencies behind a default feature. The probe then depends on it with
+  `default-features = false` and takes only the dependency-free helper, so it
+  keeps 0.2.122 and gains no packages. Current consumers keep the defaults,
+  and their graphs are unchanged. This restructures that crate's manifest.
+- (B) Move the probe to the 0.2.127 family so it takes the whole crate. It
+  gains about 159 packages, and its browser rows must be re-proven against
+  the `popErrorScope` break its pin exists to avoid.
+- (C) The probe keeps a local start function, as graphshell-web had. No new
+  dependency, but a second copy of a stack capability, against this ruling's
+  Follows.
+
+Nothing for the helper has been written yet. graphshell-web keeps its local
+start function until this is settled.
+
+### 13.36 Main `0595fa84` and the S15 pass (2026-10-03)
+
+**Merge, `9f5a73f6`.** Main `0595fa84` brings dynamics grammar G1 (every
+seiche law and overlay declares its terms), the pairing connectedness work,
+two web physics scenarios and doc rulings. It changes no manifest, lock, ESP,
+patch or Distillery file. The only file both sides changed, `DOC_README.md`,
+equals a plain three-way merge. Both locks are byte-identical afterwards
+(root `114ab762…`, web `b002ad3d…`). `grammar-g2`, including ESP's
+`load_wgpu` device parameter, is not on main and was not taken.
+
+**Gates at `9f5a73f6`** (offline, locked, Rust 1.98.1, four jobs). The cone
+checker compares each selected graph with `6345c261`. It flags seiche's
+changed `gpu` cone as its positive control, finds ESP's BERT and Numen's WGPU
+cones unchanged (their receipts carry), and finds conatus (through its
+seiche dev cone) and Distillery (through `mere-transport`) changed, so those
+were rerun too.
+
+| Gate | Result |
+| --- | --- |
+| seiche release `gpu --test gpu_repulsion` | 3 pass, 1 timing ignored, 0 adapter skips |
+| seiche release `tensor-burn-wgpu`, force parity included | 121 pass, 1 ignored |
+| seiche `--lib` / `--no-default-features --lib` / `gpu --lib` | 102 / 98 / 102 |
+| pictograph `canvas --lib` / `gpu --lib --test physics_device` | 275 / 278 |
+| mere `graph,canvas-gpu` and graphshell `canvas-gpu` checks | pass |
+| conatus release resident, exclusion, resident_chunk | 14 pass, 2 ignored, 0 skips |
+| Distillery four-feature check; lease tests | pass; 2 pass |
+| two-peer lifecycle gate (§13.32's auditor) | exit 0 in 7.7 s; the auditor accepts and rejects all 11 planted faults |
+| `cargo_mode.py verify` | pass |
+
+The two-peer receipt reads zero active allocations immediately after both
+owner reclaims. The second-lease close returns to the kept lease's 101
+allocations, the final reclaim reaches zero, and every numerical block reads
+`1.4901161193847656e-7`. The tree was clean before and after. The quiet
+GPU-on A/B and the headed reruns wait for the helper (§13.35).
+
+**S15 documentation.**
+
+- The closure receipt gains a dated banner and a 2026-10-03 section with the
+  patch table and receipt index.
+- The feature/target matrix gains a pre.4 annotation, and ESP's manifest
+  comment names pre.4.
+- The `cubecl-runtime` and `burn-cubecl` notes record their current
+  selectors. The extrema README names pre.4 and its receipt.
+- Both upstream-issue drafts say they are not to be filed for pre.4 as they
+  stand, and that no communication is authorized.
+- This plan's header annotates the pre.2 SQLite sentence.
+- Main stays pre.2 until S16, which waits on ruling 534's quiet GPU-on A/B
+  and on the helper.
