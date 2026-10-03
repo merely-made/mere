@@ -1,7 +1,7 @@
 # Physics Catalog Plan
 
 **Date:** 2026-09-02
-**Status:** in progress (P1 landed 2026-09-02; P1b, P2 on both hosts and P3 the remote board 2026-09-03; the runtime extraction 2026-09-04; P4 web half 2026-09-04, closing with the Graphshell tree port per the 2026-10-01 rulings in §5).
+**Status:** in progress (P1 landed 2026-09-02; P1b, P2 on both hosts and P3 the remote board 2026-09-03; the runtime extraction 2026-09-04; P4 web half 2026-09-04, closing with the Graphshell tree port per the 2026-10-01 rulings in §5; P5a-c 2026-10-02: kernel, cell list, lagged seam, setters and the web tree at the third-round web defaults, receipts green, merged; then turnstone and P5d; P7 moved to the [dynamics grammar plan](2026-10-02_dynamics_grammar_plan.md) 2026-10-02).
 **Scope:** A catalog of *distinct physics layout laws* — dynamical systems
 over the graph's bodies that produce different layouts because they are
 different physics — as a lever beside the arrangement catalog, plus the
@@ -521,6 +521,56 @@ pull reading −0.33 with 510 overlaps):
   gen-50; the 200-node receipt asserts at least 0.7 with its plateau
   recorded, revisited with P6b's 512² GPU grid. The alternatives were
   searching for other defaults, or changing the law.
+- **Density's stop, reopened (2026-10-02, fourth round, `65ff1b11`).** The
+  shift stop, recommended in the third round, ends the flow on a dip: the
+  rank wanders pass to pass (sample 0.84 at pass 3, 0.745 at 15 to 30, 0.877
+  at 60 to 90), so at that stop gen-50 read 0.786 against its 0.8 bar and the
+  headed fixtures 0.71 (tree) and 0.53 (old page). Under the 120-pass cap
+  every bar was met. Mark chose "Change the law": reduce the wander itself so
+  any stop reads true. The alternatives were the cap alone, keeping the shift
+  stop with a wider plateau bar, or a stricter shift. *Reading, not ruled:*
+  the lane measures the wander's cause and brings formulations back as
+  options with numbers; the shift stop stays the default meanwhile.
+- **Density's stop, fifth and sixth rounds (2026-10-03, `density-cpu`
+  `824ac8cb`, `76623e15`).** The wander's measured causes: rapier adds
+  nothing after pass 1; on 200 nodes the 64² grid moves every node about 0.05
+  spacings a pass without decay. Five formulations were prototyped, all off
+  by default. Continuous renewal at 2 spacings first looked best (gen-50 at
+  0.8 on "8 of 8" starts), but those eight starts were quarter-turn copies of
+  two, and every earlier probe and receipt seeded the spiral in key order,
+  which puts the highest-degree nodes at the centre. Over 16 inequivalent
+  dealt starts the rank where the ruled stop lands is: base passes 0.722
+  (gen-50) and 0.754 (200 nodes), renewal 0.736 and 0.768. The stop fires
+  early: gen-50 stops at pass 6 reading 0.64 to 0.78, and the 120-pass cap
+  reads 0.82 to 0.86 on all 4 dealt starts tried; on 200 nodes the stop reads
+  0.73 to 0.80 and the cap 0.78 to 0.82. The 12-node sample's rest depends on
+  its start (0.35 to 0.86 at the cap over 8 starts, mean 0.66, 2 of 8 at
+  0.8). An axis-aligned seed meets cell-centred splat cells and shifts the
+  stop's timing (200 nodes: 0° 0.737 at pass 18 against 0.79 to 0.81 at
+  passes 32 to 53 for other turns), small beside the start's own effect.
+  Asked what changes, Mark chose **"Later stop, measured"**: the passes stay,
+  and a lane compares a stricter shift (0.01 to 0.02 for 3 passes) and a
+  minimum pass count against the 120-pass cap over 16 dealt starts and brings
+  the cheapest that meets the bars. The alternatives were always running to
+  the cap, renewal anyway, or keeping the stop with lower bars. This amends
+  the fourth round's "Change the law", whose premise (a wander the law must
+  lose) the dealt starts did not bear out. Asked what the 0.8 bar means on
+  small graphs, Mark chose **"0.8 from 50 nodes up"**: the rank bar applies
+  from 50 nodes, and the sample and the headed fixture receipts check the
+  flow qualitatively (rank rises above the seed's, CV falls), recording
+  per-start values. The alternatives were a mean over a fixed set of dealt
+  starts, or one pinned start per receipt. *Reading, not ruled:* receipts
+  move from the key-order seed to dealt starts; the decay, quench,
+  wall-inset, relax and renewal knobs leave the code once the stop lands,
+  with their evidence kept in the logs.
+- **P5's web defaults, undercut by pre.4 (2026-10-03).** On `burn-pre4-repin`
+  the web page's frames take 557 ms against pre.2's 12.1 ms, GPU on or off,
+  because the wasm module re-runs its static constructors (pliron's
+  `inventory` registrations, which pre.4's `cubecl-core` pulls in) on every
+  call into wasm. "Web N = 9, web threshold 400" was ruled on pre.2's frame
+  times, so the crossover is re-measured once the constructors run once
+  (burn migration plan, the pre.4 rulings of 2026-10-03). Main stays on pre.2
+  until then; native is unaffected.
 
 *Done when:* GPU and CPU forces agree to 1e-3 relative at 1k and 10k nodes;
 a sign-flipped kernel fails the overlap check (positive control); a forced
@@ -667,6 +717,16 @@ separation; a weighted mix of two force laws at common scale matches each
 pure law at weights 1/0 and 0/1; a sequenced blend reproduces the captured
 anchor layout within a stated tolerance; compositions save and reopen with
 the scene; and the eleven law receipts plus Density's stay green.
+*Closed here, 2026-10-02: moved to the
+[dynamics grammar plan](2026-10-02_dynamics_grammar_plan.md) as its tracks*,
+per F2 ("P7 moves into the grammar plan"). The text above stays as history.
+The grammar plan carries it:
+- P7a's currency declarations go to G1, their enforcement to G3, and its
+  `PhysicsChoice` fields and affinity toggle to G4;
+- P7b becomes G2;
+- P7c, P7d and P7e become G3's Groups, weighted sum and Schedule;
+- each done-condition above goes to the track that carries its part.
+P5 and P6 stay in this plan.
 
 ## 4. Findings
 
@@ -807,6 +867,133 @@ the scene; and the eleven law receipts plus Density's stay green.
   other lane (`7f4bb8c7` → `ca47d6ef`, and P1/P1b likewise); the plan's
   earlier hashes name commits that no longer exist on main. Subjects are
   the durable handle.
+- 2026-10-02 (P5a): the tiled all-pairs kernel (`conatus::resident::kernels::exclude`)
+  matches `node_exclusion_reference` at a worst per-body relative error of
+  2.9e-6 (n = 1,000) and 1.2e-5 (n = 10,000), mean 1.6e-7 and 1.8e-7, on a
+  scatter at settled density (one body per 140² px, a twin every twentieth body
+  inside the floor, most pairs past the cutoff). RTX 4060 Laptop, Vulkan.
+- 2026-10-02 (P5a): cost per call on that machine, upload + dispatch +
+  blocking readback against the single-threaded CPU law: 500 nodes 0.69 vs
+  1.61 ms; 1,000 0.60 vs 7.35; 2,000 1.24 vs 18.3; 5,000 1.02 vs 77; 10,000
+  1.58 vs 212; 20,000 3.15 vs 679; 50,000 10.1 vs 3,035. Tiled all-pairs alone
+  stays under a frame to 50,000 here; the cell list is a large-n and
+  weak-device matter, not a 10,000-node one.
+- 2026-10-02 (P5a): CubeCL's readback is `ComputeClient::read_async`, a future
+  that is safe to poll with a no-op waker: on native CubeCL's own poll thread
+  drives the map (`cubecl-wgpu` `compute/poll.rs`), in a browser the event loop
+  does, so a result is ready no earlier than the next JS turn. The blocking
+  `read_one` the resident lane uses goes through `read_sync` and is native-only.
+  `init_device` from a host's `WgpuSetup` is synchronous on wasm as well; the
+  async setup path (`init_setup_async`) is only for a device CubeCL boots.
+- 2026-10-02 (P5a): `conatus --features resident` checks for
+  `wasm32-unknown-unknown` (burn and rapier3d included). A release wasm probe
+  that links the exclusion lane through `ResidentClient` is 2,580,991 bytes; the
+  same lane on bare CubeCL is 2,544,749, so Burn is dead-stripped and costs
+  build time, not bundle. The graphshell-web graph carries no CubeCL, Burn or
+  rapier3d today; its dev bundle was about 72 MB on 2026-09-08.
+- 2026-10-02 (P5a): the positive control needs a fixture the CPU law does not
+  overlap on its own. A ring seeded by golden angle tangles (482 overlapping
+  pairs under the CPU law) and a spring lattice buckles (1-5); unlinked bodies
+  under exclusion and the boundary settle with none, and the sign-flipped
+  kernel then leaves 520-544.
+- 2026-10-02 (P5b): with one submission in flight, an answer that takes d
+  steps to arrive is d to 2d-1 steps old while it serves, so N = 3 on the web
+  tree's three-step frames would still put one step in three on the GPU. The
+  lane keeps up to N submissions in flight, answered in order; every web step
+  submits and the first step of a frame gets an answer one step old. Cost: up
+  to N device calls a frame. This is how the ruled "newest result for up to N
+  steps" is met, not a change to it.
+- 2026-10-02 (P5b): CubeCL's poll thread delivers map callbacks late to a
+  caller that sleeps between looks: submit-to-ready was 14 ms at the median
+  (p90 25-27 ms) against 1 ms for a spinning caller. A non-blocking
+  `device.poll(Poll)` on the host's device before each look
+  (`ResidentClient::poll_device`) brings it to the second look, about 2 ms.
+  Without it a 60 Hz loop got 131 of 600 steps on the device at 200 nodes.
+- 2026-10-02 (P5b): dropping a CubeCL read before it finishes releases its
+  staging buffer while mapped, and the next submit that reuses it fails wgpu
+  validation ("Buffer ... is still mapped"). A law switch, a rebuilt
+  simulation or a closed canvas drops in-flight answers, so a dropped
+  `PendingExclusion` is now adopted by its `ResidentClient` and polled to the
+  end. The receipt fails with the adoption disabled.
+- 2026-10-02 (P5b): an unpaced native loop (ticks back to back) outruns the
+  readback even with the poll: 200 of 600 steps on the device at 2,000 nodes
+  before the poll fix. A native actor paces at 60 Hz, so the receipts pace too.
+- 2026-10-02 (P5b): two CPU-only `Simulation`s with the same seed are not
+  bit-identical; `NodeExclusion` sums over `bodies_by_node`, a `HashMap` whose
+  order is per instance, so positions differ in the sixth significant digit.
+  The refused-device receipt compares against the CPU-to-CPU spread.
+- 2026-10-02 (P5b, native, F6): lagged-mode busy time per tick at 60 Hz,
+  CPU law / device lane, in ms: 100 0.06 / 1.04; 200 0.23 / 1.02; 300 0.66 /
+  1.09; 500 1.73 / 1.12; 750 3.74 / 1.98; 1,000 5.67 / 1.39; 2,000 15.2 /
+  3.25; 5,000 66.7 / 3.67; 10,000 191 / 6.76. The device lane has about 1 ms
+  of fixed cost a tick; the crossover on this machine is about 400 nodes.
+- 2026-10-02 (P5c, web): Chrome answers a readback about two frames after the
+  submit whatever the frame's length: the newest answer was 6 steps old at
+  every size from 128 to 2,000 nodes (three steps a frame, frames 78 ms to
+  2 s). At the ruled N = 3 the lane served 1 to 15 steps in 139 to 418; at
+  N = 9 it served all but the first five. Physics stage per frame (p50,
+  unlinked bodies), CPU / N = 3 / N = 9, in ms: 128 0.3 / 1.2 / 1.3; 256
+  1.1 / 1.8 / 3.1; 512 4.5 / 4.0 / 1.5; 1,000 16.1 / 17.8 / 2.1; 2,000
+  81.9 / 94.3 / 6.1. So at N = 3 the device never wins on the web and at
+  N = 9 it wins from about 400 nodes. Put to Mark (the web N and threshold).
+- 2026-10-02 (P5c, web): `cubecl-wgpu` 0.11.0-pre.2 turns on wgpu's
+  `fragile-send-sync-non-atomic-wasm` unconditionally; feature unification
+  puts it on the page's one wgpu, which then requires a `Send` callback for
+  every wasm `map_async`. Three readbacks captured `Rc<Cell<bool>>`:
+  `ports/graphshell/src/web_gpu.rs` and `web_timing.rs` (now
+  `Arc<AtomicBool>`) and `crates/cambium/cambium-genet-web-host/src/capture.rs`,
+  outside this lane's crates (the same change, uncommitted, put to Mark).
+- 2026-10-02 (P5c, web): a generated graph with links packs into a jammed ball
+  under Springs (its random long edges pull inward): at 2,000 nodes the CPU
+  run itself ended with 11,733 overlapping pairs and spread 323, and the end
+  energy varied 53k to 767k between runs differing by a handful of steps. The
+  spanning tree alone did the same (9,829 overlaps). The settle receipt uses
+  `links=none`, unlinked bodies, where Springs is exclusion and the boundary.
+- 2026-10-02 (P5c, web): the headed runs found the receipt window occluded
+  (`visibilityState` hidden, no frames); this lane's runner copy adds Chrome's
+  `CalculateNativeWinOcclusion` disable and the two backgrounding switches.
+- 2026-10-02: `~/.cargo/registry/cache` was emptied and recreated at 18:00
+  by another process (not this lane); offline web builds then failed for
+  missing `.crate` files although the extracted sources remained. This lane
+  re-fetched the web graph's locked crates (`cargo fetch --locked`, 772
+  crates, lock unchanged).
+- 2026-10-02 (pre-existing, seiche runtime): an offloaded simulation under a
+  law that never rests holds a `u32::MAX` settle budget, and the actor exits
+  on a closed channel only when the budget reaches zero, so dropping such a
+  canvas leaves its actor thread ticking. Seen as device answers counted by a
+  dropped canvas's actor in the offload receipt (`seiche/src/runtime.rs`,
+  `run`: it returns on a closed channel only `if disconnected &&
+  ticks_remaining == 0`). Not fixed here.
+- 2026-10-02 (P5c): conatus asks for `cubecl = "0.11.0-pre.2"` (and Burn
+  `0.22.0-pre.2`) as caret requirements, which admit later pre-releases of
+  the same version. The root lock holds pre.2; graphshell-web's lock is
+  ignored by convention, so a fresh resolution of it takes the newest
+  pre-release it can reach. A clean export of the branch resolved pre.2
+  offline only because this machine's cache held no other; online it would
+  likely take pre.4, and the root's pre.2 `cubecl-runtime` patch (the wasm
+  fix) would go unused. Pinning `=` in conatus, or recording the web lock,
+  closes it; open for Mark. *Ruled 2026-10-02:* asked first, Mark replied
+  "Wait. Those should be bumped, no?"; told that pre.4 was published
+  2026-09-22 and that branch `burn-pre4-repin` (23 commits ahead of main, last
+  2026-09-30) holds the migration with ruling 411's allocator diagnosis open,
+  he chose "Finish pre.4 now, no interim pin": a lane takes the pre.4
+  migration to its gates and merge, and main is not exact-pinned meanwhile.
+  The alternatives were an interim `=` pin while the migration finished, or
+  bumping conatus alone.
+- 2026-10-02: a cargo run without `--locked` re-serializes the root lock,
+  swapping the order of the two genet revisions' `fleece` and
+  `layout-dom-api` rows; the committed lock passes `--locked` as it stands, so
+  lane commands run locked.
+- 2026-10-02 (dynamics grammar G1, F10): the 2026-09-02 finding that Kinds
+  never rests holds. On the P2 fixture under continuous ticking its kinetic
+  energy is about 18 300 at 6 s and 140 500 at 30 s, against the floor of 1,
+  and Kinds joined `PhysicsLaw::never_rests`. The receipts' Play preamble
+  had already kept every law ticking, since a settle keeps the larger budget
+  (the [dynamics grammar plan](2026-10-02_dynamics_grammar_plan.md),
+  Findings).
+- 2026-10-02 (dynamics grammar G1, F7): the laws table's Energy row ("LinLog /
+  ForceAtlas2") describes ForceAtlas2's (1, −1) force model; LinLog proper is
+  the law's attraction exponent 0, a tuning, and the id stays `energy.linlog`.
 
 ## 5. Decisions
 
@@ -1088,3 +1275,97 @@ binning are the useful patterns.
   without the fix and passes with it. The tree drag receipt now passes three
   runs in a row
   ([one-tree plan](2026-09-25_graphshell_one_tree_plan.md) §6).
+- 2026-10-02: the dynamics grammar brief was written and its ten forks
+  ruled (§3, P7). P7 moved to the
+  [dynamics grammar plan](2026-10-02_dynamics_grammar_plan.md) as its
+  tracks G1 to G6 (F2), and P7's text here is kept as history.
+- 2026-10-02 (P5a, branch `gpu-repulsion`): the tiled half of the kernel
+  landed. `kernels::exclude` is `NodeExclusion`'s law (inverse square, hard
+  floor, cutoff) over every pair through shared-memory tiles;
+  `conatus::resident::Exclusion` uploads padded positions, launches it and
+  returns a `PendingExclusion` whose `try_take` never blocks (`wait` is the
+  native-only blocking form for tests). Receipts in `conatus/tests/exclusion.rs`:
+  agreement at 1k and 10k (Findings), and the positive control, where 200
+  unlinked bodies settle with 0 overlaps on the CPU and on the device (600 of
+  600 ticks dispatched, spread 623.0 both) and 520-544 overlaps with the
+  strength's sign flipped on the device side. The existing resident receipts
+  stay green (4/4). Logs: `Code/testing/mere/gpu-repulsion/`. Not built: the
+  cell list, the lagged seam (P5b) and the host wiring (P5c), which wait on the
+  forks put to Mark the same day.
+- 2026-10-02 (P5a, after the rulings): the cell list landed. Nexus's binning
+  is ported by hand to CubeCL in `conatus::resident::binning` (Apache-2.0, a
+  retained-license row in `LICENSES.md`): a count pass, the Blelloch exclusive
+  scan with its auxiliary levels, the cursor copy and the atomic-slot scatter,
+  over a dense grid of cells a hair wider than the cutoff whose bounds the host
+  takes from the positions it uploads. `kernels::exclude_cells` (ours) walks
+  the three-by-three block around each body. `Exclusion` takes the cells at or
+  above `DEFAULT_CELL_THRESHOLD` (4,096, settable) unless the grid would
+  exceed four cells a body, when it stays on every pair. Receipts: the scan
+  is exact at 1, 255, 256, 257, 4,097 and 70,001 elements (three levels); both
+  passes agree with the CPU law at 1k, 10k and 50k (cells worst 1.7e-5,
+  5.4e-5, 9.0e-5; pairs 2.9e-6, 1.2e-5, 1.8e-5); the positive control holds on
+  both (0 overlaps against 541-544 sign-flipped); a four-body layout a
+  million units wide stays on every pair. Cost per call, pairs / cells / CPU
+  in ms: 2,000 0.69 / 0.75 / 14.7; 4,096 0.87 / 0.79 / 43.6; 10,000 1.38 /
+  0.93 / 159; 50,000 10.5 / 3.9 / 2,302; 100,000 57.7 / 7.5 / not run. So the
+  4,096 default is this machine's measured crossover.
+- 2026-10-02 (P5b): the lagged seam landed in seiche. `LaggedRepulsion`
+  (submit / poll / in-flight count) sits beside the synchronous closure;
+  `LaggedLane` holds the bookkeeping (body order and step per submission, the
+  newest answer, the limit N, and `LaggedStats`: device steps, CPU steps,
+  submissions, failures, mismatches); `ForceContext` carries one `repulsion`
+  field and the step clock; `NodeExclusion` uses the lane and runs its CPU law
+  whenever the lane returns nothing. `Simulation::set_lagged_repulsion` and
+  `repulsion_stats`, `PhysicsCommand::SetLaggedRepulsion` and
+  `Physics::set_lagged_repulsion` reach inline and offloaded simulations. The
+  `gpu` feature (`conatus[resident]`) adds `seiche::gpu::PhysicsDevice` (one
+  CubeCL client per host device, cloned; threshold, N and the cell threshold
+  ride on it; shared counters readable across an actor) and
+  `DeviceRepulsion`. Receipts: six seam tests on timed mock evaluators (an
+  answer applies from the next step; N = 1 refuses a three-step-old answer and
+  N = 3 takes it; a refused device stays on the CPU path; failed answers are
+  counted and covered; a changed body set discards its answer; lagged forces
+  reach the bodies and respect the threshold), and three on the device: a
+  2,000-node settle at threshold 0 meets the CPU's bounds (0 overlaps, spread
+  1511.1 against 1511.2, energy within 0.1%) with 591 of 600 steps on the
+  device at 2.86 ms busy a tick against 14.5; the sign-flipped device law
+  leaves 536 overlaps; a device lost after 100 submissions hands every later
+  step to the CPU with the CPU's spread. seiche 96/96 (92 without `actor`).
+- 2026-10-02 (P5c): the hosts. Pictograph feature `gpu` adds
+  `Canvas::set_physics_device` and `PhysicsBoard::set_physics_device` (a
+  device set before `offload_physics` rides the simulation onto the actor,
+  one set after arrives by command; a law switch keeps the lane) and
+  `physics_device_for(&WgpuHandles)`; mere gains `canvas-gpu` (pictograph
+  `gpu`, opt-in, per the F5 ruling), graphshell gains `canvas-gpu`
+  (`RemoteBoard::set_physics_device`), and graphshell-web turns both on. The
+  web tree builds one device from `ProducerContext.core`'s handles on the
+  producer's first frame and hands it to the canvas and the remote board;
+  `gpu=off`, `gpu_threshold` and `gpu_max_stale_steps` are page options; the
+  tree snapshot gains `physics-device` and the lane's counts; `log-physics`
+  writes them into the receipt; past 512 nodes spread and overlaps come from
+  `Canvas::layout_stats_without_stretch` (a grid, same definition).
+  Receipts, bundle `89b75bb4`: the eleven law receipts plus profiles, add and
+  drag green at the default threshold, and the eleven again at threshold 0
+  with the device asserted on (the eight `NodeExclusion` laws served 99 to 447
+  steps on the device; log `Code/testing/mere/gpu-repulsion/diagnostics/law-receipts-threshold-0-bundle-89b75bb4.log`). `p5_tree_cpu_settle_2000` (2,000 unlinked nodes) and
+  `p5_tree_gpu_settle_2000` meet the same bounds (0 overlaps, spread 1,071
+  against 1,074, energy 441k against 426k) with 413 of 418 steps on the device
+  at N = 9 and the physics stage at 6.1 ms a frame against 81.9; at the ruled
+  N = 3 the device served 9 steps and the receipt fails its count. pictograph
+  3/3 device receipts. The web threshold default is left at 1,000 and N at 3
+  pending Mark's call on the readback finding above; the native crossover
+  (about 400, N = 1) is turnstone's to set when it is wired.
+- 2026-10-02 (P5c, third round): Mark's rulings carried out. The
+  `capture.rs` flag committed by pathspec (`af7d2b5f`; cambium-genet-web-host
+  8/8). Main merged (`c4097a1e`): its genet repin (`b1eb3af` to `bd3e8861`)
+  moved 19 genet packages in the web lock, one genet revision in the graph,
+  the CubeCL and Burn family still pre.2 (lock SHA256 `a915fa23...`, copied
+  to `Code/testing/mere/gpu-repulsion/web-Cargo.lock`). The web defaults are
+  N = 9 and threshold 400 (`13910c40`), and `p5_tree_gpu_settle_2000` runs
+  at them with no `gpu_*` options. Receipts on bundle `3a82eca7`: the eleven
+  law receipts plus profiles, add and drag green at the defaults; the
+  2,000-node settle green, 413 of 418 steps on the device, physics 4.9 ms a
+  frame, spread 1,075, no overlaps, energy 425k; its CPU twin green, 89.3 ms,
+  spread 1,071, energy 441k. A `git archive` export of `13910c40` builds for
+  wasm offline both with a freshly generated web lock (4 m 06 s; the CubeCL
+  family resolved to pre.2, see Findings) and with the recorded lock.

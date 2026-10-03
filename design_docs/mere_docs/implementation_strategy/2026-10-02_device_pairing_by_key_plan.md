@@ -1,11 +1,15 @@
 # Device Pairing by Key Plan
 
 **Date**: 2026-10-02
-**Status (2026-10-02)**: in progress. Assessed and ruled by Mark on 2026-10-01
-and 2026-10-02 (rulings 1 to 31 below). D1 landed (`4963b489`); D1b's mere fix (M1)
-landed (`177b927c`), its fork fix (F1) is being released as
-`mere-p2panda-net-0.7.5` with knot and mere repinned, and `connected` is
-being fixed; then D2.
+**Status (2026-10-03)**: in progress. Assessed and ruled by Mark from 2026-10-01
+to 2026-10-03 (rulings 1 to 47 below). D1 landed (`4963b489`); D1b's mere fix (M1)
+landed (`177b927c`), its fork fix (F1) is released as
+`mere-p2panda-net-0.7.5` (`1bec457e`, pushed), with knot and mere repinned
+locally; `connected` follows the gossip overlay (ruling 31, landed
+`fdb02bd3`). Before knot's and mere's pushes, the release branch takes
+`main` and connection-event liveness is built for peers off the overlay
+(rulings 45, 47); the overlay's gap after restarts has its own lane (ruling
+36); then D2.
 **Scope**: Mark's machines find, reach and trust each other by device
 identity, not by address: the stack's own peers already do on one network;
 SSH, the path Mark uses daily, does not. Pairing a device becomes one
@@ -282,6 +286,170 @@ decides while the overlay is up (Recommended)"**. Follows: for a peer on the
 overlay, the gossip neighbour state is authoritative; iroh's path counts
 only for peers not on it. Amends ruling 22.
 
+**Ruling 32.** *Which meaning of "on the overlay" for ruling 31?* Options:
+subscribed (this node has subscribed to the topic, read exactly from the
+address book's self record); joined (from gossip's `Joined` to `Left`, not
+readable through the fork's API); per peer (gossip-authoritative once the
+peer has been a neighbour since this node joined). Mark: **"Subscribed
+(Recommended)"**. Follows: before the first neighbour comes up, every peer
+reads not connected; a device reachable only over a later SSH channel would
+too.
+
+**Ruling 33.** *GitHub's fork `main` had moved to `94947fd1` (Mark's
+2026-09-28 sync merge of upstream, adding no files beyond the release's own
+tree), so the release would not fast-forward. How should it sit?* Options:
+rebuild the release on top; merge on top of the release; push only the tag.
+Mark: **"Rebuild the release on top (Recommended)"**.
+
+**Ruling 34.** *Signalman's own workspace resolves `p2panda-core` from
+crates.io 0.7.1, where the audited CBOR split cannot compile. Which?*
+Options: patch it onto the fork tag; leave it on crates.io 0.7.1. Mark:
+**"Patch it onto the fork tag (Recommended)"**. Follows: a `[patch.crates-io]`
+row in `ports/signalman`; its graph drops the dalek-2 family (287 to 278
+packages, measured). A desktop workspace outside mere that patches retinue
+will need the same row. *Superseded by ruling 35.*
+
+**Ruling 35.** *Mark asked "why not just align signalman with the rest of
+the stack?" Make it a member of mere's workspace?* The evidence: mere's root
+excluded it because "it consumes the neighboring Retinue checkout", but its
+Retinue dependencies are now git pins (rev `6af5c0ff`), and Retinue at that
+rev names no mere package, so joining creates no second lockstep. Options:
+join mere's workspace; keep ruling 34's patch row. Mark: **"Join mere's
+workspace (Recommended)"**. Follows: signalman drops its empty `[workspace]`
+table and its exclude entry, inherits the root patch table and lock, and is
+covered by the portable gate and every compiler census (insigne's phase A
+missed it as a nested workspace); mere's lock gains Retinue's crates at that
+rev. *Amended by ruling 42:* the root already pinned `retinue` at a newer
+rev, which this evidence missed.
+
+**Ruling 36.** *After a crash-restart the restarted resident gets no gossip
+neighbour (12 of 12 runs, the same on `main` and on ruling 31's branch; §6):
+the surviving side's iroh-gossip can hold a stale pending neighbour request
+and never answers the restarted side's `Join`, whichever restart comes
+second. Data from the restarted side reaches the survivor 17 to 113 s late,
+through LogSync retries; `main`'s directory reads connected meanwhile, ruling
+31's reads not connected. What now?* Options: keep ruling 31, merge it now,
+and fix the overlay in its own lane; keep ruling 31 and hold it until the
+fix; loosen D1b's check; revisit ruling 31. Mark: **"Keep 31, merge now, fix
+lane (Recommended)"**. Follows: ruling 31 merges onto `main` with D1b's
+receipt failing at its second restart, recorded as expected until the
+overlay fix; that lane assesses where the fix lives (an iroh-gossip patch,
+the p2panda fork, or a rejoin in mere-transport) and brings it to Mark.
+
+**Ruling 37.** *The simultaneous-dial control passes 8 of 8 run alone but
+failed 1 of 10 parallel suites (no trip in 16 pairs), and suites take 11 to
+202 s, mostly in it. How should it run?* Options: ignore it in the default
+suite and run it alone; raise the pair budget; leave it. Mark: **"Raise the
+pair budget"**. Follows: it stays in the default suite. *Reading, not ruled:*
+the new budget is set from trips measured in parallel suites, recorded with
+the change.
+
+**Ruling 38.** *Beyond ruling 30's wording, the one-way tests now have the
+receiver subscribe before the dialler joins: iroh-gossip drops a `Join` for a
+topic the receiver has not subscribed to (`proto/state.rs:247-275`) and
+nothing retries it. Keep that order?* Options: keep receiver-first; revert.
+Mark: **"Keep Bob-first (Recommended)"**.
+
+**Ruling 39.** *A peer on the overlay with no gossip neighbour, while iroh
+still marks a path active, reads "not connected (a path is still marked
+active)" on the resident card and in `djinn-devices`. Keep that wording?*
+Options: keep it; plain "not connected"; name the overlay ("something like
+not connected (no gossip neighbour; a path is still active)"). Mark: **"Name
+the overlay"**. Follows: that wording, on both.
+
+**Ruling 40.** *On the release stack (iroh 1.3.0), D1's stopped-peer control
+fails at its 120 s limit: with 600 s, a killed peer read connected for
+199.5 s, against 73.5 s on iroh 1.2, `main`'s `connected` being iroh's path
+alone. How should the pushes proceed?* Options: land ruling 31 first, rerun
+on the merged stack, then push knot, mere and knot's repin back to back;
+raise D1's patience and push now; look into iroh 1.3 first. Mark: **"Look
+into iroh 1.3 first"**. Follows: no knot or mere push until it is known why
+iroh 1.3.0 holds a dead path longer; peers that are not subscribed still go
+by iroh's path under ruling 31. *2026-10-03, relayed by another session (the
+physics session), which asked Mark whether this hold covered its own
+unrelated mere push:* Mark: **"Push, then tell pairing"**. *That session's
+reading, not ruled:* the hold covers only the 0.7.5 repin's pushes.
+
+**Ruling 41.** *Knot's `main` moved 8 commits (Collapse, a new
+`knot-composition`, mere `c6707958`, genet `b1eb3af1`) and merges into the
+release branch without conflict. Which knot commit does mere pin?* Options:
+`562353aa`, the verified repin (Knot `3dfb70b`, 30 commits past mere's
+current pin `855cb75d`, plus the p2panda move); Knot's merge commit. Mark:
+**"562353aa (Recommended)"**. Follows: Knot's eight newer commits reach mere
+at its next ordinary knot repin. Step (c) moves Knot's genet to mere's
+`bd3e8861`, which descends from Knot's `b1eb3af1` (checked).
+
+**Ruling 42.** *With signalman joined, mere's lock holds two copies of
+retinue 0.1.1: signalman's four Retinue crates at `6af5c0ff` and the root's
+`retinue` at `85e716c7`, 61 commits newer (mere-transport's optional mesh
+feature). At `85e716c7` the four crates exist at the same versions and none
+names a mere package. Which?* Options: move signalman to `85e716c7`, with
+`retinue` through `workspace = true`; keep both. Mark: **"Move signalman to
+85e716c7 (Recommended)"**. Follows: one Retinue in mere; any code change the
+61 commits need comes back as a fork.
+
+**Ruling 43.** *Mark's local `crates/p2panda` was clean on `main` at
+`0a54ab82`, behind GitHub's `1bec457e`. Bring it up to date?* Options:
+fast-forward it; leave it. Mark: **"Fast-forward it (Recommended)"**. Done
+2026-10-03 with `--ff-only`; clean afterwards.
+
+**Ruling 44.** *Ruling 42's target was gone: another session's merge on
+`main` (`f62581c7`) moved the root's `retinue` and signalman's four Retinue
+rows to 0.2.0 at `fa4f925`, so mere already had one Retinue, while signalman
+still named that rev in its own rows and each Retinue repin edits two
+manifests. When signalman joins the workspace (ruling 35), how does it
+follow the root?* Options: through `workspace = true`, with outrider,
+postilion and radio-hand in the root's table; keep signalman's own rows.
+Mark: **"Through workspace = true (Recommended)"**. Follows: amends ruling
+42, whose `85e716c7` target is superseded by the root's `fa4f925`. The
+release branch's `b7913620`, made to ruling 42 before `main` moved, is
+superseded by a forward change when `main` merges in, not dropped.
+
+**Ruling 45.** *Ruling 40's investigation found iroh 1.3 no slower than 1.2:
+a killed peer reads connected for 71 to 90 s on a quiet machine on every
+stack, and 100 to 312 s under build load on both, the 199.5 s being one such
+run. The cause is the same in both: iroh keeps a closed connection's paths
+Active until the peer's remote actor idles out, 60 s after its last queued
+message, and mere's own `remote_info` polls (406 in 70 s) keep resetting
+that timer. Ruling 31 sidesteps it for overlay peers: on that day's merge,
+D1's stopped peer read not connected after 10.45 s. How do the pushes
+proceed?* Options: accept 1.3 and push after D1 passes on the repin with
+ruling 31 merged; patch iroh too; raise D1's patience. Mark: **"Accept 1.3;
+push after D1 (Recommended)"**. Follows: the release branch merges `main`
+(with ruling 31) and reruns D1, D1b and the gate; knot, mere and knot's
+repin then go back to back, each with Mark's OK. Ruling 47 adds a lane
+before them.
+
+**Ruling 46.** *Should iroh hear about the `remote_info` finding? (Ruling 21
+kept p2panda changes from upstream for now; iroh had not come up.)* Options:
+draft an issue for Mark's review; not now. Mark: **"Hmm. Burn, p2panda, and
+iroh are key dependencies developing hard. They may appreciate a heads up in
+the form of an issue. But they likely get a lot, and I would hate to be part
+of overwhelming them. That’s a big problem for open source developers today:
+tons and tons of good faith issues and prs that strike like a cholesterol
+glut in a project’s heart. So that’s part of my reluctance. Plus every issue
+is so dry and technical… i would just not write them like that unless I knew
+they were using LLMs to analyze the issue anyway (like prns). Keep note of
+these issues for a review later. If a (pre)release of any of the three goes
+by without the issue being addressed, it is then worth bringing up in a
+chill way that does not demand full mental bandwidth from stressed
+developers (i.e. describing the issue and why it matters in plain english,
+with a few key technical points as necessary)."** Follows: the [upstream
+candidates ledger](../research/2026-10-03_upstream_candidates_ledger.md)
+holds the items (eight at opening). Each is checked again when its project's
+release lands in a repin, and goes to Mark as a plain-English note only
+after a release passes it by; nothing is posted without his read.
+
+**Ruling 47.** *Peers not on a gossip overlay still read iroh's path under
+ruling 31, so a killed one reads connected for 60 s or more, extended by our
+own polls; D3 (SSH by key) is the first such case, dialling a device on its
+own ALPN. A mere-side fix would track liveness from iroh's connection events
+instead of path usage. When?* Options: decide at D3; fold into the overlay
+lane; build it now (a lane for it before the pushes). Mark: **"Build it
+now"**. Follows: a lane assesses and builds connection-event liveness for
+peers off the overlay before knot's and mere's pushes, its design forks
+coming to Mark.
+
 Also given in the same conversation (2026-10-01, Mark: "You can edit known
 hosts"): `known_hosts` entries may be updated, which was done for the
 ThinkPad (`.32`) and Q-PC (`.68`, `q-pc.local`), each key added only after
@@ -345,6 +513,13 @@ Mark SSHes into his machines.
   - [x] two residents on one machine, paired with no ticket and with mDNS
         their only way to meet, connect, and keep doing so across restarts
         (a control without the fix fails the same run);
+        *2026-10-02 annotation:* ticked on `connected` under ruling 22's
+        rule, which counted iroh's path; after a restart that signal hid an
+        overlay gap (§6, ruling 36), so the restart half is reopened by the
+        next item;
+  - [ ] (added 2026-10-02, ruling 36) at every restart, in either order, the
+        restarted side gets a gossip neighbour and data moves both ways within
+        one poll, `connected` following the overlay (ruling 31);
   - [ ] the same holds between two real machines, which D2 makes possible.
 
 - **D2 — a resident on every machine.** djinn runs as a systemd user unit on
@@ -556,6 +731,151 @@ cleromancy (`:97-102`) and isometry (`:112`, `:246-264`) pin the fork's
 0.7.4 tag beside older mere revisions, which require `=0.7.4`; each moves to
 0.7.5 at its own next mere repin, as the insigne proofs plan's phase C
 handoff did.
+
+**2026-10-02: rulings 32 to 34 landed in another session's merge.** They were
+staged in the shared primary checkout while another session's merge was in
+progress (`MERGE_HEAD` set, a conflict open in the physics catalog plan), so
+that session's merge commit `8022cedd` ("Merge gpu-repulsion…") carries
+them; a `git notes` entry on `8022cedd` says so. The content is as intended.
+From here, staging in the shared checkout first checks that no merge,
+rebase or cherry-pick is in progress.
+
+**2026-10-02: ruling 31 built, and a gap after restarts.** The `connected`
+lane built it as `8eb08a84` on ruling 30's `f212bd63`. "Subscribed" is read
+from the address book's self record: the gossip manager tags this node with
+the topic when it subscribes and untags it when it leaves (probed before,
+during and after). While subscribed, `connected` is membership in the gossip
+manager's neighbour set, the record LogSync reads; otherwise it is iroh's
+active path. A stopped peer read not connected 92 to 398 ms after its close
+(20 of 20), iroh still marking its path active each time; D1's ticketed
+receipt passes, and gossip marked a killed resident down at 17.66 s against
+the path's 74.7 s.
+
+D1b's receipt failed 3 of 3 at its second restart. Measured over 12 runs
+(`main` `177b927c` and `8eb08a84`, both restart orders, 3 each; logs in
+`C:\t\pairing-d1b\halfstate`):
+
+- At first contact both sides send `Join` and every `Neighbor` is answered.
+- At the first restart the survivor answers the fresh `Join` with a
+  `Neighbor`; the restarted side takes it as a request and answers with its
+  own, which the survivor counts as the reply, so the restarted side keeps a
+  pending entry that nothing clears.
+- At the second restart the survivor is the side holding that entry, and
+  `send_neighbor` (iroh-gossip 0.101.0, `proto/hyparview.rs:745-753`) sends
+  only when its pending insert succeeds, so the fresh `Join` gets no answer
+  and the restarted side never gains a neighbour. The failure follows the
+  second restart in either order, not a name.
+- Data from the restarted side reached the survivor 16.7 to 113.0 s after the
+  restart, carried by whichever of the survivor's LogSync retries was
+  accepted (one every 15 s: `RETRY_RATE`, 5 s, at
+  `p2panda-net/src/sync/actors/topic_manager.rs:35`, plus a 10 s timeout);
+  the restarted side starts no session without a neighbour. The other
+  direction needs a runtime write the resident lacks (`--seed-node` runs only
+  at start).
+- `main` shows the same gossip trace in 6 of 6 while its directory read
+  connected within 0.17 to 2.26 s, so the gap predates ruling 31 and the OR
+  rule hid it. The survivor reading the restarted peer connected throughout
+  fits `accept_conn` swapping the connection silently (`net.rs:772-801`;
+  *reading, not instrumented*).
+
+Also from the lane: the simultaneous-dial control flaked in 1 of 10 parallel
+suites (ruling 37); and iroh's endpoint `close()` stalled past 10 s after
+simultaneous dials three times in one suite run, the likely cause of an
+earlier unexplained hang (the test now logs the stall and moves on).
+
+**2026-10-03: 0.7.5 released; knot and mere repinned locally.**
+
+- **The release.** Per ruling 33 it was rebuilt on GitHub's fork `main`:
+  merge `91bafa2b` takes `94947fd1` without changing a file (its tree equals
+  `293dcafa`'s), and release `1bec457e` carries `d91f748b`'s content (tree
+  `6fc3c069`, the tested tree); the annotated tag `mere-p2panda-net-0.7.5`
+  points there. Pushed without force, and `ls-remote` shows `main` and the
+  tag at `1bec457e` (checked).
+- **The repins**, both local:
+  - Knot's is `562353aa`.
+  - mere's is `a5543904`: 34 files, signalman joined (ruling 35), the 36
+    strict sites, and a strictness control
+    (`control_frame_refuses_non_canonical_cbor`) that fails when
+    `GroupControlFrame::from_bytes` decodes leniently.
+  - mere's lock waits for Knot's rev on GitHub. It moves 1651 to 1667
+    packages: iroh, iroh-base and iroh-relay 1.2.0 to 1.3.0, iroh-metrics
+    1.0.2, `iroh-mdns-address-lookup` 0.6.0, the eight p2panda packages to
+    `1bec457e`, and signalman's 16. One copy each of iroh's and p2panda's
+    packages.
+- **Passing on that stack:** the portable gate (817 s), djinn 98,
+  mere-transport 50, stickleback 91, signalman 22 in the workspace, and
+  graphshell's library 191, among others. D1b's receipt also passes (first
+  contact 2.32 s, reconnected 2.64 s after each restart), and so does D1b
+  with M1 disabled, so F1 alone carries first contact.
+- **D1 fails its stopped-peer control.** On iroh 1.3.0 a killed peer read
+  connected for 199.5 s (600 s limit), against 73.5 s on 1.2.0 (ruling 40).
+- **Also found:**
+  - Knot's own tests need Knot's genet moved to mere's `bd3e8861`: 740
+    type-split errors without it, 260 passing with it. Step (c) does that.
+  - Cargo fetched `merely-made/mere.git` and `genet.git` from GitHub to load
+    Knot's pinned revs.
+  - Another session deleted shared target directories mid-run.
+  - Retinue's desktop workspace, outside mere, will need `p2panda-core`
+    patched to the 0.7.5 tag, since signalman now calls
+    `decode_cbor_strict`.
+  - Isometry decodes a peer's operation body leniently
+    (`crates/isonetry/src/campaign_space/space.rs:77`, checked) and should
+    go strict at its next repin (ruling 24).
+
+**2026-10-03: ruling 31 landed; iroh 1.3 is not slower.**
+
+- **The `connected` lane's last round** (`05fb3de2`): the simultaneous-dial
+  budget went from 16 to 48 pairs (ruling 37). Ten parallel suites with the
+  budget at 64 tripped after 3, 2, 2, 1, 2, 9, 4, 8, 3 and 3 pairs; ten
+  more at 48 passed 10 of 10, tripping after 1, 12, 1, 8, 18, 4, 3, 2, 1
+  and 1. Each pair's keys and topic are now numbered from its index, since
+  the old scheme reused other tests' identities beyond about 16 pairs. The
+  overlay wording is one constant, `NOT_CONNECTED_PATH_ACTIVE`, asserted by
+  the card's test and by `djinn-devices`' first test (ruling 39); D1b's
+  module note records its expected failure (ruling 36).
+- **Merged** as `fdb02bd3`, after verification in the normal-depth worktree
+  on `main` `39787d82` (merge `78d3245a`):
+  - mere-transport passed 52 of 52 in three runs over two merges;
+    stickleback 85 and 5; djinn's 15 test binaries (86 library tests).
+  - D1 passed twice, the stopped peer reading not connected after 10.45 s
+    and 14.02 s (73.5 s under the path rule).
+  - D1b failed at its second restart both times, as ruling 36 expects.
+  - The control: with the gossip branch disabled, the stopped-peer test
+    fails at its 10 s limit. A first control, made in `peers_for_topic`,
+    passed because the test calls the counting function directly; it proved
+    nothing and was replaced.
+  - The installed resident stayed on PID 53336 throughout.
+  - The first djinn run failed to link (`0xc0000142`) while five other
+    sessions were building; the rerun at `-j 2` passed.
+  - `main` moved by four doc-only commits between verification and merge,
+    so the merged tree differs from the verified one in those four files
+    only.
+- **iroh 1.3 (ruling 40)**, measured by the release lane with D1's harness,
+  a 600 s limit and the same kill, seconds until the stopped peer read not
+  connected:
+  - quiet: iroh 1.2 74.9, 74.3, 74.7; iroh 1.3 with p2panda 0.7.4 73.9,
+    81.5, 73.7; the repin 85.1, 74.1, 73.8;
+  - under other sessions' builds: iroh 1.2 103.2, 237.3, 178.8; the repin
+    311.8, 188.3, 173.3 (and the earlier 199.5); a pure CPU burner did not
+    stretch it.
+  - The cause, identical in both versions: `connected` read "any address
+    Active" in `remote_info`, and it flipped within about 0.1 s of the
+    peer's remote actor terminating. The actor lives until 60 s after its
+    last queued message (`ACTOR_MAX_IDLE_TIMEOUT`, iroh 1.3.0
+    `socket/remote_map/remote_state.rs:74`, reset at `:265-269`; checked),
+    and the queued messages after the last close were a final sync dial's
+    datagrams or our own `RemoteInfo` requests (406 in 70 s). Closing a
+    connection does not mark its paths inactive (`:475-491`, checked;
+    *reading* that nothing else does).
+  - Gossip marked a killed neighbour down 9.9 to 16.7 s after the kill
+    across 13 traced runs on iroh 1.3.
+- **Retinue 0.2.0 on `main`**: another session's `f62581c7` moved the root
+  and signalman to `fa4f925` and djinn's knot-site to Knot `ea3e99e`
+  (ruling 44).
+- **Reported by the physics session, not investigated here:** graphshell's
+  `carrier::tests::p2panda_murm_grant_is_refused_before_projection_bytes`
+  hit its 10 s timeout in several of its runs, twice when run alone, and
+  passed single-threaded in its latest run; load is a candidate.
 
 ## 7. Progress
 

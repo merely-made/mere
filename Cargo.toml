@@ -564,12 +564,12 @@ tincture = { package = "tinct", version = "=0.1.2", path = "crates/cambium/tinct
 # could not parse ratcheted announces from real RNS). Since the 2026-07-23 radio
 # merge the repo is one workspace (retinue, tulle, sennet, tucket, firmware), so
 # this is an immutable source-revision pin rather than a relative path.
-retinue = { version = "0.1.1", git = "https://github.com/merely-made/retinue.git", rev = "85e716c7f06dac0a5253effe5ef06d05b266f02f" }
+retinue = { version = "0.2.0", git = "https://github.com/merely-made/retinue.git", rev = "fa4f925059cc698058cb21fecc1c825d095741a9" }
 # Signalman's station crates come from the same Retinue revision, so one
-# rev governs all four (device pairing plan, ruling 42).
-outrider = { version = "0.1.1", git = "https://github.com/merely-made/retinue.git", rev = "85e716c7f06dac0a5253effe5ef06d05b266f02f" }
-postilion = { version = "0.1.0", git = "https://github.com/merely-made/retinue.git", rev = "85e716c7f06dac0a5253effe5ef06d05b266f02f" }
-radio-hand = { version = "0.0.1", git = "https://github.com/merely-made/retinue.git", rev = "85e716c7f06dac0a5253effe5ef06d05b266f02f" }
+# rev governs all four (device pairing plan, rulings 42 and 44).
+outrider = { version = "=0.2.0", git = "https://github.com/merely-made/retinue.git", rev = "fa4f925059cc698058cb21fecc1c825d095741a9" }
+postilion = { version = "=0.2.0", git = "https://github.com/merely-made/retinue.git", rev = "fa4f925059cc698058cb21fecc1c825d095741a9" }
+radio-hand = { version = "=0.0.1", git = "https://github.com/merely-made/retinue.git", rev = "fa4f925059cc698058cb21fecc1c825d095741a9" }
 
 # Reticulum identity derivation: HKDF-SHA256 stretches Mere's 32-byte master seed
 # into retinue's 64-byte dual-key private identity. retinue owns the X25519/RNG

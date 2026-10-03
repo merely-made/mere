@@ -27,7 +27,25 @@
 
 use rapier2d::prelude::*;
 
-use crate::{Force, ForceContext, RepulsionRequest};
+use crate::terms::{floored_inverse, harmonic, spring};
+use crate::{
+    Class, Declared, Force, ForceContext, Kernel, Layout, Observable, RepulsionForces,
+    RepulsionRequest, RepulsionRoute, Term, Topology,
+};
+
+/// Add a staged evaluator's forces to the bodies they were computed for.
+fn apply_forces(
+    bodies: &mut RigidBodySet,
+    nodes: &[(RigidBodyHandle, Vector)],
+    forces: &RepulsionForces,
+) {
+    let (fx, fy) = forces.components();
+    for (idx, (handle, _)) in nodes.iter().enumerate() {
+        if let Some(body) = bodies.get_mut(*handle) {
+            body.add_force(Vector::new(fx[idx], fy[idx]), true);
+        }
+    }
+}
 
 /// Pairwise repulsion that spreads nodes apart (the force-directed charge).
 ///
@@ -71,26 +89,24 @@ impl Force for NodeExclusion {
             .filter_map(|&handle| ctx.bodies.get(handle).map(|b| (handle, b.translation())))
             .collect();
 
-        // Above the threshold, a host may stage this exact layout law through a
-        // different evaluator. This remains a CPU-integrator seam: positions and
-        // forces cross it as slices, unlike Conatus's resident-buffer lane.
-        if let Some(solver) = ctx.repulsion_solver {
-            if nodes.len() >= ctx.gpu_repulsion_threshold {
-                let xs: Vec<f32> = nodes.iter().map(|(_, p)| p.x).collect();
-                let ys: Vec<f32> = nodes.iter().map(|(_, p)| p.y).collect();
-                let request = RepulsionRequest {
-                    strength: self.strength,
-                    cutoff: self.cutoff,
-                    min_distance: self.min_distance,
-                };
-                match solver(&xs, &ys, request) {
+        // At or above the threshold, a host may stage this exact law through a
+        // different evaluator: synchronously (tests, benches), or lagged on its
+        // device, where an answer up to the lane's staleness limit stands in
+        // for this step and the CPU scan below covers every other step.
+        if let Some(repulsion) = ctx.repulsion.as_deref_mut()
+            && nodes.len() >= repulsion.threshold
+        {
+            let xs: Vec<f32> = nodes.iter().map(|(_, p)| p.x).collect();
+            let ys: Vec<f32> = nodes.iter().map(|(_, p)| p.y).collect();
+            let request = RepulsionRequest {
+                strength: self.strength,
+                cutoff: self.cutoff,
+                min_distance: self.min_distance,
+            };
+            match &mut repulsion.route {
+                RepulsionRoute::Sync(solver) => match solver(&xs, &ys, request) {
                     Ok(forces) => {
-                        let (fx, fy) = forces.components();
-                        for (idx, (handle, _)) in nodes.iter().enumerate() {
-                            if let Some(body) = ctx.bodies.get_mut(*handle) {
-                                body.add_force(Vector::new(fx[idx], fy[idx]), true);
-                            }
-                        }
+                        apply_forces(ctx.bodies, &nodes, &forces);
                         return;
                     },
                     Err(error) => tracing::warn!(
@@ -98,7 +114,14 @@ impl Force for NodeExclusion {
                         nodes = nodes.len(),
                         "staged repulsion failed; falling back to NodeExclusion's CPU law"
                     ),
-                }
+                },
+                RepulsionRoute::Lagged(lane) => {
+                    let handles: Vec<RigidBodyHandle> = nodes.iter().map(|(h, _)| *h).collect();
+                    if let Some(forces) = lane.step(ctx.step, &handles, &xs, &ys, request) {
+                        apply_forces(ctx.bodies, &nodes, forces);
+                        return;
+                    }
+                },
             }
         }
 
@@ -218,5 +241,79 @@ impl Force for Boundary {
                 body.add_force(-pos * self.strength, true);
             }
         }
+    }
+}
+
+impl Declared for NodeExclusion {
+    fn terms(&self) -> Vec<Term> {
+        vec![Term::force(
+            "exclusion",
+            Topology::AllPairs {
+                cutoff: Some(self.cutoff),
+            },
+            Kernel::Repulsion { exponent: -2.0 },
+            Class::E,
+            Observable::Overlaps,
+        )]
+    }
+
+    /// `s/d`, floored, less its value at the cutoff, so it is zero beyond.
+    fn energy(&self, _term: usize, layout: &Layout<'_>) -> Option<f64> {
+        let (s, m, c) = (
+            f64::from(self.strength),
+            f64::from(self.min_distance),
+            f64::from(self.cutoff),
+        );
+        let mut energy = 0.0;
+        for i in 0..layout.nodes.len() {
+            for j in (i + 1)..layout.nodes.len() {
+                let d = layout.distance(i, j);
+                if d <= c {
+                    energy += floored_inverse(s, d, m) - s / c;
+                }
+            }
+        }
+        Some(energy)
+    }
+}
+
+impl Declared for EdgeSpring {
+    fn terms(&self) -> Vec<Term> {
+        vec![Term::force(
+            "edge spring",
+            Topology::Edges,
+            Kernel::Spring,
+            Class::E,
+            Observable::PairLength,
+        )]
+    }
+
+    fn energy(&self, _term: usize, layout: &Layout<'_>) -> Option<f64> {
+        let (k, rest) = (f64::from(self.stiffness), f64::from(self.rest_length));
+        Some(
+            layout
+                .edge_indices()
+                .into_iter()
+                .map(|(i, j)| spring(k, layout.distance(i, j), rest))
+                .sum(),
+        )
+    }
+}
+
+impl Declared for Boundary {
+    fn terms(&self) -> Vec<Term> {
+        vec![Term::force(
+            "centring",
+            Topology::Unary,
+            Kernel::Harmonic,
+            Class::E,
+            Observable::Spread,
+        )]
+    }
+
+    fn energy(&self, _term: usize, layout: &Layout<'_>) -> Option<f64> {
+        Some(harmonic(f64::from(self.strength), layout, |_| {
+            Some((0.0, 0.0))
+        }))
     }
 }
