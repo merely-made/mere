@@ -3096,3 +3096,181 @@ upstream issue; vendor-patch the constructor sources for wasm; park web
 promotion with native on pre.4. Mark: **"Bounded fix lane"**. *Follows:* no
 upstream issue is filed; pre.4 is not promoted to the web, and main is not
 merged, until the constructors run once and the A/B shows it.
+
+### 13.33 wasm constructors (2026-10-03)
+
+**Authority.** §13.31: Mark chose **"Bounded fix lane"** for the pre.4 wasm
+constructors. *Follows:* no upstream issue is filed; pre.4 is not promoted to
+the web, and main is not merged, until the constructors run once and the A/B
+shows it. Vendor-patching the constructor sources (Pliron, `inventory`,
+cubecl-ir) was the option not taken, and this lane touched none of them.
+Branch `pre4-wasm-ctors` from `f560c3b1`. Burn-remote, the remote fixture and
+ruling 411's gate are the allocator lane's and are untouched. No download:
+the web, pre.2 and extrema locks each list 0 missing archives. No push or
+merge.
+
+**The cause, shown.** wasm-ld treats a module as a "command", called into
+once per instance, when it is not relocatable, not position-independent, and
+nothing in it calls or exports `__wasm_call_ctors`. It then wraps every
+export in a `.command_export` function that runs every static constructor
+first. inventory 0.3.24's docs and wasm-bindgen 0.2.127's source both quote
+this test. rustc's link line for graphshell-web (`--print link-args`) meets
+it: `rust-lld -flavor wasm`, `--no-entry`, 5,123 `--export`s,
+`--gc-sections`, and no PIC, shared or relocatable flag, crt object,
+`_initialize` or `__wasm_call_ctors`.
+
+The raw pre.4 module's `__wasm_call_ctors` calls 8,166 constructors. All are
+`inventory` `__ctor`s expanded from Pliron's registration macros: 7,305 in
+cubecl-ir, 640 in cubecl-wgpu, 118 in Pliron, 55 in cubecl-core and 48 in
+cubecl-opt. All 5,121 function exports point at wrappers that call it, then
+the real function. After wasm-bindgen, 13 wrappers remain and 12 of the 34
+exports reach them. The 12 include `__wbindgen_malloc`, `__wbindgen_realloc`
+and `__wbindgen_free`, and `__externref_table_alloc` and `dealloc`, which the
+glue calls for every string and every JS object it hands to wasm. P5's pre.2
+bundle (`c6b52d2d`) has no `__wasm_call_ctors` and no wrapper. §13.30's
+reading holds, with one correction: the constructors are not only Pliron's
+own. They are Pliron's macros expanded in five crates.
+
+*Positive control* (a zero-dependency crate, rustc 1.98.1, run in Node 24):
+one `.init_array` constructor that counts its own runs.
+
+| Variant | Wrapped exports | Constructor runs |
+| --- | --- | --- |
+| no constructor | 0 of 2 | 0 |
+| constructor, default link | 2 of 2 | 4 after 3 calls and a read; 5 on the next read |
+| `-C link-arg=--export=__wasm_call_ctors` | 0 of 3 | 0; 1 if the embedder calls the export |
+| an exported function calls `__wasm_call_ctors` | 0 of 3 | 1 |
+
+With wasm-bindgen 0.2.127 in the loop, the default link wraps all 74 raw
+exports, and 3 `echo` calls run the constructor 12 times. The export-only
+link argument leaves 0 runs, because the generated glue never calls the
+export, so every `inventory` registry would be silently empty. A start
+function that calls `__wasm_call_ctors` gives 1.
+
+**The fix.** graphshell-web's `#[wasm_bindgen(start)]`
+(`ports/graphshell/src/web.rs`) now calls `__wasm_call_ctors` before any
+other Rust code runs, through `run_static_constructors` (five lines). The
+link line is unchanged: the reference alone flips wasm-ld's test. The fixed
+module still holds the 8,166 constructors, has no wrapper, and its only
+caller of `__wasm_call_ctors` is `run_static_constructors`. The page has one
+entry: `loader.js` → `init()` → `__wbindgen_start`, once per load.
+
+**The count.** `wasm_ctor_probe.py` makes a probe copy of a bundle. It
+appends an exported counter global incremented at the top of
+`__wasm_call_ctors`, plus one glue line that reads it. Shipped bundles are
+not modified. On the bindgen control the probe matches the crate's own
+counter: 11 = 11 wrapped, 1 = 1 fixed. The counter is read at ready and
+again after a 5 s frame window:
+
+| Bundle | At ready | After the window |
+| --- | --- | --- |
+| pre.4 before the fix (`16ab7c2e`) | 5,441 | 15,413 (repeat: 18,737) |
+| pre.4 after (`6d202d1b`), GPU on | 1 | 1 |
+| pre.4 after, `gpu=off` | 1 | 1 |
+
+**The A/B.** Three arms, one machine, back to back, alternating arm by arm:
+pre.2 (`c6b52d2d`, the §13.30 export of main `a924f380`), pre.4 before the
+fix and pre.4 after it. The scripts are the pre.4 lane's `measure_boot.py`,
+`measure_profile.py` and `run-scenario.ps1`, copied with only the Chrome
+profile and ports changed. Each arm serves its own pages. Two rounds ran
+(3 and 5 repetitions GPU on, 2 and 5 with `gpu=off`); the table gives the
+pooled medians of the repetitions. Other sessions loaded the machine
+throughout (0 to 15 of their `rustc` processes at the samples, CPU 96% at
+one), so pre.2's p50 ranges
+12.1 to 30.3 ms where §13.30 read 12.1. Frame intervals fall on vsync
+multiples (12.1, 18.2, 24.2 and 30.3 ms).
+
+| Arm | GPU | n | Ready (ms) | Frame p50 | p95 | Max | p50 per repetition |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| pre.2 | on | 8 | 1,847 | 15.2 | 30.4 | 521 | 12.1 to 30.3 |
+| pre.4 before | on | 8 | 4,530 | 812 | 949 | 949 | 612 to 1,121 |
+| pre.4 after | on | 8 | 2,177 | 21.2 | 36.3 | 446 | 12.1 to 30.2 |
+| pre.2 | off | 7 | 1,698 | 12.2 | 24.3 | 370 | 12.1 to 18.3 |
+| pre.4 before | off | 7 | 4,187 | 691 | 861 | 861 | 600 to 915 |
+| pre.4 after | off | 7 | 1,882 | 12.2 | 30.2 | 442 | 12.1 to 18.1 |
+
+Against pre.2's §13.30 figure of 12.1 ms: pre.4 after the fix reads 12.2
+with `gpu=off`, and 12.1 to 30.2 GPU on, with a median 21.2 against
+pre.2's 15.2 in the same rounds. Its ready time is 2,177 / 1,882 ms
+against 1,847 / 1,698; the wasm is 110.7 MB against 85.8 MB, and its
+fetch takes 178 to 449 ms against 129 to 333. The `gpu=off` profiles:
+pre.4 before spends 2,047 to 2,144 ms of 3.5 to 3.9 s in
+`__wasm_call_ctors`, `inventory` submits and the wrappers. pre.4 after has
+none of them in its top 30, and the same top entries as pre.2 (livery
+style and layout). Three alternating GPU-on profile pairs attribute the
+GPU-on median: busy main-thread time per 3 s is 2,059 to 2,771 ms for
+pre.4 after against 2,094 to 2,264 for pre.2. The same crates lead both
+(core, hashbrown, genet-livery, alloc, livery, read-fonts, genet-render),
+and no CubeCL, Burn, Pliron or `inventory` frame appears in either. The
+only steady difference is "(program)", 205 to 237 ms against 167 to 175.
+
+| Scenario (same rounds) | pre.2 | pre.4 before | pre.4 after |
+| --- | --- | --- | --- |
+| 2,000-node settle, physics p50 / p95 / max (ms) | 6.3 / 7.5 / 8.3 | 81.9 / 115.2 / 163.3 | 6.8 / 8.6 / 9.0 |
+| the same, frame interval p50 and wall | 2,055 ms, 370 s | 2,628 ms, 478 s | 2,125 ms, 350 s |
+| the same, bounds | 413/418, 1,075, 0 | 413/418, 1,075, 0 | 413/418, 1,075, 0 |
+| kinds wall, GPU on / off | 11 / 10 s | 86 / 78 s | 11 / 11 s |
+
+**Receipts on the fixed bundle** (`6d202d1b`, headed Chrome 154, own
+profile, NVIDIA Lovelace, page visible):
+
+- **The 14 law receipts** at the web defaults and the runner's 300 s limit:
+  **all RESULT ok**. springs 22 s, charge 20, stress 18, energy 22, orbit
+  22, kinds 9, flock 20, sync 10, flow 22, anneal 23, still 16, profiles 19,
+  add 150, drag 181. P5's pre.2 figures were 9 to 26 s, add 153 and drag
+  155. Stress, add and drag no longer time out.
+- **`p5_tree_gpu_settle_2000` at the web defaults: RESULT ok.** 413 of 418
+  steps on the device, spread 1,075, 0 overlaps, energy 424,902, physics
+  4.6 ms a frame (P5's pre.2: 413/418, 1,075, 0, 425,160, 4.9 ms). CPU twin:
+  RESULT ok, spread 1,071, energy 440,992.8, 82.9 ms.
+- **S13 (b), extrema: passes.** The repro is built as committed (release,
+  wasm-bindgen 0.2.122), and its module has the same 8,166 constructors,
+  with all 3,648 raw exports wrapped. A probe build adds the same
+  constructor-once start (uncommitted; the source was restored and verified
+  clean afterwards) and has no wrapper. Both pass all four cases with
+  `gpu_errors: []`. Both receipts are value-identical to each other and to
+  the pre.4 lane's 10-02 receipt.
+
+**P5's web crossover, re-measured** with the third round's method on the
+fixed bundle. The physics stage in ms a frame (p50), device steps of all
+steps, and the newest answer's age. The pre.2 column is P5's sweep and
+2,000-node runs (bundles `89b75bb4` and `3a82eca7`).
+
+| Nodes | CPU | N = 3 | N = 9 | pre.2: CPU / N = 3 / N = 9 |
+| --- | --- | --- | --- | --- |
+| 128 | 0.4 | 1.3, 1/139, age 7 | 1.6, 134/139, age 6 | 0.3 / 1.2, 8/139 / 1.3, 134/139 |
+| 256 | 1.0 | 1.8, 2/139, age 6 | 1.9, 134/139, age 6 | 1.1 / 1.8, 1/139 / 3.1, 134/139 |
+| 512 | 3.7 | 6.8, 1/139, age 7 | 2.6, 137/139, age 6 | 4.5 / 4.0, 15/139 / 1.5, 134/139 |
+| 1,000 | 17.2 | 26.0, 0/139, age 7 | 2.6, 134/139, age 6 | 16.1 / 17.8, 1/139 / 2.1, 134/139 |
+| 2,000 | 82.9 | 89.0, 0/418, age 8 | 4.6 and 5.5, 413/418, age 6 | 89.3 / 94.3, 9/418 / 6.1 and 4.9, 413/418 |
+
+The newest answer is six steps old at every size, as on pre.2. N = 3 keeps
+the device on at most 2 of 139 steps (0 of 418 at 2,000, which fails the
+receipt's device count, as on pre.2). N = 9 keeps it on for 134 to 137 of
+139 steps and 413 of 418. The device at N = 9 is slower than the CPU at 128
+and 256 nodes and faster from 512 up, so the crossover still lies between
+256 and 512. A second N = 9 sample (the copied sweep's mislabelled rows,
+below) reads 1.7, 2.0, 2.2 and 3.1 ms. *Reading, not ruled:* these numbers
+do not move "Web N = 9, web threshold 400", so this is not returned as a
+fork. At 512 nodes the device's margin is narrower than on pre.2 (2.2 to 2.6
+against 3.7 ms, where pre.2 read 1.5 against 4.5).
+
+*Method notes.* P5's sweep ran its N = 3 mode as `gpu_threshold=0` alone.
+That meant N = 3 on bundle `89b75bb4`, whose default N was then 3. The
+default is now 9, so the copied sweep's "gpu3" rows ran N = 9. They are
+kept as the second N = 9 sample, and the N = 3 rows were rerun with
+`gpu_max_stale_steps=3`. `p5_tree_gpu_settle_2000` has asserted
+`gpu-threshold == 400` since the third round, so 2,000-node runs at
+`gpu_threshold=0` fail that assertion alone. The table's 2,000-node N = 3
+and N = 9 rows keep threshold 400 and set N explicitly.
+
+**Held, returned as forks.** (1) The other pre.4 web cdylibs (Distillery's
+model probe and the burn browser-embedding and extrema repros) are still
+command-linked. The model probe records browser timings against configured
+bounds. (2) The fix's form: the start-function call against an exported
+`__wasm_call_ctors` plus a post-bindgen glue edit, or a shared helper.
+(3) Whether the A/B above shows it, given the GPU-on median one vsync above
+pre.2's while `gpu=off` matches. Evidence:
+`Code/testing/mere/receipts/2026-10-03/pre4-ctors` (`inspect/`,
+`control/`, `probe/`, `web/`, `ab/`). The lane target is
+`C:/t/cargo-targets/mere/pre4-ctors`.
