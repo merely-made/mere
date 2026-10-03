@@ -401,6 +401,9 @@ pub struct KnownPeer {
     /// a minute or more after its last connection closes. iroh's own view
     /// stays readable, unmixed, in [`peer_paths`](P2pandaTransport::peer_paths).
     pub connected: bool,
+    /// Whether this node is subscribed to the topic's gossip, so `connected`
+    /// is gossip's answer; false means the open-connection count gave it.
+    pub on_overlay: bool,
 }
 
 /// How, and to whom, this transport serves iroh-blobs.
@@ -1006,6 +1009,7 @@ impl P2pandaTransport {
                 reachable: info.transports.is_some(),
                 bootstrap: info.bootstrap,
                 connected,
+                on_overlay: subscribed,
             });
         }
         Ok(peers)

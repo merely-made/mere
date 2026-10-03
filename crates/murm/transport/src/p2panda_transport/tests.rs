@@ -748,6 +748,11 @@ async fn a_stopped_peer_reads_not_connected_once_its_neighbour_goes_down() {
         },
     )
     .await;
+    let listed = alice.peers_for_topic(topic).await.unwrap();
+    assert!(
+        listed.iter().all(|peer| peer.on_overlay),
+        "subscribed, so gossip decides: {listed:?}"
+    );
 
     drop((to_bob, bob_handle));
     let stopped = std::time::Instant::now();
@@ -890,6 +895,11 @@ async fn a_peer_off_the_overlay_that_closes_reads_not_connected_within_a_second(
         }
     })
     .await;
+    let listed = alice.peers_for_topic(topic).await.unwrap();
+    assert!(
+        listed.iter().all(|peer| !peer.on_overlay),
+        "not subscribed, so the count decides: {listed:?}"
+    );
 
     let closing = std::time::Instant::now();
     within("close", Duration::from_secs(10), bob.close())
@@ -1102,8 +1112,8 @@ async fn killed_peer_off_the_overlay(
 }
 
 /// Off the overlay, a killed peer reads not connected when its last connection
-/// closes, and three directory pollers do not move that; iroh's path takes 60 s
-/// or more (rulings 47, 48).
+/// closes, and three directory pollers do not move that delay; iroh's path
+/// takes 60 s or more (rulings 47, 48, 53, 55).
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
 async fn a_killed_peer_off_the_overlay_reads_not_connected_when_its_connection_closes() {
     let (quiet, polled) = tokio::join!(
@@ -1133,10 +1143,13 @@ async fn a_killed_peer_off_the_overlay_reads_not_connected_when_its_connection_c
              more: {run:?}"
         );
     }
-    let moved = quiet.not_connected.abs_diff(polled.not_connected);
+    // Each run against its own close event (ruling 53): iroh's close itself
+    // varies by seconds between runs, measured 9.98 s against 14.92 s.
+    let delay = |run: &KilledPeer| run.not_connected.saturating_sub(run.closed);
+    let moved = delay(&quiet).abs_diff(delay(&polled));
     assert!(
         moved <= Duration::from_secs(2),
-        "polling moved the live rule by {moved:?}"
+        "polling moved the live rule's delay after the close event by {moved:?}"
     );
 }
 
