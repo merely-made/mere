@@ -1,7 +1,7 @@
 # Physics Catalog Plan
 
 **Date:** 2026-09-02
-**Status:** in progress (P1 landed 2026-09-02; P1b, P2 on both hosts and P3 the remote board 2026-09-03; the runtime extraction 2026-09-04; P4 web half 2026-09-04, closing with the Graphshell tree port per the 2026-10-01 rulings in §5; P5a-c 2026-10-02 on branch `gpu-repulsion`: kernel, cell list, lagged seam, setters and the web tree wired; the web staleness limit and threshold, and a cambium edit, back with Mark).
+**Status:** in progress (P1 landed 2026-09-02; P1b, P2 on both hosts and P3 the remote board 2026-09-03; the runtime extraction 2026-09-04; P4 web half 2026-09-04, closing with the Graphshell tree port per the 2026-10-01 rulings in §5; P5a-c 2026-10-02 on branch `gpu-repulsion`: kernel, cell list, lagged seam, setters and the web tree at the third-round web defaults, receipts green; awaiting merge, then turnstone and P5d).
 **Scope:** A catalog of *distinct physics layout laws* — dynamical systems
 over the graph's bodies that produce different layouts because they are
 different physics — as a lever beside the arrangement catalog, plus the
@@ -901,7 +901,18 @@ the scene; and the eleven law receipts plus Density's stay green.
   law that never rests holds a `u32::MAX` settle budget, and the actor exits
   on a closed channel only when the budget reaches zero, so dropping such a
   canvas leaves its actor thread ticking. Seen as device answers counted by a
-  dropped canvas's actor in the offload receipt. Not fixed here.
+  dropped canvas's actor in the offload receipt (`seiche/src/runtime.rs`,
+  `run`: it returns on a closed channel only `if disconnected &&
+  ticks_remaining == 0`). Not fixed here.
+- 2026-10-02 (P5c): conatus asks for `cubecl = "0.11.0-pre.2"` (and Burn
+  `0.22.0-pre.2`) as caret requirements, which admit later pre-releases of
+  the same version. The root lock holds pre.2; graphshell-web's lock is
+  ignored by convention, so a fresh resolution of it takes the newest
+  pre-release it can reach. A clean export of the branch resolved pre.2
+  offline only because this machine's cache held no other; online it would
+  likely take pre.4, and the root's pre.2 `cubecl-runtime` patch (the wasm
+  fix) would go unused. Pinning `=` in conatus, or recording the web lock,
+  closes it; open for Mark.
 - 2026-10-02: a cargo run without `--locked` re-serializes the root lock,
   swapping the order of the two genet revisions' `fleece` and
   `layout-dom-api` rows; the committed lock passes `--locked` as it stands, so
@@ -1263,3 +1274,17 @@ binning are the useful patterns.
   3/3 device receipts. The web threshold default is left at 1,000 and N at 3
   pending Mark's call on the readback finding above; the native crossover
   (about 400, N = 1) is turnstone's to set when it is wired.
+- 2026-10-02 (P5c, third round): Mark's rulings carried out. The
+  `capture.rs` flag committed by pathspec (`af7d2b5f`; cambium-genet-web-host
+  8/8). Main merged (`c4097a1e`): its genet repin (`b1eb3af` to `bd3e8861`)
+  moved 19 genet packages in the web lock, one genet revision in the graph,
+  the CubeCL and Burn family still pre.2 (lock SHA256 `a915fa23...`, copied
+  to `Code/testing/mere/gpu-repulsion/web-Cargo.lock`). The web defaults are
+  N = 9 and threshold 400 (`13910c40`), and `p5_tree_gpu_settle_2000` runs
+  at them with no `gpu_*` options. Receipts on bundle `3a82eca7`: the eleven
+  law receipts plus profiles, add and drag green at the defaults; the
+  2,000-node settle green, 413 of 418 steps on the device, physics 4.9 ms a
+  frame, spread 1,075, no overlaps, energy 425k; its CPU twin green, 89.3 ms,
+  spread 1,071, energy 441k. A `git archive` export of `13910c40` builds for
+  wasm offline both with a freshly generated web lock (4 m 06 s; the CubeCL
+  family resolved to pre.2, see Findings) and with the recorded lock.
