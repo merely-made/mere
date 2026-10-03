@@ -8,8 +8,8 @@
 //! directory through the owner-only application door and prints it.
 
 use djinn::resident_devices::{
-    AddrKindV1, DEVICE_DIRECTORY_APP, DEVICE_DIRECTORY_ROUTE, DeviceDirectoryV1,
-    NOT_CONNECTED_PATH_ACTIVE, PairedDeviceV1, read_directory,
+    AddrKindV1, DEVICE_DIRECTORY_APP, DEVICE_DIRECTORY_ROUTE, DeviceDirectoryV1, PairedDeviceV1,
+    not_connected_path_active, read_directory,
 };
 use graphshell::native::app_admission::{AppId, AppRouteId};
 use graphshell::native::app_client::AppBrokerClient;
@@ -69,7 +69,7 @@ fn render_device(device: &PairedDeviceV1) -> String {
     let marked_active = device.path.iter().any(|addr| addr.active);
     let state = match (device.connected, device.reachable) {
         (true, _) => "connected",
-        (false, _) if marked_active => NOT_CONNECTED_PATH_ACTIVE,
+        (false, _) if marked_active => not_connected_path_active(device),
         (false, true) => "not connected (an address is known)",
         (false, false) => "not connected (no address known)",
     };
@@ -113,16 +113,18 @@ mod tests {
 
     use super::*;
 
-    /// Gossip has dropped the device while iroh still lists a path to it.
+    /// Not connected while iroh still lists a path: on the overlay gossip
+    /// dropped the device, off it no connection is open (ruling 50).
     #[test]
-    fn a_dropped_neighbour_with_an_active_path_names_the_overlay() {
-        let device = PairedDeviceV1 {
+    fn a_dropped_device_with_an_active_path_names_which_rule_dropped_it() {
+        let mut device = PairedDeviceV1 {
             node_id: "ab".repeat(32),
             label: "thinkpad".into(),
             root: None,
             pairing_id: None,
             added_ms: 1,
             connected: false,
+            on_overlay: true,
             reachable: true,
             path: vec![PathAddrV1 {
                 kind: AddrKindV1::Direct,
@@ -131,12 +133,20 @@ mod tests {
             }],
             hint: None,
         };
+        let on = render_device(&device);
         assert!(
-            render_device(&device).contains(
+            on.contains(
                 "\n  now      not connected (no gossip neighbour; a path is still active)\n"
             ),
-            "{}",
-            render_device(&device)
+            "{on}"
+        );
+        device.on_overlay = false;
+        let off = render_device(&device);
+        assert!(
+            off.contains(
+                "\n  now      not connected (no open connection; a path is still active)\n"
+            ),
+            "{off}"
         );
     }
 }
