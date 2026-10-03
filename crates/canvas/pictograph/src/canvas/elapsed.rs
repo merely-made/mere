@@ -1,7 +1,9 @@
 // Copyright 2026 Mark Alan Boykin
 // SPDX-License-Identifier: MPL-2.0
 
-use super::{Canvas, CanvasFrameProfile, ElapsedStepConfig, ElapsedStepReport};
+use super::{
+    Canvas, CanvasFrameProfile, ElapsedStepConfig, ElapsedStepReport, PaceStats, Speed, StepBudget,
+};
 use netrender::Scene;
 use std::time::Duration;
 
@@ -17,6 +19,27 @@ impl Canvas {
     /// The last timed call's work, or None after reset/deterministic advancement.
     pub fn elapsed_step_report(&self) -> Option<ElapsedStepReport> {
         self.elapsed_step
+    }
+
+    /// Set the simulation speed, 0.2x to 50x: ticks per frame at the fixed
+    /// step, so the layout's trajectory does not depend on it.
+    pub fn set_physics_speed(&mut self, speed: Speed) {
+        self.physics.set_speed(speed);
+    }
+
+    pub fn physics_speed(&self) -> Speed {
+        self.physics.speed()
+    }
+
+    /// Bound a frame's ticks above real time on the host's clock; `None`
+    /// leaves fast-forward bounded only by the step and elapsed caps.
+    pub fn set_physics_step_budget(&mut self, budget: Option<StepBudget>) {
+        self.physics.set_step_budget(budget);
+    }
+
+    /// Ticks run, the effective speed reached, and whether the budget bound.
+    pub fn physics_pace(&self) -> PaceStats {
+        self.physics.pace()
     }
 
     fn elapsed_since(&mut self, timestamp: Duration) -> Duration {
