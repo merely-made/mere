@@ -1,10 +1,12 @@
 # Device Pairing by Key Plan
 
 **Date**: 2026-10-02
-**Status (2026-10-02)**: in progress. Assessed and ruled by Mark on 2026-10-01
-and 2026-10-02 (rulings 1 to 39 below). D1 landed (`4963b489`); D1b's mere fix (M1)
-landed (`177b927c`), its fork fix (F1) is being released as
-`mere-p2panda-net-0.7.5` with knot and mere repinned; `connected` follows
+**Status (2026-10-03)**: in progress. Assessed and ruled by Mark from 2026-10-01
+to 2026-10-03 (rulings 1 to 43 below). D1 landed (`4963b489`); D1b's mere fix (M1)
+landed (`177b927c`), its fork fix (F1) is released as
+`mere-p2panda-net-0.7.5` (`1bec457e`, pushed), with knot and mere repinned
+locally and their pushes waiting on why iroh 1.3.0 holds a dead path longer
+(ruling 40); `connected` follows
 the gossip overlay (ruling 31) and is being finished, and the overlay's gap
 after restarts goes to its own lane (ruling 36); then D2.
 **Scope**: Mark's machines find, reach and trust each other by device
@@ -316,7 +318,8 @@ workspace (Recommended)"**. Follows: signalman drops its empty `[workspace]`
 table and its exclude entry, inherits the root patch table and lock, and is
 covered by the portable gate and every compiler census (insigne's phase A
 missed it as a nested workspace); mere's lock gains Retinue's crates at that
-rev.
+rev. *Amended by ruling 42:* the root already pinned `retinue` at a newer
+rev, which this evidence missed.
 
 **Ruling 36.** *After a crash-restart the restarted resident gets no gossip
 neighbour (12 of 12 runs, the same on `main` and on ruling 31's branch; §6):
@@ -352,6 +355,39 @@ active)" on the resident card and in `djinn-devices`. Keep that wording?*
 Options: keep it; plain "not connected"; name the overlay ("something like
 not connected (no gossip neighbour; a path is still active)"). Mark: **"Name
 the overlay"**. Follows: that wording, on both.
+
+**Ruling 40.** *On the release stack (iroh 1.3.0), D1's stopped-peer control
+fails at its 120 s limit: with 600 s, a killed peer read connected for
+199.5 s, against 73.5 s on iroh 1.2, `main`'s `connected` being iroh's path
+alone. How should the pushes proceed?* Options: land ruling 31 first, rerun
+on the merged stack, then push knot, mere and knot's repin back to back;
+raise D1's patience and push now; look into iroh 1.3 first. Mark: **"Look
+into iroh 1.3 first"**. Follows: no knot or mere push until it is known why
+iroh 1.3.0 holds a dead path longer; peers that are not subscribed still go
+by iroh's path under ruling 31.
+
+**Ruling 41.** *Knot's `main` moved 8 commits (Collapse, a new
+`knot-composition`, mere `c6707958`, genet `b1eb3af1`) and merges into the
+release branch without conflict. Which knot commit does mere pin?* Options:
+`562353aa`, the verified repin (Knot `3dfb70b`, 30 commits past mere's
+current pin `855cb75d`, plus the p2panda move); Knot's merge commit. Mark:
+**"562353aa (Recommended)"**. Follows: Knot's eight newer commits reach mere
+at its next ordinary knot repin. Step (c) moves Knot's genet to mere's
+`bd3e8861`, which descends from Knot's `b1eb3af1` (checked).
+
+**Ruling 42.** *With signalman joined, mere's lock holds two copies of
+retinue 0.1.1: signalman's four Retinue crates at `6af5c0ff` and the root's
+`retinue` at `85e716c7`, 61 commits newer (mere-transport's optional mesh
+feature). At `85e716c7` the four crates exist at the same versions and none
+names a mere package. Which?* Options: move signalman to `85e716c7`, with
+`retinue` through `workspace = true`; keep both. Mark: **"Move signalman to
+85e716c7 (Recommended)"**. Follows: one Retinue in mere; any code change the
+61 commits need comes back as a fork.
+
+**Ruling 43.** *Mark's local `crates/p2panda` was clean on `main` at
+`0a54ab82`, behind GitHub's `1bec457e`. Bring it up to date?* Options:
+fast-forward it; leave it. Mark: **"Fast-forward it (Recommended)"**. Done
+2026-10-03 with `--ff-only`; clean afterwards.
 
 Also given in the same conversation (2026-10-01, Mark: "You can edit known
 hosts"): `known_hosts` entries may be updated, which was done for the
@@ -685,6 +721,45 @@ Also from the lane: the simultaneous-dial control flaked in 1 of 10 parallel
 suites (ruling 37); and iroh's endpoint `close()` stalled past 10 s after
 simultaneous dials three times in one suite run, the likely cause of an
 earlier unexplained hang (the test now logs the stall and moves on).
+
+**2026-10-03: 0.7.5 released; knot and mere repinned locally.**
+
+- **The release.** Per ruling 33 it was rebuilt on GitHub's fork `main`:
+  merge `91bafa2b` takes `94947fd1` without changing a file (its tree equals
+  `293dcafa`'s), and release `1bec457e` carries `d91f748b`'s content (tree
+  `6fc3c069`, the tested tree); the annotated tag `mere-p2panda-net-0.7.5`
+  points there. Pushed without force, and `ls-remote` shows `main` and the
+  tag at `1bec457e` (checked).
+- **The repins**, both local:
+  - Knot's is `562353aa`.
+  - mere's is `a5543904`: 34 files, signalman joined (ruling 35), the 36
+    strict sites, and a strictness control
+    (`control_frame_refuses_non_canonical_cbor`) that fails when
+    `GroupControlFrame::from_bytes` decodes leniently.
+  - mere's lock waits for Knot's rev on GitHub. It moves 1651 to 1667
+    packages: iroh, iroh-base and iroh-relay 1.2.0 to 1.3.0, iroh-metrics
+    1.0.2, `iroh-mdns-address-lookup` 0.6.0, the eight p2panda packages to
+    `1bec457e`, and signalman's 16. One copy each of iroh's and p2panda's
+    packages.
+- **Passing on that stack:** the portable gate (817 s), djinn 98,
+  mere-transport 50, stickleback 91, signalman 22 in the workspace, and
+  graphshell's library 191, among others. D1b's receipt also passes (first
+  contact 2.32 s, reconnected 2.64 s after each restart), and so does D1b
+  with M1 disabled, so F1 alone carries first contact.
+- **D1 fails its stopped-peer control.** On iroh 1.3.0 a killed peer read
+  connected for 199.5 s (600 s limit), against 73.5 s on 1.2.0 (ruling 40).
+- **Also found:**
+  - Knot's own tests need Knot's genet moved to mere's `bd3e8861`: 740
+    type-split errors without it, 260 passing with it. Step (c) does that.
+  - Cargo fetched `merely-made/mere.git` and `genet.git` from GitHub to load
+    Knot's pinned revs.
+  - Another session deleted shared target directories mid-run.
+  - Retinue's desktop workspace, outside mere, will need `p2panda-core`
+    patched to the 0.7.5 tag, since signalman now calls
+    `decode_cbor_strict`.
+  - Isometry decodes a peer's operation body leniently
+    (`crates/isonetry/src/campaign_space/space.rs:77`, checked) and should
+    go strict at its next repin (ruling 24).
 
 ## 7. Progress
 
