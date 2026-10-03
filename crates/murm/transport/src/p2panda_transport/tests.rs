@@ -10,7 +10,11 @@ use identity::{IdentityProvider, InMemoryProvider};
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 
 fn make_inputs(seed: u8) -> (Ed25519Keypair, PeerID) {
-    let provider = InMemoryProvider::from_seed([seed; 32]);
+    inputs_from([seed; 32])
+}
+
+fn inputs_from(seed: [u8; 32]) -> (Ed25519Keypair, PeerID) {
+    let provider = InMemoryProvider::from_seed(seed);
     let kp = provider.master_keypair().clone();
     let peer_id = PeerID::from_public_key(provider.master_public_key());
     (kp, peer_id)
@@ -529,7 +533,7 @@ async fn close_quietly(transport: &P2pandaTransport, who: &str) {
 /// each dials the other. Without it only Alice tags Bob, and Bob joins first:
 /// gossip drops a join for a topic its receiver has not subscribed to yet.
 async fn joined_pair(
-    seed: u8,
+    (alice_seed, bob_seed): ([u8; 32], [u8; 32]),
     topic: [u8; 32],
     both_dial: bool,
 ) -> (
@@ -538,8 +542,8 @@ async fn joined_pair(
     P2pandaTransport,
     GossipHandle,
 ) {
-    let (alice_kp, alice_id) = make_inputs(seed);
-    let (bob_kp, bob_id) = make_inputs(seed + 1);
+    let (alice_kp, alice_id) = inputs_from(alice_seed);
+    let (bob_kp, bob_id) = inputs_from(bob_seed);
     let alice = P2pandaTransport::builder(&alice_kp).gossip().bind();
     let alice = within("bind", Duration::from_secs(10), alice)
         .await
@@ -644,16 +648,31 @@ async fn reads_connected(
 /// iroh then marks every address of the peer inactive for seconds at a time,
 /// from its 5 s holepunch on or from the start, while gossip keeps carrying
 /// traffic; that is why gossip decides on a subscribed overlay. The gap comes
-/// in about a third of pairs, so pairs are made until the control, the same
-/// directory with iroh's path deciding, has read the delivering link dead.
+/// in about a quarter of pairs in the parallel suite, so pairs are made until
+/// the control, the same directory with iroh's path deciding, has read the
+/// delivering link dead.
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
 async fn both_sides_dialling_at_once_stays_connected_while_the_link_delivers() {
-    const PAIRS: u8 = 16;
+    // Pairs made before the control tripped, over 10 parallel runs of this
+    // crate's suite (2026-10-03): 3, 2, 2, 1, 2, 9, 4, 8, 3, 3. An earlier
+    // suite ran 16 pairs without a trip, so 48 is 3x that and 5x the worst
+    // trip. Ten confirming runs at 48: 1, 12, 1, 8, 18, 4, 3, 2, 1, 1. Over
+    // all 20, about 1 pair in 4.4 trips, so a miss is about 4 in 10^6
+    // (ruling 37).
+    const PAIRS: u16 = 48;
     const WINDOW: Duration = Duration::from_secs(7);
+    // Per pair, so no key or topic is shared with another pair or test.
+    let numbered = |tag: u8, pair: u16, side: u8| {
+        let mut bytes = [tag; 32];
+        bytes[..2].copy_from_slice(&pair.to_le_bytes());
+        bytes[2] = side;
+        bytes
+    };
     let mut control = None;
     for pair in 0..PAIRS {
-        let topic = [0xd0 ^ pair; 32];
-        let (alice, alice_handle, bob, bob_handle) = joined_pair(200 + 2 * pair, topic, true).await;
+        let topic = numbered(0xd0, pair, 0);
+        let seeds = (numbered(0xd1, pair, 0), numbered(0xd1, pair, 1));
+        let (alice, alice_handle, bob, bob_handle) = joined_pair(seeds, topic, true).await;
         let (alice_id, bob_id) = (alice.local_peer_id(), bob.local_peer_id());
         let to_bob = Traffic::start(alice_id, &alice_handle, &bob_handle);
         let to_alice = Traffic::start(bob_id, &bob_handle, &alice_handle);
@@ -712,7 +731,8 @@ async fn both_sides_dialling_at_once_stays_connected_while_the_link_delivers() {
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
 async fn a_stopped_peer_reads_not_connected_once_its_neighbour_goes_down() {
     let topic = [0xe1; 32];
-    let (alice, alice_handle, bob, bob_handle) = joined_pair(240, topic, false).await;
+    let (alice, alice_handle, bob, bob_handle) =
+        joined_pair(([240; 32], [241; 32]), topic, false).await;
     let bob_id = bob.local_peer_id();
     let to_bob = Traffic::start(alice.local_peer_id(), &alice_handle, &bob_handle);
     within(
