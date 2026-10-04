@@ -2,14 +2,13 @@
 
 **Date**: 2026-10-02
 **Status (2026-10-04)**: in progress. Assessed and ruled by Mark from 2026-10-01
-to 2026-10-04 (rulings 1 to 62 below). D1 landed (`4963b489`); D1b's mere fix (M1)
-landed (`177b927c`), its fork fix (F1) is released as
-`mere-p2panda-net-0.7.5` (`1bec457e`, pushed). `connected` follows the
-gossip overlay (ruling 31, `fdb02bd3`) and, off it, open connections
-(rulings 47 to 56, `005e27ad`). The repin pushes are under way: Knot's
-(a) (`eb934b4`) and mere's (b) (`031b3dcc`) are pushed, and Knot's repin
-(c) follows its checks (rulings 58 to 62); the overlay's gap after restarts has its own
-lane (ruling 36); then D2.
+to 2026-10-04 (rulings 1 to 74 below). D1 landed (`4963b489`); D1b's mere fix (M1)
+landed (`177b927c`) and its fork fix (F1) shipped in the 0.7.5 repin, pushed
+2026-10-04 (fork `1bec457e`, Knot `92367ec`, mere `031b3dcc`). `connected`
+follows the gossip overlay (ruling 31) and, off it, open connections
+(rulings 47 to 56). The overlay's gap after restarts has a ruled fix in
+iroh-gossip, held until its next release (rulings 64 to 72). Paused
+before D2 while chatelaine P4a runs (ruling 73).
 **Scope**: Mark's machines find, reach and trust each other by device
 identity, not by address: the stack's own peers already do on one network;
 SSH, the path Mark uses daily, does not. Pairing a device becomes one
@@ -81,6 +80,10 @@ code:
   | M4 iMac | running | no: the bare key `mark-ik@imac-2026-08`, an agent older than certificates | none |
   | ThinkPad | not installed | — | none |
   | Q-PC | not installed | — | none |
+
+  *2026-10-04:* Mark named a fifth machine, "There's also a surface laptop 3
+  running kubuntu"; "Not a powerful device (8gb ram, 256gb ssd), but another
+  linux". Its agent, address and SSH state have not been read.
 
 - **Pairing today** takes six steps and two 128-hex copy-pastes for personal
   sync (`djinn --pairing-facts`, `--pair-node`), a separate Knot
@@ -579,6 +582,87 @@ lockstep (Recommended)"**. Follows: before such a push, `cargo check
 --workspace --all-targets` runs in a scratch Knot worktree patched at mere's
 tree; recorded in the mere/Knot lockstep memory the same day.
 
+**Ruling 63.** *Push (c) is ready apart from three knot-desktop Collapse
+tests failing with "missing Show Preview" (`apps/desktop/tests/collapse.rs:44`),
+which fail identically on Knot's `main` before the repin (`ea3e99e`, a clean
+control worktree on its own lock); every other check passes. Commit and push
+(c)?* Options: push, naming the three failures; hold until Collapse is fixed
+on Knot `main`. Mark: **"Push (c), name the 3 failures (Recommended)"**.
+Follows: the commit message names them with the control, and they are left
+to Collapse. Done 2026-10-04: GitHub's Knot `main` was still `eb934b4`, and
+`eb934b4..92367ec` was pushed with the one repin commit.
+
+**Ruling 64.** *Ruling 36's assessment (13 traced runs, iroh-gossip 0.101.0
+unchanged on this stack): a restart fails exactly when the survivor holds a
+stale pending entry for the restarted side, which predicted all 26 restarts.
+Where does the fix live?* Options: patch iroh-gossip; a nudge from
+mere-transport (close the peer's connections and re-tag after a dwell).
+(The p2panda fork was assessed and reduces to the nudge, since iroh-gossip's
+API offers only broadcast and join.) Mark: **"Patch iroh-gossip
+(Recommended)"**. Follows: ruling 46 keeps it out of upstream; the upstream
+ledger's item 3 records it.
+
+**Ruling 65.** *Which change? A1: in `on_join` (`proto/hyparview.rs:380-401`),
+clear a peer's pending entry when it is already an active neighbour, so its
+`Join` is always answered (about 3 lines; every route to a stale entry). A2:
+in `on_neighbor` (`:450-459`), do not record a reply as pending (about 2
+lines; this route only, and it touches refill and forward-join).* Options:
+A1 only; A1 and A2; A2 only. Mark: **"A1 only (Recommended)"**.
+
+**Ruling 66.** *How is the patched iroh-gossip carried?* Options: vendored in
+mere's `support/patches/` with Knot pointing at mere.git; a tagged fork
+repository, like vello and p2panda. Mark: **"A tagged fork repo"**.
+Follows: a `mark-ik/iroh-gossip` fork with a tag, patched by row in both
+mere and Knot. Creating it, its base commit and its tag come to Mark first.
+
+**Ruling 67.** *Proving data moves both ways after a restart needs a write
+on a resident that is already running; the receipts spawn the real binary,
+so a test-only path cannot do it. How?* Options: a real resident flag
+(`--seed-node-after <secs> <address> <title>`); a receipt-only environment
+variable; a cargo feature. Mark: **"A real resident flag (Recommended)"**.
+
+**Ruling 68.** *The fork's base: the `v0.101.0` tag (`2ce78afe`, what mere
+and Knot run) or upstream `main` (`2885dd9f`, unreleased)?* Mark: **"Determine
+the difference between upstream main and this pinned commit. The fork may be
+entirely unnecessary"**. Follows: the comparison in §6 (2026-10-04, upstream
+iroh-gossip): `main` does not fix it, and no release does.
+
+**Ruling 69.** *Create the public `mark-ik/iroh-gossip` fork and clone it?*
+Options: create and clone; Mark creates it. Mark: **"Wait"**. Superseded by
+ruling 72.
+
+**Ruling 70.** *The fork's tag?* Options: `mere-iroh-gossip-0.101.0`, the
+p2panda fork's pattern; `v0.101.0-mere.1`. Mark:
+**"mere-iroh-gossip-0.101.0 (Recommended)"**.
+
+**Ruling 71.** *With the comparison in hand, base the fork on the `v0.101.0`
+tag or upstream `main`?* Options: the tag, `2ce78afe`; upstream `main`,
+`2885dd9f`. Mark: **"Upstream main, 2885dd9f"**.
+
+**Ruling 72.** *Create the fork now?* Options: create and clone it; wait for
+upstream, rechecking PR #159 and issue #172 at iroh-gossip's next release,
+with D1b failing at second restarts meanwhile; Mark creates it. Mark: **"Wait
+for upstream"**. Follows: no fork is made. Ruling 36's fix is on hold, and
+so is ruling 67's flag, which serves only its receipt; D1b's restart item
+stays open. At iroh-gossip's next release, #159 and #172 are rechecked, and
+if the release passes the bug by, the upstream ledger's rule applies
+(ruling 46), with rulings 70 and 71 then giving the fork's tag and base.
+
+**Ruling 73.** *The 0.7.5 repin and both liveness rules are pushed and the
+restart-gap fix waits on iroh-gossip's next release; D2 is next in this
+plan. What next?* Options: assess D2; chatelaine P4a; pause here. Mark:
+**"Chatelaine P4a"**. Follows: this plan pauses before D2, and the
+chatelaine plan resumes (its ruling 51).
+
+**Ruling 74.** *This phase's scratch (the `C:\t\mere-repin`, `knot-repin`,
+`knot-control-ea3e99e` and `mere-iroh12` worktrees, and the build targets
+in `C:\t\p2panda-075-targets` and `C:\t\mere-verify-target`): remove it?*
+Options: worktrees and targets; logs too; keep everything. Mark: **"Remove
+worktrees and targets (Recommended)"**. Done 2026-10-04, after checking each
+worktree clean with its `HEAD` on GitHub: C: went from 470 GB to 714 GB
+free. Mark's standing rule, given the same day: keep C: above 500 GB free,
+and clean before building below 100 GB.
+
 Also given in the same conversation (2026-10-01, Mark: "You can edit known
 hosts"): `known_hosts` entries may be updated, which was done for the
 ThinkPad (`.32`) and Q-PC (`.68`, `q-pc.local`), each key added only after
@@ -658,6 +742,9 @@ Mark SSHes into his machines.
   dialling out does not. Done when:
   - [ ] each of the four machines runs the resident at login, its personal
         sync paired with the others;
+        *2026-10-04, reading, not ruled:* five machines, with the Surface
+        Laptop 3 (Kubuntu, so a systemd user unit as on Fedora) assessed
+        at D2's start;
   - [ ] the M4's agent is the current one (its agent predates certificates),
         with Mark's own SSH into each machine unaffected throughout;
   - [ ] on Windows, djinn runs beside the legacy `graphshell-device-host` on
@@ -1151,6 +1238,69 @@ loaded machine:
   to `bd3e8861` (no other rev left in any manifest; the lock has one mere
   and one genet). It stopped at the workspace check on the test helper
   (ruling 61). knot-desktop and its retinue check passed.
+- **Push (c)** (rulings 61 and 63). With the helper setting `on_overlay:
+  true`, Knot's checks passed: the workspace check, knot-editor 149,
+  knot-document 47, the retinue check, and `cargo tree -d` with one copy
+  each of mere, genet, iroh and p2panda. The exception is three of
+  knot-desktop's four Collapse tests (290 others passed), which fail the
+  same way on `ea3e99e`. Committed as `92367ec` and pushed as
+  `eb934b4..92367ec`. Knot builds on its own again.
+- **The 0.7.5 repin is complete:** the fork at `1bec457e`, Knot at
+  `92367ec`, mere at `031b3dcc`. Turnstone, Cleromancy and Isometry move at
+  their own next mere repins, Isometry with its strict site, and Retinue's
+  desktop workspace needs the `p2panda-core` patch row (findings above).
+
+**2026-10-04: ruling 36's assessment.** On the repinned stack (iroh 1.3.0,
+iroh-gossip 0.101.0, p2panda 0.7.5), 13 two-resident runs were made with
+gossip debug traces: mDNS-only and ticketed first contact, both restart
+orders, and a seeded node on each restarted side.
+
+- **The model held** (measured). Replaying each side's pending set from its
+  log predicted all 26 restarts: a restart works exactly when its survivor
+  holds no pending entry for it. Every first restart worked and every
+  second failed. In the failures the survivor got the fresh `Join` 1.4 to
+  5 s after the restart and sent no `Neighbor`, and the seeded node arrived
+  109.1 to 112.4 s late, against 0.76 to 2.2 s when a restart worked.
+- **Ruling 57's reading, corrected.** A first-restart failure was not
+  reproduced (0 of 13). Its precondition was seen once, harmless in that
+  run's order (`A-mdns-ba\2a0e5358`): a received b's `Join` and answered
+  with `Neighbor`, which reached b before a's own queued `Join`s; b took it
+  as a new request and replied, and a took that reply as the answer. So a
+  stale entry forms on whichever side receives the other's `Neighbor`
+  before processing the other's `Join`. One side joining alone is one route
+  to that, and a `Neighbor` overtaking a `Join` in a symmetric contact is
+  another. All 13 first contacts delivered both `Join`s, 2 to 96 ms apart,
+  ticketed or not.
+- **Fix locations.** iroh-gossip's API offers only `Broadcast`,
+  `BroadcastNeighbors` and `JoinPeers` (`api.rs:376-382`, checked), so a
+  re-join from the p2panda fork cannot help while the survivor's entry
+  stands; that option reduces to closing connections, the mere-side nudge.
+  The crate is about 8,000 lines. Knot restates mere's p2panda rows in its
+  own patch table (checked), so a patch row is needed in both.
+- **iroh-gossip 0.101.0's source** is upstream commit `2ce78afe`, which
+  upstream's `v0.101.0` tag points to (`.cargo_vcs_info.json`, `git
+  ls-remote`); upstream `main` is at `2885dd9f`.
+
+**2026-10-04: upstream iroh-gossip (ruling 68).** Read through GitHub's API,
+nothing downloaded:
+
+- **`main` against our pin.** `2ce78afe...2885dd9f` is 3 commits ahead and 0
+  behind: CI workflows, upstream's `Cargo.lock`, `deny.toml` and one line in
+  `src/bin/sim.rs`. `proto/hyparview.rs` is untouched, so `main` does not
+  fix it, and crates.io's newest release is 0.101.0.
+- **Issue #172** (open, 2026-09-29, no replies) reports the same last step:
+  a pending entry makes `send_neighbor` ignore a returning peer's `Join`.
+  It reaches that state by another route, quitting one topic closes a
+  connection the other topics share (`state.rs:322`), and its proposed fix
+  would not cover a killed process on one topic. Its open question, about
+  an old and a new connection overlapping after a restart, is our silent
+  swap.
+- **PR #159** (open, not draft, conflicting with `main`, no reviews; an
+  outside contributor's, 2026-09-16 to 2026-10-04) carries A1 line for line
+  in `on_join` ("the old request must not suppress our reply"), inside a
+  2,435-line rework of dial ownership and reconnects across 11 files.
+- **PR #163** (a maintainer's draft asserting HyParView's paper claims) and
+  **PR #121** change other pending-entry paths, not `on_join`'s.
 
 ## 7. Progress
 
