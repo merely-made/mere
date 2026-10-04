@@ -90,6 +90,9 @@ impl Canvas {
                 if !was_moved {
                     self.unpark();
                     self.physics.set_dragging(true);
+                    // A node drag stops following, as a pan does ("Drag stops
+                    // following", 2026-10-04): the view holds under the hand.
+                    self.follow = false;
                 }
                 let world = self.screen_to_world(new);
                 self.place_pinned_node(d.node, world);

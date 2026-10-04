@@ -330,7 +330,8 @@ pub struct Canvas {
     /// Inertial pan velocity (px/frame); decays each frame when not dragging.
     pan_velocity: (f32, f32),
     /// Whether the camera follows the layout while physics plays (eases toward
-    /// fit-to-content each frame). A pan or zoom clears it; off by default.
+    /// fit-to-content each frame). A pan, zoom or node drag clears it; off by
+    /// default.
     follow: bool,
     /// `Some(last_cursor)` while a middle-button pan drag is in progress.
     middle_drag: Option<(f32, f32)>,
