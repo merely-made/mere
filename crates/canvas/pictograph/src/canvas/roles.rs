@@ -7,24 +7,24 @@
 //! Arrangement roles on the canvas (dynamics grammar plan, G7).
 //!
 //! The active arrangement's positions play the roles of a
-//! [`seiche::RoleTable`]: seeded by default (F23), anchored items return by an
-//! anchor spring while playing and jump back when a paused drag ends (F19),
+//! [`seiche::RoleTable`]: seeded by default (F23); anchored items return,
+//! by an anchor spring while the graph moves and, once it rests, by a short
+//! transition that takes each exactly home, where it holds until the graph is
+//! next disturbed (F45), and by jumping back when a paused drag ends (F19);
 //! pinned items are kinematic at their position. An explicit pin
 //! (`pin_focused`, a nudge) is the per-item pinned case (F22). A pick while
 //! playing keeps playing from the landed positions, and a stop returns the
-//! anchored items while seeded and pinned ones stay (F24). "Settled" is the
-//! latest settle's positions, picked like any other arrangement (F30).
+//! anchored items while seeded and pinned ones stay (F24). A settle is the
+//! bodies' rms speed falling under [`SETTLE_SPEED_FLOOR`] (F46). "Settled" is
+//! the latest settle's positions, picked like any other arrangement (F30).
 
+use super::at_rest::AtRest;
 use super::*;
 use seiche::{Role, RoleTable};
 
 /// The arrangement id of the latest settle (F30). Not a cartography adapter:
 /// the canvas supplies its positions.
 pub const SETTLED_ARRANGEMENT: &str = "settled";
-
-/// Kinetic energy below which a playing graph counts as come to rest: P2's
-/// floor, the figure `never_rests` was measured against (G1, F10).
-pub const SETTLE_ENERGY_FLOOR: f32 = 1.0;
 
 /// A stop's return of anchored items: where they were and where they go.
 /// A host that adopts transitions animates between the two
@@ -47,9 +47,10 @@ pub(crate) struct ArrangementRoles {
     /// A pick made while playing resumes once its final placement lands.
     resume_after_pick: bool,
     settled: Option<Vec<(NodeKey, PortablePoint)>>,
-    settle_armed: bool,
     settles: u64,
     stop_return: Option<StopReturn>,
+    /// The settle record and the at-rest return of anchored items.
+    rest: AtRest,
 }
 
 impl Default for ArrangementRoles {
@@ -60,9 +61,9 @@ impl Default for ArrangementRoles {
             pinned: HashSet::new(),
             resume_after_pick: false,
             settled: None,
-            settle_armed: false,
             settles: 0,
             stop_return: None,
+            rest: AtRest::default(),
         }
     }
 }
@@ -119,6 +120,13 @@ impl Canvas {
         self.graph
             .get_node(key)
             .map(|node| Graph::url_grouping_key(node.url()).to_string())
+    }
+
+    /// One member's own role, when it overrides its group's and the recipe's
+    /// (F48, the detail panel).
+    pub fn member_role(&self, member: uuid::Uuid) -> Option<Role> {
+        let key = self.graph.get_node_key_by_id(member)?;
+        self.roles.table.items.get(&key).copied()
     }
 
     /// The role `key` plays now: an explicit pin first, then the table.
@@ -296,19 +304,26 @@ impl Canvas {
         self.roles.settles
     }
 
-    /// Fold one frame into the settle record: a playing graph that comes to
-    /// rest (its settle ends, or its energy falls below the floor) replaces
-    /// Settled, once per rest. A law that never rests never replaces it.
-    pub(crate) fn note_settle(&mut self, settling: bool) {
-        if self.physics_paused || self.drag.is_some_and(|d| d.moved) {
+    /// The roles' share of a frame: note a settle, then glide anchored items
+    /// home. Called right after the physics snapshot lands in the view.
+    pub(crate) fn advance_roles(&mut self) {
+        self.note_settle();
+        self.advance_home();
+    }
+
+    /// Fold one frame into the settle record: a playing graph whose bodies'
+    /// rms speed falls under the floor has settled (F46). Once per rest, the
+    /// rest replaces Settled and anchored items start home (F45). A law that
+    /// never rests does neither.
+    fn note_settle(&mut self) {
+        if self.physics_paused {
             return;
         }
-        let at_rest = !settling || self.physics.kinetic_energy() < SETTLE_ENERGY_FLOOR;
-        if !at_rest {
-            self.roles.settle_armed = true;
+        if self.drag.is_some_and(|d| d.moved) {
+            self.roles.rest.arm();
             return;
         }
-        if !std::mem::take(&mut self.roles.settle_armed) || self.physics_never_rests() {
+        if !self.roles.rest.rested(self.physics.rms_speed()) || self.physics_never_rests() {
             return;
         }
         let positions: Vec<_> = self.view.positions().collect();
@@ -318,6 +333,60 @@ impl Canvas {
             self.sync_arrangement_roles();
         }
         self.roles.settled = Some(positions);
+        self.start_home();
+    }
+
+    /// At rest, every anchored item away from its position starts home.
+    fn start_home(&mut self) {
+        let glide: Vec<_> = self
+            .view
+            .positions()
+            .filter(|&(key, _)| {
+                !self.pinned_nodes.contains(&key) && self.arrangement_role_of(key) == Role::Anchored
+            })
+            .filter_map(|(key, at)| Some((key, at, self.arrangement_slot(key)?)))
+            .collect();
+        self.roles.rest.start(&mut self.physics, glide);
+    }
+
+    /// One frame of the glide home; at its end the items hold at home.
+    fn advance_home(&mut self) {
+        self.roles.rest.step(&mut self.physics);
+    }
+
+    /// A disturbance (a settle request, a drag, a pause or play) releases
+    /// the items held at home and stops a glide, so the spring acts again.
+    pub(crate) fn unpark(&mut self) {
+        let pinned = &self.pinned_nodes;
+        let table = &self.roles.table;
+        let graph = &self.graph;
+        let keep = |key: NodeKey| {
+            pinned.contains(&key)
+                || table.role(
+                    key,
+                    graph
+                        .get_node(key)
+                        .map(|node| Graph::url_grouping_key(node.url()))
+                        .as_deref(),
+                ) == Role::Pinned
+        };
+        self.roles.rest.release(&mut self.physics, keep);
+    }
+
+    /// How many anchored items are held at home after an at-rest return.
+    /// Receipt introspection.
+    pub fn anchored_home_count(&self) -> usize {
+        self.roles.rest.parked_count()
+    }
+
+    /// The frame's layout stage alone, without composing a scene: the
+    /// physics snapshot, the paused placement, and the roles. For receipts
+    /// that run thousands of frames.
+    #[cfg(test)]
+    pub(crate) fn step_layout(&mut self) {
+        self.physics.advance_frame(&mut self.view);
+        self.apply_strategy_to_view();
+        self.advance_roles();
     }
 
     /// A placement applied while Settled is active is Settled's own (a

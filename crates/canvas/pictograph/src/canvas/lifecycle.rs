@@ -503,6 +503,7 @@ impl Canvas {
             fluid: Vec::new(),
             fluid_radius: 0.0,
             energy: 0.0,
+            speed: 0.0,
             generation: self.generation,
         });
         self.view.set_edges(dedup_edges(&self.graph));

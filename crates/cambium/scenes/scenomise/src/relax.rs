@@ -16,7 +16,8 @@
 //! between placed items and springs along routed relations, acting on the
 //! arrangement's positions in their roles (dynamics grammar plan, G7): a
 //! seeded item, the default, only starts there; an anchored item is drawn
-//! back, the canvas's anchor spring at swatch scale; a pinned item stays. A
+//! back, the canvas's anchor spring at swatch scale, and ends exactly home
+//! (F45); a pinned item stays. A
 //! swatch reads with the identical vocabulary as the canvas, at a fraction of
 //! the cost.
 //!
@@ -312,6 +313,14 @@ pub fn relax_roles(scene: &mut Scene, settings: &Relaxation, roles: &[(InstanceI
         }
     }
 
+    // At rest, anchored items finish their return exactly home (F45): the
+    // spring drew them while the scene loosened, and relaxation ends at rest.
+    for (index, item) in scene.items.iter_mut().enumerate() {
+        if role[index] == Hold::Anchored && !held[index] {
+            item.transform.translate = anchors[index];
+        }
+    }
+
     // Content bounds moved with the items.
     if let Some(first) = scene.items.first() {
         let mut bounds = sceno::Rect::new(first.transform.translate, sceno::Size2::new(0.0, 0.0));
@@ -403,21 +412,33 @@ mod tests {
     }
 
     #[test]
-    fn seeded_and_anchored_items_still_relax() {
-        // Neither is in honored_holds, so both keep moving. A scene where
-        // either silently pinned would be the same silent-soft failure
-        // wearing the other face.
-        for settings in [Relaxation::default(), Relaxation::default().anchored()] {
-            let mut scene = scene_with(&[(0.0, 0.0), (1.0, 0.0)]);
-            let before = scene.items[0].transform.translate;
-            relax(&mut scene, &settings);
-            assert_ne!(scene.items[0].transform.translate, before);
-        }
+    fn seeded_items_relax_and_anchored_items_end_home() {
+        // A seeded item is not in honored_holds, so it keeps moving; a scene
+        // where seeding silently pinned would be the silent-soft failure
+        // wearing the other face. An anchored item is drawn back while the
+        // scene loosens and ends exactly home (F45).
+        let mut seeded = scene_with(&[(0.0, 0.0), (1.0, 0.0)]);
+        let before = seeded.items[0].transform.translate;
+        relax(&mut seeded, &Relaxation::default());
+        assert_ne!(seeded.items[0].transform.translate, before);
+
+        let mut anchored = scene_with(&[(0.0, 0.0), (1.0, 0.0)]);
+        relax_roles(
+            &mut anchored,
+            &Relaxation::default(),
+            &[(InstanceId(0), Hold::Anchored)],
+        );
+        assert_eq!(anchored.items[0].transform.translate, before, "home");
+        assert_ne!(
+            anchored.items[1].transform.translate,
+            Vec2::new(1.0, 0.0),
+            "its seeded neighbour relaxed"
+        );
     }
 
     /// F22 at swatch scale: an item's role overrides the recipe's. The pinned
-    /// item holds exactly, the anchored one stays nearer home than the seeded
-    /// one beside it.
+    /// item holds exactly and the anchored one ends home (F45), while the
+    /// seeded one beside it stays where it relaxed.
     #[test]
     fn per_item_roles_override_the_recipe_role() {
         let points = [(0.0, 0.0), (10.0, 0.0), (20.0, 0.0), (30.0, 0.0)];
@@ -436,7 +457,8 @@ mod tests {
             (at.x - points[i].0).hypot(at.y - points[i].1)
         };
         assert_eq!(drift(0), 0.0, "pinned holds");
-        assert!(drift(2) < drift(3), "anchored nearer home than seeded");
+        assert_eq!(drift(2), 0.0, "anchored ends home");
+        assert!(drift(3) > 0.0, "seeded stays where it relaxed");
     }
 
     #[test]
@@ -567,10 +589,10 @@ mod tests {
                 })
                 .sum()
         };
+        assert_eq!(drift(&tethered), 0.0, "an anchored arrangement ends home");
         assert!(
-            drift(&tethered) < drift(&free),
-            "an anchored arrangement stays nearer its slots: {} vs {}",
-            drift(&tethered),
+            drift(&free) > 0.0,
+            "a seeded one does not: {}",
             drift(&free)
         );
     }

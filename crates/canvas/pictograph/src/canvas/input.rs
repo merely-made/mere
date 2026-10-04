@@ -88,6 +88,7 @@ impl Canvas {
                 // On the click→drag transition, tell the backend to keep ticking
                 // so the pinned node's neighbors react through the springs.
                 if !was_moved {
+                    self.unpark();
                     self.physics.set_dragging(true);
                 }
                 let world = self.screen_to_world(new);
@@ -630,6 +631,7 @@ impl Canvas {
     fn set_paused(&mut self, paused: bool, by_role: bool) {
         self.reset_frame_time();
         self.cancel_pick_resume();
+        self.unpark();
         if paused != self.physics_paused {
             // Publish a pending paused placement before resuming. Seed both
             // transitions from what the user sees, never from stored arrangement
@@ -683,6 +685,7 @@ impl Canvas {
     /// settle trigger routes through (the only direct `physics.settle` caller).
     /// (Physics pause.)
     pub(crate) fn settle_physics(&mut self, ticks: u32) {
+        self.unpark();
         if !self.physics_paused {
             self.physics.settle(ticks);
         }

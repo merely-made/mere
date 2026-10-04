@@ -18,6 +18,13 @@ use crate::{Footprint, Rect, Representation, Size2, SourceRef, Vec2};
 
 /// The persisted-score wire version.
 ///
+/// Version 5 gives the holds their three arrangement roles (dynamics grammar
+/// plan, F25, F44): "Seeded", "Anchored" (returns) and "Pinned". Up to version
+/// 4, "Anchored" meant best effort, which is now `Seeded`, so an older score's
+/// "Anchored" reads as [`Hold::Seeded`] and keeps its meaning. A reader
+/// refuses a score newer than itself ([`ScoreVersionError`]), and a score it
+/// reads is held in its own version's meaning from then on.
+///
 /// Version 4 absorbs the `arrangements` catalog: seven new [`Arrangement`]
 /// families, the [`Arrangement::Custom`] escape, and the three per-item
 /// disclosure fields they read ([`ScoreItem::axis`], [`ScoreItem::embedding`],
@@ -32,10 +39,35 @@ use crate::{Footprint, Rect, Representation, Size2, SourceRef, Vec2};
 /// score rather than accept it, because the one thing it would drop is an
 /// authored placement someone asked to be honored. A silently dropped pin is
 /// the failure this field exists to prevent.
-pub const SCORE_VERSION: u16 = 4;
+pub const SCORE_VERSION: u16 = 5;
+
+/// The first version whose "Anchored" hold returns (F44).
+const RETURNING_ANCHOR_SINCE: u16 = 5;
+
+/// A score newer than its reader, refused rather than half-read.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ScoreVersionError {
+    /// The score's version.
+    pub found: u16,
+    /// The newest version the reader knows.
+    pub reader: u16,
+}
+
+impl std::fmt::Display for ScoreVersionError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "score version {} is newer than this reader's {}",
+            self.found, self.reader
+        )
+    }
+}
+
+impl std::error::Error for ScoreVersionError {}
 
 /// A complete, serializable projection request.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(try_from = "ScoreWire")]
 pub struct Score {
     /// Allows an adapter to reject a score it cannot interpret.
     pub version: u16,
@@ -57,7 +89,54 @@ pub struct Score {
     pub generation: u64,
 }
 
+/// A score as written, before it is read in the reader's meaning.
+#[derive(Deserialize)]
+struct ScoreWire {
+    version: u16,
+    arrangement: Arrangement,
+    items: Vec<ScoreItem>,
+    #[serde(default)]
+    holds: Vec<HeldPlacement>,
+    generation: u64,
+}
+
+impl TryFrom<ScoreWire> for Score {
+    type Error = ScoreVersionError;
+
+    fn try_from(wire: ScoreWire) -> Result<Self, Self::Error> {
+        Score::read(wire, SCORE_VERSION)
+    }
+}
+
 impl Score {
+    /// How a reader at version `reader` reads `wire`: a newer score is
+    /// refused; an older one's "Anchored", best effort then, becomes
+    /// [`Hold::Seeded`]; and the score is stamped with the reader's version,
+    /// so it is never written back under an older meaning.
+    fn read(wire: ScoreWire, reader: u16) -> Result<Self, ScoreVersionError> {
+        if wire.version > reader {
+            return Err(ScoreVersionError {
+                found: wire.version,
+                reader,
+            });
+        }
+        let mut holds = wire.holds;
+        if wire.version < RETURNING_ANCHOR_SINCE && reader >= RETURNING_ANCHOR_SINCE {
+            for held in &mut holds {
+                if held.hold == Hold::Anchored {
+                    held.hold = Hold::Seeded;
+                }
+            }
+        }
+        Ok(Self {
+            version: reader,
+            arrangement: wire.arrangement,
+            items: wire.items,
+            holds,
+            generation: wire.generation,
+        })
+    }
+
     pub fn new(arrangement: Arrangement) -> Self {
         Self {
             version: SCORE_VERSION,
@@ -82,10 +161,8 @@ impl Score {
 /// solver that treats a pin as a suggestion produces the silent-soft failure
 /// where a person pins something, the layout quietly moves it, and nothing
 /// anywhere says so. Only [`Hold::Pinned`] is reported honored or unmet.
-//
-// F25's serde mapping is held for Mark's ruling: a score saved before the
-// three holds wrote "Anchored" for what is now `Seeded`, and an alias would
-// make a new `Anchored` read back as `Seeded`.
+/// A score before version 5 wrote "Anchored" for what is now `Seeded`; its
+/// [`Score`] reads it so (F44).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum Hold {
     /// Best effort. The arrangement seeds from here and relaxation may carry
@@ -722,9 +799,9 @@ mod tests {
     }
 
     #[test]
-    fn score_stamps_v4() {
-        assert_eq!(SCORE_VERSION, 4);
-        assert_eq!(Score::new(Arrangement::Grid(Grid::default())).version, 4);
+    fn score_stamps_v5() {
+        assert_eq!(SCORE_VERSION, 5);
+        assert_eq!(Score::new(Arrangement::Grid(Grid::default())).version, 5);
     }
 
     /// A v3 score predates the three disclosure fields entirely. It must still
@@ -767,7 +844,10 @@ mod tests {
         }
 
         let loaded: Score = serde_json::from_value(wire).expect("v3 score must still load");
-        assert_eq!(loaded.version, 3);
+        assert_eq!(
+            loaded.version, SCORE_VERSION,
+            "read into the current meaning"
+        );
         let item = &loaded.items[0];
         // Absent, not zeroed: `Some(0.0)` and `None` mean different things to
         // every arrangement that reads these.
@@ -846,10 +926,8 @@ mod tests {
         assert!(score.hold_for(&SourceRef::new("other", "north")).is_none());
     }
 
-    /// F25: the three holds round-trip, and a score saved before them reads
-    /// its "Anchored" (then best effort) as `Seeded`. The second half waits on
-    /// Mark's ruling on the wire format (a version gate, or a distinct wire
-    /// name for the returning hold); until then it fails, run with --ignored.
+    /// F25, F44: a version-5 score round-trips all three holds, byte for
+    /// byte, and a new anchored hold reads back as anchored.
     #[test]
     fn three_holds_round_trip() {
         let mut score = Score::new(Arrangement::Spiral(Spiral::default()));
@@ -865,8 +943,10 @@ mod tests {
             });
         }
         let json = serde_json::to_string(&score).unwrap();
+        assert!(json.contains(r#""version":5"#));
         let back: Score = serde_json::from_str(&json).unwrap();
         assert_eq!(back, score);
+        assert_eq!(serde_json::to_string(&back).unwrap(), json, "byte for byte");
         assert_eq!(
             back.holds[1].hold,
             Hold::Anchored,
@@ -874,8 +954,10 @@ mod tests {
         );
     }
 
+    /// F44: a version-4 score's "Anchored" was best effort, and reads as
+    /// `Seeded`; its "Pinned" stays pinned. Written again, it is a version-5
+    /// score whose seeded hold reads back as seeded.
     #[test]
-    #[ignore = "F25's wire format awaits Mark's ruling"]
     fn an_old_scores_anchored_hold_reads_as_seeded() {
         let json = r#"{
             "version": 4,
@@ -892,6 +974,45 @@ mod tests {
             Hold::Seeded,
             "a v4 anchored hold was best effort, the seeded role"
         );
+        let pinned = json.replace(r#""hold": "Anchored""#, r#""hold": "Pinned""#);
+        let pinned: Score = serde_json::from_str(&pinned).unwrap();
+        assert_eq!(pinned.holds[0].hold, Hold::Pinned, "a v4 pin is a pin");
+        let again: Score = serde_json::from_str(&serde_json::to_string(&score).unwrap()).unwrap();
+        assert_eq!(again.version, 5);
+        assert_eq!(again.holds[0].hold, Hold::Seeded, "and stays seeded");
+    }
+
+    /// F44: a reader refuses a score newer than itself. A version-4 reader
+    /// meets a version-5 score with an anchored hold; the current reader
+    /// meets a version-6 score. Each reads its own version (the control).
+    #[test]
+    fn a_reader_refuses_a_newer_score() {
+        let mut score = Score::new(Arrangement::Spiral(Spiral::default()));
+        score.holds.push(HeldPlacement::anchored(
+            SourceRef::new("fixture", "new"),
+            Vec2::new(1.0, 2.0),
+        ));
+        let wire = |version: u16| {
+            let mut value = serde_json::to_value(&score).unwrap();
+            value["version"] = serde_json::json!(version);
+            serde_json::from_value::<ScoreWire>(value).unwrap()
+        };
+        assert_eq!(
+            Score::read(wire(5), 4).unwrap_err(),
+            ScoreVersionError {
+                found: 5,
+                reader: 4
+            }
+        );
+        assert!(Score::read(wire(4), 4).is_ok(), "a v4 reader reads v4");
+        let mut six = serde_json::to_value(&score).unwrap();
+        six["version"] = serde_json::json!(6);
+        let refused = serde_json::from_value::<Score>(six).unwrap_err();
+        assert_eq!(
+            refused.to_string(),
+            "score version 6 is newer than this reader's 5"
+        );
+        assert!(serde_json::from_value::<Score>(serde_json::to_value(&score).unwrap()).is_ok());
     }
 
     #[test]
@@ -906,7 +1027,10 @@ mod tests {
             "generation": 3
         }"#;
         let score: Score = serde_json::from_str(json).unwrap();
-        assert_eq!(score.version, 1);
+        assert_eq!(
+            score.version, SCORE_VERSION,
+            "read into the current meaning"
+        );
         assert_eq!(score.generation, 3);
         assert!(score.holds.is_empty());
     }

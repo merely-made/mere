@@ -130,8 +130,10 @@ fn play(canvas: &mut Canvas, frames: usize) {
 
 /// G7's first done-condition: the brief's probe through the canvas. The seed
 /// reads ρ ≈ 1 (the positive control); seeded lets the order fall (the brief
-/// measured 0.30 at 6 s in seiche alone); anchored holds it (0.79); and every
-/// pinned item stays exactly at its position while the seeded ones move.
+/// measured 0.30 at 6 s in seiche alone); anchored holds it by its spring
+/// while the graph moves (0.79 at 5 s) and, once it rests, its glide home
+/// restores the arrangement exactly (F45); and every pinned item stays
+/// exactly at its position while the seeded ones move.
 #[test]
 fn the_spiral_probe_through_the_canvas() {
     let (canvas, keys, ordinal) = spiral_canvas();
@@ -141,31 +143,54 @@ fn the_spiral_probe_through_the_canvas() {
         "the instrument reads the seed as ordered: {seed}"
     );
 
-    let run = |table: RoleTable| {
+    let run = |table: RoleTable, frames: usize| {
         let (mut canvas, keys, ordinal) = spiral_canvas();
         canvas.set_arrangement_roles(table);
-        play(&mut canvas, SETTLE_TICKS as usize);
+        play(&mut canvas, frames);
         let r = rho(&canvas, &keys, &ordinal);
         (canvas, keys, r)
     };
-    let (seeded, _, seeded_rho) = run(RoleTable::uniform(Role::Seeded));
-    let (anchored, _, anchored_rho) = run(RoleTable::uniform(Role::Anchored));
+    let (seeded, _, seeded_rho) = run(RoleTable::uniform(Role::Seeded), SETTLE_TICKS as usize);
+    let (mut anchored, _, anchored_rho) = run(RoleTable::uniform(Role::Anchored), 300);
+    let moving_overlaps = overlaps(&anchored, &keys);
+    let mut frames = 300;
+    while (anchored.settle_count() == 0 || anchored.anchored_home_count() < N) && frames < 3000 {
+        anchored.frame(1400, 900);
+        frames += 1;
+    }
+    let rest_rho = rho(&anchored, &keys, &ordinal);
     let mut mixed = RoleTable::uniform(Role::Seeded);
     let pinned: Vec<NodeKey> = keys.iter().copied().step_by(3).collect();
     for key in &pinned {
         mixed.items.insert(*key, Role::Pinned);
     }
-    let (mixed_canvas, _, mixed_rho) = run(mixed);
+    let (mixed_canvas, _, mixed_rho) = run(mixed, SETTLE_TICKS as usize);
     println!(
-        "spiral probe through the canvas at 6 s: seed rho {seed:.3}; seeded rho {seeded_rho:.3} \
-         ({} overlaps); anchored rho {anchored_rho:.3} ({} overlaps, stiffness {}); \
-         a third pinned rho {mixed_rho:.3}",
+        "spiral probe through the canvas: seed rho {seed:.3}; seeded at 6 s rho {seeded_rho:.3} \
+         ({} overlaps); anchored at 5 s, moving, rho {anchored_rho:.3} ({moving_overlaps} \
+         overlaps, stiffness {}); anchored at rest, home after {frames} frames, rho {rest_rho:.3} \
+         ({} overlaps, the arrangement's own); a third pinned at 6 s rho {mixed_rho:.3}",
         overlaps(&seeded, &keys),
-        overlaps(&anchored, &keys),
         anchored.anchor_stiffness(),
+        overlaps(&anchored, &keys),
     );
     assert!(seeded_rho < 0.5, "seeded, the order falls: {seeded_rho}");
-    assert!(anchored_rho > 0.7, "anchored holds it: {anchored_rho}");
+    assert!(
+        anchored_rho > 0.7,
+        "anchored holds it while moving: {anchored_rho}"
+    );
+    assert_eq!(
+        anchored.anchored_home_count(),
+        N,
+        "every anchored item came home"
+    );
+    for (i, key) in keys.iter().enumerate() {
+        assert_eq!(
+            anchored.view.position_of(*key),
+            Some(slot(ordinal[i])),
+            "anchored item {i} exactly home at rest"
+        );
+    }
     let mut moved = 0;
     for (i, key) in keys.iter().enumerate() {
         let at = mixed_canvas.view.position_of(*key).unwrap();
@@ -310,11 +335,12 @@ fn drag_by(canvas: &mut Canvas, key: NodeKey, dx: f32, dy: f32) -> PortablePoint
     dropped
 }
 
-/// F19: a dragged anchored item returns with physics on and jumps back with
-/// physics off; a dragged seeded item stays where it was dropped. With
-/// physics on, "returns" is to where the anchored item rests undisturbed (the
-/// control run beside it): the outermost Spiral item rests about 220 units
-/// from its position at stiffness 12, its edges pulling against the spring.
+/// F19 and F45: a dragged anchored item returns, with physics on by its
+/// spring and then, once the graph rests, by a glide that ends exactly home;
+/// with physics off it jumps back. A dragged seeded item stays where it was
+/// dropped, its drop becoming its position, and nothing returns it (the
+/// control in the same run). The outermost Spiral item is the anchored one:
+/// its spring alone rests it about 220 units from home, its edges pulling.
 #[test]
 fn a_drag_follows_the_items_role() {
     let distance = |a: PortablePoint, b: PortablePoint| (a.x - b.x).hypot(a.y - b.y);
@@ -323,61 +349,62 @@ fn a_drag_follows_the_items_role() {
         (home.x * out, home.y * out)
     };
     for playing in [true, false] {
-        let run = |drag: bool| {
-            let (mut canvas, keys, ordinal) = spiral_canvas();
-            canvas.set_arrangement_role(Role::Anchored);
-            let anchored = keys[(0..N).max_by_key(|&i| ordinal[i]).unwrap()];
-            let seeded = keys[(0..N).find(|&i| ordinal[i] == N - 2).unwrap()];
-            let member = canvas.graph().get_node(seeded).unwrap().id;
-            canvas.set_member_role(member, Some(Role::Seeded));
-            canvas.set_physics_paused(!playing);
-            let homes = [anchored, seeded].map(|k| canvas.arrangement_slot(k).unwrap());
-            let mut drops = [homes[0], homes[1]];
-            if drag {
-                for (i, key) in [anchored, seeded].into_iter().enumerate() {
-                    let (dx, dy) = outward(homes[i]);
-                    drops[i] = drag_by(&mut canvas, key, dx, dy);
-                }
-            }
-            for _ in 0..SETTLE_TICKS {
-                canvas.frame(1400, 900);
-            }
-            let ends = [anchored, seeded].map(|k| canvas.view.position_of(k).unwrap());
-            let slots = [anchored, seeded].map(|k| canvas.arrangement_slot(k).unwrap());
-            (canvas, homes, drops, ends, slots)
-        };
-        let (_, _, _, undisturbed, _) = run(false);
-        let (canvas, homes, drops, ends, slots) = run(true);
-        println!(
-            "drag, playing {playing}: anchored dropped {:.1} from home and {:.1} from its undisturbed rest, ends {:.1} from that rest",
-            distance(drops[0], homes[0]),
-            distance(drops[0], undisturbed[0]),
-            distance(ends[0], undisturbed[0]),
-        );
-        println!(
-            "drag, playing {playing}: seeded dropped {:.1} from home, ends {:.1} from the drop and {:.1} from its undisturbed rest",
-            distance(drops[1], homes[1]),
-            distance(ends[1], drops[1]),
-            distance(ends[1], undisturbed[1]),
-        );
+        let (mut canvas, keys, ordinal) = spiral_canvas();
+        canvas.set_arrangement_role(Role::Anchored);
+        let anchored = keys[(0..N).max_by_key(|&i| ordinal[i]).unwrap()];
+        let seeded = keys[(0..N).find(|&i| ordinal[i] == N - 2).unwrap()];
+        let member = canvas.graph().get_node(seeded).unwrap().id;
+        canvas.set_member_role(member, Some(Role::Seeded));
+        canvas.set_physics_paused(!playing);
+        let homes = [anchored, seeded].map(|k| canvas.arrangement_slot(k).unwrap());
+        let mut drops = homes;
+        for (i, key) in [anchored, seeded].into_iter().enumerate() {
+            let (dx, dy) = outward(homes[i]);
+            drops[i] = drag_by(&mut canvas, key, dx, dy);
+        }
         assert!(distance(drops[0], homes[0]) > 100.0, "the drag moved it");
+        let slots = [anchored, seeded].map(|k| canvas.arrangement_slot(k).unwrap());
         assert_eq!(
             slots[0], homes[0],
             "an anchored drag leaves its position alone"
         );
         assert_eq!(slots[1], drops[1], "a seeded drop becomes its position");
         if playing {
-            assert!(
-                distance(drops[0], undisturbed[0]) > 100.0
-                    && distance(ends[0], undisturbed[0]) < 5.0,
-                "the anchored item returned by its spring"
+            let mut rested_at = None;
+            let mut frames = 0;
+            while canvas.anchored_home_count() < N - 1 && frames < 6000 {
+                canvas.step_layout();
+                frames += 1;
+                if rested_at.is_none() && canvas.settle_count() > 0 {
+                    rested_at = canvas.view.position_of(anchored);
+                }
+            }
+            let rested = rested_at.expect("the graph came to rest");
+            let end = canvas.view.position_of(anchored).unwrap();
+            let seeded_end = canvas.view.position_of(seeded).unwrap();
+            println!(
+                "drag, playing: anchored dropped {:.1} from home, rested {:.1} from it on its \
+                 spring, home after {frames} frames ({:.3} off); seeded ends {:.1} from its old \
+                 position",
+                distance(drops[0], homes[0]),
+                distance(rested, homes[0]),
+                distance(end, homes[0]),
+                distance(seeded_end, homes[1]),
             );
-            assert_eq!(
-                canvas.physics.anchor_count(),
-                N - 1,
-                "every item is anchored but the seeded one"
+            assert!(
+                distance(rested, homes[0]) > 100.0,
+                "the spring alone rests it off home"
+            );
+            assert_eq!(end, homes[0], "the glide ends exactly home");
+            assert!(
+                distance(seeded_end, homes[1]) > 100.0,
+                "nothing returns a seeded item"
             );
         } else {
+            for _ in 0..SETTLE_TICKS {
+                canvas.frame(1400, 900);
+            }
+            let ends = [anchored, seeded].map(|k| canvas.view.position_of(k).unwrap());
             assert_eq!(ends[0], homes[0], "jumped back with physics off");
             assert_eq!(ends[1], drops[1], "seeded stays exactly, paused");
         }
