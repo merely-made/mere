@@ -2,13 +2,14 @@
 
 **Date**: 2026-10-01
 **Status (2026-10-04)**: in progress. Shape ruled by Mark on 2026-10-01
-(rulings 7 and 10 to 15 in the dramatis tier architecture; rulings 16 to 58
+(rulings 7 and 10 to 15 in the dramatis tier architecture; rulings 16 to 59
 below). P0 met; P1 landed on `main` (`da3c50bc`); P2 landed (`3e4992ec`); P3
 landed (`ff68e86c`), meeting the Mere 0.4 baseline's chatelaine condition.
 The review stop ended 2026-10-04 (ruling 51). P4a's first build signs RSA
 through `ring` and ECDSA, proven on the ThinkPad; its second round carries
 rulings 54 to 58 (no re-import overwrite, P-521 refused, unsignable keys
-refused, and the RSA key built by a library).
+refused, and the RSA key built once by the `rsa` crate, ring signing:
+rulings 58, 59).
 **Scope**: found `chatelaine` as the tier's plain secret-item taxonomy; move
 castellan's OTP items and its Secret Service store onto it; then import
 (and finally export) the FIDO Credential Exchange Format through castellan.
@@ -396,6 +397,19 @@ memory: "if the domain requires expertise due to the features being
 privacy, security, or critical operation-oriented, we need to adhere to
 standards rigorously ... We should rely on the wisdom of people who have
 done this longer than a year."
+
+**Ruling 59.** *Ruling 58's search found one maintained library in the lock
+that builds a full RSA key from OpenSSH's six components: the `rsa` crate's
+`from_components` (validate and precompute). aws-lc-rs and ring take the CRT
+values as inputs (aws-lc-rs `src/rsa/key.rs:103-125`, checked), pkcs1 is a
+container, and AWS-LC's no-CRT constructor is reachable only by new unsafe
+FFI. The `rsa` construction runs once per key load, locally, in variable
+time.* Options: `rsa` builds, ring signs; defer RSA; AWS-LC through FFI.
+Mark: **"rsa builds, ring signs (Recommended)"**. Follows: the `rsa` crate's
+standard construction and PKCS#8 export run once per key load; every
+signature is ring's; recorded as `rsa` touching the key at load only, which
+amends ruling 52's "no `rsa` private-key operation in this path" to
+"no `rsa` signing or decryption".
 
 ## 3. Phases
 
