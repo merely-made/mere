@@ -24,6 +24,7 @@ mod camera;
 mod density;
 mod density_probe;
 mod density_wander;
+mod face_on_body;
 mod fold_and_source_time;
 mod gloss;
 mod layout_and_drag;

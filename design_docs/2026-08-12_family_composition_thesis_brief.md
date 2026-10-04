@@ -151,6 +151,13 @@ scope; score). Stated this compactly it is testable: any place a projection
 can exceed its sync scope, or a sync exceed its disclosure, is a bug class
 with a name.
 
+> **Amended 2026-10-04 (Mark, [graph semantics plan](mere_docs/implementation_strategy/2026-10-04_graph_semantics_plan.md)
+> ruling 4):** every query and projection result names the layer that limited
+> it, and partial residency adds "not loaded". *Reading, not ruled*: residency
+> sits inside possession (held on disk or another device, not in memory), so
+> the named layers are possession, residency, disclosure, synchronization and
+> projection.
+
 **The release narrative (device, not schedule).** Woodshed proves an
 application is worth using alone before any composition ships; Personae +
 Castellan prove identity crosses applications through both headless and
