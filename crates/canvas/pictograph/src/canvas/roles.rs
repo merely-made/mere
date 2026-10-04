@@ -366,8 +366,7 @@ impl Canvas {
                     key,
                     graph
                         .get_node(key)
-                        .map(|node| Graph::url_grouping_key(node.url()))
-                        .as_deref(),
+                        .map(|node| Graph::url_grouping_key(node.url())),
                 ) == Role::Pinned
         };
         self.roles.rest.release(&mut self.physics, keep);
