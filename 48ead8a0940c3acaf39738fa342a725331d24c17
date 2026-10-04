@@ -1,0 +1,1 @@
+Correction (2026-10-04): this merge's second parent is 2d4b1ee9 (main after Merge grammar-g7), not 60eb5940 as the subject says; main had advanced between reading it and running the merge, so it also brought G7's arrangement roles (F18-F30, F44-F49). The conflict notes in the message hold.
