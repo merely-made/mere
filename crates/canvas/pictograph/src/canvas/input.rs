@@ -23,6 +23,7 @@ use super::{
     CLICK_SLOP, Canvas, Drag, EDGE_PICK_TOL, ORBIT_TILT_PER_PX, ORBIT_YAW_PER_PX, PointerButton,
     SETTLE_TICKS, WHEEL_PAN_SCALE, ZOOM_STEP,
 };
+use seiche::Role;
 
 /// World-space radius of a freshly placed field region — its `Disk` definition
 /// radius and its enclosing square `Region` half-extent. A sensible default the
@@ -87,6 +88,7 @@ impl Canvas {
                 // On the click→drag transition, tell the backend to keep ticking
                 // so the pinned node's neighbors react through the springs.
                 if !was_moved {
+                    self.unpark();
                     self.physics.set_dragging(true);
                 }
                 let world = self.screen_to_world(new);
@@ -186,7 +188,6 @@ impl Canvas {
                         node,
                         press: self.cursor,
                         moved: false,
-                        was_pinned: self.pinned_nodes.contains(&node),
                     });
                 } else if self.begin_field_drag(self.screen_to_world(self.cursor)) {
                     // Grabbed a field's box edge (move) or corner (resize) — the deep
@@ -231,11 +232,7 @@ impl Canvas {
                 if let Some(d) = self.drag.take() {
                     if d.moved {
                         self.physics.set_dragging(false);
-                        if !d.was_pinned {
-                            self.physics.unpin(d.node);
-                            self.sync_anchor_force();
-                            self.settle_physics(SETTLE_TICKS / 3);
-                        }
+                        self.release_dragged(d.node);
                     } else if self.shift {
                         // Shift-click toggles the node in the selection (multi-select).
                         if !self.selected.remove(&d.node) {
@@ -369,18 +366,42 @@ impl Canvas {
             return false;
         }
         self.physics.unpin(key);
-        self.sync_anchor_force();
+        self.sync_arrangement_roles();
         self.settle_physics(SETTLE_TICKS / 3);
         true
     }
 
+    /// End a node drag by the node's role (F19, G7). A seeded node stays where
+    /// it was dropped, and the drop became its arrangement position. An
+    /// anchored node returns: by its anchor spring while playing, by jumping
+    /// back while paused. A pinned node stays held at the drop, its pin moved
+    /// there.
+    fn release_dragged(&mut self, node: NodeKey) {
+        let role = self.arrangement_role_of(node);
+        if role != Role::Pinned {
+            self.physics.unpin(node);
+            // Dropped at rest: the pointer's last step is not a throw.
+            if let Some(at) = self.view.position_of(node) {
+                self.reset_frame_time();
+                self.physics.seed(vec![(node, at)]);
+            }
+        }
+        if role == Role::Anchored && self.physics_paused {
+            self.jump_home(node);
+        }
+        self.sync_arrangement_roles();
+        self.settle_physics(SETTLE_TICKS / 3);
+    }
+
     /// Pin a node in the solver, update the local read model immediately, and
-    /// preserve a paused analytic arrangement's slot. The graph remains
-    /// position-free throughout.
+    /// preserve a paused analytic arrangement's slot. An anchored node's
+    /// arrangement position is its home, so a pull moves the node but not
+    /// that position. The graph remains position-free throughout.
     fn place_pinned_node(&mut self, node: NodeKey, world: Point2D<f32>) {
         self.physics.pin(node, world);
         self.view.set_position(node, world);
-        if let Some(positions) = self.strategy_positions.as_mut()
+        if self.arrangement_role_of(node) != Role::Anchored
+            && let Some(positions) = self.strategy_positions.as_mut()
             && let Some((_, position)) = positions.iter_mut().find(|(key, _)| *key == node)
         {
             *position = PortablePoint::new(world.x, world.y);
@@ -597,23 +618,44 @@ impl Canvas {
     /// a running Spiral lets forces relax
     /// from there, and "force-directed" is simply *no* analytic arrangement
     /// with physics running. (Physics as a capability.)
+    ///
+    /// A stop leaves seeded and pinned items where they are and returns
+    /// anchored items to their arrangement positions (F24); a host that
+    /// animates the return reads it from [`Self::take_stop_return`].
     pub fn set_physics_paused(&mut self, paused: bool) {
+        self.set_paused(paused, true);
+    }
+
+    /// Pause or run for the canvas's own reasons (a pick, a restore): no
+    /// stop return, since the caller places everything itself.
+    pub(crate) fn set_physics_paused_quietly(&mut self, paused: bool) {
+        self.set_paused(paused, false);
+    }
+
+    fn set_paused(&mut self, paused: bool, by_role: bool) {
         self.reset_frame_time();
+        self.cancel_pick_resume();
+        self.unpark();
         if paused != self.physics_paused {
             // Publish a pending paused placement before resuming. Seed both
             // transitions from what the user sees, never from stored arrangement
             // slots or a newer, not-yet-displayed actor snapshot.
             self.apply_strategy_to_view();
-            let positions: Vec<_> = self.view.positions().collect();
+            let mut positions: Vec<_> = self.view.positions().collect();
+            if paused && by_role {
+                positions = self.stop_placement(&positions);
+                for &(key, at) in &positions {
+                    self.view.set_position(key, at);
+                }
+            }
             self.reset_frame_time();
             self.physics.seed(positions.clone());
             self.paused_positions = paused.then_some(positions);
         }
         self.physics_paused = paused;
-        // The arrangement's anchor springs only exist while playing (paused, the
-        // buffered positions are asserted directly), so the pull follows the
-        // pause. (Arrangement as attractor.)
-        self.sync_anchor_force();
+        // Anchored items' springs exist only while playing (paused, the
+        // buffered positions are asserted directly), so they follow the pause.
+        self.sync_arrangement_roles();
         if self.physics_paused {
             self.reset_frame_time();
             self.physics.halt();
@@ -647,6 +689,7 @@ impl Canvas {
     /// settle trigger routes through (the only direct `physics.settle` caller).
     /// (Physics pause.)
     pub(crate) fn settle_physics(&mut self, ticks: u32) {
+        self.unpark();
         if !self.physics_paused {
             self.physics.settle(ticks);
         }
