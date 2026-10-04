@@ -716,7 +716,11 @@ pull reading −0.33 with 510 overlaps):
   host's `LiveEndpoint`, `mere_host`, djinn's residents) run no simulation
   for the board, and each viewer simulates its own `PhysicsBoard` from the
   owner's score, its law mirroring the viewer's canvas (P3). The question
-  goes back to Mark with the finding.
+  goes back to Mark with the finding. Put back with it (options: the
+  viewer's own dial; the owner publishing a speed on the session's snapshots
+  and diffs; 1x always), Mark chose **"The viewer's own dial"**: a remote
+  board follows the viewer's Speed select, as its law follows the viewer's
+  canvas, with no wire change.
   Orbit's API: asked how the tangential-only counter-damping meets seiche's
   public `Gravity::counter_damping: bool` (seiche 0.0.5 publishable), Mark
   chose **"Explicit enum, bump seiche"**: the bool becomes
