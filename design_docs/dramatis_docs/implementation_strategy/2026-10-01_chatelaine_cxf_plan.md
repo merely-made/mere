@@ -1,11 +1,12 @@
 # Chatelaine and CXF Import Plan
 
 **Date**: 2026-10-01
-**Status (2026-10-02)**: paused for Mark's review (ruling 28). Shape ruled
-by Mark on 2026-10-01 (rulings 7 and 10 to 15 in the dramatis tier
-architecture; rulings 16 to 50 below). P0 met; P1 landed on `main`
-(`da3c50bc`); P2 landed (`3e4992ec`); P3 landed (`ff68e86c`), meeting the
-Mere 0.4 baseline's chatelaine condition. P4a onward waits.
+**Status (2026-10-04)**: in progress. Shape ruled by Mark on 2026-10-01
+(rulings 7 and 10 to 15 in the dramatis tier architecture; rulings 16 to 53
+below). P0 met; P1 landed on `main` (`da3c50bc`); P2 landed (`3e4992ec`); P3
+landed (`ff68e86c`), meeting the Mere 0.4 baseline's chatelaine condition.
+The review stop ended 2026-10-04 (ruling 51): P4a, the agent's RSA through
+`ring` and its ECDSA, is under way (rulings 52, 53).
 **Scope**: found `chatelaine` as the tier's plain secret-item taxonomy; move
 castellan's OTP items and its Secret Service store onto it; then import
 (and finally export) the FIDO Credential Exchange Format through castellan.
@@ -320,6 +321,32 @@ chatelaine `ItemId`, so D-Bus paths keep their form; `SecretItemId` and
 timestamps map to `Some(seconds)`; search covers only `Secret` credentials).
 Options: keep bytes and accept the readings; base64 payloads; name changes.
 Mark: **"Keep bytes; accept readings (Recommended)"**.
+
+**Ruling 51.** *(Asked 2026-10-04 at the device pairing plan's pause, its
+ruling 73: what next, with D2, chatelaine P4a or a pause as options.)* Mark:
+**"Chatelaine P4a"**. Follows: the review stop after P3 (ruling 28) ends,
+and P4a starts.
+
+**Ruling 52.** *P4a teaches the agent RSA (ruling 25), and any open advisory
+comes back first: RUSTSEC-2023-0071 (Marvin, CVE-2023-49092) is open with no
+patch in any `rsa` release, 0.9.10 and 0.10.0-rc.18 included; the crate's
+private-key operations are not constant-time, so network-observable timing
+can leak the key, and its workaround says local use on a non-compromised
+computer is fine. `rsa` is already in the graph through `ssh-key`, unused
+for signing. How should the agent sign RSA?* Options: sign with `ring`,
+parsing the key with `ssh-key`, after a feasibility check; use `rsa` and
+accept the risk; ECDSA only, quarantining RSA keys. Mark: **"Sign RSA with
+`ring` (Recommended)"**. Follows: P4a's lane confirms first that `ring` can
+sign `rsa-sha2-256` and `rsa-sha2-512` from the key `ssh-key` parses, and
+comes back if it cannot; ECDSA stays on RustCrypto's curves.
+
+**Ruling 53.** *Where does P4a's end-to-end receipt run (a real `sshd`
+accepting a login signed by the new agent, on its own pipe beside the
+installed one, with a test key in that machine's `authorized_keys` for the
+run)?* Options: the ThinkPad; an iMac; WSL on the laptop. Mark: **"The
+ThinkPad (Recommended)"**. Follows: the test lines go into the ThinkPad's
+`~/.ssh/authorized_keys` for the run and come out after, with copies before
+and after compared.
 
 ## 3. Phases
 
@@ -723,6 +750,11 @@ changes the credential id, which the Secret Service never exposes.
 
 **The run stops here for Mark's review** (ruling 28). P4a, the agent's RSA
 and ECDSA, waits.
+
+**2026-10-04.** The review stop ended (ruling 51), and P4a starts with
+rulings 52 (RSA signs through `ring`, after a feasibility check, since
+RUSTSEC-2023-0071 is unpatched in every `rsa` release) and 53 (the
+end-to-end receipt on the ThinkPad).
 
 ## 6. Running it
 
