@@ -264,8 +264,9 @@ impl Canvas {
     }
 
     /// Follow the layout: while physics plays, the camera eases toward
-    /// fit-to-content each frame. Any pan or zoom turns it off; the host turns
-    /// it on (Graphshell: a law, profile or Free switch, and Fit graph).
+    /// fit-to-content each frame. Any pan, zoom or node drag turns it off; the
+    /// host turns it on (Graphshell: a law, profile or Free switch, and Fit
+    /// graph).
     pub fn set_view_follow(&mut self, on: bool) {
         self.follow = on;
     }
@@ -346,7 +347,7 @@ impl Canvas {
 
 #[cfg(test)]
 mod tests {
-    use crate::canvas::Canvas;
+    use crate::canvas::{Canvas, PointerButton};
 
     /// Swapping between two panes' viewports must move NEITHER camera, at any
     /// size. The camera and the size it was framed for install together, so a
@@ -417,7 +418,8 @@ mod tests {
     /// Following the layout ("Follow while playing", 2026-10-03). The control:
     /// a camera planted off the graph stays off it while not following. Then
     /// following eases it back until every centre is on screen, a wheel pan
-    /// stops it, and a paused canvas holds the camera even while following.
+    /// stops it, a node drag stops it while a click does not, and a paused
+    /// canvas holds the camera even while following.
     #[test]
     fn following_eases_the_camera_onto_the_layout_and_a_pan_stops_it() {
         let mut canvas = Canvas::with_sample_graph();
@@ -451,6 +453,19 @@ mod tests {
             canvas.layout_framing(0.0).outside > 0,
             "the pan's glide stands; nothing pulls it back"
         );
+
+        // A node drag stops it too; a click on a node does not.
+        canvas.fit_to_content();
+        canvas.set_view_follow(true);
+        let (key, _) = canvas.graph.nodes().next().unwrap();
+        let (x, y) = canvas.screen_position_of(key).unwrap();
+        canvas.pointer_down(PointerButton::Left, x, y);
+        canvas.pointer_up(PointerButton::Left, x, y);
+        assert!(canvas.view_follows(), "a click keeps following");
+        canvas.pointer_down(PointerButton::Left, x, y);
+        canvas.cursor_moved(x + 40.0, y);
+        assert!(!canvas.view_follows(), "a node drag stops following");
+        canvas.pointer_up(PointerButton::Left, x + 40.0, y);
 
         canvas.set_physics_paused(true);
         canvas.set_view_follow(true);
