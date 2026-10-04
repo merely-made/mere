@@ -1,5 +1,17 @@
 # Burn 0.22 Migration Plan
 
+**2026-10-04, later: rulings 555 and 556, main `8f61b367` (§13.40 to §13.43):**
+
+- **The quiet A/B (ruling 555).** It now bounds load in a window before each
+  launch. It counted 7 pre.2 and 8 pre.4 repetitions. Frame pacing is
+  indistinguishable between them, and pre.4 reaches ready about 20 ms later.
+- **wasm-bindgen 0.2.129 everywhere (ruling 556).** Every wasm module in the
+  tree is on 0.2.129. The OPFS probe's gate control is proven, so every gated
+  surface now has one.
+- **Main.** Main `8f61b367` is merged (`eba741c5`). The changed cones pass,
+  and so do the headed P5 receipts under the gate.
+- S16 has not started.
+
 **2026-10-04 rulings 545 and 546, the receipt gate, main `63345c17` (§13.38, §13.39):**
 graphshell-web, `cambium-genet-web-host` and the probe run wasm-bindgen
 0.2.129 with wgpu 30.0.1. One wgpu now runs across the root, web and probe
@@ -3979,5 +3991,338 @@ in `pre4-reconcile-cd3961dd` is superseded and says so.
     and the fixture (`64c917d5`), matching the root. Left to Cargo, it would
     sit on 0.12.3.
   - Main-ready leaves the probe's pins as they are.
+
+S16 has not started. No push, merge to main or downstream repin.
+
+### 13.40 Ruling 555: the quiet A/B's load bound (2026-10-04)
+
+**Ruling 555** (Isometry wing record, `6470300`). The question was §13.39's
+first fork. The A/B's bound measured load inside each repetition's window, so
+it counted the measured page's own Chrome. No repetition of 80 met it. The
+options, as §13.39 listed them:
+
+- (A) bound the ambient load in a window just before each launch;
+- (B) subtract this lane's process tree from the machine total;
+- (C) keep the bound and run the A/B where the machine can meet it.
+
+Mark: **"Bound load before launch"**. *Follows:* ambient load is measured just
+before each Chrome launch, outside the measured window. Only repetitions that
+start quiet count. The bound is stated before the run. The A/B is rerun that
+way: pre.2 against fixed pre.4, alternating, with the load recorded for each
+repetition.
+
+**The bound as stated** (`pre4-quiet-ab-555/bound-stated.txt`, written before
+any repetition):
+
+- Before each launch, machine-wide CPU load is sampled for 10 s.
+- A repetition counts only if that window's median is at most 25% and its
+  maximum at most 60%, no `rustc` runs at launch, and the measurement is
+  valid: ready, no page errors, page visible.
+- Up to six 10 s windows are tried. The launch follows the first window that
+  meets the bound. If none does, the repetition still runs and is not
+  counted.
+
+*Reading, not ruled:* the 25% and 60% figures are ruling 534's, carried
+unchanged to the new window.
+
+**A correction to §13.39.** Its sampler slept 1 s between WMI queries that
+each take about 1 s. So it took a sample about every 2 s, not every second
+as §13.39 says. The amended sampler, recorded in `bound-stated.txt` before
+any repetition, queries back to back: 9 samples in 10 s, measured. A window
+needs at least 7 samples. The instrument (`Win32_Processor` `LoadPercentage`)
+and the figures are unchanged.
+
+**Arms.** Both are debug bundles on wasm-bindgen 0.2.129 and wgpu 30.0.1, built
+the same way with the `getrandom_backend="wasm_js"` cfg that every earlier
+receipt bundle carried (§13.42 explains why that matters):
+
+- pre.2 is main `bd119a69`, bundle `14d3d895`;
+- pre.4 is `82d020c0`, bundle `e3c9dc88`.
+
+**The first run** was stopped by the lane after 11 attempts, none counted.
+Other sessions' builds and tests held every pre-launch window between 58% and
+100%. Those attempts used plain-shell bundles (`56a01fc4`, `eb11c9a8`); they
+are kept in `reps-stopped-run-1` and the log.
+
+**The second run.** It made 80 attempts, 40 per arm, and all 80 measurements
+were valid. 15 repetitions started quiet and counted: 7 pre.2 and 8 pre.4.
+The first 40 attempts found no quiet window while other sessions' test
+binaries ran. pre.2 stopped one short of its target of 8 when it hit the
+attempt cap.
+
+- Pre-launch medians across all 80 attempts ran from 20 to 76% (median 41%).
+- For the counted repetitions, the pre-launch median was 20 to 25% and the
+  maximum 42 to 60%.
+- The window was met after one to six tries (median three).
+- Load inside the measured window, recorded only, ran a median of 37 to 80%
+  for the counted repetitions. That is the measured Chrome itself.
+
+| Counted repetitions | pre.2 (main), 7 | pre.4, 8 |
+| --- | --- | --- |
+| frame p50, median (range) | 12.1 ms (12.0 to 12.1) | 12.05 ms (12.0 to 12.2) |
+| frame p95, median (range) | 12.3 ms (12.2 to 18.2) | 12.25 ms (12.2 to 30.3) |
+| longest frame, median | 230 ms | 218 ms |
+| frames in the 5 s window, median | 448 | 456.5 |
+| time to ready, median (range) | 1,369 ms (1,254 to 1,385) | 1,389 ms (1,326 to 1,433) |
+
+**Reading of the counted result.**
+- Fixed pre.4 and pre.2 are indistinguishable in frame pacing. Both sit on
+  the display's 12 ms step; §13.33's fiftyfold slowdown is gone.
+- pre.4 reaches ready about 20 ms (1.4%) later. At 7 and 8 repetitions that
+  difference is within pre.2's own spread.
+- The 18.2 ms pre.4 p95 that §13.39's uncounted run showed does not survive
+  quiet starts.
+
+Evidence: `pre4-quiet-ab-555` (`bound-stated.txt`, `ab.log`, `ab.json`,
+`summary-555.json`, `arms-bundles.txt`, `load-sources-*.txt`).
+
+### 13.41 Ruling 556: every wasm module on the newest wasm-bindgen (2026-10-04)
+
+**Ruling 556** (Isometry wing record, `cc969f1`; also in the physics catalog
+plan on main, `fdb1f5df`). The question was §13.39's second fork. The OPFS
+probe's gate control needed the wasm-bindgen 0.2.126 CLI, and no ruling
+covered downloading it. The options, in the order Mark saw them:
+
+- (A) move the OPFS probe to 0.2.129;
+- (B) install the 0.2.126 CLI;
+- (C) leave the gate unproven until that probe's next receipt.
+
+(§13.39 listed them in a different order.) Mark: **"move it and anything else
+to 0.2.129. let's stay with the newest."** *Follows:*
+
+- Every wasm module in the tree moves to wasm-bindgen 0.2.129, the OPFS probe
+  and the two minimal repros included.
+- The repros change only their pin. They still do not take the constructor
+  helper (ruling 533).
+- The OPFS probe's gate control is proven on 0.2.129: clean passes, planted
+  fails.
+
+**The inventory.** These exact pins existed:
+- `cambium-genet-web-host`, graphshell-web and the probe were already on
+  0.2.129.
+- Both repros were on 0.2.122.
+- The OPFS probe was on 0.2.126.
+- `crates/cambium/examples/genet_web_smoke` was on 0.2.127.
+
+Other locks still record older wasm-bindgen releases without pinning them.
+None is changed here:
+- the native remote and session fixtures (0.2.127), which are native
+  binaries, not wasm modules;
+- the upstream locks vendored with the `burn-cubecl` and `cubecl-runtime`
+  patch crates, which are never built standalone;
+- the dated probe receipts under `design_docs/.../testing/receipts`, which are
+  historical.
+
+**The move (`82d020c0`).**
+
+- *Both repros* pin wasm-bindgen 0.2.129, js-sys and web-sys 0.3.106 and
+  wasm-bindgen-futures 0.4.79. `run-repro.ps1` and the READMEs require the
+  0.2.129 CLI.
+  - Their locks also take wgpu and wgpu-types 30.0.1. 0.2.129 panics on every
+    error-scope pop with 30.0.0 (§13.37).
+  - Each lock's delta is exactly the move, 552 to 553 packages: 9 out, and 10
+    in. The tenth is tokio 1.53.1, which wasm-bindgen-futures 0.4.79 depends
+    on for emscripten only.
+- *The OPFS probe* pins the same family. Its runner, README, manifest comment
+  and one source comment name 0.2.129 and web-sys 0.3.106; 0.3.106 still has
+  no `FileSystemFileHandle.move` binding. Its lock is gitignored. It was
+  generated offline: 52 packages, wasm-bindgen 0.2.129, redb 4.2.0.
+- *genet_web_smoke* pins 0.2.129. It did not resolve before this change
+  either: its genet-taffy patch matches two packages at genet `5ae30cad`.
+  Nothing else is changed there.
+
+**Cargo's incidental edges.** Moving a pin made Cargo re-pick edges that no
+manifest asked it to change. In both repros it moved:
+- pliron's `spin` (0.10.1 to 0.12.3) and `hashbrown` (0.17.1 to 0.13.2);
+- the `windows-sys` edges of colored, errno, rustix and winapi-util (0.61.2
+  to 0.52.0).
+
+`restore_edges.py` (in `pre4-bindgen-everywhere`) puts such edges back for
+packages that are unchanged in both locks, and re-adds any package an edge
+needs.
+- **Control:** run on five real locks (root, web, probe, fixture and one
+  repro), its writer reproduces each byte for byte.
+- After the restoration, Cargo accepts each repro lock with `--locked` and
+  leaves it unchanged on a non-locked resolution.
+
+The same check found two earlier gaps:
+- `c8979b7a` restored only the probe's spin edge. Its pliron hashbrown edge
+  is now aligned to the root's 0.17.1 too.
+- The gitignored pre.4 web lock had pliron on spin 0.12.3 since the 0.2.129
+  move; it is aligned to 0.10.1 (`5db762fd` to `7c963744`, adding spin 0.10.1,
+  876 packages).
+
+pliron's spin and hashbrown edges now equal the root's in the root, web,
+probe and fixture locks and both repro locks.
+
+**Builds on 0.2.129:**
+- extrema repro `05d0230e`, embedding repro `22da0c90`;
+- OPFS probe `05bda6e1`, with its 17 native tests passing.
+
+The OPFS probe's own runner stops at `cargo fmt --check`. Its sources predate
+the 2026-09-04 rustfmt policy, which asks for trailing commas after match-arm
+blocks, and the policy wants any conforming sweep as its own commit. So the
+probe was built by a lane copy of its runner (`run-probe-nofmt.ps1`). The copy
+fixes the probe root and drops only the fmt check; provenance, fixture
+regeneration, `--locked`, the build, the tests and bindgen are all unchanged.
+The regenerated `fixtures/portability.json` is byte-identical apart from line
+endings.
+
+**Gate controls on the 0.2.129 builds (headed Chrome 154):**
+
+| Surface | Clean | Planted throw | Planted reject |
+| --- | --- | --- | --- |
+| OPFS probe, lanes 1 and 2 | both ok, gate passed, state "complete" | lanes ok, gate failed (2 entries), state "stop" | lanes ok, gate failed (2 entries), state "stop" |
+| extrema repro | `passed` true, all cases match | `passed` false | `passed` false |
+| embedding repro | `passed` true, all cases match | `passed` false | `passed` false |
+
+Each planted failure comes from the gate alone. The OPFS probe plants once
+per lane, which gives the two entries. So every gated surface is now proven:
+the graphshell scenarios, the probe's rows, both repros and the OPFS probe.
+
+**Downloads.** None. Every crate came from the local cache, offline.
+
+**Open.** Should the OPFS probe take its rustfmt sweep (`cargo fmt`, its own
+commit, and its hash in `.git-blame-ignore-revs`) so that its own runner
+passes again? The answer is Mark's.
+
+### 13.42 Main `fdb1f5df` on pre.4 and the reruns at `82d020c0` (2026-10-04)
+
+**The merge (`045c2f60`).** Main `fdb1f5df` brought several things:
+- grammar G7's arrangement roles;
+- seiche's speed dial and Orbit changes;
+- pictograph, sceno and graphshell changes;
+- the merged `web-pins-receipt-gate`;
+- plan records.
+
+Main changed no manifest and no lock. The merge base is `b38986c2`, which both
+sides already held.
+
+- Two files changed on both sides, `design_docs/DOC_README.md` and
+  `ports/graphshell/src/web.rs`. For each, weave's result equals a plain
+  `git merge-file` merge, ignoring line endings.
+- Each of the other 50 files changed only on main equals main's blob, and
+  each file changed only on this branch equals this branch's blob.
+- The root lock still resolves `--locked`.
+- Main's later commits `1ad4143c` and `bd119a69` change only the dynamics
+  grammar plan.
+
+**Cones.** Against `64c917d5`, ESP's and Numen's cones are unchanged, so their
+receipts carry. Every other cone changed (seiche, pictograph, sceno,
+graphshell, Distillery's probe tree) and was rerun at `82d020c0`. The tree was
+clean before and after.
+
+| Gate, pre.4 `82d020c0` | Result |
+| --- | --- |
+| seiche GPU repulsion (release); tensor-burn-wgpu (release) | 3 pass, 1 ignored, adapter; 131 pass |
+| seiche lib: default, no-default, gpu | 112; 108; 112 pass |
+| pictograph canvas lib; gpu with `physics_device` | 287; 290 pass, 13 ignored, adapter |
+| conatus resident (release) | 14 pass, 2 ignored, adapter, CubeCL kernels |
+| mere and graphshell `canvas-gpu` checks | pass |
+| graphshell `web` lib tests | first run 233 pass, 1 failed; rerun 234 pass, 1 ignored |
+| `cambium-genet-web-host` native tests; wasm examples check | 8 pass; pass |
+| Distillery four-feature check; lease tests | pass; 2 pass |
+| two-peer lifecycle gate | exit 0 in 10.6 s, fixture rebuilt (`ed039290`); the auditor accepts and rejects all 11 planted faults |
+| `cargo_mode.py verify` | pass |
+| web bundle; probe release bundle | `e3c9dc88`; `70b4571b` |
+
+The one failure was
+`carrier::tests::p2panda_murm_grant_is_refused_before_projection_bytes`
+("projection accept timeout"), a two-peer p2panda test, in a run with the
+machine near 100%. `carrier.rs` is unchanged since 2026-09-29, and the test
+passed at `64c917d5`.
+- Alone, it passed three of three times, at about 80% load.
+- The `carrier::` module passed (14 tests).
+- The whole suite passed on its rerun.
+
+So this reads as a timeout under load, not a regression. Its receipts are
+`c6r*` and `c6-graphshell-web-lib-rerun`.
+
+**Two web bundles from one head.** The batch's web bundle `e3c9dc88` differs
+from `eb11c9a8`, which was built minutes earlier at the same head with the
+same lock and target directory. The batch exports
+`CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_RUSTFLAGS='--cfg getrandom_backend="wasm_js"'`
+for its wasm examples check, and that export stays set for the web and probe
+builds that follow it.
+- So every batch-built receipt bundle has carried that cfg: `b0bd9cd6`,
+  main-ready's `26d20b8b`, and `e3c9dc88`.
+- A build from a plain shell does not.
+- The cfg matters only to graphshell's `webrtc-browser` feature
+  (`ports/graphshell/web/.cargo/config.toml.example`), but it changes the
+  bytes.
+
+From here, both A/B arms and the headed receipts use the cfg-carrying
+builds. The main arm's cfg build is `14d3d895`.
+
+**Headed on pre.4, under the gate (bundle `e3c9dc88`).** 30 of the 31 rows ran
+as expected. The controls fail as planted; the clean, `gpu_threshold=0`, CPU
+settle and law rows are ok with zero gate entries.
+
+- `p5_tree_gpu_settle_2000` stopped posting progress 3.5 minutes in and timed
+  out at 1,500 s. It recorded no page error, no gate entry and no result.
+- Run alone afterwards, the settle passed on pre.4 three times out of three
+  (205 to 219 s), and once on main (288 s). Both arms read 413 of 418 device
+  steps, 0 failures, spread 1,078, 0 overlaps and energy about 396,000.
+- That is one stall in four pre.4 runs. It is unreproduced and has no
+  diagnosis; the receipts keep it.
+
+**Probe rows on `70b4571b`** (the aligned lock `262ac4ad`):
+- All four embedding rows pass. The largest reference errors are unchanged:
+  MiniLM `1.416e-7`, the others below `1e-7`.
+- The SmolLM2 decoder row passes.
+- No gate entries.
+
+### 13.43 Main `8f61b367` on pre.4 (`eba741c5`) (2026-10-04)
+
+Main `8f61b367` brought three code changes, plus plan records:
+- Orbit retuned, which bumps seiche to 0.0.6;
+- node faces scaling about their top-left;
+- the speed budget as a share of the display's frame period.
+
+Main also swapped the weave merge driver for upstream `d73c4ae`. This merge
+ran on that driver.
+
+- The merge base is `fdb1f5df`. Five files changed on both sides:
+  `Cargo.toml`, `Cargo.lock`, seiche's `Cargo.toml`, `DOC_README.md` and
+  `ports/graphshell/src/web.rs`.
+  - For each, weave's result is identical, ignoring line endings, to a plain
+    `git merge-file` merge. No conflict box appeared.
+  - The other 34 files changed on main equal main's blobs, and each file
+    changed only on this branch equals this branch's blob.
+- Main's lock change is seiche 0.0.5 to 0.0.6 and nothing else. The merged
+  root lock resolves `--locked`.
+- The gitignored web lock takes the same bump (`7c963744` to `13fd2935`).
+  - Cargo's `update -p seiche` also re-picked seven loose edges: pliron's spin
+    onto 0.9.9, and windows-sys onto 0.48 or 0.59 for six crates.
+  - `restore_edges.py` put them back, so the delta is the bump alone. Cargo
+    keeps that lock under `--locked` and a non-locked resolution.
+  - So any re-resolution in these graphs reshuffles their loose edges among
+    the versions the lock already holds. Holding them is a lane call, as
+    §13.39 records.
+
+Against `82d020c0`, these cones are unchanged and carry: ESP, Numen,
+Distillery and the remote fixture, `cambium-genet-web-host`, and the probe
+(whose lock holds no seiche). The seiche, pictograph, conatus and graphshell
+cones changed and were rerun at `eba741c5`:
+
+| Gate, pre.4 `eba741c5` | Result |
+| --- | --- |
+| seiche GPU repulsion (release); tensor-burn-wgpu (release) | 3 pass, 1 ignored, adapter; 133 pass, 10 ignored |
+| seiche lib: default, no-default, gpu | 114; 110; 114 pass, 9 ignored each |
+| pictograph canvas lib; gpu with `physics_device` | 289; 292 pass, 13 ignored, adapter |
+| conatus resident (release) | 14 pass, 2 ignored, adapter, CubeCL kernels |
+| mere and graphshell `canvas-gpu` checks | pass |
+| graphshell `web` lib tests | 237 pass, 3 ignored |
+| `cargo_mode.py verify` | pass |
+| web bundle (with the getrandom cfg) | `e3246457`, web lock `13fd2935` |
+
+The newly ignored seiche tests arrived with main; they are the Orbit diagnostics.
+
+**Headed on pre.4, under the gate (bundle `e3246457`).** All 31 rows behave as
+expected. The two planted controls fail, and the other 29 are ok with zero
+gate entries. Among those 29, `p5_tree_gpu_settle_2000` (193 s) reads 413 of
+418 device steps, 0 failures, spread 1,078, 0 overlaps and energy 396,051,
+alongside its CPU twin, the 14 law receipts and the 11 `gpu_threshold=0` laws.
+The machine was quieter for this run, at 11 to 51% before each row.
 
 S16 has not started. No push, merge to main or downstream repin.
