@@ -606,6 +606,7 @@ fn the_lexical_fallback_records_its_purity_on_the_arxiv_fixture() {
             let params = MeaningParams {
                 top_k,
                 min_similarity,
+                resolution: 1.0,
             };
             let request = MeaningRequest {
                 content_revision: 0,
@@ -826,4 +827,52 @@ fn meaning_cost_by_graph_size() {
             sparse.clusters.clusters.len(),
         );
     }
+}
+
+/// F50's knob: the partition's resolution. At 1 it is the classical
+/// modularity Louvain always ran, partition for partition; away from 1 it
+/// moves the partition (the control: the knob is wired to something).
+#[test]
+fn the_partitions_resolution_is_one_by_default_and_moves_the_partition() {
+    let request = |resolution| {
+        topic_request(std::sync::Arc::new(LexicalMeaning::new().with_params(
+            MeaningParams {
+                resolution,
+                ..MeaningParams::LEXICAL
+            },
+        )))
+    };
+    let at_one = compute_meaning(request(1.0)).unwrap();
+    let pairs: Vec<(NodeKey, NodeKey, f32)> = at_one.pairs.clone();
+    let keys: Vec<NodeKey> = at_one.groups.iter().map(|(k, _)| *k).collect();
+    let classical = crate::signals::community_louvain_on_snapshot(
+        &crate::signals::CommunitySnapshot::from_weighted_pairs(keys, &pairs),
+    );
+    assert_eq!(
+        partition(&at_one.groups),
+        partition(
+            &classical
+                .clusters
+                .iter()
+                .enumerate()
+                .flat_map(|(i, c)| c.members.iter().map(move |&k| (k, i as u32)))
+                .collect::<Vec<_>>()
+        ),
+        "resolution 1 is classical modularity"
+    );
+    let coarse = compute_meaning(request(0.2)).unwrap();
+    let fine = compute_meaning(request(3.0)).unwrap();
+    let count = |s: &crate::canvas::MeaningSnapshot| partition(&s.groups).len();
+    println!(
+        "groups at resolution 0.2, 1 and 3: {}, {}, {}",
+        count(&coarse),
+        count(&at_one),
+        count(&fine)
+    );
+    assert_eq!(
+        coarse.pairs, at_one.pairs,
+        "the resolution leaves the pairs alone"
+    );
+    assert!(count(&coarse) < count(&at_one), "below 1, fewer groups");
+    assert!(count(&fine) > count(&at_one), "above 1, more groups");
 }

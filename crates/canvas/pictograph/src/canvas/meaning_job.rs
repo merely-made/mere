@@ -19,7 +19,7 @@ use kernel::graph::{Graph, NodeKey};
 use super::meaning::{
     Embedded, MeaningEngine, MeaningParams, MeaningSnapshot, MeaningState, meaning_text,
 };
-use crate::signals::{CommunitySnapshot, community_louvain_on_snapshot};
+use crate::signals::{CommunitySnapshot, community_louvain_on_snapshot_at};
 
 /// Texts a slice embeds at most.
 const EMBED_CHUNK: usize = 128;
@@ -200,10 +200,10 @@ impl MeaningJob {
             }
         }
         pairs.sort_by_key(|(a, b, _)| (a.index(), b.index()));
-        let clusters = community_louvain_on_snapshot(&CommunitySnapshot::from_weighted_pairs(
-            self.request.keys.clone(),
-            &pairs,
-        ));
+        let clusters = community_louvain_on_snapshot_at(
+            &CommunitySnapshot::from_weighted_pairs(self.request.keys.clone(), &pairs),
+            f64::from(self.request.engine.params().resolution),
+        );
         let mut groups: Vec<(NodeKey, u32)> = clusters
             .clusters
             .iter()
