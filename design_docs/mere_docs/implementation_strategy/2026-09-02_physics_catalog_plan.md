@@ -2122,3 +2122,37 @@ binning are the useful patterns.
   1x's 418, so its frame-counted bounds miss (spread 1,135, energy 96k), with
   117 of 638 device steps stale. seiche 122/122 (116 without actor, 122 + 3
   with gpu), pictograph 292, graphshell `web` 234.
+- 2026-10-04 (seiche's speed, the second round carried out, branch
+  `seiche-speed`). "The viewer's own dial": `RemoteBoard::sync` takes the
+  viewer's speed beside its choice, both pages pass the local canvas's, and
+  the board's line reads "Board speed 2x, from your Speed setting"; a test
+  runs 4, 20 and 4 ticks in four frames at the viewer's 1x, 5x and 1x. The
+  owner-publishing half was dropped unbuilt beyond the viewer side. "Target +
+  Max, budget as frame share": seiche gains `Speed::UNCAPPED` (Max: ticks until
+  the budget is spent, 50x with no budget installed, which is its control);
+  both Speed selects gain Max; the budget is 50% of the page's measured frame
+  interval (its own frame timestamps, each new interval weighted 0.25, gaps
+  over 1 s skipped) for the canvas and the remote board alike;
+  `physics_budget_share` replaces `physics_budget_ms`; the note shows the speed
+  reached whenever the layout moves (*reading, not ruled*: always, not only
+  when bound). The fast receipt and its control are bounded per frame by that
+  frame's budget plus the clock's 100 us grain. The fast receipt runs at Max,
+  because on its 300-node page the budget feeds back: half of a frame that
+  physics itself lengthens outgrows the catch-up cap at 50x (frames about 500
+  ms, budget about 250 ms, 150 ticks a frame, about 5x), and at Max the page's
+  frame reached 500 to 684 ms with stepping at 350 ms a frame; returned as a
+  finding with three options (keep; a share of the display's period; a share
+  of the non-physics time). "Staleness in ticks": no code change; the 50x
+  2,000-node GPU settle is dropped from the batch, its bounds counting frames.
+  Main `bd119a69` merged, the plan the only file both sides changed, and
+  identical to `git merge-file`'s result; a retro-check of the previous merge
+  (`48ead8a0`, whose second parent is `2d4b1ee9`, not the `60eb5940` its
+  subject names; a git note says so) found every weave auto-merge identical to
+  `git merge-file` after the hand repair. Headed on bundle `e68fbd0d`, every
+  receipt green with zero gate entries: the eleven law receipts, profiles, add,
+  drag, Density's two, slow, fast at Max (17x and 22x bound, worst over-budget
+  23 and 91 us), its 50x control (34x unbound), both Speed select receipts with
+  Max, and the 2,000-node GPU settle at 1x (413 of 418 device steps). seiche
+  123/123 (117 without actor, 123 + 3 with gpu), pictograph 292 (its real-clock
+  budget test failed once under 97% load, a frame preempted to 12.1 ms against
+  3.7, and passed twice on a quiet machine), graphshell `web` 235.
