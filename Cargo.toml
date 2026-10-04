@@ -516,7 +516,10 @@ vello = "0.10"
 # bridge names this package directly so its fragments append without crossing
 # a second, type-incompatible vello lineage.
 netrender_vello = { package = "netrender-vello", version = "0.10.1", default-features = false }
-wgpu = "30"
+# 30.0.1 at least: 30.0.0 decodes a successful WebGPU error-scope pop through
+# `JsOption`, which wasm-bindgen 0.2.126 and later read as an error, and panics
+# (burn plan 13.37, 13.38).
+wgpu = "30.0.1"
 welding-0-15 = { package = "welding", git = "https://github.com/merely-made/wgpu-weld.git", rev = "4784d07c4064195c33136b9b91c8231913f08e06", default-features = false, features = ["wgpu-30"] }
 kurbo = "0.13"
 peniko = "0.6"
