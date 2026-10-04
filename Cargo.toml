@@ -186,7 +186,7 @@ authors = ["Mark AB (markik)"]
 # Seiche and numen are workspace-owned field/runtime components. The default
 # field evaluation path stays portable; optional Burn/Rhai/Resident carriage is
 # selected at the owning crate.
-seiche = { version = "0.0.5", path = "crates/conatus/seiche" }
+seiche = { version = "0.0.6", path = "crates/conatus/seiche" }
 nisus = { version = "0.1.0", path = "crates/conatus/nisus" }
 modulus = { version = "0.1.0", path = "crates/conatus/modulus" }
 conatus = { path = "crates/conatus/conatus" }
