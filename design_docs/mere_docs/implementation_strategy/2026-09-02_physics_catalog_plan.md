@@ -2361,3 +2361,53 @@ binning are the useful patterns.
   123/123 (117 without actor, 123 + 3 with gpu), pictograph 292 (its real-clock
   budget test failed once under 97% load, a frame preempted to 12.1 ms against
   3.7, and passed twice on a quiet machine), graphshell `web` 235.
+- 2026-10-04 (seiche's speed, "The display's frame" carried out, branch
+  `seiche-speed`). The step budget is 50% of the display's frame period, taken
+  as the shortest of the last 120 intervals between the page's own frame
+  timestamps (about 2 s at 60 Hz, half a second at 240 Hz), gaps over 1 s
+  skipped and 60 Hz assumed until one is measured; the canvas and the remote
+  board on both pages read it from one `web_speed::FrameBudget`, and both
+  pages report the period beside the last interval (`display-period-ms`,
+  `frame-interval-ms`). The before/after control is the same diagnostic
+  scenario (`diag_speed_budget`, the 300-node tree page on CPU repulsion) on
+  bundle `e68fbd0d` (half the smoothed frame) and `cf8ff645` (half the
+  shortest interval). At 50x the budget grew from 146 to 171 ms over frames of
+  291 to 342 ms before, and held at 51.6 ms over frames of 327 to 479 ms
+  after; at Max it grew from 379 to 463 ms over frames of 758 to 927 ms
+  before, and held at 27.4 ms over frames of 194 to 321 ms after. The feedback
+  is gone, but the budget is not near half the display's 16.7 ms: no page here
+  keeps up with the display, so the shortest recent interval is the page's own
+  best frame (24.2 to 30.2 ms on the fixture and the 24-node page, 54.7 to 103
+  ms at 300 nodes), and the intervals are not whole multiples of 16.67 ms, so
+  no vsync quantum can be read off them. The budget comes out at 12 to 15 ms
+  on light pages and 27 to 52 ms at 300 nodes, against about 8.3 ms. This went
+  back to the coordinator as an open finding with three options (keep it as
+  built; cap the period at 1/60 s; a known display rate where the host exposes
+  one). The receipts keep their per-frame bound, that frame's budget plus the
+  clock's 100 us grain. On bundle `cf8ff645` the fast receipt met it at
+  exactly 100 us over, and the diagnostic runs saw 150 to 250 us in some
+  windows, one tick run longer than forecast, so the bound can flake. The note
+  showing the speed reached whenever the layout moves, not only when the
+  budget binds, stays a *reading, not ruled*, kept as one on the coordinator's
+  word. Main `8f61b367` merged under weave `d73c4ae` (`b6cc15fc`): the six
+  auto-merged files are identical to `git merge-file`'s result, and the plan's
+  one conflict, resolved theirs then ours with weave's `refused_by` line and
+  markers removed, is identical to the same resolution of `git merge-file`'s.
+  Main gave `Gravity::new` a counter-damping argument, so the reproducibility
+  receipt passes Orbit's `Tangential` (`ddbfffd0`), and the web lock moves to
+  `3cce8fc5` (seiche 0.0.6; the lock is not committed). Headed on bundle
+  `71959113` (wasm-bindgen 0.2.129), 21 of 22 receipts green with zero gate
+  entries: the eleven law receipts, profiles, add, drag, Density's two, slow,
+  fast at Max (bound at 2.3x and 3.4x, the budget held at 42.45 ms, half an
+  84.9 ms period, worst over-budget 50 us), both Speed select receipts with
+  Max, and the 2,000-node GPU settle at 1x (413 of 418 device steps). The 50x
+  control missed `effective >= 25` at 20.4x, unbound and 13.5 ms under its
+  budget, at 76 to 83% CPU with another lane's rustc: at 50x the 50 ms
+  catch-up clip caps the speed at 50 x 50 / frame ms, and its shortest
+  interval was 48.5 ms against 30.2 ms the round before. Rerun with no other
+  lane's rustc (52 to 58% CPU), the control passed twice (34.6x and 29.7x) and
+  the fast receipt passed, but one of its windows ran 600 us over its budget,
+  beyond the 100 us bound, which the receipt's final assertion does not see
+  (its last window read 100 us): the flake named above, met. Gates: seiche
+  125/125 (119 without actor, 125 + 3 with gpu), pictograph 294, graphshell
+  `web` 238, mere and graphshell checked clean.
