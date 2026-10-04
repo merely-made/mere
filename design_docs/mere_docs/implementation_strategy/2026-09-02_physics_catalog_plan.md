@@ -131,7 +131,7 @@ not presets.
 | `charge.barnes-hut` | Charge | Coulomb repulsion between all bodies (1/d, Barnes-Hut O(n log n)) + edge springs: the Fruchterman–Reingold shape | evenly spread neighbourhoods, the classic force picture | edges |
 | `stress.kamada-kawai` | Stress | every pair a spring whose rest length is graph distance × L | global distance fidelity: paths unroll to true length, far is far | all-pairs shortest paths, cached per topology |
 | `energy.linlog` | Energy | attraction ∝ d on edges, repulsion ∝ 1/d overall, degree-weighted (LinLog / ForceAtlas2) | communities as islands, hubs central | edges, degree |
-| `orbit.gravity` | Orbit | n-body gravitation, mass by degree, tangential initial velocity, no rest | the graph as a solar system: leaves orbit hubs | degree |
+| `orbit.gravity` | Orbit | n-body gravitation, mass by degree, tangential initial velocity, no rest; *2026-10-04:* only the orbital (tangential) motion frictionless, so radial motion settles, a weak centring well, and exclusion only to two node diameters | the graph as a solar system: leaves orbit hubs | degree |
 | `kinds.particle-life` | Kinds | particle life: each node has a kind; an asymmetric kind×kind attract/repel matrix (the ambient sim's law over the graph) | sorting, chasing and fleeing by kind; never at rest | a kind per node — the host's choice per scene (relation family, domain, facet), recorded in the saved scene |
 | `flock.boids` | Flock | separation / alignment / cohesion; edge-neighbours are flockmates | constellations that move as groups | edges |
 | `sync.kuramoto` | Sync | phase oscillators coupled along edges; angle = phase, radius = distance from focus | communities as phase clusters on a ring | edges, a focus |
@@ -999,6 +999,13 @@ P5 and P6 stay in this plan.
   seiche test ran too short under too little damping to see it. `Gravity`
   cancels each body's damping with `m·d·v` along its velocity
   (`counter_damping`), and the receipt reads energy at one and six seconds.
+  *Annotation 2026-10-04:* cancelling all of the damping also kept all the
+  energy exclusion released, and Orbit coasted apart (P5's rulings, under
+  "Energy's receipt passes off screen"). `counter_damping` is now
+  `CounterDamping::{Off, Full, Tangential}` (seiche 0.0.6, "Explicit enum,
+  bump seiche"), and Orbit's is `Tangential`: only each body's tangential
+  velocity about the gravitational mass centre, against the system's drift,
+  is driven back, so radial motion and drift settle and the orbits do not.
 - 2026-09-03 (P2): `BarnesHutRepulsion`'s default strength (2 400, `1/d`)
   is a third of `NodeExclusion` at a node diameter, exactly the
   recalibration its own docs deferred; Charge is built at 6 000 in the
@@ -2033,3 +2040,70 @@ binning are the useful patterns.
   `physics_terms` green; graphshell `--features web --lib` 232 passed, 1
   ignored, single-threaded. Logs `Code/testing/mere/orbit/` (`diag-*.log`,
   `gate-diag-*.log`).
+- 2026-10-04 (Orbit's retune, after "Frictionless orbits + centring" and
+  "Explicit enum, bump seiche"; `orbit-retune`, main `c7125cd2` merged as
+  `90919d24`, retune `0d7583d4`). Only this plan changed on both sides; weave's
+  merge of it matches a plain `git merge-file` three-way merge. seiche:
+  `Gravity::counter_damping` is `CounterDamping::{Off, Full, Tangential}`;
+  Tangential cancels the host's damping only on each body's tangential
+  velocity about the gravitational mass centre, against the system's
+  mass-weighted drift. *Reading, not ruled:* `Gravity::new` takes the choice
+  as an argument, with no default, so no caller's meaning changes silently.
+  The only callers were seiche's own (the P1 never-rests test keeps `Full`,
+  its old meaning, at no damping) and the catalog; nothing outside mere
+  names it. seiche 0.0.6, with the workspace dependency and the lock's
+  seiche row only. The catalog's Orbit is `NodeExclusion` to two node
+  diameters (`ORBIT_EXCLUSION_REACH`, 72), `Gravity` under Tangential and
+  `Boundary` 0.02 (`ORBIT_CENTRING`); `physics_terms` gains
+  `orbit.gravity[2]` as E, gravitation staying H and counter-damping N.
+  *Bounded, and still an orbit.* The bar is the one stated with the fork: an
+  extent within 3× the first second's over 120 s; from 6 s a tangential share
+  and an angular-momentum coherence of at least 0.8; at least one revolution;
+  energy above 1; no overlaps; hubs inside. The law's own Tangential over
+  the five-seed sweep (`diag_orbit_ruled`) gives a worst 1.87 / 1.59 / 2.26 /
+  2.09 (P2 at 2.5, P2 at 0.82, gen-40 at 2.5, gen-40 at 0.82), least
+  tangential 0.90, coherence 0.92, revolutions 3.29, energy 198, mass against
+  radius at most −0.16, no overlaps, within 0.15 of the test force it was
+  built from on every line. Through the canvas on the tree page's path
+  (Play, Free, Orbit; `orbit_stays_bound_and_orbiting_on_the_p2_fixture`, 30
+  s by default, 120 s as an ignored receipt) the extent is 205 at 1 s and at
+  most 246 over 120 s (1.20×), the energy 2,904 to 3,941 after the first
+  second, 5.55 revolutions, and no node off the canvas through its own
+  camera at any second, with the boot camera that main still has. seiche's
+  `tangential_counter_damping_keeps_the_orbits_bound` carries the claim with
+  `Full` as its control, which fails the tangential bar.
+  *The plan's Orbit claims, re-checked.* The laws table (annotated above):
+  gravitation, mass by degree, the kick and no rest hold, and "leaves orbit
+  hubs" reads as hubs inside on every seed. P1's floor after 600 ticks: the
+  seiche test, green. P2's energy at 1 s and 6 s: `physics_orbit` and
+  `p4_tree_physics_orbit` ok. P3's board keeps moving: the board's unit test,
+  green; its headed receipt needs the C4 WebRTC fixture, not built here, and
+  was not run. P4's drag and add rows: `physics_drag`, `physics_add` and
+  their tree versions ok. The law.orbit profile: `p4_tree_physics_profiles`
+  ok. The never-rests list and G1's classes: green. The 2026-09-03 finding is
+  annotated above.
+  *Headed receipts* on bundle `edbee10a…` (wasm-bindgen 0.2.129 CLI, the web
+  lock seeded from `0090ad99` with the seiche row bumped, now `3cce8fc5`),
+  port 8845, under the page-error gate: `p4_tree_physics_orbit`,
+  `p4_tree_physics_drag`, `p4_tree_physics_add`, `p4_tree_physics_profiles`,
+  `physics_orbit`, `physics_drag` and `physics_add` all `RESULT ok` with no
+  gate failures. The positive controls on Orbit, a planted throw on the tree
+  page and a planted panic on the old page, fail as they must. Captures were
+  inspected whole-frame: all eleven nodes on the canvas, compact. Orbit's
+  framing check lives on `energy-frame` and was not run here (nothing
+  cherry-picked); no node left the canvas at any second without the
+  following view.
+  *At no host damping (asked):* Tangential has nothing to settle with, so
+  the blow-out stays and only the centring holds it. Worst 6.28 / 5.29,
+  least tangential 0.08 / 0.46, median 0.32 / 0.63, hubs no longer inside
+  (mass against radius up to +0.28): bounded, but a radial breathing, not an
+  orbit. With a floor under the radial settling at the old page's 0.82 it
+  passes: worst 1.58 / 2.60, least tangential 0.89 / 0.96; at 0.7, worst 2.50
+  / 2.67. Back to Mark as a fork. Gates (offline, locked, debug): seiche
+  113/113, 109/109 without default features, 113/113 with `gpu` (8 ignored,
+  the diagnostics); pictograph `--features canvas --lib` 287 passed, 13
+  ignored, `physics_terms` green; graphshell `--features web --lib` 235
+  passed, 2 ignored, single-threaded; clippy clean on the changed lines.
+  Logs `Code/testing/mere/orbit/` (`diag-ruled-1.log`,
+  `diag-no-damping-1.log`, `graphshell-orbit-p2-120s.log`, `receipts-r1.log`,
+  `wasm-build-1.log`, `gate-ruled-*.log`).
