@@ -569,13 +569,8 @@ impl Canvas {
                 else {
                     continue;
                 };
-                let (cx, cy) = self.camera.to_screen(*pos);
                 let side = self.node_size(key) * FACE_INSET * self.camera.zoom;
-                let half = side * 0.5;
-                let bounds = LayoutRect::new(
-                    LayoutPoint::new(cx - half, cy - half),
-                    LayoutPoint::new(cx + half, cy + half),
-                );
+                let bounds = self.face_rect_at(key, *pos);
                 let file = self
                     .derived_face_cache
                     .entry((crate::DERIVATION_VERSION, address.clone()))
@@ -632,16 +627,8 @@ impl Canvas {
             // Inset within the face so the accent frames the icon: state /
             // selection must stay readable at a glance once an icon lands
             // (representations carry node identity).
-            let (cx, cy) = self.camera.to_screen(*pos);
-            // Inset within the node's *resolved* face, so a resized node carries
-            // its icon proportionally (identical at the default size).
-            let half = self.node_size(key) * 0.5 * FACE_INSET * self.camera.zoom;
-            let (x0, y0, x1, y1) = (cx - half, cy - half, cx + half, cy + half);
             face_cmds.push(PaintCmd::DrawImage(ImageItem {
-                placement: CommonPlacement::new(LayoutRect::new(
-                    LayoutPoint::new(x0, y0),
-                    LayoutPoint::new(x1, y1),
-                )),
+                placement: CommonPlacement::new(self.face_rect_at(key, *pos)),
                 image_key: img_key,
                 image_rendering: ImageRendering::Auto,
                 alpha_type: AlphaType::Alpha,
