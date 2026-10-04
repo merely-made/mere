@@ -131,7 +131,7 @@ not presets.
 | `charge.barnes-hut` | Charge | Coulomb repulsion between all bodies (1/d, Barnes-Hut O(n log n)) + edge springs: the Fruchterman–Reingold shape | evenly spread neighbourhoods, the classic force picture | edges |
 | `stress.kamada-kawai` | Stress | every pair a spring whose rest length is graph distance × L | global distance fidelity: paths unroll to true length, far is far | all-pairs shortest paths, cached per topology |
 | `energy.linlog` | Energy | attraction ∝ d on edges, repulsion ∝ 1/d overall, degree-weighted (LinLog / ForceAtlas2) | communities as islands, hubs central | edges, degree |
-| `orbit.gravity` | Orbit | n-body gravitation, mass by degree, tangential initial velocity, no rest; *2026-10-04:* only the orbital (tangential) motion frictionless, so radial motion settles, a weak centring well, and exclusion only to two node diameters | the graph as a solar system: leaves orbit hubs | degree |
+| `orbit.gravity` | Orbit | n-body gravitation, mass by degree, tangential initial velocity, no rest; *2026-10-04:* only the orbital (tangential) motion frictionless, so radial motion settles (at no less than 0.82 whatever the host's damping), a weak centring well, and exclusion only to two node diameters | the graph as a solar system: leaves orbit hubs | degree |
 | `kinds.particle-life` | Kinds | particle life: each node has a kind; an asymmetric kind×kind attract/repel matrix (the ambient sim's law over the graph) | sorting, chasing and fleeing by kind; never at rest | a kind per node — the host's choice per scene (relation family, domain, facet), recorded in the saved scene |
 | `flock.boids` | Flock | separation / alignment / cohesion; edge-neighbours are flockmates | constellations that move as groups | edges |
 | `sync.kuramoto` | Sync | phase oscillators coupled along edges; angle = phase, radius = distance from focus | communities as phase clusters on a ring | edges, a focus |
@@ -1062,7 +1062,9 @@ P5 and P6 stay in this plan.
   `CounterDamping::{Off, Full, Tangential}` (seiche 0.0.6, "Explicit enum,
   bump seiche"), and Orbit's is `Tangential`: only each body's tangential
   velocity about the gravitational mass centre, against the system's drift,
-  is driven back, so radial motion and drift settle and the orbits do not.
+  is driven back, so radial motion and drift settle and the orbits do not;
+  they settle at no less than `Gravity::RADIAL_FLOOR` (0.82, "Radial floor
+  at 0.82") whatever the host's damping.
 - 2026-09-03 (P2): `BarnesHutRepulsion`'s default strength (2 400, `1/d`)
   is a third of `NodeExclusion` at a node diameter, exactly the
   recalibration its own docs deferred; Charge is built at 6 000 in the
@@ -2164,3 +2166,47 @@ binning are the useful patterns.
   Logs `Code/testing/mere/orbit/` (`diag-ruled-1.log`,
   `diag-no-damping-1.log`, `graphshell-orbit-p2-120s.log`, `receipts-r1.log`,
   `wasm-build-1.log`, `gate-ruled-*.log`).
+- 2026-10-04 (Orbit's radial floor, after "Radial floor at 0.82";
+  `orbit-retune`, main `fdb1f5df` merged as `ffa90384`, the floor
+  `e9182cc8`). Only this plan changed on both sides, and weave's merge of it
+  matches `git merge-file`. `Gravity` gains `radial_floor`, default
+  `Gravity::RADIAL_FLOOR` (0.82): under Tangential, where the host's damping
+  is below it, the law damps radial motion and drift up to it itself, and at
+  or above it nothing changes. *Reading, not ruled:* the floor is a seiche
+  field and default rather than a catalog constant, since Tangential is new
+  in 0.0.6 and Orbit is its only user. The laws-table cell and the
+  2026-09-03 annotation say so.
+  *Against the bar*, the five-seed sweep (`diag_orbit_floor`), worst extent
+  as a multiple of the first second's, P2 / gen-40:
+  - host damping 0: 1.56 / 2.71, least tangential 0.90 / 0.96, coherence
+    0.92 / 0.98, revolutions 2.91 / 3.79, energy 579 / 18,972;
+  - 0.7: 1.52 / 2.52, least 0.90 / 0.96, 0.92 / 0.98, 2.92 / 4.23;
+  - 0.82: 1.54 / 1.98, least 0.89 / 0.96, 0.91 / 0.98, 2.98 / 4.11;
+  - 2.5: 1.89 / 2.31, least 0.99 / 1.00, 0.99 / 1.00, 3.39 / 3.88.
+  Hubs are inside on every seed (mass against radius at most −0.17) and no
+  run has an overlap. The control, the same law without the floor at
+  damping 0, reads 6.28 / 5.29 and least tangential 0.07 / 0.39. Through the
+  canvas on the tree page's path at damping 0
+  (`orbit_stays_bound_and_orbiting_on_the_p2_fixture_at_no_damping`, ignored,
+  120 s): 248 at 1 s, at most 377 (1.52×), 4.61 revolutions, no node off
+  the canvas at any second; at the canvas's default damping, unchanged
+  (1.20×, 5.57). seiche's `the_radial_floor_keeps_the_orbits_at_no_damping`
+  carries the claim, with the floor at 0 as its control, which fails on
+  tangential share. Both seiche Orbit tests now run the full 120 s the bar
+  was stated over: an earlier 30 s draft of this one asked for one
+  revolution in 30 s, a quarter of the bar's window, and failed at 0.78.
+  *Headed receipts* on bundle `3ff58d2a…` (0.2.129 CLI, web lock `3cce8fc5`),
+  under the page-error gate: the seven of the retune round `RESULT ok` with
+  no gate failures, and the planted throw and panic on Orbit fail. Captures
+  were inspected whole-frame. Gates (offline, locked, debug): seiche
+  114/114, 110/110 without default features, 114/114 with `gpu` (9 ignored);
+  pictograph `--features canvas --lib` 287 passed, 13 ignored,
+  `physics_terms` green; graphshell `--features web --lib` 235 passed, 3
+  ignored, single-threaded, on the second run. The first run failed on
+  `session_notices::tests::the_endpoint_is_asked_even_while_no_request_is_in_flight`
+  (polls 1 against more than 1), the timing flake the Density and G1 lanes
+  logged; it passed alone and in the rerun. The default page-path test adds
+  about 20 s to the graphshell suite in debug (30.8 s before this lane,
+  51.9 s after the retune). Logs `Code/testing/mere/orbit/`
+  (`diag-floor-1.log`, `graphshell-orbit-p2-floor.log`, `receipts-r2.log`,
+  `wasm-build-2.log`, `gate-floor-*.log`, `gate-floor2-graphshell-web.log`).
