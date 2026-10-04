@@ -2028,3 +2028,31 @@ binning are the useful patterns.
   alone, with following off); following makes zoom below 1 common there.
   Gates: seiche 103/99/103 (default, no-default, gpu), pictograph canvas 277,
   graphshell web 232 single-threaded.
+- 2026-10-04 (main 69ba33d0 merged into `energy-frame`, per "Drag stops
+  following" and "Density gets the check here"). *Merge* `9724a6d5`: of the
+  eight files both sides changed, five auto-merged exactly as a plain `git
+  merge-file` does; in `canvas_physics.rs` weave's result silently dropped
+  main's `SETTLED_ARRANGEMENT` re-export, the test module's `use` lines and two
+  of main's tests, so the plain three-way merge replaced it (its seam's missing
+  brace restored); `web_product.rs` and this plan keep both sides. Every line
+  either side added survives but two rewritten doc lines. *Drag* `38bd8b0d`: the
+  press that becomes a drag (past the click slop) stops following; a click
+  does not; the follow test drags and clicks a node. *Density*: its two law
+  receipts and two Springs controls assert framing on the settled capture.
+  *Round* on bundle `a2837089` (wasm-bindgen 0.2.129 with wgpu 30.0.1, web
+  lock `0090ad99`, the page-error gate on): the twelve law receipts, Density's
+  controls, the profiles and the framing controls pass on both pages; tree
+  drag and add, old-page add, `p4_tree_controls`, `p4_tree_live_profile`, the
+  two saved-graph receipts, `p4_tree_profile`, `p4_tree_elapsed` and both
+  2,000-node settles pass (GPU 413 of 418 steps on the device). The must-fail
+  framing control fails with `got '1'` and a planted throw fails on the gate,
+  each on both pages. The old page's `physics_drag` still fails, Stress 22
+  against 20 on a fresh profile (and Anneal 79 against 60 on a profile holding
+  an earlier saved session). The camera holds from the press through the
+  release (621.63, 393.68 at zoom 0.772 throughout), so it is not easing after
+  the drop: following zoomed the view out before the gesture, its 220 px is
+  about 285 world units, and the law pulls the node back further in the
+  measured frame (18 px against 11 one frame after release). With the follow
+  step disabled the receipt passes twice. Put back to Mark with the receipt
+  unchanged. Gates: seiche 113/109/113, pictograph canvas 289, graphshell web
+  235 single-threaded.
