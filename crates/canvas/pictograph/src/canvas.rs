@@ -701,13 +701,15 @@ mod derived_face;
 mod gloss;
 mod lifecycle;
 mod nodes;
+pub(crate) mod at_rest;
 mod roles;
 mod selection;
 mod source_time;
 mod strategy;
 mod view;
 
-pub use roles::{SETTLE_ENERGY_FLOOR, SETTLED_ARRANGEMENT, StopReturn};
+pub use at_rest::{HOME_FRAMES, SETTLE_SPEED_FLOOR};
+pub use roles::{SETTLED_ARRANGEMENT, StopReturn};
 pub use seiche::{Axes, DEFAULT_ANCHOR_STIFFNESS, Role, RoleTable};
 pub use source_time::{SourceTimeCanvas, SourceTimeSelection};
 

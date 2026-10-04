@@ -11,8 +11,9 @@
 //! the seam that lets the physics catalog move those items too: a seiche
 //! simulation with one body per item, the score's positions as the items'
 //! **arrangement positions**, each playing a role ([`seiche::Role`]: seeded
-//! by default, anchored items returning on [`seiche::AnchorSpring`], pinned
-//! items held; dynamics grammar plan, G7), and the chosen law and overlays
+//! by default, anchored items returning on [`seiche::AnchorSpring`] and, at
+//! rest, gliding exactly home, pinned items held; dynamics grammar plan, G7),
+//! and the chosen law and overlays
 //! built through the same attribute builders the canvas uses, graph-free. An
 //! axis the recipe encodes from a data field is held on that axis (F28). The
 //! host syncs the board whenever the scene changes (a new item spawns at its
@@ -27,7 +28,7 @@
 //! [`offload`](PhysicsBoard::offload)ed onto an actor thread on native — the
 //! same choice the canvas makes. (2026-09-04.)
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use euclid::default::Point2D;
 use kernel::graph::NodeKey;
@@ -36,6 +37,7 @@ use seiche::{
 };
 
 use crate::canvas::SETTLE_TICKS;
+use crate::canvas::at_rest::AtRest;
 use crate::canvas::physics_catalog::{
     LawInputs, LawSources, PhysicsDepthSource, PhysicsKindSource, PhysicsLaw, PhysicsMassSource,
     PhysicsOverlay,
@@ -95,6 +97,10 @@ pub struct PhysicsBoard {
     /// The item currently held by the pointer. This is transient view state;
     /// score slots and `items` remain the arrangement authority.
     dragging: Option<NodeKey>,
+    /// The settle record and anchored cards' at-rest return (F45, F46).
+    rest: AtRest,
+    /// Halted by the host: no settle is noted and nothing glides.
+    halted: bool,
     /// The host's device, when the board's repulsion is staged on it.
     #[cfg(feature = "gpu")]
     physics_device: Option<crate::canvas::PhysicsDevice>,
@@ -119,6 +125,8 @@ impl PhysicsBoard {
             anchor_stiffness: DEFAULT_BOARD_ANCHOR_STIFFNESS,
             encoded: Axes::NONE,
             dragging: None,
+            rest: AtRest::default(),
+            halted: false,
             #[cfg(feature = "gpu")]
             physics_device: None,
         }
@@ -324,7 +332,46 @@ impl PhysicsBoard {
     /// budget, so a law that never rests simply holds a budget that never runs
     /// out (see [`settle_for_choice`](Self::settle_for_choice)).
     pub fn tick(&mut self) -> bool {
-        self.physics.advance_frame(&mut self.view)
+        let settling = self.physics.advance_frame(&mut self.view);
+        if self.dragging.is_some() {
+            self.rest.arm();
+        } else if !self.halted && self.rest.rested(self.physics.rms_speed()) {
+            self.start_home();
+        }
+        self.rest.step(&mut self.physics);
+        settling || self.rest.gliding()
+    }
+
+    /// At rest, every anchored card away from its slot glides home (F45).
+    fn start_home(&mut self) {
+        let glide: Vec<_> = self
+            .items
+            .iter()
+            .filter(|item| self.roles.role(self.keys[&item.id], Some(&item.site)) == Role::Anchored)
+            .filter_map(|item| {
+                let key = self.keys[&item.id];
+                let at = self.view.position_of(key)?;
+                Some((key, at, Point2D::new(item.slot.0, item.slot.1)))
+            })
+            .collect();
+        self.rest.start(&mut self.physics, glide);
+    }
+
+    /// A disturbance releases the cards held at home to their springs.
+    fn unpark(&mut self) {
+        let pinned: HashSet<NodeKey> = self
+            .items
+            .iter()
+            .filter(|item| self.roles.role(self.keys[&item.id], Some(&item.site)) == Role::Pinned)
+            .map(|item| self.keys[&item.id])
+            .collect();
+        self.rest
+            .release(&mut self.physics, |key| pinned.contains(&key));
+    }
+
+    /// How many anchored cards are held at home. Receipt introspection.
+    pub fn anchored_home_count(&self) -> usize {
+        self.rest.parked_count()
     }
 
     /// Begin a transient drag of an item. The body is pinned at its current
@@ -341,6 +388,7 @@ impl PhysicsBoard {
         let Some(position) = self.position(id) else {
             return false;
         };
+        self.unpark();
         self.dragging = Some(key);
         self.physics.pin(key, Point2D::new(position.0, position.1));
         self.physics.set_dragging(true);
@@ -391,6 +439,8 @@ impl PhysicsBoard {
             self.physics.unpin(key);
             self.physics.set_dragging(false);
         }
+        self.unpark();
+        self.halted = true;
         self.physics.halt();
     }
 
@@ -498,6 +548,8 @@ impl PhysicsBoard {
     /// overlay that never rests — a budget that never runs out, which is how
     /// a perpetual law keeps its cards moving.
     fn settle_for_choice(&mut self) {
+        self.unpark();
+        self.halted = false;
         let living =
             self.choice.law.never_rests() || self.choice.overlays.iter().any(|o| o.never_rests());
         self.physics
@@ -636,22 +688,41 @@ mod tests {
         assert!(!board.drag_end());
     }
 
-    /// Under Charge with a gentle anchor, two items whose slots overlap settle
-    /// apart; under Orbit the board keeps moving.
+    /// Under Charge, two seeded items whose slots overlap settle apart; two
+    /// anchored ones are pushed apart while moving and, at rest, glide back
+    /// to their slots, overlapping as their arrangement does (F45). Under
+    /// Orbit the board keeps moving.
     #[test]
     fn charge_separates_overlapping_slots_and_orbit_never_rests() {
-        let mut board = PhysicsBoard::new();
-        board.set_roles(RoleTable::uniform(Role::Anchored));
-        board.sync(vec![item("a", 0.0, 0.0), item("b", 4.0, 2.0)]);
-        board.set_choice(PhysicsChoice {
+        let pair = || vec![item("a", 0.0, 0.0), item("b", 4.0, 2.0)];
+        let charge = PhysicsChoice {
             law: PhysicsLaw::Charge,
             ..PhysicsChoice::default()
-        });
+        };
+        let mut anchored = PhysicsBoard::new();
+        anchored.set_roles(RoleTable::uniform(Role::Anchored));
+        anchored.sync(pair());
+        anchored.set_choice(charge.clone());
+        let mut widest: f32 = 0.0;
+        for _ in 0..SETTLE_TICKS * 4 {
+            anchored.tick();
+            widest = widest.max(anchored.gap("a", "b").unwrap());
+        }
+        assert!(
+            widest > 30.0,
+            "charge pushed the anchored pair apart: {widest:.0}"
+        );
+        assert_eq!(anchored.anchored_home_count(), 2, "both came home at rest");
+        assert_eq!(anchored.position("b"), Some((4.0, 2.0)), "exactly home");
+
+        let mut board = PhysicsBoard::new();
+        board.sync(pair());
+        board.set_choice(charge);
         for _ in 0..SETTLE_TICKS {
             board.tick();
         }
         let gap = board.gap("a", "b").unwrap();
-        assert!(gap > 60.0, "charge pushed the pair apart: {gap:.0}");
+        assert!(gap > 60.0, "charge pushed the seeded pair apart: {gap:.0}");
         assert!(!board.tick(), "charge comes to rest");
 
         board.set_choice(PhysicsChoice {
