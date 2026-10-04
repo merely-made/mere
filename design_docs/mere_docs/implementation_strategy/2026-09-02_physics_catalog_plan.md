@@ -621,6 +621,32 @@ pull reading −0.33 with 510 overlaps):
   default suite keeps one quick sample check. *Reading, not ruled:* the dev
   build's speed is measured before any profile change, since an opt-level
   override touches every dev build of the crates it names.
+  *Built and ruled (2026-10-04, `seiche-speed` `ba0e2f4f`):* the dial is
+  `Physics::set_speed` (0.2 to 50, thousandths), with a per-frame step budget
+  that reports the speed reached, and slow motion drawn between the last two
+  ticks; 600 ticks are bit-identical at 0.2x, 1x, 3.7x and 50x for laws
+  without NodeExclusion or Barnes-Hut, and a different dt differs (the
+  control). The dev-build measurement corrected the figure above: debug is
+  about 34x slower than release on one start (146.5 s against 4.3 s), and
+  99.4% of a debug tick is Density's sweep. Mark ruled four questions:
+  - the control, **"Speed select"**: presets 0.2, 0.5, 1, 2, 5, 10 and 50 in
+    the physics section, default 1x, showing the speed reached when the
+    budget binds (against a log slider, slower/faster buttons, or the page
+    option only);
+  - reproducibility, **"Sum in key order"**: NodeExclusion and Barnes-Hut sum
+    bodies in key order, one sort a tick, so every law is bit-reproducible
+    run to run and across speeds, their low bits shifting once (against a
+    fixed-order map, or leaving it, where two 1x runs differed by up to about
+    70,000 ULP after 600 ticks);
+  - dev speed, **"Opt 3 in dev for physics"**: `[profile.dev.package]`
+    opt-level 3 for seiche, rapier2d, parry2d, nalgebra, simba and glamx,
+    taking one Density start from 146.5 s to 6.0 s and the pictograph suite
+    from 102.5 s to 12.6 s, rebuilds unchanged and backtraces keeping
+    file:line (against the test profile only, rewriting Density's sweep, or
+    leaving it);
+  - as built, ticked: **"8 ms budget default, Deadline pacing at 1x"** (the
+    native actor sleeps out the rest of each tick's interval). "Remote board
+    stays 1x" was left unticked and returns as its own question.
 - **Energy's receipt passes off screen (2026-10-03).** In
   `p4_tree_physics_energy`'s settled capture one node and one edge are in
   view and the rest of the 11-node fixture has left it; the start frame
