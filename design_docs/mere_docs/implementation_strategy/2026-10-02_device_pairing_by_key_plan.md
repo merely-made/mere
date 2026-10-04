@@ -1,15 +1,13 @@
 # Device Pairing by Key Plan
 
 **Date**: 2026-10-02
-**Status (2026-10-03)**: in progress. Assessed and ruled by Mark from 2026-10-01
-to 2026-10-03 (rulings 1 to 55 below). D1 landed (`4963b489`); D1b's mere fix (M1)
-landed (`177b927c`), its fork fix (F1) is released as
-`mere-p2panda-net-0.7.5` (`1bec457e`, pushed), with knot and mere repinned
-locally and `main` merged into the repin (`259f2741`); `connected` follows
-the gossip overlay (ruling 31, landed `fdb02bd3`). Before knot's and mere's
-pushes, connection-event liveness for peers off the overlay is built on
-`main` (rulings 47 to 55) and the release branch takes `main` again; the
-overlay's gap after restarts has its own lane (ruling 36); then D2.
+**Status (2026-10-04)**: in progress. Assessed and ruled by Mark from 2026-10-01
+to 2026-10-04 (rulings 1 to 63 below). D1 landed (`4963b489`); D1b's mere fix (M1)
+landed (`177b927c`) and its fork fix (F1) shipped in the 0.7.5 repin, pushed
+2026-10-04 (fork `1bec457e`, Knot `92367ec`, mere `031b3dcc`). `connected`
+follows the gossip overlay (ruling 31) and, off it, open connections
+(rulings 47 to 56). Next: the overlay's gap after restarts in its own lane
+(ruling 36), then D2.
 **Scope**: Mark's machines find, reach and trust each other by device
 identity, not by address: the stack's own peers already do on one network;
 SSH, the path Mark uses daily, does not. Pairing a device becomes one
@@ -521,6 +519,74 @@ cleared at 60.007 s once). As built, the path rule must read connected at
 Options: keep it; the original wording. Mark: **"Keep 59 s / not before 60 s
 (Recommended)"**.
 
+**Ruling 56.** *Ruling 54's A/B separated nothing: the dual-dial delivery gap
+has appeared once in 50 parallel suites, on the first liveness build, and
+not again in any arm (hook on without the killed-peer test 0 of 10; hook off
+with it 0 of 10; the final build 0 of 10, some under heavy outside load; 0
+of 20 before the hook). What now?* Options: merge and watch for recurrence;
+a bigger hook-on run first; loosen the gap check. Mark: **"Merge; watch for
+recurrence (Recommended)"**. Follows: the gap is recorded as one
+unexplained event; a second occurrence reopens it, with its logs.
+
+**Ruling 57.** *On iroh 1.3, D1b failed at its first restart in 1 of 3 runs
+(the second in the other 2). The resident logs carry no gossip detail.
+Reading: ruling 36's stale pending entry also forms at first contact when
+one side's `Join` lands before the other has joined; the side that joined
+alone holds it, and restarting the other side fails at once.* Options:
+record it under ruling 36 and let the overlay-fix lane confirm it; confirm
+it before the pushes. Mark: **"Record under 36; overlay lane confirms
+(Recommended)"**.
+
+**Ruling 58.** *Push (a), Knot: merge Knot's GitHub `main` (`ea3e99e`) into
+the repin and push two commits, that merge and `562353a`; Knot is red on its
+own until (c).* Options: push; hold. Mark: **"Push (a) (Recommended)"**.
+Done 2026-10-04: GitHub's `main` was still `ea3e99e`, the merge tree matched
+the lane's conflict-free check (`5689433f`), and `ea3e99e..eb934b4` was
+pushed with exactly those two commits.
+
+**Ruling 59.** *Push (b), mere: after (a), commit the lock with Knot
+`562353aa` from GitHub, rerun the unmodified gate, djinn, D1 and D1b, and
+fast-forward GitHub's `main` from `7587f0df` with the verified branch only:
+nine commits (`a5543904`, `b7913620`, `259f2741`, `28292406`, `a44ee831`,
+`005e27ad`, `0292f369`, `ea75dfdb` and the lock), not the local `main`'s
+unpushed physics commits; stop if the lock diff shows more than Knot's move
+from path to git, a check fails, or GitHub's `main` has moved.* Options:
+push after its checks; hold. Mark: **"Push (b) after its checks
+(Recommended)"**.
+
+**Ruling 60.** *Push (c), Knot's repin onto the pushed mere: one commit
+moving mere's rev in 40 lines and genet to `bd3e8861` in 14 rows, after
+Knot's workspace check, library, desktop, retinue and knot-document tests
+and `cargo tree -d`.* Options: push after its checks; hold. Mark: **"Push
+(c) after its checks (Recommended)"**.
+
+**Ruling 61.** *Push (c) stopped at its first check: mere `031b3dcc` added
+`on_overlay` to `KnownPeer` (ruling 52), and Knot's test-only helper
+`peer(seed, reachable, connected)` (knot-editor `resident.rs:686`) builds
+one, so it no longer compiles; it is Knot's only break, and the helper's
+tests read only `connected`. What does the helper set?* Options:
+`on_overlay: true`; `on_overlay: false`; a new parameter. Mark:
+**"on_overlay: true (Recommended)"**. Follows: the line rides in Knot's
+repin commit.
+
+**Ruling 62.** *Mere's checks missed it because djinn compiles
+knot-editor's library, not its tests. Should the mere/Knot lockstep compile
+Knot's test targets against mere's tree before mere pushes a change Knot
+consumes?* Options: add it to the lockstep; not now. Mark: **"Add it to the
+lockstep (Recommended)"**. Follows: before such a push, `cargo check
+--workspace --all-targets` runs in a scratch Knot worktree patched at mere's
+tree; recorded in the mere/Knot lockstep memory the same day.
+
+**Ruling 63.** *Push (c) is ready apart from three knot-desktop Collapse
+tests failing with "missing Show Preview" (`apps/desktop/tests/collapse.rs:44`),
+which fail identically on Knot's `main` before the repin (`ea3e99e`, a clean
+control worktree on its own lock); every other check passes. Commit and push
+(c)?* Options: push, naming the three failures; hold until Collapse is fixed
+on Knot `main`. Mark: **"Push (c), name the 3 failures (Recommended)"**.
+Follows: the commit message names them with the control, and they are left
+to Collapse. Done 2026-10-04: GitHub's Knot `main` was still `eb934b4`, and
+`eb934b4..92367ec` was pushed with the one repin commit.
+
 Also given in the same conversation (2026-10-01, Mark: "You can edit known
 hosts"): `known_hosts` entries may be updated, which was done for the
 ThinkPad (`.32`) and Q-PC (`.68`, `q-pc.local`), each key added only after
@@ -1017,6 +1083,93 @@ loaded machine:
   absolute times (ruling 53), one the dual-dial delivery-gap check
   (ruling 54).
 - Not yet built: ruling 50's wordings, which needed ruling 52.
+
+**2026-10-04: the open-connection count landed.**
+
+- **The second round** (`a44ee831`):
+  - `KnownPeer` and `PairedDeviceV1` carry `on_overlay`; the directory
+    stays at version 1, and an entry without the field reads as `false`.
+  - The two wordings are constants (`NOT_CONNECTED_NO_NEIGHBOUR`,
+    `NOT_CONNECTED_NO_CONNECTION`), chosen by one function both surfaces
+    call, with both literals asserted on both.
+  - The polling check compares each run's delay after its own close
+    (ruling 53). In 10 suites the close came 9.90 to 10.02 s after the
+    kill, and the rule followed within 0.12 s, polled or not. iroh's path
+    rule read connected at 59 s every time, cleared at 60.01 to 65.10 s
+    unpolled, and never within 150 s with pollers.
+- **Ruling 54's A/B** is recorded in ruling 56. The lane's reading of the
+  arms: A skipped both child-spawning tests; B's scratch switched the hook
+  off except for the killed-peer scenario's own parent, since with it off
+  everywhere that test fails in about 10 s and its load disappears.
+- **Merged** as `005e27ad`, after verification in the normal-depth worktree
+  on `main` `ce79a82f` (merge `cc697b8f`):
+  - mere-transport 56 of 56 twice (about 155 s each); stickleback 85 and 5;
+    djinn's 15 test binaries.
+  - D1's stopped peer read not connected after 11.03 s. D1b failed at its
+    second restart (ruling 36).
+  - The control: with the hook never installed, both liveness tests fail.
+  - The installed resident stayed on PID 53336.
+  - `main` had moved by one doc file, so the merged tree differs from the
+    verified one in that file only.
+- **Open:** the dual-dial delivery gap, one event in 50 suites (ruling 56).
+
+**2026-10-04: the repin on iroh 1.3 with liveness, and push (a).**
+
+- **The merge.** The release lane merged `main` (`0292f369`) into the repin
+  as `ea75dfdb`, without conflict. The lock is identical to the previous
+  round's verified one: 1653 to 1669 packages, one retinue, one copy each
+  of iroh's and p2panda's packages.
+- **Checks on iroh 1.3:** the gate, mere-transport in 10 parallel suites
+  (56 passed each, about 163 s; the delivery-gap check never tripped),
+  stickleback 91, signalman 22, graphshell's library 191, djinn 101, and
+  the CBOR control.
+- **Liveness on iroh 1.3:**
+  - a killed peer off the overlay closed 9.99 to 10.05 s after the kill and
+    read not connected within 0.12 s of that, polled or not;
+  - iroh's path rule read connected at 59 s every time;
+  - a graceful close off the overlay read not connected in 10 to 50 ms, and
+    a stopped peer on it in 2 to 38 ms.
+- **Receipts:** D1's stopped peer read not connected after 10.42 s. D1b
+  failed at its second restart in 2 of 3 runs and at its first in 1
+  (ruling 57). PID 53336 throughout.
+- **The push lists.** GitHub's mere `main` was `7587f0df`, and the local
+  `main` held 21 unpushed commits from the physics session's Density branch
+  besides this plan's four, so push (b) carries the verified repin branch
+  only (ruling 59).
+- **Push (a)** is done (ruling 58).
+
+**2026-10-04: push (b), and (c)'s stop.**
+
+- **Push (b)** (ruling 59). Once Knot's `562353aa` was on GitHub, the lock
+  resolved with only the four Knot crates moving from the path patch to
+  git (1669 packages before and after). It was committed alone as
+  `031b3dcc`. Checks before the push:
+  - the unmodified `cargo_mode.py verify` passed (1542 packages);
+  - djinn 101 passed;
+  - D1's stopped peer read not connected after 11.10 s, and D1b failed at
+    its second restart (ruling 36);
+  - PID 53336 throughout.
+
+  GitHub's `main` was still `7587f0df`, and `7587f0df..031b3dcc` was pushed
+  as a fast-forward of exactly the nine listed commits. The local `main`,
+  with the physics session's unpushed commits and this plan's, has diverged
+  from it; the physics session, told, merged `origin/main` into it as
+  `fb12ce11`.
+- **Push (c)** moved Knot's 40 mere rows to `031b3dcc` and its 14 genet rows
+  to `bd3e8861` (no other rev left in any manifest; the lock has one mere
+  and one genet). It stopped at the workspace check on the test helper
+  (ruling 61). knot-desktop and its retinue check passed.
+- **Push (c)** (rulings 61 and 63). With the helper setting `on_overlay:
+  true`, Knot's checks passed: the workspace check, knot-editor 149,
+  knot-document 47, the retinue check, and `cargo tree -d` with one copy
+  each of mere, genet, iroh and p2panda. The exception is three of
+  knot-desktop's four Collapse tests (290 others passed), which fail the
+  same way on `ea3e99e`. Committed as `92367ec` and pushed as
+  `eb934b4..92367ec`. Knot builds on its own again.
+- **The 0.7.5 repin is complete:** the fork at `1bec457e`, Knot at
+  `92367ec`, mere at `031b3dcc`. Turnstone, Cleromancy and Isometry move at
+  their own next mere repins, Isometry with its strict site, and Retinue's
+  desktop workspace needs the `p2panda-core` patch row (findings above).
 
 ## 7. Progress
 

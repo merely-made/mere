@@ -50,10 +50,14 @@ pub const DEVICE_DIRECTORY_ROUTE: &str = "device-directory-v1";
 /// credential: the door's owner-only endpoint is the boundary, and this route
 /// is granted to this label alone.
 pub const DEVICE_DIRECTORY_APP: &str = "djinn";
-/// What the card and `djinn-devices` say when gossip has dropped a device that
-/// iroh still lists an active path to (pairing plan ruling 39).
-pub const NOT_CONNECTED_PATH_ACTIVE: &str =
+/// What the card and `djinn-devices` say when, on the overlay, gossip has
+/// dropped a device that iroh still lists an active path to (rulings 39, 50).
+pub const NOT_CONNECTED_NO_NEIGHBOUR: &str =
     "not connected (no gossip neighbour; a path is still active)";
+/// The same off the overlay, where no connection to the device is open
+/// (ruling 50).
+pub const NOT_CONNECTED_NO_CONNECTION: &str =
+    "not connected (no open connection; a path is still active)";
 const SESSION: &str = "djinn.device-directory/v1";
 const RESOURCE_LABEL: &str = "djinn.device-directory/v1";
 
@@ -78,9 +82,13 @@ pub struct PairedDeviceV1 {
     pub pairing_id: Option<String>,
     pub added_ms: u64,
     /// This device is talking to it now: while on the graph's overlay, it is
-    /// a gossip neighbour there; otherwise there is an active path. `path` is
-    /// iroh's own view, so it can show none active, or one, either way.
+    /// a gossip neighbour there; otherwise a connection to it is open. `path`
+    /// is iroh's own view, so it can show none active, or one, either way.
     pub connected: bool,
+    /// Whether this device is on the graph's gossip overlay, so `connected`
+    /// is gossip's answer. Absent from older directories, which read false.
+    #[serde(default)]
+    pub on_overlay: bool,
     /// The transport holds an address for it. Not a live link.
     pub reachable: bool,
     /// Every address the transport holds for it, the live ones marked active.
@@ -211,6 +219,7 @@ pub fn directory_entry(
         pairing_id: device.pairing_id.clone(),
         added_ms: device.added_ms,
         connected: live.is_some_and(|peer| peer.connected),
+        on_overlay: live.is_some_and(|peer| peer.on_overlay),
         reachable: live.is_some_and(|peer| peer.reachable),
         path: paths
             .iter()
@@ -372,6 +381,16 @@ impl DeviceDirectoryEndpoint {
     }
 }
 
+/// Which rule let a device go while iroh still lists a path to it, in the
+/// words the card and `djinn-devices` both use (ruling 50).
+pub fn not_connected_path_active(device: &PairedDeviceV1) -> &'static str {
+    if device.on_overlay {
+        NOT_CONNECTED_NO_NEIGHBOUR
+    } else {
+        NOT_CONNECTED_NO_CONNECTION
+    }
+}
+
 fn card_value(device: &PairedDeviceV1) -> CardValueV1 {
     let live: Vec<&str> = device
         .path
@@ -391,9 +410,9 @@ fn card_value(device: &PairedDeviceV1) -> CardValueV1 {
         value: match (device.connected, device.reachable) {
             (true, _) if live.is_empty() => "connected, no active path right now".into(),
             (true, _) => format!("connected via {}", live.join(", ")),
-            // Off the overlay while iroh still lists a path, as for about a
-            // minute after a peer closes.
-            (false, _) if !live.is_empty() => NOT_CONNECTED_PATH_ACTIVE.into(),
+            // Not connected while iroh still lists a path, as for a minute or
+            // more after a peer dies.
+            (false, _) if !live.is_empty() => not_connected_path_active(device).into(),
             (false, true) => "not connected (an address is known)".into(),
             (false, false) => "not connected (no address known)".into(),
         },
