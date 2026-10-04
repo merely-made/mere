@@ -2341,3 +2341,25 @@ binning are the useful patterns.
   418 device steps). The must-fail framing control and a planted throw fail on
   both pages. Gates: seiche 113/109/113, pictograph canvas 290, graphshell web
   235 single-threaded.
+- 2026-10-04 (main 9ce5889f merged into `energy-frame` `d2ea7526`: the
+  face-zoom fix and Orbit's retune). Of the nine files both sides changed,
+  five auto-merged exactly as a plain `git merge-file` does; `view.rs` weave
+  auto-merged where the plain merge conflicts (both added functions after
+  `focused_screen_position`) and placed main's elsewhere, so it was taken from
+  the plain merge by hand; `canvas_controls.rs` keeps main's `SetZoom` (it
+  places the camera through `set_camera`, so a set zoom stops following like
+  any zoom) beside Fit resuming following; `canvas_physics.rs` and this plan
+  keep both sides. One semantic conflict no text merge sees: `Gravity::new`
+  takes a `CounterDamping` now, and the Energy sweep's Orbit runs record the
+  first build, so they pass `Full` (27,405 at 60 s, as recorded). The web lock
+  moves to `3cce8fc5`, the pins' `0090ad99` with seiche's row at 0.0.6, the
+  same lock the Orbit lane built with. Orbit's receipts now assert framing
+  after the final settle too (`6640bb64`), Orbit being bounded. *Round* on
+  bundle `949fbc5e`, fresh browser profile: the twelve law receipts (Orbit at
+  both its moments), Density's controls, the profiles, the framing controls,
+  drag and add pass on both pages, main's two face-zoom receipts pass, and so
+  do `p4_tree_controls`, `p4_tree_live_profile`, the saved-graph pair,
+  `p4_tree_profile`, `p4_tree_elapsed` and both 2,000-node settles (GPU 413 of
+  418 device steps); the must-fail framing control and a planted throw fail
+  on both pages. Gates: seiche 115/111/115, pictograph canvas 292, graphshell
+  web 238 single-threaded.
