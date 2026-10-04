@@ -70,6 +70,8 @@ Two stances follow, both of which a *browser* should hold anyway:
 - **Partial and multi-source.** The graph is what Mere has gathered so far, from many sources, not a closed truth. Absence is not falsehood. We take the open-world *posture* (provenance per statement, mergeable views) without open-world *logic* (entailment and reasoning, which is the footgun).
 - **Identity as the merge key.** Global, dereferenceable identity is what lets two sources about the same thing merge. Mere's nodes are already URL-addressed, so this is a strength to lean on rather than bolt on. `AddressClaim` is the existing seam.
 
+> **Amended 2026-10-04 (Mark, [graph semantics plan](../implementation_strategy/2026-10-04_graph_semantics_plan.md) rulings 1, 2 and 4).** Provenance per statement now means per *assertion*: two sources of one claim hold two statements. The merge key is a resource identity (one id per canonical URL) beneath the browsing surface, since the live node is a surface whose address changes. "Absence is not falsehood" gains a mechanism: partial residency makes "not loaded" a real state, and every query and projection result names the layer that limited it.
+
 ## Linked data is a projection, not a boundary
 
 The composition spine already says: graph truth, projected into surfaces (tree, cartography, and so on). A JSON-LD document is another projection of the same truth, and ingestion is the inverse. Linked-data interchange is the spine's own logic applied to data exchange instead of display, not a special boundary feature.
