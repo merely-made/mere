@@ -2,11 +2,13 @@
 
 **Date**: 2026-10-01
 **Status (2026-10-04)**: in progress. Shape ruled by Mark on 2026-10-01
-(rulings 7 and 10 to 15 in the dramatis tier architecture; rulings 16 to 53
+(rulings 7 and 10 to 15 in the dramatis tier architecture; rulings 16 to 58
 below). P0 met; P1 landed on `main` (`da3c50bc`); P2 landed (`3e4992ec`); P3
 landed (`ff68e86c`), meeting the Mere 0.4 baseline's chatelaine condition.
-The review stop ended 2026-10-04 (ruling 51): P4a, the agent's RSA through
-`ring` and its ECDSA, is under way (rulings 52, 53).
+The review stop ended 2026-10-04 (ruling 51). P4a's first build signs RSA
+through `ring` and ECDSA, proven on the ThinkPad; its second round carries
+rulings 54 to 58 (no re-import overwrite, P-521 refused, unsignable keys
+refused, and the RSA key built by a library).
 **Scope**: found `chatelaine` as the tier's plain secret-item taxonomy; move
 castellan's OTP items and its Secret Service store onto it; then import
 (and finally export) the FIDO Credential Exchange Format through castellan.
@@ -347,6 +349,53 @@ run)?* Options: the ThinkPad; an iMac; WSL on the laptop. Mark: **"The
 ThinkPad (Recommended)"**. Follows: the test lines go into the ThinkPad's
 `~/.ssh/authorized_keys` for the run and come out after, with copies before
 and after compared.
+
+**Ruling 54.** *Re-importing a held key (ruling 20's no-op) overwrites today:
+castellan's import replaces the slot (`authority.rs:338`) and `ssh-add`
+rewrites it at Session tier (`agent.rs:291`), silently dropping a PerUse
+key's approval. What should re-import do?* Options: a no-op on both paths;
+for import only; keep overwriting. Mark: **"No-op on both paths
+(Recommended)"**. Follows: a held fingerprint is never rewritten, both
+report "already held", and changing a held key's tier becomes its own
+intent.
+
+**Ruling 55.** *ssh-key 0.6.7 signs P-521 but its decoder refuses an ECDSA
+scalar shorter than the curve width (`private/ecdsa.rs:40-53`): about 1 in 4
+P-521 keys and 1 in 512 P-256 or P-384 keys, on import and `ssh-add`.*
+Options: pad the scalar locally; keep P-521 and state the limit; refuse
+P-521; wait for ssh-key 0.7. Mark: **"Wait, wait. Does 0.7 exist? If so, use
+that now. If not, refuse p-521 until it's fixed upstream. I am not fucking
+with encryption regimes and cryptography; those are waaay out of our
+skillset. We should remain strictly consumers, not forking standards."**
+Follows: ssh-key 0.7 has no release (crates.io lists up to `0.7.0-rc.11`,
+read 2026-10-04), and `ssh-agent-lib` 0.6.0 requires ssh-key `^0.6`, so P-521
+is refused until upstream fixes it. A P-256 or P-384 key the decoder refuses
+is refused with a clear reason; nothing pads it.
+
+**Ruling 56.** *Keys the agent can never sign (RSA outside ring's limits:
+below 2048 or above 4096 bits, primes not multiples of 512, e below 65537;
+DSA; `sk-*` security-key types) are accepted today and fail at signing.
+Refuse them at the door?* Options: refuse with the reason; accept and store.
+Mark: **"Refuse with the reason (Recommended)"**.
+
+**Ruling 57.** *Adding `ring` narrows the Windows cross-check: castellan's
+`keeper` and djinn no longer check for `x86_64-unknown-linux-gnu` here,
+since ring's C build needs a Linux cross compiler; the `secret-service`
+check still passes. How?* Options: accept and build Linux natively on the
+ThinkPad; install a cross toolchain; put ring behind a feature. Mark:
+**"Accept; build on the ThinkPad (Recommended)"**.
+
+**Ruling 58.** *`ring` loads an RSA key from eight components and OpenSSH
+files store six; the lane derived dP and dQ itself with crypto-bigint's
+constant-time remainder. With ruling 55's principle, which?* Options: a
+library derives them; keep the derivation; defer RSA. Mark: **"A library
+derives them (Recommended)"**. Follows: no key arithmetic in our code; if
+no maintained library builds the full key without a new crate, it comes
+back to Mark. Mark's principle, refined the same day, is kept as a feedback
+memory: "if the domain requires expertise due to the features being
+privacy, security, or critical operation-oriented, we need to adhere to
+standards rigorously ... We should rely on the wisdom of people who have
+done this longer than a year."
 
 ## 3. Phases
 
@@ -755,6 +804,45 @@ and ECDSA, waits.
 rulings 52 (RSA signs through `ring`, after a feasibility check, since
 RUSTSEC-2023-0071 is unpatched in every `rsa` release) and 53 (the
 end-to-end receipt on the ThinkPad).
+
+**2026-10-04: P4a, first build** (Opus lane, `2d2a36c6`, on `d0d8372b`; not
+merged).
+
+- **ring is feasible.** `rsa::KeyPair::from_components` (ring 0.17.14
+  `src/rsa/keypair.rs:219`) takes n, e, d, p, q, dP, dQ and qInv, and
+  OpenSSH's `iqmp` is ring's qInv. n must be 2048 to 4096 bits with each
+  prime a multiple of 512 bits, and e at least 65537. Its private
+  exponentiation is constant-time, and it has no public SHA-1 signing, so a
+  flagless `ssh-rsa` request is refused (*reading*). dP and dQ were derived
+  by the lane, which ruling 58 replaces.
+- **The design.** `personae/src/ssh_sign.rs` routes by key type: Ed25519
+  and ECDSA through ssh-key's RustCrypto signers, RSA through ring, the
+  request's flags choosing SHA-256 or SHA-512 (SHA-256 when both are set,
+  as OpenSSH does). The slot format is unchanged, and the lock gains two
+  dependency lines with no new packages.
+- **Evidence:**
+  - 11 signing tests verify with ssh-key's public verification, under
+    seven controls.
+  - An existing Ed25519 slot is byte-identical and signs as before.
+  - castellan imports RSA and ECDSA into new fingerprint-keyed slots beside
+    an untouched one.
+  - On the ThinkPad's `sshd` (OpenSSH 10.2p1), logins with RSA-SHA2-256,
+    RSA-SHA2-512 and ECDSA P-256, P-384 and P-521 all succeeded through a
+    receipt agent on its own pipe, and were refused before and after.
+    `authorized_keys` came back byte-identical (sha256 `bc629d2e…f4bb`).
+  - Mark's own SSH worked throughout, and PID 53336 was untouched.
+- **RustSec** (advisory-db `ef6173cb`): only RUSTSEC-2023-0071 on `rsa` is
+  open, and no `rsa` private-key operation is in the signing path. ring,
+  untrusted, spin and the rest are patched or clear.
+- **Found:**
+  - ssh-key 0.6.7's conversion to the `rsa` crate passes p twice instead
+    of p and q (`private/rsa.rs:199-203`, checked), so the agent before P4a
+    could not sign any real RSA key.
+  - Its ECDSA decoder refuses short scalars (ruling 55).
+  - `ssh-add` of a held key overwrote it at Session tier (ruling 54).
+- **Gates:** personae 166 and castellan 104 unit tests, djinn and the linux
+  `secret-service` check pass. The portable gate fails only on the known
+  worktree-depth `include_str!` errors. Clippy is unchanged.
 
 ## 6. Running it
 
