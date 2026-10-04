@@ -1,11 +1,11 @@
 // Copyright 2026 Mark Alan Boykin
 // SPDX-License-Identifier: MPL-2.0
 
-//! The speed dial through the canvas's own frame loop: one trajectory at
-//! every speed, slow motion drawn every frame, and fast-forward under a real
-//! clock's budget reporting the speed it reached. Seiche's receipts prove the
-//! stepping; these prove the canvas adds nothing between frames that depends
-//! on how many there are.
+//! The speed dial on the canvas: every catalog law keeps one trajectory at
+//! every speed (bit for bit since "Sum in key order", 2026-10-04), the canvas's
+//! own frame loop adds nothing between frames that depends on how many there
+//! are, slow motion draws every frame, and fast-forward under a real clock's
+//! budget reports the speed it reached.
 
 use std::time::Duration;
 
@@ -55,7 +55,7 @@ fn canvas(nodes: usize, law: PhysicsLaw) -> Canvas {
             })
             .collect(),
     );
-    canvas.set_physics_law(law);
+    canvas.set_physics_law(law).unwrap();
     canvas
 }
 
@@ -69,14 +69,17 @@ fn bits(canvas: &Canvas) -> Vec<(usize, u32, u32)> {
     out
 }
 
-/// Frame the canvas at `speed` until its settle ends; the frames, the ticks,
-/// and where it came to rest.
-fn settle(speed: f32, extra_ticks: u32) -> (u32, u64, Vec<(usize, u32, u32)>) {
-    let mut canvas = canvas(30, PhysicsLaw::Anneal);
+/// The settle the frame-loop receipt runs: short, since every frame composes
+/// the whole canvas at the dev profile's opt-level 0.
+const FRAME_TICKS: u32 = 60;
+
+/// Frame the canvas at `speed` through `Canvas::frame` until a settle of
+/// `ticks` ends; the frames, the ticks, and where it came to rest.
+fn settle(speed: f32, ticks: u32) -> (u32, u64, Vec<(usize, u32, u32)>) {
+    let mut canvas = canvas(30, PhysicsLaw::Springs);
     canvas.set_physics_speed(Speed::from_factor(speed));
-    if extra_ticks > 0 {
-        canvas.settle_physics(SETTLE_TICKS + extra_ticks);
-    }
+    canvas.physics.halt();
+    canvas.physics.settle(ticks);
     let mut frames = 0;
     loop {
         frames += 1;
@@ -84,32 +87,72 @@ fn settle(speed: f32, extra_ticks: u32) -> (u32, u64, Vec<(usize, u32, u32)>) {
         if !moving {
             break;
         }
-        assert!(frames < 20 * SETTLE_TICKS, "the settle never ended");
+        assert!(frames < 20 * ticks, "the settle never ended");
     }
     (frames, canvas.physics_pace().ticks, bits(&canvas))
 }
 
-/// Anneal, because it is the catalog law with no `NodeExclusion` (whose
-/// HashMap-order sum differs run to run) and whose seeded walk changes on
-/// any extra or missing tick.
+/// Through the canvas's own frame loop, which reprojects, drains and rebuilds
+/// between frames: Springs settles to the same bits at 1x, 0.2x and 50x.
 #[test]
 fn the_canvas_keeps_one_trajectory_at_every_speed() {
-    let (frames_1x, ticks_1x, at_1x) = settle(1.0, 0);
-    assert_eq!(settle(1.0, 0).2, at_1x, "1x twice");
-    let (frames_slow, ticks_slow, slow) = settle(0.2, 0);
-    let (frames_fast, ticks_fast, fast) = settle(50.0, 0);
-    let budget = u64::from(SETTLE_TICKS);
+    let (frames_1x, ticks_1x, at_1x) = settle(1.0, FRAME_TICKS);
+    assert_eq!(settle(1.0, FRAME_TICKS).2, at_1x, "1x twice");
+    let (frames_slow, ticks_slow, slow) = settle(0.2, FRAME_TICKS);
+    let (frames_fast, ticks_fast, fast) = settle(50.0, FRAME_TICKS);
+    let budget = u64::from(FRAME_TICKS);
     assert_eq!((ticks_1x, ticks_slow, ticks_fast), (budget, budget, budget));
-    assert_eq!(frames_1x, SETTLE_TICKS);
-    assert_eq!(frames_slow, 5 * (SETTLE_TICKS - 1));
-    assert_eq!(frames_fast, SETTLE_TICKS.div_ceil(50));
+    assert_eq!(frames_1x, FRAME_TICKS);
+    assert_eq!(frames_slow, 5 * (FRAME_TICKS - 1));
+    assert_eq!(frames_fast, FRAME_TICKS.div_ceil(50));
     assert_eq!(slow, at_1x, "0.2x left the 1x trajectory");
     assert_eq!(fast, at_1x, "50x left the 1x trajectory");
     // Positive control: one tick more lands elsewhere, so the comparison
     // resolves a single tick.
-    let (_, ticks_more, more) = settle(1.0, 1);
+    let (_, ticks_more, more) = settle(1.0, FRAME_TICKS + 1);
     assert_eq!(ticks_more, budget + 1);
     assert_ne!(more, at_1x, "one more tick matched");
+}
+
+/// The ticks the every-law receipt runs.
+const LAW_TICKS: u64 = 150;
+
+/// `law`'s force set on the canvas, stepped by its own backend at `speed`
+/// until `ticks` have run, then read at real time (so slow motion's drawing
+/// between ticks is not what is compared).
+fn law_at(law: PhysicsLaw, speed: f32, ticks: u64) -> Vec<(usize, u32, u32)> {
+    let mut canvas = canvas(30, law);
+    canvas.physics.settle(u32::MAX);
+    canvas.set_physics_speed(Speed::from_factor(speed));
+    while canvas.physics_pace().ticks < ticks {
+        canvas.physics.advance_frame(&mut canvas.view);
+    }
+    assert_eq!(canvas.physics_pace().ticks, ticks, "{} overshot", law.id());
+    canvas.set_physics_speed(Speed::REAL_TIME);
+    canvas.physics.refresh(&mut canvas.view);
+    bits(&canvas)
+}
+
+/// Every catalog law, its real force set: two 1x runs agree bit for bit, and
+/// 0.2x and 50x land on the same bits at the same tick. One tick more lands
+/// elsewhere (the control), except under Still, whose bodies hold.
+#[test]
+fn every_law_keeps_one_trajectory_at_every_speed() {
+    let mut held = Vec::new();
+    for law in PhysicsLaw::ALL {
+        let at_1x = law_at(law, 1.0, LAW_TICKS);
+        assert_eq!(law_at(law, 1.0, LAW_TICKS), at_1x, "{}: 1x twice", law.id());
+        assert_eq!(law_at(law, 0.2, LAW_TICKS), at_1x, "{}: 0.2x", law.id());
+        assert_eq!(law_at(law, 50.0, LAW_TICKS), at_1x, "{}: 50x", law.id());
+        if law_at(law, 1.0, LAW_TICKS + 1) == at_1x {
+            held.push(law.id());
+        }
+    }
+    assert_eq!(
+        held,
+        vec![PhysicsLaw::Still.id()],
+        "laws whose next tick moved nothing"
+    );
 }
 
 #[test]
