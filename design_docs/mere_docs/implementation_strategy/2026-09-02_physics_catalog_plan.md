@@ -2056,3 +2056,24 @@ binning are the useful patterns.
   step disabled the receipt passes twice. Put back to Mark with the receipt
   unchanged. Gates: seiche 113/109/113, pictograph canvas 289, graphshell web
   235 single-threaded.
+- 2026-10-04 (drag receipts in world units, `energy-frame` `bd790bcc`, per
+  "Measure in world units"). The canvas gains `focused_world_position`,
+  `world_point_at` and `screen_point_of` (through the camera; a round-trip test
+  at zoom 0.772); both pages gain a `move-by-world` verb beside `move-by`, keep
+  the drop point in world units at `release-at`, and publish
+  `drag-return-world` beside `drag-return`, the tree also
+  `drag-return-step-world`. `physics_drag` and `p4_tree_physics_drag` make
+  every gesture and check in world units, thresholds unchanged; at zoom 1 each
+  reads as its px twin. *Reading, not ruled:* the ruling names the old page's
+  receipt; the tree's mirror is converted too, so both pages measure the same
+  thing. Its release log shows why: the 220-unit gesture is 112 px under zoom
+  0.51 and 76 px under 0.34. *Round* on bundle `37523a31` (built from the
+  head; web lock `0090ad99`, page-error gate on), fresh browser profile: both
+  drag receipts pass (the old page's after a launch stall left no progress
+  file and a rerun passed), and so do the twelve law receipts, Density's
+  controls, the profiles, the framing controls and add on both pages,
+  `p4_tree_controls`, `p4_tree_live_profile`, the saved-graph pair,
+  `p4_tree_profile`, `p4_tree_elapsed` and both 2,000-node settles (GPU 413 of
+  418 device steps). The must-fail framing control and a planted throw fail on
+  both pages. Gates: seiche 113/109/113, pictograph canvas 290, graphshell web
+  235 single-threaded.
