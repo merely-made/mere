@@ -1,15 +1,15 @@
 # Device Pairing by Key Plan
 
 **Date**: 2026-10-02
-**Status (2026-10-03)**: in progress. Assessed and ruled by Mark from 2026-10-01
-to 2026-10-03 (rulings 1 to 51 below). D1 landed (`4963b489`); D1b's mere fix (M1)
+**Status (2026-10-04)**: in progress. Assessed and ruled by Mark from 2026-10-01
+to 2026-10-04 (rulings 1 to 56 below). D1 landed (`4963b489`); D1b's mere fix (M1)
 landed (`177b927c`), its fork fix (F1) is released as
 `mere-p2panda-net-0.7.5` (`1bec457e`, pushed), with knot and mere repinned
-locally and `main` merged into the repin (`259f2741`); `connected` follows
-the gossip overlay (ruling 31, landed `fdb02bd3`). Before knot's and mere's
-pushes, connection-event liveness for peers off the overlay is built on
-`main` (rulings 47 to 51) and the release branch takes `main` again; the
-overlay's gap after restarts has its own lane (ruling 36); then D2.
+locally. `connected` follows the gossip overlay (ruling 31, `fdb02bd3`) and,
+off it, open connections (rulings 47 to 56, `005e27ad`). Next the release
+branch takes `main` again and reruns on iroh 1.3, then knot's and mere's
+pushes come to Mark; the overlay's gap after restarts has its own lane
+(ruling 36); then D2.
 **Scope**: Mark's machines find, reach and trust each other by device
 identity, not by address: the stack's own peers already do on one network;
 SSH, the path Mark uses daily, does not. Pairing a device becomes one
@@ -482,7 +482,53 @@ in through the builder, landing on `main`. Mark: **"Always on; land on main
 (Recommended)"**. Follows: the hook is installed in
 `P2pandaTransport::bind_inner`; the build lands on `main`, and the release
 branch merges `main` again and reruns its checks on iroh 1.3 before the
-pushes.
+pushes. *2026-10-03 correction:* the question's "beside p2panda's own
+authoriser hook" was wrong. p2panda passes only the hooks its caller gives
+it (`iroh_endpoint/actors/endpoint.rs:214`); `ConnectionBlockList`
+(`authoriser.rs:76`) is a hook type a caller may add, and mere adds none,
+so ours is the only hook on mere's endpoint (checked). The ruling does not
+rest on it.
+
+**Ruling 52.** *Ruling 50's two wordings need the card and `djinn-devices` to
+know which rule decided `connected`, and the directory does not carry it;
+`DeviceDirectoryV1` and `PairedDeviceV1` reject unknown fields at version 1.
+How does it travel?* Options: a per-device flag, staying at version 1; the
+same, bumped to version 2; a directory-level flag; a per-device enum naming
+the rule. Mark: **"Per-device flag, stay v1 (Recommended)"**. Follows:
+`on_overlay` on the transport's `KnownPeer`, carried into `PairedDeviceV1`
+with a serde default; the resident and `djinn-devices` ship together in one
+crate.
+
+**Ruling 53.** *The polling check failed in 1 of 10 suites without polling
+changing anything: each run's rule followed its own connection close within
+19 and 52 ms, but iroh closed at 14.92 s in one run and 9.98 s in the other,
+and the check compared absolute times within 2 s. What should it compare?*
+Options: the delay after each run's own close; absolute times with a wider
+tolerance. Mark: **"Delay after own close (Recommended)"**.
+
+**Ruling 54.** *The dual-dial test's delivery-gap check failed in 1 of 10
+suites on the liveness branch ("the link stopped delivering at 6.99 s"),
+quiet in 20 earlier suites that ran without the hook and without the new
+killed-peer test; the data cannot separate the hook from load. What next?*
+Options: an A/B first (10 suites without the killed-peer test, 10 with it
+but no hook); loosen the check; accept the flake. Mark: **"A/B first
+(Recommended)"**.
+
+**Ruling 55.** *The killed-peer control was reworded because "the path rule
+still reads connected at kill + 60 s" races iroh's own 60 s timer (it
+cleared at 60.007 s once). As built, the path rule must read connected at
+59 s and clear no earlier than 60 s, which held in 12 of 12 runs. Keep it?*
+Options: keep it; the original wording. Mark: **"Keep 59 s / not before 60 s
+(Recommended)"**.
+
+**Ruling 56.** *Ruling 54's A/B separated nothing: the dual-dial delivery gap
+has appeared once in 50 parallel suites, on the first liveness build, and
+not again in any arm (hook on without the killed-peer test 0 of 10; hook off
+with it 0 of 10; the final build 0 of 10, some under heavy outside load; 0
+of 20 before the hook). What now?* Options: merge and watch for recurrence;
+a bigger hook-on run first; loosen the gap check. Mark: **"Merge; watch for
+recurrence (Recommended)"**. Follows: the gap is recorded as one
+unexplained event; a second occurrence reopens it, with its logs.
 
 Also given in the same conversation (2026-10-01, Mark: "You can edit known
 hosts"): `known_hosts` entries may be updated, which was done for the
@@ -922,7 +968,8 @@ earlier unexplained hang (the test now logs the stall and moves on).
   (`connection.rs:1352`) reports the close without keeping the connection
   alive. p2panda's builder appends hooks the same way
   (`p2panda-net/src/iroh_endpoint/builder.rs:85-94`, checked) and installs
-  its own authoriser hook. The hook code is identical in iroh 1.2.0 and
+  its own authoriser hook (*corrected 2026-10-03:* it installs none; see
+  ruling 51). The hook code is identical in iroh 1.2.0 and
   1.3.0, and p2panda's builder and hooks are unchanged between 0.7.4 and
   0.7.5 (checked). p2panda hashes ALPNs with its network id, so a hook sees
   no protocol names.
@@ -950,6 +997,64 @@ earlier unexplained hang (the test now logs the stall and moves on).
     when lenient.
   - D1's stopped peer read not connected after 10.48 s; D1b fails at its
     second restart (ruling 36). PID 53336 throughout.
+
+**2026-10-03: the open-connection count, first build.** The `connected` lane
+built rulings 47 to 51 as `28292406` on `main` `277a911e` (branch
+`pairing-liveness`), with no fork or lock change. `OpenConnections` counts
+connections per remote from `after_handshake` and decrements when each weak
+handle's `closed()` fires; it holds only a shared map. It is always
+installed in `bind_inner`, with a test-only switch for the control. Off the
+overlay the live rule never calls `remote_info`. Measured on a shared,
+loaded machine:
+
+- A killed peer off the overlay (a child process holding one own-ALPN
+  connection, 12 runs): its connection closed 9.99 to 14.92 s after the
+  kill, and the rule read not connected 0.01 to 0.11 s after that; iroh's
+  path rule read connected at 59 s every time and cleared at 60.01 to
+  65.08 s. With three pollers every 200 ms, the rule still followed its own
+  close within 0.11 s, while the path rule did not clear within 150 s in any
+  run.
+- A connection opened through `protocol_endpoint()` and one opened by
+  gossip were both counted; a graceful close read not connected in 10.5 ms;
+  without the hook, the killed-peer test fails before the kill.
+- The overlay is unchanged: the live-path test 50 of 50 alone, the
+  dual-dial test with its control, the stopped-peer test; D1's stopped peer
+  at 18.16 s and 14.39 s (the first likely load; that path does not go
+  through the change); D1b failing only at its second restart.
+- Gates: djinn, stickleback, clippy counts unchanged. mere-transport passed
+  8 of 10 parallel suites, each about 155 s: one failed the polling check on
+  absolute times (ruling 53), one the dual-dial delivery-gap check
+  (ruling 54).
+- Not yet built: ruling 50's wordings, which needed ruling 52.
+
+**2026-10-04: the open-connection count landed.**
+
+- **The second round** (`a44ee831`):
+  - `KnownPeer` and `PairedDeviceV1` carry `on_overlay`; the directory
+    stays at version 1, and an entry without the field reads as `false`.
+  - The two wordings are constants (`NOT_CONNECTED_NO_NEIGHBOUR`,
+    `NOT_CONNECTED_NO_CONNECTION`), chosen by one function both surfaces
+    call, with both literals asserted on both.
+  - The polling check compares each run's delay after its own close
+    (ruling 53). In 10 suites the close came 9.90 to 10.02 s after the
+    kill, and the rule followed within 0.12 s, polled or not. iroh's path
+    rule read connected at 59 s every time, cleared at 60.01 to 65.10 s
+    unpolled, and never within 150 s with pollers.
+- **Ruling 54's A/B** is recorded in ruling 56. The lane's reading of the
+  arms: A skipped both child-spawning tests; B's scratch switched the hook
+  off except for the killed-peer scenario's own parent, since with it off
+  everywhere that test fails in about 10 s and its load disappears.
+- **Merged** as `005e27ad`, after verification in the normal-depth worktree
+  on `main` `ce79a82f` (merge `cc697b8f`):
+  - mere-transport 56 of 56 twice (about 155 s each); stickleback 85 and 5;
+    djinn's 15 test binaries.
+  - D1's stopped peer read not connected after 11.03 s. D1b failed at its
+    second restart (ruling 36).
+  - The control: with the hook never installed, both liveness tests fail.
+  - The installed resident stayed on PID 53336.
+  - `main` had moved by one doc file, so the merged tree differs from the
+    verified one in that file only.
+- **Open:** the dual-dial delivery gap, one event in 50 suites (ruling 56).
 
 ## 7. Progress
 

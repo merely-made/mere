@@ -221,7 +221,7 @@ What transfers, from where, to where. Landing sites verified against the tree
 
 | Transfer | Source system | Landing site |
 | --- | --- | --- |
-| Placement satisfaction state; pin = ensure (fails loudly), anchored home = encourage | WebCoLa silent-soft caution + Penrose `ensure`/`encourage` | sceno scene surface + scenomise solvers (A1), cambium chrome (C1) |
+| Placement satisfaction state; pin = ensure (fails loudly), anchored home = encourage *(2026-10-03: the pinned and anchored roles, beside seeded; see A1)* | WebCoLa silent-soft caution + Penrose `ensure`/`encourage` | sceno scene surface + scenomise solvers (A1), cambium chrome (C1) |
 | Selection clauses with declared resolution (single / union / intersect / crossfilter) | Mosaic selections + Vega-Lite selections | chirograph intent plane / mere host coordination (A2) |
 | LOD rungs as declarative conditions (measure, operation, threshold, hysteresis) | Gosling `visibility` | cartography representation profiles, then `ScoreItem.representation` selection (A3) |
 | Transition specs between epochs, host-owned clock | Gemini | scenotime, expansion lane L5 (A4, C2) |
@@ -314,6 +314,49 @@ the violation; a test asserts the violation is present rather than the pin
 silently best-efforted; the record crosses the graphshell wire.
 Done when: a remote viewer can distinguish "placed as pinned" from "pin
 unmet" without source access.
+
+**2026-10-03, the roles.** The
+[dynamics grammar plan](2026-10-02_dynamics_grammar_plan.md) retires ensure
+and encourage for three roles: seeded, anchored and pinned (F26). Read this
+target's ensure-class as pinned. Its encourage-class covered two different
+behaviours:
+- the anchored home, which returns to the arrangement (F19);
+- sceno's best-effort `Hold::Anchored` ("relaxation may carry it away",
+  `crates/cambium/scenes/sceno/src/score.rs`, lines 86–88), which nothing
+  returns. F19 and F25 name it seeded.
+
+F25 gives `Hold` all three: `Seeded` (the old `Anchored`'s meaning, read from
+old saves by a serde alias), `Anchored` (returns) and `Pinned`. The dynamics
+plan's G7 builds it. The Progress entries below keep their words: their
+`Hold::Anchored` and "encourage" are the seeded role, and their
+"ensure-class" is pinned.
+- A1's record is unchanged: `honored_holds` carries pinned holds only.
+  *Reading, not ruled:* anchored holds stay out of it, as seeded ones did, and
+  report a residual through the dynamics plan's G6 instead.
+- **A finding for mer3ly.** `PlacementDelta::holds`
+  (`mer3ly/crates/repo-graph/src/lib.rs`, line 1878) records a pin placed
+  under mer3ly's `anchored` motion as `Hold::Anchored`, "best effort by the
+  visitor's own choice", and a test at line 3034 asserts it. The sandbox's
+  `shelfmarkPlacement` (`mer3ly/assets/graph-sandbox.js`, line 1521) makes
+  the same choice in JS. The live path itself hard-pins a manual pin in
+  either motion (`pinNode`, `mer3ly/crates/repo-graph/src/lib.rs`, line 399),
+  so the recorded class already differs from the live behaviour under
+  `anchored`. Under F25 the Rust line keeps compiling but changes meaning,
+  from best effort to returning, the next time mer3ly repins mere. Scores mer3ly has already shared read
+  back as seeded, through the alias. Which role those pins should take
+  returns to Mark with mer3ly's mobility move, which G7 lists outside its
+  track.
+  *2026-10-03, ruled:* a manual pin records as `Hold::Pinned` in either
+  motion, once mer3ly takes up the roles. Mark: "A pin is a pin
+  (Recommended)" (mer3ly's site canvas plan, Ruling 103). Both mapping sites
+  drop the motion check. *Landed the same day,* ahead of mer3ly's repin
+  (mer3ly `f0fc678`), at Mark's "make the move". mer3ly no longer writes
+  `Hold::Anchored` anywhere, so G7 changes no meaning for it.
+- **The alias, as F25 is written.** A serde alias `"Anchored"` on `Seeded`
+  also catches the new `Anchored` on read. In a scratch probe,
+  `Hold::Anchored` serialized as `"Anchored"` and read back as `Seeded`, with
+  only an `unreachable_patterns` warning. How old saves are read is G7's
+  question, and it has gone to the dynamics grammar session.
 
 **A2. Selection clauses: coordination as data — CLOSED 2026-08-23.**
 Context: release ruling D1 stands (sceno ships no intent vocabulary; the
@@ -1324,6 +1367,19 @@ is that objective's assessment.
   each toolchain bump; if it links, drop the override. The served-endpoint
   ruling is closed by this receipt; A3 stage one now holds for the product
   endpoint.
+- 2026-10-03: **arrangement roles carried in.** The dynamics grammar plan's
+  F18–F30 are recorded in the projection grammar catalog:
+  - the Free, Anchored and Pinned policies are now the seeded, anchored and
+    pinned roles, chosen per item over a recipe default, with seeded as the
+    default and an encoded axis pinned;
+  - the §6 "Force and constraint" row moved out, and "Settled" joined as an
+    arrangement source;
+  - §7 reads drag, displacement, pick and stop by role;
+  - a scene recipe names an arrangement and, optionally, a dynamics recipe,
+    under one binding.
+
+  This plan gains A1's note on the old `Hold::Anchored`, which named the
+  seeded role, and the mer3ly finding. Doc-only; no code moved.
 
 ## 2026-09-05 practice workspace browser proof
 

@@ -2,15 +2,15 @@
 
 | doc | disposition | status accurate | claims | holds | stale | unverifiable |
 |---|---|---:|---:|---:|---:|---:|
-| mere_docs/implementation_strategy/2026-10-02_device_pairing_by_key_plan.md | current | yes | 23 | 23 | 0 | 0 |
-| **Totals** |  |  | **23** | **23** | **0** | **0** |
+| mere_docs/implementation_strategy/2026-10-02_device_pairing_by_key_plan.md | current | yes | 25 | 25 | 0 | 0 |
+| **Totals** |  |  | **25** | **25** | **0** | **0** |
 
-**Totals: 1 doc, 23 claims checked (23 holds, 0 stale, 0 unverifiable), 0 contradictions.**
+**Totals: 1 doc, 25 claims checked (25 holds, 0 stale, 0 unverifiable), 0 contradictions.**
 
 Audit base: Mere `792967f8` (2026-10-01), plus the four machines read over
 SSH on 2026-10-02. `archive_docs/` is excluded.
 
-This batch exists because the plan is new. Its rulings (1 to 51) are recorded
+This batch exists because the plan is new. Its rulings (1 to 56) are recorded
 in its §3, and its three corrections are carried as dated notes into the SSH
 CA projection plan and the reachability rungs plan (R1, R2); they are not
 counted again here.
@@ -18,8 +18,8 @@ counted again here.
 ## mere_docs/implementation_strategy/2026-10-02_device_pairing_by_key_plan.md
 
 - disposition: current
-- status line: "Status (2026-10-03): in progress. Assessed and ruled by Mark from 2026-10-01 to 2026-10-03 (rulings 1 to 51 below). D1 landed (`4963b489`); D1b's mere fix (M1) landed (`177b927c`), its fork fix (F1) is released as `mere-p2panda-net-0.7.5` (`1bec457e`, pushed), with knot and mere repinned locally and `main` merged into the repin (`259f2741`); `connected` follows the gossip overlay (ruling 31, landed `fdb02bd3`). Before knot's and mere's pushes, connection-event liveness for peers off the overlay is built on `main` (rulings 47 to 51) and the release branch takes `main` again; the overlay's gap after restarts has its own lane (ruling 36); then D2." — accurate: yes
-- claims checked: 23 — holds: 23, stale: 0, unverifiable: 0
+- status line: "Status (2026-10-04): in progress. Assessed and ruled by Mark from 2026-10-01 to 2026-10-04 (rulings 1 to 56 below). D1 landed (`4963b489`); D1b's mere fix (M1) landed (`177b927c`), its fork fix (F1) is released as `mere-p2panda-net-0.7.5` (`1bec457e`, pushed), with knot and mere repinned locally. `connected` follows the gossip overlay (ruling 31, `fdb02bd3`) and, off it, open connections (rulings 47 to 56, `005e27ad`). Next the release branch takes `main` again and reruns on iroh 1.3, then knot's and mere's pushes come to Mark; the overlay's gap after restarts has its own lane (ruling 36); then D2." — accurate: yes
+- claims checked: 25 — holds: 25, stale: 0, unverifiable: 0
 
 ### Stale claims
 
@@ -78,3 +78,15 @@ with the hook and weak-handle code identical in 1.2.0; and p2panda's builder
 appending hooks (`p2panda-net/src/iroh_endpoint/builder.rs:85-94`), unchanged
 between `0a54ab82` and `1bec457e`. The release merge `259f2741` was read in
 `C:\t\mere-repin`: signalman names no Retinue rev, the root one (`fa4f925`).
+
+Added 2026-10-03 with rulings 52 to 55, two claims read in the source: p2panda
+passing only its caller's hooks to iroh (`iroh_endpoint/actors/endpoint.rs:214`,
+at `0a54ab82` and `1bec457e`) with `ConnectionBlockList` a caller-added type
+(`authoriser.rs:76`) and no hook in mere; and `DeviceDirectoryV1` and
+`PairedDeviceV1` denying unknown fields (`ports/djinn/src/resident_devices.rs:62,
+72`). The first corrects ruling 51's question text, annotated there.
+
+Added 2026-10-04 with ruling 56: `005e27ad` was compared with the verified
+merge `cc697b8f` (one doc file differs, no code), and the hook in
+`crates/murm/transport/src/p2panda_transport/open_connections.rs` was read
+(counts only; the close future taken while the connection is held).
