@@ -687,6 +687,30 @@ pull reading −0.33 with 510 overlaps):
   diagnose-and-retune lane"**: Orbit's framing check keeps failing until that
   lane lands. The alternatives were fixing it in the Energy lane, or
   accepting it as a living law and dropping its framing assert.
+  *Orbit diagnosed (2026-10-04, `orbit-retune` `dc624c58`):* exclusion does
+  76 to 83% of the terms' work in the first second, releasing the tight
+  starting layout's stored energy (230,625 on P2 against the kick's 16,614);
+  counter-damping returns exactly what damping removes, so the excess never
+  leaves and the bodies coast outward (extent 404 at 1 s, 54,909 at 120 s).
+  Centring alone bounds it but turns the motion into radial breathing
+  (tangential share 0.04). Mark chose **"Frictionless orbits + centring"**:
+  counter-damping cancels damping only on each body's tangential motion about
+  the mass centre, so radial drift settles, a weak centring term (0.02) joins
+  Orbit, and exclusion's reach shrinks from 1,000 to two node diameters
+  (worst extent 2.42 times the first second's; tangential share at least
+  0.90, coherence at least 0.92, at least 2.95 revolutions, no overlaps,
+  hubs inside). The alternatives were the same with only the kick's rotation
+  sense frictionless, or no centring with exclusion at three diameters.
+  Following the view, the old page's drag receipt failed (a dropped node 21
+  to 29 px from the drop against 20, the camera easing after release); Mark
+  chose **"Drag stops following"**: a node drag stops following as a pan
+  does, and Fit graph resumes it. Of three as-built recommendations he
+  ticked **"Density gets the check here"** (the Energy lane merges main and
+  asserts framing on Density's receipts); "Orbit's check unmarked" and "Face
+  offset gets a lane" return as their own questions.
+  The speed dial's remote board: Mark chose **"Follows the owner"**: a remote
+  board runs at the speed its owner, the device running the simulation, has
+  set, and shows it; the viewer cannot change it.
 - **Receipts gate on page errors (2026-10-03).** The pre.4 lane found that
   wgpu 30.0.0 panics once per GPU-on page (`webgpu.rs:85`, "Unexpected
   error", then `RuntimeError: unreachable`) because wasm-bindgen 0.2.126 and
