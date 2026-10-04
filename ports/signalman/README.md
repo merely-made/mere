@@ -87,8 +87,9 @@ board has already accepted is refused with silence; the command then reports a
 carrier timeout. The record starts at one for a freshly claimed board and is
 never rewound by this port.
 
-This integration package is intentionally a separate workspace and pins the
-Retinue source revision consumed by downstream Signalman builds. It is not a
+This integration package is a member of Mere's workspace (since the p2panda
+0.7.5 repin, device pairing plan ruling 35) and pins the Retinue source
+revision consumed by downstream Signalman builds. It is not a
 publishable dependency story.
 The portable boundary is `postilion::StationConfig`, which accepts a supplied
 `PrivateIdentity`; this port is its first real Persona-backed consumer.

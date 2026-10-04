@@ -621,6 +621,32 @@ pull reading −0.33 with 510 overlaps):
   default suite keeps one quick sample check. *Reading, not ruled:* the dev
   build's speed is measured before any profile change, since an opt-level
   override touches every dev build of the crates it names.
+  *Built and ruled (2026-10-04, `seiche-speed` `ba0e2f4f`):* the dial is
+  `Physics::set_speed` (0.2 to 50, thousandths), with a per-frame step budget
+  that reports the speed reached, and slow motion drawn between the last two
+  ticks; 600 ticks are bit-identical at 0.2x, 1x, 3.7x and 50x for laws
+  without NodeExclusion or Barnes-Hut, and a different dt differs (the
+  control). The dev-build measurement corrected the figure above: debug is
+  about 34x slower than release on one start (146.5 s against 4.3 s), and
+  99.4% of a debug tick is Density's sweep. Mark ruled four questions:
+  - the control, **"Speed select"**: presets 0.2, 0.5, 1, 2, 5, 10 and 50 in
+    the physics section, default 1x, showing the speed reached when the
+    budget binds (against a log slider, slower/faster buttons, or the page
+    option only);
+  - reproducibility, **"Sum in key order"**: NodeExclusion and Barnes-Hut sum
+    bodies in key order, one sort a tick, so every law is bit-reproducible
+    run to run and across speeds, their low bits shifting once (against a
+    fixed-order map, or leaving it, where two 1x runs differed by up to about
+    70,000 ULP after 600 ticks);
+  - dev speed, **"Opt 3 in dev for physics"**: `[profile.dev.package]`
+    opt-level 3 for seiche, rapier2d, parry2d, nalgebra, simba and glamx,
+    taking one Density start from 146.5 s to 6.0 s and the pictograph suite
+    from 102.5 s to 12.6 s, rebuilds unchanged and backtraces keeping
+    file:line (against the test profile only, rewriting Density's sweep, or
+    leaving it);
+  - as built, ticked: **"8 ms budget default, Deadline pacing at 1x"** (the
+    native actor sleeps out the rest of each tick's interval). "Remote board
+    stays 1x" was left unticked and returns as its own question.
 - **Energy's receipt passes off screen (2026-10-03).** In
   `p4_tree_physics_energy`'s settled capture one node and one edge are in
   view and the rest of the 11-node fixture has left it; the start frame
@@ -661,6 +687,46 @@ pull reading −0.33 with 510 overlaps):
   diagnose-and-retune lane"**: Orbit's framing check keeps failing until that
   lane lands. The alternatives were fixing it in the Energy lane, or
   accepting it as a living law and dropping its framing assert.
+  *Orbit diagnosed (2026-10-04, `orbit-retune` `dc624c58`):* exclusion does
+  76 to 83% of the terms' work in the first second, releasing the tight
+  starting layout's stored energy (230,625 on P2 against the kick's 16,614);
+  counter-damping returns exactly what damping removes, so the excess never
+  leaves and the bodies coast outward (extent 404 at 1 s, 54,909 at 120 s).
+  Centring alone bounds it but turns the motion into radial breathing
+  (tangential share 0.04). Mark chose **"Frictionless orbits + centring"**:
+  counter-damping cancels damping only on each body's tangential motion about
+  the mass centre, so radial drift settles, a weak centring term (0.02) joins
+  Orbit, and exclusion's reach shrinks from 1,000 to two node diameters
+  (worst extent 2.42 times the first second's; tangential share at least
+  0.90, coherence at least 0.92, at least 2.95 revolutions, no overlaps,
+  hubs inside). The alternatives were the same with only the kick's rotation
+  sense frictionless, or no centring with exclusion at three diameters.
+  Following the view, the old page's drag receipt failed (a dropped node 21
+  to 29 px from the drop against 20, the camera easing after release); Mark
+  chose **"Drag stops following"**: a node drag stops following as a pan
+  does, and Fit graph resumes it. Of three as-built recommendations he
+  ticked **"Density gets the check here"** (the Energy lane merges main and
+  asserts framing on Density's receipts); "Orbit's check unmarked" and "Face
+  offset gets a lane" return as their own questions.
+  The speed dial's remote board: Mark chose **"Follows the owner"**: a remote
+  board runs at the speed its owner, the device running the simulation, has
+  set, and shows it; the viewer cannot change it. *Reopened the same day:*
+  the coordinator's question said the board's pace "is set where the
+  simulation runs", which the speed lane found wrong: the owners (the C4
+  host's `LiveEndpoint`, `mere_host`, djinn's residents) run no simulation
+  for the board, and each viewer simulates its own `PhysicsBoard` from the
+  owner's score, its law mirroring the viewer's canvas (P3). The question
+  goes back to Mark with the finding.
+  Orbit's API: asked how the tangential-only counter-damping meets seiche's
+  public `Gravity::counter_damping: bool` (seiche 0.0.5 publishable), Mark
+  chose **"Explicit enum, bump seiche"**: the bool becomes
+  `CounterDamping::{Off, Full, Tangential}`, Orbit using Tangential, and
+  seiche goes to 0.0.6, so callers must choose. Orbit's framing check under
+  the following view: **"Leave it unmarked"**. The tree page's node faces
+  drawn small and offset below zoom 1 (predating the follow change): **"Its
+  own lane"**. The speed dial's fast receipt peaking at 8,100 µs against its
+  8,000 µs bound, with Chrome's clock resolving 100 µs: **"Bound = budget +
+  clock grain"**.
 - **Receipts gate on page errors (2026-10-03).** The pre.4 lane found that
   wgpu 30.0.0 panics once per GPU-on page (`webgpu.rs:85`, "Unexpected
   error", then `RuntimeError: unreachable`) because wasm-bindgen 0.2.126 and
