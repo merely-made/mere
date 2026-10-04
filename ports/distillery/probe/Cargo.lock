@@ -639,7 +639,7 @@ dependencies = [
  "num-traits",
  "parking_lot",
  "portable-atomic",
- "spin",
+ "spin 0.12.3",
 ]
 
 [[package]]
@@ -658,7 +658,7 @@ dependencies = [
  "rand 0.10.2",
  "rand_distr",
  "serde",
- "spin",
+ "spin 0.12.3",
 ]
 
 [[package]]
@@ -698,7 +698,7 @@ dependencies = [
  "regex",
  "serde",
  "serde_json",
- "spin",
+ "spin 0.12.3",
 ]
 
 [[package]]
@@ -748,7 +748,7 @@ dependencies = [
  "derive-new",
  "hashbrown 0.16.1",
  "serde",
- "spin",
+ "spin 0.12.3",
 ]
 
 [[package]]
@@ -829,7 +829,7 @@ dependencies = [
  "hashbrown 0.16.1",
  "log",
  "serde",
- "spin",
+ "spin 0.12.3",
  "tracing",
 ]
 
@@ -962,7 +962,7 @@ dependencies = [
  "rand_distr",
  "serde",
  "smallvec",
- "spin",
+ "spin 0.12.3",
  "thiserror 2.0.20",
  "uuid",
 ]
@@ -1579,7 +1579,7 @@ dependencies = [
  "portable-atomic",
  "portable-atomic-util",
  "serde",
- "spin",
+ "spin 0.12.3",
  "tynm",
  "xxhash-rust",
 ]
@@ -1656,7 +1656,7 @@ dependencies = [
  "libc",
  "log",
  "pliron",
- "spin",
+ "spin 0.12.3",
  "sysinfo",
  "winapi",
 ]
@@ -1709,7 +1709,7 @@ dependencies = [
  "serde",
  "serde_bytes",
  "serde_json",
- "spin",
+ "spin 0.12.3",
  "toml",
  "wasm-bindgen-futures",
  "web-time",
@@ -1774,7 +1774,7 @@ dependencies = [
  "rustc_apfloat",
  "serde",
  "smallvec",
- "spin",
+ "spin 0.12.3",
  "thiserror 2.0.20",
  "variadics_please",
 ]
@@ -1947,7 +1947,7 @@ dependencies = [
  "num-traits",
  "paste",
  "serde",
- "spin",
+ "spin 0.12.3",
  "variadics_please",
 ]
 
@@ -5368,7 +5368,7 @@ dependencies = [
  "rustc_apfloat",
  "slotmap",
  "smallvec",
- "spin",
+ "spin 0.10.1",
  "thiserror 2.0.20",
  "utf8-chars",
 ]
@@ -6423,6 +6423,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dd538fb6910ac1099850255cf94a94df6551fbdd602454387d0adb2d1ca6dead"
 dependencies = [
  "serde",
+]
+
+[[package]]
+name = "spin"
+version = "0.10.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "023a211cb3138dbc438680b32560ad89f699977624c9f8dbb95a47d5b4c07dd3"
+dependencies = [
+ "lock_api",
 ]
 
 [[package]]
