@@ -2,12 +2,12 @@
 
 **Date**: 2026-10-02
 **Status (2026-10-04)**: in progress. Assessed and ruled by Mark from 2026-10-01
-to 2026-10-04 (rulings 1 to 67 below). D1 landed (`4963b489`); D1b's mere fix (M1)
+to 2026-10-04 (rulings 1 to 72 below). D1 landed (`4963b489`); D1b's mere fix (M1)
 landed (`177b927c`) and its fork fix (F1) shipped in the 0.7.5 repin, pushed
 2026-10-04 (fork `1bec457e`, Knot `92367ec`, mere `031b3dcc`). `connected`
 follows the gossip overlay (ruling 31) and, off it, open connections
-(rulings 47 to 56). Next: the overlay's gap after restarts, fixed by a
-patched iroh-gossip carried in a tagged fork (rulings 36, 64 to 67), then D2.
+(rulings 47 to 56). The overlay's gap after restarts has a ruled fix in
+iroh-gossip, held until its next release (rulings 64 to 72). Next: D2.
 **Scope**: Mark's machines find, reach and trust each other by device
 identity, not by address: the stack's own peers already do on one network;
 SSH, the path Mark uses daily, does not. Pairing a device becomes one
@@ -615,6 +615,33 @@ on a resident that is already running; the receipts spawn the real binary,
 so a test-only path cannot do it. How?* Options: a real resident flag
 (`--seed-node-after <secs> <address> <title>`); a receipt-only environment
 variable; a cargo feature. Mark: **"A real resident flag (Recommended)"**.
+
+**Ruling 68.** *The fork's base: the `v0.101.0` tag (`2ce78afe`, what mere
+and Knot run) or upstream `main` (`2885dd9f`, unreleased)?* Mark: **"Determine
+the difference between upstream main and this pinned commit. The fork may be
+entirely unnecessary"**. Follows: the comparison in §6 (2026-10-04, upstream
+iroh-gossip): `main` does not fix it, and no release does.
+
+**Ruling 69.** *Create the public `mark-ik/iroh-gossip` fork and clone it?*
+Options: create and clone; Mark creates it. Mark: **"Wait"**. Superseded by
+ruling 72.
+
+**Ruling 70.** *The fork's tag?* Options: `mere-iroh-gossip-0.101.0`, the
+p2panda fork's pattern; `v0.101.0-mere.1`. Mark:
+**"mere-iroh-gossip-0.101.0 (Recommended)"**.
+
+**Ruling 71.** *With the comparison in hand, base the fork on the `v0.101.0`
+tag or upstream `main`?* Options: the tag, `2ce78afe`; upstream `main`,
+`2885dd9f`. Mark: **"Upstream main, 2885dd9f"**.
+
+**Ruling 72.** *Create the fork now?* Options: create and clone it; wait for
+upstream, rechecking PR #159 and issue #172 at iroh-gossip's next release,
+with D1b failing at second restarts meanwhile; Mark creates it. Mark: **"Wait
+for upstream"**. Follows: no fork is made. Ruling 36's fix is on hold, and
+so is ruling 67's flag, which serves only its receipt; D1b's restart item
+stays open. At iroh-gossip's next release, #159 and #172 are rechecked, and
+if the release passes the bug by, the upstream ledger's rule applies
+(ruling 46), with rulings 70 and 71 then giving the fork's tag and base.
 
 Also given in the same conversation (2026-10-01, Mark: "You can edit known
 hosts"): `known_hosts` entries may be updated, which was done for the
@@ -1230,6 +1257,27 @@ orders, and a seeded node on each restarted side.
 - **iroh-gossip 0.101.0's source** is upstream commit `2ce78afe`, which
   upstream's `v0.101.0` tag points to (`.cargo_vcs_info.json`, `git
   ls-remote`); upstream `main` is at `2885dd9f`.
+
+**2026-10-04: upstream iroh-gossip (ruling 68).** Read through GitHub's API,
+nothing downloaded:
+
+- **`main` against our pin.** `2ce78afe...2885dd9f` is 3 commits ahead and 0
+  behind: CI workflows, upstream's `Cargo.lock`, `deny.toml` and one line in
+  `src/bin/sim.rs`. `proto/hyparview.rs` is untouched, so `main` does not
+  fix it, and crates.io's newest release is 0.101.0.
+- **Issue #172** (open, 2026-09-29, no replies) reports the same last step:
+  a pending entry makes `send_neighbor` ignore a returning peer's `Join`.
+  It reaches that state by another route, quitting one topic closes a
+  connection the other topics share (`state.rs:322`), and its proposed fix
+  would not cover a killed process on one topic. Its open question, about
+  an old and a new connection overlapping after a restart, is our silent
+  swap.
+- **PR #159** (open, not draft, conflicting with `main`, no reviews; an
+  outside contributor's, 2026-09-16 to 2026-10-04) carries A1 line for line
+  in `on_join` ("the old request must not suppress our reply"), inside a
+  2,435-line rework of dial ownership and reconnects across 11 files.
+- **PR #163** (a maintainer's draft asserting HyParView's paper claims) and
+  **PR #121** change other pending-entry paths, not `on_join`'s.
 
 ## 7. Progress
 
