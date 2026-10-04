@@ -31,7 +31,20 @@ required-features = ["ssh"]
 # SSH keys as vault slots (encode/decode/import). The CLI needs this much;
 # the agent needs the protocol stack on top.
 ssh = ["dep:ssh-key", "dep:signature", "dep:gethostname"]
-agent = ["ssh", "dep:ssh-agent-lib", "dep:tokio", "dep:tracing-subscriber"]
+# RSA signs through ring (RUSTSEC-2023-0071 rules out the rsa crate's private
+# operations); ECDSA through RustCrypto's curves, named here rather than left
+# to ssh-agent-lib's feature unification.
+agent = [
+  "ssh",
+  "dep:ssh-agent-lib",
+  "dep:tokio",
+  "dep:tracing-subscriber",
+  "dep:ring",
+  "dep:crypto-bigint",
+  "ssh-key/p256",
+  "ssh-key/p384",
+  "ssh-key/p521",
+]
 
 [dependencies]
 ed25519-dalek = { version = "3", features = ["zeroize"] }
@@ -49,11 +62,17 @@ chacha20poly1305 = "0.11"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 uuid = { version = "1", features = ["v4", "serde"] }
-# `agent` feature: SSH agent protocol + OpenSSH key handling. ssh-key is
-# ed25519-only here on purpose (the agent's v1 scope); the `signature`
-# traits are how ssh-key exposes signing.
+# `agent` feature: SSH agent protocol + OpenSSH key handling. The `signature`
+# traits are how ssh-key exposes signing. ssh-key's `rsa` feature is not asked
+# for here: the agent never signs RSA through it (see `ssh_sign`).
 ssh-agent-lib = { version = "0.6", optional = true }
 ssh-key = { version = "0.6", features = ["ed25519"], optional = true }
+# RSA private-key operations, constant-time. Already in the lock (rustls).
+ring = { version = "0.17.14", optional = true }
+# Derives RSA's CRT exponents, which OpenSSH keys do not store. Already in
+# the graph under the elliptic curves; its reductions are constant-time in
+# the secret dividend.
+crypto-bigint = { version = "0.5", default-features = false, features = ["zeroize"], optional = true }
 # Hostname for the local device id (ssh_ca self-grants). Already in the
 # workspace lock via transitive deps; tiny (rustix + windows-link).
 gethostname = { version = "1", optional = true }
@@ -65,6 +84,9 @@ tracing-subscriber = { version = "0.3", optional = true }
 rand_core = { version = "0.6", features = ["getrandom"] } # ssh-key 0.6 test helper (PrivateKey::random)
 hex = "0.4"
 tempfile = "3"
+# Tests verify RSA signatures with ssh-key's public-key verification, which
+# is the rsa crate's public operation, independent of the ring signer.
+ssh-key = { version = "0.6", features = ["ed25519", "rsa"] }
 
 # OS-store unlock backend (Windows DPAPI today; other platforms follow).
 # The browser build. Two `getrandom` majors reach this crate — 0.3 directly,
