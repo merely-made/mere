@@ -197,7 +197,7 @@ pub struct Scene {
     /// The generation of inputs this scene was computed from (score +
     /// signal generations; stamped by the runtime).
     pub generation: u64,
-    /// Ensure-class placements the solver could not honor, carried with the
+    /// Pinned placements the solver could not honor, carried with the
     /// coordinate that was asked for.
     ///
     /// Empty is the common and correct case. A non-empty entry is the scene
@@ -206,18 +206,18 @@ pub struct Scene {
     /// carries [`HeldPlacement`] rather than a bare reference so a viewer with
     /// no access to the score can still report what was requested and where.
     ///
-    /// Encourage-class holds never appear here: an anchored home that drifts is
-    /// working as designed.
+    /// Seeded and anchored holds never appear here: a seeded item that drifts
+    /// is working as designed, and an anchored one returns rather than holds.
     #[serde(default)]
     pub unmet_holds: Vec<crate::HeldPlacement>,
-    /// Ensure-class placements the solver honored, bound to the instances that
+    /// Pinned placements the solver honored, bound to the instances that
     /// received them.
     ///
     /// Carried so a consumer can report satisfaction without re-deriving it
     /// against the score, and so a later pass over this scene knows which items
-    /// are not its to move. Encourage-class holds are absent by design: an
-    /// anchored home is a suggestion, and recording it here would invite a
-    /// solver to treat it as binding.
+    /// are not its to move. Seeded and anchored holds are absent by design:
+    /// neither is binding, and recording one here would invite a solver to
+    /// treat it as a pin.
     #[serde(default)]
     pub honored_holds: Vec<crate::HonoredHold>,
 }

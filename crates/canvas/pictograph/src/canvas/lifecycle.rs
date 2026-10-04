@@ -209,7 +209,7 @@ impl Canvas {
             paused_positions: None,
             projection_score: None,
             projection_representations: HashMap::new(),
-            arrangement_pull: seiche::DEFAULT_ANCHOR_STIFFNESS,
+            roles: Default::default(),
             physics_law: crate::canvas::PhysicsLaw::Springs,
             physics_overlays: Vec::new(),
             physics_kind_source: crate::canvas::PhysicsKindSource::Site,
@@ -503,6 +503,7 @@ impl Canvas {
             fluid: Vec::new(),
             fluid_radius: 0.0,
             energy: 0.0,
+            speed: 0.0,
             generation: self.generation,
         });
         self.view.set_edges(dedup_edges(&self.graph));

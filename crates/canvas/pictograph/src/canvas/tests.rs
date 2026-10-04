@@ -19,6 +19,7 @@ use layout_dom_api::{LayoutDom, LocalName, Namespace};
 use std::collections::HashMap;
 
 mod affinity;
+mod arrangement_roles;
 mod camera;
 mod density;
 mod density_probe;
