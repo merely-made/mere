@@ -758,6 +758,22 @@ pull reading −0.33 with 510 overlaps):
   **"Update, replay, decide"**: build 0.5.4, replay the four mis-merges
   against it, and keep weave only if all come out right, otherwise unwire it
   workspace-wide.
+  The old page's drag receipt under the following view still failed (Stress
+  22 against 20): following had zoomed out to 0.772 before the gesture, so
+  the receipt's 220 px drag was about 285 world units. Mark chose **"Measure
+  in world units"**: the gesture and the drag-return check work in world
+  units, reading as today at zoom 1 (against resetting zoom first, or
+  widening the thresholds). Orbit at host damping 0, where tangential-only
+  counter-damping leaves radial motion unsettled (bounded within 6.3 times
+  but breathing, tangential share as low as 0.08): Mark chose **"Radial
+  floor at 0.82"**: Orbit settles radial motion with at least the old page's
+  0.82 whatever the host's damping (at damping 0, worst 1.58 and 2.60 times,
+  tangential share at least 0.89), against documenting it. And the muniment
+  OPFS probe, whose page-error gate control needed the wasm-bindgen 0.2.126
+  CLI: Mark answered **"move it and anything else to 0.2.129. let's stay
+  with the newest."** Every wasm module in the tree moves to wasm-bindgen
+  0.2.129, the OPFS probe and the two minimal repros included (burn plan,
+  §13.40 or later).
   Orbit's API: asked how the tangential-only counter-damping meets seiche's
   public `Gravity::counter_damping: bool` (seiche 0.0.5 publishable), Mark
   chose **"Explicit enum, bump seiche"**: the bool becomes
