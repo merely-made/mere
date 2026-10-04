@@ -17,7 +17,7 @@ use std::fmt;
 use castellan::reticulum::grant::{SitedStationGrant, SitedStationGrantError};
 use insigne::CheckFault;
 use insigne::DerivedKeyAttestation;
-use p2panda_core::cbor::{decode_cbor, encode_cbor};
+use p2panda_core::cbor::{decode_cbor, decode_cbor_strict, encode_cbor};
 use pandect::{DeviceGrantError, DeviceId, decode_device_grant_set, encode_device_grant_set};
 use personae::{
     Ed25519Keypair, Ed25519PublicKey, Ed25519Signature, IdentityError, IdentityProvider,
@@ -432,7 +432,7 @@ impl SitedStationControlReceiver {
         device_id: DeviceId,
         station_ed25519_public_key: [u8; 32],
     ) -> Result<Self, SitedStationControlError> {
-        let state: SitedStationControlState = decode(bytes)?;
+        let state: SitedStationControlState = decode_snapshot(bytes)?;
         if state.schema_version != CONTROL_SCHEMA_VERSION {
             return Err(SitedStationControlError::UnsupportedSchema {
                 actual: state.schema_version,
@@ -844,6 +844,13 @@ fn encode<T: Serialize>(value: &T) -> Result<Vec<u8>, SitedStationControlError> 
 }
 
 fn decode<T: for<'de> Deserialize<'de>>(bytes: &[u8]) -> Result<T, SitedStationControlError> {
+    decode_cbor_strict(bytes).map_err(|_| SitedStationControlError::Decode)
+}
+
+// A local snapshot this receiver wrote; peers never supply it.
+fn decode_snapshot<T: for<'de> Deserialize<'de>>(
+    bytes: &[u8],
+) -> Result<T, SitedStationControlError> {
     decode_cbor(bytes).map_err(|_| SitedStationControlError::Decode)
 }
 

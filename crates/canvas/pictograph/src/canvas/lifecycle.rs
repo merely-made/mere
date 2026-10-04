@@ -210,7 +210,7 @@ impl Canvas {
             paused_positions: None,
             projection_score: None,
             projection_representations: HashMap::new(),
-            arrangement_pull: seiche::DEFAULT_ANCHOR_STIFFNESS,
+            roles: Default::default(),
             physics_law: crate::canvas::PhysicsLaw::Springs,
             physics_overlays: Vec::new(),
             physics_kind_source: crate::canvas::PhysicsKindSource::Site,
@@ -518,6 +518,7 @@ impl Canvas {
             fluid: Vec::new(),
             fluid_radius: 0.0,
             energy: 0.0,
+            speed: 0.0,
             generation: self.generation,
         });
         self.view.set_edges(dedup_edges(&self.graph));
@@ -527,6 +528,13 @@ impl Canvas {
     /// chains another frame while true.
     pub fn is_settling(&self) -> bool {
         self.physics.is_settling()
+    }
+
+    /// Whether the physics world asks for ticks of its own (a scene, or a law
+    /// whose flow has not converged), and the settle budget left: why a
+    /// layout is still moving. (Inline backend; offloaded reads `(false, 0)`.)
+    pub fn physics_tick_demand(&self) -> (bool, u32) {
+        self.physics.tick_demand()
     }
 
     /// Move physics onto an off-thread actor (the native always-offload path).
