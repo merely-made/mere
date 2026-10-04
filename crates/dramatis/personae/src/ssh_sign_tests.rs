@@ -15,21 +15,62 @@ use ssh_key::public::PublicKey;
 
 const MESSAGE: &[u8] = b"personae p4a session blob";
 
-/// Fixtures are test-only keys made by `ssh-keygen` (OpenSSH for Windows
-/// 9.5p2), unencrypted, comment `personae-p4a-fixture-<name>`.
+/// Fixtures are test-only, unencrypted keys made by `ssh-keygen` (OpenSSH
+/// for Windows 9.5p2), comment `personae-p4a-fixture-<name>`, except
+/// `rsa2048e3` (e = 3), made by Python `cryptography` 50, which ssh-keygen
+/// cannot do.
 pub(crate) fn fixture(name: &str) -> PrivateKey {
     let text = match name {
         "ed25519" => include_str!("../tests/fixtures/ssh/ed25519"),
         "rsa1024" => include_str!("../tests/fixtures/ssh/rsa1024"),
         "rsa2048" => include_str!("../tests/fixtures/ssh/rsa2048"),
+        "rsa2048e3" => include_str!("../tests/fixtures/ssh/rsa2048e3"),
+        "rsa2560" => include_str!("../tests/fixtures/ssh/rsa2560"),
         "rsa3072" => include_str!("../tests/fixtures/ssh/rsa3072"),
         "rsa4096" => include_str!("../tests/fixtures/ssh/rsa4096"),
+        "rsa8192" => include_str!("../tests/fixtures/ssh/rsa8192"),
         "ecdsa256" => include_str!("../tests/fixtures/ssh/ecdsa256"),
         "ecdsa384" => include_str!("../tests/fixtures/ssh/ecdsa384"),
         "ecdsa521" => include_str!("../tests/fixtures/ssh/ecdsa521"),
+        "dsa" => include_str!("../tests/fixtures/ssh/dsa"),
         other => panic!("no fixture {other}"),
     };
     PrivateKey::from_openssh(text).expect("fixture parses")
+}
+
+/// Security-key types carry a hardware handle, not a private key; built
+/// from public parts here, since making one needs a FIDO device.
+pub(crate) fn security_keys() -> Vec<KeypairData> {
+    use ssh_key::private::{SkEcdsaSha2NistP256, SkEd25519};
+    let ed = fixture("ed25519");
+    let ec = fixture("ecdsa256");
+    let ssh_key::public::KeyData::Ed25519(ed_public) = PublicKey::from(&ed).key_data().clone()
+    else {
+        unreachable!()
+    };
+    let ssh_key::public::KeyData::Ecdsa(ssh_key::public::EcdsaPublicKey::NistP256(ec_point)) =
+        PublicKey::from(&ec).key_data().clone()
+    else {
+        unreachable!()
+    };
+    vec![
+        KeypairData::SkEd25519(
+            SkEd25519::new(
+                ssh_key::public::SkEd25519::new(ed_public, "ssh:"),
+                0x01,
+                vec![1, 2, 3, 4],
+            )
+            .unwrap(),
+        ),
+        KeypairData::SkEcdsaSha2NistP256(
+            SkEcdsaSha2NistP256::new(
+                ssh_key::public::SkEcdsaSha2NistP256::new(ec_point, "ssh:"),
+                0x01,
+                vec![1, 2, 3, 4],
+            )
+            .unwrap(),
+        ),
+    ]
 }
 
 fn verifies(key: &PrivateKey, data: &[u8], signature: &Signature) -> bool {
@@ -124,11 +165,10 @@ fn rsa_signatures_are_deterministic_pkcs1() {
 }
 
 #[test]
-fn ecdsa_signs_on_every_curve_and_ignores_flags() {
+fn ecdsa_signs_on_p256_and_p384_and_ignores_flags() {
     for (name, curve) in [
         ("ecdsa256", EcdsaCurve::NistP256),
         ("ecdsa384", EcdsaCurve::NistP384),
-        ("ecdsa521", EcdsaCurve::NistP521),
     ] {
         let key = fixture(name);
         for flags in [0, SSH_AGENT_RSA_SHA2_256, SSH_AGENT_RSA_SHA2_512] {
@@ -162,4 +202,89 @@ fn ed25519_signs_exactly_as_before() {
         );
         assert!(verifies(&key, BASELINE_MESSAGE, &signature));
     }
+}
+
+/// Ruling 55: refused at the door and at signing, even for a P-521 key the
+/// decoder happened to accept.
+#[test]
+fn p521_is_refused_until_upstream_decodes_every_key() {
+    let key = fixture("ecdsa521");
+    assert!(matches!(
+        check_signable(key.key_data()),
+        Err(SshSignError::P521Refused)
+    ));
+    assert!(matches!(
+        sign(key.key_data(), MESSAGE, 0),
+        Err(SshSignError::P521Refused)
+    ));
+}
+
+#[test]
+fn every_signable_key_passes_the_door() {
+    for name in [
+        "ed25519", "rsa2048", "rsa3072", "rsa4096", "ecdsa256", "ecdsa384",
+    ] {
+        check_signable(fixture(name).key_data()).unwrap_or_else(|error| panic!("{name}: {error}"));
+    }
+}
+
+/// Ruling 56: each refusal names why.
+#[test]
+fn unsignable_keys_are_refused_with_the_reason() {
+    for name in ["rsa1024", "rsa2560", "rsa8192", "rsa2048e3"] {
+        let error = check_signable(fixture(name).key_data()).unwrap_err();
+        println!("{name}: {error}");
+        assert!(
+            matches!(error, SshSignError::RsaKeyRejected(_)),
+            "{name}: {error}"
+        );
+        assert!(
+            error.to_string().contains("2048 to 4096 bits"),
+            "{name}: {error}"
+        );
+    }
+    let error = check_signable(fixture("dsa").key_data()).unwrap_err();
+    assert_eq!(error.to_string(), "the agent does not sign ssh-dss keys");
+    for key in security_keys() {
+        let error = check_signable(&key).unwrap_err();
+        assert!(matches!(error, SshSignError::Unsupported(_)), "{error}");
+        assert!(error.to_string().contains("sk-"), "{error}");
+    }
+}
+
+/// Ruling 59 tripwire. ring's and the rsa crate's PKCS#1 v1.5 signatures are
+/// byte-identical, so no output test can tell who signed; this keeps the
+/// rsa crate to building the key, and ring the only RSA signer.
+#[test]
+fn the_rsa_crate_only_builds_the_key() {
+    const SOURCE: &str = include_str!("ssh_sign.rs");
+    let rsa_uses: Vec<&str> = SOURCE
+        .match_indices("rsa::")
+        .filter(|(at, _)| !SOURCE[..*at].ends_with("ring::"))
+        .map(|(at, _)| {
+            let rest = &SOURCE[at..];
+            &rest[..rest
+                .find(|c: char| !(c.is_alphanumeric() || c == ':' || c == '_'))
+                .unwrap()]
+        })
+        .collect();
+    for path in &rsa_uses {
+        assert!(
+            [
+                "rsa::pkcs8::EncodePrivateKey",
+                "rsa::BigUint::from_bytes_be",
+                "rsa::RsaPrivateKey::from_components",
+            ]
+            .contains(path),
+            "the rsa crate may build the key, never sign: found {path}"
+        );
+    }
+    assert_eq!(rsa_uses.len(), 3);
+    let compact: String = SOURCE.split_whitespace().collect();
+    assert_eq!(compact.matches("ring_key.sign(").count(), 1);
+    assert_eq!(
+        compact.matches(".sign(").count(),
+        1,
+        "one RSA signer, ring's"
+    );
 }

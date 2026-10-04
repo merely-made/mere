@@ -23,10 +23,13 @@
 //!
 //! ## Honest limits
 //!
-//! - Ed25519, ECDSA (P-256, P-384, P-521) and RSA sign, through
-//!   [`crate::ssh_sign`]: RSA by `ring`, `rsa-sha2-256` or `rsa-sha2-512` per
-//!   the request's flags, 2048 to 4096 bits; a flagless RSA request
-//!   (`ssh-rsa`, SHA-1) is refused. Other key types are refused at signing.
+//! - Ed25519, ECDSA (P-256, P-384) and RSA sign, through [`crate::ssh_sign`]:
+//!   RSA by `ring`, `rsa-sha2-256` or `rsa-sha2-512` per the request's flags,
+//!   2048 to 4096 bits; a flagless RSA request (`ssh-rsa`, SHA-1) is refused.
+//!   `ssh-add` of anything else, P-521 included, is refused with the reason
+//!   in the agent's log (the protocol carries none), and re-adding a held key
+//!   changes nothing. A P-256 or P-384 key whose scalar `ssh-key` 0.6.7
+//!   cannot decode fails inside `ssh-agent-lib`, before this agent sees it.
 //! - A standalone agent built with [`VaultAgent::new`] still refuses
 //!   [`UnlockTier::PerUse`]. A resident host may provide an
 //!   [`ApprovalBroker`] to enforce visible per-use decisions and bounded
@@ -288,13 +291,20 @@ impl<S: IdentityStorage + 'static> Session for VaultAgent<S> {
             private.set_comment(&comment);
         }
         let key = ssh_slot::protocol_key_for(&private);
+        let mut vault = self.vault.lock().unwrap();
+        // Ruling 54: a held key is never rewritten, its tier included.
+        if vault.current_profile().slots.contains_key(&key) {
+            tracing::info!(?key, "ssh identity already held; left untouched");
+            return Ok(());
+        }
+        // Ruling 56: only keys the agent can sign are taken in.
+        if let Err(refused) = ssh_sign::check_signable(private.key_data()) {
+            tracing::warn!(?key, %refused, "ssh identity refused");
+            return Err(AgentError::other(refused));
+        }
         let slot = ssh_slot::slot_for(&private, UnlockTier::Session).map_err(AgentError::other)?;
         tracing::info!(?key, "adding ssh identity to vault");
-        self.vault
-            .lock()
-            .unwrap()
-            .add_slot(key, slot)
-            .map_err(AgentError::other)
+        vault.add_slot(key, slot).map_err(AgentError::other)
     }
 
     async fn remove_identity(&mut self, identity: RemoveIdentity) -> Result<(), AgentError> {
@@ -748,9 +758,9 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn ecdsa_signs_through_the_agent_on_every_curve() {
+    async fn ecdsa_signs_through_the_agent_on_p256_and_p384() {
         let mut agent = test_agent();
-        for name in ["ecdsa256", "ecdsa384", "ecdsa521"] {
+        for name in ["ecdsa256", "ecdsa384"] {
             let key = fixture(name);
             add(&mut agent, &key).await;
             let public = PublicKey::from(&key);
@@ -798,7 +808,7 @@ mod tests {
             "the slot as pre-P4a code wrote it"
         );
 
-        let others: Vec<PrivateKey> = ["rsa2048", "rsa4096", "ecdsa256", "ecdsa384", "ecdsa521"]
+        let others: Vec<PrivateKey> = ["rsa2048", "rsa4096", "ecdsa256", "ecdsa384"]
             .into_iter()
             .map(fixture)
             .collect();
@@ -806,6 +816,7 @@ mod tests {
             add(&mut agent, key).await;
         }
         add(&mut agent, &others[0]).await;
+        add(&mut agent, &ed25519).await;
         let listed = agent.request_identities().await.unwrap();
         assert_eq!(
             listed.len(),
@@ -855,5 +866,82 @@ mod tests {
                 .unwrap();
         }
         assert_eq!(vault_slot_count(&agent), 1);
+    }
+
+    /// Ruling 54: `ssh-add` of a held PerUse key keeps it PerUse, byte for
+    /// byte, whatever comment the client sends.
+    #[tokio::test]
+    async fn readding_a_held_key_rewrites_nothing_its_tier_included() {
+        use crate::profile_wire::slot_to_plaintext;
+        let mut agent = test_agent();
+        let key = fixture("rsa2048");
+        let stored = protocol_key_for(&key);
+        agent
+            .vault
+            .lock()
+            .unwrap()
+            .add_slot(
+                stored.clone(),
+                ssh_slot::slot_for(&key, UnlockTier::PerUse).unwrap(),
+            )
+            .unwrap();
+        let wire = |agent: &VaultAgent<InMemoryStorage>| {
+            let vault = agent.vault.lock().unwrap();
+            let slot = vault.current_profile().slots.get(&stored).unwrap();
+            serde_json::to_vec(&slot_to_plaintext(&stored, slot)).unwrap()
+        };
+        let before = wire(&agent);
+        agent
+            .add_identity(AddIdentity {
+                credential: PrivateCredential::Key {
+                    privkey: key.key_data().clone(),
+                    comment: "a different comment".into(),
+                },
+            })
+            .await
+            .unwrap();
+        assert_eq!(wire(&agent), before);
+        let tier = agent.vault.lock().unwrap().current_profile().slots[&stored].unlock_tier();
+        assert_eq!(tier, UnlockTier::PerUse);
+    }
+
+    /// Rulings 55 and 56: `ssh-add` refuses what the agent cannot sign, the
+    /// reason in the error, and stores nothing.
+    #[tokio::test]
+    async fn ssh_add_refuses_unsignable_keys_with_the_reason() {
+        let mut agent = test_agent();
+        let mut refused: Vec<(String, ssh_key::private::KeypairData)> = [
+            "rsa1024",
+            "rsa2560",
+            "rsa8192",
+            "rsa2048e3",
+            "dsa",
+            "ecdsa521",
+        ]
+        .into_iter()
+        .map(|name| (name.to_string(), fixture(name).key_data().clone()))
+        .collect();
+        for key in crate::ssh_sign::tests::security_keys() {
+            refused.push(("security key".into(), key));
+        }
+        for (name, privkey) in refused {
+            let error = agent
+                .add_identity(AddIdentity {
+                    credential: PrivateCredential::Key {
+                        privkey,
+                        comment: String::new(),
+                    },
+                })
+                .await
+                .unwrap_err();
+            let reason = error.to_string();
+            assert!(
+                reason.contains("2048 to 4096 bits")
+                    || reason.contains("does not sign")
+                    || reason.contains("P-521"),
+                "{name}: {reason}"
+            );
+        }
+        assert_eq!(vault_slot_count(&agent), 0);
     }
 }

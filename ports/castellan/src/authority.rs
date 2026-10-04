@@ -88,6 +88,9 @@ pub enum IdentityIntentError {
     CarryUnavailable,
     #[error("device revocation failed ({0:?})")]
     DeviceRevocation(std::io::ErrorKind),
+    /// Refused at import, with personae's reason (ruling 56).
+    #[error("the agent cannot sign this SSH key: {0}")]
+    UnsignableKey(String),
 }
 
 /// Public result of a native SSH key mutation.
@@ -98,6 +101,8 @@ pub struct SshKeyMutationReceipt {
     pub comment: String,
     pub public_openssh: String,
     pub unlock_policy: String,
+    /// The fingerprint was already held. Since ruling 54 the held slot is
+    /// left untouched, and comment and unlock policy describe it as held.
     pub replaced_existing: bool,
 }
 
@@ -327,15 +332,30 @@ impl<S: IdentityStorage + 'static> PersonaeHost<S> {
         operation: SshKeyMutationKind,
     ) -> Result<SshKeyMutationReceipt, IdentityIntentError> {
         let key = ssh_slot::protocol_key_for(&private);
-        let slot = ssh_slot::slot_for(&private, tier)?;
         let public = PublicKey::from(&private);
         let fingerprint = public.fingerprint(ssh_key::HashAlg::Sha256).to_string();
         let public_openssh = public
             .to_openssh()
             .map_err(|_| IdentityIntentError::PublicEncoding)?;
-        let comment = private.comment().to_string();
         let mut vault = self.vault.lock().unwrap();
-        let replaced_existing = vault.current_profile().slots.contains_key(&key);
+        // Ruling 54: a held key is never rewritten; the receipt describes the
+        // slot as held, comment and tier included.
+        if let Some(held) = vault.current_profile().slots.get(&key) {
+            let held_private = ssh_slot::private_key_from_slot(held)?;
+            return Ok(SshKeyMutationReceipt {
+                operation,
+                fingerprint,
+                comment: held_private.comment().to_string(),
+                public_openssh,
+                unlock_policy: unlock_label(held.unlock_tier()),
+                replaced_existing: true,
+            });
+        }
+        // Ruling 56: only keys the agent can sign are taken in.
+        personae::ssh_sign::check_signable(private.key_data())
+            .map_err(|refused| IdentityIntentError::UnsignableKey(refused.to_string()))?;
+        let slot = ssh_slot::slot_for(&private, tier)?;
+        let comment = private.comment().to_string();
         vault.add_slot(key, slot)?;
         Ok(SshKeyMutationReceipt {
             operation,
@@ -343,7 +363,7 @@ impl<S: IdentityStorage + 'static> PersonaeHost<S> {
             comment,
             public_openssh,
             unlock_policy: unlock_label(tier),
-            replaced_existing,
+            replaced_existing: false,
         })
     }
 
@@ -1188,12 +1208,103 @@ mod tests {
             "ecdsa521" => {
                 include_str!("../../../crates/dramatis/personae/tests/fixtures/ssh/ecdsa521")
             },
+            "rsa1024" => {
+                include_str!("../../../crates/dramatis/personae/tests/fixtures/ssh/rsa1024")
+            },
+            "rsa2560" => {
+                include_str!("../../../crates/dramatis/personae/tests/fixtures/ssh/rsa2560")
+            },
+            "rsa8192" => {
+                include_str!("../../../crates/dramatis/personae/tests/fixtures/ssh/rsa8192")
+            },
+            "rsa2048e3" => {
+                include_str!("../../../crates/dramatis/personae/tests/fixtures/ssh/rsa2048e3")
+            },
+            "dsa" => include_str!("../../../crates/dramatis/personae/tests/fixtures/ssh/dsa"),
             other => panic!("no fixture {other}"),
         };
         PrivateKey::from_openssh(text).unwrap()
     }
 
-    const P4A_KEYS: [&str; 5] = ["rsa2048", "rsa4096", "ecdsa256", "ecdsa384", "ecdsa521"];
+    const P4A_KEYS: [&str; 4] = ["rsa2048", "rsa4096", "ecdsa256", "ecdsa384"];
+
+    /// Ruling 54: re-importing a held key, even asking for another tier and
+    /// carrying another comment, rewrites nothing and says it is held.
+    #[test]
+    fn reimporting_a_held_key_rewrites_nothing() {
+        let host = PersonaeHost::new(
+            IdentityVault::with_profile(
+                InMemoryStorage::new(),
+                Profile::new(
+                    ProfileId("research".to_string()),
+                    "Research",
+                    Ed25519Keypair::from_seed([0x4c; 32]),
+                ),
+            ),
+            None,
+            VaultProtectionView::Ephemeral,
+        );
+        for name in ["ed25519", "rsa2048", "ecdsa256"] {
+            let mut first = fixture(name);
+            first.set_comment("as first imported");
+            let key = protocol_key_for(&first);
+            let per_use = ImportSshKeyNativeIntentV1 {
+                unlock_policy: SshUnlockPolicyIntentV1::PerUse,
+            };
+            let imported = host.import_ssh_private(first, per_use).unwrap();
+            assert!(!imported.replaced_existing, "{name}");
+            let before = slot_parts(&host, &key);
+
+            let mut again = fixture(name);
+            again.set_comment("a different comment");
+            let receipt = host.import_ssh_private(again, session_import()).unwrap();
+            assert!(receipt.replaced_existing, "{name}: reported as held");
+            assert_eq!(receipt.comment, "as first imported", "{name}");
+            assert_eq!(receipt.unlock_policy, imported.unlock_policy, "{name}");
+            assert_eq!(slot_parts(&host, &key), before, "{name}: byte for byte");
+            assert_eq!(slot_parts(&host, &key).3, UnlockTier::PerUse, "{name}");
+        }
+    }
+
+    /// Rulings 55 and 56: import refuses what the agent cannot sign, naming
+    /// why, and stores nothing.
+    #[test]
+    fn native_import_refuses_unsignable_keys_with_the_reason() {
+        let host = PersonaeHost::new(
+            IdentityVault::with_profile(
+                InMemoryStorage::new(),
+                Profile::new(
+                    ProfileId("research".to_string()),
+                    "Research",
+                    Ed25519Keypair::from_seed([0x4d; 32]),
+                ),
+            ),
+            None,
+            VaultProtectionView::Ephemeral,
+        );
+        for name in [
+            "rsa1024",
+            "rsa2560",
+            "rsa8192",
+            "rsa2048e3",
+            "dsa",
+            "ecdsa521",
+        ] {
+            let error = host
+                .import_ssh_private(fixture(name), session_import())
+                .unwrap_err();
+            let IdentityIntentError::UnsignableKey(reason) = &error else {
+                panic!("{name}: {error}");
+            };
+            assert!(
+                reason.contains("2048 to 4096 bits")
+                    || reason.contains("ssh-dss")
+                    || reason.contains("P-521"),
+                "{name}: {reason}"
+            );
+        }
+        assert!(host.snapshot().unwrap().ssh_keys.is_empty());
+    }
 
     fn slot_parts(
         host: &PersonaeHost<InMemoryStorage>,
@@ -1312,7 +1423,6 @@ mod tests {
             ("rsa4096", 0x04, rsa(HashAlg::Sha512)),
             ("ecdsa256", 0, ecdsa(EcdsaCurve::NistP256)),
             ("ecdsa384", 0, ecdsa(EcdsaCurve::NistP384)),
-            ("ecdsa521", 0, ecdsa(EcdsaCurve::NistP521)),
         ] {
             let public = PublicKey::from(&fixture(name));
             let signature = client
