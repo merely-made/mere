@@ -515,6 +515,13 @@ impl Canvas {
         self.physics.is_settling()
     }
 
+    /// Whether the physics world asks for ticks of its own (a scene, or a law
+    /// whose flow has not converged), and the settle budget left: why a
+    /// layout is still moving. (Inline backend; offloaded reads `(false, 0)`.)
+    pub fn physics_tick_demand(&self) -> (bool, u32) {
+        self.physics.tick_demand()
+    }
+
     /// Move physics onto an off-thread actor (the native always-offload path).
     /// The host calls this once, just after construction, with a [`Wake`] that
     /// pokes its event loop when a layout snapshot is ready. Left uncalled, the
