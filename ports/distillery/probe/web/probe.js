@@ -408,7 +408,47 @@ function decoderStreamsMatch(workerRun) {
   });
 }
 
+// Receipt gate (Mark, "Gate every receipt"): every uncaught page error or
+// unhandled rejection is recorded, and any entry fails the receipt.
+const receiptGateFailures = [];
+window.addEventListener("error", (event) => {
+  receiptGateFailures.push(`uncaught: ${event.message}`);
+});
+window.addEventListener("unhandledrejection", (event) => {
+  receiptGateFailures.push(`unhandled rejection: ${event.reason}`);
+});
+// The gate's positive control: `?plant_page_error=throw|reject` plants one
+// page error while a run is live.
+function plantPageErrorForControl() {
+  const planted = new URLSearchParams(location.search).get("plant_page_error");
+  if (!planted) return;
+  setTimeout(() => {
+    if (planted === "reject") {
+      Promise.reject(new Error("receipt-gate-control: planted rejection"));
+    } else {
+      throw new Error("receipt-gate-control: planted page error");
+    }
+  }, 100);
+}
+
+function gateRow(row, since) {
+  row.gate_failures = receiptGateFailures.slice(since);
+  if (row.gate_failures.length > 0 && row.conclusions) {
+    row.conclusions.row_passed = false;
+    row.conclusions.limiting_layer = "receipt gate: uncaught page error";
+  }
+  return row;
+}
+
 async function runDecoder() {
+  const since = receiptGateFailures.length;
+  plantPageErrorForControl();
+  receipt = gateRow(await runDecoderUngated(), since);
+  showReceipt();
+  return receipt;
+}
+
+async function runDecoderUngated() {
   const configured = await decoderReady;
   const model = configured.model;
   const prefix = `decoder:${model.model_id}`;
@@ -631,6 +671,12 @@ async function environmentSnapshot() {
 }
 
 async function runConfiguredRow(model, rowIndex = null) {
+  const since = receiptGateFailures.length;
+  plantPageErrorForControl();
+  return gateRow(await runConfiguredRowUngated(model, rowIndex), since);
+}
+
+async function runConfiguredRowUngated(model, rowIndex = null) {
   const input = configuredInput(model);
   const idleMs = Number(document.getElementById("idle-ms").value);
   const frameBound = Number(document.getElementById("frame-bound").value);
