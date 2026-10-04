@@ -23,8 +23,10 @@
 //!
 //! ## Honest limits
 //!
-//! - Ed25519 only (the `ssh-key` dependency is built with only that
-//!   algorithm; other key types are refused with a clear error).
+//! - Ed25519, ECDSA (P-256, P-384, P-521) and RSA sign, through
+//!   [`crate::ssh_sign`]: RSA by `ring`, `rsa-sha2-256` or `rsa-sha2-512` per
+//!   the request's flags, 2048 to 4096 bits; a flagless RSA request
+//!   (`ssh-rsa`, SHA-1) is refused. Other key types are refused at signing.
 //! - A standalone agent built with [`VaultAgent::new`] still refuses
 //!   [`UnlockTier::PerUse`]. A resident host may provide an
 //!   [`ApprovalBroker`] to enforce visible per-use decisions and bounded
@@ -38,7 +40,6 @@
 use std::sync::{Arc, Mutex};
 use std::time::{SystemTime, UNIX_EPOCH};
 
-use signature::Signer;
 use ssh_agent_lib::agent::Session;
 use ssh_agent_lib::error::AgentError;
 use ssh_agent_lib::proto::extension::{QueryResponse, SessionBind};
@@ -58,6 +59,7 @@ use crate::signing::{
 use crate::ssh_ca::{self, SshCertAuthority, UserCertRequest};
 use crate::ssh_face;
 use crate::ssh_krl;
+use crate::ssh_sign;
 use crate::ssh_slot::{self, SshSlot};
 use crate::vault::{IdentityStorage, IdentityVault, ProtocolKey, UnlockTier};
 use crate::{InMemoryProvider, enroll};
@@ -250,11 +252,16 @@ impl<S: IdentityStorage + 'static> Session for VaultAgent<S> {
         } else {
             None
         };
-        tracing::info!(key = ?identity.key, "signing request");
-        let signed = identity
-            .private
-            .try_sign(request.data.as_slice())
-            .map_err(AgentError::other);
+        tracing::info!(key = ?identity.key, flags = request.flags, "signing request");
+        let signed = ssh_sign::sign(
+            identity.private.key_data(),
+            request.data.as_slice(),
+            request.flags,
+        )
+        .map_err(AgentError::other);
+        if let Ok(signature) = &signed {
+            tracing::info!(key = ?identity.key, algorithm = %signature.algorithm(), "signed");
+        }
         if let (Some(approval), Some(authorization)) = (&self.approval, authorization) {
             let result = match &signed {
                 Ok(signature) => SigningRecordResult::Signed {
@@ -362,6 +369,7 @@ mod tests {
     use super::*;
     use crate::Ed25519Keypair;
     use crate::signing::{ApprovalSource, RememberApproval, SigningDecision, SigningRecordResult};
+    use crate::ssh_sign::tests::fixture;
     use crate::vault::{InMemoryStorage, Profile, ProfileId};
     use signature::Verifier;
     use ssh_key::Algorithm;
@@ -658,6 +666,177 @@ mod tests {
 
         agent.remove_all_identities().await.unwrap();
         assert_eq!(vault_slot_count(&agent), 0);
+    }
+
+    async fn add(agent: &mut VaultAgent<InMemoryStorage>, key: &PrivateKey) {
+        agent
+            .add_identity(AddIdentity {
+                credential: PrivateCredential::Key {
+                    privkey: key.key_data().clone(),
+                    comment: key.comment().to_string(),
+                },
+            })
+            .await
+            .unwrap();
+    }
+
+    async fn sign_with(
+        agent: &mut VaultAgent<InMemoryStorage>,
+        credential: PublicCredential,
+        data: &[u8],
+        flags: u32,
+    ) -> Result<Signature, AgentError> {
+        agent
+            .sign(SignRequest {
+                credential,
+                data: data.to_vec(),
+                flags,
+            })
+            .await
+    }
+
+    #[tokio::test]
+    async fn rsa_signs_through_the_agent_as_its_flags_ask() {
+        use crate::ssh_sign::{SSH_AGENT_RSA_SHA2_256, SSH_AGENT_RSA_SHA2_512};
+        use ssh_key::HashAlg;
+        let mut agent = test_agent();
+        let key = fixture("rsa3072");
+        add(&mut agent, &key).await;
+        let public = PublicKey::from(&key);
+        for (flags, hash) in [
+            (SSH_AGENT_RSA_SHA2_256, HashAlg::Sha256),
+            (SSH_AGENT_RSA_SHA2_512, HashAlg::Sha512),
+        ] {
+            let signature = sign_with(&mut agent, public.key_data().clone().into(), b"blob", flags)
+                .await
+                .unwrap();
+            assert_eq!(signature.algorithm(), Algorithm::Rsa { hash: Some(hash) });
+            public.key_data().verify(b"blob", &signature).unwrap();
+        }
+        let refused = sign_with(&mut agent, public.key_data().clone().into(), b"blob", 0)
+            .await
+            .unwrap_err();
+        assert!(refused.to_string().contains("SHA-1"), "got: {refused}");
+    }
+
+    /// `ssh` prefers the personae certificate; an RSA one signs per flags too.
+    #[tokio::test]
+    async fn an_rsa_certificate_credential_signs_with_its_underlying_key() {
+        use crate::ssh_sign::SSH_AGENT_RSA_SHA2_512;
+        let mut agent = test_agent();
+        let key = fixture("rsa2048");
+        add(&mut agent, &key).await;
+        let certificate = agent
+            .request_identities()
+            .await
+            .unwrap()
+            .into_iter()
+            .find(|identity| matches!(identity.credential, PublicCredential::Cert(_)))
+            .expect("a certificate is offered");
+        let signature = sign_with(
+            &mut agent,
+            certificate.credential,
+            b"cert",
+            SSH_AGENT_RSA_SHA2_512,
+        )
+        .await
+        .unwrap();
+        PublicKey::from(&key)
+            .key_data()
+            .verify(b"cert", &signature)
+            .unwrap();
+    }
+
+    #[tokio::test]
+    async fn ecdsa_signs_through_the_agent_on_every_curve() {
+        let mut agent = test_agent();
+        for name in ["ecdsa256", "ecdsa384", "ecdsa521"] {
+            let key = fixture(name);
+            add(&mut agent, &key).await;
+            let public = PublicKey::from(&key);
+            let signature = sign_with(&mut agent, public.key_data().clone().into(), b"blob", 0)
+                .await
+                .unwrap();
+            assert_eq!(signature.algorithm(), public.algorithm(), "{name}");
+            public.key_data().verify(b"blob", &signature).unwrap();
+        }
+    }
+
+    /// The pre-P4a Ed25519 slot, captured at `d0d8372b` as its serialized
+    /// `PlaintextSlot`, stays byte-identical while RSA and ECDSA keys are
+    /// added, listed, re-added and used beside it, and signs as before.
+    #[tokio::test]
+    async fn an_existing_ed25519_slot_is_byte_identical_and_signs_as_before() {
+        use crate::profile_wire::slot_to_plaintext;
+        use crate::ssh_sign::tests::{BASELINE_MESSAGE, BASELINE_SIGNATURE};
+        const BASELINE_WIRE: &[u8] = include_bytes!("../tests/fixtures/ssh/ed25519.slot.json");
+
+        let ed25519 = fixture("ed25519");
+        let ed_key = protocol_key_for(&ed25519);
+        let wire = |agent: &VaultAgent<InMemoryStorage>| {
+            let vault = agent.vault.lock().unwrap();
+            let slot = vault
+                .current_profile()
+                .slots
+                .get(&ed_key)
+                .expect("slot held");
+            serde_json::to_vec(&slot_to_plaintext(&ed_key, slot)).unwrap()
+        };
+        let mut agent = test_agent();
+        agent
+            .vault
+            .lock()
+            .unwrap()
+            .add_slot(
+                ed_key.clone(),
+                ssh_slot::slot_for(&ed25519, UnlockTier::Session).unwrap(),
+            )
+            .unwrap();
+        assert_eq!(
+            wire(&agent),
+            BASELINE_WIRE,
+            "the slot as pre-P4a code wrote it"
+        );
+
+        let others: Vec<PrivateKey> = ["rsa2048", "rsa4096", "ecdsa256", "ecdsa384", "ecdsa521"]
+            .into_iter()
+            .map(fixture)
+            .collect();
+        for key in &others {
+            add(&mut agent, key).await;
+        }
+        add(&mut agent, &others[0]).await;
+        let listed = agent.request_identities().await.unwrap();
+        assert_eq!(
+            listed.len(),
+            2 * (1 + others.len()),
+            "a certificate and a key each"
+        );
+        for key in &others {
+            let flags = crate::ssh_sign::SSH_AGENT_RSA_SHA2_256;
+            let public = PublicKey::from(key);
+            let signature = sign_with(&mut agent, public.key_data().clone().into(), b"x", flags)
+                .await
+                .unwrap();
+            public.key_data().verify(b"x", &signature).unwrap();
+        }
+
+        let public = PublicKey::from(&ed25519);
+        let signature = sign_with(
+            &mut agent,
+            public.key_data().clone().into(),
+            BASELINE_MESSAGE,
+            0,
+        )
+        .await
+        .unwrap();
+        assert_eq!(hex::encode(signature.as_bytes()), BASELINE_SIGNATURE);
+        public
+            .key_data()
+            .verify(BASELINE_MESSAGE, &signature)
+            .unwrap();
+        assert_eq!(wire(&agent), BASELINE_WIRE, "untouched afterwards");
+        assert_eq!(vault_slot_count(&agent), 1 + others.len());
     }
 
     #[tokio::test]
