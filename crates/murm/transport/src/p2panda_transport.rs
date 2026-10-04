@@ -77,6 +77,10 @@ use stickleback::MunimentAddressBook;
 use tokio::io::{AsyncRead, AsyncWrite, ReadBuf};
 use tokio::sync::{Mutex as TokioMutex, mpsc};
 
+mod open_connections;
+
+use open_connections::OpenConnections;
+
 use crate::blobs::{BlobHash, BlobPeerAuthorizer, BlobReadAuthorizer, BlobScope, BlobStore};
 use crate::peer_route::{PeerPath, peer_addr};
 use crate::{AcceptedSession, Alpn, IngressContext, PeerID, Transport, TransportError};
@@ -381,7 +385,8 @@ pub struct KnownPeer {
     /// While this node is subscribed to the topic's gossip, this is whether
     /// the peer is a direct gossip neighbour there (a `NeighbourUp` not yet
     /// followed by a `NeighbourDown`), whatever iroh's path says. While it is
-    /// not subscribed, this is whether the endpoint holds an ACTIVE path to it.
+    /// not subscribed, this is whether at least one connection to the peer is
+    /// open on this endpoint, whichever protocol opened it.
     ///
     /// The honest answer to "are we talking to it", as opposed to "do we know
     /// where it lives". Distinguishing these is not pedantry: a firewall rule
@@ -390,12 +395,15 @@ pub struct KnownPeer {
     /// reported the peer as reachable throughout and looked healthy while
     /// nothing whatsoever replicated (2026-08-03).
     ///
-    /// Gossip decides on the overlay because iroh's path state is wrong both
-    /// ways there: when both sides dial at once it can mark every address of a
-    /// delivering peer inactive for 45 s and more, and it keeps a closed
-    /// peer's path active for about a minute. iroh's own view stays readable,
-    /// unmixed, in [`peer_paths`](P2pandaTransport::peer_paths).
+    /// Neither answer reads iroh's path state, which is wrong both ways: when
+    /// both sides dial at once it can mark every address of a delivering peer
+    /// inactive for 45 s and more, and it keeps a dead peer's path active for
+    /// a minute or more after its last connection closes. iroh's own view
+    /// stays readable, unmixed, in [`peer_paths`](P2pandaTransport::peer_paths).
     pub connected: bool,
+    /// Whether this node is subscribed to the topic's gossip, so `connected`
+    /// is gossip's answer; false means the open-connection count gave it.
+    pub on_overlay: bool,
 }
 
 /// How, and to whom, this transport serves iroh-blobs.
@@ -423,9 +431,19 @@ pub struct P2pandaTransportBuilder<'a> {
     discovery: Option<DiscoveryConfig>,
     gossip: bool,
     relay_urls: Vec<iroh::RelayUrl>,
+    /// Off only in the control test that proves the count matters.
+    #[cfg(test)]
+    connection_hook: bool,
 }
 
 impl<'a> P2pandaTransportBuilder<'a> {
+    /// Bind without the open-connection hook, for the control test only.
+    #[cfg(test)]
+    fn without_connection_hook(mut self) -> Self {
+        self.connection_hook = false;
+        self
+    }
+
     /// Mere-defined ALPNs to register; each gets its own accept queue.
     pub fn alpns(mut self, alpns: Vec<Alpn>) -> Self {
         self.alpns = alpns;
@@ -472,6 +490,8 @@ impl<'a> P2pandaTransportBuilder<'a> {
             discovery: self.discovery,
             gossip: self.gossip,
             relay_urls: self.relay_urls,
+            #[cfg(test)]
+            connection_hook: self.connection_hook,
         }
     }
 
@@ -552,6 +572,8 @@ pub struct P2pandaTransport {
     /// unless built with [`builder().gossip()`](P2pandaTransportBuilder::gossip);
     /// `subscribe`/`set_topics` use it.
     gossip: Option<Gossip>,
+    /// Connections open per remote on this endpoint, from the handshake hook.
+    open: OpenConnections,
 }
 
 impl P2pandaTransport {
@@ -565,6 +587,8 @@ impl P2pandaTransport {
             discovery: None,
             relay_urls: Vec::new(),
             gossip: false,
+            #[cfg(test)]
+            connection_hook: true,
         }
     }
 
@@ -582,6 +606,8 @@ impl P2pandaTransport {
             discovery: None,
             relay_urls: Vec::new(),
             gossip: false,
+            #[cfg(test)]
+            connection_hook: true,
         }
     }
 
@@ -640,6 +666,8 @@ impl P2pandaTransport {
             discovery,
             gossip,
             relay_urls,
+            #[cfg(test)]
+            connection_hook,
         } = builder;
         let signing_key = SigningKey::from_bytes(&signing_seed);
         let peer_id = PeerID::from_bytes(signing_key.verifying_key().as_bytes())
@@ -655,7 +683,18 @@ impl P2pandaTransport {
             .spawn()
             .await
             .map_err(|e| TransportError::Backend(format!("address book: {e}")))?;
+        // Always on (ruling 51): every connection on the endpoint, whichever
+        // protocol opens it, is counted for `connected` off the overlay.
+        let open = OpenConnections::default();
         let mut endpoint_builder = Endpoint::builder(address_book.clone()).signing_key(signing_key);
+        #[cfg(not(test))]
+        {
+            endpoint_builder = endpoint_builder.hooks(open.clone());
+        }
+        #[cfg(test)]
+        if connection_hook {
+            endpoint_builder = endpoint_builder.hooks(open.clone());
+        }
         for url in relay_urls {
             endpoint_builder = endpoint_builder.relay_url(url);
         }
@@ -770,6 +809,7 @@ impl P2pandaTransport {
             _mdns: mdns_handle,
             _discovery: discovery_handle,
             gossip: gossip_handle,
+            open,
         })
     }
 
@@ -899,16 +939,16 @@ impl P2pandaTransport {
     /// against its own subscribed topics, so the raw query returns self as a
     /// reachable peer, which every caller would have to filter out.
     pub async fn peers_for_topic(&self, topic: [u8; 32]) -> Result<Vec<KnownPeer>, TransportError> {
-        self.peers_for_topic_counting(topic, true).await
+        self.peers_for_topic_by(topic, true).await
     }
 
-    /// [`peers_for_topic`](Self::peers_for_topic) with the gossip rule
-    /// switchable: `false` lets iroh's path decide for every peer, as if this
-    /// node were not subscribed, so a test can show what the path says alone.
-    async fn peers_for_topic_counting(
+    /// [`peers_for_topic`](Self::peers_for_topic) with the rule switchable:
+    /// `live` false lets iroh's path decide for every peer, so a test can show
+    /// what the path says alone.
+    async fn peers_for_topic_by(
         &self,
         topic: [u8; 32],
-        gossip_decides: bool,
+        live: bool,
     ) -> Result<Vec<KnownPeer>, TransportError> {
         let infos = self
             .address_book
@@ -918,19 +958,19 @@ impl P2pandaTransport {
         let local = self.peer_id.to_bytes();
         // The gossip manager tags this node with a topic when it subscribes and
         // untags it when it leaves, so the self record is the subscription.
-        let subscribed =
-            gossip_decides && infos.iter().any(|info| info.node_id.as_bytes() == &local);
-        let neighbours = if subscribed {
+        let subscribed = infos.iter().any(|info| info.node_id.as_bytes() == &local);
+        let neighbours = if live && subscribed {
             self.gossip_neighbours(topic).await
         } else {
             HashSet::new()
         };
-        // Asked only when the path decides. A failure to obtain the handle is
-        // reported as "nothing is connected" rather than as an error: the
-        // address-book half of this answer is still worth returning, and a
-        // caller that cannot tell "not connected" from "could not ask" is
-        // exactly the problem this field exists to end.
-        let endpoint = if subscribed {
+        // Asked only when the path decides, never by the live rule: each ask
+        // queues a message on the peer's iroh actor. A failure to obtain the
+        // handle is reported as "nothing is connected" rather than as an
+        // error: the address-book half of this answer is still worth
+        // returning, and a caller that cannot tell "not connected" from "could
+        // not ask" is exactly the problem this field exists to end.
+        let endpoint = if live {
             None
         } else {
             self.endpoint.endpoint().await.ok()
@@ -942,8 +982,10 @@ impl P2pandaTransport {
             }
             let peer = PeerID::from_bytes(info.node_id.as_bytes())
                 .map_err(|e| TransportError::Backend(format!("peer id: {e}")))?;
-            let connected = if subscribed {
+            let connected = if live && subscribed {
                 neighbours.contains(info.node_id.as_bytes())
+            } else if live {
+                self.open.count(info.node_id.as_bytes()) > 0
             } else {
                 match &endpoint {
                     Some(endpoint) => endpoint
@@ -967,6 +1009,7 @@ impl P2pandaTransport {
                 reachable: info.transports.is_some(),
                 bootstrap: info.bootstrap,
                 connected,
+                on_overlay: subscribed,
             });
         }
         Ok(peers)
@@ -1128,7 +1171,7 @@ impl P2pandaTransport {
     /// The readable form of [`peer_ticket`](Self::peer_ticket)'s address set,
     /// plus the one fact a ticket drops: which address is the live path.
     ///
-    /// iroh's path state alone, so on a subscribed overlay a peer can be
+    /// iroh's path state alone, so a peer can be
     /// [`connected`](KnownPeer::connected) with no address active here, or not
     /// connected while one still is.
     pub async fn peer_paths(&self, peer: PeerID) -> Result<Vec<PeerPath>, TransportError> {

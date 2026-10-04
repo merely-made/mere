@@ -2,7 +2,7 @@
 
 Status: governing research catalog and boundary map
 Founded: 2026-08-15
-Last reconciled: 2026-08-29
+Last reconciled: 2026-10-03 (arrangement roles, from the dynamics grammar plan's F18–F30)
 Scope: portable graph readings, visual encodings, arrangements, realization, and interaction  
 Governs: the primitive vocabulary and promotion rules used to construct scenes  
 Consumed by: [`2026-08-18_scenograph_content_catalog.md`](2026-08-18_scenograph_content_catalog.md), the collection of complete scene recipes  
@@ -38,6 +38,8 @@ projection grammar -> scene recipe -> product adapter and authority
 
 `sceno` carries the grammar and scene result. It does not import the scene catalog or know product scene names.
 
+**2026-10-03, recipe slots.** A scene recipe names an arrangement and, optionally, a dynamics recipe. One domain binding supplies the facts both read and the actions both honour, such as drag and pin. This is ruling F21 of the [dynamics grammar plan](../implementation_strategy/2026-10-02_dynamics_grammar_plan.md), the sibling grammar for motion. The chain above is unchanged: the recipe still depends on this grammar, and now on that one too.
+
 ## The projection stack
 
 ```text
@@ -63,6 +65,19 @@ For movable spatial projections, the useful placement policies are:
 - **Free:** the solver supplies a stable initial arrangement; direct manipulation may establish a new position.
 - **Anchored:** the solver supplies a home position; displacement is temporary and the item returns toward home.
 - **Pinned:** an explicit constraint fixes an item until the pin is removed. Pinning is independent of free versus anchored behavior.
+
+**2026-10-03, the three roles.** The [dynamics grammar plan](../implementation_strategy/2026-10-02_dynamics_grammar_plan.md) rules these policies as *roles*: what an arrangement's coordinates do once physics or scripting acts on them (F18). It names them seeded, anchored and pinned, and retires "encourage" and "ensure" (F26).
+
+| Policy above | Role | Behaviour | Ruling |
+| --- | --- | --- | --- |
+| Free | Seeded | The arrangement supplies the starting position, and nothing returns the item to it. | F23, F26 |
+| Anchored | Anchored | Displaced by a drag or a force, the item returns to the arrangement by the anchor's rule while physics runs. With physics off, it jumps back when the drag ends. | F19 |
+| Pinned | Pinned | The item stays where the arrangement puts it. A solver that cannot honour it reports the pin unmet. | F19, F26 |
+
+- **Where a role is chosen (F22).** A recipe sets a default role. A group or kind may override that default, and an item may override its group or kind. A drag pin is the existing per-item case.
+- **The default (F23).** When nothing chooses, an item is seeded. Physics runs from the arrangement, and nothing returns unless a recipe, group or item says anchored.
+- **Encoded axes (F28).** An axis bound to a data field is pinned on that axis, as declared by the encoding. Physics moves only the free axes. With both axes encoded, it only separates overlaps.
+- **The last bullet above.** It held a pin to be independent of free versus anchored behaviour. *Reading, not ruled:* the roles keep that independence by layering rather than by a separate flag. A pin is an item-level role over its group's or recipe's default, and removing it returns the item to that default. Seeded, anchored and pinned are three values of one per-item choice, except on an encoded axis, where the role is per axis.
 
 ## Portable graph vocabulary
 
@@ -214,7 +229,7 @@ An arrangement computes geometry under constraints. A reading may support severa
 | Family | Variants | Current Mere position |
 | --- | --- | --- |
 | Authored spatial | Free placement, pinned ground, tabletop | Expressible through positions and constraints; product recipes remain host-owned |
-| Force and constraint | Spring, collision, gravity, clusters | Landed in Seiche; portable score promotion requires a forcing consumer |
+| Settled | The latest settle of a running law, replaced at each new settle | Ruled 2026-10-03 (dynamics grammar F30) as an arrangement source, picked like any other and opt-in; built in that plan's G7 |
 | Grid and stack | Rows, columns, masonry, ordered stack | Grid and Stack are portable in Score v4; Grid has a Cartography adapter, while Stack still lacks a current adapter consumer |
 | Axial and lanes | Timeline, Gantt, swimlane, categorical columns | Timeline and Kanban are portable in Score v4; generalized axes and guides remain a gap |
 | Radial and spiral | Radial, phyllotaxis, polar, concentric | Radial and Spiral are portable in Score v4 and have Cartography adapters |
@@ -229,6 +244,12 @@ An arrangement computes geometry under constraints. A reading may support severa
 | Generative | L-system, procedural field, semantic embedding | L-system and Embedded are portable in Score v4; procedural field semantics remain product-owned |
 | Nested and faceted | Small multiples, compound nodes, nested canvases | Nested spaces are portable; facet composition needs a forcing proof |
 | Three-dimensional | Spatial volume, layered depth, immersive graph | Deferred until a real second consumer forces portable depth semantics |
+
+**2026-10-03, forces leave this table.** Until this date the table had a row "Force and constraint", with variants "Spring, collision, gravity, clusters" and position "Landed in Seiche; portable score promotion requires a forcing consumer". By ruling F29 of the [dynamics grammar plan](../implementation_strategy/2026-10-02_dynamics_grammar_plan.md), that row moved out, because arrangements are positions, not motion. Forces now belong to the dynamics grammar, which acts on an arrangement through the three roles of [the projection stack](#the-projection-stack). One part of that row comes back as positions: a law's latest settle, which F30 makes an arrangement source, Settled, in the row above.
+- Each settle replaces Settled, and the three roles apply to it as to any arrangement.
+- An authored arrangement stays the reference unless Settled is chosen.
+- *Reading, not ruled* (the plan's): a law that never rests leaves Settled at its last value.
+- *Reading, not ruled* (this catalog's): Settled is not yet a portable `score::Arrangement` variant. A settle recorded into a score would travel as supplied coordinates, as `Embedded` does, until a consumer forces more.
 
 Portable `score::Arrangement` version 4 names Spiral, Grid, Geographic, Hulls,
 Stack, Penrose, LSystem, Timeline, Kanban, Embedded, and Radial, plus the
@@ -268,6 +289,14 @@ Motion has several meanings and should not collapse into one physics switch:
 - transition between projections or epochs;
 - data-encoded motion;
 - ambient product behavior.
+
+**2026-10-03, the roles in this section.** Under the dynamics grammar's roles (see [the projection stack](#the-projection-stack)), the table's drag, displace and pin rows read as follows.
+- A dragged seeded (free) item stays where it was dropped.
+- A displaced anchored item returns by the anchor's rule while physics runs, and jumps back when the drag ends with physics off (F19).
+- Pin or unpin sets an item's role over its group's or recipe's default (F22).
+- In the motion list, solver motion toward an arrangement is the anchored role only. A seeded arrangement starts the motion and does not pull on it (F18, F23).
+- Picking an arrangement while physics plays runs the transition, and physics continues from the landed positions (F24).
+- On stop, anchored items return by a transition, while seeded and pinned items stay (F24). Restore stays explicit.
 
 Scenotime carries portable epochs, diffs, picking state, and deterministic
 transition schedules between revisions. A transition spec declares class
@@ -431,7 +460,7 @@ Eleven systems reviewed against this catalog in the projection grammar report (2
 - [ATOM](https://www.microsoft.com/en-us/research/publication/atom-a-grammar-for-unit-visualizations/) builds unit visualizations by recursively partitioning data through layout operators until every item has a size and position, and distinguishes unit marks from aggregate marks. Transfers: the recursive-partition operator shape for arrangement factoring, and the unit/aggregate distinction the derived-marks gap needs.
 - [Mosaic](https://idl.uw.edu/mosaic/) makes coordination itself data: a selection is a set of clauses carrying source, clients, predicate, and value, with a declared resolution strategy (single, union, intersect, or crossfilter, where crossfilter means a view is filtered by every brush but its own). Transfers: brush, filter, and focus become named serializable citizens instead of host-only state; the resolution declaration is the part usually left implicit.
 - [Gosling](https://gosling-lang.org/) declares level-of-detail as visibility conditions with an explicit target, measure, operation, threshold, and hysteresis padding. Transfers: the conditions that select a representation rung become part of the spec, so a remote client can re-select on its own zoom and a static realization can state why a rung was chosen.
-- [Penrose](https://penrose.cs.cmu.edu/) separates `ensure` from `encourage`: a hard constraint that must hold and reports when it cannot, against a soft one that is best-effort by design. Transfers: the vocabulary for placement satisfaction, where a pin is ensure-class and an anchored home is encourage-class, and the answer to WebCoLa's silent-soft failure.
+- [Penrose](https://penrose.cs.cmu.edu/) separates `ensure` from `encourage`: a hard constraint that must hold and reports when it cannot, against a soft one that is best-effort by design. Transfers: the vocabulary for placement satisfaction, where a pin is ensure-class and an anchored home is encourage-class, and the answer to WebCoLa's silent-soft failure. *2026-10-03:* `ensure` and `encourage` remain Penrose's own terms. Mere's vocabulary retired them for the pinned and anchored roles, beside the seeded role, which Penrose's split has no word for (dynamics grammar F26).
 - [Bluefish](https://bluefishjs.org/) composes diagrams from declarative relations over a scenegraph that carries hierarchy and adjacency together rather than forcing a single tree. Transfers: confirmation that this catalog's compound scene shape is right, and a reason to hold it deliberately. Nothing to add today.
 - [GoFish](https://vis.csail.mit.edu/pubs/gofish/) formalizes Gestalt relations such as uniform spacing, containment, and connection inside one grammar that covers charts and diagrams alike. Transfers: the chart-side evidence for this catalog's central bet, that a chart, a diagram, and a spatial graph can be projections of one system.
 
@@ -500,6 +529,8 @@ tangible, manipulable objects in the scene rather than host-only state. Mosaic
 - [`2026-06-13_scriptable_field_regions_plan.md`](../implementation_strategy/2026-06-13_scriptable_field_regions_plan.md): field and region model.
 - [`2026-07-21_projection_proofs_plan.md`](../implementation_strategy/2026-07-21_projection_proofs_plan.md): proof sequence and portable projection discipline.
 - [`2026-08-15_projection_grammar_adoption_plan.md`](../implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md): gated targets carrying the projection grammar report's transfers into mere, genet, and cambium.
+- [`2026-10-02_dynamics_grammar_plan.md`](../implementation_strategy/2026-10-02_dynamics_grammar_plan.md): the sibling grammar for motion. Its rulings F18–F30 set the arrangement roles and the recipe slots recorded above.
+- [`2026-10-03_arrangement_and_dynamics_brief.md`](2026-10-03_arrangement_and_dynamics_brief.md): the evidence behind those rulings, with the points where arrangement and physics meet.
 - [`design_docs/scenograph_docs/technical_architecture/2026-07-22_scene_contract_note.md`](../../scenograph_docs/technical_architecture/2026-07-22_scene_contract_note.md): scene ownership contract.
 - [`2026-07-24_scenograph_0_0_3_release_plan.md`](../implementation_strategy/2026-07-24_scenograph_0_0_3_release_plan.md): historical 0.0.3 release boundary.
 

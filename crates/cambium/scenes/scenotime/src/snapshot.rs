@@ -27,12 +27,12 @@ pub struct SceneTables {
     pub regions: Vec<Option<Region>>,
     pub bounds: Rect,
     pub generation: u64,
-    /// Ensure-class placements the solver could not honor, carried through from
+    /// Pinned placements the solver could not honor, carried through from
     /// [`Scene::unmet_holds`] so a remote viewer can tell "placed as pinned"
     /// from "pin unmet" without access to the score that asked.
     #[serde(default)]
     pub unmet_holds: Vec<HeldPlacement>,
-    /// Ensure-class placements the solver honored, carried through from
+    /// Pinned placements the solver honored, carried through from
     /// [`Scene::honored_holds`].
     ///
     /// Both halves are needed for the distinction to survive the hop. Without
@@ -194,12 +194,12 @@ impl SceneSnapshot {
         }
         for unmet in &tables.unmet_holds {
             if !matches!(unmet.hold, Hold::Pinned) {
-                return invalid("an unmet hold must be ensure-class");
+                return invalid("an unmet hold must be pinned");
             }
         }
         for honored in &tables.honored_holds {
             if !matches!(honored.placement.hold, Hold::Pinned) {
-                return invalid("an honored hold must be ensure-class");
+                return invalid("an honored hold must be pinned");
             }
             let item = tables
                 .items
