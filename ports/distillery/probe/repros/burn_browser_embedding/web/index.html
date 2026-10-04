@@ -17,11 +17,36 @@
   <p id="status">idle</p>
   <pre id="output">{}</pre>
   <script type="module">
+    // Receipt gate (Mark, "Gate every receipt"): every uncaught page error or
+    // unhandled rejection is recorded, and any entry fails the receipt.
+    const receiptGateFailures = [];
+    window.addEventListener("error", (event) => {
+      receiptGateFailures.push(`uncaught: ${event.message}`);
+    });
+    window.addEventListener("unhandledrejection", (event) => {
+      receiptGateFailures.push(`unhandled rejection: ${event.reason}`);
+    });
+    // The gate's positive control: `?plant_page_error=throw|reject` plants one
+    // page error while a run is live.
+    function plantPageErrorForControl() {
+      const planted = new URLSearchParams(location.search).get("plant_page_error");
+      if (!planted) return;
+      setTimeout(() => {
+        if (planted === "reject") {
+          Promise.reject(new Error("receipt-gate-control: planted rejection"));
+        } else {
+          throw new Error("receipt-gate-control: planted page error");
+        }
+      }, 100);
+    }
+
     const runButton = document.querySelector("#run");
     const status = document.querySelector("#status");
     const output = document.querySelector("#output");
 
     async function run() {
+      const gateSince = receiptGateFailures.length;
+      plantPageErrorForControl();
       runButton.disabled = true;
       status.textContent = "running";
       const receipt = await new Promise((resolve) => {
@@ -47,7 +72,8 @@
       const passed = receipt.kind === "result"
         && receipt.result.all_cases_match
         && receipt.gpu_errors.length === 0;
-      receipt.passed = passed;
+      receipt.gate_failures = receiptGateFailures.slice(gateSince);
+      receipt.passed = passed && receipt.gate_failures.length === 0;
       output.textContent = JSON.stringify(receipt, null, 2);
       status.textContent = passed ? "passed" : "failed";
       runButton.disabled = false;
