@@ -137,6 +137,11 @@ impl PhysicsBoard {
         self.physics.set_speed(speed);
     }
 
+    /// Bound a frame's ticks above real time (see [`seiche::StepBudget`]).
+    pub fn set_step_budget(&mut self, budget: Option<seiche::StepBudget>) {
+        self.physics.set_step_budget(budget);
+    }
+
     /// Ticks run, the effective speed reached, and whether the budget bound.
     pub fn pace(&self) -> seiche::PaceStats {
         self.physics.pace()
