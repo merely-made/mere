@@ -737,7 +737,14 @@ pull reading −0.33 with 510 overlaps):
   the GPU lane he chose **"Staleness in ticks"**: forces are never more than
   9 simulated ticks old, so the CPU serves more steps at high speed and the
   reached speed shows the cost (against counting staleness in frames, or
-  blocking on the readback at speed).
+  blocking on the readback at speed). Built literally, "a share of each
+  frame" measured the page's frame interval, physics included, so on a page
+  already slower than the display the budget grew with the frames it
+  lengthened (300 nodes at 50x: frames near 500 ms, a budget near 250 ms).
+  Asked which frame, Mark chose **"The display's frame"**: 50% of the
+  display's frame period, the shortest recent interval approximating vsync,
+  so there is no feedback and a slow page keeps its frame rate (against the
+  measured frame as built, or a share of the frame's non-physics time).
   The face offset, diagnosed (2026-10-04, `tree-face-zoom`): the face is
   drawn right and the body wrong, on both pages. Pictograph's gnode style
   scales each body about its centre (the CSS default Livery follows since
