@@ -629,6 +629,36 @@ pull reading −0.33 with 510 overlaps):
   view's fit is the cause, fixes it, and adds a framing assertion to every
   law receipt with a positive control; the framing assertion only; a note.
   Mark chose **"Diagnose and gate"**.
+  *Diagnosed (2026-10-03, `energy-frame` `39387df1`):* two causes. The law's
+  scale: the fixture's two components settle about 9,600 world units apart
+  under Energy's centring (√(r·ΣW/g) with r 60,000, g 0.02), converging slowly
+  (3,882 apart at 6 s, 9,289 at 60 s), with edges at 524 against Springs' 171.
+  The view: the page fits only at boot, on a non-Free arrangement and on Fit
+  graph, never after a law switch, so every law is read at zoom 1 in a world
+  window of about 982×627; even Fit graph cannot frame Energy (zoom 0.064
+  against the floor of 0.1). The framing check (`Canvas::layout_framing`,
+  `layout-outside == 0` on every law receipt, a planted off-screen node
+  counted as exactly 1 for the control) failed before any fix: Energy 11 of
+  11, Kinds 4–5, Anneal 2–3, Orbit 4, the profiles 1–5, edge cases in Charge,
+  Stress and Flow. Asked how the view behaves, Mark chose **"Follow while
+  playing"**: from any law, profile or Free switch the camera eases toward
+  fit-to-content each frame while physics runs; any pan or zoom stops
+  following, and Fit graph resumes it. The alternatives were fitting once at
+  rest, fitting once a fixed time after each switch, or receipts pressing Fit
+  graph with the product unchanged.
+- **Receipts gate on page errors (2026-10-03).** The pre.4 lane found that
+  wgpu 30.0.0 panics once per GPU-on page (`webgpu.rs:85`, "Unexpected
+  error", then `RuntimeError: unreachable`) because wasm-bindgen 0.2.126 and
+  later count only `undefined` as no error while the browser answers `null`;
+  graphshell-web on main has it (0.2.127 with 30.0.0), and 117 receipt files
+  carry it, P5's GPU receipts included, which passed because no headed
+  receipt asserts zero page errors (the coordinator verified P5 without
+  catching it). Asked whether receipts gate on page errors, Mark chose
+  **"Gate every receipt"**: every headed receipt fails on any uncaught page
+  error or panic, with a positive control, landing with the pin fix
+  (wasm-bindgen 0.2.129 with wgpu 30.0.1, burn plan §13.38), and P5's GPU
+  receipts are rerun under it. The alternatives were the GPU receipts only,
+  or recording without failing.
 - **P5's web defaults, undercut by pre.4 (2026-10-03).** On `burn-pre4-repin`
   the web page's frames take 557 ms against pre.2's 12.1 ms, GPU on or off,
   because the wasm module re-runs its static constructors (pliron's
