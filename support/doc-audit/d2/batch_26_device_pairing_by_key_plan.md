@@ -10,7 +10,7 @@
 Audit base: Mere `792967f8` (2026-10-01), plus the four machines read over
 SSH on 2026-10-02. `archive_docs/` is excluded.
 
-This batch exists because the plan is new. Its rulings (1 to 56) are recorded
+This batch exists because the plan is new. Its rulings (1 to 62) are recorded
 in its §3, and its three corrections are carried as dated notes into the SSH
 CA projection plan and the reachability rungs plan (R1, R2); they are not
 counted again here.
@@ -18,7 +18,7 @@ counted again here.
 ## mere_docs/implementation_strategy/2026-10-02_device_pairing_by_key_plan.md
 
 - disposition: current
-- status line: "Status (2026-10-04): in progress. Assessed and ruled by Mark from 2026-10-01 to 2026-10-04 (rulings 1 to 56 below). D1 landed (`4963b489`); D1b's mere fix (M1) landed (`177b927c`), its fork fix (F1) is released as `mere-p2panda-net-0.7.5` (`1bec457e`, pushed), with knot and mere repinned locally. `connected` follows the gossip overlay (ruling 31, `fdb02bd3`) and, off it, open connections (rulings 47 to 56, `005e27ad`). Next the release branch takes `main` again and reruns on iroh 1.3, then knot's and mere's pushes come to Mark; the overlay's gap after restarts has its own lane (ruling 36); then D2." — accurate: yes
+- status line: "Status (2026-10-04): in progress. Assessed and ruled by Mark from 2026-10-01 to 2026-10-04 (rulings 1 to 62 below). D1 landed (`4963b489`); D1b's mere fix (M1) landed (`177b927c`), its fork fix (F1) is released as `mere-p2panda-net-0.7.5` (`1bec457e`, pushed). `connected` follows the gossip overlay (ruling 31, `fdb02bd3`) and, off it, open connections (rulings 47 to 56, `005e27ad`). The repin pushes are under way: Knot's (a) (`eb934b4`) and mere's (b) (`031b3dcc`) are pushed, and Knot's repin (c) follows its checks (rulings 58 to 62); the overlay's gap after restarts has its own lane (ruling 36); then D2." — accurate: yes
 - claims checked: 25 — holds: 25, stale: 0, unverifiable: 0
 
 ### Stale claims
@@ -90,3 +90,11 @@ Added 2026-10-04 with ruling 56: `005e27ad` was compared with the verified
 merge `cc697b8f` (one doc file differs, no code), and the hook in
 `crates/murm/transport/src/p2panda_transport/open_connections.rs` was read
 (counts only; the close future taken while the connection is held).
+
+Added 2026-10-04 with rulings 57 to 60: Knot's GitHub `main` read with
+`git ls-remote` at `eb934b4` after push (a), and the mere push list checked
+with `git log origin/main..` on the repin branch and on local `main`.
+
+Added 2026-10-04 with rulings 61 and 62: mere's GitHub `main` read with
+`git ls-remote` at `031b3dcc` after push (b), and Knot's test helper read at
+`crates/knot-editor/src/resident.rs:685-692` (repin worktree, `eb934b4`).
