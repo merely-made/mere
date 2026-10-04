@@ -764,7 +764,17 @@ pull reading −0.33 with 510 overlaps):
   0.5.4, 70 commits ahead, several fixes matching the failures). He chose
   **"Update, replay, decide"**: build 0.5.4, replay the four mis-merges
   against it, and keep weave only if all come out right, otherwise unwire it
-  workspace-wide.
+  workspace-wide. *Replayed (2026-10-04, logs in `Code/testing/weave-054/`):*
+  upstream `d73c4ae` (v0.5.4 plus 39 unreleased commits; every fix that
+  matters landed after the v0.5.4 tag, so crates.io's 0.5.4 has none) got all
+  four mis-merges right; across 201 replayed files it matched `git
+  merge-file` wherever that was clean, conflicted wherever it conflicted,
+  and refused 2 merges git would have made cleanly but broken, while 0.3.4
+  reproduced every recorded loss and one more (`a31b9a14`, fields dropped in
+  mesquite's `lane.rs`, restored at the time). Asked whether to install it,
+  unwire weave, or wait for a release, Mark chose **"Install d73c4ae,
+  quietly"**: the verified build is installed at a quiet moment, active
+  sessions told first.
   The old page's drag receipt under the following view still failed (Stress
   22 against 20): following had zoomed out to 0.772 before the gesture, so
   the receipt's 220 px drag was about 285 world units. Mark chose **"Measure
