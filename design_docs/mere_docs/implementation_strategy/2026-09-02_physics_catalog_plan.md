@@ -710,7 +710,23 @@ pull reading −0.33 with 510 overlaps):
   offset gets a lane" return as their own questions.
   The speed dial's remote board: Mark chose **"Follows the owner"**: a remote
   board runs at the speed its owner, the device running the simulation, has
-  set, and shows it; the viewer cannot change it.
+  set, and shows it; the viewer cannot change it. *Reopened the same day:*
+  the coordinator's question said the board's pace "is set where the
+  simulation runs", which the speed lane found wrong: the owners (the C4
+  host's `LiveEndpoint`, `mere_host`, djinn's residents) run no simulation
+  for the board, and each viewer simulates its own `PhysicsBoard` from the
+  owner's score, its law mirroring the viewer's canvas (P3). The question
+  goes back to Mark with the finding.
+  Orbit's API: asked how the tangential-only counter-damping meets seiche's
+  public `Gravity::counter_damping: bool` (seiche 0.0.5 publishable), Mark
+  chose **"Explicit enum, bump seiche"**: the bool becomes
+  `CounterDamping::{Off, Full, Tangential}`, Orbit using Tangential, and
+  seiche goes to 0.0.6, so callers must choose. Orbit's framing check under
+  the following view: **"Leave it unmarked"**. The tree page's node faces
+  drawn small and offset below zoom 1 (predating the follow change): **"Its
+  own lane"**. The speed dial's fast receipt peaking at 8,100 µs against its
+  8,000 µs bound, with Chrome's clock resolving 100 µs: **"Bound = budget +
+  clock grain"**.
 - **Receipts gate on page errors (2026-10-03).** The pre.4 lane found that
   wgpu 30.0.0 panics once per GPU-on page (`webgpu.rs:85`, "Unexpected
   error", then `RuntimeError: unreachable`) because wasm-bindgen 0.2.126 and
