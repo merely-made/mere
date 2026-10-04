@@ -645,7 +645,22 @@ pull reading −0.33 with 510 overlaps):
   fit-to-content each frame while physics runs; any pan or zoom stops
   following, and Fit graph resumes it. The alternatives were fitting once at
   rest, fitting once a fixed time after each switch, or receipts pressing Fit
-  graph with the product unchanged.
+  graph with the product unchanged. Asked about Energy's scale (every
+  candidate keeping the two-cliques claim, 3.35 to 4.66 against Springs'
+  2.49 and a bar of 3.24), Mark chose **"Repulsion 6,000, centring 0.2"**: a
+  retune under the same id, the islands 940 apart (ratio 5.1 against Springs'
+  2.6), edges 159, converged by about 20 s, framed at zoom 0.45 by the
+  following view. The alternatives were repulsion 6,000 alone (the same
+  picture at 1/√10, still creeping at 60 s), a fit to the boot view
+  (repulsion 10,000, centring 1.2, the islands mostly merged), or the
+  coefficients kept with a lower minimum zoom. The framing check also found
+  Orbit expanding without bound (extent 25,107 at 60 s, about 420 units a
+  second, kinetic energy flat near 181,000: the catalog's exclusion repulsion
+  outweighs gravity and counter-damping removes friction; without exclusion
+  it reaches 1,026 at 60 s with 1 or 2 overlaps). Mark chose **"Own
+  diagnose-and-retune lane"**: Orbit's framing check keeps failing until that
+  lane lands. The alternatives were fixing it in the Energy lane, or
+  accepting it as a living law and dropping its framing assert.
 - **Receipts gate on page errors (2026-10-03).** The pre.4 lane found that
   wgpu 30.0.0 panics once per GPU-on page (`webgpu.rs:85`, "Unexpected
   error", then `RuntimeError: unreachable`) because wasm-bindgen 0.2.126 and
