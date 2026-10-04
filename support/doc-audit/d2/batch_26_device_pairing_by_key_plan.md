@@ -10,7 +10,7 @@
 Audit base: Mere `792967f8` (2026-10-01), plus the four machines read over
 SSH on 2026-10-02. `archive_docs/` is excluded.
 
-This batch exists because the plan is new. Its rulings (1 to 67) are recorded
+This batch exists because the plan is new. Its rulings (1 to 72) are recorded
 in its §3, and its three corrections are carried as dated notes into the SSH
 CA projection plan and the reachability rungs plan (R1, R2); they are not
 counted again here.
@@ -18,7 +18,7 @@ counted again here.
 ## mere_docs/implementation_strategy/2026-10-02_device_pairing_by_key_plan.md
 
 - disposition: current
-- status line: "Status (2026-10-04): in progress. Assessed and ruled by Mark from 2026-10-01 to 2026-10-04 (rulings 1 to 67 below). D1 landed (`4963b489`); D1b's mere fix (M1) landed (`177b927c`) and its fork fix (F1) shipped in the 0.7.5 repin, pushed 2026-10-04 (fork `1bec457e`, Knot `92367ec`, mere `031b3dcc`). `connected` follows the gossip overlay (ruling 31) and, off it, open connections (rulings 47 to 56). Next: the overlay's gap after restarts, fixed by a patched iroh-gossip carried in a tagged fork (rulings 36, 64 to 67), then D2." — accurate: yes
+- status line: "Status (2026-10-04): in progress. Assessed and ruled by Mark from 2026-10-01 to 2026-10-04 (rulings 1 to 72 below). D1 landed (`4963b489`); D1b's mere fix (M1) landed (`177b927c`) and its fork fix (F1) shipped in the 0.7.5 repin, pushed 2026-10-04 (fork `1bec457e`, Knot `92367ec`, mere `031b3dcc`). `connected` follows the gossip overlay (ruling 31) and, off it, open connections (rulings 47 to 56). The overlay's gap after restarts has a ruled fix in iroh-gossip, held until its next release (rulings 64 to 72). Next: D2." — accurate: yes
 - claims checked: 25 — holds: 25, stale: 0, unverifiable: 0
 
 ### Stale claims
@@ -109,3 +109,7 @@ Added 2026-10-04 with rulings 64 to 67, three claims read: iroh-gossip's
 rows (`Cargo.toml:119-140` at `92367ec`), and 0.101.0's source commit
 `2ce78afe` (`.cargo_vcs_info.json`, upstream's `v0.101.0` tag by
 `git ls-remote`).
+
+Added 2026-10-04 with rulings 68 to 72: upstream iroh-gossip read through
+GitHub's API (`compare/2ce78afe...2885dd9f`, issue #172, PRs #159, #163 and
+#121 with their `hyparview.rs` patches); nothing downloaded.
