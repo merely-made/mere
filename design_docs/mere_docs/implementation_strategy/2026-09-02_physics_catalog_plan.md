@@ -1903,3 +1903,67 @@ binning are the useful patterns.
   `gpu`; pictograph `--features canvas --lib` 279 passed, 13 ignored;
   graphshell `--features web --lib` 232 passed, 1 ignored, single-threaded.
   Logs `gate-r9-*.log`, `r9-quick-check.raw`.
+- 2026-10-04 (Orbit's own lane, after "Own diagnose-and-retune lane";
+  `orbit-retune` from `d60c2b86`, diagnostic `3b79e414`): the cause shown,
+  the law unchanged, the fix back to Mark as a fork. The instrument is
+  `seiche/src/laws/gravity/diag.rs` (ignored tests). It runs the catalog's
+  Orbit split into its terms, exclusion (`NodeExclusion::default()`,
+  220,000/d² out to 1,000), the kick, gravitation (G 9,000, mass 1 + degree,
+  softening 24) and counter-damping, on the P2 fixture and G1's generated
+  40-node graph from the boot Spiral's shape (19√i), and books each term's
+  work on the kinetic energy and its mean outward push per window, with
+  damping and contacts as the residual. Its positive control, exclusion alone
+  at no damping, books 234,313 of work against an energy drop of 230,237.
+  Orbit's set has no centring term.
+  *The cause.* In the first second on P2, exclusion does +176,463 of work,
+  gravitation −18,228 and the kick +16,614 (83%, 9% and 8% of the three;
+  gen-40 76%, 13%, 11%), and exclusion pushes outward 172.8 against
+  gravitation's 16.8 inward (gen-40 245.1 against 43.3). Inside its cutoff
+  exclusion outweighs gravitation 6 to 12 times per pair on P2 (220,000
+  against 9,000 × (1 + degree)), and it releases the tight seed's stored
+  exclusion energy, 230,625 on P2, where the kick gives 16,614.
+  Counter-damping's work equals the damping's loss in every window (547,296
+  each in the first second), so nothing removes the excess: past 6 s every
+  term's work is near zero, the kinetic energy is flat at 211,068 (gen-40
+  1,593,253), and the extent runs 404 at 1 s, 27,405 at 60 s and 54,909 at
+  120 s (gen-40 670, 43,804, 87,713). Controls, as the largest extent over
+  120 s in multiples of the first second's, P2 / gen-40: without exclusion
+  16.5 / 32.4, gen-40 ending with 80 touching pairs (clumped cores and an
+  evaporating halo, so removing exclusion is not enough); without
+  gravitation 136.8 / 133.8; without the kick 137.3 / 132.4; without
+  counter-damping 4.5 / 4.4, with the energy at 8 / 54 by 120 s (the
+  2026-09-03 death); with centring added (`Boundary` 0.08) 4.1 / 4.0, bounded
+  but a radial breathing, tangential share 0.04 / 0.06, the energy swinging
+  between 324 and 157,982.
+  *The candidates*, test forces only, over five spiral seeds (spacing 16 to
+  40) at both pages' dampings (the tree page's 2.5, the old page's 0.82) for
+  120 s. *Reading, not ruled:* the bar is an extent within 3× the first
+  second's; from 6 s a tangential share and an angular-momentum coherence of
+  at least 0.8; at least one revolution; energy above the receipts' floor
+  of 1; no overlaps; hubs inside (mass against radius below zero). Failing,
+  on the boot seed: an escape brake (unbound bodies damped), 18.6 / 20.3,
+  because each body stays bound to its own cluster while the clusters fly
+  apart; a cap at the kick's energy, 49.6 / 52.8; exclusion cut to two node
+  diameters alone, 98.2 / 79.1, and with softening 72, 100.6 / 87.0.
+  Failing on the sweep: centring 0.02 with today's counter-damping, worst
+  6.3, tangential 0.28; counter-damping on orbital (tangential) motion only,
+  with exclusion at two diameters, worst 2.9 / 3.0 / 2.7 / 4.3 (P2 at 2.5,
+  P2 at 0.82, gen-40 at 2.5, gen-40 at 0.82), with coherence 0.23 on the
+  tight seed at 0.82, where counter-rotating bodies left by the blow-out
+  cancel and reverse the rotation; the same at three diameters, worst 2.8,
+  coherence 0.35 on one seed; the law's own radial damping at 2.5, worst
+  3.0, energy 19 on one seed. Passing on every seed: (A) orbital-only
+  counter-damping, exclusion at two diameters and centring 0.02, worst
+  1.88 / 1.60 / 2.42 / 2.01, least tangential 0.90, coherence 0.92,
+  revolutions 2.95, energy 179, mass against radius at most −0.18, no
+  overlaps; (B) as A, with only motion in the kick's sense frictionless,
+  worst 1.88 / 1.83 / 2.16 / 2.08, least 0.92, 0.93, 3.42, energy 262, at
+  most −0.15. Nearly passing: (C) that prograde form with exclusion at three
+  diameters and no centring, worst 1.98 / 1.77 / 1.93 / 2.83, but 0.86
+  revolutions and energy 58 on one seed. Back to Mark as a fork, A
+  recommended. Gates on `3b79e414` (offline, locked, debug): seiche 109/109,
+  105/105 without default features, 109/109 with `gpu` (6 ignored, the
+  diagnostics); pictograph `--features canvas --lib` 279 passed, 13 ignored,
+  `physics_terms` green; graphshell `--features web --lib` 232 passed, 1
+  ignored, single-threaded. Logs `Code/testing/mere/orbit/` (`diag-*.log`,
+  `gate-diag-*.log`).
