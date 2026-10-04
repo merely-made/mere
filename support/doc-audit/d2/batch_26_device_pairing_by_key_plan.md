@@ -2,15 +2,15 @@
 
 | doc | disposition | status accurate | claims | holds | stale | unverifiable |
 |---|---|---:|---:|---:|---:|---:|
-| mere_docs/implementation_strategy/2026-10-02_device_pairing_by_key_plan.md | current | yes | 23 | 23 | 0 | 0 |
-| **Totals** |  |  | **23** | **23** | **0** | **0** |
+| mere_docs/implementation_strategy/2026-10-02_device_pairing_by_key_plan.md | current | yes | 25 | 25 | 0 | 0 |
+| **Totals** |  |  | **25** | **25** | **0** | **0** |
 
-**Totals: 1 doc, 23 claims checked (23 holds, 0 stale, 0 unverifiable), 0 contradictions.**
+**Totals: 1 doc, 25 claims checked (25 holds, 0 stale, 0 unverifiable), 0 contradictions.**
 
 Audit base: Mere `792967f8` (2026-10-01), plus the four machines read over
 SSH on 2026-10-02. `archive_docs/` is excluded.
 
-This batch exists because the plan is new. Its rulings (1 to 51) are recorded
+This batch exists because the plan is new. Its rulings (1 to 74) are recorded
 in its §3, and its three corrections are carried as dated notes into the SSH
 CA projection plan and the reachability rungs plan (R1, R2); they are not
 counted again here.
@@ -18,8 +18,8 @@ counted again here.
 ## mere_docs/implementation_strategy/2026-10-02_device_pairing_by_key_plan.md
 
 - disposition: current
-- status line: "Status (2026-10-03): in progress. Assessed and ruled by Mark from 2026-10-01 to 2026-10-03 (rulings 1 to 51 below). D1 landed (`4963b489`); D1b's mere fix (M1) landed (`177b927c`), its fork fix (F1) is released as `mere-p2panda-net-0.7.5` (`1bec457e`, pushed), with knot and mere repinned locally and `main` merged into the repin (`259f2741`); `connected` follows the gossip overlay (ruling 31, landed `fdb02bd3`). Before knot's and mere's pushes, connection-event liveness for peers off the overlay is built on `main` (rulings 47 to 51) and the release branch takes `main` again; the overlay's gap after restarts has its own lane (ruling 36); then D2." — accurate: yes
-- claims checked: 23 — holds: 23, stale: 0, unverifiable: 0
+- status line: "Status (2026-10-04): in progress. Assessed and ruled by Mark from 2026-10-01 to 2026-10-04 (rulings 1 to 74 below). D1 landed (`4963b489`); D1b's mere fix (M1) landed (`177b927c`) and its fork fix (F1) shipped in the 0.7.5 repin, pushed 2026-10-04 (fork `1bec457e`, Knot `92367ec`, mere `031b3dcc`). `connected` follows the gossip overlay (ruling 31) and, off it, open connections (rulings 47 to 56). The overlay's gap after restarts has a ruled fix in iroh-gossip, held until its next release (rulings 64 to 72). Paused before D2 while chatelaine P4a runs (ruling 73)." — accurate: yes
+- claims checked: 25 — holds: 25, stale: 0, unverifiable: 0
 
 ### Stale claims
 
@@ -78,3 +78,42 @@ with the hook and weak-handle code identical in 1.2.0; and p2panda's builder
 appending hooks (`p2panda-net/src/iroh_endpoint/builder.rs:85-94`), unchanged
 between `0a54ab82` and `1bec457e`. The release merge `259f2741` was read in
 `C:\t\mere-repin`: signalman names no Retinue rev, the root one (`fa4f925`).
+
+Added 2026-10-03 with rulings 52 to 55, two claims read in the source: p2panda
+passing only its caller's hooks to iroh (`iroh_endpoint/actors/endpoint.rs:214`,
+at `0a54ab82` and `1bec457e`) with `ConnectionBlockList` a caller-added type
+(`authoriser.rs:76`) and no hook in mere; and `DeviceDirectoryV1` and
+`PairedDeviceV1` denying unknown fields (`ports/djinn/src/resident_devices.rs:62,
+72`). The first corrects ruling 51's question text, annotated there.
+
+Added 2026-10-04 with ruling 56: `005e27ad` was compared with the verified
+merge `cc697b8f` (one doc file differs, no code), and the hook in
+`crates/murm/transport/src/p2panda_transport/open_connections.rs` was read
+(counts only; the close future taken while the connection is held).
+
+Added 2026-10-04 with rulings 57 to 60: Knot's GitHub `main` read with
+`git ls-remote` at `eb934b4` after push (a), and the mere push list checked
+with `git log origin/main..` on the repin branch and on local `main`.
+
+Added 2026-10-04 with rulings 61 and 62: mere's GitHub `main` read with
+`git ls-remote` at `031b3dcc` after push (b), and Knot's test helper read at
+`crates/knot-editor/src/resident.rs:685-692` (repin worktree, `eb934b4`).
+
+Added 2026-10-04 with ruling 63: Knot's GitHub `main` read with
+`git ls-remote` at `92367ec` after push (c), and the Collapse control log
+(`C:/t/p2panda-075-logs/r61/control-ea3e99e-collapse.log`) read: three
+failures at `collapse.rs:44`, one pass.
+
+Added 2026-10-04 with rulings 64 to 67, three claims read: iroh-gossip's
+`Command` enum (`api.rs:376-382`), Knot's patch table restating the p2panda
+rows (`Cargo.toml:119-140` at `92367ec`), and 0.101.0's source commit
+`2ce78afe` (`.cargo_vcs_info.json`, upstream's `v0.101.0` tag by
+`git ls-remote`).
+
+Added 2026-10-04 with rulings 68 to 72: upstream iroh-gossip read through
+GitHub's API (`compare/2ce78afe...2885dd9f`, issue #172, PRs #159, #163 and
+#121 with their `hyparview.rs` patches); nothing downloaded.
+
+Added 2026-10-04 with rulings 73 and 74: C: free space read before and after
+the cleanup (`Get-PSDrive C`), and each removed worktree's `HEAD` checked
+against `origin/main`.

@@ -823,6 +823,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "az"
+version = "1.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "be5eb007b7cacc6c660343e96f650fedf4b5a77512399eb952ca6642cf8d13f7"
+
+[[package]]
 name = "backon"
 version = "1.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4712,6 +4718,27 @@ dependencies = [
 ]
 
 [[package]]
+name = "embedded-graphics"
+version = "0.8.2"
+source = "git+https://github.com/merely-made/retinue.git?rev=fa4f925059cc698058cb21fecc1c825d095741a9#fa4f925059cc698058cb21fecc1c825d095741a9"
+dependencies = [
+ "az",
+ "byteorder",
+ "embedded-graphics-core",
+ "float-cmp",
+ "micromath",
+]
+
+[[package]]
+name = "embedded-graphics-core"
+version = "0.4.1"
+source = "git+https://github.com/merely-made/retinue.git?rev=fa4f925059cc698058cb21fecc1c825d095741a9#fa4f925059cc698058cb21fecc1c825d095741a9"
+dependencies = [
+ "az",
+ "byteorder",
+]
+
+[[package]]
 name = "embedded-hal"
 version = "0.2.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5211,9 +5238,9 @@ dependencies = [
 [[package]]
 name = "fleece"
 version = "0.5.0"
-source = "git+https://github.com/merely-made/genet.git?rev=34626a6c82ee19f78609b8ebad8d513d3cc9c4cd#34626a6c82ee19f78609b8ebad8d513d3cc9c4cd"
+source = "git+https://github.com/merely-made/genet.git?rev=69a2383b2ad777b884a72f31f8f8fb7ece275c0b#69a2383b2ad777b884a72f31f8f8fb7ece275c0b"
 dependencies = [
- "layout-dom-api 0.1.1 (git+https://github.com/merely-made/genet.git?rev=34626a6c82ee19f78609b8ebad8d513d3cc9c4cd)",
+ "layout-dom-api 0.1.1 (git+https://github.com/merely-made/genet.git?rev=69a2383b2ad777b884a72f31f8f8fb7ece275c0b)",
  "sha2 0.10.9",
  "unicode-bidi",
  "unicode-segmentation",
@@ -5230,6 +5257,15 @@ dependencies = [
  "sha2 0.10.9",
  "unicode-bidi",
  "unicode-segmentation",
+]
+
+[[package]]
+name = "float-cmp"
+version = "0.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "98de4bbd547a563b716d8dfa9aad1cb19bfab00f4fa09a6a4ed21dbcf44ce9c4"
+dependencies = [
+ "num-traits",
 ]
 
 [[package]]
@@ -7405,9 +7441,9 @@ checksum = "1663ee7d8cf2900cc1414b1e1eec9f348d6eaa3bcab07579f4726a4b8499f447"
 
 [[package]]
 name = "iroh"
-version = "1.2.0"
+version = "1.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b2f8d1cfffc83efe39a1031aab423ce09cb8048071baba550508931e9a81ce46"
+checksum = "885787b892b5e2507c701f132ecbd45d2bad4bbb75157a19427087c16dadb833"
 dependencies = [
  "backon",
  "blake3",
@@ -7455,9 +7491,9 @@ dependencies = [
 
 [[package]]
 name = "iroh-base"
-version = "1.2.0"
+version = "1.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ffd1efd1aaecd68d4d1b0727a30c5811f43fb822843e48f65f6e5db3b7256cc9"
+checksum = "6ae9092be76c9f5429776ab3394f5a5a78dc19dc2524267e884a5b9781546c3f"
 dependencies = [
  "curve25519-dalek 5.0.0",
  "data-encoding",
@@ -7578,9 +7614,9 @@ dependencies = [
 
 [[package]]
 name = "iroh-mdns-address-lookup"
-version = "0.5.0"
+version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cad3dfcaddd5c3681bf0a42606498fc6e8891de793408dfbc46a9fbe76f370b3"
+checksum = "7afb03c296022fcb724a7bb76dbb8dcca6aac4f4eb65df161e084b7276c93d8c"
 dependencies = [
  "data-encoding",
  "derive_more",
@@ -7598,9 +7634,9 @@ dependencies = [
 
 [[package]]
 name = "iroh-metrics"
-version = "1.0.1"
+version = "1.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "291065721ad7c477b972e581bbc528df031dc8eb5e39fe1ff3300ae5dfb157ef"
+checksum = "8ede55536349842337f7cdc63012ec33dc637945f3259c98a0763aac364cdf09"
 dependencies = [
  "iroh-metrics-derive",
  "itoa",
@@ -7625,9 +7661,9 @@ dependencies = [
 
 [[package]]
 name = "iroh-relay"
-version = "1.2.0"
+version = "1.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "beb2294a9749d6a25fd7cd8bcf0fccd932f20716d4f967d85d3f23c7135ae6a2"
+checksum = "ee116a8233f84980574bb8d11e4517503080cd2c3605bafca04ee9c35d708bd9"
 dependencies = [
  "blake3",
  "bytes",
@@ -7925,9 +7961,9 @@ checksum = "206bf4773a58f2a051a24fb77cb6c5eeaa84403c0dc5d072ec460ed1648db594"
 
 [[package]]
 name = "js-sys"
-version = "0.3.104"
+version = "0.3.106"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0e0c1080212aad755ea003d18543e8768dd432c48819efd73a7bf1e39b7a5a3a"
+checksum = "7883d941dae510fb2d978fc3fe018c71c9e2892fd38854de3e8b92c2e5ad9cc5"
 dependencies = [
  "cfg-if",
  "futures-util",
@@ -7998,7 +8034,7 @@ checksum = "e2db585e1d738fc771bf08a151420d3ed193d9d895a36df7f6f8a9456b911ddc"
 [[package]]
 name = "knot-capture"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?rev=855cb75d939fbfbb2af847bda8f5e6a5d3b8b764#855cb75d939fbfbb2af847bda8f5e6a5d3b8b764"
+source = "git+https://github.com/merely-made/knot-editor.git?rev=562353aa0537b7f82bb9d069cf89bb250539a149#562353aa0537b7f82bb9d069cf89bb250539a149"
 dependencies = [
  "knot-file-catalog",
 ]
@@ -8006,7 +8042,7 @@ dependencies = [
 [[package]]
 name = "knot-document"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?rev=855cb75d939fbfbb2af847bda8f5e6a5d3b8b764#855cb75d939fbfbb2af847bda8f5e6a5d3b8b764"
+source = "git+https://github.com/merely-made/knot-editor.git?rev=562353aa0537b7f82bb9d069cf89bb250539a149#562353aa0537b7f82bb9d069cf89bb250539a149"
 dependencies = [
  "cambium",
  "illume",
@@ -8022,7 +8058,7 @@ dependencies = [
 [[package]]
 name = "knot-editor"
 version = "0.0.3"
-source = "git+https://github.com/merely-made/knot-editor.git?rev=855cb75d939fbfbb2af847bda8f5e6a5d3b8b764#855cb75d939fbfbb2af847bda8f5e6a5d3b8b764"
+source = "git+https://github.com/merely-made/knot-editor.git?rev=562353aa0537b7f82bb9d069cf89bb250539a149#562353aa0537b7f82bb9d069cf89bb250539a149"
 dependencies = [
  "base64 0.22.1",
  "blake3",
@@ -8030,7 +8066,7 @@ dependencies = [
  "chirograph",
  "eidetic",
  "esp",
- "fleece 0.5.0 (git+https://github.com/merely-made/genet.git?rev=34626a6c82ee19f78609b8ebad8d513d3cc9c4cd)",
+ "fleece 0.5.0 (git+https://github.com/merely-made/genet.git?rev=69a2383b2ad777b884a72f31f8f8fb7ece275c0b)",
  "graphshell-endpoint",
  "inker",
  "insigne",
@@ -8089,7 +8125,7 @@ dependencies = [
 [[package]]
 name = "knot-file-catalog"
 version = "0.0.1"
-source = "git+https://github.com/merely-made/knot-editor.git?rev=855cb75d939fbfbb2af847bda8f5e6a5d3b8b764#855cb75d939fbfbb2af847bda8f5e6a5d3b8b764"
+source = "git+https://github.com/merely-made/knot-editor.git?rev=562353aa0537b7f82bb9d069cf89bb250539a149#562353aa0537b7f82bb9d069cf89bb250539a149"
 dependencies = [
  "muniment",
  "pollster",
@@ -8163,7 +8199,7 @@ checksum = "d4345964bb142484797b161f473a503a434de77149dd8c7427788c6e13379388"
 [[package]]
 name = "layout-dom-api"
 version = "0.1.1"
-source = "git+https://github.com/merely-made/genet.git?rev=34626a6c82ee19f78609b8ebad8d513d3cc9c4cd#34626a6c82ee19f78609b8ebad8d513d3cc9c4cd"
+source = "git+https://github.com/merely-made/genet.git?rev=69a2383b2ad777b884a72f31f8f8fb7ece275c0b#69a2383b2ad777b884a72f31f8f8fb7ece275c0b"
 dependencies = [
  "markup5ever",
 ]
@@ -8547,6 +8583,12 @@ checksum = "0fae87c125b03c1d2c0150c90365d7d6bcc53fb73a9acaef207d2d065860f062"
 dependencies = [
  "imgref",
 ]
+
+[[package]]
+name = "lora-modulation"
+version = "0.1.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2c96c4a41a1f1ad04de765306e1829c7007a37898fe4033204fa82cf2e055624"
 
 [[package]]
 name = "lru"
@@ -9037,8 +9079,8 @@ dependencies = [
 
 [[package]]
 name = "mere-p2panda-net"
-version = "0.7.4"
-source = "git+https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.4#0a54ab825f6012dc9e04fd505a247daf3c698d18"
+version = "0.7.5"
+source = "git+https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5#1bec457efe7df4dd85f657902f7333ce857620d8"
 dependencies = [
  "futures-channel",
  "futures-util",
@@ -9100,6 +9142,28 @@ dependencies = [
  "toml 0.8.23",
  "tower",
  "url",
+]
+
+[[package]]
+name = "mere-signalman"
+version = "0.0.1"
+dependencies = [
+ "blake3",
+ "castellan",
+ "insigne",
+ "outrider",
+ "p2panda-core",
+ "pandect",
+ "personae",
+ "postilion",
+ "radio-hand",
+ "retinue",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "tokio",
+ "uuid",
+ "zeroize",
 ]
 
 [[package]]
@@ -9196,6 +9260,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "micromath"
+version = "2.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c3c8dda44ff03a2f238717214da50f65d5a53b45cd213a7370424ffdb6fae815"
+
+[[package]]
 name = "mien"
 version = "0.0.1"
 dependencies = [
@@ -9249,9 +9319,9 @@ dependencies = [
 
 [[package]]
 name = "minicov"
-version = "0.3.9"
+version = "0.3.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c3aa3aa12b448ac225b3102217d1ac5cc717908f02722926524b0599c933c7a0"
+checksum = "4869b6a491569605d66d3952bcdf03df789e5b536e5f0cf7758a7f08a55ae24d"
 dependencies = [
  "cc",
  "walkdir",
@@ -11167,6 +11237,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "outrider"
+version = "0.2.0"
+source = "git+https://github.com/merely-made/retinue.git?rev=fa4f925059cc698058cb21fecc1c825d095741a9#fa4f925059cc698058cb21fecc1c825d095741a9"
+dependencies = [
+ "hkdf 0.13.0",
+ "retinue",
+ "rmpv",
+ "sha2 0.11.0",
+ "thiserror 2.0.20",
+ "tulle",
+]
+
+[[package]]
 name = "owned_ttf_parser"
 version = "0.25.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -11541,7 +11624,7 @@ dependencies = [
 [[package]]
 name = "p2panda-auth"
 version = "0.7.1"
-source = "git+https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.4#0a54ab825f6012dc9e04fd505a247daf3c698d18"
+source = "git+https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5#1bec457efe7df4dd85f657902f7333ce857620d8"
 dependencies = [
  "p2panda-core",
  "petgraph 0.8.3",
@@ -11552,7 +11635,7 @@ dependencies = [
 [[package]]
 name = "p2panda-core"
 version = "0.7.1"
-source = "git+https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.4#0a54ab825f6012dc9e04fd505a247daf3c698d18"
+source = "git+https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5#1bec457efe7df4dd85f657902f7333ce857620d8"
 dependencies = [
  "blake3",
  "cbor-core",
@@ -11567,7 +11650,7 @@ dependencies = [
 [[package]]
 name = "p2panda-discovery"
 version = "0.7.1"
-source = "git+https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.4#0a54ab825f6012dc9e04fd505a247daf3c698d18"
+source = "git+https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5#1bec457efe7df4dd85f657902f7333ce857620d8"
 dependencies = [
  "blake3",
  "futures-util",
@@ -11582,7 +11665,7 @@ dependencies = [
 [[package]]
 name = "p2panda-encryption"
 version = "0.7.1"
-source = "git+https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.4#0a54ab825f6012dc9e04fd505a247daf3c698d18"
+source = "git+https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5#1bec457efe7df4dd85f657902f7333ce857620d8"
 dependencies = [
  "chacha20poly1305 0.10.1",
  "curve25519-dalek 5.0.0",
@@ -11605,7 +11688,7 @@ dependencies = [
 [[package]]
 name = "p2panda-store"
 version = "0.7.1"
-source = "git+https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.4#0a54ab825f6012dc9e04fd505a247daf3c698d18"
+source = "git+https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5#1bec457efe7df4dd85f657902f7333ce857620d8"
 dependencies = [
  "async-stream",
  "futures-util",
@@ -11615,7 +11698,7 @@ dependencies = [
 [[package]]
 name = "p2panda-stream"
 version = "0.7.1"
-source = "git+https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.4#0a54ab825f6012dc9e04fd505a247daf3c698d18"
+source = "git+https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5#1bec457efe7df4dd85f657902f7333ce857620d8"
 dependencies = [
  "futures-util",
  "p2panda-core",
@@ -11629,7 +11712,7 @@ dependencies = [
 [[package]]
 name = "p2panda-sync"
 version = "0.7.1"
-source = "git+https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.4#0a54ab825f6012dc9e04fd505a247daf3c698d18"
+source = "git+https://github.com/mark-ik/p2panda.git?tag=mere-p2panda-net-0.7.5#1bec457efe7df4dd85f657902f7333ce857620d8"
 dependencies = [
  "futures-channel",
  "futures-util",
@@ -12604,6 +12687,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "postilion"
+version = "0.2.0"
+source = "git+https://github.com/merely-made/retinue.git?rev=fa4f925059cc698058cb21fecc1c825d095741a9#fa4f925059cc698058cb21fecc1c825d095741a9"
+dependencies = [
+ "getrandom 0.3.4",
+ "heapless 0.9.3",
+ "outrider",
+ "radio-hand",
+ "retinue",
+ "selvage",
+ "serial2-tokio",
+ "thiserror 2.0.20",
+ "tokio",
+ "tulle",
+]
+
+[[package]]
 name = "potential_utf"
 version = "0.1.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -13059,6 +13159,29 @@ dependencies = [
  "wasm-bindgen",
  "wasm-bindgen-futures",
  "web-time",
+]
+
+[[package]]
+name = "radio-face"
+version = "0.0.1"
+source = "git+https://github.com/merely-made/retinue.git?rev=fa4f925059cc698058cb21fecc1c825d095741a9#fa4f925059cc698058cb21fecc1c825d095741a9"
+dependencies = [
+ "embedded-graphics",
+]
+
+[[package]]
+name = "radio-hand"
+version = "0.0.1"
+source = "git+https://github.com/merely-made/retinue.git?rev=fa4f925059cc698058cb21fecc1c825d095741a9#fa4f925059cc698058cb21fecc1c825d095741a9"
+dependencies = [
+ "ed25519-dalek 3.0.0",
+ "heapless 0.9.3",
+ "hmac 0.13.0",
+ "lora-modulation",
+ "radio-face",
+ "retinue",
+ "selvage",
+ "sha2 0.11.0",
 ]
 
 [[package]]
@@ -13691,6 +13814,7 @@ dependencies = [
  "hmac 0.13.0",
  "sha2 0.11.0",
  "tokio",
+ "tulle",
  "x25519-dalek 3.0.0",
 ]
 
@@ -13800,6 +13924,15 @@ checksum = "72f81bee8c8ef9b577d1681a70ebbc962c232461e397b22c208c43c04b67a155"
 dependencies = [
  "rmp",
  "serde",
+]
+
+[[package]]
+name = "rmpv"
+version = "1.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7a4e1d4b9b938a26d2996af33229f0ca0956c652c1375067f0b45291c1df8417"
+dependencies = [
+ "rmp",
 ]
 
 [[package]]
@@ -14445,6 +14578,11 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2ab42ca02749e120097e328d91d415325bdf43b1c72c4c8badf37375fe40a813"
 
 [[package]]
+name = "selvage"
+version = "0.1.0"
+source = "git+https://github.com/merely-made/retinue.git?rev=fa4f925059cc698058cb21fecc1c825d095741a9#fa4f925059cc698058cb21fecc1c825d095741a9"
+
+[[package]]
 name = "semver"
 version = "1.0.28"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -14580,6 +14718,29 @@ checksum = "66cf8fedced2fcf12406bcb34223dffb92eaf34908ede12fed414c82b7f00b3e"
 dependencies = [
  "base16ct 1.0.0",
  "serde",
+]
+
+[[package]]
+name = "serial2"
+version = "0.2.38"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b16809bc35793b19ce4e0c53924bc0dce3937f15487997cfdaed936004180730"
+dependencies = [
+ "cfg-if",
+ "libc",
+ "windows-sys 0.61.2",
+]
+
+[[package]]
+name = "serial2-tokio"
+version = "0.1.25"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5da5d1d379ecbacdfb9cd4b971b1b475947e4dca84249e9cde9b57109a5e7c28"
+dependencies = [
+ "libc",
+ "serial2",
+ "tokio",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -16438,6 +16599,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d2df906b07856748fa3f6e0ad0cbaa047052d4a7dd609e231c4f72cee8c36f31"
 
 [[package]]
+name = "tulle"
+version = "0.1.0"
+source = "git+https://github.com/merely-made/retinue.git?rev=fa4f925059cc698058cb21fecc1c825d095741a9#fa4f925059cc698058cb21fecc1c825d095741a9"
+dependencies = [
+ "selvage",
+ "serial2-tokio",
+ "tokio",
+]
+
+[[package]]
 name = "tungstenite"
 version = "0.29.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -16951,9 +17122,9 @@ dependencies = [
 
 [[package]]
 name = "wasm-bindgen"
-version = "0.2.127"
+version = "0.2.129"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1b70935747edd64d89de3efa29d73789b806c15798f8e7dca4d8ac356b50ce70"
+checksum = "9bb54f33acc68fd454578d9820b0bde1a1a3d17aa17bb7b6595806d02886d409"
 dependencies = [
  "cfg-if",
  "once_cell",
@@ -16964,19 +17135,20 @@ dependencies = [
 
 [[package]]
 name = "wasm-bindgen-futures"
-version = "0.4.77"
+version = "0.4.79"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6b7777d5cc23d0e91404e53ce2d5e8ec7acae3026b16233dba62cd3246457950"
+checksum = "3cbab34de2d982e9b48e18d216d04c4a6f641066ff19ffb699980f591ee3610e"
 dependencies = [
  "js-sys",
+ "tokio",
  "wasm-bindgen",
 ]
 
 [[package]]
 name = "wasm-bindgen-macro"
-version = "0.2.127"
+version = "0.2.129"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "77775f8f3f7217702089053b94958f8f54061a3f663417df76e19cbdcca29bc1"
+checksum = "2e29d0c35b16e224a7eeb5cd2d25e3e1968fbd65604117b44d3b789d00ee8535"
 dependencies = [
  "quote",
  "wasm-bindgen-macro-support",
@@ -16984,31 +17156,31 @@ dependencies = [
 
 [[package]]
 name = "wasm-bindgen-macro-support"
-version = "0.2.127"
+version = "0.2.129"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e11d33f857dc2fb11b8bc75aee111aa9cbeb12cd9f25efd3d4c2a3dd4e235284"
+checksum = "6f501a8bc3719dba86ef8ae4728879c08001bea749eb1333ac5b91e040e2a6b7"
 dependencies = [
  "bumpalo",
  "proc-macro2",
  "quote",
- "syn 2.0.119",
+ "syn 3.0.6",
  "wasm-bindgen-shared",
 ]
 
 [[package]]
 name = "wasm-bindgen-shared"
-version = "0.2.127"
+version = "0.2.129"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7ef64dbcc55df09c7e5a46182d181c2cfa3e925f3da937ea764728b4bbb9dcbf"
+checksum = "23f0c9c52aa7cd7d77769a4cfe2a9adb1b331f489a41d912ce14513d5ab995c6"
 dependencies = [
  "unicode-ident",
 ]
 
 [[package]]
 name = "wasm-bindgen-test"
-version = "0.3.77"
+version = "0.3.79"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "895a2607575412a4eda1df892084a375ea10dfeadc4d7d2ab87b854e4ddc7ba1"
+checksum = "ae7499dfd45780a0a91d7ee6bb9ac51970a4479a41a89da443fdda5a39547d42"
 dependencies = [
  "async-trait",
  "cast",
@@ -17028,20 +17200,20 @@ dependencies = [
 
 [[package]]
 name = "wasm-bindgen-test-macro"
-version = "0.3.77"
+version = "0.3.79"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4288cb0ebe215033bf949ae1fd046726daa4c32a157f24b9dc6ac387a52aa759"
+checksum = "3b84b5ac638bfb168196a1a461fcc8f46a294a18b1b6be52133b4e0db122cc9f"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.119",
+ "syn 3.0.6",
 ]
 
 [[package]]
 name = "wasm-bindgen-test-shared"
-version = "0.2.127"
+version = "0.2.129"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "33ff1c1b360982e93b6d8ea9c04836f71dba0817a16f91e229cf3a51bdd9d987"
+checksum = "4f692aa943ccd88363733b77063f32cfed5bc6cbea8e6e8b251b302f881606fe"
 
 [[package]]
 name = "wasm-compose"
@@ -17570,9 +17742,9 @@ dependencies = [
 
 [[package]]
 name = "web-sys"
-version = "0.3.104"
+version = "0.3.106"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c435338968042f4f59a557f690a253676d47ce13ceb55d70100e7facf6620a30"
+checksum = "88261b9deccee56594c11a3460c462c41f58d148598fe70ad77070126a68aba4"
 dependencies = [
  "js-sys",
  "wasm-bindgen",
@@ -19199,8 +19371,3 @@ source = "git+https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff9efdaf0ff6
 name = "boa_gc"
 version = "1.0.0-dev"
 source = "git+https://github.com/mark-ik/boa.git?branch=genet#52cfb6ff9efdaf0ff6d213ab107bbaefe5838ab0"
-
-[[patch.unused]]
-name = "iroh-mdns-address-lookup"
-version = "0.4.0"
-source = "git+https://github.com/mark-ik/iroh-address-lookups.git?branch=mere#1f7cfe8552f1512b55e54f0e0ce933d288f80cea"

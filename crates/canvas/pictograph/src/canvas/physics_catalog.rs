@@ -45,9 +45,9 @@ use petgraph::data::Element;
 use petgraph::graph::{DiGraph, EdgeIndex, NodeIndex, UnGraph};
 use petgraph::visit::EdgeRef;
 use seiche::{
-    Anneal, BarnesHutRepulsion, Boids, Boundary, DegreeRepulsion, DepthGravity, DomainCluster,
-    EdgeSpring, Force, Gravity, GravityLocus, GridSnap, Hold, HubGravity, Kuramoto, LinLogForce,
-    MagneticSpring, NodeExclusion, ParticleLife, StressSpring,
+    Anneal, BarnesHutRepulsion, Boids, Boundary, DegreeRepulsion, Density, DepthGravity,
+    DomainCluster, EdgeSpring, Force, Gravity, GravityLocus, GridSnap, Hold, HubGravity, Kuramoto,
+    LinLogForce, MagneticSpring, NodeExclusion, ParticleLife, StressSpring,
 };
 
 use crate::canvas::seiche_bridge::visible_relation_edges;
@@ -66,6 +66,18 @@ const SKELETON_STIFFNESS: f32 = 60.0;
 /// (`220_000 / 36² ≈ 170`): the seiche default of 2 400 left bodies
 /// touching under the edge springs. (Physics catalog — the Charge receipt.)
 pub(crate) const CHARGE_STRENGTH: f32 = 6_000.0;
+/// Density's grid resolution on the CPU tier (cells per side): 64², ruled
+/// 2026-10-02 (the same ranks as 128² at about a sixteenth of the cost).
+pub const DENSITY_RESOLUTION: usize = 64;
+/// Density's convergence test (ruled 2026-10-02): passes end once the mean
+/// node shift stays under a twentieth of a spacing for three passes in a
+/// row; the pass cap ends them if the test never does.
+pub const DENSITY_STOP: seiche::DensityStop = seiche::DensityStop::Shift(0.05);
+pub const DENSITY_PATIENCE: u32 = 3;
+pub const DENSITY_MAX_PASSES: u32 = 120;
+/// The fewest passes before the stop test may end them (ruled 2026-10-03,
+/// "Min 60, bar: all >= 0.7").
+pub const DENSITY_MIN_PASSES: u32 = 60;
 
 /// The physics law: which dynamics the graph moves under. Ids are technical
 /// (`family.method`), labels plain, as the arrangement catalog does it.
@@ -106,10 +118,13 @@ pub enum PhysicsLaw {
     /// No law: bodies hold where the arrangement (or a hand) put them
     /// (velocity zeroed each tick, so contacts can only nudge).
     Still,
+    /// Gastner–Newman density equalizing: nodes flow down the gradient of a
+    /// diffused mass density until it is even, so room follows mass.
+    Density,
 }
 
 impl PhysicsLaw {
-    pub const ALL: [PhysicsLaw; 11] = [
+    pub const ALL: [PhysicsLaw; 12] = [
         PhysicsLaw::Springs,
         PhysicsLaw::Charge,
         PhysicsLaw::Stress,
@@ -121,6 +136,7 @@ impl PhysicsLaw {
         PhysicsLaw::Flow,
         PhysicsLaw::Anneal,
         PhysicsLaw::Still,
+        PhysicsLaw::Density,
     ];
 
     pub fn id(self) -> &'static str {
@@ -136,6 +152,7 @@ impl PhysicsLaw {
             PhysicsLaw::Flow => "flow.magnetic",
             PhysicsLaw::Anneal => "anneal.davidson-harel",
             PhysicsLaw::Still => "still.default",
+            PhysicsLaw::Density => "density.gastner-newman",
         }
     }
 
@@ -152,6 +169,7 @@ impl PhysicsLaw {
             PhysicsLaw::Flow => "Flow",
             PhysicsLaw::Anneal => "Anneal",
             PhysicsLaw::Still => "Still",
+            PhysicsLaw::Density => "Density",
         }
     }
 
@@ -172,12 +190,45 @@ impl PhysicsLaw {
     }
 
     /// Whether the law snapshots graph structure at build (and so is rebuilt on
-    /// a topology change): Stress's distances, Orbit's masses, Kinds' kinds.
+    /// a topology change): Stress's distances, Orbit's and Density's masses,
+    /// Kinds' kinds.
     pub fn graph_bound(self) -> bool {
         matches!(
             self,
-            PhysicsLaw::Stress | PhysicsLaw::Orbit | PhysicsLaw::Kinds
+            PhysicsLaw::Stress | PhysicsLaw::Orbit | PhysicsLaw::Kinds | PhysicsLaw::Density
         )
+    }
+
+    /// Whether the law reads the mass source (and so is rebuilt when it changes).
+    pub fn weighted(self) -> bool {
+        matches!(self, PhysicsLaw::Orbit | PhysicsLaw::Density)
+    }
+
+    /// Why the law takes no overlays, if it refuses them. Density moves nodes
+    /// by its flow alone, and an overlay's force would mix into it (ruled
+    /// 2026-10-02, until laws declare their currency).
+    pub fn overlay_refusal(self) -> Option<&'static str> {
+        match self {
+            PhysicsLaw::Density => Some(
+                "Density takes no overlays: it moves nodes by its flow alone, \
+                 and an overlay's force would mix into it.",
+            ),
+            _ => None,
+        }
+    }
+}
+
+/// Overlays a law refused: which, and why. The law itself was applied.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct OverlayRefusal {
+    pub law: PhysicsLaw,
+    pub refused: Vec<PhysicsOverlay>,
+    pub reason: &'static str,
+}
+
+impl std::fmt::Display for OverlayRefusal {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.reason)
     }
 }
 
@@ -417,6 +468,13 @@ pub struct LayoutStats {
     /// reads near the diameter in hops, a local one well under it. Zero
     /// without edges.
     pub stretch: f32,
+    /// Spearman rank correlation between each node's mass (the mass source)
+    /// and its area share (discrete Voronoi cell): Density's signature,
+    /// near one when room follows mass. Zero under uniform mass.
+    pub mass_area_rank: f32,
+    /// Coefficient of variation of `mass / area share` over the nodes: how
+    /// uneven the layout's density is, zero when perfectly even.
+    pub density_cv: f32,
 }
 
 /// A named (law, overlays) pair: what a picker offers as one choice.
@@ -441,6 +499,7 @@ pub const CANVAS_PHYSICS_LAWS: &[(&str, &str)] = &[
     ("flow.magnetic", "Flow"),
     ("anneal.davidson-harel", "Anneal"),
     ("still.default", "Still"),
+    ("density.gastner-newman", "Density"),
 ];
 
 /// The overlay catalog for the toggles: `(id, label)`.
@@ -602,6 +661,12 @@ pub const CANVAS_PHYSICS_PROFILES: &[PhysicsProfile] = &[
         law: PhysicsLaw::Charge,
         overlays: &[PhysicsOverlay::Skeleton],
     },
+    PhysicsProfile {
+        id: "law.density",
+        label: "Density",
+        law: PhysicsLaw::Density,
+        overlays: &[],
+    },
 ];
 
 /// The profile with this id, if any.
@@ -609,6 +674,20 @@ pub fn physics_profile(id: &str) -> Option<&'static PhysicsProfile> {
     CANVAS_PHYSICS_PROFILES
         .iter()
         .find(|profile| profile.id == id)
+}
+
+/// Density at the catalog's defaults (ruled 2026-10-02 and 2026-10-03): 64²,
+/// one-second passes, blur 0.25 spacings, at least 60 passes, then passes
+/// repeated until the shift test stops them, the pass cap as the fallback.
+pub(crate) fn density_law(masses: Vec<(NodeKey, f32)>) -> Density {
+    let mut law = Density::new(masses, DENSITY_RESOLUTION);
+    law.seconds = 1.0;
+    law.initial_blur = 0.25;
+    law.stop = DENSITY_STOP;
+    law.patience = DENSITY_PATIENCE;
+    law.max_passes = DENSITY_MAX_PASSES;
+    law.min_passes = DENSITY_MIN_PASSES;
+    law
 }
 
 /// The sources a build reads attributes through.
@@ -909,8 +988,9 @@ impl<'a> LawInputs<'a> {
         self.depths(source, focus)
     }
 
-    /// Masses for Orbit: `1 + degree`, or `1 + rank` with the mean rank one.
-    fn masses(&self, source: PhysicsMassSource) -> Vec<(NodeKey, f32)> {
+    /// Masses for Orbit and Density: `1 + degree`, or `1 + rank` with the
+    /// mean rank one.
+    pub(crate) fn masses(&self, source: PhysicsMassSource) -> Vec<(NodeKey, f32)> {
         match source {
             PhysicsMassSource::Degree => {
                 let degree = self.degrees();
@@ -1151,6 +1231,7 @@ impl<'a> LawInputs<'a> {
             // Held, not empty: with no force at all rapier's contact solver
             // blasts an overlapping seed apart (the Still receipt found it).
             PhysicsLaw::Still => vec![Box::new(Hold)],
+            PhysicsLaw::Density => vec![Box::new(density_law(self.masses(sources.mass)))],
         }
     }
 
@@ -1243,22 +1324,40 @@ impl Canvas {
     /// Switch the law. The force set is replaced wholesale; no body moves until
     /// the next tick, then a settle (or, for a law that never rests, a
     /// continuous run) lets the new dynamics express themselves. Physics stays
-    /// paused if it was paused. (Physics catalog — P1.)
-    pub fn set_physics_law(&mut self, law: PhysicsLaw) {
+    /// paused if it was paused. A law that refuses overlays takes none: the
+    /// live ones are dropped and returned in the refusal. (Physics catalog — P1.)
+    pub fn set_physics_law(&mut self, law: PhysicsLaw) -> Result<(), OverlayRefusal> {
         self.physics_law = law;
+        let refused = self.refuse_overlays();
         self.rebuild_law_forces();
         self.settle_for_law();
+        refused
     }
 
     /// Replace the overlay set (order is run order; duplicates collapse).
-    pub fn set_physics_overlays(&mut self, overlays: Vec<PhysicsOverlay>) {
+    /// Refused, with nothing changed, while the law takes no overlays.
+    pub fn set_physics_overlays(
+        &mut self,
+        overlays: Vec<PhysicsOverlay>,
+    ) -> Result<(), OverlayRefusal> {
+        if let Some(reason) = self.physics_law.overlay_refusal()
+            && !overlays.is_empty()
+        {
+            return Err(OverlayRefusal {
+                law: self.physics_law,
+                refused: overlays,
+                reason,
+            });
+        }
         let mut seen = HashSet::new();
         self.physics_overlays = overlays.into_iter().filter(|o| seen.insert(*o)).collect();
         self.rebuild_law_forces();
         self.settle_for_law();
+        Ok(())
     }
 
-    /// Toggle one overlay on or off, returning whether it is now on.
+    /// Toggle one overlay on or off, returning whether it is now on (off,
+    /// and unchanged, while the law refuses overlays).
     pub fn toggle_physics_overlay(&mut self, overlay: PhysicsOverlay) -> bool {
         let mut overlays = self.physics_overlays.clone();
         let on = if let Some(i) = overlays.iter().position(|o| *o == overlay) {
@@ -1268,8 +1367,19 @@ impl Canvas {
             overlays.push(overlay);
             true
         };
-        self.set_physics_overlays(overlays);
-        on
+        self.set_physics_overlays(overlays).is_ok() && on
+    }
+
+    /// Drop the live overlays if the law refuses them, saying which.
+    fn refuse_overlays(&mut self) -> Result<(), OverlayRefusal> {
+        match self.physics_law.overlay_refusal() {
+            Some(reason) if !self.physics_overlays.is_empty() => Err(OverlayRefusal {
+                law: self.physics_law,
+                refused: std::mem::take(&mut self.physics_overlays),
+                reason,
+            }),
+            _ => Ok(()),
+        }
     }
 
     /// Choose where the Kinds law reads kinds from; rebuilds only if Kinds is live.
@@ -1299,9 +1409,7 @@ impl Canvas {
     /// or a weighted overlay is live.
     pub fn set_physics_mass_source(&mut self, source: PhysicsMassSource) {
         self.physics_mass_source = source;
-        if self.physics_law == PhysicsLaw::Orbit
-            || self.physics_overlays.iter().any(|o| o.weighted())
-        {
+        if self.physics_law.weighted() || self.physics_overlays.iter().any(|o| o.weighted()) {
             self.rebuild_law_forces();
             self.settle_for_law();
         }
@@ -1334,8 +1442,12 @@ impl Canvas {
     /// Replace the whole choice with one rebuild and one settle. Sources are
     /// set first and the law last, so the law's build reads the new sources
     /// and overlays. Overlay duplicates collapse, as in
-    /// [`set_physics_overlays`](Self::set_physics_overlays).
-    pub fn set_physics_choice(&mut self, choice: &crate::canvas::PhysicsChoice) {
+    /// [`set_physics_overlays`](Self::set_physics_overlays). A law that
+    /// refuses overlays is applied without them, and the refusal returned.
+    pub fn set_physics_choice(
+        &mut self,
+        choice: &crate::canvas::PhysicsChoice,
+    ) -> Result<(), OverlayRefusal> {
         self.physics_kind_source = choice.kind;
         self.physics_group_source = choice.groups;
         self.physics_mass_source = choice.mass;
@@ -1348,8 +1460,10 @@ impl Canvas {
             .filter(|o| seen.insert(*o))
             .collect();
         self.physics_law = choice.law;
+        let refused = self.refuse_overlays();
         self.rebuild_law_forces();
         self.settle_for_law();
+        refused
     }
 
     /// Apply a named profile: its law and its overlays. `false` for an unknown id.
@@ -1492,6 +1606,19 @@ impl Canvas {
                 }
             }
         }
+        let (mass_area_rank, density_cv) = {
+            let masses: HashMap<NodeKey, f32> = self
+                .law_inputs_now()
+                .masses(self.physics_mass_source)
+                .into_iter()
+                .collect();
+            let points: Vec<(f32, f32)> = positions.iter().map(|(_, p)| (p.x, p.y)).collect();
+            let weights: Vec<f32> = positions
+                .iter()
+                .map(|(k, _)| masses.get(k).copied().unwrap_or(1.0))
+                .collect();
+            crate::canvas::area_share::mass_area_stats(&points, &weights)
+        };
         let at: HashMap<NodeKey, euclid::default::Point2D<f32>> = positions.into_iter().collect();
         let edges = visible_relation_edges(&self.graph, &self.hidden_edges);
         let lengths: Vec<f32> = edges
@@ -1520,7 +1647,32 @@ impl Canvas {
             spread,
             overlaps,
             stretch,
+            mass_area_rank,
+            density_cv,
         }
+    }
+
+    /// The attribute builders over the current graph and visible edges.
+    fn law_inputs_now(&self) -> LawInputs<'_> {
+        LawInputs::new(&self.graph, &self.hidden_edges, None)
+    }
+
+    /// The number of forces in the live law slot (inline backend only). Test introspection.
+    #[cfg(test)]
+    pub(crate) fn law_force_count(&self) -> usize {
+        self.physics.force_count()
+    }
+
+    /// How many force-set rebuilds have run. Test introspection.
+    #[cfg(test)]
+    pub(crate) fn law_rebuilds(&self) -> usize {
+        self.law_rebuilds
+    }
+
+    /// The attribute builders over the current graph. Test introspection.
+    #[cfg(test)]
+    pub(crate) fn law_inputs(&self) -> LawInputs<'_> {
+        LawInputs::new(&self.graph, &self.hidden_edges, None)
     }
 
     /// [`Self::layout_stats`] without `stretch` (zero here), for graphs too
@@ -1577,24 +1729,8 @@ impl Canvas {
             spread,
             overlaps,
             stretch: 0.0,
+            // Mass against area is all-pairs as well: zero here.
+            ..LayoutStats::default()
         }
-    }
-
-    /// The number of forces in the live law slot (inline backend only). Test introspection.
-    #[cfg(test)]
-    pub(crate) fn law_force_count(&self) -> usize {
-        self.physics.force_count()
-    }
-
-    /// How many force-set rebuilds have run. Test introspection.
-    #[cfg(test)]
-    pub(crate) fn law_rebuilds(&self) -> usize {
-        self.law_rebuilds
-    }
-
-    /// The attribute builders over the current graph. Test introspection.
-    #[cfg(test)]
-    pub(crate) fn law_inputs(&self) -> LawInputs<'_> {
-        LawInputs::new(&self.graph, &self.hidden_edges, None)
     }
 }

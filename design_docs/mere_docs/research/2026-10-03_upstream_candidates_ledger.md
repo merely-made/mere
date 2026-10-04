@@ -92,8 +92,18 @@ So, for each item:
   retries.
 - **Why it matters:** a device that crashes and restarts can sit half joined
   to the overlay for minutes.
-- **What we carry:** pairing ruling 36's overlay-fix lane.
-- **Last checked:** iroh-gossip 0.101.0.
+- **What we carry:** pairing ruling 36's overlay-fix lane. *2026-10-04:*
+  the ruled fix clears a peer's pending entry in `on_join` when it is
+  already an active neighbour (pairing rulings 64, 65), but no fork is made
+  while we wait for upstream (ruling 72). A `Neighbor` overtaking a `Join`
+  forms the entry too, not only a one-sided join.
+- **Upstream already has:** issue #172 (open, 2026-09-29) reports the same
+  last step reached by another route, and PR #159 (open, outside
+  contributor, conflicting, unreviewed) carries our exact `on_join` change
+  inside a 2,435-line rework. A note from us would add our route (a
+  killed process on one topic, message order) to #172 or #159.
+- **Last checked:** iroh-gossip 0.101.0 (upstream `v0.101.0`, `2ce78afe`);
+  upstream `main` `2885dd9f`, unchanged in `hyparview.rs` (2026-10-04).
 
 ### 4. iroh-gossip: a `Join` for an unsubscribed topic is dropped
 

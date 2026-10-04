@@ -70,7 +70,9 @@ fn snapshot_on(engine: Arc<dyn MeaningEngine>) -> (MeaningSnapshot, u64) {
     let mut canvas = Canvas::with_graph(graph);
     canvas.set_meaning_engine(engine);
     canvas.set_physics_kind_source(PhysicsKindSource::Meaning);
-    canvas.set_physics_law(PhysicsLaw::Kinds);
+    canvas
+        .set_physics_law(PhysicsLaw::Kinds)
+        .expect("not refused");
     let snapshot = canvas.meaning().expect("a snapshot at build").clone();
     (snapshot, canvas.meaning_runs())
 }
@@ -188,7 +190,9 @@ fn the_model_on_the_host_device_shares_it_and_records_purity() {
     }
     println!("warm-up frames before the dispatch: {warm:?}");
     canvas.set_physics_kind_source(PhysicsKindSource::Meaning);
-    canvas.set_physics_law(PhysicsLaw::Kinds);
+    canvas
+        .set_physics_law(PhysicsLaw::Kinds)
+        .expect("not refused");
     // The build dispatched the run; frames go on while it is in flight.
     let dispatched = Instant::now();
     let mut in_flight: Vec<Duration> = Vec::new();

@@ -277,6 +277,8 @@ fn expected_classes(row: &str) -> Option<&'static [Class]> {
         "flow.magnetic[2]" => &[E],
         "anneal.davidson-harel[0]" => &[K],
         "still.default[0]" => &[K],
+        // Density writes positions from its medium (the plan's sketch).
+        "density.gastner-newman[0]" => &[K],
         "degree-repulsion/degree" | "degree-repulsion/pagerank" => &[Em],
         "hub-gravity/degree" | "hub-gravity/pagerank" => &[Em],
         "domain-cluster/degree"
@@ -294,17 +296,17 @@ fn expected_classes(row: &str) -> Option<&'static [Class]> {
     })
 }
 
-/// Every row of the brief's §5.1–5.3 declares its terms: the eleven laws
-/// (Density is the twelfth when `density-cpu` lands; the plan's Findings
-/// sketch its declaration), the eight overlays, the slots, and the always-on
+/// Every row of the brief's §5.1–5.3 declares its terms: the twelve laws
+/// (Density the twelfth, declared as the plan's Findings sketched it), the
+/// eight overlays, the slots, and the always-on
 /// terms rapier realizes. The repulsion solver seam is a rung of
 /// `NodeExclusion`, not a term, so it has no row.
 #[test]
 fn every_catalog_term_declares_itself() {
     assert_eq!(
         PhysicsLaw::ALL.len(),
-        11,
-        "Density's declaration lands with it"
+        12,
+        "every law declares its terms"
     );
     let fixture = Fixture::p2();
     let probe = fixture.probe();
