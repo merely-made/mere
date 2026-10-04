@@ -77,7 +77,7 @@
       receipt.gate_failures = receiptGateFailures.slice(gateSince);
       receipt.passed = passed && receipt.gate_failures.length === 0;
       output.textContent = JSON.stringify(receipt, null, 2);
-      status.textContent = passed ? "passed" : "failed";
+      status.textContent = receipt.passed ? "passed" : "failed";
       runButton.disabled = false;
       return receipt;
     }
