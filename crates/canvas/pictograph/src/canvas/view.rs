@@ -231,6 +231,25 @@ impl Canvas {
         self.screen_position_of(self.focused_key()?)
     }
 
+    /// Where the single focused node sits in world units, so a receipt can
+    /// measure a law's motion whatever the zoom.
+    pub fn focused_world_position(&self) -> Option<(f32, f32)> {
+        let p = self.view.position_of(self.focused_key()?)?;
+        Some((p.x, p.y))
+    }
+
+    /// The world point under screen px `screen`, through the camera.
+    pub fn world_point_at(&self, screen: (f32, f32)) -> (f32, f32) {
+        let p = self.camera.to_world(screen);
+        (p.x, p.y)
+    }
+
+    /// Where world point `world` falls in screen px, through the camera.
+    pub fn screen_point_of(&self, world: (f32, f32)) -> (f32, f32) {
+        self.camera
+            .to_screen(kernel::geometry::PortablePoint::new(world.0, world.1))
+    }
+
     /// Map a screen-px point back to world space through the camera projector
     /// (the inverse of `Camera::to_screen`; at the default camera this is
     /// `world = (screen - offset) / zoom`).
@@ -474,6 +493,30 @@ mod tests {
             let _ = canvas.frame(800, 600);
         }
         assert_eq!(canvas.camera(), held, "paused, the camera holds");
+    }
+
+    /// World and screen points round-trip through the camera at any zoom, and
+    /// the focused node's world position maps to its screen position.
+    #[test]
+    fn world_and_screen_points_round_trip_through_the_camera() {
+        let mut canvas = Canvas::with_sample_graph();
+        canvas.resize(800, 600);
+        canvas.set_camera(crate::canvas::CameraView {
+            offset: (130.0, -40.0),
+            zoom: 0.772,
+        });
+        let world = canvas.world_point_at((410.0, 275.0));
+        let back = canvas.screen_point_of(world);
+        assert!((back.0 - 410.0).abs() < 1e-3 && (back.1 - 275.0).abs() < 1e-3, "{back:?}");
+        let (key, _) = canvas.graph.nodes().next().unwrap();
+        canvas.selected = [key].into_iter().collect();
+        let at = canvas.focused_world_position().unwrap();
+        let screen = canvas.focused_screen_position().unwrap();
+        let mapped = canvas.screen_point_of(at);
+        assert!((mapped.0 - screen.0).abs() < 1e-3 && (mapped.1 - screen.1).abs() < 1e-3);
+        // A world step of 220 is 220 x zoom screen px under the top-down camera.
+        let step = canvas.screen_point_of((at.0 + 220.0, at.1));
+        assert!((step.0 - screen.0 - 220.0 * 0.772).abs() < 1e-2, "{step:?}");
     }
 
     /// `resize` still re-centres: a genuine window resize holds whatever sits
