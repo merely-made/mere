@@ -82,6 +82,9 @@ members = [
     "ports/distillery/alembic",
     "ports/distillery/athanor",
     "ports/gazette",
+    # Commissions and operates Retinue stations through Castellan. A member
+    # since the p2panda 0.7.5 repin (device pairing plan, ruling 35).
+    "ports/signalman",
     # ─── Landed 2026-09-03 from genet (design_docs/mere_docs/implementation_
     # strategy/2026-09-02_platform_boundary_and_repository_topology_plan.md,
     # the consumers-first half of P3) ───
@@ -158,10 +161,6 @@ exclude = [
     # `--manifest-path`; and standing alone, it has to restate every `[patch]`
     # entry below that its graph needs.
     "ports/graphshell/web",
-    # A private cross-product port: it consumes the neighboring Retinue
-    # checkout during the integration phase, so it must not make the Mere
-    # workspace's ordinary build acquire a sibling checkout.
-    "ports/signalman",
 ]
 
 [workspace.package]
@@ -238,8 +237,8 @@ graphshell-endpoint = { version = "0.0.2", path = "crates/graphshell/graphshell-
 # Turnstone consume one immutable revision. The `[patch]` table at the bottom of
 # this file makes this checkout the implementation source for the Mere contracts
 # Knot names, so those types keep one Cargo source identity.
-knot-editor = { version = "0.0.3", git = "https://github.com/merely-made/knot-editor.git", rev = "855cb75d939fbfbb2af847bda8f5e6a5d3b8b764" }
-knot-document = { version = "0.0.1", git = "https://github.com/merely-made/knot-editor.git", rev = "855cb75d939fbfbb2af847bda8f5e6a5d3b8b764" }
+knot-editor = { version = "0.0.3", git = "https://github.com/merely-made/knot-editor.git", rev = "562353aa0537b7f82bb9d069cf89bb250539a149" }
+knot-document = { version = "0.0.1", git = "https://github.com/merely-made/knot-editor.git", rev = "562353aa0537b7f82bb9d069cf89bb250539a149" }
 # The credential-keeper port (dramatis plan D4). No longer a reservation:
 # C1/C2 landed the OTP core, sealed OTP items, the release gate, and the
 # `keeper` identity surface graphshell re-exports.
@@ -569,6 +568,11 @@ tincture = { package = "tinct", version = "=0.1.2", path = "crates/cambium/tinct
 # merge the repo is one workspace (retinue, tulle, sennet, tucket, firmware), so
 # this is an immutable source-revision pin rather than a relative path.
 retinue = { version = "0.2.0", git = "https://github.com/merely-made/retinue.git", rev = "fa4f925059cc698058cb21fecc1c825d095741a9" }
+# Signalman's station crates come from the same Retinue revision, so one
+# rev governs all four (device pairing plan, rulings 42 and 44).
+outrider = { version = "=0.2.0", git = "https://github.com/merely-made/retinue.git", rev = "fa4f925059cc698058cb21fecc1c825d095741a9" }
+postilion = { version = "=0.2.0", git = "https://github.com/merely-made/retinue.git", rev = "fa4f925059cc698058cb21fecc1c825d095741a9" }
+radio-hand = { version = "=0.0.1", git = "https://github.com/merely-made/retinue.git", rev = "fa4f925059cc698058cb21fecc1c825d095741a9" }
 
 # Reticulum identity derivation: HKDF-SHA256 stretches Mere's 32-byte master seed
 # into retinue's 64-byte dual-key private identity. retinue owns the X25519/RNG
@@ -687,27 +691,20 @@ taffy = { package = "genet-taffy", version = "=0.14.0", git = "https://github.co
 # `parley` and a patch row here would match no package and fail resolution.
 # genet-livery reaches the fork by path inside the git checkout, and Mere's own
 # `parley` workspace dep names the fork by package (see [workspace.dependencies]).
-# The tagged `mere-p2panda-net =0.7.4` fork release owns the exact-ALPN net
+# The tagged `mere-p2panda-net =0.7.5` fork release owns the exact-ALPN net
 # crate and its seven sibling packages. The correctly named net patch supplies
 # the renamed package while the sibling patches keep the dalek-3 family on the
 # same immutable release tag.
-mere-p2panda-net = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.4" }
-p2panda-auth = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.4" }
-p2panda-core = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.4" }
-p2panda-discovery = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.4" }
-p2panda-encryption = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.4" }
-p2panda-store = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.4" }
-p2panda-stream = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.4" }
-p2panda-sync = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.4" }
+mere-p2panda-net = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.5" }
+p2panda-auth = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.5" }
+p2panda-core = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.5" }
+p2panda-discovery = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.5" }
+p2panda-encryption = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.5" }
+p2panda-store = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.5" }
+p2panda-stream = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.5" }
+p2panda-sync = { git = "https://github.com/mark-ik/p2panda.git", tag = "mere-p2panda-net-0.7.5" }
 
-# ─── LAN peer discovery (H10): one real mDNS fix, one dead theory ────────────
-# iroh-mdns-address-lookup 0.4.0 joins the multicast group only on the
-# default-route interface, so a multi-homed host (Windows with a WSL/Hyper-V
-# adapter holding the multicast route) never hears LAN mDNS. The fork's `mere`
-# branch is n0-computer/iroh-address-lookups PR #7 (per-interface sockets kept
-# in sync with the host's interfaces via netwatch), taken as-is; drop this
-# patch when a release containing it ships.
-iroh-mdns-address-lookup = { git = "https://github.com/mark-ik/iroh-address-lookups.git", branch = "mere", version = "=0.4.0" }
+# ─── LAN peer discovery (H10): one dead theory ───────────────────────────────
 # swarm-discovery 0.6.3 keeps its sockets for the life of the process. The
 # fork's `mere` branch rebuilds an interface socket after three consecutive
 # send failures, on the theory that a macOS Wi-Fi transition wedges existing

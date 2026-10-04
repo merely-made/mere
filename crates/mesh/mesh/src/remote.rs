@@ -157,7 +157,7 @@ impl RemoteSessionClaim {
         if bytes.len() > MAX_REMOTE_SESSION_CREDENTIAL_BYTES {
             return Err(RemoteClaimError::CredentialTooLarge);
         }
-        p2panda_core::cbor::decode_cbor(bytes)
+        p2panda_core::cbor::decode_cbor_strict(bytes)
             .map_err(|error| RemoteClaimError::Decode(error.to_string()))
     }
 

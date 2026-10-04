@@ -33,7 +33,7 @@
 //! byte-identical headers — content addressing is stable across peers.
 
 use identity::{Ed25519PublicKey, Ed25519Signature};
-use p2panda_core::cbor::{decode_cbor, encode_cbor};
+use p2panda_core::cbor::{decode_cbor_strict, encode_cbor};
 use p2panda_core::{Body, Hash, Header, Operation, Signature, SigningKey, VerifyingKey};
 use serde::{Deserialize, Serialize};
 
@@ -302,7 +302,7 @@ pub fn encode_post(post: &Post) -> Vec<u8> {
 /// (CBOR error, missing signature, unknown `post_type`, invalid public-key
 /// bytes, non-UTF-8 in a text/topic field).
 pub fn decode_post(bytes: &[u8]) -> Result<Post, MurmError> {
-    let wire: WirePost = decode_cbor(bytes).map_err(|_| MurmError::MalformedPost)?;
+    let wire: WirePost = decode_cbor_strict(bytes).map_err(|_| MurmError::MalformedPost)?;
     // `Header::decode` verifies the signature before it will return a header,
     // so a malformed or forged post is rejected right here.
     let header = Header::<CabalExt>::decode(&wire.header).map_err(|_| MurmError::MalformedPost)?;
