@@ -38,7 +38,7 @@ The before/after headed result is recorded in
 WGPU test in this crate checks the shared multiply and exact LayerNorm as a
 backend control.
 
-From this directory, with wasm-bindgen CLI 0.2.122 installed:
+From this directory, with wasm-bindgen CLI 0.2.129 installed:
 
 ```powershell
 .\run-repro.ps1 -WasmBindgen C:\path\to\wasm-bindgen.exe

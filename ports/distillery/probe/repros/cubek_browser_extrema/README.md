@@ -25,7 +25,7 @@ and rejects the non-finite `f32`. This workspace patches `cubek-reduce` to pass
 the bits through a mutable kernel local before reinterpretation while retaining
 the infinity and NaN cases that motivated Cubek's identity change.
 
-From this directory, with wasm-bindgen CLI 0.2.122 installed:
+From this directory, with wasm-bindgen CLI 0.2.129 installed:
 
 ```powershell
 .\run-repro.ps1 -WasmBindgen C:\path\to\wasm-bindgen.exe

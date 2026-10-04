@@ -16,8 +16,8 @@ $env:CARGO_TARGET_DIR = $TargetDir
 
 New-Item -ItemType Directory -Force -Path $TargetDir | Out-Null
 $bindgenVersion = (& $WasmBindgen --version).Trim()
-if ($bindgenVersion -ne 'wasm-bindgen 0.2.122') {
-    throw "The repro requires wasm-bindgen CLI 0.2.122; got '$bindgenVersion'."
+if ($bindgenVersion -ne 'wasm-bindgen 0.2.129') {
+    throw "The repro requires wasm-bindgen CLI 0.2.129; got '$bindgenVersion'."
 }
 Push-Location $TargetDir
 try {
