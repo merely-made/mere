@@ -21,18 +21,28 @@ blake3 = "1.5"
 burn = { version = "=0.22.0-pre.4", default-features = false, features = ["std", "wgpu"] }
 eidetic = { path = "../../../crates/eidetic/eidetic-core", default-features = false }
 esp = { path = "../../../crates/intel/esp", features = ["bert-validation", "bert-wgpu", "decoder-wgpu"] }
-# wgpu 30's BrowserWebGpu binding expects the pre-0.2.123 nullable
-# popErrorScope conversion. Newer wasm-bindgen releases turn a successful
-# null result into an object that wgpu classifies as an unexpected GPU error.
-js-sys = "=0.3.99"
+# The module start runs the static constructors once (rulings 532, 533, 536).
+cambium-genet-web-host = { path = "../../../crates/cambium/cambium-genet-web-host" }
+# One wasm-bindgen family with graphshell-web and cambium-genet-web-host
+# (ruling 545). The old 0.2.122 pin is gone: wgpu 30.0.0 decoded a successful
+# error-scope pop through `JsOption`, which wasm-bindgen 0.2.126 and later read
+# as an error, and wgpu 30.0.1 decodes it through `JsNullable` instead (burn
+# plan 13.37). cambium-genet-web-host's workspace wgpu requires 30.0.1.
+js-sys = "=0.3.106"
 muniment = { path = "../../../crates/eidetic/muniment", features = ["indexeddb"] }
-wasm-bindgen = "=0.2.122"
-wasm-bindgen-futures = "=0.4.72"
-web-sys = { version = "=0.3.99", features = [
+wasm-bindgen = "=0.2.129"
+wasm-bindgen-futures = "=0.4.79"
+web-sys = { version = "=0.3.106", features = [
     "DedicatedWorkerGlobalScope",
     "Response",
 ] }
 
 [patch.crates-io]
+# cambium-genet-web-host rides Genet; [patch] is not inherited, so these rows
+# restate graphshell-web's, at the same immutable Genet revision.
+taffy = { package = "genet-taffy", version = "=0.14.0", git = "https://github.com/merely-made/genet.git", rev = "bd3e8861b2932d62b73c9936ac3a317f1df3ffdb" }
+layout-dom-api = { git = "https://github.com/merely-made/genet.git", rev = "bd3e8861b2932d62b73c9936ac3a317f1df3ffdb", version = "=0.1.1" }
+genet-scripted-dom = { git = "https://github.com/merely-made/genet.git", rev = "bd3e8861b2932d62b73c9936ac3a317f1df3ffdb", version = "=0.1.2" }
+vello = { git = "https://github.com/mark-ik/vello.git", tag = "vello-0.10.0" }
 cubecl-runtime = { path = "../../../support/patches/cubecl-runtime" }
 cubek-reduce = { path = "../../../support/patches/cubek-reduce" }
