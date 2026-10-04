@@ -1112,6 +1112,29 @@ async function promotionKillTrials(path, base, attempts) {
   };
 }
 
+// Receipt gate (Mark, "Gate every receipt"): every uncaught page error or
+// unhandled rejection is recorded, and any entry fails the receipt.
+const receiptGateFailures = [];
+window.addEventListener("error", (event) => {
+  receiptGateFailures.push(`uncaught: ${event.message}`);
+});
+window.addEventListener("unhandledrejection", (event) => {
+  receiptGateFailures.push(`unhandled rejection: ${event.reason}`);
+});
+// The gate's positive control: `?plant_page_error=throw|reject` plants one
+// page error while a run is live.
+function plantPageErrorForControl() {
+  const planted = new URLSearchParams(location.search).get("plant_page_error");
+  if (!planted) return;
+  setTimeout(() => {
+    if (planted === "reject") {
+      Promise.reject(new Error("receipt-gate-control: planted rejection"));
+    } else {
+      throw new Error("receipt-gate-control: planted page error");
+    }
+  }, 100);
+}
+
 // ── receipt ──────────────────────────────────────────────────────────────
 
 function restoreReceipt() {
@@ -1170,6 +1193,8 @@ function conclude() {
     lane6_unopenable_stubs: lanes.lane6?.unopenable_stubs ?? null,
     lane6_promotion_kill: lanes.lane6?.promotion ?? null,
     lane6_ok: lanes.lane6?.ok ?? null,
+    receipt_gate_failures: [...receiptGateFailures],
+    receipt_gate_passed: receiptGateFailures.length === 0,
     browser_scope: {
       user_agent: receipt.environment?.user_agent ?? null,
       note: "one host per receipt; Firefox/Safari/WKWebView are separate receipts",
@@ -1208,6 +1233,7 @@ const LAST_LANE = 6;
 
 async function runLane(n, resumeMarker = null) {
   if (!receipt) await startReceipt();
+  plantPageErrorForControl();
   stateLog.replaceChildren();
   setState("running", `lane ${n}`);
   try {
@@ -1217,7 +1243,10 @@ async function runLane(n, resumeMarker = null) {
     conclude();
     saveReceipt();
     showReceipt();
-    setState(result.ok ? "complete" : "stop", `lane ${n}: ${result.ok ? "done" : "a done-condition failed; see the receipt"}`);
+    const gateOk = receiptGateFailures.length === 0;
+    setState(result.ok && gateOk ? "complete" : "stop", `lane ${n}: ${!gateOk
+      ? "the receipt gate saw a page error; see the receipt"
+      : result.ok ? "done" : "a done-condition failed; see the receipt"}`);
     return result;
   } catch (error) {
     const key = `lane${String(n).replace(/[ab]$/, "")}`;
@@ -1242,8 +1271,11 @@ async function runAll(fromLane = 1, resumeMarker = null) {
     await runLane(n, n === 4 ? resumeMarker : null);
   }
   sessionStorage.removeItem(`${RESUME_KEY}.all`);
-  setState(receipt.conclusions.stop_condition_hit ? "stop" : "complete",
-    receipt.conclusions.stop_condition_hit ? "STOP CONDITION: an unrecoverable database was observed" : "Every lane ran; read the conclusions.");
+  const { stop_condition_hit: stopHit, receipt_gate_passed: gatePassed } = receipt.conclusions;
+  setState(stopHit || !gatePassed ? "stop" : "complete",
+    stopHit ? "STOP CONDITION: an unrecoverable database was observed"
+      : !gatePassed ? "RECEIPT GATE: an uncaught page error or rejection was recorded; see the conclusions"
+        : "Every lane ran; read the conclusions.");
   return receipt;
 }
 
