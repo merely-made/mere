@@ -137,6 +137,7 @@ impl Canvas {
             generation: 0,
             cursor: (0.0, 0.0),
             pan_velocity: (0.0, 0.0),
+            follow: false,
             middle_drag: None,
             orbit_drag: None,
             drag: None,
@@ -278,6 +279,19 @@ impl Canvas {
         // positions that the next frame will paint. Running physics keeps its
         // current view because apply_strategy_to_view only overlays when paused.
         self.apply_strategy_to_view();
+        match self.content_fit() {
+            Some(fit) => {
+                self.camera.zoom = fit.zoom;
+                self.camera.offset = fit.offset;
+            },
+            None => self.recenter(),
+        }
+    }
+
+    /// The camera [`fit_to_content`](Self::fit_to_content) would install for
+    /// the positions the view holds now, or `None` with no finite position.
+    /// Following the layout eases toward it.
+    pub(crate) fn content_fit(&self) -> Option<CameraView> {
         let mut min = (f32::INFINITY, f32::INFINITY);
         let mut max = (f32::NEG_INFINITY, f32::NEG_INFINITY);
         let mut any = false;
@@ -293,8 +307,7 @@ impl Canvas {
             max = (max.0.max(p.x), max.1.max(p.y));
         }
         if !any {
-            self.recenter();
-            return;
+            return None;
         }
         // Pad the bounds so rim nodes draw fully inside the viewport (a node's
         // disc + caption extend past its position point).
@@ -307,8 +320,10 @@ impl Canvas {
             .min(1.0)
             .clamp(MIN_ZOOM, MAX_ZOOM);
         let center = ((min.0 + max.0) / 2.0, (min.1 + max.1) / 2.0);
-        self.camera.zoom = zoom;
-        self.camera.offset = (w / 2.0 - center.0 * zoom, h / 2.0 - center.1 * zoom);
+        Some(CameraView {
+            offset: (w / 2.0 - center.0 * zoom, h / 2.0 - center.1 * zoom),
+            zoom,
+        })
     }
 
     /// Whether the graph is empty, or at least one node lies within the current

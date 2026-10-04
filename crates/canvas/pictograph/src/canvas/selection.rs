@@ -59,6 +59,7 @@ impl Canvas {
             return false;
         };
         // screen = world * zoom + offset; put the node at the viewport center.
+        self.follow = false;
         self.camera.offset.0 = self.view_w as f32 / 2.0 - pos.x * self.camera.zoom;
         self.camera.offset.1 = self.view_h as f32 / 2.0 - pos.y * self.camera.zoom;
         true
