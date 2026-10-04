@@ -2,12 +2,13 @@
 
 **Date**: 2026-10-02
 **Status (2026-10-04)**: in progress. Assessed and ruled by Mark from 2026-10-01
-to 2026-10-04 (rulings 1 to 72 below). D1 landed (`4963b489`); D1b's mere fix (M1)
+to 2026-10-04 (rulings 1 to 74 below). D1 landed (`4963b489`); D1b's mere fix (M1)
 landed (`177b927c`) and its fork fix (F1) shipped in the 0.7.5 repin, pushed
 2026-10-04 (fork `1bec457e`, Knot `92367ec`, mere `031b3dcc`). `connected`
 follows the gossip overlay (ruling 31) and, off it, open connections
 (rulings 47 to 56). The overlay's gap after restarts has a ruled fix in
-iroh-gossip, held until its next release (rulings 64 to 72). Next: D2.
+iroh-gossip, held until its next release (rulings 64 to 72). Paused
+before D2 while chatelaine P4a runs (ruling 73).
 **Scope**: Mark's machines find, reach and trust each other by device
 identity, not by address: the stack's own peers already do on one network;
 SSH, the path Mark uses daily, does not. Pairing a device becomes one
@@ -79,6 +80,10 @@ code:
   | M4 iMac | running | no: the bare key `mark-ik@imac-2026-08`, an agent older than certificates | none |
   | ThinkPad | not installed | — | none |
   | Q-PC | not installed | — | none |
+
+  *2026-10-04:* Mark named a fifth machine, "There's also a surface laptop 3
+  running kubuntu"; "Not a powerful device (8gb ram, 256gb ssd), but another
+  linux". Its agent, address and SSH state have not been read.
 
 - **Pairing today** takes six steps and two 128-hex copy-pastes for personal
   sync (`djinn --pairing-facts`, `--pair-node`), a separate Knot
@@ -643,6 +648,21 @@ stays open. At iroh-gossip's next release, #159 and #172 are rechecked, and
 if the release passes the bug by, the upstream ledger's rule applies
 (ruling 46), with rulings 70 and 71 then giving the fork's tag and base.
 
+**Ruling 73.** *The 0.7.5 repin and both liveness rules are pushed and the
+restart-gap fix waits on iroh-gossip's next release; D2 is next in this
+plan. What next?* Options: assess D2; chatelaine P4a; pause here. Mark:
+**"Chatelaine P4a"**. Follows: this plan pauses before D2, and the
+chatelaine plan resumes (its ruling 51).
+
+**Ruling 74.** *This phase's scratch (the `C:\t\mere-repin`, `knot-repin`,
+`knot-control-ea3e99e` and `mere-iroh12` worktrees, and the build targets
+in `C:\t\p2panda-075-targets` and `C:\t\mere-verify-target`): remove it?*
+Options: worktrees and targets; logs too; keep everything. Mark: **"Remove
+worktrees and targets (Recommended)"**. Done 2026-10-04, after checking each
+worktree clean with its `HEAD` on GitHub: C: went from 470 GB to 714 GB
+free. Mark's standing rule, given the same day: keep C: above 500 GB free,
+and clean before building below 100 GB.
+
 Also given in the same conversation (2026-10-01, Mark: "You can edit known
 hosts"): `known_hosts` entries may be updated, which was done for the
 ThinkPad (`.32`) and Q-PC (`.68`, `q-pc.local`), each key added only after
@@ -722,6 +742,9 @@ Mark SSHes into his machines.
   dialling out does not. Done when:
   - [ ] each of the four machines runs the resident at login, its personal
         sync paired with the others;
+        *2026-10-04, reading, not ruled:* five machines, with the Surface
+        Laptop 3 (Kubuntu, so a systemd user unit as on Fedora) assessed
+        at D2's start;
   - [ ] the M4's agent is the current one (its agent predates certificates),
         with Mark's own SSH into each machine unaffected throughout;
   - [ ] on Windows, djinn runs beside the legacy `graphshell-device-host` on

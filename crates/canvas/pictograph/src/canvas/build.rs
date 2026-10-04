@@ -35,8 +35,10 @@ use crate::signals::{BridgeNodes, ClusterSet};
 use crate::canvas::palette;
 
 /// The geometry every `.gnode` color class repeats; only the fill/label differ.
-const GNODE_BOX: &str =
-    "position: absolute; left: 0; top: 0; width: 36px; height: 36px; font-size: 15px;";
+/// The frame's `translate(anchor - half) scale(zoom)` scales about the top-left;
+/// CSS's centre origin would push the body `(size/2)(1 - zoom)` off its anchor.
+const GNODE_BOX: &str = "position: absolute; left: 0; top: 0; width: 36px; height: 36px; \
+     font-size: 15px; transform-origin: 0 0;";
 
 /// Author CSS for the node-children document, built once. `.stage` is the
 /// camera-transformed container (also `position: relative`, so it is the
