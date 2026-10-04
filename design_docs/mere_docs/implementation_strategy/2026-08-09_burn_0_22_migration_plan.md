@@ -1,5 +1,22 @@
 # Burn 0.22 Migration Plan
 
+**2026-10-04 rulings 545 and 546, the receipt gate, main `63345c17` (§13.38, §13.39):**
+graphshell-web, `cambium-genet-web-host` and the probe run wasm-bindgen
+0.2.129 with wgpu 30.0.1. One wgpu now runs across the root, web and probe
+graphs, and the constructor helper lives in `cambium-genet-web-host`.
+
+- Every gated receipt surface fails on an uncaught page error or rejection,
+  and graphshell scenarios also fail on a panic. Planted controls prove the
+  gate everywhere except the OPFS probe.
+  The pins and the gate also sit on the main-ready branch
+  `web-pins-receipt-gate`.
+- Main `63345c17` is merged (`64c917d5`). The changed cones, the two-peer
+  gate, the headed P5 receipts, the four embedding rows and the SmolLM2
+  decoder row pass under the gate.
+- The quiet A/B counted no repetition under its bound (0 of 80). That and
+  the OPFS control go back as forks.
+- S16 has not started.
+
 **2026-10-03 S15 annotation:** the 2026-08-20 status below describes the pre.2
 row, including its "one `libsqlite3-sys` 0.38.2" sentence. On the pre.4 branch
 the root and graphshell-web locks hold no Turso and no SQLite of any kind,
@@ -3701,3 +3718,266 @@ Each was moved into place only after its size and SHA-256 matched
 `decoder-model.json`: `8eb740e8…`, `9ca9acdd…` and `5af571cb…` (record:
 `Code/testing/mere/receipts/2026-10-04/pre4-decoder/fetch-decoder.json`).
 Nothing else was downloaded for the model.
+
+### 13.39 Rulings 545 and 546 carried out, main `63345c17`, and the gated reruns (2026-10-04)
+
+**The main-ready branch.** Main's pre.2 web graph takes wgpu 30.0.1 with
+wasm-bindgen 0.2.129. So the pins and the receipt gate sit on their own
+branch, `web-pins-receipt-gate`, cut from main `cd3961dd`, separate from
+pre.4. The coordinator verifies and merges it ahead of S16.
+
+- `e71efa30` sets root `wgpu = "30.0.1"` and pins `=0.2.129` in graphshell-web
+  and `cambium-genet-web-host`; graphshell-web names wgpu 30.0.1.
+  - The root lock changes in eleven packages only, still 1,653 in all: the
+    wasm-bindgen family moves to 0.2.129, js-sys and web-sys to 0.3.106,
+    wasm-bindgen-futures to 0.4.79. wasm-bindgen-test moves to 0.3.79, which
+    pins its own 0.2.129 family and pins minicov at 0.3.8 (from 0.3.9) exactly.
+  - The web lock (gitignored) is seeded from P5's `a915fa23` receipt. It
+    differs from that seed in the same family plus wgpu and wgpu-types 30.0.1,
+    897 packages either way.
+  - The gate lives in `loader.js`. Uncaught errors, unhandled rejections and
+    console errors containing `panicked at` go into
+    `window.graphshellGateFailures`. Any entry turns a scenario receipt to
+    `fail` and logs `FAIL: receipt gate: N ...`. The query
+    `?plant_page_error=throw|panic` plants one error 500 ms into the run.
+- `810864ee` adds the same gate to the probe (each row's `gate_failures`),
+  both repro pages (`receipt.passed`) and the OPFS probe
+  (`receipt_gate_passed`). Their control is `?plant_page_error=throw|reject`.
+- `808c6a56` merges main `63345c17`. For `Cargo.toml` and `Cargo.lock`, weave's
+  result is byte-identical to a plain `git merge-file` merge. The merged lock
+  is main's plus the eleven swaps, 1,669 packages.
+- `b38986c2` makes the repro pages' status text and the OPFS probe's state
+  follow the gated verdict. Before it, they printed the ungated one.
+
+| Check, main-ready | `e71efa30` | after the merge, `808c6a56` |
+| --- | --- | --- |
+| `cargo_mode.py verify` (workspace, all targets) | pass, 707 s | pass, 434 s |
+| `cambium-genet-web-host` wasm check; native tests | pass; pass | pass; pass |
+| `mere-webrtc-carrier` wasm tests check | pass | pass |
+| web bundle (debug), web lock `0090ad99` locked | `26d20b8b` | `26d20b8b`, byte-identical |
+
+Main's merge reaches no source in the web bundle's cone. Its two graphshell
+files are native-only (`not(target_arch = "wasm32")`). So the headed receipts
+taken on `26d20b8b` stand for `808c6a56` too.
+
+| Headed, bundle `26d20b8b` | Result |
+| --- | --- |
+| control, `p4_tree_physics_kinds` clean | ok, 0 gate entries |
+| control, planted throw | fail: `uncaught: ... planted page error` |
+| control, planted panic | fail: `panic: panicked at receipt-gate-control ...` |
+| `p4_tree_physics_kinds`, `gpu_threshold=0` | ok, 0 entries, no `webgpu.rs:85` panic |
+| `p5_tree_gpu_settle_2000` | ok: 413 of 418 device steps, 0 failures, spread 1,075, 0 overlaps |
+| `p5_tree_cpu_settle_2000` | ok |
+| the 14 law receipts at defaults | all ok, 0 entries |
+| the 11 laws at `gpu_threshold=0` | all ok, 0 entries |
+
+Other sessions held the machine at 80 to 100% CPU through these runs, so
+their frame times are not comparisons.
+
+*Reading, not ruled:* the probe stays on 0.2.122 and wgpu 30.0.0 on this
+branch. 0.2.122's `into_option` treats `null` as `None`, so its pre.2 rows
+do not reach the panic. On pre.4 the probe's move comes with the helper
+(`d84b2a38`). So ruling 545's one wgpu across the root, web and probe graphs
+holds on pre.4 now and on main after S16. Moving main's probe sooner would
+be a separate commit.
+
+**The helper, ruling 536 (`9ca02ea4`).** `cambium-genet-web-host` gains
+`run_static_constructors_once()`: an `AtomicBool` guard, then
+`__wasm_call_ctors`, wasm32 only. graphshell-web's start calls it in place
+of its local copy, and the probe's worker-module start calls it too
+(`d84b2a38`).
+
+The crate's `ctor_once` example carries a counting `.init_array` constructor.
+A Node test (`run.mjs`) requires one run after instantiation, after three
+export calls and after a second helper call, and no `.command_export`
+wrappers. On the 0.2.129 CLI:
+
+| Build | Runs seen | Verdict |
+| --- | --- | --- |
+| as written | 1, 1, 1; 0 wrappers | pass |
+| guard removed | 1, 1, 2 | fail |
+| glue also runs the constructors | 2, 2, 2 | fail |
+| restored (`start.rs` `26ff70fc`) | 1, 1, 1 | pass |
+
+**The probe, ruling 545 (`d84b2a38`, `c8979b7a`).** The probe moves to
+wasm-bindgen 0.2.129, js-sys and web-sys 0.3.106, wasm-bindgen-futures 0.4.79
+and wgpu 30.0.1. It takes the helper's crate as a path dependency and
+restates the Genet patch rows its graph now needs: genet-taffy,
+`layout-dom-api` and `genet-scripted-dom` at `bd3e8861`, and the vello tag.
+
+- The lock grows from 585 to 775 packages, and 199 are added. 36 of them are
+  path and git packages that `cambium-genet-web-host` reaches: Cambium, Genet
+  and the Mere crates they use. The other 163 are registry crates beneath
+  those.
+- 10 are removed: the 0.2.122 family, wgpu and wgpu-types 30.0.0, and spin
+  0.10.1. Cargo had re-resolved pliron's `spin = "0"` onto 0.12.3, which no
+  manifest asked for. `c8979b7a` puts that edge back on 0.10.1, as in the
+  root lock (776 packages).
+- Cargo keeps that lock unchanged on a non-locked offline resolution, which
+  is how `run-probe.ps1` runs.
+- `run-probe.ps1` and the README require the 0.2.129 CLI.
+
+**Main `63345c17` on pre.4 (`64c917d5`).** Main brought the p2panda 0.7.5
+repin, iroh 1.3.0, Knot `562353aa`, Signalman as a member, Density P6a and
+plan records.
+
+- For root `Cargo.toml`, `Cargo.lock` and `DOC_README.md`, weave's result
+  equals a plain `git merge-file` merge, ignoring line endings. The merged
+  lock resolves `--locked` with 1,678 packages. Its delta from the branch's
+  own lock is exactly main's delta from `cd3961dd`: 19 removed, 35 added,
+  and retinue's dependency list changed.
+- The remote fixture's `[patch.crates-io]` conflicted. It keeps this branch's
+  rows (the vello tag, no burn-cubecl row, the root's eight p2panda rows) at
+  main's `mere-p2panda-net-0.7.5` tag.
+- The fixture's lock was re-resolved offline: iroh 1.0.3 becomes 1.3.0, and
+  the noq and netwatch families move with it. Cargo moved pliron's spin edge
+  here too. The edge is restored by hand, and Cargo keeps it under both
+  `--locked` and a non-locked resolution.
+- The probe and web locks are unchanged by the merge.
+- Main's own fixture lock still records p2panda from `branch=main`
+  (`9f2c2a01`) under a manifest that names the 0.7.5 tag. On main, the
+  fixture's `--locked` build would fail. S16 brings this branch's lock.
+
+Against the last verified head `9f5a73f6`, ESP's and Numen's cones changed
+only in a manifest comment and `cubecl-runtime`'s `MERE-PATCH.md`, so their
+receipts carry. Every other cone changed and was rerun at `64c917d5`, with
+the tree clean before and after:
+
+| Gate, pre.4 `64c917d5` | Result |
+| --- | --- |
+| seiche GPU repulsion (release), tensor-burn-wgpu (release) | 3 pass, 1 ignored, adapter; 128 pass |
+| seiche lib: default, no-default, gpu | 109; 105; 109 pass |
+| pictograph canvas lib; gpu with `physics_device` | 279; 282 pass, 13 ignored, adapter |
+| conatus resident (release) | 14 pass, 2 ignored, adapter, CubeCL kernels |
+| mere and graphshell `canvas-gpu` checks | pass |
+| graphshell `web` lib tests | 232 pass, 1 ignored |
+| `cambium-genet-web-host` native tests; wasm examples check | 8 pass; pass |
+| Distillery four-feature check; lease tests | pass; 2 pass |
+| two-peer lifecycle gate (§13.32's auditor) | exit 0 in 11.9 s; the auditor accepts and rejects all 11 planted faults |
+| `cargo_mode.py verify` | pass |
+| web bundle | `b0bd9cd6`, web lock `5db762fd` |
+| probe release bundle (`c8979b7a` lock `0d4c75ac`) | `ea060206` |
+
+The fixture was rebuilt for the gate: 21 min 53 s, new executable
+`c4f728bc`. The gate record's `build_compiled_*` flags read false only
+because no `Compiling` line reached the captured stderr this time. The
+two-peer receipt again reads zero allocations immediately after both owner
+reclaims. Its five native-reference blocks read `1.4901161193847656e-7`, and
+its browser-reference blocks `1.4156e-7`.
+
+**Headed on pre.4, under the gate (bundle `b0bd9cd6`).** These are the same
+31 rows as main-ready's table above, with the same verdicts. The clean,
+`gpu_threshold=0`, P5 and law rows are ok with zero gate entries. The two
+planted controls fail.
+
+- `p5_tree_gpu_settle_2000` reads 413 of 418 device steps, 0 failures,
+  spread 1,075, 0 overlaps and energy 425,261.
+- The planted panic is recorded as
+  `panic: panicked at receipt-gate-control: planted panic`.
+
+**Probe rows on pre.4 (bundle `ea060206`, Chrome 154, NVIDIA Lovelace).**
+
+- `runMatrix`: all four embedding rows pass, each with cold store, integrity
+  reopen, termination, warm reopen and quiet worker termination, and no GPU
+  validation errors. Their largest reference errors are BGE `7.47e-8`,
+  MiniLM `1.416e-7`, E5-small `8.38e-8` and E5-base `6.05e-8`. Gate entries:
+  none.
+- `runDecoder`, ruling 546's row, passes. SmolLM2-135M-Instruct matches the
+  reference ids exactly and repeats within and across workers.
+  The cooperative cancel stops before the next fragment, and the row
+  recovers exactly after device teardown. The browser still exposes no GPU
+  memory telemetry. Gate entries: none.
+
+**Gate controls, every gated surface:**
+
+| Surface | Clean | Planted |
+| --- | --- | --- |
+| graphshell scenarios, main-ready and pre.4 | ok | throw: fail; panic: fail |
+| probe embedding row (`runSuite()`) | passed | throw: `row_passed` false, limiting layer "receipt gate" |
+| probe decoder row | passed | reject: `row_passed` false, every other conclusion as in the clean row |
+| extrema repro | `passed` true | throw and reject: `passed` false, status "failed" |
+| embedding repro | `passed` true | throw and reject: `passed` false, status "failed" |
+| OPFS probe | not run | not run |
+
+- In each failing probe and repro control, the gate's entry is the only
+  failure.
+- The repro controls ran on their existing builds (extrema 2026-10-03,
+  embedding 2026-09-29). They test the page gate and are not new numerical
+  receipts.
+- The OPFS probe pins the wasm-bindgen 0.2.126 CLI, which is not on this
+  machine. Installing it is a download no ruling covers, so its gate is
+  unproven and goes back as a fork.
+- A first embedding control called `runSuite('TaylorAI/bge-micro-v2')`. That
+  ran the form's MiniLM row against BGE's reference, because
+  `runSuite(modelId)` resolves the model but does not apply it to the form.
+  The defect predates this lane and the code is the same on main. That
+  control is marked superseded; the pair above uses the default row.
+
+**Quiet GPU-on A/B, ruling 534.** The bound was fixed in `quiet_ab.py`
+before any repetition was taken. A repetition counts only if two things
+hold: the machine-wide CPU load, sampled each second through its window,
+has a median of at most 25% and a maximum of at most 60%; and no `rustc` is
+running at its start.
+
+- The pre.2 arm is main-ready's bundle `26d20b8b` and the pre.4 arm is
+  `b0bd9cd6`. Both run wasm-bindgen 0.2.129 and wgpu 30.0.1, so they differ
+  in Burn and CubeCL.
+- Each repetition loads `tree.html`, GPU on, in headed Chrome. Arms
+  alternate, 40 attempts each.
+
+No repetition met the bound: 0 of 80, though all 80 were valid (ready, no
+page errors).
+
+- The window load medians ran from 25 to 100% (median 50%), and the maxima
+  from 42 to 100% (median 70%).
+- Six repetitions started with another session's `rustc` running.
+- A one-minute idle sample taken afterwards, with nothing from this lane
+  running, read a median of 15% and a maximum of 56%.
+
+*Reading, not ruled:* each window includes the measured Chrome's own launch
+and WebGPU page. So this bound may be out of reach on this machine even when
+it is otherwise idle. Per ruling 534, the bound was not lowered. The trace is
+in `pre4-quiet-ab` (`ab.log`, `ab.json`, `trace-summary.json`,
+`idle-baseline.txt`).
+
+For the record only, and uncounted:
+
+- Frame p50 sits on the display's 6.2 and 12 ms steps in both arms, with
+  medians of 12.0 and 12.1 ms.
+- Frame p95 medians are 12.2 ms for pre.2 and 18.2 ms for pre.4.
+- Time to ready is 1,273 ms for pre.2 and 1,364 ms for pre.4.
+
+The first start's three attempts measured nothing: a bare `python` in the
+subprocess found an interpreter without `websockets`. The log marks them
+void, and the rerun uses `sys.executable`.
+
+**Downloads.** Ruling 546's three files, recorded in §13.38. The root lock's
+update brought wasm-bindgen-test 0.3.79, wasm-bindgen-test-macro 0.3.79 and
+minicov 0.3.8 into the cache from crates.io, each matching its lock checksum
+(`web-pins-gate/fetch-root.json`). Everything else resolved and built offline
+from the cache.
+
+Evidence: `Code/testing/mere/receipts/2026-10-04/` (`web-pins-gate`,
+`pre4-helper`, `pre4-probe`, `pre4-decoder`, `pre4-reconcile-63345c17`,
+`pre4-headed-64c917d5`, `pre4-probe-rows`, `pre4-quiet-ab`). The stopped batch
+in `pre4-reconcile-cd3961dd` is superseded and says so.
+
+**Returned as forks.**
+
+- **What "quiet" measures.** The A/B's bound counts the measured page's own
+  load. The options:
+  - (A) bound the ambient load in a window just before each launch;
+  - (B) subtract this lane's process tree from the machine total;
+  - (C) keep the bound and run the A/B where the machine can meet it.
+- **The OPFS probe's gate control.** It needs the wasm-bindgen 0.2.126 CLI,
+  which no ruling covers downloading. The options:
+  - (A) approve that one CLI install;
+  - (B) leave the gate unproven until that probe's next receipt;
+  - (C) move the OPFS probe to 0.2.129, which is a pin change of its own.
+- **Lane calls, reversible, for review.**
+  - pliron's spin edge is held at 0.10.1 by hand in the probe (`c8979b7a`)
+    and the fixture (`64c917d5`), matching the root. Left to Cargo, it would
+    sit on 0.12.3.
+  - Main-ready leaves the probe's pins as they are.
+
+S16 has not started. No push, merge to main or downstream repin.
