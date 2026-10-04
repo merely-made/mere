@@ -42,5 +42,5 @@ pub use registry::{
     ArrangementId, Disclosure, RegisterError, SolveError, Solver, SolverCapability, SolverRegistry,
     solve_via,
 };
-pub use relax::{Relaxation, relax, relax_holding};
+pub use relax::{Relaxation, relax, relax_holding, relax_roles};
 pub use solve::{pinned_instances, solve, solve_with};

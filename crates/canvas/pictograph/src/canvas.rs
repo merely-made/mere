@@ -267,12 +267,9 @@ struct Drag {
     node: NodeKey,
     /// Press position in screen px (the click/drag-slop origin).
     press: (f32, f32),
-    /// Set once the pointer has moved past the slop — a real drag.
+    /// Set once the pointer has moved past the slop — a real drag. Its release
+    /// follows the node's arrangement role (`Canvas::release_dragged`).
     moved: bool,
-    /// Whether the node was deliberately pinned before this transient pull
-    /// began. Releasing the pointer preserves that explicit pin; an ordinary
-    /// pull returns to dynamic layout.
-    was_pinned: bool,
 }
 
 /// The reversible, view-local portion of a fold action. Graph nodes, relation
@@ -622,8 +619,8 @@ pub struct Canvas {
     /// Persisted per pane via view-intent; the host pushes positions for it via
     /// [`apply_strategy_positions`](Canvas::apply_strategy_positions). (Layout picker.)
     active_strategy: Option<String>,
-    /// Stored positions for the active arrangement, used by anchor springs and
-    /// explicit restoration. Pausing physics does not replace these slots.
+    /// Stored positions for the active arrangement, which its roles read and
+    /// explicit restoration returns to. Pausing physics does not replace them.
     strategy_positions: Option<Vec<(NodeKey, PortablePoint)>>,
     /// The visible placement frozen by pause, independent of the stored arrangement.
     /// Reapplied after actor snapshots so a late update cannot undo a pause.
@@ -638,12 +635,10 @@ pub struct Canvas {
     /// geometry authority for layout, collision, picking, and paint bounds.
     /// (Projection proofs — P3b renderer consumption.)
     projection_representations: HashMap<NodeKey, sceno::Representation>,
-    /// How strongly a *playing* graph is pulled toward the active arrangement's
-    /// slots (`seiche::AnchorSpring` stiffness). `0.0` makes an arrangement a
-    /// pure initial condition; higher holds its shape against the graph's own
-    /// forces. The dial between "layout as authority" and "layout as
-    /// participant". (Arrangement as attractor.)
-    arrangement_pull: f32,
+    /// The roles the active arrangement's positions play once physics runs
+    /// (seeded, anchored, pinned), the anchored return's stiffness, and the
+    /// latest settle. (Dynamics grammar plan, G7.)
+    roles: roles::ArrangementRoles,
     /// The physics **law** the graph moves under — which dynamics, not how
     /// tuned (see [`physics_catalog`]). Springs is the force-directed default
     /// the canvas has always run. (Physics catalog — P1.)
@@ -708,11 +703,16 @@ mod derived_face;
 mod gloss;
 mod lifecycle;
 mod nodes;
+pub(crate) mod at_rest;
+mod roles;
 mod selection;
 mod source_time;
 mod strategy;
 mod view;
 
+pub use at_rest::{HOME_FRAMES, SETTLE_SPEED_FLOOR};
+pub use roles::{SETTLED_ARRANGEMENT, StopReturn};
+pub use seiche::{Axes, DEFAULT_ANCHOR_STIFFNESS, Role, RoleTable};
 pub use source_time::{SourceTimeCanvas, SourceTimeSelection};
 
 #[cfg(test)]

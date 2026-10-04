@@ -170,7 +170,13 @@ where
         let scope = self.live.scope_members();
         let strategy = self.live.layout_strategy().map(str::to_owned);
         let score = self.live.projection_score().cloned();
-        let arrangement_pull = self.live.arrangement_pull();
+        let mut roles = self.live.arrangement_roles().clone();
+        let role_members: Vec<_> = roles
+            .items
+            .drain()
+            .filter_map(|(key, role)| Some((self.live.graph().get_node(key)?.id, role)))
+            .collect();
+        let anchor_stiffness = self.live.anchor_stiffness();
 
         let mut snapshot = Canvas::with_graph(graph);
         snapshot.set_viewport(viewport);
@@ -203,7 +209,11 @@ where
             snapshot.set_layout_strategy(Some(strategy));
             snapshot.apply_strategy_positions(&positions);
             snapshot.set_projection_score(score);
-            snapshot.set_arrangement_pull(arrangement_pull);
+            snapshot.set_anchor_stiffness(anchor_stiffness);
+            snapshot.set_arrangement_roles(roles);
+            for (member, role) in role_members {
+                snapshot.set_member_role(member, Some(role));
+            }
         }
         snapshot
     }
