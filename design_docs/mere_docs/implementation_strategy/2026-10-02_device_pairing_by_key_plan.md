@@ -2,12 +2,12 @@
 
 **Date**: 2026-10-02
 **Status (2026-10-04)**: in progress. Assessed and ruled by Mark from 2026-10-01
-to 2026-10-04 (rulings 1 to 63 below). D1 landed (`4963b489`); D1b's mere fix (M1)
+to 2026-10-04 (rulings 1 to 67 below). D1 landed (`4963b489`); D1b's mere fix (M1)
 landed (`177b927c`) and its fork fix (F1) shipped in the 0.7.5 repin, pushed
 2026-10-04 (fork `1bec457e`, Knot `92367ec`, mere `031b3dcc`). `connected`
 follows the gossip overlay (ruling 31) and, off it, open connections
-(rulings 47 to 56). Next: the overlay's gap after restarts in its own lane
-(ruling 36), then D2.
+(rulings 47 to 56). Next: the overlay's gap after restarts, fixed by a
+patched iroh-gossip carried in a tagged fork (rulings 36, 64 to 67), then D2.
 **Scope**: Mark's machines find, reach and trust each other by device
 identity, not by address: the stack's own peers already do on one network;
 SSH, the path Mark uses daily, does not. Pairing a device becomes one
@@ -586,6 +586,35 @@ on Knot `main`. Mark: **"Push (c), name the 3 failures (Recommended)"**.
 Follows: the commit message names them with the control, and they are left
 to Collapse. Done 2026-10-04: GitHub's Knot `main` was still `eb934b4`, and
 `eb934b4..92367ec` was pushed with the one repin commit.
+
+**Ruling 64.** *Ruling 36's assessment (13 traced runs, iroh-gossip 0.101.0
+unchanged on this stack): a restart fails exactly when the survivor holds a
+stale pending entry for the restarted side, which predicted all 26 restarts.
+Where does the fix live?* Options: patch iroh-gossip; a nudge from
+mere-transport (close the peer's connections and re-tag after a dwell).
+(The p2panda fork was assessed and reduces to the nudge, since iroh-gossip's
+API offers only broadcast and join.) Mark: **"Patch iroh-gossip
+(Recommended)"**. Follows: ruling 46 keeps it out of upstream; the upstream
+ledger's item 3 records it.
+
+**Ruling 65.** *Which change? A1: in `on_join` (`proto/hyparview.rs:380-401`),
+clear a peer's pending entry when it is already an active neighbour, so its
+`Join` is always answered (about 3 lines; every route to a stale entry). A2:
+in `on_neighbor` (`:450-459`), do not record a reply as pending (about 2
+lines; this route only, and it touches refill and forward-join).* Options:
+A1 only; A1 and A2; A2 only. Mark: **"A1 only (Recommended)"**.
+
+**Ruling 66.** *How is the patched iroh-gossip carried?* Options: vendored in
+mere's `support/patches/` with Knot pointing at mere.git; a tagged fork
+repository, like vello and p2panda. Mark: **"A tagged fork repo"**.
+Follows: a `mark-ik/iroh-gossip` fork with a tag, patched by row in both
+mere and Knot. Creating it, its base commit and its tag come to Mark first.
+
+**Ruling 67.** *Proving data moves both ways after a restart needs a write
+on a resident that is already running; the receipts spawn the real binary,
+so a test-only path cannot do it. How?* Options: a real resident flag
+(`--seed-node-after <secs> <address> <title>`); a receipt-only environment
+variable; a cargo feature. Mark: **"A real resident flag (Recommended)"**.
 
 Also given in the same conversation (2026-10-01, Mark: "You can edit known
 hosts"): `known_hosts` entries may be updated, which was done for the
@@ -1170,6 +1199,37 @@ loaded machine:
   `92367ec`, mere at `031b3dcc`. Turnstone, Cleromancy and Isometry move at
   their own next mere repins, Isometry with its strict site, and Retinue's
   desktop workspace needs the `p2panda-core` patch row (findings above).
+
+**2026-10-04: ruling 36's assessment.** On the repinned stack (iroh 1.3.0,
+iroh-gossip 0.101.0, p2panda 0.7.5), 13 two-resident runs were made with
+gossip debug traces: mDNS-only and ticketed first contact, both restart
+orders, and a seeded node on each restarted side.
+
+- **The model held** (measured). Replaying each side's pending set from its
+  log predicted all 26 restarts: a restart works exactly when its survivor
+  holds no pending entry for it. Every first restart worked and every
+  second failed. In the failures the survivor got the fresh `Join` 1.4 to
+  5 s after the restart and sent no `Neighbor`, and the seeded node arrived
+  109.1 to 112.4 s late, against 0.76 to 2.2 s when a restart worked.
+- **Ruling 57's reading, corrected.** A first-restart failure was not
+  reproduced (0 of 13). Its precondition was seen once, harmless in that
+  run's order (`A-mdns-ba\2a0e5358`): a received b's `Join` and answered
+  with `Neighbor`, which reached b before a's own queued `Join`s; b took it
+  as a new request and replied, and a took that reply as the answer. So a
+  stale entry forms on whichever side receives the other's `Neighbor`
+  before processing the other's `Join`. One side joining alone is one route
+  to that, and a `Neighbor` overtaking a `Join` in a symmetric contact is
+  another. All 13 first contacts delivered both `Join`s, 2 to 96 ms apart,
+  ticketed or not.
+- **Fix locations.** iroh-gossip's API offers only `Broadcast`,
+  `BroadcastNeighbors` and `JoinPeers` (`api.rs:376-382`, checked), so a
+  re-join from the p2panda fork cannot help while the survivor's entry
+  stands; that option reduces to closing connections, the mere-side nudge.
+  The crate is about 8,000 lines. Knot restates mere's p2panda rows in its
+  own patch table (checked), so a patch row is needed in both.
+- **iroh-gossip 0.101.0's source** is upstream commit `2ce78afe`, which
+  upstream's `v0.101.0` tag points to (`.cargo_vcs_info.json`, `git
+  ls-remote`); upstream `main` is at `2885dd9f`.
 
 ## 7. Progress
 

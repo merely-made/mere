@@ -92,8 +92,12 @@ So, for each item:
   retries.
 - **Why it matters:** a device that crashes and restarts can sit half joined
   to the overlay for minutes.
-- **What we carry:** pairing ruling 36's overlay-fix lane.
-- **Last checked:** iroh-gossip 0.101.0.
+- **What we carry:** pairing ruling 36's overlay-fix lane. *2026-10-04:*
+  a patched iroh-gossip in a tagged `mark-ik/iroh-gossip` fork, clearing a
+  peer's pending entry in `on_join` when it is already an active neighbour
+  (pairing rulings 64 to 66). A `Neighbor` overtaking a `Join` forms the
+  entry too, not only a one-sided join.
+- **Last checked:** iroh-gossip 0.101.0 (upstream `v0.101.0`, `2ce78afe`).
 
 ### 4. iroh-gossip: a `Join` for an unsubscribed topic is dropped
 
