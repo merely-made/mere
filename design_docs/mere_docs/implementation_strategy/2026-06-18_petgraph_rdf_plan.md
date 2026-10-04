@@ -98,6 +98,12 @@ granularity:
     `EdgePayload` per `(from,to)` carrying a statement list, because pair adjacency
     is still the hot path. Pair-level APIs can keep returning "there is an edge from
     A to B"; RDF projection and exact mutation use statement iterators.
+    > **Amended 2026-10-04 (Mark, [graph semantics plan](2026-10-04_graph_semantics_plan.md)
+    > ruling 1):** a fact is one asserter's assertion, not the claim. Dedup keys on
+    > `(predicate, scope, asserter)`, so two asserters of one claim hold two
+    > statements, each retracted alone, projected as two reifiers on one triple term.
+    > The content-dedup described below (one record per `(predicate, scope)`, metadata
+    > overwritten in place) is what ruling 1 replaces.
   - **Enumerating current `sub_kinds` is not enough.** The statement list must carry
     per-statement metadata. A `BTreeSet<SemanticSubKind>` plus one `label` and one
     `predicate` is still lossy as soon as two predicates on the same pair need

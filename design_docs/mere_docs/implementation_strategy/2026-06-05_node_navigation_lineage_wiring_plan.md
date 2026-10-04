@@ -21,6 +21,7 @@
 
 - A **node is a browsing surface** (UUID identity; duplicate URLs welcome). It carries its own internal history: a forkable tree of visits. **Forward-fork**: going back then navigating to a new URL spawns a branch off the current visit, the prior forward branch is preserved (never truncated). This is exactly what `node-lineage`'s append-only `visit_entry` does and what `Node.navigation_memory` already stores.
 - **Navigating in place** (omnibar Enter, plain link click) extends *the focused node's* history and changes the page it shows. It mints no node.
+  > **Amended 2026-10-04 (Mark, [graph semantics plan](2026-10-04_graph_semantics_plan.md) ruling 2):** the surface model stands, but content statements no longer live on the surface. They attach to the resource the surface shows (one id per canonical URL), so navigating in place changes which resource's claims the surface shows instead of carrying page 1's claims to page 2.
 - **Within-node history** ↔ back/forward (in a tile, walks that node's visit tree).
 - **Across-node relations, three buckets by strength, distinct edge styles:**
   1. **navigated-from** (strongest) — minted by "open in new tile/node" (context menu, middle-click, Ctrl/Cmd-Enter, Ctrl+left-click). A new node + an edge back to the origin, anchored at the origin's **current visit** (a distinct anchor each time, even on revisit).

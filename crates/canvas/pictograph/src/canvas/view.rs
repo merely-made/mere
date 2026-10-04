@@ -229,6 +229,84 @@ impl Canvas {
         self.screen_position_of(self.focused_key()?)
     }
 
+    /// The node's body as Livery last drew it, `(min_x, min_y, max_x, max_y)`
+    /// in canvas px, read back from the node document by hit test: where the
+    /// gnode is painted and takes input, not where the frame meant it to go.
+    /// Seeded from the hit nearest the drawn anchor, then refined to each edge
+    /// along the axes through it, so a body another element covers reads
+    /// short. `None` before a frame, when the host draws the gnodes, or when
+    /// nothing of the body is hit within a node's size of its anchor.
+    pub fn node_body_rect(&self, key: NodeKey) -> Option<(f32, f32, f32, f32)> {
+        if self.render_gnodes_as_dom {
+            return None;
+        }
+        let gnode = *self.gnode_of.get(&key)?;
+        let (ax, ay) = self.screen_position_of(key)?;
+        let zoom = self.camera.zoom;
+        let size = self.node_size(key);
+        let anchor = (ax, ay - self.node_height(key) * zoom);
+        let hits = |x: f32, y: f32| self.node_document.hit_test(x, y) == Some(gnode);
+        // Ring by ring outward at a quarter of the drawn side.
+        let step = (size * zoom * 0.25).max(0.25);
+        let rings = (size * zoom.max(1.0) / step).ceil() as i32;
+        let seed = (0..=rings).find_map(|r| {
+            (-r..=r)
+                .flat_map(move |i| [(i, -r), (i, r), (-r, i), (r, i)])
+                .map(|(i, j)| (anchor.0 + i as f32 * step, anchor.1 + j as f32 * step))
+                .find(|&(x, y)| hits(x, y))
+        })?;
+        let reach = 2.0 * size * zoom.max(1.0) + step;
+        let edge = |inside: f32, outside: f32, hit: &dyn Fn(f32) -> bool| {
+            let (mut a, mut b) = (inside, outside);
+            for _ in 0..32 {
+                let m = 0.5 * (a + b);
+                if hit(m) {
+                    a = m;
+                } else {
+                    b = m;
+                }
+            }
+            0.5 * (a + b)
+        };
+        let min_x = edge(seed.0, seed.0 - reach, &|x| hits(x, seed.1));
+        let max_x = edge(seed.0, seed.0 + reach, &|x| hits(x, seed.1));
+        let mid_x = 0.5 * (min_x + max_x);
+        let min_y = edge(seed.1, seed.1 - reach, &|y| hits(mid_x, y));
+        let max_y = edge(seed.1, seed.1 + reach, &|y| hits(mid_x, y));
+        Some((min_x, min_y, max_x, max_y))
+    }
+
+    /// Where the face layer paints the node's face, `(min_x, min_y, max_x,
+    /// max_y)` in canvas px: the rect [`frame`](Self::frame) gives a derived
+    /// face or a favicon (one still awaiting its pixels paints nothing yet).
+    /// `None` for a face that paints no layer here, or a node with no position.
+    pub fn node_face_rect(&self, key: NodeKey) -> Option<(f32, f32, f32, f32)> {
+        if !matches!(self.node_face(key), Face::Derived | Face::Favicon) {
+            return None;
+        }
+        let world = self.view.position_of(key)?;
+        let rect = self.face_rect_at(key, PortablePoint::new(world.x, world.y));
+        Some((rect.min.x, rect.min.y, rect.max.x, rect.max.y))
+    }
+
+    /// The face's square: an upright billboard centred on the node's projected
+    /// anchor, inset within its resolved size, so a resized node carries its
+    /// face proportionally. The face layer and [`Self::node_face_rect`] share it.
+    pub(crate) fn face_rect_at(
+        &self,
+        key: NodeKey,
+        pos: PortablePoint,
+    ) -> paint_list_api::LayoutRect {
+        use paint_list_api::{LayoutPoint, LayoutRect};
+        let (cx, cy) = self.camera.to_screen(pos);
+        let side = self.node_size(key) * FACE_INSET * self.camera.zoom;
+        let half = side * 0.5;
+        LayoutRect::new(
+            LayoutPoint::new(cx - half, cy - half),
+            LayoutPoint::new(cx + half, cy + half),
+        )
+    }
+
     /// Map a screen-px point back to world space through the camera projector
     /// (the inverse of `Camera::to_screen`; at the default camera this is
     /// `world = (screen - offset) / zoom`).

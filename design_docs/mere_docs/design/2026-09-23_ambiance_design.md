@@ -215,6 +215,12 @@ examined stays ambient. Turnstone is the browser "where browsing history is the
 graph rather than a tab strip" ([TERMINOLOGY](../../TERMINOLOGY.md)). Mark:
 "this obviously directly applies to turnstone."
 
+> **Amended 2026-10-04 (Mark, [graph semantics plan](../implementation_strategy/2026-10-04_graph_semantics_plan.md)
+> ruling 4):** a recognized link statement (cites, quotes) whose target is not
+> in the graph stays ambient, but it is no longer discarded: a rebuildable
+> index, which is not graph truth, re-derives it when the target returns, and
+> the index can be purged.
+
 ### Practice: Woodshed
 
 Mark's chord questions are the ambient tier of one chord in focus: the related
