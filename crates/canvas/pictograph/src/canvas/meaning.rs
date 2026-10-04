@@ -81,6 +81,9 @@ pub struct MeaningParams {
     pub top_k: usize,
     /// The least cosine similarity a pair needs.
     pub min_similarity: f32,
+    /// The partition's modularity resolution γ: 1 is classical modularity,
+    /// above it smaller clusters, below it larger (F50).
+    pub resolution: f32,
 }
 
 impl MeaningParams {
@@ -90,6 +93,7 @@ impl MeaningParams {
     pub const LEXICAL: MeaningParams = MeaningParams {
         top_k: 4,
         min_similarity: 0.1,
+        resolution: 1.0,
     };
     /// A sentence model's tuning, the best F of a sweep of MiniLM on the
     /// topic fixture (F34): at a floor of 0.3 the clusters stay pure but each
@@ -97,6 +101,7 @@ impl MeaningParams {
     pub const MODEL: MeaningParams = MeaningParams {
         top_k: 4,
         min_similarity: 0.15,
+        resolution: 1.0,
     };
 }
 

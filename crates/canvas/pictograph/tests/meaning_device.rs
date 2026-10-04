@@ -32,27 +32,21 @@
 
 #![cfg(feature = "meaning-gpu")]
 
-#[path = "../src/canvas/tests/meaning_topics.rs"]
-#[allow(dead_code)]
-mod meaning_topics;
+mod meaning_common;
 
-use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 
 use esp::embed::bert::{Device, DeviceKind};
-use kernel::graph::NodeKey;
-use meaning_topics::{
-    ARXIV_CATEGORIES, arxiv_graph, confusion, f_measure, inverse_purity, partition, purity,
-    shuffled,
-};
+use meaning_common::meaning_topics::{arxiv_graph, partition, shuffled};
+use meaning_common::{Fixed, print_confusion, row, snapshot_on};
 use pictograph::canvas::meaning_device::{
     DeviceMeaning, check_meaning_device, host_meaning_device,
 };
 use pictograph::canvas::{
-    Canvas, Embedded, LexicalMeaning, MeaningBackend, MeaningEngine, MeaningParams,
-    MeaningSnapshot, PhysicsKindSource, PhysicsLaw, ProviderMeaning, physics_device_for,
+    Canvas, LexicalMeaning, MeaningBackend, MeaningEngine, MeaningParams, PhysicsKindSource,
+    PhysicsLaw, ProviderMeaning, physics_device_for,
 };
 
 const MEBIBYTE: u64 = 1 << 20;
@@ -61,37 +55,6 @@ fn model_dir() -> PathBuf {
     std::env::var_os("ESP_MINILM_DIR")
         .map(PathBuf::from)
         .expect("ESP_MINILM_DIR must point at the local all-MiniLM-L6-v2 artifact")
-}
-
-/// One snapshot on `engine`, through the canvas's ordinary path: Kinds by
-/// meaning, inline.
-fn snapshot_on(engine: Arc<dyn MeaningEngine>) -> (MeaningSnapshot, u64) {
-    let (graph, _, _) = arxiv_graph();
-    let mut canvas = Canvas::with_graph(graph);
-    canvas.set_meaning_engine(engine);
-    canvas.set_physics_kind_source(PhysicsKindSource::Meaning);
-    canvas
-        .set_physics_law(PhysicsLaw::Kinds)
-        .expect("not refused");
-    let snapshot = canvas.meaning().expect("a snapshot at build").clone();
-    (snapshot, canvas.meaning_runs())
-}
-
-fn row(
-    name: &str,
-    groups: &[(NodeKey, u32)],
-    topics: &HashMap<NodeKey, usize>,
-    shuffled: &HashMap<NodeKey, usize>,
-) -> (f64, f64) {
-    let f = f_measure(groups, topics);
-    let control = f_measure(groups, shuffled);
-    println!(
-        "{name}: purity {:.3}, inverse purity {:.3}, F {f:.3}, groups {}, F against shuffled topics {control:.3}",
-        purity(groups, topics),
-        inverse_purity(groups, topics),
-        partition(groups).len(),
-    );
-    (f, control)
 }
 
 #[test]
@@ -306,10 +269,12 @@ fn the_model_on_the_host_device_shares_it_and_records_purity() {
             let params = MeaningParams {
                 top_k,
                 min_similarity,
+                resolution: 1.0,
             };
             let (swept, _) = snapshot_on(Arc::new(Fixed {
                 vectors: vectors.clone(),
                 params,
+                backend: MeaningBackend::ModelGpu,
             }));
             let (f, _) = row(
                 &format!("model sweep top_k {top_k} min {min_similarity}"),
@@ -340,37 +305,6 @@ fn the_model_on_the_host_device_shares_it_and_records_purity() {
     // F34's bar: the model at F >= 0.9 on GPU and CPU.
     assert!(gpu_row.0 >= 0.9, "the model on the GPU: F {:.3}", gpu_row.0);
     assert!(cpu_row.0 >= 0.9, "the model on the CPU: F {:.3}", cpu_row.0);
-}
-
-/// Each large group's counts by category.
-fn print_confusion(name: &str, groups: &[(NodeKey, u32)], topics: &HashMap<NodeKey, usize>) {
-    println!(
-        "{name}: groups holding at least 2% of the titles, counts by category {ARXIV_CATEGORIES:?}"
-    );
-    for (size, counts) in confusion(groups, topics, ARXIV_CATEGORIES.len(), 0.02) {
-        println!("  group of {size:>3}: {counts:?}");
-    }
-}
-
-/// Vectors embedded once, replayed for a sweep's tunings.
-struct Fixed {
-    vectors: Embedded,
-    params: MeaningParams,
-}
-
-impl MeaningEngine for Fixed {
-    fn backend(&self) -> MeaningBackend {
-        MeaningBackend::ModelGpu
-    }
-
-    fn params(&self) -> MeaningParams {
-        self.params
-    }
-
-    fn embed(&self, texts: &[&str]) -> Result<Embedded, esp::embed::EmbedError> {
-        assert_eq!(texts.len(), 900, "a sweep replays the whole corpus at once");
-        Ok(self.vectors.clone())
-    }
 }
 
 /// F31: a host enabling the model boots its device greedy. A device booted
