@@ -516,7 +516,9 @@ fn settled_holds_the_last_settle_and_a_living_law_leaves_it() {
     );
 
     // A law that never rests leaves it as it was.
-    canvas.set_physics_law(PhysicsLaw::Orbit);
+    canvas
+        .set_physics_law(PhysicsLaw::Orbit)
+        .expect("Orbit takes overlays");
     for _ in 0..1200 {
         canvas.frame(1400, 900);
     }

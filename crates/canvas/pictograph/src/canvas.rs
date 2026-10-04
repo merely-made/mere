@@ -151,6 +151,7 @@ pub use palette::DerivedFacePalette;
 /// they are canvas glue (numen fields over placed nodes) that had been parked
 /// in the intel tier, where nothing consumed them.
 pub mod canvas_search;
+mod area_share;
 mod edge_cells;
 pub mod field_bridge;
 mod fields;
@@ -200,6 +201,7 @@ pub use physics_board::{BoardItem, PhysicsBoard, PhysicsChoice};
 pub use physics_catalog::{
     CANVAS_PHYSICS_DEPTH_SOURCES, CANVAS_PHYSICS_KIND_SOURCES, CANVAS_PHYSICS_LAWS,
     CANVAS_PHYSICS_MASS_SOURCES, CANVAS_PHYSICS_OVERLAYS, CANVAS_PHYSICS_PROFILES, LayoutStats,
+    OverlayRefusal,
     PhysicsDepthSource, PhysicsKindSource, PhysicsLaw, PhysicsMassSource, PhysicsOverlay,
     PhysicsProfile,
 };
