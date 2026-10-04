@@ -687,6 +687,103 @@ pull reading −0.33 with 510 overlaps):
   diagnose-and-retune lane"**: Orbit's framing check keeps failing until that
   lane lands. The alternatives were fixing it in the Energy lane, or
   accepting it as a living law and dropping its framing assert.
+  *Orbit diagnosed (2026-10-04, `orbit-retune` `dc624c58`):* exclusion does
+  76 to 83% of the terms' work in the first second, releasing the tight
+  starting layout's stored energy (230,625 on P2 against the kick's 16,614);
+  counter-damping returns exactly what damping removes, so the excess never
+  leaves and the bodies coast outward (extent 404 at 1 s, 54,909 at 120 s).
+  Centring alone bounds it but turns the motion into radial breathing
+  (tangential share 0.04). Mark chose **"Frictionless orbits + centring"**:
+  counter-damping cancels damping only on each body's tangential motion about
+  the mass centre, so radial drift settles, a weak centring term (0.02) joins
+  Orbit, and exclusion's reach shrinks from 1,000 to two node diameters
+  (worst extent 2.42 times the first second's; tangential share at least
+  0.90, coherence at least 0.92, at least 2.95 revolutions, no overlaps,
+  hubs inside). The alternatives were the same with only the kick's rotation
+  sense frictionless, or no centring with exclusion at three diameters.
+  Following the view, the old page's drag receipt failed (a dropped node 21
+  to 29 px from the drop against 20, the camera easing after release); Mark
+  chose **"Drag stops following"**: a node drag stops following as a pan
+  does, and Fit graph resumes it. Of three as-built recommendations he
+  ticked **"Density gets the check here"** (the Energy lane merges main and
+  asserts framing on Density's receipts); "Orbit's check unmarked" and "Face
+  offset gets a lane" return as their own questions.
+  The speed dial's remote board: Mark chose **"Follows the owner"**: a remote
+  board runs at the speed its owner, the device running the simulation, has
+  set, and shows it; the viewer cannot change it. *Reopened the same day:*
+  the coordinator's question said the board's pace "is set where the
+  simulation runs", which the speed lane found wrong: the owners (the C4
+  host's `LiveEndpoint`, `mere_host`, djinn's residents) run no simulation
+  for the board, and each viewer simulates its own `PhysicsBoard` from the
+  owner's score, its law mirroring the viewer's canvas (P3). The question
+  goes back to Mark with the finding. Put back with it (options: the
+  viewer's own dial; the owner publishing a speed on the session's snapshots
+  and diffs; 1x always), Mark chose **"The viewer's own dial"**: a remote
+  board follows the viewer's Speed select, as its law follows the viewer's
+  canvas, with no wire change.
+  Asked about the GPU lane falling behind at 50x (117 of 638 steps on the
+  CPU, against 5 at 1x), Mark answered: **"I mean, it's also true that I set
+  those speed numbers arbitrarily. I feel like, some computers by virtue of
+  having or not having a gpu or a stronger or weaker cpu will be able to
+  simulate the scene faster. Is there a way to define a hardware-independent
+  speed measure that allows people to use as much headroom as they want,
+  between some reasonable hardware-independent resource bounds?"** Put back:
+  speed already means simulated seconds per wall second; the 8 ms budget is
+  what depends on the machine (half a 60 Hz frame, nearly all of a 120 Hz
+  one). He chose **"Target + Max, budget as frame share"**: the presets stay
+  and gain "Max", as fast as the budget allows, and the budget becomes a
+  share of each frame (default 50%) instead of 8 ms, the page showing the
+  speed reached (against a headroom dial alone, or keeping it as built). On
+  the GPU lane he chose **"Staleness in ticks"**: forces are never more than
+  9 simulated ticks old, so the CPU serves more steps at high speed and the
+  reached speed shows the cost (against counting staleness in frames, or
+  blocking on the readback at speed).
+  The face offset, diagnosed (2026-10-04, `tree-face-zoom`): the face is
+  drawn right and the body wrong, on both pages. Pictograph's gnode style
+  scales each body about its centre (the CSS default Livery follows since
+  genet `62e1a0fa`, reaching mere at `8131d7a3`) while its arithmetic assumes
+  the top-left, so below zoom 1 bodies drift down-right by (size/2)(1 − z),
+  16.2 px at zoom 0.1; the old page has the same defect, so it cannot stay
+  unchanged. Mark chose **"transform-origin in the gnode style"**:
+  `transform-origin: 0 0` joins `GNODE_BOX` (`pictograph/src/canvas/build.rs`),
+  both pages are corrected identically and zoom 1 is unchanged, proven by a
+  body-geometry accessor and a unit test at five zooms (against the same
+  declaration inline in `frame.rs`, or translating by the unscaled half).
+  Weave (the workspace merge driver) mis-merged silently in four lanes on
+  2026-10-03 and 04, each caught only by a compile failure or a comparison
+  against `git merge-file`. Asked whether to keep it, Mark asked whether it
+  was up to date and said he would rather unwire it than keep shooting his
+  foot if it was. It was not (0.3.4 installed, built 2026-05-24; upstream
+  0.5.4, 70 commits ahead, several fixes matching the failures). He chose
+  **"Update, replay, decide"**: build 0.5.4, replay the four mis-merges
+  against it, and keep weave only if all come out right, otherwise unwire it
+  workspace-wide.
+  The old page's drag receipt under the following view still failed (Stress
+  22 against 20): following had zoomed out to 0.772 before the gesture, so
+  the receipt's 220 px drag was about 285 world units. Mark chose **"Measure
+  in world units"**: the gesture and the drag-return check work in world
+  units, reading as today at zoom 1 (against resetting zoom first, or
+  widening the thresholds). Orbit at host damping 0, where tangential-only
+  counter-damping leaves radial motion unsettled (bounded within 6.3 times
+  but breathing, tangential share as low as 0.08): Mark chose **"Radial
+  floor at 0.82"**: Orbit settles radial motion with at least the old page's
+  0.82 whatever the host's damping (at damping 0, worst 1.58 and 2.60 times,
+  tangential share at least 0.89), against documenting it. And the muniment
+  OPFS probe, whose page-error gate control needed the wasm-bindgen 0.2.126
+  CLI: Mark answered **"move it and anything else to 0.2.129. let's stay
+  with the newest."** Every wasm module in the tree moves to wasm-bindgen
+  0.2.129, the OPFS probe and the two minimal repros included (burn plan,
+  §13.40 or later).
+  Orbit's API: asked how the tangential-only counter-damping meets seiche's
+  public `Gravity::counter_damping: bool` (seiche 0.0.5 publishable), Mark
+  chose **"Explicit enum, bump seiche"**: the bool becomes
+  `CounterDamping::{Off, Full, Tangential}`, Orbit using Tangential, and
+  seiche goes to 0.0.6, so callers must choose. Orbit's framing check under
+  the following view: **"Leave it unmarked"**. The tree page's node faces
+  drawn small and offset below zoom 1 (predating the follow change): **"Its
+  own lane"**. The speed dial's fast receipt peaking at 8,100 µs against its
+  8,000 µs bound, with Chrome's clock resolving 100 µs: **"Bound = budget +
+  clock grain"**.
 - **Receipts gate on page errors (2026-10-03).** The pre.4 lane found that
   wgpu 30.0.0 panics once per GPU-on page (`webgpu.rs:85`, "Unexpected
   error", then `RuntimeError: unreachable`) because wasm-bindgen 0.2.126 and
