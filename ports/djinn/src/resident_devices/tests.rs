@@ -48,6 +48,7 @@ fn an_entry_reports_the_live_path_and_decodes_the_saved_hint() {
         reachable: true,
         bootstrap: false,
         connected: true,
+        on_overlay: true,
     };
     let paths = [
         PeerPath {
@@ -71,7 +72,7 @@ fn an_entry_reports_the_live_path_and_decodes_the_saved_hint() {
         ("thinkpad", 1_700_000_000_000)
     );
     assert_eq!(entry.pairing_id.as_deref(), Some("pairing-1"));
-    assert!(entry.connected && entry.reachable);
+    assert!(entry.connected && entry.reachable && entry.on_overlay);
     assert_eq!(
         entry.path,
         vec![
@@ -132,6 +133,7 @@ fn the_card_says_when_gossip_and_the_path_disagree() {
         reachable: true,
         bootstrap: false,
         connected: true,
+        on_overlay: true,
     };
     let mut path = [PeerPath {
         addr: direct("192.168.1.32:51234"),
@@ -151,11 +153,33 @@ fn the_card_says_when_gossip_and_the_path_disagree() {
         ..live
     };
     let stale = directory_entry(&paired(thinkpad, None), Some(&gone), &path);
-    assert!(!stale.connected);
+    assert!(!stale.connected && stale.on_overlay);
     assert_eq!(
         card_value(&stale).value,
         "not connected (no gossip neighbour; a path is still active)"
     );
+    // Off the overlay the count decided, and the card names that instead.
+    let closed = KnownPeer {
+        on_overlay: false,
+        ..gone
+    };
+    let off = directory_entry(&paired(thinkpad, None), Some(&closed), &path);
+    assert!(!off.connected && !off.on_overlay);
+    assert_eq!(
+        card_value(&off).value,
+        "not connected (no open connection; a path is still active)"
+    );
+}
+
+/// A directory written before `on_overlay` existed still reads, as version 1.
+#[test]
+fn a_device_entry_without_on_overlay_still_reads() {
+    let entry = directory_entry(&paired(peer(0x55), None), None, &[]);
+    let mut json = serde_json::to_value(&entry).unwrap();
+    json.as_object_mut().unwrap().remove("on_overlay");
+    let read: PairedDeviceV1 = serde_json::from_value(json).unwrap();
+    assert!(!read.on_overlay);
+    assert_eq!(read, entry);
 }
 
 /// The directory moves under a reader; the snapshot it took stays whole.

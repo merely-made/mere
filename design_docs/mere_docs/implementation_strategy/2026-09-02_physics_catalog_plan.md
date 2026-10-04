@@ -563,6 +563,72 @@ pull reading −0.33 with 510 overlaps):
   move from the key-order seed to dealt starts; the decay, quench,
   wall-inset, relax and renewal knobs leave the code once the stop lands,
   with their evidence kept in the logs.
+- **Density's stop, seventh round (2026-10-03, `density-cpu` `73965233`,
+  `e303e58b`).** Over the same 16 dealt starts (50 nodes / 200 nodes): the
+  120-pass cap reads min 0.699 / 0.732, mean 0.796 / 0.780, 9 of 16 at 0.8 or
+  above on 50 nodes; a minimum of 60 passes before the shift test reads min
+  0.713 / 0.703, mean 0.790 / 0.777, 9 of 16, stopping at about 60 s; shifts
+  of 0.02 and 0.01 still stop early on 50 nodes (6 and 5 of 16) and never by
+  test on 200; the ruled stop reads mean 0.722 / 0.754. No variant puts every
+  50-node start at 0.8. Density CV falls on every start under every variant,
+  and Springs reads −0.44 to −0.55 on the same starts (the control). Asked
+  which stop and bar, Mark chose **"Min 60, bar: all ≥ 0.7"**: the default
+  becomes a minimum of 60 passes before the shift test, and the bar becomes
+  every dealt start at 0.7 or above on both graphs, with the mean and the
+  count at 0.8 or above recorded. The alternatives were the 120-pass cap with
+  a mean bar near 0.8, or keeping every start at 0.8, which no stop meets.
+  This amends the third round's 0.8 bar on gen-50 and the plateau bar of 0.7
+  at 200 nodes into one bar over dealt starts.
+- **Density's declaration (2026-10-03).** After G1, `Force` requires
+  `Declared::terms()`; the lane wrote the grammar plan's sketch. Options: one
+  K term with its density field as state in the Wasserstein metric weighted
+  by node mass; K with position state, as Anneal and FlowAdvect; Em with an
+  exposed energy ∫ρ ln ρ (amending the rule that a kinematic term is K); two
+  terms, field diffusion and position advection. Mark chose **"Keep: K,
+  field, Wasserstein"**. *Reading, not ruled:* G1's instruments skip K terms,
+  so nothing measures Density's declaration; that is G5's concern.
+- **Density's experimental knobs (2026-10-03).** Measured: quench and the wall
+  inset had no effect, relax at 1.5 never stops and at 1.8 collapses, decay
+  was worse everywhere, and renewal gained nothing from dealt starts but lets
+  the field follow drags and contacts continuously. Options: keep renewal,
+  drop the other four; drop all five; keep all five off by default. Mark
+  chose **"Keep renewal, drop four"**: renewal stays as an option, and quench,
+  wall inset, relax and decay leave the code, their evidence kept in the logs
+  and here.
+- **Density's suite cost, and seiche's speed (2026-10-03, `density-cpu`
+  `0e1c745f`).** The dealt-start receipts take pictograph's default suite
+  from 110 s to 401 s; one dealt start costs 105 to 130 s in a debug build,
+  while all sixteen run in 133 s in release (three tests in parallel). Asked
+  how to carry the cost (the bars in release with a quick default check; an
+  opt-level override for seiche in dev builds; one start per graph; keep 401
+  s), Mark answered: **"Changing the speed of seiche is a useful feature for
+  dev and possibly otherwise. Let's consider how we might go from x0.20 to
+  x50?"** *Follows:* none of the options as put; seiche's speed goes to its
+  own design, put back to Mark. Density's merge waits on the interim choice.
+  *Put back the same day:* asked whether he meant a simulation-speed dial
+  (simulated seconds per wall second, 0.2x to 50x), seiche's compute speed in
+  dev and test builds (a debug build runs about 14x slower than release; one
+  Density start is ~115 s debug against ~8 s release), or both, Mark chose
+  **"Both"**. Asked how the dial changes a run (ticks per frame at a fixed
+  dt; a scaled dt; fixed dt up to a budget, then dt), he chose **"Ticks per
+  frame, fixed dt"**: the trajectory is the same at every speed, fast-forward
+  runs more ticks a frame up to a compute budget and reports when it cannot
+  keep up, and slow motion steps less often and interpolates what is drawn
+  between ticks. Asked what Density's merge carries meanwhile (release bars
+  with a quick default; keep 401 s; hold the merge), he chose **"Release
+  bars, quick default"**: all sixteen dealt starts are asserted in release as
+  ignored receipts that Density-touching lanes and merges run, and the
+  default suite keeps one quick sample check. *Reading, not ruled:* the dev
+  build's speed is measured before any profile change, since an opt-level
+  override touches every dev build of the crates it names.
+- **Energy's receipt passes off screen (2026-10-03).** In
+  `p4_tree_physics_energy`'s settled capture one node and one edge are in
+  view and the rest of the 11-node fixture has left it; the start frame
+  already runs past the edges; G1's, P5's and Density's captures match, so it
+  predates them. Options: a lane diagnoses whether the law's scale or the
+  view's fit is the cause, fixes it, and adds a framing assertion to every
+  law receipt with a positive control; the framing assertion only; a note.
+  Mark chose **"Diagnose and gate"**.
 - **P5's web defaults, undercut by pre.4 (2026-10-03).** On `burn-pre4-repin`
   the web page's frames take 557 ms against pre.2's 12.1 ms, GPU on or off,
   because the wasm module re-runs its static constructors (pliron's
