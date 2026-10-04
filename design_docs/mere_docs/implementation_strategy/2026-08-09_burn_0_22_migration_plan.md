@@ -3654,3 +3654,50 @@ crates.io into `C:/t/wasm-bindgen-0.2.129`. Its crate sha256 `5fd044ed…`
 equals crates.io's published checksum, and the binary is `87664ac7…`.
 Evidence: `Code/testing/mere/receipts/2026-10-03/pre4-bindgen`
 (`ruling-537-evidence.json`, arm locks, builds, scenario receipts).
+
+### 13.38 wgpu 30.0.1, and the decoder model (2026-10-04)
+
+Mark ruled three questions on 2026-10-04 after the coordinator re-checked
+§13.37: 117 receipt files carry the `webgpu.rs:85` panic, P5's GPU receipts
+among them. The first and third are Isometry wing rulings 545 and 546
+(`ab1b235`), recorded here. The second, **"Gate every receipt"**, is
+recorded in the physics catalog plan on main (`cd3961dd`).
+
+**Ruling 545: the web pins.** Question: §13.37's fork. The newest wasm-bindgen,
+0.2.129, works only with wgpu 30.0.1, which decodes error-scope results
+through `JsNullable`. On wgpu 30.0.0 every GPU-on page panics once. Options:
+
+- (A, recommended) 0.2.129 with wgpu 30.0.1 in graphshell-web,
+  `cambium-genet-web-host` and the probe, one wgpu across the root, web and
+  probe graphs;
+- (B) 0.2.129 with wgpu 30.0.0, keeping the panic;
+- (C) all three at 0.2.122, which would also take the root lock back to wgpu
+  30.0.0.
+
+Mark: **"0.2.129 + wgpu 30.0.1"**. *Follows:* graphshell-web,
+`cambium-genet-web-host` and the probe move to wasm-bindgen 0.2.129 and wgpu
+30.0.1, with one wgpu across the root, web and probe graphs. Then the helper
+is built as ruling 536 places it. The coordinator asked for the pins and the
+gate on main ahead of S16, on a branch of their own if main's pre.2 web graph
+can take them.
+
+**Ruling 546: the decoder download.** Question: the probe's decoder row needs SmolLM2's
+checkpoint, which is not on this machine, and no ruling covered downloading
+it. Scope as stated: exactly three files of `HuggingFaceTB/SmolLM2-135M-Instruct`
+at revision `12fd25f77366fa6b3b4b768ec3050bf629380bac` (Apache-2.0):
+
+- `config.json`, 861 B;
+- `tokenizer.json`, 2,104,556 B;
+- `model.safetensors`, 269,060,552 B.
+
+Each must match the SHA-256 in the probe's `decoder-model.json`, and they
+are stored outside the repository beside the other local models. Mark:
+**"Approve as stated"**. *Follows:* those three files only; anything beyond
+that one download goes back to Mark. Then the decoder row runs on pre.4.
+
+**Done, 2026-10-04.** The three files were fetched from Hugging Face at that
+revision into the main checkout's gitignored `models/smollm2-135m-instruct`.
+Each was moved into place only after its size and SHA-256 matched
+`decoder-model.json`: `8eb740e8…`, `9ca9acdd…` and `5af571cb…` (record:
+`Code/testing/mere/receipts/2026-10-04/pre4-decoder/fetch-decoder.json`).
+Nothing else was downloaded for the model.
