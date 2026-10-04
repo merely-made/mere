@@ -1455,3 +1455,42 @@ binning are the useful patterns.
   (1,026 at 60 s without exclusion). Gates on the instrument: seiche
   102/98/102, pictograph canvas 276, graphshell web 231 single-threaded. Logs
   and the sweep of candidate tunings: `Code/testing/mere/energy-frame/`.
+- 2026-10-04 (the fix, branch `energy-frame`, per "Follow while playing" and
+  "Repulsion 6,000, centring 0.2"). *Follow.* The canvas gains
+  `set_view_follow` / `view_follows`: while physics plays, each frame eases
+  the camera toward the camera `fit_to_content` would install (zoom
+  geometrically, the world point at the viewport centre linearly, a 0.25 s
+  time constant in host time, or one tick a frame where the host gives none).
+  A wheel pan or zoom, a middle-drag, an orbit drag, `set_camera` and the two
+  centring commands stop it; it holds while paused and while a node or the
+  camera is being dragged. Graphshell's `canvas_physics` turns it on at a law,
+  profile or Free switch and `CanvasCommand::Fit` turns it back on, so both
+  pages follow; it is off by default, so other hosts are unchanged. Both pages
+  publish `view-follow`. *Retune.* `LinLogForce`'s defaults are repulsion 6,000
+  and centring 0.2 under the same id; on the fixture's topology the islands
+  sit 5.07 apart for their size against Springs' 2.57 (asserted at Springs ×
+  1.3, the two-cliques claim's factor; two cliques 4.49 against 2.49). The
+  tree page now reads Energy converging: extent 860 × 1,113 and kinetic
+  energy 0.0 by frame 1,800, against 5,701 × 9,174 and still moving before.
+  *The control* pans first (following stops), plants the node 4,000 px off
+  (counted as exactly 1; an `== 0` there fails with `got '1'` on both pages),
+  then Fit graph resumes following and frames all 12. *Receipts* on bundle
+  `677a03a2`: the eleven law receipts, the profiles and the control pass on
+  both pages, every framing assert at 0. Before (bundle `10ac4316`): Energy
+  11 of 11 (tree) and 8, then 11 (old page); Kinds 4-5 and 1; Anneal 2-3 and
+  4-5; Orbit 4 (tree); the tree profiles 1-5; Charge, Stress and Flow one node
+  at the tree's edge. Follow alone (bundle `b59af687`, the first coefficients)
+  still left Energy 2 nodes out on the tree, past the 0.1 zoom floor. Orbit
+  passes its capture-moment check on both pages under follow (its expansion
+  outruns the floor only later), so its lane's expected failure has no frame
+  to mark at the stated moment; put back. Also run green: the tree drag and
+  add, the old page's add, `p4_tree_controls`, `p4_tree_live_profile`,
+  `p4_tree_elapsed`, `p4_tree_profile`, the two saved-graph receipts, and the
+  2,000-node settles (GPU 413 of 418 steps on the device, spread 1,075). The
+  old page's `physics_drag` fails its released-where-dropped bound (21 and 29
+  px against 20) because the camera eases after the release; put back as a
+  fork. Found on the way, not fixed: the tree page draws node faces small and
+  offset up-left of their bodies below zoom 1 (reproduced by toolbar zoom
+  alone, with following off); following makes zoom below 1 common there.
+  Gates: seiche 103/99/103 (default, no-default, gpu), pictograph canvas 277,
+  graphshell web 232 single-threaded.
