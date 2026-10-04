@@ -774,7 +774,11 @@ pull reading −0.33 with 510 overlaps):
   mesquite's `lane.rs`, restored at the time). Asked whether to install it,
   unwire weave, or wait for a release, Mark chose **"Install d73c4ae,
   quietly"**: the verified build is installed at a quiet moment, active
-  sessions told first.
+  sessions told first. *Installed 2026-10-04:* `weave 0.5.4` (d73c4ae) in
+  `~/.cargo/bin`, the global driver string unchanged. `cargo install`
+  rebuilt it, so its hashes differ from the tested build's, but replaying the
+  four merges' 37 files with the installed driver gives byte-identical
+  outputs and exit codes.
   The old page's drag receipt under the following view still failed (Stress
   22 against 20): following had zoomed out to 0.772 before the gesture, so
   the receipt's 220 px drag was about 285 world units. Mark chose **"Measure
