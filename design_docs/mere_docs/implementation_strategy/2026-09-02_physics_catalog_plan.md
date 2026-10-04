@@ -1996,3 +1996,32 @@ binning are the useful patterns.
   stepping in a debugger (lldb lacks its Python DLL here); a sampling profile
   (the shell is not elevated, so the Windows profilers cannot run; the split
   above is by timers, opt-levels and a microbenchmark instead).
+- 2026-10-04 (seiche's speed, the four rulings carried out, branch
+  `seiche-speed`). Main `60eb5940` merged with its root lock kept exactly; weave
+  had replaced the actor's `barrier`/`latest` impl with the second
+  `impl ActorPhysics` and appended `DEFAULT_BOARD_ANCHOR_STIFFNESS` twice, both
+  repaired by hand. "Opt 3 in dev for physics": the root manifest optimizes
+  seiche, rapier2d, parry2d, nalgebra, simba and glamx in dev, and
+  graphshell-web's manifest gains glamx so the two name one set; one Density
+  dealt start then takes 6.1 s (146.5 s before) and the pictograph suite 55.5 s
+  (117 s on the same merge before), the suite now bounded by
+  `arrangement_roles::the_spiral_probe_through_the_canvas` at about 51 s, not
+  by physics. "Sum in key order": `NodeExclusion` and `BarnesHutRepulsion` read
+  `laws::node_positions`; every force set is bit-reproducible over five runs,
+  and all twelve catalog laws, Density included, land on the same bits at
+  0.2x, 1x and 50x after 150 ticks, one tick more differing under every law
+  but Still; with the two files reverted both receipts fail. G1's
+  class-agreement test passes with 44 of its 166 readings moved in their low
+  digits and none beyond its tolerance. "Speed select": presets 0.2x to 50x in
+  the physics section of both pages, 1x by default, applied when chosen
+  (*reading, not ruled*), with "Running at 3.1x: the frame budget is full"
+  beneath while the budget binds. Headed on bundle `211bd071` (wasm-bindgen
+  0.2.129, web lock `0090ad99`), every receipt with zero gate entries: the
+  eleven law receipts, profiles, add, drag and Density's two green; the slow,
+  fast-control and both Speed select receipts green; two readings out of
+  bound and left as they are: `p6_tree_speed_fast` stepped at most 8,100 us
+  against its 8,000 us bound (the browser clock's grain is 100 us), and
+  `p5_tree_gpu_settle_2000` at 50x ran 677 ticks in its 120 frames against
+  1x's 418, so its frame-counted bounds miss (spread 1,135, energy 96k), with
+  117 of 638 device steps stale. seiche 122/122 (116 without actor, 122 + 3
+  with gpu), pictograph 292, graphshell `web` 234.
