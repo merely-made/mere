@@ -2,13 +2,13 @@
 
 **Date**: 2026-10-02
 **Status (2026-10-04)**: in progress. Assessed and ruled by Mark from 2026-10-01
-to 2026-10-04 (rulings 1 to 60 below). D1 landed (`4963b489`); D1b's mere fix (M1)
+to 2026-10-04 (rulings 1 to 62 below). D1 landed (`4963b489`); D1b's mere fix (M1)
 landed (`177b927c`), its fork fix (F1) is released as
 `mere-p2panda-net-0.7.5` (`1bec457e`, pushed). `connected` follows the
 gossip overlay (ruling 31, `fdb02bd3`) and, off it, open connections
 (rulings 47 to 56, `005e27ad`). The repin pushes are under way: Knot's
-(a) is pushed (`eb934b4`), mere's (b) and Knot's repin (c) follow their
-checks (rulings 58 to 60); the overlay's gap after restarts has its own
+(a) (`eb934b4`) and mere's (b) (`031b3dcc`) are pushed, and Knot's repin
+(c) follows its checks (rulings 58 to 62); the overlay's gap after restarts has its own
 lane (ruling 36); then D2.
 **Scope**: Mark's machines find, reach and trust each other by device
 identity, not by address: the stack's own peers already do on one network;
@@ -562,6 +562,23 @@ Knot's workspace check, library, desktop, retinue and knot-document tests
 and `cargo tree -d`.* Options: push after its checks; hold. Mark: **"Push
 (c) after its checks (Recommended)"**.
 
+**Ruling 61.** *Push (c) stopped at its first check: mere `031b3dcc` added
+`on_overlay` to `KnownPeer` (ruling 52), and Knot's test-only helper
+`peer(seed, reachable, connected)` (knot-editor `resident.rs:686`) builds
+one, so it no longer compiles; it is Knot's only break, and the helper's
+tests read only `connected`. What does the helper set?* Options:
+`on_overlay: true`; `on_overlay: false`; a new parameter. Mark:
+**"on_overlay: true (Recommended)"**. Follows: the line rides in Knot's
+repin commit.
+
+**Ruling 62.** *Mere's checks missed it because djinn compiles
+knot-editor's library, not its tests. Should the mere/Knot lockstep compile
+Knot's test targets against mere's tree before mere pushes a change Knot
+consumes?* Options: add it to the lockstep; not now. Mark: **"Add it to the
+lockstep (Recommended)"**. Follows: before such a push, `cargo check
+--workspace --all-targets` runs in a scratch Knot worktree patched at mere's
+tree; recorded in the mere/Knot lockstep memory the same day.
+
 Also given in the same conversation (2026-10-01, Mark: "You can edit known
 hosts"): `known_hosts` entries may be updated, which was done for the
 ThinkPad (`.32`) and Q-PC (`.68`, `q-pc.local`), each key added only after
@@ -1112,6 +1129,28 @@ loaded machine:
   besides this plan's four, so push (b) carries the verified repin branch
   only (ruling 59).
 - **Push (a)** is done (ruling 58).
+
+**2026-10-04: push (b), and (c)'s stop.**
+
+- **Push (b)** (ruling 59). Once Knot's `562353aa` was on GitHub, the lock
+  resolved with only the four Knot crates moving from the path patch to
+  git (1669 packages before and after). It was committed alone as
+  `031b3dcc`. Checks before the push:
+  - the unmodified `cargo_mode.py verify` passed (1542 packages);
+  - djinn 101 passed;
+  - D1's stopped peer read not connected after 11.10 s, and D1b failed at
+    its second restart (ruling 36);
+  - PID 53336 throughout.
+
+  GitHub's `main` was still `7587f0df`, and `7587f0df..031b3dcc` was pushed
+  as a fast-forward of exactly the nine listed commits. The local `main`,
+  with the physics session's unpushed commits and this plan's, has diverged
+  from it; the physics session, told, merged `origin/main` into it as
+  `fb12ce11`.
+- **Push (c)** moved Knot's 40 mere rows to `031b3dcc` and its 14 genet rows
+  to `bd3e8861` (no other rev left in any manifest; the lock has one mere
+  and one genet). It stopped at the workspace check on the test helper
+  (ruling 61). knot-desktop and its retinue check passed.
 
 ## 7. Progress
 
