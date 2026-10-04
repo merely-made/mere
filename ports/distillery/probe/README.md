@@ -12,10 +12,10 @@ unrelated headed ports move between Genet host generations.
 From the Mere root:
 
 ```powershell
-cargo binstall wasm-bindgen-cli@0.2.122 --root C:\path\to\wasm-bindgen-0.2.122
+cargo binstall wasm-bindgen-cli@0.2.129 --root C:\path\to\wasm-bindgen-0.2.129
 ports/distillery/probe/fetch-model-matrix.ps1
 ports/distillery/probe/run-probe.ps1 `
-  -WasmBindgen C:\path\to\wasm-bindgen-0.2.122\bin\wasm-bindgen.exe
+  -WasmBindgen C:\path\to\wasm-bindgen-0.2.129\bin\wasm-bindgen.exe
 ```
 
 The fetch command verifies every configured byte count and SHA-256 before

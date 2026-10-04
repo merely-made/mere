@@ -25,8 +25,8 @@ $env:DISTILLERY_PROBE_DIRTY = if ($ownedStatus) { 'true' } else { 'false' }
 
 New-Item -ItemType Directory -Force -Path $TargetDir | Out-Null
 $bindgenVersion = (& $WasmBindgen --version).Trim()
-if ($bindgenVersion -ne 'wasm-bindgen 0.2.122') {
-    throw "The probe requires wasm-bindgen CLI 0.2.122; got '$bindgenVersion'. Pass -WasmBindgen with the matching executable."
+if ($bindgenVersion -ne 'wasm-bindgen 0.2.129') {
+    throw "The probe requires wasm-bindgen CLI 0.2.129; got '$bindgenVersion'. Pass -WasmBindgen with the matching executable."
 }
 Push-Location $TargetDir
 try {
