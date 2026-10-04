@@ -1,15 +1,15 @@
 # Device Pairing by Key Plan
 
 **Date**: 2026-10-02
-**Status (2026-10-03)**: in progress. Assessed and ruled by Mark from 2026-10-01
-to 2026-10-03 (rulings 1 to 55 below). D1 landed (`4963b489`); D1b's mere fix (M1)
+**Status (2026-10-04)**: in progress. Assessed and ruled by Mark from 2026-10-01
+to 2026-10-04 (rulings 1 to 56 below). D1 landed (`4963b489`); D1b's mere fix (M1)
 landed (`177b927c`), its fork fix (F1) is released as
 `mere-p2panda-net-0.7.5` (`1bec457e`, pushed), with knot and mere repinned
-locally and `main` merged into the repin (`259f2741`); `connected` follows
-the gossip overlay (ruling 31, landed `fdb02bd3`). Before knot's and mere's
-pushes, connection-event liveness for peers off the overlay is built on
-`main` (rulings 47 to 55) and the release branch takes `main` again; the
-overlay's gap after restarts has its own lane (ruling 36); then D2.
+locally. `connected` follows the gossip overlay (ruling 31, `fdb02bd3`) and,
+off it, open connections (rulings 47 to 56, `005e27ad`). Next the release
+branch takes `main` again and reruns on iroh 1.3, then knot's and mere's
+pushes come to Mark; the overlay's gap after restarts has its own lane
+(ruling 36); then D2.
 **Scope**: Mark's machines find, reach and trust each other by device
 identity, not by address: the stack's own peers already do on one network;
 SSH, the path Mark uses daily, does not. Pairing a device becomes one
@@ -521,6 +521,15 @@ cleared at 60.007 s once). As built, the path rule must read connected at
 Options: keep it; the original wording. Mark: **"Keep 59 s / not before 60 s
 (Recommended)"**.
 
+**Ruling 56.** *Ruling 54's A/B separated nothing: the dual-dial delivery gap
+has appeared once in 50 parallel suites, on the first liveness build, and
+not again in any arm (hook on without the killed-peer test 0 of 10; hook off
+with it 0 of 10; the final build 0 of 10, some under heavy outside load; 0
+of 20 before the hook). What now?* Options: merge and watch for recurrence;
+a bigger hook-on run first; loosen the gap check. Mark: **"Merge; watch for
+recurrence (Recommended)"**. Follows: the gap is recorded as one
+unexplained event; a second occurrence reopens it, with its logs.
+
 Also given in the same conversation (2026-10-01, Mark: "You can edit known
 hosts"): `known_hosts` entries may be updated, which was done for the
 ThinkPad (`.32`) and Q-PC (`.68`, `q-pc.local`), each key added only after
@@ -1017,6 +1026,35 @@ loaded machine:
   absolute times (ruling 53), one the dual-dial delivery-gap check
   (ruling 54).
 - Not yet built: ruling 50's wordings, which needed ruling 52.
+
+**2026-10-04: the open-connection count landed.**
+
+- **The second round** (`a44ee831`):
+  - `KnownPeer` and `PairedDeviceV1` carry `on_overlay`; the directory
+    stays at version 1, and an entry without the field reads as `false`.
+  - The two wordings are constants (`NOT_CONNECTED_NO_NEIGHBOUR`,
+    `NOT_CONNECTED_NO_CONNECTION`), chosen by one function both surfaces
+    call, with both literals asserted on both.
+  - The polling check compares each run's delay after its own close
+    (ruling 53). In 10 suites the close came 9.90 to 10.02 s after the
+    kill, and the rule followed within 0.12 s, polled or not. iroh's path
+    rule read connected at 59 s every time, cleared at 60.01 to 65.10 s
+    unpolled, and never within 150 s with pollers.
+- **Ruling 54's A/B** is recorded in ruling 56. The lane's reading of the
+  arms: A skipped both child-spawning tests; B's scratch switched the hook
+  off except for the killed-peer scenario's own parent, since with it off
+  everywhere that test fails in about 10 s and its load disappears.
+- **Merged** as `005e27ad`, after verification in the normal-depth worktree
+  on `main` `ce79a82f` (merge `cc697b8f`):
+  - mere-transport 56 of 56 twice (about 155 s each); stickleback 85 and 5;
+    djinn's 15 test binaries.
+  - D1's stopped peer read not connected after 11.03 s. D1b failed at its
+    second restart (ruling 36).
+  - The control: with the hook never installed, both liveness tests fail.
+  - The installed resident stayed on PID 53336.
+  - `main` had moved by one doc file, so the merged tree differs from the
+    verified one in that file only.
+- **Open:** the dual-dial delivery gap, one event in 50 suites (ruling 56).
 
 ## 7. Progress
 
