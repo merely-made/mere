@@ -2,14 +2,12 @@
 
 **Date**: 2026-10-02
 **Status (2026-10-04)**: in progress. Assessed and ruled by Mark from 2026-10-01
-to 2026-10-04 (rulings 1 to 62 below). D1 landed (`4963b489`); D1b's mere fix (M1)
-landed (`177b927c`), its fork fix (F1) is released as
-`mere-p2panda-net-0.7.5` (`1bec457e`, pushed). `connected` follows the
-gossip overlay (ruling 31, `fdb02bd3`) and, off it, open connections
-(rulings 47 to 56, `005e27ad`). The repin pushes are under way: Knot's
-(a) (`eb934b4`) and mere's (b) (`031b3dcc`) are pushed, and Knot's repin
-(c) follows its checks (rulings 58 to 62); the overlay's gap after restarts has its own
-lane (ruling 36); then D2.
+to 2026-10-04 (rulings 1 to 63 below). D1 landed (`4963b489`); D1b's mere fix (M1)
+landed (`177b927c`) and its fork fix (F1) shipped in the 0.7.5 repin, pushed
+2026-10-04 (fork `1bec457e`, Knot `92367ec`, mere `031b3dcc`). `connected`
+follows the gossip overlay (ruling 31) and, off it, open connections
+(rulings 47 to 56). Next: the overlay's gap after restarts in its own lane
+(ruling 36), then D2.
 **Scope**: Mark's machines find, reach and trust each other by device
 identity, not by address: the stack's own peers already do on one network;
 SSH, the path Mark uses daily, does not. Pairing a device becomes one
@@ -578,6 +576,16 @@ consumes?* Options: add it to the lockstep; not now. Mark: **"Add it to the
 lockstep (Recommended)"**. Follows: before such a push, `cargo check
 --workspace --all-targets` runs in a scratch Knot worktree patched at mere's
 tree; recorded in the mere/Knot lockstep memory the same day.
+
+**Ruling 63.** *Push (c) is ready apart from three knot-desktop Collapse
+tests failing with "missing Show Preview" (`apps/desktop/tests/collapse.rs:44`),
+which fail identically on Knot's `main` before the repin (`ea3e99e`, a clean
+control worktree on its own lock); every other check passes. Commit and push
+(c)?* Options: push, naming the three failures; hold until Collapse is fixed
+on Knot `main`. Mark: **"Push (c), name the 3 failures (Recommended)"**.
+Follows: the commit message names them with the control, and they are left
+to Collapse. Done 2026-10-04: GitHub's Knot `main` was still `eb934b4`, and
+`eb934b4..92367ec` was pushed with the one repin commit.
 
 Also given in the same conversation (2026-10-01, Mark: "You can edit known
 hosts"): `known_hosts` entries may be updated, which was done for the
@@ -1151,6 +1159,17 @@ loaded machine:
   to `bd3e8861` (no other rev left in any manifest; the lock has one mere
   and one genet). It stopped at the workspace check on the test helper
   (ruling 61). knot-desktop and its retinue check passed.
+- **Push (c)** (rulings 61 and 63). With the helper setting `on_overlay:
+  true`, Knot's checks passed: the workspace check, knot-editor 149,
+  knot-document 47, the retinue check, and `cargo tree -d` with one copy
+  each of mere, genet, iroh and p2panda. The exception is three of
+  knot-desktop's four Collapse tests (290 others passed), which fail the
+  same way on `ea3e99e`. Committed as `92367ec` and pushed as
+  `eb934b4..92367ec`. Knot builds on its own again.
+- **The 0.7.5 repin is complete:** the fork at `1bec457e`, Knot at
+  `92367ec`, mere at `031b3dcc`. Turnstone, Cleromancy and Isometry move at
+  their own next mere repins, Isometry with its strict site, and Retinue's
+  desktop workspace needs the `p2panda-core` patch row (findings above).
 
 ## 7. Progress
 
