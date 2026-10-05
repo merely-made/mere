@@ -209,6 +209,42 @@ fn one_resident_is_killed_stopped_and_restarted_on_the_same_roots() {
     println!("RECEIPT verified {} evidence files", checked.checked);
 }
 
+/// F1: with personal sync on, a graceful stop cancels and joins every task
+/// that borrows the blob store or the published-site route, and exits 0. The
+/// control leaves one holder outside the task scope, and the shutdown's
+/// borrower check refuses it.
+#[test]
+#[ignore = "runs a real djinn resident"]
+fn a_graceful_stop_with_sync_on_exits_cleanly_and_a_left_holder_fails_it() {
+    let run = begin(
+        "djinn-harness",
+        "a_graceful_stop_with_sync_on_exits_cleanly_and_a_left_holder_fails_it",
+    );
+    let mut r = resident(&run, "synced", "synced", PASSPHRASE);
+    configure(&r, "synced", "djinn-harness-stop");
+    r.start(&[]).unwrap();
+    assert!(r.wait_ready(READY).sync.is_some(), "sync is on");
+    r.stop(STOP);
+
+    r.start(&["--control-unjoined-holder"]).unwrap();
+    r.wait_ready(READY);
+    let exit = r.stop_unjudged(STOP);
+    let error = r
+        .stopped_event()
+        .and_then(|event| event.other.get("error").cloned())
+        .unwrap_or_default();
+    run.control(
+        "f1: one blob-store holder left un-joined",
+        "exit 1, the blob store's borrower check refusing",
+        &format!("exit {:?}; {error}", exit.and_then(|e| e.code())),
+        exit.and_then(|e| e.code()) == Some(1)
+            && error
+                .as_str()
+                .is_some_and(|e| e.contains("resident blob store still has active borrowers")),
+    );
+    run.finish();
+}
+
 /// C3 with a real resident: the test process that holds the run is killed
 /// mid-run, and the resident it spawned goes with it.
 #[test]
