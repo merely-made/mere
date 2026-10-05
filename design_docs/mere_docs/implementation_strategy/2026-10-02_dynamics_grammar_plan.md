@@ -187,6 +187,8 @@ From the physics catalog plan, §3 P5–P7 and §5:
 | The picker (2026-10-01) | "Ordinary laws with a CPU tier" | Every term keeps a CPU rung, so every host can realize every spec. |
 | Rapier's role (2026-10-01) | "Rapier seems the fallback in any case" | Integration under rapier remains the default realization, and every other realization falls back to it. |
 | Licensing (2026-10-01) | "Doublecheck. Otherwise, 1" | Nexus-derived code is treated as Apache-2.0. A close port gets a `LICENSES.md` entry; code merely informed by it stays MPL-2.0 with a credit line. |
+| Permitted actions, stack seams S3 (2026-10-04) | "One model: AdvertisedAction (Recommended)" | F21's binding's permitted actions (drag, pin) are chirograph `AdvertisedAction`s, drag and pin advertising the `Curation` effect since positions are not graph truth; one path into accessibility and permission surfaces. Carried by G9 below. |
+| Determinism, stack seams S4 (2026-10-04) | "Ordered, declared, cross-platform (Recommended)", after Mark asked "How large is the performance cost of enhanced determinism?" | seiche iterates bodies in key order so a build repeats (today five processes give five fingerprints, `Code/testing/mere/seiche-repeat`); each `Term` declares deterministic, seeded or nondeterministic; rapier's `enhanced-determinism` goes on (measured free, `Code/testing/mere/rapier-determinism`); seiche's own transcendental math routes through `libm`, its cost measured; runs repeat across platforms. Carried by G8 below, with the seams plan's checkpoint C3. |
 
 **Rules for lanes on this plan** (*Reading, not ruled*, gathered from current policy):
 - **Licensing.** The licence posture brief's ruling is "MPL-2.0 by default, with correct provenance", and "there are no exceptions" (`design_docs/2026-08-22_license_posture_brief.md`). Algorithms are written from the literature where possible, as P6a's CPU tier was. Any close port gets a `LICENSES.md` entry under the licensing ruling above.
@@ -313,6 +315,21 @@ Constraints report whether they were satisfied, the physics counterpart of `scen
 - the anchor residual falls monotonically as `arrangement_pull` rises across a sweep;
 - the reports reach the web snapshot and turnstone's observe snapshot;
 - the eleven law receipts stay green.
+
+### G8 — determinism (stack seams S4, 2026-10-04)
+
+From `2026-10-04_stack_seams_plan.md` §3.2, which hands it to this plan. It extends G1's declarations and the speed dial's key-order sums (physics catalog plan, "Sum in key order", which ordered NodeExclusion and Barnes-Hut only).
+
+*Done when:*
+- the `seiche-repeat` probe prints one fingerprint across five processes (today's five different ones are the control);
+- each `Term` declares its determinism (deterministic, seeded or nondeterministic), and an undeclared one does not compile, as G1's declarations;
+- rapier's `enhanced-determinism` is on;
+- the probe's fingerprint matches on Windows and on macOS or Linux;
+- the cost of `libm` in seiche's laws is measured at the probe's sizes and reported. Checkpoint C3: if it costs more than the run-to-run spread at 5,000 bodies, the figure comes back to Mark before it is kept.
+
+### G9 — permitted actions (stack seams S3, 2026-10-04)
+
+*Done when:* the binding's permitted actions are `AdvertisedAction`s; drag and pin advertise as `Curation`; an accessibility or permission surface lists them with no physics-specific path.
 
 ### G7 — arrangement roles (approved 2026-10-03, F40)
 
