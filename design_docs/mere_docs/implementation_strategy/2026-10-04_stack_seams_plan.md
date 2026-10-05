@@ -2,7 +2,8 @@
 
 **Date:** 2026-10-04
 **Status (2026-10-05):** in progress. Twenty-two rulings in eight rounds (S1
-to S22); P1 being built in this session's worktree (S19), P2 after it; P3 and S7 done as documents; S3 to S6 carried into the
+to S22); P1 implemented on branch `stack-seams-p1` (`dd2cb6fd`), awaiting Mark's
+review, P2 after it; P3 and S7 done as documents; S3 to S6 carried into the
 dynamics grammar plan (G8, G9); S9 done by the identity lane (`b52edea7`).
 No code in this plan's own lane yet.
 
@@ -143,6 +144,18 @@ in two or more crates.
   while graphshell uses `"grid.default"` and `"scatter.default"`. Authoring
   offers a string direction, an integer spacing and string options, where
   sceno's families take typed parameters.
+- **F14 (2026-10-05, P1 as built).** Stack reads its layer from
+  `ScoreItem::axis`, not `ScoreItem::layer` (sceno's `Stack` doc), so S21's
+  "integer x as its layer" is a numeric axis held to whole values. Today's
+  scatter compiled with `invert_y: false` where sceno's `Geographic` default
+  is `true`; the catalog keeps `false` so saved scatter recipes do not flip.
+  graphshell lays cards out at 164 by 68 scene units and scales the whole scene
+  at paint (`web_practice.rs`, `card_size`), so that scene-unit card, not the
+  zoomed one, is what it supplies. The new scenograph-to-sceno edge touches two
+  lockfiles (the root and `ports/distillery/probe/remote-fixture`), one line
+  each; graphshell's web workspace keeps a gitignored local lock. During the
+  gates another session cleared the shared `C:/t/cargo-targets/mere` twice
+  mid-build, so P1's gates ran in an isolated target.
 - **F13 (2026-10-05). The compiler moved under another lane.** At `c79bb8c2`
   (00:52), for its relationship-recipe pass, the projection grammar lane moved
   graphshell's compiler into `scenomise::projection` (1,147 lines) and made
@@ -464,6 +477,20 @@ The done-conditions handed over for S3 and S4, kept for reference:
   works in `projection_compile`. Second pass (F8 to F11), rulings S7 to S10:
   the README fixed (S7), TERMINOLOGY gains pandect under Eidetic and the
   curation record (S8, S10), S9 sent to the identity lane.
+- **2026-10-05.** P1 implemented on branch `stack-seams-p1` at `dd2cb6fd`
+  (worktree `Code/worktrees/mere-stack-seams-p1`), not merged. Done-conditions
+  as built: every catalog family compiles from a definition (a test iterates
+  the catalog); graphshell's projection tests pass through the shared step, with
+  four grid assertions moved to the 180 by 84 pitch S16 rules and the option test
+  naming its key; an unregistered id and an unread option are typed issues; no
+  written-in cell size, column count or footprint remains; two compilers give
+  one score. Controls: grid pitch measured at two card sizes (180 by 84 and 216
+  by 116), and a custom solver that compiles only with its registration. Gates:
+  scenograph 8 and scenomise 97 passed; graphshell with personal-sync 319
+  library and 5 other tests passed, 4 ignored; graphshell web wasm32 check and
+  `cargo check --workspace --locked` exit 0; no warnings in changed files. Not
+  run: Woodshed and other consumers outside this repository, which meet the
+  `ProjectionCompiler` signature at repin (the adoption plan's note says so).
 - **2026-10-05.** P1 had stalled: the S18 relay reached the graph-semantics
   lane, not the recipe pass. S19 restarts it with a note left in the adoption
   plan; S20 moves item sizes to the host.

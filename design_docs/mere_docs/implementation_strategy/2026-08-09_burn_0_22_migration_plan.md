@@ -4728,3 +4728,54 @@ The coordinator's port rule holds: no other process named or held 8853.
 Main has since gained `e8b440be`, a dynamics grammar plan record only. It is
 not merged here, and it merges cleanly. S16 remains the coordinator's. No
 push.
+
+### 13.46 Knot's repin onto pre.4: two rulings (2026-10-05)
+
+Ruling 557's first handoff: knot-editor's `mere-pre4-repin` branch, off
+Knot's origin/main `5516606`, moves 42 mere rows in three manifests from
+`c79bb8c2` to `07db35e2`. Genet stays on `bd3e8861` and smolweb on
+`882baeb1`. Knot compiled with no source edits. Evidence is in
+`Code/testing/knot-editor/pre4-repin/`. They are wing rulings 585 and 586 (Isometry
+`1b7ca69`).
+
+**Ruling 585: Knot's CubeCL persistence.** The question as put: pristine
+`cubecl-runtime 0.11.0-pre.4` turns `persistence` on by default (checked in
+its manifest), which pulls in turso 0.8.0-pre.13. Mere avoids that with
+ruling 375's patch tree, but `[patch]` does not carry across workspaces, so
+standalone Knot takes upstream's default. The options:
+- "Mirror 375 via mere's git (Recommended)": one `[patch.crates-io]` row,
+  `cubecl-runtime` from mere.git at the same rev. Nothing is vendored. The
+  lock has 1,278 packages, with no turso or SQLite, and the embedding graph
+  886. Each repin moves one more row, and Knot depends on mere keeping the
+  patch until upstream fixes the default.
+- "Pristine upstream": 1,338 packages with turso's cone of about 55 crates
+  (embedding graph 941), and `cc` pinned to 1.4.7 for turso's `aegis`.
+
+Mark: **"Mirror 375 via mere's git (Recommended)"**. *Follows:* Knot's root
+patch table takes `cubecl-runtime` from mere.git at the rev its mere rows
+pin, and the row moves with them at every repin. Its default-feature graph
+(790 packages, no Burn, CubeCL or turso) is the same under both options, so
+only the embedding gates, the duplicate check and `--locked` rerun.
+
+**Ruling 586: djinn's patch rows for Knot's scene crates.** The question as put: since
+`5516606`, Knot names `scenograph` and `scenomise` from mere.git. Mere's
+`[patch."…mere.git"]` table lacks both (it has `sceno` and `scenotime`
+only), so djinn's graph carries second copies. It still compiles (252 s)
+because no types cross between them. With the two rows added, every
+duplicate clears (34 s). The options: add both rows in the mere change that
+moves djinn's Knot pin to Knot's new head; or add them on mere main now.
+Mark: **"With djinn's Knot repin (Recommended)"**. *Follows:* once Knot's
+repin is pushed, one mere change moves djinn's Knot pin from `562353aa` to
+the new head and adds the two rows. That also drops the second genet copy
+(`layout-dom-api` at `69a2383b`) mere carries today through the stale pin.
+
+**Findings, not ruled.** Each predates the repin.
+- Windows checkouts get CRLF in `assets/oewn-notices.txt` and
+  `tests/fixtures/wordnet.xml` through `.gitattributes`, which fails 7
+  `wordnet_import` tests. Control: LF bytes pass.
+- Windows defaults to the title-bar chrome, which hides toolbar buttons
+  Knot's headed scenarios press. Only a test can choose the plain toolbar.
+- `source_beside_preview` crashes in genet-livery `atomic_basis.rs:288` on
+  the baseline too.
+- Knot's `LICENSES.md` is mere's 2026-08-27 ledger, carried over by the
+  extraction. It names paths Knot does not have.

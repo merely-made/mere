@@ -21,7 +21,7 @@ This batch exists because the document is new.
 ## mere_docs/implementation_strategy/2026-10-04_stack_seams_plan.md
 
 - disposition: current
-- status line: "Status (2026-10-05): plan. Twenty-two rulings in eight rounds (S1 to S22); P1 being built in this session's worktree (S19), P2 after it; P3 and S7 done as documents; S3 to S6 carried into the dynamics grammar plan (G8, G9); S9 done by the identity lane (`b52edea7`). No code in this plan's own lane yet." — accurate: yes
+- status line: "Status (2026-10-05): plan. Twenty-two rulings in eight rounds (S1 to S22); P1 implemented on branch `stack-seams-p1` (`dd2cb6fd`), awaiting Mark's review, P2 after it; P3 and S7 done as documents; S3 to S6 carried into the dynamics grammar plan (G8, G9); S9 done by the identity lane (`b52edea7`). No code in this plan's own lane yet." — accurate: yes
 - claims checked: 30 — holds: 30, stale: 0, unverifiable: 0
 
 ### Stale claims
@@ -78,4 +78,6 @@ and file lists, the adoption plan's host continuation entry (lines 88-97),
 and the pitch arithmetic in `solve.rs` 312-322 with the footprint at
 `projection.rs` 697. S19's premise checked against the graph-semantics
 branch's record of the relay (`5666943e`) and the absence of compiler
-commits on any ref since `c79bb8c2`.
+commits on any ref since `c79bb8c2`. F14 and the P1 progress entry checked
+against branch commit `dd2cb6fd` (its diff and the gate logs) and sceno's
+`Stack` and `Geographic` docs.
