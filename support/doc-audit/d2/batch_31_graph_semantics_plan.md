@@ -22,7 +22,7 @@ This batch exists because the document is new.
 ## mere_docs/implementation_strategy/2026-10-04_graph_semantics_plan.md
 
 - disposition: current
-- status line: "Status (2026-10-04): plan. Rounds 1 to 3 ruled (rulings 1 to 15); phases final; checkpoints C1 to C4 ruled, C5 to C8 open (§5). No code." — accurate: yes
+- status line: "Status (2026-10-04): plan. Rounds 1 to 4 ruled (rulings 1 to 17); phases final; checkpoints C1 to C4 ruled, C5 to C8 open (§5). No code." — accurate: yes
 - claims checked: 29 — holds: 29, stale: 0, unverifiable: 0
 
 ### Stale claims
@@ -71,4 +71,7 @@ places the shared canonicalizer in P2; and the seven `ContainmentSubKind`s
 (`pandect/src/graph_session.rs` 406-430); the default semantic write storing
 no provenance or time (`edge_payload.rs` 271-279); and the full Semantic,
 Imported, Provenance and Arrangement sub-kind lists behind the placement
-table (`edge_taxonomy.rs`).
+table (`edge_taxonomy.rs`). Round 4 adds no code claims: its inventory is of
+document vocabulary (TERMINOLOGY, the swatch and ambiance designs, the family
+composition thesis), and "aspect" appears in code only as `AspectRatio` and
+wgpu's `TextureAspect`.
