@@ -15,7 +15,7 @@ lane's.
 ## mere_docs/implementation_strategy/2026-10-05_djinn_test_harness_plan.md
 
 - disposition: current
-- status line: "Status (2026-10-05): assessed; all ten forks ruled (§3). Next: H1 to H3 in a lane. No code changed. The vault lock plan's build waits on this harness (its ruling 18)." — accurate: yes
+- status line: "Status (2026-10-05): assessed; all forks ruled (§3, rulings 1 to 13). H1 to H3 built on a lane branch; its graceful-stop fix (ruling 11) is under way, then verification and merge. No code changed. The vault lock plan's build waits on this harness (its ruling 18)." — accurate: yes
 - claims checked: 2 — holds: 2, stale: 0, unverifiable: 0
 
 ### Stale claims
