@@ -1,7 +1,8 @@
 # Vault Lock Plan
 
 **Date**: 2026-10-05
-**Status (2026-10-05)**: assessed; all 16 forks ruled (rulings 1 to 20 in §3);
+**Status (2026-10-05)**: assessed; all 16 forks and the follow-ups ruled (rulings 1 to 24
+in §3);
 a djinn test-harness plan comes first (ruling 18), and §3's open
 questions remain. No code changed. Chatelaine P4 (CXF import) waits on this plan (chatelaine
 rulings 64, 65).
@@ -346,13 +347,28 @@ a growing delay of our own. Mark: **"Argon2id's cost only
 by default. Mark: **"15 minutes (Recommended)"**. Follows: per device and
 changeable.
 
-Still open: which unlock methods the first build carries beyond the
-passphrase and Windows Hello (ruling 4's reading); whether macOS is in
-scope; whether a resident lock should reach Turnstone, Knot and the
-graphshell app's own vault opens; the sibling repos that call
-`current_profile()` and `slot()`; and a threat statement naming hibernation
-and the pagefile. Whether Distillery's new transport key itself stays
-resident under lock (ruling 2) is open too.
+**Ruling 21.** *Which unlock methods does the first build carry?* Options:
+the passphrase plus Windows Hello; the passphrase only; every desktop
+platform's method. Mark: **"Passphrase + Windows Hello (Recommended)"**.
+Follows: other platforms' methods come later behind the same interface.
+
+**Ruling 22.** *Is macOS in scope?* Options: yes, with the pairing plan's
+D2; yes, now, through the standalone agent; Windows and Linux only. Mark:
+**"Yes, with D2 (Recommended)"**.
+
+**Ruling 23.** *Should a resident lock reach Turnstone, Knot and the
+graphshell app, which open the vault in their own processes?* Options:
+they follow the resident's broadcast and the persisted lock; record the
+gap. Mark: **"They follow the resident (Recommended)"**. Follows: the work
+reaches those repos; which of their calls break under ruling 13 is mapped
+at the build's start.
+
+**Ruling 24.** *Under lock, does Distillery's own transport key stay?*
+Options: it stays and sync continues; it is dropped and sync pauses. Mark:
+**"Stays; sync continues (Recommended)"**. Follows: the transport key only
+identifies the device to peers and opens no secret.
+
+Still open: a threat statement naming hibernation and the pagefile.
 
 ## 4. Phases
 
