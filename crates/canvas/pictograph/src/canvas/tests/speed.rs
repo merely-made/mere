@@ -271,3 +271,23 @@ fn the_board_runs_at_its_speed() {
     }
     assert_eq!(board.pace().ticks - before, 150);
 }
+
+/// The native entry point (ruled 2026-10-04, "Mere entry point, then
+/// turnstone"): a display's refresh rate in millihertz becomes half its
+/// frame on the monotonic clock, 60 Hz's when unknown, and 50x then binds on
+/// that budget.
+#[test]
+fn the_display_rate_sets_half_its_frame_as_the_budget() {
+    let mut canvas = canvas(24, PhysicsLaw::Springs);
+    assert!(canvas.physics_step_budget().is_none());
+    let us = |canvas: &Canvas| canvas.physics_step_budget().unwrap().per_frame.as_micros();
+    canvas.set_physics_display_rate(Some(165_000));
+    assert_eq!(us(&canvas), 3_030);
+    canvas.set_physics_display_rate(Some(144_000));
+    assert_eq!(us(&canvas), 3_472);
+    canvas.set_physics_display_rate(Some(60_000));
+    assert_eq!(us(&canvas), 8_333);
+    canvas.set_physics_display_rate(None);
+    assert_eq!(us(&canvas), 8_333);
+    assert_eq!(canvas.physics_step_budget().unwrap().margin, Duration::ZERO);
+}

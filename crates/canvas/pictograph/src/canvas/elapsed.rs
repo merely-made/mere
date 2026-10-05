@@ -37,6 +37,22 @@ impl Canvas {
         self.physics.set_step_budget(budget);
     }
 
+    /// Budget fast-forward to half the frame of a display refreshing at
+    /// `millihertz`, as winit's `MonitorHandle::refresh_rate_millihertz`
+    /// reports it, or 60 Hz's when the rate is unknown, on the native
+    /// monotonic clock (ruled 2026-10-04, "Mere entry point, then
+    /// turnstone"). A browser host infers its period instead.
+    #[cfg(not(all(target_family = "wasm", target_os = "unknown")))]
+    pub fn set_physics_display_rate(&mut self, millihertz: Option<u32>) {
+        self.physics
+            .set_step_budget(Some(StepBudget::for_display(millihertz)));
+    }
+
+    /// The step budget last set, as given.
+    pub fn physics_step_budget(&self) -> Option<StepBudget> {
+        self.physics.step_budget()
+    }
+
     /// Ticks run, the effective speed reached, and whether the budget bound.
     pub fn physics_pace(&self) -> PaceStats {
         self.physics.pace()
