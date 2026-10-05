@@ -2,10 +2,10 @@
 
 | doc | disposition | status accurate | claims | holds | stale | unverifiable |
 |---|---|---:|---:|---:|---:|---:|
-| mere_docs/implementation_strategy/2026-10-04_stack_seams_plan.md | current | yes | 34 | 34 | 0 | 0 |
-| **Totals** |  |  | **34** | **34** | **0** | **0** |
+| mere_docs/implementation_strategy/2026-10-04_stack_seams_plan.md | current | yes | 35 | 35 | 0 | 0 |
+| **Totals** |  |  | **35** | **35** | **0** | **0** |
 
-**Totals: 1 doc, 34 claims checked (34 holds, 0 stale, 0 unverifiable), 0 contradictions.**
+**Totals: 1 doc, 35 claims checked (35 holds, 0 stale, 0 unverifiable), 0 contradictions.**
 
 Audit base: Mere `c34449bd` (2026-10-04), with this pass's edits in the
 working tree: the new plan, its `DOC_README.md` entry at the head of the
@@ -22,7 +22,7 @@ This batch exists because the document is new.
 
 - disposition: current
 - status line: "Status (2026-10-05): in progress. Thirty-one rulings in eleven rounds (S1 to S31); P1 landed on main (`1633be0c`); P2 staged (S27 to S31, four stages in §3.1), stage 1 next; P3 and S7 done as documents; S3 to S6 carried into the dynamics grammar plan (G8, G9); S9 done by the identity lane (`b52edea7`)." — accurate: yes
-- claims checked: 34 — holds: 34, stale: 0, unverifiable: 0
+- claims checked: 35 — holds: 35, stale: 0, unverifiable: 0
 
 ### Stale claims
 
@@ -88,4 +88,8 @@ host's resume path booting a fresh core through `boot_surface`. Round 11's
 evidence checked: `push_forest_projection` and `window_root` in `multi.rs`,
 the owned layout's generic `LayoutDom` bounds, the four whole-document reads
 in `cambium-winit-a11y/src/lib.rs` (212, 324, 369, 384), the pipeline's line
-counts, and Woodshed's sources (no `HostState` field reached).
+counts, and Woodshed's sources (no `HostState` field reached). F15 checked against Knot `54bb8cd` (`git grep` of
+`compile_relationship_snapshot`: eight calls in `apps/desktop/src/composition/recipe.rs`),
+mere's root `Cargo.toml` (no `scenomise` row in the mere.git patch table),
+`dd2cb6fd` on `origin/main` through `19e6dc9f`, and the burn plan's §13.46
+entry at `ac7f906d`.
