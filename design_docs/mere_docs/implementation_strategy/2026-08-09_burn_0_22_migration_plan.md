@@ -4735,10 +4735,10 @@ Ruling 557's first handoff: knot-editor's `mere-pre4-repin` branch, off
 Knot's origin/main `5516606`, moves 42 mere rows in three manifests from
 `c79bb8c2` to `07db35e2`. Genet stays on `bd3e8861` and smolweb on
 `882baeb1`. Knot compiled with no source edits. Evidence is in
-`Code/testing/knot-editor/pre4-repin/`. Wing numbers for both rulings are to
-come.
+`Code/testing/knot-editor/pre4-repin/`. They are wing rulings 585 and 586 (Isometry
+`1b7ca69`).
 
-**Knot's CubeCL persistence.** The question as put: pristine
+**Ruling 585: Knot's CubeCL persistence.** The question as put: pristine
 `cubecl-runtime 0.11.0-pre.4` turns `persistence` on by default (checked in
 its manifest), which pulls in turso 0.8.0-pre.13. Mere avoids that with
 ruling 375's patch tree, but `[patch]` does not carry across workspaces, so
@@ -4757,7 +4757,7 @@ pin, and the row moves with them at every repin. Its default-feature graph
 (790 packages, no Burn, CubeCL or turso) is the same under both options, so
 only the embedding gates, the duplicate check and `--locked` rerun.
 
-**djinn's patch rows for Knot's scene crates.** The question as put: since
+**Ruling 586: djinn's patch rows for Knot's scene crates.** The question as put: since
 `5516606`, Knot names `scenograph` and `scenomise` from mere.git. Mere's
 `[patch."…mere.git"]` table lacks both (it has `sceno` and `scenotime`
 only), so djinn's graph carries second copies. It still compiles (252 s)
