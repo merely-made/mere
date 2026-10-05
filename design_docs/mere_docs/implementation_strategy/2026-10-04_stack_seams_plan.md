@@ -1,9 +1,9 @@
 # Stack seams plan: catalog, shared device, actions, determinism, two words
 
 **Date:** 2026-10-04
-**Status (2026-10-05):** in progress. Twenty-seven rulings in ten rounds
-(S1 to S27); P1 landed on main (`1633be0c`); P2 sized and staged (S27), no
-code yet; P3 and S7 done as documents; S3 to S6 carried into the dynamics
+**Status (2026-10-05):** in progress. Thirty-one rulings in eleven rounds
+(S1 to S31); P1 landed on main (`1633be0c`); P2 staged (S27 to S31, four
+stages in §3.1), stage 1 next; P3 and S7 done as documents; S3 to S6 carried into the dynamics
 grammar plan (G8, G9); S9 done by the identity lane (`b52edea7`).
 
 A note sent to Mark listed weak seams in the stack. Each claim was checked
@@ -433,6 +433,46 @@ subagents."**, then **"oh, i meant #1 of the three options."** Follows: S23
 stands; P2 is one branch built in stages, each stage ending with its receipts,
 and it merges once; subagents may carry stages.
 
+Round 11, 2026-10-05, on P2's shape. Evidence: `GenetMultiRunner` supports
+both topologies (`push_projection`, `push_forest_projection`); the owned layout
+is generic over `LayoutDom` (`owned_layout.rs` 86 onward), so a forest needs a
+window-subtree adapter, one mutation drain routed by window root, and
+accessibility scoped per window with ids salted by window
+(`cambium-winit-a11y` reads the whole document at four sites), an estimated
+500 to 700 lines more than separate documents; the frame and input pipeline
+(`host.rs`, `frame.rs`, `input/`, about 3,100 lines) reads one runner and one
+layout; Woodshed, Hocket and Redshank use only `run`, `AppCtx`, `HostHooks` and
+`Harness`, never `HostState`'s fields.
+
+**Ruling S28.** *Which document topology do P2's windows use?* Options: the
+forest dom (one `ScriptedDom`, one window-root per window; P2 an estimated
+1,700 to 2,700 lines in four stages); N doms (each window its own document; an
+estimated 1,200 to 2,000 lines in three stages, a cross-window move rebuilding
+its content). Mark: **"Forest dom (Recommended)"**. Follows: one document with
+a window-root per window, laid out per window through a subtree adapter, so a
+`move_before` between windows keeps the node, its scroll and its focus.
+
+**Ruling S29.** *Where do custom-paint leaves and texture producers live once
+there are several windows?* Options: one shared registry, each window painting
+the leaves its own subtree holds; one registry per window. Mark: **"Shared,
+painted per window (Recommended)"**. Follows: the application keeps one
+`LeafRegistry` and one `ProducerRegistry`; each window renders the leaves its
+layout has boxes for, so a leaf moved to another window keeps its painter.
+
+**Ruling S30.** *Does the single-window `run` move onto the shared per-window
+pipeline?* Options: one pipeline, `run`'s signatures unchanged; a separate
+multi host beside an untouched `Host`, duplicating about 1,500 lines. Mark:
+**"One pipeline (Recommended)"**. Follows: `run` and the multi-window entry
+drive the same per-window frame and input code; `run`, `AppCtx`, `HostHooks`,
+`Init` and `Harness` keep their signatures, so S25 and C1 hold.
+
+**Ruling S31.** *S27 checks in at each stage boundary. What does a check-in ask
+of you?* Options: report, then continue; wait for a go. Mark: **"nah, just
+proceed."** Follows: amends S27; the stages run back to back, each ending with
+its receipts recorded in §5, and no stage waits at a boundary. *Reading, not
+ruled*: a fork with more than one defensible answer still stops for Mark, as
+the lanes rule has it, and C1 still stops.
+
 **Ruling S14.** *Where does the next contradiction pass look?* Options: plan
 status against code; rulings across plans; sibling repos too; no pass. Mark:
 **"Plan status vs code (Recommended)"**. Follows: active plans' status lines
@@ -478,6 +518,51 @@ doc audit flags. *Reading, not ruled*: it runs after P1, one lane at a time.
   cambium-rootstock, cambium-genet-web-host, pelt desktop) build and their
   tests pass. Woodshed's three consumers live in another repository: an API
   change they must follow is a stop (checkpoint C1).
+  Staged by S27 to S31 on one branch (`stack-seams-p2`), merged once:
+  - **Stage 1, shared core (winit host).** One `Arc<RenderCore>` booted at the
+    first resume from `HostOptions::netrender` and kept for the host's life;
+    each surface made from it with its transparency; a resume makes a new
+    surface and no new core; a count of core boots; the core reachable from
+    host state and `AppCtx` for tenants. Done when a forced suspend and resume
+    leaves the boot count at one, a tenant's device is the surface's device,
+    and the consumers' tests pass.
+  - **Stage 2, per-window split (rootstock, no behaviour change).**
+    `HostState` divides into what the application shares (resources, leaf and
+    producer registries, the core and its fragment ids, commands, wake) and a
+    per-window state (window, surface, layout, zoom, pointer, hover and focus,
+    accessibility, scroll fade, geometry, captures, profiles); the frame and
+    input pipeline runs over one window's state and a crate-internal tree
+    trait that `GenetAppRunner` and a multi-runner projection both implement.
+    Done when rootstock, the winit host's `Harness` tests, the web host,
+    pelt desktop and mere-view pass with no assertion changed, the web host
+    checks on wasm32, and a diff of public signatures shows `run`, `AppCtx`,
+    `HostHooks`, `Init` and `Harness` unchanged.
+  - **Stage 3, forest window sessions (rootstock).** A subtree adapter that
+    presents a window-root as its document; each window's layout, hit testing,
+    caret, scroll and accessibility read through it; one mutation drain per
+    frame routed by window root, a mutation it cannot place dirtying every
+    window; accessibility ids salted by window; the document-wide walks scoped
+    to the window root; leaves painted per window from the shared registry.
+    Done, in a windowless multi-window harness, when two windows over one
+    document lay out at different sizes and scales; a mutation in one rebuilds
+    that window's layout and not the other's (a mutation in the other moves its
+    count: the control); a click in one changes what the other shows in the
+    same pass; accessibility ids never collide; and a node moved between window
+    roots by `move_before` keeps its `NodeId`, is laid out by its new window,
+    and a leaf moved with it keeps its painter.
+  - **Stage 4, multi-window entry (winit host).** A `run_windows` entry beside
+    `run`: its init returns the state, a lens per window key, the sheet and
+    the resources; commands open and close a window; events route by
+    `WindowId` to their projection; each window redraws and presents on its
+    own request (S26) and an idle one presents nothing; hooks know which window
+    they run for. Done when P2's done-conditions above hold with two windows
+    (one boot counted, the tenant's device the surfaces' device, a suspend and
+    resume creating none), a headed receipt on Windows shows two windows at
+    different sizes where a click in one changes the other and closing one
+    leaves the other running while an idle window's present count holds still,
+    and the workspace checks with `--locked`.
+  Merging: main merged into the branch, every gate rerun on the merged tree,
+  then main fast-forwards; not pushed.
 - **P3. Words (S5, S6).** Done as documents in the commit that records this
   plan: TERMINOLOGY gains **arrangement**, **forme** and **world** and the sceno
   entry is amended. Code identifiers migrate when a file is touched for other
@@ -515,6 +600,11 @@ The done-conditions handed over for S3 and S4, kept for reference:
   hosts must follow, stop and bring the change to Mark before making it.
 - **C2 (P2).** Whether windows share one swapchain cadence (one frame clock for
   all windows) or each window paces itself. Ruled: S26, each window paces itself.
+- **C4 (P2).** A change any stage needs in genet or another repository (a
+  public `ScopedDom`, a runner API) stops and comes to Mark.
+- **C5 (P2).** If a stage-2 or stage-3 change alters what an existing
+  single-window application sees (a `Harness` assertion that must change), stop
+  and bring the difference back.
 - **C3 (S4, dynamics lane).** If `libm` in seiche's laws costs more than the
   run-to-run spread at 5,000 bodies, bring the figure back before keeping it.
 
@@ -529,7 +619,9 @@ The done-conditions handed over for S3 and S4, kept for reference:
   the README fixed (S7), TERMINOLOGY gains pandect under Eidetic and the
   curation record (S8, S10), S9 sent to the identity lane.
 - **2026-10-05.** P2 sized against the hosts (round 10 evidence) and S27
-  ruled: one staged branch, one merge.
+  ruled: one staged branch, one merge. Round 11 (S28 to S31): the forest dom,
+  one leaf registry painted per window, one pipeline, no check-ins; the four
+  stages and checkpoints C4 and C5 written into §3.1 and §4.
 - **2026-10-05.** P1 landed on main at `1633be0c`, by Mark's "Merge it, then P2
   (Recommended)": main was merged into the branch and every gate rerun on the
   merged tree (scenograph 8, scenomise 97, graphshell 319 + 5, web wasm32 and
