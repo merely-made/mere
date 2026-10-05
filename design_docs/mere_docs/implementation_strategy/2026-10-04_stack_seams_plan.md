@@ -176,6 +176,22 @@ in two or more crates.
   the 164 by 68 card (the footprint written in at `projection.rs` 697) gives
   180 by 84; `columns` is unused there, since the grid ranker gives every item
   an explicit cell.
+- **F15 (2026-10-05, reported by the Knot lane after P1 reached origin at
+  `19e6dc9f`). P1 breaks Knot.** P1 made `compile_relationship_snapshot` and
+  its `_with_limits` form methods on `ProjectionCompiler`, built from
+  `ItemSizes`, which has no default on purpose (S20). Knot `54bb8cd` still calls
+  the free function: `crates/knot-composition/src/retention.rs` 39, a test
+  support file, and `apps/desktop/src/composition/recipe.rs` (checked here:
+  eight calls in that file). Mere builds today only because its
+  `[patch."…mere.git"]` table serves Knot no `scenomise`; ruling 586's row,
+  added with djinn's Knot repin, makes `knot-composition` fail with E0425.
+  P1's progress entry named Woodshed's consumers as not run and missed Knot,
+  which compiles inside mere's graph through djinn. Mark ruled that the Knot
+  lane adapts Knot (repin onto `19e6dc9f`, the three sites onto
+  `ProjectionCompiler::new(ItemSizes { .. })`, Knot's card size as a fork to
+  him), recorded in the burn plan's §13.46
+  ([burn plan](2026-08-09_burn_0_22_migration_plan.md)) at `ac7f906d`. P2
+  does not touch `ProjectionCompiler` or `ItemSizes`.
 
 ## 2. Rulings
 
@@ -618,6 +634,9 @@ The done-conditions handed over for S3 and S4, kept for reference:
   works in `projection_compile`. Second pass (F8 to F11), rulings S7 to S10:
   the README fixed (S7), TERMINOLOGY gains pandect under Eidetic and the
   curation record (S8, S10), S9 sent to the identity lane.
+- **2026-10-05.** F15: the Knot lane reported that P1 breaks Knot at its next
+  build against mere's tree; Mark ruled that lane adapts Knot (burn plan
+  §13.46). Told that lane P2 leaves the compiler's surface alone.
 - **2026-10-05.** P2 sized against the hosts (round 10 evidence) and S27
   ruled: one staged branch, one merge. Round 11 (S28 to S31): the forest dom,
   one leaf registry painted per window, one pipeline, no check-ins; the four
