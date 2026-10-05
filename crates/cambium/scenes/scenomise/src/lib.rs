@@ -33,6 +33,7 @@
 //! dimensionality reduction — the adapter computes it once and discloses it on
 //! the item, rather than shipping source truth for a solver to re-derive.
 
+pub mod catalog;
 mod families;
 pub mod projection;
 pub mod registry;

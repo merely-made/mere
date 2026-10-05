@@ -8,6 +8,13 @@ use super::*;
 use scenograph::{ProjectionInputBinding, RevisionEvidence};
 use std::collections::BTreeSet;
 
+/// The 164 by 68 card the compiler wrote in before hosts supplied sizes.
+fn compiler() -> ProjectionCompiler {
+    ProjectionCompiler::new(ItemSizes {
+        card: Size2::new(164.0, 68.0),
+    })
+}
+
 // Adapter-shaped fixtures, not domain computations. Actual Mora/Working Set
 // calculations belong to their consumer integration tests, not this compiler.
 fn disclosed(owner: &str, kind: &str) -> RelationshipDataset {
@@ -57,7 +64,7 @@ fn snapshot(data: &RelationshipDataset) -> RelationshipSnapshot {
     }
 }
 fn refuses(saved: &RelationshipSnapshot, data: &RelationshipDataset, field: &str) {
-    let issues = compile_relationship_snapshot(saved, data).unwrap_err();
+    let issues = compiler().compile_relationship_snapshot(saved, data).unwrap_err();
     assert!(
         issues.iter().any(|issue| issue.field.contains(field)),
         "expected {field}, got {issues:?}"
@@ -68,7 +75,7 @@ fn refuses(saved: &RelationshipSnapshot, data: &RelationshipDataset, field: &str
 fn scene_preserves_repeated_source_occurrences_and_exact_explained_edge_endpoints() {
     let data = disclosed("sound-adapter", "sound.rhyme");
     let saved = snapshot(&data);
-    let compiled = compile_relationship_snapshot(&saved, &data).unwrap();
+    let compiled = compiler().compile_relationship_snapshot(&saved, &data).unwrap();
     assert_eq!(compiled.projection.scene.items.len(), 3);
     assert_eq!(compiled.projection.scene.sources.len(), 2);
     let original = compiled.projection.instance_by_occurrence["a"];
@@ -127,7 +134,7 @@ fn same_edited_recipe_saves_reopens_and_rebinds_between_two_host_disclosures() {
         serde_json::from_slice(&serde_json::to_vec(&saved).unwrap()).unwrap();
     assert_eq!(saved, reopened);
     assert_eq!(
-        compile_relationship_snapshot(&reopened, &sound)
+        compiler().compile_relationship_snapshot(&reopened, &sound)
             .unwrap()
             .projection
             .selected,
@@ -135,7 +142,7 @@ fn same_edited_recipe_saves_reopens_and_rebinds_between_two_host_disclosures() {
     );
     saved.source_name = "music".into();
     saved.selected_relationship = Some(music.relationships[0].id.clone());
-    let rebound = compile_relationship_snapshot(&saved, &music).unwrap();
+    let rebound = compiler().compile_relationship_snapshot(&saved, &music).unwrap();
     assert_eq!(saved.recipe.definition.id, "material-comparison");
     assert_eq!(
         saved
@@ -168,7 +175,7 @@ fn same_edited_recipe_saves_reopens_and_rebinds_between_two_host_disclosures() {
     );
     assert_eq!(
         rebound.projection.score.arrangement,
-        compile_relationship_snapshot(&reopened, &sound)
+        compiler().compile_relationship_snapshot(&reopened, &sound)
             .unwrap()
             .projection
             .score
@@ -292,7 +299,7 @@ fn bounds_precede_binding_cloning_and_solving_and_all_numbers_are_finite() {
         },
     ] {
         assert!(
-            compile_relationship_snapshot_with_limits(&saved, &data, &limits)
+            compiler().compile_relationship_snapshot_with_limits(&saved, &data, &limits)
                 .unwrap_err()
                 .iter()
                 .any(|issue| issue.field.starts_with("limits."))
