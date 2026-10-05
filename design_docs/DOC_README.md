@@ -12,6 +12,9 @@ visible Woodshed host integration, and the shared horizontal reveal fix
 `5011e2f9`. Committed-source host acceptance includes 18 reviewed baseline,
 narrow and fresh-process captures. Retention is an isolated unsealed session
 fixture; personal-wallet encryption and broader platform acceptance stay separate.
+Knot's subsequent `9d0b955f` adoption includes eight reviewed 420px/400% recipe
+captures and the coherent horizontal-reveal pin; native personal-wallet retention
+remains unqualified.
 
 ## Required reading order
 
