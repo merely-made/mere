@@ -1,8 +1,8 @@
 # Graph semantics plan: assertions, resources, saved queries, residency
 
 **Date:** 2026-10-04
-**Status (2026-10-04):** plan. Rounds 1 and 2 ruled (rulings 1 to 8); phases
-final; implementation checkpoints listed in §5. No code.
+**Status (2026-10-04):** plan. Rounds 1 to 4 ruled (rulings 1 to 17); phases
+final; checkpoints C1 to C4 ruled, C5 to C8 open (§5). No code.
 
 Four questions were put to Mark from outside the project: what a link records,
 what makes two things the same thing, what a saved query can become, and how
@@ -204,7 +204,107 @@ statements among them are copied as they stood at the freeze revision, so a
 later retraction does not change the frozen record. Annotations attach to the
 frozen node. A receiver missing a resource sees it through ruling 4's coverage.
 
+Round 3 put checkpoints C1 to C4 before the lane could meet them.
+
+**Ruling 9 (C1).** *What asserter do existing statements get?* Options: journal
+replay, else unknown; journal replay, else the user; unknown for all. Mark:
+**"Journal replay, else unknown (Recommended)"**. Follows: a statement minted
+inside a session takes the author of the journal entry that minted it
+(`AttributedDelta`, with ids captured by `ReplaySetEdgesByIds`), read through
+ruling 5, so a link a page makes is the page's. A statement from a baseline
+(imported graphs, sessions older than their journal) gets an explicit
+"unknown" asserter, shown as such and never merged with the user's.
+
+**Ruling 10 (C2).** *Which statements move to the resource graph?* Options: per
+predicate, by nature; per family; Semantic only. Mark: **"Per predicate, by
+nature (Recommended)"**. Follows: each sub-kind declares its nature (content
+or experience) in the predicate registry the statement kernel brief names, and
+placement follows it. The table is in §4, after ruling 14 settled its two-way
+rows.
+
+**Ruling 11 (C3).** *Where do existing claims land?* Options: replay, else
+current; replay, else hold aside; current for all. Mark: **"Replay, else
+current (Recommended)"**. Follows: journal replay attaches each claim to the
+resource its node showed when the claim was minted; a baseline-era claim goes
+to the currently shown resource, and the migration writes a note listing the
+claims that landed by default.
+
+**Ruling 12 (C4a).** *What are the two senses called?* Options: node stays and
+"resource" is added; "resource" and "surface" as terms. Mark (free text):
+**"R-gnode, for resource graph node, contrasted against just graph node, which
+a resource graph depends on right? Should be a name for that relationship… not
+like a subgraph or a nested graph, but an aspect of the graph or something.
+Idk!"** Answered: the dependency runs the other way (a node shows a resource;
+the resource graph stands alone, and only arrival and residency flow from
+nodes), and "gnode" is ruled as a node's rendered body (TERMINOLOGY,
+2026-07-02), which a resource mostly lacks. Put back as two questions. Mark,
+on the name: **"Resource (Recommended)"**. Follows: "resource" names what a
+canonical URL identifies; "node" and "gnode" keep their meanings; "browsing
+surface" stays a description, not a term.
+
+**Ruling 13 (C4b).** *What is the resource graph to the mere's graph?* Options:
+strata; aspects; noumenal and phenomenal; no term. Mark: **"Strata
+(Recommended)"**. Follows: a mere's graph has two strata, the resource stratum
+(what things are, and the claims about them) under the node stratum (how they
+were met: trail, layout, groupings). A node rests on the resource it shows.
+
+**Ruling 14 (C2 rows).** *Which two-way rows go to the resource stratum?*
+Options (several allowed): `AgentDerived`; `DependsOn`, `Blocks`, `NextStep`;
+`SharedCollection`; `UserGrouped`. Mark: **"AgentDerived (Recommended),
+DependsOn, Blocks, NextStep, SharedCollection, That usergrouped distinction
+sounds like it would be better with user tags as resources and usergrouping as
+layout"**. Follows: the first five go to the resource stratum; `UserGrouped`
+stays in the node stratum as layout; user tags move to the resource stratum
+(ruling 15 settles how).
+
+**Ruling 15.** *"User tags as resources": which reading?* Options: tags are
+resources; tags live on resources. Mark: **"Tags are resources
+(Recommended)"**. Follows: a tag becomes a resource with its own IRI (a SKOS
+concept, local by default and shareable, able to carry a label and broader or
+narrower tags), and tagging is the tagger's statement linking a thing's
+resource to the tag's. This takes the stance doc's named candidate, "tags and
+classifications as recognized vocabulary types", for tags; classifications
+are checkpoint C8.
+
+Round 4 came from Mark mid-round, after ruling 13: "Hm. Maybe aspect could
+distinguish the various senses of graph there too, the planes, layers, tiers
+and whatnot". An inventory found six ways a mere's graph is divided (strata,
+planes, keeping, attention, the socialization tiers, coverage); "aspect" unused
+as a term; "layer" in TERMINOLOGY almost entirely architectural; and "tier"
+naming two divisions, with a sentence in TERMINOLOGY warning they differ.
+
+**Ruling 16.** *Should "aspect" be the umbrella for the ways a mere's graph is
+divided?* Options: umbrella, with each aspect's parts keeping their names;
+"aspect" replacing the part words; no umbrella. Mark: **"Umbrella, parts keep
+names (Recommended)"**. Follows: TERMINOLOGY gains **aspect**, with a table of
+the six, their parts, their shape and where each is ruled. A new way of
+dividing the graph enters as an aspect and says how it differs from the
+others.
+
+**Ruling 17.** *Which division keeps "tier"?* Options: keeping's bottom step
+becomes the ambient level; keep "ambient tier". Mark: **"Ambient level
+(Recommended)"**. Follows: keeping's steps are all levels; "tier" names only
+the t1 to t4 socialization aspect. Amends the 2026-09-23 wording, not its
+meaning; text written before keeps its words, under a dated note. Cleromancy's
+and Isocosm's design records also say "ambient tier"; they are outside this
+repository and are left for their own sessions.
+
 ## 4. Phases
+
+### Placement by stratum (rulings 10, 14, 15)
+
+| Family | Resource stratum | Node stratum |
+|---|---|---|
+| Semantic | `Hyperlink`, `Cites`, `Quotes`, `Summarizes`, `Elaborates`, `ExampleOf`, `Supports`, `Contradicts`, `Questions`, `SameEntityAs`, `DuplicateOf`, `CanonicalMirrorOf`, `AgentDerived`, `DependsOn`, `Blocks`, `NextStep` | `UserGrouped` |
+| Provenance | `ClippedFrom`, `ExcerptedFrom`, `SummarizedFrom`, `TranslatedFrom`, `RewrittenFrom`, `GeneratedFrom`, `ExtractedFrom`, `ImportedFromSource` | `CopiedFrom` |
+| Imported | `RssMembership`, `FileSystemImport`, `ArchiveMembership`, `SharedCollection` | `BookmarkFolder`, `HistoryImport`, `SessionImport` |
+| Containment | `UrlPath`, `Domain`, `FileSystem`, `ClipSource` | `UserFolder`, `NotebookSection`, `CollectionMember` |
+| Traversal | none | all |
+| Arrangement | none | `FrameMember`, `TileGroup`, `SplitPair` |
+| Tags | tag resources, and tagging statements to them | none |
+
+*Reading, not ruled*: open-predicate statements (no recognized sub-kind, from
+JSON-LD ingest and readers) are content and sit in the resource stratum.
 
 In order; each phase lands green before the next starts. Code samples: none.
 
@@ -224,7 +324,9 @@ In order; each phase lands green before the next starts. Code samples: none.
   extractor at a new version updates its old assertion rather than adding one;
   no production writer passes `None` (a test enumerates the writers);
   `dataset_round_trip_is_lossless_under_the_profile` stays green with a case of
-  two reifiers on one triple term; existing snapshots load (checkpoint C1).
+  two reifiers on one triple term; existing snapshots load, with asserters
+  recovered by journal replay and baseline-era statements marked unknown
+  (ruling 9), and a test pins both cases.
 - **P2. Resource graph (rulings 2, 6).** Eidetic's `canonical_url` moves to
   chartulary, the common dependency of the kernel and eidetic-core, and both
   use it; nothing keeps a private copy. Each mere holds two chartulary graphs:
@@ -237,7 +339,12 @@ In order; each phase lands green before the next starts. Code samples: none.
   its two resources. Cross-family selector walks join through the shown
   resource. Page versions are content-hashed captures under the resource. SPARQL
   is served by a `QueryableDataset` adapter over the resource graph, retiring
-  the per-query `dataset_quads` rebuild in `linked-data::query`.
+  the per-query `dataset_quads` rebuild in `linked-data::query`. Placement
+  follows the table above, declared per predicate in the registry (ruling 10).
+  Existing claims migrate by journal replay, else to the currently shown
+  resource with a note of the defaults (ruling 11). Tags become tag resources
+  and tagging statements (ruling 15). Code and docs say "resource" and
+  "stratum" (rulings 12, 13).
   Done when: two surfaces showing one canonical URL see the same content
   statements; a surface navigating from page 1 to page 2 shows page 2's
   statements while page 1's stay on page 1's resource; a `utm_` variant and a
@@ -246,6 +353,10 @@ In order; each phase lands green before the next starts. Code samples: none.
   Traversal crosses from a surface into the resource graph and back; the SPARQL
   path builds no dataset per call and returns the same rows as the old path on
   the existing query tests (the old path survives only as the test oracle);
+  a node's tags read back as tagging statements to tag resources, and two
+  nodes showing one resource show the same tags; a replayed journal puts a
+  claim made before a node navigated on the earlier page's resource, and a
+  baseline-era claim lands on the current resource and in the migration note;
   `cargo check -p mere-kernel --target wasm32-unknown-unknown` stays green.
 - **P3. Coverage and the pending index (ruling 4).** A coverage note travels
   with every query result and scene projection, naming each layer that limited
@@ -291,26 +402,31 @@ In order; each phase lands green before the next starts. Code samples: none.
 Choices with more than one defensible answer that the phases will meet. Each
 comes back to Mark as a fork, with evidence, before the code commits to one.
 
-- **C1 (P1). Legacy statements.** What asserter does a stored statement with no
-  provenance get on load: a legacy marker, the local user, or the ingest engine
-  that probably wrote it.
-- **C2 (P2). Which families sit on resources.** Semantic, Imported and
-  Provenance are content and Traversal and Arrangement are experience; the
-  seven containment sub-kinds split three ways: URL-derived (`UrlPath`,
-  `Domain`), resource-level (`FileSystem`, `ClipSource`) and user layout
-  (`UserFolder`, `NotebookSection`, `CollectionMember`).
-- **C3 (P2). Migration of existing claims.** A surface's content statements
-  were asserted while it showed whichever page it showed then; the store does
-  not record which. Attach them to the currently shown resource, to the
-  resource of the visit nearest the assertion time, or drop them with a record.
-- **C4 (P2). Words.** Names for the two senses of node (resource, surface) in
-  TERMINOLOGY and in code.
+- **C1 (P1). Legacy statements.** Ruled: ruling 9.
+- **C2 (P2). Which families sit on resources.** Ruled: rulings 10 and 14; the
+  table is in §4.
+- **C3 (P2). Migration of existing claims.** Ruled: ruling 11.
+- **C4 (P2). Words.** Ruled: rulings 12 and 13 (resource; strata).
 - **C5 (P3). Purge default.** The pending index's default purge policy.
 - **C6 (P4). The frozen node.** What kind of node bears a frozen selection, and
   where it is placed.
+- **C7 (P2). Tag IRIs.** How a local tag's IRI is minted (a per-mere namespace,
+  a per-identity namespace, or a hash of the label), and how two tags with one
+  label from different taggers relate.
+- **C8 (P2). Classifications.** Whether node classifications (with their
+  suggested, accepted and rejected states) follow tags into the resource
+  stratum.
 
 ## 6. Progress
 
 - **2026-10-04.** Plan written; questions grounded (§2); round 1 ruled
   (rulings 1 to 4); round 2 ruled (rulings 5 to 8, ruling 6 after a comparison
   Mark asked for); phases final; checkpoints C1 to C6 listed.
+- **2026-10-04.** Round 3 ruled C1 to C4 ahead of the lane (rulings 9 to 15,
+  ruling 12 after Mark's own coinage was answered and put back, ruling 15
+  after his free text on `UserGrouped` was put back); placement table added;
+  checkpoints C7 and C8 opened by ruling 15.
+- **2026-10-04.** Round 4 (rulings 16 and 17), raised by Mark: "aspect" is the
+  umbrella for the graph's divisions, and keeping's bottom step is the ambient
+  level. Carried into TERMINOLOGY (aspect, ambiance), the ambiance design and
+  the reservoir plan.
