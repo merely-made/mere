@@ -75,7 +75,7 @@ impl<K: PartialEq + Copy, V> Slot<K, V> {
     }
 
     fn fresh_value(&self, key: K) -> Option<&V> {
-        self.fresh(key).then(|| self.value.as_ref()).flatten()
+        self.value.as_ref().filter(|_| self.fresh(key))
     }
 }
 

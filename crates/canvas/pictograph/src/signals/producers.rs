@@ -38,8 +38,8 @@ pub fn radial_rings(graph: &Graph, focus: NodeKey) -> HashMap<NodeKey, u32> {
     while let Some(key) = queue.pop_front() {
         let next = ring_of[&key] + 1;
         for neighbour in graph.neighbors_undirected(key) {
-            if !ring_of.contains_key(&neighbour) {
-                ring_of.insert(neighbour, next);
+            if let std::collections::hash_map::Entry::Vacant(slot) = ring_of.entry(neighbour) {
+                slot.insert(next);
                 queue.push_back(neighbour);
             }
         }
