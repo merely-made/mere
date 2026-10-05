@@ -4782,6 +4782,14 @@ pushed head, so the content is GitHub's. *Reading, not ruled:* that GitHub
 serves the commit is proven by the first networked fetch elsewhere, not
 here.
 
+*Annotation, 2026-10-05:* the next move of djinn's Knot pin is not this
+plan's. Under mer3ly Ruling 112, the Projection grammar session owns the
+genet `image-decode` chain (mer3ly Ruling 111). It runs mere's genet repin
+to `bf723d5d532`, then Knot's genet repin and push, then djinn's Knot pin to
+that Knot head, and finishes with one copy of each genet crate in mere's
+graph. The order is seiche-speed first, then djinn's repin onto `54bb8cd`, then
+that chain.
+
 **Findings, not ruled.** Each predates the repin.
 - Windows checkouts get CRLF in `assets/oewn-notices.txt` and
   `tests/fixtures/wordnet.xml` through `.gitattributes`, which fails 7
