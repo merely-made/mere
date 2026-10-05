@@ -1,13 +1,13 @@
 # Graph semantics plan: assertions, resources, saved queries, residency
 
 **Date:** 2026-10-04
-**Status (2026-10-05):** in progress. P1 implemented and validated on the
-isolated `graph-semantics` branch, with C1, stable-root attribution,
-retract/assert, A1 and B1 resolved. Mark authorized P2 with "Proceed".
-P2 inventory has begun; C2 and C3 are resolved. Work is stopped before code
-at C4 naming, migration collision handling and the shared UUID helper's
-dependency/lock change. P3–P5 have not begun; nothing has been integrated
-into main.
+**Status (2026-10-05):** in progress. P1 committed and validated at
+`459cad84` against the branch's prior contract, not integrated into main.
+Reconciled main `62219dd1` rulings 9–19 before P2 source edits. A1/B1/C1
+selected by "All 1"; C4 agrees with ruling 19, and B1/C1 remain approved.
+P2 is stopped: ruling 9 exposes a P1 exact-journal attribution mismatch;
+rulings 10/14/15/18 expand and correct P2. C7/C8 remain open. P3–P5 have
+not begun; the primary checkout is untouched.
 
 Four questions were put to Mark from outside the project: what a link records,
 what makes two things the same thing, what a saved query can become, and how
@@ -545,8 +545,78 @@ No new package, version, checksum or source is expected. Options:
    independent resource-id minting gate open. Revisit this seam before P2
    can land.
 
-None of A, B or C has been selected. No source, dependency or lock mutation
-has been made at this checkpoint; the Scenomise compiler hold remains.
+At that checkpoint none of A, B or C had been selected; no source,
+dependency or lock mutation had been made. The later ruling and main
+reconciliation are recorded below.
+
+### Main reconciliation and P1 contract finding (2026-10-05)
+
+**Branch follow-up ruling.** Mark: **"All 1"**, selecting A1/B1/C1 above.
+A1's names match main ruling 19. B1 preserves distinct old handles, requires
+exact-id edits for ambiguous migrated keys and stops conflicting-id migration.
+C1 approves only the shared locked UUIDv5 dependency edge and corresponding
+offline lock update. This does not settle C7/C8.
+
+Mark then requested a check against current main. Verified main `62219dd1`:
+its rulings 9–19 had reached main after this branch's base `36893553`.
+Those rulings are incorporated verbatim into §3, with §4's placement table,
+phase gates and §5's new checkpoints. Earlier branch choices and receipts
+remain historical evidence; the following reconciliations govern new code:
+
+- **C3:** rulings 11/18 select replay-first, not current-resource-for-all.
+  Recover the resources shown when journal-reachable claims were minted;
+  only baseline/unreachable claims default to current resources, with the
+  branch's preserved-original migration record and uncertainty mark.
+- **Placement:** the fixed containment split agrees with the table, but
+  blanket family placement does not. `UserGrouped`, `CopiedFrom`,
+  `BookmarkFolder`, `HistoryImport` and `SessionImport` remain surface-owned.
+  Placement is declared per predicate's nature in the registry.
+- **Tags:** ruling 15 adds SKOS tag resources and tagging assertions to P2.
+  C7 tag-IRI identity and C8 classification placement remain open.
+- **Words:** ruling 19 resolves C4; rulings 13/16/17 supply strata, aspect
+  and ambient level. No duplicate naming question is needed.
+- **Coordination:** the compiler request was intended for the recipe-pass
+  owner, not this lane. This lane has no ownership obligation in
+  `scenomise::projection`; there is currently no reason to edit it.
+  Stack-seams S5/S8/S10 identify workbench forme relations, curation records
+  and Pandect as Eidetic's session layer; migrate identifiers when touched,
+  without creating an unrelated rename pass.
+
+**P1 mismatch with ruling 9, proven by source inspection.**
+`replay_delta_as` substitutes Author on three raw assertion variants but
+passes `ReplaySetEdgesByIds` unchanged (`graph/capture.rs` 537–545,
+582–592). `set_edges_between` supplies unknown attribution to every missing
+source (`graph/edge_ops.rs` 484). The existing test
+`legacy_exact_capture_attribution_matches_checkpoint_replay` introduces a
+new exact handle in an entry with a known Author, then explicitly expects
+unknown and rejects that Author (`graph/journal.rs` 659, 709, 724–727).
+Ruling 9 instead requires the minting journal Author for such a handle;
+baseline-era claims remain unknown and explicit sources must be preserved.
+The prior passing P1 receipts do not prove this revised invariant. No new
+Cargo run or source fix was performed during this audit.
+
+**Integration boundary.** A full merge of main would additionally bring
+1,050 changed root-lockfile lines and unrelated source/dependency work since
+the base. The authorized UUID edge does not authorize a broad resolver update.
+This pass reconciles governing documentation only, leaving code/manifest/lock
+integration for a separately recorded step. Main's dirty Scrying files are
+unrelated and untouched.
+
+**Independent P1 validation reported (2026-10-05).** The plan-authoring
+session reported a separate detached-worktree run at `459cad84`, offline
+and locked, using `C:/t/cargo-targets/mere`. Counts reproduce the branch
+receipt exactly: kernel 323 passed/one doc example ignored; linked-data
+with query 40; Pandect 305; Pictograph with canvas 293/13 ignored;
+Graphshell with personal-sync 326 library plus five other tests/four
+ignored; workspace and wasm32 kernel checks exit 0. Removing provenance
+from both dedup keys made the separate-asserter and legacy-insert invariant
+tests fail, then the verifier restored the code. These are the independent
+session's reported results, not a new run by this lane. Its cited legacy
+author test covers raw journal assertions, not the exact-capture case
+identified above. Ignored, sibling, headed and device tests remain unrun.
+The verifier removed its own worktree and reported approximately 16 GB
+additional shared-target output due to its different source path. This
+lane did not delete shared build output or create another target.
 
 ## 3. Rulings
 
@@ -653,7 +723,144 @@ statements among them are copied as they stood at the freeze revision, so a
 later retraction does not change the frozen record. Annotations attach to the
 frozen node. A receiver missing a resource sees it through ruling 4's coverage.
 
+Round 3 put checkpoints C1 to C4 before the lane could meet them.
+
+**Ruling 9 (C1).** *What asserter do existing statements get?* Options: journal
+replay, else unknown; journal replay, else the user; unknown for all. Mark:
+**"Journal replay, else unknown (Recommended)"**. Follows: a statement minted
+inside a session takes the author of the journal entry that minted it
+(`AttributedDelta`, with ids captured by `ReplaySetEdgesByIds`), read through
+ruling 5, so a link a page makes is the page's. A statement from a baseline
+(imported graphs, sessions older than their journal) gets an explicit
+"unknown" asserter, shown as such and never merged with the user's.
+
+**Ruling 10 (C2).** *Which statements move to the resource graph?* Options: per
+predicate, by nature; per family; Semantic only. Mark: **"Per predicate, by
+nature (Recommended)"**. Follows: each sub-kind declares its nature (content
+or experience) in the predicate registry the statement kernel brief names, and
+placement follows it. The table is in §4, after ruling 14 settled its two-way
+rows.
+
+**Ruling 11 (C3).** *Where do existing claims land?* Options: replay, else
+current; replay, else hold aside; current for all. Mark: **"Replay, else
+current (Recommended)"**. Follows: journal replay attaches each claim to the
+resource its node showed when the claim was minted; a baseline-era claim goes
+to the currently shown resource, and the migration writes a note listing the
+claims that landed by default.
+
+**Ruling 12 (C4a).** *What are the two senses called?* Options: node stays and
+"resource" is added; "resource" and "surface" as terms. Mark (free text):
+**"R-gnode, for resource graph node, contrasted against just graph node, which
+a resource graph depends on right? Should be a name for that relationship… not
+like a subgraph or a nested graph, but an aspect of the graph or something.
+Idk!"** Answered: the dependency runs the other way (a node shows a resource;
+the resource graph stands alone, and only arrival and residency flow from
+nodes), and "gnode" is ruled as a node's rendered body (TERMINOLOGY,
+2026-07-02), which a resource mostly lacks. Put back as two questions. Mark,
+on the name: **"Resource (Recommended)"**. Follows: "resource" names what a
+canonical URL identifies; "node" and "gnode" keep their meanings; "browsing
+surface" stays a description, not a term.
+
+**Ruling 13 (C4b).** *What is the resource graph to the mere's graph?* Options:
+strata; aspects; noumenal and phenomenal; no term. Mark: **"Strata
+(Recommended)"**. Follows: a mere's graph has two strata, the resource stratum
+(what things are, and the claims about them) under the node stratum (how they
+were met: trail, layout, groupings). A node rests on the resource it shows.
+
+**Ruling 14 (C2 rows).** *Which two-way rows go to the resource stratum?*
+Options (several allowed): `AgentDerived`; `DependsOn`, `Blocks`, `NextStep`;
+`SharedCollection`; `UserGrouped`. Mark: **"AgentDerived (Recommended),
+DependsOn, Blocks, NextStep, SharedCollection, That usergrouped distinction
+sounds like it would be better with user tags as resources and usergrouping as
+layout"**. Follows: the first five go to the resource stratum; `UserGrouped`
+stays in the node stratum as layout; user tags move to the resource stratum
+(ruling 15 settles how).
+
+**Ruling 15.** *"User tags as resources": which reading?* Options: tags are
+resources; tags live on resources. Mark: **"Tags are resources
+(Recommended)"**. Follows: a tag becomes a resource with its own IRI (a SKOS
+concept, local by default and shareable, able to carry a label and broader or
+narrower tags), and tagging is the tagger's statement linking a thing's
+resource to the tag's. This takes the stance doc's named candidate, "tags and
+classifications as recognized vocabulary types", for tags; classifications
+are checkpoint C8.
+
+Round 4 came from Mark mid-round, after ruling 13: "Hm. Maybe aspect could
+distinguish the various senses of graph there too, the planes, layers, tiers
+and whatnot". An inventory found six ways a mere's graph is divided (strata,
+planes, keeping, attention, the socialization tiers, coverage); "aspect" unused
+as a term; "layer" in TERMINOLOGY almost entirely architectural; and "tier"
+naming two divisions, with a sentence in TERMINOLOGY warning they differ.
+
+**Ruling 16.** *Should "aspect" be the umbrella for the ways a mere's graph is
+divided?* Options: umbrella, with each aspect's parts keeping their names;
+"aspect" replacing the part words; no umbrella. Mark: **"Umbrella, parts keep
+names (Recommended)"**. Follows: TERMINOLOGY gains **aspect**, with a table of
+the six, their parts, their shape and where each is ruled. A new way of
+dividing the graph enters as an aspect and says how it differs from the
+others.
+
+**Ruling 17.** *Which division keeps "tier"?* Options: keeping's bottom step
+becomes the ambient level; keep "ambient tier". Mark: **"Ambient level
+(Recommended)"**. Follows: keeping's steps are all levels; "tier" names only
+the t1 to t4 socialization aspect. Amends the 2026-09-23 wording, not its
+meaning; text written before keeps its words, under a dated note. Cleromancy's
+and Isocosm's design records also say "ambient tier"; they are outside this
+repository and are left for their own sessions.
+
+Round 5, 2026-10-05. The lane carrying this plan works on branch
+`graph-semantics`, cut at `36893553`, before rulings 9 to 17 reached main.
+It put C1, C2 and C3 to Mark again there, and was about to put C4. Its C1
+("1", a legacy marker for missing provenance, with author-aware journal
+replay in the code) and its C2 ("1", the fixed containment split) agree with
+rulings 9, 10 and 14. Its C3 ("1", the currently shown resource for every
+old claim, with a migration record) did not offer replay, which ruling 11
+had chosen.
+
+**Ruling 18 (C3 reconciled).** *Which C3 stands: ruling 11 on main, or the
+branch's current resource for all?* Options: replay first, as on main;
+current for all, as on the branch. Mark: **"Replay first, as on main
+(Recommended)"**. Follows: ruling 11 stands. Claims inside a retained journal
+land on the resource their node showed when they were minted; only claims the
+journal cannot reach (baseline-era) fall back to the currently shown resource.
+The branch's migration record (original endpoints, ids, times, asserters, an
+uncertainty mark) applies to those fallback cases.
+
+**Ruling 19 (C4 amended).** *Which names?* Options: resource and surface;
+resource and node. Mark first asked why resource and surface had been the
+first proposal, and said he did not mind using them (free text: **"Hm.
+Resource and surface were your first instincts too. Tell me why, and I don't
+mind using those."**). Answered: the record's own model calls the node "a
+browsing surface" (2026-05-18 brief, 2026-06-05 lineage plan); the pair is
+symmetric; and with two strata "node" naturally means any graph element, so
+reserving it for one kind needs "resource node versus node" qualification.
+Against it: 52 public types use "surface" in the UI sense and `SurfaceId`
+already names chrome and accessibility elements (`graph-kernel/src/accessibility.rs`
+49); "node" is the product's commonest word. The lane's form, `ResourceNode`
+and `SurfaceNode` in code with `Node` and `NodeKey` kept as compatibility
+names, answers both. Mark: **"Resource and surface (Recommended)"**. Follows:
+amends rulings 12 and 13. Prose says resource and surface; code gets
+`ResourceNode` and `SurfaceNode`, with `Node` and `NodeKey` kept as
+compatibility names for surfaces; "node" means any graph element in either
+stratum; gnode is unchanged; `SurfaceId` is not reused. The strata are the
+resource stratum under the surface stratum.
+
 ## 4. Phases
+
+### Placement by stratum (rulings 10, 14, 15)
+
+| Family | Resource stratum | Surface stratum |
+|---|---|---|
+| Semantic | `Hyperlink`, `Cites`, `Quotes`, `Summarizes`, `Elaborates`, `ExampleOf`, `Supports`, `Contradicts`, `Questions`, `SameEntityAs`, `DuplicateOf`, `CanonicalMirrorOf`, `AgentDerived`, `DependsOn`, `Blocks`, `NextStep` | `UserGrouped` |
+| Provenance | `ClippedFrom`, `ExcerptedFrom`, `SummarizedFrom`, `TranslatedFrom`, `RewrittenFrom`, `GeneratedFrom`, `ExtractedFrom`, `ImportedFromSource` | `CopiedFrom` |
+| Imported | `RssMembership`, `FileSystemImport`, `ArchiveMembership`, `SharedCollection` | `BookmarkFolder`, `HistoryImport`, `SessionImport` |
+| Containment | `UrlPath`, `Domain`, `FileSystem`, `ClipSource` | `UserFolder`, `NotebookSection`, `CollectionMember` |
+| Traversal | none | all |
+| Arrangement | none | `FrameMember`, `TileGroup`, `SplitPair` |
+| Tags | tag resources, and tagging statements to them | none |
+
+*Reading, not ruled*: open-predicate statements (no recognized sub-kind, from
+JSON-LD ingest and readers) are content and sit in the resource stratum.
 
 In order; each phase lands green before the next starts. Code samples: none.
 
@@ -673,7 +880,9 @@ In order; each phase lands green before the next starts. Code samples: none.
   extractor at a new version updates its old assertion rather than adding one;
   no production writer passes `None` (a test enumerates the writers);
   `dataset_round_trip_is_lossless_under_the_profile` stays green with a case of
-  two reifiers on one triple term; existing snapshots load (checkpoint C1).
+  two reifiers on one triple term; existing snapshots load, with asserters
+  recovered by journal replay and baseline-era statements marked unknown
+  (ruling 9), and a test pins both cases.
 - **P2. Resource graph (rulings 2, 6).** Eidetic's `canonical_url` moves to
   chartulary, the common dependency of the kernel and eidetic-core, and both
   use it; nothing keeps a private copy. Each mere holds two chartulary graphs:
@@ -686,7 +895,13 @@ In order; each phase lands green before the next starts. Code samples: none.
   its two resources. Cross-family selector walks join through the shown
   resource. Page versions are content-hashed captures under the resource. SPARQL
   is served by a `QueryableDataset` adapter over the resource graph, retiring
-  the per-query `dataset_quads` rebuild in `linked-data::query`.
+  the per-query `dataset_quads` rebuild in `linked-data::query`. Placement
+  follows the table above, declared per predicate in the registry (ruling 10).
+  Existing claims migrate by journal replay, else to the currently shown
+  resource with a note of the defaults (ruling 11). Tags become tag resources
+  and tagging statements (ruling 15). Code and docs say "resource" and "surface", with
+  `ResourceNode` and `SurfaceNode` and compatibility `Node`/`NodeKey` names
+  (ruling 19); the two strata are resource and surface.
   Done when: two surfaces showing one canonical URL see the same content
   statements; a surface navigating from page 1 to page 2 shows page 2's
   statements while page 1's stay on page 1's resource; a `utm_` variant and a
@@ -695,6 +910,10 @@ In order; each phase lands green before the next starts. Code samples: none.
   Traversal crosses from a surface into the resource graph and back; the SPARQL
   path builds no dataset per call and returns the same rows as the old path on
   the existing query tests (the old path survives only as the test oracle);
+  a node's tags read back as tagging statements to tag resources, and two
+  nodes showing one resource show the same tags; a replayed journal puts a
+  claim made before a node navigated on the earlier page's resource, and a
+  baseline-era claim lands on the current resource and in the migration note;
   `cargo check -p mere-kernel --target wasm32-unknown-unknown` stays green.
 - **P3. Coverage and the pending index (ruling 4).** A coverage note travels
   with every query result and scene projection, naming each layer that limited
@@ -740,28 +959,21 @@ In order; each phase lands green before the next starts. Code samples: none.
 Choices with more than one defensible answer that the phases will meet. Each
 comes back to Mark as a fork, with evidence, before the code commits to one.
 
-- **C1 (P1). Legacy statements.** What asserter does a stored statement with no
-  provenance get on load: a legacy marker, the local user, or the ingest engine
-  that probably wrote it. **Resolved 2026-10-04:** Mark selected **"1"**, the
-  explicit unknown legacy asserter marker; see the dated C1 ruling in §2.
-- **C2 (P2). Which families sit on resources.** Semantic, Imported and
-  Provenance are content and Traversal and Arrangement are experience; the
-  seven containment sub-kinds split three ways: URL-derived (`UrlPath`,
-  `Domain`), resource-level (`FileSystem`, `ClipSource`) and user layout
-  (`UserFolder`, `NotebookSection`, `CollectionMember`).
-  **Resolved 2026-10-05:** Mark selected **"1"**, the fixed split; see the
-  dated C2 ruling in §2.
-- **C3 (P2). Migration of existing claims.** A surface's content statements
-  were asserted while it showed whichever page it showed then; the store does
-  not record which. Attach them to the currently shown resource, to the
-  resource of the visit nearest the assertion time, or drop them with a record.
-  **Resolved 2026-10-05:** Mark selected **"1"**, currently shown resources
-  with a migration record; collision handling remains a separate fork.
-- **C4 (P2). Words.** Names for the two senses of node (resource, surface) in
-  TERMINOLOGY and in code.
+- **C1 (P1). Legacy statements.** Ruled: ruling 9.
+- **C2 (P2). Which families sit on resources.** Ruled: rulings 10 and 14; the
+  table is in §4.
+- **C3 (P2). Migration of existing claims.** Ruled: ruling 11.
+- **C4 (P2). Words.** Ruled: ruling 19 amends rulings 12 and 13
+  (resource and surface; resource and surface strata).
 - **C5 (P3). Purge default.** The pending index's default purge policy.
 - **C6 (P4). The frozen node.** What kind of node bears a frozen selection, and
   where it is placed.
+- **C7 (P2). Tag IRIs.** How a local tag's IRI is minted (a per-mere namespace,
+  a per-identity namespace, or a hash of the label), and how two tags with one
+  label from different taggers relate.
+- **C8 (P2). Classifications.** Whether node classifications (with their
+  suggested, accepted and rejected states) follow tags into the resource
+  stratum.
 
 ## 6. Progress
 
@@ -889,3 +1101,19 @@ comes back to Mark as a fork, with evidence, before the code commits to one.
   No P2 code, manifest or lockfile changed; Cargo/wasm and sibling builds
   remain unrun at this documentation checkpoint. Retained worktree and target
   ownership and the compiler hold are unchanged.
+
+- **2026-10-05. All 1 and main reconciliation.** Recorded the branch's A1/B1/C1
+  answer, then checked main at Mark's request. Incorporated canonical rulings
+  9–19, predicate placement, tag-resource gates, C7/C8 and current terminology
+  without deleting branch findings or prior progress. C3 replay-first is the
+  reconciled ruling; C4 is already decided. Source inspection found the exact
+  journal attribution mismatch with ruling 9 recorded above. Stopped before
+  P2 source work because the current phase contract differs. No merge of
+  unrelated main source or lock changes, Cargo tests, wasm or sibling builds
+  was performed. Main and its dirty files remain untouched. Worktree and
+  reusable target remain retained for this lane; independent gates may also
+  be using the shared target.
+  The independent session then reported matching receipts and a successful
+  dedup-defect control, recorded above; those do not close the exact-capture
+  attribution gap. Mark reaffirmed `ResourceNode` and `SurfaceNode`; C4 is
+  settled and is not reopened.
