@@ -4362,6 +4362,13 @@ and merges it into main. The Knot and Isometry repins follow as steps of
 their own. This lane's part was to make the branch ready for that: merge main
 `6c3dca60` or newer, rerun the gates and the headed set on the final head,
 and report the head.
+*Annotation, 2026-10-05:* S16 ran. The coordinator merged `4b0713db` into
+main at `cec0b3a4`: weave's tree was identical to a plain text merge's, and
+it differed from the gated head only in the dynamics grammar plan. It was
+pushed with Mark's approval, so origin/main is now `07db35e2`. Knot's repin
+onto it started the same day on knot-editor's `mere-pre4-repin` branch.
+Isometry's waits until its checkpoint 9 merges (wing ruling 572, Isometry
+`5c705da`).
 
 **Rulings 558 and 559** were one multi-select question, and Mark ticked both:
 
