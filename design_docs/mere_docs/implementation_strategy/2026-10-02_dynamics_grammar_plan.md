@@ -484,3 +484,28 @@ These are *Reading, not ruled*. Each returns to Mark at the named track's checkp
     - `canvas/input.rs`, `canvas/roles.rs`, `ports/graphshell/src/web_practice.rs` and `web_tree/product.rs`.
     - The ignored web lock.
     - A plain three-way text merge of each overlapping file with each lane has no conflict hunk (`trial-merges.log`).
+- 2026-10-05 (G9, second round: F60 to F63): main `9680306d` merged into `grammar-g9` (`85525373`). The plan and the root lock were the only files both sides changed, and each matches a plain `git merge-file`, line endings aside (`Code/testing/mere/grammar-g9/merge-9680306d-check.log`). F63 is built at `d8441788`, and F61's route and F62 were assessed. Both go back to Mark as forks before anything is built past them.
+  - **F63.** `AtRest::budget_ended` (`canvas/at_rest.rs`) notes the frame a settle budget runs out. On it, the board's `tick` (`physics_board.rs`) and the canvas's `note_settle` (`canvas/roles.rs`) start the home step whether or not the speed floor was met. Only the speed floor still counts as a settle, so Settled (F30) and the settle count are unchanged.
+    - The probe is the receipt (`canvas/tests/home_at_budget_end.rs`, `f63-after.log`). On the board, the dragged anchored card ends exactly home at its own stiffness and at the canvas's, after 380 frames: the 360-frame budget and the 20-frame glide. On the canvas, an anchored item dragged while another moves ends exactly home: by the speed floor after 309 frames while playing, and after 48 frames when given a finite budget of 30.
+    - The positive control, with the new step removed from both surfaces, brings back the misses: 58.191 and 2.326 on the board, and 16.893 on the canvas's finite budget (`f63-control-step-removed.log`).
+    - *Correction to F63's record:* the 2.3-unit miss and the 135-frame return were the board's at the canvas's stiffness, not the canvas's. The canvas cannot reach a budget end with roles in play: placing an arrangement pauses (`strategy.rs:35-39`), and play runs an unbounded budget (`input.rs`, `set_paused`). Its finite-budget case is reached only in the test, by giving the playing canvas a finite budget directly.
+  - **The web lock** gains a second line on the merged tree: main's `c79bb8c2` makes scenomise depend on scenograph. `77f16c24…` becomes `2e099cf6…`, resolved offline (`web-lock-r2.diff`).
+  - **Gates on the merged tree** (`gates-g9c.log`):
+    - chirograph: 39.
+    - pictograph `canvas`: 299, 13 ignored.
+    - pictograph `gpu`: 3.
+    - The `mere` and graphshell `canvas-gpu` checks: both pass.
+    - graphshell `web`: 238, 4 ignored, single-threaded.
+    - Clippy on pictograph: no warning in this lane's code.
+    - The fresh wasm build into an empty target (`wasm-build-fresh-r2.log`): bundle `bd1dbc16…`; the web lock is unchanged by the build.
+  - **Headed** (bundle `bd1dbc16…`, one port and Chrome profile per receipt, ports 8870 to 8878, `receipts-r3.log`): 8 of 8 pass with no page error and no gate failure: the G7 role and pin receipts, `practice_encoded_axes`, `practice_workspace`, and the drag receipts on both pages. The page-error control fails by the receipt gate, as it should.
+    - A harness finding. Round two ran every receipt on one port (8863). After its first receipt, the port held listening sockets owned by no process, and the runner refused the rest (`receipts-r2.log`). The same orphans appeared on 8877 and 8878 after round three and cleared within minutes. A port per run avoids it.
+    - Round two's batch also counted that refusal as the control failing. Round three's control counts only a failure by the receipt gate.
+  - **Assessed, back to Mark** (evidence in the lane's report):
+    - F61's route: how the viewer's actions join graphshell-client's tree and how a local one is told from an endpoint's, by where it came from or by its intent name. Also which items list them: the fixture route mounts no local projection.
+    - F62: how actions are expressed. ARIA 1.2 has no action list, and the pinned AccessKit adapters (`accesskit_windows` 0.32.1, `accesskit_macos` 0.26.3, `accesskit_atspi_common` 0.18.1) never read AccessKit's `custom_actions`; a reader can only Click, Focus, SetValue, scroll or select text.
+    - F62: which of 2,000 nodes are described. The web host re-syncs accessibility every drawn frame (`cambium-genet-web-host/src/mount.rs:232-238`).
+    - F62: rootstock's API. A drawn child has no route back today: `A11yRequest` targets DOM nodes only.
+    - F62: where the graph's description is computed. Only the tree page's wasm-only producer draws pictograph's canvas (`web_tree.rs:167`); no native host does.
+    - F62: what an invoked Drag does without a pointer.
+    - The web instrument: CDP's `Accessibility.getFullAXTree` would change the runner's "no DevTools" rule (`run-scenario.ps1:9`).
