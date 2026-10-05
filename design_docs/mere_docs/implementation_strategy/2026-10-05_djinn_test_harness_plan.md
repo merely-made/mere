@@ -1,8 +1,9 @@
 # djinn Test Harness Plan
 
 **Date**: 2026-10-05
-**Status (2026-10-05)**: assessed; all ten forks ruled (§3). Next: H1 to H3
-in a lane. No code
+**Status (2026-10-05)**: assessed; all forks ruled (§3, rulings 1 to 13). H1
+to H3 built on a lane branch; its graceful-stop fix (ruling 11) is under
+way, then verification and merge. No code
 changed. The vault lock plan's build waits on this harness (its ruling 18).
 **Scope**: one shared, tested way to run djinn residents under test:
 isolated, observed without scraping logs, stopped and restarted, held
@@ -257,6 +258,28 @@ test with outcomes unchanged, then the lock receipts, other helpers when
 touched; the lock receipts only; everything now. Mark: **"D1 and D1b, then
 the lock (Recommended)"**.
 
+**Ruling 11.** *The harness found that djinn's graceful stop with personal
+sync on exits 1 ("still has active borrowers", `resident.rs:303`,
+`resident_blobs.rs:255`): sync's background tasks outlive the run loop.
+Ctrl-C takes the same path.* Options: fix it in this lane; its own lane.
+Mark: **"Fix it in this lane (Recommended)"**.
+
+**Ruling 12.** *The installed resident is told apart by an `--installed`
+flag the installer passes; manual runs need it or explicit endpoints, and
+the legacy launcher passes none.* Options: keep the flag; detect by install
+path; the flag, with the legacy launcher updated too. Mark: **"Keep the
+flag (Recommended)"**. Follows: the legacy launcher retires at the pairing
+plan's D2 switch.
+
+**Ruling 13.** *Six smaller choices as built:* stop as its own
+`resident-control-v1` route, so granting status never grants stop; the
+guard's installed-locations list mirroring the installers' paths,
+overridable, empty on Unix; the crate under `crates/system`, since crates
+may not depend on ports; status read by running `djinn --resident-status`,
+avoiding a dependency cycle; the canary design, with receipts defaulting to
+`%TEMP%\djinn-receipts`; a Linux test bus left to H5. Options: accept all
+six; review each. Mark: **"Accept all six (Recommended)"**.
+
 ## 4. Phases
 
 Drafted from the assessment; set once the forks are ruled.
@@ -317,3 +340,39 @@ Controls, each of which must fail where it should:
 
 **2026-10-05.** Assessed by a read-only lane (Opus); the load-bearing claims
 re-checked in code. Nothing built. Next: Mark's rulings on §3.
+
+**2026-10-05, H1 to H3 built** (Opus lane, `38ed523a` and `c55faaff`, not
+merged):
+
+- **`crates/system/djinn-testkit`** (unpublished, depending on no djinn,
+  castellan, personae or graphshell code) holds:
+  - a run with a machine-wide lock, an opt-in quiet mode, load samples, and
+    a kill-on-close job;
+  - an isolated `Resident` with readiness by enumerated pipes plus the
+    status route, kill, stop and restart;
+  - the guard, which refuses standard endpoints, `--installed`, missing
+    redirects and a bus it did not start;
+  - the walls (the installed resident by path, PID and start time; pipes
+    enumerated, never opened; canary times);
+  - the `mere.djinn.receipt/v1` record with `verify` and a summary
+    renderer.
+- **On djinn's side:**
+  - `resident-status-v1` and `resident-control-v1` (stop), granted to the
+    `djinn` label only, with `--resident-status` and `--stop-resident`;
+  - `--events-file`, `--log-filter` and `--installed`; the Windows
+    installer passes `--installed`;
+  - castellan's Unix receipt listener refuses the user's `SSH_AUTH_SOCK`.
+- **Results:**
+  - D1 on the harness passed, its stopped peer not connected after 14.3 s.
+  - D1b failed at its second restart, as pairing ruling 36 expects.
+  - The two files went from 795 to 340 lines, 311 fewer net of a shared
+    144-line module.
+  - Controls C1, C3, C4 and C5 each failed where they should, and every
+    record verified.
+  - The installed resident (PID 14756, `graphshell-device-host.exe`,
+    started 05:06:01) was identical before and after every run.
+- **One condition red:** a graceful stop with sync on exits 1 (ruling 11).
+- **Gates:** djinn, djinn-testkit, personae and castellan pass, and the
+  lock adds only the new crate. djinn's own Linux cross-check cannot run
+  here (ring's C build needs a cross compiler; chatelaine ruling 57 moves
+  such checks to the ThinkPad).
