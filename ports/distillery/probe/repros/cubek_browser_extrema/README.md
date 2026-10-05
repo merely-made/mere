@@ -1,13 +1,19 @@
 # Cubek browser extrema reproducer
 
 This is the reduction-only extraction of Distillery's first failed MiniLM
-browser row. It uses Burn 0.22.0-pre.2 and Cubek 0.3.0-pre.2 to run four scalar
+browser row. It uses Burn 0.22.0-pre.4 and Cubek 0.3.0-pre.4 to run four scalar
 extrema cases through BrowserWebGpu in a dedicated worker:
 
 - a finite maximum;
 - an all-negative-infinity maximum;
 - an all-positive-infinity minimum; and
 - a maximum containing NaN.
+
+**2026-10-03:** the receipts named below from before September record the
+pre.2 row. On pre.4 the patched row passes all four cases in headed Chrome
+([`receipts/2026-10-03_pre4_chrome.json`](receipts/2026-10-03_pre4_chrome.json),
+migration plan §13.30). Pristine pre.4 without the `cubek-reduce` patch has not
+been run.
 
 The page captures WebGPU validation errors separately from returned tensor
 bytes. This distinction matters because a failed dispatch can still leave a
@@ -19,7 +25,7 @@ and rejects the non-finite `f32`. This workspace patches `cubek-reduce` to pass
 the bits through a mutable kernel local before reinterpretation while retaining
 the infinity and NaN cases that motivated Cubek's identity change.
 
-From this directory, with wasm-bindgen CLI 0.2.122 installed:
+From this directory, with wasm-bindgen CLI 0.2.129 installed:
 
 ```powershell
 .\run-repro.ps1 -WasmBindgen C:\path\to\wasm-bindgen.exe

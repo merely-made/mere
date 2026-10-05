@@ -8,7 +8,6 @@
 
 use cubecl::config::autotune::AutotuneLevel;
 use cubecl::{
-    TestRuntime,
     ir::{ElemType, FloatKind, UIntKind},
     prelude::*,
     zspace::Shape,
@@ -29,7 +28,7 @@ use cubek_test_utils::{
 /// values. The rows are designed to hit every interesting slice:
 /// `[0,0,0,0]` (empty), `[1,1,1,1]` (full), `[0,1,0,0]` (mixed).
 fn reduce_mask(config: ReduceOperationConfig) -> Vec<f32> {
-    let client = TestRuntime::client(&Default::default());
+    let client = cubecl::test_device().client();
 
     let shape = Shape::new([3, 4]);
     #[rustfmt::skip]
@@ -39,7 +38,7 @@ fn reduce_mask(config: ReduceOperationConfig) -> Vec<f32> {
         0.0, 1.0, 0.0, 0.0, // any = 1, all = 0
     ];
 
-    let input_dtype = f32::as_type_native_unchecked().storage_type();
+    let input_dtype = f32::elem_type_native();
     let (input_handle, _) = TestInput::builder(client.clone(), shape.clone())
         .dtype(input_dtype)
         .layout(StridedLayout::Explicit(vec![4, 1]))
@@ -47,7 +46,7 @@ fn reduce_mask(config: ReduceOperationConfig) -> Vec<f32> {
         .generate_with_f32_host_data();
 
     // Drives the real `precision()` path: Any/All require the flag storage as
-    // output (u32 here — the bool backing callers request on runtimes without
+    // output (u32 here: the bool backing callers request on runtimes without
     // 8-bit storage, and the dtype every test runtime supports) while
     // accumulation stays = input. The kernel writes the flags directly into
     // the u32 output, so the f32-input -> flag-output conversion is exercised
@@ -72,8 +71,8 @@ fn reduce_mask(config: ReduceOperationConfig) -> Vec<f32> {
 
     let input_binding = input_handle.binding();
     let output_binding = output_handle.clone().binding();
-    let outcome = launch_and_capture_outcome(&client, |c| {
-        reduce::<TestRuntime>(
+    let outcome = launch_and_capture_outcome(&client, &[&output_handle.handle], |c| {
+        reduce(
             c,
             input_binding,
             output_binding,

@@ -1,20 +1,40 @@
-use crate::{CubeRuntime, tensor::CubeTensor};
+use crate::{CubeDevice, tensor::CubeTensor};
 use burn_backend::cubecl::dtype_to_storage_type;
 use burn_backend::{
-    Backend, BackendGraph, BackendTypes, DTypeUsage, DTypeUsageSet, DeviceOps, ExecutionError,
-    TensorData,
+    Backend, BackendGraph, BackendTypes, DTypeUsage, DTypeUsageSet, ExecutionError,
+    InstallMemoryPoolsError, MemoryPoolLayout, MemoryPoolUsage, ProfileDuration, ProfileOptions,
+    ProfileToken, SlicedPool, SlicedPoolReport, TensorData, profile_with_tokens,
 };
-use burn_std::{BoolStore, DType};
+use burn_std::{BoolStore, DType, id::StreamId, quantization::quantizable};
+use cubecl::device::DeviceId;
 use cubecl::{
+    MemoryConfiguration, MemoryPoolKind,
+    client::{Client, ProfileWindow},
+    config::memory::{MemoryPoolConfig, MemoryPoolsConfig, MemoryPoolsPreset},
+    config::size::MemorySize,
     features::{MmaConfig, TypeUsage},
-    server::ComputeServer,
+    ir::ElemType,
+    server::{ProfileError, ProfilingToken},
 };
-use std::marker::PhantomData;
 
 #[cfg(not(feature = "fusion"))]
 use burn_backend::tensor::{BoolTensor, FloatTensor, IntTensor, QuantizedTensor};
 #[cfg(not(feature = "fusion"))]
 use burn_ir::{BackendIr, TensorHandle};
+
+/// Whether the runtime can hold a quantized dtype's scales, which `dtype_to_storage_type` misses
+/// because it doesn't see the scheme's scale levels. Non-quantized dtypes always pass.
+fn qfloat_params_usable(client: &Client, dtype: DType) -> bool {
+    let DType::QFloat(scheme) = dtype else {
+        return true;
+    };
+
+    quantizable(&scheme)
+        && client
+            .properties()
+            .type_usage(ElemType::from_scale_dtype(scheme.scale_dtype()))
+            .is_superset(TypeUsage::Buffer | TypeUsage::Conversion)
+}
 
 /// Turn a cubecl graph-capture error into a backend [`ExecutionError`].
 fn graph_err(err: impl core::fmt::Display) -> ExecutionError {
@@ -23,37 +43,64 @@ fn graph_err(err: impl core::fmt::Display) -> ExecutionError {
     }
 }
 
-/// Generic tensor backend that can be compiled just-in-time to any shader runtime
+/// Turn a cubecl profiling error into a backend [`ExecutionError`].
+fn profile_err(err: ProfileError) -> ExecutionError {
+    ExecutionError::WithContext {
+        reason: format!("{err}"),
+    }
+}
+
+/// A window a kernel-stamping runtime could not measure.
+///
+/// A runtime that stamps the stream (CUDA, HIP) answers a window nothing ran
+/// in with two stamps and nothing between them. One that stamps kernels (wgpu)
+/// has no query set for it and refuses it as [`ProfileError::NotMeasured`] —
+/// but it refuses **two** cases with one error, and cubecl says so where the
+/// refusal is raised: a window that dispatched nothing, and a window whose
+/// work never landed in a timestamped pass. The second is a kernel that ran.
+///
+/// So this resolves to no measurement rather than to a zero. Zero is the
+/// fastest duration there is, and a caller comparing two windows — which is
+/// what a profiling scope is for — would take the one that could not be
+/// measured as the quicker of the two. `None` is already how every reader of a
+/// [`ProfileDuration`] spells an absence, and the error it replaces carried
+/// exactly that meaning.
+fn empty_window() -> ProfileDuration {
+    ProfileDuration::new_device_time_maybe(async move { None })
+}
+
+/// A captured launch sequence, tagged with the device it was captured on.
+///
+/// `cubecl::client::Graph` is self-contained: it owns a handle to the device it recorded on and
+/// replays there no matter what device the caller names. Every cubecl runtime is one backend now,
+/// so a graph captured on CUDA and replayed with a wgpu device is no longer a variant mismatch the
+/// dispatch layer catches — without this tag it would replay, silently, on the wrong device.
+#[derive(Clone, Debug)]
+pub struct CubeGraph {
+    graph: cubecl::client::Graph,
+    device: CubeDevice,
+}
+
+/// Tensor backend that compiles just-in-time for whichever runtime its device
+/// names.
 #[derive(new)]
-pub struct CubeBackend<R: CubeRuntime> {
-    _runtime: PhantomData<R>,
+pub struct CubeBackend;
+
+impl BackendTypes for CubeBackend {
+    type Device = CubeDevice;
+
+    type FloatTensorPrimitive = CubeTensor;
+    type IntTensorPrimitive = CubeTensor;
+    type BoolTensorPrimitive = CubeTensor;
+    type QuantizedTensorPrimitive = CubeTensor;
+
+    type GraphPrimitive = CubeGraph;
 }
 
-impl<R> BackendTypes for CubeBackend<R>
-where
-    R: CubeRuntime,
-    R::Server: ComputeServer,
-    R::Device: DeviceOps,
-{
-    type Device = R::Device;
-
-    type FloatTensorPrimitive = CubeTensor<R>;
-    type IntTensorPrimitive = CubeTensor<R>;
-    type BoolTensorPrimitive = CubeTensor<R>;
-    type QuantizedTensorPrimitive = CubeTensor<R>;
-
-    type GraphPrimitive = cubecl::client::Graph<R>;
-}
-
-impl<R> Backend for CubeBackend<R>
-where
-    R: CubeRuntime,
-    R::Server: ComputeServer,
-    R::Device: DeviceOps,
-{
+impl Backend for CubeBackend {
     fn name(device: &Self::Device) -> String {
-        let client = R::client(device);
-        format!("cubecl<{}>", R::name(&client))
+        let client = device.client();
+        format!("cubecl<{}>", client.name())
     }
 
     fn seed(_device: &Self::Device, seed: u64) {
@@ -65,39 +112,121 @@ where
     }
 
     fn sync(device: &Self::Device) -> Result<(), ExecutionError> {
-        let client = R::client(device);
+        let client = device.client();
+        // A barrier plus the device's own fault, and nothing more: a launch
+        // failure lives on the buffers the launch never wrote and surfaces on
+        // the read of one of them, so it is not this sync's to report.
+        // `client.sync_buffers` is the same barrier plus a check of named
+        // tensors, for a caller that wants both.
         futures_lite::future::block_on(client.sync()).map_err(|err| ExecutionError::WithContext {
             reason: format!("{err}"),
         })
     }
 
+    fn profile<O: Send + 'static>(
+        device: &Self::Device,
+        options: ProfileOptions,
+        func: impl FnOnce() -> O + Send,
+    ) -> Result<(O, ProfileDuration), ExecutionError> {
+        // Not cubecl's bracketed `profile`: that one runs the closure on the
+        // device's runner while holding the device, so a closure waiting on
+        // another thread's call to the same device — a data loader building
+        // its batch there, say — would never get it back. The split window
+        // opens and closes on the stream without holding anything between.
+        profile_with_tokens::<Self, O>(device, options, func)
+    }
+
+    fn profile_start(device: &Self::Device) -> Result<Option<ProfileToken>, ExecutionError> {
+        let client = device.client();
+        client
+            .profile_start()
+            .map(|window| {
+                Some(ProfileToken {
+                    id: window.token.id,
+                    opened_on: window.stream_id.value,
+                })
+            })
+            .map_err(profile_err)
+    }
+
+    fn profile_end(
+        device: &Self::Device,
+        token: ProfileToken,
+        _options: ProfileOptions,
+    ) -> Result<ProfileDuration, ExecutionError> {
+        // Nothing is queued past the window here: every launch reaches the
+        // stream as it is made, so there is nothing for the flush option to
+        // force out.
+        let client = device.client();
+        // Closed on the stream it was opened on, which the token carries —
+        // not on the calling thread's, which need not be the same one.
+        let window = ProfileWindow {
+            stream_id: StreamId {
+                value: token.opened_on,
+            },
+            token: ProfilingToken { id: token.id },
+        };
+        match client.profile_end(window) {
+            Ok(duration) => Ok(duration),
+            Err(ProfileError::NotMeasured { .. }) => Ok(empty_window()),
+            Err(err) => Err(profile_err(err)),
+        }
+    }
+
+    /// Dropped on the stream it was opened on, without recording an end —
+    /// cubecl returns the start event to its pool and nothing is measured.
+    fn profile_abandon(device: &Self::Device, token: ProfileToken) {
+        let window = ProfileWindow {
+            stream_id: StreamId {
+                value: token.opened_on,
+            },
+            token: ProfilingToken { id: token.id },
+        };
+        device.client().profile_abandon(window);
+    }
+
     fn graph_prepare(device: &Self::Device) -> Result<(), ExecutionError> {
-        let client = R::client(device);
+        let client = device.client();
         client.graph_prepare().map_err(graph_err)
     }
 
     fn graph_start_capture(device: &Self::Device) -> Result<(), ExecutionError> {
-        let client = R::client(device);
+        let client = device.client();
         client.start_capture().map_err(graph_err)
     }
 
     fn graph_stop_capture(device: &Self::Device) -> Result<BackendGraph<Self>, ExecutionError> {
-        let client = R::client(device);
-        client.stop_capture().map_err(graph_err)
+        let client = device.client();
+        let graph = client.stop_capture().map_err(graph_err)?;
+
+        Ok(CubeGraph {
+            graph,
+            device: device.clone(),
+        })
     }
 
     unsafe fn graph_replay(
-        _device: &Self::Device,
+        device: &Self::Device,
         graph: &BackendGraph<Self>,
     ) -> Result<(), ExecutionError> {
-        // cubecl's `Graph::replay` is fire-and-forget: it enqueues the dispatch
-        // and returns immediately, so a replay failure is not reported here — it
-        // lands in the stream's error queue and surfaces on the next sync/flush.
+        // The replay goes to the device the graph was captured on whatever is passed here, so a
+        // caller naming a different one gets told rather than silently served the other device.
+        if &graph.device != device {
+            return Err(ExecutionError::WithContext {
+                reason: format!(
+                    "The graph was captured on {:?} and cannot replay on {device:?}",
+                    graph.device
+                ),
+            });
+        }
+
+        // cubecl's `Graph::replay` blocks on the enqueue and reports what the
+        // enqueue said; a failure also leaves the graph's write set carrying
+        // it, so a read of those buffers keeps failing until a replay lands.
         //
         // Safety: the buffer-liveness and stream-ordering obligations are the
         // caller's, forwarded verbatim from this method's own contract.
-        unsafe { graph.replay() };
-        Ok(())
+        unsafe { graph.graph.replay() }.map_err(graph_err)
     }
 
     fn memory_persistent_allocations<
@@ -109,20 +238,85 @@ where
         input: Input,
         func: Func,
     ) -> Output {
-        let client = R::client(device);
-        client.memory_persistent_allocation(input, func).unwrap()
+        let client = device.client();
+        client.memory_persistent_allocation(input, func)
     }
 
     fn memory_cleanup(device: &Self::Device) {
-        let client = R::client(device);
+        let client = device.client();
         client.memory_cleanup();
+    }
+
+    fn memory_install_pools(
+        device: &Self::Device,
+        layout: MemoryPoolLayout,
+    ) -> Result<(), InstallMemoryPoolsError> {
+        let client = device.client();
+        let properties = &client.properties().memory;
+        let config = pool_config(layout, properties.alignment.max(1))?;
+
+        // The runtime panics on an unhonourable layout, on a device thread the
+        // caller cannot catch and taking the device with it. Resolving it here
+        // first turns that into this method's error, by the runtime's own rules
+        // rather than a second copy of them.
+        MemoryConfiguration::default()
+            .resolve(Some(&config), properties)
+            .map_err(|err| InstallMemoryPoolsError::InvalidLayout {
+                reason: err.to_string(),
+            })?;
+
+        client
+            .install_memory_pools(&config)
+            .map_err(runtime_install_error)
+    }
+
+    fn memory_pool_report(device: &Self::Device) -> Option<Vec<SlicedPoolReport>> {
+        let report = device.client().memory_report();
+
+        // The pools a layout can be paired with, in the order allocations are
+        // routed through them: a `Sliced` layout maps onto them one to one, and
+        // a `Direct` layout is the single entry with no page size. The presets
+        // mix in pools of other kinds, dropped here — so their entries keep the
+        // routing order but not the positions of any layout.
+        Some(
+            report
+                .dynamic
+                .iter()
+                .filter_map(|pool| match pool.kind {
+                    MemoryPoolKind::Sliced { page_size, .. } => Some(SlicedPoolReport {
+                        page_size,
+                        pages: pool.pages,
+                        pages_peak: pool.pages_peak,
+                        largest_alloc: pool.largest_alloc,
+                    }),
+                    MemoryPoolKind::Direct => Some(SlicedPoolReport {
+                        page_size: 0,
+                        pages: pool.pages,
+                        pages_peak: pool.pages_peak,
+                        largest_alloc: pool.largest_alloc,
+                    }),
+                    _ => None,
+                })
+                .collect(),
+        )
+    }
+
+    fn memory_pool_usage(device: &Self::Device) -> Option<MemoryPoolUsage> {
+        let usage = device.client().memory_usage();
+
+        Some(MemoryPoolUsage {
+            number_allocs: usage.number_allocs,
+            bytes_in_use: usage.bytes_in_use,
+            bytes_padding: usage.bytes_padding,
+            bytes_reserved: usage.bytes_reserved,
+        })
     }
 
     fn staging<'a, Iter>(data: Iter, device: &Self::Device)
     where
         Iter: Iterator<Item = &'a mut TensorData>,
     {
-        let client = R::client(device);
+        let client = device.client();
         client.staging(data.map(|td| &mut td.bytes), false);
     }
 
@@ -132,8 +326,11 @@ where
         if let DType::Bool(BoolStore::Native) = dtype {
             return false;
         }
+        let client = device.client();
 
-        let client = R::client(device);
+        if !qfloat_params_usable(&client, dtype) {
+            return false;
+        }
 
         let type_usage = client.properties().type_usage(dtype_to_storage_type(dtype));
         // Same as `TypeUsage::all_scalar()`, but we make the usage explicit here
@@ -151,8 +348,11 @@ where
         if let DType::Bool(BoolStore::Native) = dtype {
             return DTypeUsageSet::empty();
         }
+        let client = device.client();
 
-        let client = R::client(device);
+        if !qfloat_params_usable(&client, dtype) {
+            return DTypeUsageSet::empty();
+        }
 
         let props = client.properties();
         let storage = dtype_to_storage_type(dtype);
@@ -181,45 +381,36 @@ where
     }
 
     fn device_count(type_id: u16) -> usize {
-        let client = R::client(&Default::default());
-        client.device_count(type_id)
+        CubeDevice::enumerate(DeviceId::new(type_id, 0)).len()
     }
 
     fn flush(device: &Self::Device) {
-        let client = R::client(device);
+        let client = device.client();
         client.flush().unwrap();
     }
 }
 
-impl<R: CubeRuntime> core::fmt::Debug for CubeBackend<R> {
+impl core::fmt::Debug for CubeBackend {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str("CubeCLBackend")
     }
 }
 
-impl<R: CubeRuntime> Clone for CubeBackend<R> {
+impl Clone for CubeBackend {
     fn clone(&self) -> Self {
         Self::new()
     }
 }
 
-impl<R: CubeRuntime> Default for CubeBackend<R> {
+impl Default for CubeBackend {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl<R: cubecl::Runtime> CubeRuntime for R
-where
-    R::Device: DeviceOps,
-{
-    type CubeDevice = R::Device;
-    type CubeServer = R::Server;
-}
-
 #[cfg(not(feature = "fusion"))]
-impl<R: CubeRuntime> BackendIr for CubeBackend<R> {
-    type Handle = CubeTensor<R>;
+impl BackendIr for CubeBackend {
+    type Handle = CubeTensor;
 
     fn float_tensor(handle: TensorHandle<Self::Handle>) -> FloatTensor<Self> {
         handle.handle
@@ -251,5 +442,84 @@ impl<R: CubeRuntime> BackendIr for CubeBackend<R> {
 
     fn quantized_tensor_handle(tensor: QuantizedTensor<Self>) -> Self::Handle {
         tensor
+    }
+}
+
+/// A pool layout in the runtime's own vocabulary, with sizes aligned to
+/// `alignment` — the rounding the runtime applies anyway, done here because the
+/// cap has to be counted in the pages it will actually build. Multiplying the
+/// *requested* page size instead buys fewer aligned pages than were asked for,
+/// and for a single-page pool a cap that cannot fit its page at all.
+fn pool_config(
+    layout: MemoryPoolLayout,
+    alignment: u64,
+) -> Result<MemoryPoolsConfig, InstallMemoryPoolsError> {
+    let config = match layout {
+        MemoryPoolLayout::Sliced(pools) => MemoryPoolsConfig::Explicit(
+            pools
+                .into_iter()
+                .map(
+                    |SlicedPool {
+                         page_size,
+                         pages,
+                         max_slice,
+                     }| {
+                        let page_size = align_up(page_size, alignment)?;
+                        let max_pool_size = pages
+                            .map(|pages| {
+                                page_size.checked_mul(pages).ok_or_else(|| {
+                                    InstallMemoryPoolsError::InvalidLayout {
+                                        reason: format!(
+                                            "a cap of {pages} pages of {page_size} B overflows"
+                                        ),
+                                    }
+                                })
+                            })
+                            .transpose()?;
+
+                        Ok(MemoryPoolConfig::Sliced {
+                            page_size: MemorySize(page_size),
+                            max_slice_size: max_slice
+                                .map(|size| align_up(size, alignment))
+                                .transpose()?
+                                .map(MemorySize),
+                            max_pool_size: max_pool_size.map(MemorySize),
+                            dealloc_period: None,
+                        })
+                    },
+                )
+                .collect::<Result<Vec<_>, _>>()?,
+        ),
+        // Never reclaiming on its own: a direct pool is installed to measure
+        // what a workload allocates, which is a short window with an explicit
+        // cleanup on either side of it.
+        MemoryPoolLayout::Direct => {
+            MemoryPoolsConfig::Explicit(vec![MemoryPoolConfig::Direct { reclaim_at: None }])
+        }
+        MemoryPoolLayout::SubSlices => MemoryPoolsConfig::Preset(MemoryPoolsPreset::SubSlices),
+        MemoryPoolLayout::ExclusivePages => {
+            MemoryPoolsConfig::Preset(MemoryPoolsPreset::ExclusivePages)
+        }
+    };
+
+    Ok(config)
+}
+
+/// A size rounded up to the device's alignment. Zero stays zero, for the
+/// layout's own validation to reject by field.
+fn align_up(size: u64, alignment: u64) -> Result<u64, InstallMemoryPoolsError> {
+    size.checked_next_multiple_of(alignment)
+        .ok_or_else(|| InstallMemoryPoolsError::InvalidLayout {
+            reason: format!("{size} B cannot be aligned up to {alignment} B"),
+        })
+}
+
+/// The runtime's refusal, in the backend's vocabulary.
+fn runtime_install_error(err: cubecl::InstallMemoryPoolsError) -> InstallMemoryPoolsError {
+    match err {
+        cubecl::InstallMemoryPoolsError::PoolsInUse { bytes_in_use } => {
+            InstallMemoryPoolsError::PoolsInUse { bytes_in_use }
+        }
+        cubecl::InstallMemoryPoolsError::Unsupported => InstallMemoryPoolsError::Unsupported,
     }
 }

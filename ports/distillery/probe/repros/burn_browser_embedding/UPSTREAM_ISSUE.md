@@ -1,5 +1,10 @@
 # BrowserWebGpu silently corrupts binary ops with the same tensor as both inputs
 
+**2026-10-03, not to be filed for pre.4:** upstream Burn/CubeCL pre.4 passes
+all ten graph and eleven embedding cases in the same browser where the
+reconstructed pre.2 row still fails (Mere migration plan §13.27). This draft
+describes the pre.2 row only. No upstream communication has been authorized.
+
 ## Summary
 
 On Burn `0.22.0-pre.2` / CubeCL `0.11.0-pre.2`, BrowserWebGpu returns stale or
@@ -74,3 +79,13 @@ scopes. Mere carries the experiment as a temporary backport in
 The same guard was applied to Burn's numeric, integer, and float binary
 launchers. The receipt exercises the numeric path; upstream should add backend
 coverage for the integer and float-family launchers as well.
+
+## 2026-09-29 disposition
+
+The historical pre.2 dependency row still reproduces this failure in the current
+browser. The pre.4 dependency row passes all ten graph and eleven embedding
+cases in the same session without Mere's burn-cubecl patch; nine native unfused
+launcher controls also match the patched row. Ruling 410 therefore retires the
+four selectors on the migration branch. This identifies a dependency-stack
+difference, not a particular upstream fix, and preserves the original report's
+historical scope. Exact comparison receipts are linked from this fixture's README.

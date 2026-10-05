@@ -12,7 +12,7 @@
 [package]
 edition = "2024"
 name = "burn-remote"
-version = "0.22.0-pre.2"
+version = "0.22.0-pre.4"
 authors = ["nathanielsimard <nathaniel.simard.42@gmail.com>"]
 build = false
 autolib = false
@@ -31,7 +31,6 @@ keywords = [
 categories = ["science"]
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/tracel-ai/burn/tree/main/crates/burn-router-remote"
-resolver = "2"
 
 [package.metadata.docs.rs]
 features = ["doc"]
@@ -58,7 +57,10 @@ iroh = [
     "dep:iroh",
     "tokio/io-util",
 ]
-server = ["tokio/sync", "tokio/macros"]
+server = [
+    "tokio/sync", "tokio/macros",
+    "dep:tracing-subscriber",
+]
 tracing = [
     "burn-communication?/tracing",
     "burn-ir/tracing",
@@ -83,7 +85,7 @@ name = "iroh"
 path = "tests/iroh.rs"
 
 [dependencies.burn-backend]
-version = "=0.22.0-pre.2"
+version = "=0.22.0-pre.4"
 features = [
     "default",
     "serde",
@@ -91,27 +93,27 @@ features = [
 default-features = false
 
 [dependencies.burn-communication]
-version = "=0.22.0-pre.2"
+version = "=0.22.0-pre.4"
 optional = true
 default-features = false
 
 [dependencies.burn-fusion]
-version = "=0.22.0-pre.2"
+version = "=0.22.0-pre.4"
 optional = true
 default-features = false
 
 [dependencies.burn-ir]
-version = "=0.22.0-pre.2"
+version = "=0.22.0-pre.4"
 features = ["default"]
 default-features = false
 
 [dependencies.burn-router]
-version = "=0.22.0-pre.2"
+version = "=0.22.0-pre.4"
 features = ["default"]
 default-features = false
 
 [dependencies.burn-std]
-version = "=0.22.0-pre.2"
+version = "=0.22.0-pre.4"
 features = ["default"]
 default-features = false
 
@@ -163,9 +165,18 @@ features = [
 version = "0.7"
 optional = true
 
+[dependencies.tracing-subscriber]
+version = "0.3.23"
+features = [
+    "default",
+    "fmt",
+    "env-filter",
+]
+optional = true
+
 [dev-dependencies]
-burn-flex = { version = "=0.22.0-pre.2", features = ["default"] }
-burn-tensor = { version = "=0.22.0-pre.2", features = ["default", "remote-websocket"] }
+burn-flex = { version = "=0.22.0-pre.4", features = ["default"] }
+burn-tensor = { version = "=0.22.0-pre.4", features = ["default", "remote-websocket"] }
 
 [target.'cfg(all(target_family = "wasm", target_os = "unknown"))'.dependencies.futures-util]
 version = "0.3"
