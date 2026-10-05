@@ -52,6 +52,62 @@ fn fixture() -> (ScriptedDom, OwnedLayout, NodeId, NodeId, NodeId) {
     (dom, layout, scroller, content, other)
 }
 
+#[test]
+fn element_reveal_notifies_each_two_axis_plane_once_and_keeps_start_vertical() {
+    let mut dom = ScriptedDom::new();
+    let root = dom.document();
+    let scroller = div(
+        &mut dom,
+        root,
+        "position:relative;margin-left:400px;margin-top:500px;width:200px;height:100px;overflow:auto;",
+    );
+    let content = div(
+        &mut dom,
+        scroller,
+        "position:relative;width:900px;height:600px;",
+    );
+    let target = div(
+        &mut dom,
+        content,
+        "position:absolute;left:820px;top:550px;width:80px;height:40px;overflow:auto;",
+    );
+    div(&mut dom, target, "width:160px;height:80px;");
+    let mut layout = OwnedLayout::new(
+        &dom,
+        &[""],
+        VIEWPORT.0,
+        VIEWPORT.1,
+        &[],
+        &Default::default(),
+    );
+
+    assert_eq!(
+        layout.scroll_into_view(&dom, target, ScrollAlign::Nearest),
+        vec![ScrollTarget::Element(scroller), ScrollTarget::Document]
+    );
+    assert_eq!(layout.element_scroll()[&scroller], (700.0, 490.0));
+    assert!(
+        !layout.element_scroll().contains_key(&target),
+        "reveal scrolls ancestors, not the target's contents"
+    );
+    assert!(layout.visible_rect(&dom, target).is_some());
+    assert!(
+        layout
+            .scroll_into_view(&dom, target, ScrollAlign::Nearest)
+            .is_empty()
+    );
+
+    assert_eq!(
+        layout.scroll_into_view(&dom, target, ScrollAlign::Start),
+        vec![ScrollTarget::Element(scroller)]
+    );
+    assert_eq!(
+        layout.element_scroll()[&scroller],
+        (700.0, 500.0),
+        "Start changes vertical alignment only; horizontal remains nearest and clamped"
+    );
+}
+
 /// Wheel a container to its end, whatever its range is.
 fn scroll_to_end(dom: &ScriptedDom, layout: &mut OwnedLayout, x: f32, y: f32) {
     layout.scroll_at_target(dom, x, y, 0.0, 10_000.0);

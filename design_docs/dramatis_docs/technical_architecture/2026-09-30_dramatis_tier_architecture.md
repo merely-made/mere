@@ -438,3 +438,10 @@ Rulings 10 to 15 answer the standards survey's open decision 5 (CXF import
 policy), which had been open since 2026-08-24. Rulings 16 to 22, the same
 day, belong to chatelaine's implementation and are recorded in the
 [chatelaine and CXF plan](../implementation_strategy/2026-10-01_chatelaine_cxf_plan.md) §2.
+
+*2026-10-05:* the stack seams plan's ruling S9 (Mark: "mien's becomes
+PersonaKey (Recommended)") renamed mien's `PersonaId`, a persona's leaf
+public key, to `PersonaKey`, so `PersonaId` names only personae's persona
+UUID. Carried by this tier's lane as `f702ca27` (merged `b52edea7`); no
+wire or persisted format carried the type. The vault's lock, found missing
+on 2026-10-04, has its own [vault lock plan](../implementation_strategy/2026-10-05_vault_lock_plan.md).

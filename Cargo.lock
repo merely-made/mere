@@ -12188,6 +12188,8 @@ dependencies = [
  "hex",
  "insigne",
  "rand_core 0.6.4",
+ "ring",
+ "rsa",
  "serde",
  "serde_json",
  "signature 2.2.0",
@@ -14303,6 +14305,7 @@ name = "scenomise"
 version = "0.0.4"
 dependencies = [
  "sceno",
+ "scenograph",
  "serde",
  "serde_json",
 ]
