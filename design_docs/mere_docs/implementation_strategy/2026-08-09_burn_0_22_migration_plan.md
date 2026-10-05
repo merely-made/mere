@@ -1,5 +1,15 @@
 # Burn 0.22 Migration Plan
 
+**2026-10-05, later: ruling 567, main `9680306d` (§13.45).**
+
+- The probe, repro and OPFS runners build with the repo's pinned toolchain,
+  read from `rust-toolchain.toml`. Before, rustup gave their neutral
+  directories the default stable, 1.97.1.
+- A planted uninstalled channel fails each runner before any cargo command.
+- The four bundles are rebuilt on 1.98.1 and their rows and controls pass.
+- Main `9680306d` is merged, and the gates and headed set pass.
+- S16 is the coordinator's.
+
 **2026-10-05 rulings 557 to 559 (§13.44):**
 
 - **S16 is approved.** The coordinator merges this branch into main, and the
@@ -4545,3 +4555,169 @@ Two rows collided with another lane:
 
 Main has since moved to `c36641d6`: mien's PersonaKey rename and plan
 records. It is not merged here. S16 is the coordinator's to run. No push.
+
+### 13.45 Ruling 567: the runners build with the repo's pin (2026-10-05)
+
+**Ruling 567** (Isometry wing record, main `79a403a`). The question was one of
+§13.44's forks, as it was put to Mark:
+
+> the probe, repro and OPFS runners build from a neutral directory, so rustup
+> gives them the default stable (1.97.1 here), not the repo's pinned 1.98.1.
+> Every probe and repro bundle so far was built that way. What should the
+> runners use?
+
+The options:
+
+- the repo's pin: each runner reads mere's `rust-toolchain.toml` and builds
+  with it, the bundles are rebuilt once, and their hashes are recorded;
+- update default stable;
+- leave it and record it.
+
+Mark: **"The repo's pin (Recommended)"**.
+
+*Follows:*
+
+- Each runner reads the channel from mere's `rust-toolchain.toml` rather than
+  a hardcoded version, so a bump there carries through.
+- A positive control shows each runner's rustc line before and after (1.97.1,
+  then 1.98.1). A planted mismatch, a toolchain file naming a channel that is
+  not installed, must fail loudly, not fall back. Nothing is installed to
+  prove it.
+- Each bundle is rebuilt once with its own runner, and its new hash is
+  recorded beside the old 1.97.1 one. Each bundle's rows and planted
+  controls are rerun.
+
+**Findings, not rulings.** The wing record lists §13.44's other two forks as
+findings, and they are recorded here the same way:
+
+- byte identity holds per target directory;
+- the OPFS probe stamps its provenance into each build.
+
+No change follows from either.
+
+**Main `9680306d` first (`344196c2`).** It brought mien's PersonaKey rename,
+scenomise's new scenograph dependency, origin's recipe commits (`b2f67356`,
+`c79bb8c2`) and plan records.
+
+- The merge base is `79f1cba4`. `Cargo.lock` and `DOC_README.md` changed on
+  both sides. For each, weave 0.5.4's result equals a plain `git merge-file`
+  merge, ignoring line endings.
+- The 28 files changed only on main equal main's blobs.
+- Main's lock change is scenomise's scenograph edge alone. The root lock
+  resolves `--locked`.
+- The remote fixture's committed lock takes the same edge, adding scenograph
+  as a path package, so it still resolves `--locked`. The gitignored web lock
+  takes it too (`13fd2935` to `f8eab000`), and nothing else in it moves.
+
+**The pin (`06423cab`).** `scripts/repo-toolchain.ps1` defines
+`Use-RepoToolchain`. In order, it:
+
+1. reads `channel` from mere's `rust-toolchain.toml`;
+2. sets `RUSTUP_AUTO_INSTALL=0`, so no rustup proxy can install behind the
+   check;
+3. refuses a channel that `rustup toolchain list` does not show as
+   installed;
+4. pins `RUSTUP_TOOLCHAIN` for the rest of the runner;
+5. prints the rustc line.
+
+The probe's `run-probe.ps1`, both `run-repro.ps1` and the OPFS
+`run-probe.ps1` call it before their first cargo command. The probe and the
+repros gain `-NoServe`, as the OPFS runner already has, so a runner can
+finish without starting its server.
+
+`genet_web_smoke` has no runner. It builds from its own directory, where
+rustup already finds the pin: rustc 1.98.1 there, before and after.
+
+**Positive control.**
+
+| | Before (`344196c2`) | After (`06423cab`) |
+| --- | --- | --- |
+| rustc from the runners' neutral directories (`C:\t`, the probe's and repros' target dirs) | 1.97.1 (`8bab26f4f`) | each runner prints `toolchain: 1.98.1 (rustc 1.98.1 (48a229cea 2026-09-01))` |
+| toolchain whose std the wasm links (embedded rustup paths) | probe: `stable-x86_64-pc-windows-msvc` ×33 | probe ×33, extrema ×27, embedding ×28, OPFS ×19, all `1.98.1-x86_64-pc-windows-msvc` |
+
+**Planted mismatch.** With `rust-toolchain.toml` edited to channel `1.91.0`,
+which is not installed, each of the four runners exited 1 within two
+seconds, before any cargo command. Each printed:
+
+> The repository pins Rust 1.91.0 (…rust-toolchain.toml), which is not
+> installed. Install it with rustup; this runner does not fall back to
+> another toolchain.
+
+The file was then restored. The rustup toolchain directory listing is the
+same before and after, so nothing was installed.
+
+**The bundles, rebuilt once with their own runners.**
+
+| Bundle | Built with 1.97.1 (`b84197a7`) | Built with 1.98.1 (`06423cab`) |
+| --- | --- | --- |
+| Distillery probe | `541cf624` | `9449e949` |
+| extrema repro | `67c74c8d` | `50caa057` |
+| embedding repro | `79badeca` | `cf7b7baa` |
+| muniment OPFS probe | `b24fdacd` | `6010ec9a` |
+
+The new builds also carry main `9680306d`'s sources. The probe's runner
+compiled only 4 crates, because 1.98.1 dependency artifacts from an earlier
+in-directory build were already in its target directory with matching
+fingerprints. The repros compiled 171 crates each, and the OPFS probe 26.
+
+**Rows and planted controls on the 1.98.1 bundles:**
+
+- *The probe.* All four embedding rows pass. The largest reference errors
+  are BGE `7.47e-8`, MiniLM `1.416e-7`, E5-small `8.38e-8` and E5-base
+  `6.05e-8`, the same as before. The SmolLM2 decoder row passes with an
+  exact reference match.
+  - A planted throw fails the embedding row; the reference still matches,
+    and the limiting layer is the gate.
+  - A planted reject fails the decoder row; the exact match still holds.
+- *Both repros.* Clean, each reports `passed` with all cases matching. A
+  planted throw and a planted reject each report `passed` false, with
+  every case still matching.
+- *The OPFS probe.* Clean, lanes 1 and 2 are ok, the gate passes and the state
+  is "complete". A planted throw and a planted reject each leave the lanes
+  ok, fail the gate, and stop the state.
+
+**Gates for the merge's cone (`06423cab`).** Against `b84197a7`, the seiche,
+conatus, ESP and Numen cones are unchanged and carry. The rest were rerun.
+The getrandom export is now scoped to the root workspace's one wasm check,
+and the web bundle was built with no exported rustflags.
+
+| Gate | Result |
+| --- | --- |
+| pictograph canvas lib; gpu with `physics_device` | 292; 295 pass, 13 ignored, adapter |
+| mere and graphshell `canvas-gpu` checks | pass |
+| graphshell `web` lib tests | 238 pass, 4 ignored |
+| `cambium-genet-web-host` native tests; wasm examples check | 8 pass; pass |
+| Distillery four-feature check; lease tests | pass; 2 pass |
+| two-peer lifecycle gate | exit 0 in 7.5 s, fixture rebuilt; the auditor accepts and rejects all 11 planted faults |
+| `cargo_mode.py verify` | pass |
+| web bundle (rustc 1.98.1, committed cfg only) | `23e9d2bc`, web lock `f8eab000` |
+
+**Headed under the gate (bundle `23e9d2bc`, port 8853).** All 31 rows behave
+as expected. The two planted controls fail, and the other 29 are ok with
+zero gate entries. `p5_tree_gpu_settle_2000` reads 413 of 418 device steps,
+0 failures, spread 1,078, 0 overlaps. Every receipt's captures name its own
+scenario.
+
+Getting there took four void runs, all kept and marked in the log:
+- *Runs 1 and 2.* After any row, a killed sink leaves port entries owned by
+  pid 0 for up to TIME_WAIT's two minutes, and `Get-NetTCPConnection` labels
+  some of them `Listen`, with a remote port. The lane runner refused the
+  port on those entries, so rows that followed a completed row refused to
+  run.
+- *Run 3* added a logged retry and showed the wait could exceed two
+  minutes.
+- *Run 4* refused at its own start check, on the same entries.
+- *The fix.* The runner copy's check (`Code/testing/.../run-scenario.ps1`,
+  the lane's tool and not a repository file) and the headed script's own
+  checks now count only listeners owned by a live process.
+
+The coordinator's port rule holds: no other process named or held 8853.
+
+**Head.** After §13.44 (`d101d7ff`):
+- `344196c2`, the main `9680306d` merge;
+- `06423cab`, the pin;
+- this documentation commit.
+
+Main has since gained `e8b440be`, a dynamics grammar plan record only. It is
+not merged here, and it merges cleanly. S16 remains the coordinator's. No
+push.
