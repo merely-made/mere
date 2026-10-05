@@ -4,6 +4,11 @@
 **Kind:** design record. Mark's rulings on ambiance, the examples he gave, the
 stack precedents they cite, and how they sit in Mere's existing session and
 memory design. No code.
+> **Amended 2026-10-04 (Mark, [graph semantics plan](../implementation_strategy/2026-10-04_graph_semantics_plan.md)
+> ruling 17):** keeping's bottom step is now called **the ambient level**, so that
+> *tier* names only the t1–t4 socialization aspect. The meaning is unchanged; the
+> text below keeps "ambient tier" as written.
+
 **Status (2026-09-23):** recorded; every question raised while writing it was
 ruled the same day (§9).
 

@@ -1,7 +1,7 @@
 # Graph semantics plan: assertions, resources, saved queries, residency
 
 **Date:** 2026-10-04
-**Status (2026-10-04):** plan. Rounds 1 to 3 ruled (rulings 1 to 15); phases
+**Status (2026-10-04):** plan. Rounds 1 to 4 ruled (rulings 1 to 17); phases
 final; checkpoints C1 to C4 ruled, C5 to C8 open (§5). No code.
 
 Four questions were put to Mark from outside the project: what a link records,
@@ -266,6 +266,29 @@ resource to the tag's. This takes the stance doc's named candidate, "tags and
 classifications as recognized vocabulary types", for tags; classifications
 are checkpoint C8.
 
+Round 4 came from Mark mid-round, after ruling 13: "Hm. Maybe aspect could
+distinguish the various senses of graph there too, the planes, layers, tiers
+and whatnot". An inventory found six ways a mere's graph is divided (strata,
+planes, keeping, attention, the socialization tiers, coverage); "aspect" unused
+as a term; "layer" in TERMINOLOGY almost entirely architectural; and "tier"
+naming two divisions, with a sentence in TERMINOLOGY warning they differ.
+
+**Ruling 16.** *Should "aspect" be the umbrella for the ways a mere's graph is
+divided?* Options: umbrella, with each aspect's parts keeping their names;
+"aspect" replacing the part words; no umbrella. Mark: **"Umbrella, parts keep
+names (Recommended)"**. Follows: TERMINOLOGY gains **aspect**, with a table of
+the six, their parts, their shape and where each is ruled. A new way of
+dividing the graph enters as an aspect and says how it differs from the
+others.
+
+**Ruling 17.** *Which division keeps "tier"?* Options: keeping's bottom step
+becomes the ambient level; keep "ambient tier". Mark: **"Ambient level
+(Recommended)"**. Follows: keeping's steps are all levels; "tier" names only
+the t1 to t4 socialization aspect. Amends the 2026-09-23 wording, not its
+meaning; text written before keeps its words, under a dated note. Cleromancy's
+and Isocosm's design records also say "ambient tier"; they are outside this
+repository and are left for their own sessions.
+
 ## 4. Phases
 
 ### Placement by stratum (rulings 10, 14, 15)
@@ -403,3 +426,7 @@ comes back to Mark as a fork, with evidence, before the code commits to one.
   ruling 12 after Mark's own coinage was answered and put back, ruling 15
   after his free text on `UserGrouped` was put back); placement table added;
   checkpoints C7 and C8 opened by ruling 15.
+- **2026-10-04.** Round 4 (rulings 16 and 17), raised by Mark: "aspect" is the
+  umbrella for the graph's divisions, and keeping's bottom step is the ambient
+  level. Carried into TERMINOLOGY (aspect, ambiance), the ambiance design and
+  the reservoir plan.
