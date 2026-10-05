@@ -1,8 +1,8 @@
 # djinn Test Harness Plan
 
 **Date**: 2026-10-05
-**Status (2026-10-05)**: assessed; forks 1 to 8 ruled (§3), the rest wait
-for Mark. No code
+**Status (2026-10-05)**: assessed; all ten forks ruled (§3). Next: H1 to H3
+in a lane. No code
 changed. The vault lock plan's build waits on this harness (its ruling 18).
 **Scope**: one shared, tested way to run djinn residents under test:
 isolated, observed without scraping logs, stopped and restarted, held
@@ -226,7 +226,8 @@ dev-dependency anywhere, castellan and personae included.
 
 **Ruling 6.** *The receipt record?* Options: a versioned JSON record per run
 with a committed summary under `mere_docs/testing/receipts/` and raw
-records outside the tree under `C:	eceipts`, rechecked by a verifier;
+records outside the tree under `C:	
+eceipts`, rechecked by a verifier;
 a hand-written `RECEIPT.md`; stdout lines. Mark: **"Versioned JSON +
 committed summary (Recommended)"**.
 
@@ -244,6 +245,17 @@ names, refuses standard endpoints, missing redirects and a bus it did not
 start, tracks only its own processes, and re-checks at the end; a
 non-installed djinn refuses the default endpoints, and the receipt
 listener's wall extends to Unix `SSH_AUTH_SOCK`.
+
+**Ruling 9.** *Stopping and restarting?* Options: a kill and a graceful
+stop through an owner-only stop intent on the door; a kill plus a console
+Ctrl-Break; a kill only. Mark: **"Kill and a graceful stop
+(Recommended)"**. Follows: the vault lock's persisted lock (its ruling 5)
+must survive both.
+
+**Ruling 10.** *Who uses it first?* Options: D1 and D1b as its acceptance
+test with outcomes unchanged, then the lock receipts, other helpers when
+touched; the lock receipts only; everything now. Mark: **"D1 and D1b, then
+the lock (Recommended)"**.
 
 ## 4. Phases
 
