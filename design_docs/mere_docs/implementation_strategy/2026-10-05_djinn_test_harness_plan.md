@@ -1,7 +1,7 @@
 # djinn Test Harness Plan
 
 **Date**: 2026-10-05
-**Status (2026-10-05)**: assessed; forks 1 to 4 ruled (§3), the rest wait
+**Status (2026-10-05)**: assessed; forks 1 to 8 ruled (§3), the rest wait
 for Mark. No code
 changed. The vault lock plan's build waits on this harness (its ruling 18).
 **Scope**: one shared, tested way to run djinn residents under test:
@@ -215,6 +215,35 @@ a machine-wide lock file; refuse while loaded; bounded retries. Mark:
 ThinkPad and the Surface, macOS with D2, and the laptop's `Win+L` and
 suspend as attended steps; remote Linux with checklists here; all manual.
 Mark: **"Remote runner + attended steps (Recommended)"**.
+
+**Ruling 5.** *Ruling 1's consequence: djinn depends on castellan and
+personae (`ports/djinn/Cargo.toml:48, 68`), so a djinn feature cannot be
+used from their own tests without a dependency cycle. Is that fine?*
+Options: fine, with resident-level receipts in djinn's tests; switch to
+`djinn-testkit`. Mark: **"Switch to djinn-testkit"**. Follows: amends
+ruling 1; the harness is an unpublished `djinn-testkit` crate usable as a
+dev-dependency anywhere, castellan and personae included.
+
+**Ruling 6.** *The receipt record?* Options: a versioned JSON record per run
+with a committed summary under `mere_docs/testing/receipts/` and raw
+records outside the tree under `C:	eceipts`, rechecked by a verifier;
+a hand-written `RECEIPT.md`; stdout lines. Mark: **"Versioned JSON +
+committed summary (Recommended)"**.
+
+**Ruling 7.** *What djinn exposes for observation?* Options: an owner-only
+`resident-status-v1` route and a `--log-filter` flag; those plus a
+JSON-lines event file; structured logs, still scraped. Mark: **"Also an
+event file"**. Follows: the status route, the log-filter flag, and a
+lifecycle event file.
+
+**Ruling 8.** *How are the walls enforced?* Options: a guard plus
+resident-side refusals; the guard only; convention. Mark: **"Guard +
+resident refusals (Recommended)"**. Follows: the guard captures the
+installed resident by executable path, PID, start time and enumerated pipe
+names, refuses standard endpoints, missing redirects and a bus it did not
+start, tracks only its own processes, and re-checks at the end; a
+non-installed djinn refuses the default endpoints, and the receipt
+listener's wall extends to Unix `SSH_AUTH_SOCK`.
 
 ## 4. Phases
 
