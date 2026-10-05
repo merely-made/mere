@@ -1,8 +1,8 @@
 # Stack seams plan: catalog, shared device, actions, determinism, two words
 
 **Date:** 2026-10-04
-**Status (2026-10-05):** in progress. Twenty-two rulings in eight rounds (S1
-to S22); P1 landed on main (`1633be0c`), P2 next; P3 and S7 done as documents; S3 to S6 carried into the
+**Status (2026-10-05):** in progress. Twenty-six rulings in nine rounds (S1
+to S26); P1 landed on main (`1633be0c`), P2 next; P3 and S7 done as documents; S3 to S6 carried into the
 dynamics grammar plan (G8, G9); S9 done by the identity lane (`b52edea7`).
 No code in this plan's own lane yet.
 
@@ -381,6 +381,40 @@ relationship compile on it. *Reading, not ruled*: the relationship-recipe
 compile, which calls `compile_snapshot`, becomes a method too and keeps its
 grid-only rule; the alias constants stay exported for saved recipes.
 
+Round 9, 2026-10-05, on P2's design. Evidence: the host is single-root (one
+rootstock `Host`, one `native_window`, `run(options, init, hooks)`); texture
+producers reach the device through `ProducerContext` and are rebuilt on every
+resume, because the producer registry resets when the device changes
+(`cambium-rootstock/src/producer/registry.rs` 147) and each resume boots a new
+core; the [one state, N windows design](../design/2026-07-05_one_state_n_windows_design.md)
+rules "one dom as a forest", and its framework half (`GenetMultiRunner`, now
+`crates/cambium/cambium/src/multi.rs`) and the forest dom have landed, unused by
+this host.
+
+**Ruling S23.** *Sequence P2?* Options: the shared core first, then windows;
+both together. Mark: **"Both together"**. Follows: one change set delivers the
+shared, resume-surviving core and multi-window.
+
+**Ruling S24.** *What does a second window show?* Options: one state with N
+lenses; independent roots. Mark: **"One state, N lenses (Recommended)"**.
+Follows: the host runs `GenetMultiRunner` over one state; each window is a
+projection with its own lens, layout session, viewport, DPI and focus, and a
+change made in one window reaches the others in the same pass, per the
+2026-07-05 design.
+
+**Ruling S25.** *What API do multi-window applications use?* Options: an
+additive multi-window entry; one API with a single window as its simplest
+case. Mark: **"Additive multi-window entry (Recommended)"**. Follows: a new
+entry with a lens per window and a command to open one sits beside `run`,
+which stays exactly as it is, so Woodshed, Hocket and Redshank are untouched
+and checkpoint C1 is not reached.
+
+**Ruling S26 (C2).** *How do windows pace their frames?* Options: each window
+paces itself; one frame clock. Mark: **"Each window paces itself
+(Recommended)"**. Follows: each window redraws and presents on its own request,
+at its own monitor's rate, the shared core serving them in turn; an idle window
+costs nothing. Checkpoint C2 is resolved.
+
 **Ruling S14.** *Where does the next contradiction pass look?* Options: plan
 status against code; rulings across plans; sibling repos too; no pass. Mark:
 **"Plan status vs code (Recommended)"**. Follows: active plans' status lines
@@ -462,7 +496,7 @@ The done-conditions handed over for S3 and S4, kept for reference:
 - **C1 (P2).** If multi-window needs an API change the woodshed repository's
   hosts must follow, stop and bring the change to Mark before making it.
 - **C2 (P2).** Whether windows share one swapchain cadence (one frame clock for
-  all windows) or each window paces itself.
+  all windows) or each window paces itself. Ruled: S26, each window paces itself.
 - **C3 (S4, dynamics lane).** If `libm` in seiche's laws costs more than the
   run-to-run spread at 5,000 bodies, bring the figure back before keeping it.
 
