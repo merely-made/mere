@@ -1,7 +1,7 @@
 # Stack seams plan: catalog, shared device, actions, determinism, two words
 
 **Date:** 2026-10-04
-**Status (2026-10-05):** plan. Sixteen rulings in four rounds (S1 to S16);
+**Status (2026-10-05):** plan. Seventeen rulings in five rounds (S1 to S17);
 P1 in progress in this session's worktree, P2 after it; P3 and S7 done as documents; S3 to S6 carried into the
 dynamics grammar plan (G8, G9); S9 done by the identity lane (`b52edea7`).
 No code in this plan's own lane yet.
@@ -143,6 +143,16 @@ in two or more crates.
   while graphshell uses `"grid.default"` and `"scatter.default"`. Authoring
   offers a string direction, an integer spacing and string options, where
   sceno's families take typed parameters.
+- **F13 (2026-10-05). The compiler moved under another lane.** At `c79bb8c2`
+  (00:52), for its relationship-recipe pass, the projection grammar lane moved
+  graphshell's compiler into `scenomise::projection` (1,147 lines) and made
+  scenomise depend on scenograph; its plan names its integration worktree "the
+  single owner of shared compiler changes for this pass", with consumer
+  qualification in Knot and Woodshed in progress. Moved verbatim, and so still
+  open for P1: the dataset types in scenomise (`projection.rs` 525-570), the two
+  string ids (508-509), and `arrangement_for` with the 184 by 84 cell and 8
+  columns (1099-1125). At 14:38 that lane was idle and no branch held unmerged
+  compiler edits.
 
 ## 2. Rulings
 
@@ -287,6 +297,15 @@ required in the definition. Mark: **"Measured from the items
 cell fits the largest item, columns follow the item count, spacing is the
 authored spacing); options override; no layout constants in hosts or families.
 
+**Ruling S17 (round 5, from F13).** *Who builds the rest of P1, now that the
+compiler lives in scenomise under the projection lane's pass?* Options:
+coordinate, then build here; hand the rest to that lane; wait for its pass to
+end. Mark: **"Coordinate, then build here (Recommended)"**. Follows: this
+session tells the projection lane what P1 changes in `scenomise::projection`
+and asks it to hold compiler edits until P1 lands, or to name what its
+qualification needs; P1 is built in a worktree from current main, and nothing
+merges before Mark's review.
+
 **Ruling S14.** *Where does the next contradiction pass look?* Options: plan
 status against code; rulings across plans; sibling repos too; no pass. Mark:
 **"Plan status vs code (Recommended)"**. Follows: active plans' status lines
@@ -382,6 +401,8 @@ The done-conditions handed over for S3 and S4, kept for reference:
   works in `projection_compile`. Second pass (F8 to F11), rulings S7 to S10:
   the README fixed (S7), TERMINOLOGY gains pandect under Eidetic and the
   curation record (S8, S10), S9 sent to the identity lane.
+- **2026-10-05.** F13: the compiler had moved into `scenomise::projection`
+  under the projection lane (`c79bb8c2`); S17 rules coordination, then P1 here.
 - **2026-10-05.** P1's assessment found the registry holds custom solvers
   only (F12), which invalidated S1's framing; put back as round 4 (S15, S16):
   a built-in catalog beside the registry, and parameters measured from the
