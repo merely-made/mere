@@ -97,12 +97,12 @@ mod field_ops;
 // the rkyv `with = ...` archive helpers are crate-internal and used
 // only by struct field annotations in this file.
 pub(crate) use identity::UuidAsBytes;
-pub use identity::{EdgeKey, GraphDirection, GraphIndex, GraphViewId, NodeKey};
+pub use identity::{EdgeKey, GraphDirection, GraphIndex, GraphViewId, NodeKey, SurfaceNodeKey};
 
 // Node + NodeLifecycle extracted to `node.rs` per the same
 // decomposition target. Re-exported so `kernel::graph::Node`
 // continues to resolve.
-pub use node::Node;
+pub use node::{Node, SurfaceNode};
 pub use node_facets::{NodeFacetStore, VisitHistoryFacet};
 
 // Node navigation history extracted to `history.rs` (2026-05-11

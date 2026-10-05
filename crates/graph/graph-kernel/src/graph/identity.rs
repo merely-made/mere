@@ -28,8 +28,11 @@ use rkyv::{
 };
 use uuid::Uuid;
 
-/// Stable node handle (petgraph NodeIndex — survives other deletions).
-pub type NodeKey = NodeIndex;
+/// Stable surface handle (petgraph NodeIndex — survives other deletions).
+pub type SurfaceNodeKey = NodeIndex;
+
+/// Compatibility name for a stable surface handle.
+pub type NodeKey = SurfaceNodeKey;
 
 /// Stable edge handle (petgraph EdgeIndex).
 pub type EdgeKey = EdgeIndex;

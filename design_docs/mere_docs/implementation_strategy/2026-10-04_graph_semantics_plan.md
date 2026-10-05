@@ -5,11 +5,15 @@
 `graph-semantics`, with the ruling-9 exact-journal and legacy-checkpoint
 attribution repair complete after the original `459cad84` receipt.
 Reconciled main `62219dd1` rulings 9–19 before P2 source edits; the graph
-plan is unchanged at main `3b220f90`. A1/B1/C1 selected by "All 1";
+plan is unchanged at main `d2d6ac3d`. A1/B1/C1 selected by "All 1";
 `ResourceNode`/`SurfaceNode` are settled by ruling 19, and B1/C1 remain
-approved. Mark authorized P2 after the P1 repair at `4bc9ae96`.
-P2 inventory is complete at C7/C8; stopped for those rulings before source
-edits. Replay-first migration and per-predicate placement govern P2.
+approved. Mark authorized P2 after the P1 repair at `4bc9ae96`, then
+selected C7 identity namespaces with future moot aggregation and C8 resource
+classification records (rulings 20–21). Shared canonicalization and the
+`SurfaceNode`/`SurfaceNodeKey` names are implemented and gated; UUID namespace,
+classification collisions, lifecycle filtering and resource journal captures
+remain checkpoints C9–C12 before dependent code. Replay-first migration and
+per-predicate placement govern P2.
 P3–P5 have not begun. Main integration awaits Mark's review.
 
 Four questions were put to Mark from outside the project: what a link records,
@@ -712,8 +716,8 @@ does not justify attributing a baseline tag to the current user.
    owners' meanings automatically. Legacy labels use that global identity;
    tagger attribution is recovered where proven, else marked unknown.
 
-The fallback is part of option 1's proposed policy, not an already decided
-ruling. Persistent concept references must remain usable independently of
+The fallback was proposed with option 1 and approved in ruling 20 on
+2026-10-05. Persistent concept references must remain usable independently of
 their display labels; exact IRI encoding and label-edit behavior have not
 been selected by this inventory.
 
@@ -758,6 +762,104 @@ if the selected C8 option meets them. Migration must preserve the originals
 instead of silently applying today's first-wins dedup. Journal replay can
 recover recorder and historical resource placement; provenance categories
 alone cannot supply baseline asserter identities.
+
+### P2 shared identity slice and remaining checkpoints (2026-10-05)
+
+C7/C8 were answered in rulings 20–21. The independent initial slice moves
+the existing canonicalizer, unchanged, to `chartulary/src/canonical.rs`,
+keeps Eidetic's public reexports and makes its already-locked Chartulary edge
+unconditional. Five shared tests pair canonical aliases with meaningful
+path/query/authority differences. `graph/node.rs` now declares `SurfaceNode`,
+with `Node` a compatibility alias; `graph/identity.rs` adds `SurfaceNodeKey`
+and preserves `NodeKey`. No resource graph or migration is implemented yet.
+
+**C9: resource UUID namespace.** The existing surface namespace is fixed at
+`graph/mod.rs` 456, and linked-data ingest hashes the raw URL through it
+(`linked-data/src/ingest/apply.rs` 74). There is no resource namespace in
+the plan or existing helper. UUIDv5 needs both namespace and canonical IRI;
+changing either changes every resource id. Options, recommendation first:
+
+1. **Standard URL namespace.** UUID's `NAMESPACE_URL` with the shared
+   canonical IRI. Portable without a Mere-specific namespace, and separate
+   from the current surface namespace.
+2. **Dedicated Mere resource namespace.** Freeze a new namespace constant
+   for resources. Same deterministic identity across hosts, but other
+   implementations must also carry that Mere-specific constant.
+3. **Existing node namespace.** Reuse the surface helper's namespace with
+   the canonical IRI. Already-canonical ingested surfaces and their resources
+   then have equal UUIDs in different strata; raw noncanonical URLs still
+   differ. Every id lookup must carry its stratum.
+
+The approved narrow UUID dependency edge remains held until this answer;
+the lockfile is unchanged.
+
+**C10: classification collisions.** The seven-field record lacks an id,
+asserter and time (`graph-kernel/src/types.rs` 413–425). Dedup compares only
+scheme/value (`graph/node_facets.rs` 213–246; `graph/node_props.rs` 334–351).
+A source-derived Python reproduction, not a Rust runtime or saved-data
+census, fed Accepted/primary and Rejected/nonprimary records at the same
+key: two inputs become one Accepted/primary record; reverse insertion
+becomes one Rejected/nonprimary record. Identical-record and distinct-key
+controls retain their expected records; different values may retain two
+primaries. Status and primary edits currently select by scheme/value
+(`graph/node_props.rs` 404–449). Options:
+
+1. **Preserve variants.** Keep divergent records with their original surface
+   references, mark the shared resource conflicted, and require precise
+   record selection before editing status or primary choice.
+2. **Hold conflicts for review.** Migrate unambiguous records; retain
+   conflicting groups and origins outside ordinary active classifications
+   until reviewed.
+3. **Select by an explicit survivor policy.** Preserve originals in the
+   migration record but select one active record. Status precedence, primary
+   ties and missing journal evidence need further rulings.
+
+**C11: classification lifecycle.** Four ordinary consumers ignore all five
+statuses; see C8's source references above. Suggested has an existing
+selection test; Rejected has no control and would currently export as an
+affirmative RDF type. C8 decides record placement, not filtering. Options:
+
+1. **Affirmative only.** Accepted, Verified and Imported enter ordinary
+   selection/display/export; Suggested and Rejected remain review data.
+2. **Exclude Rejected only.** Suggested remains in ordinary results and
+   affirmative export, preserving its current selection behavior.
+3. **Keep all statuses.** Lifecycle remains metadata, with all records
+   participating in ordinary results and affirmative export.
+
+**C12: resource journal protocol and consumer seam.** One Turnstone
+`CapturedDelta` match is exhaustive (`repos/turnstone/src/behaviors.rs` 104–177); new
+variants break that API. Knot-editor has no matching uses. The existing
+facet carrier has arbitrary JSON (`graph/capture.rs` 114–118), but replay
+currently first resolves a surface (`graph/apply.rs` 888), and undo treats
+it as an ordinary facet (`graph/revert.rs` 344–355). Options:
+
+1. **Typed resource captures.** Add explicit resource-record, exact resource
+   pair and shown-resource forms; old captures retain their surface grammar.
+   Clear typed semantics, but stop for coordinated consumer authorization
+   before introducing the known Turnstone API break.
+2. **Versioned reserved facet protocol.** Carry resource commands in explicit
+   versioned JSON with record kind, stratum and resource ids. Enum consumers
+   still compile, but replay, attribution and undo must interpret those
+   reserved facets as graph commands, including resource-only records.
+
+Both require wake-up fanout to surfaces showing changed resources. Turnstone
+currently collects literal capture ids and resolves only surface ancestry
+(`repos/turnstone/src/behaviors.rs` 109, 183); a resource UUID alone does not accomplish that.
+Existing edge captures cannot distinguish old surface endpoints from new
+resource endpoints (`graph/apply.rs` 1087). UUID or presence inference must
+not silently select the stratum. These are read-only consumer findings;
+siblings are untouched.
+
+**Validation finding.** Eidetic's optional no-default-feature probe has
+104 passing tests and two failures: `json_schema_validates_simple_object`
+and `json_schema_rejects_constraint_violation`. The identical 104/2 result
+was reproduced with this slice's two Eidetic files temporarily restored to
+branch baseline `27f9f428`, then restored byte-for-byte in `finally`.
+The unaffected tests assume the `json-schema` feature (`schema_def/tests.rs`
+119, 135), while `schema_def/validators.rs` 30–34 correctly reports validator
+unavailability without it. Default-feature Eidetic passes all 109 tests,
+including both controls. No feature-guard fix was folded into graph semantics;
+the optional suite is not reported green.
 
 ## 3. Rulings
 
@@ -986,6 +1088,23 @@ compatibility names for surfaces; "node" means any graph element in either
 stratum; gnode is unchanged; `SurfaceId` is not reused. The strata are the
 resource stratum under the surface stratum.
 
+**Ruling 20 (C7).** Mark: **"C7, 1, but eventually we will want to be able to
+aggregate to 3, but that’s a moot thing we can build from 1 probably."**
+Selects the identity namespace option above: a vocabulary belongs to a stable
+identity across meres; different owners' equal labels remain distinct concepts,
+and another owner's concept can be explicitly reused by IRI. Proven historical
+taggers supply their identities; unattributed legacy concepts remain scoped
+to their original mere with unknown-attributed tagging assertions. Future
+aggregation across vocabularies belongs in the moot direction. *Reading,
+not ruled*: aggregation can be built over those concept references without
+erasing their origins; its mechanism and implementation are not selected.
+
+**Ruling 21 (C8).** Mark: **"C8, 1"**. Selects resource records: the full
+classification record, including lifecycle and primary selection, lives on
+the resource. Surfaces showing one resource read the same classification and
+review state. This settles placement; the existing first-wins collision and
+lifecycle-ignorant read paths are not newly endorsed by this answer.
+
 ## 4. Phases
 
 ### Placement by stratum (rulings 10, 14, 15)
@@ -1109,12 +1228,18 @@ comes back to Mark as a fork, with evidence, before the code commits to one.
 - **C5 (P3). Purge default.** The pending index's default purge policy.
 - **C6 (P4). The frozen node.** What kind of node bears a frozen selection, and
   where it is placed.
-- **C7 (P2). Tag IRIs.** How a local tag's IRI is minted (a per-mere namespace,
-  a per-identity namespace, or a hash of the label), and how two tags with one
-  label from different taggers relate.
-- **C8 (P2). Classifications.** Whether node classifications (with their
-  suggested, accepted and rejected states) follow tags into the resource
-  stratum.
+- **C7 (P2). Tag IRIs.** Ruled: ruling 20, identity namespace with an
+  original-mere fallback for unattributed legacy concepts. Future moot
+  aggregation is a direction; its mechanism remains open.
+- **C8 (P2). Classifications.** Ruled: ruling 21, complete resource records.
+- **C9 (P2). Resource UUID namespace.** Which UUIDv5 namespace names the
+  canonical IRI, distinct from or shared with existing surface identities.
+- **C10 (P2). Classification collisions.** How divergent records from
+  same-resource surfaces remain addressable without a first-wins survivor.
+- **C11 (P2). Classification lifecycle.** Which statuses enter ordinary
+  selection, display and affirmative RDF export.
+- **C12 (P2). Resource journal captures.** Typed resource captures with a
+  coordinated consumer API change, or an explicit versioned facet protocol.
 
 ## 6. Progress
 
@@ -1312,3 +1437,39 @@ comes back to Mark as a fork, with evidence, before the code commits to one.
   owned by this lane for P2 and review; the shared Mere target remains for
   validation. No download, dependency, extra target or isolated Cargo home
   was created.
+
+- **2026-10-05. Initial P2 slice gated; stopped at C9–C12.** Recorded
+  Mark's C7/C8 choices as rulings 20–21, including future moot aggregation
+  as a direction rather than an implemented mechanism. Shared canonicalization
+  now belongs to Chartulary; Eidetic keeps its public import paths. All four
+  moved function bodies match branch baseline exactly. The existing Chartulary
+  dependency is unconditional without a lockfile change. `SurfaceNode` and
+  `SurfaceNodeKey` are exported with `Node`/`NodeKey` compatibility aliases.
+  `ResourceNode`, the resource graph, migration and the query adapter are not
+  implemented; P2 is incomplete. Resource UUID namespace, classification
+  collisions/lifecycle and journal protocol are evidence-backed forks above.
+  No sibling API changed.
+
+  Gates, offline and locked with `-j 1` in `C:/t/cargo-targets/mere`:
+  Chartulary **64 passed**, Eidetic default **109 passed** (two doc examples
+  ignored), kernel **325 passed** (one doc example ignored), workspace check
+  **exit 0**, wasm32 kernel check **exit 0**. The optional Eidetic no-default
+  suite is **104 passed / 2 failed**, identically reproduced at the unchanged
+  baseline with positive controls in both runs; see the validation finding.
+  Initial build attempts lost a shared fingerprint directory, then execution
+  session handles disappeared without completion receipts. Required root
+  gates were rerun to completion; no other owner's processes/output were
+  removed. Formatting and `git diff --check` passed. Documentation audit and
+  planted-defect/clean-fixture controls exited 0. All finding buckets match
+  branch-baseline documents audited in the same current environment, with
+  no findings on this plan. Missing-root references rose from 202 earlier
+  in the session to 206 on both baseline and edited documents; this slice
+  adds none. No active document was added.
+
+  Pandect, linked-data/query, Pictograph and Graphshell test suites were not
+  rerun for this bounded slice; their prior receipts remain above. Ignored
+  tests, sibling builds, headed/browser/device proofs and later-phase gates
+  were not run. No downloads, new dependency, lock change, patch override,
+  extra target or isolated Cargo home. Retained: the graph-semantics worktree
+  and branch, owned by this lane for P2/review; the shared Mere target for
+  reusable builds. Nothing is integrated into main.
