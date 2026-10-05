@@ -1,8 +1,8 @@
 # Stack seams plan: catalog, shared device, actions, determinism, two words
 
 **Date:** 2026-10-04
-**Status (2026-10-04):** plan. Ten rulings in two rounds (S1 to S10); P1 and
-P2 for this plan's lane; P3 and S7 done as documents; S3 to S6 carried into the
+**Status (2026-10-05):** plan. Fourteen rulings in three rounds (S1 to S14);
+P1 in progress in this session's worktree, P2 after it; P3 and S7 done as documents; S3 to S6 carried into the
 dynamics grammar plan (G8, G9); S9 done by the identity lane (`b52edea7`).
 No code in this plan's own lane yet.
 
@@ -222,14 +222,60 @@ archive), and pandect is its session layer; TERMINOLOGY gains pandect and
 amends Eidetic. *Reading, not ruled*: the crates stay where they are; whether
 pandect moves under `crates/eidetic/` is not ruled.
 
+Round 3, 2026-10-05, on carrying out P1 and P2.
+
+**Ruling S11.** *Who builds P1?* Options: this session, in a worktree; a brief
+for another lane; park it. Mark: **"Build here, in a worktree
+(Recommended)"**. Follows: this session builds P1 on its own branch under
+`Code/worktrees/`, stops at forks, and nothing reaches main until Mark reviews
+it.
+
+**Ruling S12.** *How much of the compile does P1 share?* Options: the whole
+compile over a trait; catalog resolution only; a portable dataset contract.
+Mark (free text): **"Wait, why didn't we want a portable contract…?"**
+Answered: graphshell's comment ("supplied to the compiler without a product
+dependency or a portable product-data contract",
+`projection_compile.rs` 135) applies the
+[remote projection host plan](2026-07-22_graphshell_remote_projection_host_plan.md)'s
+charter, ruled with Mark on 2026-07-22: portable contracts carry placement and
+representation only and stay product-free (line 81), "Keep product adapters
+beside their source truth" (579), and "later radio facts add data without
+widening the portable contract" (389). The dataset itself is generic (named
+typed fields, values, occurrences with source references), already
+serializable, and loaded as JSON only inside one host (a fixture and the
+editor preview, `web_projection.rs` 65); it never travels the remote protocol,
+where endpoints compile locally and send scores. Put back with options: a
+shared generic table, local; a trait over host data; catalog resolution only;
+a portable wire contract. Mark: **"Shared generic table, local
+(Recommended)"**. Follows: the generic dataset moves to scenograph as a
+host-neutral type, documented as the in-host input to compilation and never
+part of the remote protocol; the whole compile moves to scenomise. Nothing
+widens per product; product adapters still resolve their own truth into the
+table.
+
+**Ruling S13.** *When does P2 happen?* Options: here, after P1; another lane
+now; park it. Mark: **"Here, after P1 (Recommended)"**. Follows: this session
+takes P2 once P1 is reviewed.
+
+**Ruling S14.** *Where does the next contradiction pass look?* Options: plan
+status against code; rulings across plans; sibling repos too; no pass. Mark:
+**"Plan status vs code (Recommended)"**. Follows: active plans' status lines
+and done-claims are checked against the tree, starting with the documents the
+doc audit flags. *Reading, not ruled*: it runs after P1, one lane at a time.
+
 ## 3. Phases
 
 ### 3.1 This plan's lane
 
-- **P1. One arrangement catalog (S1).** A compile step in scenomise, which
-  holds the registry and already depends on sceno, takes a scenograph
-  definition and a resolved dataset and returns a `sceno::Score`, resolving the
-  arrangement id through the registry with parameters from the definition.
+- **P1. One arrangement catalog (S1, S11, S12).** Graphshell's generic
+  dataset (`ProjectionDataset`, `ProjectionOccurrence`, `ProjectionFieldType`,
+  `ProjectionValue`) moves to scenograph as a host-neutral type, documented as
+  the in-host input to compilation and never part of the remote protocol. The
+  whole compile (`compile`, `refresh`, `compile_snapshot` and their issue and
+  result types) moves to scenomise, which holds the registry and already
+  depends on sceno: it takes a scenograph definition and a dataset and returns
+  a `sceno::Score`, resolving the arrangement id through the registry with
+  parameters from the definition.
   Graphshell's `arrangement_for` and `placement_for` retire into it.
   Scenograph's crate doc is corrected. **Owner:** this plan's lane. Asked
   through the projection grammar session, which works beside
@@ -304,6 +350,11 @@ The done-conditions handed over for S3 and S4, kept for reference:
   works in `projection_compile`. Second pass (F8 to F11), rulings S7 to S10:
   the README fixed (S7), TERMINOLOGY gains pandect under Eidetic and the
   curation record (S8, S10), S9 sent to the identity lane.
+- **2026-10-05.** Round 3 (S11 to S14): P1 is built here in a worktree with
+  the whole compile shared over a generic dataset type, P2 follows, and the
+  next pass checks plan status against code. Mark asked why the portable
+  contract had been avoided; the 2026-07-22 charter was quoted back before the
+  question was put again.
 - **2026-10-05.** P1's owner settled: this lane, by Mark's answer relayed and
   recorded at `1a2e71db`. S5 and S6 needed no change in the projection grammar
   documents, which already use "arrangement" for positions and "scene" in the
