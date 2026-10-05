@@ -774,6 +774,34 @@ pull reading −0.33 with 510 overlaps):
   budget from a refresh rate, the 50% default moves into seiche, and
   pictograph gains a display-rate setter; turnstone then repins mere and
   takes its refresh rate from winit as the next step.
+  *Ruled 2026-10-05* (the speed lane's two forks at `seiche-speed`
+  `0a34a170`). Built as ruled, the inference fell back to 16.7 ms in all 16
+  logged windows on this 165 Hz panel, even at 0.5 ms tolerance: a few
+  start-up intervals sit 1.3 to 2.5 ms off any multiple and stay in the
+  window, and steady ones scatter about 0.2 ms; a 90% quorum found the period
+  in 8 of 16, half of it in 1, nothing in 7. Asked how the period should be
+  found (a robust estimator designed against the logged windows; the quorum;
+  keep as ruled; drop inference), Mark asked: **"Hm. How robust are the
+  conditions the robust estimator would be deriving from? I can think of a
+  lot of dependencies that might differ. Could we run this robust estimation
+  on the thinkpad also, as a double-check?"** Put back with the conditions the
+  intervals depend on (the display's rate, variable refresh and monitor; the
+  browser's clock grain, 100 µs here and 5 µs cross-origin isolated; energy
+  saver's 30 fps cap and hidden-tab throttling; load; the compositor), he
+  chose **"Both machines + planted"**: the lane logs intervals here and on
+  the ThinkPad (`thinkpad-l14-f`, Fedora 44), adds planted traces for
+  variable refresh, a 30 fps cap, a monitor switch and a 5 µs clock, and
+  designs the estimator against all of them; done when it reads within 1% on
+  both machines, never reports a fraction of the period, and falls back to
+  the 1/60 s cap where a trace has no period (against logging the ThinkPad
+  first and deciding after, the quorum, or dropping inference). When the period is inferred,
+  the 1x floor's start-up ticks broke the fast receipt's every-window bound
+  in about 6 of 10 runs (two ticks in 4,500 µs against a 3,039 µs budget,
+  half of 6.08 ms). Mark chose **"Only ticks past the floor"**: the receipt
+  bounds the ticks the gate admitted beyond the 1x floor, "fast-forward is
+  never slower than 1x" stands, and every frame the gate decides stays
+  checked (against letting the budget stop below the floor, or bounding
+  every frame and accepting those misses).
   The face offset, diagnosed (2026-10-04, `tree-face-zoom`): the face is
   drawn right and the body wrong, on both pages. Pictograph's gnode style
   scales each body about its centre (the CSS default Livery follows since
