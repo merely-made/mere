@@ -94,6 +94,7 @@ where
                 pointer: &mut self.s.pending_pointer,
                 scroll: &mut self.s.pending_scroll,
                 window_commands: &commands,
+                render_core: self.s.render_core.as_ref(),
                 geometry,
                 frame_profile,
             };
@@ -285,10 +286,10 @@ where
         use paint_list_api::PaintCmd;
 
         let Some(surface) = self.s.surface.as_ref() else {
-            // No surface means no renderer, and any previously registered
-            // fragments died with it. Clear so a resumed surface re-registers
-            // from scratch instead of placing dangling ids.
-            self.s.leaf_fragments.clear();
+            // No surface this turn (suspended, or not yet booted). The
+            // renderer lives in the render core, which outlives the surface,
+            // so fragments registered before a suspend are still valid after
+            // the resume and are kept, not forgotten.
             return;
         };
         let renderer = surface.core().renderer();

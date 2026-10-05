@@ -16,6 +16,7 @@ use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
 use cambium::{GenetAppRunner, TextInput};
 use cambium_winit::ScrollbarFade;
+use genet_render_host::RenderCore;
 use genet_scripted_dom::NodeId;
 use netrender::NetrenderOptions;
 
@@ -716,6 +717,12 @@ where
     /// without routing through application state. The same handle `init`
     /// received.
     pub window_commands: &'a WindowCommands,
+    /// The render core every surface of this host draws through: one wgpu
+    /// device and renderer, booted once and kept across suspend and resume.
+    /// Hand it to a same-device tenant (a compute or import pass) so what it
+    /// renders lands on the device the host presents with. `None` under
+    /// [`Harness`] and before the first surface exists.
+    pub render_core: Option<&'a Arc<RenderCore>>,
     /// Where the window is now, for persisting across launches. `None` under
     /// [`Harness`], which has no window.
     pub geometry: Option<WindowGeometry>,
@@ -891,6 +898,11 @@ where
     /// The presentation surface behind the neutral seam. A browser event
     /// source supplies the same pair against a canvas.
     pub surface: Option<Box<dyn Surface>>,
+    /// The render core the surface was made from, held here so it outlives
+    /// the surface: a suspend drops the surface and keeps the device, and the
+    /// resume makes a new surface from this same core (stack seams S2). The
+    /// event source sets it when it boots the core.
+    pub render_core: Option<Arc<RenderCore>>,
     pub runner: Option<Runner<State, Logic, V>>,
     /// Retained Livery/Buckram session in logical coordinates.
     pub layout: Option<OwnedLayout>,
@@ -1018,6 +1030,7 @@ where
             titlebar_published: None,
             titlebar_sheet: String::new(),
             surface: None,
+            render_core: None,
             runner: None,
             layout: None,
             layout_size: (0.0, 0.0),
@@ -1367,6 +1380,7 @@ where
                 pointer: &mut self.s.pending_pointer,
                 scroll: &mut self.s.pending_scroll,
                 window_commands: &commands,
+                render_core: self.s.render_core.as_ref(),
                 geometry,
                 frame_profile,
             };
@@ -1412,6 +1426,7 @@ where
             pointer: &mut self.s.pending_pointer,
             scroll: &mut self.s.pending_scroll,
             window_commands: &commands,
+            render_core: self.s.render_core.as_ref(),
             geometry: self.s.geometry,
             frame_profile: self.s.last_frame_profile,
         };
@@ -1497,6 +1512,7 @@ where
                 pointer: &mut self.s.pending_pointer,
                 scroll: &mut self.s.pending_scroll,
                 window_commands: &commands,
+                render_core: self.s.render_core.as_ref(),
                 geometry,
                 frame_profile,
             };
