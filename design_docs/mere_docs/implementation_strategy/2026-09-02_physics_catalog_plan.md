@@ -760,7 +760,20 @@ pull reading −0.33 with 510 overlaps):
   Mark chose **"Gate keeps a forecast margin"**: the budget stops ticking
   when the time left is under the forecast tick plus a margin, so the
   overrun stays within the clock grain (against widening the bound by one
-  tick's error, or leaving it).
+  tick's error, or leaving it). *Corrected the same day:* the web can read
+  the display's period after all. This panel runs at 165 Hz (6.06 ms), and
+  every logged interval is a whole multiple of it within the clock grain
+  (24.2 to 103 ms are 4 to 17 periods); the lane had tested only 16.67 ms, so
+  the cap as ruled gives 8.3 ms here, about 2.75 times half this display's
+  frame. Mark chose **"Infer the period"**: the period is the largest value
+  between 1/360 s and 1/60 s that every recent interval is a whole multiple
+  of, with the 1/60 s cap as the fallback. On the native side, where
+  turnstone pins mere `bd5912fb` from before the dial and draws graph panes
+  with the fixed-step `canvas.frame`, Mark answered **"Mere entry point, then
+  turnstone shouldn't be left stale, so that next"**: seiche builds a step
+  budget from a refresh rate, the 50% default moves into seiche, and
+  pictograph gains a display-rate setter; turnstone then repins mere and
+  takes its refresh rate from winit as the next step.
   The face offset, diagnosed (2026-10-04, `tree-face-zoom`): the face is
   drawn right and the body wrong, on both pages. Pictograph's gnode style
   scales each body about its centre (the CSS default Livery follows since

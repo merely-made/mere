@@ -2,7 +2,7 @@
 
 **Date**: 2026-10-01
 **Status (2026-10-04)**: in progress. Shape ruled by Mark on 2026-10-01
-(rulings 7 and 10 to 15 in the dramatis tier architecture; rulings 16 to 61
+(rulings 7 and 10 to 15 in the dramatis tier architecture; rulings 16 to 62
 below). P0 met; P1 landed on `main` (`da3c50bc`); P2 landed (`3e4992ec`); P3
 landed (`ff68e86c`), meeting the Mere 0.4 baseline's chatelaine condition.
 The review stop ended 2026-10-04 (ruling 51). P4a's first build signs RSA
@@ -409,7 +409,10 @@ Mark: **"rsa builds, ring signs (Recommended)"**. Follows: the `rsa` crate's
 standard construction and PKCS#8 export run once per key load; every
 signature is ring's; recorded as `rsa` touching the key at load only, which
 amends ruling 52's "no `rsa` private-key operation in this path" to
-"no `rsa` signing or decryption".
+"no `rsa` signing or decryption". *2026-10-04 correction:* the premise
+"once per key load" was wrong for this agent, which decodes every SSH slot
+from the vault on each request (`ssh_slot.rs:92, 123-127`), so loading and
+signing coincide; ruling 62 settles it.
 
 **Ruling 60.** *A third import door neither ruling named,
 `personae-vault add-ssh` (`bin/personae-vault/main.rs:255-300`), still
@@ -423,6 +426,18 @@ the ThinkPad's cargo caches (5 git checkouts, 44 crates), crossing the
 lane's no-downloads wall. Keep or clear?* Options: keep; clear. Mark:
 **"Might be nice to clone the actual repos/ and crates/ needed, but that
 does add more overhead. Keep for now"**.
+
+**Ruling 62.** *Ruling 59's premise was wrong: each request decodes every
+SSH slot, and nothing decoded stays in memory, so the `rsa` crate's
+variable-time construction would run on every RSA signature. ring never
+zeroizes RSA key material on drop (`arithmetic/bigint/boxed_limbs.rs:27-28`).
+Which?* Options: defer RSA; keep the construction per signature, amending
+ruling 59's premise; cache ring's key. Mark: **"Cache the ring key"**.
+Follows: ring's `KeyPair` is built once per key, held by fingerprint,
+checked against the slot's current bytes before use, and dropped when the
+key is removed or the profile switches (castellan's remove and switch paths
+included). Recorded: this keeps a second, long-lived in-memory copy of each
+RSA private key, which ring frees without clearing.
 
 ## 3. Phases
 
