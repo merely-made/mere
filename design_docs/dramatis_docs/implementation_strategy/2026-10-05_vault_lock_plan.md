@@ -1,7 +1,7 @@
 # Vault Lock Plan
 
 **Date**: 2026-10-05
-**Status (2026-10-05)**: assessed; forks 1 to 8 ruled (rulings 1 to 8 in
+**Status (2026-10-05)**: assessed; forks 1 to 12 ruled (rulings 1 to 12 in
 §3), the rest wait for Mark. No code changed. Chatelaine P4 (CXF import) waits on this plan (chatelaine
 rulings 64, 65).
 **Scope**: the resident's secrets can be locked. While locked, no secret
@@ -274,6 +274,29 @@ it (the CLI and tests keep it); clear it after startup; accept it. Mark:
 behaviour (no identities listed; sign, add and remove fail, with the
 reason logged); list and prompt; error everything. Mark: **"OpenSSH's
 behaviour (Recommended)"**.
+
+**Ruling 9.** *ssh-agent's lock messages (`ssh-add -x`/`-X`), which
+ssh-agent-lib exposes unsupported by default?* Options: `-x` engages the
+vault lock and `-X` is refused over the wire; both, OpenSSH-style, with a
+lock-password hash of our own; neither. Mark: **"-x locks; -X refused
+(Recommended)"**. Follows: unlocking happens only on the resident's own
+surface.
+
+**Ruling 10.** *What do castellan's surfaces do while locked?* Options:
+typed `Locked` refusals (a Locked card with a portable Lock and a
+native-only Unlock; OTP refused; Secret Service collections Locked, with
+`Unlock` returning a real Prompt); queue until unlock; show nothing. Mark:
+**"Typed Locked refusals (Recommended)"**.
+
+**Ruling 11.** *What can be seen while locked?* Options: a secret-free
+snapshot kept at lock time (labels and public keys); only "locked"; a
+separately keyed metadata index. Mark: **"A secret-free snapshot
+(Recommended)"**.
+
+**Ruling 12.** *Is `UnlockTier` custody or consent?* Options: consent, with
+the docs fixed and the vault-wide lock as the custody control; custody,
+with per-slot sealing; consent plus a confirmation path in the standalone
+`personae-agent`. Mark: **"Consent; fix the docs (Recommended)"**.
 
 ## 4. Phases
 
