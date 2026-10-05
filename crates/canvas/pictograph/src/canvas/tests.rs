@@ -36,6 +36,7 @@ mod node_state;
 mod permitted_actions;
 mod physics_catalog;
 mod physics_terms;
+mod reader;
 mod relations;
 mod restore_and_queries;
 mod retained_layout;

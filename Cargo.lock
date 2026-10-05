@@ -6338,9 +6338,14 @@ dependencies = [
 name = "graphshell"
 version = "0.0.2"
 dependencies = [
+ "accesskit",
  "async-trait",
  "base64 0.22.1",
  "blake3",
+ "cambium",
+ "cambium-genet-winit-host",
+ "cambium-rootstock",
+ "cambium-winit-a11y",
  "castellan",
  "chartulary",
  "chirograph",

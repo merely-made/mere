@@ -106,6 +106,9 @@ pub struct PhysicsBoard {
     halted: bool,
     /// What the binding withdraws from the cards' advertisements (G9).
     actions: PermittedActions,
+    /// A keyboard move under way (F67): where it began, and where the card is
+    /// held now.
+    key_move: Option<((f32, f32), (f32, f32))>,
     /// The host's device, when the board's repulsion is staged on it.
     #[cfg(feature = "gpu")]
     physics_device: Option<crate::canvas::PhysicsDevice>,
@@ -133,6 +136,7 @@ impl PhysicsBoard {
             rest: AtRest::default(),
             halted: false,
             actions: PermittedActions::default(),
+            key_move: None,
             #[cfg(feature = "gpu")]
             physics_device: None,
         }
@@ -339,6 +343,7 @@ impl PhysicsBoard {
             .is_some_and(|key| !live.values().any(|live_key| *live_key == key))
         {
             self.dragging = None;
+            self.key_move = None;
             self.physics.set_dragging(false);
         }
         // Every body, at its slot; `sync_nodes` leaves an existing body where
@@ -481,6 +486,7 @@ impl PhysicsBoard {
     /// its slot. An encoded axis goes back to its value at once, since the
     /// data, not the drop, says where the card is on it.
     pub fn drag_end(&mut self) -> bool {
+        self.key_move = None;
         let Some(key) = self.dragging.take() else {
             return false;
         };
@@ -499,10 +505,66 @@ impl PhysicsBoard {
         true
     }
 
+    /// Start a keyboard move of card `id`, the pointerless drag (F67): a drag
+    /// the host's arrows steer, refused as a drag is.
+    pub fn begin_key_move(&mut self, id: &str) -> bool {
+        let Some(at) = self.position(id) else {
+            return false;
+        };
+        if !self.drag_start(id) {
+            return false;
+        }
+        self.key_move = Some((at, at));
+        true
+    }
+
+    /// The card a keyboard move holds.
+    pub fn key_moving(&self) -> Option<&str> {
+        self.key_move?;
+        let key = self.dragging?;
+        self.keys
+            .iter()
+            .find(|(_, k)| **k == key)
+            .map(|(id, _)| id.as_str())
+    }
+
+    /// Nudge the held card by `(dx, dy)` in the score's units.
+    pub fn key_move_by(&mut self, dx: f32, dy: f32) -> bool {
+        let Some((origin, at)) = self.key_move else {
+            return false;
+        };
+        let to = (at.0 + dx, at.1 + dy);
+        if !self.drag_move(to.0, to.1) {
+            return false;
+        }
+        self.key_move = Some((origin, to));
+        true
+    }
+
+    /// End the keyboard move: `drop` (Enter) releases the card where it is,
+    /// by its role; otherwise (Escape) it goes back where the move began,
+    /// then is released.
+    pub fn end_key_move(&mut self, drop: bool) -> bool {
+        let Some((origin, _)) = self.key_move else {
+            return false;
+        };
+        let held = self.dragging;
+        if !self.drag_end() {
+            return false;
+        }
+        if !drop && let Some(key) = held {
+            self.physics
+                .seed(vec![(key, Point2D::new(origin.0, origin.1))]);
+            self.physics.refresh(&mut self.view);
+        }
+        true
+    }
+
     /// Halt motion for a paused board. An active drag is cancelled and its
     /// body is returned to the dynamic solver before the halt, so a later
     /// `sync` or choice change can explicitly reawaken the board.
     pub fn halt(&mut self) {
+        self.key_move = None;
         if let Some(key) = self.dragging.take() {
             self.physics.unpin(key);
             self.physics.set_dragging(false);
