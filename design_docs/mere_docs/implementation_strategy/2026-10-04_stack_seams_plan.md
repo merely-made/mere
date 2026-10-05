@@ -2,8 +2,7 @@
 
 **Date:** 2026-10-04
 **Status (2026-10-05):** in progress. Twenty-two rulings in eight rounds (S1
-to S22); P1 implemented on branch `stack-seams-p1` (`dd2cb6fd`), awaiting Mark's
-review, P2 after it; P3 and S7 done as documents; S3 to S6 carried into the
+to S22); P1 landed on main (`1633be0c`), P2 next; P3 and S7 done as documents; S3 to S6 carried into the
 dynamics grammar plan (G8, G9); S9 done by the identity lane (`b52edea7`).
 No code in this plan's own lane yet.
 
@@ -477,6 +476,10 @@ The done-conditions handed over for S3 and S4, kept for reference:
   works in `projection_compile`. Second pass (F8 to F11), rulings S7 to S10:
   the README fixed (S7), TERMINOLOGY gains pandect under Eidetic and the
   curation record (S8, S10), S9 sent to the identity lane.
+- **2026-10-05.** P1 landed on main at `1633be0c`, by Mark's "Merge it, then P2
+  (Recommended)": main was merged into the branch and every gate rerun on the
+  merged tree (scenograph 8, scenomise 97, graphshell 319 + 5, web wasm32 and
+  workspace `--locked` exit 0) before main fast-forwarded. Not pushed.
 - **2026-10-05.** P1 implemented on branch `stack-seams-p1` at `dd2cb6fd`
   (worktree `Code/worktrees/mere-stack-seams-p1`), not merged. Done-conditions
   as built: every catalog family compiles from a definition (a test iterates
