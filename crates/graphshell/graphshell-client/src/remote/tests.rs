@@ -486,3 +486,74 @@ fn the_first_bounded_form_opens_from_any_client() {
     assert_eq!(form.status, "Choose values · Choose a colour");
     assert_eq!(form.target.as_ref().unwrap().observed_revision, Revision(1));
 }
+
+/// The viewer's own actions (dynamics grammar plan, F64): listed beside the
+/// endpoint's on each card, carried out by the host's handler with nothing
+/// written for the endpoint, even under an intent the endpoint also
+/// advertises; an unlisted intent or unknown card is refused unhandled. The
+/// control: the endpoint's own action of that intent does go on the wire,
+/// so the check would see carrier traffic.
+#[test]
+fn local_actions_are_listed_and_run_by_the_host_never_the_carrier() {
+    struct Viewer {
+        invoked: Vec<(InstanceId, String, Option<String>)>,
+    }
+    impl LocalActions for Viewer {
+        fn actions(&self, item: &crate::LocalActionTarget<'_>) -> Vec<AdvertisedAction> {
+            if item.instance == InstanceId(0) {
+                vec![action(APPEND, "Append here", false), action("viewer/pin", "Pin", false)]
+            } else {
+                Vec::new()
+            }
+        }
+        fn invoke(
+            &mut self,
+            item: &crate::LocalActionTarget<'_>,
+            action: &AdvertisedAction,
+        ) -> bool {
+            self.invoked.push((
+                item.instance,
+                action.intent.0.clone(),
+                item.source.map(|source| source.adapter.clone()),
+            ));
+            true
+        }
+    }
+    let (mut remote, mut board) = mounted();
+    let mut viewer = Viewer {
+        invoked: Vec::new(),
+    };
+    let tree = remote.accessibility_tree_with(&viewer).expect("mounted");
+    let card = &tree.children[0];
+    let local: Vec<_> = card.local_actions.iter().map(|a| a.intent.0.as_str()).collect();
+    assert_eq!(local, [APPEND, "viewer/pin"]);
+    assert!(card.actions.iter().any(|a| a.intent.0 == APPEND), "the endpoint's own");
+    assert!(
+        remote.accessibility_tree_with(&crate::NoLocalActions).is_some_and(|tree| tree.children[0].local_actions.is_empty()),
+        "without a host, no local actions"
+    );
+
+    assert_eq!(
+        remote.invoke_local(InstanceId(0), &IntentReference(APPEND.into()), &mut viewer),
+        Ok(true)
+    );
+    assert!(remote.take_outgoing().is_empty(), "nothing written for the endpoint");
+    assert!(!remote.in_flight());
+    assert_eq!(viewer.invoked, [(InstanceId(0), APPEND.to_string(), Some("board".into()))]);
+    assert_eq!(cards(&remote), 1, "the endpoint did not append");
+    assert_eq!(
+        remote.invoke_local(InstanceId(0), &IntentReference("viewer/drag".into()), &mut viewer),
+        Err(LocalActionError::NotListed)
+    );
+    assert_eq!(
+        remote.invoke_local(InstanceId(7), &IntentReference("viewer/pin".into()), &mut viewer),
+        Err(LocalActionError::UnknownItem)
+    );
+    assert_eq!(viewer.invoked.len(), 1, "refusals call no handler");
+
+    // The control: the endpoint's own APPEND is written, and appends.
+    remote.invoke_action(index_of(&remote, APPEND));
+    assert!(remote.in_flight(), "on the wire");
+    pump(&mut remote, &mut board);
+    assert_eq!(cards(&remote), 2);
+}

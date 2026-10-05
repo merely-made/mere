@@ -714,7 +714,40 @@ where
     /// minus the OS adapter no test can supply.
     pub fn a11y_request(&mut self, action: A11yAction, node: NodeId) {
         self.host
-            .apply_a11y_requests(&[A11yRequest { action, node }]);
+            .apply_a11y_requests(&[A11yRequest::node(action, node)]);
+        self.relayout();
+    }
+
+    /// The drawn nodes' action buttons in this frame's projected tree: each
+    /// button's AccessKit id and the action a reader's click on it names.
+    pub fn a11y_produced_actions(
+        &mut self,
+    ) -> std::collections::HashMap<accesskit::NodeId, cambium_rootstock::ProducedAction> {
+        let core = &mut self.host.core;
+        let (Some(runner), Some(layout)) = (core.s.runner.as_ref(), core.s.layout.as_ref()) else {
+            panic!("a11y_produced_actions needs a laid-out harness: call layout_at first");
+        };
+        let dom = runner.dom();
+        let dom_ref = dom.borrow();
+        let (_, _, produced) = cambium_winit_a11y::project_tree_with_actions(
+            &dom_ref,
+            layout,
+            &mut core.s.leaves,
+            &mut core.s.producers,
+            core.s.last_focus,
+        );
+        produced
+    }
+
+    /// Route a reader's request on a drawn node's action button through the
+    /// host's accessibility path, as a drained one would be.
+    pub fn a11y_produced_request(
+        &mut self,
+        action: A11yAction,
+        produced: cambium_rootstock::ProducedAction,
+    ) {
+        self.host
+            .apply_a11y_requests(&[A11yRequest::produced(action, produced)]);
         self.relayout();
     }
 

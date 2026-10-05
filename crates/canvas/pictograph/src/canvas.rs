@@ -707,19 +707,26 @@ impl Default for Canvas {
     }
 }
 
+mod actions;
 mod cartography;
 mod derived_face;
 mod gloss;
 mod lifecycle;
 mod nodes;
 pub(crate) mod at_rest;
+mod reader;
 mod roles;
 mod selection;
 mod source_time;
 mod strategy;
 mod view;
 
+pub use actions::{
+    AdvertisedAction, ArrangementAction, DRAG_INTENT, DRAG_SCHEMA, IntentEffect, IntentReference,
+    PIN_INTENT, PIN_SCHEMA, PermittedActions,
+};
 pub use at_rest::{HOME_FRAMES, SETTLE_SPEED_FLOOR};
+pub use reader::{CanvasDescription, DESCRIBED_ITEMS, DescribedItem};
 pub use roles::{SETTLED_ARRANGEMENT, StopReturn};
 pub use seiche::{Axes, DEFAULT_ANCHOR_STIFFNESS, Role, RoleTable};
 pub use source_time::{SourceTimeCanvas, SourceTimeSelection};
