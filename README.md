@@ -39,8 +39,8 @@ wiring the remaining unconsumed crates into hosts.
 
 **The graph**: what a mere holds.
 - *Resource*: what a canonical URL identifies. Claims about it (what a page says, cites, or derives from, and its tags) attach to the resource, each kept with who asserted it.
-- *Node*: what the user browses in. A node shows one resource at a time; navigating changes which.
-- *Strata*: the resource stratum (what things are) under the node stratum (how they were met: trail, layout, groupings).
+- *Surface*: what the user browses in. A surface shows one resource at a time; navigating changes which. Resources and surfaces are both nodes of the graph.
+- *Strata*: the resource stratum (what things are) under the surface stratum (how they were met: trail, layout, groupings).
 - *Aspect*: any way of dividing the graph: strata, planes (truth and curation), keeping, attention, socialization tiers, coverage.
 
 A graph becomes a picture through two grammars that share one binding.

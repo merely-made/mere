@@ -12,10 +12,10 @@ unrelated headed ports move between Genet host generations.
 From the Mere root:
 
 ```powershell
-cargo binstall wasm-bindgen-cli@0.2.122 --root C:\path\to\wasm-bindgen-0.2.122
+cargo binstall wasm-bindgen-cli@0.2.129 --root C:\path\to\wasm-bindgen-0.2.129
 ports/distillery/probe/fetch-model-matrix.ps1
 ports/distillery/probe/run-probe.ps1 `
-  -WasmBindgen C:\path\to\wasm-bindgen-0.2.122\bin\wasm-bindgen.exe
+  -WasmBindgen C:\path\to\wasm-bindgen-0.2.129\bin\wasm-bindgen.exe
 ```
 
 The fetch command verifies every configured byte count and SHA-256 before
@@ -149,3 +149,27 @@ This completes D2c's configured embedding phase and establishes one decoder
 ceiling. Physical GPU-memory release remains unobservable because the browser
 exposes no allocation telemetry; host-controlled device teardown is proven. A
 product default remains open. Trainers remain outside this ceiling probe.
+
+## 2026-09-29 migration annotation: upstream Burn-CubeCL
+
+Ruling 410 retires the burn-cubecl selector on the pre.4 migration branch after
+the reconstructed pre.2 browser failure and upstream pre.4 success in the same
+browser, plus nine matching native unfused launcher controls. Root, this probe,
+the remote fixture and embedding fixture now select pristine registry pre.4.
+Other patch policies remain independently selected. The migration plan §13.28
+and embedding reproducer receipts preserve the evidence and qualifications.
+The remaining model, extrema, two-peer lifecycle and integration gates remain
+open at this annotation; this does not turn historical receipts into new ones.
+
+## 2026-10-03 migration annotation: repaired close path (ruling 508)
+
+On the pre.4 branch, burn-remote's close now waits for the device to finish
+releasing a session's allocations, and reports a failed wait instead of
+acknowledging a clean close (`support/patches/burn-remote/MERE-PATCH.md`).
+The remote fixture also guards its native-reference comparison against
+non-finite values. It adds a second-live-lease stage: one lease closes through
+its holder's revoke while another stays live on the same device and must keep
+its lease, its session, identical output and its share of the allocator. The
+first passing receipt of this fixture on pre.4 is
+[`receipts/2026-10-03_pre4_remote_minilm_repaired.json`](receipts/2026-10-03_pre4_remote_minilm_repaired.json).
+Migration plan §13.32 records its commands, controls and qualifications.
