@@ -1,7 +1,7 @@
 # Stack seams plan: catalog, shared device, actions, determinism, two words
 
 **Date:** 2026-10-04
-**Status (2026-10-05):** plan. Fourteen rulings in three rounds (S1 to S14);
+**Status (2026-10-05):** plan. Sixteen rulings in four rounds (S1 to S16);
 P1 in progress in this session's worktree, P2 after it; P3 and S7 done as documents; S3 to S6 carried into the
 dynamics grammar plan (G8, G9); S9 done by the identity lane (`b52edea7`).
 No code in this plan's own lane yet.
@@ -133,6 +133,16 @@ in two or more crates.
   with saving sessions; pandect ("everything a Mere session gathers under one
   cover") holds them and depends on eidetic and muniment, as the ambiance
   design's §5 describes.
+- **F12 (2026-10-05, P1's assessment). The registry is the custom catalog
+  only.** F1 and S1's options called scenomise's `SolverRegistry` the
+  arrangement catalog. It holds only solvers reached through
+  `sceno::Arrangement::Custom`: "The eleven named families never touch the
+  registry" (`scenomise/src/registry.rs`, `solve_via`), and nothing registers
+  them, so the named families have no ids. Ids already disagree: scenograph's
+  default `kind` is `"grid"` (`scenograph/src/lib.rs`, `Arrangement::default`)
+  while graphshell uses `"grid.default"` and `"scatter.default"`. Authoring
+  offers a string direction, an integer spacing and string options, where
+  sceno's families take typed parameters.
 
 ## 2. Rulings
 
@@ -257,6 +267,26 @@ table.
 now; park it. Mark: **"Here, after P1 (Recommended)"**. Follows: this session
 takes P2 once P1 is reviewed.
 
+**Ruling S15 (round 4, from F12).** *Where do authored arrangement ids
+resolve?* Options: a built-in catalog beside the registry; register the
+built-ins as solvers; ids are sceno's variant names. Mark: **"Built-in catalog
+beside registry (Recommended)"**. Follows: scenomise gains a catalog of the
+eleven named families, each with an id, a `SolverCapability` (determinism,
+requires, tags) and a constructor from the authored arrangement into its typed
+sceno variant; an id not in it falls through to the registry as
+`Arrangement::Custom`. One lookup for hosts, and the typed enum stays
+exhaustive. *Reading, not ruled*: ids are the families' plain names
+(`grid`, `spiral`, `geographic` and the rest), and graphshell's
+`grid.default` and `scatter.default` resolve as aliases so saved definitions
+still load.
+
+**Ruling S16.** *Where does a parameter come from when the definition does not
+give it?* Options: measured from the items; documented family defaults;
+required in the definition. Mark: **"Measured from the items
+(Recommended)"**. Follows: unset parameters derive from the score (a grid
+cell fits the largest item, columns follow the item count, spacing is the
+authored spacing); options override; no layout constants in hosts or families.
+
 **Ruling S14.** *Where does the next contradiction pass look?* Options: plan
 status against code; rulings across plans; sibling repos too; no pass. Mark:
 **"Plan status vs code (Recommended)"**. Follows: active plans' status lines
@@ -275,7 +305,9 @@ doc audit flags. *Reading, not ruled*: it runs after P1, one lane at a time.
   result types) moves to scenomise, which holds the registry and already
   depends on sceno: it takes a scenograph definition and a dataset and returns
   a `sceno::Score`, resolving the arrangement id through the registry with
-  parameters from the definition.
+  parameters from the definition. The arrangement resolves through S15's
+  built-in catalog, falling through to the registry for custom ids, with unset
+  parameters measured from the items (S16).
   Graphshell's `arrangement_for` and `placement_for` retire into it.
   Scenograph's crate doc is corrected. **Owner:** this plan's lane. Asked
   through the projection grammar session, which works beside
@@ -350,6 +382,10 @@ The done-conditions handed over for S3 and S4, kept for reference:
   works in `projection_compile`. Second pass (F8 to F11), rulings S7 to S10:
   the README fixed (S7), TERMINOLOGY gains pandect under Eidetic and the
   curation record (S8, S10), S9 sent to the identity lane.
+- **2026-10-05.** P1's assessment found the registry holds custom solvers
+  only (F12), which invalidated S1's framing; put back as round 4 (S15, S16):
+  a built-in catalog beside the registry, and parameters measured from the
+  items.
 - **2026-10-05.** Round 3 (S11 to S14): P1 is built here in a worktree with
   the whole compile shared over a generic dataset type, P2 follows, and the
   next pass checks plan status against code. Mark asked why the portable

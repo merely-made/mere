@@ -21,7 +21,7 @@ This batch exists because the document is new.
 ## mere_docs/implementation_strategy/2026-10-04_stack_seams_plan.md
 
 - disposition: current
-- status line: "Status (2026-10-05): plan. Fourteen rulings in three rounds (S1 to S14); P1 in progress in this session's worktree, P2 after it; P3 and S7 done as documents; S3 to S6 carried into the dynamics grammar plan (G8, G9); S9 done by the identity lane (`b52edea7`). No code in this plan's own lane yet." — accurate: yes
+- status line: "Status (2026-10-05): plan. Sixteen rulings in four rounds (S1 to S16); P1 in progress in this session's worktree, P2 after it; P3 and S7 done as documents; S3 to S6 carried into the dynamics grammar plan (G8, G9); S9 done by the identity lane (`b52edea7`). No code in this plan's own lane yet." — accurate: yes
 - claims checked: 30 — holds: 30, stale: 0, unverifiable: 0
 
 ### Stale claims
@@ -67,4 +67,6 @@ search of mien and the workspace for the old name. Round 3's S12 evidence
 checked: the comment at `projection_compile.rs` 135 and its commit `534ae1c6`,
 the remote projection host plan's lines 81, 389 and 579, the dataset's serde
 derives, and its only JSON load at `web_projection.rs` 65 (a fixture and the
-editor preview).
+editor preview). F12 checked against `registry.rs` (`solve_via`'s doc and the
+absence of any built-in registration), scenograph's `Arrangement::default`, and
+graphshell's two id constants (`projection_compile.rs` 75-76).
