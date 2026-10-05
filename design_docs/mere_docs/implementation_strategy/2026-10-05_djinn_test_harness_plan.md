@@ -1,7 +1,8 @@
 # djinn Test Harness Plan
 
 **Date**: 2026-10-05
-**Status (2026-10-05)**: assessed; the forks in §3 wait for Mark. No code
+**Status (2026-10-05)**: assessed; forks 1 to 4 ruled (§3), the rest wait
+for Mark. No code
 changed. The vault lock plan's build waits on this harness (its ruling 18).
 **Scope**: one shared, tested way to run djinn residents under test:
 isolated, observed without scraping logs, stopped and restarted, held
@@ -191,6 +192,29 @@ Each comes with the lane's recommendation first.
       re-exec and transport helpers follow when they are touched.
     - The lock receipts only.
     - Everything now.
+
+### Rulings
+
+**Ruling 1.** *Where does the harness live?* Options: a `djinn-testkit`
+crate; a module in djinn's tests; a `test-support` feature in djinn; a
+receipt binary. Mark: **"A djinn feature"**. *Reading, not ruled:* djinn
+depends on castellan and personae, so those crates cannot use it from
+their own tests without a dependency cycle; their resident-level receipts
+run in djinn's tests (put back to Mark the same day).
+
+**Ruling 2.** *Language?* Options: Rust, with shell only to launch; Rust
+plus committed scripts; per-lane scripts. Mark: **"Rust, shell only to
+launch (Recommended)"**.
+
+**Ruling 3.** *Timing under load?* Options: relative to the run's own
+events with load recorded, wide absolute bounds, an opt-in quiet mode and
+a machine-wide lock file; refuse while loaded; bounded retries. Mark:
+**"Relative timing, record load (Recommended)"**.
+
+**Ruling 4.** *Real-machine receipts?* Options: a remote runner for the
+ThinkPad and the Surface, macOS with D2, and the laptop's `Win+L` and
+suspend as attended steps; remote Linux with checklists here; all manual.
+Mark: **"Remote runner + attended steps (Recommended)"**.
 
 ## 4. Phases
 
