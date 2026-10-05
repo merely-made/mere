@@ -120,6 +120,7 @@ where
     s.a11y = Some(Box::new(a11y));
     s.files = Some(Box::new(WebFileChooser::new(&canvas)?));
     s.window = Some(Box::new(window.clone()));
+    s.render_core = Some(surface.shared_core());
     s.surface = Some(Box::new(surface));
 
     let host = Rc::new(RefCell::new(Host::new(options, None, hooks, s, wake)));
