@@ -1,8 +1,9 @@
 # Vault Lock Plan
 
 **Date**: 2026-10-05
-**Status (2026-10-05)**: assessed; forks 1 to 15 ruled (rulings 1 to 16 in
-§3), the rest wait for Mark. No code changed. Chatelaine P4 (CXF import) waits on this plan (chatelaine
+**Status (2026-10-05)**: assessed; all 16 forks ruled (rulings 1 to 20 in §3);
+a djinn test-harness plan comes first (ruling 18), and §3's open
+questions remain. No code changed. Chatelaine P4 (CXF import) waits on this plan (chatelaine
 rulings 64, 65).
 **Scope**: the resident's secrets can be locked. While locked, no secret
 material can be reached through the vault or the resident's derived keys.
@@ -323,6 +324,35 @@ harness as its own question. Evidence: `personae-agent` is a 210-line host
 of personae's agent library with Windows, macOS (launchd) and Linux
 installers; djinn's Windows installer already retires its task; on macOS
 and Linux it remains the deployed agent until the pairing plan's D2.
+
+**Ruling 17.** *How should djinn take on the CLI agent?* Options: djinn
+hosts it, with the standalone bin and its three installers retired after
+the pairing plan's D2 (the M4 moves then); an agent-only djinn mode; keep
+both. Mark: **"djinn hosts it; retire after D2 (Recommended)"**. Follows:
+the vault lock applies to one agent, djinn's.
+
+**Ruling 18.** *djinn's test harness (each lane this week rebuilt its own
+two-resident harness): when?* Options: its own plan, before the lock
+build; the lock plan's first phase; later. Mark: **"Its own plan, before
+the lock build (Recommended)"**. Follows: a shared djinn harness (spawning
+residents, isolation roots, pipes, the installed-agent walls, receipts) is
+assessed and built first; the lock's receipts are its first customer.
+
+**Ruling 19.** *Failed-unlock throttling?* Options: Argon2id's cost only;
+a growing delay of our own. Mark: **"Argon2id's cost only
+(Recommended)"**.
+
+**Ruling 20.** *The default idle window?* Options: 15, 5 or 30 minutes; off
+by default. Mark: **"15 minutes (Recommended)"**. Follows: per device and
+changeable.
+
+Still open: which unlock methods the first build carries beyond the
+passphrase and Windows Hello (ruling 4's reading); whether macOS is in
+scope; whether a resident lock should reach Turnstone, Knot and the
+graphshell app's own vault opens; the sibling repos that call
+`current_profile()` and `slot()`; and a threat statement naming hibernation
+and the pagefile. Whether Distillery's new transport key itself stays
+resident under lock (ruling 2) is open too.
 
 ## 4. Phases
 
