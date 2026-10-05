@@ -3,8 +3,9 @@
 **Date:** 2026-10-04
 **Status (2026-10-05):** in progress. P1 implemented and validated on the
 isolated `graph-semantics` branch, with C1, stable-root attribution,
-retract/assert, A1 and B1 resolved. Awaiting Mark's P1 review before P2.
-P2–P5 have not begun; nothing has been integrated into main.
+retract/assert, A1 and B1 resolved. Mark authorized P2 with "Proceed".
+P2 inventory has begun and is stopped at C2 before code changes; C3 and C4
+remain open. P3–P5 have not begun; nothing has been integrated into main.
 
 Four questions were put to Mark from outside the project: what a link records,
 what makes two things the same thing, what a saved query can become, and how
@@ -362,6 +363,75 @@ full journal replay, checkpoint-plus-tail replay and snapshot reopening
 `crates/graph/graph-kernel/src/graph/journal.rs`,
 `legacy_exact_capture_attribution_matches_checkpoint_replay`).
 
+### P2 containment checkpoint (2026-10-05)
+
+Verified at P1 commit `459cad84`. The seven containment sub-kinds have
+seven explicit construction sites outside test modules in Mere: two
+`UrlPath` and one `Domain` in `graph/query.rs` (297, 386, 395), one
+`CollectionMember` editor mapping in `ports/graphshell/src/product.rs`
+(202, applied at 627), and three built-in fixture assertions in
+`ports/graphshell/src/mere_host_fixture.rs` (174, 192, 200). The other
+four sub-kinds have no named production origin writer found. Generic
+assertion and replay paths accept them; snapshot reconstruction restores
+all seven (`graph/snapshot/from.rs` 378–387). Kernel paths here are under
+`crates/graph/graph-kernel/src/`.
+
+`CollectionMember` is broader than layout in current fixtures: scene to
+file, and persona to device twice. A read-only sibling search found one
+named containment writer in Turnstone (`turnstone/src/overmap.rs` 111),
+joining session containers referenced by `sub_graph_refs`, and none in
+Knot-editor. These are source findings, not consumer build receipts.
+
+C2 options, recommendation first; none selected:
+
+1. **Fixed split by sub-kind (recommended).** Resources carry `UrlPath`,
+   `Domain`, `FileSystem`, `ClipSource`; surfaces carry `UserFolder`,
+   `NotebookSection`, `CollectionMember`. This follows the plan's proposed
+   split and preserves the editor/overmap meanings. Persona/device fixture
+   membership also stays surface-owned; resource collections would need a
+   distinct later relation.
+2. **Explicit graph per writer.** URL-derived containment is resource-owned;
+   authored containment can use explicit resource or surface endpoints.
+   Resource collections and layout collections can share `CollectionMember`,
+   but routing, migration and walks must distinguish both endpoint kinds.
+3. **All containment on surfaces.** Preserve the current writers' surface
+   meaning; URL hierarchy remains about addressed surfaces and is unavailable
+   to resource-only containment queries.
+
+**Lane coordination.** Mark relayed the stack-seams P1 request covering
+`scenomise::projection` and its dataset types. This lane holds those files
+for that owner. The current Pictograph canvas path calls `scenomise::solve`
+(`crates/canvas/pictograph/src/canvas/strategy.rs` 268); no dependency on a
+relationship-compiler change has been identified for graph semantics P2.
+This lane owns neither the recipe pass nor Woodshed's captures, so its
+response cannot qualify that owner's pitch change or repin. Current main's
+stack-seams plan records the separate S12/S15–S18 coordination; it is not
+part of this branch's base.
+
+**Dependency finding.** The canonicalizer is std-only, but Eidetic currently
+gates chartulary behind `lineage` (`crates/eidetic/eidetic-core/Cargo.toml`
+44, 70). Chartulary is already in Eidetic's lockfile dependency list.
+Neither crate has a UUID dependency, while the kernel has UUIDv5 support.
+A complete shared resource-id helper in chartulary would add an edge to the
+existing UUID package and require a lockfile change. That remains an explicit
+stop before implementation; no manifest or lockfile has been changed.
+The existing raw-URL surface helper's namespace is documented as fixed
+(`graph/mod.rs` 454–466), so resource identity needs a separate helper.
+
+**C3 inventory, no migration choice.** A persisted semantic assertion has
+seven fields, with no endpoint URL, visit or version reference; its edge
+names two surface UUIDs (`persistence_edge.rs` 173, 429). Its optional time
+can change on reassertion. Navigation has visit creation and latest-access
+times, not a complete chronological cursor log; old snapshots may have no
+history (`graph/history.rs` 190–242; `persistence.rs` 250–255). A complete
+retained journal and baseline can recover shown URLs by sequence, but
+baseline assertions can predate that log (`crates/system/pandect/src/graph_session.rs`
+363–447). Nearest-visit assignment would therefore be inference.
+Collapsing same-URL surfaces also combines assertion buckets: live upsert
+can lose a distinct legacy handle while exact restore preserves it
+(`graph/edge_data.rs` 256–292). Migration must retain handles and explicitly
+resolve collisions before a policy is implemented. C3 remains open.
+
 ## 3. Rulings
 
 Mark's answers, from multiple-choice rounds; each is the option label quoted
@@ -668,3 +738,18 @@ comes back to Mark as a fork, with evidence, before the code commits to one.
   this lane for Mark's review and eventual integration; shared reusable
   target `C:/t/cargo-targets/mere`, retained for Mere validation. Stopped
   before P2 as required.
+
+- **2026-10-05. P2 inventory, stopped at C2.** Mark authorized continuation.
+  Re-read the documentation policy, plan and relevant terminology; inventoried
+  containment writers, shared canonicalization and the query seam. Recorded
+  C2's evidence and three options above; no P2 code or naming decision made.
+  C3/C4 and dependency/lock review remain ahead of implementation. Compiler
+  files are held for the stack-seams owner. No source, manifest or lockfile
+  changed; Cargo, wasm, consumer and headed gates were not rerun for this
+  documentation checkpoint. The isolated worktree and reusable Mere target
+  remain owned by this lane for review and continued validation.
+  The documentation audit and its planted-defect/clean-fixture self-test
+  exited 0; this plan has no audit findings. Existing counts: 10 orphans,
+  one statusless plan, 40 broken relative links, 202 missing known-root
+  paths and two stale historical annotations. `git diff --check` passed.
+  No new active document was added.
