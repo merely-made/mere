@@ -785,7 +785,16 @@ pull reading −0.33 with 510 overlaps):
   conditions the robust estimator would be deriving from? I can think of a
   lot of dependencies that might differ. Could we run this robust estimation
   on the thinkpad also, as a double-check?"** Put back with the conditions the
-  intervals depend on; open until he answers. When the period is inferred,
+  intervals depend on (the display's rate, variable refresh and monitor; the
+  browser's clock grain, 100 µs here and 5 µs cross-origin isolated; energy
+  saver's 30 fps cap and hidden-tab throttling; load; the compositor), he
+  chose **"Both machines + planted"**: the lane logs intervals here and on
+  the ThinkPad (`thinkpad-l14-f`, Fedora 44), adds planted traces for
+  variable refresh, a 30 fps cap, a monitor switch and a 5 µs clock, and
+  designs the estimator against all of them; done when it reads within 1% on
+  both machines, never reports a fraction of the period, and falls back to
+  the 1/60 s cap where a trace has no period (against logging the ThinkPad
+  first and deciding after, the quorum, or dropping inference). When the period is inferred,
   the 1x floor's start-up ticks broke the fast receipt's every-window bound
   in about 6 of 10 runs (two ticks in 4,500 µs against a 3,039 µs budget,
   half of 6.08 ms). Mark chose **"Only ticks past the floor"**: the receipt
