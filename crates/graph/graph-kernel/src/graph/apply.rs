@@ -539,6 +539,7 @@ fn set_node_facet(graph: &mut Graph, key: NodeKey, facet: &str, value: serde_jso
     let Some(node_id) = graph.get_node(key).map(|node| node.id) else {
         return false;
     };
+    let visits = facet == super::node_facets::VISIT_HISTORY;
     let facet = chartulary::FacetId::new(facet);
     if graph.facets().get(&node_id, &facet) == Some(&value) {
         return false;
@@ -547,6 +548,9 @@ fn set_node_facet(graph: &mut Graph, key: NodeKey, facet: &str, value: serde_jso
         .facets
         .set(node_id, facet, value, &chartulary::AcceptAll)
         .expect("AcceptAll cannot reject a graph facet");
+    if visits {
+        graph.bump_visit_revision();
+    }
     true
 }
 
@@ -554,10 +558,14 @@ fn remove_node_facet(graph: &mut Graph, key: NodeKey, facet: &str) -> bool {
     let Some(node_id) = graph.get_node(key).map(|node| node.id) else {
         return false;
     };
-    graph
+    let removed = graph
         .facets
         .remove(&node_id, &chartulary::FacetId::new(facet))
-        .is_some()
+        .is_some();
+    if removed && facet == super::node_facets::VISIT_HISTORY {
+        graph.bump_visit_revision();
+    }
+    removed
 }
 
 pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResult {
