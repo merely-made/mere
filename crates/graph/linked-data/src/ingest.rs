@@ -386,8 +386,7 @@ fn collect_contribution<E: std::fmt::Display>(
     // label / provenance / assertion time, and a `urn:mere:statement:<id>`
     // IRI carries the fact handle itself. Everything else flows to pass B.
     let mut plain: Vec<Quad> = Vec::new();
-    let mut reified: std::collections::HashMap<String, ReifiedStatement> =
-        std::collections::HashMap::new();
+    let mut reified: BTreeMap<String, ReifiedStatement> = BTreeMap::new();
     let mut reifier_meta: Vec<Quad> = Vec::new();
     for quad in quads {
         let quad = quad.map_err(|err| IngestError::Parse(err.to_string()))?;
@@ -569,7 +568,10 @@ fn collect_contribution<E: std::fmt::Display>(
                     object.clone(),
                     statement.graph_scope.clone(),
                 );
-                if let Some(&position) = edge_index.get(&match_key) {
+                // A base triple describes the shared claim, not another
+                // assertion. Consume its slot once; each further reifier
+                // creates its own contribution instead of overwriting it.
+                if let Some(position) = edge_index.remove(&match_key) {
                     let edge = &mut edges[position];
                     edge.statement_id = statement_id;
                     edge.label = statement.label;
@@ -583,10 +585,6 @@ fn collect_contribution<E: std::fmt::Display>(
                     nodes
                         .entry(statement.subject.clone())
                         .or_insert_with(|| NodeContribution::new(&statement.subject));
-                    // The materialized edge joins the index, so a later reifier
-                    // naming the same fact attaches to it instead of pushing a
-                    // duplicate — what the old linear scan over `edges` did.
-                    edge_index.insert(match_key, edges.len());
                     edges.push(EdgeContribution {
                         subject: statement.subject,
                         predicate: statement.predicate,

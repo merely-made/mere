@@ -420,3 +420,55 @@ fn unbundled_remote_context_is_refused() {
         Err(IngestError::Parse(_))
     ));
 }
+
+#[test]
+fn every_ingest_assertion_path_supplies_source_or_author() {
+    use kernel::graph::Author;
+    let author = Author::engine("jsonld", "1");
+    for recognized in [false, true] {
+        for metadata in [0, 1, 2] {
+            for source in [None, Some("https://source.test/")] {
+                let contribution = GraphContribution {
+                    nodes: vec![
+                        NodeContribution::new("https://a.test/"),
+                        NodeContribution::new("https://b.test/"),
+                    ],
+                    edges: vec![EdgeContribution {
+                        subject: "https://a.test/".into(),
+                        object: "https://b.test/".into(),
+                        predicate: if recognized {
+                            "https://mere.computer/ns/rel#cites"
+                        } else {
+                            "https://example.test/rel"
+                        }
+                        .into(),
+                        graph_scope: GraphScope::Source,
+                        statement_id: (metadata == 2).then(|| "imported".into()),
+                        label: (metadata == 1).then(|| "label".into()),
+                        provenance_iri: source.map(str::to_owned),
+                        asserted_at_ms: None,
+                    }],
+                };
+                let mut graph = Graph::new();
+                let outcome = graph.write_as(author.clone(), |graph| {
+                    apply_contribution(graph, &contribution)
+                });
+                assert_eq!(outcome.edges_asserted, 1);
+                assert_eq!(outcome.edges_skipped, 0);
+                let from = graph.get_node_by_url("https://a.test/").unwrap().0;
+                let to = graph.get_node_by_url("https://b.test/").unwrap().0;
+                let statements = graph
+                    .get_edge(graph.find_edge_key(from, to).unwrap())
+                    .unwrap()
+                    .semantic_statements();
+                assert_eq!(statements.len(), 1);
+                let fallback = author.asserter_iri();
+                assert_eq!(
+                    statements[0].provenance_iri.as_deref(),
+                    Some(source.unwrap_or(&fallback))
+                );
+                assert_eq!(statements[0].graph_scope, GraphScope::Source);
+            }
+        }
+    }
+}

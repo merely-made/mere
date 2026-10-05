@@ -183,6 +183,14 @@ impl Graph {
                 .and_then(|id| graph.get_node_key_by_id(id));
             if let (Some(from), Some(to)) = (from_key, to_key) {
                 graph.restore_persisted_edge(from, to, pedge);
+                if let Some(key) = graph.find_edge_key(from, to)
+                    && let Some(payload) = graph.inner.edge_mut(key)
+                    && let Some(data) = &mut payload.semantic
+                {
+                    for statement in &mut data.statements {
+                        statement.normalize_legacy_asserter();
+                    }
+                }
             }
         }
 
@@ -309,13 +317,21 @@ impl Graph {
                     }
                 }
             } else {
-                for sub_kind in &semantic.sub_kinds {
-                    let assertion = EdgeAssertion::Semantic {
-                        sub_kind: semantic_sub_kind(sub_kind.clone()),
-                        label: semantic.label.clone(),
-                        decay_progress: semantic.agent_decay_progress,
-                    };
-                    let _ = graph.assert_relation(from, to, assertion);
+                let key = graph
+                    .find_edge_key(from, to)
+                    .unwrap_or_else(|| graph.inner.connect(from, to, EdgePayload::new()));
+                if let Some(payload) = graph.inner.edge_mut(key) {
+                    for sub_kind in &semantic.sub_kinds {
+                        let sub_kind = semantic_sub_kind(sub_kind.clone());
+                        payload.assert_semantic_statement(SemanticStatementSpec {
+                            predicate: predicate_iri(sub_kind).into(),
+                            recognized_sub_kind: Some(sub_kind),
+                            label: semantic.label.clone(),
+                            graph_scope: crate::types::GraphScope::Default,
+                            provenance_iri: Some(edge_data::UNKNOWN_LEGACY_ASSERTER_IRI.into()),
+                            asserted_at_ms: None,
+                        });
+                    }
                 }
                 // Restore the open predicate IRI. Create the edge when the
                 // sub-kind loop above made none — a raw predicate-only

@@ -223,3 +223,41 @@ fn ticking_moves_nodes_from_the_seed() {
     });
     assert!(moved, "the force-directed settle moves nodes off the seed");
 }
+
+#[test]
+fn independent_assertions_group_into_one_drawn_link() {
+    use kernel::graph::SemanticStatementSpec;
+    let mut graph = Graph::new();
+    let a = graph.add_node("https://a.test/".into(), Default::default());
+    let b = graph.add_node("https://b.test/".into(), Default::default());
+    let assertion = |asserter: &str| SemanticStatementSpec {
+        predicate: kernel::graph::predicate_iri(SemanticSubKind::Cites).into(),
+        recognized_sub_kind: Some(SemanticSubKind::Cites),
+        provenance_iri: Some(asserter.into()),
+        ..Default::default()
+    };
+    let (_, alice) = graph
+        .assert_semantic_statement(a, b, assertion("https://alice.test/"))
+        .unwrap();
+    let (_, bob) = graph
+        .assert_semantic_statement(a, b, assertion("https://bob.test/"))
+        .unwrap();
+    assert_ne!(alice.statement_id, bob.statement_id);
+    assert_eq!(
+        graph
+            .get_edge(graph.find_edge_key(a, b).unwrap())
+            .unwrap()
+            .semantic_statements()
+            .len(),
+        2
+    );
+    assert_eq!(dedup_edges(&graph), vec![(a, b)]);
+    assert!(graph.retract_semantic_statement(a, b, &alice.statement_id));
+    assert_eq!(
+        dedup_edges(&graph),
+        vec![(a, b)],
+        "Bob still draws the link"
+    );
+    assert!(graph.retract_semantic_statement(a, b, &bob.statement_id));
+    assert!(dedup_edges(&graph).is_empty());
+}

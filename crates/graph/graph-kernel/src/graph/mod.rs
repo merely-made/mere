@@ -122,7 +122,7 @@ pub use history::{
 // through [`EdgeAssertion`].
 pub use capture::{
     CapturedDelta, DeltaRecorder, GraphTableStats, replay_captured_deltas,
-    replay_captured_deltas_onto, set_captured_delta_hook,
+    replay_captured_deltas_as_onto, replay_captured_deltas_onto, set_captured_delta_hook,
 };
 pub use journal::{
     AttributedDelta, Author, AuthorKind, GraphJournal, USER_AUTHOR, journal_capture_hook,
@@ -329,6 +329,9 @@ pub struct Graph {
     /// graph truth. (Alembic B5 — by-sessions eviction.)
     current_session: u64,
 
+    /// Attribution context supplied by the session performing a write.
+    write_author: Author,
+
     /// Where this graph sends its own captured deltas, once a host opts it in
     /// with [`set_recorder`](Self::set_recorder). Not graph truth, and not
     /// carried by a clone.
@@ -349,6 +352,7 @@ impl Graph {
             revision: 0,
             url_grouping_revision: 0,
             current_session: 0,
+            write_author: Author::user(),
             recorder: capture::Recorder::default(),
         }
     }
@@ -364,6 +368,22 @@ impl Graph {
     /// Whether this graph records its deltas.
     pub fn is_recording(&self) -> bool {
         self.recorder.0.is_some()
+    }
+
+    /// The recorder identity used when a writer has no attributed source.
+    pub fn write_author(&self) -> &Author {
+        &self.write_author
+    }
+
+    /// Run a write under the same author its journal will record.
+    pub fn write_as<R>(&mut self, author: Author, write: impl FnOnce(&mut Self) -> R) -> R {
+        let previous = std::mem::replace(&mut self.write_author, author);
+        let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| write(self)));
+        self.write_author = previous;
+        match result {
+            Ok(value) => value,
+            Err(panic) => std::panic::resume_unwind(panic),
+        }
     }
 
     /// Set the current app-launch session number (Alembic B5). The host calls this once,

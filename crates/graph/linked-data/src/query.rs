@@ -275,7 +275,6 @@ mod tests {
             },
         );
 
-        let node = graph.get_node_mut(a).expect("node a");
         let mut published = NodeProperty::new(
             "https://schema.org/datePublished".to_string(),
             "2026-07-04".to_string(),
@@ -286,13 +285,13 @@ mod tests {
             Some(1_720_000_100_456),
         );
         published.datatype = Some("http://www.w3.org/2001/XMLSchema#date".to_string());
-        node.properties.push(published);
+        assert!(graph.append_node_properties(a, vec![published]));
         let mut summary = NodeProperty::new(
             "https://schema.org/abstract".to_string(),
             "Un article".to_string(),
         );
         summary.lang = Some("fr".to_string());
-        node.properties.push(summary);
+        assert!(graph.append_node_properties(a, vec![summary]));
 
         graph
     }

@@ -36,19 +36,43 @@ impl Graph {
         to: NodeKey,
         assertion: EdgeAssertion,
     ) -> Option<EdgeKey> {
+        self.assert_relation_as(
+            from,
+            to,
+            assertion,
+            self.write_author().asserter_iri(),
+            None,
+        )
+    }
+
+    pub(crate) fn assert_relation_as(
+        &mut self,
+        from: NodeKey,
+        to: NodeKey,
+        assertion: EdgeAssertion,
+        asserter_iri: String,
+        asserted_at_ms: Option<u64>,
+    ) -> Option<EdgeKey> {
         if let EdgeAssertion::Semantic {
             sub_kind,
             label,
             decay_progress: _,
         } = assertion
         {
-            return self.assert_semantic_relation_in_scope(
-                from,
-                to,
-                sub_kind,
-                label,
-                GraphScope::Default,
-            );
+            return self
+                .assert_semantic_statement(
+                    from,
+                    to,
+                    SemanticStatementSpec {
+                        predicate: super::predicate_iri(sub_kind).into(),
+                        recognized_sub_kind: Some(sub_kind),
+                        label,
+                        graph_scope: GraphScope::Default,
+                        provenance_iri: Some(asserter_iri),
+                        asserted_at_ms,
+                    },
+                )
+                .and_then(|(edge, outcome)| outcome.changed.then_some(edge));
         }
         if !self.inner.contains_node(from) || !self.inner.contains_node(to) {
             return None;
@@ -83,21 +107,19 @@ impl Graph {
         label: Option<String>,
         graph_scope: GraphScope,
     ) -> Option<EdgeKey> {
-        if !self.inner.contains_node(from) || !self.inner.contains_node(to) {
-            return None;
-        }
-        let edge_key = self
-            .find_edge_key(from, to)
-            .unwrap_or_else(|| self.inner.connect(from, to, EdgePayload::new()));
-        let changed = {
-            let payload = self.inner.edge_mut(edge_key)?;
-            payload.assert_semantic_relation_in_scope(sub_kind, label, graph_scope)
-        };
-        if changed {
-            self.bump_revision();
-            return Some(edge_key);
-        }
-        None
+        self.assert_semantic_statement(
+            from,
+            to,
+            SemanticStatementSpec {
+                predicate: super::predicate_iri(sub_kind).into(),
+                recognized_sub_kind: Some(sub_kind),
+                label,
+                graph_scope,
+                provenance_iri: Some(self.write_author().asserter_iri()),
+                asserted_at_ms: None,
+            },
+        )
+        .and_then(|(edge, outcome)| outcome.changed.then_some(edge))
     }
 
     /// Assert an **open predicate** semantic relation from `from` to `to`,
@@ -123,21 +145,19 @@ impl Graph {
         predicate: String,
         graph_scope: GraphScope,
     ) -> Option<EdgeKey> {
-        if !self.inner.contains_node(from) || !self.inner.contains_node(to) {
-            return None;
-        }
-        let edge_key = self
-            .find_edge_key(from, to)
-            .unwrap_or_else(|| self.inner.connect(from, to, EdgePayload::new()));
-        let changed = {
-            let payload = self.inner.edge_mut(edge_key)?;
-            payload.assert_semantic_predicate_in_scope(predicate, graph_scope)
-        };
-        if changed {
-            self.bump_revision();
-            return Some(edge_key);
-        }
-        None
+        self.assert_semantic_statement(
+            from,
+            to,
+            SemanticStatementSpec {
+                recognized_sub_kind: None,
+                predicate,
+                label: None,
+                graph_scope,
+                provenance_iri: Some(self.write_author().asserter_iri()),
+                asserted_at_ms: None,
+            },
+        )
+        .and_then(|(edge, outcome)| outcome.changed.then_some(edge))
     }
 
     /// Replay helper: add node only if UUID is not already present.
@@ -297,8 +317,11 @@ impl Graph {
         &mut self,
         from: NodeKey,
         to: NodeKey,
-        spec: SemanticStatementSpec,
+        mut spec: SemanticStatementSpec,
     ) -> Option<(EdgeKey, StatementAssert)> {
+        if spec.provenance_iri.is_none() {
+            spec.provenance_iri = Some(self.write_author().asserter_iri());
+        }
         if !self.inner.contains_node(from) || !self.inner.contains_node(to) {
             return None;
         }
@@ -311,20 +334,24 @@ impl Graph {
         };
         if outcome.changed {
             self.bump_revision();
+            self.capture_semantic_pair(from, to);
         }
         Some((edge_key, outcome))
     }
 
     /// Assert a semantic statement whose id is ALREADY minted — the re-ingest /
     /// round-trip path (a reifier carried the fact handle, and preserving it is
-    /// what makes `RDF -> kernel -> RDF` id-stable). Same content-dedup as the
-    /// persisted-snapshot load; endpoints must exist.
+    /// what makes `RDF -> kernel -> RDF` id-stable). Reasserting the same
+    /// asserter updates its existing handle; endpoints must exist.
     pub fn assert_persisted_semantic_statement(
         &mut self,
         from: NodeKey,
         to: NodeKey,
-        statement: SemanticStatement,
+        mut statement: SemanticStatement,
     ) -> Option<EdgeKey> {
+        if statement.provenance_iri.is_none() {
+            statement.provenance_iri = Some(self.write_author().asserter_iri());
+        }
         if !self.inner.contains_node(from) || !self.inner.contains_node(to) {
             return None;
         }
@@ -333,10 +360,11 @@ impl Graph {
             .unwrap_or_else(|| self.inner.connect(from, to, EdgePayload::new()));
         let changed = {
             let payload = self.inner.edge_mut(edge_key)?;
-            payload.push_persisted_semantic_statement(statement)
+            payload.upsert_persisted_semantic_statement(statement)
         };
         if changed {
             self.bump_revision();
+            self.capture_semantic_pair(from, to);
         }
         Some(edge_key)
     }
@@ -367,8 +395,21 @@ impl Graph {
         }
         if removed {
             self.bump_revision();
+            self.capture_semantic_pair(from, to);
         }
         removed
+    }
+
+    /// Keep assertion ids and metadata exact through journal replay and undo.
+    pub(crate) fn capture_semantic_pair(&self, from: NodeKey, to: NodeKey) {
+        let (Some(from_node), Some(to_node)) = (self.get_node(from), self.get_node(to)) else {
+            return;
+        };
+        self.record_delta(&super::capture::CapturedDelta::ReplaySetEdgesByIds {
+            from_id: from_node.id.to_string(),
+            to_id: to_node.id.to_string(),
+            edges: self.persisted_edges_between(from, to),
+        });
     }
 
     pub(crate) fn retract_relations(
@@ -429,6 +470,21 @@ impl Graph {
         for edge in edges {
             self.restore_persisted_edge(from, to, edge);
         }
+        let restored: Vec<_> = self
+            .inner
+            .inner()
+            .edges_connecting(from, to)
+            .map(|edge| edge.id())
+            .collect();
+        for key in restored {
+            if let Some(payload) = self.inner.edge_mut(key)
+                && let Some(semantic) = &mut payload.semantic
+            {
+                for statement in &mut semantic.statements {
+                    statement.normalize_legacy_asserter();
+                }
+            }
+        }
         self.bump_revision();
     }
 
@@ -437,21 +493,34 @@ impl Graph {
         self.inner.edge_mut(key)
     }
 
-    /// Set (or clear) the canonical semantic-predicate IRI on an existing edge.
-    /// Returns whether the edge exists. The sanctioned write path for a payload's
-    /// predicate — the linked-data ingest and inker statements previously reached
-    /// it through `get_edge_mut` (write-path migration, 2026-07-01). A content
-    /// annotation on an existing edge, not a structural change, so the revision
-    /// holds (same rule as title/tag edits).
+    /// Legacy replay only: set the aggregate predicate on an existing edge.
+    /// Live corrections retract one statement and assert its replacement.
     pub(crate) fn set_edge_semantic_predicate(
         &mut self,
         key: EdgeKey,
         predicate: Option<String>,
     ) -> bool {
+        self.set_edge_semantic_predicate_as(key, predicate, self.write_author().asserter_iri())
+    }
+
+    /// Legacy replay only, with the old record's attribution envelope.
+    pub(crate) fn set_edge_semantic_predicate_as(
+        &mut self,
+        key: EdgeKey,
+        predicate: Option<String>,
+        asserter: String,
+    ) -> bool {
         let Some(payload) = self.inner.edge_mut(key) else {
             return false;
         };
         payload.set_semantic_predicate(predicate);
+        if let Some(semantic) = payload.semantic.as_mut() {
+            for statement in &mut semantic.statements {
+                if statement.provenance_iri.is_none() {
+                    statement.provenance_iri = Some(asserter.clone());
+                }
+            }
+        }
         true
     }
 

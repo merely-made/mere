@@ -1,10 +1,10 @@
 # Graph semantics plan: assertions, resources, saved queries, residency
 
 **Date:** 2026-10-04
-**Status (2026-10-05):** in progress. C1 and stable-root attribution are ruled;
-retract/assert is the selected direction pending the requested co-op review.
-P1 remains uncommitted at the sync assertion identity and legacy-retraction
-forks below. P1–P5 are not yet landed.
+**Status (2026-10-05):** in progress. P1 implemented and validated on the
+isolated `graph-semantics` branch, with C1, stable-root attribution,
+retract/assert, A1 and B1 resolved. Awaiting Mark's P1 review before P2.
+P2–P5 have not begun; nothing has been integrated into main.
 
 Four questions were put to Mark from outside the project: what a link records,
 what makes two things the same thing, what a saved query can become, and how
@@ -307,8 +307,60 @@ of this historical decoding decision.
    reproduces historical results but explicitly exempts those old events
    from P1's independent-retraction invariant.
 
-Neither fork has been selected or implemented. P1 cannot land until the
-choices and their gates are resolved; P2 has not begun.
+At this checkpoint neither fork had been selected or implemented. P1 could
+not land until the choices and their gates were resolved; P2 had not begun.
+
+**Follow-up ruling (2026-10-05).** Mark: **"A1, b1, sure"**. Carry signed
+caller-supplied assertion ids and times, derive fallback handles for old
+assertions, and use exact-id retractions for new semantic writes. Decode
+old selector-only semantic retractions as that stable root withdrawing its
+own matching assertions. This permits previously hidden claims to reappear
+when an old log is reopened. The co-op review is complete; live bulk
+predicate edits use retract/assert rather than selecting a merge survivor.
+
+### P1 implementation findings after A1/B1 (2026-10-05)
+
+The optional `statement_id` and `asserted_at_ms` fields on personal-sync
+assertion events are omitted when absent, preserving old CBOR bodies and
+signatures. New semantic authoring fills them before signing; a caller's
+supplied id/time is retained. Old assertions use a deterministic handle
+from the signed operation hash and event position, retaining unknown time.
+`RetractAssertion` targets a handle; new semantic selector withdrawals are
+refused rather than written as old events. Decoding those old events
+withdraws only the verified stable root's claims, for both sub-kind and
+family selectors (`ports/graphshell/src/personal_sync/assertions.rs`,
+`prepare_event`, `validate_event`, `retract_legacy`).
+
+The rebuildable identity index refuses an id reused for different endpoints,
+predicate or asserter at intake when the body is readable, and again during
+projection. Reasserting the same claim updates its first handle, matching
+ruling 1. Keyless retention still defers checks of sealed contents until
+they can be read; no retained operations are discarded
+(`ports/graphshell/src/personal_sync.rs`, `accept_into`,
+`observe_assertion_ids`, `materialize`). The seven signed-operation tests
+include two roots, receiver replication, explicit id/time carriage, unchanged
+legacy bytes, fallback id stability, missing-id no-op and real exact
+withdrawal, collision refusal with a distinct-id positive control, and both
+old selector forms. The original failing tests are now green.
+
+Removed the live bulk-predicate delta; exact retract/assert replacements
+mint a new handle and preserve the other asserter's full record, including
+through captured replay. Legacy capture decoding and its serialized schema
+remain (`crates/graph/graph-kernel/src/graph/apply.rs`,
+`crates/graph/graph-kernel/src/graph/tests/assertion_replay.rs`). A bounded
+Rust-source search found no sibling use of the removed live variant or of
+the expanded personal-sync event enum. Turnstone's exhaustive capture match
+continues to use the retained legacy variants; sibling builds were not run.
+
+Review found an attribution discrepancy between historical exact journal
+replay and checkpoint loading. Exact pair restoration now fills missing
+provenance with the C1 marker on every restored parallel bucket and on
+aggregate-only legacy records. It does not merge duplicate handles or
+alter their ids/times; known sources remain unchanged. Controls compare
+full journal replay, checkpoint-plus-tail replay and snapshot reopening
+(`crates/graph/graph-kernel/src/graph/edge_ops.rs`, `set_edges_between`;
+`crates/graph/graph-kernel/src/graph/journal.rs`,
+`legacy_exact_capture_attribution_matches_checkpoint_replay`).
 
 ## 3. Rulings
 
@@ -577,3 +629,42 @@ comes back to Mark as a fork, with evidence, before the code commits to one.
   The documentation audit and its planted-defect/clean-fixture self-test
   exited **0** with the same existing finding counts as the previous
   checkpoint; this plan has no findings. No active document was added.
+
+- **2026-10-05. P1 complete after A1/B1.** Separate attributable assertions,
+  precise retraction and exact update/replacement replay are implemented.
+  Production writer controls enumerate nine kernel entry points, twelve
+  linked-data ingestion cases, page sources, scoped journal/session Authors,
+  canvas grouping and signed personal-sync operations. RDF projection/ingest
+  retains separate reifiers on one triple; the profile round-trip gate passes.
+  Legacy snapshot and journal controls preserve handles, times and known
+  sources, supplying the C1 marker where attribution is missing. The live
+  bulk setter is retired; real legacy capture decoding is retained.
+  A1 carries caller ids/times in signed events and supplies deterministic
+  old-event handles; B1 scopes old semantic selector withdrawals to their
+  stable root. Conflicting id reuse is refused; new semantic withdrawals
+  require exact ids. No serialized capture variant or field was added.
+
+  Final package validation, all offline, locked and using the reusable
+  `C:/t/cargo-targets/mere`:
+  **kernel 323 passed**, with **one documentation example ignored**;
+  **mere-linked-data with query 40 passed**;
+  **Pandect 305 passed**;
+  **Pictograph with canvas 293 passed, 13 ignored**;
+  **Graphshell with personal-sync 326 library tests plus five other tests
+  passed, four ignored**. The focused sync run also passed all seven
+  regressions. The first linked-data gate invocation used the library name
+  instead of its package name and ran no tests; the corrected invocation
+  above passed. **Workspace check and wasm32 kernel check both exited 0**.
+  The documentation audit and planted-defect/clean-fixture self-test exited
+  **0**, with unchanged existing failure counts and no findings for this
+  plan. `git diff --check` passed. No active document was added.
+
+  Source and canonical docs are committed together on this branch. Prior
+  documentation checkpoints: `8dabea00`, `9ec20ffb`, `64845ccc`. No main
+  integration, sibling build, headed browser/UI/device proof or later-phase
+  gate was run. Ignored tests remain unrun. No dependency, download,
+  manifest/lock change, patch override or isolated Cargo home was needed.
+  Retained: `C:/Users/mark_/Code/worktrees/mere-graph-semantics`, owned by
+  this lane for Mark's review and eventual integration; shared reusable
+  target `C:/t/cargo-targets/mere`, retained for Mere validation. Stopped
+  before P2 as required.
