@@ -406,6 +406,9 @@ Drafted from the assessment; set once the forks are ruled.
   - [ ] the gates pass, with Windows-only and Linux-only code each compiled
         on its own target;
   - [ ] PID 53336 is untouched; deployment is Mark's step.
+        *2026-10-05 correction:* the installed resident's PID changes
+        on reboot (14756 that morning); the wall is its identity captured
+        at each run's start (djinn test harness plan).
 
 ## 5. Findings
 
