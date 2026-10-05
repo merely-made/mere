@@ -1,9 +1,9 @@
 # Stack seams plan: catalog, shared device, actions, determinism, two words
 
 **Date:** 2026-10-04
-**Status (2026-10-04):** plan. Six rulings (S1 to S6); P1 and P2 for this
-plan's lane, P3 done as documents; S3 and S4 belong to the dynamics grammar
-lane, which carries them into its own plan (§3.2). No code.
+**Status (2026-10-04):** plan. Ten rulings in two rounds (S1 to S10); P1 and
+P2 for this plan's lane; P3 and S7 done as documents; S3 to S6 carried into the
+dynamics grammar plan (G8, G9); S9 with the identity lane (§3.2). No code.
 
 A note sent to Mark listed weak seams in the stack. Each claim was checked
 against the code (§1); six seams proved real and went to him as
@@ -92,6 +92,47 @@ Verified 2026-10-04 against Mere `c34449bd`.
   `grammar-g2` holds 50 changed files, 5,042 insertions and 99 deletions
   against main, unmerged.
 
+A second pass, the same day at `d2e5c273`, censused public type names defined
+in two or more crates.
+
+- **F8. Most duplicate names are layering, not seams.** `Graph` (chartulary's
+  generic graph under the kernel's wrapper), `NodeKey` (one petgraph
+  `NodeIndex` alias in four crates; `inker/src/routing/ids.rs` 20 says so),
+  `Term` (a force term in seiche, an RDF term in chartulary), `Admission`
+  (storage in stickleback, session in murm, observation in apparatus),
+  `Selection` (chirograph's portable noun beside a practice-workspace enum in
+  graphshell), `ProjectionRequest` (cartography's in-process call beside
+  chirograph's wire request), and the three tile structures (forme, platen's
+  `TileLayout`, cambium's `TileTree`), which the
+  [workbench component plan](../../cambium_docs/implementation_strategy/2026-08-31_workbench_component_plan.md)
+  rules as one pipeline: "Mere's Forme remains durable graph-arrangement
+  authority; Platen compiles a Forme arrangement into a Workbench
+  presentation". document-host's script `Grant` derives from servitor's
+  authority (`Grant::from_authority`, its README), so it is not a second
+  sandbox. One stale comment: platen's `Workbench` alias says the name "will be
+  reused by the future projection-authoring component"
+  (`crates/platen/platen/src/workbench.rs` 410-415); projection authoring is
+  scenograph, and cambium's `Workbench` holds the name.
+- **F9. Two `ViewIntent`s that never meet.** cartography's is a per-call
+  request, "what the user is trying to see right now" (target size, focus,
+  filter; `crates/canvas/cartography/src/request.rs` 42). pandect's is the
+  persisted per-session view record: hidden relations, folds, camera
+  (`crates/system/pandect/src/view_intent_store.rs` 118), which is the swatch
+  design's curation plane.
+- **F10. Two `PersonaId`s, an id and a key.** personae's is a UUID
+  (`crates/dramatis/personae/src/lib.rs` 120); mien's is "a persona's leaf
+  identity (its public key)" that "derives in production from master +
+  persona_id" (`crates/moot/mien/src/persona_chain.rs` 35).
+- **F11. The README and TERMINOLOGY behind the record.** The README called Mere
+  "the library behind a graph-first browser", where TERMINOLOGY (ruled
+  2026-09-05) says Mere is the platform and "Not a browser"; it counted 92
+  crates (the workspace has 100 members, 87 crates and 13 packages under
+  `ports/`) and four ports (nine port directories are members); its status was
+  dated 2026-08-12. TERMINOLOGY had no pandect entry while crediting Eidetic
+  with saving sessions; pandect ("everything a Mere session gathers under one
+  cover") holds them and depends on eidetic and muniment, as the ambiance
+  design's §5 describes.
+
 ## 2. Rulings
 
 Mark's answers, from multiple-choice rounds; each is the option label quoted
@@ -150,6 +191,36 @@ sceno's sense and its recipe; seiche's `SceneSpec` is a world spec, matching
 conatus's `BodyWorld`; netrender's op list is "the paint list" in prose, its
 type being another repository's. Code renames opportunistically.
 
+Round 2, from the second pass (F8 to F11).
+
+**Ruling S7.** *What happens to the README?* Options: fix facts and add the
+ruled words; rewrite from the record; wait for PROJECT_DESCRIPTION. Mark:
+**"Fix facts, add ruled words (Recommended)"**. Follows: the opening follows
+the 2026-09-05 ruling (Mere is a platform, Turnstone the browser); counts,
+ports and the status date are corrected; the graph's words (resource, node,
+strata, aspect) and forme and world join Design vocabulary in a few lines; the
+rest of the prose stays. PROJECT_DESCRIPTION.md remains Mark's to found.
+
+**Ruling S8.** *Which `ViewIntent` keeps the name?* Options: pandect's becomes
+curation; cartography's becomes a request; keep both. Mark: **"pandect's
+becomes curation (Recommended)"**. Follows: pandect's stored record is the
+curation record, named for the plane it holds; cartography's per-call
+`ViewIntent` keeps its name. Renamed when touched, with the stored file name
+still read.
+
+**Ruling S9.** *What is mien's `PersonaId`?* Options: it becomes
+`PersonaKey`; keep both. Mark: **"mien's becomes PersonaKey (Recommended)"**.
+Follows: the key is named a key; personae's id keeps `PersonaId`. The identity
+lane renames it.
+
+**Ruling S10.** *Who holds a mere's sessions?* Options: pandect holds and
+Eidetic archives; pandect is part of Eidetic; leave TERMINOLOGY as is. Mark:
+**"Pandect is part of Eidetic"**. Follows: Eidetic names the memory family
+(muniment's stores and journals, pandect's session record, the codicil
+archive), and pandect is its session layer; TERMINOLOGY gains pandect and
+amends Eidetic. *Reading, not ruled*: the crates stay where they are; whether
+pandect moves under `crates/eidetic/` is not ruled.
+
 ## 3. Phases
 
 ### 3.1 This plan's lane
@@ -181,11 +252,16 @@ type being another repository's. Code renames opportunistically.
   entry is amended. Code identifiers migrate when a file is touched for other
   reasons, never as a churn pass.
 
-### 3.2 For the dynamics grammar lane
+### 3.2 For other lanes
 
-S3 and S4 change seiche and the binding, which that lane is building on
-`grammar-g2`. Its plan is being edited there, so this plan does not edit it;
-the lane takes these in. Suggested done-conditions:
+**Carried, 2026-10-04.** The dynamics grammar lane took S3 to S6 into its plan
+on main: S3 and S4 as inputs with tracks G8 (determinism, all five S4
+done-conditions and checkpoint C3, this plan's two probes named as its
+instruments) and G9 (permitted actions) at `6c3dca60`; S5 and S6 as inputs,
+with G4's binding naming `AdvertisedAction`s and S4's three sum sites, at
+`e932d526`. **S9** goes to the identity lane, which owns personae and mien.
+
+The done-conditions handed over for S3 and S4, kept for reference:
 
 - **S3.** The binding's permitted actions are `AdvertisedAction`s; drag and pin
   advertise as `Curation`; an accessibility or permission surface lists them
@@ -211,3 +287,8 @@ the lane takes these in. Suggested done-conditions:
 - **2026-10-04.** Note verified against the code (§1, two of its claims
   stale); rulings S1 to S6; probes kept under `Code/testing/mere/`; P3's
   documents landed with this plan.
+- **2026-10-04.** S3 to S6 sent to the dynamics grammar lane, which carried
+  them (`6c3dca60`, `e932d526`); S1 sent to the projection grammar lane, which
+  works in `projection_compile`. Second pass (F8 to F11), rulings S7 to S10:
+  the README fixed (S7), TERMINOLOGY gains pandect under Eidetic and the
+  curation record (S8, S10), S9 sent to the identity lane.
