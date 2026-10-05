@@ -15,6 +15,8 @@ use std::collections::BTreeMap;
 
 use serde::{Deserialize, Serialize};
 
+pub mod relationship;
+
 /// The stable schema version for authored projection definitions.
 pub const PROJECTION_DEFINITION_VERSION: u16 = 1;
 

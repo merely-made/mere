@@ -2,13 +2,14 @@
 
 **Date**: 2026-10-01
 **Status (2026-10-04)**: in progress. Shape ruled by Mark on 2026-10-01
-(rulings 7 and 10 to 15 in the dramatis tier architecture; rulings 16 to 63
+(rulings 7 and 10 to 15 in the dramatis tier architecture; rulings 16 to 65
 below). P0 met; P1 landed on `main` (`da3c50bc`); P2 landed (`3e4992ec`); P3
 landed (`ff68e86c`), meeting the Mere 0.4 baseline's chatelaine condition.
 The review stop ended 2026-10-04 (ruling 51), and P4a landed
 (`007fbe7c`, rulings 51 to 63): the agent signs RSA through ring and ECDSA
 (P-256, P-384) beside Ed25519; held keys are never rewritten; unsignable
-keys and P-521 are refused at all three doors. P4 (CXF import) is next.
+keys and P-521 are refused at all three doors. P4 (CXF import) waits for
+the vault lock, in its own plan (rulings 64, 65).
 **Scope**: found `chatelaine` as the tier's plain secret-item taxonomy; move
 castellan's OTP items and its Secret Service store onto it; then import
 (and finally export) the FIDO Credential Exchange Format through castellan.
@@ -449,6 +450,17 @@ no cache; keep the cache. Mark: **"Per signature, no cache"**. Follows:
 ruling 62 is withdrawn. The `rsa` crate builds the key on each RSA
 signature, when the agent decodes it from the vault, and ring signs; no
 long-lived copy is held.
+
+**Ruling 64.** *The vault cannot lock (no lock or close method; castellan
+always reports `Unlocked`), and decrypted keys stay in memory until the
+process exits. Locking is its own objective. When?* Options: before P4;
+beside P4; after P4. Mark: **"Before P4 (Recommended)"**. Follows: P4 waits
+for the vault lock, since CXF import brings passwords, cards and OTP secrets
+into the same vault.
+
+**Ruling 65.** *Where does the lock work live?* Options: its own dated plan
+under `dramatis_docs`, assessed by a read-only lane first; a chatelaine
+phase before P4. Mark: **"Its own plan (Recommended)"**.
 
 ## 3. Phases
 

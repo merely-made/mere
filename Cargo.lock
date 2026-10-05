@@ -14521,6 +14521,7 @@ name = "scenomise"
 version = "0.0.4"
 dependencies = [
  "sceno",
+ "scenograph",
  "serde",
  "serde_json",
 ]
