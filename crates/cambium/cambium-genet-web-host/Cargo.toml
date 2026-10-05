@@ -71,3 +71,10 @@ console_error_panic_hook = "0.1"
 name = "a11y_page"
 path = "examples/a11y_page/main.rs"
 crate-type = ["cdylib"]
+
+# The one-run fixture for run_static_constructors_once; examples/ctor_once/run.mjs
+# loads it in Node.
+[[example]]
+name = "ctor_once"
+path = "examples/ctor_once/main.rs"
+crate-type = ["cdylib"]

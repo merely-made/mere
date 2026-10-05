@@ -12,7 +12,7 @@
 [package]
 edition = "2024"
 name = "cubek-reduce"
-version = "0.3.0-pre.2"
+version = "0.3.0-pre.4"
 authors = [
     "nathanielsimard <nathaniel.simard.42@gmail.com>",
     "louisfd <louisfd94@gmail.com>",
@@ -66,15 +66,15 @@ name = "lib"
 path = "tests/lib.rs"
 
 [dependencies.cubecl]
-version = "=0.11.0-pre.2"
+version = "=0.11.0-pre.4"
 default-features = false
 
 [dependencies.cubek-std]
-version = "=0.3.0-pre.2"
+version = "=0.3.0-pre.4"
 default-features = false
 
 [dependencies.cubek-test-utils]
-version = "=0.3.0-pre.2"
+version = "=0.3.0-pre.4"
 optional = true
 default-features = false
 
@@ -89,10 +89,8 @@ default-features = false
 
 [dependencies.num-traits]
 version = "0.2.19"
-
-[dependencies.pretty_assertions]
-version = "1.4"
-optional = true
+features = ["libm"]
+default-features = false
 
 [dependencies.serde]
 version = "1.0.204"
@@ -107,15 +105,16 @@ version = "2"
 default-features = false
 
 [dev-dependencies.cubecl]
-version = "=0.11.0-pre.2"
+version = "=0.11.0-pre.4"
 features = ["test-runtime"]
 default-features = false
 
 [dev-dependencies.cubecl-common]
-version = "=0.11.0-pre.2"
+version = "=0.11.0-pre.4"
 default-features = false
 
 [dev-dependencies.cubek-test-utils]
-version = "=0.3.0-pre.2"
+version = "=0.3.0-pre.4"
+default-features = false
 
 [workspace]
