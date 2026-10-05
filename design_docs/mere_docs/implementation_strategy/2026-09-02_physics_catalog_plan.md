@@ -801,7 +801,16 @@ pull reading −0.33 with 510 overlaps):
   bounds the ticks the gate admitted beyond the 1x floor, "fast-forward is
   never slower than 1x" stands, and every frame the gate decides stays
   checked (against letting the budget stop below the floor, or bounding
-  every frame and accepting those misses).
+  every frame and accepting those misses). Built at `ac5e1440`: the fast
+  receipt green in 10 of 10 on a calm machine, and a planted 10 ms clock
+  stall failing the bound in 7 of 7; the full headed round failed only on
+  timing rows at 76 to 82% CPU while other sessions compiled. Asked whether
+  seiche-speed merges at this checkpoint, before the estimator, Mark chose
+  **"Merge at the checkpoint"**: once the full headed round is green on a
+  calm machine, the speed dial, the native entry point and the floor bound
+  merge, the viewer cone starts, and the estimator follows on its own
+  branch; until then the web budget keeps falling back to 8.3 ms, as on main
+  (against merging once, with the estimator proven on both machines).
   The face offset, diagnosed (2026-10-04, `tree-face-zoom`): the face is
   drawn right and the body wrong, on both pages. Pictograph's gnode style
   scales each body about its centre (the CSS default Livery follows since
