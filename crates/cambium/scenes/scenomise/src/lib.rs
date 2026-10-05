@@ -34,6 +34,7 @@
 //! the item, rather than shipping source truth for a solver to re-derive.
 
 mod families;
+pub mod projection;
 pub mod registry;
 mod relax;
 mod solve;
