@@ -1,4 +1,4 @@
-# Batch 31 — vault lock plan (new plan)
+# Batch 33 — vault lock plan (new plan)
 
 | doc | disposition | status accurate | claims | holds | stale | unverifiable |
 |---|---|---:|---:|---:|---:|---:|
