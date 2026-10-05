@@ -2749,3 +2749,41 @@ binning are the useful patterns.
   receipts); the law receipts were not rerun, the budget being inert at 1x.
   Gates: seiche 128/128 (122 without actor, 128 + 3 with gpu), pictograph 298,
   graphshell `web` 242, mere and graphshell checked clean.
+- 2026-10-05 (seiche's speed, "Only ticks past the floor" carried out, the
+  checkpoint before the estimator, branch `seiche-speed` `e0b7d5c7`). Main
+  `9680306d` merged (`bd63aa72`): the plan the only file both sides changed,
+  weave's result identical to `git merge-file`'s, no conflict. Main's
+  scenomise gained a scenograph dependency, so the gitignored web lock took
+  that one edge (`cargo metadata --offline`, nothing else changed; `3cce8fc5`
+  to `b5dd3025`). Seiche's step report gains `admitted`, the ticks the
+  budget's gate admitted past the 1x floor, and `admitted_until`, when the
+  last of them ended; the floor's own ticks still run whatever the budget, so
+  fast-forward is never slower than 1x. The tree page's every-window bound
+  reads `admitted_until` against each frame's budget in frames where the gate
+  admitted ticks (`pace-gated-frames`), counts floor-only frames past the
+  budget apart (`pace-floor-over-frames`), and the last window's figure reads
+  the same way. A seiche test holds the split: seven admitted 1 ms ticks
+  ending at the 8 ms budget, a 60 ms floor admitting none, and a planted 5 ms
+  tick the gate admits ending 1 ms past. The positive control is a stall
+  planted in the budget's clock (`physics_plant_stall_ms`, 10 ms every 97th
+  reading by default), and `p6_tree_speed_fast_planted` asserts the bound sees
+  it. On bundle `eec720d1` the fast receipt was green in 10 of 10 consecutive
+  runs (no other lane's rustc, the CPU at 7 to 45%), and in 24 of 25 valid
+  runs on the bundle, the one miss a frame whose admitted ticks ended 567 us
+  past its budget at 34% CPU, a stall the 200 us margin does not cover; the
+  planted control failed the bound in all seven of its runs (8 to 12 frames
+  past the grain, the worst 7.7 to 9.7 ms over). Some runs read an early
+  budget of 3,030 us, the inferred 6.06 ms period before the outlying
+  intervals arrive, and stayed inside it. Sixteen runs never started: the
+  harness's port was still held when a run began, where it was traced by a
+  killed sink's listener lingering under pid 0; the harness now waits for the
+  port and falls back to a nearby free one. Gates at the head: seiche 129/129
+  (123 without actor, 129 + 3 with gpu), pictograph 298, graphshell `web` 242,
+  mere and graphshell checked clean. The full headed round, run straight
+  through, met 76 to 82% CPU and up to three other lanes' rustc partway, and
+  its load-sensitive receipts missed (the fast receipt at 0.47x with one
+  admitted frame 167 us past, its 50x control at 12.2x, the Speed select's Max
+  step 967 us past, Density's control at rank 0.01 against 0, the planted
+  control timing out); the law receipts, slow, the main page's Speed select
+  and the 2,000-node settle were green. It is rerun with a calm wait before
+  each scenario, recorded when it lands.
