@@ -1,0 +1,486 @@
+// Copyright 2026 Mark Alan Boykin
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// SPDX-License-Identifier: MPL-2.0
+
+//! The resident's account of itself and its owner-only stop, on the
+//! application door (djinn test harness plan, rulings 7 and 9).
+//!
+//! `resident-status-v1` is read-only: how this start unlocked, what protects
+//! the vault, the lock state (Unlocked until the vault lock exists), the
+//! endpoints it serves, the ticket it listens on, and whether it is ready.
+//! `resident-control-v1` takes one intent, stop, and the resident leaves the
+//! way Ctrl-C makes it leave. They are separate routes so that granting the
+//! status to an application never grants it the stop. Both are granted to
+//! the `djinn` label alone, as the device directory is.
+
+use std::future::Future;
+use std::sync::{Arc, RwLock};
+use std::time::Duration;
+
+use chirograph::{
+    BoundsRelationship, CachePolicy, CardValueV1, CarrierRequestBody, CarrierResponseBody,
+    ContentHash, EndpointDescriptor, IntentInvocation, IntentResult, PortableCardV1,
+    PresentationBinding, PresentationCapability, PresentationCodec, PresentationKey,
+    PresentationManifest, PresentationOffer, PresentationSemantics, ProjectionOffer,
+    ProjectionRequest, ProjectionSession, ProjectionSnapshot, ProtocolVersion, ResourceRequest,
+    ResourceResponse, SemanticRole,
+};
+use graphshell::identity::{VaultLockView, VaultProtectionView};
+use graphshell::native::app_admission::{AppId, AppRouteGrants};
+use graphshell::native::app_client::{AppBrokerClient, AppClientError};
+use graphshell::native::endpoint_catalog::{
+    ResidentEndpointCatalog, ResidentEndpointCatalogError, ResidentEndpointRoute,
+};
+use graphshell_endpoint::{IntentSink, PresentationSource, ProjectionCatalog, ProjectionSource};
+use sceno::{
+    Arrangement, Footprint, InstanceId, ProjectedItem, Representation, Scene, Score, Size2,
+    SourceRef, Transform2,
+};
+use scenotime::{Revision, SceneEpoch, SceneSnapshot};
+use serde::{Deserialize, Serialize};
+use tokio::sync::Notify;
+
+use crate::resident_devices::DEVICE_DIRECTORY_APP;
+
+pub const RESIDENT_STATUS_ROUTE: &str = "resident-status-v1";
+pub const RESIDENT_CONTROL_ROUTE: &str = "resident-control-v1";
+/// The one caller both routes are granted to: djinn's own CLI.
+pub const RESIDENT_APP: &str = DEVICE_DIRECTORY_APP;
+pub const STATUS_SCHEMA: &str = "djinn.resident-status/v1";
+pub const STOP_INTENT: &str = "djinn.resident/stop-v1";
+const STATUS_SESSION: &str = "djinn.resident-status/v1";
+const CONTROL_SESSION: &str = "djinn.resident-control/v1";
+
+/// How this start opened the vault.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum StartupUnlockV1 {
+    AutoOs,
+    Passphrase,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ProtectionV1 {
+    OsProtected,
+    Passphrase,
+    Ephemeral,
+}
+
+impl From<VaultProtectionView> for ProtectionV1 {
+    fn from(view: VaultProtectionView) -> Self {
+        match view {
+            VaultProtectionView::OsProtected => Self::OsProtected,
+            VaultProtectionView::Passphrase => Self::Passphrase,
+            VaultProtectionView::Ephemeral => Self::Ephemeral,
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum LockStateV1 {
+    Unlocked,
+    Locked,
+}
+
+impl From<VaultLockView> for LockStateV1 {
+    fn from(view: VaultLockView) -> Self {
+        match view {
+            VaultLockView::Unlocked => Self::Unlocked,
+            VaultLockView::Locked => Self::Locked,
+        }
+    }
+}
+
+/// Which listener holds the agent endpoint.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum AgentListenerV1 {
+    Standard,
+    Receipt,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ResidentEndpointsV1 {
+    pub agent: String,
+    pub agent_listener: AgentListenerV1,
+    pub browser: String,
+    pub app: String,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct SyncStatusV1 {
+    pub node_id: String,
+    pub ticket: String,
+}
+
+/// The resident, as it reports itself.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ResidentStatusV1 {
+    pub schema: String,
+    pub pid: u32,
+    pub started_ms: u64,
+    /// Launched by the installer with `--installed`.
+    pub installed: bool,
+    /// Every lane open and every door served.
+    pub ready: bool,
+    pub startup_unlock: StartupUnlockV1,
+    pub protection: ProtectionV1,
+    pub lock: LockStateV1,
+    pub endpoints: ResidentEndpointsV1,
+    /// Absent when personal sync is off.
+    pub sync: Option<SyncStatusV1>,
+}
+
+/// The status the resident keeps current and the route reads.
+#[derive(Clone)]
+pub struct ResidentStatusSource(Arc<RwLock<ResidentStatusV1>>);
+
+impl ResidentStatusSource {
+    pub fn new(status: ResidentStatusV1) -> Self {
+        Self(Arc::new(RwLock::new(status)))
+    }
+
+    pub fn read(&self) -> ResidentStatusV1 {
+        self.0.read().expect("status is never poisoned").clone()
+    }
+
+    pub fn update(&self, change: impl FnOnce(&mut ResidentStatusV1)) {
+        change(&mut self.0.write().expect("status is never poisoned"));
+    }
+}
+
+/// The stop the control route raises and the run loop waits on.
+#[derive(Clone, Default)]
+pub struct StopSignal(Arc<Notify>);
+
+impl StopSignal {
+    /// `notify_one` keeps a permit, so a stop before the loop waits is kept.
+    pub fn raise(&self) {
+        self.0.notify_one();
+    }
+
+    pub fn raised(&self) -> impl Future<Output = ()> + '_ {
+        self.0.notified()
+    }
+}
+
+/// The default endpoints a start would take, which only the installed
+/// resident may hold (harness plan ruling 8). Empty when `installed`.
+pub fn default_endpoints_taken(
+    installed: bool,
+    standard_agent: bool,
+    (browser, default_browser): (&str, &str),
+    (app, default_app): (&str, &str),
+) -> Vec<&'static str> {
+    if installed {
+        return Vec::new();
+    }
+    let same = |a: &str, b: &str| {
+        if cfg!(windows) {
+            a.eq_ignore_ascii_case(b)
+        } else {
+            a == b
+        }
+    };
+    let mut taken = Vec::new();
+    if standard_agent {
+        taken.push("the standard SSH agent endpoint");
+    }
+    if same(browser, default_browser) {
+        taken.push("the default browser endpoint");
+    }
+    if same(app, default_app) {
+        taken.push("the default app endpoint");
+    }
+    taken
+}
+
+/// Grant both routes to their one caller.
+pub fn grant(grants: &AppRouteGrants, route: ResidentEndpointRoute) {
+    grants.grant(AppId::new(RESIDENT_APP), route);
+}
+
+fn route(id: &str) -> ResidentEndpointRoute {
+    ResidentEndpointRoute::new(id, Duration::from_millis(50)).expect("resident route is valid")
+}
+
+fn request(session: &str) -> ProjectionRequest {
+    ProjectionRequest {
+        version: ProtocolVersion::V1,
+        session: ProjectionSession(session.into()),
+        score: Score::new(Arrangement::Spiral(Default::default())),
+    }
+}
+
+/// One card whose media is a typed JSON resource, as the device directory
+/// serves its own.
+fn card_snapshot(session: &str, label: &str, card_bytes: &[u8]) -> ProjectionSnapshot {
+    let mut scene = Scene::new();
+    let source = scene.intern_source(SourceRef::new(session, "status"));
+    scene.items.push(ProjectedItem {
+        source,
+        space: Scene::WORLD,
+        transform: Transform2::IDENTITY,
+        footprint: Footprint::Rect {
+            size: Size2::new(1.0, 1.0),
+        },
+        representation: Representation::Card,
+        layer: 0,
+        visible: false,
+        hit: None,
+        channels: Vec::new(),
+    });
+    let key = PresentationKey(session.into());
+    let mut presentation = PresentationManifest::default();
+    presentation.bindings.push(PresentationBinding {
+        instance: InstanceId(0),
+        key: key.clone(),
+    });
+    presentation.offers.insert(
+        key,
+        vec![PresentationOffer {
+            codec: PresentationCodec::PortableCardV1,
+            resource: ContentHash::of(card_bytes),
+            byte_size: card_bytes.len() as u64,
+            requires: PresentationCapability::PortableCard,
+            semantics: PresentationSemantics {
+                label: label.into(),
+                role: SemanticRole::Graphic,
+                bounds: BoundsRelationship::FitWithinFootprint,
+                actions: Vec::new(),
+            },
+        }],
+    );
+    ProjectionSnapshot {
+        version: ProtocolVersion::V1,
+        session: ProjectionSession(session.into()),
+        scene: SceneSnapshot::from_dense(SceneEpoch(1), Revision(1), scene)
+            .expect("a one-item scene is dense"),
+        presentation,
+        cache_policy: CachePolicy::default(),
+    }
+}
+
+/// The status route's endpoint. A snapshot keeps its bytes, so the
+/// resources it names stay servable while the status moves.
+pub struct ResidentStatusEndpoint {
+    source: ResidentStatusSource,
+    current: Option<(Vec<u8>, Vec<u8>)>,
+}
+
+impl ResidentStatusEndpoint {
+    pub fn new(source: ResidentStatusSource) -> Self {
+        Self {
+            source,
+            current: None,
+        }
+    }
+
+    pub fn register(
+        source: ResidentStatusSource,
+        catalog: &mut ResidentEndpointCatalog,
+    ) -> Result<ResidentEndpointRoute, ResidentEndpointCatalogError> {
+        catalog.register(RESIDENT_STATUS_ROUTE, "Resident status", move |_| {
+            Ok(Self::new(source.clone()))
+        })?;
+        Ok(route(RESIDENT_STATUS_ROUTE))
+    }
+}
+
+impl ProjectionCatalog for ResidentStatusEndpoint {
+    fn describe(&self) -> EndpointDescriptor {
+        EndpointDescriptor {
+            label: "Djinn resident status".into(),
+            projections: vec![ProjectionOffer {
+                label: "Resident status".into(),
+                request: request(STATUS_SESSION),
+            }],
+        }
+    }
+}
+
+impl ProjectionSource for ResidentStatusEndpoint {
+    type Error = String;
+
+    fn snapshot(&mut self, request: ProjectionRequest) -> Result<ProjectionSnapshot, Self::Error> {
+        if request.session.0 != STATUS_SESSION {
+            return Err("resident-status snapshot names another session".into());
+        }
+        let status = self.source.read();
+        let status_bytes = serde_json::to_vec(&status).map_err(|error| error.to_string())?;
+        let value = |label: &str, value: String| CardValueV1 {
+            label: label.into(),
+            value,
+        };
+        let card = PortableCardV1 {
+            title: "Resident".into(),
+            values: vec![
+                value("ready", status.ready.to_string()),
+                value("lock", format!("{:?}", status.lock)),
+                value("unlocked by", format!("{:?}", status.startup_unlock)),
+                value("agent", status.endpoints.agent.clone()),
+            ],
+            badges: Vec::new(),
+            media: vec![ContentHash::of(&status_bytes)],
+        };
+        let card_bytes = serde_json::to_vec(&card).map_err(|error| error.to_string())?;
+        let snapshot = card_snapshot(STATUS_SESSION, "Resident status", &card_bytes);
+        self.current = Some((status_bytes, card_bytes));
+        Ok(snapshot)
+    }
+}
+
+impl PresentationSource for ResidentStatusEndpoint {
+    type Error = String;
+
+    fn resource(&mut self, request: ResourceRequest) -> Result<ResourceResponse, Self::Error> {
+        if request.session.0 != STATUS_SESSION {
+            return Err("resident-status resource names another session".into());
+        }
+        let Some((status, card)) = self.current.as_ref() else {
+            return Err("request a resident-status snapshot first".into());
+        };
+        let bytes = [card, status]
+            .into_iter()
+            .find(|bytes| ContentHash::of(bytes) == request.resource)
+            .ok_or("that resource is not in the current resident-status snapshot")?
+            .clone();
+        Ok(ResourceResponse {
+            session: request.session,
+            resource: request.resource,
+            bytes,
+        })
+    }
+}
+
+impl IntentSink for ResidentStatusEndpoint {
+    type Error = String;
+
+    fn invoke(&mut self, _: IntentInvocation) -> Result<IntentResult, Self::Error> {
+        Ok(IntentResult::Rejected {
+            reason: "the resident status is read-only; stop is on resident-control-v1".into(),
+        })
+    }
+}
+
+/// The control route's endpoint: one intent, stop.
+pub struct ResidentControlEndpoint {
+    stop: StopSignal,
+}
+
+impl ResidentControlEndpoint {
+    pub fn new(stop: StopSignal) -> Self {
+        Self { stop }
+    }
+
+    pub fn register(
+        stop: StopSignal,
+        catalog: &mut ResidentEndpointCatalog,
+    ) -> Result<ResidentEndpointRoute, ResidentEndpointCatalogError> {
+        catalog.register(RESIDENT_CONTROL_ROUTE, "Resident control", move |_| {
+            Ok(Self::new(stop.clone()))
+        })?;
+        Ok(route(RESIDENT_CONTROL_ROUTE))
+    }
+}
+
+impl ProjectionCatalog for ResidentControlEndpoint {
+    fn describe(&self) -> EndpointDescriptor {
+        EndpointDescriptor {
+            label: "Djinn resident control".into(),
+            projections: vec![ProjectionOffer {
+                label: "Resident control".into(),
+                request: request(CONTROL_SESSION),
+            }],
+        }
+    }
+}
+
+impl ProjectionSource for ResidentControlEndpoint {
+    type Error = String;
+
+    fn snapshot(&mut self, request: ProjectionRequest) -> Result<ProjectionSnapshot, Self::Error> {
+        if request.session.0 != CONTROL_SESSION {
+            return Err("resident-control snapshot names another session".into());
+        }
+        Ok(card_snapshot(CONTROL_SESSION, "Resident control", b"{}"))
+    }
+}
+
+impl PresentationSource for ResidentControlEndpoint {
+    type Error = String;
+
+    fn resource(&mut self, _: ResourceRequest) -> Result<ResourceResponse, Self::Error> {
+        Err("resident control serves no resources".into())
+    }
+}
+
+impl IntentSink for ResidentControlEndpoint {
+    type Error = String;
+
+    fn invoke(&mut self, intent: IntentInvocation) -> Result<IntentResult, Self::Error> {
+        if intent.session.0 != CONTROL_SESSION {
+            return Err("resident-control intent names another session".into());
+        }
+        if intent.intent != STOP_INTENT {
+            return Ok(IntentResult::Rejected {
+                reason: format!("resident control takes {STOP_INTENT} only"),
+            });
+        }
+        self.stop.raise();
+        Ok(IntentResult::Accepted)
+    }
+}
+
+/// Read the status through an open `resident-status-v1` route.
+pub async fn read_status(client: &mut AppBrokerClient) -> Result<ResidentStatusV1, AppClientError> {
+    client.open_session().await?;
+    let snapshot = client.snapshot(request(STATUS_SESSION)).await?;
+    let offer = snapshot
+        .presentation
+        .offers
+        .values()
+        .flatten()
+        .next()
+        .ok_or_else(|| AppClientError::Refused("the status snapshot has no card".into()))?;
+    let card: PortableCardV1 = serde_json::from_slice(
+        &client
+            .resource(snapshot.session.clone(), offer.resource)
+            .await?,
+    )?;
+    let resource = *card
+        .media
+        .first()
+        .ok_or_else(|| AppClientError::Refused("the status card has no typed resource".into()))?;
+    Ok(serde_json::from_slice(
+        &client.resource(snapshot.session, resource).await?,
+    )?)
+}
+
+/// Ask the resident to stop through an open `resident-control-v1` route.
+pub async fn request_stop(client: &mut AppBrokerClient) -> Result<(), AppClientError> {
+    client.open_session().await?;
+    let body = client
+        .request_body(CarrierRequestBody::Intent(IntentInvocation {
+            session: ProjectionSession(CONTROL_SESSION.into()),
+            target: InstanceId(0),
+            observed_epoch: SceneEpoch(1),
+            observed_revision: Revision(1),
+            intent: STOP_INTENT.into(),
+            payload: Vec::new(),
+        }))
+        .await?;
+    match body {
+        CarrierResponseBody::Intent(IntentResult::Accepted) => Ok(()),
+        CarrierResponseBody::Intent(other) => Err(AppClientError::Refused(format!(
+            "stop was not accepted: {other:?}"
+        ))),
+        _ => Err(AppClientError::Refused(
+            "the resident answered stop with something else".into(),
+        )),
+    }
+}
