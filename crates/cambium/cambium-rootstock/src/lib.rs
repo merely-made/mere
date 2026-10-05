@@ -44,9 +44,10 @@ mod owned_layout;
 pub use owned_layout::{OwnedLayout, ScrollAlign, ScrollTarget};
 pub mod producer;
 pub use producer::{
-    ProducedTexture, ProducerContext, ProducerError, ProducerFrameInfo, ProducerFrameStats,
-    ProducerNode, ProducerRegistrationError, ProducerRegistry, ProducerRole, ProducerSemantics,
-    ResolvedAppearance, SourceAlpha, SourceEncoding, TextureProducer,
+    ProducedAction, ProducedTexture, ProducerAction, ProducerContext, ProducerError,
+    ProducerFrameInfo, ProducerFrameStats, ProducerNode, ProducerRegistrationError,
+    ProducerRegistry, ProducerRole, ProducerSemantics, ResolvedAppearance, SourceAlpha,
+    SourceEncoding, TextureProducer,
 };
 
 /// The host's clock.
@@ -219,11 +220,39 @@ pub enum A11yAction {
     SetValue(f64),
 }
 
-/// One drained screen-reader request: which action, on which DOM node.
-#[derive(Clone, Copy, Debug, PartialEq)]
+/// One drained screen-reader request: which action, on what.
+#[derive(Clone, Debug, PartialEq)]
 pub struct A11yRequest {
     pub action: A11yAction,
-    pub node: NodeId,
+    pub target: A11yTarget,
+}
+
+/// What a reader's request lands on.
+#[derive(Clone, Debug, PartialEq)]
+pub enum A11yTarget {
+    /// A DOM node of the application's tree.
+    Node(NodeId),
+    /// One action of a node a texture producer draws, as the producer's own
+    /// button for it presents it ([`ProducerNode::actions`]).
+    Produced(ProducedAction),
+}
+
+impl A11yRequest {
+    /// A request on a DOM node.
+    pub fn node(action: A11yAction, node: NodeId) -> Self {
+        Self {
+            action,
+            target: A11yTarget::Node(node),
+        }
+    }
+
+    /// A request on a drawn node's action button.
+    pub fn produced(action: A11yAction, produced: ProducedAction) -> Self {
+        Self {
+            action,
+            target: A11yTarget::Produced(produced),
+        }
+    }
 }
 
 /// How a host publishes its accessible tree and collects what a reader asked

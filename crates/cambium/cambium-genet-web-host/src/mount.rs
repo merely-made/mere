@@ -431,9 +431,9 @@ where
         "click",
         web_sys::MouseEvent,
         move |e: web_sys::MouseEvent| {
-            if let Some(node) = m.target_of(e.target()) {
+            if let Some(target) = m.request_target_of(e.target()) {
                 let action = A11yAction::Click;
-                reader_act(&h, A11yRequest { action, node });
+                reader_act(&h, A11yRequest { action, target });
             }
         }
     );
@@ -448,9 +448,9 @@ where
             if m.moving.get() {
                 return;
             }
-            if let Some(node) = m.target_of(e.target()) {
+            if let Some(target) = m.request_target_of(e.target()) {
                 let action = A11yAction::Focus;
-                reader_act(&h, A11yRequest { action, node });
+                reader_act(&h, A11yRequest { action, target });
             }
         }
     );

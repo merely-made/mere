@@ -463,3 +463,129 @@ These are *Reading, not ruled*. Each returns to Mark at the named track's checkp
   - **F47, F49.** As built: instant jump-back, the pinned-drag behaviour per surface, both axes encoded, the scene shape under F44's version; group overrides by site until G2 merges.
   - **Gates** on `edf9690d`, offline and locked, target `C:/t/cargo-targets/mere/grammar-g7`, logs `Code/testing/mere/grammar-g7/gate-g7d-*.log` with a summary in `gates-g7d.log`: seiche 112 (default), 108 (no default features) and 112 (`gpu`); sceno, scenomise and scenotime 29, 79 and 36, none ignored; pictograph `canvas` 287, the 13 ignored being main's Density release receipts and probes; pictograph `gpu` device receipts 3; `cargo check` of `mere` (`graph,canvas-gpu`), of graphshell (`canvas-gpu`) and, new to the gates, of graphshell's `personal-sync` library and tests; graphshell `web` 234 (one diagnostic ignored), single-threaded; clippy on seiche and pictograph with no warning in this lane's files (`edf9690d` removes the one there, a no-op `as_deref`). The standalone wasm build passes offline and locked into an empty target (`wasm-build-fresh-2.log`): bundle SHA256 `3cf7b687…`, web lock `a915fa23…` unchanged, and the same warning sites as a build of main `63345c17` (`wasm-build-control.log`, bundle `6edd10b7…`).
   - **Headed** (port 8827, this lane's Chrome profile and runner copies). On the fresh bundle `3cf7b687…` with the machine otherwise idle (`receipts-r3.log`), 27 of 27: the eleven law receipts `p4_tree_physics_*`, Density's two from main, the G7 receipts (`p4_tree_arrangement_roles.scn`, `practice_encoded_axes.scn`, and this round's `p4_tree_role_controls.scn`, `p4_tree_item_role.scn` and `role_controls.scn`), and the drag, controls, profiles, add, keys, elapsed (`nodes=128`), saved edit and reopen (`app=local`) and practice workspace receipts. The tree page draws its controls, so its captures show the Role select at Anchored with the fixture back on its Spiral slots, Seeded again with the items spread, and the detail panel's Item role at Pinned. The old page's captures are canvas readbacks without its DOM, so that receipt is its select and status assertions, the drawn status reading "Item role set to pinned". An earlier pass on the incremental bundle `61a05f22…`, run while the native gates loaded the machine (`receipts-r2.log`), failed Density's control once: a settled rank of 0.010 against its bar of `<= 0`. Run alternately on this lane's fresh bundle and on a build of main `63345c17` with the machine idle (`density-ab.log`), each read −0.029 three times of three, the figure Density's lane recorded, so G7 leaves the control where main has it; the bar's margin is 0.03. *Reading, not ruled:* the load moved that one run.
+- 2026-10-05 (G9, permitted actions): built on branch `grammar-g9` from main `4bc901d2`, unmerged, at `b9c849f5`. Five choices go back to Mark as forks. Four are built at the recommendation, each in one place. The surface that lists the actions is held, as the brief asked, because four surfaces could list them.
+  - **Inventory** (main `4bc901d2`). Chirograph's `AdvertisedAction` (`crates/chirograph/src/lib.rs:121-152`) carries an intent, label, explanation, payload schema, an optional input form and an `IntentEffect` (`Curation`, `DomainTruth` or `ExternalEffect`, `:112-119`). Endpoints advertise them per presentation (`PresentationSemantics.actions`, `:346-352`): Graphshell's session item, live, identity and transfer endpoints, canary and address handlers, and djinn's resident endpoints. Graphshell-client's renderer-neutral `AccessibilityTree` lists them per item (`crates/graphshell/graphshell-client/src/lib.rs:120-133`, `:378-410`), `remote::advertised_actions` deduplicates them by intent (`remote.rs:168-188`), and three surfaces draw them: the tree page's Remote actions group (`ports/graphshell/src/web_tree/remote.rs:448-469`), the old page's remote actions (`web_remote.rs:328`) and the snapshot view (`view.rs:465`). Nothing on the canvas or the board used them. The canvas allowed every drag and every pin: the press (`canvas/input.rs:189`), `pin_focused` and `nudge_focused` (`:319-346`, which no host calls), and the Item role select (`canvas/roles.rs:105`). The board refused a pinned card's drag by a role test (`physics_board.rs:385`). The practice page refused every drag while motion was off, by `physics_enabled` (`ports/graphshell/src/web_practice.rs:1215`). The binding is `PhysicsChoice` (`physics_board.rs:53`), the role table (`seiche::roles`; the canvas's `ArrangementRoles`, `canvas/roles.rs:41`), and `SavedSceneV2`'s `arrangement_pull` and `arrangement_roles` (`ports/graphshell/src/product.rs:225-271`).
+  - **The vocabulary** (`crates/canvas/pictograph/src/canvas/actions.rs`): the intents `mere.arrangement.drag` and `mere.arrangement.pin` (`:36`, `:41`), labelled Drag and Pin, with schemas `<intent>/v1`, the Curation effect and no input form. `ArrangementAction` names the two (`:47`), and `advertised_in` (`:90`) is the one test a gesture makes. `PermittedActions` (`:100`) is what a binding withdraws, nothing by default.
+  - **The canvas** advertises drag for every item and pin (`Canvas::advertised_actions`, `actions.rs:175`). Drag's explanation follows the role: seeded "nothing returns it", anchored "it returns to its arrangement position when you let go", pinned "Drag this item's pin". The gestures read the advertisement: a press becomes a drag only on an item that advertises drag, and otherwise stays a click (`input.rs:89`). `pin_focused` asks pin (`:330`), and `nudge_focused`, the keyboard's drag, asks drag (`:350`). `set_member_role(.., Pinned)` asks pin (`roles.rs:114`). The recipe default and group roles are not per item and do not ask.
+  - **The board** leaves drag out for a pinned card, so F47's refusal is now what it advertises. Its drag names the encoded axes that return on release, for example "when you let go, x and y return to their values" (`PhysicsBoard::advertised_actions`, `physics_board.rs:203`). `drag_start` and `set_item_role(.., Pinned)` read it (`:451`, `:186`). The practice page's pointer no longer reads `physics_enabled`: with motion off, the board withdraws drag (`PracticeHost::sync_permitted`, `web_practice.rs:305`).
+  - **Withdrawal under way.** Withdrawing drag during a drag ends the drag at once, as a release by role. The canvas does this in `set_permitted_actions` (`actions.rs:210`). The board does it in `end_withdrawn_drag` (`physics_board.rs:236`), after a role change, a sync or a withdrawal. Both pages' item-role apply now reports a refused pin.
+  - **Dependency.** Pictograph's `canvas` feature depends on chirograph. The root lock gains one line (pictograph → chirograph), and the web lock gains the same line: `3cce8fc5…` becomes `77f16c24…` (`Code/testing/mere/grammar-g9/web-lock.diff`).
+  - **Tests** (`canvas/tests/permitted_actions.rs`, five):
+    - Drag and pin advertise as Curation on both surfaces, and a pinned card advertises pin alone.
+    - Each canvas role's drag does what its explanation says: a seeded drop becomes the item's position; an anchored item jumps back with physics off; a pinned item's pin moves to the drop.
+    - The positive control: with drag withdrawn, a drag leaves the item exactly where it was, the press selects it as a click, and a nudge is refused. Restored, the same gesture moves it. With pin withdrawn, the explicit pin and the pinned role are refused while other roles are taken.
+    - A drag withdrawn mid-drag ends as a release on the canvas and on the board.
+    - The board's drags, including both practice-board encodings, return exactly to their values. A seeded card refuses a withdrawn drag.
+    - With the canvas's and the board's drag gates removed, three of the five fail (`gate-mutation-control.log`).
+  - **Gates** (`Code/testing/mere/grammar-g9/gates-g9a.log`): offline and locked, target `C:/t/cargo-targets/mere/grammar-g9`.
+    - chirograph: 39 tests.
+    - pictograph `canvas`: 297, 13 ignored (main's Density release receipts). Rerun after rustfmt on the committed tree, 297 again (`gate-g9b-pictograph-canvas.log`).
+    - pictograph `gpu` device receipts: 3.
+    - `cargo check` of `mere` (`graph,canvas-gpu`) and of graphshell (`canvas-gpu`) both pass.
+    - graphshell `web`: 238 passed, 4 ignored, single-threaded.
+    - Clippy on pictograph: no warning in this lane's code.
+    - The fresh wasm build passes offline and locked into an empty target with wasm-bindgen 0.2.129 (`wasm-build-fresh.log`). Bundle SHA256 `57552fd5…`; web lock `77f16c24…`, unchanged by the build.
+  - **Headed** (port 8861, this lane's Chrome profile and runner copies; on bundle `57552fd5…`, `receipts-r1.log`): 8 of 8 pass, each with no page error and no gate failure. They are `p4_tree_arrangement_roles`, `p4_tree_role_controls`, `p4_tree_item_role` (`app=local`), `role_controls`, `practice_encoded_axes`, `practice_workspace`, `p4_tree_physics_drag` and `physics_drag`. The page-error gate's positive control, `p4_tree_role_controls` with `plant_page_error=throw`, fails with one gate failure, as it should.
+  - **Findings.**
+    - The board's at-rest return (F45) never starts when the settle budget ends while cards still move. At the board's anchored stiffness (0.5), the budget ends at frame 359 with kinetic energy 94 to 109, and a dragged anchored card stops 58 units from its position. At the canvas's stiffness (12) it comes exactly home after 135 frames when it is the only card dragged. With another card moving, it stops 2.3 short. `board-return-probe.log` has the figures. This is G7's path, not changed here. Until it is fixed, the board's "returns to its arrangement position" is true only approximately.
+    - No headed receipt drags a practice-board card: the scenario verbs press only the canvas (`web_scenario.rs:315-347`). The practice page's change is covered natively by the board's tests, and headed only by `practice_workspace`'s motion toggle, under the page-error gate.
+    - Withdrawals are not saved with a scene. The practice page's motion-off is the only withdrawal a host makes.
+  - **Returned to Mark:** the surface that lists the actions (held); the action names; what pin covers, and whether the role select becomes an action; how a drag withdrawn mid-drag behaves; and pictograph's chirograph dependency.
+  - **Shared files touched:**
+    - `Cargo.lock`, one line. burn-pre4-repin also changes the lock.
+    - `crates/canvas/pictograph/Cargo.toml`, also changed by grammar-g2.
+    - `canvas.rs`, `physics_board.rs`, `canvas/tests.rs` and `ports/graphshell/src/web_product.rs`, also changed by seiche-speed and grammar-g2.
+    - `canvas/input.rs`, `canvas/roles.rs`, `ports/graphshell/src/web_practice.rs` and `web_tree/product.rs`.
+    - The ignored web lock.
+    - A plain three-way text merge of each overlapping file with each lane has no conflict hunk (`trial-merges.log`).
+- 2026-10-05 (G9, second round: F60 to F63): main `9680306d` merged into `grammar-g9` (`85525373`). The plan and the root lock were the only files both sides changed, and each matches a plain `git merge-file`, line endings aside (`Code/testing/mere/grammar-g9/merge-9680306d-check.log`). F63 is built at `d8441788`, and F61's route and F62 were assessed. Both go back to Mark as forks before anything is built past them.
+  - **F63.** `AtRest::budget_ended` (`canvas/at_rest.rs`) notes the frame a settle budget runs out. On it, the board's `tick` (`physics_board.rs`) and the canvas's `note_settle` (`canvas/roles.rs`) start the home step whether or not the speed floor was met. Only the speed floor still counts as a settle, so Settled (F30) and the settle count are unchanged.
+    - The probe is the receipt (`canvas/tests/home_at_budget_end.rs`, `f63-after.log`). On the board, the dragged anchored card ends exactly home at its own stiffness and at the canvas's, after 380 frames: the 360-frame budget and the 20-frame glide. On the canvas, an anchored item dragged while another moves ends exactly home: by the speed floor after 309 frames while playing, and after 48 frames when given a finite budget of 30.
+    - The positive control, with the new step removed from both surfaces, brings back the misses: 58.191 and 2.326 on the board, and 16.893 on the canvas's finite budget (`f63-control-step-removed.log`).
+    - *Correction to F63's record:* the 2.3-unit miss and the 135-frame return were the board's at the canvas's stiffness, not the canvas's. The canvas cannot reach a budget end with roles in play: placing an arrangement pauses (`strategy.rs:35-39`), and play runs an unbounded budget (`input.rs`, `set_paused`). Its finite-budget case is reached only in the test, by giving the playing canvas a finite budget directly.
+  - **The web lock** gains a second line on the merged tree: main's `c79bb8c2` makes scenomise depend on scenograph. `77f16c24…` becomes `2e099cf6…`, resolved offline (`web-lock-r2.diff`).
+  - **Gates on the merged tree** (`gates-g9c.log`):
+    - chirograph: 39.
+    - pictograph `canvas`: 299, 13 ignored.
+    - pictograph `gpu`: 3.
+    - The `mere` and graphshell `canvas-gpu` checks: both pass.
+    - graphshell `web`: 238, 4 ignored, single-threaded.
+    - Clippy on pictograph: no warning in this lane's code.
+    - The fresh wasm build into an empty target (`wasm-build-fresh-r2.log`): bundle `bd1dbc16…`; the web lock is unchanged by the build.
+  - **Headed** (bundle `bd1dbc16…`, one port and Chrome profile per receipt, ports 8870 to 8878, `receipts-r3.log`): 8 of 8 pass with no page error and no gate failure: the G7 role and pin receipts, `practice_encoded_axes`, `practice_workspace`, and the drag receipts on both pages. The page-error control fails by the receipt gate, as it should.
+    - A harness finding. Round two ran every receipt on one port (8863). After its first receipt, the port held listening sockets owned by no process, and the runner refused the rest (`receipts-r2.log`). The same orphans appeared on 8877 and 8878 after round three and cleared within minutes. A port per run avoids it.
+    - Round two's batch also counted that refusal as the control failing. Round three's control counts only a failure by the receipt gate.
+  - **Assessed, back to Mark** (evidence in the lane's report):
+    - F61's route: how the viewer's actions join graphshell-client's tree and how a local one is told from an endpoint's, by where it came from or by its intent name. Also which items list them: the fixture route mounts no local projection.
+    - F62: how actions are expressed. ARIA 1.2 has no action list, and the pinned AccessKit adapters (`accesskit_windows` 0.32.1, `accesskit_macos` 0.26.3, `accesskit_atspi_common` 0.18.1) never read AccessKit's `custom_actions`; a reader can only Click, Focus, SetValue, scroll or select text.
+    - F62: which of 2,000 nodes are described. The web host re-syncs accessibility every drawn frame (`cambium-genet-web-host/src/mount.rs:232-238`).
+    - F62: rootstock's API. A drawn child has no route back today: `A11yRequest` targets DOM nodes only.
+    - F62: where the graph's description is computed. Only the tree page's wasm-only producer draws pictograph's canvas (`web_tree.rs:167`); no native host does.
+    - F62: what an invoked Drag does without a pointer.
+    - The web instrument: CDP's `Accessibility.getFullAXTree` would change the runner's "no DevTools" rule (`run-scenario.ps1:9`).
+- 2026-10-05 (G9, third round: F64 to F68 carried out): main `813b738c` merged into `grammar-g9` (`60176e38`). Only the plan changed on both sides, and weave's merge matches a plain `git merge-file`. Main has since gained `cec0b3a4` (burn-pre4's lock swap), which is not merged here. Built at `9fd45b01`.
+  - **rootstock (F66)** (`crates/cambium/cambium-rootstock`):
+    - `ProducerNode` gains a stable `key` and `actions: Vec<ProducerAction { id, label, description }>`.
+    - `TextureProducer::act(key, id) -> bool` defaults to false. `ProducerRegistry::act` routes a `ProducedAction { slot, key, id }` to the producer.
+    - `A11yRequest` targets an `A11yTarget`, either a DOM node or a produced action. `apply_a11y_requests` puts the app's focus on the produced node's slot, so keys reach the producer's view, and hands a click to `act`.
+    - No chirograph dependency.
+  - **Both lowerings (F65)**:
+    - **AccessKit** (`cambium-winit-a11y`): each drawn node's actions are Button children taking Click and Focus, named by label, with the description set. `project_tree_with_actions` returns the button-to-action map that `map_request` resolves through. Ids are FNV hashes of (slot, key, action), stable however the producer orders its nodes.
+    - **ARIA** (`cambium-genet-web-host`'s mirror): a drawn node with actions is a group named by `aria-label`, its actions focusable `role=button` children with `aria-description`. A click on one resolves through `MirrorHandle::request_target_of` to the produced action.
+    - The native harness gains `a11y_produced_actions` and `a11y_produced_request`.
+  - **pictograph (F67)** (`canvas/reader.rs`):
+    - `Canvas::describe_items(cap)` lists the items on screen in graph order, at most 200 (`DESCRIBED_ITEMS`). The focused item is always among them, taking the last place when the cap would leave it out. Each carries its key, member, caption label, drawn rect and advertised actions, and the slot's name is "N of M shown".
+    - `pin_member` pins an item by member.
+    - The keyboard move: `begin_key_move` (refused unless drag is advertised), `key_move_by` in screen px, and `end_key_move(drop)`, where Enter releases by role and Escape returns the item to where the move began. A withdrawal under way ends it as a release (F60). The board has the same move.
+  - **graphshell (F67)** (`ports/graphshell/src/canvas_reader.rs`, under `web`):
+    - `canvas_semantics` and `describe_canvas` map the description onto producer semantics.
+    - `canvas_act` makes Pin pin and Drag start a keyboard move; `key_move` steers it.
+    - `Plant` is the instruments' positive control: missing item, missing action, or dead action.
+    - The tree page's producer answers `semantics` and `act`, and its keys steer a move by the page's arrow step of 42 px.
+  - **graphshell-client (F64)**:
+    - `AccessibleItem.local_actions` is filled by a host-supplied `LocalActions` through `accessibility_tree_with`.
+    - `ClientState::invoke_local` and `RemoteSession::invoke_local` call the host's handler and nothing else.
+    - `CanvasLocalActions` (the local graph's items, by their `mere.graph` source) and `BoardLocalActions` (the board's cards, by instance) are the hosts' providers.
+  - **Dependencies:** graphshell gains cambium-rootstock under `web`, and four dev-dependencies: cambium, cambium-genet-winit-host, cambium-winit-a11y and accesskit. F67 counted two. The mapping module needs rootstock's types, and the harness test needs cambium to build its view and accesskit to name the tree's types. The root lock gains those five lines on graphshell's entry; the web lock gains cambium-rootstock (`2e099cf6…` to `f9f610f8…`).
+  - **Tests** (all passing; logs in `Code/testing/mere/grammar-g9/`):
+    - `cambium-winit-a11y`: a producer's action reaches the tree as a Button and its click routes back to `act`.
+    - The mirror: a group with focusable buttons carrying their action, and ids that hold across reordering.
+    - graphshell-client: local actions are listed and run by the host, with nothing written for the endpoint. The endpoint's own action of the same intent going on the wire is the control.
+    - pictograph `canvas/tests/reader.rs`: the description, the cap, pin by member, and the keyboard move on the canvas and the board.
+    - The native receipt (`canvas_reader/tests.rs`) reads cambium-winit-a11y's tree in the headless harness: "12 of 12 shown", every item with Drag and Pin. A Pin press pins. A Drag press focuses the slot, and arrow keys delivered through the host's key path move the item; Enter drops it and Escape returns it. Each plant fails the same check: missing item, missing action, and an action that does not route. The client's tree lists drag and pin on the mounted local graph's items, with the mere host's projection revision unchanged, and on the fixture remote's cards.
+  - **Gates** (`gates-g9d.log`):
+    - chirograph: 39.
+    - pictograph `canvas`: 304, 13 ignored.
+    - pictograph `gpu`: 3.
+    - The cambium crates' suites and graphshell-client's: 60 pass.
+    - The `mere`, graphshell `canvas-gpu` and `personal-sync` checks pass.
+    - graphshell `web`: 242, 4 ignored, single-threaded.
+    - Clippy on pictograph and the shared crates: nothing in this lane's code.
+    - The fresh wasm build passes into the lane's one wasm target, cleared first: bundle `95f45a6b…`, the same bytes as the incremental build; the web lock is unchanged by it (`wasm-build-fresh-r4.log`).
+  - **Headed** (`receipts-r4.log`, one port and Chrome profile per receipt, a port counted held only by a live process): 16 of 16 as expected.
+    - `p4_tree_canvas_reader` passes, reading the page's semantic tree: "11 of 11 shown", every item with Drag and Pin, described. A reader's Pin pins the item. A reader's Drag starts a move: two arrows give an offset of 84,0, Enter keeps it, and a second move's Escape returns it to 0,0.
+    - Its controls fail on their planted assertion with no page error: missing item on `reader-items`, missing action on `reader-buttons`, dead action on `pinned`.
+    - `p4_tree_canvas_reader_cdp` passes, Chrome's computed tree reading 11 items each with described Drag and Pin. Its control (missing action) passes the page and fails in Chrome's tree.
+    - The G7 role and pin receipts, the practice workspace, both pages' drag receipts and the keys receipt all pass.
+    - The page-error control fails by the receipt gate.
+  - **Findings.**
+    - `Canvas::with_sample_graph` labels all 12 nodes "node". A reader there hears twelve identical names, and my instrument first matched items by name and missed a planted missing item until it matched by key. The Graphshell fixture's eleven titles are distinct.
+    - The scenario lane's `reader-click` queues its click on the event loop: a click dispatched inside a lane step re-entered the host's borrow (`mount.rs:250`).
+    - The rule's exception is documented in this lane's runner (`run-scenario-r4.ps1`) and in `p4_tree_canvas_reader_cdp.scn`. The canonical `Code/testing/mere/scripts/run-graphshell-web-scenario.ps1` has no `-Cdp` and is unchanged.
+  - **Built, back to Mark:** which 200 items when more are on screen, and their reading order. Built as graph order with the focused item kept.
+- 2026-10-05 (G9, fourth round: on pre.4): main `75e13d8d` merged into `grammar-g9` (`90fcad2f`). It brings pre.4 (`cec0b3a4`), F69 and F67's corrected dependency count.
+  - **The merge.** The plan and the root lock were the only files both sides changed, and each matches a plain `git merge-file` (`Code/testing/mere/grammar-g9/merge-75e13d8d-check.log`). The merged root lock resolves `--locked` offline and differs from main's by exactly G9's six lines (`root-lock-r5.diff`). The web lock is pre.4's `f8eab000…` plus G9's two lines, graphshell's `cambium-rootstock` and pictograph's `chirograph`, resolved offline to `d3117b3a…` (`web-lock-r5.diff`).
+  - **Gates** (`gates-g9e.log`), compiled while other sessions loaded the machine, then run once a 30 s window fell under 35%. During the run the 30 s means were 35% to 73% (mean 54%), with 2 to 8 rustc or cargo processes (`cpu-r5-during-gates.log`). The counts are round three's:
+    - chirograph: 39.
+    - pictograph `canvas`: 304, 13 ignored.
+    - pictograph `gpu`: 3.
+    - The cambium crates' suites pass, and graphshell-client's 60.
+    - The `mere`, graphshell `canvas-gpu` and `personal-sync` checks pass.
+    - graphshell `web`: 242, 4 ignored, single-threaded.
+    - Clippy reports nothing in this lane's code.
+  - **Fresh wasm build** into the lane's one wasm target, emptied first (`wasm-build-fresh-r5.log`): bundle `01a0a3c9…`, the web lock unchanged by it. The getrandom cfg now comes only from the committed `ports/graphshell/web/.cargo/config.toml` (ruling 558). An earlier attempt also exported it and was stopped before it finished, since Cargo joins the two and the duplicate flag changes the bundle (`wasm-build-fresh-r5-void-duplicate-cfg.log`).
+  - **Headed** (`receipts-r5.log`; bundle `01a0a3c9…`; a port and Chrome profile per row, 8920 to 8935, with listeners counted only when a live process owns them): 16 of 16 as expected, started once a window fell under 35%. During the run the 30 s means were 38% to 57% (mean 47%), with 4 to 10 rustc or cargo processes (`cpu-r5-during-headed.log`).
+    - The reader receipt and its three controls, each failing on its planted assertion.
+    - The DevTools receipt and its control, the control failing in Chrome's tree.
+    - The G7 role and pin receipts, both practice receipts, both pages' drag receipts and the keys receipt.
+    - The page-error control, failing by the receipt gate.

@@ -18,7 +18,9 @@
 //! bodies' rms speed falling under [`SETTLE_SPEED_FLOOR`] (F46). "Settled" is
 //! the latest settle's positions, picked like any other arrangement (F30).
 
+use super::actions::{ArrangementAction, PermittedActions};
 use super::at_rest::AtRest;
+use super::reader::KeyMove;
 use super::*;
 use seiche::{Role, RoleTable};
 
@@ -51,6 +53,12 @@ pub(crate) struct ArrangementRoles {
     stop_return: Option<StopReturn>,
     /// The settle record and the at-rest return of anchored items.
     rest: AtRest,
+    /// What the binding withdraws from the items' advertisements (G9).
+    pub(crate) actions: PermittedActions,
+    /// A keyboard move under way, the pointerless drag (F67).
+    pub(crate) key_move: Option<KeyMove>,
+    /// The latest keyboard move, kept after it ends. Receipt introspection.
+    pub(crate) last_key_move: Option<KeyMove>,
 }
 
 impl Default for ArrangementRoles {
@@ -64,6 +72,9 @@ impl Default for ArrangementRoles {
             settles: 0,
             stop_return: None,
             rest: AtRest::default(),
+            actions: PermittedActions::default(),
+            key_move: None,
+            last_key_move: None,
         }
     }
 }
@@ -100,12 +111,16 @@ impl Canvas {
         self.settle_physics(SETTLE_TICKS);
     }
 
-    /// One item's role (`None` clears it), by member id. Returns whether the
-    /// member exists.
+    /// One item's role (`None` clears it), by member id. Returns whether it
+    /// was set: not for a member the graph lacks, nor a pin the item does not
+    /// advertise (G9).
     pub fn set_member_role(&mut self, member: uuid::Uuid, role: Option<Role>) -> bool {
         let Some(key) = self.graph.get_node_key_by_id(member) else {
             return false;
         };
+        if role == Some(Role::Pinned) && !self.permits(key, ArrangementAction::Pin) {
+            return false;
+        }
         match role {
             Some(role) => self.roles.table.items.insert(key, role),
             None => self.roles.table.items.remove(&key),
@@ -316,6 +331,7 @@ impl Canvas {
     /// rest replaces Settled and anchored items start home (F45). A law that
     /// never rests does neither.
     fn note_settle(&mut self) {
+        let budget_ended = self.roles.rest.budget_ended(self.physics.is_settling());
         if self.physics_paused {
             return;
         }
@@ -324,6 +340,11 @@ impl Canvas {
             return;
         }
         if !self.roles.rest.rested(self.physics.rms_speed()) || self.physics_never_rests() {
+            // A budget spent with the bodies still moving is no settle, but
+            // anchored items still go home (F63).
+            if budget_ended {
+                self.start_home();
+            }
             return;
         }
         let positions: Vec<_> = self.view.positions().collect();

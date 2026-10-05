@@ -21,7 +21,9 @@
 //! positions, save on an encoded axis, and only their slots move), ticks it
 //! each frame, and reads positions back for drawing. The score itself is
 //! never written: the board is the viewer's physics over the endpoint's
-//! truth. (Physics catalog — P3.)
+//! truth. (Physics catalog — P3.) What a person may do to a card is
+//! advertised as chirograph actions, and the drag and the pin read them
+//! ([`PhysicsBoard::advertised_actions`]; dynamics grammar plan, G9).
 //!
 //! The simulation runs behind [`seiche::Physics`], the stack's inline/actor
 //! backend, so a board ticks in the frame loop on wasm and can be
@@ -37,6 +39,7 @@ use seiche::{
 };
 
 use crate::canvas::SETTLE_TICKS;
+use crate::canvas::actions::{self, AdvertisedAction, ArrangementAction, PermittedActions};
 use crate::canvas::at_rest::AtRest;
 use crate::canvas::physics_catalog::{
     LawInputs, LawSources, PhysicsDepthSource, PhysicsKindSource, PhysicsLaw, PhysicsMassSource,
@@ -101,6 +104,11 @@ pub struct PhysicsBoard {
     rest: AtRest,
     /// Halted by the host: no settle is noted and nothing glides.
     halted: bool,
+    /// What the binding withdraws from the cards' advertisements (G9).
+    actions: PermittedActions,
+    /// A keyboard move under way (F67): where it began, and where the card is
+    /// held now.
+    key_move: Option<((f32, f32), (f32, f32))>,
     /// The host's device, when the board's repulsion is staged on it.
     #[cfg(feature = "gpu")]
     physics_device: Option<crate::canvas::PhysicsDevice>,
@@ -127,6 +135,8 @@ impl PhysicsBoard {
             dragging: None,
             rest: AtRest::default(),
             halted: false,
+            actions: PermittedActions::default(),
+            key_move: None,
             #[cfg(feature = "gpu")]
             physics_device: None,
         }
@@ -168,20 +178,77 @@ impl PhysicsBoard {
         self.roles = roles;
         self.sync_roles();
         self.settle_for_choice();
+        self.end_withdrawn_drag();
     }
 
-    /// One card's role by id (`None` clears it). Returns whether it exists.
+    /// One card's role by id (`None` clears it). Returns whether it was set:
+    /// not for an unknown card, nor a pin the card does not advertise (G9).
     pub fn set_item_role(&mut self, id: &str, role: Option<Role>) -> bool {
         let Some(&key) = self.keys.get(id) else {
             return false;
         };
+        if role == Some(Role::Pinned) && !self.permits(id, ArrangementAction::Pin) {
+            return false;
+        }
         match role {
             Some(role) => self.roles.items.insert(key, role),
             None => self.roles.items.remove(&key),
         };
         self.sync_roles();
         self.settle_for_choice();
+        self.end_withdrawn_drag();
         true
+    }
+
+    /// The actions card `id` advertises now, drag then pin (G9). A pinned
+    /// card stays in its arrangement, so it advertises no drag (F47); a drag
+    /// says which encoded axes return to their values on release (F28).
+    /// What the binding withdraws is left out. Empty for an unknown card.
+    pub fn advertised_actions(&self, id: &str) -> Vec<AdvertisedAction> {
+        let Some(role) = self.role_of(id) else {
+            return Vec::new();
+        };
+        let mut advertised = Vec::new();
+        if self.actions.allows(ArrangementAction::Drag) && role != Role::Pinned {
+            advertised
+                .push(ArrangementAction::Drag.advertise(actions::board_drag(role, self.encoded)));
+        }
+        if self.actions.allows(ArrangementAction::Pin) {
+            advertised.push(ArrangementAction::Pin.advertise(actions::BOARD_PIN));
+        }
+        advertised
+    }
+
+    /// Whether card `id` advertises `action`: what the drag and the pin ask.
+    pub fn permits(&self, id: &str, action: ArrangementAction) -> bool {
+        action.advertised_in(&self.advertised_actions(id))
+    }
+
+    /// What the binding withdraws.
+    pub fn permitted_actions(&self) -> &PermittedActions {
+        &self.actions
+    }
+
+    /// Replace what the binding withdraws. A drag under way whose card no
+    /// longer advertises drag ends at once, as a release by its role.
+    pub fn set_permitted_actions(&mut self, permitted: PermittedActions) {
+        self.actions = permitted;
+        self.end_withdrawn_drag();
+    }
+
+    /// End the drag under way if its card no longer advertises drag.
+    fn end_withdrawn_drag(&mut self) {
+        let Some(key) = self.dragging else {
+            return;
+        };
+        let held = self
+            .items
+            .iter()
+            .find(|item| self.keys.get(&item.id) == Some(&key))
+            .map(|item| item.id.clone());
+        if held.is_some_and(|id| !self.permits(&id, ArrangementAction::Drag)) {
+            self.drag_end();
+        }
     }
 
     /// The role a card plays.
@@ -276,6 +343,7 @@ impl PhysicsBoard {
             .is_some_and(|key| !live.values().any(|live_key| *live_key == key))
         {
             self.dragging = None;
+            self.key_move = None;
             self.physics.set_dragging(false);
         }
         // Every body, at its slot; `sync_nodes` leaves an existing body where
@@ -322,6 +390,8 @@ impl PhysicsBoard {
         self.sync_roles();
         self.rebuild_forces();
         self.settle_for_choice();
+        // A card whose site moved into a pinned group stops being dragged.
+        self.end_withdrawn_drag();
         // So a host that syncs and draws in one frame sees the fresh item.
         self.physics.refresh(&mut self.view);
         fresh
@@ -333,9 +403,11 @@ impl PhysicsBoard {
     /// out (see [`settle_for_choice`](Self::settle_for_choice)).
     pub fn tick(&mut self) -> bool {
         let settling = self.physics.advance_frame(&mut self.view);
+        let budget_ended = self.rest.budget_ended(self.physics.is_settling());
         if self.dragging.is_some() {
             self.rest.arm();
-        } else if !self.halted && self.rest.rested(self.physics.rms_speed()) {
+        } else if !self.halted && (self.rest.rested(self.physics.rms_speed()) || budget_ended) {
+            // At rest, or the budget spent with the cards still moving (F63).
             self.start_home();
         }
         self.rest.step(&mut self.physics);
@@ -376,13 +448,14 @@ impl PhysicsBoard {
 
     /// Begin a transient drag of an item. The body is pinned at its current
     /// simulated position so the first pointer move cannot jump it, while the
-    /// other bodies continue responding to the board's forces. A pinned card
-    /// stays in its arrangement and refuses the drag.
+    /// other bodies continue responding to the board's forces. A card that
+    /// does not advertise drag refuses it: a pinned card, which stays in its
+    /// arrangement, or one whose drag the binding withdrew (G9).
     pub fn drag_start(&mut self, id: &str) -> bool {
         let Some(&key) = self.keys.get(id) else {
             return false;
         };
-        if self.dragging.is_some() || self.role_of(id) == Some(Role::Pinned) {
+        if self.dragging.is_some() || !self.permits(id, ArrangementAction::Drag) {
             return false;
         }
         let Some(position) = self.position(id) else {
@@ -413,6 +486,7 @@ impl PhysicsBoard {
     /// its slot. An encoded axis goes back to its value at once, since the
     /// data, not the drop, says where the card is on it.
     pub fn drag_end(&mut self) -> bool {
+        self.key_move = None;
         let Some(key) = self.dragging.take() else {
             return false;
         };
@@ -431,10 +505,66 @@ impl PhysicsBoard {
         true
     }
 
+    /// Start a keyboard move of card `id`, the pointerless drag (F67): a drag
+    /// the host's arrows steer, refused as a drag is.
+    pub fn begin_key_move(&mut self, id: &str) -> bool {
+        let Some(at) = self.position(id) else {
+            return false;
+        };
+        if !self.drag_start(id) {
+            return false;
+        }
+        self.key_move = Some((at, at));
+        true
+    }
+
+    /// The card a keyboard move holds.
+    pub fn key_moving(&self) -> Option<&str> {
+        self.key_move?;
+        let key = self.dragging?;
+        self.keys
+            .iter()
+            .find(|(_, k)| **k == key)
+            .map(|(id, _)| id.as_str())
+    }
+
+    /// Nudge the held card by `(dx, dy)` in the score's units.
+    pub fn key_move_by(&mut self, dx: f32, dy: f32) -> bool {
+        let Some((origin, at)) = self.key_move else {
+            return false;
+        };
+        let to = (at.0 + dx, at.1 + dy);
+        if !self.drag_move(to.0, to.1) {
+            return false;
+        }
+        self.key_move = Some((origin, to));
+        true
+    }
+
+    /// End the keyboard move: `drop` (Enter) releases the card where it is,
+    /// by its role; otherwise (Escape) it goes back where the move began,
+    /// then is released.
+    pub fn end_key_move(&mut self, drop: bool) -> bool {
+        let Some((origin, _)) = self.key_move else {
+            return false;
+        };
+        let held = self.dragging;
+        if !self.drag_end() {
+            return false;
+        }
+        if !drop && let Some(key) = held {
+            self.physics
+                .seed(vec![(key, Point2D::new(origin.0, origin.1))]);
+            self.physics.refresh(&mut self.view);
+        }
+        true
+    }
+
     /// Halt motion for a paused board. An active drag is cancelled and its
     /// body is returned to the dynamic solver before the halt, so a later
     /// `sync` or choice change can explicitly reawaken the board.
     pub fn halt(&mut self) {
+        self.key_move = None;
         if let Some(key) = self.dragging.take() {
             self.physics.unpin(key);
             self.physics.set_dragging(false);
