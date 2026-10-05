@@ -3,7 +3,8 @@
 **Date:** 2026-10-04
 **Status (2026-10-05):** in progress. Thirty-one rulings in eleven rounds
 (S1 to S31); P1 landed on main (`1633be0c`); P2 staged (S27 to S31, four
-stages in §3.1), stage 1 next; P3 and S7 done as documents; S3 to S6 carried into the dynamics
+stages in §3.1), stage 1 built on branch `stack-seams-p2` (`76aa1bee`), stage
+2 next; P3 and S7 done as documents; S3 to S6 carried into the dynamics
 grammar plan (G8, G9); S9 done by the identity lane (`b52edea7`).
 
 A note sent to Mark listed weak seams in the stack. Each claim was checked
@@ -192,6 +193,23 @@ in two or more crates.
   him), recorded in the burn plan's §13.46
   ([burn plan](2026-08-09_burn_0_22_migration_plan.md)) at `ac7f906d`. P2
   does not touch `ProjectionCompiler` or `ItemSizes`.
+- **F16 (2026-10-05, P2 stage 1's control). wgpu's device equality cannot tell
+  two boots apart.** wgpu 30 compares a `Device` by a per-instance id
+  (`impl_eq_ord_hash_proxy!(CoreDevice => .id)`), and each `RenderCore::boot`
+  makes its own instance, so devices from two boots compare equal. Stage 1's
+  control first passed wrongly on exactly this; the receipt now compares device
+  identity. The producer registry detects a changed device with the same `!=`
+  (`cambium-rootstock/src/producer/registry.rs`, `prepare`), so under the old
+  reboot on every resume a new device went unnoticed there. After stage 1 a
+  host's device never changes, so nothing reaches it today; recovery from a
+  lost device would need the check to compare identity.
+- **F17 (2026-10-05, for P2 stage 4). Several surfaces through one core must
+  key their rasterization.** Genet's `RenderCore::rasterize_for` doc: a host
+  that rasterizes several surfaces through one core must key each, or every
+  tile is dirty on every frame (234 of 234 in the shell paint plan's
+  measurement). Rootstock's redraw calls the unkeyed `rasterize_scaled`
+  (`frame.rs`), harmless with one window; stage 4 keys it per window, and
+  `presentation_host` is already unique per host.
 
 ## 2. Rulings
 
@@ -634,6 +652,20 @@ The done-conditions handed over for S3 and S4, kept for reference:
   works in `projection_compile`. Second pass (F8 to F11), rulings S7 to S10:
   the README fixed (S7), TERMINOLOGY gains pandect under Eidetic and the
   curation record (S8, S10), S9 sent to the identity lane.
+- **2026-10-05.** P2 stage 1 built on branch `stack-seams-p2` at `76aa1bee`
+  (worktree `Code/worktrees/mere-stack-seams-p2`, which took P1's build target;
+  P1's worktree removed), not merged. One `Arc<RenderCore>` per host, kept
+  across suspend and resume, each surface made from it with its transparency;
+  `HostState::render_core` and `AppCtx::render_core` for tenants, set by the web
+  host too; the renderer's retained leaf fragments survive a suspend. Receipt
+  (`headed_tests::one_core`, headed, Windows): one boot across a forced suspend
+  and resume, the same core, a present from the new surface, and the tenant's
+  device identical to the surface's. Control (`headed_tests::control`, the core
+  forgotten across the suspend): two boots, a different core, the tenant on the
+  old device. Gates: rootstock, the winit host, cambium-winit-a11y, mesquite,
+  mere-view and pelt-desktop tests pass; the web host checks on wasm32 (one
+  warning, G9's unused `MirrorHandle::target_of`, reported to its lane). F16
+  and F17 recorded.
 - **2026-10-05.** F15: the Knot lane reported that P1 breaks Knot at its next
   build against mere's tree; Mark ruled that lane adapts Knot (burn plan
   §13.46). Told that lane P2 leaves the compiler's surface alone.
