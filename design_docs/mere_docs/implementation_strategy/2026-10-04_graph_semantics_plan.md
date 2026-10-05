@@ -4,8 +4,9 @@
 **Status (2026-10-05):** in progress. P1 implemented and validated on the
 isolated `graph-semantics` branch, with C1, stable-root attribution,
 retract/assert, A1 and B1 resolved. Mark authorized P2 with "Proceed".
-P2 inventory has begun; C2 is resolved and work is stopped at C3 before code
-changes. C4 remains open. P3–P5 have not begun; nothing has been integrated
+P2 inventory has begun; C2 and C3 are resolved. Work is stopped before code
+at C4 naming, migration collision handling and the shared UUID helper's
+dependency/lock change. P3–P5 have not begun; nothing has been integrated
 into main.
 
 Four questions were put to Mark from outside the project: what a link records,
@@ -416,7 +417,7 @@ part of this branch's base.
 
 **Dependency finding.** The canonicalizer is std-only, but Eidetic currently
 gates chartulary behind `lineage` (`crates/eidetic/eidetic-core/Cargo.toml`
-44, 70). Chartulary is already in Eidetic's lockfile dependency list.
+38, 55). Chartulary is already in Eidetic's lockfile dependency list.
 Neither crate has a UUID dependency, while the kernel has UUIDv5 support.
 A complete shared resource-id helper in chartulary would add an edge to the
 existing UUID package and require a lockfile change. That remains an explicit
@@ -436,7 +437,8 @@ baseline assertions can predate that log (`crates/system/pandect/src/graph_sessi
 Collapsing same-URL surfaces also combines assertion buckets: live upsert
 can lose a distinct legacy handle while exact restore preserves it
 (`graph/edge_data.rs` 256–292). Migration must retain handles and explicitly
-resolve collisions before a policy is implemented. C3 remains open.
+resolve collisions before a policy is implemented. C3's endpoint policy
+is resolved below; collision handling remains open.
 
 ### C3 migration checkpoint (2026-10-05)
 
@@ -457,7 +459,7 @@ empty legacy properties/classifications/derivations, while session loading
 reads the facet store (`graph/snapshot/to.rs` 101–109;
 `crates/system/pandect/src/graph_session.rs` 435–440).
 
-C3 options, recommendation first; none selected:
+C3 options presented, recommendation first; selection recorded below:
 
 1. **Currently shown resources, with a migration record (recommended).**
    Move old content claims to the canonical resources their endpoint surfaces
@@ -474,6 +476,12 @@ C3 options, recommendation first; none selected:
    original claims in a recoverable migration record and require a later
    placement decision; old content claims disappear from active queries.
 
+**C3 ruling (2026-10-05).** Mark: **"1"**, selecting currently shown
+resources with a migration record. Attach old content claims to the
+canonical resources their surfaces show at migration; preserve original
+endpoints, ids, times and asserters in the record, and mark uncertain
+historical page ownership. This does not select a collision survivor.
+
 Regardless of the endpoint policy, collapse is a separate unresolved choice.
 The existing fixture has two surfaces at one URL (`graph/tests/snapshot_basic.rs`
 547–631). Two distinct old handles can become one dedup key on one resource
@@ -482,6 +490,63 @@ Same-id/different-payload input would silently reject one record in the
 existing helper (`graph/edge_data.rs` 256–292). No such conflict was measured
 in Mark's data, and no migration is implemented. Return the collision policy
 as a further fork before code chooses a survivor or changes an id.
+
+### Remaining P2 forks (2026-10-05)
+
+**A. C4 naming.** The kernel has one `Node` wrapper and `NodeKey` index
+alias (`graph/node.rs` 35, `graph/identity.rs` 32). `SurfaceId` already
+names chrome/accessibility elements (`crates/graph/graph-kernel/src/accessibility.rs`
+49), so that spelling must not be repurposed. TERMINOLOGY's link amendment
+leaves the two node names open. Options, recommendation first:
+
+1. **Resource and surface.** Prose distinguishes a resource from a browsing
+   surface; code uses `ResourceNode` and `SurfaceNode`. Keep `Node` and
+   `NodeKey` as compatibility names for the existing surface API. The word
+   node can describe either graph element; rendered bodies remain gnodes.
+2. **Resource and node.** Keep `Node` as the primary name for the browsing
+   object; add `ResourceNode` for content. Less API naming change, but the
+   prose distinction between a resource node and a node needs qualification.
+
+**B. Migration collisions.** Two same-URL surfaces can supply two distinct
+handles for one resource-pair assertion key. Exact-id retraction exists,
+but both live assertion routes currently select the first matching content
+key even when a carried id differs (`graph/edge_data.rs` 174, 257;
+`graph/edge_ops.rs` 346–367, 377). RDF reifiers use statement ids across
+the dataset, so conflicting reuse needs dataset-wide preflight. Options:
+
+1. **Preserve handles; stop on conflicting id reuse (recommended).** Keep
+   every distinct legacy handle, extending C1's exact-restore exception.
+   Ambiguous migrated keys require exact-id edits; refuse content-only
+   updates that would select an arbitrary record. Preflight migration and
+   stop an affected session if one id names divergent records; keep the
+   originals intact. This needs an additive precise edit/replace path.
+2. **Collapse with aliases.** Select one active survivor, retain all originals
+   and aliases, and define how old-id retractions affect it. This changes
+   active identity semantics and requires a survivor rule; caller-supplied
+   ids in A1 did not authorize caller-selected merge survivors.
+3. **Deterministically remint conflicting records.** Preserve records but
+   change conflicting active handles, recording old-endpoints/old-id to
+   new-id mappings. Replay and retraction need translation; signed historical
+   operations remain unchanged.
+
+**C. Shared identity dependency/lock stop.** Chartulary and Eidetic have no
+UUID dependency. The lock already contains UUID 1.26.1 and sha1_smol 1.0.1;
+UUIDv5 is already enabled by the kernel. Both package sources and archives
+are cached in the default Cargo home. Expected changes are exactly:
+add `uuid = { version = "1", features = ["v5"] }` to Chartulary; make
+Eidetic's existing chartulary dependency unconditional and leave `lineage`
+as an empty feature; add `uuid` to Chartulary's lockfile dependency list.
+No new package, version, checksum or source is expected. Options:
+
+1. **Reuse locked UUIDv5 (recommended).** Authorize that dependency-edge
+   change and only its matching lock update, resolved offline. Stop if
+   resolution requests any download or larger lock delta; no broad update.
+2. **Defer the shared helper.** Preserve manifests/lock and leave P2's
+   independent resource-id minting gate open. Revisit this seam before P2
+   can land.
+
+None of A, B or C has been selected. No source, dependency or lock mutation
+has been made at this checkpoint; the Scenomise compiler hold remains.
 
 ## 3. Rulings
 
@@ -690,6 +755,8 @@ comes back to Mark as a fork, with evidence, before the code commits to one.
   were asserted while it showed whichever page it showed then; the store does
   not record which. Attach them to the currently shown resource, to the
   resource of the visit nearest the assertion time, or drop them with a record.
+  **Resolved 2026-10-05:** Mark selected **"1"**, currently shown resources
+  with a migration record; collision handling remains a separate fork.
 - **C4 (P2). Words.** Names for the two senses of node (resource, surface) in
   TERMINOLOGY and in code.
 - **C5 (P3). Purge default.** The pending index's default purge policy.
@@ -814,3 +881,11 @@ comes back to Mark as a fork, with evidence, before the code commits to one.
   the shared UUID helper's dependency/lock change remain open. No P2 source,
   manifest or lockfile was changed; Cargo/wasm and consumer gates were not
   rerun. Compiler hold and retained worktree/target ownership are unchanged.
+
+- **2026-10-05. C3 resolved; remaining P2 forks.** Mark selected "1", current
+  resources with preserved originals and uncertain historical ownership.
+  Rechecked assertion update/retraction and identity types; recorded C4,
+  collision and the concrete dependency-edge/lock proposal together above.
+  No P2 code, manifest or lockfile changed; Cargo/wasm and sibling builds
+  remain unrun at this documentation checkpoint. Retained worktree and target
+  ownership and the compiler hold are unchanged.
