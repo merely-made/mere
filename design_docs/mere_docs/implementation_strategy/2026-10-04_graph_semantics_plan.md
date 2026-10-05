@@ -1,10 +1,10 @@
 # Graph semantics plan: assertions, resources, saved queries, residency
 
 **Date:** 2026-10-04
-**Status (2026-10-04):** in progress. Branch-base review complete; C1 ruled
-for the unknown legacy asserter marker. P1 partially implemented; awaiting
-peer-attribution and predicate-edit rulings before finishing writer wiring.
-P1–P5 are not yet landed.
+**Status (2026-10-05):** in progress. C1 and stable-root attribution are ruled;
+retract/assert is the selected direction pending the requested co-op review.
+P1 remains uncommitted at the sync assertion identity and legacy-retraction
+forks below. P1–P5 are not yet landed.
 
 Four questions were put to Mark from outside the project: what a link records,
 what makes two things the same thing, what a saved query can become, and how
@@ -203,7 +203,7 @@ the load-policy checkpoint; production writers still supply a known asserter.
   `EdgeAssertion` signatures remain stable. This is source inspection,
   not a sibling build receipt; no sibling files were changed.
 
-### Additional P1 forks (2026-10-04, awaiting Mark)
+### Additional P1 forks (2026-10-04, answered with follow-up review)
 
 **Peer identity.** The personal sync fold is a production assertion writer
 (`ports/graphshell/src/personal_sync.rs`, `apply_event`, line 1384). The signed
@@ -237,8 +237,78 @@ The new asserter field alone does not settle this identity conflict.
 3. **Merge collisions.** Keep a caller-selected assertion id, retire collided
    ids, and journal the complete change.
 
-No peer identity or predicate-edit policy has been selected in code. P1 stays
-open; these choices were returned through the user input panel.
+At this checkpoint neither policy had been selected in code. These choices
+were returned through the user input panel; the subsequent answer and review
+are recorded below.
+
+### P1 co-op and sync findings (2026-10-05)
+
+**Follow-up ruling.** Mark: **"yeah, the stable root. retract/assert sounds
+fine, but double check against caller-selected id. idk but i'd think co-op
+might need it"**. The stable root is now supplied by `materialize` after
+verification (`ports/graphshell/src/personal_sync.rs`, lines 1214–1216);
+the signing device remains in `WriterReceipt`. No bulk-setter retirement or
+collision merge has been implemented.
+
+**Caller identity is distinct from a merge survivor.** The kernel's
+`assert_persisted_semantic_statement` accepts an already-minted id; a repeated
+dedup key keeps its existing handle (`crates/graph/graph-kernel/src/graph/edge_ops.rs`,
+line 346; `crates/graph/graph-kernel/src/graph/tests/assertion_replay.rs`,
+line 125). Commons assigns its own
+`(writer, counter)` edge ids in an atomic commit; Knot assertions use the
+signed operation hash and retract an exact causally observed assertion.
+The bounded sibling audit found no kernel `statement_id` consumers and no
+established caller-selected survivor operation. This is source inspection,
+not a sibling build or cross-device receipt.
+
+**The personal sync grammar loses assertion identity.** `AssertRelation`
+carries only endpoints and `EdgeAssertion`; `RetractRelation` carries only
+endpoints and a selector (`personal_sync.rs`, lines 133–142). Each call to
+`materialize` creates a new graph (line 1204) and replays live assertions
+(line 1388), so ids are minted anew. The same path supplies no assertion time.
+The selector replay (line 1399) removes all matching sources rather than
+one assertion.
+
+Three regression tests now assert the P1 invariants using two admitted stable
+roots and real signed operations, with positive controls in the same run
+(`personal_sync.rs`, lines 1731, 1755, 1772). Results: **1 passed, 2 failed**.
+Attribution yields two statements with distinct ids and the correct roots;
+device signing keys differ from those roots. Rebuilding the unchanged log
+changes **both of two ids**; all assertion times are `None`. One root's
+retraction reduces **two statements to zero**, where the other source's one
+statement must remain. The failing regressions are retained uncommitted;
+they are not weakened or disabled.
+
+**Fork A: portable assertion identity.** Both options add a signed authoring
+time for new assertions; historical operations without a recorded time keep
+an explicit unknown time. Both preserve the first handle when the same
+asserter reasserts its existing claim, as ruling 1 requires.
+
+1. **Carry caller-supplied assertion ids (recommended).** Add assertion id
+   and time to the signed assertion event, plus an exact-id retraction event.
+   Derive a deterministic fallback handle from the signed operation and
+   event position for old assertions. This preserves an id minted by a
+   co-op host or imported assertion before sync; conflicting id/content
+   reuse must be refused.
+2. **Derive all sync assertion ids.** Use the signed operation and event
+   position to allocate the first assertion's handle; add an exact-id
+   retraction event. Co-op callers learn the id after authoring and cannot
+   preserve a preexisting handle through this event grammar.
+
+**Fork B: old selector-only retractions.** New exact-id events are independent
+of this historical decoding decision.
+
+1. **Withdraw only the writer's matching assertions (recommended).** Interpret
+   an old selector event as that stable root withdrawing its selected claims.
+   Other roots' assertions survive. Reopening an old log can restore a claim
+   that the old broad retraction previously hid.
+2. **Preserve historical broad deletion.** Old selector events continue to
+   erase every matching source; new writers use exact-id events only. This
+   reproduces historical results but explicitly exempts those old events
+   from P1's independent-retraction invariant.
+
+Neither fork has been selected or implemented. P1 cannot land until the
+choices and their gates are resolved; P2 has not begun.
 
 ## 3. Rulings
 
@@ -487,3 +557,23 @@ comes back to Mark as a fork, with evidence, before the code commits to one.
   dependencies, downloads, isolated Cargo home or local patch override were
   needed. The documentation audit and its planted-defect/clean-fixture
   self-test exited **0**; existing audit findings remain as recorded above.
+
+- **2026-10-05. P1 sync checkpoint.** Resumed after Mark's pause; wired the
+  verified stable root into the personal-sync assertion writer and added
+  three signed-operation regression tests. The focused run reported
+  **1 passed, 2 failed**; the full Graphshell library suite with
+  `personal-sync` reported **320 passed, 2 failed, 4 ignored**. Both failures
+  are the measured invariant violations in the dated Findings above. The
+  required `cargo check --workspace --offline --locked` now exits **0**.
+  All Cargo commands used `C:/t/cargo-targets/mere`; no new dependency,
+  download, manifest/lock change, patch override or isolated Cargo home was
+  needed. The stable-root source edit and failing regressions remain
+  uncommitted at forks A and B; the live bulk setter remains unchanged.
+  Kernel, linked-data, Pandect, Pictograph and wasm32 gates were not rerun:
+  their source has not changed since the previous recorded passing gates.
+  Graphshell binaries, integration-test targets, sibling builds and headed
+  UI/device gates were not run. The reusable target and isolated worktree
+  remain owned by this P1 lane until review and integration. P2 has not begun.
+  The documentation audit and its planted-defect/clean-fixture self-test
+  exited **0** with the same existing finding counts as the previous
+  checkpoint; this plan has no findings. No active document was added.
