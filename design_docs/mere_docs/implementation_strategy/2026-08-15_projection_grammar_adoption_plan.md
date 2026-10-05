@@ -30,6 +30,21 @@ explicit failures. Source ownership remains in Woodshed; the included export
 is a reproducible three-card Set made from its real musical catalog, not a live
 connection to a user's saved practice library.
 
+*2026-10-05, one arrangement catalog.* The
+[stack seams plan](2026-10-04_stack_seams_plan.md) ruled S1: "Resolve through
+scenomise (Recommended)". Graphshell maps the two families above by hand:
+- `arrangement_for` and `placement_for` in `ports/graphshell/src/projection_compile.rs`
+  (lines 666-691);
+- `grid.default` uses a fixed 184 by 84 cell and 8 columns;
+- `scatter.default` maps to `Geographic`;
+- every other id resolves to nothing.
+
+Both functions retire into one shared scenomise compile step. It resolves an
+id through the registry, takes its parameters from the definition, and makes
+every registered family authorable. That plan's P1 carries it out. Asked who
+takes P1, Mark answered: "Seams lane keeps P1 (Recommended)". This plan
+records the change and does not build it.
+
 Progress (2026-09-04): Luna produced the Woodshed exporter and Terra the
 compiler skeleton before both hit the account usage limit. Root completed
 integration. An isolated source-path harness passed 14 compiler/editor tests,
