@@ -46,15 +46,149 @@ fn root(_: &Clicks) -> Child {
 }
 
 fn pane(host: &Harness<Clicks, Logic, Child>) -> NodeId {
-    fn find(dom: &ScriptedDom, node: NodeId) -> Option<NodeId> {
-        if dom.attribute(node, &Namespace::from(""), &LocalName::from("id")) == Some("pane") {
+    node(host, "pane")
+}
+
+fn node(host: &Harness<Clicks, Logic, Child>, id: &str) -> NodeId {
+    fn find(dom: &ScriptedDom, node: NodeId, id: &str) -> Option<NodeId> {
+        if dom.attribute(node, &Namespace::from(""), &LocalName::from("id")) == Some(id) {
             return Some(node);
         }
-        dom.dom_children(node).find_map(|child| find(dom, child))
+        dom.dom_children(node)
+            .find_map(|child| find(dom, child, id))
     }
     let dom = host.runner().dom();
     let dom = dom.borrow();
-    find(&dom, dom.document()).expect("the pane is in the DOM")
+    find(&dom, dom.document(), id).expect("the element is in the DOM")
+}
+
+fn horizontal_root(_: &Clicks) -> Child {
+    Box::new(el(
+        "div",
+        (
+            el("div", ()).attr("id", "lead"),
+            el(
+                "div",
+                (
+                    el("div", ()).attr("id", "spacer"),
+                    el(
+                        "div",
+                        el(
+                            "div",
+                            (
+                                button("Left node", |clicks: &mut Clicks, _| clicks.count += 1)
+                                    .attr("id", "left"),
+                                button("Right node", |clicks: &mut Clicks, _| clicks.count += 1)
+                                    .attr("id", "right"),
+                            ),
+                        )
+                        .attr("id", "canvas"),
+                    )
+                    .attr("id", "horizontal"),
+                ),
+            )
+            .attr("id", "pane"),
+        ),
+    ))
+}
+
+const HORIZONTAL_SHEET: &str = "body { margin:0; } #lead { height:0; } \
+    #pane { width:300px; height:200px; overflow-y:auto; overflow-x:hidden; } \
+    #spacer { height:600px; } \
+    #horizontal { width:300px; height:100px; overflow-x:auto; overflow-y:hidden; } \
+    #canvas { position:relative; width:900px; height:100px; } \
+    button { position:absolute; top:0; width:80px; height:40px; } \
+    #left { left:0; } #right { left:820px; }";
+
+fn horizontal_host(sheet: String) -> Harness<Clicks, Logic, Child> {
+    let mut host = Harness::with_hooks(
+        Init {
+            state: Clicks { count: 0 },
+            logic: horizontal_root as Logic,
+            sheet,
+            fonts: Vec::new(),
+            images: Vec::new(),
+        },
+        inert_hooks(),
+    );
+    host.layout_at(420.0, 300.0);
+    host
+}
+
+#[test]
+fn click_on_reveals_rightmost_node_in_horizontal_and_vertical_planes() {
+    let mut host = horizontal_host(HORIZONTAL_SHEET.to_string());
+    assert!(host.visible_rect(node(&host, "right")).is_none());
+    assert!(host.click_on(&Selector::role("button").containing("Right node")));
+    assert_eq!(
+        host.state().count,
+        1,
+        "semantic click reached the rightmost node"
+    );
+    assert_eq!(host.element_scroll(node(&host, "horizontal")), (600.0, 0.0));
+    assert!(host.element_scroll(pane(&host)).1 > 0.0);
+    assert_eq!(host.viewport_scroll(), (0.0, 0.0));
+    assert!(host.click_on(&Selector::role("button").containing("Left node")));
+    assert_eq!(host.element_scroll(node(&host, "horizontal")), (0.0, 0.0));
+    assert_eq!(host.state().count, 2);
+}
+
+#[test]
+fn click_on_reveals_through_every_horizontal_ancestor() {
+    let mut host = horizontal_host(format!(
+        "{HORIZONTAL_SHEET} \
+        #pane {{ overflow-x:auto; }} #horizontal {{ width:500px; }}"
+    ));
+    assert!(host.click_on(&Selector::role("button").containing("Right node")));
+    assert_eq!(host.state().count, 1);
+    assert_eq!(host.element_scroll(node(&host, "horizontal")), (400.0, 0.0));
+    assert_eq!(host.element_scroll(pane(&host)).0, 200.0);
+    assert!(host.element_scroll(pane(&host)).1 > 0.0);
+    assert_eq!(host.viewport_scroll(), (0.0, 0.0));
+}
+
+#[test]
+fn click_on_reveals_horizontal_document_overflow() {
+    let mut host = horizontal_host(format!(
+        "{HORIZONTAL_SHEET} \
+        #pane {{ width:900px; overflow:visible; }} \
+        #horizontal {{ width:900px; overflow:visible; }}"
+    ));
+    assert!(host.click_on(&Selector::role("button").containing("Right node")));
+    assert_eq!(host.state().count, 1);
+    assert_eq!(host.viewport_scroll().0, 480.0);
+    assert!(host.viewport_scroll().1 > 0.0);
+    assert_eq!(host.element_scroll(node(&host, "horizontal")), (0.0, 0.0));
+    assert_eq!(host.element_scroll(pane(&host)), (0.0, 0.0));
+}
+
+#[test]
+fn click_on_wide_target_reveals_visible_part_without_oscillation() {
+    let mut host = horizontal_host(format!(
+        "{HORIZONTAL_SHEET} \
+        #right {{ left:100px; width:800px; }}"
+    ));
+    assert!(host.click_on(&Selector::role("button").containing("Right node")));
+    let scroll = host.element_scroll(node(&host, "horizontal"));
+    assert_eq!(scroll, (100.0, 0.0));
+    assert!(host.click_on(&Selector::role("button").containing("Right node")));
+    assert_eq!(host.element_scroll(node(&host, "horizontal")), scroll);
+    assert_eq!(host.state().count, 2);
+}
+
+#[test]
+fn click_on_does_not_scroll_hidden_overflow_or_chase_it_in_document() {
+    for overflow in ["hidden", "clip"] {
+        let mut host = horizontal_host(format!(
+            "{HORIZONTAL_SHEET} \
+            #horizontal {{ overflow-x:{overflow}; }}"
+        ));
+        assert!(!host.click_on(&Selector::role("button").containing("Right node")));
+        assert_eq!(host.state().count, 0);
+        assert_eq!(host.element_scroll(node(&host, "horizontal")), (0.0, 0.0));
+        assert_eq!(host.element_scroll(pane(&host)).0, 0.0);
+        assert_eq!(host.viewport_scroll().0, 0.0);
+    }
 }
 
 #[test]
