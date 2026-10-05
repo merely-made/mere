@@ -1,8 +1,8 @@
 # Vault Lock Plan
 
 **Date**: 2026-10-05
-**Status (2026-10-05)**: assessed; the design forks in §3 wait for Mark. No
-code changed. Chatelaine P4 (CXF import) waits on this plan (chatelaine
+**Status (2026-10-05)**: assessed; forks 1 to 5 ruled (rulings 1 to 4 in
+§3), the rest wait for Mark. No code changed. Chatelaine P4 (CXF import) waits on this plan (chatelaine
 rulings 64, 65).
 **Scope**: the resident's secrets can be locked. While locked, no secret
 material can be reached through the vault or the resident's derived keys.
@@ -219,6 +219,38 @@ Open questions:
 - which sibling repos call `current_profile()` and `slot()`, whose
   signatures would change (a scope question for Mark);
 - naming hibernation and pagefile exposure in a threat statement.
+
+### Rulings
+
+**Ruling 1.** *What does "lock" cover?* Options: every secret the resident
+exercises (the personae vault, profile and storage key, plus
+`CastellanResident`'s record and freshness keys); the personae vault only;
+everything, Distillery, Knot and pairing included. Mark: **"Every secret
+the resident uses (Recommended)"**.
+
+**Ruling 2.** *Distillery's P2P transport identity is the persona's master
+keypair. What happens to it under lock?* Options: it stays while sync runs;
+derive a transport key now; stop sync on lock. Mark: **"Derive a transport
+key now"**. Follows: Distillery gets a key derived for transport, so the
+master can leave memory on lock; its peer identity changes, and existing
+peers must learn the new one. Whether the transport key itself stays
+resident under lock is a follow-up question.
+
+**Ruling 3.** *What locks the vault?* Options: an explicit intent, the OS
+session locking, suspend and an idle timeout, each per device, with idle
+failing closed; explicit only; explicit plus idle. Mark: **"Intent, OS
+lock, sleep, idle (Recommended)"**.
+
+**Ruling 4.** *What does unlocking take?* Options: a passphrase (through
+`passphrase_root`) or Windows Hello as a gate, with silent DPAPI re-unlock
+only by opt-in; passphrase only; silent, as today. Mark: **"1, and i'm sure
+there are mac and/or linux and/or mobile integrations like biometrics and
+passkeys and passwords and pins and whatnot"**. Follows: the passphrase or
+OS presence, with no silent re-unlock unless opted into. *Reading, not
+ruled:* one unlock interface with a method per platform (Windows Hello;
+macOS Touch ID; Linux biometrics through the desktop's own stack; passkeys,
+PINs and mobile biometrics later); which methods this plan builds first is
+a follow-up question.
 
 ## 4. Phases
 
