@@ -324,6 +324,7 @@ impl Canvas {
     /// rest replaces Settled and anchored items start home (F45). A law that
     /// never rests does neither.
     fn note_settle(&mut self) {
+        let budget_ended = self.roles.rest.budget_ended(self.physics.is_settling());
         if self.physics_paused {
             return;
         }
@@ -332,6 +333,11 @@ impl Canvas {
             return;
         }
         if !self.roles.rest.rested(self.physics.rms_speed()) || self.physics_never_rests() {
+            // A budget spent with the bodies still moving is no settle, but
+            // anchored items still go home (F63).
+            if budget_ended {
+                self.start_home();
+            }
             return;
         }
         let positions: Vec<_> = self.view.positions().collect();
