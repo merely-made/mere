@@ -1,8 +1,8 @@
 # Stack seams plan: catalog, shared device, actions, determinism, two words
 
 **Date:** 2026-10-04
-**Status (2026-10-05):** in progress. Twenty rulings in seven rounds (S1 to
-S20); P1 being built in this session's worktree (S19), P2 after it; P3 and S7 done as documents; S3 to S6 carried into the
+**Status (2026-10-05):** in progress. Twenty-two rulings in eight rounds (S1
+to S22); P1 being built in this session's worktree (S19), P2 after it; P3 and S7 done as documents; S3 to S6 carried into the
 dynamics grammar plan (G8, G9); S9 done by the identity lane (`b52edea7`).
 No code in this plan's own lane yet.
 
@@ -345,6 +345,29 @@ Follows: compilation takes the representation's measured size from the host
 beside the dataset (graphshell passes its card size, Woodshed its own);
 nothing is written into scenomise. This follows the 2026-07-22 charter, which
 puts presentation (cards, glyphs) with the host.
+
+**Ruling S21 (round 8, P1's design).** *How do the eleven families get their
+per-item inputs?* Recipes encode x, y, color and label; families read an
+explicit cell (Grid), a coordinate (Geographic, Hulls), a 2D embedding
+(Embedded), a numeric axis (Timeline, Radial's rings), a categorical axis
+(Kanban), a layer (Stack), or only order (Spiral, Penrose, LSystem)
+(`scenomise/src/families/`, `sceno::ScoreItem`). Options: the catalog maps x
+and y; grow the encoding; only where x and y fit. Mark: **"Catalog maps x and
+y (Recommended)"**. Follows: each catalog entry declares how it reads the
+encoding: Grid ranks x and y into cells; Geographic and Hulls take (x, y) as a
+coordinate; Embedded as an embedding; Timeline and Radial take numeric x as
+their axis; Kanban takes text x as its column; Stack takes integer x as its
+layer; Spiral, Penrose and LSystem order by x. A missing or wrong-typed channel
+is a typed issue naming it. All eleven are authorable with today's grammar.
+
+**Ruling S22.** *What shape does the compile API take?* S20 needs the host's
+item sizes and S15's fall-through needs a `SolverRegistry`. Options: a compiler
+value; extra parameters. Mark: **"A compiler value (Recommended)"**. Follows:
+the host builds one `ProjectionCompiler` holding its item sizes and its
+registry, and calls `compile`, `refresh`, `compile_snapshot` and the
+relationship compile on it. *Reading, not ruled*: the relationship-recipe
+compile, which calls `compile_snapshot`, becomes a method too and keeps its
+grid-only rule; the alias constants stay exported for saved recipes.
 
 **Ruling S14.** *Where does the next contradiction pass look?* Options: plan
 status against code; rulings across plans; sibling repos too; no pass. Mark:
