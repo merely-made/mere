@@ -7,8 +7,9 @@ attribution repair complete after the original `459cad84` receipt.
 Reconciled main `62219dd1` rulings 9–19 before P2 source edits; the graph
 plan is unchanged at main `3b220f90`. A1/B1/C1 selected by "All 1";
 `ResourceNode`/`SurfaceNode` are settled by ruling 19, and B1/C1 remain
-approved. Stopped at the P1 boundary for review before P2. Replay-first
-migration and per-predicate placement govern P2; C7/C8 remain open.
+approved. Mark authorized P2 after the P1 repair at `4bc9ae96`.
+P2 inventory is complete at C7/C8; stopped for those rulings before source
+edits. Replay-first migration and per-predicate placement govern P2.
 P3–P5 have not begun. Main integration awaits Mark's review.
 
 Four questions were put to Mark from outside the project: what a link records,
@@ -664,6 +665,100 @@ The kernel's empty-tail regression (`graph/journal.rs` 789) and the session's ge
 checkpoint cover this repair. A second read-only review found no further
 concrete blocker. Gate results follow in Progress.
 
+### P2 tag and classification checkpoints (2026-10-05)
+
+Resumed on `4bc9ae96` after Mark's "Proceed". Main is `75e13d8d`; its
+graph plan last changed at `62219dd1`, with C7/C8 still open. The branch
+worktree is clean before this documentation pass. Naming, predicate
+placement, replay-first migration, distinct legacy handles and the narrow
+locked UUID dependency approval remain settled.
+
+**C7 evidence.** Tags are exact-string membership, with no concept id,
+namespace, tagger or assertion time (`crates/eidetic/chartulary/src/container.rs`
+75; `crates/graph/graph-kernel/src/persistence.rs` 160). Three kernel mutation
+routes insert one, insert many or remove one (`graph/node_props.rs` 218, 236;
+`graph/node_facets.rs` 132). The kernel performs no label normalization;
+case and Unicode differences are currently distinct. Two presentation fields
+are keyed by label (`types.rs` 662–663). Ingestion promotes three literal
+predicates to tags and deduplicates their strings, retaining no tagger on the
+promoted tag (`crates/graph/linked-data/src/ingest.rs` 153–158, 646–647).
+
+Tag captures contain only node id and text (`graph/capture.rs` 123–130).
+The Author envelope recovers successful journaled additions. Adding the
+same string again is a no-op, so an unrecorded second tagger cannot be
+recovered. Personal sync likewise carries node/text, but its verified stable
+root is available during the fold (`ports/graphshell/src/personal_sync.rs`
+128–135, 1274, 1431–1440). A stable mere namespace is available from
+`MereId::derive`, UUIDv5 over persona and domain
+(`crates/system/pandect/src/reservoir.rs` 108–118).
+
+C7 options, recommendation first. Each preserves existing exact label
+distinctions and separates concept identity from the tagging assertion's
+asserter. Existing missing taggers remain explicitly unknown; absent history
+does not justify attributing a baseline tag to the current user.
+
+1. **Identity namespace (recommended).** A tag vocabulary belongs to its
+   stable identity across meres. Equal labels from different owners are
+   distinct concepts; a person may deliberately use another owner's concept
+   by its IRI. Journal-covered legacy tags use their proven identity;
+   unattributed legacy concepts use the original mere's namespace, with
+   unknown-attributed tagging assertions.
+2. **Mere namespace.** Equal labels within one mere identify one concept,
+   with each tagger's assertion separate. The same label in another mere is
+   a different concept. Legacy labels stay in their original mere's vocabulary;
+   recover tagger attribution where proven, else mark unknown.
+3. **Global label identity.** An exact equal label identifies one concept
+   everywhere, with separate tagging assertions. This merges different
+   owners' meanings automatically. Legacy labels use that global identity;
+   tagger attribution is recovered where proven, else marked unknown.
+
+The fallback is part of option 1's proposed policy, not an already decided
+ruling. Persistent concept references must remain usable independently of
+their display labels; exact IRI encoding and label-edit behavior have not
+been selected by this inventory.
+
+**C8 evidence.** Classification records have seven fields, three schemes,
+six provenance categories and five statuses: Accepted, Suggested, Rejected,
+Verified and Imported. They have no assertion id, asserter, source IRI or
+time (`crates/graph/graph-kernel/src/types.rs` 337–425). Dedup uses only
+`(scheme, value)`, keeping the first record even when the incoming status or
+provenance differs (`graph/node_props.rs` 334–351;
+`graph/node_facets.rs` 213–246). Add/remove/status/primary are four mutation
+operations with replay forms (`graph/apply.rs` 370–392).
+
+The bounded `crates/` and `ports/` search found one production producer:
+the RDF type importer, which records Imported status/provenance
+(`crates/graph/linked-data/src/ingest/apply.rs` 48–57, 97–104).
+No production acceptance/rejection caller or Rejected-status usage was found.
+Four consumers ignore lifecycle: Kind selection (`graph/field_ops.rs` 117–135),
+UDC facets (`graph/facet_projection.rs` 155–174), RDF type display
+(`graph/display.rs` 112–119), and RDF export
+(`crates/graph/linked-data/src/lib.rs` 308–324). A Rejected type would therefore
+still export as an affirmative type. Suggested selection has an existing
+control (`graph/facet_projection.rs` 319–348); rejection has none. These are
+source findings, not a new runtime proof or a ruling on lifecycle filtering.
+
+C8 options, recommendation first:
+
+1. **Resource records (recommended).** Move the complete classifications
+   to the resource, retaining lifecycle and primary selection together.
+   Every surface showing it reads the same records and review state.
+2. **Resource claim, separate review.** Keep the classification proposition
+   on the resource, with acceptance/rejection and primary choice in a
+   separate reviewer or surface record. Viewers may disagree; this needs
+   review identity that the existing record lacks.
+3. **Surface records.** Keep independent classifications and review state
+   on each surface. Two surfaces may disagree about one resource; how those
+   content classifications behave on navigation would require a further ruling.
+
+Placement alone does not select classification-to-statement representation,
+lifecycle filtering, or a survivor when two old surfaces contribute conflicting
+records for one `(scheme, value)`. These remain implementation checkpoints
+if the selected C8 option meets them. Migration must preserve the originals
+instead of silently applying today's first-wins dedup. Journal replay can
+recover recorder and historical resource placement; provenance categories
+alone cannot supply baseline asserter identities.
+
 ## 3. Rulings
 
 Mark's answers, from multiple-choice rounds; each is the option label quoted
@@ -1203,3 +1298,17 @@ comes back to Mark as a fork, with evidence, before the code commits to one.
   owned by this lane for review and eventual integration; shared reusable
   `C:/t/cargo-targets/mere`, retained for Mere builds. No generated output was
   deleted or additional target created.
+
+- **2026-10-05. P2 resumed, stopped at C7/C8.** Mark authorized continuation
+  after `4bc9ae96`. Re-read governing docs, checked current main, and used
+  two bounded read-only inventories to ground tag identity and classification
+  placement. Recorded the evidence and options above. Resource/surface naming
+  and earlier approvals are not reopened. No P2 source, manifest or lockfile
+  changed. Cargo, wasm, sibling and headed/device gates were not rerun for
+  this documentation checkpoint; P1's latest receipts remain recorded above.
+  Documentation audit and planted-defect/clean-fixture controls exited 0;
+  existing finding counts are unchanged and this plan has no audit findings.
+  `git diff --check` passed. No active document was added. The worktree remains
+  owned by this lane for P2 and review; the shared Mere target remains for
+  validation. No download, dependency, extra target or isolated Cargo home
+  was created.
