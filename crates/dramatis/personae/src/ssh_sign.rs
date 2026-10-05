@@ -9,8 +9,9 @@
 //! - Ed25519 and ECDSA P-256 and P-384 sign through `ssh-key`'s per-type
 //!   signers, which are RustCrypto's.
 //! - RSA signs through `ring`, `rsa-sha2-256` or `rsa-sha2-512` as the
-//!   request's flags ask. The `rsa` crate builds the key at load and never
-//!   signs or decrypts (rulings 52, 59; RUSTSEC-2023-0071).
+//!   request's flags ask. The `rsa` crate builds the key once per signature,
+//!   when the agent decodes it from the vault, and never signs or decrypts
+//!   (rulings 52, 59, 63; RUSTSEC-2023-0071).
 //!   `PrivateKey::try_sign` is never called: its RSA arm is the `rsa` crate's.
 //! - P-521 is refused until `ssh-key` decodes every P-521 scalar (ruling 55).
 //!
@@ -123,10 +124,10 @@ pub fn ring_keypair(keypair: &RsaKeypair) -> Result<ring::rsa::KeyPair, SshSignE
             .map(rsa::BigUint::from_bytes_be)
             .ok_or_else(|| SshSignError::RsaKeyRejected("a component is not positive".into()))
     };
-    // Ruling 59: the rsa crate touches the key here, at load only. Its
-    // standard construction validates it and derives the CRT values OpenSSH
-    // does not store; its PKCS#8 export hands ring the full key. Every
-    // signature is ring's.
+    // Rulings 59, 63: the rsa crate builds the key here, once per signature,
+    // when the agent decodes it from the vault. Its standard construction
+    // validates it and derives the CRT values OpenSSH does not store; its
+    // PKCS#8 export hands ring the full key. Every signature is ring's.
     let built = rsa::RsaPrivateKey::from_components(
         int(&keypair.public.n)?,
         int(&keypair.public.e)?,
