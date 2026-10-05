@@ -573,3 +573,19 @@ These are *Reading, not ruled*. Each returns to Mark at the named track's checkp
     - The scenario lane's `reader-click` queues its click on the event loop: a click dispatched inside a lane step re-entered the host's borrow (`mount.rs:250`).
     - The rule's exception is documented in this lane's runner (`run-scenario-r4.ps1`) and in `p4_tree_canvas_reader_cdp.scn`. The canonical `Code/testing/mere/scripts/run-graphshell-web-scenario.ps1` has no `-Cdp` and is unchanged.
   - **Built, back to Mark:** which 200 items when more are on screen, and their reading order. Built as graph order with the focused item kept.
+- 2026-10-05 (G9, fourth round: on pre.4): main `75e13d8d` merged into `grammar-g9` (`90fcad2f`). It brings pre.4 (`cec0b3a4`), F69 and F67's corrected dependency count.
+  - **The merge.** The plan and the root lock were the only files both sides changed, and each matches a plain `git merge-file` (`Code/testing/mere/grammar-g9/merge-75e13d8d-check.log`). The merged root lock resolves `--locked` offline and differs from main's by exactly G9's six lines (`root-lock-r5.diff`). The web lock is pre.4's `f8eab000…` plus G9's two lines, graphshell's `cambium-rootstock` and pictograph's `chirograph`, resolved offline to `d3117b3a…` (`web-lock-r5.diff`).
+  - **Gates** (`gates-g9e.log`), compiled while other sessions loaded the machine, then run once a 30 s window fell under 35%. During the run the 30 s means were 35% to 73% (mean 54%), with 2 to 8 rustc or cargo processes (`cpu-r5-during-gates.log`). The counts are round three's:
+    - chirograph: 39.
+    - pictograph `canvas`: 304, 13 ignored.
+    - pictograph `gpu`: 3.
+    - The cambium crates' suites pass, and graphshell-client's 60.
+    - The `mere`, graphshell `canvas-gpu` and `personal-sync` checks pass.
+    - graphshell `web`: 242, 4 ignored, single-threaded.
+    - Clippy reports nothing in this lane's code.
+  - **Fresh wasm build** into the lane's one wasm target, emptied first (`wasm-build-fresh-r5.log`): bundle `01a0a3c9…`, the web lock unchanged by it. The getrandom cfg now comes only from the committed `ports/graphshell/web/.cargo/config.toml` (ruling 558). An earlier attempt also exported it and was stopped before it finished, since Cargo joins the two and the duplicate flag changes the bundle (`wasm-build-fresh-r5-void-duplicate-cfg.log`).
+  - **Headed** (`receipts-r5.log`; bundle `01a0a3c9…`; a port and Chrome profile per row, 8920 to 8935, with listeners counted only when a live process owns them): 16 of 16 as expected, started once a window fell under 35%. During the run the 30 s means were 38% to 57% (mean 47%), with 4 to 10 rustc or cargo processes (`cpu-r5-during-headed.log`).
+    - The reader receipt and its three controls, each failing on its planted assertion.
+    - The DevTools receipt and its control, the control failing in Chrome's tree.
+    - The G7 role and pin receipts, both practice receipts, both pages' drag receipts and the keys receipt.
+    - The page-error control, failing by the receipt gate.
