@@ -1,8 +1,10 @@
 # Vault Lock Plan
 
 **Date**: 2026-10-05
-**Status (2026-10-05)**: assessed; forks 1 to 12 ruled (rulings 1 to 12 in
-§3), the rest wait for Mark. No code changed. Chatelaine P4 (CXF import) waits on this plan (chatelaine
+**Status (2026-10-05)**: assessed; all 16 forks and the follow-ups ruled (rulings 1 to 24
+in §3);
+a djinn test-harness plan comes first (ruling 18), and §3's open
+questions remain. No code changed. Chatelaine P4 (CXF import) waits on this plan (chatelaine
 rulings 64, 65).
 **Scope**: the resident's secrets can be locked. While locked, no secret
 material can be reached through the vault or the resident's derived keys.
@@ -298,6 +300,76 @@ the docs fixed and the vault-wide lock as the custody control; custody,
 with per-slot sealing; consent plus a confirmation path in the standalone
 `personae-agent`. Mark: **"Consent; fix the docs (Recommended)"**.
 
+**Ruling 13.** *How does lock state reach every holder?* Options: state in
+`IdentityVault` (accessors return `Locked`, which breaks `current_profile()`
+and `slot()`, Knot first) plus a broadcast from `PersonaeHost` that
+derived-key holders obey; vault state only; broadcast only. Mark: **"Vault
+state plus a broadcast (Recommended)"**.
+
+**Ruling 14.** *A persona switch while locked?* Options: refused; switching
+unlocks the target. Mark: **"Refused (Recommended)"**.
+
+**Ruling 15.** *Does the vault lock reach pandect's wallet store (Knot's
+signing seed)?* Options: the lock also relocks the wallet stores djinn
+opened ("one unlock ladder"); personae only. Mark: **"Lock relocks it too
+(Recommended)"**. Follows: Knot's sync pauses while locked.
+
+**Ruling 16** *(asked as: is the standalone `personae-agent` still a target,
+with options dev tool, target with askpass later, retire).* Mark: **"hm.
+would it make sense for djinn to take on those capabilities, so
+personae-agent just becomes a djinn feature set/implementation/agent? i
+have been wondering about our testing framework for djinn too... and it's
+the daemon/cli thing for the stack, no? seems important"**. Follows: the
+question is put back as djinn absorbing the agent, with djinn's test
+harness as its own question. Evidence: `personae-agent` is a 210-line host
+of personae's agent library with Windows, macOS (launchd) and Linux
+installers; djinn's Windows installer already retires its task; on macOS
+and Linux it remains the deployed agent until the pairing plan's D2.
+
+**Ruling 17.** *How should djinn take on the CLI agent?* Options: djinn
+hosts it, with the standalone bin and its three installers retired after
+the pairing plan's D2 (the M4 moves then); an agent-only djinn mode; keep
+both. Mark: **"djinn hosts it; retire after D2 (Recommended)"**. Follows:
+the vault lock applies to one agent, djinn's.
+
+**Ruling 18.** *djinn's test harness (each lane this week rebuilt its own
+two-resident harness): when?* Options: its own plan, before the lock
+build; the lock plan's first phase; later. Mark: **"Its own plan, before
+the lock build (Recommended)"**. Follows: a shared djinn harness (spawning
+residents, isolation roots, pipes, the installed-agent walls, receipts) is
+assessed and built first; the lock's receipts are its first customer.
+
+**Ruling 19.** *Failed-unlock throttling?* Options: Argon2id's cost only;
+a growing delay of our own. Mark: **"Argon2id's cost only
+(Recommended)"**.
+
+**Ruling 20.** *The default idle window?* Options: 15, 5 or 30 minutes; off
+by default. Mark: **"15 minutes (Recommended)"**. Follows: per device and
+changeable.
+
+**Ruling 21.** *Which unlock methods does the first build carry?* Options:
+the passphrase plus Windows Hello; the passphrase only; every desktop
+platform's method. Mark: **"Passphrase + Windows Hello (Recommended)"**.
+Follows: other platforms' methods come later behind the same interface.
+
+**Ruling 22.** *Is macOS in scope?* Options: yes, with the pairing plan's
+D2; yes, now, through the standalone agent; Windows and Linux only. Mark:
+**"Yes, with D2 (Recommended)"**.
+
+**Ruling 23.** *Should a resident lock reach Turnstone, Knot and the
+graphshell app, which open the vault in their own processes?* Options:
+they follow the resident's broadcast and the persisted lock; record the
+gap. Mark: **"They follow the resident (Recommended)"**. Follows: the work
+reaches those repos; which of their calls break under ruling 13 is mapped
+at the build's start.
+
+**Ruling 24.** *Under lock, does Distillery's own transport key stay?*
+Options: it stays and sync continues; it is dropped and sync pauses. Mark:
+**"Stays; sync continues (Recommended)"**. Follows: the transport key only
+identifies the device to peers and opens no secret.
+
+Still open: a threat statement naming hibernation and the pagefile.
+
 ## 4. Phases
 
 Drafted from the assessment; set once the forks are ruled.
@@ -334,6 +406,9 @@ Drafted from the assessment; set once the forks are ruled.
   - [ ] the gates pass, with Windows-only and Linux-only code each compiled
         on its own target;
   - [ ] PID 53336 is untouched; deployment is Mark's step.
+        *2026-10-05 correction:* the installed resident's PID changes
+        on reboot (14756 that morning); the wall is its identity captured
+        at each run's start (djinn test harness plan).
 
 ## 5. Findings
 

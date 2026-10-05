@@ -30,22 +30,35 @@ impl ReduceCost {
     /// Computes operations as `(reduce_len - 1) * ops_per_step` per fold, and byte traffic
     /// for input reads and output writes.
     pub fn work(&self) -> Work {
-        let outputs = self.reduce_count * self.outputs_per_fold();
+        let (read, written) = self.traffic();
 
         Work {
-            compute_ops: self.reduce_count
-                * self.reduce_len.saturating_sub(1)
-                * self.ops_per_step(),
-            bytes: self.reduce_len * self.reduce_count * self.dtypes.input.size()
-                + outputs * self.dtypes.output.size(),
+            compute_ops: self.compute_ops(),
+            bytes: read + written,
         }
+    }
+
+    /// Operations the fold performs, `reduce_len - 1` steps per reduction.
+    pub fn compute_ops(&self) -> usize {
+        self.reduce_count * self.reduce_len.saturating_sub(1) * self.ops_per_step()
+    }
+
+    /// Compulsory global traffic in bytes, split by direction, which
+    /// [`work`](Self::work) sums.
+    pub fn traffic(&self) -> (usize, usize) {
+        let outputs = self.reduce_count * self.outputs_per_fold();
+
+        (
+            self.reduce_len * self.reduce_count * self.dtypes.input.size(),
+            outputs * self.dtypes.output.size(),
+        )
     }
 
     /// Generates a throughput key using direct ALU throughput for the accumulation element type.
     pub fn compute_key(&self) -> ThroughputKey {
         ThroughputKey {
             mode: ThroughputMode::ComputeDirect {
-                dtype: self.dtypes.accumulation.elem_type(),
+                dtype: self.dtypes.accumulation,
             },
         }
     }
@@ -104,10 +117,10 @@ impl From<&ReduceProblem> for ReduceCost {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use cubecl::ir::{ElemType, FloatKind, StorageType, UIntKind};
+    use cubecl::ir::{ElemType, FloatKind, UIntKind};
 
     fn f32_dtypes() -> ReduceDtypes {
-        let f32 = StorageType::Scalar(ElemType::Float(FloatKind::F32));
+        let f32 = ElemType::Float(FloatKind::F32);
 
         ReduceDtypes {
             input: f32,
@@ -223,7 +236,7 @@ mod tests {
         let argmax = ReduceCost {
             instruction: ReduceOperationConfig::ArgMax,
             dtypes: ReduceDtypes {
-                output: StorageType::Scalar(ElemType::UInt(UIntKind::U32)),
+                output: ElemType::UInt(UIntKind::U32),
                 ..f32_dtypes()
             },
             ..cost()

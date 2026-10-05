@@ -1,5 +1,6 @@
 #[cfg(test)]
 mod alias_broadcast_tests;
+mod same_view;
 #[cfg(feature = "autotune")]
 mod autotune_bounds;
 mod binary;
@@ -12,6 +13,7 @@ mod contiguous;
 mod cross;
 mod index;
 mod mask;
+mod memory_order;
 mod unary_float;
 mod unary_int;
 mod unary_numeric;
@@ -36,6 +38,7 @@ pub mod conv;
 /// CTC loss kernel
 pub mod ctc;
 /// FFT algorithms
+#[cfg(feature = "fft")]
 pub mod fft;
 /// Grid sampling kernels
 pub mod grid_sample;

@@ -1,8 +1,8 @@
 # Stack seams plan: catalog, shared device, actions, determinism, two words
 
 **Date:** 2026-10-04
-**Status (2026-10-05):** plan. Fourteen rulings in three rounds (S1 to S14);
-P1 in progress in this session's worktree, P2 after it; P3 and S7 done as documents; S3 to S6 carried into the
+**Status (2026-10-05):** in progress. Twenty rulings in seven rounds (S1 to
+S20); P1 being built in this session's worktree (S19), P2 after it; P3 and S7 done as documents; S3 to S6 carried into the
 dynamics grammar plan (G8, G9); S9 done by the identity lane (`b52edea7`).
 No code in this plan's own lane yet.
 
@@ -133,6 +133,37 @@ in two or more crates.
   with saving sessions; pandect ("everything a Mere session gathers under one
   cover") holds them and depends on eidetic and muniment, as the ambiance
   design's §5 describes.
+- **F12 (2026-10-05, P1's assessment). The registry is the custom catalog
+  only.** F1 and S1's options called scenomise's `SolverRegistry` the
+  arrangement catalog. It holds only solvers reached through
+  `sceno::Arrangement::Custom`: "The eleven named families never touch the
+  registry" (`scenomise/src/registry.rs`, `solve_via`), and nothing registers
+  them, so the named families have no ids. Ids already disagree: scenograph's
+  default `kind` is `"grid"` (`scenograph/src/lib.rs`, `Arrangement::default`)
+  while graphshell uses `"grid.default"` and `"scatter.default"`. Authoring
+  offers a string direction, an integer spacing and string options, where
+  sceno's families take typed parameters.
+- **F13 (2026-10-05). The compiler moved under another lane.** At `c79bb8c2`
+  (00:52), for its relationship-recipe pass, the projection grammar lane moved
+  graphshell's compiler into `scenomise::projection` (1,147 lines) and made
+  scenomise depend on scenograph; its plan names its integration worktree "the
+  single owner of shared compiler changes for this pass", with consumer
+  qualification in Knot and Woodshed in progress. Moved verbatim, and so still
+  open for P1: the dataset types in scenomise (`projection.rs` 525-570), the two
+  string ids (508-509), and `arrangement_for` with the 184 by 84 cell and 8
+  columns (1099-1125). At 14:38 that lane was idle and no branch held unmerged
+  compiler edits.
+  **Corrected 2026-10-05:** the attribution above is wrong. Projection grammar
+  [78751e] reports it wrote none of `c79bb8c2`, `b2f67356` or `4a2560ed`, nor
+  the plan text naming the integration worktree; the commits carry only
+  `mark-ik`, and Mark knows the session that did. That pass's next step is
+  Woodshed-side ("The Woodshed checkout lane owns implementation"), consuming
+  the compiler through a pinned mere revision. Measured for P1's effect on it:
+  grid pitch is `cell + gap` (`scenomise/src/solve.rs` 312-322), so today's
+  184 by 84 cell at spacing 16 gives a 200 by 100 pitch, and a cell fitted to
+  the 164 by 68 card (the footprint written in at `projection.rs` 697) gives
+  180 by 84; `columns` is unused there, since the grid ranker gives every item
+  an explicit cell.
 
 ## 2. Rulings
 
@@ -257,6 +288,64 @@ table.
 now; park it. Mark: **"Here, after P1 (Recommended)"**. Follows: this session
 takes P2 once P1 is reviewed.
 
+**Ruling S15 (round 4, from F12).** *Where do authored arrangement ids
+resolve?* Options: a built-in catalog beside the registry; register the
+built-ins as solvers; ids are sceno's variant names. Mark: **"Built-in catalog
+beside registry (Recommended)"**. Follows: scenomise gains a catalog of the
+eleven named families, each with an id, a `SolverCapability` (determinism,
+requires, tags) and a constructor from the authored arrangement into its typed
+sceno variant; an id not in it falls through to the registry as
+`Arrangement::Custom`. One lookup for hosts, and the typed enum stays
+exhaustive. *Reading, not ruled*: ids are the families' plain names
+(`grid`, `spiral`, `geographic` and the rest), and graphshell's
+`grid.default` and `scatter.default` resolve as aliases so saved definitions
+still load.
+
+**Ruling S16.** *Where does a parameter come from when the definition does not
+give it?* Options: measured from the items; documented family defaults;
+required in the definition. Mark: **"Measured from the items
+(Recommended)"**. Follows: unset parameters derive from the score (a grid
+cell fits the largest item, columns follow the item count, spacing is the
+authored spacing); options override; no layout constants in hosts or families.
+
+**Ruling S17 (round 5, from F13).** *Who builds the rest of P1, now that the
+compiler lives in scenomise under the projection lane's pass?* Options:
+coordinate, then build here; hand the rest to that lane; wait for its pass to
+end. Mark: **"Coordinate, then build here (Recommended)"**. Follows: this
+session tells the projection lane what P1 changes in `scenomise::projection`
+and asks it to hold compiler edits until P1 lands, or to name what its
+qualification needs; P1 is built in a worktree from current main, and nothing
+merges before Mark's review.
+
+**Ruling S18 (round 6, from F13's correction).** *Proceed with P1, now that
+S17 reached the wrong lane?* Options: proceed and leave a note; find the owner
+first; hand P1 to that owner. Mark (free text): **"Ah, i know the agent. Pass
+me a message and I'll relay it."** Follows: a message stating P1's changes
+(S12, S15, S16, the moved paths kept re-exported, the id aliases, and the pitch
+change from 200 by 100 to 180 by 84) and asking the recipe pass to hold
+compiler edits, name what its Woodshed pass needs, and say whether the pitch
+change suits its captures went to Mark for relay. *Reading, not ruled*: P1's
+code waits for that answer; read-only assessment continues.
+
+**Ruling S19 (round 7).** *Restart P1 now?* The message S18 sent for relay
+reached the graph-semantics lane, not the recipe pass, whose author is still
+unidentified here; nothing had touched the compiler since `c79bb8c2`, and the
+graph-semantics lane was holding the files. Options: build now and leave a
+note; wait for the recipe author. Mark: **"Build now, leave a note
+(Recommended)"**. Follows: P1 is built in the `stack-seams-p1` worktree; a dated
+cross-reference in the projection grammar adoption plan states the moved
+paths, the aliases, the signature change and the pitch change for the recipe
+pass to find at repin; nothing merges before Mark's review.
+
+**Ruling S20.** *Where does an item's size come from?* The compiler writes
+every card in at 164 by 68 (`scenomise/src/projection.rs` 697), which would
+make S16's measurement nominal. Options: the host supplies it; an authored
+option; a documented default. Mark: **"Host supplies it (Recommended)"**.
+Follows: compilation takes the representation's measured size from the host
+beside the dataset (graphshell passes its card size, Woodshed its own);
+nothing is written into scenomise. This follows the 2026-07-22 charter, which
+puts presentation (cards, glyphs) with the host.
+
 **Ruling S14.** *Where does the next contradiction pass look?* Options: plan
 status against code; rulings across plans; sibling repos too; no pass. Mark:
 **"Plan status vs code (Recommended)"**. Follows: active plans' status lines
@@ -275,7 +364,9 @@ doc audit flags. *Reading, not ruled*: it runs after P1, one lane at a time.
   result types) moves to scenomise, which holds the registry and already
   depends on sceno: it takes a scenograph definition and a dataset and returns
   a `sceno::Score`, resolving the arrangement id through the registry with
-  parameters from the definition.
+  parameters from the definition. The arrangement resolves through S15's
+  built-in catalog, falling through to the registry for custom ids, with unset
+  parameters measured from the items (S16).
   Graphshell's `arrangement_for` and `placement_for` retire into it.
   Scenograph's crate doc is corrected. **Owner:** this plan's lane. Asked
   through the projection grammar session, which works beside
@@ -350,6 +441,18 @@ The done-conditions handed over for S3 and S4, kept for reference:
   works in `projection_compile`. Second pass (F8 to F11), rulings S7 to S10:
   the README fixed (S7), TERMINOLOGY gains pandect under Eidetic and the
   curation record (S8, S10), S9 sent to the identity lane.
+- **2026-10-05.** P1 had stalled: the S18 relay reached the graph-semantics
+  lane, not the recipe pass. S19 restarts it with a note left in the adoption
+  plan; S20 moves item sizes to the host.
+- **2026-10-05.** F13's attribution corrected (the recipe pass is another
+  session's, which Mark knows); S18: a message for it relayed through Mark,
+  and P1's code waits on the answer.
+- **2026-10-05.** F13: the compiler had moved into `scenomise::projection`
+  under the projection lane (`c79bb8c2`); S17 rules coordination, then P1 here.
+- **2026-10-05.** P1's assessment found the registry holds custom solvers
+  only (F12), which invalidated S1's framing; put back as round 4 (S15, S16):
+  a built-in catalog beside the registry, and parameters measured from the
+  items.
 - **2026-10-05.** Round 3 (S11 to S14): P1 is built here in a worktree with
   the whole compile shared over a generic dataset type, P2 follows, and the
   next pass checks plan status against code. Mark asked why the portable

@@ -905,6 +905,13 @@ mod worker {
         Ok(report)
     }
 
+    /// The module's start: pre.4 CubeCL's static constructors, once, before
+    /// any other Rust code (burn migration plan 13.33; rulings 532, 533, 536).
+    #[wasm_bindgen(start)]
+    pub fn start() {
+        cambium_genet_web_host::run_static_constructors_once();
+    }
+
     /// Ask the active decoder generation to stop before its next token is
     /// delivered to the observer.
     #[wasm_bindgen]
