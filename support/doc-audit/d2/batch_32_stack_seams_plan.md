@@ -21,7 +21,7 @@ This batch exists because the document is new.
 ## mere_docs/implementation_strategy/2026-10-04_stack_seams_plan.md
 
 - disposition: current
-- status line: "Status (2026-10-05): plan. Seventeen rulings in five rounds (S1 to S17); P1 in progress in this session's worktree, P2 after it; P3 and S7 done as documents; S3 to S6 carried into the dynamics grammar plan (G8, G9); S9 done by the identity lane (`b52edea7`). No code in this plan's own lane yet." — accurate: yes
+- status line: "Status (2026-10-05): plan. Eighteen rulings in six rounds (S1 to S18); P1 assessed in this session's worktree and waiting on the recipe pass's answer (S18), P2 after it; P3 and S7 done as documents; S3 to S6 carried into the dynamics grammar plan (G8, G9); S9 done by the identity lane (`b52edea7`). No code in this plan's own lane yet." — accurate: yes
 - claims checked: 30 — holds: 30, stale: 0, unverifiable: 0
 
 ### Stale claims
@@ -73,4 +73,7 @@ graphshell's two id constants (`projection_compile.rs` 75-76). F13 checked
 against `c79bb8c2`'s file list and the adoption plan lines it added, the
 moved constants and mapping in `scenomise/src/projection.rs`, and a scan of
 every local branch for unmerged compiler edits (two found, both merges of
-main only).
+main only). F13's correction checked against the three commits' authorship
+and file lists, the adoption plan's host continuation entry (lines 88-97),
+and the pitch arithmetic in `solve.rs` 312-322 with the footprint at
+`projection.rs` 697.

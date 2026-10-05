@@ -1,8 +1,9 @@
 # Stack seams plan: catalog, shared device, actions, determinism, two words
 
 **Date:** 2026-10-04
-**Status (2026-10-05):** plan. Seventeen rulings in five rounds (S1 to S17);
-P1 in progress in this session's worktree, P2 after it; P3 and S7 done as documents; S3 to S6 carried into the
+**Status (2026-10-05):** plan. Eighteen rulings in six rounds (S1 to S18);
+P1 assessed in this session's worktree and waiting on the recipe pass's
+answer (S18), P2 after it; P3 and S7 done as documents; S3 to S6 carried into the
 dynamics grammar plan (G8, G9); S9 done by the identity lane (`b52edea7`).
 No code in this plan's own lane yet.
 
@@ -153,6 +154,17 @@ in two or more crates.
   string ids (508-509), and `arrangement_for` with the 184 by 84 cell and 8
   columns (1099-1125). At 14:38 that lane was idle and no branch held unmerged
   compiler edits.
+  **Corrected 2026-10-05:** the attribution above is wrong. Projection grammar
+  [78751e] reports it wrote none of `c79bb8c2`, `b2f67356` or `4a2560ed`, nor
+  the plan text naming the integration worktree; the commits carry only
+  `mark-ik`, and Mark knows the session that did. That pass's next step is
+  Woodshed-side ("The Woodshed checkout lane owns implementation"), consuming
+  the compiler through a pinned mere revision. Measured for P1's effect on it:
+  grid pitch is `cell + gap` (`scenomise/src/solve.rs` 312-322), so today's
+  184 by 84 cell at spacing 16 gives a 200 by 100 pitch, and a cell fitted to
+  the 164 by 68 card (the footprint written in at `projection.rs` 697) gives
+  180 by 84; `columns` is unused there, since the grid ranker gives every item
+  an explicit cell.
 
 ## 2. Rulings
 
@@ -306,6 +318,16 @@ and asks it to hold compiler edits until P1 lands, or to name what its
 qualification needs; P1 is built in a worktree from current main, and nothing
 merges before Mark's review.
 
+**Ruling S18 (round 6, from F13's correction).** *Proceed with P1, now that
+S17 reached the wrong lane?* Options: proceed and leave a note; find the owner
+first; hand P1 to that owner. Mark (free text): **"Ah, i know the agent. Pass
+me a message and I'll relay it."** Follows: a message stating P1's changes
+(S12, S15, S16, the moved paths kept re-exported, the id aliases, and the pitch
+change from 200 by 100 to 180 by 84) and asking the recipe pass to hold
+compiler edits, name what its Woodshed pass needs, and say whether the pitch
+change suits its captures went to Mark for relay. *Reading, not ruled*: P1's
+code waits for that answer; read-only assessment continues.
+
 **Ruling S14.** *Where does the next contradiction pass look?* Options: plan
 status against code; rulings across plans; sibling repos too; no pass. Mark:
 **"Plan status vs code (Recommended)"**. Follows: active plans' status lines
@@ -401,6 +423,9 @@ The done-conditions handed over for S3 and S4, kept for reference:
   works in `projection_compile`. Second pass (F8 to F11), rulings S7 to S10:
   the README fixed (S7), TERMINOLOGY gains pandect under Eidetic and the
   curation record (S8, S10), S9 sent to the identity lane.
+- **2026-10-05.** F13's attribution corrected (the recipe pass is another
+  session's, which Mark knows); S18: a message for it relayed through Mark,
+  and P1's code waits on the answer.
 - **2026-10-05.** F13: the compiler had moved into `scenomise::projection`
   under the projection lane (`c79bb8c2`); S17 rules coordination, then P1 here.
 - **2026-10-05.** P1's assessment found the registry holds custom solvers
