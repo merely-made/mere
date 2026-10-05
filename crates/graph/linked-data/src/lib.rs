@@ -309,7 +309,10 @@ fn node_direct_quads(graph: &Graph, key: NodeKey, node: &Node) -> Vec<Quad> {
     let classifications = graph.node_classifications(key).unwrap_or_default();
     let mut types: Vec<&str> = classifications
         .iter()
-        .filter(|c| matches!(&c.scheme, ClassificationScheme::Custom(s) if s == "rdf:type"))
+        .filter(|c| {
+            c.status.is_affirmative()
+                && matches!(&c.scheme, ClassificationScheme::Custom(s) if s == "rdf:type")
+        })
         .map(|c| c.value.as_str())
         .collect();
     types.sort_unstable();
@@ -703,6 +706,66 @@ mod tests {
     use kernel::graph::{EdgeAssertion, Graph, SemanticSubKind};
     use kernel::types::{GraphScope, NodeProperty};
     use serde_json::json;
+
+    #[test]
+    fn type_export_uses_affirmative_statuses_and_retains_review_records() {
+        use kernel::types::{
+            ClassificationProvenance, ClassificationScheme, ClassificationStatus,
+            NodeClassification,
+        };
+
+        for (status, exported) in [
+            (ClassificationStatus::Accepted, true),
+            (ClassificationStatus::Verified, true),
+            (ClassificationStatus::Imported, true),
+            (ClassificationStatus::Suggested, false),
+            (ClassificationStatus::Rejected, false),
+        ] {
+            let mut graph = Graph::new();
+            let key = graph.add_node("https://classification.test/".into(), Default::default());
+            graph.get_node_mut(key).unwrap().title = "Classification control".into();
+            let record = NodeClassification {
+                scheme: ClassificationScheme::Custom("rdf:type".into()),
+                value: "https://schema.org/Article".into(),
+                label: Some("Article".into()),
+                confidence: 0.8,
+                provenance: ClassificationProvenance::UserAuthored,
+                status,
+                primary: true,
+            };
+            assert!(graph.add_node_classifications(key, vec![record.clone()]));
+            let types: Vec<_> = super::dataset_quads(&graph)
+                .into_iter()
+                .filter(|quad| quad.predicate.as_str() == super::RDF_TYPE)
+                .collect();
+            assert_eq!(types.len(), usize::from(exported), "{record:?}");
+            if exported {
+                assert_eq!(types[0].object.to_string(), "<https://schema.org/Article>");
+            }
+            let exported_bytes = serde_json::to_vec(&to_jsonld(&graph)).unwrap();
+            let contribution = from_jsonld(&exported_bytes).expect("JSON-LD export reingests");
+            let node = contribution
+                .nodes
+                .iter()
+                .find(|node| node.id == "https://classification.test/")
+                .expect("exported node remains");
+            assert_eq!(node.title.as_deref(), Some("Classification control"));
+            assert_eq!(node.types.contains(&record.value), exported, "{record:?}");
+            #[cfg(feature = "query")]
+            {
+                let rows = super::query::sparql(
+                    &graph,
+                    "SELECT ?type WHERE { <https://classification.test/> a ?type }",
+                )
+                .expect("classification query");
+                assert_eq!(rows.rows.len(), usize::from(exported), "{record:?}");
+                if exported {
+                    assert_eq!(rows.rows[0], vec![Some(record.value.clone())]);
+                }
+            }
+            assert_eq!(graph.node_classifications(key).unwrap(), vec![record]);
+        }
+    }
 
     /// A graph with one recognized edge (A cites B, canonical IRI), one raw
     /// open-predicate edge (A → C, `schema:citation`), and curated literals on A.

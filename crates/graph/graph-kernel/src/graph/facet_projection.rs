@@ -162,7 +162,9 @@ pub fn facet_projection_for_node(graph: &Graph, key: NodeKey) -> Option<FacetPro
             .map(|t| FacetScalar::Text(t.clone()))
             .collect();
         for c in graph.node_classifications(key).unwrap_or_default() {
-            udc_values.push(FacetScalar::Text(c.value.clone()));
+            if c.status.is_affirmative() {
+                udc_values.push(FacetScalar::Text(c.value.clone()));
+            }
         }
         if !udc_values.is_empty() {
             proj.insert(
@@ -316,7 +318,7 @@ mod tests {
     }
 
     #[test]
-    fn projection_udc_classes_merges_tags_and_classifications() {
+    fn projection_udc_classes_keeps_suggested_classifications_for_review() {
         use crate::graph::{
             ClassificationProvenance, ClassificationScheme, ClassificationStatus,
             NodeClassification,
@@ -343,6 +345,56 @@ mod tests {
             panic!("expected Collection");
         };
         assert!(items.contains(&FacetScalar::Text("udc:51".to_string())));
-        assert!(items.contains(&FacetScalar::Text("udc:519.6".to_string())));
+        assert!(!items.contains(&FacetScalar::Text("udc:519.6".to_string())));
+        let retained = graph.node_classifications(key).unwrap();
+        assert_eq!(retained.len(), 1);
+        assert_eq!(retained[0].status, ClassificationStatus::Suggested);
+    }
+
+    #[test]
+    fn classification_facets_include_affirmative_statuses_without_discarding_review() {
+        use crate::types::{
+            ClassificationProvenance, ClassificationScheme, ClassificationStatus,
+            NodeClassification,
+        };
+
+        for scheme in [
+            ClassificationScheme::Udc,
+            ClassificationScheme::ContentKind,
+            ClassificationScheme::Custom("rdf:type".into()),
+        ] {
+            for (status, projected) in [
+                (ClassificationStatus::Accepted, true),
+                (ClassificationStatus::Verified, true),
+                (ClassificationStatus::Imported, true),
+                (ClassificationStatus::Suggested, false),
+                (ClassificationStatus::Rejected, false),
+            ] {
+                let mut graph = Graph::new();
+                let key = build_node(&mut graph, "https://example.test/");
+                graph.insert_node_tag(key, "retained-tag".into());
+                let record = NodeClassification {
+                    scheme: scheme.clone(),
+                    value: "classification-value".into(),
+                    label: Some("Classification".into()),
+                    confidence: 0.8,
+                    provenance: ClassificationProvenance::UserAuthored,
+                    status,
+                    primary: true,
+                };
+                assert!(graph.add_node_classification(key, record.clone()));
+                let facets = facet_projection_for_node(&graph, key).unwrap();
+                let FacetValue::Collection(values) = &facets[facet_keys::UDC_CLASSES] else {
+                    panic!("expected classification collection");
+                };
+                assert!(values.contains(&FacetScalar::Text("retained-tag".into())));
+                assert_eq!(
+                    values.contains(&FacetScalar::Text(record.value.clone())),
+                    projected,
+                    "{record:?}"
+                );
+                assert_eq!(graph.node_classifications(key).unwrap(), vec![record]);
+            }
+        }
     }
 }

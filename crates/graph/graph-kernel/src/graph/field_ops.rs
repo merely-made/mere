@@ -115,7 +115,7 @@ impl Graph {
 
     /// Resolve a coupling's [`NodeSelector`] to the matching nodes, against node
     /// tags and classifications. `Kind(k)` matches a node carrying any
-    /// classification whose value is `k` (the v1 interpretation; a
+    /// affirmative classification whose value is `k` (the v1 interpretation; a
     /// scheme-qualified match can refine it later).
     pub fn nodes_matching<'a>(
         &'a self,
@@ -129,9 +129,11 @@ impl Graph {
                 NodeSelector::All => true,
                 NodeSelector::Tagged(tag) => node.tags.contains(tag),
                 NodeSelector::NotTagged(tag) => !node.tags.contains(tag),
-                NodeSelector::Kind(kind) => self
-                    .node_classifications(key)
-                    .is_some_and(|classes| classes.iter().any(|c| &c.value == kind)),
+                NodeSelector::Kind(kind) => self.node_classifications(key).is_some_and(|classes| {
+                    classes
+                        .iter()
+                        .any(|c| c.status.is_affirmative() && &c.value == kind)
+                }),
             }
         })
     }
@@ -246,5 +248,49 @@ mod tests {
             .nodes_matching(&NodeSelector::Kind("paper".into()))
             .collect();
         assert!(no_kind.is_empty());
+    }
+
+    #[test]
+    fn kind_selection_uses_affirmative_classifications_and_retains_review_records() {
+        use crate::types::{
+            ClassificationProvenance, ClassificationScheme, ClassificationStatus,
+            NodeClassification,
+        };
+
+        for scheme in [
+            ClassificationScheme::ContentKind,
+            ClassificationScheme::Udc,
+            ClassificationScheme::Custom("rdf:type".into()),
+        ] {
+            for (status, selected) in [
+                (ClassificationStatus::Accepted, true),
+                (ClassificationStatus::Verified, true),
+                (ClassificationStatus::Imported, true),
+                (ClassificationStatus::Suggested, false),
+                (ClassificationStatus::Rejected, false),
+            ] {
+                let mut graph = Graph::new();
+                let key = graph.add_node("https://example.test/".into(), Point2D::zero());
+                let record = NodeClassification {
+                    scheme: scheme.clone(),
+                    value: "article".into(),
+                    label: Some("Article".into()),
+                    confidence: 0.8,
+                    provenance: ClassificationProvenance::UserAuthored,
+                    status,
+                    primary: true,
+                };
+                assert!(graph.add_node_classification(key, record.clone()));
+                let actual: Vec<_> = graph
+                    .nodes_matching(&NodeSelector::Kind("article".into()))
+                    .collect();
+                assert_eq!(
+                    actual,
+                    if selected { vec![key] } else { vec![] },
+                    "{record:?}"
+                );
+                assert_eq!(graph.node_classifications(key).unwrap(), vec![record]);
+            }
+        }
     }
 }
