@@ -3,7 +3,8 @@
 **Date:** 2026-10-04
 **Status (2026-10-04):** plan. Ten rulings in two rounds (S1 to S10); P1 and
 P2 for this plan's lane; P3 and S7 done as documents; S3 to S6 carried into the
-dynamics grammar plan (G8, G9); S9 with the identity lane (§3.2). No code.
+dynamics grammar plan (G8, G9); S9 done by the identity lane (`b52edea7`).
+No code in this plan's own lane yet.
 
 A note sent to Mark listed weak seams in the stack. Each claim was checked
 against the code (§1); six seams proved real and went to him as
@@ -265,7 +266,12 @@ on main: S3 and S4 as inputs with tracks G8 (determinism, all five S4
 done-conditions and checkpoint C3, this plan's two probes named as its
 instruments) and G9 (permitted actions) at `6c3dca60`; S5 and S6 as inputs,
 with G4's binding naming `AdvertisedAction`s and S4's three sum sites, at
-`e932d526`. **S9** goes to the identity lane, which owns personae and mien.
+`e932d526`. **S9** went to the identity lane, which owns personae and mien,
+and is done: mien's type is `PersonaKey` (`f702ca27`, merged on main as
+`b52edea7`), with no serde, wire or persisted format carrying it and no user
+outside mien. That lane also renamed mien's internal `standing_persona_id`,
+which returns the key, to `standing_persona_key`, marking it as its own
+reading of the ruling.
 
 The done-conditions handed over for S3 and S4, kept for reference:
 
@@ -302,3 +308,8 @@ The done-conditions handed over for S3 and S4, kept for reference:
   recorded at `1a2e71db`. S5 and S6 needed no change in the projection grammar
   documents, which already use "arrangement" for positions and "scene" in the
   projection sense.
+- **2026-10-05.** S9 done by the identity lane (`b52edea7`); checked here
+  against the tree (one `PersonaKey` definition, no `PersonaId` left in mien,
+  no outside uses, personae's `PersonaId` unchanged). Its test run (mien's 59
+  tests; gemot, moothold and distillery checked) is that lane's report, not
+  rerun here.

@@ -21,7 +21,7 @@ This batch exists because the document is new.
 ## mere_docs/implementation_strategy/2026-10-04_stack_seams_plan.md
 
 - disposition: current
-- status line: "Status (2026-10-04): plan. Ten rulings in two rounds (S1 to S10); P1 and P2 for this plan's lane; P3 and S7 done as documents; S3 to S6 carried into the dynamics grammar plan (G8, G9); S9 with the identity lane (§3.2). No code." — accurate: yes
+- status line: "Status (2026-10-04): plan. Ten rulings in two rounds (S1 to S10); P1 and P2 for this plan's lane; P3 and S7 done as documents; S3 to S6 carried into the dynamics grammar plan (G8, G9); S9 done by the identity lane (`b52edea7`). No code in this plan's own lane yet." — accurate: yes
 - claims checked: 30 — holds: 30, stale: 0, unverifiable: 0
 
 ### Stale claims
@@ -62,4 +62,5 @@ on `Grant::from_authority`, platen's alias at `workbench.rs` 410-415); F9's two
 plan's `6c3dca60` and `e932d526` as the carrying commits in §3.2. Added
 2026-10-05: P1's owner, checked against the adoption plan's lines added at
 `1a2e71db` (Mark's answer quoted there) and `projection_compile.rs`'s last
-commit, `e387df16`.
+commit, `e387df16`. S9's completion checked against `b52edea7` on main and a
+search of mien and the workspace for the old name.
