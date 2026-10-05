@@ -125,6 +125,8 @@ impl Canvas {
         self.view_w = w;
         self.view_h = h;
         let viewport = DeviceIntSize::new(w as i32, h as i32);
+        // Host time for this frame, or one tick when the host gives none.
+        let dt = elapsed.map_or(seiche::TICK_DT, |(elapsed, _)| elapsed.as_secs_f32());
 
         // Advance physics (the in-thread tick, or the freshest actor snapshot)
         // into the read model, and learn whether the layout is still settling.
@@ -199,6 +201,8 @@ impl Canvas {
         } else if self.middle_drag.is_none() {
             self.pan_velocity = (0.0, 0.0);
         }
+        // Following the layout: ease toward fit-to-content while physics plays.
+        let following = self.follow_step(dt);
         self.generation = self.generation.wrapping_add(1);
 
         // Reproject the underlay from the view positions (a
@@ -537,8 +541,12 @@ impl Canvas {
 
         // A sliced Meaning run advances once a frame, so it asks for the next
         // one until it lands. (Dynamics grammar plan, G2, F35.)
-        let needs_redraw =
-            settling || gliding || dragging || self.ambient.is_some() || self.meaning_pending();
+        let needs_redraw = settling
+            || gliding
+            || dragging
+            || following
+            || self.ambient.is_some()
+            || self.meaning_pending();
         observer.mark(9);
         (scene, needs_redraw)
     }
@@ -570,13 +578,8 @@ impl Canvas {
                 else {
                     continue;
                 };
-                let (cx, cy) = self.camera.to_screen(*pos);
                 let side = self.node_size(key) * FACE_INSET * self.camera.zoom;
-                let half = side * 0.5;
-                let bounds = LayoutRect::new(
-                    LayoutPoint::new(cx - half, cy - half),
-                    LayoutPoint::new(cx + half, cy + half),
-                );
+                let bounds = self.face_rect_at(key, *pos);
                 let file = self
                     .derived_face_cache
                     .entry((crate::DERIVATION_VERSION, address.clone()))
@@ -633,16 +636,8 @@ impl Canvas {
             // Inset within the face so the accent frames the icon: state /
             // selection must stay readable at a glance once an icon lands
             // (representations carry node identity).
-            let (cx, cy) = self.camera.to_screen(*pos);
-            // Inset within the node's *resolved* face, so a resized node carries
-            // its icon proportionally (identical at the default size).
-            let half = self.node_size(key) * 0.5 * FACE_INSET * self.camera.zoom;
-            let (x0, y0, x1, y1) = (cx - half, cy - half, cx + half, cy + half);
             face_cmds.push(PaintCmd::DrawImage(ImageItem {
-                placement: CommonPlacement::new(LayoutRect::new(
-                    LayoutPoint::new(x0, y0),
-                    LayoutPoint::new(x1, y1),
-                )),
+                placement: CommonPlacement::new(self.face_rect_at(key, *pos)),
                 image_key: img_key,
                 image_rendering: ImageRendering::Auto,
                 alpha_type: AlphaType::Alpha,

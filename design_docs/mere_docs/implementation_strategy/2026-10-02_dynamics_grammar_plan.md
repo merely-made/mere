@@ -163,6 +163,14 @@ Mark's words are quoted as the physics catalog plan records them (§3, P7, and �
 
 **F55, channel ids for the moved disclosures (2026-10-04; G2b's fourth question).** Options: reuse the existing channel where the fact is the same, otherwise new families on F32's pattern; one family per disclosure; no ids until a physics term reads one. Mark: **"Reuse, else new families"**. *Follows:* the cluster partition stays `groups.cluster`; the rest take families such as `order.recency`, `order.timeline`, `rings.focus`, `coords.spectral`, `weight.degree` and `importance.betweenness`. G2b's third and fifth questions are F51's (recency in f64; betweenness moved as is).
 
+**F56, Meaning's model and tuning (2026-10-04; G2's fourteenth question).** Question: on the 900 arXiv titles, MiniLM reaches F 0.906 at best, in 2 of 44 cells, an edge result; e5-base-v2 (MIT; its card asks for mean pooling and a "query: " prefix, checked by the coordinator) holds a plateau, with the prefix 0.946 at k 16 and classical Louvain (γ 1), 23 of 44 cells meeting the bar, at 415 MiB of GPU memory against MiniLM's 86 and 243 s on the CPU for 900 titles against about 55 s. Options: e5-base-v2 prefixed at k 16; e5-base-v2 at its best cell (no prefix, k 32, γ 1.25, F 0.953); e5-small-v2 prefixed (F 0.913, 127 MiB); keep MiniLM with P7's Meaning condition unmet on arXiv. Mark: **"e5-base-v2, prefixed, k 16"**. *Follows:* Meaning's model is e5-base-v2 with mean pooling and the "query: " prefix, at top-k 16 and γ 1; the wasm default stays the lexical fallback.
+
+**F57, the edge line (2026-10-04; G2's sixteenth question).** Options: 0.01, as read; 0.02; counting the cells that meet the bar. Mark: **"0.01"**. *Follows:* a result clearing 0.9 by less than 0.01 (about nine titles in 900) is an edge result and is not adopted.
+
+**F58, the e5 models' provenance (2026-10-04).** Question: the e5 files on disk (`models/`, outside the tree) carry only config, tokenizer and weights, with no card, licence, pooling config or revision; the cards online say MIT. Options: record MIT with the card's URL, hash the local files and match them to a published Hugging Face revision by its listed file hashes (metadata only, no weight download), pinning that revision in a manifest as the decoder's is; download afresh at a chosen revision; note it and move on. Mark: **"Hash and match"**.
+
+**F59, the lexical tuning (2026-10-04; G2's fifteenth question).** Options: keep k 4, floor 0.1, γ 1 (F 0.330); k 16, floor 0.1, γ 0.9 (0.389 in 6 groups); the sweep's best (0.425 in 3 groups). Mark: **"Keep k 4, γ 1"**.
+
 **F40, G7 (2026-10-03).** Question: approve G7, arrangement roles (§2, proposed at `784ce5b5`), which carries out F18 to F30, and place it. Options: approve, with G7 before G3; approve, after G2; amend first. Mark: **"Approve; G7 before G3"**. *Follows:* G7 starts now beside G2's open work, and G3 follows it, since G3's schedules use captures with a role (F27).
 
 **F41, the README's text (2026-10-03).** Question: the design-vocabulary section F13 placed in the README, its projection half in Mark's words and its dynamics half drafted from the rulings, placed after Status. Options: use the text as shown; the projection half only; edit the wording. Mark: **"Use this text"**. *Follows:* the section is committed as shown.
@@ -185,6 +193,8 @@ From the physics catalog plan, §3 P5–P7 and §5:
 | The picker (2026-10-01) | "Ordinary laws with a CPU tier" | Every term keeps a CPU rung, so every host can realize every spec. |
 | Rapier's role (2026-10-01) | "Rapier seems the fallback in any case" | Integration under rapier remains the default realization, and every other realization falls back to it. |
 | Licensing (2026-10-01) | "Doublecheck. Otherwise, 1" | Nexus-derived code is treated as Apache-2.0. A close port gets a `LICENSES.md` entry; code merely informed by it stays MPL-2.0 with a credit line. |
+| Permitted actions, stack seams S3 (2026-10-04) | "One model: AdvertisedAction (Recommended)" | F21's binding's permitted actions (drag, pin) are chirograph `AdvertisedAction`s, drag and pin advertising the `Curation` effect since positions are not graph truth; one path into accessibility and permission surfaces. Carried by G9 below. |
+| Determinism, stack seams S4 (2026-10-04) | "Ordered, declared, cross-platform (Recommended)", after Mark asked "How large is the performance cost of enhanced determinism?" | seiche iterates bodies in key order so a build repeats (today five processes give five fingerprints, `Code/testing/mere/seiche-repeat`); each `Term` declares deterministic, seeded or nondeterministic; rapier's `enhanced-determinism` goes on (measured free, `Code/testing/mere/rapier-determinism`); seiche's own transcendental math routes through `libm`, its cost measured; runs repeat across platforms. Carried by G8 below, with the seams plan's checkpoint C3. |
 
 **Rules for lanes on this plan** (*Reading, not ruled*, gathered from current policy):
 - **Licensing.** The licence posture brief's ruling is "MPL-2.0 by default, with correct provenance", and "there are no exceptions" (`design_docs/2026-08-22_license_posture_brief.md`). Algorithms are written from the literature where possible, as P6a's CPU tier was. Any close port gets a `LICENSES.md` entry under the licensing ruling above.
@@ -360,6 +370,21 @@ Constraints report whether they were satisfied, the physics counterpart of `scen
 - the anchor residual falls monotonically as `arrangement_pull` rises across a sweep;
 - the reports reach the web snapshot and turnstone's observe snapshot;
 - the eleven law receipts stay green.
+
+### G8 — determinism (stack seams S4, 2026-10-04)
+
+From `2026-10-04_stack_seams_plan.md` §3.2, which hands it to this plan. It extends G1's declarations and the speed dial's key-order sums (physics catalog plan, "Sum in key order", which ordered NodeExclusion and Barnes-Hut only).
+
+*Done when:*
+- the `seiche-repeat` probe prints one fingerprint across five processes (today's five different ones are the control);
+- each `Term` declares its determinism (deterministic, seeded or nondeterministic), and an undeclared one does not compile, as G1's declarations;
+- rapier's `enhanced-determinism` is on;
+- the probe's fingerprint matches on Windows and on macOS or Linux;
+- the cost of `libm` in seiche's laws is measured at the probe's sizes and reported. Checkpoint C3: if it costs more than the run-to-run spread at 5,000 bodies, the figure comes back to Mark before it is kept.
+
+### G9 — permitted actions (stack seams S3, 2026-10-04)
+
+*Done when:* the binding's permitted actions are `AdvertisedAction`s; drag and pin advertise as `Curation`; an accessibility or permission surface lists them with no physics-specific path.
 
 ### G7 — arrangement roles (approved 2026-10-03, F40)
 

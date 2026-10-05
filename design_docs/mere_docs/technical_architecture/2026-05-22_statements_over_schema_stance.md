@@ -61,6 +61,8 @@ RDF describes resources. It never described the reading of them. RDF was built t
 2. **Radical.** Internal store becomes a quad store, everything is quads, SPARQL is the internal query, families become vocabulary on top. Rejected as the *substrate*: the workspace half runs at frame rate over mutable state, behavior dispatch wants exhaustive closed enums, a SPARQL engine is heavy in wasm, and "natively RDF" pulls toward the OWL/RDFS reasoning footgun this doc already excludes.
 3. **Split (the live option).** The content subgraph becomes a real SPARQL-queryable RDF store ([Oxigraph](https://crates.io/crates/oxigraph) is the wasm-capable Rust candidate); the browse and workspace graphs stay in the native kernel; the node IRI is the join key. This makes "build on RDF" true for the half where facts are shared, without the kernel becoming RDF.
 
+   > **Amended 2026-10-04 (Mark, [graph semantics plan](../implementation_strategy/2026-10-04_graph_semantics_plan.md) ruling 6):** the split is taken, in petgraph form rather than as a separate RDF store: each mere holds a resource graph (content statements, one resource per canonical URL, keyed by the UUIDv5 of its IRI) beside the surface graph (browse and workspace), joined by the resource a surface shows. SPARQL runs over the resource graph through a `QueryableDataset` adapter. A table-as-truth form was compared and declined, since it is the held-RDF-truth design measured on 2026-06-18.
+
 **Disposition.** Hold position 1 now: the native kernel stays the substrate, and the world/experience cut is a conceptual layer over it. Treat position 3, promoting the content subgraph into an actual SPARQL store, as a future projection that earns its place when federated or semantic query over the content graph is a real requirement. This is the same slot the [event-DAG substrate brief](../implementation_strategy/2026-05-07_event_dag_substrate_brief.md) assigns Oxigraph and NextGraph at the engram boundary.
 
 ## The posture
@@ -69,6 +71,8 @@ Two stances follow, both of which a *browser* should hold anyway:
 
 - **Partial and multi-source.** The graph is what Mere has gathered so far, from many sources, not a closed truth. Absence is not falsehood. We take the open-world *posture* (provenance per statement, mergeable views) without open-world *logic* (entailment and reasoning, which is the footgun).
 - **Identity as the merge key.** Global, dereferenceable identity is what lets two sources about the same thing merge. Mere's nodes are already URL-addressed, so this is a strength to lean on rather than bolt on. `AddressClaim` is the existing seam.
+
+> **Amended 2026-10-04 (Mark, [graph semantics plan](../implementation_strategy/2026-10-04_graph_semantics_plan.md) rulings 1, 2 and 4).** Provenance per statement now means per *assertion*: two sources of one claim hold two statements. The merge key is a resource identity (one id per canonical URL) beneath the browsing surface, since the live node is a surface whose address changes. "Absence is not falsehood" gains a mechanism: partial residency makes "not loaded" a real state, and every query and projection result names the layer that limited it.
 
 ## Linked data is a projection, not a boundary
 
@@ -91,5 +95,6 @@ Incrementally. Each instance is a small, separate plan that points back here.
 
 - **First instance, in-flight:** open the Semantic predicate for linked-data ingest/export. See the [linked-data ingest/export plan](../implementation_strategy/2026-05-22_linked_data_ingest_export_plan.md) *(historical citation)* <!-- doc-audit: historical-link -->.
 - **Candidate next instances, named but not scheduled:** node properties as recognized predicates on the node-as-subject (closes the property-bag gap); `tags` and classifications as recognized vocabulary types; folding the scattered provenance and trust annotations into one statement-level annotation.
+  > **Amended 2026-10-04 (Mark, [graph semantics plan](../implementation_strategy/2026-10-04_graph_semantics_plan.md) ruling 15):** taken for tags: a tag becomes a resource (a SKOS concept) and tagging is a statement to it. Classifications are that plan's checkpoint C8.
 
 Each lands only when a consumer needs it, under the composition spine's discipline. The principle is the through-line; the plans are the work.

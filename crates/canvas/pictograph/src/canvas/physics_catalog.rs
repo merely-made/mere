@@ -45,9 +45,9 @@ use petgraph::data::Element;
 use petgraph::graph::{DiGraph, EdgeIndex, NodeIndex, UnGraph};
 use petgraph::visit::EdgeRef;
 use seiche::{
-    Anneal, BarnesHutRepulsion, Boids, Boundary, DegreeRepulsion, Density, DepthGravity,
-    DomainCluster, EdgeSpring, Force, Gravity, GravityLocus, GridSnap, Hold, HubGravity, Kuramoto,
-    LinLogForce, MagneticSpring, NodeExclusion, ParticleLife, StressSpring,
+    Anneal, BarnesHutRepulsion, Boids, Boundary, CounterDamping, DegreeRepulsion, Density,
+    DepthGravity, DomainCluster, EdgeSpring, Force, Gravity, GravityLocus, GridSnap, Hold,
+    HubGravity, Kuramoto, LinLogForce, MagneticSpring, NodeExclusion, ParticleLife, StressSpring,
 };
 
 use crate::canvas::seiche_bridge::visible_relation_edges;
@@ -66,6 +66,12 @@ const SKELETON_STIFFNESS: f32 = 60.0;
 /// (`220_000 / 36² ≈ 170`): the seiche default of 2 400 left bodies
 /// touching under the edge springs. (Physics catalog — the Charge receipt.)
 pub(crate) const CHARGE_STRENGTH: f32 = 6_000.0;
+/// Orbit's exclusion reaches two node diameters: a guard at contact, where
+/// Springs' reach of 1,000 outweighed gravitation at every range inside it
+/// and threw the graph apart. Orbit's centring is a weak well that holds what
+/// the orbits spread. (Ruled 2026-10-04, "Frictionless orbits + centring".)
+pub(crate) const ORBIT_EXCLUSION_REACH: f32 = 4.0 * seiche::NODE_BODY_RADIUS;
+pub(crate) const ORBIT_CENTRING: f32 = 0.02;
 /// Density's grid resolution on the CPU tier (cells per side): 64², ruled
 /// 2026-10-02 (the same ranks as 128² at about a sixteenth of the cost).
 pub const DENSITY_RESOLUTION: usize = 64;
@@ -1200,8 +1206,17 @@ impl<'a> LawInputs<'a> {
                 Box::new(LinLogForce::default()),
             ],
             PhysicsLaw::Orbit => vec![
-                Box::new(NodeExclusion::default()),
-                Box::new(Gravity::new(self.masses(sources.mass))),
+                Box::new(NodeExclusion {
+                    cutoff: ORBIT_EXCLUSION_REACH,
+                    ..NodeExclusion::default()
+                }),
+                Box::new(Gravity::new(
+                    self.masses(sources.mass),
+                    CounterDamping::Tangential,
+                )),
+                Box::new(Boundary {
+                    strength: ORBIT_CENTRING,
+                }),
             ],
             PhysicsLaw::Kinds => {
                 let (kinds, kind_count) = self.kinds(sources.kind);
