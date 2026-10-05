@@ -1,8 +1,8 @@
 # Graph semantics plan: assertions, resources, saved queries, residency
 
 **Date:** 2026-10-04
-**Status (2026-10-04):** plan. Round 1 ruled (rulings 1 to 4); round 2 forks
-open (§5); phases are a draft until those land. No code.
+**Status (2026-10-04):** plan. Rounds 1 and 2 ruled (rulings 1 to 8); phases
+final; implementation checkpoints listed in §5. No code.
 
 Four questions were put to Mark from outside the project: what a link records,
 what makes two things the same thing, what a saved query can become, and how
@@ -157,59 +157,160 @@ residency, disclosure, synchronization, projection; the purge policy is a
 setting whose default is open; the residency unit, and whether full residency
 remains a mode, are fork 5.3.
 
-## 4. Phases (draft)
+Round 2 put the forks rulings 1 to 4 opened, which the round-1 draft numbered
+5.1 to 5.4; they are rulings 5 to 8, in that order.
 
-*Reading, not ruled*: an order and done-conditions drafted from rulings 1 to 4.
-Final after round 2.
+**Ruling 5.** *Who is the asserter in the dedup key?* Options: the attributed
+source, else the journal Author; the journal Author only; the Author with its
+version in the key. Mark: **"Attributed source, else Author (Recommended)"**.
+Follows: the asserter is whoever the claim is attributed to: the page for a
+claim the page makes, the peer for a claim a peer shared, otherwise the journal
+`Author` who wrote it (a persona id for a person; a rule's, script's or
+engine's name, with its version kept as metadata, so a new extractor version
+updates its predecessor's assertion rather than adding one). `provenance_iri`
+holds the asserter; the recorder stays in the journal.
 
-- **P1. Assertions (ruling 1).** The statement dedup key gains the asserter;
-  every production writer names one; projection emits one reifier per
-  assertion; the view groups a claim's assertions; retract is per assertion.
+**Ruling 6.** *How are resources represented?* Options: a resource graph beside
+the surface graph; a second node kind in one graph; a resource table keyed by
+IRI. Mark (free text): **"I favor 1, but could we compare 1 and 3?"** The
+comparison: option 3 makes the table the truth and a petgraph index derived
+from it, which is the held-RDF-truth design measured on 2026-06-18 at about 11x
+memory, 19x load and 18x mutation (petgraph-RDF plan), applied to the content
+half; it needs the walk, selector, journal and snapshot machinery a second
+time; its two wins, IRI-keyed storage and SPARQL without a per-query rebuild,
+are available to option 1. Put back with options: resource graph, IRI-keyed;
+resource table keyed by IRI; measure both first. Mark: **"Resource graph,
+IRI-keyed (Recommended)"**. Follows: two chartulary graphs per mere. The
+resource graph carries content statements between resources; the surface
+graph keeps traversal, arrangement and layout containment; a surface records
+the resource it shows, and the canvas lifts content links onto surfaces;
+cross-family walks join through that relation. Resource storage is keyed by
+resource id (the UUIDv5 of the canonical IRI, so lookup by IRI is one hash),
+and SPARQL is served by a `QueryableDataset` adapter over the resource graph
+instead of a dataset rebuilt per query. Petgraph-as-truth (2026-06-18) holds.
+
+**Ruling 7.** *What is the residency unit?* Options: the neighborhood of what
+is in view; projection scope plus a margin; whole sessions or nested graphs.
+Mark: **"Neighborhood of what's in view (Recommended)"**. Follows: k hops, a
+setting, around every surface in an open projection, plus pinned and focused
+items; anything else loads on demand and reports "not loaded" until then. Full
+residency stays a setting for small meres.
+
+**Ruling 8.** *What does a frozen selection hold?* Options: resource
+references with statement copies; references only; full copies. Mark:
+**"Resource refs, statement copies (Recommended)"**. Follows: members are
+referenced by resource id, which is portable because it is deterministic; the
+statements among them are copied as they stood at the freeze revision, so a
+later retraction does not change the frozen record. Annotations attach to the
+frozen node. A receiver missing a resource sees it through ruling 4's coverage.
+
+## 4. Phases
+
+In order; each phase lands green before the next starts. Code samples: none.
+
+- **P1. Assertions (rulings 1, 5).** The statement dedup key becomes
+  `(recognized_sub_kind, predicate, graph_scope, asserter)`, with the asserter
+  in `provenance_iri`: the attributed source when the writer records a claim on
+  someone's behalf (the page for a claim a page makes, the peer for a shared
+  claim, the `prov:wasAttributedTo` agent on ingest), else the journal `Author`
+  rendered as an IRI (persona id for a person; name for a rule, script or
+  engine, version as metadata). Every production writer supplies one; the
+  `GraphDelta` variants that assert statements carry it. Retract is per
+  assertion. The view groups a claim's assertions into one drawn link.
+  Projection emits one RDF 1.2 reifier per assertion.
   Done when: two asserters of one `(predicate, scope)` on one pair yield two
   statements with distinct ids, provenance and times; retracting one leaves the
-  other; a same-asserter re-assertion updates in place; the
-  `RDF -> kernel -> RDF` round-trip gate stays green with two reifiers on one
-  triple; existing snapshots load with each old statement as one assertion.
-- **P2. Resource identity (ruling 2).** One canonicalizer shared by kernel,
-  linked-data and eidetic; resource ids as UUIDv5 over the canonical URL;
-  content statements keyed to resources; a surface shows one resource and
-  `NavigateNode` changes which; captures under the resource. Done when: two
-  surfaces showing one canonical URL see the same content statements; a
-  surface navigating from page 1 to page 2 shows page 2's statements and page
-  1's stay on page 1's resource; a `utm_` variant resolves to the same
-  resource; ingest and eidetic produce the same resource id for one page.
-- **P3. Coverage and the pending index (ruling 4).** Every query and
-  projection result carries a coverage note; the pending index replaces the
-  discard and is rebuildable and purgeable. Done when: a link whose target is
-  absent is re-derived when the target arrives, with a positive control; a
-  purge empties the index without touching graph truth; a SPARQL result and a
-  scene both report which layer limited them.
-- **P4. Saved queries (ruling 3).** SPARQL as a subgraph spec; share by spec;
-  freeze into a nested graph with spec and revision. Done when: a SPARQL-spec
-  `Linked` subgraph reconciles on revision change like the other kinds; a
-  shared spec evaluates over the receiver's graph; a frozen nested graph keeps
-  its members when the source graph changes and names the spec and revision.
-- **P5. Partial residency (ruling 4).** Neighborhood loading from muniment;
-  absence unknown by default; "not loaded" reported through P3's coverage.
-  Done when: a graph larger than the resident set navigates with only the
-  neighborhood in memory, an unloaded neighbor is reported as not loaded
-  rather than absent, and loading it restores its relations.
+  other; the same asserter re-asserting updates its own record in place; an
+  extractor at a new version updates its old assertion rather than adding one;
+  no production writer passes `None` (a test enumerates the writers);
+  `dataset_round_trip_is_lossless_under_the_profile` stays green with a case of
+  two reifiers on one triple term; existing snapshots load (checkpoint C1).
+- **P2. Resource graph (rulings 2, 6).** Eidetic's `canonical_url` moves to
+  chartulary, the common dependency of the kernel and eidetic-core, and both
+  use it; nothing keeps a private copy. Each mere holds two chartulary graphs:
+  a resource graph (one resource per canonical URL, id = UUIDv5 over the
+  canonical IRI, minted the same way by the kernel, linked-data ingest and
+  eidetic) carrying content statements, and the surface graph keeping
+  traversal, arrangement and layout containment. A surface records the
+  resource it shows; `NavigateNode` changes that record and no longer carries
+  claims. The canvas lifts a content link onto every pair of surfaces showing
+  its two resources. Cross-family selector walks join through the shown
+  resource. Page versions are content-hashed captures under the resource. SPARQL
+  is served by a `QueryableDataset` adapter over the resource graph, retiring
+  the per-query `dataset_quads` rebuild in `linked-data::query`.
+  Done when: two surfaces showing one canonical URL see the same content
+  statements; a surface navigating from page 1 to page 2 shows page 2's
+  statements while page 1's stay on page 1's resource; a `utm_` variant and a
+  fragment variant resolve to one resource; the kernel, ingest and eidetic mint
+  the same resource id for one page; a component walk selecting Semantic plus
+  Traversal crosses from a surface into the resource graph and back; the SPARQL
+  path builds no dataset per call and returns the same rows as the old path on
+  the existing query tests (the old path survives only as the test oracle);
+  `cargo check -p mere-kernel --target wasm32-unknown-unknown` stays green.
+- **P3. Coverage and the pending index (ruling 4).** A coverage note travels
+  with every query result and scene projection, naming each layer that limited
+  it: possession, residency, disclosure, synchronization, projection.
+  `apply_link_statements` stops discarding: a recognized link whose target
+  resource is absent goes to a pending index that is not graph truth, can be
+  rebuilt from source documents, re-derives the statement when the target
+  resource enters the graph, and can be purged under a policy that is a
+  setting.
+  Done when: a recognized link to an absent target is re-derived when the
+  target arrives, and the same test with the index purged first derives
+  nothing (the control); rebuilding the index from documents reproduces it;
+  purging touches no graph truth (snapshot equal before and after); a SPARQL
+  result and a scene projection each carry a coverage note, and a test makes
+  each layer fire at least once.
+- **P4. Saved queries (rulings 3, 8).** A `Linked` subgraph spec may be a SPARQL
+  query beside the nine shapes, reconciled on revision change like the rest.
+  Sharing a saved query sends the spec. Freeze mints a node bearing a nested
+  graph that holds member resource ids, copies of the statements among them as
+  of the freeze revision, the spec and the revision; annotations attach to that
+  node. A subgraph itself never syncs.
+  Done when: a SPARQL-spec subgraph reconciles on a revision change and skips
+  on an unchanged revision; a shared spec evaluated on a second graph yields
+  that graph's members; a frozen selection is unchanged after a member
+  statement is retracted at the source (and a live `Linked` subgraph over the
+  same spec does change, the control); a frozen selection opened where a member
+  resource is absent reports it through P3's coverage.
+- **P5. Partial residency (rulings 4, 7).** Muniment stores both graphs
+  addressably, keyed by id (resource id for resources), so one node and its
+  statements load without the whole snapshot. The resident set is k hops (a
+  setting) around every surface in an open projection, plus pinned and focused
+  items. Anything else loads on demand and reports "not loaded" through P3's
+  coverage until it does. Full residency stays a setting.
+  Done when: a graph several times the resident set navigates with only the
+  neighborhood in memory (a counting allocator or the footprint probe shows
+  it); an unloaded neighbor reports "not loaded", never "absent"; loading it
+  restores its relations exactly (snapshot-equal to the full-residency load);
+  with full residency set, the same tests report no residency coverage; the
+  IndexedDB backend passes the same residency tests as redb.
 
-## 5. Open forks
+## 5. Checkpoints
 
-- **5.1 Who is the asserter?** (Ruling 1.) The journal's `Author` (kind and id,
-  with version as metadata or as part of the key), the statement's existing
-  `provenance_iri`, or both.
-- **5.2 How are resources represented?** (Ruling 2.) A second node kind in the
-  one petgraph, or a resource graph beside the surface graph joined by a
-  "shows" relation.
-- **5.3 What is the residency unit?** (Ruling 4.) A k-hop neighborhood of what
-  is in view, the scope of the active projections plus a margin, or whole
-  sessions and nested graphs; and whether full residency stays a mode.
-- **5.4 What does a frozen selection hold?** (Ruling 3.) References to resource
-  and statement ids at the freeze revision, or copies of the members.
+Choices with more than one defensible answer that the phases will meet. Each
+comes back to Mark as a fork, with evidence, before the code commits to one.
+
+- **C1 (P1). Legacy statements.** What asserter does a stored statement with no
+  provenance get on load: a legacy marker, the local user, or the ingest engine
+  that probably wrote it.
+- **C2 (P2). Which families sit on resources.** Semantic, Imported and
+  Provenance are content and Traversal and Arrangement are experience; the
+  seven containment sub-kinds split three ways: URL-derived (`UrlPath`,
+  `Domain`), resource-level (`FileSystem`, `ClipSource`) and user layout
+  (`UserFolder`, `NotebookSection`, `CollectionMember`).
+- **C3 (P2). Migration of existing claims.** A surface's content statements
+  were asserted while it showed whichever page it showed then; the store does
+  not record which. Attach them to the currently shown resource, to the
+  resource of the visit nearest the assertion time, or drop them with a record.
+- **C4 (P2). Words.** Names for the two senses of node (resource, surface) in
+  TERMINOLOGY and in code.
+- **C5 (P3). Purge default.** The pending index's default purge policy.
+- **C6 (P4). The frozen node.** What kind of node bears a frozen selection, and
+  where it is placed.
 
 ## 6. Progress
 
 - **2026-10-04.** Plan written; questions grounded (§2); round 1 ruled
-  (rulings 1 to 4). Round 2 (§5) next.
+  (rulings 1 to 4); round 2 ruled (rulings 5 to 8, ruling 6 after a comparison
+  Mark asked for); phases final; checkpoints C1 to C6 listed.
