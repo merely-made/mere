@@ -745,6 +745,22 @@ pull reading −0.33 with 510 overlaps):
   display's frame period, the shortest recent interval approximating vsync,
   so there is no feedback and a slow page keeps its frame rate (against the
   measured frame as built, or a share of the frame's non-physics time).
+  Built (`seiche-speed` `ad2420a4`, 50% of the shortest of the last 120
+  intervals), the feedback was gone (300 nodes at 50x: the budget held at
+  51.6 ms against 146 to 171 ms before) but the shortest interval is the
+  page's own best frame, not vsync, when the page never keeps up: 24 to 30
+  ms on light pages and 55 to 103 ms at 300 nodes on this machine, so the
+  budget came out 12 to 52 ms. Mark chose **"Known rate, else capped"**:
+  native hosts use the display's real refresh rate; on the web the period is
+  the shortest recent interval but no longer than 1/60 s, so the budget is
+  at most about 8.3 ms and less on faster displays (against half the best
+  frame as built, or always capping at 1/60 s). The fast receipt's
+  per-frame bound (budget plus the clock's 100 µs) saw 150 to 600 µs over in
+  some windows, because the gate admits a tick on a forecast of its cost:
+  Mark chose **"Gate keeps a forecast margin"**: the budget stops ticking
+  when the time left is under the forecast tick plus a margin, so the
+  overrun stays within the clock grain (against widening the bound by one
+  tick's error, or leaving it).
   The face offset, diagnosed (2026-10-04, `tree-face-zoom`): the face is
   drawn right and the body wrong, on both pages. Pictograph's gnode style
   scales each body about its centre (the CSS default Livery follows since
