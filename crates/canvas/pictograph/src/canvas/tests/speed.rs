@@ -187,6 +187,7 @@ fn timed(
     canvas.set_physics_step_budget(Some(StepBudget {
         per_frame: budget,
         clock: seiche::monotonic_clock,
+        margin: Duration::ZERO,
     }));
     let mut out = Vec::new();
     for frame in 0..=frames {
