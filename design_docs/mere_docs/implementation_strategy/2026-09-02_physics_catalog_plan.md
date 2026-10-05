@@ -745,6 +745,35 @@ pull reading −0.33 with 510 overlaps):
   display's frame period, the shortest recent interval approximating vsync,
   so there is no feedback and a slow page keeps its frame rate (against the
   measured frame as built, or a share of the frame's non-physics time).
+  Built (`seiche-speed` `ad2420a4`, 50% of the shortest of the last 120
+  intervals), the feedback was gone (300 nodes at 50x: the budget held at
+  51.6 ms against 146 to 171 ms before) but the shortest interval is the
+  page's own best frame, not vsync, when the page never keeps up: 24 to 30
+  ms on light pages and 55 to 103 ms at 300 nodes on this machine, so the
+  budget came out 12 to 52 ms. Mark chose **"Known rate, else capped"**:
+  native hosts use the display's real refresh rate; on the web the period is
+  the shortest recent interval but no longer than 1/60 s, so the budget is
+  at most about 8.3 ms and less on faster displays (against half the best
+  frame as built, or always capping at 1/60 s). The fast receipt's
+  per-frame bound (budget plus the clock's 100 µs) saw 150 to 600 µs over in
+  some windows, because the gate admits a tick on a forecast of its cost:
+  Mark chose **"Gate keeps a forecast margin"**: the budget stops ticking
+  when the time left is under the forecast tick plus a margin, so the
+  overrun stays within the clock grain (against widening the bound by one
+  tick's error, or leaving it). *Corrected the same day:* the web can read
+  the display's period after all. This panel runs at 165 Hz (6.06 ms), and
+  every logged interval is a whole multiple of it within the clock grain
+  (24.2 to 103 ms are 4 to 17 periods); the lane had tested only 16.67 ms, so
+  the cap as ruled gives 8.3 ms here, about 2.75 times half this display's
+  frame. Mark chose **"Infer the period"**: the period is the largest value
+  between 1/360 s and 1/60 s that every recent interval is a whole multiple
+  of, with the 1/60 s cap as the fallback. On the native side, where
+  turnstone pins mere `bd5912fb` from before the dial and draws graph panes
+  with the fixed-step `canvas.frame`, Mark answered **"Mere entry point, then
+  turnstone shouldn't be left stale, so that next"**: seiche builds a step
+  budget from a refresh rate, the 50% default moves into seiche, and
+  pictograph gains a display-rate setter; turnstone then repins mere and
+  takes its refresh rate from winit as the next step.
   The face offset, diagnosed (2026-10-04, `tree-face-zoom`): the face is
   drawn right and the body wrong, on both pages. Pictograph's gnode style
   scales each body about its centre (the CSS default Livery follows since
@@ -2231,3 +2260,149 @@ binning are the useful patterns.
   51.9 s after the retune). Logs `Code/testing/mere/orbit/`
   (`diag-floor-1.log`, `graphshell-orbit-p2-floor.log`, `receipts-r2.log`,
   `wasm-build-2.log`, `gate-floor-*.log`, `gate-floor2-graphshell-web.log`).
+- 2026-10-03 (Energy's off-screen receipt, branch `energy-frame` `629968cf`,
+  per "Diagnose and gate"): diagnosed and gated; the fix is put back as forks.
+  *Cause.* Two parts. The law's scale: on the P2 fixture (11 nodes, two
+  components of 5 and 6, 10 relations) Energy's centring alone holds the
+  components against the all-pairs repulsion, so they settle near
+  √(r·ΣW/g) = √(60,000 · 31 / 0.02) ≈ 9,600 world units apart. It converges,
+  slowly: 3,882 apart at 6 s, 7,232 at 20 s, 9,289 at 60 s (seiche replica,
+  kinetic energy 368 at 60 s); edges settle at 524 against Springs' 171. The
+  tree page read the same course from its own state: extent 1,692 × 1,771 by
+  frame 30 (10 of 11 off), 5,701 × 9,174 at frame 1,800; the old page
+  3,405 × 9,121. And the view: the page fits only at boot (to the Spiral,
+  119 × 115), on a non-Free arrangement and on Fit graph, never after a law
+  switch, so every law is read at zoom 1 against a 982 × 627 (tree) or
+  1,282 × 722 (old page) world box. Even Fit graph cannot frame Energy: it
+  needs zoom 0.064 and the canvas stops at 0.1. Springs on the same path stays
+  inside, 457 × 470 at frame 1,800. *The gate.* `Canvas::layout_framing`
+  counts node centres off the viewport through the canvas's own camera; both
+  pages publish `layout-outside`, `layout-extent` and `view-extent`; the
+  eleven law receipts and the profiles assert `layout-outside == 0` on the
+  frame each second capture shows, and resting laws again after the final
+  settle. The control (`*_framing_control`, both pages) plants a node 4,000 px
+  off the canvas under Still: counted exactly, and an `== 0` assert fails on
+  it with `got '1'`. *Reading, not ruled:* the margin is 0 (a centre inside
+  the canvas rectangle; panels the old page overlays on its canvas are not
+  subtracted), and those two moments are the stated ones for living laws too.
+  *Before any fix* (bundle `10ac4316`, two rounds): Energy
+  fails on both pages (11 of 11 on the tree; 8, then 11 on the old page),
+  Kinds (4-5 tree, 1 old), Anneal (2-3 tree, 4-5 old), Orbit (4, tree), the
+  tree profiles (1-5); Charge (one node, both rounds), Stress and Flow (one
+  node, first round only) sit at the tree's edge and pass on the old page;
+  Springs, Flock, Sync and Still pass everywhere. Orbit, met
+  on the way, expands without bound: 25,107 units at 60 s, linear, energy flat,
+  because exclusion outweighs gravity while counter-damping removes friction
+  (1,026 at 60 s without exclusion). Gates on the instrument: seiche
+  102/98/102, pictograph canvas 276, graphshell web 231 single-threaded. Logs
+  and the sweep of candidate tunings: `Code/testing/mere/energy-frame/`.
+- 2026-10-04 (the fix, branch `energy-frame`, per "Follow while playing" and
+  "Repulsion 6,000, centring 0.2"). *Follow.* The canvas gains
+  `set_view_follow` / `view_follows`: while physics plays, each frame eases
+  the camera toward the camera `fit_to_content` would install (zoom
+  geometrically, the world point at the viewport centre linearly, a 0.25 s
+  time constant in host time, or one tick a frame where the host gives none).
+  A wheel pan or zoom, a middle-drag, an orbit drag, `set_camera` and the two
+  centring commands stop it; it holds while paused and while a node or the
+  camera is being dragged. Graphshell's `canvas_physics` turns it on at a law,
+  profile or Free switch and `CanvasCommand::Fit` turns it back on, so both
+  pages follow; it is off by default, so other hosts are unchanged. Both pages
+  publish `view-follow`. *Retune.* `LinLogForce`'s defaults are repulsion 6,000
+  and centring 0.2 under the same id; on the fixture's topology the islands
+  sit 5.07 apart for their size against Springs' 2.57 (asserted at Springs ×
+  1.3, the two-cliques claim's factor; two cliques 4.49 against 2.49). The
+  tree page now reads Energy converging: extent 860 × 1,113 and kinetic
+  energy 0.0 by frame 1,800, against 5,701 × 9,174 and still moving before.
+  *The control* pans first (following stops), plants the node 4,000 px off
+  (counted as exactly 1; an `== 0` there fails with `got '1'` on both pages),
+  then Fit graph resumes following and frames all 12. *Receipts* on bundle
+  `677a03a2`: the eleven law receipts, the profiles and the control pass on
+  both pages, every framing assert at 0. Before (bundle `10ac4316`): Energy
+  11 of 11 (tree) and 8, then 11 (old page); Kinds 4-5 and 1; Anneal 2-3 and
+  4-5; Orbit 4 (tree); the tree profiles 1-5; Charge, Stress and Flow one node
+  at the tree's edge. Follow alone (bundle `b59af687`, the first coefficients)
+  still left Energy 2 nodes out on the tree, past the 0.1 zoom floor. Orbit
+  passes its capture-moment check on both pages under follow (its expansion
+  outruns the floor only later), so its lane's expected failure has no frame
+  to mark at the stated moment; put back. Also run green: the tree drag and
+  add, the old page's add, `p4_tree_controls`, `p4_tree_live_profile`,
+  `p4_tree_elapsed`, `p4_tree_profile`, the two saved-graph receipts, and the
+  2,000-node settles (GPU 413 of 418 steps on the device, spread 1,075). The
+  old page's `physics_drag` fails its released-where-dropped bound (21 and 29
+  px against 20) because the camera eases after the release; put back as a
+  fork. Found on the way, not fixed: the tree page draws node faces small and
+  offset up-left of their bodies below zoom 1 (reproduced by toolbar zoom
+  alone, with following off); following makes zoom below 1 common there.
+  Gates: seiche 103/99/103 (default, no-default, gpu), pictograph canvas 277,
+  graphshell web 232 single-threaded.
+- 2026-10-04 (main 69ba33d0 merged into `energy-frame`, per "Drag stops
+  following" and "Density gets the check here"). *Merge* `9724a6d5`: of the
+  eight files both sides changed, five auto-merged exactly as a plain `git
+  merge-file` does; in `canvas_physics.rs` weave's result silently dropped
+  main's `SETTLED_ARRANGEMENT` re-export, the test module's `use` lines and two
+  of main's tests, so the plain three-way merge replaced it (its seam's missing
+  brace restored); `web_product.rs` and this plan keep both sides. Every line
+  either side added survives but two rewritten doc lines. *Drag* `38bd8b0d`: the
+  press that becomes a drag (past the click slop) stops following; a click
+  does not; the follow test drags and clicks a node. *Density*: its two law
+  receipts and two Springs controls assert framing on the settled capture.
+  *Round* on bundle `a2837089` (wasm-bindgen 0.2.129 with wgpu 30.0.1, web
+  lock `0090ad99`, the page-error gate on): the twelve law receipts, Density's
+  controls, the profiles and the framing controls pass on both pages; tree
+  drag and add, old-page add, `p4_tree_controls`, `p4_tree_live_profile`, the
+  two saved-graph receipts, `p4_tree_profile`, `p4_tree_elapsed` and both
+  2,000-node settles pass (GPU 413 of 418 steps on the device). The must-fail
+  framing control fails with `got '1'` and a planted throw fails on the gate,
+  each on both pages. The old page's `physics_drag` still fails, Stress 22
+  against 20 on a fresh profile (and Anneal 79 against 60 on a profile holding
+  an earlier saved session). The camera holds from the press through the
+  release (621.63, 393.68 at zoom 0.772 throughout), so it is not easing after
+  the drop: following zoomed the view out before the gesture, its 220 px is
+  about 285 world units, and the law pulls the node back further in the
+  measured frame (18 px against 11 one frame after release). With the follow
+  step disabled the receipt passes twice. Put back to Mark with the receipt
+  unchanged. Gates: seiche 113/109/113, pictograph canvas 289, graphshell web
+  235 single-threaded.
+- 2026-10-04 (drag receipts in world units, `energy-frame` `bd790bcc`, per
+  "Measure in world units"). The canvas gains `focused_world_position`,
+  `world_point_at` and `screen_point_of` (through the camera; a round-trip test
+  at zoom 0.772); both pages gain a `move-by-world` verb beside `move-by`, keep
+  the drop point in world units at `release-at`, and publish
+  `drag-return-world` beside `drag-return`, the tree also
+  `drag-return-step-world`. `physics_drag` and `p4_tree_physics_drag` make
+  every gesture and check in world units, thresholds unchanged; at zoom 1 each
+  reads as its px twin. *Reading, not ruled:* the ruling names the old page's
+  receipt; the tree's mirror is converted too, so both pages measure the same
+  thing. Its release log shows why: the 220-unit gesture is 112 px under zoom
+  0.51 and 76 px under 0.34. *Round* on bundle `37523a31` (built from the
+  head; web lock `0090ad99`, page-error gate on), fresh browser profile: both
+  drag receipts pass (the old page's after a launch stall left no progress
+  file and a rerun passed), and so do the twelve law receipts, Density's
+  controls, the profiles, the framing controls and add on both pages,
+  `p4_tree_controls`, `p4_tree_live_profile`, the saved-graph pair,
+  `p4_tree_profile`, `p4_tree_elapsed` and both 2,000-node settles (GPU 413 of
+  418 device steps). The must-fail framing control and a planted throw fail on
+  both pages. Gates: seiche 113/109/113, pictograph canvas 290, graphshell web
+  235 single-threaded.
+- 2026-10-04 (main 9ce5889f merged into `energy-frame` `d2ea7526`: the
+  face-zoom fix and Orbit's retune). Of the nine files both sides changed,
+  five auto-merged exactly as a plain `git merge-file` does; `view.rs` weave
+  auto-merged where the plain merge conflicts (both added functions after
+  `focused_screen_position`) and placed main's elsewhere, so it was taken from
+  the plain merge by hand; `canvas_controls.rs` keeps main's `SetZoom` (it
+  places the camera through `set_camera`, so a set zoom stops following like
+  any zoom) beside Fit resuming following; `canvas_physics.rs` and this plan
+  keep both sides. One semantic conflict no text merge sees: `Gravity::new`
+  takes a `CounterDamping` now, and the Energy sweep's Orbit runs record the
+  first build, so they pass `Full` (27,405 at 60 s, as recorded). The web lock
+  moves to `3cce8fc5`, the pins' `0090ad99` with seiche's row at 0.0.6, the
+  same lock the Orbit lane built with. Orbit's receipts now assert framing
+  after the final settle too (`6640bb64`), Orbit being bounded. *Round* on
+  bundle `949fbc5e`, fresh browser profile: the twelve law receipts (Orbit at
+  both its moments), Density's controls, the profiles, the framing controls,
+  drag and add pass on both pages, main's two face-zoom receipts pass, and so
+  do `p4_tree_controls`, `p4_tree_live_profile`, the saved-graph pair,
+  `p4_tree_profile`, `p4_tree_elapsed` and both 2,000-node settles (GPU 413 of
+  418 device steps); the must-fail framing control and a planted throw fail
+  on both pages. Gates: seiche 115/111/115, pictograph canvas 292, graphshell
+  web 238 single-threaded.

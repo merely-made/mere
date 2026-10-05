@@ -44,6 +44,8 @@ impl Canvas {
     /// range. The host suppresses its own first-frame recenter when it restores a
     /// camera, so this value is not immediately overwritten.
     pub fn set_camera(&mut self, view: CameraView) {
+        // An explicit placement is a pan or zoom: the camera stops following.
+        self.follow = false;
         self.camera.zoom = if view.zoom.is_finite() && view.zoom > 0.0 {
             view.zoom.clamp(MIN_ZOOM, MAX_ZOOM)
         } else {
@@ -229,6 +231,25 @@ impl Canvas {
         self.screen_position_of(self.focused_key()?)
     }
 
+    /// Where the single focused node sits in world units, so a receipt can
+    /// measure a law's motion whatever the zoom.
+    pub fn focused_world_position(&self) -> Option<(f32, f32)> {
+        let p = self.view.position_of(self.focused_key()?)?;
+        Some((p.x, p.y))
+    }
+
+    /// The world point under screen px `screen`, through the camera.
+    pub fn world_point_at(&self, screen: (f32, f32)) -> (f32, f32) {
+        let p = self.camera.to_world(screen);
+        (p.x, p.y)
+    }
+
+    /// Where world point `world` falls in screen px, through the camera.
+    pub fn screen_point_of(&self, world: (f32, f32)) -> (f32, f32) {
+        self.camera
+            .to_screen(kernel::geometry::PortablePoint::new(world.0, world.1))
+    }
+
     /// The node's body as Livery last drew it, `(min_x, min_y, max_x, max_y)`
     /// in canvas px, read back from the node document by hit test: where the
     /// gnode is painted and takes input, not where the frame meant it to go.
@@ -338,11 +359,92 @@ impl Canvas {
         }
         Box2D::new(min, max)
     }
+
+    /// Follow the layout: while physics plays, the camera eases toward
+    /// fit-to-content each frame. Any pan, zoom or node drag turns it off; the
+    /// host turns it on (Graphshell: a law, profile or Free switch, and Fit
+    /// graph).
+    pub fn set_view_follow(&mut self, on: bool) {
+        self.follow = on;
+    }
+
+    /// Whether the camera is following the layout.
+    pub fn view_follows(&self) -> bool {
+        self.follow
+    }
+
+    /// One frame of following over `dt` seconds: zoom geometrically and the
+    /// world point at the viewport centre linearly toward the fit. Holds while
+    /// paused and while a node or the camera is being dragged. Whether the
+    /// camera moved.
+    pub(crate) fn follow_step(&mut self, dt: f32) -> bool {
+        if !self.follow
+            || self.physics_paused
+            || self.drag.is_some()
+            || self.middle_drag.is_some()
+            || self.orbit_drag.is_some()
+        {
+            return false;
+        }
+        let Some(fit) = self.content_fit() else {
+            return false;
+        };
+        let k = 1.0 - (-dt.max(0.0) / FOLLOW_EASE_SECONDS).exp();
+        let (w, h) = (self.view_w as f32 / 2.0, self.view_h as f32 / 2.0);
+        let (z, o) = (self.camera.zoom, self.camera.offset);
+        let centre = ((w - o.0) / z, (h - o.1) / z);
+        let goal = ((w - fit.offset.0) / fit.zoom, (h - fit.offset.1) / fit.zoom);
+        let zoom = (z * (fit.zoom / z).powf(k)).clamp(MIN_ZOOM, MAX_ZOOM);
+        let centre = (
+            centre.0 + (goal.0 - centre.0) * k,
+            centre.1 + (goal.1 - centre.1) * k,
+        );
+        let offset = (w - centre.0 * zoom, h - centre.1 * zoom);
+        let moved = (offset.0 - o.0).abs() > 0.01
+            || (offset.1 - o.1).abs() > 0.01
+            || (zoom - z).abs() > z * 1e-4;
+        self.camera.zoom = zoom;
+        self.camera.offset = offset;
+        moved
+    }
+
+    /// Whether every node's centre is on screen: each position through the
+    /// camera against the viewport inset by `margin` px, and the layout's
+    /// world extent beside the viewport's.
+    pub fn layout_framing(&self, margin: f32) -> LayoutFraming {
+        let (w, h) = (self.view_w as f32, self.view_h as f32);
+        let view = self.world_viewport();
+        let mut framing = LayoutFraming {
+            view: [view.min.x, view.min.y, view.max.x, view.max.y],
+            extent: [f32::INFINITY, f32::INFINITY, f32::NEG_INFINITY, f32::NEG_INFINITY],
+            ..LayoutFraming::default()
+        };
+        for (_, p) in self.view.positions() {
+            framing.nodes += 1;
+            if !p.x.is_finite() || !p.y.is_finite() {
+                framing.outside += 1;
+                continue;
+            }
+            let e = &mut framing.extent;
+            *e = [e[0].min(p.x), e[1].min(p.y), e[2].max(p.x), e[3].max(p.y)];
+            let (x, y) = self
+                .camera
+                .to_screen(kernel::geometry::PortablePoint::new(p.x, p.y));
+            if x < margin || y < margin || x > w - margin || y > h - margin {
+                framing.outside += 1;
+            }
+        }
+        if framing.extent[0] > framing.extent[2] {
+            // No finite position: an empty extent, not an inverted one.
+            framing.extent = [0.0; 4];
+        }
+        framing
+    }
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::canvas::Canvas;
+    use crate::canvas::{Canvas, PointerButton};
 
     /// Swapping between two panes' viewports must move NEITHER camera, at any
     /// size. The camera and the size it was framed for install together, so a
@@ -382,6 +484,117 @@ mod tests {
         assert_eq!(canvas.viewport(), primary);
         assert_eq!(primary.view, (800, 600));
         assert_eq!(lens.view, (400, 900));
+    }
+
+    /// The framing instrument: a fitted graph has every centre on screen, and
+    /// a camera panned one viewport-width past it (the planted off-screen
+    /// case) has none; a margin wider than half the view counts every node.
+    #[test]
+    fn layout_framing_counts_centres_off_the_viewport() {
+        let mut canvas = Canvas::with_sample_graph();
+        canvas.resize(800, 600);
+        canvas.fit_to_content();
+        let fitted = canvas.layout_framing(0.0);
+        assert!(fitted.nodes > 0, "the sample graph has nodes");
+        assert_eq!(fitted.outside, 0, "fitted: {fitted:?}");
+        let [x0, y0, x1, y1] = fitted.extent;
+        let [v0, w0, v1, w1] = fitted.view;
+        assert!(x0 >= v0 && y0 >= w0 && x1 <= v1 && y1 <= w1, "{fitted:?}");
+
+        let mut camera = canvas.camera();
+        camera.offset.0 += 800.0 + (x1 - x0) * camera.zoom;
+        canvas.set_camera(camera);
+        let planted = canvas.layout_framing(0.0);
+        assert_eq!(planted.outside, planted.nodes, "panned away: {planted:?}");
+        assert_eq!(planted.extent, fitted.extent, "the layout did not move");
+
+        canvas.fit_to_content();
+        assert_eq!(canvas.layout_framing(301.0).outside, fitted.nodes);
+    }
+
+    /// Following the layout ("Follow while playing", 2026-10-03). The control:
+    /// a camera planted off the graph stays off it while not following. Then
+    /// following eases it back until every centre is on screen, a wheel pan
+    /// stops it, a node drag stops it while a click does not, and a paused
+    /// canvas holds the camera even while following.
+    #[test]
+    fn following_eases_the_camera_onto_the_layout_and_a_pan_stops_it() {
+        let mut canvas = Canvas::with_sample_graph();
+        canvas.resize(800, 600);
+        canvas.fit_to_content();
+        canvas.set_physics_paused(false);
+        let nodes = canvas.layout_framing(0.0).nodes;
+        let mut planted = canvas.camera();
+        planted.offset.0 += 4_000.0;
+        canvas.set_camera(planted);
+        assert!(!canvas.view_follows(), "a placement is not followed");
+        for _ in 0..60 {
+            let _ = canvas.frame(800, 600);
+        }
+        assert_eq!(canvas.layout_framing(0.0).outside, nodes, "not following");
+
+        canvas.set_view_follow(true);
+        for _ in 0..120 {
+            let _ = canvas.frame(800, 600);
+        }
+        let framed = canvas.layout_framing(0.0);
+        assert_eq!(framed.outside, 0, "following, two seconds on: {framed:?}");
+        assert!(canvas.view_follows());
+
+        canvas.wheel(0.0, 400.0);
+        assert!(!canvas.view_follows(), "a pan stops following");
+        for _ in 0..120 {
+            let _ = canvas.frame(800, 600);
+        }
+        assert!(
+            canvas.layout_framing(0.0).outside > 0,
+            "the pan's glide stands; nothing pulls it back"
+        );
+
+        // A node drag stops it too; a click on a node does not.
+        canvas.fit_to_content();
+        canvas.set_view_follow(true);
+        let (key, _) = canvas.graph.nodes().next().unwrap();
+        let (x, y) = canvas.screen_position_of(key).unwrap();
+        canvas.pointer_down(PointerButton::Left, x, y);
+        canvas.pointer_up(PointerButton::Left, x, y);
+        assert!(canvas.view_follows(), "a click keeps following");
+        canvas.pointer_down(PointerButton::Left, x, y);
+        canvas.cursor_moved(x + 40.0, y);
+        assert!(!canvas.view_follows(), "a node drag stops following");
+        canvas.pointer_up(PointerButton::Left, x + 40.0, y);
+
+        canvas.set_physics_paused(true);
+        canvas.set_view_follow(true);
+        let held = canvas.camera();
+        for _ in 0..30 {
+            let _ = canvas.frame(800, 600);
+        }
+        assert_eq!(canvas.camera(), held, "paused, the camera holds");
+    }
+
+    /// World and screen points round-trip through the camera at any zoom, and
+    /// the focused node's world position maps to its screen position.
+    #[test]
+    fn world_and_screen_points_round_trip_through_the_camera() {
+        let mut canvas = Canvas::with_sample_graph();
+        canvas.resize(800, 600);
+        canvas.set_camera(crate::canvas::CameraView {
+            offset: (130.0, -40.0),
+            zoom: 0.772,
+        });
+        let world = canvas.world_point_at((410.0, 275.0));
+        let back = canvas.screen_point_of(world);
+        assert!((back.0 - 410.0).abs() < 1e-3 && (back.1 - 275.0).abs() < 1e-3, "{back:?}");
+        let (key, _) = canvas.graph.nodes().next().unwrap();
+        canvas.selected = [key].into_iter().collect();
+        let at = canvas.focused_world_position().unwrap();
+        let screen = canvas.focused_screen_position().unwrap();
+        let mapped = canvas.screen_point_of(at);
+        assert!((mapped.0 - screen.0).abs() < 1e-3 && (mapped.1 - screen.1).abs() < 1e-3);
+        // A world step of 220 is 220 x zoom screen px under the top-down camera.
+        let step = canvas.screen_point_of((at.0 + 220.0, at.1));
+        assert!((step.0 - screen.0 - 220.0 * 0.772).abs() < 1e-2, "{step:?}");
     }
 
     /// `resize` still re-centres: a genuine window resize holds whatever sits

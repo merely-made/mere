@@ -90,6 +90,9 @@ impl Canvas {
                 if !was_moved {
                     self.unpark();
                     self.physics.set_dragging(true);
+                    // A node drag stops following, as a pan does ("Drag stops
+                    // following", 2026-10-04): the view holds under the hand.
+                    self.follow = false;
                 }
                 let world = self.screen_to_world(new);
                 self.place_pinned_node(d.node, world);
@@ -118,6 +121,8 @@ impl Canvas {
     /// `LineDelta` by [`WHEEL_PAN_SCALE`] / `PixelDelta` straight through). Ctrl =
     /// cursor-anchored zoom; otherwise an infinite-canvas pan impulse into inertia.
     pub fn wheel(&mut self, dx: f32, dy: f32) -> bool {
+        // A pan or zoom: the camera stops following the layout.
+        self.follow = false;
         if self.ctrl {
             let factor = ZOOM_STEP.powf(dy / WHEEL_PAN_SCALE);
             self.zoom_at(self.cursor, factor);
@@ -169,6 +174,7 @@ impl Canvas {
         self.cursor = (x, y);
         match button {
             PointerButton::Middle => {
+                self.follow = false;
                 self.middle_drag = Some(self.cursor);
                 self.pan_velocity = (0.0, 0.0);
             },
@@ -176,6 +182,7 @@ impl Canvas {
                 if self.alt {
                     // Alt+left begins an orbit drag (yaw + tilt the camera); it owns the gesture,
                     // so no node pick / field grab / marquee starts. (Isometric camera — orbit.)
+                    self.follow = false;
                     self.orbit_drag = Some(self.cursor);
                 } else if let Some(fold) = self.fold_summary_at_screen(self.cursor) {
                     self.fold_press = Some((fold, self.cursor));

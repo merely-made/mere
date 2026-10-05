@@ -281,6 +281,9 @@ Cleromancy   Turnstone   Knot   Graphshell   other first-party clients
   any mere by default. An exception is an explicit, recorded denial. Ambient
   material crossing from one mere into another application's ambient tier
   needs a separate opt-in per mere and per app (ambiance design §9).
+  *Amended 2026-10-04 ([graph semantics plan](2026-10-04_graph_semantics_plan.md)
+  ruling 17): "ambient tier" here and below now reads "ambient level"; meaning
+  unchanged.*
 - **No daemon required.** A standalone application embeds the same resident
   library when it owns the whole process (R4's precedent). If djinn is running,
   the application is its client and never opens the stores itself.

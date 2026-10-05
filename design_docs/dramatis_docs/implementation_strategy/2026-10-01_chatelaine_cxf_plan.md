@@ -2,14 +2,13 @@
 
 **Date**: 2026-10-01
 **Status (2026-10-04)**: in progress. Shape ruled by Mark on 2026-10-01
-(rulings 7 and 10 to 15 in the dramatis tier architecture; rulings 16 to 59
+(rulings 7 and 10 to 15 in the dramatis tier architecture; rulings 16 to 63
 below). P0 met; P1 landed on `main` (`da3c50bc`); P2 landed (`3e4992ec`); P3
 landed (`ff68e86c`), meeting the Mere 0.4 baseline's chatelaine condition.
-The review stop ended 2026-10-04 (ruling 51). P4a's first build signs RSA
-through `ring` and ECDSA, proven on the ThinkPad; its second round carries
-rulings 54 to 58 (no re-import overwrite, P-521 refused, unsignable keys
-refused, and the RSA key built once by the `rsa` crate, ring signing:
-rulings 58, 59).
+The review stop ended 2026-10-04 (ruling 51), and P4a landed
+(`007fbe7c`, rulings 51 to 63): the agent signs RSA through ring and ECDSA
+(P-256, P-384) beside Ed25519; held keys are never rewritten; unsignable
+keys and P-521 are refused at all three doors. P4 (CXF import) is next.
 **Scope**: found `chatelaine` as the tier's plain secret-item taxonomy; move
 castellan's OTP items and its Secret Service store onto it; then import
 (and finally export) the FIDO Credential Exchange Format through castellan.
@@ -409,7 +408,47 @@ Mark: **"rsa builds, ring signs (Recommended)"**. Follows: the `rsa` crate's
 standard construction and PKCS#8 export run once per key load; every
 signature is ring's; recorded as `rsa` touching the key at load only, which
 amends ruling 52's "no `rsa` private-key operation in this path" to
-"no `rsa` signing or decryption".
+"no `rsa` signing or decryption". *2026-10-04 correction:* the premise
+"once per key load" was wrong for this agent, which decodes every SSH slot
+from the vault on each request (`ssh_slot.rs:92, 123-127`), so loading and
+signing coincide; ruling 62 settles it.
+
+**Ruling 60.** *A third import door neither ruling named,
+`personae-vault add-ssh` (`bin/personae-vault/main.rs:255-300`), still
+overwrites a held key and checks nothing; covering it means the CLI build
+takes personae's `agent` feature. Cover it?* Options: cover it; leave the
+CLI as is. Mark: **"Cover it (Recommended)"**. Follows: rulings 54 and 56
+hold on all three doors.
+
+**Ruling 61.** *P4a's native ThinkPad check fetched lock-pinned sources into
+the ThinkPad's cargo caches (5 git checkouts, 44 crates), crossing the
+lane's no-downloads wall. Keep or clear?* Options: keep; clear. Mark:
+**"Might be nice to clone the actual repos/ and crates/ needed, but that
+does add more overhead. Keep for now"**.
+
+**Ruling 62.** *Ruling 59's premise was wrong: each request decodes every
+SSH slot, and nothing decoded stays in memory, so the `rsa` crate's
+variable-time construction would run on every RSA signature. ring never
+zeroizes RSA key material on drop (`arithmetic/bigint/boxed_limbs.rs:27-28`).
+Which?* Options: defer RSA; keep the construction per signature, amending
+ruling 59's premise; cache ring's key. Mark: **"Cache the ring key"**.
+Follows: ring's `KeyPair` is built once per key, held by fingerprint,
+checked against the slot's current bytes before use, and dropped when the
+key is removed or the profile switches (castellan's remove and switch paths
+included). Recorded: this keeps a second, long-lived in-memory copy of each
+RSA private key, which ring frees without clearing.
+
+**Ruling 63.** *Is the cache secured? It would not be: plain process memory,
+not locked against swap or excluded from dumps, and ring frees it without
+clearing. Verifying a secured cache to the crates' standard is not
+possible for us (clearing ring's copy needs unsafe code or a ring fork, and
+a zeroing, page-locking allocator would be our own mechanism, backed by our
+tests rather than audits); and the vault never locks, so a cache would live
+as long as the agent. What now for RSA?* Options: defer RSA; per signature,
+no cache; keep the cache. Mark: **"Per signature, no cache"**. Follows:
+ruling 62 is withdrawn. The `rsa` crate builds the key on each RSA
+signature, when the agent decodes it from the vault, and ring signs; no
+long-lived copy is held.
 
 ## 3. Phases
 
@@ -857,6 +896,41 @@ merged).
 - **Gates:** personae 166 and castellan 104 unit tests, djinn and the linux
   `secret-service` check pass. The portable gate fails only on the known
   worktree-depth `include_str!` errors. Clippy is unchanged.
+
+**2026-10-04: P4a landed** as `007fbe7c` (lane commits `2d2a36c6`,
+`62e69f13`, `4c4ce3bc`, `dfee134a`), after verification at normal depth on
+`main` `ff78acca` (merge `eb79b36e`):
+
+- `cargo metadata --locked`, personae and castellan with every feature (294
+  tests), djinn's 15 test binaries, the linux `secret-service` check, and
+  the full portable gate (1542 packages) passed.
+- The control: RSA signed by the `rsa` crate's own PKCS#1 signer fails the
+  tripwire and the bounds test.
+- PID 53336 was untouched. The merged code differs from the verified tree
+  only in `dfee134a`'s comments.
+
+Round two built the rest:
+
+- The `rsa` crate's standard construction and PKCS#8 export hand ring the
+  key, and the crypto-bigint derivation is gone.
+- Ruling 54's no-op and ruling 56's refusals hold at castellan's import,
+  `ssh-add` and `personae-vault add-ssh`.
+- P-521 is refused.
+- A P-256 or P-384 key that ssh-key's decoder refuses over `ssh-add` still
+  shows only "communication with agent failed", since `ssh-agent-lib`
+  decodes before our code runs.
+- The ThinkPad receipt passed again (RSA-SHA2-256 and -512, P-256, P-384;
+  P-521 and DSA refused) with `authorized_keys` byte-identical. Its native
+  `keeper` and djinn checks pass, after fetching lock-pinned sources there
+  (ruling 61).
+
+**2026-10-04: the vault never locks.** `IdentityVault` has no lock or close
+method; castellan's `PersonaeHost` sets `lock: VaultLockView::Unlocked`
+(`ports/castellan/src/authority.rs:201`), and nothing sets `Locked`, which
+appears only as a label (`projection.rs:614`). Once unlocked, every key's
+decrypted bytes stay in the vault's `SecretBytes` (zeroized on drop, not
+memory-locked) until the process ends. Mark, the same day: "Hey wait, we
+need to be able to lock the vault lmao. Otherwise it's just a big room".
 
 ## 6. Running it
 
