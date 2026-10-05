@@ -9,7 +9,7 @@
 
 Audit base: Mere `cdbeeba6` (2026-10-01). `archive_docs/` is excluded.
 
-This batch exists because the plan is new. Its rulings (16 to 59) are
+This batch exists because the plan is new. Its rulings (16 to 61) are
 recorded in its §2 and pointed to from the dramatis tier architecture's §7
 and §9 and the crate consolidation plan's C5 log; they are not counted again
 here.
@@ -17,7 +17,7 @@ here.
 ## dramatis_docs/implementation_strategy/2026-10-01_chatelaine_cxf_plan.md
 
 - disposition: current
-- status line: "Status (2026-10-04): in progress. Shape ruled by Mark on 2026-10-01 (rulings 7 and 10 to 15 in the dramatis tier architecture; rulings 16 to 59 below). P0 met; P1 landed on `main` (`da3c50bc`); P2 landed (`3e4992ec`); P3 landed (`ff68e86c`), meeting the Mere 0.4 baseline's chatelaine condition. The review stop ended 2026-10-04 (ruling 51). P4a's first build signs RSA through `ring` and ECDSA, proven on the ThinkPad; its second round carries rulings 54 to 58 (no re-import overwrite, P-521 refused, unsignable keys refused, and the RSA key built once by the `rsa` crate, ring signing: rulings 58, 59)." — accurate: yes
+- status line: "Status (2026-10-04): in progress. Shape ruled by Mark on 2026-10-01 (rulings 7 and 10 to 15 in the dramatis tier architecture; rulings 16 to 61 below). P0 met; P1 landed on `main` (`da3c50bc`); P2 landed (`3e4992ec`); P3 landed (`ff68e86c`), meeting the Mere 0.4 baseline's chatelaine condition. The review stop ended 2026-10-04 (ruling 51). P4a's first build signs RSA through `ring` and ECDSA, proven on the ThinkPad; its second round carries rulings 54 to 58 (no re-import overwrite, P-521 refused, unsignable keys refused, and the RSA key built once by the `rsa` crate, ring signing: rulings 58, 59)." — accurate: yes
 - claims checked: 12 — holds: 12, stale: 0, unverifiable: 0
 
 ### Stale claims
