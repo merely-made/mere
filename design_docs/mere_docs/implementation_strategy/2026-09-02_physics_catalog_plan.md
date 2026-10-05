@@ -131,7 +131,7 @@ not presets.
 | `charge.barnes-hut` | Charge | Coulomb repulsion between all bodies (1/d, Barnes-Hut O(n log n)) + edge springs: the Fruchterman–Reingold shape | evenly spread neighbourhoods, the classic force picture | edges |
 | `stress.kamada-kawai` | Stress | every pair a spring whose rest length is graph distance × L | global distance fidelity: paths unroll to true length, far is far | all-pairs shortest paths, cached per topology |
 | `energy.linlog` | Energy | attraction ∝ d on edges, repulsion ∝ 1/d overall, degree-weighted (LinLog / ForceAtlas2) | communities as islands, hubs central | edges, degree |
-| `orbit.gravity` | Orbit | n-body gravitation, mass by degree, tangential initial velocity, no rest | the graph as a solar system: leaves orbit hubs | degree |
+| `orbit.gravity` | Orbit | n-body gravitation, mass by degree, tangential initial velocity, no rest; *2026-10-04:* only the orbital (tangential) motion frictionless, so radial motion settles (at no less than 0.82 whatever the host's damping), a weak centring well, and exclusion only to two node diameters | the graph as a solar system: leaves orbit hubs | degree |
 | `kinds.particle-life` | Kinds | particle life: each node has a kind; an asymmetric kind×kind attract/repel matrix (the ambient sim's law over the graph) | sorting, chasing and fleeing by kind; never at rest | a kind per node — the host's choice per scene (relation family, domain, facet), recorded in the saved scene |
 | `flock.boids` | Flock | separation / alignment / cohesion; edge-neighbours are flockmates | constellations that move as groups | edges |
 | `sync.kuramoto` | Sync | phase oscillators coupled along edges; angle = phase, radius = distance from focus | communities as phase clusters on a ring | edges, a focus |
@@ -737,7 +737,30 @@ pull reading −0.33 with 510 overlaps):
   the GPU lane he chose **"Staleness in ticks"**: forces are never more than
   9 simulated ticks old, so the CPU serves more steps at high speed and the
   reached speed shows the cost (against counting staleness in frames, or
-  blocking on the readback at speed).
+  blocking on the readback at speed). Built literally, "a share of each
+  frame" measured the page's frame interval, physics included, so on a page
+  already slower than the display the budget grew with the frames it
+  lengthened (300 nodes at 50x: frames near 500 ms, a budget near 250 ms).
+  Asked which frame, Mark chose **"The display's frame"**: 50% of the
+  display's frame period, the shortest recent interval approximating vsync,
+  so there is no feedback and a slow page keeps its frame rate (against the
+  measured frame as built, or a share of the frame's non-physics time).
+  Built (`seiche-speed` `ad2420a4`, 50% of the shortest of the last 120
+  intervals), the feedback was gone (300 nodes at 50x: the budget held at
+  51.6 ms against 146 to 171 ms before) but the shortest interval is the
+  page's own best frame, not vsync, when the page never keeps up: 24 to 30
+  ms on light pages and 55 to 103 ms at 300 nodes on this machine, so the
+  budget came out 12 to 52 ms. Mark chose **"Known rate, else capped"**:
+  native hosts use the display's real refresh rate; on the web the period is
+  the shortest recent interval but no longer than 1/60 s, so the budget is
+  at most about 8.3 ms and less on faster displays (against half the best
+  frame as built, or always capping at 1/60 s). The fast receipt's
+  per-frame bound (budget plus the clock's 100 µs) saw 150 to 600 µs over in
+  some windows, because the gate admits a tick on a forecast of its cost:
+  Mark chose **"Gate keeps a forecast margin"**: the budget stops ticking
+  when the time left is under the forecast tick plus a margin, so the
+  overrun stays within the clock grain (against widening the bound by one
+  tick's error, or leaving it).
   The face offset, diagnosed (2026-10-04, `tree-face-zoom`): the face is
   drawn right and the body wrong, on both pages. Pictograph's gnode style
   scales each body about its centre (the CSS default Livery follows since
@@ -757,7 +780,21 @@ pull reading −0.33 with 510 overlaps):
   0.5.4, 70 commits ahead, several fixes matching the failures). He chose
   **"Update, replay, decide"**: build 0.5.4, replay the four mis-merges
   against it, and keep weave only if all come out right, otherwise unwire it
-  workspace-wide.
+  workspace-wide. *Replayed (2026-10-04, logs in `Code/testing/weave-054/`):*
+  upstream `d73c4ae` (v0.5.4 plus 39 unreleased commits; every fix that
+  matters landed after the v0.5.4 tag, so crates.io's 0.5.4 has none) got all
+  four mis-merges right; across 201 replayed files it matched `git
+  merge-file` wherever that was clean, conflicted wherever it conflicted,
+  and refused 2 merges git would have made cleanly but broken, while 0.3.4
+  reproduced every recorded loss and one more (`a31b9a14`, fields dropped in
+  mesquite's `lane.rs`, restored at the time). Asked whether to install it,
+  unwire weave, or wait for a release, Mark chose **"Install d73c4ae,
+  quietly"**: the verified build is installed at a quiet moment, active
+  sessions told first. *Installed 2026-10-04:* `weave 0.5.4` (d73c4ae) in
+  `~/.cargo/bin`, the global driver string unchanged. `cargo install`
+  rebuilt it, so its hashes differ from the tested build's, but replaying the
+  four merges' 37 files with the installed driver gives byte-identical
+  outputs and exit codes.
   The old page's drag receipt under the following view still failed (Stress
   22 against 20): following had zoomed out to 0.772 before the gesture, so
   the receipt's 220 px drag was about 285 world units. Mark chose **"Measure
@@ -1056,6 +1093,15 @@ P5 and P6 stay in this plan.
   seiche test ran too short under too little damping to see it. `Gravity`
   cancels each body's damping with `m·d·v` along its velocity
   (`counter_damping`), and the receipt reads energy at one and six seconds.
+  *Annotation 2026-10-04:* cancelling all of the damping also kept all the
+  energy exclusion released, and Orbit coasted apart (P5's rulings, under
+  "Energy's receipt passes off screen"). `counter_damping` is now
+  `CounterDamping::{Off, Full, Tangential}` (seiche 0.0.6, "Explicit enum,
+  bump seiche"), and Orbit's is `Tangential`: only each body's tangential
+  velocity about the gravitational mass centre, against the system's drift,
+  is driven back, so radial motion and drift settle and the orbits do not;
+  they settle at no less than `Gravity::RADIAL_FLOOR` (0.82, "Radial floor
+  at 0.82") whatever the host's damping.
 - 2026-09-03 (P2): `BarnesHutRepulsion`'s default strength (2 400, `1/d`)
   is a third of `NodeExclusion` at a node diameter, exactly the
   recalibration its own docs deferred; Charge is built at 6 000 in the
@@ -2026,3 +2072,324 @@ binning are the useful patterns.
   `gpu`; pictograph `--features canvas --lib` 279 passed, 13 ignored;
   graphshell `--features web --lib` 232 passed, 1 ignored, single-threaded.
   Logs `gate-r9-*.log`, `r9-quick-check.raw`.
+- 2026-10-04 (Orbit's own lane, after "Own diagnose-and-retune lane";
+  `orbit-retune` from `d60c2b86`, diagnostic `3b79e414`): the cause shown,
+  the law unchanged, the fix back to Mark as a fork. The instrument is
+  `seiche/src/laws/gravity/diag.rs` (ignored tests). It runs the catalog's
+  Orbit split into its terms, exclusion (`NodeExclusion::default()`,
+  220,000/d² out to 1,000), the kick, gravitation (G 9,000, mass 1 + degree,
+  softening 24) and counter-damping, on the P2 fixture and G1's generated
+  40-node graph from the boot Spiral's shape (19√i), and books each term's
+  work on the kinetic energy and its mean outward push per window, with
+  damping and contacts as the residual. Its positive control, exclusion alone
+  at no damping, books 234,313 of work against an energy drop of 230,237.
+  Orbit's set has no centring term.
+  *The cause.* In the first second on P2, exclusion does +176,463 of work,
+  gravitation −18,228 and the kick +16,614 (83%, 9% and 8% of the three;
+  gen-40 76%, 13%, 11%), and exclusion pushes outward 172.8 against
+  gravitation's 16.8 inward (gen-40 245.1 against 43.3). Inside its cutoff
+  exclusion outweighs gravitation 6 to 12 times per pair on P2 (220,000
+  against 9,000 × (1 + degree)), and it releases the tight seed's stored
+  exclusion energy, 230,625 on P2, where the kick gives 16,614.
+  Counter-damping's work equals the damping's loss in every window (547,296
+  each in the first second), so nothing removes the excess: past 6 s every
+  term's work is near zero, the kinetic energy is flat at 211,068 (gen-40
+  1,593,253), and the extent runs 404 at 1 s, 27,405 at 60 s and 54,909 at
+  120 s (gen-40 670, 43,804, 87,713). Controls, as the largest extent over
+  120 s in multiples of the first second's, P2 / gen-40: without exclusion
+  16.5 / 32.4, gen-40 ending with 80 touching pairs (clumped cores and an
+  evaporating halo, so removing exclusion is not enough); without
+  gravitation 136.8 / 133.8; without the kick 137.3 / 132.4; without
+  counter-damping 4.5 / 4.4, with the energy at 8 / 54 by 120 s (the
+  2026-09-03 death); with centring added (`Boundary` 0.08) 4.1 / 4.0, bounded
+  but a radial breathing, tangential share 0.04 / 0.06, the energy swinging
+  between 324 and 157,982.
+  *The candidates*, test forces only, over five spiral seeds (spacing 16 to
+  40) at both pages' dampings (the tree page's 2.5, the old page's 0.82) for
+  120 s. *Reading, not ruled:* the bar is an extent within 3× the first
+  second's; from 6 s a tangential share and an angular-momentum coherence of
+  at least 0.8; at least one revolution; energy above the receipts' floor
+  of 1; no overlaps; hubs inside (mass against radius below zero). Failing,
+  on the boot seed: an escape brake (unbound bodies damped), 18.6 / 20.3,
+  because each body stays bound to its own cluster while the clusters fly
+  apart; a cap at the kick's energy, 49.6 / 52.8; exclusion cut to two node
+  diameters alone, 98.2 / 79.1, and with softening 72, 100.6 / 87.0.
+  Failing on the sweep: centring 0.02 with today's counter-damping, worst
+  6.3, tangential 0.28; counter-damping on orbital (tangential) motion only,
+  with exclusion at two diameters, worst 2.9 / 3.0 / 2.7 / 4.3 (P2 at 2.5,
+  P2 at 0.82, gen-40 at 2.5, gen-40 at 0.82), with coherence 0.23 on the
+  tight seed at 0.82, where counter-rotating bodies left by the blow-out
+  cancel and reverse the rotation; the same at three diameters, worst 2.8,
+  coherence 0.35 on one seed; the law's own radial damping at 2.5, worst
+  3.0, energy 19 on one seed. Passing on every seed: (A) orbital-only
+  counter-damping, exclusion at two diameters and centring 0.02, worst
+  1.88 / 1.60 / 2.42 / 2.01, least tangential 0.90, coherence 0.92,
+  revolutions 2.95, energy 179, mass against radius at most −0.18, no
+  overlaps; (B) as A, with only motion in the kick's sense frictionless,
+  worst 1.88 / 1.83 / 2.16 / 2.08, least 0.92, 0.93, 3.42, energy 262, at
+  most −0.15. Nearly passing: (C) that prograde form with exclusion at three
+  diameters and no centring, worst 1.98 / 1.77 / 1.93 / 2.83, but 0.86
+  revolutions and energy 58 on one seed. Back to Mark as a fork, A
+  recommended. Gates on `3b79e414` (offline, locked, debug): seiche 109/109,
+  105/105 without default features, 109/109 with `gpu` (6 ignored, the
+  diagnostics); pictograph `--features canvas --lib` 279 passed, 13 ignored,
+  `physics_terms` green; graphshell `--features web --lib` 232 passed, 1
+  ignored, single-threaded. Logs `Code/testing/mere/orbit/` (`diag-*.log`,
+  `gate-diag-*.log`).
+- 2026-10-04 (Orbit's retune, after "Frictionless orbits + centring" and
+  "Explicit enum, bump seiche"; `orbit-retune`, main `c7125cd2` merged as
+  `90919d24`, retune `0d7583d4`). Only this plan changed on both sides; weave's
+  merge of it matches a plain `git merge-file` three-way merge. seiche:
+  `Gravity::counter_damping` is `CounterDamping::{Off, Full, Tangential}`;
+  Tangential cancels the host's damping only on each body's tangential
+  velocity about the gravitational mass centre, against the system's
+  mass-weighted drift. *Reading, not ruled:* `Gravity::new` takes the choice
+  as an argument, with no default, so no caller's meaning changes silently.
+  The only callers were seiche's own (the P1 never-rests test keeps `Full`,
+  its old meaning, at no damping) and the catalog; nothing outside mere
+  names it. seiche 0.0.6, with the workspace dependency and the lock's
+  seiche row only. The catalog's Orbit is `NodeExclusion` to two node
+  diameters (`ORBIT_EXCLUSION_REACH`, 72), `Gravity` under Tangential and
+  `Boundary` 0.02 (`ORBIT_CENTRING`); `physics_terms` gains
+  `orbit.gravity[2]` as E, gravitation staying H and counter-damping N.
+  *Bounded, and still an orbit.* The bar is the one stated with the fork: an
+  extent within 3× the first second's over 120 s; from 6 s a tangential share
+  and an angular-momentum coherence of at least 0.8; at least one revolution;
+  energy above 1; no overlaps; hubs inside. The law's own Tangential over
+  the five-seed sweep (`diag_orbit_ruled`) gives a worst 1.87 / 1.59 / 2.26 /
+  2.09 (P2 at 2.5, P2 at 0.82, gen-40 at 2.5, gen-40 at 0.82), least
+  tangential 0.90, coherence 0.92, revolutions 3.29, energy 198, mass against
+  radius at most −0.16, no overlaps, within 0.15 of the test force it was
+  built from on every line. Through the canvas on the tree page's path
+  (Play, Free, Orbit; `orbit_stays_bound_and_orbiting_on_the_p2_fixture`, 30
+  s by default, 120 s as an ignored receipt) the extent is 205 at 1 s and at
+  most 246 over 120 s (1.20×), the energy 2,904 to 3,941 after the first
+  second, 5.55 revolutions, and no node off the canvas through its own
+  camera at any second, with the boot camera that main still has. seiche's
+  `tangential_counter_damping_keeps_the_orbits_bound` carries the claim with
+  `Full` as its control, which fails the tangential bar.
+  *The plan's Orbit claims, re-checked.* The laws table (annotated above):
+  gravitation, mass by degree, the kick and no rest hold, and "leaves orbit
+  hubs" reads as hubs inside on every seed. P1's floor after 600 ticks: the
+  seiche test, green. P2's energy at 1 s and 6 s: `physics_orbit` and
+  `p4_tree_physics_orbit` ok. P3's board keeps moving: the board's unit test,
+  green; its headed receipt needs the C4 WebRTC fixture, not built here, and
+  was not run. P4's drag and add rows: `physics_drag`, `physics_add` and
+  their tree versions ok. The law.orbit profile: `p4_tree_physics_profiles`
+  ok. The never-rests list and G1's classes: green. The 2026-09-03 finding is
+  annotated above.
+  *Headed receipts* on bundle `edbee10a…` (wasm-bindgen 0.2.129 CLI, the web
+  lock seeded from `0090ad99` with the seiche row bumped, now `3cce8fc5`),
+  port 8845, under the page-error gate: `p4_tree_physics_orbit`,
+  `p4_tree_physics_drag`, `p4_tree_physics_add`, `p4_tree_physics_profiles`,
+  `physics_orbit`, `physics_drag` and `physics_add` all `RESULT ok` with no
+  gate failures. The positive controls on Orbit, a planted throw on the tree
+  page and a planted panic on the old page, fail as they must. Captures were
+  inspected whole-frame: all eleven nodes on the canvas, compact. Orbit's
+  framing check lives on `energy-frame` and was not run here (nothing
+  cherry-picked); no node left the canvas at any second without the
+  following view.
+  *At no host damping (asked):* Tangential has nothing to settle with, so
+  the blow-out stays and only the centring holds it. Worst 6.28 / 5.29,
+  least tangential 0.08 / 0.46, median 0.32 / 0.63, hubs no longer inside
+  (mass against radius up to +0.28): bounded, but a radial breathing, not an
+  orbit. With a floor under the radial settling at the old page's 0.82 it
+  passes: worst 1.58 / 2.60, least tangential 0.89 / 0.96; at 0.7, worst 2.50
+  / 2.67. Back to Mark as a fork. Gates (offline, locked, debug): seiche
+  113/113, 109/109 without default features, 113/113 with `gpu` (8 ignored,
+  the diagnostics); pictograph `--features canvas --lib` 287 passed, 13
+  ignored, `physics_terms` green; graphshell `--features web --lib` 235
+  passed, 2 ignored, single-threaded; clippy clean on the changed lines.
+  Logs `Code/testing/mere/orbit/` (`diag-ruled-1.log`,
+  `diag-no-damping-1.log`, `graphshell-orbit-p2-120s.log`, `receipts-r1.log`,
+  `wasm-build-1.log`, `gate-ruled-*.log`).
+- 2026-10-04 (Orbit's radial floor, after "Radial floor at 0.82";
+  `orbit-retune`, main `fdb1f5df` merged as `ffa90384`, the floor
+  `e9182cc8`). Only this plan changed on both sides, and weave's merge of it
+  matches `git merge-file`. `Gravity` gains `radial_floor`, default
+  `Gravity::RADIAL_FLOOR` (0.82): under Tangential, where the host's damping
+  is below it, the law damps radial motion and drift up to it itself, and at
+  or above it nothing changes. *Reading, not ruled:* the floor is a seiche
+  field and default rather than a catalog constant, since Tangential is new
+  in 0.0.6 and Orbit is its only user. The laws-table cell and the
+  2026-09-03 annotation say so.
+  *Against the bar*, the five-seed sweep (`diag_orbit_floor`), worst extent
+  as a multiple of the first second's, P2 / gen-40:
+  - host damping 0: 1.56 / 2.71, least tangential 0.90 / 0.96, coherence
+    0.92 / 0.98, revolutions 2.91 / 3.79, energy 579 / 18,972;
+  - 0.7: 1.52 / 2.52, least 0.90 / 0.96, 0.92 / 0.98, 2.92 / 4.23;
+  - 0.82: 1.54 / 1.98, least 0.89 / 0.96, 0.91 / 0.98, 2.98 / 4.11;
+  - 2.5: 1.89 / 2.31, least 0.99 / 1.00, 0.99 / 1.00, 3.39 / 3.88.
+  Hubs are inside on every seed (mass against radius at most −0.17) and no
+  run has an overlap. The control, the same law without the floor at
+  damping 0, reads 6.28 / 5.29 and least tangential 0.07 / 0.39. Through the
+  canvas on the tree page's path at damping 0
+  (`orbit_stays_bound_and_orbiting_on_the_p2_fixture_at_no_damping`, ignored,
+  120 s): 248 at 1 s, at most 377 (1.52×), 4.61 revolutions, no node off
+  the canvas at any second; at the canvas's default damping, unchanged
+  (1.20×, 5.57). seiche's `the_radial_floor_keeps_the_orbits_at_no_damping`
+  carries the claim, with the floor at 0 as its control, which fails on
+  tangential share. Both seiche Orbit tests now run the full 120 s the bar
+  was stated over: an earlier 30 s draft of this one asked for one
+  revolution in 30 s, a quarter of the bar's window, and failed at 0.78.
+  *Headed receipts* on bundle `3ff58d2a…` (0.2.129 CLI, web lock `3cce8fc5`),
+  under the page-error gate: the seven of the retune round `RESULT ok` with
+  no gate failures, and the planted throw and panic on Orbit fail. Captures
+  were inspected whole-frame. Gates (offline, locked, debug): seiche
+  114/114, 110/110 without default features, 114/114 with `gpu` (9 ignored);
+  pictograph `--features canvas --lib` 287 passed, 13 ignored,
+  `physics_terms` green; graphshell `--features web --lib` 235 passed, 3
+  ignored, single-threaded, on the second run. The first run failed on
+  `session_notices::tests::the_endpoint_is_asked_even_while_no_request_is_in_flight`
+  (polls 1 against more than 1), the timing flake the Density and G1 lanes
+  logged; it passed alone and in the rerun. The default page-path test adds
+  about 20 s to the graphshell suite in debug (30.8 s before this lane,
+  51.9 s after the retune). Logs `Code/testing/mere/orbit/`
+  (`diag-floor-1.log`, `graphshell-orbit-p2-floor.log`, `receipts-r2.log`,
+  `wasm-build-2.log`, `gate-floor-*.log`, `gate-floor2-graphshell-web.log`).
+- 2026-10-03 (Energy's off-screen receipt, branch `energy-frame` `629968cf`,
+  per "Diagnose and gate"): diagnosed and gated; the fix is put back as forks.
+  *Cause.* Two parts. The law's scale: on the P2 fixture (11 nodes, two
+  components of 5 and 6, 10 relations) Energy's centring alone holds the
+  components against the all-pairs repulsion, so they settle near
+  √(r·ΣW/g) = √(60,000 · 31 / 0.02) ≈ 9,600 world units apart. It converges,
+  slowly: 3,882 apart at 6 s, 7,232 at 20 s, 9,289 at 60 s (seiche replica,
+  kinetic energy 368 at 60 s); edges settle at 524 against Springs' 171. The
+  tree page read the same course from its own state: extent 1,692 × 1,771 by
+  frame 30 (10 of 11 off), 5,701 × 9,174 at frame 1,800; the old page
+  3,405 × 9,121. And the view: the page fits only at boot (to the Spiral,
+  119 × 115), on a non-Free arrangement and on Fit graph, never after a law
+  switch, so every law is read at zoom 1 against a 982 × 627 (tree) or
+  1,282 × 722 (old page) world box. Even Fit graph cannot frame Energy: it
+  needs zoom 0.064 and the canvas stops at 0.1. Springs on the same path stays
+  inside, 457 × 470 at frame 1,800. *The gate.* `Canvas::layout_framing`
+  counts node centres off the viewport through the canvas's own camera; both
+  pages publish `layout-outside`, `layout-extent` and `view-extent`; the
+  eleven law receipts and the profiles assert `layout-outside == 0` on the
+  frame each second capture shows, and resting laws again after the final
+  settle. The control (`*_framing_control`, both pages) plants a node 4,000 px
+  off the canvas under Still: counted exactly, and an `== 0` assert fails on
+  it with `got '1'`. *Reading, not ruled:* the margin is 0 (a centre inside
+  the canvas rectangle; panels the old page overlays on its canvas are not
+  subtracted), and those two moments are the stated ones for living laws too.
+  *Before any fix* (bundle `10ac4316`, two rounds): Energy
+  fails on both pages (11 of 11 on the tree; 8, then 11 on the old page),
+  Kinds (4-5 tree, 1 old), Anneal (2-3 tree, 4-5 old), Orbit (4, tree), the
+  tree profiles (1-5); Charge (one node, both rounds), Stress and Flow (one
+  node, first round only) sit at the tree's edge and pass on the old page;
+  Springs, Flock, Sync and Still pass everywhere. Orbit, met
+  on the way, expands without bound: 25,107 units at 60 s, linear, energy flat,
+  because exclusion outweighs gravity while counter-damping removes friction
+  (1,026 at 60 s without exclusion). Gates on the instrument: seiche
+  102/98/102, pictograph canvas 276, graphshell web 231 single-threaded. Logs
+  and the sweep of candidate tunings: `Code/testing/mere/energy-frame/`.
+- 2026-10-04 (the fix, branch `energy-frame`, per "Follow while playing" and
+  "Repulsion 6,000, centring 0.2"). *Follow.* The canvas gains
+  `set_view_follow` / `view_follows`: while physics plays, each frame eases
+  the camera toward the camera `fit_to_content` would install (zoom
+  geometrically, the world point at the viewport centre linearly, a 0.25 s
+  time constant in host time, or one tick a frame where the host gives none).
+  A wheel pan or zoom, a middle-drag, an orbit drag, `set_camera` and the two
+  centring commands stop it; it holds while paused and while a node or the
+  camera is being dragged. Graphshell's `canvas_physics` turns it on at a law,
+  profile or Free switch and `CanvasCommand::Fit` turns it back on, so both
+  pages follow; it is off by default, so other hosts are unchanged. Both pages
+  publish `view-follow`. *Retune.* `LinLogForce`'s defaults are repulsion 6,000
+  and centring 0.2 under the same id; on the fixture's topology the islands
+  sit 5.07 apart for their size against Springs' 2.57 (asserted at Springs ×
+  1.3, the two-cliques claim's factor; two cliques 4.49 against 2.49). The
+  tree page now reads Energy converging: extent 860 × 1,113 and kinetic
+  energy 0.0 by frame 1,800, against 5,701 × 9,174 and still moving before.
+  *The control* pans first (following stops), plants the node 4,000 px off
+  (counted as exactly 1; an `== 0` there fails with `got '1'` on both pages),
+  then Fit graph resumes following and frames all 12. *Receipts* on bundle
+  `677a03a2`: the eleven law receipts, the profiles and the control pass on
+  both pages, every framing assert at 0. Before (bundle `10ac4316`): Energy
+  11 of 11 (tree) and 8, then 11 (old page); Kinds 4-5 and 1; Anneal 2-3 and
+  4-5; Orbit 4 (tree); the tree profiles 1-5; Charge, Stress and Flow one node
+  at the tree's edge. Follow alone (bundle `b59af687`, the first coefficients)
+  still left Energy 2 nodes out on the tree, past the 0.1 zoom floor. Orbit
+  passes its capture-moment check on both pages under follow (its expansion
+  outruns the floor only later), so its lane's expected failure has no frame
+  to mark at the stated moment; put back. Also run green: the tree drag and
+  add, the old page's add, `p4_tree_controls`, `p4_tree_live_profile`,
+  `p4_tree_elapsed`, `p4_tree_profile`, the two saved-graph receipts, and the
+  2,000-node settles (GPU 413 of 418 steps on the device, spread 1,075). The
+  old page's `physics_drag` fails its released-where-dropped bound (21 and 29
+  px against 20) because the camera eases after the release; put back as a
+  fork. Found on the way, not fixed: the tree page draws node faces small and
+  offset up-left of their bodies below zoom 1 (reproduced by toolbar zoom
+  alone, with following off); following makes zoom below 1 common there.
+  Gates: seiche 103/99/103 (default, no-default, gpu), pictograph canvas 277,
+  graphshell web 232 single-threaded.
+- 2026-10-04 (main 69ba33d0 merged into `energy-frame`, per "Drag stops
+  following" and "Density gets the check here"). *Merge* `9724a6d5`: of the
+  eight files both sides changed, five auto-merged exactly as a plain `git
+  merge-file` does; in `canvas_physics.rs` weave's result silently dropped
+  main's `SETTLED_ARRANGEMENT` re-export, the test module's `use` lines and two
+  of main's tests, so the plain three-way merge replaced it (its seam's missing
+  brace restored); `web_product.rs` and this plan keep both sides. Every line
+  either side added survives but two rewritten doc lines. *Drag* `38bd8b0d`: the
+  press that becomes a drag (past the click slop) stops following; a click
+  does not; the follow test drags and clicks a node. *Density*: its two law
+  receipts and two Springs controls assert framing on the settled capture.
+  *Round* on bundle `a2837089` (wasm-bindgen 0.2.129 with wgpu 30.0.1, web
+  lock `0090ad99`, the page-error gate on): the twelve law receipts, Density's
+  controls, the profiles and the framing controls pass on both pages; tree
+  drag and add, old-page add, `p4_tree_controls`, `p4_tree_live_profile`, the
+  two saved-graph receipts, `p4_tree_profile`, `p4_tree_elapsed` and both
+  2,000-node settles pass (GPU 413 of 418 steps on the device). The must-fail
+  framing control fails with `got '1'` and a planted throw fails on the gate,
+  each on both pages. The old page's `physics_drag` still fails, Stress 22
+  against 20 on a fresh profile (and Anneal 79 against 60 on a profile holding
+  an earlier saved session). The camera holds from the press through the
+  release (621.63, 393.68 at zoom 0.772 throughout), so it is not easing after
+  the drop: following zoomed the view out before the gesture, its 220 px is
+  about 285 world units, and the law pulls the node back further in the
+  measured frame (18 px against 11 one frame after release). With the follow
+  step disabled the receipt passes twice. Put back to Mark with the receipt
+  unchanged. Gates: seiche 113/109/113, pictograph canvas 289, graphshell web
+  235 single-threaded.
+- 2026-10-04 (drag receipts in world units, `energy-frame` `bd790bcc`, per
+  "Measure in world units"). The canvas gains `focused_world_position`,
+  `world_point_at` and `screen_point_of` (through the camera; a round-trip test
+  at zoom 0.772); both pages gain a `move-by-world` verb beside `move-by`, keep
+  the drop point in world units at `release-at`, and publish
+  `drag-return-world` beside `drag-return`, the tree also
+  `drag-return-step-world`. `physics_drag` and `p4_tree_physics_drag` make
+  every gesture and check in world units, thresholds unchanged; at zoom 1 each
+  reads as its px twin. *Reading, not ruled:* the ruling names the old page's
+  receipt; the tree's mirror is converted too, so both pages measure the same
+  thing. Its release log shows why: the 220-unit gesture is 112 px under zoom
+  0.51 and 76 px under 0.34. *Round* on bundle `37523a31` (built from the
+  head; web lock `0090ad99`, page-error gate on), fresh browser profile: both
+  drag receipts pass (the old page's after a launch stall left no progress
+  file and a rerun passed), and so do the twelve law receipts, Density's
+  controls, the profiles, the framing controls and add on both pages,
+  `p4_tree_controls`, `p4_tree_live_profile`, the saved-graph pair,
+  `p4_tree_profile`, `p4_tree_elapsed` and both 2,000-node settles (GPU 413 of
+  418 device steps). The must-fail framing control and a planted throw fail on
+  both pages. Gates: seiche 113/109/113, pictograph canvas 290, graphshell web
+  235 single-threaded.
+- 2026-10-04 (main 9ce5889f merged into `energy-frame` `d2ea7526`: the
+  face-zoom fix and Orbit's retune). Of the nine files both sides changed,
+  five auto-merged exactly as a plain `git merge-file` does; `view.rs` weave
+  auto-merged where the plain merge conflicts (both added functions after
+  `focused_screen_position`) and placed main's elsewhere, so it was taken from
+  the plain merge by hand; `canvas_controls.rs` keeps main's `SetZoom` (it
+  places the camera through `set_camera`, so a set zoom stops following like
+  any zoom) beside Fit resuming following; `canvas_physics.rs` and this plan
+  keep both sides. One semantic conflict no text merge sees: `Gravity::new`
+  takes a `CounterDamping` now, and the Energy sweep's Orbit runs record the
+  first build, so they pass `Full` (27,405 at 60 s, as recorded). The web lock
+  moves to `3cce8fc5`, the pins' `0090ad99` with seiche's row at 0.0.6, the
+  same lock the Orbit lane built with. Orbit's receipts now assert framing
+  after the final settle too (`6640bb64`), Orbit being bounded. *Round* on
+  bundle `949fbc5e`, fresh browser profile: the twelve law receipts (Orbit at
+  both its moments), Density's controls, the profiles, the framing controls,
+  drag and add pass on both pages, main's two face-zoom receipts pass, and so
+  do `p4_tree_controls`, `p4_tree_live_profile`, the saved-graph pair,
+  `p4_tree_profile`, `p4_tree_elapsed` and both 2,000-node settles (GPU 413 of
+  418 device steps); the must-fail framing control and a planted throw fail
+  on both pages. Gates: seiche 115/111/115, pictograph canvas 292, graphshell
+  web 238 single-threaded.

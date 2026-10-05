@@ -98,6 +98,14 @@ granularity:
     `EdgePayload` per `(from,to)` carrying a statement list, because pair adjacency
     is still the hot path. Pair-level APIs can keep returning "there is an edge from
     A to B"; RDF projection and exact mutation use statement iterators.
+    > **Amended 2026-10-04 (Mark, [graph semantics plan](2026-10-04_graph_semantics_plan.md)
+    > ruling 1):** a fact is one asserter's assertion, not the claim. Dedup keys on
+    > `(predicate, scope, asserter)`, so two asserters of one claim hold two
+    > statements, each retracted alone, projected as two reifiers on one triple term.
+    > The content-dedup described below (one record per `(predicate, scope)`, metadata
+    > overwritten in place) is what ruling 1 replaces. Ruling 5: the asserter is the
+    > attributed source (the page, the peer, the ingested `prov:wasAttributedTo`),
+    > else the journal `Author`, held in `provenance_iri`.
   - **Enumerating current `sub_kinds` is not enough.** The statement list must carry
     per-statement metadata. A `BTreeSet<SemanticSubKind>` plus one `label` and one
     `predicate` is still lossy as soon as two predicates on the same pair need
@@ -179,6 +187,11 @@ literals, lang tags, named graphs, reifier metadata, multiple statements on one
 node pair, raw + CiTO predicates).
 
 ## Phase 3 — `QueryableDataset` adapter (SPARQL over the kernel, no held quads)
+
+> **Amended 2026-10-04 (Mark, [graph semantics plan](2026-10-04_graph_semantics_plan.md)
+> ruling 6):** content statements move to a resource graph beside the surface graph,
+> and SPARQL is served by this adapter over the resource graph rather than by a
+> dataset rebuilt per query. That plan's P2 carries this phase.
 
 - Implement `spareval::QueryableDataset` over the kernel: `InternalTerm` = an
   **interned term-id** (a u32 into a kernel term dictionary, IRIs/literals interned

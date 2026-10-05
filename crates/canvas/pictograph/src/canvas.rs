@@ -113,7 +113,9 @@ fn blend_affinity_pairs(
 
 mod types;
 pub use crate::signals::{BridgeMetric, ImportanceMetric};
-pub use types::{CameraView, EdgeCell, Face, NodeShape, NodeState, PointerButton, Viewport};
+pub use types::{
+    CameraView, EdgeCell, Face, LayoutFraming, NodeShape, NodeState, PointerButton, Viewport,
+};
 
 // The graph-scene paint lane, merged from platen in the 2026-07-09
 // decomposition (platen is the pane home now; the canvas is the graph-truth
@@ -253,6 +255,9 @@ pub const WHEEL_PAN_SCALE: f32 = 40.0;
 const ZOOM_STEP: f32 = 1.15;
 /// Pan-inertia decay per frame (lower = stops sooner).
 const PAN_DECAY: f32 = 0.85;
+/// Following the layout eases the camera toward fit-to-content with this time
+/// constant (seconds): about 63% of the way in one, 95% in three.
+const FOLLOW_EASE_SECONDS: f32 = 0.25;
 /// Clamp for the camera zoom.
 const MIN_ZOOM: f32 = 0.1;
 const MAX_ZOOM: f32 = 8.0;
@@ -339,6 +344,10 @@ pub struct Canvas {
     cursor: (f32, f32),
     /// Inertial pan velocity (px/frame); decays each frame when not dragging.
     pan_velocity: (f32, f32),
+    /// Whether the camera follows the layout while physics plays (eases toward
+    /// fit-to-content each frame). A pan, zoom or node drag clears it; off by
+    /// default.
+    follow: bool,
     /// `Some(last_cursor)` while a middle-button pan drag is in progress.
     middle_drag: Option<(f32, f32)>,
     /// `Some(last_cursor)` while an Alt+left-button **orbit** drag is in progress (horizontal =

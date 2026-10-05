@@ -270,6 +270,8 @@ fn expected_classes(row: &str) -> Option<&'static [Class]> {
         "energy.linlog[0]" => &[E],
         "energy.linlog[1]" => &[E, E, E],
         "orbit.gravity[1]" => &[H, N, K],
+        // Orbit's centring well (ruled 2026-10-04, "Frictionless orbits + centring").
+        "orbit.gravity[2]" => &[E],
         "kinds.particle-life[1]" => &[N, E],
         "flock.boids[1]" => &[E, N, Em, N, E],
         "sync.kuramoto[1]" => &[H, H],

@@ -21,6 +21,14 @@ over a chosen edge projection → which of the nine shapes, ranked by fit) plus 
 canvas reveal/derive/crystallize choreography. Everything downstream of "here is a
 shape" already exists.
 
+> **Amended 2026-10-04 (Mark, [graph semantics plan](../implementation_strategy/2026-10-04_graph_semantics_plan.md)
+> ruling 3):** a `Linked` spec may also be a SPARQL query, beside the nine shapes.
+> A saved subgraph is shared by its spec, which each receiver evaluates over their
+> own graph, and "freeze" materializes the current members into a nested graph
+> recording the spec and revision. A subgraph itself still never syncs. Ruling 8:
+> the frozen nested graph references members by resource id and copies the
+> statements among them as of the freeze revision.
+
 ## The interaction
 
 1. **Select, and the wiring reveals itself.** On a multi-selection the canvas dims
