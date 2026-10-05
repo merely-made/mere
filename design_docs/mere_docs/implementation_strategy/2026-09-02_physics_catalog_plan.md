@@ -2573,3 +2573,80 @@ binning are the useful patterns.
   (its last window read 100 us): the flake named above, met. Gates: seiche
   125/125 (119 without actor, 125 + 3 with gpu), pictograph 294, graphshell
   `web` 238, mere and graphshell checked clean.
+- 2026-10-04 (seiche's speed, "Known rate, else capped" and "Gate keeps a
+  forecast margin" carried out, branch `seiche-speed` `394596c7`). Main
+  `ff78acca` merged first (`e8ae8498`): the five auto-merged files are
+  identical to `git merge-file`'s result, and the plan's one conflict,
+  resolved theirs then ours with weave's `refused_by` line and markers
+  removed, is identical to the same resolution of `git merge-file`'s. The web
+  half: the display period is the shortest of the last 120 intervals and never
+  more than 1/60 s, so the budget is at most 8,333 us; `FrameBudget` moves
+  from graphshell-web, a wasm-only cdylib whose tests never run, into
+  `graphshell::frame_budget`, whose test holds 8,333 us on a page slower than
+  60 Hz, 3,030 us on intervals of a 165 Hz display, a hidden page's gap
+  skipped and old intervals aged out. A correction to the last finding: this
+  laptop's panel runs at 165 Hz (Win32 `CurrentRefreshRate` 165), and every
+  interval logged is a whole multiple of its 6.06 ms period to within the
+  clock's grain (24.2, 30.2, 36.4, 42.4, 48.5, 54.7, 60.6, 84.9 and 103.1 ms
+  are 4 to 17 periods; frames of 193.9 to 478.9 ms are 32 to 79), so the web
+  can read the display's quantum after all; the finding said none could be
+  read because it tried only 16.67 ms. Returned as a fork (infer the quantum,
+  the largest period of which every recent interval is a whole multiple within
+  the grain, searched from 1/360 s to 1/60 s with the cap as fallback, 3.03 ms
+  here; or the cap as ruled, 8.3 ms here). The native half is not built:
+  turnstone, the native host, pins mere `bd5912fb` (2026-09-30), which
+  predates the dial, and mere main does not carry the dial either; turnstone
+  draws graph panes with the fixed-step `canvas.frame`
+  (`turnstone/src/app/mod.rs`) and has no speed control, so the budget would
+  never apply at its 1x. Where it would read the rate: the graph surface's
+  render in `turnstone/src/shell/render.rs`, where the window is in hand, and
+  the lens windows' in `turnstone/src/shell/lens.rs`, by
+  `window.current_monitor()` and winit 0.30's
+  `MonitorHandle::refresh_rate_millihertz()`, an `Option<u32>`. Returned as a
+  fork (a mere-side entry point now and turnstone's wiring once the dial
+  reaches main and turnstone's pin moves; turnstone now on a pin to this
+  branch; native left until turnstone has a speed control). The margin:
+  `StepBudget` gains `margin`, and the gate admits a tick only while the time
+  left covers the forecast tick plus it. The web pages keep 200 us, two of the
+  browser clock's 100 us steps (`physics_budget_margin_us` sets it); the
+  actor's `Instant` clock keeps none. Why 200 us: with the period capped and
+  the margin at 0, a probe bundle logged every tick the gate admitted against
+  the forecast it was admitted on. On the 300-node page, about 2,500 a run at
+  Max and at 50x, a tick ran at most 200 us past its forecast (p99 138), 1.6
+  to 3.0% of them more than 100 us; on the 24-node page at most 194 us; on the
+  11-node fixture at most 413 us, one in 154,062 more than 300 us. A tick and
+  its forecast are both read in steps, so a tick the forecast saw at one
+  reading can read two steps dearer, and the frame's own reading takes the
+  third, which the bound allows. One step (100 us) would leave the 300-node
+  page's worst tick exactly on the bound; a margin scaled to the forecast
+  vanishes on light pages, where cheap ticks read 0 us and the forecast with
+  them. The control is a seiche test on a virtual clock read in 100 us steps:
+  a 200 us tick, every 40th 400 us, an 8 ms budget at 50x; at margin 0 every
+  one of twelve frames admits the dearer tick last and runs 200 us over, past
+  the grain, and at 200 us none does. Headed (`diag_speed_margin`, Springs
+  applied eight times on the 300-node page at Max, 155 frames above real time
+  a run), the margin moves every frame by its 200 us: with it, four runs had
+  none past the grain and the worst 133 us under budget; at margin 0 the worst
+  was 67 to 167 us over. But at margin 0 that page ran a frame past the grain
+  in only 2 of 6 runs (167 us each), and the four probe pages together in 5 of
+  12 (167 to 567 us), so a headed margin-0 control cannot be a gate, and the
+  seiche test is the control. Every window: the tree page keeps, since it
+  opened, the frames above real time, the worst one's overrun and how many ran
+  past the grain (`pace-over-budget-worst-us`, `pace-over-grain-frames`); the
+  fast receipt, its control and the Speed select assert the worst, not only
+  the last window's, and a `log-pace` verb writes the figures into the
+  receipt. Headed on bundle `e681ecfa` (web lock `3cce8fc5`, wasm-bindgen
+  0.2.129), with no other lane's rustc and the CPU at 12 to 28%, all 23
+  receipts green with zero gate entries: the eleven law receipts, profiles,
+  add, drag, Density's two and main's framing control; slow; fast at Max on
+  300 nodes (the budget 8,333 us, half the capped 16.7 ms period, bound at
+  2.0x and 2.9x, every window's worst 133 us under budget, none past the
+  grain); its 50x control on 24 nodes (8,333 us, unbound at 38.3x, worst 1,933
+  us under); both Speed select receipts with Max; and the 2,000-node GPU
+  settle at 1x (413 of 418 device steps). The light fixture's frames came as
+  close as 18.2 ms apart, three of the panel's periods, and its budget is
+  8,333 us too. A faster display was not emulated: the panel already is one,
+  but no page here keeps up with it, so the under-8.3 ms case stands on the
+  `frame_budget` test (3,030 us at 165 Hz intervals). Gates: seiche 127/127
+  (121 without actor, 127 + 3 with gpu), pictograph 297, graphshell `web` 240,
+  mere and graphshell checked clean.
