@@ -1,10 +1,9 @@
 # djinn Test Harness Plan
 
 **Date**: 2026-10-05
-**Status (2026-10-05)**: assessed; all forks ruled (§3, rulings 1 to 13). H1
-to H3 built on a lane branch; its graceful-stop fix (ruling 11) is under
-way, then verification and merge. No code
-changed. The vault lock plan's build waits on this harness (its ruling 18).
+**Status (2026-10-05)**: all forks ruled (§3, rulings 1 to 13). H1 to H3
+landed on `main` (`318b8f70`), the graceful stop fixed (ruling 11). H4 to H6
+open; H4 is built with the vault lock (its ruling 18).
 **Scope**: one shared, tested way to run djinn residents under test:
 isolated, observed without scraping logs, stopped and restarted, held
 behind enforced walls around the installed resident, and recorded as
@@ -285,21 +284,22 @@ six; review each. Mark: **"Accept all six (Recommended)"**.
 Drafted from the assessment; set once the forks are ruled.
 
 - **H1 — isolated resident.** Done when:
-  - [ ] a spawn redirects every root and endpoint, and an incomplete list
+  - [x] a spawn redirects every root and endpoint, and an incomplete list
         is refused;
-  - [ ] readiness needs no log scraping;
-  - [ ] kill, graceful stop and restart work on the same roots;
-  - [ ] no orphans remain if the test process dies;
-  - [ ] D1 and D1b run on the harness with unchanged outcomes, the lines
-        removed from them counted.
+  - [x] readiness needs no log scraping;
+  - [x] kill, graceful stop and restart work on the same roots;
+  - [x] no orphans remain if the test process dies;
+  - [x] D1 and D1b run on the harness with unchanged outcomes, the lines
+        removed from them counted. *(D1b's second restart is a race, not a
+        fixed outcome: see §6, 2026-10-05, landed.)*
 - **H2 — walls.** Done when:
-  - [ ] no pinned PID and no kill by name remain;
-  - [ ] the installed identity and its pipes are recorded identical before
+  - [x] no pinned PID and no kill by name remain;
+  - [x] the installed identity and its pipes are recorded identical before
         and after every run;
-  - [ ] each wall has a refusal test.
+  - [x] each wall has a refusal test.
 - **H3 — records.** Done when:
-  - [ ] every run writes the versioned record;
-  - [ ] a verifier recomputes its evidence hashes.
+  - [x] every run writes the versioned record;
+  - [x] a verifier recomputes its evidence hashes.
 - **H4 — the lock's seams.** Done when:
   - [ ] the status route reports lock state and startup mode;
   - [ ] fake triggers and a fake clock work in-process, and scripted
@@ -376,3 +376,36 @@ merged):
   lock adds only the new crate. djinn's own Linux cross-check cannot run
   here (ring's C build needs a cross compiler; chatelaine ruling 57 moves
   such checks to the ThinkPad).
+
+**2026-10-05, H1 to H3 landed** (`318b8f70`, merging `38ed523a`,
+`c55faaff` and `45216587`):
+
+- **The fix (ruling 11), `45216587`.** graphshell's `ResidentTasks`
+  (`ports/graphshell/src/native/tasks.rs`) scopes the tasks a resident
+  spawns. djinn's stop path aborts and joins them before the release checks,
+  so the route and blob-store borrowers they held are gone when shutdown
+  asks.
+- **Verified in `mere-verify`.** First the branch merged on `add54925`
+  (`6ed24c46`), then again on `a8116320` (`935e10ce`) after `main` moved 20
+  commits:
+  - djinn, djinn-testkit, personae and castellan tests, graphshell's library
+    tests, and the `cargo_mode` gate passed;
+  - the four live harness tests passed both times (the canary test's
+    record is marked failed by design: it proves the canary catches an
+    unguarded root);
+  - D1 passed, the stopped peer not connected after 13.9 s.
+  - D1b passed outright on `6ed24c46`, its second restart included.
+- **Reading, not ruled:** the second restart is the HyParView race (pairing
+  ruling 72 waits for upstream). It opens only when a Neighbor message
+  overtakes a Join, so one pass means this run did not hit it, not that it
+  is gone.
+- **Control (ruling 11):** with `cancel_and_join` removed from djinn's stop
+  path, the graceful-stop test failed with exit 1: "published-site route
+  still has active borrowers; blob custody: resident blob store still has
+  active borrowers". With the call restored, it passes.
+- **The installed resident** (PID 14756, started 05:06:01) was identical
+  before and after both runs.
+- **What landed:** the tree on `main` is `935e10ce` plus `main`'s four
+  later files (docs and one wasm-only removal in
+  `cambium-genet-web-host`).
+- **Next:** H4, the lock's seams, built with the vault lock (L1 to L4).
