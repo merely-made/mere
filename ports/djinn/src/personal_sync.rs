@@ -120,6 +120,10 @@ pub struct PersonalSyncStarted {
     pub surface: DeviceSurfaceHandle,
     /// The paired-device directory, read live from this host.
     pub directory: DeviceDirectorySource,
+    /// This device's personal-graph node id, hex.
+    pub node_id: String,
+    /// The ticket this start listens on, as the status route reports it.
+    pub ticket: String,
 }
 
 /// Start personal sync for a profile, or return `None` when the owner has not
@@ -257,11 +261,13 @@ pub async fn start<P: IdentityProvider + ?Sized>(
     // disclosed on request through `pairing_facts` rather than written here on
     // every start. A peer learns it from the attestation on the wire anyway;
     // that is a different surface from a plaintext file.
+    let node_id = owner_settings::hex32(&host.node_id());
+    let ticket = host.ticket().await?;
     tracing::info!(
         graph = %owner_settings::hex32(&graph),
-        node_id = %owner_settings::hex32(&host.node_id()),
+        node_id = %node_id,
         paired = sync.paired_devices.len(),
-        ticket = %host.ticket().await?,
+        ticket = %ticket,
         "personal graph sync listening"
     );
     // Name any device that can reach this graph but cannot write to it. The
@@ -334,7 +340,12 @@ pub async fn start<P: IdentityProvider + ?Sized>(
         graphshell::receipts::inbox_dir(&data_root),
     );
     spawn_accept_watch(host, Arc::clone(&surface));
-    Ok(Some(PersonalSyncStarted { surface, directory }))
+    Ok(Some(PersonalSyncStarted {
+        surface,
+        directory,
+        node_id,
+        ticket,
+    }))
 }
 
 /// Run the one-shot blob operations the operator asked for on this start.
