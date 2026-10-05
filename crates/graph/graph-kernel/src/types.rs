@@ -404,6 +404,13 @@ pub enum ClassificationStatus {
     Imported,
 }
 
+impl ClassificationStatus {
+    /// Classifications used by ordinary selection, display and affirmative export.
+    pub fn is_affirmative(&self) -> bool {
+        matches!(self, Self::Accepted | Self::Verified | Self::Imported)
+    }
+}
+
 /// A single provenance-bearing classification record on a node.
 ///
 /// Multiple records can coexist; at most one should have `primary: true` per scheme.

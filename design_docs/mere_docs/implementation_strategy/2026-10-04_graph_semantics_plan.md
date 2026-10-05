@@ -9,11 +9,15 @@ plan is unchanged at main `d2d6ac3d`. A1/B1/C1 selected by "All 1";
 `ResourceNode`/`SurfaceNode` are settled by ruling 19, and B1/C1 remain
 approved. Mark authorized P2 after the P1 repair at `4bc9ae96`, then
 selected C7 identity namespaces with future moot aggregation and C8 resource
-classification records (rulings 20–21). Shared canonicalization and the
-`SurfaceNode`/`SurfaceNodeKey` names are implemented and gated; UUID namespace,
-classification collisions, lifecycle filtering and resource journal captures
-remain checkpoints C9–C12 before dependent code. Replay-first migration and
-per-predicate placement govern P2.
+classification records (rulings 20–21), then accepted C9–C12 option 1
+(rulings 22–25). Shared canonicalization, the `SurfaceNode`/`SurfaceNodeKey`
+names, the common resource UUID helper, `ResourceNode` identity and affirmative
+classification readers are implemented. Resource graph population, conflict
+migration and typed journal captures remain incomplete. The typed consumer
+contract is prepared; the known Turnstone capture-match break remains held
+under the Mere-only coordination rule. Replay-first migration and
+per-predicate placement govern P2. The current identity/lifecycle slice and
+recreation repair pass their gates; P2 is not complete.
 P3–P5 have not begun. Main integration awaits Mark's review.
 
 Four questions were put to Mark from outside the project: what a link records,
@@ -861,6 +865,59 @@ unavailability without it. Default-feature Eidetic passes all 109 tests,
 including both controls. No feature-guard fix was folded into graph semantics;
 the optional suite is not reported green.
 
+### P2 identity, lifecycle and replay preparation (2026-10-05)
+
+After Mark accepted C9–C12 option 1, Chartulary gained `resource_id`, UUIDv5
+in `NAMESPACE_URL` over its sole canonicalizer (`canonical.rs` 59). The
+kernel's `ResourceNode` owns immutable identity/address (`graph/resource.rs`)
+and indexes correctly in a Chartulary graph; Eidetic re-exports the same
+helper. This is identity plumbing, not production population of the second
+graph. The approved dependency edge adds only `uuid` to Chartulary and one
+dependency-list line to the lockfile, with no package/version/checksum changes.
+
+`ClassificationStatus::is_affirmative` governs kind selection, classification
+facets, type display and affirmative RDF export. Five-status tests include
+Accepted/Verified/Imported controls and exact retained review records;
+JSON-LD reingest and SPARQL share the export test. The initial new export test
+assumed ingest retains an id-only node; a title positive control corrected
+that fixture. No ingest behavior was changed. Full resource classification
+migration and conflict editing from C10 are not implemented yet.
+
+The final kernel run exposed a real clock-dependent recreation defect:
+`Revert::recreate` compared original facets against a scratch birth, so a
+same-millisecond visit clock could omit its restoration. A later replay birth
+then changed the timestamp. Recreation now writes every original facet and
+removes birth facets absent from the original. The deterministic regression
+uses planner clock 100, replay clock 101, original clocks 100/90/absent, and
+an untouched node at 42. Ordinary undo keeps its before/after/live checks.
+
+The prepared C12 contract appends three typed capture kinds: resource record
+by resource id, exact resource pair by both resource ids, and shown resource
+by surface id. Optional record/reference values restore prior absence without
+selecting blob purge or navigation GC. The old `ReplaySetEdgesByIds` fields
+and postcard ordinals stay unchanged. Turnstone's exhaustive capture match
+still needs a coordinated update (`repos/turnstone/src/behaviors.rs` 109–177,
+292). Resource changes fan out to every surface showing affected resources,
+then expand through existing surface ancestry. A resource UUID alone is not
+a surface notification. Historical legacy effects use explicit migration
+endpoints, never the surface's current URL.
+
+Legacy exact-pair replay needs a surface-pair membership ledger and a
+statement-id-to-original-resource-endpoints ledger. Clearing one old surface
+pair must retain another pair's assertion handles on the same resource pair;
+minting binds endpoints at the historical entry, including withdraw/restore
+after navigation. This follows rulings 11/18 and B1, rather than a new
+migration policy. The known Turnstone consumer break remains unapplied.
+The active Turnstone lane received the concrete coordination contract and
+holds its existing Scry pins; siblings remain untouched by this lane.
+
+The read-only persistence inventory found no production rkyv graph-byte
+reader/writer in Mere, Turnstone or Knot-editor. Production graph stores use
+JSON, but this does not promise old rkyv-byte compatibility. Before resource
+population, snapshot save/load, Pandect snapshot composition and Graphshell
+selection export must retain the new resource records/references/edges.
+Their current old-column-only paths cannot be reused unchanged.
+
 ## 3. Rulings
 
 Mark's answers, from multiple-choice rounds; each is the option label quoted
@@ -1105,6 +1162,28 @@ the resource. Surfaces showing one resource read the same classification and
 review state. This settles placement; the existing first-wins collision and
 lifecycle-ignorant read paths are not newly endorsed by this answer.
 
+**Ruling 22 (C9).** Mark: **"i accept the recommendations. proceed."**
+Selects option 1: resource ids use UUIDv5 under the standard URL namespace
+over the sole shared canonical IRI. The existing surface namespace stays
+fixed. The already-approved dependency edge may use the locked UUID package;
+any broader lock change remains a stop.
+
+**Ruling 23 (C10).** The same answer selects option 1: preserve conflicting
+classification variants with their original surface references, mark the
+resource conflicted and require precise record selection before editing
+review state or primary choice. No insertion-order survivor is selected.
+
+**Ruling 24 (C11).** The same answer selects option 1: Accepted, Verified
+and Imported classifications participate in ordinary selection, display and
+affirmative RDF export. Suggested and Rejected remain retained review data.
+
+**Ruling 25 (C12).** The same answer selects option 1: explicit typed
+resource-record, exact resource-pair and shown-resource journal captures.
+Legacy captures retain their surface grammar. The recommended route included
+coordination before the known Turnstone API break lands. The lane's Mere-only
+scope and stop-on-consumer-break rule still apply; this records the protocol
+choice, not a completed consumer update.
+
 ## 4. Phases
 
 ### Placement by stratum (rulings 10, 14, 15)
@@ -1232,14 +1311,14 @@ comes back to Mark as a fork, with evidence, before the code commits to one.
   original-mere fallback for unattributed legacy concepts. Future moot
   aggregation is a direction; its mechanism remains open.
 - **C8 (P2). Classifications.** Ruled: ruling 21, complete resource records.
-- **C9 (P2). Resource UUID namespace.** Which UUIDv5 namespace names the
-  canonical IRI, distinct from or shared with existing surface identities.
-- **C10 (P2). Classification collisions.** How divergent records from
-  same-resource surfaces remain addressable without a first-wins survivor.
-- **C11 (P2). Classification lifecycle.** Which statuses enter ordinary
-  selection, display and affirmative RDF export.
-- **C12 (P2). Resource journal captures.** Typed resource captures with a
-  coordinated consumer API change, or an explicit versioned facet protocol.
+- **C9 (P2). Resource UUID namespace.** Ruled: ruling 22, standard URL
+  namespace over the shared canonical IRI.
+- **C10 (P2). Classification collisions.** Ruled: ruling 23, preserve
+  variants/origins with precise edits.
+- **C11 (P2). Classification lifecycle.** Ruled: ruling 24, affirmative
+  statuses only in ordinary readers; retain review records.
+- **C12 (P2). Resource journal captures.** Ruled: ruling 25, typed captures.
+  The known consumer API break remains held pending coordination.
 
 ## 6. Progress
 
@@ -1473,3 +1552,52 @@ comes back to Mark as a fork, with evidence, before the code commits to one.
   extra target or isolated Cargo home. Retained: the graph-semantics worktree
   and branch, owned by this lane for P2/review; the shared Mere target for
   reusable builds. Nothing is integrated into main.
+
+- **2026-10-05. P2 identity/lifecycle slice gated; held at the existing
+  consumer authorization boundary.** Mark accepted C9–C12 option 1, recorded
+  as rulings 22–25. Added the shared UUIDv5 resource helper, Eidetic export,
+  immutable `ResourceNode` identity/address and Chartulary indexing tests.
+  Ordinary classification selection, facets, type display and RDF export now
+  use Accepted/Verified/Imported while retaining Suggested/Rejected records.
+  Full conflict migration, production resource graph, tags, navigation routing,
+  canvas lifting and query adapter remain unimplemented; P2 is incomplete.
+  Typed captures are prepared as a concrete consumer contract, unapplied
+  pending coordinated authorization under the Mere-only brief. The active
+  Turnstone lane received that contract and holds existing Scry pins. This
+  lane changed no sibling source or API and no Scenomise projection files.
+
+  The required final kernel run found the clock-dependent recreation defect
+  above (329 passed / one failed before repair). `4f11d63c` restores every
+  original facet on recreation, with ordinary conditional undo preserved.
+  The deterministic control removes that forced restoration: original clock
+  90 and absent-clock controls complete first; equal planner/original clock
+  100 then fails against replay clock 101. The untouched-node 42 control is
+  checked in the same run. The mutated run exits 101 with one failure; source
+  is restored byte-for-byte in `finally`, then the full kernel gate passes.
+
+  Final gates, `--offline --locked -j 1`, shared `C:/t/cargo-targets/mere`:
+  **Chartulary 66 passed**, **Eidetic default 109 passed** (two doc examples
+  ignored), **kernel 331 passed** (one doc example ignored), **linked-data
+  with query 41 passed**, **workspace check exit 0**, **wasm32 kernel check
+  exit 0**. The first Eidetic command used its directory name as a package
+  name and failed selection; the corrected `-p eidetic` gate completed.
+  The first new linked-data test's id-only-node assumption was corrected
+  using a title positive control before its final passing runs. Cargo waited
+  for shared cache/build locks; no other owner's process or output was removed.
+
+  Touched-file formatting and `git diff --check` pass. Documentation audit
+  and planted-defect/clean-fixture self-test exit 0. This plan has no findings;
+  every audit bucket matches branch-baseline documents in the same environment
+  (333 active, 322 indexed, 10 orphans, one statusless plan, 40 broken relative
+  links, 158 ambiguous paths, 206 missing known-root paths, two stale historical
+  annotations). No active document was added. A main recheck confirms its
+  graph plan's last change remains `62219dd1`.
+
+  Pandect, Pictograph and Graphshell test suites, the known optional Eidetic
+  no-default baseline failures, ignored tests, sibling builds, headed/browser/
+  device proofs and later-phase gates were not rerun. The sole manifest/lock
+  change is the approved existing locked UUID dependency edge; no new package,
+  version/checksum change, download, patch override or isolated Cargo home.
+  Retained: the graph-semantics worktree/branch for P2 and Mark's review,
+  owned by this lane; the shared Mere target for reusable validation. No
+  additional generated-output directory was created. Nothing reached main.
