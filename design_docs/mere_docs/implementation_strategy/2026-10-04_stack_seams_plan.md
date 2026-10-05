@@ -1,10 +1,10 @@
 # Stack seams plan: catalog, shared device, actions, determinism, two words
 
 **Date:** 2026-10-04
-**Status (2026-10-05):** in progress. Twenty-six rulings in nine rounds (S1
-to S26); P1 landed on main (`1633be0c`), P2 next; P3 and S7 done as documents; S3 to S6 carried into the
-dynamics grammar plan (G8, G9); S9 done by the identity lane (`b52edea7`).
-No code in this plan's own lane yet.
+**Status (2026-10-05):** in progress. Twenty-seven rulings in ten rounds
+(S1 to S27); P1 landed on main (`1633be0c`); P2 sized and staged (S27), no
+code yet; P3 and S7 done as documents; S3 to S6 carried into the dynamics
+grammar plan (G8, G9); S9 done by the identity lane (`b52edea7`).
 
 A note sent to Mark listed weak seams in the stack. Each claim was checked
 against the code (§1); six seams proved real and went to him as
@@ -415,6 +415,24 @@ paces itself; one frame clock. Mark: **"Each window paces itself
 at its own monitor's rate, the shared core serving them in turn; an idle window
 costs nothing. Checkpoint C2 is resolved.
 
+Round 10, 2026-10-05, on how P2 lands. Evidence, from reading the hosts
+after S23: the shared core is small (boot one `RenderCore`, make each surface
+from it, keep it across resume), but one state with N lenses is not.
+Rootstock's `HostState` holds 60 fields, most of them one window's, beside
+one `GenetAppRunner`; the owned layout lays out a whole document, and genet's
+subtree adapter (`ScopedDom`, `genet-scripted/livery.rs` 1611) is private; no
+host drives `GenetMultiRunner`; the winit host makes one window and boots a new
+core on each resume. Roughly 1,500 to 3,000 changed lines over several sessions.
+
+**Ruling S27.** *P2 sized: S23's "Both together" was ruled before these numbers.
+How should it land?* Options, put in plain text: keep S23, one branch built in
+stages with a check-in at each stage and one merge; land the shared core now,
+with multi-window as its own later change; land the core and park
+multi-window, then do the S14 pass. Mark: **"1. feel free to orchestrate using
+subagents."**, then **"oh, i meant #1 of the three options."** Follows: S23
+stands; P2 is one branch built in stages, each stage ending with its receipts,
+and it merges once; subagents may carry stages.
+
 **Ruling S14.** *Where does the next contradiction pass look?* Options: plan
 status against code; rulings across plans; sibling repos too; no pass. Mark:
 **"Plan status vs code (Recommended)"**. Follows: active plans' status lines
@@ -510,6 +528,8 @@ The done-conditions handed over for S3 and S4, kept for reference:
   works in `projection_compile`. Second pass (F8 to F11), rulings S7 to S10:
   the README fixed (S7), TERMINOLOGY gains pandect under Eidetic and the
   curation record (S8, S10), S9 sent to the identity lane.
+- **2026-10-05.** P2 sized against the hosts (round 10 evidence) and S27
+  ruled: one staged branch, one merge.
 - **2026-10-05.** P1 landed on main at `1633be0c`, by Mark's "Merge it, then P2
   (Recommended)": main was merged into the branch and every gate rerun on the
   merged tree (scenograph 8, scenomise 97, graphshell 319 + 5, web wasm32 and

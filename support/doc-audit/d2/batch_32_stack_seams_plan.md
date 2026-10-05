@@ -2,10 +2,10 @@
 
 | doc | disposition | status accurate | claims | holds | stale | unverifiable |
 |---|---|---:|---:|---:|---:|---:|
-| mere_docs/implementation_strategy/2026-10-04_stack_seams_plan.md | current | yes | 30 | 30 | 0 | 0 |
-| **Totals** |  |  | **30** | **30** | **0** | **0** |
+| mere_docs/implementation_strategy/2026-10-04_stack_seams_plan.md | current | yes | 34 | 34 | 0 | 0 |
+| **Totals** |  |  | **34** | **34** | **0** | **0** |
 
-**Totals: 1 doc, 30 claims checked (30 holds, 0 stale, 0 unverifiable), 0 contradictions.**
+**Totals: 1 doc, 34 claims checked (34 holds, 0 stale, 0 unverifiable), 0 contradictions.**
 
 Audit base: Mere `c34449bd` (2026-10-04), with this pass's edits in the
 working tree: the new plan, its `DOC_README.md` entry at the head of the
@@ -21,8 +21,8 @@ This batch exists because the document is new.
 ## mere_docs/implementation_strategy/2026-10-04_stack_seams_plan.md
 
 - disposition: current
-- status line: "Status (2026-10-05): plan. Twenty-six rulings in nine rounds (S1 to S26); P1 landed on main (`1633be0c`), P2 next; P3 and S7 done as documents; S3 to S6 carried into the dynamics grammar plan (G8, G9); S9 done by the identity lane (`b52edea7`). No code in this plan's own lane yet." — accurate: yes
-- claims checked: 30 — holds: 30, stale: 0, unverifiable: 0
+- status line: "Status (2026-10-05): in progress. Twenty-seven rulings in ten rounds (S1 to S27); P1 landed on main (`1633be0c`); P2 sized and staged (S27), no code yet; P3 and S7 done as documents; S3 to S6 carried into the dynamics grammar plan (G8, G9); S9 done by the identity lane (`b52edea7`)." — accurate: yes
+- claims checked: 34 — holds: 34, stale: 0, unverifiable: 0
 
 ### Stale claims
 
@@ -80,4 +80,8 @@ and the pitch arithmetic in `solve.rs` 312-322 with the footprint at
 branch's record of the relay (`5666943e`) and the absence of compiler
 commits on any ref since `c79bb8c2`. F14 and the P1 progress entry checked
 against branch commit `dd2cb6fd` (its diff and the gate logs) and sceno's
-`Stack` and `Geographic` docs.
+`Stack` and `Geographic` docs. Round 10's evidence checked against the tree at `b6a50a4d`: `HostState`'s
+60 fields (`cambium-rootstock/src/host.rs` 877-1007), genet's private
+`ScopedDom` (`genet-scripted/livery.rs` 1611, genet `bf723d5d`), no host
+constructing `GenetMultiRunner` outside cambium's own tests, and the winit
+host's resume path booting a fresh core through `boot_surface`.
