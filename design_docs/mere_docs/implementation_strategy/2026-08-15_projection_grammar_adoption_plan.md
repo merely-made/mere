@@ -4,7 +4,9 @@
 
 ## Cross-domain relationship recipe continuation (2026-10-05)
 
-Status: shared implementation landed in the integration worktree; consumer qualification in progress.
+Status: shared implementation and Knot adoption published and qualified;
+visible Woodshed host adoption is published and qualified on committed source
+`c55461cc`, with acceptance documentation on main at `dad3f624`.
 The existing Scenograph authoring definitions are the source contract. The
 executable compiler has moved from Graphshell to `scenomise::projection`,
 preserving the authoring crate's independence from solvers and widgets.
@@ -50,9 +52,9 @@ its previous scatter support.
 Knot integrates actual Mora relationships into its reading UI and typed retained
 collection material. Woodshed supplies actual Working Set/catalog disclosure and
 retains shared recipe state through its existing session model. Woodshed's
-compiler adoption is exercised by a standalone compatibility instrument; its
-visible host recipe editor and production dependency repin remain follow-ons,
-not completed UI acceptance.
+compiler adoption is exercised by a standalone compatibility instrument and a
+visible host recipe editor. Production uses one coherent Mere `5011e2f9` /
+Genet `bd3e8861` pair, without a local path override or copied compiler.
 
 Shared qualification (2026-10-05): `cargo test --locked -p scenograph -p
 scenomise` passes 8 authoring tests, 88 choreography tests (including nine new
@@ -63,7 +65,7 @@ tests; the generic compiler's prior grid/scatter semantics remain intact.
 Shared Clippy passes with only the explicit pre-existing `manual_contains`
 solver-lint allowance; unconditional strict Clippy is not claimed.
 
-Publication: shared code is on Mere main at
+Historical disclosure checkpoint: shared code is on Mere main at
 `c79bb8c203b52817991e0d7ba1c4ce3c3a2aac34`. Woodshed's disclosed source and
 session adoption are on main at `c92e7c96779ef316f5d8244a59de7cbc84f42a0b`.
 Its receipt reports core 189, views 97, desktop session 16, shared adoption 5,
@@ -80,7 +82,73 @@ recipe scenario has four reviewed captures at 1280×1100 (bind, spacing, explain
 relation, authority refusal); successful personal-wallet retention and
 narrow/high-zoom recipe visuals remain unrun. Knot's canonical collection plan
 records its complete suite and encrypted-retention receipts. The visible
-Woodshed editor/renderer is the next integration slice, not a closed condition.
+Woodshed editor/renderer was qualified in the host continuation below; Knot's
+unrun native personal-wallet and narrow/high-zoom gates remain separate.
+
+Host continuation starting point (2026-10-05): refreshed Woodshed main `c92e7c9` matches the
+published disclosure/session proof. Its production Mere `8106c7c` / Genet
+`34626a6` pair predates the shared compiler. The next bounded pass integrates
+the real shared draft/compiler into a visible Woodshed reading, preserving
+Working Set/Card identity and source custody. It includes explicit source
+navigation and rebind/refusal, durable edited state, actual host controls,
+separate-process reopen, and default/narrow native captures. Production pins
+must remain coherent; no local path override or copied layout/compiler counts
+as adoption. The Woodshed checkout lane owns implementation and its canonical
+plan; this coordinating lane owns capture review and shared status reconciliation.
+
+Shared host contribution `5011e2f9` is published: Woodshed's 420px native
+graph-node acceptance exposed that Rootstock's generic `scroll_into_view`
+handled only the vertical axis. The independent semantic-click fixture failed
+before the fix. The host now reveals horizontal targets through ancestor
+scrollports and the document, respects clipping, keeps oversized targets stable,
+and reports each moved plane once. Vertical alignment and caret-follow behavior
+remain unchanged. Qualification: 56 Rootstock unit tests and 157 native-host
+tests across 25 suites pass; the focused 18-test click/scroll gate is included
+in that host total. No solver, shader, domain calculation, or Genet pin change
+was required. Woodshed's production repin and final native matrix now pass.
+
+Visible host qualification (2026-10-05): Woodshed implementation source
+`c55461cc97bb29e9e78ecb2bb310bb4bda5accdf` uses the shared draft and compiler
+for editable labels/spacing, graph occurrence selection, and method-disclosed
+pitch-class relationships. A retained reading appears in Woodshed's own Mere
+view, linked to its exact captured Working Set. Navigation checks owner Set,
+Card identity, ordered content revision and full owner-derived disclosure;
+changed source instructions refuse until explicit rebind. Navigation does not
+start playback or transfer a background rehearsal owner. Invalid optional
+retained payloads are preserved, not silently overwritten.
+
+The final automated gate passes 558 tests (core 189, integration 1, desktop 63,
+graph 14, views 106, theory 181, doctests 4); the standalone compatibility
+instrument separately passes 5. Locked desktop build and native host check of
+the web crate pass. This is not a browser/wasm runtime acceptance claim.
+
+Committed-source native acceptance passes 8 captures at 1280×900, 8 at 420×900,
+and 2 after a separate-process reopen. All 18 captures were visually reviewed,
+including real last/middle graph-node selection at narrow width, readable
+explanation/method/limits, visible stale-source refusal, explicit rebind, retained
+owner disclosure, restored spacing/selection, and exact source Card navigation.
+The first final narrow attempt failed before any capture landed because the
+surface was occluded; its logs remain preserved. An unchanged-source replay in
+a fresh profile passed after explicit foreground Raise. External scenario copies
+only extend initial settling to allow native launch and Raise; assertions remain
+those of the committed scenarios.
+
+Evidence: `/Users/markik/Code/testing/woodshed/relationship-host-20261005/receipt.json`
+records source/binary/scenario hashes, automated logs, preserved failed attempts,
+and the committed baseline, narrow retry and reopen captures. Retention here
+uses the production session FsBackend in an isolated explicitly unsealed profile.
+It proves durable host state, not successful personal-wallet encryption. No
+high-zoom, other-platform, release-signing or browser-runtime qualification is
+claimed. A multi-reading library and explicit recovery UI for invalid payloads
+remain follow-ons; this bounded host slice does not complete A5 or dynamics G1–G6.
+
+Publication verified: Woodshed main and origin/main match
+`dad3f6240bef8339432effa2d9fe7840d5035612`, with a clean checkout. That
+acceptance-only commit follows the native-qualified implementation `c55461cc`.
+The existing Woodshed `design_docs/2026-07-11_stage_set_tools_plan.md` and
+document index record the final gates and their limits; no parallel plan was
+introduced. Mere's shared behavior fix is on main at
+`5011e2f90e988775410fe4b4213e9895fe64538e`.
 
 ## Executable authoring proof (2026-09-04, verified in current working tree)
 
