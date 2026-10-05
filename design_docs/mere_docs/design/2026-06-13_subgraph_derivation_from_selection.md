@@ -25,7 +25,9 @@ shape" already exists.
 > ruling 3):** a `Linked` spec may also be a SPARQL query, beside the nine shapes.
 > A saved subgraph is shared by its spec, which each receiver evaluates over their
 > own graph, and "freeze" materializes the current members into a nested graph
-> recording the spec and revision. A subgraph itself still never syncs.
+> recording the spec and revision. A subgraph itself still never syncs. Ruling 8:
+> the frozen nested graph references members by resource id and copies the
+> statements among them as of the freeze revision.
 
 ## The interaction
 
