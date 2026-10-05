@@ -95,5 +95,6 @@ Incrementally. Each instance is a small, separate plan that points back here.
 
 - **First instance, in-flight:** open the Semantic predicate for linked-data ingest/export. See the [linked-data ingest/export plan](../implementation_strategy/2026-05-22_linked_data_ingest_export_plan.md) *(historical citation)* <!-- doc-audit: historical-link -->.
 - **Candidate next instances, named but not scheduled:** node properties as recognized predicates on the node-as-subject (closes the property-bag gap); `tags` and classifications as recognized vocabulary types; folding the scattered provenance and trust annotations into one statement-level annotation.
+  > **Amended 2026-10-04 (Mark, [graph semantics plan](../implementation_strategy/2026-10-04_graph_semantics_plan.md) ruling 15):** taken for tags: a tag becomes a resource (a SKOS concept) and tagging is a statement to it. Classifications are that plan's checkpoint C8.
 
 Each lands only when a consumer needs it, under the composition spine's discipline. The principle is the through-line; the plans are the work.
