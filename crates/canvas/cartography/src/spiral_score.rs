@@ -7,9 +7,11 @@
 //! Mere's graph-to-Scenograph Spiral adapter.
 //!
 //! The solver is portable (`scenomise::solve`). This module is deliberately
-//! not: it reads graph recency, chooses the browser's LOD rungs, and maps
-//! `NodeKey`s back into the local canvas projection. That is the boundary P3
-//! exists to prove.
+//! not: it places the graph in the order it is handed, chooses the browser's
+//! LOD rungs from the recency it is handed, and maps `NodeKey`s back into the
+//! local canvas projection. That is the boundary P3 exists to prove. The order
+//! and the recency are the host's channel registry's (`order.recency`,
+//! `order.timeline`; dynamics grammar plan, G2b).
 
 use std::collections::HashMap;
 
@@ -32,16 +34,19 @@ pub struct MereSpiralProjection {
 
 /// Build and realize Mere's P3 pane-spiral score.
 ///
-/// `extents` are the host's measured node faces. `recent_first` maps native
-/// timestamps to a score ordinal; the portable score itself retains only that
-/// deterministic ordinal, never a Mere timestamp.
+/// `extents` are the host's measured node faces. `ordered` is the order the
+/// spiral places the nodes in, most recent first or the graph's own order, and
+/// `recency` each node's recency in `0..=1`, which picks its rung; the host's
+/// channel registry produces both. The portable score retains only the
+/// ordinal, never a Mere timestamp.
 pub fn project_spiral_score(
     graph: &Graph,
     extents: Option<&HashMap<NodeKey, (f32, f32)>>,
     focus: Option<NodeKey>,
-    recent_first: bool,
+    ordered: &[NodeKey],
+    recency: &HashMap<NodeKey, f32>,
 ) -> MereSpiralProjection {
-    project_spiral_score_for_view(graph, extents, focus, recent_first, 1.0, None)
+    project_spiral_score_for_view(graph, extents, focus, ordered, recency, 1.0, None)
 }
 
 /// Build and realize Mere's P3 pane-spiral score for one declared view.
@@ -53,31 +58,11 @@ pub fn project_spiral_score_for_view(
     graph: &Graph,
     extents: Option<&HashMap<NodeKey, (f32, f32)>>,
     focus: Option<NodeKey>,
-    recent_first: bool,
+    ordered: &[NodeKey],
+    recency: &HashMap<NodeKey, f32>,
     zoom_level: f32,
     previous: Option<&Score>,
 ) -> MereSpiralProjection {
-    let mut ordered: Vec<NodeKey> = graph.nodes().map(|(key, _)| key).collect();
-    if recent_first {
-        ordered.sort_by_key(|key| {
-            let node = graph
-                .get_node(*key)
-                .expect("node keys came from this graph");
-            (
-                std::cmp::Reverse(
-                    graph
-                        .node_last_visited(*key)
-                        .unwrap_or(std::time::SystemTime::UNIX_EPOCH),
-                ),
-                // Visit facets persist millisecond timestamps, so nodes created
-                // in one tick commonly tie. Stable identity makes that score
-                // order portable instead of inheriting local graph iteration.
-                std::cmp::Reverse(node.id),
-            )
-        });
-    }
-
-    let recency = normalized_recency(graph, &ordered);
     let registry = default_graph_representation_registry();
     let previous: HashMap<&str, &Representation> = previous
         .into_iter()
@@ -180,41 +165,6 @@ pub fn project_spiral_score_for_view(
     MereSpiralProjection { score, projection }
 }
 
-fn normalized_recency(graph: &Graph, keys: &[NodeKey]) -> HashMap<NodeKey, f32> {
-    let times: Vec<_> = keys
-        .iter()
-        .copied()
-        .map(|key| {
-            let seconds = graph
-                .node_last_visited(key)
-                .and_then(|time| time.duration_since(std::time::SystemTime::UNIX_EPOCH).ok())
-                .map(|duration| duration.as_secs_f64())
-                .unwrap_or(0.0);
-            (key, seconds)
-        })
-        .collect();
-    let minimum = times
-        .iter()
-        .map(|(_, time)| *time)
-        .fold(f64::INFINITY, f64::min);
-    let maximum = times
-        .iter()
-        .map(|(_, time)| *time)
-        .fold(f64::NEG_INFINITY, f64::max);
-    let span = maximum - minimum;
-    times
-        .into_iter()
-        .map(|(key, time)| {
-            let value = if span.is_finite() && span > f64::EPSILON {
-                ((time - minimum) / span) as f32
-            } else {
-                1.0
-            };
-            (key, value)
-        })
-        .collect()
-}
-
 fn footprint_for((w, h): (f32, f32)) -> Footprint {
     if w > 0.0 && h > 0.0 {
         Footprint::Rect {
@@ -228,13 +178,12 @@ fn footprint_for((w, h): (f32, f32)) -> Footprint {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use kernel::graph::apply::{GraphDelta, add_node, apply_graph_delta};
+    use kernel::graph::apply::add_node;
     use uuid::Uuid;
 
-    #[test]
-    fn recency_becomes_portable_order_and_selects_declared_lod_rungs() {
+    fn fixture(ids: std::ops::RangeInclusive<u128>) -> (Graph, Vec<NodeKey>) {
         let mut graph = Graph::new();
-        let keys: Vec<_> = (1..=4)
+        let keys = ids
             .map(|id| {
                 add_node(
                     &mut graph,
@@ -244,23 +193,33 @@ mod tests {
                 )
             })
             .collect();
-        for (offset, key) in keys.iter().enumerate() {
-            let node_id = graph.get_node(*key).unwrap().id;
-            apply_graph_delta(
-                &mut graph,
-                GraphDelta::ReplayTouchNodeLastVisitedById {
-                    node_id,
-                    timestamp_ms: offset as u64,
-                },
-            );
-        }
+        (graph, keys)
+    }
+
+    /// The registry's recency (`order.recency`) is computed host-side; these
+    /// tests hand the spiral the order and the values it would produce.
+    fn newest(keys: &[NodeKey]) -> HashMap<NodeKey, f32> {
+        keys.iter().map(|key| (*key, 1.0)).collect()
+    }
+
+    #[test]
+    fn the_handed_order_is_the_portable_order_and_recency_selects_declared_lod_rungs() {
+        let (graph, keys) = fixture(1..=4);
+        let ordered = [keys[3], keys[2], keys[1], keys[0]];
+        let recency = HashMap::from([
+            (keys[0], 0.0),
+            (keys[1], 1.0 / 3.0),
+            (keys[2], 2.0 / 3.0),
+            (keys[3], 1.0),
+        ]);
         let extents = HashMap::from([
             (keys[0], (36.0, 36.0)),
             (keys[1], (52.0, 52.0)),
             (keys[2], (80.0, 80.0)),
             (keys[3], (88.0, 88.0)),
         ]);
-        let projected = project_spiral_score(&graph, Some(&extents), Some(keys[3]), true);
+        let projected =
+            project_spiral_score(&graph, Some(&extents), Some(keys[3]), &ordered, &recency);
         assert_eq!(
             projected.score.items[0].source.id,
             Uuid::from_u128(4).to_string()
@@ -288,33 +247,30 @@ mod tests {
 
     #[test]
     fn one_graph_at_two_zooms_selects_different_rungs_without_moving_items() {
-        let mut graph = Graph::new();
-        let newest = add_node(
-            &mut graph,
-            Some(Uuid::from_u128(1)),
-            "fixture://newest".to_string(),
-            PortablePoint::zero(),
-        );
-        let oldest = add_node(
-            &mut graph,
-            Some(Uuid::from_u128(2)),
-            "fixture://oldest".to_string(),
-            PortablePoint::zero(),
-        );
-        for (key, timestamp_ms) in [(oldest, 1), (newest, 2)] {
-            let node_id = graph.get_node(key).unwrap().id;
-            apply_graph_delta(
-                &mut graph,
-                GraphDelta::ReplayTouchNodeLastVisitedById {
-                    node_id,
-                    timestamp_ms,
-                },
-            );
-        }
-        let extents = HashMap::from([(newest, (64.0, 64.0)), (oldest, (64.0, 64.0))]);
+        let (graph, keys) = fixture(1..=2);
+        let (newest_key, oldest) = (keys[0], keys[1]);
+        let ordered = [newest_key, oldest];
+        let recency = HashMap::from([(newest_key, 1.0), (oldest, 0.0)]);
+        let extents = HashMap::from([(newest_key, (64.0, 64.0)), (oldest, (64.0, 64.0))]);
 
-        let near = project_spiral_score_for_view(&graph, Some(&extents), None, true, 1.0, None);
-        let far = project_spiral_score_for_view(&graph, Some(&extents), None, true, 0.5, None);
+        let near = project_spiral_score_for_view(
+            &graph,
+            Some(&extents),
+            None,
+            &ordered,
+            &recency,
+            1.0,
+            None,
+        );
+        let far = project_spiral_score_for_view(
+            &graph,
+            Some(&extents),
+            None,
+            &ordered,
+            &recency,
+            0.5,
+            None,
+        );
 
         assert_eq!(near.score.items[0].representation, Representation::Card);
         assert_eq!(far.score.items[0].representation, Representation::Glyph);
@@ -325,15 +281,9 @@ mod tests {
 
     #[test]
     fn an_unmeasured_item_does_not_claim_a_card() {
-        let mut graph = Graph::new();
-        add_node(
-            &mut graph,
-            Some(Uuid::from_u128(1)),
-            "fixture://one".to_string(),
-            PortablePoint::zero(),
-        );
-
-        let projected = project_spiral_score_for_view(&graph, None, None, true, 2.0, None);
+        let (graph, keys) = fixture(1..=1);
+        let projected =
+            project_spiral_score_for_view(&graph, None, None, &keys, &newest(&keys), 2.0, None);
         assert_eq!(
             projected.score.items[0].representation,
             Representation::Glyph
@@ -343,20 +293,18 @@ mod tests {
 
     #[test]
     fn prior_score_supplies_hysteresis_and_focus_stays_live() {
-        let mut graph = Graph::new();
-        let key = add_node(
-            &mut graph,
-            Some(Uuid::from_u128(1)),
-            "fixture://one".to_string(),
-            PortablePoint::zero(),
-        );
+        let (graph, keys) = fixture(1..=1);
+        let key = keys[0];
+        let recency = newest(&keys);
         let extents = HashMap::from([(key, (64.0, 64.0))]);
-        let card = project_spiral_score_for_view(&graph, Some(&extents), None, true, 1.0, None);
+        let card =
+            project_spiral_score_for_view(&graph, Some(&extents), None, &keys, &recency, 1.0, None);
         let retained = project_spiral_score_for_view(
             &graph,
             Some(&extents),
             None,
-            true,
+            &keys,
+            &recency,
             0.95,
             Some(&card.score),
         );
@@ -364,7 +312,8 @@ mod tests {
             &graph,
             Some(&extents),
             None,
-            true,
+            &keys,
+            &recency,
             0.89,
             Some(&retained.score),
         );
@@ -372,7 +321,8 @@ mod tests {
             &graph,
             Some(&extents),
             Some(key),
-            true,
+            &keys,
+            &recency,
             0.2,
             Some(&released.score),
         );
@@ -385,47 +335,6 @@ mod tests {
         assert_eq!(
             focused.score.items[0].representation,
             Representation::LivePane
-        );
-    }
-
-    #[test]
-    fn equal_recency_uses_stable_identity_order() {
-        let mut graph = Graph::new();
-        let keys: Vec<_> = (1..=3)
-            .map(|id| {
-                add_node(
-                    &mut graph,
-                    Some(Uuid::from_u128(id)),
-                    format!("fixture://{id}"),
-                    PortablePoint::zero(),
-                )
-            })
-            .collect();
-        for key in keys {
-            let node_id = graph.get_node(key).unwrap().id;
-            apply_graph_delta(
-                &mut graph,
-                GraphDelta::ReplayTouchNodeLastVisitedById {
-                    node_id,
-                    timestamp_ms: 7,
-                },
-            );
-        }
-
-        let projected = project_spiral_score(&graph, None, None, true);
-        let ids: Vec<_> = projected
-            .score
-            .items
-            .iter()
-            .map(|item| item.source.id.as_str())
-            .collect();
-        assert_eq!(
-            ids,
-            [
-                Uuid::from_u128(3).to_string(),
-                Uuid::from_u128(2).to_string(),
-                Uuid::from_u128(1).to_string(),
-            ]
         );
     }
 }

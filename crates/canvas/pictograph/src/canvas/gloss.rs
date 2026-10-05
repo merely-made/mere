@@ -77,7 +77,12 @@ impl Canvas {
         // multiplies the swatch node size by this. Off => uniform 1.0.
         let size_factor = |key: &NodeKey| -> f32 {
             if self.gloss_size_by_importance {
-                0.7 + self.node_importance.get(key).copied().unwrap_or(0.0) * 1.2
+                0.7 + self
+                    .channels
+                    .importance_held(self.importance_metric)
+                    .and_then(|weights| weights.get(key).copied())
+                    .unwrap_or(0.0)
+                    * 1.2
             } else {
                 1.0
             }

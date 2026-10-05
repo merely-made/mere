@@ -228,33 +228,45 @@ fn lsystem_matches_the_pre_migration_placement() {
     );
 }
 
+// Spectral's and Radial's pre-migration goldens moved with their producers to
+// pictograph's channel registry (`signals::registry_tests`), where the
+// coordinates and rings are computed and handed in (dynamics grammar plan,
+// G2b). Here each adapter is shown placing what it is handed.
+
 #[test]
-fn spectral_matches_the_pre_migration_placement() {
-    // Nodes inside one connected component share an eigenvector value, so the
-    // hub and its spokes coincide and the bridge pair coincides. That is the
-    // pre-migration behaviour, preserved deliberately: the layout separates
-    // components, and within a component it says nothing.
+fn spectral_places_the_coordinates_it_is_handed_and_rings_out_without_them() {
     let (graph, keys) = fixture();
-    let signals = IntelligenceSignals::default();
+    let mut signals = IntelligenceSignals::default();
+    signals.spectral = Some(crate::signals::NodeEmbeddings {
+        coords: keys
+            .iter()
+            .enumerate()
+            .map(|(i, key)| (*key, (i as f32 / 6.0 - 0.5, 0.25)))
+            .collect(),
+    });
     let projection = SpectralAdapter::default().project(&ProjectionRequest {
         graph: &graph,
         signals: &signals,
         intent: intent(None, None),
     });
-    assert_golden(
-        "spectral",
-        &keys,
-        &projection,
-        &[
-            (146.7027, 34.4556),
-            (146.7027, 34.4556),
-            (146.7027, 34.4556),
-            (146.7027, 34.4556),
-            (-152.6299, -228.9111),
-            (-152.6299, -228.9111),
-            (-281.5509, 320.0),
-        ],
-    );
+    let first = projection
+        .nodes
+        .iter()
+        .find(|node| node.node == keys[0])
+        .expect("placed")
+        .position;
+    // Scale 320 about the origin: -0.5 lands at -160, 0.25 at 80.
+    assert!((first.x + 160.0).abs() < EPSILON, "{first:?}");
+    assert!((first.y - 80.0).abs() < EPSILON, "{first:?}");
+
+    // Nothing disclosed: every node still lands, on the fallback ring.
+    let bare = IntelligenceSignals::default();
+    let fallback = SpectralAdapter::default().project(&ProjectionRequest {
+        graph: &graph,
+        signals: &bare,
+        intent: intent(None, None),
+    });
+    assert_eq!(fallback.nodes.len(), keys.len());
 }
 
 #[test]
@@ -309,15 +321,20 @@ fn kanban_matches_the_pre_migration_placement() {
 }
 
 #[test]
-fn radial_matches_the_pre_migration_placement() {
+fn radial_matches_the_pre_migration_placement_from_the_rings_it_is_handed() {
     // Ring 0 is the hub, ring 1 its three spokes, and the three nodes the walk
-    // never reaches land on ring 2 — max reachable plus one.
+    // never reaches land on ring 2 — max reachable plus one. The rings are
+    // the registry's breadth-first walk from the hub, handed in on the axis.
     let (graph, keys) = fixture();
     let signals = IntelligenceSignals::default();
+    let rings: HashMap<NodeKey, AxisValue> = [(0, 0.0), (1, 1.0), (2, 1.0), (3, 1.0)]
+        .into_iter()
+        .map(|(i, ring)| (keys[i], AxisValue::Numeric(ring)))
+        .collect();
     let projection = RadialAdapter::default().project(&ProjectionRequest {
         graph: &graph,
         signals: &signals,
-        intent: intent(None, Some(keys[0])),
+        intent: intent(Some(rings), Some(keys[0])),
     });
     assert_golden(
         "radial",

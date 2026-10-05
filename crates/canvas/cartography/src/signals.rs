@@ -32,6 +32,16 @@ pub struct IntelligenceSignals {
     /// similarity): embeddings are absolute 2D positions ready for
     /// layout consumption.
     pub embeddings: Option<NodeEmbeddings>,
+    /// Per-node coordinates from the graph Laplacian, which the Spectral
+    /// arrangement places by (`coords.spectral`). The host's channel registry
+    /// computes them; cartography computes none (dynamics grammar plan, G2b,
+    /// F38).
+    #[serde(default)]
+    pub spectral: Option<NodeEmbeddings>,
+    /// Per-node degree plus one, which Radial's weighted policy spreads its
+    /// rings by (`weight.degree`). The host's channel registry computes it.
+    #[serde(default)]
+    pub degree_weights: Option<ImportanceWeights>,
 }
 
 /// A partition of nodes into named clusters with confidence scores.
@@ -137,6 +147,8 @@ mod tests {
         assert!(s.bridges.is_none());
         assert!(s.importance.is_none());
         assert!(s.embeddings.is_none());
+        assert!(s.spectral.is_none());
+        assert!(s.degree_weights.is_none());
     }
 
     #[test]

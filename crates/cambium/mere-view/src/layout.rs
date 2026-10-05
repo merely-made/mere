@@ -6,11 +6,14 @@
 
 use std::collections::HashMap;
 
-use cartography::adapters::project_graph_only;
-use cartography::{IntelligenceSignals, Projection, ProjectionRequest, TargetSize, ViewIntent};
+use cartography::adapters::{SpectralAdapter, project_graph_only};
+use cartography::{
+    IntelligenceSignals, NodeEmbeddings, Projection, ProjectionRequest, TargetSize, ViewIntent,
+};
 use kernel::geometry::PortablePoint;
 use kernel::graph::apply::{add_node, assert_relation};
 use kernel::graph::{EdgeAssertion, Graph, SemanticSubKind};
+use pictograph::signals::ChannelRegistry;
 use uuid::Uuid;
 
 use crate::model::GraphModel;
@@ -75,7 +78,20 @@ pub fn lay_out(
         assert_relation(&mut scratch, from, to, link);
     }
 
-    let signals = IntelligenceSignals::default();
+    // Every fact a layout reads comes from the channel registry; cartography
+    // computes none (dynamics grammar plan, G2b, F53). Only Spectral reads one.
+    let mut signals = IntelligenceSignals::default();
+    let spectral = SpectralAdapter::default();
+    if [layout, DEFAULT_LAYOUT].contains(&SpectralAdapter::PROJECTION_ID) {
+        let mut registry = ChannelRegistry::new();
+        signals.spectral = Some(NodeEmbeddings {
+            coords: registry
+                .spectral(&scratch, spectral.iterations)
+                .iter()
+                .map(|(key, xy)| (*key, *xy))
+                .collect(),
+        });
+    }
     let request = ProjectionRequest {
         graph: &scratch,
         signals: &signals,

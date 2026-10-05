@@ -766,27 +766,36 @@ pub(crate) struct LawInputs<'a> {
     nodes: Vec<NodeKey>,
     edges: Vec<(NodeKey, NodeKey)>,
     /// Each node's site (the URL host for a graph node; whatever grouping a
-    /// board's host names), the Kinds law's and the group overlay's default.
-    sites: HashMap<NodeKey, String>,
+    /// board's host names), the Kinds law's and the group overlay's default:
+    /// the canvas's registry's `groups.site` when it hands them in.
+    sites: std::borrow::Cow<'a, HashMap<NodeKey, String>>,
     clusters: Option<&'a crate::signals::ClusterSet>,
     meaning: Option<&'a crate::canvas::meaning::MeaningSnapshot>,
 }
 
 impl<'a> LawInputs<'a> {
+    /// The inputs over `graph`, reading `sites` when the caller's registry
+    /// holds them (computing them here otherwise, as a stats reader does).
     pub(crate) fn new(
         graph: &Graph,
         hidden_edges: &HashSet<crate::canvas::EdgeCell>,
         clusters: Option<&'a crate::signals::ClusterSet>,
+        sites: Option<&'a HashMap<NodeKey, String>>,
     ) -> Self {
-        let sites = graph
-            .nodes()
-            .map(|(key, node)| (key, crate::canvas::channels::site_of(node).to_string()))
-            .collect();
         let mut inputs = Self::from_parts(
             graph.nodes().map(|(key, _)| key).collect(),
             visible_relation_edges(graph, hidden_edges),
-            sites,
+            HashMap::new(),
         );
+        inputs.sites = match sites {
+            Some(sites) => std::borrow::Cow::Borrowed(sites),
+            None => std::borrow::Cow::Owned(
+                graph
+                    .nodes()
+                    .map(|(key, node)| (key, crate::canvas::channels::site_of(node).to_string()))
+                    .collect(),
+            ),
+        };
         inputs.clusters = clusters;
         inputs
     }
@@ -802,7 +811,7 @@ impl<'a> LawInputs<'a> {
         Self {
             nodes,
             edges,
-            sites,
+            sites: std::borrow::Cow::Owned(sites),
             clusters: None,
             meaning: None,
         }
@@ -1544,15 +1553,18 @@ impl Canvas {
             self.refresh_meaning();
         }
         let sources = self.law_sources();
+        // The site channel from the registry, once per structure and URL grouping.
+        self.channels.sites(&self.graph);
         let forces = {
             let inputs = LawInputs::new(
                 &self.graph,
                 &self.hidden_edges,
                 if wants_clusters {
-                    self.community_cache.as_ref()
+                    self.channels.community_held()
                 } else {
                     None
                 },
+                self.channels.sites_fresh(&self.graph),
             )
             .with_meaning(self.meaning.snapshot());
             inputs.forces(self.physics_law, &self.physics_overlays, sources)
@@ -1669,7 +1681,7 @@ impl Canvas {
 
     /// The attribute builders over the current graph and visible edges.
     fn law_inputs_now(&self) -> LawInputs<'_> {
-        LawInputs::new(&self.graph, &self.hidden_edges, None)
+        LawInputs::new(&self.graph, &self.hidden_edges, None, None)
     }
 
     /// The number of forces in the live law slot (inline backend only). Test introspection.
@@ -1687,7 +1699,7 @@ impl Canvas {
     /// The attribute builders over the current graph. Test introspection.
     #[cfg(test)]
     pub(crate) fn law_inputs(&self) -> LawInputs<'_> {
-        LawInputs::new(&self.graph, &self.hidden_edges, None)
+        LawInputs::new(&self.graph, &self.hidden_edges, None, None)
     }
 
     /// [`Self::layout_stats`] without `stretch` (zero here), for graphs too

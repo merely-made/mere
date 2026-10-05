@@ -19,7 +19,7 @@ use layout_dom_api::{LayoutDom, LocalName, Namespace};
 use std::collections::HashMap;
 
 mod affinity;
-mod arrangement_goldens;
+pub(crate) mod arrangement_goldens;
 mod arrangement_roles;
 mod camera;
 mod density;
@@ -37,6 +37,7 @@ mod node_minting;
 mod node_state;
 mod physics_catalog;
 mod physics_terms;
+mod registry_readers;
 mod relations;
 mod restore_and_queries;
 mod retained_layout;

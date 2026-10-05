@@ -29,10 +29,8 @@ use crate::strategy::LayoutStrategy;
 
 #[cfg(test)]
 mod parity;
-pub mod producers;
 pub mod score;
 
-pub use producers::{degree_weights, radial_rings, spectral_coords};
 pub use score::{Disclosures, empty_projection, project_score, score_from_request};
 
 /// Declare an adapter whose whole job is a config, an id, and the disclosures
@@ -199,9 +197,10 @@ analytic_adapter!(
     Arrangement::Kanban
 );
 
-/// The strategies that lay out from the graph alone, needing no focus, axis
-/// or clusters. A host offering a layout choice over a bare graph picks from
-/// these.
+/// The strategies that lay out from the graph and the registry's facts alone,
+/// needing no focus, axis or clusters. A host offering a layout choice over a
+/// bare graph picks from these; Spectral reads the coordinates the host's
+/// channel registry disclosed (`IntelligenceSignals::spectral`).
 pub const GRAPH_ONLY_STRATEGIES: &[&str] = &[
     PhyllotaxisAdapter::PROJECTION_ID,
     GridAdapter::PROJECTION_ID,
@@ -283,13 +282,15 @@ impl LayoutStrategy for SemanticEmbeddingAdapter {
 /// reflects connectivity: clusters separate spatially and a path unrolls into a
 /// line.
 ///
-/// The expensive analytic strategy the arrangement cache exists for —
-/// recomputed on a structural change, not per frame.
+/// The coordinates are a disclosure (`IntelligenceSignals::spectral`), which
+/// the host's channel registry computes once per structural revision; with
+/// none disclosed, every node rings out (dynamics grammar plan, G2b).
 #[derive(Debug, Clone, PartialEq)]
 pub struct SpectralAdapter {
     pub config: sceno::Embedded,
-    /// Power-iteration count. A producer parameter, not a placement one, which
-    /// is why it sits here rather than in the arrangement.
+    /// Power-iteration count the host's registry should produce the
+    /// coordinates with. A producer parameter, not a placement one, which is
+    /// why it sits here rather than in the arrangement.
     pub iterations: usize,
 }
 
@@ -327,7 +328,20 @@ impl LayoutStrategy for SpectralAdapter {
                 fallback: sceno::EmbeddingFallback::RingOutside,
                 ..self.config.clone()
             }),
-            &Disclosures::default().with_embedding(spectral_coords(request.graph, self.iterations)),
+            &Disclosures::default().with_embedding(
+                request
+                    .signals
+                    .spectral
+                    .as_ref()
+                    .map(|spectral| {
+                        spectral
+                            .coords
+                            .iter()
+                            .map(|(key, (x, y))| (*key, sceno::Vec2::new(*x, *y)))
+                            .collect()
+                    })
+                    .unwrap_or_default(),
+            ),
         );
         if keys.is_empty() {
             return empty_projection(Self::PROJECTION_ID);
@@ -338,9 +352,11 @@ impl LayoutStrategy for SpectralAdapter {
 
 /// Concentric rings around `ViewIntent::focus`.
 ///
-/// The breadth-first walk runs here, where the graph is; what reaches the score
-/// is one ring index per node. Without a focus there is nothing to ring around,
-/// and the projection is empty.
+/// Reads each node's ring from `ViewIntent::axis_values` (a numeric ring
+/// index, as Timeline reads its axis), which the host's channel registry walks
+/// from the focus (`rings.focus`), and the weighted policy's weights from
+/// `IntelligenceSignals::degree_weights` (`weight.degree`). Without a focus
+/// there is nothing to ring around, and the projection is empty.
 #[derive(Debug, Clone, Default, PartialEq)]
 pub struct RadialAdapter {
     pub config: sceno::Radial,
@@ -356,23 +372,18 @@ impl LayoutStrategy for RadialAdapter {
     }
 
     fn project(&self, request: &ProjectionRequest<'_>) -> Projection {
-        let Some(focus) = request.intent.focus else {
+        if request.intent.focus.is_none() {
             return empty_projection(Self::PROJECTION_ID);
-        };
+        }
 
-        let rings = radial_rings(request.graph, focus);
-        let axis: HashMap<NodeKey, crate::request::AxisValue> = rings
-            .into_iter()
-            .map(|(key, ring)| (key, crate::request::AxisValue::Numeric(ring as f64)))
-            .collect();
-
-        let mut disclosures = Disclosures::default().with_axis(axis);
-        // Only the weighted policy reads it, and the degree walk is not free.
+        let mut disclosures = Disclosures::from_intent(request);
+        // Only the weighted policy reads it.
         if matches!(
             self.config.angular_policy,
             sceno::RadialAngularPolicy::Weighted
-        ) {
-            disclosures = disclosures.with_weight(degree_weights(request.graph));
+        ) && let Some(weights) = &request.signals.degree_weights
+        {
+            disclosures = disclosures.with_weight(weights.weights.iter().copied().collect());
         }
 
         let (score, keys) =

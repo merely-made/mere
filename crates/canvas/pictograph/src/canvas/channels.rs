@@ -13,14 +13,25 @@
 //! `kind.site`, `groups.meaning`, `mass.pagerank`, `depth.focus`,
 //! `pairs.blend`, `distances.hops`. The option ids are the ones the saved
 //! scene already stores per slot. Values come from the builders the laws
-//! read ([`LawInputs`]) and the caches the canvas keeps (the Louvain
-//! partition, the Meaning snapshot, the affinity signals), so a channel is
-//! one computation whoever reads it.
+//! read ([`LawInputs`]) and the canvas's channel registry (the Louvain
+//! partition, the sites, the affinity signals, the Meaning snapshot), so a
+//! channel is one computation whoever reads it.
+//!
+//! Cartography's disclosures joined in G2b (F38, F55, "Reuse, else new
+//! families"): Columns (by site) and (by cluster) read `groups.site` and
+//! `groups.cluster`, and the rest take families of their own,
+//! `order.recency`, `order.timeline`, `rings.focus`, `coords.spectral`,
+//! `weight.degree`, `importance.degree`, `importance.betweenness`, and
+//! `bridges.betweenness` and `bridges.articulation` (*Reading, not ruled*:
+//! the bridge family's name).
 
 use kernel::graph::{Graph, Node, NodeKey};
 
 use super::physics_catalog::{LawInputs, PhysicsDepthSource, PhysicsKindSource, PhysicsMassSource};
-use super::{AFFINITY_MIN_SIMILARITY, AffinityBlend, Canvas, blend_affinity_pairs};
+use super::{
+    AFFINITY_MIN_SIMILARITY, AffinityBlend, BRIDGE_THRESHOLD, Canvas, blend_affinity_pairs,
+};
+use crate::signals::{BridgeMetric, ImportanceMetric};
 
 /// A node's site: its URL authority. The one function behind the site
 /// channel and Columns (by site)'s column key.
@@ -43,16 +54,34 @@ pub enum ChannelFamily {
     Pairs,
     /// Graph distances between connected pairs: Stress.
     Distances,
+    /// An order over the nodes: the Spiral's and the Timeline's.
+    Order,
+    /// Ring indices from the focus: Radial's.
+    Rings,
+    /// Coordinates per node: Spectral's.
+    Coords,
+    /// A weight per node an arrangement spreads by: Radial's weighted policy.
+    Weight,
+    /// Normalized importance per node: size by importance, the gloss.
+    Importance,
+    /// The bridge nodes: the bridge rings, the gloss's bridge emphasis.
+    Bridges,
 }
 
 impl ChannelFamily {
-    pub const ALL: [ChannelFamily; 6] = [
+    pub const ALL: [ChannelFamily; 12] = [
         ChannelFamily::Kind,
         ChannelFamily::Groups,
         ChannelFamily::Mass,
         ChannelFamily::Depth,
         ChannelFamily::Pairs,
         ChannelFamily::Distances,
+        ChannelFamily::Order,
+        ChannelFamily::Rings,
+        ChannelFamily::Coords,
+        ChannelFamily::Weight,
+        ChannelFamily::Importance,
+        ChannelFamily::Bridges,
     ];
 
     pub fn id(self) -> &'static str {
@@ -63,8 +92,22 @@ impl ChannelFamily {
             ChannelFamily::Depth => "depth",
             ChannelFamily::Pairs => "pairs",
             ChannelFamily::Distances => "distances",
+            ChannelFamily::Order => "order",
+            ChannelFamily::Rings => "rings",
+            ChannelFamily::Coords => "coords",
+            ChannelFamily::Weight => "weight",
+            ChannelFamily::Importance => "importance",
+            ChannelFamily::Bridges => "bridges",
         }
     }
+}
+
+/// Which order: most recently visited first, or the graph's enumeration
+/// order (the one every score's ordinal follows).
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum OrderSource {
+    Recency,
+    Timeline,
 }
 
 /// One channel of the registry.
@@ -79,6 +122,29 @@ pub enum Channel {
     Pairs(AffinityBlend),
     /// Shortest paths in hops, a hop costing `1 / multiplicity`.
     Distances,
+    /// The recency order or the enumeration order.
+    Order(OrderSource),
+    /// Breadth-first rings from the focus.
+    Rings,
+    /// The graph Laplacian's coordinates.
+    Coords,
+    /// Degree plus one, over every edge.
+    Weight,
+    /// Importance by degree or betweenness, normalized.
+    Importance(ImportanceMetric),
+    /// Betweenness brokers or articulation points.
+    Bridges(BridgeMetric),
+}
+
+const ORDERS: [OrderSource; 2] = [OrderSource::Recency, OrderSource::Timeline];
+const IMPORTANCE: [ImportanceMetric; 2] = [ImportanceMetric::Degree, ImportanceMetric::Betweenness];
+const BRIDGES: [BridgeMetric; 2] = [BridgeMetric::Betweenness, BridgeMetric::Articulation];
+
+fn order_option(order: OrderSource) -> &'static str {
+    match order {
+        OrderSource::Recency => "recency",
+        OrderSource::Timeline => "timeline",
+    }
 }
 
 fn pairs_option(blend: AffinityBlend) -> &'static str {
@@ -105,6 +171,10 @@ impl Channel {
         all.extend(PhysicsDepthSource::ALL.map(Channel::Depth));
         all.extend(PAIRS.map(Channel::Pairs));
         all.push(Channel::Distances);
+        all.extend(ORDERS.map(Channel::Order));
+        all.extend([Channel::Rings, Channel::Coords, Channel::Weight]);
+        all.extend(IMPORTANCE.map(Channel::Importance));
+        all.extend(BRIDGES.map(Channel::Bridges));
         all
     }
 
@@ -116,6 +186,12 @@ impl Channel {
             Channel::Depth(_) => ChannelFamily::Depth,
             Channel::Pairs(_) => ChannelFamily::Pairs,
             Channel::Distances => ChannelFamily::Distances,
+            Channel::Order(_) => ChannelFamily::Order,
+            Channel::Rings => ChannelFamily::Rings,
+            Channel::Coords => ChannelFamily::Coords,
+            Channel::Weight => ChannelFamily::Weight,
+            Channel::Importance(_) => ChannelFamily::Importance,
+            Channel::Bridges(_) => ChannelFamily::Bridges,
         }
     }
 
@@ -127,6 +203,12 @@ impl Channel {
             Channel::Depth(source) => source.id(),
             Channel::Pairs(blend) => pairs_option(blend),
             Channel::Distances => "hops",
+            Channel::Order(order) => order_option(order),
+            Channel::Rings => "focus",
+            Channel::Coords => "spectral",
+            Channel::Weight => "degree",
+            Channel::Importance(metric) => metric.as_code(),
+            Channel::Bridges(metric) => metric.as_code(),
         }
     }
 
@@ -148,6 +230,21 @@ impl Channel {
                 .find(|blend| pairs_option(*blend) == option)
                 .map(Channel::Pairs),
             "distances" => (option == "hops").then_some(Channel::Distances),
+            "order" => ORDERS
+                .into_iter()
+                .find(|order| order_option(*order) == option)
+                .map(Channel::Order),
+            "rings" => (option == "focus").then_some(Channel::Rings),
+            "coords" => (option == "spectral").then_some(Channel::Coords),
+            "weight" => (option == "degree").then_some(Channel::Weight),
+            "importance" => IMPORTANCE
+                .into_iter()
+                .find(|metric| metric.as_code() == option)
+                .map(Channel::Importance),
+            "bridges" => BRIDGES
+                .into_iter()
+                .find(|metric| metric.as_code() == option)
+                .map(Channel::Bridges),
             _ => None,
         }
     }
@@ -164,25 +261,89 @@ pub enum ChannelValues {
     Depths(Vec<(NodeKey, u32)>),
     /// Weighted pairs.
     Pairs(Vec<(NodeKey, NodeKey, f32)>),
+    /// Every node, in the order's order.
+    Order(Vec<NodeKey>),
+    /// A ring per node the focus reaches, in key order; empty without a focus.
+    Rings(Vec<(NodeKey, u32)>),
+    /// A coordinate pair per node, in key order; empty for a graph with no
+    /// structure to project.
+    Coords(Vec<(NodeKey, (f32, f32))>),
+    /// Nodes, in key order.
+    Nodes(Vec<NodeKey>),
+}
+
+fn in_key_order<V: Copy>(map: &std::collections::HashMap<NodeKey, V>) -> Vec<(NodeKey, V)> {
+    let mut values: Vec<(NodeKey, V)> = map.iter().map(|(key, value)| (*key, *value)).collect();
+    values.sort_by_key(|(key, _)| key.index());
+    values
 }
 
 impl Canvas {
     /// The graph inputs every channel resolves through, with the partition
     /// and the Meaning snapshot as they stand.
-    fn channel_inputs(&self) -> LawInputs<'_> {
+    fn channel_inputs(&mut self) -> LawInputs<'_> {
+        self.channels.sites(&self.graph);
         LawInputs::new(
             &self.graph,
             &self.hidden_edges,
-            self.community_cache.as_ref(),
+            self.channels.community_held(),
+            self.channels.sites_fresh(&self.graph),
         )
         .with_meaning(self.meaning.snapshot())
     }
 
-    /// Resolve a channel against the current graph and caches. It reads the
-    /// Louvain partition and the Meaning snapshot as they stand (cluster and
-    /// meaning read site before either exists); a reader that needs them
-    /// fresh asks for them first, as a law build does.
-    pub fn channel_values(&self, channel: Channel) -> ChannelValues {
+    /// Resolve a channel against the current graph and the registry. It reads
+    /// the Louvain partition and the Meaning snapshot as they stand (cluster
+    /// and meaning read site before either exists); a reader that needs them
+    /// fresh asks for them first, as a law build does. The registry's other
+    /// facts are brought up to the graph as they are read.
+    pub fn channel_values(&mut self, channel: Channel) -> ChannelValues {
+        match channel {
+            Channel::Order(OrderSource::Recency) => {
+                return ChannelValues::Order(self.channels.recency(&self.graph).order.clone());
+            },
+            Channel::Order(OrderSource::Timeline) => {
+                return ChannelValues::Order(self.channels.enumeration(&self.graph).to_vec());
+            },
+            Channel::Rings => {
+                let rings = match self.focused_key() {
+                    Some(focus) => in_key_order(self.channels.rings(&self.graph, focus)),
+                    None => Vec::new(),
+                };
+                return ChannelValues::Rings(rings);
+            },
+            Channel::Coords => {
+                let iterations = cartography::adapters::SpectralAdapter::default().iterations;
+                return ChannelValues::Coords(in_key_order(
+                    self.channels.spectral(&self.graph, iterations),
+                ));
+            },
+            Channel::Weight => {
+                return ChannelValues::Weights(in_key_order(
+                    self.channels.degree_weights(&self.graph),
+                ));
+            },
+            Channel::Importance(metric) => {
+                return ChannelValues::Weights(in_key_order(
+                    self.channels.importance(&self.graph, metric),
+                ));
+            },
+            Channel::Bridges(metric) => {
+                let mut nodes = self
+                    .channels
+                    .bridges(&self.graph, metric, BRIDGE_THRESHOLD)
+                    .bridges
+                    .clone();
+                nodes.sort_by_key(|key| key.index());
+                return ChannelValues::Nodes(nodes);
+            },
+            Channel::Pairs(blend) if blend != AffinityBlend::ContentOnly => {
+                self.channels
+                    .structural_affinity(&self.graph, AFFINITY_MIN_SIMILARITY);
+            },
+            _ => {},
+        }
+        let focus = self.focused_key();
         let inputs = self.channel_inputs();
         match channel {
             Channel::Kind(source) => ChannelValues::Groups(
@@ -195,33 +356,32 @@ impl Canvas {
             ),
             Channel::Groups(source) => ChannelValues::Groups(inputs.groups(source)),
             Channel::Mass(source) => ChannelValues::Weights(inputs.mass_values(source)),
-            Channel::Depth(source) => {
-                ChannelValues::Depths(inputs.depth_values(source, self.focused_key()))
-            },
+            Channel::Depth(source) => ChannelValues::Depths(inputs.depth_values(source, focus)),
             Channel::Pairs(blend) => {
-                let structural = (blend != AffinityBlend::ContentOnly).then(|| {
-                    match (&self.affinity_cache, self.affinity_cache_revision) {
-                        (Some(cache), revision) if revision == self.graph.revision() => {
-                            cache.clone()
-                        },
-                        _ => crate::signals::structural_affinity(
-                            &self.graph,
-                            AFFINITY_MIN_SIMILARITY,
-                        ),
-                    }
-                });
+                let structural = (blend != AffinityBlend::ContentOnly)
+                    .then(|| {
+                        self.channels
+                            .structural_affinity_fresh(&self.graph, AFFINITY_MIN_SIMILARITY)
+                    })
+                    .flatten();
                 let content = (blend != AffinityBlend::StructuralOnly)
                     .then_some(self.content_affinity.as_deref())
                     .flatten();
-                ChannelValues::Pairs(blend_affinity_pairs(structural.as_ref(), content))
+                ChannelValues::Pairs(blend_affinity_pairs(structural, content))
             },
             Channel::Distances => ChannelValues::Pairs(inputs.weighted_distances()),
+            Channel::Order(_)
+            | Channel::Rings
+            | Channel::Coords
+            | Channel::Weight
+            | Channel::Importance(_)
+            | Channel::Bridges(_) => unreachable!("resolved from the registry above"),
         }
     }
 
     /// The groups channel for any kind channel, as G3's grouped laws will
     /// read it: every node's group, dense, in key order.
-    pub fn channel_groups(&self, source: PhysicsKindSource) -> Vec<(NodeKey, u32)> {
+    pub fn channel_groups(&mut self, source: PhysicsKindSource) -> Vec<(NodeKey, u32)> {
         self.channel_inputs().groups(source)
     }
 }
