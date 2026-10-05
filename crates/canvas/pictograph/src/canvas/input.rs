@@ -16,6 +16,7 @@ use kernel::graph::{
     NodeKey, NodeSelector, ScalarField,
 };
 
+use super::actions::ArrangementAction;
 use super::build::hyperlink;
 use super::edge_cells::{edge_cell_hit_test, edge_cells_in_rect};
 use super::seiche_bridge::seed_cluster;
@@ -81,7 +82,12 @@ impl Canvas {
         }
         if let Some(mut d) = self.drag {
             let was_moved = d.moved;
-            if !d.moved && (new.0 - d.press.0).hypot(new.1 - d.press.1) > CLICK_SLOP {
+            // A press becomes a drag only on an item that advertises drag;
+            // otherwise it stays a click (G9).
+            if !d.moved
+                && (new.0 - d.press.0).hypot(new.1 - d.press.1) > CLICK_SLOP
+                && self.permits(d.node, ArrangementAction::Drag)
+            {
                 d.moved = true;
             }
             if d.moved {
@@ -316,10 +322,14 @@ impl Canvas {
 
     /// Hold the single focused node at its current visual position. This is
     /// view-local curation: it does not write coordinates into the graph.
+    /// Refused unless the node advertises pin (G9).
     pub fn pin_focused(&mut self) -> bool {
         let Some(key) = self.focused_key() else {
             return false;
         };
+        if !self.permits(key, ArrangementAction::Pin) {
+            return false;
+        }
         let Some(position) = self.view.position_of(key) else {
             return false;
         };
@@ -331,10 +341,15 @@ impl Canvas {
     /// Nudge the single focused node in world coordinates, holding it in its
     /// new position. Hosts map keyboard arrows into their chosen world step.
     /// The node stays held until [`release_focused`](Self::release_focused).
+    /// A nudge is the keyboard's drag: refused unless the node advertises
+    /// drag (G9).
     pub fn nudge_focused(&mut self, dx: f32, dy: f32) -> bool {
         let Some(key) = self.focused_key() else {
             return false;
         };
+        if !self.permits(key, ArrangementAction::Drag) {
+            return false;
+        }
         let Some(position) = self.view.position_of(key) else {
             return false;
         };
@@ -379,7 +394,7 @@ impl Canvas {
     /// anchored node returns: by its anchor spring while playing, by jumping
     /// back while paused. A pinned node stays held at the drop, its pin moved
     /// there.
-    fn release_dragged(&mut self, node: NodeKey) {
+    pub(crate) fn release_dragged(&mut self, node: NodeKey) {
         let role = self.arrangement_role_of(node);
         if role != Role::Pinned {
             self.physics.unpin(node);

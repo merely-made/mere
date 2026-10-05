@@ -18,6 +18,7 @@
 //! bodies' rms speed falling under [`SETTLE_SPEED_FLOOR`] (F46). "Settled" is
 //! the latest settle's positions, picked like any other arrangement (F30).
 
+use super::actions::{ArrangementAction, PermittedActions};
 use super::at_rest::AtRest;
 use super::*;
 use seiche::{Role, RoleTable};
@@ -51,6 +52,8 @@ pub(crate) struct ArrangementRoles {
     stop_return: Option<StopReturn>,
     /// The settle record and the at-rest return of anchored items.
     rest: AtRest,
+    /// What the binding withdraws from the items' advertisements (G9).
+    pub(crate) actions: PermittedActions,
 }
 
 impl Default for ArrangementRoles {
@@ -64,6 +67,7 @@ impl Default for ArrangementRoles {
             settles: 0,
             stop_return: None,
             rest: AtRest::default(),
+            actions: PermittedActions::default(),
         }
     }
 }
@@ -100,12 +104,16 @@ impl Canvas {
         self.settle_physics(SETTLE_TICKS);
     }
 
-    /// One item's role (`None` clears it), by member id. Returns whether the
-    /// member exists.
+    /// One item's role (`None` clears it), by member id. Returns whether it
+    /// was set: not for a member the graph lacks, nor a pin the item does not
+    /// advertise (G9).
     pub fn set_member_role(&mut self, member: uuid::Uuid, role: Option<Role>) -> bool {
         let Some(key) = self.graph.get_node_key_by_id(member) else {
             return false;
         };
+        if role == Some(Role::Pinned) && !self.permits(key, ArrangementAction::Pin) {
+            return false;
+        }
         match role {
             Some(role) => self.roles.table.items.insert(key, role),
             None => self.roles.table.items.remove(&key),
