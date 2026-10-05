@@ -1,9 +1,10 @@
 # Graph semantics plan: assertions, resources, saved queries, residency
 
 **Date:** 2026-10-04
-**Status (2026-10-04):** in progress. Branch-base review complete; P1 writer
-and snapshot paths inspected, stopped at C1 before changing code. Rounds 1
-and 2 ruled (rulings 1 to 8); P1–P5 remain unimplemented.
+**Status (2026-10-04):** in progress. Branch-base review complete; C1 ruled
+for the unknown legacy asserter marker. P1 partially implemented; awaiting
+peer-attribution and predicate-edit rulings before finishing writer wiring.
+P1–P5 are not yet landed.
 
 Four questions were put to Mark from outside the project: what a link records,
 what makes two things the same thing, what a saved query can become, and how
@@ -146,7 +147,7 @@ claim without evidence and would affect more than disk loading. The
 snapshot alone cannot recover the original asserter or expand an already
 merged claim back into its lost assertions.
 
-C1 remains open. Options returned to Mark, recommendation first:
+C1 options returned to Mark, recommendation first:
 
 1. **Legacy marker (recommended).** Missing provenance receives a stable IRI
    explicitly meaning unknown legacy asserter. Keep existing statement ids,
@@ -160,7 +161,84 @@ C1 remains open. Options returned to Mark, recommendation first:
    ingest engine. This makes its later assertions update the legacy record,
    but assigns an engine the stored record does not establish.
 
-No migration policy, assertion-key change or API change has been implemented.
+**C1 ruling (2026-10-04).** Mark: **"1"**, selecting the legacy marker above.
+Missing legacy provenance receives an explicit unknown-asserter IRI; existing
+statement ids, times and supplied provenance are preserved. Attribution to
+the current user or an assumed ingest engine is not selected. This resolves
+the load-policy checkpoint; production writers still supply a known asserter.
+
+### P1 implementation findings (2026-10-04)
+
+- **Assertion identity.** Both live insert paths now dedup with attribution.
+  Ingest of a carried handle updates the held assertion for that asserter,
+  retaining its id. Exact snapshot/undo restoration remains a separate path:
+  C1 requires preserving every legacy handle, including several records whose
+  unknown authors collapse to the same marker
+  (`crates/graph/graph-kernel/src/graph/edge_data.rs`,
+  `crates/graph/graph-kernel/src/graph/edge_payload.rs`).
+- **Writer attribution and capture.** The session previously assigned its
+  Author only after executing an edit. `Graph::write_as` now supplies that
+  context during the edit and restores it on return or panic. An attributed
+  source overrides it. Semantic edits capture exact pair state, including
+  updates that mint no id and precise retractions. The existing capture
+  schema is unchanged; author-aware replay recovers the journal Author for
+  old raw assertions, while bare captures without an envelope use the C1
+  unknown marker (`crates/system/pandect/src/graph_session.rs`,
+  `crates/graph/graph-kernel/src/graph/capture.rs`,
+  `crates/graph/graph-kernel/src/graph/journal.rs`). Predicate annotation can
+  create a statement, so its delta also carries attribution.
+- **RDF ingest.** Several reifiers on one triple previously overwrote the
+  same contribution. Ingest consumes the base-triple slot once, then emits
+  one contribution per further reifier; reifier traversal is deterministic.
+  Export already emitted one reifier per statement
+  (`crates/graph/linked-data/src/ingest.rs`,
+  `crates/graph/linked-data/src/lib.rs`). Query fixtures still wrote literal
+  properties onto the removed node field; they now use the facet write API
+  (`crates/graph/linked-data/src/query.rs`).
+- **Consumer boundary.** A read-only Rust-source search in Turnstone and
+  knot-editor found zero constructors or matches of the six changed
+  asserting/predicate-setting `GraphDelta` variants. Turnstone has an
+  exhaustive capture match in its behaviors module, so P1 adds neither a
+  capture variant nor serialized fields. Public assertion helper and
+  `EdgeAssertion` signatures remain stable. This is source inspection,
+  not a sibling build receipt; no sibling files were changed.
+
+### Additional P1 forks (2026-10-04, awaiting Mark)
+
+**Peer identity.** The personal sync fold is a production assertion writer
+(`ports/graphshell/src/personal_sync.rs`, `apply_event`, line 1384). The signed
+operation gives two 32-byte identities: its device signer and a verified
+stable persona root; `WriterReceipt` retains both (line 399), and
+`materialize` verifies the root before applying events (line 1213). The fold
+currently passes neither to the assertion. The required workspace check
+fails with E0063 at this writer because its delta now requires attribution.
+Consequences below follow from the dedup key, rather than a device trial:
+
+1. **Stable persona root (recommended).** Two devices of one persona update
+   one assertion; signing-key rotation does not add an asserter. Keep the
+   signer in the existing receipt.
+2. **Device signing key.** Two devices create two assertions; key rotation
+   adds another asserter. Keep the persona root in the existing receipt.
+
+**Predicate mutation.** `SemanticData::set_statement_predicate` rewrites all
+predicates on a pair (`crates/graph/graph-kernel/src/graph/edge_data.rs`, line
+306). For two open predicates under one scope and known asserter, a bulk stamp
+leaves two ids but only one dedup key. This follows directly from its loop;
+the ordinary assertion APIs have no such collision. A Rust-source search
+finds zero production callers of the live `SetEdgeSemanticPredicate` delta
+in Mere, Turnstone or knot-editor; its fixture and legacy replay paths remain.
+The new asserter field alone does not settle this identity conflict.
+
+1. **Retire the live bulk setter (recommended).** Writers assert the correct
+   predicate upfront. Changing a claim retracts it and asserts its replacement;
+   legacy decoding remains available.
+2. **Edit one assertion.** Target its id, preserve that id when changing its
+   predicate, and reject a collision with another assertion.
+3. **Merge collisions.** Keep a caller-selected assertion id, retire collided
+   ids, and journal the complete change.
+
+No peer identity or predicate-edit policy has been selected in code. P1 stays
+open; these choices were returned through the user input panel.
 
 ## 3. Rulings
 
@@ -356,7 +434,8 @@ comes back to Mark as a fork, with evidence, before the code commits to one.
 
 - **C1 (P1). Legacy statements.** What asserter does a stored statement with no
   provenance get on load: a legacy marker, the local user, or the ingest engine
-  that probably wrote it.
+  that probably wrote it. **Resolved 2026-10-04:** Mark selected **"1"**, the
+  explicit unknown legacy asserter marker; see the dated C1 ruling in §2.
 - **C2 (P2). Which families sit on resources.** Semantic, Imported and
   Provenance are content and Traversal and Arrangement are experience; the
   seven containment sub-kinds split three ways: URL-derived (`UrlPath`,
@@ -388,3 +467,23 @@ comes back to Mark as a fork, with evidence, before the code commits to one.
   `Code/repos`. The graph semantics plan has no audit findings. No new active
   document was added. Cargo tests, the workspace check and the wasm32 check
   were not run: no Rust code or manifest changed before this checkpoint.
+
+- **2026-10-04. P1 partial implementation after C1.** Implemented per-asserter
+  assertion identity, Author IRI rendering and scoped writer context, explicit
+  page attribution, legacy-marker loading with ids/times preserved, exact
+  capture of assertion updates/retractions, Author-aware replay, and separate
+  RDF reifiers on one triple. Added writer enumeration, engine-version,
+  source-priority, load-fidelity, replay, reingest and drawn-link grouping
+  controls. Source changes remain uncommitted while the additional P1 forks
+  above await Mark; P2 has not begun.
+  Validation, all with the reusable `C:/t/cargo-targets/mere`, offline and locked:
+  kernel **320 passed**; linked-data with `query` **40 passed**; Pandect
+  **305 passed**; Pictograph with `canvas` **293 passed, 13 ignored** (the
+  portable-only run also passed 15). The kernel's one ignored documentation
+  example was not run. The wasm32 kernel check exited **0**. The required
+  workspace check exited **101**, with one E0063 at the personal-sync writer
+  awaiting the peer-identity ruling. No sibling builds, headed UI, GPU/device
+  integration tests or later-phase gates were run. No manifest/lock changes,
+  dependencies, downloads, isolated Cargo home or local patch override were
+  needed. The documentation audit and its planted-defect/clean-fixture
+  self-test exited **0**; existing audit findings remain as recorded above.
