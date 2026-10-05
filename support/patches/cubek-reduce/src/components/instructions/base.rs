@@ -149,9 +149,56 @@ impl<X: CubePrimitive> Value<X> {
     }
 }
 
+/// How much fully-unrolled top-k selection work is worth emitting, counted in
+/// copies of a loop body.
+///
+/// The selection networks below are `k`-by-`k`: every candidate walks all `k`
+/// accumulator slots. Unrolling both levels keeps the accumulator in registers
+/// with constant slot indices, which is worth a lot — rolled, the slots move to
+/// scratch memory and every step becomes a load/store. Measured on a
+/// `32x512x4095` `ArgTopK` (device timing, RTX 5090 / Vulkan), unrolling is
+/// worth 5.8x at `k = 32` and 2.2x at `k = 64`.
+///
+/// But the emitted kernel grows with the product, so a flat cap on `k` prices
+/// the three nest shapes wrong: `topk_finalize_*` is `k * k * vector_size`, not
+/// `k * k`, and is the first to become unaffordable. Budgeting the product
+/// instead lets the square nests unroll further than the cubic one, and stops
+/// all of them before the backend compiler does: past this budget the same
+/// selection runs as a plain runtime loop whose kernel size does not depend on
+/// `k` at all.
+pub(crate) const TOPK_UNROLL_BUDGET: usize = 1024;
+
+/// Whether any lane of `item` reaches the list slot `kth` — reaches, not only
+/// beats, so a tie still goes through the insertion and its coordinate rule.
+///
+/// The negation is load-bearing and is not `>=`: this guard only skips what
+/// provably cannot enter, so a NaN, which compares unordered against every
+/// slot, has to reach the insertion the way it did before the guard existed.
+/// There it takes slot 0 — `elements[j] > NaN` is false — and carries its own
+/// coordinate out. Under `>=` a NaN would fail the guard instead, and an
+/// all-NaN row would insert nothing and emit the `u32::MAX` null-accumulator
+/// sentinel as its index.
+#[cube]
+#[allow(clippy::neg_cmp_op_on_partial_ord)]
+pub(crate) fn reaches<N: Numeric, S: Size>(item: Vector<N, S>, kth: Vector<N, S>) -> bool {
+    let mut any = false;
+    #[unroll]
+    for i in 0..item.vector_size().comptime() {
+        if !(item.extract(i) < kth.extract(i)) {
+            any = true;
+        }
+    }
+    any
+}
+
 /// Plane-cooperative top-k insertion; the candidate's coordinate decides which
 /// algorithm runs, since winners are identified by their coordinate when one
 /// rides along and by lane id otherwise.
+///
+/// A step none of whose lanes reaches the list's last kept slot changes nothing
+/// and is skipped: the insertion is `k` plane reductions per step, and over a
+/// long row almost every step is such a step — on a 151936-wide row of logits
+/// the insertion was the whole cost of a top-20 (4.7 ms on GP100).
 #[cube]
 pub fn plane_topk_insert<N: Numeric, S: Size>(
     elements: &mut Array<Vector<N, S>>,
@@ -160,16 +207,18 @@ pub fn plane_topk_insert<N: Numeric, S: Size>(
     coord: &Value<Vector<u32, S>>,
     #[comptime] k: usize,
 ) {
-    match coord {
-        Value::None => plane_topk_insert_values(elements, item, k),
-        Value::Single(coord) => plane_topk_insert_with_coords(
-            elements,
-            coordinates.multiple_mut(),
-            item,
-            coord.unwrap(),
-            k,
-        ),
-        Value::Multiple(_) => panic!("a top-k candidate carries at most one coordinate"),
+    if plane_any(reaches(item, elements[k - 1])) {
+        match coord {
+            Value::None => plane_topk_insert_values(elements, item, k),
+            Value::Single(coord) => plane_topk_insert_with_coords(
+                elements,
+                coordinates.multiple_mut(),
+                item,
+                coord.unwrap(),
+                k,
+            ),
+            Value::Multiple(_) => panic!("a top-k candidate carries at most one coordinate"),
+        }
     }
 }
 
@@ -184,7 +233,7 @@ fn plane_topk_insert_with_coords<N: Numeric, S: Size>(
     let mut local_best_val = item;
     let mut local_best_coord = coord;
 
-    #[unroll]
+    #[unroll(k * k <= crate::components::instructions::TOPK_UNROLL_BUDGET)]
     for _i in 0..k {
         let winning_val = plane_max(local_best_val);
         let winning_coord =
@@ -193,7 +242,7 @@ fn plane_topk_insert_with_coords<N: Numeric, S: Size>(
         let mut insert_val = winning_val;
         let mut insert_coord = winning_coord;
 
-        #[unroll]
+        #[unroll(k * k <= crate::components::instructions::TOPK_UNROLL_BUDGET)]
         for j in 0..k {
             let to_keep = select_many(
                 elements[j].equal(&insert_val),
@@ -228,7 +277,7 @@ fn plane_topk_insert_values<N: Numeric, S: Size>(
     let mut local_best_val = item;
     let lane_id = Vector::new(UNIT_POS_X);
 
-    #[unroll]
+    #[unroll(k * k <= crate::components::instructions::TOPK_UNROLL_BUDGET)]
     for _i in 0..k {
         let winning_val = plane_max(local_best_val);
         let is_match = local_best_val.equal(&winning_val);
@@ -236,7 +285,7 @@ fn plane_topk_insert_values<N: Numeric, S: Size>(
 
         let mut insert_val = winning_val;
 
-        #[unroll]
+        #[unroll(k * k <= crate::components::instructions::TOPK_UNROLL_BUDGET)]
         for j in 0..k {
             let to_keep = elements[j].greater_than(&insert_val);
             let next_val = select_many(to_keep, insert_val, elements[j]);
@@ -276,12 +325,12 @@ fn plane_topk_merge_with_coords<N: Numeric, S: Size>(
     let mut cursor = Vector::new(0u32);
     let lane_id = Vector::new(UNIT_POS_X);
 
-    #[unroll]
+    #[unroll(k * k <= crate::components::instructions::TOPK_UNROLL_BUDGET)]
     for i in 0..k {
         let mut local_val = Vector::new(N::min_value());
         let mut local_coord = Vector::new(u32::MAX);
 
-        #[unroll]
+        #[unroll(k * k <= crate::components::instructions::TOPK_UNROLL_BUDGET)]
         for j in 0..k {
             let is_pointed = cursor.equal(&Vector::new(j as u32));
             local_val = select_many(is_pointed, elements[j], local_val);
@@ -317,11 +366,11 @@ fn plane_topk_merge_values<N: Numeric, S: Size>(
     let mut cursor = Vector::new(0u32);
     let lane_id = Vector::new(UNIT_POS_X);
 
-    #[unroll]
+    #[unroll(k * k <= crate::components::instructions::TOPK_UNROLL_BUDGET)]
     for i in 0..k {
         let mut local_val = Vector::new(N::min_value());
 
-        #[unroll]
+        #[unroll(k * k <= crate::components::instructions::TOPK_UNROLL_BUDGET)]
         for j in 0..k {
             let is_pointed = cursor.equal(&Vector::new(j as u32));
             local_val = select_many(is_pointed, elements[j], local_val);
