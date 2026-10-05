@@ -32,6 +32,7 @@ mod live_physics;
 mod node_face;
 mod node_minting;
 mod node_state;
+mod permitted_actions;
 mod physics_catalog;
 mod physics_terms;
 mod relations;

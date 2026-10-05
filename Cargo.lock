@@ -12379,6 +12379,7 @@ version = "0.2.0"
 dependencies = [
  "armillary",
  "chartulary",
+ "chirograph",
  "emblem",
  "esp",
  "euclid",
