@@ -12188,6 +12188,8 @@ dependencies = [
  "hex",
  "insigne",
  "rand_core 0.6.4",
+ "ring",
+ "rsa",
  "serde",
  "serde_json",
  "signature 2.2.0",

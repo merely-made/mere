@@ -80,6 +80,8 @@ pub mod ssh_ca;
 pub mod ssh_face;
 #[cfg(feature = "ssh")]
 pub mod ssh_krl;
+#[cfg(feature = "agent")]
+pub mod ssh_sign;
 #[cfg(feature = "ssh")]
 pub mod ssh_slot;
 pub mod startup_unlock;
