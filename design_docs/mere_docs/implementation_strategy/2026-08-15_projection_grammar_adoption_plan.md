@@ -58,7 +58,29 @@ Shared qualification (2026-10-05): `cargo test --locked -p scenograph -p
 scenomise` passes 8 authoring tests, 88 choreography tests (including nine new
 relationship regressions), and the authoring compile-fail doctest. The two
 crates also pass `cargo check --locked --target wasm32-unknown-unknown`.
-Graphshell compatibility and consumer qualification remain in progress.
+Graphshell's native `--features web` compiler compatibility suite passes 12
+tests; the generic compiler's prior grid/scatter semantics remain intact.
+Shared Clippy passes with only the explicit pre-existing `manual_contains`
+solver-lint allowance; unconditional strict Clippy is not claimed.
+
+Publication: shared code is on Mere main at
+`c79bb8c203b52817991e0d7ba1c4ce3c3a2aac34`. Woodshed's disclosed source and
+session adoption are on main at `c92e7c96779ef316f5d8244a59de7cbc84f42a0b`.
+Its receipt reports core 189, views 97, desktop session 16, shared adoption 5,
+exporters 10 and integration 1 tests passing, plus separate-process restoration
+using the production session backend on an isolated unsealed fixture. It does
+not qualify a visible Woodshed editor or native rendering.
+
+Knot's actual Mora-derived recipe also rebinds through the common draft to the
+generated Woodshed disclosure: edited label/spacing, repeated-source identity,
+occurrence selection and exact musical explanation survive; neither dataset
+changes, missing semantic facets refuse, and Knot document anchors cannot be
+repurposed as music owner actions. Focused adapter test passes. Knot's native
+recipe scenario has four reviewed captures at 1280×1100 (bind, spacing, explained
+relation, authority refusal); successful personal-wallet retention and
+narrow/high-zoom recipe visuals remain unrun. Knot's canonical collection plan
+records its complete suite and encrypted-retention receipts. The visible
+Woodshed editor/renderer is the next integration slice, not a closed condition.
 
 ## Executable authoring proof (2026-09-04, verified in current working tree)
 
