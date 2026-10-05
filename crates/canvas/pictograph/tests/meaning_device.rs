@@ -23,10 +23,13 @@
 //! launch fails validation (the first run of this receipt, kept in the lane's
 //! `meaning-device.log`).
 //!
-//! The purity receipt is ignored by default: it needs the local MiniLM
-//! artifact and an adapter. The boot receipt needs an adapter only.
+//! The model is the pinned one (`MeaningModel::pinned`, F56 and F58:
+//! e5-base-v2 at its matched revision, mean-pooled, with the `query: `
+//! prefix, at top-k 16 and classical modularity). The purity receipt is
+//! ignored by default: it needs the local models directory and an adapter.
+//! The boot receipt needs an adapter only.
 //!
-//! `ESP_MINILM_DIR=<repo>/models/all-MiniLM-L6-v2 cargo test -p pictograph
+//! `ESP_MODELS_DIR=<repo>/models cargo test --release -p pictograph
 //! --features meaning-gpu --test meaning_device -- --ignored --nocapture
 //! --test-threads=1`
 
@@ -40,27 +43,38 @@ use std::time::{Duration, Instant};
 
 use esp::embed::bert::{Device, DeviceKind};
 use meaning_common::meaning_topics::{arxiv_graph, partition, shuffled};
-use meaning_common::{Fixed, print_confusion, row, snapshot_on};
+use meaning_common::{print_confusion, row, snapshot_on};
 use pictograph::canvas::meaning_device::{
     DeviceMeaning, check_meaning_device, host_meaning_device,
 };
+use pictograph::canvas::meaning_model::MeaningModel;
 use pictograph::canvas::{
     Canvas, LexicalMeaning, MeaningBackend, MeaningEngine, MeaningParams, PhysicsKindSource,
-    PhysicsLaw, ProviderMeaning, physics_device_for,
+    PhysicsLaw, physics_device_for,
 };
 
 const MEBIBYTE: u64 = 1 << 20;
 
-fn model_dir() -> PathBuf {
-    std::env::var_os("ESP_MINILM_DIR")
+fn models_dir() -> PathBuf {
+    std::env::var_os("ESP_MODELS_DIR")
         .map(PathBuf::from)
-        .expect("ESP_MINILM_DIR must point at the local all-MiniLM-L6-v2 artifact")
+        .expect("ESP_MODELS_DIR must point at the local models directory")
 }
 
 #[test]
-#[ignore = "requires the local all-MiniLM-L6-v2 artifact (ESP_MINILM_DIR) and a wgpu adapter"]
+#[ignore = "requires the local models directory (ESP_MODELS_DIR) and a wgpu adapter"]
 fn the_model_on_the_host_device_shares_it_and_records_purity() {
-    let model = model_dir();
+    let models = models_dir();
+    let pinned = MeaningModel::pinned();
+    println!(
+        "model {} at {} ({}, {} pooling, prefix {:?}), tuning {:?}",
+        pinned.model_id,
+        pinned.revision,
+        pinned.license,
+        pinned.pooling,
+        pinned.prefix,
+        MeaningParams::MODEL
+    );
     let plain = netrender::boot().expect("a wgpu adapter");
     let info = plain.adapter.get_info();
     println!(
@@ -94,7 +108,7 @@ fn the_model_on_the_host_device_shares_it_and_records_purity() {
     // One device: the engine's is the one the physics device registered.
     let before = in_use();
     let started = Instant::now();
-    let engine = DeviceMeaning::load(&model, &device)
+    let engine = DeviceMeaning::load_pinned(&models, &device)
         .expect("the model loads on the host's device")
         .with_pair_threshold(0);
     let load = started.elapsed();
@@ -105,15 +119,17 @@ fn the_model_on_the_host_device_shares_it_and_records_purity() {
         "host client bytes in use: {before} before the model, {loaded} after ({:.1} MiB more), load {load:?}",
         (loaded.saturating_sub(before)) as f64 / MEBIBYTE as f64
     );
+    let weights = pinned.artifacts.weights.bytes;
     assert!(
-        loaded.saturating_sub(before) >= 50 * MEBIBYTE,
-        "the model's weights live on the host's client"
+        loaded.saturating_sub(before) >= weights * 9 / 10,
+        "the model's weights ({weights} bytes) live on the host's client"
     );
 
     // The control: a model on a freshly booted device leaves the host's
     // client where it was.
-    let control = DeviceMeaning::load_on(&model, Device::wgpu(DeviceKind::DefaultDevice))
-        .expect("the control model loads on a device of its own");
+    let control =
+        DeviceMeaning::load_model_on(pinned, &models, Device::wgpu(DeviceKind::DefaultDevice))
+            .expect("the control model loads on a device of its own");
     let after_control = in_use();
     println!(
         "control device {:?}: host client bytes in use {after_control} ({} bytes moved)",
@@ -226,10 +242,9 @@ fn the_model_on_the_host_device_shares_it_and_records_purity() {
 
     // The same model on the CPU, and the lexical fallback.
     let started = Instant::now();
-    let cpu_engine = ProviderMeaning::new(
-        esp::embed::bert::load_cpu(&model).expect("the model loads on the CPU"),
-        MeaningBackend::ModelCpu,
-    );
+    let cpu_engine = pinned
+        .load_cpu(&models)
+        .expect("the model loads on the CPU");
     let (cpu, cpu_runs) = snapshot_on(Arc::new(cpu_engine));
     println!("model on the CPU: load and run {:?}", started.elapsed());
     assert_eq!(cpu_runs, 1);
@@ -252,42 +267,6 @@ fn the_model_on_the_host_device_shares_it_and_records_purity() {
 
     print_confusion("model on the host's GPU", &gpu.groups, &topics);
     print_confusion("lexical fallback", &lexical.groups, &topics);
-
-    // The model's tuning neighbourhood, over the GPU's vectors embedded once,
-    // for the record (the search and partition run per tuning).
-    let texts: Vec<String> = {
-        let (graph, _, _) = arxiv_graph();
-        keys.iter()
-            .map(|k| graph.get_node(*k).unwrap().title.clone())
-            .collect()
-    };
-    let text_refs: Vec<&str> = texts.iter().map(String::as_str).collect();
-    let vectors = engine.embed(&text_refs).expect("the GPU embeds the corpus");
-    let mut best = (0.0, MeaningParams::MODEL);
-    for top_k in [2, 4, 8, 16, 32, 64] {
-        for min_similarity in [0.1, 0.15, 0.2, 0.25, 0.3, 0.4] {
-            let params = MeaningParams {
-                top_k,
-                min_similarity,
-                resolution: 1.0,
-            };
-            let (swept, _) = snapshot_on(Arc::new(Fixed {
-                vectors: vectors.clone(),
-                params,
-                backend: MeaningBackend::ModelGpu,
-            }));
-            let (f, _) = row(
-                &format!("model sweep top_k {top_k} min {min_similarity}"),
-                &swept.groups,
-                &topics,
-                &shuffled,
-            );
-            if f > best.0 {
-                best = (f, params);
-            }
-        }
-    }
-    println!("model sweep best: F {:.3} at {:?}", best.0, best.1);
 
     // The measure says no to shuffled topics on every backend, and the model
     // knows more than the lexical fallback.
@@ -358,4 +337,32 @@ fn a_default_boot_is_refused_with_its_reason_and_a_greedy_boot_passes() {
         !missing.to_string().contains("TIMESTAMP_QUERY"),
         "{missing}"
     );
+}
+
+/// F58's manifest: it parses, names the pinned revision, pooling and prefix,
+/// and the load check refuses a model directory that is missing or holds an
+/// artifact at another size. Needs no model and no adapter.
+#[test]
+fn the_pinned_manifest_parses_and_the_load_check_refuses_a_wrong_size() {
+    let pinned = MeaningModel::pinned();
+    assert_eq!(pinned.model_id, "intfloat/e5-base-v2");
+    assert_eq!(pinned.revision, "f52bf8ec8c7124536f0efb74aca902b2995e5bcd");
+    assert_eq!(pinned.license, "MIT");
+    assert_eq!(pinned.prefix, "query: ");
+    assert_eq!(
+        pinned.pooling().expect("a known pooling"),
+        esp::embed::bert::Pooling::Mean
+    );
+    let root = std::env::temp_dir().join(format!("meaning-model-check-{}", std::process::id()));
+    let missing = pinned.check(&root).expect_err("no model directory");
+    assert!(missing.to_string().contains(&pinned.model_id), "{missing}");
+    let dir = root.join(&pinned.directory);
+    std::fs::create_dir_all(&dir).unwrap();
+    for artifact in pinned.artifacts() {
+        std::fs::write(dir.join(&artifact.file), b"not the pinned bytes").unwrap();
+    }
+    let wrong = pinned.check(&root).expect_err("artifacts at other sizes");
+    println!("refused: {wrong}");
+    assert!(wrong.to_string().contains("pinned at"), "{wrong}");
+    std::fs::remove_dir_all(&root).unwrap();
 }

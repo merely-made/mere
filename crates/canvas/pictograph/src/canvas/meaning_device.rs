@@ -28,7 +28,8 @@ use esp::embed::{EmbedError, EmbeddingProvider, VectorIndex};
 use kernel::graph::NodeKey;
 
 use super::PhysicsDevice;
-use super::meaning::{Embedded, MeaningBackend, MeaningEngine, MeaningParams};
+use super::meaning::{Embedded, MeaningBackend, MeaningEngine, MeaningParams, embed_prefixed};
+use super::meaning_model::MeaningModel;
 
 /// Whether `device` can carry the model, and why not: CubeCL times kernels
 /// on the device whenever the adapter offers `TIMESTAMP_QUERY`, so a device
@@ -63,6 +64,7 @@ pub struct DeviceMeaning {
     device: Device,
     params: MeaningParams,
     pair_threshold: usize,
+    prefix: String,
 }
 
 impl DeviceMeaning {
@@ -75,7 +77,8 @@ impl DeviceMeaning {
         Self::load_on(model_dir, host_meaning_device(device))
     }
 
-    /// Load the model on any Burn wgpu device.
+    /// Load the model in `model_dir` on any Burn wgpu device, mean-pooled
+    /// and unprefixed.
     pub fn load_on(model_dir: impl AsRef<Path>, device: Device) -> Result<Self, EmbedError> {
         let provider = esp::embed::bert::load_wgpu(model_dir, device.clone())?;
         Ok(Self {
@@ -83,6 +86,36 @@ impl DeviceMeaning {
             device,
             params: MeaningParams::MODEL,
             pair_threshold: AFFINITY_GPU_MIN_ENTRIES,
+            prefix: String::new(),
+        })
+    }
+
+    /// The pinned model ([`MeaningModel::pinned`], F56) from the host's
+    /// `models` directory, on the host's device, with its pooling and prefix.
+    pub fn load_pinned(
+        models: impl AsRef<Path>,
+        device: &PhysicsDevice,
+    ) -> Result<Self, EmbedError> {
+        check_meaning_device(device)?;
+        Self::load_model_on(MeaningModel::pinned(), models, host_meaning_device(device))
+    }
+
+    /// `model` from `models` on any Burn wgpu device, with its pooling and
+    /// prefix.
+    pub fn load_model_on(
+        model: &MeaningModel,
+        models: impl AsRef<Path>,
+        device: Device,
+    ) -> Result<Self, EmbedError> {
+        let dir = model.check(models)?;
+        let provider = esp::embed::bert::BertEmbeddingProvider::load(dir, device.clone())?
+            .with_pooling(model.pooling()?);
+        Ok(Self {
+            provider: Box::new(provider),
+            device,
+            params: MeaningParams::MODEL,
+            pair_threshold: AFFINITY_GPU_MIN_ENTRIES,
+            prefix: model.prefix.clone(),
         })
     }
 
@@ -114,7 +147,7 @@ impl MeaningEngine for DeviceMeaning {
     }
 
     fn embed(&self, texts: &[&str]) -> Result<Embedded, EmbedError> {
-        self.provider.embed(texts).map(Embedded::Dense)
+        embed_prefixed(self.provider.as_ref(), &self.prefix, texts).map(Embedded::Dense)
     }
 
     /// The device's batched search from the threshold up; below it, the
