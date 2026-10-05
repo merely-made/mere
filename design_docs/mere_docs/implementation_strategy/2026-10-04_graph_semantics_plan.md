@@ -1,8 +1,9 @@
 # Graph semantics plan: assertions, resources, saved queries, residency
 
 **Date:** 2026-10-04
-**Status (2026-10-04):** plan. Rounds 1 and 2 ruled (rulings 1 to 8); phases
-final; implementation checkpoints listed in §5. No code.
+**Status (2026-10-04):** in progress. Branch-base review complete; P1 writer
+and snapshot paths inspected, stopped at C1 before changing code. Rounds 1
+and 2 ruled (rulings 1 to 8); P1–P5 remain unimplemented.
 
 Four questions were put to Mark from outside the project: what a link records,
 what makes two things the same thing, what a saved query can become, and how
@@ -98,6 +99,68 @@ Verified 2026-10-04 against Mere `68d2a928`.
   possession ⊇ disclosure ⊇ synchronization ⊇ projection, each owned by a
   mechanism; a projection exceeding its sync scope is a named bug class. It
   does not require a result to say which layer limited it.
+
+### Branch-base review (2026-10-04)
+
+Verified against branch `graph-semantics` base `36893553`, in the isolated
+`mere-graph-semantics` worktree. Fifteen of the sixteen source files checked
+for F1–F8 are unchanged from `68d2a928`. The remaining file,
+`crates/canvas/pictograph/src/canvas/input.rs`, changes camera following on
+drag, pan and zoom; `Canvas::visit` is unchanged and now starts at line 424.
+F1–F9's architectural gaps remain; no phase changes.
+
+- **F2 precision.** The production RDF scope decoder and encoder do mention
+  `GraphScope::Source` and `GraphScope::User`
+  (`crates/graph/linked-data/src/ingest.rs` 210–211 and
+  `crates/graph/linked-data/src/lib.rs` 149–150). The original statement that
+  every hit is in a test is too broad. These translate a supplied scope;
+  they do not supply attribution to the other assertion writers. P1 stands.
+- **F8 consumer status.** A search of all Rust files under `crates/` and
+  `ports/` finds zero production call sites of `apply_link_statements` and
+  zero production readers of `pending_targets`; its executable callers and
+  readers are tests in `crates/graph/linked-data/src/statements.rs`.
+  This is an unconsumed pending-target path, rather than evidence of observed
+  production data loss. P3 still needs the index and its consumer wiring.
+- **F9 document drift.** The family composition thesis now carries the
+  2026-10-04 ruling-4 amendment (lines 154–159); the stance document carries
+  ruling-6 and ruling-1/2/4 amendments (lines 65 and 76). They record the
+  intended resource split and coverage, not implemented mechanisms.
+
+### C1 evidence (2026-10-04)
+
+`PersistedSemanticStatement` has seven fields: id, predicate, recognized
+sub-kind, label, scope, optional provenance and optional time
+(`crates/graph/graph-kernel/src/persistence_edge.rs` 173–186). It has no
+recorder `Author`; `GraphSnapshot` has no author or journal input
+(`crates/graph/graph-kernel/src/persistence.rs` 237–253). The journal's Author
+is separate (`crates/graph/graph-kernel/src/graph/journal.rs` 88–99).
+
+There are two legacy restore paths: a statement bucket preserves missing
+provenance verbatim, while an aggregate-only semantic edge synthesizes
+statements (`crates/graph/graph-kernel/src/graph/snapshot/from.rs` 291–329).
+The same restore helper also serves exact undo restoration and merge
+(`crates/graph/graph-kernel/src/graph/edge_ops.rs` 430;
+`crates/graph/graph-kernel/src/graph/merge.rs` 109). Consequently, assigning
+the current user or an ingest engine in that helper would attribute an old
+claim without evidence and would affect more than disk loading. The
+snapshot alone cannot recover the original asserter or expand an already
+merged claim back into its lost assertions.
+
+C1 remains open. Options returned to Mark, recommendation first:
+
+1. **Legacy marker (recommended).** Missing provenance receives a stable IRI
+   explicitly meaning unknown legacy asserter. Keep existing statement ids,
+   times and supplied provenance. This preserves the claim without claiming
+   that the current user or an engine authored it; later known assertions
+   remain separate from the legacy assertion.
+2. **Local user.** Attribute missing provenance to the user opening the
+   graph. This makes later assertions by that user update the legacy record,
+   but assigns authorship the stored record does not establish.
+3. **Ingest engine.** Attribute missing provenance to an assumed historic
+   ingest engine. This makes its later assertions update the legacy record,
+   but assigns an engine the stored record does not establish.
+
+No migration policy, assertion-key change or API change has been implemented.
 
 ## 3. Rulings
 
@@ -314,3 +377,14 @@ comes back to Mark as a fork, with evidence, before the code commits to one.
 - **2026-10-04.** Plan written; questions grounded (§2); round 1 ruled
   (rulings 1 to 4); round 2 ruled (rulings 5 to 8, ruling 6 after a comparison
   Mark asked for); phases final; checkpoints C1 to C6 listed.
+- **2026-10-04.** Created the requested `graph-semantics` branch and isolated
+  worktree at `36893553`; reviewed F1–F9 and began P1 by inspecting assertion,
+  persistence and restore paths. Stopped at C1 before code changes. The
+  documentation audit's planted-defect/clean-fixture self-test passed; the
+  baseline audit exited 0 but reported existing findings (10 index orphans,
+  one statusless plan, 40 broken relative links, 206 missing known-root paths
+  and two stale historical annotations). The worktree layout also makes
+  sibling-path resolution relative to `Code/worktrees` rather than
+  `Code/repos`. The graph semantics plan has no audit findings. No new active
+  document was added. Cargo tests, the workspace check and the wasm32 check
+  were not run: no Rust code or manifest changed before this checkpoint.
