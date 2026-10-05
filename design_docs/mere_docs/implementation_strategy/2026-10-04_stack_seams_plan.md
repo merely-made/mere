@@ -230,7 +230,13 @@ pandect moves under `crates/eidetic/` is not ruled.
   definition and a resolved dataset and returns a `sceno::Score`, resolving the
   arrangement id through the registry with parameters from the definition.
   Graphshell's `arrangement_for` and `placement_for` retire into it.
-  Scenograph's crate doc is corrected. *Reading, not ruled*: scenomise is the
+  Scenograph's crate doc is corrected. **Owner:** this plan's lane. Asked
+  through the projection grammar session, which works beside
+  `projection_compile`, Mark answered "Seams lane keeps P1 (Recommended)"; that
+  session recorded the answer and S1 in the
+  [projection grammar adoption plan](2026-08-15_projection_grammar_adoption_plan.md)
+  at `1a2e71db`, and reports no lane of its own in the file (last touched
+  `e387df16`, 2026-09-09). *Reading, not ruled*: scenomise is the
   home because scenograph deliberately has no solver dependency.
   Done when: every family the registry holds compiles from a definition (a
   test iterates the registry); graphshell's existing projection tests pass
@@ -292,3 +298,7 @@ The done-conditions handed over for S3 and S4, kept for reference:
   works in `projection_compile`. Second pass (F8 to F11), rulings S7 to S10:
   the README fixed (S7), TERMINOLOGY gains pandect under Eidetic and the
   curation record (S8, S10), S9 sent to the identity lane.
+- **2026-10-05.** P1's owner settled: this lane, by Mark's answer relayed and
+  recorded at `1a2e71db`. S5 and S6 needed no change in the projection grammar
+  documents, which already use "arrangement" for positions and "scene" in the
+  projection sense.

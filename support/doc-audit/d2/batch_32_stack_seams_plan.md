@@ -59,4 +59,7 @@ on `Grant::from_authority`, platen's alias at `workbench.rs` 410-415); F9's two
 `ViewIntent`s and the absence of any conversion between them; F10's two
 `PersonaId`s; F11's README claims against `cargo metadata` (100 members, 13 under
 `ports/`), the ports directory, and pandect's `Cargo.toml`; and the dynamics
-plan's `6c3dca60` and `e932d526` as the carrying commits in §3.2.
+plan's `6c3dca60` and `e932d526` as the carrying commits in §3.2. Added
+2026-10-05: P1's owner, checked against the adoption plan's lines added at
+`1a2e71db` (Mark's answer quoted there) and `projection_compile.rs`'s last
+commit, `e387df16`.
