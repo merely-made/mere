@@ -208,14 +208,33 @@ pub(crate) fn arrangement_hashes(graph: &Graph, keys: &[NodeKey]) -> Vec<(String
         ),
     );
     // Radial's weighted policy is the one reader of the degree weights, and
-    // no canvas strategy picks it, so it is projected through cartography.
+    // no canvas strategy picks it, so it is projected through cartography,
+    // handed the rings and the weights from a channel registry as a host does
+    // (G2b moved both producers out of cartography).
     {
         use cartography::LayoutStrategy;
-        let signals = cartography::IntelligenceSignals::default();
+        let mut registry = crate::signals::ChannelRegistry::new();
+        let signals = cartography::IntelligenceSignals {
+            degree_weights: Some(cartography::ImportanceWeights {
+                weights: registry
+                    .degree_weights(graph)
+                    .iter()
+                    .map(|(key, weight)| (*key, *weight))
+                    .collect(),
+            }),
+            ..cartography::IntelligenceSignals::default()
+        };
         let mut options = crate::canvas::CartographySceneOptions::canvas_pixels(WIDTH, HEIGHT)
             .with_focus(keys[0]);
         options.extents = Some(extents.clone());
-        let request = crate::canvas::build_projection_request(graph, &signals, &options);
+        let mut request = crate::canvas::build_projection_request(graph, &signals, &options);
+        request.intent.axis_values = Some(
+            registry
+                .rings(graph, keys[0])
+                .iter()
+                .map(|(key, ring)| (*key, cartography::AxisValue::Numeric(f64::from(*ring))))
+                .collect(),
+        );
         let projection = cartography::adapters::RadialAdapter {
             config: sceno::Radial {
                 angular_policy: sceno::RadialAngularPolicy::Weighted,

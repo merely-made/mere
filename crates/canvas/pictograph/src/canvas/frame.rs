@@ -310,7 +310,7 @@ impl Canvas {
         // Community rings: a halo per node in its community's colour, spliced into the same
         // world-space transform. (Graph signals — community to a ring.)
         if self.show_community_rings
-            && let Some(community) = self.community_cache.as_ref()
+            && let Some(community) = self.channels.community_held()
         {
             let rings = community_ring_overlay(&self.view, community, |k| self.node_size(k) / 2.0);
             underlay.splice_world_overlays(rings);
@@ -318,7 +318,7 @@ impl Canvas {
         // Bridge rings: a bold ring on the high-betweenness brokers, over the community rings so the
         // connectors stand out. (Graph signals — bridges.)
         if self.show_bridge_rings
-            && let Some(bridges) = self.bridge_cache.as_ref()
+            && let Some(bridges) = self.channels.bridges_held(self.bridge_metric)
         {
             let rings = bridge_ring_overlay(&self.view, bridges, |k| self.node_size(k) / 2.0);
             underlay.splice_world_overlays(rings);

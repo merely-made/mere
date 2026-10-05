@@ -131,6 +131,16 @@ fn every_channel_id_round_trips_and_resolves_over_every_node() {
                     "{id}"
                 )
             },
+            ChannelValues::Order(order) => assert!(covered(&order), "{id}"),
+            // No focus on the fixture: nothing to ring around.
+            ChannelValues::Rings(rings) => assert!(rings.is_empty(), "{id}"),
+            ChannelValues::Coords(coords) => assert!(
+                covered(&coords.iter().map(|(k, _)| *k).collect::<Vec<_>>()),
+                "{id}"
+            ),
+            ChannelValues::Nodes(nodes) => {
+                assert!(nodes.iter().all(|k| keys.contains(k)), "{id}")
+            },
             ChannelValues::Pairs(values) => {
                 assert!(
                     matches!(

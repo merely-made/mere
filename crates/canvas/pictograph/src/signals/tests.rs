@@ -68,24 +68,6 @@ fn no_edges_yields_all_zero_importance() {
 }
 
 #[test]
-fn produce_cheap_signals_fills_only_importance() {
-    let mut graph = Graph::new();
-    graph.add_node(
-        "https://one.example".to_string(),
-        PortablePoint::new(0.0, 0.0),
-    );
-    let signals = produce_cheap_signals(&graph);
-    assert!(signals.importance.is_some(), "importance is produced");
-    assert!(
-        signals.clusters.is_none(),
-        "the un-produced signals stay None"
-    );
-    assert!(signals.affinity.is_none());
-    assert!(signals.bridges.is_none());
-    assert!(signals.embeddings.is_none());
-}
-
-#[test]
 fn betweenness_marks_the_broker_on_a_path() {
     // a-b-c: b is on the only a–c shortest path => betweenness max; the endpoints are 0.
     let mut graph = Graph::new();

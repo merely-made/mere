@@ -4,22 +4,22 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! Graph work whose result is a disclosure.
+//! Graph work whose result is a disclosure an arrangement reads: ring indices
+//! from a breadth-first walk, spectral coordinates from the graph Laplacian,
+//! degree weights, the recency order and the enumeration order. Moved from
+//! cartography (`adapters/producers.rs` and `spiral_score.rs`) unchanged in
+//! arithmetic, so every arrangement's output holds (dynamics grammar plan,
+//! G2b, F38). The [`ChannelRegistry`](super::ChannelRegistry) runs them once
+//! per key; these are the computations it caches.
 //!
-//! Two arrangements read graph topology: rings come from a breadth-first walk,
-//! and spectral coordinates come from the graph Laplacian. Neither computation
-//! belongs in a solver — `sceno`'s contract is that solvers never learn a
-//! source's native truth, and a score carries no relations to learn it from.
-//!
-//! Both reduce to a small per-item value, so the walk happens once here, beside
-//! the graph that already exists, and what crosses into the score is a ring
-//! index or a pair of coordinates. This is the same shape `Hulls` has always
-//! used: the adapter discloses a coordinate, the solver tiles.
+//! Each reduces to a small per-item value, so the walk happens once beside the
+//! graph, and what crosses into a score is a ring index, a weight or a pair of
+//! coordinates: `sceno`'s solvers never learn a source's native truth.
 
 use std::collections::{HashMap, VecDeque};
+use std::time::{SystemTime, UNIX_EPOCH};
 
 use kernel::graph::{Graph, NodeKey};
-use sceno::Vec2;
 
 /// Breadth-first ring index from `focus`. The focus is ring zero.
 ///
@@ -48,12 +48,14 @@ pub fn radial_rings(graph: &Graph, focus: NodeKey) -> HashMap<NodeKey, u32> {
 }
 
 /// Undirected degree plus one, as the angular weight for
-/// [`sceno::RadialAngularPolicy::Weighted`].
+/// `sceno::RadialAngularPolicy::Weighted`.
 ///
-/// The plus-one is why this is disclosed rather than derived: it guarantees a
-/// zero-degree node still gets a slot, and it matches the solver's own default
-/// of `1.0` for an item that disclosed no weight, so an isolated node and an
-/// undisclosed one occupy the same arc.
+/// The plus-one guarantees a zero-degree node still gets a slot, and it matches
+/// the solver's own default of `1.0` for an item that disclosed no weight, so
+/// an isolated node and an undisclosed one occupy the same arc. Self-loops do
+/// not count, and every edge does, hidden or not: this is the graph's degree,
+/// not the physics view's (which is why it is `weight.degree`, not
+/// `mass.degree`).
 pub fn degree_weights(graph: &Graph) -> HashMap<NodeKey, f32> {
     graph
         .nodes()
@@ -72,15 +74,14 @@ pub fn degree_weights(graph: &Graph) -> HashMap<NodeKey, f32> {
 ///
 /// Normalizing here rather than in the solver is deliberate: eigenvector
 /// components come out a few thousandths wide, and only this side knows that.
-/// [`sceno::Embedded`] then applies the caller's origin and scale, which is the
-/// same arithmetic the old `SpectralAdapter` did inline after its own auto-fit.
+/// `sceno::Embedded` then applies the caller's origin and scale.
 ///
 /// Returns an empty map when the graph has no structure to project — an
 /// edgeless or perfectly symmetric graph collapses every component to zero.
 /// Empty rather than all-zeros, so `EmbeddingFallback` decides what happens to
-/// nodes with nothing to place them by, instead of stacking them all at once
+/// nodes with nothing to place them by, instead of stacking them all at one
 /// point.
-pub fn spectral_coords(graph: &Graph, iterations: usize) -> HashMap<NodeKey, Vec2> {
+pub fn spectral_coords(graph: &Graph, iterations: usize) -> HashMap<NodeKey, (f32, f32)> {
     let keys: Vec<NodeKey> = graph.nodes().map(|(key, _)| key).collect();
     if keys.is_empty() {
         return HashMap::new();
@@ -100,7 +101,7 @@ pub fn spectral_coords(graph: &Graph, iterations: usize) -> HashMap<NodeKey, Vec
     }
     keys.iter()
         .zip(&coords)
-        .map(|(key, (x, y))| (*key, Vec2::new((x / max_abs) as f32, (y / max_abs) as f32)))
+        .map(|(key, (x, y))| (*key, ((x / max_abs) as f32, (y / max_abs) as f32)))
         .collect()
 }
 
@@ -112,10 +113,10 @@ fn weighted_adjacency(graph: &Graph, keys: &[NodeKey]) -> Vec<Vec<(usize, f64)>>
     let mut rows: Vec<HashMap<usize, f64>> = vec![HashMap::new(); keys.len()];
     for (i, key) in keys.iter().enumerate() {
         for neighbour in graph.neighbors_undirected(*key) {
-            if let Some(&j) = index.get(&neighbour) {
-                if i != j {
-                    *rows[i].entry(j).or_insert(0.0) += 1.0;
-                }
+            if let Some(&j) = index.get(&neighbour)
+                && i != j
+            {
+                *rows[i].entry(j).or_insert(0.0) += 1.0;
             }
         }
     }
@@ -201,4 +202,75 @@ fn orthonormalize(vector: &mut [f64], found: &[Vec<f64>]) {
 fn start_value(i: usize, eigen_index: usize, n: usize) -> f64 {
     let t = i as f64 / n.max(1) as f64;
     ((eigen_index + 1) as f64 * std::f64::consts::PI * t).cos()
+}
+
+/// The graph's own enumeration order: what every score's ordinal follows, and
+/// the order a timeline lays its axis along.
+pub fn enumeration_order(graph: &Graph) -> Vec<NodeKey> {
+    graph.nodes().map(|(key, _)| key).collect()
+}
+
+/// The recency channel: every node, most recently visited first, and each
+/// node's recency normalized into `0..=1` (newest `1.0`).
+#[derive(Clone, Debug, Default, PartialEq)]
+pub struct Recency {
+    /// Most recent first. Visit facets persist millisecond timestamps, so
+    /// nodes created in one tick commonly tie; a tie goes to the larger
+    /// stable id, so the order is portable instead of inheriting local graph
+    /// iteration.
+    pub order: Vec<NodeKey>,
+    /// Each node's visit time across the graph's span, in `f64` seconds, then
+    /// `f32` (F51: the spiral's arithmetic). A graph with one distinct visit
+    /// time reads every node as newest.
+    pub values: HashMap<NodeKey, f32>,
+}
+
+pub fn recency(graph: &Graph) -> Recency {
+    let mut order = enumeration_order(graph);
+    order.sort_by_key(|key| {
+        let node = graph
+            .get_node(*key)
+            .expect("node keys came from this graph");
+        (
+            std::cmp::Reverse(graph.node_last_visited(*key).unwrap_or(UNIX_EPOCH)),
+            std::cmp::Reverse(node.id),
+        )
+    });
+    let values = normalized_recency(graph, &order);
+    Recency { order, values }
+}
+
+fn normalized_recency(graph: &Graph, keys: &[NodeKey]) -> HashMap<NodeKey, f32> {
+    let times: Vec<_> = keys
+        .iter()
+        .copied()
+        .map(|key| {
+            let seconds = graph
+                .node_last_visited(key)
+                .and_then(|time: SystemTime| time.duration_since(UNIX_EPOCH).ok())
+                .map(|duration| duration.as_secs_f64())
+                .unwrap_or(0.0);
+            (key, seconds)
+        })
+        .collect();
+    let minimum = times
+        .iter()
+        .map(|(_, time)| *time)
+        .fold(f64::INFINITY, f64::min);
+    let maximum = times
+        .iter()
+        .map(|(_, time)| *time)
+        .fold(f64::NEG_INFINITY, f64::max);
+    let span = maximum - minimum;
+    times
+        .into_iter()
+        .map(|(key, time)| {
+            let value = if span.is_finite() && span > f64::EPSILON {
+                ((time - minimum) / span) as f32
+            } else {
+                1.0
+            };
+            (key, value)
+        })
+        .collect()
 }

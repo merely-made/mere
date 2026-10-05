@@ -9212,6 +9212,7 @@ dependencies = [
  "mere-cartography",
  "mere-kernel",
  "mesquite",
+ "pictograph",
  "sprigging",
  "taproot",
  "uuid",
