@@ -106,7 +106,9 @@ if (Test-Path -LiteralPath $installedDevice) {
 Copy-Item -LiteralPath $deviceSource -Destination $installedDevice -Force
 Copy-Item -LiteralPath $nativeSource -Destination $installedNative -Force
 
-$deviceArguments = "--log-file ""$logFile"""
+# --installed: this launch alone may bind the standard agent pipe and the
+# default browser and app pipes; any other djinn refuses them.
+$deviceArguments = "--installed --log-file ""$logFile"""
 $resolvedDataRoot = $null
 if ($DataRoot) {
     $resolvedDataRoot = [System.IO.Path]::GetFullPath($DataRoot)
