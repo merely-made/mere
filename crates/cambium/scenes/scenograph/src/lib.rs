@@ -7,14 +7,17 @@
 //! Scenograph: host-neutral projection authoring definitions.
 //!
 //! This crate owns durable authoring data, local validation, source binding,
-//! and deterministic JSON. Hosts own their editor UI, source acquisition,
-//! catalog resolution, persistence policy, compilation, and realization.
-//! It deliberately has no runtime, solver, widget, or product dependency.
+//! deterministic JSON, and the resolved [`dataset`] a host compiles against.
+//! Hosts own their editor UI, source acquisition, persistence policy, item
+//! measurement, and realization; arrangement resolution and compilation are
+//! shared in `scenomise`. It deliberately has no runtime, solver, widget, or
+//! product dependency.
 
 use std::collections::BTreeMap;
 
 use serde::{Deserialize, Serialize};
 
+pub mod dataset;
 pub mod relationship;
 
 /// The stable schema version for authored projection definitions.

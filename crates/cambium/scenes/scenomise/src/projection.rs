@@ -16,10 +16,13 @@
 use std::collections::{BTreeMap, HashMap, HashSet};
 
 use sceno::{
-    Arrangement as ScenoArrangement, Footprint, Geographic, Grid, InstanceId, Placement,
-    Representation, Score, ScoreItem, Size2, SourceRef, Vec2,
+    Arrangement as ScenoArrangement, AxisValue, Footprint, InstanceId, Placement, Representation,
+    Score, ScoreItem, Size2, SourceRef, Vec2,
 };
 use serde::{Deserialize, Serialize};
+
+use crate::catalog::{ChannelUse, Family, Measure, OptionIssue};
+use crate::registry::SolverRegistry;
 
 pub use scenograph::relationship::{
     AUTHORED_ORDER_FACET, EXPLAINED_RELATIONSHIPS_FACET, OCCURRENCE_LABELS_FACET, RecipeEdit,
@@ -95,20 +98,8 @@ impl Default for RelationshipCompileLimits {
     }
 }
 
-/// Compile current disclosed evidence; never infer relationships from numeric
-/// fields, compare domain values, execute scripts or acquire an authority.
-pub fn compile_relationship_snapshot(
-    snapshot: &RelationshipSnapshot,
-    disclosed: &RelationshipDataset,
-) -> Result<CompiledRelationshipProjection, Vec<CompileIssue>> {
-    compile_relationship_snapshot_with_limits(
-        snapshot,
-        disclosed,
-        &RelationshipCompileLimits::default(),
-    )
-}
-
-pub fn compile_relationship_snapshot_with_limits(
+fn relationship_snapshot(
+    compiler: &ProjectionCompiler,
     snapshot: &RelationshipSnapshot,
     disclosed: &RelationshipDataset,
     limits: &RelationshipCompileLimits,
@@ -136,8 +127,8 @@ pub fn compile_relationship_snapshot_with_limits(
         }
     }
     let definition = &snapshot.recipe.definition;
-    if definition.arrangement.kind != GRID_ARRANGEMENT_ID {
-        issues.push(CompileIssue::new("arrangement.kind", "authored occurrence order requires grid.default; it is not a physical scatter coordinate"));
+    if Family::resolve(&definition.arrangement.kind) != Some(Family::Grid) {
+        issues.push(CompileIssue::new("arrangement.kind", "authored occurrence order requires the grid arrangement; it is not a physical scatter coordinate"));
     }
     if definition.reading.kind != "nodes"
         || definition.reading.key != "occurrence_id"
@@ -305,7 +296,7 @@ pub fn compile_relationship_snapshot_with_limits(
             .values
             .insert("__recipe_layout_row".into(), ProjectionValue::Number(0.0));
     }
-    let mut projection = compile_snapshot(
+    let mut projection = compiler.compile_snapshot(
         &ProjectionSnapshot {
             definition: bound,
             selected_occurrence: snapshot.selected_occurrence.clone(),
@@ -502,76 +493,122 @@ fn relationship_bounds(
 #[path = "projection_relationship_tests.rs"]
 mod relationship_tests;
 
+#[cfg(test)]
+#[path = "projection_catalog_tests.rs"]
+mod catalog_tests;
+
 use scenograph::{Channel, ProjectionDefinition, PublicSourceRevision, SourceBinding};
 
-/// The two stable arrangement ids Graphshell currently compiles.
+/// Arrangement ids saved recipes carry. The [`catalog`](crate::catalog) reads
+/// them as aliases of `grid` and `geographic`.
 pub const GRID_ARRANGEMENT_ID: &str = "grid.default";
 pub const SCATTER_ARRANGEMENT_ID: &str = "scatter.default";
 const COORDINATES_DIRECTION: &str = "coordinates";
 const NODES_READING_ID: &str = "nodes";
 
-/// The type a product disclosed for a field in one resolved dataset.
-#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum ProjectionFieldType {
-    Text,
-    Number,
-    Boolean,
-}
+pub use scenograph::dataset::{
+    ProjectionDataset, ProjectionFieldType, ProjectionOccurrence, ProjectionValue,
+};
 
-/// One source value, kept small enough to make an adapter's disclosure plain.
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case", tag = "kind", content = "value")]
-pub enum ProjectionValue {
-    Text(String),
-    Number(f64),
-    Boolean(bool),
-}
-
-impl ProjectionValue {
-    fn field_type(&self) -> ProjectionFieldType {
-        match self {
-            Self::Text(_) => ProjectionFieldType::Text,
-            Self::Number(_) => ProjectionFieldType::Number,
-            Self::Boolean(_) => ProjectionFieldType::Boolean,
-        }
-    }
-
-    fn text(&self) -> Option<&str> {
-        match self {
-            Self::Text(value) => Some(value),
-            _ => None,
-        }
-    }
-
-    fn number(&self) -> Option<f64> {
-        match self {
-            Self::Number(value) => Some(*value),
-            _ => None,
-        }
-    }
-}
-
-/// One occurrence in a product's resolved reading.
+/// Item sizes the host measured for the representations it realizes.
 ///
-/// `occurrence_id` is Graphshell's selection/persistence identity. `source`
-/// remains source truth identity, so two occurrences may intentionally name
-/// the same source.
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-pub struct ProjectionOccurrence {
-    pub occurrence_id: String,
-    pub source: SourceRef,
-    pub values: BTreeMap<String, ProjectionValue>,
+/// Presentation stays with the host: the compiler places what the host says it
+/// will draw, and writes in no size of its own.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct ItemSizes {
+    /// The footprint of one card.
+    pub card: Size2,
 }
 
-/// A product-resolved dataset supplied to the compiler without a product
-/// dependency or a portable product-data contract.
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-pub struct ProjectionDataset {
-    pub source: SourceBinding,
-    pub revision: PublicSourceRevision,
-    pub fields: BTreeMap<String, ProjectionFieldType>,
-    pub occurrences: Vec<ProjectionOccurrence>,
+/// One host's compiler: its measured item sizes and the solvers it registered.
+///
+/// A recipe's arrangement id resolves through the built-in
+/// [`catalog`](crate::catalog) first and this registry second.
+#[derive(Debug)]
+pub struct ProjectionCompiler {
+    sizes: ItemSizes,
+    registry: SolverRegistry,
+}
+
+impl ProjectionCompiler {
+    /// A compiler with no custom solvers.
+    pub fn new(sizes: ItemSizes) -> Self {
+        Self::with_registry(sizes, SolverRegistry::new())
+    }
+
+    pub fn with_registry(sizes: ItemSizes, registry: SolverRegistry) -> Self {
+        Self { sizes, registry }
+    }
+
+    pub fn sizes(&self) -> ItemSizes {
+        self.sizes
+    }
+
+    pub fn registry(&self) -> &SolverRegistry {
+        &self.registry
+    }
+
+    /// Compile one saved definition against the current disclosed dataset.
+    pub fn compile(
+        &self,
+        definition: &ProjectionDefinition,
+        dataset: &ProjectionDataset,
+    ) -> Result<CompiledProjection, Vec<CompileIssue>> {
+        compile_inner(self, definition, dataset, None, None)
+    }
+
+    /// Revalidate a reading while retaining solved geometry when all solver
+    /// inputs are unchanged. The host's item sizes travel in the score's
+    /// footprints, so a resized card re-solves; labels and unrelated disclosed
+    /// values do not.
+    pub fn refresh(
+        &self,
+        previous: &CompiledProjection,
+        definition: &ProjectionDefinition,
+        dataset: &ProjectionDataset,
+    ) -> Result<CompiledProjection, Vec<CompileIssue>> {
+        compile_inner(self, definition, dataset, None, Some(previous))
+    }
+
+    /// Reopen a saved definition and restore selection only when that exact
+    /// occurrence still exists in the resolved dataset.
+    pub fn compile_snapshot(
+        &self,
+        snapshot: &ProjectionSnapshot,
+        dataset: &ProjectionDataset,
+    ) -> Result<CompiledProjection, Vec<CompileIssue>> {
+        compile_inner(
+            self,
+            &snapshot.definition,
+            dataset,
+            snapshot.selected_occurrence.as_deref(),
+            None,
+        )
+    }
+
+    /// Compile current disclosed evidence; never infer relationships from
+    /// numeric fields, compare domain values, execute scripts or acquire an
+    /// authority.
+    pub fn compile_relationship_snapshot(
+        &self,
+        snapshot: &RelationshipSnapshot,
+        disclosed: &RelationshipDataset,
+    ) -> Result<CompiledRelationshipProjection, Vec<CompileIssue>> {
+        self.compile_relationship_snapshot_with_limits(
+            snapshot,
+            disclosed,
+            &RelationshipCompileLimits::default(),
+        )
+    }
+
+    pub fn compile_relationship_snapshot_with_limits(
+        &self,
+        snapshot: &RelationshipSnapshot,
+        disclosed: &RelationshipDataset,
+        limits: &RelationshipCompileLimits,
+    ) -> Result<CompiledRelationshipProjection, Vec<CompileIssue>> {
+        relationship_snapshot(self, snapshot, disclosed, limits)
+    }
 }
 
 /// Field-specific compiler feedback suitable for the authoring host.
@@ -590,7 +627,7 @@ impl CompileIssue {
     }
 }
 
-/// The scene and exact reverse mappings a Graphshell realization needs.
+/// The scene and exact reverse mappings a host realization needs.
 #[derive(Debug)]
 pub struct CompiledProjection {
     pub score: Score,
@@ -611,47 +648,40 @@ pub struct ProjectionSnapshot {
     pub selected_occurrence: Option<String>,
 }
 
-/// Compile one saved definition against the current disclosed dataset.
-pub fn compile(
-    definition: &ProjectionDefinition,
-    dataset: &ProjectionDataset,
-) -> Result<CompiledProjection, Vec<CompileIssue>> {
-    compile_inner(definition, dataset, None, None)
+/// Where a recipe's arrangement resolved.
+enum Target {
+    Builtin(Family),
+    Custom(String),
 }
 
-/// Revalidate a reading while retaining solved geometry when all solver inputs
-/// are unchanged. Labels and unrelated disclosed values do not require solving
-/// this fixed-footprint card representation. Future measured representations
-/// must put their measurements in the score before this comparison.
-pub fn refresh(
-    previous: &CompiledProjection,
-    definition: &ProjectionDefinition,
-    dataset: &ProjectionDataset,
-) -> Result<CompiledProjection, Vec<CompileIssue>> {
-    compile_inner(definition, dataset, None, Some(previous))
+impl Target {
+    /// How the family reads x and y; a custom solver reads what they disclose.
+    fn channels(&self) -> Option<ChannelUse> {
+        match self {
+            Self::Builtin(family) => Some(family.channels()),
+            Self::Custom(_) => None,
+        }
+    }
 }
 
-/// Reopen a saved definition and restore selection only when that exact
-/// occurrence still exists in the resolved dataset.
-pub fn compile_snapshot(
-    snapshot: &ProjectionSnapshot,
-    dataset: &ProjectionDataset,
-) -> Result<CompiledProjection, Vec<CompileIssue>> {
-    compile_inner(
-        &snapshot.definition,
-        dataset,
-        snapshot.selected_occurrence.as_deref(),
-        None,
-    )
+fn resolve_target(compiler: &ProjectionCompiler, definition: &ProjectionDefinition) -> Option<Target> {
+    let kind = definition.arrangement.kind.as_str();
+    Family::resolve(kind).map(Target::Builtin).or_else(|| {
+        compiler
+            .registry
+            .resolve(kind)
+            .map(|_| Target::Custom(kind.to_owned()))
+    })
 }
 
 fn compile_inner(
+    compiler: &ProjectionCompiler,
     definition: &ProjectionDefinition,
     dataset: &ProjectionDataset,
     selected_occurrence: Option<&str>,
     previous: Option<&CompiledProjection>,
 ) -> Result<CompiledProjection, Vec<CompileIssue>> {
-    let mut issues = validation_issues(definition, dataset);
+    let mut issues = validation_issues(compiler, definition, dataset);
     if let Some(selected) = selected_occurrence
         && !dataset
             .occurrences
@@ -674,45 +704,66 @@ fn compile_inner(
         .and_then(|channel| field_name(channel, "encoding.label"))
         .expect("validated label field");
     let x_field = field_name(&definition.encoding.x, "encoding.x").expect("validated x field");
-    let y_field = field_name(&definition.encoding.y, "encoding.y").expect("validated y field");
-    let arrangement = arrangement_for(definition).expect("validated arrangement");
+    let y_field = field_name(&definition.encoding.y, "encoding.y");
+    let target = resolve_target(compiler, definition).expect("validated arrangement");
+    let channels = target.channels();
 
     let mut occurrences: Vec<_> = dataset.occurrences.iter().collect();
     occurrences.sort_by(|left, right| left.occurrence_id.cmp(&right.occurrence_id));
-    let grid_ranks = (definition.arrangement.kind == GRID_ARRANGEMENT_ID).then(|| {
+    if channels == Some(ChannelUse::Order) {
+        // Order-only families place by ordinal, so x decides the order; the
+        // stable sort keeps occurrence ids as the tiebreak.
+        occurrences.sort_by(|left, right| order_cmp(left, right, x_field));
+    }
+    let measure = Measure {
+        largest: compiler.sizes.card,
+        count: occurrences.len(),
+        spacing: definition.arrangement.spacing as f32,
+        coordinates: (channels == Some(ChannelUse::Coordinate))
+            .then(|| coordinate_extent(&occurrences, x_field, y_field.expect("validated y field")))
+            .flatten(),
+    };
+    let arrangement = match &target {
+        Target::Builtin(family) => family
+            .arrangement(&definition.arrangement.options, &measure)
+            .map_err(option_issues)?,
+        Target::Custom(id) => ScenoArrangement::Custom {
+            id: id.clone(),
+            config: serde_json::Value::Object(
+                definition
+                    .arrangement
+                    .options
+                    .iter()
+                    .map(|(key, value)| (key.clone(), serde_json::Value::String(value.clone())))
+                    .collect(),
+            ),
+        },
+    };
+    let grid_ranks = (channels == Some(ChannelUse::Cells)).then(|| {
         (
             dense_ranks(&occurrences, x_field),
-            dense_ranks(&occurrences, y_field),
+            dense_ranks(&occurrences, y_field.expect("validated y field")),
         )
     });
     let mut score = Score::new(arrangement);
     score.generation = stable_generation(dataset);
     for (ordinal, occurrence) in occurrences.iter().enumerate() {
-        let x = number(occurrence, x_field).expect("validated x value");
-        let y = number(occurrence, y_field).expect("validated y value");
-        score.items.push(ScoreItem {
+        let mut item = ScoreItem {
             source: occurrence.source.clone(),
             ordinal: ordinal as u32,
             footprint: Footprint::Rect {
-                size: Size2::new(164.0, 68.0),
+                size: compiler.sizes.card,
             },
             representation: Representation::Card,
-            placement: if let Some((x_ranks, y_ranks)) = &grid_ranks {
-                // Dense numeric ranks preserve the two declared encodings
-                // without allocating ninety-six empty rows for a 96 bpm card.
-                Placement::Cell {
-                    column: x_ranks[&dense_rank_key(x)],
-                    row: y_ranks[&dense_rank_key(y)],
-                }
-            } else {
-                placement_for(definition, x, y).expect("validated placement")
-            },
+            placement: Placement::Ordinal,
             layer: 0,
             visible: true,
             axis: None,
             embedding: None,
             weight: None,
-        });
+        };
+        disclose(&mut item, channels, occurrence, x_field, y_field, grid_ranks.as_ref());
+        score.items.push(item);
     }
     // Compare exact solver inputs, not revision hashes: source revisions can
     // change without affecting placement, and unchanged revisions cannot excuse
@@ -733,7 +784,8 @@ fn compile_inner(
         scene.generation = score.generation;
         scene
     } else {
-        crate::solve(&score)
+        crate::solve_via(&score, &compiler.registry)
+            .map_err(|error| vec![CompileIssue::new("arrangement.kind", error.to_string())])?
     };
     let mut labels = HashMap::new();
     let mut occurrence_by_instance = HashMap::new();
@@ -764,6 +816,110 @@ fn compile_inner(
     })
 }
 
+/// Give an item what its family reads from x and y.
+fn disclose(
+    item: &mut ScoreItem,
+    channels: Option<ChannelUse>,
+    occurrence: &ProjectionOccurrence,
+    x_field: &str,
+    y_field: Option<&str>,
+    grid_ranks: Option<&(BTreeMap<u64, i32>, BTreeMap<u64, i32>)>,
+) {
+    let x_number = number(occurrence, x_field);
+    let x_text = occurrence.values.get(x_field).and_then(ProjectionValue::text);
+    let y_number = y_field.and_then(|field| number(occurrence, field));
+    let xy = || {
+        let (x, y) = (x_number.expect("validated x value"), y_number.expect("validated y value"));
+        (x, y)
+    };
+    match channels {
+        Some(ChannelUse::Cells) => {
+            let (x, y) = xy();
+            let (x_ranks, y_ranks) = grid_ranks.expect("grid ranks for a cell family");
+            // Dense numeric ranks preserve the two declared encodings without
+            // allocating ninety-six empty rows for a 96 bpm card.
+            item.placement = Placement::Cell {
+                column: x_ranks[&dense_rank_key(x)],
+                row: y_ranks[&dense_rank_key(y)],
+            };
+        },
+        Some(ChannelUse::Coordinate) => {
+            let (x, y) = xy();
+            item.placement = Placement::Coordinate(Vec2::new(x as f32, y as f32));
+        },
+        Some(ChannelUse::Embedding) => {
+            let (x, y) = xy();
+            item.embedding = Some(Vec2::new(x as f32, y as f32));
+        },
+        Some(ChannelUse::NumericAxis | ChannelUse::IntegerAxis) => {
+            item.axis = Some(AxisValue::Numeric(x_number.expect("validated x value")));
+        },
+        Some(ChannelUse::CategoricalAxis) => {
+            item.axis = Some(AxisValue::Categorical(
+                x_text.expect("validated x value").to_owned(),
+            ));
+        },
+        // The ordinal carries the order.
+        Some(ChannelUse::Order) => {},
+        // A custom solver reads whatever x and y can disclose; its declared
+        // requirements are checked when it solves.
+        None => {
+            item.axis = x_number
+                .map(AxisValue::Numeric)
+                .or_else(|| x_text.map(|text| AxisValue::Categorical(text.to_owned())));
+            item.embedding = x_number
+                .zip(y_number)
+                .map(|(x, y)| Vec2::new(x as f32, y as f32));
+            item.weight = y_number.map(|y| y as f32);
+        },
+    }
+}
+
+/// Order two occurrences by their x value; validation keeps one type per field.
+fn order_cmp(
+    left: &ProjectionOccurrence,
+    right: &ProjectionOccurrence,
+    field: &str,
+) -> std::cmp::Ordering {
+    match (left.values.get(field), right.values.get(field)) {
+        (Some(ProjectionValue::Number(a)), Some(ProjectionValue::Number(b))) => a.total_cmp(b),
+        (Some(ProjectionValue::Text(a)), Some(ProjectionValue::Text(b))) => a.cmp(b),
+        _ => std::cmp::Ordering::Equal,
+    }
+}
+
+/// The smallest and largest disclosed coordinate, in the source's units.
+fn coordinate_extent(
+    occurrences: &[&ProjectionOccurrence],
+    x_field: &str,
+    y_field: &str,
+) -> Option<(Vec2, Vec2)> {
+    occurrences
+        .iter()
+        .filter_map(|occurrence| {
+            Some(Vec2::new(
+                number(occurrence, x_field)? as f32,
+                number(occurrence, y_field)? as f32,
+            ))
+        })
+        .fold(None, |extent, at| {
+            Some(match extent {
+                None => (at, at),
+                Some((min, max)) => (
+                    Vec2::new(min.x.min(at.x), min.y.min(at.y)),
+                    Vec2::new(max.x.max(at.x), max.y.max(at.y)),
+                ),
+            })
+        })
+}
+
+fn option_issues(issues: Vec<OptionIssue>) -> Vec<CompileIssue> {
+    issues
+        .into_iter()
+        .map(|issue| CompileIssue::new(issue.field, issue.message))
+        .collect()
+}
+
 /// Builds the same dense ranks as the former per-occurrence closure, once for
 /// each grid channel. Finite values have one `==` equivalence class per bit
 /// pattern except signed zero, which deliberately shares a rank.
@@ -786,6 +942,7 @@ fn dense_rank_key(value: f64) -> u64 {
 }
 
 fn validation_issues(
+    compiler: &ProjectionCompiler,
     definition: &ProjectionDefinition,
     dataset: &ProjectionDataset,
 ) -> Vec<CompileIssue> {
@@ -854,48 +1011,55 @@ fn validation_issues(
         dataset,
         "reading.key",
         &definition.reading.key,
-        ProjectionFieldType::Text,
+        &[ProjectionFieldType::Text],
     );
-    required_channel_field(
-        &mut issues,
-        dataset,
-        "encoding.x",
-        &definition.encoding.x,
-        ProjectionFieldType::Number,
-    );
-    required_channel_field(
-        &mut issues,
-        dataset,
-        "encoding.y",
-        &definition.encoding.y,
-        ProjectionFieldType::Number,
-    );
-    let Some(label) = definition.encoding.label.as_ref() else {
-        issues.push(CompileIssue::new(
+    let target = resolve_target(compiler, definition);
+    let (x_types, reads_y): (&[ProjectionFieldType], bool) =
+        match target.as_ref().and_then(Target::channels) {
+            Some(channels) => (channels.x_types(), channels.reads_y()),
+            // A custom solver reads whatever x discloses; an unresolved
+            // arrangement is reported below.
+            None => (ANY_FIELD_TYPE, false),
+        };
+    required_channel_field(&mut issues, dataset, "encoding.x", &definition.encoding.x, x_types);
+    if reads_y {
+        required_channel_field(
+            &mut issues,
+            dataset,
+            "encoding.y",
+            &definition.encoding.y,
+            &[ProjectionFieldType::Number],
+        );
+    }
+    match definition.encoding.label.as_ref() {
+        Some(label) => required_channel_field(
+            &mut issues,
+            dataset,
+            "encoding.label",
+            label,
+            &[ProjectionFieldType::Text],
+        ),
+        None => issues.push(CompileIssue::new(
             "encoding.label",
             "an executable projection needs a text label field",
-        ));
-        validate_arrangement(&mut issues, definition);
-        validate_occurrences(&mut issues, definition, dataset);
-        return issues;
-    };
-    required_channel_field(
-        &mut issues,
-        dataset,
-        "encoding.label",
-        label,
-        ProjectionFieldType::Text,
-    );
+        )),
+    }
     if definition.encoding.color.is_some() {
         issues.push(CompileIssue::new(
             "encoding.color",
             "color encoding is not implemented by this compiler",
         ));
     }
-    validate_arrangement(&mut issues, definition);
-    validate_occurrences(&mut issues, definition, dataset);
+    validate_arrangement(&mut issues, compiler, definition, dataset, target.as_ref());
+    validate_occurrences(&mut issues, definition, dataset, target.as_ref());
     issues
 }
+
+const ANY_FIELD_TYPE: &[ProjectionFieldType] = &[
+    ProjectionFieldType::Text,
+    ProjectionFieldType::Number,
+    ProjectionFieldType::Boolean,
+];
 
 fn source_matches(
     issues: &mut Vec<CompileIssue>,
@@ -939,10 +1103,10 @@ fn required_field(
     dataset: &ProjectionDataset,
     target: &str,
     field: &str,
-    expected: ProjectionFieldType,
+    expected: &[ProjectionFieldType],
 ) {
     match dataset.fields.get(field) {
-        Some(actual) if *actual == expected => {},
+        Some(actual) if expected.contains(actual) => {},
         Some(_) => issues.push(CompileIssue::new(target, "field has an incompatible type")),
         None => issues.push(CompileIssue::new(
             target,
@@ -956,7 +1120,7 @@ fn required_channel_field(
     dataset: &ProjectionDataset,
     target: &str,
     channel: &Channel,
-    expected: ProjectionFieldType,
+    expected: &[ProjectionFieldType],
 ) {
     match channel {
         Channel::Field(field) => required_field(issues, dataset, target, field, expected),
@@ -967,24 +1131,41 @@ fn required_channel_field(
     }
 }
 
-fn validate_arrangement(issues: &mut Vec<CompileIssue>, definition: &ProjectionDefinition) {
-    match definition.arrangement.kind.as_str() {
-        GRID_ARRANGEMENT_ID | SCATTER_ARRANGEMENT_ID => {},
-        _ => issues.push(CompileIssue::new(
+fn validate_arrangement(
+    issues: &mut Vec<CompileIssue>,
+    compiler: &ProjectionCompiler,
+    definition: &ProjectionDefinition,
+    dataset: &ProjectionDataset,
+    target: Option<&Target>,
+) {
+    match target {
+        None => issues.push(CompileIssue::new(
             "arrangement.kind",
-            "supported arrangements are grid.default and scatter.default",
+            format!(
+                "{} names no built-in arrangement and no registered solver",
+                definition.arrangement.kind
+            ),
         )),
+        Some(Target::Builtin(family)) => {
+            // Options are judged against a provisional measure; their meaning
+            // does not depend on where the items fall.
+            let measure = Measure {
+                largest: compiler.sizes.card,
+                count: dataset.occurrences.len(),
+                spacing: definition.arrangement.spacing as f32,
+                coordinates: None,
+            };
+            if let Err(refused) = family.arrangement(&definition.arrangement.options, &measure) {
+                issues.extend(option_issues(refused));
+            }
+        },
+        // A custom solver judges its own configuration when it solves.
+        Some(Target::Custom(_)) => {},
     }
     if definition.arrangement.direction != COORDINATES_DIRECTION {
         issues.push(CompileIssue::new(
             "arrangement.direction",
             "this compiler requires the coordinates direction",
-        ));
-    }
-    if !definition.arrangement.options.is_empty() {
-        issues.push(CompileIssue::new(
-            "arrangement.options",
-            "this compiler does not support arrangement options",
         ));
     }
 }
@@ -993,7 +1174,9 @@ fn validate_occurrences(
     issues: &mut Vec<CompileIssue>,
     definition: &ProjectionDefinition,
     dataset: &ProjectionDataset,
+    target: Option<&Target>,
 ) {
+    let channels = target.and_then(Target::channels);
     let mut seen = HashSet::new();
     let label = definition
         .encoding
@@ -1001,7 +1184,10 @@ fn validate_occurrences(
         .as_ref()
         .and_then(|channel| field_name(channel, ""));
     let x = field_name(&definition.encoding.x, "");
-    let y = field_name(&definition.encoding.y, "");
+    let y = channels
+        .is_some_and(ChannelUse::reads_y)
+        .then(|| field_name(&definition.encoding.y, ""))
+        .flatten();
     for occurrence in &dataset.occurrences {
         let prefix = format!("occurrences.{}", occurrence.occurrence_id);
         if occurrence.occurrence_id.trim().is_empty() || !seen.insert(&occurrence.occurrence_id) {
@@ -1040,30 +1226,46 @@ fn validate_occurrences(
                 "the reading key must repeat this occurrence id exactly",
             ));
         }
-        for (target, field, type_name) in [
-            ("encoding.label", label, "text"),
-            ("encoding.x", x, "number"),
-            ("encoding.y", y, "number"),
-        ] {
-            let Some(field) = field else {
-                continue;
-            };
-            let value = occurrence.values.get(field);
-            let valid = match type_name {
-                "text" => value.and_then(ProjectionValue::text).is_some(),
-                "number" => value
-                    .and_then(ProjectionValue::number)
-                    .is_some_and(f64::is_finite),
-                _ => false,
-            };
-            if !valid {
+        let finite = |value: Option<&ProjectionValue>| {
+            value
+                .and_then(ProjectionValue::number)
+                .is_some_and(f64::is_finite)
+        };
+        let checks = [
+            (
+                "encoding.label",
+                label,
+                "a text",
+                label.map(|field| {
+                    occurrence
+                        .values
+                        .get(field)
+                        .and_then(ProjectionValue::text)
+                        .is_some()
+                }),
+            ),
+            (
+                "encoding.x",
+                x,
+                x_kind(channels),
+                x.map(|field| x_valid(channels, occurrence.values.get(field))),
+            ),
+            (
+                "encoding.y",
+                y,
+                "a finite number",
+                y.map(|field| finite(occurrence.values.get(field))),
+            ),
+        ];
+        for (target, field, kind, valid) in checks {
+            if let (Some(field), Some(false)) = (field, valid) {
                 issues.push(CompileIssue::new(
                     format!("{prefix}.values.{field}"),
-                    format!("{target} needs a finite {type_name} value"),
+                    format!("{target} needs {kind} value"),
                 ));
             }
         }
-        if definition.arrangement.kind == SCATTER_ARRANGEMENT_ID {
+        if matches!(channels, Some(ChannelUse::Coordinate | ChannelUse::Embedding)) {
             for field in [x, y].into_iter().flatten() {
                 if let Some(value) = occurrence
                     .values
@@ -1074,11 +1276,38 @@ fn validate_occurrences(
                 {
                     issues.push(CompileIssue::new(
                         format!("{prefix}.values.{field}"),
-                        "scatter coordinates must fit finite scene units",
+                        "coordinates must fit finite scene units",
                     ));
                 }
             }
         }
+    }
+}
+
+/// What x must hold for a channel use, in an issue's words.
+fn x_kind(channels: Option<ChannelUse>) -> &'static str {
+    match channels {
+        Some(ChannelUse::CategoricalAxis) => "a text",
+        Some(ChannelUse::Order) => "a text or finite number",
+        Some(ChannelUse::IntegerAxis) => "a whole number",
+        Some(_) => "a finite number",
+        None => "a",
+    }
+}
+
+fn x_valid(channels: Option<ChannelUse>, value: Option<&ProjectionValue>) -> bool {
+    let number = value.and_then(ProjectionValue::number);
+    match channels {
+        Some(ChannelUse::CategoricalAxis) => value.and_then(ProjectionValue::text).is_some(),
+        Some(ChannelUse::Order) => {
+            value.and_then(ProjectionValue::text).is_some() || number.is_some_and(f64::is_finite)
+        },
+        Some(ChannelUse::IntegerAxis) => {
+            number.is_some_and(|value| value.is_finite() && value.fract() == 0.0)
+        },
+        Some(_) => number.is_some_and(f64::is_finite),
+        // A custom solver reads whatever x carries.
+        None => value.is_some(),
     }
 }
 
@@ -1094,35 +1323,6 @@ fn number(occurrence: &ProjectionOccurrence, field: &str) -> Option<f64> {
         .values
         .get(field)
         .and_then(ProjectionValue::number)
-}
-
-fn arrangement_for(definition: &ProjectionDefinition) -> Option<ScenoArrangement> {
-    let spacing = definition.arrangement.spacing as f32;
-    match definition.arrangement.kind.as_str() {
-        GRID_ARRANGEMENT_ID => Some(ScenoArrangement::Grid(Grid {
-            origin: Vec2::ZERO,
-            cell: Vec2::new(184.0, 84.0),
-            columns: 8,
-            gap: spacing,
-        })),
-        SCATTER_ARRANGEMENT_ID => Some(ScenoArrangement::Geographic(Geographic {
-            origin: Vec2::ZERO,
-            units_per_coordinate: spacing,
-            invert_y: false,
-        })),
-        _ => None,
-    }
-}
-
-fn placement_for(definition: &ProjectionDefinition, x: f64, y: f64) -> Option<Placement> {
-    match definition.arrangement.kind.as_str() {
-        GRID_ARRANGEMENT_ID => Some(Placement::Cell {
-            column: x as i32,
-            row: y as i32,
-        }),
-        SCATTER_ARRANGEMENT_ID => Some(Placement::Coordinate(Vec2::new(x as f32, y as f32))),
-        _ => None,
-    }
 }
 
 fn stable_generation(dataset: &ProjectionDataset) -> u64 {

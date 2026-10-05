@@ -8248,6 +8248,7 @@ dependencies = [
 name = "scenograph"
 version = "0.0.4"
 dependencies = [
+ "sceno",
  "serde",
  "serde_json",
 ]
