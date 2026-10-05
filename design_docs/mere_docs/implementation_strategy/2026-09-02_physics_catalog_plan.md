@@ -2663,3 +2663,61 @@ binning are the useful patterns.
   `frame_budget` test (3,030 us at 165 Hz intervals). Gates: seiche 127/127
   (121 without actor, 127 + 3 with gpu), pictograph 297, graphshell `web` 240,
   mere and graphshell checked clean.
+- 2026-10-05 (seiche's speed, "Infer the period" and "Mere entry point, then
+  turnstone shouldn't be left stale, so that next" carried out, branch
+  `seiche-speed`). Main `4bc901d2` merged (`1dc8f5a8`): the plan the only file
+  both sides changed, weave's result identical to `git merge-file`'s, no
+  conflict. The entry point (`1d2f04cf`): seiche gains `DEFAULT_BUDGET_SHARE`
+  (0.5, moved from graphshell's `web_speed`), `FALLBACK_DISPLAY_PERIOD` (60
+  Hz's), `display_period(millihertz)` for the rate winit's
+  `MonitorHandle::refresh_rate_millihertz` reports (60 Hz's when unknown or
+  zero), `StepBudget::of_period`, and on native targets
+  `StepBudget::for_display`, half the period on the monotonic clock with no
+  margin; `Physics::step_budget` hands back the budget last set, inline or
+  offloaded. Pictograph gains `Canvas::set_physics_display_rate(Option<u32>)`
+  and `Canvas::physics_step_budget`. Tested at 60, 120, 144, 165 and 59.94 Hz
+  and an unknown rate in seiche, through the offload too, and at 165, 144 and
+  60 Hz and none on the canvas. A known native rate is taken as it is, not
+  capped at 1/60 s (*reading, not ruled*: the cap is the browser's fallback).
+  Turnstone's repin and wiring follow this branch's merge, arranged by the
+  coordinator. The inference (`2254832b`): the web period is the largest
+  between 1/360 s and 1/60 s that every recent interval is a whole multiple of
+  within the browser clock's 100 us grain, tried at the shortest interval over
+  1, 2, 3, ... and refined over all of them; when nothing fits, the shortest
+  interval, between 1/360 s and 1/60 s, stands in (*reading, not ruled*: "the
+  1/60 s cap as the fallback" read as the rule built before it). Its tests
+  hold 60, 120, 144 and 165 Hz from mixed multiples read in 100 us steps, the
+  even-multiple overestimate (6,060 us on a 165 Hz page that always takes an
+  even number of refreshes; at 60 Hz two refreshes are past the cap), the
+  fallback, gaps and ageing. The snapshot, the product page and the pace lines
+  say where the period came from and how far the worst interval sat from its
+  multiple, and `diag_display_period` logs the intervals for an offline fit.
+  On this panel the rule as ruled infers nothing: in all 16 logged windows
+  (two runs each of the 300-node and 24-node pages, under load and calm) the
+  period fell back to 16.7 ms, so the budget stayed 8,333 us, and it still did
+  at tolerances up to 0.5 ms. Two causes, from the logged intervals: a few
+  frames near the page's start and its arrangement change land off any
+  multiple (53.2 ms against 9 periods, 28.5, 44.9, 114.3 ms, 1.3 to 2.5 ms
+  off) and stay in the 120-interval window; and the steady intervals scatter
+  by up to about 0.2 ms (36.4 to 36.6 ms for six periods), as two timestamps
+  each read within a step would. The panel's period read 6.061 ms in one run
+  and 6.078 to 6.089 ms in another. A quorum, the largest period that 90% of
+  the intervals fit within 0.2 ms, found 6.06 to 6.08 ms in 8 of the 16
+  windows, half of it (3.04 ms) in one and nothing in seven. Returned as a
+  fork. A second finding, from the fast receipt's every-window bound: in 6 of
+  10 runs of it this round (no other lane's rustc, the CPU at 34 to 57%)
+  exactly one frame ran past the grain, 1,461 to 3,082 us over, always in the
+  first window; the last round's runs had none. The pace line now names the
+  worst frame (`e0ecb3d5`), and it read: the second frame above real time, two
+  ticks in 4,500 us against a 3,039 us budget. That budget is half of 6.078
+  ms: early, before the outlying intervals arrive, the inference does find
+  this panel's period, and the two ticks were the 1x floor's, which the budget
+  never stops ("fast-forward is never slower than 1x"), at about 2.25 ms each
+  while the 300-node layout starts. So once the period is inferred on this
+  page, the floor and the bound over every frame cannot both hold; the gate
+  itself kept every frame it decided within the grain. Returned as a fork with
+  the first. The other dial receipts on bundle `da14cbaf` were green (slow;
+  the 50x control unbound at 36.6x, worst 2,533 us under; both Speed select
+  receipts); the law receipts were not rerun, the budget being inert at 1x.
+  Gates: seiche 128/128 (122 without actor, 128 + 3 with gpu), pictograph 298,
+  graphshell `web` 242, mere and graphshell checked clean.
