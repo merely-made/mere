@@ -127,6 +127,9 @@ members = [
     # The application host contract genet's P1 split out of genet-host-api. A
     # host contract rather than a widget, so it lands beside `fetch`.
     "crates/system/surface-api",
+    # The djinn test harness (djinn test harness plan, ruling 5): unpublished,
+    # a path dev-dependency for djinn, castellan, personae and their siblings.
+    "crates/system/djinn-testkit",
     # ─── Landed 2026-09-03 from genet (the same plan, P3) ───
     # The engine-management layer: inker selects and orchestrates content
     # engines, document-canvas lays its documents out, the three engine
