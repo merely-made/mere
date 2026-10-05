@@ -1,7 +1,7 @@
 # Vault Lock Plan
 
 **Date**: 2026-10-05
-**Status (2026-10-05)**: assessed; forks 1 to 5 ruled (rulings 1 to 4 in
+**Status (2026-10-05)**: assessed; forks 1 to 8 ruled (rulings 1 to 8 in
 §3), the rest wait for Mark. No code changed. Chatelaine P4 (CXF import) waits on this plan (chatelaine
 rulings 64, 65).
 **Scope**: the resident's secrets can be locked. While locked, no secret
@@ -251,6 +251,29 @@ ruled:* one unlock interface with a method per platform (Windows Hello;
 macOS Touch ID; Linux biometrics through the desktop's own stack; passkeys,
 PINs and mobile biometrics later); which methods this plan builds first is
 a follow-up question.
+
+**Ruling 5.** *At rest, AutoOs lets any same-user process open the vault
+with no prompt, and djinn restarts within 5 s of exiting, so a killed
+locked resident would reopen silently.* Options: AutoOs at logon with the
+lock persisting across restarts (`StartupUnlockMode::Locked`); always
+prompt; leave as is. Mark: **"AutoOs at logon, lock persists
+(Recommended)"**.
+
+**Ruling 6.** *What does locking do to memory?* Options: drop the profile
+and storage key and fix the residue (`PlaintextProfile`, the DPAPI buffer,
+the per-listing seed copy) with `zeroize`, proven by a tracking-allocator
+test; drop only; also page locking and dump exclusion. Mark: **"Drop keys,
+fix residue (Recommended)"**.
+
+**Ruling 7.** *`PERSONAE_PASSPHRASE` would leave the unlock credential in
+the process environment.* Options: residents with lock enabled never read
+it (the CLI and tests keep it); clear it after startup; accept it. Mark:
+**"Residents never read it (Recommended)"**.
+
+**Ruling 8.** *What does the SSH agent do while locked?* Options: OpenSSH's
+behaviour (no identities listed; sign, add and remove fail, with the
+reason logged); list and prompt; error everything. Mark: **"OpenSSH's
+behaviour (Recommended)"**.
 
 ## 4. Phases
 
