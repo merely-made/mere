@@ -2,7 +2,7 @@
 
 **Date**: 2026-10-01
 **Status (2026-10-04)**: in progress. Shape ruled by Mark on 2026-10-01
-(rulings 7 and 10 to 15 in the dramatis tier architecture; rulings 16 to 59
+(rulings 7 and 10 to 15 in the dramatis tier architecture; rulings 16 to 61
 below). P0 met; P1 landed on `main` (`da3c50bc`); P2 landed (`3e4992ec`); P3
 landed (`ff68e86c`), meeting the Mere 0.4 baseline's chatelaine condition.
 The review stop ended 2026-10-04 (ruling 51). P4a's first build signs RSA
@@ -410,6 +410,19 @@ standard construction and PKCS#8 export run once per key load; every
 signature is ring's; recorded as `rsa` touching the key at load only, which
 amends ruling 52's "no `rsa` private-key operation in this path" to
 "no `rsa` signing or decryption".
+
+**Ruling 60.** *A third import door neither ruling named,
+`personae-vault add-ssh` (`bin/personae-vault/main.rs:255-300`), still
+overwrites a held key and checks nothing; covering it means the CLI build
+takes personae's `agent` feature. Cover it?* Options: cover it; leave the
+CLI as is. Mark: **"Cover it (Recommended)"**. Follows: rulings 54 and 56
+hold on all three doors.
+
+**Ruling 61.** *P4a's native ThinkPad check fetched lock-pinned sources into
+the ThinkPad's cargo caches (5 git checkouts, 44 crates), crossing the
+lane's no-downloads wall. Keep or clear?* Options: keep; clear. Mark:
+**"Might be nice to clone the actual repos/ and crates/ needed, but that
+does add more overhead. Keep for now"**.
 
 ## 3. Phases
 
