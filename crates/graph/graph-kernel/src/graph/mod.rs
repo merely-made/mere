@@ -329,6 +329,15 @@ pub struct Graph {
     /// [`revision`](Self::revision). (Dynamics grammar plan, G2, F33.)
     content_revision: u64,
 
+    /// A monotonic **visit revision**: bumped whenever a node's visit history
+    /// (`visit.history`) may have changed, through any kernel writer of it, a
+    /// generic facet delta naming it, a sidecar overlay, or mutable facet
+    /// access. Structure and text leave it alone. A consumer keyed to recency,
+    /// such as the channel registry's recency order, recomputes only when it or
+    /// the structural revision moves. Not persisted. (Dynamics grammar plan,
+    /// G2b, F54.)
+    visit_revision: u64,
+
     /// The current app-launch session number, set once by the host via
     /// [`set_current_session`](Self::set_current_session) right after construction/
     /// restore. `0` (the default) means "not wired" — [`navigate_node`](Self::navigate_node)
@@ -357,6 +366,7 @@ impl Graph {
             revision: 0,
             url_grouping_revision: 0,
             content_revision: 0,
+            visit_revision: 0,
             current_session: 0,
             recorder: capture::Recorder::default(),
         }
@@ -404,6 +414,12 @@ impl Graph {
         self.content_revision
     }
 
+    /// The current visit revision (see the field's doc): it advances when a
+    /// node's visit history may have changed, never on structure or text.
+    pub fn visit_revision(&self) -> u64 {
+        self.visit_revision
+    }
+
     /// The categorical site key used by URL-grouped projections: the authority
     /// after `://` and before a path, query, or fragment, or the whole hostless
     /// input. It deliberately retains ports and opaque values.
@@ -427,6 +443,10 @@ impl Graph {
 
     pub(crate) fn bump_content_revision(&mut self) {
         self.content_revision = self.content_revision.wrapping_add(1);
+    }
+
+    pub(crate) fn bump_visit_revision(&mut self) {
+        self.visit_revision = self.visit_revision.wrapping_add(1);
     }
 
     // Single-write-path boundary (Phase 6.5 — ENFORCED as of the 2026-07-01

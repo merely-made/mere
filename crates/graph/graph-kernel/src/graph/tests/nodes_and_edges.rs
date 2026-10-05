@@ -150,6 +150,77 @@ fn content_revision_advances_on_node_text_and_membership_only() {
 }
 
 #[test]
+fn visit_revision_advances_on_visit_history_only() {
+    use crate::graph::apply::{GraphDelta, apply_graph_delta};
+    let mut graph = Graph::new();
+    let a = graph.add_node("https://a.example".to_string(), Point2D::new(0.0, 0.0));
+    let b = graph.add_node("https://b.example".to_string(), Point2D::new(1.0, 0.0));
+    let added = graph.visit_revision();
+    assert!(added >= 2, "each added node's creation visit is a visit");
+
+    // A visit moves it, and neither structure nor text.
+    let (structure, content) = (graph.revision(), graph.content_revision());
+    assert!(graph.set_node_last_visited_at_ms(a, 1_000));
+    let visited = graph.visit_revision();
+    assert!(visited > added, "a visit is a visit");
+    assert_eq!(graph.revision(), structure, "a visit is not structure");
+    assert_eq!(graph.content_revision(), content, "a visit is not text");
+    // The same timestamp again changes nothing.
+    assert!(!graph.set_node_last_visited_at_ms(a, 1_000));
+    assert_eq!(graph.visit_revision(), visited, "an unchanged visit");
+
+    // Structure, text and other facets leave it alone.
+    graph.assert_relation(a, b, hyperlink());
+    assert!(graph.set_node_title(a, "Saturn".to_string()));
+    assert!(graph.insert_node_tag(a, "astronomy".to_string()));
+    assert_eq!(graph.visit_revision(), visited, "not a visit");
+
+    // The replay delta and a generic facet delta naming visit history both
+    // move it; a generic delta naming another facet does not.
+    let node_id = graph.get_node(b).unwrap().id;
+    apply_graph_delta(
+        &mut graph,
+        GraphDelta::ReplayTouchNodeLastVisitedById {
+            node_id,
+            timestamp_ms: 2_000,
+        },
+    );
+    let replayed = graph.visit_revision();
+    assert!(replayed > visited, "the replay delta is a visit");
+    apply_graph_delta(
+        &mut graph,
+        GraphDelta::SetNodeFacet {
+            key: b,
+            facet: "custom.note".to_string(),
+            value: serde_json::json!({"text": "hello"}),
+        },
+    );
+    assert_eq!(graph.visit_revision(), replayed, "another facet");
+    apply_graph_delta(
+        &mut graph,
+        GraphDelta::ReplaySetNodeFacetById {
+            node_id,
+            facet: crate::graph::node_facets::VISIT_HISTORY.to_string(),
+            value: serde_json::json!({"last_visited_ms": 3_000, "last_session_visited": 0}),
+        },
+    );
+    let generic = graph.visit_revision();
+    assert!(generic > replayed, "a generic write of visit history");
+    assert_eq!(
+        graph
+            .node_last_visited(b)
+            .and_then(|t| t.duration_since(std::time::UNIX_EPOCH).ok())
+            .map(|d| d.as_millis()),
+        Some(3_000),
+        "the generic write is the one the reader sees"
+    );
+
+    // Mutable facet access may touch visits, so it counts as one.
+    let _ = graph.facets_mut();
+    assert!(graph.visit_revision() > generic, "raw facet access");
+}
+
+#[test]
 fn url_grouping_key_matches_site_kanban_authority() {
     assert_eq!(
         Graph::url_grouping_key("https://example.test:8443/a?b#c"),
