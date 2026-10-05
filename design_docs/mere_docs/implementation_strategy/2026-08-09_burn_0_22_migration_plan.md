@@ -1,5 +1,18 @@
 # Burn 0.22 Migration Plan
 
+**2026-10-05 rulings 557 to 559 (§13.44):**
+
+- **S16 is approved.** The coordinator merges this branch into main, and the
+  Knot and Isometry repins follow as their own steps.
+- **The getrandom wasm cfg is committed** in every standalone wasm
+  workspace's `.cargo/config.toml`. A plain-shell build and a batch build at
+  one commit, in one target directory, now give byte-identical
+  graphshell-web bundles.
+- **The OPFS probe is formatted** (`9d778fc5`, listed in
+  `.git-blame-ignore-revs`), and its own runner passes.
+- **Main `79f1cba4` is merged.** The gates and the headed set pass on the
+  final head.
+
 **2026-10-04, later: rulings 555 and 556, main `8f61b367` (§13.40 to §13.43):**
 
 - **The quiet A/B (ruling 555).** It now bounds load in a window before each
@@ -4326,3 +4339,209 @@ alongside its CPU twin, the 14 law receipts and the 11 `gpu_threshold=0` laws.
 The machine was quieter for this run, at 11 to 51% before each row.
 
 S16 has not started. No push, merge to main or downstream repin.
+
+### 13.44 Rulings 557 to 559: promotion, the committed cfg, the OPFS fmt sweep (2026-10-04 to 05)
+
+Mark ruled on §13.40's counted A/B. These are Isometry wing rulings 557 to 559
+(`5af574e`). The options as they were put to him are in that wing record.
+This section records his answers and what each one required here.
+
+**Ruling 557: promotion, then the handoffs.** Mark: **"Promote, then
+handoffs"**. *Follows:* S16 is approved. The coordinator verifies this branch
+and merges it into main. The Knot and Isometry repins follow as steps of
+their own. This lane's part was to make the branch ready for that: merge main
+`6c3dca60` or newer, rerun the gates and the headed set on the final head,
+and report the head.
+
+**Rulings 558 and 559** were one multi-select question, and Mark ticked both:
+
+- **Ruling 558: the getrandom cfg is committed.** Mark: **"Commit the
+  getrandom cfg"**. *Follows:* `--cfg getrandom_backend="wasm_js"` goes in the
+  web workspaces' committed cargo config, so every build of a commit makes
+  the same bundle. A plain-shell build and a batch build at the same commit
+  must be shown to give byte-identical bundles. If the cfg cannot live in
+  committed config without affecting native builds, stop and report.
+- **Ruling 559: the OPFS probe's fmt sweep.** Mark: **"Sweep fmt over the
+  OPFS probe"**. *Follows:* `cargo fmt` runs over the muniment OPFS probe as
+  its own commit. That commit's hash goes into `.git-blame-ignore-revs`. The
+  probe's own runner must then pass, which is shown by rerunning it.
+
+**Main `79f1cba4` (`47342709`).** It brought Energy's view-follow, the
+display-period inference, Chatelaine P4a and plan records.
+
+- The merge base is `8f61b367`. Four files changed on both sides:
+  `.gitattributes`, `Cargo.lock`, `DOC_README.md` and
+  `ports/graphshell/src/web.rs`. Weave 0.5.4's result for each equals a
+  plain `git merge-file` merge, ignoring line endings.
+- The 82 files changed only on main equal main's blobs, and each file
+  changed only on this branch equals this branch's blob.
+- Main's lock change is personae's dependency list alone: ring and rsa for
+  its `agent` feature.
+- The root lock resolves `--locked`, and the gitignored web lock still
+  resolves `--locked` unchanged.
+
+**Ruling 559, as done.**
+
+- `9d778fc5` is the sweep alone, from `cargo fmt` under the root
+  `rustfmt.toml` (rustfmt 1.9.0). 48 match-arm blocks gain their trailing
+  comma. Every added line is `},` and nothing else changes.
+- `9a292691` adds `.git-blame-ignore-revs`, which is new to this repository,
+  listing `9d778fc5`. Control: `git blame` attributes 5 lines of
+  `workload.rs` to the sweep without the file and 0 with
+  `--ignore-revs-file`.
+- The probe's own `run-probe.ps1` then passed end to end: `cargo fmt --check`,
+  the fixture, the `--locked` build, 17 native tests and bindgen. It passed
+  again at `b84197a7` from a clean target directory.
+- The OPFS gate controls pass on that build: clean passes; planted throw and
+  planted reject both stop on the gate.
+
+**Ruling 558, as done.**
+
+`e0536ef3` commits `ports/graphshell/web/.cargo/config.toml`.
+- It holds the target-scoped cfg and nothing else.
+- It stays portable: no patch, paths, source or include tables, which is
+  `cargo_mode.py`'s rule for tracked configs.
+- `.gitignore` re-includes that one file.
+- The example config stops repeating the cfg.
+
+Native builds never see a `[target.wasm32-unknown-unknown]` flag. A scratch
+crate showed that: its native rustc line carries no cfg, while its wasm32
+line does. No checkout on this machine had an untracked file at that path.
+
+How Cargo combines flags, measured on a scratch crate:
+- Rustflags arrays are joined across config files, `--config` files and the
+  `CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_RUSTFLAGS` variable. Committed config
+  plus that export gives the flag twice.
+- `RUSTFLAGS` replaces the array instead of joining it.
+- Rustflags do not enter the top crate's `-C metadata`, but dependencies get
+  separate artifacts per flag set.
+- Cargo reads config from the working directory, not from the manifest's.
+
+**The demonstration.** Three clean builds of graphshell-web at `e0536ef3`, in
+one target directory (`pre4-reconcile-e0536ef3/web_identity.sh`):
+
+| Build | Raw wasm | Bundle |
+| --- | --- | --- |
+| (1) plain shell in the web directory | `c0aa57b8` | `3f0f0bcd` |
+| (2) the batch with its old export | `2b13f34e` | `3d530b88` |
+| (3) the batch without the export | `c0aa57b8` | `3f0f0bcd` |
+
+- (1) and (3) are byte-identical.
+- (2) differs only in one embedded path. Cargo hashes the joined, doubled
+  flag into livery's build-script directory (`livery-be75d247` against
+  `livery-db6e1ff3`), and graphshell-web embeds that `OUT_DIR` path. With
+  the path normalised, (2) is identical too.
+- (2) reproduces the batch's own c11 bundle exactly, so same-directory
+  builds are deterministic.
+- This lane's batch exported that variable, which is how §13.42's two
+  bundles at one head arose. It is now scoped to the root workspace's wasm
+  checks.
+- At `b84197a7` the web build is fresh and still `c0aa57b8`.
+
+**The other wasm workspaces (`b84197a7`).** The probe, both repros, the OPFS
+probe and `genet_web_smoke` commit the same config, and `.gitignore`
+re-includes each. Their runners build from a neutral directory, where Cargo
+would not find the file, so they pass it with `--config`.
+
+None of these compiles getrandom 0.3 for wasm32, and getrandom 0.4 picks its
+backend by feature alone. So the cfg changes no behaviour there. It does
+change the top crate's bytes. In one target directory, flipping the export
+flips the probe between `70b4571b` (with the cfg) and `1437a693` (without),
+and Cargo reports `RustflagsChanged` for the probe crate alone. Before this
+commit, the batch built the probe with the cfg and its runner without it.
+Now both carry it.
+
+*Reading, not ruled:* "the web workspaces" is read as every standalone wasm
+workspace, so the rule is one rule. `genet_web_smoke` takes the file but
+still does not resolve: its genet-taffy patch is ambiguous, as before
+ruling 556.
+
+**Found while proving it, and returned as forks.**
+
+- **The target-directory path is part of the bundle.**
+  - graphshell-web embeds livery's `OUT_DIR` path.
+  - Release builds' ThinLTO symbol suffixes also vary with the target path.
+  - So one commit built into two different target directories gives
+    different bytes, cfg or no cfg. Byte identity holds per target
+    directory.
+  - Removing that needs `trim-paths`, which is unstable on Cargo 1.97 and
+    1.98, or `--remap-path-prefix`, which is machine-specific. Neither is
+    applied here.
+- **The neutral-directory runners use another toolchain.**
+  - rustup picks the toolchain from the working directory. The probe,
+    repros and OPFS runners therefore build with the default `stable`,
+    which is 1.97.1 here, not the repository's pinned 1.98.1.
+  - A build from inside those workspaces uses 1.98.1 and gives different
+    bytes. Every probe and repro bundle so far was built with 1.97.1.
+  - Pinning the runners to the repository's toolchain would be a change of
+    its own.
+- **The OPFS probe stamps provenance into its build.** Its runner bakes the
+  commit, the source and lock hashes and a build time into the wasm, so
+  each runner build is unique by design.
+
+**Gates on the final code (`e0536ef3`; `b84197a7` adds only config files and
+runner flags).** Against `eba741c5`, Numen's and `cambium-genet-web-host`'s
+cones are unchanged and carry. ESP's and Distillery's cones changed through
+personae, so their gates ran too.
+
+| Gate | Result |
+| --- | --- |
+| seiche GPU repulsion (release); tensor-burn-wgpu (release) | 3 pass, adapter; 134 pass, 11 ignored |
+| seiche lib: default, no-default, gpu | 115; 111; 115 pass, 10 ignored each |
+| pictograph canvas lib; gpu with `physics_device` | 292 pass; first run 1 failed, rerun 295 pass, adapter |
+| conatus resident (release) | 14 pass, 2 ignored, adapter, CubeCL kernels |
+| ESP BERT WGPU parity; real MiniLM fixture (release) | 4 pass, 2 ignored; 1 pass |
+| mere and graphshell `canvas-gpu` checks | pass |
+| graphshell `web` lib tests | 238 pass, 4 ignored |
+| Distillery four-feature check; lease tests | pass; 2 pass |
+| two-peer lifecycle gate | exit 0 in 12.5 s, fixture rebuilt; the auditor accepts and rejects all 11 planted faults |
+| `cargo_mode.py verify` | pass |
+
+The pictograph failure was
+`source_time_canvas_keeps_live_graph_and_arrangement_while_previewing_a_journal_prefix`.
+- The two snapshots it compares differ in one character: `timestamp_secs`,
+  `1791173604` against `1791173603`. The snapshot embeds the wall clock, so a
+  second boundary fell between the two reads.
+- It passed alone three of three times, and the gate passed on rerun.
+- The test is main's and predates this lane.
+
+**Headed under the gate (bundle `3f0f0bcd`).**
+- 29 of the 31 rows were as expected from the first run. The controls fail as
+  planted; the clean, `gpu_threshold=0`, P5 and law rows are ok with zero
+  gate entries.
+- `p5_tree_gpu_settle_2000` reads 413 of 418 device steps, 0 failures, spread
+  1,078, 0 overlaps.
+
+Two rows collided with another lane:
+- A Chrome on the grammar-g2 profile loaded a density-control scenario
+  against this run's port 8823 and posted its receipt into this run's sink.
+  `law-gpu0-still` therefore holds a density-control receipt, and
+  `law-gpu0-flow` never finished.
+- Every receipt was checked against its own scenario's captures, and only
+  those two were affected.
+- Rerun on port 8843, both are ok with zero gate entries.
+
+**The other web bundles at `b84197a7`, as their runners build them.**
+- The probe is `541cf624`. Its runner (`--config`) and the batch's old way
+  (the export, from `/tmp`) give the same fingerprint and the same bytes.
+  The second of those builds compiled nothing.
+  - It differs from the earlier incremental cfg build `70b4571b`. That build
+    reused dependency artifacts from older runs; this one is from a clean
+    target directory. *Not diagnosed further.*
+  - On `541cf624` all four embedding rows pass (largest reference error
+    MiniLM `1.416e-7`), and the SmolLM2 decoder matches exactly. The planted
+    control fails the row on the gate alone.
+- The extrema repro is `67c74c8d` and the embedding repro `79badeca`. Each
+  passes clean and fails when planted.
+- The OPFS probe is `b24fdacd`, built by its own runner. Its gate controls
+  pass.
+
+**Head for S16.** After `47342709` (the main merge) come:
+- `9d778fc5`, the fmt sweep;
+- `9a292691`, `.git-blame-ignore-revs`;
+- `e0536ef3`, the web config;
+- `b84197a7`, the other web configs and the runners;
+- this documentation commit.
+
+Main has since moved to `c36641d6`: mien's PersonaKey rename and plan
+records. It is not merged here. S16 is the coordinator's to run. No push.
