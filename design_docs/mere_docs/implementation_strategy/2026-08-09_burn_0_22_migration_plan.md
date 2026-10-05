@@ -4782,6 +4782,22 @@ pushed head, so the content is GitHub's. *Reading, not ruled:* that GitHub
 serves the commit is proven by the first networked fetch elsewhere, not
 here.
 
+**Who adapts Knot to stack seams P1 (2026-10-05).** The question as put:
+stack seams P1 (on origin since `19e6dc9f`) made
+`compile_relationship_snapshot` a `ProjectionCompiler` method, built from
+host-supplied `ItemSizes`, with no default card on purpose. Knot `54bb8cd`
+still calls the old free function (`crates/knot-composition/src/retention.rs:39`,
+plus a desktop site and a test site). djinn's repin with ruling 586's
+`scenomise` row therefore fails to compile (E0425 in `knot-composition`). It
+compiles today only because mere serves no `scenomise` to Knot. Under the
+lockstep rule Knot adapts first, and it must choose its own card size. The
+options: P1's own session adapts Knot; this coordinator's Knot lane adapts it;
+land djinn now with only the `scenograph` row; hold djinn. Mark: **"My
+Knot lane adapts Knot"**. *Follows:* a Knot lane repins Knot onto mere's
+origin and moves its three call sites to `ProjectionCompiler`. Knot's card
+size comes back to Mark as a fork. djinn's repin waits, then moves to that
+Knot head with both 586 rows.
+
 *Annotation, 2026-10-05:* the next move of djinn's Knot pin is not this
 plan's. Under mer3ly Ruling 112, the Projection grammar session owns the
 genet `image-decode` chain (mer3ly Ruling 111). It runs mere's genet repin
