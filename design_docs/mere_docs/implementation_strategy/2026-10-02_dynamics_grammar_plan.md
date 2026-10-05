@@ -519,3 +519,53 @@ These are *Reading, not ruled*. Each returns to Mark at the named track's checkp
     - F62: where the graph's description is computed. Only the tree page's wasm-only producer draws pictograph's canvas (`web_tree.rs:167`); no native host does.
     - F62: what an invoked Drag does without a pointer.
     - The web instrument: CDP's `Accessibility.getFullAXTree` would change the runner's "no DevTools" rule (`run-scenario.ps1:9`).
+- 2026-10-05 (G9, third round: F64 to F68 carried out): main `813b738c` merged into `grammar-g9` (`60176e38`). Only the plan changed on both sides, and weave's merge matches a plain `git merge-file`. Main has since gained `cec0b3a4` (burn-pre4's lock swap), which is not merged here. Built at `9fd45b01`.
+  - **rootstock (F66)** (`crates/cambium/cambium-rootstock`):
+    - `ProducerNode` gains a stable `key` and `actions: Vec<ProducerAction { id, label, description }>`.
+    - `TextureProducer::act(key, id) -> bool` defaults to false. `ProducerRegistry::act` routes a `ProducedAction { slot, key, id }` to the producer.
+    - `A11yRequest` targets an `A11yTarget`, either a DOM node or a produced action. `apply_a11y_requests` puts the app's focus on the produced node's slot, so keys reach the producer's view, and hands a click to `act`.
+    - No chirograph dependency.
+  - **Both lowerings (F65)**:
+    - **AccessKit** (`cambium-winit-a11y`): each drawn node's actions are Button children taking Click and Focus, named by label, with the description set. `project_tree_with_actions` returns the button-to-action map that `map_request` resolves through. Ids are FNV hashes of (slot, key, action), stable however the producer orders its nodes.
+    - **ARIA** (`cambium-genet-web-host`'s mirror): a drawn node with actions is a group named by `aria-label`, its actions focusable `role=button` children with `aria-description`. A click on one resolves through `MirrorHandle::request_target_of` to the produced action.
+    - The native harness gains `a11y_produced_actions` and `a11y_produced_request`.
+  - **pictograph (F67)** (`canvas/reader.rs`):
+    - `Canvas::describe_items(cap)` lists the items on screen in graph order, at most 200 (`DESCRIBED_ITEMS`). The focused item is always among them, taking the last place when the cap would leave it out. Each carries its key, member, caption label, drawn rect and advertised actions, and the slot's name is "N of M shown".
+    - `pin_member` pins an item by member.
+    - The keyboard move: `begin_key_move` (refused unless drag is advertised), `key_move_by` in screen px, and `end_key_move(drop)`, where Enter releases by role and Escape returns the item to where the move began. A withdrawal under way ends it as a release (F60). The board has the same move.
+  - **graphshell (F67)** (`ports/graphshell/src/canvas_reader.rs`, under `web`):
+    - `canvas_semantics` and `describe_canvas` map the description onto producer semantics.
+    - `canvas_act` makes Pin pin and Drag start a keyboard move; `key_move` steers it.
+    - `Plant` is the instruments' positive control: missing item, missing action, or dead action.
+    - The tree page's producer answers `semantics` and `act`, and its keys steer a move by the page's arrow step of 42 px.
+  - **graphshell-client (F64)**:
+    - `AccessibleItem.local_actions` is filled by a host-supplied `LocalActions` through `accessibility_tree_with`.
+    - `ClientState::invoke_local` and `RemoteSession::invoke_local` call the host's handler and nothing else.
+    - `CanvasLocalActions` (the local graph's items, by their `mere.graph` source) and `BoardLocalActions` (the board's cards, by instance) are the hosts' providers.
+  - **Dependencies:** graphshell gains cambium-rootstock under `web`, and four dev-dependencies: cambium, cambium-genet-winit-host, cambium-winit-a11y and accesskit. F67 counted two. The mapping module needs rootstock's types, and the harness test needs cambium to build its view and accesskit to name the tree's types. The root lock gains those five lines on graphshell's entry; the web lock gains cambium-rootstock (`2e099cf6…` to `f9f610f8…`).
+  - **Tests** (all passing; logs in `Code/testing/mere/grammar-g9/`):
+    - `cambium-winit-a11y`: a producer's action reaches the tree as a Button and its click routes back to `act`.
+    - The mirror: a group with focusable buttons carrying their action, and ids that hold across reordering.
+    - graphshell-client: local actions are listed and run by the host, with nothing written for the endpoint. The endpoint's own action of the same intent going on the wire is the control.
+    - pictograph `canvas/tests/reader.rs`: the description, the cap, pin by member, and the keyboard move on the canvas and the board.
+    - The native receipt (`canvas_reader/tests.rs`) reads cambium-winit-a11y's tree in the headless harness: "12 of 12 shown", every item with Drag and Pin. A Pin press pins. A Drag press focuses the slot, and arrow keys delivered through the host's key path move the item; Enter drops it and Escape returns it. Each plant fails the same check: missing item, missing action, and an action that does not route. The client's tree lists drag and pin on the mounted local graph's items, with the mere host's projection revision unchanged, and on the fixture remote's cards.
+  - **Gates** (`gates-g9d.log`):
+    - chirograph: 39.
+    - pictograph `canvas`: 304, 13 ignored.
+    - pictograph `gpu`: 3.
+    - The cambium crates' suites and graphshell-client's: 60 pass.
+    - The `mere`, graphshell `canvas-gpu` and `personal-sync` checks pass.
+    - graphshell `web`: 242, 4 ignored, single-threaded.
+    - Clippy on pictograph and the shared crates: nothing in this lane's code.
+    - The fresh wasm build passes into the lane's one wasm target, cleared first: bundle `95f45a6b…`, the same bytes as the incremental build; the web lock is unchanged by it (`wasm-build-fresh-r4.log`).
+  - **Headed** (`receipts-r4.log`, one port and Chrome profile per receipt, a port counted held only by a live process): 16 of 16 as expected.
+    - `p4_tree_canvas_reader` passes, reading the page's semantic tree: "11 of 11 shown", every item with Drag and Pin, described. A reader's Pin pins the item. A reader's Drag starts a move: two arrows give an offset of 84,0, Enter keeps it, and a second move's Escape returns it to 0,0.
+    - Its controls fail on their planted assertion with no page error: missing item on `reader-items`, missing action on `reader-buttons`, dead action on `pinned`.
+    - `p4_tree_canvas_reader_cdp` passes, Chrome's computed tree reading 11 items each with described Drag and Pin. Its control (missing action) passes the page and fails in Chrome's tree.
+    - The G7 role and pin receipts, the practice workspace, both pages' drag receipts and the keys receipt all pass.
+    - The page-error control fails by the receipt gate.
+  - **Findings.**
+    - `Canvas::with_sample_graph` labels all 12 nodes "node". A reader there hears twelve identical names, and my instrument first matched items by name and missed a planted missing item until it matched by key. The Graphshell fixture's eleven titles are distinct.
+    - The scenario lane's `reader-click` queues its click on the event loop: a click dispatched inside a lane step re-entered the host's borrow (`mount.rs:250`).
+    - The rule's exception is documented in this lane's runner (`run-scenario-r4.ps1`) and in `p4_tree_canvas_reader_cdp.scn`. The canonical `Code/testing/mere/scripts/run-graphshell-web-scenario.ps1` has no `-Cdp` and is unchanged.
+  - **Built, back to Mark:** which 200 items when more are on screen, and their reading order. Built as graph order with the focused item kept.
