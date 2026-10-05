@@ -2,10 +2,10 @@
 
 | doc | disposition | status accurate | claims | holds | stale | unverifiable |
 |---|---|---:|---:|---:|---:|---:|
-| mere_docs/implementation_strategy/2026-10-04_graph_semantics_plan.md | current | yes | 21 | 21 | 0 | 0 |
-| **Totals** |  |  | **21** | **21** | **0** | **0** |
+| mere_docs/implementation_strategy/2026-10-04_graph_semantics_plan.md | current | yes | 29 | 29 | 0 | 0 |
+| **Totals** |  |  | **29** | **29** | **0** | **0** |
 
-**Totals: 1 doc, 21 claims checked (21 holds, 0 stale, 0 unverifiable), 0 contradictions.**
+**Totals: 1 doc, 29 claims checked (29 holds, 0 stale, 0 unverifiable), 0 contradictions.**
 
 Audit base: Mere `68d2a928` (2026-10-04), with this pass's edits in the
 working tree: the new plan, its `DOC_README.md` entry at the head of the
@@ -22,8 +22,8 @@ This batch exists because the document is new.
 ## mere_docs/implementation_strategy/2026-10-04_graph_semantics_plan.md
 
 - disposition: current
-- status line: "Status (2026-10-04): plan. Round 1 ruled (rulings 1 to 4); round 2 forks open (§5); phases are a draft until those land. No code." — accurate: yes
-- claims checked: 21 — holds: 21, stale: 0, unverifiable: 0
+- status line: "Status (2026-10-04): plan. Rounds 1 to 4 ruled (rulings 1 to 17); phases final; checkpoints C1 to C4 ruled, C5 to C8 open (§5). No code." — accurate: yes
+- claims checked: 29 — holds: 29, stale: 0, unverifiable: 0
 
 ### Stale claims
 
@@ -59,4 +59,19 @@ search for freeze, materialize and nest operations over subgraphs found only
 `copy_component_from`, which forks a component into a new session graph); F8
 `from_snapshot` (`snapshot/from.rs` 48) and `pending_targets`
 (`statements.rs` 80-83) with no reader outside that file; F9 the narrowing
-gradient (family composition thesis, 146-152).
+gradient (family composition thesis, 146-152). Added with rulings 5 to 8: the
+2026-06-18 held-RDF-truth multiples (about 11x memory, 19x load, 18x mutation;
+petgraph-RDF plan 38-44) quoted in ruling 6; the kernel and eidetic-core both
+depending on chartulary and not on each other (their `Cargo.toml`s), which
+places the shared canonicalizer in P2; and the seven `ContainmentSubKind`s
+(`edge_taxonomy.rs` 119-127) named in checkpoint C2. Added with rulings 9 to
+15: journal entries as `AttributedDelta { author, delta }` (`journal.rs`
+161-170) with minted statement ids captured by `ReplaySetEdgesByIds`
+(`apply.rs` 518-530); sessions opening from a baseline plus the journal
+(`pandect/src/graph_session.rs` 406-430); the default semantic write storing
+no provenance or time (`edge_payload.rs` 271-279); and the full Semantic,
+Imported, Provenance and Arrangement sub-kind lists behind the placement
+table (`edge_taxonomy.rs`). Round 4 adds no code claims: its inventory is of
+document vocabulary (TERMINOLOGY, the swatch and ambiance designs, the family
+composition thesis), and "aspect" appears in code only as `AspectRatio` and
+wgpu's `TextureAspect`.

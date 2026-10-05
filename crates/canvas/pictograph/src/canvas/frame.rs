@@ -125,6 +125,8 @@ impl Canvas {
         self.view_w = w;
         self.view_h = h;
         let viewport = DeviceIntSize::new(w as i32, h as i32);
+        // Host time for this frame, or one tick when the host gives none.
+        let dt = elapsed.map_or(seiche::TICK_DT, |(elapsed, _)| elapsed.as_secs_f32());
 
         // Advance physics (the in-thread tick, or the freshest actor snapshot)
         // into the read model, and learn whether the layout is still settling.
@@ -196,6 +198,8 @@ impl Canvas {
         } else if self.middle_drag.is_none() {
             self.pan_velocity = (0.0, 0.0);
         }
+        // Following the layout: ease toward fit-to-content while physics plays.
+        let following = self.follow_step(dt);
         self.generation = self.generation.wrapping_add(1);
 
         // Reproject the underlay from the view positions (a
@@ -532,7 +536,8 @@ impl Canvas {
             after_cull,
         );
 
-        let needs_redraw = settling || gliding || dragging || self.ambient.is_some();
+        let needs_redraw =
+            settling || gliding || dragging || following || self.ambient.is_some();
         observer.mark(9);
         (scene, needs_redraw)
     }

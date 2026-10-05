@@ -272,20 +272,14 @@ fn cmd_add_ssh(
         .map_err(|err| format!("parse {} as an OpenSSH private key: {err}", path.display()))?;
 
     let key = ssh_slot::protocol_key_for(&private);
-    let slot = ssh_slot::slot_for(&private, tier).map_err(|err| err.to_string())?;
-    let profile = load(storage, id)?;
-    let already = profile.slots.contains_key(&key);
+    if let AddSsh::AlreadyHeld(held) = add_ssh_key(storage, id, &private, tier)? {
+        println!("already held {}", format_key(&key));
+        println!("  {}", describe_ssh(&private));
+        println!("  unlock: {} (left untouched)", tier_label(held));
+        return Ok(());
+    }
 
-    let mut vault = personae::IdentityVault::with_profile(storage, profile);
-    vault
-        .add_slot(key.clone(), slot)
-        .map_err(|err| format!("store slot: {err}"))?;
-
-    println!(
-        "{} {}",
-        if already { "replaced" } else { "imported" },
-        format_key(&key)
-    );
+    println!("imported {}", format_key(&key));
     println!("  {}", describe_ssh(&private));
     println!("  unlock: {}", tier_label(tier));
     if tier == UnlockTier::PerUse {
@@ -299,6 +293,38 @@ fn cmd_add_ssh(
         path.display()
     );
     Ok(())
+}
+
+/// What `add-ssh` did with a key.
+#[derive(Debug, PartialEq)]
+enum AddSsh {
+    Imported,
+    /// The fingerprint was held; nothing was written. Carries its tier.
+    AlreadyHeld(UnlockTier),
+}
+
+/// The import door, as castellan's and `ssh-add`'s (ruling 60).
+fn add_ssh_key(
+    storage: &dyn IdentityStorage,
+    id: &ProfileId,
+    private: &PrivateKey,
+    tier: UnlockTier,
+) -> Result<AddSsh, String> {
+    let key = ssh_slot::protocol_key_for(private);
+    let profile = load(storage, id)?;
+    // Ruling 54: a held key is never rewritten, its tier included.
+    if let Some(held) = profile.slots.get(&key) {
+        return Ok(AddSsh::AlreadyHeld(held.unlock_tier()));
+    }
+    // Ruling 56: only keys the agent can sign are taken in.
+    personae::ssh_sign::check_signable(private.key_data())
+        .map_err(|refused| format!("refused: {refused}"))?;
+    let slot = ssh_slot::slot_for(private, tier).map_err(|err| err.to_string())?;
+    let mut vault = personae::IdentityVault::with_profile(storage, profile);
+    vault
+        .add_slot(key, slot)
+        .map_err(|err| format!("store slot: {err}"))?;
+    Ok(AddSsh::Imported)
 }
 
 fn cmd_pub(storage: &dyn IdentityStorage, id: &ProfileId, rest: &[String]) -> Result<(), String> {
@@ -500,5 +526,108 @@ mod tests {
         let key = ProtocolKey::new("nostr", None);
         let profile = profile_with(std::slice::from_ref(&key));
         assert_eq!(resolve_key(&profile, "nostr").unwrap(), key);
+    }
+
+    /// personae's test-only fixtures.
+    fn fixture(name: &str) -> PrivateKey {
+        let text = match name {
+            "ed25519" => include_str!("../../../tests/fixtures/ssh/ed25519"),
+            "rsa1024" => include_str!("../../../tests/fixtures/ssh/rsa1024"),
+            "rsa2048" => include_str!("../../../tests/fixtures/ssh/rsa2048"),
+            "rsa2048e3" => include_str!("../../../tests/fixtures/ssh/rsa2048e3"),
+            "rsa2560" => include_str!("../../../tests/fixtures/ssh/rsa2560"),
+            "rsa8192" => include_str!("../../../tests/fixtures/ssh/rsa8192"),
+            "ecdsa256" => include_str!("../../../tests/fixtures/ssh/ecdsa256"),
+            "ecdsa521" => include_str!("../../../tests/fixtures/ssh/ecdsa521"),
+            "dsa" => include_str!("../../../tests/fixtures/ssh/dsa"),
+            other => panic!("no fixture {other}"),
+        };
+        PrivateKey::from_openssh(text).unwrap()
+    }
+
+    fn empty_vault() -> (personae::InMemoryStorage, ProfileId) {
+        let storage = personae::InMemoryStorage::new();
+        let id = ProfileId("t".into());
+        storage
+            .save_profile(&Profile::new(
+                id.clone(),
+                "t",
+                Ed25519Keypair::from_seed([2; 32]),
+            ))
+            .unwrap();
+        (storage, id)
+    }
+
+    fn slot_parts(
+        storage: &dyn IdentityStorage,
+        id: &ProfileId,
+        key: &ProtocolKey,
+    ) -> (String, Vec<u8>, CredentialLineage, UnlockTier) {
+        match load(storage, id)
+            .unwrap()
+            .slots
+            .get(key)
+            .expect("slot held")
+        {
+            IdentitySlot::Direct {
+                kind,
+                payload,
+                lineage,
+                unlock_tier,
+            } => (
+                kind.clone(),
+                payload.as_slice().to_vec(),
+                *lineage,
+                *unlock_tier,
+            ),
+            _ => panic!("ssh slots are Direct"),
+        }
+    }
+
+    /// Ruling 60 (54): `add-ssh` of a held key, asking for another tier with
+    /// another comment, writes nothing and says it is held.
+    #[test]
+    fn add_ssh_leaves_a_held_key_untouched() {
+        let (storage, id) = empty_vault();
+        for name in ["ed25519", "rsa2048", "ecdsa256"] {
+            let mut first = fixture(name);
+            first.set_comment("as first added");
+            let key = ssh_slot::protocol_key_for(&first);
+            assert_eq!(
+                add_ssh_key(&storage, &id, &first, UnlockTier::PerUse).unwrap(),
+                AddSsh::Imported
+            );
+            let before = slot_parts(&storage, &id, &key);
+            let mut again = fixture(name);
+            again.set_comment("a different comment");
+            assert_eq!(
+                add_ssh_key(&storage, &id, &again, UnlockTier::Session).unwrap(),
+                AddSsh::AlreadyHeld(UnlockTier::PerUse),
+                "{name}"
+            );
+            assert_eq!(slot_parts(&storage, &id, &key), before, "{name}");
+        }
+    }
+
+    /// Ruling 60 (55, 56): the same door and reasons as `ssh-add` and import.
+    #[test]
+    fn add_ssh_refuses_unsignable_keys_with_the_reason() {
+        let (storage, id) = empty_vault();
+        for name in [
+            "rsa1024",
+            "rsa2560",
+            "rsa8192",
+            "rsa2048e3",
+            "dsa",
+            "ecdsa521",
+        ] {
+            let reason =
+                add_ssh_key(&storage, &id, &fixture(name), UnlockTier::Session).unwrap_err();
+            let gate = personae::ssh_sign::check_signable(fixture(name).key_data())
+                .unwrap_err()
+                .to_string();
+            assert_eq!(reason, format!("refused: {gate}"), "{name}");
+        }
+        assert!(load(&storage, &id).unwrap().slots.is_empty());
     }
 }
