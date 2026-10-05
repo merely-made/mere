@@ -7,11 +7,17 @@
 param(
     [int]$Port = 8733,
     [string]$TargetDir = 'C:\t\cubek-browser-extrema-repro',
-    [string]$WasmBindgen = 'wasm-bindgen'
+    [string]$WasmBindgen = 'wasm-bindgen',
+    [switch]$NoServe
 )
 
 $ErrorActionPreference = 'Stop'
 $reproRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
+$mereRoot = (Resolve-Path (Join-Path $reproRoot '..\..\..\..\..')).Path
+# The repository's pinned toolchain (rust-toolchain.toml; burn plan 13.45),
+# not whatever rustup picks in the neutral directory below.
+. (Join-Path $mereRoot 'scripts\repo-toolchain.ps1')
+Use-RepoToolchain -MereRoot $mereRoot
 $env:CARGO_TARGET_DIR = $TargetDir
 
 New-Item -ItemType Directory -Force -Path $TargetDir | Out-Null
@@ -36,5 +42,6 @@ if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 $url = "http://localhost:$Port/"
 Write-Host "Cubek browser extrema repro: $url"
+if ($NoServe) { exit 0 }
 Write-Host 'Press Ctrl+C to stop the server.'
 python -m http.server $Port --directory $reproRoot\web

@@ -7,12 +7,17 @@
 param(
     [int]$Port = 8732,
     [string]$TargetDir = 'C:\t\distillery-model-probe',
-    [string]$WasmBindgen = 'wasm-bindgen'
+    [string]$WasmBindgen = 'wasm-bindgen',
+    [switch]$NoServe
 )
 
 $ErrorActionPreference = 'Stop'
 $probeRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 $mereRoot = (Resolve-Path (Join-Path $probeRoot '..\..\..')).Path
+# The repository's pinned toolchain (rust-toolchain.toml; burn plan 13.45),
+# not whatever rustup picks in the neutral directory below.
+. (Join-Path $mereRoot 'scripts\repo-toolchain.ps1')
+Use-RepoToolchain -MereRoot $mereRoot
 $env:CARGO_TARGET_DIR = $TargetDir
 $env:DISTILLERY_PROBE_COMMIT = (git -C $mereRoot rev-parse HEAD).Trim()
 $ownedStatus = git -C $mereRoot status --porcelain -- `
@@ -49,5 +54,6 @@ if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 $url = "http://localhost:$Port/ports/distillery/probe/web/"
 Write-Host "Distillery model probe: $url"
+if ($NoServe) { exit 0 }
 Write-Host 'Press Ctrl+C to stop the server.'
 python -m http.server $Port --directory $mereRoot
