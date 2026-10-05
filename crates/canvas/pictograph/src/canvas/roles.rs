@@ -20,6 +20,7 @@
 
 use super::actions::{ArrangementAction, PermittedActions};
 use super::at_rest::AtRest;
+use super::reader::KeyMove;
 use super::*;
 use seiche::{Role, RoleTable};
 
@@ -54,6 +55,10 @@ pub(crate) struct ArrangementRoles {
     rest: AtRest,
     /// What the binding withdraws from the items' advertisements (G9).
     pub(crate) actions: PermittedActions,
+    /// A keyboard move under way, the pointerless drag (F67).
+    pub(crate) key_move: Option<KeyMove>,
+    /// The latest keyboard move, kept after it ends. Receipt introspection.
+    pub(crate) last_key_move: Option<KeyMove>,
 }
 
 impl Default for ArrangementRoles {
@@ -68,6 +73,8 @@ impl Default for ArrangementRoles {
             stop_return: None,
             rest: AtRest::default(),
             actions: PermittedActions::default(),
+            key_move: None,
+            last_key_move: None,
         }
     }
 }

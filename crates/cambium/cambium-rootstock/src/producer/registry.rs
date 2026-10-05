@@ -93,6 +93,14 @@ impl ProducerRegistry {
         self.entries.get_mut(&key)?.producer.semantics()
     }
 
+    /// Hand a reader's invoked action to the producer that drew the node.
+    /// Whether it carried it out; `false` for an unknown slot.
+    pub fn act(&mut self, action: &super::ProducedAction) -> bool {
+        self.entries
+            .get_mut(&action.slot)
+            .is_some_and(|entry| entry.producer.act(action.key, &action.id))
+    }
+
     pub fn error(&self, key: u64) -> Option<ProducerError> {
         self.entries.get(&key)?.error
     }

@@ -209,6 +209,7 @@ impl Canvas {
     /// longer advertises drag ends at once, as a release by its role.
     pub fn set_permitted_actions(&mut self, permitted: PermittedActions) {
         self.roles.actions = permitted;
+        self.end_withdrawn_key_move();
         if let Some(drag) = self.drag
             && drag.moved
             && !self.permits(drag.node, ArrangementAction::Drag)

@@ -719,6 +719,33 @@ where
             return;
         }
         for request in requests {
+            let node = match &request.target {
+                crate::A11yTarget::Node(node) => *node,
+                // A drawn node's action button: the node lives in its slot,
+                // so the app's focus goes to the slot (keys then reach the
+                // producer's view, a keyboard move's arrows), and a click is
+                // the producer's to carry out.
+                crate::A11yTarget::Produced(produced) => {
+                    let slot = match (self.s.runner.as_ref(), self.s.layout.as_ref()) {
+                        (Some(runner), Some(layout)) => {
+                            let dom = runner.dom();
+                            let dom = dom.borrow();
+                            layout
+                                .custom_leaf_nodes(&*dom)
+                                .into_iter()
+                                .find_map(|(key, node)| (key == produced.slot).then_some(node))
+                        },
+                        _ => None,
+                    };
+                    if let (Some(slot), Some(runner)) = (slot, self.s.runner.as_mut()) {
+                        runner.set_focus(Some(slot));
+                    }
+                    if request.action == A11yAction::Click {
+                        self.s.producers.act(produced);
+                    }
+                    continue;
+                },
+            };
             let Some(runner) = self.s.runner.as_mut() else {
                 break;
             };
@@ -726,11 +753,11 @@ where
                 A11yAction::Click => {
                     // No cursor is involved, so the local point is genuinely the
                     // element's own origin rather than a hit position.
-                    runner.dispatch_click(request.node, PointerClick::at((0.0, 0.0)));
+                    runner.dispatch_click(node, PointerClick::at((0.0, 0.0)));
                 },
-                A11yAction::Focus => runner.set_focus(Some(request.node)),
+                A11yAction::Focus => runner.set_focus(Some(node)),
                 A11yAction::SetValue(value) => {
-                    runner.dispatch_value(request.node, cambium::ValueEvent { value });
+                    runner.dispatch_value(node, cambium::ValueEvent { value });
                 },
             }
         }

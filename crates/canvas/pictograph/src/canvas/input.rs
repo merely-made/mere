@@ -327,6 +327,12 @@ impl Canvas {
         let Some(key) = self.focused_key() else {
             return false;
         };
+        self.pin_key(key)
+    }
+
+    /// Hold `key` where it is drawn: the explicit pin, refused unless it
+    /// advertises pin (G9).
+    pub(crate) fn pin_key(&mut self, key: NodeKey) -> bool {
         if !self.permits(key, ArrangementAction::Pin) {
             return false;
         }
@@ -415,7 +421,7 @@ impl Canvas {
     /// preserve a paused analytic arrangement's slot. An anchored node's
     /// arrangement position is its home, so a pull moves the node but not
     /// that position. The graph remains position-free throughout.
-    fn place_pinned_node(&mut self, node: NodeKey, world: Point2D<f32>) {
+    pub(crate) fn place_pinned_node(&mut self, node: NodeKey, world: Point2D<f32>) {
         self.physics.pin(node, world);
         self.view.set_position(node, world);
         if self.arrangement_role_of(node) != Role::Anchored
