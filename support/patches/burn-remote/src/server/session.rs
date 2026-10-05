@@ -62,7 +62,7 @@ struct Session {
     authorization: Arc<[u8]>,
     close: watch::Sender<bool>,
     done: watch::Sender<SessionCompletion>,
-    worker_done: Option<oneshot::Receiver<()>>,
+    worker_done: Option<oneshot::Receiver<Result<(), String>>>,
     finishing: bool,
 }
 
@@ -282,7 +282,9 @@ where
                 let was_bound = session._task_sender.is_some();
                 // The manager retains one sender so a worker cannot disappear while the pump is
                 // active. Drop it before waiting, then acknowledge closure only after the worker
-                // has synced, dropped its interpreter, and run backend memory cleanup.
+                // has synced, dropped its interpreter, run backend memory cleanup, and waited for
+                // that release to complete on the device. A teardown failure is reported, never
+                // acknowledged as a clean close.
                 drop(session._task_sender.take());
                 (session.worker_done.take(), None, was_bound)
             }
@@ -302,9 +304,12 @@ where
         }
 
         let cleanup = match worker_done {
-            Some(worker_done) => worker_done.await.map_err(|_| {
-                format!("Session {session_id} worker stopped before backend cleanup completed")
-            }),
+            Some(worker_done) => worker_done
+                .await
+                .map_err(|_| {
+                    format!("Session {session_id} worker stopped before backend cleanup completed")
+                })
+                .and_then(|teardown| teardown),
             None => Ok(()),
         };
 
@@ -333,5 +338,94 @@ where
                 Err(error)
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod teardown_tests {
+    //! Mere: close reports a failed teardown instead of acknowledging it as clean.
+
+    use super::*;
+    use crate::server::worker::teardown_fault;
+    use crate::shared::TransferCapability;
+    use crate::{PeerAddr, PeerId};
+    use burn_backend::TensorData;
+    use burn_flex::Flex;
+    use std::future::Future;
+
+    struct NoTransfer;
+
+    impl<B: BackendIr> TensorTransfer<B> for NoTransfer {
+        fn expose_data(
+            &self,
+            _data: TensorData,
+            _max_downloads: u32,
+            _capability: TransferCapability,
+            _target: PeerId,
+        ) -> impl Future<Output = ()> + Send {
+            async {}
+        }
+
+        fn download_tensor(
+            &self,
+            _remote: PeerAddr,
+            _capability: TransferCapability,
+        ) -> impl Future<Output = Option<TensorData>> + Send {
+            async { None }
+        }
+
+        fn fail(
+            &self,
+            _capability: TransferCapability,
+            _target: PeerId,
+            _reason: String,
+        ) -> impl Future<Output = ()> + Send {
+            async {}
+        }
+    }
+
+    async fn bound(manager: &SessionManager<Flex, NoTransfer>) -> SessionId {
+        let session_id = SessionId::new();
+        manager
+            .reserve_session(session_id, 0, Arc::from(&b"teardown-test"[..]))
+            .await
+            .expect("reserve");
+        // Dropping the binding drops its task sender and response queue, as a closed pump does.
+        drop(manager.bind_session(session_id).await.expect("bind"));
+        session_id
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn a_failed_teardown_sync_is_reported_and_never_acknowledged_clean() {
+        let manager =
+            SessionManager::<Flex, NoTransfer>::new(vec![Default::default()], Arc::new(NoTransfer));
+
+        // Success path in the same run: an unarmed session closes clean and leaves the registry.
+        let clean = bound(&manager).await;
+        assert_eq!(manager.finish_session(clean).await, Ok(()));
+        assert!(manager.sessions().await.iter().all(|s| s.id != clean));
+        assert_eq!(manager.close_session(clean).await, Ok(false));
+
+        // Injected failure of the post-release completion wait.
+        let faulted = bound(&manager).await;
+        teardown_fault::arm(faulted);
+        let closed = manager.finish_session(faulted).await;
+        assert!(
+            closed
+                .as_ref()
+                .is_err_and(|error| error.contains("injected teardown sync failure")),
+            "a failed teardown must be reported: {closed:?}"
+        );
+        assert!(
+            manager.sessions().await.iter().any(|s| s.id == faulted),
+            "a failed teardown must not be acknowledged by removing the session"
+        );
+        let again = manager.close_session(faulted).await;
+        assert!(
+            again
+                .as_ref()
+                .is_err_and(|error| error.contains("injected teardown sync failure")),
+            "a later close must report the same failure: {again:?}"
+        );
     }
 }

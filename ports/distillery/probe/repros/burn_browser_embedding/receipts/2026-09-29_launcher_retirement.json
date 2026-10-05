@@ -1,0 +1,96 @@
+{
+  "ruling": 410,
+  "source_test_commit": "69964ad335405221a998bf910d2cc8c24860a887",
+  "scope": "Nine native unfused launcher cases: subtraction, atan2 and XOR; broadcast aliases, same-shape aliases, separate inputs.",
+  "patched": {
+    "accepted": true,
+    "tests": 9,
+    "numerical_rows": 9,
+    "sha256": "be242863b9b06bac171cf588baeff01ad24cc7911d46f79751cc644f4bccfccc",
+    "controls": {
+      "empty_rejected": true,
+      "wrong_numeric_output_rejected": true,
+      "zero_test_run_rejected": true,
+      "wrong_case_name_rejected": true
+    }
+  },
+  "upstream": {
+    "accepted": true,
+    "tests": 9,
+    "numerical_rows": 9,
+    "sha256": "f0553badaa5530ab047206fd3945b0bcb9c8e5f0ffe1c7180385decaf92d0fa7",
+    "controls": {
+      "empty_rejected": true,
+      "wrong_numeric_output_rejected": true,
+      "zero_test_run_rejected": true,
+      "wrong_case_name_rejected": true
+    }
+  },
+  "binary_provenance": {
+    "patched": {
+      "binary": "C:\\t\\cargo-targets\\mere\\release\\deps\\launcher_retirement-4fbdf6e50c4ec98b.exe",
+      "sha256": "054a6c64eaf4a48808eaf3dfefaf54bdb9ad6c745d1a06ea7861f3226b356c5f",
+      "raw_stdout_sha256": "be242863b9b06bac171cf588baeff01ad24cc7911d46f79751cc644f4bccfccc"
+    },
+    "upstream": {
+      "binary": "C:\\t\\cargo-targets\\mere\\release\\deps\\launcher_retirement-b902c23815cb7741.exe",
+      "sha256": "b6a5838de4eb7b4420571a61433a40c12163a08852ed455d555fadb36e1cc42c",
+      "raw_stdout_sha256": "f0553badaa5530ab047206fd3945b0bcb9c8e5f0ffe1c7180385decaf92d0fa7"
+    }
+  },
+  "numerical_comparison": {
+    "cases": 9,
+    "max_abs_output_differences": {
+      "('BroadcastAlias', 'atan2=true')": 0.0,
+      "('SameShapeAlias', 'atan2=true')": 0.0,
+      "('Separate', 'atan2=true')": 0.0,
+      "('BroadcastAlias', 'atan2=false')": 0.0,
+      "('SameShapeAlias', 'atan2=false')": 0.0,
+      "('Separate', 'atan2=false')": 0.0,
+      "('BroadcastAlias', 'xor')": 0,
+      "('SameShapeAlias', 'xor')": 0,
+      "('Separate', 'xor')": 0
+    }
+  },
+  "portable_raw_files": {
+    "2026-09-29_launcher_patched.txt": "be242863b9b06bac171cf588baeff01ad24cc7911d46f79751cc644f4bccfccc",
+    "2026-09-29_launcher_upstream.txt": "f0553badaa5530ab047206fd3945b0bcb9c8e5f0ffe1c7180385decaf92d0fa7"
+  },
+  "upstream_archive_sha256": "109bc3f8304b5b2dcf4497c49c4675941fc67ce3e07a04f74298aaa738107aea",
+  "registry_files_verified_before_and_after": 122,
+  "selector_graphs": [
+    {
+      "manifest": "Cargo.toml",
+      "attempt": "graph-1-root",
+      "locked_packages": 1660,
+      "metadata_packages": 1533,
+      "selected_source": "registry+https://github.com/rust-lang/crates.io-index",
+      "selected_manifest": "C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\burn-cubecl-0.22.0-pre.4\\Cargo.toml"
+    },
+    {
+      "manifest": "ports/distillery/probe/Cargo.toml",
+      "attempt": "graph-2-probe",
+      "locked_packages": 585,
+      "metadata_packages": 585,
+      "selected_source": "registry+https://github.com/rust-lang/crates.io-index",
+      "selected_manifest": "C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\burn-cubecl-0.22.0-pre.4\\Cargo.toml"
+    },
+    {
+      "manifest": "ports/distillery/probe/remote-fixture/Cargo.toml",
+      "attempt": "graph-3-remote-fixture",
+      "locked_packages": 982,
+      "metadata_packages": 982,
+      "selected_source": "registry+https://github.com/rust-lang/crates.io-index",
+      "selected_manifest": "C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\burn-cubecl-0.22.0-pre.4\\Cargo.toml"
+    },
+    {
+      "manifest": "ports/distillery/probe/repros/burn_browser_embedding/Cargo.toml",
+      "attempt": "graph-4-burn_browser_embedding",
+      "locked_packages": 552,
+      "metadata_packages": 552,
+      "selected_source": "registry+https://github.com/rust-lang/crates.io-index",
+      "selected_manifest": "C:\\Users\\mark_\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\burn-cubecl-0.22.0-pre.4\\Cargo.toml"
+    }
+  ],
+  "qualification": "Conditional retirement on migration branch only. Remaining affected-consumer, extrema and two-peer lifecycle gates and main promotion are not accepted by this receipt. Six-field predicate in public fixture verifies construction, not an upstream guard."
+}
