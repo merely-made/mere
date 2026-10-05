@@ -281,6 +281,7 @@ impl CapturedDelta {
                 from_id: parse_uuid(from_id),
                 to_id: parse_uuid(to_id),
                 assertion: assertion.clone(),
+                asserter_iri: super::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI.into(),
             },
             Self::ReplayRemoveNodeById { node_id } => GraphDelta::ReplayRemoveNodeById {
                 node_id: parse_uuid(node_id),
@@ -480,6 +481,7 @@ impl CapturedDelta {
                 from_id: parse_uuid(from_id),
                 to_id: parse_uuid(to_id),
                 predicate: predicate.clone(),
+                asserter_iri: super::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI.into(),
             },
             Self::ReplayAssertSemanticPredicateByIds {
                 from_id,
@@ -489,6 +491,7 @@ impl CapturedDelta {
                 from_id: parse_uuid(from_id),
                 to_id: parse_uuid(to_id),
                 predicate: predicate.clone(),
+                asserter_iri: super::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI.into(),
             },
             Self::ReplayAppendFrameLayoutHintById { node_id, hint } => {
                 GraphDelta::ReplayAppendFrameLayoutHintById {
@@ -574,6 +577,19 @@ impl CapturedDelta {
                 }
             },
         })
+    }
+    /// Replay old assertion records with their journal's attribution envelope.
+    pub fn replay_delta_as(&self, author: &super::Author) -> Option<GraphDelta> {
+        let mut delta = self.replay_delta()?;
+        match &mut delta {
+            GraphDelta::ReplayAssertRelationByIds { asserter_iri, .. }
+            | GraphDelta::ReplayAssertSemanticPredicateByIds { asserter_iri, .. }
+            | GraphDelta::ReplaySetEdgeSemanticPredicateByIds { asserter_iri, .. } => {
+                *asserter_iri = author.asserter_iri();
+            },
+            _ => {},
+        }
+        Some(delta)
     }
 }
 
@@ -755,12 +771,34 @@ pub fn replay_captured_deltas_onto<I>(graph: &mut Graph, deltas: I)
 where
     I: IntoIterator<Item = CapturedDelta>,
 {
+    replay_graph_deltas_onto(
+        graph,
+        deltas.into_iter().filter_map(|delta| delta.replay_delta()),
+    );
+}
+
+/// Quiet replay with an author for old assertion records lacking stored attribution.
+/// Exact statement captures retain their original attributed source.
+pub fn replay_captured_deltas_as_onto<I>(graph: &mut Graph, author: &super::Author, deltas: I)
+where
+    I: IntoIterator<Item = CapturedDelta>,
+{
+    replay_graph_deltas_onto(
+        graph,
+        deltas
+            .into_iter()
+            .filter_map(|delta| delta.replay_delta_as(author)),
+    );
+}
+
+pub(crate) fn replay_graph_deltas_onto<I>(graph: &mut Graph, deltas: I)
+where
+    I: IntoIterator<Item = GraphDelta>,
+{
     let _quiet = QuietThread::begin();
     let recorder = graph.recorder.0.take();
     for delta in deltas {
-        if let Some(delta) = delta.replay_delta() {
-            let _ = apply_graph_delta(graph, delta);
-        }
+        let _ = apply_graph_delta(graph, delta);
     }
     graph.recorder.0 = recorder;
 }
@@ -1680,14 +1718,14 @@ mod tests {
         );
         let field_id = FieldId::from_uuid(Uuid::from_u128(24));
         let coupling_id = CouplingId::from_uuid(Uuid::from_u128(25));
-        crate::graph::apply::assert_relation(
-            &mut graph,
+        graph.assert_semantic_statement(
             a,
             b,
-            EdgeAssertion::Semantic {
-                sub_kind: SemanticSubKind::Hyperlink,
-                label: None,
-                decay_progress: None,
+            crate::graph::SemanticStatementSpec {
+                predicate: "https://schema.org/author".into(),
+                recognized_sub_kind: Some(SemanticSubKind::Hyperlink),
+                provenance_iri: Some(crate::graph::journal::Author::user().asserter_iri()),
+                ..Default::default()
             },
         );
         let _ = crate::graph::apply::apply_graph_delta(
@@ -1957,17 +1995,10 @@ mod tests {
                 },
             },
         );
-        let ab_edge = graph.find_edge_key(a, b).expect("a->b edge");
-        let _ = crate::graph::apply::apply_graph_delta(
-            &mut graph,
-            GraphDelta::SetEdgeSemanticPredicate {
-                edge: ab_edge,
-                predicate: Some("https://schema.org/author".into()),
-            },
-        );
         let _ = crate::graph::apply::apply_graph_delta(
             &mut graph,
             GraphDelta::AssertSemanticPredicate {
+                asserter_iri: crate::graph::journal::Author::user().asserter_iri(),
                 from: b,
                 to: c,
                 predicate: "https://schema.org/citation".into(),
@@ -2079,7 +2110,7 @@ mod tests {
         let captured = captured.lock().expect("capture sink");
         // What replay would otherwise read from the clock or mint again rides
         // beside the edits: each new node's visit stamp, and the exact edge
-        // after each minted statement. Set those aside, then check the edits.
+        // after each semantic edit. Set those aside, then check the edits.
         let stamps = captured
             .windows(2)
             .filter(|pair| {
@@ -2097,7 +2128,7 @@ mod tests {
         assert_eq!(
             (stamps, minted),
             (3, 2),
-            "three new nodes; a hyperlink and a predicate minted"
+            "three new nodes; hyperlink assertion with its predicate and open assertion captured"
         );
         let mut out = Vec::new();
         for (index, delta) in captured.iter().enumerate() {
@@ -2111,7 +2142,7 @@ mod tests {
                 out.push(delta.clone());
             }
         }
-        assert_eq!(out.len(), 52);
+        assert_eq!(out.len(), 49);
         assert!(matches!(
             out[0],
             CapturedDelta::ReplayAddNodeWithIdIfMissing { .. }
@@ -2126,56 +2157,56 @@ mod tests {
         ));
         assert!(matches!(
             out[3],
-            CapturedDelta::ReplayAssertRelationByIds { .. }
-        ));
-        assert!(matches!(
-            out[4],
             CapturedDelta::ReplayAppendTraversalByIds { .. }
         ));
         assert!(matches!(
-            out[5],
+            out[4],
             CapturedDelta::ReplaySetNodeTitleById { .. }
         ));
-        assert!(matches!(out[6], CapturedDelta::ReplaySetNodeUrlById { .. }));
+        assert!(matches!(out[5], CapturedDelta::ReplaySetNodeUrlById { .. }));
+        assert!(matches!(
+            out[6],
+            CapturedDelta::ReplaySetNodeImageById { .. }
+        ));
         assert!(matches!(
             out[7],
             CapturedDelta::ReplaySetNodeImageById { .. }
         ));
         assert!(matches!(
             out[8],
-            CapturedDelta::ReplaySetNodeImageById { .. }
-        ));
-        assert!(matches!(
-            out[9],
             CapturedDelta::ReplaySetNodeMimeHintById { .. }
         ));
         assert!(matches!(
-            out[10],
+            out[9],
             CapturedDelta::ReplaySetNodePinnedById { .. }
         ));
         assert!(matches!(
-            out[11],
+            out[10],
             CapturedDelta::ReplayInsertNodeTagById { .. }
         ));
         assert!(matches!(
-            out[12],
+            out[11],
             CapturedDelta::ReplayRemoveNodeTagById { .. }
         ));
         assert!(matches!(
-            out[13],
+            out[12],
             CapturedDelta::ReplaySetNodeBodyById { .. }
         ));
         assert!(matches!(
-            out[14],
+            out[13],
             CapturedDelta::ReplayTouchNodeLastVisitedById { .. }
         ));
         assert!(matches!(
-            out[15],
+            out[14],
             CapturedDelta::ReplayInsertNodeTagById { .. }
         ));
         assert!(matches!(
-            out[16],
+            out[15],
             CapturedDelta::ReplaySetNodeTagIconOverrideById { .. }
+        ));
+        assert!(matches!(
+            out[16],
+            CapturedDelta::ReplayNavigateNodeById { .. }
         ));
         assert!(matches!(
             out[17],
@@ -2183,50 +2214,50 @@ mod tests {
         ));
         assert!(matches!(
             out[18],
-            CapturedDelta::ReplayNavigateNodeById { .. }
-        ));
-        assert!(matches!(
-            out[19],
             CapturedDelta::ReplayNodeHistoryBackById { .. }
         ));
         assert!(matches!(
-            out[20],
+            out[19],
             CapturedDelta::ReplayNodeHistoryForwardById { .. }
         ));
         assert!(matches!(
-            out[21],
+            out[20],
             CapturedDelta::ReplayBranchHistoryByIds { .. }
         ));
         assert!(matches!(
-            out[22],
+            out[21],
             CapturedDelta::ReplayNavigateNodeById { .. }
         ));
-        assert!(matches!(out[23], CapturedDelta::ReplayAddField { .. }));
-        assert!(matches!(out[24], CapturedDelta::ReplayAddCoupling { .. }));
+        assert!(matches!(out[22], CapturedDelta::ReplayAddField { .. }));
+        assert!(matches!(out[23], CapturedDelta::ReplayAddCoupling { .. }));
         assert!(matches!(
-            out[25],
+            out[24],
             CapturedDelta::ReplaySetFieldCouplingStrengthByFieldId { .. }
         ));
         assert!(matches!(
-            out[26],
+            out[25],
             CapturedDelta::ReplayRetireFieldById { .. }
         ));
         assert!(matches!(
-            out[27],
+            out[26],
             CapturedDelta::ReplayActivateFieldById { .. }
         ));
         assert!(matches!(
-            out[28],
+            out[27],
             CapturedDelta::ReplayRetractCouplingById { .. }
         ));
-        assert!(matches!(out[29], CapturedDelta::ReplayAddCoupling { .. }));
+        assert!(matches!(out[28], CapturedDelta::ReplayAddCoupling { .. }));
         assert!(matches!(
-            out[30],
+            out[29],
             CapturedDelta::ReplaySetFieldCouplingStrengthByFieldId { .. }
         ));
         assert!(matches!(
-            out[31],
+            out[30],
             CapturedDelta::ReplayAppendNodePropertyById { .. }
+        ));
+        assert!(matches!(
+            out[31],
+            CapturedDelta::ReplayAddNodeClassificationById { .. }
         ));
         assert!(matches!(
             out[32],
@@ -2238,74 +2269,62 @@ mod tests {
         ));
         assert!(matches!(
             out[34],
-            CapturedDelta::ReplayAddNodeClassificationById { .. }
-        ));
-        assert!(matches!(
-            out[35],
             CapturedDelta::ReplaySetNodeClassificationStatusById { .. }
         ));
         assert!(matches!(
-            out[36],
+            out[35],
             CapturedDelta::ReplaySetNodePrimaryClassificationById { .. }
         ));
         assert!(matches!(
-            out[37],
+            out[36],
             CapturedDelta::ReplayRemoveNodeClassificationById { .. }
         ));
         assert!(matches!(
-            out[38],
+            out[37],
             CapturedDelta::ReplayRecordNodeDerivationById { .. }
         ));
         assert!(matches!(
+            out[38],
+            CapturedDelta::ReplayAppendFrameLayoutHintById { .. }
+        ));
+        assert!(matches!(
             out[39],
-            CapturedDelta::ReplaySetEdgeSemanticPredicateByIds { .. }
+            CapturedDelta::ReplayAppendFrameLayoutHintById { .. }
         ));
         assert!(matches!(
             out[40],
-            CapturedDelta::ReplayAssertSemanticPredicateByIds { .. }
-        ));
-        assert!(matches!(
-            out[41],
-            CapturedDelta::ReplayAppendFrameLayoutHintById { .. }
-        ));
-        assert!(matches!(
-            out[42],
-            CapturedDelta::ReplayAppendFrameLayoutHintById { .. }
-        ));
-        assert!(matches!(
-            out[43],
             CapturedDelta::ReplayMoveFrameLayoutHintById { .. }
         ));
         assert!(matches!(
-            out[44],
+            out[41],
             CapturedDelta::ReplayRemoveFrameLayoutHintById { .. }
         ));
         assert!(matches!(
-            out[45],
+            out[42],
             CapturedDelta::ReplaySetFrameSplitOfferSuppressedById { .. }
         ));
         assert!(matches!(
-            out[46],
+            out[43],
             CapturedDelta::ReplayUpdateNodeHistoryById { .. }
         ));
         assert!(matches!(
+            out[44],
+            CapturedDelta::ReplaySetImportRecords { .. }
+        ));
+        assert!(matches!(
+            out[45],
+            CapturedDelta::ReplaySetImportRecords { .. }
+        ));
+        assert!(matches!(
+            out[46],
+            CapturedDelta::ReplaySetImportRecords { .. }
+        ));
+        assert!(matches!(
             out[47],
-            CapturedDelta::ReplaySetImportRecords { .. }
-        ));
-        assert!(matches!(
-            out[48],
-            CapturedDelta::ReplaySetImportRecords { .. }
-        ));
-        assert!(matches!(
-            out[49],
-            CapturedDelta::ReplaySetImportRecords { .. }
-        ));
-        assert!(matches!(
-            out[50],
             CapturedDelta::ReplayRetractRelationsByIds { .. }
         ));
         assert!(matches!(
-            out[51],
+            out[48],
             CapturedDelta::ReplayRemoveNodeById { .. }
         ));
     }

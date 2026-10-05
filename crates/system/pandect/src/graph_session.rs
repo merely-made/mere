@@ -38,7 +38,7 @@ use kernel::graph::apply::{GraphDelta, apply_graph_delta};
 use kernel::graph::node_facets::{PROVENANCE_DERIVATIONS, PROVENANCE_IMPORT};
 use kernel::graph::{
     AttributedDelta, Author, CapturedDelta, Graph, GraphJournal, LogId, Part, Seq, Touched,
-    replay_captured_deltas_onto, revert_change,
+    replay_captured_deltas_as_onto, revert_change,
 };
 use kernel::persistence::GraphSnapshot;
 use kernel::time::wall_clock_now;
@@ -440,14 +440,7 @@ impl<B: Backend> GraphSession<B> {
             },
             _ => (baseline.clone(), Seq(0)),
         };
-        replay_captured_deltas_onto(
-            &mut graph,
-            journal
-                .log()
-                .from(checkpointed)
-                .iter()
-                .map(|entry| entry.delta.clone()),
-        );
+        journal.replay_from(checkpointed, &mut graph);
 
         let mut session = Self {
             slots,
@@ -566,7 +559,7 @@ impl<B: Backend> GraphSession<B> {
         let deltas = edits
             .iter()
             .map(|edit| {
-                edit.replay_delta()
+                edit.replay_delta_as(&author)
                     .ok_or_else(|| SessionError::NotReplayable(format!("{edit:?}")))
             })
             .collect::<Result<Vec<_>, _>>()?;
@@ -598,7 +591,7 @@ impl<B: Backend> GraphSession<B> {
         edit: impl FnOnce(&mut Graph) -> R,
     ) -> (R, Applied) {
         let first = self.journal.live_cursor();
-        let result = edit(&mut self.graph);
+        let result = self.graph.write_as(author.clone(), edit);
         let recorded = std::mem::take(&mut *self.pending.lock().expect("recorder buffer"));
         for delta in recorded {
             self.journal.record_as(author.clone(), delta);
@@ -832,7 +825,7 @@ impl<B: Backend> GraphSession<B> {
             .edits
             .iter()
             .map(|edit| {
-                edit.replay_delta()
+                edit.replay_delta_as(&author)
                     .ok_or_else(|| SessionError::NotReplayable(format!("{edit:?}")))
             })
             .collect::<Result<Vec<_>, _>>()?;
@@ -872,7 +865,9 @@ impl<B: Backend> GraphSession<B> {
     pub fn graph_at(&self, cursor: Seq) -> Option<Graph> {
         let entries = self.journal.entries().get(..cursor.index())?;
         let mut graph = self.baseline.clone();
-        replay_captured_deltas_onto(&mut graph, entries.iter().map(|entry| entry.delta.clone()));
+        for entry in entries {
+            replay_captured_deltas_as_onto(&mut graph, &entry.author, [entry.delta.clone()]);
+        }
         Some(graph)
     }
 
@@ -1153,6 +1148,7 @@ impl<B: Backend + Clone> MereSessions<B> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use kernel::graph::replay_captured_deltas_onto;
 
     use euclid::default::Point2D;
     use muniment::{DirectoryBackend, MemoryBackend};
@@ -1254,7 +1250,6 @@ mod tests {
                     "person persona-a via turnstone",
                     "person persona-a via knot-editor",
                     "person persona-a via knot-editor",
-                    "person persona-a via knot-editor",
                 ]
             );
             let kinds: Vec<&ChangeKind> = session.changes().iter().map(|c| &c.kind).collect();
@@ -1270,12 +1265,12 @@ mod tests {
             let session_dir = dir.path().join("sessions").join(id.as_uuid().to_string());
             assert!(session_dir.join("manifest.json").is_file());
             let journal = std::fs::read_to_string(session_dir.join("journal.jsonl")).unwrap();
-            assert_eq!(journal.lines().count(), 7);
+            assert_eq!(journal.lines().count(), 6);
 
             let store = DirectoryBackend::open(dir.path()).unwrap();
             let reopened = GraphSession::open(store, id).await.unwrap();
             assert_eq!(fingerprint(reopened.graph()), live);
-            assert_eq!(reopened.journal().len(), 7);
+            assert_eq!(reopened.journal().len(), 6);
             assert_eq!(reopened.changes().len(), 3);
             assert_eq!(
                 reopened.manifest().display_name.as_deref(),
@@ -1771,6 +1766,68 @@ mod tests {
                 .unwrap();
             assert_eq!(result.end, Seq(3));
             assert_eq!(session.graph().get_node(key).unwrap().title, "Seven");
+        });
+    }
+    #[test]
+    fn assertion_author_version_and_source_survive_session_replay() {
+        use kernel::graph::{SemanticStatementSpec, SemanticSubKind, predicate_iri};
+        pollster::block_on(async {
+            let mere = MereSessions::new(MemoryBackend::default());
+            let manifest = mere.mint(person(), None).await.unwrap();
+            let mut session = mere.open(manifest.session_id).await.unwrap();
+            session.apply(person(), vec![add(1), add(2)]).await.unwrap();
+            let claim = |graph: &mut Graph, time, source: Option<&str>| {
+                let from = graph.get_node_key_by_id(Uuid::from_u128(1)).unwrap();
+                let to = graph.get_node_key_by_id(Uuid::from_u128(2)).unwrap();
+                graph
+                    .assert_semantic_statement(
+                        from,
+                        to,
+                        SemanticStatementSpec {
+                            predicate: predicate_iri(SemanticSubKind::Cites).into(),
+                            recognized_sub_kind: Some(SemanticSubKind::Cites),
+                            provenance_iri: source.map(str::to_owned),
+                            asserted_at_ms: Some(time),
+                            ..Default::default()
+                        },
+                    )
+                    .unwrap()
+                    .1
+                    .statement_id
+            };
+            let (first, _) = session.edit_now(Author::engine("extractor", "1"), |graph| {
+                claim(graph, 10, None)
+            });
+            let (second, _) = session.edit_now(Author::engine("extractor", "2"), |graph| {
+                claim(graph, 20, None)
+            });
+            assert_eq!(
+                first, second,
+                "new engine version updates its own assertion"
+            );
+            session.edit_now(Author::engine("extractor", "2"), |graph| {
+                claim(graph, 30, Some("https://page.test/"))
+            });
+            let graph = session.graph();
+            let from = graph.get_node_key_by_id(Uuid::from_u128(1)).unwrap();
+            let to = graph.get_node_key_by_id(Uuid::from_u128(2)).unwrap();
+            let statements = graph
+                .get_edge(graph.find_edge_key(from, to).unwrap())
+                .unwrap()
+                .semantic_statements();
+            assert_eq!(statements.len(), 2);
+            assert_eq!(
+                statements[0].provenance_iri,
+                Some(Author::engine("extractor", "1").asserter_iri())
+            );
+            assert_eq!(statements[0].asserted_at_ms, Some(20));
+            assert_eq!(
+                statements[1].provenance_iri.as_deref(),
+                Some("https://page.test/")
+            );
+            let live = serde_json::to_value(graph.to_snapshot()).unwrap();
+            let replayed = session.graph_at(session.journal().live_cursor()).unwrap();
+            assert_eq!(serde_json::to_value(replayed.to_snapshot()).unwrap(), live);
         });
     }
 }

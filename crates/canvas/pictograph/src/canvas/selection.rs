@@ -157,9 +157,11 @@ impl Canvas {
         // already present), so we don't gate success on its return: for a clean
         // pair the relation is present afterwards either way, which is what
         // "relate these two" means. Reconcile rebuilds edges / springs.
+        let asserter_iri = self.graph.write_author().asserter_iri();
         let _ = apply_graph_delta(
             &mut self.graph,
             GraphDelta::AssertRelation {
+                asserter_iri,
                 from: pair[0],
                 to: pair[1],
                 assertion: EdgeAssertion::Semantic {
@@ -188,9 +190,11 @@ impl Canvas {
         let Some(to) = self.graph.get_node_key_by_id(to_id) else {
             return false;
         };
+        let asserter_iri = self.graph.write_author().asserter_iri();
         let _ = apply_graph_delta(
             &mut self.graph,
             GraphDelta::AssertRelation {
+                asserter_iri,
                 from,
                 to,
                 assertion: EdgeAssertion::Semantic {
@@ -509,7 +513,8 @@ impl Canvas {
             .any(|relation| {
                 relation.from == from
                     && relation.to == to
-                    && crate::canvas::edge_cells::selector_for_relation_kind(relation.kind) == selector
+                    && crate::canvas::edge_cells::selector_for_relation_kind(relation.kind)
+                        == selector
             })
             .then_some(cell)
     }

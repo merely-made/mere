@@ -249,6 +249,7 @@ mod tests {
         apply_graph_delta(
             &mut graph,
             GraphDelta::AssertRelation {
+                asserter_iri: crate::graph::journal::Author::user().asserter_iri(),
                 from: a,
                 to: b,
                 assertion: crate::graph::EdgeAssertion::Semantic {

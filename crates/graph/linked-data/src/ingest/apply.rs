@@ -113,6 +113,10 @@ pub fn apply_contribution(graph: &mut Graph, contribution: &GraphContribution) -
             continue;
         };
         let sub_kind = sub_kind_from_iri(&edge.predicate);
+        let asserter = edge
+            .provenance_iri
+            .clone()
+            .unwrap_or_else(|| graph.write_author().asserter_iri());
         let has_statement_metadata = edge.statement_id.is_some()
             || edge.label.is_some()
             || edge.provenance_iri.is_some()
@@ -133,7 +137,7 @@ pub fn apply_contribution(graph: &mut Graph, contribution: &GraphContribution) -
                             recognized_sub_kind: sub_kind,
                             label: edge.label.clone(),
                             graph_scope: edge.graph_scope.clone(),
-                            provenance_iri: edge.provenance_iri.clone(),
+                            provenance_iri: Some(asserter.clone()),
                             asserted_at_ms: edge.asserted_at_ms,
                         },
                     )
@@ -147,7 +151,7 @@ pub fn apply_contribution(graph: &mut Graph, contribution: &GraphContribution) -
                             recognized_sub_kind: sub_kind,
                             label: edge.label.clone(),
                             graph_scope: edge.graph_scope.clone(),
-                            provenance_iri: edge.provenance_iri.clone(),
+                            provenance_iri: Some(asserter.clone()),
                             asserted_at_ms: edge.asserted_at_ms,
                         },
                     )

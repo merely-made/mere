@@ -4,8 +4,6 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-use std::collections::BTreeSet;
-
 use chartulary::stemma::TransitionKind;
 use euclid::default::Point2D;
 use uuid::Uuid;
@@ -35,6 +33,7 @@ pub enum GraphDelta {
         from: NodeKey,
         to: NodeKey,
         assertion: EdgeAssertion,
+        asserter_iri: String,
     },
     RemoveNode {
         key: NodeKey,
@@ -48,6 +47,7 @@ pub enum GraphDelta {
         from_id: Uuid,
         to_id: Uuid,
         assertion: EdgeAssertion,
+        asserter_iri: String,
     },
     ReplayRemoveNodeById {
         node_id: Uuid,
@@ -169,11 +169,13 @@ pub enum GraphDelta {
         from_id: Uuid,
         to_id: Uuid,
         predicate: Option<String>,
+        asserter_iri: String,
     },
     ReplayAssertSemanticPredicateByIds {
         from_id: Uuid,
         to_id: Uuid,
         predicate: String,
+        asserter_iri: String,
     },
     ReplayAppendFrameLayoutHintById {
         node_id: Uuid,
@@ -399,17 +401,13 @@ pub enum GraphDelta {
         tag: String,
         icon: Option<BadgeIcon>,
     },
-    /// Set (or clear) the canonical semantic-predicate IRI on an existing edge.
-    SetEdgeSemanticPredicate {
-        edge: EdgeKey,
-        predicate: Option<String>,
-    },
     /// Assert a plain semantic edge carrying a raw predicate IRI (the
     /// unrecognized-predicate ingest path), creating the edge if absent.
     AssertSemanticPredicate {
         from: NodeKey,
         to: NodeKey,
         predicate: String,
+        asserter_iri: String,
     },
     ReplayAddField {
         field: PersistedField,
@@ -501,34 +499,6 @@ fn capture_visit_stamp(graph: &Graph, key: NodeKey) {
     }
 }
 
-/// The statement ids on every relation from `from` to `to`.
-fn statement_ids(graph: &Graph, from: NodeKey, to: NodeKey) -> BTreeSet<String> {
-    graph
-        .persisted_edges_between(from, to)
-        .into_iter()
-        .filter_map(|edge| edge.semantic)
-        .flat_map(|semantic| semantic.statements)
-        .map(|statement| statement.statement_id)
-        .collect()
-}
-
-/// Journal the exact relations from `from` to `to` when an edit minted a
-/// statement id there: replay would mint a different one, so the journal
-/// keeps the ids this graph holds.
-fn capture_minted_statements(graph: &Graph, from: NodeKey, to: NodeKey, before: &BTreeSet<String>) {
-    if statement_ids(graph, from, to).is_subset(before) {
-        return;
-    }
-    let (Some(from_node), Some(to_node)) = (graph.get_node(from), graph.get_node(to)) else {
-        return;
-    };
-    graph.record_delta(&CapturedDelta::ReplaySetEdgesByIds {
-        from_id: from_node.id.to_string(),
-        to_id: to_node.id.to_string(),
-        edges: graph.persisted_edges_between(from, to),
-    });
-}
-
 fn capture_resolved_import_records(graph: &Graph) {
     graph.record_delta(&CapturedDelta::ReplaySetImportRecords {
         import_records: graph.import_records().to_vec(),
@@ -586,21 +556,20 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
             from,
             to,
             assertion,
+            asserter_iri,
         } => {
-            let from_id = graph.get_node(from).map(|node| node.id);
-            let to_id = graph.get_node(to).map(|node| node.id);
+            let semantic = matches!(assertion, EdgeAssertion::Semantic { .. });
             let capture_assertion = assertion.clone();
-            let minted_before = statement_ids(graph, from, to);
-            let edge = graph.assert_relation(from, to, assertion);
-            if edge.is_some()
-                && let (Some(from_id), Some(to_id)) = (from_id, to_id)
+            let edge = graph.assert_relation_as(from, to, assertion, asserter_iri, None);
+            if !semantic
+                && edge.is_some()
+                && let (Some(from_node), Some(to_node)) = (graph.get_node(from), graph.get_node(to))
             {
                 graph.record_delta(&CapturedDelta::ReplayAssertRelationByIds {
-                    from_id: from_id.to_string(),
-                    to_id: to_id.to_string(),
+                    from_id: from_node.id.to_string(),
+                    to_id: to_node.id.to_string(),
                     assertion: capture_assertion,
                 });
-                capture_minted_statements(graph, from, to, &minted_before);
             }
             GraphDeltaResult::EdgeAdded(edge)
         },
@@ -632,25 +601,25 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
             from_id,
             to_id,
             assertion,
+            asserter_iri,
         } => {
-            let capture_assertion = assertion.clone();
-            let pair = graph
+            let edge = graph
                 .get_node_key_by_id(from_id)
-                .zip(graph.get_node_key_by_id(to_id));
-            let minted_before = pair
-                .map(|(from, to)| statement_ids(graph, from, to))
-                .unwrap_or_default();
-            let edge = graph.replay_assert_relation_by_ids(from_id, to_id, assertion);
-            if edge.is_some() {
-                graph.record_delta(&CapturedDelta::ReplayAssertRelationByIds {
-                    from_id: from_id.to_string(),
-                    to_id: to_id.to_string(),
-                    assertion: capture_assertion,
+                .zip(graph.get_node_key_by_id(to_id))
+                .and_then(|(from, to)| {
+                    match apply_graph_delta(
+                        graph,
+                        GraphDelta::AssertRelation {
+                            from,
+                            to,
+                            assertion,
+                            asserter_iri,
+                        },
+                    ) {
+                        GraphDeltaResult::EdgeAdded(edge) => edge,
+                        _ => unreachable!(),
+                    }
                 });
-                if let Some((from, to)) = pair {
-                    capture_minted_statements(graph, from, to, &minted_before);
-                }
-            }
             GraphDeltaResult::EdgeAdded(edge)
         },
         GraphDelta::ReplayRemoveNodeById { node_id } => {
@@ -1579,24 +1548,18 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
             from_id,
             to_id,
             predicate,
+            asserter_iri,
         } => {
             let pair = graph
                 .get_node_key_by_id(from_id)
                 .zip(graph.get_node_key_by_id(to_id));
-            let minted_before = pair
-                .map(|(from, to)| statement_ids(graph, from, to))
-                .unwrap_or_default();
-            let updated =
-                graph.replay_set_edge_semantic_predicate_by_ids(from_id, to_id, predicate.clone());
-            if updated {
-                graph.record_delta(&CapturedDelta::ReplaySetEdgeSemanticPredicateByIds {
-                    from_id: from_id.to_string(),
-                    to_id: to_id.to_string(),
-                    predicate,
+            let updated = pair
+                .and_then(|(from, to)| graph.find_edge_key(from, to))
+                .is_some_and(|edge| {
+                    graph.set_edge_semantic_predicate_as(edge, predicate.clone(), asserter_iri)
                 });
-                if let Some((from, to)) = pair {
-                    capture_minted_statements(graph, from, to, &minted_before);
-                }
+            if updated && let Some((from, to)) = pair {
+                graph.capture_semantic_pair(from, to);
             }
             GraphDeltaResult::NodeMetadataUpdated(updated)
         },
@@ -1604,68 +1567,47 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
             from_id,
             to_id,
             predicate,
+            asserter_iri,
         } => {
-            let pair = graph
+            let edge = graph
                 .get_node_key_by_id(from_id)
-                .zip(graph.get_node_key_by_id(to_id));
-            let minted_before = pair
-                .map(|(from, to)| statement_ids(graph, from, to))
-                .unwrap_or_default();
-            let edge =
-                graph.replay_assert_semantic_predicate_by_ids(from_id, to_id, predicate.clone());
-            if edge.is_some() {
-                graph.record_delta(&CapturedDelta::ReplayAssertSemanticPredicateByIds {
-                    from_id: from_id.to_string(),
-                    to_id: to_id.to_string(),
-                    predicate,
+                .zip(graph.get_node_key_by_id(to_id))
+                .and_then(|(from, to)| {
+                    match apply_graph_delta(
+                        graph,
+                        GraphDelta::AssertSemanticPredicate {
+                            from,
+                            to,
+                            predicate,
+                            asserter_iri,
+                        },
+                    ) {
+                        GraphDeltaResult::EdgeAdded(edge) => edge,
+                        _ => unreachable!(),
+                    }
                 });
-                if let Some((from, to)) = pair {
-                    capture_minted_statements(graph, from, to, &minted_before);
-                }
-            }
             GraphDeltaResult::EdgeAdded(edge)
-        },
-        GraphDelta::SetEdgeSemanticPredicate { edge, predicate } => {
-            let pair = graph.inner.inner().edge_endpoints(edge);
-            let endpoints = pair
-                .and_then(|(from, to)| Some((graph.get_node(from)?.id, graph.get_node(to)?.id)));
-            let minted_before = pair
-                .map(|(from, to)| statement_ids(graph, from, to))
-                .unwrap_or_default();
-            let capture_predicate = predicate.clone();
-            let updated = graph.set_edge_semantic_predicate(edge, predicate);
-            if updated && let Some((from_id, to_id)) = endpoints {
-                graph.record_delta(&CapturedDelta::ReplaySetEdgeSemanticPredicateByIds {
-                    from_id: from_id.to_string(),
-                    to_id: to_id.to_string(),
-                    predicate: capture_predicate,
-                });
-                if let Some((from, to)) = pair {
-                    capture_minted_statements(graph, from, to, &minted_before);
-                }
-            }
-            GraphDeltaResult::NodeMetadataUpdated(updated)
         },
         GraphDelta::AssertSemanticPredicate {
             from,
             to,
             predicate,
+            asserter_iri,
         } => {
-            let from_id = graph.get_node(from).map(|node| node.id);
-            let to_id = graph.get_node(to).map(|node| node.id);
-            let capture_predicate = predicate.clone();
-            let minted_before = statement_ids(graph, from, to);
-            let edge = graph.assert_semantic_predicate(from, to, predicate);
-            if edge.is_some()
-                && let (Some(from_id), Some(to_id)) = (from_id, to_id)
-            {
-                graph.record_delta(&CapturedDelta::ReplayAssertSemanticPredicateByIds {
-                    from_id: from_id.to_string(),
-                    to_id: to_id.to_string(),
-                    predicate: capture_predicate,
-                });
-                capture_minted_statements(graph, from, to, &minted_before);
-            }
+            let edge = graph
+                .assert_semantic_statement(
+                    from,
+                    to,
+                    super::SemanticStatementSpec {
+                        predicate,
+                        recognized_sub_kind: None,
+                        label: None,
+                        graph_scope: GraphScope::Default,
+                        provenance_iri: Some(asserter_iri),
+                        asserted_at_ms: None,
+                    },
+                )
+                .and_then(|(edge, outcome)| outcome.changed.then_some(edge));
             GraphDeltaResult::EdgeAdded(edge)
         },
         GraphDelta::ReplayAddField { field } => {
@@ -1883,12 +1825,14 @@ pub fn assert_relation(
     to: NodeKey,
     assertion: EdgeAssertion,
 ) -> Option<EdgeKey> {
+    let asserter_iri = graph.write_author().asserter_iri();
     match apply_graph_delta(
         graph,
         GraphDelta::AssertRelation {
             from,
             to,
             assertion,
+            asserter_iri,
         },
     ) {
         GraphDeltaResult::EdgeAdded(key) => key,

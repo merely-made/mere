@@ -977,7 +977,8 @@ mod tests {
     /// THE Phase 2 losslessness gate (petgraph-RDF plan): a graph exercising
     /// the full profile construct matrix — typed + language-tagged literals,
     /// named graph scopes, statement metadata (label / provenance / assertion
-    /// time via RDF 1.2 reifiers), two differently-scoped statements on one
+    /// time via RDF 1.2 reifiers), two asserters of one triple term and
+    /// two differently-scoped statements on one
     /// pair, a recognized (CiTO-mapped) and a raw predicate, `rdf:type`,
     /// curated title/tags — projects to quads, re-ingests through the quad
     /// path into a FRESH graph, and projects identically: a normalized
@@ -985,7 +986,9 @@ mod tests {
     /// handles. "Lossless under the profile" as a checked property.
     #[test]
     fn dataset_round_trip_is_lossless_under_the_profile() {
+        use super::{GRAPH_SCOPE_USER, RDF_REIFIES};
         use kernel::graph::SemanticStatementSpec;
+        use oxrdf::{GraphName, NamedNode, Term};
 
         let mut graph = Graph::new();
         let a = graph.add_node("https://a.test/".to_string(), Default::default());
@@ -1037,6 +1040,23 @@ mod tests {
                 },
             )
             .expect("raw predicate statement");
+
+        // The same triple term and scope has two independently attributable
+        // assertion handles; neither reifier may overwrite the other.
+        graph
+            .assert_semantic_statement(
+                a,
+                b,
+                SemanticStatementSpec {
+                    predicate: "https://mere.computer/ns/rel#cites".to_string(),
+                    recognized_sub_kind: Some(SemanticSubKind::Cites),
+                    label: Some("also cited by Alice".to_string()),
+                    graph_scope: GraphScope::User,
+                    provenance_iri: Some("https://persona.test/alice".to_string()),
+                    asserted_at_ms: Some(1_720_000_050_000),
+                },
+            )
+            .expect("second asserter statement");
 
         // Typed + language-tagged + scoped literals with metadata.
         let mut published = NodeProperty::new(
@@ -1094,11 +1114,32 @@ mod tests {
         };
         let exported = normalized(&graph);
 
+        let reifiers: Vec<_> = crate::dataset_quads(&graph)
+            .into_iter()
+            .filter(|quad| {
+                quad.predicate.as_str() == RDF_REIFIES
+                    && quad.graph_name
+                        == GraphName::from(NamedNode::new(GRAPH_SCOPE_USER).expect("user scope"))
+                    && matches!(&quad.object, Term::Triple(triple)
+                        if triple.predicate.as_str() == "https://mere.computer/ns/rel#cites")
+            })
+            .collect();
+        assert_eq!(reifiers.len(), 2, "one reifier per asserter");
+        assert_ne!(reifiers[0].subject, reifiers[1].subject);
+        assert_eq!(
+            reifiers[0].object, reifiers[1].object,
+            "one shared triple term"
+        );
+
         let contribution =
             crate::ingest::from_quads(crate::dataset_quads(&graph), "gate").expect("quad ingest");
         let mut reimported = Graph::new();
         let outcome = crate::ingest::apply_contribution(&mut reimported, &contribution);
         assert!(outcome.edges_skipped == 0, "self-contained contribution");
+        assert_eq!(
+            outcome.edges_asserted, 4,
+            "all four assertion handles survive"
+        );
 
         let reexported = normalized(&reimported);
         assert_eq!(
@@ -1175,13 +1216,16 @@ mod tests {
             None,
             GraphScope::Source,
         );
-        graph.get_node_mut(a).expect("node a").properties.push(
+        assert!(graph.append_node_properties(
+            a,
+            vec![
             NodeProperty::new(
                 "https://schema.org/datePublished".to_string(),
                 "2026-07-04".to_string(),
             )
             .with_graph_scope(GraphScope::User),
-        );
+        ]
+        ));
 
         let scoped_edge = crate::query::sparql(
             &graph,
@@ -1241,11 +1285,7 @@ mod tests {
             Some(1_720_000_100_456),
         );
         property.statement_id = "stmt-prop-1".to_string();
-        graph
-            .get_node_mut(a)
-            .expect("node a")
-            .properties
-            .push(property);
+        assert!(graph.append_node_properties(a, vec![property]));
 
         let (_, node_a) = graph.get_node_by_url("https://a.test/").expect("node a");
         assert!(
