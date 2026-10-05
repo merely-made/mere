@@ -36,7 +36,10 @@ use muniment::{Journal, LogId, Provenance, Seq};
 use rkyv::{Archive, Deserialize, Serialize};
 
 use super::Graph;
-use super::capture::{CapturedDelta, DeltaRecorder, replay_graph_deltas_onto};
+use super::capture::{
+    CapturedDelta, DeltaRecorder, ReplayAttribution, replay_attributed_deltas_onto,
+    replay_graph_deltas_onto,
+};
 use super::source_time::{SourceExtent, SourceTime};
 
 /// The id the trusted UI's person records under when the host has no persona
@@ -309,9 +312,14 @@ impl GraphJournal {
     /// replays every current entry. A cursor beyond the known prefix is stale
     /// and is refused rather than silently clamped to live.
     pub fn snapshot_at(&self, cursor: Seq) -> Option<Graph> {
+        self.snapshot_at_from(&Graph::new(), cursor)
+    }
+
+    /// Replay a prefix over its retained baseline, preserving baseline attribution.
+    pub fn snapshot_at_from(&self, baseline: &Graph, cursor: Seq) -> Option<Graph> {
         let end = cursor.index();
         (end <= self.log.len()).then(|| {
-            let mut graph = Graph::new();
+            let mut graph = baseline.clone();
             replay_entries_onto(&mut graph, &self.log.entries()[..end]);
             graph
         })
@@ -357,8 +365,28 @@ impl GraphJournal {
     /// The checkpoint-plus-tail path: restore a `GraphSnapshot`, then apply only
     /// the journal entries recorded after the snapshot's sequence. The incremental
     /// twin of [`replay`](Self::replay).
+    /// Without a retained baseline, exact records missing attribution stay unknown.
+    /// Use [`replay_from_with_baseline`](Self::replay_from_with_baseline) to recover
+    /// the original minting author across earlier removal and later restoration.
     pub fn replay_from(&self, since: Seq, graph: &mut Graph) {
-        replay_entries_onto(graph, self.log.from(since));
+        replay_graph_deltas_onto(
+            graph,
+            self.log
+                .from(since)
+                .iter()
+                .filter_map(|entry| entry.delta.replay_delta_as(&entry.author)),
+        );
+    }
+
+    /// Replay a checkpoint tail with the baseline and original minting entries.
+    /// `baseline` is the graph before entry zero, not the checkpoint at `since`.
+    pub fn replay_from_with_baseline(&self, since: Seq, graph: &mut Graph, baseline: &Graph) {
+        let mut attribution = ReplayAttribution::from_baseline(baseline);
+        for entry in self.log.entries().iter().take(since.index()) {
+            let _ = attribution.replay_delta(&entry.delta, &entry.author);
+        }
+        attribution.repair_checkpoint(graph);
+        replay_attributed_deltas_onto(graph, &mut attribution, self.log.from(since));
     }
 
     /// Fork this journal under a new identity: copies the whole edit history and
@@ -395,12 +423,8 @@ fn replay_entries_onto<'a, I>(graph: &mut Graph, entries: I)
 where
     I: IntoIterator<Item = &'a AttributedDelta>,
 {
-    replay_graph_deltas_onto(
-        graph,
-        entries
-            .into_iter()
-            .filter_map(|entry| entry.delta.replay_delta_as(&entry.author)),
-    );
+    let mut attribution = ReplayAttribution::from_baseline(graph);
+    replay_attributed_deltas_onto(graph, &mut attribution, entries);
 }
 
 impl SourceTime for GraphJournal {
@@ -657,10 +681,10 @@ mod tests {
 
     #[test]
     fn legacy_exact_capture_attribution_matches_checkpoint_replay() {
-        use crate::graph::{SemanticStatementSpec, edge_data::UNKNOWN_LEGACY_ASSERTER_IRI};
+        use crate::graph::SemanticStatementSpec;
 
         let recorder = Author::engine("legacy-extractor", "1");
-        for source in [None, Some("https://source.test/page")] {
+        for source in [Some("https://source.test/page"), None] {
             let mut template =
                 replay_captured_deltas([add(1, "https://a.test/"), add(2, "https://b.test/")]);
             let from = template.get_node_key_by_id(Uuid::from_u128(1)).unwrap();
@@ -682,6 +706,29 @@ mod tests {
             let old_statement = &mut old_edges[0].semantic.as_mut().unwrap().statements[0];
             old_statement.statement_id = "legacy-exact-handle".into();
             old_statement.provenance_iri = source.map(str::to_owned);
+            if source.is_none() {
+                let exact = CapturedDelta::ReplaySetEdgesByIds {
+                    from_id: Uuid::from_u128(1).to_string(),
+                    to_id: Uuid::from_u128(2).to_string(),
+                    edges: old_edges.clone(),
+                };
+                let mut baseline = template.clone();
+                super::super::capture::replay_captured_deltas_onto(&mut baseline, [exact.clone()]);
+                let mut baseline_journal = GraphJournal::new();
+                baseline_journal.record_as(recorder.clone(), exact);
+                baseline_journal.replay_from(Seq(0), &mut baseline);
+                assert_eq!(
+                    baseline.persisted_edges_between(from, to)[0]
+                        .semantic
+                        .as_ref()
+                        .unwrap()
+                        .statements[0]
+                        .provenance_iri
+                        .as_deref(),
+                    Some(super::super::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI),
+                    "an unattributed baseline handle stays unknown"
+                );
+            }
             let mut journal = GraphJournal::new();
             journal.record(add(1, "https://a.test/"));
             journal.record(add(2, "https://b.test/"));
@@ -721,17 +768,203 @@ mod tests {
             assert_eq!(statements[0].asserted_at_ms, Some(100));
             assert_eq!(
                 statements[0].provenance_iri.as_deref(),
-                Some(source.unwrap_or(UNKNOWN_LEGACY_ASSERTER_IRI)),
-                "missing legacy attribution is explicit; a known source remains unchanged"
+                Some(
+                    source
+                        .map(str::to_owned)
+                        .unwrap_or_else(|| recorder.asserter_iri())
+                        .as_str()
+                ),
+                "a minted handle recovers its Author; a known source remains unchanged"
             );
-            assert_ne!(statements[0].provenance_iri, Some(recorder.asserter_iri()));
 
             let mut checkpoint = Graph::from_snapshot(&prefix.to_snapshot());
-            journal.replay_from(Seq(3), &mut checkpoint);
+            journal.replay_from_with_baseline(Seq(3), &mut checkpoint, &Graph::new());
             assert_eq!(checkpoint.persisted_edges_between(from, to), expected);
             let reopened = Graph::from_snapshot(&full.to_snapshot());
             assert_eq!(reopened.persisted_edges_between(from, to), expected);
         }
+    }
+
+    #[test]
+    fn legacy_checkpoint_empty_tail_recovers_proven_minting_attribution() {
+        use crate::graph::{SemanticStatementSpec, edge_data::UNKNOWN_LEGACY_ASSERTER_IRI};
+
+        let mut template =
+            replay_captured_deltas([add(1, "https://a.test/"), add(2, "https://b.test/")]);
+        let from = template.get_node_key_by_id(Uuid::from_u128(1)).unwrap();
+        let to = template.get_node_key_by_id(Uuid::from_u128(2)).unwrap();
+        template.assert_semantic_statement(
+            from,
+            to,
+            SemanticStatementSpec {
+                predicate: super::super::predicate_iri(SemanticSubKind::Cites).into(),
+                recognized_sub_kind: Some(SemanticSubKind::Cites),
+                provenance_iri: Some("https://template.test/".into()),
+                asserted_at_ms: Some(100),
+                ..Default::default()
+            },
+        );
+        let mut edges = template.persisted_edges_between(from, to);
+        let mut unknown = edges[0].semantic.as_ref().unwrap().statements[0].clone();
+        unknown.statement_id = "baseline-unknown".into();
+        unknown.provenance_iri = None;
+        let mut known = unknown.clone();
+        known.statement_id = "baseline-source".into();
+        known.provenance_iri = Some("https://source.test/page".into());
+        known.asserted_at_ms = Some(101);
+        edges[0].semantic.as_mut().unwrap().statements = vec![unknown.clone(), known];
+        let capture = |edges| CapturedDelta::ReplaySetEdgesByIds {
+            from_id: Uuid::from_u128(1).to_string(),
+            to_id: Uuid::from_u128(2).to_string(),
+            edges,
+        };
+        let mut baseline = template;
+        super::super::capture::replay_captured_deltas_onto(&mut baseline, [capture(edges.clone())]);
+        let mut minted = unknown;
+        minted.statement_id = "minted-handle".into();
+        minted.asserted_at_ms = Some(200);
+        edges[0].semantic.as_mut().unwrap().statements.push(minted);
+        let minter = Author::engine("first-extractor", "1");
+        let mut journal = GraphJournal::new();
+        journal.record_as(minter.clone(), capture(edges));
+        let mut checkpoint = baseline.clone();
+        super::super::capture::replay_captured_deltas_onto(
+            &mut checkpoint,
+            journal.entries().iter().map(|entry| entry.delta.clone()),
+        );
+        let old = checkpoint.persisted_edges_between(from, to);
+        let old_statements = &old[0].semantic.as_ref().unwrap().statements;
+        assert_eq!(old_statements.len(), 3);
+        assert_eq!(
+            old_statements[0].provenance_iri.as_deref(),
+            Some(UNKNOWN_LEGACY_ASSERTER_IRI)
+        );
+        assert_eq!(
+            old_statements[1].provenance_iri.as_deref(),
+            Some("https://source.test/page")
+        );
+        assert_eq!(
+            old_statements[2].provenance_iri.as_deref(),
+            Some(UNKNOWN_LEGACY_ASSERTER_IRI)
+        );
+        checkpoint = Graph::from_snapshot(&checkpoint.to_snapshot());
+        let before_revision = checkpoint.revision();
+        let captured = Arc::new(Mutex::new(Vec::new()));
+        let sink = captured.clone();
+        checkpoint.set_recorder(Some(Arc::new(move |delta| {
+            sink.lock().unwrap().push(delta.clone());
+        })));
+        journal.replay_from_with_baseline(Seq(1), &mut checkpoint, &baseline);
+        let repaired = checkpoint.persisted_edges_between(from, to);
+        let statements = &repaired[0].semantic.as_ref().unwrap().statements;
+        assert_eq!(statements[2].provenance_iri, Some(minter.asserter_iri()));
+        assert_eq!(statements[2].statement_id, "minted-handle");
+        assert_eq!(statements[2].asserted_at_ms, Some(200));
+        assert_eq!(statements[0], old_statements[0]);
+        assert_eq!(statements[1], old_statements[1]);
+        assert!(checkpoint.revision() > before_revision);
+        assert!(captured.lock().unwrap().is_empty());
+        let full = journal.snapshot_at_from(&baseline, Seq(1)).unwrap();
+        assert_eq!(repaired, full.persisted_edges_between(from, to));
+    }
+
+    #[test]
+    fn exact_capture_attribution_survives_later_authors_and_absent_checkpoint_handles() {
+        use crate::graph::{SemanticStatementSpec, edge_data::UNKNOWN_LEGACY_ASSERTER_IRI};
+
+        let mut template =
+            replay_captured_deltas([add(1, "https://a.test/"), add(2, "https://b.test/")]);
+        let from = template.get_node_key_by_id(Uuid::from_u128(1)).unwrap();
+        let to = template.get_node_key_by_id(Uuid::from_u128(2)).unwrap();
+        template.assert_semantic_statement(
+            from,
+            to,
+            SemanticStatementSpec {
+                predicate: super::super::predicate_iri(SemanticSubKind::Cites).into(),
+                recognized_sub_kind: Some(SemanticSubKind::Cites),
+                provenance_iri: Some("https://template.test/".into()),
+                asserted_at_ms: Some(100),
+                ..Default::default()
+            },
+        );
+        let mut edges = template.persisted_edges_between(from, to);
+        let mut unknown = edges[0].semantic.as_ref().unwrap().statements[0].clone();
+        unknown.statement_id = "baseline-unknown".into();
+        unknown.provenance_iri = None;
+        let mut known = unknown.clone();
+        known.statement_id = "baseline-source".into();
+        known.provenance_iri = Some("https://source.test/page".into());
+        edges[0].semantic.as_mut().unwrap().statements = vec![unknown.clone(), known.clone()];
+        let capture = |edges| CapturedDelta::ReplaySetEdgesByIds {
+            from_id: Uuid::from_u128(1).to_string(),
+            to_id: Uuid::from_u128(2).to_string(),
+            edges,
+        };
+        let mut baseline = template;
+        super::super::capture::replay_captured_deltas_onto(&mut baseline, [capture(edges.clone())]);
+
+        let minter = Author::engine("first-extractor", "1");
+        let updater = Author::script("later-update", "1");
+        let undoer = Author::rule("undo", "1");
+        let mut minted = unknown.clone();
+        minted.statement_id = "minted-handle".into();
+        minted.asserted_at_ms = Some(200);
+        edges[0].semantic.as_mut().unwrap().statements.push(minted);
+        let mut journal = GraphJournal::new();
+        journal.record_as(minter.clone(), capture(edges.clone()));
+        edges[0].semantic.as_mut().unwrap().statements[2].asserted_at_ms = Some(201);
+        journal.record_as(updater.clone(), capture(edges.clone()));
+        let mut withdrawn = edges.clone();
+        withdrawn[0].semantic.as_mut().unwrap().statements = vec![known];
+        journal.record_as(updater, capture(withdrawn));
+        edges[0].semantic.as_mut().unwrap().statements[2].asserted_at_ms = Some(202);
+        edges[0].semantic.as_mut().unwrap().statements[1].provenance_iri = None;
+        journal.record_as(undoer, capture(edges));
+
+        let full = journal.snapshot_at_from(&baseline, Seq(4)).unwrap();
+        let expected = full.persisted_edges_between(from, to);
+        let statements = &expected[0].semantic.as_ref().unwrap().statements;
+        assert_eq!(statements.len(), 3);
+        assert_eq!(statements[0].statement_id, "baseline-unknown");
+        assert_eq!(statements[0].asserted_at_ms, Some(100));
+        assert_eq!(
+            statements[0].provenance_iri.as_deref(),
+            Some(UNKNOWN_LEGACY_ASSERTER_IRI)
+        );
+        assert_eq!(statements[1].statement_id, "baseline-source");
+        assert_eq!(
+            statements[1].provenance_iri.as_deref(),
+            Some("https://source.test/page")
+        );
+        assert_eq!(statements[2].statement_id, "minted-handle");
+        assert_eq!(statements[2].asserted_at_ms, Some(202));
+        assert_eq!(statements[2].provenance_iri, Some(minter.asserter_iri()));
+        for cursor in 0..=4 {
+            let prefix = journal.snapshot_at_from(&baseline, Seq(cursor)).unwrap();
+            let mut checkpoint = Graph::from_snapshot(&prefix.to_snapshot());
+            journal.replay_from_with_baseline(Seq(cursor), &mut checkpoint, &baseline);
+            assert_eq!(checkpoint.persisted_edges_between(from, to), expected);
+        }
+
+        let withdrawn = journal.snapshot_at_from(&baseline, Seq(3)).unwrap();
+        assert_eq!(
+            withdrawn.persisted_edges_between(from, to)[0]
+                .semantic
+                .as_ref()
+                .unwrap()
+                .statements
+                .len(),
+            1
+        );
+        let mut without_baseline = Graph::from_snapshot(&withdrawn.to_snapshot());
+        journal.replay_from(Seq(3), &mut without_baseline);
+        let conservative = without_baseline.persisted_edges_between(from, to);
+        assert_eq!(
+            conservative[0].semantic.as_ref().unwrap().statements[2]
+                .provenance_iri
+                .as_deref(),
+            Some(UNKNOWN_LEGACY_ASSERTER_IRI)
+        );
     }
 
     /// A key-independent view: sorted node ids and sorted (from, to, kind) triples.

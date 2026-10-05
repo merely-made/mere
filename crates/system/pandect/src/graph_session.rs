@@ -38,7 +38,7 @@ use kernel::graph::apply::{GraphDelta, apply_graph_delta};
 use kernel::graph::node_facets::{PROVENANCE_DERIVATIONS, PROVENANCE_IMPORT};
 use kernel::graph::{
     AttributedDelta, Author, CapturedDelta, Graph, GraphJournal, LogId, Part, Seq, Touched,
-    replay_captured_deltas_as_onto, revert_change,
+    revert_change,
 };
 use kernel::persistence::GraphSnapshot;
 use kernel::time::wall_clock_now;
@@ -440,7 +440,7 @@ impl<B: Backend> GraphSession<B> {
             },
             _ => (baseline.clone(), Seq(0)),
         };
-        journal.replay_from(checkpointed, &mut graph);
+        journal.replay_from_with_baseline(checkpointed, &mut graph, &baseline);
 
         let mut session = Self {
             slots,
@@ -863,12 +863,7 @@ impl<B: Backend> GraphSession<B> {
     /// The graph as it stood at journal cursor `cursor`: the baseline with the
     /// first `cursor` entries replayed. `None` past the live cursor.
     pub fn graph_at(&self, cursor: Seq) -> Option<Graph> {
-        let entries = self.journal.entries().get(..cursor.index())?;
-        let mut graph = self.baseline.clone();
-        for entry in entries {
-            replay_captured_deltas_as_onto(&mut graph, &entry.author, [entry.delta.clone()]);
-        }
-        Some(graph)
+        self.journal.snapshot_at_from(&self.baseline, cursor)
     }
 
     /// Every view with state, in key order.
@@ -1310,6 +1305,163 @@ mod tests {
             assert_eq!(whole(reopened.graph()), live, "checkpoint plus tail");
             let replayed = reopened.graph_at(reopened.journal().live_cursor()).unwrap();
             assert_eq!(whole(&replayed), live, "baseline plus whole journal");
+        });
+    }
+
+    #[test]
+    fn legacy_exact_assertions_keep_minting_authors_across_checkpointed_withdrawals() {
+        pollster::block_on(async {
+            let store = MemoryBackend::new();
+            let mere = MereSessions::new(store.clone());
+            let id = mere.mint(person(), None).await.unwrap().session_id;
+            let mut session = mere.open(id).await.unwrap();
+            let mut template = kernel::graph::replay_captured_deltas([add(1), add(2)]);
+            let from = template.get_node_key_by_id(Uuid::from_u128(1)).unwrap();
+            let to = template.get_node_key_by_id(Uuid::from_u128(2)).unwrap();
+            template
+                .assert_semantic_statement(
+                    from,
+                    to,
+                    kernel::graph::SemanticStatementSpec {
+                        predicate: kernel::graph::predicate_iri(
+                            kernel::graph::SemanticSubKind::Cites,
+                        )
+                        .into(),
+                        recognized_sub_kind: Some(kernel::graph::SemanticSubKind::Cites),
+                        provenance_iri: Some("https://source.test/page".into()),
+                        asserted_at_ms: Some(100),
+                        ..Default::default()
+                    },
+                )
+                .unwrap();
+            let mut baseline_edges = template.to_snapshot().edges;
+            assert_eq!(baseline_edges.len(), 1);
+            let statements = &mut baseline_edges[0].semantic.as_mut().unwrap().statements;
+            statements[0].statement_id = "baseline-source".into();
+            let mut unknown = statements[0].clone();
+            unknown.statement_id = "baseline-unknown".into();
+            unknown.provenance_iri = None;
+            statements.push(unknown.clone());
+            let exact = |edges| CapturedDelta::ReplaySetEdgesByIds {
+                from_id: Uuid::from_u128(1).to_string(),
+                to_id: Uuid::from_u128(2).to_string(),
+                edges,
+            };
+            replay_captured_deltas_onto(&mut template, [exact(baseline_edges.clone())]);
+            session.baseline = template;
+            session.write_baseline = true;
+            session.head_stored = false;
+            let restorer = Author::person("persona-b").via("knot-editor");
+            let mut minted_edges = baseline_edges.clone();
+            unknown.statement_id = "journal-minted".into();
+            minted_edges[0]
+                .semantic
+                .as_mut()
+                .unwrap()
+                .statements
+                .push(unknown);
+            session
+                .journal
+                .record_as(person(), exact(minted_edges.clone()));
+            session.graph = session.baseline.clone();
+            replay_captured_deltas_onto(&mut session.graph, [exact(minted_edges.clone())]);
+            session
+                .store(SystemTime::now(), Vec::new(), true)
+                .await
+                .unwrap();
+            let old_checkpoint = GraphSession::open(store.clone(), id).await.unwrap();
+            let old_checkpoint_snapshot = old_checkpoint.graph().to_snapshot();
+            let old_statements = &old_checkpoint_snapshot.edges[0]
+                .semantic
+                .as_ref()
+                .unwrap()
+                .statements;
+            let old_source_of = |id: &str| {
+                old_statements
+                    .iter()
+                    .find(|s| s.statement_id == id)
+                    .unwrap()
+                    .provenance_iri
+                    .as_deref()
+                    .unwrap()
+            };
+            assert_eq!(
+                old_source_of("baseline-source"),
+                "https://source.test/page",
+                "legacy checkpoint explicit-source control"
+            );
+            assert_eq!(
+                old_source_of("baseline-unknown"),
+                kernel::graph::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI,
+                "legacy checkpoint baseline control"
+            );
+            assert_eq!(
+                old_source_of("journal-minted"),
+                person().asserter_iri(),
+                "an empty tail still repairs legacy checkpoint attribution"
+            );
+            assert_eq!(
+                whole(old_checkpoint.graph()),
+                whole(&old_checkpoint.graph_at(Seq(1)).unwrap())
+            );
+            drop(old_checkpoint);
+            session
+                .journal
+                .record_as(restorer.clone(), exact(baseline_edges));
+            session.graph = session
+                .journal
+                .snapshot_at_from(&session.baseline, Seq(2))
+                .unwrap();
+            session
+                .store(SystemTime::now(), Vec::new(), true)
+                .await
+                .unwrap();
+            session
+                .journal
+                .record_as(restorer.clone(), exact(minted_edges));
+            session.graph = session
+                .journal
+                .snapshot_at_from(&session.baseline, Seq(3))
+                .unwrap();
+            session.flush(SystemTime::now()).await.unwrap();
+            drop(session);
+
+            let reopened = GraphSession::open(store, id).await.unwrap();
+            let full = reopened.graph_at(Seq(3)).unwrap();
+            assert_eq!(
+                whole(reopened.graph()),
+                whole(&full),
+                "checkpoint plus tail equals full replay"
+            );
+            let edges = full.to_snapshot().edges;
+            let statements = &edges[0].semantic.as_ref().unwrap().statements;
+            let source_of = |id: &str| {
+                statements
+                    .iter()
+                    .find(|s| s.statement_id == id)
+                    .unwrap()
+                    .provenance_iri
+                    .as_deref()
+                    .unwrap()
+            };
+            assert_eq!(
+                source_of("baseline-source"),
+                "https://source.test/page",
+                "explicit-source control"
+            );
+            assert_eq!(
+                source_of("baseline-unknown"),
+                kernel::graph::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI,
+                "baseline control"
+            );
+            assert_eq!(
+                source_of("journal-minted"),
+                person().asserter_iri(),
+                "restoration keeps the minting Author"
+            );
+            assert_ne!(source_of("journal-minted"), restorer.asserter_iri());
+            assert_eq!(statements.len(), 3);
+            assert!(statements.iter().all(|s| s.asserted_at_ms == Some(100)));
         });
     }
 

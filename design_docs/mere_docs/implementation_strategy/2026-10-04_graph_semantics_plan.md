@@ -1,13 +1,15 @@
 # Graph semantics plan: assertions, resources, saved queries, residency
 
 **Date:** 2026-10-04
-**Status (2026-10-05):** in progress. P1 committed and validated at
-`459cad84` against the branch's prior contract, not integrated into main.
-Reconciled main `62219dd1` rulings 9–19 before P2 source edits. A1/B1/C1
-selected by "All 1"; C4 agrees with ruling 19, and B1/C1 remain approved.
-P2 is stopped: ruling 9 exposes a P1 exact-journal attribution mismatch;
-rulings 10/14/15/18 expand and correct P2. C7/C8 remain open. P3–P5 have
-not begun; the primary checkout is untouched.
+**Status (2026-10-05):** in progress. P1 implemented and gated on
+`graph-semantics`, with the ruling-9 exact-journal and legacy-checkpoint
+attribution repair complete after the original `459cad84` receipt.
+Reconciled main `62219dd1` rulings 9–19 before P2 source edits; the graph
+plan is unchanged at main `3b220f90`. A1/B1/C1 selected by "All 1";
+`ResourceNode`/`SurfaceNode` are settled by ruling 19, and B1/C1 remain
+approved. Stopped at the P1 boundary for review before P2. Replay-first
+migration and per-predicate placement govern P2; C7/C8 remain open.
+P3–P5 have not begun. Main integration awaits Mark's review.
 
 Four questions were put to Mark from outside the project: what a link records,
 what makes two things the same thing, what a saved query can become, and how
@@ -618,6 +620,50 @@ The verifier removed its own worktree and reported approximately 16 GB
 additional shared-target output due to its different source path. This
 lane did not delete shared build output or create another target.
 
+### P1 exact-journal repair findings (2026-10-05)
+
+The strengthened `legacy_exact_capture_attribution_matches_checkpoint_replay`
+test failed against the original P1 implementation: **one run, one failure**,
+unknown legacy attribution where the minting engine Author was required.
+The explicit-source iteration and baseline-unknown control passed before the
+failure. The initial Cargo invocation's unqualified exact filter ran zero
+tests; the qualified test was run directly from that freshly built test binary.
+Only this lane's own waiting Cargo processes were stopped after that receipt.
+
+`ReplayAttribution` retains the first source for each stable assertion handle,
+seeded from the baseline. Exact journal records recover the minting Author
+only when no earlier source is available; explicit sources remain intact.
+Removing a handle does not remove its attribution, so later restoration cannot
+attribute it to the undoing Author (`graph/capture.rs` 797).
+`snapshot_at_from` and `replay_from_with_baseline` accept the retained baseline;
+the latter scans the journal prefix for carried handles before applying the
+checkpoint tail (`graph/journal.rs` 319, 383). Raw historical records did not
+capture stable handles; their existing Author-aware replay remains, without
+inventing identities absent from the history. Context-free `replay_from`
+preserves conservative unknown attribution for exact records lacking a source.
+
+Pandect uses those baseline-aware paths both on reopening and when obtaining
+a historical graph (`graph_session.rs` 443, 866). The kernel regression checks
+all five checkpoint cursors, including a cursor where the old handles are
+absent (`graph/journal.rs` 872). The session persistence regression restores a
+missing-source mint after a checkpointed withdrawal by a different persona,
+with explicit-source and baseline-unknown controls in the same run
+(`graph_session.rs` 1312). No public signature or capture schema is removed
+or changed; the two baseline-aware methods are additive.
+
+Read-only review identified a second case: historical checkpoints may already
+hold journal-minted handles with missing sources, converted to the unknown
+marker at snapshot load. Scanning the prefix alone left these unknown when
+the tail was empty. The persisted session regression reproduced this:
+**zero passed, one failed**, after the explicit-source and baseline-unknown
+controls passed. `repair_checkpoint` now replaces missing/unknown sources
+only from the recovered handle ledger before tail replay, preserving explicit
+sources and baseline unknowns (`graph/capture.rs` 821). It preserves ids/times,
+advances the revision when it changes attribution and emits no capture.
+The kernel's empty-tail regression (`graph/journal.rs` 789) and the session's genuinely old stored
+checkpoint cover this repair. A second read-only review found no further
+concrete blocker. Gate results follow in Progress.
+
 ## 3. Rulings
 
 Mark's answers, from multiple-choice rounds; each is the option label quoted
@@ -1117,3 +1163,43 @@ comes back to Mark as a fork, with evidence, before the code commits to one.
   dedup-defect control, recorded above; those do not close the exact-capture
   attribution gap. Mark reaffirmed `ResourceNode` and `SurfaceNode`; C4 is
   settled and is not reopened.
+
+- **2026-10-05. P1 ruling-9 repair complete.** Recover exact assertion
+  attribution from the minting journal Author, retain it through withdrawal
+  and restoration by later Authors, and repair old checkpoint attribution
+  even with an empty tail. Explicit sources, baseline unknowns, ids and times
+  remain intact. Pandect reopening and historical graph materialization use
+  the retained baseline. Capture serialization and existing public signatures
+  are unchanged; baseline-aware replay methods are additive. Naming remains
+  `ResourceNode`/`SurfaceNode`, with `Node`/`NodeKey` surface compatibility
+  names when P2 implements the two strata.
+
+  Negative receipts and their positive controls are recorded in Findings.
+  The initial new Pandect fixture used a private kernel helper and failed to
+  compile; it was corrected to use public snapshots before the persisted
+  old-checkpoint negative run. Final validation, offline, locked, with one
+  Cargo job and `C:/t/cargo-targets/mere`: **kernel 325 passed**, one doc
+  example ignored; **Pandect 306 passed**; **linked-data with query 40
+  passed**, including `dataset_round_trip_is_lossless_under_the_profile`;
+  **workspace check exit 0**; **wasm32 kernel check exit 0**. Source review
+  independently found and then confirmed repair of the old-checkpoint case.
+  Main recheck at `3b220f90` found the graph plan's last change remains
+  `62219dd1`; unrelated dirty Scrying source/docs remain untouched.
+
+  The documentation audit and its planted-defect/clean-fixture self-test
+  exited **0**; existing finding counts remain 10 orphans, one statusless
+  plan, 40 broken relative links, 202 missing known-root paths and two stale
+  historical annotations. This plan has no audit findings. `git diff --check`
+  passed. No active document was added. Source and canonical documentation
+  are committed on this branch, awaiting Mark's review; stopped before P2.
+
+  Pictograph and Graphshell suites were not rerun for this narrow repair;
+  their prior P1 receipts stand. Ignored tests, sibling builds, headed
+  browser/UI/device proofs and later-phase gates were not run. No dependency,
+  download, manifest/lock change, patch override or isolated Cargo home was
+  needed. One PowerShell formatting launch failed with memory pressure;
+  formatting succeeded on retry without profiles, preserving other live
+  build owners. Retained: `C:/Users/mark_/Code/worktrees/mere-graph-semantics`,
+  owned by this lane for review and eventual integration; shared reusable
+  `C:/t/cargo-targets/mere`, retained for Mere builds. No generated output was
+  deleted or additional target created.

@@ -15,6 +15,7 @@
 //! separate until those writes grow stable-id replay forms of their own.
 
 use std::cell::RefCell;
+use std::collections::BTreeMap;
 use std::sync::Arc;
 
 use chartulary::stemma::TransitionKind;
@@ -579,6 +580,7 @@ impl CapturedDelta {
         })
     }
     /// Replay old assertion records with their journal's attribution envelope.
+    /// Exact captures need the baseline-aware journal methods to recover minting authors.
     pub fn replay_delta_as(&self, author: &super::Author) -> Option<GraphDelta> {
         let mut delta = self.replay_delta()?;
         match &mut delta {
@@ -789,6 +791,114 @@ where
             .into_iter()
             .filter_map(|delta| delta.replay_delta_as(author)),
     );
+}
+
+/// Attribution outlives a handle's removal so an undo keeps its original source.
+pub(crate) struct ReplayAttribution(BTreeMap<String, String>);
+
+impl ReplayAttribution {
+    pub(crate) fn from_baseline(graph: &Graph) -> Self {
+        let mut attribution = Self(BTreeMap::new());
+        attribution.observe_graph(graph);
+        attribution
+    }
+
+    fn observe_graph(&mut self, graph: &Graph) {
+        for edge in graph.inner.inner().edge_weights() {
+            for statement in edge.semantic_statements() {
+                self.0
+                    .entry(statement.statement_id.clone())
+                    .or_insert_with(|| {
+                        statement
+                            .provenance_iri
+                            .clone()
+                            .unwrap_or_else(|| super::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI.into())
+                    });
+            }
+        }
+    }
+
+    pub(crate) fn repair_checkpoint(&self, graph: &mut Graph) {
+        let unknown = super::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI;
+        let keys: Vec<_> = graph.inner.inner().edge_indices().collect();
+        let mut changed = false;
+        for key in keys {
+            if let Some(payload) = graph.inner.edge_mut(key)
+                && let Some(semantic) = &mut payload.semantic
+            {
+                for statement in &mut semantic.statements {
+                    if statement
+                        .provenance_iri
+                        .as_deref()
+                        .is_none_or(|source| source == unknown)
+                        && let Some(source) = self.0.get(&statement.statement_id)
+                        && statement.provenance_iri.as_deref() != Some(source.as_str())
+                    {
+                        statement.provenance_iri = Some(source.clone());
+                        changed = true;
+                    }
+                }
+            }
+        }
+        if changed {
+            graph.bump_revision();
+        }
+    }
+
+    pub(crate) fn replay_delta(
+        &mut self,
+        delta: &CapturedDelta,
+        author: &super::Author,
+    ) -> Option<GraphDelta> {
+        let mut delta = delta.replay_delta_as(author)?;
+        if let GraphDelta::ReplaySetEdgesByIds { edges, .. } = &mut delta {
+            for edge in edges {
+                if let Some(semantic) = &mut edge.semantic {
+                    for statement in &mut semantic.statements {
+                        let original =
+                            self.0
+                                .entry(statement.statement_id.clone())
+                                .or_insert_with(|| {
+                                    statement
+                                        .provenance_iri
+                                        .clone()
+                                        .unwrap_or_else(|| author.asserter_iri())
+                                });
+                        if statement.provenance_iri.is_none() {
+                            statement.provenance_iri = Some(original.clone());
+                        }
+                    }
+                }
+            }
+        }
+        Some(delta)
+    }
+}
+
+pub(crate) fn replay_attributed_deltas_onto<'a, I>(
+    graph: &mut Graph,
+    attribution: &mut ReplayAttribution,
+    entries: I,
+) where
+    I: IntoIterator<Item = &'a super::journal::AttributedDelta>,
+{
+    let _quiet = QuietThread::begin();
+    let recorder = graph.recorder.0.take();
+    for entry in entries {
+        if let Some(delta) = attribution.replay_delta(&entry.delta, &entry.author) {
+            let legacy_assertion = matches!(
+                delta,
+                GraphDelta::ReplayAssertRelationByIds { .. }
+                    | GraphDelta::ReplayAssertSemanticPredicateByIds { .. }
+                    | GraphDelta::ReplaySetEdgeSemanticPredicateByIds { .. }
+            );
+            let _ = apply_graph_delta(graph, delta);
+            if legacy_assertion {
+                attribution.observe_graph(graph);
+            }
+        }
+    }
+    graph.recorder.0 = recorder;
 }
 
 pub(crate) fn replay_graph_deltas_onto<I>(graph: &mut Graph, deltas: I)
