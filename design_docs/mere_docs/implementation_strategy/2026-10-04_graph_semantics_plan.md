@@ -4,8 +4,9 @@
 **Status (2026-10-05):** in progress. P1 implemented and validated on the
 isolated `graph-semantics` branch, with C1, stable-root attribution,
 retract/assert, A1 and B1 resolved. Mark authorized P2 with "Proceed".
-P2 inventory has begun and is stopped at C2 before code changes; C3 and C4
-remain open. P3–P5 have not begun; nothing has been integrated into main.
+P2 inventory has begun; C2 is resolved and work is stopped at C3 before code
+changes. C4 remains open. P3–P5 have not begun; nothing has been integrated
+into main.
 
 Four questions were put to Mark from outside the project: what a link records,
 what makes two things the same thing, what a saved query can become, and how
@@ -382,7 +383,7 @@ named containment writer in Turnstone (`turnstone/src/overmap.rs` 111),
 joining session containers referenced by `sub_graph_refs`, and none in
 Knot-editor. These are source findings, not consumer build receipts.
 
-C2 options, recommendation first; none selected:
+C2 options presented, recommendation first; selection recorded below:
 
 1. **Fixed split by sub-kind (recommended).** Resources carry `UrlPath`,
    `Domain`, `FileSystem`, `ClipSource`; surfaces carry `UserFolder`,
@@ -397,6 +398,11 @@ C2 options, recommendation first; none selected:
 3. **All containment on surfaces.** Preserve the current writers' surface
    meaning; URL hierarchy remains about addressed surfaces and is unavailable
    to resource-only containment queries.
+
+**C2 ruling (2026-10-05).** Mark: **"1"**, selecting the fixed split.
+Resources carry `UrlPath`, `Domain`, `FileSystem`, `ClipSource`; surfaces
+carry `UserFolder`, `NotebookSection`, `CollectionMember`. The existing
+persona/device fixture membership therefore remains surface-owned.
 
 **Lane coordination.** Mark relayed the stack-seams P1 request covering
 `scenomise::projection` and its dataset types. This lane holds those files
@@ -431,6 +437,51 @@ Collapsing same-URL surfaces also combines assertion buckets: live upsert
 can lose a distinct legacy handle while exact restore preserves it
 (`graph/edge_data.rs` 256–292). Migration must retain handles and explicitly
 resolve collisions before a policy is implemented. C3 remains open.
+
+### C3 migration checkpoint (2026-10-05)
+
+Rechecked at `5666943e`, which changes documentation only. Three assertion
+helper routes supply no time (`graph/edge_ops.rs` 39–45, 119, 157), and
+same-source reassertion can overwrite a handle's time (`graph/edge_data.rs`
+184–205). Imported linear history uses array indices as synthetic
+milliseconds (`graph/history.rs` 392–415). A nearest-visit assignment cannot
+recover the original endpoints reliably. These are schema and code findings;
+no census of Mark's saved data was performed.
+
+Current page identity is available on restoration: the shared navigation
+cursor overrides the stored primary URL except for a Graphshell clip route
+(`graph/snapshot/from.rs` 155–173). A retained journal can offer stronger
+historical evidence, but claims in its baseline may predate it. Existing
+facet authority must be loaded beside the snapshot: current snapshots write
+empty legacy properties/classifications/derivations, while session loading
+reads the facet store (`graph/snapshot/to.rs` 101–109;
+`crates/system/pandect/src/graph_session.rs` 435–440).
+
+C3 options, recommendation first; none selected:
+
+1. **Currently shown resources, with a migration record (recommended).**
+   Move old content claims to the canonical resources their endpoint surfaces
+   show at migration. Preserve original endpoints, ids, times and asserters
+   in a migration record; mark historical page ownership as uncertain.
+   Deterministic and complete, but an old claim can be attached to a page
+   reached after it was asserted.
+2. **Nearest timestamped visits.** Infer historical endpoints from visits
+   nearest each assertion time. Requires further choices for missing and
+   synthetic times, ties, back/forward and first assertion versus reassertion.
+   Preserve the originals and mark the inferred mapping.
+3. **Remove uncertain claims from active results, retain originals for review.**
+   Do not assign uncertain historical content to a resource. Preserve the
+   original claims in a recoverable migration record and require a later
+   placement decision; old content claims disappear from active queries.
+
+Regardless of the endpoint policy, collapse is a separate unresolved choice.
+The existing fixture has two surfaces at one URL (`graph/tests/snapshot_basic.rs`
+547–631). Two distinct old handles can become one dedup key on one resource
+pair; normal upsert would lose a handle, while exact restore keeps both.
+Same-id/different-payload input would silently reject one record in the
+existing helper (`graph/edge_data.rs` 256–292). No such conflict was measured
+in Mark's data, and no migration is implemented. Return the collision policy
+as a further fork before code chooses a survivor or changes an id.
 
 ## 3. Rulings
 
@@ -633,6 +684,8 @@ comes back to Mark as a fork, with evidence, before the code commits to one.
   seven containment sub-kinds split three ways: URL-derived (`UrlPath`,
   `Domain`), resource-level (`FileSystem`, `ClipSource`) and user layout
   (`UserFolder`, `NotebookSection`, `CollectionMember`).
+  **Resolved 2026-10-05:** Mark selected **"1"**, the fixed split; see the
+  dated C2 ruling in §2.
 - **C3 (P2). Migration of existing claims.** A surface's content statements
   were asserted while it showed whichever page it showed then; the store does
   not record which. Attach them to the currently shown resource, to the
@@ -753,3 +806,11 @@ comes back to Mark as a fork, with evidence, before the code commits to one.
   one statusless plan, 40 broken relative links, 202 missing known-root
   paths and two stale historical annotations. `git diff --check` passed.
   No new active document was added.
+
+- **2026-10-05. C2 resolved; stopped at C3.** Mark selected "1", the fixed
+  containment split, recorded verbatim above. Rechecked migration schema,
+  timestamp limitations, shared-navigation restoration and session loading;
+  returned the three C3 endpoint policies. Handle collisions, C4 naming and
+  the shared UUID helper's dependency/lock change remain open. No P2 source,
+  manifest or lockfile was changed; Cargo/wasm and consumer gates were not
+  rerun. Compiler hold and retained worktree/target ownership are unchanged.
