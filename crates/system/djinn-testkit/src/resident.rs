@@ -447,7 +447,7 @@ impl Resident {
     /// The graceful stop: the owner-only stop intent on the app door, then
     /// the wait for the process to leave. Records whether it left in time;
     /// a resident that does not is killed and the stop recorded as failed.
-    pub fn stop(&mut self, patience: Duration) -> Option<ExitStatus> {
+    fn stop_with(&mut self, patience: Duration, judge_exit: bool) -> Option<ExitStatus> {
         let live = self.live.as_ref()?;
         let pid = live.pid;
         let asked = Instant::now();
@@ -485,21 +485,38 @@ impl Resident {
             json!({ "accepted": accepted, "took_ms": took.as_millis() as u64, "pid": pid }),
             accepted && status.is_some(),
         );
-        let stopped = self
-            .events()
-            .into_iter()
-            .rfind(|event| event.event == "stopped");
-        self.shared.assertion(
-            &format!("{} shut down cleanly (start {})", self.name, self.starts),
-            Bound::State,
-            json!({ "exit": 0 }),
-            json!({
-                "exit": status.and_then(|s| s.code()),
-                "stopped": stopped.map(|event| event.other),
-            }),
-            status.is_some_and(|s| s.success()),
-        );
+        if judge_exit {
+            let stopped = self.stopped_event();
+            self.shared.assertion(
+                &format!("{} shut down cleanly (start {})", self.name, self.starts),
+                Bound::State,
+                json!({ "exit": 0 }),
+                json!({
+                    "exit": status.and_then(|s| s.code()),
+                    "stopped": stopped.map(|event| event.other),
+                }),
+                status.is_some_and(|s| s.success()),
+            );
+        }
         status
+    }
+
+    /// The graceful stop, judged: the resident must also exit 0.
+    pub fn stop(&mut self, patience: Duration) -> Option<ExitStatus> {
+        self.stop_with(patience, true)
+    }
+
+    /// The graceful stop without judging the exit, for a control that must
+    /// exit badly; the caller records what it expected.
+    pub fn stop_unjudged(&mut self, patience: Duration) -> Option<ExitStatus> {
+        self.stop_with(patience, false)
+    }
+
+    /// The last start's `stopped` event, when it wrote one.
+    pub fn stopped_event(&self) -> Option<ResidentEvent> {
+        self.events()
+            .into_iter()
+            .rfind(|event| event.event == "stopped")
     }
 
     /// The lifecycle events of the current (or last) start.

@@ -56,6 +56,7 @@ use graphshell::native::identity_ui::SystemNativeIdentityUi;
 use graphshell::native::personae_host::PersonaeHost;
 #[cfg(windows)]
 use graphshell::native::personae_host::STANDARD_WINDOWS_AGENT_ENDPOINT;
+use graphshell::native::tasks::ResidentTasks;
 use graphshell::profile::{default_vault_dir, resolve_selected_profile};
 use personae::bootstrap::{self, PASSPHRASE_ENV, Unlock};
 use personae::{IdentityVault, ProfileId};
@@ -96,6 +97,9 @@ struct Args {
     resident_status: bool,
     /// Ask a running resident to stop through its app door, and exit.
     stop_resident: bool,
+    /// Receipt control: leave one blob-store holder outside the task scope,
+    /// so a graceful stop must fail its borrower check.
+    control_unjoined_holder: bool,
     /// Command-line overrides folded over the profile's stored settings.
     #[cfg(feature = "personal-sync")]
     sync_overrides: SyncOverrides,
@@ -284,6 +288,7 @@ fn parse_args() -> Result<Args, String> {
     let mut installed = false;
     let mut resident_status = false;
     let mut stop_resident = false;
+    let mut control_unjoined_holder = false;
     #[cfg(feature = "personal-sync")]
     let mut sync_graph = None;
     #[cfg(feature = "personal-sync")]
@@ -368,6 +373,7 @@ fn parse_args() -> Result<Args, String> {
             "--installed" => installed = true,
             "--resident-status" => resident_status = true,
             "--stop-resident" => stop_resident = true,
+            "--control-unjoined-holder" => control_unjoined_holder = true,
             #[cfg(feature = "personal-sync")]
             "--sync-graph" => {
                 sync_graph = Some(argv.next().ok_or("--sync-graph needs a value")?);
@@ -499,6 +505,7 @@ fn parse_args() -> Result<Args, String> {
         installed,
         resident_status,
         stop_resident,
+        control_unjoined_holder,
         #[cfg(feature = "personal-sync")]
         sync_overrides: SyncOverrides {
             graph: sync_graph,
@@ -838,8 +845,22 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
 
     // Keep every broker future inside this async block.  Its captures, most
     // notably the blob-store clones held by personal sync, are dropped before
-    // the resident begins its ordered shutdown.
-    let outcome: Result<(), Box<dyn std::error::Error>> = async {
+    // the resident begins its ordered shutdown. What the block spawns (door
+    // connections, sync's watchers) is not dropped with it, so it runs in a
+    // task scope that is cancelled and joined below. Boxed: the loop's future
+    // is large, and the scope must not carry it on the main thread's stack.
+    let tasks = ResidentTasks::new();
+    if args.control_unjoined_holder {
+        // A receipt control: one blob-store holder outside the scope, which
+        // the shutdown's borrower check must refuse.
+        let held = resident.blobs();
+        tokio::spawn(async move {
+            let _held = held;
+            std::future::pending::<()>().await;
+        });
+        tracing::warn!("control: a blob-store holder left outside the task scope");
+    }
+    let outcome: Result<(), Box<dyn std::error::Error>> = tasks.scope(Box::pin(async {
         #[cfg(not(windows))]
         prepare_unix_agent_endpoint(match &args.agent {
             AgentEndpoint::Standard(endpoint) | AgentEndpoint::Receipt(endpoint) => endpoint,
@@ -1135,8 +1156,11 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
                 stop_works.notify_one();
             }
         }
-    }
+    }))
     .await;
+    // Before the release checks: every spawned holder ends and lets go.
+    let ended = tasks.cancel_and_join().await;
+    tracing::info!(tasks = ended, "resident tasks cancelled and joined");
 
     // The run loop borrowed the works; hand them back so the ordered shutdown
     // below is the one thing that closes them.
