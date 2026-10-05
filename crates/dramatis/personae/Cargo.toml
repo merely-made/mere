@@ -21,15 +21,17 @@ name = "personae-agent"
 path = "src/bin/personae-agent.rs"
 required-features = ["agent"]
 
-# V3: inspect and manage the vault from a terminal.
+# V3: inspect and manage the vault from a terminal. `agent` because its
+# `add-ssh` door refuses keys the agent cannot sign, as `ssh-add` and
+# castellan's import do (chatelaine ruling 60).
 [[bin]]
 name = "personae-vault"
 path = "src/bin/personae-vault/main.rs"
-required-features = ["ssh"]
+required-features = ["agent"]
 
 [features]
-# SSH keys as vault slots (encode/decode/import). The CLI needs this much;
-# the agent needs the protocol stack on top.
+# SSH keys as vault slots (encode/decode/import). The agent, and the CLI
+# whose import shares its signability door, need `agent` on top.
 ssh = ["dep:ssh-key", "dep:signature", "dep:gethostname"]
 # RSA signs through ring; the rsa crate only builds the key at load (rulings
 # 52, 59: RUSTSEC-2023-0071 rules out its signing and decryption). ECDSA
