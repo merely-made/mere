@@ -398,9 +398,11 @@ impl PhysicsBoard {
     /// out (see [`settle_for_choice`](Self::settle_for_choice)).
     pub fn tick(&mut self) -> bool {
         let settling = self.physics.advance_frame(&mut self.view);
+        let budget_ended = self.rest.budget_ended(self.physics.is_settling());
         if self.dragging.is_some() {
             self.rest.arm();
-        } else if !self.halted && self.rest.rested(self.physics.rms_speed()) {
+        } else if !self.halted && (self.rest.rested(self.physics.rms_speed()) || budget_ended) {
+            // At rest, or the budget spent with the cards still moving (F63).
             self.start_home();
         }
         self.rest.step(&mut self.physics);

@@ -27,6 +27,7 @@ mod density_wander;
 mod face_on_body;
 mod fold_and_source_time;
 mod gloss;
+mod home_at_budget_end;
 mod layout_and_drag;
 mod live_physics;
 mod node_face;
