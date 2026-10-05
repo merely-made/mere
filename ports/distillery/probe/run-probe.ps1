@@ -34,7 +34,9 @@ try {
     # rewrites their unused entries in nondeterministic order, so --locked
     # rejects an otherwise unchanged package graph. The checked-in lockfile
     # still pins the selected package versions.
-    cargo build --manifest-path (Join-Path $probeRoot 'Cargo.toml') --release --target wasm32-unknown-unknown
+    # The committed wasm cfg (.cargo/config.toml, ruling 558); this neutral
+    # directory would not find it.
+    cargo build --manifest-path (Join-Path $probeRoot 'Cargo.toml') --config (Join-Path $probeRoot '.cargo\config.toml') --release --target wasm32-unknown-unknown
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 } finally {
     Pop-Location

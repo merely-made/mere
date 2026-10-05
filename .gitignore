@@ -90,9 +90,14 @@ __pycache__/
 # `**/.cargo/*` excludes the contents at every level without excluding the dirs.
 **/.cargo/*
 !/.cargo/config.toml.example
-# Portable committed configs (no redirects): graphshell-web's wasm cfg
-# (burn plan 13.44, ruling 558).
+# Portable committed configs (no redirects): every standalone wasm
+# workspace's cfg (burn plan 13.44, ruling 558).
 !/ports/graphshell/web/.cargo/config.toml
+!/ports/distillery/probe/.cargo/config.toml
+!/ports/distillery/probe/repros/burn_browser_embedding/.cargo/config.toml
+!/ports/distillery/probe/repros/cubek_browser_extrema/.cargo/config.toml
+!/ports/muniment-opfs-probe/.cargo/config.toml
+!/crates/cambium/examples/genet_web_smoke/.cargo/config.toml
 /target-*/
 
 # Isolated cargo homes created for dependency experiments — e.g.

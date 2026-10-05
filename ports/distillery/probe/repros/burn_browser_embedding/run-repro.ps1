@@ -21,7 +21,9 @@ if ($bindgenVersion -ne 'wasm-bindgen 0.2.129') {
 }
 Push-Location $TargetDir
 try {
-    cargo build --locked --manifest-path (Join-Path $reproRoot 'Cargo.toml') --release --target wasm32-unknown-unknown
+    # The committed wasm cfg (.cargo/config.toml, ruling 558); this neutral
+    # directory would not find it.
+    cargo build --locked --manifest-path (Join-Path $reproRoot 'Cargo.toml') --config (Join-Path $reproRoot '.cargo\config.toml') --release --target wasm32-unknown-unknown
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 } finally {
     Pop-Location
