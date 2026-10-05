@@ -768,11 +768,11 @@ impl OwnedLayout {
         (self.viewport_scroll != before).then_some(ScrollTarget::Document)
     }
 
-    /// Bring `node` into view on the vertical axis: the nearest ancestor that
-    /// scrolls vertically and has room to, otherwise the document viewport,
-    /// moves by `align`, and the planes outside it follow (see
-    /// [`follow_out`](Self::follow_out)). Returns the planes that moved,
-    /// innermost first: none for a node that is gone or does not paint.
+    /// Bring `node` into view through its ancestor scrollports and the document.
+    /// Horizontal planes reveal the nearest edge; the first vertical plane
+    /// with room moves by `align`, and outer vertical planes follow by nearest.
+    /// Returns each plane that moved once, innermost first, even when both axes
+    /// moved. A retired node or one without painted bounds moves no planes.
     pub(crate) fn scroll_into_view<D: LayoutDom<NodeId = NodeId>>(
         &mut self,
         dom: &D,
@@ -783,11 +783,118 @@ impl OwnedLayout {
         if self.painted_rect(dom, node).is_none() {
             return Vec::new();
         }
-        let first = self.vertical_scroll_container(dom, node);
-        self.follow_out(dom, first, align, |layout, dom| {
-            let (_, top, _, height) = layout.painted_rect(dom, node)?;
-            Some((top, height))
-        })
+        let mut moved = Vec::new();
+        let mut vertical_align = align;
+        let mut ancestor = dom.parent(node);
+        while let Some(container) = ancestor {
+            let axes = scroll_axes(&self.styles, container);
+            if !axes.0 && !axes.1 {
+                ancestor = dom.parent(container);
+                continue;
+            }
+            let range = element_scroll_range(dom, &self.styles, &self.fragments, container);
+            let mut changed = false;
+            if axes.0 && range.0 > 0.0 {
+                changed = self.reveal_horizontal(dom, node, Some((container, range.0)));
+            }
+            if axes.1 && range.1 > 0.0 {
+                if let Some((_, top, _, height)) = self.painted_rect(dom, node) {
+                    changed |= self
+                        .move_plane(dom, Some((container, range.1)), top, height, vertical_align)
+                        .is_some();
+                }
+                vertical_align = ScrollAlign::Nearest;
+            }
+            if changed {
+                moved.push(ScrollTarget::Element(container));
+            }
+            ancestor = dom.parent(container);
+        }
+        let mut changed = self.reveal_horizontal(dom, node, None);
+        if let Some((_, top, _, height)) = self.painted_rect(dom, node) {
+            changed |= self
+                .move_plane(dom, None, top, height, vertical_align)
+                .is_some();
+        }
+        if changed {
+            moved.push(ScrollTarget::Document);
+        }
+        moved
+    }
+
+    /// Reveal only the part that can escape inner clips. In particular, a
+    /// hidden/clip box is not a scroll plane, and its invisible overflow must
+    /// not cause an outer plane to chase an unreachable target. Bounds are
+    /// re-read after every move, in the same painted coordinate space as the
+    /// scrollport; no additional viewport or nested-scroll subtraction applies.
+    fn reveal_horizontal<D: LayoutDom<NodeId = NodeId>>(
+        &mut self,
+        dom: &D,
+        node: NodeId,
+        plane: Option<(NodeId, f32)>,
+    ) -> bool {
+        let Some((left, _, width, _)) = self.painted_rect(dom, node) else {
+            return false;
+        };
+        let (mut left, mut right) = (left, left + width);
+        let mut ancestor = dom.parent(node);
+        while let Some(container) = ancestor {
+            if plane.is_some_and(|(owner, _)| owner == container) {
+                break;
+            }
+            if let Some((x, _, width, _)) = self.content_clip(dom, container) {
+                left = left.max(x);
+                right = right.min(x + width);
+                if right <= left {
+                    return false;
+                }
+            }
+            ancestor = dom.parent(container);
+        }
+        let (area_left, area_width, current, range) = match plane {
+            Some((container, range)) => {
+                let Some((x, _, width, _)) = self
+                    .content_clip(dom, container)
+                    .or_else(|| self.painted_rect(dom, container))
+                else {
+                    return false;
+                };
+                (
+                    x,
+                    width,
+                    self.element_scroll.get(&container).map_or(0.0, |s| s.0),
+                    range,
+                )
+            },
+            None => (
+                0.0,
+                self.viewport.0,
+                self.viewport_scroll.0,
+                (self.content_extent.0 - self.viewport.0).max(0.0),
+            ),
+        };
+        let to_left = left - area_left;
+        let to_right = right - (area_left + area_width);
+        // A target covering both edges already has its nearest visible part
+        // on screen. Leave it there rather than alternating between edges.
+        let delta = if to_left < 0.0 && to_right > 0.0 {
+            0.0
+        } else if to_left < 0.0 {
+            to_left
+        } else if to_right > 0.0 {
+            to_right.min(to_left)
+        } else {
+            0.0
+        };
+        let next = (current + delta).clamp(0.0, range);
+        if next == current {
+            return false;
+        }
+        match plane {
+            Some((container, _)) => self.element_scroll.entry(container).or_default().0 = next,
+            None => self.viewport_scroll.0 = next,
+        }
+        true
     }
 
     /// Walk the vertical planes out from `first`, a scroller or else the
