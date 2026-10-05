@@ -1,7 +1,7 @@
 # Vault Lock Plan
 
 **Date**: 2026-10-05
-**Status (2026-10-05)**: assessed; forks 1 to 12 ruled (rulings 1 to 12 in
+**Status (2026-10-05)**: assessed; forks 1 to 15 ruled (rulings 1 to 16 in
 §3), the rest wait for Mark. No code changed. Chatelaine P4 (CXF import) waits on this plan (chatelaine
 rulings 64, 65).
 **Scope**: the resident's secrets can be locked. While locked, no secret
@@ -297,6 +297,32 @@ separately keyed metadata index. Mark: **"A secret-free snapshot
 the docs fixed and the vault-wide lock as the custody control; custody,
 with per-slot sealing; consent plus a confirmation path in the standalone
 `personae-agent`. Mark: **"Consent; fix the docs (Recommended)"**.
+
+**Ruling 13.** *How does lock state reach every holder?* Options: state in
+`IdentityVault` (accessors return `Locked`, which breaks `current_profile()`
+and `slot()`, Knot first) plus a broadcast from `PersonaeHost` that
+derived-key holders obey; vault state only; broadcast only. Mark: **"Vault
+state plus a broadcast (Recommended)"**.
+
+**Ruling 14.** *A persona switch while locked?* Options: refused; switching
+unlocks the target. Mark: **"Refused (Recommended)"**.
+
+**Ruling 15.** *Does the vault lock reach pandect's wallet store (Knot's
+signing seed)?* Options: the lock also relocks the wallet stores djinn
+opened ("one unlock ladder"); personae only. Mark: **"Lock relocks it too
+(Recommended)"**. Follows: Knot's sync pauses while locked.
+
+**Ruling 16** *(asked as: is the standalone `personae-agent` still a target,
+with options dev tool, target with askpass later, retire).* Mark: **"hm.
+would it make sense for djinn to take on those capabilities, so
+personae-agent just becomes a djinn feature set/implementation/agent? i
+have been wondering about our testing framework for djinn too... and it's
+the daemon/cli thing for the stack, no? seems important"**. Follows: the
+question is put back as djinn absorbing the agent, with djinn's test
+harness as its own question. Evidence: `personae-agent` is a 210-line host
+of personae's agent library with Windows, macOS (launchd) and Linux
+installers; djinn's Windows installer already retires its task; on macOS
+and Linux it remains the deployed agent until the pairing plan's D2.
 
 ## 4. Phases
 

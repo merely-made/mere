@@ -15,7 +15,7 @@ lane's, each marked in the plan by whether it was re-checked.
 ## dramatis_docs/implementation_strategy/2026-10-05_vault_lock_plan.md
 
 - disposition: current
-- status line: "Status (2026-10-05): assessed; forks 1 to 12 ruled (rulings 1 to 12 in §3), the rest wait for Mark. No code changed. Chatelaine P4 (CXF import) waits on this plan (chatelaine rulings 64, 65)." — accurate: yes
+- status line: "Status (2026-10-05): assessed; forks 1 to 15 ruled (rulings 1 to 16 in §3), the rest wait for Mark. No code changed. Chatelaine P4 (CXF import) waits on this plan (chatelaine rulings 64, 65)." — accurate: yes
 - claims checked: 7 — holds: 7, stale: 0, unverifiable: 0
 
 ### Stale claims
