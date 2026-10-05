@@ -4769,6 +4769,19 @@ repin is pushed, one mere change moves djinn's Knot pin from `562353aa` to
 the new head and adds the two rows. That also drops the second genet copy
 (`layout-dom-api` at `69a2383b`) mere carries today through the stale pin.
 
+**How djinn's lane gets Knot `54bb8cd` (2026-10-05).** The question as put:
+cargo's git cache lacks knot-editor `54bb8cd`, because the Knot lane tested
+djinn through a path patch, so the lock cannot resolve offline. The fetch is
+8 commits and 103 objects past what is cached. The options: fetch it from the
+local checkout into cargo's cached repository, with no network; let cargo
+fetch it from GitHub once; hold the lane. Mark: **"From the local
+checkout"**. *Follows:* the commit is fetched from
+`Code/repos/knot-editor` into cargo's knot-editor repository under cargo's
+`refs/commit/<sha>` naming, and the lane resolves offline. The hash is the
+pushed head, so the content is GitHub's. *Reading, not ruled:* that GitHub
+serves the commit is proven by the first networked fetch elsewhere, not
+here.
+
 **Findings, not ruled.** Each predates the repin.
 - Windows checkouts get CRLF in `assets/oewn-notices.txt` and
   `tests/fixtures/wordnet.xml` through `.gitattributes`, which fails 7
