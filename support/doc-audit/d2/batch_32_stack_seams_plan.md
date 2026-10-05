@@ -21,7 +21,7 @@ This batch exists because the document is new.
 ## mere_docs/implementation_strategy/2026-10-04_stack_seams_plan.md
 
 - disposition: current
-- status line: "Status (2026-10-05): plan. Eighteen rulings in six rounds (S1 to S18); P1 assessed in this session's worktree and waiting on the recipe pass's answer (S18), P2 after it; P3 and S7 done as documents; S3 to S6 carried into the dynamics grammar plan (G8, G9); S9 done by the identity lane (`b52edea7`). No code in this plan's own lane yet." — accurate: yes
+- status line: "Status (2026-10-05): plan. Twenty rulings in seven rounds (S1 to S20); P1 being built in this session's worktree (S19), P2 after it; P3 and S7 done as documents; S3 to S6 carried into the dynamics grammar plan (G8, G9); S9 done by the identity lane (`b52edea7`). No code in this plan's own lane yet." — accurate: yes
 - claims checked: 30 — holds: 30, stale: 0, unverifiable: 0
 
 ### Stale claims
@@ -76,4 +76,6 @@ every local branch for unmerged compiler edits (two found, both merges of
 main only). F13's correction checked against the three commits' authorship
 and file lists, the adoption plan's host continuation entry (lines 88-97),
 and the pitch arithmetic in `solve.rs` 312-322 with the footprint at
-`projection.rs` 697.
+`projection.rs` 697. S19's premise checked against the graph-semantics
+branch's record of the relay (`5666943e`) and the absence of compiler
+commits on any ref since `c79bb8c2`.

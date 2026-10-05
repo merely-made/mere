@@ -193,6 +193,23 @@ every registered family authorable. That plan's P1 carries it out. Asked who
 takes P1, Mark answered: "Seams lane keeps P1 (Recommended)". This plan
 records the change and does not build it.
 
+*2026-10-05, P1 under way (stack seams rulings S12, S15 to S20).* A
+cross-reference for the relationship-recipe pass, which moved the compiler
+into `scenomise::projection` at `c79bb8c2`. One correction to the note
+above: scenomise's registry holds only custom solvers (stack seams F12), so
+ids resolve through a built-in catalog of sceno's eleven named families beside
+it, and an unknown id falls through to the registry (S15). P1 changes the
+compiler where it now lives: the dataset types move to scenograph and stay
+re-exported from `scenomise::projection` (S12); `grid.default` and
+`scatter.default` resolve as aliases, so saved recipes load (S15); parameters a
+recipe leaves unset are measured from the items (S16); and item sizes come from
+the host instead of the 164 by 68 written into the compiler (S20), so the
+compile entry points take the host's sizes. A consumer sees two changes when it
+repins past P1: that signature, and grid pitch (cell plus gap), which becomes
+the host's card size plus the spacing (180 by 84 for a 164 by 68 card at
+spacing 16, against 200 by 100 today). Built on branch `stack-seams-p1`;
+nothing merges before Mark's review.
+
 Progress (2026-09-04): Luna produced the Woodshed exporter and Terra the
 compiler skeleton before both hit the account usage limit. Root completed
 integration. An isolated source-path harness passed 14 compiler/editor tests,
