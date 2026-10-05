@@ -95,11 +95,11 @@ impl MeaningParams {
         min_similarity: 0.1,
         resolution: 1.0,
     };
-    /// A sentence model's tuning, the best F of a sweep of MiniLM on the
-    /// topic fixture (F34): at a floor of 0.3 the clusters stay pure but each
-    /// topic splits in four.
+    /// The sentence model's tuning (F56): e5-base-v2, prefixed, at top-k 16
+    /// and classical modularity, F 0.946 on the arXiv fixture and inside the
+    /// plateau where the bar holds (F50's sweep). The floor is the sweep's.
     pub const MODEL: MeaningParams = MeaningParams {
-        top_k: 4,
+        top_k: 16,
         min_similarity: 0.15,
         resolution: 1.0,
     };
@@ -201,11 +201,27 @@ impl MeaningEngine for LexicalMeaning {
     }
 }
 
+/// `texts` with `prefix` before each, or `texts` as they are when it is
+/// empty.
+pub(crate) fn embed_prefixed(
+    provider: &dyn EmbeddingProvider,
+    prefix: &str,
+    texts: &[&str],
+) -> Result<Vec<Vec<f32>>, EmbedError> {
+    if prefix.is_empty() {
+        return provider.embed(texts);
+    }
+    let owned: Vec<String> = texts.iter().map(|text| format!("{prefix}{text}")).collect();
+    let refs: Vec<&str> = owned.iter().map(String::as_str).collect();
+    provider.embed(&refs)
+}
+
 /// Any embedding provider as an engine, with the CPU row scan.
 pub struct ProviderMeaning {
     provider: Box<dyn EmbeddingProvider>,
     backend: MeaningBackend,
     params: MeaningParams,
+    prefix: String,
 }
 
 impl ProviderMeaning {
@@ -218,11 +234,19 @@ impl ProviderMeaning {
             provider,
             backend,
             params,
+            prefix: String::new(),
         }
     }
 
     pub fn with_params(mut self, params: MeaningParams) -> Self {
         self.params = params;
+        self
+    }
+
+    /// Prepend `prefix` to every text before it is embedded (a model whose
+    /// card asks for one, such as e5's `query: `).
+    pub fn with_prefix(mut self, prefix: &str) -> Self {
+        self.prefix = prefix.to_string();
         self
     }
 }
@@ -237,7 +261,7 @@ impl MeaningEngine for ProviderMeaning {
     }
 
     fn embed(&self, texts: &[&str]) -> Result<Embedded, EmbedError> {
-        self.provider.embed(texts).map(Embedded::Dense)
+        embed_prefixed(self.provider.as_ref(), &self.prefix, texts).map(Embedded::Dense)
     }
 }
 

@@ -215,6 +215,10 @@ pub mod meaning;
 /// A sentence model on the host's own device for the Meaning channel.
 #[cfg(feature = "meaning-gpu")]
 pub mod meaning_device;
+/// The Meaning channel's sentence model, pinned: model, revision, licence,
+/// pooling, prefix and hashes (F56, F58).
+#[cfg(feature = "meaning-gpu")]
+pub mod meaning_model;
 mod meaning_job;
 mod meaning_lane;
 pub use channels::{Channel, ChannelFamily, ChannelValues};
