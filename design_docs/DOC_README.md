@@ -6,6 +6,13 @@ the deep rationale lives in the doc itself.
 
 Current bounded proofs (2026-09-05): the [projection grammar adoption plan](mere_docs/implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md) records executable Graphshell authoring, the interactive practice workspace with retained rendering and measured compiler improvements, and the two-peer Woodshed comparison space with signed admission, authority filtering, and offline disk reopening; fixture scope and source-hashed receipts are explicit.
 
+Cross-domain continuation (2026-10-05): that plan records published shared
+relationship authoring/compiler and Knot UI/retention adoption, Woodshed's
+visible Woodshed host integration, and the shared horizontal reveal fix
+`5011e2f9`. Committed-source host acceptance includes 18 reviewed baseline,
+narrow and fresh-process captures. Retention is an isolated unsealed session
+fixture; personal-wallet encryption and broader platform acceptance stay separate.
+
 ## Required reading order
 
 Terminology amendment (2026-09-20): [TERMINOLOGY.md](TERMINOLOGY.md) restores
