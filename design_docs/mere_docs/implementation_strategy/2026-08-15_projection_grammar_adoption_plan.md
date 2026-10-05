@@ -2,6 +2,64 @@
 
 **Status:** active: the executable Graphshell authoring proof landed 2026-09-04; A5 and the remaining portable-grammar questions stay open.
 
+## Cross-domain relationship recipe continuation (2026-10-05)
+
+Status: shared implementation landed in the integration worktree; consumer qualification in progress.
+The existing Scenograph authoring definitions are the source contract. The
+executable compiler has moved from Graphshell to `scenomise::projection`,
+preserving the authoring crate's independence from solvers and widgets.
+Graphshell continues to compose that capability into its reference host.
+
+Feature target: one editable relationship recipe over Knot sound selections and
+Woodshed Working Set occurrences. Start with authored order, occurrence labels,
+and disclosed relationships with explanations and method provenance. Duplicate
+occurrences may refer to one source; selection and relationship endpoints remain
+occurrence-specific. Domain calculations and owner actions stay in the adapters.
+
+Done conditions:
+
+- Both domains use the same shared recipe/compiler rather than copied layout
+  implementations, with explicit refusal for missing semantic roles.
+- A spacing/arrangement edit, occurrence selection, and explained relationship
+  survive save/reopen; compatible rebinding requires an explicit new source.
+- Knot embeds the capability in its reading workflow and retains validated
+  recipe versions in its own mere. Woodshed retains its own source custody.
+- Shared tests cover source freshness, duplicate occurrences, relation endpoints,
+  schema bounds and compatible/incompatible bindings; consumer tests exercise
+  actual domain results and owner actions. Native captures qualify only the
+  paths actually observed.
+
+This slice does not require the completion of dynamics G1–G6. Existing physics,
+pairing and dependency-migration lanes keep their owners. No recipe conveys a
+credential, data-access grant, or script execution authority.
+
+Findings: inspection of Mere `bd119a69d` confirms existing durable Scenograph
+definitions and the executable compiler's node/grid/scatter subset. The two
+consumer repositories remain separate; the local integration worktree is the
+single owner of shared compiler changes for this pass.
+
+Progress: Scenograph supplies the typed relationship recipe, shared draft edits
+and saved occurrence/relationship selection. Scenomise supplies bounded
+disclosure validation, source-revision checking, compilation and explained edge
+endpoints; Graphshell reexports the compiler instead of copying it. Named
+`authored_order`, `occurrence_labels` and `explained_relationships` facets are
+mandatory. Ordinal relationship recipes use a spaced grid; scatter coordinates
+are not inferred from occurrence order. The generic coordinate compiler retains
+its previous scatter support.
+
+Knot integrates actual Mora relationships into its reading UI and typed retained
+collection material. Woodshed supplies actual Working Set/catalog disclosure and
+retains shared recipe state through its existing session model. Woodshed's
+compiler adoption is exercised by a standalone compatibility instrument; its
+visible host recipe editor and production dependency repin remain follow-ons,
+not completed UI acceptance.
+
+Shared qualification (2026-10-05): `cargo test --locked -p scenograph -p
+scenomise` passes 8 authoring tests, 88 choreography tests (including nine new
+relationship regressions), and the authoring compile-fail doctest. The two
+crates also pass `cargo check --locked --target wasm32-unknown-unknown`.
+Graphshell compatibility and consumer qualification remain in progress.
+
 ## Executable authoring proof (2026-09-04, verified in current working tree)
 
 Mark requested Luna/Terra subagents to try the review's bounded proof. Graphshell's
