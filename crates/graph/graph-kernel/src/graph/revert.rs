@@ -265,7 +265,14 @@ impl Revert {
     }
 
     /// Put back each node part the change altered and nobody touched since.
-    fn node_parts(&mut self, id: Uuid, before: &NodeState, after: &NodeState, live: &NodeState) {
+    fn node_parts(
+        &mut self,
+        id: Uuid,
+        before: &NodeState,
+        after: &NodeState,
+        live: &NodeState,
+        recreating: bool,
+    ) {
         let node_id = id.to_string();
         self.part(
             Part::Title(id),
@@ -353,7 +360,7 @@ impl Revert {
             };
             self.part(
                 Part::Facet(id, facet.clone()),
-                was != became,
+                recreating || was != became,
                 live.facets.get(facet) == became,
                 edit,
             );
@@ -372,12 +379,6 @@ impl Revert {
 
     /// Make a node the change removed again, as it stood before.
     pub(super) fn recreate(&mut self, id: Uuid, before: &NodeState) {
-        self.edits
-            .push(CapturedDelta::ReplayAddNodeWithIdIfMissing {
-                id: id.to_string(),
-                url: before.url.clone(),
-                position: [0.0, 0.0],
-            });
         // What a node is born with, so every part below lands as it stood.
         let mut scratch = Graph::new();
         let _ = apply_graph_delta(
@@ -389,7 +390,18 @@ impl Revert {
             },
         );
         let born = node_state(&scratch, id).expect("the scratch node exists");
-        self.node_parts(id, before, &born, &born);
+        self.recreate_from_birth_state(id, before, &born);
+    }
+
+    fn recreate_from_birth_state(&mut self, id: Uuid, before: &NodeState, born: &NodeState) {
+        self.edits
+            .push(CapturedDelta::ReplayAddNodeWithIdIfMissing {
+                id: id.to_string(),
+                url: before.url.clone(),
+                position: [0.0, 0.0],
+            });
+        // Replay's birth clock can differ from the planner's; restore every facet.
+        self.node_parts(id, before, born, born, true);
     }
 }
 
@@ -440,7 +452,7 @@ pub fn revert_change(
                 out.recreate(*id, &was);
             },
             (Some(_), None, Some(_)) => out.keep(Part::Node(*id)),
-            (Some(was), Some(became), Some(now)) => out.node_parts(*id, &was, &became, &now),
+            (Some(was), Some(became), Some(now)) => out.node_parts(*id, &was, &became, &now, false),
             // Removed by someone since the change.
             (Some(was), Some(became), None) => {
                 if was != became {
@@ -711,6 +723,75 @@ pub(super) mod tests {
         assert!(revert.kept.is_empty(), "{:?}", revert.kept);
         apply_all(&mut live, &revert.edits);
         assert_eq!(fingerprint(&live), fingerprint(&before));
+    }
+
+    #[test]
+    fn recreation_restores_facets_when_the_birth_clock_changes() {
+        for original_visit in [Some(90), None, Some(100)] {
+            let mut before = Graph::new();
+            apply_all(&mut before, &[add(1), add(2)]);
+            let visit_facet = super::super::node_facets::VISIT_HISTORY;
+            apply_all(
+                &mut before,
+                &[
+                    facet(
+                        1,
+                        visit_facet,
+                        r#"{"last_visited_ms":42,"last_session_visited":0}"#,
+                    ),
+                    facet(2, "custom.note", r#"{"text":"original"}"#),
+                ],
+            );
+            let original = match original_visit {
+                Some(timestamp) => facet(
+                    2,
+                    visit_facet,
+                    &serde_json::json!({
+                        "last_visited_ms": timestamp,
+                        "last_session_visited": 0,
+                    })
+                    .to_string(),
+                ),
+                None => CapturedDelta::ReplayRemoveNodeFacetById {
+                    node_id: id(2).to_string(),
+                    facet: visit_facet.into(),
+                },
+            };
+            apply_all(&mut before, &[original]);
+            let was = node_state(&before, id(2)).unwrap();
+            let mut scratch = Graph::new();
+            apply_all(&mut scratch, &[add(2)]);
+            let mut born = node_state(&scratch, id(2)).unwrap();
+            born.facets.insert(
+                visit_facet.into(),
+                serde_json::json!({"last_visited_ms":100,"last_session_visited":0}),
+            );
+            let mut revert = Revert::default();
+            revert.recreate_from_birth_state(id(2), &was, &born);
+
+            let mut live = before.clone();
+            apply_all(&mut live, &[remove(2)]);
+            apply_all(&mut live, &revert.edits[..1]);
+            // A later replay birth, even when original and planner both read 100.
+            apply_all(
+                &mut live,
+                &[CapturedDelta::ReplayTouchNodeLastVisitedById {
+                    node_id: id(2).to_string(),
+                    timestamp_ms: 101,
+                }],
+            );
+            apply_all(&mut live, &revert.edits[1..]);
+            assert_eq!(
+                fingerprint(&live),
+                fingerprint(&before),
+                "{original_visit:?}"
+            );
+            assert_eq!(
+                node_state(&live, id(1)).unwrap().facets[visit_facet]["last_visited_ms"],
+                42,
+                "the untouched node keeps its own timestamp"
+            );
+        }
     }
 
     #[test]
