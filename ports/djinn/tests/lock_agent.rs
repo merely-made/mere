@@ -316,7 +316,7 @@ fn ssh_add_locks_the_resident_like_openssh_and_the_wire_unlock_is_refused() {
     run.require(
         "after the unlock ssh-add -L lists the same identities",
         Bound::State,
-        &listed_text.lines().map(key_of).collect::<Vec<_>>(),
+        listed_text.lines().map(key_of).collect::<Vec<_>>(),
         relisted_text.lines().map(key_of).collect::<Vec<_>>(),
         relisted.status.success()
             && relisted_text.lines().map(key_of).collect::<Vec<_>>()
