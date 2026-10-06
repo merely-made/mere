@@ -1,7 +1,13 @@
 # Crypto Generation Unification
 
 **Date:** 2026-08-10
-**Status:** DONE 2026-08-10 for every first-party manifest in mere
+**Status (2026-10-06):** reopened by ruling S44 of the
+[stack seams plan](2026-10-04_stack_seams_plan.md). The unification landed
+2026-08-10 (`1468e1b1`) for every first-party manifest then in mere; three
+first-party manifests have since pinned `sha2 = "0.10"` against the ruled 0.11
+row: djinn (`37706afb`), the distillery session fixture (`aa121f03`) and Pelt
+desktop (on genet's 0.10 line). Open: repin all three to 0.11, a follow-on
+task (below); Pelt's repin may wait on genet's own move to 0.11.
 **Anchors:** [crypto stack decision](../technical_architecture/2026-08-10_crypto_stack_decision.md),
 [dependency footprint brief](../../2026-07-04_dependency_footprint_brief.md)
 (which named this migration unit on 2026-07-04 and did not execute it)
@@ -68,6 +74,15 @@ elliptic-curve, bcrypt-pbkdf, oxrdf. We do not own those manifests, and the
 decision doc's rule is that a transitive dep on the other row is tolerable
 while a first-party one is not.
 
+**Corrected 2026-10-06 (S14 pass):** no longer true. At mere `535bca11` three
+first-party manifests pin `sha2 = "0.10"`: `ports/djinn/Cargo.toml` (line 78,
+added in `37706afb`, 2026-09-13), `ports/pelt/desktop/Cargo.toml` (line 186,
+commented "this carries genet's 0.10 line") and
+`ports/distillery/probe/session-fixture/Cargo.toml` (line 21, added in
+`aa121f03`, 2026-08-24). The base Cargo.lock lists `djinn` 0.0.2 and
+`pelt-desktop` 0.2.0 among sha2 0.10.9's dependents. The `session-runtime` row
+in the table above is now pandect.
+
 Two items are ours but out of this repo's reach:
 
 - **`misfin` 0.0.4** pulls sha2 0.10 through its own published manifest. It
@@ -80,3 +95,21 @@ Two items are ours but out of this repo's reach:
 `argon2` stays at 0.5.3: 0.6 is release-candidate only, and a password-hash
 change is a stored-format change that wants its own migration note.
 `signature` 2 rides with `ssh-key` 0.6 rather than moving alone.
+
+## Reopened 2026-10-06: the three `sha2` 0.10 pins
+
+Ruling S44 of the [stack seams plan](2026-10-04_stack_seams_plan.md): repin
+all three, as a follow-on task outside the S14 documentation pass. Done when:
+
+- [ ] `ports/djinn/Cargo.toml` takes the 0.11 row;
+- [ ] `ports/distillery/probe/session-fixture/Cargo.toml` takes the 0.11 row;
+- [ ] `ports/pelt/desktop/Cargo.toml` takes the 0.11 row, which may wait on
+      genet's own move to 0.11.
+
+## Progress
+
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_43_s14_phase_b5.md: the status reopened under
+  ruling S44, the Residue claim corrected with the three first-party
+  `sha2` 0.10 pins, and the repins added as open done-conditions.

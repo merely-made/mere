@@ -58,6 +58,9 @@ keeps what is genuinely composition rather than capability:
   routing every signing approval — which would have failed silently rather than
   loudly had the sweep missed it.
 
+  **Corrected 2026-10-06 (S14 pass):** the rename's commit, `617ea210`, is
+  dated 2026-08-15, as the follow-ups below record, not the same day.
+
   **Receipts under `docs/receipts/` were deliberately not rewritten.** They
   record what a run produced on its date, and editing evidence to match today's
   vocabulary is how a receipt stops being one. The persona-switch receipt was
@@ -125,6 +128,13 @@ became [chirograph](https://crates.io/crates/chirograph), both published 0.0.1.
 The crate names in this section are left as they were written, per the receipt
 rule; read them as the pre-rename vocabulary.
 
+**Corrected 2026-10-06 (S14 pass):** titulus was folded back into chirograph
+in `83feb122` (2026-09-23, recorded in the
+[crate consolidation plan](2026-09-23_crate_consolidation_plan.md)). At mere
+`535bca11` there is no titulus crate, only `crates/chirograph/src/titulus.rs`;
+castellan imports the cards from chirograph (`ports/castellan/src/projection.rs`,
+line 21), and chirograph is at 0.0.2.
+
 ## Follow-ups, not this pass
 
 - Publishing castellan 0.0.2 with the keeper feature needs graphshell-protocol
@@ -139,3 +149,11 @@ rule; read them as the pre-rename vocabulary.
   **Done 2026-08-15** (`617ea210`): decided with the other two.
   `graphshell.identity.*` became `castellan.*`; the resolution is recorded
   in the wire-strings section above.
+
+## Progress
+
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_43_s14_phase_b5.md: a dated note on titulus's
+  fold back into chirograph (`83feb122`), and the wire-string rename's date
+  reconciled with `617ea210`.
