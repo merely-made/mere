@@ -14,6 +14,8 @@
 //! array) left in memory nobody owns. Stack copies and memory the OS
 //! allocates are outside what this can see.
 
+// Each includer uses its own subset.
+#![allow(dead_code)]
 
 use std::alloc::{GlobalAlloc, Layout, System};
 use std::cell::UnsafeCell;
