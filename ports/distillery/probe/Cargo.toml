@@ -40,9 +40,9 @@ web-sys = { version = "=0.3.106", features = [
 [patch.crates-io]
 # cambium-genet-web-host rides Genet; [patch] is not inherited, so these rows
 # restate graphshell-web's, at the same immutable Genet revision.
-taffy = { package = "genet-taffy", version = "=0.14.0", git = "https://github.com/merely-made/genet.git", rev = "bd3e8861b2932d62b73c9936ac3a317f1df3ffdb" }
-layout-dom-api = { git = "https://github.com/merely-made/genet.git", rev = "bd3e8861b2932d62b73c9936ac3a317f1df3ffdb", version = "=0.1.1" }
-genet-scripted-dom = { git = "https://github.com/merely-made/genet.git", rev = "bd3e8861b2932d62b73c9936ac3a317f1df3ffdb", version = "=0.1.2" }
+taffy = { package = "genet-taffy", version = "=0.14.0", git = "https://github.com/merely-made/genet.git", rev = "d851a9db0cd1ff7837768250f21e9dff63455940" }
+layout-dom-api = { git = "https://github.com/merely-made/genet.git", rev = "d851a9db0cd1ff7837768250f21e9dff63455940", version = "=0.1.1" }
+genet-scripted-dom = { git = "https://github.com/merely-made/genet.git", rev = "d851a9db0cd1ff7837768250f21e9dff63455940", version = "=0.1.2" }
 vello = { git = "https://github.com/mark-ik/vello.git", tag = "vello-0.10.0" }
 cubecl-runtime = { path = "../../../support/patches/cubecl-runtime" }
 cubek-reduce = { path = "../../../support/patches/cubek-reduce" }
