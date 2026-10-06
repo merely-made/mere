@@ -1,6 +1,6 @@
 # Balaur Review Brief
 
-**Status:** findings written 2026-10-06 (§3); forks A to E (§3.9) are with Mark.
+**Status:** findings written 2026-10-06 (§3); forks A to E ruled the same day (§1).
 
 **Subject:** [balaurengine/balaur](https://github.com/balaurengine/balaur), "A 2D & 3D
 node-based game engine, fully deterministic, with scripts that reload in
@@ -32,6 +32,38 @@ from balaur, "since it's MIT and all". The coordinator read balaur's README,
   run spread at 500, 2,000 and 5,000 bodies
   (`Code/testing/mere/rapier-determinism/probe.log`). This is stack seams S4's
   evidence; the rest of S4 is track G8 in the dynamics grammar plan.
+
+**Rulings on the findings (2026-10-06, §3.9's forks A to E).** The coordinator
+checked the review's claims about our code before asking. They hold:
+`scenotime` interpolates rotation linearly (`transition.rs:191`); scenomise
+refuses with "does not read this option" (`catalog.rs:498`); graphshell's
+`projection_editor.rs` has no undo; the `seiche-repeat` probe hashes `to_bits`;
+and seiche keeps two generators (`emitter.rs`, `laws/mod.rs`).
+
+- **A, where whole-document history lives.** Options: generic in Cambium;
+  Graphshell's projection editor only; scenograph. Mark: **"Generic, in
+  Cambium (Recommended)"**. *Follows:* one history over any cloneable
+  document, timed by the host's clock, so no editor builds its own.
+- **B, how arrangement options are declared.** Options: declared as data; a
+  separate editor descriptor; leave undeclared. Mark: **"Declared as data
+  (Recommended)"**. *Follows:* each catalog family and `SolverCapability`
+  declares its options in a closed type set that matches today's seven
+  readers, and both refusal and the editor's rows come from that one
+  declaration.
+- **E, G8's instruments.** Options: amend G8 now; that, plus replay as a
+  track; leave G8 as ruled. Mark: **"That, plus replay as a track"**.
+  *Follows:* G8 gains a per-tick trace, labelled slices with
+  first-divergence reporting, velocity in the hash, one owned random
+  generator per world, and a lint against bare transcendentals and
+  hash-ordered loops. Input record and replay, with a restorable
+  checkpoint, become a new track (dynamics grammar plan).
+- **C and D, motion (lane L5).** Asked which of two to accept, with anything
+  unticked to come back, Mark ticked both: **"Write our own easing, Rotation
+  mode, short arc default"**. *Follows:* when L5's authored front-end
+  arrives, the easing set is written from the public formulas and balaur's
+  `ease.rs` is not ported. Each `TransitionSpec` gets a rotation mode, short
+  arc by default. Mark then asked to hear more about the two before they are
+  built.
 
 ## 2. What the review reads for
 
