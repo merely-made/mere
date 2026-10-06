@@ -2,10 +2,10 @@
 
 | doc | disposition | status accurate | claims | holds | stale | unverifiable |
 |---|---|---:|---:|---:|---:|---:|
-| mere_docs/implementation_strategy/2026-10-04_stack_seams_plan.md | current | yes | 40 | 40 | 0 | 0 |
-| **Totals** |  |  | **40** | **40** | **0** | **0** |
+| mere_docs/implementation_strategy/2026-10-04_stack_seams_plan.md | current | yes | 45 | 45 | 0 | 0 |
+| **Totals** |  |  | **45** | **45** | **0** | **0** |
 
-**Totals: 1 doc, 40 claims checked (40 holds, 0 stale, 0 unverifiable), 0 contradictions.**
+**Totals: 1 doc, 45 claims checked (45 holds, 0 stale, 0 unverifiable), 0 contradictions.**
 
 Audit base: Mere `c34449bd` (2026-10-04), with this pass's edits in the
 working tree: the new plan, its `DOC_README.md` entry at the head of the
@@ -21,8 +21,8 @@ This batch exists because the document is new.
 ## mere_docs/implementation_strategy/2026-10-04_stack_seams_plan.md
 
 - disposition: current
-- status line: "Status (2026-10-05): in progress. Thirty-one rulings in eleven rounds (S1 to S31); P1 landed on main (`1633be0c`); P2 staged (S27 to S31, four stages in §3.1), stages 1 to 3 built on branch `stack-seams-p2` (`21b0057f`), stage 4 next; P3 and S7 done as documents; S3 to S6 carried into the dynamics grammar plan (G8, G9); S9 done by the identity lane (`b52edea7`)." — accurate: yes
-- claims checked: 40 — holds: 40, stale: 0, unverifiable: 0
+- status line: "Status (2026-10-05): in progress. Thirty-one rulings in eleven rounds (S1 to S31); P1 landed on main (`1633be0c`); P2 staged (S27 to S31, four stages in §3.1), landed on main (`40d7ae5e`), with F19 a fork for Mark; P3 and S7 done as documents; S3 to S6 carried into the dynamics grammar plan (G8, G9); S9 done by the identity lane (`b52edea7`)." — accurate: yes
+- claims checked: 45 — holds: 45, stale: 0, unverifiable: 0
 
 ### Stale claims
 
@@ -101,4 +101,9 @@ entry at `ac7f906d`. F16 checked against wgpu 30.0.1's
 `frame.rs` call; stage 1's entry against branch commit `76aa1bee` and its gate
 and receipt logs. Stage 2's entry checked against branch
 commit `03f8fe74`, its gate logs, and the review subagent's report. Stage 3's entry checked against branch
-commit `21b0057f`, its gate logs, and the two control runs.
+commit `21b0057f`, its gate logs, and the two control runs. F18 checked against winit
+0.30.13's `platform_impl/windows/window.rs` 152 and `event_loop.rs` 1276-1298
+and the stalled and passing headed logs; F19 against the Knot lane's report
+(not rerun here); F20 against the review subagent's report and `windows.rs`;
+stage 4's and the landing's entries against `7ae0e36e`, `e131273e`,
+`40d7ae5e` and their gate logs; the F15 addition against `102aa548`.

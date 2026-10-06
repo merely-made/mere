@@ -3,8 +3,7 @@
 **Date:** 2026-10-04
 **Status (2026-10-05):** in progress. Thirty-one rulings in eleven rounds
 (S1 to S31); P1 landed on main (`1633be0c`); P2 staged (S27 to S31, four
-stages in §3.1), stages 1 to 3 built on branch `stack-seams-p2` (`21b0057f`),
-stage 4 next; P3 and S7 done as documents; S3 to S6 carried into the dynamics
+stages in §3.1), landed on main (`40d7ae5e`), with F19 a fork for Mark; P3 and S7 done as documents; S3 to S6 carried into the dynamics
 grammar plan (G8, G9); S9 done by the identity lane (`b52edea7`).
 
 A note sent to Mark listed weak seams in the stack. Each claim was checked
@@ -203,7 +202,7 @@ in two or more crates.
   padding and hands that to the `ProjectionCompiler`, with retention
   validation's nominal size, the measuring path and the padding to come back
   to him as forks; recorded in the burn plan's §13.46 ("Knot's card size under
-  P1", `7d6dc003`). That lane also notes P1 moves Knot's spacing whatever card
+  P1", `7d6dc003`; how it measures, `102aa548`). That lane also notes P1 moves Knot's spacing whatever card
   is chosen (card plus gap, where a fixed 184 by 84 cell was), and that Knot is
   the first host to measure its card rather than declare it.
 - **F16 (2026-10-05, P2 stage 1's control). wgpu's device equality cannot tell
@@ -223,6 +222,46 @@ in two or more crates.
   measurement). Rootstock's redraw calls the unkeyed `rasterize_scaled`
   (`frame.rs`), harmless with one window; stage 4 keys it per window, and
   `presentation_host` is already unique per host.
+- **F18 (2026-10-05, P2 stage 4's control). On Windows, one animating window
+  starves another.** Winit 0.30 asks for a frame with
+  `RedrawWindow(RDW_INTERNALPAINT)` and delivers it on `WM_PAINT`
+  (`platform_impl/windows/window.rs` 152, `event_loop.rs` 1276), and Win32
+  hands `WM_PAINT` to the first window needing paint every time, so a window
+  that asks for its next frame from each frame, as an animating one does,
+  keeps being chosen. Measured: with both windows animating, B presented 4,981
+  frames from 4,979 redraw events while A had one event and presented nothing
+  more, until the driver gave up. Deferring the request to the idle turn did
+  not change it (the request still precedes the next message wait), and
+  forcing the paint from inside a callback (`RDW_UPDATENOW`) only re-queues it,
+  since winit's `WM_PAINT` handler buffers while a callback runs. The
+  multi-window entry therefore notes each window's requests and, on Windows
+  only, draws each window that asked in the idle turn, through the same
+  handler a delivered paint runs; `Fifo` presentation paces each to its
+  monitor, and paints the OS sends still arrive as before. Elsewhere it hands
+  the requests to the platform at the idle turn, so X11, Wayland and macOS keep
+  their own frame delivery. After: A presented 8 frames while B presented 9.
+  *Reading, not ruled*: Windows-only because that is where the starvation was
+  measured; drawing from the idle turn everywhere would bypass Wayland's frame
+  callbacks, under which a hidden surface's `Fifo` acquire can block, and
+  piggybacking one window's frame on another's paint has the same hazard.
+  Two animating windows on X11, Wayland and macOS are unmeasured.
+- **F19 (2026-10-05, reported by the Knot lane). P1 accepts degenerate card
+  sizes.** Run through five relationship recipes at seven `ItemSizes` cards,
+  among them 0 by 0, NaN and 1e6, scenomise gave byte-identical outcomes and
+  issue lists, with no complaint about 0 by 0 or NaN. Since S20 has hosts supply
+  the size, a host bug that hands over 0 or NaN passes silently. How to refuse
+  them (a `Result` from `ProjectionCompiler::new`, a typed compile issue, a
+  debug assertion) is a fork for Mark; the first changes the signature the Knot
+  lane is adapting to, which was told to proceed on the current one.
+- **F20 (2026-10-05, P2 stage 4's review). What the multi-window pacing leaves
+  unmeasured.** Serving each window that asked in one idle turn, each acquire
+  waiting on its swapchain, couples windows on monitors of different refresh
+  rates to the slower (a 60 Hz and a 144 Hz window would both draw at 60);
+  S26's "at its own monitor's rate" holds for windows on like monitors. Whether
+  Win32's modal move and size loops still run the idle turn (so an animating
+  window keeps drawing while another is dragged) is unmeasured, as is whether an
+  occluded but not minimized window's present blocks. A panic inside a turn
+  leaves the lent runner in that window; nothing catches it today.
 
 ## 2. Rulings
 
@@ -665,6 +704,59 @@ The done-conditions handed over for S3 and S4, kept for reference:
   works in `projection_compile`. Second pass (F8 to F11), rulings S7 to S10:
   the README fixed (S7), TERMINOLOGY gains pandect under Eidetic and the
   curation record (S8, S10), S9 sent to the identity lane.
+- **2026-10-05.** P2 landed on main at `40d7ae5e`, by S27's one merge: main
+  (`102aa548`) was merged into the branch, weave resolving the one shared file
+  (`cambium-genet-web-host/src/a11y.rs`, G9's `target_of` removal beside P2's
+  window-subtree signatures), and every gate rerun on the merged tree (573
+  passed, 0 failed, 9 ignored; the four headed receipts; the web host on wasm32,
+  now without a warning; `cargo check --workspace --locked`) before main
+  fast-forwarded. Not pushed. P2's done-conditions as built: two windows render
+  with one core boot counted, a tenant handed the core shares the surfaces'
+  device, a suspend and resume boots none, and mere's consumers build and pass.
+  Checkpoints C1, C4 and C5 were not reached: Woodshed's surface compiles as
+  written (stage 2's review), no genet change was needed, and no single-window
+  assertion changed. Open: F19 for Mark; F20's unmeasured cases; two animating
+  windows on X11, Wayland and macOS (F18).
+- **2026-10-05.** P2 stage 4 built on branch `stack-seams-p2` at `7ae0e36e`,
+  with review fixes at `e131273e`. `run_windows` beside `run`: `WindowsInit`
+  (state, sheet, resources, launch windows as lens and options),
+  `WindowHooks`, `WindowHost`, and the `WinitWindows` event source over
+  `MultiHost`; `WinitHost` takes the tree as a defaulted parameter and the
+  single-window lifecycle splits into per-window pieces both entries drive;
+  events route by `WindowId` to their window's turn; hooks open, close and
+  redraw windows through `ctx.runner`; a window whose close policy exits
+  closes, and the last one ends the loop. Rasterization is keyed per host
+  (F17). Each window paces itself (S26) through a noted request that the idle
+  turn serves; on Windows the idle turn draws each window that asked (F18).
+  Receipts: `headed_tests::windows` (two windows at 480 by 360 and 720 by 480,
+  one core boot, both surfaces and a tenant on one device, a click in A shown
+  in B, one frame presented for that click, a forced suspend and resume
+  booting nothing, B presenting 0 frames while A presented 8, closing A leaving
+  B up) and its control (a third window after the core is forgotten boots a
+  second core on its own device; an animating B presents); windowless, a turn
+  opens and closes windows, and a sheet one window swaps from a hook reaches
+  the other; GPU, a producer moved between windows survives whichever draws
+  first, one key in two windows is a duplicate rather than a theft, and a
+  closed window's producers retire. A read-only review subagent (opus) of
+  stages 3 and 4 found three bugs (a sheet swapped outside the frame hook never
+  reached the other windows; a producer moved between windows was retired if
+  the source drew first; a wake redrew only the first window) and five risky
+  behaviours (a reached window asked through the native window, doubling the
+  acting window's frames: 2 per click before, 1 after; hidden windows drawn by
+  the idle turn; one key in two windows thrashing; a closed window's producers
+  and window-root left behind; nested shadow trees dropped from the whole
+  document's view), all fixed at `e131273e`, each fix with a receipt whose
+  control was run except the wake, the hidden-window skip and the cascade of
+  windows opened from a first frame. The first click count read 2 for an
+  instrument reason (the platform's first paint of a newly shown window landed
+  inside the count) and settles both windows before the click now. The
+  single-window core boots before `init` again, as before stage 4. Gates on
+  the branch: cambium, rootstock, the winit host, cambium-winit-a11y,
+  mesquite, mere-view and pelt-desktop pass 573, fail 0, ignore 9 with stage
+  1's warnings; the four headed receipts pass; the web host checks on wasm32;
+  `cargo check --workspace --locked` exits 0. The non-Windows idle-turn branch
+  was type-checked on Windows with the cfgs swapped, as no Linux C toolchain
+  is installed here. F18 to F20 recorded.
 - **2026-10-05.** P2 stage 3 built on branch `stack-seams-p2` at `21b0057f`, not
   merged. `WindowDom` presents a window-root as its document, and the pipeline's
   layout, hit testing, caret, scroll, paint, producer and accessibility reads go
