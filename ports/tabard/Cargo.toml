@@ -17,7 +17,7 @@ tinct = { workspace = true }
 
 [dev-dependencies]
 # Formerly relative paths into genet's components; now the workspace git pins.
-genet-livery = { workspace = true }
+genet-livery = { workspace = true, features = ["image-decode"] }
 genet-static-dom = { workspace = true }
 layout-dom-api = { workspace = true }
 livery = { workspace = true }
