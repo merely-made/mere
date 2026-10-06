@@ -613,6 +613,11 @@ receipt. Mark: **"Newer record supersedes"**. Follows:
 snapshot covers as superseding the snapshot's record, and coverage and totals
 count the batch record; the snapshot file stays unchanged; DOC_POLICY's
 addendum says so. Phase B's records are ordinary batch records.
+*Reading, not ruled* (2026-10-06): the same holds between batch records,
+a later batch's record superseding an earlier batch's for the same path,
+since three of phase B's plans (the event model, fact visualization and
+insigne proofs plans) were last judged in batches 15 and 22, not the
+snapshot; one batch judging a path twice is still an error.
 
 **Ruling S35.** *Three active receipts share the basename `RECEIPT.md`. Rename
 them?* Options: rename in place to dated names, updating their citations; the
