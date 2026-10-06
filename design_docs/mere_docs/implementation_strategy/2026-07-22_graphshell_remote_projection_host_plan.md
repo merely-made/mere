@@ -18,15 +18,20 @@ superseded. Section 9's murm/moot promotion row is withdrawn and the
 audio-primitives row deferred to a git pin. The four protocol planes, the
 disclosure rules, the G-series proof sequence, and all landed receipts remain
 in force unchanged.
-**Status:** the local G0 boundary is sealed; G1's loopback presentation, G2's
-diff/resume/persistence, and G3's real Turnstone endpoint proofs are complete as
-of 2026-07-22. The Graphshell workspace is published on the existing
-`mark-ik/graphshell` repository; its retired browser donor remains available in
-the same Git history. G4, the already-proven Isometry projection, is next.
-Graphshell is ruled as the Merely family's remote projection host. It is
-neither the projection engine nor Mere's internal chrome layer. This plan
-remains the cross-repository roadmap; Graphshell's README owns the live package
-boundary.
+**Status (2026-10-06):** G0 through G5 are complete. G0 to G3 and G4 (the
+Isometry projection, implemented locally; `ports/graphshell/src/bin/g4_sessions.rs`)
+on 2026-07-22; G5a to G5f between 2026-07-25 and 2026-07-29, the two-device run
+closing on 2026-07-29 (§8, with the H6a and H6b receipts). The browser carrier
+profile was physically proven on 2026-09-02 (Findings). G6 is next; no active
+document records G6 or G7 as done. G8 is folded into H4 of the reference host
+plan. The crates have lived in Mere since the 2026-07-23 consolidation
+(`crates/chirograph`, `crates/graphshell/graphshell-client`,
+`crates/graphshell/graphshell-endpoint`, `ports/graphshell`), not on the
+`mark-ik/graphshell` repository, whose history keeps the retired browser donor.
+Graphshell is ruled as the Merely family's remote projection host, and since
+2026-07-27 also Mere's WASM-safe local reference host. It is neither the
+projection engine nor Mere's internal chrome layer. This plan remains the
+cross-repository roadmap; Graphshell's README owns the live package boundary.
 
 **Companions:** the
 [projection-engine prior-art brief](../research/2026-07-21_projection_engine_prior_art_brief.md),
@@ -999,3 +1004,12 @@ line when the viewer has a key"; the honest distance is this list.
 - Completed G1's loopback presentation proof: sidecar offers, independent
   content-addressed resources, two capability profiles, semantic fallback,
   accessibility actions, deterministic receipt, and headed responsive check.
+
+### 2026-10-06 (S14 pass)
+
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_49_s14_phase_b11.md: the status now records G4
+  and G5 complete (G5f on 2026-07-29), the browser carrier profile proven on
+  2026-09-02, G6 next, G8 folded into H4, and the crates in Mere since
+  2026-07-23, which also resolves its contradictions with the header and §8.
