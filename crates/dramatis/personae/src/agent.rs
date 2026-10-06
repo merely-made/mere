@@ -39,6 +39,15 @@
 //!   destination constraints are not yet stored as key policy.
 //! - Any local process may connect to the agent endpoint, same as stock
 //!   ssh-agent (plan §threat-model note).
+//!
+//! ## While the vault is locked (vault lock rulings 8 and 9)
+//!
+//! OpenSSH's behaviour: no identities are listed; sign, add and remove fail,
+//! each refusal logged with its reason (the protocol carries none).
+//! `ssh-add -x` engages the resident's vault lock through
+//! [`VaultLockRequest`]; its lock password is cleared and never used, since
+//! hashing it would be our own mechanism. `ssh-add -X` is refused: unlocking
+//! happens only on the resident's own surface.
 
 use std::sync::{Arc, Mutex};
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -66,8 +75,19 @@ use crate::ssh_krl;
 use crate::ssh_sign;
 use crate::ssh_slot::{self, SshSlot};
 use crate::vault::{IdentityStorage, IdentityVault, ProtocolKey, UnlockTier};
+use crate::IdentityError;
 
 pub use crate::ssh_slot::{SSH_MOD_ID, protocol_key_for};
+
+/// What `ssh-add -x` engages (ruling 9): the resident's whole lock, so every
+/// holder of a vault-derived key drops it before the agent answers.
+pub trait VaultLockRequest: Send + Sync {
+    /// Lock now; a refusal (ruling 27) is an error.
+    fn lock_vault(&self) -> Result<(), IdentityError>;
+}
+
+/// The reason every locked refusal carries, in the log and the error.
+const LOCKED: &str = "refused while the vault is locked";
 
 /// Agent session over a shared vault.
 ///
@@ -79,6 +99,7 @@ pub struct VaultAgent<S: IdentityStorage> {
     approval: Option<ApprovalBroker>,
     adapter: String,
     binding: Option<VerifiedSshBinding>,
+    locker: Option<Arc<dyn VaultLockRequest>>,
 }
 
 #[derive(Clone)]
@@ -94,6 +115,7 @@ impl<S: IdentityStorage> Clone for VaultAgent<S> {
             approval: self.approval.clone(),
             adapter: self.adapter.clone(),
             binding: None,
+            locker: self.locker.clone(),
         }
     }
 }
@@ -106,7 +128,25 @@ impl<S: IdentityStorage> VaultAgent<S> {
             approval: None,
             adapter: "ssh-agent.local".to_string(),
             binding: None,
+            locker: None,
         }
+    }
+
+    /// Let `ssh-add -x` engage `locker`. Without one, the lock message is
+    /// refused, as before.
+    pub fn with_vault_lock(mut self, locker: Arc<dyn VaultLockRequest>) -> Self {
+        self.locker = Some(locker);
+        self
+    }
+
+    fn is_locked(&self) -> bool {
+        self.vault.lock().unwrap().is_locked()
+    }
+
+    /// The logged refusal for `operation` while locked.
+    fn refuse_locked(operation: &str) -> AgentError {
+        tracing::warn!(operation, "ssh agent {LOCKED}");
+        std::io::Error::other(format!("{operation} {LOCKED}")).into()
     }
 
     /// Wrap a vault and route tiered signing through a visible approval broker.
@@ -120,6 +160,7 @@ impl<S: IdentityStorage> VaultAgent<S> {
             approval: Some(approval),
             adapter: adapter.into(),
             binding: None,
+            locker: None,
         }
     }
 
@@ -134,6 +175,7 @@ impl<S: IdentityStorage> VaultAgent<S> {
             approval: Some(approval),
             adapter: adapter.into(),
             binding: None,
+            locker: None,
         }
     }
 
@@ -147,7 +189,7 @@ impl<S: IdentityStorage> VaultAgent<S> {
         self.approval.as_ref()
     }
 
-    /// Locked lists nothing; the agent's locked behaviour proper is L2.
+    /// Locked lists nothing (the vault answers `Locked`).
     fn ssh_identities(&self) -> Vec<SshSlot> {
         match self.vault.lock().unwrap().current_profile() {
             Ok(profile) => ssh_slot::ssh_slots(profile),
@@ -209,6 +251,10 @@ impl<S: IdentityStorage + 'static> Session for VaultAgent<S> {
         // ever seen the key still works. `sign` resolves both to the same
         // slot, because a credential's key_data is the key either way.
         let mut identities = Vec::new();
+        if self.is_locked() {
+            tracing::debug!("ssh agent lists no identities while the vault is locked");
+            return Ok(identities);
+        }
         for identity in self.ssh_identities() {
             let public = PublicKey::from(&identity.private);
             let comment = identity.private.comment().to_string();
@@ -227,15 +273,22 @@ impl<S: IdentityStorage + 'static> Session for VaultAgent<S> {
     }
 
     async fn sign(&mut self, request: SignRequest) -> Result<Signature, AgentError> {
+        if self.is_locked() {
+            return Err(Self::refuse_locked("sign"));
+        }
         let wanted: PublicKey = request.credential.key_data().clone().into();
         let Some(identity) = self.find_by_public(&wanted) else {
             return Err(std::io::Error::other("identity not found in vault").into());
         };
+        // Only the slot's public facts wait out an approval; the private key
+        // is fetched again afterwards, so a lock meanwhile refuses the sign.
+        let (fingerprint, tier, key) = (identity.fingerprint(), identity.tier, identity.key);
+        drop(identity.private);
         let authorization = if let Some(approval) = self.approval.clone() {
             let profile = self.vault.lock().unwrap().profile_id().0.clone();
             let mut signing_request = SigningRequest::new(
                 profile,
-                identity.fingerprint(),
+                fingerprint,
                 "ssh.sign",
                 request.data.as_slice(),
                 self.adapter.clone(),
@@ -247,12 +300,12 @@ impl<S: IdentityStorage + 'static> Session for VaultAgent<S> {
             }
             Some(
                 approval
-                    .authorize(signing_request, SigningPolicy::from(identity.tier))
+                    .authorize(signing_request, SigningPolicy::from(tier))
                     .await
                     .map_err(|error| std::io::Error::other(error.to_string()))?,
             )
-        } else if identity.tier == UnlockTier::PerUse {
-            tracing::warn!(key = ?identity.key, "per-use slot refused: no confirmation UI yet");
+        } else if tier == UnlockTier::PerUse {
+            tracing::warn!(?key, "per-use slot refused: no confirmation UI yet");
             return Err(std::io::Error::other(
                 "per-use slot refused: the agent has no confirmation UI yet",
             )
@@ -260,7 +313,27 @@ impl<S: IdentityStorage + 'static> Session for VaultAgent<S> {
         } else {
             None
         };
-        tracing::info!(key = ?identity.key, flags = request.flags, "signing request");
+        let identity = match self.is_locked() {
+            true => Err(Self::refuse_locked("sign")),
+            false => self
+                .find_by_public(&wanted)
+                .ok_or_else(|| std::io::Error::other("identity not found in vault").into()),
+        };
+        let identity = match identity {
+            Ok(identity) => identity,
+            Err(error) => {
+                if let (Some(approval), Some(authorization)) = (&self.approval, authorization) {
+                    approval.complete(
+                        authorization,
+                        SigningRecordResult::Failed {
+                            code: SigningFailureCode::AdapterFailure,
+                        },
+                    );
+                }
+                return Err(error);
+            },
+        };
+        tracing::info!(?key, flags = request.flags, "signing request");
         let signed = ssh_sign::sign(
             identity.private.key_data(),
             request.data.as_slice(),
@@ -268,7 +341,7 @@ impl<S: IdentityStorage + 'static> Session for VaultAgent<S> {
         )
         .map_err(AgentError::other);
         if let Ok(signature) = &signed {
-            tracing::info!(key = ?identity.key, algorithm = %signature.algorithm(), "signed");
+            tracing::info!(?key, algorithm = %signature.algorithm(), "signed");
         }
         if let (Some(approval), Some(authorization)) = (&self.approval, authorization) {
             let result = match &signed {
@@ -288,6 +361,9 @@ impl<S: IdentityStorage + 'static> Session for VaultAgent<S> {
     }
 
     async fn add_identity(&mut self, identity: AddIdentity) -> Result<(), AgentError> {
+        if self.is_locked() {
+            return Err(Self::refuse_locked("add identity"));
+        }
         let PrivateCredential::Key { privkey, comment } = identity.credential else {
             return Err(std::io::Error::other("unsupported credential type").into());
         };
@@ -318,6 +394,9 @@ impl<S: IdentityStorage + 'static> Session for VaultAgent<S> {
     }
 
     async fn remove_identity(&mut self, identity: RemoveIdentity) -> Result<(), AgentError> {
+        if self.is_locked() {
+            return Err(Self::refuse_locked("remove identity"));
+        }
         let wanted: PublicKey = identity.credential.key_data().clone().into();
         let Some(found) = self.find_by_public(&wanted) else {
             return Err(std::io::Error::other("identity not found in vault").into());
@@ -369,7 +448,42 @@ impl<S: IdentityStorage + 'static> Session for VaultAgent<S> {
         }
     }
 
+    /// `ssh-add -x`: engage the resident's vault lock. The password is
+    /// cleared unread. Locking a locked agent fails, as OpenSSH's does.
+    async fn lock(&mut self, mut password: String) -> Result<(), AgentError> {
+        zeroize::Zeroize::zeroize(&mut password);
+        let Some(locker) = self.locker.clone() else {
+            tracing::warn!("ssh agent lock refused: this agent has no vault lock to engage");
+            return Err(std::io::Error::other("this agent has no vault lock to engage").into());
+        };
+        if self.is_locked() {
+            tracing::warn!("ssh agent lock refused: the vault is already locked");
+            return Err(std::io::Error::other("the vault is already locked").into());
+        }
+        match locker.lock_vault() {
+            Ok(()) => {
+                tracing::info!("vault locked over the ssh agent protocol");
+                Ok(())
+            },
+            Err(error) => {
+                tracing::warn!(%error, "ssh agent lock refused");
+                Err(AgentError::other(error))
+            },
+        }
+    }
+
+    /// `ssh-add -X` is refused over the wire (ruling 9): unlocking happens
+    /// only on the resident's own surface.
+    async fn unlock(&mut self, mut password: String) -> Result<(), AgentError> {
+        zeroize::Zeroize::zeroize(&mut password);
+        tracing::warn!("ssh agent unlock refused: unlock on the resident's own surface");
+        Err(std::io::Error::other("unlock over the agent protocol is refused").into())
+    }
+
     async fn remove_all_identities(&mut self) -> Result<(), AgentError> {
+        if self.is_locked() {
+            return Err(Self::refuse_locked("remove all identities"));
+        }
         let keys: Vec<ProtocolKey> = self
             .ssh_identities()
             .into_iter()
@@ -715,8 +829,8 @@ mod tests {
             .unwrap();
     }
 
-    async fn sign_with(
-        agent: &mut VaultAgent<InMemoryStorage>,
+    async fn sign_with<S: IdentityStorage + 'static>(
+        agent: &mut VaultAgent<S>,
         credential: PublicCredential,
         data: &[u8],
         flags: u32,
@@ -930,6 +1044,188 @@ mod tests {
         let tier =
             agent.vault.lock().unwrap().current_profile().unwrap().slots[&stored].unlock_tier();
         assert_eq!(tier, UnlockTier::PerUse);
+    }
+
+    // ─── Vault lock rulings 8 and 9 ───────────────────────────────────────
+
+    use crate::sealed_profile_storage::PASSPHRASE_ROOT_FILE;
+    use crate::unlock::UnlockMethod;
+    use crate::SealedProfileStorage;
+
+    const LOCK_PASSPHRASE: &[u8] = b"agent lock";
+
+    /// Locks the shared vault directly: the resident's broadcast is
+    /// castellan's, and this agent only needs something to engage.
+    struct DirectLock(Arc<Mutex<IdentityVault<SealedProfileStorage>>>);
+
+    impl VaultLockRequest for DirectLock {
+        fn lock_vault(&self) -> Result<(), IdentityError> {
+            self.0.lock().unwrap().lock()
+        }
+    }
+
+    /// A lockable agent over a temp vault holding one Ed25519 key.
+    fn lockable_agent(
+        dir: &std::path::Path,
+    ) -> (VaultAgent<SealedProfileStorage>, PrivateKey) {
+        let root = [0x6e; 32];
+        crate::save_passphrase_root(dir.join(PASSPHRASE_ROOT_FILE), &root, LOCK_PASSPHRASE)
+            .unwrap();
+        let storage = SealedProfileStorage::open_with_key(dir, root);
+        let key = random_key("locked");
+        let mut profile = Profile::new(
+            ProfileId("test".into()),
+            "test",
+            Ed25519Keypair::from_seed([7; 32]),
+        );
+        profile.slots.insert(
+            protocol_key_for(&key),
+            ssh_slot::slot_for(&key, UnlockTier::Session).unwrap(),
+        );
+        storage.save_profile(&profile).unwrap();
+        let vault = Arc::new(Mutex::new(IdentityVault::with_profile(storage, profile)));
+        let agent = VaultAgent::from_shared_vault(
+            Arc::clone(&vault),
+            ApprovalBroker::new(Duration::from_secs(1)),
+            "ssh-agent.test",
+        )
+        .with_vault_lock(Arc::new(DirectLock(vault)));
+        (agent, key)
+    }
+
+    fn credential(key: &PrivateKey) -> PublicCredential {
+        PublicKey::from(key).key_data().clone().into()
+    }
+
+    #[tokio::test]
+    async fn a_locked_agent_lists_nothing_and_refuses_sign_add_and_remove_with_the_reason() {
+        let dir = tempfile::tempdir().unwrap();
+        let (mut agent, key) = lockable_agent(dir.path());
+        let before = agent.request_identities().await.unwrap();
+        assert_eq!(before.len(), 2, "certificate and key");
+        agent.lock(String::from("ignored")).await.unwrap();
+
+        assert!(agent.request_identities().await.unwrap().is_empty());
+        let sign = sign_with(&mut agent, credential(&key), b"x", 0).await;
+        assert!(sign.unwrap_err().to_string().contains(LOCKED));
+        let other = random_key("newcomer");
+        let add = agent
+            .add_identity(AddIdentity {
+                credential: PrivateCredential::Key {
+                    privkey: other.key_data().clone(),
+                    comment: String::new(),
+                },
+            })
+            .await;
+        assert!(add.unwrap_err().to_string().contains(LOCKED));
+        let remove = agent
+            .remove_identity(RemoveIdentity {
+                credential: credential(&key),
+            })
+            .await;
+        assert!(remove.unwrap_err().to_string().contains(LOCKED));
+        let remove_all = agent.remove_all_identities().await;
+        assert!(remove_all.unwrap_err().to_string().contains(LOCKED));
+
+        // Unlocked on the resident's own surface: the same identities, signing.
+        agent
+            .vault
+            .lock()
+            .unwrap()
+            .unlock(UnlockMethod::Passphrase(LOCK_PASSPHRASE))
+            .unwrap();
+        let after = agent.request_identities().await.unwrap();
+        assert_eq!(
+            after.iter().map(|i| i.credential.key_data()).collect::<Vec<_>>(),
+            before.iter().map(|i| i.credential.key_data()).collect::<Vec<_>>()
+        );
+        let signature = sign_with(&mut agent, credential(&key), b"x", 0).await.unwrap();
+        PublicKey::from(&key).key_data().verify(b"x", &signature).unwrap();
+        assert_eq!(vault_slot_count_of(&agent), 1, "nothing added or removed");
+    }
+
+    fn vault_slot_count_of(agent: &VaultAgent<SealedProfileStorage>) -> usize {
+        agent.vault.lock().unwrap().current_profile().unwrap().slots.len()
+    }
+
+    #[tokio::test]
+    async fn the_lock_message_engages_the_vault_lock_and_unlock_is_refused() {
+        let dir = tempfile::tempdir().unwrap();
+        let (mut agent, _key) = lockable_agent(dir.path());
+        agent.lock(String::from("pw")).await.unwrap();
+        assert!(agent.vault.lock().unwrap().is_locked());
+        assert!(agent.vault.lock().unwrap().storage().is_locked());
+        // OpenSSH fails a second lock.
+        assert!(agent.lock(String::from("pw")).await.is_err());
+        // `-X` never unlocks, whatever the password.
+        let refused = agent.unlock(String::from("pw")).await.unwrap_err();
+        assert!(refused.to_string().contains("refused"), "{refused}");
+        let passphrase = String::from_utf8(LOCK_PASSPHRASE.to_vec()).unwrap();
+        assert!(agent.unlock(passphrase).await.is_err());
+        assert!(agent.vault.lock().unwrap().is_locked());
+    }
+
+    #[tokio::test]
+    async fn without_a_vault_lock_the_lock_message_is_refused() {
+        let mut agent = test_agent();
+        assert!(agent.lock(String::from("pw")).await.is_err());
+        assert!(!agent.vault.lock().unwrap().is_locked());
+    }
+
+    /// A lock while a sign waits for approval: the key is fetched again
+    /// after the approval, so the sign is refused and recorded failed.
+    #[tokio::test]
+    async fn a_lock_during_an_approval_refuses_the_sign() {
+        let dir = tempfile::tempdir().unwrap();
+        let (agent, _) = lockable_agent(dir.path());
+        let key = random_key("guarded");
+        agent
+            .vault
+            .lock()
+            .unwrap()
+            .add_slot(
+                protocol_key_for(&key),
+                ssh_slot::slot_for(&key, UnlockTier::PerUse).unwrap(),
+            )
+            .unwrap();
+        let broker = agent.approval_broker().unwrap().clone();
+        let mut signer = agent.clone();
+        let wanted = credential(&key);
+        let signing = tokio::spawn(async move { sign_with_any(&mut signer, wanted).await });
+        let pending = loop {
+            if let Some(pending) = broker.pending().into_iter().next() {
+                break pending;
+            }
+            tokio::task::yield_now().await;
+        };
+        agent.vault.lock().unwrap().lock().unwrap();
+        broker
+            .decide(
+                pending.request.request_id,
+                SigningDecision::Approve {
+                    remember: RememberApproval::Once,
+                },
+            )
+            .unwrap();
+        let error = signing.await.unwrap().unwrap_err();
+        assert!(error.to_string().contains(LOCKED), "{error}");
+        assert!(matches!(
+            broker.history()[0].result,
+            SigningRecordResult::Failed { .. }
+        ));
+    }
+
+    async fn sign_with_any<S: IdentityStorage + 'static>(
+        agent: &mut VaultAgent<S>,
+        credential: PublicCredential,
+    ) -> Result<Signature, AgentError> {
+        agent
+            .sign(SignRequest {
+                credential,
+                data: b"held".to_vec(),
+                flags: 0,
+            })
+            .await
     }
 
     /// Rulings 55 and 56: `ssh-add` refuses what the agent cannot sign, the

@@ -11,15 +11,49 @@
 //! same type. Either shape retains one OS file lock and one external freshness
 //! ledger for the lifetime of every clone, and one transaction lock per
 //! persona for every multi-record write.
+//!
+//! ## Locking (vault lock ruling 1)
+//!
+//! The record and freshness keys derive from the vault, so they follow its
+//! lock: [`CastellanResident::lock`] forgets both for every clone and every
+//! store handed out, and [`CastellanResident::unlock`] takes them back.
+//! [`CredentialLockHolder`] is the hook that does both from the resident
+//! host's lock.
 
 use std::collections::BTreeMap;
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
 
-use personae::{IdentityError, PersonaId, SealedRecordStorage};
+use personae::{IdentityError, IdentityProvider, PersonaId, SealedRecordStorage};
+use zeroize::Zeroizing;
 
 use crate::items::ItemStore;
+use crate::lock::VaultLockHolder;
 use crate::otp::OtpItemStore;
+
+/// The record and freshness keys, cleared when dropped.
+type DerivedKeys = (Zeroizing<[u8; 32]>, Zeroizing<[u8; 32]>);
+
+/// The two salts a resident derives its record and freshness keys under.
+#[derive(Clone, Copy, Debug)]
+pub struct CredentialSalts {
+    /// Seals credential contents.
+    pub record: &'static [u8],
+    /// Authenticates the external freshness ledger.
+    pub freshness: &'static [u8],
+}
+
+impl CredentialSalts {
+    /// Both keys from the unlocked vault, cleared when dropped.
+    fn derive<P: IdentityProvider + ?Sized>(
+        &self,
+        vault: &P,
+    ) -> Result<DerivedKeys, IdentityError> {
+        let record = Zeroizing::new(vault.derive_keypair(self.record)?.to_seed());
+        let freshness = Zeroizing::new(vault.derive_keypair(self.freshness)?.to_seed());
+        Ok((record, freshness))
+    }
+}
 
 /// Exclusive authority over one Castellan credential-record directory.
 #[derive(Clone)]
@@ -52,6 +86,42 @@ impl CastellanResident {
         })
     }
 
+    /// [`Self::claim`] with both keys derived from `vault` under `salts`.
+    pub fn claim_derived(
+        records_root: impl Into<PathBuf>,
+        freshness_root: impl Into<PathBuf>,
+        vault: &(impl IdentityProvider + ?Sized),
+        salts: CredentialSalts,
+    ) -> Result<Self, IdentityError> {
+        let (record, freshness) = salts.derive(vault)?;
+        Self::claim(records_root, *record, freshness_root, *freshness)
+    }
+
+    /// Forget the record and freshness keys for every clone and every store
+    /// this authority handed out. Locking twice is harmless.
+    pub fn lock(&self) {
+        self.records.lock();
+    }
+
+    /// Take both keys back.
+    pub fn unlock(&self, record_key: [u8; 32], freshness_key: [u8; 32]) -> Result<(), IdentityError> {
+        self.records.unlock(record_key, Some(freshness_key))
+    }
+
+    /// Whether the keys are forgotten.
+    pub fn is_locked(&self) -> bool {
+        self.records.is_locked()
+    }
+
+    /// The hook that locks this authority with the vault and re-derives its
+    /// keys under `salts` on unlock.
+    pub fn lock_holder(&self, salts: CredentialSalts) -> Arc<dyn VaultLockHolder> {
+        Arc::new(CredentialLockHolder {
+            resident: self.clone(),
+            salts,
+        })
+    }
+
     /// Open one persona's sealed items under this authority.
     pub fn items(&self, persona: PersonaId) -> ItemStore {
         ItemStore::with_transaction(self.records.clone(), persona, self.transaction(persona))
@@ -81,6 +151,27 @@ impl CastellanResident {
             .entry(persona)
             .or_insert_with(|| Arc::new(Mutex::new(())))
             .clone()
+    }
+}
+
+/// A [`CastellanResident`] as a vault lock holder.
+pub struct CredentialLockHolder {
+    resident: CastellanResident,
+    salts: CredentialSalts,
+}
+
+impl VaultLockHolder for CredentialLockHolder {
+    fn name(&self) -> &str {
+        "castellan credentials"
+    }
+
+    fn lock(&self) {
+        self.resident.lock();
+    }
+
+    fn unlock(&self, vault: &dyn IdentityProvider) -> Result<(), IdentityError> {
+        let (record, freshness) = self.salts.derive(vault)?;
+        self.resident.unlock(*record, *freshness)
     }
 }
 

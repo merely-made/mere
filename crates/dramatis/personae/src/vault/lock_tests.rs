@@ -373,3 +373,108 @@ fn an_authoritative_store_needs_its_freshness_key_back() {
     plain.lock();
     assert!(plain.unlock(ROOT, Some([0x7c; 32])).is_err());
 }
+
+// ─── Ruling 39: enrolment lifts ruling 27's refusal ───────────────────────
+
+/// A sealed vault with no enrolled passphrase and no OS-held root: the
+/// device ruling 39 names, where nothing could unlock it.
+fn unenrolled(dir: &Path) -> IdentityVault<SealedProfileStorage> {
+    let storage = SealedProfileStorage::open_with_key(dir, ROOT);
+    storage.save_profile(&profile("work", 0x11)).unwrap();
+    IdentityVault::open(storage, &ProfileId("work".into())).unwrap()
+}
+
+#[test]
+fn enrolment_then_a_passphrase_unlock_works_end_to_end() {
+    let dir = tempdir().unwrap();
+    let mut vault = unenrolled(dir.path());
+    assert!(vault.lock().is_err(), "ruling 27 refuses before enrolment");
+    let before = slot_bytes(&vault);
+
+    vault.enroll_passphrase(PASSPHRASE).unwrap();
+    assert!(vault.unlock_methods().passphrase);
+    // The same root, wrapped: it unwraps to the key the records use.
+    let wrapped = crate::load_passphrase_root(dir.path().join(PASSPHRASE_ROOT_FILE), PASSPHRASE)
+        .unwrap()
+        .unwrap();
+    assert_eq!(wrapped, ROOT);
+
+    vault.lock().unwrap();
+    assert!(vault.storage().is_locked());
+    assert!(vault.unlock(UnlockMethod::Passphrase(b"wrong")).is_err());
+    vault.unlock(UnlockMethod::Passphrase(PASSPHRASE)).unwrap();
+    assert_eq!(slot_bytes(&vault), before);
+}
+
+#[test]
+fn enrolment_is_refused_while_locked() {
+    let dir = tempdir().unwrap();
+    let vault = locked_over_open_storage(dir.path());
+    assert!(is_locked_error(vault.enroll_passphrase(b"another")));
+}
+
+#[test]
+fn a_locked_storage_cannot_be_enrolled() {
+    let dir = tempdir().unwrap();
+    let storage = SealedProfileStorage::open_with_key(dir.path(), ROOT);
+    storage.lock();
+    assert!(is_locked_error(storage.enroll_passphrase(PASSPHRASE)));
+    assert!(!dir.path().join(PASSPHRASE_ROOT_FILE).exists());
+}
+
+/// An enrolment is never silently replaced; changing it is
+/// `change_passphrase`, which needs the old one.
+#[test]
+fn a_second_enrolment_is_refused_and_the_first_kept() {
+    let dir = tempdir().unwrap();
+    let vault = unenrolled(dir.path());
+    vault.enroll_passphrase(PASSPHRASE).unwrap();
+    assert!(vault.enroll_passphrase(b"usurper").is_err());
+    assert!(vault.enroll_passphrase(b"").is_err());
+    let path = dir.path().join(PASSPHRASE_ROOT_FILE);
+    assert!(crate::load_passphrase_root(&path, b"usurper").is_err());
+    assert_eq!(
+        crate::load_passphrase_root(&path, PASSPHRASE).unwrap(),
+        Some(ROOT)
+    );
+}
+
+#[test]
+fn delegates_and_other_backends_answer_enrolment() {
+    let dir = tempdir().unwrap();
+    let inner = SealedProfileStorage::open_with_key(dir.path().join("boxed"), ROOT);
+    let boxed: Box<dyn IdentityStorage> = Box::new(inner);
+    boxed.enroll_passphrase(PASSPHRASE).unwrap();
+    assert!(boxed.unlock_methods().passphrase);
+
+    let borrowed_inner = SealedProfileStorage::open_with_key(dir.path().join("borrowed"), ROOT);
+    let borrowed: &dyn IdentityStorage = &borrowed_inner;
+    borrowed.enroll_passphrase(PASSPHRASE).unwrap();
+    assert!(borrowed_inner.unlock_methods().passphrase);
+
+    assert!(InMemoryStorage::new().enroll_passphrase(PASSPHRASE).is_err());
+    let passphrase_vault =
+        PassphraseEncryptedStorage::open(dir.path().join("v.json"), PASSPHRASE).unwrap();
+    assert!(passphrase_vault.enroll_passphrase(b"second").is_err());
+}
+
+#[test]
+fn opening_an_existing_auto_os_root_never_mints_one() {
+    let dir = tempdir().unwrap();
+    assert!(
+        SealedProfileStorage::open_existing_auto_os(dir.path())
+            .unwrap()
+            .is_none()
+    );
+    assert!(std::fs::read_dir(dir.path()).unwrap().next().is_none());
+    if SealedProfileStorage::open_auto_os(dir.path())
+        .unwrap()
+        .is_some()
+    {
+        assert!(
+            SealedProfileStorage::open_existing_auto_os(dir.path())
+                .unwrap()
+                .is_some()
+        );
+    }
+}
