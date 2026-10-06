@@ -4933,6 +4933,26 @@ that Knot head, and finishes with one copy of each genet crate in mere's
 graph. The order is seiche-speed first, then djinn's repin onto `54bb8cd`, then
 that chain.
 
+**djinn's Knot repin, done (2026-10-06).** `cf88887d` on branch
+`djinn-knot-pre4`, off main `ec5293f0`, not pushed. Under "My Knot lane
+adapts Knot", the repin lands on Knot `c966e31` rather than `54bb8cd`.
+`knot-editor` and `knot-document` move from `562353aa`, and djinn's
+`knot-site` from `ea3e99ef`. Ruling 586's `scenograph` and `scenomise` rows
+are added. Knot `c966e31` came from the local checkout into cargo's cache, as
+ruled above, and its tree matches. The lock goes from 1,679 to 1,678
+packages: genet `69a2383b`'s `fleece` and `layout-dom-api` leave, and every
+Knot, genet, scene, Burn, CubeCL and wgpu crate has one copy. Knot names no
+new mere package; its desktop-only names still have no rows, and nothing in
+mere's graph uses them. Gates, offline and `--locked` at `-j 4`, with
+evidence in `Code/testing/mere/djinn-knot-pre4/c966/`:
+
+| Gate | Result |
+| --- | --- |
+| djinn check, all targets | pass |
+| djinn tests | 116 pass, 9 ignored; `knot_residue` 0 live, 20 freed uncleared |
+| mere `graph,canvas-gpu` and graphshell `canvas-gpu` checks | pass |
+| `cargo_mode.py verify` | pass, lock `b44eb40b` |
+
 **Findings, not ruled.** Each predates the repin.
 - Windows checkouts get CRLF in `assets/oewn-notices.txt` and
   `tests/fixtures/wordnet.xml` through `.gitattributes`, which fails 7
