@@ -1,7 +1,7 @@
 # Dynamics Grammar Plan
 
 **Date:** 2026-10-02
-**Status (2026-10-03):** G1 done on branch `grammar-g1`, ready to merge: the declarations, the instruments, F7's relabel and exponent, and F10's measurement and change, with the four questions G1 returned ruled as F14 to F17 (§1.1) and carried out. G2 starts once G1 is merged; G3 to G6 wait for the arrangement design (F11, F17). Written from the [dynamics grammar brief](../research/2026-10-02_dynamics_grammar_brief.md) and Mark's rulings of 2026-10-02.
+**Status (2026-10-06):** G1 merged 2026-10-03 (`39787d82`): the declarations, the instruments, F7's relabel and exponent, and F10's measurement and change, with the four questions G1 returned ruled as F14 to F17 (§1.1) and carried out. G7, arrangement roles, merged 2026-10-04 (`2d4b1ee9`), and G9, permitted actions, 2026-10-05 (`c1cd69ff`). G2 is under way on `grammar-g2`, not merged (Progress, 2026-10-06). G8 is open. Whether G7's merge clears F11 and F17's gate for G3 to G6 is an open question (§3, raised by the S14 pass). Written from the [dynamics grammar brief](../research/2026-10-02_dynamics_grammar_brief.md) and Mark's rulings of 2026-10-02.
 **Scope:** turn the physics catalog's laws, overlays and slots into one specification model of *terms and targets*. Every term declares what it is, and two instruments check each declaration. Sources become one channel registry. Composition gets declared semantics (a weighted sum at a common scale, groups, schedules, currencies). Choices travel as a portable `DynamicsSpec`. Annealing and one optimizer join integration as realizations, gated on each term's class. Pins, anchors and contacts report whether they were satisfied. This plan is P7 of the physics catalog plan, moved here by ruling F2.
 
 Not in scope:
@@ -408,6 +408,14 @@ These are *Reading, not ruled*. Each returns to Mark at the named track's checkp
 7. **G5: which optimizer.** L-BFGS over the declared energy (OpenMM's minimizer, Penrose) or stress majorization (Graphviz's default for stress).
 8. **The effectiveness record's home.** The brief, §8, argues for a table versioned beside the spec. This plan's Findings section is where it is seeded until a home is ruled.
 
+**Open, raised by the S14 pass (2026-10-06): does G7's merge clear the gate on G3 to G6?** F17 ("G2 now, rest after") holds G3 to G6 until the arrangement design's rulings, and F11 says nothing changes in code until that design rules. The design was ruled as F18 to F30 on 2026-10-03, from the arrangement brief, and G7's forks as F44 to F49. G7 carries them out and merged to main at `2d4b1ee9` on 2026-10-04. F40 ("Approve; G7 before G3") placed G3 after G7 and placed none of G4 to G6; §2 sends the order of tracks that could run side by side back to Mark. Some of the design stays outside G7: the projection grammar catalog's §6 row (F29, the Projection grammar session's), mer3ly's Anchored/Free mobility, and group overrides reading a G2 `groups.*` channel once G2 merges (F49). G2 is not merged (`grammar-g2`), and §2 reads G3's Meaning instance as needing it (*Reading, not ruled*). The options:
+- the gate cleared with G7's merge: G3 may start, as F40 placed it, and G4 to G6 follow in an order Mark sets under §2;
+- the gate cleared for G3 only: G4 to G6 wait until they are placed;
+- the gate holds until G2 merges as well, since G3's Meaning instance and F49's group key read G2's channels;
+- the gate cleared on 2026-10-03, when F18 to F30 were ruled, and G7's merge bears only on G3, through F40.
+
+This pass decides none of them.
+
 ## 4. Findings
 
 - 2026-10-02 (planning): P5's rungs and Density's tiers are unmerged. `gpu-repulsion` is at `60a990a5`, and `density-cpu` is at `c402d5e7`, a merge of main over `5f529c64`. Density's overlay refusal is `PhysicsLaw::overlay_refusal` on that branch (`density-cpu:crates/canvas/pictograph/src/canvas/physics_catalog.rs`, line 199). G3 and G5 build on these once they land.
@@ -589,3 +597,4 @@ These are *Reading, not ruled*. Each returns to Mark at the named track's checkp
     - The DevTools receipt and its control, the control failing in Chrome's tree.
     - The G7 role and pin receipts, both practice receipts, both pages' drag receipts and the keys receipt.
     - The page-error control, failing by the receipt gate.
+- 2026-10-06 (G2, read from `git log grammar-g2` by the S14 pass): G2 has been under way since 2026-10-03 on branch `grammar-g2` and is not merged. Its first commit is `6d112683` (2026-10-03), its head `6b4039d0` (2026-10-05, "dynamics grammar plan: G2 round 4, e5-base-v2 pinned and P7 met; G2b built, its goldens held"), 18 commits not on main, and the last main it merged is `6c3dca60` (2026-10-04, at `92d0f8f3`). The lane's rounds and findings are in the branch's copy of this plan and arrive when it merges; this entry adds nothing from them.
