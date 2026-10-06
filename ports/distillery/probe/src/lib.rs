@@ -690,7 +690,8 @@ mod worker {
         // Burn's synchronous WGPU constructor is appropriate on native hosts,
         // but browser adapter/device creation is promise-backed. Initializing
         // it synchronously traps in wasm before the first tensor upload.
-        let device = Device::wgpu_async(DeviceKind::default()).await;
+        let device = Device::wgpu_options().init_async().await
+            .map_err(|error| JsValue::from_str(&error.to_string()))?;
         let (model_load_ms, first_execution_ms, repeat_execution_ms, execution) =
             match config.workload {
                 WorkloadKind::SentenceEmbedding => {

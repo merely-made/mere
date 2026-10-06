@@ -293,7 +293,10 @@ async fn remote_provider(
         .endpoint_addr()
         .await
         .map_err(|error| error.to_string())?;
-    let device = Device::remote_iroh_authorized(&endpoint, server_addr, 0, credential);
+    let host = burn::remote::RemoteHost::iroh(
+        burn::remote::IrohHost::new(server_addr).with_endpoint(endpoint),
+    ).with_credential(credential);
+    let device = Device::remote_options(&host).init().map_err(|error| error.to_string())?;
     let started = Instant::now();
     let provider = BertEmbeddingProvider::load(model_dir, device)
         .map_err(|error| format!("load remote provider: {error}"))?;

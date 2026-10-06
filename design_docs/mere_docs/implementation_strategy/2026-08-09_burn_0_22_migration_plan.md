@@ -2237,3 +2237,16 @@ external receipt directory. Other renderer/headed work could run concurrently:
 these are correctness gates, with no exclusive-GPU or timing claim. The stable
 Mere target remains shared and reusable. Lane M remains parked with its prepared
 files; carrying this accepted correction into pre.4 awaits coordinator release.
+
+
+### Stable Burn backport for Turnstone (2026-10-06)
+
+This branch applies Burn 0.22.0, CubeCL 0.11.0 and Cubek 0.3.0 to
+Turnstone's existing Mere baseline bd5912fbbb8f468defc3bbeee7eac5a4f7d2b2f3.
+It preserves that baseline's public scene, projection and networking APIs
+so Turnstone can repin its Mere family coherently without importing
+unrelated API migrations. The three vendor patches come from the stable
+migration branch, with provenance recorded in their MERE-PATCH.md files.
+The root lock and active inference manifests use stable releases.
+Validation results and publication state are recorded in the main stable
+migration plan entry; this backport is initially an unpushed local commit.
