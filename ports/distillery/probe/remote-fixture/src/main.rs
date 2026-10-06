@@ -13,6 +13,7 @@ use std::time::{Duration, Instant};
 use burn::tensor::Device;
 use burn_wgpu::{Wgpu, WgpuDevice};
 use cubecl::wgpu::WgpuDeviceKind;
+use distillery::mesh_host::{HostConfig, ManualClock, MeshHost, ObservedConditions, Step};
 use distillery::{
     BURN_REMOTE_RESOURCE, BlobCustody, Distillery, RemoteSessionService, RemoteSessionSettings,
     RetentionSettings,
@@ -25,7 +26,6 @@ use mesh::{
     LeaseTerms, MESH_AUTHOR_SALT, MemoryBlobSpace, MeshEvent, MeshStore, ReclaimReason,
     RemoteSessionClaim, ResourceId, ResourceRegistry, SyncedMesh,
 };
-use distillery::mesh_host::{HostConfig, ManualClock, MeshHost, ObservedConditions, Step};
 use muniment::MemoryBackend;
 use serde::Serialize;
 use serde_json::{Value, json};
@@ -380,7 +380,13 @@ async fn remote_provider(
         .endpoint_addr()
         .await
         .map_err(|error| error.to_string())?;
-    let device = Device::remote_iroh_authorized(&endpoint, server_addr, 0, credential);
+    let host = burn::remote::RemoteHost::iroh(
+        burn::remote::IrohHost::new(server_addr).with_endpoint(endpoint),
+    )
+    .with_credential(credential);
+    let device = Device::remote_options(&host)
+        .init()
+        .map_err(|error| error.to_string())?;
     let started = Instant::now();
     let provider = BertEmbeddingProvider::load(model_dir, device)
         .map_err(|error| format!("load remote provider: {error}"))?;
@@ -954,7 +960,7 @@ async fn run_remote(
                 "server_peer": server_endpoint.id().to_string(),
                 "client_peer": client_endpoint.id().to_string(),
                 "same_endpoint": false,
-                "server_backend": format!("burn-wgpu 0.22.0-pre.4 Wgpu/AutoCompiler DiscreteGpu(0), {}", backend_profile()),
+                "server_backend": format!("burn-wgpu 0.22.0 Wgpu/AutoCompiler DiscreteGpu(0), {}", backend_profile()),
                 "client_backend": "Burn Dispatch Remote over authorized Iroh"
             },
             "first_run": {
@@ -1066,7 +1072,10 @@ mod verification_tests {
     fn finite_receipt_fixture() -> Vec<f32> {
         let mut output = vec![0.0; 384];
         output[..8].copy_from_slice(&REFERENCE_FIRST_8);
-        let first_8_squared = REFERENCE_FIRST_8.iter().map(|value| value * value).sum::<f32>();
+        let first_8_squared = REFERENCE_FIRST_8
+            .iter()
+            .map(|value| value * value)
+            .sum::<f32>();
         assert!(first_8_squared < 1.0);
         output[8] = (1.0 - first_8_squared).sqrt();
         output
@@ -1080,19 +1089,31 @@ mod verification_tests {
     #[test]
     fn error_rejects_non_finite_values_on_either_side() {
         for value in [f32::NAN, f32::INFINITY, f32::NEG_INFINITY] {
-            assert!(max_abs_error(&[value], &[0.0])
-                .unwrap_err()
-                .contains("non-finite"));
-            assert!(max_abs_error(&[0.0], &[value])
-                .unwrap_err()
-                .contains("non-finite"));
+            assert!(
+                max_abs_error(&[value], &[0.0])
+                    .unwrap_err()
+                    .contains("non-finite")
+            );
+            assert!(
+                max_abs_error(&[0.0], &[value])
+                    .unwrap_err()
+                    .contains("non-finite")
+            );
         }
     }
 
     #[test]
     fn error_rejects_unequal_lengths() {
-        assert!(max_abs_error(&[0.0], &[]).unwrap_err().contains("length mismatch"));
-        assert!(max_abs_error(&[], &[0.0]).unwrap_err().contains("length mismatch"));
+        assert!(
+            max_abs_error(&[0.0], &[])
+                .unwrap_err()
+                .contains("length mismatch")
+        );
+        assert!(
+            max_abs_error(&[], &[0.0])
+                .unwrap_err()
+                .contains("length mismatch")
+        );
     }
 
     #[test]
@@ -1110,9 +1131,11 @@ mod verification_tests {
         for value in [f32::NAN, f32::INFINITY, f32::NEG_INFINITY] {
             let mut reference = output.clone();
             reference[383] = value;
-            assert!(numerical_receipt(&output, &reference)
-                .unwrap_err()
-                .contains("non-finite"));
+            assert!(
+                numerical_receipt(&output, &reference)
+                    .unwrap_err()
+                    .contains("non-finite")
+            );
         }
     }
 

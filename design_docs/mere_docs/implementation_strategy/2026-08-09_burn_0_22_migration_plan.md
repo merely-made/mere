@@ -4906,3 +4906,36 @@ that chain.
   the baseline too.
 - Knot's `LICENSES.md` is mere's 2026-08-27 ledger, carried over by the
   extraction. It names paths Knot does not have.
+
+
+### 13.47 Burn 0.22 stable migration (2026-10-06)
+
+Mark's scope: migrate off the prerelease, including ESP, Conatus, Distillery
+and the inference consumers in sibling repositories. The stable release
+uses Burn `0.22.0`, CubeCL `0.11.0` and Cubek `0.3.0`. Active manifest rows
+are exact stable requirements; historical receipts retain their original
+versions. Tensor readbacks use the final `try_to_vec` API.
+
+The three active vendor patches are rebased onto their stable releases:
+CubeCL runtime's manifest-only persistence opt-out; Burn Remote's owner
+session control and acknowledged teardown; and Cubek reduction's runtime
+infinity materialization. Their `MERE-PATCH.md` files record the new source
+commits and retained deltas. The remote rebase preserves stable FIFO task
+processing, response cancellation, hosted-device translation, typed
+credentials and connection errors. Distillery adapts its authorizer and
+shared-endpoint connections to these APIs.
+
+Verified so far on macOS with the repository's Rust `1.98.1`:
+- ESP and Conatus CPU/GPU/autodiff feature compilation; 420 CPU tests and
+  two autodiff tests in the focused assessment.
+- Distillery compiles with `remote,trainer-gpu,trainer-autodiff`.
+- All 47 patched remote library tests pass, including targeted close,
+  in-flight admission fencing, panic cleanup and failed teardown reporting.
+- Portable root lock verification passes: 1,556 packages, no prerelease
+  Burn/CubeCL/Cubek rows.
+
+The resident GPU tests, Distillery tests, standalone fixtures, remote
+integration tests and headed browser checks are still being run. This
+entry does not mark the migration's lifecycle or product gates complete.
+Sibling repins must carry the stable runtime patch at their workspace
+roots; Distillery consumers must also carry the remote patch.

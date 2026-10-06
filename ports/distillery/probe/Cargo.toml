@@ -18,7 +18,7 @@ serde_json = "1"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 blake3 = "1.5"
-burn = { version = "=0.22.0-pre.4", default-features = false, features = ["std", "wgpu"] }
+burn = { version = "=0.22.0", default-features = false, features = ["std", "wgpu"] }
 eidetic = { path = "../../../crates/eidetic/eidetic-core", default-features = false }
 esp = { path = "../../../crates/intel/esp", features = ["bert-validation", "bert-wgpu", "decoder-wgpu"] }
 # The module start runs the static constructors once (rulings 532, 533, 536).
