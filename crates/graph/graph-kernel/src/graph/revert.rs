@@ -25,7 +25,7 @@ use uuid::Uuid;
 use super::apply::{GraphDelta, apply_graph_delta};
 use super::capture::{CapturedDelta, persisted_coupling_from_coupling, persisted_field_from_field};
 use super::{CouplingId, FieldId, Graph, NodeKey};
-use crate::persistence::PersistedEdge;
+use crate::persistence::{PersistedEdge, PersistedResourceFacet, PersistedResourceRecord};
 
 /// One part of the graph a change can alter.
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -46,6 +46,10 @@ pub enum Part {
     Field(Uuid),
     Coupling(Uuid),
     ImportRecords,
+    Resource(Uuid),
+    ResourceFacet(Uuid, String),
+    ResourceEdges(Uuid, Uuid),
+    ShownResource(Uuid),
 }
 
 /// The edits that revert a change, and the parts left as they are.
@@ -66,6 +70,9 @@ pub struct Touched {
     /// Fields whose couplings were retuned as a group.
     pub coupled_fields: BTreeSet<Uuid>,
     pub import_records: bool,
+    pub resources: BTreeSet<Uuid>,
+    pub resource_edges: BTreeSet<(Uuid, Uuid)>,
+    pub shown_surfaces: BTreeSet<Uuid>,
 }
 
 fn uuid(text: &str) -> Option<Uuid> {
@@ -153,6 +160,25 @@ impl Touched {
             D::ReplayRetractCouplingById { coupling_id } => {
                 self.couplings.extend(uuid(coupling_id));
             },
+            D::ReplaySetResourceRecordById { resource_id, .. } => {
+                self.resources.extend(uuid(resource_id));
+            },
+            D::ReplaySetResourceEdgesByIds {
+                from_resource_id,
+                to_resource_id,
+                ..
+            } => {
+                if let (Some(from), Some(to)) = (uuid(from_resource_id), uuid(to_resource_id)) {
+                    self.resource_edges.insert((from, to));
+                }
+            },
+            D::ReplaySetShownResourceById {
+                surface_id,
+                resource_id,
+            } => {
+                self.shown_surfaces.extend(uuid(surface_id));
+                self.resources.extend(resource_id.as_deref().and_then(uuid));
+            },
         }
     }
 
@@ -171,6 +197,7 @@ impl Touched {
             | Part::Facet(id, _)
             | Part::History(id) => {
                 self.nodes.contains(id)
+                    || self.shown_surfaces.contains(id)
                     || self.edges.iter().any(|(from, to)| from == id || to == id)
             },
             Part::Edges(from, to) => {
@@ -181,6 +208,19 @@ impl Touched {
             Part::Field(id) => self.fields.contains(id),
             Part::Coupling(id) => self.couplings.contains(id) || !self.coupled_fields.is_empty(),
             Part::ImportRecords => self.import_records,
+            Part::Resource(id) | Part::ResourceFacet(id, _) => {
+                self.resources.contains(id)
+                    || self
+                        .resource_edges
+                        .iter()
+                        .any(|(from, to)| from == id || to == id)
+            },
+            Part::ResourceEdges(from, to) => {
+                self.resource_edges.contains(&(*from, *to))
+                    || self.resources.contains(from)
+                    || self.resources.contains(to)
+            },
+            Part::ShownResource(id) => self.shown_surfaces.contains(id) || self.nodes.contains(id),
         }
     }
 }
@@ -246,9 +286,100 @@ fn incident_pairs(graph: &Graph, id: Uuid) -> Vec<(Uuid, Uuid)> {
         .collect()
 }
 
+fn shown_resource(graph: &Graph, surface: Uuid) -> Option<Uuid> {
+    graph
+        .get_node_by_id(surface)
+        .and_then(|(key, _)| graph.shown_resource_id(key))
+}
+
+fn resource_incident_pairs(graph: &Graph, id: Uuid) -> Vec<(Uuid, Uuid)> {
+    use petgraph::visit::EdgeRef;
+    let Some(key) = graph.resources.key_of(&id) else {
+        return Vec::new();
+    };
+    graph
+        .resources
+        .inner()
+        .edges_directed(key, petgraph::Direction::Outgoing)
+        .chain(
+            graph
+                .resources
+                .inner()
+                .edges_directed(key, petgraph::Direction::Incoming),
+        )
+        .filter_map(|edge| {
+            Some((
+                graph.resources.node(edge.source())?.id(),
+                graph.resources.node(edge.target())?.id(),
+            ))
+        })
+        .collect()
+}
+
+fn resource_facets(record: &PersistedResourceRecord) -> BTreeMap<String, Value> {
+    record
+        .facets
+        .iter()
+        .map(|facet| {
+            (
+                facet.facet.clone(),
+                serde_json::from_str(&facet.value_json)
+                    .expect("stored resource facets are valid JSON"),
+            )
+        })
+        .collect()
+}
+
 impl Revert {
     fn keep(&mut self, part: Part) {
         self.kept.push(part);
+    }
+
+    fn resource_parts(
+        &mut self,
+        id: Uuid,
+        before: &PersistedResourceRecord,
+        after: &PersistedResourceRecord,
+        live: &PersistedResourceRecord,
+    ) {
+        let was = resource_facets(before);
+        let became = resource_facets(after);
+        let mut now = resource_facets(live);
+        let keys: BTreeSet<_> = was.keys().chain(became.keys()).collect();
+        let mut changed = false;
+        for key in keys {
+            if was.get(key) == became.get(key) {
+                continue;
+            }
+            if now.get(key) != became.get(key) {
+                self.keep(Part::ResourceFacet(id, key.clone()));
+                continue;
+            }
+            match was.get(key) {
+                Some(value) => {
+                    now.insert(key.clone(), value.clone());
+                },
+                None => {
+                    now.remove(key);
+                },
+            }
+            changed = true;
+        }
+        if changed {
+            self.edits.push(CapturedDelta::ReplaySetResourceRecordById {
+                resource_id: id.to_string(),
+                record: Some(PersistedResourceRecord {
+                    canonical_iri: live.canonical_iri.clone(),
+                    facets: now
+                        .into_iter()
+                        .map(|(facet, value)| PersistedResourceFacet {
+                            facet,
+                            value_json: value.to_string(),
+                        })
+                        .collect(),
+                }),
+            });
+        }
     }
 
     /// Revert one part: `changed` if the change altered it, `untouched` if it
@@ -416,6 +547,37 @@ pub fn revert_change(
 ) -> Revert {
     let touched = Touched::of(change);
     let mut out = Revert::default();
+    let mut resource_coming = BTreeSet::new();
+    let mut resource_removals = BTreeSet::new();
+    let mut resource_pairs = touched.resource_edges.clone();
+    for id in &touched.resources {
+        resource_pairs.extend(resource_incident_pairs(before, *id));
+        resource_pairs.extend(resource_incident_pairs(after, *id));
+        match (
+            before.resource_record(*id),
+            after.resource_record(*id),
+            live.resource_record(*id),
+        ) {
+            (None, Some(became), Some(now)) => {
+                if now == became {
+                    resource_removals.insert(*id);
+                } else {
+                    out.keep(Part::Resource(*id));
+                }
+            },
+            (Some(was), None, None) => {
+                resource_coming.insert(*id);
+                out.edits.push(CapturedDelta::ReplaySetResourceRecordById {
+                    resource_id: id.to_string(),
+                    record: Some(was),
+                });
+            },
+            (Some(_), None, Some(_)) => out.keep(Part::Resource(*id)),
+            (Some(was), Some(became), Some(now)) => out.resource_parts(*id, &was, &became, &now),
+            (Some(was), Some(became), None) if was != became => out.keep(Part::Resource(*id)),
+            _ => {},
+        }
+    }
     let mut pairs = touched.edges.clone();
     // A node made or removed takes its relations with it.
     for id in &touched.nodes {
@@ -437,7 +599,10 @@ pub fn revert_change(
                 let unlinked_since = incident_pairs(live, *id).into_iter().all(|(from, to)| {
                     edges_between(live, from, to) == edges_between(after, from, to)
                 });
-                if now == became && unlinked_since {
+                if now == became
+                    && unlinked_since
+                    && shown_resource(live, *id) == shown_resource(after, *id)
+                {
                     going.insert(*id);
                     removals.push(CapturedDelta::ReplayRemoveNodeById {
                         node_id: id.to_string(),
@@ -483,6 +648,50 @@ pub fn revert_change(
             from_id: from.to_string(),
             to_id: to.to_string(),
             edges: was,
+        });
+    }
+    for (from, to) in resource_pairs {
+        let was = before.persisted_resource_edges_between(from, to);
+        let became = after.persisted_resource_edges_between(from, to);
+        if was == became {
+            continue;
+        }
+        let present = |id| resource_coming.contains(&id) || live.resource_record(id).is_some();
+        if live.persisted_resource_edges_between(from, to) != became
+            || !present(from)
+            || !present(to)
+        {
+            out.keep(Part::ResourceEdges(from, to));
+            continue;
+        }
+        out.edits.push(CapturedDelta::ReplaySetResourceEdgesByIds {
+            from_resource_id: from.to_string(),
+            to_resource_id: to.to_string(),
+            edges: was,
+        });
+    }
+    let shown_surfaces: BTreeSet<_> = touched
+        .shown_surfaces
+        .union(&touched.nodes)
+        .copied()
+        .collect();
+    for id in shown_surfaces {
+        let was = shown_resource(before, id);
+        let became = shown_resource(after, id);
+        if was == became {
+            continue;
+        }
+        let surface_present = coming.contains(&id) || live.get_node_by_id(id).is_some();
+        let resource_present = was.is_none_or(|resource| {
+            resource_coming.contains(&resource) || live.resource_record(resource).is_some()
+        });
+        if shown_resource(live, id) != became || !surface_present || !resource_present {
+            out.keep(Part::ShownResource(id));
+            continue;
+        }
+        out.edits.push(CapturedDelta::ReplaySetShownResourceById {
+            surface_id: id.to_string(),
+            resource_id: was.map(|resource| resource.to_string()),
         });
     }
     out.edits.extend(removals);
@@ -552,6 +761,20 @@ pub fn revert_change(
                 coupling_id: id.to_string(),
             },
         });
+    }
+    if !resource_removals.is_empty() {
+        let mut scratch = live.clone();
+        super::capture::replay_captured_deltas_onto(&mut scratch, out.edits.iter().cloned());
+        for resource in resource_removals {
+            if scratch.set_resource_record(resource, None) {
+                out.edits.push(CapturedDelta::ReplaySetResourceRecordById {
+                    resource_id: resource.to_string(),
+                    record: None,
+                });
+            } else {
+                out.keep(Part::Resource(resource));
+            }
+        }
     }
     out
 }
@@ -900,5 +1123,340 @@ pub(super) mod tests {
         );
         assert!(!touched.reaches(&Part::Title(id(4))));
         assert!(!touched.reaches(&Part::ImportRecords));
+    }
+}
+
+#[cfg(test)]
+mod resource_revert_tests {
+    use super::*;
+    use crate::graph::SemanticStatement;
+
+    fn record(iri: &str, facets: &[(&str, Value)]) -> CapturedDelta {
+        CapturedDelta::ReplaySetResourceRecordById {
+            resource_id: chartulary::resource_id(iri).to_string(),
+            record: Some(PersistedResourceRecord {
+                canonical_iri: chartulary::canonical_url(iri),
+                facets: facets
+                    .iter()
+                    .map(|(facet, value)| PersistedResourceFacet {
+                        facet: (*facet).into(),
+                        value_json: value.to_string(),
+                    })
+                    .collect(),
+            }),
+        }
+    }
+
+    fn shown(surface: Uuid, resource: Uuid) -> CapturedDelta {
+        CapturedDelta::ReplaySetShownResourceById {
+            surface_id: surface.to_string(),
+            resource_id: Some(resource.to_string()),
+        }
+    }
+
+    fn pair(from: Uuid, to: Uuid, handle: &str) -> CapturedDelta {
+        let mut source = Graph::new();
+        let a = source.add_node_with_id(from, "https://a.test".into(), Default::default());
+        let b = source.add_node_with_id(to, "https://b.test".into(), Default::default());
+        source.assert_persisted_semantic_statement(
+            a,
+            b,
+            SemanticStatement {
+                statement_id: handle.into(),
+                predicate: "https://vocab.test/relation".into(),
+                recognized_sub_kind: None,
+                label: None,
+                graph_scope: crate::types::GraphScope::User,
+                provenance_iri: Some("https://people.test/source".into()),
+                asserted_at_ms: Some(100),
+            },
+        );
+        CapturedDelta::ReplaySetResourceEdgesByIds {
+            from_resource_id: from.to_string(),
+            to_resource_id: to.to_string(),
+            edges: source.persisted_edges_between(a, b),
+        }
+    }
+
+    fn apply(graph: &mut Graph, edits: &[CapturedDelta]) {
+        super::tests::apply_all(graph, edits);
+    }
+
+    #[test]
+    fn resource_undo_keeps_later_facet_keys_and_reports_same_key_conflicts() {
+        let iri = "https://resource.test/a";
+        let resource = chartulary::resource_id(iri);
+        let mut before = Graph::new();
+        apply(
+            &mut before,
+            &[record(iri, &[("a", Value::from(1)), ("b", Value::from(1))])],
+        );
+        let change = [record(iri, &[("a", Value::from(2)), ("b", Value::from(1))])];
+        let mut after = before.clone();
+        apply(&mut after, &change);
+        let mut live = after.clone();
+        apply(
+            &mut live,
+            &[record(
+                iri,
+                &[
+                    ("a", Value::from(2)),
+                    ("b", Value::from(3)),
+                    ("foreign", serde_json::json!({"kept":true})),
+                ],
+            )],
+        );
+        let undo = revert_change(&change, &before, &after, &live);
+        assert!(undo.kept.is_empty());
+        apply(&mut live, &undo.edits);
+        let facets = resource_facets(&live.resource_record(resource).unwrap());
+        assert_eq!(facets["a"], Value::from(1));
+        assert_eq!(facets["b"], Value::from(3));
+        assert_eq!(facets["foreign"], serde_json::json!({"kept":true}));
+
+        let mut conflict = after.clone();
+        apply(
+            &mut conflict,
+            &[record(iri, &[("a", Value::from(4)), ("b", Value::from(3))])],
+        );
+        let undo = revert_change(&change, &before, &after, &conflict);
+        assert_eq!(undo.kept, [Part::ResourceFacet(resource, "a".into())]);
+        assert!(undo.edits.is_empty());
+        assert_eq!(
+            resource_facets(&conflict.resource_record(resource).unwrap())["a"],
+            Value::from(4)
+        );
+    }
+
+    fn creation_fixture() -> (Graph, Graph, Vec<CapturedDelta>, Uuid, Uuid, Uuid, Uuid) {
+        let surface_a = Uuid::from_u128(1);
+        let surface_b = Uuid::from_u128(2);
+        let resource_a = chartulary::resource_id("https://resource.test/a");
+        let resource_b = chartulary::resource_id("https://resource.test/b");
+        let mut before = Graph::new();
+        before.add_node_with_id(
+            surface_a,
+            "https://surface.test/a".into(),
+            Default::default(),
+        );
+        before.add_node_with_id(
+            surface_b,
+            "https://surface.test/b".into(),
+            Default::default(),
+        );
+        apply(
+            &mut before,
+            &[
+                record("https://resource.test/b", &[]),
+                shown(surface_b, resource_b),
+            ],
+        );
+        let change = vec![
+            record("https://resource.test/a", &[]),
+            pair(resource_a, resource_b, "owned-handle"),
+            shown(surface_a, resource_a),
+        ];
+        let mut after = before.clone();
+        apply(&mut after, &change);
+        (
+            before, after, change, surface_a, surface_b, resource_a, resource_b,
+        )
+    }
+
+    #[test]
+    fn resource_undo_creation_clears_pairs_and_bindings_before_record() {
+        let (before, after, change, surface_a, surface_b, resource_a, resource_b) =
+            creation_fixture();
+        let undo = revert_change(&change, &before, &after, &after);
+        assert!(undo.kept.is_empty());
+        let removal = undo
+            .edits
+            .iter()
+            .position(|edit| {
+                matches!(
+                    edit,
+                    CapturedDelta::ReplaySetResourceRecordById { record: None, .. }
+                )
+            })
+            .unwrap();
+        let pair = undo.edits.iter().position(|edit| matches!(edit, CapturedDelta::ReplaySetResourceEdgesByIds { edges, .. } if edges.is_empty())).unwrap();
+        let binding = undo
+            .edits
+            .iter()
+            .position(|edit| {
+                matches!(
+                    edit,
+                    CapturedDelta::ReplaySetShownResourceById {
+                        resource_id: None,
+                        ..
+                    }
+                )
+            })
+            .unwrap();
+        assert!(pair < removal && binding < removal);
+        let mut restored = after.clone();
+        apply(&mut restored, &undo.edits);
+        assert!(restored.resource_record(resource_a).is_none());
+        assert!(
+            restored
+                .persisted_resource_edges_between(resource_a, resource_b)
+                .is_empty()
+        );
+        assert_eq!(shown_resource(&restored, surface_a), None);
+        assert_eq!(shown_resource(&restored, surface_b), Some(resource_b));
+        assert_eq!(
+            restored.resource_record(resource_b),
+            before.resource_record(resource_b)
+        );
+        assert!(restored.get_node_by_id(surface_a).is_some());
+    }
+
+    #[test]
+    fn resource_undo_creation_keeps_later_surface_and_pair_references() {
+        let (before, after, change, surface_a, surface_b, resource_a, resource_b) =
+            creation_fixture();
+        for later_surface in [true, false] {
+            let mut live = after.clone();
+            let resource_c = chartulary::resource_id("https://resource.test/c");
+            if later_surface {
+                apply(&mut live, &[shown(surface_b, resource_a)]);
+            } else {
+                apply(
+                    &mut live,
+                    &[
+                        record("https://resource.test/c", &[]),
+                        pair(resource_a, resource_c, "later-handle"),
+                    ],
+                );
+            }
+            let undo = revert_change(&change, &before, &after, &live);
+            assert!(undo.kept.contains(&Part::Resource(resource_a)));
+            apply(&mut live, &undo.edits);
+            assert!(live.resource_record(resource_a).is_some());
+            assert!(
+                live.persisted_resource_edges_between(resource_a, resource_b)
+                    .is_empty(),
+                "owned pair still reverts"
+            );
+            assert_eq!(
+                shown_resource(&live, surface_a),
+                None,
+                "owned binding still reverts"
+            );
+            assert!(live.resource_record(resource_b).is_some());
+            if later_surface {
+                assert_eq!(shown_resource(&live, surface_b), Some(resource_a));
+            } else {
+                let surviving = live.persisted_resource_edges_between(resource_a, resource_c);
+                assert_eq!(
+                    surviving[0].semantic.as_ref().unwrap().statements[0].statement_id,
+                    "later-handle"
+                );
+                assert_eq!(shown_resource(&live, surface_b), Some(resource_b));
+            }
+        }
+    }
+
+    #[test]
+    fn surface_creation_undo_preserves_later_shown_binding() {
+        let resource_a = chartulary::resource_id("https://resource.test/a");
+        let resource_b = chartulary::resource_id("https://resource.test/b");
+        let surface = Uuid::from_u128(99);
+        let mut before = Graph::new();
+        apply(
+            &mut before,
+            &[
+                record("https://resource.test/a", &[]),
+                record("https://resource.test/b", &[]),
+            ],
+        );
+        for initial_binding in [None, Some(resource_a)] {
+            let mut change = vec![CapturedDelta::ReplayAddNodeWithIdIfMissing {
+                id: surface.to_string(),
+                url: "https://surface.test".into(),
+                position: [0.0, 0.0],
+            }];
+            if let Some(resource) = initial_binding {
+                change.push(shown(surface, resource));
+            }
+            let mut after = before.clone();
+            apply(&mut after, &change);
+            let undo = revert_change(&change, &before, &after, &after);
+            assert!(undo.kept.is_empty());
+            let mut original = after.clone();
+            apply(&mut original, &undo.edits);
+            assert!(original.get_node_by_id(surface).is_none());
+            assert!(original.surface_ids_showing_resource(resource_a).is_empty());
+            assert!(original.resource_record(resource_a).is_some());
+            assert!(original.resource_record(resource_b).is_some());
+
+            let mut later = after.clone();
+            apply(&mut later, &[shown(surface, resource_b)]);
+            let undo = revert_change(&change, &before, &after, &later);
+            assert!(undo.kept.contains(&Part::Node(surface)));
+            if initial_binding.is_some() {
+                assert!(undo.kept.contains(&Part::ShownResource(surface)));
+            }
+            apply(&mut later, &undo.edits);
+            assert!(later.get_node_by_id(surface).is_some());
+            assert_eq!(shown_resource(&later, surface), Some(resource_b));
+            assert_eq!(later.surface_ids_showing_resource(resource_b), [surface]);
+            assert!(later.resource_record(resource_a).is_some());
+        }
+    }
+
+    #[test]
+    fn surface_removal_undo_restores_shown_binding_and_keeps_later_recreation() {
+        let (_, before, _, surface_a, surface_b, resource_a, resource_b) = creation_fixture();
+        let change = [CapturedDelta::ReplayRemoveNodeById {
+            node_id: surface_a.to_string(),
+        }];
+        let mut after = before.clone();
+        apply(&mut after, &change);
+        assert!(after.get_node_by_id(surface_a).is_none());
+        assert!(after.surface_ids_showing_resource(resource_a).is_empty());
+        let undo = revert_change(&change, &before, &after, &after);
+        assert!(undo.kept.is_empty());
+        let mut restored = after.clone();
+        apply(&mut restored, &undo.edits);
+        assert_eq!(shown_resource(&restored, surface_a), Some(resource_a));
+        assert_eq!(shown_resource(&restored, surface_b), Some(resource_b));
+        assert_eq!(
+            restored.resource_record(resource_a),
+            before.resource_record(resource_a)
+        );
+
+        let mut later = after.clone();
+        later.add_node_with_id(surface_a, "https://later.test".into(), Default::default());
+        apply(&mut later, &[shown(surface_a, resource_b)]);
+        let undo = revert_change(&change, &before, &after, &later);
+        assert!(undo.kept.contains(&Part::Node(surface_a)));
+        assert!(undo.kept.contains(&Part::ShownResource(surface_a)));
+        apply(&mut later, &undo.edits);
+        assert_eq!(shown_resource(&later, surface_a), Some(resource_b));
+        assert_eq!(
+            later.get_node_by_id(surface_a).unwrap().1.url(),
+            "https://later.test"
+        );
+        assert_eq!(shown_resource(&later, surface_b), Some(resource_b));
+    }
+
+    #[test]
+    fn resource_touched_parts_keep_equal_surface_ids_separate() {
+        let from = Uuid::from_u128(1);
+        let to = Uuid::from_u128(2);
+        let touched = Touched::of(&[CapturedDelta::ReplaySetResourceEdgesByIds {
+            from_resource_id: from.to_string(),
+            to_resource_id: to.to_string(),
+            edges: Vec::new(),
+        }]);
+        assert!(touched.reaches(&Part::ResourceEdges(from, to)));
+        assert!(touched.reaches(&Part::Resource(from)));
+        assert!(!touched.reaches(&Part::Edges(from, to)));
+        assert!(!touched.reaches(&Part::Node(from)));
+        let touched = Touched::of(&[shown(from, to)]);
+        assert!(touched.reaches(&Part::ShownResource(from)));
+        assert!(touched.reaches(&Part::Resource(to)));
+        assert!(!touched.reaches(&Part::Resource(from)));
     }
 }

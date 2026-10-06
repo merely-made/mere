@@ -534,6 +534,9 @@ fn test_snapshot_edge_with_missing_url_is_dropped() {
         fields: vec![],
         couplings: vec![],
         navigation: SharedNavigationMemory::empty(),
+        resources: vec![],
+        resource_edges: vec![],
+        shown_resources: vec![],
     };
 
     let graph = Graph::from_snapshot(&snapshot);
@@ -614,6 +617,9 @@ fn test_snapshot_duplicate_urls_last_wins() {
         fields: vec![],
         couplings: vec![],
         navigation: SharedNavigationMemory::empty(),
+        resources: vec![],
+        resource_edges: vec![],
+        shown_resources: vec![],
     };
 
     let graph = Graph::from_snapshot(&snapshot);

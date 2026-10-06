@@ -285,6 +285,13 @@ pub struct Graph {
     /// [`chartulary::Graph::inner`]. (Graph signals.)
     pub(crate) inner: chartulary::Graph<Node, EdgePayload>,
 
+    /// Resource truth beneath surfaces, indexed by the prepared identity IRI.
+    pub(crate) resources: chartulary::Graph<ResourceNode, EdgePayload>,
+    /// The one live authority for ordinary resource metadata.
+    pub(crate) resource_facets: chartulary::FacetStore<Uuid>,
+    /// Explicit surface UUID to resource UUID associations.
+    pub(crate) shown_resources: BTreeMap<Uuid, Uuid>,
+
     /// Atomic optional metadata keyed by stable node id. This is the single
     /// live authority persisted by the host as `facets.json`; snapshot columns
     /// are legacy import inputs only.
@@ -345,6 +352,9 @@ impl Graph {
     pub fn new() -> Self {
         Self {
             inner: chartulary::Graph::new(),
+            resources: chartulary::Graph::new(),
+            resource_facets: chartulary::FacetStore::new(),
+            shown_resources: BTreeMap::new(),
             facets: chartulary::FacetStore::new(),
             url_to_nodes: HashMap::new(),
             import_records: Vec::new(),
@@ -517,6 +527,7 @@ impl Graph {
                 self.remove_url_mapping(address.as_url_str(), key);
             }
             let node_id = node.id;
+            self.shown_resources.remove(&node_id);
             self.remove_facets_for_node(node_id);
             let removed_id = node_id.to_string();
             for record in &mut self.import_records {

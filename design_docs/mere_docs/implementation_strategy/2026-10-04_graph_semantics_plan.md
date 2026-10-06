@@ -13,11 +13,12 @@ classification records (rulings 20–21), then accepted C9–C12 option 1
 (rulings 22–25). Shared canonicalization, the `SurfaceNode`/`SurfaceNodeKey`
 names, the common resource UUID helper, `ResourceNode` identity and affirmative
 classification readers are implemented. Resource graph population, conflict
-migration and typed journal captures remain incomplete. The typed consumer
-contract is prepared; the known Turnstone capture-match break remains held
-under the Mere-only coordination rule. Replay-first migration and
-per-predicate placement govern P2. The current identity/lifecycle slice and
-recreation repair pass their gates; P2 is not complete.
+migration remain incomplete. Mark authorized Turnstone coordination; typed
+resource storage, captures and undo pass the full kernel gate; the prepared
+Turnstone consumer patch passes its bounded source gate. C13–C17 await rulings on predicate placement, saved-graph
+composition, selection export, vocabulary IRI identity and snapshot rejection.
+Replay-first migration and per-predicate placement govern P2. The committed
+identity/lifecycle slice and recreation repair pass their gates; P2 is incomplete.
 P3–P5 have not begun. Main integration awaits Mark's review.
 
 Four questions were put to Mark from outside the project: what a link records,
@@ -918,6 +919,127 @@ population, snapshot save/load, Pandect snapshot composition and Graphshell
 selection export must retain the new resource records/references/edges.
 Their current old-column-only paths cannot be reused unchanged.
 
+### P2 consumer authorization and further forks (2026-10-05)
+
+Mark authorized the coordinated Turnstone consumer patch: **"authorize, feel
+free to communicate with the turnstone agent and/or orchestrate. proceed"**.
+The active Turnstone lane owns its behavior-match update and keeps existing
+Scry proof pins frozen. Agreed read contract: `surface_ids_showing_resource`
+returns sorted, deduplicated surface UUIDs; `shown_resource_id` reads a current
+surface binding. Both remain current-state reads, never historical inference.
+
+The typed resource-record DTO can carry canonical IRI and ordinary resource
+facets (`facet`, `value_json` strings) without changing its posted shape when
+classification variants arrive. A resource-specific FacetStore is the one
+live metadata authority; the DTO is its projection. Facets carry data, not
+reserved commands. Strings follow existing postcard-safe facet captures.
+Exact restoration preflights JSON/duplicate keys and replaces only the named
+resource's metadata. Guarded inverse creation does not define cascading
+resource deletion, unloading or blob purge.
+
+**C13: unfamiliar predicate placement.** Linked-data ingest is one concrete
+production producer with three raw-predicate branches (`crates/graph/linked-data/src/ingest/apply.rs`
+115); four public kernel write surfaces accept raw predicates. Seven explicit
+runtime handling sites classify them as Semantic. The registry has zero
+implemented placement declarations; the statement brief leaves its concrete
+shape undesigned. The placement table's open-predicate resource default is
+still explicitly *Reading, not ruled*. Known predicate rulings remain fixed.
+
+1. **Resource default, explicit overrides (recommended).** Unfamiliar
+   predicates default to resources; an explicit per-predicate declaration can
+   select surfaces. Preserve that declared nature across persisted replay.
+2. **Require declaration.** Retain unresolved contributions and admit them
+   only after placement is supplied; writers gain a declaration requirement.
+3. **Always resources.** Every unfamiliar predicate is content; custom surface
+   relations require another representation or recognition by the kernel.
+
+**C14: composition and surface identity.** Pandect intentionally remaps B's
+same-URL surface to A's first identity (`crates/system/pandect/src/snapshot_merge.rs`
+68–122). Four unit tests and one nonempty graph-codicil composition test
+encode this; Athanor has one external production caller. Given two codicils
+with two surfaces each and one common URL, current behavior retains three
+surfaces. C10 already requires preserving divergent resource classifications
+and origins; existing whole-facet first-wins cannot serve that merge.
+
+1. **Preserve surface identities (recommended).** Retain four surfaces and
+   three resources; merge resources by canonical identity. Amend old URL
+   consolidation expectations explicitly.
+2. **Keep URL consolidation.** Retain three surfaces; remap the second
+   shared-URL surface and its relations/binding to the first, retaining the
+   existing A-first conflicting surface facets.
+3. **Compose setting.** Support both, with a separately ruled default and
+   tests for each mode.
+
+**C15: selection export and tag concepts.** Graphshell has four transfer
+scopes, one production filtered-snapshot call (`ports/graphshell/src/product.rs`
+698) and one mixed round-trip test (1095). That test includes a tagged file;
+tags currently travel in surface rows. Merely adding resource columns would
+leak unselected resource data. This product export is distinct from ruling
+8's later frozen-query selection.
+
+1. **Shown resources plus tag targets (recommended).** Retain selected
+   surfaces' shown resources and concept targets needed by their tagging
+   statements; keep exact resource statements among retained endpoints.
+2. **Strict induced resource set.** Retain only resources shown by selected
+   surfaces and statements among them; omit tags to standalone concepts.
+
+**C16: vocabulary IRI identity.** The sole page canonicalizer removes fragments
+(`crates/eidetic/chartulary/src/canonical.rs` 38). The common resource helper
+therefore gives `https://vocab.example/#Cat` and `#Dog` one UUID. C7 permits
+external concept reuse by IRI; C9 fixes the UUID namespace, not vocabulary
+IRI equivalence. Keep the ruled page fragment/tracking aliases and standard
+URL UUID namespace in both choices.
+
+1. **Exact vocabulary IRIs (recommended).** Canonicalize document addresses
+   for page resources; use the exact vocabulary-term IRI for concept identity,
+   including fragment, query and case. A common UUID primitive hashes the
+   prepared identity IRI for both.
+2. **Normalize vocabulary web addresses.** Also normalize term IRI scheme,
+   host and default port, while preserving fragments and every query value.
+   This merges differently cased host spellings of one concept, unlike exact
+   RDF-term equality. Non-web vocabulary IRIs remain exact.
+
+No dependent predicate-routing, composition, export-closure or vocabulary
+identity policy is selected in code at this checkpoint. Neutral resource
+storage and typed capture work can continue while answers are pending.
+
+**C17: rejecting invalid resource snapshots.** Review found that the existing
+`Graph::from_snapshot` return type cannot report a rejected new resource
+record or pair. The current new-column restore loop ignores helper refusals;
+a conflicting reused handle can therefore silently lose a pair. Invalid facet
+JSON similarly loses the resource and its dependent links. New resource pair
+captures also need exact carried statements: legacy aggregate-only semantic
+records synthesize fresh handles during conversion and cannot be replayed
+idempotently. The typed setter rejects those records; the old surface
+fallback is unchanged. Code: `graph/resource.rs`, `graph/snapshot/from.rs`,
+`store.rs`, all under `crates/graph/graph-kernel/src`.
+
+The audit found ten production materializers of this kernel graph: two kernel,
+five Pandect and three Graphshell call sites. Both native file loaders already
+return `io::Result`; session and transfer APIs have corruption/error results.
+The rkyv `Deserialize` implementation has only a generic `Fallible` error
+bound, so converting a semantic snapshot error there requires an explicit
+API decision. The additive checked path can be tested independently.
+
+Options submitted to Mark, recommendation first:
+
+1. Add a checked `try_from_snapshot` returning a clear error; use it at
+   fallible load boundaries. Retain `from_snapshot` as a compatibility wrapper
+   that stops with that error rather than returning partial truth.
+2. Change `from_snapshot` itself to return `Result`, coordinating the wider
+   consumer API patch.
+
+The additive checked materializer rejects invalid new resource columns
+before creating a graph. Wrapper and load-boundary behavior remains unselected
+at C17: old `from_snapshot`, file loaders and rkyv deserialization are unchanged.
+The checked API is therefore not yet the production load gate. Its tests
+include identical valid duplicates and preserve the entire rejected input.
+A final review aligned active surface-handle detection with materialization:
+orphan legacy edge records are not active collisions, while uppercase UUID
+spellings resolving to existing surfaces remain active. Both controls run
+alongside the active-collision rejection in the same test.
+No new lexical restriction is imposed on caller-selected statement handles.
+
 ## 3. Rulings
 
 Mark's answers, from multiple-choice rounds; each is the option label quoted
@@ -1318,7 +1440,11 @@ comes back to Mark as a fork, with evidence, before the code commits to one.
 - **C11 (P2). Classification lifecycle.** Ruled: ruling 24, affirmative
   statuses only in ordinary readers; retain review records.
 - **C12 (P2). Resource journal captures.** Ruled: ruling 25, typed captures.
-  The known consumer API break remains held pending coordination.
+  Coordination authorized 2026-10-05; the Turnstone lane has a prepared
+  patch and awaits a gated Mere API checkpoint.
+- **C13–C17 (P2).** Open: the dated Findings above give the evidence and
+  options for predicate placement, composition, export, term identity and
+  checked snapshot rejection.
 
 ## 6. Progress
 
@@ -1601,3 +1727,64 @@ comes back to Mark as a fork, with evidence, before the code commits to one.
   Retained: the graph-semantics worktree/branch for P2 and Mark's review,
   owned by this lane; the shared Mere target for reusable validation. No
   additional generated-output directory was created. Nothing reached main.
+
+- **2026-10-05. P2 typed storage and consumer seam, C13–C17 pending.**
+  Mark authorized coordinated Turnstone work. Added the resource graph and
+  its ordinary facet store beside the surface graph; explicit shown-resource
+  associations; typed resource-record, resource-pair and shown-resource
+  captures; and conditional undo for each. All old capture fields and
+  postcard ordinals stay unchanged. Resource record writes validate identity
+  and all JSON before mutation; exact resource pairs retain each carried
+  payload, order, statement handle, time and source. Conflicting active
+  handle reuse and aggregate-only semantic input are refused atomically.
+  Retained migration records are not active assertions. No production
+  navigation, migration, routing, tag vocabulary or query adapter is wired
+  by this slice; those remain P2 work.
+
+  Source: `crates/graph/graph-kernel/src/graph/resource.rs`,
+  `graph/apply.rs`, `graph/capture.rs`, `graph/revert.rs`, and
+  `graph/snapshot/{checked,from,to,tests}.rs` under the same crate.
+  Shared conversion keeps surface restore behavior and structural revision
+  changes; snapshot resource pairs preserve their exact iteration order.
+  Legacy JSON without new columns yields an empty resource graph. JSON,
+  current-layout rkyv and postcard DTO/capture roundtrips pass. No old rkyv
+  byte-layout compatibility is claimed.
+
+  The additive `try_from_snapshot` checks complete resource input before
+  materializing a graph. Existing infallible wrappers and production load
+  boundaries remain unchanged pending C17; unchecked new-schema load can
+  still lose rejected records. This is an explicit integration hold, not a
+  completed load gate. C13–C16 likewise hold their dependent policy work.
+
+  Final gates, offline/locked, one Cargo job, shared Mere target:
+  **Chartulary 66 passed**, **kernel 353 passed** (one doc example ignored),
+  **linked-data with query 41 passed**, **Pandect 306 passed**,
+  **wasm32 kernel check exit 0**, **workspace check exit 0**. Focused capture and undo runs passed three
+  and six tests; the full suite also covers ten snapshot/checked-load tests.
+  Negative controls have valid same-run controls. First fixture attempts
+  exposed a noncanonical empty-path slash and existing session-only layout
+  exclusion; corrected fixtures retain the intended positive controls. The
+  new checked-load assertion initially required Graph Debug through
+  `expect_err`; an explicit Result match fixed the test without changing
+  Graph's API. Final full kernel gate is green.
+
+  The Turnstone owner records **six executed bounded consumer regressions
+  passed** at `feb2594`, with all 209 supplier/fixture source hashes unchanged over the
+  final run. That receipt predates the final checked-loader orphan correction;
+  the capture/read contract is unchanged, and final supplier requalification
+  waits for the branch checkpoint. Its artifact remains unapplied to production behavior and its
+  portable pins/Scry proof remain frozen. This does not qualify the full
+  App/drain/native integration. Mere root changed no sibling source.
+
+  After the final orphan/active consistency correction, the kernel, wasm and
+  workspace gates were rerun successfully. Formatting and diff checks pass;
+  doc audit and its planted-defect/clean-fixture self-test exit 0. Every audit
+  bucket matches branch-baseline documents in the same environment; this plan
+  has no findings (333 active, 322 indexed). No active doc was added.
+
+  Pictograph/Graphshell suites, a separate Eidetic rerun, ignored tests, full
+  sibling application builds and headed/browser/device proofs were not run.
+  P2 is incomplete; P3–P5 have not begun. No new dependencies, downloads,
+  Cargo homes or build-output directories. The
+  graph-semantics worktree/branch remains owned by this lane for P2 and
+  Mark's review; the shared Mere target remains reusable. Main is untouched.
