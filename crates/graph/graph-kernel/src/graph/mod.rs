@@ -73,6 +73,7 @@ pub mod merge;
 pub mod node;
 pub mod node_facets;
 pub mod node_props;
+pub mod predicate_registry;
 mod relation_read;
 pub mod resource;
 /// Reverting one change: undo's edits and the parts it keeps (reservoir plan V2).
@@ -109,6 +110,9 @@ pub use identity::{
 // continues to resolve.
 pub use node::{Node, SurfaceNode};
 pub use node_facets::{NodeFacetStore, VisitHistoryFacet};
+pub use predicate_registry::{
+    GraphStratum, built_in_predicate_stratum, built_in_relation_stratum, default_predicate_stratum,
+};
 pub use resource::ResourceNode;
 
 // Node navigation history extracted to `history.rs` (2026-05-11

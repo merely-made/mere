@@ -26,7 +26,12 @@ gates pass (Graphshell serial; initial parallel carrier timeout recorded).
 The reversible codec is integrated in production. Mark selected C20 option 1
 (ruling 33); malformed reserved v1 IDs fail ingest atomically and all 50
 linked-data/query tests pass. The workspace and documentation gates pass.
-C21 custom placement ownership is the next open registry checkpoint.
+Mark selected C21 "With the mere, proceed" (ruling 34): custom placement
+declarations belong to the mere and govern subsequent writes after reopening.
+The built-in placement catalog is implemented and gated (367 kernel tests,
+workspace and wasm32 checks, documentation audit).
+Mutable declaration behavior remains held at C22 composition conflicts and
+C23 later nature changes.
 Resource population and conflict migration remain incomplete.
 Replay-first migration and per-predicate placement govern P2. The committed
 identity/lifecycle slice and recreation repair pass their gates; P2 is incomplete.
@@ -1303,6 +1308,83 @@ mint-time endpoints separately under ruling 11. New resource writes use the
 existing typed exact resource-pair captures rather than reinterpret old
 surface grammar. No routing or registry policy is implemented at this point.
 
+### Fixed placement catalog findings (2026-10-06)
+
+`crates/graph/graph-kernel/src/graph/predicate_registry.rs` owns the settled
+built-in placement table. `GraphStratum` distinguishes Resource and Surface;
+`built_in_relation_stratum` exhaustively covers all 43 recognized sub-kinds
+(32 resource, eleven surface), plus traversal on surfaces and the open-predicate
+resource default. `built_in_predicate_stratum` recognizes the 17 canonical
+Semantic IRIs and exact tagging predicate; `default_predicate_stratum` adds
+only the unfamiliar-resource fallback (lines 18, 25, 87, 96).
+
+Two tests enumerate every known kind against the ruled surface set and count
+both strata, with traversal/open controls in the same run. Predicate tests
+check every canonical Semantic IRI, tags, resource dependencies and shared
+collections, contrasting exact known IRIs with unfamiliar strings and a cased
+lookalike (lines 107, 153). Defaults are explicitly not an effective resolver
+for custom per-mere declarations. The only other source edit re-exports this
+module from `graph/mod.rs`; no live caller routes through it yet. No capture,
+snapshot, dependency, registry back-edge or mutable override grammar changed.
+This installs the fixed table independently of the two open policy forks.
+
+### Durable placement seams and checkpoints C22–C23 (2026-10-06)
+
+C21's per-mere authority can use ordinary typed metadata on an exact-IRI
+predicate resource (`ResourceNode::for_term`), persisted in
+`PersistedResourceRecord` and captured by `ReplaySetResourceRecordById`.
+This uses zero new snapshot columns and zero new public capture variants
+(`crates/graph/graph-kernel/src/graph/resource.rs` 46, 118;
+`graph/capture.rs` 261; `graph/revert.rs` 337, under the same kernel root).
+There is no general graph-level metadata slot; surface facets require a real
+surface owner and separate sidecar. Predicate resources fit the already
+ruled exact vocabulary identity and ordinary resource metadata authority.
+This is an implementation seam, not a selected declaration conflict policy.
+
+**C22: conflicting declarations on composition.** Two inputs can declare
+one custom predicate as Resource versus Surface. Current composition returns
+an error when one resource facet key has two unequal values; equal values
+compose, and disjoint keys retain both values. The existing test checks one
+conflicting pair, equal metadata and two retained disjoint keys, while both
+source records remain intact (`crates/system/pandect/src/snapshot_merge.rs`
+162–187, `resource_conflicts_return_errors_with_equal_and_disjoint_controls`
+485). A variant-bearing declaration facet could keep both values in a valid
+combined resource record, but its effective-write behavior is not ruled.
+
+1. **Retain variants, require a choice (recommended).** Keep the declarations
+   and their origins; require explicit selection before new writes using that
+   predicate. Exact historical claims and unaffected predicates remain usable.
+2. **Reject composition until reconciled.** Keep both input meres intact, but
+   return a conflict rather than create the combined mere. This reuses the
+   existing atomic composition boundary and does not select a survivor.
+
+**C23: changing a custom predicate's nature after claims exist.** Exact
+surface and resource captures already name different owning stores. Resource
+pair preflight rejects reuse of one handle across active stores
+(`crates/graph/graph-kernel/src/graph/resource.rs` 230–291); precise live
+retraction still reads only the surface pair (`graph/edge_ops.rs` 382,
+under the same kernel root). A declaration edit therefore cannot implicitly
+move held statements or make its current nature the sole handle locator.
+Two strata can hold historical assertions of a predicate without rewriting
+the original capture grammar, but later declaration changes need a rule.
+
+1. **Future assertions only (recommended).** Apply the changed declaration
+   to newly created assertions. Existing handles keep their recorded placement;
+   exact replay, updates and undo preserve it. Reads and precise retractions
+   search both strata rather than trust the latest declaration alone.
+2. **Forbid changes while claims exist.** Keep the declaration stable while
+   that predicate has held claims. Changing it later requires a separate,
+   reviewed migration; no automatic movement is selected here.
+
+C22 and C23 are put to Mark together before mutable declaration policy lands.
+The built-in catalog and durable storage inspection proceed independently.
+Selection export must also retain the declaration resources needed by retained
+assertions; today's closure includes shown resources and tag targets only
+(`ports/graphshell/src/product.rs` 832). This follows from C21's authority
+traveling with the mere. The session-import guard continues to refuse resource
+inputs pending its already-held recorded resource import path
+(`crates/graph/graph-kernel/src/graph/merge.rs` 39). No guard is weakened here.
+
 ## 3. Rulings
 
 Mark's answers, from multiple-choice rounds; each is the option label quoted
@@ -1617,6 +1699,12 @@ invalid hexadecimal bytes or invalid UTF-8. Return an explicit error with no
 partial contribution. Unrelated foreign reifiers and unknown versions keep
 their existing behavior.
 
+**Ruling 34 (C21, 2026-10-06).** Mark: **"With the mere, proceed"**.
+Selects declarations persisted with the mere, governing subsequent writes
+consistently after opening in another host. Installed host registries do not
+replace that authority. Composition must retain and resolve conflicting
+declarations; this ruling does not choose the conflict policy.
+
 ## 4. Phases
 
 ### Placement by stratum (rulings 10, 14, 15)
@@ -1769,12 +1857,60 @@ comes back to Mark as a fork, with evidence, before the code commits to one.
   33. Reject malformed reserved v1 hex/UTF-8 without a partial contribution;
   unrelated foreign namespaces/versions retain their existing behavior.
 
-- **C21 (P2). Custom predicate placement ownership.** Open: persist
-  declarations with the mere or use the installed host registry for new writes.
-  Historical placement remains preserved by exact captures in either case.
-  Evidence and two options appear above; mutable override installation waits.
+- **C21 (P2). Custom predicate placement ownership.** Ruled: with the mere,
+  ruling 34. Historical placement remains preserved by exact captures; durable
+  declarations govern subsequent writes. Conflict policy remains open.
+
+- **C22 (P2). Conflicting placement declarations.** Open: retain variants
+  and require selection for new writes, or reject composition until reconciled.
+- **C23 (P2). Later nature changes.** Open: affect new assertions while
+  preserving held handles, or forbid changes while claims exist.
 
 ## 6. Progress
+
+- **2026-10-06. Fixed placement catalog qualified; stopped at C22/C23.**
+  Added the kernel-owned built-in table, stratum type and default lookups;
+  no mutable declaration, routing, snapshot/capture grammar or host-registry
+  authority is installed. Independent review matched all 43 recognized kinds
+  (32 resource, eleven surface), surface traversal, the open-resource default,
+  all 17 canonical Semantic IRIs and tagging, and found zero live callers.
+
+  Kernel with `store`, offline/locked and one job in the shared Mere target:
+  **367 passed**, one ignored doc example; resource-key compile-fail doctest
+  **one passed**. The wrong-placement control deliberately put `UserGrouped`
+  on resources and failed exactly one invariant test (expected Surface, got
+  Resource). Restored exact source bytes; the full kernel gate passes again.
+  Pandect's unchanged `resource_conflicts_return_errors_with_equal_and_disjoint_controls`
+  passes **one test**, 312 filtered out, with conflicting/equal/disjoint controls
+  and intact source records in the same run. Full Pandect tests are not claimed.
+  `cargo check --workspace --offline --locked -j 1` and the wasm32 kernel
+  check exit 0. The workspace check waited for the shared package-cache lock;
+  no other owner's process/cache was changed and no extra Cargo home was made.
+  Existing compiler/configuration warnings remain; no lockfile changes.
+
+  The durable seam needs zero new snapshot fields/public capture variants:
+  typed metadata on exact-IRI predicate resources can use existing resource
+  snapshots, captures and conditional facet undo. Selection export must retain
+  declaration dependencies; recorded resource import remains held. C22/C23
+  were asked together before declaration-conflict or later-edit behavior is
+  selected. P2 is incomplete; P3–P5 remain unbegun.
+
+  Final touched-file rustfmt/diff checks, documentation audit and its
+  planted-defect/clean-fixture self-test pass; all audit buckets remain equal
+  to HEAD baseline in this environment. No new active doc or D2 record.
+  Full Pandect, linked-data, Pictograph and Graphshell suites were not rerun;
+  neither were ignored examples, full sibling builds or headed/browser/physical
+  proofs. No downloads, dependencies, source pins, capture grammar, snapshot
+  fields or main checkout changed. Nothing is pushed or integrated into main.
+  Keep the existing graph-semantics worktree for its unfinished P2 and Mark's
+  review, and reuse `C:/t/cargo-targets/mere` for shared builds/receipts. No new
+  worktree, target, Cargo home or scratch source was created.
+
+- **2026-10-06. C21 continuation authorized.** Mark: "With the mere,
+  proceed". Resuming from clean `bd8df55c`. Add the settled built-in placement
+  catalog independently while reviewing durable declaration capture,
+  persistence, composition and conflicting changes. No override conflict or
+  migration policy is selected by this continuation. P2 remains incomplete.
 
 - **2026-10-06. C19/C20 production RDF repair qualified; stopped at C21.**
   Promoted the shared codec into production export/ingest and added three
