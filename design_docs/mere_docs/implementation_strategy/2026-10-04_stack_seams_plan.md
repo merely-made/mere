@@ -1,8 +1,8 @@
 # Stack seams plan: catalog, shared device, actions, determinism, two words
 
 **Date:** 2026-10-04
-**Status (2026-10-06):** in progress. Sixty-one rulings in twenty rounds
-(S1 to S61); P1 landed on main (`1633be0c`); P2 staged (S27 to S31, four
+**Status (2026-10-06):** in progress. Sixty-five rulings in twenty-one rounds
+(S1 to S65); P1 landed on main (`1633be0c`); P2 staged (S27 to S31, four
 stages in §3.1) and landed on main (`40d7ae5e`); S32 (F19) landed on main
 (`48c08dee`); the S14 pass (S33) under way; P3 and S7 done as documents; S3 to
 S6 carried into the dynamics grammar plan (G8, G9); S9 done by the identity
@@ -798,6 +798,16 @@ Round 20, 2026-10-06. Evidence: phase C's per-plan open items for the next sixte
 
 **Ruling S61.** *Projection and publishing plans: which are archived?* Options: projection receipts; native smolweb rendering; the graphshell remote projection host; the knot publishing protocol (multi-select). Mark: **"Projection receipts, Native smolweb rendering, Graphshell remote projection host, Knot publishing protocol, Explain the difference for 2"**. Follows: all four are archived: projection receipts' FT9/FT10 gates to the projection grammar adoption plan, the remote projection host's G6/G7 to the reference host plan's H-series, Knot's copy of the publishing protocol canonical; native smolweb rendering's question of which render design stands (its "2") is explained to Mark and put back before its host-integration tail is placed.
 
+Round 21, 2026-10-06. Evidence: the code of the two smolweb render designs (`crates/cambium/cambium/src/nematic.rs` and `views.rs`; `crates/system/document-lanes/src/smolweb.rs`), and phase C's open items for the last six of S49's plans.
+
+**Ruling S62.** *Native smolweb's two render designs: per-format Cambium views over Errand's ASTs (no host uses them), or the EngineDocument lane (Nematic lowers every format into Inker blocks that document-canvas lays out; Pelt, Turnstone and Signalman read it). Which stands?* Options: the lane as default with bespoke views only where the line model is not box-shaped; the EngineDocument lane only; the per-format views. Mark: **"Wait, the fidelity work can enrich the asts that feed engine documents? Why wouldn’t we do that?"**. Follows: not yet settled. Answered: yes, enriching the ASTs that feed EngineDocument is the fidelity plan's own central finding ("the losses are at the parse ASTs") and applies under every option; what remains open is a format whose structure blocks cannot carry even with richer ASTs (gopher's typed column), which needs a new block kind or a bespoke view. Put back in round 22.
+
+**Ruling S63.** *S58's four ML plans consolidate now that Burn 0.22 is out. Where do their open items go?* Options: a new plan written now; parked in the tails backlog for the ML lane. Mark: **"New plan, written now (Recommended)"**. Follows: this pass writes one new plan carrying the four plans' open items, stable Burn 0.22 adoption first, each item citing its source plan, with phases and done-conditions.
+
+**Ruling S64.** *Architecture and record plans: which are archived?* Options: spatial compute; the tactile tier; derived faces; event model convergence (multi-select). Mark: **"Spatial compute, Tactile tier, Derived faces, Event model convergence"**. Follows: all four are archived: spatial compute's Nexus watch to the conatus engine plan and its other tails to the backlog; the tactile tier's T4 and T5 to the backlog (T5's overlap with dynamics grammar G4 and the physics catalog noted); derived faces' editing, branding gap and manifest question to the backlog; the event model's subclasses and native currentTarget to the backlog, genet's copy then standing as the live one.
+
+**Ruling S65.** *The last two: which are archived?* Options: reticulum transport; doc policy consolidation (multi-select). Mark: **"Reticulum transport, Doc policy consolidation"**. Follows: both are archived: reticulum's forged legacy-binding test, README docs and Phase 3 decision to the backlog (retinue's plan covers the backend); the doc policy plan's genet docs/ merge to the backlog, with DOC_POLICY.md's "Track the work in" pointer repointed to DOC_POLICY itself.
+
 ## 3. Phases
 
 ### 3.1 This plan's lane
@@ -940,6 +950,7 @@ The done-conditions handed over for S3 and S4, kept for reference:
 - **2026-10-06.** Round 18: S50 to S53, the first sixteen of S49's plans ruled; ten to archive (scrying tile, render ladder, comms shell, tear-out gestures, orrery graph intelligence, orrery custom layout element, graph query layer, petgraph RDF, graph write-path migration, graph delta capture), six to stay active.
 - **2026-10-06.** Round 19: S54 to S57, the next sixteen of S49's plans ruled; ten to archive (engine profile boundary, session service runner, bounty verification economy, capture provenance consent, insigne proofs, identity vault SSH agent, castellan OTP, dramatis tier, persona wallet carry layer, participant gate packs), six to stay active.
 - **2026-10-06.** Round 20: S58 to S61, all sixteen archived, with three directions: the four ML plans consolidate into one new plan now that Burn 0.22 is out; the four search and memory plans get a critical pass, Eidetic's development taken up; native smolweb's render-design question explained and put back.
+- **2026-10-06.** Round 21: S62 to S65. S62's smolweb question answered with Mark's own reframing (enrich the ASTs either way) and put back; S63 a consolidated ML plan written now; six more plans archived (spatial compute, tactile tier, derived faces, event model, reticulum, doc policy). S49's rounds are done: 42 of 53 plans to archive, 11 stay active.
 - **2026-10-06.** Round 16: S46 (live plans handed to their lanes), S47
   (reviewed write lanes) and S48 (ownerless tails to the archived plan tails
   backlog). S44's repins and S45's header re-run were flagged as separate
