@@ -1,11 +1,14 @@
 # Meerkat automation: two subsystems, one vocabulary
 
 **Date**: 2026-07-07 (self-drive mode landed 2026-07-08)
-**Status**: Assessment + the unification, now built and complete for the whole session. The
-"what ails it" fixes landed with the Slice 3 headed check; the `MEERKAT_SCENARIO` self-drive
-mode + shared scenario vocabulary landed 2026-07-08 (multi-window + settings verified headed),
-and the `navigate` + `key` verbs for flows outside the registry landed the same day (find
-verified headed). Only pointer gestures remain outside a scenario (Migration item 4).
+**Status (2026-10-06):** landed in meerkat on 2026-07-07 and 2026-07-08 (the
+"what ails it" fixes, the `MEERKAT_SCENARIO` self-drive mode, the shared scenario format, and
+the `navigate` and `key` verbs), retired with it 2026-07-18 (`c5f01064`); surviving library
+parts: none in Mere; open: nothing in this plan, though `Code/testing/mere/scripts/mk-harness.ps1`
+outside the repository still launches `meerkat.exe` (see the open question at the end). Live
+scenario work is graphshell's `ports/graphshell/src/web_scenario.rs` and the `.scn` runners in
+`crates/cambium` (`crates/cambium/mesquite/src/scenario.rs`,
+`crates/cambium/cambium-genet-winit-host/tests/scenario.rs`).
 **Scope**: the two ways meerkat is driven under automation, what ails the headed one, and a
 scheme to let one *scenario* run either way.
 **Related**: the [meerkat one-state migration (archived)](../../archive_docs/2026-07-07_one_state_migration/2026-07-06_meerkat_one_state_migration_plan.md)
@@ -67,6 +70,8 @@ session; the fourth is the proposal below.
   passed `_chrome_tex = None` and the capture silently no-opped. **Fixed** in
   `render/paint.rs`: fall back to the cached `chrome_base_tex` (which holds exactly the
   chrome-minus-orrery the chrome-layer capture targets), so capture works on any frame.
+  **Corrected 2026-10-06 (S14 pass):** `render/paint.rs` was meerkat's file and left the
+  workspace with it in `c5f01064` (2026-07-18); it is absent at mere `535bca11`.
 
 With those, the Slice 3 headed check ran clean: primary + a Ctrl+Shift+N leaf both rendered
 from the one `GenetMultiRunner` (leaf slim, primary full, both on the shared graph through
@@ -137,6 +142,11 @@ opens on the primary) -> `spawn` -> `assert windows == 2` (PASS, two live OS win
 `capture leaf @1` (the slim leaf), all from one `GenetMultiRunner`, no OS input, no focus
 race.
 
+**Corrected 2026-10-06 (S14 pass):** this mode and all of its code (the scenario vocabulary,
+`ScenarioRunner`, `pump_scenario`, the `Shell::scenario_*` executors and the
+`scenario/runner.rs` tests) left the workspace with meerkat in `c5f01064` (2026-07-18). No
+`.rs` file at mere `535bca11` names `MEERKAT_SCENARIO`.
+
 ## Migration / next
 
 1. **Landed 2026-07-07**: `mk-harness.ps1` base; the partitioned-mode capture fix; target-dir
@@ -164,9 +174,32 @@ race.
      Verified headed: `scenarios/find.scn` opens find with `key ctrl+f` and types a query.
 4. **Cleanup**: the orphaned `C:\t\meerkat-target` build tree can still be deleted.
 
+   **Corrected 2026-10-06 (S14 pass):** item 4 is moot: `C:\t\meerkat-target` no longer
+   exists. The seed scenarios of items 2 and 3 (`settings.scn`, `scenarios/find.scn`) left
+   with meerkat in `c5f01064` (2026-07-18) and are absent at mere `535bca11`.
+
 The end state is now reached across the whole session, not just the registry-id core: one
 scenario vocabulary (registry ids + `navigate` + `key`), two runners (headless assert / headed
 self-drive+capture), one PS base (`mk-harness`) that only launches and collects. The only
 things still outside a scenario are pointer gestures (drag / click-at-coord); those remain the
 `Click`/`Dda-Capture` province of `mk-harness` and are a later verb if a scenario ever needs
 them.
+
+**Corrected 2026-10-06 (S14 pass):** this end state was meerkat's and retired with it on
+2026-07-18 (`c5f01064`). `Code/testing/mere/scripts/mk-harness.ps1:70` still sets `$MK_EXE`
+to `target\debug\meerkat.exe`, which no longer builds, and the target-dir override is gone
+(`.cargo/` holds only `config.toml.example`). Scenario-driven checks now run through
+graphshell's `ports/graphshell/src/web_scenario.rs` and the `.scn` runners in
+`crates/cambium`.
+
+**Open, raised by the S14 pass (2026-10-06):** what becomes of
+`Code/testing/mere/scripts/mk-harness.ps1`, which still launches `meerkat.exe`? Options:
+retire it beside the other retired drivers in `Code/testing/_archive/scripts/`; repoint it
+at a current host's scenario runner.
+
+## Progress
+
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at mere 535bca11,
+  from the D2 record in support/doc-audit/d2/batch_45_s14_phase_b7.md. The status records
+  the scenario mode as landed in meerkat and retired with it; the unmarked meerkat paths,
+  Migration item 4 and the end state are annotated; the `mk-harness.ps1` question is open.
