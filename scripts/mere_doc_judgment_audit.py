@@ -47,10 +47,20 @@ def active_paths() -> list[str]:
     )
 
 
-def parse_supplements() -> tuple[dict[str, dict[str, int | str]], list[str]]:
+def batch_number(batch: Path) -> int:
+    match = re.match(r"batch_(\d+)", batch.name)
+    return int(match.group(1)) if match else 0
+
+
+def parse_supplements() -> tuple[dict[str, dict[str, int | str]], list[str], int]:
     records: dict[str, dict[str, int | str]] = {}
+    origin: dict[str, str] = {}
+    superseded = 0
     errors: list[str] = []
-    for batch in sorted(LEDGER.glob("batch_*.md")):
+    # A later batch's record for a path supersedes an earlier batch's
+    # (stack seams plan, ruling S34, as read for supplements); one batch
+    # judging a path twice is still an error.
+    for batch in sorted(LEDGER.glob("batch_*.md"), key=lambda b: (batch_number(b), b.name)):
         text = batch.read_text(encoding="utf-8")
         headers = list(DOC_HEADER.finditer(text))
         for index, header in enumerate(headers):
@@ -58,7 +68,7 @@ def parse_supplements() -> tuple[dict[str, dict[str, int | str]], list[str]]:
             if path.startswith("design_docs/"):
                 path = path.removeprefix("design_docs/")
             body = text[header.end() : headers[index + 1].start() if index + 1 < len(headers) else len(text)]
-            if path in records:
+            if origin.get(path) == batch.name:
                 errors.append(f"duplicate supplemental record: {path}")
                 continue
             disposition = DISPOSITION.search(body)
@@ -81,6 +91,9 @@ def parse_supplements() -> tuple[dict[str, dict[str, int | str]], list[str]]:
                     f"{batch.name}: {path}: counts do not sum "
                     f"({checked} != {holds}+{stale}+{unverifiable})"
                 )
+            if path in records:
+                superseded += 1
+            origin[path] = batch.name
             records[path] = {
                 "disposition": disposition.group(1).lower(),
                 "status_accurate": status.group(1).lower(),
@@ -89,7 +102,7 @@ def parse_supplements() -> tuple[dict[str, dict[str, int | str]], list[str]]:
                 "stale": stale,
                 "unverifiable": unverifiable,
             }
-    return records, errors
+    return records, errors, superseded
 
 
 def audit() -> dict[str, object]:
@@ -105,7 +118,7 @@ def audit() -> dict[str, object]:
             if field in correction:
                 legacy[path][field] = correction[field]
     active = active_paths()
-    supplements, errors = parse_supplements()
+    supplements, errors, superseded_supplements = parse_supplements()
     if snapshot_hash != SNAPSHOT_SHA256:
         errors.append(
             f"snapshot aggregate digest changed: {snapshot_hash} != {SNAPSHOT_SHA256}"
@@ -172,6 +185,7 @@ def audit() -> dict[str, object]:
         "legacy_active_records": len(legacy_active),
         "supplemental_records": len(supplements),
         "superseded_legacy_records": len(superseded),
+        "superseded_supplemental_records": superseded_supplements,
         "inactive_legacy_records": len(inactive_legacy),
         "combined_records": len(combined_records),
         "combined_dispositions": dict(sorted(dispositions.items())),
@@ -195,7 +209,8 @@ def main() -> int:
             f"{report['covered_active_docs']}/{report['active_docs']} active; "
             f"{report['legacy_active_records']} legacy + "
             f"{report['supplemental_records']} supplemental "
-            f"({report['superseded_legacy_records']} superseding legacy); "
+            f"({report['superseded_legacy_records']} superseding legacy, "
+            f"{report['superseded_supplemental_records']} superseding earlier batches); "
             f"{report['inactive_legacy_records']} inactive legacy"
         )
         for error in report["errors"]:
