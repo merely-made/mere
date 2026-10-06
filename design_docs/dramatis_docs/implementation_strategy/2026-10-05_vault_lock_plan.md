@@ -1,7 +1,7 @@
 # Vault Lock Plan
 
 **Date**: 2026-10-05
-**Status (2026-10-06)**: rulings 1 to 51 in §3; the threat statement is
+**Status (2026-10-06)**: rulings 1 to 54 in §3; the threat statement is
 still open. L1 landed (`2556a20c`). L2's checkpoints A (`7c588deb`) and B
 (`ec1768ab`) landed. Still to come in L2: the Secret Service on the
 ThinkPad, ruling 42 (Linux starts locked), ruling 44 (Distillery's
@@ -630,6 +630,29 @@ the old one), re-measure, and ledger whatever iroh and p2panda-net still
 leave; fix it with the Knot fix later. Mark: **"Fix transport first
 (Recommended)"**.
 
+Rulings 52 to 54 were asked on 2026-10-06 from ruling 51's transport fix.
+
+**Ruling 52.** *After the transport fix, the transport leaves exactly what
+p2panda-net and iroh leave alone, except an intermittent 392-byte block.
+On close the transport asks p2panda's endpoint actor for the iroh
+endpoint, and the boxed message carries stale stack bytes from bind.*
+Options: keep the iroh endpoint handle from bind so close sends no actor
+message (and ledger the cause); ledger only. Mark: **"Keep the handle
+(Recommended)"**.
+
+**Ruling 53.** *The g5, h6 and h7 receipt binaries still pass their test
+seeds (hashed from environment variables, never the vault) by value into
+`InMemoryProvider`.* Options: leave them, noted; fix them too. Mark:
+**"Leave them (Recommended)"**.
+
+**Ruling 54.** *With ruling 52 built, the 392 and 1824 blocks are gone
+from transport runs (0 of 30; p2panda-net alone shows them in 6 to 23 of
+30). Four other transport calls (`endpoint_addr`, `peers`, `peer_ticket`,
+`peer_paths`) still ask the actor on every call, and the residue test
+does not cover them.* Options: move all four onto the kept handle (`peers`
+loses its "could not ask" branch); close only. Mark: **"Move all four
+(Recommended)"**.
+
 Still open: a threat statement naming hibernation and the pagefile.
 
 ## 4. Phases
@@ -936,3 +959,32 @@ The Secret Service is checkpoint B, on the ThinkPad.
   - then Knot's 22 functions on the Knot lane's P1 head;
   - djinn's strict residue test lands with the repin, judged against
     iroh's own baseline in the same process.
+
+**2026-10-06, ruling 51's transport fix built** (branch `transport-seed`:
+`ed741806`, then `01b4f632` for ruling 52; not merged):
+- **The change:**
+  - the builder holds the seed as one `Box<Zeroizing<[u8; 32]>>`;
+  - new borrowing entry points (`builder_from_seed_ref`, `bind_seed_ref`);
+  - the by-value ones are kept for Knot and clear their own copy;
+  - p2panda's handles and spawns are boxed with no await between;
+  - mere's callers moved to the borrowing path.
+- **Measured** (freed uncleared blocks holding the seed, one process): the
+  transport's own block (6080 bytes, its task frame) is gone. After the
+  fix the transport leaves exactly p2panda-net's own set. Ruling 52
+  removed the intermittent 392 and 1824 blocks (0 of 30 runs).
+- **`mere-transport/tests/seed_residue.rs`** fails on any block size found
+  in every transport run and in no baseline run. The baselines are iroh
+  alone and p2panda-net alone, nested exactly as the transport is.
+- **Verified in `mere-verify` at `ed741806`:**
+  - my control (the held seed without `Zeroizing`) failed with "the
+    transport's own blocks {(false, 32)}";
+  - the residue test passed 3 of 3;
+  - the transport tests and the gate passed;
+  - graphshell's library tests passed 191 on a rerun. One carrier test
+    timed out once under load, then passed 3 of 3 on the branch and 3 of
+    3 on `main` (a load flake, not a regression).
+- **What iroh and p2panda-net leave** is in the upstream candidates ledger
+  (items 10 and 11).
+- **Next:** ruling 54 on the same branch, merged onto `main` `ebfb490a`,
+  which moved djinn's Knot pin to `ef89a18`. Then verification and the
+  merge.
