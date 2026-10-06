@@ -3,7 +3,8 @@
 **Date:** 2026-10-04
 **Status (2026-10-05):** in progress. Thirty-one rulings in eleven rounds
 (S1 to S31); P1 landed on main (`1633be0c`); P2 staged (S27 to S31, four
-stages in §3.1), stage 1 next; P3 and S7 done as documents; S3 to S6 carried into the dynamics
+stages in §3.1), stages 1 to 3 built on branch `stack-seams-p2` (`21b0057f`),
+stage 4 next; P3 and S7 done as documents; S3 to S6 carried into the dynamics
 grammar plan (G8, G9); S9 done by the identity lane (`b52edea7`).
 
 A note sent to Mark listed weak seams in the stack. Each claim was checked
@@ -176,6 +177,52 @@ in two or more crates.
   the 164 by 68 card (the footprint written in at `projection.rs` 697) gives
   180 by 84; `columns` is unused there, since the grid ranker gives every item
   an explicit cell.
+- **F15 (2026-10-05, reported by the Knot lane after P1 reached origin at
+  `19e6dc9f`). P1 breaks Knot.** P1 made `compile_relationship_snapshot` and
+  its `_with_limits` form methods on `ProjectionCompiler`, built from
+  `ItemSizes`, which has no default on purpose (S20). Knot `54bb8cd` still calls
+  the free function: `crates/knot-composition/src/retention.rs` 39, a test
+  support file, and `apps/desktop/src/composition/recipe.rs` (checked here:
+  eight calls in that file). Mere builds today only because its
+  `[patch."…mere.git"]` table serves Knot no `scenomise`; ruling 586's row,
+  added with djinn's Knot repin, makes `knot-composition` fail with E0425.
+  P1's progress entry named Woodshed's consumers as not run and missed Knot,
+  which compiles inside mere's graph through djinn. Mark ruled that the Knot
+  lane adapts Knot (repin onto `19e6dc9f`, the three sites onto
+  `ProjectionCompiler::new(ItemSizes { .. })`, Knot's card size as a fork to
+  him), recorded in the burn plan's §13.46
+  ([burn plan](2026-08-09_burn_0_22_migration_plan.md)) at `ac7f906d`. P2
+  does not touch `ProjectionCompiler` or `ItemSizes`.
+  **Corrected 2026-10-05:** the counts above are wrong. Knot `54bb8cd` has
+  twelve call sites: one in `retention.rs` and eleven in
+  `apps/desktop/src/composition/recipe.rs` (five in code, six in its tests; the
+  twelfth mention there is the import), and `tests/support/recipe.rs` makes
+  none; "eight" came from output cut off at ten lines. The Knot lane reports
+  Mark's ruling on Knot's card, "Measured from Knot's font": the desktop
+  measures each recipe's widest occurrence label in its own font plus button
+  padding and hands that to the `ProjectionCompiler`, with retention
+  validation's nominal size, the measuring path and the padding to come back
+  to him as forks; recorded in the burn plan's §13.46 ("Knot's card size under
+  P1", `7d6dc003`). That lane also notes P1 moves Knot's spacing whatever card
+  is chosen (card plus gap, where a fixed 184 by 84 cell was), and that Knot is
+  the first host to measure its card rather than declare it.
+- **F16 (2026-10-05, P2 stage 1's control). wgpu's device equality cannot tell
+  two boots apart.** wgpu 30 compares a `Device` by a per-instance id
+  (`impl_eq_ord_hash_proxy!(CoreDevice => .id)`), and each `RenderCore::boot`
+  makes its own instance, so devices from two boots compare equal. Stage 1's
+  control first passed wrongly on exactly this; the receipt now compares device
+  identity. The producer registry detects a changed device with the same `!=`
+  (`cambium-rootstock/src/producer/registry.rs`, `prepare`), so under the old
+  reboot on every resume a new device went unnoticed there. After stage 1 a
+  host's device never changes, so nothing reaches it today; recovery from a
+  lost device would need the check to compare identity.
+- **F17 (2026-10-05, for P2 stage 4). Several surfaces through one core must
+  key their rasterization.** Genet's `RenderCore::rasterize_for` doc: a host
+  that rasterizes several surfaces through one core must key each, or every
+  tile is dirty on every frame (234 of 234 in the shell paint plan's
+  measurement). Rootstock's redraw calls the unkeyed `rasterize_scaled`
+  (`frame.rs`), harmless with one window; stage 4 keys it per window, and
+  `presentation_host` is already unique per host.
 
 ## 2. Rulings
 
@@ -618,6 +665,86 @@ The done-conditions handed over for S3 and S4, kept for reference:
   works in `projection_compile`. Second pass (F8 to F11), rulings S7 to S10:
   the README fixed (S7), TERMINOLOGY gains pandect under Eidetic and the
   curation record (S8, S10), S9 sent to the identity lane.
+- **2026-10-05.** P2 stage 3 built on branch `stack-seams-p2` at `21b0057f`, not
+  merged. `WindowDom` presents a window-root as its document, and the pipeline's
+  layout, hit testing, caret, scroll, paint, producer and accessibility reads go
+  through it (a single window's root is the document); `HostTree` gains `mount`
+  and `drain_mutations`; `Accessibility::sync` takes the window's subtree and
+  `cambium-winit-a11y`'s projection is generic over `LayoutDom`; `MultiHost`
+  holds the runner, the forest document and the windows' hosts, and a window's
+  turn lends it the runner (its `ctx.runner`, a `WindowTree`), the shared part
+  and the hooks; a mutation router files each drained mutation under the
+  window it touched, or every window when it cannot place it; each window
+  records its leaf keys and the producer registry leaves keys other windows
+  hold alone; a shared sheet swap carries a generation. In cambium,
+  `GenetMultiRunner` gains the per-window calls the pipeline makes, and its
+  trees hand message dispatch and focus collection their mount (the two
+  findings recorded with stage 2). Receipts, windowless in rootstock: each
+  window lays out its own subtree at its own size and scale; a click in one
+  changes the other in the same pass; a change only one window shows rebuilds
+  only that window's layout (a change only the other shows is the control);
+  each window's accessibility tree, through the host's own sync, is its own
+  subtree; a node moved between window roots by `move_before` keeps its
+  `NodeId`, is laid out by its new window, and its leaf keeps its painter; a
+  producer another window holds is not retired (GPU test, with the retiring
+  control). Controls on the instrument: every mount made the document fails
+  four receipts, and every mutation filed to every window fails the routing
+  receipt. The first accessibility receipt built its own view and passed under
+  the scoping control, so it was rewritten to read what the host's sync path
+  hands a recording bridge. Gates: cambium, rootstock, the winit host,
+  cambium-winit-a11y, mesquite, mere-view and pelt-desktop pass 567, fail 0,
+  ignore 7, with stage 1's warnings; the headed receipt and its control pass;
+  the web host checks on wasm32. A first gate run failed one test (`RefCell
+  already borrowed`): a document borrow stage 3 had bound to a variable
+  outlived the caret move and met the update after it; scoped to its block.
+  *As built against §3.1's text*: accessibility ids are not salted by window.
+  They are opaque ids of nodes in one arena and each window's tree holds only
+  its own subtree, so no id can be in two trees (the receipt checks exactly
+  that); a salt would only matter if two windows' trees were merged into one
+  namespace, which nothing does. The message-dispatch mount fix has no receipt
+  of its own; it makes dispatch match what rebuild already did.
+- **2026-10-05.** P2 stage 2 built on branch `stack-seams-p2` at `03f8fe74`, not
+  merged, no behaviour change. `HostTree`, a sealed trait over the runner calls
+  the pipeline makes, implemented for `Runner`; `Host`, `HostState`, `AppCtx`,
+  `HostHooks` and four hook aliases take the tree as a fourth type parameter
+  defaulted to `Runner`; `AppShared` holds the eight shared fields as
+  `HostState::shared`. Gates: the stage 1 suites pass with the same counts (316
+  passed, 0 failed, 6 ignored) and warnings; the headed receipt and its control
+  pass; the web host checks on wasm32. A read-only review subagent (opus) read
+  the diff and every use in Woodshed, Hocket and Knot: no behaviour change once
+  the shared fields were declared where they had been (drop order), and no
+  consumer that fails to compile. *As built against §3.1's text*, recorded
+  rather than ruled because none changes what an application sees: the trait is
+  public and sealed, not crate-internal, because it bounds public types; window
+  commands and the wake flag stay per window (a window verb names a window; the
+  wake's home is stage 4's); and "signatures unchanged" holds as source
+  compatibility, not literally, since `AppCtx` and `HostHooks` gained the
+  defaulted parameter: a name written with three parameters denotes the type it
+  did, and the one pattern that would need an annotation (an untyped
+  `HostHooks` literal whose closure calls a method on `ctx.runner`) occurs in no
+  consumer. Found for stage 3: the producer registry retires every producer whose
+  key is not in the frame's layout (`registry.rs`, `prepare`), which under one
+  registry painted per window (S29) would retire another window's producers; and
+  cambium's `RunnerTree` builds and rebuilds under its mount but hands message
+  dispatch and focus collection the document (`runner.rs`, eight
+  `parent: Some(document())` sites and `focusables`).
+- **2026-10-05.** P2 stage 1 built on branch `stack-seams-p2` at `76aa1bee`
+  (worktree `Code/worktrees/mere-stack-seams-p2`, which took P1's build target;
+  P1's worktree removed), not merged. One `Arc<RenderCore>` per host, kept
+  across suspend and resume, each surface made from it with its transparency;
+  `HostState::render_core` and `AppCtx::render_core` for tenants, set by the web
+  host too; the renderer's retained leaf fragments survive a suspend. Receipt
+  (`headed_tests::one_core`, headed, Windows): one boot across a forced suspend
+  and resume, the same core, a present from the new surface, and the tenant's
+  device identical to the surface's. Control (`headed_tests::control`, the core
+  forgotten across the suspend): two boots, a different core, the tenant on the
+  old device. Gates: rootstock, the winit host, cambium-winit-a11y, mesquite,
+  mere-view and pelt-desktop tests pass; the web host checks on wasm32 (one
+  warning, G9's unused `MirrorHandle::target_of`, reported to its lane). F16
+  and F17 recorded.
+- **2026-10-05.** F15: the Knot lane reported that P1 breaks Knot at its next
+  build against mere's tree; Mark ruled that lane adapts Knot (burn plan
+  §13.46). Told that lane P2 leaves the compiler's surface alone.
 - **2026-10-05.** P2 sized against the hosts (round 10 evidence) and S27
   ruled: one staged branch, one merge. Round 11 (S28 to S31): the forest dom,
   one leaf registry painted per window, one pipeline, no check-ins; the four

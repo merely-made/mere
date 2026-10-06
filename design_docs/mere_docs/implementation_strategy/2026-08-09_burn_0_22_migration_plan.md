@@ -4782,6 +4782,75 @@ pushed head, so the content is GitHub's. *Reading, not ruled:* that GitHub
 serves the commit is proven by the first networked fetch elsewhere, not
 here.
 
+**Who adapts Knot to stack seams P1 (2026-10-05).** The question as put:
+stack seams P1 (on origin since `19e6dc9f`) made
+`compile_relationship_snapshot` a `ProjectionCompiler` method, built from
+host-supplied `ItemSizes`, with no default card on purpose. Knot `54bb8cd`
+still calls the old free function (`crates/knot-composition/src/retention.rs:39`,
+plus a desktop site and a test site). djinn's repin with ruling 586's
+`scenomise` row therefore fails to compile (E0425 in `knot-composition`). It
+compiles today only because mere serves no `scenomise` to Knot. Under the
+lockstep rule Knot adapts first, and it must choose its own card size. The
+options: P1's own session adapts Knot; this coordinator's Knot lane adapts it;
+land djinn now with only the `scenograph` row; hold djinn. Mark: **"My
+Knot lane adapts Knot"**. *Follows:* a Knot lane repins Knot onto mere's
+origin and moves its three call sites to `ProjectionCompiler`. Knot's card
+size comes back to Mark as a fork. djinn's repin waits, then moves to that
+Knot head with both 586 rows.
+
+**Knot's card size under P1 (2026-10-05).** The question as put: Knot is
+adapted to P1 (12 calls moved to a `ProjectionCompiler`, all its headless
+recipe tests pass) against a placeholder card. S20 has the host supply "the
+representation's measured size". Knot has never had one of its own: it draws
+each card at the footprint the compiler returns, and retention validation's
+accept or reject does not depend on the size. P1 changes Knot's spacing
+(card plus gap, no longer a fixed 184 by 84 cell) whichever size is chosen. The
+options: one 164 by 68 constant in knot-composition behind a single
+`recipe_compiler()`; measured from Knot's font, the widest occurrence label
+plus button padding per recipe; 184 by 84. Mark: **"Measured from Knot's
+font"**. *Follows:* the desktop measures each recipe's widest occurrence
+label in its own font, plus button padding, and gives the compiler that
+size, so the layout re-solves with font, zoom and labels. *Reading, not
+ruled:* retention validation has no fonts, so it still needs a nominal size.
+That number, the measuring path and the padding come back as forks.
+
+**How Knot measures its card (2026-10-05, four questions in one round).**
+Evidence from Knot's harness, with the real desktop sheet and bundled fonts:
+the host has no text-measure API but exposes the last layout's rects
+(`AppCtx::painted_rect`). The card is the label width plus 1 px of rounding
+plus 22 (the declared `padding:6px 10px` and 1 px border), by 31 (one 17 px line
+plus 14). The control: at the exact width, 2 of 4 labels stay on one line; at
+1 px wider, all 4; at 1 px narrower, none. The pressed card is semibold
+(`readings.rs:28`). Sizes are identical at UI zoom 1, 2 and 4. Validation gives
+byte-identical outcomes for five cases at seven sizes (164 by 68, 1 by 1, 0 by
+0, NaN, 1e6) and never reads geometry.
+
+- How to measure. Options: read the previous layout through role-less,
+  `aria-hidden` probe spans; shape the text directly with genet-parley.
+  Mark: **"Read the previous layout (Recommended)"**. The drawn string is
+  probed at weight 600 and read through `painted_rect` in the frame hook. The
+  result is stored by label set, and the probes are removed once measured.
+- The first frame after labels change. Options: hide the scene for one frame;
+  show the old or nominal size. Mark: **"Hide the scene one frame
+  (Recommended)"**.
+- The card's shape. Options: one line with no width cap; keep the 68 px
+  minimum height; cap the width and measure the wrapped height. Mark: **"One
+  line, no width cap (Recommended)"**. The widest label sets every card's
+  width.
+- Validation's nominal size. Options: a named 164 by 68 constant; a 1 by 1
+  sentinel. Mark: **"Named 164×68 constant (Recommended)"**. The constant is
+  validation-only and lives in knot-composition, shared by the desktop's four
+  action gates and the tests. Only the view's draw call takes the measured
+  compiler.
+
+*Annotation, 2026-10-05:* the next move of djinn's Knot pin is not this
+plan's. Under mer3ly Ruling 112, the Projection grammar session owns the
+genet `image-decode` chain (mer3ly Ruling 111). It runs mere's genet repin
+to `bf723d5d532`, then Knot's genet repin and push, then djinn's Knot pin to
+that Knot head, and finishes with one copy of each genet crate in mere's
+graph. The order is seiche-speed first, then djinn's repin onto `54bb8cd`, then
+that chain.
+
 **Findings, not ruled.** Each predates the repin.
 - Windows checkouts get CRLF in `assets/oewn-notices.txt` and
   `tests/fixtures/wordnet.xml` through `.gitattributes`, which fails 7

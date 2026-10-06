@@ -69,14 +69,6 @@ struct Shared {
 }
 
 impl MirrorHandle {
-    /// The DOM node behind the mirror element an event reached, if any.
-    pub fn target_of(&self, event_target: Option<web_sys::EventTarget>) -> Option<NodeId> {
-        match self.request_target_of(event_target)? {
-            cambium_rootstock::A11yTarget::Node(node) => Some(node),
-            cambium_rootstock::A11yTarget::Produced(_) => None,
-        }
-    }
-
     /// What a reader's request on the mirror element an event reached lands
     /// on: its DOM node, or the drawn node's action its button stands for.
     pub fn request_target_of(
