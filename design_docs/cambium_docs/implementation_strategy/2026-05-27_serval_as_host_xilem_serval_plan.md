@@ -307,6 +307,12 @@ already exposes (`run_microtasks`, `run_event_loop`).
   - **More pointer events** — `pointermove`/`pointerup`/wheel (the input half
     of scrolling + pointer gestures — a future Lane H axis).
 
+  **Corrected 2026-10-06 (S14 pass):** no longer open. Stage 6 added wheel
+  scrolling and Stage 7 added pointer-drag (`pointerdown`/`move`/`up` with
+  capture) and the slider, as Stage 7 below and the Status line record; the
+  code is `crates/cambium/cambium/src/pointer.rs` and
+  `crates/cambium/cambium/src/slider.rs`.
+
 - **Stage 4 (overlays + inline style) — done.** The host-overlay slice, and
   the engine capability it forced.
   - **Inline `style` support (`dfe8702`).** serval's stylo adapter returned
@@ -356,6 +362,12 @@ already exposes (`run_microtasks`, `run_event_loop`).
     clips and per-node `ScrollOffsets`, and the `pelt-live` demo passes the same
     offsets to hit-testing that it passes to paint. `hit_test_is_clip_and_scroll_aware`
     pins the behavior.
+
+    **Corrected 2026-10-06 (S14 pass):** that test no longer exists. It was
+    added in genet 9e78d1a92e0 (2026-06-01) and removed in genet 55c05d11759
+    (2026-08-21, "Retire Stylo and the incumbent layout cone"). Equivalent
+    coverage is now in genet's components/genet-livery/src/layout/tests.rs
+    (l.7678) and tests/form_control_hit.rs (l.289).
   - **Known gap — no `z-index`.** (Closed by Stage 7 Tier 1 below.) Stacking was
     document order, so an overlay (the `select` dropdown) was covered by a later
     sibling (the scroller); the demo worked around it by ordering the select
@@ -539,3 +551,13 @@ local, so the pace is ours to set.
 - Performance of the binding. Correctness and shape first.
 - Rendering chrome through serval on top of a host framework
   (architecture 2). Excluded by design.
+
+## Progress
+
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_46_s14_phase_b8.md: Stage 3's still-open pointer
+  events are annotated as done (Stages 6 and 7, Cambium's `pointer.rs` and
+  `slider.rs`), and Stage 6's removed `hit_test_is_clip_and_scroll_aware` test
+  is annotated with its removal commit and genet's current coverage. The
+  Status line was judged accurate and is unchanged.
