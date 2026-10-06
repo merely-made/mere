@@ -496,6 +496,12 @@ This pass decides none of them.
 - 2026-10-02 (G1, what `never_rests` changes): `Physics::settle` keeps the larger budget (`crates/conatus/seiche/src/runtime.rs`, line 598). The receipts' preamble starts with Play, the play control's unbounded run, so every P2 and P4 law receipt has run under continuous ticking whatever `never_rests` says. A probe that left Springs under that preamble for 600 frames found it still stepping (Progress, 2026-10-03). The flag decides only a switch from rest, and the remote board's settle. `physics_catalog::from_rest_a_living_law_ticks_on_and_a_resting_one_stops` shows Kinds ticking past the budget where Stress stops, and it fails with Kinds out of `never_rests` (log `Code/testing/mere/grammar-g1/never-rests-control.log`). The physics catalog plan's pre-existing actor finding (an offloaded canvas under a living law keeps its actor ticking after it is dropped) now covers Kinds too.
 - 2026-10-02 (G1): to isolate Boids' cruise, its steering gain became a parameter, `Boids::cruise`, replacing the literal 0.5. The default is 0.5, so the force is bitwise the same.
 - Effectiveness record, seeded (*Reading, not ruled* on its home; open question 8). The P2 receipts (`Code/testing/mere/physics_p2_receipt.md`), the P4 drag rows, and the density overlay probe (`Code/testing/mere/density/probe-overlays.log`; Density alone rank 0.60, with Hub pull −0.33 and 510 overlaps) are its first rows.
+- 2026-10-06, a tail taken from the archived projection proofs plan (the S14
+  archive pass, `2026-07-03_archived_plan_tails_plan.md`, "2026-10-06 archive
+  pass"): **the arrangement pull**, removed in `270172db` (G7, 2026-10-03), is
+  this plan's. It is retired, not open: F18 to F30's roles (seeded, anchored,
+  pinned) replace it, and F47 keeps `arrangement_pull` in `SavedSceneV1` only as
+  the anchored stiffness, with a serde default.
 
 ## Progress
 
