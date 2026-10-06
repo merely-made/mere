@@ -1,6 +1,16 @@
 # Graph Delta Capture + Apparatus Table Stats Plan
 
-**Status:** in progress.
+**Status (2026-10-06):** kernel half landed and live; host half landed in
+meerkat on 2026-07-02 and 2026-07-03, retired with it 2026-07-18
+(`c5f01064`). Phase A, the `apply_graph_delta` capture hook and the resolved
+replay forms are in `crates/graph/graph-kernel/src/graph/capture.rs`. Retired
+with meerkat: Phase B's env-gated session log writer, Phase C's
+`graph_delta_log` whole-snapshot oracle, and Phase D's typed apparatus stat
+model and its rows. Surviving library parts: `CapturedDelta`, the capture
+hook, the replay forms and their kernel tests (capture.rs), and `GraphJournal`
+(`crates/graph/graph-kernel/src/graph/journal.rs`), which supersedes the
+session log. Open: no canned regression log is in the tree, and per-table
+stats have no home (see Phase D).
 **Date:** 2026-07-02.
 **Scope:** the mere half of the doctrine-shortfalls work from the
 [data-oriented doctrine brief](../../2026-07-02_data_oriented_doctrine_brief.md)
@@ -63,6 +73,11 @@ deviations in the brief; revisit when scale demands).
 - Done: a browsing session with the env var set yields a log whose entry count
   matches the session's applied deltas.
 
+**Corrected 2026-10-06 (S14 pass):** the writer was meerkat's and left with it
+in `c5f01064` (2026-07-18). `MERE_GRAPH_DELTA_LOG` appears in no code at mere
+535bca11 (`git log -S MERE_GRAPH_DELTA_LOG`). The session log's successor is
+`GraphJournal` (`crates/graph/graph-kernel/src/graph/journal.rs`).
+
 ### Phase C — replay + oracle test
 
 - `replay_delta_log(log) -> Graph`: fold `CapturedDelta`s into `Replay*`
@@ -87,6 +102,16 @@ deviations in the brief; revisit when scale demands).
 - This also derisks murm sync: the sync lane will speak the same resolved
   `Replay*` vocabulary this phase exercises.
 
+**Corrected 2026-10-06 (S14 pass):** the whole-snapshot oracle described above
+was meerkat's `graph_delta_log` replay test and left with meerkat in
+`c5f01064`; no `graph_delta_log` appears in any `.rs` file at mere 535bca11.
+The kernel replay tests remain but do not compare whole snapshots: the replay
+test at capture.rs:1138 spot-checks many fields and compares only the
+navigation snapshot (l.1624-1650), never a whole `GraphSnapshot`, and
+journal.rs:832 checks that journal replay matches live mutation. No canned
+regression log is in the tree, so the second half of the done condition is
+unmet.
+
 ### Phase D — apparatus table stats
 
 - A small stats convention (a struct, not a framework): per table, kind label,
@@ -109,6 +134,18 @@ deviations in the brief; revisit when scale demands).
   ~M KiB, last batch dirtied K elements."
 - Done: apparatus shows live table stats for kernel + one engine document; the
   panel goes empty-state (not fake) for sources that are not wired.
+
+**Corrected 2026-10-06 (S14 pass):** the Meerkat-side typed apparatus stat
+model and its kernel, document and scene rows (Progress, 2026-07-02 and
+2026-07-03) left with meerkat in `c5f01064`. `crates/domain/apparatus/src/lib.rs`
+is now a bounded observation store with placeholder sections and no table
+stats.
+
+**Open, raised by the S14 pass (2026-10-06):** do per-table stats get a new
+home? Options: re-scope them into `crates/domain/apparatus`; leave them
+retired with meerkat, with `GraphJournal` and the
+[graph view curation plan](2026-08-03_graph_view_curation_and_interaction_plan.md)
+as the successors.
 
 ## Progress
 
@@ -210,3 +247,10 @@ deviations in the brief; revisit when scale demands).
   dirty-set size, empty-state text), keeping the ownership boundary out of
   `platen` while rendering richer kernel / engine / scene diagnostics from the
   same apparatus pane.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_46_s14_phase_b8.md: the status records the kernel
+  half as landed and the host half (Phase B's log writer, Phase C's
+  `graph_delta_log` oracle, Phase D's stat model) as landed in meerkat and
+  retired with it (`c5f01064`), `GraphJournal` is named as the session log's
+  successor, and the per-table stats' home is left as an open question.

@@ -54,9 +54,9 @@ impl TransferCapability {
         Self(rand::random())
     }
 
-    /// Deterministic compatibility key for the legacy 64-bit WebSocket transfer service.
+    /// The 64-bit key the WebSocket transfer service rendezvouses on, taken from the capability.
     #[cfg(feature = "websocket")]
-    pub(crate) fn legacy_id(self) -> u64 {
+    pub(crate) fn websocket_id(self) -> u64 {
         u64::from_le_bytes(
             self.0[..8]
                 .try_into()
@@ -106,7 +106,7 @@ pub enum RemoteMessage {
 
 /// Client-side session handshake.
 #[allow(missing_docs)]
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct SessionInit {
     pub version: u16,
     pub session_id: SessionId,
@@ -114,6 +114,17 @@ pub struct SessionInit {
     /// Opaque application credential interpreted by the compute node's authorizer.
     #[serde(with = "serde_bytes")]
     pub authorization: Vec<u8>,
+}
+
+impl core::fmt::Debug for SessionInit {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        // Never the authorization, which is often a shared secret.
+        f.debug_struct("SessionInit")
+            .field("version", &self.version)
+            .field("session_id", &self.session_id)
+            .field("device_index", &self.device_index)
+            .finish_non_exhaustive()
+    }
 }
 
 impl SessionInit {
@@ -137,6 +148,26 @@ pub struct SessionInfo {
     pub device_count: u32,
     /// Authenticated identity of the compute node, when the transport provides one.
     pub peer_id: Option<PeerId>,
+}
+
+/// Why a server will not serve a session, as the client is told.
+///
+/// A category and never the authorizer's own words: the client is not yet authorized, and an
+/// authorizer writes its reasons for the server's log.
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SessionRefusal {
+    /// The server's authorizer rejected the client's credential.
+    Unauthorized,
+    /// The server does not host the device the client asked for. Only an authorized client is
+    /// told how many it hosts.
+    NoSuchDevice { device_count: u32 },
+    /// The server cannot read the client's handshake, as when the client speaks another version
+    /// of the Burn Remote protocol. Told before authorization, so it reveals the server's
+    /// version, which a client could find by trying each version anyway.
+    ///
+    /// The only refusal a client on another version receives, so its encoding never changes, nor
+    /// do the Iroh ALPN and stream header that carry it.
+    IncompatibleProtocol { server_version: u16 },
 }
 
 #[allow(missing_docs)]
@@ -258,4 +289,33 @@ pub enum TaskResponseContent {
     /// The window's duration on the server's clock; `None` when it carried no
     /// measurement.
     ProfileEnd(Result<Option<Duration>, ExecutionError>),
+    /// The server's answer to an `Init` it will not serve, in place of [`Init`](Self::Init),
+    /// before it closes the session.
+    InitRefused(SessionRefusal),
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn an_incompatible_protocol_refusal_keeps_its_wire_encoding() {
+        let refusal = TaskResponse {
+            content: TaskResponseContent::InitRefused(SessionRefusal::IncompatibleProtocol {
+                server_version: 2,
+            }),
+            id: 0,
+        };
+
+        // `[content, id]`, each variant a one-entry map keyed by its name.
+        let expected = [
+            &[0x92, 0x81, 0xab][..],
+            b"InitRefused",
+            &[0x81, 0xb4],
+            b"IncompatibleProtocol",
+            &[0x91, 0x02, 0x00],
+        ]
+        .concat();
+        assert_eq!(rmp_serde::to_vec(&refusal).unwrap(), expected);
+    }
 }

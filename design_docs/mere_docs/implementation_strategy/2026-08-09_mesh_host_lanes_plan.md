@@ -2,9 +2,13 @@
 
 **Date**: 2026-08-09
 
-**Status**: Implemented through the Burn 0.22.0-pre.2 production row. **H0, H1,
-H2, and the lease-bound remote adapter have landed.** Stable Burn 0.22
-repinning and its clean package receipt remain release-gated.
+**Status (2026-10-06):** H0, H1, H2 and the lease-bound remote adapter have
+landed (mere `7fb07225` and `176c31e8`, p2panda `9f2c2a01`); the host now lives
+in distillery as `distillery::mesh_host` (2026-09-23). Production is the Burn
+0.22.0-pre.4 row since `cec0b3a4` (2026-10-05), with burn-remote's close patch
+carried at pre.4. Stable Burn 0.22 closure (repin and clean package receipt) is
+the only gate left, and the
+[Burn 0.22 migration plan](2026-08-09_burn_0_22_migration_plan.md) owns it.
 
 The remote gate landed on 2026-08-23 in mere `7fb07225`, after the pre.2 source
 re-audit corrected the close seam and the client/server identity rules. The
@@ -281,6 +285,12 @@ The remote adapter uses this exact production prerelease row. Stable
 publication closure must still repeat the dependency and receipt matrix; the
 prerelease success is not that receipt.
 
+**Corrected 2026-10-06 (S14 pass):** pre.2 is no longer the production row.
+Since `cec0b3a4` (2026-10-05, the burn plan's S16) main is on 0.22.0-pre.4, and
+the vendored burn-remote is version 0.22.0-pre.4
+(`support/patches/burn-remote/Cargo.toml`, line 15), so the adapter's close
+patch is carried at pre.4. Stable closure stays with the burn plan.
+
 ---
 
 ## 6. Remote adapter
@@ -410,6 +420,10 @@ classes, and remote tensor transport beyond the adapter gate above.
   now resolves one wgpu 30.0.0 and one libsqlite3-sys 0.38.2, the old
   `cubecl-wgpu` backport retired, and the native, wasm, WGPU, real-device, and
   ESP package receipts passed. Stable repinning remains open.
+
+  **Corrected 2026-10-06 (S14 pass):** the graph has moved since. The root lock
+  at `535bca11` carries wgpu 30.0.1 and no libsqlite3-sys or turso entries
+  (ruling 375's cubecl-runtime patch, root `Cargo.toml` lines 673-677).
 - **2026-08-23 (remote adapter)**: pre.2 was re-audited and the last executable
   gate landed. The pure mesh claim binds mesh, job, lease, epoch, job poster,
   server transport identity, device index, and exact resource; the authorizer
@@ -433,3 +447,8 @@ classes, and remote tensor transport beyond the adapter gate above.
   [crate consolidation](2026-09-23_crate_consolidation_plan.md) ruling; Djinn
   reaches it through its existing distillery dependency. Its 10 unit and 2
   integration tests moved with it and pass.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_50_s14_phase_b12.md: the status names the pre.4
+  production row (`cec0b3a4`) and the folded host, and §5's pre.2 sentence and
+  the 2026-08-20 graph line carry corrections.

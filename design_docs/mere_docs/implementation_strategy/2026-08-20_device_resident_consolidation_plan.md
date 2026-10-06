@@ -438,6 +438,21 @@ viewport because Probe's re-derived selector layout disagrees with Turnstone's
 painted textarea; moving automation targeting onto the retained painted layout
 is scoped to the Genet/Turnstone automation contract.
 
+**Corrected 2026-10-06 (S14 pass):** the blocker named above is gone, though
+the receipts it blocked are not recorded as run. Knot's sources left Mere on
+2026-09-04 (root `Cargo.toml`, lines 95-96): `KnotResidentSource` is now in
+`knot-editor/crates/knot-editor/src/endpoint.rs` and
+`KnotSpaceAuthoritySnapshot` in
+`knot-editor/crates/knot-editor/src/authority.rs`, and knot-editor ships a
+standalone `knot` desktop binary (`knot-editor/apps/desktop/Cargo.toml`,
+`[[bin]] name = "knot"`, added in knot-editor `4434584`, 2026-09-01).
+
+**Open, raised by the S14 pass (2026-10-06):** with Knot's source in
+knot-editor, where are the remaining standalone-Knot headed receipts (sync
+status, edit/restart/evidence-open, resident-stopped directory editing)
+produced? Options: keep them here as this plan's V1 acceptance work; move them
+to a knot-editor plan.
+
 #### Command-palette performance observation
 
 Reported 2026-08-22: interaction lags while Turnstone's command palette is
@@ -624,3 +639,9 @@ This plan does not:
   then storage. Its focused library tests and both consumer checks pass.
   No common service framework, policy object, or resident configuration was
   extracted.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_50_s14_phase_b12.md: the status stands; §6's
+  "no standalone Knot executable" blocker is corrected (Knot's source and its
+  `knot` binary now live in knot-editor), and where the remaining
+  standalone-Knot receipts are produced is raised as an open question there.
