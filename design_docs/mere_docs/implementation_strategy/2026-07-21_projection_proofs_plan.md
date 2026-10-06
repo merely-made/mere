@@ -1,15 +1,20 @@
 # Projection Proofs Plan
 
 **Date**: 2026-07-21
-**Status**: P3/P4/P5 code slices are landed in the working tree. P3 has a
-green two-process headed receipt, including score restore after restart. Live
-radio facts remain correctly deferred because no radio product exposes them.
+**Status (2026-10-06):** P1–P5 complete on main: the P3/P4/P5 slices were
+committed (`f78ea81e`, 2026-07-22) and closed by `93ca150f` (2026-07-26,
+"Projection proofs are done"), P3 with a green two-process headed receipt. The
+scenograph family was absorbed into mere by `6a37de6b` and moved to
+`crates/cambium/scenes` by `3e4d5098`; its
+[0.0.3 release plan](2026-07-24_scenograph_0_0_3_release_plan.md) is
+complete. Open: live radio facts for P5; the naming drift between the two
+display-name tables (the scenomise catalog says "L-system" and "Kanban" where
+the canvas catalog carries the ratified Fractal and Columns); and the
+arrangement pull, which `270172db` (2026-10-03) removed and which now belongs
+to the [dynamics grammar plan](2026-10-02_dynamics_grammar_plan.md).
 Executes the five-proof sequence from the
 [projection_engine_prior_art_brief](../research/2026-07-21_projection_engine_prior_art_brief.md)
-§9. Proof 1 landed same-day. The scenograph family repo is founded
-([mark-ik/scenograph](https://github.com/mark-ik/scenograph), commit `5a730e1`:
-`sceno` core / `scenomise` choreography / `scenotime` runtime / `scenograph`
-facade, MIT/Apache ed2024, name-holding; crates.io publication is Mark's step).
+§9.
 
 ## Plan
 
@@ -23,6 +28,10 @@ facade, MIT/Apache ed2024, name-holding; crates.io publication is Mark's step).
   §5), landing in `sceno` with mere as first consumer. This is where the
   `cartography::Projection` point+radius ceiling lifts and where P1's overlap
   finding gets its fix.
+
+  **Corrected 2026-10-06 (S14 pass):** done. P2's first slice landed in
+  `sceno` and its consumption slice in mere on 2026-07-22 (Progress), closed
+  with the rest by `93ca150f`.
 - **P3 — pane spiral.** Move the kernel-neutral Spiral solver into
   `scenomise`; keep the graph-to-scene adaptation in `mere-cartography`.
   Persist one product-free score and prove that its measurements give
@@ -54,6 +63,12 @@ facade, MIT/Apache ed2024, name-holding; crates.io publication is Mark's step).
   low-layer map underlay plus geographic source facts, preserved through
   score-to-scene realization. Live Retinue/Tulle/Sennet location facts wait
   for an actual radio fact surface; none exists in those products today.
+
+  **Open, raised by the S14 pass (2026-10-06):** retinue's position
+  disclosure plan (2026-09-01) records its PD1 and PD2 as implemented in
+  software. Does that count as the radio fact surface P5's live half waits
+  for? Options: yes, and P5's live half becomes adapting it; no, P5's live
+  half waits for a product to expose location facts.
 
 **Done overall** = one persisted, product-free score vocabulary drives the
 Mere pane spiral, the Isometry overmap and board, and the geographic fixture;
@@ -110,7 +125,23 @@ neither portable crate nor serialized scene type mentions either product.
     picker correctly reads the canvas table; unifying them, or deriving one
     from the other, is the next cleanup and belongs before a third table
     appears.
+
+    **Corrected 2026-10-06 (S14 pass):** the arrangements crate was absorbed
+    in `cc40c24f` (2026-08-22). Its successor, the scenomise catalog
+    (`crates/cambium/scenes/scenomise/src/catalog.rs`), shows "L-system" and
+    "Kanban", disagreeing with the ratified Fractal and Columns that
+    `CANVAS_LAYOUT_STRATEGIES` carries
+    (`crates/canvas/pictograph/src/canvas/cartography_scene.rs`); Turnstone's
+    `palette_actions` reads the canvas table.
+
+    **Open, raised by the S14 pass (2026-10-06):** which display-name table
+    is authoritative? Options: the canvas's `CANVAS_LAYOUT_STRATEGIES`, with
+    the scenomise catalog renamed to Fractal and Columns; the scenomise
+    catalog, with the canvas table derived from it.
   - Still open: a checkmarked layout picker surface (palette-only today).
+
+    **Corrected 2026-10-06 (S14 pass):** Turnstone's Arrange pane exists
+    (its `arrange_pane.rs`, turnstone `f7a5388`, 2026-09-03).
 
 ## Arrangement naming (plain vocabulary, stack-consistent)
 
@@ -174,6 +205,11 @@ The proper consistency end-state is the checkmarked layout picker deriving its
 labels from the registry `display_name` (owed follow-up), so turnstone stops
 hardcoding labels; today the hardcoded palette label is kept *matching* the
 registry.
+
+**Corrected 2026-10-06 (S14 pass):** this follow-on is no longer owed. The
+Findings record the picker's labels derived from `CANVAS_LAYOUT_STRATEGIES`
+since 2026-08-18, and Turnstone's Arrange pane (`f7a5388`, 2026-09-03) is the
+picker surface; the remaining drift is between the two tables (see Findings).
 
 ## Progress
 
@@ -418,6 +454,10 @@ registry.
   relax's pull toward slots, and the physics board's slot pull go to that
   design (`research/2026-10-03_arrangement_and_dynamics_brief.md`); the code
   is unchanged until it rules.
+
+  **Corrected 2026-10-06 (S14 pass):** it ruled the same day. The dynamics
+  grammar plan's F18–F20 are dated 2026-10-03, and `270172db` (17:37 that day)
+  removed `set_arrangement_pull` and `sync_anchor_force`.
   **Build-topology finding (cost of the sibling split)**: turnstone could not see
   the new force at all — mere patches numen/quint/seiche to the local conatus
   checkout, turnstone patched none of them, so it silently built against the
@@ -454,3 +494,4 @@ registry.
   reachable by API today; the gesture is a separate, deliberate choice.
   **Review sweep**: scenograph 29, seiche 53, `mere-canvas` 143,
   `mere-cartography` 17, `arrangements` 89, `isometry-views` 38 — all green.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at mere 535bca11, from the D2 record in support/doc-audit/d2/batch_41_s14_phase_b3.md: status set to P1–P5 complete on main (`93ca150f`) with the scenes at `crates/cambium/scenes`, the P2 marker, picker, display-name and 2026-10-03 annotation passages corrected, and the authoritative name table and the radio fact surface raised as open questions.

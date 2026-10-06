@@ -1,6 +1,14 @@
 # Identity Vault + SSH Agent Plan
 
-**Status:** V1-V3 landed and the personae fold executed; V4 is demand-driven and V5 sync remains deferred.
+**Status (2026-10-06):** V1–V3 landed 2026-07-22 and the personae fold
+executed 2026-07-24 (`crates/dramatis/personae`). The resident host the
+2026-07-22 ruling called for has landed: castellan hosts `VaultAgent` with
+approval (`ports/castellan/src/authority.rs`, `b53ba480`, 2026-08-14). V4's
+passwords and TOTP now have a taxonomy under the
+[chatelaine plan](../../dramatis_docs/implementation_strategy/2026-10-01_chatelaine_cxf_plan.md),
+whose P1–P3 have landed (`da3c50bc`, `3e4992ec`, `ff68e86c`); see the open
+question under V4. V5 sync remains deferred: no replicated `IdentityStorage`
+exists.
 
 **2026-07-22.** Turn personae's existing vault skeleton into a working credential
 vault with an SSH-agent front end. This is the "our own 1Password/KeePassXC
@@ -110,6 +118,15 @@ Passwords, TOTP, secure notes as additional slot kinds (or a parallel
 item enum if protocol-slot semantics do not fit). Scope-check against real
 need before building; §3's `Custom` slot may already cover it.
 
+**Corrected 2026-10-06 (S14 pass):** V4 is no longer only demand-driven.
+Passwords and TOTP have a taxonomy under the
+[chatelaine plan](../../dramatis_docs/implementation_strategy/2026-10-01_chatelaine_cxf_plan.md),
+whose P1–P3 have landed (`da3c50bc`, `3e4992ec`, `ff68e86c`).
+
+**Open, raised by the S14 pass (2026-10-06):** does the chatelaine plan now
+own V4? Options: yes, and V4 closes here as moved to chatelaine; no, V4 stays
+a separate personae phase beside chatelaine's item store.
+
 ### V5. Sync (deferred, gated)
 
 `IdentityStorage` backend replicated over the murm/moot spine. Explicitly
@@ -200,6 +217,12 @@ oversell.
   not from a standalone agent install. A scheduled task (or shell-profile
   lazy start) is interim dogfood scaffolding only, and is removed when the
   host adoption lands.
+
+  **Corrected 2026-10-06 (S14 pass):** the host adoption has landed in
+  castellan, which hosts `VaultAgent` with approval
+  (`ports/castellan/src/authority.rs`, `b53ba480`, 2026-08-14). The
+  [Graphshell remote projection host plan](2026-07-22_graphshell_remote_projection_host_plan.md)'s
+  G8, folded into its H4, took over this ruling.
 - 2026-07-22: **interim launch installed (Mark approved the scheduled
   task).** Release exe + `personae-agent.vbs` at
   `%LOCALAPPDATA%\personae\bin`; logon-triggered task `personae-agent`
@@ -248,6 +271,11 @@ oversell.
   `ssh_slot` (slot shape + encode/decode/find, shared by agent and CLI),
   and an `IdentityStorage for &T` blanket impl beside the `Box<T>` one.
   66 lib tests + 5 CLI tests green, clippy clean on both feature sets.
+
+  **Corrected 2026-10-06 (S14 pass):** `personae-vault` now requires the
+  `agent` feature, not `ssh` (`crates/dramatis/personae/Cargo.toml`,
+  `4c4ce3bc`, 2026-10-04), because its `add-ssh` door refuses keys the agent
+  cannot sign.
 - 2026-07-22 V3 receipts: read-only commands against the **real** vault
   list the live SSH slot; `pub` exported a public key byte-identical to
   the `.pub` file and to the laptop's `authorized_keys` (the recovery
@@ -276,7 +304,19 @@ oversell.
   from mere → installs → manages the logon task) so the source→install path
   is documented now that it moved. hocket already git-deps personae from mere
   main, so its build gets this work.
+
+  **Open, raised by the S14 pass (2026-10-06):** castellan now hosts the
+  agent (`b53ba480`), but the interim install scripts remain
+  (`install-agent-windows.ps1`, `install-agent-linux.sh`,
+  `install-agent-macos.sh` in `crates/dramatis/personae`), and the Windows
+  script's header still says "Until then". Do they retire? Options: retire
+  them now that castellan hosts the agent; keep them as the standalone install
+  path, with the header reworded.
 - Next: V4 (broader item types) is optional and demand-driven; the
   higher-value next step is the auto-update pressure test from the
   [auto-update brief](../../2026-07-22_auto-update_brief.md), since it
   gates load-bearing deployment of any of this.
+
+  **Corrected 2026-10-06 (S14 pass):** V4's item types now have a taxonomy
+  under the chatelaine plan; see the correction under V4.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at mere 535bca11, from the D2 record in support/doc-audit/d2/batch_41_s14_phase_b3.md: the resident host recorded as landed in castellan (`b53ba480`), V4's items as taxonomized under chatelaine, the CLI's feature gate corrected to `agent`, and V4's ownership and the interim install scripts raised as open questions.
