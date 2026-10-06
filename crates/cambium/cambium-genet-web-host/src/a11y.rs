@@ -36,7 +36,7 @@ use std::collections::{HashMap, HashSet};
 use std::rc::Rc;
 
 use cambium_rootstock::{
-    A11yRequest, Accessibility, LeafRegistry, NodeId, OwnedLayout, ScriptedDom, document_projection,
+    A11yRequest, Accessibility, LeafRegistry, NodeId, OwnedLayout, WindowDom, document_projection,
 };
 use layout_dom_api::{LayoutDom as _, LocalName, Namespace, NodeKind};
 use wasm_bindgen::JsCast;
@@ -310,7 +310,7 @@ fn update(document: &Document, mirrored: &mut Mirrored, wanted: &Written) {
 
 /// Every DOM node by its opaque id, and each leaf's key.
 fn walk(
-    dom: &ScriptedDom,
+    dom: &WindowDom<'_>,
     node: NodeId,
     targets: &mut HashMap<u64, NodeId>,
     leaves: &mut HashMap<u64, u64>,
@@ -335,7 +335,7 @@ fn walk(
 impl Accessibility for DomAccessibility {
     fn sync(
         &mut self,
-        dom: &ScriptedDom,
+        dom: &WindowDom<'_>,
         layout: &OwnedLayout,
         leaves: &mut LeafRegistry<u64>,
         producers: &mut cambium_rootstock::ProducerRegistry,

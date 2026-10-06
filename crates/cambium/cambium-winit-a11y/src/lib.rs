@@ -30,9 +30,9 @@ use std::collections::HashMap;
 
 use accesskit::{Action, ActionData, Affine, NodeId as A11yNodeId, Rect, Role, TreeUpdate};
 use cambium_rootstock::{ProducedAction, ProducerRegistry, ProducerRole, ProducerSemantics};
-use genet_scripted_dom::{NodeId, ScriptedDom};
+use genet_scripted_dom::NodeId;
 use genet_winit_host::{AccessKitBridge, BridgeStatus};
-use layout_dom_api::{LayoutDom as _, LocalName, Namespace, NodeKind};
+use layout_dom_api::{LayoutDom, LocalName, Namespace, NodeKind};
 use sprigging::LeafRegistry;
 use winit::window::Window;
 
@@ -46,7 +46,7 @@ pub use cambium_rootstock::{A11yAction, A11yRequest, A11yTarget, Accessibility};
 impl Accessibility for A11yHost {
     fn sync(
         &mut self,
-        dom: &ScriptedDom,
+        dom: &cambium_rootstock::WindowDom<'_>,
         layout: &cambium_rootstock::OwnedLayout,
         leaves: &mut LeafRegistry<u64>,
         producers: &mut ProducerRegistry,
@@ -113,7 +113,7 @@ impl A11yHost {
     /// tree, so a stale id never points the reader at nothing.
     fn sync_inner(
         &mut self,
-        dom: &ScriptedDom,
+        dom: &cambium_rootstock::WindowDom<'_>,
         layout: &cambium_rootstock::OwnedLayout,
         leaves: &mut LeafRegistry<u64>,
         producers: &mut ProducerRegistry,
@@ -208,8 +208,8 @@ impl A11yHost {
 /// action is resolved through. Split out so the projection is assertable in an
 /// ordinary test — an accessibility regression that only a screen reader can
 /// catch is one nobody catches.
-pub fn project_tree(
-    dom: &ScriptedDom,
+pub fn project_tree<D: LayoutDom<NodeId = NodeId>>(
+    dom: &D,
     layout: &cambium_rootstock::OwnedLayout,
     leaves: &mut LeafRegistry<u64>,
     producers: &mut ProducerRegistry,
@@ -221,8 +221,8 @@ pub fn project_tree(
 
 /// [`project_tree`], also returning which drawn node's action each produced
 /// button stands for, the map a reader's click on one resolves through.
-pub fn project_tree_with_actions(
-    dom: &ScriptedDom,
+pub fn project_tree_with_actions<D: LayoutDom<NodeId = NodeId>>(
+    dom: &D,
     layout: &cambium_rootstock::OwnedLayout,
     leaves: &mut LeafRegistry<u64>,
     producers: &mut ProducerRegistry,
@@ -233,7 +233,7 @@ pub fn project_tree_with_actions(
     HashMap<A11yNodeId, ProducedAction>,
 ) {
     let root = dom.document();
-    let id_of = |d: &ScriptedDom, n: NodeId| A11yNodeId(d.opaque_id(n));
+    let id_of = |d: &D, n: NodeId| A11yNodeId(d.opaque_id(n));
     let focused = focus.and_then(|opaque| find_opaque(dom, root, opaque));
     let mut tree = genet_render::accesskit_tree_with_generated_text(
         dom,
@@ -389,21 +389,29 @@ fn accesskit_role(role: ProducerRole) -> Role {
 /// `layout_scale` is the device scale **times the UI zoom**, because both
 /// separate the two spaces and a reader has no way to know about either. Pass
 /// [`Host::layout_scale`](cambium_rootstock::Host::layout_scale).
-pub fn scale_tree_to_window(tree: &mut TreeUpdate, dom: &ScriptedDom, layout_scale: f64) {
+pub fn scale_tree_to_window<D: LayoutDom<NodeId = NodeId>>(
+    tree: &mut TreeUpdate,
+    dom: &D,
+    layout_scale: f64,
+) {
     let root = A11yNodeId(dom.opaque_id(dom.document()));
     if let Some((_, node)) = tree.nodes.iter_mut().find(|(id, _)| *id == root) {
         node.set_transform(Affine::scale(layout_scale));
     }
 }
 
-fn walk(dom: &ScriptedDom, node: NodeId, visit: &mut impl FnMut(NodeId)) {
+fn walk<D: LayoutDom<NodeId = NodeId>>(dom: &D, node: NodeId, visit: &mut impl FnMut(NodeId)) {
     visit(node);
     for child in dom.dom_children(node) {
         walk(dom, child, visit);
     }
 }
 
-fn find_opaque(dom: &ScriptedDom, node: NodeId, opaque: u64) -> Option<NodeId> {
+fn find_opaque<D: LayoutDom<NodeId = NodeId>>(
+    dom: &D,
+    node: NodeId,
+    opaque: u64,
+) -> Option<NodeId> {
     if dom.opaque_id(node) == opaque {
         return Some(node);
     }
@@ -411,7 +419,7 @@ fn find_opaque(dom: &ScriptedDom, node: NodeId, opaque: u64) -> Option<NodeId> {
         .find_map(|child| find_opaque(dom, child, opaque))
 }
 
-fn custom_leaf_key(dom: &ScriptedDom, node: NodeId) -> Option<u64> {
+fn custom_leaf_key<D: LayoutDom<NodeId = NodeId>>(dom: &D, node: NodeId) -> Option<u64> {
     if dom.kind(node) != NodeKind::Element
         || !matches!(
             dom.element_name(node)?.local.as_ref(),
@@ -427,6 +435,8 @@ fn custom_leaf_key(dom: &ScriptedDom, node: NodeId) -> Option<u64> {
 
 #[cfg(test)]
 mod dpi_tests {
+    use genet_scripted_dom::ScriptedDom;
+
     use super::*;
     use accesskit::{ActionRequest, Node, Role, Tree, TreeId};
 

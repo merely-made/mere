@@ -140,12 +140,26 @@ impl ProducerRegistry {
         self.device = None;
     }
 
+    #[cfg(test)]
     pub(crate) fn prepare<D: LayoutDom<NodeId = NodeId>>(
         &mut self,
         surface: &dyn Surface,
         layout: &OwnedLayout,
         dom: &D,
         scale: f32,
+    ) -> ProducerFrameStats {
+        self.prepare_window(surface, layout, dom, scale, &Default::default())
+    }
+
+    /// Stage this window's producers. A key in `held_elsewhere` belongs to
+    /// another window's layout and is left alone rather than retired.
+    pub(crate) fn prepare_window<D: LayoutDom<NodeId = NodeId>>(
+        &mut self,
+        surface: &dyn Surface,
+        layout: &OwnedLayout,
+        dom: &D,
+        scale: f32,
+        held_elsewhere: &std::collections::HashSet<u64>,
     ) -> ProducerFrameStats {
         let mut stats = ProducerFrameStats::default();
         let renderer = surface.renderer();
@@ -175,7 +189,12 @@ impl ProducerRegistry {
             .entries
             .iter()
             .filter_map(|(&key, entry)| {
-                (entry.owner.is_some() && !nodes.contains_key(&key)).then_some(key)
+                // A key another window lays out is that window's producer,
+                // not an absent one.
+                (entry.owner.is_some()
+                    && !nodes.contains_key(&key)
+                    && !held_elsewhere.contains(&key))
+                .then_some(key)
             })
             .collect();
         for key in absent {

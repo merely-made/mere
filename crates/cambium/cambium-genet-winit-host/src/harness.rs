@@ -60,15 +60,7 @@ where
     Logic: FnMut(&State) -> V + 'static,
     V: RootView<State>,
 {
-    HostHooks {
-        frame: Box::new(|_| false),
-        after_dispatch: Box::new(|_| {}),
-        after_frame: Box::new(|_| {}),
-        after_wake: Box::new(|_| {}),
-        close_request: Box::new(|_, _| crate::CloseDisposition::Exit),
-        focused_text: Box::new(|_| None),
-        key_intercept: Box::new(|_, _| false),
-    }
+    HostHooks::inert()
 }
 
 impl<State, Logic, V> Harness<State, Logic, V>
@@ -659,7 +651,7 @@ where
         let dom = runner.dom();
         let dom_ref = dom.borrow();
         cambium_winit_a11y::project_tree(
-            &dom_ref,
+            &*dom_ref,
             layout,
             &mut core.s.shared.leaves,
             &mut core.s.shared.producers,
@@ -676,7 +668,11 @@ where
         };
         let dom = runner.dom();
         let dom_ref = dom.borrow();
-        cambium_rootstock::document_projection(&dom_ref, layout, core.s.last_focus)
+        cambium_rootstock::document_projection(
+            &cambium_rootstock::WindowDom::document(&dom_ref),
+            layout,
+            core.s.last_focus,
+        )
     }
 
     /// Answer the application's file requests with `files`, a test's own
@@ -730,7 +726,7 @@ where
         let dom = runner.dom();
         let dom_ref = dom.borrow();
         let (_, _, produced) = cambium_winit_a11y::project_tree_with_actions(
-            &dom_ref,
+            &*dom_ref,
             layout,
             &mut core.s.shared.leaves,
             &mut core.s.shared.producers,
@@ -767,7 +763,7 @@ where
         let (mut tree, _) = self.a11y_tree();
         let dom = self.runner().dom();
         let dom_ref = dom.borrow();
-        cambium_winit_a11y::scale_tree_to_window(&mut tree, &dom_ref, layout_scale);
+        cambium_winit_a11y::scale_tree_to_window(&mut tree, &*dom_ref, layout_scale);
         drop(dom_ref);
         tree
     }

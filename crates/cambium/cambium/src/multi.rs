@@ -340,6 +340,99 @@ where
         actions
     }
 
+    /// Every live projection, in insertion order.
+    pub fn projection_ids(&self) -> impl Iterator<Item = ProjectionId> + '_ {
+        self.projections
+            .iter()
+            .enumerate()
+            .filter_map(|(index, slot)| slot.as_ref().map(|_| ProjectionId(index)))
+    }
+
+    /// Dispatch an accessibility value to `target` in projection `id`'s
+    /// window, then rebuild every other projection.
+    pub fn dispatch_value(
+        &mut self,
+        id: ProjectionId,
+        target: NodeId,
+        event: crate::ValueEvent,
+    ) -> Vec<Action> {
+        let actions = {
+            let Self {
+                state, projections, ..
+            } = self;
+            let Some(Some(projection)) = projections.get_mut(id.0) else {
+                return Vec::new();
+            };
+            projection
+                .tree
+                .dispatch_value(&mut projection.logic, state, target, event)
+        };
+        self.rebuild_others(id);
+        actions
+    }
+
+    /// The file request a view in projection `id`'s window filed, if any.
+    pub fn take_file_request(&mut self, id: ProjectionId) -> Option<crate::FileRequest> {
+        self.projections
+            .get_mut(id.0)
+            .and_then(Option::as_mut)
+            .and_then(|projection| projection.tree.take_file_request())
+    }
+
+    /// Answer a file request in projection `id`'s window, then rebuild every
+    /// other projection.
+    pub fn dispatch_file(
+        &mut self,
+        id: ProjectionId,
+        target: NodeId,
+        event: crate::FileEvent,
+    ) -> Vec<Action> {
+        let actions = {
+            let Self {
+                state, projections, ..
+            } = self;
+            let Some(Some(projection)) = projections.get_mut(id.0) else {
+                return Vec::new();
+            };
+            projection
+                .tree
+                .dispatch_file(&mut projection.logic, state, target, event)
+        };
+        self.rebuild_others(id);
+        actions
+    }
+
+    /// Route a hover transition in projection `id`'s window, then rebuild
+    /// every other projection.
+    pub fn dispatch_hover(
+        &mut self,
+        id: ProjectionId,
+        target: NodeId,
+        event: crate::HoverEvent,
+    ) -> Vec<Action> {
+        let actions = {
+            let Self {
+                state, projections, ..
+            } = self;
+            let Some(Some(projection)) = projections.get_mut(id.0) else {
+                return Vec::new();
+            };
+            projection
+                .tree
+                .dispatch_hover(&mut projection.logic, state, target, event)
+        };
+        self.rebuild_others(id);
+        actions
+    }
+
+    /// Projection `id`'s focusable elements, in document order within its
+    /// window.
+    pub fn focusables(&self, id: ProjectionId) -> Vec<NodeId> {
+        self.projection(id)
+            .map(|p| p.tree.focusables())
+            .unwrap_or_default()
+    }
+
     /// Projection `id`'s document handle.
     pub fn dom(&self, id: ProjectionId) -> Option<DomHandle> {
         self.projection(id).map(|p| p.tree.dom())

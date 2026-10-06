@@ -243,13 +243,14 @@ where
                 view_state,
                 root,
                 dom,
+                mount,
                 ..
             } = self;
             let mut message = MessageCtx::new(path, DynMessage::new(event));
             let element = GenetElementMut {
                 node: &mut root.node,
                 dom: dom.clone(),
-                parent: Some(dom.borrow().document()),
+                parent: Some(*mount),
             };
             if let MessageResult::Action(action) =
                 view.message(view_state, &mut message, element, state)
@@ -375,6 +376,7 @@ where
                 view_state,
                 root,
                 dom,
+                mount,
                 ..
             } = self;
             for (path, event) in deliveries {
@@ -382,7 +384,7 @@ where
                 let mut_ref = GenetElementMut {
                     node: &mut root.node,
                     dom: dom.clone(),
-                    parent: Some(dom.borrow().document()),
+                    parent: Some(*mount),
                 };
                 if let MessageResult::Action(action) =
                     view.message(view_state, &mut msg, mut_ref, state)
@@ -466,6 +468,7 @@ where
                 view_state,
                 root,
                 dom,
+                mount,
                 ..
             } = self;
 
@@ -474,7 +477,7 @@ where
                 let mut_ref = GenetElementMut {
                     node: &mut root.node,
                     dom: dom.clone(),
-                    parent: Some(dom.borrow().document()),
+                    parent: Some(*mount),
                 };
                 // Handlers may mutate state in place (a rebuild below reflects
                 // that) and/or bubble an `Action` up to the root. A root-level
@@ -542,7 +545,7 @@ where
     pub(crate) fn focusables(&self) -> Vec<NodeId> {
         let dom = self.dom.borrow();
         let mut out = Vec::new();
-        collect_focusables(&dom, &self.ctx, dom.document(), &mut out);
+        collect_focusables(&dom, &self.ctx, self.mount, &mut out);
         out
     }
 
@@ -631,6 +634,7 @@ where
                     view_state,
                     root,
                     dom,
+                    mount,
                     ..
                 } = self;
 
@@ -639,7 +643,7 @@ where
                     let mut_ref = GenetElementMut {
                         node: &mut root.node,
                         dom: dom.clone(),
-                        parent: Some(dom.borrow().document()),
+                        parent: Some(*mount),
                     };
                     if let MessageResult::Action(a) =
                         view.message(view_state, &mut msg, mut_ref, state)
@@ -852,13 +856,14 @@ where
                 view_state,
                 root,
                 dom,
+                mount,
                 ..
             } = self;
             let mut message = MessageCtx::new(path, DynMessage::new(event.clone()));
             let element = GenetElementMut {
                 node: &mut root.node,
                 dom: dom.clone(),
-                parent: Some(dom.borrow().document()),
+                parent: Some(*mount),
             };
             if let MessageResult::Action(action) =
                 view.message(view_state, &mut message, element, state)
@@ -892,6 +897,7 @@ where
                 view_state,
                 root,
                 dom,
+                mount,
                 ..
             } = self;
             // Clone into the message: the handler mutates its clone's shared
@@ -900,7 +906,7 @@ where
             let mut_ref = GenetElementMut {
                 node: &mut root.node,
                 dom: dom.clone(),
-                parent: Some(dom.borrow().document()),
+                parent: Some(*mount),
             };
             if let MessageResult::Action(a) = view.message(view_state, &mut msg, mut_ref, state) {
                 actions.push(a);
@@ -937,13 +943,14 @@ where
                 view_state,
                 root,
                 dom,
+                mount,
                 ..
             } = self;
             let mut message = MessageCtx::new(path, DynMessage::new(event));
             let element = GenetElementMut {
                 node: &mut root.node,
                 dom: dom.clone(),
-                parent: Some(dom.borrow().document()),
+                parent: Some(*mount),
             };
             if let MessageResult::Action(action) =
                 view.message(view_state, &mut message, element, state)
@@ -1024,13 +1031,14 @@ where
                 view_state,
                 root,
                 dom,
+                mount,
                 ..
             } = self;
             let mut msg = MessageCtx::new(path, DynMessage::new(event.clone()));
             let mut_ref = GenetElementMut {
                 node: &mut root.node,
                 dom: dom.clone(),
-                parent: Some(dom.borrow().document()),
+                parent: Some(*mount),
             };
             if let MessageResult::Action(a) = view.message(view_state, &mut msg, mut_ref, state) {
                 actions.push(a);
