@@ -6,9 +6,9 @@ roster refinements R1 to R3), retired with it 2026-07-18 (`c5f01064`); surviving
 library parts: the `shellbar_edge` setting in
 `crates/system/pandect/src/settings_store.rs` with `ShellbarEdge` in
 `crates/system/pandect/src/application_settings_store.rs`, and R1's facets and
-R3's sections in `crates/mere/src/roster.rs`; open, with no current host: F2.3
-(the graph switcher, which is MG4 of the multi-graph activation plan, and the
-persona chip).
+R3's sections in `crates/mere/src/roster.rs`; open, with no current host:
+F2.3's persona chip. F2.3's graph-switcher half is MG4 of the multi-graph
+activation plan, which that plan records as done in meerkat on 2026-06-10.
 **Related**: [graph roster + frame taxonomy §4](../design/2026-06-07_graph_roster_and_frame_taxonomy.md#4-shellbar-2026-06-09), [frame tree plan](../../archive_docs/2026-06-09_completed_plans/2026-06-08_frame_tree_in_meerkat_plan.md), `crates/meerkat/` *(historical citation)* <!-- doc-audit: historical-path -->, `crates/system/pandect/src/settings_store.rs`
 
 Wire a docked chrome strip (the shellbar) that gives mouse users access to the
