@@ -31,8 +31,8 @@ use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 use personae::sealed_profile_storage::PASSPHRASE_ROOT_FILE;
 use personae::{
     CredentialLineage, Ed25519Keypair, IdentitySlot, IdentityStorage, IdentityVault,
-    PassphraseEncryptedStorage, Profile, ProfileId, ProtocolKey, SealedProfileStorage, SecretBytes,
-    UnlockMethod, UnlockTier,
+    PassphraseEncryptedStorage, Profile, ProfileId, ProtocolKey, SealedProfileStorage,
+    SealedRecordStorage, SecretBytes, UnlockMethod, UnlockTier,
 };
 use zeroize::Zeroizing;
 
@@ -268,7 +268,8 @@ static GLOBAL: Tracker = Tracker;
 
 // ─── Harness ──────────────────────────────────────────────────────────────
 
-fn plant(index: usize, bytes: &[u8], json: bool) {
+fn plant(index: usize, label: &'static str, bytes: &[u8], json: bool) {
+    LABELS.lock().unwrap()[index] = label;
     assert!(bytes.len() <= MAX_CANARY && bytes.len() >= WINDOW);
     let mut canary = Canary {
         bytes: [0; MAX_CANARY],
@@ -345,12 +346,8 @@ fn canary_bytes<const N: usize>(offset: usize) -> [u8; N] {
     out
 }
 
-const NAMES: [&str; MAX_CANARIES] = [
-    "master seed",
-    "slot payload",
-    "storage key",
-    "argon2 final block",
-];
+/// What each canary slot holds in the current scenario, for the report.
+static LABELS: std::sync::Mutex<[&str; MAX_CANARIES]> = std::sync::Mutex::new(["-"; MAX_CANARIES]);
 
 struct Report {
     failures: usize,
@@ -366,7 +363,7 @@ impl Report {
         self.failures += 1;
         println!("residue {scenario}: {} hit(s)", hits.len());
         let name = |p: usize| match p {
-            99 => "after drop",
+            99 => "end of scenario",
             UNTRACKED => "before arming",
             p => phases.get(p).copied().unwrap_or("?"),
         };
@@ -374,7 +371,7 @@ impl Report {
             println!(
                 "  {} {} ({}) in a {}-byte block, phase {} (allocated in {})",
                 if h.live { "live" } else { "freed uncleared" },
-                NAMES[h.canary],
+                LABELS.lock().unwrap()[h.canary],
                 if h.json { "decimal JSON" } else { "raw" },
                 h.size,
                 name(h.phase),
@@ -431,7 +428,7 @@ fn main() {
     let payload: [u8; 48] = canary_bytes(32);
 
     // Positive control: the instrument must see what it claims to see.
-    plant(0, &seed, true);
+    plant(0, "master seed", &seed, true);
     arm();
     phase(1);
     drop(std::hint::black_box(seed.to_vec()));
@@ -476,7 +473,7 @@ fn main() {
     );
     assert!(control, "the instrument failed its positive control");
 
-    plant(1, &payload, true);
+    plant(1, "slot payload", &payload, true);
 
     // SealedProfileStorage, the AutoOs desktop backend (fixed root here).
     let dir = tempfile::tempdir().unwrap();
@@ -500,6 +497,7 @@ fn main() {
 
     sealed_lock(&mut report, dir.path(), seed, &payload);
     passphrase_lock(&mut report, dir.path(), seed, &payload);
+    authoritative_lock(&mut report, dir.path());
 
     // The DPAPI-held AutoOs root, read back from disk.
     #[cfg(windows)]
@@ -510,7 +508,7 @@ fn main() {
                 .unwrap()
                 .unwrap(),
         );
-        plant(2, root.as_ref(), false);
+        plant(2, "DPAPI root", root.as_ref(), false);
         arm();
         phase(1);
         let again = Zeroizing::new(
@@ -548,7 +546,7 @@ fn sealed_lock(report: &mut Report, root: &std::path::Path, seed: [u8; 32], payl
     std::fs::create_dir_all(&dir).unwrap();
     let key: [u8; 32] = canary_bytes(96);
     personae::save_passphrase_root(dir.join(PASSPHRASE_ROOT_FILE), &key, b"lock").unwrap();
-    plant(2, &key, false);
+    plant(2, "sealed root key", &key, false);
     arm();
     phase(1);
     let storage = SealedProfileStorage::open_with_key(&dir, key);
@@ -598,8 +596,8 @@ fn passphrase_lock(report: &mut Report, root: &std::path::Path, seed: [u8; 32], 
         .flat_map(|word| word.to_le_bytes())
         .collect();
     drop(blocks);
-    plant(2, kek.as_ref(), false);
-    plant(3, &last, false);
+    plant(2, "passphrase KEK", kek.as_ref(), false);
+    plant(3, "argon2 final block", &last, false);
     arm();
     phase(1);
     let storage = PassphraseEncryptedStorage::open(&path, b"lock").unwrap();
@@ -648,6 +646,42 @@ fn passphrase_lock(report: &mut Report, root: &std::path::Path, seed: [u8; 32], 
         overflow,
     );
     drop(vault);
+    with_state(|s| {
+        s.canaries[2] = None;
+        s.canaries[3] = None;
+    });
+}
+
+/// Castellan's shape: an authoritative record store with its own
+/// freshness key (ruling 1). After a lock, neither key may stay live.
+fn authoritative_lock(report: &mut Report, root: &std::path::Path) {
+    let record_key: [u8; 32] = canary_bytes(128);
+    let freshness_key: [u8; 32] = canary_bytes(160);
+    plant(2, "record key", &record_key, false);
+    plant(3, "freshness key", &freshness_key, false);
+    arm();
+    phase(1);
+    let store = SealedRecordStorage::claim_with_file_freshness(
+        root.join("auth-records"),
+        record_key,
+        root.join("auth-freshness"),
+        freshness_key,
+    )
+    .unwrap();
+    let clone = store.clone();
+    store.save_record("item.json", &7u32).unwrap();
+    phase(2);
+    clone.lock();
+    let (hits, overflow) = disarm();
+    report.check(
+        "authoritative store locked",
+        &["setup", "claim and save", "lock"],
+        &hits,
+        overflow,
+    );
+    store.unlock(record_key, Some(freshness_key)).unwrap();
+    assert_eq!(store.load_record::<u32>("item.json").unwrap(), Some(7));
+    drop((store, clone));
     with_state(|s| {
         s.canaries[2] = None;
         s.canaries[3] = None;
