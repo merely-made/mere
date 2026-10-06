@@ -405,6 +405,9 @@ except the report's shape.
 ## Stop rules
 
 - No shared contract type, crate or view is extracted in this slice.
+  **Corrected 2026-10-06 (S14 pass):** these stop rules were written for
+  slice 1. Slice 2, planned above, extracted the shared contract as
+  `moot::coop` in its K1 (`4837248d`), so this first rule binds slice 1 only.
 - No change to Gemot semantics; both consumers use existing membership,
   delegation and revocation operations. In stickleback and Commons, only the
   changes this plan names: the group-key lane, `forget_epochs`, the exported
@@ -450,3 +453,10 @@ equal for the duplicate-replay check. `coop`'s own reference-driver test still
 declares `receipts_duplicate_replay: false` for Turnstone's profile; that is
 the store-free reference, not Turnstone's declaration, and is left for the
 next mere pass rather than a repin cascade of its own.
+
+## Progress
+
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_35_s14_phase_a1.md; the stop rules are scoped
+  to slice 1, since slice 2's K1 extracted `moot::coop`.
