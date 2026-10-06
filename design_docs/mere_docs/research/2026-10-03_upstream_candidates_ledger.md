@@ -1,12 +1,14 @@
 # Upstream Candidates Ledger
 
 **Date**: 2026-10-03
-**Status (2026-10-03)**: open; eight items, none raised. Kept by ruling 46 of
+**Status (2026-10-05)**: open; nine items, none raised. Kept by ruling 46 of
 the device pairing plan: noted for a later review, raised only after a
-release passes them by.
+release passes them by. Item 9 (argon2) comes from the vault lock plan's
+ruling 33.
 **Scope**: defects and rough edges found in the stack's fastest-moving
 dependencies (iroh and iroh-gossip, p2panda, and Burn's CubeCL) that the
 upstream projects may want to hear about, with what we carry meanwhile.
+Item 9 extends it to a security dependency, argon2 (vault lock ruling 33).
 
 **Related**:
 
@@ -14,6 +16,8 @@ upstream projects may want to hear about, with what we carry meanwhile.
   ruling 46, and the measurements behind items 1 to 6 (its §6).
 - [Burn 0.22 migration plan](../implementation_strategy/2026-08-09_burn_0_22_migration_plan.md):
   item 7 (its §13.3).
+- [vault lock plan](../../dramatis_docs/implementation_strategy/2026-10-05_vault_lock_plan.md):
+  item 9 (its ruling 33).
 
 ---
 
@@ -167,7 +171,25 @@ So, for each item:
   moves (pairing ruling 26 holds the diagnosis).
 - **Last checked:** `iroh-mdns-address-lookup` 0.6.0.
 
+### 9. argon2: working memory freed uncleared
+
+- **What happens:** `Argon2::hash_password_into` allocates the algorithm's
+  memory blocks (about 19 MiB at our parameters) and frees them without
+  clearing. In 0.5.3 the `Vec<Block>` drops uncleared even with the
+  `zeroize` feature (`src/lib.rs:229-232`); in 0.6.0-rc.8 `Blocks`'s `Drop`
+  deallocates without zeroizing (`src/block.rs:190-200`). The final blocks
+  suffice to recompute the derived key. Read in source, not measured.
+- **Why it matters to us:** the vault lock's passphrase unlock derives its
+  key through argon2, and a lock should leave no key material behind.
+- **What we carry:** vault lock ruling 33. We call argon2's own public
+  `hash_password_into_with_memory` with a buffer we zeroize, with argon2's
+  `zeroize` feature on. That is a public API, not a patch.
+- **Last checked:** argon2 0.5.3 (in the lock) and 0.6.0-rc.8.
+
 ## 3. Progress
 
 **2026-10-03.** Opened with items 1 to 8 from the pairing plan and the Burn
 plan. None raised.
+
+**2026-10-05.** Item 9 (argon2) added from the vault lock plan's ruling 33.
+Not raised.
