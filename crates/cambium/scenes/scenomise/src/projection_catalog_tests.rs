@@ -275,3 +275,29 @@ fn two_hosts_compile_one_recipe_to_one_score() {
     );
     assert_eq!(first.scene, second.scene);
 }
+
+/// A degenerate card is a typed issue (S32), and a usable one compiles (the
+/// control).
+#[test]
+fn a_degenerate_card_is_a_typed_issue() {
+    for (w, h) in [
+        (0.0, 0.0),
+        (164.0, 0.0),
+        (-1.0, 68.0),
+        (f32::NAN, 68.0),
+        (164.0, f32::INFINITY),
+    ] {
+        let issues = ProjectionCompiler::new(sizes(w, h))
+            .compile(&definition("grid", "x"), &dataset())
+            .unwrap_err();
+        assert!(
+            issues.iter().any(|issue| issue.field == "items.card"),
+            "{w} by {h}: {issues:?}"
+        );
+    }
+    assert!(
+        ProjectionCompiler::new(sizes(1.0, 1.0))
+            .compile(&definition("grid", "x"), &dataset())
+            .is_ok()
+    );
+}

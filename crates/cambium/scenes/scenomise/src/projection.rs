@@ -105,6 +105,7 @@ fn relationship_snapshot(
     limits: &RelationshipCompileLimits,
 ) -> Result<CompiledRelationshipProjection, Vec<CompileIssue>> {
     relationship_bounds(snapshot, disclosed, limits)?;
+    let card = card_issue(compiler.sizes);
     let mut issues = snapshot
         .validate()
         .err()
@@ -271,6 +272,7 @@ fn relationship_snapshot(
             "the saved selected relationship is absent from this source or excluded by the recipe",
         ));
     }
+    issues.extend(card);
     if !issues.is_empty() {
         return Err(issues);
     }
@@ -941,6 +943,19 @@ fn dense_rank_key(value: f64) -> u64 {
     if value == 0.0 { 0 } else { value.to_bits() }
 }
 
+/// A host's card must be a finite positive size on both sides (S32): a
+/// degenerate measure is reported, not laid out.
+fn card_issue(sizes: ItemSizes) -> Option<CompileIssue> {
+    let Size2 { w, h } = sizes.card;
+    let usable = |side: f32| side.is_finite() && side > 0.0;
+    (!(usable(w) && usable(h))).then(|| {
+        CompileIssue::new(
+            "items.card",
+            format!("the host's card must be a finite positive size; it was {w} by {h}"),
+        )
+    })
+}
+
 fn validation_issues(
     compiler: &ProjectionCompiler,
     definition: &ProjectionDefinition,
@@ -971,6 +986,7 @@ fn validation_issues(
         .into_iter()
         .map(|issue| CompileIssue::new(issue.field, issue.message))
         .collect();
+    issues.extend(card_issue(compiler.sizes));
 
     source_matches(&mut issues, definition, dataset);
     if definition.reading.value.is_some() {
