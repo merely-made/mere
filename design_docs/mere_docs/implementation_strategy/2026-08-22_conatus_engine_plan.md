@@ -167,6 +167,15 @@ warnings-denied checks pass. This proves a code boundary only. Nexus earns a
 backend seat later through an isolated lifecycle/query receipt and the exact
 host-device receipt; it does not inherit one from opacity alone.
 
+*Annotation, 2026-10-06, a tail taken from the archived spatial compute plan*
+(the S14 archive pass, recorded in `2026-07-03_archived_plan_tails_plan.md`, "2026-10-06
+archive pass"): **the Nexus adoption watch** is this plan's. The trigger is the
+tactile body count outgrowing CPU rapier. When a product's tactile body count
+meets that, Nexus's backend seat is reconsidered under the condition above:
+an isolated lifecycle and query receipt, plus the exact host-device receipt.
+Wing ruling 604 adds a requirement: any backend must keep G8's bit-for-bit
+replay across machines.
+
 Complete at Mere commit `339e8567`: six `conatus-voxel` tests, eighteen
 Conatus unit tests, the cross-package voxel-collider integration test, and
 warnings-denied Clippy passed.
