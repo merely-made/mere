@@ -1,12 +1,12 @@
 # Vault Lock Plan
 
 **Date**: 2026-10-05
-**Status (2026-10-05)**: all 16 forks and the follow-ups ruled (rulings 1
-to 24 in §3); the threat statement is still open. The djinn test harness it
-waited on (ruling 18) landed (`318b8f70`). L1 is under way on a lane branch:
-checkpoint A (residue fixes, the no-residue instrument, the caller map of
-ruling 23, a proposed lock API). Nothing merged. Chatelaine P4 (CXF import)
-waits on this plan (chatelaine rulings 64, 65).
+**Status (2026-10-05)**: rulings 1 to 36 in §3; the threat statement is
+still open. The djinn test harness it waited on (ruling 18) landed
+(`318b8f70`). L1's checkpoint A is built and verified on a lane branch
+(residue fixes, the no-residue instrument, the caller map); rulings 25 to
+36 settle the lock API, which is next. Nothing merged. Chatelaine P4 (CXF
+import) waits on this plan (chatelaine rulings 64, 65).
 **Scope**: the resident's secrets can be locked. While locked, no secret
 material can be reached through the vault or the resident's derived keys.
 Unlocking takes a user act. Every consumer (the SSH agent, castellan's item
@@ -369,6 +369,96 @@ Options: it stays and sync continues; it is dropped and sync pauses. Mark:
 **"Stays; sync continues (Recommended)"**. Follows: the transport key only
 identifies the device to peers and opens no secret.
 
+Rulings 25 to 36 were asked on 2026-10-05 from L1's checkpoint A (§6),
+after its claims were checked in code and its instrument rerun.
+
+**Ruling 25.** *Where does the locked state live? Dropping the profile is
+not a lock, because the storage keeps its own key and `switch_profile`
+reloads silently.* Options: the vault drops its profile and the storage
+drops its key, the storage trait gaining lock and unlock, so every record
+call fails closed while locked (only personae implements the trait, so no
+sibling breaks); the vault only, holding the storage optionally, with the
+caller handing it back at unlock and so carrying the whole ladder. Mark:
+**"Vault and storage both (Recommended)"**.
+
+**Ruling 26.** *What shape do the secret accessors (`current_profile`,
+`slot`) take while locked?* Options: `Result<_, Locked>`, as ruling 13
+reads (about 25 production call sites in mere, Turnstone and graphshell
+change); `Option`, which loses the reason; a guard
+(`vault.unlocked()?`), with fewer signatures changing downstream. Mark:
+**"Result<_, Locked> (Recommended)"**.
+
+**Ruling 27.** *No passphrase-wrapped root exists anywhere yet
+(`passphrase_root` has no caller), so a persisted lock with no Windows
+Hello and no enrolled passphrase could never be undone.* Options: `lock()`
+refuses unless at least one unlock method is available on the device; the
+first enabling of lock enrols a passphrase. Mark: **"Refuse lock without
+one (Recommended)"**.
+
+**Ruling 28.** *Where does the Windows Hello gate live? `windows` 0.62.2 is
+in the lock through djinn, and `UserConsentVerifier` needs only feature
+flags.* Options: personae, behind a feature, so only personae can mint the
+OS-presence token after Hello succeeds (one lock edge, no new package);
+djinn, which needs a public constructor for the token, so any caller could
+claim presence. Mark: **"In personae (Recommended)"**.
+
+**Ruling 29.** *How is "locked" reported?* Options: a new
+`IdentityError::Locked` variant, which breaks any exhaustive match (to be
+checked in the build); a separate error type. Mark: **"New IdentityError
+variant (Recommended)"**.
+
+**Ruling 30.** *Castellan hands a clone of `SealedRecordStorage` to every
+item store (`resident.rs:56`). Do the clones share one key cell?* Options:
+yes, so locking any copy locks every copy (a change to what `Clone` means
+there, documented); no, each holder locks its own. Mark: **"Yes, one shared
+cell (Recommended)"**.
+
+**Ruling 31.** *How does a lock reach the holders of vault-derived keys?*
+Options: synchronous holder hooks, so `lock()` returns only after every
+registered holder has dropped its keys, plus a `tokio` watch channel for
+observers (the UI, the status route); the watch channel alone, which
+leaves a window where castellan still holds its keys. Mark: **"Sync hooks +
+watch (Recommended)"**.
+
+**Ruling 32.** *Where is the persisted lock (ruling 5) checked at open?
+hocket reads the DPAPI root through `startup_unlock` directly.* Options:
+in `startup_unlock`'s root loaders, the one point hocket passes through
+(advisory against same-user processes, which can read the DPAPI file
+anyway; the threat statement says so); in `bootstrap` and `roster` only,
+which hocket bypasses. Mark: **"In startup_unlock's loaders
+(Recommended)"**.
+
+**Ruling 33.** *argon2 0.5.3 frees its ~19 MiB of working memory uncleared
+after deriving the passphrase key; the final blocks suffice to recompute
+it (read in source, not measured).* Options: call argon2's own
+`hash_password_into_with_memory` with a buffer we zeroize, enabling its
+`zeroize` feature (a feature edge), and ledger the gap; ledger only. Mark:
+**"Public API + ledger (Recommended)"**. Follows: upstream candidates
+ledger item 9; argon2 0.6.0-rc.8 does not clear the memory either.
+
+**Ruling 34.** *The lane's `zeroizing_json` (a serializer that sizes its
+output first so nothing reallocates, and a serde visitor that clears each
+buffer it outgrows) removes the residue serde_json's reallocation leaves.
+It is memory hygiene, not crypto, and its bytes equal serde_json's.*
+Options: keep it, guarded by the leak test and the equality test; drop it
+and record the gap; keep it and ledger it. Mark: **"Keep it
+(Recommended)"**.
+
+**Ruling 35.** *Turnstone falls back to an unsealed seed or a
+process-local key when its vault will not open (`identity.rs:125-135`), so
+under a persisted lock it would quietly start as a different identity.*
+Options: tell "locked" from "unavailable" and, while locked, run with the
+identity pending and never use the fallback (kept for a missing vault);
+keep the fallback and record that a lock re-roots Turnstone. Mark: **"Wait
+for unlock (Recommended)"**.
+
+**Ruling 36.** *Ruling 23 named Turnstone, Knot and the graphshell app; the
+caller map also found hocket and woodshed, which open the storage or the
+root directly. Should a live lock reach them?* Options: the same as ruling
+23 (the resident's broadcast and the persisted lock), widening the work
+into those repos; the persisted lock only, refusing their next open, with
+the gap recorded. Mark: **"Same as ruling 23 (Recommended)"**.
+
 Still open: a threat statement naming hibernation and the pagefile.
 
 ## 4. Phases
@@ -426,6 +516,20 @@ and 23 through ssh-agent-lib; Secret Service 0.2's lock and Prompt
 semantics; `zeroize` and `secrecy`, both in the lock; and the OS session,
 power and presence APIs.
 
+**2026-10-05, from L1's checkpoint A.**
+- Zeroizing the structs alone left residue. `serde_json::to_vec` and
+  serde's `Vec<u8>` visitor grow by reallocating, and each reallocation
+  freed an uncleared copy (ruling 34 keeps the lane's fix).
+- For L2: serde_json's scratch buffer for strings with escapes is also
+  freed uncleared, which matters for castellan items holding secret strings.
+- The instrument sees the heap only. Stack copies (moves of `[u8; 32]`, a
+  documented `zeroize` limit) and DPAPI's `LocalAlloc` buffer are fixed by
+  reading, not measured.
+- argon2's working memory is freed uncleared in 0.5.3 and 0.6.0-rc.8
+  (ruling 33).
+- The persisted lock is advisory against same-user processes, which can
+  read the DPAPI root file; this belongs in the threat statement.
+
 ## 6. Progress
 
 **2026-10-05.** Assessed by a read-only lane (Opus); the load-bearing claims
@@ -442,3 +546,38 @@ order is met. An Opus lane builds L1 up to checkpoint A:
 
 It stops there; the API's choices come to Mark as forks before the
 breaking change is built, Knot first.
+
+**2026-10-05, L1 checkpoint A reached** (Opus lane, branch
+`worktree-agent-a014d67042870a2b4`, base `24bfe7be`, not merged):
+- `fea481a3` adds the no-residue instrument
+  (`crates/dramatis/personae/tests/no_residue.rs`). It is a test-only
+  tracking allocator with three canaries: the master seed, a slot payload,
+  and a DPAPI root in a temp dir. It is red on purpose at that commit.
+- `ffd3279b` adds the residue fixes:
+  - `PlaintextProfile` and `PlaintextSlot` zeroize on drop, and
+    `plaintext_to_slot` moves instead of cloning;
+  - a crate-private `zeroizing_json`;
+  - the passphrase storage's decrypted plaintext is `Zeroizing` at load,
+    list and open;
+  - the DPAPI buffer is cleared before `LocalFree`;
+  - the agent's listing no longer copies the seed.
+  No public API changed and the lock file is unchanged.
+- **Verified in `mere-verify`:**
+  - at `fea481a3` the instrument fails: the positive control finds what it
+    should, then sealed storage shows 12 hits, passphrase storage 20 and
+    the DPAPI root 1;
+  - at `ffd3279b` all four scenarios are clean;
+  - personae with all features passes 174 + 7 + 1, castellan 107 + 3 + 4
+    + 1.
+- **The caller map (ruling 23):**
+  - mere: personae's agent, castellan's authority, Distillery's transport
+    identity, djinn's resident (which opens the vault a second time for the
+    Distillery lane), and graphshell's `GraphshellIdentity`.
+  - Turnstone: `identity.rs`, with the fallback hazard of ruling 35.
+  - hocket and woodshed reach the storage or the DPAPI root directly
+    (ruling 36).
+  - Knot has no production use of `IdentityVault`; its seed comes through
+    pandect's wallet (ruling 15).
+  - mer3ly, retinue, cleromancy and isometry are unaffected.
+- The lane proposed the lock API; rulings 25 to 36 settle its forks. Next:
+  L1's breaking change on the same branch, then L2.
