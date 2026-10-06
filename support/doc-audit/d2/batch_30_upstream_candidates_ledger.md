@@ -19,7 +19,7 @@ This batch exists because the document is new.
 ## mere_docs/research/2026-10-03_upstream_candidates_ledger.md
 
 - disposition: current
-- status line: "Status (2026-10-03): open; eight items, none raised. Kept by ruling 46 of the device pairing plan: noted for a later review, raised only after a release passes them by." — accurate: yes
+- status line: "Status (2026-10-05): open; nine items, none raised. Kept by ruling 46 of the device pairing plan: noted for a later review, raised only after a release passes them by. Item 9 (argon2) comes from the vault lock plan's ruling 33." — accurate: yes
 - claims checked: 12 — holds: 11, stale: 0, unverifiable: 1
 
 ### Stale claims

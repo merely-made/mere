@@ -724,6 +724,20 @@ The done-conditions handed over for S3 and S4, kept for reference:
   works in `projection_compile`. Second pass (F8 to F11), rulings S7 to S10:
   the README fixed (S7), TERMINOLOGY gains pandect under Eidetic and the
   curation record (S8, S10), S9 sent to the identity lane.
+- **2026-10-05.** The S14 pass begun (S33), at audit base `26060e88`.
+  Assessment: 337 active documents, 155 of them plans (81 whose status claims
+  landed or done, 21 in progress, 13 planned, 36 otherwise worded, 4 with no
+  status line); D2 judgment coverage 316 of 337, the 21 without a record all
+  added by other lanes since 2026-09-05; three active receipts share the
+  basename `RECEIPT.md`, which the judgment audit rejects. The pass runs in
+  three phases: A, a D2 record for each of the 21; B, the 155 plans' status
+  lines and done-claims re-judged against the tree, most records dating from
+  the early-September snapshot; C, corrections as dated annotations with a
+  remediation receipt, after the 2026-09-06 one. Read-only subagents (opus)
+  draft the records in batches; every stale claim they report is re-checked
+  here before a document changes. *Reading, not ruled*: archive moves for
+  plans found complete (DOC_POLICY §8) and renaming the three receipts go to
+  Mark as forks rather than being made here.
 - **2026-10-05.** Round 12: S32 (a degenerate card is a typed compile issue)
   and S33 (the S14 pass next).
 - **2026-10-05.** P2 landed on main at `40d7ae5e`, by S27's one merge: main
