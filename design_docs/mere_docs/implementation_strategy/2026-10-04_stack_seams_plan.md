@@ -202,8 +202,8 @@ in two or more crates.
   measures each recipe's widest occurrence label in its own font plus button
   padding and hands that to the `ProjectionCompiler`, with retention
   validation's nominal size, the measuring path and the padding to come back
-  to him as forks. Not found in mere's documents at `7abbb416`; the lane's
-  record holds it. That lane also notes P1 moves Knot's spacing whatever card
+  to him as forks; recorded in the burn plan's §13.46 ("Knot's card size under
+  P1", `7d6dc003`). That lane also notes P1 moves Knot's spacing whatever card
   is chosen (card plus gap, where a fixed 184 by 84 cell was), and that Knot is
   the first host to measure its card rather than declare it.
 - **F16 (2026-10-05, P2 stage 1's control). wgpu's device equality cannot tell
