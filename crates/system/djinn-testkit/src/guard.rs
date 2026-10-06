@@ -132,7 +132,10 @@ impl Guard {
         for (name, value) in env {
             if FORBIDDEN.contains(&name.as_str()) {
                 let owned = name == "DBUS_SESSION_BUS_ADDRESS" && self.owned_buses.contains(value);
-                if !owned {
+                // An SSH client may name this run's own agent endpoint, and
+                // nothing else (the lock's agent receipts, harness H4).
+                let own_agent = name == "SSH_AUTH_SOCK" && self.endpoint(name, value).is_ok();
+                if !owned && !own_agent {
                     return refuse(format!("{name} would reach the user's own state"));
                 }
             }
@@ -371,5 +374,25 @@ mod tests {
                 .check(SpawnKind::Resident, &good(&dir), &args, &none)
                 .is_err()
         );
+    }
+
+    /// An SSH client may reach this run's agent endpoint, and only that:
+    /// the standard agent and any other path are refused.
+    #[test]
+    fn ssh_auth_sock_is_only_ever_this_runs_agent() {
+        let dir = std::env::temp_dir().join("djinn-testkit-guard");
+        let guard = guard(&dir);
+        let none = BTreeSet::new();
+        let with = |value: &str| {
+            let mut env = good(&dir);
+            env.insert("SSH_AUTH_SOCK".into(), value.into());
+            guard.check(SpawnKind::Command, &env, &[], &none)
+        };
+        with(&endpoint(&dir, "agent")).unwrap();
+        for standard in crate::walls::standard_endpoints() {
+            assert!(with(&standard).is_err(), "{standard}");
+        }
+        assert!(with("agent.sock").is_err());
+        assert!(with(r"\\.\pipe\someone-elses-agent").is_err());
     }
 }

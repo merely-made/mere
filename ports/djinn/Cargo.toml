@@ -72,6 +72,9 @@ scenotime.workspace = true
 serde = { version = "1", features = ["derive"] }
 serde_json.workspace = true
 rcgen = "0.13.2"
+# `--enroll-passphrase` reads the passphrase from the terminal, never the
+# environment (vault lock rulings 7 and 39). Already in the lock (minisign).
+rpassword = "7.5"
 rustls = { version = "0.23", default-features = false, features = ["ring", "std", "tls12"] }
 tokio-rustls = { version = "0.26", default-features = false, features = ["ring", "tls12"] }
 gemini-protocol = { version = "=0.1.7", features = ["server"] }

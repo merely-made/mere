@@ -4490,6 +4490,7 @@ dependencies = [
  "personae",
  "rand_core 0.6.4",
  "rcgen 0.13.2",
+ "rpassword",
  "rustls",
  "safetensors 0.4.5",
  "sceno",
