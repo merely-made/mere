@@ -2796,3 +2796,32 @@ binning are the useful patterns.
   control timing out); the law receipts, slow, the main page's Speed select
   and the 2,000-node settle were green. It is rerun with a calm wait before
   each scenario, recorded when it lands.
+- 2026-10-06 (seiche's speed, the merge candidate's calm round, branch
+  `seiche-speed`, per "Merge at the checkpoint" and "Ask sessions to pause").
+  Main `75e13d8d` (Burn/CubeCL pre.4) merged at `2b6d620e` and main `4714489f`
+  (G9, stack seams P1 and S32) at `e491e539`: three files and then eleven
+  changed on both sides, every weave result identical to `git merge-file`'s,
+  no conflicts, main's root lock kept exactly. The gitignored web lock started
+  from the pre.4 lane's (`f8eab000`) and took three dependency edges to
+  packages already in it, cambium-rootstock, chirograph and sceno (`cargo
+  metadata --offline`; now `fd064e9b`). Merged, main's G9 test called
+  `RemoteBoard::sync` with the three arguments it took before this branch's
+  "The viewer's own dial"; it passes real time now (`aad08332`, test-only, the
+  bundle unchanged). Gates: seiche 129/129 (123 without actor, 129 + 3 with
+  gpu), pictograph 310, graphshell `web` 246, mere and graphshell checked
+  clean. The round was first run with the machine loaded (66 to 100% CPU, up
+  to 13 other lanes' rustc): its 16 law and fixture passes and Density's
+  control's miss at rank 0.08 were set aside. Calm (no other lane's rustc or
+  cargo at Normal priority or above and the CPU under 50% for two samples 15 s
+  apart, a bounded wait before every row, rows whose wait ran out rerun), on
+  bundle `aa9d30b9`: all 24 rows green, the CPU at each row's start 18 to 65%.
+  The eleven law receipts, profiles, add, drag, Density, Density's control
+  (rank -0.029, as in earlier calm rounds: the 0.08 was the load), the framing
+  control; slow; fast at Max (worst admitted frame 133 us under); the planted
+  control failing the bound for its planted reason (11 frames past the grain,
+  the worst 9,367 us, the 10 ms stall's signature); the 50x control; both
+  Speed select receipts; the 2,000-node GPU settle at 1x (413 of 418 device
+  steps). The fast receipt then ran 12 more times, calm or passing under load:
+  12 of 12 green, the worst admitted frame 233 us under to 67 us over its
+  budget, none past the grain, so the one 567 us miss did not recur and the
+  200 us margin stands.
