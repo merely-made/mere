@@ -382,6 +382,10 @@ impl TreeLane {
                 "remote-physics-law",
                 self.shared.canvas.borrow().physics_law().id(),
             )
+            .with_field(
+                "remote-physics-speed",
+                crate::web_speed::field(remote.board.speed()),
+            )
             .with_field("remote-energy", format!("{:.1}", board.energy()))
             .with_field(
                 "remote-gap",
@@ -547,6 +551,7 @@ impl Product for TreeLane {
             });
         let step = canvas.elapsed_step_report().unwrap_or_default();
         let snapshot = self.remote_fields(ctx, self.physics_fields(ctx, ProbeSnapshot::default()));
+        let snapshot = super::speed::fields(snapshot, &canvas, &self.shared);
         let snapshot = snapshot
             .with_field("physics-steps", step.steps.to_string())
             .with_field(
@@ -748,6 +753,24 @@ impl Product for TreeLane {
                     lane.mismatched,
                     lane.last_age,
                 ));
+                Ok(())
+            },
+            // `log-pace <label>`: the speed dial's budget and every
+            // window's worst frame into the receipt.
+            "log-pace" => {
+                let line = super::speed::pace_line(
+                    rest.trim(),
+                    &self.shared.canvas.borrow(),
+                    &self.shared,
+                );
+                self.shared.physics_log.borrow_mut().push(line);
+                Ok(())
+            },
+            // `log-intervals <label>`: the frame intervals the display
+            // period is read from, into the receipt.
+            "log-intervals" => {
+                let line = super::speed::intervals_line(rest.trim(), &self.shared);
+                self.shared.physics_log.borrow_mut().push(line);
                 Ok(())
             },
             // `set-zoom <z>`: the zoom exactly, about the canvas centre.

@@ -45,6 +45,7 @@ mod scope_and_cartography;
 mod score_and_physics;
 mod selection;
 mod sizing;
+mod speed;
 
 fn first_edge_cell_between(
     canvas: &Canvas,

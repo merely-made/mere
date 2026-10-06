@@ -220,6 +220,9 @@ fn actor_elapsed_calls_only_drain_and_send_no_commands() {
         energy: 0.0,
         speed: 0.0,
         command_epoch: 0,
+        dial: crate::Speed::REAL_TIME,
+        budget: None,
+        pace: crate::PaceStats::default(),
     });
     let mut sim = Simulation::new();
     let node = NodeKey::new(0);
@@ -231,6 +234,7 @@ fn actor_elapsed_calls_only_drain_and_send_no_commands() {
             snapshot: sim.snapshot(1),
             settling: false,
             command_epoch: 0,
+            pace: crate::PaceStats::default(),
         })
         .unwrap();
     for _ in 0..3 {

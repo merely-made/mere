@@ -142,6 +142,21 @@ impl PhysicsBoard {
         }
     }
 
+    /// Set the board's simulation speed (see [`seiche::Speed`]).
+    pub fn set_speed(&mut self, speed: seiche::Speed) {
+        self.physics.set_speed(speed);
+    }
+
+    /// Bound a frame's ticks above real time (see [`seiche::StepBudget`]).
+    pub fn set_step_budget(&mut self, budget: Option<seiche::StepBudget>) {
+        self.physics.set_step_budget(budget);
+    }
+
+    /// Ticks run, the effective speed reached, and whether the budget bound.
+    pub fn pace(&self) -> seiche::PaceStats {
+        self.physics.pace()
+    }
+
     /// Move the board's simulation onto an actor thread (native hosts; a
     /// no-op once offloaded). `wake` pokes the host's event loop.
     pub fn offload(&mut self, wake: armillary::Wake) {

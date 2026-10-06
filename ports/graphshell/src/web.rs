@@ -29,6 +29,7 @@ mod web_practice;
 mod web_remote;
 mod web_rtc_link;
 mod web_scenario;
+mod web_speed;
 mod web_timing;
 mod web_tree;
 mod web_view;
@@ -146,6 +147,10 @@ struct BrowserHost {
     /// `layout_stats` is a pairwise pass over every node; recompute it only
     /// on motion, one frame past rest, and on a chrome change.
     layout_stats_stale: bool,
+    /// The speed reached, shown under the speed select while the layout moves.
+    reached_note: web_speed::ReachedNote,
+    /// The step budget, a share of the measured frame interval.
+    frame_budget: web_speed::FrameBudget,
     layout_moved: bool,
     layout_stats: mere::canvas::LayoutStats,
     /// Screen px where the last `drag-focused` released, for `data-drag-return`.
@@ -362,6 +367,8 @@ impl BrowserHost {
             physics_law,
             physics_paused,
             remote_cards,
+            remote_speed: (self.active == ActiveSession::Remote && self.remote_mounted().is_some())
+                .then(|| web_speed::board_line(self.remote_board.speed())),
             action_draft: self.form().draft.as_ref().map(ActionDraft::semantics),
         };
         if let Some(live) = &self.live_projection {
@@ -412,6 +419,11 @@ impl BrowserHost {
             return Ok(());
         }
         self.advance_arrangement_transition(host_ms);
+        // The step budget is a share of the display's period, read from the
+        // frames' intervals (ruled 2026-10-04, "Infer the period").
+        let budget = self.frame_budget.frame(host_ms);
+        self.canvas.set_physics_step_budget(Some(budget));
+        self.remote_board.set_step_budget(Some(budget));
         if self.chrome_dirty {
             // A host command can move bodies without a settle.
             self.layout_stats_stale = true;
@@ -1815,6 +1827,9 @@ async fn run(root_element: Element) -> Result<(), String> {
         None => app.host.graph().clone(),
     };
     let mut graph_canvas = web_graphs::prepared_canvas(canvas_graph, width, height);
+    let speed_options = web_speed::options()?;
+    let frame_budget = web_speed::frame_budget(speed_options);
+    web_speed::apply(&mut graph_canvas, speed_options, &frame_budget);
     let physics_paused = graph_canvas.physics_paused();
     graph_canvas.select_by_url(FIXTURE_WEB_ADDRESS);
     let primary_member = graph_canvas.focused_member();
@@ -1849,6 +1864,7 @@ async fn run(root_element: Element) -> Result<(), String> {
         physics_law: mere::canvas::PhysicsLaw::Springs.label().to_string(),
         physics_paused,
         remote_cards: Vec::new(),
+        remote_speed: None,
         action_draft: None,
     };
     // The chrome's font. A browser has no system fonts for fontique to find,
@@ -1864,6 +1880,8 @@ async fn run(root_element: Element) -> Result<(), String> {
         remote: RemoteLink::Fixture(remote),
         remote_board: RemoteBoard::new(),
         layout_stats_stale: true,
+        reached_note: web_speed::ReachedNote::default(),
+        frame_budget,
         layout_moved: false,
         layout_stats: mere::canvas::LayoutStats::default(),
         drag_drop: None,
