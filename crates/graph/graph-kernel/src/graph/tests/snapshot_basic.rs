@@ -41,7 +41,7 @@ fn assert_semantic_predicate_creates_open_predicate_edge() {
     let key = graph
         .assert_semantic_predicate(a, b, "https://schema.org/citation".to_string())
         .expect("edge created");
-    let payload = graph.get_edge(key).expect("payload");
+    let payload = graph.get_relation(key).expect("payload");
     // Carries no sub-kinds, yet still reports the Semantic family.
     assert!(payload.has_relation(RelationSelector::Family(EdgeFamily::Semantic)));
     assert!(!payload.is_empty());

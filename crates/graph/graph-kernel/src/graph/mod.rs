@@ -73,6 +73,7 @@ pub mod merge;
 pub mod node;
 pub mod node_facets;
 pub mod node_props;
+mod relation_read;
 pub mod resource;
 /// Reverting one change: undo's edits and the parts it keeps (reservoir plan V2).
 pub mod revert;
@@ -98,7 +99,10 @@ mod field_ops;
 // the rkyv `with = ...` archive helpers are crate-internal and used
 // only by struct field annotations in this file.
 pub(crate) use identity::UuidAsBytes;
-pub use identity::{EdgeKey, GraphDirection, GraphIndex, GraphViewId, NodeKey, SurfaceNodeKey};
+pub use identity::{
+    EdgeKey, GraphDirection, GraphIndex, GraphViewId, NodeKey, RelationKey, ResourceEdgeKey,
+    SurfaceNodeKey,
+};
 
 // Node + NodeLifecycle extracted to `node.rs` per the same
 // decomposition target. Re-exported so `kernel::graph::Node`

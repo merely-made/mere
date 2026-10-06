@@ -43,6 +43,9 @@ use serde_json::{Map, Value, json};
 use std::collections::BTreeMap;
 use time::{OffsetDateTime, format_description::well_known::Rfc3339};
 
+#[cfg(test)]
+mod reifier;
+
 /// JSON-LD ingest (Phase 2): `application/ld+json` → a graph contribution.
 pub mod ingest;
 
@@ -840,7 +843,7 @@ mod tests {
             )
             .expect("edge");
         graph
-            .get_edge_mut(e)
+            .get_relation_mut(e)
             .expect("payload")
             .set_semantic_predicate(Some("https://schema.org/citation".to_string()));
 

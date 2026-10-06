@@ -153,7 +153,7 @@ fn new_engine_version_updates_its_assertion_and_other_author_stays_separate() {
         graph.assert_semantic_statement(from, to, spec()).unwrap()
     });
     assert_ne!(first.statement_id, second.statement_id);
-    let other_before = graph.get_edge(edge).unwrap().semantic_statements()[1].clone();
+    let other_before = graph.get_relation(edge).unwrap().semantic_statements()[1].clone();
     let (_, updated) = graph.write_as(Author::engine("extractor", "2"), |graph| {
         graph
             .assert_semantic_statement(
@@ -169,7 +169,7 @@ fn new_engine_version_updates_its_assertion_and_other_author_stays_separate() {
     });
     assert_eq!(first.statement_id, updated.statement_id);
     assert!(updated.changed);
-    let statements = graph.get_edge(edge).unwrap().semantic_statements();
+    let statements = graph.get_relation(edge).unwrap().semantic_statements();
     assert_eq!(statements.len(), 2);
     assert_eq!(statements[0].asserted_at_ms, Some(200));
     assert_eq!(statements[1], other_before);
@@ -236,7 +236,7 @@ fn writer_scope_restores_after_nested_returns_and_panic() {
     let (from, to) = pair(&mut graph);
     let (edge, _) = graph.assert_semantic_statement(from, to, spec()).unwrap();
     assert_eq!(
-        graph.get_edge(edge).unwrap().semantic_statements()[0].provenance_iri,
+        graph.get_relation(edge).unwrap().semantic_statements()[0].provenance_iri,
         Some(original.asserter_iri()),
         "a real write after the panic uses the restored author"
     );

@@ -1,7 +1,7 @@
 # Graph semantics plan: assertions, resources, saved queries, residency
 
 **Date:** 2026-10-04
-**Status (2026-10-05):** in progress. P1 implemented and gated on
+**Status (2026-10-06):** in progress. P1 implemented and gated on
 `graph-semantics`, with the ruling-9 exact-journal and legacy-checkpoint
 attribution repair complete after the original `459cad84` receipt. Those
 receipts covered IRI-safe handles; C19 now exposes an opaque-id reifier gap.
@@ -19,7 +19,11 @@ resource storage, captures and undo pass the full kernel gate; the prepared
 Turnstone consumer patch passes its bounded source gate. Mark accepted C13–C17 recommendations with "go ahead?" (rulings 26–30).
 The independent composition/export, exact vocabulary identity, checked load
 and borrowed query-adapter checkpoint passes its gates. Production predicate
-routing is held at C18; C19 holds the newly exposed RDF handle encoding choice.
+routing remains incomplete. C18/C19 option 1 is accepted (rulings 31–32).
+Typed edge handles and projection readers are implemented; their checkpoint
+gates pass (Graphshell serial; initial parallel carrier timeout recorded).
+The reversible codec is independently tested, with
+production RDF integration held at C20's malformed encoded-ID policy.
 Resource population and conflict migration remain incomplete.
 Replay-first migration and per-predicate placement govern P2. The committed
 identity/lifecycle slice and recreation repair pass their gates; P2 is incomplete.
@@ -1155,6 +1159,77 @@ be opened as a new session with its exact resources, assertions and bindings;
 resource-empty legacy imports remain supported. Tests guard both refusals with
 those positive controls. This guard is not a resource merge implementation.
 
+### Typed edge handle implementation findings (2026-10-06)
+
+`ResourceEdgeKey` is an opaque wrapper with crate-private raw access;
+`RelationKey` names its owning stratum (`crates/graph/graph-kernel/src/graph/identity.rs`).
+Mixed assertion writers and `GraphDeltaResult::EdgeAdded` now return that
+outer key; their current writes are explicitly tagged Surface. Surface
+`EdgeKey`, `get_edge` and `find_edge_key` remain surface-only.
+
+The new `graph/relation_read.rs` in that crate dispatches `get_relation` to
+one owning store and exposes typed resource edges and projected directed
+pair/incoming/outgoing iterators. They preserve parallel edges and lift
+resource links through explicit shown-resource associations without mirrored
+surface payloads. Kernel display roles now read that projection. This seam
+does not populate resources, route predicates or implement resource retractions.
+
+Three invariant tests cover both stores at raw index 0 with distinct content,
+an absent resource index beside a present surface control, parallel/reverse
+edges, self-loops, binding fanout/unbinding and projected display alongside
+the old surface display. A compile-fail doctest guards ResourceEdgeKey passed
+to the surface getter. Existing assertion tests retain their invariants while
+reading mixed-return keys with `get_relation`. The first full test compile
+caught one additional query fixture passing a mixed key to `get_edge`; it
+was corrected to `get_relation` without weakening its row assertions.
+
+Read-only caller review found zero production result inspectors outside kernel
+apply, six external semantic writer sites discarding their results, and no
+new handle consumers in Turnstone's earlier 142-file inventory. Remaining
+semantic mutation readers stay on their current surface path until predicate
+routing and exact resource retraction are implemented. The governed placement
+table has 44 closed kinds, 32 resource and 12 surface. No new routing choice
+is implied by this sequencing; P2 routing is already authorized.
+
+### Malformed encoded assertion IDs checkpoint C20 (2026-10-06)
+
+Ruling 32 chooses reversible encoding for unsafe String handles. The authored
+codec (`crates/graph/linked-data/src/reifier.rs`) uses
+`urn:mere:statement-id:v1:` with lowercase hexadecimal UTF-8 bytes,
+disjoint from the legacy namespace. Three valid RDF reifier IRIs illustrate
+invalid encoded payloads: suffix `0` (odd length), `gg` (nonhex), and `ff`
+(invalid UTF-8). None can recover the original String handle.
+
+Existing ingest recognizes only the legacy prefix and treats other reifiers
+as foreign (`crates/graph/linked-data/src/ingest.rs` 559–562): no carried id,
+but label/source/time survive. The apply path mints a new assertion handle
+(`crates/graph/linked-data/src/ingest/apply.rs` 145–158). Owning the new format
+requires a choice about malformed input; unrelated foreign reifiers remain
+unchanged in both options.
+
+1. **Reject malformed recognized IDs (recommended).** Return an ingest error
+   for invalid hex or UTF-8 under the exact reserved v1 namespace. No partial
+   contribution is returned and the caller can retain/review the input.
+   Adds a restriction only to malformed reserved-format input.
+2. **Treat as foreign.** Preserve label/source/time but mint a new assertion
+   id, matching prior external-input behavior. The inability to recover the
+   claimed carried identity becomes an intentional fallback.
+
+Unknown namespaces/versions continue through the existing foreign path.
+C20 has been put to Mark; ingest policy wiring waits for the answer. Helper
+and typed edge work can be verified independently. No policy is selected here.
+
+Executed control: a temporary test fed all three malformed v1 names through
+the unchanged ingest path. Each returned one edge, no carried statement id,
+author `https://probe.test/author` and time 42. All three metadata controls
+passed alongside the codec's valid/legacy round-trip controls: four tests
+passed (three permanent helper tests and the one probe). Removed the probe
+and its backup after exact helper restoration, SHA256
+`2afdf5ea4bbc805586aaccc23ce4736b8ac3a49cbd0ed0daa5e71bfd525abc97` before
+formatting. The codec remains test-only; production export/ingest retain
+their original behavior while C20 is pending. This does not repair or qualify
+the arbitrary-handle dataset/reingest path yet.
+
 ## 3. Rulings
 
 Mark's answers, from multiple-choice rounds; each is the option label quoted
@@ -1450,6 +1525,19 @@ namespace. Page canonicalization must not collapse distinct concepts.
 error, and preserve rkyv's existing generic error bounds. Invalid resource
 columns do not silently lose claims; legacy surface compatibility remains.
 
+**Ruling 31 (C18, 2026-10-06).** Mark: **"Yep. Proceed."** in response
+to C18 option 1 and C19 option 1. Keep surface `EdgeKey`, `get_edge` and
+`find_edge_key`; add opaque `ResourceEdgeKey` and
+`RelationKey::{Surface, Resource}` for mixed assertion writers/results,
+with explicit owning-store readers and resource/projected relation iterators.
+Independent resource indices must never be implicitly read as surface keys.
+
+**Ruling 32 (C19, 2026-10-06).** The same answer selects option 1:
+preserve valid legacy statement reifier IRIs; reversibly encode unsafe
+caller-selected handles under a distinct versioned namespace outside
+`urn:mere:statement:` and decode both formats. Existing valid output stays
+stable; arbitrary kernel String handles retain their identity and metadata.
+
 ## 4. Phases
 
 ### Placement by stratum (rulings 10, 14, 15)
@@ -1592,15 +1680,66 @@ comes back to Mark as a fork, with evidence, before the code commits to one.
   Implementation and gates are in progress; the dated Findings retain the
   evidence and alternatives.
 
-- **C18 (P2). Edge handle ownership.** Open: independently allocated
-  resource/surface indices collide. The dated Findings above give the executed
-  probe, caller counts and three API options. Production routing stops here.
+- **C18 (P2). Edge handle ownership.** Ruled: option 1, ruling 31.
+  The dated Findings retain the probe, caller counts and alternatives.
 
-- **C19 (P1/P2). Opaque assertion reifier ids.** Open: valid kernel handles
-  can lose RDF reifiers and carried metadata. The dated Findings give the
-  executed positive/negative probe and three encoding/error choices.
+- **C19 (P1/P2). Opaque assertion reifier ids.** Ruled: option 1, ruling 32.
+  The dated Findings retain the positive/negative probe and alternatives.
+
+- **C20 (P1/P2). Malformed encoded assertion IDs.** Open: reserved-format
+  invalid hex/UTF-8 may error or follow foreign-id fallback. Evidence and
+  two options are recorded above; dependent ingest integration waits.
 
 ## 6. Progress
+
+- **2026-10-06. C18/C19 continuation authorized.** Mark accepted option 1
+  for both with "Yep. Proceed." Branch state is clean at `3536e074` before
+  edits. Kernel handle and linked-data encoding work are delegated within
+  the existing graph-semantics worktree; parent owns caller review and docs.
+  Main integration, dependency changes and sibling edits remain outside
+  this continuation. P2 is incomplete; final gates remain pending.
+
+- **2026-10-06. C18 checkpoint qualified; stopped at C20.** Added opaque
+  resource edge keys, stratum-bearing mixed results, owning-store readers,
+  projected directed pair/adjacency reads and resource-aware display roles.
+  Three runtime tests and one compile-fail guard cover the ownership and
+  projection invariants with same-run positive controls. Mixed-return test
+  callers use the typed reader; an initial query test compile mismatch was
+  corrected without changing its assertions. Production predicate routing,
+  resource retractions and migration remain incomplete.
+
+  C19's independent test-only codec preserves valid legacy IRIs and exactly
+  encodes unsafe handles in a disjoint versioned namespace. Three tests cover
+  empty/Unicode legacy handles, unsafe bytes, namespace lookalikes and
+  malformed/foreign distinctions. Production emission and ingest remain
+  unchanged pending C20; the general arbitrary-handle RDF round-trip gate
+  is still open. The temporary three-input C20 probe and backup were removed.
+
+  Final gates, offline/locked, one Cargo job in the shared Mere target:
+  kernel with `store` **365 passed**, one doc example ignored and the new
+  compile-fail doctest passed; linked-data/query **47 passed**; Pandect
+  **313 passed**; Pictograph/canvas **293 passed**, 13 ignored;
+  Graphshell/personal-sync **331 library plus five integration tests passed**,
+  four ignored, with `--test-threads=1`; workspace check and wasm32 kernel
+  check **exit 0**. The initial default-parallel Graphshell run was
+  **330 passed / one failed / four ignored**: the unchanged
+  `p2panda_murm_grant_is_refused_before_projection_bytes` timed out accepting
+  its projection at `ports/graphshell/src/carrier.rs` 678. The carrier-filtered
+  rerun passed **14 tests**, including real acceptance/refusal controls; the
+  full serial run then passed unchanged. No timeout or carrier code changed.
+  Contention is a possible explanation, not established by a baseline probe;
+  no renewed default-parallel pass is claimed.
+
+  Touched-file rustfmt/diff checks pass. Final documentation audit and its
+  planted-defect/clean-fixture self-test pass; audit buckets remain equal to
+  HEAD baseline in the same environment. No new active doc or D2 record.
+  Separate Eidetic tests, ignored tests, full sibling builds and
+  headed/browser/physical proofs were not run. Main's graph plan still last
+  changed at `62219dd1`; this lane changes neither main nor sibling sources,
+  dependencies, lockfile, source pins or capture grammar. No download, extra
+  target, Cargo home or worktree was created. Keep the existing worktree and
+  branch for unfinished P2 and Mark's review, and the shared stable Mere target
+  for reusable builds/receipts. C20 awaits Mark; P3–P5 remain unbegun.
 
 - **2026-10-04.** Plan written; questions grounded (§2); round 1 ruled
   (rulings 1 to 4); round 2 ruled (rulings 5 to 8, ruling 6 after a comparison

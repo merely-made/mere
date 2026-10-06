@@ -9,8 +9,8 @@ use euclid::default::Point2D;
 use uuid::Uuid;
 
 use super::{
-    Coupling, CouplingId, EdgeAssertion, EdgeKey, Field, FieldId, FrameLayoutHint, Graph,
-    NavigationTrigger, NodeKey, RelationSelector, SemanticSubKind,
+    Coupling, CouplingId, EdgeAssertion, Field, FieldId, FrameLayoutHint, Graph, NavigationTrigger,
+    NodeKey, RelationKey, RelationSelector, SemanticSubKind,
     capture::{
         CapturedDelta, coupling_from_persisted, field_from_persisted,
         persisted_coupling_from_coupling, persisted_field_from_field,
@@ -478,7 +478,7 @@ pub enum GraphDelta {
 pub enum GraphDeltaResult {
     NodeAdded(NodeKey),
     NodeMaybeAdded(Option<NodeKey>),
-    EdgeAdded(Option<EdgeKey>),
+    EdgeAdded(Option<RelationKey>),
     NodeRemoved(bool),
     EdgesRemoved(usize),
     TraversalAppended(bool),
@@ -1877,7 +1877,7 @@ pub fn assert_relation(
     from: NodeKey,
     to: NodeKey,
     assertion: EdgeAssertion,
-) -> Option<EdgeKey> {
+) -> Option<RelationKey> {
     let asserter_iri = graph.write_author().asserter_iri();
     match apply_graph_delta(
         graph,
@@ -1901,7 +1901,7 @@ pub fn assert_semantic_relation_in_scope(
     sub_kind: SemanticSubKind,
     label: Option<String>,
     graph_scope: GraphScope,
-) -> Option<EdgeKey> {
+) -> Option<RelationKey> {
     graph.assert_semantic_relation_in_scope(from, to, sub_kind, label, graph_scope)
 }
 
@@ -1912,7 +1912,7 @@ pub fn assert_semantic_predicate_in_scope(
     to: NodeKey,
     predicate: String,
     graph_scope: GraphScope,
-) -> Option<EdgeKey> {
+) -> Option<RelationKey> {
     graph.assert_semantic_predicate_in_scope(from, to, predicate, graph_scope)
 }
 

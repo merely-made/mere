@@ -910,7 +910,7 @@ mod row_family_parity_tests {
         assert!(g.append_traversal(hub, mixed, NavigationTrigger::Back, Some(2)));
 
         // The open-predicate edge yields exactly one OpenPredicate row.
-        let open_rows = relation_rows(hub, open, g.get_edge(open_key).unwrap());
+        let open_rows = relation_rows(hub, open, g.get_relation(open_key).unwrap());
         assert_eq!(
             open_rows.iter().map(|r| r.kind).collect::<Vec<_>>(),
             vec![RelationKind::OpenPredicate]
