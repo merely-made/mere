@@ -10,16 +10,17 @@ true when it was written, and the boundary plan reclassed it as application
 composition, which is Mere's. Nothing about what it owns changed.
 
 **Date**: 2026-08-31
-**Status:** W5 opened (2026-09-04) — Turnstone's panes become tiles, ruled by
-Mark; S1 and S2 are committed in this Mere snapshot; S3 remains Turnstone's
-pin/adoption work. W1 through W4 are implemented and landed through
-coordinated Genet, Mere, and product branches. W4 has captured native Pelt
-acceptance and cancellation receipts, a headed Graphshell browser
-save/mutate/reload receipt, and a durable Woodshed open-lane consumer with full
-view and host receipts.
-The temporary `genet-host-api::tile` compatibility module is now removed.
-Pinned products that still need their own current-Genet port retain that work
-outside the shared component contract.
+**Status (2026-10-06):** W1 through W4 landed through coordinated Genet, Mere
+and product branches (W4 closed on Genet `main` 2026-09-02), and the temporary
+`genet-host-api::tile` compatibility module is removed. W5 opened 2026-09-04,
+ruled by Mark (Turnstone's panes become tiles): S1 landed in Mere as
+`701072ed`, S2 as `dc5ff2b0`, `f0c7966b` and `9408681b`. S3 is Turnstone's:
+its pin is satisfied (Turnstone pins `workbench` at Mere `bd5912fb`, which
+contains `9408681b`), and its adoption (Turnstone's A4/S3) has not started.
+Open: S3's adoption, and the follow-ups owed after S2 (Pelt onto the shared bar
+names, retiring the `frisket-*` aliases and `TabBarNames`). Pinned products
+that still need their own current-Genet port retain that work outside the
+shared component contract.
 
 ## Ruling
 
@@ -328,6 +329,11 @@ finding: mere has no `rustfmt.toml`, so `cargo fmt` strips the `},`
 match-arm commas cambium inherited from genet — a formatter run in this
 crate now churns twenty-five files, and which style wins is Mark's call.
 
+**Corrected 2026-10-06 (S14 pass):** the rustfmt finding is resolved.
+`3575a1af` (2026-09-04, "Adopt the canonical rustfmt policy") added the root
+`rustfmt.toml`, the family-wide policy with `match_block_trailing_comma =
+true`, which is Genet's style.
+
 **S3. Turnstone's panes ride the tree.** (Owned by
 `turnstone/design_docs/2026-08-08_pane_registry_and_graph_panes_plan.md`,
 A4 as revised 2026-09-04; summarized here so the two halves read as one.)
@@ -358,6 +364,13 @@ git revision. This snapshot already contains S1/S2; S3 starts when Turnstone
 adopts a Mere revision containing them. Turnstone's current pin and adoption
 are not verifiable from this repository, so they remain an external consumer
 gate. The `physics catalog` P4 native-drag half waits on that same adoption.
+
+**Corrected 2026-10-06 (S14 pass):** the pin half of this gate is met.
+Turnstone pins `workbench` at Mere `bd5912fb` (turnstone `Cargo.toml:229`),
+and S2c's `9408681b` is an ancestor of `bd5912fb`. The adoption half has not
+started: Turnstone's sources have no `workbench::Workspace` or
+`cambium::workspace` use, and its `panes/legacy_bridge.rs` and the
+`SpaceBlueprint` references remain.
 
 ## Progress
 
@@ -557,3 +570,9 @@ gate. The `physics catalog` P4 native-drag half waits on that same adoption.
   and therefore satisfies the explicit pre-P2 prerequisite in the platform
   boundary and repository topology plan. These follow-ups do not touch that
   plan's four P1 mixed seams.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_47_s14_phase_b9.md: S1 and S2 recorded as landed
+  with their commits, S3's pin recorded as satisfied (`bd5912fb` contains
+  `9408681b`) with its adoption not started, and the rustfmt finding marked
+  resolved by `3575a1af`.
