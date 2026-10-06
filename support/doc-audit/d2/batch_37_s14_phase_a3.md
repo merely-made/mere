@@ -3,11 +3,11 @@
 | doc | disposition | status accurate | claims | holds | stale | unverifiable |
 |---|---|---:|---:|---:|---:|---:|
 | mere_docs/testing/receipts/2026-09-08_stack_pillar_probes/arena/R2_A_RECEIPT.md | current | n/a | 21 | 21 | 0 | 0 |
-| mere_docs/testing/receipts/2026-09-08_stack_pillar_probes/custody-backend/RECEIPT.md | current | n/a | 18 | 17 | 0 | 1 |
+| mere_docs/testing/receipts/2026-09-08_stack_pillar_probes/custody-backend/2026-09-08_custody_backend_receipt.md | current | n/a | 18 | 17 | 0 | 1 |
 | mere_docs/testing/receipts/2026-09-08_stack_pillar_probes/execution/R1_EXECUTION_RECEIPT.md | current | n/a | 16 | 13 | 1 | 2 |
 | mere_docs/testing/receipts/2026-09-08_stack_pillar_probes/identity/R2_B_C_RECEIPT.md | current | n/a | 23 | 21 | 0 | 2 |
-| mere_docs/testing/receipts/2026-09-09_s10_custody_transact/RECEIPT.md | current | n/a | 28 | 22 | 3 | 3 |
-| mere_docs/testing/receipts/2026-09-20_resource_resolution_probes/RECEIPT.md | current | n/a | 32 | 31 | 0 | 1 |
+| mere_docs/testing/receipts/2026-09-09_s10_custody_transact_receipt.md | current | n/a | 28 | 22 | 3 | 3 |
+| mere_docs/testing/receipts/2026-09-20_resource_resolution_probes/2026-09-20_resource_resolution_receipt.md | current | n/a | 32 | 31 | 0 | 1 |
 | nematic_docs/implementation_strategy/2026-09-15_micron_navigation_plan.md | current | no | 58 | 51 | 5 | 2 |
 | **Totals** |  |  | **196** | **176** | **9** | **11** |
 
@@ -65,7 +65,7 @@ churn loop; the baseline run (exit 101, 5 passed, 2 failed, 551.69 s), the
 fence-disabled run (4 passed, 3 failed, 75.20 s) and the retention candidate
 (exit 0, 7 passed, 43.73 s). Genet later fixed the defect in `ec5421b7591`.
 
-## mere_docs/testing/receipts/2026-09-08_stack_pillar_probes/custody-backend/RECEIPT.md
+## mere_docs/testing/receipts/2026-09-08_stack_pillar_probes/custody-backend/2026-09-08_custody_backend_receipt.md
 
 - disposition: current
 - status line: "" — accurate: n/a
@@ -77,7 +77,7 @@ fence-disabled run (4 passed, 3 failed, 75.20 s) and the retention candidate
 
 ### Contradictions
 
-- The S10 receipt (`2026-09-09_s10_custody_transact/RECEIPT.md`, lines 6-9)
+- The S10 receipt (`2026-09-09_s10_custody_transact_receipt.md`, lines 6-9)
   says it supersedes this probe for the production-boundary question; this
   receipt has no pointer forward.
 - The transactional conditional API this receipt says product work needs
@@ -161,7 +161,7 @@ broken controls mapped to a named test, the tombstone-to-live direction
 through the same `move_ref` path. Unverifiable: two concurrent working-tree
 remarks.
 
-## mere_docs/testing/receipts/2026-09-09_s10_custody_transact/RECEIPT.md
+## mere_docs/testing/receipts/2026-09-09_s10_custody_transact_receipt.md
 
 - disposition: current
 - status line: "" — accurate: n/a
@@ -205,7 +205,7 @@ main without a `transact` call; the scratch report leaving the cross-process
 question open. Unverifiable: the worktree and branch (both gone), the
 runtime transcript and the command table.
 
-## mere_docs/testing/receipts/2026-09-20_resource_resolution_probes/RECEIPT.md
+## mere_docs/testing/receipts/2026-09-20_resource_resolution_probes/2026-09-20_resource_resolution_receipt.md
 
 - disposition: current
 - status line: "" — accurate: n/a
