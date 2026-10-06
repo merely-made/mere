@@ -41,6 +41,13 @@ The model asserts:
    while no callback is registered and demonstrates that callback-only logic
    sleeps with runnable work. The recheck sees the changed revision and returns
    `drive-now`.
+
+   **Corrected 2026-10-06 (S14 pass):** this negative control cannot fail.
+   `r1_drive_wake_model.ps1` sets `$callbackRegistered = $false` just before
+   the completion, so `$missedCallback` is true by construction and the
+   assertion's callback-only half is never exercised. The callback-only case is
+   asserted by construction, not demonstrated; that was so from the start, not
+   drift.
 4. Navigation cancellation plus a session generation refuses an old
    completion. A current completion is accepted once; its duplicate is
    refused.
