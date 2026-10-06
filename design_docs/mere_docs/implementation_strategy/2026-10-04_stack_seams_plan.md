@@ -860,6 +860,27 @@ The done-conditions handed over for S3 and S4, kept for reference:
   works in `projection_compile`. Second pass (F8 to F11), rulings S7 to S10:
   the README fixed (S7), TERMINOLOGY gains pandect under Eidetic and the
   curation record (S8, S10), S9 sent to the identity lane.
+- **2026-10-06.** The S14 pass, phase B done: batches 39 to 51 re-judge
+  all 145 plans at `535bca11`, superseding their earlier records (S34). 1,656
+  claims checked: 1,190 hold, 408 stale, 58 unverifiable; 241 contradictions;
+  85 status lines wrong (59%). Dispositions: 82 current, 34
+  historical-marked, 25 historical-unmarked, 4 superseded. Every batch was
+  drafted by one read-only subagent and checked by a second; across thirteen
+  verifications none refuted a record outright, three refuted single items
+  (Graphshell's face picker, athanor's image GC, a surviving
+  `is_surface_engine`), and each found about six items true only in part, all
+  applied. The largest causes: meerkat's removal (`c5f01064`), the 2026-09-23
+  folds, and status lines never updated after Progress moved. The judgment
+  audit's one error is another lane's new balaur review brief (`ed8b67e8`),
+  committed without a record. Phase C assessed: 166 documents carry
+  recommended actions (92 wrong status lines, 440 stale claims); about 67
+  are archive candidates under S36; DOC_README has dozens of stale entries
+  and 10 orphans; the doc audit reports 14 resolved annotations; about 33
+  documents carry the dead `crates/graph/subgraph` banner; and 27 of the 166
+  were touched by other lanes since 2026-09-29, about a dozen of them heavily
+  (physics catalog, dynamics grammar, burn, the one-tree plan, vault lock,
+  device pairing, chatelaine, projection grammar). How phase C runs goes to
+  Mark.
 - **2026-10-06.** Round 15: S42 (`reference-data` is the lexical plan's
   L2), S43 (the lattice pass continues), S44 (all three `sha2` 0.10 pins
   repinned, as a follow-on) and S45 (headers re-run and gated, as a
