@@ -408,6 +408,11 @@ preference as the user's offset on it.
   figure isometry ships is Mark's call, recorded in the isometry plan.
   Seam gap recorded: `AppCtx` exposes no laid-out geometry, so a self-test
   cannot print an element's painted edge; the harness can.
+  **Corrected 2026-10-06 (S14 pass):** Z5 is committed: Isometry `7a468533`
+  (2026-09-03, "Move the desktop host onto the shared Cambium host") adds
+  `isometry/crates/isometry-genet/src/host_zoom.rs`. Isometry's `DESIGN_SIZE`
+  is still `(1100, 820)`, and its migration plan leaves the 820-versus-1040
+  figure as Mark's call.
 - **2026-09-03, Z4's zoom-1.0 claim receipted against a clean HEAD.** The
   host smoke scenario was run in a throwaway worktree at `8c1e324` (HEAD,
   none of today's uncommitted genet work) and in the working tree at zoom
@@ -487,3 +492,6 @@ preference as the user's offset on it.
   10`. This proves the X11 property path under Xwayland, including the
   non-unit-zoom arithmetic. It is not a native Xorg receipt. The temporary
   worktree was removed after the query.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at mere
+  535bca11, from the D2 record in support/doc-audit/d2/batch_45_s14_phase_b7.md.
+  The Z5 entry's "uncommitted" is annotated with Isometry `7a468533`.

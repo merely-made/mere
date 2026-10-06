@@ -57,7 +57,7 @@ impl core::fmt::Display for AutotuneLogContext {
             match event {
                 AutotuneLogEvent::TuningStep(step, duration) => {
                     write!(f, "\n - Tuning: {step} (compilation & bench: {duration:?})")?
-                }
+                },
                 AutotuneLogEvent::ShortCircuit(name) => write!(
                     f,
                     "\nShort circuiting autotune. {name} is close enough to peak throughput."
@@ -263,7 +263,7 @@ fn write_log<K: AutotuneKey>(
                 "Fastest result {}-{key}. Top 3 times: {top_times:?}{context_str}",
                 fastest.name,
             ));
-        }
+        },
         AutotuneLogLevel::Full => {
             let mut context_str = String::new();
             if let Some(ctx) = log_context {
@@ -287,11 +287,11 @@ fn write_log<K: AutotuneKey>(
                 match &result.outcome {
                     Ok(val) => {
                         logger.log_autotune(&format!("{val}"));
-                    }
+                    },
                     Err(err) => logger.log_autotune(&format!("{err}")),
                 }
             }
-        }
-        AutotuneLogLevel::Disabled => {}
+        },
+        AutotuneLogLevel::Disabled => {},
     }
 }

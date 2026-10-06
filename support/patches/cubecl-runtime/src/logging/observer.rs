@@ -329,7 +329,7 @@ pub(crate) fn read_and_notify_timed(
             "Skipped timing a launch of `{kernel}` for its observer: \
              the profiled window carried no measurement"
         ),
-        (Some(_), None) => {}
+        (Some(_), None) => {},
     }
 
     ProfileDuration::new(alloc::boxed::Box::pin(async move { ticks }), method)
@@ -386,7 +386,7 @@ pub(crate) fn notify_profiled(kernel: &'static str, profile: ProfileDuration) {
             TimingRequest::Deferred => {
                 observer.profiled(kernel, profile);
                 return;
-            }
+            },
             // Asked for no timing between the launch being bracketed and this
             // call — an observation that ended underneath it, or one answering
             // differently at two moments, which `TimingRequest` forbids. Said
@@ -404,7 +404,7 @@ pub(crate) fn notify_profiled(kernel: &'static str, profile: ProfileDuration) {
                     );
                 }
                 return;
-            }
+            },
             TimingRequest::Resolved => (Arc::clone(observer), profile),
         }
     };

@@ -43,11 +43,18 @@ agent walk the graph halo by halo and then watch its attention move down the pag
   semantic state Apparatus and the a11y projection consume. The agent tracks what it is
   looking at already, so emitting its focus is surfacing a field it already holds, not new
   instrumentation.
+  **Corrected 2026-10-06 (S14 pass):** no longer built: the harness went with meerkat
+  (retired 2026-07-18, `c5f01064`), and `AgentObservation` has no hits in mere or
+  Turnstone. No live agent-focus source is named in the tree, so build-path step 1's
+  "plus the harness today" no longer holds.
 - **A document is already a tree of focusable elements (built).** The a11y projection turns
   a rendered document into a semantic element tree (sections, divs), and the
   [find overlay](../../../crates/meerkat/src/find.rs) *(historical citation)* <!-- doc-audit: historical-link --> already highlights document regions
   at their rects. So "highlight the section an operator is on" reuses the rect-highlight
   path with a different target and colour.
+  **Corrected 2026-10-06 (S14 pass):** no find overlay exists in mere now, so the
+  rect-highlight path this bullet and build-path step 2 reuse is gone. The a11y
+  projection survives in Turnstone (`turnstone/src/a11y.rs`).
 - **Node colours + selection rings + per-pane focus (built).** The visual vocabulary
   (identity colour per node, selection ring, a focus node per pane) is there.
 
@@ -59,6 +66,14 @@ operator's focus does. The web-clip inspector (planned, the
 on a live scrying tile via `elementFromPoint`, capture its HTML subtree, crop its rect,
 `build_clip_knot`, assert `ProvenanceSubKind::ClippedFrom`) **is the element-highlight UI**.
 So three features share one element-targeting primitive:
+
+**Corrected 2026-10-06 (S14 pass):** the inspector's building blocks now exist in
+`crates/import/src/web_clip.rs`: `web_clip_script` with an `elementFromPoint` picker
+(`:63`, `:94`), `ClipRect` (`:33`), `write_clip_node` writing a `ClippedFrom` edge
+(`:293`, `:346`), and a call to `build_clip_knot` (`:465`). No host calls the picker or
+`write_clip_node`; Turnstone uses only the text-fragment half
+(`turnstone/src/knot_authoring.rs:364`, `:375`), and the hover-pick inspector itself is
+unbuilt.
 
 > a focusable **target** (a graph node, or a document element) + its **rect / position** +
 > a **coloured highlight**, with the **source** being your cursor, an agent's
@@ -156,6 +171,14 @@ scrying / verso-scry live-tile element primitives, node colours + selection ring
 into-node element-highlight wiring; the web-clip element inspector (planned, not built);
 and remote presence, which waits on the co-op browsing lane.
 
+**Corrected 2026-10-06 (S14 pass):** of the "built / named" list, the `agent_harness`
+focus source and the find overlay are gone (see the corrections above), and there is no
+verso-scry: the live-tile primitive is `crates/inker/engines/scrying-engine` alone. Still
+built: the cartography `Overlay` channel (`ClusterHalo`, `BridgeEmphasis`, with a minimap
+consumer), the a11y projection (in Turnstone) and `ProvenanceSubKind::ClippedFrom`. Of the
+gap, the web-clip inspector's building blocks exist in `crates/import` (see the
+correction under the web-clip section); the inspector UI is still unbuilt.
+
 ## Open questions
 
 - **Multiple operators on one node:** stacked / concentric rings vs a blended colour.
@@ -179,3 +202,10 @@ and remote presence, which waits on the co-op browsing lane.
   Biscuit later), and whether it is per-role (a `moderator` cap bundle) or per-grant.
 - **Agent-actions-in-record:** the default (private) and whether a moot may require agent
   transparency as a charter condition of entry for agents acting in the space.
+
+## Progress
+
+- **2026-10-06 (S14 pass).** Claims corrected against the tree at mere 535bca11, from the D2
+  record in support/doc-audit/d2/batch_48_s14_phase_b10.md (the status line held): the
+  meerkat harness focus source, the find overlay and verso-scry marked gone, and the
+  web-clip building blocks in `crates/import` recorded.

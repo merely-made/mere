@@ -1,6 +1,12 @@
 # Orrery Browser Lane Plan (capture-first)
 
-**Status:** planning / design 2026-06-24. **Supersedes** the node-representation and
+**Status (2026-10-06):** superseded 2026-07-27 by the
+[Graphshell reference host plan](2026-07-27_graphshell_reference_host_plan.md) (the banner
+below); evidence only. The v1 extension shipped as Graphshell H5
+(`ports/graphshell/web/extension/`, receipt
+`ports/graphshell/docs/2026-07-28_h5a_browser_storage_capture_core_receipt.md`).
+
+Drafted 2026-06-24 as planning / design. **Supersedes** the node-representation and
 delivery framing of the
 [browser_extension_companion_plan](2026-06-23_browser_extension_companion_plan.md):
 its "orrery-in-a-tab live DOM cards" P1 is replaced here by **capture-first,
@@ -194,3 +200,10 @@ Nova/Boa, the companion (deferred with sync).
   [node-body/face](2026-06-23_node_body_face_model_plan.md),
   [document-script substrate](../../archive_docs/2026-07-03_completed_plans/2026-06-21_document_script_substrate_plan.md)
   (the reused pieces).
+
+## Progress
+
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at mere 535bca11,
+  from the D2 record in support/doc-audit/d2/batch_48_s14_phase_b10.md: the 2026-07-27
+  supersession folded into the Status line, with the v1 extension's Graphshell H5 home
+  named.

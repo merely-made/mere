@@ -9,7 +9,9 @@ rust-version = "1.92.0"
 description = "The composed graph library behind Turnstone and other graph-shaped applications."
 
 [features]
-default = ["graph", "linked-data", "canvas", "workbench"]
+default = ["graph", "linked-data", "canvas", "workbench", "image-decode"]
+# Forwards genet-livery's image decoding (mer3ly Ruling 111); on by default.
+image-decode = ["pictograph?/image-decode"]
 # The portable Mere graph/domain surface. This is deliberately smaller than
 # the composed desktop facade so browser hosts can take graph truth without
 # presentation or host-workbench dependencies.

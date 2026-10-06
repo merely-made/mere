@@ -10,9 +10,11 @@ use std::pin::Pin;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 
+use burn::backend::Backend;
 use burn::tensor::Device;
 use burn_wgpu::{Wgpu, WgpuDevice};
 use cubecl::wgpu::WgpuDeviceKind;
+use distillery::mesh_host::{HostConfig, ManualClock, MeshHost, ObservedConditions, Step};
 use distillery::{
     BURN_REMOTE_RESOURCE, BlobCustody, Distillery, RemoteSessionService, RemoteSessionSettings,
     RetentionSettings,
@@ -25,7 +27,6 @@ use mesh::{
     LeaseTerms, MESH_AUTHOR_SALT, MemoryBlobSpace, MeshEvent, MeshStore, ReclaimReason,
     RemoteSessionClaim, ResourceId, ResourceRegistry, SyncedMesh,
 };
-use distillery::mesh_host::{HostConfig, ManualClock, MeshHost, ObservedConditions, Step};
 use muniment::MemoryBackend;
 use serde::Serialize;
 use serde_json::{Value, json};
@@ -90,7 +91,10 @@ struct AllocatorSnapshot {
 
 impl AllocatorSnapshot {
     fn capture(device: &WgpuDevice) -> Result<Self, String> {
-        let usage = cubecl::Device::from(device.clone()).client().memory_usage();
+        let usage = cubecl::Device::from(device.clone())
+            .client()
+            .memory_report(cubecl::MemoryScope::Device)
+            .usage();
         Ok(Self {
             number_allocs: usage.number_allocs,
             bytes_in_use: usage.bytes_in_use,
@@ -359,7 +363,7 @@ async fn remote_provider(
     poster_key: &identity::Ed25519Keypair,
     run: &ActiveRun,
     model_dir: &Path,
-) -> Result<(Arc<BertEmbeddingProvider>, f64), String> {
+) -> Result<(Arc<BertEmbeddingProvider>, f64, Device), String> {
     let credential = RemoteSessionClaim::signed(
         poster_key,
         MESH,
@@ -380,13 +384,20 @@ async fn remote_provider(
         .endpoint_addr()
         .await
         .map_err(|error| error.to_string())?;
-    let device = Device::remote_iroh_authorized(&endpoint, server_addr, 0, credential);
+    let host = burn::remote::RemoteHost::iroh(
+        burn::remote::IrohHost::new(server_addr).with_endpoint(endpoint),
+    )
+    .with_credential(credential);
+    let device = Device::remote_options(&host)
+        .init()
+        .map_err(|error| error.to_string())?;
     let started = Instant::now();
-    let provider = BertEmbeddingProvider::load(model_dir, device)
+    let provider = BertEmbeddingProvider::load(model_dir, device.clone())
         .map_err(|error| format!("load remote provider: {error}"))?;
     Ok((
         Arc::new(provider),
         started.elapsed().as_secs_f64() * 1_000.0,
+        device,
     ))
 }
 
@@ -665,7 +676,7 @@ async fn run_remote(
     let first_run = await_run(&mut works, &service, job, 0).await?;
     report_stage("first-lease-active");
 
-    let (remote, remote_load_ms) = remote_provider(
+    let (remote, remote_load_ms, _) = remote_provider(
         &client_transport,
         &server_transport,
         &service,
@@ -746,7 +757,7 @@ async fn run_remote(
     if recovery_run.lease == first_run.lease {
         return Err("recovery reused the reclaimed lease".into());
     }
-    let (recovered, recovery_load_ms) = remote_provider(
+    let (recovered, recovery_load_ms, _) = remote_provider(
         &client_transport,
         &server_transport,
         &service,
@@ -800,7 +811,7 @@ async fn run_remote(
     conditions.set(DeviceConditions::spare());
     let kept_job = post_job(&works, &poster_key, &request, 2).await?;
     let kept_run = await_run(&mut works, &service, kept_job, 0).await?;
-    let (kept, kept_load_ms) = remote_provider(
+    let (kept, kept_load_ms, kept_device) = remote_provider(
         &client_transport,
         &server_transport,
         &service,
@@ -815,8 +826,14 @@ async fn run_remote(
         .map_err(|error| error.to_string())?;
     let kept_numerical = numerical_receipt(&kept_output, &native_output)?;
     report_stage("kept-lease-executed");
-    // Settle the device before taking the kept lease's baseline. Only the baseline gets this
-    // help; the close under test below is observed without any fixture-side wait.
+    // Readback completion can precede the remote client's queued tensor deregistrations.
+    // Flush the remote FIFO before settling GPU memory, so the baseline contains the model's
+    // retained tensors rather than inference temporaries. Only this baseline gets fixture-side
+    // cleanup; the close under test below is observed without any fixture-side sync or cleanup.
+    kept_device
+        .sync()
+        .map_err(|error| format!("kept remote baseline barrier failed: {error:?}"))?;
+    <Wgpu as Backend>::memory_cleanup(&cubecl::Device::from(server_device.clone()));
     cubecl::Device::from(server_device.clone())
         .client()
         .sync()
@@ -831,7 +848,7 @@ async fn run_remote(
 
     let closed_job = post_job(&works, &poster_key, &request, 3).await?;
     let closed_run = await_run(&mut works, &service, closed_job, 0).await?;
-    let (closed, closed_load_ms) = remote_provider(
+    let (closed, closed_load_ms, _) = remote_provider(
         &client_transport,
         &server_transport,
         &service,
@@ -954,7 +971,7 @@ async fn run_remote(
                 "server_peer": server_endpoint.id().to_string(),
                 "client_peer": client_endpoint.id().to_string(),
                 "same_endpoint": false,
-                "server_backend": format!("burn-wgpu 0.22.0-pre.4 Wgpu/AutoCompiler DiscreteGpu(0), {}", backend_profile()),
+                "server_backend": format!("burn-wgpu 0.22.0 Wgpu/AutoCompiler DiscreteGpu(0), {}", backend_profile()),
                 "client_backend": "Burn Dispatch Remote over authorized Iroh"
             },
             "first_run": {
@@ -1012,6 +1029,7 @@ async fn run_remote(
                 "kept_reclaimed_for_shutdown": kept_reclaimed,
                 "allocator": {
                     "kept_baseline_settled_by_fixture_sync": allocator_kept_baseline,
+                    "kept_baseline_settlement": ["remote FIFO barrier", "server memory cleanup", "server sync"],
                     "with_both": allocator_with_both,
                     "immediate_after_close": allocator_immediate_after_close,
                     "after_close": allocator_after_close,
@@ -1066,7 +1084,10 @@ mod verification_tests {
     fn finite_receipt_fixture() -> Vec<f32> {
         let mut output = vec![0.0; 384];
         output[..8].copy_from_slice(&REFERENCE_FIRST_8);
-        let first_8_squared = REFERENCE_FIRST_8.iter().map(|value| value * value).sum::<f32>();
+        let first_8_squared = REFERENCE_FIRST_8
+            .iter()
+            .map(|value| value * value)
+            .sum::<f32>();
         assert!(first_8_squared < 1.0);
         output[8] = (1.0 - first_8_squared).sqrt();
         output
@@ -1080,19 +1101,31 @@ mod verification_tests {
     #[test]
     fn error_rejects_non_finite_values_on_either_side() {
         for value in [f32::NAN, f32::INFINITY, f32::NEG_INFINITY] {
-            assert!(max_abs_error(&[value], &[0.0])
-                .unwrap_err()
-                .contains("non-finite"));
-            assert!(max_abs_error(&[0.0], &[value])
-                .unwrap_err()
-                .contains("non-finite"));
+            assert!(
+                max_abs_error(&[value], &[0.0])
+                    .unwrap_err()
+                    .contains("non-finite")
+            );
+            assert!(
+                max_abs_error(&[0.0], &[value])
+                    .unwrap_err()
+                    .contains("non-finite")
+            );
         }
     }
 
     #[test]
     fn error_rejects_unequal_lengths() {
-        assert!(max_abs_error(&[0.0], &[]).unwrap_err().contains("length mismatch"));
-        assert!(max_abs_error(&[], &[0.0]).unwrap_err().contains("length mismatch"));
+        assert!(
+            max_abs_error(&[0.0], &[])
+                .unwrap_err()
+                .contains("length mismatch")
+        );
+        assert!(
+            max_abs_error(&[], &[0.0])
+                .unwrap_err()
+                .contains("length mismatch")
+        );
     }
 
     #[test]
@@ -1110,9 +1143,11 @@ mod verification_tests {
         for value in [f32::NAN, f32::INFINITY, f32::NEG_INFINITY] {
             let mut reference = output.clone();
             reference[383] = value;
-            assert!(numerical_receipt(&output, &reference)
-                .unwrap_err()
-                .contains("non-finite"));
+            assert!(
+                numerical_receipt(&output, &reference)
+                    .unwrap_err()
+                    .contains("non-finite")
+            );
         }
     }
 

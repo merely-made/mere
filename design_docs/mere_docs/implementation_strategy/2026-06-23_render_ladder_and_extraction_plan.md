@@ -1,17 +1,18 @@
 # Mere render ladder + web-extraction lane
 
-*Written before the 2026-09-05 retirement of graphlet (TERMINOLOGY.md): read graphlet as subgraph. Identifiers such as GraphletId, GraphletRef, and SessionGraphlets are now SubgraphId, SubgraphRef, and SessionSubgraphs, and the graphlets crate is crates/graph/subgraph (code renamed 2026-09-12).*
+*Written before the 2026-09-05 retirement of graphlet (TERMINOLOGY.md): read graphlet as subgraph. Identifiers such as GraphletId, GraphletRef, and SessionGraphlets are now SubgraphId, SubgraphRef, and SessionSubgraphs, and the graphlets crate became crates/graph/subgraph (code renamed 2026-09-12), since folded into mere as `crates/mere/src/subgraph.rs` (`61894570`, 2026-09-23; corrected 2026-10-06).*
 
 **Date**: 2026-06-23
-**Status:** substantially built (2026-07-01) — see Progress. Phase 1a (rung taxonomy),
-phase 2a-c (scripted render rung + external scripts + cookies), phase 3 (input → event
-bridge), and phase 4 slices 1-3 + wiring (genet-extract, Contribution path,
-headless-scripted + reader-mode extract, single-hop link materializer) all landed
-2026-06-23/24. The `--features scripted` compile break (the `ResourceFetcher` trait
-mismatch at `content/actor.rs:33`) was **fixed 2026-07-01** — see the Progress entry;
-the scripted feature builds and its 5 tests pass. 1b (picker surfacing), keyboard
-dispatch, interactive-region refinement, and the crawl frontier (V2 actor) remain
-open. Grounds the page-JS lane as a *rung*, not a
+**Status (2026-10-06):** the meerkat integration (1b, the phase 2 scripted lane, the
+phase 3 click routing, the phase 4 Contribution and link wiring) landed in meerkat on
+2026-06-23 to 2026-07-01, retired with it 2026-07-18 (`c5f01064`); surviving library
+parts: the rung taxonomy (genet's `document-session-api`, re-exported by inker's routing),
+genet's `dispatch_event` / `click_at` / `extract()`, fleece's `PageExtract` and
+`extract_main_text`, and pelt's `ScriptResourceFetcher`, with pelt's scripted viewers
+hosting the scripted rung (`ports/pelt/desktop/scripted_viewer.rs`). The crawl frontier
+landed in `crates/crawl` (first in the checkpoint `893b6887`, 2026-07-02). Open: keyboard
+dispatch, interactive-region refinement, routing article `main_text` into the eidetic
+corpus, and a `pump()` before the scripted extract. Grounds the page-JS lane as a *rung*, not a
 static-path replacement, and adds the orthogonal analysis axis.
 **Origin**: the page-JS scoping conversation. Page JS is mostly built in genet + pelt
 (see "Findings"); before wiring it into meerkat we fix the framing so it slots into the
@@ -84,6 +85,9 @@ already in place**: the inker engine picker (`engine_pins` / `EngineRoutePolicy`
 "Render rungs of the internet" = expose the genet profiles as engine choices and pin a
 node to the rung it needs. Nematic stays the protocol-faithful lane (Gemini / Gopher /
 Markdown / feeds), untouched.
+
+**Corrected 2026-10-06 (S14 pass):** `engine_pins` has no hits; `EngineRoutePolicy`
+survives (`crates/inker/inker/src/routing.rs:76`).
 
 ### The extraction primitives mostly exist
 
@@ -190,9 +194,18 @@ relational-browse V2 scope.
    registry-gated, so a pin to an unimplemented rung falls back to static (tested). *(1b
    remaining)* surface the available rungs in the meerkat picker — folds into phase 2,
    since a rung only becomes pickable once registered.
+   **Corrected 2026-10-06 (S14 pass):** 1b landed with phase 2a (the 2026-06-23 phase 2a
+   entry) and went with meerkat. `GenetRung`, `genet_rung` and `is_genet_rung` now live in
+   genet's `document-session-api` (`engine_ids.rs:105,149,162`), re-exported by
+   `crates/inker/inker/src/routing.rs`.
 2. **Scripted rung** — port `ScriptedDocument` into the content actor (B): fetcher +
    cookie/storage providers + the `pump`/`frame` loop + per-document runtime lifecycle.
    Lights up `document.cookie` / `localStorage`. The big integration chunk.
+   **Corrected 2026-10-06 (S14 pass):** the content-actor scripted lane (`build_scripted`,
+   `ScriptFetcher`) landed in meerkat and was retired with it 2026-07-18 (`c5f01064`); it has
+   no hits now. Pelt's scripted viewers host the scripted rung (lines 54-63 of
+   `ports/pelt/desktop/scripted_viewer.rs`), over `ScriptResourceFetcher`
+   (`ports/pelt/desktop/lib.rs:131`).
 3. **Input → event bridge** (C) — interactive scripted rung. *(done 2026-06-24.)* A
    click now flows pointer → hit-test → dispatch → listeners → re-render, end to end:
    - **genet `Runtime::dispatch_event(raw_id, type) -> bool`** (`cf44ec4`): dispatches a
@@ -212,6 +225,11 @@ relational-browse V2 scope.
      `is_scripted` (`f58ab47`), and input.rs routes a left click on a `genet.scripted`
      card/tile to the page, consuming it like a link click (`f277afc`). All gated behind
      the `scripted` feature; the default JS-free build is unchanged.
+     **Corrected 2026-10-06 (S14 pass):** the meerkat half went with meerkat (retired
+     2026-07-18, `c5f01064`): `click_scripted` and `is_scripted` have no hits, and
+     `ContentCommand::ScriptedClick` survives only as a cfg-gated wire variant in
+     content-contract (`lib.rs:169-170`, `:432`) with no producer or consumer. Genet's
+     `dispatch_event` and pelt's `click_at` survive.
 
    Region-level refinement (which parts of a scripted tile are interactive vs. a
    drag-handle for the orrery) and keyboard-event dispatch (`keydown`/`keyup` via a
@@ -252,6 +270,14 @@ relational-browse V2 scope.
    reader-mode body for distillation is the next consumer); (c) a `pump()` before the
    scripted extract, so timer/promise-driven content (not just synchronous + deferred)
    is captured.
+   **Corrected 2026-10-06 (S14 pass):** genet has no `genet-extract` component;
+   `PageExtract` and `extract_main_text` live in genet's fleece (`fleece/src/lib.rs:383`,
+   `:822`). The meerkat wiring (`page_extract_contribution`,
+   `contribution_from_page_extract`, `harvest_links`, `materialize_links`) went with
+   meerkat and has no hits; `ContentCommand::MaterializeLinks` is an orphan wire variant
+   (content-contract `lib.rs:166`). Item (a), the crawl frontier, landed in `crates/crawl`
+   ("Host-neutral crawl frontier and bounded crawl runtime"), with `Frontier` /
+   `max_depth`, robots, sitemap and a dedicated actor; (b) and (c) stay open.
 5. **Refinements** — script-added stylesheets, retain-until-dirty layout, origin rung
    policy, and the web-API long tail (Canvas2D / WebSocket / fetch-driven re-render;
    genet already has a WebGL factory seam) as pages demand — standards by standards.
@@ -477,3 +503,8 @@ parsed (and optionally scripted) DOM.
   including the external-script and click-dispatch tests — the scripted-live link-nav
   wiring compiles and passes for the first time); base `cargo check -p meerkat`
   unaffected.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at mere 535bca11,
+  from the D2 record in support/doc-audit/d2/batch_48_s14_phase_b10.md: the meerkat
+  integration recorded as retired with meerkat and the surviving genet, fleece, pelt and
+  `crates/crawl` parts named, the `engine_pins`, 1b, scripted-lane, click and extraction
+  wiring claims annotated, and the subgraph banner fixed.

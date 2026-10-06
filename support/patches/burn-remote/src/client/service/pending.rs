@@ -95,7 +95,7 @@ impl Responder {
                 // Receiver dropped is fine (caller no longer cares).
                 let _ = tx.send(content);
                 true
-            }
+            },
             None => false,
         }
     }

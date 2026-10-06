@@ -338,6 +338,9 @@ still needs its own lane and Isometry's pin. Burn 0.22.0 stable was published
 2026-10-06T18:46Z and CubeCL 0.11.0 at 15:59Z (crates.io), so the next Burn
 step is pre.4 → 0.22.0, which goes to Mark as its own assessment (burn plan).
 
+*Annotation, the same day:* the stable migration merged on mere main (burn plan
+§13.47), so T2's Burn baseline is now stable 0.22.0, not pre.4.
+
 1. **Nisus becomes the voxel world store** (330): a chunk map, world
    revision, revision log and additive writes extend its revision-gated
    chunk patches. `Ground` becomes a thin product layer over that store or

@@ -1,18 +1,21 @@
 # Meerkat Promotion Pass Plan
 
-*Written before the 2026-09-05 retirement of graphlet (TERMINOLOGY.md): read graphlet as subgraph. Identifiers such as GraphletId, GraphletRef, and SessionGraphlets are now SubgraphId, SubgraphRef, and SessionSubgraphs, and the graphlets crate is crates/graph/subgraph (code renamed 2026-09-12).*
+*Written before the 2026-09-05 retirement of graphlet (TERMINOLOGY.md): read graphlet as subgraph. Identifiers such as GraphletId, GraphletRef, and SessionGraphlets are now SubgraphId, SubgraphRef, and SessionSubgraphs, and the graphlets crate became crates/graph/subgraph (code renamed 2026-09-12), since folded into mere as `crates/mere/src/subgraph.rs` (`61894570`, 2026-09-23).*
 
 **Date**: 2026-07-02
-**Status**: P1/P2/P3-first-slice/P4/P5/P6/P7 promoted. P8's input-snapshot seam,
-first two domain moves, roster's pure helper layer, roster's explicit builder
-contract, and graphlet builder contract landed. `pane_data.rs` now has explicit
-local input structs and pure builders too, but the store-backed pane rows still
-remain in `meerkat`. The follow-up review on 2026-07-02 tightened P3/P4/P8
-before code move. A later implementation pass on 2026-07-02 landed P1/P2/P5/P6/P7
-and then re-ran the P3 seam check. The compile witness for P1/P2 is still
-blocked by unrelated workspace breakage (`session-runtime` and earlier
-`graph-kernel` errors), but the nearby imports settled enough to confirm the
-wider P3 contract shape below.
+**Status (2026-10-06):** historical. P1 to P7 and the P8 slices landed in and
+out of meerkat on 2026-07-02 and 2026-07-03; meerkat's side (the `WindowCtx`
+wrappers, the store-backed pane rows and P8's remaining host-side builders)
+retired with it 2026-07-18 (`c5f01064`). Surviving library parts:
+`crates/system/fetch` (P1), `crates/crawl` (P2),
+`crates/system/content-contract` (P3's first slice), `import::web_clip` (P4),
+the subgraph derivation, now `crates/mere/src/subgraph.rs` (P5), chrome's nav
+and suggest modules (P6), P7's theme-editing core, which went from
+register-theme into `mere-registry` (`3430ba2b`) and then to
+`ports/tabard/src/theme/` (`7f133433`), gloss and roster, now
+`crates/mere/src/gloss.rs` and `crates/mere/src/roster.rs` (P8, folded in
+`61894570`), and `crates/domain/apparatus`. Open: nothing in this plan; current
+ownership follows the platform-boundary plan (2026-09-05 note below).
 **Scope**: Promote host-neutral domain and infrastructure modules out of the
 `meerkat` crate into workspace crates, and consolidate what stays. meerkat is
 54,760 LOC across ~86 modules, with ~85 of them declared in `main.rs` (the bin)
@@ -170,6 +173,12 @@ register-theme already depends on tincture, so the fold carries no new dep.
 - Home: into `register-theme` itself (bundle bias; one consumer).
 - Done when: meerkat's theme editor views call the promoted API through the
   retained `WindowCtx` wrapper.
+
+**Corrected 2026-10-06 (S14 pass):** register-theme no longer exists. It was
+folded into `mere-registry` (`crates/system/registry`, `3430ba2b`, 2026-09-23),
+and the theme tree then moved to `ports/tabard/src/theme/` (`7f133433`,
+2026-09-24). The meerkat `WindowCtx` wrapper left with meerkat (`c5f01064`,
+2026-07-18).
 
 ### P8 — pane data halves into a new crates/domain/ tree
 
@@ -438,3 +447,9 @@ Verified by grepping each candidate's `use` lines. "crate-refs" counts
   data/view/render glue was pointed at the neutral module. The remaining P8
   work is crate placement and any further host-input slimming, not view-owned
   roster types.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_49_s14_phase_b11.md: the status rewritten as
+  history in the S39 shape, with the surviving library homes named; the P7
+  register-theme home corrected to `mere-registry` and then Tabard; and the
+  subgraph banner pointed at `crates/mere/src/subgraph.rs`.

@@ -844,6 +844,29 @@ pull reading −0.33 with 510 overlaps):
     the period. Mark chose **"Look for a tiebreaker"**: before merging, the
     lane looks for another signal that separates the two cases, with
     evidence (against accepting it as a documented limit).
+  *Ruled 2026-10-06, after the forks were carried out* (`seiche-speed-estimator`
+  `48990451`). The ThinkPad's 60.003 Hz panel read 16.666 to 16.667 ms, after
+  a polishing fix for a half-period read found under load. Every prefix window
+  on both machines now reads within 1% or falls back to the cap: 445 on the
+  ThinkPad and 700 here. The fast receipt compares Max against the page's
+  own 1x (3.31 times, calm), and the slowed-Max control misses. The lane's
+  tiebreaker: a dedicated worker's requestAnimationFrame loop over an
+  `OffscreenCanvas`, doing no work, ran at exactly one refresh under every
+  main-thread load tried. Here that was 991 intervals, all 6.06 ms; on the
+  ThinkPad, 361, all 16.67 ms. Where the main thread read twice the period
+  in 36 of 47 windows, the worker read the true period in all 96.
+  - Asked whether to adopt it, Mark chose **"Worker rAF, main thread
+    fallback"**: a small worker posts batched intervals into the same
+    estimator, and the main thread's intervals stand in where a browser has
+    no worker requestAnimationFrame. Firefox's worker requestAnimationFrame
+    and a system-wide load case are tested before merging (against adopting
+    it with no further tests, or accepting the limit).
+  - Asked whether the merge needs a calm round, as seiche-speed's did, Mark
+    chose **"Merge main; under-load passes count"**: after main is merged
+    and the lane re-gated, a dial row that passes under load counts, and a
+    miss is rerun calm (against pausing the sessions for a calm round).
+    With the budget now 3 ms, the 50x control has read 20.9 to 24.7 times
+    against its bar of 25 under load.
   The face offset, diagnosed (2026-10-04, `tree-face-zoom`): the face is
   drawn right and the body wrong, on both pages. Pictograph's gnode style
   scales each body about its centre (the CSS default Livery follows since
