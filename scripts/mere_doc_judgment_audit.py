@@ -143,7 +143,12 @@ def audit() -> dict[str, object]:
     supplemental_active = {path for path in active if path in supplements}
     covered = legacy_active | supplemental_active
     missing = sorted(set(active) - covered)
-    unknown_supplements = sorted(set(supplements) - set(active))
+    # A batch record whose document has moved into archive_docs remains as
+    # history, like an archived snapshot record; any other unknown path is an error.
+    archived_names = {path.name for path in (DOCS / "archive_docs").rglob("*.md")}
+    not_active = sorted(set(supplements) - set(active))
+    inactive_supplements = [path for path in not_active if Path(path).name in archived_names]
+    unknown_supplements = [path for path in not_active if Path(path).name not in archived_names]
     # A batch record for a path the snapshot covers is a later judgment and
     # supersedes the snapshot's record (stack seams plan, ruling S34).
     superseded = sorted(legacy_active & supplemental_active)
@@ -192,6 +197,7 @@ def audit() -> dict[str, object]:
         "combined_claim_totals": totals,
         "missing_active_records": missing,
         "unknown_supplemental_records": unknown_supplements,
+        "inactive_supplemental_records": inactive_supplements,
         "errors": errors,
     }
 
@@ -211,7 +217,8 @@ def main() -> int:
             f"{report['supplemental_records']} supplemental "
             f"({report['superseded_legacy_records']} superseding legacy, "
             f"{report['superseded_supplemental_records']} superseding earlier batches); "
-            f"{report['inactive_legacy_records']} inactive legacy"
+            f"{report['inactive_legacy_records']} inactive legacy, "
+            f"{len(report['inactive_supplemental_records'])} inactive supplemental"
         )
         for error in report["errors"]:
             print(f"error: {error}")
