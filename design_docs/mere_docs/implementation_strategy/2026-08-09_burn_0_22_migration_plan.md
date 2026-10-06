@@ -4925,17 +4925,75 @@ processing, response cancellation, hosted-device translation, typed
 credentials and connection errors. Distillery adapts its authorizer and
 shared-endpoint connections to these APIs.
 
-Verified so far on macOS with the repository's Rust `1.98.1`:
+Verified on macOS with Rust `1.98.1`:
 - ESP and Conatus CPU/GPU/autodiff feature compilation; 420 CPU tests and
   two autodiff tests in the focused assessment.
-- Distillery compiles with `remote,trainer-gpu,trainer-autodiff`.
-- All 47 patched remote library tests pass, including targeted close,
-  in-flight admission fencing, panic cleanup and failed teardown reporting.
-- Portable root lock verification passes: 1,556 packages, no prerelease
-  Burn/CubeCL/Cubek rows.
+- ESP's native `bert-wgpu,decoder-wgpu,decoder-autodiff` library suite:
+  214 passed, three fixture-dependent tests ignored.
+- Conatus's resident suite: 33 passed, two timing tests ignored. The scan
+  test's pseudo-random input generator now uses intentional wrapping
+  multiplication; its former debug overflow stopped the GPU assertion.
+- Distillery with `remote,trainer-gpu,trainer-autodiff`: compiles and passes
+  all 26 library tests.
+- Patched Burn Remote: all 47 library tests and all 27 upstream Iroh
+  integration tests pass, including targeted close, admission fencing,
+  panic cleanup and failed teardown reporting.
+- The real-weight two-peer MiniLM receipt passes on the plain native WGPU
+  backend: cancellation, fresh-session recovery, single-lease close,
+  retained-lease re-execution and final allocator release. Final live bytes
+  and allocation count are zero; reserved pool bytes retain 16 KiB and are
+  not treated as live allocations or driver VRAM. The kept lease's baseline
+  is settled with a remote FIFO barrier, server cleanup and server sync.
+  The close itself receives no fixture-side sync or cleanup, and the exact
+  live-byte/allocation-count comparisons remain in force. Its post-close
+  embedding is bit-identical to the preceding one. The receipt is
+  `ports/distillery/probe/receipts/2026-10-06_stable_remote_minilm.json`.
+- Turnstone's application compiles with
+  `distillery/remote,distillery/trainer-gpu,distillery/trainer-autodiff`.
+  Its matching Knot and Redshank revisions resolve all five source-identity
+  mismatches found during the repin.
+- The Turnstone-baseline Mere backport compiles Distillery with the same
+  remote/trainer features and compiles its standalone remote fixture.
+- Portable root lock verification: 1,556 packages; lock SHA256
+  `cacbf284015bb57dba65c792455368cc6ed8ab41ce2a5d8c99673a848f1ad2c8`.
+- Headed browser WebGPU: four Cubek extrema cases and all 21 Burn
+  embedding/graph cases pass with no GPU or page-gate errors. Receipts
+  are retained in the corresponding reproducer receipt directories.
+- The full Distillery browser probe builds for `wasm32-unknown-unknown`;
+  its native and model-session fixtures compile. Browser initialization
+  uses `Device::wgpu_options().init_async()` and propagates typed errors
+  through the caller's existing error type. Allocator measurements use
+  `memory_report(MemoryScope::Device).usage()`.
+- Knot's current branch: BERT/WGPU feature compilation, all-features
+  dependency resolution and 148 BERT-enabled library tests pass. Its
+  supported toolchain moves from 1.97.1 to the tested 1.98.1.
+- Isocosm's resident-ground example compiles and runs on Radeon/Metal:
+  the Burn/raw views share an allocation, a four-byte patch retains the
+  atlas without allocator growth, and the accepted delta replays.
+  Mesocosm and shared Isomere resolve with Burn-free default graphs.
 
-The resident GPU tests, Distillery tests, standalone fixtures, remote
-integration tests and headed browser checks are still being run. This
-entry does not mark the migration's lifecycle or product gates complete.
-Sibling repins must carry the stable runtime patch at their workspace
-roots; Distillery consumers must also carry the remote patch.
+Sibling source strategy:
+- Knot and Isocosm advance their inference consumers and root runtime
+  patches to the stable core commit `5fecd707c6bc9022f952c6d7b99d59f0f568d8e8`.
+  Other Mere dependencies retain their existing public API baselines.
+- Turnstone advances its Mere family coherently to the stable backport on
+  its former `bd5912fb` baseline. Knot's installed document/desktop manifests
+  and Woodshed/Redshank follow that same source so shared surface and fetch
+  types do not split across two Mere revisions. The backports preserve the
+  older scene, projection and networking APIs. Fixture-only follow-ups on
+  the backport branch do not change its pinned production APIs.
+- Standalone GPU fixture workspaces carry the runtime patch themselves;
+  patches do not inherit across workspace boundaries.
+
+Limits and publication state:
+- Eponym and its ambience probe remain unverified because the checkout
+  lacks `/Users/markik/Code/crates/renderling/crates/renderling/Cargo.toml`
+  (and its associated local Crabslab patch directories). Their Conatus
+  repins are prepared; no unrelated renderer source was substituted.
+- These are macOS checks. Windows builds, the complete headed product
+  acceptance matrix, and process/driver VRAM telemetry are not claimed.
+- Git publishing is blocked: local Git/gh credentials are unavailable and
+  the GitHub connector returns HTTP 403 on tree creation. No PR or remote
+  write succeeded. The immutable sibling pins currently resolve from
+  locally fetched commits in Cargo's Git cache; clean remote verification
+  requires publishing the prepared branches first.
