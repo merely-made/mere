@@ -1,8 +1,8 @@
 # Stack seams plan: catalog, shared device, actions, determinism, two words
 
 **Date:** 2026-10-04
-**Status (2026-10-06):** in progress. Forty-one rulings in fourteen rounds
-(S1 to S41); P1 landed on main (`1633be0c`); P2 staged (S27 to S31, four
+**Status (2026-10-06):** in progress. Forty-eight rulings in sixteen rounds
+(S1 to S48); P1 landed on main (`1633be0c`); P2 staged (S27 to S31, four
 stages in §3.1) and landed on main (`40d7ae5e`); S32 (F19) landed on main
 (`48c08dee`); the S14 pass (S33) under way; P3 and S7 done as documents; S3 to
 S6 carried into the dynamics grammar plan (G8, G9); S9 done by the identity
@@ -685,6 +685,75 @@ Options: Mark asks that Codex session; the active Knot lane answers; rule it
 now. Mark: **"Rule it now"**. Follows: S37's question goes back to Mark
 directly, in round 15.
 
+Round 15, 2026-10-06. S37's question put back under S41, and the three
+forks phase C cannot write a status line without (S38).
+
+**Ruling S42 (S37 put back).** *Is `reference-data` (`9310518b`: opt-in,
+licence-carrying, BLAKE3-checked packs of language-tagged senses and
+relations, which Knot pins) the lexical capability plan's L2?* Options: yes,
+L2 re-scopes onto it; two surfaces, each justified; retire one. Mark: **"Yes,
+it is L2 (Recommended)"**. Follows: phase C records L2 as partly built in
+`reference-data` and re-scopes L2 onto that crate; L1, L3, L5 and
+Turnstone's L4 stay open; mere has one lexical surface.
+
+**Ruling S43.** *The lattice sync pass's status is dated 2026-09-20; L1 and
+L2's passes, the consumer round, CI and the two-row patch baseline have
+landed since, and L5 (three knot-editor revisions), the L3/L6/L7 consumers,
+P2's cleanup and P4 remain. Continue or close?* Options: continue with the
+status rewritten; close and extract. Mark: **"Continue, status rewritten
+(Recommended)"**. Follows: phase C rewrites the status to record what landed
+and name the four open items; the plan stays active as their owner.
+
+**Ruling S44.** *Three first-party manifests pin `sha2` 0.10 against the
+crypto plan's ruled 0.11 row (djinn, the distillery session fixture, Pelt
+desktop on genet's 0.10 line). What does the status record?* Options: repin
+two and except Pelt; repin all three; accept all three as exceptions. Mark:
+**"Repin all three"**. Follows: the crypto generation plan reopens for the
+three repins, Pelt's possibly waiting on genet's own move to 0.11; the repins
+are a follow-on task, not part of this documentation pass.
+
+**Ruling S45.** *61 owned sources lack the MPL Exhibit A header the license
+sweep's P1 audit requires, most carrying only a short SPDX line. What should
+happen?* Options: re-run the header tool and add a gate; record the drift
+only; accept the SPDX header. Mark: **"Re-run tool, add a gate
+(Recommended)"**. Follows: `scripts/relicense_headers.py` is re-run over the
+files on a clean tree in one commit, and a check makes new owned files carry
+the header; both are a follow-on task outside this pass, and the license
+sweep's status records the drift until then.
+
+Round 16, 2026-10-06, after phase B. Evidence: the phase C assessment in
+§5 (166 documents with recommended actions, about 67 archive candidates, 27
+documents touched by other lanes since 2026-09-29).
+
+**Ruling S46.** *About a dozen of the 166 documents are lanes' live plans
+that moved heavily this week. How does phase C treat them?* Options: hand
+them to their lanes with their records and correct the rest; edit all of
+them additively; ask each lane first. Mark: **"Hand to their lanes
+(Recommended)"**. Follows: phase C leaves the live plans alone and each lane
+is pointed at its record; the other documents are corrected. *Reading, not
+ruled*: "live" means ten or more commits from other lanes since 2026-09-29,
+plus the djinn test harness plan (founded 2026-10-05, its lane active):
+physics catalog, dynamics grammar, burn 0.22 migration, graphshell one tree,
+vault lock, device pairing, chatelaine, projection grammar adoption, the
+controls and physics receipt, conatus engine, djinn test harness.
+
+**Ruling S47.** *How are the corrections carried out?* Options: opus write
+lanes in their own worktrees, each diff reviewed with both audits green before
+it merges; sequentially by this session. Mark: **"Write lanes, reviewed
+(Recommended)"**. Follows: write lanes correct their assigned documents in
+worktrees; this session reviews each diff, runs both audits, and merges.
+*Reading, not ruled*: lanes edit only their assigned documents; DOC_README,
+archive moves and the tails backlog are cross-cutting, so lanes propose them
+and this session applies them centrally, avoiding merge collisions.
+
+**Ruling S48.** *Where do archived plans' ownerless tails go?* Options: their
+live owner when one plainly exists, else a new dated section of the archived
+plan tails backlog; a new follow-ons plan per area root; ask per plan. Mark:
+**"Archived plan tails (Recommended)"**. Follows: phase C moves each tail to
+its plain live owner or into a dated section of
+`2026-07-03_archived_plan_tails_plan.md`, citing the archived plan, before
+the archive move.
+
 ## 3. Phases
 
 ### 3.1 This plan's lane
@@ -824,6 +893,35 @@ The done-conditions handed over for S3 and S4, kept for reference:
   works in `projection_compile`. Second pass (F8 to F11), rulings S7 to S10:
   the README fixed (S7), TERMINOLOGY gains pandect under Eidetic and the
   curation record (S8, S10), S9 sent to the identity lane.
+- **2026-10-06.** Round 16: S46 (live plans handed to their lanes), S47
+  (reviewed write lanes) and S48 (ownerless tails to the archived plan tails
+  backlog). S44's repins and S45's header re-run were flagged as separate
+  follow-on tasks for Mark to start.
+- **2026-10-06.** The S14 pass, phase B done: batches 39 to 51 re-judge
+  all 145 plans at `535bca11`, superseding their earlier records (S34). 1,656
+  claims checked: 1,190 hold, 408 stale, 58 unverifiable; 241 contradictions;
+  85 status lines wrong (59%). Dispositions: 82 current, 34
+  historical-marked, 25 historical-unmarked, 4 superseded. Every batch was
+  drafted by one read-only subagent and checked by a second; across thirteen
+  verifications none refuted a record outright, three refuted single items
+  (Graphshell's face picker, athanor's image GC, a surviving
+  `is_surface_engine`), and each found about six items true only in part, all
+  applied. The largest causes: meerkat's removal (`c5f01064`), the 2026-09-23
+  folds, and status lines never updated after Progress moved. The judgment
+  audit's one error is another lane's new balaur review brief (`ed8b67e8`),
+  committed without a record. Phase C assessed: 166 documents carry
+  recommended actions (92 wrong status lines, 440 stale claims); about 67
+  are archive candidates under S36; DOC_README has dozens of stale entries
+  and 10 orphans; the doc audit reports 14 resolved annotations; about 33
+  documents carry the dead `crates/graph/subgraph` banner; and 27 of the 166
+  were touched by other lanes since 2026-09-29, about a dozen of them heavily
+  (physics catalog, dynamics grammar, burn, the one-tree plan, vault lock,
+  device pairing, chatelaine, projection grammar). How phase C runs goes to
+  Mark.
+- **2026-10-06.** Round 15: S42 (`reference-data` is the lexical plan's
+  L2), S43 (the lattice pass continues), S44 (all three `sha2` 0.10 pins
+  repinned, as a follow-on) and S45 (headers re-run and gated, as a
+  follow-on).
 - **2026-10-06.** Phase B, batches 39 to 46 recorded (96 plans; the
   per-batch counts are in each record), each drafted by a read-only subagent
   and checked by an independent read-only verifier whose corrections are

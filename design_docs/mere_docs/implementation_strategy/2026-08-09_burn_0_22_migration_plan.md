@@ -1,5 +1,17 @@
 # Burn 0.22 Migration Plan
 
+**Status (2026-10-06, stable):** the active Burn family is migrated to
+Burn `0.22.0`, CubeCL `0.11.0` and Cubek `0.3.0` (§13.47). ESP, Conatus,
+Numen, Seiche and Distillery use stable APIs; native GPU, browser embedding
+and extrema, real-weight remote inference and two-lease cleanup checks pass.
+Knot, Isocosm, Turnstone and Woodshed/Redshank consume published stable
+commits. The user requested direct integration into main, without PRs or
+commit trailers. The final portable root lock passes locked metadata; the
+workspace audit finds no active Burn-family prerelease pins. Eponym's local
+renderer checkout, Windows builds and the complete headed product matrix
+remain outside the verified scope. Dated prerelease entries below retain
+their historical scope; the parked pre.3 lane remains historical.
+
 **2026-10-05, later: ruling 567, main `9680306d` (§13.45).**
 
 - The probe, repro and OPFS runners build with the repo's pinned toolchain,
@@ -8,7 +20,8 @@
 - A planted uninstalled channel fails each runner before any cargo command.
 - The four bundles are rebuilt on 1.98.1 and their rows and controls pass.
 - Main `9680306d` is merged, and the gates and headed set pass.
-- S16 is the coordinator's.
+- S16 is the coordinator's. *Annotation, 2026-10-06 (S14 pass):* S16 ran
+  later on 2026-10-05 (`cec0b3a4`; the status above, §13.44).
 
 **2026-10-05 rulings 557 to 559 (§13.44):**
 
@@ -33,7 +46,8 @@
   surface now has one.
 - **Main.** Main `8f61b367` is merged (`eba741c5`). The changed cones pass,
   and so do the headed P5 receipts under the gate.
-- S16 has not started.
+- S16 has not started. *Annotation, 2026-10-06 (S14 pass):* S16 ran on
+  2026-10-05 (`cec0b3a4`; the status above, §13.44).
 
 **2026-10-04 rulings 545 and 546, the receipt gate, main `63345c17` (§13.38, §13.39):**
 graphshell-web, `cambium-genet-web-host` and the probe run wasm-bindgen
@@ -50,7 +64,8 @@ graphs, and the constructor helper lives in `cambium-genet-web-host`.
   decoder row pass under the gate.
 - The quiet A/B counted no repetition under its bound (0 of 80). That and
   the OPFS control go back as forks.
-- S16 has not started.
+- S16 has not started. *Annotation, 2026-10-06 (S14 pass):* S16 ran on
+  2026-10-05 (`cec0b3a4`; the status above, §13.44).
 
 **2026-10-03 S15 annotation:** the 2026-08-20 status below describes the pre.2
 row, including its "one `libsqlite3-sys` 0.38.2" sentence. On the pre.4 branch
@@ -598,6 +613,12 @@ Stop on any of these conditions:
   §13.30 records two main merges, 169 checksum-verified downloads under
   ruling 378, the native, headed and graph gates, and two forks held: the
   ruling 411 repair, and the pre.4 wasm constructor cost.
+
+- **2026-10-05** (recorded 2026-10-06 by the S14 pass): S16 ran under
+  ruling 557. The coordinator merged the pre.4 branch into main at
+  `cec0b3a4` and pushed it, origin/main then at `07db35e2`, so main is on
+  pre.4 (§13.44). Knot's repin (S17) began the same day (§13.46);
+  Isometry's (S18) waits for its checkpoint 9.
 
 ## 12. Pre.3 repin execution plan (2026-09-16)
 
@@ -1710,6 +1731,20 @@ can wait for S16.
   Mark says otherwise; (b) after S16, remove the worktree and delete the branch;
   (c) keep the branch as archaeology and remove only the worktree. **Recommend
   (a) for now**, and decide at S16.
+  **Open, raised by the S14 pass (2026-10-06): retire the parked pre.3 lane
+  now that pre.4 is production?** §13.13 answered S0-8 on 2026-09-27:
+  "preserve the parked pre.3 branch, worktree and uncommitted work". The
+  revisit this item set for S16 is not recorded, though S16 ran on
+  2026-10-05 (`cec0b3a4`, §13.44) and main is on pre.4. The lane is still
+  there: `burn-pre3-repin` holds four unmerged commits (`276608d5`,
+  `e1c0cb44`, `31102555`, `610a32c5`, the last on 2026-09-16), and
+  `Code/worktrees/mere-burn-pre3` has 11 uncommitted paths. The options, as
+  this item put them:
+  - (a) leave both until Mark says otherwise, as §13.13 answered;
+  - (b) remove the worktree and delete the branch;
+  - (c) keep the branch as archaeology and remove only the worktree.
+
+  This pass decides none of them.
 - **S0-9. Network during execution.** Every pre.4 burn, cubecl and cubek crate
   is already cached, and so is the 0.2.122 CLI; a nested workspace may still
   want an uncached crate. Options: (a) allow crates.io crate downloads when an
@@ -4727,7 +4762,8 @@ The coordinator's port rule holds: no other process named or held 8853.
 
 Main has since gained `e8b440be`, a dynamics grammar plan record only. It is
 not merged here, and it merges cleanly. S16 remains the coordinator's. No
-push.
+push. *Annotation, 2026-10-06 (S14 pass):* S16 ran later on 2026-10-05
+(`cec0b3a4`; §13.44's annotation).
 
 ### 13.46 Knot's repin onto pre.4: two rulings (2026-10-05)
 
@@ -4896,6 +4932,26 @@ that Knot head, and finishes with one copy of each genet crate in mere's
 graph. The order is seiche-speed first, then djinn's repin onto `54bb8cd`, then
 that chain.
 
+**djinn's Knot repin, done (2026-10-06).** `cf88887d` on branch
+`djinn-knot-pre4`, off main `ec5293f0`, not pushed. Under "My Knot lane
+adapts Knot", the repin lands on Knot `c966e31` rather than `54bb8cd`.
+`knot-editor` and `knot-document` move from `562353aa`, and djinn's
+`knot-site` from `ea3e99ef`. Ruling 586's `scenograph` and `scenomise` rows
+are added. Knot `c966e31` came from the local checkout into cargo's cache, as
+ruled above, and its tree matches. The lock goes from 1,679 to 1,678
+packages: genet `69a2383b`'s `fleece` and `layout-dom-api` leave, and every
+Knot, genet, scene, Burn, CubeCL and wgpu crate has one copy. Knot names no
+new mere package; its desktop-only names still have no rows, and nothing in
+mere's graph uses them. Gates, offline and `--locked` at `-j 4`, with
+evidence in `Code/testing/mere/djinn-knot-pre4/c966/`:
+
+| Gate | Result |
+| --- | --- |
+| djinn check, all targets | pass |
+| djinn tests | 116 pass, 9 ignored; `knot_residue` 0 live, 20 freed uncleared |
+| mere `graph,canvas-gpu` and graphshell `canvas-gpu` checks | pass |
+| `cargo_mode.py verify` | pass, lock `b44eb40b` |
+
 **Findings, not ruled.** Each predates the repin.
 - Windows checkouts get CRLF in `assets/oewn-notices.txt` and
   `tests/fixtures/wordnet.xml` through `.gitattributes`, which fails 7
@@ -4974,7 +5030,7 @@ Verified on macOS with Rust `1.98.1`:
   atlas without allocator growth, and the accepted delta replays.
   Mesocosm and shared Isomere resolve with Burn-free default graphs.
 
-Final source audit: 718 local Cargo manifests and 25 Burn-family lockfiles
+Final source audit: 720 local Cargo manifests and 25 Burn-family lockfiles
 pass with no active prerelease requirements or package rows. Build caches,
 historical design documents and retired vendor patches are excluded. The
 audit script, receipts, validation logs and Git bundles are retained in the
@@ -5000,8 +5056,28 @@ Limits and publication state:
   repins are prepared; no unrelated renderer source was substituted.
 - These are macOS checks. Windows builds, the complete headed product
   acceptance matrix, and process/driver VRAM telemetry are not claimed.
-- Git publishing is blocked: local Git/gh credentials are unavailable and
-  the GitHub connector returns HTTP 403 on tree creation. No PR or remote
-  write succeeded. The immutable sibling pins currently resolve from
-  locally fetched commits in Cargo's Git cache; clean remote verification
-  requires publishing the prepared branches first.
+- Git credentials became available and all seven migration/backport branches
+  were published. The immutable Mere, Knot and Redshank pins were verified
+  using fresh bare repositories fetched from GitHub, without Cargo cache
+  objects. The user requested direct integration into main, with no PRs
+  and no commit trailers. Current-main changes are preserved in merge
+  commits; the older API backport branches remain dependency snapshots.
+
+Main integration preserves Knot's P1 recipe work at `19e6dc9f` for its
+presentation dependencies and advances its ESP/runtime rows to stable Burn.
+Mere's root Knot and Djinn site pins advance to Knot `a5888dc62ba87c6ef499161e9f756845533abb43`.
+Turnstone's newly added Scry dependency follows the same stable Mere backport
+as its other Mere packages. The combined Knot suite passes all 148 tests;
+Turnstone's combined remote/GPU/autodiff build and locked metadata pass
+(1,578 resolved packages, 63 stable Burn-family rows).
+
+After integrating current main and the stable Knot pin, the portable locked
+metadata gate passes with 1,555 packages and 61 stable Burn-family rows.
+The final root lock SHA-256 is
+`4035b74a5acd61da2bd155a74a28201f06e5f3b9bdb99731c18fed6e56f76016`.
+
+The final `cargo check --locked -p djinn` passes against this Knot pin.
+A stale cached Workbench artifact initially hid exports present in the
+checked-out source; rebuilding Workbench cleared that failure without a
+source change. All five primary migration trees are integrated into main
+and pushed directly, with the two older API backport branches retained.

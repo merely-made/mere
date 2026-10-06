@@ -5,6 +5,17 @@
 > Mere under E2 of `knot-editor/design_docs/2026-09-01_knot_editor_repository_extraction_plan.md`,
 > so the `ports/knot` *(historical citation)* <!-- doc-audit: historical-path --> paths below name the layout each receipt landed against.
 
+**Corrected 2026-10-06 (S14 pass):** if "one immutable revision" means one
+revision shared by every consumer, it does not hold at mere 535bca11:
+Turnstone pins knot-editor `3dfb70b0`, Mere's root manifest (which djinn uses
+through `knot-editor.workspace = true`) pins `562353aa`, and djinn's
+`knot-site` pins `ea3e99ef`.
+
+**Open, raised by the S14 pass (2026-10-06):** is "one immutable revision" the
+intended rule for Knot's consumers? Options: one shared knot-editor revision
+across Turnstone, Mere and djinn's `knot-site`; each consumer pins its own
+immutable revision.
+
 **Date:** 2026-08-02
 **Status:** K0-K3 complete. K1 chose Option A (Mark): shared documents are
 projected, personal documents replicate, and T4's done condition is replaced
@@ -216,6 +227,10 @@ change rather than more wiring at the branch — Turnstone has the identity, it
 simply is not passed here. Unfinished, not blocked, and the shape of the fix
 is known.
 
+**Corrected 2026-10-06 (S14 pass):** this paragraph is the 2026-08-02 state.
+K3's entry below (2026-08-06) records that Turnstone hosts every Knot mode
+in-process, so the persona-vault modes no longer spawn by default.
+
 Note the root is still `TURNSTONE_KNOT_ROOT`, and correctly so — it names
 *which directory is your vault*, which is real configuration rather than
 deployment accident. What the env var no longer decides is whether a
@@ -336,6 +351,11 @@ from there. `ports/knot/tests/send_probe.rs` *(historical citation)* <!-- doc-au
 link in that two-repo chain names the type that changed instead of surfacing as
 a confusing trait error at a registration in another crate.
 
+**Corrected 2026-10-06 (S14 pass):** the trait is no longer genet's, here or
+in the paragraph above. Inker landed in Mere from Genet on 2026-09-03
+(`75199c1c`), and `BlockEvaluator: Send` is now defined in
+`crates/inker/inker/src/document/evaluate.rs`.
+
 **The carrier now distinguishes a refusal from a disconnection.**
 `Carrier::request` returned `Result<_, String>`, and an endpoint that said no
 was indistinguishable from a link that died. `CarrierError::Refused` against
@@ -411,6 +431,12 @@ precisely to combine two rankings, and with one engine there is nothing to
 fuse. Knot is not off the seam by oversight; it has never had the second
 input the seam requires.
 
+**Corrected 2026-10-06 (S14 pass):** Sibylla is deleted. knot-editor's
+`search.rs` now uses `esp::embed::SemanticSearch` with a
+`KnotEmbeddingPreference`, which can select BERT through esp's `bert` feature.
+S0 and S1 are still unbuilt: `search.rs` has no tantivy index and no `fuse`
+call.
+
 ### What is reusable, and what is not
 
 - `fuse(lexical, vector, k, weights) -> Vec<FusedHit>` is a **pure function
@@ -454,11 +480,23 @@ has a BERT provider; whether Knot's semantic side uses it is a separate
 quality question, and hash-bucket vectors remain a legitimate cheap default
 for the vector input once a real lexical input exists beside them.
 
+**Corrected 2026-10-06 (S14 pass):** there is no Sibylla to take a BERT
+provider from; Knot now chooses its embedding provider, BERT included, through
+esp (see the correction under "The actual defect").
+
 ## Not in scope
 
 - **Wasm.** Same reasoning as the carrier plan: the argument is portability,
   not sandboxing, because Knot is first-party.
-- **Wasm.** Same reasoning as the carrier plan: the argument is portability,
-  not sandboxing, because Knot is first-party.
 - **The DCGKA carrier**, still open under the place port's T3b and untouched
   by any of this.
+
+## Progress
+
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  `support/doc-audit/d2/batch_42_s14_phase_b4.md`: `BlockEvaluator`'s home is
+  repointed to inker in Mere, the search defect is reworded for esp after
+  Sibylla's deletion (S0 and S1 still unbuilt), K0's spawning note is tied to
+  K3, the repeated Wasm bullet is removed, and the repository note's "one
+  immutable revision" is checked against three different pins.

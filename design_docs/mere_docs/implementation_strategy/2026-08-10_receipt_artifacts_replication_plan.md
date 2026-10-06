@@ -1,8 +1,14 @@
 # Receipt Artifacts Replication Plan
 
 **Date**: 2026-08-10
-**Status**: R0-R3 built 2026-08-10. R3 landed in the projection rather than
-turnstone, for the reason in §5; one gap named there. See §5.
+**Status (2026-10-06):** R0-R3 built 2026-08-10, and the store-backed
+read-through closed the gap §5 names. The first-party app door (§6.1, §6.2),
+the Turnstone client and Device Receipts lens (§6.3) and the headed receipt
+(§6.4) landed 2026-08-14 to 2026-08-16; Turnstone `8382e75` gave the pane its
+scroll. The intake and both doors have since moved from graphshell to djinn
+(the device host became `ports/djinn/src/bin/djinn.rs` in `1a3dcf6f`,
+2026-08-22). Open: R1's done-condition, a receipt browsable on a second paired
+device, has no receipt here; §6.5's remote runs were ingested on one machine.
 **Scope**: receipts — scenario receipts, frame captures, screenshots, and
 their provenance manifests — as content-addressed artifacts in the personal
 graph, replicated across the owner's own devices by the stack itself.
@@ -188,6 +194,10 @@ More than expected, and the plan is mostly wiring because of it:
   polling `<data_root>/receipts/inbox` every 10s beside the existing pairing,
   card-refresh, and accept watches.
 
+  **Corrected 2026-10-06 (S14 pass):** the intake now lives in djinn, not
+  graphshell: `spawn_receipt_intake` is in `ports/djinn/src/personal_sync.rs`
+  (line 1115), beside `stage_captures` (line 1064).
+
   Three decisions in the intake worth keeping:
 
   - **One turn per receipt.** A run is one fact; batching two runs into a turn
@@ -300,6 +310,9 @@ More than expected, and the plan is mostly wiring because of it:
   than taking it alongside, so there is one statement of what a receipt's
   captures are.
 
+  **Corrected 2026-10-06 (S14 pass):** `stage_captures` now lives in djinn,
+  at `ports/djinn/src/personal_sync.rs` (line 1064).
+
   **Then the read-through itself.** `IdentityEndpoint` gained an optional
   `ResourceReader` and a byte-budgeted cache (64 MiB, oldest-first eviction);
   `bytes_for` answers from `resources` and `released` first, so transfers cost
@@ -321,6 +334,14 @@ More than expected, and the plan is mostly wiring because of it:
   end against the changed hand-off: the inbox entry now carries `source`
   beside `events`, and the node id, blob hash and event count are unchanged
   from before the format moved.
+
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_43_s14_phase_b5.md: the status rewritten to
+  record the app door, the Turnstone lens and the headed receipt as landed
+  and the intake and doors as moved to djinn, with R1's second-device
+  condition named open; dated notes on the moved intake, the device host and
+  the pane's scroll.
 
 ## 6. The lens, and the one decision in front of it
 
@@ -379,6 +400,8 @@ client at the wrong door is refused with a reason instead of half-speaking the
 other protocol, an `AppId` label, and a default-deny `AllowedApps` whose
 default set is `turnstone`.
 
+**Corrected 2026-10-06 (S14 pass):** `AllowedApps` is now `AllowedAppRoutes`.
+
 **What proves "first-party" is the endpoint's permissions, not the name.** The
 socket and pipe are the owner's, so reaching them at all means running as the
 owner. The app id is a label: it tells the host and the operator which
@@ -435,6 +458,10 @@ client is not replayable as another, and there is a test pinning exactly that.
 **Wired:** `graphshell_device_host` serves both doors, off one surface handle,
 so a browser and an application on the same device see one set of cards rather
 than two. `--app-endpoint` overrides, mirroring `--browser-endpoint`.
+
+**Corrected 2026-10-06 (S14 pass):** that binary moved (a git rename) into
+`ports/djinn/src/bin/djinn.rs` in `1a3dcf6f` (2026-08-22); djinn now serves the
+app door (`serve_app_broker`, line 1009 there).
 
 **Verified.** 208 graphshell lib tests pass, 13 of them on this lane. The one
 that matters is `turnstone_opens_a_session_and_reads_a_capture`: a full session
@@ -547,3 +574,7 @@ Also exposed: the Device Receipts pane has **no scroll container**. With a real
 graph the host offers 35 cards and only the first few are reachable at all.
 Receipts now sort first (by the badge the endpoint sends), which makes the pane
 usable, but the missing scroll is a real gap.
+
+**Corrected 2026-10-06 (S14 pass):** closed. Turnstone `8382e75` (2026-08-16)
+added scrolling (`PaneScroll` in turnstone's `device_receipts_pane.rs`, line
+120), with `device_receipts_scroll.scn` as its scenario.

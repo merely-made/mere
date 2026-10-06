@@ -32,6 +32,14 @@ Out of scope: any change to `graph-kernel`'s write path or a relation delta
 journal (a possible E2 phase 2, gated on E2's numbers); the substrate decision;
 cross-application node reconciliation (a separate assessment).
 
+**Corrected 2026-10-06 (S14 pass):** both crates named here have since been
+folded. Subgraph is now the module `crates/mere/src/subgraph.rs` (folded by
+`61894570`, 2026-09-23), and canvas is now `pictograph`, with
+`collapse_descendants` in
+`crates/canvas/pictograph/src/canvas/fold_projection.rs` (folded by
+`f590e45d`, 2026-09-24). The `mere-subgraph` and `canvas` packages that the
+phases' done-conditions and Progress name no longer exist.
+
 ## Phases
 
 ### E1 — fix the quadratic fold closure
@@ -319,6 +327,9 @@ helper is being reworked anyway. 3 is a substrate decision, not a bug fix.
   struck and its open item closed, the subgraph design set rewritten, the
   2026-06-13 derivation design doc moved to its new name, and the
   pre-retirement briefs marked rather than rewritten.
+  **Corrected 2026-10-06 (S14 pass):** the crate was later folded into mere
+  as `crates/mere/src/subgraph.rs` (`61894570`, 2026-09-23); see the note
+  under Scope.
 - 2026-09-12. Q1 and Q2 landed. `RelationKind::OpenPredicate` (family
   Semantic, tag keeps the Semantic family byte with a sentinel sub-ordinal)
   gives every statement a row; the Traversal row now follows sidecar
@@ -337,3 +348,8 @@ helper is being reworked anyway. 3 is a substrate decision, not a bug fix.
   (it fails against the old loader), and the derived `UrlPath` relation is
   rebuilt child-to-parent on load, which pins why the derived pair is not
   carried across verbatim.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_44_s14_phase_b6.md: a dated note records the
+  later folds of the subgraph crate into `mere` and of canvas into
+  `pictograph`.

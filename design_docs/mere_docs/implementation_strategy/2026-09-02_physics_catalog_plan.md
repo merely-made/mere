@@ -1,7 +1,7 @@
 # Physics Catalog Plan
 
 **Date:** 2026-09-02
-**Status:** in progress (P1 landed 2026-09-02; P1b, P2 on both hosts and P3 the remote board 2026-09-03; the runtime extraction 2026-09-04; P4 web half 2026-09-04, closing with the Graphshell tree port per the 2026-10-01 rulings in §5; P5a-c 2026-10-02: kernel, cell list, lagged seam, setters and the web tree at the third-round web defaults, receipts green, merged; then turnstone and P5d; P7 moved to the [dynamics grammar plan](2026-10-02_dynamics_grammar_plan.md) 2026-10-02).
+**Status (2026-10-06):** in progress. P1 landed 2026-09-02; P1b, P2 on both hosts and P3 the remote board 2026-09-03; the runtime extraction 2026-09-04; P4's web half 2026-09-04, closing with the Graphshell tree port per the 2026-10-01 rulings in §5. P5a-c (kernel, cell list, lagged seam, setters and the web tree at the third-round web defaults, receipts green) merged 2026-10-02 (`8022cedd`); turnstone's wiring and P5d remain. P6a, Density's CPU tier, merged 2026-10-04 (`9b576c84`); P6b, the GPU tier, and P6c, its receipts, remain. Orbit's retune (`9ce5889f`) and Energy's, with the view following while playing (`562488b0`), merged 2026-10-04. Seiche's speed dial, the native entry point and the 1x-floor bound merged 2026-10-06 (`c6e8cc09`, calm round 24 of 24); the period estimator is on `seiche-speed-estimator`, not merged, and turnstone's repin and speed wiring follow the dial's merge (Progress, 2026-10-05). P7 moved to the [dynamics grammar plan](2026-10-02_dynamics_grammar_plan.md) 2026-10-02.
 **Scope:** A catalog of *distinct physics layout laws* — dynamical systems
 over the graph's bodies that produce different layouts because they are
 different physics — as a lever beside the arrangement catalog, plus the
@@ -821,6 +821,29 @@ pull reading −0.33 with 510 overlaps):
   (against counting passes under load and rerunning misses calm, or waiting
   for calm however long it takes). The rows already run under load do not
   count.
+  *Ruled 2026-10-06, the estimator's three forks* (`seiche-speed-estimator`
+  `bf373b36`). The rule takes the largest period between 1/360 s and 1/60 s
+  that 75% of the last 40 intervals fit, each within 0.3 ms of a whole
+  multiple. It lifts to a multiple when the fit holds, steps down to a
+  fraction when that fits 0.15 more, and reads nothing before 16 intervals.
+  Every one of the 526 replayed prefix windows reads within 1% of 6.07 ms or
+  falls back, and all 12 planted traces read correctly. So Max's budget
+  became 3,030 µs.
+  - The fast receipt then missed its `effective speed >= 1` bar calm, 3 of 3
+    (0.75x, 0.81x, 0.82x). The 300-node page's frames take 160 to 270 ms;
+    Max was still faster than that page's own 1x. Mark chose **"Relative to
+    the page's 1x"**: Max must be at least as fast as the same page's 1x
+    run (against a lighter page, or keeping the bar).
+  - The ThinkPad's only Chrome is the Flatpak one, and it exposes no WebGPU
+    adapter without flags. Mark chose **"WebGPU flag, throwaway profile"**:
+    only the lane's throwaway profile is launched with
+    `--enable-unsafe-webgpu --enable-features=Vulkan`, and nothing on the
+    machine changes (against a plain interval page, Firefox as is, or
+    skipping the ThinkPad).
+  - A page whose frames always take an even number of refreshes reads twice
+    the period. Mark chose **"Look for a tiebreaker"**: before merging, the
+    lane looks for another signal that separates the two cases, with
+    evidence (against accepting it as a documented limit).
   The face offset, diagnosed (2026-10-04, `tree-face-zoom`): the face is
   drawn right and the body wrong, on both pages. Pictograph's gnode style
   scales each body about its centre (the CSS default Livery follows since

@@ -1,7 +1,14 @@
 # Burn Wgpu Flip Plan (burn brief, Lane 1)
 
 **Date**: 2026-07-04
-**Status**: P0-P3 landed and measured; P4 aether wasm receipt green (2026-07-05). embed's wasm receipt is its own follow-on slice (getrandom-0.3-via-ahash + the tokenizers/onig C dependency); see Findings.
+**Status (2026-10-06):** complete. P0–P3 landed and measured, and the P4
+aether wasm receipt went green, on 2026-07-05. embed's wasm receipt, deferred
+here, was closed by the ESP consolidation's E0 (`1283b4a8`, 2026-08-09): wasm
+builds use tokenizers' `unstable_wasm` path, Oniguruma is native-only, and
+`bert-wgpu` passes on `wasm32-unknown-unknown`. The crates have since been
+renamed, embed to esp (`crates/intel/esp`) and aether to numen
+(`crates/conatus/numen`); the move to burn 0.22 belongs to the
+[burn 0.22 migration plan](2026-08-09_burn_0_22_migration_plan.md).
 **Related**: [burn_utilization_brief](../research/2026-07-04_burn_utilization_brief.md) (Lane 1 + decision D1; this plan is its first spin-out), [local_models_harness_brief](../research/2026-06-24_local_models_harness_brief.md) (D2, the wasm ceiling, starts after this), `crates/intel/embed` *(historical citation)* <!-- doc-audit: historical-path -->, `crates/orrery/aether` *(historical citation)* <!-- doc-audit: historical-path -->.
 
 ## Scope
@@ -113,6 +120,12 @@ harness brief.
   mechanically possible today; whether to share stays a scheduling question
   (queue contention vs the frame budget), revisit when the first resident-
   data consumer lands.
+
+  **Corrected 2026-10-06 (S14 pass):** these versions are out of date. The
+  tree is on burn `=0.22.0-pre.4` (`crates/intel/esp/Cargo.toml`,
+  `crates/conatus/numen/Cargo.toml`), cubecl-wgpu 0.11.0-pre.4 and wgpu 30.0.1
+  (root `Cargo.toml`). `Cargo.lock` still holds a single wgpu, so the
+  unification conclusion holds.
 - 2026-07-05, **P4 aether receipt green**: `cargo check -p aether --features
   field-burn-wgpu --target wasm32-unknown-unknown` passes after two
   target-gated feature switches in aether's manifest (no code changes):
@@ -130,6 +143,14 @@ harness brief.
   audit plus swapping the tokenizer regex backend — a real slice, deferred
   (harness-brief D2 territory), not a Lane-1 gate. embed's manifest already
   carries the getrandom-0.4 switch so that wall is pre-cleared.
+
+  **Corrected 2026-10-06 (S14 pass):** the
+  [ESP consolidation plan](2026-08-08_esp_consolidation_plan.md)'s E0
+  (`1283b4a8`, 2026-08-09) closed this slice and re-ran the earlier wasm
+  receipts. Wasm builds use tokenizers' `unstable_wasm` path, Oniguruma is
+  native-only (`crates/intel/esp/Cargo.toml`), and `bert-wgpu` passes on
+  `wasm32-unknown-unknown`
+  ([feature target matrix](../../intel_docs/technical_architecture/2026-08-09_feature_target_matrix.md)).
 
 ## Progress
 
@@ -189,3 +210,4 @@ harness brief.
   One capture caveat: with the pre-fix failing test, the release test
   binary hung after the panic and needed a kill (wgpu-linked harness
   teardown on the failure path); the passing suite exits cleanly.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at mere 535bca11, from the D2 record in support/doc-audit/d2/batch_41_s14_phase_b3.md: status set to complete, with embed's wasm receipt recorded as closed by ESP E0 (`1283b4a8`), the embed→esp and aether→numen renames named, and the D1 versions corrected to burn 0.22 pre-release and wgpu 30.

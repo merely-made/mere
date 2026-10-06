@@ -1,15 +1,27 @@
 # License Sweep Plan
 
 **Date:** 2026-08-22
-**Status:** **P0 and P1 landed 2026-08-27; P2 (genet), P4 turnstone and hocket, P5 mora and wavicle, and P7 mesocosm, paredros, netrender, wgpu-graft, wgpu-scry and wgpu-weld landed 2026-09-03; P6 clause and layout landed 2026-09-03**; P3 isometry, P4 woodshed and P7 retinue wait on their lanes' dirty trees; P5 gaz has no repository to sweep (see 2026-09-03); one P2 hazard open in genet (see 2026-09-03). mere is MPL-2.0 by
-default with correct provenance — receipt in §6's Progress. Both P0
-confirmations were settled 2026-08-22 (header shape C, the notice
-`Mark Alan Boykin`, no exceptions); P0's tooling and ledger were built
-2026-08-27, and its two open verifications are answered there. Two rulings
-were taken during the work: `crates/system/luggage` carries MPL-2.0 with the
-Tauri/CrabNebula notices retained, and published crates ship no license text
-file (root `LICENSE` only), which struck one P1 done-condition. The remaining
-gate for each later phase is unchanged: a clean tree in that repository.
+**Status (2026-10-06):** P0 and P1 landed 2026-08-27; P2 (genet
+`957926e4e8a`), P4 turnstone and hocket, P5 mora and wavicle, P6 clause and
+layout, and P7 mesocosm, paredros, netrender, wgpu-graft, wgpu-scry and
+wgpu-weld landed 2026-09-03. P3 isometry, P4 woodshed and P7 retinue still
+wait on their lanes' trees (at the S14 audit isometry's root is still
+`MIT OR Apache-2.0`, 154 of woodshed's 188 Rust files lack headers, and
+retinue is unheaded); P5 gaz has no repository to sweep (see 2026-09-03). The
+genet P2 hazard looks overtaken, since cambium has left genet and mere's copy
+carries pointer.rs; whether that closes it is open (§6, the 2026-09-03 P2
+hazard entry). Open in
+mere (ruling S45 of the [stack seams plan](2026-10-04_stack_seams_plan.md)):
+61 owned sources lack Exhibit A at mere 535bca11, most carrying only a short
+SPDX line, so P1's zero-unheaded condition no longer holds until
+`scripts/relicense_headers.py` is re-run on a clean tree and a gate makes new
+owned files carry the header, both a follow-on task. Settled: header shape C,
+the notice `Mark Alan Boykin` and no exceptions (2026-08-22); luggage carries
+MPL-2.0 with the Tauri/CrabNebula notices retained; published crates ship no
+license text file (root `LICENSE` only), which struck one P1 done-condition;
+tinct's notice files were deleted by ruling (`642ca2d7`), and inker's, dropped
+in merge `0a8198ba`, stay deleted (ruling S40: inker is MPL-2.0). The gate for
+each remaining phase is unchanged: a clean tree in that repository.
 **Scope:** Carry the 2026-08-22 ruling, MPL-2.0 by default with correct
 provenance, into every owned repository: manifests, source headers, LICENSE
 files, READMEs, and a provenance ledger per repository. No code changes, no
@@ -163,6 +175,17 @@ Done when:
 - `cargo check -p castellan -p personae -p notochord -p sceno` is green;
 - `--audit` for mere reports zero unheaded owned sources.
 
+**Corrected 2026-10-06 (S14 pass):** the second condition and the last no
+longer hold. At mere `535bca11`, `git grep -L 'Mozilla Public' 535bca11 -- '*.rs'`
+finds 61 sources outside the ledger paths without Exhibit A: 54 under crates
+and ports (for example graphshell's web_tree, the registry's diagnostics,
+reference-data and mesquite) and 7 probe sources under the testing receipts.
+Most carry a short `Copyright` plus SPDX MPL-2.0 header, which the tool's
+audit does not accept, and files added since P1 lack the header. Ruling S45
+has `scripts/relicense_headers.py` re-run over them on a clean tree in one
+commit, and a gate added so new owned files carry the header, as a follow-on
+task outside the S14 pass.
+
 ### P2. genet
 
 Tasks:
@@ -232,6 +255,15 @@ P2.
   old grant permanently and the new one ships at each crate's next functional
   bump (the brief's no-republish rule). mere's `LICENSES.md` records them.
   Open: whether the two notice-file pairs are removed at that bump.
+
+  **Corrected 2026-10-06 (S14 pass):** settled. tinct's pair was deleted by
+  Mark's ruling in `642ca2d7` (2026-09-24). inker, which absorbed verso-tile,
+  carries no notice files at mere `535bca11`, though not by a ruling at the
+  time: merge `0a8198ba` (2026-09-06) dropped them (its first parent has
+  inker's LICENSE-MIT and LICENSE-APACHE, its second verso-tile's, the merge
+  neither). Ruling S40 accepts the deletion: inker is MPL-2.0 like the rest of
+  the workspace. mere's LICENSES.md still lists both pairs and calls the four
+  files "not to be deleted"; S40 has those rows and that sentence amended.
 
   **2026-09-03, superseding ruling.** Mark ruled the promoted-library clause
   retired outright rather than reworded to the fork/vendor criterion this
@@ -460,3 +492,22 @@ never before that repository's ledger is written.
 - **2026-09-03, P7 item 4 LANDED: wgpu-graft, headers** (`2df70d6`). Ruled: the 57 owned sources take shape C; their derivation from the Slint servo embedding example stays recorded through `NOTICE` and the ledger's derivative rows. 57 headered (53 Rust and WGSL, 4 scripts), the retained table's four paths proven to cover all 460 vendored files, the `freetype-sys-compat` manifest's stray `MIT` corrected. Audit 57 owned, 0 unheaded, 0 Exhibit B; `cargo check -p grafting` green. Tool finding: `already_covered` matched "Mozilla Public" alone, so the three Servo-adapted `keyutils.rs` with an `// Original: Mozilla Public License 2.0` provenance line were skipped as if headed; the mark is now Exhibit A's opening words.
 - **2026-09-03, P5 LANDED: gaz** (`none`). The brief's premise no longer holds: `merely-made/gaz` does not exist on GitHub, and no repository containing `gaz` exists under `merely-made` or `mark-ik` (checked with `gh repo view` and `gh repo list` on 2026-09-03). Mark ruled the crate relicensed rather than archived and wants the name kept; the name is his by the naming ledger, and the code is mere's `crates/dramatis/gaz` (Mark, 2026-09-03): 11 files under the workspace's MPL-2.0 with shape C headers since mere's P1, audit clean. Nothing to sweep. If the repository is to exist again, that is a founding, and per the naming ledger a claim is made with a real publish.
 - **2026-09-03, P2 hazard LANDED: genet** (`957926e`). **The genet relicense committed half of an active lane's change.** `components/cambium/cambium/src/lib.rs` *(historical citation)* <!-- doc-audit: historical-path --> was swept in carrying the lane's new `pub use pointer::{.., PointerButton, ..}` while `pointer.rs`, which defines the enum, stayed in the working tree with the other held-out files. On a clean checkout genet head therefore fails to compile `cambium` (`E0432` unresolved import), found by mere's repoint against head on 2026-09-03; the lane's own checkout builds because the definition is present there. The hold-out list was taken from `git status` once, before the tool ran, and the sweep's diff was then reviewed as headers only; a file the lane touched between the two moments, or whose lane edit sat beside a header change, was not caught. Rule for the next sweep: after `--apply`, diff every swept file against `HEAD` with the header lines filtered out and require the remainder empty, per file, before committing; a non-empty remainder is the lane's and the file is held out. Repair is Mark's call: the lane commits its `pointer.rs` half, or authorizes committing it.
+
+  **Corrected 2026-10-06 (S14 pass):** overtaken in the tree. Genet's HEAD
+  (`90c5ef507db` at the S14 audit) no longer carries cambium among its
+  components, only support/name-claims/cambium, and in mere
+  `crates/cambium/cambium/src/pointer.rs` exists, with
+  `crates/cambium/cambium/src/lib.rs` re-exporting `PointerButton` (line 162).
+
+  **Open, raised by the S14 pass (2026-10-06):** is the P2 hazard closed as
+  moot, or does closing it need a receipt that genet's head builds on its
+  own? Options: close it as moot, since cambium has left genet and mere's
+  copy carries pointer.rs; keep it open until a clean-checkout genet build
+  is receipted.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_43_s14_phase_b5.md: the status rewritten to
+  record the 61-file header drift as open under ruling S45 and the notice
+  files as settled under S40; dated notes on P1's done-conditions, the P6
+  notice-file question and the genet P2 hazard, with one open question
+  raised on the hazard.

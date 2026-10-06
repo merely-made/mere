@@ -5,17 +5,25 @@
 > Mere under E2 of `knot-editor/design_docs/2026-09-01_knot_editor_repository_extraction_plan.md`,
 > so the `ports/knot` *(historical citation)* <!-- doc-audit: historical-path --> paths below name the layout each receipt landed against.
 
+**Corrected 2026-10-06 (S14 pass):** if "one immutable revision" means one
+revision shared by every consumer, it does not hold at mere 535bca11:
+Turnstone pins knot-editor `3dfb70b0`, Mere's root manifest (which djinn uses
+through `knot-editor.workspace = true`) pins `562353aa`, and djinn's
+`knot-site` pins `ea3e99ef`.
+
+**Open, raised by the S14 pass (2026-10-06):** is "one immutable revision" the
+intended rule for Knot's consumers? Options: one shared knot-editor revision
+across Turnstone, Mere and djinn's `knot-site`; each consumer pins its own
+immutable revision.
+
 **Date:** 2026-07-25
-**Status:** implementation complete locally 2026-07-27. K0 through K7 are
-executable. Knot has now pulled Stickleback's causal projection seam:
-concurrent writers for one document are reported as a visible conflict while
-unrelated documents remain available, and an explicit resolution names the
-exact causal versions it replaces. Personal vault sync and communal
-multi-member Knot are separate signed encryption profiles; communal documents
-use retained Commons data-key epochs. Graphshell protocol 1.1 now carries the
-payload-free revision bell Knot's native watcher needed. K7's Cambium text
-primitive is committed on local Genet `main` at `44e291afe8b`; publishing that
-commit remains the clean remote-checkout gate.
+**Status (2026-10-06):** complete. K0 through K7 landed locally 2026-07-27 in
+Mere's former `ports/knot` *(historical citation)* <!-- doc-audit: historical-path -->, including Stickleback's causal
+conflict projection, the signed personal and Commons encryption profiles, and
+Graphshell protocol 1.1's revision bell. K7's publication gate is cleared:
+Genet `44e291afe8b` is an ancestor of Genet's `origin/main` and of Mere's Genet
+pin `bd3e8861`. Knot left Mere for its own repository on 2026-09-04
+(knot-editor's extraction plan, E2).
 
 **Companions:** genet's
 [pelt and knot direction](https://github.com/merely-made/genet/blob/main/docs/2026-07-24_pelt_knot_direction.md)
@@ -52,6 +60,11 @@ A port is also the reversible choice, which is what an incubator wants. It can
 be promoted into Turnstone as a pane, or spun out to its own repository if it
 graduates into a product. Founding a repository intended to dissolve is the
 expensive direction.
+
+**Corrected 2026-10-06 (S14 pass):** the "not a standalone repository" half
+of this ruling was reversed by the spin-out it allowed for: Knot became its own
+repository, knot-editor, under E2 of its extraction plan (2026-09-04; see the
+repository note above).
 
 **Name:** plain `knot`, per Mark 2026-07-25, favoring brevity over the word
 pool. The port shares its word with the document format (`.knot`,
@@ -106,6 +119,10 @@ vault inside the app rather than merely a cheaper one.
   `DjotKnotEngine` preview from one host-owned source buffer. Cambium and
   Genet/Parley now supply the shared edit, IME, selection, movement, and
   geometry primitives. K7 is integration, not a new editor core.
+
+  **Corrected 2026-10-06 (S14 pass):** `knot-editor-host` no longer lives in
+  Genet; it is a Mere workspace member at `crates/inker/knot-editor-host`,
+  moved there on 2026-09-04 when Knot's sources left Mere.
 - **Boundary.** chirograph, -client, -endpoint, and -stdio, with the
   stdio carrier giving a child-process JSON boundary. The G4 receipt mounted
   Turnstone and Isometry sessions into one host with neither product in
@@ -163,6 +180,13 @@ Done-conditions, not dates. Every rung is complete locally. Automatic
 same-document text merge remains a Knot-owned product decision; the log now
 has an explicit, causal resolution operation instead of a hidden
 whole-document tiebreak.
+
+**Corrected 2026-10-06 (S14 pass):** automatic same-document text merge was
+decided and built the same day: `automatic_text_merge` landed in Mere
+`259f4e3b` (2026-07-27, in the former `ports/knot/src/sync.rs` *(historical citation)* <!-- doc-audit: historical-path -->),
+about seven hours after this sentence was written (`e06f5a78`). In
+knot-editor, `078fead` (2026-08-20) added Djot-block merge in `djot_merge.rs`,
+and `eee326f` (2026-08-25) moved `automatic_text_merge` there.
 
 - **K0. Port scaffold. Complete locally 2026-07-27.** `ports/knot` *(historical citation)* <!-- doc-audit: historical-path --> is a
   workspace member and `knot_endpoint` discloses a fixed fixture through the
@@ -228,6 +252,10 @@ whole-document tiebreak.
   `.knot`. The corresponding Genet primitive is committed locally at
   `44e291afe8b`; remote reproducibility waits only on publishing it.
 
+  **Corrected 2026-10-06 (S14 pass):** that gate is cleared. Genet
+  `44e291afe8b` is an ancestor of Genet's `origin/main` and of Mere's Genet pin
+  `bd3e8861`.
+
 **Carrier note.** Graphshell protocol 1.1 adds the revision bell:
 `CarrierNotice { session, epoch, revision }`. It carries no scene payload.
 The notifying stdio server reads requests on a helper thread so quiet input
@@ -248,6 +276,10 @@ rather than inverting into a second product, the same rule Strophe holds for
 the audio layer. Not an IDE, per the Genet ruling that knot's destination is
 the authoring browser. No separate notes product competing with Turnstone for
 the same users.
+
+**Corrected 2026-10-06 (S14 pass):** "not a new repository" was reversed by
+the 2026-09-04 extraction; Knot is now the knot-editor repository (see the
+repository note).
 
 ## Progress
 
@@ -287,3 +319,10 @@ the same users.
   protocol 1.1 gained the revision bell and the stdio/host recovery path.
   Focused library suites pass 39 Graphshell, 9 protocol, 5 stdio, and 36 Knot
   tests; the separate real-process Knot bell/resume test also passes.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  `support/doc-audit/d2/batch_42_s14_phase_b4.md`: K7's Genet publication gate
+  is recorded as cleared, §3's `knot-editor-host` home, §5's automatic merge
+  and the §1/§6 repository rulings are annotated with what landed, and the
+  repository note's "one immutable revision" is checked against three
+  different pins.
