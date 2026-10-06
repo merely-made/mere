@@ -296,7 +296,7 @@ fn nan_extrema_data(shape: &Shape, axis: usize) -> Vec<f32> {
                 2 if axis_coordinate + 1 == axis_len => f32::NAN,
                 3 if axis_coordinate == axis_len / 3 || axis_coordinate == (2 * axis_len) / 3 => {
                     f32::NAN
-                }
+                },
                 4 => f32::NAN,
                 5 if axis_coordinate == 0 || axis_coordinate + 1 == axis_len => 9.0,
                 6 if axis_coordinate == 0 || axis_coordinate + 1 == axis_len => -9.0,
@@ -357,4 +357,26 @@ fn integer_extrema_data(shape: &Shape) -> Vec<f32> {
     (0..shape.iter().product())
         .map(|linear| ((linear * 17) % 31) as f32 - 15.0)
         .collect()
+}
+
+#[test]
+fn max_abs_short_axis_nan() {
+    let shape = Shape::new([2, 3]);
+    let strides = Strides::new(&[3, 1]);
+    let mut cases = vec![unit_case(shape.clone(), strides.clone(), 1)];
+    if supports_plane() {
+        for independent in [false, true] {
+            cases.push(plane_case(
+                shape.clone(),
+                strides.clone(),
+                1,
+                independent,
+                false,
+            ));
+        }
+    }
+    for case in cases {
+        case.with_data(vec![1.0, f32::NAN, -3.0, 1.0, -4.0, 3.0])
+            .test_max_abs();
+    }
 }

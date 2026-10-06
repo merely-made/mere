@@ -58,7 +58,7 @@ pub struct ReduceInput {
 pub enum ReduceValues {
     /// Uniform over `[-1, 1]`, drawn from this seed.
     Uniform(u64),
-    /// An evenly spaced ramp over `[-1, 1)`, dealt out by an odd stride so no
+    /// An evenly spaced ramp over `[-1, 1)`, distributed by an odd stride so no
     /// run of the tensor is sorted. Every value stays distinct down to f16, so
     /// a top-k has a single right answer and no tie can decide the comparison.
     Ramp,
@@ -111,7 +111,7 @@ pub fn comparison_epsilon(config: ReduceOperationConfig) -> f32 {
     match config {
         ReduceOperationConfig::Sum | ReduceOperationConfig::Mean | ReduceOperationConfig::Prod => {
             1.0
-        }
+        },
         ReduceOperationConfig::Max
         | ReduceOperationConfig::Min
         | ReduceOperationConfig::MaxAbs
