@@ -1,7 +1,17 @@
 # Comms Shell Plan
 
 **Date**: 2026-06-05
-**Status**: Largely implemented (the `shell/comms` domain crate and the meerkat pane exist; see Progress). The realization of Mere's **comms surface** in
+**Status (2026-10-06):** P1 to P5 landed outside meerkat; P6, the docked comms
+pane, landed in meerkat on 2026-06-06, retired with it 2026-07-18
+(`c5f01064`). Surviving library parts: errand's `misfin_send` (errand is now
+`crates/system/errand`); misfin's `deterministic_identity`, `identity_salt` and
+`MailboxStore` (misfin 0.0.4 on crates.io); murm's cabal `history` and
+`subscribe`; and the `crates/shell/comms` domain crate (`ProtocolAdapter`,
+`Comms`, `CommsPane`, the misfin and murm adapters), which no manifest
+consumes beyond the workspace entry. Open: a host for the pane, P6c's
+remaining live pieces (the misfin server socket, networked murm cabals, the
+misfin send path), P3b′, and the contact model deferred on 2026-06-15.
+The plan was the realization of Mere's **comms surface** in
 meerkat: a docked peripheral pane that surfaces unified communications (misfin
 mail + murm cabals, with room for mooting protocols), rendered through the same
 domain → host pattern as the chrome. It closes the [modular integration
@@ -112,6 +122,16 @@ the inbox, P5 depends on the adapters, P6 is the visible payoff.
   domain into it: identity, a conversation list, a reader (envelope + nematic body),
   and a compose / send view. *Done:* open the comms pane, see your identity and
   conversations (misfin mail + murm cabals), read + compose + send.
+
+  **Corrected 2026-10-06 (S14 pass):** P6 landed in meerkat (P6a to P6c,
+  2026-06-06) and was removed with it in `c5f01064` (2026-07-18): the
+  `comms_host.rs` actor and the pane views are gone, and no manifest depends
+  on `mere-comms` beyond the workspace entry. The comms crate's own manifest
+  still describes it as surfaced by the meerkat comms pane.
+
+  **Open, raised by the S14 pass (2026-10-06):** `crates/shell/comms` has had
+  no consumer since meerkat left. Does it stay? Options: keep it as the comms
+  domain a future host's pane consumes; retire it.
 - **Later:** mooting protocol adapters (Matrix / Nostr / …) as those backends land;
   external-server polish; gloss / apparatus / settings reusing the P6 docked-pane
   slot.
@@ -413,3 +433,8 @@ make it a live shell (compose, send, read, conversation list) with murm cabals
   is ours); ephemeral = murm-native real + misfin local-only. And the **`misfind`**
   daemon split (the adapter reads a `MailboxStore`, not a socket) for decision 3's
   receive-server. No code; frames a later phase.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_47_s14_phase_b9.md: P6 recorded as landed in
+  meerkat and removed with it (`c5f01064`), the surviving errand, misfin, murm
+  and comms parts named, and the comms crate's future opened as a question.
