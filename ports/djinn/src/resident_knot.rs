@@ -10,9 +10,28 @@
 //! Personae owns startup unlock, Murm owns transport, and iroh-blobs owns the
 //! physical content store. This module only keeps those authorities alive in
 //! one resident and registers the stable local route.
+//!
+//! ## Closed while the vault is locked (vault lock ruling 48)
+//!
+//! The route is registered once, over a [`KnotGate`]. While the lane is
+//! closed the gate refuses every open, and closing it cuts every live
+//! session, so no route or session keeps the source (and its signing seed)
+//! alive. Reopening refills the gate: the route serves again.
 
 use std::path::{Path, PathBuf};
+use std::sync::{Arc, Mutex, Weak};
 use std::time::Duration;
+
+use chirograph::{
+    CarrierNotice, EndpointDescriptor, IntentInvocation, IntentResult, ProjectionRequest,
+    ProjectionSnapshot, ResourceChunkRequest, ResourceChunkResponse, ResourceRequest,
+    ResourceResponse, ResumeReply, ResumeRequest,
+};
+use graphshell::lifecycle::AdmittedEndpointContext;
+use graphshell::native::endpoint_catalog::{ResidentEndpoint, ResidentEndpointSession};
+use graphshell_endpoint::{
+    IntentSink, PresentationSource, ProjectionCatalog, ProjectionNoticeSource, ProjectionSource,
+};
 
 use knot_editor::{
     KnotContentRetentionPort, KnotResidentSource, KnotRosetteConfig, KnotSettings,
@@ -33,12 +52,121 @@ pub const RESIDENT_KNOT_ROUTE: &str = "knot";
 /// Notice cadence for live document revisions on the local route.
 pub const RESIDENT_KNOT_NOTICE_POLL: Duration = Duration::from_millis(50);
 
+const CLOSED: &str = "Knot is closed while the vault is locked";
+
+/// What the registered route opens through: the lane's sessions while it is
+/// open, refusals while it is closed.
+#[derive(Clone, Default)]
+pub struct KnotGate(Arc<Mutex<GateState>>);
+
+#[derive(Default)]
+struct GateState {
+    /// The open lane's own catalog, its factory holding the source.
+    lane: Option<ResidentEndpointCatalog>,
+    sessions: Vec<Weak<Mutex<Option<ResidentEndpointSession>>>>,
+}
+
+impl KnotGate {
+    fn lock(&self) -> std::sync::MutexGuard<'_, GateState> {
+        self.0.lock().unwrap_or_else(std::sync::PoisonError::into_inner)
+    }
+
+    fn arm(&self, source: KnotResidentSource, rosette: KnotRosetteConfig) {
+        let mut lane = ResidentEndpointCatalog::new();
+        lane.register_resumable_notifying(RESIDENT_KNOT_ROUTE, "Knot", move |_| {
+            Ok(source
+                .session(Some(KnotWriteGrant::new(rosette.max_source_bytes)))
+                .with_rosette_config(rosette))
+        })
+        .expect("a fresh lane catalog takes its one route");
+        self.lock().lane = Some(lane);
+    }
+
+    /// Refuse new opens and cut every live session. Returns how many were
+    /// cut.
+    pub fn close(&self) -> usize {
+        let mut state = self.lock();
+        state.lane = None;
+        let mut cut = 0;
+        for session in state.sessions.drain(..) {
+            if let Some(session) = session.upgrade() {
+                let mut held = session.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+                cut += usize::from(held.take().is_some());
+            }
+        }
+        cut
+    }
+
+    /// Whether the lane is open.
+    pub fn is_open(&self) -> bool {
+        self.lock().lane.is_some()
+    }
+
+    fn open(&self, context: &AdmittedEndpointContext) -> Result<Box<dyn ResidentEndpoint>, String> {
+        let mut state = self.lock();
+        let lane = state.lane.as_mut().ok_or_else(|| CLOSED.to_string())?;
+        let session = lane
+            .open(RESIDENT_KNOT_ROUTE, context)
+            .map_err(|error| error.to_string())?;
+        let held = Arc::new(Mutex::new(Some(session)));
+        state.sessions.retain(|weak| weak.strong_count() > 0);
+        state.sessions.push(Arc::downgrade(&held));
+        Ok(Box::new(GatedSession(held)))
+    }
+}
+
+/// One live Knot session, cut when the lane closes.
+struct GatedSession(Arc<Mutex<Option<ResidentEndpointSession>>>);
+
+impl GatedSession {
+    fn with<R>(&self, f: impl FnOnce(&mut ResidentEndpointSession) -> Result<R, String>) -> Result<R, String> {
+        let mut held = self.0.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+        f(held.as_mut().ok_or_else(|| CLOSED.to_string())?)
+    }
+}
+
+impl ResidentEndpoint for GatedSession {
+    fn describe(&self) -> EndpointDescriptor {
+        self.with(|session| Ok(session.describe()))
+            .unwrap_or_else(|_| EndpointDescriptor {
+                label: CLOSED.to_string(),
+                projections: Vec::new(),
+            })
+    }
+
+    fn snapshot(&mut self, request: ProjectionRequest) -> Result<ProjectionSnapshot, String> {
+        self.with(|session| session.snapshot(request))
+    }
+
+    fn resource(&mut self, request: ResourceRequest) -> Result<ResourceResponse, String> {
+        self.with(|session| session.resource(request))
+    }
+
+    fn resource_chunk(
+        &mut self,
+        request: ResourceChunkRequest,
+    ) -> Result<ResourceChunkResponse, String> {
+        self.with(|session| session.resource_chunk(request))
+    }
+
+    fn invoke(&mut self, intent: IntentInvocation) -> Result<IntentResult, String> {
+        self.with(|session| session.invoke(intent))
+    }
+
+    fn poll_notice(&mut self) -> Result<Option<CarrierNotice>, String> {
+        self.with(|session| session.poll_notice())
+    }
+
+    fn resume(&mut self, request: ResumeRequest) -> Result<ResumeReply, String> {
+        self.with(|session| session.resume(request))
+    }
+}
+
 /// One startup-unlocked Knot source, optional network host, and settings view.
 pub struct ResidentKnot {
-    source: KnotResidentSource,
     sync: Option<KnotSyncHost>,
     settings_file: PathBuf,
-    rosette: KnotRosetteConfig,
+    gate: KnotGate,
 }
 
 impl ResidentKnot {
@@ -47,6 +175,17 @@ impl ResidentKnot {
         data_root: &Path,
         config: KnotResidentSettings,
         blob_custody: ResidentBlobCustody,
+    ) -> Result<Self, String> {
+        Self::open_through(data_root, config, blob_custody, KnotGate::default()).await
+    }
+
+    /// [`Self::open`], serving the route through `gate` (a reopen keeps the
+    /// gate its route was registered over).
+    pub async fn open_through(
+        data_root: &Path,
+        config: KnotResidentSettings,
+        blob_custody: ResidentBlobCustody,
+        gate: KnotGate,
     ) -> Result<Self, String> {
         let persona_uuid = uuid::Uuid::parse_str(config.persona.trim())
             .map_err(|error| format!("invalid resident Knot persona UUID: {error}"))?;
@@ -148,27 +287,28 @@ impl ResidentKnot {
 
         let mut rosette = KnotRosetteConfig::default();
         rosette.max_source_bytes = config.max_source_bytes;
+        gate.arm(source, rosette);
         Ok(Self {
-            source,
             sync,
             settings_file,
-            rosette,
+            gate,
         })
     }
 
-    /// Register the stable route. Every admitted open receives an independent
-    /// session over the same resident source and operation store.
+    /// Register the stable route, once, over the gate. Every admitted open
+    /// receives an independent session over the same resident source and
+    /// operation store while the lane is open.
     pub fn register(
         &self,
         catalog: &mut ResidentEndpointCatalog,
     ) -> Result<(), ResidentEndpointCatalogError> {
-        let source = self.source.clone();
-        let rosette = self.rosette;
-        catalog.register_resumable_notifying(RESIDENT_KNOT_ROUTE, "Knot", move |_| {
-            Ok(source
-                .session(Some(KnotWriteGrant::new(rosette.max_source_bytes)))
-                .with_rosette_config(rosette))
-        })
+        let gate = self.gate.clone();
+        catalog.register_erased(RESIDENT_KNOT_ROUTE, "Knot", move |context| gate.open(context))
+    }
+
+    /// The gate the route is served through.
+    pub fn gate(&self) -> KnotGate {
+        self.gate.clone()
     }
 
     /// Local route descriptor granted to an installed first-party client.
@@ -217,7 +357,9 @@ impl ResidentKnot {
     }
 
     /// Stop network activity before the source-owned evidence actor shuts down.
+    /// The route refuses from here on, and live sessions are cut.
     pub async fn close(mut self) -> Result<(), String> {
+        self.gate.close();
         if let Some(sync) = self.sync.take() {
             sync.close()
                 .await
@@ -374,14 +516,16 @@ mod tests {
         other_host.close().await.unwrap();
 
         let settings_file = root.path().join("knot-sync.json");
+        let rosette = KnotRosetteConfig {
+            max_source_bytes: 4096,
+            ..KnotRosetteConfig::default()
+        };
+        let gate = KnotGate::default();
+        gate.arm(source.clone(), rosette);
         let mut resident = ResidentKnot {
-            source,
             sync: Some(host),
             settings_file: settings_file.clone(),
-            rosette: KnotRosetteConfig {
-                max_source_bytes: 4096,
-                ..KnotRosetteConfig::default()
-            },
+            gate,
         };
         let empty_authority_revision = resident.sync.as_ref().unwrap().authority_revision();
         assert!(!readers.allows(scope, &peer, hash));
@@ -443,10 +587,29 @@ mod tests {
 
         let mut reopened = catalog.open(RESIDENT_KNOT_ROUTE, &context).unwrap();
         let request = reopened.describe().projections.remove(0).request;
-        let snapshot = reopened.snapshot(request).unwrap();
+        let snapshot = reopened.snapshot(request.clone()).unwrap();
         let (_, edited, _) = editable_resource(&mut reopened, &snapshot, "field-note");
         assert_eq!(edited.source, "# Edited while sync is resident\n");
+
+        // Ruling 48: closing the lane cuts the live session and refuses
+        // opens; re-arming serves the same route again.
+        let gate = resident.gate();
+        assert_eq!(gate.close(), 1, "the live session is cut");
+        assert!(!gate.is_open());
+        assert!(reopened.snapshot(request.clone()).is_err());
+        let refused = catalog.open(RESIDENT_KNOT_ROUTE, &context).map(drop);
+        assert!(
+            refused
+                .unwrap_err()
+                .to_string()
+                .contains("closed while the vault is locked")
+        );
         drop(reopened);
+        gate.arm(source.clone(), rosette);
+        let mut again = catalog.open(RESIDENT_KNOT_ROUTE, &context).unwrap();
+        let request = again.describe().projections.remove(0).request;
+        assert!(again.snapshot(request).is_ok());
+        drop(again);
         drop(catalog);
         resident.close().await.unwrap();
     }

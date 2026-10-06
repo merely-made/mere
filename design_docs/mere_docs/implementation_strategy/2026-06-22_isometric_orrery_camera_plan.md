@@ -1,7 +1,14 @@
 # Isometric Orrery Camera Plan: 2.5D as one parameterized planar camera
 
 **Date**: 2026-06-22
-**Status**: Planning (with Mark). The "2.5D isometric rung" of the
+**Status (2026-10-06):** complete 2026-06-24 (`715203a`, `70a486f`). The camera
+(P0 to P3, billboard picking, the Alt+drag orbit) lives in pictograph's canvas
+(`crates/canvas/pictograph/src/canvas/scene_paint.rs`, `view.rs`, `input.rs`);
+Turnstone hosts the toggle, orbit, tilt, height and the Alt modifier
+(`Action::ToggleIsometric`). The `ToggleProjection` command and yaw/tilt
+persistence landed in meerkat on 2026-06-23, retired with it 2026-07-18
+(`c5f01064`); surviving library parts: the camera above; open: yaw/tilt
+persistence, which no host now writes. The "2.5D isometric rung" of the
 [orrery physics environments research](../research/2026-06-22_orrery_physics_environments_research.md):
 the cheap, in-stack dimensional mode (an isometric, orbitable camera with fake height) over the
 existing 2D rapier physics, with no rapier3d and no new render lane. Full 3D stays the gated long
@@ -290,6 +297,13 @@ picking / dragging a raised node lands on the right node.
   gesture (involved `input.rs`; the command + the bin's q/e/[/] keys cover driving it). Headed
   palette / reload spot-check is a quick confirm in the app (meerkat is Mark's in-flight, not
   auto-driven).
+  **Corrected 2026-10-06 (S14 pass):** both pieces landed in meerkat and were retired with it
+  2026-07-18 (`c5f01064`): `ToggleProjection`, the "Projection (toggle 2.5D isometric)" palette
+  entry, `>projection`, `camera_to_snapshot`, `snapshot_to_camera` and `snapshot_yaw_tilt` have no
+  hits in mere or Turnstone. The live toggle is Turnstone's `Action::ToggleIsometric`
+  (`turnstone/src/action.rs:280`, palette "Toggle isometric view" at `:660`, key `i`). Pandect's
+  `CameraSnapshot` (`view_intent_store.rs:80`) is a bare affine that nothing fills with yaw/tilt,
+  and Turnstone keeps yaw/tilt per runtime only (`turnstone/src/app/runtime_pool.rs:182`).
 - 2026-06-24: **Alt+drag orbit gesture landed (committed `70a486f`); the plan is fully complete.** The
   last deferred piece, now that the command-registry refactor settled and the tree was clean. Wired as
   a first-class orrery gesture beside the middle-drag pan: an `alt` flag (`set_alt`, mirroring
@@ -301,3 +315,11 @@ picking / dragging a raised node lands on the right node.
   it; a non-Alt left drag does not orbit). Headed-verified (scry-shots/isoorb-a vs -b): an Alt+left-drag
   reclines + rotates the field, cards upright. The in-app orbit now matches the q/e/[/] keys + the
   `>projection` toggle. **Nothing deferred remains.**
+  **Corrected 2026-10-06 (S14 pass):** no longer true of the tree: yaw/tilt persistence went with
+  Meerkat (see the 2026-06-23 correction). The standalone `orrery` bin whose keys (i, q/e, [/], h)
+  drove every headed check above was deleted in `47833f65` (2026-09-24). Turnstone pushes `set_alt`
+  (`turnstone/src/shell/events.rs:288`), so the in-app Alt+drag orbit survives there.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at mere 535bca11, from the
+  D2 record in support/doc-audit/d2/batch_48_s14_phase_b10.md: status set to complete with the
+  camera in pictograph and Turnstone as host, and the meerkat command, persistence and bin claims
+  marked retired, leaving yaw/tilt persistence open.

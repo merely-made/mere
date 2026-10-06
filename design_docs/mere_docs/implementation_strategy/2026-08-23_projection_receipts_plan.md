@@ -1,12 +1,15 @@
 # Projection Receipts Plan
 
-*Written before the 2026-09-05 retirement of graphlet (TERMINOLOGY.md): read graphlet as subgraph. Identifiers such as GraphletId, GraphletRef, and SessionGraphlets are now SubgraphId, SubgraphRef, and SessionSubgraphs, and the graphlets crate is crates/graph/subgraph (code renamed 2026-09-12).*
+*Written before the 2026-09-05 retirement of graphlet (TERMINOLOGY.md): read graphlet as subgraph. Identifiers such as GraphletId, GraphletRef, and SessionGraphlets are now SubgraphId, SubgraphRef, and SessionSubgraphs, and the graphlets crate became crates/graph/subgraph (code renamed 2026-09-12), since folded into mere as `crates/mere/src/subgraph.rs` (`61894570`, 2026-09-23).*
 
 **Date:** 2026-08-23  
-**Status:** active; Waves 1 and 2 are complete. Mer3ly is the headed first
-consumer and gazette Ledger the heterogeneous second; the Gazette port
-promotion and this plan landed at `0da3b8ba`. FT6, FT7, and FT8 closed
-2026-08-25. Wave 3 remains explicitly gated.
+**Status (2026-10-06):** Waves 1 and 2 complete; wave 3 gated. FT1-FT5 were
+implemented 2026-08-23 (Mere `7aa64240`, `41ff2aba`, `6cc014c4`; Mer3ly
+`5410512`), FT6 closed 2026-08-24, and FT7 (Mere `302bbe72`, Mer3ly `4c42847`)
+and FT8 (Retinue `8cea8f9`) closed 2026-08-25. Mer3ly is the headed first
+consumer and gazette Ledger the heterogeneous second. The Gazette port
+promotion landed at `0da3b8ba` and this plan in `db9c613c`, both 2026-08-24.
+Open: wave 3 (FT9, FT10), gated on a field-data consumer that does not exist.
 **Scope:** sequence the nine acceptance receipts of the
 [projection-scenes direction note](../../2026-08-23_projection_scenes_and_graph_native_platform.md)
 §8 into feature targets with named forcing consumers and done-conditions.
@@ -334,3 +337,8 @@ radio model for Current.
   locked, offline Signalman suite passes 50 tests with `-j 1`. This is a
   deterministic mixed-realization contract receipt, not a headed hardware or
   owner-interaction receipt. It does not open A3 stage two, A5, or wave 3.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_44_s14_phase_b6.md: the status now cites
+  `db9c613c` for this plan (`0da3b8ba` carried only the Gazette promotion) and
+  dates FT6 2026-08-24, and the banner names `crates/mere/src/subgraph.rs`.

@@ -1,6 +1,12 @@
 # Event-model convergence plan (2026-06-01)
 
-**Status:** core dispatcher convergence landed; `window`/`document` targeting and shadow-tree `composedPath` remain explicitly deferred.
+**Status (2026-10-06):** core dispatcher convergence (steps 1–3) and the
+dom/events push landed 2026-06-01. Three items this plan deferred have since
+landed in genet, all inside Mere's genet pin `bd3e8861`: `window` in the
+propagation path (`0057a122779`), the shadow-including path with retargeting
+and `composedPath` (`9a994bb4193`), and passive-listener cancel gating. Open:
+per-interface event subclasses (`createEvent` still returns a base `Event`)
+and `currentTarget` on the native side.
 
 The audit's [#1 priority](./2026-05-29_serval_holistic_audit.md) *(historical citation)* <!-- doc-audit: historical-link -->: serval has
 **two** capture→target→bubble dispatchers, and they have already drifted. This
@@ -92,6 +98,11 @@ load-bearing subset (defer the rest explicitly):
 `eventPhase` as an observable constant, retargeting. None blocks the two arcs
 today.
 
+**Corrected 2026-10-06 (S14 pass):** shadow trees with retargeting and
+`composedPath` (genet `9a994bb4193`) and passive listeners (a passive
+listener's `preventDefault` is now a no-op) have since landed in genet, inside
+Mere's genet pin `bd3e8861`; see the correction under "Still open" below.
+
 ## The convergence mechanism: a shared scenario table, asserted on both sides
 
 The thing that *keeps* them converged. The two dispatchers live in **separate
@@ -119,6 +130,19 @@ The shared scenario table (each row asserted on both sides):
 
 Each test's doc comment names its twin and points here. Drift in one without the
 other is a visible inconsistency a reviewer (or a grep for the doc path) catches.
+
+**Corrected 2026-10-06 (S14 pass):** only the native side points here
+(`crates/cambium/cambium/src/tests.rs` and `crates/cambium/cambium/src/propagation.rs`).
+The JS twin, genet's `dom_node_events_work` (genet `dom/tests.rs`, lines
+1936-1940 at the pin), points at genet's own copy of this plan
+(`docs/2026-06-01_event_model_convergence_plan.md` in genet, 185 lines, no
+status line) and still names `xilem-serval`.
+
+**Open, raised by the S14 pass (2026-10-06):** genet still tracks its own copy
+of this plan, and its JS test cites that copy, while DOC_POLICY §2 says shared
+material lives once. Which copy is canonical? Options: keep Mere's copy and
+repoint genet's test at it; keep genet's copy, since the JS half lives there;
+keep both, with one marked derived.
 
 ## Sequencing
 
@@ -177,6 +201,17 @@ per-interface event subclasses (MouseEvent etc. — `createEvent` returns a base
 Event); shadow DOM / `composedPath` retargeting; passive scroll-blocking;
 `currentTarget` on the native side.
 
+**Corrected 2026-10-06 (S14 pass):** three of these have landed in genet, all
+inside Mere's genet pin `bd3e8861`. `window` is in the propagation path above
+the document (`0057a122779`, "unify window into the Node event-propagation
+model"); shadow DOM with retargeting and `composedPath` (`9a994bb4193`); and
+passive listeners gate cancellation: a passive listener's `preventDefault` is
+a no-op, and WPT's `non-cancelable-when-passive` rule is implemented in
+genet's `bootstrap.js`. Still open: per-interface event subclasses
+(`createEvent` returns a base `Event`) and `currentTarget` on the native side.
+The table-internal-tree case (`Event-dispatch-bubble-canceled`) was not
+re-checked.
+
 Steps 1 and 3 are pure-mine (dom.rs + a test crate). Step 2 touches the runner —
 coordinate so it doesn't land on top of the agent's in-flight pointer work.
 
@@ -185,3 +220,7 @@ coordinate so it doesn't land on top of the agent's in-flight pointer work.
 - WPT: `serval-wpt testharness dom/events/<subset>` pass count before/after
   step 1 (the event-dispatch conformance tests).
 - A green cross-path conformance test (step 3) — the standing anti-drift guard.
+
+## Progress
+
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at mere 535bca11, from the D2 record in support/doc-audit/d2/batch_39_s14_phase_b1.md: `window` targeting, shadow `composedPath` and passive gating recorded as landed in genet, the deferred, still-open and twin-pointer passages corrected, and genet's duplicate copy raised as an open question.

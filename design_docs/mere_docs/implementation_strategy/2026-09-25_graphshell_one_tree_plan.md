@@ -355,6 +355,8 @@ assessment returned:
   Cambium's inline `display: none` (`1182f642`), and centres the board
   titles with no style change (`de115df8`). §6 has the evidence. The lane
   neither pushes mere nor merges it to main; "push mere" is still to do.
+  *Annotation, 2026-10-06 (S14 pass):* done. `genet-repin` merged to main
+  as `04a92ffe` on 2026-10-02, and it and `7a0950da` are on origin/main.
 - *Reading, not ruled:* the remote scenarios follow the panel lane's
   precedent of tree copies (`p4_tree_*`) with the originals kept for the old
   page, and the physics panel stays operable during a remote session, since
@@ -687,6 +689,10 @@ this tree.
   Current main uses Mesquite for shared scenario execution. The follow-up
   integrates its lane with browser asynchronous captures and removes the
   unpublished rootstock runner.
+  *Annotation, 2026-10-06 (S14 pass):* done. Merge `8c04c96a` (2026-09-27,
+  "Merge main and run the browser proof through Mesquite") removed
+  cambium-rootstock's `scenario` module, and the lane is Mesquite's `Lane`
+  (`crates/cambium/mesquite`, unified in `8fce5365`).
   Mark has since approved Mesquite and proceeding to phase 4, with
   performance and live physics explicitly open (see the follow-up rulings).
 - 2026-09-27: the first phase-4 slice adds shared canvas commands and a
@@ -782,6 +788,14 @@ this tree.
   records artifact hashes and measurements. Integration into main and
   retirement of this collision worktree remain pending; the shared primary
   checkout is untouched.
+  *Annotation, 2026-10-06 (S14 pass):* the 2,000-node run had finished
+  before this entry was committed (`108647cb`, 07:26): its raw receipt,
+  `Code/testing/mere/scenarios/graphshell-web/tree_final_live_2000/`, written
+  at 02:42, records state ok over 14 frames, interval p50 2217.3 ms and p95
+  2486.2 ms. The controls receipt now records it. Integration landed:
+  `650f8541` merged to main in `3270cac2` on 2026-10-01. The collision
+  worktree, `Code/worktrees/mere-canvas-elapsed` at `74ee42ff`, still exists,
+  so its retirement is still pending.
 - 2026-09-30: Mark finds the current physics slightly laggy but acceptable,
   and points out that layout, physics law and scale can change the result.
   Record this separately from timings. A comparison must identify the

@@ -39,6 +39,16 @@ use crate::types::{
 
 /// Derivation salt for the key that signs session transcripts.
 const SESSION_SIGNING_SALT: &[u8] = b"mere/network-policy/session-signer/v1";
+
+/// The session-signer salt bound to one network: the global salt followed by
+/// the network id. A signer derived under it signs hellos for that network
+/// only, so a key a vault lock leaves in place for one local door opens no
+/// other network (vault lock ruling 46). Remote hellos keep the global salt.
+pub fn network_session_signing_salt(network: &NetworkId) -> Vec<u8> {
+    let mut salt = SESSION_SIGNING_SALT.to_vec();
+    salt.extend_from_slice(&network.0);
+    salt
+}
 /// Domain separator for the signed transcript.
 const TRANSCRIPT_DOMAIN: &[u8] = b"mere/network-policy/session-transcript/v1";
 
@@ -184,11 +194,62 @@ impl SessionHello {
         binding: &ProofBinding,
         delegations: Vec<SignedDelegationCertificate>,
     ) -> Result<Self, HandshakeError> {
+        Self::issue_under(
+            provider,
+            SESSION_SIGNING_SALT,
+            network,
+            profile,
+            action,
+            class,
+            nonce,
+            binding,
+            delegations,
+        )
+    }
+
+    /// [`Self::issue`] with a signer bound to `network`
+    /// ([`network_session_signing_salt`]).
+    #[allow(clippy::too_many_arguments)]
+    pub fn issue_network_bound<P: IdentityProvider>(
+        provider: &P,
+        network: NetworkId,
+        profile: ProfileRef,
+        action: RequestedAction,
+        class: TrafficClass,
+        nonce: [u8; 32],
+        binding: &ProofBinding,
+        delegations: Vec<SignedDelegationCertificate>,
+    ) -> Result<Self, HandshakeError> {
+        Self::issue_under(
+            provider,
+            &network_session_signing_salt(&network),
+            network,
+            profile,
+            action,
+            class,
+            nonce,
+            binding,
+            delegations,
+        )
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn issue_under<P: IdentityProvider>(
+        provider: &P,
+        salt: &[u8],
+        network: NetworkId,
+        profile: ProfileRef,
+        action: RequestedAction,
+        class: TrafficClass,
+        nonce: [u8; 32],
+        binding: &ProofBinding,
+        delegations: Vec<SignedDelegationCertificate>,
+    ) -> Result<Self, HandshakeError> {
         let session_signer = provider
-            .attest_derived_key(SESSION_SIGNING_SALT)
+            .attest_derived_key(salt)
             .map_err(|_| HandshakeError::Identity)?;
         let keypair = provider
-            .derive_keypair(SESSION_SIGNING_SALT)
+            .derive_keypair(salt)
             .map_err(|_| HandshakeError::Identity)?;
         let mut hello = Self {
             version: SUPPORTED_WIRE_VERSION,
@@ -248,9 +309,16 @@ impl SessionHello {
     /// Verify the session proof against the responder's own view.
     ///
     /// Checks the derived-key attestation, that the attested master is the
-    /// claimed subject, and the transcript signature over `binding`.
+    /// claimed subject, and the transcript signature over `binding`. The
+    /// signer is attested under the global salt or under the salt bound to
+    /// this hello's own network, never another network's.
     pub fn verify_proof(&self, binding: &ProofBinding) -> bool {
-        let Ok(signer) = self.session_signer.check(SESSION_SIGNING_SALT) else {
+        let bound = network_session_signing_salt(&self.network);
+        let Ok(signer) = self
+            .session_signer
+            .check(SESSION_SIGNING_SALT)
+            .or_else(|_| self.session_signer.check(&bound))
+        else {
             return false;
         };
         if signer.master() != &self.subject {

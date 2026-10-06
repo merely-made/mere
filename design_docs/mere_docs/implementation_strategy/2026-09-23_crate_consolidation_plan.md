@@ -2,12 +2,16 @@
 
 **Date:** 2026-09-23
 
-**Status:** in progress, 2026-09-23. C1-C3's clear-cut moves are landed and
-pushed. Mark ruled every open question the same day (see Rulings): C4's folds
-are in progress in this session, insigne's delegation split is the dramatis
-session's (phase A landed 2026-09-24 as `5364dfa0`; phases B to D follow in
-the [insigne proofs plan](../../dramatis_docs/implementation_strategy/2026-09-23_insigne_proofs_plan.md)),
-and chatelaine waits on a CXF-shaped taxonomy.
+**Status (2026-10-06):** C1 to C4 and C2a have landed (C2a's T1 to T5 by
+`8167d196`, C4's last fold `cambium::nematic` on 2026-09-25). insigne's
+phases A to D have landed (A `5364dfa0`, B `538226a3`; C in Mere and Knot and
+D in Gaz on 2026-09-29, per the
+[insigne proofs plan](../../dramatis_docs/implementation_strategy/2026-09-23_insigne_proofs_plan.md)),
+and chatelaine's P1 to P3 (`da3c50bc`, `3e4992ec`, `ff68e86c`, by 2026-10-02),
+which meets C5's conditions. Open: C5's version baseline; C6's crates.io
+deletions, which are Mark's; and the dramatis facade (C2's dramatis row,
+unbuilt). Mark's rulings sit under "The ruling this serves" and in the C4
+table.
 
 ## The ruling this serves
 
@@ -47,9 +51,9 @@ the direction that makes no dependency cycle.
 | `mere-athanor` | the furnace passes: forgetting, image cleanup, consolidation, retirement | `pandect::athanor` | landed `1bda73d5` |
 | `mere-alembic` | the three memory levels, behind its `recall` feature | `pandect::memory_levels` | landed `1bda73d5` |
 | `mien` | standing (event grammar, ledger, persona chains and vault, gate, wire, store) and the composite reputation lens | `gemot::moot::standing`, `moothold::concord` | landed `a1551086` |
-| `chatelaine` | the secret-item taxonomy, shaped against CXF's credential kinds | castellan's secret-free OTP item types (`OtpItemId`, the `OtpItem` read model), once the taxonomy exists | ruled: design first; shape ruled 2026-10-01 (plain taxonomy, no secret bytes, storage or crypto; CXF import policy for all 17 types), unbuilt |
-| `insigne` | presentable proofs: typed keys, delegation certificates and revocations, derived-key attestations | gaz's `TypedKey`; personae's delegation data types | `TypedKey` landed `0f3f854f`; the delegation types landed `5364dfa0` (insigne proofs plan, phase A); phases B to D open (dramatis session) |
-| `tabard` | theme and stylesheet authoring over tinct, illume and CSS | registry's theme module, the smolweb palettes, Pelt's theme persistence | ruled 2026-09-24; see C2a |
+| `chatelaine` | the secret-item taxonomy, shaped against CXF's credential kinds | castellan's secret-free OTP item types (`OtpItemId`, the `OtpItem` read model), once the taxonomy exists | ruled: design first; shape ruled 2026-10-01 (plain taxonomy, no secret bytes, storage or crypto; CXF import policy for all 17 types), unbuilt. **Corrected 2026-10-06 (S14 pass):** landed: the chatelaine plan's P1 to P3 (`da3c50bc`, `3e4992ec`, `ff68e86c`, by 2026-10-02) |
+| `insigne` | presentable proofs: typed keys, delegation certificates and revocations, derived-key attestations | gaz's `TypedKey`; personae's delegation data types | `TypedKey` landed `0f3f854f`; the delegation types landed `5364dfa0` (insigne proofs plan, phase A); phases B to D open (dramatis session). **Corrected 2026-10-06 (S14 pass):** landed: phase B `538226a3` (2026-09-26), C in Mere and Knot and D in Gaz (2026-09-29, insigne proofs plan) |
+| `tabard` | theme and stylesheet authoring over tinct, illume and CSS | registry's theme module, the smolweb palettes, Pelt's theme persistence | ruled 2026-09-24; see C2a. **Corrected 2026-10-06 (S14 pass):** landed: C2a's T1 to T5 (`63808506` to `8167d196`, 2026-09-24) |
 | `dramatis` | the tier facade | none misplaced | nothing to move; ruled 2026-10-01 a real facade re-exporting personae, insigne and gaz for repos outside mere, unbuilt |
 | `mere-apparatus` | shared diagnostics: bounded observations beneath product-owned views | renderer-independent store and optional Mesquite attachment; projection skeleton retained; product state and redaction stay local | Core published at Mere `ca2351b3`; focused gates pass. Redshank's real save-worker pilot at Woodshed `a57085b` passes 63 desktop tests and bounded native receipts. Turnstone `d6b62ad` passes the sealed-graph 612-test workspace gate with nine ignores, focused participant/UI checks and final native migration/restart with bounded loss. See the [diagnostics design](2026-06-08_system_diagnostics_and_accessibility_plan.md). Exact presented frame, broader worker qualification and human AT remain open |
 
@@ -389,3 +393,9 @@ crate inventory at the Code root.
   receipt passing natively. chatelaine has its real contents for its one
   publish at the baseline; castellan now depends on it, so chatelaine
   publishes first.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_35_s14_phase_a1.md; the status records C1 to C4,
+  C2a, insigne A to D and chatelaine P1 to P3 landed, with C5's baseline,
+  C6's deletions and the dramatis facade open, and the C2 table's
+  chatelaine, insigne and tabard rows are annotated as landed.

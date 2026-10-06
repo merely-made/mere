@@ -27,6 +27,12 @@ The current generic Backend::apply is insufficient to establish that boundary
 on its own. Turnstone's existing deposit-and-download writer cannot simply be
 called for capture because it also creates a user-visible file.
 
+**Corrected 2026-10-06 (S14 pass):** the transactional conditional read/write
+API this paragraph calls for landed the next day as `Backend::transact`
+(`9ba9f790`, 2026-09-09; `crates/eidetic/muniment/src/backend.rs:144`). The
+[S10 custody transact receipt](../../2026-09-09_s10_custody_transact_receipt.md)
+records it and supersedes this probe for the production-boundary question.
+
 Reopen is verified. Process-kill recovery, injected I/O failures, competing
 writers, portable owner-key encoding, disclosure policy, envelope persistence
 and headed capture remain untested. Probe keys use controlled fixed labels;

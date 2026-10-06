@@ -1,9 +1,12 @@
 # FLORA, Tulpa, and Standing plan
 
-**Status:** landed on `main` (2026-09-02), after the integration branch completed
-on 2026-08-31. Gemot owns the
-social protocol, Distillery owns exact tensor execution, and the integrated
-signed, replicated, restart-durable receipt is green.
+**Status (2026-10-06):** landed on `main` (2026-09-02, rebased onto `f2924f08`),
+after the integration branch completed on 2026-08-31; all four phases are done.
+Standing's event grammar, ledger, wire, gate and store have since moved from
+Gemot to `crates/moot/mien` (`a1551086`, 2026-09-23). Gemot keeps Tulpa, FLORA
+and the `gemot/standing/v1` lane, Distillery owns exact tensor execution, and
+the integrated signed, replicated, restart-durable receipt passed again on
+2026-09-02.
 
 ## Rulings and ownership
 
@@ -46,6 +49,15 @@ Done conditions:
 - Existing Tessera stores and native drops decode without rewriting facts.
 - The deprecated source aliases are visibly compatibility-only.
 - Standing gates Tulpa eligibility only through an explicit constitution rule.
+
+**Corrected 2026-10-06 (S14 pass):** `a1551086` (2026-09-23, "Make mien the
+standing crate") overtook this phase's rename of the Gemot domain. Standing's
+event grammar, ledger, wire, gate and store now live in `crates/moot/mien`, gemot
+depends on mien, and no `standing` module remains under
+`crates/moot/gemot/src/moot/`. The same commit deleted gemot's deprecated
+`tessera` source-compatibility module, so no source aliases remain; only the
+on-disk `tessera.redb` reader and the `tessera_operations` serde alias survive
+(`crates/moot/gemot/src/moot/service.rs`, lines 69 and 128).
 
 ## Phase 2: Tulpa social fold
 
@@ -129,6 +141,11 @@ Done conditions:
   references, aggregates reversed arrivals to stable bytes, publishes and
   adopts the candidate, records follow-through, reopens three redb stores, and
   proves the same projections after restart.
+  **Corrected 2026-10-06 (S14 pass):** the four commits cited in these entries
+  are the integration branch's, and none is an ancestor of mere `535bca11`. Their
+  main-line equivalents after the 2026-09-02 rebase are `b9cd2d30` (for
+  `244b66be` and its source lane `7fddd485`), `3894c6a2` (for `b806acf0`) and
+  `9342808c` (for `0738b709`).
 - **2026-08-31:** measured 1/1 integrated receipt, 11/11 Distillery library
   tests, and 122/122 Gemot library tests green. Package-scoped strict Clippy is
   recorded in the companion receipt. Upstream `77b3c3a2` corrected the stale
@@ -146,3 +163,7 @@ Done conditions:
   to identical bytes in either arrival order, and a v0/v1 mix is refused by
   name on `adapter_format_version` first and on the config bytes'
   `peft_version` second. The exact stacking mathematics did not change.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at mere
+  535bca11, from the D2 record in support/doc-audit/d2/batch_45_s14_phase_b7.md.
+  The status and Phase 1 record Standing's move to mien and the deleted tessera
+  alias module (`a1551086`); the pre-rebase commits are mapped to main.

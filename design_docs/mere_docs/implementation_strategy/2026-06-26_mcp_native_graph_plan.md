@@ -19,6 +19,20 @@ over `Command::ALL`), so the MCP tool set is that registry exposed over MCP, plu
 read-only resources for nodes and subgraphs. Mutating tools route through the same
 command path, so they inherit its gating.
 
+**Corrected 2026-10-06 (S14 pass):** that substrate is gone. `ActionRegistry` survives
+only as a string literal
+(`crates/system/registry/src/mod_loader/loader/registry/registry_default.rs:71`),
+`Command::ALL` has no hits (the agent harness went with meerkat), and the command
+registry plan is retired. Two live plans now schedule MCP as an optional adapter: the
+[Graphshell reference host plan](2026-07-27_graphshell_reference_host_plan.md)'s H9, over
+Graphshell's projection, query and intent grammar, and the
+[djinn family resident services plan](2026-08-22_djinn_family_resident_services_plan.md)'s
+F2, over djinn's authenticated agent door.
+
+**Open, raised by the S14 pass (2026-10-06):** which substrate does the expose half ride
+now? Options: Graphshell's intent grammar (H9's adapter); djinn's authenticated agent
+door (F2's adapter).
+
 **Consume: internal agents reach external MCP servers.** Agent nodes and the harness
 gain an MCP client, so an agent node's policy can call out to external MCP tools. The
 outbound half of the same boundary.
@@ -61,3 +75,7 @@ outbound half of the same boundary.
   direction, both directions, marked future. The expose half rides the existing command
   registry as its tool surface and the capability spine as its gate; the consume half
   adds an MCP client to the agent path. No work scheduled, no code.
+- **2026-10-06 (S14 pass).** Claims corrected against the tree at mere 535bca11, from the
+  D2 record in support/doc-audit/d2/batch_48_s14_phase_b10.md (the status line held): the
+  retired command-registry substrate annotated, the Graphshell H9 and djinn F2 adapters
+  named, and the expose half's substrate written in as an open question.

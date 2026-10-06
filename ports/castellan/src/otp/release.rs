@@ -150,6 +150,9 @@ impl OtpReleasedCode {
 /// Failure while submitting or resolving an OTP release petition.
 #[derive(Debug)]
 pub enum OtpReleaseError {
+    /// The vault is locked: no petition is taken and no code released
+    /// (vault lock ruling 10).
+    Locked,
     /// The candidate participant or session fact was absent, too long, padded
     /// with whitespace, or unsafe to retain in a visible request.
     InvalidParticipant,
@@ -175,6 +178,7 @@ pub enum OtpReleaseError {
 impl fmt::Display for OtpReleaseError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
+            OtpReleaseError::Locked => f.write_str("the vault is locked"),
             OtpReleaseError::InvalidParticipant => f.write_str(
                 "release participant facts must be trimmed printable text of at most 256 characters",
             ),
@@ -200,7 +204,8 @@ impl std::error::Error for OtpReleaseError {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match self {
             OtpReleaseError::Item(error) => Some(error),
-            OtpReleaseError::InvalidParticipant
+            OtpReleaseError::Locked
+            | OtpReleaseError::InvalidParticipant
             | OtpReleaseError::InvalidPolicy(_)
             | OtpReleaseError::ClockBeforeUnixEpoch
             | OtpReleaseError::TooManyPending { .. }
@@ -213,7 +218,10 @@ impl std::error::Error for OtpReleaseError {
 
 impl From<OtpItemError> for OtpReleaseError {
     fn from(error: OtpItemError) -> Self {
-        Self::Item(error)
+        match error {
+            OtpItemError::Store(ItemStoreError::Locked) => Self::Locked,
+            error => Self::Item(error),
+        }
     }
 }
 

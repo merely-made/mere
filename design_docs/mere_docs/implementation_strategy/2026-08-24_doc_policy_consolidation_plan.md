@@ -20,6 +20,11 @@ the time — genet's `design_docs/` is therefore still untracked, which is a liv
 risk recorded below. Two follow-on lanes are recorded and **not** scheduled:
 genet's `docs/` migration, and the pre-existing broken links (§Findings).
 
+**Corrected 2026-10-06 (S14 pass):** both were committed the same day.
+Genet's `design_docs/` (policy, index and the eight documents) landed in genet
+`944949f5c86` on 2026-08-24 and is on genet's HEAD; turquet's policy landed in
+turquet `b553c69` on 2026-08-24. The live risk named here is closed.
+
 **Scope**: Three separable pieces, in dependency order.
 
 - **A** — extract a canonical `DOC_POLICY.md` core and distribute it.
@@ -332,6 +337,17 @@ Mark with each item's evidence.
   the repository, its docs go with it in the same session. An area root
   describing code that lives elsewhere is the failure this pass cleaned up.
 
+  **Corrected 2026-10-06 (S14 pass):** the three roots came back to mere on
+  2026-09-03, with `crates/inker` and `crates/nematic`, under the platform
+  boundary plan's P3; at mere 535bca11 they hold nine documents. DOC_POLICY.md's
+  local addendum records the return; this plan had not.
+
+  **Open, raised by the S14 pass (2026-10-06):** where is that return
+  tracked? DOC_POLICY.md's addendum says to "Track the work in" this plan,
+  which recorded it only in the correction above. Options: record it here,
+  keeping DOC_POLICY's pointer; record it in DOC_POLICY only and edit the
+  pointer.
+
 - **2026-09-02 (D1 landed, D2 opened)**: Mark asked for a review of mere and
   an audit of its docs. Mechanical pass run against `bcb222ce` (numbers and
   blind spots in §Finding 2026-09-02); four scope decisions taken with the
@@ -536,6 +552,13 @@ Mark with each item's evidence.
   examples, and 30 versioned protocol identifiers. Both D2 identity coverage
   and the self-testing D3 gate pass, satisfying phase D's done-condition.
 
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_44_s14_phase_b6.md: genet's and turquet's
+  same-day commits close the header's "Not committed" and the Open risk, the
+  three area roots' 2026-09-03 return to mere is recorded, and the checker's
+  restoration into `scripts/` is noted against the 2026-09-02 Finding.
+
 ### Finding: genet now has two doc homes
 
 Recorded because it is a known cost of decision 4, not an oversight.
@@ -543,6 +566,10 @@ Recorded because it is a known cost of decision 4, not an oversight.
 (~163 docs, ungoverned, unindexed). The boundary is **date and governance, not
 subject matter**, and it is stated plainly in genet's policy addendum so the
 next person does not have to infer it. New docs go to `design_docs/`.
+
+**Corrected 2026-10-06 (S14 pass):** the eight documents no longer sit in
+genet. The three roots returned to mere on 2026-09-03 under the platform
+boundary plan's P3 (see the correction under C3's Progress entry).
 
 Merging them is the obvious end state and was **deliberately not attempted**:
 163 files plus **49 references to `genet/docs/` from 32 files outside genet**,
@@ -615,6 +642,10 @@ and is now committed; genet is not, because a session is actively working in
 that tree and its `design_docs/` also holds that session's in-flight fleece
 work. Committing it is theirs to do, not ours. Flagged rather than fixed.
 
+**Corrected 2026-10-06 (S14 pass):** the risk closed the day it was written:
+genet committed its `design_docs/` in genet `944949f5c86` on 2026-08-24, and
+that commit is on genet's HEAD.
+
 ### Finding (2026-09-02): the active tree, measured
 
 D1, verified against `bcb222ce` with the eight docs then dirty under another
@@ -670,3 +701,7 @@ hash check accepts a hash resolving in *any* local repo, so a hash
 attributed to the wrong repo passes; plan Status classification is by regex,
 and its 45-doc "unclear" bucket was not hand-sorted in D1. The checker lives
 outside the tree (`mere_doc_audit.py`, scratchpad) and is rerun to close D3.
+
+**Corrected 2026-10-06 (S14 pass):** the checker was restored into the tree
+as `scripts/mere_doc_audit.py` on 2026-09-04 (Progress), and
+`scripts/mere_doc_judgment_audit.py` joined it on 2026-09-06.

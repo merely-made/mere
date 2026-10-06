@@ -266,6 +266,12 @@ matching retains its existing behavior. The shared host fixture compares
 selection and accessibility activation of the same referenced-name button and
 rejects targets hidden or renamed while a click waits.
 
+**Corrected 2026-10-06 (S14 pass):** this subsection's "in progress" status is
+closed. Its own "Final integration" paragraph below closes the source
+integration and machine-verification gates (`32edc2ad` merged), and the
+2026-09-30 section supersedes it, qualifying contributed semantics at
+Turnstone `b2ead70`. Human AT and custom-leaf parity stay open there.
+
 Mere's isolated integration passed the standalone Graphshell Wasm check,
 60 focused tests and the native smoke
 (32 frames, three distinct nonblank captures, AccessKit installed with 15 nodes).
@@ -395,6 +401,12 @@ failure-control, loss and publication evidence lives in
 `Code/testing/turnstone/diagnostic-inspection/final/`. Turnstone's custom compositor
 has no immutable diagnostic-state/pixel seal yet; its behavioral captures do not
 close that gate. The existing root docs were updated without a functional repin.
+
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_47_s14_phase_b9.md: the status holds; the
+  2026-09-29 semantic subsection's "in progress" status marked closed and
+  superseded by the 2026-09-30 section.
 
 ### Remaining owner gates after the first consumers
 

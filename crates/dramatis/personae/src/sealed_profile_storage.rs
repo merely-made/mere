@@ -107,6 +107,20 @@ impl SealedProfileStorage {
         Ok(Some(Self::open_with_key(root, key)))
     }
 
+    /// Open over an `AutoOs` root that already exists, never minting one.
+    /// `Ok(None)` when there is none here (or no backend on this platform).
+    pub fn open_existing_auto_os(root: impl Into<PathBuf>) -> Result<Option<Self>, IdentityError> {
+        let root: PathBuf = root.into();
+        let Some(key) = crate::startup_unlock::load_existing_auto_unlock_root(
+            root.join(AUTO_UNLOCK_ROOT_FILE),
+        )?
+        else {
+            return Ok(None);
+        };
+        let key = Zeroizing::new(key);
+        Ok(Some(Self::open_with_key(root, *key)))
+    }
+
     fn record_path(id: &ProfileId) -> String {
         let hash = blake3::hash(id.0.as_bytes());
         format!("{PROFILE_DIR}/{}.json", hash.to_hex())
@@ -189,7 +203,9 @@ impl IdentityStorage for SealedProfileStorage {
                         )
                     })?,
             ),
-            // The gate has been passed; the key comes from the OS store.
+            // The gate has been passed; the key comes from the OS store. L3's
+            // persisted lock (ruling 32) checks in `startup_unlock`'s loaders;
+            // a loader taking this `OsPresence` goes beside them, called here.
             UnlockMethod::OsPresence(_verified) => Zeroizing::new(
                 crate::startup_unlock::load_existing_auto_unlock_root(
                     self.root.join(AUTO_UNLOCK_ROOT_FILE),
@@ -200,6 +216,24 @@ impl IdentityStorage for SealedProfileStorage {
             ),
         };
         self.records.unlock(*root, None)
+    }
+
+    /// Wrap the root this storage holds under `passphrase`, beside the
+    /// profiles: the same root, never a new one (see `passphrase_root`).
+    fn enroll_passphrase(&self, passphrase: &[u8]) -> Result<(), IdentityError> {
+        if passphrase.is_empty() {
+            return Err(IdentityError::Backend(
+                "an empty passphrase cannot be enrolled".to_string(),
+            ));
+        }
+        let path = self.root.join(PASSPHRASE_ROOT_FILE);
+        if crate::passphrase_root_exists(&path) {
+            return Err(IdentityError::Backend(
+                "a passphrase is already enrolled for this vault".to_string(),
+            ));
+        }
+        self.records
+            .with_key(|root| crate::save_passphrase_root(&path, root, passphrase))?
     }
 
     fn list_profiles(&self) -> Result<Vec<ProfileSummary>, IdentityError> {

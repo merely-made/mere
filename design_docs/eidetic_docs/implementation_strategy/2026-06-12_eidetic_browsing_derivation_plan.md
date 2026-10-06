@@ -1,14 +1,17 @@
 # Eidetic Browsing Derivation Plan — your own trail, made useful
 
 **Date**: 2026-06-12
-**Status**: Active. This plan **activates** two of the
-[deferred phases](2026-06-09_eidetic_deferred_phases_plan.md) — Phase 8
-(browsing memory) in full, and Phase 9's **producer half** native-first — and
-sequences them into the user-value arc Mark named: *a user derives useful
-information from their own browsing, for themselves*. The deferred-phases plan
-stays the umbrella for what this plan does not pull in (Phase 7 / OPFS, the
-wasm probe, and Phase 9's moot-consume half: `EngramDirectory`, merge policy,
-defensive ingestion).
+**Status (2026-10-06):** E1 to E4 landed on 2026-06-12; E2's done-condition
+still waits on Mark's run over a real exported history. E3 and E4 were built on
+tantivy, which `7a5b7e19` (2026-09-07) replaced with an in-tree BM25 and
+stored-column reports. E5 is partly delivered in Turnstone under the
+[search surface wiring plan](../../mere_docs/implementation_strategy/2026-08-12_search_surface_wiring_plan.md)'s
+W2 (omnibar recall); W3's reports and the corridor strip are not delivered. The
+plan activated two of the [deferred phases](2026-06-09_eidetic_deferred_phases_plan.md),
+Phase 8 (browsing memory) in full and Phase 9's producer half native-first; the
+deferred-phases plan stays the umbrella for what this plan does not pull in
+(Phase 7 / OPFS, the wasm probe, and Phase 9's moot-consume half:
+`EngramDirectory`, merge policy, defensive ingestion).
 **Source design**: [eidetic design pass](../research/2026-05-09_eidetic_design_pass.md)
 (§Layer 4, §6.2 browsing memory, §7.5 search-index engrams, §8 privacy/quota).
 **Conflict posture**: pure mere lane — eidetic crates, `import`, and a dev
@@ -43,6 +46,13 @@ only, mapping left to the call site); the vector half in `intel/embed`
 (`EmbeddingProvider`, persisted `VectorIndex`); eidetic Layers 1-3 + the
 model library. The missing middle is trace engrams, the lexical index, and
 the derivation API over them.
+
+**Corrected 2026-10-06 (S14 pass):** no `intel/embed` crate exists any more
+(here and in Recall above); the vector index lives in
+`crates/intel/esp/src/embed/`. The lineage bridge now reads `chartulary::stemma`,
+aliased as `GraphMemorySnapshot`
+(`crates/eidetic/eidetic-core/src/browsing/lineage.rs`), rather than
+`node-lineage`.
 
 ## Slices (each independently landable; done conditions, not dates)
 
@@ -109,6 +119,13 @@ detail, producer side only:
 hits over an indexed real-history trail; a format-version mismatch refuses
 the index and re-mints from traces; `cargo test -p eidetic-search` green.
 
+**Corrected 2026-10-06 (S14 pass):** tantivy is gone. `7a5b7e19` (2026-09-07,
+"in-tree BM25 with one tokenizer replaces tantivy") replaced the
+`tantivy::Directory` produce path and the tantivy format version with an in-tree
+BM25, and `crates/intel/eidetic-search` now describes itself as an in-tree BM25
+index with stored-column reports, so E4's reports below no longer use tantivy's
+fast-field aggregations.
+
 ### E4 — hybrid recall + reports
 
 - **Fusion seam is engine-agnostic**: `eidetic-search` fuses
@@ -128,6 +145,16 @@ month report from real history; fusion weights are a setting, not a constant.
 Omnibar recall, gloss corridor strip, apparatus reports. **Gated on the
 window-composition reshape settling** (same adoption pattern as mesh → P6).
 The bin is the proof surface until then.
+
+**Corrected 2026-10-06 (S14 pass):** E5 is partly delivered, in Turnstone rather
+than a Mere shell. Omnibar recall shipped under the
+[search surface wiring plan](../../mere_docs/implementation_strategy/2026-08-12_search_surface_wiring_plan.md)'s
+W2 (Turnstone `18cf209`, 2026-08-12; `fuse_many` from `501d87a`, 2026-09-07):
+Turnstone's `trail_memory.rs` uses `BrowsingMemory`, `TrailIndex` and
+`fuse_many`. W3's reports and the corridor strip are not delivered, and that
+plan's status is open. Explicit page sources are now captured through Fleece
+(P3a, Turnstone `b4e69ce`), but the trail and recall corpus still carries url
+and title only (W6 open).
 
 ## Out of scope (named, with triggers)
 
@@ -240,3 +267,8 @@ The bin is the proof surface until then.
   artifact corruption and ate `target/smoke/` — smoke fixtures are
   clean-vulnerable by design; re-made.) The geist/shell wiring of the same
   seam remains the consumer-side step it always was.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in support/doc-audit/d2/batch_45_s14_phase_b7.md.
+  The status records E1-E4 as landed with E2's real-export run open; the tantivy,
+  embed and node-lineage changes are annotated, and E5 points to the search
+  surface wiring plan.

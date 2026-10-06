@@ -1,9 +1,18 @@
 # Portable tiles: cross-window DOM identity (design step 4)
 
 **Date**: 2026-07-08
-**Status**: Planning, downstream of the forest dom. Same-document cross-window moves are
-**blocked on step 3** ([forest_dom_plan](../../archive_docs/2026-08-06_completed_plans/2026-07-08_forest_dom_plan.md)); this plan captures
-the target + the open questions so the shape is settled before step 3 lands.
+**Status (2026-10-06):** no slice landed here, and the consumer it was written
+for is gone: this plan was the meerkat consumer, and meerkat was removed
+2026-07-18 (`c5f01064`). Step 3 no longer blocks it: the
+[forest_dom_plan](../../archive_docs/2026-08-06_completed_plans/2026-07-08_forest_dom_plan.md)
+landed 2026-07-18, and its topology is live as Cambium's
+`GenetMultiRunner::push_forest_projection`
+(`crates/cambium/cambium/src/multi.rs:132`), used by cambium-rootstock and
+Turnstone; only genet-layout's `ForestDom` spike was retired (genet
+`55c05d11759`). P0's outcome is delivered by Turnstone's tear-out
+(`TearOutActivePane`, `turnstone:src/action.rs:233-238`; `tear_out_tile` at
+`turnstone:src/app/pane_arms.rs:345`, with member-keyed content sessions at
+`turnstone:src/shell/lens.rs:232-250`). Open: P1 and P2, unblocked and unbuilt.
 **Parent**: [one_state_n_windows_design](../design/2026-07-05_one_state_n_windows_design.md)
 — **step 4** (§8), the mechanism in §5, the trichotomy in §6.
 **Genet dependency (LANDED)**: the moveBefore engine
@@ -12,6 +21,13 @@ S1–S5): the `PortableKeyed` View wrapper, the `Moved` mutation, the ctx **nurs
 departing keyed subtree until the target adopts it), and `(node, path)` handler
 reconciliation. A cross-parent keyed move already preserves element + DOM node + view state
 + live handlers with one atomic `Moved`. This plan is the **meerkat consumer** of that.
+
+**Corrected 2026-10-06 (S14 pass):** meerkat was removed 2026-07-18
+(`c5f01064`), and with it the pelt `TileShell` and `WindowView` bookkeeping
+that the lane split below describes. `PortableKeyed` and the nursery survive
+in Cambium (`crates/cambium/cambium/src/context.rs`, lines 126 and 244), and
+`crates/cambium/cambium/src/frisket.rs:39` keys `Slot::View` tiles by `TileId`.
+
 **Gesture source**: [tearout_gestures_plan](2026-06-24_tearout_gestures_plan.md) owns the
 user-facing tear-out gestures (drag = leaf, Shift = branch, Ctrl+Shift = fork — the *graph
 scope* axis); this plan owns what happens to the tile's *DOM identity* when a gesture moves
@@ -117,6 +133,10 @@ option between fresh-build and the full forest dom):
 - **The lane split is the design-vs-build reconciliation** — settle it (two-lane story vs
   workbench-into-DOM) before P1, or P1 chases a model meerkat does not have.
 - **Blocked on the forest-dom gate.** P1/P2 cannot start until step 3 is committed; P0 can.
+
+  **Corrected 2026-10-06 (S14 pass):** the gate is passed. The forest dom
+  landed 2026-07-18 and its topology is live as Cambium's
+  `push_forest_projection` (see the status).
 - **Do not over-build the middle path** (see recommendation) — it is a real option, not a
   default.
 - **Scroll carry is the recurring load-bearing bit** across both lanes and both the middle path
@@ -127,3 +147,15 @@ option between fresh-build and the full forest dom):
 
 *(none yet — planning stage, downstream of the forest-dom gate. P0, the surface-lane scroll
 carry, is the one slice that can start independently.)*
+
+**Corrected 2026-10-06 (S14 pass):** P0's outcome exists in Turnstone, not
+here. Its `TearOutActivePane` keeps the pane's DOM, widget state and scroll
+untouched by the move (`turnstone:src/action.rs:233-238`), with the branch arm
+`TearOutTile` at `:476-480`.
+
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_49_s14_phase_b11.md: the "blocked on step 3"
+  status replaced (the forest dom landed and lives on as Cambium's forest
+  projection), the meerkat consumer recorded as gone, and P0's outcome located
+  in Turnstone's tear-out.
