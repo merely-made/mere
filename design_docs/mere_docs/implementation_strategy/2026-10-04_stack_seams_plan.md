@@ -1,9 +1,10 @@
 # Stack seams plan: catalog, shared device, actions, determinism, two words
 
 **Date:** 2026-10-04
-**Status (2026-10-05):** in progress. Thirty-one rulings in eleven rounds
-(S1 to S31); P1 landed on main (`1633be0c`); P2 staged (S27 to S31, four
-stages in §3.1), landed on main (`40d7ae5e`), with F19 a fork for Mark; P3 and S7 done as documents; S3 to S6 carried into the dynamics
+**Status (2026-10-05):** in progress. Thirty-three rulings in twelve rounds
+(S1 to S33); P1 landed on main (`1633be0c`); P2 staged (S27 to S31, four
+stages in §3.1) and landed on main (`40d7ae5e`); S32 (F19) next, then the S14
+pass (S33); P3 and S7 done as documents; S3 to S6 carried into the dynamics
 grammar plan (G8, G9); S9 done by the identity lane (`b52edea7`).
 
 A note sent to Mark listed weak seams in the stack. Each claim was checked
@@ -559,6 +560,25 @@ its receipts recorded in §5, and no stage waits at a boundary. *Reading, not
 ruled*: a fork with more than one defensible answer still stops for Mark, as
 the lanes rule has it, and C1 still stops.
 
+Round 12, 2026-10-05, after P2 landed. Evidence: F19 (the Knot lane's five
+recipes at seven cards, 0 by 0 and NaN among them, byte-identical with no
+complaint) and F18 and F20 (what P2 leaves unmeasured off Windows).
+
+**Ruling S32 (F19).** *How should the compiler refuse degenerate card sizes?*
+Options: a typed compile issue in the list unknown ids and options already
+use; `ProjectionCompiler::new` returning a `Result`, a signature change
+graphshell and Knot would follow; a debug assertion only. Mark: **"Typed
+compile issue (Recommended)"**. Follows: `compile`, `refresh` and the
+snapshot compiles report an `items.card` issue when either side of the card
+is not a finite positive number; no signature changes, so the Knot lane's
+adaptation stands.
+
+**Ruling S33.** *P2 has landed. What next?* Options: the S14 status-versus-code
+pass; measuring F18 and F20 on Mark's Linux and macOS machines; stop. Mark:
+**"S14 status-vs-code pass (Recommended)"**. Follows: after S32, the pass S14
+ruled runs, checking active plans' status lines and done-claims against the
+tree. F18 and F20 stay open.
+
 **Ruling S14.** *Where does the next contradiction pass look?* Options: plan
 status against code; rulings across plans; sibling repos too; no pass. Mark:
 **"Plan status vs code (Recommended)"**. Follows: active plans' status lines
@@ -704,6 +724,8 @@ The done-conditions handed over for S3 and S4, kept for reference:
   works in `projection_compile`. Second pass (F8 to F11), rulings S7 to S10:
   the README fixed (S7), TERMINOLOGY gains pandect under Eidetic and the
   curation record (S8, S10), S9 sent to the identity lane.
+- **2026-10-05.** Round 12: S32 (a degenerate card is a typed compile issue)
+  and S33 (the S14 pass next).
 - **2026-10-05.** P2 landed on main at `40d7ae5e`, by S27's one merge: main
   (`102aa548`) was merged into the branch, weave resolving the one shared file
   (`cambium-genet-web-host/src/a11y.rs`, G9's `target_of` removal beside P2's
