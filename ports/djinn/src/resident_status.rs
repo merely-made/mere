@@ -576,3 +576,51 @@ async fn control_intent(
         ))),
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use std::sync::atomic::{AtomicUsize, Ordering};
+
+    use super::*;
+
+    fn invocation(intent: &str, payload: &[u8]) -> IntentInvocation {
+        IntentInvocation {
+            session: ProjectionSession(CONTROL_SESSION.into()),
+            target: InstanceId(0),
+            observed_epoch: SceneEpoch(1),
+            observed_revision: Revision(1),
+            intent: intent.into(),
+            payload: payload.to_vec(),
+        }
+    }
+
+    /// Ruling 47: `unlock-native-v1` carries nothing. A payload, a
+    /// passphrase sent where none belongs, is refused before the resident's
+    /// prompt runs; the empty one runs it.
+    #[test]
+    fn the_native_unlock_refuses_any_payload() {
+        let prompts = Arc::new(AtomicUsize::new(0));
+        let counted = Arc::clone(&prompts);
+        let mut control = ResidentControlEndpoint {
+            stop: StopSignal::default(),
+            unlock: ControlUnlock {
+                passphrase: None,
+                native: Some(Arc::new(move || {
+                    counted.fetch_add(1, Ordering::SeqCst);
+                    Ok(())
+                })),
+            },
+        };
+        let refused = control
+            .invoke(invocation(UNLOCK_NATIVE_INTENT, b"a passphrase"))
+            .unwrap();
+        assert!(
+            matches!(&refused, IntentResult::Rejected { reason } if reason.contains("carries nothing")),
+            "{refused:?}"
+        );
+        assert_eq!(prompts.load(Ordering::SeqCst), 0, "no prompt ran");
+        let accepted = control.invoke(invocation(UNLOCK_NATIVE_INTENT, b"")).unwrap();
+        assert_eq!(accepted, IntentResult::Accepted);
+        assert_eq!(prompts.load(Ordering::SeqCst), 1);
+    }
+}
