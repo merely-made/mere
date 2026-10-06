@@ -29,6 +29,13 @@ name = "personae-vault"
 path = "src/bin/personae-vault/main.rs"
 required-features = ["agent"]
 
+# Vault lock ruling 6's no-residue instrument. It installs its own global
+# allocator, so it runs outside libtest's harness, on one thread.
+[[test]]
+name = "no_residue"
+path = "tests/no_residue.rs"
+harness = false
+
 [features]
 # SSH keys as vault slots (encode/decode/import). The agent, and the CLI
 # whose import shares its signability door, need `agent` on top.
