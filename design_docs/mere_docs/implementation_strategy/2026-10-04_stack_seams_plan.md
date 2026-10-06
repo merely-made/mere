@@ -1,10 +1,12 @@
 # Stack seams plan: catalog, shared device, actions, determinism, two words
 
 **Date:** 2026-10-04
-**Status (2026-10-05):** in progress. Twenty rulings in seven rounds (S1 to
-S20); P1 being built in this session's worktree (S19), P2 after it; P3 and S7 done as documents; S3 to S6 carried into the
-dynamics grammar plan (G8, G9); S9 done by the identity lane (`b52edea7`).
-No code in this plan's own lane yet.
+**Status (2026-10-05):** in progress. Thirty-three rulings in twelve rounds
+(S1 to S33); P1 landed on main (`1633be0c`); P2 staged (S27 to S31, four
+stages in §3.1) and landed on main (`40d7ae5e`); S32 (F19) landed on main
+(`48c08dee`); the S14 pass (S33) under way; P3 and S7 done as documents; S3 to
+S6 carried into the dynamics grammar plan (G8, G9); S9 done by the identity
+lane (`b52edea7`).
 
 A note sent to Mark listed weak seams in the stack. Each claim was checked
 against the code (§1); six seams proved real and went to him as
@@ -143,6 +145,18 @@ in two or more crates.
   while graphshell uses `"grid.default"` and `"scatter.default"`. Authoring
   offers a string direction, an integer spacing and string options, where
   sceno's families take typed parameters.
+- **F14 (2026-10-05, P1 as built).** Stack reads its layer from
+  `ScoreItem::axis`, not `ScoreItem::layer` (sceno's `Stack` doc), so S21's
+  "integer x as its layer" is a numeric axis held to whole values. Today's
+  scatter compiled with `invert_y: false` where sceno's `Geographic` default
+  is `true`; the catalog keeps `false` so saved scatter recipes do not flip.
+  graphshell lays cards out at 164 by 68 scene units and scales the whole scene
+  at paint (`web_practice.rs`, `card_size`), so that scene-unit card, not the
+  zoomed one, is what it supplies. The new scenograph-to-sceno edge touches two
+  lockfiles (the root and `ports/distillery/probe/remote-fixture`), one line
+  each; graphshell's web workspace keeps a gitignored local lock. During the
+  gates another session cleared the shared `C:/t/cargo-targets/mere` twice
+  mid-build, so P1's gates ran in an isolated target.
 - **F13 (2026-10-05). The compiler moved under another lane.** At `c79bb8c2`
   (00:52), for its relationship-recipe pass, the projection grammar lane moved
   graphshell's compiler into `scenomise::projection` (1,147 lines) and made
@@ -164,6 +178,103 @@ in two or more crates.
   the 164 by 68 card (the footprint written in at `projection.rs` 697) gives
   180 by 84; `columns` is unused there, since the grid ranker gives every item
   an explicit cell.
+- **F15 (2026-10-05, reported by the Knot lane after P1 reached origin at
+  `19e6dc9f`). P1 breaks Knot.** P1 made `compile_relationship_snapshot` and
+  its `_with_limits` form methods on `ProjectionCompiler`, built from
+  `ItemSizes`, which has no default on purpose (S20). Knot `54bb8cd` still calls
+  the free function: `crates/knot-composition/src/retention.rs` 39, a test
+  support file, and `apps/desktop/src/composition/recipe.rs` (checked here:
+  eight calls in that file). Mere builds today only because its
+  `[patch."…mere.git"]` table serves Knot no `scenomise`; ruling 586's row,
+  added with djinn's Knot repin, makes `knot-composition` fail with E0425.
+  P1's progress entry named Woodshed's consumers as not run and missed Knot,
+  which compiles inside mere's graph through djinn. Mark ruled that the Knot
+  lane adapts Knot (repin onto `19e6dc9f`, the three sites onto
+  `ProjectionCompiler::new(ItemSizes { .. })`, Knot's card size as a fork to
+  him), recorded in the burn plan's §13.46
+  ([burn plan](2026-08-09_burn_0_22_migration_plan.md)) at `ac7f906d`. P2
+  does not touch `ProjectionCompiler` or `ItemSizes`.
+  **Corrected 2026-10-05:** the counts above are wrong. Knot `54bb8cd` has
+  twelve call sites: one in `retention.rs` and eleven in
+  `apps/desktop/src/composition/recipe.rs` (five in code, six in its tests; the
+  twelfth mention there is the import), and `tests/support/recipe.rs` makes
+  none; "eight" came from output cut off at ten lines. The Knot lane reports
+  Mark's ruling on Knot's card, "Measured from Knot's font": the desktop
+  measures each recipe's widest occurrence label in its own font plus button
+  padding and hands that to the `ProjectionCompiler`, with retention
+  validation's nominal size, the measuring path and the padding to come back
+  to him as forks; recorded in the burn plan's §13.46 ("Knot's card size under
+  P1", `7d6dc003`; how it measures, `102aa548`). That lane also notes P1 moves Knot's spacing whatever card
+  is chosen (card plus gap, where a fixed 184 by 84 cell was), and that Knot is
+  the first host to measure its card rather than declare it.
+- **F16 (2026-10-05, P2 stage 1's control). wgpu's device equality cannot tell
+  two boots apart.** wgpu 30 compares a `Device` by a per-instance id
+  (`impl_eq_ord_hash_proxy!(CoreDevice => .id)`), and each `RenderCore::boot`
+  makes its own instance, so devices from two boots compare equal. Stage 1's
+  control first passed wrongly on exactly this; the receipt now compares device
+  identity. The producer registry detects a changed device with the same `!=`
+  (`cambium-rootstock/src/producer/registry.rs`, `prepare`), so under the old
+  reboot on every resume a new device went unnoticed there. After stage 1 a
+  host's device never changes, so nothing reaches it today; recovery from a
+  lost device would need the check to compare identity.
+- **F17 (2026-10-05, for P2 stage 4). Several surfaces through one core must
+  key their rasterization.** Genet's `RenderCore::rasterize_for` doc: a host
+  that rasterizes several surfaces through one core must key each, or every
+  tile is dirty on every frame (234 of 234 in the shell paint plan's
+  measurement). Rootstock's redraw calls the unkeyed `rasterize_scaled`
+  (`frame.rs`), harmless with one window; stage 4 keys it per window, and
+  `presentation_host` is already unique per host.
+- **F18 (2026-10-05, P2 stage 4's control). On Windows, one animating window
+  starves another.** Winit 0.30 asks for a frame with
+  `RedrawWindow(RDW_INTERNALPAINT)` and delivers it on `WM_PAINT`
+  (`platform_impl/windows/window.rs` 152, `event_loop.rs` 1276), and Win32
+  hands `WM_PAINT` to the first window needing paint every time, so a window
+  that asks for its next frame from each frame, as an animating one does,
+  keeps being chosen. Measured: with both windows animating, B presented 4,981
+  frames from 4,979 redraw events while A had one event and presented nothing
+  more, until the driver gave up. Deferring the request to the idle turn did
+  not change it (the request still precedes the next message wait), and
+  forcing the paint from inside a callback (`RDW_UPDATENOW`) only re-queues it,
+  since winit's `WM_PAINT` handler buffers while a callback runs. The
+  multi-window entry therefore notes each window's requests and, on Windows
+  only, draws each window that asked in the idle turn, through the same
+  handler a delivered paint runs; `Fifo` presentation paces each to its
+  monitor, and paints the OS sends still arrive as before. Elsewhere it hands
+  the requests to the platform at the idle turn, so X11, Wayland and macOS keep
+  their own frame delivery. After: A presented 8 frames while B presented 9.
+  *Reading, not ruled*: Windows-only because that is where the starvation was
+  measured; drawing from the idle turn everywhere would bypass Wayland's frame
+  callbacks, under which a hidden surface's `Fifo` acquire can block, and
+  piggybacking one window's frame on another's paint has the same hazard.
+  Two animating windows on X11, Wayland and macOS are unmeasured.
+- **F19 (2026-10-05, reported by the Knot lane). P1 accepts degenerate card
+  sizes.** Run through five relationship recipes at seven `ItemSizes` cards,
+  among them 0 by 0, NaN and 1e6, scenomise gave byte-identical outcomes and
+  issue lists, with no complaint about 0 by 0 or NaN. Since S20 has hosts supply
+  the size, a host bug that hands over 0 or NaN passes silently. How to refuse
+  them (a `Result` from `ProjectionCompiler::new`, a typed compile issue, a
+  debug assertion) is a fork for Mark; the first changes the signature the Knot
+  lane is adapting to, which was told to proceed on the current one.
+  **Ruled and built 2026-10-05:** a typed compile issue (S32), landed on main
+  at `48c08dee`.
+- **F20 (2026-10-05, P2 stage 4's review). What the multi-window pacing leaves
+  unmeasured.** Serving each window that asked in one idle turn, each acquire
+  waiting on its swapchain, couples windows on monitors of different refresh
+  rates to the slower (a 60 Hz and a 144 Hz window would both draw at 60);
+  S26's "at its own monitor's rate" holds for windows on like monitors. Whether
+  Win32's modal move and size loops still run the idle turn (so an animating
+  window keeps drawing while another is dragged) is unmeasured, as is whether an
+  occluded but not minimized window's present blocks. A panic inside a turn
+  leaves the lent runner in that window; nothing catches it today.
+- **F21 (2026-10-05, S32's gates). A graphshell carrier test times out under
+  load.** `carrier::tests::p2panda_murm_grant_is_refused_before_projection_bytes`
+  waits 10 seconds for the server to accept a projection session. Run within
+  graphshell's `projection` test filter (35 tests) it timed out at that accept
+  in 2 of 5 runs with S32 and in none of 4 without it, and alone it passed 3 of
+  3 in about 2.5 seconds each. It reads no scenomise code, and both failures
+  came while other builds and subagents were loading the machine. *Reading,
+  not ruled*: a timing flake in a fixed timeout, not caused by S32; it is
+  recorded here and not fixed, as graphshell's carrier is outside this plan.
 
 ## 2. Rulings
 
@@ -346,6 +457,140 @@ beside the dataset (graphshell passes its card size, Woodshed its own);
 nothing is written into scenomise. This follows the 2026-07-22 charter, which
 puts presentation (cards, glyphs) with the host.
 
+**Ruling S21 (round 8, P1's design).** *How do the eleven families get their
+per-item inputs?* Recipes encode x, y, color and label; families read an
+explicit cell (Grid), a coordinate (Geographic, Hulls), a 2D embedding
+(Embedded), a numeric axis (Timeline, Radial's rings), a categorical axis
+(Kanban), a layer (Stack), or only order (Spiral, Penrose, LSystem)
+(`scenomise/src/families/`, `sceno::ScoreItem`). Options: the catalog maps x
+and y; grow the encoding; only where x and y fit. Mark: **"Catalog maps x and
+y (Recommended)"**. Follows: each catalog entry declares how it reads the
+encoding: Grid ranks x and y into cells; Geographic and Hulls take (x, y) as a
+coordinate; Embedded as an embedding; Timeline and Radial take numeric x as
+their axis; Kanban takes text x as its column; Stack takes integer x as its
+layer; Spiral, Penrose and LSystem order by x. A missing or wrong-typed channel
+is a typed issue naming it. All eleven are authorable with today's grammar.
+
+**Ruling S22.** *What shape does the compile API take?* S20 needs the host's
+item sizes and S15's fall-through needs a `SolverRegistry`. Options: a compiler
+value; extra parameters. Mark: **"A compiler value (Recommended)"**. Follows:
+the host builds one `ProjectionCompiler` holding its item sizes and its
+registry, and calls `compile`, `refresh`, `compile_snapshot` and the
+relationship compile on it. *Reading, not ruled*: the relationship-recipe
+compile, which calls `compile_snapshot`, becomes a method too and keeps its
+grid-only rule; the alias constants stay exported for saved recipes.
+
+Round 9, 2026-10-05, on P2's design. Evidence: the host is single-root (one
+rootstock `Host`, one `native_window`, `run(options, init, hooks)`); texture
+producers reach the device through `ProducerContext` and are rebuilt on every
+resume, because the producer registry resets when the device changes
+(`cambium-rootstock/src/producer/registry.rs` 147) and each resume boots a new
+core; the [one state, N windows design](../design/2026-07-05_one_state_n_windows_design.md)
+rules "one dom as a forest", and its framework half (`GenetMultiRunner`, now
+`crates/cambium/cambium/src/multi.rs`) and the forest dom have landed, unused by
+this host.
+
+**Ruling S23.** *Sequence P2?* Options: the shared core first, then windows;
+both together. Mark: **"Both together"**. Follows: one change set delivers the
+shared, resume-surviving core and multi-window.
+
+**Ruling S24.** *What does a second window show?* Options: one state with N
+lenses; independent roots. Mark: **"One state, N lenses (Recommended)"**.
+Follows: the host runs `GenetMultiRunner` over one state; each window is a
+projection with its own lens, layout session, viewport, DPI and focus, and a
+change made in one window reaches the others in the same pass, per the
+2026-07-05 design.
+
+**Ruling S25.** *What API do multi-window applications use?* Options: an
+additive multi-window entry; one API with a single window as its simplest
+case. Mark: **"Additive multi-window entry (Recommended)"**. Follows: a new
+entry with a lens per window and a command to open one sits beside `run`,
+which stays exactly as it is, so Woodshed, Hocket and Redshank are untouched
+and checkpoint C1 is not reached.
+
+**Ruling S26 (C2).** *How do windows pace their frames?* Options: each window
+paces itself; one frame clock. Mark: **"Each window paces itself
+(Recommended)"**. Follows: each window redraws and presents on its own request,
+at its own monitor's rate, the shared core serving them in turn; an idle window
+costs nothing. Checkpoint C2 is resolved.
+
+Round 10, 2026-10-05, on how P2 lands. Evidence, from reading the hosts
+after S23: the shared core is small (boot one `RenderCore`, make each surface
+from it, keep it across resume), but one state with N lenses is not.
+Rootstock's `HostState` holds 60 fields, most of them one window's, beside
+one `GenetAppRunner`; the owned layout lays out a whole document, and genet's
+subtree adapter (`ScopedDom`, `genet-scripted/livery.rs` 1611) is private; no
+host drives `GenetMultiRunner`; the winit host makes one window and boots a new
+core on each resume. Roughly 1,500 to 3,000 changed lines over several sessions.
+
+**Ruling S27.** *P2 sized: S23's "Both together" was ruled before these numbers.
+How should it land?* Options, put in plain text: keep S23, one branch built in
+stages with a check-in at each stage and one merge; land the shared core now,
+with multi-window as its own later change; land the core and park
+multi-window, then do the S14 pass. Mark: **"1. feel free to orchestrate using
+subagents."**, then **"oh, i meant #1 of the three options."** Follows: S23
+stands; P2 is one branch built in stages, each stage ending with its receipts,
+and it merges once; subagents may carry stages.
+
+Round 11, 2026-10-05, on P2's shape. Evidence: `GenetMultiRunner` supports
+both topologies (`push_projection`, `push_forest_projection`); the owned layout
+is generic over `LayoutDom` (`owned_layout.rs` 86 onward), so a forest needs a
+window-subtree adapter, one mutation drain routed by window root, and
+accessibility scoped per window with ids salted by window
+(`cambium-winit-a11y` reads the whole document at four sites), an estimated
+500 to 700 lines more than separate documents; the frame and input pipeline
+(`host.rs`, `frame.rs`, `input/`, about 3,100 lines) reads one runner and one
+layout; Woodshed, Hocket and Redshank use only `run`, `AppCtx`, `HostHooks` and
+`Harness`, never `HostState`'s fields.
+
+**Ruling S28.** *Which document topology do P2's windows use?* Options: the
+forest dom (one `ScriptedDom`, one window-root per window; P2 an estimated
+1,700 to 2,700 lines in four stages); N doms (each window its own document; an
+estimated 1,200 to 2,000 lines in three stages, a cross-window move rebuilding
+its content). Mark: **"Forest dom (Recommended)"**. Follows: one document with
+a window-root per window, laid out per window through a subtree adapter, so a
+`move_before` between windows keeps the node, its scroll and its focus.
+
+**Ruling S29.** *Where do custom-paint leaves and texture producers live once
+there are several windows?* Options: one shared registry, each window painting
+the leaves its own subtree holds; one registry per window. Mark: **"Shared,
+painted per window (Recommended)"**. Follows: the application keeps one
+`LeafRegistry` and one `ProducerRegistry`; each window renders the leaves its
+layout has boxes for, so a leaf moved to another window keeps its painter.
+
+**Ruling S30.** *Does the single-window `run` move onto the shared per-window
+pipeline?* Options: one pipeline, `run`'s signatures unchanged; a separate
+multi host beside an untouched `Host`, duplicating about 1,500 lines. Mark:
+**"One pipeline (Recommended)"**. Follows: `run` and the multi-window entry
+drive the same per-window frame and input code; `run`, `AppCtx`, `HostHooks`,
+`Init` and `Harness` keep their signatures, so S25 and C1 hold.
+
+**Ruling S31.** *S27 checks in at each stage boundary. What does a check-in ask
+of you?* Options: report, then continue; wait for a go. Mark: **"nah, just
+proceed."** Follows: amends S27; the stages run back to back, each ending with
+its receipts recorded in §5, and no stage waits at a boundary. *Reading, not
+ruled*: a fork with more than one defensible answer still stops for Mark, as
+the lanes rule has it, and C1 still stops.
+
+Round 12, 2026-10-05, after P2 landed. Evidence: F19 (the Knot lane's five
+recipes at seven cards, 0 by 0 and NaN among them, byte-identical with no
+complaint) and F18 and F20 (what P2 leaves unmeasured off Windows).
+
+**Ruling S32 (F19).** *How should the compiler refuse degenerate card sizes?*
+Options: a typed compile issue in the list unknown ids and options already
+use; `ProjectionCompiler::new` returning a `Result`, a signature change
+graphshell and Knot would follow; a debug assertion only. Mark: **"Typed
+compile issue (Recommended)"**. Follows: `compile`, `refresh` and the
+snapshot compiles report an `items.card` issue when either side of the card
+is not a finite positive number; no signature changes, so the Knot lane's
+adaptation stands.
+
+**Ruling S33.** *P2 has landed. What next?* Options: the S14 status-versus-code
+pass; measuring F18 and F20 on Mark's Linux and macOS machines; stop. Mark:
+**"S14 status-vs-code pass (Recommended)"**. Follows: after S32, the pass S14
+ruled runs, checking active plans' status lines and done-claims against the
+tree. F18 and F20 stay open.
+
 **Ruling S14.** *Where does the next contradiction pass look?* Options: plan
 status against code; rulings across plans; sibling repos too; no pass. Mark:
 **"Plan status vs code (Recommended)"**. Follows: active plans' status lines
@@ -391,6 +636,51 @@ doc audit flags. *Reading, not ruled*: it runs after P1, one lane at a time.
   cambium-rootstock, cambium-genet-web-host, pelt desktop) build and their
   tests pass. Woodshed's three consumers live in another repository: an API
   change they must follow is a stop (checkpoint C1).
+  Staged by S27 to S31 on one branch (`stack-seams-p2`), merged once:
+  - **Stage 1, shared core (winit host).** One `Arc<RenderCore>` booted at the
+    first resume from `HostOptions::netrender` and kept for the host's life;
+    each surface made from it with its transparency; a resume makes a new
+    surface and no new core; a count of core boots; the core reachable from
+    host state and `AppCtx` for tenants. Done when a forced suspend and resume
+    leaves the boot count at one, a tenant's device is the surface's device,
+    and the consumers' tests pass.
+  - **Stage 2, per-window split (rootstock, no behaviour change).**
+    `HostState` divides into what the application shares (resources, leaf and
+    producer registries, the core and its fragment ids, commands, wake) and a
+    per-window state (window, surface, layout, zoom, pointer, hover and focus,
+    accessibility, scroll fade, geometry, captures, profiles); the frame and
+    input pipeline runs over one window's state and a crate-internal tree
+    trait that `GenetAppRunner` and a multi-runner projection both implement.
+    Done when rootstock, the winit host's `Harness` tests, the web host,
+    pelt desktop and mere-view pass with no assertion changed, the web host
+    checks on wasm32, and a diff of public signatures shows `run`, `AppCtx`,
+    `HostHooks`, `Init` and `Harness` unchanged.
+  - **Stage 3, forest window sessions (rootstock).** A subtree adapter that
+    presents a window-root as its document; each window's layout, hit testing,
+    caret, scroll and accessibility read through it; one mutation drain per
+    frame routed by window root, a mutation it cannot place dirtying every
+    window; accessibility ids salted by window; the document-wide walks scoped
+    to the window root; leaves painted per window from the shared registry.
+    Done, in a windowless multi-window harness, when two windows over one
+    document lay out at different sizes and scales; a mutation in one rebuilds
+    that window's layout and not the other's (a mutation in the other moves its
+    count: the control); a click in one changes what the other shows in the
+    same pass; accessibility ids never collide; and a node moved between window
+    roots by `move_before` keeps its `NodeId`, is laid out by its new window,
+    and a leaf moved with it keeps its painter.
+  - **Stage 4, multi-window entry (winit host).** A `run_windows` entry beside
+    `run`: its init returns the state, a lens per window key, the sheet and
+    the resources; commands open and close a window; events route by
+    `WindowId` to their projection; each window redraws and presents on its
+    own request (S26) and an idle one presents nothing; hooks know which window
+    they run for. Done when P2's done-conditions above hold with two windows
+    (one boot counted, the tenant's device the surfaces' device, a suspend and
+    resume creating none), a headed receipt on Windows shows two windows at
+    different sizes where a click in one changes the other and closing one
+    leaves the other running while an idle window's present count holds still,
+    and the workspace checks with `--locked`.
+  Merging: main merged into the branch, every gate rerun on the merged tree,
+  then main fast-forwards; not pushed.
 - **P3. Words (S5, S6).** Done as documents in the commit that records this
   plan: TERMINOLOGY gains **arrangement**, **forme** and **world** and the sceno
   entry is amended. Code identifiers migrate when a file is touched for other
@@ -427,7 +717,12 @@ The done-conditions handed over for S3 and S4, kept for reference:
 - **C1 (P2).** If multi-window needs an API change the woodshed repository's
   hosts must follow, stop and bring the change to Mark before making it.
 - **C2 (P2).** Whether windows share one swapchain cadence (one frame clock for
-  all windows) or each window paces itself.
+  all windows) or each window paces itself. Ruled: S26, each window paces itself.
+- **C4 (P2).** A change any stage needs in genet or another repository (a
+  public `ScopedDom`, a runner API) stops and comes to Mark.
+- **C5 (P2).** If a stage-2 or stage-3 change alters what an existing
+  single-window application sees (a `Harness` assertion that must change), stop
+  and bring the difference back.
 - **C3 (S4, dynamics lane).** If `libm` in seiche's laws costs more than the
   run-to-run spread at 5,000 bodies, bring the figure back before keeping it.
 
@@ -441,6 +736,193 @@ The done-conditions handed over for S3 and S4, kept for reference:
   works in `projection_compile`. Second pass (F8 to F11), rulings S7 to S10:
   the README fixed (S7), TERMINOLOGY gains pandect under Eidetic and the
   curation record (S8, S10), S9 sent to the identity lane.
+- **2026-10-05.** S32 built on branch `stack-seams-s32` (`3ecba102`) and
+  landed on main at `48c08dee`, main (`2c4eaa1b`, documents only) merged into
+  the branch first. `card_issue` refuses a card whose width or height is not a
+  finite positive number with an `items.card` issue: `validation_issues`
+  carries it, so `compile`, `refresh` and `compile_snapshot` refuse, and the
+  relationship compile adds it ahead of its first refusal. No signature
+  changed, so the Knot lane's adaptation stands. Receipts:
+  `a_degenerate_card_is_a_typed_issue` (0 by 0, a zero height, a negative
+  width, a NaN and an infinite side) and
+  `a_relationship_compile_refuses_a_degenerate_card` (0 by 0 and NaN), each
+  ending with a usable card that compiles; with `card_issue` removed both
+  fail. Gates: scenomise 99 passed; graphshell's `projection` tests 35 passed;
+  `cargo check --workspace --locked` exits 0. The new lines add no rustfmt
+  differences; the three files' existing ones are left for the repository's
+  separate formatting sweep. One graphshell test timed out under load (F21).
+  Not pushed.
+- **2026-10-05.** The S14 pass begun (S33), at audit base `26060e88`.
+  Assessment: 337 active documents, 155 of them plans (81 whose status claims
+  landed or done, 21 in progress, 13 planned, 36 otherwise worded, 4 with no
+  status line); D2 judgment coverage 316 of 337, the 21 without a record all
+  added by other lanes since 2026-09-05; three active receipts share the
+  basename `RECEIPT.md`, which the judgment audit rejects. The pass runs in
+  three phases: A, a D2 record for each of the 21; B, the 155 plans' status
+  lines and done-claims re-judged against the tree, most records dating from
+  the early-September snapshot; C, corrections as dated annotations with a
+  remediation receipt, after the 2026-09-06 one. Read-only subagents (opus)
+  draft the records in batches; every stale claim they report is re-checked
+  here before a document changes. *Reading, not ruled*: archive moves for
+  plans found complete (DOC_POLICY §8) and renaming the three receipts go to
+  Mark as forks rather than being made here.
+- **2026-10-05.** Round 12: S32 (a degenerate card is a typed compile issue)
+  and S33 (the S14 pass next).
+- **2026-10-05.** P2 landed on main at `40d7ae5e`, by S27's one merge: main
+  (`102aa548`) was merged into the branch, weave resolving the one shared file
+  (`cambium-genet-web-host/src/a11y.rs`, G9's `target_of` removal beside P2's
+  window-subtree signatures), and every gate rerun on the merged tree (573
+  passed, 0 failed, 9 ignored; the four headed receipts; the web host on wasm32,
+  now without a warning; `cargo check --workspace --locked`) before main
+  fast-forwarded. Not pushed. P2's done-conditions as built: two windows render
+  with one core boot counted, a tenant handed the core shares the surfaces'
+  device, a suspend and resume boots none, and mere's consumers build and pass.
+  Checkpoints C1, C4 and C5 were not reached: Woodshed's surface compiles as
+  written (stage 2's review), no genet change was needed, and no single-window
+  assertion changed. Open: F19 for Mark; F20's unmeasured cases; two animating
+  windows on X11, Wayland and macOS (F18).
+- **2026-10-05.** P2 stage 4 built on branch `stack-seams-p2` at `7ae0e36e`,
+  with review fixes at `e131273e`. `run_windows` beside `run`: `WindowsInit`
+  (state, sheet, resources, launch windows as lens and options),
+  `WindowHooks`, `WindowHost`, and the `WinitWindows` event source over
+  `MultiHost`; `WinitHost` takes the tree as a defaulted parameter and the
+  single-window lifecycle splits into per-window pieces both entries drive;
+  events route by `WindowId` to their window's turn; hooks open, close and
+  redraw windows through `ctx.runner`; a window whose close policy exits
+  closes, and the last one ends the loop. Rasterization is keyed per host
+  (F17). Each window paces itself (S26) through a noted request that the idle
+  turn serves; on Windows the idle turn draws each window that asked (F18).
+  Receipts: `headed_tests::windows` (two windows at 480 by 360 and 720 by 480,
+  one core boot, both surfaces and a tenant on one device, a click in A shown
+  in B, one frame presented for that click, a forced suspend and resume
+  booting nothing, B presenting 0 frames while A presented 8, closing A leaving
+  B up) and its control (a third window after the core is forgotten boots a
+  second core on its own device; an animating B presents); windowless, a turn
+  opens and closes windows, and a sheet one window swaps from a hook reaches
+  the other; GPU, a producer moved between windows survives whichever draws
+  first, one key in two windows is a duplicate rather than a theft, and a
+  closed window's producers retire. A read-only review subagent (opus) of
+  stages 3 and 4 found three bugs (a sheet swapped outside the frame hook never
+  reached the other windows; a producer moved between windows was retired if
+  the source drew first; a wake redrew only the first window) and five risky
+  behaviours (a reached window asked through the native window, doubling the
+  acting window's frames: 2 per click before, 1 after; hidden windows drawn by
+  the idle turn; one key in two windows thrashing; a closed window's producers
+  and window-root left behind; nested shadow trees dropped from the whole
+  document's view), all fixed at `e131273e`, each fix with a receipt whose
+  control was run except the wake, the hidden-window skip and the cascade of
+  windows opened from a first frame. The first click count read 2 for an
+  instrument reason (the platform's first paint of a newly shown window landed
+  inside the count) and settles both windows before the click now. The
+  single-window core boots before `init` again, as before stage 4. Gates on
+  the branch: cambium, rootstock, the winit host, cambium-winit-a11y,
+  mesquite, mere-view and pelt-desktop pass 573, fail 0, ignore 9 with stage
+  1's warnings; the four headed receipts pass; the web host checks on wasm32;
+  `cargo check --workspace --locked` exits 0. The non-Windows idle-turn branch
+  was type-checked on Windows with the cfgs swapped, as no Linux C toolchain
+  is installed here. F18 to F20 recorded.
+- **2026-10-05.** P2 stage 3 built on branch `stack-seams-p2` at `21b0057f`, not
+  merged. `WindowDom` presents a window-root as its document, and the pipeline's
+  layout, hit testing, caret, scroll, paint, producer and accessibility reads go
+  through it (a single window's root is the document); `HostTree` gains `mount`
+  and `drain_mutations`; `Accessibility::sync` takes the window's subtree and
+  `cambium-winit-a11y`'s projection is generic over `LayoutDom`; `MultiHost`
+  holds the runner, the forest document and the windows' hosts, and a window's
+  turn lends it the runner (its `ctx.runner`, a `WindowTree`), the shared part
+  and the hooks; a mutation router files each drained mutation under the
+  window it touched, or every window when it cannot place it; each window
+  records its leaf keys and the producer registry leaves keys other windows
+  hold alone; a shared sheet swap carries a generation. In cambium,
+  `GenetMultiRunner` gains the per-window calls the pipeline makes, and its
+  trees hand message dispatch and focus collection their mount (the two
+  findings recorded with stage 2). Receipts, windowless in rootstock: each
+  window lays out its own subtree at its own size and scale; a click in one
+  changes the other in the same pass; a change only one window shows rebuilds
+  only that window's layout (a change only the other shows is the control);
+  each window's accessibility tree, through the host's own sync, is its own
+  subtree; a node moved between window roots by `move_before` keeps its
+  `NodeId`, is laid out by its new window, and its leaf keeps its painter; a
+  producer another window holds is not retired (GPU test, with the retiring
+  control). Controls on the instrument: every mount made the document fails
+  four receipts, and every mutation filed to every window fails the routing
+  receipt. The first accessibility receipt built its own view and passed under
+  the scoping control, so it was rewritten to read what the host's sync path
+  hands a recording bridge. Gates: cambium, rootstock, the winit host,
+  cambium-winit-a11y, mesquite, mere-view and pelt-desktop pass 567, fail 0,
+  ignore 7, with stage 1's warnings; the headed receipt and its control pass;
+  the web host checks on wasm32. A first gate run failed one test (`RefCell
+  already borrowed`): a document borrow stage 3 had bound to a variable
+  outlived the caret move and met the update after it; scoped to its block.
+  *As built against §3.1's text*: accessibility ids are not salted by window.
+  They are opaque ids of nodes in one arena and each window's tree holds only
+  its own subtree, so no id can be in two trees (the receipt checks exactly
+  that); a salt would only matter if two windows' trees were merged into one
+  namespace, which nothing does. The message-dispatch mount fix has no receipt
+  of its own; it makes dispatch match what rebuild already did.
+- **2026-10-05.** P2 stage 2 built on branch `stack-seams-p2` at `03f8fe74`, not
+  merged, no behaviour change. `HostTree`, a sealed trait over the runner calls
+  the pipeline makes, implemented for `Runner`; `Host`, `HostState`, `AppCtx`,
+  `HostHooks` and four hook aliases take the tree as a fourth type parameter
+  defaulted to `Runner`; `AppShared` holds the eight shared fields as
+  `HostState::shared`. Gates: the stage 1 suites pass with the same counts (316
+  passed, 0 failed, 6 ignored) and warnings; the headed receipt and its control
+  pass; the web host checks on wasm32. A read-only review subagent (opus) read
+  the diff and every use in Woodshed, Hocket and Knot: no behaviour change once
+  the shared fields were declared where they had been (drop order), and no
+  consumer that fails to compile. *As built against §3.1's text*, recorded
+  rather than ruled because none changes what an application sees: the trait is
+  public and sealed, not crate-internal, because it bounds public types; window
+  commands and the wake flag stay per window (a window verb names a window; the
+  wake's home is stage 4's); and "signatures unchanged" holds as source
+  compatibility, not literally, since `AppCtx` and `HostHooks` gained the
+  defaulted parameter: a name written with three parameters denotes the type it
+  did, and the one pattern that would need an annotation (an untyped
+  `HostHooks` literal whose closure calls a method on `ctx.runner`) occurs in no
+  consumer. Found for stage 3: the producer registry retires every producer whose
+  key is not in the frame's layout (`registry.rs`, `prepare`), which under one
+  registry painted per window (S29) would retire another window's producers; and
+  cambium's `RunnerTree` builds and rebuilds under its mount but hands message
+  dispatch and focus collection the document (`runner.rs`, eight
+  `parent: Some(document())` sites and `focusables`).
+- **2026-10-05.** P2 stage 1 built on branch `stack-seams-p2` at `76aa1bee`
+  (worktree `Code/worktrees/mere-stack-seams-p2`, which took P1's build target;
+  P1's worktree removed), not merged. One `Arc<RenderCore>` per host, kept
+  across suspend and resume, each surface made from it with its transparency;
+  `HostState::render_core` and `AppCtx::render_core` for tenants, set by the web
+  host too; the renderer's retained leaf fragments survive a suspend. Receipt
+  (`headed_tests::one_core`, headed, Windows): one boot across a forced suspend
+  and resume, the same core, a present from the new surface, and the tenant's
+  device identical to the surface's. Control (`headed_tests::control`, the core
+  forgotten across the suspend): two boots, a different core, the tenant on the
+  old device. Gates: rootstock, the winit host, cambium-winit-a11y, mesquite,
+  mere-view and pelt-desktop tests pass; the web host checks on wasm32 (one
+  warning, G9's unused `MirrorHandle::target_of`, reported to its lane). F16
+  and F17 recorded.
+- **2026-10-05.** F15: the Knot lane reported that P1 breaks Knot at its next
+  build against mere's tree; Mark ruled that lane adapts Knot (burn plan
+  §13.46). Told that lane P2 leaves the compiler's surface alone.
+- **2026-10-05.** P2 sized against the hosts (round 10 evidence) and S27
+  ruled: one staged branch, one merge. Round 11 (S28 to S31): the forest dom,
+  one leaf registry painted per window, one pipeline, no check-ins; the four
+  stages and checkpoints C4 and C5 written into §3.1 and §4.
+- **2026-10-05.** P1 landed on main at `1633be0c`, by Mark's "Merge it, then P2
+  (Recommended)": main was merged into the branch and every gate rerun on the
+  merged tree (scenograph 8, scenomise 97, graphshell 319 + 5, web wasm32 and
+  workspace `--locked` exit 0) before main fast-forwarded. Not pushed.
+- **2026-10-05.** P1 implemented on branch `stack-seams-p1` at `dd2cb6fd`
+  (worktree `Code/worktrees/mere-stack-seams-p1`), not merged. Done-conditions
+  as built: every catalog family compiles from a definition (a test iterates
+  the catalog); graphshell's projection tests pass through the shared step, with
+  four grid assertions moved to the 180 by 84 pitch S16 rules and the option test
+  naming its key; an unregistered id and an unread option are typed issues; no
+  written-in cell size, column count or footprint remains; two compilers give
+  one score. Controls: grid pitch measured at two card sizes (180 by 84 and 216
+  by 116), and a custom solver that compiles only with its registration. Gates:
+  scenograph 8 and scenomise 97 passed; graphshell with personal-sync 319
+  library and 5 other tests passed, 4 ignored; graphshell web wasm32 check and
+  `cargo check --workspace --locked` exit 0; no warnings in changed files. Not
+  run: Woodshed and other consumers outside this repository, which meet the
+  `ProjectionCompiler` signature at repin (the adoption plan's note says so).
 - **2026-10-05.** P1 had stalled: the S18 relay reached the graph-semantics
   lane, not the recipe pass. S19 restarts it with a note left in the adoption
   plan; S20 moves item sizes to the host.

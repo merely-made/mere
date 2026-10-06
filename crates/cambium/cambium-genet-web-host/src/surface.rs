@@ -22,7 +22,7 @@ use web_sys::HtmlCanvasElement;
 
 /// A `RenderCore` plus the canvas surface created from it.
 pub struct WebSurface {
-    core: RenderCore,
+    core: Arc<RenderCore>,
     surface: WindowSurface,
 }
 
@@ -38,10 +38,16 @@ impl WebSurface {
         height: u32,
         options: NetrenderOptions,
     ) -> Result<Self, String> {
-        let core = RenderCore::boot_async(options).await?;
+        let core = Arc::new(RenderCore::boot_async(options).await?);
         // The one browser-specific line in the whole presentation path.
         let surface = core.create_surface(wgpu::SurfaceTarget::Canvas(canvas), width, height)?;
         Ok(Self { core, surface })
+    }
+
+    /// The render core this canvas draws through, for the host state that
+    /// hands it to same-device tenants.
+    pub fn shared_core(&self) -> Arc<RenderCore> {
+        self.core.clone()
     }
 }
 
