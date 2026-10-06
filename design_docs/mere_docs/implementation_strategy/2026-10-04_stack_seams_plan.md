@@ -736,6 +736,29 @@ The done-conditions handed over for S3 and S4, kept for reference:
   works in `projection_compile`. Second pass (F8 to F11), rulings S7 to S10:
   the README fixed (S7), TERMINOLOGY gains pandect under Eidetic and the
   curation record (S8, S10), S9 sent to the identity lane.
+- **2026-10-05.** The S14 pass, phase A done: D2 records for the 21
+  documents added since the snapshot (batches 35 to 37), coverage 337 of 337.
+  Three read-only subagents (opus) drafted them at `26060e88`; every stale
+  claim and contradiction was re-checked here before it went into a record.
+  604 claims checked, 32 stale, 26 contradictions. Seven status lines are
+  wrong: the hagiograph plan (H5 landed in isometry the day the plan was
+  written, and three crates consume it), lattice sync (the 2026-09-23
+  consumer round, CI and the two-row unused-patch baseline unrecorded),
+  lexical capability ("not started" while `reference-data`, `9310518b`,
+  serves Knot), ranged fetch (T2 unblocked since 2026-09-23), crate
+  consolidation (C4, insigne B to D and chatelaine landed), the pre.4
+  allocator diagnosis (repair selected by ruling 508 and accepted, pre.4
+  merged at `cec0b3a4`), and micron navigation (P1c, Cambium's scroll request
+  and A1's Knot half landed). Among the rest: the tree migration inventory
+  predates the physics panel and remote session; the R1 receipt's
+  callback-only control cannot fail; the S10 receipt's test breakdown is
+  51 + 8, not 56 + 3; the controls receipt never records its 2,000-node
+  result (ok, interval p50 2217.3 ms). The doc audit reports 14 annotated
+  links that now resolve (it exits 0 without `--fail-on-findings`). The
+  judgment audit's one remaining error is the three `RECEIPT.md` basenames.
+  Phase B's re-judgments cannot be supplemental batch records: the audit
+  rejects a supplement that duplicates a legacy record, and DOC_POLICY keeps
+  the snapshot unchanged; where they live goes to Mark.
 - **2026-10-05.** S32 built on branch `stack-seams-s32` (`3ecba102`) and
   landed on main at `48c08dee`, main (`2c4eaa1b`, documents only) merged into
   the branch first. `card_issue` refuses a card whose width or height is not a
