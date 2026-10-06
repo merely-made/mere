@@ -21,7 +21,7 @@ This batch exists because the document is new.
 ## mere_docs/implementation_strategy/2026-10-04_stack_seams_plan.md
 
 - disposition: current
-- status line: "Status (2026-10-06): in progress. Thirty-seven rulings in thirteen rounds (S1 to S37); P1 landed on main (`1633be0c`); P2 staged (S27 to S31, four stages in §3.1) and landed on main (`40d7ae5e`); S32 (F19) landed on main (`48c08dee`); the S14 pass (S33) under way; P3 and S7 done as documents; S3 to S6 carried into the dynamics grammar plan (G8, G9); S9 done by the identity lane (`b52edea7`)." — accurate: yes
+- status line: "Status (2026-10-06): in progress. Forty-one rulings in fourteen rounds (S1 to S41); P1 landed on main (`1633be0c`); P2 staged (S27 to S31, four stages in §3.1) and landed on main (`40d7ae5e`); S32 (F19) landed on main (`48c08dee`); the S14 pass (S33) under way; P3 and S7 done as documents; S3 to S6 carried into the dynamics grammar plan (G8, G9); S9 done by the identity lane (`b52edea7`)." — accurate: yes
 - claims checked: 45 — holds: 45, stale: 0, unverifiable: 0
 
 ### Stale claims
