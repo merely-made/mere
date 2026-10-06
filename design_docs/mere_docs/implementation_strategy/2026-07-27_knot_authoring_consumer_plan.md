@@ -5,15 +5,27 @@
 > Mere under E2 of `knot-editor/design_docs/2026-09-01_knot_editor_repository_extraction_plan.md`,
 > so the `ports/knot` *(historical citation)* <!-- doc-audit: historical-path --> paths below name the layout each receipt landed against.
 
+**Corrected 2026-10-06 (S14 pass):** if "one immutable revision" means one
+revision shared by every consumer, it does not hold at mere 535bca11:
+Turnstone pins knot-editor `3dfb70b0`, Mere's root manifest (which djinn uses
+through `knot-editor.workspace = true`) pins `562353aa`, and djinn's
+`knot-site` pins `ea3e99ef`.
+
+**Open, raised by the S14 pass (2026-10-06):** is "one immutable revision" the
+intended rule for Knot's consumers? Options: one shared knot-editor revision
+across Turnstone, Mere and djinn's `knot-site`; each consumer pins its own
+immutable revision.
+
 **Date:** 2026-07-27
-**Status:** all Knot-owned work in the reconciled sequence is complete locally:
-A1 through A4, typed Inspector clip insertion, production Resolve/Run
-providers, sanitized HTML lowering, and the sealed attributable resolve cache.
-Deterministic and real-process receipts are green, including the OS-headed
-Genet Probe drive. Exact selected-range clipping is complete for Genet's
-static retained document producer. Livery and scripted documents remain
-producer-specific selection seams; Knot already accepts and preserves an
-explicit selector without inventing one.
+**Status (2026-10-06):** all Knot-owned work in the reconciled sequence is
+complete locally: A1 through A4, typed Inspector clip insertion, production
+Resolve/Run providers, sanitized HTML lowering, and the sealed attributable
+resolve cache, with deterministic, real-process and OS-headed Genet Probe
+receipts green. Exact selected-range clipping is complete for Genet's static
+producer, and the Livery and scripted producer seams have since landed in
+Genet: both emit selection-scoped clips with DOM ranges (Genet `50c1fd7d40e`,
+2026-07-28, present at Mere's Genet pin `bd3e8861`). Knot accepts and
+preserves an explicit selector without inventing one.
 
 **Companions:** the completed [Knot port plan](2026-07-25_knot_port_plan.md),
 the reconciled
@@ -184,6 +196,13 @@ text without the 1.3 cache metadata.
   It retains whole-document clipping with `selector: None` when there is no
   selection. Livery still supplies that whole-document fallback; the scripted
   lane supplies no clip yet.
+
+  **Corrected 2026-10-06 (S14 pass):** both have since landed in Genet. Genet
+  `50c1fd7d40e` (2026-07-28) retains exact Livery text selection, and the
+  Livery and scripted engines in Genet's `genet-documents` (`livery.rs`,
+  `scripted.rs`) both emit selection-scoped clips with DOM ranges through
+  `semantic_clip_from_selection_with_links`; both are present at Mere's Genet
+  pin `bd3e8861`.
 - Resolve and Run are complete for the first production capability set.
   Graphshell carries strict `knot.transclusion.resolve/v1` and
   `knot.block.run/v1` payloads. Knot owns `auto` / `ask` / `never`, scheme and
@@ -418,6 +437,12 @@ separately need retained selection and clip production. Until those producers
 land, whole-document clipping with `selector: None` remains the explicit
 fallback where available.
 
+**Corrected 2026-10-06 (S14 pass):** those producers have landed. Genet
+`50c1fd7d40e` (2026-07-28) retains exact Livery text selection, and Genet's
+Livery and scripted engines (`livery.rs`, `scripted.rs` in `genet-documents`)
+both emit selection-scoped clips with DOM ranges; both are present at Mere's
+Genet pin `bd3e8861`.
+
 ## Stop rules
 
 - No direct Turnstone filesystem or vault write.
@@ -430,3 +455,12 @@ fallback where available.
   conflict.
 - No clip provenance encoded only in prose.
 - No automatic fetch or evaluation while received content remains unconsented.
+
+## Progress
+
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  `support/doc-audit/d2/batch_42_s14_phase_b4.md`: the status and the
+  selected-range sections record Genet's Livery and scripted selection
+  producers as landed (`50c1fd7d40e`), and the repository note's "one
+  immutable revision" is checked against three different pins.

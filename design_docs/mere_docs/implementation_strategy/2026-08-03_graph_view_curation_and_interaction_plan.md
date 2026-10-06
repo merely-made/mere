@@ -1,9 +1,9 @@
 # Graph View Curation and Interaction Plan
 
-*Written before the 2026-09-05 retirement of graphlet (TERMINOLOGY.md): read graphlet as subgraph. Identifiers such as GraphletId, GraphletRef, and SessionGraphlets are now SubgraphId, SubgraphRef, and SessionSubgraphs, and the graphlets crate is crates/graph/subgraph (code renamed 2026-09-12). CollapsedGraphlet is now ArrangementKind::Supernode.*
+*Written before the 2026-09-05 retirement of graphlet (TERMINOLOGY.md): read graphlet as subgraph. Identifiers such as GraphletId, GraphletRef, and SessionGraphlets are now SubgraphId, SubgraphRef, and SessionSubgraphs, and the graphlets crate became crates/graph/subgraph (code renamed 2026-09-12), since folded into `crates/mere/src/subgraph.rs` (`61894570`, 2026-09-23). CollapsedGraphlet is now ArrangementKind::Supernode.*
 
 **Date:** 2026-08-03  
-**Status:** C3's root-Canvas fold is landed; its Swatch proof remains pending.
+**Status (2026-10-06):** C3's root-Canvas fold is landed; its Swatch proof remains pending.
 C4 is complete: the source-time contract has journal-prefix and Git-authority
 adapters, plus a real second source in Isometry's pre-log `GameSnapshot` and
 authority `GameEvent` Codicil. Its Overmap Swatch has a Cambium slider that
@@ -105,6 +105,11 @@ This plan calls the second one **view state** in prose. Renaming either public
 type is outside the first slices; adding a third type with the same name is
 forbidden.
 
+**Corrected 2026-10-06 (S14 pass):** session-runtime is gone. The durable
+`ViewIntent` and its store now live in pandect
+(`crates/system/pandect/src/view_intent_store.rs`, re-exported as
+`pandect::ViewIntent`); read `session_runtime::ViewIntent` above as that type.
+
 Likewise:
 
 - **source time** selects a graph snapshot or checkpoint;
@@ -131,6 +136,10 @@ which historical graph is drawn. Every arrangement can be scrubbed.
 | Remote actions and authority | Graphshell protocol and participant gate | Advertise, invoke, validate, accept/reject/stale |
 | Live-view sharing | producer/host | Versioned source reference plus proven view-state fields |
 | Exact capture sharing | Chirograph projection capture | Content-addressed serialized snapshot plus presentation resources |
+
+**Corrected 2026-10-06 (S14 pass):** durable local curation is owned by
+pandect's `view_intent_store` (`crates/system/pandect/src/view_intent_store.rs`),
+not session-runtime, which no longer exists.
 
 Sceno stays an output contract. A share recipe, history provider, gesture state
 machine, or product command does not move into it. A Scenograph contract bump
@@ -452,6 +461,11 @@ Graphshell target change waits for Canvas and Swatch receipts. C4's two source
 adapters can be developed together; the shared trait is written after both
 shapes are visible. C6 remains last.
 
+**Open, raised by the S14 pass (2026-10-06):** C6 is complete while C3's
+Swatch proof is still pending, against this sequence and the "stop after each
+slice's receipt wall" rule. Options: accept the out-of-order completion and
+amend the sequencing rule; reopen C3's Swatch proof as a gate.
+
 ## Verification wall
 
 Every slice records the evidence level honestly:
@@ -536,3 +550,12 @@ It extends rather than rewrites:
   which keeps truth mutation behind graph deltas;
 - [swatch_primitive_design](../design/2026-06-27_swatch_primitive_design.md),
   especially truth versus per-instance curation and cells-as-edges.
+
+## Progress
+
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  `support/doc-audit/d2/batch_42_s14_phase_b4.md`: the status line is dated
+  (its content verified), the view-state owner is repointed to pandect, the
+  graphlet banner names `crates/mere/src/subgraph.rs`, and the C3/C6
+  sequencing conflict is written in as a fork.
