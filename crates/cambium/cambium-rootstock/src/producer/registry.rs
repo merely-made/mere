@@ -122,7 +122,20 @@ impl ProducerRegistry {
     }
 
     pub(crate) fn suspend_all(&mut self, renderer: Option<&netrender::Renderer>) {
+        self.suspend_except(&Default::default(), renderer);
+    }
+
+    /// Suspend every producer but those `held` names: under several windows,
+    /// the keys other windows lay out, whose producers are theirs to keep.
+    pub(crate) fn suspend_except(
+        &mut self,
+        held: &std::collections::HashSet<u64>,
+        renderer: Option<&netrender::Renderer>,
+    ) {
         for (&key, entry) in &mut self.entries {
+            if held.contains(&key) {
+                continue;
+            }
             if entry.active {
                 entry.producer.suspend();
             }
@@ -137,7 +150,9 @@ impl ProducerRegistry {
                 renderer.unregister_external_image(netrender::external_image_key(key));
             }
         }
-        self.device = None;
+        if held.is_empty() {
+            self.device = None;
+        }
     }
 
     #[cfg(test)]

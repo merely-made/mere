@@ -575,10 +575,16 @@ where
             wgpu::Color::BLACK
         };
         let phase = crate::Instant::now();
-        let (_tex, view) =
-            surface
-                .core()
-                .rasterize_scaled(scene, pw, ph, ColorLoad::Clear(clear), scale);
+        // Keyed by this host: several windows rasterize through one core, and
+        // an unkeyed raster diffs against whichever surface drew last (F17).
+        let (_tex, view) = surface.core().rasterize_scaled_for(
+            self.s.presentation_host,
+            scene,
+            pw,
+            ph,
+            ColorLoad::Clear(clear),
+            scale,
+        );
         profile.raster_us = elapsed_us(phase.elapsed());
         if let Some(timings) = surface.renderer().last_frame_timings() {
             let span = |name: &str| timings.span(name).map(elapsed_us).unwrap_or_default();

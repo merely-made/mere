@@ -76,10 +76,11 @@ where
     /// Retire staged images before a platform drops/replaces its surface, or
     /// suspend transient targets while the containing window is hidden.
     pub fn suspend_producers(&mut self) {
-        self.s
-            .shared
-            .producers
-            .suspend_all(self.s.surface.as_ref().map(|surface| surface.renderer()));
+        let shared = &mut self.s.shared;
+        shared.producers.suspend_except(
+            &shared.held_elsewhere,
+            self.s.surface.as_ref().map(|surface| surface.renderer()),
+        );
     }
 
     pub(crate) fn prepare_producers(&mut self, scale: f32) -> ProducerFrameStats {
@@ -88,14 +89,17 @@ where
             self.s.layout.as_ref(),
             self.s.runner.as_ref(),
         ) else {
-            self.s.shared.producers.suspend_all(None);
+            let shared = &mut self.s.shared;
+            shared
+                .producers
+                .suspend_except(&shared.held_elsewhere, None);
             return ProducerFrameStats::default();
         };
         if self.s.hidden {
-            self.s
-                .shared
+            let shared = &mut self.s.shared;
+            shared
                 .producers
-                .suspend_all(Some(surface.renderer()));
+                .suspend_except(&shared.held_elsewhere, Some(surface.renderer()));
             return ProducerFrameStats::default();
         }
         let dom = runner.dom();

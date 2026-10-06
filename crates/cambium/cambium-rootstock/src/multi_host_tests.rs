@@ -78,7 +78,10 @@ fn multi() -> (Multi, ProjectionId, ProjectionId) {
             ui_zoom: zoom,
             ..HostOptions::default()
         };
-        multi.open(lens(label), options, s, wake)
+        multi.open(
+            lens(label),
+            Host::new(options, None, HostHooks::inert(), s, wake),
+        )
     };
     let a = open(&mut multi, "A", 1.0);
     let b = open(&mut multi, "B", 2.0);
@@ -394,4 +397,44 @@ fn a_node_moved_between_windows_keeps_its_identity_and_its_leaf_keeps_its_painte
             );
         })
         .unwrap();
+}
+
+#[test]
+fn a_turn_opens_and_closes_windows_through_its_tree() {
+    let (mut multi, a, b) = multi();
+    let c = multi
+        .with_window(a, |h| {
+            let tree = h.s.runner.as_mut().unwrap();
+            let c = tree.open(lens("C"), HostOptions::default());
+            tree.close(a);
+            c
+        })
+        .unwrap();
+    let (opened, closed) = multi.take_requests();
+    assert_eq!(
+        opened.iter().map(|(id, _)| *id).collect::<Vec<_>>(),
+        vec![c]
+    );
+    assert_eq!(closed, vec![a]);
+    assert!(
+        multi.take_requests().0.is_empty(),
+        "requests are taken once"
+    );
+    for (id, options) in opened {
+        let s = HostState::new();
+        let wake = HostWake::new(s.wake_pending.clone(), Arc::new(|| {}));
+        multi.attach(id, Host::new(options, None, HostHooks::inert(), s, wake));
+    }
+    for id in closed {
+        assert!(multi.close(id).is_some());
+    }
+    assert_eq!(multi.windows().collect::<Vec<_>>(), vec![b, c]);
+    layout_at(&mut multi, c, 400.0, 300.0);
+    let dom = multi.dom();
+    let label = find(&dom.borrow(), multi.window_root(c).unwrap(), "window C").unwrap();
+    assert!(
+        painted(&mut multi, c, label).is_some(),
+        "C lays out its own lens"
+    );
+    assert!(multi.window_root(a).is_none(), "A's root left the document");
 }
