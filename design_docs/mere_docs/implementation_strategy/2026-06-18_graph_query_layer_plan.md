@@ -2,9 +2,21 @@
 
 *Written before the 2026-09-05 retirement of graphlet (TERMINOLOGY.md): read graphlet as subgraph. Identifiers such as GraphletId, GraphletRef, and SessionGraphlets are now SubgraphId, SubgraphRef, and SessionSubgraphs, and the graphlets crate is crates/graph/subgraph (code renamed 2026-09-12).*
 
-Status: **slices 1+2 shipped and verified.** SPARQL query over the focused graph,
-kernel-sourced and one-way (the kernel stays truth; this is a derived, read-only
-view for interop and exploration). A residual backlog follows; none of it blocks.
+**Corrected 2026-10-06 (S14 pass):** that crate path no longer exists. The
+subgraph crate was folded into mere in `61894570` (2026-09-23);
+`SessionSubgraphs` is in `crates/mere/src/subgraph.rs`.
+
+**Status (2026-10-06):** slice 1 landed and survives as linked-data's `query`
+feature, rewired from Oxigraph onto `spareval` over `oxrdf::Dataset` in
+`8e7ae82b` (2026-07-06), with `dataset_quads` as the projection it queries.
+Slice 2, the `>sparql` omnibar verb, landed in meerkat on 2026-06-18, retired
+with it 2026-07-18 (`c5f01064`); only the mere facade's `query` feature
+remains (`crates/mere/Cargo.toml`). Backlog #5 landed under the petgraph-RDF
+plan (`70278fed`), and #2 in part (statement-metadata reifiers). Open: #1, the
+rest of #2, #3 (carried by the graph semantics plan's P4), #4, and #6 to #8.
+The layer is SPARQL query over the focused graph, kernel-sourced and one-way
+(the kernel stays truth; this is a derived, read-only view for interop and
+exploration). None of the residual backlog blocks.
 
 Parent / cross-refs:
 
@@ -31,6 +43,11 @@ walking the graph, retiring the duplicated walk. Verified by the existing
 linked-data goldens (21/21). `oxrdf 0.3` was already a direct dep; no new
 dependency.
 
+**Corrected 2026-10-06 (S14 pass):** `node_quads` is no longer the single
+projection. `dataset_quads` (`crates/graph/linked-data/src/lib.rs`, line 532)
+is now the canonical projection for query; `node_quads` (line 523) remains as
+the default-graph-only input to the JSON-LD shapers.
+
 ### Slice 1 — the query capability (library)
 
 `linked-data/src/query.rs`, behind an optional **`query` feature**:
@@ -41,6 +58,12 @@ Ephemeral (store built per call, dropped after). `oxigraph = { version = "0.5",
 default-features = false }` so `Store::new()` is in-memory with **no RocksDB** —
 keeps the wasm/PWA target viable. Verified: `sparql_selects_a_literal_and_an_edge_over_node_quads`
 (literal + edge SELECT over the seed graph), 22/22 lib tests.
+
+**Corrected 2026-10-06 (S14 pass):** slice 1 no longer builds an Oxigraph
+store. `8e7ae82b` (2026-07-06, petgraph-RDF Phase 3) rewired `sparql` onto
+`spareval` evaluating directly over an `oxrdf::Dataset`; Oxigraph remains only
+as a test-side parity oracle (`crates/graph/linked-data/Cargo.toml`,
+`crates/graph/linked-data/src/query.rs`).
 
 ### Slice 2 — the `>sparql` omnibar verb (host)
 
@@ -59,6 +82,11 @@ Live form:
 >sparql("SELECT ?s ?o WHERE { ?s <https://schema.org/name> ?o }")
 ```
 
+**Corrected 2026-10-06 (S14 pass):** slice 2 went with meerkat. Its host files
+(`shell_eval.rs`, `command_drain.rs`) were deleted in `c5f01064` (2026-07-18),
+no `sparql` call exists in Mere's ports, and only the mere facade's `query`
+feature remains (`crates/mere/Cargo.toml`, line 53).
+
 ---
 
 ## Residual backlog (ranked by leverage; none blocking)
@@ -73,6 +101,11 @@ Live form:
    `rdf-12` feature) is the standards-correct home: `node_quads` emits quoted
    triples for the metadata, so export and query become lossless for edges. The
    one genuinely new RDF capability worth doing.
+   **Corrected 2026-10-06 (S14 pass):** partly done.
+   `push_statement_metadata_quads` emits `rdf:reifies` reifiers carrying the
+   statement's label, provenance and asserted-at
+   (`crates/graph/linked-data/src/lib.rs`, lines 204 to 240), and Oxigraph and
+   oxrdf carry `rdf-12`.
 3. **`CONSTRUCT` / `DESCRIBE` → graphlet.** `query.rs` currently returns an error
    for `QueryResults::Graph`. Wiring `CONSTRUCT` output into a derived subgraph
    ties SPARQL to graphlet-derivation (reveal latent structure as a real graphlet).
@@ -84,6 +117,9 @@ Live form:
 5. **Turtle / N-Quads I/O.** Cheap interop win via `oxttl` (same ox* family),
    widening import/export beyond JSON-LD. A lot of linked data in the wild is
    Turtle.
+   **Corrected 2026-10-06 (S14 pass):** done under the petgraph-RDF plan:
+   `crates/graph/linked-data/src/serialize.rs` has `to_nquads`, `to_trig`,
+   `from_nquads` and `from_trig` (`70278fed`, 2026-07-06).
 6. **Semantic-surface JSON-LD-in-view (Path A payoff).** Emit kernel-sourced
    `<script type="application/ld+json">` per card once orrery nodes are DOM. Gated
    on unified-document-host Phase 2 (orrery-as-element), not pure RDF work.
@@ -110,3 +146,15 @@ not a task.
   `c5e6400c`) restored a coherent set. Lesson, matching the workspace convention:
   for gitignored, branch-tracked owned forks, re-resolve fresh rather than bump
   pins one at a time.
+
+  **Corrected 2026-10-06 (S14 pass):** the slice 1 code is committed and
+  present at mere 535bca11 (`node_quads` in
+  `crates/graph/linked-data/src/lib.rs`, `sparql` in
+  `crates/graph/linked-data/src/query.rs`).
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_47_s14_phase_b9.md: "What shipped" corrected for
+  `spareval` and `dataset_quads`, slice 2 recorded as landed in meerkat and
+  retired with it (`c5f01064`), backlog #2 marked partly and #5 wholly done
+  under the petgraph-RDF plan, the dead subgraph path corrected, and the
+  "not committed" note corrected.
