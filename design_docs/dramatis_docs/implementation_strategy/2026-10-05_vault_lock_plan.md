@@ -634,7 +634,8 @@ Still open: a threat statement naming hibernation and the pagefile.
 
 ## 4. Phases
 
-Drafted from the assessment; set once the forks are ruled.
+Drafted from the assessment; set on 2026-10-05 once rulings 1 to 24 were
+made, and carried out since under the later rulings.
 
 - **L1 — personae can lock.** `IdentityVault::lock()` drops the profile and
   the storage key, and every accessor that reaches secret material returns
