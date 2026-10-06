@@ -4,8 +4,9 @@
 **Status (2026-10-06):** in progress. Sixty-six rulings in twenty-two rounds
 (S1 to S66); P1 landed on main (`1633be0c`); P2 staged (S27 to S31, four
 stages in §3.1) and landed on main (`40d7ae5e`); S32 (F19) landed on main
-(`48c08dee`); the S14 pass (S33) under way; P3 and S7 done as documents; S3 to
-S6 carried into the dynamics grammar plan (G8, G9); S9 done by the identity
+(`48c08dee`); the S14 pass (S33) done (`8d7702d2`, receipt
+`support/doc-audit/d2/remediation_2026-10-06.md`); P3 and S7 done as
+documents; S3 to S6 carried into the dynamics grammar plan (G8, G9); S9 done by the identity
 lane (`b52edea7`).
 
 A note sent to Mark listed weak seams in the stack. Each claim was checked
@@ -956,6 +957,21 @@ The done-conditions handed over for S3 and S4, kept for reference:
 - **2026-10-06.** Round 20: S58 to S61, all sixteen archived, with three directions: the four ML plans consolidate into one new plan now that Burn 0.22 is out; the four search and memory plans get a critical pass, Eidetic's development taken up; native smolweb's render-design question explained and put back.
 - **2026-10-06.** Round 21: S62 to S65. S62's smolweb question answered with Mark's own reframing (enrich the ASTs either way) and put back; S63 a consolidated ML plan written now; six more plans archived (spatial compute, tactile tier, derived faces, event model, reticulum, doc policy). S49's rounds are done: 42 of 53 plans to archive, 11 stay active.
 - **2026-10-06.** Round 22: S66, smolweb renders through one path: richer ASTs into an extended EngineDocument, the per-format Cambium views retiring.
+- **2026-10-06.** The S14 pass, phase C done; the pass is complete. Fourteen
+  write lanes corrected 145 of their 155 documents (the other ten needed no
+  edit), merged `3e107e32` to `a3b69537`: 428 dated corrections in 134
+  documents and 75 Open notes; the live plans' lanes corrected eleven more
+  (S46). DOC_README lane D (`d2184520`) corrected 99 entries and indexed 9
+  orphans. Archive lane E (merged `8d7702d2`) moved 88 plans (77 completed,
+  7 superseded, 4 retired), rewrote 674 links, and recorded about 200 tails in
+  the archived plan tails plan's "2026-10-06 archive pass" section, the S59
+  critical-pass subsection among them; the identity and Conatus lanes took
+  their `owner:` tails the same day (`73812e3a`, `a0cfa30a`). The receipt is
+  `support/doc-audit/d2/remediation_2026-10-06.md`: per-lane counts, the
+  readings not ruled (knot-editor's copies as owners, petgraph RDF Phase 4
+  to the backlog), six record errata and the follow-ons (S44, S45, S59, S66's
+  code retirement, the render ladder rethink). Both audits exit 0; judgment
+  coverage 253/253.
 - **2026-10-06.** Round 16: S46 (live plans handed to their lanes), S47
   (reviewed write lanes) and S48 (ownerless tails to the archived plan tails
   backlog). S44's repins and S45's header re-run were flagged as separate
