@@ -28,6 +28,13 @@ its own copy.
    English WordNet (CC BY 4.0) ships in the product. The Wiktionary-derived
    etymology and word-parts data (CC BY-SA) is a separate artifact the user opts
    into, so share-alike never enters the shipped binary.
+   **Open, raised by the S14 pass (2026-10-06):** this decision ships Open
+   English WordNet in the product, but `reference-data`, now L2 under ruling
+   S42, installs and enables no upstream dictionary by itself: every pack is
+   installed opt-in and enabled by an explicit host or user choice
+   (`crates/intel/reference-data/README.md`). Options: the product enables
+   the OEWN pack by default on install; OEWN ships but stays opt-in like
+   every pack; this decision is amended to opt-in throughout.
 3. **Languages: English now, designed for more later.** The API takes a language
    tag from the first commit even while only English resolves, so a second
    language is additive rather than a rewrite.
