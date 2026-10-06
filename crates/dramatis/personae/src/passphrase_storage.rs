@@ -152,12 +152,15 @@ impl PassphraseEncryptedStorage {
             // Verify against an existing profile if any.
             if let Some((_, p)) = file.profiles.iter().next() {
                 let cipher = ChaCha20Poly1305::new(
-                    &Key::try_from(&kek.as_ref()[..]).expect("fixed-length key material"),
+                    &Key::try_from(kek.as_ref()).expect("fixed-length key material"),
                 );
                 let nonce = &Nonce::try_from(&p.nonce[..]).expect("fixed-length key material");
-                cipher
-                    .decrypt(nonce, p.ciphertext.as_slice())
-                    .map_err(|_| IdentityError::Backend("incorrect passphrase".to_string()))?;
+                // The check's plaintext is the profile itself.
+                let _checked = Zeroizing::new(
+                    cipher
+                        .decrypt(nonce, p.ciphertext.as_slice())
+                        .map_err(|_| IdentityError::Backend("incorrect passphrase".to_string()))?,
+                );
             }
             (file.salt, kek, file.profiles)
         } else {
@@ -232,23 +235,25 @@ impl IdentityStorage for PassphraseEncryptedStorage {
             .ok_or_else(|| IdentityError::Backend(format!("profile not found: {:?}", id)))?;
         let kek = self.inner.lock().unwrap().kek.clone();
         let cipher = ChaCha20Poly1305::new(
-            &Key::try_from(&kek.as_ref()[..]).expect("fixed-length key material"),
+            &Key::try_from(kek.as_ref()).expect("fixed-length key material"),
         );
         let nonce = &Nonce::try_from(&entry.nonce[..]).expect("fixed-length key material");
-        let plaintext_bytes = cipher
-            .decrypt(nonce, entry.ciphertext.as_slice())
-            .map_err(|_| IdentityError::Backend("decrypt profile failed".to_string()))?;
-        let plain: PlaintextProfile = serde_json::from_slice(&plaintext_bytes)
+        let plaintext_bytes = Zeroizing::new(
+            cipher
+                .decrypt(nonce, entry.ciphertext.as_slice())
+                .map_err(|_| IdentityError::Backend("decrypt profile failed".to_string()))?,
+        );
+        let mut plain: PlaintextProfile = serde_json::from_slice(&plaintext_bytes)
             .map_err(|e| IdentityError::Backend(format!("decode plaintext: {e}")))?;
 
         let mut slots = HashMap::with_capacity(plain.slots.len());
-        for s in &plain.slots {
+        for s in &mut plain.slots {
             let (k, slot) = plaintext_to_slot(s);
             slots.insert(k, slot);
         }
         Ok(Profile {
             id: id.clone(),
-            display_name: plain.display_name,
+            display_name: std::mem::take(&mut plain.display_name),
             master: Ed25519Keypair::from_seed(plain.master_seed),
             slots,
         })
@@ -264,12 +269,13 @@ impl IdentityStorage for PassphraseEncryptedStorage {
                 .map(|(k, s)| slot_to_plaintext(k, s))
                 .collect(),
         };
-        let plaintext_bytes = serde_json::to_vec(&plain)
+        let plaintext_bytes = crate::zeroizing_json::to_vec(&plain)
             .map_err(|e| IdentityError::Backend(format!("encode plaintext: {e}")))?;
+        drop(plain);
 
         let kek = self.inner.lock().unwrap().kek.clone();
         let cipher = ChaCha20Poly1305::new(
-            &Key::try_from(&kek.as_ref()[..]).expect("fixed-length key material"),
+            &Key::try_from(kek.as_ref()).expect("fixed-length key material"),
         );
         let nonce_bytes = random_bytes(NONCE_LEN);
         let nonce = &Nonce::try_from(&nonce_bytes[..]).expect("fixed-length key material");
@@ -298,7 +304,7 @@ impl IdentityStorage for PassphraseEncryptedStorage {
         let file = self.load_file()?;
         let kek = self.inner.lock().unwrap().kek.clone();
         let cipher = ChaCha20Poly1305::new(
-            &Key::try_from(&kek.as_ref()[..]).expect("fixed-length key material"),
+            &Key::try_from(kek.as_ref()).expect("fixed-length key material"),
         );
         let mut out = Vec::with_capacity(file.profiles.len());
         for (id_str, entry) in &file.profiles {
@@ -306,14 +312,16 @@ impl IdentityStorage for PassphraseEncryptedStorage {
             // decrypts per list call, fine for the expected profile
             // counts (handful) but worth caching if it ever matters.
             let nonce = &Nonce::try_from(&entry.nonce[..]).expect("fixed-length key material");
-            let bytes = cipher
-                .decrypt(nonce, entry.ciphertext.as_slice())
-                .map_err(|_| IdentityError::Backend("decrypt for list failed".to_string()))?;
-            let plain: PlaintextProfile = serde_json::from_slice(&bytes)
+            let bytes = Zeroizing::new(
+                cipher
+                    .decrypt(nonce, entry.ciphertext.as_slice())
+                    .map_err(|_| IdentityError::Backend("decrypt for list failed".to_string()))?,
+            );
+            let mut plain: PlaintextProfile = serde_json::from_slice(&bytes)
                 .map_err(|e| IdentityError::Backend(format!("decode plaintext: {e}")))?;
             out.push(ProfileSummary {
                 id: ProfileId(id_str.clone()),
-                display_name: plain.display_name,
+                display_name: std::mem::take(&mut plain.display_name),
                 slot_count: plain.slots.len(),
             });
         }

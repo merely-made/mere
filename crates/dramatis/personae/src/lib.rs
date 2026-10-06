@@ -86,6 +86,7 @@ pub mod ssh_sign;
 pub mod ssh_slot;
 pub mod startup_unlock;
 pub mod vault;
+mod zeroizing_json;
 
 pub use crate::error::IdentityError;
 pub use crate::keypair::{Ed25519Keypair, Ed25519PublicKey, Ed25519Signature};
