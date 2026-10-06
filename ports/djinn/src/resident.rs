@@ -386,7 +386,7 @@ fn claim_credentials<P: IdentityProvider + ?Sized>(
 fn published_site_profile_root(data_root: &Path, profile: &ProfileId) -> PathBuf {
     data_root
         .join("published-sites")
-        .join(blake3::hash(profile.0.as_bytes()).to_hex().to_string())
+        .join(blake3::hash(profile.0.as_bytes()).to_hex().as_str())
 }
 
 fn published_site_profile_scope(profile: &ProfileId) -> BlobScope {

@@ -31,6 +31,9 @@ use crate::items::ItemStore;
 use crate::lock::VaultLockHolder;
 use crate::otp::OtpItemStore;
 
+/// The record and freshness keys, cleared when dropped.
+type DerivedKeys = (Zeroizing<[u8; 32]>, Zeroizing<[u8; 32]>);
+
 /// The two salts a resident derives its record and freshness keys under.
 #[derive(Clone, Copy, Debug)]
 pub struct CredentialSalts {
@@ -45,7 +48,7 @@ impl CredentialSalts {
     fn derive<P: IdentityProvider + ?Sized>(
         &self,
         vault: &P,
-    ) -> Result<(Zeroizing<[u8; 32]>, Zeroizing<[u8; 32]>), IdentityError> {
+    ) -> Result<DerivedKeys, IdentityError> {
         let record = Zeroizing::new(vault.derive_keypair(self.record)?.to_seed());
         let freshness = Zeroizing::new(vault.derive_keypair(self.freshness)?.to_seed());
         Ok((record, freshness))

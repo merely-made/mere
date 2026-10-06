@@ -314,8 +314,21 @@ impl Resident {
         args: &[&str],
         stdin: &[u8],
     ) -> Result<Output, HarnessError> {
+        self.ssh_client_env(program, args, stdin, &[])
+    }
+
+    /// [`Self::ssh_client`] with more variables (an `SSH_ASKPASS`, say);
+    /// still guarded.
+    pub fn ssh_client_env(
+        &self,
+        program: &Path,
+        args: &[&str],
+        stdin: &[u8],
+        extra: &[(&str, &str)],
+    ) -> Result<Output, HarnessError> {
         let args: Vec<String> = args.iter().map(|arg| arg.to_string()).collect();
         let mut env = self.env_map();
+        env.extend(extra.iter().map(|(k, v)| (k.to_string(), v.to_string())));
         env.insert("SSH_AUTH_SOCK".into(), self.endpoint("agent"));
         // Win32-OpenSSH exits 255, silently, without it. A machine root
         // (`C:\ProgramData`), not a user's.

@@ -41,9 +41,13 @@ pub const PROFILE_SWITCH_INTENT: &str = "castellan.profile.switch";
 pub const PROFILE_SWITCH_SCHEMA: &str = "castellan.profile.switch/v1";
 pub const PROFILE_CREATE_INTENT: &str = "castellan.profile.create";
 pub const PROFILE_CREATE_SCHEMA: &str = "castellan.profile.create/v1";
+/// Lock the vault; portable (vault lock ruling 10).
 pub const VAULT_LOCK_INTENT: &str = "castellan.vault.lock";
+/// [`LockVaultIntentV1`]'s schema.
 pub const VAULT_LOCK_SCHEMA: &str = "castellan.vault.lock/v1";
+/// Unlock the vault; native only, and refused as an intent (ruling 9).
 pub const VAULT_UNLOCK_INTENT: &str = "castellan.vault.unlock";
+/// The Unlock action's schema; it carries nothing.
 pub const VAULT_UNLOCK_SCHEMA: &str = "castellan.vault.unlock/v1";
 
 /// Lock the vault (vault lock ruling 10). Portable: any admitted surface may
