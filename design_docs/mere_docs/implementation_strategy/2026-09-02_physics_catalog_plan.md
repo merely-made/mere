@@ -1,7 +1,7 @@
 # Physics Catalog Plan
 
 **Date:** 2026-09-02
-**Status:** in progress (P1 landed 2026-09-02; P1b, P2 on both hosts and P3 the remote board 2026-09-03; the runtime extraction 2026-09-04; P4 web half 2026-09-04, closing with the Graphshell tree port per the 2026-10-01 rulings in §5; P5a-c 2026-10-02: kernel, cell list, lagged seam, setters and the web tree at the third-round web defaults, receipts green, merged; then turnstone and P5d; P7 moved to the [dynamics grammar plan](2026-10-02_dynamics_grammar_plan.md) 2026-10-02).
+**Status (2026-10-06):** in progress. P1 landed 2026-09-02; P1b, P2 on both hosts and P3 the remote board 2026-09-03; the runtime extraction 2026-09-04; P4's web half 2026-09-04, closing with the Graphshell tree port per the 2026-10-01 rulings in §5. P5a-c (kernel, cell list, lagged seam, setters and the web tree at the third-round web defaults, receipts green) merged 2026-10-02 (`8022cedd`); turnstone's wiring and P5d remain. P6a, Density's CPU tier, merged 2026-10-04 (`9b576c84`); P6b, the GPU tier, and P6c, its receipts, remain. Orbit's retune (`9ce5889f`) and Energy's, with the view following while playing (`562488b0`), merged 2026-10-04. Seiche's speed dial, the native entry point and the 1x-floor bound merged 2026-10-06 (`c6e8cc09`, calm round 24 of 24); the period estimator is on `seiche-speed-estimator`, not merged, and turnstone's repin and speed wiring follow the dial's merge (Progress, 2026-10-05). P7 moved to the [dynamics grammar plan](2026-10-02_dynamics_grammar_plan.md) 2026-10-02.
 **Scope:** A catalog of *distinct physics layout laws* — dynamical systems
 over the graph's bodies that produce different layouts because they are
 different physics — as a lever beside the arrangement catalog, plus the
