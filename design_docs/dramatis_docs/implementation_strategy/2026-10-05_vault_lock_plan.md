@@ -366,6 +366,11 @@ gap. Mark: **"They follow the resident (Recommended)"**. Follows: the work
 reaches those repos; which of their calls break under ruling 13 is mapped
 at the build's start.
 
+*2026-10-06 annotation to ruling 15:* the dramatis repo plan's ruling D8
+moves pandect's wallet secrets into castellan, so this lock reaches them
+there once that lands. Until then ruling 15 stands as written. Its D18
+finishes this plan first.
+
 *2026-10-06 annotation to rulings 23, 35 and 36:* the dramatis repo plan's
 ruling D5 has graphshell, Turnstone, woodshed, hocket and knot-editor call
 djinn instead of opening the vault. Once that lands, "following the
