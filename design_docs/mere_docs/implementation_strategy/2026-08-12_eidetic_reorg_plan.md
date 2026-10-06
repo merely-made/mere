@@ -1,11 +1,15 @@
 # Eidetic Reorg Plan
 
 **Date**: 2026-08-12
-**Status**: open; authorized by Mark 2026-08-12 ("you can reorg eidetic").
-Execution is timed around the sibling sessions currently in mere's tree
-(distillery v0, moothold): the moves touch the workspace manifest, so they
-land as one commit when the tree quiets, with the search wiring plan's W4
-consuming the new homes.
+**Status (2026-10-06):** landed 2026-08-12 in `8595cd38`, authorized by Mark
+the same day ("you can reorg eidetic"). `persistence` is
+`esp::embed::persistence` behind esp's `persistence` feature, `field_bridge`
+and `canvas_search` are in `crates/canvas/pictograph/src/canvas/`, and no
+`mere-embed` package remains. Open: done-condition 4's census row (the
+[leverage census](../../2026-08-10_leverage_census_brief.md) still reads
+`mere-embed` "Keep; wires in as W4"). E-R4's fetchers have since folded into
+eidetic-core (`254b23b6`), and graphshell-web has had its own workspace since
+`74b55236`; both are noted below.
 
 **Related**:
 [search_surface_wiring_plan](2026-08-12_search_surface_wiring_plan.md) (W4
@@ -76,6 +80,13 @@ one.
   must not enter eidetic-core; their wiring destinations are already named
   (gazette feed pipeline, mesh blob lane).
 
+  **Corrected 2026-10-06 (S14 pass):** the fetchers are no longer crates.
+  `254b23b6` (2026-09-23) folded them into eidetic-core as the features
+  `https-fetcher` and `iroh-fetcher` (`crates/eidetic/eidetic-core/Cargo.toml`,
+  lines 59-60; `crates/eidetic/eidetic-core/src/https_fetcher.rs` and
+  `crates/eidetic/eidetic-core/src/iroh_fetcher.rs`), so the dependency walls
+  are now feature gates.
+
 Non-moves, stated so the reorg has edges: muniment, codicil, chartulary,
 scholia, tulpa, eidetic-fjall, and eidetic-search all stay put. The family
 directory is coherent; the reorg is the dissolution of one orphan crate
@@ -125,6 +136,12 @@ into the two homes its halves always had.
   whereas a gated member keeps sharing both. Its doc comment carries the
   command that checks it for the target it is for.
 
+  **Corrected 2026-10-06 (S14 pass):** the rejected arrangement is the one in
+  the tree. Since `74b55236` (2026-08-24) `ports/graphshell/web/Cargo.toml`
+  carries its own `[workspace]` (line 16), the root lists it under `exclude`
+  (root `Cargo.toml`, lines 156-167, whose comment says the `[workspace]`
+  table is what actually keeps it out), and it restates the root's patches.
+
   **A third instance of the crypto-row hole surfaced in the same pass**, in
   `src/bin/h6_transfer_peer/source.rs`. It had stayed hidden because bin
   targets are only compiled by `--all-targets` or a workspace check — the
@@ -137,6 +154,12 @@ into the two homes its halves always had.
   graphshell-web --target wasm32-unknown-unknown` exits 0. Use
   `--all-targets`: the lib-only form is what let a bin carry a compile
   error for two days.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_50_s14_phase_b12.md: the status records the
+  2026-08-12 landing (`8595cd38`) with the census row as the one open item,
+  and E-R4's fetchers (`254b23b6`) and graphshell-web's own workspace
+  (`74b55236`) carry corrections.
 
 ## Done conditions
 
