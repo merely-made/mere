@@ -78,6 +78,12 @@ gestures commit which proposals), wired into a real canvas. This is
 where the metaphors become configurable, and it belongs to the canvas
 host rather than to conatus.
 
+**Open, raised by the S14 pass (2026-10-06):** T5 overlaps two later plans
+that do not reference this one: the physics catalog's named profiles, and the
+dynamics grammar plan's G4 `DynamicsSpec` saved in `SavedSceneV1`. Where does
+the mere profile live? Options: fold T5 into dynamics grammar G4; fold it into
+the physics catalog's profiles; keep it separate here.
+
 ## Stop rules
 
 - No fact types, logs, or callbacks in seiche: proposals are reads.
@@ -111,3 +117,11 @@ host rather than to conatus.
   meaningful against a pull. Receipts for all three gates run in
   `tests/tactile.rs`; the sieve and support receipts share one run, as
   the plan's done-conditions asked.
+
+## Progress
+
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_44_s14_phase_b6.md: every claim held (T1-T3
+  landed, T4 and T5 open); T5's overlap with the physics catalog and
+  dynamics grammar plans is written in as an open question.
