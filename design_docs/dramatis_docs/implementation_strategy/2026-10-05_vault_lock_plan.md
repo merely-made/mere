@@ -688,3 +688,13 @@ personae lock API, `b7bcbdb0` adapts castellan and Distillery, not merged):
   - a loader variant that takes the `OsPresence` proof, so the persisted
     lock (ruling 32, L3) does not block presence unlock;
   - ruling 38's constructor, which builds a vault without a decrypt (L3).
+
+**2026-10-06, L2 started.** The dramatis repo plan's ruling D18 finishes this plan
+first. An Opus lane builds L2 up to checkpoint A:
+- the lock coordinator (rulings 13 and 31);
+- castellan's typed refusals;
+- the agent's OpenSSH semantics and `-x`/`-X`, with a harness receipt over an
+  isolated pipe;
+- passphrase enrolment (ruling 39), and lockable test storages.
+
+The Secret Service is checkpoint B, on the ThinkPad.
