@@ -533,7 +533,7 @@ execution. A green unit suite is not reported as headed proof.
 ## Supersession and adjacent authority
 
 This plan supersedes the operative substrate and scrubber sections of
-[event_log_timeline_plan](2026-07-01_event_log_timeline_plan.md). That plan's
+[event_log_timeline_plan](../../archive_docs/2026-10-06_superseded_plans/2026-07-01_event_log_timeline_plan.md). That plan's
 undo/restore distinctions remain useful, but its proposed `GraphMutation` log
 and discrete `SliderSpec` premise are obsolete now that `GraphJournal` and
 Cambium pointer capture are implemented.
@@ -543,10 +543,10 @@ It extends rather than rewrites:
 - [swatch_primitive_plan](2026-06-27_swatch_primitive_plan.md), whose P6
   generic component was deliberately not extracted from two bespoke consumers;
   Cambium plus Isometry now provide a new, real second-consumer seam;
-- [scenograph_0_0_3_release_plan](2026-07-24_scenograph_0_0_3_release_plan.md), especially
+- [scenograph_0_0_3_release_plan](../../archive_docs/2026-10-06_completed_plans/2026-07-24_scenograph_0_0_3_release_plan.md), especially
   the settled ownership of output identity, scene revision, protocol intent,
   and authority;
-- [graph_write_path_migration_plan](2026-07-01_graph_write_path_migration_plan.md),
+- [graph_write_path_migration_plan](../../archive_docs/2026-10-06_completed_plans/2026-07-01_graph_write_path_migration_plan.md),
   which keeps truth mutation behind graph deltas;
 - [swatch_primitive_design](../design/2026-06-27_swatch_primitive_design.md),
   especially truth versus per-instance curation and cells-as-edges.

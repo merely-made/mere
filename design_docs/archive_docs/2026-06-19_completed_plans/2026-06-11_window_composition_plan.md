@@ -9,7 +9,7 @@ load-bearing (pool + `orrery_lru` + `MAX_POOLED_ORRERIES` + `reap_graph` + park/
 pool, render draws multiple orreries, `OpenGraphBeside` summons a second graph pane,
 per-pane render + wheel/hover). **Migrated:** the P2 per-pane *input* tail (per-pane
 focus / nav / save) into the
-[unified_document_host_plan](../../mere_docs/implementation_strategy/2026-06-17_unified_document_host_plan.md)
+[unified_document_host_plan](../2026-10-06_completed_plans/2026-06-17_unified_document_host_plan.md)
 (one shell document + shell hit-test). **Spun out:** P3-P5 + the deferred per-pane
 camera + OQ3-OQ5 to
 [tearout_composability_plan](../../mere_docs/implementation_strategy/2026-06-19_tearout_composability_plan.md).

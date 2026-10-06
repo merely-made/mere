@@ -8,13 +8,13 @@ Research includes initial model and Rust arena experiments; full consumer experi
 implementation promotion remain open (see §7's experiment results).
 **Anchors:** [application prospects brief](2026-07-24_application_prospects_brief.md)
 (the three-seam composition thesis this elevates),
-[Graphshell remote projection host plan](mere_docs/implementation_strategy/2026-07-22_graphshell_remote_projection_host_plan.md)
+[Graphshell remote projection host plan](archive_docs/2026-10-06_completed_plans/2026-07-22_graphshell_remote_projection_host_plan.md)
 and [reference host plan](mere_docs/implementation_strategy/2026-07-27_graphshell_reference_host_plan.md)
 (the rulings this extends),
 [credential port + gazette brief](mere_docs/research/2026-08-10_credential_port_gazette_brief.md)
 (the castellan split this generalizes),
 [persona model brief](mere_docs/research/2026-05-14_persona_model_brief.md),
-[participant gate + packs plan](mere_docs/implementation_strategy/2026-07-17_participant_gate_packs_plan.md).
+[participant gate + packs plan](archive_docs/2026-10-06_completed_plans/2026-07-17_participant_gate_packs_plan.md).
 
 > **Note (2026-09-23): the unit is the data domain, not the application.** Mark
 > ruled that "each data domain deserves its own mere. that isn't the same as
@@ -273,7 +273,7 @@ than flattening those levels into one kind of component.
 | Capabilities and authority | Mere capability algebra, Servitor and Gemot admission | Existing owners; prospective end-to-end grant/revocation research, keeping observation separate from mutation permission. |
 | Resource resolution | Genet resource fetch interfaces; Mere transport/protocol adapters; host policy | Prospective lane for consistent resolution/cancellation across script, document and host paths. Fetching bytes does not decide admission or durable custody. |
 | Semantic observation and control | Genet engine observables; Cambium input/accessibility; host automation | Prospective lane for semantic readback and action routing through real hosts. Ortet O5 is the first platform-host boundary proof. |
-| Configuration | Typed owner settings, providers, Cambium presentation, host application | Already governed by the [configuration ownership plan](mere_docs/implementation_strategy/2026-08-06_configuration_ownership_settings_projection_plan.md); use its gaps rather than opening a duplicate lane. |
+| Configuration | Typed owner settings, providers, Cambium presentation, host application | Already governed by the [configuration ownership plan](archive_docs/2026-10-06_completed_plans/2026-08-06_configuration_ownership_settings_projection_plan.md); use its gaps rather than opening a duplicate lane. |
 
 Spatial, inference, audio and networking components may be domain pillars
 without becoming obligations of every application. R1 and R2 are the first

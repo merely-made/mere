@@ -104,7 +104,7 @@ stewards its **own endpoint-scoped Rust implementation** from the public-domain
 spec (interop-tested against the Python reference as a black-box oracle) rather
 than adopting Beechat or FreeTAK long-term. Details and reference-license
 discipline live in the
-[reticulum transport plan](../implementation_strategy/2026-06-29_reticulum_transport_plan.md)
+[reticulum transport plan](../../archive_docs/2026-10-06_completed_plans/2026-06-29_reticulum_transport_plan.md)
 Direction section.
 
 **Addendum (2026-07-24):** the landscape shifted under option C's bridge

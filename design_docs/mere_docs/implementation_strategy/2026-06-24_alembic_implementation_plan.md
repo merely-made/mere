@@ -162,7 +162,7 @@ actor plan only, with this plan pointing there.
 ### E — Event log + Timeline (scoped for implementation, decision #5)
 
 **Spun out 2026-07-01** to its own plan:
-[event_log_timeline_plan](2026-07-01_event_log_timeline_plan.md) — read that doc for the current,
+[event_log_timeline_plan](../../archive_docs/2026-10-06_superseded_plans/2026-07-01_event_log_timeline_plan.md) — read that doc for the current,
 code-verified implementation spec (it corrects one finding here: `apply_graph_delta` is not the mutation
 chokepoint this section implies; it has 2 real call sites, not a universal funnel). This section stays as
 the historical decision record.

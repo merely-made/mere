@@ -5,10 +5,10 @@
 the [stack seams plan](2026-10-04_stack_seams_plan.md), which consolidated the
 open items of four plans archived on 2026-10-06 (ruling S58: "These four need
 to be consolidated now that 0.22 is out"): the
-[distillery v0 plan](2026-08-12_distillery_v0_plan.md),
-the [inference provider plan](2026-07-05_inference_provider_plan.md),
-the [browser model ceiling probe](2026-08-09_browser_model_ceiling_probe_plan.md)
-and the [mesh host lanes plan](2026-08-09_mesh_host_lanes_plan.md).
+[distillery v0 plan](../../archive_docs/2026-10-06_completed_plans/2026-08-12_distillery_v0_plan.md),
+the [inference provider plan](../../archive_docs/2026-10-06_completed_plans/2026-07-05_inference_provider_plan.md),
+the [browser model ceiling probe](../../archive_docs/2026-10-06_completed_plans/2026-08-09_browser_model_ceiling_probe_plan.md)
+and the [mesh host lanes plan](../../archive_docs/2026-10-06_completed_plans/2026-08-09_mesh_host_lanes_plan.md).
 Stable Burn 0.22.0, CubeCL 0.11.0 and Cubek 0.3.0 reached main on
 2026-10-06 (burn 0.22 migration plan, §13.47), so the prerelease gate these
 plans waited on has lifted.

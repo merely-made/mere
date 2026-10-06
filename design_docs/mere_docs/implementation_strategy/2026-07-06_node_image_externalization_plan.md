@@ -22,13 +22,13 @@ render-side image cache in place of every node holding its pixels forever.
 
 Cross-refs:
 
-- [petgraph_rdf_plan](2026-06-18_petgraph_rdf_plan.md) — the Phase 4 gate note is
+- [petgraph_rdf_plan](../../archive_docs/2026-10-06_completed_plans/2026-06-18_petgraph_rdf_plan.md) — the Phase 4 gate note is
   the measurement that motivates this; that plan ranked image externalization as
   the #1 footprint lever (~64%), ahead of `EdgePayload` slimming and interning.
 - [alembic_memory_and_engrams](../technical_architecture/2026-06-09_alembic_memory_and_engrams.md)
   and [alembic_implementation_plan](2026-06-24_alembic_implementation_plan.md) —
   the three-level memory model and the eidetic store this rides on.
-- [athanor_steady_heat_actor_plan](2026-06-25_athanor_steady_heat_actor_plan.md) —
+- [athanor_steady_heat_actor_plan](../../archive_docs/2026-10-06_completed_plans/2026-06-25_athanor_steady_heat_actor_plan.md) —
   the forgetting daemon that will garbage-collect orphaned image blobs.
 - [meerkat_render_perf_plan](../../archive_docs/2026-09-02_retired_plans/2026-06-24_meerkat_render_perf_plan.md) — the render
   path whose card-raster cost the decoded-image cache must not regress.

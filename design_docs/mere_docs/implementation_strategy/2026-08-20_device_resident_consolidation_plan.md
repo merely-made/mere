@@ -14,8 +14,8 @@ duplicate host and store compositions this exposes.
 
 - [Knot product floor and cuts](../research/2026-08-19_knot_lane_brief.md)
 - [Graphshell reference host](2026-07-27_graphshell_reference_host_plan.md)
-- [Knot in Graphshell](2026-08-02_knot_in_graphshell_plan.md)
-- [receipt artifact replication](2026-08-10_receipt_artifacts_replication_plan.md)
+- [Knot in Graphshell](../../archive_docs/2026-10-06_completed_plans/2026-08-02_knot_in_graphshell_plan.md)
+- [receipt artifact replication](../../archive_docs/2026-10-06_completed_plans/2026-08-10_receipt_artifacts_replication_plan.md)
 - [reachability and privacy lanes](2026-08-03_reachability_rungs_and_privacy_lanes_plan.md)
 - [RFC 6920 Named Information URIs](https://www.rfc-editor.org/rfc/rfc6920.html)
 - [p2panda client and node topology](https://aquadoggo.p2panda.org/specifications/aquadoggo/networking/clients-nodes/)

@@ -30,7 +30,7 @@ version bumps, no publishes, no edition migrations.
 **Related:**
 
 - [license posture brief](../../2026-08-22_license_posture_brief.md) (the ruling)
-- [repo consolidation plan](2026-07-23_repo_consolidation_plan.md) §4 (superseded line)
+- [repo consolidation plan](../../archive_docs/2026-10-06_completed_plans/2026-07-23_repo_consolidation_plan.md) §4 (superseded line)
 - mere's July relicense `a9902e3c` and its copyright-string follow-up `fc90a3f`
   (the reverse sweep: 361 files, line endings preserved per file)
 - retinue `20fc747` (single `LICENSE`, dual files removed, `deny.toml` allowing MPL)
