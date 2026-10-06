@@ -828,6 +828,14 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
         .with_vault_dir(args.vault_dir.clone()),
     );
     // The status follows the lock (ruling 31's watch channel; harness H4).
+    // The doors' kept keys are captured now, while unlocked, so the doors
+    // stay open through any later lock (rulings 40, 46). A resident that
+    // starts locked (ruling 42, L3) captures them at its first unlock.
+    if let Err(error) =
+        graphshell::native::local_session::DoorIdentity::door_keys(personae.as_ref())
+    {
+        tracing::warn!(%error, "door keys not captured at start");
+    }
     // `djinn --unlock` arrives here over the control route (ruling 41).
     let unlocker: resident_status::Unlocker = {
         let personae = Arc::clone(&personae);
@@ -1257,6 +1265,12 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
                             // close runs after lock() returned: that window
                             // is logged.
                             let since = std::time::Instant::now();
+                            if now == VaultLockView::Unlocked {
+                                // Kept from the first unlock on (ruling 46).
+                                let _ = graphshell::native::local_session::DoorIdentity::door_keys(
+                                    personae.as_ref(),
+                                );
+                            }
                             match now {
                                 VaultLockView::Locked => match resident.close_knot().await {
                                     Ok(None) => {},

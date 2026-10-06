@@ -164,10 +164,8 @@ impl ResidentEndpoint for GatedSession {
 
 /// One startup-unlocked Knot source, optional network host, and settings view.
 pub struct ResidentKnot {
-    source: KnotResidentSource,
     sync: Option<KnotSyncHost>,
     settings_file: PathBuf,
-    rosette: KnotRosetteConfig,
     gate: KnotGate,
 }
 
@@ -289,12 +287,10 @@ impl ResidentKnot {
 
         let mut rosette = KnotRosetteConfig::default();
         rosette.max_source_bytes = config.max_source_bytes;
-        gate.arm(source.clone(), rosette);
+        gate.arm(source, rosette);
         Ok(Self {
-            source,
             sync,
             settings_file,
-            rosette,
             gate,
         })
     }
@@ -527,10 +523,8 @@ mod tests {
         let gate = KnotGate::default();
         gate.arm(source.clone(), rosette);
         let mut resident = ResidentKnot {
-            source,
             sync: Some(host),
             settings_file: settings_file.clone(),
-            rosette,
             gate,
         };
         let empty_authority_revision = resident.sync.as_ref().unwrap().authority_revision();
@@ -593,10 +587,29 @@ mod tests {
 
         let mut reopened = catalog.open(RESIDENT_KNOT_ROUTE, &context).unwrap();
         let request = reopened.describe().projections.remove(0).request;
-        let snapshot = reopened.snapshot(request).unwrap();
+        let snapshot = reopened.snapshot(request.clone()).unwrap();
         let (_, edited, _) = editable_resource(&mut reopened, &snapshot, "field-note");
         assert_eq!(edited.source, "# Edited while sync is resident\n");
+
+        // Ruling 48: closing the lane cuts the live session and refuses
+        // opens; re-arming serves the same route again.
+        let gate = resident.gate();
+        assert_eq!(gate.close(), 1, "the live session is cut");
+        assert!(!gate.is_open());
+        assert!(reopened.snapshot(request.clone()).is_err());
+        let refused = catalog.open(RESIDENT_KNOT_ROUTE, &context).map(drop);
+        assert!(
+            refused
+                .unwrap_err()
+                .to_string()
+                .contains("closed while the vault is locked")
+        );
         drop(reopened);
+        gate.arm(source.clone(), rosette);
+        let mut again = catalog.open(RESIDENT_KNOT_ROUTE, &context).unwrap();
+        let request = again.describe().projections.remove(0).request;
+        assert!(again.snapshot(request).is_ok());
+        drop(again);
         drop(catalog);
         resident.close().await.unwrap();
     }
