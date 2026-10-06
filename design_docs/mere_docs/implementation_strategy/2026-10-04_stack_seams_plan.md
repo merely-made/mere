@@ -3,8 +3,8 @@
 **Date:** 2026-10-04
 **Status (2026-10-05):** in progress. Thirty-one rulings in eleven rounds
 (S1 to S31); P1 landed on main (`1633be0c`); P2 staged (S27 to S31, four
-stages in §3.1), stages 1 and 2 built on branch `stack-seams-p2` (`03f8fe74`),
-stage 3 next; P3 and S7 done as documents; S3 to S6 carried into the dynamics
+stages in §3.1), stages 1 to 3 built on branch `stack-seams-p2` (`21b0057f`),
+stage 4 next; P3 and S7 done as documents; S3 to S6 carried into the dynamics
 grammar plan (G8, G9); S9 done by the identity lane (`b52edea7`).
 
 A note sent to Mark listed weak seams in the stack. Each claim was checked
@@ -665,6 +665,44 @@ The done-conditions handed over for S3 and S4, kept for reference:
   works in `projection_compile`. Second pass (F8 to F11), rulings S7 to S10:
   the README fixed (S7), TERMINOLOGY gains pandect under Eidetic and the
   curation record (S8, S10), S9 sent to the identity lane.
+- **2026-10-05.** P2 stage 3 built on branch `stack-seams-p2` at `21b0057f`, not
+  merged. `WindowDom` presents a window-root as its document, and the pipeline's
+  layout, hit testing, caret, scroll, paint, producer and accessibility reads go
+  through it (a single window's root is the document); `HostTree` gains `mount`
+  and `drain_mutations`; `Accessibility::sync` takes the window's subtree and
+  `cambium-winit-a11y`'s projection is generic over `LayoutDom`; `MultiHost`
+  holds the runner, the forest document and the windows' hosts, and a window's
+  turn lends it the runner (its `ctx.runner`, a `WindowTree`), the shared part
+  and the hooks; a mutation router files each drained mutation under the
+  window it touched, or every window when it cannot place it; each window
+  records its leaf keys and the producer registry leaves keys other windows
+  hold alone; a shared sheet swap carries a generation. In cambium,
+  `GenetMultiRunner` gains the per-window calls the pipeline makes, and its
+  trees hand message dispatch and focus collection their mount (the two
+  findings recorded with stage 2). Receipts, windowless in rootstock: each
+  window lays out its own subtree at its own size and scale; a click in one
+  changes the other in the same pass; a change only one window shows rebuilds
+  only that window's layout (a change only the other shows is the control);
+  each window's accessibility tree, through the host's own sync, is its own
+  subtree; a node moved between window roots by `move_before` keeps its
+  `NodeId`, is laid out by its new window, and its leaf keeps its painter; a
+  producer another window holds is not retired (GPU test, with the retiring
+  control). Controls on the instrument: every mount made the document fails
+  four receipts, and every mutation filed to every window fails the routing
+  receipt. The first accessibility receipt built its own view and passed under
+  the scoping control, so it was rewritten to read what the host's sync path
+  hands a recording bridge. Gates: cambium, rootstock, the winit host,
+  cambium-winit-a11y, mesquite, mere-view and pelt-desktop pass 567, fail 0,
+  ignore 7, with stage 1's warnings; the headed receipt and its control pass;
+  the web host checks on wasm32. A first gate run failed one test (`RefCell
+  already borrowed`): a document borrow stage 3 had bound to a variable
+  outlived the caret move and met the update after it; scoped to its block.
+  *As built against §3.1's text*: accessibility ids are not salted by window.
+  They are opaque ids of nodes in one arena and each window's tree holds only
+  its own subtree, so no id can be in two trees (the receipt checks exactly
+  that); a salt would only matter if two windows' trees were merged into one
+  namespace, which nothing does. The message-dispatch mount fix has no receipt
+  of its own; it makes dispatch match what rebuild already did.
 - **2026-10-05.** P2 stage 2 built on branch `stack-seams-p2` at `03f8fe74`, not
   merged, no behaviour change. `HostTree`, a sealed trait over the runner calls
   the pipeline makes, implemented for `Runner`; `Host`, `HostState`, `AppCtx`,
