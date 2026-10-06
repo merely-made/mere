@@ -1,8 +1,8 @@
 # Stack seams plan: catalog, shared device, actions, determinism, two words
 
 **Date:** 2026-10-04
-**Status (2026-10-06):** in progress. Sixty-six rulings in twenty-two rounds
-(S1 to S66); P1 landed on main (`1633be0c`); P2 staged (S27 to S31, four
+**Status (2026-10-06):** in progress. Seventy rulings in twenty-three rounds
+(S1 to S70); P1 landed on main (`1633be0c`); P2 staged (S27 to S31, four
 stages in §3.1) and landed on main (`40d7ae5e`); S32 (F19) landed on main
 (`48c08dee`); the S14 pass (S33) done (`8d7702d2`, receipt
 `support/doc-audit/d2/remediation_2026-10-06.md`); P3 and S7 done as
@@ -813,6 +813,16 @@ Round 22, 2026-10-06. Evidence: S62's reframing: enriching the ASTs that feed En
 
 **Ruling S66.** *For smolweb structure that EngineDocument's blocks cannot carry even from a richer AST, which?* Options: extend EngineDocument with the block kind it lacks, one path, the per-format views retiring; keep bespoke per-format views for those exceptions. Mark: **"Extend EngineDocument (Recommended)"**. Follows: the EngineDocument lane is the single smolweb render path: the fidelity plan enriches the parse ASTs and adds whatever block kind EngineDocument lacks (a typed-column block first), so every host gets it through the lane; the per-format views in `cambium::nematic` retire (a follow-on code task); the native smolweb rendering plan's two-family model is historical, and the plan archives under S61 with its host-integration tail carried by the fidelity plan.
 
+Round 23, 2026-10-06. Evidence: the phase C remediation receipt (`support/doc-audit/d2/remediation_2026-10-06.md`) and its readings not ruled; knot-editor carries near-identical copies of the Knot port, authoring consumer and knot-in-graphshell plans; about ten archived tails name plans in Turnstone, knot-editor and Isometry, whose sessions are offline.
+
+**Ruling S67.** *Who owns the tails of the three archived Knot plans (the knot port, the authoring consumer, Knot in graphshell): the 'one immutable revision' pin rule, the optional headed selected-clip receipt, Knot search S0/S1?* Options: knot-editor's copies, as S61 ruled for the publishing protocol; mere's backlog until a Knot plan names them. Mark: **"knot-editor's copies (Recommended)"**. Follows: knot-editor's copies own them; the tails section's `owner: knot-editor's copy` entries stand, and the receipt's reading is now ruled.
+
+**Ruling S68.** *Petgraph RDF's Phase 4 is gated and was not in that plan's Open list; S53 sends its open items to the graph semantics plan. Does Phase 4 go there too?* Options: the backlog, as recorded; a Received note in the graph semantics plan. Mark: **"Backlog (Recommended)"**. Follows: Phase 4 stays in the archived plan tails backlog; the receipt's reading is now ruled.
+
+**Ruling S69.** *About ten archived tails name plans in other repositories (Turnstone: the page capture C4 gate, the pane registry's A4, the pointer-capture gap; knot-editor: six items; Isometry: the Z5 figure). Their sessions are offline. What happens to them?* Options: record only, in mere's tails section; a dated note in each owning plan, widening scope to the three repositories; message each session when it is next online. Mark: **"Note in each plan"**. Follows: each owning plan in Turnstone, knot-editor and Isometry gets a short dated note naming its tail and citing mere's tails section and the archived plan; each repository's DOC_POLICY and git posture are read first, and the note is the only edit there.
+
+**Ruling S70.** *What is next now that the S14 pass is done?* Options: the S59 critical pass with Eidetic's development; S66's code follow-on (a typed-column block in EngineDocument, richer smolweb ASTs, the per-format `cambium::nematic` views retiring); the render ladder rethink; the F18/F20 measurements. Mark: **"S66 code follow-on"**. Follows: S66's code follow-on is the next objective, assessed first (the smolweb fidelity plan, EngineDocument, the views' consumers) before any code.
+
 ## 3. Phases
 
 ### 3.1 This plan's lane
@@ -972,6 +982,7 @@ The done-conditions handed over for S3 and S4, kept for reference:
   to the backlog), six record errata and the follow-ons (S44, S45, S59, S66's
   code retirement, the render ladder rethink). Both audits exit 0; judgment
   coverage 253/253.
+- **2026-10-06.** Round 23: S67 (knot-editor's copies own the Knot tails), S68 (petgraph RDF Phase 4 stays in the backlog), S69 (a dated note in each other repository's owning plan) and S70 (S66's code follow-on next).
 - **2026-10-06.** Round 16: S46 (live plans handed to their lanes), S47
   (reviewed write lanes) and S48 (ownerless tails to the archived plan tails
   backlog). S44's repins and S45's header re-run were flagged as separate

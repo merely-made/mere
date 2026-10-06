@@ -167,10 +167,12 @@ The tails owned in other repositories are recorded and were not edited:
   tails (the pin rule, the optional headed selected-clip receipt, Knot search
   S0/S1). S61 rules only the publishing protocol's copy canonical, and lane
   L6 had made ownership conditional. Those three plans were archived under
-  S49's plainly complete clause.
+  S49's plainly complete clause. **Ruled 2026-10-06 (S67):** knot-editor's
+  copies own them.
 - **Petgraph RDF Phase 4.** It went to the backlog, not the graph semantics
   plan. It is gated and was not in the plan's Open list, so it was not
   counted among the "open items" S53 sends to graph semantics.
+  **Ruled 2026-10-06 (S68):** it stays in the backlog.
 - **The rest:** the capability model's sub-delegation went to the backlog
   because its tracking plan is archived and its gate has been met; castellan
   OTP's follow-ons went to the backlog because S56 allows either home.
@@ -215,7 +217,8 @@ The Conatus lane found the batch_46 and batch_50 items.
 - **S50:** rethink the render ladder.
 - **Projection grammar:** take FT9/FT10 into the adoption plan.
 - **Other repositories:** the Turnstone, knot-editor and Isometry tails,
-  which go to Mark.
+  which go to Mark. **Ruled 2026-10-06 (S69):** a dated note in each owning
+  plan.
 - **The 49 active Open notes.**
 - **A pre-existing broken link, left alone:**
   `archive_docs/2026-06-09_pivot_superseded/2026-05-15_browser_taxonomy_translation_brief.md`
