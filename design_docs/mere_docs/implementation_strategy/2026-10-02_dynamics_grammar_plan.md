@@ -452,6 +452,11 @@ These are *Reading, not ruled*. Each returns to Mark at the named track's checkp
 - the gate holds until G2 merges as well, since G3's Meaning instance and F49's group key read G2's channels;
 - the gate cleared on 2026-10-03, when F18 to F30 were ruled, and G7's merge bears only on G3, through F40.
 
+*Ruled 2026-10-06:* Mark: **"Cleared; G3 may start (Recommended)"** (against
+clearing it for G3 only, or holding it until G2 merges). *Follows:* the gate
+cleared with G7's merge. G3 starts now, and Mark sets the order of G4 to G6
+when G3 reports.
+
 This pass decides none of them.
 
 ## 4. Findings
