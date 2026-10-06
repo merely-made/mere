@@ -1,9 +1,12 @@
 # Component catalog growth plan
 
-**Status:** active. This replaces the proposed 2026-07-09 component-catalog
-plan still preserved in Genet. Cambium owns reusable view compositions;
-Sprigging owns portable paint leaves. Applications continue to own product
-policy and their CSS themes.
+**Status (2026-10-06):** every gate (C0 to C6) and the catalog refinements are
+marked landed, the last on 2026-08-12, and nothing is in progress. One
+done-condition is unmet: C5's `summary_body` is reused by one application
+(Isometry), not the two C5 requires. This replaces the proposed 2026-07-09
+component-catalog plan still preserved in Genet. Cambium owns reusable view
+compositions; Sprigging owns portable paint leaves. Applications continue to own
+product policy and their CSS themes.
 
 ## Current acceptance surface
 
@@ -177,6 +180,12 @@ card, detail panel, or C1 popover.
 Done when an accordion and recursive tree share one disclosure primitive, and
 the summary body is reused by two applications.
 
+**Corrected 2026-10-06 (S14 pass):** C5 is only partly met. The shared
+disclosure primitive holds, but only one application calls `summary_body`:
+Isometry (`isometry/crates/isometry-views/src/downtime.rs`). Woodshed, Turnstone
+and knot-editor do not, and `mere-verify` mirrors mere. The second application
+is outstanding.
+
 ### C6. Component boundary
 
 **Landed 2026-08-12.** `cambium::component` owns the narrow erasure seam for a
@@ -222,6 +231,12 @@ module is lifted. Revisit only if a third consumer needs generation-counted
 staleness. Full reasoning in the 2026-08-12 brief in the repository root
 docs.
 
+**Corrected 2026-10-06 (S14 pass):** both references to "the 2026-08-12 brief in
+the repository root docs" mean genet's
+`docs/2026-08-12_meristem_scope_cut_and_component_contract_brief.md`, written
+before this plan moved to Mere. Mere's root `design_docs/` holds only an
+unrelated brief of that date, the family composition thesis.
+
 **Component-shaped controls (2026-08-12).** `setting_row` and `graph_canvas`
 are the two built so far. The rule they establish: a control gains this shape
 when a consumer pulls, and the author decides the value/interaction split for
@@ -260,3 +275,10 @@ remain the fast acceptance wall.
   application-owned until their second consumer fixes a smaller shared shape.
 - Badge, progress, and sync indicators should use native DOM/CSS unless their
   geometry or update rate proves a Sprigging leaf is warranted.
+
+## Progress
+
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at mere
+  535bca11, from the D2 record in support/doc-audit/d2/batch_45_s14_phase_b7.md. The
+  status names the landed gates and C5's unmet two-application reuse; C5 and the
+  2026-08-12 brief references are annotated.

@@ -1,8 +1,15 @@
 # Apparatus Pane + Runtime Theme Switcher Plan
 
 **Date**: 2026-06-08
-**Status**: Planning → building. Greenlit by Mark as the next arc after F1 (the
-frame tree). The first **settings/system** consumer of the frame-tree substrate.
+**Status (2026-10-06):** landed in meerkat on 2026-06-08 (A1, the runtime theme
+switcher and apparatus pane; A2, orrery theming), retired with it 2026-07-18
+(`c5f01064`); surviving library parts: the four-theme `ThemeRegistry` and
+`ChromeTheme::mere_darker` in `tabard::theme` (`ports/tabard/src/theme/`) and
+`PersistedSettings.theme_id` in `crates/system/pandect/src/settings_store.rs`;
+open, with no current host: A3 (fold the settings overlay into apparatus) and
+per-theme high-contrast node fills. Theme modes now have their own
+[theme modes plan](2026-07-05_theme_modes_plan.md), which does not claim to
+replace this one.
 **Related**: [frame tree in meerkat](../../archive_docs/2026-06-09_completed_plans/2026-06-08_frame_tree_in_meerkat_plan.md) (the pane substrate), [graph roster + frame taxonomy](../design/2026-06-07_graph_roster_and_frame_taxonomy.md) (apparatus = the system pane; settings folds into it), `register-theme` (the tokens), `apparatus` crate (uxtree skeleton).
 
 Build **apparatus** as a frame pane (host diagnostics + settings) and land the
@@ -18,12 +25,22 @@ pass already wired. The theme choice persists.
   its chrome CSS + the host-drawn surfaces (window controls) from a resolved
   `ChromeTheme`. But meerkat resolves the *default* once at startup; there is no
   runtime switch and the registry isn't kept.
+  **Corrected 2026-10-06 (S14 pass):** `register-theme` (also in the Related line)
+  is now `tabard::theme`: the four-theme `ThemeRegistry` is in
+  `ports/tabard/src/theme/registry.rs` and `ChromeTheme::mere_darker` in
+  `ports/tabard/src/theme/chrome.rs`.
 - **Settings persistence exists.** `session-runtime::settings_store`
   (`PersistedSettings { tab_cap }`) is the sidecar; each field is serde-default,
   so adding `theme_id` reads old files cleanly.
+  **Corrected 2026-10-06 (S14 pass):** the settings store is now
+  `crates/system/pandect/src/settings_store.rs`, which carries
+  `PersistedSettings.theme_id`; no session-runtime path exists at mere
+  `535bca11`.
 - **The `apparatus` crate is a uxtree a11y skeleton**, not a render view-model.
   So the apparatus *pane* renders in meerkat like the `roster` pane (a genet DOM
   themed from the chrome tokens), not via the domain crate.
+  **Corrected 2026-10-06 (S14 pass):** true when written; the `apparatus` crate
+  now holds bounded diagnostic observations.
 - **The orrery's colors are hardcoded** (`build.rs`: `surface_bg`,
   `dark_scene_style`, the `NODE_SHEET` gnode fills). They don't read theme tokens,
   so a theme switch re-themes the chrome + panes but **not** the graph backdrop /
@@ -92,3 +109,13 @@ shellbar (F2; panes summon via keybind for now).
 - A2 caveat retired for the common themes; per-theme **node fills** (HC wanting
   yellow/white nodes) remain a later refinement. A3 (fold the chrome settings
   overlay into apparatus) still pending.
+  **Corrected 2026-10-06 (S14 pass):** the host A1 and A2 landed in is gone.
+  Meerkat left the workspace in `c5f01064` (2026-07-18), and with it
+  `PaneContent::Apparatus`, the Ctrl+, summon, `toggle_pane` and
+  `Orrery::set_palette` (the only `set_palette` at mere `535bca11` is pictograph's
+  cartography canvas); frisket's `PaneContent` moved to merecat in the same
+  commit. A3 and the high-contrast node fills have no current host.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at mere
+  535bca11, from the D2 record in support/doc-audit/d2/batch_45_s14_phase_b7.md. The
+  status records A1 and A2 as landed in meerkat and retired with it; the
+  `register-theme`, `session-runtime` and meerkat pane claims are annotated.
