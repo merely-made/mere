@@ -221,6 +221,13 @@ impl<K: AutotuneKey> Tuner<K> {
         cache.fastest(key)
     }
 
+    /// The index settled for `key`, reading only: never starts a round, never waits on one, never
+    /// validates a persisted result, and never resets the cache after an environment switch — it
+    /// reports nothing settled there instead, until the next [`check_tune`](Self::check_tune).
+    pub(crate) fn settled(&self, key: &K) -> Option<usize> {
+        self.cache.lock().settled(key)
+    }
+
     /// Fetch the logger instance.
     pub fn logger(&self) -> Arc<Mutex<Logger>> {
         self.logger.clone()
@@ -228,11 +235,11 @@ impl<K: AutotuneKey> Tuner<K> {
 
     /// Check the cache, validate checksums if needed, and kick off a tuning job if the
     /// key is a miss. Returns the resolved cache state.
-    pub fn check_tune<'a, F: TuneInputs, Out: AutotuneOutput>(
+    pub fn check_tune<'a, F: TuneInputs, Out: AutotuneOutput, Id>(
         &self,
         key: &K,
         inputs: &F::At<'a>,
-        tunables: &TunableSet<K, F, Out>,
+        tunables: &TunableSet<K, F, Out, Id>,
         #[cfg_attr(not(persistence), allow(unused))] checksum: impl FnOnce() -> String + Send + Sync,
         client: &Client,
         mut log_context: Option<crate::tune::AutotuneLogContext>,
@@ -273,7 +280,7 @@ impl<K: AutotuneKey> Tuner<K> {
                 TuneCacheResult::Hit { .. } | TuneCacheResult::Pending => return cur,
                 TuneCacheResult::Miss | TuneCacheResult::Unchecked => {
                     cache.mark_pending(key.clone())
-                }
+                },
             }
             // Scope the guard: the rest of this function re-locks `self.cache` (fast
             // path insert, `process_request`), and the mutex is non-reentrant.
@@ -303,7 +310,8 @@ impl<K: AutotuneKey> Tuner<K> {
         // After the fast path: a key with one candidate is answered, not
         // tuned, and leaves nothing to record.
         #[cfg(persistence)]
-        let recording = crate::tune::record::TuneRecording::new(&self.cache.lock(), key, &checksum);
+        let mut recording =
+            crate::tune::record::TuneRecording::new(&self.cache.lock(), key, &checksum);
         // A recorded tune tracks its steps whether or not anything logs them:
         // the log context is what collects the record's trials.
         #[cfg(persistence)]
@@ -313,6 +321,11 @@ impl<K: AutotuneKey> Tuner<K> {
 
         let test_inputs = tunables.generate_inputs(key, inputs);
         let plan = tunables.plan(key);
+        #[cfg(persistence)]
+        if recording.is_open() {
+            let names: Vec<&str> = autotunables.iter().map(|tune| tune.name.as_str()).collect();
+            recording.plan(&plan, &names);
+        }
         let bounds = tunables.bounds(key, inputs);
         let limit = bounds.as_ref().and_then(|bounds| bounds.time_limit());
 
@@ -427,9 +440,9 @@ impl<K: AutotuneKey> Tuner<K> {
         // batch failed to queue anything.
         let mut pending = Vec::<PendingBench>::new();
         loop {
-            let tunable_indices = job.plan.next();
+            let batch = job.plan.next();
 
-            if tunable_indices.is_empty() {
+            if batch.is_empty() {
                 let key = &job.key;
                 panic!(
                     "Can't execute the autotune plan for key: {key:?}\n - plan: {:?}\n - results: {:?}",
@@ -437,7 +450,8 @@ impl<K: AutotuneKey> Tuner<K> {
                 );
             }
 
-            for index in tunable_indices {
+            // Every candidate is measured: a group's patience is the adaptive scheduler's alone.
+            for index in batch.indices() {
                 let op = job.autotunables[index];
 
                 let start_time = job
@@ -488,14 +502,14 @@ impl<K: AutotuneKey> Tuner<K> {
                         // The step is reported once `process_request` has resolved the samples,
                         // so the logged duration covers benchmarking and not just the launch.
                         pending.push(bench);
-                    }
+                    },
                     Err(err) => {
                         job.results[index] = AutotuneResult::error(err);
                         if let Some(start) = start_time {
                             job.log_context
                                 .push_tuning_step(op.name.to_string(), start.elapsed());
                         }
-                    }
+                    },
                 }
             }
 
@@ -659,7 +673,7 @@ async fn process_request<K: AutotuneKey>(
                 .as_ref()
                 .expect("At least one kernel has to succeed.")
                 .index
-        }
+        },
     };
 
     {

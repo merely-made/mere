@@ -239,12 +239,12 @@ graphshell-endpoint = { version = "0.0.2", path = "crates/graphshell/graphshell-
 # Its sources left this repository on 2026-09-04 under that plan's E2; Djinn and
 # Turnstone consume one immutable revision. The `[patch]` table at the bottom of
 # this file makes this checkout the implementation source for the Mere contracts
-# Knot names, so those types keep one Cargo source identity. `c966e31` is Knot
-# on Mere `19e6dc9f` (pre.4 and stack seams P1, its calls moved to
-# `ProjectionCompiler`); Knot moved first, as ruling 557 orders, and djinn's
+# Knot names, so those types keep one Cargo source identity. `a5888dc6` is Knot
+# retaining Mere `19e6dc9f` for stack seams P1 and using `5fecd707`
+# for stable Burn inference; Knot moved first, as ruling 557 orders, and djinn's
 # `knot-site` row follows this one.
-knot-editor = { version = "0.0.3", git = "https://github.com/merely-made/knot-editor.git", rev = "c966e314902066b963e0c22a77bd42c36d1a8319" }
-knot-document = { version = "0.0.1", git = "https://github.com/merely-made/knot-editor.git", rev = "c966e314902066b963e0c22a77bd42c36d1a8319" }
+knot-editor = { version = "0.0.3", git = "https://github.com/merely-made/knot-editor.git", rev = "a5888dc62ba87c6ef499161e9f756845533abb43" }
+knot-document = { version = "0.0.1", git = "https://github.com/merely-made/knot-editor.git", rev = "a5888dc62ba87c6ef499161e9f756845533abb43" }
 # The credential-keeper port (dramatis plan D4). No longer a reservation:
 # C1/C2 landed the OTP core, sealed OTP items, the release gate, and the
 # `keeper` identity surface graphshell re-exports.
@@ -677,7 +677,7 @@ vello = { git = "https://github.com/mark-ik/vello.git", tag = "vello-0.10.0" }
 # existed to do. The vendored copy remains at support/patches/cubecl-wgpu for
 # archaeology until a stable 0.22 lands, but it is no longer patched in.
 # cubecl-wgpu = { path = "support/patches/cubecl-wgpu" }
-# cubecl-runtime 0.11.0-pre.4: the source is pristine upstream. The manifest
+# cubecl-runtime 0.11.0: the source is pristine upstream. The manifest
 # removes persistence from default features (ruling 375), avoiding the Turso
 # cache in Mere's defaults-disabled GPU graph. Remove when upstream makes
 # persistence opt-in or fixes the defaults-on edge in cubecl-wgpu.
@@ -686,7 +686,7 @@ cubecl-runtime = { path = "support/patches/cubecl-runtime" }
 # the old pre.2 browser failure reproduced while upstream pre.4 passed all 21
 # cases, plus nine unfused native launcher controls. Vendored patch source
 # remains for provenance; current consumers select the registry crate.
-# burn-remote 0.22.0-pre.4: pump-observed targeted close and session receipts
+# burn-remote 0.22.0: pump-observed targeted close and session receipts
 # let owner reclaim stop one admitted lease without dropping the protocol.
 # Remove when upstream provides equivalent control and passes the lifecycle
 # receipt, including reclaim and recovery.
