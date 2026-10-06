@@ -1,19 +1,22 @@
 # Esp Consolidation Plan
 
 **Date**: 2026-08-08
-**Status**: E0-E4 complete 2026-08-09. ESP 0.1.0, Vates 0.1.2, and Sibylla
-0.1.2 are published on crates.io in that order. The 2026-08-08 adversarial
-amendments remain authoritative: corrected knot consumer graph, restored
-mesh/scheduler boundaries, host-side device policy, narrowed servitor
-language, and separate portability and repository-promotion gates. Supersedes
-the first draft written in `repos/esp/design_docs/` *(historical citation)* <!-- doc-audit: historical-path -->; that file is now a pointer
-here. D2's configured embedding matrix and first exact browser decoder row now
-pass, including cooperative token-boundary cancellation, explicit browser
-device teardown, and exact recovery in a fresh worker. Physical GPU-allocation
-release remains unobservable in Chromium. Immutable ModelSession plus the real
-PEFT LoRA row are complete, and Eidetic's training/evaluation artifact boundary
-has landed. The next model execution gate is one deterministic local trainer
-fixture; communal compute remains later.
+**Status (2026-10-06)**: E0-E4 complete 2026-08-09. ESP 0.1.0, Vates 0.1.2,
+and Sibylla 0.1.2 are published on crates.io in that order. The Vates and
+Sibylla compatibility shims and their names were deleted from the tree on
+2026-09-23 (`d69be378`); `crates/intel` now holds esp, eidetic-search,
+mora-cmudict and reference-data. The 2026-08-08 adversarial amendments remain
+authoritative: corrected knot consumer graph, restored mesh/scheduler
+boundaries, host-side device policy, narrowed servitor language, and separate
+portability and repository-promotion gates. Supersedes the first draft written
+in `repos/esp/design_docs/` *(historical citation)* <!-- doc-audit: historical-path -->; that file is now a pointer here. The
+ready work was spun out to its own plans on 2026-08-09, and the later lane
+progress in §6 (D2, ModelSession, Lane 4) is theirs. The deterministic local
+trainer gate this line used to name has been met: the
+[Distillery v0 plan](2026-08-12_distillery_v0_plan.md) records the first local
+trainer receipt and the `esp.train.peft-lora/v1` mesh job, and the
+[autodiff LoRA trainer plan](2026-09-02_autodiff_lora_trainer_plan.md) is
+complete on `main` (2026-09-03).
 **Scope**: fold `vates` and `sibylla` into one crate named `esp` inside mere,
 retire the two names, and connect the crate to the intention corpus it serves.
 The lanes themselves keep their own plans; this doc consolidates the code and
@@ -136,6 +139,10 @@ Two side-findings the consolidation collects:
   no maintenance badge; the shim keeps any stray consumer compiling and
   pointing at the door. Cost accepted: the shims pin an esp version and ride
   along on future bumps.
+
+  **Corrected 2026-10-06 (S14 pass):** the shims no longer ride along.
+  `d69be378` (2026-09-23) deleted the Vates and Sibylla shims and their names
+  from the tree; the published 0.1.2 releases remain on crates.io.
 
 Risks carry from the draft: mere's workspace manifest is the likeliest
 concurrent-work conflict, so E1 and E2 land as separate commits with targeted
@@ -345,6 +352,10 @@ implies. If the halves ever diverge, the intermediate is `esp-infer` +
   consumer compiled before concurrent publication-client work introduced an
   unrelated temporary-borrow error in its test module; that work was preserved
   untouched. That was the final local boundary before publication.
+
+  **Corrected 2026-10-06 (S14 pass):** the retained Vates and Sibylla
+  compatibility crates were deleted with their names in `d69be378`
+  (2026-09-23).
 - **2026-08-09, E4 publication**: committed the consolidation as `1283b4a8`
   and published from a clean detached worktree at that commit. ESP 0.1.0
   packaged, verified, uploaded, and became available first. Vates 0.1.2 then
@@ -446,3 +457,17 @@ implies. If the halves ever diverge, the intermediate is `esp-infer` +
   training resource to ESP or Mesh. The next forcing act is one local,
   deterministic baseline-versus-adapter receipt; its actual resource seam and
   trainer choice remain uncommitted until then.
+
+  **Corrected 2026-10-06 (S14 pass):** that forcing act has happened. The
+  [Distillery v0 plan](2026-08-12_distillery_v0_plan.md) records the first
+  local trainer receipt and the `esp.train.peft-lora/v1` mesh job, with the
+  adapter strictly beating the unchanged baseline; the
+  [autodiff LoRA trainer plan](2026-09-02_autodiff_lora_trainer_plan.md) is
+  complete on `main` (2026-09-03), and esp gained `decoder-autodiff` in
+  `5214dc7f`.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  `support/doc-audit/d2/batch_42_s14_phase_b4.md`: the status is trimmed to
+  E0-E4 plus the shim deletion (`d69be378`) and the met trainer gate; E4, the
+  2026-08-09 entry and the 2026-08-26 entry are annotated with the shim
+  deletion and the trainer landing.

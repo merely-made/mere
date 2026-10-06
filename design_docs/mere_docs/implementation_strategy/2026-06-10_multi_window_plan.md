@@ -2,22 +2,31 @@
 
 *Written before the 2026-09-05 retirement of graphlet (TERMINOLOGY.md): read graphlet as subgraph. Identifiers such as GraphletId, GraphletRef, and SessionGraphlets are now SubgraphId, SubgraphRef, and SessionSubgraphs, and the graphlets crate is crates/graph/subgraph (code renamed 2026-09-12).*
 
+**Corrected 2026-10-06 (S14 pass):** that crate path no longer exists. The subgraph crate was folded into mere in `61894570` (2026-09-23): `SessionSubgraphs` is in `crates/mere/src/subgraph.rs`, and `SubgraphId` and `SubgraphRef` are in `crates/forme/forme/src/subgraph.rs`.
+
 **Date**: 2026-06-10
-**Status**: MW1–MW3 **done** (the per-window reshape, the `WindowId` registry,
-one-device/N-surfaces, spawn/close, slim leaf chrome — see Progress). **MW4–MW6 are
-superseded** by the
-[window composition plan (archived)](../../archive_docs/2026-06-19_completed_plans/2026-06-11_window_composition_plan.md), which reframes the
-second window as **orrery (authority) vs panes (views that resolve to an orrery by
-`graph_id`)** and pools the orrery off `Shell` by `GraphId` (the MW6 "IOU", brought
-forward and converged with far-B) after finding the shared constellation is UUID-keyed
-and graph-agnostic. The MW4–MW6 sections below are kept for history; read them through
-that plan. This plan carved the window seam and staged leaf → branch → fork.
+**Status (2026-10-06):** historical. MW1–MW3 (the per-window reshape, the
+`WindowId` registry, one device with N surfaces, spawn and close, slim leaf
+chrome; see Progress) landed in meerkat on 2026-06-10 and 2026-06-11, retired
+with it 2026-07-18 (`c5f01064`): `WindowView`, `Shell` and `WindowKind` are
+absent at `535bca11`. Surviving library parts: none named by the S14 record.
+MW4–MW6 were superseded by the
+[window composition plan (archived)](../../archive_docs/2026-06-19_completed_plans/2026-06-11_window_composition_plan.md),
+which reframes the second window as orrery (authority) vs panes (views that
+resolve to an orrery by `graph_id`); the MW4–MW6 sections below are kept for
+history. The current multi-window direction is the
+[one-state, n-windows design](../design/2026-07-05_one_state_n_windows_design.md).
+Open here: nothing. This plan carved the window seam and staged leaf → branch
+→ fork.
 **Reframed 2026-07-05**: the N-runner/N-dom/N-ShellState shape this plan built is
 now the *current* state, not the target. The
 [one-state-N-windows design](../design/2026-07-05_one_state_n_windows_design.md)
 names the next architecture: one runner, one app state, one forest dom, windows as
 lenses; the chrome mirroring and spawn-time chip seeding this plan's machinery
 required become the thing to delete.
+**Corrected 2026-10-06 (S14 pass):** that shape is no longer the current state
+either: meerkat left the workspace in `c5f01064` (2026-07-18), and
+`WindowView`, `Shell` and `WindowKind` are absent at `535bca11`.
 **Related**: [tear-out operations brief](../research/2026-05-11_tearout_operations_brief.md) (the leaf/branch/fork model this implements), [multi-graph activation plan](2026-06-09_multi_graph_activation_plan.md) (MG6 lists this; far-B and multi-window share the per-window-view-over-shared-graph split), [peripheral panes architecture](../technical_architecture/2026-06-06_peripheral_panes_architecture.md) (panes are per-window). Code: `crates/meerkat/` *(historical citation)* <!-- doc-audit: historical-path -->, `crates/system/session-runtime/` *(historical citation)* <!-- doc-audit: historical-path -->, `crates/shell/frame/` *(historical citation)* <!-- doc-audit: historical-path -->.
 
 Drag a pane or tile out of its window into a new OS window that shares the backing
@@ -739,3 +748,6 @@ workbench_runner)`](../../../crates/meerkat/src/window_view.rs) *(historical cit
   shared orrery to **workbench-only** rendering behind a read-only `NodeView` seam
   (resolve member → url + metadata from the shared constellation). A leaf today still
   shows the shared orrery under its slim chrome.
+  **Corrected 2026-10-06 (S14 pass):** "today" here is 2026-06-11; the leaf
+  window and its code left with meerkat in `c5f01064` (2026-07-18).
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at mere 535bca11, from the D2 record in support/doc-audit/d2/batch_39_s14_phase_b1.md: the status rewritten as historical (landed in meerkat, retired with it in `c5f01064`), the "Reframed" line's "current state" and the last entry's "today" corrected, and the graphlet banner's dead subgraph crate path fixed.

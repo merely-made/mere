@@ -1,13 +1,16 @@
 # Graph write-path migration (finish Phase 6.5)
 
-*Written before the 2026-09-05 retirement of graphlet (TERMINOLOGY.md): read graphlet as subgraph. Identifiers such as GraphletId, GraphletRef, and SessionGraphlets are now SubgraphId, SubgraphRef, and SessionSubgraphs, and the graphlets crate is crates/graph/subgraph (code renamed 2026-09-12).*
+*Written before the 2026-09-05 retirement of graphlet (TERMINOLOGY.md): read graphlet as subgraph. Identifiers such as GraphletId, GraphletRef, and SessionGraphlets are now SubgraphId, SubgraphRef, and SessionSubgraphs, and the graphlets crate became crates/graph/subgraph (code renamed 2026-09-12), since folded into mere as `crates/mere/src/subgraph.rs` (`61894570`, 2026-09-23).*
 
 **Date**: 2026-07-01
-**Status**: In progress. Finishes the single-write-path boundary that `graph/mod.rs:328` declares but
-does not enforce ("graph topology mutators are crate-internal... other runtime/shell code paths should
-route through reducer intents"). Prerequisite hardening for
-[event_log_timeline_plan](2026-07-01_event_log_timeline_plan.md): once `apply_graph_delta` is the real
-funnel, slice E's recording hook instruments one function instead of ~45 mutator bodies.
+**Status (2026-10-06):** landed 2026-07-01 (Progress, "Implemented"). The single-write-path boundary
+is enforced: the boundary comment, now at `crates/graph/graph-kernel/src/graph/mod.rs:412`, reads
+"ENFORCED as of the 2026-07-01 write-path migration", and both escape hatches are `pub(crate)`
+(`get_node_mut` at query.rs:108, `get_edge_mut` at edge_ops.rs:436). The
+[event_log_timeline_plan](2026-07-01_event_log_timeline_plan.md) this was hardening for was superseded
+on 2026-08-03; the funnel is instrumented by `CapturedDelta` capture (capture.rs, imported at
+apply.rs:16) and `GraphJournal` (journal.rs) instead. Open: the `apply.rs` split named under Gotchas
+(the file is 1938 lines; there is no `delta.rs`).
 
 ## Audit findings (2026-07-01, code-verified)
 
@@ -38,6 +41,11 @@ funnel, slice E's recording hook instruments one function instead of ~45 mutator
    `set_node_projected_position` (physics/view — "positions are no longer graph truth", the Position
    gut), `set_current_session` (per-launch host wiring, B5), `set_node_lifecycle` (webview runtime
    state). Not truth, not logged, not delta-routed.
+
+   **Corrected 2026-10-06 (S14 pass):** `set_node_lifecycle` no longer exists anywhere in
+   crates/graph at mere 535bca11. Webview runtime state left the kernel for the `BrowserNodeState`
+   sidecar, as the boundary comment says (`crates/graph/graph-kernel/src/graph/mod.rs`, l.425-428), so
+   class 3 is now positions and `set_current_session` only.
 4. **Test fixtures** → a `fixtures` cargo feature on kernel exposing a `GraphFixtures` extension trait
    that delegates to the `pub(crate)` mutators. Enabled only via `dev-dependencies`; call sites stay
    unchanged, each test module adds one `use`.
@@ -78,6 +86,14 @@ funnel, slice E's recording hook instruments one function instead of ~45 mutator
   write).
 - `apply.rs` will blow the 600-LOC ceiling with ~16 new arms — split into `delta.rs` (enum + results)
   and `apply.rs` (fn + wrappers) when it does.
+
+  **Corrected 2026-10-06 (S14 pass):** the ceiling was blown and the split never happened: at mere
+  535bca11 `crates/graph/graph-kernel/src/graph/apply.rs` is 1938 lines and there is no `delta.rs`
+  beside it. This is the plan's one unmet item.
+
+  **Open, raised by the S14 pass (2026-10-06):** is the `apply.rs` split still wanted? Options:
+  extract it as a tail into a backlog or a live plan before this plan is archived; close it as not
+  wanted, the file staying whole.
 - Feature unification: `cargo test --workspace` builds kernel with `fixtures` on everywhere; enforcement
   is "production code doesn't import the trait" + release builds (no dev-deps) lack the feature. Good
   enough; the boundary is review-visible, which is the point.
@@ -101,3 +117,9 @@ funnel, slice E's recording hook instruments one function instead of ~45 mutator
   gained the one-line import. All non-meerkat crates green (877 tests); meerkat test-compile clean.
   The compiler did the call-site enumeration once visibility flipped — grep-based auditing had missed
   gyre's five inline test modules and three orrery test modules; E0624 found every one.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at mere 535bca11, from the
+  D2 record in support/doc-audit/d2/batch_46_s14_phase_b8.md: the status now says landed and
+  enforced (boundary comment at mod.rs:412), the event-log prerequisite is recorded as superseded by
+  capture and `GraphJournal`, class 3's `set_node_lifecycle` is annotated as gone, the unmet
+  `apply.rs` split is recorded with an open question, and the subgraph banner names
+  `crates/mere/src/subgraph.rs`.

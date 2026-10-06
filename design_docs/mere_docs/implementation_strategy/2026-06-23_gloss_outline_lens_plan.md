@@ -1,8 +1,18 @@
 # Gloss Outline Lens Plan
 
-*Written before the 2026-09-05 retirement of graphlet (TERMINOLOGY.md): read graphlet as subgraph. Identifiers such as GraphletId, GraphletRef, and SessionGraphlets are now SubgraphId, SubgraphRef, and SessionSubgraphs, and the graphlets crate is crates/graph/subgraph (code renamed 2026-09-12).*
+*Written before the 2026-09-05 retirement of graphlet (TERMINOLOGY.md): read graphlet as subgraph. Identifiers such as GraphletId, GraphletRef, and SessionGraphlets are now SubgraphId, SubgraphRef, and SessionSubgraphs, and the graphlets crate was crates/graph/subgraph (code renamed 2026-09-12), now `crates/mere/src/subgraph.rs` (folded in `61894570`, 2026-09-23).*
 
-**Status:** partially implemented: P0, P1, P1a, and P2 caps landed; the remaining pluggable-lens work stays open.
+**Status (2026-10-06):** partially implemented. P0 landed 2026-06-23 (`8d55f96`,
+`ffb1b5e`); its crate is now `crates/mere/src/glossary.rs` (`outline_rows`,
+`outline_djot`, `graph_metrics`; folded in `61894570`). P1, P1a and P2's caps landed in
+meerkat on 2026-07-01 and 2026-07-02, retired with it 2026-07-18 (`c5f01064`);
+surviving library parts: the glossary projections and the row cap in
+`crates/mere/src/gloss.rs` (`cap_outline_rows`, `MAX_OUTLINE_DEPTH`). No host renders
+the outline today. Open: a host outline section and its a11y, P2's nesting axis and
+scope lens, P3 (its signals gate is open: the producer lives in
+`crates/canvas/pictograph/src/signals/`), and P4.
+
+Earlier status (undated, 2026-09-05 reconcile): partially implemented: P0, P1, P1a, and P2 caps landed; the remaining pluggable-lens work stays open.
 
 **Planning (with Mark), 2026-06-23.** A hierarchical **djot outline of the graph**
 plus a compact **metrics** readout, surfaced as the gloss Navigator's long-deferred
@@ -11,6 +21,10 @@ plus a compact **metrics** readout, surfaced as the gloss Navigator's long-defer
 slice 4 just freed up (today `mere-orrery`, to be renamed). The outline is a real djot
 document, so it doubles as the seed of the first notetaking feature: the read view now,
 an editable knot later.
+
+**Corrected 2026-10-06 (S14 pass):** "Planning" is the 2026-06-23 state; the dated
+status above supersedes it. The crate was renamed `glossary` (`8d55f96`) and then
+folded into `mere` as `crates/mere/src/glossary.rs` (`61894570`).
 
 This plan **implements** existing design; it does not re-design. It realizes the
 [gloss Navigator design](../design/2026-06-07_gloss_navigator_design.md)'s deferred
@@ -59,6 +73,11 @@ later follow.
   unbuilt `intel/signals` producer ([graph_signals P1-P3](../../archive_docs/2026-08-20_completed_plans/2026-06-22_graph_signals_layer_plan.md)).
   The outline **consumes** them when they ship and **falls back** (degree for importance,
   components for community) until then. It must not become a second producer.
+
+  **Corrected 2026-10-06 (S14 pass):** the producer is built. It landed 2026-06-24 as
+  `mere-signals` (the archived graph signals plan's closing note) and now lives in
+  pictograph, `crates/canvas/pictograph/src/signals/` (importance, community; folded in
+  `f590e45d`).
 - **mere-orrery is the right home + already nearly free.** Pure `Graph -> view` domain
   crate, deps `kernel` / `uxtree` / `accesskit` / `tracing` (`mere-orrery/Cargo.toml:16-20`);
   its only function `project_graph` (the a11y projection) was retired host-side by slice 4
@@ -196,6 +215,9 @@ an ad-hoc list: the format *is* the editing + export path.
   consumes importance (node emphasis) + community (grouping) with degree / components fallback
   until then. Gated on graph_signals; no work here lands ahead of that producer. Done: importance
   / community appear in the outline when signals are present, fallback otherwise.
+
+  **Corrected 2026-10-06 (S14 pass):** the gate is open; the producer exists in
+  `crates/canvas/pictograph/src/signals/` (see Findings).
 - **P4 — knot-ification + curation.** "Open outline as knot" -> editable djot knot; outline
   gestures (drag-to-reorder, promote-to-section) write back via `assert_relation` with typed
   provenance (projection contract). The notetaking feature proper. Done: the outline opens as an
@@ -339,3 +361,13 @@ an ad-hoc list: the format *is* the editing + export path.
   Progress for the two real rendering bugs found and fixed along the way
   (both in the minimap, not the outline) and the harness/perf work that
   surfaced.
+
+  **Corrected 2026-10-06 (S14 pass):** the host halves of P1, P1a and Decision #4
+  left with meerkat (`c5f01064`, 2026-07-18): `gloss_outline_view`,
+  `gloss_outline_a11y_tree` and the apparatus "Graph" section (`apparatus_items`) have
+  no hits in the tree, and Turnstone does not use the glossary outline or `mere::gloss`.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at mere
+  535bca11, from the D2 record in support/doc-audit/d2/batch_40_s14_phase_b2.md: a
+  dated status separating the surviving glossary library from the meerkat-retired host
+  halves, P3's gate noted open, the crate's rename and fold, and the subgraph banner
+  path.

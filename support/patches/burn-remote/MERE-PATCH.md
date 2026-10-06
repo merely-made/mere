@@ -1,7 +1,7 @@
 # Mere burn-remote patch
 
-Source: crates.io `burn-remote 0.22.0-pre.4`, upstream Burn commit
-`d3c8d7c615e5a1b739d9997de8a88dcd4dea638c`.
+Source: crates.io `burn-remote 0.22.0`, upstream Burn commit
+`b8d75ad07f426537594a5beb9309d62d916bcf05`.
 License: MIT OR Apache-2.0, unchanged from upstream.
 
 The released server authorizes an Iroh session only at admission. Removing a
@@ -14,13 +14,21 @@ interval. `IrohRemoteProtocol::sessions` exposes reserved or active session IDs
 and opaque credentials; `close_session` targets one pump. Client close uses the
 same teardown. The public exports include `ServedSession` and `SessionId`.
 
-Rebased on 2026-09-27 from the preserved pre.3 delta at `610a32c5`. Seven
-source deltas apply unchanged to pristine pre.4. The two server exports are
-inserted alongside pre.4's new `ServerLogging` export. Both manifests retain
-pre.4's `tracing-subscriber` server feature and add `tokio/macros` for Mere's
-pump selection. The normalized manifest restores exact pre.4 test dependencies,
-an empty workspace, and its self patch. No pre.3 source file replaces an
-upstream pre.4 file wholesale.
+Rebased on 2026-10-06 onto pristine stable source. Stable connection errors,
+credential types, public server builder, hosted-device ID translation, FIFO
+worker admission, response cancellation and global shutdown are preserved.
+The patch adds a public `IrohRemoteProtocol::from_endpoint` constructor for
+application-owned endpoints and keeps the protocol alive across owner clones.
+Stable `HostSpec` and `IrohHost` handle client connections.
+
+The session registry reserves admission before the application authorizer,
+keeps failed teardown registered, and reports completion to every closer.
+The duplex pump watches owner close, server shutdown and response-writer exit.
+Worker completion waits for released device allocations and propagates errors.
+The normalized manifest adds an empty workspace, self patch and exact stable
+test dependencies; both manifests enable `tokio/macros` for pump selection.
+Regression tests cover targeted close, in-flight authorization fencing and
+failed cleanup acknowledgements alongside stable upstream's tests.
 
 This rebase alone is not lifecycle acceptance. Full two-peer reclaim/recovery
 and headed checks remain gates in the migration plan. Remove the patch when an

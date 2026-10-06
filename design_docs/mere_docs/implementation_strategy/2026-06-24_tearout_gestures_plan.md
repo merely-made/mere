@@ -1,6 +1,6 @@
 # Tear-out gestures plan (leaf / branch / fork + cross-graph drag)
 
-*Vocabulary updated 2026-09-12: graphlet → subgraph per TERMINOLOGY.md (retired 2026-09-05). Dated status and Progress entries keep the meerkat-era names they recorded (branch_graphlet_from, graphlets.rs, graphlet_classifier.rs, graphlets.json, GraphletBinding::Forked); read them as history. The live names are SessionSubgraphs in crates/graph/subgraph and the subgraphs.json sidecar.*
+*Vocabulary updated 2026-09-12: graphlet → subgraph per TERMINOLOGY.md (retired 2026-09-05). Dated status and Progress entries keep the meerkat-era names they recorded (branch_graphlet_from, graphlets.rs, graphlet_classifier.rs, graphlets.json, GraphletBinding::Forked); read them as history. The live names are SessionSubgraphs, first in crates/graph/subgraph and now in `crates/mere/src/subgraph.rs` (folded in `61894570`, 2026-09-23), and the subgraphs.json sidecar.*
 
 **Date**: 2026-06-24
 **⚠️ 2026-07-19 — the entire implementation below was meerkat/orrery, deleted with meerkat
@@ -11,7 +11,23 @@ turnstone re-wire. Fork specifically now carries layout through the `arrangement
 facet families, not the retired `commit_positions_to_graph` write-back — see **G4-R** at the
 tail. The status line below is the meerkat-era record, kept for the design (not the wiring).
 
-**Status:** **Trichotomy + cross-graph copy/move + cascade DONE + driven** (meerkat-era; G1
+**Corrected 2026-10-06 (S14 pass):** the gesture stack is no longer unwired. G4-R
+completed 2026-07-20 (mere `c9caf26`, turnstone `aa32a24`; the section at the tail),
+and Turnstone wires the leaf arm (`TearOutActivePane`), the branch arm (`TearOutTile`)
+and the fork arm (`ForkNode`, `ForkFocusedNode`) in `turnstone/src/action.rs`, routed
+in `turnstone/src/app/mod.rs`. G5's copy / move and G6's cascade were not found in
+Turnstone's source. The meerkat-era status is kept below as "Earlier status".
+
+**Status (2026-10-06):** the trichotomy, cross-graph copy / move and cascade landed in
+meerkat between 2026-06-25 and 2026-07-03, retired with it 2026-07-18 (`c5f01064`);
+surviving library parts: the kernel's `copy_node_from` and `copy_component_from`
+(returning `ComponentCopy`), `CopiedFrom` provenance, the subgraph bindings, and the
+facet carry (`copy_node_facets`, `copy_scene_facets`). On Turnstone, G4-R is done and
+the leaf, branch and fork arms are wired. Open: G5 copy / move and G6 cascade on
+Turnstone, and the ambiguous no-modifier drag, whose routed home (the notification
+subsystem plan) was retired on 2026-09-02.
+
+Earlier status (meerkat-era record): **Trichotomy + cross-graph copy/move + cascade DONE + driven** (meerkat-era; G1
 plumbing, G3 branch, G4 fork, G5 copy+move, G6 cascade via subgraph #3; subgraph #1 per-window
 focus also landed). **Tile-tab leaf tear-out is now DONE + fresh-headed verified.** The one substantial
 interactive item still open is the ambiguous **no-modifier orrery drag** path, which now cleanly
@@ -27,6 +43,12 @@ belongs to the notification/toast subsystem plus the pin-vs-drag-out gesture spl
   Fresh leaf / branch / fork runs off a fresh app binary each ended with a second Meerkat window.
   The broader "orrery as desktop" dock-side + ratio setting reframe is still a separate follow-up
   if we want it; it is no longer the blocker for the tile-tab origin itself.
+
+**Corrected 2026-10-06 (S14 pass):** the
+[notification subsystem plan](../../archive_docs/2026-09-02_retired_plans/2026-06-27_notification_subsystem_plan.md)
+was retired on 2026-09-02; its Phase 0 foundation left with meerkat and its model is
+carried in the [archived plan tails](2026-07-03_archived_plan_tails_plan.md). The
+ambiguous drag has no live home outside this plan.
 
 Both triggers queue the now-built `TearOut { node, from }`. Spun out of the
 now-closed
@@ -492,6 +514,11 @@ v0 (palette parent link suffices); auto-consolidation policy disabled by default
   runs each ended with a second Meerkat window. That clears the tile-tab trigger from the
   remaining list. The only material tear-out-gesture item still open is the ambiguous
   no-modifier orrery drag path, which stays coupled to the notification/toast work.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at mere
+  535bca11, from the D2 record in support/doc-audit/d2/batch_40_s14_phase_b2.md: a
+  dated Turnstone-era status (meerkat work retired, G4-R done, leaf / branch / fork
+  wired, G5, G6 and the ambiguous drag open), the "UNWIRED on turnstone" banner
+  corrected, the retired notification home noted, and the subgraph path fixed.
 
 ## G4-R — Fork re-wiring on turnstone (facet-carry)
 

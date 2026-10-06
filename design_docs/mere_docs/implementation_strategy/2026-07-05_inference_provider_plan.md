@@ -1,7 +1,7 @@
 # Inference Provider Plan (burn brief, Lane 3)
 
 **Date**: 2026-07-05
-**Status**: P0 (seam + stub), P1 (own decoder body incl. seeded temperature/top-p sampling; validated on the real TinyLlama checkpoint, 9.95 tok/s on wgpu vs 0.09 on ndarray), P2 (eidetic loading; corridor proven transparent), P3 (actor with cancellation), and the meerkat host wiring (`>ask` omnibar verb) all landed. P4's native measurement is landed; its headed-browser half is scoped in the D2 browser model ceiling probe.
+**Status (2026-10-06):** P0 (seam and stub), P1 (own decoder body with seeded temperature/top-p sampling, validated on the real TinyLlama checkpoint at 9.95 tok/s on wgpu against 0.09 on ndarray), P2 (Eidetic loading), P3 (actor with cancellation) and P4's native measurement landed on 2026-07-05 in the `infer` crate, consolidated since into `esp::infer` (`crates/intel/esp/src/infer/`, `1283b4a8`, 2026-08-09), where `CannedProvider` is now `StubInferenceProvider`. The meerkat host wiring (the `>ask` omnibar verb) landed in meerkat on 2026-07-06, retired with it 2026-07-18 (`c5f01064`); no host in Mere or Turnstone now calls `spawn_inference_actor`, and only the distillery probes use `DecoderProvider` directly. P4's headed-browser half moved to the D2 browser model ceiling probe, which ran D2a, the MiniLM D2b row, the D2c embedding matrix and one D2c decoder row (`3bdb66fc`, `dd215ebd`, `45327c30`, 2026-08-22). Open: a host consumer, and the 2026-07-06 follow-ups (a per-model prompt template, an answer card), whose host left with meerkat.
 **Related**: [burn_utilization_brief](../research/2026-07-04_burn_utilization_brief.md) (Lane 3), [local_models_harness_brief](../research/2026-06-24_local_models_harness_brief.md) (§2 defines this seam; §3 the actor harness; §4 the wasm/native split), [geist_models_brief](../research/2026-05-10_geist_models_brief.md) (adapter envelope, deferred to Lane 4), [burn_wgpu_flip_plan](2026-07-04_burn_wgpu_flip_plan.md) (the GPU receipts motivating burn-first), [browser_model_ceiling_probe_plan](2026-08-09_browser_model_ceiling_probe_plan.md) (the remaining P4/D2 headed proof).
 
 ## Scope
@@ -37,6 +37,12 @@ entry point), the Distillery trainer, marketplace/governance.
 Done when the crate builds in the workspace with focused tests for
 streaming order, max-token/stop handling, capability matching, and trait
 object safety.
+
+**Corrected 2026-10-06 (S14 pass):** the seam no longer lives in its own
+crate. It was consolidated into ESP as `esp::infer`
+(`crates/intel/esp/src/infer/`, `1283b4a8`, 2026-08-09), and `CannedProvider`
+is now `StubInferenceProvider` (`crates/intel/esp/src/infer/stub.rs:21`). Read
+the crate and stub names below as the 2026-07 layout.
 
 ### P1 — Burn model body (own body, reference-vendored — decided 2026-07-05)
 
@@ -96,6 +102,11 @@ render contention. The wasm model-size ceiling remains empirical and is now
 owned by the [D2 headed-browser plan](2026-08-09_browser_model_ceiling_probe_plan.md),
 which separates storage/copy pressure, worker execution, UI impact, and model
 size rather than binding one unqualified number.
+
+**Corrected 2026-10-06 (S14 pass):** D2 has run. Its plan records D2a, the
+MiniLM D2b row, the D2c embedding matrix and one D2c decoder row complete
+(`3bdb66fc`, `dd215ebd`, `45327c30`, 2026-08-22), with the upper model
+boundaries and physical GPU-allocation release unmeasured.
 
 ## Findings
 
@@ -356,3 +367,9 @@ size rather than binding one unqualified number.
   artifact through IndexedDB/Eidetic, a Web Worker lifecycle, cancellation,
   frame-impact measurement, and a configurable size sweep before declaring an
   in-browser tier.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_49_s14_phase_b11.md: the status records the move
+  into `esp::infer` and the `StubInferenceProvider` rename, words the `>ask`
+  host as landed then retired with meerkat, and records that D2 ran through
+  D2c on 2026-08-22.

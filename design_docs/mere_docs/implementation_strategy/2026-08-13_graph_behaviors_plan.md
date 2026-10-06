@@ -1,11 +1,17 @@
 # Graph Behaviors Plan: watches, cascades, and the reactive participant
 
 **Date:** 2026-08-13
-**Redesign status, 2026-09-20:** the Servitor resident/run design in
+**Redesign status (2026-10-06):** the Servitor resident/run design in
 [section 8](#8-servitor-resident-and-run-redesign-2026-09-20) extends the landed
 behavior primitives. R1a admission, the R1b reducer and the Turnstone adapter
-have source implementations with static review. Cargo validation and the
-portable consumer pin remain pending. R2 and R3 remain planned. The earlier receipts cover only their original implementations.
+are implemented and have run under Cargo: mere `0e031fa5` (2026-09-22)
+committed Servitor's resident.rs and run.rs, verified on the tracked portable
+lock (1,029 tests pass); Turnstone `5d2c910` swept in R1a and R1b and repinned
+mere to `0e031fa5` portably, `f3f8e3d` fixed its one failing test (21 resident
+tests pass), and Turnstone now pins mere `bd5912fb`, which contains
+`0e031fa5`. Whether that closes R1's acceptance is open (§8.6). R2 and R3
+remain planned (no `ProcedureGraph` types exist). The earlier receipts cover
+only their original implementations.
 **Status:** W0 through W5 landed 2026-08-13, with a green headed receipt
 (`turnstone scenarios/behaviors_wake.scn`, captures under
 `Code/testing/turnstone/behaviors_wake`). Two follow-ups remain: the review row
@@ -285,6 +291,12 @@ Carried over or ruled here:
   cascade without a restart. (The headless halves of the first two and of the
   budget clause are covered by W1a; what remains is the wiring and the headed
   receipt.)
+
+  **Corrected 2026-10-06 (S14 pass):** the "MOSTLY LANDED" heading predates
+  the "W1b closed" Progress entry (2026-08-13) and the green headed receipt
+  (`behaviors_wake.scn`), and the status line records W1b landed. What remains
+  is the status line's follow-up: the budget setting has no headed receipt of
+  its own (Turnstone has no budget scenario at the S14 audit).
 - **W2: trigger context into the body. MOSTLY LANDED 2026-08-13.** A woken
   body reads `mere.trigger()`, beside `mere.snapshot()` and gated on the same
   `app.read` capability because it describes the graph. It returns a
@@ -319,6 +331,12 @@ Carried over or ruled here:
   the rings before anything is granted; the inbox rule runs headed; its
   edit is attributed in the inspector; and uninstalling the participant removes
   the watch with it.
+
+  **Corrected 2026-10-06 (S14 pass):** the "MOSTLY LANDED" heading predates
+  the "W2 closed" Progress entry (2026-08-13) and the green headed receipt
+  (`behaviors_wake.scn`), and the status line records W2 landed. The status
+  line's open follow-up here is the review row's clipping in the palette,
+  which the S14 pass could not check without a headed run.
 - **W2.5: containment is only derived on load. RULED (option 1) and LANDED
   2026-08-13.** `Graph::derive_containment_for` asserts a new node's URL-path
   parent at mint, called from both mint paths, so containment means the same
@@ -472,6 +490,11 @@ crate boundaries after the procedural-graphs discussion; this section records
 the recommended design rather than treating the old boundaries as fixed.
 *Participant* names admission through the gate; *servitor* names a resident
 helper. *Denizen* belongs to the Isometry simulation family.
+
+**Corrected 2026-10-06 (S14 pass):** no longer only a proposed design. R1a and
+R1b are implemented (§8.6, §8.7; Servitor's resident.rs and run.rs landed in
+mere `0e031fa5`, 2026-09-22); R2 and R3 are unbuilt (no `ProcedureGraph` types
+exist at mere `535bca11`).
 
 ### 8.1 Findings and the boundary to move
 
@@ -704,6 +727,20 @@ family to one revision, regenerate locks through Cargo, then execute focused
 Servitor and Turnstone gates after the hold is lifted. Do not hand-author a lock
 receipt or mix old and new shared authority types across source identities.
 
+**Corrected 2026-10-06 (S14 pass):** the Cargo gates and the consumer repin
+have since run. Mere `0e031fa5` (2026-09-22, an ancestor of `535bca11`)
+committed Servitor's resident.rs and run.rs, "Verified on the tracked portable
+lock, Rust 1.98.1 … 1,029 tests pass". Turnstone `5d2c910` swept in R1a and
+R1b and repinned mere to `0e031fa5` portably (cargo test 586 passed, 1
+failed); `f3f8e3d` fixed that failure, and 21 resident tests pass. Turnstone
+now pins mere `bd5912fb`, which contains `0e031fa5`.
+
+**Open, raised by the S14 pass (2026-10-06):** does Turnstone's repin to mere
+`bd5912fb` satisfy "the portable consumer pin", closing R1a's and R1b's
+validation, or does R1 also need the headed and crash-recovery evidence this
+section names? Options: the repin and the Cargo runs above close R1a and R1b
+validation; R1 stays open until headed and crash-recovery receipts exist.
+
 R1b extends admission with durable run intent and outcomes, cancellation,
 stale-result refusal and uncertain-effect reconciliation. Passing admission alone
 does not make retries or interrupted external effects safe.
@@ -757,7 +794,18 @@ end-to-end durable effects. R2 procedural guidance and R3 evaluated adoption
 remain subsequent slices; they must not infer successful actions from a model's
 text or a queued port request.
 
+**Corrected 2026-10-06 (S14 pass):** the portable pins, compilation and
+regression execution held here have since run (mere `0e031fa5`; Turnstone
+`5d2c910` and `f3f8e3d`; see §8.6).
+
 ## Progress
+
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_43_s14_phase_b5.md: the redesign status rewritten
+  with the `0e031fa5`, `5d2c910` and `f3f8e3d` receipts; dated notes on §8's
+  own status, §8.6, §8.7, this log's 2026-09-20 entry and the W1b and W2
+  headings; one open question raised in §8.6.
 
 - 2026-09-20: reviewed current Servitor/Turnstone consumers and proposed the
   resident/run redesign in section 8. Separated principal, instance and artifact
@@ -768,6 +816,9 @@ text or a queued port request.
   reconciliation and source regressions; section 8.7 records its boundaries.
   Static review and the incremental documentation audit passed. The new tests
   have not run under the Cargo hold.
+
+  **Corrected 2026-10-06 (S14 pass):** the tests have since run: mere
+  `0e031fa5` (1,029 pass) and Turnstone `5d2c910` and `f3f8e3d` (see §8.6).
 
 - 2026-08-18 (frequency bound / signaling target 3 complete): deadband belongs
   to **actuation**. Suppressing a watch cannot protect the journal from a

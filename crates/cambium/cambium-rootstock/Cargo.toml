@@ -11,6 +11,11 @@ repository.workspace = true
 # Consumers take it from genet.git by branch.
 publish = false
 
+[features]
+default = ["image-decode"]
+# Forwards genet-livery's image decoding (mer3ly Ruling 111); on by default.
+image-decode = ["genet-livery/image-decode", "genet-render/image-decode"]
+
 [dependencies]
 # The neutral key vocabulary this crate lowers into when it dispatches to a
 # runner. Named here so the conversion lives on this side of the seam rather

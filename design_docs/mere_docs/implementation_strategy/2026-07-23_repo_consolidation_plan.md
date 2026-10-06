@@ -1,8 +1,18 @@
 # Repo Consolidation Plan
 
 **Date:** 2026-07-23
-**Status:** ruled with Mark 2026-07-23; execution started same day. Later
-rulings: the bucket repo is named **smolweb**, and the errand spec crates
+**Status (2026-10-06):** executed 2026-07-23 and 2026-07-24; topology
+superseded 2026-09-02. C0 to C6 are done (Progress, "C6 done"; mere
+`73d8b1b1`, `6a37de6b`, `0086c9c3`, `4b8d875f`), the publish sweep
+republished 21 crates at their new homes, and every absorbed repository was
+deleted except graphshell, which stays archived (Open). The Cambium,
+upper-component and final-topology placement was superseded on 2026-09-02 by
+the [platform boundary and repository topology plan](2026-09-02_platform_boundary_and_repository_topology_plan.md)
+(boundary correction below). Still open: hocket's toolchain pin, still
+1.96.0, and the four unpublished `graphshell-*` crates (Still open).
+
+**Rulings recorded in the 2026-07-23 status (ruled with Mark that day,
+execution starting the same day):** the bucket repo is named **smolweb**, and the errand spec crates
 (spartan/nex/guppy protocols) move into it, with gemini, titan, gopher,
 finger, plain, a shared TOFU/client-cert helper, and gemtext listed as
 trigger-gated later extractions from errand. **Personae folds** with a
@@ -470,6 +480,16 @@ primary repos build from clean clones.
     genet were both live under another session (genet 23 dirty files), and
     publishing 17 crates from a dirty tree can ship a half-state permanently.
 
+### 2026-10-06
+
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_46_s14_phase_b8.md: the status now records C0 to
+  C6 as executed and the topology as superseded 2026-09-02, with hocket's
+  toolchain and the `graphshell-*` publication as what is still open; the later
+  rulings the old status carried are kept under their own label; and the
+  "Still on 1.96.0" list is annotated (isometry and turnstone now pin 1.98.1).
+
 ## Open
 
 **Closed since:** the publish sweep ran (21 crates republished at their new
@@ -543,6 +563,9 @@ be consumed by git, never by version** (woodshed `abdf524`).
     `tests/unit/style`, which is pinned to an older Stylo surface and uses
     `#![feature]` on stable. wgpu-graft's CI names a package
     (`wgpu-native-texture-interop`) that does not exist in the workspace.
+
+  **Corrected 2026-10-06 (S14 pass):** isometry and turnstone have since moved:
+  both now pin 1.98.1 in rust-toolchain.toml. Only hocket is still on 1.96.0.
 
 ### MSRV, ruled and defended 2026-07-24
 

@@ -61,7 +61,7 @@ pub struct GraphCaseReceipt {
 #[cfg(target_arch = "wasm32")]
 mod browser {
     use burn::nn::LayerNormConfig;
-    use burn::tensor::{Device, DeviceKind, Int, Tensor, TensorData, module::embedding};
+    use burn::tensor::{Device, Int, Tensor, TensorData, module::embedding};
     use wasm_bindgen::prelude::*;
 
     use super::{EmbeddingCaseReceipt, EmbeddingReceipt, GraphCaseReceipt};
@@ -122,14 +122,14 @@ mod browser {
             .into_data_async()
             .await
             .map_err(|error| JsValue::from_str(&format!("group input readback: {error:?}")))?
-            .to_vec::<i32>()
+            .try_to_vec::<i32>()
             .map_err(|error| JsValue::from_str(&format!("group input to Vec<i32>: {error:?}")))?;
         let output = case
             .output
             .into_data_async()
             .await
             .map_err(|error| JsValue::from_str(&format!("group embedding readback: {error:?}")))?
-            .to_vec::<f32>()
+            .try_to_vec::<f32>()
             .map_err(|error| {
                 JsValue::from_str(&format!("group embedding to Vec<f32>: {error:?}"))
             })?;
@@ -238,7 +238,7 @@ mod browser {
             .into_data_async()
             .await
             .map_err(|error| JsValue::from_str(&format!("input readback: {error:?}")))?
-            .to_vec::<i32>()
+            .try_to_vec::<i32>()
             .map_err(|error| JsValue::from_str(&format!("input to Vec<i32>: {error:?}")))?;
         let output_tensor = if through_param_module {
             let module = burn::nn::Embedding {
@@ -256,7 +256,7 @@ mod browser {
             .into_data_async()
             .await
             .map_err(|error| JsValue::from_str(&format!("embedding readback: {error:?}")))?
-            .to_vec::<f32>()
+            .try_to_vec::<f32>()
             .map_err(|error| JsValue::from_str(&format!("embedding to Vec<f32>: {error:?}")))?;
         let _downstream = downstream
             .into_data_async()
@@ -334,7 +334,7 @@ mod browser {
             .into_data_async()
             .await
             .map_err(|error| JsValue::from_str(&format!("{name} readback: {error:?}")))?
-            .to_vec::<f32>()
+            .try_to_vec::<f32>()
             .map_err(|error| JsValue::from_str(&format!("{name} to Vec<f32>: {error:?}")))?;
         let first_8 = output.iter().take(8).copied().collect::<Vec<_>>();
         let first_8_bits = first_8.iter().map(|value| value.to_bits()).collect();
@@ -545,7 +545,10 @@ mod browser {
 
     #[wasm_bindgen]
     pub async fn run_embedding_repro() -> Result<String, JsValue> {
-        let device = Device::wgpu_async(DeviceKind::default()).await;
+        let device = Device::wgpu_options()
+            .init_async()
+            .await
+            .map_err(|error| JsValue::from_str(&error.to_string()))?;
         let graph_cases = run_layer_norm_graph_cases(&device).await?;
         let mut cases = vec![
             run_case("tiny-mixed", 4, 3, &[2, 0, 3, 1], 0, 0, 0, false, &device).await?,
@@ -692,7 +695,7 @@ mod tests {
             Tensor::from_data(TensorData::new(input.to_vec(), [1, 10]), &device);
         let squared = (tensor.clone() * tensor.clone())
             .into_data()
-            .to_vec::<f32>()
+            .try_to_vec::<f32>()
             .unwrap();
         let expected_squared = input.map(|value| value * value);
         assert!(
@@ -717,7 +720,7 @@ mod tests {
             .init(&device)
             .forward(tensor)
             .into_data()
-            .to_vec::<f32>()
+            .try_to_vec::<f32>()
             .unwrap();
         assert!(
             normalized

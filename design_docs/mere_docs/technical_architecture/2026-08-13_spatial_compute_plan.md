@@ -1,14 +1,17 @@
 # Spatial Compute Plan (2026-08-13)
 
-**Status: complete 2026-08-13; amended 2026-08-14 (§0.5: lanes are
-program shapes, resident-views law).** P1 through P4 all decided and
+**Status (2026-10-06):** complete 2026-08-13; amended 2026-08-14 (§0.5:
+lanes are program shapes, resident-views law). P1 through P4 all decided and
 their work landed. P4 is a narrowing rather than an extraction (see below),
-with its one live hazard closed in code. Every open item is closed:
-slot stability ruled, the kernels promoted into `quint::resident` with
-the rust-gpu carriage working, and the windowed run presented. What
-remains is not this plan's: the promotion trigger for the lease
-(a shipped producer and consumer) and the renderling shader-edit wall,
-both with named watch conditions. The GPU
+with its one live hazard closed in code. Slot stability is ruled and the
+windowed run presented. The resident kernels, first promoted on rust-gpu,
+migrated to CubeCL on 2026-08-16 (`9cf7b3e5`, `a9982673`) and now live in
+`conatus::resident` (`crates/conatus/conatus/src/resident.rs`, feature
+`resident`, since `eae87153`); `quint-shaders` and its `.spv` are deleted, so
+the rust-gpu carriage is retired here. What remains is not this plan's: the
+promotion trigger for the lease (a shipped producer and consumer). The
+renderling shader-edit watch is moot (renderling axed 2026-09-15), and the wgpu
+row is one row, wgpu 30.0.1. The GPU
 architecture for conatus and its render consumers, ratified by Mark from
 the conatus discussion of 2026-08-13 (the projection ruling and its
 amendment in
@@ -83,6 +86,9 @@ compute side (`cubecl-wgpu 0.11.0-pre.2` wants `^30.0.0`, `burn
 regime is indifferent to which version wins; it is not indifferent to
 two of them.
 
+**Corrected 2026-10-06 (S14 pass):** the break is closed. The root now pins
+one row, wgpu 30.0.1 (root `Cargo.toml`, lines 513-524).
+
 **Nexus is a quarry, not a dependency.** Harvest: Morton sorting and
 Karras-style hierarchy construction and refit (shared machinery for BH
 far-field and wing spatial queries; BH adds mass and centre-of-mass
@@ -144,6 +150,11 @@ there is no fallback to pass on silently, so the question retires with
 the mechanism rather than needing an answer. `quint-shaders` is kept,
 retired for compute, because the carriage it documents is still how we
 *consume* rust-gpu artifacts we do not author.
+
+**Corrected 2026-10-06 (S14 pass):** `eae87153` (2026-08-31) deleted
+quint-shaders as well, and moved the resident lane to
+`crates/conatus/conatus/src/resident.rs` (feature `resident`), so
+`quint::resident` is now `conatus::resident`.
 
 **The field tier now publishes the lease.** `Resident::positions_lease`
 and `forces_lease` hand out the same `SpatialLease` the chunk bundles
@@ -319,6 +330,18 @@ what actually executes. And the windowed run is
 `paredros/probes/ambience-lease`'s `live` binary: the same lane at
 vsync in a winit window, worst steady-state frame 24.8 ms, receipt at
 `Code/testing/paredros/p2_live_ambience.png`.
+
+**Corrected 2026-10-06 (S14 pass):** this paragraph no longer describes the
+tree. The kernels migrated to CubeCL on 2026-08-16, as §0.5 records:
+`9cf7b3e5` removed `PASSTHROUGH_SHADERS` and the WGSL fallback, and
+`a9982673` recorded it in quint-shaders' README. Then `eae87153` (2026-08-31)
+moved `resident.rs` to `crates/conatus/conatus/src/resident.rs` (feature
+`resident`) and deleted quint-shaders and its `.spv`; no `.spv` and no
+`PASSTHROUGH_SHADERS` remain anywhere, and `quint::resident` is now
+`conatus::resident`. Paredros became Eponym (isometry `9410128b`,
+2026-09-24), so the probe here and in P3 and P4 is now
+`isometry/eponym/probes/ambience-lease`; the P3 receipt moved to
+`Code/testing/eponym/from-repos-testing-2026-09/`.
 
 ### P3. Wing projection
 
@@ -535,11 +558,20 @@ positive case.
   active 0.10 work rather than a design gap. Retire the fork by
   re-checking plain upstream later, not by waiting on a fix. Full
   detail in `quint-shaders/README.md`.
+
+  **Corrected 2026-10-06 (S14 pass):** that README is gone: `eae87153`
+  (2026-08-31) deleted quint-shaders. The fork branch
+  `mark-ik/prerelease-version-gate` still exists.
 - **2026-08-13 (carriage):** a receipt that a `.spv` *exists* is not a
   receipt that it *runs*. The first passing suite took the WGSL
   fallback throughout, because the test device never requested
   `PASSTHROUGH_SHADERS`. The lane now reports which source it built
   from and a test asserts the SPIR-V path where the adapter allows it.
+
+  **Corrected 2026-10-06 (S14 pass):** the SPIR-V path, the WGSL fallback and
+  this receipt retired with the CubeCL migration (`9cf7b3e5`, 2026-08-16; see
+  §0.5), as did the "WGSL survives as the downlevel path" line in the P2 spike
+  finding above.
 - **2026-08-13 (P2 spike):** the cloud drifts. Across 2.5 billion
   float pair-sums per frame, non-associativity leaves a net momentum
   bias, and 300 frames walked the 50k cloud about 450 units off origin.
@@ -579,3 +611,12 @@ positive case.
   measurable, and the crossover logic in seiche (Burn above 1000 nodes)
   holds for the CPU-naive comparison it was written against but not
   against a resident explicit kernel, which wins at every n measured.
+
+## Progress
+
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_50_s14_phase_b12.md: the status records the
+  CubeCL kernels in `conatus::resident` and the retired rust-gpu carriage,
+  drops the renderling watch and the split wgpu row, and the P2 paragraph, the
+  paredros probe paths and the quint-shaders pointer carry corrections.

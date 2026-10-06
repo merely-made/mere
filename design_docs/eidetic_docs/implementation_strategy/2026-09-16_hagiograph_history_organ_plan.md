@@ -2,8 +2,10 @@
 
 **Date:** 2026-09-16
 
-**Status, 2026-09-16:** H1 to H4 landed. H5, Mesocosm pinning and adopting
-the crate, is next. No consumer yet.
+**Status (2026-10-06):** H1 to H5 landed, all on 2026-09-16: H1 to H4 in
+Mere (`4a895c5e`, `53648d3a`), H5 in isometry (`8e41d90`, `490fb32`).
+Consumers: Mesocosm and isocosm pin the crate at Mere `32edc2ad`, and
+eponym-world uses it. Open: only §3's "later, not planned here" items.
 
 **Owns:** turning the 26-line `hagiograph` reservation into the history organ
 Mark ruled on 2026-09-16: the record of standing marks and the feat rule over
@@ -147,3 +149,9 @@ legend nobody tells fade, and memorials handed to the stack's voxel lane.
   its axis and holder, and `merge` and `reckon` alone require `Clone`.
   `DeepTimeError::Stalled.ticks` counts the advances made, which equals the
   ceiling when refused.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_35_s14_phase_a1.md; records H5 as landed in
+  isometry on 2026-09-16 (`8e41d90`, Mesocosm's `WorldRecord` a newtype over
+  `hagiograph::Record`; `490fb32`, `Epochal` implemented and `hagiograph::run`
+  called before a generated world is entered) and names the consumers.
