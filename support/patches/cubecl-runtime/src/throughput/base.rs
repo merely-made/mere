@@ -201,7 +201,7 @@ impl ThroughputValue {
         let (mut val_per_s, unit) = match key.mode {
             ThroughputMode::ComputeDirect { .. } | ThroughputMode::ComputeCmma { .. } => {
                 (self.ops_per_s(), "OPS")
-            }
+            },
             ThroughputMode::Memory(_) => (self.bytes_per_s(key), "bytes"),
             ThroughputMode::Launch => {
                 let dur = self.duration_per_op();
@@ -209,7 +209,7 @@ impl ThroughputValue {
                     return String::from("N/A");
                 }
                 return format!("{dur:?}/launch");
-            }
+            },
         };
 
         if val_per_s.is_nan() {

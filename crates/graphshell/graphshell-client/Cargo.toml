@@ -32,4 +32,4 @@ layout_dom_api = { workspace = true }
 # Test-only: proves the frozen realization is resolvable through the identity
 # the DOM carries, which is the only way taproot can drive anything.
 # Named genet-probe until genet 7baa554c (2026-09-14).
-taproot = { workspace = true }
+taproot = { workspace = true, features = ["image-decode"] }

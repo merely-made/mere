@@ -14,12 +14,17 @@ repository.workspace = true
 # Split out of cambium-winit 2026-07-26; the code is unchanged.
 publish = false
 
+[features]
+default = ["image-decode"]
+# Forwards genet-livery's image decoding (mer3ly Ruling 111); on by default.
+image-decode = ["genet-render/image-decode", "cambium-rootstock/image-decode"]
+
 [dependencies]
 sprigging = { version = "0.2.0", path = "../sprigging" }
 # The neutral accessibility seam this crate implements for winit. The
 # request vocabulary lives there because it never named winit or AccessKit
 # in the first place; only the window handle below is ours.
-cambium-rootstock = { version = "0.1.0", path = "../cambium-rootstock" }
+cambium-rootstock = { version = "0.1.0", path = "../cambium-rootstock", default-features = false }
 winit = "0.30.13"
 accesskit = "0.24"
 genet-render = { workspace = true }

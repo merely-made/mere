@@ -1,18 +1,15 @@
 # Mere cubek-reduce patch
 
-Source: crates.io `cubek-reduce 0.3.0-pre.4`, upstream Cubek commit
-`648520b6fd8bfe18bedeb03efe61063dc1efafc5`.
-License: MIT OR Apache-2.0. The two license files are retained from the previous
-vendor copy because the published crate omits them.
+Source: crates.io `cubek-reduce 0.3.0`, upstream Cubek commit `b6ac1f2ee54c773f345c0bfbd9f330c9022cc3a8`.
+License: MIT OR Apache-2.0. License files retained from the previous vendor copy.
 
-The floating-point extrema identities in `src/components/instructions/extrema.rs`
-materialize infinity bits through a mutable runtime local. Browser WGSL
-validation otherwise folds a literal bitcast and rejects non-finite `f32`
-before dispatch. Infinity and NaN semantics are preserved.
+Rebased on 2026-10-06 onto the stable release. The sole source delta is one
+helper and two calls in `src/components/instructions/extrema.rs`: materialize
+infinity bits through a mutable runtime local so WGSL validation does not
+constant-fold a non-finite float. Stable upstream's NaN-propagating intrinsics
+and all other release changes are preserved. The normalized manifest adds an
+empty workspace for direct tests.
 
-Rebased on 2026-09-27 from the preserved pre.3 delta at `610a32c5`: exactly one
-helper and two call sites apply unchanged to pristine pre.4. The normalized
-manifest additionally carries an empty workspace for direct upstream tests.
-This source rebase does not prove the new IR still emits the required runtime
-value. All four headed browser extrema cases remain required by the migration
-plan. Remove this patch once a released Cubek row passes them without it.
+Remove once a released Cubek passes the four headed browser extrema cases
+without this workaround. A source rebase alone does not establish browser
+acceptance.
