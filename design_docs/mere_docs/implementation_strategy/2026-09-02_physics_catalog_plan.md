@@ -2835,3 +2835,46 @@ binning are the useful patterns.
   12 of 12 green, the worst admitted frame 233 us under to 67 us over its
   budget, none past the grain, so the one 567 us miss did not recur and the
   200 us margin stands.
+- 2026-10-06 (seiche's speed, the estimator, branch `seiche-speed-estimator`,
+  per "Both machines + planted"). Main `c6e8cc09`, seiche-speed merged, merged
+  in (`e68e0f2d`): no file changed on both sides, main's root lock kept; the
+  gitignored web lock took three zeroize edges for vault lock L1 (`cargo
+  metadata --offline`, now `87188cd2`). The estimator (`381ef289`,
+  `7f98fc4c`): the period is the largest in [1/360 s, 1/60 s] that 75% of the
+  last 40 intervals fit, within two clock steps and 0.1 ms of refresh jitter
+  (0.3 ms at the browser's 100 us), from candidates at the eight shortest
+  intervals over 1, 2, 3, ..., refined by least squares; lifted to twice or
+  three times itself when that keeps 85% of the fit and half the intervals, so
+  a fraction is not read where the period narrowly misses the quorum; stepped
+  down to a half or a third when that fits 0.15 more, so a multiple is not
+  read where a page's frames mostly take an even number of refreshes (the
+  300-node page's first frames take 30, and its first window read 12.157 ms
+  before the step-down); nothing read from fewer than 16 intervals; else the
+  1/60 s cap. Over every prefix window of this machine's 24 logged windows
+  (526, what the page saw as each interval arrived), it reads within 1% of
+  6.07 ms or falls back, none above or below. Twelve planted traces read as
+  they should: 60 Hz (the positive control), 165 Hz over 4 to 17 refreshes,
+  144 Hz on a 5 us clock, 30 fps caps at 60 and 144 Hz, variable refresh
+  falling back to the cap, switches 60 to 144, 144 to 60 and 120 to 60 Hz
+  reading the new rate, 15% outliers, 0.1 ms jitter, mostly six refreshes. The
+  one inherent case: a page whose frames all take an even number of refreshes
+  reads twice the period, the most its intervals show (never a fraction; the
+  cap bounds it); returned as the fork Mark named. Headed on bundle `7c5b48da`
+  both pages read 6.06 to 6.08 ms from their first window. Gates: seiche
+  129/129 (123 without actor, 129 + 3 with gpu), pictograph 310, graphshell
+  `web` 247, mere and graphshell checked clean. The dial rows, with the budget
+  now half this panel's real frame (3,030 us, not 8,333): slow, the 50x
+  control (150 ticks in 1.5 ms, unbound), the planted control (failing the
+  bound for its stall, 9,270 us over) and both Speed select receipts green;
+  the fast receipt misses `physics-effective-speed >= 1` calm in three of
+  three runs (0.82x, 0.75x, 0.81x, at 12 to 18% CPU with no Normal-priority
+  builds), its every-window bound holding (worst admitted frame 130 us under):
+  3 ms of physics in a 160 to 270 ms frame cannot reach 1x of simulated time
+  on this page, though it stays faster than the 1x setting there. Returned as
+  a fork. The law receipts were not rerun: at 1x the budget does not apply.
+  The ThinkPad (`thinkpad-l14-f`, Fedora 44, a 1366x768 panel at 60.003 Hz,
+  Chrome only as the Flatpak `com.google.Chrome`): reached over SSH, the
+  bundle copied and served on its loopback, a probe page loads, but the tree
+  page stops before its scenario: Chrome on Linux exposes no WebGPU adapter
+  unless launched with `--enable-unsafe-webgpu`, and netrender cannot boot
+  without one. Returned as a fork; nothing installed, no setting changed.
