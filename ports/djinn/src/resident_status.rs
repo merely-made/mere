@@ -54,6 +54,9 @@ pub const STATUS_SCHEMA: &str = "djinn.resident-status/v1";
 pub const STOP_INTENT: &str = "djinn.resident/stop-v1";
 /// Unlock by passphrase; the payload is the passphrase's raw bytes.
 pub const UNLOCK_INTENT: &str = "djinn.resident/unlock-v1";
+/// Show the resident's own unlock prompt; the payload is empty, and no
+/// credential crosses the pipe (vault lock ruling 47).
+pub const UNLOCK_NATIVE_INTENT: &str = "djinn.resident/unlock-native-v1";
 const STATUS_SESSION: &str = "djinn.resident-status/v1";
 const CONTROL_SESSION: &str = "djinn.resident-control/v1";
 
@@ -159,6 +162,18 @@ impl ResidentStatusSource {
 
 /// Unlocks the resident's vault by passphrase; the reason on refusal.
 pub type Unlocker = Arc<dyn Fn(&[u8]) -> Result<(), String> + Send + Sync>;
+
+/// Shows the resident's own unlock prompt and unlocks from it.
+pub type NativeUnlocker = Arc<dyn Fn() -> Result<(), String> + Send + Sync>;
+
+/// The control route's two ways in to an unlock.
+#[derive(Clone, Default)]
+pub struct ControlUnlock {
+    /// `djinn --unlock`: a passphrase read at the caller's terminal.
+    pub passphrase: Option<Unlocker>,
+    /// `djinn --unlock --native`: the resident's own prompt.
+    pub native: Option<NativeUnlocker>,
+}
 
 /// The stop the control route raises and the run loop waits on.
 #[derive(Clone, Default)]
@@ -377,25 +392,28 @@ impl IntentSink for ResidentStatusEndpoint {
 /// The control route's endpoint: stop, and unlock when given an unlocker.
 pub struct ResidentControlEndpoint {
     stop: StopSignal,
-    unlock: Option<Unlocker>,
+    unlock: ControlUnlock,
 }
 
 impl ResidentControlEndpoint {
     pub fn new(stop: StopSignal) -> Self {
-        Self { stop, unlock: None }
+        Self {
+            stop,
+            unlock: ControlUnlock::default(),
+        }
     }
 
     pub fn register(
         stop: StopSignal,
         catalog: &mut ResidentEndpointCatalog,
     ) -> Result<ResidentEndpointRoute, ResidentEndpointCatalogError> {
-        Self::register_with_unlock(stop, None, catalog)
+        Self::register_with_unlock(stop, ControlUnlock::default(), catalog)
     }
 
-    /// Register the route with the unlock intent served by `unlock`.
+    /// Register the route with its unlock intents served by `unlock`.
     pub fn register_with_unlock(
         stop: StopSignal,
-        unlock: Option<Unlocker>,
+        unlock: ControlUnlock,
         catalog: &mut ResidentEndpointCatalog,
     ) -> Result<ResidentEndpointRoute, ResidentEndpointCatalogError> {
         catalog.register(RESIDENT_CONTROL_ROUTE, "Resident control", move |_| {
@@ -453,19 +471,36 @@ impl IntentSink for ResidentControlEndpoint {
                 self.stop.raise();
                 Ok(IntentResult::Accepted)
             },
-            UNLOCK_INTENT => Ok(match &self.unlock {
-                Some(unlock) => match unlock(&payload) {
-                    Ok(()) => IntentResult::Accepted,
-                    Err(reason) => IntentResult::Rejected { reason },
+            UNLOCK_INTENT => Ok(match &self.unlock.passphrase {
+                Some(unlock) => answer(unlock(&payload)),
+                None => refused("a passphrase unlock"),
+            }),
+            UNLOCK_NATIVE_INTENT => Ok(match &self.unlock.native {
+                Some(unlock) if payload.is_empty() => answer(unlock()),
+                Some(_) => IntentResult::Rejected {
+                    reason: "the native unlock carries nothing".into(),
                 },
-                None => IntentResult::Rejected {
-                    reason: "this resident takes no unlock on its control route".into(),
-                },
+                None => refused("a native unlock"),
             }),
             _ => Ok(IntentResult::Rejected {
-                reason: format!("resident control takes {STOP_INTENT} or {UNLOCK_INTENT}"),
+                reason: format!(
+                    "resident control takes {STOP_INTENT}, {UNLOCK_INTENT} or {UNLOCK_NATIVE_INTENT}"
+                ),
             }),
         }
+    }
+}
+
+fn answer(result: Result<(), String>) -> IntentResult {
+    match result {
+        Ok(()) => IntentResult::Accepted,
+        Err(reason) => IntentResult::Rejected { reason },
+    }
+}
+
+fn refused(what: &str) -> IntentResult {
+    IntentResult::Rejected {
+        reason: format!("this resident takes no {what} on its control route"),
     }
 }
 
@@ -506,6 +541,11 @@ pub async fn request_unlock(
     passphrase: &[u8],
 ) -> Result<(), AppClientError> {
     control_intent(client, UNLOCK_INTENT, passphrase.to_vec(), "unlock").await
+}
+
+/// Ask the resident to show its own unlock prompt: nothing crosses the pipe.
+pub async fn request_native_unlock(client: &mut AppBrokerClient) -> Result<(), AppClientError> {
+    control_intent(client, UNLOCK_NATIVE_INTENT, Vec::new(), "the native unlock").await
 }
 
 async fn control_intent(

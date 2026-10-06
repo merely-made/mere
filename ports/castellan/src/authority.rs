@@ -38,7 +38,8 @@ use personae::signing::{ApprovalBroker, DecisionError, RememberApproval, Signing
 use personae::ssh_slot;
 use personae::{
     CredentialLineage, Ed25519Keypair, Ed25519PublicKey, IdentityError, IdentityProvider,
-    IdentityStorage, IdentityVault, ProfileId, ProtocolKey, UnlockMethod, UnlockTier, roster,
+    IdentityStorage, IdentityVault, ProfileId, ProtocolKey, RetainedKeys, UnlockMethod,
+    UnlockTier, roster,
 };
 use serde::{Deserialize, Serialize};
 use ssh_key::{Algorithm, PrivateKey, PublicKey};
@@ -223,6 +224,8 @@ pub struct PersonaeHost<S: IdentityStorage> {
     protection: VaultProtectionView,
     lock: Arc<ResidentLock<S>>,
     listener: Arc<Mutex<AgentListenerView>>,
+    /// Keys the lock leaves in place, one set per purpose (rulings 40, 46).
+    retained: Mutex<Vec<Arc<RetainedKeys>>>,
 }
 
 /// What stays visible while locked (ruling 11): the profile and SSH key
@@ -425,6 +428,7 @@ impl<S: IdentityStorage + 'static> PersonaeHost<S> {
             protection,
             lock,
             listener: Arc::new(Mutex::new(AgentListenerView::StandaloneRetained)),
+            retained: Mutex::new(Vec::new()),
             vault_dir: None,
         }
     }
@@ -464,6 +468,26 @@ impl<S: IdentityStorage + 'static> PersonaeHost<S> {
     /// every unlock. Registered while locked, it locks at once.
     pub fn register_lock_holder(&self, holder: Arc<dyn VaultLockHolder>) {
         self.lock.register(holder);
+    }
+
+    /// A restricted provider for exactly `salts` that the lock leaves in
+    /// place (rulings 40, 46): captured from the vault the first time it is
+    /// asked for while unlocked, then served as kept, locked or not. It
+    /// derives nothing else. Locked with nothing kept, it is `Locked`.
+    pub fn retained_keys(&self, salts: &[Vec<u8>]) -> Result<Arc<RetainedKeys>, IdentityError> {
+        let vault = self.vault.lock().unwrap();
+        let master = IdentityProvider::master_public_key(&*vault);
+        let mut retained = self.retained.lock().unwrap();
+        if let Some(kept) = retained
+            .iter()
+            .find(|kept| kept.master_public_key() == master && kept.holds(salts))
+        {
+            return Ok(Arc::clone(kept));
+        }
+        let captured = Arc::new(RetainedKeys::capture(&*vault, salts)?);
+        retained.retain(|kept| kept.master_public_key() == master);
+        retained.push(Arc::clone(&captured));
+        Ok(captured)
     }
 
     fn ensure_unlocked(&self) -> Result<(), IdentityIntentError> {
@@ -807,6 +831,19 @@ impl<S: IdentityStorage + 'static> PersonaeHost<S> {
     ) -> Result<ProfileSwitchReceipt, IdentityIntentError> {
         let id = ProfileId(payload.profile);
         self.vault.lock().unwrap().switch_profile(&id)?;
+        // The kept sets follow the persona now speaking.
+        let salts: Vec<Vec<Vec<u8>>> = self
+            .retained
+            .lock()
+            .unwrap()
+            .iter()
+            .map(|kept| kept.salts())
+            .collect();
+        for set in salts {
+            if let Err(error) = self.retained_keys(&set) {
+                tracing::warn!(%error, "kept keys not recaptured after the switch");
+            }
+        }
         let remembered = match &self.vault_dir {
             Some(dir) => match roster::remember_profile(dir, &id) {
                 Ok(()) => true,

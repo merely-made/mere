@@ -65,7 +65,9 @@ mesh.workspace = true
 muniment.workspace = true
 notochord.workspace = true
 pandect.workspace = true
-personae = { workspace = true, features = ["agent"] }
+# `os-presence`: the resident's own unlock prompt asks Windows Hello first
+# (vault lock ruling 47).
+personae = { workspace = true, features = ["agent", "os-presence"] }
 rand_core = { version = "0.6", features = ["getrandom"], optional = true }
 sceno.workspace = true
 scenotime.workspace = true
