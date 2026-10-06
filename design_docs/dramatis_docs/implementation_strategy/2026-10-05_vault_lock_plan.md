@@ -1,12 +1,12 @@
 # Vault Lock Plan
 
 **Date**: 2026-10-05
-**Status (2026-10-05)**: rulings 1 to 36 in §3; the threat statement is
+**Status (2026-10-06)**: rulings 1 to 39 in §3; the threat statement is
 still open. The djinn test harness it waited on (ruling 18) landed
-(`318b8f70`). L1's checkpoint A is built and verified on a lane branch
-(residue fixes, the no-residue instrument, the caller map); rulings 25 to
-36 settle the lock API, which is next. Nothing merged. Chatelaine P4 (CXF
-import) waits on this plan (chatelaine rulings 64, 65).
+(`318b8f70`). L1's checkpoints A and B (residue fixes, the no-residue
+instrument, the lock API) are built and verified on a lane branch; one
+missing test (§6, control B) and ruling 37 come before L1 merges. Chatelaine
+P4 (CXF import) waits on this plan (chatelaine rulings 64, 65).
 **Scope**: the resident's secrets can be locked. While locked, no secret
 material can be reached through the vault or the resident's derived keys.
 Unlocking takes a user act. Every consumer (the SSH agent, castellan's item
@@ -459,6 +459,32 @@ root directly. Should a live lock reach them?* Options: the same as ruling
 into those repos; the persisted lock only, refusing their next open, with
 the gap recorded. Mark: **"Same as ruling 23 (Recommended)"**.
 
+Rulings 37 to 39 were asked on 2026-10-06 from L1's checkpoint B (§6).
+
+**Ruling 37.** *chacha20poly1305 0.11's own `zeroize` feature is off in our
+lock, so the cipher's internal key copy is not cleared on drop. The
+measured leak was fixed by lending the key instead of copying it; the
+feature alone did not fix that one.* Options: enable it too (the library's
+own feature, like ruling 33; two feature edges, no new package); ledger
+only. Mark: **"Enable it too (Recommended)"**.
+
+**Ruling 38.** *After a restart under a persisted lock (L3), the resident
+knows nothing about the persona: the only list of names and public keys is
+inside the sealed profile.* Options: only the profile id until unlock (no
+new file at rest); a public snapshot persisted beside the vault at lock
+time (persona names and public keys at rest, outside the seal); the same
+snapshot sealed with DPAPI, separately from the vault root. Mark: **"Only
+the profile id (Recommended)"**. Follows: a resident that starts locked
+shows a Locked card with no names or keys; ruling 11's snapshot is the
+in-memory one kept at lock time.
+
+**Ruling 39.** *Ruling 27 refuses `lock()` without an unlock method; Linux
+has no Hello, and nothing can enroll a passphrase (the storage hides the
+root `passphrase_root` wraps).* Options: a personae enrollment API plus a
+djinn command that prompts on the terminal, never the environment (ruling
+7), built in L2; the same plus a castellan enrollment card; Hello only
+until later. Mark: **"personae API + djinn CLI (Recommended)"**.
+
 Still open: a threat statement naming hibernation and the pagefile.
 
 ## 4. Phases
@@ -581,3 +607,35 @@ breaking change is built, Knot first.
   - mer3ly, retinue, cleromancy and isometry are unaffected.
 - The lane proposed the lock API; rulings 25 to 36 settle its forks. Next:
   L1's breaking change on the same branch, then L2.
+
+**2026-10-06, L1 checkpoint B built** (same lane; `095c0423` adds the
+personae lock API, `b7bcbdb0` adapts castellan and Distillery, not merged):
+- The API follows rulings 25 to 30 and 33: `lock`, `unlock`, `is_locked`
+  and `unlock_methods` on the vault and the storage trait;
+  `IdentityError::Locked`; `PublicProfile` answering while locked; one
+  shared key cell; `OsPresence` minted only by personae's Hello gate
+  (feature `os-presence`).
+- The lane also measured argon2's residue: three uncleared 19.9 MB blocks
+  with argon2's own `hash_password_into`, none with ruling 33's fix.
+- It found a stack copy of the passphrase KEK reaching the heap and fixed
+  it by lending the key to the cipher rather than copying it out.
+  *Reading, not ruled:* that is ruling 6's residue fix.
+- No exhaustive match on `IdentityError` exists in mere or its siblings.
+- Knot's pinned revision compiled against the branch: one error, identical
+  at the base (pairing ruling 61's, fixed in Knot's repin).
+- **Verified in `mere-verify`:**
+  - personae 194 + 7 + 1, with the leak test clean in all six scenarios;
+  - castellan 107 + 3 + 4 + 1, djinn 88, Distillery 24, graphshell 191;
+  - the gate passed;
+  - the lock file adds two feature edges and no package;
+  - the installed resident was identical before and after.
+- **Control A** (argon2's own call put back): the leak test failed with the
+  three argon2 blocks.
+- **Control B** (`authority.freshness.lock()` removed from
+  `SealedRecordStorage::lock`): every test still passed. The freshness test
+  checks that unlock wants the key back, not that lock dropped it, so
+  ruling 1's freshness key could stay in memory under lock unnoticed.
+  Today's code does drop it; the test is what is missing. Sent back to the
+  lane.
+- Next: the freshness test and ruling 37 on the same branch, then L1's
+  merge.
