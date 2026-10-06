@@ -194,14 +194,21 @@ pub mod physics_board;
 pub mod physics_device;
 #[cfg(feature = "gpu")]
 pub use physics_device::{PhysicsDevice, physics_device_for};
+/// Compositions beyond a law and its overlays: a weighted mix of force laws
+/// and groups. (Dynamics grammar plan, G3.)
+pub mod composition;
 /// The physics catalog: the laws a graph can move under, the overlays composed
 /// onto them, and the named profiles. (Physics catalog — P1.)
 pub mod physics_catalog;
+/// Schedules of compositions, each stage to its stop, with captures taken by
+/// role. (Dynamics grammar plan, G3.)
+pub mod schedule;
 pub use board_scene::{
     BoardBackdrop, BoardCard, BoardFit, BoardFootprint, BoardRect, BoardScene, BoardText,
     BoardTransform,
     backdrop_color,
 };
+pub use composition::{CompositionRefusal, PhysicsComposition, PhysicsGrouping};
 pub use physics_board::{BoardItem, PhysicsBoard, PhysicsChoice};
 pub use physics_catalog::{
     CANVAS_PHYSICS_DEPTH_SOURCES, CANVAS_PHYSICS_KIND_SOURCES, CANVAS_PHYSICS_LAWS,
@@ -210,6 +217,7 @@ pub use physics_catalog::{
     PhysicsDepthSource, PhysicsKindSource, PhysicsLaw, PhysicsMassSource, PhysicsOverlay,
     PhysicsProfile,
 };
+pub use schedule::{CAPTURED_ARRANGEMENT, PhysicsStage, StageStop};
 
 /// Force-directed settle length (frames) after a (re)seed, ~6s at 60fps.
 const SETTLE_TICKS: u32 = 360;
@@ -667,6 +675,11 @@ pub struct Canvas {
     /// Where the Depth overlay reads a node's depth from (roots, layers, the
     /// focus). (Physics catalog — P1b.)
     physics_depth_source: PhysicsDepthSource,
+    /// A composition the law slot runs instead of the law: a weighted mix of
+    /// force laws, or groups. `None` runs the law. (Dynamics grammar plan, G3.)
+    physics_composition: Option<composition::PhysicsComposition>,
+    /// A schedule of compositions under way, if any. (Dynamics grammar plan, G3.)
+    schedule: Option<schedule::ScheduleRun>,
     /// How many times the law + overlay force set was rebuilt. Test only.
     #[cfg(test)]
     law_rebuilds: usize,
