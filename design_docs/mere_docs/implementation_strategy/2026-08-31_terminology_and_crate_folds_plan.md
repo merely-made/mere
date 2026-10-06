@@ -6,6 +6,17 @@ the Djinn Distillery lane that arrived upstream in between, and every recorded
 gate was rerun green before the push. The seven external consumer commits
 follow it in their own repositories.
 
+**Corrected 2026-10-06 (S14 pass):** Progress names four consumer commits, not
+seven, and no list of seven exists in this plan, its receipt, DOC_README or
+the landing commits. The siblings' origin/main carry more than four
+2026-08-31 consumer commits: turnstone `030ba08`, retinue `5cc4c2d`, isometry
+`0b17fe9f`, `92f8a692` and `de04c9e2`, Mesocosm `fc12da3e` and `096f740f`
+(its history now in isometry), woodshed `b5bd3b6` and mora `0416081`.
+
+**Open, raised by the S14 pass (2026-10-06):** which seven consumer commits
+does the status mean? Options: correct the count to the four Progress names;
+identify the other three among the commits above.
+
 ## Scope and rulings
 
 This plan executes the 2026-08-31 vocabulary and ownership pass without
@@ -130,10 +141,21 @@ Done conditions:
 - **2026-08-31:** implemented the Eidetic Codicil rename, TrainingCorpus v2
   reader/writer, Graphshell legacy import, Pandect persistence aliases, and the
   Muniment Journal move in `962333d1`.
+  **Corrected 2026-10-06 (S14 pass):** `962333d1` is the pre-rebase hash and
+  is not on main; the commit that landed is `c51b9704`.
 - **2026-08-31:** folded Scholia into Chartulary in `0f160ff0` and Quint into
   Numen, Seiche, and Conatus in `d5d5f9b9`.
+  **Corrected 2026-10-06 (S14 pass):** both are pre-rebase hashes and not on
+  main; the commits that landed are `275448cd` and `eae87153`, between
+  `f2924f08` and mere 535bca11.
 - **2026-08-31:** migrated Turnstone (`b079e3f`), Retinue (`3c6ff79`), Isometry
   (`0b17fe9`), and Mesocosm (`cff9b71`) on isolated consumer branches.
+  **Corrected 2026-10-06 (S14 pass):** Turnstone `b079e3f` and Retinue
+  `3c6ff79` are on no branch now; the landed versions are turnstone `030ba08`
+  and retinue `5cc4c2d` (both 2026-08-31, "Migrate … to muniment journals").
+  Mesocosm's history lives in isometry's `archive/mesocosm/*` branches, where
+  `cff9b71` is absent and the landed equivalents are `fc12da3e` and
+  `096f740f`. Isometry `0b17fe9` is on origin/main.
 - **2026-08-31:** Muniment's 37 tests and Eidetic's 95 default-feature tests
   pass in the disposable provider workspace. Chartulary's 59 tests, Woodshed's
   14 tests, Mora's 37 tests, and the focused owner checks and Clippy gates also
@@ -160,3 +182,9 @@ Done conditions:
   stack was replayed once more; the only overlap was Canvas's `quint`→`numen`
   rename against D3's new modules, and the Canvas check and the three Djinn
   receipts were rerun on that tree before landing.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_44_s14_phase_b6.md: Progress's pre-rebase Mere
+  hashes and its Turnstone, Retinue and Mesocosm hashes are annotated with the
+  landed ones, and the status's "seven" consumer commits is left open against
+  the four named.
