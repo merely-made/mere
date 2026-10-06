@@ -17,7 +17,7 @@ use cambium::{
     tab_drop_index, tab_target,
 };
 use genet_livery::{Device, LiveryDocument, StyleSet};
-use genet_render::accesskit_tree;
+use genet_render::{A11yStyleQueries, accesskit_tree_with_style};
 use genet_scripted_dom::{NodeId, ScriptedDom};
 use layout_dom_api::{LayoutDom, LocalName, Namespace};
 use pelt_core::WorkspaceRect;
@@ -795,7 +795,15 @@ impl FrisketSurface {
             .into_iter()
             .map(|node| (AccessNodeId(dom.opaque_id(node)), node))
             .collect::<HashMap<_, _>>();
-        let mut tree = accesskit_tree(dom, fragments, None);
+        let mut tree = accesskit_tree_with_style(
+            dom,
+            fragments,
+            None,
+            &A11yStyleQueries {
+                generated: &|node| self.document.generated_text(node),
+                rendered: &|node| self.document.rendered_visible(node),
+            },
+        );
 
         // A Frisket document is rebuilt whenever Chrome state changes, so a
         // raw ScriptedDom NodeId would become foreign on the next frame. Keep
