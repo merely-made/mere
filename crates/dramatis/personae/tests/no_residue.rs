@@ -16,6 +16,11 @@
 //! must be found, a `Zeroizing` one must not. Stack copies and memory the OS
 //! allocates (DPAPI's `LocalAlloc`) are outside what this can see.
 //!
+//! The lock scenarios scan what a locked vault keeps live, with the vault
+//! still alive: no seed, payload or storage key may remain. The passphrase
+//! one also plants a window of Argon2's final memory block, which with the
+//! salt recomputes the passphrase key (ruling 33).
+//!
 //! No libtest harness: the allocator is process-wide, and one thread keeps
 //! the scan free of races.
 
@@ -23,10 +28,11 @@ use std::alloc::{GlobalAlloc, Layout, System};
 use std::cell::UnsafeCell;
 use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
+use personae::sealed_profile_storage::PASSPHRASE_ROOT_FILE;
 use personae::{
     CredentialLineage, Ed25519Keypair, IdentitySlot, IdentityStorage, IdentityVault,
-    PassphraseEncryptedStorage, Profile, ProfileId, ProtocolKey, SealedProfileStorage,
-    SecretBytes, UnlockTier,
+    PassphraseEncryptedStorage, Profile, ProfileId, ProtocolKey, SealedProfileStorage, SecretBytes,
+    UnlockMethod, UnlockTier,
 };
 use zeroize::Zeroizing;
 
@@ -58,7 +64,11 @@ struct Hit {
     canary: usize,
     json: bool,
     size: usize,
+    /// The phase the block was allocated in; `UNTRACKED` if before arming.
+    born: usize,
 }
+
+const UNTRACKED: usize = usize::MAX;
 
 struct State {
     canaries: [Option<Canary>; MAX_CANARIES],
@@ -66,6 +76,7 @@ struct State {
     hit_count: usize,
     live_ptr: [usize; TABLE],
     live_size: [usize; TABLE],
+    live_born: [usize; TABLE],
     tracked: usize,
     overflow: bool,
 }
@@ -80,6 +91,7 @@ static STATE: Shared = Shared(UnsafeCell::new(State {
     hit_count: 0,
     live_ptr: [0; TABLE],
     live_size: [0; TABLE],
+    live_born: [0; TABLE],
     tracked: 0,
     overflow: false,
 }));
@@ -110,6 +122,7 @@ impl State {
             if self.live_ptr[i] == 0 || self.live_ptr[i] == TOMBSTONE {
                 self.live_ptr[i] = ptr;
                 self.live_size[i] = size;
+                self.live_born[i] = PHASE.load(Ordering::Relaxed);
                 self.tracked += 1;
                 return;
             }
@@ -118,27 +131,31 @@ impl State {
         self.overflow = true;
     }
 
-    fn remove(&mut self, ptr: usize) {
+    /// Forget a block; returns the phase it was born in.
+    fn remove(&mut self, ptr: usize) -> usize {
         if self.tracked == 0 {
-            return;
+            return UNTRACKED;
         }
         let mut i = slot_of(ptr);
         for _ in 0..TABLE {
             match self.live_ptr[i] {
-                0 => return,
+                0 => return UNTRACKED,
                 p if p == ptr => {
                     self.live_ptr[i] = TOMBSTONE;
                     self.tracked -= 1;
-                    return;
+                    return self.live_born[i];
                 },
                 _ => i = (i + 1) % TABLE,
             }
         }
+        UNTRACKED
     }
 
-    fn scan(&mut self, block: &[u8], live: bool) {
+    fn scan(&mut self, block: &[u8], live: bool, born: usize) {
         for c in 0..MAX_CANARIES {
-            let Some(canary) = &self.canaries[c] else { continue };
+            let Some(canary) = &self.canaries[c] else {
+                continue;
+            };
             let raw = raw_hit(canary, block);
             let json = !raw && canary.json && json_hit(canary, block);
             if (raw || json) && self.hit_count < MAX_HITS {
@@ -148,6 +165,7 @@ impl State {
                     canary: c,
                     json,
                     size: block.len(),
+                    born,
                 });
                 self.hit_count += 1;
             } else if raw || json {
@@ -180,13 +198,21 @@ fn json_hit(c: &Canary, block: &[u8]) -> bool {
     let mut num: u32 = 0;
     let mut in_num = false;
     let finish = |num: u32, run: &mut usize, expect: &mut i32| -> bool {
-        let j = if num <= 255 { c.unique[num as usize] as i32 } else { -1 };
+        let j = if num <= 255 {
+            c.unique[num as usize] as i32
+        } else {
+            -1
+        };
         if j < 0 {
             *run = 0;
             *expect = -1;
             return false;
         }
-        *run = if *run > 0 && j == *expect { *run + 1 } else { 1 };
+        *run = if *run > 0 && j == *expect {
+            *run + 1
+        } else {
+            1
+        };
         *expect = j + 1;
         *run >= WINDOW
     };
@@ -214,6 +240,9 @@ unsafe impl GlobalAlloc for Tracker {
     unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
         let ptr = unsafe { System.alloc(layout) };
         if !ptr.is_null() && ARMED.load(Ordering::Relaxed) {
+            // Fresh blocks start zeroed while armed, so a hit is never stale
+            // heap left from before arming.
+            unsafe { std::ptr::write_bytes(ptr, 0, layout.size()) };
             with_state(|s| s.insert(ptr as usize, layout.size()));
         }
         ptr
@@ -222,10 +251,10 @@ unsafe impl GlobalAlloc for Tracker {
     unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {
         let armed = ARMED.load(Ordering::Relaxed);
         with_state(|s| {
-            s.remove(ptr as usize);
+            let born = s.remove(ptr as usize);
             if armed {
                 let block = unsafe { std::slice::from_raw_parts(ptr, layout.size()) };
-                s.scan(block, false);
+                s.scan(block, false, born);
             }
         });
         unsafe { System.dealloc(ptr, layout) }
@@ -251,12 +280,17 @@ fn plant(index: usize, bytes: &[u8], json: bool) {
     };
     canary.bytes[..bytes.len()].copy_from_slice(bytes);
     for (j, &b) in bytes.iter().enumerate() {
+        // A fifth repeat of one byte value only loses that anchor.
         let n = &mut canary.at_count[b as usize];
-        assert!(*n < 4, "canary repeats a byte too often");
-        canary.at[b as usize][*n as usize] = j as u8;
-        *n += 1;
+        if *n < 4 {
+            canary.at[b as usize][*n as usize] = j as u8;
+            *n += 1;
+        }
         if json {
-            assert_eq!(canary.unique[b as usize], -1, "decimal canary needs distinct bytes");
+            assert_eq!(
+                canary.unique[b as usize], -1,
+                "decimal canary needs distinct bytes"
+            );
             canary.unique[b as usize] = j as i16;
         }
     }
@@ -283,7 +317,8 @@ fn disarm() -> (Vec<Hit>, bool) {
             let p = s.live_ptr[i];
             if p != 0 && p != TOMBSTONE {
                 let block = unsafe { std::slice::from_raw_parts(p as *const u8, s.live_size[i]) };
-                s.scan(block, true);
+                let born = s.live_born[i];
+                s.scan(block, true, born);
             }
         }
         let mut out = [None; MAX_HITS];
@@ -310,7 +345,12 @@ fn canary_bytes<const N: usize>(offset: usize) -> [u8; N] {
     out
 }
 
-const NAMES: [&str; MAX_CANARIES] = ["master seed", "slot payload", "storage root", "-"];
+const NAMES: [&str; MAX_CANARIES] = [
+    "master seed",
+    "slot payload",
+    "storage key",
+    "argon2 final block",
+];
 
 struct Report {
     failures: usize,
@@ -325,18 +365,20 @@ impl Report {
         }
         self.failures += 1;
         println!("residue {scenario}: {} hit(s)", hits.len());
+        let name = |p: usize| match p {
+            99 => "after drop",
+            UNTRACKED => "before arming",
+            p => phases.get(p).copied().unwrap_or("?"),
+        };
         for h in hits {
             println!(
-                "  {} {} ({}) in a {}-byte block, phase {}",
+                "  {} {} ({}) in a {}-byte block, phase {} (allocated in {})",
                 if h.live { "live" } else { "freed uncleared" },
                 NAMES[h.canary],
                 if h.json { "decimal JSON" } else { "raw" },
                 h.size,
-                phases.get(h.phase).copied().unwrap_or(if h.phase == 99 {
-                    "after drop"
-                } else {
-                    "?"
-                }),
+                name(h.phase),
+                name(h.born),
             );
         }
     }
@@ -372,7 +414,7 @@ fn storage_round_trip<S: IdentityStorage>(storage: S, seed: [u8; 32], payload: &
     drop(profile);
     phase(2);
     let mut vault = IdentityVault::open(storage, &ProfileId("work".into())).unwrap();
-    assert_eq!(vault.current_profile().master.to_seed(), seed);
+    assert_eq!(vault.current_profile().unwrap().master.to_seed(), seed);
     phase(3);
     vault.switch_profile(&ProfileId("work".into())).unwrap();
     phase(4);
@@ -411,10 +453,26 @@ fn main() {
         && saw(99, true, false);
     println!(
         "positive control: uncleared raw {} / uncleared decimal {} / zeroized {} / live {}",
-        if saw(1, false, false) { "found" } else { "MISSED" },
-        if saw(2, false, true) { "found" } else { "MISSED" },
-        if hits.iter().any(|h| h.phase == 3) { "FLAGGED" } else { "clean" },
-        if saw(99, true, false) { "found" } else { "MISSED" },
+        if saw(1, false, false) {
+            "found"
+        } else {
+            "MISSED"
+        },
+        if saw(2, false, true) {
+            "found"
+        } else {
+            "MISSED"
+        },
+        if hits.iter().any(|h| h.phase == 3) {
+            "FLAGGED"
+        } else {
+            "clean"
+        },
+        if saw(99, true, false) {
+            "found"
+        } else {
+            "MISSED"
+        },
     );
     assert!(control, "the instrument failed its positive control");
 
@@ -439,6 +497,9 @@ fn main() {
     let (hits, overflow) = disarm();
     let phases = [&STORAGE_PHASES[..], &["reopen"]].concat();
     report.check("passphrase storage", &phases, &hits, overflow);
+
+    sealed_lock(&mut report, dir.path(), seed, &payload);
+    passphrase_lock(&mut report, dir.path(), seed, &payload);
 
     // The DPAPI-held AutoOs root, read back from disk.
     #[cfg(windows)]
@@ -470,10 +531,127 @@ fn main() {
 
     clear_canaries();
     if report.failures > 0 {
-        println!("no-residue: FAILED ({} scenario(s) left key residue)", report.failures);
+        println!(
+            "no-residue: FAILED ({} scenario(s) left key residue)",
+            report.failures
+        );
         std::process::exit(1);
     }
     println!("no-residue: ok");
+}
+
+/// A sealed vault, its root enrolled under a passphrase, opened and locked
+/// with everything allocated while armed; the live scan runs with the
+/// locked vault still alive.
+fn sealed_lock(report: &mut Report, root: &std::path::Path, seed: [u8; 32], payload: &[u8]) {
+    let dir = root.join("sealed-lock");
+    std::fs::create_dir_all(&dir).unwrap();
+    let key: [u8; 32] = canary_bytes(96);
+    personae::save_passphrase_root(dir.join(PASSPHRASE_ROOT_FILE), &key, b"lock").unwrap();
+    plant(2, &key, false);
+    arm();
+    phase(1);
+    let storage = SealedProfileStorage::open_with_key(&dir, key);
+    storage
+        .save_profile(&canary_profile(seed, payload))
+        .unwrap();
+    phase(2);
+    let mut vault = IdentityVault::open(storage, &ProfileId("work".into())).unwrap();
+    phase(3);
+    vault.lock().unwrap();
+    let (hits, overflow) = disarm();
+    report.check(
+        "sealed vault locked",
+        &["setup", "save", "open", "lock"],
+        &hits,
+        overflow,
+    );
+    vault.unlock(UnlockMethod::Passphrase(b"lock")).unwrap();
+    assert_eq!(vault.current_profile().unwrap().master.to_seed(), seed);
+    drop(vault);
+    with_state(|s| s.canaries[2] = None);
+}
+
+/// A passphrase vault reopened (Argon2 runs) and locked while armed. The
+/// test derives the same key and final block first, unarmed, to plant them.
+fn passphrase_lock(report: &mut Report, root: &std::path::Path, seed: [u8; 32], payload: &[u8]) {
+    let path = root.join("lock-vault.json");
+    PassphraseEncryptedStorage::open(&path, b"lock")
+        .unwrap()
+        .save_profile(&canary_profile(seed, payload))
+        .unwrap();
+    let file: serde_json::Value = serde_json::from_slice(&std::fs::read(&path).unwrap()).unwrap();
+    let salt: Vec<u8> = file["salt"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|b| b.as_u64().unwrap() as u8)
+        .collect();
+    let argon = argon2::Argon2::default();
+    let mut blocks = vec![argon2::Block::default(); argon.params().block_count()];
+    let mut kek = Zeroizing::new([0u8; 32]);
+    argon
+        .hash_password_into_with_memory(b"lock", &salt, kek.as_mut(), &mut blocks[..])
+        .unwrap();
+    let last: Vec<u8> = blocks.last().unwrap().as_ref()[..8]
+        .iter()
+        .flat_map(|word| word.to_le_bytes())
+        .collect();
+    drop(blocks);
+    plant(2, kek.as_ref(), false);
+    plant(3, &last, false);
+    arm();
+    phase(1);
+    let storage = PassphraseEncryptedStorage::open(&path, b"lock").unwrap();
+    phase(2);
+    let mut vault = IdentityVault::open(storage, &ProfileId("work".into())).unwrap();
+    phase(7);
+    vault
+        .remove_slot(&ProtocolKey::new("absent", None))
+        .unwrap();
+    vault
+        .add_slot(
+            ProtocolKey::new("second", None),
+            IdentitySlot::Direct {
+                kind: "second".into(),
+                payload: SecretBytes::new(vec![7; 8]),
+                lineage: CredentialLineage::LocallyDerived,
+                unlock_tier: UnlockTier::Session,
+            },
+        )
+        .unwrap();
+    phase(3);
+    vault.lock().unwrap();
+    phase(4);
+    vault
+        .storage()
+        .unlock(UnlockMethod::Passphrase(b"lock"))
+        .unwrap();
+    phase(6);
+    vault.unlock(UnlockMethod::Passphrase(b"lock")).unwrap();
+    phase(5);
+    vault.lock().unwrap();
+    let (hits, overflow) = disarm();
+    report.check(
+        "passphrase vault locked",
+        &[
+            "setup",
+            "open storage",
+            "open vault",
+            "lock",
+            "storage unlock",
+            "relock",
+            "vault unlock",
+            "save",
+        ],
+        &hits,
+        overflow,
+    );
+    drop(vault);
+    with_state(|s| {
+        s.canaries[2] = None;
+        s.canaries[3] = None;
+    });
 }
 
 #[cfg(feature = "agent")]
@@ -492,8 +670,7 @@ fn agent_listing(report: &mut Report, root: &std::path::Path, seed: [u8; 32], pa
         personae::ssh_slot::slot_for(&ssh, UnlockTier::Session).unwrap(),
     );
     drop(ssh);
-    let mut agent =
-        personae::agent::VaultAgent::new(IdentityVault::with_profile(storage, profile));
+    let mut agent = personae::agent::VaultAgent::new(IdentityVault::with_profile(storage, profile));
     arm();
     phase(1);
     {
