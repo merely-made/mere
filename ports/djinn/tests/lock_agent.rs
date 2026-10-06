@@ -7,10 +7,11 @@
 //! The vault lock's agent receipt (vault lock plan L2, rulings 8 and 9;
 //! harness plan H4): a real djinn resident on an isolated pipe, driven by
 //! the system's own OpenSSH tools. `ssh-add -x` locks the whole resident
-//! and its event file says so; while locked nothing is listed and sign,
-//! add and remove fail; `ssh-add -X` is refused. The status route reads
-//! unlocked at start; while locked it cannot be read at all (the app door
-//! admits sessions with a vault-derived key), which the run records.
+//! and its status route says so; while locked nothing is listed and sign,
+//! add and remove fail, and `ssh-add -X` is refused. `djinn --unlock`'s
+//! route then refuses a wrong passphrase and takes the right one, after
+//! which the same identities are listed and a signature verifies; locked
+//! again, the resident stops gracefully (rulings 40, 41, 46).
 //!
 //! ```text
 //! cargo test -p djinn --test lock_agent -- --ignored --nocapture
@@ -23,7 +24,10 @@ mod resident_harness;
 use std::path::{Path, PathBuf};
 use std::process::Output;
 
+use djinn::resident_status::{self, RESIDENT_APP, RESIDENT_CONTROL_ROUTE};
 use djinn_testkit::{Bound, verify};
+use graphshell::native::app_admission::{AppId, AppRouteId};
+use graphshell::native::app_client::AppBrokerClient;
 use resident_harness::*;
 use serde_json::json;
 
@@ -37,6 +41,17 @@ fn openssh(tool: &str) -> PathBuf {
         .join("System32")
         .join("OpenSSH")
         .join(format!("{tool}.exe"))
+}
+
+/// An identity line as `ssh-add -L` prints it, minus what is minted per
+/// listing: a certificate is fresh each time, so it is compared by type.
+fn key_of(line: &str) -> String {
+    let mut fields = line.split_whitespace();
+    let kind = fields.next().unwrap_or_default();
+    match kind.ends_with("-cert-v01@openssh.com") {
+        true => format!("{kind} (certificate)"),
+        false => format!("{kind} {}", fields.next().unwrap_or_default()),
+    }
 }
 
 fn text(output: &Output) -> String {
@@ -185,26 +200,14 @@ fn ssh_add_locks_the_resident_like_openssh_and_the_wire_unlock_is_refused() {
         text(&locked),
         locked.status.success() && text(&locked).contains("locked"),
     );
-    // The lock reaches the status as the event file sees it: the route
-    // itself cannot be read while locked, since the app door admits each
-    // session with a key derived from the vault (a finding, recorded).
-    let ((), waited) = run.wait_for("the event file records locked", STOP, || {
-        r.events()
-            .iter()
-            .any(|event| event.event == "locked")
-            .then_some(())
+    // H4's first condition: the status route, read through the door's kept
+    // keys while the vault is locked (rulings 40, 46).
+    let (status, waited) = run.wait_for("the status route reports locked", STOP, || {
+        r.status().filter(|status| status.lock == "locked")
     });
     run.step(
-        "locked event",
-        json!({ "waited_ms": waited.as_millis() as u64 }),
-    );
-    let unreadable = r.status();
-    run.step(
-        "finding: the status route while locked",
-        json!({
-            "readable": unreadable.is_some(),
-            "why": "the app door's session admission derives its delegation signer from the vault",
-        }),
+        "status locked",
+        json!({ "waited_ms": waited.as_millis() as u64, "lock": status.lock }),
     );
 
     // Locked: OpenSSH's behaviour.
@@ -261,26 +264,112 @@ fn ssh_add_locks_the_resident_like_openssh_and_the_wire_unlock_is_refused() {
         );
     }
     let still_empty = r.ssh_client(&add, &["-L"], b"").unwrap();
-    let events: Vec<String> = r.events().into_iter().map(|e| e.event).collect();
+    let still = r.status().expect("the status route answers while locked");
     run.require(
-        "after -X the resident is still locked and lists nothing; the event file \
-         records one lock and no unlock",
+        "after -X the resident is still locked and lists nothing",
         Bound::State,
-        json!({
-            "events": ["started", "listening", "ready", "locked"],
-            "listed": "no identities",
-        }),
-        json!({ "events": events, "listed": text(&still_empty) }),
-        events == ["started", "listening", "ready", "locked"]
-            && text(&still_empty).contains("no identities"),
+        json!({ "lock": "locked", "listed": "no identities" }),
+        json!({ "lock": still.lock, "listed": text(&still_empty) }),
+        still.lock == "locked" && text(&still_empty).contains("no identities"),
     );
 
-    // The stop intent rides the same door, so a locked resident is killed.
-    run.step(
-        "finding: no graceful stop while locked",
-        json!({ "why": "resident-control-v1 needs an admitted app session" }),
+    // `djinn --unlock` (ruling 41): the passphrase on the owner-only control
+    // route. The seam: this test calls `request_unlock`, which `--unlock`
+    // calls once the terminal has the passphrase; only the read is skipped.
+    let runtime = tokio::runtime::Runtime::new().unwrap();
+    let unlock = |passphrase: &[u8]| {
+        runtime.block_on(async {
+            let mut client = AppBrokerClient::open_route_at(
+                &r.endpoint("app"),
+                AppId::new(RESIDENT_APP),
+                AppRouteId::new(RESIDENT_CONTROL_ROUTE).unwrap(),
+            )
+            .await
+            .map_err(|error| error.to_string())?;
+            let answer = resident_status::request_unlock(&mut client, passphrase).await;
+            let _ = client.close().await;
+            answer.map_err(|error| error.to_string())
+        })
+    };
+    let wrong = unlock(b"not the passphrase");
+    let after_wrong = r.status().expect("the status route answers");
+    run.require(
+        "djinn --unlock with a wrong passphrase leaves it locked",
+        Bound::State,
+        json!({ "refused": true, "lock": "locked" }),
+        json!({ "answer": format!("{wrong:?}"), "lock": after_wrong.lock }),
+        wrong.is_err() && after_wrong.lock == "locked",
     );
-    r.kill();
+    let right = unlock(PASSPHRASE.as_bytes());
+    let (opened, _) = run.wait_for("the status route reports unlocked", STOP, || {
+        r.status().filter(|status| status.lock == "unlocked")
+    });
+    run.require(
+        "djinn --unlock with the right passphrase unlocks",
+        Bound::State,
+        json!({ "answer": "Ok(())", "lock": "unlocked" }),
+        json!({ "answer": format!("{right:?}"), "lock": opened.lock }),
+        right.is_ok() && opened.lock == "unlocked",
+    );
+    let relisted = r.ssh_client(&add, &["-L"], b"").unwrap();
+    let relisted_text = String::from_utf8_lossy(&relisted.stdout).into_owned();
+    run.require(
+        "after the unlock ssh-add -L lists the same identities",
+        Bound::State,
+        listed_text.lines().map(key_of).collect::<Vec<_>>(),
+        relisted_text.lines().map(key_of).collect::<Vec<_>>(),
+        relisted.status.success()
+            && relisted_text.lines().map(key_of).collect::<Vec<_>>()
+                == listed_text.lines().map(key_of).collect::<Vec<_>>(),
+    );
+    let resigned = sign(&r);
+    let rechecked = r
+        .ssh_client(
+            &keygen,
+            &[
+                "-Y",
+                "check-novalidate",
+                "-n",
+                NAMESPACE,
+                "-s",
+                &keys.join("message.txt.sig").display().to_string(),
+            ],
+            &std::fs::read(&message).unwrap(),
+        )
+        .unwrap();
+    run.require(
+        "after the unlock a signature through the agent verifies",
+        Bound::State,
+        "exit 0, Good signature",
+        format!("{} | {}", text(&resigned), text(&rechecked)),
+        resigned.status.success() && text(&rechecked).contains("Good"),
+    );
+
+    // Locked again, then the graceful stop (ruling 40: the stop route too).
+    let relocked = with_askpass(&unused, &["-x"]);
+    let (locked_again, _) = run.wait_for("the status route reports locked again", STOP, || {
+        r.status().filter(|status| status.lock == "locked")
+    });
+    run.require(
+        "ssh-add -x locks it again",
+        Bound::State,
+        json!({ "exit": 0, "lock": "locked" }),
+        json!({ "exit": relocked.status.code(), "lock": locked_again.lock }),
+        relocked.status.success() && locked_again.lock == "locked",
+    );
+    drop(runtime);
+    r.stop(STOP);
+    let events: Vec<String> = r.events().into_iter().map(|e| e.event).collect();
+    let expected = [
+        "started", "listening", "ready", "locked", "unlocked", "locked", "stopping", "stopped",
+    ];
+    run.require(
+        "the event file runs the lock, the unlock, the relock and the stop",
+        Bound::State,
+        expected,
+        &events,
+        events == expected,
+    );
     let receipt = run.finish();
     let checked = verify(&dir).unwrap();
     assert!(
