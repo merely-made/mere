@@ -50,6 +50,29 @@ const MAX_SHORT_TTL_SECONDS: u32 = 24 * 60 * 60;
 #[cfg(windows)]
 pub const STANDARD_WINDOWS_AGENT_ENDPOINT: &str = r"\\.\pipe\openssh-ssh-agent";
 
+/// Whether `endpoint` is this user's `SSH_AUTH_SOCK`.
+#[cfg(not(windows))]
+fn is_standard_unix_agent(endpoint: &str) -> bool {
+    same_socket(endpoint, std::env::var_os("SSH_AUTH_SOCK").as_deref())
+}
+
+/// The same path, or the same file once links resolve.
+#[cfg(any(not(windows), test))]
+fn same_socket(endpoint: &str, standard: Option<&std::ffi::OsStr>) -> bool {
+    let Some(standard) = standard.filter(|s| !s.is_empty()) else {
+        return false;
+    };
+    let (endpoint, standard) = (
+        std::path::Path::new(endpoint),
+        std::path::Path::new(standard),
+    );
+    endpoint == standard
+        || matches!(
+            (endpoint.canonicalize(), standard.canonicalize()),
+            (Ok(a), Ok(b)) if a == b
+        )
+}
+
 /// Rejected Graphshell identity action.
 #[derive(Debug, thiserror::Error)]
 pub enum IdentityIntentError {
@@ -239,6 +262,9 @@ impl<S: IdentityStorage + 'static> PersonaeHost<S> {
     }
 
     /// Bind an isolated Unix socket for acceptance testing.
+    ///
+    /// The user's own `SSH_AUTH_SOCK` is refused, as the OpenSSH pipe is on
+    /// Windows: it belongs to the agent the user already runs.
     #[cfg(not(windows))]
     pub fn bind_receipt_listener(
         &self,
@@ -248,6 +274,12 @@ impl<S: IdentityStorage + 'static> PersonaeHost<S> {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::InvalidInput,
                 "the receipt SSH agent socket path is empty",
+            ));
+        }
+        if is_standard_unix_agent(endpoint) {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::PermissionDenied,
+                "receipt listener cannot bind the standard SSH agent endpoint",
             ));
         }
         let listener = tokio::net::UnixListener::bind(endpoint)?;
@@ -755,6 +787,24 @@ mod tests {
     use ssh_key::{Algorithm, LineEnding};
 
     use super::*;
+
+    /// The Unix receipt wall: the user's `SSH_AUTH_SOCK`, by path or by a
+    /// link to it, is the standard endpoint; any other socket is not.
+    #[test]
+    fn the_users_agent_socket_is_the_standard_endpoint() {
+        let dir = tempfile::tempdir().unwrap();
+        let sock = dir.path().join("agent.sock");
+        std::fs::write(&sock, b"").unwrap();
+        let standard = Some(sock.as_os_str());
+        assert!(same_socket(&sock.display().to_string(), standard));
+        assert!(!same_socket(
+            &dir.path().join("receipt.sock").display().to_string(),
+            standard
+        ));
+        assert!(!same_socket(&sock.display().to_string(), None));
+        let dotted = dir.path().join(".").join("agent.sock");
+        assert!(same_socket(&dotted.display().to_string(), standard));
+    }
 
     #[test]
     fn snapshot_discloses_public_ssh_material_but_not_the_private_slot() {
