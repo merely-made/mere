@@ -1745,6 +1745,18 @@ can wait for S16.
   - (b) remove the worktree and delete the branch;
   - (c) keep the branch as archaeology and remove only the worktree.
 
+*Ruled 2026-10-06:* Mark: **"Remove both"** (against keeping the branch and
+dropping only the worktree, or leaving both). Done the same day:
+- the worktree `Code/worktrees/mere-burn-pre3` was removed. Its 11
+  uncommitted paths were all pre.3 manifest pins, which pre.4 on main
+  supersedes, and it had been untouched since 2026-09-16;
+- branch `burn-pre3-repin` was deleted. It was at `610a32c5`, and its four
+  commits are `276608d5`, `e1c0cb44`, `31102555` and `610a32c5`.
+
+The scratch evidence this plan cites (`C:	\mere-burn-pre3-*`) is kept. Also on
+2026-10-06, Burn 0.22.0 stable (18:46Z) and CubeCL 0.11.0 (15:59Z) were
+published. The step from pre.4 to 0.22.0 is assessed before anything moves.
+
   This pass decides none of them.
 - **S0-9. Network during execution.** Every pre.4 burn, cubecl and cubek crate
   is already cached, and so is the 0.2.122 CLI; a nested workspace may still

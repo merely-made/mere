@@ -65,6 +65,12 @@ and seiche keeps two generators (`emitter.rs`, `laws/mod.rs`).
   arc by default. Mark then asked to hear more about the two before they are
   built.
 
+*Ruled 2026-10-06, after the coordinator described the two:* the rotation
+modes are **"Short arc, as authored, clockwise and counter"**. Each
+`TransitionSpec` takes Short arc (the default), As authored (today's linear
+interpolation, for spins and data-driven sweeps), Clockwise or
+Counter-clockwise.
+
 ## 2. What the review reads for
 
 The six slices named when the question was put:

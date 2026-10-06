@@ -330,6 +330,14 @@ when S16 merged the pre.4 branch at `cec0b3a4` under ruling 557, "Promote,
 then handoffs" (burn migration plan §13.44). Whether that is the acceptance
 ruling 363 waits for is not recorded here.
 
+*Ruled 2026-10-06:* asked whether ruling 557's promotion, together with Knot's
+and djinn's repins onto pre.4, counts as 363's acceptance (options: yes; no,
+not until Isometry repins; ask the wing session), Mark answered **"Yes,
+however, 0.22 also dropped today."** *Follows:* T2's pre.4 condition is met. T2
+still needs its own lane and Isometry's pin. Burn 0.22.0 stable was published
+2026-10-06T18:46Z and CubeCL 0.11.0 at 15:59Z (crates.io), so the next Burn
+step is pre.4 → 0.22.0, which goes to Mark as its own assessment (burn plan).
+
 1. **Nisus becomes the voxel world store** (330): a chunk map, world
    revision, revision log and additive writes extend its revision-gated
    chunk patches. `Ground` becomes a thin product layer over that store or
