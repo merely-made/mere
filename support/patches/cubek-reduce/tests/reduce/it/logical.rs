@@ -91,7 +91,7 @@ fn reduce_mask(config: ReduceOperationConfig) -> Vec<f32> {
                 HostDataVec::F32(values) => values,
                 other => panic!("expected f32 output, got {other:?}"),
             }
-        }
+        },
         ExecutionOutcome::CompileError(e) => panic!("compile error: {e}"),
     }
 }

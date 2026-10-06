@@ -17,7 +17,9 @@ path = "lib.rs"
 bench = false
 
 [features]
-default = ["livery", "reader", "netfetch"]
+default = ["livery", "reader", "netfetch", "image-decode"]
+# Forwards genet-livery's image decoding (mer3ly Ruling 111); on by default.
+image-decode = ["genet-livery?/image-decode", "genet-render?/image-decode", "genet-documents?/image-decode", "genet-scripted?/image-decode"]
 # Engine-neutral headed presentation. Both engines can produce a `Scene`; this
 # feature owns only the winit/wgpu shell that presents one.
 present = [
