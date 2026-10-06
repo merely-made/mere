@@ -5,11 +5,18 @@ Three disposable probes for lane R3 of the
 Native Windows x86_64, `rustc 1.97.1 (8bab26f4f 2026-07-14)`. Real netfetcher at
 genet `5ae30cad` (the revision mere, woodshed and turnstone all pin; unchanged
 at genet HEAD `9976945058b`), real `iroh-blobs` 0.103.0 (mere-transport's pin),
-real ureq 3.4 as `ports/redshank/Cargo.toml` declares it. Every server is an
+real ureq 3.4 as `ports/redshank/Cargo.toml` *(historical citation)* <!-- doc-audit: historical-path --> declares it. Every server is an
 in-process loopback HTTP server: **no TLS, no real network, no Redshank or
 Turnstone code in the loop.** Each `src` is the regression manifest; logs are
 beside it. To replay, run Cargo on each manifest with `--locked` from outside
 any workspace, with its own target directory.
+
+**Noted 2026-10-06 (S14 pass):** three later changes. Woodshed `fdc5980`, 22
+minutes after this receipt, moved Redshank onto one shared agent (the side
+finding under R3-C); Woodshed `bf5923d` (2026-09-22) moved it onto Mere's fetch
+handle, so Redshank no longer declares ureq. Mere now pins genet `bd3e8861`.
+The Redshank manifest cited above is Woodshed's
+(`woodshed/ports/redshank/Cargo.toml`), not Mere's.
 
 ## R3-A, ranged read on a persona-scoped context: 6 of 6 pass
 

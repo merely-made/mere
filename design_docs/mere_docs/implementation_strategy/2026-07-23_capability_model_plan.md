@@ -1,6 +1,6 @@
 # Capability Model Plan
 
-**Status:** completed round: typed delegation, revocation, Moot authorization, peer use, and the D3b extraction landed; later consumer-driven extensions remain separate work.
+**Status (2026-10-06):** completed round. Typed delegation, revocation, Moot authorization and peer use landed 2026-07-24. The D3b leaf extraction (`mere-capability`) landed 2026-08-18 and was folded back into servitor on 2026-09-23 (`5335a869`), so the algebra now lives in `crates/servitor/src/cap.rs`; delegation statements and their checks moved from personae to insigne on 2026-09-24 (`5364dfa0`). Open: follow-on 2 (sub-delegation) only, gated on and tracked in the [remote projection host plan](2026-07-22_graphshell_remote_projection_host_plan.md); later consumer-driven extensions remain separate work.
 
 Servitor's authority layer, from stringly prefixes to a typed capability with
 a partial order, plus the three things that order makes possible: attenuation,
@@ -110,6 +110,10 @@ duplicates personae's. It was written without grepping for an existing
 implementation, against this repo's own standing rule (check existing crates
 first; extend, don't duplicate). The correction is F5's ruling below.
 
+**Corrected 2026-10-06 (S14 pass):** the grammar F5 found has since split. In
+`5364dfa0` (2026-09-24) the statement and verification types moved to insigne
+(`crates/dramatis/insigne/src/delegation.rs`); personae keeps only issuing.
+
 ### F4. `Mode::Delegate` is inert because the order does not exist
 
 `Delegate` is defined, ordered above `Write`, and nothing delegates. It cannot:
@@ -215,6 +219,14 @@ two-dimensional `(path_prefix, actions)`:
 | --- | --- | --- |
 | `Cap::Power("navigate")` at `Write` | `power/navigate` | `{read, write}` |
 | `Cap::Scope("scenario/a")` at `Read` | `scope/scenario/a` | `{read}` |
+
+**Corrected 2026-10-06 (S14 pass):** personae no longer owns all of the
+delegation machinery. Since `5364dfa0` (2026-09-24) the statements and their
+checks (`SignedDelegationCertificate`, `DelegationRevocation`, chain
+verification) live in insigne, `crates/dramatis/insigne/src/delegation.rs`;
+personae keeps issuing, which needs a persona's keys, and servitor depends on
+insigne with its `verify` feature. Read "personae" in this section as insigne
+for statements and checks.
 
 Both halves of the order survive the encoding, which is why this is a view and
 not a lossy mapping:
@@ -626,6 +638,13 @@ are not lost, ordered by how much they matter.
   keep their API while gemot now depends on the leaf directly. Gemot's
   `MootAuthorizationProvider` remains its L2 membership/policy input seam; it
   no longer implies a second capability algebra.
+
+  **Corrected 2026-10-06 (S14 pass):** the leaf did not last. `5335a869`
+  (2026-09-23) folded `mere-capability` back into servitor, deleting
+  `crates/capability` *(historical citation)* <!-- doc-audit: historical-path --> and gemot's dependency on it. The algebra, `FacetNamespace`
+  and `Cap::Facet` included, is defined in `crates/servitor/src/cap.rs`;
+  `servitor::grant` re-exports `Mode` from it, and gemot imports
+  `servitor::cap::{Cap, Mode}` through its servitor dependency.
 - **`Cap::Facet` is the third structural kind.** Its wire form is
   `facet:<dot.namespace>`; coverage is dot-segment prefix, so `web.` covers
   `web.viewer` but not `website.viewer` or `denizen.binding`, and cross-kind
@@ -641,3 +660,12 @@ are not lost, ordered by how much they matter.
   54/54, gemot 112/112 (including typed authorization 9/9), Turnstone's focused
   signed-install / uninstall-revocation test 1/1, and touched-package Clippy
   with warnings denied.
+
+### 2026-10-06
+
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  `support/doc-audit/d2/batch_42_s14_phase_b4.md`: the status line, F5, D3b
+  and the 2026-08-18 entry now record the leaf's fold back into servitor
+  (`5335a869`) and the move of delegation statements and checks to insigne
+  (`5364dfa0`).

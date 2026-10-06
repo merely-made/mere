@@ -1,7 +1,7 @@
 # Reachability Rungs and Privacy Lanes
 
 **Date:** 2026-08-03
-**Status:** R0 landed, recorded 2026-09-01; R1 landed 2026-08-03 (Graphshell) and 2026-08-06 (Knot), the genuinely remote receipt still open; R2 scoped; R3 scoped, gated on emissary entering the tree. Veilid retired 2026-09-01.
+**Status (2026-10-06):** R0 landed, recorded 2026-09-01, with one fork pin left since `a5543904` (2026-10-03); R1 landed 2026-08-03 (Graphshell) and 2026-08-06 (Knot), the genuinely remote receipt still open; R2 scoped, its premise of authenticated announce app data overtaken (the announce now sends none); R3's Noise in-stream plane landed 2026-08-06 (`crates/murm/transport/src/noise.rs`), while its emissary and Arti lanes remain scoped, emissary gated on entering the tree. Veilid retired 2026-09-01.
 **Depends on:** the S1 findings recorded in the
 [reference host plan](2026-07-27_graphshell_reference_host_plan.md) H6 addendum;
 the retinue lane in `mere-transport` (feature-gated, trusted-mesh only until
@@ -89,6 +89,13 @@ configures discovery through this type, not the builder.
   peer on macOS must ship as a signed app carrying the local-network usage
   declaration. The pin is harmless and fixes nothing; drop it at the next
   revisit.
+
+**Corrected 2026-10-06 (S14 pass):** one fork is pinned now, not two.
+`a5543904` (2026-10-03, after this plan's last edit) removed the
+`iroh-mdns-address-lookup` pin; the root `Cargo.toml` block is headed "LAN
+peer discovery (H10): one dead theory" and pins only `swarm-discovery`. The
+p2panda fork tag is `mere-p2panda-net-0.7.5`, not the 0.7.4 the 2026-10-02
+correction above cites.
 
 **The client-side race**, fixed in `g5_peer` and inherited by every host:
 p2panda builds the endpoint and its mDNS actor lazily on the first dial and
@@ -246,6 +253,18 @@ data to carry the relay-tagged iroh `EndpointAddr`. Three properties fall out:
 - **No new trust surface:** the hint rides inside the binding the announce
   already signs, so a forged address claim fails existing verification.
 
+**Corrected 2026-10-06 (S14 pass):** the premise above contradicts this
+section's own 2026-10-02 correction and the tree: `build_app_data` in
+`reticulum_transport/announce.rs` (lines 38-51) returns empty app data, so
+there is no authenticated app-data binding left to extend; the signed Retinue
+identity carries the Mere key instead.
+
+**Open, raised by the S14 pass (2026-10-06):** does R2's design need
+reopening now that the announce carries no app data? Options: reopen R2 and
+decide where the hint rides (a marker in the announce with the full hint
+fetched over the link, or app data reintroduced within the 255-byte frame);
+keep R2 as written and settle it under the open design point below.
+
 Open design point, to settle before building: a serialized relay-tagged
 `EndpointAddr` is roughly 150-200 bytes, fine on TCP and tight on LoRa
 airtime. Either RF announces carry a minimal marker with the full hint
@@ -321,6 +340,12 @@ Not done, and not needed yet: Noise over iroh *datagrams* (the low-latency
 composition), and pre-shared-key or `Noise_KK`/`Noise_IK` patterns for
 capability-scoped sessions. `XX` is the right default while both ends are ours.
 
+**Open, raised by the S14 pass (2026-10-06):** is Noise R3 progress or its own
+lane? It landed 2026-08-06 while R3's status line still read "scoped, gated on
+emissary". Options: count it as R3 progress, as the status line now does; give
+the in-stream plane its own rung or lane, separate from the privacy lanes'
+emissary gate.
+
 **Arti (clearnet plane, later).** The Tor Project's own Rust rewrite:
 library-first, client and onion-service support solid, relay mode incomplete.
 Consumer posture is correct here, the opposite of emissary: Tor's network is
@@ -376,3 +401,13 @@ the tree as a dependency; it does not block R1 or R2.
 - R0 section added; status line corrected; Findings and Progress sections
   added per DOC_POLICY §8; Veilid entry added to Not in scope. Survey §4,
   reference host H10 and Djinn F3 now point here.
+
+### 2026-10-06
+
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  `support/doc-audit/d2/batch_42_s14_phase_b4.md`: the status records R3's
+  Noise landing and R2's overtaken premise; R0's fork list is corrected to the
+  one remaining pin (`a5543904`) and the 0.7.5 p2panda tag; R2's premise is
+  annotated against the empty announce app data; two forks (Noise's lane,
+  R2's reopening) are written in.

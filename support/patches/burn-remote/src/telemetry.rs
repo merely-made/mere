@@ -304,7 +304,7 @@ impl TelemetryEvent {
                     inputs,
                     outputs,
                 }
-            }
+            },
         }
     }
 
@@ -337,6 +337,7 @@ impl TelemetryEvent {
     }
 }
 
+#[cfg(any(feature = "client", feature = "server"))]
 pub(crate) const CHANNEL_CAPACITY: usize = 4096;
 
 /// Cloneable handle a worker emits into. Inert until a [`TelemetrySubscription`] is attached.
@@ -462,7 +463,7 @@ impl TrafficAggregator {
                         ops: ops.len() as u64,
                     },
                 );
-            }
+            },
             TelemetryEvent::GraphExecuted {
                 graph,
                 bindings_bytes,
@@ -473,16 +474,16 @@ impl TrafficAggregator {
                     self.fused_ops += cost.ops;
                 }
                 self.actual += *bindings_bytes as u64;
-            }
+            },
             TelemetryEvent::Op { kind, .. } => {
                 self.unfused_ops += 1;
                 *self.unfused_by_kind.entry(*kind).or_default() += 1;
-            }
+            },
             TelemetryEvent::TensorDropped { .. } => {
                 self.unfused_ops += 1;
                 *self.unfused_by_kind.entry(OpClass::Drop).or_default() += 1;
-            }
-            _ => {}
+            },
+            _ => {},
         }
     }
 

@@ -1,16 +1,17 @@
 # Smolweb Host Integration Plan — the genet native lane in meerkat
 
 **Date**: 2026-06-28
-**Status:** **P1–P3 landed 2026-06-28** (reconciled 2026-07-01; genet `1bbbfdb`, `0b7ca87`,
-`5c07ad5`; mere `476880b`, `0dd0c3e`, `3eed418`, `8dc3683`) — render, theme, scroll,
-link nav all wired, but **compile-verified only, no headed run yet**. The 2026-07-01
-review left open items (see Open questions): theme hard-coded to `App` against the
-settled Site-default design, band-scroll cadence untested, and the trust-posture gap
-(owned by the smolweb fidelity plan's Workstream 2). P4 optional, unstarted.
-Separately, the scripted-live follow-on's `ResourceFetcher` trait mismatch at
-`content/actor.rs:33` was **fixed 2026-07-01** (render-ladder plan's lane — see its
-progress log; `--features scripted` now compiles, 5/5 tests). The smolweb feature
-itself builds green.
+**Status (2026-10-06):** historical. P1–P3 and the scripted-live follow-on
+landed in meerkat (mere `476880b`, `0dd0c3e`, `3eed418`, `8dc3683`, `737e0cd`,
+every one dated 2026-07-01, compile-verified only), retired with it 2026-07-18
+(`c5f01064`), which deleted `content/handlers.rs` and `content/actor.rs`.
+Surviving library parts: the genet side (`1bbbfdb`, `0b7ca87`, `5c07ad5`,
+`1856486`, `5f50134`, all on genet main). Open: nothing carried forward. The
+2026-07-01 review's App-theme and band-scroll items and P4 lost their host in
+`c5f01064`; Turnstone's eight engine-native smolweb lanes use
+`SmolwebTheme::default()`, which is `Site`, the settled design, and its Reader
+and Micron lanes use `SmolwebTheme::System`. The trust-posture gap belongs to
+the smolweb fidelity plan's Workstream 2.
 
 > **Historical note (2026-09-05):** This is a Meerkat integration receipt. Its
 > phase and path names preserve the landed context, but do not establish current
@@ -219,3 +220,4 @@ later).
   scripted` compiles, 5/5 scripted tests pass. The smolweb lane was never affected;
   theme remains hard-coded to `SmolwebTheme::App` (`content/handlers.rs:185`),
   confirming the open-question review item.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at mere 535bca11, from the D2 record in support/doc-audit/d2/batch_41_s14_phase_b3.md: the historical note folded into a dated status recording P1–P3 as landed in meerkat (commits dated 2026-07-01) and retired with it (`c5f01064`), with the review's open items not carried forward.

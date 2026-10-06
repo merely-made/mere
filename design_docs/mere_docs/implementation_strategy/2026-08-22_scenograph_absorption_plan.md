@@ -1,6 +1,6 @@
 # Scenograph Absorption Plan
 
-*Written before the 2026-09-05 retirement of graphlet (TERMINOLOGY.md): read graphlet as subgraph. Identifiers such as GraphletId, GraphletRef, and SessionGraphlets are now SubgraphId, SubgraphRef, and SessionSubgraphs, and the graphlets crate is crates/graph/subgraph (code renamed 2026-09-12).*
+*Written before the 2026-09-05 retirement of graphlet (TERMINOLOGY.md): read graphlet as subgraph. Identifiers such as GraphletId, GraphletRef, and SessionGraphlets are now SubgraphId, SubgraphRef, and SessionSubgraphs, and the graphlets crate became crates/graph/subgraph (code renamed 2026-09-12), since folded into mere as `crates/mere/src/subgraph.rs` (`61894570`, 2026-09-23).*
 
 **Date:** 2026-08-22
 **Status:** complete — S1–S7 landed; `arrangements` is deleted and `mer3ly`
@@ -492,6 +492,10 @@ must be repinned once mere is pushed. A gitignored
 `mer3ly/.cargo/config.toml` resolves them to the local working copy in the
 meantime, the same mechanism mere uses for its own git siblings.
 
+**Corrected 2026-10-06 (S14 pass):** done since. As the status line records,
+`mer3ly` `54fd8e2` repinned to mere `330eee98`, and `mer3ly` now pins mere
+`d82afa17`.
+
 The other consumers (`retinue/signalman-desktop`, `mesocosm`,
 `woodshed-core`, `turnstone`, `cleromancy`) take `sceno`/`scenomise`/
 `scenotime`/`seiche` and never touched `arrangements`, so none needs a source
@@ -499,6 +503,11 @@ change. **`SCORE_VERSION` 4 still applies to them**: a stored v3 score loads
 with the three disclosure fields defaulted to absent, which
 `v3_score_loads_with_disclosure_fields_absent` proves, but each repo's pin
 should be bumped deliberately rather than drifting.
+
+**Corrected 2026-10-06 (S14 pass):** the score format has moved on. At mere
+`535bca11` it is `SCORE_VERSION: u16 = 5`
+(`crates/cambium/scenes/sceno/src/score.rs`, line 42), bumped in `4d602ad3`
+(2026-10-04).
 
 ## Out of scope
 
@@ -510,3 +519,11 @@ should be bumped deliberately rather than drifting.
   at swatch tier, with their own pan/zoom projection. Mere does not consume
   it — only `AnyView`, the caret types, and persona-picker widgets —
   `woodshed-views` does. Untouched here.
+
+## Progress
+
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_43_s14_phase_b5.md: dated notes on Score 5
+  (`4d602ad3`) and on `mer3ly`'s repin, and the subgraph banner pointed at
+  `crates/mere/src/subgraph.rs`.

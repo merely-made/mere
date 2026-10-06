@@ -1,9 +1,16 @@
 # Intelligence-Tier Vector Index: the burn lift (and HNSW alternative)
 
 **Date**: 2026-07-06
-**Status**: scoped, not started. A cross-cutting scaling investment surfaced by the
-Lane 5 P5 wiring; deliberately its own plan because it lifts three consumers at
-once, not just arrangement.
+**Status (2026-10-06):** P1 to P3's library half landed; consumer routing not wired; P4
+deferred. P1's batched-cosine kernel with ndarray and wgpu parity landed in `bb1b1608`
+(2026-07-08). P2's crossover was measured in `98111f60` (2026-07-08) and is recorded as
+`AFFINITY_GPU_MIN_ENTRIES` = 1024 and `SEARCH_GPU_MIN_ENTRIES` = 4096 (index_burn.rs:39,43).
+P3's keyed accelerators `nearest_over_index` and `affinity_pairs_over_index` landed in
+`c6ab781b` (2026-07-08; index_burn.rs:113,144). The code is in
+`crates/intel/esp/src/embed/index_burn.rs`, behind esp's `index-burn` / `index-burn-wgpu`
+features. Open: no crate enables `index-burn` and nothing outside index_burn.rs calls the
+accelerators, so affinity, recall and canvas search do not yet route to them (the first
+done condition; see P3). P4 (HNSW) stays deferred.
 **Related**: [burn_utilization_brief](../research/2026-07-04_burn_utilization_brief.md)
 (Lane 1 GPU findings, Lane 5 force pass), [orrery_graph_intelligence_plan](2026-07-06_orrery_graph_intelligence_plan.md)
 (where the O(N²) affinity scan lives), `crates/intel/embed/src/index.rs` *(historical citation)* <!-- doc-audit: historical-path --> (the flat
@@ -26,6 +33,11 @@ an actor" note:
    exact program with a different reduction (dot / norms instead of inverse-square).
    So the affinity signal is not stuck at CPU `O(N²)`; it can be a burn kernel that
    already has a proven sibling in the codebase.
+
+   **Corrected 2026-10-06 (S14 pass):** `aether` was renamed `quint` in `5b91b2ea`
+   (2026-07-09), and quint was folded into its owners in `eae87153`. The sibling kernel,
+   here and in Path A's "sibling to `aether::forces`", is now `repulsion` in
+   `crates/conatus/seiche/src/tensor_forces.rs` (l.104).
 2. **The flat index is a shared ceiling, not an arrangement-only one.** The same
    `embed::index::VectorIndex` backs:
    - **arrangement** (`affinity_pairs`, this session),
@@ -88,6 +100,17 @@ are different crossovers and both matter.
 `canvas_search` (query field) each gain the burn fast-path above their measured N,
 behind the feature. Default build unchanged.
 
+**Corrected 2026-10-06 (S14 pass):** P3 landed only its library half: the keyed
+accelerators and the routing constants (`c6ab781b`, whose message says "Routing is the
+caller's one-line check"). At mere 535bca11 only esp defines `index-burn`
+(`crates/intel/esp/Cargo.toml`, l.80-81), no crate enables it, and nothing outside
+index_burn.rs calls the accelerators, so none of the three consumers routes yet.
+
+**Open, raised by the S14 pass (2026-10-06):** is Path A closed? Options: treat it as
+closed, since the accelerators and constants exist and routing is each caller's one-line
+check (the stance `c6ab781b` takes); keep P3 open until affinity, recall and canvas search
+actually route above their crossovers.
+
 ### P4 (optional / later) — HNSW for the tail
 Only if a real corpus makes the GPU `O(N²)` sweep the wrong shape. Pure-Rust, all
 targets, the browser answer.
@@ -114,4 +137,12 @@ targets, the browser answer.
 - **Browser target.** GPU compute in the browser is the least-certain leg (Lane 1's
   wasm-embed receipt is a named follow-on). Path B (HNSW, CPU) is the portable floor
   there.
-```
+
+## Progress
+
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at mere
+  535bca11, from the D2 record in support/doc-audit/d2/batch_46_s14_phase_b8.md: the
+  status records P1 (`bb1b1608`), P2 (`98111f60`) and P3's accelerators (`c6ab781b`) as
+  landed with consumer routing not wired, the `aether::forces::repulsion` citation is
+  repointed to seiche, P3's routing is left as an open question, and a stray closing code
+  fence is removed.

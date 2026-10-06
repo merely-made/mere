@@ -36,6 +36,11 @@ Two reasons this earns a kernel rather than a footnote:
 - `sim = queries · corpusᵀ` — one matmul, `[Q,N]`, the heavy `O(Q·N·d)` work.
 - Read back `[Q,N]` and take each query's top-k on the CPU (cheap `O(N)` per row).
 
+**Corrected 2026-10-06 (S14 pass):** the backend generic is gone. The Burn 0.22
+migration (`6ce399ea`, 2026-08-20, after the 2026-08-09 move) changed these
+entry points to take `device: &Device` with no `B` parameter
+(`crates/intel/esp/src/embed/index_burn.rs`, lines 53, 113 and 144).
+
 Deliberately uses only proven burn idioms (`matmul`, `swap_dims`, element-wise
 square, `sum_dim`, `sqrt`, `recip`, f32 readback) — **no `topk`, no Int-tensor
 readback** — so it is identical across the ndarray and wgpu backends without the
@@ -68,6 +73,11 @@ ndarray↔wgpu parity test gated on `index-burn-wgpu`.
     -responsibility functions compose cleanly, and the caller can override the
     threshold. When mere / Isometry adopt sibylla they enable `index-burn(-wgpu)`
     and route large graphs to these; nothing couples the pure facade to burn.
+
+**Corrected 2026-10-06 (S14 pass):** `nearest_over_index` and
+`affinity_pairs_over_index` no longer take a backend parameter `B`; since the
+Burn 0.22 migration (`6ce399ea`) they take `device: &Device`, as the
+correction under P1 records.
 
 ## Findings
 
@@ -117,3 +127,11 @@ default below those and when the feature is off.
   top-k returning only `[Q,k]` would shrink it — a refinement, not P1.
 - **Small N is fine on CPU.** This is a scaling lever; sequence P3 when a consumer
   actually pushes `N` up, not speculatively.
+
+## Progress
+
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_47_s14_phase_b9.md: the P1 and P3 signatures
+  noted as no longer generic over a backend since the Burn 0.22 migration
+  (`6ce399ea`).

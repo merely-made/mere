@@ -1,6 +1,15 @@
 # Family Repo Merges Plan (eidetic + conatus)
 
-**Status:** P1-P3 and the `mere-eidetic` publish follow-on landed; donor GitHub archiving and later published-metadata refreshes remain pending.
+**Status (2026-10-06):** superseded by the
+[repo consolidation plan](2026-07-23_repo_consolidation_plan.md). P1–P3
+landed 2026-07-21 and the `mere-eidetic` rename and publish 2026-07-22; then
+`6a37de6b` (2026-07-23, "Absorb nine component families into mere") made every
+family crate a mere workspace path dependency, and `ca798151` (2026-09-18)
+reversed the rename, so `crates/eidetic/eidetic-core/Cargo.toml` names the
+package `eidetic` again. The P4 metadata follow-on is retired: the family
+manifests already carry `repository = "https://github.com/merely-made/mere"`.
+Open: whether donor GitHub archiving is still a task (see the open question
+under P4).
 
 2026-07-21. Ecosystem repo reorganization: group satellite single-crate repos
 into family repos by concern, where the family is a true lockstep stack.
@@ -33,13 +42,28 @@ Decided with Mark in session; both merges executed same day.
     family facade. Companions were never published, so their rename just
     reserves the `mere-eidetic-*` names by manifest (not yet published).
     Verified: `mere-eidetic` lib 85 tests green, consumers + turnstone build.
+
+    **Corrected 2026-10-06 (S14 pass):** the rename was reversed in
+    `ca798151` (2026-09-18, "Rename mere-eidetic* packages to eidetic*");
+    `crates/eidetic/eidetic-core/Cargo.toml` reads `name = "eidetic"`.
   - GitHub-archive the seven donor repos (numen, quint, seiche, muniment,
     codicil, chartulary, scholia) with tombstone READMEs pointing at the
     family repos; delete the local checkouts after. Left for Mark.
+
+    **Open, raised by the S14 pass (2026-10-06):** is archiving the seven
+    donor repos still a task, now that their crates live in mere
+    (`6a37de6b`)? The pass could not check GitHub. Options: keep it as an open
+    tail; record it as done or dropped.
   - Next `cargo publish` of each crate picks up the new `repository` field
     (update each crate's `Cargo.toml` repository URL at that time; not
     changed preemptively so the published metadata keeps matching the live
     published versions).
+
+    **Corrected 2026-10-06 (S14 pass):** the manifests already say
+    `repository = "https://github.com/merely-made/mere"`
+    (`crates/eidetic/chartulary/Cargo.toml`,
+    `crates/conatus/seiche/Cargo.toml`, `crates/servitor/Cargo.toml`), so this
+    follow-on is retired.
   - crates.io `eidetic` (0.0.1, Mark's reservation) still carries the
     mere-lane description; reword at next publish.
 
@@ -54,6 +78,12 @@ Decided with Mark in session; both merges executed same day.
   stay separate repos: declined by Mark for legal reasons** (provenance
   boundary; MeshCore source-readable vs Meshtastic clean-room must remain
   independently auditable).
+
+  **Corrected 2026-10-06 (S14 pass):** both postures changed on 2026-07-23.
+  `6a37de6b` absorbed the standalones personae, armillary, vates, sibylla and
+  servitor into mere, and retinue, tulle, tucket and sennet merged into one
+  workspace (retinue's README, History section; mere's root `Cargo.toml` pins
+  that one revision).
 - **Names**: family repos take fresh names rather than the top crate's name.
   **eidetic** for the memory family (Mark: the name was always meant for the
   memory/recording/consolidating role). **conatus** for the physics family
@@ -83,5 +113,13 @@ Decided with Mark in session; both merges executed same day.
   `.cargo/config.toml` patches moved to family paths plus a new
   `[patch."…/eidetic.git"]` section; lock refreshed (zero references to old
   URLs); `mere-kernel` lib **273 tests green** on both family paths.
+
+  **Corrected 2026-10-06 (S14 pass):** `6a37de6b` (2026-07-23) made every
+  family crate a mere workspace path dependency; no `eidetic.git` or
+  `conatus.git` reference remains. `crates/eidetic` now holds chartulary,
+  eidetic-core, hagiograph and muniment, and `crates/conatus` holds conatus,
+  modulus, nisus, numen and seiche (quint was folded into its owners in
+  `eae87153`, 2026-08-31).
 - Remaining consumers (turnstone, hocket, isometry, woodshed, servitor):
   repointed this session; see the commit trail in each repo.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at mere 535bca11, from the D2 record in support/doc-audit/d2/batch_41_s14_phase_b3.md: the plan recorded as superseded by the repo consolidation plan, with the 2026-07-23 absorption (`6a37de6b`) and the `ca798151` rename reversal noted, the P4 metadata follow-on retired, and donor archiving raised as an open question.

@@ -306,10 +306,10 @@ impl TestCase {
                     ValidationResult::Pass => {
                         assert_equals_approx(&actual_indices, &expected_indices, 0.0)
                             .as_test_outcome()
-                    }
+                    },
                     failed => failed.as_test_outcome(),
                 }
-            }
+            },
             ExecutionOutcome::CompileError(e) => TestOutcome::CompileError(e),
         };
         self.enforce_outcome(outcome);
@@ -384,7 +384,7 @@ impl TestCase {
                 let actual =
                     HostData::from_tensor_handle(&client, output_handle, HostDataType::F32);
                 assert_equals_approx(&actual, &expected, epsilon).as_test_outcome()
-            }
+            },
             ExecutionOutcome::CompileError(e) => TestOutcome::CompileError(e),
         };
         self.enforce_outcome(outcome);
@@ -416,7 +416,7 @@ impl TestCase {
         let strides = match config {
             ReduceOperationConfig::ArgTopK(k) | ReduceOperationConfig::TopK(k) if is_parallel => {
                 parallel_multiple_output_strides(self.shape.as_slice(), &self.stride, axis, *k)
-            }
+            },
             _ => contiguous_strides(output_shape.as_slice()),
         };
         TestInput::builder(client.clone(), output_shape.clone())

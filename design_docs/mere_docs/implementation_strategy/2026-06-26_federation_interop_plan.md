@@ -31,6 +31,14 @@ schema registry (alembic). It is consulted at the boundary where engrams cross p
 is not the local version, resolve a lens chain and project it to the local shape;
 bidirectionality lets a write flow back.
 
+**Corrected 2026-10-06 (S14 pass):** engrams are now codicils (`c51b9704`,
+2026-08-31, "Rename Eidetic engrams to codicils and logs to journals"). The schema
+vocabulary (`SchemaRef`, pointing at a schema codicil) lives in
+`crates/eidetic/eidetic-core/src/schema.rs`, but no schema registry type exists,
+and "alembic" now names Distillery's recall component
+(`ports/distillery/alembic/README.md`). The lens registry's neighbour is
+therefore eidetic-core's schema vocabulary, not an alembic registry.
+
 **Decisions to settle.**
 - Lens authorship: hand-written per schema bump, derived from a schema diff, or both.
 - Storage: lenses as their own engram kind (so they federate like any other content) vs
@@ -46,6 +54,21 @@ before any network wiring; the sync-boundary hook second.
 **Gap.** No federation access-control primitive: nothing says "peer X may read subgraph
 S, revocably," without a server. The federation tiers (moot, moothold, coalition) need
 it to share a slice with a peer.
+
+**Corrected 2026-10-06 (S14 pass):** this gap no longer holds as stated; other
+lanes have built a form of the primitive. Servitor has capabilities and grants
+(`crates/servitor/src/cap.rs`: `Mode`, ordered Read < Write < Delegate;
+`crates/servitor/src/grant.rs`: a `Grant` with expiry), and its
+`crates/servitor/README.md` leaves room for a later Meadowcap-shaped provider.
+Gemot has capability-scoped `MootAuthorizationRequest`
+(`crates/moot/gemot/src/moot/service.rs`). Commons has an encrypted graph
+profile with group-key epochs and parking (`crates/moot/commons/src/encrypted.rs`;
+`af674f30`, `3d3ad81c`). No borrow (Meadowcap, UCAN or Keyhive) has been chosen.
+
+**Open, raised by the S14 pass (2026-10-06):** what is left of §2 now that
+servitor, Gemot and Commons provide grants, scoped authorization and group-key
+epochs? Options: narrow §2 to the remaining borrow choice (Meadowcap, UCAN or
+Keyhive) over those primitives; rule §2 superseded by them.
 
 **This is the federation sense of "capability," distinct from two existing in-app
 senses** that must not be conflated: the
@@ -68,6 +91,8 @@ adopting a stack wholesale.
   grant over a namespace, not an ad-hoc node set.
 - The grant dovetails with **Tessera** as the trust receipt and with the tier framework
   (a grant's reach graduates with trust).
+  **Corrected 2026-10-06 (S14 pass):** Tessera is now Standing (the
+  `gemot/standing/v1` lane), with its code in `crates/moot/mien`.
 - Revocability without a server is the hard part: capability tokens plus an epoch /
   key-rotation model (Keyhive's domain) rather than a server-side revocation list.
 
@@ -111,3 +136,7 @@ both are scoped here so the design is settled before federation data starts flow
   federation capability sense is unscoped (the existing "capability" docs are the in-app
   permission spine and DocumentScript confinement, a different layer). Design-level only,
   no code.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at mere
+  535bca11, from the D2 record in support/doc-audit/d2/batch_45_s14_phase_b7.md. §2's
+  gap is annotated with what servitor, Gemot and Commons now provide, engram and
+  Tessera with codicil and Standing; whether §2 narrows or is superseded is left open.

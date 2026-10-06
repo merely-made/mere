@@ -1,7 +1,16 @@
 # Host P2P Wiring Plan (meerkat S5)
 
 **Date**: 2026-06-03
-**Status**: Draft (for review, no code yet). The detailed elaboration of the
+**Status (2026-10-06):** superseded by the
+[Murm/Moot plan](2026-07-12_murm_peer_runtime_and_moot_domain_plan.md)
+(2026-09-05). S5.0 to S5.2 landed in meerkat on 2026-06-03 to 2026-06-05,
+retired with it 2026-07-18 (`c5f01064`). Surviving library parts: the ticket
+bootstrap, `P2pandaTransport::ticket` and `add_peer_ticket`
+(`crates/murm/transport/src/p2panda_transport.rs`), and its convergence test
+`two_moots_converge_bootstrapped_by_ticket`, now in
+`crates/moot/mien/src/sync.rs`. S5.3 moved to the
+[comms shell plan](2026-06-05_comms_shell_plan.md). Open: nothing here. The
+plan was the detailed elaboration of the
 [modular integration plan](2026-06-02_modular_integration_plan.md)'s **S5 (comms
 surface + cheap p2p win)**: how the proven p2p substrate (transport + murm's
 `SyncedCabal` + tessera's `SyncedMoot`) wires into the meerkat host loop.
@@ -297,3 +306,10 @@ The minimal seed file is a known interim: a plaintext secret on disk. The
 passphrase-encrypted persona vault (`<data_root>/personas/<id>/vault/`) is the
 follow-on that supersedes it (the `identity` crate already has the vault +
 passphrase backend).
+
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_47_s14_phase_b9.md: the "no code yet" status
+  replaced by the supersession by the Murm/Moot plan, with S5.0 to S5.2
+  recorded as landed in meerkat and retired with it (`c5f01064`), the
+  surviving ticket bootstrap named, and S5.3 pointed at the comms shell plan.

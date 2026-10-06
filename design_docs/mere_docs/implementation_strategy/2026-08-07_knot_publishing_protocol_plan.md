@@ -5,13 +5,31 @@
 > Mere under E2 of `knot-editor/design_docs/2026-09-01_knot_editor_repository_extraction_plan.md`,
 > so the `ports/knot` *(historical citation)* <!-- doc-audit: historical-path --> paths below name the layout each receipt landed against.
 
+**Corrected 2026-10-06 (S14 pass):** the knot-editor pins are not one
+revision. At mere 535bca11 three were pinned: Djinn used the workspace
+knot-editor at `562353aa` (root `Cargo.toml:243`) plus knot-site at `ea3e99ef`,
+and Turnstone pinned `3dfb70b0` at its HEAD that day. Since then Djinn and the
+workspace root share one Knot revision, `c966e31` (`cf88887d`, merged in
+`840c543d`); Turnstone's pin is outside this repository.
+
+**Open, raised by the S14 pass (2026-10-06):** Knot Editor carries its own copy
+of this plan (`knot-editor/design_docs/2026-08-07_knot_publishing_protocol_plan.md`),
+which differs from this one only in the repository note and the audit markers
+and calls itself a historical integration record; the Mark read adapter doc is
+duplicated there too. Which copy is canonical (DOC_POLICY §2 and §4)? Options:
+Mere's copy is canonical and Knot's becomes a citation; Knot's is canonical
+and Mere's is archived; keep both and accept the drift.
+
 **Date**: 2026-08-07
-**Status**: Phase A implemented and physically receipted, including a
-public-client renewal on 2026-08-19. Direction remains **A then B** (§4). The
-existing K2 Graphshell projection rehearsal is useful precedent, not this
-protocol. Phase B has not begun: the Phase-A grammar needs real product use and
-an intended independent implementer before it is promoted into a compatibility
-commitment.
+**Status (2026-10-06):** Phase A implemented and physically receipted,
+including a public-client renewal on 2026-08-19. Direction remains **A then B**
+(§4). The existing K2 Graphshell projection rehearsal is useful precedent, not
+this protocol. Phase B's decision gate has a recorded outcome: the
+[Mark read adapter](2026-08-08_knot_mark_read_adapter.md) carries the
+compatibility table and chooses option 1, a bounded Mark read adapter,
+implemented in knot-editor (`MARK_ALPN`). The Phase B specification and the
+`knot-protocol` crate are not entered (§9), and whether the adapter counts as
+entering Phase B is open there.
 
 **Scope**: Let one persona explicitly share selected, versioned Knot documents
 with another persona without giving that reader a paired-writer grant, a vault
@@ -511,6 +529,19 @@ stays on disk but out of Git.
 portable contract until product use stabilizes them and a second implementer
 has a concrete reason to consume the resulting vectors.
 
+**Corrected 2026-10-06 (S14 pass):** step 2 below, the Mark comparison gate,
+has a recorded choice. Mere's
+[2026-08-08_knot_mark_read_adapter.md](2026-08-08_knot_mark_read_adapter.md)
+says it records the Phase B choice from this plan: the compatibility table,
+then option 1, a bounded Mark read adapter, reported implemented
+(`knot-editor:crates/knot-editor/src/mark.rs:36`, `MARK_ALPN`). No
+`knot-protocol` crate exists, and steps 3 to 5 are not entered.
+
+**Open, raised by the S14 pass (2026-10-06):** does the Mark read adapter count
+as Phase B's entry? Options: count it as Phase B's decision gate passed and
+word the status that way; record it as an out-of-sequence side adapter, with
+Phase B itself still unentered.
+
 Once its entry conditions hold, Phase B proceeds in this order:
 
 1. Freeze Phase A packet fixtures, refusal fixtures, and source/version
@@ -550,3 +581,12 @@ concurrent facts are a single ordered chain.
 - Do not report a causal operation digest as a sequential document version.
 - Do not start Mark interoperability code, public discovery, write verbs, or a
   second carrier before the physical Phase A read-and-revocation receipt.
+
+## Progress
+
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_49_s14_phase_b11.md: the Phase B wording
+  reconciled with the Mark read adapter (gate outcome recorded, specification
+  not entered), the "one immutable revision" note corrected, and the
+  adapter-as-entry and canonical-copy questions opened.

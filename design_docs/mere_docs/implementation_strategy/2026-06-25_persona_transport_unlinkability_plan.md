@@ -1,21 +1,30 @@
 # Persona Transport Unlinkability — Plan + Research Brief
 
-**Status:** design (2026-06-25). Mode 1 + the relay-diversity half-measure are the
+**Status (2026-10-06):** design, with the device fabric built. The identity-level fabric
+Sequencing step 2 calls for landed with the wallet plan's storage slice (2026-07-02):
+`DeviceRoster` (personae `carry/mod.rs:350`), `DeviceExposure { HiddenClient (default),
+ExposedEgress }` (`carry/mod.rs:164-171`) and `ACTION_TRANSPORT_EGRESS`
+(`carry/scope.rs:45`). Open: Mode 1 + relay diversity, `PersonaManifest.egress` and
+per-persona endpoint routing, own-cluster v1, and the Nym research track.
+Mode 1 + the relay-diversity half-measure are the
 near-term buildable plan; the own-device-cluster family is the core of the privacy
-story and is mostly a design gap, not an implementation gap; Nym and the metadata
-ceiling are a named research track. No code yet.
+story; Nym and the metadata ceiling are a named research track.
 
 This doc owns the persona-transport privacy model: how a persona's network presence is
 (or is not) linkable to you and to your other personas, what modes we offer, and how a
 persona's transport choice couples to its tessera standing. It sits between the identity
-crate (`crates/persona/identity` *(planned target)* <!-- doc-audit: planned-path -->), the transport (`crates/murm/transport`), and the
-standing layer (`crates/moot/gemot/src/tessera` *(planned target)* <!-- doc-audit: planned-path -->).
+crate (`crates/persona/identity` *(historical citation)* <!-- doc-audit: historical-path -->), the transport (`crates/murm/transport`), and the
+standing layer (`crates/moot/gemot/src/tessera` *(historical citation)* <!-- doc-audit: historical-path -->).
+**Corrected 2026-10-06 (S14 pass):** the identity crate is `crates/dramatis/personae`, and
+the standing files live in mien: `crates/moot/mien/src/persona_chain.rs` and
+`crates/moot/mien/src/gate.rs` (`posting_threshold` at `:31`). The links below keep the
+old paths as historical citations.
 
 ## The axis: anonymity is the opposite of reputation
 
 The frame that ties everything together: **reputation is the cost of continuity;
 anonymity is the cost of starting over.** Standing accrues at a persona chain root
-([`persona_chain.rs`](../../../crates/moot/gemot/src/tessera/persona_chain.rs) *(planned target)* <!-- doc-audit: planned-link -->); a
+([`persona_chain.rs`](../../../crates/moot/gemot/src/tessera/persona_chain.rs) *(historical citation)* <!-- doc-audit: historical-link -->); a
 face that carries standing is, by carrying it, more linkable. A fully unlinkable face is
 a fresh zero-standing chain. So a persona's transport mode and its standing tier are one
 slider, not two:
@@ -27,7 +36,7 @@ slider, not two:
 | **Burner** | fresh chain, zero standing (below the gate's posting threshold until earned or vouched) | most-unlinkable transport (own-cluster, friend-relay, or the Nym ceiling) |
 
 The gate already enforces the bottom row: a fresh chain sits below `posting_threshold`
-([`gate.rs`](../../../crates/moot/gemot/src/tessera/gate.rs) *(planned target)* <!-- doc-audit: planned-link -->), so a burner's transport
+([`gate.rs`](../../../crates/moot/gemot/src/tessera/gate.rs) *(historical citation)* <!-- doc-audit: historical-link -->), so a burner's transport
 privacy is a free cost. Picking a persona therefore picks a face, a reputation, and a
 transport profile at once. The product surface is one gesture, not a settings maze: a
 **burner** button mints a fresh chain on the most-private transport; a **main** is the
@@ -59,6 +68,10 @@ The leaks cost wildly different amounts to close, which is why this is tiered.
 - **Relays are automatic NAT fallback, not deliberate routing.** iroh-relay rides under
   p2panda-net and kicks in only when holepunch fails; iroh 0.98 does not expose
   deliberate "relay through this chosen node" as a public API.
+  **Corrected 2026-10-06 (S14 pass):** the transport now pins `iroh = "1.0.3"`
+  (`crates/murm/transport/Cargo.toml:51`); whether 1.0.3 exposes deliberate
+  relay-through-node has not been checked, so this and the later 0.98 mentions are
+  unverified for the current pin.
 - **Multi-device sync is proven, multi-device routing is not.** Mesh M1 (2026-06-12) does
   two-machine job round-trips over LogSync. But the mesh is cross-device *coordination*,
   not single-persona *egress routing*. A persona is a context boundary, not a network
@@ -66,6 +79,11 @@ The leaks cost wildly different amounts to close, which is why this is tiered.
 - **The seam is a design gap.** `PersonaId` is a bare UUID; there is no identity-level
   `DeviceRoster`, no `PersonaManifest.egress` persistence yet, and no session-startup
   resolution of a persona's transport. Adding it is design work, not a fight with iroh.
+  **Corrected 2026-10-06 (S14 pass):** the identity-level `DeviceRoster` exists now, with
+  `DeviceExposure` and the `transport.egress` action (see the Status line); it landed
+  through the wallet plan on 2026-07-02, which this plan's 2026-07-02 entry names without
+  saying it landed. `PersonaManifest.egress` and session-startup transport resolution are
+  still absent.
 
 ## Mode 1 + the half-measure (the near-term plan)
 
@@ -198,6 +216,8 @@ commercial (a VPN) or stranger (Tor/Nym) — a different and for many a more acc
 model, and it maps directly onto Mere's coalition/moothold federation tiers: the same
 trusted-peer set that federates data can serve as egress relays. The cost is that a
 friend's node sees your traffic metadata, and availability/coordination across the circle.
+**Corrected 2026-10-06 (S14 pass):** "coalition" is now gemot (renamed 2026-07-30,
+`TERMINOLOGY.md:152`).
 
 ## The metadata-resistance ceiling: Nym (research-only)
 
@@ -247,6 +267,10 @@ first rung of becoming infrastructure.
 4. **Research:** Nym as an optional high-sensitivity egress (the global-timing tier);
    the iroh-relay-protocol path only if in-protocol relay proves worth it.
 
+**Open, raised by the S14 pass (2026-10-06):** with the device fabric landed through the
+wallet, does this plan keep Mode 1 and per-persona egress, or does that work move under
+dramatis? Options: keep it here; move it under dramatis.
+
 ## Done-conditions and open questions
 
 **Done (Mode 1):** two personas, two unlinkable NodeIds, no shared discovery record,
@@ -280,6 +304,11 @@ the per-persona-egress concentration question.
   persona-derivation convention is now stated explicitly as
   `derive_keypair(BLAKE3('persona' || persona_id))`, and the device fabric is now named
   correctly as identity-level `DeviceRoster` plus persona-level `PersonaManifest.egress`.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at mere 535bca11,
+  from the D2 record in support/doc-audit/d2/batch_48_s14_phase_b10.md: the device fabric
+  recorded as landed, the planned markers made historical with the personae and mien
+  paths, the iroh pin and the gemot rename noted, and the plan's home written in as an
+  open question.
 
 ## Findings (research, 2026-06-25)
 

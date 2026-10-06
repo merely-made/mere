@@ -1,16 +1,20 @@
 # Scrying Tile Plan (flip P4 / integration S6)
 
 **Date**: 2026-06-10
-**Status:** reconciled to code 2026-06-23; X1 shipped, X2 input core shipped
-(chrome round-trip still open), X3 multi-tile lifecycle shipped (durable
-`compat_mode` not yet the source of truth), X4 untouched (Windows-only).
-Shipped via a session-local `engine_pins` map + a host-concrete producer pool
-(`meerkat/src/scrying_host.rs`), **not** the `ScryingTileEngine` /
-`ProducerFactory` registry seam, which has zero meerkat consumers — the
-Findings below predicted this; folding the pin into `inker::routing` and the
-producer into the registry is the inker-picker plan's Phase 0. The phase bodies
-record original intent; the **Progress** log carries shipped reality and the
-two display-model pivots that postdate the 2026-06-11 entry.
+**Status (2026-10-06):** X1, X2's input core and X3's lifecycle landed in
+meerkat between 2026-06-10 and 2026-06-23 (`0adca6e` single tile, `06b6ac7`
+multi-tile), retired with it 2026-07-18 (`c5f01064`), the host-concrete
+producer pool (`scrying_host.rs`) included. Surviving library parts:
+scrying-engine's `ScryingTileEngine` and `ProducerFactory`, still with no
+consumer outside scrying-engine; netrender's `compose_external_texture`; and
+wgpu-scry's `new_offscreen`, `new_attached` and `force_restart_capture`. Pelt
+now hosts scrying surfaces (`ports/pelt/desktop/scrying_receipt.rs`,
+`ports/pelt/desktop/dx12_surface.rs`). The per-node `compat_mode` left
+graph-kernel for pandect in `ebd92b89` (2026-07-09). Open: X2's chrome
+round-trip, X3's durable pin, X4 (macOS, Linux) and the registry fold-in (the
+engine picker plan's Phase-5 companion), none with a host since meerkat left.
+The phase bodies record original intent; the **Progress** log carries shipped
+reality and the two display-model pivots that postdate the 2026-06-11 entry.
 **Scope**: Land external web content in meerkat: a node routed to `scrying.web`
 renders through the system WebView (WebView2 first), its GPU frames imported
 into the host's wgpu device and composited at the tile/card rect via
@@ -53,6 +57,11 @@ the archived Masonry-era
   carries the per-node compatibility-mode toggle field (node.rs:115), with a
   `SetNodeCompatMode` delta and `set_node_compat_mode` accessor — the
   graph-truth hook for the pin (still unused by the live path; see X3).
+
+  **Corrected 2026-10-06 (S14 pass):** `compat_mode` left graph-kernel's
+  `Node` in `ebd92b89` (2026-07-09, "Boundary pass: browser state out of
+  kernel Node"); it now lives in pandect
+  (`crates/system/pandect/src/browser_node_state.rs`).
 - **netrender** — `compose_external_texture` / `ExternalTexturePlacement` with
   `scene_op_boundary` ordering, shipped and exercised by meerkat's ~12 actor-
   texture call sites in render.rs.
@@ -108,6 +117,11 @@ session-local `engine_pins` map on `SharedState.content`, not `pinned_engine`
 through `inker::routing`. The display model also moved twice past this phase's
 "composite the imported texture at the card rect" sketch — see Progress.
 
+**Corrected 2026-10-06 (S14 pass):** the host pool went with meerkat:
+`scrying_host.rs` was deleted in `c5f01064` (2026-07-18). Scrying surfaces are
+now hosted by Pelt (`ports/pelt/desktop/scrying_receipt.rs`,
+`ports/pelt/desktop/dx12_surface.rs`).
+
 ### X2 — Input, navigation, chrome integration
 
 Forward mouse/pointer/keyboard/wheel to the producer when the pointer is over
@@ -151,6 +165,12 @@ to suppress respawn; a capture-stall restart exists). The one open gap is the
 map (cleared on graph switch), while graph-kernel's durable `node.compat_mode`
 field is built and read by the inspector but does **not** yet drive scrying.
 Connecting it is the remaining X3 work.
+
+**Corrected 2026-10-06 (S14 pass):** the durable field is no longer
+graph-kernel's: `compat_mode` moved to pandect
+(`crates/system/pandect/src/browser_node_state.rs`) in `ebd92b89`
+(2026-07-09), and the session-local live path it was to replace went with
+meerkat in `c5f01064`.
 
 ### X4 — Other platforms
 
@@ -360,6 +380,18 @@ Linux box.
     truth (live path is still session-local `engine_pins`); X4 (Windows-only); the
     `ScryingTileEngine` / `ProducerFactory` registry fold-in (inker-picker Phase 0);
     overlay/auto-hide scrollbars; frame-arrival wake.
+
+    **Corrected 2026-10-06 (S14 pass):** the engine picker plan's Phase 0
+    (landed 2026-06-15) routed only the pin; that plan names the producer
+    registry fold-in its Phase-5 companion.
   - **Doc hygiene this session:** repointed scrying-engine's `lib.rs` doc comment
     from the archived 2026-05-11 plan to this one (Constraints note cleared);
     refreshed the `What already exists` line refs.
+
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_47_s14_phase_b9.md: X1 to X3 recorded as landed
+  in meerkat and retired with it (`c5f01064`), the surviving scrying-engine,
+  netrender and wgpu-scry parts and Pelt's scrying host named, `compat_mode`
+  pointed at pandect (`ebd92b89`), and the Phase 0 versus Phase-5 naming of the
+  registry fold-in reconciled with the engine picker plan.

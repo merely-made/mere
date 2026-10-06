@@ -1,6 +1,18 @@
 # Projection Grammar Adoption Plan
 
-**Status:** active: the executable Graphshell authoring proof landed 2026-09-04; A5 and the remaining portable-grammar questions stay open.
+**Status (2026-10-06):** active.
+- The 2026-10-05 cross-domain relationship recipe continuation is published and
+  qualified (its own status line, below).
+- The executable compiler lives in `scenomise::projection` since `c79bb8c2`.
+- Stack seams P1's arrangement catalog landed on main at `1633be0c`: built-in
+  families, `ProjectionCompiler` with host `ItemSizes`.
+- A5 and the remaining portable-grammar questions stay open.
+
+This line supersedes the two older status lines in the document, the
+2026-09-04 one below and "Status (reconciled 2026-09-01)" further down. Both
+keep their words as history (stack seams S14 pass, batch 43).
+
+Earlier status (2026-09-04): active: the executable Graphshell authoring proof landed 2026-09-04; A5 and the remaining portable-grammar questions stay open.
 
 ## Cross-domain relationship recipe continuation (2026-10-05)
 
@@ -201,6 +213,11 @@ id through the registry, takes its parameters from the definition, and makes
 every registered family authorable. That plan's P1 carries it out. Asked who
 takes P1, Mark answered: "Seams lane keeps P1 (Recommended)". This plan
 records the change and does not build it.
+*Superseded 2026-10-06* (stack seams S14 pass, batch 43). When this note was
+written, local main did not yet hold `c79bb8c2`, which had already moved the
+compiler into `scenomise::projection`. `ports/graphshell/src/projection_compile.rs`
+is now 432 lines and re-exports `scenomise::projection::*`, so the hand map
+above is gone. P1 then replaced it with the built-in catalog (next note).
 
 *2026-10-05, P1 under way (stack seams rulings S12, S15 to S20).* A
 cross-reference for the relationship-recipe pass, which moved the compiler
@@ -218,6 +235,9 @@ repins past P1: that signature, and grid pitch (cell plus gap), which becomes
 the host's card size plus the spacing (180 by 84 for a 164 by 68 card at
 spacing 16, against 200 by 100 today). Built on branch `stack-seams-p1`;
 nothing merges before Mark's review.
+*2026-10-06:* P1 landed on main at `1633be0c`, recorded in the stack seams plan
+at `add54925`. The compile entry points take a `ProjectionCompiler` built from
+host `ItemSizes` (`scenomise/src/projection.rs:520`, `:530`).
 
 Progress (2026-09-04): Luna produced the Woodshed exporter and Terra the
 compiler skeleton before both hit the account usage limit. Root completed
@@ -327,6 +347,7 @@ reopen, `?scenario=scenarios/co_op_retained.scn&sink=http://127.0.0.1:<port>/sce
 captures the retained GPU projection on that origin.
 
 **Date**: 2026-08-15
+*Superseded by the top status line (2026-10-06); kept as written.*
 **Status (reconciled 2026-09-01)**: A0, A6, A1, C1, B1, B2, B3, C3, A3 stage
 one, A4+C2, and A2 are closed. Turnstone `648bf19` is B1's definitive close,
 including routed screen-reader interaction. The Projection Receipts Plan's

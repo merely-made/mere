@@ -1,45 +1,25 @@
 # Persona Wallet — The Universal Carry Layer
 
-**Status:** storage slice, first host-adoption slice, typed signed-grant (2026-07-04)
-slice, remote-auth grant issuance slice, wrapped private-epoch crypto helper slice,
-pairing-transcript helper slice, pairing ticket/code helper slice, first Meerkat
-pairing-host slice, delegated-device response/SAS preview slice, enrollment-bundle
-slice plus delegatee enrollment-host/bootstrap-preservation slice, and the first
-`private.read` host/restore slice plus pairing-expiry/artifact-coherence hardening
-slice plus first capability-slot wiring slice plus first delegated-device
-revocation slice landed, plus the encrypted-vault design slice and the first
-local sealed-record unlock/migration slice plus the startup-unlock setting /
-locked-startup flow slice. Companion to the
+**Status (2026-10-06):** the library slices (2026-07-02 to 2026-07-08) survive: the
+wallet stores, grants and `WalletEpochSealer` in pandect
+(`crates/system/pandect/src/wallet_store/`, `wallet_grant/`, `codicil_seal.rs`), the
+sealed-record vault, startup unlock and passphrase root in personae, and eidetic's seal
+seam. Castellan now hosts grant issuance and revocation
+(`ports/castellan/src/reticulum/grant.rs`, `ports/castellan/src/authority.rs`). The
+Meerkat host slices (startup seeding, the pairing-host and delegatee-host seams, the
+`pelt/wallet` unlock and relock page, and graph-engram sealing) landed in meerkat on
+2026-07-02 to 2026-07-08, retired with it 2026-07-18 (`c5f01064`); surviving library
+parts: those above, with gap #2's host half living on as castellan's sealed storage and
+pandect's `wallet_sealed_backend.rs`; open: the PAKE/QR chrome and transport UI,
+epoch-history usage beyond the current epoch, copy-mode export/import, non-Windows
+startup unlock backends, and a migration pass for cleartext private blobs. Lock/unlock
+follow-through belongs to the
+[vault lock plan](../../dramatis_docs/implementation_strategy/2026-10-05_vault_lock_plan.md).
+
+Companion to the
 [persona_transport_unlinkability_plan](2026-06-25_persona_transport_unlinkability_plan.md).
-The wallet is "Layer 0", the carry layer everything else references. Most of what sits
-under it exists or is named in code; the identity-level and persona-level wallet manifest
-stores are now real in `session-runtime`, and Meerkat now seeds/loads them at startup and
-points `sync`/`comms` at the shared identity root. `identity/grants/<device_id>.cbor` now
-also has a typed signed envelope with canonical CBOR encode/decode, signing, verification,
-stable content-hash helpers, a remote-auth issuance helper that updates roster/index
-state coherently, XChaCha20-based wrap/unwrap helpers for private-epoch material, and a
-deterministic pairing-transcript helper that derives both the wrapping key and short auth
-string from a shared pairing secret plus device identities. The wallet layer also now has
-a typed pairing ticket/response seam for QR or manual-code transport, and Meerkat now has
-an artifact-based omnibar host seam that can mint remote-auth pairing tickets and accept a
-filled response artifact into grant issuance. That host seam is still manual/admin, but it
-now requests `identity.act` plus `private.read`, loads the delegator's current plaintext
-private epoch from a temporary per-persona bridge, wraps it into the grant, and exports an
-enrollment artifact the delegatee can install. Meerkat can now also materialize the
-delegated device side: it persists a local delegated-device identity bridge, caches the
-pairing ticket locally, writes a filled response artifact from a scanned ticket, previews
-the shared short auth string before grant issuance, and on install restores the signed
-grant, persona wallet manifests, roster enrollment, grant index, and the current plaintext
-private epoch against that local delegated-device identity. Remote-auth revocation can now
-also mark a delegated device revoked, clear its persona wallet slot grants, block new
-enrollment-bundle export, rotate future-write private epochs when that device had
-`private.read`, and refresh the remaining pairing-backed delegated grants with new wrapped
-epoch material for the rotated head. The identity seed, local delegated-device identity,
-owner-side wrapping-key bridge, and temporary persona epoch bridge now all have
-sealed-record migration paths under the new vault seam; the remaining gap is the actual
-PAKE/QR chrome, transport UI around that shared secret, per-persona encryption-at-rest and
-epoch-history usage beyond the current epoch, copy-mode export/import, and non-Windows
-startup unlock backends.
+The wallet is "Layer 0", the carry layer everything else references; the slice-by-slice
+record is in Progress.
 
 This doc answers three questions that turned out to be one: how do you *carry* a persona
 across devices, is that mechanism the same for engrams and history, and is data private
@@ -424,6 +404,10 @@ Windows DPAPI is the first implemented `AutoOs` backend. `Prompt` and
 `Locked` are now surfaced in Meerkat's `pelt/wallet` settings page as persisted
 startup policies. A follow-on slice now adds an explicit `Unlock now with OS store`
 action for the current launch; full passphrase prompt chrome is still pending.
+**Corrected 2026-10-06 (S14 pass):** the `pelt/wallet` page went with meerkat (retired
+2026-07-18, `c5f01064`) and has no hits. `StartupUnlockMode` is persisted in pandect
+(`device_settings_store.rs`), and `AutoOs` is Windows-only (personae
+`startup_unlock.rs:14-15`), so non-Windows backends are open.
 
 ### Retention policy for the wrapping-key bridge
 
@@ -466,6 +450,14 @@ wallet, device roster, persona wallet, grant paths, and tests); and the chosen l
 engines `p2panda-auth` (cleartext gating) and `p2panda-encryption` (the private lane),
 both evaluated in the substrate spike.
 
+**Corrected 2026-10-06 (S14 pass):** the `session-runtime` modules this plan names
+(`wallet_store`, `wallet_grant`, `WalletEpochSealer`) now live in pandect:
+`crates/system/pandect/src/wallet_store/`, `wallet_grant/` and `codicil_seal.rs:52`. The
+Meerkat host seams named below went with meerkat (retired 2026-07-18, `c5f01064`;
+`pelt/wallet` and `pair_remote_auth` have no hits); castellan now hosts grant issuance and
+revocation (`ports/castellan/src/reticulum/grant.rs:26`, `:127`;
+`ports/castellan/src/authority.rs:25`, `:467`).
+
 **Gap to build:**
 
 1. **The wallet store** — an identity-level root (`identity/wallet.json`,
@@ -496,6 +488,13 @@ both evaluated in the substrate spike.
    adoption + sealed compose landed 2026-07-08**, so gap #2 is wired end to end. Still open:
    a migration pass for pre-existing cleartext private blobs (they still read fine — unmarked
    = cleartext — just not sealed retroactively).
+   **Corrected 2026-10-06 (S14 pass):** the graph-engram sealed path
+   (`save_graph_engram_sealed`, `open_engram_as_session_sealed`,
+   `compose_graph_engrams_sealed`, and the meerkat `export.rs` / `shell_load.rs` call sites)
+   went with meerkat and has no hits. `WalletEpochSealer`'s live consumers are castellan
+   (`payload_sealer`, lines 448-452 of `ports/castellan/src/authority.rs`, wrapping a backend
+   in `ports/castellan/src/sealed_storage.rs`) and pandect's `wallet_sealed_backend.rs`. The
+   seal seam (eidetic `seal.rs`, `save_typed_sealed` / `load_typed_sealed`) survives.
 3. **The capability-token layer** — typed signed device-grant storage, remote-auth grant
    issuance, wrapped private-epoch crypto helpers, pairing-transcript derivation, and a
    typed pairing ticket/response seam landed 2026-07-02 in `session-runtime::wallet_grant`
@@ -792,6 +791,11 @@ current head, and replacement of the temporary plaintext bridges as the live sea
   so the toolbar chip and comms pane do not keep stale success state. Still open:
   passphrase-entry chrome for `Prompt` and delegated device follow-through beyond the
   seed-backed lanes.
+  **Corrected 2026-10-06 (S14 pass):** the relock and the unlock page went with meerkat
+  (retired 2026-07-18, `c5f01064`). The
+  [vault lock plan](../../dramatis_docs/implementation_strategy/2026-10-05_vault_lock_plan.md)
+  (§1-2, citing this plan) found "the vault never locks", and lock/unlock follow-through is
+  that plan's.
 - **2026-07-06** — landed the passphrase-wrapped vault-root backend in
   `crates/dramatis/personae/src/passphrase_root.rs`: an Argon2id-KEK + ChaCha20-Poly1305
   seal over the same 32-byte vault root the DPAPI `AutoOs` wrapper produces, reusing
@@ -865,6 +869,13 @@ current head, and replacement of the temporary plaintext bridges as the live sea
   unseal). **Gap #2 is now wired end to end**: a graph engram saved with a staged persona epoch
   is sealed at rest and thaws only with that persona's sealer. Remaining: a migration pass for
   pre-existing cleartext private blobs (a genuine follow-on, not a blocker — they still read).
+  **Corrected 2026-10-06 (S14 pass):** the engram half of this went with meerkat; see the
+  correction under gap #2 in "Exists vs gap".
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at mere 535bca11,
+  from the D2 record in support/doc-audit/d2/batch_48_s14_phase_b10.md: the status rewritten
+  around the surviving pandect, personae and castellan parts with the meerkat host slices
+  retired, the `session-runtime` paths, the `pelt/wallet` page, the graph-engram sealed path
+  and the relock annotated, and lock/unlock follow-through pointed at the vault lock plan.
 
 ## Findings (research, 2026-06-25)
 

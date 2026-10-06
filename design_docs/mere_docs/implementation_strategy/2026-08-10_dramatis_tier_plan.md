@@ -93,6 +93,11 @@ tulpa pattern, MIT/Apache, ed2024), local repo `repos/dramatis` *(historical cit
       C1 (the OTP core, RFC-vector-verified) and C2 (sealed items, tile and
       release gate, admitted-session consumer, Linux Secret Service, Steam
       Guard) complete 2026-08-21; product hosting open.
+
+      **Corrected 2026-10-06 (S14 pass):** the OTP plan's own status dates
+      C1 and C2 complete 2026-08-20, then hardened and extended 2026-08-21
+      (resident lock and freshness ledger, Linux Secret Service, Steam
+      Guard); the status line above gives only the second date.
 - [ ] Any facade content in the `dramatis` crate. The reservation stays empty
       until something imports it. **Superseded 2026-10-01** by Mark's
       ruling 8 in the [dramatis tier architecture](../../dramatis_docs/technical_architecture/2026-09-30_dramatis_tier_architecture.md):
@@ -192,3 +197,15 @@ to the IconVG decoder (`repos/emblem`, formerly `repos/iconvg` *(historical cita
   and its normalization moves upstream to smolweb. chatelaine becomes a plain
   taxonomy crate, with CXF import policy ruled for all 17 types. dramatis
   becomes the facade sibling repos pin. Rulings 6 to 15 are recorded there.
+
+  **Corrected 2026-10-06 (S14 pass):** chatelaine is no longer unbuilt. P1
+  (`da3c50bc`), P2 (`3e4992ec`), P3 (`ff68e86c`) and P4a (`007fbe7c`) of the
+  [chatelaine and CXF import plan](../../dramatis_docs/implementation_strategy/2026-10-01_chatelaine_cxf_plan.md)
+  are all ancestors of mere `535bca11`; that plan carries the rest. The
+  `dramatis` facade is still unbuilt (`crates/dramatis/dramatis` 0.0.2 has a
+  doc-only lib.rs).
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_43_s14_phase_b5.md: a dated note that chatelaine
+  P1 to P4a have landed, and the C1-C2 completion date reconciled with the
+  OTP plan.
