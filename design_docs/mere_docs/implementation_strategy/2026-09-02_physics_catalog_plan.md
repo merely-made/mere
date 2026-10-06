@@ -801,7 +801,26 @@ pull reading −0.33 with 510 overlaps):
   bounds the ticks the gate admitted beyond the 1x floor, "fast-forward is
   never slower than 1x" stands, and every frame the gate decides stays
   checked (against letting the budget stop below the floor, or bounding
-  every frame and accepting those misses).
+  every frame and accepting those misses). Built at `ac5e1440`: the fast
+  receipt green in 10 of 10 on a calm machine, and a planted 10 ms clock
+  stall failing the bound in 7 of 7; the full headed round failed only on
+  timing rows at 76 to 82% CPU while other sessions compiled. Asked whether
+  seiche-speed merges at this checkpoint, before the estimator, Mark chose
+  **"Merge at the checkpoint"**: once the full headed round is green on a
+  calm machine, the speed dial, the native entry point and the floor bound
+  merge, the viewer cone starts, and the estimator follows on its own
+  branch; until then the web budget keeps falling back to 8.3 ms, as on main
+  (against merging once, with the estimator proven on both machines).
+  *Ruled 2026-10-06:* the machine stayed busy for hours, with other
+  sessions keeping about 8 builds at Normal priority, and every calm wait
+  timed out. Under 66 to 100% CPU, 16 of 17 law and fixture rows passed on
+  candidate `aad08332`. Density's control read 0.08 against a bar of 0; calm
+  runs had read -0.01 and -0.02. Asked how the round should count, Mark chose
+  **"Ask sessions to pause"**: the coordinator asks the active sessions to
+  stop building for about an hour, and the whole round runs calm as ruled
+  (against counting passes under load and rerunning misses calm, or waiting
+  for calm however long it takes). The rows already run under load do not
+  count.
   The face offset, diagnosed (2026-10-04, `tree-face-zoom`): the face is
   drawn right and the body wrong, on both pages. Pictograph's gnode style
   scales each body about its centre (the CSS default Livery follows since
@@ -2787,3 +2806,32 @@ binning are the useful patterns.
   control timing out); the law receipts, slow, the main page's Speed select
   and the 2,000-node settle were green. It is rerun with a calm wait before
   each scenario, recorded when it lands.
+- 2026-10-06 (seiche's speed, the merge candidate's calm round, branch
+  `seiche-speed`, per "Merge at the checkpoint" and "Ask sessions to pause").
+  Main `75e13d8d` (Burn/CubeCL pre.4) merged at `2b6d620e` and main `4714489f`
+  (G9, stack seams P1 and S32) at `e491e539`: three files and then eleven
+  changed on both sides, every weave result identical to `git merge-file`'s,
+  no conflicts, main's root lock kept exactly. The gitignored web lock started
+  from the pre.4 lane's (`f8eab000`) and took three dependency edges to
+  packages already in it, cambium-rootstock, chirograph and sceno (`cargo
+  metadata --offline`; now `fd064e9b`). Merged, main's G9 test called
+  `RemoteBoard::sync` with the three arguments it took before this branch's
+  "The viewer's own dial"; it passes real time now (`aad08332`, test-only, the
+  bundle unchanged). Gates: seiche 129/129 (123 without actor, 129 + 3 with
+  gpu), pictograph 310, graphshell `web` 246, mere and graphshell checked
+  clean. The round was first run with the machine loaded (66 to 100% CPU, up
+  to 13 other lanes' rustc): its 16 law and fixture passes and Density's
+  control's miss at rank 0.08 were set aside. Calm (no other lane's rustc or
+  cargo at Normal priority or above and the CPU under 50% for two samples 15 s
+  apart, a bounded wait before every row, rows whose wait ran out rerun), on
+  bundle `aa9d30b9`: all 24 rows green, the CPU at each row's start 18 to 65%.
+  The eleven law receipts, profiles, add, drag, Density, Density's control
+  (rank -0.029, as in earlier calm rounds: the 0.08 was the load), the framing
+  control; slow; fast at Max (worst admitted frame 133 us under); the planted
+  control failing the bound for its planted reason (11 frames past the grain,
+  the worst 9,367 us, the 10 ms stall's signature); the 50x control; both
+  Speed select receipts; the 2,000-node GPU settle at 1x (413 of 418 device
+  steps). The fast receipt then ran 12 more times, calm or passing under load:
+  12 of 12 green, the worst admitted frame 233 us under to 67 us over its
+  budget, none past the grain, so the one 567 us miss did not recur and the
+  200 us margin stands.

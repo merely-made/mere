@@ -29,6 +29,13 @@ name = "personae-vault"
 path = "src/bin/personae-vault/main.rs"
 required-features = ["agent"]
 
+# Vault lock ruling 6's no-residue instrument. It installs its own global
+# allocator, so it runs outside libtest's harness, on one thread.
+[[test]]
+name = "no_residue"
+path = "tests/no_residue.rs"
+harness = false
+
 [features]
 # SSH keys as vault slots (encode/decode/import). The agent, and the CLI
 # whose import shares its signability door, need `agent` on top.
@@ -48,6 +55,9 @@ agent = [
   "ssh-key/p384",
   "ssh-key/p521",
 ]
+# Windows Hello as the unlock gate (vault lock rulings 21, 28). Elsewhere
+# presence reports unavailable.
+os-presence = ["dep:windows"]
 
 [dependencies]
 ed25519-dalek = { version = "3", features = ["zeroize"] }
@@ -60,8 +70,10 @@ zeroize = { version = "1", features = ["zeroize_derive"] }
 thiserror = "1"
 tracing = "0.1"
 # Passphrase-encrypted storage + sealed-record backends.
-argon2 = "0.5"
-chacha20poly1305 = "0.11"
+# `zeroize` clears the working memory we hand it (vault lock ruling 33).
+argon2 = { version = "0.5", features = ["zeroize"] }
+# `zeroize` clears the cipher's copy of the key on drop (ruling 37).
+chacha20poly1305 = { version = "0.11", features = ["zeroize"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 uuid = { version = "1", features = ["v4", "serde"] }
@@ -115,4 +127,11 @@ uuid = { version = "1", features = ["js"] }
 windows-sys = { version = "0.59", features = [
   "Win32_Foundation",
   "Win32_Security_Cryptography",
+] }
+# `os-presence`: UserConsentVerifier, and its window-parented interop.
+# Already in the workspace lock through djinn.
+windows = { version = "0.62", optional = true, features = [
+  "Security_Credentials_UI",
+  "Win32_Foundation",
+  "Win32_System_WinRT",
 ] }

@@ -1,0 +1,34 @@
+{
+  "date": "2026-09-29",
+  "ruling": 410,
+  "answer_verbatim": "I suppose A, then B if we can",
+  "historical_control": {
+    "fixture_behavior": "ac87a236; current license headers",
+    "lock_and_supporting_patches": "28ed6a4f",
+    "packages": 570,
+    "wgpu": "30.0.0",
+    "graph_pass": 5,
+    "graph_fail": 5,
+    "embedding_pass": 11,
+    "gpu_errors": []
+  },
+  "pre4_control": {
+    "build_head": "6b52297f5852059735dff6073f20741e67ce1b81",
+    "method": "Exact previously verified upstream build assets replayed in same Codex IAB2 session",
+    "packages": 552,
+    "wgpu": "30.0.1",
+    "graph_pass": 10,
+    "embedding_pass": 11,
+    "gpu_errors": []
+  },
+  "files_sha256": {
+    "2026-09-29_pre2_reconstructed_iab.json": "896efc912d5182372c67681450eb9e2c299c622764a57562302cfe63d142432e",
+    "2026-09-29_pre2_reconstructed_iab.png": "7ab6e8dcd5f8f150c58ec00b28d25c824b3284817e91444817ca1b409385a407",
+    "2026-09-29_pre4_same_browser_iab.json": "fb80ef683c83e08ca6f7b3412a96988cc8dff1e66af9efb215aeec74feaa7688",
+    "2026-09-29_pre4_same_browser_iab.png": "de460a18f441ef1455a1bc3d7c35b5387a5b620358fb7ee16896e86cb05df568"
+  },
+  "qualification": "The August receipt names28ed6a4f, which lacks its reported full graph ladder. This reconstructs the historical dependency row with unchanged ac87a236 test bodies; it does not reconstruct the exact August executable or toolchain.",
+  "reading_not_ruled": "The observed difference follows the dependency stack under the same current browser. It does not identify a specific upstream fix. Proceed toward conditional retirement after applicable launcher and migration checks.",
+  "restoration": "Original source/config bytes restored exactly to clean34d29269 before this documentation/test batch. Both owned localhost servers stopped; tabs closed.",
+  "remaining": "Nine public unfused launcher controls added but not yet executed; selector retirement, remaining S13 and main promotion remain open."
+}

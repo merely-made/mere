@@ -124,17 +124,54 @@ mod tests {
         // Some random input on device 1.
         let input_shape = [1, 28, 28];
         let input = Tensor::<3>::random(input_shape, Distribution::Default, &device_1);
-        let numbers_expected: Vec<f32> = input.to_data().to_vec().unwrap();
+        let numbers_expected: Vec<f32> = input.to_data().try_into_vec().unwrap();
 
         // Move tensor to device 2.
         let input = input.to_device(&device_2);
-        let numbers: Vec<f32> = input.to_data().to_vec().unwrap();
+        let numbers: Vec<f32> = input.to_data().try_into_vec().unwrap();
         assert_eq!(numbers, numbers_expected);
 
         // Move tensor back to device 1.
         let input = input.to_device(&device_1);
-        let numbers: Vec<f32> = input.to_data().to_vec().unwrap();
+        let numbers: Vec<f32> = input.into_data().try_into_vec().unwrap();
         assert_eq!(numbers, numbers_expected);
+
+        rt.shutdown_background();
+    }
+
+    /// A profiling window over the wire. The server here hosts a backend with
+    /// no device clock, so the window it is asked to open is answered with
+    /// none and the client measures between two syncs instead — the path a
+    /// remote device that opens no windows has to keep working on, with or
+    /// without fusion in front of the router.
+    #[test]
+    pub fn test_profile_over_websocket() {
+        let rt = tokio::runtime::Builder::new_multi_thread()
+            .enable_io()
+            .build()
+            .unwrap();
+
+        rt.spawn(
+            crate::server::RemoteServerBuilder::<Flex>::new(vec![Default::default()])
+                .port(3180)
+                .start_async(),
+        );
+
+        std::thread::sleep(std::time::Duration::from_millis(500));
+
+        let device = Device::remote_websocket("ws://localhost:3180", 0);
+        let (sum, duration) = device
+            .profile(|| {
+                Tensor::<1>::ones([1024], &device)
+                    .sum()
+                    .into_scalar::<f32>()
+            })
+            .expect("a window the server cannot open is measured between syncs");
+
+        assert_eq!(sum, 1024.0);
+        let ticks = burn_std::future::block_on(duration.resolve())
+            .expect("a system-time window always carries a measurement");
+        assert!(ticks.duration() > std::time::Duration::ZERO);
 
         rt.shutdown_background();
     }
@@ -199,7 +236,7 @@ mod tests {
         let data = rt
             .block_on(<RemoteBackend as FloatTensorOps<RemoteBackend>>::float_into_data(out))
             .unwrap();
-        let values: Vec<f32> = data.to_vec().unwrap();
+        let values: Vec<f32> = data.try_to_vec().unwrap();
         assert_eq!(values, vec![6.0, 12.0, 18.0]);
 
         rt.shutdown_background();
@@ -292,7 +329,7 @@ mod tests {
         let data = rt
             .block_on(<RemoteBackend as FloatTensorOps<RemoteBackend>>::float_into_data(out))
             .unwrap();
-        let values: Vec<f32> = data.to_vec().unwrap();
+        let values: Vec<f32> = data.try_to_vec().unwrap();
         assert_eq!(values, vec![6.0, 12.0, 18.0]);
 
         rt.block_on(router.shutdown()).unwrap();
@@ -529,15 +566,15 @@ mod tests {
 
         let input_shape = [1, 28, 28];
         let input = Tensor::<3>::random(input_shape, Distribution::Default, &device_0);
-        let numbers_expected: Vec<f32> = input.to_data().to_vec().unwrap();
+        let numbers_expected: Vec<f32> = input.to_data().try_into_vec().unwrap();
 
         // Move tensor to the second device on the same host and back.
         let input = input.to_device(&device_1);
-        let numbers: Vec<f32> = input.to_data().to_vec().unwrap();
+        let numbers: Vec<f32> = input.to_data().try_into_vec().unwrap();
         assert_eq!(numbers, numbers_expected);
 
         let input = input.to_device(&device_0);
-        let numbers: Vec<f32> = input.to_data().to_vec().unwrap();
+        let numbers: Vec<f32> = input.into_data().try_into_vec().unwrap();
         assert_eq!(numbers, numbers_expected);
 
         rt.shutdown_background();
@@ -643,7 +680,7 @@ mod tests {
 
         // The enumerated devices are usable: run an op on the last one.
         let input = Tensor::<2>::from_floats([[1.0, 2.0], [3.0, 4.0]], &devices[2]);
-        let numbers: Vec<f32> = (input * 2.0).to_data().to_vec().unwrap();
+        let numbers: Vec<f32> = (input * 2.0).into_data().try_into_vec().unwrap();
         assert_eq!(numbers, vec![2.0, 4.0, 6.0, 8.0]);
 
         rt.shutdown_background();
@@ -691,7 +728,7 @@ mod tests {
 
         // One successful round-trip so the sockets are actually up and the demux task is running.
         let input = Tensor::<2>::from_floats([[1.0, 2.0], [3.0, 4.0]], &device);
-        let warmup: Vec<f32> = (input * 2.0).to_data().to_vec().unwrap();
+        let warmup: Vec<f32> = (input * 2.0).into_data().try_into_vec().unwrap();
         assert_eq!(warmup, vec![2.0, 4.0, 6.0, 8.0]);
 
         // Kill the server: dropping its runtime closes the listener and both client sockets.
@@ -776,7 +813,7 @@ mod tests {
         let finished = finishes_within(std::time::Duration::from_secs(10), || {
             let device = Device::remote_websocket("ws://localhost:3090", 0);
             let input = Tensor::<2>::from_floats([[10.0, 20.0]], &device);
-            let numbers: Vec<f32> = (input * 3.0).to_data().to_vec().unwrap();
+            let numbers: Vec<f32> = (input * 3.0).into_data().try_into_vec().unwrap();
             assert_eq!(numbers, vec![30.0, 60.0]);
         });
         assert!(
@@ -814,7 +851,7 @@ mod tests {
 
         // Move back to local and verify.
         let back = doubled.to_device(&local);
-        let numbers: Vec<f32> = back.to_data().to_vec().unwrap();
+        let numbers: Vec<f32> = back.into_data().try_into_vec().unwrap();
         assert_eq!(numbers, vec![2.0, 4.0, 6.0, 8.0, 10.0, 12.0]);
 
         rt.shutdown_background();
@@ -855,7 +892,7 @@ mod fusion_tests {
             let data = burn_std::reader::try_read_sync(B::float_into_data(d))
                 .expect("remote read should resolve synchronously")
                 .expect("read should succeed");
-            out.push(data.to_vec::<f32>().unwrap());
+            out.push(data.try_to_vec::<f32>().unwrap());
         }
         out
     }
@@ -963,7 +1000,7 @@ mod fusion_tests {
             .expect("remote read should resolve synchronously")
             .expect("read should succeed");
 
-            let values = data.to_vec::<f32>().unwrap();
+            let values = data.try_to_vec::<f32>().unwrap();
             let expected = [1.0f32.exp(), 2.0f32.exp(), 3.0f32.exp()];
             for (a, e) in values.iter().zip(expected.iter()) {
                 assert!((a - e).abs() < 1e-4, "iter {i}: {a} vs {e}");
@@ -1027,7 +1064,7 @@ mod fusion_tests {
             >>::float_into_data(made))
             .expect("remote read should resolve synchronously")
             .expect("read should succeed");
-            let values = data.to_vec::<f32>().unwrap();
+            let values = data.try_to_vec::<f32>().unwrap();
             assert_eq!(values, vec![1.0, 2.0, 3.0], "iter {i}");
         }
 
@@ -1095,7 +1132,7 @@ mod fusion_tests {
                     .expect("remote read should resolve synchronously")
                     .expect("read should succeed");
 
-            let values = data.to_vec::<f32>().unwrap();
+            let values = data.try_to_vec::<f32>().unwrap();
             // a=[1,2,3], b=[4,5,6], c=[7,8,9]; t = log(exp(a)+b) + c
             let expected: Vec<f32> = (0..3)
                 .map(|k| {
@@ -1180,7 +1217,7 @@ mod fusion_tests {
                 burn_std::reader::try_read_sync(<B as FloatTensorOps<B>>::float_into_data(exp))
                     .expect("remote read should resolve synchronously")
                     .expect("read should succeed");
-            let exp_values = exp_data.to_vec::<f32>().unwrap();
+            let exp_values = exp_data.try_to_vec::<f32>().unwrap();
             let exp_expected = [1.0f32.exp(), 2.0f32.exp(), 3.0f32.exp()];
             for (g, e) in exp_values.iter().zip(exp_expected.iter()) {
                 assert!((g - e).abs() < 1e-3, "iter {i} (exp): {g} vs {e}");
@@ -1193,7 +1230,7 @@ mod fusion_tests {
                 burn_std::reader::try_read_sync(<B as FloatTensorOps<B>>::float_into_data(log))
                     .expect("remote read should resolve synchronously")
                     .expect("read should succeed");
-            let log_values = log_data.to_vec::<f32>().unwrap();
+            let log_values = log_data.try_to_vec::<f32>().unwrap();
             let log_expected = [1.0f32.ln(), 2.0f32.ln(), 3.0f32.ln()];
             for (g, e) in log_values.iter().zip(log_expected.iter()) {
                 assert!((g - e).abs() < 1e-3, "iter {i} (log): {g} vs {e}");

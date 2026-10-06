@@ -2,10 +2,10 @@
 
 | doc | disposition | status accurate | claims | holds | stale | unverifiable |
 |---|---|---:|---:|---:|---:|---:|
-| mere_docs/implementation_strategy/2026-10-04_stack_seams_plan.md | current | yes | 30 | 30 | 0 | 0 |
-| **Totals** |  |  | **30** | **30** | **0** | **0** |
+| mere_docs/implementation_strategy/2026-10-04_stack_seams_plan.md | current | yes | 45 | 45 | 0 | 0 |
+| **Totals** |  |  | **45** | **45** | **0** | **0** |
 
-**Totals: 1 doc, 30 claims checked (30 holds, 0 stale, 0 unverifiable), 0 contradictions.**
+**Totals: 1 doc, 45 claims checked (45 holds, 0 stale, 0 unverifiable), 0 contradictions.**
 
 Audit base: Mere `c34449bd` (2026-10-04), with this pass's edits in the
 working tree: the new plan, its `DOC_README.md` entry at the head of the
@@ -21,8 +21,8 @@ This batch exists because the document is new.
 ## mere_docs/implementation_strategy/2026-10-04_stack_seams_plan.md
 
 - disposition: current
-- status line: "Status (2026-10-05): plan. Fourteen rulings in three rounds (S1 to S14); P1 in progress in this session's worktree, P2 after it; P3 and S7 done as documents; S3 to S6 carried into the dynamics grammar plan (G8, G9); S9 done by the identity lane (`b52edea7`). No code in this plan's own lane yet." — accurate: yes
-- claims checked: 30 — holds: 30, stale: 0, unverifiable: 0
+- status line: "Status (2026-10-06): in progress. Forty-one rulings in fourteen rounds (S1 to S41); P1 landed on main (`1633be0c`); P2 staged (S27 to S31, four stages in §3.1) and landed on main (`40d7ae5e`); S32 (F19) landed on main (`48c08dee`); the S14 pass (S33) under way; P3 and S7 done as documents; S3 to S6 carried into the dynamics grammar plan (G8, G9); S9 done by the identity lane (`b52edea7`)." — accurate: yes
+- claims checked: 45 — holds: 45, stale: 0, unverifiable: 0
 
 ### Stale claims
 
@@ -67,4 +67,45 @@ search of mien and the workspace for the old name. Round 3's S12 evidence
 checked: the comment at `projection_compile.rs` 135 and its commit `534ae1c6`,
 the remote projection host plan's lines 81, 389 and 579, the dataset's serde
 derives, and its only JSON load at `web_projection.rs` 65 (a fixture and the
-editor preview).
+editor preview). F12 checked against `registry.rs` (`solve_via`'s doc and the
+absence of any built-in registration), scenograph's `Arrangement::default`, and
+graphshell's two id constants (`projection_compile.rs` 75-76). F13 checked
+against `c79bb8c2`'s file list and the adoption plan lines it added, the
+moved constants and mapping in `scenomise/src/projection.rs`, and a scan of
+every local branch for unmerged compiler edits (two found, both merges of
+main only). F13's correction checked against the three commits' authorship
+and file lists, the adoption plan's host continuation entry (lines 88-97),
+and the pitch arithmetic in `solve.rs` 312-322 with the footprint at
+`projection.rs` 697. S19's premise checked against the graph-semantics
+branch's record of the relay (`5666943e`) and the absence of compiler
+commits on any ref since `c79bb8c2`. F14 and the P1 progress entry checked
+against branch commit `dd2cb6fd` (its diff and the gate logs) and sceno's
+`Stack` and `Geographic` docs. Round 10's evidence checked against the tree at `b6a50a4d`: `HostState`'s
+60 fields (`cambium-rootstock/src/host.rs` 877-1007), genet's private
+`ScopedDom` (`genet-scripted/livery.rs` 1611, genet `bf723d5d`), no host
+constructing `GenetMultiRunner` outside cambium's own tests, and the winit
+host's resume path booting a fresh core through `boot_surface`. Round 11's
+evidence checked: `push_forest_projection` and `window_root` in `multi.rs`,
+the owned layout's generic `LayoutDom` bounds, the four whole-document reads
+in `cambium-winit-a11y/src/lib.rs` (212, 324, 369, 384), the pipeline's line
+counts, and Woodshed's sources (no `HostState` field reached). F15 checked against Knot `54bb8cd` (`git grep` of
+`compile_relationship_snapshot`; recounted with `git grep -c`: twelve mentions in
+`apps/desktop/src/composition/recipe.rs`, one of them the import, one in `retention.rs`,
+none in `tests/support/recipe.rs`),
+mere's root `Cargo.toml` (no `scenomise` row in the mere.git patch table),
+`dd2cb6fd` on `origin/main` through `19e6dc9f`, and the burn plan's §13.46
+entry at `ac7f906d`. F16 checked against wgpu 30.0.1's
+`src/backend/wgpu_core.rs` 752 and `src/api/device.rs` 26, and netrender
+`9607d16f`'s `boot_async_shared` (a new instance per boot); F17 against genet
+`bd3e8861`'s `genet-render-host` `rasterize_for` doc and rootstock's
+`frame.rs` call; stage 1's entry against branch commit `76aa1bee` and its gate
+and receipt logs. Stage 2's entry checked against branch
+commit `03f8fe74`, its gate logs, and the review subagent's report. Stage 3's entry checked against branch
+commit `21b0057f`, its gate logs, and the two control runs. F18 checked against winit
+0.30.13's `platform_impl/windows/window.rs` 152 and `event_loop.rs` 1276-1298
+and the stalled and passing headed logs; F19 against the Knot lane's report
+(not rerun here); F20 against the review subagent's report and `windows.rs`;
+stage 4's and the landing's entries against `7ae0e36e`, `e131273e`,
+`40d7ae5e` and their gate logs; the F15 addition against `102aa548`. S32's entry and F21 checked against `3ecba102`, `48c08dee`, the gate
+logs, the control runs with `card_issue` removed, and the nine runs of
+graphshell's `projection` filter with and without S32.

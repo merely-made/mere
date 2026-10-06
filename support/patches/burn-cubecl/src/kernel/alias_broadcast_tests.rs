@@ -1,8 +1,8 @@
 //! Direct launcher regressions: no fusion backend can replace these operations.
-use super::{binary, binary_float, binary_int};
-use crate::{ops::base, tensor::CubeTensor};
+use super::{binary, binary_float, binary_int, same_view::same_view};
+use crate::{CubeDevice, ops::base, tensor::CubeTensor};
 use burn_backend::{Shape, TensorData, TensorMetadata};
-use cubecl::wgpu::{WgpuDevice, WgpuRuntime};
+use cubecl::wgpu::{WgpuDevice, WgpuDeviceKind};
 
 #[derive(Clone, Copy, Debug)]
 enum Case {
@@ -12,10 +12,10 @@ enum Case {
 }
 
 fn views(
-    input: &CubeTensor<WgpuRuntime>,
-    other: &CubeTensor<WgpuRuntime>,
+    input: &CubeTensor,
+    other: &CubeTensor,
     case: Case,
-) -> (CubeTensor<WgpuRuntime>, CubeTensor<WgpuRuntime>, Vec<usize>) {
+) -> (CubeTensor, CubeTensor, Vec<usize>) {
     let same_shape = matches!(case, Case::SameShapeAlias);
     let lhs = base::reshape(input.clone(), Shape::new([3, 1]));
     let rhs = base::reshape(
@@ -27,45 +27,36 @@ fn views(
         Shape::new(if same_shape { [3, 1] } else { [1, 3] }),
     );
     assert_eq!(
-        lhs.handle.is_same_allocation(&rhs.handle),
+        same_view(&lhs.handle, &rhs.handle),
         !matches!(case, Case::Separate),
         "fixture must exercise the intended real handle identity"
     );
     (lhs, rhs, if same_shape { vec![3, 1] } else { vec![3, 3] })
 }
 
-fn assert_fresh(
-    output: &CubeTensor<WgpuRuntime>,
-    input: &CubeTensor<WgpuRuntime>,
-    other: &CubeTensor<WgpuRuntime>,
-    shape: &[usize],
-) {
+fn assert_fresh(output: &CubeTensor, input: &CubeTensor, other: &CubeTensor, shape: &[usize]) {
     assert_eq!(output.shape(), Shape::from(shape));
-    assert!(
-        !output
-            .handle
-            .memory
-            .is_same_allocation(&input.handle.memory)
+    assert_ne!(
+        output.handle.memory.descriptor().id,
+        input.handle.memory.descriptor().id
     );
-    assert!(
-        !output
-            .handle
-            .memory
-            .is_same_allocation(&other.handle.memory)
+    assert_ne!(
+        output.handle.memory.descriptor().id,
+        other.handle.memory.descriptor().id
     );
 }
 
 fn float_case(case: Case, atan2: bool) {
-    let device = WgpuDevice::DiscreteGpu(0);
+    let device = CubeDevice::Wgpu(WgpuDevice::new(WgpuDeviceKind::DiscreteGpu(0)));
     let values = [-2.0_f32, 1.0, 5.0];
     let others = [3.0_f32, -4.0, 2.0];
-    let input = base::from_data::<WgpuRuntime>(TensorData::new(values.to_vec(), [3]), &device);
-    let other = base::from_data::<WgpuRuntime>(TensorData::new(others.to_vec(), [3]), &device);
+    let input = base::from_data(TensorData::new(values.to_vec(), [3]), &device);
+    let other = base::from_data(TensorData::new(others.to_vec(), [3]), &device);
     let (lhs, rhs, shape) = views(&input, &other, case);
     let output = if atan2 {
-        binary_float::launch_binop_float::<WgpuRuntime, binary_float::ArcTan2Op>(lhs, rhs)
+        binary_float::launch_binop_float::<binary_float::ArcTan2Op>(lhs, rhs)
     } else {
-        binary::launch_binop::<WgpuRuntime, binary::SubOp>(lhs, rhs)
+        binary::launch_binop::<binary::SubOp>(lhs, rhs)
     };
     assert_fresh(&output, &input, &other, &shape);
     let actual = base::into_data_sync(output).to_vec::<f32>().unwrap();
@@ -100,13 +91,13 @@ fn float_case(case: Case, atan2: bool) {
 }
 
 fn integer_case(case: Case) {
-    let device = WgpuDevice::DiscreteGpu(0);
+    let device = CubeDevice::Wgpu(WgpuDevice::new(WgpuDeviceKind::DiscreteGpu(0)));
     let values = [2_i32, 7, 13];
     let others = [3_i32, 6, 10];
-    let input = base::from_data::<WgpuRuntime>(TensorData::new(values.to_vec(), [3]), &device);
-    let other = base::from_data::<WgpuRuntime>(TensorData::new(others.to_vec(), [3]), &device);
+    let input = base::from_data(TensorData::new(values.to_vec(), [3]), &device);
+    let other = base::from_data(TensorData::new(others.to_vec(), [3]), &device);
     let (lhs, rhs, shape) = views(&input, &other, case);
-    let output = binary_int::launch_binop_int::<WgpuRuntime, binary_int::BitwiseXorOp>(lhs, rhs);
+    let output = binary_int::launch_binop_int::<binary_int::BitwiseXorOp>(lhs, rhs);
     assert_fresh(&output, &input, &other, &shape);
     let actual = base::into_data_sync(output).to_vec::<i32>().unwrap();
     let right = if matches!(case, Case::Separate) {
