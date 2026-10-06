@@ -102,6 +102,8 @@ struct Args {
     control_unjoined_holder: bool,
     /// Enrol a vault passphrase typed at the terminal, and exit.
     enroll_passphrase: bool,
+    /// Unlock a running resident with a passphrase typed at the terminal.
+    unlock: bool,
     /// Command-line overrides folded over the profile's stored settings.
     #[cfg(feature = "personal-sync")]
     sync_overrides: SyncOverrides,
@@ -164,8 +166,9 @@ async fn main() {
             },
         }
     }
-    // Status and stop talk to a running resident; this process hosts nothing.
-    if args.resident_status || args.stop_resident {
+    // Status, stop and unlock talk to a running resident; this process hosts
+    // nothing.
+    if args.resident_status || args.stop_resident || args.unlock {
         match resident_client(&args).await {
             Ok(message) => {
                 println!("{message}");
@@ -265,18 +268,35 @@ fn refuse_default_endpoints(args: &Args) -> Result<(), String> {
     ))
 }
 
-/// `--resident-status` and `--stop-resident`, over the app door.
+/// `--resident-status`, `--stop-resident` and `--unlock`, over the app door.
+/// Unlock rides the control route only: the status route never carries a
+/// passphrase (vault lock ruling 41).
 async fn resident_client(args: &Args) -> Result<String, String> {
-    let route = if args.stop_resident {
+    let route = if args.stop_resident || args.unlock {
         RESIDENT_CONTROL_ROUTE
     } else {
         RESIDENT_STATUS_ROUTE
+    };
+    // Read before the door opens, so a cancelled prompt opens nothing.
+    let passphrase = match args.unlock {
+        true => Some(
+            djinn::enrollment::read_from_terminal("Vault passphrase: ")
+                .map_err(|error| error.to_string())?,
+        ),
+        false => None,
     };
     let route = AppRouteId::new(route).map_err(|error| error.to_string())?;
     let mut client =
         AppBrokerClient::open_route_at(&args.app_endpoint, AppId::new(RESIDENT_APP), route)
             .await
             .map_err(|error| error.to_string())?;
+    if let Some(passphrase) = passphrase {
+        let unlocked = resident_status::request_unlock(&mut client, passphrase.as_bytes()).await;
+        drop(passphrase);
+        let _ = client.close().await;
+        unlocked.map_err(|error| error.to_string())?;
+        return Ok("unlocked".into());
+    }
     if args.stop_resident {
         resident_status::request_stop(&mut client)
             .await
@@ -308,6 +328,7 @@ fn parse_args() -> Result<Args, String> {
     let mut stop_resident = false;
     let mut control_unjoined_holder = false;
     let mut enroll_passphrase = false;
+    let mut unlock = false;
     #[cfg(feature = "personal-sync")]
     let mut sync_graph = None;
     #[cfg(feature = "personal-sync")]
@@ -394,6 +415,7 @@ fn parse_args() -> Result<Args, String> {
             "--stop-resident" => stop_resident = true,
             "--control-unjoined-holder" => control_unjoined_holder = true,
             "--enroll-passphrase" => enroll_passphrase = true,
+            "--unlock" => unlock = true,
             #[cfg(feature = "personal-sync")]
             "--sync-graph" => {
                 sync_graph = Some(argv.next().ok_or("--sync-graph needs a value")?);
@@ -527,6 +549,7 @@ fn parse_args() -> Result<Args, String> {
         stop_resident,
         control_unjoined_holder,
         enroll_passphrase,
+        unlock,
         #[cfg(feature = "personal-sync")]
         sync_overrides: SyncOverrides {
             graph: sync_graph,
@@ -694,6 +717,7 @@ fn usage() -> &'static str {
      blobs at start: [--stage-blob <file>] [--fetch-blob <64-hex-hash>]\n\
      a running resident: --resident-status | --stop-resident [--app-endpoint <endpoint>]\n\
      enrol a vault passphrase at the terminal: --enroll-passphrase [--dir <vault-dir>]\n\
+     unlock a running resident at the terminal: --unlock [--app-endpoint <endpoint>]\n\
      receipt only: --receipt-agent-endpoint <isolated-endpoint>"
 }
 
@@ -793,6 +817,15 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
         .with_vault_dir(args.vault_dir.clone()),
     );
     // The status follows the lock (ruling 31's watch channel; harness H4).
+    // `djinn --unlock` arrives here over the control route (ruling 41).
+    let unlocker: resident_status::Unlocker = {
+        let personae = Arc::clone(&personae);
+        Arc::new(move |passphrase: &[u8]| {
+            personae
+                .unlock_vault(personae::UnlockMethod::Passphrase(passphrase))
+                .map_err(|error| error.to_string())
+        })
+    };
     let mut lock_state = personae.lock_state();
     let initial_lock = *lock_state.borrow_and_update();
     status.update(|status| status.lock = initial_lock.into());
@@ -987,7 +1020,13 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
                 .await?;
             resident_status::grant(&grants, route);
             let route = catalog
-                .update(|catalog| ResidentControlEndpoint::register(stop.clone(), catalog))
+                .update(|catalog| {
+                    ResidentControlEndpoint::register_with_unlock(
+                        stop.clone(),
+                        Some(unlocker.clone()),
+                        catalog,
+                    )
+                })
                 .await?;
             resident_status::grant(&grants, route);
             // V1 grants the reservoir to the first-party clients this door
