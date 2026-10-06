@@ -36,7 +36,14 @@ use crate::persistence::PersistedEdge;
 /// The edits that import `incoming` into `live`. `incoming` is a codicil's
 /// graph with the codicil's facet store laid in whole, not over what its
 /// snapshot's legacy columns import.
+/// This compatibility path stops on resources until resource-aware import lands.
 pub fn import_edits(live: &Graph, incoming: &Graph) -> Vec<CapturedDelta> {
+    assert!(
+        incoming.resources.node_count() == 0
+            && incoming.resources.edge_count() == 0
+            && incoming.shown_resources.is_empty(),
+        "surface-only import cannot preserve resource records"
+    );
     let mut edits = Vec::new();
     for (_, node) in incoming.nodes() {
         let (id, node_id) = (node.id, node.id.to_string());
@@ -125,6 +132,42 @@ mod tests {
     use crate::graph::{EdgeAssertion, NavigationTrigger, NodeFacetStore, SemanticSubKind};
     use crate::persistence::GraphSnapshot;
     use crate::types::{ImageRef, ImageRole};
+
+    #[test]
+    fn surface_import_stops_before_losing_resources_with_legacy_positive_control() {
+        let live = Graph::new();
+        let mut legacy = Graph::new();
+        legacy.add_node_with_id(
+            id(1),
+            "https://surface.test/".into(),
+            Point2D::new(0.0, 0.0),
+        );
+        let edits = import_edits(&live, &legacy);
+        assert!(!edits.is_empty());
+        let mut accepted = live.clone();
+        apply_all(&mut accepted, &edits);
+        assert_eq!(accepted.node_count(), 1);
+        assert!(accepted.get_node_by_id(id(1)).is_some());
+        let mut snapshot = legacy.to_snapshot();
+        let iri = "https://resource.test/page";
+        snapshot
+            .resources
+            .push(crate::persistence::PersistedResourceRecord {
+                canonical_iri: iri.into(),
+                facets: vec![],
+            });
+        let incoming = Graph::try_from_snapshot(&snapshot).unwrap();
+        assert!(
+            std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+                import_edits(&live, &incoming)
+            }))
+            .is_err()
+        );
+        assert_eq!(live.node_count(), 0);
+        assert!(live.resource_nodes().next().is_none());
+        assert_eq!(incoming.node_count(), 1);
+        assert!(incoming.resource(chartulary::resource_id(iri)).is_some());
+    }
 
     type Codicil = (GraphSnapshot, NodeFacetStore);
 

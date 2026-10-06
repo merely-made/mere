@@ -46,7 +46,14 @@ fn semantic_sub_kind(sub_kind: PersistedSemanticSubKind) -> SemanticSubKind {
 }
 
 impl Graph {
+    /// Load a snapshot, stopping on invalid explicit resource data.
+    /// Fallible load boundaries should use [`Self::try_from_snapshot`].
     pub fn from_snapshot(snapshot: &GraphSnapshot) -> Self {
+        Self::try_from_snapshot(snapshot)
+            .unwrap_or_else(|error| panic!("invalid graph snapshot: {error}"))
+    }
+
+    pub(super) fn from_snapshot_unchecked(snapshot: &GraphSnapshot) -> Self {
         let mut graph = Graph::new();
         // Restore the shared navigation history (one visit space, owner per node)
         // before the node loop, so each node's restored current page reads from it.

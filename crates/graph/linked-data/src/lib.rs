@@ -60,8 +60,7 @@ pub mod serialize;
 pub mod statements;
 
 /// SPARQL query over the graph via spareval evaluating directly over the
-/// projected dataset (the `query` feature). Consumes [`dataset_quads`] as its
-/// projection.
+/// borrowed RDF projection (the `query` feature).
 #[cfg(feature = "query")]
 pub mod query;
 
@@ -533,10 +532,55 @@ pub fn node_quads(graph: &Graph, key: NodeKey, node: &Node) -> Vec<Quad> {
 /// The RDF dataset quads for the whole graph, including named-graph scoped
 /// semantic statements and node properties plus dataset-only reifier metadata.
 pub fn dataset_quads(graph: &Graph) -> Vec<Quad> {
+    dataset_quad_iter(graph).collect()
+}
+
+fn resource_edge_quads(
+    from: &kernel::graph::resource::ResourceNode,
+    to: &kernel::graph::resource::ResourceNode,
+    payload: &kernel::graph::EdgePayload,
+) -> Vec<Quad> {
+    let mut quads = Vec::new();
+    let (Ok(subject), Ok(target)) = (
+        NamedNode::new(from.canonical_iri()),
+        NamedNode::new(to.canonical_iri()),
+    ) else {
+        return quads;
+    };
+    for statement in payload.semantic_statements() {
+        push_quad(
+            &mut quads,
+            &subject,
+            &statement.predicate,
+            target.clone().into(),
+            &statement.graph_scope,
+        );
+        push_statement_metadata_quads(
+            &mut quads,
+            &subject,
+            &statement.statement_id,
+            &statement.predicate,
+            target.clone().into(),
+            &statement.graph_scope,
+            statement.label.as_deref(),
+            statement.provenance_iri.as_deref(),
+            statement.asserted_at_ms,
+        );
+    }
+    let mut seen = std::collections::HashSet::new();
+    quads.retain(|quad| seen.insert(quad.clone()));
+    quads
+}
+
+pub(crate) fn dataset_quad_iter(graph: &Graph) -> impl Iterator<Item = Quad> + '_ {
     graph
         .nodes()
         .flat_map(|(key, node)| node_dataset_quads(graph, key, node))
-        .collect()
+        .chain(
+            graph
+                .resource_edges()
+                .flat_map(|(from, to, payload)| resource_edge_quads(from, to, payload)),
+        )
 }
 
 fn node_object(graph: &Graph, key: NodeKey, node: &Node) -> Value {

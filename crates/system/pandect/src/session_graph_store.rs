@@ -58,7 +58,12 @@ pub fn save(path: &Path, graph: &Graph) -> io::Result<()> {
 /// session). A malformed file surfaces as an error so the host can decide whether
 /// to fall back to a fresh graph rather than silently discard the session.
 pub fn load(path: &Path) -> io::Result<Option<Graph>> {
-    Ok(load_snapshot(path)?.map(|snapshot| Graph::from_snapshot(&snapshot)))
+    load_snapshot(path)?
+        .map(|snapshot| {
+            Graph::try_from_snapshot(&snapshot)
+                .map_err(|error| io::Error::new(io::ErrorKind::InvalidData, error))
+        })
+        .transpose()
 }
 
 /// Read the persisted snapshot without converting it into a [`Graph`].
@@ -119,6 +124,59 @@ mod tests {
             load(&path).expect("load ok").is_none(),
             "no file means a fresh session"
         );
+    }
+
+    #[test]
+    fn checked_snapshot_file_load_rejects_invalid_resources_and_preserves_input() {
+        use kernel::persistence::{PersistedResourceFacet, PersistedResourceRecord};
+
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("graph.json");
+        let mut graph = Graph::new();
+        graph.add_node("https://surface.test".into(), Point2D::new(0.0, 0.0));
+        let mut valid = graph.to_snapshot();
+        valid.resources.push(PersistedResourceRecord {
+            canonical_iri: "urn:mere:test:pandect-store".into(),
+            facets: vec![PersistedResourceFacet {
+                facet: "foreign.metadata".into(),
+                value_json: "true".into(),
+            }],
+        });
+        fs::write(&path, serde_json::to_vec(&valid).unwrap()).unwrap();
+        assert_eq!(
+            load(&path).unwrap().unwrap().to_snapshot().resources,
+            valid.resources
+        );
+        for conflict in [false, true] {
+            let mut invalid = valid.clone();
+            if conflict {
+                let mut record = invalid.resources[0].clone();
+                record.facets[0].value_json = "false".into();
+                invalid.resources.push(record);
+            } else {
+                invalid.resources[0].facets[0].value_json = "{".into();
+            }
+            let bytes = serde_json::to_vec(&invalid).unwrap();
+            fs::write(&path, &bytes).unwrap();
+            let error = match load(&path) {
+                Err(error) => error,
+                Ok(_) => panic!("invalid resource snapshot was loaded"),
+            };
+            assert_eq!(error.kind(), io::ErrorKind::InvalidData);
+            assert_eq!(fs::read(&path).unwrap(), bytes);
+            assert_eq!(
+                load_snapshot(&path).unwrap().unwrap().resources,
+                invalid.resources
+            );
+        }
+        let mut legacy = serde_json::to_value(&valid).unwrap();
+        for column in ["resources", "resource_edges", "shown_resources"] {
+            legacy.as_object_mut().unwrap().remove(column);
+        }
+        fs::write(&path, serde_json::to_vec(&legacy).unwrap()).unwrap();
+        let loaded = load(&path).unwrap().unwrap();
+        assert_eq!(loaded.node_count(), 1);
+        assert!(loaded.to_snapshot().resources.is_empty());
     }
 
     #[test]
