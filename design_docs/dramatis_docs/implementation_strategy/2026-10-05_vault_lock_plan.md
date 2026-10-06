@@ -1,7 +1,7 @@
 # Vault Lock Plan
 
 **Date**: 2026-10-05
-**Status (2026-10-06)**: rulings 1 to 45 in §3; the threat statement is
+**Status (2026-10-06)**: rulings 1 to 48 in §3; the threat statement is
 still open. L1 (personae can lock) landed (`2556a20c`). L2's checkpoint A
 (every consumer obeys, the Secret Service aside) landed (`7c588deb`). L2
 checkpoint B (rulings 40, 41, 43) and the Secret Service on the ThinkPad
@@ -554,6 +554,46 @@ locked.
 
 Mark kept all four: **"Standalone agent refuses -x, Second -x fails,
 Enrolment never mints, Locked: only Unlock acts"**.
+
+Rulings 46 to 48 were asked on 2026-10-06 from L2 checkpoint B's forks.
+The lane stopped before building rulings 40, 41a and 43.
+
+**Ruling 46** *(how ruling 40 is carried out).* *An admitted door session
+needs two vault-derived keys. The delegation signer is already namespaced
+to the door (`mere.graphshell` plus the local network id). notochord's
+session signer is derived under one global salt that every remote hello
+uses (`notochord/src/handshake.rs:41`, accepted alone at `:253`), so
+keeping it live while locked keeps the persona's network login live.*
+Options:
+- notochord also accepts a session signer derived under a salt bound to
+  the local network, used only by the local door, while remote hellos
+  keep the global salt, which locks (additive; old peers and Knot
+  unaffected; the subject stays the persona);
+- keep the global signer;
+- the door speaks as its own derived identity, which changes every app's
+  subject.
+
+Mark: **"Network-bound signer (Recommended)"**. Follows: the door holds a
+restricted provider. It answers the master public key and derives or
+attests only the door's two salts; every other salt returns Locked.
+
+**Ruling 47** *(how ruling 41's native half is triggered).* Options:
+- the Locked card's native-only Unlock reaches the resident's own UI, as
+  SSH import does: Windows Hello first, then a passphrase box, the
+  credential never leaving the resident (a browser wire enum gains one
+  variant);
+- `djinn --unlock --native` asks the resident to show its prompt;
+- both.
+
+Mark: **"Both"**.
+
+**Ruling 48** *(when ruling 43's Knot lane closes).* Options: djinn's run
+loop closes it when the watch reports Locked (a short logged window after
+`lock()` returns; the route switches to Locked refusals and live Knot
+sessions are cut; it reopens on unlock); a synchronous holder that blocks
+on the close (no window, but the agent's lock call waits on Knot's network
+shutdown, and it needs a multi-thread runtime). Mark: **"Close right after
+lock (Recommended)"**.
 
 Still open: a threat statement naming hibernation and the pagefile.
 
