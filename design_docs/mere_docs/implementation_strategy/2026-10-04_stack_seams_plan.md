@@ -672,7 +672,7 @@ under S36.
 **Ruling S40.** *Merge `0a8198ba` (2026-09-06) dropped inker's `LICENSE-MIT`
 and `LICENSE-APACHE`, which LICENSES.md says are not to be deleted. Restore
 them or accept the deletion?* Options: restore from the merge's first parent;
-accept the deletion and amend LICENSES.md. Mark: **"Eh, they're supposed to be
+accept the deletion and amend LICENSES.md. Mark: **"Eh, they’re supposed to be
 mpl-2.0"**. Follows: the files stay deleted; inker is MPL-2.0 like the rest of
 the workspace, and LICENSES.md's inker and tinct rows and its "not to be
 deleted" sentence are amended in phase C. *Reading, not ruled*: the versions
