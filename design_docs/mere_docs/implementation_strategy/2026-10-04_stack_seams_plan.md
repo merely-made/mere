@@ -1,8 +1,8 @@
 # Stack seams plan: catalog, shared device, actions, determinism, two words
 
 **Date:** 2026-10-04
-**Status (2026-10-06):** in progress. Forty-eight rulings in sixteen rounds
-(S1 to S48); P1 landed on main (`1633be0c`); P2 staged (S27 to S31, four
+**Status (2026-10-06):** in progress. Forty-nine rulings in seventeen rounds
+(S1 to S49); P1 landed on main (`1633be0c`); P2 staged (S27 to S31, four
 stages in §3.1) and landed on main (`40d7ae5e`); S32 (F19) landed on main
 (`48c08dee`); the S14 pass (S33) under way; P3 and S7 done as documents; S3 to
 S6 carried into the dynamics grammar plan (G8, G9); S9 done by the identity
@@ -753,6 +753,20 @@ plan tails backlog; a new follow-ons plan per area root; ask per plan. Mark:
 its plain live owner or into a dated section of
 `2026-07-03_archived_plan_tails_plan.md`, citing the archived plan, before
 the archive move.
+
+Round 17, 2026-10-06, after phase C's fourteen lanes merged. Evidence: the
+lanes' archive-candidate lists; 46 plans plainly complete, about 53 posing
+completeness as a fork.
+
+**Ruling S49.** *About 53 plans pose completeness as a fork, most asking
+whether a meerkat-era or dormant plan's open items are re-homed onto a live
+host or archived. How are they handled?* Options: leave them active with
+their forks as Open notes, lanes deciding later; rule them now in
+multi-select rounds; archive only the unbuilt ones without a consumer. Mark:
+**"Rule them now"**. Follows: the plans come to Mark in multi-select rounds;
+each ticked plan is archived with its tails extracted (S36, S48), and each
+unticked plan stays active with its corrected status. The 46 plainly complete
+plans are archived under S36 without a round.
 
 ## 3. Phases
 
