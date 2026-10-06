@@ -1,13 +1,14 @@
 # Vault Lock Plan
 
 **Date**: 2026-10-05
-**Status (2026-10-06)**: rulings 1 to 49 in §3; the threat statement is
-still open. L1 (personae can lock) landed (`2556a20c`). L2's checkpoint A
-(every consumer obeys, the Secret Service aside) landed (`7c588deb`). L2
-checkpoint B (rulings 40, 41, 43) and the Secret Service on the ThinkPad
-are next. The [dramatis repo plan](2026-10-06_dramatis_repo_plan.md) moves
-this code later. Chatelaine P4 (CXF import) waits on this plan (chatelaine
-rulings 64, 65).
+**Status (2026-10-06)**: rulings 1 to 51 in §3; the threat statement is
+still open. L1 landed (`2556a20c`). L2's checkpoints A (`7c588deb`) and B
+(`ec1768ab`) landed. Still to come in L2: the Secret Service on the
+ThinkPad, ruling 42 (Linux starts locked), ruling 44 (Distillery's
+transport key) and the seed residue fixes (rulings 49 to 51). The
+[dramatis repo plan](2026-10-06_dramatis_repo_plan.md) moves this code
+later. Chatelaine P4 (CXF import) waits on this plan (chatelaine rulings
+64, 65).
 **Scope**: the resident's secrets can be locked. While locked, no secret
 material can be reached through the vault or the resident's derived keys.
 Unlocking takes a user act. Every consumer (the SSH agent, castellan's item
@@ -608,6 +609,27 @@ not an upstream ledger item.* Options:
 
 Mark: **"Fix in knot-editor (Recommended)"**.
 
+**Ruling 50** *(the base for ruling 49's Knot fix).* *Twenty-two
+knot-editor functions take the seed by value. The burn coordinator's Knot
+lane is mid-flight on knot-editor (`mere-p1-adapt`, `7bea433`), and burn
+plan 13.46 holds djinn's next Knot pin move for that head.* Options:
+- branch from the Knot lane's P1 head once it lands, so the seed fix is
+  the next Knot commit and djinn's repin after theirs carries it;
+- branch from origin/main `54bb8cd` now and have the Knot lane merge it;
+- hand the change list to their lane.
+
+Mark: **"After their head (Recommended)"**.
+
+**Ruling 51** *(mere's transport).* *mere's own transport
+(`crates/murm/transport`: `builder_from_seed`, `bind_seed`) also takes the
+seed by value, and Knot calls it, so Knot's fix takes effect only once the
+transport is fixed. iroh alone leaves 2 freed blocks per bind and close;
+p2panda-net's share cannot be measured until the transport is fixed.*
+Options: fix the transport now (mere work, an additive borrowing API beside
+the old one), re-measure, and ledger whatever iroh and p2panda-net still
+leave; fix it with the Knot fix later. Mark: **"Fix transport first
+(Recommended)"**.
+
 Still open: a threat statement naming hibernation and the pagefile.
 
 ## 4. Phases
@@ -889,3 +911,27 @@ The Secret Service is checkpoint B, on the ThinkPad.
 - **Finding:** a resident whose door was never used before it locked has
   no door keys until its first unlock. That is the shape ruling 42's
   resident, which starts locked, will have.
+
+**2026-10-06, L2 checkpoint B landed** (`ec1768ab`, merging `l2b` through
+`7555a36d`):
+- `7555a36d` adds `the_native_unlock_refuses_any_payload`.
+- **My control 2, rerun:** the native unlock intent accepting a payload
+  now fails that test.
+- **Verified:** djinn's library tests (91), and the gate on the merge with
+  `main` `9b53f744`. The tree that landed is that merge.
+- **The seed residue, measured by the lane** (freed uncleared blocks, no
+  live copies):
+  - Knot's `author`: 1;
+  - an iroh endpoint bind and close alone: 2;
+  - mere's `P2pandaTransport` bind: 7, or 11 with gossip;
+  - `KnotSyncHost::open` and close: 19;
+  - p2panda's `SigningKey` and iroh's `SecretKey` clear themselves.
+- **Reading, not measured:** a `[u8; 32]` taken by value into an async
+  function leaves its copy in the future, and `Zeroizing` alone does not
+  stop moves copying. The fix is borrowing, or one boxed `Zeroizing`,
+  across every await.
+- **Next under rulings 50 and 51:**
+  - the transport first, in mere;
+  - then Knot's 22 functions on the Knot lane's P1 head;
+  - djinn's strict residue test lands with the repin, judged against
+    iroh's own baseline in the same process.
