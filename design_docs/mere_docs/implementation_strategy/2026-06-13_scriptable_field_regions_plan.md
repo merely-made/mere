@@ -1,8 +1,18 @@
 # Scriptable Field Regions Plan
 
-*Written before the 2026-09-05 retirement of graphlet (TERMINOLOGY.md): read graphlet as subgraph. Identifiers such as GraphletId, GraphletRef, and SessionGraphlets are now SubgraphId, SubgraphRef, and SessionSubgraphs, and the graphlets crate is crates/graph/subgraph (code renamed 2026-09-12).*
+*Written before the 2026-09-05 retirement of graphlet (TERMINOLOGY.md): read graphlet as subgraph. Identifiers such as GraphletId, GraphletRef, and SessionGraphlets are now SubgraphId, SubgraphRef, and SessionSubgraphs, and the graphlets crate was crates/graph/subgraph (code renamed 2026-09-12), now `crates/mere/src/subgraph.rs` (folded in `61894570`, 2026-09-23).*
 
-**Status:** partially implemented: movable and resizable field regions landed; physics-setting and further scripted-region work remains deferred.
+**Status (2026-10-06):** partially implemented. Landed: placement, move and resize,
+the force well and rebuild-on-mutation (P0, P1 and the follow-ups, `3c62b15` to
+`7445e70`), and the physics settings on 2026-06-14: runtime damping (`540935f2`,
+`50c23945`), now `Canvas::set_physics_damping`, driven live by Turnstone and
+Graphshell; per-field strength (`af775f24`), whose library half survives as
+`set_field_strength` with no host driver since meerkat's removal (2026-07-18,
+`c5f01064`). No host calls `add_field_at` (only a pictograph test does), so a user
+cannot place a field today. Open: per-field response (gather / repel / wall /
+dampen), and P2-P4.
+
+Earlier status (undated, 2026-09-05 reconcile): partially implemented: movable and resizable field regions landed; physics-setting and further scripted-region work remains deferred.
 
 A **field region** is a spatial area you place on the graph that carries a rule
 set — scriptable in rhai — governing the graph's characteristics inside it:
@@ -16,6 +26,10 @@ this plan owns the **localized / scripted arrangement** half of the *arrange* st
 scene-wide arrangement choice is the node-representation plan's), plus the placed rule region
 (forces, edge-visibility) and its rhai surface. Field regions are already moveable + resizable
 (Progress, `7445e70`).
+
+**Corrected 2026-10-06 (S14 pass):** the node-representation plan was superseded on
+2026-06-23 and its arrangement axis went to the graph signals layer plan, archived
+complete on 2026-08-20, so the scene-wide arrangement choice has no active owner.
 
 This is the "field" the user means — not a node attribute, a **spatial rule
 region**. It unifies three subsystems that already exist separately (forces via
@@ -52,6 +66,12 @@ rule surface**.
   graph via `FieldProjection::commit_to_graph`. **This is the seam the region's
   rule script extends**: today it is registry-id / global authoring; a field
   region scopes it to a placed extent.
+
+  **Corrected 2026-10-06 (S14 pass):** both seams moved. `commit_to_graph` was
+  removed; numen stays graph-kernel-free and a graph write is the host's job
+  (`crates/conatus/numen/src/projection.rs`). `CouplingForce::from_coupling` became
+  pictograph's `coupling_force_from_graph` bridge
+  (`crates/canvas/pictograph/src/canvas/seiche_bridge.rs`).
 - **Edge visibility** — the graphlet
   [`EdgeProjectionSpec`](../research/2026-06-13_edge_system_audit.md) (the design
   in [subgraph derivation](../design/2026-06-13_subgraph_derivation_from_selection.md))
@@ -61,6 +81,9 @@ rule surface**.
 - **Layout** — the `orrery/arrangements` family (layout strategies) already
   arranges node subsets. A region's layout rule selects an arrangement applied to
   its contained nodes.
+
+  **Corrected 2026-10-06 (S14 pass):** no `orrery/arrangements` package exists; the
+  layout adapters are `crates/canvas/cartography/src/adapters/`.
 - **The gaps**: (1) no gesture to *place* a field at a world point (the just-shipped
   `add_node_at` is the exact pattern to mirror — `Orrery::add_field_at`); (2) the
   orrery does not *render* fields (placed fields are invisible — grep finds no
@@ -81,6 +104,12 @@ script is rhai, with privileged bindings in three domains:
   nodes show/hide per the spec). (Substrate: the graphlet projection.)
 - **Layout** — `arrange(strategy)`, applying an arrangement to the contained
   nodes within the region's box. (Substrate: `orrery/arrangements`.)
+
+**Corrected 2026-10-06 (S14 pass):** the substrate names above are pre-fold. The
+coupling force resolves through pictograph's seiche bridge, the arrangements are
+cartography's adapters, and `EdgeProjectionSpec` is forme's
+(`crates/forme/forme/src/subgraph.rs`). No `FieldContext`, `show_edges` or `arrange`
+binding exists yet.
 
 The region is a first-class visible object: a translucent outline (disk radius /
 box) painted in the orrery, **selectable and movable like a node** (drag to
@@ -195,6 +224,16 @@ dampen), the **move/resize re-aims the well** behavior (today the force snapshot
 the field definition at placement, so dragging the field doesn't move its pull
 until rebuild), and field **removal** dropping its force.
 
+**Corrected 2026-10-06 (S14 pass):** part of this section, and the "still deferred"
+list in the last 2026-06-14 Progress entry, landed later that day, after that entry
+(`9d46d934`). Runtime damping (`540935f2`, `50c23945`) is now
+`Canvas::set_physics_damping` in `crates/canvas/pictograph/src/canvas/input.rs`,
+called by Turnstone's session lifecycle and by `ports/graphshell/src/canvas_physics.rs`.
+Per-field strength (`af775f24`) is now `set_field_strength` in the same file, over the
+kernel's `set_field_coupling_strength` (`crates/graph/graph-kernel/src/graph/field_ops.rs`);
+its control was meerkat's roster, so no host drives it today. Per-field response is
+still absent.
+
 ## Progress
 
 - 2026-06-13: Plan written from the field-system scout (kernel `Field`/`Coupling`,
@@ -243,3 +282,8 @@ until rebuild), and field **removal** dropping its force.
   comment). **Still deferred to the physics menu (post-window-composition):**
   per-field strength, response (gather/repel/wall/dampen), and the inertia/damping
   toggle — the *tuning* surface, distinct from the now-shipped *mechanics*.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at mere
+  535bca11, from the D2 record in support/doc-audit/d2/batch_40_s14_phase_b2.md: a
+  dated status recording the 2026-06-14 physics settings and the missing host driver
+  for placement and per-field strength, the subgraph banner path, and the moved
+  numen / seiche / cartography substrate names.

@@ -9,6 +9,14 @@ re-homed: cond 1 -> [orrery_custom_layout_element_plan](2026-06-23_orrery_custom
 slice 5 -> [layout_phase_split_probe_plan](../../archive_docs/2026-09-02_retired_plans/2026-06-23_layout_phase_split_probe_plan.md);
 secondary-orreries -> tearout; tiles -> composition spine.
 
+**Corrected 2026-10-06 (S14 pass):** this is a historical record now, not a current
+one: the host it describes was meerkat, deleted 2026-07-18 (`c5f01064`). Nothing in
+the tree implements the one shell document or the orrery element; `orrery_a11y_tree`
+survives only in a comment in `crates/mere/src/glossary.rs`. Slice 5's home, the
+layout phase split probe plan, was retired 2026-09-02 and its point carried to the
+[archived plan tails](2026-07-03_archived_plan_tails_plan.md). The same applies to the
+"foundational, still-current record" wording in the closing Progress entry.
+
 **Rename banner (2026-07-02):** the code pointers throughout this doc (`OrreryCard`,
 `node_card_view`, `.node-card`, `render_as_cards`/`set_render_as_cards`, `point_over_orrery_card`)
 predate the node/card terminology cleanup and no longer exist under those names — see
@@ -16,6 +24,10 @@ predate the node/card terminology cleanup and no longer exist under those names 
 consensus (a node's rendered body is a **gnode**, never a card) and current names
 (`OrreryGnode`/`gnode_view`/`.gnode`/`render_gnodes_as_dom`). Left unedited below as the
 historical record.
+
+**Corrected 2026-10-06 (S14 pass):** `OrreryGnode` and `gnode_view` left with meerkat.
+Only `.gnode` and `render_gnodes_as_dom` survive, in pictograph
+(`crates/canvas/pictograph/src/canvas.rs`, `crates/canvas/pictograph/src/canvas/cartography.rs`).
 
 Status (reconciled 2026-06-19 cross-plan consolidation). Phase 1's document consolidation is
 **done** (all 4 done-conditions). Phase 2 cond 3/4/5 **landed host-side**, **but** the
@@ -825,6 +837,10 @@ original four resolve or narrow; resolutions are reflected in the phase notes ab
     `gloss_a11y_tree` also emits a `SelectNodeByUrl` Link per node, so with both panes open a node
     carries two routes under different ids, harmless (the bridge's `find_map` returns one).
 
+    **Corrected 2026-10-06 (S14 pass):** the crate's fate was settled: renamed `glossary`
+    on 2026-06-26 (`8d55f96`, `ffb1b5e`; see the gloss outline lens plan), then folded
+    into `mere` as `crates/mere/src/glossary.rs` (`61894570`, 2026-09-23).
+
 - **2026-06-23 (CLOSED — core complete, Phase-2 tail spun out).** Phase 1 (one document, one shell
   root) is done 4/4 and the four pressing slices landed + verified. The plan's task-list is complete;
   what remained is re-homed, so this plan is **closed**. It stays in place (not moved to
@@ -853,3 +869,9 @@ original four resolve or narrow; resolutions are reflected in the phase notes ab
     follow-on in node-representation / interaction territory. Slice 2 removed the cards from the Tab
     ring and slice 4 gave assistive tech actionable node selection via the a11y tree; the visual
     keyboard ring stepping orrery nodes is not built.
+
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at mere
+  535bca11, from the D2 record in support/doc-audit/d2/batch_40_s14_phase_b2.md: the
+  "still-current" framing marked historical (host deleted 2026-07-18), the rename
+  banner's surviving names, slice 5's retired home, and the settled fate of
+  `mere-orrery`.

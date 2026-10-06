@@ -1,6 +1,25 @@
 # Alembic implementation plan: graph engrams, the memory pane, and Athanor
 
-**Status:** partially implemented: slices A-C landed; merge, promotion, event-log, LoRA, and settings/Timeline follow-ons remain deferred.
+**Status (2026-10-06):** partially implemented. Slices A-C landed 2026-06-24, their host
+halves in meerkat, retired with it 2026-07-18 (`c5f01064`); surviving library parts:
+the codicil spine (`crates/system/pandect/src/graph_codicil.rs`) and the memory levels
+(`ports/distillery/alembic/src/memory_levels.rs`). Slice D is half landed: the
+forgetting (`d3893dd`, `95f3a20`) and consolidation passes live in `mere-athanor`
+(`ports/distillery/athanor/src/lib.rs`, moved in `1bda73d5`). Merge landed as
+`compose_graph_codicils` (`3e828a48`, 2026-06-30). Slice E's successor, the event log
+timeline plan, was superseded on 2026-08-03 by the graph view curation plan
+(`GraphJournal`). The LoRA lane was spun off to the local models harness brief. Open:
+D's background scheduling, facet pass and Steward surfacing; the promote / demote UI,
+editable settings, and the Timeline.
+
+Earlier status (undated, 2026-09-05 reconcile): partially implemented: slices A-C landed; merge, promotion, event-log, LoRA, and settings/Timeline follow-ons remain deferred.
+
+**Corrected 2026-10-06 (S14 pass):** engrams were renamed codicils on 2026-08-31
+(`c51b9704`). The names this plan uses (`save_graph_engram`, `open_engram_as_session`,
+`list_graph_engrams`, `GraphEngram`) are now `save_graph_codicil`,
+`open_codicil_as_session` and `list_graph_codicils` in
+`crates/system/pandect/src/graph_codicil.rs`, under the `mere.graph-snapshot/v2`
+schema (v1 is read as legacy). Left unedited below as the historical record.
 
 The build plan that realizes the [Alembic memory + engrams architecture](../technical_architecture/2026-06-09_alembic_memory_and_engrams.md)
 (the design seed). That doc stays the canonical model; this sequences the build into shippable slices,
@@ -73,6 +92,10 @@ context-binding toggle (global vs selection-filtered) per the dock contract.
 
 Done when the Alembic pane opens from the palette / dock, lists engrams, and clicking one opens it.
 
+**Corrected 2026-10-06 (S14 pass):** slice B landed in meerkat (`b029d83`, `7c6e5f4`; see
+Progress) and was retired with it on 2026-07-18 (`c5f01064`). Turnstone registers a
+`PaneContent::Alembic`; what it shows was not traced by the pass.
+
 ### C — The three memory levels
 
 Promotion short→long as an affirmative act (tag / bookmark a node promotes it + its group); the
@@ -123,6 +146,19 @@ background (vs the manual trigger), the **consolidation / facet** passes (consol
 graph engrams already dedup by content-addressing), and surfacing the live pass in **Steward** (today
 the count lands in the Apparatus diagnostics buffer, not Steward's live-ops view).
 
+**Corrected 2026-10-06 (S14 pass):** the consolidation pass landed 2026-07-01 (the athanor
+steady-heat actor plan's P2), and both passes now live in `mere-athanor`
+(`ports/distillery/athanor/src/lib.rs`: `propose_forgetting`, `apply_forgetting`,
+`propose_consolidation`, `apply_consolidation`; moved in `1bda73d5`). D is not done:
+its "runs in the background" condition is unmet, since the crate's module doc says
+scheduling the passes "is still to come" and a 2026-09-02 ruling there gives the
+scheduler to Djinn; the facet pass and Steward surfacing remain open.
+
+**Open, raised by the S14 pass (2026-10-06):** which plan reports and owns slice D's
+open remainder (background scheduling, the facet pass, Steward surfacing)? Options:
+this plan, reporting A-D plus merge as its status does now; the athanor steady-heat
+actor plan only, with this plan pointing there.
+
 ### E — Event log + Timeline (scoped for implementation, decision #5)
 
 **Spun out 2026-07-01** to its own plan:
@@ -130,6 +166,12 @@ the count lands in the Apparatus diagnostics buffer, not Steward's live-ops view
 code-verified implementation spec (it corrects one finding here: `apply_graph_delta` is not the mutation
 chokepoint this section implies; it has 2 real call sites, not a universal funnel). This section stays as
 the historical decision record.
+
+**Corrected 2026-10-06 (S14 pass):** that plan was itself superseded for implementation
+on 2026-08-03 by the
+[graph view curation and interaction plan](2026-08-03_graph_view_curation_and_interaction_plan.md):
+`GraphJournal` and its attributed `CapturedDelta` supply the append-only replay
+substrate proposed below as a new `GraphMutation` log.
 
 The substrate undo/redo and the Timeline both ride. One append-only log of graph mutations, two
 projections (eidetic R0): the **Alembic** current fold (slice C's live nodes / facets) and the
@@ -224,6 +266,11 @@ Verification: a unit/integration test that `save → (drop) → open` round-trip
 
 ## Progress
 
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at mere
+  535bca11, from the D2 record in support/doc-audit/d2/batch_40_s14_phase_b2.md: a
+  dated status (A-C landed with host halves retired with meerkat, D half landed in
+  `mere-athanor`, merge landed, E superseded), a codicil-rename banner, and slice D's
+  ownership left open for this plan's lane. (This log runs newest first.)
 - 2026-06-24: **Athanor forgetting + slice C eviction landed** (commits `d3893dd` spine, `95f3a20`
   host wiring). The R0 propose/apply forgetting pass (`athanor` module + `content_store::evict_content`
   over `FjallStore::delete_blob`), run from the Alembic Recent section's "forget stale recent now"

@@ -1,7 +1,16 @@
 # xilem-serval control-set adoption
 
 **Date**: 2026-06-25
-**Status**: P1 + P2 done 2026-06-25 (genet + meerkat). P3 gated/open. From the
+**Status (2026-10-06):** historical. P1 and P2 landed in genet and meerkat on 2026-06-25;
+the meerkat halves (the `views.rs` button helper, the `PaneItem` / `PaneAria` radio and
+switch rows) were retired with meerkat 2026-07-18 (`c5f01064`); surviving library
+parts: `OnClick::attr` (now in cambium's `event.rs`) and genet-render's ARIA reading
+(`role`, `aria-checked`). P3 is moot: `PaneItem` is gone, and Turnstone already lenses a
+`&mut RadioGroup` with `aria-checked` (`turnstone/src/inspector_pane.rs`). The control
+set is cambium's, in mere (`crates/cambium/cambium/src/controls/`). Nothing in this
+plan is open.
+
+Earlier status: P1 + P2 done 2026-06-25 (genet + meerkat). P3 gated/open. From the
 [genet capability-misuse sweep](../../archive_docs/2026-07-03_completed_plans/2026-06-25_overlay_primitive_adoption_plan.md) (2026-06-25).
 **Owner**: meerkat (consumes xilem-serval `controls`); P1/P2 also touch genet (xilem-serval +
 genet-render).
@@ -24,6 +33,12 @@ Specifics:
   chosen one carrying `app-btn-active` + a check glyph. A radio group, minus `role="radio"`/`aria-checked`.
 - **`checkbox`/`toggle`** — engine on/off and orrery/crawl boolean switches are buttons toggling
   `app-btn-active` (the host closures are even named `toggle`). No switch/checkbox role.
+
+**Corrected 2026-10-06 (S14 pass):** the control set is cambium's now, in mere, not
+xilem-serval's `controls.rs`: `button` and `toggle` in `crates/cambium/cambium/src/controls/`
+(`button.rs`, `toggle.rs`, with the text field in `field.rs`), and `radio_group`,
+`select` and `slider` in `crates/cambium/cambium/src/radio.rs`, `select.rs` and
+`slider.rs`. The meerkat sites described above left with meerkat (`c5f01064`).
 
 ## The structural obstacle
 
@@ -55,6 +70,10 @@ stateless, a near drop-in).
 **P3 — evaluate full primitive adoption (gated).**
 - If a lensed `PaneItem` path emerges (or settings panes move off the key-drain model), adopt
   `radio_group` / `toggle` / `checkbox` directly and delete the hand-rolled class-toggle code.
+
+**Corrected 2026-10-06 (S14 pass):** P3's gate is moot. `PaneItem` left with meerkat, and
+Turnstone already lenses a `&mut RadioGroup` directly, stamping `aria-checked`
+(`turnstone/src/inspector_pane.rs`).
 
 ## Non-goals (verified, do not force-fit)
 
@@ -97,3 +116,7 @@ stateless, a near drop-in).
   group structure in the item stream; the radio rows announce + read their checked state without it
   (the P2 Done condition), so this is a later refinement. The menu-editor inclusion list (reorder rows
   with ✓) and the script-cap cycle buttons are left as-is (neither is a radio/switch).
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at mere
+  535bca11, from the D2 record in support/doc-audit/d2/batch_40_s14_phase_b2.md: a
+  dated historical status (P1 and P2 done, meerkat halves retired, P3 moot), and the
+  control set relocated to cambium in mere.

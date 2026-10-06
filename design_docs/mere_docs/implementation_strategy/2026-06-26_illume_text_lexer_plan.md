@@ -1,7 +1,19 @@
 # Illume: the text lexer / highlighter, its tinct + genet pairing, and the omnibar legibility goal
 
 **Date**: 2026-06-26
-**Status**: Points 1-6 done and headed-verified. Point 7 part-shipped 2026-06-27
+**Status (2026-10-06):** points 1-6 landed 2026-06-26 (mere `bcaf834`, `6d0a2ae`,
+`81d0c86`, `8e32f38`, `e271adc`, `3fdc64f`; genet `6a3ceace`, `3abaad8`, `ea5fdf33`);
+their meerkat consumers, the editor and omnibar highlighting, were retired with meerkat
+2026-07-18 (`c5f01064`). Point 7: tinct 0.1.0 and illume 0.0.1 were published
+2026-06-27 (not re-checked; no network in the pass). Point 8's extraction (2026-07-08)
+was reversed on 2026-09-03 (platform boundary plan, P3): illume, tinct and cambium are
+workspace path members of mere again. illume is `crates/nematic/illume`, licensed
+MPL-2.0; tinct is `crates/cambium/tinct`; the highlight bridge is cambium's `highlight`
+feature (`crates/cambium/cambium/src/highlight.rs`). Open: a stable illume release,
+and the omnibar grammar gaps (one shared grammar, completion everywhere, a typable
+graph query).
+
+Earlier status: Points 1-6 done and headed-verified. Point 7 part-shipped 2026-06-27
 (tinct 0.1.0 + illume 0.0.1 published). **Point 8 landed 2026-07-08: illume extracted
 to its own repo and the bridge dissolved into genet.** illume is now a standalone
 public repo (`github.com/mark-ik/illume`, MIT OR Apache-2.0, edition 2024), and the
@@ -106,6 +118,10 @@ illume's first non-editor consumer.
   doesn't consume it after all); mere sources tinct from crates.io via a `package = "tinct"`
   alias, so every `use tincture::` and `tincture.workspace` stayed unchanged.
 
+**Corrected 2026-10-06 (S14 pass):** tinct is no longer sourced from crates.io. It has
+been a workspace path member since 2026-09-03 (`crates/cambium/tinct`; the root
+`Cargo.toml` keeps the `tincture` alias over the path dependency).
+
 ## Build sequence (the point-by-point)
 
 1. **tinct `syntax` module — DONE** (tincture `03661ce`). `SyntaxRole` (16 roles) +
@@ -140,6 +156,14 @@ illume's first non-editor consumer.
    **revises Decision 5**: the seam is no longer host-owned (that was a single-host
    premise), it is owned by the shared toolkit, so every genet host inherits highlighting
    for free and none re-writes the map. meerkat's bridge deleted; 230 bin tests green.
+
+   **Corrected 2026-10-06 (S14 pass):** point 8 has been reversed. illume is a workspace
+   path dependency of mere again: its manifest records "Landed in mere 2026-09-03
+   (platform boundary plan, P3)" (`crates/nematic/illume/Cargo.toml`), and it is
+   licensed `MPL-2.0`, not MIT OR Apache-2.0. The bridge is cambium's, in mere, not
+   xilem-serval's: the `highlight` feature in `crates/cambium/cambium/Cargo.toml` and
+   `crates/cambium/cambium/src/highlight.rs`. The same holds for Decision 5's revision
+   below.
 
 ## Decisions
 
@@ -314,3 +338,8 @@ illume's first non-editor consumer.
   Follow-on: Isometry can adopt highlighting with a single `xilem-serval/highlight` flag;
   omnibar entity highlighting (lost in concurrent churn) re-wires as one
   `highlighted_text_field(omnibar, Highlight::Entities)` call.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at mere
+  535bca11, from the D2 record in support/doc-audit/d2/batch_40_s14_phase_b2.md: a
+  dated status recording the 2026-09-03 re-homing of illume, tinct and cambium into
+  mere, illume's MPL-2.0 licence, the highlight bridge as cambium's feature, and tinct
+  as a path member.
