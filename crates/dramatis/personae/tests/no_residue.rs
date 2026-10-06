@@ -428,12 +428,17 @@ fn main() {
     let (hits, overflow) = disarm();
     report.check("sealed profile storage", &STORAGE_PHASES, &hits, overflow);
 
-    // PassphraseEncryptedStorage, the portable passphrase vault.
-    let pass = PassphraseEncryptedStorage::open(dir.path().join("vault.json"), b"canary").unwrap();
+    // PassphraseEncryptedStorage, the portable passphrase vault. Reopening
+    // checks the passphrase by decrypting a stored profile.
+    let path = dir.path().join("vault.json");
+    let pass = PassphraseEncryptedStorage::open(&path, b"canary").unwrap();
     arm();
     storage_round_trip(pass, seed, &payload);
+    phase(6);
+    drop(PassphraseEncryptedStorage::open(&path, b"canary").unwrap());
     let (hits, overflow) = disarm();
-    report.check("passphrase storage", &STORAGE_PHASES, &hits, overflow);
+    let phases = [&STORAGE_PHASES[..], &["reopen"]].concat();
+    report.check("passphrase storage", &phases, &hits, overflow);
 
     // The DPAPI-held AutoOs root, read back from disk.
     #[cfg(windows)]

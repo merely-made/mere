@@ -103,7 +103,7 @@ impl SealedProfileStorage {
 
 impl IdentityStorage for SealedProfileStorage {
     fn load_profile(&self, id: &ProfileId) -> Result<Profile, IdentityError> {
-        let record: SealedProfileRecord = self
+        let mut record: SealedProfileRecord = self
             .records
             .load_record(Self::record_path(id))?
             .ok_or_else(|| IdentityError::Backend(format!("profile not found: {:?}", id)))?;
@@ -114,13 +114,13 @@ impl IdentityStorage for SealedProfileStorage {
             )));
         }
         let mut slots = std::collections::HashMap::with_capacity(record.profile.slots.len());
-        for s in &record.profile.slots {
+        for s in &mut record.profile.slots {
             let (k, slot) = plaintext_to_slot(s);
             slots.insert(k, slot);
         }
         Ok(Profile {
             id: id.clone(),
-            display_name: record.profile.display_name,
+            display_name: std::mem::take(&mut record.profile.display_name),
             master: Ed25519Keypair::from_seed(record.profile.master_seed),
             slots,
         })
@@ -168,7 +168,7 @@ impl IdentityStorage for SealedProfileStorage {
             if !name.ends_with(".json") {
                 continue;
             }
-            let record: SealedProfileRecord = self
+            let mut record: SealedProfileRecord = self
                 .records
                 .load_record(format!("{PROFILE_DIR}/{name}"))?
                 .ok_or_else(|| {
@@ -176,7 +176,7 @@ impl IdentityStorage for SealedProfileStorage {
                 })?;
             out.push(ProfileSummary {
                 id: ProfileId(record.id),
-                display_name: record.profile.display_name,
+                display_name: std::mem::take(&mut record.profile.display_name),
                 slot_count: record.profile.slots.len(),
             });
         }

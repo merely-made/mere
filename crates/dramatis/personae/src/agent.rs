@@ -65,7 +65,7 @@ use crate::ssh_krl;
 use crate::ssh_sign;
 use crate::ssh_slot::{self, SshSlot};
 use crate::vault::{IdentityStorage, IdentityVault, ProtocolKey, UnlockTier};
-use crate::{InMemoryProvider, enroll};
+use crate::enroll;
 
 pub use crate::ssh_slot::{SSH_MOD_ID, protocol_key_for};
 
@@ -161,11 +161,12 @@ impl<S: IdentityStorage> VaultAgent<S> {
     /// Minted per listing rather than cached: it costs one Ed25519
     /// signature, and a certificate that is re-minted on demand can never
     /// be the stale one left over from a policy that has since narrowed.
+    ///
+    /// The vault is the provider: no copy of the master seed is made.
     fn certificate_for(&self, slot: &SshSlot) -> Option<Certificate> {
         let vault = self.vault.lock().unwrap();
         let profile = vault.current_profile();
-        let provider = InMemoryProvider::from_seed(profile.master.to_seed());
-        let ca = SshCertAuthority::derive(&provider).ok()?;
+        let ca = SshCertAuthority::derive(&*vault).ok()?;
         let policy = ssh_face::effective_policy(profile).ok()?;
         let ledger = ssh_krl::load_ledger(profile).ok()?;
         let now_ms = SystemTime::now()
@@ -173,7 +174,7 @@ impl<S: IdentityStorage> VaultAgent<S> {
             .ok()?
             .as_millis() as u64;
         let grant = ssh_ca::self_grant(
-            &provider,
+            &*vault,
             enroll::local_device_id(),
             &policy.action_refs(),
             ssh_ca::MAX_CERT_TTL_MS,

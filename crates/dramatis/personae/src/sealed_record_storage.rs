@@ -262,9 +262,9 @@ impl SealedRecordStorage {
         let generation = current.generation.checked_add(1).ok_or_else(|| {
             IdentityError::Backend(format!("sealed record {aad:?} exhausted its generation"))
         })?;
-        let plaintext = Zeroizing::new(serde_json::to_vec(value).map_err(|err| {
+        let plaintext = crate::zeroizing_json::to_vec(value).map_err(|err| {
             IdentityError::Backend(format!("encode sealed record {:?}: {err}", path))
-        })?);
+        })?;
         let nonce = random_bytes(NONCE_LEN);
         let cipher = ChaCha20Poly1305::new(
             &Key::try_from(self.key.as_ref()).expect("fixed-length key material"),
