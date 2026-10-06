@@ -124,7 +124,7 @@ exactly why a scene is the reusable unit and a lever is not.
 
 Two consequences. **Naming**: the brand words belong to the scene register,
 not the arrangement register, so the reservations recorded in the
-[projection proofs plan](../implementation_strategy/2026-07-21_projection_proofs_plan.md)
+[projection proofs plan](../../archive_docs/2026-10-06_completed_plans/2026-07-21_projection_proofs_plan.md)
 are released to it and the placement levers keep plain mechanism names.
 Mark's own reading of the two levers: Mosaic's placement is **Grid** (already
 in the arrangement register, in its packing variant, which needs no new name),

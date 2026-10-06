@@ -37,7 +37,7 @@ files, or other store-and-forward paths.
   owns typed digests, commitments, and proof domains.
 - [`../technical_architecture/2026-06-19_statement_kernel_brief.md`](../technical_architecture/2026-06-19_statement_kernel_brief.md)
   owns per-predicate lifecycle and GC.
-- [`2026-06-29_reticulum_transport_plan.md`](2026-06-29_reticulum_transport_plan.md)
+- [`2026-06-29_reticulum_transport_plan.md`](../../archive_docs/2026-10-06_completed_plans/2026-06-29_reticulum_transport_plan.md)
   keeps Reticulum bilateral while sync and blobs remain Iroh-only.
 - [`../../../../retinue/design_docs/2026-07-06_retinue_v0_plan.md`](../../../../retinue/design_docs/2026-07-06_retinue_v0_plan.md)
   owns Reticulum packet, link, and resource transfer.
@@ -671,7 +671,7 @@ supplying its own authority and checkpoint fold.
 
 **Open, raised by the S14 pass (2026-10-06):** stickleback gained a group-key
 lane in September under the
-[coop lifecycle parity plan](2026-09-16_coop_lifecycle_parity_plan.md)
+[coop lifecycle parity plan](../../archive_docs/2026-10-06_completed_plans/2026-09-16_coop_lifecycle_parity_plan.md)
 (`71a767b8`, 2026-09-16: add, remove and rotate frames; `11f0d705` and
 `3d3ad81c`, 2026-09-17: parking records sealed to a missing epoch, group
 lookups, forgetting epochs). This plan does not mention it, and whether it now

@@ -7,7 +7,7 @@ personal-corpus value that follow from it.
 
 Cross-refs:
 
-- [petgraph_rdf_plan](../implementation_strategy/2026-06-18_petgraph_rdf_plan.md)
+- [petgraph_rdf_plan](../../archive_docs/2026-10-06_completed_plans/2026-06-18_petgraph_rdf_plan.md)
   — statement records inside pair-local edge buckets; the Mere RDF projection
   profile.
 - [statements_over_schema_stance](2026-05-22_statements_over_schema_stance.md) — the

@@ -525,14 +525,14 @@ tangible, manipulable objects in the scene rather than host-only state. Mosaic
 - [`2026-08-10_scenograph_expansion_brief.md`](2026-08-10_scenograph_expansion_brief.md): expansion candidates and ownership questions.
 - [`2026-07-21_projection_engine_prior_art_brief.md`](2026-07-21_projection_engine_prior_art_brief.md): prior-art comparison for the projection engine.
 - [`2026-06-22_graph_projections_research.md`](2026-06-22_graph_projections_research.md): graph projection families and early taxonomy.
-- [`2026-06-18_node_representation_arrangement_plan.md`](../implementation_strategy/2026-06-18_node_representation_arrangement_plan.md): representation and arrangement implementation seams.
+- [`2026-06-18_node_representation_arrangement_plan.md`](../../archive_docs/2026-10-06_superseded_plans/2026-06-18_node_representation_arrangement_plan.md): representation and arrangement implementation seams.
 - [`2026-06-13_scriptable_field_regions_plan.md`](../implementation_strategy/2026-06-13_scriptable_field_regions_plan.md): field and region model.
-- [`2026-07-21_projection_proofs_plan.md`](../implementation_strategy/2026-07-21_projection_proofs_plan.md): proof sequence and portable projection discipline.
+- [`2026-07-21_projection_proofs_plan.md`](../../archive_docs/2026-10-06_completed_plans/2026-07-21_projection_proofs_plan.md): proof sequence and portable projection discipline.
 - [`2026-08-15_projection_grammar_adoption_plan.md`](../implementation_strategy/2026-08-15_projection_grammar_adoption_plan.md): gated targets carrying the projection grammar report's transfers into mere, genet, and cambium.
 - [`2026-10-02_dynamics_grammar_plan.md`](../implementation_strategy/2026-10-02_dynamics_grammar_plan.md): the sibling grammar for motion. Its rulings F18–F30 set the arrangement roles and the recipe slots recorded above.
 - [`2026-10-03_arrangement_and_dynamics_brief.md`](2026-10-03_arrangement_and_dynamics_brief.md): the evidence behind those rulings, with the points where arrangement and physics meet.
 - [`design_docs/scenograph_docs/technical_architecture/2026-07-22_scene_contract_note.md`](../../scenograph_docs/technical_architecture/2026-07-22_scene_contract_note.md): scene ownership contract.
-- [`2026-07-24_scenograph_0_0_3_release_plan.md`](../implementation_strategy/2026-07-24_scenograph_0_0_3_release_plan.md): historical 0.0.3 release boundary.
+- [`2026-07-24_scenograph_0_0_3_release_plan.md`](../../archive_docs/2026-10-06_completed_plans/2026-07-24_scenograph_0_0_3_release_plan.md): historical 0.0.3 release boundary.
 
 ## Closing thesis
 

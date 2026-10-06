@@ -24,7 +24,7 @@ locked.
 - [protocol architecture plan](../../mere_docs/implementation_strategy/2026-05-05_protocol_architecture_plan.md):
   §3.6 and §3.7 describe `UnlockTier` as custody tiers, and its line 349
   claims swap leakage is defended. Neither is true today.
-- [persona wallet carry layer plan](../../mere_docs/implementation_strategy/2026-06-25_persona_wallet_carry_layer_plan.md):
+- [persona wallet carry layer plan](../../archive_docs/2026-10-06_completed_plans/2026-06-25_persona_wallet_carry_layer_plan.md):
   the "one unlock ladder" rule (:358-362), and Meerkat's 2026-07-04 "Lock
   now" (:788-792).
 - [dramatis repo plan](2026-10-06_dramatis_repo_plan.md): moves the

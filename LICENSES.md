@@ -75,7 +75,7 @@ A published version keeps the grant it shipped with, permanently; MPL-2.0
 reaches it at its next functional bump, per the sweep plan's invariant 8. That
 rule already governs `crates/system/luggage` above. It governs the
 engine-management layer too, which arrived from genet on 2026-09-03 under the
-[platform boundary plan](design_docs/mere_docs/implementation_strategy/2026-09-02_platform_boundary_and_repository_topology_plan.md)'s
+[platform boundary plan](design_docs/archive_docs/2026-10-06_completed_plans/2026-09-02_platform_boundary_and_repository_topology_plan.md)'s
 P3, after genet's own 2026-08-27 ruling had already put every source in these
 crates under Exhibit A and every manifest on `MPL-2.0`.
 

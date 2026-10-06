@@ -53,7 +53,7 @@ The corrections, each carried into the body text below:
 - Seiche remains the graph-oriented 2D specialist, not an eventual adapter.
 - The host/profile orders passes; allocation ownership follows advanced
   state (the host-conducts ruling,
-  [spatial compute plan](../technical_architecture/2026-08-13_spatial_compute_plan.md)).
+  [spatial compute plan](../../archive_docs/2026-10-06_completed_plans/2026-08-13_spatial_compute_plan.md)).
   Netrender's tenancy seam stays the device seam.
 - The engine-owned render view becomes a lean spatial frame with no cameras,
   lights, sprites, or presentation policy (§4).
