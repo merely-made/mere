@@ -1,17 +1,17 @@
 # Capture, Provenance, and Consent Plan — one live record: where you went, what you chose among, where it came from, what may leave
 
 **Date**: 2026-06-26
-**Status**: C1 (live recorder) + C2 (candidate-context) **built + runtime-verified**
-(2026-06-26); the relational-browse V1 **materializer trigger** (`>materialize`)
-that lights C2 up is shipped + verified. C5 (page text into the index)
-is **built + verified** (`>recall`, `8b8b039`); C3's materialize / crawl half
-(harvested links record `ExtractedFrom` provenance) is **built** (`cdd2130`),
-and the web-clip case now writes `ClippedFrom` provenance from `>clip`.
-C4's membrane is **live**: the **consent gate** (`>capture`), **retention**
-(`390d74a`), **forget** (`>forget`, traces + index, `00a5331`), and
-federatability (the existing `PrivacyClass`) are built + verified. Remaining:
-forget's provenance-edge cleanup, C3's excerpt / summarize / generated-node
-provenance cases, and Phase 9
+**Status (2026-10-06):** C1 to C5 landed in meerkat on 2026-06-26 to 2026-06-29
+(`ac43edd`, `223ff4b`, `831bdcf`, `8b8b039`, `cdd2130`, `390d74a`, `00a5331`), retired
+with it 2026-07-18 (`c5f01064`); the `>materialize`, `>recall`, `>capture`, `>forget`
+and `>clip` verbs are gone. Surviving library parts: eidetic's `TraceEvent.candidates`,
+`apply_quota` and `forget_url`; eidetic-search's `rebuild_with_text`; linked-data's
+`ExtractedFrom` writer and `Graph::record_derivation`; import's `ClippedFrom` clip path;
+and `save_trace`'s LocalOnly stamp. The live recorders are now Turnstone
+(`turnstone/src/trail_memory.rs`, capture plus recall, whose C4 consent gate is a no-op
+stub) and Graphshell (`ports/graphshell/src/capture.rs`, consented intake under its own
+disabled-by-default `HistoryCapturePolicy`). Open: a C4 consent gate in a live host,
+forget's provenance cleanup, C3's excerpt / summarize / generated-node cases, and Phase 9
 federation promotion/consumption. Created from the 2026-06-26 cross-cutting state
 audit (crawl / engram / knot / federation / models / graph / documentscript),
 which found that the left half of the browsing-data vision (browse, crawl,
@@ -125,6 +125,10 @@ gated by a `Content.capture_enabled` flag (the C4 hook, default on), schema boot
 at store open. 2 unit tests + a headed run (two navigations each logged "recorded a
 browsing trace", no failures). Per-nav trace today; batching into segments + quota is
 the C4 retention refinement.
+**Corrected 2026-10-06 (S14 pass):** `browse_capture.rs` and its `nav_sync.rs` tap went
+with meerkat (retired 2026-07-18, `c5f01064`) and have no hits. The live recorders are
+Turnstone's `turnstone/src/trail_memory.rs` and Graphshell's
+`ports/graphshell/src/capture.rs`.
 
 ### C2 — Candidate-context (the relational enrichment, absorbed from V3)
 
@@ -170,6 +174,10 @@ against the set; richer decisions need the neighborhood interaction UI. The V1
 `>materialize` trigger (relational-browse V1's "thin remaining wire-up") was wired
 here so C2 lights up; headed-verified end to end: navigate → `>materialize` →
 navigate records candidates 0 → 1.
+**Corrected 2026-10-06 (S14 pass):** `candidate_links` and `>materialize` went with
+meerkat and have no hits. `TraceEvent.candidates` survives (eidetic `browsing/mod.rs:143`),
+but Graphshell's recorder writes `candidates: Vec::new()`
+(`ports/graphshell/src/capture.rs:496`).
 
 ### C3 — Provenance-family writers (one mechanism, three payoffs)
 
@@ -204,6 +212,9 @@ same fragment -> knot path. The clip fragment can also carry a cropped visual,
 stored as the clip node thumbnail/sprite. Unit coverage exercises fragment
 parsing, fallback body parsing, cropped visual sizing, clip-node relation +
 thumbnail writing, and knot provenance.
+**Corrected 2026-10-06 (S14 pass):** `>clip` went with meerkat; the clip-node writer
+survives in `crates/import/src/web_clip.rs` (`ClippedFrom` at `:346`, the
+`build_clip_knot` call at `:465`).
 
 **Remaining:**
 
@@ -276,6 +287,16 @@ class defaulting to LocalOnly. **(Built + verified: consent gate, retention
 existing `PrivacyClass`. C4's membrane is live; only forget's provenance-edge
 cleanup, a narrow materialized-only case, remains.)**
 
+**Corrected 2026-10-06 (S14 pass):** the membrane is not live in any host now. The
+persisted `CaptureConsent`, `record_browse_nav`, `>capture` and `>forget` went with
+meerkat (retired 2026-07-18, `c5f01064`) and have no hits. Turnstone's consent gate is a
+no-op stub that cites this plan (`turnstone/src/trail_memory.rs:307-312`: "C4 replaces
+this body"); Graphshell has its own disabled-by-default `HistoryCapturePolicy` (lines
+177-207 of `ports/graphshell/src/capture.rs`) and a `forget_url` (`:536`). The library
+parts survive: `apply_quota` (eidetic `browsing/mod.rs:345`), `retention_keep_n` (pandect
+`settings_store.rs:86`), `forget_url` (`browsing/mod.rs:368`) and `save_trace`'s LocalOnly
+stamp.
+
 ### C5 — Page text into the index (the fired trigger)
 
 Close the hop both the eidetic plan and the relational plan describe as the
@@ -303,6 +324,9 @@ dev-bin only). Headed-verified: `>recall documentation` (a term only in the page
 body, not the title or URL) returns the page. Caveats: the index rebuilds per query
 (incremental maintenance + a results pane are follow-ons), and **consent-gating of
 what is indexed is C4** — the "an excluded page is not indexed" clause lands there.
+**Corrected 2026-10-06 (S14 pass):** `>recall` and the meerkat trail index went with
+meerkat; `rebuild_with_text` survives (`crates/intel/eidetic-search/src/index.rs:204`),
+and Turnstone's `trail_memory.rs` now carries capture plus recall.
 
 ---
 
@@ -335,11 +359,19 @@ what is indexed is C4** — the "an excluded page is not indexed" clause lands t
 - **The text-extraction seam fired.** `genet-extract::extract_text` / `main_text`
   is built and render-free; `eidetic-search` still indexes only titles / URLs.
   This is C5.
+- **Corrected 2026-10-06 (S14 pass):** the three findings above were resolved in
+  meerkat by C3 (`cdd2130`), C4 (`390d74a`, `00a5331`) and C5 (`8b8b039`). Their library
+  halves survive (linked-data's `ExtractedFrom` writer, eidetic's `apply_quota` and
+  `forget_url`, eidetic-search's `rebuild_with_text`); the consent gate went with meerkat
+  (see the C4 correction).
 - **`net.fetch` is no longer a stub** (relevant because the crawl recorder rides
   the fetch path): `ContentNetFetcher` is a real backend over `fetch_page`,
   origin-gated, SSRF-floored, rate-capped; `document-host` tests green. Earlier
   "stub" framing in the relational and substrate plans was same-day-stale and is
   superseded by the documentscript net-hardening plan.
+  **Corrected 2026-10-06 (S14 pass):** `ContentNetFetcher` is gone; the seam is the
+  `NetFetcher` trait (`crates/script/document-host/src/net.rs:25`), and `fetch_page` is
+  at `crates/system/fetch/src/lib.rs:667`.
 - **Naming resolved 2026-07-12**: `fauna` is the Moot's catalog of accumulated
   engram CID references (`MootRoster.fauna`); `flora` retains its established
   federated-LoRA meaning. Federatability class C4 and adapter-engram schemas can
@@ -352,6 +384,10 @@ what is indexed is C4** — the "an excluded page is not indexed" clause lands t
 - **Consent default.** Off, corridor-only, or full capture by default? The vision
   wants a rich corpus; the privacy posture wants opt-in. This is a product
   decision the membrane must encode, not assume.
+  **Open, raised by the S14 pass (2026-10-06):** the two hosts now disagree: this plan's
+  C4 shipped `Full` by default, while Graphshell's `HistoryCapturePolicy` is disabled by
+  default. Which default does C4 encode? Options: `Full` by default; disabled (opt-in)
+  by default.
 - **Legality policy.** Provenance edges say *where a row came from*; they do not
   say *whether you may federate a distillation of it.* C4 provides the
   federatability hook; the policy that sets it (crawled third-party page text:
@@ -471,3 +507,9 @@ what is indexed is C4** — the "an excluded page is not indexed" clause lands t
   Cropped visual clips are stored as thumbnail/sprite data on the clip node. This
   closes the C3 canonical clip case; remaining C3 cases are excerpt / summarize /
   future agent-generated nodes.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at mere 535bca11,
+  from the D2 record in support/doc-audit/d2/batch_48_s14_phase_b10.md: C1 to C5 recorded
+  as landed in meerkat and retired with it, with the surviving library parts and the
+  Turnstone and Graphshell recorders named; the C1, C2, C3 clip, C4 and C5 host claims,
+  the resolved Findings and `ContentNetFetcher` annotated; and the consent default's
+  divergence written in as an open question.

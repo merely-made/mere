@@ -1,15 +1,23 @@
 # petgraph-RDF plan — a losslessly RDF-projectable, SPARQL-queryable petgraph kernel
 
-Status: **Phase 1A partial.** Direction decided from the feasibility research + a
+**Status (2026-10-06):** Phases 1 and 2 landed 2026-07-04 to 2026-07-06
+(statement buckets, typed literals, graph scope, statement metadata,
+federation-safe `StatementId` minting, the round-trip gate, vocabulary
+alignment, N-Quads/TriG I/O, the snapshot-size gate). Phase 3's spareval path
+landed 2026-07-06 (`sparql()` over `dataset_quads`); whether it meets Phase 3's
+done-condition is open (see Phase 3), and the resource-graph adapter of the
+[graph semantics plan](2026-10-04_graph_semantics_plan.md)'s ruling 6 is carried
+by that plan's P2. Phase 4 is gated and deferred on the 2026-07-06 footprint
+measurement. Open: the JSON-LD shaper gaps, the `skip_serializing_if`
+follow-up, the `ExampleOf` and `Summarizes` rows, the raw-IRI `Semantic` edge
+path, and dropping `dep:oxigraph`.
+
+Direction decided from the feasibility research + a
 perf benchmark: **petgraph stays the truth and the runtime; RDF is a lossless,
 on-demand projection plus a SPARQL query adapter, never a second held authority.**
 The target is not "the kernel stores all RDF" but a defined **Mere RDF projection
 profile**: the content subgraph is losslessly projectable, the experience/runtime
-layer stays native. The current landed slices are the semantic statement-bucket
-backbone, typed literal fidelity on `NodeProperty`, and graph-scope fields on
-semantic statements / node properties with dataset-query visibility. Full
-named-graph JSON-LD shaping, statement metadata, and the direct SPARQL adapter
-are still ahead. The work is to (1) carry the profile in the content model
+layer stays native. The work is to (1) carry the profile in the content model
 (statement records in pair-local edge buckets, typed literals, named-graph scope,
 statement provenance), (2) prove losslessness with a round-trip test, (3) run
 SPARQL over the kernel via a `QueryableDataset` adapter, and (4) — only if
@@ -122,6 +130,10 @@ granularity:
     statement metadata is immutable, which this plan does not assume. The current
     landed slice uses a local timestamp+nonce string as a temporary allocator; Phase
     1 is not fully done until the federation-safe minting story is pinned.
+    **Corrected 2026-10-06 (S14 pass):** the minting story is pinned (2026-07-05
+    entry): ids are `{unix_ms:012x}-{process_salt:016x}-{counter:016x}`
+    (graph-kernel `types.rs:125`, minted at `:133-138`), and wasm hosts seed the
+    salt through `seed_statement_minter` (`types.rs:102`).
   - **Empty semantic buckets do not linger.** Retracting the last semantic statement
     clears the semantic sidecar, and if that leaves the whole `EdgePayload` empty
     the petgraph edge itself is removed. So pair-level APIs read "there is an edge
@@ -215,6 +227,20 @@ node pair, raw + CiTO predicates).
 Done when: `>sparql` and the seed-graph SPARQL tests run via the adapter over the
 kernel directly, with no oxigraph Store in the path.
 
+**Corrected 2026-10-06 (S14 pass):** the `>sparql` verb named here and in the
+2026-07-06 entry went with Meerkat; nothing outside `crates/graph/linked-data`
+calls `sparql(` in crates/ or ports/, so the condition now rests on the
+seed-graph tests alone. The "already satisfies the done-condition" reading
+above is in tension with the condition's "over the kernel directly":
+`sparql()` projects "into a fresh in-memory dataset per call" (linked-data
+`query.rs:47-50`), and the graph semantics plan's ruling 6 serves SPARQL by an
+adapter "instead of a dataset rebuilt per query".
+
+**Open, raised by the S14 pass (2026-10-06):** does Phase 3 count as done?
+Options: done on the shipped spareval path, with ruling 6's adapter a new
+requirement in the graph semantics plan's P2; or Phase 3 reopens, carried by
+graph semantics P2.
+
 ## Phase 4 (gated, endgame) — interned slotmap kernel, only if footprint demands
 
 - Trigger: the enriched petgraph kernel's memory (typed literals + graph-ids +
@@ -260,6 +286,9 @@ kernel directly, with no oxigraph Store in the path.
   heap goes — images 64% / RDF content 28% (mostly struct, not strings) /
   structure 8% at 50k nodes; a term dictionary reclaims ~1%. See the Phase 4
   gate note. Re-runnable (`cargo run --release`).
+  **Corrected 2026-10-06 (S14 pass):** the probe is gone from the tree and
+  cannot be re-run; `crates/probes` holds only mesh-lexical-wasm,
+  murm-direct-phy, pack-distribution and wing-three-paths.
 - **`QueryableDataset`** (spareval): `internal_quads_for_pattern` +
   `internalize_term` + `externalize_term`, `InternalTerm: Clone+Eq+Hash`
   (interned-id friendly), `Error`; oxrdf + spargebra only, no RocksDB. SPARQL over
@@ -274,6 +303,10 @@ kernel directly, with no oxigraph Store in the path.
   `NodeProperty` carries datatype/lang, linked-data ingest keeps them, and
   export/query projection emits them. `NodeClassification` already carries rich
   provenance/status and maps to `rdf:type`.
+  **Corrected 2026-10-06 (S14 pass):** ingest no longer ignores reifier input:
+  linked-data `ingest.rs:231` and `:336-341` lift `rdf:reifies`,
+  `prov:wasAttributedTo` and `prov:generatedAtTime` (2026-07-05 entry). The
+  JSON-LD shaper gaps stay open.
 - **Granularity**: `SemanticData` is one aggregate payload per `(from,to)` edge, so
   it cannot hold per-predicate graph/provenance/time/label. Statement records are
   the fix. They can live inside the pair-local `EdgePayload` bucket; they do not
@@ -299,6 +332,8 @@ kernel directly, with no oxigraph Store in the path.
   and federation tombstones. A local allocator is fine for the landed slice, but
   Phase 1 completion needs a device-safe minting story that does not depend on edge
   position or serialization order.
+  **Corrected 2026-10-06 (S14 pass):** that story landed 2026-07-05 (graph-kernel
+  `types.rs:102`, `:125`); see the correction under Phase 1.
 - **Scope discipline**: Phase 4 is evidence-gated, not default; do not build the
   slotmap kernel unless the footprint demands it.
 - **Common-case bloat**: per-statement `provenance` + `graph_scope` on every
@@ -466,3 +501,10 @@ kernel directly, with no oxigraph Store in the path.
   declared superproperty. The raw-IRI `Semantic` edge path (Phase 2's
   deferred half) is what Knot needs for those predicates to enter a Mere
   graph rather than be reported as unrecognized.
+
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_48_s14_phase_b10.md: Phases 1 and 2 and Phase 3's
+  spareval path recorded as landed with Phase 4 deferred, the minting,
+  reifier-ingest and probe text marked overtaken, the `>sparql` done-condition
+  annotated, and Phase 3's completeness written in as an open question.
