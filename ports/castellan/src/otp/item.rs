@@ -105,7 +105,7 @@ impl From<ItemStoreError> for OtpItemError {
 
 impl From<IdentityError> for OtpItemError {
     fn from(error: IdentityError) -> Self {
-        Self::Store(ItemStoreError::Storage(error))
+        Self::Store(ItemStoreError::from(error))
     }
 }
 

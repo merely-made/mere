@@ -14,7 +14,8 @@
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
-use castellan::resident::CastellanResident;
+use castellan::lock::VaultLockHolder;
+use castellan::resident::{CastellanResident, CredentialSalts};
 use distillery::lifecycle::{CloseAction, CloseFuture, close_all};
 use graphshell::native::endpoint_catalog::{
     ResidentEndpointCatalog, ResidentEndpointCatalogError, ResidentEndpointRoute,
@@ -22,7 +23,6 @@ use graphshell::native::endpoint_catalog::{
 use personae::bootstrap::Unlock;
 use personae::{IdentityProvider, ProfileId};
 use transport::BlobScope;
-use zeroize::Zeroize;
 
 use crate::resident_blobs::ResidentBlobCustody;
 use crate::resident_distillery::ResidentDistillery;
@@ -34,6 +34,10 @@ use crate::settings::{OwnerSettings, ReservoirLaneSettings};
 
 const CASTELLAN_RECORD_SALT: &[u8] = b"mere.djinn/castellan/records/v1";
 const CASTELLAN_FRESHNESS_SALT: &[u8] = b"mere.djinn/castellan/freshness/v1";
+const CASTELLAN_SALTS: CredentialSalts = CredentialSalts {
+    record: CASTELLAN_RECORD_SALT,
+    freshness: CASTELLAN_FRESHNESS_SALT,
+};
 
 /// Process-wide services retained by one Djinn run.
 pub struct DjinnResident {
@@ -174,6 +178,12 @@ impl DjinnResident {
     /// The single record authority behind every Castellan view or adapter.
     pub fn credentials(&self) -> &CastellanResident {
         &self.credentials
+    }
+
+    /// The hook the resident host's lock runs (vault lock ruling 1): it
+    /// drops the credential keys and re-derives them on unlock.
+    pub fn credential_lock_holder(&self) -> Arc<dyn VaultLockHolder> {
+        self.credentials.lock_holder(CASTELLAN_SALTS)
     }
 
     /// Clone the shared physical blob custody for a composed product lane.
@@ -364,29 +374,19 @@ fn claim_credentials<P: IdentityProvider + ?Sized>(
     profile: &ProfileId,
 ) -> Result<CastellanResident, String> {
     let profile_root = credential_profile_root(data_root, profile);
-    let mut record_key = identity
-        .derive_keypair(CASTELLAN_RECORD_SALT)
-        .map_err(|error| format!("derive Castellan record key: {error}"))?
-        .to_seed();
-    let mut freshness_key = identity
-        .derive_keypair(CASTELLAN_FRESHNESS_SALT)
-        .map_err(|error| format!("derive Castellan freshness key: {error}"))?
-        .to_seed();
-    let claimed = CastellanResident::claim(
+    CastellanResident::claim_derived(
         profile_root.join("records"),
-        record_key,
         profile_root.join("freshness"),
-        freshness_key,
-    );
-    record_key.zeroize();
-    freshness_key.zeroize();
-    claimed.map_err(|error| format!("claim Castellan resident: {error}"))
+        identity,
+        CASTELLAN_SALTS,
+    )
+    .map_err(|error| format!("claim Castellan resident: {error}"))
 }
 
 fn published_site_profile_root(data_root: &Path, profile: &ProfileId) -> PathBuf {
     data_root
         .join("published-sites")
-        .join(blake3::hash(profile.0.as_bytes()).to_hex().to_string())
+        .join(blake3::hash(profile.0.as_bytes()).to_hex().as_str())
 }
 
 fn published_site_profile_scope(profile: &ProfileId) -> BlobScope {
