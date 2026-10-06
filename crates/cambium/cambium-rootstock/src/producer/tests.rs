@@ -451,3 +451,32 @@ fn gpu_unsupported_encoding_and_duplicate_dom_key_refuse_stale_pixels() {
     assert_eq!(registry.error(7), Some(ProducerError::DuplicateDomKey));
     assert!(registry.commands(7).unwrap().is_empty());
 }
+
+/// One registry painted per window (S29): a producer whose key another
+/// window's layout holds is that window's, so this window's frame leaves it
+/// alone. The same frame with no other window holding the key retires it,
+/// which is the control.
+#[test]
+fn gpu_a_producer_another_window_holds_is_not_retired() {
+    let surface = surface();
+    let (mut dom, layout, node) = fixture(SHEET);
+    let producer = Rc::new(RefCell::new(Producer::default()));
+    let mut registry = ProducerRegistry::new();
+    registry.register(7, producer.clone(), &["color"]).unwrap();
+    assert_eq!(registry.prepare(&surface, &layout, &dom, 1.0).stages, 1);
+
+    dom.remove(node);
+    let layout = OwnedLayout::new(&dom, &[SHEET], 160.0, 120.0, &[], &Default::default());
+    let elsewhere = std::collections::HashSet::from([7]);
+    let stats = registry.prepare_window(&surface, &layout, &dom, 1.0, &elsewhere);
+    assert_eq!(
+        stats.retirements, 0,
+        "another window's producer is not absent"
+    );
+    assert!(registry.contains(7));
+    assert_eq!(producer.borrow().retired, 0);
+
+    let stats = registry.prepare(&surface, &layout, &dom, 1.0);
+    assert_eq!(stats.retirements, 1, "held by no window, it retires");
+    assert!(!registry.contains(7));
+}

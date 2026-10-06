@@ -430,7 +430,10 @@ where
             let dom = runner.dom();
             let dom_ref = dom.borrow();
             decorations::window_control_rect(
-                &*dom_ref,
+                &cambium_rootstock::WindowDom::new(
+                    &dom_ref,
+                    cambium_rootstock::HostTree::mount(runner),
+                ),
                 runner.root(),
                 layout,
                 &self.options.maximize_control_label,

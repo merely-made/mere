@@ -27,7 +27,8 @@ where
     pub fn content_size(&self, node: NodeId) -> Option<(f32, f32)> {
         let dom = self.runner.dom();
         let dom = dom.borrow();
-        Some(self.layout?.element_geometry(&*dom, node)?.content_size())
+        let view = crate::WindowDom::new(&dom, self.runner.mount());
+        Some(self.layout?.element_geometry(&view, node)?.content_size())
     }
 
     /// Inverse document paint mapping into the node's content box. Rejects
@@ -37,9 +38,10 @@ where
         let layout = self.layout?;
         let dom = self.runner.dom();
         let dom = dom.borrow();
+        let view = crate::WindowDom::new(&dom, self.runner.mount());
         let scroll = layout.viewport_scroll();
         layout
-            .element_geometry(&*dom, node)?
+            .element_geometry(&view, node)?
             .map_to_content(x + scroll.0, y + scroll.1)
     }
 }
@@ -98,9 +100,10 @@ where
         }
         let dom = runner.dom();
         let dom = dom.borrow();
-        self.s
-            .shared
+        let view = crate::WindowDom::new(&dom, runner.mount());
+        let shared = &mut self.s.shared;
+        shared
             .producers
-            .prepare(surface, layout, &*dom, scale)
+            .prepare_window(surface, layout, &view, scale, &shared.held_elsewhere)
     }
 }

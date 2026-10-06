@@ -14,10 +14,11 @@ use cambium::{
     PointerEvent, ValueEvent, WheelEvent,
 };
 use genet_scripted_dom::NodeId;
+use layout_dom_api::{DomMutation, LayoutDom as _, LayoutDomMut as _};
 
 use crate::meristem_bounds::RootView;
 
-mod sealed {
+pub(crate) mod sealed {
     pub trait Sealed {}
 }
 
@@ -32,6 +33,13 @@ pub trait HostTree<State>: sealed::Sealed {
     fn dom(&self) -> DomHandle;
     /// The tree's root element.
     fn root(&self) -> NodeId;
+    /// The node the tree builds under: the document for a single window, the
+    /// window-root element under a forest. Layout, paint, hit testing and
+    /// accessibility see the subtree below it.
+    fn mount(&self) -> NodeId;
+    /// Drain the document mutations that touched this tree's subtree since it
+    /// last asked.
+    fn drain_mutations(&mut self, out: &mut Vec<DomMutation<NodeId>>);
     /// The application state the tree renders.
     fn state(&self) -> &State;
     /// Apply a state update and rebuild what renders it.
@@ -75,6 +83,14 @@ where
 
     fn root(&self) -> NodeId {
         GenetAppRunner::root(self)
+    }
+
+    fn mount(&self) -> NodeId {
+        GenetAppRunner::dom(self).borrow().document()
+    }
+
+    fn drain_mutations(&mut self, out: &mut Vec<DomMutation<NodeId>>) {
+        GenetAppRunner::dom(self).borrow_mut().drain_mutations(out);
     }
 
     fn state(&self) -> &State {

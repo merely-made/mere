@@ -287,10 +287,13 @@ pub trait Accessibility {
     ///
     /// `producers` is asked for each texture-producer slot's own semantics
     /// ([`TextureProducer::semantics`]), which a host writes under the slot.
+    ///
+    /// `dom` is this window's subtree of the document: the whole document for
+    /// a single window, its window-root's subtree under a forest.
     #[allow(clippy::too_many_arguments)]
     fn sync(
         &mut self,
-        dom: &ScriptedDom,
+        dom: &WindowDom<'_>,
         layout: &OwnedLayout,
         leaves: &mut LeafRegistry<u64>,
         producers: &mut ProducerRegistry,
@@ -304,7 +307,7 @@ pub trait Accessibility {
 /// the browser host lowers it to ARIA. `focus` is the focused node's opaque id,
 /// as [`Accessibility::sync`] receives it.
 pub fn document_projection(
-    dom: &ScriptedDom,
+    dom: &WindowDom<'_>,
     layout: &OwnedLayout,
     focus: Option<u64>,
 ) -> DocumentA11yProjection {
@@ -320,7 +323,7 @@ pub fn document_projection(
     )
 }
 
-fn find_opaque(dom: &ScriptedDom, node: NodeId, opaque: u64) -> Option<NodeId> {
+fn find_opaque(dom: &WindowDom<'_>, node: NodeId, opaque: u64) -> Option<NodeId> {
     use layout_dom_api::LayoutDom as _;
     if dom.opaque_id(node) == opaque {
         return Some(node);
@@ -865,9 +868,13 @@ mod capture;
 mod frame;
 mod host;
 mod input;
+mod multi_host;
+#[cfg(test)]
+mod multi_host_tests;
 mod spatial;
 mod tree;
 mod wake;
+mod window_dom;
 mod window_verbs;
 
 /// Bounds the host's view type without naming meristem at every use site.
@@ -894,6 +901,8 @@ pub use host::{
     Runner, ScrollIntoView, StampedCaptureFn, WindowFrame, ZOOM_LADDER, env_size, fit_zoom,
     ladder_step,
 };
+pub use multi_host::{MultiHost, MultiRunner, WindowTree};
 pub use tree::HostTree;
+pub use window_dom::WindowDom;
 pub use wake::HostWake;
 pub use window_verbs::{AppRegion, WindowCommand, WindowCommands, WindowGeometry};

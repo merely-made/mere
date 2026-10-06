@@ -747,7 +747,8 @@ where
         let layout = self.layout?;
         let dom = self.runner.dom();
         let dom = dom.borrow();
-        layout.painted_rect(&*dom, node)
+        let view = crate::WindowDom::new(&dom, self.runner.mount());
+        layout.painted_rect(&view, node)
     }
 
     /// The part of `node` inside the viewport and every ancestor content clip,
@@ -756,7 +757,8 @@ where
         let layout = self.layout?;
         let dom = self.runner.dom();
         let dom = dom.borrow();
-        layout.visible_rect(&*dom, node)
+        let view = crate::WindowDom::new(&dom, self.runner.mount());
+        layout.visible_rect(&view, node)
     }
 
     /// Names and roles from the same retained document projection the host
@@ -770,8 +772,9 @@ where
         let layout = self.layout?;
         let dom = self.runner.dom();
         let dom = dom.borrow();
-        let focus = self.runner.focus().map(|node| dom.opaque_id(node));
-        Some(crate::document_projection(&dom, layout, focus))
+        let view = crate::WindowDom::new(&dom, self.runner.mount());
+        let focus = self.runner.focus().map(|node| view.opaque_id(node));
+        Some(crate::document_projection(&view, layout, focus))
     }
 
     /// Ask the host to scroll `node` into view.
@@ -836,6 +839,28 @@ where
     /// `true` to consume the event; `after_dispatch` runs either way when
     /// consumed.
     pub key_intercept: Box<dyn FnMut(&mut T, &KeyPress) -> bool>,
+}
+
+impl<State, Logic, V, T> HostHooks<State, Logic, V, T>
+where
+    State: 'static,
+    Logic: FnMut(&State) -> V,
+    V: RootView<State>,
+{
+    /// Hooks that do nothing: the starting point for a test that only cares
+    /// about routing, and what a multi-window host's windows hold between
+    /// turns while the application's own hooks are lent to another window.
+    pub fn inert() -> Self {
+        Self {
+            frame: Box::new(|_| false),
+            after_dispatch: Box::new(|_| {}),
+            after_frame: Box::new(|_| {}),
+            after_wake: Box::new(|_| {}),
+            close_request: Box::new(|_, _| CloseDisposition::Exit),
+            focused_text: Box::new(|_| None),
+            key_intercept: Box::new(|_, _| false),
+        }
+    }
 }
 
 /// What `init` hands back once the window exists.
@@ -914,6 +939,13 @@ pub struct AppShared {
     /// has a clip and layer in the renderer, so every leaf still paints its
     /// commands inline.
     pub leaf_fragments: std::collections::HashMap<u64, (u64, u64)>,
+    /// Counts sheet swaps, so a window that did not swap the sheet notices it
+    /// changed and lays out afresh.
+    pub(crate) sheet_generation: u64,
+    /// The leaf keys other windows' layouts hold, set before each window's
+    /// turn: a producer whose key another window lays out is that window's,
+    /// not absent. Empty for a single window.
+    pub(crate) held_elsewhere: std::collections::HashSet<u64>,
 }
 
 impl Default for AppShared {
@@ -927,6 +959,8 @@ impl Default for AppShared {
             producers: crate::ProducerRegistry::new(),
             rendered: sprigging::RenderedLeaves::new(),
             leaf_fragments: std::collections::HashMap::new(),
+            sheet_generation: 0,
+            held_elsewhere: std::collections::HashSet::new(),
         }
     }
 }
@@ -983,6 +1017,10 @@ where
     pub(crate) last_leaf_repaints: u64,
     /// What this window shares with the application's other windows.
     pub shared: AppShared,
+    /// The shared sheet's generation this window's layout was built against.
+    pub(crate) layout_sheet_generation: u64,
+    /// The custom-leaf keys this window's last layout held.
+    pub(crate) leaf_keys: Vec<u64>,
     /// Cursor position in logical coordinates.
     pub cursor: (f32, f32),
     /// Live modifier state, in the neutral vocabulary. Winit's own state is
@@ -1084,6 +1122,8 @@ where
             last_leaf_render_us: 0,
             last_leaf_repaints: 0,
             shared: AppShared::default(),
+            layout_sheet_generation: 0,
+            leaf_keys: Vec::new(),
             cursor: (0.0, 0.0),
             modifiers: Modifiers::NONE,
             text_drag: None,
