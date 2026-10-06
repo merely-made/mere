@@ -43,6 +43,14 @@ What we can feed, grounded in the actual surfaces. Split by whether a real produ
 - **Live operations** (the steward): `steward_rows()` enumerates live operations + the graph count.
 - **Graph size**: `node_count` / `edge_count`.
 
+**Corrected 2026-10-06 (S14 pass):** the meerkat sources in both "Real now" lists left
+with meerkat on 2026-07-18 (`c5f01064`): its `ContentState`, `SyncStatus`,
+observability buffer and steward rows (`steward_rows` has no hits). Live equivalents
+exist for two: Turnstone's `ContentStates` (`turnstone/src/content.rs`) and
+stickleback's `SyncStatus` (`crates/stickleback/src/synced_space.rs`, re-exported as
+`mesh::SyncStatus`). None exists for the observability buffer or the steward rows.
+Degree, favicon / node state and graph size stand.
+
 ### Contract exists, producer pending — per-node + per-edge
 
 [`cartography::signals::IntelligenceSignals`](../../../crates/orrery/cartography/src/signals.rs) *(historical citation)* <!-- doc-audit: historical-link --> is
@@ -60,6 +68,13 @@ already a narrow contract carrying exactly the richer per-node truth, consumed t
 These are `Option` by design: a strategy that lacks a signal ignores it. Until an intelligence
 *producer* runs, importance / affinity read `None` and the physics that depends on them sits quiet.
 We do not fake them. (Degree is a real, cheap stand-in for importance in the meantime.)
+
+**Corrected 2026-10-06 (S14 pass):** the producer exists. Importance, community and
+affinity are computed in pictograph, `crates/canvas/pictograph/src/signals/`
+(`structural_affinity` in `affinity.rs`), and the affinity spring is built from them
+in `crates/canvas/pictograph/src/canvas.rs`. The contract is
+`crates/canvas/cartography/src/signals.rs`, and its consumers are cartography's layout
+adapters (`crates/canvas/cartography/src/adapters/`); no `arrangements` crate exists.
 
 **Boundary with the graph signals layer.** Producing these graph-structure signals (the `intel/signals`
 cache, the community / centrality / affinity computation) and their *non-physics* encodings (size,
@@ -92,6 +107,9 @@ sources above and pushes it into the active sim at **low frequency**. One pulse,
 each sim interprets the same metrics in its idiom (n-body body count = active ops; sand source rate =
 ingest throughput, dune = backlog; Game of Life density = event rate; particle-life species
 populations = the item mix). The data underneath is one honest thing; the sim is the chosen gauge.
+
+**Corrected 2026-10-06 (S14 pass):** meerkat no longer exists to gather the metrics, and
+neither `AmbientMetrics` nor `set_metrics` exists yet; the `AmbientSim` trait does.
 
 ## Design commitments (from the design conversation)
 
@@ -139,6 +157,14 @@ Mark's caution: do not choke the system with simulation when it is mid-heavy-tas
    (alongside the runtime signals) onto materials. Degree is the stand-in until then.
 5. **Collision-relations + scriptable tags** (each optional, behind the confirmation default).
 
+**Corrected 2026-10-06 (S14 pass):** slice 4's wait is over; the graph signals producer
+exists in pictograph (see the correction under "Contract exists, producer pending").
+Slices 1 and 2 were specified on meerkat's sources, which are gone.
+
+**Open, raised by the S14 pass (2026-10-06):** where do slices 1 and 2 get their inputs?
+Options: re-ground them on Turnstone's signal sources (`ContentStates`, the stickleback
+`SyncStatus`); wait for a host that exposes fetch, sync and operations metrics.
+
 ## Progress
 
 - 2026-06-24: **Plan written; surfaces scouted, signals scoped.** Read the meerkat observability /
@@ -148,3 +174,8 @@ Mark's caution: do not choke the system with simulation when it is mid-heavy-tas
   layer, not new physics; `IntelligenceSignals` is the right home for richer per-node quantities
   (importance / affinity / clusters), consumed by arrangement adapters but awaiting a live producer;
   content state + degree + sync are the strongest real-now signals. No code yet.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at mere
+  535bca11, from the D2 record in support/doc-audit/d2/batch_40_s14_phase_b2.md: the
+  signals producer noted built in pictograph, the adapters path corrected, meerkat's
+  "real now" sources noted gone with their two live equivalents, and slices 1-2's
+  inputs left open for this plan's lane. The status line stands.
