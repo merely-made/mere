@@ -3,9 +3,10 @@
 **Date:** 2026-10-04
 **Status (2026-10-05):** in progress. Thirty-three rulings in twelve rounds
 (S1 to S33); P1 landed on main (`1633be0c`); P2 staged (S27 to S31, four
-stages in §3.1) and landed on main (`40d7ae5e`); S32 (F19) next, then the S14
-pass (S33); P3 and S7 done as documents; S3 to S6 carried into the dynamics
-grammar plan (G8, G9); S9 done by the identity lane (`b52edea7`).
+stages in §3.1) and landed on main (`40d7ae5e`); S32 (F19) landed on main
+(`48c08dee`); the S14 pass (S33) under way; P3 and S7 done as documents; S3 to
+S6 carried into the dynamics grammar plan (G8, G9); S9 done by the identity
+lane (`b52edea7`).
 
 A note sent to Mark listed weak seams in the stack. Each claim was checked
 against the code (§1); six seams proved real and went to him as
@@ -254,6 +255,8 @@ in two or more crates.
   them (a `Result` from `ProjectionCompiler::new`, a typed compile issue, a
   debug assertion) is a fork for Mark; the first changes the signature the Knot
   lane is adapting to, which was told to proceed on the current one.
+  **Ruled and built 2026-10-05:** a typed compile issue (S32), landed on main
+  at `48c08dee`.
 - **F20 (2026-10-05, P2 stage 4's review). What the multi-window pacing leaves
   unmeasured.** Serving each window that asked in one idle turn, each acquire
   waiting on its swapchain, couples windows on monitors of different refresh
@@ -263,6 +266,15 @@ in two or more crates.
   window keeps drawing while another is dragged) is unmeasured, as is whether an
   occluded but not minimized window's present blocks. A panic inside a turn
   leaves the lent runner in that window; nothing catches it today.
+- **F21 (2026-10-05, S32's gates). A graphshell carrier test times out under
+  load.** `carrier::tests::p2panda_murm_grant_is_refused_before_projection_bytes`
+  waits 10 seconds for the server to accept a projection session. Run within
+  graphshell's `projection` test filter (35 tests) it timed out at that accept
+  in 2 of 5 runs with S32 and in none of 4 without it, and alone it passed 3 of
+  3 in about 2.5 seconds each. It reads no scenomise code, and both failures
+  came while other builds and subagents were loading the machine. *Reading,
+  not ruled*: a timing flake in a fixed timeout, not caused by S32; it is
+  recorded here and not fixed, as graphshell's carrier is outside this plan.
 
 ## 2. Rulings
 
@@ -724,6 +736,22 @@ The done-conditions handed over for S3 and S4, kept for reference:
   works in `projection_compile`. Second pass (F8 to F11), rulings S7 to S10:
   the README fixed (S7), TERMINOLOGY gains pandect under Eidetic and the
   curation record (S8, S10), S9 sent to the identity lane.
+- **2026-10-05.** S32 built on branch `stack-seams-s32` (`3ecba102`) and
+  landed on main at `48c08dee`, main (`2c4eaa1b`, documents only) merged into
+  the branch first. `card_issue` refuses a card whose width or height is not a
+  finite positive number with an `items.card` issue: `validation_issues`
+  carries it, so `compile`, `refresh` and `compile_snapshot` refuse, and the
+  relationship compile adds it ahead of its first refusal. No signature
+  changed, so the Knot lane's adaptation stands. Receipts:
+  `a_degenerate_card_is_a_typed_issue` (0 by 0, a zero height, a negative
+  width, a NaN and an infinite side) and
+  `a_relationship_compile_refuses_a_degenerate_card` (0 by 0 and NaN), each
+  ending with a usable card that compiles; with `card_issue` removed both
+  fail. Gates: scenomise 99 passed; graphshell's `projection` tests 35 passed;
+  `cargo check --workspace --locked` exits 0. The new lines add no rustfmt
+  differences; the three files' existing ones are left for the repository's
+  separate formatting sweep. One graphshell test timed out under load (F21).
+  Not pushed.
 - **2026-10-05.** The S14 pass begun (S33), at audit base `26060e88`.
   Assessment: 337 active documents, 155 of them plans (81 whose status claims
   landed or done, 21 in progress, 13 planned, 36 otherwise worded, 4 with no
