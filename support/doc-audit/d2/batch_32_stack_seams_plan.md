@@ -89,7 +89,9 @@ evidence checked: `push_forest_projection` and `window_root` in `multi.rs`,
 the owned layout's generic `LayoutDom` bounds, the four whole-document reads
 in `cambium-winit-a11y/src/lib.rs` (212, 324, 369, 384), the pipeline's line
 counts, and Woodshed's sources (no `HostState` field reached). F15 checked against Knot `54bb8cd` (`git grep` of
-`compile_relationship_snapshot`: eight calls in `apps/desktop/src/composition/recipe.rs`),
+`compile_relationship_snapshot`; recounted with `git grep -c`: twelve mentions in
+`apps/desktop/src/composition/recipe.rs`, one of them the import, one in `retention.rs`,
+none in `tests/support/recipe.rs`),
 mere's root `Cargo.toml` (no `scenomise` row in the mere.git patch table),
 `dd2cb6fd` on `origin/main` through `19e6dc9f`, and the burn plan's §13.46
 entry at `ac7f906d`. F16 checked against wgpu 30.0.1's
