@@ -210,17 +210,29 @@ impl PhysicsLaw {
 
     /// Why the law takes no overlays, if it refuses them. Density moves nodes
     /// by its flow alone, and an overlay's force would mix into it (ruled
-    /// 2026-10-02, until laws declare their currency).
+    /// 2026-10-02, "Refuse overlays on Density now"; which overlays it takes
+    /// converted waits on their measurements, dynamics grammar plan, G3).
+    /// Otherwise a law refuses what its currency refuses
+    /// ([`Self::admits`]), which no current law does for every overlay.
     pub fn overlay_refusal(self) -> Option<&'static str> {
         match self {
-            PhysicsLaw::Density => Some(
-                "Density takes no overlays: it moves nodes by its flow alone, \
-                 and an overlay's force would mix into it.",
-            ),
-            _ => None,
+            PhysicsLaw::Density => Some(DENSITY_INTERIM),
+            _ => {
+                let mut refusals = PhysicsOverlay::ALL
+                    .iter()
+                    .map(|o| self.admits(*o).refusal());
+                refusals
+                    .next()
+                    .flatten()
+                    .filter(|_| refusals.all(|r| r.is_some()))
+            },
         }
     }
 }
+
+/// Density's interim refusal (ruled 2026-10-02, "Refuse overlays on Density now").
+pub(crate) const DENSITY_INTERIM: &str = "Density takes no overlays: it moves nodes by its flow \
+                                          alone, and an overlay's force would mix into it.";
 
 /// Overlays a law refused: which, and why. The law itself was applied.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -694,6 +706,19 @@ pub(crate) struct LawSources {
     pub focus: Option<NodeKey>,
 }
 
+impl LawSources {
+    /// The default sources and no focus: enough to build any law over no
+    /// graph, to read its declared terms.
+    pub(crate) fn bare() -> Self {
+        Self {
+            kind: PhysicsKindSource::Site,
+            mass: PhysicsMassSource::Degree,
+            depth: PhysicsDepthSource::Roots,
+            focus: None,
+        }
+    }
+}
+
 /// A petgraph view of the visible topology: the directed multigraph (one
 /// edge per visible relation cell) for PageRank, layering, dominators and
 /// components; the undirected simple graph (one edge per pair, cost
@@ -794,6 +819,16 @@ impl<'a> LawInputs<'a> {
 
     pub(crate) fn topology(&self) -> TopologyView {
         TopologyView::new(&self.nodes, &self.edges)
+    }
+
+    /// The visible spring edges the forces pull along.
+    pub(crate) fn edges(&self) -> &[(NodeKey, NodeKey)] {
+        &self.edges
+    }
+
+    /// Each node's site, for inputs built over a subset of the nodes.
+    pub(crate) fn sites(&self) -> &HashMap<NodeKey, String> {
+        &self.sites
     }
 
     fn degrees(&self) -> HashMap<NodeKey, u32> {
@@ -1257,6 +1292,8 @@ impl Canvas {
     /// paused if it was paused. A law that refuses overlays takes none: the
     /// live ones are dropped and returned in the refusal. (Physics catalog — P1.)
     pub fn set_physics_law(&mut self, law: PhysicsLaw) -> Result<(), OverlayRefusal> {
+        self.physics_composition = None;
+        self.schedule = None;
         self.physics_law = law;
         let refused = self.refuse_overlays();
         self.rebuild_law_forces();
@@ -1363,6 +1400,8 @@ impl Canvas {
         &mut self,
         choice: &crate::canvas::PhysicsChoice,
     ) -> Result<(), OverlayRefusal> {
+        self.physics_composition = None;
+        self.schedule = None;
         self.physics_kind_source = choice.kind;
         self.physics_mass_source = choice.mass;
         self.physics_depth_source = choice.depth;
@@ -1385,6 +1424,8 @@ impl Canvas {
         let Some(profile) = physics_profile(id) else {
             return false;
         };
+        self.physics_composition = None;
+        self.schedule = None;
         self.physics_law = profile.law;
         self.physics_overlays = profile.overlays.to_vec();
         self.rebuild_law_forces();
@@ -1406,7 +1447,8 @@ impl Canvas {
     /// Whether the live law or an overlay snapshots graph structure, so a
     /// topology change must rebuild it.
     pub(crate) fn physics_forces_are_graph_bound(&self) -> bool {
-        self.physics_law.graph_bound()
+        self.physics_composition.is_some()
+            || self.physics_law.graph_bound()
             || self.physics_overlays.iter().any(|o| o.graph_bound())
             || (self.physics_mass_source == PhysicsMassSource::PageRank
                 && self.physics_overlays.iter().any(|o| o.weighted()))
@@ -1414,7 +1456,12 @@ impl Canvas {
 
     /// Whether the live law or an overlay keeps the graph moving on its own.
     pub fn physics_never_rests(&self) -> bool {
-        self.physics_law.never_rests() || self.physics_overlays.iter().any(|o| o.never_rests())
+        let laws = self.physics_composition.as_ref().map_or_else(
+            || vec![self.physics_law],
+            crate::canvas::composition::PhysicsComposition::laws,
+        );
+        laws.iter().any(|law| law.never_rests())
+            || self.physics_overlays.iter().any(|o| o.never_rests())
     }
 
     /// The sources the next build reads through.
@@ -1450,7 +1497,7 @@ impl Canvas {
                     None
                 },
             );
-            inputs.forces(self.physics_law, &self.physics_overlays, sources)
+            self.composed_forces(&inputs, sources)
         };
         self.physics.set_forces(forces);
     }
