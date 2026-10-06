@@ -102,6 +102,10 @@ struct Args {
     control_unjoined_holder: bool,
     /// Enrol a vault passphrase typed at the terminal, and exit.
     enroll_passphrase: bool,
+    /// Unlock a running resident with a passphrase typed at the terminal.
+    unlock: bool,
+    /// With `--unlock`: have the resident show its own prompt instead.
+    native: bool,
     /// Command-line overrides folded over the profile's stored settings.
     #[cfg(feature = "personal-sync")]
     sync_overrides: SyncOverrides,
@@ -164,8 +168,9 @@ async fn main() {
             },
         }
     }
-    // Status and stop talk to a running resident; this process hosts nothing.
-    if args.resident_status || args.stop_resident {
+    // Status, stop and unlock talk to a running resident; this process hosts
+    // nothing.
+    if args.resident_status || args.stop_resident || args.unlock {
         match resident_client(&args).await {
             Ok(message) => {
                 println!("{message}");
@@ -265,18 +270,41 @@ fn refuse_default_endpoints(args: &Args) -> Result<(), String> {
     ))
 }
 
-/// `--resident-status` and `--stop-resident`, over the app door.
+/// `--resident-status`, `--stop-resident` and `--unlock`, over the app door.
+/// Unlock rides the control route only: the status route never carries a
+/// passphrase (vault lock ruling 41).
 async fn resident_client(args: &Args) -> Result<String, String> {
-    let route = if args.stop_resident {
+    let route = if args.stop_resident || args.unlock {
         RESIDENT_CONTROL_ROUTE
     } else {
         RESIDENT_STATUS_ROUTE
+    };
+    // Read before the door opens, so a cancelled prompt opens nothing.
+    let passphrase = match args.unlock && !args.native {
+        true => Some(
+            djinn::enrollment::read_from_terminal("Vault passphrase: ")
+                .map_err(|error| error.to_string())?,
+        ),
+        false => None,
     };
     let route = AppRouteId::new(route).map_err(|error| error.to_string())?;
     let mut client =
         AppBrokerClient::open_route_at(&args.app_endpoint, AppId::new(RESIDENT_APP), route)
             .await
             .map_err(|error| error.to_string())?;
+    if args.unlock && args.native {
+        let unlocked = resident_status::request_native_unlock(&mut client).await;
+        let _ = client.close().await;
+        unlocked.map_err(|error| error.to_string())?;
+        return Ok("unlocked on the resident's own prompt".into());
+    }
+    if let Some(passphrase) = passphrase {
+        let unlocked = resident_status::request_unlock(&mut client, passphrase.as_bytes()).await;
+        drop(passphrase);
+        let _ = client.close().await;
+        unlocked.map_err(|error| error.to_string())?;
+        return Ok("unlocked".into());
+    }
     if args.stop_resident {
         resident_status::request_stop(&mut client)
             .await
@@ -308,6 +336,8 @@ fn parse_args() -> Result<Args, String> {
     let mut stop_resident = false;
     let mut control_unjoined_holder = false;
     let mut enroll_passphrase = false;
+    let mut unlock = false;
+    let mut native = false;
     #[cfg(feature = "personal-sync")]
     let mut sync_graph = None;
     #[cfg(feature = "personal-sync")]
@@ -394,6 +424,8 @@ fn parse_args() -> Result<Args, String> {
             "--stop-resident" => stop_resident = true,
             "--control-unjoined-holder" => control_unjoined_holder = true,
             "--enroll-passphrase" => enroll_passphrase = true,
+            "--unlock" => unlock = true,
+            "--native" => native = true,
             #[cfg(feature = "personal-sync")]
             "--sync-graph" => {
                 sync_graph = Some(argv.next().ok_or("--sync-graph needs a value")?);
@@ -527,6 +559,8 @@ fn parse_args() -> Result<Args, String> {
         stop_resident,
         control_unjoined_holder,
         enroll_passphrase,
+        unlock,
+        native,
         #[cfg(feature = "personal-sync")]
         sync_overrides: SyncOverrides {
             graph: sync_graph,
@@ -694,6 +728,7 @@ fn usage() -> &'static str {
      blobs at start: [--stage-blob <file>] [--fetch-blob <64-hex-hash>]\n\
      a running resident: --resident-status | --stop-resident [--app-endpoint <endpoint>]\n\
      enrol a vault passphrase at the terminal: --enroll-passphrase [--dir <vault-dir>]\n\
+     unlock a running resident at the terminal: --unlock [--native] [--app-endpoint <endpoint>]\n\
      receipt only: --receipt-agent-endpoint <isolated-endpoint>"
 }
 
@@ -793,6 +828,45 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
         .with_vault_dir(args.vault_dir.clone()),
     );
     // The status follows the lock (ruling 31's watch channel; harness H4).
+    // The doors' kept keys are captured now, while unlocked, so the doors
+    // stay open through any later lock (rulings 40, 46). A resident that
+    // starts locked (ruling 42, L3) captures them at its first unlock.
+    if let Err(error) =
+        graphshell::native::local_session::DoorIdentity::door_keys(personae.as_ref())
+    {
+        tracing::warn!(%error, "door keys not captured at start");
+    }
+    // `djinn --unlock` arrives here over the control route (ruling 41).
+    let unlocker: resident_status::Unlocker = {
+        let personae = Arc::clone(&personae);
+        Arc::new(move |passphrase: &[u8]| {
+            personae
+                .unlock_vault(personae::UnlockMethod::Passphrase(passphrase))
+                .map_err(|error| error.to_string())
+        })
+    };
+    // `djinn --unlock --native` shows the resident's own prompt (ruling 47).
+    let native_unlocker: resident_status::NativeUnlocker = {
+        let personae = Arc::clone(&personae);
+        Arc::new(move || {
+            let prompt = || {
+                graphshell::native::identity_ui::apply_native_identity_action(
+                    &personae,
+                    &SystemNativeIdentityUi::default(),
+                    graphshell::browser_carrier::NativeIdentityAction::UnlockVault,
+                )
+            };
+            // A dialog blocks; the worker it holds is handed over meanwhile.
+            match tokio::task::block_in_place(prompt) {
+                graphshell::browser_carrier::NativeIdentityResult::UnlockedVault => Ok(()),
+                other => Err(format!("the native unlock ended: {other:?}")),
+            }
+        })
+    };
+    let control_unlock = resident_status::ControlUnlock {
+        passphrase: Some(unlocker.clone()),
+        native: Some(native_unlocker),
+    };
     let mut lock_state = personae.lock_state();
     let initial_lock = *lock_state.borrow_and_update();
     status.update(|status| status.lock = initial_lock.into());
@@ -987,7 +1061,13 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
                 .await?;
             resident_status::grant(&grants, route);
             let route = catalog
-                .update(|catalog| ResidentControlEndpoint::register(stop.clone(), catalog))
+                .update(|catalog| {
+                    ResidentControlEndpoint::register_with_unlock(
+                        stop.clone(),
+                        control_unlock.clone(),
+                        catalog,
+                    )
+                })
                 .await?;
             resident_status::grant(&grants, route);
             // V1 grants the reservoir to the first-party clients this door
@@ -1181,6 +1261,35 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
                             };
                             tracing::info!(event, "vault lock state changed");
                             events.emit(event, json!({}));
+                            // Knot's lane follows the lock (ruling 48). The
+                            // close runs after lock() returned: that window
+                            // is logged.
+                            let since = std::time::Instant::now();
+                            if now == VaultLockView::Unlocked {
+                                // Kept from the first unlock on (ruling 46).
+                                let _ = graphshell::native::local_session::DoorIdentity::door_keys(
+                                    personae.as_ref(),
+                                );
+                            }
+                            match now {
+                                VaultLockView::Locked => match resident.close_knot().await {
+                                    Ok(None) => {},
+                                    Ok(Some(cut)) => {
+                                        let window_ms = since.elapsed().as_millis() as u64;
+                                        tracing::info!(cut, window_ms, "Knot lane closed after the lock");
+                                        events.emit("knot-closed", json!({ "cut": cut, "window_ms": window_ms }));
+                                    },
+                                    Err(error) => tracing::error!(%error, "Knot lane did not close cleanly"),
+                                },
+                                VaultLockView::Unlocked => match resident.reopen_knot().await {
+                                    Ok(true) => {
+                                        tracing::info!("Knot lane reopened after the unlock");
+                                        events.emit("knot-reopened", json!({}));
+                                    },
+                                    Ok(false) => {},
+                                    Err(error) => tracing::error!(%error, "Knot lane did not reopen"),
+                                },
+                            }
                         },
                         Err(_) => lock_watched = false,
                     }

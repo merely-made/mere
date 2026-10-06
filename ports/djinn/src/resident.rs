@@ -26,11 +26,11 @@ use transport::BlobScope;
 
 use crate::resident_blobs::ResidentBlobCustody;
 use crate::resident_distillery::ResidentDistillery;
-use crate::resident_knot::ResidentKnot;
+use crate::resident_knot::{KnotGate, ResidentKnot};
 use crate::resident_mere::MereRoutes;
 use crate::resident_reservoir::{ReservoirLane, ResidentReservoir};
 use crate::resident_site::{PublishedSiteEndpoint, PublishedSiteService};
-use crate::settings::{OwnerSettings, ReservoirLaneSettings};
+use crate::settings::{KnotResidentSettings, OwnerSettings, ReservoirLaneSettings};
 
 const CASTELLAN_RECORD_SALT: &[u8] = b"mere.djinn/castellan/records/v1";
 const CASTELLAN_FRESHNESS_SALT: &[u8] = b"mere.djinn/castellan/freshness/v1";
@@ -45,6 +45,9 @@ pub struct DjinnResident {
     blobs: ResidentBlobCustody,
     site: Arc<tokio::sync::Mutex<PublishedSiteService>>,
     knot: Option<ResidentKnot>,
+    /// What reopens the Knot lane after a lock: its settings and the gate
+    /// its route was registered over (vault lock ruling 48).
+    knot_reopen: Option<(PathBuf, KnotResidentSettings, KnotGate)>,
     distillery: Option<ResidentDistillery>,
     reservoir_settings: ReservoirLaneSettings,
     /// Off until [`DjinnResident::open_reservoir`] opens it under a shared
@@ -88,6 +91,7 @@ impl DjinnResident {
                 });
             },
         };
+        let knot_settings = owner.knot.clone();
         let knot = match owner.knot {
             Some(settings) => match ResidentKnot::open(data_root, settings, blobs.clone()).await {
                 Ok(knot) => Some(knot),
@@ -133,11 +137,16 @@ impl DjinnResident {
             },
             None => None,
         };
+        let knot_reopen = match (&knot, knot_settings) {
+            (Some(knot), Some(settings)) => Some((data_root.to_path_buf(), settings, knot.gate())),
+            _ => None,
+        };
         Ok(Self {
             credentials,
             blobs,
             site,
             knot,
+            knot_reopen,
             distillery,
             reservoir_settings: owner.reservoir,
             reservoir: ReservoirLane::Off,
@@ -227,9 +236,35 @@ impl DjinnResident {
         }
     }
 
-    /// Whether this run has a configured resident Knot source.
+    /// Whether this run has an open resident Knot source.
     pub fn knot_enabled(&self) -> bool {
         self.knot.is_some()
+    }
+
+    /// Close the Knot lane for a vault lock (ruling 48): the route refuses,
+    /// live sessions are cut, sync stops, and the source and its seed go.
+    /// Returns how many sessions were cut, or `None` with no lane open.
+    pub async fn close_knot(&mut self) -> Result<Option<usize>, String> {
+        let Some(knot) = self.knot.take() else {
+            return Ok(None);
+        };
+        let cut = knot.gate().close();
+        knot.close().await?;
+        Ok(Some(cut))
+    }
+
+    /// Reopen the Knot lane after an unlock, through the gate its route was
+    /// registered over, so the same route serves again.
+    pub async fn reopen_knot(&mut self) -> Result<bool, String> {
+        if self.knot.is_some() {
+            return Ok(false);
+        }
+        let Some((data_root, settings, gate)) = self.knot_reopen.clone() else {
+            return Ok(false);
+        };
+        let knot = ResidentKnot::open_through(&data_root, settings, self.blobs.clone(), gate).await?;
+        self.knot = Some(knot);
+        Ok(true)
     }
 
     /// Loggable Knot transport facts without exposing a source or signing key.
@@ -284,6 +319,7 @@ impl DjinnResident {
             blobs,
             site,
             knot,
+            knot_reopen: _,
             distillery,
             reservoir_settings: _,
             reservoir,

@@ -68,6 +68,7 @@ pub mod passphrase_root;
 pub mod passphrase_storage;
 mod profile_wire;
 mod provider;
+mod retained;
 pub mod roster;
 pub mod seal;
 pub mod sealed_profile_storage;
@@ -99,6 +100,7 @@ pub use crate::passphrase_storage::PassphraseEncryptedStorage;
 pub use crate::provider::{
     AttestationKeys, IdentityProvider, InMemoryProvider, SealedIdentityProvider,
 };
+pub use crate::retained::RetainedKeys;
 pub use crate::roster::{OpenedVault, Roster, RosterEntry, open_shared};
 pub use crate::seal::{seal_bytes, unseal_bytes};
 pub use crate::sealed_profile_storage::SealedProfileStorage;
