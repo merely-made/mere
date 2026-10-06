@@ -50,7 +50,7 @@ fn max_advance<T: Numeric, N: Size>(
                 advance_argmax(acc, acc_coord, candidate, candidate_coord);
             elements.assign(&Value::new_single(selected));
             coordinates.assign(&Value::new_single(selected_coord));
-        }
+        },
         Value::Multiple(_) => panic!("a max candidate carries at most one coordinate"),
     }
 }
@@ -78,7 +78,7 @@ fn max_insert<T: Numeric, N: Size>(
                 select_argmax(acc, acc_coord, candidate, candidate_coord);
             elements.assign(&Value::new_single(selected));
             coordinates.assign(&Value::new_single(selected_coord));
-        }
+        },
         Value::Multiple(_) => panic!("a max candidate carries at most one coordinate"),
     }
 }
@@ -95,7 +95,7 @@ fn plane_max_candidate<T: Numeric, N: Size>(
         Value::Single(coord) => {
             let (winning, winning_coord) = plane_argmax_propagating_nan(item, coord.unwrap());
             (winning, Value::new_single(winning_coord))
-        }
+        },
         Value::Multiple(_) => panic!("a max candidate carries at most one coordinate"),
     }
 }
@@ -199,14 +199,14 @@ impl<P: ReducePrecision> ReduceInstruction<P> for Max {
                     .extract(0usize);
                 }
                 (Value::new_single(Out::cast_from(max)), Value::new_None())
-            }
+            },
             Value::Single(_) => {
                 let (max, coordinate) = max_finalize_with_coords::<P>(&accumulator);
                 (
                     Value::new_single(Out::cast_from(max)),
                     Value::new_single(Idx::cast_from(coordinate)),
                 )
-            }
+            },
             Value::Multiple(_) => panic!("a max accumulator holds at most one coordinate vector"),
         }
     }
@@ -228,7 +228,7 @@ impl<P: ReducePrecision> ReduceInstruction<P> for Max {
 
 impl<P: ReducePrecision> ReduceWithIndices<P> for Max {}
 
-/// Collapse the vectorized accumulator lanes down to the final maximum and its
+/// Collapse the vectorized accumulator components down to the final maximum and its
 /// coordinate, for the parallel layout.
 ///
 /// Ties break towards the lower coordinate, matching the CPU reference. The

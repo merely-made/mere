@@ -160,7 +160,7 @@ fn warmup<'a, F: TuneInputs, Out: AutotuneOutput>(
             // every call, so the remaining warmups and the whole sampling loop are skipped.
             // The error is propagated as-is to keep the reason it was rejected.
             Ok((Err(err), _)) => return Err(err),
-            Ok(_) => {}
+            Ok(_) => {},
             Err(err) => errors.push(err),
         }
     }

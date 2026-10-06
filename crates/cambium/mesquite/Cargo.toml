@@ -10,12 +10,17 @@ repository.workspace = true
 # release blocks taproot's own publish today).
 publish = false
 
+[features]
+default = ["image-decode"]
+# Forwards genet-livery's image decoding (mer3ly Ruling 111); on by default.
+image-decode = ["taproot/image-decode", "cambium-rootstock/image-decode"]
+
 [dependencies]
 # The document host seam this lane drives: `AppCtx`, the capture arming hook,
 # `read_frame`, the frame profile and the pointer queue. Path deps like every
 # other member of the family.
 cambium = { version = "0.3.3", path = "../cambium" }
-cambium-rootstock = { version = "0.1.0", path = "../cambium-rootstock" }
+cambium-rootstock = { version = "0.1.0", path = "../cambium-rootstock", default-features = false }
 # The scenario grammar, the selector resolver and the `Automatable`/`Driveable`
 # seam this crate implements generically. Through the workspace genet pins, so
 # one genet identity stays in every consumer's graph.

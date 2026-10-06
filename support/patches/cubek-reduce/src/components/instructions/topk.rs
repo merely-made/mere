@@ -49,7 +49,7 @@ impl ReduceWithIndicesFamily for TopK {
 /// Ties break towards the lower coordinate, matching the CPU reference. A
 /// coordinate-less candidate emits no index arithmetic at all.
 ///
-/// A candidate that reaches no lane's last kept slot changes nothing and skips
+/// A candidate that reaches no component's last kept slot changes nothing and skips
 /// the `k`-slot walk — over a long row, almost every candidate.
 #[cube]
 pub(crate) fn topk_insert<N: Numeric, S: Size>(
@@ -70,7 +70,7 @@ pub(crate) fn topk_insert<N: Numeric, S: Size>(
                     elements[j] = select_many(to_keep, elements[j], insert_val);
                     insert_val = next_val;
                 }
-            }
+            },
             Value::Single(coord) => {
                 let mut insert_coord = coord.unwrap();
                 let coords = coordinates.multiple_mut();
@@ -90,7 +90,7 @@ pub(crate) fn topk_insert<N: Numeric, S: Size>(
                     coords[j] = select_many(to_keep, coords[j], insert_coord);
                     insert_coord = next_coord;
                 }
-            }
+            },
             Value::Multiple(_) => panic!("a top-k candidate carries at most one coordinate"),
         }
     }
@@ -249,7 +249,7 @@ impl<P: ReducePrecision> ReduceInstruction<P> for TopK {
                     &item.args,
                     this.k,
                 );
-            }
+            },
             ReduceStep::Identity => {
                 topk_insert::<P::EA, P::SI>(
                     elements,
@@ -258,7 +258,7 @@ impl<P: ReducePrecision> ReduceInstruction<P> for TopK {
                     &item.args,
                     this.k,
                 );
-            }
+            },
         }
     }
 
@@ -298,7 +298,7 @@ impl<P: ReducePrecision> ReduceInstruction<P> for TopK {
             Value::None => {
                 let values = topk_finalize_values::<P, Out>(&accumulator, this.k);
                 (Value::new_Multiple(values), Value::new_None())
-            }
+            },
             Value::Multiple(_) => {
                 let (values, coords) = topk_finalize_with_coords::<P>(&accumulator, this.k);
 
@@ -314,7 +314,7 @@ impl<P: ReducePrecision> ReduceInstruction<P> for TopK {
                     Value::new_Multiple(out_values),
                     Value::new_Multiple(out_indices),
                 )
-            }
+            },
             Value::Single(_) => panic!("top-k accumulator coordinates are one slice per slot"),
         }
     }
@@ -340,7 +340,7 @@ impl<P: ReducePrecision> ReduceInstruction<P> for TopK {
                     out_indices[i] = Vector::cast_from(acc_args[i]);
                 }
                 Value::new_Multiple(out_indices)
-            }
+            },
             Value::Single(_) => panic!("top-k accumulator coordinates are one slice per slot"),
         };
 

@@ -16,7 +16,7 @@ use crate::{
 };
 use cubecl::{prelude::*, std::tensor::r#virtual::VirtualTensor};
 
-/// How many candidate slots a top-k thread may keep across its vector lanes
+/// How many candidate slots a top-k thread may keep across its vector components
 /// before the reduce reads its input scalar instead: `k * vector_size` values
 /// and as many coordinates live per thread.
 const TOPK_VECTOR_SLOTS: usize = 32;
@@ -101,7 +101,7 @@ fn prepare_reduce_launch(
         &strategy.vectorization,
     );
     // The rolled top-k selection network (`k * k > TOPK_UNROLL_BUDGET`) keeps
-    // per-lane accumulator and finalize arrays whose dynamic indexing places
+    // per-component accumulator and finalize arrays whose dynamic indexing places
     // them in per-thread local memory, and their footprint scales with
     // `k * vector_size` (about 48 bytes per slot at width 8). Past roughly
     // 4 KiB per thread the NVIDIA Vulkan driver corrupts memory around the
@@ -114,7 +114,7 @@ fn prepare_reduce_launch(
     // case that exposed this, comfortably below the fault threshold.
     //
     // Past a handful of slots the vector costs even where the rolled path is not
-    // taken: every lane of it keeps its own `k` candidates, values and
+    // taken: every component of it keeps its own `k` candidates, values and
     // coordinates, so width 8 at `k = 20` is 320 accumulator registers a thread.
     // The kernel spills and the cube shrinks to a single plane; scalar, the
     // same top-20 of a 151936-wide row (a vocabulary, the sampler's case) ran
@@ -125,7 +125,7 @@ fn prepare_reduce_launch(
                 || *k * *k > crate::components::instructions::TOPK_UNROLL_BUDGET =>
         {
             (1, 1)
-        }
+        },
         _ => (vector_size_input, vector_size_output),
     };
 
@@ -157,15 +157,15 @@ fn prepare_reduce_launch(
         RoutineStrategy::Unit(strategy) => {
             let routine = UnitRoutine;
             routine.prepare(client, problem, settings, strategy)?
-        }
+        },
         RoutineStrategy::Plane(strategy) => {
             let routine = PlaneRoutine;
             routine.prepare(client, problem, settings, strategy)?
-        }
+        },
         RoutineStrategy::Cube(strategy) => {
             let routine = CubeRoutine;
             routine.prepare(client, problem, settings, strategy)?
-        }
+        },
     };
 
     Ok((blueprint, settings, out_vec_axis))
@@ -449,7 +449,7 @@ fn reduce_with_indices_kernel_inner<
                 blueprint.vectorization_mode,
                 cube,
             )
-        }
+        },
         GlobalReduceBlueprint::Plane(plane) => {
             GlobalFullPlaneReduce::execute_with_indices::<P, Out, Idx, R::Instruction<P>>(
                 input,
@@ -461,7 +461,7 @@ fn reduce_with_indices_kernel_inner<
                 blueprint.vectorization_mode,
                 plane,
             )
-        }
+        },
         GlobalReduceBlueprint::Unit(unit) => {
             GlobalFullUnitReduce::execute_with_indices::<P, Out, Idx, R::Instruction<P>>(
                 input,
@@ -473,7 +473,7 @@ fn reduce_with_indices_kernel_inner<
                 blueprint.vectorization_mode,
                 unit,
             )
-        }
+        },
     };
 }
 
@@ -524,7 +524,7 @@ fn reduce_kernel_inner<P: ReducePrecision, Out: NumericVector, R: ReduceFamily>(
                 blueprint.vectorization_mode,
                 cube,
             )
-        }
+        },
         GlobalReduceBlueprint::Plane(plane) => {
             GlobalFullPlaneReduce::execute::<P, Out, R::Instruction<P>>(
                 input,
@@ -535,7 +535,7 @@ fn reduce_kernel_inner<P: ReducePrecision, Out: NumericVector, R: ReduceFamily>(
                 blueprint.vectorization_mode,
                 plane,
             )
-        }
+        },
         GlobalReduceBlueprint::Unit(unit) => {
             GlobalFullUnitReduce::execute::<P, Out, R::Instruction<P>>(
                 input,
@@ -546,6 +546,6 @@ fn reduce_kernel_inner<P: ReducePrecision, Out: NumericVector, R: ReduceFamily>(
                 blueprint.vectorization_mode,
                 unit,
             )
-        }
+        },
     };
 }
