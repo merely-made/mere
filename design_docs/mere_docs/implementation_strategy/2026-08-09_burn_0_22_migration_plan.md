@@ -4814,6 +4814,35 @@ size, so the layout re-solves with font, zoom and labels. *Reading, not
 ruled:* retention validation has no fonts, so it still needs a nominal size.
 That number, the measuring path and the padding come back as forks.
 
+**How Knot measures its card (2026-10-05, four questions in one round).**
+Evidence from Knot's harness, with the real desktop sheet and bundled fonts:
+the host has no text-measure API but exposes the last layout's rects
+(`AppCtx::painted_rect`). The card is the label width plus 1 px of rounding
+plus 22 (the declared `padding:6px 10px` and 1 px border), by 31 (one 17 px line
+plus 14). The control: at the exact width, 2 of 4 labels stay on one line; at
+1 px wider, all 4; at 1 px narrower, none. The pressed card is semibold
+(`readings.rs:28`). Sizes are identical at UI zoom 1, 2 and 4. Validation gives
+byte-identical outcomes for five cases at seven sizes (164 by 68, 1 by 1, 0 by
+0, NaN, 1e6) and never reads geometry.
+
+- How to measure. Options: read the previous layout through role-less,
+  `aria-hidden` probe spans; shape the text directly with genet-parley.
+  Mark: **"Read the previous layout (Recommended)"**. The drawn string is
+  probed at weight 600 and read through `painted_rect` in the frame hook. The
+  result is stored by label set, and the probes are removed once measured.
+- The first frame after labels change. Options: hide the scene for one frame;
+  show the old or nominal size. Mark: **"Hide the scene one frame
+  (Recommended)"**.
+- The card's shape. Options: one line with no width cap; keep the 68 px
+  minimum height; cap the width and measure the wrapped height. Mark: **"One
+  line, no width cap (Recommended)"**. The widest label sets every card's
+  width.
+- Validation's nominal size. Options: a named 164 by 68 constant; a 1 by 1
+  sentinel. Mark: **"Named 164×68 constant (Recommended)"**. The constant is
+  validation-only and lives in knot-composition, shared by the desktop's four
+  action gates and the tests. Only the view's draw call takes the measured
+  compiler.
+
 *Annotation, 2026-10-05:* the next move of djinn's Knot pin is not this
 plan's. Under mer3ly Ruling 112, the Projection grammar session owns the
 genet `image-decode` chain (mer3ly Ruling 111). It runs mere's genet repin
