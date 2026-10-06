@@ -18,7 +18,7 @@
 use std::fs::{File, TryLockError};
 use std::io::Write;
 use std::path::{Component, Path, PathBuf};
-use std::sync::{Arc, Mutex, MutexGuard};
+use std::sync::{Arc, Mutex, MutexGuard, RwLock};
 
 use chacha20poly1305::aead::{Aead, KeyInit, Payload};
 use chacha20poly1305::{ChaCha20Poly1305, Key, Nonce};
@@ -84,10 +84,17 @@ pub enum SealedRecordChange<T> {
 /// Each relative record path maps to one sealed JSON envelope on disk. The
 /// record path itself is bound into AEAD associated data so ciphertext cannot be
 /// transparently copied to a different logical record id.
+///
+/// ## Clones share one key
+///
+/// Every clone holds the same key cell (vault lock ruling 30). [`Self::lock`]
+/// on any clone forgets the key for all of them, and [`Self::unlock`] on any
+/// clone restores it for all. While locked, every record call returns
+/// [`IdentityError::Locked`], absent records included.
 #[derive(Clone)]
 pub struct SealedRecordStorage {
     root: PathBuf,
-    key: Zeroizing<[u8; 32]>,
+    key: Arc<RwLock<Option<Zeroizing<[u8; 32]>>>>,
     update_lock: Arc<Mutex<()>>,
     authority: Option<Arc<AuthoritativeStore>>,
 }
@@ -98,10 +105,72 @@ impl SealedRecordStorage {
     pub fn open_with_key(root: impl Into<PathBuf>, key: [u8; 32]) -> Self {
         Self {
             root: root.into(),
-            key: Zeroizing::new(key),
+            key: Arc::new(RwLock::new(Some(Zeroizing::new(key)))),
             update_lock: Arc::new(Mutex::new(())),
             authority: None,
         }
+    }
+
+    /// Forget the record key, and the freshness key of an authoritative
+    /// store, for this store and every clone of it.
+    pub fn lock(&self) {
+        let _guard = self.lock_updates();
+        *self.key.write().unwrap_or_else(|e| e.into_inner()) = None;
+        if let Some(authority) = &self.authority {
+            authority.freshness.lock();
+        }
+    }
+
+    /// Whether the key is forgotten.
+    pub fn is_locked(&self) -> bool {
+        self.key.read().unwrap_or_else(|e| e.into_inner()).is_none()
+    }
+
+    /// Restore the keys for this store and every clone.
+    ///
+    /// An authoritative store (one from [`Self::claim_with_file_freshness`])
+    /// needs its freshness key back too; any other refuses one. The caller
+    /// re-derives both: this type owns no unlock ceremony.
+    pub fn unlock(
+        &self,
+        key: [u8; 32],
+        freshness_key: Option<[u8; 32]>,
+    ) -> Result<(), IdentityError> {
+        let _guard = self.lock_updates();
+        match (&self.authority, freshness_key) {
+            (Some(authority), Some(freshness_key)) => authority.freshness.unlock(freshness_key),
+            (None, None) => {},
+            (Some(_), None) => {
+                return Err(IdentityError::Backend(
+                    "an authoritative sealed-record store needs its freshness key to unlock"
+                        .to_string(),
+                ));
+            },
+            (None, Some(_)) => {
+                return Err(IdentityError::Backend(
+                    "this sealed-record store keeps no freshness ledger".to_string(),
+                ));
+            },
+        }
+        *self.key.write().unwrap_or_else(|e| e.into_inner()) = Some(Zeroizing::new(key));
+        Ok(())
+    }
+
+    /// Run `f` with the AEAD for the current key, or [`IdentityError::Locked`].
+    ///
+    /// The key is borrowed where it lives, never copied out: a stack copy
+    /// can reach the heap later through a moved value's uninitialized bytes,
+    /// which the no-residue test caught for the passphrase vault's key.
+    fn with_cipher<R>(&self, f: impl FnOnce(&ChaCha20Poly1305) -> R) -> Result<R, IdentityError> {
+        let key = self.key.read().unwrap_or_else(|e| e.into_inner());
+        let key = key.as_ref().ok_or(IdentityError::Locked)?;
+        let cipher =
+            ChaCha20Poly1305::new(<&Key>::try_from(&key[..]).expect("fixed-length key material"));
+        Ok(f(&cipher))
+    }
+
+    fn ensure_unlocked(&self) -> Result<(), IdentityError> {
+        self.with_cipher(|_| ())
     }
 
     /// Claim exclusive process authority over a record directory and bind it
@@ -152,7 +221,7 @@ impl SealedRecordStorage {
         }
         Ok(Self {
             root,
-            key: Zeroizing::new(key),
+            key: Arc::new(RwLock::new(Some(Zeroizing::new(key)))),
             update_lock: Arc::new(Mutex::new(())),
             authority: Some(Arc::new(AuthoritativeStore {
                 _lease: lease,
@@ -174,6 +243,7 @@ impl SealedRecordStorage {
     where
         T: DeserializeOwned,
     {
+        self.ensure_unlocked()?;
         let (path, aad) = resolve_record_path(&self.root, relative)?;
         let bytes = match std::fs::read(&path) {
             Ok(bytes) => bytes,
@@ -211,21 +281,19 @@ impl SealedRecordStorage {
         let legacy = envelope.version == LEGACY_SEALED_RECORD_FORMAT_VERSION;
         let generation = if legacy { 0 } else { envelope.generation };
         let observed = revision(Some(&bytes), generation, envelope.deleted);
-        let cipher = ChaCha20Poly1305::new(
-            &Key::try_from(self.key.as_ref()).expect("fixed-length key material"),
-        );
         let nonce = &Nonce::try_from(&envelope.nonce[..]).expect("fixed-length key material");
         let encryption_aad = envelope_aad(&aad, envelope.version, generation, envelope.deleted);
         let plaintext = Zeroizing::new(
-            cipher
-                .decrypt(
+            self.with_cipher(|cipher| {
+                cipher.decrypt(
                     nonce,
                     Payload {
                         msg: envelope.ciphertext.as_slice(),
                         aad: encryption_aad.as_bytes(),
                     },
                 )
-                .map_err(|_| IdentityError::Backend(format!("decrypt sealed record {:?}", path)))?,
+            })?
+            .map_err(|_| IdentityError::Backend(format!("decrypt sealed record {:?}", path)))?,
         );
         if envelope.deleted {
             if !plaintext.is_empty() {
@@ -257,6 +325,7 @@ impl SealedRecordStorage {
     where
         T: Serialize,
     {
+        self.ensure_unlocked()?;
         let (path, aad) = resolve_record_path(&self.root, relative)?;
         let current = self.current_revision(&path, &aad)?;
         let generation = current.generation.checked_add(1).ok_or_else(|| {
@@ -266,18 +335,17 @@ impl SealedRecordStorage {
             IdentityError::Backend(format!("encode sealed record {:?}: {err}", path))
         })?;
         let nonce = random_bytes(NONCE_LEN);
-        let cipher = ChaCha20Poly1305::new(
-            &Key::try_from(self.key.as_ref()).expect("fixed-length key material"),
-        );
         let encryption_aad = envelope_aad(&aad, SEALED_RECORD_FORMAT_VERSION, generation, false);
-        let ciphertext = cipher
-            .encrypt(
-                &Nonce::try_from(&nonce[..]).expect("fixed-length key material"),
-                Payload {
-                    msg: plaintext.as_slice(),
-                    aad: encryption_aad.as_bytes(),
-                },
-            )
+        let ciphertext = self
+            .with_cipher(|cipher| {
+                cipher.encrypt(
+                    &Nonce::try_from(&nonce[..]).expect("fixed-length key material"),
+                    Payload {
+                        msg: plaintext.as_slice(),
+                        aad: encryption_aad.as_bytes(),
+                    },
+                )
+            })?
             .map_err(|err| {
                 IdentityError::Backend(format!("encrypt sealed record {:?}: {err}", path))
             })?;
@@ -318,6 +386,7 @@ impl SealedRecordStorage {
     /// Delete one record. Missing files are ignored.
     pub fn delete_record(&self, relative: impl AsRef<Path>) -> Result<(), IdentityError> {
         let _guard = self.lock_updates();
+        self.ensure_unlocked()?;
         let (path, aad) = resolve_record_path(&self.root, relative.as_ref())?;
         if self.authority.is_some() {
             let current = self.current_revision(&path, &aad)?;
@@ -325,18 +394,17 @@ impl SealedRecordStorage {
                 IdentityError::Backend(format!("sealed record {aad:?} exhausted its generation"))
             })?;
             let nonce = random_bytes(NONCE_LEN);
-            let cipher = ChaCha20Poly1305::new(
-                &Key::try_from(self.key.as_ref()).expect("fixed-length key material"),
-            );
             let encryption_aad = envelope_aad(&aad, SEALED_RECORD_FORMAT_VERSION, generation, true);
-            let ciphertext = cipher
-                .encrypt(
-                    &Nonce::try_from(&nonce[..]).expect("fixed-length key material"),
-                    Payload {
-                        msg: &[],
-                        aad: encryption_aad.as_bytes(),
-                    },
-                )
+            let ciphertext = self
+                .with_cipher(|cipher| {
+                    cipher.encrypt(
+                        &Nonce::try_from(&nonce[..]).expect("fixed-length key material"),
+                        Payload {
+                            msg: &[],
+                            aad: encryption_aad.as_bytes(),
+                        },
+                    )
+                })?
                 .map_err(|error| {
                     IdentityError::Backend(format!("seal tombstone for {path:?}: {error}"))
                 })?;

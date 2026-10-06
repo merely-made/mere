@@ -85,6 +85,7 @@ pub mod ssh_sign;
 #[cfg(feature = "ssh")]
 pub mod ssh_slot;
 pub mod startup_unlock;
+pub mod unlock;
 pub mod vault;
 mod zeroizing_json;
 
@@ -106,9 +107,10 @@ pub use crate::startup_unlock::{
     StartupUnlockMode, auto_unlock_backend_available, load_existing_auto_unlock_root,
     load_or_create_auto_unlock_root,
 };
+pub use crate::unlock::{OsPresence, UnlockMethod, UnlockMethods};
 pub use crate::vault::{
     CredentialLineage, IdentitySlot, IdentityStorage, IdentityVault, InMemoryStorage, Profile,
-    ProfileId, ProfileSummary, ProtocolKey, SecretBytes, UnlockTier,
+    ProfileId, ProfileSummary, ProtocolKey, PublicProfile, SecretBytes, SlotSummary, UnlockTier,
 };
 
 /// Identity of a persona — the user's mode-scoped identity boundary.

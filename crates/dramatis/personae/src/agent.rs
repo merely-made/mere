@@ -56,6 +56,7 @@ use ssh_key::certificate::Certificate;
 use ssh_key::private::PrivateKey;
 use ssh_key::public::PublicKey;
 
+use crate::enroll;
 use crate::signing::{
     ApprovalBroker, SigningFailureCode, SigningPolicy, SigningRecordResult, SigningRequest,
 };
@@ -65,7 +66,6 @@ use crate::ssh_krl;
 use crate::ssh_sign;
 use crate::ssh_slot::{self, SshSlot};
 use crate::vault::{IdentityStorage, IdentityVault, ProtocolKey, UnlockTier};
-use crate::enroll;
 
 pub use crate::ssh_slot::{SSH_MOD_ID, protocol_key_for};
 
@@ -147,12 +147,16 @@ impl<S: IdentityStorage> VaultAgent<S> {
         self.approval.as_ref()
     }
 
+    /// Locked lists nothing; the agent's locked behaviour proper is L2.
     fn ssh_identities(&self) -> Vec<SshSlot> {
-        ssh_slot::ssh_slots(self.vault.lock().unwrap().current_profile())
+        match self.vault.lock().unwrap().current_profile() {
+            Ok(profile) => ssh_slot::ssh_slots(profile),
+            Err(_) => Vec::new(),
+        }
     }
 
     fn find_by_public(&self, wanted: &PublicKey) -> Option<SshSlot> {
-        ssh_slot::find_by_public(self.vault.lock().unwrap().current_profile(), wanted)
+        ssh_slot::find_by_public(self.vault.lock().unwrap().current_profile().ok()?, wanted)
     }
 
     /// Mint a login certificate for one identity from the vault's own
@@ -165,7 +169,7 @@ impl<S: IdentityStorage> VaultAgent<S> {
     /// The vault is the provider: no copy of the master seed is made.
     fn certificate_for(&self, slot: &SshSlot) -> Option<Certificate> {
         let vault = self.vault.lock().unwrap();
-        let profile = vault.current_profile();
+        let profile = vault.current_profile().ok()?;
         let ca = SshCertAuthority::derive(&*vault).ok()?;
         let policy = ssh_face::effective_policy(profile).ok()?;
         let ledger = ssh_krl::load_ledger(profile).ok()?;
@@ -228,7 +232,7 @@ impl<S: IdentityStorage + 'static> Session for VaultAgent<S> {
             return Err(std::io::Error::other("identity not found in vault").into());
         };
         let authorization = if let Some(approval) = self.approval.clone() {
-            let profile = self.vault.lock().unwrap().current_profile().id.0.clone();
+            let profile = self.vault.lock().unwrap().profile_id().0.clone();
             let mut signing_request = SigningRequest::new(
                 profile,
                 identity.fingerprint(),
@@ -294,7 +298,12 @@ impl<S: IdentityStorage + 'static> Session for VaultAgent<S> {
         let key = ssh_slot::protocol_key_for(&private);
         let mut vault = self.vault.lock().unwrap();
         // Ruling 54: a held key is never rewritten, its tier included.
-        if vault.current_profile().slots.contains_key(&key) {
+        if vault
+            .current_profile()
+            .map_err(AgentError::other)?
+            .slots
+            .contains_key(&key)
+        {
             tracing::info!(?key, "ssh identity already held; left untouched");
             return Ok(());
         }
@@ -402,7 +411,14 @@ mod tests {
     }
 
     fn vault_slot_count(agent: &VaultAgent<InMemoryStorage>) -> usize {
-        agent.vault.lock().unwrap().current_profile().slots.len()
+        agent
+            .vault
+            .lock()
+            .unwrap()
+            .current_profile()
+            .unwrap()
+            .slots
+            .len()
     }
 
     #[tokio::test]
@@ -434,7 +450,15 @@ mod tests {
             listed[0].credential.key_data(),
             listed[1].credential.key_data()
         );
-        assert!(agent.vault.lock().unwrap().slot(&stored_key).is_some());
+        assert!(
+            agent
+                .vault
+                .lock()
+                .unwrap()
+                .slot(&stored_key)
+                .unwrap()
+                .is_some()
+        );
     }
 
     /// Signing must work when the client picks the certificate, since that
@@ -788,6 +812,7 @@ mod tests {
             let vault = agent.vault.lock().unwrap();
             let slot = vault
                 .current_profile()
+                .unwrap()
                 .slots
                 .get(&ed_key)
                 .expect("slot held");
@@ -888,7 +913,7 @@ mod tests {
             .unwrap();
         let wire = |agent: &VaultAgent<InMemoryStorage>| {
             let vault = agent.vault.lock().unwrap();
-            let slot = vault.current_profile().slots.get(&stored).unwrap();
+            let slot = vault.current_profile().unwrap().slots.get(&stored).unwrap();
             serde_json::to_vec(&slot_to_plaintext(&stored, slot)).unwrap()
         };
         let before = wire(&agent);
@@ -902,7 +927,8 @@ mod tests {
             .await
             .unwrap();
         assert_eq!(wire(&agent), before);
-        let tier = agent.vault.lock().unwrap().current_profile().slots[&stored].unlock_tier();
+        let tier =
+            agent.vault.lock().unwrap().current_profile().unwrap().slots[&stored].unlock_tier();
         assert_eq!(tier, UnlockTier::PerUse);
     }
 

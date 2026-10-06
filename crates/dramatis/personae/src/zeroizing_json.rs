@@ -15,8 +15,8 @@
 use std::fmt;
 use std::io;
 
-use serde::de::{Deserializer, SeqAccess, Visitor};
 use serde::Serialize;
+use serde::de::{Deserializer, SeqAccess, Visitor};
 use zeroize::Zeroizing;
 
 /// `serde_json::to_vec` into one exactly-sized buffer that zeroizes on drop.
