@@ -19,6 +19,10 @@ round is recorded in place rather than edited away, newest first:
   (§5.13b). Repository state corrected: the fifth- and sixth-pass changes are
   **uncommitted**, and the tree holds concurrent other-lane work.
 
+  **Corrected 2026-10-06 (S14 pass):** the fifth- and sixth-pass changes were
+  committed in `5cb55436` (2026-08-23, "Make the OPFS probe's benchmark and
+  contract gates honest"), an ancestor of mere 535bca11.
+
 - **Fifth round.** The ASCII key contract was enforced only on `scan`/`list`,
   so a non-ASCII key could enter through `put`/`apply` and surface through
   `list("")` in IndexedDB's order (§5.13b); the promotion lane recorded
@@ -72,6 +76,13 @@ The superseded first receipt
 ([`2026-08-22_redb_opfs_probe.json`](../../../ports/muniment-opfs-probe/receipts/2026-08-22_redb_opfs_probe.json))
 is kept as history and **should not be cited**: it predates the harness in the
 tree and its `browser_to_native` field still reads "pending native verify".
+
+**Corrected 2026-10-06 (S14 pass):** the receipts pin the harness as it stood
+on 2026-08-23 (they last changed in `e008c0cc`), not the current one. The
+harness changed afterwards, first in `e9aadb4a` (2026-08-27, licence headers on
+every harness file), then in `810864ee`, `b38986c2`, `82d020c0`, `9d778fc5`,
+`b84197a7` and `06423cab`, so a receipt's `probe_source_sha256` names a
+superseded harness.
 
 ## 1. Research question
 
@@ -131,6 +142,9 @@ the picture in the tree matches the picture in the code; any can be reversed.
    wasm-bindgen-futures 0.4.76), the CLI installed on this machine and
    graphshell-web's pin. The distillery probe's 0.2.122 pin was a wgpu 30
    workaround that does not apply here.
+   **Corrected 2026-10-06 (S14 pass):** the probe now pins
+   `wasm-bindgen = "=0.2.129"` (`ports/muniment-opfs-probe/Cargo.toml:46`,
+   `82d020c0`, 2026-10-04); the receipts predate that change.
 4. **Web Locks are driven from the page, not from Rust.** web-sys gates
    `LockManager::request` behind `--cfg=web_sys_unstable_apis`. The
    sync-access handle's own exclusivity is the hard lock and is exercised from
@@ -140,6 +154,9 @@ the picture in the tree matches the picture in the code; any can be reversed.
 5. **This plan lives in muniment's in-crate `design_docs/`**, as named in the
    brief, beside the founding proposal; the repo-level `DOC_README.md` carries
    the pointer (DOC_POLICY §7).
+   **Corrected 2026-10-06 (S14 pass):** the plan lives in
+   `design_docs/eidetic_docs/implementation_strategy/`, moved there by
+   `db9c613c` (2026-08-24).
 6. **A receipt pins its own build, not a commit.** The probe stays untracked
    while it is a probe, so receipts carry SHA-256 of the probe tree, of the
    compiled-in muniment source, and of the whole lockfile (built `--locked`
@@ -147,6 +164,10 @@ the picture in the tree matches the picture in the code; any can be reversed.
    page actually loaded (§5.3b). The alternative — commit the probe so the
    commit identifies it — is available and is Mark's call; I have not
    committed anything.
+   **Corrected 2026-10-06 (S14 pass):** the probe is committed, so the commit
+   question is retired: it landed in `cc40c24f` (2026-08-22), as §6's state
+   note says, and twelve commits touch `ports/muniment-opfs-probe/` up to mere
+   535bca11. The receipts still identify their build by hashes, as above.
 7. **A second engine is a lane, not a footnote.** Firefox runs through
    Playwright (`run-browser.mjs`) with its own receipt rather than being
    folded into the Chromium one, so a divergence stays visible (§5.11).
@@ -381,6 +402,10 @@ untracked while it is a probe, so the git commit alone does not: the first
 receipt recorded only `commit + dirty:true`, and its `environment` block was
 demonstrably from an earlier harness revision than the one in the tree. That
 receipt has been superseded rather than defended.
+
+**Corrected 2026-10-06 (S14 pass):** the probe is tracked. It landed in
+`cc40c24f` (2026-08-22), and later commits touch it (see the correction under
+§3 item 6).
 
 **Corrected twice, 2026-08-22.** The first attempt hashed only `src/`,
 `web/` and `Cargo.toml` — which left out the compiled-in **muniment path
@@ -1076,6 +1101,13 @@ Two things follow:
 - `check_integrity` needs `&mut Database`, so it runs before the muniment
   adapter wraps the database in an `Arc`.
 
+**Open, raised by the S14 pass (2026-10-06):** muniment's `Backend` gained
+`transact` in `9ba9f790` (2026-09-09, the S10 custody ruling), defaulting to
+`NotTransactional`, and the probe's adapters do not implement it. Does adoption
+require the redb-on-OPFS adapter to implement `Backend::transact`? Options:
+yes, adoption requires it; no, the `NotTransactional` default is acceptable
+for this backend.
+
 ## 6. Progress
 
 - **2026-08-22** — Brief received. Grounded against the tree: muniment on
@@ -1325,6 +1357,16 @@ Two things follow:
   carries **one line from each lane**, so that file needs hunk-level
   separation rather than path-level.
 
+  **Corrected 2026-10-06 (S14 pass):** the fifth- and sixth-pass changes were
+  committed in `5cb55436` (2026-08-23), an ancestor of mere 535bca11.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_47_s14_phase_b9.md: the fifth- and sixth-pass
+  fixes marked committed in `5cb55436`, the probe's commit question retired,
+  the plan's location and wasm-bindgen pin corrected, the receipts noted as
+  pinning the 2026-08-23 harness, §7.3's one-engine wording reconciled with
+  §7.1, and the `Backend::transact` question opened under §5.14.
+
 ## 7. Decision
 
 **Revised through six review rounds (2026-08-22 to 2026-08-23).** The first version of this
@@ -1427,6 +1469,10 @@ hand, redb-on-OPFS is a *credible* browser backend whose profile is the
 opposite of IndexedDB's: better indexed reads, worse unbatched durable writes.
 Which one wins depends on a consumer's mix, which is a product question.
 
+**Corrected 2026-10-06 (S14 pass):** read "two-engine feasibility" here. §7.1
+and the status line record feasibility on Chromium 151 and Firefox 153, not on
+Chromium alone.
+
 **Retaining IndexedDB as the incumbent remains sensible** — it ships, it
 passes, and nothing here forces a change. **Rejecting redb-on-OPFS as the
 eventual default is not supported by this benchmark**, and I withdraw the
@@ -1458,3 +1504,7 @@ Before the selection is made, the tail worth finishing (in order):
 Still Mark's calls, not mine: whether to commit the probe so a commit
 identifies it; the Web Locks posture (§3.4); and whether Safari coverage is a
 precondition for the selection or can trail it.
+
+**Corrected 2026-10-06 (S14 pass):** the first of these is settled: the probe
+is committed (`cc40c24f`, with later commits). The Web Locks posture and
+Safari coverage remain open.
