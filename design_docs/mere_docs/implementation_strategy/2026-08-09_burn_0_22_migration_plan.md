@@ -1757,6 +1757,20 @@ The scratch evidence this plan cites (`C:	\mere-burn-pre3-*`) is kept. Also on
 2026-10-06, Burn 0.22.0 stable (18:46Z) and CubeCL 0.11.0 (15:59Z) were
 published. The step from pre.4 to 0.22.0 is assessed before anything moves.
 
+*Ruled 2026-10-06:* asked how to take 0.22.0 (assess now then repin; diff only;
+stay on pre.4 until Isometry repins; wait for a point release), Mark answered
+**"First, assess. I have an agent on it that might need your perspective"**.
+*Follows:* Mark's own agent runs the assessment, and this plan's coordinator
+answers its questions. Nothing repins until it reports. Facts in hand for it:
+- `cubecl-runtime` 0.11.0 still defaults `persistence` on (crates.io feature
+  list), so ruling 375's patch and Knot's ruling 585 row are still needed;
+- whether the other three patches (burn-cubecl's same-allocation fix,
+  burn-remote's lease-bound close, cubek-reduce's extrema identity) are still
+  needed takes a pre.4-to-stable source diff;
+- ruling 558's getrandom cfg and ruling 567's runner pin carry over;
+- Isometry's repin onto pre.4 has not started and could go straight to
+  stable (wing ruling 572).
+
   This pass decides none of them.
 - **S0-9. Network during execution.** Every pre.4 burn, cubecl and cubek crate
   is already cached, and so is the 0.2.122 CLI; a nested workspace may still
