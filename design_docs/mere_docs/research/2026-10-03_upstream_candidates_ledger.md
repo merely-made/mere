@@ -1,7 +1,7 @@
 # Upstream Candidates Ledger
 
 **Date**: 2026-10-03
-**Status (2026-10-05)**: open; nine items, none raised. Kept by ruling 46 of
+**Status (2026-10-06)**: open; eleven items, none raised. Kept by ruling 46 of
 the device pairing plan: noted for a later review, raised only after a
 release passes them by. Item 9 (argon2) comes from the vault lock plan's
 ruling 33.
@@ -186,6 +186,53 @@ So, for each item:
   `zeroize` feature on. That is a public API, not a patch.
 - **Last checked:** argon2 0.5.3 (in the lock) and 0.6.0-rc.8.
 
+### 10. iroh: a bind's builder, secret key included, stays in its future
+
+- **What happens:** `Endpoint::builder(..).secret_key(..).bind()` takes the
+  builder by value, so the `SecretKey`'s bytes sit in the bind future's
+  state and the caller's task frame. When those are freed the bytes are
+  not cleared: 7720 bytes (the tokio task cell, key at offset 808) and
+  7736 (tokio's debug-build box of the large future, offset 5736). The
+  same holds further in:
+  - `iroh::socket::bind` (3464 bytes, offsets 2792 and 3112);
+  - `RelayTransport::new` in `Transports::bind` (4520, offset 704);
+  - `endpoint::Builder::address_lookup` (240, offset 208);
+  - `portmapper::Client::new` (3400, intermittent, freed on a nat_pmp
+    error);
+  - iroh-gossip's `net::Builder::spawn` (5512, offset 4072).
+
+  `SecretKey` clears itself on drop; only moved copies remain. Measured
+  with a test-only tracking allocator.
+- **Why it matters to us:** the vault lock (rulings 49 to 51) wants no
+  key material left after a lock. These copies are freed, not live, but
+  their contents survive until reused.
+- **What we carry:** nothing; we measure against an iroh-only baseline
+  (`crates/murm/transport/tests/seed_residue.rs`).
+- **Last checked:** iroh 1.3.0, iroh-gossip 0.101.0, portmapper 0.19.3.
+
+### 11. p2panda-net: the signing key moves through actor futures
+
+- **What happens:** p2panda-net's by-value `signing_key(SigningKey)` API
+  leaves the key's bytes in futures and actor state that are freed
+  uncleared:
+  - `iroh_endpoint::Builder::spawn` (2360 bytes, offset 200);
+  - `gossip::Builder::spawn` (3680, an `Endpoint` clone's args, offset
+    680);
+  - ractor start and run futures for the `IrohEndpoint` actor (448, 544,
+    736) and for `GossipManager` (648, 744, 2584).
+
+  An actor call that boxes the 392-byte `ToIrohEndpoint` enum copies
+  uninitialized bytes from a caller stack that still held key bytes from
+  bind (offsets 120 and 280). A 1824-byte block goes with it, untraced.
+  Measured.
+- **Why it matters to us:** as item 10.
+- **What we carry:** mere's transport keeps iroh's endpoint handle from
+  bind and asks the actor nothing afterwards (vault lock rulings 52 and
+  54), so the 392 and 1824 blocks no longer appear in transport runs. The
+  other blocks are p2panda-net's own and remain.
+- **Last checked:** mere-p2panda-net 0.7.5 and p2panda-core 0.7.1 (fork
+  tag `mere-p2panda-net-0.7.5`, `1bec457`), ractor 0.16.5.
+
 ## 3. Progress
 
 **2026-10-03.** Opened with items 1 to 8 from the pairing plan and the Burn
@@ -193,3 +240,6 @@ plan. None raised.
 
 **2026-10-05.** Item 9 (argon2) added from the vault lock plan's ruling 33.
 Not raised.
+
+**2026-10-06.** Items 10 (iroh) and 11 (p2panda-net) added from the vault lock
+plan's rulings 49 to 52. Not raised.
