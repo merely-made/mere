@@ -25,6 +25,9 @@ locked.
 - [persona wallet carry layer plan](../../mere_docs/implementation_strategy/2026-06-25_persona_wallet_carry_layer_plan.md):
   the "one unlock ladder" rule (:358-362), and Meerkat's 2026-07-04 "Lock
   now" (:788-792).
+- [dramatis repo plan](2026-10-06_dramatis_repo_plan.md): moves the
+  vault's custody from personae into castellan and the tier out of mere;
+  sequenced after this plan's L2 at the earliest.
 
 ---
 
