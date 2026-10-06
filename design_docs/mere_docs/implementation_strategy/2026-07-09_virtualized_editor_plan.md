@@ -1,11 +1,18 @@
 # Virtualized line-based editor buffer (the IDE-editor ladder, rung 3)
 
 **Date**: 2026-07-09
-**Status**: partially implemented and next shared-editor work scoped. The rung-3
-*infrastructure* (arrangement leaf + `VirtualWindow`) is built in Genet, and
-Cambium now has a read-only fold projection. This plan covers the coordinate
-map and projected focused-text path required before folding can become a live
-editor, plus the later gutter and large-file work. Grew out of the [djot editor plan](../../archive_docs/2026-08-06_completed_plans/2026-06-24_djot_editor_knot_nodes_plan.md)
+**Status (2026-10-06):** partially implemented. The rung-3 infrastructure is
+built in Mere, not Genet: Cambium's `arrangement`, `placed` and `placed_with`
+(`crates/cambium/cambium/src/arrangement.rs`) and Sprigging's `VirtualWindow`
+(`crates/cambium/sprigging/src/arrange.rs:52`, formerly chisel), which left
+Genet with Cambium in genet `ce79fd44a4d` (2026-09-03). Cambium's read-only
+fold projection landed 2026-09-13 (`2676c5e9`), and its line layout with a
+gutter cell per line on 2026-09-25 (`0d341dee`), P2's gutter without the
+virtualization; Knot's folded source tile puts its fold controls there. Open:
+P1's virtualized line render and the rest of P2 over it, the editable-fold
+slices (the `EditableFoldProjection` coordinate map, Rootstock's projected
+focused text, the folded styled textarea), then P3 and P4. Grew out of the
+[djot editor plan](../../archive_docs/2026-08-06_completed_plans/2026-06-24_djot_editor_knot_nodes_plan.md)
 Phase 3 (folds), which is blocked on this.
 
 ## Why (what the textarea cannot do)
@@ -21,6 +28,10 @@ out whole, so it cannot:
 - **Gutter** — place line numbers / fold arrows / diagnostics aligned to each line as
   sibling content;
 - **Scale** — a 10k-line file lays out entirely; only visible rows should materialize.
+
+**Corrected 2026-10-06 (S14 pass):** genet-layout and meerkat are both gone
+(genet `55c05d11759`, 2026-08-21; `c5f01064`, 2026-07-18). The textarea is now
+Cambium's `styled_textarea` (`crates/cambium/cambium/src/styled_field.rs:190`).
 
 The chisel catalog's "djot-to-IDE editor ladder" names this: rung 1 highlighting (done,
 genet `highlight`), **rung 2 gutter**, **rung 3 virtualized buffer**, rung 4 structure
@@ -40,6 +51,14 @@ decorations. Folds sit on rungs 2–3.
 
 So the **virtualization mechanism is done**. No meerkat consumer uses it yet; the editor
 would be the first.
+
+**Corrected 2026-10-06 (S14 pass):** this infrastructure lives in Mere, not
+Genet. `arrangement`, `placed` and `placed_with` are Cambium's
+(`crates/cambium/cambium/src/arrangement.rs`, lines 27, 41 and 62), and
+`VirtualWindow` is Sprigging's (`crates/cambium/sprigging/src/arrange.rs:52`,
+formerly chisel); Cambium and Sprigging left Genet in genet `ce79fd44a4d`
+(2026-09-03). Meerkat is gone, so P1's "first meerkat arrangement consumer"
+and Decision 1's "genet's" read as the 2026-07 layout.
 
 ## The architecture
 
@@ -203,7 +222,23 @@ coordinate path uses the projection.
   span for each collapsed region. This advances the shared P1/P2 display rung;
   it does not virtualize lines, provide a gutter/control, or make folding live.
   Editable folds still require P3's coordinate map and hidden-input path.
+
+  **Corrected 2026-10-06 (S14 pass):** the gutter half is now done; see the
+  2026-09-25 entry below.
+- **2026-09-25, fold rows with a gutter cell landed (recorded 2026-10-06 by
+  the S14 pass).** `0d341dee` added `FoldProjection::lines()`, `rows(gutter)`
+  and `FOLD_ROWS_CSS` (`crates/cambium/cambium/src/fold_projection.rs`, lines
+  196, 251 and 37), described in its commit as the gutter of this plan's P2,
+  without the virtualization. Knot's folded source tile puts its fold controls
+  in that gutter (`knot-editor:apps/desktop/src/document_folding.rs`). Lines
+  are not virtualized and folding is not live.
 - **2026-07-09, design written.** Confirmed the rung-3 infra (arrangement + `VirtualWindow`
   + `placed`) is built genet-side with no meerkat consumer yet; framed the editor over it;
   surfaced the editing-layer as the gating decision (A hidden-textarea / B full custom / C
   read-only-first) and recommended C→A. No code yet — the editing-layer call gates P3+.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_49_s14_phase_b11.md: the infrastructure located in
+  Mere (Cambium's arrangement and Sprigging's `VirtualWindow`), the gutter rows
+  of `0d341dee` recorded, and the genet-layout and meerkat framing of the
+  textarea and P1 marked as the 2026-07 layout.

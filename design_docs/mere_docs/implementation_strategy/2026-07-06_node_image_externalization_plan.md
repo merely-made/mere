@@ -1,6 +1,16 @@
 # Node image externalization plan — preview imagery to content-addressed blobs
 
-Status: **Planned.** Motivated by a measurement: the petgraph-RDF plan's Phase 4
+**Status (2026-10-06):** in progress. Phases 1 to 3 landed by 2026-07-26 (the
+content-addressed store in `crates/system/pandect/src/image_store.rs`, the
+role-keyed `images` map on `Node` and `PersistedNode` with the legacy-image
+migration, and `SetNodeImage` on the delta spine). Phase 4's byte-bounded LRU
+(`ResolvedImageCache`, 64 MiB default) and Phase 5's orphan GC in athanor
+(`propose_image_gc`, `apply_image_gc`, per-role reference forgetting) landed in
+library code in `6d1187a7` (2026-07-27). Open: no host runs the Phase 5 pass
+yet; Phase 4's done-condition names the meerkat render-perf harness, which left
+with meerkat (`c5f01064`); and Phase 6's re-measure.
+
+Motivated by a measurement: the petgraph-RDF plan's Phase 4
 footprint probe (`crates/probes/rdf-kernel-footprint/` *(historical citation)* <!-- doc-audit: historical-path -->, see that plan's Phase 4
 gate note) found that at 50k nodes the kernel's live heap is **64% inline image
 bytes** (`Node::thumbnail_png` + `Node::favicon_rgba`), dwarfing every other
@@ -214,6 +224,20 @@ Each phase states its done-condition (a checkable property), not a duration.
   to today; the meerkat render-perf harness shows no regression on the steady-state
   card-raster path; the cache respects its byte bound (an eviction test).
 
+**Corrected 2026-10-06 (S14 pass):** the bounded cache exists:
+`ResolvedImageCache`
+(`crates/canvas/pictograph/src/canvas/resolved_image_cache.rs`, 64 MiB
+default, set through `set_resolved_image_cache_limit_bytes` at
+`crates/canvas/pictograph/src/canvas/nodes.rs:65`), added in `6d1187a7` on
+2026-07-27. The meerkat render-perf harness this condition names left with
+meerkat (`c5f01064`, 2026-07-18).
+
+**Open, raised by the S14 pass (2026-10-06):** the harness behind Phase 4's
+no-regression condition is gone. What closes Phase 4? Options: restate the
+condition against a living render path (Turnstone's or pictograph's canvas)
+and measure it there; close Phase 4 on the eviction test and the byte bound
+alone.
+
 ### Phase 5 — Orphan GC as an Athanor pass
 
 - **Orphan sweep (structural).** Image blobs are shared (content-addressed), so
@@ -375,6 +399,10 @@ Verified against the code, 2026-07-06:
   unbounded** — the plan's bounded LRU is policy on this same seam and remains
   open.
 
+  **Corrected 2026-10-06 (S14 pass):** the bounded LRU landed the next day:
+  `ResolvedImageCache` (64 MiB default) in `6d1187a7` (2026-07-27), a commit
+  whose subject names other work. See the correction under Phase 4.
+
   **Receipts.** kernel 278, session-runtime 219, canvas 145, import 9, all
   green. The migration test asserts a legacy snapshot externalizes, that a
   re-saved snapshot's JSON contains neither `thumbnail_png` nor
@@ -390,6 +418,16 @@ Verified against the code, 2026-07-06:
   build is broken until they are updated), the bounded cache, favicon
   capture's RGBA→PNG-at-store-time write site, and phase 5's orphan GC.
 
+  **Corrected 2026-10-06 (S14 pass):** three of these are done. Turnstone uses
+  the new model at its HEAD (`turnstone:src/session.rs:616` for `ImageRole`,
+  `turnstone:src/browse.rs:582` for `register_resolved_image`, `:1062` for
+  `.favicon()`). The bounded cache landed in `6d1187a7` (above). Phase 5's
+  orphan GC is in athanor: `propose_image_gc` and `apply_image_gc`
+  (`ports/distillery/athanor/src/lib.rs:182`, `:198`), with per-role reference
+  forgetting (`:232`, `:263`) and tests over `stored_image_hexes` (`:574`,
+  `:635`), also added in `6d1187a7`; no host invokes it yet. The favicon
+  RGBA→PNG write site could not be checked.
+
 - **2026-07-06** — Plan authored from the Phase 4 footprint measurement plus a
   codebase investigation. Key outcome of the investigation: the entire blob /
   content-address / forgetting substrate already exists (eidetic `Store`,
@@ -404,3 +442,10 @@ Verified against the code, 2026-07-06:
   snapshot that share `thumbnail_png` today, and added per-role retention (favicon =
   disposable/re-fetchable, snapshot = node-precious for un-refetchable content) on
   the existing `memory_levels` axis.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_49_s14_phase_b11.md: the "Planned" status replaced
+  with Phases 1 to 5 landed in library code (Phase 4's LRU and Phase 5's athanor
+  GC in `6d1187a7`), Turnstone's read sites recorded as updated, the GC's
+  missing host caller and Phase 6 named as open, and Phase 4's lost harness
+  opened as a question.
