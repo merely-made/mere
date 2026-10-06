@@ -326,6 +326,16 @@ product default is a later decision informed by these receipts.
   source path as of the audited revisions recorded in the upstream issue
   draft.
 
+  **Corrected 2026-10-06 (S14 pass):** the guard is no longer selected. At
+  mere 535bca11 the root `Cargo.toml` (lines 673 to 681) says the
+  `burn-cubecl` selector was retired under ruling 410, with current consumers
+  on the registry crate, and that the `cubecl-runtime` patch source is pristine
+  upstream. The
+  [burn 0.22 migration plan](2026-08-09_burn_0_22_migration_plan.md) records
+  the retirement in §13.28 (2026-09-29), after upstream pre.4 passed, and its
+  status records the four embedding rows and the SmolLM2 decoder row passing
+  on that line.
+
   The forcing consumer now passes in headed Chromium 151: cold and warm
   MiniLM embeddings are finite and unit norm, repeat within and across workers,
   and match ESP's native fixture within `8.940697e-8`. Integrity reopen,
@@ -379,3 +389,8 @@ product default is a later decision informed by these receipts.
   saw no late messages in 300 ms, and started a fresh worker that reopened the
   same manifest and exactly reproduced all eight reference tokens. GPU error
   scopes stayed empty. Physical allocation release remains explicitly unknown.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_49_s14_phase_b11.md: the status held; the
+  2026-08-22 vendored `burn-cubecl` guard is marked retired under ruling 410
+  (burn 0.22 migration plan §13.28).
