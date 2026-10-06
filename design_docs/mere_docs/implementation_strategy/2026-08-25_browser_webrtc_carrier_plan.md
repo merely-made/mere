@@ -14,7 +14,7 @@ proof before adding public rendezvous infrastructure.
 **Related:**
 
 - [browser-to-native WebRTC feasibility](../research/2026-08-25_browser_native_webrtc_carrier_probe.md)
-- [Graphshell remote projection host](2026-07-22_graphshell_remote_projection_host_plan.md)
+- [Graphshell remote projection host](../../archive_docs/2026-10-06_completed_plans/2026-07-22_graphshell_remote_projection_host_plan.md)
 - [Graphshell reference host](2026-07-27_graphshell_reference_host_plan.md)
 - [reachability rungs and privacy lanes](2026-08-03_reachability_rungs_and_privacy_lanes_plan.md)
 - [net-media plan](2026-05-26_net_media_plan.md)

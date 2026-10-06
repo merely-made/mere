@@ -268,7 +268,7 @@ shadow-DOM and spec work; keep the plan in place as a historical design record.
 
 ## Cross-refs
 
-- [unified_document_host_plan](2026-06-17_unified_document_host_plan.md) — the
+- [unified_document_host_plan](../../archive_docs/2026-10-06_completed_plans/2026-06-17_unified_document_host_plan.md) — the
   root topology this extends (kept in place as foundational record).
 - [interaction_model_spine](../technical_architecture/2026-06-18_interaction_model_spine.md)
   — ownership map; overlay roots slot into the Render/Interact stages.
@@ -276,11 +276,11 @@ shadow-DOM and spec work; keep the plan in place as a historical design record.
   2026-07-04 checkpoint) — the inverted dual of the remote runner.
 - genet `docs/2026-07-02_dom_mutation_capture_replay_plan.md` +
   `BoxTree::graft_subtree` — the mutation transport + splice substrate.
-- [xilem_serval_control_adoption_plan](2026-06-25_xilem_serval_control_adoption_plan.md)
+- [xilem_serval_control_adoption_plan](../../archive_docs/2026-10-06_completed_plans/2026-06-25_xilem_serval_control_adoption_plan.md)
   — the chrome-side control adoption this makes bidirectional.
 - Archived [find_in_page_host_ui_plan](../../archive_docs/2026-07-03_completed_plans/2026-06-16_find_in_page_host_ui_plan.md)
   — the rect pipeline P2 retires.
-- [petgraph_rdf_plan](2026-06-18_petgraph_rdf_plan.md) statement buckets — the
+- [petgraph_rdf_plan](../../archive_docs/2026-10-06_completed_plans/2026-06-18_petgraph_rdf_plan.md) statement buckets — the
   annotation-pin backend.
 - Genet W3C knockout strategy (project memory) — P3-P5 is the first
   knockout-then-rebuild rebuild, done in the cheap layer; P0's spec subsets

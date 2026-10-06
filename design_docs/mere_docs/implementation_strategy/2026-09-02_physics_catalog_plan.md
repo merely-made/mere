@@ -15,7 +15,7 @@ WASM layout mods.
 (§5, the strategy catalogue and the helper-era preset portfolio),
 [the cartography–gyre layout seam](../technical_architecture/2026-05-29_cartography_aether_layout_seam.md)
 (arrangements compute, physics simulates; the seed/read-back bridge),
-[physics scenes and tangibility plan](2026-06-22_physics_scenes_and_tangibility_plan.md)
+[physics scenes and tangibility plan](../../archive_docs/2026-10-06_completed_plans/2026-06-22_physics_scenes_and_tangibility_plan.md)
 (the scene and ambient catalogs this one sits beside),
 [browser WebRTC carrier plan](2026-08-25_browser_webrtc_carrier_plan.md)
 (the web host and the scenario lane the receipts run on).
