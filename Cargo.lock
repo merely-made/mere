@@ -406,6 +406,7 @@ dependencies = [
  "blake2",
  "cpufeatures 0.2.17",
  "password-hash 0.5.0",
+ "zeroize",
 ]
 
 [[package]]
@@ -2424,6 +2425,7 @@ dependencies = [
  "cipher 0.5.2",
  "cpufeatures 0.3.1",
  "rand_core 0.10.1",
+ "zeroize",
 ]
 
 [[package]]
@@ -2449,6 +2451,7 @@ dependencies = [
  "chacha20 0.10.2",
  "cipher 0.5.2",
  "poly1305 0.9.1",
+ "zeroize",
 ]
 
 [[package]]
@@ -12384,6 +12387,7 @@ dependencies = [
  "tracing",
  "tracing-subscriber",
  "uuid",
+ "windows",
  "windows-sys 0.59.0",
  "zeroize",
 ]
