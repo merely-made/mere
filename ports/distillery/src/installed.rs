@@ -264,8 +264,11 @@ impl InstalledAuthority {
     }
 
     /// The master transport identity belonging to the selected Personae profile.
-    pub fn transport_identity(&self) -> &Ed25519Keypair {
-        &self.vault.current_profile().master
+    ///
+    /// Errors while the vault is locked (rulings 2 and 24 replace it with a
+    /// derived transport key).
+    pub fn transport_identity(&self) -> Result<&Ed25519Keypair, InstalledError> {
+        Ok(&self.vault.current_profile()?.master)
     }
 
     /// The mesh author derived under the selected profile.
@@ -322,7 +325,7 @@ impl InstalledAuthority {
             ResidentStorage::open(paths.blob_store_root(), mesh_id, settings.blob_gc_every).await?;
         let blobs = storage.blobs();
         let transport = Arc::new(
-            P2pandaTransport::builder(self.transport_identity())
+            P2pandaTransport::builder(self.transport_identity()?)
                 .gossip()
                 .blobs(&blobs)
                 .bind()
@@ -435,7 +438,7 @@ mod tests {
 
         let first = InstalledAuthority::open_with(directory.path(), &vault_dir, unlock()).unwrap();
         let first_author = first.mesh_author().unwrap().public_key().to_bytes();
-        let first_transport = first.transport_identity().public_key().to_bytes();
+        let first_transport = first.transport_identity().unwrap().public_key().to_bytes();
         assert_eq!(first.profile(), profile);
         assert!(first.protection().contains("passphrase-encrypted"));
         assert_ne!(
@@ -471,7 +474,7 @@ mod tests {
             first.mesh_author().unwrap().public_key().to_bytes(),
             "the name of the room must not be the name of the speaker"
         );
-        assert_ne!(mesh_id, first.transport_identity().public_key().to_bytes());
+        assert_ne!(mesh_id, first.transport_identity().unwrap().public_key().to_bytes());
         drop(first);
 
         let reopened =
