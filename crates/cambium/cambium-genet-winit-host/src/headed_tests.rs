@@ -212,3 +212,418 @@ fn control() {
     );
     assert!(r.presents_after > r.presents_before);
 }
+
+// ------------------------------------------------- stage 4: many windows
+//
+// cargo test -p cambium-genet-winit-host --lib headed_tests::windows -- --ignored --exact
+// cargo test -p cambium-genet-winit-host --lib headed_tests::windows_control -- --ignored --exact
+
+use std::cell::Cell;
+
+use cambium::{ProjectionId, clickable};
+use cambium_rootstock::WindowDom;
+use genet_scripted_dom::NodeId;
+use layout_dom_api::LayoutDom as _;
+
+use crate::windows::{WindowHooks, WindowsInit, WinitWindows};
+
+#[derive(Default)]
+struct Shared {
+    clicks: u32,
+}
+
+type WChild = Box<dyn AnyView<Shared, (), GenetCtx, GenetElement>>;
+type WLogic = Box<dyn FnMut(&Shared) -> WChild>;
+
+const WSHEET: &str = "div { display: block; height: 20px; } \
+                      button { display: block; width: 120px; height: 30px; }";
+
+fn window_lens(label: &'static str) -> WLogic {
+    Box::new(move |shared: &Shared| {
+        Box::new(el(
+            "div",
+            (
+                el("div", text(format!("window {label}"))),
+                clickable(
+                    el("button", text(format!("count {label}"))),
+                    |s: &mut Shared, _| s.clicks += 1,
+                ),
+                el("div", text(format!("clicks:{}", shared.clicks))),
+            ),
+        )) as WChild
+    })
+}
+
+fn find(dom: &ScriptedDom, root: NodeId, needle: &str) -> Option<NodeId> {
+    let mut stack = vec![root];
+    while let Some(node) = stack.pop() {
+        if dom.dom_children(node).any(|c| dom.text(c) == Some(needle)) {
+            return Some(node);
+        }
+        stack.extend(dom.dom_children(node));
+    }
+    None
+}
+
+fn text_under(dom: &ScriptedDom, root: NodeId) -> String {
+    let mut out = String::new();
+    let mut stack = vec![root];
+    while let Some(node) = stack.pop() {
+        if let Some(t) = dom.text(node) {
+            out.push_str(t);
+            out.push('|');
+        }
+        stack.extend(dom.dom_children(node));
+    }
+    out
+}
+
+/// What the driver read across the run.
+#[derive(Debug, Default)]
+struct WindowsReadings {
+    windows: usize,
+    boots: u32,
+    one_device: bool,
+    sizes: Vec<(f32, f32)>,
+    other_saw_click: bool,
+    boots_after_resume: u32,
+    animated_frames: u64,
+    idle_frames: u64,
+    idle_presents_held: bool,
+    open_after_close: usize,
+    other_still_shown: bool,
+    third_boots: u32,
+    third_on_its_own_device: bool,
+}
+
+#[derive(Clone, Copy, PartialEq, Debug)]
+enum Step {
+    Launched,
+    /// Waiting for B to present what it owes (the click asked both windows to
+    /// redraw) and then hold still, before A starts animating.
+    Settling {
+        stable: u32,
+        last_b: u64,
+    },
+    Animating {
+        a0: u64,
+        b0: u64,
+    },
+    Done,
+}
+
+struct WindowsDriver {
+    windows: WinitWindows<Shared, WLogic, WChild>,
+    animate_a: Rc<Cell<bool>>,
+    tenant: Rc<RefCell<Option<Arc<RenderCore>>>>,
+    /// The control: a third window opened after the core was forgotten must
+    /// read a second boot on a device of its own.
+    control: bool,
+    step: Step,
+    turns: u32,
+    readings: WindowsReadings,
+    /// RedrawRequested events seen per native window, for a stalled run.
+    redraws: std::collections::HashMap<WindowId, u32>,
+}
+
+const A: ProjectionId = ProjectionId(0);
+const B: ProjectionId = ProjectionId(1);
+
+impl WindowsDriver {
+    fn boots(&self) -> u32 {
+        let multi = self.windows.multi.as_ref().unwrap();
+        multi
+            .windows()
+            .filter_map(|id| multi.slot(id).map(|w| w.core_boots))
+            .sum()
+    }
+
+    fn presents(&self, id: ProjectionId) -> u64 {
+        let multi = self.windows.multi.as_ref().unwrap();
+        multi.slot(id).map_or(0, |w| w.s.presentation_sequence)
+    }
+
+    fn device_of(&self, id: ProjectionId) -> Option<*const wgpu::Device> {
+        let multi = self.windows.multi.as_ref().unwrap();
+        multi
+            .slot(id)
+            .and_then(|w| w.s.surface.as_ref())
+            .map(|s| s.device() as *const wgpu::Device)
+    }
+
+    fn launched(&mut self, event_loop: &ActiveEventLoop) {
+        let multi = self.windows.multi.as_ref().unwrap();
+        self.readings.windows = multi.windows().count();
+        self.readings.sizes = multi
+            .windows()
+            .filter_map(|id| multi.slot(id).map(|w| w.s.layout_size))
+            .collect();
+        self.readings.boots = self.boots();
+        let devices = [self.device_of(A), self.device_of(B)];
+        let tenant = self
+            .tenant
+            .borrow()
+            .as_ref()
+            .map(|core| core.device() as *const wgpu::Device);
+        self.readings.one_device =
+            devices[0].is_some() && devices[0] == devices[1] && tenant == devices[0];
+
+        // A click in A, through A's host.
+        let multi = self.windows.multi.as_mut().unwrap();
+        multi.with_window(A, |w| {
+            let tree = w.s.runner.as_ref().unwrap();
+            let (dom, root) = (HostTree::dom(tree), HostTree::mount(tree));
+            let (x, y, bw, bh) = {
+                let d = dom.borrow();
+                let button = find(&d, root, "count A").expect("A's button");
+                w.s.layout
+                    .as_ref()
+                    .unwrap()
+                    .painted_rect(&WindowDom::new(&d, root), button)
+                    .expect("A paints its button")
+            };
+            w.pointer_moved(x + bw / 2.0, y + bh / 2.0);
+            w.press_left();
+            w.release();
+        });
+        self.windows.after_turn(event_loop);
+        let multi = self.windows.multi.as_ref().unwrap();
+        let dom = multi.dom();
+        self.readings.other_saw_click =
+            text_under(&dom.borrow(), multi.window_root(B).unwrap()).contains("clicks:1");
+
+        // Suspend and resume every window.
+        self.windows.suspended(event_loop);
+        self.windows.resumed(event_loop);
+        self.readings.boots_after_resume = self.boots();
+
+        self.step = Step::Settling {
+            stable: 0,
+            last_b: self.presents(B),
+        };
+    }
+
+    fn settling(&mut self, event_loop: &ActiveEventLoop, stable: u32, last_b: u64) {
+        // Keep the loop turning while nothing animates, so B's count can be
+        // seen to hold.
+        event_loop.set_control_flow(ControlFlow::wait_duration(
+            std::time::Duration::from_millis(16),
+        ));
+        let b = self.presents(B);
+        if b != last_b {
+            self.step = Step::Settling {
+                stable: 0,
+                last_b: b,
+            };
+            return;
+        }
+        if stable < 20 {
+            self.step = Step::Settling {
+                stable: stable + 1,
+                last_b,
+            };
+            return;
+        }
+        // B has held still for twenty turns: A animates, B is left alone.
+        self.animate_a.set(true);
+        let multi = self.windows.multi.as_ref().unwrap();
+        let kicked: &[ProjectionId] = if self.control { &[A, B] } else { &[A] };
+        for &id in kicked {
+            if let Some(native) = multi.slot(id).and_then(|w| w.native_window.as_ref()) {
+                native.request_redraw();
+            }
+        }
+        self.step = Step::Animating {
+            a0: self.presents(A),
+            b0: b,
+        };
+    }
+
+    fn animating(&mut self, event_loop: &ActiveEventLoop, a0: u64, b0: u64) {
+        let frames = self.presents(A).saturating_sub(a0);
+        if frames < 8 {
+            return;
+        }
+        self.animate_a.set(false);
+        self.readings.animated_frames = frames;
+        self.readings.idle_frames = self.presents(B).saturating_sub(b0);
+        self.readings.idle_presents_held = self.presents(B) == b0;
+        if self.control {
+            let multi = self.windows.multi.as_mut().unwrap();
+            let third = multi
+                .with_window(B, |w| {
+                    w.s.shared.render_core = None;
+                    w.s.runner.as_mut().unwrap().open(
+                        window_lens("C"),
+                        HostOptions {
+                            title: "cambium window C".into(),
+                            initial_logical_size: (360.0, 240.0),
+                            ..Default::default()
+                        },
+                    )
+                })
+                .unwrap();
+            self.windows.after_turn(event_loop);
+            self.readings.third_boots = self.boots();
+            self.readings.third_on_its_own_device =
+                self.device_of(third).is_some() && self.device_of(third) != self.device_of(B);
+        }
+        // Close A as the platform would.
+        let multi = self.windows.multi.as_mut().unwrap();
+        multi.with_window(A, |w| w.request_close(crate::CloseRequest::Native));
+        self.windows.after_turn(event_loop);
+        let multi = self.windows.multi.as_ref().unwrap();
+        self.readings.open_after_close = multi.windows().count();
+        self.readings.other_still_shown = multi.slot(B).is_some_and(|w| w.native_window.is_some());
+        self.step = Step::Done;
+        event_loop.exit();
+    }
+}
+
+impl ApplicationHandler<HostEvent> for WindowsDriver {
+    fn resumed(&mut self, event_loop: &ActiveEventLoop) {
+        self.windows.resumed(event_loop);
+    }
+
+    fn user_event(&mut self, event_loop: &ActiveEventLoop, event: HostEvent) {
+        self.windows.user_event(event_loop, event);
+    }
+
+    fn window_event(&mut self, event_loop: &ActiveEventLoop, id: WindowId, event: WindowEvent) {
+        if matches!(event, WindowEvent::RedrawRequested) {
+            *self.redraws.entry(id).or_default() += 1;
+        }
+        self.windows.window_event(event_loop, id, event);
+    }
+
+    fn about_to_wait(&mut self, event_loop: &ActiveEventLoop) {
+        self.windows.about_to_wait(event_loop);
+        if self.step == Step::Done {
+            return;
+        }
+        self.turns += 1;
+        if self.turns > 5_000 {
+            let multi = self.windows.multi.as_ref().unwrap();
+            for id in multi.windows() {
+                let w = multi.slot(id).unwrap();
+                let native = w.native_window.as_ref().map(|n| n.id());
+                eprintln!(
+                    "[headed] window {:?}: presents {} redraw events {:?} last frame {:?}",
+                    id,
+                    w.s.presentation_sequence,
+                    native.and_then(|n| self.redraws.get(&n)),
+                    w.s.last_frame_profile.map(|p| (p.acquire_us, p.total_us)),
+                );
+            }
+            eprintln!("[headed] gave up at {:?}", self.step);
+            event_loop.exit();
+            return;
+        }
+        match self.step {
+            Step::Launched => self.launched(event_loop),
+            Step::Settling { stable, last_b } => self.settling(event_loop, stable, last_b),
+            Step::Animating { a0, b0 } => self.animating(event_loop, a0, b0),
+            Step::Done => {},
+        }
+    }
+}
+
+fn drive_windows(control: bool) -> WindowsReadings {
+    let mut builder = EventLoop::<HostEvent>::with_user_event();
+    #[cfg(target_os = "windows")]
+    {
+        use winit::platform::windows::EventLoopBuilderExtWindows;
+        builder.with_any_thread(true);
+    }
+    #[cfg(all(unix, not(target_os = "macos")))]
+    {
+        use winit::platform::x11::EventLoopBuilderExtX11;
+        builder.with_any_thread(true);
+    }
+    let event_loop = builder.build().expect("an event loop");
+    let animate_a = Rc::new(Cell::new(false));
+    let tenant = Rc::new(RefCell::new(None));
+    let mut hooks: WindowHooks<Shared, WLogic, WChild> = HostHooks::inert();
+    hooks.frame = Box::new({
+        let (animate_a, tenant) = (animate_a.clone(), tenant.clone());
+        move |ctx| {
+            if tenant.borrow().is_none() {
+                *tenant.borrow_mut() = ctx.render_core.cloned();
+            }
+            // The control animates B too, so the idle count has frames to see.
+            animate_a.get() && (control || ctx.runner.window() == A)
+        }
+    });
+    let window = |label: &'static str, size: (f64, f64)| {
+        (
+            window_lens(label),
+            HostOptions {
+                title: format!("cambium window {label}"),
+                initial_logical_size: size,
+                ..Default::default()
+            },
+        )
+    };
+    let windows = vec![window("A", (480.0, 360.0)), window("B", (720.0, 480.0))];
+    let init = move |_: &HostWake| WindowsInit {
+        state: Shared::default(),
+        sheet: WSHEET.into(),
+        fonts: Vec::new(),
+        images: Vec::new(),
+        windows,
+    };
+    let mut driver = WindowsDriver {
+        windows: WinitWindows::new(&event_loop, Box::new(init), hooks),
+        animate_a,
+        tenant,
+        control,
+        step: Step::Launched,
+        turns: 0,
+        readings: WindowsReadings::default(),
+        redraws: Default::default(),
+    };
+    event_loop.run_app(&mut driver).expect("the event loop ran");
+    eprintln!("[headed] windows control={control} {:?}", driver.readings);
+    assert_eq!(driver.step, Step::Done, "the driver finished");
+    driver.readings
+}
+
+/// Two windows over one state: one device for both, a click in one changes
+/// the other, a suspend and resume boots nothing, an idle window presents
+/// nothing while the other animates, and closing one leaves the other.
+#[test]
+#[ignore = "headed: opens two windows on a GPU"]
+#[cfg(not(target_os = "macos"))]
+fn windows() {
+    let r = drive_windows(false);
+    assert_eq!(r.windows, 2);
+    assert_eq!(r.boots, 1, "one core for both windows");
+    assert!(
+        r.one_device,
+        "both surfaces and the tenant share one device"
+    );
+    assert_ne!(
+        r.sizes[0], r.sizes[1],
+        "the windows lay out at their own sizes"
+    );
+    assert!(r.other_saw_click, "B shows the click A took");
+    assert_eq!(r.boots_after_resume, 1, "the resume booted nothing");
+    assert!(r.animated_frames >= 8);
+    assert!(r.idle_presents_held, "B presented nothing while A animated");
+    assert_eq!(r.open_after_close, 1, "closing A left one window");
+    assert!(r.other_still_shown, "B is still up");
+}
+
+/// The control: a window opened after the core was forgotten boots a second
+/// core and sits on its own device, and a B that animates too presents frames,
+/// so the receipt above can see both.
+#[test]
+#[ignore = "headed: opens three windows on a GPU"]
+#[cfg(not(target_os = "macos"))]
+fn windows_control() {
+    let r = drive_windows(true);
+    assert_eq!(r.third_boots, 2, "forgetting the core boots another");
+    assert!(r.third_on_its_own_device);
+    assert!(r.idle_frames > 0, "an animating B presents");
+    assert_eq!(r.open_after_close, 2);
+}

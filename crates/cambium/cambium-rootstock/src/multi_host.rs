@@ -26,7 +26,7 @@ use layout_dom_api::{DomMutation, LayoutDom as _, LayoutDomMut as _};
 
 use crate::meristem_bounds::RootView;
 use crate::tree::sealed;
-use crate::{AppShared, Host, HostHooks, HostOptions, HostState, HostTree, HostWake};
+use crate::{AppShared, Host, HostHooks, HostOptions, HostTree};
 
 /// The runner every window shares: one state, one window projection each.
 pub type MultiRunner<State, Logic, V> = GenetMultiRunner<State, Logic, V, ()>;
@@ -40,7 +40,15 @@ where
 {
     runner: MultiRunner<State, Logic, V>,
     router: MutationRouter,
+    requests: WindowRequests,
     window: ProjectionId,
+}
+
+/// Windows a turn asked to open or close, acted on when the turn ends.
+#[derive(Default)]
+struct WindowRequests {
+    opened: Vec<(ProjectionId, HostOptions)>,
+    closed: Vec<ProjectionId>,
 }
 
 impl<State, Logic, V> WindowTree<State, Logic, V>
@@ -52,6 +60,23 @@ where
     /// The window this turn belongs to.
     pub fn window(&self) -> ProjectionId {
         self.window
+    }
+
+    /// Open a window whose view is `logic`, a lens over the shared state, with
+    /// its own options. It joins the document at once; the event source gives
+    /// it a native window when this turn ends.
+    pub fn open(&mut self, logic: Logic, options: HostOptions) -> ProjectionId {
+        let dom = HostTree::dom(self);
+        let id = self.runner.push_forest_projection(dom, logic);
+        self.requests.opened.push((id, options));
+        id
+    }
+
+    /// Close window `id`, this one or another, when this turn ends.
+    pub fn close(&mut self, id: ProjectionId) {
+        if !self.requests.closed.contains(&id) {
+            self.requests.closed.push(id);
+        }
     }
 
     /// The runner every window shares.
@@ -237,8 +262,13 @@ impl MutationRouter {
             .collect();
         let dom = dom.borrow();
         let window_of = |node: NodeId| -> Option<ProjectionId> {
+            // A node retired since (a closed window's subtree) has no
+            // ancestors to read, so it cannot be placed.
             let mut current = Some(node);
             while let Some(id) = current {
+                if !dom.is_live(id) {
+                    return None;
+                }
                 if let Some(&(window, _)) = roots.iter().find(|(_, root)| *root == id) {
                     return Some(window);
                 }
@@ -298,6 +328,34 @@ impl MutationRouter {
     }
 }
 
+/// A multi-window host's per-window slot: a [`Host`] over a [`WindowTree`], or
+/// an event source's wrapper around one (the winit host's, which adds the
+/// native window).
+pub trait WindowSlot<State: 'static, Logic, V>
+where
+    Logic: FnMut(&State) -> V,
+    V: RootView<State>,
+{
+    fn host(&self) -> &Host<State, Logic, V, WindowTree<State, Logic, V>>;
+    fn host_mut(&mut self) -> &mut Host<State, Logic, V, WindowTree<State, Logic, V>>;
+}
+
+impl<State, Logic, V> WindowSlot<State, Logic, V>
+    for Host<State, Logic, V, WindowTree<State, Logic, V>>
+where
+    State: 'static,
+    Logic: FnMut(&State) -> V,
+    V: RootView<State>,
+{
+    fn host(&self) -> &Self {
+        self
+    }
+
+    fn host_mut(&mut self) -> &mut Self {
+        self
+    }
+}
+
 /// The windows of one application over one forest document, taking turns.
 ///
 /// Between turns the multi host keeps what every window shares: the runner and
@@ -305,25 +363,31 @@ impl MutationRouter {
 /// application's hooks. [`with_window`](Self::with_window) lends them to one
 /// window's [`Host`] for the length of a closure, so that window runs the same
 /// frame and input pipeline a single-window host runs, then takes them back.
-pub struct MultiHost<State: 'static, Logic, V>
-where
+pub struct MultiHost<
+    State: 'static,
+    Logic,
+    V,
+    W = Host<State, Logic, V, WindowTree<State, Logic, V>>,
+> where
     Logic: FnMut(&State) -> V,
     V: RootView<State>,
 {
-    tree: Option<(MultiRunner<State, Logic, V>, MutationRouter)>,
+    tree: Option<(MultiRunner<State, Logic, V>, MutationRouter, WindowRequests)>,
     shared: AppShared,
     hooks: HostHooks<State, Logic, V, WindowTree<State, Logic, V>>,
     dom: DomHandle,
     /// Index-aligned with the runner's projection slots, which are never
-    /// reused: `windows[id.0]` is window `id`, `None` once it closed.
-    windows: Vec<Option<Host<State, Logic, V, WindowTree<State, Logic, V>>>>,
+    /// reused: `windows[id.0]` is window `id`, `None` before it is attached
+    /// and once it closed.
+    windows: Vec<Option<W>>,
 }
 
-impl<State, Logic, V> MultiHost<State, Logic, V>
+impl<State, Logic, V, W> MultiHost<State, Logic, V, W>
 where
     State: 'static,
     Logic: FnMut(&State) -> V + 'static,
     V: RootView<State>,
+    W: WindowSlot<State, Logic, V>,
 {
     /// A multi-window host over `state`, with no windows yet.
     pub fn new(
@@ -332,7 +396,11 @@ where
         hooks: HostHooks<State, Logic, V, WindowTree<State, Logic, V>>,
     ) -> Self {
         Self {
-            tree: Some((MultiRunner::new(state), MutationRouter::default())),
+            tree: Some((
+                MultiRunner::new(state),
+                MutationRouter::default(),
+                WindowRequests::default(),
+            )),
             shared,
             hooks,
             dom: Rc::new(RefCell::new(ScriptedDom::new())),
@@ -340,34 +408,51 @@ where
         }
     }
 
-    /// Open a window whose view is `logic` (its lens over the shared state),
-    /// with its own options and host state, under a fresh window-root of the
-    /// one document.
-    pub fn open(
-        &mut self,
-        logic: Logic,
-        options: HostOptions,
-        s: HostState<State, Logic, V, WindowTree<State, Logic, V>>,
-        wake: HostWake,
-    ) -> ProjectionId {
-        let (runner, _) = self.tree.as_mut().expect("windows open between turns");
+    /// Open a window whose view is `logic` (its lens over the shared state)
+    /// under a fresh window-root of the one document, with `window` as its
+    /// host.
+    pub fn open(&mut self, logic: Logic, window: W) -> ProjectionId {
+        let (runner, ..) = self.tree.as_mut().expect("windows open between turns");
         let id = runner.push_forest_projection(self.dom.clone(), logic);
-        if self.windows.len() <= id.0 {
-            self.windows.resize_with(id.0 + 1, || None);
-        }
-        self.windows[id.0] = Some(Host::new(options, None, HostHooks::inert(), s, wake));
+        self.attach(id, window);
         id
     }
 
-    /// Close window `id`: tear its tree down and drop its host. The shared
-    /// state and the other windows are untouched.
-    pub fn close(&mut self, id: ProjectionId) {
-        let (runner, router) = self.tree.as_mut().expect("windows close between turns");
+    /// Give window `id`, opened from a hook, its host.
+    pub fn attach(&mut self, id: ProjectionId, window: W) {
+        if self.windows.len() <= id.0 {
+            self.windows.resize_with(id.0 + 1, || None);
+        }
+        self.windows[id.0] = Some(window);
+    }
+
+    /// The windows hooks asked to open (each with its options) and to close
+    /// since the last call. The event source attaches a host to each opened
+    /// one and closes the others.
+    pub fn take_requests(&mut self) -> (Vec<(ProjectionId, HostOptions)>, Vec<ProjectionId>) {
+        let (.., requests) = self.tree.as_mut().expect("asked between turns");
+        let requests = std::mem::take(requests);
+        (requests.opened, requests.closed)
+    }
+
+    /// Close window `id`: tear its tree down and hand its host back to drop.
+    /// The shared state and the other windows are untouched.
+    pub fn close(&mut self, id: ProjectionId) -> Option<W> {
+        let (runner, router, _) = self.tree.as_mut().expect("windows close between turns");
         runner.remove_projection(id);
         router.forget(id);
-        if let Some(slot) = self.windows.get_mut(id.0) {
-            *slot = None;
-        }
+        self.windows.get_mut(id.0).and_then(Option::take)
+    }
+
+    /// Window `id`'s slot between turns, for what the event source keeps
+    /// beside the host (its native window). Host methods need a turn.
+    pub fn slot(&self, id: ProjectionId) -> Option<&W> {
+        self.windows.get(id.0).and_then(Option::as_ref)
+    }
+
+    /// The same, mutably.
+    pub fn slot_mut(&mut self, id: ProjectionId) -> Option<&mut W> {
+        self.windows.get_mut(id.0).and_then(Option::as_mut)
     }
 
     /// The open windows, in the order they were opened.
@@ -400,41 +485,40 @@ where
     /// Drain the document and report which windows a change reached since
     /// they last laid out, so the event source asks those to redraw.
     pub fn touched_windows(&mut self) -> HashSet<ProjectionId> {
-        let (runner, router) = self.tree.as_mut().expect("asked between turns");
+        let (runner, router, _) = self.tree.as_mut().expect("asked between turns");
         router.collect(runner);
         router.pending()
     }
 
     /// Run `f` as window `id`'s turn: its host holds the runner, the shared
     /// part and the hooks until `f` returns. `None` for a closed window.
-    pub fn with_window<R>(
-        &mut self,
-        id: ProjectionId,
-        f: impl FnOnce(&mut Host<State, Logic, V, WindowTree<State, Logic, V>>) -> R,
-    ) -> Option<R> {
+    pub fn with_window<R>(&mut self, id: ProjectionId, f: impl FnOnce(&mut W) -> R) -> Option<R> {
         let held_elsewhere: HashSet<u64> = self
             .windows
             .iter()
             .enumerate()
             .filter(|(index, _)| *index != id.0)
             .filter_map(|(_, slot)| slot.as_ref())
-            .flat_map(|host| host.s.leaf_keys.iter().copied())
+            .flat_map(|window| window.host().s.leaf_keys.iter().copied())
             .collect();
-        let host = self.windows.get_mut(id.0)?.as_mut()?;
-        let (runner, router) = self.tree.take().expect("turns do not nest");
+        let window = self.windows.get_mut(id.0)?.as_mut()?;
+        let (runner, router, requests) = self.tree.take().expect("turns do not nest");
+        let host = window.host_mut();
         host.s.runner = Some(WindowTree {
             runner,
             router,
+            requests,
             window: id,
         });
         self.shared.held_elsewhere = held_elsewhere;
         std::mem::swap(&mut host.s.shared, &mut self.shared);
         std::mem::swap(&mut host.hooks, &mut self.hooks);
-        let result = f(host);
+        let result = f(window);
+        let host = window.host_mut();
         std::mem::swap(&mut host.hooks, &mut self.hooks);
         std::mem::swap(&mut host.s.shared, &mut self.shared);
         let tree = host.s.runner.take().expect("a turn hands its tree back");
-        self.tree = Some((tree.runner, tree.router));
+        self.tree = Some((tree.runner, tree.router, tree.requests));
         Some(result)
     }
 }

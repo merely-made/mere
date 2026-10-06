@@ -901,7 +901,7 @@ pub use host::{
     Runner, ScrollIntoView, StampedCaptureFn, WindowFrame, ZOOM_LADDER, env_size, fit_zoom,
     ladder_step,
 };
-pub use multi_host::{MultiHost, MultiRunner, WindowTree};
+pub use multi_host::{MultiHost, MultiRunner, WindowSlot, WindowTree};
 pub use tree::HostTree;
 pub use window_dom::WindowDom;
 pub use wake::HostWake;

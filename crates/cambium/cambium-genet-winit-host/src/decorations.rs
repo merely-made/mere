@@ -152,11 +152,12 @@ where
 /// The client-side window frame. Inherent on the winit wrapper: every method
 /// here needs a native window, which is exactly what the wrapper adds to the
 /// host. Nothing here has a browser meaning.
-impl<State, Logic, V> crate::WinitHost<State, Logic, V>
+impl<State, Logic, V, T> crate::WinitHost<State, Logic, V, T>
 where
     State: 'static,
     Logic: FnMut(&State) -> V + 'static,
     V: cambium_rootstock::meristem_bounds::RootView<State>,
+    T: cambium_rootstock::HostTree<State>,
 {
     /// What the window frame makes of the point `(x, y)` in logical
     /// coordinates.
