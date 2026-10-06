@@ -350,6 +350,44 @@ From `2026-10-04_stack_seams_plan.md` §3.2, which hands it to this plan. It ext
 - the probe's fingerprint matches on Windows and on macOS or Linux;
 - the cost of `libm` in seiche's laws is measured at the probe's sizes and reported. Checkpoint C3: if it costs more than the run-to-run spread at 5,000 bodies, the figure comes back to Mark before it is kept.
 
+*Annotation, 2026-10-06: G8 amended, and a new track.*
+- **The amendment.** From the balaur review
+  (`design_docs/mere_docs/research/2026-10-06_balaur_review_brief.md`, fork E),
+  Mark: **"That, plus replay as a track"**. G8's instruments gain:
+  - a per-tick trace with labelled slices, reporting the first tick and slice
+    that diverge;
+  - velocity in the hash;
+  - one owned random generator per world, in place of seiche's xorshift32 and
+    SplitMix64;
+  - a lint against bare transcendentals and hash-ordered loops.
+- **The new track.** Input record and replay, with a restorable checkpoint,
+  becomes a track of its own, G10 below. seiche's `LayoutSnapshot` holds
+  positions only.
+- **Wing ruling 604** (Isometry wing record, `ee3d9687`), Mark: **"Require it
+  now"**. Every float path a game hands to the sim's physics must replay bit
+  for bit on any machine, and G8 carries this in conatus too:
+  - rapier's `enhanced-determinism`;
+  - glam (or glamx) with `libm` and `scalar-math`;
+  - the lint;
+  - a digest diffed across Windows, macOS and Linux.
+
+  As relayed, conatus takes rapier3d 0.33 without those features today.
+  Mesocosm, Eponym and isocosm's legacy trees share an FNV-1a witness over
+  postcard bytes (`isometer_core::snapshot::hash_bytes`), which matches
+  `seiche-repeat`'s FNV-1a over `to_bits`.
+
+### G10 — input record and replay (balaur review fork E, 2026-10-06)
+
+*Done when:* a run's inputs (pointer drags, pins, law and dial changes,
+seeds) record to a JSON Lines file. The file has a header, one line per
+tick with that tick's digest, and a trailer whose absence means the run
+crashed. Replaying it on another machine reproduces every per-tick digest. A
+restorable checkpoint holds positions, velocities, generator state and each
+term's state, and restoring it mid-run continues to the same digests.
+*Positive control:* a planted extra input, or a perturbed checkpoint, diverges
+at the tick where it was planted, and the G8 trace names it. Its order
+against G3 to G6 is Mark's.
+
 ### G9 — permitted actions (stack seams S3, 2026-10-04)
 
 *Done when:* the binding's permitted actions are `AdvertisedAction`s; drag and pin advertise as `Curation`; an accessibility or permission surface lists them with no physics-specific path. *Annotation, 2026-10-05:* F61 names the surface (graphshell-client's `AccessibilityTree`, with a route for a local `Curation` intent), F62 adds that a screen reader reaches the graph canvas's items and their drag and pin through rootstock's producer semantics in both lowerings, and F63 makes the board's return home finish at the settle budget's end.
