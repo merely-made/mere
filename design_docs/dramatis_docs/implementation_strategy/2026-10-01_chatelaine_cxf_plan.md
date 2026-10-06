@@ -985,3 +985,12 @@ As ruled (26 to 29), with the workspace's lane rules:
   compiles. `--tests` and `--all-features` fail on `ring`'s C build script,
   reached only through castellan's dev-dependency on gazette (`reqwest`,
   `rustls`), so tests are compiled on the ThinkPad.
+
+**2026-10-06, tails inherited from the S14 archive pass** (recorded in the
+[archived plan tails plan](../../mere_docs/implementation_strategy/2026-07-03_archived_plan_tails_plan.md), "2026-10-06 archive pass"). This plan
+now owns:
+- **V4, broader item types**, from the
+  [identity vault SSH agent plan](../../archive_docs/2026-10-06_completed_plans/2026-07-22_identity-vault-ssh-agent_plan.md).
+  S56 answered that plan's question: V4 moves here.
+- **CXF import**, from the castellan OTP plan. That is this plan's P4
+  already, so nothing new.

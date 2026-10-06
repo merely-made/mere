@@ -988,3 +988,13 @@ The Secret Service is checkpoint B, on the ThinkPad.
 - **Next:** ruling 54 on the same branch, merged onto `main` `ebfb490a`,
   which moved djinn's Knot pin to `ef89a18`. Then verification and the
   merge.
+
+**2026-10-06, a tail inherited from the S14 archive pass** (recorded in the
+[archived plan tails plan](../../mere_docs/implementation_strategy/2026-07-03_archived_plan_tails_plan.md), "2026-10-06 archive pass"): lock and
+unlock follow-through, and non-Windows startup unlock backends, from the
+[persona wallet carry layer plan](../../archive_docs/2026-10-06_completed_plans/2026-06-25_persona_wallet_carry_layer_plan.md).
+- Lock and unlock follow-through is this plan.
+- Non-Windows startup is already ruled:
+  - Linux starts locked and waits for the native or terminal prompt, with
+    no OS-held root (ruling 42);
+  - macOS joins with the pairing plan's D2 (ruling 22).
