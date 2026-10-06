@@ -22,6 +22,18 @@ sections say which plan each came from.
   warn + fail the tile under D3D12.
 - **`favicon_data_uri` misnomer** — it also encodes the snapshot peek; rename.
 
+**Corrected 2026-10-06 (S14 pass):** `favicon_data_uri` no longer exists in
+Mere, Turnstone or Genet's components at mere `535bca11`; it was meerkat render
+code, removed with meerkat 2026-07-18 (`c5f01064`). The same holds for the
+find-field paste tail (`handle_clipboard_shortcut`), the context-submenu tails
+and the `ProducerSurface` rename, each corrected where it sits.
+
+**Open, raised by the S14 pass (2026-10-06):** four tails in the 2026-07-03 and
+2026-07-04 sections name meerkat code that no longer exists (above). How should
+this backlog carry them? Options: prune them the way the 2026-09-02 pass
+treated deleted subjects, keeping only any host-agnostic principle; keep them
+in place marked as history.
+
 ## From documentscript_net_hardening (substantially complete 2026-06-24)
 
 - **E1 refinement, uncredentialed same-origin fetch** — a same-origin `net.fetch`
@@ -34,6 +46,11 @@ sections say which plan each came from.
   commands during I/O (A2's 30s timeout mitigates today).
 - **E3 — mod install/approval + optional signing** (the proper B1 fix; today any
   approved-capability `.wasm` in `mods/` auto-attaches).
+
+  **Corrected 2026-10-06 (S14 pass):** nothing auto-attaches today.
+  `discover_wasm_mods_in_dir`
+  (`crates/system/registry/src/mod_loader/loader/free_fns.rs:149`) has no
+  production caller in Mere or Turnstone; only its tests call it.
 - **B4 — `.cwasm` AOT mods invisible to discovery** (loader supports them; discovery
   matches only `*.wasm`).
 - **D2 — `Fetched` carries no HTTP status** (non-2xx collapses to `Err`; guests
@@ -52,6 +69,10 @@ sections say which plan each came from.
 - **Paste into the find field** — `handle_clipboard_shortcut` routes to
   omnibar/palette only.
 
+  **Corrected 2026-10-06 (S14 pass):** `handle_clipboard_shortcut` no longer
+  exists in Mere, Turnstone or Genet's components; it left with meerkat
+  (`c5f01064`, 2026-07-18). See the open question under native_surface_compositing.
+
 ## From context_submenus (implemented 2026-06-25)
 
 - **GUI feel verify pass** — pixel placement of the flyout, live hover/keyboard
@@ -65,6 +86,11 @@ sections say which plan each came from.
 - **Depth-N submenus** — model is depth-1 by convention; deeper needs a path, not an
   index.
 
+**Corrected 2026-10-06 (S14 pass):** the context-submenu code these items
+concern no longer exists in Mere, Turnstone or Genet's components; it left with
+meerkat (`c5f01064`, 2026-07-18). `submenu_hover` was a proposed field and was
+never added. See the open question under native_surface_compositing.
+
 ## From keyed_view_sequence (implemented 2026-07-02)
 
 - **P4 — `ElementSplice` move primitive** for state-preserving arbitrary reorder.
@@ -77,6 +103,9 @@ sections say which plan each came from.
 - **rkyv compaction of graph engrams** (Alembic tail B6) — override
   `TypedPayload::serialize_to_bytes` for `GraphEngram` with rkyv (mind the
   read-alignment `AlignedVec` gotcha). Measure the size win first.
+
+  **Corrected 2026-10-06 (S14 pass):** `GraphEngram` is now `GraphCodicil`
+  (`c51b9704`, 2026-08-31; `crates/system/pandect/src/graph_codicil.rs:62`).
 - **Promote `merge_snapshots` into the kernel** (`Graph::merge_from`, reusing the
   URL index + edge API) once the kernel is quiet — the snapshot-level merge was the
   non-colliding path, not the final shape.
@@ -99,6 +128,11 @@ sections say which plan each came from.
 
 - **`SecondaryForward` rename** — the flip shim kept the old `ProducerSurface`
   name while becoming generic over `WebSurface`; rename when touched (cosmetic).
+
+  **Corrected 2026-10-06 (S14 pass):** `ProducerSurface` no longer exists in
+  Mere, Turnstone or Genet's components; the shim left with meerkat
+  (`c5f01064`, 2026-07-18). `SecondaryForward` was the proposed new name and
+  never existed. See the open question under native_surface_compositing.
 
 ### From retained_text_tiled_render (acceptance met 2026-07-03)
 
@@ -126,6 +160,11 @@ in-plan), ui_dpi_scaling, gloss_scene_to_dom (follow-ups owned by the active
 gloss_outline_lens plan), graphlet_wiring (cross-plan leftovers owned by the
 active relational_browse plan), tearout_composability (continuation is the
 active tearout_gestures plan).
+
+**Corrected 2026-10-06 (S14 pass):** the relational_browse plan is no longer
+active. It was archived as
+[2026-06-23_relational_browse_graphlet_plan.md](../../archive_docs/2026-08-06_completed_plans/2026-06-23_relational_browse_graphlet_plan.md),
+so graphlet_wiring's cross-plan leftovers point at an archived plan.
 
 ## 2026-09-02 archive pass (17 retired plans → `archive_docs/2026-09-02_retired_plans/`)
 
@@ -175,6 +214,12 @@ genet's `design_docs/`, not here.
   the chip — `Ledger::score` exists, no consumer) and 7 (Steward per-row
   controls — the pane is a read-only downloads projection) are unbuilt with
   their substrate present.
+
+  **Corrected 2026-10-06 (S14 pass):** item 6 is done. Barnes-Hut is live as
+  `PhysicsLaw::Charge` ("charge.barnes-hut",
+  `crates/canvas/pictograph/src/canvas/physics_catalog.rs:149` and
+  `:1110-1114`), landed in `37477457` on 2026-09-02 and recorded in the
+  [physics catalog plan](./2026-09-02_physics_catalog_plan.md).
 - **Forme dead-submodule cleanup, never done**: `subgraph` (renamed from `graphlet` 2026-09-12), `lens`, `parity`,
   `pressure`, `reconciliation` still exist at `crates/forme/forme/src/`. A
   deletion; wants a yes.
@@ -249,6 +294,11 @@ genet's `design_docs/`, not here.
   SelectionOverride` stack**, **true parallel edge instances**; the plan's
   §Contradictions and §Pitfalls are durable design notes.
 
+  **Corrected 2026-10-06 (S14 pass):** two locations are inexact. `SubgraphSpec`
+  is `forme::SubgraphSpec` (`crates/forme/forme/src/subgraph.rs:69`), not part
+  of `mere::roster`, and `EdgeFamily` lives in graph-kernel
+  (`crates/graph/graph-kernel/src/graph/edge_taxonomy.rs:33`), not canvas.
+
 ### From kith_capability_sharing (gate cleared 2026-08-09, never started)
 
 - **Owed by name**: `crates/mesh/mesh/src/lease.rs:22-26` *(historical citation)* <!-- doc-audit: historical-path --> — "the kith plan,
@@ -307,6 +357,13 @@ genet's `design_docs/`, not here.
   above. Four of them are code rulings rather than doc tails: the orphaned
   `PersonaSettings` fields, the forme submodules, `ToastSpec`, and the one-line
   Barnes-Hut wire.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_49_s14_phase_b11.md: the Barnes-Hut tail marked
+  done (physics catalog P1, `37477457`), the E3 auto-attach claim and the
+  GraphEngram and session-runtime names corrected, the relational_browse owner
+  noted as archived, the roster model locations fixed, and the four
+  meerkat-subject tails marked with an open question on pruning them.
 
 ## From stickleback_replication_promotion (complete 2026-07-27, archived 2026-08-06)
 
@@ -344,6 +401,9 @@ genet's `design_docs/`, not here.
   scripts. Only the settings slice is tracked today, by the
   [configuration ownership plan](./2026-08-06_configuration_ownership_settings_projection_plan.md);
   the rest is unowned. Worth naming before the crate is treated as settled.
+
+  **Corrected 2026-10-06 (S14 pass):** `session-runtime` is now `pandect`
+  (`441e70f0`, 2026-08-15).
 - **Production journal persistence** (the G5 follow-on list). Until it lands,
   the delta vocabulary can still change without forcing a durable-log
   migration, which is the reason it was safe to defer and the reason it stops
