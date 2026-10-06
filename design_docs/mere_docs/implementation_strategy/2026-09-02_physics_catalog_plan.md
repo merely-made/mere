@@ -811,6 +811,16 @@ pull reading −0.33 with 510 overlaps):
   merge, the viewer cone starts, and the estimator follows on its own
   branch; until then the web budget keeps falling back to 8.3 ms, as on main
   (against merging once, with the estimator proven on both machines).
+  *Ruled 2026-10-06:* the machine stayed busy for hours, with other
+  sessions keeping about 8 builds at Normal priority, and every calm wait
+  timed out. Under 66 to 100% CPU, 16 of 17 law and fixture rows passed on
+  candidate `aad08332`. Density's control read 0.08 against a bar of 0; calm
+  runs had read -0.01 and -0.02. Asked how the round should count, Mark chose
+  **"Ask sessions to pause"**: the coordinator asks the active sessions to
+  stop building for about an hour, and the whole round runs calm as ruled
+  (against counting passes under load and rerunning misses calm, or waiting
+  for calm however long it takes). The rows already run under load do not
+  count.
   The face offset, diagnosed (2026-10-04, `tree-face-zoom`): the face is
   drawn right and the body wrong, on both pages. Pictograph's gnode style
   scales each body about its centre (the CSS default Livery follows since
