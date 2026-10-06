@@ -311,3 +311,24 @@ fn bounds_precede_binding_cloning_and_solving_and_all_numbers_are_finite() {
         .insert("order".into(), ProjectionValue::Number(f64::NAN));
     refuses(&saved, &invalid, "dataset.values");
 }
+
+/// The relationship compile refuses a degenerate card the same way (S32).
+#[test]
+fn a_relationship_compile_refuses_a_degenerate_card() {
+    let data = disclosed("sound-adapter", "sound.rhyme");
+    let saved = snapshot(&data);
+    for card in [Size2::new(0.0, 0.0), Size2::new(f32::NAN, 68.0)] {
+        let issues = ProjectionCompiler::new(ItemSizes { card })
+            .compile_relationship_snapshot(&saved, &data)
+            .unwrap_err();
+        assert!(
+            issues.iter().any(|issue| issue.field == "items.card"),
+            "{issues:?}"
+        );
+    }
+    assert!(
+        compiler()
+            .compile_relationship_snapshot(&saved, &data)
+            .is_ok()
+    );
+}
