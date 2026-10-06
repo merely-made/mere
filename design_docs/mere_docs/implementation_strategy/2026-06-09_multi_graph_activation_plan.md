@@ -1,16 +1,23 @@
 # Multi-Graph Activation Plan
 
 **Date**: 2026-06-09
-**Status**: In progress. MG1–MG5 done plus the host text path — meerkat runs
-multi-graph with a window-scoped pane layout (near-Model-B): the shellbar
-switcher creates / switches / closes / **renames** graphs (labelled tiles), and
-switching keeps the panes while re-sourcing the graph-bound ones. MG6's **far-B
-(different-graph leaves coexisting) and multi-window tear-out are now delivered /
-owned by the [tearout_composability_plan](../../archive_docs/2026-07-04_completed_plans/2026-06-19_tearout_composability_plan.md)** (its
-P1 explicitly converges far-B / MG6, and `OpenGraphBeside` summons a second Orrery
-pane, `session_ops.rs:470`). What remains uniquely here: the **persona chip** (gated
-on multi-persona) and **per-session engine-profile escalation** (manifest field
-present, unwired).
+**Status (2026-10-06):** historical. MG1–MG5 and the host text path landed in
+meerkat on 2026-06-09 and 2026-06-10, retired with it 2026-07-18
+(`c5f01064`); meerkat's switcher, `retag_graph_bound` and
+`follows_active_graph` left with it. Surviving library parts: pandect's
+`ManifestStore` (`crates/system/pandect/src/manifest_store.rs`) and the
+switcher-thumbnail builder, now `build_switcher_thumbnail_with`
+(`crates/system/pandect/src/switcher_thumbnail.rs`), neither consumed outside
+pandect. MG6's far-B and tear-out went on 2026-06-15 to the
+[window composition plan (archived)](../../archive_docs/2026-06-19_completed_plans/2026-06-11_window_composition_plan.md)
+and then to its continuation, the
+[tear-out composability plan (archived)](../../archive_docs/2026-07-04_completed_plans/2026-06-19_tearout_composability_plan.md);
+`OpenGraphBeside` and `session_ops` left with meerkat. Open: the **persona
+chip** (gated on multi-persona; `crates/dramatis/persona-picker` now exists)
+and **per-session engine-profile escalation** (the manifest field in
+`crates/system/pandect/src/manifest.rs` is unwired; the
+[engine profile boundary plan](2026-05-14_engine_profile_boundary_plan.md)'s
+v0b covers it).
 **Related**: [shellbar plan F2.3](2026-06-09_shellbar_plan.md), [graph session manifest plan](../../archive_docs/2026-06-09_completed_plans/2026-05-11_graph_session_manifest_plan.md), [switcher thumbnails plan](../../archive_docs/2026-06-09_completed_plans/2026-05-14_switcher_thumbnails_plan.md), [multi-window plan](2026-06-10_multi_window_plan.md), [peripheral panes architecture](../technical_architecture/2026-06-06_peripheral_panes_architecture.md) (panes are per-window), [composition spine](../technical_architecture/2026-05-21_mere_composition_spine.md). Code: `crates/system/session-runtime/` *(historical citation)* <!-- doc-audit: historical-path -->, `crates/meerkat/` *(historical citation)* <!-- doc-audit: historical-path -->, `crates/shell/frame/` *(historical citation)* <!-- doc-audit: historical-path -->.
 
 > **Historical/supersession note (2026-09-05):** This is the Meerkat activation
@@ -210,3 +217,4 @@ Near-B is reached: all graph-bound leaves follow one active graph (they read the
   set/clear/cancel). meerkat suite green (44 lib + 63 bin); workspace check clean.
   Follow-ups: IME / paste in the rename buffer; caching the switcher scene to avoid
   per-frame reshaping; wider labels (hover tooltip) given the 40px constraint.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at mere 535bca11, from the D2 record in support/doc-audit/d2/batch_39_s14_phase_b1.md: the status rewritten as historical (landed in meerkat, retired with it in `c5f01064`), naming pandect's surviving `ManifestStore` and thumbnail builder, the window composition plan and its tear-out continuation as MG6's owners, and the persona chip and engine-profile escalation as open.

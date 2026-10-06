@@ -1,7 +1,7 @@
 # Engine profile boundary — implementation plan
 
 **Date**: 2026-05-14
-**Status**: Implementation plan — v0a path-resolution primitive landed; v0b per-engine wiring pending
+**Status (2026-10-06):** v0a path-resolution primitive landed, now in `crates/system/pandect/src/engine_profile_store.rs` with no callers outside pandect; v0b per-engine wiring not started.
 
 > **Reconcile note (2026-07-03 archive pass):** `engine_profile_store.rs`
 > (`crates/system/session-runtime/` *(historical citation)* <!-- doc-audit: historical-path -->) now carries `engine_profile_path` /
@@ -16,6 +16,10 @@
 - [`../research/2026-05-11_browser_multiplexer_framing.md`](../research/2026-05-11_browser_multiplexer_framing.md) §5.4 — the framing brief that defines the tiered scoping.
 - [crates/system/session-runtime/src/manifest.rs](../../../crates/system/session-runtime/src/manifest.rs) *(historical citation)* <!-- doc-audit: historical-link --> — `EngineProfileBinding` enum (PersonaScoped / SessionScoped / GraphScoped), `PersonaId`, `GraphSessionManifest::engine_profile` are already in place.
 - [crates/inker/src/engine.rs](../../../crates/inker/src/engine.rs) *(historical citation)* <!-- doc-audit: historical-link --> — `Engine::engine_id() -> &str` is the stable engine identifier that names the UDF directory.
+
+**Corrected 2026-10-06 (S14 pass):** the current homes. `engine_profile_path` and `engine_profile_path_for_session` are in `crates/system/pandect/src/engine_profile_store.rs`, with 9 tests and no callers outside pandect; pandect's `EngineProfileBinding` scope enum is in `crates/system/pandect/src/manifest.rs`; `Engine::engine_id` is in `crates/inker/inker/src/engine.rs`; and the scrying engine v0b names first is `crates/inker/engines/scrying-engine`. A second type shares the name: inker's `struct EngineProfileBinding { user_data_dir: String }` in `crates/inker/inker/src/surface_engine.rs`, which the surface engines consume and Pelt fills with the constant `"pelt-surface-profile"`. This plan named neither.
+
+**Open, raised by the S14 pass (2026-10-06):** two types are named `EngineProfileBinding`: pandect's scope enum and inker's `user_data_dir` struct, where v0b would connect. Options: rename one; declare inker's struct the v0b seam; merge them.
 
 ---
 
@@ -153,3 +157,7 @@ Future fields the manifest might want, tracked here so they don't get lost:
 1. **Where does `data_root` come from?** The host's `ManifestStore` already has a `root: PathBuf` pointing at the sessions directory. The engine-profile resolver wants the *parent*. Either pass it explicitly, add `data_root: PathBuf` to `ManifestStore`, or store it once on `HostRoot`. Filed for v0b.
 2. **Profile binding mutation.** If the user flips `PersonaScoped → SessionScoped` mid-session, the cookies should *not* silently migrate. Either the change takes effect on next session restart, or the engine relaunches against the new path with a clear "your previous cookies stayed in the persona pool" message. Filed for v0b.
 3. **Engine UDF deletion on session kill.** A killed session's UDF should be cleaned up if it was session/graph-scoped; persona-scoped UDFs survive. Tracked alongside the manifest store's `.trash/` workflow.
+
+## Progress
+
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at mere 535bca11, from the D2 record in support/doc-audit/d2/batch_39_s14_phase_b1.md: the status dated, the current homes named (pandect's store and enum, inker's engine id, the scrying engine), and the two `EngineProfileBinding` types raised as an open question.
