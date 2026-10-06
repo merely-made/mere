@@ -372,7 +372,7 @@ impl<S: IdentityStorage + 'static> PersonaeHost<S> {
         let mut vault = self.vault.lock().unwrap();
         // Ruling 54: a held key is never rewritten; the receipt describes the
         // slot as held, comment and tier included.
-        if let Some(held) = vault.current_profile().slots.get(&key) {
+        if let Some(held) = vault.current_profile()?.slots.get(&key) {
             let held_private = ssh_slot::private_key_from_slot(held)?;
             return Ok(SshKeyMutationReceipt {
                 operation,
@@ -409,7 +409,7 @@ impl<S: IdentityStorage + 'static> PersonaeHost<S> {
         }
         let key = ProtocolKey::new(ssh_slot::SSH_MOD_ID, Some(request.fingerprint.clone()));
         let mut vault = self.vault.lock().unwrap();
-        let Some(slot) = vault.current_profile().slots.get(&key) else {
+        let Some(slot) = vault.current_profile()?.slots.get(&key) else {
             return Err(IdentityIntentError::KeyNotFound);
         };
         let private = ssh_slot::private_key_from_slot(slot)?;
@@ -485,7 +485,8 @@ impl<S: IdentityStorage + 'static> PersonaeHost<S> {
     /// Secret-free Graphshell read model.
     pub fn snapshot(&self) -> std::io::Result<IdentitySurfaceSnapshot> {
         let vault = self.vault.lock().unwrap();
-        let profile = vault.current_profile();
+        // The locked snapshot is L2's; until then a locked vault is an error.
+        let profile = vault.current_profile().map_err(std::io::Error::other)?;
         let current_id = profile.id.0.clone();
         let mut profiles: Vec<_> = vault
             .storage()
@@ -1361,7 +1362,7 @@ mod tests {
         key: &ProtocolKey,
     ) -> (String, Vec<u8>, CredentialLineage, UnlockTier) {
         let vault = host.vault.lock().unwrap();
-        match vault.current_profile().slots.get(key).expect("slot held") {
+        match vault.current_profile().unwrap().slots.get(key).expect("slot held") {
             personae::IdentitySlot::Direct {
                 kind,
                 payload,

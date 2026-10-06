@@ -211,7 +211,7 @@ fn dpapi_protect(plaintext: &[u8]) -> Result<Vec<u8>, IdentityError> {
 }
 
 #[cfg(windows)]
-fn dpapi_unprotect(ciphertext: &[u8]) -> Result<Vec<u8>, IdentityError> {
+fn dpapi_unprotect(ciphertext: &[u8]) -> Result<zeroize::Zeroizing<Vec<u8>>, IdentityError> {
     use std::ptr::null_mut;
     use windows_sys::Win32::Foundation::LocalFree;
     use windows_sys::Win32::Security::Cryptography::{CRYPT_INTEGER_BLOB, CryptUnprotectData};
@@ -238,9 +238,11 @@ fn dpapi_unprotect(ciphertext: &[u8]) -> Result<Vec<u8>, IdentityError> {
     if ok == 0 {
         return Err(IdentityError::Backend("dpapi unprotect failed".to_string()));
     }
+    // CryptUnprotectData's documentation: clear the plaintext before LocalFree.
     let plaintext = unsafe {
-        let slice = std::slice::from_raw_parts(output.pbData, output.cbData as usize);
-        let bytes = slice.to_vec();
+        let slice = std::slice::from_raw_parts_mut(output.pbData, output.cbData as usize);
+        let bytes = zeroize::Zeroizing::new(slice.to_vec());
+        zeroize::Zeroize::zeroize(slice);
         LocalFree(output.pbData.cast());
         bytes
     };
