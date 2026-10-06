@@ -19,7 +19,7 @@ use crate::A11yAction;
 use cambium::PointerClick;
 use genet_render::VisualCaret;
 use genet_scripted_dom::NodeId;
-use layout_dom_api::{DomMutation, LayoutDomMut as _};
+use layout_dom_api::DomMutation;
 use netrender::{ColorLoad, ExternalTexturePlacement};
 use paint_list_api::{DeviceIntSize, PaintEnvelope, PaintList as _};
 
@@ -53,8 +53,9 @@ type EmittedScene = (
     Option<PaintEnvelope>,
 );
 
-impl<State, Logic, V> Host<State, Logic, V>
+impl<State, Logic, V, T> Host<State, Logic, V, T>
 where
+    T: crate::HostTree<State>,
     State: 'static,
     Logic: FnMut(&State) -> V + 'static,
     V: RootView<State>,
@@ -80,9 +81,9 @@ where
                 logical_size,
                 ui_zoom,
                 zoom_changed,
-                leaves: &mut self.s.leaves,
+                leaves: &mut self.s.shared.leaves,
                 files: &mut self.s.files,
-                producers: &mut self.s.producers,
+                producers: &mut self.s.shared.producers,
                 set_sheet: &mut self.s.pending_sheet,
                 set_ui_zoom: &mut self.s.pending_ui_zoom,
                 close: &mut self.s.close_requested,
@@ -94,15 +95,14 @@ where
                 pointer: &mut self.s.pending_pointer,
                 scroll: &mut self.s.pending_scroll,
                 window_commands: &commands,
+                render_core: self.s.shared.render_core.as_ref(),
                 geometry,
                 frame_profile,
             };
             (self.hooks.frame)(&mut ctx)
         };
         if let Some(sheet) = self.s.pending_sheet.take() {
-            self.s.sheet = sheet;
-            self.s.layout = None;
-            self.s.layout_size = (0.0, 0.0);
+            self.swap_sheet(sheet);
         }
         if let Some(zoom) = self.s.pending_ui_zoom.take() {
             self.set_ui_zoom(zoom);
@@ -160,12 +160,21 @@ where
         let layout_update_started = crate::Instant::now();
         let now_s = self.s.anim_base.elapsed().as_secs_f64();
         let titlebar_moved = self.publish_titlebar_area(lw);
-        let runner = self.s.runner.as_ref().expect("checked above");
-        let dom = runner.dom();
+        // Another window swapped the shared sheet: lay out afresh, as the
+        // window that swapped it does.
+        if self.s.layout_sheet_generation != self.s.shared.sheet_generation {
+            self.s.layout = None;
+            self.s.layout_size = (0.0, 0.0);
+            self.s.layout_sheet_generation = self.s.shared.sheet_generation;
+        }
+        let runner = self.s.runner.as_mut().expect("checked above");
         let mut muts: Vec<DomMutation<NodeId>> = Vec::new();
-        dom.borrow_mut().drain_mutations(&mut muts);
+        runner.drain_mutations(&mut muts);
+        let dom = runner.dom();
+        let mount = runner.mount();
         let dom_ref = dom.borrow();
-        let sheets: Vec<&str> = vec![self.s.sheet.as_str(), self.s.titlebar_sheet.as_str()];
+        let view = crate::WindowDom::new(&dom_ref, mount);
+        let sheets: Vec<&str> = vec![self.s.shared.sheet.as_str(), self.s.titlebar_sheet.as_str()];
         let mutation_count = muts.len() as u64;
         let size_changed = self.s.layout_size != (lw, lh);
         let mut tick_us = 0;
@@ -178,25 +187,25 @@ where
         match self.s.layout.as_mut() {
             Some(layout) if muts.is_empty() && !size_changed && !titlebar_moved => {
                 let phase = crate::Instant::now();
-                let _ = layout.tick_animations(&*dom_ref, now_s);
+                let _ = layout.tick_animations(&view, now_s);
                 tick_us = elapsed_us(phase.elapsed());
             },
             Some(layout) if !size_changed && !titlebar_moved => {
                 rebuilt = true;
                 let phase = crate::Instant::now();
-                layout.rebuild(&*dom_ref, lw, lh);
+                layout.rebuild(&view, lw, lh);
                 rebuild_us = elapsed_us(phase.elapsed());
             },
             _ => {
                 rebuilt = true;
                 let phase = crate::Instant::now();
                 let mut layout = crate::OwnedLayout::new(
-                    &*dom_ref,
+                    &view,
                     &sheets,
                     lw,
                     lh,
-                    &self.s.fonts,
-                    &self.s.images,
+                    &self.s.shared.fonts,
+                    &self.s.shared.images,
                 );
                 // Carry BOTH scroll planes across rebuilds: element scroll and
                 // the document scroll. Dropping the latter snaps a scrolled
@@ -205,7 +214,7 @@ where
                 // container that shrank or stopped scrolling cannot carry a
                 // stale offset in.
                 if let Some(prev) = self.s.layout.as_ref() {
-                    layout.set_element_scroll(&*dom_ref, prev.element_scroll().clone());
+                    layout.set_element_scroll(&view, prev.element_scroll().clone());
                     layout.set_viewport_scroll(prev.viewport_scroll());
                 }
                 self.s.layout = Some(layout);
@@ -220,7 +229,7 @@ where
         match caret {
             Some((node, caret)) if self.s.caret_followed != Some((node, caret.byte)) => {
                 let layout = self.s.layout.as_mut().expect("layout just ensured");
-                let _ = layout.caret_into_view(&*dom_ref, node, caret);
+                let _ = layout.caret_into_view(&view, node, caret);
                 self.s.caret_followed = Some((node, caret.byte));
             },
             Some(_) => {},
@@ -233,7 +242,7 @@ where
             let layout = self.s.layout.as_mut().expect("layout just ensured");
             let now = crate::Instant::now();
             for request in std::mem::take(&mut self.s.pending_scroll) {
-                for target in layout.scroll_into_view(&*dom_ref, request.node, request.align) {
+                for target in layout.scroll_into_view(&view, request.node, request.align) {
                     self.s.scrollbar_fade.note(target, now);
                 }
             }
@@ -245,17 +254,18 @@ where
         let anim_active = layout.has_active_animations();
         let layout_update_us = elapsed_us(layout_update_started.elapsed());
         let leaf_boxes_started = crate::Instant::now();
-        let sizes: HashMap<u64, (f32, f32)> =
-            layout.custom_leaf_boxes(&*dom_ref).into_iter().collect();
+        let sizes: HashMap<u64, (f32, f32)> = layout.custom_leaf_boxes(&view).into_iter().collect();
+        self.s.leaf_keys.clear();
+        self.s.leaf_keys.extend(sizes.keys().copied());
         let leaf_boxes_us = elapsed_us(leaf_boxes_started.elapsed());
         let leaf_render_started = crate::Instant::now();
-        let leaf_repaints = self.s.leaves.render_into(
+        let leaf_repaints = self.s.shared.leaves.render_into(
             |key| {
                 sizes
                     .get(&key)
                     .map(|&(width, height)| sprigging::Size { width, height })
             },
-            &mut self.s.rendered,
+            &mut self.s.shared.rendered,
         );
         self.s.last_layout_update_us = layout_update_us;
         self.s.last_layout_tick_us = tick_us;
@@ -285,16 +295,16 @@ where
         use paint_list_api::PaintCmd;
 
         let Some(surface) = self.s.surface.as_ref() else {
-            // No surface means no renderer, and any previously registered
-            // fragments died with it. Clear so a resumed surface re-registers
-            // from scratch instead of placing dangling ids.
-            self.s.leaf_fragments.clear();
+            // No surface this turn (suspended, or not yet booted). The
+            // renderer lives in the render core, which outlives the surface,
+            // so fragments registered before a suspend are still valid after
+            // the resume and are kept, not forgotten.
             return;
         };
         let renderer = surface.core().renderer();
 
         let mut seen: Vec<u64> = Vec::new();
-        for (key, epoch, splice) in self.s.rendered.path_a_entries() {
+        for (key, epoch, splice) in self.s.shared.rendered.path_a_entries() {
             let fragmentable = !splice.iter().any(|cmd| {
                 matches!(
                     cmd,
@@ -302,26 +312,26 @@ where
                 )
             });
             if !fragmentable {
-                if let Some((id, _)) = self.s.leaf_fragments.remove(&key) {
+                if let Some((id, _)) = self.s.shared.leaf_fragments.remove(&key) {
                     let _ = renderer.remove_fragment(id);
                 }
                 continue;
             }
             seen.push(key);
-            match self.s.leaf_fragments.get(&key) {
+            match self.s.shared.leaf_fragments.get(&key) {
                 Some((_, e)) if *e == epoch => {},
                 Some(&(id, _)) => {
                     let fragment =
                         paint_list_render::translate_paint_cmds_to_fragment(splice, &[], &[]);
                     if renderer.update_fragment(id, fragment) == Some(true) {
-                        self.s.leaf_fragments.insert(key, (id, epoch));
+                        self.s.shared.leaf_fragments.insert(key, (id, epoch));
                     }
                 },
                 None => {
                     let fragment =
                         paint_list_render::translate_paint_cmds_to_fragment(splice, &[], &[]);
                     if let Some(id) = renderer.register_fragment(fragment) {
-                        self.s.leaf_fragments.insert(key, (id, epoch));
+                        self.s.shared.leaf_fragments.insert(key, (id, epoch));
                     }
                 },
             }
@@ -330,13 +340,14 @@ where
         // not laid out): their retained lowerings go with them.
         let stale: Vec<u64> = self
             .s
+            .shared
             .leaf_fragments
             .keys()
             .copied()
             .filter(|k| !seen.contains(k))
             .collect();
         for key in stale {
-            if let Some((id, _)) = self.s.leaf_fragments.remove(&key) {
+            if let Some((id, _)) = self.s.shared.leaf_fragments.remove(&key) {
                 let _ = renderer.remove_fragment(id);
             }
         }
@@ -348,9 +359,11 @@ where
     pub fn focused_caret_rect(&self) -> Option<(f32, f32, f32, f32)> {
         let (node, caret, _) = self.focused_overlay()?;
         let layout = self.s.layout.as_ref()?;
-        let dom = self.s.runner.as_ref()?.dom();
+        let runner = self.s.runner.as_ref()?;
+        let dom = runner.dom();
         let dom_ref = dom.borrow();
-        let rect = layout.caret_rect_for_position(&*dom_ref, node, caret, 2.0)?;
+        let view = crate::WindowDom::new(&dom_ref, runner.mount());
+        let rect = layout.caret_rect_for_position(&view, node, caret, 2.0)?;
         Some((rect.x, rect.y, rect.width, rect.height))
     }
 
@@ -365,8 +378,9 @@ where
         };
         let dom = runner.dom();
         let dom_ref = dom.borrow();
+        let view = crate::WindowDom::new(&dom_ref, runner.mount());
         layout
-            .selection_rects(&*dom_ref, node, start, end)
+            .selection_rects(&view, node, start, end)
             .into_iter()
             .map(|rect| (rect.x, rect.y, rect.width, rect.height))
             .collect()
@@ -402,7 +416,8 @@ where
         };
         let dom = runner.dom();
         let dom_ref = dom.borrow();
-        let Some(rect) = layout.caret_rect_for_position(&*dom_ref, node, caret, 2.0) else {
+        let view = crate::WindowDom::new(&dom_ref, runner.mount());
+        let Some(rect) = layout.caret_rect_for_position(&view, node, caret, 2.0) else {
             return;
         };
         // The seam takes the *platform's* logical coordinates (winit multiplies
@@ -429,12 +444,13 @@ where
         let layout = self.s.layout.as_mut()?;
         let dom = runner.dom();
         let dom_ref = dom.borrow();
+        let view = crate::WindowDom::new(&dom_ref, runner.mount());
         let source = SpriggingSource {
-            rendered: &self.s.rendered,
-            producers: &self.s.producers,
+            rendered: &self.s.shared.rendered,
+            producers: &self.s.shared.producers,
         };
         let mut list = layout.emit_paint_list_with_leaves(
-            &*dom_ref,
+            &view,
             DeviceIntSize::new(lw as i32, lh as i32),
             focused_overlay,
             |key| source.leaf_commands(key),
@@ -448,7 +464,7 @@ where
         // geometry, the shared fade clock supplies alpha.
         let now = crate::Instant::now();
         let fade = &self.s.scrollbar_fade;
-        layout.append_scrollbars(&*dom_ref, &mut list, &|t| fade.alpha(t, now));
+        layout.append_scrollbars(&view, &mut list, &|t| fade.alpha(t, now));
         let paint_capture = self
             .s
             .pending_paint_capture
@@ -556,10 +572,16 @@ where
             wgpu::Color::BLACK
         };
         let phase = crate::Instant::now();
-        let (_tex, view) =
-            surface
-                .core()
-                .rasterize_scaled(scene, pw, ph, ColorLoad::Clear(clear), scale);
+        // Keyed by this host: several windows rasterize through one core, and
+        // an unkeyed raster diffs against whichever surface drew last (F17).
+        let (_tex, view) = surface.core().rasterize_scaled_for(
+            self.s.presentation_host,
+            scene,
+            pw,
+            ph,
+            ColorLoad::Clear(clear),
+            scale,
+        );
         profile.raster_us = elapsed_us(phase.elapsed());
         if let Some(timings) = surface.renderer().last_frame_timings() {
             let span = |name: &str| timings.span(name).map(elapsed_us).unwrap_or_default();
@@ -691,8 +713,8 @@ where
         // device scale alone would point at a control's unzoomed position.
         let layout_scale = self.layout_scale();
         let requests = {
-            let dom = match self.s.runner.as_ref() {
-                Some(runner) => runner.dom(),
+            let (dom, mount) = match self.s.runner.as_ref() {
+                Some(runner) => (runner.dom(), runner.mount()),
                 None => return,
             };
             let dom_ref = dom.borrow();
@@ -701,10 +723,10 @@ where
             };
             // The window is the adapter's own now, so the seam does not carry it.
             a11y.sync(
-                &dom_ref,
+                &crate::WindowDom::new(&dom_ref, mount),
                 layout,
-                &mut self.s.leaves,
-                &mut self.s.producers,
+                &mut self.s.shared.leaves,
+                &mut self.s.shared.producers,
                 self.s.last_focus,
                 layout_scale,
             )
@@ -719,6 +741,34 @@ where
             return;
         }
         for request in requests {
+            let node = match &request.target {
+                crate::A11yTarget::Node(node) => *node,
+                // A drawn node's action button: the node lives in its slot,
+                // so the app's focus goes to the slot (keys then reach the
+                // producer's view, a keyboard move's arrows), and a click is
+                // the producer's to carry out.
+                crate::A11yTarget::Produced(produced) => {
+                    let slot = match (self.s.runner.as_ref(), self.s.layout.as_ref()) {
+                        (Some(runner), Some(layout)) => {
+                            let dom = runner.dom();
+                            let dom = dom.borrow();
+                            let view = crate::WindowDom::new(&dom, runner.mount());
+                            layout
+                                .custom_leaf_nodes(&view)
+                                .into_iter()
+                                .find_map(|(key, node)| (key == produced.slot).then_some(node))
+                        },
+                        _ => None,
+                    };
+                    if let (Some(slot), Some(runner)) = (slot, self.s.runner.as_mut()) {
+                        runner.set_focus(Some(slot));
+                    }
+                    if request.action == A11yAction::Click {
+                        self.s.shared.producers.act(produced);
+                    }
+                    continue;
+                },
+            };
             let Some(runner) = self.s.runner.as_mut() else {
                 break;
             };
@@ -726,11 +776,11 @@ where
                 A11yAction::Click => {
                     // No cursor is involved, so the local point is genuinely the
                     // element's own origin rather than a hit position.
-                    runner.dispatch_click(request.node, PointerClick::at((0.0, 0.0)));
+                    runner.dispatch_click(node, PointerClick::at((0.0, 0.0)));
                 },
-                A11yAction::Focus => runner.set_focus(Some(request.node)),
+                A11yAction::Focus => runner.set_focus(Some(node)),
                 A11yAction::SetValue(value) => {
-                    runner.dispatch_value(request.node, cambium::ValueEvent { value });
+                    runner.dispatch_value(node, cambium::ValueEvent { value });
                 },
             }
         }
@@ -750,10 +800,11 @@ where
         let (x, y) = self.s.cursor;
         let dom = runner.dom();
         let dom_ref = dom.borrow();
-        let hovered_node = layout.hit_test(&*dom_ref, x, y);
+        let view = crate::WindowDom::new(&dom_ref, runner.mount());
+        let hovered_node = layout.hit_test(&view, x, y);
         let focused_node = runner.focus();
-        let hovered = hovered_node.map(|n| layout_dom_api::LayoutDom::opaque_id(&*dom_ref, n));
-        let focused = focused_node.map(|n| layout_dom_api::LayoutDom::opaque_id(&*dom_ref, n));
+        let hovered = hovered_node.map(|n| layout_dom_api::LayoutDom::opaque_id(&view, n));
+        let focused = focused_node.map(|n| layout_dom_api::LayoutDom::opaque_id(&view, n));
         if (hovered, focused) == (self.s.last_hover, self.s.last_focus) {
             return;
         }
@@ -763,8 +814,8 @@ where
         // hover/focus transition runs from now rather than a stale
         // idle-frozen clock.
         let now_s = self.s.anim_base.elapsed().as_secs_f64();
-        let _ = layout.tick_animations(&*dom_ref, now_s);
-        if layout.set_interaction(&*dom_ref, hovered_node, focused_node) {
+        let _ = layout.tick_animations(&view, now_s);
+        if layout.set_interaction(&view, hovered_node, focused_node) {
             drop(dom_ref);
             if let Some(window) = self.s.window.as_ref() {
                 window.request_redraw();

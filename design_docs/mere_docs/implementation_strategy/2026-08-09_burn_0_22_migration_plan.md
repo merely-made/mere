@@ -4728,3 +4728,136 @@ The coordinator's port rule holds: no other process named or held 8853.
 Main has since gained `e8b440be`, a dynamics grammar plan record only. It is
 not merged here, and it merges cleanly. S16 remains the coordinator's. No
 push.
+
+### 13.46 Knot's repin onto pre.4: two rulings (2026-10-05)
+
+Ruling 557's first handoff: knot-editor's `mere-pre4-repin` branch, off
+Knot's origin/main `5516606`, moves 42 mere rows in three manifests from
+`c79bb8c2` to `07db35e2`. Genet stays on `bd3e8861` and smolweb on
+`882baeb1`. Knot compiled with no source edits. Evidence is in
+`Code/testing/knot-editor/pre4-repin/`. They are wing rulings 585 and 586 (Isometry
+`1b7ca69`).
+
+**Ruling 585: Knot's CubeCL persistence.** The question as put: pristine
+`cubecl-runtime 0.11.0-pre.4` turns `persistence` on by default (checked in
+its manifest), which pulls in turso 0.8.0-pre.13. Mere avoids that with
+ruling 375's patch tree, but `[patch]` does not carry across workspaces, so
+standalone Knot takes upstream's default. The options:
+- "Mirror 375 via mere's git (Recommended)": one `[patch.crates-io]` row,
+  `cubecl-runtime` from mere.git at the same rev. Nothing is vendored. The
+  lock has 1,278 packages, with no turso or SQLite, and the embedding graph
+  886. Each repin moves one more row, and Knot depends on mere keeping the
+  patch until upstream fixes the default.
+- "Pristine upstream": 1,338 packages with turso's cone of about 55 crates
+  (embedding graph 941), and `cc` pinned to 1.4.7 for turso's `aegis`.
+
+Mark: **"Mirror 375 via mere's git (Recommended)"**. *Follows:* Knot's root
+patch table takes `cubecl-runtime` from mere.git at the rev its mere rows
+pin, and the row moves with them at every repin. Its default-feature graph
+(790 packages, no Burn, CubeCL or turso) is the same under both options, so
+only the embedding gates, the duplicate check and `--locked` rerun.
+
+**Ruling 586: djinn's patch rows for Knot's scene crates.** The question as put: since
+`5516606`, Knot names `scenograph` and `scenomise` from mere.git. Mere's
+`[patch."…mere.git"]` table lacks both (it has `sceno` and `scenotime`
+only), so djinn's graph carries second copies. It still compiles (252 s)
+because no types cross between them. With the two rows added, every
+duplicate clears (34 s). The options: add both rows in the mere change that
+moves djinn's Knot pin to Knot's new head; or add them on mere main now.
+Mark: **"With djinn's Knot repin (Recommended)"**. *Follows:* once Knot's
+repin is pushed, one mere change moves djinn's Knot pin from `562353aa` to
+the new head and adds the two rows. That also drops the second genet copy
+(`layout-dom-api` at `69a2383b`) mere carries today through the stale pin.
+
+**How djinn's lane gets Knot `54bb8cd` (2026-10-05).** The question as put:
+cargo's git cache lacks knot-editor `54bb8cd`, because the Knot lane tested
+djinn through a path patch, so the lock cannot resolve offline. The fetch is
+8 commits and 103 objects past what is cached. The options: fetch it from the
+local checkout into cargo's cached repository, with no network; let cargo
+fetch it from GitHub once; hold the lane. Mark: **"From the local
+checkout"**. *Follows:* the commit is fetched from
+`Code/repos/knot-editor` into cargo's knot-editor repository under cargo's
+`refs/commit/<sha>` naming, and the lane resolves offline. The hash is the
+pushed head, so the content is GitHub's. *Reading, not ruled:* that GitHub
+serves the commit is proven by the first networked fetch elsewhere, not
+here.
+
+**Who adapts Knot to stack seams P1 (2026-10-05).** The question as put:
+stack seams P1 (on origin since `19e6dc9f`) made
+`compile_relationship_snapshot` a `ProjectionCompiler` method, built from
+host-supplied `ItemSizes`, with no default card on purpose. Knot `54bb8cd`
+still calls the old free function (`crates/knot-composition/src/retention.rs:39`,
+plus a desktop site and a test site). djinn's repin with ruling 586's
+`scenomise` row therefore fails to compile (E0425 in `knot-composition`). It
+compiles today only because mere serves no `scenomise` to Knot. Under the
+lockstep rule Knot adapts first, and it must choose its own card size. The
+options: P1's own session adapts Knot; this coordinator's Knot lane adapts it;
+land djinn now with only the `scenograph` row; hold djinn. Mark: **"My
+Knot lane adapts Knot"**. *Follows:* a Knot lane repins Knot onto mere's
+origin and moves its three call sites to `ProjectionCompiler`. Knot's card
+size comes back to Mark as a fork. djinn's repin waits, then moves to that
+Knot head with both 586 rows.
+
+**Knot's card size under P1 (2026-10-05).** The question as put: Knot is
+adapted to P1 (12 calls moved to a `ProjectionCompiler`, all its headless
+recipe tests pass) against a placeholder card. S20 has the host supply "the
+representation's measured size". Knot has never had one of its own: it draws
+each card at the footprint the compiler returns, and retention validation's
+accept or reject does not depend on the size. P1 changes Knot's spacing
+(card plus gap, no longer a fixed 184 by 84 cell) whichever size is chosen. The
+options: one 164 by 68 constant in knot-composition behind a single
+`recipe_compiler()`; measured from Knot's font, the widest occurrence label
+plus button padding per recipe; 184 by 84. Mark: **"Measured from Knot's
+font"**. *Follows:* the desktop measures each recipe's widest occurrence
+label in its own font, plus button padding, and gives the compiler that
+size, so the layout re-solves with font, zoom and labels. *Reading, not
+ruled:* retention validation has no fonts, so it still needs a nominal size.
+That number, the measuring path and the padding come back as forks.
+
+**How Knot measures its card (2026-10-05, four questions in one round).**
+Evidence from Knot's harness, with the real desktop sheet and bundled fonts:
+the host has no text-measure API but exposes the last layout's rects
+(`AppCtx::painted_rect`). The card is the label width plus 1 px of rounding
+plus 22 (the declared `padding:6px 10px` and 1 px border), by 31 (one 17 px line
+plus 14). The control: at the exact width, 2 of 4 labels stay on one line; at
+1 px wider, all 4; at 1 px narrower, none. The pressed card is semibold
+(`readings.rs:28`). Sizes are identical at UI zoom 1, 2 and 4. Validation gives
+byte-identical outcomes for five cases at seven sizes (164 by 68, 1 by 1, 0 by
+0, NaN, 1e6) and never reads geometry.
+
+- How to measure. Options: read the previous layout through role-less,
+  `aria-hidden` probe spans; shape the text directly with genet-parley.
+  Mark: **"Read the previous layout (Recommended)"**. The drawn string is
+  probed at weight 600 and read through `painted_rect` in the frame hook. The
+  result is stored by label set, and the probes are removed once measured.
+- The first frame after labels change. Options: hide the scene for one frame;
+  show the old or nominal size. Mark: **"Hide the scene one frame
+  (Recommended)"**.
+- The card's shape. Options: one line with no width cap; keep the 68 px
+  minimum height; cap the width and measure the wrapped height. Mark: **"One
+  line, no width cap (Recommended)"**. The widest label sets every card's
+  width.
+- Validation's nominal size. Options: a named 164 by 68 constant; a 1 by 1
+  sentinel. Mark: **"Named 164×68 constant (Recommended)"**. The constant is
+  validation-only and lives in knot-composition, shared by the desktop's four
+  action gates and the tests. Only the view's draw call takes the measured
+  compiler.
+
+*Annotation, 2026-10-05:* the next move of djinn's Knot pin is not this
+plan's. Under mer3ly Ruling 112, the Projection grammar session owns the
+genet `image-decode` chain (mer3ly Ruling 111). It runs mere's genet repin
+to `bf723d5d532`, then Knot's genet repin and push, then djinn's Knot pin to
+that Knot head, and finishes with one copy of each genet crate in mere's
+graph. The order is seiche-speed first, then djinn's repin onto `54bb8cd`, then
+that chain.
+
+**Findings, not ruled.** Each predates the repin.
+- Windows checkouts get CRLF in `assets/oewn-notices.txt` and
+  `tests/fixtures/wordnet.xml` through `.gitattributes`, which fails 7
+  `wordnet_import` tests. Control: LF bytes pass.
+- Windows defaults to the title-bar chrome, which hides toolbar buttons
+  Knot's headed scenarios press. Only a test can choose the plain toolbar.
+- `source_beside_preview` crashes in genet-livery `atomic_basis.rs:288` on
+  the baseline too.
+- Knot's `LICENSES.md` is mere's 2026-08-27 ledger, carried over by the
+  extraction. It names paths Knot does not have.

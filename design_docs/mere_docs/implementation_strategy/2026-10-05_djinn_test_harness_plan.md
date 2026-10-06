@@ -1,9 +1,9 @@
 # djinn Test Harness Plan
 
 **Date**: 2026-10-05
-**Status (2026-10-05)**: assessed; all ten forks ruled (§3). Next: H1 to H3
-in a lane. No code
-changed. The vault lock plan's build waits on this harness (its ruling 18).
+**Status (2026-10-05)**: all forks ruled (§3, rulings 1 to 13). H1 to H3
+landed on `main` (`318b8f70`), the graceful stop fixed (ruling 11). H4 to H6
+open; H4 is built with the vault lock (its ruling 18).
 **Scope**: one shared, tested way to run djinn residents under test:
 isolated, observed without scraping logs, stopped and restarted, held
 behind enforced walls around the installed resident, and recorded as
@@ -257,26 +257,49 @@ test with outcomes unchanged, then the lock receipts, other helpers when
 touched; the lock receipts only; everything now. Mark: **"D1 and D1b, then
 the lock (Recommended)"**.
 
+**Ruling 11.** *The harness found that djinn's graceful stop with personal
+sync on exits 1 ("still has active borrowers", `resident.rs:303`,
+`resident_blobs.rs:255`): sync's background tasks outlive the run loop.
+Ctrl-C takes the same path.* Options: fix it in this lane; its own lane.
+Mark: **"Fix it in this lane (Recommended)"**.
+
+**Ruling 12.** *The installed resident is told apart by an `--installed`
+flag the installer passes; manual runs need it or explicit endpoints, and
+the legacy launcher passes none.* Options: keep the flag; detect by install
+path; the flag, with the legacy launcher updated too. Mark: **"Keep the
+flag (Recommended)"**. Follows: the legacy launcher retires at the pairing
+plan's D2 switch.
+
+**Ruling 13.** *Six smaller choices as built:* stop as its own
+`resident-control-v1` route, so granting status never grants stop; the
+guard's installed-locations list mirroring the installers' paths,
+overridable, empty on Unix; the crate under `crates/system`, since crates
+may not depend on ports; status read by running `djinn --resident-status`,
+avoiding a dependency cycle; the canary design, with receipts defaulting to
+`%TEMP%\djinn-receipts`; a Linux test bus left to H5. Options: accept all
+six; review each. Mark: **"Accept all six (Recommended)"**.
+
 ## 4. Phases
 
 Drafted from the assessment; set once the forks are ruled.
 
 - **H1 — isolated resident.** Done when:
-  - [ ] a spawn redirects every root and endpoint, and an incomplete list
+  - [x] a spawn redirects every root and endpoint, and an incomplete list
         is refused;
-  - [ ] readiness needs no log scraping;
-  - [ ] kill, graceful stop and restart work on the same roots;
-  - [ ] no orphans remain if the test process dies;
-  - [ ] D1 and D1b run on the harness with unchanged outcomes, the lines
-        removed from them counted.
+  - [x] readiness needs no log scraping;
+  - [x] kill, graceful stop and restart work on the same roots;
+  - [x] no orphans remain if the test process dies;
+  - [x] D1 and D1b run on the harness with unchanged outcomes, the lines
+        removed from them counted. *(D1b's second restart is a race, not a
+        fixed outcome: see §6, 2026-10-05, landed.)*
 - **H2 — walls.** Done when:
-  - [ ] no pinned PID and no kill by name remain;
-  - [ ] the installed identity and its pipes are recorded identical before
+  - [x] no pinned PID and no kill by name remain;
+  - [x] the installed identity and its pipes are recorded identical before
         and after every run;
-  - [ ] each wall has a refusal test.
+  - [x] each wall has a refusal test.
 - **H3 — records.** Done when:
-  - [ ] every run writes the versioned record;
-  - [ ] a verifier recomputes its evidence hashes.
+  - [x] every run writes the versioned record;
+  - [x] a verifier recomputes its evidence hashes.
 - **H4 — the lock's seams.** Done when:
   - [ ] the status route reports lock state and startup mode;
   - [ ] fake triggers and a fake clock work in-process, and scripted
@@ -317,3 +340,72 @@ Controls, each of which must fail where it should:
 
 **2026-10-05.** Assessed by a read-only lane (Opus); the load-bearing claims
 re-checked in code. Nothing built. Next: Mark's rulings on §3.
+
+**2026-10-05, H1 to H3 built** (Opus lane, `38ed523a` and `c55faaff`, not
+merged):
+
+- **`crates/system/djinn-testkit`** (unpublished, depending on no djinn,
+  castellan, personae or graphshell code) holds:
+  - a run with a machine-wide lock, an opt-in quiet mode, load samples, and
+    a kill-on-close job;
+  - an isolated `Resident` with readiness by enumerated pipes plus the
+    status route, kill, stop and restart;
+  - the guard, which refuses standard endpoints, `--installed`, missing
+    redirects and a bus it did not start;
+  - the walls (the installed resident by path, PID and start time; pipes
+    enumerated, never opened; canary times);
+  - the `mere.djinn.receipt/v1` record with `verify` and a summary
+    renderer.
+- **On djinn's side:**
+  - `resident-status-v1` and `resident-control-v1` (stop), granted to the
+    `djinn` label only, with `--resident-status` and `--stop-resident`;
+  - `--events-file`, `--log-filter` and `--installed`; the Windows
+    installer passes `--installed`;
+  - castellan's Unix receipt listener refuses the user's `SSH_AUTH_SOCK`.
+- **Results:**
+  - D1 on the harness passed, its stopped peer not connected after 14.3 s.
+  - D1b failed at its second restart, as pairing ruling 36 expects.
+  - The two files went from 795 to 340 lines, 311 fewer net of a shared
+    144-line module.
+  - Controls C1, C3, C4 and C5 each failed where they should, and every
+    record verified.
+  - The installed resident (PID 14756, `graphshell-device-host.exe`,
+    started 05:06:01) was identical before and after every run.
+- **One condition red:** a graceful stop with sync on exits 1 (ruling 11).
+- **Gates:** djinn, djinn-testkit, personae and castellan pass, and the
+  lock adds only the new crate. djinn's own Linux cross-check cannot run
+  here (ring's C build needs a cross compiler; chatelaine ruling 57 moves
+  such checks to the ThinkPad).
+
+**2026-10-05, H1 to H3 landed** (`318b8f70`, merging `38ed523a`,
+`c55faaff` and `45216587`):
+
+- **The fix (ruling 11), `45216587`.** graphshell's `ResidentTasks`
+  (`ports/graphshell/src/native/tasks.rs`) scopes the tasks a resident
+  spawns. djinn's stop path aborts and joins them before the release checks,
+  so the route and blob-store borrowers they held are gone when shutdown
+  asks.
+- **Verified in `mere-verify`.** First the branch merged on `add54925`
+  (`6ed24c46`), then again on `a8116320` (`935e10ce`) after `main` moved 20
+  commits:
+  - djinn, djinn-testkit, personae and castellan tests, graphshell's library
+    tests, and the `cargo_mode` gate passed;
+  - the four live harness tests passed both times (the canary test's
+    record is marked failed by design: it proves the canary catches an
+    unguarded root);
+  - D1 passed, the stopped peer not connected after 13.9 s.
+  - D1b passed outright on `6ed24c46`, its second restart included.
+- **Reading, not ruled:** the second restart is the HyParView race (pairing
+  ruling 72 waits for upstream). It opens only when a Neighbor message
+  overtakes a Join, so one pass means this run did not hit it, not that it
+  is gone.
+- **Control (ruling 11):** with `cancel_and_join` removed from djinn's stop
+  path, the graceful-stop test failed with exit 1: "published-site route
+  still has active borrowers; blob custody: resident blob store still has
+  active borrowers". With the call restored, it passes.
+- **The installed resident** (PID 14756, started 05:06:01) was identical
+  before and after both runs.
+- **What landed:** the tree on `main` is `935e10ce` plus `main`'s four
+  later files (docs and one wasm-only removal in
+  `cambium-genet-web-host`).
+- **Next:** H4, the lock's seams, built with the vault lock (L1 to L4).
