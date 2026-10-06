@@ -1,8 +1,8 @@
 # Stack seams plan: catalog, shared device, actions, determinism, two words
 
 **Date:** 2026-10-04
-**Status (2026-10-06):** in progress. Thirty-seven rulings in thirteen rounds
-(S1 to S37); P1 landed on main (`1633be0c`); P2 staged (S27 to S31, four
+**Status (2026-10-06):** in progress. Forty-one rulings in fourteen rounds
+(S1 to S41); P1 landed on main (`1633be0c`); P2 staged (S27 to S31, four
 stages in §3.1) and landed on main (`40d7ae5e`); S32 (F19) landed on main
 (`48c08dee`); the S14 pass (S33) under way; P3 and S7 done as documents; S3 to
 S6 carried into the dynamics grammar plan (G8, G9); S9 done by the identity
@@ -648,6 +648,43 @@ Follows: the session that built `reference-data` is asked what it intended,
 and its answer comes back to Mark as this question's evidence; the lexical
 plan's record (batch 35) stands meanwhile.
 
+Round 14, 2026-10-06, during phase B. Evidence: batches 39 to 46 (96 plans)
+and the drafts' "Forks for Mark" lists, about 80 so far.
+
+**Ruling S38.** *Phase B has turned up about 80 design forks, most belonging
+to their plan's own lane rather than to this status pass. How should they be
+handled?* Options: phase C writes each into its plan as a dated "Open, raised
+by the S14 pass" note and only forks that block a status correction or an
+archive move come to Mark; every fork to Mark in rounds; one forks ledger.
+Mark: **"Route to lanes (Recommended)"**. Follows: phase C records each fork
+in its own plan with its options; Mark is asked only where a status line or an
+archive move cannot be written without the answer.
+
+**Ruling S39.** *About 30 plans describe meerkat code as landed or live; how
+does phase C word their status?* Options: landed, then retired with meerkat,
+with survivors and open items named; count only surviving library code as
+landed; reopen meerkat-only work against Turnstone. Mark: **"Landed, then
+retired (Recommended)"**. Follows: such a status reads "landed in meerkat on
+<date>, retired with it 2026-07-18 (`c5f01064`); surviving library parts:
+...; open: ...", and a plan with nothing else open is extracted and archived
+under S36.
+
+**Ruling S40.** *Merge `0a8198ba` (2026-09-06) dropped inker's `LICENSE-MIT`
+and `LICENSE-APACHE`, which LICENSES.md says are not to be deleted. Restore
+them or accept the deletion?* Options: restore from the merge's first parent;
+accept the deletion and amend LICENSES.md. Mark: **"Eh, they're supposed to be
+mpl-2.0"**. Follows: the files stay deleted; inker is MPL-2.0 like the rest of
+the workspace, and LICENSES.md's inker and tinct rows and its "not to be
+deleted" sentence are amended in phase C. *Reading, not ruled*: the versions
+already on crates.io keep the grant they were published under.
+
+**Ruling S41.** *S37 said to ask `reference-data`'s lane, but no reachable
+session built it (no Claude transcript has its code; the Knot composition
+work beside it sits next to a `codex/knot-composition` branch). Who answers?*
+Options: Mark asks that Codex session; the active Knot lane answers; rule it
+now. Mark: **"Rule it now"**. Follows: S37's question goes back to Mark
+directly, in round 15.
+
 ## 3. Phases
 
 ### 3.1 This plan's lane
@@ -787,6 +824,17 @@ The done-conditions handed over for S3 and S4, kept for reference:
   works in `projection_compile`. Second pass (F8 to F11), rulings S7 to S10:
   the README fixed (S7), TERMINOLOGY gains pandect under Eidetic and the
   curation record (S8, S10), S9 sent to the identity lane.
+- **2026-10-06.** Phase B, batches 39 to 46 recorded (96 plans; the
+  per-batch counts are in each record), each drafted by a read-only subagent
+  and checked by an independent read-only verifier whose corrections are
+  applied, with a direct sample per batch. No verifier refuted a record
+  outright; one claim was half refuted (B7, `is_surface_engine` survives) and
+  roughly six items per batch held only in part. Findings past the documents:
+  three first-party manifests pin `sha2` 0.10 against the ruled 0.11 row
+  (djinn, Pelt, the session fixture); 61 owned sources lack the MPL Exhibit A
+  header; merge `0a8198ba` dropped inker's notice files (S40). Round 14: S38
+  (forks routed to lanes), S39 (meerkat-era wording), S40 (inker stays
+  MPL-2.0) and S41 (S37 ruled directly).
 - **2026-10-06.** Round 13: S34 (a newer batch record supersedes the
   snapshot's), S35 (the three receipts renamed, S10's flattened), S36 (plans
   found complete are extracted and archived) and S37 (`reference-data`'s lane
