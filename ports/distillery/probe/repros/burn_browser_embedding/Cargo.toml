@@ -27,6 +27,5 @@ web-sys = "=0.3.99"
 burn = { version = "=0.22.0", default-features = false, features = ["std", "wgpu"] }
 
 [patch.crates-io]
-burn-cubecl = { path = "../../../../../support/patches/burn-cubecl" }
 cubecl-runtime = { path = "../../../../../support/patches/cubecl-runtime" }
 cubek-reduce = { path = "../../../../../support/patches/cubek-reduce" }

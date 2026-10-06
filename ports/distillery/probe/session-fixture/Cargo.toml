@@ -19,3 +19,6 @@ safetensors = "0.4"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 sha2 = "0.10"
+
+[patch.crates-io]
+cubecl-runtime = { path = "../../../../support/patches/cubecl-runtime" }
