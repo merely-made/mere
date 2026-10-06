@@ -89,7 +89,9 @@ fn current_profile_is_refused_while_locked() {
 fn slot_is_refused_while_locked() {
     let dir = tempdir().unwrap();
     let vault = locked_over_open_storage(dir.path());
-    assert!(is_locked_error(vault.slot(&ProtocolKey::new("nostr", None))));
+    assert!(is_locked_error(
+        vault.slot(&ProtocolKey::new("nostr", None))
+    ));
 }
 
 #[test]
@@ -158,6 +160,28 @@ fn the_public_view_survives_a_lock() {
     assert_eq!(vault.master_public_key(), master);
     assert_eq!(before.slots.len(), 1);
     assert_eq!(before.slots[0].kind, "nostr");
+}
+
+/// Production vaults hold `Box<dyn IdentityStorage>` (the bootstrap ladder)
+/// or a borrowed storage; the delegates must pass the lock through.
+#[test]
+fn boxed_and_borrowed_storages_lock_through_their_delegates() {
+    let dir = tempdir().unwrap();
+    let sealed = sealed_vault(dir.path());
+    let id = ProfileId("work".into());
+    let storage: Box<dyn IdentityStorage> =
+        Box::new(SealedProfileStorage::open_with_key(dir.path(), ROOT));
+    let mut boxed = IdentityVault::open(storage, &id).unwrap();
+    boxed.lock().unwrap();
+    assert!(boxed.storage().is_locked());
+    assert!(is_locked_error(boxed.storage().load_profile(&id)));
+
+    let inner = SealedProfileStorage::open_with_key(dir.path(), ROOT);
+    let mut borrowed = IdentityVault::open(&inner, &id).unwrap();
+    borrowed.lock().unwrap();
+    assert!(inner.is_locked());
+    assert!(is_locked_error(inner.load_profile(&id)));
+    drop(sealed);
 }
 
 // ─── Ruling 27: no lock nobody can undo ───────────────────────────────────
@@ -271,7 +295,9 @@ fn a_passphrase_vault_takes_no_os_presence() {
     assert!(storage.is_locked());
     assert!(storage.unlock(UnlockMethod::Passphrase(b"wrong")).is_err());
     assert!(storage.is_locked());
-    storage.unlock(UnlockMethod::Passphrase(PASSPHRASE)).unwrap();
+    storage
+        .unlock(UnlockMethod::Passphrase(PASSPHRASE))
+        .unwrap();
     assert!(storage.load_profile(&ProfileId("work".into())).is_ok());
 }
 
@@ -302,7 +328,9 @@ fn a_locked_passphrase_storage_refuses_every_profile_call() {
     storage.save_profile(&profile("work", 0x44)).unwrap();
     storage.lock();
     every_profile_call_is_refused(&storage);
-    storage.unlock(UnlockMethod::Passphrase(PASSPHRASE)).unwrap();
+    storage
+        .unlock(UnlockMethod::Passphrase(PASSPHRASE))
+        .unwrap();
     assert!(storage.load_profile(&ProfileId("work".into())).is_ok());
 }
 
