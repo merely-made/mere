@@ -1,5 +1,18 @@
 # Burn 0.22 Migration Plan
 
+**Status (2026-10-06):** pre.4 is production. S16 ran on 2026-10-05: the
+coordinator merged the pre.4 branch into main at `cec0b3a4` and pushed it
+with Mark's approval, origin/main then at `07db35e2` (§13.44). Main's root
+lock holds Burn and burn-remote `0.22.0-pre.4` and CubeCL `0.11.0-pre.4`,
+and 33 manifest rows pin `=0.22.0-pre.4`. S17, Knot: Knot's repin onto
+`07db35e2` is on Knot's origin/main (`54bb8cd`), its P1 adaptation is not
+pushed, and djinn's Knot pin is still `562353aa` (§13.46). S18, Isometry:
+waits until Isometry's checkpoint 9 merges (§13.44, wing ruling 572).
+Stable 0.22 closure remains release-gated. Whether to retire the parked
+pre.3 lane is open (§13.12, S0-8). The dated entries below keep their
+scope; the paragraphs labelled Status from 2026-09-27 and earlier describe
+the pre.2 row as it then stood.
+
 **2026-10-05, later: ruling 567, main `9680306d` (§13.45).**
 
 - The probe, repro and OPFS runners build with the repo's pinned toolchain,
@@ -8,7 +21,8 @@
 - A planted uninstalled channel fails each runner before any cargo command.
 - The four bundles are rebuilt on 1.98.1 and their rows and controls pass.
 - Main `9680306d` is merged, and the gates and headed set pass.
-- S16 is the coordinator's.
+- S16 is the coordinator's. *Annotation, 2026-10-06 (S14 pass):* S16 ran
+  later on 2026-10-05 (`cec0b3a4`; the status above, §13.44).
 
 **2026-10-05 rulings 557 to 559 (§13.44):**
 
@@ -33,7 +47,8 @@
   surface now has one.
 - **Main.** Main `8f61b367` is merged (`eba741c5`). The changed cones pass,
   and so do the headed P5 receipts under the gate.
-- S16 has not started.
+- S16 has not started. *Annotation, 2026-10-06 (S14 pass):* S16 ran on
+  2026-10-05 (`cec0b3a4`; the status above, §13.44).
 
 **2026-10-04 rulings 545 and 546, the receipt gate, main `63345c17` (§13.38, §13.39):**
 graphshell-web, `cambium-genet-web-host` and the probe run wasm-bindgen
@@ -50,7 +65,8 @@ graphs, and the constructor helper lives in `cambium-genet-web-host`.
   decoder row pass under the gate.
 - The quiet A/B counted no repetition under its bound (0 of 80). That and
   the OPFS control go back as forks.
-- S16 has not started.
+- S16 has not started. *Annotation, 2026-10-06 (S14 pass):* S16 ran on
+  2026-10-05 (`cec0b3a4`; the status above, §13.44).
 
 **2026-10-03 S15 annotation:** the 2026-08-20 status below describes the pre.2
 row, including its "one `libsqlite3-sys` 0.38.2" sentence. On the pre.4 branch
@@ -598,6 +614,12 @@ Stop on any of these conditions:
   §13.30 records two main merges, 169 checksum-verified downloads under
   ruling 378, the native, headed and graph gates, and two forks held: the
   ruling 411 repair, and the pre.4 wasm constructor cost.
+
+- **2026-10-05** (recorded 2026-10-06 by the S14 pass): S16 ran under
+  ruling 557. The coordinator merged the pre.4 branch into main at
+  `cec0b3a4` and pushed it, origin/main then at `07db35e2`, so main is on
+  pre.4 (§13.44). Knot's repin (S17) began the same day (§13.46);
+  Isometry's (S18) waits for its checkpoint 9.
 
 ## 12. Pre.3 repin execution plan (2026-09-16)
 
@@ -1710,6 +1732,20 @@ can wait for S16.
   Mark says otherwise; (b) after S16, remove the worktree and delete the branch;
   (c) keep the branch as archaeology and remove only the worktree. **Recommend
   (a) for now**, and decide at S16.
+  **Open, raised by the S14 pass (2026-10-06): retire the parked pre.3 lane
+  now that pre.4 is production?** §13.13 answered S0-8 on 2026-09-27:
+  "preserve the parked pre.3 branch, worktree and uncommitted work". The
+  revisit this item set for S16 is not recorded, though S16 ran on
+  2026-10-05 (`cec0b3a4`, §13.44) and main is on pre.4. The lane is still
+  there: `burn-pre3-repin` holds four unmerged commits (`276608d5`,
+  `e1c0cb44`, `31102555`, `610a32c5`, the last on 2026-09-16), and
+  `Code/worktrees/mere-burn-pre3` has 11 uncommitted paths. The options, as
+  this item put them:
+  - (a) leave both until Mark says otherwise, as §13.13 answered;
+  - (b) remove the worktree and delete the branch;
+  - (c) keep the branch as archaeology and remove only the worktree.
+
+  This pass decides none of them.
 - **S0-9. Network during execution.** Every pre.4 burn, cubecl and cubek crate
   is already cached, and so is the 0.2.122 CLI; a nested workspace may still
   want an uncached crate. Options: (a) allow crates.io crate downloads when an
@@ -4727,7 +4763,8 @@ The coordinator's port rule holds: no other process named or held 8853.
 
 Main has since gained `e8b440be`, a dynamics grammar plan record only. It is
 not merged here, and it merges cleanly. S16 remains the coordinator's. No
-push.
+push. *Annotation, 2026-10-06 (S14 pass):* S16 ran later on 2026-10-05
+(`cec0b3a4`; §13.44's annotation).
 
 ### 13.46 Knot's repin onto pre.4: two rulings (2026-10-05)
 
