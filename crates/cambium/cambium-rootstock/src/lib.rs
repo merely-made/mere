@@ -866,6 +866,7 @@ mod frame;
 mod host;
 mod input;
 mod spatial;
+mod tree;
 mod wake;
 mod window_verbs;
 
@@ -886,11 +887,13 @@ pub mod meristem_bounds {
 
 pub use capture::{Frame, read_frame};
 pub use host::{
-    AppCtx, AppFrameInsets, AppHook, CaptureFn, CloseDisposition, CloseRequest, CloseRequestHook,
-    FocusedTextHook, FocusedTextSlot, FrameHook, FrameProfile, Hook, Host, HostFont, HostHooks,
-    HostImage, HostOptions, HostPointer, HostState, IdlePolicy, Init, KeyInterceptHook,
-    PaintCaptureFn, PresentationObserver, PresentedFrame, RelayoutProfile, Runner, ScrollIntoView,
-    StampedCaptureFn, WindowFrame, ZOOM_LADDER, env_size, fit_zoom, ladder_step,
+    AppCtx, AppFrameInsets, AppHook, AppShared, CaptureFn, CloseDisposition, CloseRequest,
+    CloseRequestHook, FocusedTextHook, FocusedTextSlot, FrameHook, FrameProfile, Hook, Host,
+    HostFont, HostHooks, HostImage, HostOptions, HostPointer, HostState, IdlePolicy, Init,
+    KeyInterceptHook, PaintCaptureFn, PresentationObserver, PresentedFrame, RelayoutProfile,
+    Runner, ScrollIntoView, StampedCaptureFn, WindowFrame, ZOOM_LADDER, env_size, fit_zoom,
+    ladder_step,
 };
+pub use tree::HostTree;
 pub use wake::HostWake;
 pub use window_verbs::{AppRegion, WindowCommand, WindowCommands, WindowGeometry};

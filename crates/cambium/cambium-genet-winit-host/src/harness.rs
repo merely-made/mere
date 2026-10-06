@@ -193,7 +193,7 @@ where
         let dom = std::rc::Rc::new(std::cell::RefCell::new(
             genet_scripted_dom::ScriptedDom::new(),
         ));
-        s.sheet = sheet;
+        s.shared.sheet = sheet;
         s.set_resources(fonts, images);
         s.runner = Some(Runner::new(dom, logic, state));
         let wake = HostWake::new(s.wake_pending.clone(), std::sync::Arc::new(|| {}));
@@ -412,7 +412,7 @@ where
             name: "harness",
             dom: &dom_ref,
             rect: [0.0, 0.0, w, h],
-            sheet: &self.host.s.sheet,
+            sheet: &self.host.s.shared.sheet,
         }])
     }
 
@@ -661,8 +661,8 @@ where
         cambium_winit_a11y::project_tree(
             &dom_ref,
             layout,
-            &mut core.s.leaves,
-            &mut core.s.producers,
+            &mut core.s.shared.leaves,
+            &mut core.s.shared.producers,
             core.s.last_focus,
         )
     }
@@ -732,8 +732,8 @@ where
         let (_, _, produced) = cambium_winit_a11y::project_tree_with_actions(
             &dom_ref,
             layout,
-            &mut core.s.leaves,
-            &mut core.s.producers,
+            &mut core.s.shared.leaves,
+            &mut core.s.shared.producers,
             core.s.last_focus,
         );
         produced

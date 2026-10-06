@@ -23,8 +23,8 @@ use netrender::NetrenderOptions;
 use crate::meristem_bounds::RootView;
 use crate::wake::HostWake;
 use crate::{Accessibility, HostWindow, Surface, WindowCommands, WindowGeometry};
+use crate::{HostTree, OwnedLayout, ScrollAlign, ScrollTarget};
 use crate::{KeyPress, Modifiers};
-use crate::{OwnedLayout, ScrollAlign, ScrollTarget};
 
 /// An application-level close request. Native window chrome and an app's own
 /// Close command deliberately use the same path.
@@ -71,8 +71,8 @@ pub type StampedCaptureFn =
     Box<dyn FnOnce(&dyn Surface, &wgpu::TextureView, PresentedFrame) + 'static>;
 
 /// One-shot read-only observation, before capture callbacks and pointer/AT input.
-pub type PresentationObserver<State, Logic, V> =
-    Box<dyn FnOnce(&AppCtx<'_, State, Logic, V>, PresentedFrame)>;
+pub type PresentationObserver<State, Logic, V, T = Runner<State, Logic, V>> =
+    Box<dyn FnOnce(&AppCtx<'_, State, Logic, V, T>, PresentedFrame)>;
 
 fn next_host_identity() -> u64 {
     static NEXT: AtomicUsize = AtomicUsize::new(1);
@@ -635,13 +635,14 @@ pub struct ScrollIntoView {
 
 /// What the application sees inside a hook. One shape for every hook so the
 /// application-side plumbing stays boring.
-pub struct AppCtx<'a, State: 'static, Logic, V>
+pub struct AppCtx<'a, State: 'static, Logic, V, T = Runner<State, Logic, V>>
 where
     Logic: FnMut(&State) -> V,
     V: RootView<State>,
 {
-    /// The runner: state access, updates, and dispatch.
-    pub runner: &'a mut Runner<State, Logic, V>,
+    /// The runner: state access, updates, and dispatch. A single-window
+    /// host's [`Runner`]; under a multi-window host, this window's projection.
+    pub runner: &'a mut T,
     /// The host-owned retained layout for read-only geometry queries.
     ///
     /// Kept private to the crate so an application cannot couple itself to
@@ -700,7 +701,7 @@ where
     /// Arm a capture of the next presented frame.
     pub capture: &'a mut Option<CaptureFn>,
     /// Optional one-shot state seal for the next successful presentation.
-    pub presentation_observer: &'a mut Option<PresentationObserver<State, Logic, V>>,
+    pub presentation_observer: &'a mut Option<PresentationObserver<State, Logic, V, T>>,
     /// Optional branded readback of the same presentation as the state seal.
     pub capture_stamped: &'a mut Option<StampedCaptureFn>,
     /// Arm a one-shot paint-envelope capture. When armed with `capture`, both
@@ -731,8 +732,9 @@ where
     pub frame_profile: Option<FrameProfile>,
 }
 
-impl<State, Logic, V> AppCtx<'_, State, Logic, V>
+impl<State, Logic, V, T> AppCtx<'_, State, Logic, V, T>
 where
+    T: HostTree<State>,
     Logic: FnMut(&State) -> V,
     V: RootView<State>,
 {
@@ -790,12 +792,14 @@ where
 }
 
 /// A per-frame hook: return `true` to keep frames coming.
-pub type FrameHook<State, Logic, V> = Box<dyn FnMut(&mut AppCtx<'_, State, Logic, V>) -> bool>;
+pub type FrameHook<State, Logic, V, T = Runner<State, Logic, V>> =
+    Box<dyn FnMut(&mut AppCtx<'_, State, Logic, V, T>) -> bool>;
 /// A plain application hook over the standard context.
-pub type AppHook<State, Logic, V> = Box<dyn FnMut(&mut AppCtx<'_, State, Logic, V>)>;
+pub type AppHook<State, Logic, V, T = Runner<State, Logic, V>> =
+    Box<dyn FnMut(&mut AppCtx<'_, State, Logic, V, T>)>;
 /// A request from the OS or an application command to close the root window.
-pub type CloseRequestHook<State, Logic, V> =
-    Box<dyn FnMut(&mut AppCtx<'_, State, Logic, V>, CloseRequest) -> CloseDisposition>;
+pub type CloseRequestHook<State, Logic, V, T = Runner<State, Logic, V>> =
+    Box<dyn FnMut(&mut AppCtx<'_, State, Logic, V, T>, CloseRequest) -> CloseDisposition>;
 /// The text-seam query: which text field has focus, if any.
 pub type FocusedTextHook<State, Logic, V> =
     Box<dyn Fn(&Runner<State, Logic, V>) -> Option<FocusedTextSlot<State>>>;
@@ -805,7 +809,7 @@ pub type KeyInterceptHook<State, Logic, V> =
 
 /// The application's hooks. Plain closures, owned state lives in their
 /// captured environment (an `Rc<RefCell<...>>` for anything shared).
-pub struct HostHooks<State: 'static, Logic, V>
+pub struct HostHooks<State: 'static, Logic, V, T = Runner<State, Logic, V>>
 where
     Logic: FnMut(&State) -> V,
     V: RootView<State>,
@@ -813,25 +817,25 @@ where
     /// Runs at the top of every frame, before layout and paint: drive
     /// animations, sync leaves, poll backends. Return `true` to keep frames
     /// coming (an animation is live).
-    pub frame: FrameHook<State, Logic, V>,
+    pub frame: FrameHook<State, Logic, V, T>,
     /// The tail of every input dispatch: persist, push state to backends,
     /// drain window-chrome requests.
-    pub after_dispatch: AppHook<State, Logic, V>,
+    pub after_dispatch: AppHook<State, Logic, V, T>,
     /// Runs after a frame is presented and the accessibility tree synced:
     /// scenario pumping and other per-presented-frame work.
-    pub after_frame: AppHook<State, Logic, V>,
+    pub after_frame: AppHook<State, Logic, V, T>,
     /// Runs after an application-owned worker wakes the host, before the
     /// redraw it requested. Drain the application's own channel here.
-    pub after_wake: AppHook<State, Logic, V>,
+    pub after_wake: AppHook<State, Logic, V, T>,
     /// Decides what a native or application-requested close means. The host
     /// owns the resulting visibility or exit; the application owns policy.
-    pub close_request: CloseRequestHook<State, Logic, V>,
+    pub close_request: CloseRequestHook<State, Logic, V, T>,
     /// The text seam: which text field has focus, if any.
-    pub focused_text: FocusedTextHook<State, Logic, V>,
+    pub focused_text: Box<dyn Fn(&T) -> Option<FocusedTextSlot<State>>>,
     /// Pre-dispatch keyboard intercept (Escape policy and friends). Return
     /// `true` to consume the event; `after_dispatch` runs either way when
     /// consumed.
-    pub key_intercept: KeyInterceptHook<State, Logic, V>,
+    pub key_intercept: Box<dyn FnMut(&mut T, &KeyPress) -> bool>,
 }
 
 /// What `init` hands back once the window exists.
@@ -881,7 +885,55 @@ pub fn env_size(key: &str) -> Option<f64> {
         .filter(|v| *v > 0.0)
 }
 
-pub struct HostState<State: 'static, Logic, V>
+/// What every window of an application shares: its resources, its
+/// custom-paint leaves and texture producers, and the render core they draw
+/// through (stack seams S29). A single-window host keeps it in its one
+/// [`HostState`]; a multi-window host lends it to whichever window is taking
+/// its turn, so each window paints the leaves its own layout holds.
+pub struct AppShared {
+    /// The render core every surface is made from, held here so it outlives
+    /// the surfaces: a suspend drops a surface and keeps the device, and the
+    /// resume makes a new surface from this same core (stack seams S2). The
+    /// event source sets it when it boots the core.
+    pub render_core: Option<Arc<RenderCore>>,
+    /// The application's stylesheet.
+    pub sheet: String,
+    /// Host-supplied faces. Held here, not in the layout, so a rebuilt text
+    /// system is registered again from the same list.
+    pub fonts: Vec<HostFont>,
+    /// Host-supplied image bytes by URL, handed to layout and paint each frame.
+    pub images: std::collections::HashMap<String, Vec<u8>>,
+    pub leaves: sprigging::LeafRegistry<u64>,
+    pub producers: crate::ProducerRegistry,
+    pub rendered: sprigging::RenderedLeaves,
+    /// Netrender roadmap E4 — leaf key → (retained `FragmentId`, epoch it was
+    /// translated at). Synced against `rendered` each redraw while a surface
+    /// exists. The fragments live in the render core's renderer, which outlives
+    /// any surface, so a suspend keeps them. The emitter does not place them
+    /// yet: `emit_scene` passes no fragment lookup until a retained fragment
+    /// has a clip and layer in the renderer, so every leaf still paints its
+    /// commands inline.
+    pub leaf_fragments: std::collections::HashMap<u64, (u64, u64)>,
+}
+
+impl Default for AppShared {
+    fn default() -> Self {
+        Self {
+            render_core: None,
+            sheet: String::new(),
+            fonts: Vec::new(),
+            images: std::collections::HashMap::new(),
+            leaves: sprigging::LeafRegistry::new(),
+            producers: crate::ProducerRegistry::new(),
+            rendered: sprigging::RenderedLeaves::new(),
+            leaf_fragments: std::collections::HashMap::new(),
+        }
+    }
+}
+
+/// One window's host state, with the application's [`AppShared`] part in
+/// `shared`.
+pub struct HostState<State: 'static, Logic, V, T = Runner<State, Logic, V>>
 where
     Logic: FnMut(&State) -> V,
     V: RootView<State>,
@@ -898,12 +950,8 @@ where
     /// The presentation surface behind the neutral seam. A browser event
     /// source supplies the same pair against a canvas.
     pub surface: Option<Box<dyn Surface>>,
-    /// The render core the surface was made from, held here so it outlives
-    /// the surface: a suspend drops the surface and keeps the device, and the
-    /// resume makes a new surface from this same core (stack seams S2). The
-    /// event source sets it when it boots the core.
-    pub render_core: Option<Arc<RenderCore>>,
-    pub runner: Option<Runner<State, Logic, V>>,
+    /// The tree this window drives.
+    pub runner: Option<T>,
     /// Retained Livery/Buckram session in logical coordinates.
     pub layout: Option<OwnedLayout>,
     pub layout_size: (f32, f32),
@@ -933,22 +981,8 @@ where
     pub(crate) last_leaf_boxes_us: u64,
     pub(crate) last_leaf_render_us: u64,
     pub(crate) last_leaf_repaints: u64,
-    pub sheet: String,
-    /// Host-supplied faces. Held here, not in the layout, so a rebuilt text
-    /// system is registered again from the same list.
-    pub fonts: Vec<HostFont>,
-    /// Host-supplied image bytes by URL, handed to layout and paint each frame.
-    pub images: std::collections::HashMap<String, Vec<u8>>,
-    pub leaves: sprigging::LeafRegistry<u64>,
-    pub producers: crate::ProducerRegistry,
-    pub rendered: sprigging::RenderedLeaves,
-    /// Netrender roadmap E4 — leaf key → (retained `FragmentId`, epoch it was
-    /// translated at). Synced against `rendered` each redraw while a surface
-    /// (and therefore a renderer registry) exists; cleared when the surface is
-    /// gone, since the registry died with it. When a key is here,
-    /// `emit_paint_list_with_leaves` places a marker instead of splicing the
-    /// leaf's commands, and the renderer composes the cached lowering.
-    pub leaf_fragments: std::collections::HashMap<u64, (u64, u64)>,
+    /// What this window shares with the application's other windows.
+    pub shared: AppShared,
     /// Cursor position in logical coordinates.
     pub cursor: (f32, f32),
     /// Live modifier state, in the neutral vocabulary. Winit's own state is
@@ -997,7 +1031,7 @@ where
     /// the same deferral `pending_sheet` gets, and for the same reason.
     pub pending_ui_zoom: Option<f32>,
     pub pending_capture: Option<CaptureFn>,
-    pub pending_presentation_observer: Option<PresentationObserver<State, Logic, V>>,
+    pub pending_presentation_observer: Option<PresentationObserver<State, Logic, V, T>>,
     pub pending_stamped_capture: Option<StampedCaptureFn>,
     pub presentation_host: u64,
     pub presentation_sequence: u64,
@@ -1018,7 +1052,7 @@ where
     pub tab_held: bool,
 }
 
-impl<State, Logic, V> HostState<State, Logic, V>
+impl<State, Logic, V, T> HostState<State, Logic, V, T>
 where
     State: 'static,
     Logic: FnMut(&State) -> V,
@@ -1030,7 +1064,6 @@ where
             titlebar_published: None,
             titlebar_sheet: String::new(),
             surface: None,
-            render_core: None,
             runner: None,
             layout: None,
             layout_size: (0.0, 0.0),
@@ -1050,13 +1083,7 @@ where
             last_leaf_boxes_us: 0,
             last_leaf_render_us: 0,
             last_leaf_repaints: 0,
-            sheet: String::new(),
-            fonts: Vec::new(),
-            images: std::collections::HashMap::new(),
-            leaves: sprigging::LeafRegistry::new(),
-            producers: crate::ProducerRegistry::new(),
-            rendered: sprigging::RenderedLeaves::new(),
-            leaf_fragments: std::collections::HashMap::new(),
+            shared: AppShared::default(),
             cursor: (0.0, 0.0),
             modifiers: Modifiers::NONE,
             text_drag: None,
@@ -1094,8 +1121,8 @@ where
     /// event source lands them the same way; the image list becomes the
     /// URL-keyed ledger Livery resolves against.
     pub fn set_resources(&mut self, fonts: Vec<HostFont>, images: Vec<HostImage>) {
-        self.fonts = fonts;
-        self.images = images
+        self.shared.fonts = fonts;
+        self.shared.images = images
             .into_iter()
             .map(|image| (image.url, image.bytes))
             .collect();
@@ -1104,15 +1131,15 @@ where
 
 /// The host: options, hooks, and everything the donor's `App` owned that was
 /// not application policy.
-pub struct Host<State: 'static, Logic, V>
+pub struct Host<State: 'static, Logic, V, T = Runner<State, Logic, V>>
 where
     Logic: FnMut(&State) -> V,
     V: RootView<State>,
 {
     pub options: HostOptions,
     pub init: Option<InitFn<State, Logic>>,
-    pub hooks: HostHooks<State, Logic, V>,
-    pub s: HostState<State, Logic, V>,
+    pub hooks: HostHooks<State, Logic, V, T>,
+    pub s: HostState<State, Logic, V, T>,
     pub wake: HostWake,
 }
 
@@ -1129,8 +1156,9 @@ pub enum IdlePolicy {
     A11yWake,
 }
 
-impl<State, Logic, V> Host<State, Logic, V>
+impl<State, Logic, V, T> Host<State, Logic, V, T>
 where
+    T: crate::HostTree<State>,
     State: 'static,
     Logic: FnMut(&State) -> V + 'static,
     V: RootView<State>,
@@ -1144,8 +1172,8 @@ where
     pub fn new(
         options: HostOptions,
         init: Option<InitFn<State, Logic>>,
-        hooks: HostHooks<State, Logic, V>,
-        s: HostState<State, Logic, V>,
+        hooks: HostHooks<State, Logic, V, T>,
+        s: HostState<State, Logic, V, T>,
         wake: HostWake,
     ) -> Self {
         let mut host = Self {
@@ -1366,9 +1394,9 @@ where
                 logical_size,
                 ui_zoom,
                 zoom_changed,
-                leaves: &mut self.s.leaves,
+                leaves: &mut self.s.shared.leaves,
                 files: &mut self.s.files,
-                producers: &mut self.s.producers,
+                producers: &mut self.s.shared.producers,
                 set_sheet: &mut self.s.pending_sheet,
                 set_ui_zoom: &mut self.s.pending_ui_zoom,
                 close: &mut self.s.close_requested,
@@ -1380,7 +1408,7 @@ where
                 pointer: &mut self.s.pending_pointer,
                 scroll: &mut self.s.pending_scroll,
                 window_commands: &commands,
-                render_core: self.s.render_core.as_ref(),
+                render_core: self.s.shared.render_core.as_ref(),
                 geometry,
                 frame_profile,
             };
@@ -1412,9 +1440,9 @@ where
             logical_size,
             ui_zoom,
             zoom_changed: false,
-            leaves: &mut self.s.leaves,
+            leaves: &mut self.s.shared.leaves,
             files: &mut self.s.files,
-            producers: &mut self.s.producers,
+            producers: &mut self.s.shared.producers,
             set_sheet: &mut self.s.pending_sheet,
             set_ui_zoom: &mut self.s.pending_ui_zoom,
             close: &mut self.s.close_requested,
@@ -1426,7 +1454,7 @@ where
             pointer: &mut self.s.pending_pointer,
             scroll: &mut self.s.pending_scroll,
             window_commands: &commands,
-            render_core: self.s.render_core.as_ref(),
+            render_core: self.s.shared.render_core.as_ref(),
             geometry: self.s.geometry,
             frame_profile: self.s.last_frame_profile,
         };
@@ -1437,7 +1465,7 @@ where
     /// view state ended. Shared by normal hooks and close negotiation.
     fn apply_pending(&mut self) {
         if let Some(sheet) = self.s.pending_sheet.take() {
-            self.s.sheet = sheet;
+            self.s.shared.sheet = sheet;
             // Force a full relayout under the new sheet.
             self.s.layout = None;
             self.s.layout_size = (0.0, 0.0);
@@ -1498,9 +1526,9 @@ where
                 logical_size,
                 ui_zoom,
                 zoom_changed,
-                leaves: &mut self.s.leaves,
+                leaves: &mut self.s.shared.leaves,
                 files: &mut self.s.files,
-                producers: &mut self.s.producers,
+                producers: &mut self.s.shared.producers,
                 set_sheet: &mut self.s.pending_sheet,
                 set_ui_zoom: &mut self.s.pending_ui_zoom,
                 close: &mut self.s.close_requested,
@@ -1512,7 +1540,7 @@ where
                 pointer: &mut self.s.pending_pointer,
                 scroll: &mut self.s.pending_scroll,
                 window_commands: &commands,
-                render_core: self.s.render_core.as_ref(),
+                render_core: self.s.shared.render_core.as_ref(),
                 geometry,
                 frame_profile,
             };
@@ -1586,8 +1614,9 @@ pub enum Hook {
     AfterWake,
 }
 
-impl<State, Logic, V> Host<State, Logic, V>
+impl<State, Logic, V, T> Host<State, Logic, V, T>
 where
+    T: crate::HostTree<State>,
     State: 'static,
     Logic: FnMut(&State) -> V + 'static,
     V: RootView<State>,
@@ -1631,8 +1660,9 @@ where
     }
 }
 
-impl<State, Logic, V> Host<State, Logic, V>
+impl<State, Logic, V, T> Host<State, Logic, V, T>
 where
+    T: crate::HostTree<State>,
     State: 'static,
     Logic: FnMut(&State) -> V + 'static,
     V: RootView<State>,

@@ -27,8 +27,9 @@ use crate::Host;
 use crate::meristem_bounds::RootView;
 use crate::{Box2, Direction, score};
 
-impl<State, Logic, V> Host<State, Logic, V>
+impl<State, Logic, V, T> Host<State, Logic, V, T>
 where
+    T: crate::HostTree<State>,
     State: 'static,
     Logic: FnMut(&State) -> V + 'static,
     V: RootView<State>,

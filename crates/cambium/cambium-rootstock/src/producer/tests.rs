@@ -262,8 +262,8 @@ fn gpu_host_timestamps_and_visibility_reach_the_producer() {
     }
 
     let requests = Rc::new(Cell::new(0));
-    let mut state = HostState::new();
-    state.sheet = SHEET.into();
+    let mut state: HostState<_, _, _> = HostState::new();
+    state.shared.sheet = SHEET.into();
     state.set_resources(vec![], vec![]);
     state.window = Some(Box::new(Window(requests.clone())));
     state.surface = Some(Box::new(surface()));
@@ -274,6 +274,7 @@ fn gpu_host_timestamps_and_visibility_reach_the_producer() {
     ));
     let producer = Rc::new(RefCell::new(Producer::default()));
     state
+        .shared
         .producers
         .register(7, producer.clone(), &["color"])
         .unwrap();
