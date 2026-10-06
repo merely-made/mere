@@ -1,6 +1,14 @@
 # Deletion, Retention, and Native Drop Plan
 
-**Status**: Active plan.
+**Status (2026-10-06):** active. The remaining work, as the tree shows it at
+mere 535bca11: Iroh and Retinue carriage of drops (no `DropId` use exists
+outside stickleback and gemot), binding group keys to the drop protector (see
+the open question under D5), a conversation retention checkpoint, complete
+reference tracing, and live peer command wiring. The Moot mapping (aggregate
+Moot drops, `be99eadb`, 2026-07-15) and the Moot constitution fold
+(`crates/moot/gemot/src/moot/constitution/fold.rs`, by `a4da5193`,
+2026-07-17) have landed, as have configured redb reopen and imported-view
+refresh (Progress, 2026-07-13).
 **Date**: 2026-07-12.
 **Promotion note (2026-07-26)**: every `murm-replication` reference below now
 means the `stickleback` package at `crates/stickleback`. The promotion was a
@@ -9,6 +17,13 @@ receipt hashes changed, so the receipts below stand as written. This plan's
 remaining work (group encryption, live peer command wiring, durable reopen, the
 Moot mapping, reference tracing, the constitution fold) is unaffected. See the
 [promotion plan](../../archive_docs/2026-08-06_completed_plans/2026-07-26_stickleback_replication_promotion_plan.md).
+**Corrected 2026-10-06 (S14 pass):** three items in that remaining-work list
+had already landed when the note was written: durable reopen (configured redb
+reopen, Progress 2026-07-13), the Moot mapping (aggregate Moot drops in
+`crates/moot/gemot/src/moot/records/store.rs`, l.414-479, `be99eadb`,
+2026-07-15) and the constitution fold
+(`crates/moot/gemot/src/moot/constitution/fold.rs`, l.143, by `a4da5193`,
+2026-07-17). The Status line carries the current list.
 **Scope**: Give Mere's p2panda-backed spaces one deletion and retention law,
 then define a transport-independent native drop format for moving the same
 accepted operations, checkpoints, proofs, and payloads over Iroh, Retinue,
@@ -84,6 +99,9 @@ files, or other store-and-forward paths.
 | Materialization | Domain folds; generic graph snapshots elsewhere | Several areas already use snapshot plus tail replay | No shared checkpoint contract for replicated spaces |
 | Off-grid bytes | feature-gated `ReticulumTransport`; future Retinue resources | Bilateral streams work; sync and blobs stay Iroh-only | No delay-tolerant application bundle |
 | Group security | constitution/capability plans plus Murm's cabal keyring | Native drops have real epoch protection; authorized group-state distribution is not wired | Personae/p2panda must install and persist authorized epoch keys |
+
+**Corrected 2026-10-06 (S14 pass):** the Murmur history row's "Meerkat selects
+redb" no longer holds: meerkat left the workspace in `c5f01064` (2026-07-18).
 
 Ownership after this plan:
 
@@ -651,6 +669,16 @@ Murm's protector from authorized p2panda group state or an equivalent Mere
 provider. Then migrate moot/tessera and remaining mesh records, with each domain
 supplying its own authority and checkpoint fold.
 
+**Open, raised by the S14 pass (2026-10-06):** stickleback gained a group-key
+lane in September under the
+[coop lifecycle parity plan](2026-09-16_coop_lifecycle_parity_plan.md)
+(`71a767b8`, 2026-09-16: add, remove and rotate frames; `11f0d705` and
+`3d3ad81c`, 2026-09-17: parking records sealed to a missing epoch, group
+lookups, forgetting epochs). This plan does not mention it, and whether it now
+feeds Murm's drop protector was not verifiable. Does that lane satisfy "feed
+Murm's protector from authorized group state"? Options: yes, record the item as
+met by that lane; no, binding group keys to the drop protector stays open here.
+
 Domain rollout status, 2026-07-13: mesh and direct conversation now supply
 concrete catch-up/archive/radio selectors. Conversation catch-up uses the live
 per-author sequence frontier because its retention checkpoint contract has not
@@ -661,6 +689,11 @@ while profile and membership switches gate their header-resident data. The
   view refresh, and an epoch-aware cabal drop protector are landed. Iroh/Retinue
   carriage, group authorization/key distribution, and the Moot mapping remain
   D5 work.
+
+**Corrected 2026-10-06 (S14 pass):** the Moot mapping is no longer D5 work:
+aggregate Moot drops landed in `be99eadb` (2026-07-15;
+`crates/moot/gemot/src/moot/records/store.rs`, l.414-479), as the Progress
+list records under "Landed aggregate Moot drops".
 
 Done when:
 
@@ -853,6 +886,11 @@ and Retinue remain opaque carriers; domain folds remain the semantic owners.
 - Added `CheckpointAuthority` and a Moot `GovernedCheckpointAuthority` fed only
   by a constitution revision and signer set. Roster membership alone grants
   nothing. The live constitution log/fold remains the governance gap.
+
+  **Corrected 2026-10-06 (S14 pass):** that gap closed: the constitution fold
+  is `crates/moot/gemot/src/moot/constitution/fold.rs` (l.143), landed by
+  `a4da5193` (2026-07-17), and §5 D2 above already records Moot's constitution
+  event, fold and store as producing the accepted revision and signer set.
 - Landed aggregate Moot drops. A critical canonical constitution-evidence
   record travels beside retained Moot operations; import admits the evidence
   first, refreshes the authority history, then atomically admits the object
@@ -867,3 +905,14 @@ and Retinue remain opaque carriers; domain folds remain the semantic owners.
   authority test passed earlier in this chain; the downstream mesh/Moot rerun
   after payload hydration stalled in the workspace build and was terminated
   without a source diagnostic.
+
+### 2026-10-06
+
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_46_s14_phase_b8.md: the status is dated and
+  carries the one remaining-work list the tree supports; the promotion note's,
+  D5's and Progress's claims that the Moot mapping and constitution fold were
+  still open are annotated as landed (`be99eadb`, `a4da5193`); the §2 table's
+  meerkat mention is annotated; and the September stickleback group-key lane is
+  cross-referenced with an open question on the drop protector.
