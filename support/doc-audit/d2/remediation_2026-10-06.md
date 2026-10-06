@@ -126,6 +126,8 @@ The live lanes took their `owner:` tails into their own plans the same day:
   plan; the arrangement pull into the dynamics grammar plan, recorded there
   as retired by G7;
 - projection grammar: FT9/FT10 were sent to its lane and await uptake.
+  **Taken 2026-10-06:** as Track F (F1, F2) of the adoption plan
+  (`28985298`).
 
 The tails owned in other repositories are recorded and were not edited:
 
@@ -215,10 +217,15 @@ The Conatus lane found the batch_46 and batch_50 items.
 - **S66, code:** add a typed-column block to EngineDocument and retire the
   per-format `cambium::nematic` views.
 - **S50:** rethink the render ladder.
-- **Projection grammar:** take FT9/FT10 into the adoption plan.
+- **Projection grammar:** take FT9/FT10 into the adoption plan. **Done
+  2026-10-06** (`28985298`).
 - **Other repositories:** the Turnstone, knot-editor and Isometry tails,
   which go to Mark. **Ruled 2026-10-06 (S69):** a dated note in each owning
-  plan.
+  plan. **Done 2026-10-06:** Turnstone `a616ece`, knot-editor `33cc855`,
+  Isometry `929647b8`. Two tails with no named plan went to the plan owning
+  their code path: the pointer-capture gap to Turnstone's pane registry plan,
+  the `write_bytes_with_backup` move to knot-editor's application workspace
+  plan (*reading, not ruled*).
 - **The 49 active Open notes.**
 - **A pre-existing broken link, left alone:**
   `archive_docs/2026-06-09_pivot_superseded/2026-05-15_browser_taxonomy_translation_brief.md`

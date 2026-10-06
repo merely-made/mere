@@ -983,6 +983,14 @@ The done-conditions handed over for S3 and S4, kept for reference:
   code retirement, the render ladder rethink). Both audits exit 0; judgment
   coverage 253/253.
 - **2026-10-06.** Round 23: S67 (knot-editor's copies own the Knot tails), S68 (petgraph RDF Phase 4 stays in the backlog), S69 (a dated note in each other repository's owning plan) and S70 (S66's code follow-on next).
+- **2026-10-06.** S69 done: dated notes in Turnstone (`a616ece`: the C4
+  consent gate in the page capture plan; workbench S3 and the pointer-capture
+  gap in the pane registry plan), knot-editor (`33cc855`: five plans, the
+  Knot tails under S60, S61 and S67) and Isometry (`929647b8`: Z5's figure).
+  *Reading, not ruled*: the two tails without a named plan went to the plan
+  owning their code path. Turnstone's untracked `.github/workflows/portable.yml`
+  (2026-09-20) was left alone. The projection grammar lane took FT9/FT10 as
+  its adoption plan's Track F (`28985298`).
 - **2026-10-06.** Round 16: S46 (live plans handed to their lanes), S47
   (reviewed write lanes) and S48 (ownerless tails to the archived plan tails
   backlog). S44's repins and S45's header re-run were flagged as separate
