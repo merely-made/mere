@@ -1,8 +1,8 @@
 # Stack seams plan: catalog, shared device, actions, determinism, two words
 
 **Date:** 2026-10-04
-**Status (2026-10-06):** in progress. Fifty-three rulings in eighteen rounds
-(S1 to S53); P1 landed on main (`1633be0c`); P2 staged (S27 to S31, four
+**Status (2026-10-06):** in progress. Fifty-seven rulings in nineteen rounds
+(S1 to S57); P1 landed on main (`1633be0c`); P2 staged (S27 to S31, four
 stages in §3.1) and landed on main (`40d7ae5e`); S32 (F19) landed on main
 (`48c08dee`); the S14 pass (S33) under way; P3 and S7 done as documents; S3 to
 S6 carried into the dynamics grammar plan (G8, G9); S9 done by the identity
@@ -778,6 +778,16 @@ Round 18, 2026-10-06. Evidence: phase C's per-plan open items for the first sixt
 
 **Ruling S53.** *Graph data and RDF plans: which are archived?* Options: the graph query layer; petgraph RDF; the graph write-path migration; graph delta capture and stats (multi-select). Mark: **"Graph query layer,Petgraph RDF,Graph write-path migration,Graph delta capture / stats"**. Follows: all four are archived: the graph query layer's #3 and Graph-results error to graph semantics P4 and its other residue to the backlog; petgraph RDF's open items to the graph semantics plan; the write-path plan's apply.rs split and the capture plan's regression log and per-table stats to the backlog.
 
+Round 19, 2026-10-06. Evidence: phase C's per-plan open items for the next sixteen of S49's plans; multi-select, a ticked plan archived with its open items extracted, an unticked one staying active.
+
+**Ruling S54.** *Dormant or unbuilt plans: which are archived?* Options: the engine profile boundary; the session service runner; the bounty verification economy; the polyglot block resolver (multi-select). Mark: **"Engine profile boundary, Session service runner, Bounty verification economy"**. Follows: those three are archived, their v0b scopes and the bounty design to the archived plan tails backlog; the polyglot block resolver stays active.
+
+**Ruling S55.** *Unbuilt design plans: which are archived?* Options: the runtime mod authoring loop; MCP native graph; persona transport unlinkability; capture provenance consent (multi-select). Mark: **"Capture provenance consent"**. Follows: capture provenance consent is archived, its C4 consent gate going to the live recorders' owners (Turnstone's trail memory and page capture plan, Graphshell H5) and its other tails to the backlog; the other three stay active.
+
+**Ruling S56.** *Identity and dramatis plans: which are archived?* Options: the SSH CA projection; insigne proofs; the identity vault SSH agent; castellan OTP (multi-select). Mark: **"Insigne proofs, Identity vault SSH agent, Castellan OTP"**. Follows: those three are archived: insigne's remaining repins and castellan OTP's follow-ons to the dramatis repo plan or the backlog, the vault's V4 to the chatelaine plan and V5 to the backlog; the SSH CA projection stays active.
+
+**Ruling S57.** *More identity and protocol plans: which are archived?* Options: the dramatis tier; the persona wallet carry layer; the protocol architecture; participant gate packs (multi-select). Mark: **"Dramatis tier, Persona wallet carry layer, Participant gate packs"**. Follows: those three are archived: the dramatis facade and the wallet's carry gaps to the dramatis repo plan (lock and unlock to the vault lock plan), the gate packs' B5 tessera receipt and meadowcap layer to the backlog; the protocol architecture stays active.
+
 ## 3. Phases
 
 ### 3.1 This plan's lane
@@ -918,6 +928,7 @@ The done-conditions handed over for S3 and S4, kept for reference:
   the README fixed (S7), TERMINOLOGY gains pandect under Eidetic and the
   curation record (S8, S10), S9 sent to the identity lane.
 - **2026-10-06.** Round 18: S50 to S53, the first sixteen of S49's plans ruled; ten to archive (scrying tile, render ladder, comms shell, tear-out gestures, orrery graph intelligence, orrery custom layout element, graph query layer, petgraph RDF, graph write-path migration, graph delta capture), six to stay active.
+- **2026-10-06.** Round 19: S54 to S57, the next sixteen of S49's plans ruled; ten to archive (engine profile boundary, session service runner, bounty verification economy, capture provenance consent, insigne proofs, identity vault SSH agent, castellan OTP, dramatis tier, persona wallet carry layer, participant gate packs), six to stay active.
 - **2026-10-06.** Round 16: S46 (live plans handed to their lanes), S47
   (reviewed write lanes) and S48 (ownerless tails to the archived plan tails
   backlog). S44's repins and S45's header re-run were flagged as separate
