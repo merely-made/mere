@@ -73,7 +73,13 @@ impl ApplicationHandler<HostEvent> for Driver {
         }
         // The first resume drew the first frame synchronously, so by the first
         // idle turn the core, a surface and the tenant's handle all exist.
-        let before = self.host.s.render_core.clone().expect("a core was booted");
+        let before = self
+            .host
+            .s
+            .shared
+            .render_core
+            .clone()
+            .expect("a core was booted");
         let mut readings = Readings {
             boots_before: self.host.core_boots,
             presents_before: self.host.s.presentation_sequence,
@@ -82,10 +88,16 @@ impl ApplicationHandler<HostEvent> for Driver {
         self.host.suspended(event_loop);
         readings.surface_dropped = self.host.s.surface.is_none();
         if self.drop_core {
-            self.host.s.render_core = None;
+            self.host.s.shared.render_core = None;
         }
         self.host.resumed(event_loop);
-        let after = self.host.s.render_core.clone().expect("a core after resume");
+        let after = self
+            .host
+            .s
+            .shared
+            .render_core
+            .clone()
+            .expect("a core after resume");
         readings.boots_after = self.host.core_boots;
         readings.presents_after = self.host.s.presentation_sequence;
         readings.core_kept = Arc::ptr_eq(&before, &after);
@@ -154,7 +166,10 @@ fn drive(drop_core: bool) -> Readings {
         readings: readings.clone(),
     };
     event_loop.run_app(&mut driver).expect("the event loop ran");
-    let readings = readings.borrow_mut().take().expect("the driver read the host");
+    let readings = readings
+        .borrow_mut()
+        .take()
+        .expect("the driver read the host");
     eprintln!("[headed] drop_core={drop_core} {readings:?}");
     readings
 }
@@ -171,8 +186,14 @@ fn one_core() {
     assert_eq!(r.boots_before, 1, "one core booted for the first frame");
     assert_eq!(r.boots_after, 1, "the resume booted no core");
     assert!(r.core_kept, "the same core before and after");
-    assert!(r.presents_after > r.presents_before, "the resumed surface presented");
-    assert!(r.tenant_device_is_surface_device, "the tenant shares the device");
+    assert!(
+        r.presents_after > r.presents_before,
+        "the resumed surface presented"
+    );
+    assert!(
+        r.tenant_device_is_surface_device,
+        "the tenant shares the device"
+    );
 }
 
 /// The control: a host that forgets its core across the suspend must read a
@@ -185,6 +206,9 @@ fn control() {
     let r = drive(true);
     assert_eq!(r.boots_after, 2, "forgetting the core boots another");
     assert!(!r.core_kept);
-    assert!(!r.tenant_device_is_surface_device, "the tenant is on the old device");
+    assert!(
+        !r.tenant_device_is_surface_device,
+        "the tenant is on the old device"
+    );
     assert!(r.presents_after > r.presents_before);
 }

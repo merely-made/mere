@@ -7,8 +7,9 @@
 use super::{ProducerFrameStats, ResolvedAppearance};
 use crate::{AppCtx, Host, NodeId, meristem_bounds::RootView};
 
-impl<State: 'static, Logic, V> AppCtx<'_, State, Logic, V>
+impl<State: 'static, Logic, V, T> AppCtx<'_, State, Logic, V, T>
 where
+    T: crate::HostTree<State>,
     Logic: FnMut(&State) -> V,
     V: RootView<State>,
 {
@@ -43,17 +44,18 @@ where
     }
 }
 
-impl<State: 'static, Logic, V> Host<State, Logic, V>
+impl<State: 'static, Logic, V, T> Host<State, Logic, V, T>
 where
+    T: crate::HostTree<State>,
     Logic: FnMut(&State) -> V + 'static,
     V: RootView<State>,
 {
     /// Draw with a caller-supplied monotonic timestamp. Ordinary redraw remains
     /// untimed for deterministic callers; timestamps never leak into later draws.
     pub fn redraw_at(&mut self, timestamp: std::time::Duration) {
-        self.s.producers.timestamp = Some(timestamp);
+        self.s.shared.producers.timestamp = Some(timestamp);
         self.redraw();
-        self.s.producers.timestamp = None;
+        self.s.shared.producers.timestamp = None;
     }
 
     /// Update platform visibility immediately, even if no frame will be delivered.
@@ -73,6 +75,7 @@ where
     /// suspend transient targets while the containing window is hidden.
     pub fn suspend_producers(&mut self) {
         self.s
+            .shared
             .producers
             .suspend_all(self.s.surface.as_ref().map(|surface| surface.renderer()));
     }
@@ -83,15 +86,21 @@ where
             self.s.layout.as_ref(),
             self.s.runner.as_ref(),
         ) else {
-            self.s.producers.suspend_all(None);
+            self.s.shared.producers.suspend_all(None);
             return ProducerFrameStats::default();
         };
         if self.s.hidden {
-            self.s.producers.suspend_all(Some(surface.renderer()));
+            self.s
+                .shared
+                .producers
+                .suspend_all(Some(surface.renderer()));
             return ProducerFrameStats::default();
         }
         let dom = runner.dom();
         let dom = dom.borrow();
-        self.s.producers.prepare(surface, layout, &*dom, scale)
+        self.s
+            .shared
+            .producers
+            .prepare(surface, layout, &*dom, scale)
     }
 }

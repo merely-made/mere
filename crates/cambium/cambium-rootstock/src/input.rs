@@ -72,8 +72,9 @@ fn key_trace() -> bool {
     })
 }
 
-impl<State, Logic, V> Host<State, Logic, V>
+impl<State, Logic, V, T> Host<State, Logic, V, T>
 where
+    T: crate::HostTree<State>,
     State: 'static,
     Logic: FnMut(&State) -> V + 'static,
     V: RootView<State>,
@@ -164,7 +165,7 @@ where
         };
         let dom = runner.dom();
         let dom = dom.borrow();
-        layout.producer_admits_pointer(&*dom, node, self.s.cursor, &self.s.producers)
+        layout.producer_admits_pointer(&*dom, node, self.s.cursor, &self.s.shared.producers)
     }
 
     /// A left-button press in the content area: click, then drag capture, then

@@ -388,12 +388,12 @@ where
     /// life. Booting from the options factory rather than a stashed value is
     /// why `HostOptions::netrender` is a closure.
     fn render_core(&mut self) -> Result<Arc<RenderCore>, String> {
-        if let Some(core) = self.s.render_core.as_ref() {
+        if let Some(core) = self.s.shared.render_core.as_ref() {
             return Ok(core.clone());
         }
         let core = Arc::new(RenderCore::boot((self.options.netrender)())?);
         self.core_boots += 1;
-        self.s.render_core = Some(core.clone());
+        self.s.shared.render_core = Some(core.clone());
         Ok(core)
     }
 
@@ -849,7 +849,7 @@ where
         a11y.attach(window.clone());
         self.s.a11y = Some(Box::new(a11y));
         self.s.files = Some(Box::new(DialogFileChooser));
-        self.s.sheet = sheet;
+        self.s.shared.sheet = sheet;
         self.s.set_resources(fonts, images);
         self.native_window = Some(window.clone());
         self.s.window = Some(Box::new(WinitWindow(window)));

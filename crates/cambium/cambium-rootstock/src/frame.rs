@@ -53,8 +53,9 @@ type EmittedScene = (
     Option<PaintEnvelope>,
 );
 
-impl<State, Logic, V> Host<State, Logic, V>
+impl<State, Logic, V, T> Host<State, Logic, V, T>
 where
+    T: crate::HostTree<State>,
     State: 'static,
     Logic: FnMut(&State) -> V + 'static,
     V: RootView<State>,
@@ -80,9 +81,9 @@ where
                 logical_size,
                 ui_zoom,
                 zoom_changed,
-                leaves: &mut self.s.leaves,
+                leaves: &mut self.s.shared.leaves,
                 files: &mut self.s.files,
-                producers: &mut self.s.producers,
+                producers: &mut self.s.shared.producers,
                 set_sheet: &mut self.s.pending_sheet,
                 set_ui_zoom: &mut self.s.pending_ui_zoom,
                 close: &mut self.s.close_requested,
@@ -94,14 +95,14 @@ where
                 pointer: &mut self.s.pending_pointer,
                 scroll: &mut self.s.pending_scroll,
                 window_commands: &commands,
-                render_core: self.s.render_core.as_ref(),
+                render_core: self.s.shared.render_core.as_ref(),
                 geometry,
                 frame_profile,
             };
             (self.hooks.frame)(&mut ctx)
         };
         if let Some(sheet) = self.s.pending_sheet.take() {
-            self.s.sheet = sheet;
+            self.s.shared.sheet = sheet;
             self.s.layout = None;
             self.s.layout_size = (0.0, 0.0);
         }
@@ -166,7 +167,7 @@ where
         let mut muts: Vec<DomMutation<NodeId>> = Vec::new();
         dom.borrow_mut().drain_mutations(&mut muts);
         let dom_ref = dom.borrow();
-        let sheets: Vec<&str> = vec![self.s.sheet.as_str(), self.s.titlebar_sheet.as_str()];
+        let sheets: Vec<&str> = vec![self.s.shared.sheet.as_str(), self.s.titlebar_sheet.as_str()];
         let mutation_count = muts.len() as u64;
         let size_changed = self.s.layout_size != (lw, lh);
         let mut tick_us = 0;
@@ -196,8 +197,8 @@ where
                     &sheets,
                     lw,
                     lh,
-                    &self.s.fonts,
-                    &self.s.images,
+                    &self.s.shared.fonts,
+                    &self.s.shared.images,
                 );
                 // Carry BOTH scroll planes across rebuilds: element scroll and
                 // the document scroll. Dropping the latter snaps a scrolled
@@ -250,13 +251,13 @@ where
             layout.custom_leaf_boxes(&*dom_ref).into_iter().collect();
         let leaf_boxes_us = elapsed_us(leaf_boxes_started.elapsed());
         let leaf_render_started = crate::Instant::now();
-        let leaf_repaints = self.s.leaves.render_into(
+        let leaf_repaints = self.s.shared.leaves.render_into(
             |key| {
                 sizes
                     .get(&key)
                     .map(|&(width, height)| sprigging::Size { width, height })
             },
-            &mut self.s.rendered,
+            &mut self.s.shared.rendered,
         );
         self.s.last_layout_update_us = layout_update_us;
         self.s.last_layout_tick_us = tick_us;
@@ -295,7 +296,7 @@ where
         let renderer = surface.core().renderer();
 
         let mut seen: Vec<u64> = Vec::new();
-        for (key, epoch, splice) in self.s.rendered.path_a_entries() {
+        for (key, epoch, splice) in self.s.shared.rendered.path_a_entries() {
             let fragmentable = !splice.iter().any(|cmd| {
                 matches!(
                     cmd,
@@ -303,26 +304,26 @@ where
                 )
             });
             if !fragmentable {
-                if let Some((id, _)) = self.s.leaf_fragments.remove(&key) {
+                if let Some((id, _)) = self.s.shared.leaf_fragments.remove(&key) {
                     let _ = renderer.remove_fragment(id);
                 }
                 continue;
             }
             seen.push(key);
-            match self.s.leaf_fragments.get(&key) {
+            match self.s.shared.leaf_fragments.get(&key) {
                 Some((_, e)) if *e == epoch => {},
                 Some(&(id, _)) => {
                     let fragment =
                         paint_list_render::translate_paint_cmds_to_fragment(splice, &[], &[]);
                     if renderer.update_fragment(id, fragment) == Some(true) {
-                        self.s.leaf_fragments.insert(key, (id, epoch));
+                        self.s.shared.leaf_fragments.insert(key, (id, epoch));
                     }
                 },
                 None => {
                     let fragment =
                         paint_list_render::translate_paint_cmds_to_fragment(splice, &[], &[]);
                     if let Some(id) = renderer.register_fragment(fragment) {
-                        self.s.leaf_fragments.insert(key, (id, epoch));
+                        self.s.shared.leaf_fragments.insert(key, (id, epoch));
                     }
                 },
             }
@@ -331,13 +332,14 @@ where
         // not laid out): their retained lowerings go with them.
         let stale: Vec<u64> = self
             .s
+            .shared
             .leaf_fragments
             .keys()
             .copied()
             .filter(|k| !seen.contains(k))
             .collect();
         for key in stale {
-            if let Some((id, _)) = self.s.leaf_fragments.remove(&key) {
+            if let Some((id, _)) = self.s.shared.leaf_fragments.remove(&key) {
                 let _ = renderer.remove_fragment(id);
             }
         }
@@ -431,8 +433,8 @@ where
         let dom = runner.dom();
         let dom_ref = dom.borrow();
         let source = SpriggingSource {
-            rendered: &self.s.rendered,
-            producers: &self.s.producers,
+            rendered: &self.s.shared.rendered,
+            producers: &self.s.shared.producers,
         };
         let mut list = layout.emit_paint_list_with_leaves(
             &*dom_ref,
@@ -704,8 +706,8 @@ where
             a11y.sync(
                 &dom_ref,
                 layout,
-                &mut self.s.leaves,
-                &mut self.s.producers,
+                &mut self.s.shared.leaves,
+                &mut self.s.shared.producers,
                 self.s.last_focus,
                 layout_scale,
             )
@@ -742,7 +744,7 @@ where
                         runner.set_focus(Some(slot));
                     }
                     if request.action == A11yAction::Click {
-                        self.s.producers.act(produced);
+                        self.s.shared.producers.act(produced);
                     }
                     continue;
                 },
