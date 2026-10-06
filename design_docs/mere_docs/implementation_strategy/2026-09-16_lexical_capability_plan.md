@@ -1,7 +1,15 @@
 # Lexical Capability Plan — senses, word parts, etymology, and writing checks
 
-**Status (2026-09-16):** accepted; not started. New objective, raised by Mark
-2026-09-16. Nothing implemented. The verified survey behind it, with licences,
+**Status (2026-10-06):** in progress; L2 is partly built. Ruling S42 of the
+[stack seams plan](2026-10-04_stack_seams_plan.md) makes
+`crates/intel/reference-data` (`9310518b`, 2026-09-30) this plan's L2 and
+re-scopes L2 onto that crate, so Mere has one lexical surface. It looks up a
+lemma, language and sources and returns language-tagged senses and relations
+with per-source provenance, from packs installed opt-in, checked against a
+BLAKE3 digest, each manifest carrying licence and attribution; Knot consumes
+it (`knot-editor/Cargo.toml:29`, at Mere `9310518b`). Open: L2's morphology
+and etymology layers, L1, L3, L5, and Turnstone's half of L4. Objective
+raised by Mark 2026-09-16. The verified survey behind it, with licences,
 sizes and formats per dataset, is the
 [lexical and grammar resources brief](../research/2026-09-16_lexical_grammar_resources_brief.md).
 
@@ -75,6 +83,14 @@ reports the add-on layers as unavailable when absent, carries provenance on
 every returned fact, and its tests run offline against a small committed sample
 rather than the full dataset.
 
+**Corrected 2026-10-06 (S14 pass):** a crate doing much of this exists,
+and neither it nor this plan named the other: `crates/intel/reference-data`
+(`9310518b`, 2026-09-30), whose lookup returns language-tagged senses and relations with
+per-source provenance and whose tests run offline against a small synthetic
+fixture. Ruling S42 (stack seams plan) makes it L2 and re-scopes L2 onto it,
+so the two lexical surfaces on paper become one. The morphology and etymology
+layers are not built there yet.
+
 ### L3. Writing checks
 
 Harper behind a thin Mere seam, so the checker is swappable and the apps never
@@ -121,3 +137,8 @@ retraining any model; spelling correction UI; and any runtime network access.
 
 - 2026-09-16: survey completed, six decisions taken across two rounds, plan
   accepted. Nothing implemented.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_35_s14_phase_a1.md; records `reference-data`
+  (`9310518b`) as L2, partly built, under ruling S42, with L1, L3, L5 and
+  Turnstone's L4 open.
