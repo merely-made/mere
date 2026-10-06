@@ -1,8 +1,8 @@
 # Stack seams plan: catalog, shared device, actions, determinism, two words
 
 **Date:** 2026-10-04
-**Status (2026-10-06):** in progress. Fifty-seven rulings in nineteen rounds
-(S1 to S57); P1 landed on main (`1633be0c`); P2 staged (S27 to S31, four
+**Status (2026-10-06):** in progress. Sixty-one rulings in twenty rounds
+(S1 to S61); P1 landed on main (`1633be0c`); P2 staged (S27 to S31, four
 stages in §3.1) and landed on main (`40d7ae5e`); S32 (F19) landed on main
 (`48c08dee`); the S14 pass (S33) under way; P3 and S7 done as documents; S3 to
 S6 carried into the dynamics grammar plan (G8, G9); S9 done by the identity
@@ -788,6 +788,16 @@ Round 19, 2026-10-06. Evidence: phase C's per-plan open items for the next sixte
 
 **Ruling S57.** *More identity and protocol plans: which are archived?* Options: the dramatis tier; the persona wallet carry layer; the protocol architecture; participant gate packs (multi-select). Mark: **"Dramatis tier, Persona wallet carry layer, Participant gate packs"**. Follows: those three are archived: the dramatis facade and the wallet's carry gaps to the dramatis repo plan (lock and unlock to the vault lock plan), the gate packs' B5 tessera receipt and meadowcap layer to the backlog; the protocol architecture stays active.
 
+Round 20, 2026-10-06. Evidence: phase C's per-plan open items for the next sixteen of S49's plans; multi-select, a ticked plan archived with its open items extracted, an unticked one staying active.
+
+**Ruling S58.** *Distillery and ML plans: which are archived?* Options: distillery v0; the inference provider; the browser model ceiling probe; mesh host lanes (multi-select). Mark: **"Distillery v0, Inference provider, Browser model ceiling probe, Mesh host lanes, These four need to be consolidated now that 0.22 is out"**. Follows: all four are archived, and their open items are consolidated into one new plan rather than the backlog. *Reading, not ruled*: "0.22 is out" means stable Burn 0.22 has been released, which the burn plan's stable closure and the mesh host lanes' last gate wait on; the consolidated plan's name and scope come back to Mark.
+
+**Ruling S59.** *Search, memory and receipt plans: which are archived?* Options: eidetic browsing derivation; redb over OPFS feasibility; the intel vector index burn lift (mere twin); receipt artifacts replication (multi-select). Mark: **"Eidetic browsing derivation, redb over OPFS feasibility, Intel vector index burn lift (mere twin), Receipt artifacts replication, These also need a good critical pass and to be turned into a plan if needed, but eidetic needs development now that identity has a clear path"**. Follows: all four are archived; their open items get a critical pass and become a plan if warranted, and Eidetic's development is to be taken up now that identity's path is clear. *Reading, not ruled*: the critical pass is a new objective with its own assessment, after phase C.
+
+**Ruling S60.** *Host and surface plans: which are archived?* Options: the workbench component; the knot shared surface; host UI zoom; component catalog growth (multi-select). Mark: **"Workbench component, Knot shared surface, Host UI zoom, Component catalog growth"**. Follows: all four are archived: the workbench's S3 to Turnstone's pane registry plan (A4), the shared surface's F0 to knot-editor's application workspace plan and its pointer-capture gap to Turnstone, the zoom plan's Z5 figure to Isometry's migration plan, and the remaining tails (catalog promotion rules and decisions among them) to the backlog.
+
+**Ruling S61.** *Projection and publishing plans: which are archived?* Options: projection receipts; native smolweb rendering; the graphshell remote projection host; the knot publishing protocol (multi-select). Mark: **"Projection receipts, Native smolweb rendering, Graphshell remote projection host, Knot publishing protocol, Explain the difference for 2"**. Follows: all four are archived: projection receipts' FT9/FT10 gates to the projection grammar adoption plan, the remote projection host's G6/G7 to the reference host plan's H-series, Knot's copy of the publishing protocol canonical; native smolweb rendering's question of which render design stands (its "2") is explained to Mark and put back before its host-integration tail is placed.
+
 ## 3. Phases
 
 ### 3.1 This plan's lane
@@ -929,6 +939,7 @@ The done-conditions handed over for S3 and S4, kept for reference:
   curation record (S8, S10), S9 sent to the identity lane.
 - **2026-10-06.** Round 18: S50 to S53, the first sixteen of S49's plans ruled; ten to archive (scrying tile, render ladder, comms shell, tear-out gestures, orrery graph intelligence, orrery custom layout element, graph query layer, petgraph RDF, graph write-path migration, graph delta capture), six to stay active.
 - **2026-10-06.** Round 19: S54 to S57, the next sixteen of S49's plans ruled; ten to archive (engine profile boundary, session service runner, bounty verification economy, capture provenance consent, insigne proofs, identity vault SSH agent, castellan OTP, dramatis tier, persona wallet carry layer, participant gate packs), six to stay active.
+- **2026-10-06.** Round 20: S58 to S61, all sixteen archived, with three directions: the four ML plans consolidate into one new plan now that Burn 0.22 is out; the four search and memory plans get a critical pass, Eidetic's development taken up; native smolweb's render-design question explained and put back.
 - **2026-10-06.** Round 16: S46 (live plans handed to their lanes), S47
   (reviewed write lanes) and S48 (ownerless tails to the archived plan tails
   backlog). S44's repins and S45's header re-run were flagged as separate
