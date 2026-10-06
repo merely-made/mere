@@ -4882,6 +4882,11 @@ change.
   Mark: **"Report to the reveal's owner (Recommended)"**. *Follows:* Knot
   changes nothing. The finding goes to the projection-grammar adoption
   plan's owner.
+  *Annotation, 2026-10-06:* `5011e2f9` came from the relationship-recipe
+  session, the one that wrote `c79bb8c2`, `b2f67356` and `4a2560ed` and the
+  plan's 2026-10-05 recipe sections, not the Projection grammar session. The
+  two share a name. The finding reaches it through Mark, with the frames in
+  `Code/testing/knot-editor/p1-adapt/headed/compare/`.
 
 *Annotation, 2026-10-05:* the next move of djinn's Knot pin is not this
 plan's. Under mer3ly Ruling 112, the Projection grammar session owns the
