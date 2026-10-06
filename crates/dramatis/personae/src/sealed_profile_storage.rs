@@ -31,18 +31,34 @@
 //! manages the key. Profile ids are hashed for the filename (ids are
 //! user-chosen strings; hashing keeps them filesystem-safe), and the id
 //! itself is stored inside the sealed record.
+//!
+//! ## Locking
+//!
+//! Locking forgets the root key. Unlocking takes one of two user acts:
+//! the passphrase, which unwraps the same root from [`PASSPHRASE_ROOT_FILE`]
+//! (see [`crate::passphrase_root`]), or OS presence, after which the root is
+//! read back from the `AutoOs` store. Either needs its file in this
+//! directory; [`IdentityStorage::unlock_methods`] reports which exist.
 
 use std::path::PathBuf;
 
 use serde::{Deserialize, Serialize};
 
+use zeroize::Zeroizing;
+
 use crate::profile_wire::{PlaintextProfile, plaintext_to_slot, slot_to_plaintext};
 use crate::sealed_record_storage::SealedRecordStorage;
+use crate::unlock::{UnlockMethod, UnlockMethods};
 use crate::vault::{IdentityStorage, Profile, ProfileId, ProfileSummary};
 use crate::{Ed25519Keypair, IdentityError};
 
 const PROFILE_DIR: &str = "profiles";
 const AUTO_UNLOCK_ROOT_FILE: &str = "auto-unlock-root.json";
+
+/// Where the passphrase-wrapped copy of the root lives, beside the profiles
+/// (a [`crate::PassphraseWrappedRoot`], written by
+/// [`crate::save_passphrase_root`]).
+pub const PASSPHRASE_ROOT_FILE: &str = "passphrase-root.json";
 
 /// One profile's sealed record. The id rides inside the plaintext so a
 /// directory listing can recover it (filenames are hashes).
@@ -103,7 +119,7 @@ impl SealedProfileStorage {
 
 impl IdentityStorage for SealedProfileStorage {
     fn load_profile(&self, id: &ProfileId) -> Result<Profile, IdentityError> {
-        let record: SealedProfileRecord = self
+        let mut record: SealedProfileRecord = self
             .records
             .load_record(Self::record_path(id))?
             .ok_or_else(|| IdentityError::Backend(format!("profile not found: {:?}", id)))?;
@@ -114,13 +130,13 @@ impl IdentityStorage for SealedProfileStorage {
             )));
         }
         let mut slots = std::collections::HashMap::with_capacity(record.profile.slots.len());
-        for s in &record.profile.slots {
+        for s in &mut record.profile.slots {
             let (k, slot) = plaintext_to_slot(s);
             slots.insert(k, slot);
         }
         Ok(Profile {
             id: id.clone(),
-            display_name: record.profile.display_name,
+            display_name: std::mem::take(&mut record.profile.display_name),
             master: Ed25519Keypair::from_seed(record.profile.master_seed),
             slots,
         })
@@ -147,7 +163,49 @@ impl IdentityStorage for SealedProfileStorage {
         self.records.delete_record(Self::record_path(id))
     }
 
+    fn unlock_methods(&self) -> UnlockMethods {
+        UnlockMethods {
+            passphrase: crate::passphrase_root_exists(self.root.join(PASSPHRASE_ROOT_FILE)),
+            os_presence: self.root.join(AUTO_UNLOCK_ROOT_FILE).is_file()
+                && crate::unlock::presence_availability().is_available(),
+        }
+    }
+
+    fn lock(&self) {
+        self.records.lock();
+    }
+
+    fn is_locked(&self) -> bool {
+        self.records.is_locked()
+    }
+
+    fn unlock(&self, method: UnlockMethod<'_>) -> Result<(), IdentityError> {
+        let root = match method {
+            UnlockMethod::Passphrase(passphrase) => Zeroizing::new(
+                crate::load_passphrase_root(self.root.join(PASSPHRASE_ROOT_FILE), passphrase)?
+                    .ok_or_else(|| {
+                        IdentityError::Backend(
+                            "no passphrase is enrolled for this vault".to_string(),
+                        )
+                    })?,
+            ),
+            // The gate has been passed; the key comes from the OS store.
+            UnlockMethod::OsPresence(_verified) => Zeroizing::new(
+                crate::startup_unlock::load_existing_auto_unlock_root(
+                    self.root.join(AUTO_UNLOCK_ROOT_FILE),
+                )?
+                .ok_or_else(|| {
+                    IdentityError::Backend("no OS-held root for this vault".to_string())
+                })?,
+            ),
+        };
+        self.records.unlock(*root, None)
+    }
+
     fn list_profiles(&self) -> Result<Vec<ProfileSummary>, IdentityError> {
+        if self.records.is_locked() {
+            return Err(IdentityError::Locked);
+        }
         let dir = self.profiles_dir();
         let entries = match std::fs::read_dir(&dir) {
             Ok(entries) => entries,
@@ -168,7 +226,7 @@ impl IdentityStorage for SealedProfileStorage {
             if !name.ends_with(".json") {
                 continue;
             }
-            let record: SealedProfileRecord = self
+            let mut record: SealedProfileRecord = self
                 .records
                 .load_record(format!("{PROFILE_DIR}/{name}"))?
                 .ok_or_else(|| {
@@ -176,7 +234,7 @@ impl IdentityStorage for SealedProfileStorage {
                 })?;
             out.push(ProfileSummary {
                 id: ProfileId(record.id),
-                display_name: record.profile.display_name,
+                display_name: std::mem::take(&mut record.profile.display_name),
                 slot_count: record.profile.slots.len(),
             });
         }

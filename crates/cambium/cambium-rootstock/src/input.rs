@@ -72,8 +72,9 @@ fn key_trace() -> bool {
     })
 }
 
-impl<State, Logic, V> Host<State, Logic, V>
+impl<State, Logic, V, T> Host<State, Logic, V, T>
 where
+    T: crate::HostTree<State>,
     State: 'static,
     Logic: FnMut(&State) -> V + 'static,
     V: RootView<State>,
@@ -129,7 +130,8 @@ where
         let layout = self.s.layout.as_ref()?;
         let dom = runner.dom();
         let dom_ref = dom.borrow();
-        layout.hit_test(&*dom_ref, x, y)
+        let view = crate::WindowDom::new(&dom_ref, runner.mount());
+        layout.hit_test(&view, x, y)
     }
 
     /// The retained layout, for callers that read it without re-hit-testing.
@@ -153,7 +155,8 @@ where
                 .and_then(|(runner, layout)| {
                     let dom = runner.dom();
                     let dom_ref = dom.borrow();
-                    layout.local_coordinates(&*dom_ref, node, self.s.cursor)
+                    let view = crate::WindowDom::new(&dom_ref, runner.mount());
+                    layout.local_coordinates(&view, node, self.s.cursor)
                 });
         local.unwrap_or(((0.0, 0.0), (0.0, 0.0)))
     }
@@ -164,7 +167,8 @@ where
         };
         let dom = runner.dom();
         let dom = dom.borrow();
-        layout.producer_admits_pointer(&*dom, node, self.s.cursor, &self.s.producers)
+        let view = crate::WindowDom::new(&dom, runner.mount());
+        layout.producer_admits_pointer(&view, node, self.s.cursor, &self.s.shared.producers)
     }
 
     /// A left-button press in the content area: click, then drag capture, then
@@ -275,7 +279,8 @@ where
         let caret = {
             let dom = runner.dom();
             let dom = dom.borrow();
-            layout.caret_position_at_point(&*dom, slot.node, x, y)
+            let view = crate::WindowDom::new(&dom, runner.mount());
+            layout.caret_position_at_point(&view, slot.node, x, y)
         };
         let Some(caret) = caret else { return };
         runner.update(|state| {
@@ -345,7 +350,8 @@ where
         let caret = {
             let dom = runner.dom();
             let dom = dom.borrow();
-            layout.caret_position_at_point(&*dom, slot.node, x, y)
+            let view = crate::WindowDom::new(&dom, runner.mount());
+            layout.caret_position_at_point(&view, slot.node, x, y)
         };
         let Some(caret) = caret else {
             return;
@@ -399,13 +405,19 @@ where
         if slot.node != base_node {
             return;
         }
-        let Some(moved) = layout.selection_visual_move(
-            &*runner.dom().borrow(),
-            slot.node,
-            to_visual_selection(base_selection),
-            movement,
-            press.modifiers.shift,
-        ) else {
+        // The borrow ends with the move: the update below rebuilds the tree.
+        let moved = {
+            let dom = runner.dom();
+            let dom_ref = dom.borrow();
+            layout.selection_visual_move(
+                &crate::WindowDom::new(&dom_ref, runner.mount()),
+                slot.node,
+                to_visual_selection(base_selection),
+                movement,
+                press.modifiers.shift,
+            )
+        };
+        let Some(moved) = moved else {
             return;
         };
         runner.update(|state| {
@@ -626,7 +638,8 @@ where
         {
             let dom = runner.dom();
             let dom_ref = dom.borrow();
-            layout.scroll_at_target(&*dom_ref, x, y, dx, dy)
+            let view = crate::WindowDom::new(&dom_ref, runner.mount());
+            layout.scroll_at_target(&view, x, y, dx, dy)
         } else {
             None
         };

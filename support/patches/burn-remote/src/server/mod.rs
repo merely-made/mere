@@ -7,10 +7,12 @@ pub(crate) mod transfer;
 pub(crate) mod worker;
 
 mod builder;
+mod logging;
 
 pub use crate::shared::SessionId;
 pub use builder::{Channel, RemoteServerBuilder};
 pub use burn_router::{CustomOpHandler, CustomOpRegistry};
+pub use logging::ServerLogging;
 pub use session::ServedSession;
 
 #[cfg(feature = "iroh")]

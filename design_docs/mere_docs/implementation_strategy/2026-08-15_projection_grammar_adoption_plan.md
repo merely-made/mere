@@ -79,11 +79,20 @@ occurrence selection and exact musical explanation survive; neither dataset
 changes, missing semantic facets refuse, and Knot document anchors cannot be
 repurposed as music owner actions. Focused adapter test passes. Knot's native
 recipe scenario has four reviewed captures at 1280×1100 (bind, spacing, explained
-relation, authority refusal); successful personal-wallet retention and
-narrow/high-zoom recipe visuals remain unrun. Knot's canonical collection plan
+relation, authority refusal). Knot subsequently adopts shared horizontal reveal
+`5011e2f9` on implementation `e4cf739c`, published with acceptance docs at
+`9d0b955f`. Its compact recipe scenario passes four reviewed native captures at
+420×900 and four at 1280×900 / 400% UI zoom: real second occurrence selection
+reveals the full card, method/limits and source anchor remain readable across
+scroll positions, and unavailable-authority refusal is visible. Updated-pin
+qualification passes desktop 306 tests / one existing ignore, composition/readings
+61 / one existing ignore, locked build and metadata. Successful native personal-wallet
+retention remains unrun. Knot's canonical collection plan
 records its complete suite and encrypted-retention receipts. The visible
 Woodshed editor/renderer was qualified in the host continuation below; Knot's
-unrun native personal-wallet and narrow/high-zoom gates remain separate.
+unrun native personal-wallet gate remains separate. The compact native receipt
+is `/Users/markik/Code/testing/knot-editor/recipe-responsive-20261005/receipt.json`;
+no retained collection reopen, browser runtime or other-platform claim is added.
 
 Host continuation starting point (2026-10-05): refreshed Woodshed main `c92e7c9` matches the
 published disclosure/session proof. Its production Mere `8106c7c` / Genet
@@ -192,6 +201,23 @@ id through the registry, takes its parameters from the definition, and makes
 every registered family authorable. That plan's P1 carries it out. Asked who
 takes P1, Mark answered: "Seams lane keeps P1 (Recommended)". This plan
 records the change and does not build it.
+
+*2026-10-05, P1 under way (stack seams rulings S12, S15 to S20).* A
+cross-reference for the relationship-recipe pass, which moved the compiler
+into `scenomise::projection` at `c79bb8c2`. One correction to the note
+above: scenomise's registry holds only custom solvers (stack seams F12), so
+ids resolve through a built-in catalog of sceno's eleven named families beside
+it, and an unknown id falls through to the registry (S15). P1 changes the
+compiler where it now lives: the dataset types move to scenograph and stay
+re-exported from `scenomise::projection` (S12); `grid.default` and
+`scatter.default` resolve as aliases, so saved recipes load (S15); parameters a
+recipe leaves unset are measured from the items (S16); and item sizes come from
+the host instead of the 164 by 68 written into the compiler (S20), so the
+compile entry points take the host's sizes. A consumer sees two changes when it
+repins past P1: that signature, and grid pitch (cell plus gap), which becomes
+the host's card size plus the spacing (180 by 84 for a 164 by 68 card at
+spacing 16, against 200 by 100 today). Built on branch `stack-seams-p1`;
+nothing merges before Mark's review.
 
 Progress (2026-09-04): Luna produced the Woodshed exporter and Terra the
 compiler skeleton before both hit the account usage limit. Root completed

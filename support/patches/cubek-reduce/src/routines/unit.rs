@@ -7,7 +7,7 @@ use crate::{
     launch::calculate_plane_count_per_cube,
     routines::{BlueprintStrategy, Routine, UnitReduceBlueprint},
 };
-use cubecl::{CubeCount, CubeDim, Runtime, client::ComputeClient};
+use cubecl::{CubeCount, CubeDim, client::Client};
 use cubek_std::cube_count::cube_count_spread_with_total;
 
 #[derive(Debug, Clone)]
@@ -20,9 +20,9 @@ impl Routine for UnitRoutine {
     type Strategy = UnitStrategy;
     type Blueprint = UnitReduceBlueprint;
 
-    fn prepare<R: Runtime>(
+    fn prepare(
         &self,
-        client: &cubecl::prelude::ComputeClient<R>,
+        client: &cubecl::prelude::Client,
         problem: ReduceProblem,
         settings: ReduceVectorSettings,
         strategy: BlueprintStrategy<Self>,
@@ -52,7 +52,7 @@ impl Routine for UnitRoutine {
             }
             BlueprintStrategy::Inferred(_) => {
                 let (blueprint, cube_dim, cube_count) =
-                    generate_blueprint::<R>(client, problem, &settings)?;
+                    generate_blueprint(client, problem, &settings)?;
                 (blueprint, cube_dim, cube_count)
             }
         };
@@ -68,8 +68,8 @@ impl Routine for UnitRoutine {
     }
 }
 
-fn generate_blueprint<R: Runtime>(
-    client: &ComputeClient<R>,
+fn generate_blueprint(
+    client: &Client,
     problem: ReduceProblem,
     settings: &ReduceVectorSettings,
 ) -> Result<(ReduceBlueprint, CubeDim, CubeCount), ReduceError> {
@@ -85,7 +85,7 @@ fn generate_blueprint<R: Runtime>(
     let (cube_count, cube_launched) = cube_count_spread_with_total(client, working_cubes);
 
     // Unchecked comptime fast path only when raw shapes are their own
-    // autotune keys — see the twin comment in `plane.rs`.
+    // autotune keys: see the twin comment in `plane.rs`.
     let unit_idle = !settings.unchecked_fast_paths
         || !working_units.is_multiple_of(num_units_in_cube as usize)
         || cube_launched != working_cubes;

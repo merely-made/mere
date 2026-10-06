@@ -42,6 +42,12 @@ single record authority behind every Castellan view
 (`ports/djinn/src/resident.rs`). Gazette's authority half joins it as a
 djinn-composed service (ruled 2026-10-01, §7; unbuilt).
 
+*2026-10-06 note:* the [dramatis repo plan](../implementation_strategy/2026-10-06_dramatis_repo_plan.md)
+(rulings D1 to D3) moves the tier to its own repository, folds chatelaine
+into dramatis as its keychain, and narrows castellan to the half that
+holds and exercises secrets, personae's vault custody included. Nothing
+has moved yet; this section describes the tree as it stands.
+
 ## 2. Three axes
 
 The tier is organised along three independent axes. Most of its boundaries are

@@ -44,9 +44,10 @@ mod owned_layout;
 pub use owned_layout::{OwnedLayout, ScrollAlign, ScrollTarget};
 pub mod producer;
 pub use producer::{
-    ProducedTexture, ProducerContext, ProducerError, ProducerFrameInfo, ProducerFrameStats,
-    ProducerNode, ProducerRegistrationError, ProducerRegistry, ProducerRole, ProducerSemantics,
-    ResolvedAppearance, SourceAlpha, SourceEncoding, TextureProducer,
+    ProducedAction, ProducedTexture, ProducerAction, ProducerContext, ProducerError,
+    ProducerFrameInfo, ProducerFrameStats, ProducerNode, ProducerRegistrationError,
+    ProducerRegistry, ProducerRole, ProducerSemantics, ResolvedAppearance, SourceAlpha,
+    SourceEncoding, TextureProducer,
 };
 
 /// The host's clock.
@@ -219,11 +220,39 @@ pub enum A11yAction {
     SetValue(f64),
 }
 
-/// One drained screen-reader request: which action, on which DOM node.
-#[derive(Clone, Copy, Debug, PartialEq)]
+/// One drained screen-reader request: which action, on what.
+#[derive(Clone, Debug, PartialEq)]
 pub struct A11yRequest {
     pub action: A11yAction,
-    pub node: NodeId,
+    pub target: A11yTarget,
+}
+
+/// What a reader's request lands on.
+#[derive(Clone, Debug, PartialEq)]
+pub enum A11yTarget {
+    /// A DOM node of the application's tree.
+    Node(NodeId),
+    /// One action of a node a texture producer draws, as the producer's own
+    /// button for it presents it ([`ProducerNode::actions`]).
+    Produced(ProducedAction),
+}
+
+impl A11yRequest {
+    /// A request on a DOM node.
+    pub fn node(action: A11yAction, node: NodeId) -> Self {
+        Self {
+            action,
+            target: A11yTarget::Node(node),
+        }
+    }
+
+    /// A request on a drawn node's action button.
+    pub fn produced(action: A11yAction, produced: ProducedAction) -> Self {
+        Self {
+            action,
+            target: A11yTarget::Produced(produced),
+        }
+    }
 }
 
 /// How a host publishes its accessible tree and collects what a reader asked
@@ -258,10 +287,13 @@ pub trait Accessibility {
     ///
     /// `producers` is asked for each texture-producer slot's own semantics
     /// ([`TextureProducer::semantics`]), which a host writes under the slot.
+    ///
+    /// `dom` is this window's subtree of the document: the whole document for
+    /// a single window, its window-root's subtree under a forest.
     #[allow(clippy::too_many_arguments)]
     fn sync(
         &mut self,
-        dom: &ScriptedDom,
+        dom: &WindowDom<'_>,
         layout: &OwnedLayout,
         leaves: &mut LeafRegistry<u64>,
         producers: &mut ProducerRegistry,
@@ -275,7 +307,7 @@ pub trait Accessibility {
 /// the browser host lowers it to ARIA. `focus` is the focused node's opaque id,
 /// as [`Accessibility::sync`] receives it.
 pub fn document_projection(
-    dom: &ScriptedDom,
+    dom: &WindowDom<'_>,
     layout: &OwnedLayout,
     focus: Option<u64>,
 ) -> DocumentA11yProjection {
@@ -291,7 +323,7 @@ pub fn document_projection(
     )
 }
 
-fn find_opaque(dom: &ScriptedDom, node: NodeId, opaque: u64) -> Option<NodeId> {
+fn find_opaque(dom: &WindowDom<'_>, node: NodeId, opaque: u64) -> Option<NodeId> {
     use layout_dom_api::LayoutDom as _;
     if dom.opaque_id(node) == opaque {
         return Some(node);
@@ -836,8 +868,13 @@ mod capture;
 mod frame;
 mod host;
 mod input;
+mod multi_host;
+#[cfg(test)]
+mod multi_host_tests;
 mod spatial;
+mod tree;
 mod wake;
+mod window_dom;
 mod window_verbs;
 
 /// Bounds the host's view type without naming meristem at every use site.
@@ -857,11 +894,15 @@ pub mod meristem_bounds {
 
 pub use capture::{Frame, read_frame};
 pub use host::{
-    AppCtx, AppFrameInsets, AppHook, CaptureFn, CloseDisposition, CloseRequest, CloseRequestHook,
-    FocusedTextHook, FocusedTextSlot, FrameHook, FrameProfile, Hook, Host, HostFont, HostHooks,
-    HostImage, HostOptions, HostPointer, HostState, IdlePolicy, Init, KeyInterceptHook,
-    PaintCaptureFn, PresentationObserver, PresentedFrame, RelayoutProfile, Runner, ScrollIntoView,
-    StampedCaptureFn, WindowFrame, ZOOM_LADDER, env_size, fit_zoom, ladder_step,
+    AppCtx, AppFrameInsets, AppHook, AppShared, CaptureFn, CloseDisposition, CloseRequest,
+    CloseRequestHook, FocusedTextHook, FocusedTextSlot, FrameHook, FrameProfile, Hook, Host,
+    HostFont, HostHooks, HostImage, HostOptions, HostPointer, HostState, IdlePolicy, Init,
+    KeyInterceptHook, PaintCaptureFn, PresentationObserver, PresentedFrame, RelayoutProfile,
+    Runner, ScrollIntoView, StampedCaptureFn, WindowFrame, ZOOM_LADDER, env_size, fit_zoom,
+    ladder_step,
 };
+pub use multi_host::{MultiHost, MultiRunner, WindowRequests, WindowSlot, WindowTree};
+pub use tree::HostTree;
+pub use window_dom::WindowDom;
 pub use wake::HostWake;
 pub use window_verbs::{AppRegion, WindowCommand, WindowCommands, WindowGeometry};

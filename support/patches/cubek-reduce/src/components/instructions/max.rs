@@ -1,6 +1,6 @@
 use super::{
-    ArgAccumulator, ReduceFamily, ReduceInstruction, max_identity, plane_argmax_propagating_nan,
-    plane_max_propagating_nan, select_argmax, select_max,
+    ArgAccumulator, ReduceFamily, ReduceInstruction, advance_argmax, max_identity,
+    plane_argmax_propagating_nan, plane_max_propagating_nan, select_argmax, select_max,
 };
 use crate::components::{
     instructions::{
@@ -28,6 +28,31 @@ impl ReduceFamily for Max {
 impl ReduceWithIndicesFamily for Max {
     type Instruction<P: ReducePrecision> = Self;
     type Config = ReduceOutputMode;
+}
+
+/// As [`max_insert`], for a candidate that comes after everything the
+/// accumulator has seen. Only the per-element path can promise that.
+#[cube]
+fn max_advance<T: Numeric, N: Size>(
+    elements: &mut Value<Vector<T, N>>,
+    coordinates: &mut Value<Vector<u32, N>>,
+    candidate: Vector<T, N>,
+    candidate_coord: &Value<Vector<u32, N>>,
+) {
+    let acc = elements.item();
+
+    match candidate_coord {
+        Value::None => elements.assign(&Value::new_single(select_max(acc, candidate))),
+        Value::Single(coord) => {
+            let candidate_coord = coord.unwrap();
+            let acc_coord = coordinates.item();
+            let (selected, selected_coord) =
+                advance_argmax(acc, acc_coord, candidate, candidate_coord);
+            elements.assign(&Value::new_single(selected));
+            coordinates.assign(&Value::new_single(selected_coord));
+        }
+        Value::Multiple(_) => panic!("a max candidate carries at most one coordinate"),
+    }
 }
 
 /// Fold `candidate` into the accumulator, keeping the larger item per vector
@@ -122,7 +147,7 @@ impl<P: ReducePrecision> ReduceInstruction<P> for Max {
             ReduceStep::Identity => (item.elements, item.args),
         };
 
-        max_insert(
+        max_advance(
             &mut accumulator.elements,
             &mut accumulator.args,
             Vector::cast_from(candidate),
@@ -165,13 +190,13 @@ impl<P: ReducePrecision> ReduceInstruction<P> for Max {
                 let acc = accumulator.elements.item();
                 let mut max = max_identity::<P::EA>();
                 #[unroll]
-                for k in 0..acc.size() {
+                for k in 0..acc.vector_size() {
                     let candidate = acc.extract(k);
                     max = select_max(
                         Vector::<P::EA, Const<1>>::new(candidate),
                         Vector::<P::EA, Const<1>>::new(max),
                     )
-                    .extract(0);
+                    .extract(0usize);
                 }
                 (Value::new_single(Out::cast_from(max)), Value::new_None())
             }
@@ -210,7 +235,7 @@ impl<P: ReducePrecision> ReduceWithIndices<P> for Max {}
 /// accumulator must have been built with coordinate tracking on.
 #[cube]
 fn max_finalize_with_coords<P: ReducePrecision>(accumulator: &Accumulator<P>) -> (P::EA, u32) {
-    let vector_size = accumulator.elements.item().size().comptime();
+    let vector_size = accumulator.elements.item().vector_size().comptime();
 
     if vector_size > 1 {
         let mut max = max_identity::<P::EA>();
@@ -228,15 +253,15 @@ fn max_finalize_with_coords<P: ReducePrecision>(accumulator: &Accumulator<P>) ->
                 Vector::<u32, Const<1>>::new(acc_coordinate),
             );
 
-            max = selected.extract(0);
-            coordinate = selected_coordinate.extract(0);
+            max = selected.extract(0usize);
+            coordinate = selected_coordinate.extract(0usize);
         }
 
         (max, coordinate)
     } else {
         (
-            accumulator.elements.item().extract(0),
-            accumulator.args.item().extract(0),
+            accumulator.elements.item().extract(0usize),
+            accumulator.args.item().extract(0usize),
         )
     }
 }

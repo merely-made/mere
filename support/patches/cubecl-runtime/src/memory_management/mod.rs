@@ -1,15 +1,12 @@
-pub(crate) mod memory_pool;
-
 mod base;
-
-/// Export utilities to keep track of CPU buffers when performing async data copies.
-pub mod drop_queue;
+mod config;
+mod handle;
+mod layout;
 
 pub use base::*;
-
-/// Dynamic memory management strategy.
-mod memory_manage;
-pub use memory_manage::*;
+pub use config::*;
+pub use handle::*;
+pub use layout::*;
 
 use alloc::vec::Vec;
 
@@ -20,6 +17,19 @@ pub enum PoolType {
     ExclusivePages {
         /// The minimum number of bytes to allocate in this pool.
         max_alloc_size: u64,
+    },
+    /// Give every allocation its own device allocation, sized to the request
+    /// and reused by exact size.
+    ///
+    /// No carving at all, so it wastes only alignment padding. Worth it where
+    /// padding matters more than allocation count — under a
+    /// [`DryRun`](crate::dry_run::DryRun), where unresolved reservations never
+    /// reach the driver at all, or on a device the workload barely fits.
+    Direct {
+        /// Reserved bytes above which free slices are returned to the driver.
+        /// A watermark rather than a budget; `None` reclaims only on an
+        /// explicit cleanup.
+        reclaim_at: Option<u64>,
     },
     /// Use a memory where each allocation is a slice of a bigger allocation.
     SlicedPages {
@@ -86,3 +96,53 @@ impl Default for MemoryConfiguration {
         }
     }
 }
+
+#[derive(Default, Clone, Copy, Debug)]
+/// The mode of allocation used.
+pub enum MemoryAllocationMode {
+    /// Use the automatic memory management strategy for allocation.
+    #[default]
+    Auto,
+    /// Use a persistent memory management strategy, meaning that all allocations are for data that is
+    /// likely never going to be freed.
+    Persistent,
+}
+
+/// Why installing a dynamic pool layout did not take effect.
+///
+/// The layout itself was already valid — that is
+/// [`PoolConfigError`](PoolConfigError), reported when the configuration is
+/// resolved. This is about the pools' *state* at the moment of the swap.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum InstallMemoryPoolsError {
+    /// The dynamic pools still hold live allocations, so the old layout was
+    /// kept. A live slice carries its pool position, and swapping the pool
+    /// list under it would leave that position pointing at a different pool.
+    ///
+    /// Transient: retry once whatever holds them drains. A cleanup that does
+    /// not clear it usually means a cache is holding slices (the metadata
+    /// info cache) or a captured graph is pinning them.
+    PoolsInUse {
+        /// Bytes still live in the dynamic pools.
+        bytes_in_use: u64,
+    },
+    /// This server has no configurable dynamic pools. Permanent — unlike
+    /// [`PoolsInUse`](Self::PoolsInUse), retrying will never succeed.
+    Unsupported,
+}
+
+impl core::fmt::Display for InstallMemoryPoolsError {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            InstallMemoryPoolsError::PoolsInUse { bytes_in_use } => write!(
+                f,
+                "the dynamic pools kept their layout: {bytes_in_use} bytes are still live in them"
+            ),
+            InstallMemoryPoolsError::Unsupported => {
+                write!(f, "this server has no configurable dynamic memory pools")
+            }
+        }
+    }
+}
+
+impl core::error::Error for InstallMemoryPoolsError {}

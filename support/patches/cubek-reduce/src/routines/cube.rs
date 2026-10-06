@@ -7,7 +7,7 @@ use crate::{
     launch::{calculate_plane_count_per_cube, support_plane},
     routines::{BlueprintStrategy, CubeBlueprint, Routine},
 };
-use cubecl::{CubeCount, CubeDim, Runtime, client::ComputeClient, features::Plane};
+use cubecl::{CubeCount, CubeDim, client::Client, features::Plane};
 use cubek_std::cube_count::cube_count_spread_with_total;
 
 #[derive(Debug, Clone)]
@@ -23,9 +23,9 @@ impl Routine for CubeRoutine {
     type Strategy = CubeStrategy;
     type Blueprint = CubeBlueprint;
 
-    fn prepare<R: Runtime>(
+    fn prepare(
         &self,
-        client: &ComputeClient<R>,
+        client: &Client,
         problem: ReduceProblem,
         settings: ReduceVectorSettings,
         strategy: BlueprintStrategy<Self>,
@@ -87,7 +87,7 @@ impl Routine for CubeRoutine {
             }
             BlueprintStrategy::Inferred(strategy) => {
                 let (blueprint, cube_dim, cube_count) =
-                    generate_blueprint::<R>(client, problem, &settings, strategy)?;
+                    generate_blueprint(client, problem, &settings, strategy)?;
                 (blueprint, cube_dim, cube_count)
             }
         };
@@ -103,8 +103,8 @@ impl Routine for CubeRoutine {
     }
 }
 
-fn generate_blueprint<R: Runtime>(
-    client: &ComputeClient<R>,
+fn generate_blueprint(
+    client: &Client,
     problem: ReduceProblem,
     settings: &ReduceVectorSettings,
     strategy: CubeStrategy,
@@ -139,7 +139,7 @@ fn generate_blueprint<R: Runtime>(
     let cube_size = cube_dim.num_elems();
 
     // Unchecked comptime fast paths only when raw shapes are their own
-    // autotune keys — see the twin comment in `plane.rs`.
+    // autotune keys: see the twin comment in `plane.rs`.
     let unchecked = settings.unchecked_fast_paths;
     let work_size = match settings.vectorization_mode {
         VectorizationMode::Parallel => problem.reduce_len / settings.vector_size_input,
@@ -155,7 +155,7 @@ fn generate_blueprint<R: Runtime>(
 
     // Out-of-range units come from the reduce-axis tail *and* from over-launched
     // (idle) cubes; both need a bound check. When the input read has a write side
-    // effect (fuse-on-read), that check must branch rather than mask — a mask
+    // effect (fuse-on-read), that check must branch rather than mask: a mask
     // clamps the index to 0 and still performs the side-effecting read,
     // clobbering position 0.
     let tail_bounds = !(unchecked && work_size.is_multiple_of(cube_size as usize));

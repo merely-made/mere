@@ -127,6 +127,9 @@ members = [
     # The application host contract genet's P1 split out of genet-host-api. A
     # host contract rather than a widget, so it lands beside `fetch`.
     "crates/system/surface-api",
+    # The djinn test harness (djinn test harness plan, ruling 5): unpublished,
+    # a path dev-dependency for djinn, castellan, personae and their siblings.
+    "crates/system/djinn-testkit",
     # ─── Landed 2026-09-03 from genet (the same plan, P3) ───
     # The engine-management layer: inker selects and orchestrates content
     # engines, document-canvas lays its documents out, the three engine
@@ -667,25 +670,19 @@ vello = { git = "https://github.com/mark-ik/vello.git", tag = "vello-0.10.0" }
 # existed to do. The vendored copy remains at support/patches/cubecl-wgpu for
 # archaeology until a stable 0.22 lands, but it is no longer patched in.
 # cubecl-wgpu = { path = "support/patches/cubecl-wgpu" }
-# cubecl-runtime 0.11.0-pre.2's published manifest omitted the direct
-# wasm-bindgen-futures edge used by its wasm tuner and left serde/hash support
-# desktop-only. The source is the unchanged registry crate; its manifest carries
-# upstream fixes bce4e489 and 7a2ee1c3. Delete this patch when a Burn/CubeCL
-# release containing those fixes replaces the prerelease row.
+# cubecl-runtime 0.11.0-pre.4: the source is pristine upstream. The manifest
+# removes persistence from default features (ruling 375), avoiding the Turso
+# cache in Mere's defaults-disabled GPU graph. Remove when upstream makes
+# persistence opt-in or fixes the defaults-on edge in cubecl-wgpu.
 cubecl-runtime = { path = "support/patches/cubecl-runtime" }
-# burn-cubecl 0.22.0-pre.2 binds a shared tensor allocation twice for binary
-# operations such as `x.clone() * x`. BrowserWebGpu silently returns stale
-# storage for that launch shape, breaking LayerNorm. The vendored launcher
-# binds the allocation once and aliases the second logical input. Delete with
-# the runtime identity helper when an upstream release passes Distillery's
-# headed same-allocation and BERT-width LayerNorm receipts.
-burn-cubecl = { path = "support/patches/burn-cubecl" }
-# burn-remote 0.22.0-pre.2 can authorize an Iroh session only when it opens.
-# Its internal `SessionManager::close` does not stop the live session pump, so
-# owner reclaim cannot end one admitted lease without dropping the whole
-# protocol. This vendored crate adds pump-observed targeted close plus a
-# read-only active-session receipt. Delete it when an upstream release exposes
-# equivalent control and passes the lease-reclaim receipt.
+# burn-cubecl 0.22.0-pre.4: the selector was retired under ruling 410 after
+# the old pre.2 browser failure reproduced while upstream pre.4 passed all 21
+# cases, plus nine unfused native launcher controls. Vendored patch source
+# remains for provenance; current consumers select the registry crate.
+# burn-remote 0.22.0-pre.4: pump-observed targeted close and session receipts
+# let owner reclaim stop one admitted lease without dropping the protocol.
+# Remove when upstream provides equivalent control and passes the lifecycle
+# receipt, including reclaim and recovery.
 burn-remote = { path = "support/patches/burn-remote" }
 layout-dom-api = { git = "https://github.com/merely-made/genet.git", rev = "bd3e8861b2932d62b73c9936ac3a317f1df3ffdb", version = "=0.1.1" }
 genet-scripted-dom = { git = "https://github.com/merely-made/genet.git", rev = "bd3e8861b2932d62b73c9936ac3a317f1df3ffdb", version = "=0.1.2" }

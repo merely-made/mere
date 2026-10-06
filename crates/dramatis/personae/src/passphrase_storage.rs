@@ -43,7 +43,7 @@ use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
 
-use argon2::Argon2;
+use argon2::{Argon2, Block};
 use chacha20poly1305::aead::{Aead, KeyInit};
 use chacha20poly1305::{ChaCha20Poly1305, Key, Nonce};
 
@@ -51,6 +51,7 @@ use serde::{Deserialize, Serialize};
 use zeroize::Zeroizing;
 
 use crate::profile_wire::{PlaintextProfile, plaintext_to_slot, slot_to_plaintext};
+use crate::unlock::{UnlockMethod, UnlockMethods};
 use crate::vault::{IdentityStorage, Profile, ProfileId, ProfileSummary};
 use crate::{Ed25519Keypair, IdentityError};
 
@@ -91,8 +92,12 @@ pub(crate) fn derive_kek(
 ) -> Result<Zeroizing<[u8; 32]>, IdentityError> {
     let argon = Argon2::default();
     let mut kek = Zeroizing::new([0u8; 32]);
+    // argon2's own `hash_password_into` frees its working memory uncleared,
+    // and the last blocks recompute the KEK; this buffer zeroizes on drop
+    // (ruling 33).
+    let mut blocks = Zeroizing::new(vec![Block::default(); argon.params().block_count()]);
     argon
-        .hash_password_into(passphrase, salt, kek.as_mut())
+        .hash_password_into_with_memory(passphrase, salt, kek.as_mut(), &mut blocks[..])
         .map_err(|e| IdentityError::Backend(format!("argon2 derive: {e}")))?;
     Ok(kek)
 }
@@ -118,7 +123,8 @@ struct Inner {
     /// (re-rolling would force a re-derive on every save).
     salt: Vec<u8>,
     /// Cached KEK; the file's salt + the original passphrase produced it.
-    kek: Zeroizing<[u8; 32]>,
+    /// `None` while locked.
+    kek: Option<Zeroizing<[u8; 32]>>,
 }
 
 impl PassphraseEncryptedStorage {
@@ -149,16 +155,7 @@ impl PassphraseEncryptedStorage {
                 )));
             }
             let kek = derive_kek(passphrase, &file.salt)?;
-            // Verify against an existing profile if any.
-            if let Some((_, p)) = file.profiles.iter().next() {
-                let cipher = ChaCha20Poly1305::new(
-                    &Key::try_from(&kek.as_ref()[..]).expect("fixed-length key material"),
-                );
-                let nonce = &Nonce::try_from(&p.nonce[..]).expect("fixed-length key material");
-                cipher
-                    .decrypt(nonce, p.ciphertext.as_slice())
-                    .map_err(|_| IdentityError::Backend("incorrect passphrase".to_string()))?;
-            }
+            check_kek(&kek, &file)?;
             (file.salt, kek, file.profiles)
         } else {
             let salt = random_bytes(ARGON2_SALT_LEN);
@@ -168,8 +165,27 @@ impl PassphraseEncryptedStorage {
 
         Ok(Self {
             path,
-            inner: Arc::new(Mutex::new(Inner { salt, kek })),
+            inner: Arc::new(Mutex::new(Inner {
+                salt,
+                kek: Some(kek),
+            })),
         })
+    }
+
+    /// Run `f` with the AEAD for the cached KEK, or [`IdentityError::Locked`].
+    ///
+    /// The key is borrowed where it lives, never copied out, so no stack
+    /// copy of it outlives the call (see the no-residue test).
+    fn with_cipher<R>(&self, f: impl FnOnce(&ChaCha20Poly1305) -> R) -> Result<R, IdentityError> {
+        let inner = self.inner.lock().unwrap();
+        let kek = inner.kek.as_ref().ok_or(IdentityError::Locked)?;
+        let key = <&Key>::try_from(&kek[..]).expect("fixed-length key material");
+        let cipher = ChaCha20Poly1305::new(key);
+        Ok(f(&cipher))
+    }
+
+    fn ensure_unlocked(&self) -> Result<(), IdentityError> {
+        self.with_cipher(|_| ())
     }
 
     fn load_file(&self) -> Result<EncryptedFile, IdentityError> {
@@ -205,6 +221,23 @@ impl PassphraseEncryptedStorage {
     }
 }
 
+/// Verify a KEK against one stored profile, if any; with none stored, any
+/// passphrase is indistinguishable (see [`PassphraseEncryptedStorage::open`]).
+fn check_kek(kek: &[u8; 32], file: &EncryptedFile) -> Result<(), IdentityError> {
+    if let Some((_, p)) = file.profiles.iter().next() {
+        let cipher =
+            ChaCha20Poly1305::new(&Key::try_from(&kek[..]).expect("fixed-length key material"));
+        let nonce = &Nonce::try_from(&p.nonce[..]).expect("fixed-length key material");
+        // The check's plaintext is the profile itself.
+        let _checked = Zeroizing::new(
+            cipher
+                .decrypt(nonce, p.ciphertext.as_slice())
+                .map_err(|_| IdentityError::Backend("incorrect passphrase".to_string()))?,
+        );
+    }
+    Ok(())
+}
+
 fn tempfile_in_dir(dir: &Path) -> Result<PathBuf, IdentityError> {
     use std::time::{SystemTime, UNIX_EPOCH};
     let n = SystemTime::now()
@@ -225,36 +258,35 @@ fn tempfile_in_dir(dir: &Path) -> Result<PathBuf, IdentityError> {
 
 impl IdentityStorage for PassphraseEncryptedStorage {
     fn load_profile(&self, id: &ProfileId) -> Result<Profile, IdentityError> {
+        self.ensure_unlocked()?;
         let file = self.load_file()?;
         let entry = file
             .profiles
             .get(&id.0)
             .ok_or_else(|| IdentityError::Backend(format!("profile not found: {:?}", id)))?;
-        let kek = self.inner.lock().unwrap().kek.clone();
-        let cipher = ChaCha20Poly1305::new(
-            &Key::try_from(&kek.as_ref()[..]).expect("fixed-length key material"),
-        );
         let nonce = &Nonce::try_from(&entry.nonce[..]).expect("fixed-length key material");
-        let plaintext_bytes = cipher
-            .decrypt(nonce, entry.ciphertext.as_slice())
-            .map_err(|_| IdentityError::Backend("decrypt profile failed".to_string()))?;
-        let plain: PlaintextProfile = serde_json::from_slice(&plaintext_bytes)
+        let plaintext_bytes = Zeroizing::new(
+            self.with_cipher(|cipher| cipher.decrypt(nonce, entry.ciphertext.as_slice()))?
+                .map_err(|_| IdentityError::Backend("decrypt profile failed".to_string()))?,
+        );
+        let mut plain: PlaintextProfile = serde_json::from_slice(&plaintext_bytes)
             .map_err(|e| IdentityError::Backend(format!("decode plaintext: {e}")))?;
 
         let mut slots = HashMap::with_capacity(plain.slots.len());
-        for s in &plain.slots {
+        for s in &mut plain.slots {
             let (k, slot) = plaintext_to_slot(s);
             slots.insert(k, slot);
         }
         Ok(Profile {
             id: id.clone(),
-            display_name: plain.display_name,
+            display_name: std::mem::take(&mut plain.display_name),
             master: Ed25519Keypair::from_seed(plain.master_seed),
             slots,
         })
     }
 
     fn save_profile(&self, profile: &Profile) -> Result<(), IdentityError> {
+        self.ensure_unlocked()?;
         let plain = PlaintextProfile {
             display_name: profile.display_name.clone(),
             master_seed: profile.master.to_seed(),
@@ -264,17 +296,14 @@ impl IdentityStorage for PassphraseEncryptedStorage {
                 .map(|(k, s)| slot_to_plaintext(k, s))
                 .collect(),
         };
-        let plaintext_bytes = serde_json::to_vec(&plain)
+        let plaintext_bytes = crate::zeroizing_json::to_vec(&plain)
             .map_err(|e| IdentityError::Backend(format!("encode plaintext: {e}")))?;
+        drop(plain);
 
-        let kek = self.inner.lock().unwrap().kek.clone();
-        let cipher = ChaCha20Poly1305::new(
-            &Key::try_from(&kek.as_ref()[..]).expect("fixed-length key material"),
-        );
         let nonce_bytes = random_bytes(NONCE_LEN);
         let nonce = &Nonce::try_from(&nonce_bytes[..]).expect("fixed-length key material");
-        let ciphertext = cipher
-            .encrypt(nonce, plaintext_bytes.as_slice())
+        let ciphertext = self
+            .with_cipher(|cipher| cipher.encrypt(nonce, plaintext_bytes.as_slice()))?
             .map_err(|e| IdentityError::Backend(format!("encrypt profile: {e}")))?;
 
         let mut file = self.load_file()?;
@@ -289,35 +318,64 @@ impl IdentityStorage for PassphraseEncryptedStorage {
     }
 
     fn delete_profile(&self, id: &ProfileId) -> Result<(), IdentityError> {
+        self.ensure_unlocked()?;
         let mut file = self.load_file()?;
         file.profiles.remove(&id.0);
         self.save_file(&file)
     }
 
     fn list_profiles(&self) -> Result<Vec<ProfileSummary>, IdentityError> {
+        self.ensure_unlocked()?;
         let file = self.load_file()?;
-        let kek = self.inner.lock().unwrap().kek.clone();
-        let cipher = ChaCha20Poly1305::new(
-            &Key::try_from(&kek.as_ref()[..]).expect("fixed-length key material"),
-        );
         let mut out = Vec::with_capacity(file.profiles.len());
         for (id_str, entry) in &file.profiles {
             // Decrypt to get display_name + slot count. This is N
             // decrypts per list call, fine for the expected profile
             // counts (handful) but worth caching if it ever matters.
             let nonce = &Nonce::try_from(&entry.nonce[..]).expect("fixed-length key material");
-            let bytes = cipher
-                .decrypt(nonce, entry.ciphertext.as_slice())
-                .map_err(|_| IdentityError::Backend("decrypt for list failed".to_string()))?;
-            let plain: PlaintextProfile = serde_json::from_slice(&bytes)
+            let bytes = Zeroizing::new(
+                self.with_cipher(|cipher| cipher.decrypt(nonce, entry.ciphertext.as_slice()))?
+                    .map_err(|_| IdentityError::Backend("decrypt for list failed".to_string()))?,
+            );
+            let mut plain: PlaintextProfile = serde_json::from_slice(&bytes)
                 .map_err(|e| IdentityError::Backend(format!("decode plaintext: {e}")))?;
             out.push(ProfileSummary {
                 id: ProfileId(id_str.clone()),
-                display_name: plain.display_name,
+                display_name: std::mem::take(&mut plain.display_name),
                 slot_count: plain.slots.len(),
             });
         }
         Ok(out)
+    }
+
+    fn unlock_methods(&self) -> UnlockMethods {
+        UnlockMethods {
+            passphrase: true,
+            os_presence: false,
+        }
+    }
+
+    fn lock(&self) {
+        self.inner.lock().unwrap().kek = None;
+    }
+
+    fn is_locked(&self) -> bool {
+        self.inner.lock().unwrap().kek.is_none()
+    }
+
+    /// Re-derives the KEK (Argon2id's cost is the only throttle, ruling 19)
+    /// and checks it against a stored profile before keeping it.
+    fn unlock(&self, method: UnlockMethod<'_>) -> Result<(), IdentityError> {
+        let UnlockMethod::Passphrase(passphrase) = method else {
+            return Err(IdentityError::Backend(
+                "a passphrase vault unlocks only by its passphrase".to_string(),
+            ));
+        };
+        let file = self.load_file()?;
+        let kek = derive_kek(passphrase, &file.salt)?;
+        check_kek(&kek, &file)?;
+        self.inner.lock().unwrap().kek = Some(kek);
+        Ok(())
     }
 }
 
