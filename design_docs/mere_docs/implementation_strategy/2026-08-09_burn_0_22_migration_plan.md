@@ -4861,6 +4861,28 @@ passing.
   164 by 68 ones. Then Knot pushes. djinn's repin and the genet chain wait for
   that push.
 
+**Knot's headed recipe receipts at `306a808` (2026-10-06, three questions).**
+With the measured card, the cards are one line and sized to the widest label,
+at card-plus-gap spacing. Both recipe scenarios pass at their own settings, and
+nothing else in the frames changed. The 400% scrolled-root band predates the
+change.
+
+- Push Knot now? Options: push now; fix the empty band first; hold. Mark:
+  **"Fix the empty band first"**.
+- The empty band. The scene keeps a 90 px minimum height
+  (`bounds.size.h.max(90.0)` in `recipe.rs`), so 31 px cards leave about
+  59 px of empty panel above "Explain…". Options: fit the scene's bounds;
+  lower the minimum; leave it. Mark: **"Fit the scene's bounds
+  (Recommended)"**. *Follows:* the 90 px minimum goes, and the scene is as
+  tall as its laid-out cards.
+- The selected first card stays partly scrolled off after Explain. This
+  predates the change: the shared horizontal reveal, cambium-rootstock's
+  `owned_layout.rs` from `5011e2f9`, does not re-run on a selection change.
+  Options: report it to the reveal's owner; re-trigger the reveal from Knot.
+  Mark: **"Report to the reveal's owner (Recommended)"**. *Follows:* Knot
+  changes nothing. The finding goes to the projection-grammar adoption
+  plan's owner.
+
 *Annotation, 2026-10-05:* the next move of djinn's Knot pin is not this
 plan's. Under mer3ly Ruling 112, the Projection grammar session owns the
 genet `image-decode` chain (mer3ly Ruling 111). It runs mere's genet repin
