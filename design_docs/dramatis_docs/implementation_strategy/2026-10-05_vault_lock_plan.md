@@ -1,11 +1,13 @@
 # Vault Lock Plan
 
 **Date**: 2026-10-05
-**Status (2026-10-06)**: rulings 1 to 39 in §3; the threat statement is
-still open. L1 (personae can lock) landed on `main` (`2556a20c`). L2 (every
-consumer obeys) is next. The [dramatis repo plan](2026-10-06_dramatis_repo_plan.md)
-moves this code later. Chatelaine P4 (CXF import) waits on this plan
-(chatelaine rulings 64, 65).
+**Status (2026-10-06)**: rulings 1 to 45 in §3; the threat statement is
+still open. L1 (personae can lock) landed (`2556a20c`). L2's checkpoint A
+(every consumer obeys, the Secret Service aside) landed (`7c588deb`). L2
+checkpoint B (rulings 40, 41, 43) and the Secret Service on the ThinkPad
+are next. The [dramatis repo plan](2026-10-06_dramatis_repo_plan.md) moves
+this code later. Chatelaine P4 (CXF import) waits on this plan (chatelaine
+rulings 64, 65).
 **Scope**: the resident's secrets can be locked. While locked, no secret
 material can be reached through the vault or the resident's derived keys.
 Unlocking takes a user act. Every consumer (the SSH agent, castellan's item
@@ -498,6 +500,61 @@ djinn command that prompts on the terminal, never the environment (ruling
 7), built in L2; the same plus a castellan enrollment card; Hello only
 until later. Mark: **"personae API + djinn CLI (Recommended)"**.
 
+Rulings 40 to 45 were asked on 2026-10-06 from L2's checkpoint A (§6).
+
+**Ruling 40.** *While locked, djinn's own doors close: each app session's
+signer is derived from the vault, so even the status and stop routes
+cannot be reached.* Options: the doors' session-signing key is a
+namespaced derived key the lock leaves in place, as ruling 24 does for the
+transport key (it authenticates the resident to apps and opens nothing);
+the status and stop routes admit sessions without it; accept it and
+observe a locked resident through its event file. Mark: **"Door key stays
+(Recommended)"**.
+
+**Ruling 41.** *How is a running djinn unlocked? The unlock call exists,
+but nothing in djinn reaches it.* Options: a native Windows Hello or
+passphrase prompt in the resident (ruling 21), so the credential never
+crosses a pipe; a `djinn --unlock` command that sends the passphrase over
+the owner-only control route; both. Mark: **"Both"**. Follows: both are
+built. The command's passphrase crosses a local pipe, so it should sit
+only on the owner-only control route. *Reading, not ruled.*
+
+**Ruling 42.** *Linux has no OS-held root. Its vault is the passphrase
+vault, which can already lock and unlock by passphrase, but the resident
+takes that passphrase from `PERSONAE_PASSPHRASE`, which ruling 7 forbids
+for a resident that locks.* Options: the Linux resident starts locked and
+waits for the same native prompt (a terminal prompt when headless); an
+AutoOs backend for Linux (the kernel keyring, or systemd-creds bound to
+the TPM; the desktop keyring is awkward because castellan is the Secret
+Service there); the environment for now, as an exception. Mark: **"Starts
+locked, prompt (Recommended)"**.
+
+**Ruling 43.** *Ruling 15 (the lock also relocks Knot's seed) can be done
+now without pandect changes.* Options: djinn closes the Knot lane on lock
+and reopens it on unlock, with the seed's residue measured; wait for the
+dramatis repo plan's D8. Mark: **"Close/reopen now (Recommended)"**.
+Follows: Knot's sync pauses while locked.
+
+**Ruling 44** *(amends how rulings 2 and 24 are carried out).* *Deriving
+Distillery's transport key changes the device's network id, and peers
+find a device's address by its master key.* Options: a separate plan
+where peers accept both identities for a window; one coordinated switch
+across Mark's devices; reopen ruling 2 and keep the master resident. Mark:
+**"Hard switch"**. Follows: no window; every device switches in one
+update. Peers outside Mark's devices learn the new transport identity
+afresh. Until it lands, Distillery keeps the master in memory while
+locked.
+
+**Ruling 45.** *The lane's smaller calls.* Each was offered for unticking:
+- the standalone agent refuses `-x`;
+- a second `-x` fails, as in OpenSSH;
+- enrolment never mints or replaces a root;
+- while locked, only the vault card acts (pending approval cards lose
+  their buttons; revocation and the wallet sealer are refused).
+
+Mark kept all four: **"Standalone agent refuses -x, Second -x fails,
+Enrolment never mints, Locked: only Unlock acts"**.
+
 Still open: a threat statement naming hibernation and the pagefile.
 
 ## 4. Phases
@@ -518,11 +575,11 @@ Drafted from the assessment; set once the forks are ruled.
         Hello's prompt is Mark's attended step, its token path tested with
         a test-only constructor.)*
 - **L2 — every consumer obeys.** Done when:
-  - [ ] over the isolated named pipe, the agent behaves as ruled while
+  - [x] over the isolated named pipe, the agent behaves as ruled while
         locked, and `ssh-add -x`/`-X` as ruled;
-  - [ ] `CastellanResident` drops its keys, so items and the OTP gate return
+  - [x] `CastellanResident` drops its keys, so items and the OTP gate return
         `Locked`;
-  - [ ] the snapshot reports Locked, and Unlock is native-only;
+  - [x] the snapshot reports Locked, and Unlock is native-only;
   - [ ] Secret Service collections report Locked, `GetSecret(s)` refuses,
         and `Unlock` returns a Prompt, proven on the ThinkPad with
         `secret-tool` under a disposable bus.
@@ -698,3 +755,52 @@ first. An Opus lane builds L2 up to checkpoint A:
 - passphrase enrolment (ruling 39), and lockable test storages.
 
 The Secret Service is checkpoint B, on the ThinkPad.
+
+**2026-10-06, L2 checkpoint A landed** (`7c588deb`, merging `b173f766` and
+`fcd82877`):
+- **What it built:**
+  - the resident lock coordinator (rulings 13 and 31): the vault first,
+    then every holder, then the watch channel; a holder that fails to
+    re-derive relocks everything;
+  - `CastellanResident`'s lock holder;
+  - castellan's typed refusals (ruling 10): items, the OTP gate,
+    revocation, the wallet sealer, and switching (ruling 14);
+  - the Locked card, with only a native Unlock, and the kept snapshot
+    (ruling 11);
+  - the agent's OpenSSH semantics: `ssh-add -x` locks the vault, and `-X`
+    is refused (rulings 8 and 9);
+  - passphrase enrolment through personae and `djinn --enroll-passphrase`
+    (ruling 39);
+  - a castellan no-residue scenario, which shares the tracker with
+    personae's.
+- **The lane's guard removals:** the holder hook, the agent's sign guard,
+  the `-X` refusal, revocation's guard and the snapshot's locked branch.
+  Each failed a test.
+- **The lane's receipt:** `20261006T091745Z-7115a66e` used the system's
+  OpenSSH (`ssh-add`, `ssh-keygen -Y sign`) over an isolated pipe. All 15
+  assertions passed, the record verified, and the installed resident was
+  identical.
+- **Verified in `mere-verify` at `fcd82877`:**
+  - my two controls each failed a named test: no relock when a holder
+    fails (`a_holder_that_cannot_rederive_relocks_everything`), and a
+    holder joining a locked vault keeping its keys
+    (`a_holder_joining_a_locked_vault_locks`);
+  - personae 205 + 7 + 1, castellan 120 + 3 + 4 + 1, djinn 90 plus its
+    integration tests, testkit 6 + 5;
+  - the receipt again (`20261006T095312Z-774abc32`, passed, 4 evidence
+    files verified), and the harness's live tests;
+  - the gate, on the merge with `main` `e8115a16`;
+  - the installed resident identical.
+- **The lock** gains djinn's edge to `rpassword`, already present. Knot's
+  pinned revision shows the same single `knot-desktop` failure as the base
+  (two genet copies), so the branch adds nothing.
+- **Not verified:**
+  - the wire sign refusal against the real binary (OpenSSH never sends a
+    sign request when nothing is listed; proven in castellan's in-process
+    pipe test);
+  - a real Hello prompt;
+  - personae and castellan on Linux with all features;
+  - serde_json's escape buffer (§5);
+  - ruling 7 (the receipt's resident still opens with the environment
+    passphrase, for ruling 42 to remove).
+- Rulings 40 to 45 settle its forks.
