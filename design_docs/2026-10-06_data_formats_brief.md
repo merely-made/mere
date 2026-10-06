@@ -134,6 +134,14 @@ postcard code found mentions in `graph-kernel` (7), `notochord` (11),
   `content-contract` and `chatelaine`, which showed no version header near
   their postcard records. The options were: audit through a lane; note only.
   Mark: "Audit through a lane (Recommended)".
+- **F6. One header helper.** Asked when the lanes were planned: "How should
+  postcard records get their version header?" The options were: one shared
+  helper in Mere (wing-formats' 8-byte magic and `u16` version, with
+  `frame`, `unframe` and `peek`, in one small Mere crate that Mere's crates
+  and wing-formats both use, old unheadered bytes loading as version 0);
+  per-crate headers. Mark: "One shared helper in Mere (Recommended)". F4's
+  lane is
+  [`2026-10-06_postcard_framing_plan.md`](mere_docs/implementation_strategy/2026-10-06_postcard_framing_plan.md).
 - **F5. Isocosm's rosters.** Asked whether rosters (`Founding::SpacedRoster`,
   `SEEDED_KINDS`) move from Rust into datasheets. The options were: yes,
   through a plan; only new ones; not now. Mark: "Yes, through a plan
