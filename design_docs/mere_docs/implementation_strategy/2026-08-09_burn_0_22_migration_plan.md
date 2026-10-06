@@ -4843,6 +4843,24 @@ byte-identical outcomes for five cases at seven sizes (164 by 68, 1 by 1, 0 by
   action gates and the tests. Only the view's draw call takes the measured
   compiler.
 
+**Knot's card: a probe that never measures, and when Knot pushes (2026-10-05).**
+Built at knot-editor `889e1aa` (unpushed), with all the done-condition tests
+passing.
+
+- A probe that can never give a usable size, for example after a font or
+  stylesheet failure, made the frame hook request frames forever. Options:
+  stop after a few frames; fall back to the 164 by 68 card; keep
+  re-measuring. Mark: **"Stop after a few frames (Recommended)"**. *Follows:*
+  after a few frames (about 3) with no usable rect, the hook stops requesting
+  frames and the scene stays hidden, with a logged warning. It re-measures
+  on the next label change or window resize.
+- When Knot pushes. Options: after its headed recipe receipts; now, with the
+  receipts after. Mark: **"After the headed receipts (Recommended)"**.
+  *Follows:* once seiche-speed's timing round is done, Knot's recipe receipts
+  run at both window settings and their frames are compared with the old
+  164 by 68 ones. Then Knot pushes. djinn's repin and the genet chain wait for
+  that push.
+
 *Annotation, 2026-10-05:* the next move of djinn's Knot pin is not this
 plan's. Under mer3ly Ruling 112, the Projection grammar session owns the
 genet `image-decode` chain (mer3ly Ruling 111). It runs mere's genet repin
