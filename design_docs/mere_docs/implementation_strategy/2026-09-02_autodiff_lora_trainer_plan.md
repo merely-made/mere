@@ -242,6 +242,13 @@ examples; v0 remains available under its own arm; every receipt above is
 green on the landed `main`; and the FLoRA artifact contract has not changed
 a byte.
 
+**Corrected 2026-10-06 (S14 pass):** as built there is no default arm in
+Djinn's lane configuration: `ports/djinn/examples/` holds only
+`resident_v1_fixture.rs`, the lane configuration names only the device and
+the arm arrives inside each posted request (Phase 3, Progress), and the two
+arms appear only in `ports/djinn/tests/common/mod.rs`, whose receipts run
+both.
+
 ## Progress
 
 - **2026-09-03:** Phase 1 landed in `crates/intel/esp`: `decoder-autodiff`
@@ -312,3 +319,8 @@ a byte.
   resource), D2 (per-case targets and several target modules now; shared
   length kept, padding with a mask named as the follow-on), and D3 (Adam
   from `burn-optim` over a LoRA `Module`, every hyperparameter explicit).
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_44_s14_phase_b6.md: the Done section's "default
+  arm in Djinn's lane configuration examples" is annotated as built (the arm
+  is chosen per request and the tests run both arms).

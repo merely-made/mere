@@ -2788,6 +2788,19 @@ matter of picking the hour; the Workbench W4 receipts are on genet main.
   remains outside this repository move: Cloudflare still proxies the custom
     domain, GitHub therefore reports the organization domain unverified and does
     not yet permit HTTPS enforcement.
+  **Corrected 2026-10-06 (S14 pass):** the hardening followed the same day.
+  P6's Status (2026-09-05: met) and this plan's status line record domain
+  verification, certificate issuance and HTTPS enforcement closed on
+  2026-09-05, and Mer3ly's receipt
+  (`mer3ly/docs/receipts/org-transfer/2026-09-05_p6_platform_topology.md`,
+  lines 58-78) shows `https_enforced=true`.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_44_s14_phase_b6.md: the 2026-09-05 HTTPS tail
+  and the games-wing genet pin are annotated, and P7's close, until now only
+  in the status line, is entered here: P7 closed 2026-09-06 when the
+  documentation-policy D3 audit reached zero failing findings (the doc policy
+  consolidation plan's 2026-09-06 Progress).
 
 ## Games-wing renderer adoption (2026-09-09)
 
@@ -2805,6 +2818,15 @@ The pin-only baseline passed the focused all-target check of
 Netrender c77. The full workspace all-features/all-targets attempt stopped in the
 separately pinned Knot editor: `EditableTextV1` initializers in `endpoint.rs`
 are missing `public_revision`.
+
+**Corrected 2026-10-06 (S14 pass):** true when written, stale now. Main
+pinned genet `3a7b5023` from `6e453de7` (2026-09-09) until `8131d7a3`
+(2026-09-12) advanced every pin to `ec5281ef7fc`; at mere 535bca11 the pins
+are `bd3e8861` (the root `Cargo.toml` and
+`ports/graphshell/web/Cargo.toml`), which does not contain `3a7b5023`. That
+commit now survives only on genet's `origin/wing-platform-alignment-20260909`.
+The Netrender alignment holds: the base pins `9607d16f`, which contains
+`c77b0be8`.
 
 The consumer closure also requires the existing atlas and deferred-input work:
 Cambium's polygon fields, retained callout paint and separate `GraphAtlasEvent`;
