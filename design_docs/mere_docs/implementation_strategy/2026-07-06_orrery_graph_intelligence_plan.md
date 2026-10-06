@@ -1,11 +1,19 @@
 # Orrery Graph Intelligence Plan (burn brief, Lane 5)
 
 **Date**: 2026-07-06
-**Status**: P1-P6 landed (2026-07-06). Force pass (P1-P3) + semantic-arrangement
-bridge (P4) + live meerkat content-affinity wiring (P5) + blended affinity and
-content-text enrichment (P6) are all in and tested. Open: the `semantic-embeddings`
-BERT-provider upgrade (a separate slice), the off-thread embedding actor (raw-body
-text + the intel-index lift), and the P3 live force-pass injection (held — niche).
+**Status (2026-10-06):** P1–P6 landed 2026-07-06. P1–P4 and P6 survive
+under new homes: the repulsion kernel is `seiche::tensor_forces`, behind
+optional `tensor-burn` features (`eae87153`, 2026-08-31), the solver seam is
+seiche's `set_repulsion_solver`, the affinity bridge and the lexical provider
+are in esp (`crates/intel/esp/src/embed`), and `AffinityBlend` and
+`set_content_affinity` are in pictograph. P5's driver landed in meerkat on
+2026-07-06, retired with it 2026-07-18 (`c5f01064`); pictograph's
+`set_content_affinity` now has no caller in Mere or Turnstone. The held P3 live
+injection was superseded by the physics catalog plan's P5c (`c57e820b`,
+2026-10-02), and the intel-index lift has landed
+(`crates/intel/esp/src/embed/index_burn.rs`). Open: the BERT
+`semantic-embeddings` provider upgrade and the off-thread embedding actor
+(raw-body text), both written against the removed meerkat driver.
 **Related**: [burn_utilization_brief](../research/2026-07-04_burn_utilization_brief.md) (Lane 5), [burn_wgpu_flip_plan](2026-07-04_burn_wgpu_flip_plan.md) (L1: shipped burn-wgpu embeddings + aether field lowering + the CPU-vs-GPU timing methodology this reuses), [graph_signals_layer_plan](../../archive_docs/2026-08-20_completed_plans/2026-06-22_graph_signals_layer_plan.md) (the consumer for similarity edges), `crates/orrery/aether` *(historical citation)* <!-- doc-audit: historical-path --> (the burn-lowering home; gyre stays burn-free), `crates/intel/embed` *(historical citation)* <!-- doc-audit: historical-path --> (`field_bridge` / `canvas_search`: the embedding→field seam already built).
 
 ## Scope
@@ -23,6 +31,11 @@ Lane 5's two done-conditions, in leverage/tractability order:
 gyre stays burn-free: the force pass lives in aether (the field source), gyre
 consumes the resulting forces. Out of scope: Lane 4 (training), the cond-1
 `<orrery>` element.
+
+**Corrected 2026-10-06 (S14 pass):** `aether::forces::repulsion` and
+`repulsion_reference` moved to `seiche::tensor_forces`
+(`crates/conatus/seiche/src/tensor_forces.rs`) in `eae87153` (2026-08-31),
+behind optional `tensor-burn` features in seiche's manifest.
 
 ## Honest framing (the cap the brief names)
 
@@ -93,6 +106,17 @@ the orrery builds its sim) is held pending whether large-graph settle is a
 priority. The measurement is the deliverable; the wiring is a thin, low-urgency
 follow-on.
 
+**Corrected 2026-10-06 (S14 pass):** `RepulsionSolver` is no longer a plain
+`Fn`; it is `Arc<dyn Fn(&[f32], &[f32], RepulsionRequest) ->
+Result<RepulsionForces, RepulsionSolverError>>`, with `set_repulsion_solver` in
+`crates/conatus/seiche/src/lib.rs`. `aether::forces::repulsion_wgpu` became
+`repulsion_wgpu_roundtrip`, documented as a staging helper. The held live
+injection is done another way: pictograph's `Canvas` and `PhysicsBoard` take a
+host `PhysicsDevice` with lagged GPU repulsion
+(`crates/canvas/pictograph/src/canvas/physics_device.rs`, `c57e820b`,
+2026-10-02), recorded as P5c in the
+[physics catalog plan](2026-09-02_physics_catalog_plan.md).
+
 ### P4 — Semantic arrangement (mechanism landed 2026-07-06)
 
 The mechanism turned out to already exist on the gyre side: `AffinitySpring`
@@ -159,6 +183,13 @@ stays structural). Three pieces, each tested:
   pane — the gnode-pool idiom). 4 meerkat tests (valid/symmetric/deduped pairs,
   two-node floor, revision-gate, throttle).
 
+**Corrected 2026-10-06 (S14 pass):** the meerkat driver
+(`content_affinity`, `ContentArrangement`) was deleted with meerkat in
+`c5f01064` (2026-07-18). The orrery seam survives as `set_content_affinity` in
+pictograph's `strategy.rs`, with no caller in Mere or Turnstone; the lexical
+provider survives as `LexicalEmbeddingProvider` in
+`crates/intel/esp/src/embed/lexical.rs`.
+
 **Honest bounds (carried forward):**
 
 - **Lexical, not semantic, today.** Shared surface vocabulary clusters; a
@@ -214,6 +245,9 @@ embedding actor (the same actor the P3/P5 scaling notes call for), not this slic
 The intel-tier index lift that actor would also want is scoped in
 [intel_vector_index_burn_lift_plan](2026-07-06_intel_vector_index_burn_lift_plan.md).
 
+**Corrected 2026-10-06 (S14 pass):** that lift's Path A has landed
+(`crates/intel/esp/src/embed/index_burn.rs`).
+
 ## Findings
 
 - 2026-07-06: `embed::field_bridge` (233 LOC) + `canvas_search` (349 LOC)
@@ -245,6 +279,7 @@ The intel-tier index lift that actor would also want is scoped in
 
 ## Progress
 
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at mere 535bca11, from the D2 record in support/doc-audit/d2/batch_41_s14_phase_b3.md: P1–P4 and P6 recorded under their seiche, esp and pictograph homes, P5's driver as retired with meerkat (`c5f01064`), the held P3 injection as superseded by physics catalog P5c (`c57e820b`), the index lift as landed, and the solver signature, rename and alias claims corrected.
 - 2026-07-06 — **P6 landed (blended affinity + content-text enrichment)**. Structural
   and content affinity now combine via an `AffinityBlend` mode (default `Blend` = a
   noisy-OR `1−(1−s)(1−c)` of the two weights; `ContentOnly`/`StructuralOnly` retained),
@@ -257,6 +292,10 @@ The intel-tier index lift that actor would also want is scoped in
   Also this session: the meaningless-by-design `HashedEmbeddingProvider` renamed to
   `StubEmbeddingProvider` (deprecated alias kept) so it stops reading like a usable
   provider, and D1 re-scoped in the brief now that embedding is a third GPU consumer.
+
+  **Corrected 2026-10-06 (S14 pass):** no `HashedEmbeddingProvider` alias
+  exists in code now; `StubEmbeddingProvider` is in
+  `crates/intel/esp/src/embed/stub.rs`.
 - 2026-07-06 — **P5 landed (live meerkat wiring, content-affinity half)**. The P4
   bridge is now driven end-to-end in the focused orrery behind an off-by-default
   `content-affinity` feature. Three verified pieces: (1) `Orrery::set_content_affinity`

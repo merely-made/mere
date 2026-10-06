@@ -1,6 +1,17 @@
 # Reticulum transport plan
 
-**Status:** partial: P0/P1 and the bounded test row landed and verified; documentation and the decision gate remain open.
+**Status (2026-10-06):** P0/P1 and the bounded test row landed on the
+Beechat `reticulum` 0.1.0 crate on 2026-07-01. `be99eadb` (2026-07-15,
+retinue's R5) replaced that backend with retinue behind the same trait
+(`reticulum = ["dep:retinue", "dep:hkdf", "dep:sha2"]` in
+`crates/murm/transport/Cargo.toml`, retinue 0.2.0 by git rev), and
+`a69e4867` (2026-07-27) revised the identity and the binding: the Ed25519 half
+is the master seed itself, and announce app data is empty, the 96-byte binding
+read only as legacy. The Direction section's trigger has fired, but Phase 3's
+decision is unrecorded; the feature is default-off, enabled by `commons-spine`
+only as a dev-dependency and by the `murm-direct-phy` probe as a normal one.
+Open: a forged legacy-binding test, a README section on ALPN mapping, announce
+discovery and binding, the DOC_README update, and the Phase 3 decision itself.
 
 Plan for adding an optional `ReticulumTransport` backend to the Mere `transport`
 crate (`crates/murm/transport`).
@@ -13,6 +24,13 @@ Rust port [`reticulum`](https://crates.io/crates/reticulum) v0.1.0. The probe is
 limited to bilateral stream connectivity: one `connect(peer, alpn)` and one
 `accept(alpn)` yielding an `AsyncRead + AsyncWrite` stream. Sync (gossip / RBSR
 / LogSync) and blob transfer remain iroh-only for now.
+
+**Corrected 2026-10-06 (S14 pass):** the backend is no longer Beechat's
+crate. `be99eadb` (2026-07-15) replaced it with retinue: the feature is
+`reticulum = ["dep:retinue", "dep:hkdf", "dep:sha2"]`
+(`crates/murm/transport/Cargo.toml`), and the workspace pins retinue 0.2.0 at
+git rev `fa4f925`. Retinue's v0 plan records "R5 — Mere adoption. DONE
+2026-07-15".
 
 ## What is in scope
 
@@ -52,6 +70,18 @@ plus a stewardship check the same day:
   copied text; treat the Python reference as a black-box interop oracle
   (mixed-runtime smoke tests against `rnsd`) rather than a code reference, given
   its license posture.
+
+  **Corrected 2026-10-06 (S14 pass):** retinue's current notice no longer
+  matches the black-box-only rule. Its `THIRD_PARTY_NOTICES.md`, section
+  "Reticulum", reports a first limited review of RNS implementation source on
+  2026-09-26, says no RNS code was copied or translated, and calls comparative
+  review the current scope, adaptation being a separate decision.
+
+  **Open, raised by the S14 pass (2026-10-06):** should this reference
+  discipline keep its own wording, now that retinue's notice states the
+  current posture? Options: point this section at retinue's notice instead of
+  restating it; keep it as Mere's record of the 2026-07-06 rule, with the
+  notice cited beside it.
 - Scope: **endpoint-first**, wire-compatible with RNS 1.3.x — identity, announce,
   link, resource, TCP interface first; transport-node routing and RNode/LoRa
   interfaces later; LXMF-wire optional on top. A Mere node needs to be a
@@ -67,6 +97,13 @@ plus a stewardship check the same day:
   `repos/retinue/design_docs/2026-07-06_retinue_v0_plan.md` (phases R0
   oracle-harness/primitives → R5 Mere adoption). Standalone-sibling shape:
   own repo, crates.io-only dep, one-way (Mere consumes it).
+
+**Corrected 2026-10-06 (S14 pass):** the trigger fired. Mere's own
+implementation replaced Beechat behind the same trait in `be99eadb`
+(2026-07-15), so the probe is no longer pinned to Beechat 0.1.0. Retinue's
+README gives its licence as MPL-2.0, not dual MIT/Apache-2.0, and Mere takes
+retinue by git rev in the root `Cargo.toml`, not as a crates.io-only
+dependency.
 
 ## Findings
 
@@ -95,6 +132,11 @@ plus a stewardship check the same day:
 - The crate uses `ed25519-dalek` 2.1.1 and `tokio` 1.x, matching Mere's existing
   stack. Its build script needs `protoc` for the Kaonic gRPC protobuf files.
 
+**Corrected 2026-10-06 (S14 pass):** these findings describe Beechat's crate,
+which `be99eadb` replaced with retinue. The `protoc` requirement was Beechat's
+`build.rs`; the retinue crate has no `build.rs` (only its firmware has one)
+and no tonic or prost dependency.
+
 ### Identity mapping
 
 Mere's master key is a single Ed25519 keypair. Reticulum needs both X25519 and
@@ -103,6 +145,11 @@ using HKDF-SHA256 with a Mere-specific context string, producing a reproducible
 `PrivateIdentity` for each Mere seed. The Mere `PeerID` is still computed from
 only the Ed25519 verifying key, so it is stable with respect to the other Mere
 transports.
+
+**Corrected 2026-10-06 (S14 pass):** only the X25519 half is HKDF-derived
+now. The Ed25519 half is the Mere master seed itself (`derive_identity` in
+`crates/murm/transport/src/reticulum_transport/keys.rs`), changed in
+`a69e4867` (2026-07-27).
 
 ### Authenticated PeerID binding
 
@@ -124,6 +171,13 @@ The receiver:
 4. Stores `PeerID → (ALPN, DestinationDesc)` in a local address book.
 
 Only after this binding succeeds can `connect(peer, alpn)` resolve the peer.
+
+**Corrected 2026-10-06 (S14 pass):** announce app data is now intentionally
+empty: the signed retinue identity already carries the Mere public key, and the
+96-byte binding made a valid announce too large for a 255-byte LoRa frame. The
+`PeerID || signature` form is read only as legacy
+(`crates/murm/transport/src/reticulum_transport/announce.rs`), changed in
+`a69e4867` (2026-07-27).
 
 ### ALPN mapping
 
@@ -165,6 +219,10 @@ announces it.
   - Optional `reticulum` feature added to `crates/murm/transport/Cargo.toml`.
   - `cargo check -p transport --features reticulum` passes with `PROTOC` set to
     a local `protoc.exe`.
+
+  **Corrected 2026-10-06 (S14 pass):** `be99eadb` (2026-07-15) replaced the
+  `reticulum = "0.1"` dependency with retinue; see the correction under the
+  Goal.
 - 2026-07-01 — **P0/P1 implemented and verified (this is the real green).** A
   review found the 2026-06-29 state was a *false green*: `reticulum_transport.rs`
   was committed but never declared in `lib.rs`, so `--features reticulum` compiled
@@ -201,12 +259,17 @@ announces it.
     present to build the feature. It was not on PATH; the build used a pinned
     prebuilt `protoc` via the `PROTOC` env var. This is a real build/CI
     prerequisite, recorded in the risk table.
+
+    **Corrected 2026-10-06 (S14 pass):** the requirement left with Beechat's
+    crate. Retinue has no `build.rs` outside its firmware and no tonic or
+    prost dependency.
   - **Verified.** `cargo check -p transport --features reticulum --tests` green
     (15s); `cargo clippy` clean; `cargo test` green — 3 tests, incl.
     `bilateral_round_trip_over_tcp_loopback` (two instances discover each other by
     authenticated announce, establish a link, and round-trip `hello`/`world`),
     finishing in 0.64s. Mere-side changes uncommitted (concurrent meerkat/orrery
     work in the tree).
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at mere 535bca11, from the D2 record in support/doc-audit/d2/batch_41_s14_phase_b3.md: the Beechat backend recorded as replaced by retinue (`be99eadb`) and the identity and binding as revised (`a69e4867`), the protoc, licence and crates.io claims corrected, and the reference discipline's relation to retinue's notice raised as an open question.
 
 ## Phases and done-conditions
 
@@ -241,6 +304,12 @@ Done when:
   `app_data` must be rejected — currently only exercised implicitly, since
   `connect` succeeds only when the binding verifies).
 
+**Corrected 2026-10-06 (S14 pass):** the module's `tests.rs` now holds five
+tests, the three named above among them, and still no forged or mismatched
+binding test. Since `a69e4867` the `app_data` binding is the legacy form (see
+the correction under "Authenticated PeerID binding"), so the remaining test is
+a forged legacy binding.
+
 ### Phase 3 — Documentation and decision gate
 
 Done when:
@@ -250,6 +319,12 @@ Done when:
 - `design_docs/DOC_README.md` is updated.
 - Decision recorded: keep feature-flagged, wire into host config, or pause on
   blockers.
+
+**Corrected 2026-10-06 (S14 pass):** `crates/murm/transport/README.md` covers
+only the feature row, not the ALPN mapping, announce discovery or binding. No
+decision is recorded; in the tree the feature stays default-off, enabled by
+`commons-spine` as a dev-dependency and by the `murm-direct-phy` probe as a
+normal one.
 
 ## Risks and mitigations
 
@@ -261,3 +336,7 @@ Done when:
 | `PeerID`-to-destination synthesis is impossible | Use authenticated announce cache instead of synthesis. |
 | Identity derivation mismatch | Use deterministic HKDF from the Ed25519 seed; test reproducibility. |
 | Lock-heavy `Arc<Mutex<_>>` API | Minimize critical sections; run event drains in background tasks. |
+
+**Corrected 2026-10-06 (S14 pass):** the `reticulum` v0.1.0 and `protoc` rows
+describe Beechat's crate, which `be99eadb` replaced with retinue; retinue needs
+no `protoc`.
