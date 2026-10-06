@@ -1440,8 +1440,9 @@ comes back to Mark as a fork, with evidence, before the code commits to one.
 - **C11 (P2). Classification lifecycle.** Ruled: ruling 24, affirmative
   statuses only in ordinary readers; retain review records.
 - **C12 (P2). Resource journal captures.** Ruled: ruling 25, typed captures.
-  Coordination authorized 2026-10-05; the Turnstone lane has a prepared
-  patch and awaits a gated Mere API checkpoint.
+  Coordination authorized 2026-10-05. Typed source checkpoint `cff35712`
+  passes the bounded Turnstone consumer gate at `c3b14cb`; production patch,
+  dependency integration and main review remain held.
 - **C13–C17 (P2).** Open: the dated Findings above give the evidence and
   options for predicate placement, composition, export, term identity and
   checked snapshot rejection.
@@ -1770,9 +1771,11 @@ comes back to Mark as a fork, with evidence, before the code commits to one.
 
   The Turnstone owner records **six executed bounded consumer regressions
   passed** at `feb2594`, with all 209 supplier/fixture source hashes unchanged over the
-  final run. That receipt predates the final checked-loader orphan correction;
-  the capture/read contract is unchanged, and final supplier requalification
-  waits for the branch checkpoint. Its artifact remains unapplied to production behavior and its
+  final run. That earlier receipt predates the final checked-loader orphan
+  correction. The owner subsequently requalified exact Mere `cff35712` at
+  Turnstone `c3b14cb`: **six passed**, all 209 fresh source hashes unchanged,
+  supplier HEAD exact and checkout clean before/after. All 152 frozen Scry
+  source hashes remain unchanged. Its artifact remains unapplied to production behavior and its
   portable pins/Scry proof remain frozen. This does not qualify the full
   App/drain/native integration. Mere root changed no sibling source.
 
@@ -1788,3 +1791,12 @@ comes back to Mark as a fork, with evidence, before the code commits to one.
   Cargo homes or build-output directories. The
   graph-semantics worktree/branch remains owned by this lane for P2 and
   Mark's review; the shared Mere target remains reusable. Main is untouched.
+
+- **2026-10-05. Typed API checkpoint and exact consumer receipt recorded.**
+  Mere `cff35712` contains the gated typed-storage/capture slice. Turnstone
+  `c3b14cb` records bounded consumer requalification against that exact
+  commit, six passed, stable 209 supplier/fixture source hashes and unchanged
+  152 frozen Scry inputs. This documentation follow-up changes no source.
+  Production behavior/pins and full App integration remain held for the
+  compatible reviewed integration set; C13–C17 still await Mark's rulings.
+  Main integration is not authorized by the bounded supplier review.
