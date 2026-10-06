@@ -193,6 +193,19 @@ in two or more crates.
   him), recorded in the burn plan's §13.46
   ([burn plan](2026-08-09_burn_0_22_migration_plan.md)) at `ac7f906d`. P2
   does not touch `ProjectionCompiler` or `ItemSizes`.
+  **Corrected 2026-10-05:** the counts above are wrong. Knot `54bb8cd` has
+  twelve call sites: one in `retention.rs` and eleven in
+  `apps/desktop/src/composition/recipe.rs` (five in code, six in its tests; the
+  twelfth mention there is the import), and `tests/support/recipe.rs` makes
+  none; "eight" came from output cut off at ten lines. The Knot lane reports
+  Mark's ruling on Knot's card, "Measured from Knot's font": the desktop
+  measures each recipe's widest occurrence label in its own font plus button
+  padding and hands that to the `ProjectionCompiler`, with retention
+  validation's nominal size, the measuring path and the padding to come back
+  to him as forks. Not found in mere's documents at `7abbb416`; the lane's
+  record holds it. That lane also notes P1 moves Knot's spacing whatever card
+  is chosen (card plus gap, where a fixed 184 by 84 cell was), and that Knot is
+  the first host to measure its card rather than declare it.
 - **F16 (2026-10-05, P2 stage 1's control). wgpu's device equality cannot tell
   two boots apart.** wgpu 30 compares a `Device` by a per-instance id
   (`impl_eq_ord_hash_proxy!(CoreDevice => .id)`), and each `RenderCore::boot`
