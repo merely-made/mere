@@ -573,6 +573,11 @@ pub struct P2pandaTransport {
     /// `IrohEndpointArgs`), and those handles hold clones of it, so none is
     /// moved once made, and moving the transport moves pointers (ruling 51).
     endpoint: Box<Endpoint>,
+    /// iroh's endpoint, asked of p2panda's actor once, at bind: its handle
+    /// holds no key, and `close` then sends the actor no message (ruling 52).
+    /// The actor is spawned unsupervised and binds once, so this stays its
+    /// endpoint for the transport's life.
+    iroh: iroh::Endpoint,
     address_book: AddressBook,
     /// The store under `address_book`, for the one write its actor cannot
     /// make atomically: a record only if none exists.
@@ -756,6 +761,10 @@ impl P2pandaTransport {
                 .await
                 .map_err(|e| TransportError::Backend(format!("endpoint: {e}")))?,
         );
+        let iroh = endpoint
+            .endpoint()
+            .await
+            .map_err(|e| TransportError::Backend(format!("endpoint(): {e}")))?;
         let queues: AlpnQueues = Arc::new(StdMutex::new(HashMap::new()));
         for alpn in &alpns {
             let (tx, rx) = mpsc::unbounded_channel();
@@ -863,6 +872,7 @@ impl P2pandaTransport {
 
         Ok(Self {
             endpoint,
+            iroh,
             address_book,
             address_store,
             peer_id,
@@ -921,13 +931,12 @@ impl P2pandaTransport {
     /// Call this when a bounded transport owner is finished. Dropping an open
     /// iroh endpoint aborts its remaining connections and makes the remote end
     /// report a lost connection even after all application data was delivered.
+    ///
+    /// Uses the handle kept at bind: a message to p2panda's actor here would
+    /// be boxed whole by ractor, unused bytes included, and those can carry
+    /// key bytes left on this thread's stack by bind (ruling 52).
     pub async fn close(&self) -> Result<(), TransportError> {
-        let endpoint = self
-            .endpoint
-            .endpoint()
-            .await
-            .map_err(|e| TransportError::Backend(format!("endpoint(): {e}")))?;
-        endpoint.close().await;
+        self.iroh.close().await;
         Ok(())
     }
 
