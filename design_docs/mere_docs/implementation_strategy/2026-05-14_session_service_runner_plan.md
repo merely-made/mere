@@ -1,7 +1,7 @@
 # SessionServiceRunner — implementation plan
 
 **Date**: 2026-05-14
-**Status**: Implementation plan — v0a trait + null runner landed; v0b real workers pending
+**Status (2026-10-06):** v0a trait, `NullRunner` and `InMemoryRunner` landed, now in `crates/system/pandect/src/session_service_runner.rs`; v0b real workers not started (nothing outside pandect uses the runner).
 
 > **Reconcile note (2026-07-03 archive pass):** the code moved past the status line —
 > `session_service_runner.rs` now also ships an `InMemoryRunner` (`impl SessionServiceRunner`)
@@ -9,6 +9,9 @@
 > `SessionServiceRunner` worker. v0b is at least partially real; the remaining question is
 > which of the §-listed worker kinds (fetcher pool, embedder, indexer, …) still lack runners.
 > File paths below are 2026-05-14-era; verify before use.
+
+**Corrected 2026-10-06 (S14 pass):** the code had not moved past the status line, and v0b is not partially real. The misfin server did not run as a `SessionServiceRunner` worker: even at checkpoint `8dcaf441`, misfin's `server.rs` (lines 29-31) only said a host "or a daemon-side `SessionServiceRunner` worker" could spawn it, and misfin left Mere in `f2e7825d` (2026-07-03). At `535bca11` nothing outside `crates/system/pandect` names `SessionServiceRunner`, `NullRunner` or `InMemoryRunner`. The trait, `NullRunner` and `InMemoryRunner` are in `crates/system/pandect/src/session_service_runner.rs`; `WorkerKind` and `active_workers` are in `crates/system/pandect/src/manifest.rs`.
+
 **Scope**: Let sessions declare background workers (fetcher pool, embedder, indexer, intelligence-signal producer, …) that run with no attached client. Per the framing brief §5.7, the kernel stays a pure data layer; networking and GPU/model runtimes live behind a `SessionServiceRunner` capability the host implements. Land the trait + a no-op runner + the worker-status vocabulary now; per-worker implementations land as their workloads materialise.
 
 **Related**:
@@ -35,6 +38,8 @@ The trait is portable (lives in `system/session-runtime`, wasm-clean) so a futur
 - `NullRunner` no-op implementation lets `HostRoot` thread a runner reference through even before any real worker exists.
 - An `InMemoryRunner` test double records start/stop calls — basis for v0b real-worker tests too.
 - Trait tests cover start → stop → list lifecycle.
+
+**Corrected 2026-10-06 (S14 pass):** no `HostRoot` type exists, at `535bca11` or at `8dcaf441`; the only mention is a doc comment in `crates/system/pandect/src/session_service_runner.rs` (line 105). `NullRunner` landed, but no host threads it through, and v0b's `HostRoot` below names a type that was never built.
 
 **v0b done when (per worker):**
 
@@ -114,8 +119,14 @@ The `InMemoryRunner` (in `#[cfg(test)]` plus exported for downstream test crates
 
 The trait is intentionally synchronous and accepts owned ids — both choices keep it remotable. A future `RemoteRunner` impl over IPC matches this shape directly. Errors are values not panics for the same reason: remote-edge failures must be expressible without unwinding across the IPC boundary.
 
+**Open, raised by the S14 pass (2026-10-06):** the [dramatis tier architecture](../../dramatis_docs/technical_architecture/2026-09-30_dramatis_tier_architecture.md)'s ruling 6 makes feed polling a job on djinn's resident scheduler. How does `SessionServiceRunner` relate to that scheduler? Options: the runner stays the session-worker contract; djinn's scheduler supersedes it; both, scoped apart.
+
 ## 8. Open questions
 
 1. **Async vs sync.** v0a keeps the trait synchronous. Real workers are long-running; the runner likely orchestrates async tasks internally but exposes a sync trait to the host (start returns once the task is spawned, not when it completes). When/if a worker's start has to await something, switch the trait to `async fn` or expose `start_async`. Defer until a real worker hits the constraint.
 2. **Per-worker config.** Some workers want config (e.g. fetcher concurrency limits). v0a's `start_worker(session_id, kind)` doesn't carry config; v0b adds either per-kind config in the manifest or a `WorkerConfig` enum parameter to the start signature. Decide when a real worker needs more than its `WorkerKind`.
 3. **Crash / restart semantics.** What happens when a worker dies? `WorkerStatus::state` can grow `Crashed { error }`; the runner decides restart policy. v0a leaves this to v0b — the test runner doesn't model crashes.
+
+## Progress
+
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at mere 535bca11, from the D2 record in support/doc-audit/d2/batch_39_s14_phase_b1.md: the status dated and pointed at pandect, the 2026-07-03 reconcile note's "misfin worker, v0b partially real" and v0a's `HostRoot` corrected, and the runner's relation to djinn's resident scheduler raised as an open question.

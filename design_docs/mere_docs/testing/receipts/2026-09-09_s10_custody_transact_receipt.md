@@ -8,6 +8,11 @@ the 2026-09-08 custody-backend probe this one supersedes for the
 production-boundary question; that probe's `src/lib.rs` scenarios are ported
 here as real tests against the real crate.
 
+**Corrected 2026-10-06 (S14 pass):** only the probe's stale-collection and
+negative-control shapes were ported. Its owner-specific transfer, reopen and
+self-transfer scenario was not: `custody_transact_tests.rs` mentions transfers
+only in doc comments, at `9ba9f790` and at mere `26060e88`.
+
 Work happened in the worktree `C:/Users/mark_/Code/worktrees/mere-s10-custody-20260909`,
 branch `slice/s10-custody-20260909`, based on mere main `725b0f35`. Landing
 commit: `9ba9f790ad856aefb6d603f28c471d177504b79f`. Muniment crate tree hash at
@@ -103,6 +108,10 @@ claim refused, post-commit late claim sees no dangling reference, the
 apply-alone negative control retained as a documented regression) and the two
 typed-refusal tests (default, zip).
 
+**Corrected 2026-10-06 (S14 pass):** the breakdown is 51 pre-existing + 8 new
+(3 memory, 3 redb, 2 refusal). Muniment has 51 `#[test]`s at `725b0f35` and 59
+at `9ba9f790`, and `custody_transact_tests.rs` adds 8; the total of 59 holds.
+
 ## Environment residual (out of muniment's scope, recorded not silently fixed)
 
 The worktree's local, gitignored `.cargo/config.toml` had a stale
@@ -115,6 +124,10 @@ only (not committed; does not touch the genet repo or the other active mere
 session) rather than repaired. Whoever next touches genet's paint rename
 should also update `mere/.cargo/config.toml` on any machine that still has the
 old entry.
+
+**Corrected 2026-10-06 (S14 pass):** the paint component was not renamed.
+Genet `5af76a0cb8c` (2026-09-07) removed it and carved out `genet-compositor`;
+`webgl-essl` existed before that commit.
 
 ## Residuals
 

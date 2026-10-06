@@ -6,15 +6,20 @@
 > so the `ports/knot` *(historical citation)* <!-- doc-audit: historical-path --> paths below name the layout each receipt landed against.
 
 **Date:** 2026-08-24
-**Status:** in progress; current-origin G0 and the narrow `knot-document`
-package published; K0, the reusable Knot surface, desktop wrapper, and semantic
-host receipt implemented and independently green; Turnstone T0 consumer core
-and user invocation landed, including explicit read-only admission; generic
-accessibility landed; P0 is complete — Turnstone admits
-`distillery.installed.v1` through the existing registry with no
-provider-specific renderer arm, the full shell binary builds from published
-sources, and the contract is reduced and frozen at v1 (Genet `001448d55`,
-Turnstone `3f63671`); F0 is the next gated lane
+**Status (2026-10-06):** G0 through P0 landed; F0 has moved to knot-editor.
+G0 and the narrow `knot-document` package published; K0, the reusable Knot
+surface, desktop wrapper and semantic host receipt are green; Turnstone's T0
+consumer core, invocation, read-only admission and generic accessibility
+landed; P0 is complete, with the contract reduced and frozen at v1 (Genet
+`001448d55`, Turnstone `3f63671`), and its descriptor-literal follow-through is
+done. F0 is no longer this plan's next lane: knot-editor's copy of this plan
+(repository note, 2026-09-05) names knot-editor's
+`2026-09-05_knot_application_workspace_plan.md` as F0's authority and calls the
+shared-surface plan a historical record. The contracts now live in mere:
+`SurfaceDescriptor` in `crates/system/surface-api/surface.rs` (split out by
+`3e9f02f6`, 2026-09-02) and `RetainedSurfaceSession` in
+`crates/cambium/cambium/src/surface.rs`. Open elsewhere: the pointer-capture
+routing gap (2026-09-05 finding) is Turnstone T-lane work.
 **Scope:** prove one Knot document surface in a standalone host and Turnstone,
 then prove the contribution seam with a second port. This plan does not require
 or privilege a `.knot` container format, a subprocess boundary, or a universal
@@ -344,6 +349,15 @@ SurfaceDescriptor {
 
 This sketch is illustrative. G0 establishes the compile-ready names.
 
+**Corrected 2026-10-06 (S14 pass):** `genet-host-api` no longer owns the
+descriptor, and Cambium is no longer under genet's components/cambium. At
+mere 535bca11, `SurfaceDescriptor` is in `crates/system/surface-api/surface.rs`
+(l.86; the application half was split out of `genet-host-api` as
+`mere-surface-api` by `3e9f02f6`, 2026-09-02), and `RetainedSurfaceSession` is
+in `crates/cambium/cambium/src/surface.rs` (l.60). The P0 freeze also cut
+`roles`, `multiplicity`, `placement_hint` and `potential_capabilities` from the
+sketch above (Progress, 2026-08-26).
+
 The descriptor contains stable facts. Current availability belongs to an
 admitted session. Executable factories, command handlers, setting values,
 resident handles, and product snapshots do not live in the descriptor.
@@ -406,6 +420,11 @@ independent state.
 Done when the focused Genet tests compile and pass, the host API remains below
 Cambium in the dependency graph, and the runtime trait does not mention Knot,
 Turnstone, `sceno::Scene`, winit, or platform AccessKit adapters.
+
+**Corrected 2026-10-06 (S14 pass):** G0's files have since moved into mere: the
+descriptor half of genet-host-api is `crates/system/surface-api/surface.rs`
+(`3e9f02f6`, 2026-09-02), and Cambium's session is
+`crates/cambium/cambium/src/surface.rs`. See the correction under §3.1.
 
 ### K0. Narrow Knot document snapshot, intent, and session
 
@@ -532,6 +551,14 @@ projection only; every effect is rechecked by the owning authority.
 Done when standalone Knot and Turnstone show the same state transitions and
 neither host gains vault, resident, evidence-custody, or publishing authority
 through UI admission.
+
+**Corrected 2026-10-06 (S14 pass):** F0 is no longer governed here. The
+knot-editor copy of this plan
+(knot-editor/design_docs/2026-08-24_knot_shared_surface_and_port_contribution_plan.md,
+repository note 2026-09-05) names knot-editor's
+2026-09-05_knot_application_workspace_plan.md as F0's current authority and
+calls this shared-surface plan a historical record. The two copies have
+diverged.
 
 ## 5. Merge and ownership rules
 
@@ -709,6 +736,20 @@ through UI admission.
   test fixtures drop the removed fields when each repo aligns past
   `001448d55`; the pointer-capture routing gap stays noted for the T lane.
   P0 is complete.
+
+  **Corrected 2026-10-06 (S14 pass):** that follow-through is done: no
+  `placement_hint` or `potential_capabilities` remains in any `.rs` file in
+  mere, knot-editor or turnstone. The pointer-capture gap still holds:
+  turnstone's src/contributed_surface.rs (l.526-549) still ignores
+  `pointer_capture` on move and up.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_46_s14_phase_b8.md: the status records G0 to P0
+  as landed and points F0 to knot-editor's application workspace plan; §3.1
+  and G0 are annotated with the contracts' current homes in mere
+  (`crates/system/surface-api`, `crates/cambium/cambium`); and P0's
+  descriptor-literal follow-through is recorded as done, with the
+  pointer-capture gap left to the Turnstone T lane.
 
 ## 8. Final done conditions
 

@@ -1,6 +1,6 @@
 # Family-Shared Identity: One Persona Across Every Merely Application
 
-**Status:** shared-identity adoption landed for Graphshell, Turnstone, Knot, Woodshed, and Hocket; Hocket's return-to-own-identity UI remains intentionally unbuilt.
+**Status (2026-10-06):** shared-identity adoption landed for Graphshell, Turnstone, Knot, Woodshed, and Hocket; Hocket's return-to-own-identity UI remains intentionally unbuilt.
 
 **2026-08-08.** Turnstone, Woodshed, Knot, Hocket and Cleromancy are separate
 products and the same person's. A document sealed in one should open in the
@@ -43,6 +43,11 @@ worse failure, because they diverge and nothing can say which is authoritative.
 Adoption happens on access rather than as a migration step, so an application
 that has not run since the split still finds its persona the first time it
 looks.
+
+**Corrected 2026-10-06 (S14 pass):** the module is now `pandect::shared_root`,
+in `crates/system/pandect/src/shared_root.rs` (`MERE_ROOT` at line 29,
+`shared_root` at 41, `adopt_legacy_identity` at 67): session-runtime was
+renamed pandect in `441e70f0` (2026-08-15).
 
 ### `personae::roster` — which persona (mere)
 
@@ -107,6 +112,12 @@ choice is a hand-written enum per host delegating all six methods.
 | **Cleromancy** | nothing to wire | It has no identity. `CLEROMANCY_ROOT` holds product state (the redb store, sync settings); `admitted.rs` says outright that identity and transport stay outside. |
 | **Isometry** | nothing to wire | `isometry-net` takes an `Ed25519Keypair` as a parameter. No persistent identity exists yet; when one does, `roster::open_shared` is the call. |
 | **Hocket** | wired 2026-08-09 | Adopted into the vault keeping its key, or kept deliberately apart when the family persona is somebody else, with a confirmed one-way switch between the two. See below. |
+
+**Corrected 2026-10-06 (S14 pass):** the Turnstone row no longer holds.
+Turnstone `d6c4bdc` (2026-08-22, "Route persona Knot authoring through the
+resident") removed `HostedKnot::PersonaVault`; `enum HostedKnot` now has only
+`Directory` (turnstone's src/knot_authoring.rs, lines 482-484), and
+persona-vault mode goes through Graphshell's resident (`KnotHub::resident`).
 
 ### Woodshed's sealing is not a gate
 
@@ -231,6 +242,13 @@ write it.
 - Turnstone's `TURNSTONE_KNOT_PERSONA` is now the override, not a
   requirement: unset, both the hosted and spawned Knot paths resolve the sole
   wallet under the shared root.
+
+  **Corrected 2026-10-06 (S14 pass):** Turnstone now refuses the variable in
+  persona-vault mode: "Graphshell owner settings select the resident Knot
+  persona; remove TURNSTONE_KNOT_PERSONA from Turnstone" (turnstone's
+  src/knot_authoring.rs, lines 830-833), since `d6c4bdc` moved the persona
+  route to the resident (see the table above).
+
 - `knot_sync_host`'s two positionals are now optional: bare invocation is the
   ordinary machine (shared root, sole persona); one positional is read as
   whichever it parses as (a UUID cannot be mistaken for a path); explicit
@@ -394,3 +412,11 @@ Two defects the tests caught, both worth carrying as cautions:
   "return to my own identity", because that is a second rotation with the same
   cost and no caller has asked for it. The consent record is a single file, so
   the mechanism is there if it is ever wanted.
+
+## Progress
+
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_43_s14_phase_b5.md: the status line dated, and
+  dated notes added for the pandect rename and for Turnstone's Knot persona
+  route moving to Graphshell's resident (`d6c4bdc`).

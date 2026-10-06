@@ -85,6 +85,20 @@ a keepsake.
 - **Canvas grows the `Derived` face arm**; rule-driven variation (by node
   kind, state, degree) is parameters into the same generator, upstream of it.
 
+**Corrected 2026-10-06 (S14 pass):** Canvas no longer sits beside the
+generator. `f590e45d` (2026-09-24, "Fold canvas and mere-signals into
+pictograph") moved it into `crates/canvas/pictograph/src/canvas/`, so the
+portable sink and the `Face::Derived` arm now live inside pictograph
+(`crates/canvas/pictograph/src/canvas/types.rs`, lines 142-156). The manifest
+still reads `version = "0.2.0"` (`crates/canvas/pictograph/Cargo.toml`,
+line 3), so the in-tree 0.2.0 is no longer the source the published 0.2.0
+carries.
+
+**Open, raised by the S14 pass (2026-10-06):** pictograph's manifest version
+names source that differs from the published 0.2.0 tarball (a manifest
+question rather than a doc one). Options: bump the version now; leave it at
+0.2.0 until the next publish.
+
 ## 5. Determinism and versioning
 
 Same address → same bytes, across machines and peers — this inherits emblem's
@@ -234,6 +248,11 @@ Done when:
   unyanked. Its registry tarball carries the D4 derivation-v3 source; the
   downloaded immutable tarball passes `cargo test --all-features --locked -j 1`
   with 22 unit tests, two headless-vello pixel tests, and zero doc tests.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_50_s14_phase_b12.md: the status stands; §4 records
+  the canvas fold into pictograph (`f590e45d`), and the unbumped 0.2.0
+  manifest version is raised as an open question there.
 
 ### D1 receipt (2026-08-29)
 

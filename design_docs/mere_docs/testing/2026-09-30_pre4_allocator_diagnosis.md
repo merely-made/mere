@@ -5,6 +5,13 @@ Source: `124fc42bb4809dd27f9029d91e966915c97d5fd3` plus temporary fixture-only
 post-failure instrumentation, restored afterward. Production patches,
 dependencies and acceptance thresholds were not changed.
 
+**Corrected 2026-10-06 (S14 pass):** the repair is selected and accepted.
+Ruling 508 put it in burn-remote's close path (`88fd392f`, 2026-10-03), and
+its acceptance is recorded in `861042c9` (2026-10-03,
+[burn plan](../implementation_strategy/2026-08-09_burn_0_22_migration_plan.md)
+§13.32). Pre.4 merged to main at `cec0b3a4` on 2026-10-05. The measurements
+below remain pre-repair evidence.
+
 ## Authority and method
 
 Isometry ruling 411 records Mark's exact answer **"A!"** to bounded diagnosis,
@@ -57,6 +64,11 @@ can wait on other work. The separate native-reference finiteness verifier and
 strict numerical ceiling also remain required. These failed runs produced no
 completed JSON numerical receipt.
 
+**Corrected 2026-10-06 (S14 pass):** the fork was answered by ruling 508
+(the burn plan's 2026-10-03 entry): the repair is `88fd392f`, accepted in
+`861042c9` with receipt
+`ports/distillery/probe/receipts/2026-10-03_pre4_remote_minilm_repaired.json`.
+
 ## Verification and evidence
 
 Independent review checked source/run/log/executable/model hashes and exact
@@ -79,3 +91,9 @@ The generated executable still contains diagnostic code and must be rebuilt
 before an acceptance run. The existing migration worktree and shared target are
 retained for the unresolved gate; no new isolated home, target or worktree was
 created. Main integration and downstream repins remain held.
+
+**Corrected 2026-10-06 (S14 pass):** the acceptance run passed on
+2026-10-03 (`861042c9`). Main integration followed: `cec0b3a4` (2026-10-05,
+"Merge burn-pre4-repin", S16, ruling 557) is on main's first-parent history,
+the `Cargo.lock` at `535bca11` resolves `burn` and `burn-remote`
+0.22.0-pre.4, and `a90a9d11` records Knot's repin started.

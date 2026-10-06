@@ -1,7 +1,14 @@
 # Physics Scenes and Tangibility Plan: shared-world environments for the orrery
 
 **Date**: 2026-06-22
-**Status**: Planning (with Mark). The build plan for the
+**Status (2026-10-06):** complete 2026-06-24 (the final entry: "feature-complete"). The engine
+lives in seiche (`crates/conatus/seiche/src/scene_sim.rs`, `scene_spec.rs`, `fluid_coupling.rs`,
+`field.rs`, `emitter.rs`) and pictograph's canvas (`canvas/nodes.rs`, `canvas/ambient/`). The host
+binding (the Scene settings page and the `>scene` verb) landed in meerkat on 2026-06-23 and
+2026-06-24, retired with it 2026-07-18 (`c5f01064`); surviving library parts: the engine above;
+open: a Mere or Turnstone host scene picker and tangibility binding (mer3ly's repo-graph binds
+backdrop scenes), a bounds-drain, a fluid emitter, reuse of aether's `CouplingForce`, and
+re-applying tangibility on node add. The build plan for the
 [orrery physics environments research](../research/2026-06-22_orrery_physics_environments_research.md):
 non-node physics scenes sharing the orrery's rapier world, the interactive/intangible tangibility
 lever, and the research's two features (living backdrop, interactive scene) plus liquid. The
@@ -10,8 +17,11 @@ dimensional modes are owned by the
 *content and physics*, that one is the *view*.
 **Code**: `crates/orrery/gyre` *(historical citation)* <!-- doc-audit: historical-path --> (the `Simulation`; scene bodies are the gap), `crates/orrery/orrery` *(historical citation)* <!-- doc-audit: historical-path -->
 (`frame.rs` paint + the scene paint pass), `crates/canvas/pictograph/src/canvas/scene_paint.rs` (the ground
-layer), `crates/meerkat` *(historical citation)* <!-- doc-audit: historical-path --> (the tangibility command + scene picker), optional new `crates/orrery/scene` *(planned target)* <!-- doc-audit: planned-path -->
+layer), `crates/meerkat` *(historical citation)* <!-- doc-audit: historical-path --> (the tangibility command + scene picker), optional new `crates/orrery/scene` *(historical citation)* <!-- doc-audit: historical-path -->
 (scene format + transplanted scenes), `salva2d` (liquid).
+**Corrected 2026-10-06 (S14 pass):** no scene crate was made: P3/P4b put the scene format in seiche
+(`crates/conatus/seiche/src/scene_spec.rs`, with the catalog scenes beside it). `salva2d` was never
+adopted: P4 rules "salva is out", and P4c built its own PBF fluid.
 
 **Related**:
 
@@ -208,8 +218,10 @@ within budget.
 - **Where the scene world lives.** Scene bodies in the node `Simulation` (one world, simplest,
   Mark's same-world ask) vs a sibling `Simulation` for separation. Lean one world (the ask), with
   collision groups keeping the layout clean.
-- **Scene crate vs in-orrery.** A new `crates/orrery/scene` *(planned target)* <!-- doc-audit: planned-path --> for the `SceneSpec` + transplanted
+- **Scene crate vs in-orrery.** A new `crates/orrery/scene` *(historical citation)* <!-- doc-audit: historical-path --> for the `SceneSpec` + transplanted
   scenes, or a module in `orrery`? Lean a small crate so scenes are shareable and testable headless.
+  **Corrected 2026-10-06 (S14 pass):** settled without a new crate: the format is seiche's
+  `crates/conatus/seiche/src/scene_spec.rs`.
 - **Tangibility default per feature.** Backdrop intangible, interactive scene tangible? Confirm, and
   whether the lever is per-node, global, or both (the mechanism supports all).
 - **Scene persistence.** Does a chosen scene persist with the session (the cartography sidecar, where
@@ -419,6 +431,11 @@ within budget.
   like `relate("cites")`). That centrally edits the already-over-ceiling `command.rs`, so it likely
   wants a `command.rs` split first (a Mark-coordinated refactor of his registry). A headed pass through
   the lane UI also waits on a settings-navigation drive harness (none exists yet).
+  **Corrected 2026-10-06 (S14 pass):** this page landed in meerkat and was retired with it
+  2026-07-18 (`c5f01064`); `pelt/scene`, `scene_settings.rs` and `apply_scene_key` have no hits. No
+  Mere or Turnstone host loads scenes now; mer3ly's repo-graph does (`apply_backdrop`,
+  `mer3ly/crates/repo-graph/src/lib.rs:1683-1705`, since `240b4f4`, 2026-08-12), loading seiche
+  scenes and setting tangibility.
 - 2026-06-24: **Bucket A joint scenes (committed `f0ce2f0`); headed-verified.** Four more catalog
   scenes exercising the P4b joints, all pure `SceneSpec` (no new engine code): `cradle_scene`
   (Newton's cradle, five elastic balls on rigid revolute-rod pendulums, the end one launched so the
@@ -477,6 +494,8 @@ within budget.
   galaxy->nbody, plife->particles) that both the Scene page buttons (now keyed `scene:<name>`) and the
   verb route through, so they cannot drift. meerkat lib + bin tests green (14 shell_eval incl. the
   scene verb).
+  **Corrected 2026-10-06 (S14 pass):** the verb and `load_named_scene` landed in meerkat and were
+  retired with it 2026-07-18 (`c5f01064`); neither has hits now.
 - 2026-06-24: **Ambient-sim seam + tincture + two more sims (committed `1be0936` / `57005a0` /
   `366e4f0`); headed-verified.** Generalised the lone Game of Life into an `AmbientSim` trait
   (advance + paint + default_tincture) the orrery holds as `Box<dyn AmbientSim>`, and gave each
@@ -527,3 +546,9 @@ within budget.
   (scry-shots/p4sd-*, p4bf-*, p4cr-*): sand + water settle side by side, a pool drapes over the
   pyramid's blocks, crates settle at varied angles with their texture tilting to match. The
   physics-scenes arc is feature-complete.
+  **Corrected 2026-10-06 (S14 pass):** the orrery bin whose keys (1-9, 0, f, c/b/k/m, x, g, n, p,
+  s, t) drove the headed checks above was deleted in `47833f65` (2026-09-24).
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at mere 535bca11, from the
+  D2 record in support/doc-audit/d2/batch_48_s14_phase_b10.md: status set to complete with the
+  engine in seiche and pictograph, the meerkat scene page, verb and bin marked retired, the
+  scene-crate marker made historical, and `salva2d` noted as never adopted.

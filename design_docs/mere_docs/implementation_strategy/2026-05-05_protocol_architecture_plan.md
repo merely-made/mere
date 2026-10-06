@@ -1,15 +1,25 @@
 # Protocol Architecture Plan
 
 **Date**: 2026-05-05
-**Status**: Draft / canonical direction (architecture-level; per-protocol module plans branch off). **Partially superseded by the 2026-05-07 briefs:**
+**Status (2026-10-06):** Architecture-level direction, partly overtaken; per-protocol module plans branch off. Still holding: §2's iroh and iroh-blobs rows and §3's vault types. Overtaken: the rest of §2 (the transport is p2panda), §3.6 and §3.7's custody reading of `UnlockTier` (vault lock plan, ruling 12), and §4's Mode 1 via verso (dramatis tier architecture, rulings 3 and 6); see the correction below the two brief bullets. §5 is unbuilt. **First partially superseded by the 2026-05-07 briefs:**
 
 - [`2026-05-07_event_dag_substrate_brief.md`](2026-05-07_event_dag_substrate_brief.md) reframes wire-format / sync-layer / schema-locality / privacy-transport / persona-design decisions. §2 (iroh layering), §3 (identity vault), §4 (self-host-with-fallback) of *this* plan remain authoritative.
 - [`2026-05-07_moot_tiers_and_voluntary_hosting_brief.md`](2026-05-07_moot_tiers_and_voluntary_hosting_brief.md) reframes §5 (Protocol Mods and Primitive Moot Nodes) through a four-tier scale (orrery → moot → moothold → coalition) with voluntary hosting, cheesecloth pinning, and ILL-shaped reciprocity. Notable lexicon shift: *moothold* now means t3 (federation of moots), *coalition* now means t4 (sovereign coalition of mootholds). The earlier "coalition = federation of moots" framing in this plan is superseded.
+
+**Corrected 2026-10-06 (S14 pass):** §2, §3 and §4 no longer remain authoritative as wholes.
+§2: the `mere-transport` iroh path retired (the banner below); `crates/murm/transport/src/` has `p2panda_transport.rs` and `reticulum_transport.rs` and no iroh transport, and gossip is p2panda-net's `GossipHandle`, so §2's iroh-gossip and iroh-docs rows, the Cable choice rule and the ALPN ledger are superseded. Its iroh and iroh-blobs rows hold: iroh stays the QUIC byte plane under p2panda-net, and `crates/murm/transport/src/p2panda_transport.rs` uses iroh and iroh-blobs directly.
+§3: the vault types hold (`crates/dramatis/personae/src/vault.rs`), but the [vault lock plan](../../dramatis_docs/implementation_strategy/2026-10-05_vault_lock_plan.md)'s ruling 12 rules `UnlockTier` consent, not custody, and records that §3.6's custody tiers and §3.7's swap-leakage defence are not true today.
+§4: `verso-tile` was folded into `inker::flip` on 2026-09-05, and the [dramatis tier architecture](../../dramatis_docs/technical_architecture/2026-09-30_dramatis_tier_architecture.md)'s rulings 3 and 6 put announcing in gazette (castellan issues, gazette announces), as a djinn service that exports static well-known files first; that document also records that no earlier document named an owner for announcing.
+
+**Open, raised by the S14 pass (2026-10-06):** do §2's surviving rows and §3 stay authoritative in this plan? Options: they stay authoritative here; this plan keeps them as history, deferring to the p2panda transport for §2 and to the vault lock plan for §3.
+
 **Scope**: Cross-cutting plan governing how Mere composes peer-to-peer transports, identity, identity-discovery (WebFinger), and protocol mods (Cable, Matrix, Nostr, IRC, ATproto, ActivityPub, Misfin, …) into a coherent whole. Defines the layered relationship between Cable and the iroh toolkit, the multi-protocol identity vault, the self-host-with-fallback pattern for identity publication, and the "primitive node" pattern by which any protocol — whether the user's mod is installed or not — can appear in the orrery.
 
 **Drives**: The Mere Phase 2C → Phase 3 work program, plus per-protocol mod specs that branch from this plan.
 
 > **Crate-name + substrate note (2026-06-09 audit):** crate names below predate the 2026-05-19 supercrate naming pass and the `graphshell` dissolution: `mere-identity`→`persona/identity`, `mere-transport`→`murm/transport`, `mere-kernel`→`graph/graph-kernel`, `mere-host-runtime`→`system/session-runtime`. The bilateral substrate has since pivoted Cable→p2panda (the `mere-transport` iroh path retired, BLAKE2b→BLAKE3), so the Cable wire-format and iroh-transport sections are partially superseded by the [p2panda spike](../../archive_docs/2026-06-09_completed_plans/2026-06-01_p2panda_substrate_spike_plan.md). Dated "shipped"/progress receipts below are left as historical record.
+>
+> **Corrected 2026-10-06 (S14 pass):** two of these targets have moved again: `persona/identity` is now `crates/dramatis/personae`, and `system/session-runtime` was renamed pandect in `441e70f0` (2026-08-15), now `crates/system/pandect`.
 
 **Related**:
 
@@ -358,7 +368,11 @@ Phase 2C ships level 0 (single-process, all mods trusted). Phase 3 ships level 2
 
 A future doc under `mere_docs/technical_architecture/` will own the full threat model; this plan defines the surface and names the level-0 assumption explicitly.
 
+**Corrected 2026-10-06 (S14 pass):** the [vault lock plan](../../dramatis_docs/implementation_strategy/2026-10-05_vault_lock_plan.md)'s ruling 12 rules `UnlockTier` consent, not custody: §3.6's tiers are approval policy, not custody tiers, and that plan records that this section's swap-leakage defence is not true today.
+
 ### 3.7 Phase boundary
+
+**Corrected 2026-10-06 (S14 pass):** a second §3.7; read it as §3.8. The 2026-05-05 resolution pass renumbered the isolation section to §3.7 (Progress) but not this one.
 
 Identity vault lands **before** any new protocol mod that needs non-Mere credentials. That makes it the gate for Nostr / Matrix / ATproto / IRC mods. Cable continues to work pre-vault using the existing `InMemoryProvider`-style trait impl.
 
@@ -406,6 +420,8 @@ This mode requires:
 - A reachable hostname or IP (DDNS, port forwarding, hole-punching via iroh, or LAN-only).
 - Verso running an HTTP listener (already in scope per the smolweb engine + nematic work; this plan formalizes the shape).
 - The user's credentials in the vault (TLS cert; Mere's master key signs the WebFinger doc).
+
+**Open, raised by the S14 pass (2026-10-06):** Mode 1 no longer has its host (`verso-tile` was folded into `inker::flip` on 2026-09-05), and the dramatis tier architecture's rulings 3 and 6 put announcing in gazette, a djinn service exporting static well-known files first (see the correction under the status). Does §4 survive those rulings? Options: the tier rulings stand and §4's Mode 1 is dropped from this plan; §4 stands as the long-range Mode 1 beside them.
 
 #### Mode 2 — third-party hosting fallback
 
@@ -856,3 +872,7 @@ Code-side and plan-side execution against the §6 phase tracks user requested in
 - External p2p landscape grounded against current sources in the [murm/p2p landscape brief](../research/2026-05-31_murm_p2p_landscape_brief.md). §2 iroh layering validated: iroh 1.0.0-rc.1 (2026-05-27), noq stabilizing, and two external stacks (Holochain, p2panda) converged on iroh.
 - **iroh-docs caution (added to §2.4).** iroh 1.0 stabilizes the connection layer plus noq, not the higher protocols; iroh-docs is a community meta-protocol over blobs+gossip. The "iroh-docs first concrete consumer = moot roster" track (§6 Phase 3) should treat iroh-docs as a swappable projection, with p2panda-sync and willow-rs as fallbacks.
 - The §3 vault skeleton plus passphrase backend are built (`persona/identity`); the §5 moot/bridge/primitive-node layer remains a 61-LOC stub. No §5 code started. p2panda's modular rewrite is now a substrate adopt-candidate for the event-DAG core (the substrate brief's deferral predates it).
+
+### 2026-10-06 — S14 pass
+
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at mere 535bca11, from the D2 record in support/doc-audit/d2/batch_39_s14_phase_b1.md: the status narrowed to what still holds (§2's iroh and iroh-blobs rows, §3's types), the banner's rename targets updated, §3 pointed at vault-lock ruling 12 and §4 at tier rulings 3 and 6, the duplicate §3.7 noted, and §4's fate and §2/§3's authority raised as open questions.

@@ -1,5 +1,14 @@
 # Burn 0.22 prerelease closure receipt
 
+**2026-10-06 S16 annotation (S14 pass):** S16 ran on 2026-10-05. Main merged
+the pre.4 branch at `cec0b3a4` and was pushed, origin/main then at `07db35e2`
+([migration plan](../implementation_strategy/2026-08-09_burn_0_22_migration_plan.md)
+§13.44). Main's production row is now Burn `=0.22.0-pre.4`, CubeCL
+`=0.11.0-pre.4` and Cubek `=0.3.0-pre.4`. The 2026-10-03 annotation's "Main
+stays on pre.2 until S16", and the pre.2 production row in the 2026-08-20
+Status and Remaining gate below, describe main before S16. The pre.2 receipts
+stay historical, and stable publication remains gated.
+
 **2026-10-03 S15 closure annotation:** on the pre.4 migration branch the
 row is Burn `=0.22.0-pre.4`, CubeCL `=0.11.0-pre.4` and Cubek `=0.3.0-pre.4`,
 exact-pinned in every consumer manifest, with one version per crate in the root

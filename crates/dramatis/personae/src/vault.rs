@@ -332,6 +332,15 @@ pub trait IdentityStorage: Send + Sync {
     /// Re-key from a user act. A wrong credential is an error and leaves
     /// the storage locked.
     fn unlock(&self, method: UnlockMethod<'_>) -> Result<(), IdentityError>;
+
+    /// Enrol a passphrase that can unlock this storage (ruling 39). Needs
+    /// the storage unlocked; an existing enrolment is refused, not replaced.
+    /// Backends that hold no OS-wrapped root refuse.
+    fn enroll_passphrase(&self, _passphrase: &[u8]) -> Result<(), IdentityError> {
+        Err(IdentityError::Backend(
+            "this storage cannot enrol a passphrase".to_string(),
+        ))
+    }
 }
 
 /// Borrowed storage delegates, so a vault can be opened over a backend
@@ -369,6 +378,10 @@ impl<T: IdentityStorage + ?Sized> IdentityStorage for &T {
     fn unlock(&self, method: UnlockMethod<'_>) -> Result<(), IdentityError> {
         (**self).unlock(method)
     }
+
+    fn enroll_passphrase(&self, passphrase: &[u8]) -> Result<(), IdentityError> {
+        (**self).enroll_passphrase(passphrase)
+    }
 }
 
 /// Boxed storage delegates, so callers can pick a backend at runtime
@@ -404,6 +417,10 @@ impl<T: IdentityStorage + ?Sized> IdentityStorage for Box<T> {
 
     fn unlock(&self, method: UnlockMethod<'_>) -> Result<(), IdentityError> {
         (**self).unlock(method)
+    }
+
+    fn enroll_passphrase(&self, passphrase: &[u8]) -> Result<(), IdentityError> {
+        (**self).enroll_passphrase(passphrase)
     }
 }
 
@@ -546,6 +563,15 @@ impl<S: IdentityStorage> IdentityVault<S> {
     /// Which unlock methods this device offers for this vault now.
     pub fn unlock_methods(&self) -> UnlockMethods {
         self.storage.unlock_methods()
+    }
+
+    /// Enrol a passphrase over the vault's root (ruling 39), so a device
+    /// with no OS presence can lock (ruling 27). Refused while locked.
+    pub fn enroll_passphrase(&self, passphrase: &[u8]) -> Result<(), IdentityError> {
+        if self.current.is_none() {
+            return Err(IdentityError::Locked);
+        }
+        self.storage.enroll_passphrase(passphrase)
     }
 
     /// Lock: drop the profile and have the storage forget its key.

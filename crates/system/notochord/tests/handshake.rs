@@ -434,3 +434,121 @@ fn a_good_proof_does_not_open_a_service_the_owner_has_not_offered() {
     let (_, decision) = respond(&policy, &ledger, &bytes, &facts, NOW_MS, 0);
     assert_eq!(reason(&decision), DenyReason::ServiceNotOffered);
 }
+
+// ─── Vault lock ruling 46: a session signer bound to its network ─────────
+
+const OTHER_NETWORK: NetworkId = NetworkId([9; 32]);
+
+fn bound_hello_from<P: IdentityProvider>(
+    provider: &P,
+    binding: &ProofBinding,
+    delegations: Vec<SignedDelegationCertificate>,
+) -> Result<SessionHello, notochord::HandshakeError> {
+    SessionHello::issue_network_bound(
+        provider,
+        NETWORK,
+        ProfileRef {
+            id: "mere.base".into(),
+            revision: 2,
+        },
+        action(),
+        TrafficClass::Interactive,
+        [42; 32],
+        binding,
+        delegations,
+    )
+}
+
+fn admitted(hello: &SessionHello) -> bool {
+    let policy = policy(ServiceAccess::MemberOnly);
+    let bytes = hello.encode(&policy.limits).expect("encode");
+    let facts = carrier_authenticating(member_key());
+    respond(&policy, &RevocationLedger::new(), &bytes, &facts, NOW_MS, 0)
+        .1
+        .is_accept()
+}
+
+/// The global salt still admits (old-style hellos are unchanged), and so
+/// does the signer bound to the hello's own network.
+#[test]
+fn both_signer_salts_are_accepted_for_their_own_network() {
+    let binding = initiator_binding(member_key());
+    let grant = || vec![member_grant_to(member_key())];
+    let global = hello_from(&member(), &binding, grant());
+    assert!(admitted(&global), "global");
+    let bound = bound_hello_from(&member(), &binding, grant()).unwrap();
+    assert!(admitted(&bound), "network-bound");
+    assert_ne!(bound.session_signer, global.session_signer);
+}
+
+/// Answers the salt bound to `NETWORK` with `OTHER_NETWORK`'s key and
+/// attestation: a signer bound to one network presented on another.
+struct Rebound(InMemoryProvider);
+
+impl Rebound {
+    fn swap(&self, salt: &[u8]) -> Vec<u8> {
+        if salt == notochord::network_session_signing_salt(&NETWORK) {
+            notochord::network_session_signing_salt(&OTHER_NETWORK)
+        } else {
+            salt.to_vec()
+        }
+    }
+}
+
+impl IdentityProvider for Rebound {
+    fn master_public_key(&self) -> personae::Ed25519PublicKey {
+        self.0.master_public_key()
+    }
+
+    fn derive_keypair(
+        &self,
+        salt: &[u8],
+    ) -> Result<personae::Ed25519Keypair, personae::IdentityError> {
+        self.0.derive_keypair(&self.swap(salt))
+    }
+
+    fn attest_derived_key(
+        &self,
+        salt: &[u8],
+    ) -> Result<insigne::DerivedKeyAttestation, personae::IdentityError> {
+        self.0.attest_derived_key(&self.swap(salt))
+    }
+}
+
+#[test]
+fn a_signer_bound_to_another_network_is_refused() {
+    let binding = initiator_binding(member_key());
+    let grant = vec![member_grant_to(member_key())];
+    let hello = bound_hello_from(&Rebound(member()), &binding, grant).unwrap();
+    assert!(!hello.verify_proof(&binding));
+    assert!(!admitted(&hello));
+}
+
+/// A restricted provider holding only the bound signer opens its own
+/// network, and cannot make a remote-style (global salt) hello.
+#[test]
+fn a_retained_bound_signer_cannot_make_a_global_hello() {
+    let binding = initiator_binding(member_key());
+    let retained = personae::RetainedKeys::capture(
+        &member(),
+        &[notochord::network_session_signing_salt(&NETWORK)],
+    )
+    .unwrap();
+    let grant = vec![member_grant_to(member_key())];
+    let bound = bound_hello_from(&retained, &binding, grant).unwrap();
+    assert!(admitted(&bound));
+    let global = SessionHello::issue(
+        &retained,
+        NETWORK,
+        ProfileRef {
+            id: "mere.base".into(),
+            revision: 2,
+        },
+        action(),
+        TrafficClass::Interactive,
+        [42; 32],
+        &binding,
+        Vec::new(),
+    );
+    assert!(matches!(global, Err(notochord::HandshakeError::Identity)));
+}

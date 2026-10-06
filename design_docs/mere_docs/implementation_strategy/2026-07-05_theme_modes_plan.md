@@ -24,6 +24,12 @@ receipts prove consumer mappings, not installed user settings. In Mere,
 explicit `DocumentStyleSheet`. Those are the native reader seams; protocol
 parsers need no dependency on Tabard.
 
+**Corrected 2026-10-06 (S14 pass):** `SmolwebTheme` is now defined in
+`tabard::smolweb` and re-exported by document-lanes
+(`crates/system/document-lanes/src/smolweb.rs:36`; `d16f055f`, 2026-09-24),
+so the seam's type is Tabard's. Protocol parsers still need no Tabard
+dependency: nematic has none.
+
 Keep three targets explicit: application chrome, reader appearance, and an
 author's published stylesheet. Changing a reader preference must not rewrite
 source or publish it. Micron's authored colors remain source facts even when a
@@ -73,6 +79,11 @@ consumer evidence before entering implementation. The shared Micron presentation
 scope lives in the
 [fidelity plan](../../nematic_docs/implementation_strategy/2026-07-01_smolweb_fidelity_plan.md#micron-completion-scope-2026-09-13).
 
+**Open, raised by the S14 pass (2026-10-06):** the "tabard fill" commits of
+2026-09-24 (T2a to T4, among them `7f133433` and `d16f055f`) have no plan in
+Mere's design_docs. Which plan owns the Tabard scope? Options: this plan
+absorbs it; a separate Tabard plan owns it.
+
 ## The model (decision record)
 
 - A THEME is a set of tinct-style seed key colors the user picks (`tinct::Seeds` shape: brand
@@ -105,6 +116,13 @@ scope lives in the
 - OS-follow: a setting maps the system scheme (and, where the platform reports it, the system
   contrast preference) onto the mode; manual pick overrides. Follows the configurability
   doctrine: expose, do not hardcode.
+
+**Corrected 2026-10-06 (S14 pass):** this section is historical. Its mechanism,
+`IncrementalLayout::set_prefers_color_scheme` over Stylo's servo `Device`, no
+longer exists in Mere or Genet's components: genet-layout and Stylo were
+retired in genet `55c05d11759` (2026-08-21). The Related line's engine half and
+the T2/T3 receipts below name the same mechanism; the 2026-09-13 note covers
+the July receipts, not this one.
 
 ## Phases
 
@@ -268,3 +286,8 @@ T4 and T5 ride settings passes; T5 last.
   `template_is_complete_and_valid_for_all_flag_combos`; suite 225 pass / same 3 pre-existing
   fails. Still open: genet `new`-with-scheme (deferred while moveBefore edits genet-layout)
   and the rhai calculator graduation.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at mere 535bca11,
+  from the D2 record in support/doc-audit/d2/batch_49_s14_phase_b11.md: the Engine-mapping
+  section marked historical (genet-layout and Stylo retired in genet `55c05d11759`),
+  `SmolwebTheme`'s move into `tabard::smolweb` (`d16f055f`) noted, and the Tabard scope's
+  owning plan opened as a question.

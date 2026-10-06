@@ -41,6 +41,20 @@ pub const PROFILE_SWITCH_INTENT: &str = "castellan.profile.switch";
 pub const PROFILE_SWITCH_SCHEMA: &str = "castellan.profile.switch/v1";
 pub const PROFILE_CREATE_INTENT: &str = "castellan.profile.create";
 pub const PROFILE_CREATE_SCHEMA: &str = "castellan.profile.create/v1";
+/// Lock the vault; portable (vault lock ruling 10).
+pub const VAULT_LOCK_INTENT: &str = "castellan.vault.lock";
+/// [`LockVaultIntentV1`]'s schema.
+pub const VAULT_LOCK_SCHEMA: &str = "castellan.vault.lock/v1";
+/// Unlock the vault; native only, and refused as an intent (ruling 9).
+pub const VAULT_UNLOCK_INTENT: &str = "castellan.vault.unlock";
+/// The Unlock action's schema; it carries nothing.
+pub const VAULT_UNLOCK_SCHEMA: &str = "castellan.vault.unlock/v1";
+
+/// Lock the vault (vault lock ruling 10). Portable: any admitted surface may
+/// lock, since locking only takes authority away. It carries nothing.
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct LockVaultIntentV1 {}
 
 /// Typed, secret-free signing decision payload.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -157,8 +171,77 @@ pub struct IdentityProjectionCard {
     pub actions: Vec<IdentityProjectionAction>,
 }
 
+/// The vault card's actions. Locked, it offers only Unlock, which is
+/// native: the credential never rides an intent (ruling 10).
+fn vault_actions(lock: VaultLockView) -> Vec<IdentityProjectionAction> {
+    if lock == VaultLockView::Locked {
+        return vec![IdentityProjectionAction {
+            intent: VAULT_UNLOCK_INTENT,
+            schema: VAULT_UNLOCK_SCHEMA,
+            label: "Unlock…",
+            payload: None,
+            native_only: true,
+            input_form: None,
+        }];
+    }
+    vec![
+        IdentityProjectionAction {
+            intent: SSH_GENERATE_INTENT,
+            schema: SSH_GENERATE_SCHEMA,
+            label: "Generate SSH key…",
+            payload: None,
+            native_only: true,
+            input_form: None,
+        },
+        IdentityProjectionAction {
+            intent: SSH_IMPORT_NATIVE_INTENT,
+            schema: SSH_IMPORT_NATIVE_SCHEMA,
+            label: "Import SSH key…",
+            payload: None,
+            native_only: true,
+            input_form: None,
+        },
+        // On the vault card rather than beside a persona: it belongs to
+        // the vault, not to whoever is in use. `payload: None` is the
+        // established shape for an action whose fields the native host
+        // collects, the same as the two above.
+        IdentityProjectionAction {
+            intent: PROFILE_CREATE_INTENT,
+            schema: PROFILE_CREATE_SCHEMA,
+            label: "New persona…",
+            payload: None,
+            native_only: true,
+            input_form: None,
+        },
+        IdentityProjectionAction {
+            intent: VAULT_LOCK_INTENT,
+            schema: VAULT_LOCK_SCHEMA,
+            label: "Lock",
+            payload: Some(
+                serde_json::to_value(LockVaultIntentV1::default())
+                    .expect("the lock payload is always serializable"),
+            ),
+            native_only: false,
+            input_form: None,
+        },
+    ]
+}
+
 /// Build the portable identity surface from the secret-free host snapshot.
+///
+/// While the vault is locked, only the vault card acts (its Unlock); every
+/// other card is shown without actions, since each would reach a secret.
 pub fn project_identity(snapshot: &IdentitySurfaceSnapshot) -> Vec<IdentityProjectionCard> {
+    let mut cards = project_cards(snapshot);
+    if snapshot.vault.lock == VaultLockView::Locked {
+        for card in cards.iter_mut().skip(1) {
+            card.actions.clear();
+        }
+    }
+    cards
+}
+
+fn project_cards(snapshot: &IdentitySurfaceSnapshot) -> Vec<IdentityProjectionCard> {
     let mut cards = vec![IdentityProjectionCard {
         key: "identity:vault".to_string(),
         card: PortableCardV1 {
@@ -171,36 +254,7 @@ pub fn project_identity(snapshot: &IdentitySurfaceSnapshot) -> Vec<IdentityProje
             badges: vec!["Personae".to_string(), "native authority".to_string()],
             media: Vec::new(),
         },
-        actions: vec![
-            IdentityProjectionAction {
-                intent: SSH_GENERATE_INTENT,
-                schema: SSH_GENERATE_SCHEMA,
-                label: "Generate SSH key…",
-                payload: None,
-                native_only: true,
-                input_form: None,
-            },
-            IdentityProjectionAction {
-                intent: SSH_IMPORT_NATIVE_INTENT,
-                schema: SSH_IMPORT_NATIVE_SCHEMA,
-                label: "Import SSH key…",
-                payload: None,
-                native_only: true,
-                input_form: None,
-            },
-            // On the vault card rather than beside a persona: it belongs to
-            // the vault, not to whoever is in use. `payload: None` is the
-            // established shape for an action whose fields the native host
-            // collects, the same as the two above.
-            IdentityProjectionAction {
-                intent: PROFILE_CREATE_INTENT,
-                schema: PROFILE_CREATE_SCHEMA,
-                label: "New persona…",
-                payload: None,
-                native_only: true,
-                input_form: None,
-            },
-        ],
+        actions: vault_actions(snapshot.vault.lock),
     }];
 
     cards.push(IdentityProjectionCard {
@@ -746,10 +800,15 @@ mod tests {
             .iter()
             .find(|card| card.key == "identity:vault")
             .unwrap();
-        // Generate, import, and (since the keeper founding) create-persona.
-        assert_eq!(vault.actions.len(), 3);
-        assert!(vault.actions.iter().all(|action| action.native_only));
-        assert!(vault.actions.iter().all(|action| action.payload.is_none()));
+        // Generate, import, and (since the keeper founding) create-persona,
+        // all native; then Lock, portable and carrying nothing (ruling 10).
+        assert_eq!(vault.actions.len(), 4);
+        let (native, lock) = vault.actions.split_at(3);
+        assert!(native.iter().all(|action| action.native_only));
+        assert!(native.iter().all(|action| action.payload.is_none()));
+        assert_eq!(lock[0].intent, VAULT_LOCK_INTENT);
+        assert!(!lock[0].native_only);
+        assert_eq!(lock[0].payload, Some(serde_json::json!({})));
 
         let key = cards
             .iter()
@@ -769,6 +828,43 @@ mod tests {
                 .unwrap()
                 .contains("private")
         );
+    }
+
+    /// Ruling 10: a Locked card offers only the native Unlock, and no other
+    /// card acts while locked.
+    #[test]
+    fn a_locked_surface_offers_only_the_native_unlock() {
+        use crate::view::ProfileView;
+        let mut snapshot = snapshot(SigningPolicy::PerUse);
+        snapshot.vault.lock = VaultLockView::Locked;
+        snapshot.profiles.push(ProfileView {
+            id: "personal".to_string(),
+            display_name: "Personal".to_string(),
+            selected: false,
+            slot_count: 0,
+            master_public_fingerprint: "blake3:test".to_string(),
+        });
+        snapshot.ssh_keys.push(SshKeyView {
+            profile: "research".to_string(),
+            fingerprint: "SHA256:public".to_string(),
+            comment: "workstation".to_string(),
+            public_openssh: "ssh-ed25519 AAAA-public workstation".to_string(),
+            lineage: "locally derived".to_string(),
+            device_loss_note: "recoverable".to_string(),
+            unlock_policy: "session".to_string(),
+        });
+        let cards = project_identity(&snapshot);
+        let vault = &cards[0];
+        assert_eq!(vault.key, "identity:vault");
+        assert!(vault.card.values.iter().any(|v| v.value == "locked"));
+        assert_eq!(vault.actions.len(), 1);
+        assert_eq!(vault.actions[0].intent, VAULT_UNLOCK_INTENT);
+        assert!(vault.actions[0].native_only);
+        assert!(vault.actions[0].payload.is_none());
+        assert!(cards[1..].iter().all(|card| card.actions.is_empty()));
+        // The public view is still shown.
+        assert!(cards.iter().any(|c| c.key == "identity:profile:personal"));
+        assert!(cards.iter().any(|c| c.key == "identity:ssh:SHA256:public"));
     }
 
     #[test]

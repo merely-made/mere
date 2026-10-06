@@ -556,15 +556,18 @@ build.
 - **P4a — the agent learns RSA and ECDSA (ruling 25).** personae's SSH slots
   and agent, and castellan's SSH import, accept RSA and ECDSA keys beside
   Ed25519. Waits for Mark's review after P3 (ruling 28). Done when:
-  - [ ] the agent signs with RSA using SHA-2 (`rsa-sha2-256` and
+  - [x] the agent signs with RSA using SHA-2 (`rsa-sha2-256` and
         `rsa-sha2-512`, honouring the agent protocol's signature flags) and
         with ECDSA on the curves `ssh-key` supports;
-  - [ ] the RustSec advisory database is checked for every crate the new
+        *2026-10-06 annotation:* P-256 and P-384 only. P-521 is refused
+        until `ssh-key` decodes it (ruling 55), so "the curves `ssh-key`
+        supports" is met as ruling 55 narrowed it.
+  - [x] the RustSec advisory database is checked for every crate the new
         algorithms pull in (the `rsa` crate included), and any open advisory
         comes back to Mark before this phase lands;
-  - [ ] every existing Ed25519 slot is byte-identical afterwards, and an
+  - [x] every existing Ed25519 slot is byte-identical afterwards, and an
         Ed25519 signature from the new agent verifies exactly as before;
-  - [ ] the new agent is proven against a real `sshd` while running beside
+  - [x] the new agent is proven against a real `sshd` while running beside
         the installed one, on its own socket or pipe; no lane replaces an
         installed agent, and where the end-to-end receipt runs is put to
         Mark at this phase's start, since it means a test key in some

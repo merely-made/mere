@@ -1,7 +1,14 @@
 # Shellbar Plan (F2)
 
 **Date**: 2026-06-09
-**Status**: In progress.
+**Status (2026-10-06):** landed in meerkat on 2026-06-09 (F2.1, F2.2 and the
+roster refinements R1 to R3), retired with it 2026-07-18 (`c5f01064`); surviving
+library parts: the `shellbar_edge` setting in
+`crates/system/pandect/src/settings_store.rs` with `ShellbarEdge` in
+`crates/system/pandect/src/application_settings_store.rs`, and R1's facets and
+R3's sections in `crates/mere/src/roster.rs`; open, with no current host:
+F2.3's persona chip. F2.3's graph-switcher half is MG4 of the multi-graph
+activation plan, which that plan records as done in meerkat on 2026-06-10.
 **Related**: [graph roster + frame taxonomy §4](../design/2026-06-07_graph_roster_and_frame_taxonomy.md#4-shellbar-2026-06-09), [frame tree plan](../../archive_docs/2026-06-09_completed_plans/2026-06-08_frame_tree_in_meerkat_plan.md), `crates/meerkat/` *(historical citation)* <!-- doc-audit: historical-path -->, `crates/system/pandect/src/settings_store.rs`
 
 Wire a docked chrome strip (the shellbar) that gives mouse users access to the
@@ -46,6 +53,13 @@ operation.
 9. **`meerkat/src/frame_ops.rs`** — handle `ToggleRoster`, `ToggleGloss`,
    `ToggleApparatus` in `drain_pending_command`.
 
+**Corrected 2026-10-06 (S14 pass):** the meerkat files named in steps 2 to 9
+left the workspace with meerkat in `c5f01064` (2026-07-18), and
+`SHELLBAR_THICKNESS`, `ToggleApparatus` and `shellbar_rect` are absent at mere
+`535bca11`. Step 1 survives in pandect: `ShellbarEdge` is in
+`crates/system/pandect/src/application_settings_store.rs` and the
+`shellbar_edge` field in `crates/system/pandect/src/settings_store.rs`.
+
 ### F2.2 — Move shellbar
 
 Right-click shellbar → context menu: "Move to left / right / top / bottom."
@@ -88,8 +102,15 @@ reserved slot gated on multi-persona.
   relation kind label ("Hyperlink", "Traversal", etc.), and the other node's title. A `.roster-edges`
   section renders beneath the facets strip when non-empty. `relation_kind_label()` covers all
   six `RelationKind` families. Tests: 95 total green.
+  **Corrected 2026-10-06 (S14 pass):** the surviving `RosterRow` in
+  `crates/mere/src/roster.rs` has no `edges` field; links are a separate
+  `LinkRow` beside it.
 + 2026-06-09: R3 (sort/filter by content type) implemented. `roster_rows()` now sorts by
   `(content_bucket, title)` and stamps `section_header` on the first row of each bucket.
   `content_bucket()` maps MIME → shape → (order, label): Documents (0), Feeds (1), Menus (2),
   Unknown (3). Orrery shape wiring was already in place. `RosterRow` gains `section_header:
   Option<String>`; `build_roster_dom` renders `.roster-section` headers when set. Tests: 96 total green.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at mere
+  535bca11, from the D2 record in support/doc-audit/d2/batch_45_s14_phase_b7.md. The
+  status records F2.1, F2.2 and R1 to R3 as landed in meerkat and retired with it;
+  the F2.1 meerkat files and R2's `RosterRow.edges` are annotated.

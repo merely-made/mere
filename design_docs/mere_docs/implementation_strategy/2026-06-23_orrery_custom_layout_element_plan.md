@@ -26,6 +26,14 @@ So the correctness gap is **closed for the two live consumers**. cond 1 is the s
 makes the transform special-casing unnecessary for *all* future consumers (text selection, IME
 carets, find-in-page rects inside the orrery), not a fix for a present-day bug.
 
+**Corrected 2026-10-06 (S14 pass):** the interim no longer exists. `orrery_element` and
+both consumers were meerkat's, deleted 2026-07-18 (`c5f01064`), and
+`IncrementalLayout::accumulated_translate` is defined neither in genet main nor in
+mere. The successor surface is pictograph's retained `node_document` (`.stage` /
+`.gnode`, `crates/canvas/pictograph/src/canvas.rs`), whose gnodes are still positioned
+by a per-frame `transform: translate` (`crates/canvas/pictograph/src/canvas/frame.rs`).
+No custom-layout mode exists in genet or pictograph.
+
 ## Mechanism A (the form) — lifted from the unified plan's cond-1 design
 
 **Mechanism B (absolute `left`/`top`) is rejected.** Setting each card's `left`/`top` from `gyre`
@@ -50,6 +58,12 @@ path was built to avoid (regression guard, genet `incremental.rs:1232`). B reint
 per-card `transform: translate`; `render.rs` feeds gyre's per-node positions into the concern each
 frame instead of into transforms. `accumulated_translate` then returns 0 for the cards (their
 fragments carry the real positions) so the interim ring + a11y fixes become harmless no-ops.
+
+**Corrected 2026-10-06 (S14 pass):** the genet anchors cited in this section are gone
+from genet main: there is no `incremental.rs` (the regression guard) and no
+`external_texture_key_of` (the marker-attribute precedent). The host migration
+described here targeted meerkat's `orrery_element` and `render.rs`, which no longer
+exist.
 
 ## Scope + engine ask
 
@@ -80,3 +94,8 @@ perf cost; (c) the secondary-orreries / side-by-side work (tearout) wants the cl
 - **2026-06-23 (parked).** Extracted from the unified-document-host plan on its core-complete
   closeout. No code; deferred by design until a trigger above fires. The Mechanism-A design + the
   rejected Mechanism B are the load-bearing record carried forward.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at mere
+  535bca11, from the D2 record in support/doc-audit/d2/batch_40_s14_phase_b2.md: the
+  interim (`accumulated_translate`, `orrery_element`) and the genet anchors noted gone,
+  and pictograph's transform-positioned `node_document` named as the successor surface.
+  The status line stands.

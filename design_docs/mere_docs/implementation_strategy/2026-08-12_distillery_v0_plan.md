@@ -1,7 +1,7 @@
 # Distillery v0 Plan
 
 **Date**: 2026-08-12  
-**Status**: D0 complete; D1 resident authority lifecycle complete. Its installed
+**Status (2026-10-06):** D0 complete; D1 resident authority lifecycle complete. Its installed
 Personae/settings binding, configure/inspect binary, and read-only Cambium
 surface pass an exact-source focused Cargo gate, and Turnstone admits the
 surface as the contribution seam's second provider; operational host
@@ -374,6 +374,10 @@ host-policy composition plus the full workspace gate continue to track in
   fixture's numbers, via a mesh job. Verified from a clean `origin/main`
   worktree: the receipt, both distillery feature sets' tests, the full esp
   `decoder-lora` suite, and package Clippy with warnings denied.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_43_s14_phase_b5.md: the status line dated, and a
+  dated note that Alembic and Athanor now carry content (`1bda73d5`).
 
 ## 10. Operational host-policy composition (assessment)
 
@@ -1130,6 +1134,13 @@ dependencies; neither opens a lane in this plan. When Alembic emits runs they
 are one more job kind on the board, and the
 [projection walk plan](2026-09-02_distillery_projection_walk_plan.md) carries
 them into the board's Chronicle as such.
+
+**Corrected 2026-10-06 (S14 pass):** neither is a stub any longer. At mere
+`535bca11`, `ports/distillery/athanor/Cargo.toml` depends on alembic, eidetic,
+kernel and pandect (euclid only as a dev-dependency), and alembic carries
+`ports/distillery/alembic/src/memory_levels.rs`, both from `1bda73d5`
+(2026-09-23, "Move Athanor's passes and the memory levels into their named
+crates").
 
 ### The trainer takes real gradients, 2026-09-03
 

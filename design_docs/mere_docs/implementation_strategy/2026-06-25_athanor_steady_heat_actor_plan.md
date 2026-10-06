@@ -1,7 +1,15 @@
 # Athanor's steady-heat actor
 
 **Date**: 2026-06-25
-**Status**: P1 + P2 done (2026-07-01). Spun out of the [Alembic tail handoff](../../archive_docs/2026-06-30_completed_plans/2026-06-25_alembic_tail_and_audit_polish_handoff.md)
+**Status (2026-10-06):** P1 (the idle cadence) landed in meerkat on 2026-06-30, retired
+with it 2026-07-18 (`c5f01064`); surviving library parts: P2's consolidation pass
+(2026-07-01) and the forgetting pass, both in `mere-athanor`
+(`ports/distillery/athanor/src/lib.rs`, moved in `1bda73d5`). Nothing schedules them
+today; Turnstone runs only the retirement pass, on session open. A 2026-09-02 ruling in
+that crate gives the scheduler to Djinn ("scheduled, not resident"), which overtakes
+P3's resident actor. Open: scheduling the passes, and the facet pass.
+
+Earlier status: P1 + P2 done (2026-07-01). Spun out of the [Alembic tail handoff](../../archive_docs/2026-06-30_completed_plans/2026-06-25_alembic_tail_and_audit_polish_handoff.md)
 B1 (slice D's remainder). Architecture: [alembic memory + engrams](../technical_architecture/2026-06-09_alembic_memory_and_engrams.md).
 
 ## Goal
@@ -25,6 +33,12 @@ Stays inside eidetic **R0**: Athanor proposes, the host applies.
   `content`, `find_worker` all follow it. Path B below mirrors it.
 - **The idle hook** — `app_handler::about_to_wait` (the winit idle callback) currently only drains
   cross-window commands. It is where a host-side cadence (Path A) hangs, with `ControlFlow::WaitUntil`.
+
+**Corrected 2026-10-06 (S14 pass):** the pass logic moved from `session-runtime/athanor.rs`
+to `ports/distillery/athanor/src/lib.rs` (`mere-athanor`, `1bda73d5`, 2026-09-23). The
+manual trigger (`run_forgetting_pass`) and the `app_handler::about_to_wait` idle hook
+were meerkat's and left with it on 2026-07-18 (`c5f01064`); the `spawn_fetcher` actor
+shape survives in `crates/system/fetch`.
 
 ## Two shapes (the real choice)
 
@@ -71,6 +85,13 @@ up a thread + snapshot hand-off for it. The actor's reason to exist is the conso
   same material gain a lineage link.
 - **P3 (Path B, when facet extraction lands).** `spawn_athanor` actor owns the cadence + heavy passes
   off-thread; forgetting/consolidation move behind it. Done: a heavy pass runs without dropping a frame.
+
+**Corrected 2026-10-06 (S14 pass):** P1's cadence (`app_handler/idle_forgetting.rs`,
+`IDLE_GRACE`, `PASS_INTERVAL`) left with meerkat, so nothing schedules forgetting or
+consolidation today; the crate's module doc says scheduling them "is still to come".
+Turnstone runs only `propose_retirement`, on session open (`turnstone/src/recycle.rs`).
+P3's resident `spawn_athanor` actor is overtaken by the ruling in the same module doc
+(2026-09-02): Athanor is "scheduled, not resident", and Djinn contains the scheduler.
 
 ## Gotchas
 
@@ -121,3 +142,8 @@ up a thread + snapshot hand-off for it. The actor's reason to exist is the conso
   (4 new) in `athanor.rs`, all green. Not yet surfaced in Steward beyond the diagnostic — no "last
   consolidation" row like B2's forgetting one; a thin follow-on if it turns out to matter. P3 (Path B
   actor) still blocked on facet extraction landing.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at mere
+  535bca11, from the D2 record in support/doc-audit/d2/batch_40_s14_phase_b2.md: a
+  dated status (P1 retired with meerkat, the passes surviving in `mere-athanor`,
+  nothing scheduling them, P3 overtaken by the Djinn-scheduler ruling) and the moved
+  pass-logic path.

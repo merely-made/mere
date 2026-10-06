@@ -8,7 +8,7 @@
 **Totals: 1 doc, 25 claims checked (25 holds, 0 stale, 0 unverifiable), 0 contradictions.**
 
 Audit base: Mere `792967f8` (2026-10-01), plus the four machines read over
-SSH on 2026-10-02. `archive_docs/` is excluded.
+SSH on 2026-10-02. Status line re-checked 2026-10-06 at `91cb5749` after the S14 pass (batch 46). `archive_docs/` is excluded.
 
 This batch exists because the plan is new. Its rulings (1 to 74) are recorded
 in its §3, and its three corrections are carried as dated notes into the SSH
@@ -18,7 +18,7 @@ counted again here.
 ## mere_docs/implementation_strategy/2026-10-02_device_pairing_by_key_plan.md
 
 - disposition: current
-- status line: "Status (2026-10-04): in progress. Assessed and ruled by Mark from 2026-10-01 to 2026-10-04 (rulings 1 to 74 below). D1 landed (`4963b489`); D1b's mere fix (M1) landed (`177b927c`) and its fork fix (F1) shipped in the 0.7.5 repin, pushed 2026-10-04 (fork `1bec457e`, Knot `92367ec`, mere `031b3dcc`). `connected` follows the gossip overlay (ruling 31) and, off it, open connections (rulings 47 to 56). The overlay's gap after restarts has a ruled fix in iroh-gossip, held until its next release (rulings 64 to 72). Paused before D2 while chatelaine P4a runs (ruling 73)." — accurate: yes
+- status line: "Status (2026-10-06): in progress, paused before D2. Rulings 1 to 74. - D1 landed (`4963b489`). - D1b's mere fix (M1) landed (`177b927c`); its fork fix (F1) shipped in the 0.7.5 repin, pushed 2026-10-04 (fork `1bec457e`, Knot `92367ec`, mere `031b3dcc`). - `connected` follows the gossip overlay (ruling 31, `fdb02bd3`) and, off it, open connections (rulings 47 to 56, `005e27ad`). - The overlay's gap after restarts has a ruled fix in iroh-gossip, held until its next release (rulings 64 to 72). The pause of ruling 73 (for chatelaine P4a) has lapsed: P4a landed as `007fbe7c`. The identity work then moved to the vault lock plan. D2 has not been put back to Mark, and its restart waits on his word (see §7, 2026-10-06)." — accurate: yes
 - claims checked: 25 — holds: 25, stale: 0, unverifiable: 0
 
 ### Stale claims
