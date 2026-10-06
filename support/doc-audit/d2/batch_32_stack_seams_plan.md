@@ -2,10 +2,10 @@
 
 | doc | disposition | status accurate | claims | holds | stale | unverifiable |
 |---|---|---:|---:|---:|---:|---:|
-| mere_docs/implementation_strategy/2026-10-04_stack_seams_plan.md | current | yes | 38 | 38 | 0 | 0 |
-| **Totals** |  |  | **38** | **38** | **0** | **0** |
+| mere_docs/implementation_strategy/2026-10-04_stack_seams_plan.md | current | yes | 39 | 39 | 0 | 0 |
+| **Totals** |  |  | **39** | **39** | **0** | **0** |
 
-**Totals: 1 doc, 38 claims checked (38 holds, 0 stale, 0 unverifiable), 0 contradictions.**
+**Totals: 1 doc, 39 claims checked (39 holds, 0 stale, 0 unverifiable), 0 contradictions.**
 
 Audit base: Mere `c34449bd` (2026-10-04), with this pass's edits in the
 working tree: the new plan, its `DOC_README.md` entry at the head of the
@@ -21,8 +21,8 @@ This batch exists because the document is new.
 ## mere_docs/implementation_strategy/2026-10-04_stack_seams_plan.md
 
 - disposition: current
-- status line: "Status (2026-10-05): in progress. Thirty-one rulings in eleven rounds (S1 to S31); P1 landed on main (`1633be0c`); P2 staged (S27 to S31, four stages in §3.1), stage 1 built on branch `stack-seams-p2` (`76aa1bee`), stage 2 next; P3 and S7 done as documents; S3 to S6 carried into the dynamics grammar plan (G8, G9); S9 done by the identity lane (`b52edea7`)." — accurate: yes
-- claims checked: 38 — holds: 38, stale: 0, unverifiable: 0
+- status line: "Status (2026-10-05): in progress. Thirty-one rulings in eleven rounds (S1 to S31); P1 landed on main (`1633be0c`); P2 staged (S27 to S31, four stages in §3.1), stages 1 and 2 built on branch `stack-seams-p2` (`03f8fe74`), stage 3 next; P3 and S7 done as documents; S3 to S6 carried into the dynamics grammar plan (G8, G9); S9 done by the identity lane (`b52edea7`)." — accurate: yes
+- claims checked: 39 — holds: 39, stale: 0, unverifiable: 0
 
 ### Stale claims
 
@@ -97,4 +97,5 @@ entry at `ac7f906d`. F16 checked against wgpu 30.0.1's
 `9607d16f`'s `boot_async_shared` (a new instance per boot); F17 against genet
 `bd3e8861`'s `genet-render-host` `rasterize_for` doc and rootstock's
 `frame.rs` call; stage 1's entry against branch commit `76aa1bee` and its gate
-and receipt logs.
+and receipt logs. Stage 2's entry checked against branch
+commit `03f8fe74`, its gate logs, and the review subagent's report.

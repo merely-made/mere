@@ -3,8 +3,8 @@
 **Date:** 2026-10-04
 **Status (2026-10-05):** in progress. Thirty-one rulings in eleven rounds
 (S1 to S31); P1 landed on main (`1633be0c`); P2 staged (S27 to S31, four
-stages in §3.1), stage 1 built on branch `stack-seams-p2` (`76aa1bee`), stage
-2 next; P3 and S7 done as documents; S3 to S6 carried into the dynamics
+stages in §3.1), stages 1 and 2 built on branch `stack-seams-p2` (`03f8fe74`),
+stage 3 next; P3 and S7 done as documents; S3 to S6 carried into the dynamics
 grammar plan (G8, G9); S9 done by the identity lane (`b52edea7`).
 
 A note sent to Mark listed weak seams in the stack. Each claim was checked
@@ -652,6 +652,31 @@ The done-conditions handed over for S3 and S4, kept for reference:
   works in `projection_compile`. Second pass (F8 to F11), rulings S7 to S10:
   the README fixed (S7), TERMINOLOGY gains pandect under Eidetic and the
   curation record (S8, S10), S9 sent to the identity lane.
+- **2026-10-05.** P2 stage 2 built on branch `stack-seams-p2` at `03f8fe74`, not
+  merged, no behaviour change. `HostTree`, a sealed trait over the runner calls
+  the pipeline makes, implemented for `Runner`; `Host`, `HostState`, `AppCtx`,
+  `HostHooks` and four hook aliases take the tree as a fourth type parameter
+  defaulted to `Runner`; `AppShared` holds the eight shared fields as
+  `HostState::shared`. Gates: the stage 1 suites pass with the same counts (316
+  passed, 0 failed, 6 ignored) and warnings; the headed receipt and its control
+  pass; the web host checks on wasm32. A read-only review subagent (opus) read
+  the diff and every use in Woodshed, Hocket and Knot: no behaviour change once
+  the shared fields were declared where they had been (drop order), and no
+  consumer that fails to compile. *As built against §3.1's text*, recorded
+  rather than ruled because none changes what an application sees: the trait is
+  public and sealed, not crate-internal, because it bounds public types; window
+  commands and the wake flag stay per window (a window verb names a window; the
+  wake's home is stage 4's); and "signatures unchanged" holds as source
+  compatibility, not literally, since `AppCtx` and `HostHooks` gained the
+  defaulted parameter: a name written with three parameters denotes the type it
+  did, and the one pattern that would need an annotation (an untyped
+  `HostHooks` literal whose closure calls a method on `ctx.runner`) occurs in no
+  consumer. Found for stage 3: the producer registry retires every producer whose
+  key is not in the frame's layout (`registry.rs`, `prepare`), which under one
+  registry painted per window (S29) would retire another window's producers; and
+  cambium's `RunnerTree` builds and rebuilds under its mount but hands message
+  dispatch and focus collection the document (`runner.rs`, eight
+  `parent: Some(document())` sites and `focusables`).
 - **2026-10-05.** P2 stage 1 built on branch `stack-seams-p2` at `76aa1bee`
   (worktree `Code/worktrees/mere-stack-seams-p2`, which took P1's build target;
   P1's worktree removed), not merged. One `Arc<RenderCore>` per host, kept
