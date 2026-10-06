@@ -131,13 +131,14 @@ def audit() -> dict[str, object]:
     covered = legacy_active | supplemental_active
     missing = sorted(set(active) - covered)
     unknown_supplements = sorted(set(supplements) - set(active))
-    overlap = sorted(legacy_active & supplemental_active)
+    # A batch record for a path the snapshot covers is a later judgment and
+    # supersedes the snapshot's record (stack seams plan, ruling S34).
+    superseded = sorted(legacy_active & supplemental_active)
+    superseded_keys = {path if path in legacy else Path(path).name for path in superseded}
     if missing:
         errors.extend(f"active document lacks D2 record: {path}" for path in missing)
     if unknown_supplements:
         errors.extend(f"supplemental record is not active: {path}" for path in unknown_supplements)
-    if overlap:
-        errors.extend(f"supplement duplicates legacy record: {path}" for path in overlap)
 
     active_set = set(active)
     inactive_legacy = sorted(
@@ -146,7 +147,10 @@ def audit() -> dict[str, object]:
         if name.replace("\\", "/") not in active_set
         and not ("/" not in name and "\\" not in name and name in basenames)
     )
-    combined_records = [*legacy.values(), *supplements.values()]
+    combined_records = [
+        *(record for path, record in legacy.items() if path not in superseded_keys),
+        *supplements.values(),
+    ]
     dispositions = Counter(str(record.get("disposition", "(missing)")) for record in combined_records)
     totals = {
         field: sum(int(record.get(field, 0) or 0) for record in combined_records)
@@ -167,6 +171,7 @@ def audit() -> dict[str, object]:
         "legacy_corrections": len(corrections),
         "legacy_active_records": len(legacy_active),
         "supplemental_records": len(supplements),
+        "superseded_legacy_records": len(superseded),
         "inactive_legacy_records": len(inactive_legacy),
         "combined_records": len(combined_records),
         "combined_dispositions": dict(sorted(dispositions.items())),
@@ -189,7 +194,8 @@ def main() -> int:
             "D2 coverage: "
             f"{report['covered_active_docs']}/{report['active_docs']} active; "
             f"{report['legacy_active_records']} legacy + "
-            f"{report['supplemental_records']} supplemental; "
+            f"{report['supplemental_records']} supplemental "
+            f"({report['superseded_legacy_records']} superseding legacy); "
             f"{report['inactive_legacy_records']} inactive legacy"
         )
         for error in report["errors"]:
