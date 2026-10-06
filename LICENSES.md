@@ -81,12 +81,12 @@ crates under Exhibit A and every manifest on `MPL-2.0`.
 
 | Crate | Path | Published version's grant | In-tree notice files |
 |---|---|---|---|
-| `inker` | `crates/inker/inker` | 0.1.1, MIT OR Apache-2.0 | `LICENSE-MIT`, `LICENSE-APACHE` (carried over from `verso-tile` 0.1.0 when it folded into `inker::flip`, 2026-09-05) |
+| `inker` | `crates/inker/inker` | 0.1.1, MIT OR Apache-2.0 | — (the pair carried over from `verso-tile` 0.1.0 was dropped by merge `0a8198ba`, 2026-09-06, and stays removed under ruling S40) |
 | `document-canvas` | `crates/inker/document-canvas` | 0.1.0 | — |
 | `nematic` | `crates/nematic/nematic` | 0.1.1 | — |
 | `illume` | `crates/nematic/illume` | 0.0.2 | — |
 | `errand` | `crates/system/errand` | 0.3.4, MIT OR Apache-2.0 | — |
-| `tinct` | `crates/cambium/tinct` | 0.1.2, MIT OR Apache-2.0 | `LICENSE-MIT`, `LICENSE-APACHE` |
+| `tinct` | `crates/cambium/tinct` | 0.1.2, MIT OR Apache-2.0 | — (deleted by Mark's ruling, `642ca2d7`, 2026-09-24) |
 
 Each arrived from genet 2026-09-03 under its own published grant; relicensing
 is the sweep plan's call at the next bump. Nothing here was relicensed on the
@@ -96,6 +96,12 @@ already on crates.io. This is the same disposition genet's own ledger records,
 which names `sprigging` 0.2.1, `illume` 0.0.2, `errand` 0.3.4, `tinct` 0.1.2
 and `inker` 0.1.1 explicitly and keeps the ruling as the precedent the sweep was
 decided on.
+
+**Amended 2026-10-06** (stack seams plan, ruling S40): both notice-file pairs
+are gone. tinct's was deleted by Mark's ruling (`642ca2d7`, 2026-09-24);
+inker's was dropped by merge `0a8198ba` (2026-09-06) and stays deleted, since
+inker is MPL-2.0 like the rest of the workspace. The versions already on
+crates.io keep the grant they were published under.
 
 The three engine adapters — `scrying-engine`, `graft-engine` and `weld-engine`
 — are `publish = false` and have no published version, so nothing is held open
