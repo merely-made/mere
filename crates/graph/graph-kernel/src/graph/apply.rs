@@ -16,7 +16,9 @@ use super::{
         persisted_coupling_from_coupling, persisted_field_from_field,
     },
 };
-use crate::persistence::{PersistedCoupling, PersistedEdge, PersistedField};
+use crate::persistence::{
+    PersistedCoupling, PersistedEdge, PersistedField, PersistedResourceRecord,
+};
 use crate::types::{
     BadgeIcon, ClassificationScheme, ClassificationStatus, GraphScope, ImageRef, ImageRole,
     ImportRecord, NodeClassification, NodeDerivation, NodeImportProvenance, NodeProperty,
@@ -208,6 +210,19 @@ pub enum GraphDelta {
         from_id: Uuid,
         to_id: Uuid,
         edges: Vec<PersistedEdge>,
+    },
+    ReplaySetResourceRecordById {
+        resource_id: Uuid,
+        record: Option<PersistedResourceRecord>,
+    },
+    ReplaySetResourceEdgesByIds {
+        from_resource_id: Uuid,
+        to_resource_id: Uuid,
+        edges: Vec<PersistedEdge>,
+    },
+    ReplaySetShownResourceById {
+        surface_id: Uuid,
+        resource_id: Option<Uuid>,
     },
     ReplayTouchNodeLastVisitedById {
         node_id: Uuid,
@@ -1101,6 +1116,44 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 to_id: to_id.to_string(),
                 edges: graph.persisted_edges_between(from, to),
             });
+            GraphDeltaResult::Applied
+        },
+        GraphDelta::ReplaySetResourceRecordById {
+            resource_id,
+            record,
+        } => {
+            if graph.set_resource_record(resource_id, record) {
+                graph.record_delta(&CapturedDelta::ReplaySetResourceRecordById {
+                    resource_id: resource_id.to_string(),
+                    record: graph.resource_record(resource_id),
+                });
+            }
+            GraphDeltaResult::Applied
+        },
+        GraphDelta::ReplaySetResourceEdgesByIds {
+            from_resource_id,
+            to_resource_id,
+            edges,
+        } => {
+            if graph.set_resource_edges_between(from_resource_id, to_resource_id, &edges) {
+                graph.record_delta(&CapturedDelta::ReplaySetResourceEdgesByIds {
+                    from_resource_id: from_resource_id.to_string(),
+                    to_resource_id: to_resource_id.to_string(),
+                    edges: graph.persisted_resource_edges_between(from_resource_id, to_resource_id),
+                });
+            }
+            GraphDeltaResult::Applied
+        },
+        GraphDelta::ReplaySetShownResourceById {
+            surface_id,
+            resource_id,
+        } => {
+            if graph.set_shown_resource(surface_id, resource_id) {
+                graph.record_delta(&CapturedDelta::ReplaySetShownResourceById {
+                    surface_id: surface_id.to_string(),
+                    resource_id: resource_id.map(|id| id.to_string()),
+                });
+            }
             GraphDeltaResult::Applied
         },
         GraphDelta::ReplayTouchNodeLastVisitedById {

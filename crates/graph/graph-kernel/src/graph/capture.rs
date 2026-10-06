@@ -30,7 +30,7 @@ use super::{
 };
 use crate::persistence::{
     PersistedCoupling, PersistedCouplingResponse, PersistedEdge, PersistedField,
-    PersistedFieldExtent, PersistedFieldLifecycle, PersistedNodeSelector,
+    PersistedFieldExtent, PersistedFieldLifecycle, PersistedNodeSelector, PersistedResourceRecord,
 };
 use crate::types::{
     BadgeIcon, ClassificationScheme, ClassificationStatus, ImageRef, ImageRole, ImportRecord,
@@ -257,6 +257,19 @@ pub enum CapturedDelta {
     ReplaySetNodeContentById {
         node_id: String,
         content: Option<[u8; 32]>,
+    },
+    ReplaySetResourceRecordById {
+        resource_id: String,
+        record: Option<PersistedResourceRecord>,
+    },
+    ReplaySetResourceEdgesByIds {
+        from_resource_id: String,
+        to_resource_id: String,
+        edges: Vec<PersistedEdge>,
+    },
+    ReplaySetShownResourceById {
+        surface_id: String,
+        resource_id: Option<String>,
     },
 }
 
@@ -544,6 +557,29 @@ impl CapturedDelta {
                 to_id: parse_uuid(to_id),
                 edges: edges.clone(),
             },
+            Self::ReplaySetResourceRecordById {
+                resource_id,
+                record,
+            } => GraphDelta::ReplaySetResourceRecordById {
+                resource_id: parse_uuid(resource_id),
+                record: record.clone(),
+            },
+            Self::ReplaySetResourceEdgesByIds {
+                from_resource_id,
+                to_resource_id,
+                edges,
+            } => GraphDelta::ReplaySetResourceEdgesByIds {
+                from_resource_id: parse_uuid(from_resource_id),
+                to_resource_id: parse_uuid(to_resource_id),
+                edges: edges.clone(),
+            },
+            Self::ReplaySetShownResourceById {
+                surface_id,
+                resource_id,
+            } => GraphDelta::ReplaySetShownResourceById {
+                surface_id: parse_uuid(surface_id),
+                resource_id: resource_id.as_deref().map(parse_uuid),
+            },
             Self::ReplayTouchNodeLastVisitedById {
                 node_id,
                 timestamp_ms,
@@ -804,7 +840,12 @@ impl ReplayAttribution {
     }
 
     fn observe_graph(&mut self, graph: &Graph) {
-        for edge in graph.inner.inner().edge_weights() {
+        for edge in graph
+            .inner
+            .inner()
+            .edge_weights()
+            .chain(graph.resources.inner().edge_weights())
+        {
             for statement in edge.semantic_statements() {
                 self.0
                     .entry(statement.statement_id.clone())
@@ -819,11 +860,21 @@ impl ReplayAttribution {
     }
 
     pub(crate) fn repair_checkpoint(&self, graph: &mut Graph) {
+        let changed = self.repair_edges(&mut graph.inner) | self.repair_edges(&mut graph.resources);
+        if changed {
+            graph.bump_revision();
+        }
+    }
+
+    fn repair_edges<N: chartulary::Identified>(
+        &self,
+        graph: &mut chartulary::Graph<N, super::EdgePayload>,
+    ) -> bool {
         let unknown = super::edge_data::UNKNOWN_LEGACY_ASSERTER_IRI;
-        let keys: Vec<_> = graph.inner.inner().edge_indices().collect();
+        let keys: Vec<_> = graph.inner().edge_indices().collect();
         let mut changed = false;
         for key in keys {
-            if let Some(payload) = graph.inner.edge_mut(key)
+            if let Some(payload) = graph.edge_mut(key)
                 && let Some(semantic) = &mut payload.semantic
             {
                 for statement in &mut semantic.statements {
@@ -840,9 +891,7 @@ impl ReplayAttribution {
                 }
             }
         }
-        if changed {
-            graph.bump_revision();
-        }
+        changed
     }
 
     pub(crate) fn replay_delta(
@@ -851,7 +900,9 @@ impl ReplayAttribution {
         author: &super::Author,
     ) -> Option<GraphDelta> {
         let mut delta = delta.replay_delta_as(author)?;
-        if let GraphDelta::ReplaySetEdgesByIds { edges, .. } = &mut delta {
+        if let GraphDelta::ReplaySetEdgesByIds { edges, .. }
+        | GraphDelta::ReplaySetResourceEdgesByIds { edges, .. } = &mut delta
+        {
             for edge in edges {
                 if let Some(semantic) = &mut edge.semantic {
                     for statement in &mut semantic.statements {
@@ -2437,5 +2488,223 @@ mod tests {
             out[48],
             CapturedDelta::ReplayRemoveNodeById { .. }
         ));
+    }
+}
+
+#[cfg(test)]
+mod resource_capture_tests {
+    use std::sync::{Arc, Mutex};
+
+    use super::*;
+    use crate::graph::{Author, GraphJournal, SemanticStatement};
+    use crate::persistence::PersistedResourceFacet;
+
+    fn record(iri: &str) -> CapturedDelta {
+        CapturedDelta::ReplaySetResourceRecordById {
+            resource_id: chartulary::resource_id(iri).to_string(),
+            record: Some(PersistedResourceRecord {
+                canonical_iri: chartulary::canonical_url(iri),
+                facets: vec![PersistedResourceFacet {
+                    facet: "foreign.metadata".into(),
+                    value_json: r#"{"nested":[null,{"future":"kept"}]}"#.into(),
+                }],
+            }),
+        }
+    }
+
+    fn edges(from: Uuid, to: Uuid) -> Vec<PersistedEdge> {
+        let mut persisted = Vec::new();
+        for (statement_id, source_iri, time) in [
+            ("minted-handle", "https://people.test/minter", 10),
+            ("explicit-handle", "https://people.test/explicit", 20),
+        ] {
+            let mut graph = Graph::new();
+            let source =
+                graph.add_node_with_id(from, "https://surface-a.test".into(), Default::default());
+            let target =
+                graph.add_node_with_id(to, "https://surface-b.test".into(), Default::default());
+            graph.assert_persisted_semantic_statement(
+                source,
+                target,
+                SemanticStatement {
+                    statement_id: statement_id.into(),
+                    predicate: "https://vocab.test/relation".into(),
+                    recognized_sub_kind: None,
+                    label: None,
+                    graph_scope: crate::types::GraphScope::User,
+                    provenance_iri: Some(source_iri.into()),
+                    asserted_at_ms: Some(time),
+                },
+            );
+            persisted.extend(graph.persisted_edges_between(source, target));
+        }
+        persisted
+    }
+
+    #[test]
+    fn resource_capture_codecs_preserve_old_ordinals_and_new_payloads() {
+        let old_pair = CapturedDelta::ReplaySetEdgesByIds {
+            from_id: "a".into(),
+            to_id: "b".into(),
+            edges: Vec::new(),
+        };
+        assert_eq!(
+            postcard::to_allocvec(&old_pair).unwrap(),
+            [37, 1, b'a', 1, b'b', 0]
+        );
+        let old_content = CapturedDelta::ReplaySetNodeContentById {
+            node_id: "a".into(),
+            content: None,
+        };
+        assert_eq!(
+            postcard::to_allocvec(&old_content).unwrap(),
+            [46, 1, b'a', 0]
+        );
+        let iri = "https://resource.test/a";
+        let resource = chartulary::resource_id(iri);
+        let other = chartulary::resource_id("https://resource.test/b");
+        let variants = [
+            record(iri),
+            CapturedDelta::ReplaySetResourceEdgesByIds {
+                from_resource_id: resource.to_string(),
+                to_resource_id: other.to_string(),
+                edges: edges(resource, other),
+            },
+            CapturedDelta::ReplaySetShownResourceById {
+                surface_id: Uuid::from_u128(1).to_string(),
+                resource_id: Some(resource.to_string()),
+            },
+        ];
+        for (ordinal, delta) in (47u8..).zip(variants) {
+            let bytes = postcard::to_allocvec(&delta).unwrap();
+            assert_eq!(bytes[0], ordinal);
+            assert_eq!(
+                postcard::from_bytes::<CapturedDelta>(&bytes).unwrap(),
+                delta
+            );
+            let json = serde_json::to_string(&delta).unwrap();
+            assert_eq!(serde_json::from_str::<CapturedDelta>(&json).unwrap(), delta);
+        }
+    }
+
+    #[test]
+    fn resource_capture_replay_preserves_strata_exact_data_and_noops() {
+        let from = chartulary::resource_id("https://resource.test/a");
+        let to = chartulary::resource_id("https://resource.test/b");
+        let mut graph = Graph::new();
+        let source =
+            graph.add_node_with_id(from, "https://surface.test/a".into(), Default::default());
+        let target =
+            graph.add_node_with_id(to, "https://surface.test/b".into(), Default::default());
+        graph.assert_persisted_semantic_statement(
+            source,
+            target,
+            SemanticStatement {
+                statement_id: "surface-control".into(),
+                predicate: "https://vocab.test/surface".into(),
+                recognized_sub_kind: None,
+                label: None,
+                graph_scope: crate::types::GraphScope::User,
+                provenance_iri: Some("https://people.test/surface".into()),
+                asserted_at_ms: Some(30),
+            },
+        );
+        let baseline = graph.clone();
+        let seen = Arc::new(Mutex::new(Vec::new()));
+        let sink = seen.clone();
+        graph.set_recorder(Some(Arc::new(move |delta: &CapturedDelta| {
+            sink.lock().unwrap().push(delta.clone())
+        })));
+        let writes = [
+            record("https://resource.test/a"),
+            record("https://resource.test/b"),
+            CapturedDelta::ReplaySetResourceEdgesByIds {
+                from_resource_id: from.to_string(),
+                to_resource_id: to.to_string(),
+                edges: edges(from, to),
+            },
+            CapturedDelta::ReplaySetShownResourceById {
+                surface_id: from.to_string(),
+                resource_id: Some(from.to_string()),
+            },
+        ];
+        for delta in &writes {
+            apply_graph_delta(&mut graph, delta.replay_delta().unwrap());
+        }
+        let recorded = seen.lock().unwrap().clone();
+        assert_eq!(recorded.len(), 4);
+        let revision = graph.revision();
+        for delta in &recorded {
+            apply_graph_delta(&mut graph, delta.replay_delta().unwrap());
+        }
+        assert_eq!(
+            seen.lock().unwrap().len(),
+            4,
+            "identical writes capture nothing"
+        );
+        assert_eq!(graph.revision(), revision);
+        assert_eq!(
+            graph.persisted_edges_between(source, target),
+            baseline.persisted_edges_between(source, target)
+        );
+        assert_eq!(
+            graph.persisted_resource_edges_between(from, to),
+            edges(from, to)
+        );
+        let mut restored = baseline;
+        replay_captured_deltas_onto(&mut restored, recorded);
+        assert_eq!(restored.resource_record(from), graph.resource_record(from));
+        assert_eq!(
+            restored.persisted_resource_edges_between(from, to),
+            graph.persisted_resource_edges_between(from, to)
+        );
+        assert_eq!(restored.shown_resource_id(source), Some(from));
+        assert_eq!(restored.surface_ids_showing_resource(from), [from]);
+    }
+
+    #[test]
+    fn resource_capture_journal_preserves_mint_source_across_withdrawal() {
+        let from = chartulary::resource_id("https://resource.test/a");
+        let to = chartulary::resource_id("https://resource.test/b");
+        let mut captured = edges(from, to);
+        captured[0].semantic.as_mut().unwrap().statements[0].provenance_iri = None;
+        let pair = |edges| CapturedDelta::ReplaySetResourceEdgesByIds {
+            from_resource_id: from.to_string(),
+            to_resource_id: to.to_string(),
+            edges,
+        };
+        let minter = Author::engine("mint-engine", "v1");
+        let restorer = Author::person("restoring-person");
+        let mut journal = GraphJournal::new();
+        journal.record(record("https://resource.test/a"));
+        journal.record(record("https://resource.test/b"));
+        journal.record_as(minter.clone(), pair(captured.clone()));
+        let before_withdrawal = journal.replay();
+        journal.record_as(restorer.clone(), pair(Vec::new()));
+        let absent = journal.replay();
+        assert!(absent.persisted_resource_edges_between(from, to).is_empty());
+        assert!(
+            absent.resource_record(from).is_some(),
+            "withdrawal keeps resource identity"
+        );
+        journal.record_as(restorer, pair(captured));
+        let restored = journal.replay();
+        assert_eq!(
+            restored.persisted_resource_edges_between(from, to),
+            before_withdrawal.persisted_resource_edges_between(from, to)
+        );
+        let persisted = restored.persisted_resource_edges_between(from, to);
+        assert_eq!(persisted.len(), 2, "parallel exact records remain separate");
+        let minted = &persisted[0].semantic.as_ref().unwrap().statements[0];
+        let explicit = &persisted[1].semantic.as_ref().unwrap().statements[0];
+        assert_eq!(minted.statement_id, "minted-handle");
+        assert_eq!(minted.asserted_at_ms, Some(10));
+        assert_eq!(minted.provenance_iri, Some(minter.asserter_iri()));
+        assert_eq!(explicit.statement_id, "explicit-handle");
+        assert_eq!(explicit.asserted_at_ms, Some(20));
+        assert_eq!(
+            explicit.provenance_iri.as_deref(),
+            Some("https://people.test/explicit")
+        );
     }
 }

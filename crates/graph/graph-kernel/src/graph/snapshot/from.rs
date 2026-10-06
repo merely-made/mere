@@ -11,6 +11,7 @@
 //! decomposition pass.
 
 use euclid::default::Point2D;
+use std::collections::BTreeMap;
 use uuid::Uuid;
 
 use super::super::*;
@@ -194,6 +195,40 @@ impl Graph {
             }
         }
 
+        for record in &snapshot.resources {
+            let id = chartulary::resource_id_from_canonical_iri(&record.canonical_iri);
+            graph.set_resource_record(id, Some(record.clone()));
+        }
+        let mut resource_pairs: BTreeMap<(Uuid, Uuid), Vec<PersistedEdge>> = BTreeMap::new();
+        for edge in &snapshot.resource_edges {
+            let (Ok(from), Ok(to)) = (
+                Uuid::parse_str(&edge.from_node_id),
+                Uuid::parse_str(&edge.to_node_id),
+            ) else {
+                continue;
+            };
+            let mut edge = edge.clone();
+            if let Some(semantic) = &mut edge.semantic {
+                for statement in &mut semantic.statements {
+                    statement
+                        .provenance_iri
+                        .get_or_insert_with(|| edge_data::UNKNOWN_LEGACY_ASSERTER_IRI.to_owned());
+                }
+            }
+            resource_pairs.entry((from, to)).or_default().push(edge);
+        }
+        for ((from, to), edges) in resource_pairs {
+            graph.set_resource_edges_between(from, to, &edges);
+        }
+        for shown in &snapshot.shown_resources {
+            if let (Ok(surface), Ok(resource)) = (
+                Uuid::parse_str(&shown.surface_id),
+                Uuid::parse_str(&shown.resource_id),
+            ) {
+                graph.set_shown_resource(surface, Some(resource));
+            }
+        }
+
         // Field layer (field-system Phase 2). Malformed ids / definitions skip the
         // entry rather than failing the whole load, matching the node/edge loops.
         for pfield in &snapshot.fields {
@@ -286,221 +321,212 @@ impl Graph {
 }
 
 impl Graph {
-    /// Make one persisted edge's relations live from `from` to `to`, as a
-    /// snapshot load does. Undo's exact edge write uses the same path, so a
-    /// reverted edge is exactly as faithful as a save and reload.
+    /// Merge one persisted edge into a surface pair, retaining revision behavior.
     pub(crate) fn restore_persisted_edge(
         &mut self,
         from: NodeKey,
         to: NodeKey,
         pedge: &PersistedEdge,
     ) {
-        let graph = self;
-        if let Some(semantic) = &pedge.semantic {
-            if !semantic.statements.is_empty() {
-                let key = graph
-                    .find_edge_key(from, to)
-                    .unwrap_or_else(|| graph.inner.connect(from, to, EdgePayload::new()));
-                if let Some(payload) = graph.inner.edge_mut(key) {
-                    for statement in &semantic.statements {
-                        let _ = payload.push_persisted_semantic_statement(SemanticStatement {
-                            statement_id: statement.statement_id.clone(),
-                            predicate: statement.predicate.clone(),
-                            recognized_sub_kind: statement
-                                .recognized_sub_kind
-                                .map(semantic_sub_kind),
-                            label: statement.label.clone(),
-                            graph_scope: statement.graph_scope.clone(),
-                            provenance_iri: statement.provenance_iri.clone(),
-                            asserted_at_ms: statement.asserted_at_ms,
-                        });
-                    }
-                }
-            } else {
-                let key = graph
-                    .find_edge_key(from, to)
-                    .unwrap_or_else(|| graph.inner.connect(from, to, EdgePayload::new()));
-                if let Some(payload) = graph.inner.edge_mut(key) {
-                    for sub_kind in &semantic.sub_kinds {
-                        let sub_kind = semantic_sub_kind(sub_kind.clone());
-                        payload.assert_semantic_statement(SemanticStatementSpec {
-                            predicate: predicate_iri(sub_kind).into(),
-                            recognized_sub_kind: Some(sub_kind),
-                            label: semantic.label.clone(),
-                            graph_scope: crate::types::GraphScope::Default,
-                            provenance_iri: Some(edge_data::UNKNOWN_LEGACY_ASSERTER_IRI.into()),
-                            asserted_at_ms: None,
-                        });
-                    }
-                }
-                // Restore the open predicate IRI. Create the edge when the
-                // sub-kind loop above made none — a raw predicate-only
-                // Semantic edge (linked-data ingest) has empty `sub_kinds`.
-                if semantic.predicate.is_some() {
-                    let key = graph
-                        .find_edge_key(from, to)
-                        .unwrap_or_else(|| graph.inner.connect(from, to, EdgePayload::new()));
-                    if let Some(payload) = graph.inner.edge_mut(key) {
-                        payload.set_semantic_predicate(semantic.predicate.clone());
-                    }
-                }
+        let existing = self.find_edge_key(from, to);
+        let mut payload = existing
+            .and_then(|key| self.inner.edge(key))
+            .cloned()
+            .unwrap_or_else(EdgePayload::new);
+        let structural_changes = restore_persisted_payload(&mut payload, pedge);
+        if pedge.semantic.is_some() || pedge.traversal.is_some() || !payload.is_empty() {
+            match existing {
+                Some(key) => *self.inner.edge_mut(key).expect("existing edge") = payload,
+                None => {
+                    self.inner.connect(from, to, payload);
+                },
             }
         }
-        if let Some(arrangement) = &pedge.arrangement {
-            for sub_kind in &arrangement.sub_kinds {
-                let assertion = match sub_kind {
-                    PersistedArrangementSubKind::FrameMember => EdgeAssertion::Arrangement {
-                        sub_kind: ArrangementSubKind::FrameMember,
-                    },
-                    PersistedArrangementSubKind::TileGroup => EdgeAssertion::Arrangement {
-                        sub_kind: ArrangementSubKind::TileGroup,
-                    },
-                    PersistedArrangementSubKind::SplitPair => EdgeAssertion::Arrangement {
-                        sub_kind: ArrangementSubKind::SplitPair,
-                    },
-                    PersistedArrangementSubKind::TabNeighbor
-                    | PersistedArrangementSubKind::ActiveTab
-                    | PersistedArrangementSubKind::PinnedInFrame => continue,
-                };
-                let _ = graph.assert_relation(from, to, assertion);
-            }
+        for _ in 0..structural_changes {
+            self.bump_revision();
         }
-        if let Some(containment) = &pedge.containment {
-            for sub_kind in &containment.sub_kinds {
-                // Every persisted sub-kind is restored. `UrlPath` and
-                // `Domain` are re-derived below by
-                // `rebuild_derived_containment_relations`, but the
-                // authored ones exist only here: dropping any of them
-                // loses user data. Matched exhaustively so a new
-                // variant is a compile error rather than a silent
-                // omission.
-                let sub_kind = match sub_kind {
-                    PersistedContainmentSubKind::UrlPath => ContainmentSubKind::UrlPath,
-                    PersistedContainmentSubKind::Domain => ContainmentSubKind::Domain,
-                    PersistedContainmentSubKind::FileSystem => ContainmentSubKind::FileSystem,
-                    PersistedContainmentSubKind::UserFolder => ContainmentSubKind::UserFolder,
-                    PersistedContainmentSubKind::ClipSource => ContainmentSubKind::ClipSource,
-                    PersistedContainmentSubKind::NotebookSection => {
-                        ContainmentSubKind::NotebookSection
-                    },
-                    PersistedContainmentSubKind::CollectionMember => {
-                        ContainmentSubKind::CollectionMember
-                    },
-                };
-                let _ = graph.assert_relation(from, to, EdgeAssertion::Containment { sub_kind });
+    }
+}
+
+/// Decode a standalone pair without changing carried assertion metadata.
+pub(crate) fn payload_from_persisted(pedge: &PersistedEdge) -> EdgePayload {
+    let mut payload = EdgePayload::new();
+    restore_persisted_payload(&mut payload, pedge);
+    payload
+}
+
+/// Merge persisted sidecars; report structural insertions for surface revisions.
+pub(crate) fn restore_persisted_payload(payload: &mut EdgePayload, pedge: &PersistedEdge) -> usize {
+    let mut structural_changes = 0;
+    if let Some(semantic) = &pedge.semantic {
+        if !semantic.statements.is_empty() {
+            for statement in &semantic.statements {
+                let _ = payload.push_persisted_semantic_statement(SemanticStatement {
+                    statement_id: statement.statement_id.clone(),
+                    predicate: statement.predicate.clone(),
+                    recognized_sub_kind: statement.recognized_sub_kind.map(semantic_sub_kind),
+                    label: statement.label.clone(),
+                    graph_scope: statement.graph_scope.clone(),
+                    provenance_iri: statement.provenance_iri.clone(),
+                    asserted_at_ms: statement.asserted_at_ms,
+                });
             }
-        }
-        if let Some(imported) = &pedge.imported {
-            for sub_kind in &imported.sub_kinds {
-                let assertion = match sub_kind {
-                    PersistedImportedSubKind::BookmarkFolder => EdgeAssertion::Imported {
-                        sub_kind: ImportedSubKind::BookmarkFolder,
-                    },
-                    PersistedImportedSubKind::HistoryImport => EdgeAssertion::Imported {
-                        sub_kind: ImportedSubKind::HistoryImport,
-                    },
-                    PersistedImportedSubKind::SessionImport => EdgeAssertion::Imported {
-                        sub_kind: ImportedSubKind::SessionImport,
-                    },
-                    PersistedImportedSubKind::RssMembership => EdgeAssertion::Imported {
-                        sub_kind: ImportedSubKind::RssMembership,
-                    },
-                    PersistedImportedSubKind::FileSystemImport => EdgeAssertion::Imported {
-                        sub_kind: ImportedSubKind::FileSystemImport,
-                    },
-                    PersistedImportedSubKind::ArchiveMembership => EdgeAssertion::Imported {
-                        sub_kind: ImportedSubKind::ArchiveMembership,
-                    },
-                    PersistedImportedSubKind::SharedCollection => EdgeAssertion::Imported {
-                        sub_kind: ImportedSubKind::SharedCollection,
-                    },
-                };
-                let _ = graph.assert_relation(from, to, assertion);
+        } else {
+            for sub_kind in &semantic.sub_kinds {
+                payload.assert_semantic_statement(SemanticStatementSpec {
+                    predicate: predicate_iri(semantic_sub_kind(sub_kind.clone())).into(),
+                    recognized_sub_kind: Some(semantic_sub_kind(sub_kind.clone())),
+                    label: semantic.label.clone(),
+                    graph_scope: crate::types::GraphScope::Default,
+                    provenance_iri: Some(edge_data::UNKNOWN_LEGACY_ASSERTER_IRI.into()),
+                    asserted_at_ms: None,
+                });
             }
-        }
-        if let Some(provenance) = &pedge.provenance {
-            for sub_kind in &provenance.sub_kinds {
-                let assertion = match sub_kind {
-                    PersistedProvenanceSubKind::ClippedFrom => EdgeAssertion::Provenance {
-                        sub_kind: ProvenanceSubKind::ClippedFrom,
-                    },
-                    PersistedProvenanceSubKind::ExcerptedFrom => EdgeAssertion::Provenance {
-                        sub_kind: ProvenanceSubKind::ExcerptedFrom,
-                    },
-                    PersistedProvenanceSubKind::SummarizedFrom => EdgeAssertion::Provenance {
-                        sub_kind: ProvenanceSubKind::SummarizedFrom,
-                    },
-                    PersistedProvenanceSubKind::TranslatedFrom => EdgeAssertion::Provenance {
-                        sub_kind: ProvenanceSubKind::TranslatedFrom,
-                    },
-                    PersistedProvenanceSubKind::RewrittenFrom => EdgeAssertion::Provenance {
-                        sub_kind: ProvenanceSubKind::RewrittenFrom,
-                    },
-                    PersistedProvenanceSubKind::GeneratedFrom => EdgeAssertion::Provenance {
-                        sub_kind: ProvenanceSubKind::GeneratedFrom,
-                    },
-                    PersistedProvenanceSubKind::ExtractedFrom => EdgeAssertion::Provenance {
-                        sub_kind: ProvenanceSubKind::ExtractedFrom,
-                    },
-                    PersistedProvenanceSubKind::ImportedFromSource => EdgeAssertion::Provenance {
-                        sub_kind: ProvenanceSubKind::ImportedFromSource,
-                    },
-                    PersistedProvenanceSubKind::CopiedFrom => EdgeAssertion::Provenance {
-                        sub_kind: ProvenanceSubKind::CopiedFrom,
-                    },
-                };
-                let _ = graph.assert_relation(from, to, assertion);
-            }
-        }
-        if let Some(traversal) = &pedge.traversal {
-            // Ensure a payload exists for from→to, then
-            // overwrite its traversal sidecar with the persisted
-            // events + metrics.
-            let edge_key = graph
-                .find_edge_key(from, to)
-                .unwrap_or_else(|| graph.inner.connect(from, to, EdgePayload::new()));
-            if let Some(payload) = graph.inner.edge_mut(edge_key) {
-                let data = payload.traversal.get_or_insert_with(TraversalData::default);
-                data.traversals = traversal
-                    .traversals
-                    .iter()
-                    .map(|record| Traversal {
-                        timestamp_ms: record.timestamp_ms,
-                        trigger: match record.trigger {
-                            PersistedNavigationTrigger::Unknown => NavigationTrigger::Unknown,
-                            PersistedNavigationTrigger::LinkClick => NavigationTrigger::LinkClick,
-                            PersistedNavigationTrigger::Back => NavigationTrigger::Back,
-                            PersistedNavigationTrigger::Forward => NavigationTrigger::Forward,
-                            PersistedNavigationTrigger::AddressBarEntry => {
-                                NavigationTrigger::AddressBarEntry
-                            },
-                            PersistedNavigationTrigger::PanePromotion => {
-                                NavigationTrigger::PanePromotion
-                            },
-                            PersistedNavigationTrigger::Programmatic => {
-                                NavigationTrigger::Programmatic
-                            },
-                            PersistedNavigationTrigger::Redirect => NavigationTrigger::Redirect,
-                            PersistedNavigationTrigger::ReopenSession => {
-                                NavigationTrigger::ReopenSession
-                            },
-                            PersistedNavigationTrigger::JumpAnchor => NavigationTrigger::JumpAnchor,
-                            PersistedNavigationTrigger::InPageSearchJump => {
-                                NavigationTrigger::InPageSearchJump
-                            },
-                            PersistedNavigationTrigger::ImportedHistory => {
-                                NavigationTrigger::ImportedHistory
-                            },
-                        },
-                    })
-                    .collect();
-                data.metrics = EdgeMetrics {
-                    total_navigations: traversal.metrics.total_navigations,
-                    forward_navigations: traversal.metrics.forward_navigations,
-                    backward_navigations: traversal.metrics.backward_navigations,
-                    last_navigated_at: traversal.metrics.last_navigated_at,
-                };
+            if semantic.predicate.is_some() {
+                payload.set_semantic_predicate(semantic.predicate.clone());
             }
         }
     }
+    if let Some(arrangement) = &pedge.arrangement {
+        for sub_kind in &arrangement.sub_kinds {
+            let assertion = match sub_kind {
+                PersistedArrangementSubKind::FrameMember => EdgeAssertion::Arrangement {
+                    sub_kind: ArrangementSubKind::FrameMember,
+                },
+                PersistedArrangementSubKind::TileGroup => EdgeAssertion::Arrangement {
+                    sub_kind: ArrangementSubKind::TileGroup,
+                },
+                PersistedArrangementSubKind::SplitPair => EdgeAssertion::Arrangement {
+                    sub_kind: ArrangementSubKind::SplitPair,
+                },
+                PersistedArrangementSubKind::TabNeighbor
+                | PersistedArrangementSubKind::ActiveTab
+                | PersistedArrangementSubKind::PinnedInFrame => continue,
+            };
+            structural_changes += usize::from(payload.assert_relation(assertion));
+        }
+    }
+    if let Some(containment) = &pedge.containment {
+        for sub_kind in &containment.sub_kinds {
+            // Every persisted sub-kind is restored. `UrlPath` and
+            // `Domain` are re-derived below by
+            // `rebuild_derived_containment_relations`, but the
+            // authored ones exist only here: dropping any of them
+            // loses user data. Matched exhaustively so a new
+            // variant is a compile error rather than a silent
+            // omission.
+            let sub_kind = match sub_kind {
+                PersistedContainmentSubKind::UrlPath => ContainmentSubKind::UrlPath,
+                PersistedContainmentSubKind::Domain => ContainmentSubKind::Domain,
+                PersistedContainmentSubKind::FileSystem => ContainmentSubKind::FileSystem,
+                PersistedContainmentSubKind::UserFolder => ContainmentSubKind::UserFolder,
+                PersistedContainmentSubKind::ClipSource => ContainmentSubKind::ClipSource,
+                PersistedContainmentSubKind::NotebookSection => ContainmentSubKind::NotebookSection,
+                PersistedContainmentSubKind::CollectionMember => {
+                    ContainmentSubKind::CollectionMember
+                },
+            };
+            structural_changes +=
+                usize::from(payload.assert_relation(EdgeAssertion::Containment { sub_kind }));
+        }
+    }
+    if let Some(imported) = &pedge.imported {
+        for sub_kind in &imported.sub_kinds {
+            let assertion = match sub_kind {
+                PersistedImportedSubKind::BookmarkFolder => EdgeAssertion::Imported {
+                    sub_kind: ImportedSubKind::BookmarkFolder,
+                },
+                PersistedImportedSubKind::HistoryImport => EdgeAssertion::Imported {
+                    sub_kind: ImportedSubKind::HistoryImport,
+                },
+                PersistedImportedSubKind::SessionImport => EdgeAssertion::Imported {
+                    sub_kind: ImportedSubKind::SessionImport,
+                },
+                PersistedImportedSubKind::RssMembership => EdgeAssertion::Imported {
+                    sub_kind: ImportedSubKind::RssMembership,
+                },
+                PersistedImportedSubKind::FileSystemImport => EdgeAssertion::Imported {
+                    sub_kind: ImportedSubKind::FileSystemImport,
+                },
+                PersistedImportedSubKind::ArchiveMembership => EdgeAssertion::Imported {
+                    sub_kind: ImportedSubKind::ArchiveMembership,
+                },
+                PersistedImportedSubKind::SharedCollection => EdgeAssertion::Imported {
+                    sub_kind: ImportedSubKind::SharedCollection,
+                },
+            };
+            structural_changes += usize::from(payload.assert_relation(assertion));
+        }
+    }
+    if let Some(provenance) = &pedge.provenance {
+        for sub_kind in &provenance.sub_kinds {
+            let assertion = match sub_kind {
+                PersistedProvenanceSubKind::ClippedFrom => EdgeAssertion::Provenance {
+                    sub_kind: ProvenanceSubKind::ClippedFrom,
+                },
+                PersistedProvenanceSubKind::ExcerptedFrom => EdgeAssertion::Provenance {
+                    sub_kind: ProvenanceSubKind::ExcerptedFrom,
+                },
+                PersistedProvenanceSubKind::SummarizedFrom => EdgeAssertion::Provenance {
+                    sub_kind: ProvenanceSubKind::SummarizedFrom,
+                },
+                PersistedProvenanceSubKind::TranslatedFrom => EdgeAssertion::Provenance {
+                    sub_kind: ProvenanceSubKind::TranslatedFrom,
+                },
+                PersistedProvenanceSubKind::RewrittenFrom => EdgeAssertion::Provenance {
+                    sub_kind: ProvenanceSubKind::RewrittenFrom,
+                },
+                PersistedProvenanceSubKind::GeneratedFrom => EdgeAssertion::Provenance {
+                    sub_kind: ProvenanceSubKind::GeneratedFrom,
+                },
+                PersistedProvenanceSubKind::ExtractedFrom => EdgeAssertion::Provenance {
+                    sub_kind: ProvenanceSubKind::ExtractedFrom,
+                },
+                PersistedProvenanceSubKind::ImportedFromSource => EdgeAssertion::Provenance {
+                    sub_kind: ProvenanceSubKind::ImportedFromSource,
+                },
+                PersistedProvenanceSubKind::CopiedFrom => EdgeAssertion::Provenance {
+                    sub_kind: ProvenanceSubKind::CopiedFrom,
+                },
+            };
+            structural_changes += usize::from(payload.assert_relation(assertion));
+        }
+    }
+    if let Some(traversal) = &pedge.traversal {
+        let data = payload.traversal.get_or_insert_with(TraversalData::default);
+        data.traversals = traversal
+            .traversals
+            .iter()
+            .map(|record| Traversal {
+                timestamp_ms: record.timestamp_ms,
+                trigger: match record.trigger {
+                    PersistedNavigationTrigger::Unknown => NavigationTrigger::Unknown,
+                    PersistedNavigationTrigger::LinkClick => NavigationTrigger::LinkClick,
+                    PersistedNavigationTrigger::Back => NavigationTrigger::Back,
+                    PersistedNavigationTrigger::Forward => NavigationTrigger::Forward,
+                    PersistedNavigationTrigger::AddressBarEntry => {
+                        NavigationTrigger::AddressBarEntry
+                    },
+                    PersistedNavigationTrigger::PanePromotion => NavigationTrigger::PanePromotion,
+                    PersistedNavigationTrigger::Programmatic => NavigationTrigger::Programmatic,
+                    PersistedNavigationTrigger::Redirect => NavigationTrigger::Redirect,
+                    PersistedNavigationTrigger::ReopenSession => NavigationTrigger::ReopenSession,
+                    PersistedNavigationTrigger::JumpAnchor => NavigationTrigger::JumpAnchor,
+                    PersistedNavigationTrigger::InPageSearchJump => {
+                        NavigationTrigger::InPageSearchJump
+                    },
+                    PersistedNavigationTrigger::ImportedHistory => {
+                        NavigationTrigger::ImportedHistory
+                    },
+                },
+            })
+            .collect();
+        data.metrics = EdgeMetrics {
+            total_navigations: traversal.metrics.total_navigations,
+            forward_navigations: traversal.metrics.forward_navigations,
+            backward_navigations: traversal.metrics.backward_navigations,
+            last_navigated_at: traversal.metrics.last_navigated_at,
+        };
+    }
+    structural_changes
 }
