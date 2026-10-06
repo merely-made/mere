@@ -23,7 +23,9 @@ use euclid::default::Point2D;
 use uuid::Uuid;
 
 use super::edge_payload::EdgePayload;
-use super::{Coupling, EdgeAssertion, EdgeKey, Field, Graph, Node, NodeKey, RelationSelector};
+use super::{
+    Coupling, EdgeAssertion, EdgeKey, Field, Graph, Node, NodeKey, RelationKey, RelationSelector,
+};
 
 /// Raw-mutator access for test fixtures. Every method delegates to the
 /// `pub(crate)` inherent mutator of the same name.
@@ -37,13 +39,13 @@ pub trait GraphFixtures {
         from: NodeKey,
         to: NodeKey,
         assertion: EdgeAssertion,
-    ) -> Option<EdgeKey>;
+    ) -> Option<RelationKey>;
     fn assert_semantic_predicate(
         &mut self,
         from: NodeKey,
         to: NodeKey,
         predicate: String,
-    ) -> Option<EdgeKey>;
+    ) -> Option<RelationKey>;
     fn retract_relations(
         &mut self,
         from: NodeKey,
@@ -69,6 +71,7 @@ pub trait GraphFixtures {
     fn add_coupling(&mut self, coupling: Coupling);
     fn get_node_mut(&mut self, key: NodeKey) -> Option<&mut Node>;
     fn get_edge_mut(&mut self, key: EdgeKey) -> Option<&mut EdgePayload>;
+    fn get_relation_mut(&mut self, key: RelationKey) -> Option<&mut EdgePayload>;
 }
 
 impl GraphFixtures for Graph {
@@ -87,7 +90,7 @@ impl GraphFixtures for Graph {
         from: NodeKey,
         to: NodeKey,
         assertion: EdgeAssertion,
-    ) -> Option<EdgeKey> {
+    ) -> Option<RelationKey> {
         Graph::assert_relation(self, from, to, assertion)
     }
     fn assert_semantic_predicate(
@@ -95,7 +98,7 @@ impl GraphFixtures for Graph {
         from: NodeKey,
         to: NodeKey,
         predicate: String,
-    ) -> Option<EdgeKey> {
+    ) -> Option<RelationKey> {
         Graph::assert_semantic_predicate(self, from, to, predicate)
     }
     fn retract_relations(
@@ -152,5 +155,8 @@ impl GraphFixtures for Graph {
     }
     fn get_edge_mut(&mut self, key: EdgeKey) -> Option<&mut EdgePayload> {
         Graph::get_edge_mut(self, key)
+    }
+    fn get_relation_mut(&mut self, key: RelationKey) -> Option<&mut EdgePayload> {
+        Graph::get_relation_mut(self, key)
     }
 }

@@ -294,7 +294,14 @@ fn statement_assert_dedups_by_content_and_retracts_by_id() {
     assert_eq!(edge, edge2, "one pair bucket");
     assert!(second.changed);
     assert_ne!(first.statement_id, second.statement_id);
-    assert_eq!(graph.get_edge(edge).unwrap().semantic_statements().len(), 2);
+    assert_eq!(
+        graph
+            .get_relation(edge)
+            .unwrap()
+            .semantic_statements()
+            .len(),
+        2
+    );
 
     // Exact re-assert dedups to the same handle, no change.
     let (_, again) = graph
@@ -315,7 +322,14 @@ fn statement_assert_dedups_by_content_and_retracts_by_id() {
     // Precise retract: the other statement survives; retracting the last
     // semantic statement (with no other family payload) removes the edge.
     assert!(graph.retract_semantic_statement(a, b, &first.statement_id));
-    assert_eq!(graph.get_edge(edge).unwrap().semantic_statements().len(), 1);
+    assert_eq!(
+        graph
+            .get_relation(edge)
+            .unwrap()
+            .semantic_statements()
+            .len(),
+        1
+    );
     assert!(
         !graph.retract_semantic_statement(a, b, &first.statement_id),
         "retract is idempotent per id"

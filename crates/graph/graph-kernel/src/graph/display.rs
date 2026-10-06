@@ -74,11 +74,8 @@ impl Graph {
     /// structural link predicates (`hyperlink` / `references`) that describe the
     /// link, not the node. `None` if no incoming edge carries a usable predicate.
     fn incoming_role(&self, key: NodeKey) -> Option<String> {
-        for src in self.in_neighbors(key) {
-            let Some(edge_key) = self.find_edge_key(src, key) else {
-                continue;
-            };
-            let Some(sem) = self.get_edge(edge_key).and_then(|p| p.semantic_data()) else {
+        for (_, _, payload) in self.projected_incoming_relations(key) {
+            let Some(sem) = payload.semantic_data() else {
                 continue;
             };
             // The open predicate IRI (raw web predicate from ingest), or the

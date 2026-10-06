@@ -25,7 +25,7 @@ use super::edge_data::Traversal;
 use super::edge_data::{SemanticStatement, SemanticStatementSpec, StatementAssert};
 use super::edge_payload::EdgePayload;
 use super::edge_taxonomy::{EdgeAssertion, RelationSelector, SemanticSubKind};
-use super::identity::{EdgeKey, NodeKey};
+use super::identity::{EdgeKey, NodeKey, RelationKey};
 use super::{DissolvedTraversalRecord, Graph};
 use crate::persistence::PersistedEdge;
 
@@ -35,7 +35,7 @@ impl Graph {
         from: NodeKey,
         to: NodeKey,
         assertion: EdgeAssertion,
-    ) -> Option<EdgeKey> {
+    ) -> Option<RelationKey> {
         self.assert_relation_as(
             from,
             to,
@@ -52,7 +52,7 @@ impl Graph {
         assertion: EdgeAssertion,
         asserter_iri: String,
         asserted_at_ms: Option<u64>,
-    ) -> Option<EdgeKey> {
+    ) -> Option<RelationKey> {
         if let EdgeAssertion::Semantic {
             sub_kind,
             label,
@@ -86,7 +86,7 @@ impl Graph {
             };
             if changed {
                 self.bump_revision();
-                return Some(edge_key);
+                return Some(RelationKey::Surface(edge_key));
             }
             return None;
         }
@@ -96,7 +96,7 @@ impl Graph {
         }
         let edge_key = self.inner.connect(from, to, payload);
         self.bump_revision();
-        Some(edge_key)
+        Some(RelationKey::Surface(edge_key))
     }
 
     pub(crate) fn assert_semantic_relation_in_scope(
@@ -106,7 +106,7 @@ impl Graph {
         sub_kind: SemanticSubKind,
         label: Option<String>,
         graph_scope: GraphScope,
-    ) -> Option<EdgeKey> {
+    ) -> Option<RelationKey> {
         self.assert_semantic_statement(
             from,
             to,
@@ -134,7 +134,7 @@ impl Graph {
         from: NodeKey,
         to: NodeKey,
         predicate: String,
-    ) -> Option<EdgeKey> {
+    ) -> Option<RelationKey> {
         self.assert_semantic_predicate_in_scope(from, to, predicate, GraphScope::Default)
     }
 
@@ -144,7 +144,7 @@ impl Graph {
         to: NodeKey,
         predicate: String,
         graph_scope: GraphScope,
-    ) -> Option<EdgeKey> {
+    ) -> Option<RelationKey> {
         self.assert_semantic_statement(
             from,
             to,
@@ -201,7 +201,7 @@ impl Graph {
         from_id: Uuid,
         to_id: Uuid,
         assertion: EdgeAssertion,
-    ) -> Option<EdgeKey> {
+    ) -> Option<RelationKey> {
         let from_key = self.get_node_key_by_id(from_id)?;
         let to_key = self.get_node_key_by_id(to_id)?;
         self.assert_relation(from_key, to_key, assertion)
@@ -230,7 +230,7 @@ impl Graph {
         from_id: Uuid,
         to_id: Uuid,
         predicate: String,
-    ) -> Option<EdgeKey> {
+    ) -> Option<RelationKey> {
         let from_key = self.get_node_key_by_id(from_id)?;
         let to_key = self.get_node_key_by_id(to_id)?;
         self.assert_semantic_predicate(from_key, to_key, predicate)
@@ -318,7 +318,7 @@ impl Graph {
         from: NodeKey,
         to: NodeKey,
         mut spec: SemanticStatementSpec,
-    ) -> Option<(EdgeKey, StatementAssert)> {
+    ) -> Option<(RelationKey, StatementAssert)> {
         if spec.provenance_iri.is_none() {
             spec.provenance_iri = Some(self.write_author().asserter_iri());
         }
@@ -336,7 +336,7 @@ impl Graph {
             self.bump_revision();
             self.capture_semantic_pair(from, to);
         }
-        Some((edge_key, outcome))
+        Some((RelationKey::Surface(edge_key), outcome))
     }
 
     /// Assert a semantic statement whose id is ALREADY minted — the re-ingest /
@@ -348,7 +348,7 @@ impl Graph {
         from: NodeKey,
         to: NodeKey,
         mut statement: SemanticStatement,
-    ) -> Option<EdgeKey> {
+    ) -> Option<RelationKey> {
         if statement.provenance_iri.is_none() {
             statement.provenance_iri = Some(self.write_author().asserter_iri());
         }
@@ -366,7 +366,7 @@ impl Graph {
             self.bump_revision();
             self.capture_semantic_pair(from, to);
         }
-        Some(edge_key)
+        Some(RelationKey::Surface(edge_key))
     }
 
     /// Precise retract by fact handle (the id `assert_semantic_statement`

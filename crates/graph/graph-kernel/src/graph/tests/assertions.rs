@@ -35,7 +35,7 @@ fn separate_asserters_keep_their_own_assertions_and_retract_alone() {
         .unwrap();
     assert_eq!(edge, same_edge, "both assertions share one pair bucket");
     assert_ne!(first.statement_id, second.statement_id);
-    let statements = graph.get_edge(edge).unwrap().semantic_statements();
+    let statements = graph.get_relation(edge).unwrap().semantic_statements();
     assert_eq!(statements.len(), 2);
     assert_eq!(statements[0].provenance_iri, alice.provenance_iri);
     assert_eq!(statements[1].provenance_iri, bob.provenance_iri);
@@ -61,7 +61,7 @@ fn separate_asserters_keep_their_own_assertions_and_retract_alone() {
         .unwrap();
     assert!(updated.changed, "the same asserter can update its record");
     assert_eq!(updated.statement_id, first.statement_id);
-    let statements = graph.get_edge(edge).unwrap().semantic_statements();
+    let statements = graph.get_relation(edge).unwrap().semantic_statements();
     assert_eq!(statements.len(), 2);
     assert_eq!(statements[0].label.as_deref(), Some("checked again"));
     assert_eq!(statements[0].asserted_at_ms, Some(3_000));
@@ -69,7 +69,7 @@ fn separate_asserters_keep_their_own_assertions_and_retract_alone() {
 
     assert!(graph.retract_semantic_statement(source, target, &first.statement_id));
     assert!(!graph.retract_semantic_statement(source, target, &first.statement_id));
-    let statements = graph.get_edge(edge).unwrap().semantic_statements();
+    let statements = graph.get_relation(edge).unwrap().semantic_statements();
     assert_eq!(statements, &[bob_before_update]);
     assert!(graph.retract_semantic_statement(source, target, &second.statement_id));
     assert!(graph.find_edge_key(source, target).is_none());

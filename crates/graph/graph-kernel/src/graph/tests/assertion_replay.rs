@@ -391,7 +391,7 @@ fn open_predicate_assertion_supplies_attribution_on_an_existing_pair() {
         .unwrap();
     assert!(
         graph
-            .get_edge(edge)
+            .get_relation(edge)
             .unwrap()
             .semantic_statements()
             .is_empty()
@@ -405,7 +405,7 @@ fn open_predicate_assertion_supplies_attribution_on_an_existing_pair() {
             asserter_iri: "https://source.test/".into(),
         },
     );
-    let statements = graph.get_edge(edge).unwrap().semantic_statements();
+    let statements = graph.get_relation(edge).unwrap().semantic_statements();
     assert_eq!(statements.len(), 1);
     assert_eq!(statements[0].predicate, "https://example.test/rel");
     assert_eq!(
