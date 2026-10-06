@@ -1,7 +1,7 @@
 # Dramatis Repo Plan
 
 **Date**: 2026-10-06
-**Status (2026-10-06)**: opened; rulings D1 to D3 (§3) set the shape. Nothing
+**Status (2026-10-06)**: opened; rulings D1 to D5 (§3) set the shape. Nothing
 assessed in depth and nothing built. Next: a read-only assessment (§2's open
 list), then a round of forks for Mark. The build is sequenced against the
 vault lock plan, which is editing castellan and personae now.
@@ -144,10 +144,27 @@ structural rather than a convention. Mark: **"I agree with moving the
 personae secrets to castellan and opening this plan, along with that
 narrowing of castellan for dramatis."**
 
-*Reading, not ruled:*
+*Reading, not ruled* (ruled the same day as D4):
 - castellan stays a separate crate, not a feature on an embeddable one. A
   check fails the build if anything but the resident depends on it.
 - The build follows the vault lock's L2 at the earliest.
+
+**Ruling D4.** *castellan's form and the sequence.* Put to Mark as the
+reading above: castellan stays a separate crate that only djinn links,
+with a build check enforcing it, and the move comes after the vault lock's
+L2 at the earliest. Mark: **"Agreed!"**
+
+**Ruling D5.** *Apps that open the vault themselves.* graphshell and
+Turnstone open their own vaults; hocket and woodshed read the storage or
+the DPAPI root directly. Under D4 they cannot link castellan. Mark: **"i
+would much prefer graphshell, turnstone, woodshed, knot-editor, etc. all
+unify on calling djinn"**. Follows: every app reaches identity and secrets
+by calling djinn, not by opening a vault. The assessment sizes the routes
+each needs. *Reading, not ruled:*
+- "etc." covers hocket, the other app the map found;
+- knot-editor is named although it has no production use of
+  `IdentityVault`, because its signing seed comes through pandect's wallet
+  (vault lock ruling 15), which also belongs behind djinn.
 
 ## 4. Phases
 
@@ -161,3 +178,7 @@ None yet.
 
 **2026-10-06.** Opened with rulings D1 to D3. Next: a read-only assessment
 of §2's open list.
+
+**2026-10-06.** Rulings D4 (castellan a djinn-only crate, after the vault
+lock's L2) and D5 (apps unify on calling djinn). The read-only assessment
+(Opus) is running.

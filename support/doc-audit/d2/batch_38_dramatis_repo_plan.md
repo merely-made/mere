@@ -14,7 +14,7 @@ This batch exists because the plan is new.
 ## dramatis_docs/implementation_strategy/2026-10-06_dramatis_repo_plan.md
 
 - disposition: current
-- status line: "Status (2026-10-06): opened; rulings D1 to D3 (§3) set the shape. Nothing assessed in depth and nothing built. Next: a read-only assessment (§2's open list), then a round of forks for Mark. The build is sequenced against the vault lock plan, which is editing castellan and personae now." — accurate: yes
+- status line: "Status (2026-10-06): opened; rulings D1 to D5 (§3) set the shape. Nothing assessed in depth and nothing built. Next: a read-only assessment (§2's open list), then a round of forks for Mark. The build is sequenced against the vault lock plan, which is editing castellan and personae now." — accurate: yes
 - claims checked: 4 — holds: 4, stale: 0, unverifiable: 0
 
 ### Stale claims

@@ -366,6 +366,12 @@ gap. Mark: **"They follow the resident (Recommended)"**. Follows: the work
 reaches those repos; which of their calls break under ruling 13 is mapped
 at the build's start.
 
+*2026-10-06 annotation to rulings 23, 35 and 36:* the dramatis repo plan's
+ruling D5 has graphshell, Turnstone, woodshed, hocket and knot-editor call
+djinn instead of opening the vault. Once that lands, "following the
+resident" means djinn's answers say Locked; until then these rulings stand
+as written.
+
 **Ruling 24.** *Under lock, does Distillery's own transport key stay?*
 Options: it stays and sync continues; it is dropped and sync pauses. Mark:
 **"Stays; sync continues (Recommended)"**. Follows: the transport key only
