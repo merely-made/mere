@@ -376,6 +376,20 @@ From `2026-10-04_stack_seams_plan.md` §3.2, which hands it to this plan. It ext
   postcard bytes (`isometer_core::snapshot::hash_bytes`), which matches
   `seiche-repeat`'s FNV-1a over `to_bits`.
 
+- **Wing ruling 609** (Isometry `6703f555`), Mark: **"Once, in mere"**. One
+  labelled digest is built in mere and shared by conatus's G8 and Isocosm; no
+  second copy sits beside `isometer_core::snapshot::hash_bytes`. Its related
+  rulings are wing-only: 607 moves Isocosm off SHA-256-over-JSON onto the FNV-1a
+  witness with labelled entries, and 610 sets checkpoints per epoch and traces
+  on demand. Isocosm's needs, as relayed:
+  - labels are string stable ids (places, bodies, processes);
+  - entries are hashed from serde values, since the sim is integer-only;
+  - a first-divergence report between two entry lists;
+  - nothing per frame.
+
+  *Reading, not ruled:* G8 shapes the crate. Its name and home (a new crate,
+  or a module of an existing one) go to Mark when G8 is briefed.
+
 ### G10 — input record and replay (balaur review fork E, 2026-10-06)
 
 *Done when:* a run's inputs (pointer drags, pins, law and dial changes,
