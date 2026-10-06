@@ -1,27 +1,32 @@
 # Conatus Shared Spatial Runtime
 
 **Date:** 2026-08-22  
-**Status:** active; body/runtime foundation, private-backend integrity, first
-profile-local resident body-position publication, and first product renderer
-tenant implemented; Nexus admission probe blocked at its upstream Windows
-shader build; scope corrected 2026-08-23. 2026-08-26: Mesocosm's runtime
+**Status (2026-10-06):** active; body/runtime foundation and private-backend
+integrity (`339e8567`) implemented. The first profile-local resident
+body-position publication and the first product renderer tenant were
+implemented in Isometry's `isometry-runtime`, since retired (relayed, §3), and
+stand as historical receipts. Nexus admission probe blocked at its upstream
+Windows shader build; scope corrected 2026-08-23. `quint` was folded into its
+owners at `eae87153` (Existing pieces). 2026-08-26: Mesocosm's runtime
 became the first product tactile consumer (terrarium picking over
-`BodyWorld`, Rapier private), quint's `ResidentChunk` join was proven with
-per-brick patches, tracer-validated read epochs, and allocator-observed
-bytes (V1b), and `conatus-brick` — the shared sparse-brick ABI both game
-vessels pin — advanced on `codex/conatus-brick-lift` to `bd8f0044`.
+`BodyWorld`, Rapier private), quint's `ResidentChunk` join (now
+`conatus::resident`) was proven with per-brick patches, tracer-validated read
+epochs, and allocator-observed bytes (V1b), and `conatus-brick` (`modulus`
+since `33f9b6b6`) — the shared sparse-brick ABI both game vessels pin —
+advanced on `codex/conatus-brick-lift` to `bd8f0044`.
 2026-09-26: `modulus`'s shrinking-retarget defect fixed and its atlas sized
 to the card by `AtlasLimits`, ruled by Mark (brick-atlas pass below).
 2026-09-27: `modulus`'s `brick_dda` takes each voxel crossing afresh from the
 eye instead of accumulating it and clamps its first voxel into the pointer
 volume, and the same walk is public on the CPU as `BrickMap::trace`, all
-ruled by Mark (brick-traversal precision pass below); on branch
-`dda-precision`, not yet merged.
+ruled by Mark (brick-traversal precision pass below); on main since
+2026-09-27 (`a404cd48`, `5e46956a`, `c3e054d6`).
 2026-09-28: body-binding shape and the T2 voxel-store lane carried from the
 wing's existing rulings into §1 and §2. Both are planned, not implemented;
 body bindings remain document-only under ruling 346, and T2 waits for the
-accepted pre.4 migration under ruling 363. This documentation pass neither
-implements nor certifies the separate query-refresh API.
+accepted pre.4 migration under ruling 363 (main is on pre.4 since
+2026-10-05; see T2). This documentation pass neither implements nor
+certifies the separate query-refresh API.
 **Scope:** Build the shared spatial runtime. Mesocosm, Paredros, Isometry,
 and Mere projections consume it through product-owned runtime profiles
 instead of incubating spatial machinery in product-local probes.
@@ -98,6 +103,16 @@ changes the engine path itself.
 | Netrender | One-device tenancy and final frame composition |
 | Renderling | 3D scene/render implementation, consumed as a tenant |
 | Mesocosm voxel types | First source material for generic voxel storage, revision, dirty-region, collision, and meshing features; since 2026-08-26 Mesocosm is also a runtime consumer, holding `BodyWorld` tactile advice through its own `mesocosm-runtime` adapter |
+
+*Annotation, 2026-10-06 (S14 pass):* `quint` is no longer a crate.
+`eae87153` (authored 2026-08-31, on main 2026-09-02) folded it into its
+owners: the resident allocations and chunks into `conatus::resident`
+(`crates/conatus/conatus/src/resident/`, feature `resident`), field
+evaluation and Burn lowering into `numen` (`eval.rs`, `lower_burn.rs`), and
+its forces into `seiche` (`crates/conatus/seiche/src/tensor_forces.rs`).
+Read "Quint" below (§2,
+§3, §5 and the implementation order's items 4 and 6) as those owners.
+`conatus-brick` is `modulus` since `33f9b6b6` (2026-08-28).
 
 The dependency direction is runtime to implementation only. Product crates
 depend on Conatus. Conatus must not depend on a game.
@@ -310,6 +325,11 @@ from this documentation update. The source rulings live in
 `isometry/eponym/design_docs/2026-09-09_functional_loops_plan.md` retains the
 product receipt and adoption dependencies.
 
+*Annotation, 2026-10-06 (S14 pass):* main moved to pre.4 on 2026-10-05,
+when S16 merged the pre.4 branch at `cec0b3a4` under ruling 557, "Promote,
+then handoffs" (burn migration plan §13.44). Whether that is the acceptance
+ruling 363 waits for is not recorded here.
+
 1. **Nisus becomes the voxel world store** (330): a chunk map, world
    revision, revision log and additive writes extend its revision-gated
    chunk patches. `Ground` becomes a thin product layer over that store or
@@ -369,6 +389,15 @@ and tenant selection. Conatus's existing `FrameUpdate` remains unchanged.
 This disposable product projection does not settle allocation ownership for
 state advanced directly on the GPU, or establish a shared frame or lease.
 
+*Annotation, 2026-10-06 (S14 pass; relayed, not verified here):* the S14
+pass's record (`support/doc-audit/d2/batch_46_s14_phase_b8.md`) and its
+coordinator relay that this slice's Isometry half (`15f5da2`) and §4's
+marker tenant (`7d45c40`) lived in Isometry's `isometry-runtime` crate,
+which Isometry retired at `73a31409` on 2026-09-27 under wing ruling 299.
+Isometry's repository was not read for this annotation. Both are historical
+receipts, not live code; §1 already records the crate's retirement. Mere's
+half, `c382e734`, is on main, its resident code now in `conatus::resident`.
+
 Burn/CubeCL handles dense fields and authored kernels. Khal/rust-gpu artifacts
 are adopted where their explicit spatial algorithms are useful. Tool choice
 follows the operation. Allocation ownership follows advanced state: Conatus
@@ -399,6 +428,8 @@ suballocation directly, projects through configurable basis and appearance
 settings, renders into its own same-device texture, and gives Netrender an
 explicit external-composition boundary. Netrender learns neither Conatus body
 semantics nor Quint allocation policy.
+*Annotation, 2026-10-06 (S14 pass; relayed):* this tenant was retired with
+`isometry-runtime` (§3's annotation) and is a historical receipt.
 
 Renderling remains a candidate for a later 3D portion through another
 profile-owned adapter. It was not pulled into the 2D proof because its current
@@ -452,6 +483,8 @@ product systems use.
 1. Make the current private Rapier implementation a real internal boundary;
    keep backend selection private until a named product workload forces a
    second implementation.
+   *Annotation, 2026-10-06 (S14 pass):* done 2026-08-24 at `339e8567`, the
+   private backend integrity pass above; backend selection stays private.
 2. Keep extending `conatus` as the shared spatial package; `seiche` stays the
    2D graph specialist rather than the 2D graph API becoming the 3D core or
    being forced through it.
@@ -466,6 +499,10 @@ product systems use.
    Add a Renderling or other 3D adapter only when a product lens demands it,
    and keep shared frame vocabulary provisional until a second game challenges
    it.
+   *Annotation, 2026-10-06 (S14 pass; relayed):* the body-position view in
+   item 4 and this tenant were Isometry's, retired with `isometry-runtime`
+   (§3's annotation); Quint's allocations are `conatus::resident`'s (Existing
+   pieces).
 6. Add optional field adapters and spatial scripting against the shared
    resources without making Numen or Quint depend on Conatus.
 

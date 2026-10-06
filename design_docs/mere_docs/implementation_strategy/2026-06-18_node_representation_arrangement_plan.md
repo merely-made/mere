@@ -10,6 +10,9 @@ interactive/scripted-form feasibility). The **arrangement axis** is owned by
 [graph_signals_layer_plan](../../archive_docs/2026-08-20_completed_plans/2026-06-22_graph_signals_layer_plan.md) (Decision 7). Kept as the
 record of P0-P4; new representation work lands in the successor.
 
+**Corrected 2026-10-06 (S14 pass):** the graph signals layer plan was archived complete
+on 2026-08-20, so the arrangement axis has no active owner today.
+
 **Rename banner (2026-07-02):** this doc's code pointers predate the node/card terminology
 cleanup — `OrreryCard` → `OrreryGnode`, `node_card_view` → `gnode_view`, the `.node-card` CSS
 class → `.gnode`, `render_as_cards`/`set_render_as_cards` → `render_gnodes_as_dom`/
@@ -31,6 +34,11 @@ layers, **representation** (what a node looks like) and **arrangement** (how nod
 while the node's *truth* (content, identity, edges) stays authoritative in the kernel + DOM.
 **Code**: `crates/orrery/` *(historical citation)* <!-- doc-audit: historical-path --> (orrery + gyre), `crates/meerkat/` *(historical citation)* <!-- doc-audit: historical-path --> (render, window_view, input),
 `crates/platen/` (cartography dispatch).
+
+**Corrected 2026-10-06 (S14 pass):** platen no longer carries cartography dispatch; that
+lane merged into the canvas crate on 2026-07-09 (module doc of
+`crates/platen/platen/src/lib.rs`). Cartography is now `crates/canvas/cartography` plus
+`crates/canvas/pictograph`.
 
 Sibling / converging docs:
 
@@ -810,3 +818,7 @@ it is the default of a setting, not a baked constant.
   "blocked" framing to "built-and-unwired" (scry path) / "DOM-substrate-available". The open refinements
   (in-scene sprites, styling lens, label density) carry there with named owners; the arrangement half
   stays with graph-signals-layer.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at mere
+  535bca11, from the D2 record in support/doc-audit/d2/batch_40_s14_phase_b2.md: the
+  platen code header corrected (cartography is the canvas crates now) and the
+  arrangement axis noted as ownerless since graph signals was archived.

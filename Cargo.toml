@@ -239,9 +239,12 @@ graphshell-endpoint = { version = "0.0.2", path = "crates/graphshell/graphshell-
 # Its sources left this repository on 2026-09-04 under that plan's E2; Djinn and
 # Turnstone consume one immutable revision. The `[patch]` table at the bottom of
 # this file makes this checkout the implementation source for the Mere contracts
-# Knot names, so those types keep one Cargo source identity.
-knot-editor = { version = "0.0.3", git = "https://github.com/merely-made/knot-editor.git", rev = "562353aa0537b7f82bb9d069cf89bb250539a149" }
-knot-document = { version = "0.0.1", git = "https://github.com/merely-made/knot-editor.git", rev = "562353aa0537b7f82bb9d069cf89bb250539a149" }
+# Knot names, so those types keep one Cargo source identity. `a5888dc6` is Knot
+# retaining Mere `19e6dc9f` for stack seams P1 and using `5fecd707`
+# for stable Burn inference; Knot moved first, as ruling 557 orders, and djinn's
+# `knot-site` row follows this one.
+knot-editor = { version = "0.0.3", git = "https://github.com/merely-made/knot-editor.git", rev = "a5888dc62ba87c6ef499161e9f756845533abb43" }
+knot-document = { version = "0.0.1", git = "https://github.com/merely-made/knot-editor.git", rev = "a5888dc62ba87c6ef499161e9f756845533abb43" }
 # The credential-keeper port (dramatis plan D4). No longer a reservation:
 # C1/C2 landed the OTP core, sealed OTP items, the release gate, and the
 # `keeper` identity surface graphshell re-exports.
@@ -623,6 +626,10 @@ notochord = { path = "crates/system/notochord" }
 pandect = { path = "crates/system/pandect" }
 personae = { path = "crates/dramatis/personae" }
 sceno = { path = "crates/cambium/scenes/sceno" }
+# Knot has named these two since its `5516606`; they arrived with the
+# `c966e31` pin (wing ruling 586, "With djinn's Knot repin (Recommended)").
+scenograph = { path = "crates/cambium/scenes/scenograph" }
+scenomise = { path = "crates/cambium/scenes/scenomise" }
 scenotime = { path = "crates/cambium/scenes/scenotime" }
 script-rhai = { path = "crates/script/rhai" }
 servitor = { path = "crates/servitor" }

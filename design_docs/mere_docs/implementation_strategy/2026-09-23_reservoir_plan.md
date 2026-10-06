@@ -1,24 +1,24 @@
 # Reservoir plan: shared meres held by the device resident
 
 **Date:** 2026-09-23
-**Status:** in progress. V1 is complete and on main: the pandect index,
-wallet-persona resolution, djinn's reservoir lane and route, and a real
-two-process receipt. It reached origin with `5364dfa0` on 2026-09-24. V2's
-shape was ruled on 2026-09-23 and 2026-09-24 (§7). Steps 1 to 3
-(muniment, graph-kernel, pandect) landed on 2026-09-24 and reached origin on
-2026-09-25; step 3b, undo with exact replay, landed on 2026-09-25 and reached
-origin the same day. Step 4, `MereHost` on `GraphSession` in Graphshell, landed
-and reached origin on 2026-09-25, and a browser receipt the same day shows it
-running in Chromium over IndexedDB (§7 item 29); the receipt's scenario verdicts
-await a headed run. Step 5, djinn's routes, landed on 2026-09-25 with its
-two-process receipt, meeting V2's done-conditions (§8), and reached origin the
-same day. V2b, the mere view, was assessed and ruled the same day (§7 items 34
-to 40): Graphshell first moves onto one Cambium tree, in its own plan. V2b's
-steps 1 to 3, the component, its headed proof and the route adapter, landed
-and reached origin the same day. Step 4, Graphshell on one Cambium tree, is
-under way: its plan's phases 1 and 2, accessibility in the browser and the
-file seam, were done on 2026-09-26, and phase 3, the canvas as a producer, is
-next.
+**Status (2026-10-06):** in progress. V1 is complete and on main: the pandect
+index, wallet-persona resolution, djinn's reservoir lane and route, and a real
+two-process receipt; it reached origin with `5364dfa0` on 2026-09-24. V2 is
+complete and on origin: steps 1 to 3 (muniment, graph-kernel, pandect) landed
+on 2026-09-24, and step 3b (undo with exact replay), step 4 (`MereHost` on
+`GraphSession` in Graphshell) and step 5 (djinn's routes, meeting V2's
+done-conditions, §8) on 2026-09-25. Step 4's browser receipt (§7 item 29)
+still awaits its headed scenario verdicts. V2b, the mere view: steps 1 to 3
+(the component, its headed proof and the route adapter) landed and reached
+origin on 2026-09-25. Step 4, Graphshell on one Cambium tree, runs in
+[its own plan](2026-09-25_graphshell_one_tree_plan.md), whose status is the
+authority: at mere 535bca11 its phases 1 and 2 were done on 2026-09-26, phase
+3 has headed correctness receipts, and Mark approved phase 4 on 2026-09-27.
+Open: V2b steps 4 and 5 (Graphshell's panel), V3, V4 and V5.
+**Open, raised by the S14 pass (2026-10-06):** should this status keep
+restating the one-tree plan's position, the duplication that went stale here,
+or only point to that plan's status? Options: keep restating it; point to
+that plan's status instead.
 **Scope:** give each data domain one mere, and make every mere of an identity
 openable by any of that identity's applications. The meres are held by the
 device resident, with sessions, a graph journal and an Eidetic archive.
@@ -1413,3 +1413,9 @@ V2b's rulings, all 2026-09-25:
   from the browser's file chooser, the winit host from the platform dialog,
   and the scenario lane from a `file` step. A test page read a file set on
   its chooser in Mark's Chrome.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_44_s14_phase_b6.md: step 4's position now
+  follows the one-tree plan's own status (phase 3 receipted, phase 4 approved
+  2026-09-27) instead of "phase 3 is next", and the headed verdicts stay
+  explicitly open.

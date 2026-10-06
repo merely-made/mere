@@ -41,6 +41,13 @@ crate is an empty reservation, and per the module/crate/publish rule a crate
 needs a wall, a subset, a consumer, or an audience. This has one consumer
 (castellan) and no wall yet. If a second consumer appears, it promotes.
 
+**Corrected 2026-10-06 (S14 pass):** chatelaine is no longer an empty
+reservation. `crates/dramatis/chatelaine` is a real taxonomy crate (item.rs,
+otp.rs, disposition.rs), landed by P1 to P3 of the
+[chatelaine and CXF import plan](../../dramatis_docs/implementation_strategy/2026-10-01_chatelaine_cxf_plan.md)
+(`da3c50bc`, `3e4992ec`, `ff68e86c`), and castellan imports `OtpCodeStyle` and
+`OtpAlgorithm` from it. That plan now owns OTP storage and CXF import.
+
 The division the vocabulary implies holds: a TOTP *secret* is a chatelaine
 item (stored, never shown), and computing a code is the *castellan*
 exercising it. C1 builds the exercising; C2 builds the item.
@@ -139,6 +146,11 @@ exercising it. C1 builds the exercising; C2 builds the item.
   issuer out of the on-disk plaintext, and proves that the same item handle is
   absent for another persona.
 
+  **Corrected 2026-10-06 (S14 pass):** records now live under
+  `castellan/items/v1` as chatelaine items (`ports/castellan/src/items/records.rs`,
+  line 18, and castellan's otp/item.rs); the chatelaine plan's P2 (`3e4992ec`)
+  removed the `castellan/otp/v1` formats.
+
 - 2026-08-20: C2b and C2c landed. `OtpCodeTile` gives a host the code,
   secret-free metadata, and an absolute expiry without prescribing component
   geometry or a carrier message. `OtpReleaseGate` is the only public code path
@@ -221,6 +233,9 @@ exercising it. C1 builds the exercising; C2 builds the item.
   support imports a `shared_secret` and generates codes. The crate is still
   0.0.2; no release followed C2.
 
+  **Corrected 2026-10-06 (S14 pass):** `ports/castellan/Cargo.toml` is now at
+  version 0.0.3, bumped in `5ca0d3a3` (2026-08-23).
+
 - 2026-08-22: Djinn now opens and closes `CastellanResident` beside the
   selected Personae profile. It derives separate record and freshness keys
   from that unlocked identity, stores both under a profile-constrained Djinn
@@ -230,3 +245,9 @@ exercising it. C1 builds the exercising; C2 builds the item.
   which may be guessed from a profile string. Likewise Djinn does not yet
   render `OtpCodeTile` or host an admitted approval surface. Those are the
   forcing consumers for the next product slice, not optional daemon defaults.
+
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_43_s14_phase_b5.md: dated notes on C2a's record
+  path (now `castellan/items/v1`), on chatelaine being a real crate owned by
+  the chatelaine and CXF import plan, and on castellan's 0.0.3 version.

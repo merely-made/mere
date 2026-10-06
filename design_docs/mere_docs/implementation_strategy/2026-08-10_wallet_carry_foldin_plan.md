@@ -65,6 +65,11 @@ verbatim move wrong:
   the codec).
 - `session-runtime::engram_seal`: unchanged; the PayloadSealer seam.
 
+**Corrected 2026-10-06 (S14 pass):** session-runtime was renamed pandect in
+`441e70f0` (2026-08-15), so the adapter modules are now `pandect::wallet_store`
+and `pandect::wallet_grant`, and `WalletEpochSealer` lives in
+`crates/system/pandect/src/codicil_seal.rs` (line 52).
+
 ## Done conditions
 
 ### W1: the model moves (this session)
@@ -110,6 +115,9 @@ verbatim move wrong:
       acted on: `[u8; 32]` keys serialize as CBOR arrays of integers rather than
       byte strings, which costs about 2x on every key. That is the format in the
       wild; changing it is a migration, not a cleanup.)
+
+      **Corrected 2026-10-06 (S14 pass):** the fixture no longer exists;
+      `03552f46` (2026-08-14) removed it.
 - [x] **RULED: the envelope codec STAYS in the adapter** — and the reason is not
       byte-compat, which holds. It is that `personae::delegation` already exists
       and is the same concept: an issuer delegating a scoped, time-bounded
@@ -149,6 +157,12 @@ verbatim move wrong:
       `validate` (one concern each), and `issue` / `enroll` / `revoke` /
       `refresh` (the four flows that write wallet state).
 
+      **Corrected 2026-10-06 (S14 pass):** at mere `535bca11` pandect's
+      wallet_grant has no `envelope` module. It has the post-migration shape
+      instead, with certificate.rs, trust.rs, migrate.rs and revocation.rs:
+      the device grant became certificate-shaped when the spun-out question
+      above was executed.
+
 ### W4: consumers re-base + closure
 
 - [x] **knot re-base: ruled unnecessary, facade stays.** knot turned out to
@@ -170,6 +184,11 @@ verbatim move wrong:
 nothing to do with the wallet: `athanor.rs` (840), `graph_engram.rs` (817),
 `manifest_store.rs` (655). Left alone deliberately; they are their own task.
 
+**Corrected 2026-10-06 (S14 pass):** Athanor moved out to
+`ports/distillery/athanor` in `1bda73d5`; graph_engram is now
+`crates/system/pandect/src/graph_codicil.rs` (838 lines); and
+`crates/system/pandect/src/manifest_store.rs` is 658 lines.
+
 ## Progress
 
 - 2026-08-10 (W2): the split landed with all 245 session-runtime tests green
@@ -185,3 +204,8 @@ nothing to do with the wallet: `athanor.rs` (840), `graph_engram.rs` (817),
   the same `CarryRef::of` spelling (digests unchanged). wallet_grant's whole
   diff was 9 insertions / 10 deletions, which is the payoff of converting at
   the producers instead of the touchpoints.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_43_s14_phase_b5.md: dated notes on the pandect
+  rename, the certificate-shaped wallet_grant, the removed grant fixture and
+  the files noted in passing.

@@ -1,9 +1,10 @@
 # djinn Test Harness Plan
 
 **Date**: 2026-10-05
-**Status (2026-10-05)**: all forks ruled (§3, rulings 1 to 13). H1 to H3
-landed on `main` (`318b8f70`), the graceful stop fixed (ruling 11). H4 to H6
-open; H4 is built with the vault lock (its ruling 18).
+**Status (2026-10-06)**: all forks ruled (§3, rulings 1 to 13). H1 to H3
+landed on `main` (`318b8f70`), the graceful stop fixed (ruling 11). H4 is
+partly met through the vault lock (the status route's lock state). H4's
+other conditions, H5 and H6 are open.
 **Scope**: one shared, tested way to run djinn residents under test:
 isolated, observed without scraping logs, stopped and restarted, held
 behind enforced walls around the installed resident, and recorded as
@@ -281,7 +282,8 @@ six; review each. Mark: **"Accept all six (Recommended)"**.
 
 ## 4. Phases
 
-Drafted from the assessment; set once the forks are ruled.
+Drafted from the assessment; set on 2026-10-05 once rulings 1 to 13 were
+made.
 
 - **H1 — isolated resident.** Done when:
   - [x] a spawn redirects every root and endpoint, and an incomplete list
@@ -301,7 +303,11 @@ Drafted from the assessment; set once the forks are ruled.
   - [x] every run writes the versioned record;
   - [x] a verifier recomputes its evidence hashes.
 - **H4 — the lock's seams.** Done when:
-  - [ ] the status route reports lock state and startup mode;
+  - [x] the status route reports lock state and startup mode;
+        *2026-10-06:* `resident-status-v1` carries both (`lock` and
+        `StartupUnlockV1`), and the vault lock's L2 receipt reads Locked
+        through it while the vault is locked (vault lock ruling 40, landed
+        `ec1768ab`).
   - [ ] fake triggers and a fake clock work in-process, and scripted
         unlock in a subprocess;
   - [ ] the lock receipts fail against today's `main`: a restarted

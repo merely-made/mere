@@ -17,6 +17,10 @@ by-sessions eviction and D's Athanor P1/P2 both shipped 2026-06-30/07-01); that 
 historical plan was drafted, before the later replay and pointer substrates superseded its implementation.
 Architecture: [alembic memory + engrams](../technical_architecture/2026-06-09_alembic_memory_and_engrams.md) §9.
 
+**Corrected 2026-10-06 (S14 pass):** the alembic implementation plan's own
+status says "slices A-C landed", not A-D. The S14 pass could not confirm
+slice D (Athanor P1/P2) against the tree.
+
 ## Goal
 
 One append-only log of graph mutations (`GraphMutation`), with two read-only projections over it: the
@@ -215,3 +219,4 @@ chokepoint).
   (not the universal funnel it was assumed to be) against 95+ direct kernel-mutator calls from orrery
   alone — corrected to instrumenting each kernel mutator's own body, mirroring B5's proven
   `navigate_node`-stamp pattern. Not started in code.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at mere 535bca11, from the D2 record in support/doc-audit/d2/batch_41_s14_phase_b3.md: the 2026-07-01 entry's per-mutator hook was itself superseded the same day, when the write-path migration made `apply_graph_delta` the single chokepoint (see "What already exists"), and the plan was superseded for implementation on 2026-08-03 by the graph view curation plan, whose `GraphJournal` and Cambium pointer capture replace its log and scrubber; the alembic A-C/A-D disagreement is noted under the status.

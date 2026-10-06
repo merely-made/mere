@@ -1,13 +1,16 @@
 # Configuration Ownership and Settings Projection Plan
 
 **Date**: 2026-08-06
-**Status**: implementation complete through C6; C7 deferred by design
+**Status (2026-10-06)**: implementation complete through C6; C7 deferred by
+design; Knot's move to Pandect's `write_bytes_with_backup` (the 2026-08-26
+follow-up under C3) is still open in knot-editor, whose settings write still
+removes then renames.
 **Scope**: cross-product umbrella. Owns the settings taxonomy, the ledger, the
 provider contract, and the mere-local work. Sibling products (Woodshed, Hocket,
 Isometry, Cleromancy) do their own splits under their own design_docs plans;
 this plan holds pointers, not their work.
 **Code**: `genet/components/genet-host-api/tile.rs` *(historical citation)* <!-- doc-audit: historical-path --> (the `SettingsRef` lane,
-tile.rs:144), `genet/components/config` (opts/prefs),
+tile.rs:144), `genet/components/config` *(historical citation)* <!-- doc-audit: historical-path --> (opts/prefs),
 `mere/crates/system/session-runtime/src/{application_settings_store.rs,device_settings_store.rs,settings_store.rs}` +
 `persona_settings_store.rs`, `knot-editor/crates/knot-editor/src/settings.rs`,
 `mere/ports/graphshell/src/native/owner_settings.rs` *(historical citation)* <!-- doc-audit: historical-path -->,
@@ -20,6 +23,18 @@ tile.rs:144), `genet/components/config` (opts/prefs),
 (archived 2026-08-06; its landed work died with meerkat and its settings-as-nodes
 metaphor was ruled out by the pane-taxonomy revision; its durable ideas are
 carried below under "Carried forward").
+
+**Corrected 2026-10-06 (S14 pass):** several homes on the Code line have
+moved. Mere's settings stores are now in pandect,
+`crates/system/pandect/src/application_settings_store.rs`,
+`crates/system/pandect/src/device_settings_store.rs`,
+`crates/system/pandect/src/persona_settings_store.rs` and
+`crates/system/pandect/src/settings_store.rs`, since session-runtime is gone.
+Genet deleted its config component (opts/prefs) in `5af76a0cb8c`
+(2026-09-07). Graphshell's `owner_settings.rs` became
+`ports/djinn/src/settings.rs` in `1a3dcf6f`. The settings contract and
+`SettingsRef` now live in Mere (see the correction under "The contract
+(C3)"). Turnstone has no `apparatus_pane.rs` any more.
 
 ---
 
@@ -96,6 +111,13 @@ Worked examples across the wing:
 | hocket `UpdateSettings` | `update-settings.json` through `pelt/update` provider | device | C5 settings file landed; `HOCKET_SETTINGS` is an isolated-file override |
 | isometry, cleromancy | none | n/a | join at C7 on the first real personal setting |
 
+**Corrected 2026-10-06 (S14 pass):** the genet `opts` and `prefs` rows are
+historical: Genet deleted its config component in `5af76a0cb8c` (2026-09-07).
+The mere store rows now live in pandect (`crates/system/pandect/src/`), and
+the graphshell `OwnerSettings` row moved to `ports/djinn/src/settings.rs` in
+`1a3dcf6f` (2026-08-22). The file:line citations in this table are the
+2026-08-06 code.
+
 The mere `PersistedSettings` fields, by likely axis ruling (the C1 decision
 finalizes each):
 
@@ -142,6 +164,14 @@ demands one.
   extract, not the schema."
 - The ledger above stays a document. No runtime registry of all settings, no
   universal JSON store, no framework crate.
+
+**Corrected 2026-10-06 (S14 pass):** the contract no longer lives in
+genet-host-api. `SettingSpec`, `SettingsProvider` and `SettingsProjection`
+are in Mere's `mere-surface-api` (`crates/system/surface-api/settings.rs`),
+and `SettingsRef` is in `crates/cambium/workbench/lib.rs`: Genet `d25ef444d21`
+renamed `tile.rs` to its workbench component's `lib.rs`, which has since moved
+into Mere's `crates/cambium/workbench`. Read `genet-host-api::settings` in
+C3, C4 and the Progress log as that home.
 
 2026-08-26 follow-up: Distillery became the third concrete settings consumer,
 so Pandect now owns the narrow `write_bytes_with_backup` replacement mechanism.
@@ -271,3 +301,9 @@ restoration after a failed final rename.
 - 2026-08-06: **C7 disposition recorded.** Isometry and Cleromancy remain
   latecomers until a real personal setting exists; both stay outside the
   implementation gate.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  `support/doc-audit/d2/batch_42_s14_phase_b4.md`: the Code line, the ledger
+  and the C3 contract are repointed to pandect, `mere-surface-api`, Mere's
+  workbench and djinn; the genet config citation is marked historical
+  (`5af76a0cb8c`); the dated status names Knot's open write-path migration.
