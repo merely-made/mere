@@ -49,6 +49,9 @@ use {
 /// Failure while reading, writing or exercising a persona's sealed items.
 #[derive(Debug)]
 pub enum ItemStoreError {
+    /// The vault is locked, so the record keys are gone (vault lock ruling
+    /// 10). Nothing was read or written.
+    Locked,
     /// Personae could not read, write or authenticate a sealed record.
     Storage(IdentityError),
     /// A record was filed for another persona than the store's.
@@ -82,6 +85,7 @@ pub enum ItemStoreError {
 impl fmt::Display for ItemStoreError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
+            Self::Locked => f.write_str("the vault is locked"),
             Self::Storage(error) => write!(f, "sealed item storage: {error}"),
             Self::PersonaMismatch { expected, found } => write!(
                 f,
@@ -117,7 +121,10 @@ impl std::error::Error for ItemStoreError {
 
 impl From<IdentityError> for ItemStoreError {
     fn from(error: IdentityError) -> Self {
-        Self::Storage(error)
+        match error {
+            IdentityError::Locked => Self::Locked,
+            error => Self::Storage(error),
+        }
     }
 }
 

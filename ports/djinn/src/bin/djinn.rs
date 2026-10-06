@@ -100,6 +100,8 @@ struct Args {
     /// Receipt control: leave one blob-store holder outside the task scope,
     /// so a graceful stop must fail its borrower check.
     control_unjoined_holder: bool,
+    /// Enrol a vault passphrase typed at the terminal, and exit.
+    enroll_passphrase: bool,
     /// Command-line overrides folded over the profile's stored settings.
     #[cfg(feature = "personal-sync")]
     sync_overrides: SyncOverrides,
@@ -146,6 +148,22 @@ async fn main() {
             std::process::exit(2);
         },
     };
+    // Enrolment edits the vault directory and reports; it hosts nothing.
+    if args.enroll_passphrase {
+        match djinn::enrollment::enroll_passphrase(
+            &args.vault_dir,
+            &mut djinn::enrollment::read_from_terminal,
+        ) {
+            Ok(message) => {
+                println!("{message}");
+                return;
+            },
+            Err(error) => {
+                eprintln!("djinn: {error}");
+                std::process::exit(1);
+            },
+        }
+    }
     // Status and stop talk to a running resident; this process hosts nothing.
     if args.resident_status || args.stop_resident {
         match resident_client(&args).await {
@@ -289,6 +307,7 @@ fn parse_args() -> Result<Args, String> {
     let mut resident_status = false;
     let mut stop_resident = false;
     let mut control_unjoined_holder = false;
+    let mut enroll_passphrase = false;
     #[cfg(feature = "personal-sync")]
     let mut sync_graph = None;
     #[cfg(feature = "personal-sync")]
@@ -374,6 +393,7 @@ fn parse_args() -> Result<Args, String> {
             "--resident-status" => resident_status = true,
             "--stop-resident" => stop_resident = true,
             "--control-unjoined-holder" => control_unjoined_holder = true,
+            "--enroll-passphrase" => enroll_passphrase = true,
             #[cfg(feature = "personal-sync")]
             "--sync-graph" => {
                 sync_graph = Some(argv.next().ok_or("--sync-graph needs a value")?);
@@ -506,6 +526,7 @@ fn parse_args() -> Result<Args, String> {
         resident_status,
         stop_resident,
         control_unjoined_holder,
+        enroll_passphrase,
         #[cfg(feature = "personal-sync")]
         sync_overrides: SyncOverrides {
             graph: sync_graph,
@@ -672,6 +693,7 @@ fn usage() -> &'static str {
      seed a node at start: [--seed-node <address> <title>]\n\
      blobs at start: [--stage-blob <file>] [--fetch-blob <64-hex-hash>]\n\
      a running resident: --resident-status | --stop-resident [--app-endpoint <endpoint>]\n\
+     enrol a vault passphrase at the terminal: --enroll-passphrase [--dir <vault-dir>]\n\
      receipt only: --receipt-agent-endpoint <isolated-endpoint>"
 }
 
@@ -742,7 +764,7 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
         ready: false,
         startup_unlock,
         protection: protection.into(),
-        // No vault lock exists yet; it reports here when it does.
+        // The host's lock state follows once it exists (below).
         lock: VaultLockView::Unlocked.into(),
         endpoints: ResidentEndpointsV1 {
             agent: match &args.agent {
@@ -770,6 +792,10 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
         // applied to this resident.
         .with_vault_dir(args.vault_dir.clone()),
     );
+    // The status follows the lock (ruling 31's watch channel; harness H4).
+    let mut lock_state = personae.lock_state();
+    let initial_lock = *lock_state.borrow_and_update();
+    status.update(|status| status.lock = initial_lock.into());
 
     #[cfg(feature = "personal-sync")]
     let app_dir = owner_settings::default_app_dir();
@@ -793,6 +819,9 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
         Unlock::from_env(),
     )
     .await?;
+    // The credential keys follow the vault's lock (vault lock ruling 1).
+    #[cfg(feature = "personal-sync")]
+    personae.register_lock_holder(resident.credential_lock_holder());
     // The reservoir lives under the family-shared root, not this resident's
     // data root: every application of the identity reaches the same meres.
     #[cfg(feature = "personal-sync")]
@@ -1084,6 +1113,7 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
         // release. `stopping` and `works_running` exist to keep a resolved
         // future from being polled again.
         let mut stopping = false;
+        let mut lock_watched = true;
         let mut works_running = works_enabled;
         let mut exit: Option<Result<(), Box<dyn std::error::Error>>> = None;
         status.update(|status| status.ready = true);
@@ -1139,6 +1169,21 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
                         Ok(()) => Err("first-party application broker ended unexpectedly".into()),
                         Err(error) => Err(error.into()),
                     });
+                }
+                changed = lock_state.changed(), if lock_watched => {
+                    match changed {
+                        Ok(()) => {
+                            let now = *lock_state.borrow_and_update();
+                            status.update(|status| status.lock = now.into());
+                            let event = match now {
+                                VaultLockView::Locked => "locked",
+                                VaultLockView::Unlocked => "unlocked",
+                            };
+                            tracing::info!(event, "vault lock state changed");
+                            events.emit(event, json!({}));
+                        },
+                        Err(_) => lock_watched = false,
+                    }
                 }
                 _ = knot_refresh.tick(), if resident.knot_enabled() && exit.is_none() => {
                     if let Err(error) = resident.refresh().await {
