@@ -44,11 +44,16 @@ where
     window: ProjectionId,
 }
 
-/// Windows a turn asked to open or close, acted on when the turn ends.
+/// What turns asked of the event source, acted on when they end.
 #[derive(Default)]
-struct WindowRequests {
-    opened: Vec<(ProjectionId, HostOptions)>,
-    closed: Vec<ProjectionId>,
+pub struct WindowRequests {
+    /// Windows to open, each with its options; their projections exist.
+    pub opened: Vec<(ProjectionId, HostOptions)>,
+    /// Windows to close.
+    pub closed: Vec<ProjectionId>,
+    /// Windows to redraw: a change they show that no document mutation
+    /// carries, such as a leaf's or a producer's own state.
+    pub redraws: Vec<ProjectionId>,
 }
 
 impl<State, Logic, V> WindowTree<State, Logic, V>
@@ -76,6 +81,15 @@ where
     pub fn close(&mut self, id: ProjectionId) {
         if !self.requests.closed.contains(&id) {
             self.requests.closed.push(id);
+        }
+    }
+
+    /// Ask window `id` to redraw when this turn ends: for a change it shows
+    /// that no document mutation carries (a leaf's or producer's own state),
+    /// which the host cannot see.
+    pub fn redraw(&mut self, id: ProjectionId) {
+        if !self.requests.redraws.contains(&id) {
+            self.requests.redraws.push(id);
         }
     }
 
@@ -426,22 +440,40 @@ where
         self.windows[id.0] = Some(window);
     }
 
-    /// The windows hooks asked to open (each with its options) and to close
-    /// since the last call. The event source attaches a host to each opened
-    /// one and closes the others.
-    pub fn take_requests(&mut self) -> (Vec<(ProjectionId, HostOptions)>, Vec<ProjectionId>) {
+    /// What hooks asked of the event source since the last call: windows to
+    /// open (a host to attach to each), to close, and to redraw.
+    pub fn take_requests(&mut self) -> WindowRequests {
         let (.., requests) = self.tree.as_mut().expect("asked between turns");
-        let requests = std::mem::take(requests);
-        (requests.opened, requests.closed)
+        std::mem::take(requests)
     }
 
-    /// Close window `id`: tear its tree down and hand its host back to drop.
-    /// The shared state and the other windows are untouched.
+    /// Close window `id`: tear its tree and its window-root down, retire the
+    /// producers whose nodes went with it, and hand its host back to drop. The
+    /// shared state and the other windows are untouched.
     pub fn close(&mut self, id: ProjectionId) -> Option<W> {
         let (runner, router, _) = self.tree.as_mut().expect("windows close between turns");
         runner.remove_projection(id);
         router.forget(id);
+        let dom = self.dom.borrow();
+        let renderer = self.shared.render_core.as_ref().map(|core| core.renderer());
+        self.shared.producers.retire_orphans(
+            |node| crate::window_dom::ancestor_or_self(&dom, node, dom.document()),
+            renderer,
+        );
+        drop(dom);
         self.windows.get_mut(id.0).and_then(Option::take)
+    }
+
+    /// The windows whose layout predates the shared sheet: one window swapped
+    /// it, and the others lay out afresh when they next draw.
+    pub fn behind_on_sheet(&self) -> Vec<ProjectionId> {
+        self.windows()
+            .filter(|&id| {
+                self.slot(id).is_some_and(|window| {
+                    window.host().s.layout_sheet_generation != self.shared.sheet_generation
+                })
+            })
+            .collect()
     }
 
     /// Window `id`'s slot between turns, for what the event source keeps

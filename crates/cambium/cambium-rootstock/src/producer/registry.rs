@@ -32,6 +32,12 @@ struct Entry {
 
 /// Registrations survive CSS hiding; removing a previously bound DOM node
 /// retires its registration. Register again when recreating an absent node.
+/// Whether another window owns the producer with this key and owner node: a
+/// key another window last laid out, or an owner node that now lives under
+/// another window's root (moved there since that window last laid out).
+/// Always false for a single window.
+pub(crate) type Elsewhere<'a> = &'a dyn Fn(u64, Option<NodeId>) -> bool;
+
 #[derive(Default)]
 pub struct ProducerRegistry {
     entries: BTreeMap<u64, Entry>,
@@ -122,18 +128,19 @@ impl ProducerRegistry {
     }
 
     pub(crate) fn suspend_all(&mut self, renderer: Option<&netrender::Renderer>) {
-        self.suspend_except(&Default::default(), renderer);
+        self.suspend_except(&|_, _| false, renderer);
+        self.device = None;
     }
 
-    /// Suspend every producer but those `held` names: under several windows,
-    /// the keys other windows lay out, whose producers are theirs to keep.
+    /// Suspend every producer but those another window owns (see
+    /// [`Elsewhere`]), whose producers are theirs to keep.
     pub(crate) fn suspend_except(
         &mut self,
-        held: &std::collections::HashSet<u64>,
+        elsewhere: Elsewhere<'_>,
         renderer: Option<&netrender::Renderer>,
     ) {
         for (&key, entry) in &mut self.entries {
-            if held.contains(&key) {
+            if elsewhere(key, entry.owner) {
                 continue;
             }
             if entry.active {
@@ -150,9 +157,33 @@ impl ProducerRegistry {
                 renderer.unregister_external_image(netrender::external_image_key(key));
             }
         }
-        if held.is_empty() {
-            self.device = None;
+    }
+
+    /// Forget the device the producers last rendered on, so the next frame
+    /// takes whichever it is given.
+    pub(crate) fn forget_device(&mut self) {
+        self.device = None;
+    }
+
+    /// Retire every producer whose owner node left the document: under
+    /// several windows, those of a window that closed. Returns how many.
+    pub(crate) fn retire_orphans(
+        &mut self,
+        in_document: impl Fn(NodeId) -> bool,
+        renderer: Option<&netrender::Renderer>,
+    ) -> usize {
+        let orphans: Vec<u64> = self
+            .entries
+            .iter()
+            .filter_map(|(&key, entry)| entry.owner.is_some_and(|n| !in_document(n)).then_some(key))
+            .collect();
+        for &key in &orphans {
+            self.remove(key);
+            if let Some(renderer) = renderer {
+                renderer.unregister_external_image(netrender::external_image_key(key));
+            }
         }
+        orphans.len()
     }
 
     #[cfg(test)]
@@ -163,18 +194,20 @@ impl ProducerRegistry {
         dom: &D,
         scale: f32,
     ) -> ProducerFrameStats {
-        self.prepare_window(surface, layout, dom, scale, &Default::default())
+        self.prepare_window(surface, layout, dom, scale, &|_, _| false)
     }
 
-    /// Stage this window's producers. A key in `held_elsewhere` belongs to
-    /// another window's layout and is left alone rather than retired.
+    /// Stage this window's producers. One another window owns (see
+    /// [`Elsewhere`]) is left alone rather than retired as absent, and a key
+    /// this window lays out while another window's node still owns it is a
+    /// duplicate, as two nodes with one key in one window are.
     pub(crate) fn prepare_window<D: LayoutDom<NodeId = NodeId>>(
         &mut self,
         surface: &dyn Surface,
         layout: &OwnedLayout,
         dom: &D,
         scale: f32,
-        held_elsewhere: &std::collections::HashSet<u64>,
+        elsewhere: Elsewhere<'_>,
     ) -> ProducerFrameStats {
         let mut stats = ProducerFrameStats::default();
         let renderer = surface.renderer();
@@ -204,12 +237,9 @@ impl ProducerRegistry {
             .entries
             .iter()
             .filter_map(|(&key, entry)| {
-                // A key another window lays out is that window's producer,
-                // not an absent one.
-                (entry.owner.is_some()
-                    && !nodes.contains_key(&key)
-                    && !held_elsewhere.contains(&key))
-                .then_some(key)
+                // A producer another window owns is not an absent one.
+                (entry.owner.is_some() && !nodes.contains_key(&key) && !elsewhere(key, entry.owner))
+                    .then_some(key)
             })
             .collect();
         for key in absent {
@@ -229,6 +259,15 @@ impl ProducerRegistry {
                 stats.invalid_frames += 1;
                 continue;
             };
+            if entry
+                .owner
+                .is_some_and(|previous| previous != node && elsewhere(key, Some(previous)))
+            {
+                entry.error = Some(ProducerError::DuplicateDomKey);
+                suspend_entry(entry, image_key, renderer, &mut stats);
+                stats.invalid_frames += 1;
+                continue;
+            }
             if entry.owner.is_some_and(|previous| previous != node) {
                 entry.producer.retire();
                 entry.active = false;

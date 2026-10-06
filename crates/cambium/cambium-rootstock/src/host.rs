@@ -1503,12 +1503,18 @@ where
 
     /// Apply requests a hook made after its temporary borrows of the runner and
     /// view state ended. Shared by normal hooks and close negotiation.
+    /// Swap the application's stylesheet: this window lays out afresh under
+    /// it, and the generation tells every other window to.
+    pub(crate) fn swap_sheet(&mut self, sheet: String) {
+        self.s.shared.sheet = sheet;
+        self.s.shared.sheet_generation += 1;
+        self.s.layout = None;
+        self.s.layout_size = (0.0, 0.0);
+    }
+
     fn apply_pending(&mut self) {
         if let Some(sheet) = self.s.pending_sheet.take() {
-            self.s.shared.sheet = sheet;
-            // Force a full relayout under the new sheet.
-            self.s.layout = None;
-            self.s.layout_size = (0.0, 0.0);
+            self.swap_sheet(sheet);
         }
         if let Some(zoom) = self.s.pending_ui_zoom.take() {
             self.set_ui_zoom(zoom);

@@ -468,7 +468,9 @@ fn gpu_a_producer_another_window_holds_is_not_retired() {
     dom.remove(node);
     let layout = OwnedLayout::new(&dom, &[SHEET], 160.0, 120.0, &[], &Default::default());
     let elsewhere = std::collections::HashSet::from([7]);
-    let stats = registry.prepare_window(&surface, &layout, &dom, 1.0, &elsewhere);
+    let stats = registry.prepare_window(&surface, &layout, &dom, 1.0, &|key, _| {
+        elsewhere.contains(&key)
+    });
     assert_eq!(
         stats.retirements, 0,
         "another window's producer is not absent"
@@ -479,4 +481,126 @@ fn gpu_a_producer_another_window_holds_is_not_retired() {
     let stats = registry.prepare(&surface, &layout, &dom, 1.0);
     assert_eq!(stats.retirements, 1, "held by no window, it retires");
     assert!(!registry.contains(7));
+}
+
+/// Two windows over one document (S28): window roots `a` and `b`.
+fn forest() -> (ScriptedDom, NodeId, NodeId) {
+    let mut dom = ScriptedDom::new();
+    let doc = dom.document();
+    let a = dom.create_element(name("div"));
+    dom.append_child(doc, a);
+    let b = dom.create_element(name("div"));
+    dom.append_child(doc, b);
+    (dom, a, b)
+}
+
+fn leaf_under(dom: &mut ScriptedDom, parent: NodeId, key: &str) -> NodeId {
+    let node = dom.create_element(name("custom-leaf"));
+    dom.set_attribute(node, name("key"), key);
+    dom.append_child(parent, node);
+    node
+}
+
+/// One window's frame over its subtree, judged by the rule the host's bridge
+/// applies: another window owns a producer whose node lives under its root.
+fn window_frame(
+    registry: &mut ProducerRegistry,
+    surface: &TestSurface,
+    dom: &ScriptedDom,
+    root: NodeId,
+) -> ProducerFrameStats {
+    let view = crate::WindowDom::new(dom, root);
+    let layout = OwnedLayout::new(&view, &[SHEET], 160.0, 120.0, &[], &Default::default());
+    let elsewhere = |_: u64, owner: Option<NodeId>| owner.is_some_and(|n| view.elsewhere(n));
+    registry.prepare_window(surface, &layout, &view, 1.0, &elsewhere)
+}
+
+/// A producer whose node moved to another window is that window's, whichever
+/// window draws first; one whose node left the document is retired (the
+/// control).
+#[test]
+fn gpu_a_producer_moved_to_another_window_survives_either_order() {
+    let surface = surface();
+    let (mut dom, a, b) = forest();
+    let node = leaf_under(&mut dom, a, "7");
+    let producer = Rc::new(RefCell::new(Producer::default()));
+    let mut registry = ProducerRegistry::new();
+    registry.register(7, producer.clone(), &["color"]).unwrap();
+    assert_eq!(window_frame(&mut registry, &surface, &dom, a).stages, 1);
+
+    dom.move_before(b, node, None);
+    let stats = window_frame(&mut registry, &surface, &dom, a);
+    assert_eq!(
+        stats.retirements, 0,
+        "A drawing first does not retire B's producer"
+    );
+    assert!(registry.contains(7));
+    let stats = window_frame(&mut registry, &surface, &dom, b);
+    assert_eq!(stats.retirements, 0);
+    assert_eq!(
+        producer.borrow().retired,
+        0,
+        "the same producer, never restarted"
+    );
+    assert_eq!(registry.error(7), None);
+
+    dom.remove(node);
+    let stats = window_frame(&mut registry, &surface, &dom, a);
+    assert_eq!(
+        stats.retirements, 1,
+        "a node gone from the document retires"
+    );
+    assert!(!registry.contains(7));
+}
+
+/// One key laid out in two windows is a duplicate, as two nodes with one key
+/// in one window are: the second window does not take the producer from the
+/// first. Once the first window's node is gone, the second may (the control).
+#[test]
+fn gpu_one_key_in_two_windows_is_a_duplicate_not_a_theft() {
+    let surface = surface();
+    let (mut dom, a, b) = forest();
+    let node_a = leaf_under(&mut dom, a, "7");
+    let _node_b = leaf_under(&mut dom, b, "7");
+    let producer = Rc::new(RefCell::new(Producer::default()));
+    let mut registry = ProducerRegistry::new();
+    registry.register(7, producer.clone(), &["color"]).unwrap();
+    assert_eq!(window_frame(&mut registry, &surface, &dom, a).stages, 1);
+
+    let stats = window_frame(&mut registry, &surface, &dom, b);
+    assert_eq!(registry.error(7), Some(ProducerError::DuplicateDomKey));
+    assert_eq!((stats.retirements, producer.borrow().retired), (0, 0));
+
+    dom.remove(node_a);
+    let stats = window_frame(&mut registry, &surface, &dom, b);
+    assert_eq!(stats.retirements, 1, "with A's node gone, B takes the key");
+    assert_eq!(registry.error(7), None);
+}
+
+/// A closed window's producers retire with its subtree; one whose node is
+/// still in the document stays (the control).
+#[test]
+fn gpu_a_closed_windows_producers_retire() {
+    let surface = surface();
+    let (mut dom, a, b) = forest();
+    let _in_a = leaf_under(&mut dom, a, "7");
+    let _in_b = leaf_under(&mut dom, b, "8");
+    let mut registry = ProducerRegistry::new();
+    registry
+        .register(7, Rc::new(RefCell::new(Producer::default())), &["color"])
+        .unwrap();
+    registry
+        .register(8, Rc::new(RefCell::new(Producer::default())), &["color"])
+        .unwrap();
+    window_frame(&mut registry, &surface, &dom, a);
+    window_frame(&mut registry, &surface, &dom, b);
+
+    dom.remove(a);
+    let document = dom.document();
+    let retired = registry.retire_orphans(
+        |n| crate::window_dom::ancestor_or_self(&dom, n, document),
+        Some(surface.renderer()),
+    );
+    assert_eq!(retired, 1);
+    assert!(!registry.contains(7) && registry.contains(8));
 }

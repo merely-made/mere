@@ -286,6 +286,8 @@ struct WindowsReadings {
     one_device: bool,
     sizes: Vec<(f32, f32)>,
     other_saw_click: bool,
+    /// Frames A presented for the click, once both windows settled.
+    click_frames: u64,
     boots_after_resume: u32,
     animated_frames: u64,
     idle_frames: u64,
@@ -297,13 +299,24 @@ struct WindowsReadings {
 }
 
 #[derive(Clone, Copy, PartialEq, Debug)]
+enum AfterSettle {
+    /// The windows have shown themselves (the platform's first paints are
+    /// in): click in A.
+    ClickNow,
+    /// Count A's frames for the click, then suspend and resume.
+    Click { a_before: u64 },
+    /// Start A animating.
+    Animate,
+}
+
+#[derive(Clone, Copy, PartialEq, Debug)]
 enum Step {
     Launched,
-    /// Waiting for B to present what it owes (the click asked both windows to
-    /// redraw) and then hold still, before A starts animating.
+    /// Waiting for both windows to present what they owe and then hold still.
     Settling {
         stable: u32,
-        last_b: u64,
+        last: (u64, u64),
+        next: AfterSettle,
     },
     Animating {
         a0: u64,
@@ -351,7 +364,7 @@ impl WindowsDriver {
             .map(|s| s.device() as *const wgpu::Device)
     }
 
-    fn launched(&mut self, event_loop: &ActiveEventLoop) {
+    fn launched(&mut self) {
         let multi = self.windows.multi.as_ref().unwrap();
         self.readings.windows = multi.windows().count();
         self.readings.sizes = multi
@@ -368,7 +381,16 @@ impl WindowsDriver {
         self.readings.one_device =
             devices[0].is_some() && devices[0] == devices[1] && tenant == devices[0];
 
+        self.step = Step::Settling {
+            stable: 0,
+            last: (self.presents(A), self.presents(B)),
+            next: AfterSettle::ClickNow,
+        };
+    }
+
+    fn click(&mut self, event_loop: &ActiveEventLoop) {
         // A click in A, through A's host.
+        let a_before = self.presents(A);
         let multi = self.windows.multi.as_mut().unwrap();
         multi.with_window(A, |w| {
             let tree = w.s.runner.as_ref().unwrap();
@@ -386,44 +408,59 @@ impl WindowsDriver {
             w.press_left();
             w.release();
         });
-        self.windows.after_turn(event_loop);
+        self.windows.after_turn(event_loop, &[A]);
         let multi = self.windows.multi.as_ref().unwrap();
         let dom = multi.dom();
         self.readings.other_saw_click =
             text_under(&dom.borrow(), multi.window_root(B).unwrap()).contains("clicks:1");
 
-        // Suspend and resume every window.
-        self.windows.suspended(event_loop);
-        self.windows.resumed(event_loop);
-        self.readings.boots_after_resume = self.boots();
-
         self.step = Step::Settling {
             stable: 0,
-            last_b: self.presents(B),
+            last: (self.presents(A), self.presents(B)),
+            next: AfterSettle::Click { a_before },
         };
     }
 
-    fn settling(&mut self, event_loop: &ActiveEventLoop, stable: u32, last_b: u64) {
-        // Keep the loop turning while nothing animates, so B's count can be
+    fn settling(
+        &mut self,
+        event_loop: &ActiveEventLoop,
+        stable: u32,
+        last: (u64, u64),
+        next: AfterSettle,
+    ) {
+        // Keep the loop turning while nothing animates, so the counts can be
         // seen to hold.
         event_loop.set_control_flow(ControlFlow::wait_duration(
             std::time::Duration::from_millis(16),
         ));
-        let b = self.presents(B);
-        if b != last_b {
+        let now = (self.presents(A), self.presents(B));
+        if now != last || stable < 20 {
+            let stable = if now == last { stable + 1 } else { 0 };
+            self.step = Step::Settling {
+                stable,
+                last: now,
+                next,
+            };
+            return;
+        }
+        if next == AfterSettle::ClickNow {
+            self.click(event_loop);
+            return;
+        }
+        if let AfterSettle::Click { a_before } = next {
+            self.readings.click_frames = now.0 - a_before;
+            // Suspend and resume every window.
+            self.windows.suspended(event_loop);
+            self.windows.resumed(event_loop);
+            self.readings.boots_after_resume = self.boots();
             self.step = Step::Settling {
                 stable: 0,
-                last_b: b,
+                last: (self.presents(A), self.presents(B)),
+                next: AfterSettle::Animate,
             };
             return;
         }
-        if stable < 20 {
-            self.step = Step::Settling {
-                stable: stable + 1,
-                last_b,
-            };
-            return;
-        }
+        let b = now.1;
         // B has held still for twenty turns: A animates, B is left alone.
         self.animate_a.set(true);
         let multi = self.windows.multi.as_ref().unwrap();
@@ -463,7 +500,7 @@ impl WindowsDriver {
                     )
                 })
                 .unwrap();
-            self.windows.after_turn(event_loop);
+            self.windows.after_turn(event_loop, &[B]);
             self.readings.third_boots = self.boots();
             self.readings.third_on_its_own_device =
                 self.device_of(third).is_some() && self.device_of(third) != self.device_of(B);
@@ -471,7 +508,7 @@ impl WindowsDriver {
         // Close A as the platform would.
         let multi = self.windows.multi.as_mut().unwrap();
         multi.with_window(A, |w| w.request_close(crate::CloseRequest::Native));
-        self.windows.after_turn(event_loop);
+        self.windows.after_turn(event_loop, &[A]);
         let multi = self.windows.multi.as_ref().unwrap();
         self.readings.open_after_close = multi.windows().count();
         self.readings.other_still_shown = multi.slot(B).is_some_and(|w| w.native_window.is_some());
@@ -520,8 +557,8 @@ impl ApplicationHandler<HostEvent> for WindowsDriver {
             return;
         }
         match self.step {
-            Step::Launched => self.launched(event_loop),
-            Step::Settling { stable, last_b } => self.settling(event_loop, stable, last_b),
+            Step::Launched => self.launched(),
+            Step::Settling { stable, last, next } => self.settling(event_loop, stable, last, next),
             Step::Animating { a0, b0 } => self.animating(event_loop, a0, b0),
             Step::Done => {},
         }
@@ -607,6 +644,7 @@ fn windows() {
         "the windows lay out at their own sizes"
     );
     assert!(r.other_saw_click, "B shows the click A took");
+    assert_eq!(r.click_frames, 1, "A presented one frame for the click");
     assert_eq!(r.boots_after_resume, 1, "the resume booted nothing");
     assert!(r.animated_frames >= 8);
     assert!(r.idle_presents_held, "B presented nothing while A animated");

@@ -76,11 +76,30 @@ where
     /// Retire staged images before a platform drops/replaces its surface, or
     /// suspend transient targets while the containing window is hidden.
     pub fn suspend_producers(&mut self) {
+        let dom = self
+            .s
+            .runner
+            .as_ref()
+            .map(|runner| (runner.dom(), runner.mount()));
+        let dom_ref = dom.as_ref().map(|(dom, mount)| (dom.borrow(), *mount));
+        let view = dom_ref
+            .as_ref()
+            .map(|(dom, mount)| crate::WindowDom::new(dom, *mount));
         let shared = &mut self.s.shared;
+        let held = &shared.held_elsewhere;
+        let elsewhere = |key: u64, owner: Option<NodeId>| {
+            held.contains(&key)
+                || owner
+                    .zip(view.as_ref())
+                    .is_some_and(|(n, v)| v.elsewhere(n))
+        };
         shared.producers.suspend_except(
-            &shared.held_elsewhere,
+            &elsewhere,
             self.s.surface.as_ref().map(|surface| surface.renderer()),
         );
+        if held.is_empty() {
+            shared.producers.forget_device();
+        }
     }
 
     pub(crate) fn prepare_producers(&mut self, scale: f32) -> ProducerFrameStats {
@@ -90,24 +109,36 @@ where
             self.s.runner.as_ref(),
         ) else {
             let shared = &mut self.s.shared;
+            let held = &shared.held_elsewhere;
             shared
                 .producers
-                .suspend_except(&shared.held_elsewhere, None);
+                .suspend_except(&|key, _| held.contains(&key), None);
+            if held.is_empty() {
+                shared.producers.forget_device();
+            }
             return ProducerFrameStats::default();
         };
-        if self.s.hidden {
-            let shared = &mut self.s.shared;
-            shared
-                .producers
-                .suspend_except(&shared.held_elsewhere, Some(surface.renderer()));
-            return ProducerFrameStats::default();
-        }
         let dom = runner.dom();
         let dom = dom.borrow();
         let view = crate::WindowDom::new(&dom, runner.mount());
         let shared = &mut self.s.shared;
+        let held = &shared.held_elsewhere;
+        // Another window owns a producer whose key it last laid out, or whose
+        // node now lives under its root.
+        let elsewhere = |key: u64, owner: Option<NodeId>| {
+            held.contains(&key) || owner.is_some_and(|n| view.elsewhere(n))
+        };
+        if self.s.hidden {
+            shared
+                .producers
+                .suspend_except(&elsewhere, Some(surface.renderer()));
+            if held.is_empty() {
+                shared.producers.forget_device();
+            }
+            return ProducerFrameStats::default();
+        }
         shared
             .producers
-            .prepare_window(surface, layout, &view, scale, &shared.held_elsewhere)
+            .prepare_window(surface, layout, &view, scale, &elsewhere)
     }
 }

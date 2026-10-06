@@ -67,9 +67,14 @@ fn lens(label: &'static str) -> Logic {
 }
 
 fn multi() -> (Multi, ProjectionId, ProjectionId) {
+    multi_with(HostHooks::inert())
+}
+
+fn multi_with(
+    hooks: HostHooks<App, Logic, Child, WindowTree<App, Logic, Child>>,
+) -> (Multi, ProjectionId, ProjectionId) {
     let mut shared = AppShared::default();
     shared.sheet = SHEET.into();
-    let hooks: HostHooks<App, Logic, Child, WindowTree<App, Logic, Child>> = HostHooks::inert();
     let mut multi = MultiHost::new(App::default(), shared, hooks);
     let open = |multi: &mut Multi, label: &'static str, zoom: f32| {
         let s = HostState::new();
@@ -410,14 +415,16 @@ fn a_turn_opens_and_closes_windows_through_its_tree() {
             c
         })
         .unwrap();
-    let (opened, closed) = multi.take_requests();
+    let root_a = multi.window_root(a).unwrap();
+    let requests = multi.take_requests();
+    let (opened, closed) = (requests.opened, requests.closed);
     assert_eq!(
         opened.iter().map(|(id, _)| *id).collect::<Vec<_>>(),
         vec![c]
     );
     assert_eq!(closed, vec![a]);
     assert!(
-        multi.take_requests().0.is_empty(),
+        multi.take_requests().opened.is_empty(),
         "requests are taken once"
     );
     for (id, options) in opened {
@@ -436,5 +443,42 @@ fn a_turn_opens_and_closes_windows_through_its_tree() {
         painted(&mut multi, c, label).is_some(),
         "C lays out its own lens"
     );
-    assert!(multi.window_root(a).is_none(), "A's root left the document");
+    assert!(multi.window_root(a).is_none(), "A's projection is gone");
+    assert!(
+        !dom.borrow().is_live(root_a),
+        "and its window-root left the document"
+    );
+}
+
+/// A sheet one window swaps from a hook other than the frame hook reaches the
+/// other window: it is behind on the sheet until it lays out, then lays out
+/// under the new one.
+#[test]
+fn a_sheet_one_window_swaps_from_a_hook_reaches_the_other() {
+    const WIDE: &str = "div { display: block; height: 20px; }                         button { display: block; width: 200px; height: 30px; }";
+    let swap = Rc::new(Cell::new(false));
+    let mut hooks: HostHooks<App, Logic, Child, WindowTree<App, Logic, Child>> = HostHooks::inert();
+    hooks.after_dispatch = Box::new({
+        let swap = swap.clone();
+        move |ctx| {
+            if swap.replace(false) {
+                *ctx.set_sheet = Some(WIDE.into());
+            }
+        }
+    });
+    let (mut multi, a, b) = multi_with(hooks);
+    layout_at(&mut multi, a, 400.0, 300.0);
+    layout_at(&mut multi, b, 300.0, 600.0);
+    let dom = multi.dom();
+    let button_b = find(&dom.borrow(), multi.window_root(b).unwrap(), "count").unwrap();
+    let width = |multi: &mut Multi| painted(multi, b, button_b).unwrap().2;
+    assert_eq!(width(&mut multi), 80.0);
+    assert!(multi.behind_on_sheet().is_empty());
+
+    swap.set(true);
+    multi.with_window(a, |h| h.after_dispatch()).unwrap();
+    assert!(multi.behind_on_sheet().contains(&b), "B knows it is behind");
+    layout_at(&mut multi, b, 300.0, 600.0);
+    assert_eq!(width(&mut multi), 200.0, "B lays out under A's new sheet");
+    assert!(!multi.behind_on_sheet().contains(&b));
 }
