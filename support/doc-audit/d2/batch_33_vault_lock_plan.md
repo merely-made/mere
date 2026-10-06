@@ -15,7 +15,7 @@ lane's, each marked in the plan by whether it was re-checked.
 ## dramatis_docs/implementation_strategy/2026-10-05_vault_lock_plan.md
 
 - disposition: current
-- status line: "Status (2026-10-06): rulings 1 to 39 in §3; the threat statement is still open. The djinn test harness it waited on (ruling 18) landed (`318b8f70`). L1's checkpoints A and B (residue fixes, the no-residue instrument, the lock API) are built and verified on a lane branch; one missing test (§6, control B) and ruling 37 come before L1 merges. Chatelaine P4 (CXF import) waits on this plan (chatelaine rulings 64, 65)." — accurate: yes
+- status line: "Status (2026-10-06): rulings 1 to 39 in §3; the threat statement is still open. L1 (personae can lock) landed on `main` (`2556a20c`). L2 (every consumer obeys) is next. The dramatis repo plan moves this code later. Chatelaine P4 (CXF import) waits on this plan (chatelaine rulings 64, 65)." — accurate: yes
 - claims checked: 7 — holds: 7, stale: 0, unverifiable: 0
 
 ### Stale claims

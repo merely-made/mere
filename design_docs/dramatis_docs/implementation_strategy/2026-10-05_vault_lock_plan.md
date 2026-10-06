@@ -2,11 +2,10 @@
 
 **Date**: 2026-10-05
 **Status (2026-10-06)**: rulings 1 to 39 in §3; the threat statement is
-still open. The djinn test harness it waited on (ruling 18) landed
-(`318b8f70`). L1's checkpoints A and B (residue fixes, the no-residue
-instrument, the lock API) are built and verified on a lane branch; one
-missing test (§6, control B) and ruling 37 come before L1 merges. Chatelaine
-P4 (CXF import) waits on this plan (chatelaine rulings 64, 65).
+still open. L1 (personae can lock) landed on `main` (`2556a20c`). L2 (every
+consumer obeys) is next. The [dramatis repo plan](2026-10-06_dramatis_repo_plan.md)
+moves this code later. Chatelaine P4 (CXF import) waits on this plan
+(chatelaine rulings 64, 65).
 **Scope**: the resident's secrets can be locked. While locked, no secret
 material can be reached through the vault or the resident's derived keys.
 Unlocking takes a user act. Every consumer (the SSH agent, castellan's item
@@ -497,14 +496,16 @@ Drafted from the assessment; set once the forks are ruled.
 - **L1 — personae can lock.** `IdentityVault::lock()` drops the profile and
   the storage key, and every accessor that reaches secret material returns
   `Locked`. Done when:
-  - [ ] each accessor has a test, and each test fails if its guard is
+  - [x] each accessor has a test, and each test fails if its guard is
         removed;
-  - [ ] a no-residue instrument (a tracking allocator) finds no canary key
+  - [x] a no-residue instrument (a tracking allocator) finds no canary key
         live or freed uncleared after a lock, and fails on today's
         `profile_wire` clones as its positive control;
-  - [ ] after an unlock by the ruled method, slots are byte-identical and an
+  - [x] after an unlock by the ruled method, slots are byte-identical and an
         Ed25519 signature verifies exactly as before, while a wrong
-        credential leaves the vault locked.
+        credential leaves the vault locked. *(Passphrase measured; Windows
+        Hello's prompt is Mark's attended step, its token path tested with
+        a test-only constructor.)*
 - **L2 — every consumer obeys.** Done when:
   - [ ] over the isolated named pipe, the agent behaves as ruled while
         locked, and `ssh-add -x`/`-X` as ruled;
@@ -642,3 +643,37 @@ personae lock API, `b7bcbdb0` adapts castellan and Distillery, not merged):
   lane.
 - Next: the freshness test and ruling 37 on the same branch, then L1's
   merge.
+
+**2026-10-06, L1 landed** (`2556a20c`, merging `fea481a3`, `ffd3279b`,
+`095c0423`, `b7bcbdb0` and `f40a4d60`):
+- **Checkpoint C, `f40a4d60`:**
+  - a no-residue scenario for an authoritative record store (castellan's
+    shape), with canary record and freshness keys;
+  - a test that boxed and borrowed storages lock through their delegates;
+  - ruling 37's cipher feature.
+- **The lane's lock-body audit.** It removed every key-dropping line in
+  every `lock()` (the record key, the freshness lock, the freshness
+  ledger's key, the vault's profile and storage lock, both profile
+  storages, the passphrase KEK, and the `&T` and `Box<T>` delegates). Each
+  removal failed a test or a leak scenario.
+- **Verified in `mere-verify`:**
+  - my control B, rerun at `f40a4d60`, now fails: "live freshness key ...
+    no-residue: FAILED";
+  - personae 195 + 7 + 1 with seven leak scenarios clean, and castellan
+    107 + 3 + 4 + 1;
+  - the gate passed at `f40a4d60` and again on the merge with `main`
+    `3a80b1fe`; the tree that landed is that verified merge.
+- **The lock file** gains four feature edges (argon2, chacha20 and
+  chacha20poly1305 zeroize; personae to windows) and no package.
+- **Not verified here:**
+  - a real Windows Hello prompt (Mark's step);
+  - personae's all-features build on Linux (ring needs a cross compiler;
+    chatelaine ruling 57 moves such checks to the ThinkPad);
+  - stack copies, which the instrument cannot see.
+- **For L2:**
+  - passphrase enrolment (ruling 39);
+  - lockable test storages (`InMemoryStorage` cannot lock);
+  - serde_json's escape scratch buffer (§5);
+  - a loader variant that takes the `OsPresence` proof, so the persisted
+    lock (ruling 32, L3) does not block presence unlock;
+  - ruling 38's constructor, which builds a vault without a decrypt (L3).
