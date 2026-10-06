@@ -165,3 +165,10 @@ safetensors = "0.4"
 scenotime.workspace = true
 tempfile = "3"
 tokio = { version = "1", features = ["macros", "rt", "rt-multi-thread", "sync", "time"] }
+
+# Vault lock ruling 48: what Knot leaves of its seed once the lane closes,
+# measured with personae's tracker (its own global allocator, no libtest).
+[[test]]
+name = "knot_residue"
+path = "tests/knot_residue.rs"
+harness = false
