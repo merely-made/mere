@@ -28,7 +28,7 @@ that the lane split below describes. `PortableKeyed` and the nursery survive
 in Cambium (`crates/cambium/cambium/src/context.rs`, lines 126 and 244), and
 `crates/cambium/cambium/src/frisket.rs:39` keys `Slot::View` tiles by `TileId`.
 
-**Gesture source**: [tearout_gestures_plan](2026-06-24_tearout_gestures_plan.md) owns the
+**Gesture source**: [tearout_gestures_plan](../../archive_docs/2026-10-06_completed_plans/2026-06-24_tearout_gestures_plan.md) owns the
 user-facing tear-out gestures (drag = leaf, Shift = branch, Ctrl+Shift = fork — the *graph
 scope* axis); this plan owns what happens to the tile's *DOM identity* when a gesture moves
 it. The two axes are orthogonal.

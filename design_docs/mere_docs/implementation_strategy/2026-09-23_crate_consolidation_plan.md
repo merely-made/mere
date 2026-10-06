@@ -6,7 +6,7 @@
 `8167d196`, C4's last fold `cambium::nematic` on 2026-09-25). insigne's
 phases A to D have landed (A `5364dfa0`, B `538226a3`; C in Mere and Knot and
 D in Gaz on 2026-09-29, per the
-[insigne proofs plan](../../dramatis_docs/implementation_strategy/2026-09-23_insigne_proofs_plan.md)),
+[insigne proofs plan](../../archive_docs/2026-10-06_completed_plans/2026-09-23_insigne_proofs_plan.md)),
 and chatelaine's P1 to P3 (`da3c50bc`, `3e4992ec`, `ff68e86c`, by 2026-10-02),
 which meets C5's conditions. Open: C5's version baseline; C6's crates.io
 deletions, which are Mark's; and the dramatis facade (C2's dramatis row,

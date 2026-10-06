@@ -18,7 +18,7 @@ plan's V2b then places the mere view in that tree.
 - `crates/cambium/cambium-genet-web-host/src/a11y.rs`, whose module doc
   recorded the web host's accessibility gap and, since phase 1, describes the
   mirror.
-- [Platform boundary and repository topology plan](2026-09-02_platform_boundary_and_repository_topology_plan.md),
+- [Platform boundary and repository topology plan](../../archive_docs/2026-10-06_completed_plans/2026-09-02_platform_boundary_and_repository_topology_plan.md),
   whose `p2_cambium_h3_boot` receipt first showed the chrome and the graph
   scene through Genet on the web target.
 

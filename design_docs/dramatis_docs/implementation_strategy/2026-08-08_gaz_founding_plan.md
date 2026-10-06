@@ -353,7 +353,7 @@ is monotonic, so a replayed or late event cannot rewind a record.
         insigne's core, so it can be checked again later, for instance against
         a newer revocation list, which is why notochord retains its session
         claims. The data types moved into insigne in the
-        [insigne proofs plan](2026-09-23_insigne_proofs_plan.md)'s phase A
+        [insigne proofs plan](../../archive_docs/2026-10-06_completed_plans/2026-09-23_insigne_proofs_plan.md)'s phase A
         (`5364dfa0`, 2026-09-24); gaz keeping them is that plan's phase D,
         landed 2026-09-29. `KeyProof` retains attestations with their salt,
         signed certificates, or opaque protocol evidence with its format and

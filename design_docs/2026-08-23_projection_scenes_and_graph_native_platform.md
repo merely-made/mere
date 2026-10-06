@@ -20,7 +20,7 @@ web platform with graph-native application behavior.
 - Genet `docs/2026-08-14_web_platform_host_contract_plan.md`
 
 **2026-08-23 follow-on:** the §8 receipts are scheduled in the
-[projection receipts plan](mere_docs/implementation_strategy/2026-08-23_projection_receipts_plan.md):
+[projection receipts plan](archive_docs/2026-10-06_completed_plans/2026-08-23_projection_receipts_plan.md):
 wave 1 is Matrix and coordination with mer3ly as first consumer and the
 gazette Ledger as heterogeneous second; the field receipts stay gated there.
 
@@ -255,7 +255,7 @@ the [agreed requirements/facets basis](mere_docs/research/2026-08-15_projection_
 
 There are three relevant precedents:
 
-- The [June 2 integration model](mere_docs/implementation_strategy/2026-06-02_modular_integration_plan.md#1-the-architecture-a-graph-rooted-projection-model)
+- The [June 2 integration model](archive_docs/2026-10-06_superseded_plans/2026-06-02_modular_integration_plan.md#1-the-architecture-a-graph-rooted-projection-model)
   explicitly calls a detached tile a leaf retaining its graph binding. Preserve
   that source custody without requiring every application to have a spatial
   graph as its privileged visible root.

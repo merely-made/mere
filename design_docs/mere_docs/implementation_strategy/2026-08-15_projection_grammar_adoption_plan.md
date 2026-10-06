@@ -370,12 +370,12 @@ lanes L1-L5 and governed by the
 [projection grammar catalog](../research/2026-08-15_projection_grammar_catalog.md)
 promotion rules.
 **Related**:
-[scenograph_0_0_3_release_plan](2026-07-24_scenograph_0_0_3_release_plan.md)
+[scenograph_0_0_3_release_plan](../../archive_docs/2026-10-06_completed_plans/2026-07-24_scenograph_0_0_3_release_plan.md)
 (historical 0.0.3 release; rulings D1-D4),
-[projection_proofs_plan](2026-07-21_projection_proofs_plan.md) (P1-P5 landed),
+[projection_proofs_plan](../../archive_docs/2026-10-06_completed_plans/2026-07-21_projection_proofs_plan.md) (P1-P5 landed),
 scene contract note
 (`design_docs/scenograph_docs/technical_architecture/2026-07-22_scene_contract_note.md`),
-[multi_window_plan](2026-06-10_multi_window_plan.md),
+[multi_window_plan](../../archive_docs/2026-10-06_completed_plans/2026-06-10_multi_window_plan.md),
 [graph_signals_layer_plan](../../archive_docs/2026-08-20_completed_plans/2026-06-22_graph_signals_layer_plan.md),
 [accesskit_screen_reader_verification](../../archive_docs/2026-09-02_retired_plans/2026-06-09_accesskit_screen_reader_verification.md).
 
@@ -582,7 +582,7 @@ declaration; decide its home with evidence (chirograph beside the intent
 triple, or mere host state that graphshell serializes); wire two views over
 one authority through it.
 Forcing consumer: L3's entrance gate is met. Mer3ly shares a scene by URL hash,
-and Wave 1 of the [projection receipts plan](2026-08-23_projection_receipts_plan.md)
+and Wave 1 of the [projection receipts plan](../../archive_docs/2026-10-06_completed_plans/2026-08-23_projection_receipts_plan.md)
 supplies the genuine two-view ask: its spatial view and two-reading Matrix
 contribute named clauses over the same source identities. The proof forced
 crossfilter only; union and intersection remain absent until their behavior is

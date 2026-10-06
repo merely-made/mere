@@ -337,15 +337,15 @@ This document carries no phase status, which goes stale; the plans carry it.
 
 | Piece | Authority |
 |---|---|
-| the tier's founding and the port direction | [dramatis tier plan](../../mere_docs/implementation_strategy/2026-08-10_dramatis_tier_plan.md) |
+| the tier's founding and the port direction | [dramatis tier plan](../../archive_docs/2026-10-06_completed_plans/2026-08-10_dramatis_tier_plan.md) |
 | the credential port and gazette fronts, standards inventory | [credential port + gazette brief](../../mere_docs/research/2026-08-10_credential_port_gazette_brief.md) |
 | personae's scope and seams | [personae founding](2026-07-08_personae_founding.md) |
 | delegation grammar's content | [device-grant delegation reconciliation](../../mere_docs/technical_architecture/2026-08-11_device_grant_delegation_reconciliation.md) |
-| insigne's move and API | [insigne proofs plan](../implementation_strategy/2026-09-23_insigne_proofs_plan.md) |
+| insigne's move and API | [insigne proofs plan](../../archive_docs/2026-10-06_completed_plans/2026-09-23_insigne_proofs_plan.md) |
 | the contact model (the *them* spec) | [contact identity model brief](../../mere_docs/research/2026-06-15_contact_identity_model_brief.md) |
 | gaz's phases, anchors, intake | [gaz founding plan](../implementation_strategy/2026-08-08_gaz_founding_plan.md) |
-| castellan's keeper surface | [castellan keeper founding plan](../../mere_docs/implementation_strategy/2026-08-14_castellan_keeper_founding_plan.md) |
-| castellan's credential runway | [castellan OTP plan](../../mere_docs/implementation_strategy/2026-08-10_castellan_otp_plan.md) |
+| castellan's keeper surface | [castellan keeper founding plan](../../archive_docs/2026-10-06_completed_plans/2026-08-14_castellan_keeper_founding_plan.md) |
+| castellan's credential runway | [castellan OTP plan](../../archive_docs/2026-10-06_completed_plans/2026-08-10_castellan_otp_plan.md) |
 | the resident | [djinn resident services plan](../../mere_docs/implementation_strategy/2026-08-22_djinn_family_resident_services_plan.md) |
 | chatelaine, insigne, dramatis as crates | [crate consolidation plan](../../mere_docs/implementation_strategy/2026-09-23_crate_consolidation_plan.md) |
 | standards grading (JSContact, DIDs, CXF) | [standards survey brief](../../2026-08-24_standards_survey_brief.md) |

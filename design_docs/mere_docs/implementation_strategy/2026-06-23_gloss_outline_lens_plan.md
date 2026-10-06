@@ -120,7 +120,7 @@ with Mark):
   **Considered and declined: folding `linked-data` into `glossary`** (Mark's question). The kinship
   is real (both `Graph -> representation`), but the `crates/graph/` supercrate already expresses it
   as siblings without a merge; linked-data is mature, RDF-dep-heavy, and the spine of two active
-  plans ([graph_query_layer](2026-06-18_graph_query_layer_plan.md), [petgraph_rdf](2026-06-18_petgraph_rdf_plan.md)),
+  plans ([graph_query_layer](../../archive_docs/2026-10-06_completed_plans/2026-06-18_graph_query_layer_plan.md), [petgraph_rdf](../../archive_docs/2026-10-06_completed_plans/2026-06-18_petgraph_rdf_plan.md)),
   so absorbing it would churn those plans, balloon glossary's dep tree, and stretch the name past
   the human-digest role. Human digest (glossary) and machine interchange (linked-data) stay distinct
   crates, same supercrate. Reversible if Mark later wants the merge.
@@ -263,9 +263,9 @@ an ad-hoc list: the format *is* the editing + export path.
   projection contract, the no-split rule, the outline as the sixth projection.
 - [interaction model spine](../technical_architecture/2026-06-18_interaction_model_spine.md) —
   the djot lane + the named "gloss-outline / A3" / first-notetaking-feature slot.
-- [modular integration plan](2026-06-02_modular_integration_plan.md) — the graph-rooted
+- [modular integration plan](../../archive_docs/2026-10-06_superseded_plans/2026-06-02_modular_integration_plan.md) — the graph-rooted
   projection model (graph is root; gloss is a projection).
-- [node representation / arrangement plan](2026-06-18_node_representation_arrangement_plan.md) —
+- [node representation / arrangement plan](../../archive_docs/2026-10-06_superseded_plans/2026-06-18_node_representation_arrangement_plan.md) —
   node color / form rides into the outline rows (representation orthogonal).
 - nematic knot (djot design (`design_docs/nematic_docs/implementation_strategy/2026-05-08_polyglot_knot_design.md`),
   evaluation/export (`genet/design_docs/archive_docs/2026-09-02/2026-06-12_knot_evaluation_export_plan.md`))

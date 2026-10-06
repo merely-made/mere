@@ -11,7 +11,7 @@ test or probe receipt; deferred points are carried forward in §7 of the
 [`2026-06-04_resource_coordination_brief.md`](../../mere_docs/research/2026-06-04_resource_coordination_brief.md),
 [`2026-06-12_mesh_m1_plan.md`](../2026-06-15_completed_plans/2026-06-12_mesh_m1_plan.md),
 [`2026-06-30_mesh_lease_scheduler_plan.md`](2026-06-30_mesh_lease_scheduler_plan.md),
-[`2026-08-08_esp_consolidation_plan.md`](../../mere_docs/implementation_strategy/2026-08-08_esp_consolidation_plan.md)
+[`2026-08-08_esp_consolidation_plan.md`](../2026-10-06_completed_plans/2026-08-08_esp_consolidation_plan.md)
 
 M2 turns the M1 convergence proof into a bounded execution substrate. Its whole
 claim is one versioned job namespace, one resource registry, and one useful

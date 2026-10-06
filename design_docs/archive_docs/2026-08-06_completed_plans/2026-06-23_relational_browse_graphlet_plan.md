@@ -2,7 +2,7 @@
 
 **Date**: 2026-06-23
 **Status**: V1 + V2 **built** (2026-06-24/25, see Progress); V3 **moved to** the
-[Capture, Provenance, and Consent plan](../../mere_docs/implementation_strategy/2026-06-26_capture_provenance_consent_plan.md).
+[Capture, Provenance, and Consent plan](../2026-10-06_completed_plans/2026-06-26_capture_provenance_consent_plan.md).
 Spun out of a design conversation (Mark) about
 visual graph crawlers (the egui-based [raydroplet/crawler-rs](https://github.com/raydroplet/crawler-rs)
 as a UX reference only; its egui_graphs / fdg-sim / petgraph stack does not
@@ -13,7 +13,7 @@ to the already-built eidetic capture/index back-end; it deliberately does *not*
 re-derive that work.
 **Relationship to existing plans** (read these; this plan composes them, it does
 not restate them):
-- [Eidetic Browsing Derivation](../../eidetic_docs/implementation_strategy/2026-06-12_eidetic_browsing_derivation_plan.md)
+- [Eidetic Browsing Derivation](../2026-10-06_completed_plans/2026-06-12_eidetic_browsing_derivation_plan.md)
   — **built** (E1-E4 green): `BrowsingTrace` capture from `node-lineage`,
   real-history ingest, the `eidetic-search` tantivy index (BM25 + fast-field
   reports), hybrid lexical+vector recall. It explicitly parks **full page-text
@@ -29,9 +29,9 @@ not restate them):
   of personal LoRA adapters across a moot/coalition (the geist is framed there as
   **LoRA + RAG**, the adapter shipping as a content-addressed engram). The flora
   lane is the model-weight counterpart to the index lane.
-- Graph substrate: [node representation / arrangement](../../mere_docs/implementation_strategy/2026-06-18_node_representation_arrangement_plan.md)
-  (LOD: dot → glyph → chip → card), [graph query layer](../../mere_docs/implementation_strategy/2026-06-18_graph_query_layer_plan.md),
-  [petgraph/RDF](../../mere_docs/implementation_strategy/2026-06-18_petgraph_rdf_plan.md). DocumentScript driver, for the
+- Graph substrate: [node representation / arrangement](../2026-10-06_superseded_plans/2026-06-18_node_representation_arrangement_plan.md)
+  (LOD: dot → glyph → chip → card), [graph query layer](../2026-10-06_completed_plans/2026-06-18_graph_query_layer_plan.md),
+  [petgraph/RDF](../2026-10-06_completed_plans/2026-06-18_petgraph_rdf_plan.md). DocumentScript driver, for the
   later sandboxed form: [substrate](../2026-07-03_completed_plans/2026-06-21_document_script_substrate_plan.md)
   + [follow-ons](../2026-07-03_completed_plans/2026-06-23_document_script_followons_plan.md).
 
@@ -240,7 +240,7 @@ cross-link *relations* fall out of the graph as the frontier revisits shared tar
 ### V3 — relational capture into eidetic (the LoRA-readiness lever)
 
 > **Moved + generalized (2026-06-26):** V3 is now owned by the
-> [Capture, Provenance, and Consent plan](../../mere_docs/implementation_strategy/2026-06-26_capture_provenance_consent_plan.md),
+> [Capture, Provenance, and Consent plan](../2026-10-06_completed_plans/2026-06-26_capture_provenance_consent_plan.md),
 > which unifies this candidate-set capture with the live recorder, provenance, and
 > consent so all four ride one record written from the first traversal. Kept here
 > for context; build it there.
@@ -427,7 +427,7 @@ from scratch.
   primitive resolves the "one missing primitive", and **`net.fetch` is a real
   backend, not a stub**. Corrected the stale Status line, the Findings
   "missing primitive" note, and the `net.fetch` Open Question accordingly. **V3 is
-  moved** to the [Capture, Provenance, and Consent plan](../../mere_docs/implementation_strategy/2026-06-26_capture_provenance_consent_plan.md),
+  moved** to the [Capture, Provenance, and Consent plan](../2026-10-06_completed_plans/2026-06-26_capture_provenance_consent_plan.md),
   which generalizes the candidate-set capture into a single live record (traversal +
   candidate-context + provenance + consent) plus the live recorder meerkat lacks
   today (nothing writes a `BrowsingTrace` from the running app yet) and the

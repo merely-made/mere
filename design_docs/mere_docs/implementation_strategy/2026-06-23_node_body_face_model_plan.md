@@ -8,7 +8,7 @@
 B4. Turnstone hosts sprite import with a hull; Graphshell has a face picker; no host has a
 material picker. Several follow-on owners named below are archived (see Collected
 follow-ons). Successor to the representation half of the
-[node_representation_arrangement_plan](2026-06-18_node_representation_arrangement_plan.md),
+[node_representation_arrangement_plan](../../archive_docs/2026-10-06_superseded_plans/2026-06-18_node_representation_arrangement_plan.md),
 which is substantially complete (P0 cues, P1 per-node form, P2-static sprite faces + the
 sprite-alpha hull collider, P3/P4 done) and whose representation axis this plan re-bases. The
 arrangement half already spun out to
@@ -127,7 +127,7 @@ unconfigured graph is unchanged. Persist via the cartography sidecar, where size
 hulls already ride.
 
 Done when a node can be made heavy / bouncy / slippery, the change is live and persists across
-reload, and it composes with the [physics_scenes_and_tangibility_plan](2026-06-22_physics_scenes_and_tangibility_plan.md)
+reload, and it composes with the [physics_scenes_and_tangibility_plan](../../archive_docs/2026-10-06_completed_plans/2026-06-22_physics_scenes_and_tangibility_plan.md)
 tangibility lever (a tangible, custom-material node interacts physically with a scene).
 
 ### B3 — The generalized shape editor (the swatch as body designer)
