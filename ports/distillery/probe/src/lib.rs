@@ -360,7 +360,7 @@ mod worker {
     use std::cell::Cell;
     use std::ops::ControlFlow;
 
-    use burn::tensor::{Device, DeviceKind};
+    use burn::tensor::Device;
     use eidetic::{
         Hash, ManifestId, ModelLibrary, NoFetcher, PrivacyClass, ProvenanceOrigin,
         ProvenanceRecord, Timestamp, TrustEnvelope,
@@ -691,7 +691,7 @@ mod worker {
         // but browser adapter/device creation is promise-backed. Initializing
         // it synchronously traps in wasm before the first tensor upload.
         let device = Device::wgpu_options().init_async().await
-            .map_err(|error| JsValue::from_str(&error.to_string()))?;
+            .map_err(|error| error.to_string())?;
         let (model_load_ms, first_execution_ms, repeat_execution_ms, execution) =
             match config.workload {
                 WorkloadKind::SentenceEmbedding => {
