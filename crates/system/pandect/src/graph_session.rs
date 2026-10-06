@@ -277,10 +277,13 @@ async fn read<B: Backend, T: DeserializeOwned>(
 /// rather than overlay what the snapshot's columns import: a session stores
 /// its whole facet store, and an overlay would add default-valued facets the
 /// graph never held.
-fn graph_of(snapshot: &GraphSnapshot, facets: NodeFacetStore) -> Graph {
-    let mut graph = Graph::from_snapshot(snapshot);
+fn graph_of(
+    snapshot: &GraphSnapshot,
+    facets: NodeFacetStore,
+) -> Result<Graph, kernel::graph::snapshot::ResourceSnapshotError> {
+    let mut graph = Graph::try_from_snapshot(snapshot)?;
     *graph.facets_mut() = facets;
-    graph
+    Ok(graph)
 }
 
 fn baseline_of(graph: &Graph) -> Baseline {
@@ -414,6 +417,8 @@ impl<B: Backend> GraphSession<B> {
         let baseline = read::<B, Baseline>(&slots, &keys.at(BASELINE))
             .await?
             .map(|baseline| graph_of(&baseline.graph, baseline.facets))
+            .transpose()
+            .map_err(|error| SessionError::Corrupt(format!("{}: {error}", keys.at(BASELINE))))?
             .unwrap_or_default();
         let journal = GraphJournal::from_log(
             Journal::<AttributedDelta>::load_entries(
@@ -436,7 +441,12 @@ impl<B: Backend> GraphSession<B> {
                 let facets: NodeFacetStore = read(&slots, &keys.at(NODE_FACETS_FILE))
                     .await?
                     .unwrap_or_default();
-                (graph_of(&snapshot, facets), checkpoint.cursor)
+                (
+                    graph_of(&snapshot, facets).map_err(|error| {
+                        SessionError::Corrupt(format!("{}: {error}", keys.at(GRAPH)))
+                    })?,
+                    checkpoint.cursor,
+                )
             },
             _ => (baseline.clone(), Seq(0)),
         };
@@ -1271,6 +1281,101 @@ mod tests {
                 reopened.manifest().display_name.as_deref(),
                 Some("readings")
             );
+        });
+    }
+
+    #[test]
+    fn checked_snapshot_session_load_reports_baseline_and_checkpoint_corruption() {
+        use kernel::persistence::{PersistedResourceFacet, PersistedResourceRecord};
+
+        pollster::block_on(async {
+            let store = MemoryBackend::new();
+            let mere = MereSessions::new(store.clone());
+            let id = mere.mint(person(), None).await.unwrap().session_id;
+            let keys = Keys::new(id);
+            let graph = kernel::graph::replay_captured_deltas([add(1)]);
+            let mut valid = graph.to_snapshot();
+            valid.resources.push(PersistedResourceRecord {
+                canonical_iri: "urn:mere:test:checked-session".into(),
+                facets: vec![PersistedResourceFacet {
+                    facet: "foreign.metadata".into(),
+                    value_json: "true".into(),
+                }],
+            });
+            let baseline = |snapshot: GraphSnapshot| Baseline {
+                graph: snapshot,
+                facets: NodeFacetStore::default(),
+            };
+            for column in [BASELINE, GRAPH] {
+                for conflict in [false, true] {
+                    store
+                        .apply(&[
+                            pretty(keys.at(BASELINE), &baseline(valid.clone())).unwrap(),
+                            pretty(keys.at(GRAPH), &valid).unwrap(),
+                            pretty(keys.at(CHECKPOINT), &Checkpoint { cursor: Seq(0) }).unwrap(),
+                        ])
+                        .await
+                        .unwrap();
+                    let opened = GraphSession::open(store.clone(), id).await.unwrap();
+                    assert_eq!(opened.graph().to_snapshot().resources, valid.resources);
+                    assert_eq!(opened.graph().node_count(), 1);
+                    let mut invalid = valid.clone();
+                    if conflict {
+                        let mut record = invalid.resources[0].clone();
+                        record.facets[0].value_json = "false".into();
+                        invalid.resources.push(record);
+                    } else {
+                        invalid.resources[0].facets[0].value_json = "{".into();
+                    }
+                    let op = if column == BASELINE {
+                        pretty(keys.at(column), &baseline(invalid.clone())).unwrap()
+                    } else {
+                        pretty(keys.at(column), &invalid).unwrap()
+                    };
+                    store.apply(&[op.clone()]).await.unwrap();
+                    match GraphSession::open(store.clone(), id).await {
+                        Err(SessionError::Corrupt(error)) => {
+                            assert!(error.contains(&keys.at(column)));
+                            assert!(error.contains(if conflict {
+                                "conflicts"
+                            } else {
+                                "invalid JSON"
+                            }));
+                        },
+                        Err(error) => panic!("unexpected load error: {error}"),
+                        Ok(_) => panic!("invalid resource snapshot was loaded"),
+                    }
+                    let slots = JsonSlots::new(store.clone());
+                    let held = if column == BASELINE {
+                        read::<_, Baseline>(&slots, &keys.at(column))
+                            .await
+                            .unwrap()
+                            .unwrap()
+                            .graph
+                    } else {
+                        read::<_, GraphSnapshot>(&slots, &keys.at(column))
+                            .await
+                            .unwrap()
+                            .unwrap()
+                    };
+                    assert_eq!(held.resources, invalid.resources);
+                }
+            }
+            let mut legacy = serde_json::to_value(&valid).unwrap();
+            for column in ["resources", "resource_edges", "shown_resources"] {
+                legacy.as_object_mut().unwrap().remove(column);
+            }
+            let legacy: GraphSnapshot = serde_json::from_value(legacy).unwrap();
+            store
+                .apply(&[
+                    pretty(keys.at(BASELINE), &baseline(legacy.clone())).unwrap(),
+                    pretty(keys.at(GRAPH), &legacy).unwrap(),
+                ])
+                .await
+                .unwrap();
+            let opened = GraphSession::open(store, id).await.unwrap();
+            assert_eq!(opened.graph().node_count(), 1);
+            assert!(opened.graph().to_snapshot().resources.is_empty());
         });
     }
 

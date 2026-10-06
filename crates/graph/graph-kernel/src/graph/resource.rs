@@ -12,6 +12,9 @@ use chartulary::{Address, Addressed, Identified};
 use petgraph::visit::{EdgeRef, IntoEdgeReferences};
 use uuid::Uuid;
 
+/// A tagging assertion points from the tagged resource to its concept resource.
+pub const TAGGED_WITH_IRI: &str = "https://mere.computer/ns/rel#taggedWith";
+
 /// One resource identified by a canonical IRI.
 ///
 /// Identity and address are immutable together. Content records will be
@@ -26,6 +29,12 @@ impl ResourceNode {
     pub fn new(iri: &str) -> Self {
         let canonical = chartulary::canonical_url(iri);
         Self::from_canonical_iri(&canonical)
+    }
+
+    /// Identify a vocabulary term by its exact IRI, including fragment and case.
+    /// Page resources use [`Self::new`] instead.
+    pub fn for_term(iri: &str) -> Self {
+        Self::from_canonical_iri(iri)
     }
 
     pub(crate) fn from_canonical_iri(canonical: &str) -> Self {
@@ -57,6 +66,23 @@ impl Graph {
     /// The resources currently held in this graph.
     pub fn resource_nodes(&self) -> impl Iterator<Item = &ResourceNode> {
         self.resources.nodes().map(|(_, resource)| resource)
+    }
+
+    /// Resource edges with their resource endpoints. Surface indices never cross this seam.
+    pub fn resource_edges(
+        &self,
+    ) -> impl Iterator<Item = (&ResourceNode, &ResourceNode, &super::EdgePayload)> {
+        self.resources.inner().edge_references().map(|edge| {
+            (
+                self.resources
+                    .node(edge.source())
+                    .expect("resource endpoint exists"),
+                self.resources
+                    .node(edge.target())
+                    .expect("resource endpoint exists"),
+                edge.weight(),
+            )
+        })
     }
 
     /// Resource metadata, separate from surface metadata.
@@ -494,6 +520,74 @@ mod tests {
         assert_eq!(
             ResourceNode::new(first.url()),
             ResourceNode::new(second.url())
+        );
+    }
+
+    #[test]
+    fn vocabulary_term_identity_preserves_fragments_query_and_case() {
+        let cat = ResourceNode::for_term("https://vocab.test/concepts#Cat");
+        for iri in [
+            "https://vocab.test/concepts#Dog",
+            "https://vocab.test/concepts#cat",
+            "https://VOCAB.test/concepts#Cat",
+            "https://vocab.test/concepts?edition=1#Cat",
+        ] {
+            let term = ResourceNode::for_term(iri);
+            assert_eq!(term.canonical_iri(), iri);
+            assert_eq!(term.id(), chartulary::resource_id_from_canonical_iri(iri));
+            assert_ne!(term.id(), cat.id());
+        }
+        assert_eq!(cat, ResourceNode::for_term(cat.canonical_iri()));
+        assert_eq!(
+            ResourceNode::new("https://vocab.test/concepts#Cat"),
+            ResourceNode::new("https://VOCAB.test:443/concepts#Dog")
+        );
+        assert_ne!(cat.id(), ResourceNode::new(cat.canonical_iri()).id());
+    }
+
+    #[test]
+    fn exact_term_records_and_resource_edge_endpoints_survive_checked_load() {
+        use crate::graph::{EdgePayload, SemanticStatement, SemanticSubKind};
+        let mut graph = Graph::new();
+        let terms = [
+            ResourceNode::for_term("https://vocab.test/concepts#Cat"),
+            ResourceNode::for_term("https://vocab.test/concepts#Dog"),
+        ];
+        for term in &terms {
+            assert!(graph.set_resource_record(
+                term.id(),
+                Some(PersistedResourceRecord {
+                    canonical_iri: term.canonical_iri().into(),
+                    facets: vec![],
+                })
+            ));
+        }
+        let mut payload = EdgePayload::new();
+        payload.push_persisted_semantic_statement(SemanticStatement {
+            statement_id: "exact-vocabulary-assertion".into(),
+            predicate: crate::graph::predicate_iri(SemanticSubKind::SameEntityAs).into(),
+            recognized_sub_kind: Some(SemanticSubKind::SameEntityAs),
+            label: None,
+            graph_scope: crate::types::GraphScope::Default,
+            provenance_iri: Some("https://author.test/".into()),
+            asserted_at_ms: Some(19),
+        });
+        let edge =
+            super::super::snapshot::persisted_edge_for_ids(terms[0].id(), terms[1].id(), &payload);
+        assert!(graph.set_resource_edges_between(terms[0].id(), terms[1].id(), &[edge]));
+        let restored = Graph::try_from_snapshot(&graph.to_snapshot()).unwrap();
+        for term in &terms {
+            assert_eq!(restored.resource(term.id()), Some(term));
+        }
+        let edges: Vec<_> = restored.resource_edges().collect();
+        assert_eq!(edges.len(), 1);
+        assert_eq!(edges[0].0, &terms[0]);
+        assert_eq!(edges[0].1, &terms[1]);
+        assert_eq!(edges[0].2, &payload);
+        assert_eq!(
+            restored.edge_count(),
+            0,
+            "resource edges do not create surface edges"
         );
     }
 

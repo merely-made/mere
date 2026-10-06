@@ -309,6 +309,6 @@ impl Graph {
     /// Legacy surface conversion retains its existing compatibility behavior.
     pub fn try_from_snapshot(snapshot: &GraphSnapshot) -> Result<Self, ResourceSnapshotError> {
         validate_resource_columns(snapshot)?;
-        Ok(Self::from_snapshot(snapshot))
+        Ok(Self::from_snapshot_unchecked(snapshot))
     }
 }

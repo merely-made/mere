@@ -330,6 +330,35 @@ fn checked_rejection(snapshot: &GraphSnapshot) -> ResourceSnapshotError {
 }
 
 #[test]
+fn checked_snapshot_compatibility_wrappers_stop_before_partial_materialization() {
+    let (valid, surface, from, to) = resource_snapshot_fixture();
+    assert_resource_snapshot_restores(&valid, surface, from, to);
+    let bytes = rkyv::to_bytes::<rkyv::rancor::Error>(&valid).unwrap();
+    let graph = rkyv::from_bytes::<Graph, rkyv::rancor::Error>(&bytes).unwrap();
+    assert_eq!(graph.to_snapshot().resource_edges, valid.resource_edges);
+
+    let mut invalid = valid.clone();
+    let mut conflicting = invalid.resource_edges[0].clone();
+    conflicting.from_node_id = to.to_string();
+    conflicting.to_node_id = from.to_string();
+    invalid.resource_edges.push(conflicting);
+    let error = checked_rejection(&invalid).to_string();
+    let stopped = std::panic::catch_unwind(|| Graph::from_snapshot(&invalid));
+    let panic = match stopped {
+        Err(panic) => panic,
+        Ok(_) => panic!("compatibility wrapper returned partial graph"),
+    };
+    let message = panic.downcast_ref::<String>().unwrap();
+    assert!(message.contains(&error));
+    let bytes = rkyv::to_bytes::<rkyv::rancor::Error>(&invalid).unwrap();
+    assert!(
+        std::panic::catch_unwind(|| { rkyv::from_bytes::<Graph, rkyv::rancor::Error>(&bytes) })
+            .is_err()
+    );
+    assert!(Graph::try_from_snapshot(&valid).is_ok());
+}
+
+#[test]
 fn checked_resource_load_accepts_identical_duplicates_and_legacy_empty_columns() {
     let (mut snapshot, surface, from, to) = resource_snapshot_fixture();
     assert!(Graph::try_from_snapshot(&snapshot).is_ok());

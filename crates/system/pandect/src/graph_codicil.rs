@@ -86,10 +86,11 @@ impl TypedPayload for LegacyGraphCodicil {
 }
 
 impl GraphCodicil {
-    fn into_graph(self) -> Graph {
-        let mut graph = Graph::from_snapshot(&self.snapshot);
+    fn into_graph(self) -> Result<Graph> {
+        let mut graph = Graph::try_from_snapshot(&self.snapshot)
+            .map_err(|error| Error::new(format!("invalid graph codicil snapshot: {error}")))?;
         graph.overlay_facets(self.facets);
-        graph
+        Ok(graph)
     }
 }
 
@@ -305,12 +306,18 @@ pub async fn open_codicil_as_session_sealed(
     };
     if manifest.schema == graph_snapshot_schema_ref() {
         let payload = load_typed_sealed::<GraphCodicil>(store, &mut fetcher, sealer, id).await?;
-        return Ok(payload.map(GraphCodicil::into_graph));
+        return payload.map(GraphCodicil::into_graph).transpose();
     }
     if manifest.schema == legacy_graph_snapshot_schema_ref() {
         let payload =
             load_typed_sealed::<LegacyGraphCodicil>(store, &mut fetcher, sealer, id).await?;
-        return Ok(payload.map(|codicil| Graph::from_snapshot(&codicil.0)));
+        return payload
+            .map(|codicil| {
+                Graph::try_from_snapshot(&codicil.0).map_err(|error| {
+                    Error::new(format!("invalid legacy graph codicil snapshot: {error}"))
+                })
+            })
+            .transpose();
     }
     Err(Error::new(format!(
         "manifest {} is not a graph codicil",
@@ -326,10 +333,8 @@ pub async fn list_graph_codicils(store: &mut dyn Store) -> Result<Vec<BlobManife
     Ok(manifests)
 }
 
-/// Compose several graph codicils into one by URL-identity merge (Alembic tail B7 /
-/// decision #1). Thaws each id's snapshot, folds them with
-/// [`merge_snapshots`](crate::snapshot_merge::merge_snapshots) (the first id is the
-/// canonical base), and saves the union as a new codicil.
+/// Compose several graph codicils, retaining surface identities and sharing
+/// resource identities. The first codicil supplies the field layer and navigation.
 ///
 /// The new codicil is `Derived` and its `ProvenanceRecord.upstream` records the source
 /// ids — the lineage `upstream` (empty on every freeze until now) finally populated,
@@ -366,7 +371,7 @@ pub async fn compose_graph_codicils_sealed(
         };
         acc = Some(match acc {
             None => codicil,
-            Some(base) => merge_graph_codicils(base, codicil),
+            Some(base) => merge_graph_codicils(base, codicil)?,
         });
     }
     let mut codicil = acc.expect("ids is non-empty, so acc is Some");
@@ -404,20 +409,26 @@ async fn load_graph_codicil_sealed(
     };
     let mut fetcher = NoFetcher;
     if manifest.schema == graph_snapshot_schema_ref() {
-        return load_typed_sealed::<GraphCodicil>(store, &mut fetcher, sealer, id).await;
+        let payload = load_typed_sealed::<GraphCodicil>(store, &mut fetcher, sealer, id).await?;
+        if let Some(codicil) = &payload {
+            Graph::try_from_snapshot(&codicil.snapshot)
+                .map_err(|error| Error::new(format!("invalid graph codicil snapshot: {error}")))?;
+        }
+        return Ok(payload);
     }
     if manifest.schema == legacy_graph_snapshot_schema_ref() {
-        return Ok(
-            load_typed_sealed::<LegacyGraphCodicil>(store, &mut fetcher, sealer, id)
-                .await?
-                .map(|legacy| {
-                    let graph = Graph::from_snapshot(&legacy.0);
-                    GraphCodicil {
-                        snapshot: graph.to_snapshot(),
-                        facets: graph.facets().clone(),
-                    }
-                }),
-        );
+        return load_typed_sealed::<LegacyGraphCodicil>(store, &mut fetcher, sealer, id)
+            .await?
+            .map(|legacy| {
+                let graph = Graph::try_from_snapshot(&legacy.0).map_err(|error| {
+                    Error::new(format!("invalid legacy graph codicil snapshot: {error}"))
+                })?;
+                Ok(GraphCodicil {
+                    snapshot: graph.to_snapshot(),
+                    facets: graph.facets().clone(),
+                })
+            })
+            .transpose();
     }
     Err(Error::new(format!(
         "manifest {} is not a graph codicil",
@@ -425,9 +436,9 @@ async fn load_graph_codicil_sealed(
     )))
 }
 
-fn merge_graph_codicils(a: GraphCodicil, b: GraphCodicil) -> GraphCodicil {
+fn merge_graph_codicils(a: GraphCodicil, b: GraphCodicil) -> Result<GraphCodicil> {
     let (snapshot, _, remap) =
-        crate::snapshot_merge::merge_snapshots_with_remap(&a.snapshot, &b.snapshot);
+        crate::snapshot_merge::merge_snapshots_with_remap(&a.snapshot, &b.snapshot)?;
     let mut facets = a.facets;
     for (node, node_facets) in b.facets.iter() {
         let canonical = remap
@@ -447,7 +458,7 @@ fn merge_graph_codicils(a: GraphCodicil, b: GraphCodicil) -> GraphCodicil {
             }
         }
     }
-    GraphCodicil { snapshot, facets }
+    Ok(GraphCodicil { snapshot, facets })
 }
 
 #[cfg(test)]
@@ -752,11 +763,13 @@ mod tests {
             ga.add_node("https://x.example".to_string(), Point2D::new(0.0, 0.0));
             ga.add_node("https://y.example".to_string(), Point2D::new(1.0, 0.0));
             set_pinned(&mut ga, "https://y.example", false);
+            let ay = ga.get_node_by_url("https://y.example").unwrap().1.id;
             let mut gb = Graph::new();
             gb.add_node("https://y.example".to_string(), Point2D::new(0.0, 0.0));
             gb.add_node("https://z.example".to_string(), Point2D::new(1.0, 0.0));
             set_pinned(&mut gb, "https://y.example", true);
             set_pinned(&mut gb, "https://z.example", true);
+            let by = gb.get_node_by_url("https://y.example").unwrap().1.id;
 
             let id_a =
                 save_graph_codicil(&mut store, &ga, RedactionPolicy::default(), Timestamp(1))
@@ -777,24 +790,30 @@ mod tests {
             .expect("compose ok")
             .expect("a non-empty id list composes a codicil");
 
-            // The thawed union carries x, y, z — the shared y is not doubled.
+            // Content may share a URL while each browsing surface stays distinct.
             let graph = open_codicil_as_session(&mut store, composed)
                 .await
                 .expect("load ok")
                 .expect("the composed codicil is present");
             assert_eq!(
                 graph.nodes().count(),
-                3,
-                "x, y, z union; shared y not doubled"
+                4,
+                "x, two independent y surfaces, and z"
             );
             assert!(graph.get_node_by_url("https://x.example").is_some());
             assert!(graph.get_node_by_url("https://z.example").is_some());
-            let (y, _) = graph.get_node_by_url("https://y.example").unwrap();
+            let y = graph.get_node_key_by_id(ay).unwrap();
+            let other_y = graph.get_node_key_by_id(by).unwrap();
             let (z, _) = graph.get_node_by_url("https://z.example").unwrap();
             assert_eq!(
                 graph.node_is_pinned(y),
                 Some(false),
-                "the canonical source wins a same-node facet conflict"
+                "A's surface keeps its own context"
+            );
+            assert_eq!(
+                graph.node_is_pinned(other_y),
+                Some(true),
+                "B's surface keeps its own context"
             );
             assert_eq!(
                 graph.node_is_pinned(z),
@@ -832,6 +851,71 @@ mod tests {
                     .expect("ok")
                     .is_none(),
                 "no sources -> nothing composed",
+            );
+        });
+    }
+
+    #[test]
+    fn invalid_resource_codicil_open_and_compose_fail_with_valid_control() {
+        pollster::block_on(async {
+            let mut store = InMemoryStore::default();
+            let graph = sample_graph();
+            let valid =
+                save_graph_codicil(&mut store, &graph, RedactionPolicy::default(), Timestamp(1))
+                    .await
+                    .unwrap();
+            assert!(
+                open_codicil_as_session(&mut store, valid)
+                    .await
+                    .unwrap()
+                    .is_some()
+            );
+            let mut snapshot = graph.to_snapshot();
+            snapshot
+                .resources
+                .push(kernel::persistence::PersistedResourceRecord {
+                    canonical_iri: "https://invalid.test/resource".into(),
+                    facets: vec![kernel::persistence::PersistedResourceFacet {
+                        facet: "test.data".into(),
+                        value_json: "invalid JSON".into(),
+                    }],
+                });
+            let invalid = save_graph_snapshot_codicil(
+                &mut store,
+                snapshot,
+                graph.facets().clone(),
+                RedactionPolicy::default(),
+                Timestamp(2),
+            )
+            .await
+            .unwrap();
+            let before = list_graph_codicils(&mut store).await.unwrap().len();
+            assert!(open_codicil_as_session(&mut store, invalid).await.is_err());
+            assert!(
+                compose_graph_codicils(
+                    &mut store,
+                    &[valid, invalid],
+                    RedactionPolicy::default(),
+                    Timestamp(3)
+                )
+                .await
+                .is_err()
+            );
+            assert_eq!(
+                list_graph_codicils(&mut store).await.unwrap().len(),
+                before,
+                "failed composition stores no partial result"
+            );
+            assert!(
+                compose_graph_codicils(
+                    &mut store,
+                    &[valid, valid],
+                    RedactionPolicy::default(),
+                    Timestamp(4)
+                )
+                .await
+                .unwrap()
+                .is_some()
             );
         });
     }

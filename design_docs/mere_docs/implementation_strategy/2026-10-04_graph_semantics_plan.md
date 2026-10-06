@@ -3,7 +3,8 @@
 **Date:** 2026-10-04
 **Status (2026-10-05):** in progress. P1 implemented and gated on
 `graph-semantics`, with the ruling-9 exact-journal and legacy-checkpoint
-attribution repair complete after the original `459cad84` receipt.
+attribution repair complete after the original `459cad84` receipt. Those
+receipts covered IRI-safe handles; C19 now exposes an opaque-id reifier gap.
 Reconciled main `62219dd1` rulings 9–19 before P2 source edits; the graph
 plan is unchanged at main `d2d6ac3d`. A1/B1/C1 selected by "All 1";
 `ResourceNode`/`SurfaceNode` are settled by ruling 19, and B1/C1 remain
@@ -15,8 +16,11 @@ names, the common resource UUID helper, `ResourceNode` identity and affirmative
 classification readers are implemented. Resource graph population, conflict
 migration remain incomplete. Mark authorized Turnstone coordination; typed
 resource storage, captures and undo pass the full kernel gate; the prepared
-Turnstone consumer patch passes its bounded source gate. C13–C17 await rulings on predicate placement, saved-graph
-composition, selection export, vocabulary IRI identity and snapshot rejection.
+Turnstone consumer patch passes its bounded source gate. Mark accepted C13–C17 recommendations with "go ahead?" (rulings 26–30).
+The independent composition/export, exact vocabulary identity, checked load
+and borrowed query-adapter checkpoint passes its gates. Production predicate
+routing is held at C18; C19 holds the newly exposed RDF handle encoding choice.
+Resource population and conflict migration remain incomplete.
 Replay-first migration and per-predicate placement govern P2. The committed
 identity/lifecycle slice and recreation repair pass their gates; P2 is incomplete.
 P3–P5 have not begun. Main integration awaits Mark's review.
@@ -1040,6 +1044,117 @@ spellings resolving to existing surfaces remain active. Both controls run
 alongside the active-collision rejection in the same test.
 No new lexical restriction is imposed on caller-selected statement handles.
 
+### P2 edge ownership checkpoint C18 (2026-10-05)
+
+The next production routing edit exposes a new API choice. `EdgeKey` is a
+bare surface `EdgeIndex` (`crates/graph/graph-kernel/src/graph/identity.rs`
+38); both graph stores allocate independently, and Chartulary `connect`
+delegates to `add_edge` (`crates/eidetic/chartulary/src/graph.rs` 112).
+`get_edge` and `find_edge_key` read only the surface store
+(`crates/graph/graph-kernel/src/graph/edge_ops.rs` 528, 533).
+Five mixed assertion APIs return this key, including the statement writers
+(316, 346) and apply helpers (1875, 1897, 1909);
+`GraphDeltaResult::EdgeAdded` also carries it
+(`crates/graph/graph-kernel/src/graph/apply.rs` 481).
+
+An executed temporary kernel probe created surface `UserGrouped` and
+resource `Cites` edges, both at raw index 0. In the same run both proper
+store readers passed. Passing the resource index to the existing surface
+reader then failed its Cites expectation: exit 1, one expected failure.
+The probe was removed and the original source restored byte-for-byte
+(SHA256 `9BCCBBF6588608A502CBFE306C8C5CDDB9091B71D18E24F792FA427907A7C536`).
+This is evidence for the checkpoint, not a failing committed gate.
+
+The Mere audit found seven production `get_edge` calls: six semantic/label
+readers require resource-aware reads; one traversal reader stays surface.
+The six are `crates/graph/graph-kernel/src/graph/display.rs` 81,
+`crates/graph/linked-data/src/lib.rs` 362/442,
+`crates/canvas/pictograph/src/canvas/selection.rs` 335,
+`crates/mere/src/roster.rs` 664 and
+`ports/graphshell/src/personal_sync/assertions.rs` 158.
+The traversal reader is `crates/graph/graph-kernel/src/graph/apply.rs` 710.
+These counts concern production Rust, excluding tests.
+Six direct/scoped external statement writers discard their returned key.
+The authorized Turnstone peer inspected all 142 tracked Rust source files at
+`c3b14cb`: zero EdgeKey, EdgeAdded, GraphDeltaResult, get_edge or find_edge_key
+callers; four generic relation writes and two Canvas writes discard results.
+Its pins, production sources and 152 frozen Scry inputs remain unchanged.
+This read-only audit does not requalify the earlier supplier receipt.
+
+1. **Typed outer handle (recommended).** Keep surface `EdgeKey` and its
+   surface readers; add an opaque `ResourceEdgeKey` and
+   `RelationKey::{Surface, Resource}` for mixed assertion APIs and EdgeAdded.
+   A separate handle reader and resource/projected relation iterators read
+   the single owning store. No implicit resource-to-surface conversion.
+2. **Separate routed writers.** Keep old writers surface-only and add routed
+   APIs returning the typed outer handle. Migrate all production content
+   callers; old writers must reject resource predicates, adding compatibility
+   names and a risk that unmigrated callers cease recording content.
+3. **Tag EdgeKey itself.** Replace the alias with a discriminated key and
+   make get_edge dispatch by stratum. This commits to broader petgraph
+   conversion changes, including surface traversal/query internals.
+
+C18 is open. No handle API choice or production routing has been implemented.
+The independently authorized C14–C17 changes can be gated before this stop.
+
+### Opaque assertion handles and RDF checkpoint C19 (2026-10-05)
+
+Kernel handles remain arbitrary strings, including whitespace, under A1/B1
+and the checked snapshot controls. The existing RDF emitter concatenates
+`urn:mere:statement:` with the raw handle, then silently returns if that is
+not a valid NamedNode (`crates/graph/linked-data/src/lib.rs` 187, 214).
+The base triple survives but its reifier, attribution and time disappear.
+Ingest knows only suffix stripping under that prefix
+(`crates/graph/linked-data/src/ingest.rs` 337, 559–562).
+Without a reifier it receives no carried handle, source or time; the apply
+path then mints a fresh assertion instead of preserving the caller's handle
+(`crates/graph/linked-data/src/ingest/apply.rs` 129–139).
+
+A temporary probe used two checked resource fixtures in one run. For
+`valid-handle`, base/reifier/author/time counts were 1/1/1/1; ingest retained
+that id, `https://probe.test/author` and time 42. For a handle containing a
+newline, counts were 1/0/0/0 and ingest's id/author/time were all absent.
+The final expected-reifier assertion failed (exit 1, one expected failure,
+44 filtered). Both base triples and the valid metadata were positive controls.
+Source was restored byte-for-byte, backup removed: SHA256
+`461cb6ce3f374a11f49277e4c7e496d13920c38a8c165b27990ce4f66b5fe42d`.
+This pre-existing gap reopens general round-trip qualification; the existing
+44-test gate covers its present fixtures, not arbitrary opaque ids.
+
+1. **Preserve valid URNs, encode unsafe handles (recommended).** Retain every
+   valid legacy reifier IRI. Unsafe handles use reversible UTF-8 byte encoding
+   under a distinct versioned namespace outside `urn:mere:statement:`;
+   ingest recognizes both. A disjoint namespace prevents collisions with
+   legacy handles resembling encoded suffixes. Existing valid exports remain
+   stable, and arbitrary caller-selected handles round-trip exactly.
+2. **Encode every handle.** Emit all handles under the new reversible
+   namespace and ingest both forms. This simplifies the new output grammar
+   but changes every existing reifier IRI and normalized export.
+3. **Fallible export.** Explicitly reject unsafe reifier handles at checked
+   RDF export/query boundaries while retaining unrestricted kernel handles.
+   This preserves legacy output but prevents those assertions from RDF
+   exchange until the caller resolves the error; wrapper error policy is
+   also required. Silent omission is not an option.
+
+C19 is open. No encoding, kernel lexical restriction or export error policy
+has been chosen. Production routing and general RDF round-trip qualification
+stop at C18/C19; independent checked loads and identity/export seams stay
+reviewable on the isolated branch.
+
+### Resource-bearing import boundary (2026-10-05)
+
+Review of the new resource-preserving export found that the old kernel
+`import_edits` emits only surface/facet/pair captures
+(`crates/graph/graph-kernel/src/graph/merge.rs` 40). Its one production caller,
+Graphshell product import, would otherwise report success while omitting all
+three resource columns (`ports/graphshell/src/product.rs` 720).
+Resource-aware import remains part of the held P2 integration. Until then the
+kernel compatibility importer stops on incoming resources, and the fallible
+product path refuses before live edits or journal writes. The same codicil can
+be opened as a new session with its exact resources, assertions and bindings;
+resource-empty legacy imports remain supported. Tests guard both refusals with
+those positive controls. This guard is not a resource merge implementation.
+
 ## 3. Rulings
 
 Mark's answers, from multiple-choice rounds; each is the option label quoted
@@ -1306,6 +1421,35 @@ coordination before the known Turnstone API break lands. The lane's Mere-only
 scope and stop-on-consumer-break rule still apply; this records the protocol
 choice, not a completed consumer update.
 
+**Ruling 26 (C13).** Mark: **"go ahead?"** in response to the five
+recommended choices C13–C17. Selects option 1: unfamiliar predicates default
+to resources, with explicit per-predicate surface overrides declared by
+nature in the registry and preserved through replay. Known placement stays
+as ruled in the table below.
+
+**Ruling 27 (C14).** The same answer selects option 1: composition preserves
+distinct surface identities and merges resources by canonical identity. Two
+snapshots with two surfaces each and one common URL retain four surfaces
+and three resources. Conflicting records retain their variants and origins
+under ruling 23; no URL-based surface collapse is performed.
+
+**Ruling 28 (C15).** The same answer selects option 1: selection export
+retains selected surfaces' shown resources and concept targets needed by
+their tagging statements, plus exact statements among retained endpoints.
+All three resource columns are filtered together. This product export does
+not change ruling 8's frozen-query selection.
+
+**Ruling 29 (C16).** The same answer selects option 1: page identities use
+`canonical_url`; vocabulary term IRIs remain exact, including fragments,
+query and case. Both hash the prepared identity IRI under the shared UUID
+namespace. Page canonicalization must not collapse distinct concepts.
+
+**Ruling 30 (C17).** The same answer selects option 1: add the checked
+`try_from_snapshot` result and use it at fallible load boundaries. Retain
+`from_snapshot` as a compatibility wrapper that stops with the checked
+error, and preserve rkyv's existing generic error bounds. Invalid resource
+columns do not silently lose claims; legacy surface compatibility remains.
+
 ## 4. Phases
 
 ### Placement by stratum (rulings 10, 14, 15)
@@ -1320,8 +1464,9 @@ choice, not a completed consumer update.
 | Arrangement | none | `FrameMember`, `TileGroup`, `SplitPair` |
 | Tags | tag resources, and tagging statements to them | none |
 
-*Reading, not ruled*: open-predicate statements (no recognized sub-kind, from
-JSON-LD ingest and readers) are content and sit in the resource stratum.
+Open-predicate statements (no recognized sub-kind, from JSON-LD ingest and
+readers) default to the resource stratum, with explicit per-predicate surface
+overrides declared by nature and preserved through replay (ruling 26).
 
 In order; each phase lands green before the next starts. Code samples: none.
 
@@ -1443,9 +1588,17 @@ comes back to Mark as a fork, with evidence, before the code commits to one.
   Coordination authorized 2026-10-05. Typed source checkpoint `cff35712`
   passes the bounded Turnstone consumer gate at `c3b14cb`; production patch,
   dependency integration and main review remain held.
-- **C13–C17 (P2).** Open: the dated Findings above give the evidence and
-  options for predicate placement, composition, export, term identity and
-  checked snapshot rejection.
+- **C13–C17 (P2).** Ruled: recommendations accepted as rulings 26–30.
+  Implementation and gates are in progress; the dated Findings retain the
+  evidence and alternatives.
+
+- **C18 (P2). Edge handle ownership.** Open: independently allocated
+  resource/surface indices collide. The dated Findings above give the executed
+  probe, caller counts and three API options. Production routing stops here.
+
+- **C19 (P1/P2). Opaque assertion reifier ids.** Open: valid kernel handles
+  can lose RDF reifiers and carried metadata. The dated Findings give the
+  executed positive/negative probe and three encoding/error choices.
 
 ## 6. Progress
 
@@ -1800,3 +1953,70 @@ comes back to Mark as a fork, with evidence, before the code commits to one.
   Production behavior/pins and full App integration remain held for the
   compatible reviewed integration set; C13–C17 still await Mark's rulings.
   Main integration is not authorized by the bounded supplier review.
+
+- **2026-10-05. P2 continuation, C13–C17 accepted.** Mark accepted all five
+  recommendations with "go ahead?". Recorded rulings 26–30 and delegated
+  checked load boundaries, composition/export and query adapter work in the
+  existing isolated lane. No main integration or dependency change authorized
+  by this continuation. Production resource routing is still incomplete.
+
+- **2026-10-05. P2 independent checkpoint gates in progress.** Full kernel
+  including the native `store` feature: 361 passed, one doc example ignored.
+  Linked-data with `query`: 44 passed; the nine-query battery matches both
+  materialized spareval and Store oracles, and the existing 3x Store-copy
+  performance tripwire passes. Pandect: 313 passed. All Cargo commands are
+  offline, locked, `-j 1`, sharing `C:/t/cargo-targets/mere`. Touched Rust
+  format and diff checks pass. Doc audit exits 0, self-test exits 0, all
+  audit buckets equal the HEAD baseline in the same worktree (333 active,
+  322 indexed). Graphshell, workspace and wasm gates still pending here.
+  C18 holds routing; no phase completion or main integration is claimed.
+  Review also found an opaque-id reifier gap, being checked before a C19 fork.
+
+- **2026-10-05. P2 import omission caught before checkpoint.** Added the
+  resource-bearing import refusal after source review found the legacy merger
+  ignores resource columns. New-session opening preserves them, and legacy
+  imports stay supported; complete merge integration remains held. The first
+  Graphshell gate caught a fixture-only private API/disabled fixtures feature
+  mistake, corrected to the existing public add-node helper without manifest
+  edits. Kernel and Graphshell gates are being rerun for these final changes.
+  Main is now `2c4eaa1b`; read-only check confirms its graph plan is still the
+  `62219dd1` revision with rulings 1–19, without new C18/C19 answers. No main
+  merge was performed. The branch's recorded rulings 20–30 remain governing.
+
+- **2026-10-05. P2 independent checkpoint qualified, stopped at C18/C19.**
+  Recorded accepted rulings 26–30. Composition retains distinct surface ids
+  and unions equal/disjoint resource metadata; conflicting facets and reused
+  conflicting handles fail before loss. Selection export retains shown
+  resources and needed tag concepts with exact statements, and Copy retains
+  resource/assertion ids while remapping shown surface ids. Exact vocabulary
+  term identity preserves fragment/query/case. Checked materialization is used
+  at native/session/codicil/host/transfer fallible loads, while the compatible
+  rkyv wrapper retains its generic bounds. Explicit resource semantic RDF
+  projection and the borrowed QueryableDataset remove the per-query whole
+  dataset rebuild. Each pattern still scans the projection; only bounded
+  node/pair buffers and matched-quad set deduplication are allocated.
+  Valid resource-bearing merge import is explicitly refused pending resource
+  integration; opening the same codicil as a new session preserves all three
+  columns. The kernel compatibility import stops rather than discarding them.
+  Full final gates: kernel with `store` 362 passed, one doc example ignored;
+  linked-data/query 44 passed; Pandect 313 passed; Graphshell/personal-sync
+  331 library tests plus five integration tests passed, four ignored.
+  Workspace locked check and wasm32 kernel check both exit 0. Touched Rust
+  format/diff checks pass. Offline/locked `-j 1` throughout; no dependency or
+  lock changes, new packages, downloads or sibling edits. Existing Cargo
+  warnings remain. Gate logs are the bounded named `graph-semantics-*.log`
+  files in the shared stable Mere target, retained by this lane as receipts.
+  The two deliberately failing probes established index-0 wrong-store lookup
+  and opaque-handle metadata loss with same-run positive controls; both source
+  backups were restored exactly and removed. General RDF round-trip safety
+  for arbitrary handles remains open at C19 despite the present fixture gate.
+  No production routing, migration, resource classification variant merger,
+  tag writer or saved query/residency phases have landed. Separate Eidetic and
+  Pictograph suites, ignored tests, headed/browser/device proofs and full
+  sibling builds were not run this turn. Turnstone's read-only caller audit
+  informs C18; its prior consumer gate remains qualified only at `cff35712`.
+  Final doc audit and self-test exit 0; all audit buckets are unchanged
+  from the HEAD baseline in the same worktree. Retain the existing isolated
+  worktree for P2 continuation and Mark's review; no new target/home/worktree.
+  Nothing is pushed or integrated into main. C18/C19 options remain open;
+  this checkpoint does not select an answer or complete P2.
