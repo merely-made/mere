@@ -4798,6 +4798,22 @@ origin and moves its three call sites to `ProjectionCompiler`. Knot's card
 size comes back to Mark as a fork. djinn's repin waits, then moves to that
 Knot head with both 586 rows.
 
+**Knot's card size under P1 (2026-10-05).** The question as put: Knot is
+adapted to P1 (12 calls moved to a `ProjectionCompiler`, all its headless
+recipe tests pass) against a placeholder card. S20 has the host supply "the
+representation's measured size". Knot has never had one of its own: it draws
+each card at the footprint the compiler returns, and retention validation's
+accept or reject does not depend on the size. P1 changes Knot's spacing
+(card plus gap, no longer a fixed 184 by 84 cell) whichever size is chosen. The
+options: one 164 by 68 constant in knot-composition behind a single
+`recipe_compiler()`; measured from Knot's font, the widest occurrence label
+plus button padding per recipe; 184 by 84. Mark: **"Measured from Knot's
+font"**. *Follows:* the desktop measures each recipe's widest occurrence
+label in its own font, plus button padding, and gives the compiler that
+size, so the layout re-solves with font, zoom and labels. *Reading, not
+ruled:* retention validation has no fonts, so it still needs a nominal size.
+That number, the measuring path and the padding come back as forks.
+
 *Annotation, 2026-10-05:* the next move of djinn's Knot pin is not this
 plan's. Under mer3ly Ruling 112, the Projection grammar session owns the
 genet `image-decode` chain (mer3ly Ruling 111). It runs mere's genet repin
