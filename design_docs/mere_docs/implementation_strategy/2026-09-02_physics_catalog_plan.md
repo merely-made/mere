@@ -2878,3 +2878,45 @@ binning are the useful patterns.
   page stops before its scenario: Chrome on Linux exposes no WebGPU adapter
   unless launched with `--enable-unsafe-webgpu`, and netrender cannot boot
   without one. Returned as a fork; nothing installed, no setting changed.
+- 2026-10-06 (seiche's speed, the estimator's three forks carried out, branch
+  `seiche-speed-estimator`). "WebGPU flag, throwaway profile": the ThinkPad's
+  Flatpak Chrome, only its throwaway profile
+  (`~/.var/app/com.google.Chrome/seiche-speed-profile`), launched with
+  `--enable-unsafe-webgpu --enable-features=Vulkan`, nothing set globally or
+  installed, its processes stopped after each run. Its 60.003 Hz panel read
+  16.666 to 16.667 ms on both pages in five runs, calm and under six and eight
+  busy processes. Replaying its 445 prefix windows found one the rule read at
+  half the period: the first candidate refined to 16.674 ms fitting 0.808, and
+  its half, refined exactly, fitted 0.962, clearing the step-down. The period
+  found is now polished to the best-fitting refined candidate within 1% before
+  lifting or stepping down (`021259ef`); since, every prefix window of both
+  machines (the ThinkPad's 445 within 1% of 16.666 ms, this machine's 700
+  within 1% of 6.07 ms) reads within 1% or falls back, none above or below,
+  the ThinkPad's windows are fixtures, and the test fails with polishing off.
+  "Relative to the page's 1x" (`f1c00c53`): the fast receipt runs the 300-node
+  page at 1x, marks the speed it reaches (`mark-pace`), switches to Max and
+  asserts Max's effective speed is at least the mark; the every-window bound
+  stays; the control, `p6_tree_speed_fast_slow_max`, plants a 500 ms busy-wait
+  in every frame at Max, outside physics, and must miss. Calm on bundle
+  `53d621a5`: Max 0.814x against the page's 1x at 0.246x (ratio 3.31), the
+  control at 0.799. "Look for a tiebreaker": a probe page that busy-waits each
+  frame recorded, side by side, its main-thread rAF intervals, the same with
+  one light frame in 30, a dedicated worker's own rAF loop over an
+  OffscreenCanvas doing no work, `requestVideoFrameCallback` on a video of its
+  captured canvas, and its callbacks' phase against `performance.now()`. On
+  this machine (165 Hz) at an 11 ms busy-wait the main thread's intervals read
+  twice the period in 36 of 47 windows, the even-multiple case; the worker's
+  rAF ran at one refresh at every load tried (991 intervals in 6 s, all 6.06
+  ms, at 9.5, 11, 17 and 21 ms), as it did on the ThinkPad (361 in 6 s, all
+  16.67 ms, at 24, 30 and 45 ms). Light frames helped only in part (49 of 51
+  windows at 11 ms), `requestVideoFrameCallback` follows the page's own
+  frames, the phase and the media hints carry no period. Recommended: read the
+  period from a worker's rAF loop. Gates: seiche 129/129 (123 without actor,
+  129 + 3 with gpu), pictograph 310, graphshell `web` 247, mere and graphshell
+  checked clean. The dial rows on `53d621a5`: slow, fast, its two controls
+  (the slowed Max missing the 1x comparison, the planted stall failing the
+  bound at 9,370 us), both Speed select receipts and the 50x control green;
+  the machine was not calm for the last four (4 to 9 Normal-priority builds),
+  passes under load counting, the 50x control's two misses under load (24.7x
+  and 20.9x against 25, frames slow enough that 150 ticks filled the 3 ms
+  budget) not counted and its third try green.
