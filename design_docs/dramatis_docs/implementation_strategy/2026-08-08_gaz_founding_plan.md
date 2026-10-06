@@ -194,6 +194,21 @@ is monotonic, so a replayed or late event cannot rewind a record.
 - **M0.5 — the anchor.** Executes the §2 ruling. Nothing stores a book yet
   and nothing outside gaz consumes it (checked 2026-09-23), so there is no
   migration and no legacy decoder (DOC_POLICY §3). Done when:
+
+  **Corrected 2026-10-06 (S14 pass):** the sentence above was false on its
+  date. Retinue's Signalman desktop has imported gaz and loaded and saved a
+  `ContactBook` through Muniment slots since retinue `864645e` (2026-08-19),
+  at Mere `d82afa17` (Signalman's `messages.rs` in retinue, lines 5, 50 and
+  128). M0.5 then changed the stored shape (a list of records instead of a map,
+  the hex map keys gone), so Signalman's stored books are in the pre-M0.5
+  shape. The insigne proofs plan's phase D records the same consumer still
+  importing the pre-M0.5 `ContactKey`.
+
+  **Open, raised by the S14 pass (2026-10-06):** how are Signalman's stored
+  books, in the pre-M0.5 shape, handled when it repins? Options: a one-time
+  migration in retinue; declare them disposable; a legacy decoder in gaz
+  (DOC_POLICY §3 permits shims for real user data).
+
   - [x] `TypedKey` is an enum over Ed25519 (32 bytes), secp256k1 (33,
         compressed), P-256 (33, compressed) and a whole Reticulum identity
         (64). A Nostr x-only key converts
@@ -474,6 +489,11 @@ signalman/retinue bullet), which met Mark's condition for accepting it.
   could disagree on a hand-edited or corrupted file; now there is one copy,
   and a load refuses two records on one anchor. M0's JSON shape (hex map keys)
   is gone with it, which costs nothing: no book was ever stored (DOC_POLICY §3).
+
+  **Corrected 2026-10-06 (S14 pass):** books were stored: Retinue's Signalman
+  desktop had saved `ContactBook`s through Muniment since 2026-08-19, in M0's
+  map shape (see the correction under M0.5 in §4).
+
 - **Every fixture has a real source**, not invented bytes: the did:key spec's
   worked example, `bsky.app`'s live secp256k1 key, a live P-256 key from the
   PLC export, prns's RNS 1.4.2 identity, and the IETF base58 draft's examples.
@@ -774,3 +794,7 @@ lockfile and publication. All new Rust files remain below 600 lines.
 
 Reuse the primary `C:\t\cargo-targets\mere`; raw logs live in `gaz-m2-receipts`. This
 slice creates no isolated worktree, Cargo target or Cargo home.
+
+### 2026-10-06: S14 pass
+
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at mere 535bca11, from the D2 record in support/doc-audit/d2/batch_39_s14_phase_b1.md: M0.5's and §5's "no book was ever stored" corrected with Signalman's Muniment-stored books, and their pre-M0.5 shape raised as an open question at M0.5.

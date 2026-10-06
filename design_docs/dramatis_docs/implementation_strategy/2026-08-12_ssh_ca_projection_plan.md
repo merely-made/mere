@@ -1,10 +1,14 @@
 # SSH CA Projection Plan
 
 **Date**: 2026-08-12
-**Status**: T1–T5 landed 2026-08-12, the same day this was drafted; see
-Progress for what the building of it corrected. Drafted the evening the
-wgpu-weld parity sweep ran its Intel-iMac leg over SSH and paid the
-bilateral toll three ways in one afternoon.
+**Status (2026-10-06):** landed 2026-08-12, the day this was drafted: T1 and
+T3. Partial: T2 (the user-CA half only; host certificates were never built,
+see the correction below); T4 (the certificate-serving agent validated on one
+OS of three); T5 (revocation folds to a KRL file, but the deploy to enrolled
+hosts that its validation needs stops at printed instructions). Moved: host
+certificates, to the
+[device pairing by key plan](../../mere_docs/implementation_strategy/2026-10-02_device_pairing_by_key_plan.md)'s
+phase D4.
 **Corrected 2026-10-02**: host certificates were never built. Nothing
 outside tests calls `SshCertAuthority::mint_host_cert` (`ssh_ca.rs:276`),
 and `enroll-host` writes only an `authorized_keys` `cert-authority` line and
@@ -202,3 +206,5 @@ Not done, and honest about it:
 - **The KRL deploy path stops at the file.** `krl --out` compiles a real
   KRL; putting it in a host's `sshd_config` is root-side and deliberately
   left as printed instructions.
+
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at mere 535bca11, from the D2 record in support/doc-audit/d2/batch_39_s14_phase_b1.md: the status no longer claims T1–T5 landed; it records T1 and T3 as landed, T2, T4 and T5 as partial, and host certificates as moved to device pairing D4, matching the 2026-10-02 correction.
