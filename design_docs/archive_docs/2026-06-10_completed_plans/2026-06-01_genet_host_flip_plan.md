@@ -274,7 +274,7 @@ Xilem + Masonry host is removed.
     has zero consumers and no WebView path exists in meerkat; the netrender
     destination (`compose_external_texture`) is real and exercised by
     meerkat's own actor textures. Live home:
-    [integration plan](../../mere_docs/implementation_strategy/2026-06-02_modular_integration_plan.md) S6.
+    [integration plan](../2026-10-06_superseded_plans/2026-06-02_modular_integration_plan.md) S6.
     One correction to Phase 4's text: `content_generation` is not "the
     frame-arrival hint" — compositor-pass lowering defaults it to `None` and
     frame arrival is implicit at composite time (`paint_list_api`

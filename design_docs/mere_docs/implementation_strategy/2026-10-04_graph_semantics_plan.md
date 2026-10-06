@@ -13,7 +13,7 @@ verbatim; anything beyond his words is marked *Reading, not ruled*.
 
 Parents: the [statements-over-schema stance](../technical_architecture/2026-05-22_statements_over_schema_stance.md),
 the [statement kernel brief](../technical_architecture/2026-06-19_statement_kernel_brief.md),
-the [petgraph-RDF plan](2026-06-18_petgraph_rdf_plan.md), the
+the [petgraph-RDF plan](../../archive_docs/2026-10-06_completed_plans/2026-06-18_petgraph_rdf_plan.md), the
 [node navigation lineage plan](2026-06-05_node_navigation_lineage_wiring_plan.md),
 the [ambiance design](../design/2026-09-23_ambiance_design.md) and the
 [family composition thesis](../../2026-08-12_family_composition_thesis_brief.md)
@@ -422,6 +422,12 @@ In order; each phase lands green before the next starts. Code samples: none.
   statement is retracted at the source (and a live `Linked` subgraph over the
   same spec does change, the control); a frozen selection opened where a member
   resource is absent reports it through P3's coverage.
+
+  **Received 2026-10-06 (S14 archive pass):** backlog #3, `CONSTRUCT` /
+  `DESCRIBE` output into a subgraph (ruling 3 had already placed it here),
+  and the error `query.rs` returns today for `QueryResults::Graph`, from the
+  archived [graph query layer plan](../../archive_docs/2026-10-06_completed_plans/2026-06-18_graph_query_layer_plan.md)
+  (ruling S53 of the [stack seams plan](2026-10-04_stack_seams_plan.md)).
 - **P5. Partial residency (rulings 4, 7).** Muniment stores both graphs
   addressably, keyed by id (resource id for resources), so one node and its
   statements load without the whole snapshot. The resident set is k hops (a
@@ -434,6 +440,14 @@ In order; each phase lands green before the next starts. Code samples: none.
   restores its relations exactly (snapshot-equal to the full-residency load);
   with full residency set, the same tests report no residency coverage; the
   IndexedDB backend passes the same residency tests as redb.
+
+**Received 2026-10-06 (S14 archive pass):** the JSON-LD shaper gaps, the
+`skip_serializing_if` follow-up, the `ExampleOf` and `Summarizes`
+vocabulary rows, the raw-IRI `Semantic` edge path, dropping
+`dep:oxigraph`, and the open question whether its Phase 3 is done on the
+shipped spareval path (with ruling 6's adapter a new P2 requirement) or
+reopens, carried by P2, from the archived
+[petgraph-RDF plan](../../archive_docs/2026-10-06_completed_plans/2026-06-18_petgraph_rdf_plan.md) (ruling S53).
 
 ## 5. Checkpoints
 

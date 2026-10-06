@@ -14,7 +14,7 @@ and unforced surface does not ship.
 
 **Related**: the scene contract note
 (`design_docs/scenograph_docs/technical_architecture/2026-07-22_scene_contract_note.md`),
-[projection_proofs_plan](../implementation_strategy/2026-07-21_projection_proofs_plan.md),
+[projection_proofs_plan](../../archive_docs/2026-10-06_completed_plans/2026-07-21_projection_proofs_plan.md),
 [swatch_primitive_design](../design/2026-06-27_swatch_primitive_design.md),
 Woodshed's [stage/set/tools plan](../../../../woodshed/design_docs/2026-07-11_stage_set_tools_plan.md).
 

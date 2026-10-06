@@ -46,7 +46,7 @@ each existing fragment; it extends them, it does not duplicate them.
   P2 adds the slot's multi-selection branch (`render/cards.rs:129` TODO).
 - [graphlet wiring plan](../../archive_docs/2026-07-04_completed_plans/2026-06-25_graphlet_wiring_plan.md) **owns the per-window
   instance machinery + subgraph derivation/reconcile**. P3 crystallize reuses it.
-- [petgraph / RDF plan](2026-06-18_petgraph_rdf_plan.md) **owns edge multigraph
+- [petgraph / RDF plan](../../archive_docs/2026-10-06_completed_plans/2026-06-18_petgraph_rdf_plan.md) **owns edge multigraph
   storage** and the ruling that visual collapse is an experience-LOD setting. P4 is
   that experience-LOD render; it needs no kernel storage change.
 - [graph signals layer plan](../../archive_docs/2026-08-20_completed_plans/2026-06-22_graph_signals_layer_plan.md) **owns the

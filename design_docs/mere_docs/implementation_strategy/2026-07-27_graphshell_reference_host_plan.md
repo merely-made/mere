@@ -26,15 +26,15 @@ resident composition the desktop owner") moved the device host to
 `ports/djinn` (`ports/djinn/src/bin/djinn.rs`).
 
 This plan amends the product center of the
-[Graphshell remote projection host plan](2026-07-22_graphshell_remote_projection_host_plan.md).
+[Graphshell remote projection host plan](../../archive_docs/2026-10-06_completed_plans/2026-07-22_graphshell_remote_projection_host_plan.md).
 That plan's portable session crates, projection/presentation/intent planes,
 admission boundary, and G1-G5 receipts remain. Its statement that Graphshell's
 local truth is only remote-scene curation does not: Graphshell now also owns and
 hosts the user's local Mere graph.
 
 It absorbs the live parts of the
-[capture-first browser lane](2026-06-24_orrery_browser_lane_plan.md) and the
-[extension/companion plan](2026-06-23_browser_extension_companion_plan.md).
+[capture-first browser lane](../../archive_docs/2026-10-06_superseded_plans/2026-06-24_orrery_browser_lane_plan.md) and the
+[extension/companion plan](../../archive_docs/2026-10-06_superseded_plans/2026-06-23_browser_extension_companion_plan.md).
 Those plans remain historical evidence for capture APIs, browser delivery, and
 the companion split; their old Merecat/orrery product framing is superseded.
 
@@ -42,11 +42,11 @@ Related boundaries:
 
 - [one node, atomic facets](../technical_architecture/2026-07-18_one_node_facets_layer_map.md)
 - [Mere as the unifying graph](../technical_architecture/2026-07-08_mere_as_the_unifying_graph.md)
-- [repo consolidation](2026-07-23_repo_consolidation_plan.md)
-- [Knot port](2026-07-25_knot_port_plan.md)
+- [repo consolidation](../../archive_docs/2026-10-06_completed_plans/2026-07-23_repo_consolidation_plan.md)
+- [Knot port](../../archive_docs/2026-10-06_completed_plans/2026-07-25_knot_port_plan.md)
 - [low-power radio and managed network](2026-07-24_low_power_managed_network_plan.md)
-- [identity vault and SSH agent](2026-07-22_identity-vault-ssh-agent_plan.md)
-- [persona wallet carry layer](2026-06-25_persona_wallet_carry_layer_plan.md)
+- [identity vault and SSH agent](../../archive_docs/2026-10-06_completed_plans/2026-07-22_identity-vault-ssh-agent_plan.md)
+- [persona wallet carry layer](../../archive_docs/2026-10-06_completed_plans/2026-06-25_persona_wallet_carry_layer_plan.md)
 
 ---
 
@@ -418,6 +418,16 @@ canvas rewrite.
 
 ## 9. Implementation sequence
 
+**Received 2026-10-06 (S14 archive pass):** G6, composing several
+applications (one saved Graphshell workspace reopens two endpoint
+applications, keeps their truths separate, and preserves its own
+arrangement and links), and G7, product pulls and constrained management
+(Woodshed, Hocket and radio-management adapters with task receipts, and a
+constrained profile with measured byte budgets), to be taken up in this
+H-series, from the archived
+[Graphshell remote projection host plan](../../archive_docs/2026-10-06_completed_plans/2026-07-22_graphshell_remote_projection_host_plan.md)
+(ruling S61 of the [stack seams plan](2026-10-04_stack_seams_plan.md)).
+
 ### H0. Seal the WASM product cone
 
 **Files:**
@@ -613,7 +623,7 @@ device-local facet exclusion. See the
 ### H4. Make Personae visible and usable
 
 **Absorbs G8** from the
-[remote projection host plan](2026-07-22_graphshell_remote_projection_host_plan.md),
+[remote projection host plan](../../archive_docs/2026-10-06_completed_plans/2026-07-22_graphshell_remote_projection_host_plan.md),
 which was written the same day to carry the 2026-07-22 ruling that the agent's
 resident home is Graphshell. Three things that entry made explicit and this
 one should not lose:
@@ -900,6 +910,13 @@ Proving that injection in a second host remains an integration follow-on.
 Favicon intake is a separate optional `tabs` permission and retention feature,
 not an H5 completion condition. See the
 [H5b cross-browser capture and controls receipt](../../../ports/graphshell/docs/2026-07-28_h5b_cross_browser_capture_controls_receipt.md).
+
+**Received 2026-10-06 (S14 archive pass):** a C4 consent gate for live
+capture, with its open question of the default (the archived plan's C4
+shipped `Full`; this H5's `HistoryCapturePolicy` is disabled by default),
+shared with Turnstone's page capture plan for its trail memory, from the
+archived [capture provenance consent plan](../../archive_docs/2026-10-06_completed_plans/2026-06-26_capture_provenance_consent_plan.md)
+(ruling S55).
 
 ### H6. Move one selection between two devices
 

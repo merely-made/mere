@@ -87,7 +87,7 @@ Verified 2026-10-04 against Mere `c34449bd`.
   and core on every resume (636-650). Its doc rules out multi-window "per the
   Signalman desktop scope (retinue, 2026-08-09)" (18-19). The ratified GPU
   regime puts tenants on one device and one queue
-  ([spatial compute plan](../technical_architecture/2026-08-13_spatial_compute_plan.md),
+  ([spatial compute plan](../../archive_docs/2026-10-06_completed_plans/2026-08-13_spatial_compute_plan.md),
   lines 25 and 56). Consumers: mere-view, cambium-rootstock,
   cambium-genet-web-host and pelt's desktop port here; woodshed, hocket and
   redshank in the woodshed repository.
@@ -107,7 +107,7 @@ in two or more crates.
   graphshell), `ProjectionRequest` (cartography's in-process call beside
   chirograph's wire request), and the three tile structures (forme, platen's
   `TileLayout`, cambium's `TileTree`), which the
-  [workbench component plan](../../cambium_docs/implementation_strategy/2026-08-31_workbench_component_plan.md)
+  [workbench component plan](../../archive_docs/2026-10-06_completed_plans/2026-08-31_workbench_component_plan.md)
   rules as one pipeline: "Mere's Forme remains durable graph-arrangement
   authority; Platen compiles a Forme arrangement into a Workbench
   presentation". document-host's script `Grant` derives from servitor's
@@ -378,7 +378,7 @@ Mark (free text): **"Wait, why didn't we want a portable contract…?"**
 Answered: graphshell's comment ("supplied to the compiler without a product
 dependency or a portable product-data contract",
 `projection_compile.rs` 135) applies the
-[remote projection host plan](2026-07-22_graphshell_remote_projection_host_plan.md)'s
+[remote projection host plan](../../archive_docs/2026-10-06_completed_plans/2026-07-22_graphshell_remote_projection_host_plan.md)'s
 charter, ruled with Mark on 2026-07-22: portable contracts carry placement and
 representation only and stay product-free (line 81), "Keep product adapters
 beside their source truth" (579), and "later radio facts add data without

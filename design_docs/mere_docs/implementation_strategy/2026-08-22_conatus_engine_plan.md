@@ -53,7 +53,7 @@ The corrections, each carried into the body text below:
 - Seiche remains the graph-oriented 2D specialist, not an eventual adapter.
 - The host/profile orders passes; allocation ownership follows advanced
   state (the host-conducts ruling,
-  [spatial compute plan](../technical_architecture/2026-08-13_spatial_compute_plan.md)).
+  [spatial compute plan](../../archive_docs/2026-10-06_completed_plans/2026-08-13_spatial_compute_plan.md)).
   Netrender's tenancy seam stays the device seam.
 - The engine-owned render view becomes a lean spatial frame with no cameras,
   lights, sprites, or presentation policy (§4).
@@ -166,6 +166,15 @@ Rapier imports and handles are confined to the private implementation, and
 warnings-denied checks pass. This proves a code boundary only. Nexus earns a
 backend seat later through an isolated lifecycle/query receipt and the exact
 host-device receipt; it does not inherit one from opacity alone.
+
+*Annotation, 2026-10-06, a tail taken from the archived spatial compute plan*
+(the S14 archive pass, recorded in `2026-07-03_archived_plan_tails_plan.md`, "2026-10-06
+archive pass"): **the Nexus adoption watch** is this plan's. The trigger is the
+tactile body count outgrowing CPU rapier. When a product's tactile body count
+meets that, Nexus's backend seat is reconsidered under the condition above:
+an isolated lifecycle and query receipt, plus the exact host-device receipt.
+Wing ruling 604 adds a requirement: any backend must keep G8's bit-for-bit
+replay across machines.
 
 Complete at Mere commit `339e8567`: six `conatus-voxel` tests, eighteen
 Conatus unit tests, the cross-package voxel-collider integration test, and

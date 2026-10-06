@@ -103,7 +103,7 @@ presence. The durable recording modes below reuse the event-DAG + capability lay
 
 Presence is not one mode, it is a spectrum of who-may-see-what, governed like everything
 else in a moot. The same private / public / ephemeral dial from the
-[wallet plan](2026-06-25_persona_wallet_carry_layer_plan.md), pointed at **conduct**
+[wallet plan](../../archive_docs/2026-10-06_completed_plans/2026-06-25_persona_wallet_carry_layer_plan.md), pointed at **conduct**
 instead of content, plus one new degree of freedom (asymmetry):
 
 - **Ephemeral** (the default): the presence channel above, gossiped and expired, never
@@ -187,7 +187,7 @@ correction under the web-clip section); the inspector UI is still unbuilt.
   presence and a *durable* reasoning graph at once).
 - **Privacy:** presence reveals what you are reading, so broadcasting your own focus to
   co-op guests is a privacy choice, not a default. It is a presence-shaped instance of the
-  persona privacy dial (the [wallet plan](2026-06-25_persona_wallet_carry_layer_plan.md));
+  persona privacy dial (the [wallet plan](../../archive_docs/2026-10-06_completed_plans/2026-06-25_persona_wallet_carry_layer_plan.md));
   an agent's presence is local-by-default, a guest's is opt-in per moot.
 - **Element-targeting stability:** a document element reference must survive re-layout
   (anchor on the a11y / DOM node, not a pixel rect), the same anchor problem the clip

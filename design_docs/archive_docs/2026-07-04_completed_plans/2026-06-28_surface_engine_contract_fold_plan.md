@@ -6,7 +6,7 @@ Fold every surface engine (scry / weld / graft, and future ones) onto the neutra
 `resource_epoch` contract addition (mere `0bee036`) and the grafting interop
 convergence (wgpu-graft `953da76`; welding/scrying DX12 delegation `1f29bb6` /
 `44c785a`). Related: engine_picker_and_pluggability_plan (`design_docs/inker_docs/implementation_strategy/2026-06-15_engine_picker_and_pluggability_plan.md`)
-(compile gating + activation), [scrying_tile_plan](../../mere_docs/implementation_strategy/2026-06-10_scrying_tile_plan.md)
+(compile gating + activation), [scrying_tile_plan](../2026-10-06_completed_plans/2026-06-10_scrying_tile_plan.md)
 (the `ScryingHost`), and wgpu-scry `design_docs/2026-06-28_improvement_backlog.md`.
 
 ## Findings (capability audit, 2026-06-28)

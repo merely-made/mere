@@ -485,7 +485,7 @@ it as written, with the correction above.
 ### Phase G: promote the corrected families (WITHDRAWN 2026-07-23)
 
 **This phase is void, and nothing replaces it.** The
-[repo consolidation ruling](2026-07-23_repo_consolidation_plan.md) settled that
+[repo consolidation ruling](../../archive_docs/2026-10-06_completed_plans/2026-07-23_repo_consolidation_plan.md) settled that
 Mere is the platform and its extracted families stay its components, with the
 bar for a separate repository being coherent identity apart from the six
 primaries. It withdraws the murm/moot promotion by name. `repos/murm` *(historical citation)* <!-- doc-audit: historical-path --> and
@@ -658,7 +658,7 @@ dependency out of gemot that was never out. And the posture worth holding is
 about **source**: gemot's code names no session type, which is now enforced by
 the two-file import result above, rather than about a build graph that stopped
 being clean some time ago. The general lesson is the [cambium-winit
-one](2026-07-23_repo_consolidation_plan.md) in a new place: a manifest comment
+one](../../archive_docs/2026-10-06_completed_plans/2026-07-23_repo_consolidation_plan.md) in a new place: a manifest comment
 is a claim about the graph, and only `cargo tree` settles it.
 
 **Receipts:** 228 tests green across the four crates, run before and after the
@@ -783,7 +783,7 @@ was just written to prevent one section above — and I nearly did it here.
 `cargo test -p murm-replication` "again stalled during workspace dependency
 resolution before compilation and was stopped", leaving Murm, Moot, and mesh
 package tests pending "a normal workspace rerun after that resolver state is
-repaired". The [repo consolidation](2026-07-23_repo_consolidation_plan.md) did
+repaired". The [repo consolidation](../../archive_docs/2026-10-06_completed_plans/2026-07-23_repo_consolidation_plan.md) did
 repair it — every one of them now runs from a normal workspace command:
 
 | package | result |
@@ -856,7 +856,7 @@ not one.
 ### 2026-07-24: a moot's commons is unauthorized, and there is no shared-graph record
 
 Surveyed on entering this lane from the [capability model
-round](2026-07-23_capability_model_plan.md), which had just made a moot peer's
+round](../../archive_docs/2026-10-06_completed_plans/2026-07-23_capability_model_plan.md), which had just made a moot peer's
 petition authorizable (`gemot::MootAuthority`). Two structural facts, both
 verified against the tree rather than inferred:
 
