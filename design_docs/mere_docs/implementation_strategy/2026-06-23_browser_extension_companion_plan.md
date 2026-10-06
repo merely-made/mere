@@ -1,12 +1,23 @@
 # Browser Extension + Companion Node Plan
 
 **Date**: 2026-06-23
-**Status**: Planning (with Mark). Net-new delivery target; no code yet.
+**Status (2026-10-06):** superseded 2026-07-27 by the
+[Graphshell reference host plan](2026-07-27_graphshell_reference_host_plan.md)
+(H4/H5), which absorbs the live parts of this plan; kept as evidence. An MV3
+extension ships at `ports/graphshell/web/extension/`, with its capture core at
+`ports/graphshell/src/capture.rs`.
 **Node + delivery framing superseded 2026-06-24** by
 [orrery_browser_lane_plan](2026-06-24_orrery_browser_lane_plan.md) (capture-first,
 favicon-body nodes not "DOM cards", gloss sidebar + orrery discrete tab, baseline
 cross-browser, no-sync v1). The companion / smolweb / p2p / federation half below
 stands as the forward arc beyond that v1.
+**Corrected 2026-10-06 (S14 pass):** the orrery browser lane plan is itself
+superseded (its 2026-07-27 banner), and the Graphshell reference host plan
+(`:25-28`) absorbs the live parts of both plans, which "remain historical
+evidence".
+**Open, raised by the S14 pass (2026-10-06):** where does the companion /
+smolweb / p2p / federation forward arc live now? Options: in the Graphshell
+reference host plan; in a home of its own.
 **Scope**: Deliver Mere as a browser **extension / PWA** that reuses the portable
 orrery core and leans on the host browser for what it already does (HTML layout,
 text, tabs, navigation), while a paired **native companion node** carries what a
@@ -121,6 +132,7 @@ seam, per-target backend, gated by the `net` grant (default-denied, §6 consent)
 
 - `kernel` ([graph-kernel/Cargo.toml](../../../crates/graph/graph-kernel/Cargo.toml)) describes itself "Portable identity, authority, and mutation kernel," keeps native persistence behind an off-by-default `store` feature, and already splits UUID by target (v5/SHA-1 every target; v4/RNG gated `cfg(not(wasm32))`).
 - `gyre` (rapier2d, pure-Rust physics, runs in wasm), `aether` (field math), `arrangements` (deterministic layouts, pure serde), `cartography` (contracts). All plain compute.
+  **Corrected 2026-10-06 (S14 pass):** no `gyre`, `aether` or `arrangements` package exists; their successors are seiche, numen and the cartography adapters. Only `cartography` (`crates/canvas/cartography`) survives by name.
 - `nematic` (smolweb): the host browser cannot speak gemini/gopher/spartan, so this is literally what the browser does not do. Render target is HTML.
 - The event-DAG grammar plus tessera/reciprocity/moot logic: pure data model and projections; the portability and sharing substrate.
 
@@ -136,6 +148,11 @@ of per-node accessors a host needs to draw cards: `node_color`, `node_state_colo
 demoted dots stay as the underlay." A browser host is a new consumer of that mode,
 where "the shell document" becomes the browser DOM.
 
+**Corrected 2026-10-06 (S14 pass):** `render_as_cards` and `node_representation`
+have no hits in crates/ or ports/. `node_color`, `node_state_color`,
+`node_selected`, `node_shape` and `node_position` survive in pictograph
+(`canvas/cartography.rs:65-112`).
+
 The crate is also already wasm-aware: the native present stack (winit + wgpu +
 genet-winit-host) is gated `cfg(not(target_arch = "wasm32"))`, the in-thread physics
 backend is called out as "the future no-threads wasm profile," and "the wasm present
@@ -146,6 +163,11 @@ The one non-gated friction: the genet-backed gnode pool (`build_pool_dom`,
 hard dependency. `render_as_cards` skips it at *runtime*, but it still *compiles* in.
 The first refactor feature-gates that pool so a cards-only wasm build does not pull
 genet-layout.
+
+**Corrected 2026-10-06 (S14 pass):** `node_layout` has no hits; `build_pool_dom`
+survives in pictograph (`canvas/build.rs:222`), and `node_dom` remains only as
+the local name for its result (`lifecycle.rs:116,393`), so the genet-backed
+node pool still compiles in.
 
 ---
 
@@ -159,6 +181,8 @@ zero networking.
 native). A `dom-cards` profile forces `render_as_cards` and gates the pool out.
 *Done when* `cargo build --target wasm32-unknown-unknown -p orrery --no-default-features --features dom-cards`
 is green and the dep tree shows no genet-layout / inker / platen.
+**Corrected 2026-10-06 (S14 pass):** no `orrery` package exists, so this
+command no longer names a buildable target.
 
 **P1 — Orrery in a tab, DOM cards, no network.** A thin wasm shell crate presents the
 netrender underlay to a WebGPU canvas (Canvas2D fallback) and draws node cards as DOM
@@ -173,6 +197,10 @@ OPFS. MV3 extension: a consent surface, then `history` / `tabs` / `webNavigation
 capture into the trace, projected to a `kernel::graph::Graph` and into the orrery.
 *Done when* real consented browsing appears as an arrangeable orrery, recorded in the
 federatable `BrowsingTrace` rather than the session-local `SharedNavigationMemory`.
+**Corrected 2026-10-06 (S14 pass):** the extension capture shipped as Graphshell
+H5 (`ports/graphshell/web/extension/`, receipt
+`ports/graphshell/docs/2026-07-28_h5a_browser_storage_capture_core_receipt.md`),
+and `BrowsingMemory` is no longer dormant (see Findings).
 
 **P3 — Smolweb in the tab.** nematic renders gemtext / gopher to HTML; the tab displays
 it; fetch comes from the companion or an HTTP-to-smolweb gateway. *Done when* opening a
@@ -233,6 +261,8 @@ cartography).
 - **The host-DOM-card seam already exists.** `render_as_cards` + the per-node accessors
   (`crates/orrery/orrery/src/lib.rs:228, :954, :903-952`) are the orrery-as-element work;
   the browser is a new consumer, not a new fork.
+  **Corrected 2026-10-06 (S14 pass):** `render_as_cards` is gone (see the
+  correction in §3).
 - **The portable core is wasm-clean by design.** `kernel` is self-described "Portable"
   with `store` off-by-default and per-target UUID handling; gyre/aether/arrangements/
   cartography are plain compute. The friction is entirely the render/composition path
@@ -242,6 +272,10 @@ cartography).
   federation-faithful half the in-the-wings audit flags with zero live callers. The
   extension is its natural driver, and its requirements (portable, shareable browsing)
   select it over the session-local `SharedNavigationMemory` the native path ships.
+  **Corrected 2026-10-06 (S14 pass):** no longer dormant:
+  `BrowsingMemory::record_traversal` has live callers in
+  `ports/graphshell/src/capture.rs:482` and in Turnstone's
+  `turnstone/src/trail_memory.rs`.
 - **Smolweb renders in the tab.** nematic to HTML to browser DOM is the lightest path;
   pelt-in-a-popup solved a problem the browser already solves. Fetch stays on the
   companion (raw TCP/TLS), render in the tab.
@@ -309,3 +343,11 @@ cartography).
   `generate!` (`path: "../../wit"`); regenerated the guests; `cargo test -p document-host` green
   (19 tests). The browser jco path now has a shared contract dir to point at. The Open risk drops
   from "not yet shared" to a residual "keep native + jco on one world (no browser fork)".
+
+### 2026-10-06
+
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at mere 535bca11,
+  from the D2 record in support/doc-audit/d2/batch_48_s14_phase_b10.md: status set to
+  superseded by the Graphshell reference host plan, the `render_as_cards`, accessor,
+  gnode-pool, `orrery` package, keep-set and dormant-capture claims annotated, and the
+  forward arc's home written in as an open question.
