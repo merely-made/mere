@@ -66,9 +66,12 @@ pub type NodeKey = petgraph::stable_graph::NodeIndex;
 /// instead of owning a frame loop and a settle budget of its own. (Lifted out
 /// of `mere-canvas` 2026-09-04.)
 pub mod runtime;
+#[cfg(not(all(target_family = "wasm", target_os = "unknown")))]
+pub use runtime::monotonic_clock;
 pub use runtime::{
-    ElapsedStepConfig, ElapsedStepReport, Physics, PhysicsCommand, PhysicsUpdate, TICK_DT,
-    TICK_DURATION,
+    DEFAULT_BUDGET_SHARE, ElapsedStepConfig, ElapsedStepReport, FALLBACK_DISPLAY_PERIOD, PaceStats,
+    Physics, PhysicsCommand, PhysicsUpdate, Speed, StepBudget, TICK_DT, TICK_DURATION,
+    display_period,
 };
 
 /// What each force is, term by term (topology, kernel, state, currency,

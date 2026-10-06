@@ -2453,3 +2453,385 @@ binning are the useful patterns.
   418 device steps); the must-fail framing control and a planted throw fail
   on both pages. Gates: seiche 115/111/115, pictograph canvas 292, graphshell
   web 238 single-threaded.
+- 2026-10-03 (seiche's speed, branch `seiche-speed`, Part 1: the dial, as
+  ruled, "Ticks per frame, fixed dt"). Where a frame's ticks were decided:
+  `Physics::advance_frame` (one a call), `Physics::advance_elapsed` (elapsed
+  time over `TICK_DURATION`, capped at 50 ms and three steps) and the actor's
+  `run` (a tick, then `sleep(TICK_DT)`); the canvas's `frame_observed` picks
+  the first two, the web tree passes the animation timestamp, turnstone calls
+  `frame()` with physics offloaded, and the remote board `tick()`s. Settle
+  budgets (`SETTLE_TICKS` 360, `SIZE_RESETTLE_TICKS` 90), `never_rests` (a
+  `u32::MAX` budget), Anneal's cooling, the lagged lane's staleness
+  (`now - answer.step`) and Density's passes (`seconds` of `dt`, 60 ticks a
+  pass) already count ticks; only the ambient backdrop counts frames, and it
+  is not seiche's. Built: seiche's `Speed` (thousandths, 0.2 to 50) owes wall
+  time times the speed in integer units on all three drivers, so 0.2x is one
+  tick every five frame-equivalents exactly; `StepBudget` bounds fast-forward
+  on the host's clock and never cuts a call below what real time would run in
+  it; `PaceStats` reports ticks, the effective speed over 32 frames and
+  whether the budget bound; below real time the simulation leads by one tick
+  and the snapshot is drawn between the last two (draw only). The canvas and
+  the board carry it, and the web tree takes it as page options
+  (`physics_speed`, `physics_budget_ms`, 8 ms provisional); the visible
+  control is a fork. Receipts: one trajectory, bit for bit, at 0.2x, 1x, 3.7x
+  and 50x on both drivers, the actor and the canvas (LinLog and Anneal; two 1x
+  runs agree first; dt 1/30 and one tick more differ); settles of exactly 600
+  (seiche) and 360 (canvas) ticks at every speed; slow motion drawn every
+  frame and stepped about a fifth as often (web: 0.202x, 30 of 30 frames
+  drawn, 7 stepped); the budget binding (virtual clock exact; canvas on the
+  real clock within one tick's variation; web, 300 nodes at 50x, stepping at
+  most 8.1 ms on the browser clock's 0.1 ms grain and reaching 1.6x against
+  the page's 166 ms frames, with 24 nodes unbound at 39.6x as the control).
+  The eleven law receipts plus profiles, add and drag are green at 1x on
+  bundle `aa0041d9`, and `p5_tree_gpu_settle_2000` at 1x and at 50x (366 of
+  389 steps on the device). seiche 111/111 (105/105 without `actor`),
+  pictograph 279/279. Found on the way: `NodeExclusion` and
+  `BarnesHutRepulsion` sum in `HashMap` order and are not reproducible run to
+  run (24 of 24 bodies differ after 600 ticks, up to 33,559 and 69,959 ULP;
+  every other law term, and `NodeExclusion` summed in key order, is). Nine of
+  the eleven laws carry one of the two, so today a run is bit-reproducible,
+  and the dial's identity provable, only under Anneal and Still. At 50x under
+  the budget the 2,000-node page ran 244 ticks in 120 frames against 1x's 418
+  until the budget's floor went in (the receipt fails without it). The actor
+  now sleeps out the rest of its interval rather than a whole `TICK_DT` after
+  each tick, so native 1x runs at real time instead of a tick's cost slower
+  (not measured in turnstone). Logs: `Code/testing/mere/seiche-speed/`.
+- 2026-10-03 (seiche's speed, Part 2: dev and test build speed, measured
+  only). On a `git archive` export of `density-cpu` `dad99fde`, every variant
+  passed as `--config` (no profile changed), one dealt start (`gen-50`, start
+  0, 3,601 ticks) and pictograph's default suite, quiet machine, two samples:
+  dev 146.5 s and 102.5 s; release 4.3 s and 8.7 s (34x on one start, not
+  the 14x recorded above, which timed starts three to a core); seiche alone at
+  opt-level 1, 2, 3: 97 s, 8.0 s, 7.7 s, the suite 81, 53, 63 s; seiche with
+  rapier2d, parry2d, nalgebra, simba and glamx at 1, 2, 3: 30 s, 7.2 s, 6.0 s,
+  the suite 24.7, 12.7, 12.6 s; `[profile.test]` at opt-level 1 for every
+  crate 9.8 s and 9.7 s, after rebuilding every crate once (388 s); the test profile's registry crates at 2 with seiche
+  at 0 147 s and 50.6 s, and with seiche at 2 7.3 s and 10.1 s. The rebuild
+  after a one-line seiche edit stays 12 to 19 s at every dev and test level
+  (release 38.6 s), and backtraces from inside `Simulation::tick` keep every
+  frame with file and line at every dev and test level (release loses the
+  inlined frames). Where debug's time goes: Density's force is 99.4% of a
+  tick (rapier's step 0.6%); its Jacobi sweep runs 49 ns a cell in debug
+  against 1.2 in release, of which overflow checks and debug assertions are
+  about a fifth and the `Index` call chain with its bounds checks about two
+  fifths (raw pointers: 28 ns); allocation is 14 a tick at every level. In
+  release the bounds checks block vectorisation (indexed 1.2 ns, raw 0.24).
+  The profile choice goes to Mark as a fork. Not verified: locals and
+  stepping in a debugger (lldb lacks its Python DLL here); a sampling profile
+  (the shell is not elevated, so the Windows profilers cannot run; the split
+  above is by timers, opt-levels and a microbenchmark instead).
+- 2026-10-04 (seiche's speed, the four rulings carried out, branch
+  `seiche-speed`). Main `60eb5940` merged with its root lock kept exactly; weave
+  had replaced the actor's `barrier`/`latest` impl with the second
+  `impl ActorPhysics` and appended `DEFAULT_BOARD_ANCHOR_STIFFNESS` twice, both
+  repaired by hand. "Opt 3 in dev for physics": the root manifest optimizes
+  seiche, rapier2d, parry2d, nalgebra, simba and glamx in dev, and
+  graphshell-web's manifest gains glamx so the two name one set; one Density
+  dealt start then takes 6.1 s (146.5 s before) and the pictograph suite 55.5 s
+  (117 s on the same merge before), the suite now bounded by
+  `arrangement_roles::the_spiral_probe_through_the_canvas` at about 51 s, not
+  by physics. "Sum in key order": `NodeExclusion` and `BarnesHutRepulsion` read
+  `laws::node_positions`; every force set is bit-reproducible over five runs,
+  and all twelve catalog laws, Density included, land on the same bits at
+  0.2x, 1x and 50x after 150 ticks, one tick more differing under every law
+  but Still; with the two files reverted both receipts fail. G1's
+  class-agreement test passes with 44 of its 166 readings moved in their low
+  digits and none beyond its tolerance. "Speed select": presets 0.2x to 50x in
+  the physics section of both pages, 1x by default, applied when chosen
+  (*reading, not ruled*), with "Running at 3.1x: the frame budget is full"
+  beneath while the budget binds. Headed on bundle `211bd071` (wasm-bindgen
+  0.2.129, web lock `0090ad99`), every receipt with zero gate entries: the
+  eleven law receipts, profiles, add, drag and Density's two green; the slow,
+  fast-control and both Speed select receipts green; two readings out of
+  bound and left as they are: `p6_tree_speed_fast` stepped at most 8,100 us
+  against its 8,000 us bound (the browser clock's grain is 100 us), and
+  `p5_tree_gpu_settle_2000` at 50x ran 677 ticks in its 120 frames against
+  1x's 418, so its frame-counted bounds miss (spread 1,135, energy 96k), with
+  117 of 638 device steps stale. seiche 122/122 (116 without actor, 122 + 3
+  with gpu), pictograph 292, graphshell `web` 234.
+- 2026-10-04 (seiche's speed, the second round carried out, branch
+  `seiche-speed`). "The viewer's own dial": `RemoteBoard::sync` takes the
+  viewer's speed beside its choice, both pages pass the local canvas's, and
+  the board's line reads "Board speed 2x, from your Speed setting"; a test
+  runs 4, 20 and 4 ticks in four frames at the viewer's 1x, 5x and 1x. The
+  owner-publishing half was dropped unbuilt beyond the viewer side. "Target +
+  Max, budget as frame share": seiche gains `Speed::UNCAPPED` (Max: ticks until
+  the budget is spent, 50x with no budget installed, which is its control);
+  both Speed selects gain Max; the budget is 50% of the page's measured frame
+  interval (its own frame timestamps, each new interval weighted 0.25, gaps
+  over 1 s skipped) for the canvas and the remote board alike;
+  `physics_budget_share` replaces `physics_budget_ms`; the note shows the speed
+  reached whenever the layout moves (*reading, not ruled*: always, not only
+  when bound). The fast receipt and its control are bounded per frame by that
+  frame's budget plus the clock's 100 us grain. The fast receipt runs at Max,
+  because on its 300-node page the budget feeds back: half of a frame that
+  physics itself lengthens outgrows the catch-up cap at 50x (frames about 500
+  ms, budget about 250 ms, 150 ticks a frame, about 5x), and at Max the page's
+  frame reached 500 to 684 ms with stepping at 350 ms a frame; returned as a
+  finding with three options (keep; a share of the display's period; a share
+  of the non-physics time). "Staleness in ticks": no code change; the 50x
+  2,000-node GPU settle is dropped from the batch, its bounds counting frames.
+  Main `bd119a69` merged, the plan the only file both sides changed, and
+  identical to `git merge-file`'s result; a retro-check of the previous merge
+  (`48ead8a0`, whose second parent is `2d4b1ee9`, not the `60eb5940` its
+  subject names; a git note says so) found every weave auto-merge identical to
+  `git merge-file` after the hand repair. Headed on bundle `e68fbd0d`, every
+  receipt green with zero gate entries: the eleven law receipts, profiles, add,
+  drag, Density's two, slow, fast at Max (17x and 22x bound, worst over-budget
+  23 and 91 us), its 50x control (34x unbound), both Speed select receipts with
+  Max, and the 2,000-node GPU settle at 1x (413 of 418 device steps). seiche
+  123/123 (117 without actor, 123 + 3 with gpu), pictograph 292 (its real-clock
+  budget test failed once under 97% load, a frame preempted to 12.1 ms against
+  3.7, and passed twice on a quiet machine), graphshell `web` 235.
+- 2026-10-04 (seiche's speed, "The display's frame" carried out, branch
+  `seiche-speed`). The step budget is 50% of the display's frame period, taken
+  as the shortest of the last 120 intervals between the page's own frame
+  timestamps (about 2 s at 60 Hz, half a second at 240 Hz), gaps over 1 s
+  skipped and 60 Hz assumed until one is measured; the canvas and the remote
+  board on both pages read it from one `web_speed::FrameBudget`, and both
+  pages report the period beside the last interval (`display-period-ms`,
+  `frame-interval-ms`). The before/after control is the same diagnostic
+  scenario (`diag_speed_budget`, the 300-node tree page on CPU repulsion) on
+  bundle `e68fbd0d` (half the smoothed frame) and `cf8ff645` (half the
+  shortest interval). At 50x the budget grew from 146 to 171 ms over frames of
+  291 to 342 ms before, and held at 51.6 ms over frames of 327 to 479 ms
+  after; at Max it grew from 379 to 463 ms over frames of 758 to 927 ms
+  before, and held at 27.4 ms over frames of 194 to 321 ms after. The feedback
+  is gone, but the budget is not near half the display's 16.7 ms: no page here
+  keeps up with the display, so the shortest recent interval is the page's own
+  best frame (24.2 to 30.2 ms on the fixture and the 24-node page, 54.7 to 103
+  ms at 300 nodes), and the intervals are not whole multiples of 16.67 ms, so
+  no vsync quantum can be read off them. The budget comes out at 12 to 15 ms
+  on light pages and 27 to 52 ms at 300 nodes, against about 8.3 ms. This went
+  back to the coordinator as an open finding with three options (keep it as
+  built; cap the period at 1/60 s; a known display rate where the host exposes
+  one). The receipts keep their per-frame bound, that frame's budget plus the
+  clock's 100 us grain. On bundle `cf8ff645` the fast receipt met it at
+  exactly 100 us over, and the diagnostic runs saw 150 to 250 us in some
+  windows, one tick run longer than forecast, so the bound can flake. The note
+  showing the speed reached whenever the layout moves, not only when the
+  budget binds, stays a *reading, not ruled*, kept as one on the coordinator's
+  word. Main `8f61b367` merged under weave `d73c4ae` (`b6cc15fc`): the six
+  auto-merged files are identical to `git merge-file`'s result, and the plan's
+  one conflict, resolved theirs then ours with weave's `refused_by` line and
+  markers removed, is identical to the same resolution of `git merge-file`'s.
+  Main gave `Gravity::new` a counter-damping argument, so the reproducibility
+  receipt passes Orbit's `Tangential` (`ddbfffd0`), and the web lock moves to
+  `3cce8fc5` (seiche 0.0.6; the lock is not committed). Headed on bundle
+  `71959113` (wasm-bindgen 0.2.129), 21 of 22 receipts green with zero gate
+  entries: the eleven law receipts, profiles, add, drag, Density's two, slow,
+  fast at Max (bound at 2.3x and 3.4x, the budget held at 42.45 ms, half an
+  84.9 ms period, worst over-budget 50 us), both Speed select receipts with
+  Max, and the 2,000-node GPU settle at 1x (413 of 418 device steps). The 50x
+  control missed `effective >= 25` at 20.4x, unbound and 13.5 ms under its
+  budget, at 76 to 83% CPU with another lane's rustc: at 50x the 50 ms
+  catch-up clip caps the speed at 50 x 50 / frame ms, and its shortest
+  interval was 48.5 ms against 30.2 ms the round before. Rerun with no other
+  lane's rustc (52 to 58% CPU), the control passed twice (34.6x and 29.7x) and
+  the fast receipt passed, but one of its windows ran 600 us over its budget,
+  beyond the 100 us bound, which the receipt's final assertion does not see
+  (its last window read 100 us): the flake named above, met. Gates: seiche
+  125/125 (119 without actor, 125 + 3 with gpu), pictograph 294, graphshell
+  `web` 238, mere and graphshell checked clean.
+- 2026-10-04 (seiche's speed, "Known rate, else capped" and "Gate keeps a
+  forecast margin" carried out, branch `seiche-speed` `394596c7`). Main
+  `ff78acca` merged first (`e8ae8498`): the five auto-merged files are
+  identical to `git merge-file`'s result, and the plan's one conflict,
+  resolved theirs then ours with weave's `refused_by` line and markers
+  removed, is identical to the same resolution of `git merge-file`'s. The web
+  half: the display period is the shortest of the last 120 intervals and never
+  more than 1/60 s, so the budget is at most 8,333 us; `FrameBudget` moves
+  from graphshell-web, a wasm-only cdylib whose tests never run, into
+  `graphshell::frame_budget`, whose test holds 8,333 us on a page slower than
+  60 Hz, 3,030 us on intervals of a 165 Hz display, a hidden page's gap
+  skipped and old intervals aged out. A correction to the last finding: this
+  laptop's panel runs at 165 Hz (Win32 `CurrentRefreshRate` 165), and every
+  interval logged is a whole multiple of its 6.06 ms period to within the
+  clock's grain (24.2, 30.2, 36.4, 42.4, 48.5, 54.7, 60.6, 84.9 and 103.1 ms
+  are 4 to 17 periods; frames of 193.9 to 478.9 ms are 32 to 79), so the web
+  can read the display's quantum after all; the finding said none could be
+  read because it tried only 16.67 ms. Returned as a fork (infer the quantum,
+  the largest period of which every recent interval is a whole multiple within
+  the grain, searched from 1/360 s to 1/60 s with the cap as fallback, 3.03 ms
+  here; or the cap as ruled, 8.3 ms here). The native half is not built:
+  turnstone, the native host, pins mere `bd5912fb` (2026-09-30), which
+  predates the dial, and mere main does not carry the dial either; turnstone
+  draws graph panes with the fixed-step `canvas.frame`
+  (`turnstone/src/app/mod.rs`) and has no speed control, so the budget would
+  never apply at its 1x. Where it would read the rate: the graph surface's
+  render in `turnstone/src/shell/render.rs`, where the window is in hand, and
+  the lens windows' in `turnstone/src/shell/lens.rs`, by
+  `window.current_monitor()` and winit 0.30's
+  `MonitorHandle::refresh_rate_millihertz()`, an `Option<u32>`. Returned as a
+  fork (a mere-side entry point now and turnstone's wiring once the dial
+  reaches main and turnstone's pin moves; turnstone now on a pin to this
+  branch; native left until turnstone has a speed control). The margin:
+  `StepBudget` gains `margin`, and the gate admits a tick only while the time
+  left covers the forecast tick plus it. The web pages keep 200 us, two of the
+  browser clock's 100 us steps (`physics_budget_margin_us` sets it); the
+  actor's `Instant` clock keeps none. Why 200 us: with the period capped and
+  the margin at 0, a probe bundle logged every tick the gate admitted against
+  the forecast it was admitted on. On the 300-node page, about 2,500 a run at
+  Max and at 50x, a tick ran at most 200 us past its forecast (p99 138), 1.6
+  to 3.0% of them more than 100 us; on the 24-node page at most 194 us; on the
+  11-node fixture at most 413 us, one in 154,062 more than 300 us. A tick and
+  its forecast are both read in steps, so a tick the forecast saw at one
+  reading can read two steps dearer, and the frame's own reading takes the
+  third, which the bound allows. One step (100 us) would leave the 300-node
+  page's worst tick exactly on the bound; a margin scaled to the forecast
+  vanishes on light pages, where cheap ticks read 0 us and the forecast with
+  them. The control is a seiche test on a virtual clock read in 100 us steps:
+  a 200 us tick, every 40th 400 us, an 8 ms budget at 50x; at margin 0 every
+  one of twelve frames admits the dearer tick last and runs 200 us over, past
+  the grain, and at 200 us none does. Headed (`diag_speed_margin`, Springs
+  applied eight times on the 300-node page at Max, 155 frames above real time
+  a run), the margin moves every frame by its 200 us: with it, four runs had
+  none past the grain and the worst 133 us under budget; at margin 0 the worst
+  was 67 to 167 us over. But at margin 0 that page ran a frame past the grain
+  in only 2 of 6 runs (167 us each), and the four probe pages together in 5 of
+  12 (167 to 567 us), so a headed margin-0 control cannot be a gate, and the
+  seiche test is the control. Every window: the tree page keeps, since it
+  opened, the frames above real time, the worst one's overrun and how many ran
+  past the grain (`pace-over-budget-worst-us`, `pace-over-grain-frames`); the
+  fast receipt, its control and the Speed select assert the worst, not only
+  the last window's, and a `log-pace` verb writes the figures into the
+  receipt. Headed on bundle `e681ecfa` (web lock `3cce8fc5`, wasm-bindgen
+  0.2.129), with no other lane's rustc and the CPU at 12 to 28%, all 23
+  receipts green with zero gate entries: the eleven law receipts, profiles,
+  add, drag, Density's two and main's framing control; slow; fast at Max on
+  300 nodes (the budget 8,333 us, half the capped 16.7 ms period, bound at
+  2.0x and 2.9x, every window's worst 133 us under budget, none past the
+  grain); its 50x control on 24 nodes (8,333 us, unbound at 38.3x, worst 1,933
+  us under); both Speed select receipts with Max; and the 2,000-node GPU
+  settle at 1x (413 of 418 device steps). The light fixture's frames came as
+  close as 18.2 ms apart, three of the panel's periods, and its budget is
+  8,333 us too. A faster display was not emulated: the panel already is one,
+  but no page here keeps up with it, so the under-8.3 ms case stands on the
+  `frame_budget` test (3,030 us at 165 Hz intervals). Gates: seiche 127/127
+  (121 without actor, 127 + 3 with gpu), pictograph 297, graphshell `web` 240,
+  mere and graphshell checked clean.
+- 2026-10-05 (seiche's speed, "Infer the period" and "Mere entry point, then
+  turnstone shouldn't be left stale, so that next" carried out, branch
+  `seiche-speed`). Main `4bc901d2` merged (`1dc8f5a8`): the plan the only file
+  both sides changed, weave's result identical to `git merge-file`'s, no
+  conflict. The entry point (`1d2f04cf`): seiche gains `DEFAULT_BUDGET_SHARE`
+  (0.5, moved from graphshell's `web_speed`), `FALLBACK_DISPLAY_PERIOD` (60
+  Hz's), `display_period(millihertz)` for the rate winit's
+  `MonitorHandle::refresh_rate_millihertz` reports (60 Hz's when unknown or
+  zero), `StepBudget::of_period`, and on native targets
+  `StepBudget::for_display`, half the period on the monotonic clock with no
+  margin; `Physics::step_budget` hands back the budget last set, inline or
+  offloaded. Pictograph gains `Canvas::set_physics_display_rate(Option<u32>)`
+  and `Canvas::physics_step_budget`. Tested at 60, 120, 144, 165 and 59.94 Hz
+  and an unknown rate in seiche, through the offload too, and at 165, 144 and
+  60 Hz and none on the canvas. A known native rate is taken as it is, not
+  capped at 1/60 s (*reading, not ruled*: the cap is the browser's fallback).
+  Turnstone's repin and wiring follow this branch's merge, arranged by the
+  coordinator. The inference (`2254832b`): the web period is the largest
+  between 1/360 s and 1/60 s that every recent interval is a whole multiple of
+  within the browser clock's 100 us grain, tried at the shortest interval over
+  1, 2, 3, ... and refined over all of them; when nothing fits, the shortest
+  interval, between 1/360 s and 1/60 s, stands in (*reading, not ruled*: "the
+  1/60 s cap as the fallback" read as the rule built before it). Its tests
+  hold 60, 120, 144 and 165 Hz from mixed multiples read in 100 us steps, the
+  even-multiple overestimate (6,060 us on a 165 Hz page that always takes an
+  even number of refreshes; at 60 Hz two refreshes are past the cap), the
+  fallback, gaps and ageing. The snapshot, the product page and the pace lines
+  say where the period came from and how far the worst interval sat from its
+  multiple, and `diag_display_period` logs the intervals for an offline fit.
+  On this panel the rule as ruled infers nothing: in all 16 logged windows
+  (two runs each of the 300-node and 24-node pages, under load and calm) the
+  period fell back to 16.7 ms, so the budget stayed 8,333 us, and it still did
+  at tolerances up to 0.5 ms. Two causes, from the logged intervals: a few
+  frames near the page's start and its arrangement change land off any
+  multiple (53.2 ms against 9 periods, 28.5, 44.9, 114.3 ms, 1.3 to 2.5 ms
+  off) and stay in the 120-interval window; and the steady intervals scatter
+  by up to about 0.2 ms (36.4 to 36.6 ms for six periods), as two timestamps
+  each read within a step would. The panel's period read 6.061 ms in one run
+  and 6.078 to 6.089 ms in another. A quorum, the largest period that 90% of
+  the intervals fit within 0.2 ms, found 6.06 to 6.08 ms in 8 of the 16
+  windows, half of it (3.04 ms) in one and nothing in seven. Returned as a
+  fork. A second finding, from the fast receipt's every-window bound: in 6 of
+  10 runs of it this round (no other lane's rustc, the CPU at 34 to 57%)
+  exactly one frame ran past the grain, 1,461 to 3,082 us over, always in the
+  first window; the last round's runs had none. The pace line now names the
+  worst frame (`e0ecb3d5`), and it read: the second frame above real time, two
+  ticks in 4,500 us against a 3,039 us budget. That budget is half of 6.078
+  ms: early, before the outlying intervals arrive, the inference does find
+  this panel's period, and the two ticks were the 1x floor's, which the budget
+  never stops ("fast-forward is never slower than 1x"), at about 2.25 ms each
+  while the 300-node layout starts. So once the period is inferred on this
+  page, the floor and the bound over every frame cannot both hold; the gate
+  itself kept every frame it decided within the grain. Returned as a fork with
+  the first. The other dial receipts on bundle `da14cbaf` were green (slow;
+  the 50x control unbound at 36.6x, worst 2,533 us under; both Speed select
+  receipts); the law receipts were not rerun, the budget being inert at 1x.
+  Gates: seiche 128/128 (122 without actor, 128 + 3 with gpu), pictograph 298,
+  graphshell `web` 242, mere and graphshell checked clean.
+- 2026-10-05 (seiche's speed, "Only ticks past the floor" carried out, the
+  checkpoint before the estimator, branch `seiche-speed` `e0b7d5c7`). Main
+  `9680306d` merged (`bd63aa72`): the plan the only file both sides changed,
+  weave's result identical to `git merge-file`'s, no conflict. Main's
+  scenomise gained a scenograph dependency, so the gitignored web lock took
+  that one edge (`cargo metadata --offline`, nothing else changed; `3cce8fc5`
+  to `b5dd3025`). Seiche's step report gains `admitted`, the ticks the
+  budget's gate admitted past the 1x floor, and `admitted_until`, when the
+  last of them ended; the floor's own ticks still run whatever the budget, so
+  fast-forward is never slower than 1x. The tree page's every-window bound
+  reads `admitted_until` against each frame's budget in frames where the gate
+  admitted ticks (`pace-gated-frames`), counts floor-only frames past the
+  budget apart (`pace-floor-over-frames`), and the last window's figure reads
+  the same way. A seiche test holds the split: seven admitted 1 ms ticks
+  ending at the 8 ms budget, a 60 ms floor admitting none, and a planted 5 ms
+  tick the gate admits ending 1 ms past. The positive control is a stall
+  planted in the budget's clock (`physics_plant_stall_ms`, 10 ms every 97th
+  reading by default), and `p6_tree_speed_fast_planted` asserts the bound sees
+  it. On bundle `eec720d1` the fast receipt was green in 10 of 10 consecutive
+  runs (no other lane's rustc, the CPU at 7 to 45%), and in 24 of 25 valid
+  runs on the bundle, the one miss a frame whose admitted ticks ended 567 us
+  past its budget at 34% CPU, a stall the 200 us margin does not cover; the
+  planted control failed the bound in all seven of its runs (8 to 12 frames
+  past the grain, the worst 7.7 to 9.7 ms over). Some runs read an early
+  budget of 3,030 us, the inferred 6.06 ms period before the outlying
+  intervals arrive, and stayed inside it. Sixteen runs never started: the
+  harness's port was still held when a run began, where it was traced by a
+  killed sink's listener lingering under pid 0; the harness now waits for the
+  port and falls back to a nearby free one. Gates at the head: seiche 129/129
+  (123 without actor, 129 + 3 with gpu), pictograph 298, graphshell `web` 242,
+  mere and graphshell checked clean. The full headed round, run straight
+  through, met 76 to 82% CPU and up to three other lanes' rustc partway, and
+  its load-sensitive receipts missed (the fast receipt at 0.47x with one
+  admitted frame 167 us past, its 50x control at 12.2x, the Speed select's Max
+  step 967 us past, Density's control at rank 0.01 against 0, the planted
+  control timing out); the law receipts, slow, the main page's Speed select
+  and the 2,000-node settle were green. It is rerun with a calm wait before
+  each scenario, recorded when it lands.
+- 2026-10-06 (seiche's speed, the merge candidate's calm round, branch
+  `seiche-speed`, per "Merge at the checkpoint" and "Ask sessions to pause").
+  Main `75e13d8d` (Burn/CubeCL pre.4) merged at `2b6d620e` and main `4714489f`
+  (G9, stack seams P1 and S32) at `e491e539`: three files and then eleven
+  changed on both sides, every weave result identical to `git merge-file`'s,
+  no conflicts, main's root lock kept exactly. The gitignored web lock started
+  from the pre.4 lane's (`f8eab000`) and took three dependency edges to
+  packages already in it, cambium-rootstock, chirograph and sceno (`cargo
+  metadata --offline`; now `fd064e9b`). Merged, main's G9 test called
+  `RemoteBoard::sync` with the three arguments it took before this branch's
+  "The viewer's own dial"; it passes real time now (`aad08332`, test-only, the
+  bundle unchanged). Gates: seiche 129/129 (123 without actor, 129 + 3 with
+  gpu), pictograph 310, graphshell `web` 246, mere and graphshell checked
+  clean. The round was first run with the machine loaded (66 to 100% CPU, up
+  to 13 other lanes' rustc): its 16 law and fixture passes and Density's
+  control's miss at rank 0.08 were set aside. Calm (no other lane's rustc or
+  cargo at Normal priority or above and the CPU under 50% for two samples 15 s
+  apart, a bounded wait before every row, rows whose wait ran out rerun), on
+  bundle `aa9d30b9`: all 24 rows green, the CPU at each row's start 18 to 65%.
+  The eleven law receipts, profiles, add, drag, Density, Density's control
+  (rank -0.029, as in earlier calm rounds: the 0.08 was the load), the framing
+  control; slow; fast at Max (worst admitted frame 133 us under); the planted
+  control failing the bound for its planted reason (11 frames past the grain,
+  the worst 9,367 us, the 10 ms stall's signature); the 50x control; both
+  Speed select receipts; the 2,000-node GPU settle at 1x (413 of 418 device
+  steps). The fast receipt then ran 12 more times, calm or passing under load:
+  12 of 12 green, the worst admitted frame 233 us under to 67 us over its
+  budget, none past the grain, so the one 567 us miss did not recur and the
+  200 us margin stands.

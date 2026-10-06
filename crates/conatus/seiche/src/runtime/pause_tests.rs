@@ -64,6 +64,9 @@ fn stale_actor_snapshots_cannot_undo_reseed_or_halt() {
         energy: 0.0,
         speed: 0.0,
         command_epoch: 0,
+        dial: Speed::REAL_TIME,
+        budget: None,
+        pace: PaceStats::default(),
     });
     let mut sim = Simulation::new();
     let node = NodeKey::new(0);
@@ -81,6 +84,7 @@ fn stale_actor_snapshots_cannot_undo_reseed_or_halt() {
             snapshot: sim.snapshot(100),
             settling: false,
             command_epoch: 2,
+            pace: PaceStats::default(),
         })
         .unwrap();
     assert!(physics.advance_frame(&mut view));
@@ -93,6 +97,7 @@ fn stale_actor_snapshots_cannot_undo_reseed_or_halt() {
             snapshot: sim.snapshot(101),
             settling: true,
             command_epoch: 3,
+            pace: PaceStats::default(),
         })
         .unwrap();
     physics.refresh(&mut view);
@@ -110,6 +115,7 @@ fn stale_actor_snapshots_cannot_undo_reseed_or_halt() {
             snapshot: sim.snapshot(102),
             settling: true,
             command_epoch: 3,
+            pace: PaceStats::default(),
         })
         .unwrap();
     physics.refresh(&mut view);
@@ -119,7 +125,7 @@ fn stale_actor_snapshots_cannot_undo_reseed_or_halt() {
 
 #[cfg(feature = "actor")]
 fn receive_epoch(updates: &Receiver<PhysicsUpdate>, epoch: u64) -> PhysicsUpdate {
-    let deadline = std::time::Instant::now() + Duration::from_secs(2);
+    let deadline = std::time::Instant::now() + std::time::Duration::from_secs(2);
     loop {
         let remaining = deadline
             .checked_duration_since(std::time::Instant::now())
@@ -140,7 +146,7 @@ fn actor_acknowledges_seed_and_halt_without_a_tick() {
 
     let sim = perpetual_pair();
     let (handle, updates) = spawn(Arc::new(|| {}), move |commands, out| {
-        run(sim, 0, false, true, commands, out);
+        run(sim, ActorState::fresh(0, false, true), commands, out);
     });
     let node = NodeKey::new(0);
     let restored = Point2D::new(10.0, 20.0);

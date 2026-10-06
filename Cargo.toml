@@ -733,3 +733,22 @@ swarm-discovery = { git = "https://github.com/mark-ik/swarm-discovery.git", bran
 # satisfies resolution. Git deps so a bare clone resolves.
 boa_engine = { git = "https://github.com/mark-ik/boa.git", branch = "genet" }
 boa_gc = { git = "https://github.com/mark-ik/boa.git", branch = "genet" }
+
+# Physics in dev builds (physics catalog plan, ruled 2026-10-04, "Opt 3 in dev
+# for physics"): one Density start took 146.5 s at the dev profile's
+# opt-level 0 and 6.0 s with these six crates at 3, the pictograph suite
+# 102.5 s and 12.6 s, with the rebuild after a one-line seiche edit unchanged
+# and backtraces keeping file and line. graphshell-web's own manifest names the
+# same six.
+[profile.dev.package.seiche]
+opt-level = 3
+[profile.dev.package.rapier2d]
+opt-level = 3
+[profile.dev.package.parry2d]
+opt-level = 3
+[profile.dev.package.nalgebra]
+opt-level = 3
+[profile.dev.package.simba]
+opt-level = 3
+[profile.dev.package.glamx]
+opt-level = 3

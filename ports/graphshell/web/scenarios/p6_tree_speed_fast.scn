@@ -1,0 +1,49 @@
+# Seiche's speed dial (physics catalog plan, 2026-10-03): fast-forward under
+# the frame budget, half the display's frame period (ruled 2026-10-04,
+# "Target + Max, budget as frame share", "The display's frame"), never more
+# than half of 1/60 s on the web ("Known rate, else capped"), the gate keeping
+# 200 us past the forecast tick ("Gate keeps a forecast margin").
+# tree.html?nodes=300&seed=7&links=none&gpu=off&physics_speed=max runs as fast
+# as the budget allows, so the budget binds every frame, the canvas reports
+# the speed it reached, and stepping stays inside each frame's own budget.
+# p6_tree_speed_fast_control is 50x at 24 nodes; p6_tree_speed_fast_planted
+# is this receipt with a stall planted in the budget's clock, which must fail
+# the bound.
+assert snap ready == true
+assert snap physics-speed == max
+assert snap physics-budget-share == 0.5
+assert snap physics-budget-margin-us == 200
+click role:button Play physics
+settle 2
+assert snap physics-paused == false
+click role:combobox Arrangement
+settle 1
+click role:option Free (physics alone)
+settle 1
+click role:button Apply arrangement
+settle 1
+assert snap layout == free
+settle 10
+timing start speed-fast
+settle 30
+timing stop
+log-physics fast
+log-pace fast
+assert snap physics-budget-bound == true
+assert snap physics-effective-speed >= 1
+assert snap pace-frames == 30
+# The 300-node page is far slower than its display: the period is capped.
+assert snap display-period-ms <= 16.7
+assert snap physics-budget-us <= 8333
+# Each frame's bound is its budget plus the browser clock's 100 us
+# resolution (performance.now), ruled 2026-10-04, "Bound = budget + clock
+# grain", over every frame above real time since the page opened, not only
+# the last window's (ruled the same day with the margin), on the ticks the
+# gate admitted past the 1x floor (ruled 2026-10-05, "Only ticks past the
+# floor"): the floor's own ticks run whatever the budget.
+assert snap pace-gated-frames >= 1
+assert snap pace-over-budget-us <= 100
+assert snap pace-over-budget-worst-us <= 100
+assert snap pace-over-grain-frames == 0
+assert snap finite == true
+log p6 speed fast receipt complete
