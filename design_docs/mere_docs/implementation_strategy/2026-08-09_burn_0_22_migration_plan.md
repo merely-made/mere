@@ -4948,8 +4948,10 @@ Verified on macOS with Rust `1.98.1`:
   live-byte/allocation-count comparisons remain in force. Its post-close
   embedding is bit-identical to the preceding one. The receipt is
   `ports/distillery/probe/receipts/2026-10-06_stable_remote_minilm.json`.
-- Turnstone's application compiles with
+- Turnstone's application compiles with `--locked` and
   `distillery/remote,distillery/trainer-gpu,distillery/trainer-autodiff`.
+  All root features plus that backend lane resolve 1,559 packages and 63
+  stable Burn-family rows.
   Its matching Knot and Redshank revisions resolve all five source-identity
   mismatches found during the repin.
 - The Turnstone-baseline Mere backport compiles Distillery with the same
@@ -4971,6 +4973,12 @@ Verified on macOS with Rust `1.98.1`:
   the Burn/raw views share an allocation, a four-byte patch retains the
   atlas without allocator growth, and the accepted delta replays.
   Mesocosm and shared Isomere resolve with Burn-free default graphs.
+
+Final source audit: 718 local Cargo manifests and 25 Burn-family lockfiles
+pass with no active prerelease requirements or package rows. Build caches,
+historical design documents and retired vendor patches are excluded. The
+audit script, receipts, validation logs and Git bundles are retained in the
+workspace assessment directory.
 
 Sibling source strategy:
 - Knot and Isocosm advance their inference consumers and root runtime
