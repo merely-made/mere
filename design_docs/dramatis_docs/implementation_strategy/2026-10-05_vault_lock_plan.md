@@ -1,11 +1,12 @@
 # Vault Lock Plan
 
 **Date**: 2026-10-05
-**Status (2026-10-05)**: assessed; all 16 forks and the follow-ups ruled (rulings 1 to 24
-in §3);
-a djinn test-harness plan comes first (ruling 18), and §3's open
-questions remain. No code changed. Chatelaine P4 (CXF import) waits on this plan (chatelaine
-rulings 64, 65).
+**Status (2026-10-05)**: all 16 forks and the follow-ups ruled (rulings 1
+to 24 in §3); the threat statement is still open. The djinn test harness it
+waited on (ruling 18) landed (`318b8f70`). L1 is under way on a lane branch:
+checkpoint A (residue fixes, the no-residue instrument, the caller map of
+ruling 23, a proposed lock API). Nothing merged. Chatelaine P4 (CXF import)
+waits on this plan (chatelaine rulings 64, 65).
 **Scope**: the resident's secrets can be locked. While locked, no secret
 material can be reached through the vault or the resident's derived keys.
 Unlocking takes a user act. Every consumer (the SSH agent, castellan's item
@@ -429,3 +430,15 @@ power and presence APIs.
 
 **2026-10-05.** Assessed by a read-only lane (Opus); the load-bearing claims
 re-checked in code. Nothing built. Next: Mark's rulings on §3.
+
+**2026-10-05, L1 started.** The harness landed (`318b8f70`), so ruling 18's
+order is met. An Opus lane builds L1 up to checkpoint A:
+- the residue fixes of ruling 6;
+- the tracking-allocator instrument, with its positive control failing on
+  today's clones;
+- the map of ruling 23 (every caller in mere and its siblings that ruling
+  13's `Locked` return breaks);
+- a proposed lock API.
+
+It stops there; the API's choices come to Mark as forks before the
+breaking change is built, Knot first.
