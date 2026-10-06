@@ -27,6 +27,7 @@
 //! contexts without network access. Class-IRI projection policy and complete
 //! named-graph / statement metadata fidelity remain outside this layer.
 
+use crate::reifier::statement_id_from_reifier;
 use crate::{SCHEMA_KEYWORDS, SCHEMA_NAME};
 use kernel::types::{GraphScope, NodeProperty};
 use oxjsonld::{JsonLdParser, JsonLdRemoteDocument};
@@ -75,8 +76,8 @@ pub struct EdgeContribution {
     pub predicate: String,
     pub object: String,
     pub graph_scope: GraphScope,
-    /// The fact handle a `urn:mere:statement:<id>` reifier carried; preserving
-    /// it through apply is what makes the dataset round trip id-stable.
+    /// The exact fact handle a legacy or encoded Mere reifier carried.
+    /// Preserving it through apply makes the dataset round trip id-stable.
     pub statement_id: Option<String>,
     pub label: Option<String>,
     pub provenance_iri: Option<String>,
@@ -95,8 +96,7 @@ pub struct GraphContribution {
 /// RDF ingest failure (JSON-LD, N-Quads, or TriG).
 #[derive(Debug)]
 pub enum IngestError {
-    /// The bytes were not valid for their RDF syntax (oxjsonld / oxttl
-    /// parse/expansion error).
+    /// RDF syntax, expansion, or reserved Mere reifier data was invalid.
     Parse(String),
 }
 
@@ -333,8 +333,6 @@ fn collect_context_strings(ctx: &serde_json::Value, out: &mut Vec<String>) {
         _ => {},
     }
 }
-/// The reifier-IRI prefix `dataset_quads` mints fact handles under.
-const STATEMENT_REIFIER_PREFIX: &str = "urn:mere:statement:";
 const RDF_REIFIES: &str = "http://www.w3.org/1999/02/22-rdf-syntax-ns#reifies";
 const RDFS_LABEL: &str = "http://www.w3.org/2000/01/rdf-schema#label";
 const PROV_WAS_ATTRIBUTED_TO: &str = "http://www.w3.org/ns/prov#wasAttributedTo";
@@ -343,6 +341,7 @@ const PROV_GENERATED_AT_TIME: &str = "http://www.w3.org/ns/prov#generatedAtTime"
 /// One lifted RDF 1.2 reifier: the fact it names + the metadata its other
 /// quads carried.
 struct ReifiedStatement {
+    statement_id: Option<String>,
     subject: String,
     predicate: String,
     object: ReifiedObject,
@@ -383,7 +382,7 @@ fn collect_contribution<E: std::fmt::Display>(
     // Pass A: materialize the stream and lift out RDF 1.2 reifiers. A subject
     // that `rdf:reifies` a triple term is statement METADATA, not a node: its
     // reified (s, p, o, g) names the fact, its other quads carry the fact's
-    // label / provenance / assertion time, and a `urn:mere:statement:<id>`
+    // label / provenance / assertion time, and a legacy or encoded Mere
     // IRI carries the fact handle itself. Everything else flows to pass B.
     let mut plain: Vec<Quad> = Vec::new();
     let mut reified: BTreeMap<String, ReifiedStatement> = BTreeMap::new();
@@ -394,6 +393,9 @@ fn collect_contribution<E: std::fmt::Display>(
             && let Term::Triple(triple) = &quad.object
         {
             let reifier = subject_iri(&quad.subject, namespace);
+            let statement_id = statement_id_from_reifier(&reifier).map_err(|error| {
+                IngestError::Parse(format!("invalid assertion ID reifier {reifier}: {error}"))
+            })?;
             let object = match &triple.object {
                 Term::NamedNode(node) => ReifiedObject::Resource(node.as_str().to_string()),
                 Term::BlankNode(node) => {
@@ -409,6 +411,7 @@ fn collect_contribution<E: std::fmt::Display>(
             reified.insert(
                 reifier,
                 ReifiedStatement {
+                    statement_id,
                     subject: subject_iri(&triple.subject.clone(), namespace),
                     predicate: normalize_schema_org(triple.predicate.as_str()),
                     object,
@@ -509,8 +512,8 @@ fn collect_contribution<E: std::fmt::Display>(
     // Attach the lifted reifier metadata to the matching contributions:
     // resource-object statements to edges (by subject + predicate + object +
     // scope), literal-object statements to node properties (by predicate +
-    // value + typing + scope). A `urn:mere:statement:<id>` reifier also hands
-    // over the fact id, keeping the round trip id-stable; a foreign reifier
+    // value + typing + scope). A Mere reifier also hands over the exact fact
+    // id, keeping the round trip id-stable; a foreign reifier
     // leaves the id to the kernel's minter.
     //
     // Both matches are indexed up front rather than linear-scanned per reifier,
@@ -556,10 +559,8 @@ fn collect_contribution<E: std::fmt::Display>(
             }
         }
     }
-    for (reifier, statement) in reified {
-        let statement_id = reifier
-            .strip_prefix(STATEMENT_REIFIER_PREFIX)
-            .map(str::to_string);
+    for statement in reified.into_values() {
+        let statement_id = statement.statement_id;
         match &statement.object {
             ReifiedObject::Resource(object) => {
                 let match_key = (

@@ -4,7 +4,8 @@
 **Status (2026-10-06):** in progress. P1 implemented and gated on
 `graph-semantics`, with the ruling-9 exact-journal and legacy-checkpoint
 attribution repair complete after the original `459cad84` receipt. Those
-receipts covered IRI-safe handles; C19 now exposes an opaque-id reifier gap.
+receipts covered IRI-safe handles; the C19 opaque-id gap is now repaired
+and its expanded RDF round-trip gate passes.
 Reconciled main `62219dd1` rulings 9–19 before P2 source edits; the graph
 plan is unchanged at main `d2d6ac3d`. A1/B1/C1 selected by "All 1";
 `ResourceNode`/`SurfaceNode` are settled by ruling 19, and B1/C1 remain
@@ -22,8 +23,10 @@ and borrowed query-adapter checkpoint passes its gates. Production predicate
 routing remains incomplete. C18/C19 option 1 is accepted (rulings 31–32).
 Typed edge handles and projection readers are implemented; their checkpoint
 gates pass (Graphshell serial; initial parallel carrier timeout recorded).
-The reversible codec is independently tested, with
-production RDF integration held at C20's malformed encoded-ID policy.
+The reversible codec is integrated in production. Mark selected C20 option 1
+(ruling 33); malformed reserved v1 IDs fail ingest atomically and all 50
+linked-data/query tests pass. The workspace and documentation gates pass.
+C21 custom placement ownership is the next open registry checkpoint.
 Resource population and conflict migration remain incomplete.
 Replay-first migration and per-predicate placement govern P2. The committed
 identity/lifecycle slice and recreation repair pass their gates; P2 is incomplete.
@@ -1230,6 +1233,76 @@ formatting. The codec remains test-only; production export/ingest retain
 their original behavior while C20 is pending. This does not repair or qualify
 the arbitrary-handle dataset/reingest path yet.
 
+### Opaque assertion RDF integration findings (2026-10-06)
+
+- **Exact handles in production.** The shared codec is now compiled in
+  production and export calls its encoder (`crates/graph/linked-data/src/lib.rs`
+  46–48, 214). Valid legacy reifier IRIs stay byte-for-byte stable. Unsafe
+  String handles encode as lower-hex UTF-8 in the disjoint v1 namespace;
+  empty and ordinary Unicode handles still use their valid legacy IRIs
+  (`crates/graph/linked-data/src/reifier.rs` 15–53).
+- **Failing reserved input is atomic.** Ingest decodes both formats while
+  collecting reifiers in pass A. Invalid v1 hex/UTF-8 returns an explicit
+  existing `IngestError::Parse` before a contribution can escape; the parser
+  has no live graph reference (`crates/graph/linked-data/src/ingest.rs` 393–399).
+  Foreign IRIs and unknown versions retain their existing no-carried-ID path.
+  The duplicate legacy prefix and export formatter are removed.
+- **Production-path controls.** The malformed-input test covers three error
+  classes in both valid/invalid stream orders, with legacy, encoded, foreign
+  and unknown-version positive controls. Ten independently attributed IDs on
+  one triple retain exact handles, source, time, label and User scope through
+  quad ingest, N-Quads, TriG, apply and normalized dataset comparison. Both
+  surface and explicit resource projections are exercised. Borrowed SPARQL
+  sees every exact reifier, with a Default-scope negative beside the User-scope
+  positive. Two unsafe literal handles preserve datatype/language, provenance,
+  time and Source/User scope through file parsing and application
+  (`crates/graph/linked-data/src/reifier.rs` 167, 205, 376).
+- **Bounds unchanged.** These fixtures use valid source IRIs and representable
+  millisecond timestamps. Invalid source IRIs and times outside the serializer's
+  range retain their previous omission behavior (`lib.rs` 191–238, under the
+  same linked-data source root). This repair qualifies arbitrary String IDs
+  under the existing RDF profile, not metadata outside that profile. Applying
+  contributions still uses the existing surface writer pending P2 routing;
+  exact RDF identity fidelity does not qualify resource placement on ingest.
+
+### Custom placement registry ownership checkpoint C21 (2026-10-06)
+
+The settled placement table covers 43 recognized non-traversal sub-kinds
+(17 Semantic, three Arrangement, seven Containment, seven Imported and nine
+Provenance); traversal stays on surfaces. Thirty-two are resource kinds and
+eleven are surface kinds. There are zero implemented predicate-placement
+registry declarations (`crates/graph/graph-kernel/src/graph/edge_taxonomy.rs`,
+`edge_data.rs` 384). The statement brief explicitly leaves the registry's
+concrete shape open (`../technical_architecture/2026-06-19_statement_kernel_brief.md`
+162). Ruling 26 fixes the unfamiliar-predicate resource default and permits
+explicit per-predicate surface overrides; it does not settle who owns those
+overrides for subsequent writes after reopening elsewhere.
+
+Exact pair captures already preserve a historical statement's owning store
+(`crates/graph/graph-kernel/src/graph/capture.rs` 261–274). The snapshot stores
+both strata and shown associations, with no predicate registry column
+(`crates/graph/graph-kernel/src/persistence.rs` 288–310). Mere's host registry
+depends on the kernel, so the kernel cannot depend back on that registry
+(`crates/system/registry/Cargo.toml`). Either choice needs a kernel-level
+placement input; persisted declarations additionally need durable ownership.
+
+1. **Persist declarations with the mere (recommended).** A custom predicate's
+   declared nature travels with the mere and governs subsequent writes after
+   reopening in another host. Composition must retain and resolve conflicting
+   declarations; its conflict policy remains a separate design concern.
+2. **Installed host registry.** Local installed declarations govern new
+   writes. Exact captures preserve historical placement independently, but a
+   later assertion can land differently when the mere opens in another host.
+
+C21 is put to Mark before mutable override installation. The fixed table and
+legacy/live replay split do not depend on that answer. Review found two raw
+legacy replay arms delegate to live assertion arms (`graph/apply.rs` 615–638
+and 1619–1642, under `crates/graph/graph-kernel/src`). Before live routing,
+keep those old operations explicitly surface-only; migration must recover
+mint-time endpoints separately under ruling 11. New resource writes use the
+existing typed exact resource-pair captures rather than reinterpret old
+surface grammar. No routing or registry policy is implemented at this point.
+
 ## 3. Rulings
 
 Mark's answers, from multiple-choice rounds; each is the option label quoted
@@ -1538,6 +1611,12 @@ caller-selected handles under a distinct versioned namespace outside
 `urn:mere:statement:` and decode both formats. Existing valid output stays
 stable; arbitrary kernel String handles retain their identity and metadata.
 
+**Ruling 33 (C20, 2026-10-06).** Mark: **"Option 1"**. Reject ingest
+when a reifier uses the exact reserved v1 assertion-ID namespace but carries
+invalid hexadecimal bytes or invalid UTF-8. Return an explicit error with no
+partial contribution. Unrelated foreign reifiers and unknown versions keep
+their existing behavior.
+
 ## 4. Phases
 
 ### Placement by stratum (rulings 10, 14, 15)
@@ -1686,11 +1765,54 @@ comes back to Mark as a fork, with evidence, before the code commits to one.
 - **C19 (P1/P2). Opaque assertion reifier ids.** Ruled: option 1, ruling 32.
   The dated Findings retain the positive/negative probe and alternatives.
 
-- **C20 (P1/P2). Malformed encoded assertion IDs.** Open: reserved-format
-  invalid hex/UTF-8 may error or follow foreign-id fallback. Evidence and
-  two options are recorded above; dependent ingest integration waits.
+- **C20 (P1/P2). Malformed encoded assertion IDs.** Ruled: option 1, ruling
+  33. Reject malformed reserved v1 hex/UTF-8 without a partial contribution;
+  unrelated foreign namespaces/versions retain their existing behavior.
+
+- **C21 (P2). Custom predicate placement ownership.** Open: persist
+  declarations with the mere or use the installed host registry for new writes.
+  Historical placement remains preserved by exact captures in either case.
+  Evidence and two options appear above; mutable override installation waits.
 
 ## 6. Progress
+
+- **2026-10-06. C19/C20 production RDF repair qualified; stopped at C21.**
+  Promoted the shared codec into production export/ingest and added three
+  production-path invariant tests alongside its three helper controls.
+  Linked-data with `query`, offline/locked and one Cargo job in the shared
+  Mere target, passes **50 tests**, zero failed/ignored; no doc tests exist.
+  The old-encoder control runs exactly one round-trip invariant test and
+  fails with **four reifiers instead of ten**. Restored exact source bytes;
+  the full 50-test gate passes again. The initial control invocation selected
+  zero tests because its exact filter omitted the module path; corrected
+  before recording any control qualification. No temporary source/backup
+  files remain. `cargo check --workspace --offline --locked -j 1` exits 0.
+  Existing compiler/configuration warnings remain; no lockfile changes.
+
+  Independent source review found no codec or atomic-ingest defect and
+  confirmed the unchanged metadata bounds above. Routing review identified
+  the legacy/live replay split and C21 registry ownership; no P2 routing
+  edits or custom override policy were selected. C21 is put to Mark under
+  this lane's stop-at-forks rule. P2 remains incomplete; P3–P5 remain unbegun.
+
+  Final touched-file rustfmt and diff checks pass. Documentation audit and
+  its planted-defect/clean-fixture self-test pass; all finding buckets remain
+  equal to HEAD baseline in the same environment. No new active doc or D2
+  record. Kernel/store tests and wasm32 kernel check were not rerun because
+  no kernel source changed in this bounded repair; their `9058352e` gates
+  remain historical evidence. Untouched crate tests, ignored tests, sibling
+  builds and headed/browser/physical proofs were not run. No downloads,
+  dependencies, source pins, capture grammar or main checkout changed.
+  Nothing is pushed or integrated into main. Retain the existing isolated
+  worktree for the graph-semantics lane's unfinished P2 and Mark's review;
+  reuse the shared stable `C:/t/cargo-targets/mere` for builds/receipts. No
+  extra target, Cargo home, worktree or scratch source was created.
+
+- **2026-10-06. C20 continuation authorized.** Mark selected "Option 1".
+  Resuming from clean branch checkpoint `9058352e`; promote the shared
+  reversible codec into export/ingest and qualify exact assertion identity,
+  metadata and malformed-input rejection. P2 routing review runs independently;
+  no sibling, dependency or lock changes are authorized by this step.
 
 - **2026-10-06. C18/C19 continuation authorized.** Mark accepted option 1
   for both with "Yep. Proceed." Branch state is clean at `3536e074` before

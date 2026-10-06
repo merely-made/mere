@@ -43,8 +43,9 @@ use serde_json::{Map, Value, json};
 use std::collections::BTreeMap;
 use time::{OffsetDateTime, format_description::well_known::Rfc3339};
 
-#[cfg(test)]
 mod reifier;
+
+use reifier::statement_reifier_id;
 
 /// JSON-LD ingest (Phase 2): `application/ld+json` → a graph contribution.
 pub mod ingest;
@@ -185,10 +186,6 @@ fn property_literal(property: &NodeProperty) -> Literal {
         return Literal::new_typed_literal(property.value.clone(), datatype);
     }
     Literal::new_simple_literal(property.value.clone())
-}
-
-fn statement_reifier_id(statement_id: &str) -> String {
-    format!("urn:mere:statement:{statement_id}")
 }
 
 fn asserted_at_literal(asserted_at_ms: u64) -> Option<Literal> {
