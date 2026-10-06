@@ -1,8 +1,8 @@
 # Stack seams plan: catalog, shared device, actions, determinism, two words
 
 **Date:** 2026-10-04
-**Status (2026-10-06):** in progress. Forty-five rulings in fifteen rounds
-(S1 to S45); P1 landed on main (`1633be0c`); P2 staged (S27 to S31, four
+**Status (2026-10-06):** in progress. Forty-eight rulings in sixteen rounds
+(S1 to S48); P1 landed on main (`1633be0c`); P2 staged (S27 to S31, four
 stages in §3.1) and landed on main (`40d7ae5e`); S32 (F19) landed on main
 (`48c08dee`); the S14 pass (S33) under way; P3 and S7 done as documents; S3 to
 S6 carried into the dynamics grammar plan (G8, G9); S9 done by the identity
@@ -721,6 +721,39 @@ files on a clean tree in one commit, and a check makes new owned files carry
 the header; both are a follow-on task outside this pass, and the license
 sweep's status records the drift until then.
 
+Round 16, 2026-10-06, after phase B. Evidence: the phase C assessment in
+§5 (166 documents with recommended actions, about 67 archive candidates, 27
+documents touched by other lanes since 2026-09-29).
+
+**Ruling S46.** *About a dozen of the 166 documents are lanes' live plans
+that moved heavily this week. How does phase C treat them?* Options: hand
+them to their lanes with their records and correct the rest; edit all of
+them additively; ask each lane first. Mark: **"Hand to their lanes
+(Recommended)"**. Follows: phase C leaves the live plans alone and each lane
+is pointed at its record; the other documents are corrected. *Reading, not
+ruled*: "live" means ten or more commits from other lanes since 2026-09-29,
+plus the djinn test harness plan (founded 2026-10-05, its lane active):
+physics catalog, dynamics grammar, burn 0.22 migration, graphshell one tree,
+vault lock, device pairing, chatelaine, projection grammar adoption, the
+controls and physics receipt, conatus engine, djinn test harness.
+
+**Ruling S47.** *How are the corrections carried out?* Options: opus write
+lanes in their own worktrees, each diff reviewed with both audits green before
+it merges; sequentially by this session. Mark: **"Write lanes, reviewed
+(Recommended)"**. Follows: write lanes correct their assigned documents in
+worktrees; this session reviews each diff, runs both audits, and merges.
+*Reading, not ruled*: lanes edit only their assigned documents; DOC_README,
+archive moves and the tails backlog are cross-cutting, so lanes propose them
+and this session applies them centrally, avoiding merge collisions.
+
+**Ruling S48.** *Where do archived plans' ownerless tails go?* Options: their
+live owner when one plainly exists, else a new dated section of the archived
+plan tails backlog; a new follow-ons plan per area root; ask per plan. Mark:
+**"Archived plan tails (Recommended)"**. Follows: phase C moves each tail to
+its plain live owner or into a dated section of
+`2026-07-03_archived_plan_tails_plan.md`, citing the archived plan, before
+the archive move.
+
 ## 3. Phases
 
 ### 3.1 This plan's lane
@@ -860,6 +893,10 @@ The done-conditions handed over for S3 and S4, kept for reference:
   works in `projection_compile`. Second pass (F8 to F11), rulings S7 to S10:
   the README fixed (S7), TERMINOLOGY gains pandect under Eidetic and the
   curation record (S8, S10), S9 sent to the identity lane.
+- **2026-10-06.** Round 16: S46 (live plans handed to their lanes), S47
+  (reviewed write lanes) and S48 (ownerless tails to the archived plan tails
+  backlog). S44's repins and S45's header re-run were flagged as separate
+  follow-on tasks for Mark to start.
 - **2026-10-06.** The S14 pass, phase B done: batches 39 to 51 re-judge
   all 145 plans at `535bca11`, superseding their earlier records (S34). 1,656
   claims checked: 1,190 hold, 408 stale, 58 unverifiable; 241 contradictions;
