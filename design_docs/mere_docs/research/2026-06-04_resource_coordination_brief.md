@@ -101,7 +101,7 @@ grant, the board ignores unauthorized claims, and revocation prevents new leases
 ## 4. Bounty And Verification Economy
 
 **Authority**:
-[`../../moothold_docs/implementation_strategy/2026-06-30_bounty_verification_economy_plan.md`](../../moothold_docs/implementation_strategy/2026-06-30_bounty_verification_economy_plan.md)
+[`../../archive_docs/2026-10-06_retired_plans/2026-06-30_bounty_verification_economy_plan.md`](../../archive_docs/2026-10-06_retired_plans/2026-06-30_bounty_verification_economy_plan.md)
 
 **Related**:
 [`../implementation_strategy/2026-05-07_moot_tiers_and_voluntary_hosting_brief.md`](../implementation_strategy/2026-05-07_moot_tiers_and_voluntary_hosting_brief.md),

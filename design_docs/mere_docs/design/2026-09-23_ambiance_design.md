@@ -510,7 +510,7 @@ Consequences:
 - **"tier".** Mere's in-product vocabulary already uses tiers for socialization:
   mere t1, moot t2, moothold t3, gemot t4 ([DOC_README](../../DOC_README.md),
   working principles). The
-  [physics scenes plan](../implementation_strategy/2026-06-22_physics_scenes_and_tangibility_plan.md)
+  [physics scenes plan](../../archive_docs/2026-10-06_completed_plans/2026-06-22_physics_scenes_and_tangibility_plan.md)
   uses "Tier 2, ambient separate sims" for the living backdrop. *The ambient
   tier* is neither: it is the bottom level of the keeping axis.
 - **"ambient".** The
@@ -543,7 +543,7 @@ Consequences:
   is now minted. It is unrelated to *reservoir sampling*, the random-sampling
   algorithm, which matters in RNG work. *Vault*, the other word offered, stays
   with the personae vault, `%LOCALAPPDATA%\personae\vault`
-  ([family shared identity plan](../implementation_strategy/2026-08-08_family_shared_identity_plan.md)),
+  ([family shared identity plan](../../archive_docs/2026-10-06_completed_plans/2026-08-08_family_shared_identity_plan.md)),
   and Knot's vault
   ([suite census](../../2026-08-22_turnstone_suite_composition_and_capability_census.md)).
 - **Entries.** On 2026-09-23 [TERMINOLOGY](../../TERMINOLOGY.md) gains

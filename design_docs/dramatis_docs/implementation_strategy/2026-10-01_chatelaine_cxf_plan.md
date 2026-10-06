@@ -22,9 +22,9 @@ castellan's OTP items and its Secret Service store onto it; then import
   C5: the Mere 0.4 baseline waits on chatelaine's taxonomy landing.
 - [standards survey](../../2026-08-24_standards_survey_brief.md) §2.3: CXF
   ADOPT (import first), CXP WATCH, the plaintext hazard.
-- [castellan OTP plan](../../mere_docs/implementation_strategy/2026-08-10_castellan_otp_plan.md):
+- [castellan OTP plan](../../archive_docs/2026-10-06_completed_plans/2026-08-10_castellan_otp_plan.md):
   the RFC-vector-verified OTP core this plan re-homes, not rewrites.
-- [insigne proofs plan](2026-09-23_insigne_proofs_plan.md): the precedent for
+- [insigne proofs plan](../../archive_docs/2026-10-06_completed_plans/2026-09-23_insigne_proofs_plan.md): the precedent for
   a plain-data core with no cryptography, checked by a wasm build.
 
 ---

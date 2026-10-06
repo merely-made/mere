@@ -18,7 +18,7 @@ errors are corrected below, each verified against the code.
 
 Sibling / converging docs:
 
-- [node_representation_arrangement_plan](../../mere_docs/implementation_strategy/2026-06-18_node_representation_arrangement_plan.md):
+- [node_representation_arrangement_plan](../2026-10-06_superseded_plans/2026-06-18_node_representation_arrangement_plan.md):
   the arrangement half of node-rep (Phase A = kanban/timeline lives there). **Decision 2 reserves
   node face color for activation state** — the encoding collision below.
 - [graph_cluster_namespaces_brief](../../mere_docs/implementation_strategy/2026-05-10_graph_cluster_namespaces_brief.md): already states

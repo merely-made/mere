@@ -10,7 +10,7 @@ verified 2026-07-24. Current `main` is the unpublished 0.0.4 development line.
 
 The four questions this note left open are answered below under
 [Rulings](#rulings-2026-07-24-release), executed per the
-[Scenograph 0.0.3 release plan](../../../design_docs/mere_docs/implementation_strategy/2026-07-24_scenograph_0_0_3_release_plan.md).
+[Scenograph 0.0.3 release plan](../../archive_docs/2026-10-06_completed_plans/2026-07-24_scenograph_0_0_3_release_plan.md).
 
 The family moved on 2026-07-23: the standalone `scenograph` repo was absorbed
 into mere at `crates/scenograph`, and on 2026-09-03 the three crates moved
@@ -18,7 +18,7 @@ again to `crates/cambium/scenes/` under the Cambium umbrella, with the generic
 `scenograph` facade dissolved (platform boundary plan, P2). The proof sequence
 and findings live
 in this repo beside it,
-[projection_proofs_plan](../../../design_docs/mere_docs/implementation_strategy/2026-07-21_projection_proofs_plan.md);
+[projection_proofs_plan](../../archive_docs/2026-10-06_completed_plans/2026-07-21_projection_proofs_plan.md);
 the direction record is the
 [prior-art brief](../../../design_docs/mere_docs/research/2026-07-21_projection_engine_prior_art_brief.md).
 

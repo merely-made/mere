@@ -90,9 +90,9 @@ world is the third: one host-agnostic WIT contract, `OpfsStore` browser /
 **Open, raised by the S14 pass (2026-10-06):** Phase 7 and the newer
 browser-storage work ignore each other. Muniment's `IndexedDbBackend`
 (`crates/eidetic/muniment/src/indexeddb_backend.rs`) is the browser store
-today, per the [redb over OPFS feasibility plan](2026-08-22_redb_opfs_feasibility_plan.md),
+today, per the [redb over OPFS feasibility plan](../../archive_docs/2026-10-06_completed_plans/2026-08-22_redb_opfs_feasibility_plan.md),
 which has its own probe (`ports/muniment-opfs-probe`); and the
-[orrery browser lane plan](../../mere_docs/implementation_strategy/2026-06-24_orrery_browser_lane_plan.md)
+[orrery browser lane plan](../../archive_docs/2026-10-06_superseded_plans/2026-06-24_orrery_browser_lane_plan.md)
 says its lane activates Phase 7, which this plan records only as a trigger
 emerging. What becomes of Phase 7? Options: keep the hand-rolled
 `eidetic-opfs` Store and reconcile it with Muniment's `IndexedDbBackend` and
@@ -102,7 +102,7 @@ Phase 7.
 ### Phase 8 — `eidetic::browsing` (Layer-4 browsing memory)
 
 **ACTIVATED 2026-06-12** → built under the
-[browsing derivation plan](2026-06-12_eidetic_browsing_derivation_plan.md)
+[browsing derivation plan](../../archive_docs/2026-10-06_completed_plans/2026-06-12_eidetic_browsing_derivation_plan.md)
 (slices E1/E2; the pull is Mark directly — the single-consumer rule).
 
 Browsing-memory accumulation composing `BrowsingTrace` and related typed payloads
@@ -121,7 +121,7 @@ than duplicate a visited-set.
 ### Phase 9 — `SearchIndex` schema + tantivy
 
 **Producer half ACTIVATED 2026-06-12** → built native-first under the
-[browsing derivation plan](2026-06-12_eidetic_browsing_derivation_plan.md)
+[browsing derivation plan](../../archive_docs/2026-10-06_completed_plans/2026-06-12_eidetic_browsing_derivation_plan.md)
 (slices E3/E4: `eidetic-search`, the format-versioned `SearchIndex` engram,
 BM25 recall + fast-field reports, the engine-agnostic hybrid-fusion seam).
 The **consume half stays here** (EngramDirectory over iroh-blobs ranges,
@@ -236,7 +236,7 @@ checkout at `Code/.tantivy-probe` — and the design pass §7.5):**
   hybrid-retrieval (BM25 + vector) tie to geist RAG. Still trigger-gated; no
   code.
 - 2026-06-12 — **Phase 8 and Phase 9's producer half activated** into the
-  [browsing derivation plan](2026-06-12_eidetic_browsing_derivation_plan.md)
+  [browsing derivation plan](../../archive_docs/2026-10-06_completed_plans/2026-06-12_eidetic_browsing_derivation_plan.md)
   (Mark pulled the user-value arc directly: derive useful information from
   your own browsing). This plan remains the umbrella for Phase 7, the wasm
   probe, and Phase 9's consume/federation half.

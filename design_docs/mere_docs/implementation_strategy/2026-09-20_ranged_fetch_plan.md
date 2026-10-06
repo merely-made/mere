@@ -8,7 +8,7 @@ The research, probes and rulings stay there; this plan owns the work.
 **Companions:** the [netfetcher plan](../../archive_docs/2026-06-09_completed_plans/2026-05-25_netfetcher_plan.md)
 (Mere owns networking, hosts run the fetcher, Genet consumes bytes), the
 [session store plan](2026-06-23_native_session_store_plan.md) (one session
-substrate per persona), the [engine profile boundary plan](2026-05-14_engine_profile_boundary_plan.md)
+substrate per persona), the [engine profile boundary plan](../../archive_docs/2026-10-06_retired_plans/2026-05-14_engine_profile_boundary_plan.md)
 (a session's profile binding is persona, session or graph scoped), the
 [net-media plan](2026-05-26_net_media_plan.md) (the likely second consumer), and
 the [R3 receipt](../testing/receipts/2026-09-20_resource_resolution_probes/2026-09-20_resource_resolution_receipt.md).

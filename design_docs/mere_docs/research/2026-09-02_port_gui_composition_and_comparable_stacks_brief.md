@@ -8,7 +8,7 @@ against the tree at mere `77a3701f052` and genet `fcb6c8fbd77`; §5 is
 web-sourced and cited. Nothing here schedules code; the Distillery walk it
 recommends has its own plan.
 **Anchors:** the
-[platform boundary and repository topology plan](../implementation_strategy/2026-09-02_platform_boundary_and_repository_topology_plan.md)
+[platform boundary and repository topology plan](../../archive_docs/2026-10-06_completed_plans/2026-09-02_platform_boundary_and_repository_topology_plan.md)
 (the lines being redrawn), the
 [projection/scenes direction note](../../2026-08-23_projection_scenes_and_graph_native_platform.md)
 (what Cambium owns for GUIs; the nine questions), the

@@ -17,7 +17,7 @@ demand must not take a lease, and M3 enforces that rather than pretending
 otherwise.
 
 The supervisor, and the lanes M2 and M3 both leaned on, are gates H0-H2 of the
-[mesh host lanes plan](../../mere_docs/implementation_strategy/2026-08-09_mesh_host_lanes_plan.md).
+[mesh host lanes plan](../2026-10-06_completed_plans/2026-08-09_mesh_host_lanes_plan.md).
 
 **Related**:
 [`2026-06-04_resource_coordination_brief.md`](../../mere_docs/research/2026-06-04_resource_coordination_brief.md),
@@ -238,7 +238,7 @@ counts, and reliability effects.
 
 M2 and M3 both leaned on lanes the mesh does not provide, and both said so
 rather than pretending otherwise. All of it now lives in one place: the
-[mesh host lanes plan](../../mere_docs/implementation_strategy/2026-08-09_mesh_host_lanes_plan.md), which owns
+[mesh host lanes plan](../2026-10-06_completed_plans/2026-08-09_mesh_host_lanes_plan.md), which owns
 peer-to-peer blob delivery, blob retention, retention versus live leases,
 portable checkpoints, tolerant verification, and reliability accounting.
 
@@ -358,7 +358,7 @@ Each line names the receipt that closed it. Paths are under
     claim operations a later epoch depends on will stop that epoch validating.
     Recorded in `fold.rs` and carried forward rather than papered over.
 
-  Deferred into the [mesh host lanes plan](../../mere_docs/implementation_strategy/2026-08-09_mesh_host_lanes_plan.md):
+  Deferred into the [mesh host lanes plan](../2026-10-06_completed_plans/2026-08-09_mesh_host_lanes_plan.md):
   portable checkpoints (a checkpoint is local until a blob lane can carry it),
   retention interaction with live leases, and reliability accounting — plus M2's
   three, which move there from §7 of this plan.

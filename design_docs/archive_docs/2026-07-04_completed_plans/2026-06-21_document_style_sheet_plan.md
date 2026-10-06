@@ -31,7 +31,7 @@ Related: [interaction_model_spine](../../mere_docs/technical_architecture/2026-0
 (consumes the same `DocumentRenderPacket` this restyles; restyle-vs-relayout
 question, §6), engine_picker_and_pluggability_plan (`design_docs/inker_docs/implementation_strategy/2026-06-15_engine_picker_and_pluggability_plan.md`)
 (sibling inker plan; per-engine profile pattern this borrows),
-[apparatus_pane_and_theme_switcher_plan](../../mere_docs/implementation_strategy/2026-06-08_apparatus_pane_and_theme_switcher_plan.md)
+[apparatus_pane_and_theme_switcher_plan](../2026-10-06_completed_plans/2026-06-08_apparatus_pane_and_theme_switcher_plan.md)
 + `register-theme` (the theme token source for §4),
 [settings_lane_consolidation_plan](../2026-07-13_superseded_plans/2026-06-21_settings_lane_consolidation_plan.md)
 (the `pelt` provider appearance page where the customization surface lands, §5).
@@ -184,7 +184,7 @@ theme switcher) re-themes documents in the same gesture. This is the richer
 analog of Geopard's single `colors: bool` + accent inheritance: light / dark /
 high-contrast seeds already exist, so documents join them rather than carrying a
 parallel palette. Ties to
-[apparatus_pane_and_theme_switcher_plan](../../mere_docs/implementation_strategy/2026-06-08_apparatus_pane_and_theme_switcher_plan.md)
+[apparatus_pane_and_theme_switcher_plan](../2026-10-06_completed_plans/2026-06-08_apparatus_pane_and_theme_switcher_plan.md)
 (A3 + per-theme HC fills).
 
 ---

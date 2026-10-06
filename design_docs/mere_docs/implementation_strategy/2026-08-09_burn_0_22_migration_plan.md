@@ -314,10 +314,10 @@ The probe was reverted; the tree is back on burn 0.21 with the patch in place.
 
 **Related**:
 [`../research/2026-07-04_burn_utilization_brief.md`](../research/2026-07-04_burn_utilization_brief.md),
-[`2026-07-04_burn_wgpu_flip_plan.md`](2026-07-04_burn_wgpu_flip_plan.md),
+[`2026-07-04_burn_wgpu_flip_plan.md`](../../archive_docs/2026-10-06_completed_plans/2026-07-04_burn_wgpu_flip_plan.md),
 [`2026-06-30_mesh_lease_scheduler_plan.md`](../../archive_docs/2026-08-09_completed_plans/2026-06-30_mesh_lease_scheduler_plan.md),
-[`2026-08-09_browser_model_ceiling_probe_plan.md`](2026-08-09_browser_model_ceiling_probe_plan.md),
-[`2026-08-08_esp_consolidation_plan.md`](2026-08-08_esp_consolidation_plan.md)
+[`2026-08-09_browser_model_ceiling_probe_plan.md`](../../archive_docs/2026-10-06_completed_plans/2026-08-09_browser_model_ceiling_probe_plan.md),
+[`2026-08-08_esp_consolidation_plan.md`](../../archive_docs/2026-10-06_completed_plans/2026-08-08_esp_consolidation_plan.md)
 
 This plan moves Mere from Burn 0.21 to stable 0.22 without combining the
 dependency migration with remote execution, model-session design, or new
