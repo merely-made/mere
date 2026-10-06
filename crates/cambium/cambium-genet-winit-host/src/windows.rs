@@ -226,15 +226,37 @@ where
         }
     }
 
-    /// What a turn leaves for the event source: windows hooks opened or
-    /// closed, windows whose close policy ended them, and windows a shared
-    /// change reached, which are asked to redraw.
-    pub(crate) fn after_turn(&mut self, event_loop: &ActiveEventLoop) {
-        let (opened, mut closing) = self.multi().take_requests();
-        for (id, options) in opened {
-            let window = self.window_host(options);
-            self.multi().attach(id, window);
-            self.show(event_loop, id);
+    /// Ask window `id` for a frame, through its paced request, so the idle
+    /// turn serves it with every other window's.
+    fn want_frame(&mut self, id: ProjectionId) {
+        if let Some(wanted) = self.multi().slot(id).and_then(|w| w.paced.as_ref()) {
+            wanted.set(true);
+        }
+    }
+
+    /// What turns leave for the event source: windows hooks opened, closed or
+    /// asked to redraw, windows whose close policy ended them, and windows a
+    /// change reached or a sheet swap left behind, which are asked for a frame.
+    /// `acting` are the windows whose turns these were: a change a window made
+    /// to itself is its own to show, as it is for a single window.
+    pub(crate) fn after_turn(&mut self, event_loop: &ActiveEventLoop, acting: &[ProjectionId]) {
+        let mut closing = Vec::new();
+        // A window opened from another window's first frame is opened too, to
+        // a bound: a frame that opens a window every time would never end.
+        for _ in 0..64 {
+            let requests = self.multi().take_requests();
+            closing.extend(requests.closed);
+            for id in requests.redraws {
+                self.want_frame(id);
+            }
+            if requests.opened.is_empty() {
+                break;
+            }
+            for (id, options) in requests.opened {
+                let window = self.window_host(options);
+                self.multi().attach(id, window);
+                self.show(event_loop, id);
+            }
         }
         let multi = self.multi();
         closing.extend(multi.windows().filter(|id| {
@@ -246,12 +268,16 @@ where
             self.close(id);
         }
         let multi = self.multi();
-        for id in multi.touched_windows() {
-            if let Some(native) = multi.slot(id).and_then(|w| w.native_window.as_ref()) {
-                native.request_redraw();
-            }
+        let mut owed: Vec<ProjectionId> = multi
+            .touched_windows()
+            .into_iter()
+            .filter(|id| !acting.contains(id))
+            .collect();
+        owed.extend(multi.behind_on_sheet());
+        for id in owed {
+            self.want_frame(id);
         }
-        if multi.windows().next().is_none() {
+        if self.multi().windows().next().is_none() {
             event_loop.exit();
         }
     }
@@ -279,7 +305,7 @@ where
             let id = self.multi().open(logic, window);
             self.show(event_loop, id);
         }
-        self.after_turn(event_loop);
+        self.after_turn(event_loop, &[]);
     }
 }
 
@@ -298,6 +324,7 @@ where
         for id in multi.windows().collect::<Vec<_>>() {
             multi.with_window(id, |window| window.resume_surface());
         }
+        self.after_turn(event_loop, &[]);
     }
 
     fn suspended(&mut self, _event_loop: &ActiveEventLoop) {
@@ -334,27 +361,35 @@ where
         };
         #[cfg(target_os = "windows")]
         let owed = {
-            let mut drew = false;
+            let mut drew = Vec::new();
             for id in multi.windows().collect::<Vec<_>>() {
-                if asked(multi, id) {
+                // A hidden or minimized window gets no paint from the platform,
+                // and gets none here: its request waits for it to be shown.
+                let showing = multi.slot(id).is_some_and(|window| {
+                    !window.s.hidden
+                        && window
+                            .native_window
+                            .as_ref()
+                            .is_some_and(|native| native.is_minimized() != Some(true))
+                });
+                if showing && asked(multi, id) {
                     multi.with_window(id, |window| {
                         window.handle_window_event(WindowEvent::RedrawRequested)
                     });
-                    drew = true;
+                    drew.push(id);
                 }
             }
-            if drew {
-                self.after_turn(event_loop);
+            if !drew.is_empty() {
+                self.after_turn(event_loop, &drew);
             }
             let multi = self.multi();
             // A frame drawn just now that asked for the next one: come straight
             // back. Acquiring it waits on the swapchain, so this paces at the
             // monitor's rate.
             multi.windows().any(|id| {
-                multi
-                    .slot(id)
-                    .and_then(|window| window.paced.as_ref())
-                    .is_some_and(|wanted| wanted.get())
+                multi.slot(id).is_some_and(|window| {
+                    !window.s.hidden && window.paced.as_ref().is_some_and(|wanted| wanted.get())
+                })
             })
         };
         #[cfg(not(target_os = "windows"))]
@@ -385,9 +420,15 @@ where
                 if let Some(id) = first {
                     multi.with_window(id, |window| window.wake_turn());
                 }
+                // What the drain changed may show in any window, through a
+                // leaf or a producer as easily as the document, so every
+                // window is asked for a frame.
+                for id in self.multi().windows().collect::<Vec<_>>() {
+                    self.want_frame(id);
+                }
             },
         }
-        self.after_turn(event_loop);
+        self.after_turn(event_loop, &[]);
     }
 
     fn window_event(&mut self, event_loop: &ActiveEventLoop, native: WindowId, event: WindowEvent) {
@@ -396,6 +437,6 @@ where
         };
         self.multi()
             .with_window(id, |window| window.handle_window_event(event));
-        self.after_turn(event_loop);
+        self.after_turn(event_loop, &[id]);
     }
 }

@@ -48,16 +48,18 @@ impl<'a> WindowDom<'a> {
         self.dom
     }
 
-    /// Whether `node` lies in this window's subtree.
+    /// Whether `node` lies in this window's subtree. A shadow root has no
+    /// parent; its host's place decides.
     pub fn contains(&self, node: NodeId) -> bool {
-        let mut current = Some(node);
-        while let Some(id) = current {
-            if id == self.root {
-                return true;
-            }
-            current = self.dom.parent(id);
-        }
-        false
+        ancestor_or_self(self.dom, node, self.root)
+    }
+
+    /// Whether `node` lives under another window: live, in the document, and
+    /// not in this window's subtree. Never true for a single window.
+    pub fn elsewhere(&self, node: NodeId) -> bool {
+        self.dom.is_live(node)
+            && !self.contains(node)
+            && ancestor_or_self(self.dom, node, self.dom.document())
     }
 
     fn is_root(&self, id: NodeId) -> bool {
@@ -125,6 +127,9 @@ impl LayoutDom for WindowDom<'_> {
     }
 
     fn shadow_roots(&self) -> Vec<NodeId> {
+        if self.root == self.dom.document() {
+            return self.dom.shadow_roots();
+        }
         self.dom
             .shadow_roots()
             .into_iter()
@@ -195,5 +200,68 @@ impl LayoutDom for WindowDom<'_> {
 
     fn doctype_data(&self, id: NodeId) -> Option<DoctypeView<'_>> {
         self.dom.doctype_data(id)
+    }
+}
+
+/// Whether `ancestor` is `node` or encloses it, through shadow hosts. A node
+/// retired along the way has no ancestors to read, so it is not enclosed.
+pub(crate) fn ancestor_or_self(dom: &ScriptedDom, node: NodeId, ancestor: NodeId) -> bool {
+    let mut current = Some(node);
+    while let Some(id) = current {
+        if !dom.is_live(id) {
+            return false;
+        }
+        if id == ancestor {
+            return true;
+        }
+        current = dom.parent(id).or_else(|| dom.shadow_host(id));
+    }
+    false
+}
+
+#[cfg(test)]
+mod tests {
+    use layout_dom_api::{LayoutDomMut as _, ShadowRootInit};
+
+    use super::*;
+
+    fn element(dom: &mut ScriptedDom, parent: NodeId) -> NodeId {
+        let node = dom.create_element(QualName::new(
+            None,
+            Namespace::from(""),
+            LocalName::from("div"),
+        ));
+        dom.append_child(parent, node);
+        node
+    }
+
+    /// A shadow tree nested in another: the whole document passes every shadow
+    /// root straight through, and a window holds the nested one when it holds
+    /// the outer host.
+    #[test]
+    fn nested_shadow_trees_belong_to_the_window_holding_their_hosts() {
+        let mut dom = ScriptedDom::new();
+        let doc = dom.document();
+        let window = element(&mut dom, doc);
+        let outer_host = element(&mut dom, window);
+        let outer = dom.attach_shadow_unchecked(outer_host, ShadowRootInit::default(), false);
+        let inner_host = element(&mut dom, outer);
+        let inner = dom.attach_shadow_unchecked(inner_host, ShadowRootInit::default(), false);
+
+        let mut all = WindowDom::document(&dom).shadow_roots();
+        all.sort_by_key(|n| n.raw());
+        let mut expected = dom.shadow_roots();
+        expected.sort_by_key(|n| n.raw());
+        assert_eq!(all, expected, "the document passes straight through");
+        assert!(all.contains(&inner));
+
+        let view = WindowDom::new(&dom, window);
+        assert!(
+            view.contains(inner_host),
+            "through the outer shadow root's host"
+        );
+        let roots = view.shadow_roots();
+        assert!(roots.contains(&outer) && roots.contains(&inner));
+        assert!(!view.elsewhere(inner_host));
     }
 }

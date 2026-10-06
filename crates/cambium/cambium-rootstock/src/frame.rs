@@ -102,10 +102,7 @@ where
             (self.hooks.frame)(&mut ctx)
         };
         if let Some(sheet) = self.s.pending_sheet.take() {
-            self.s.shared.sheet = sheet;
-            self.s.shared.sheet_generation += 1;
-            self.s.layout = None;
-            self.s.layout_size = (0.0, 0.0);
+            self.swap_sheet(sheet);
         }
         if let Some(zoom) = self.s.pending_ui_zoom.take() {
             self.set_ui_zoom(zoom);

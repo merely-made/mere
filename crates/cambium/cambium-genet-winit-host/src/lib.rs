@@ -1071,6 +1071,9 @@ where
             return;
         }
         let (window, restored) = self.open_native_window(event_loop);
+        // The core boots before the application's init, as it always has, so
+        // a machine with no usable device fails before any app state exists.
+        self.render_core().expect("boot genet host");
         let init = self.init.take().expect("resumed once");
         // The application takes its end of the window-verb seam here, stores
         // it in its own state, and calls it from ordinary click handlers.

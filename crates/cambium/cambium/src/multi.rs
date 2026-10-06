@@ -159,7 +159,13 @@ where
         if let Some(slot) = self.projections.get_mut(id.0)
             && let Some(projection) = slot.take()
         {
+            let (dom, mount) = (projection.tree.dom(), projection.tree.mount());
             projection.tree.teardown();
+            // A forest projection's window-root was minted for it; it goes too.
+            let mut d = dom.borrow_mut();
+            if mount != d.document() && d.is_live(mount) {
+                d.remove(mount);
+            }
         }
     }
 
