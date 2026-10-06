@@ -1,8 +1,8 @@
 # Stack seams plan: catalog, shared device, actions, determinism, two words
 
 **Date:** 2026-10-04
-**Status (2026-10-05):** in progress. Thirty-three rulings in twelve rounds
-(S1 to S33); P1 landed on main (`1633be0c`); P2 staged (S27 to S31, four
+**Status (2026-10-06):** in progress. Thirty-seven rulings in thirteen rounds
+(S1 to S37); P1 landed on main (`1633be0c`); P2 staged (S27 to S31, four
 stages in §3.1) and landed on main (`40d7ae5e`); S32 (F19) landed on main
 (`48c08dee`); the S14 pass (S33) under way; P3 and S7 done as documents; S3 to
 S6 carried into the dynamics grammar plan (G8, G9); S9 done by the identity
@@ -597,6 +597,52 @@ status against code; rulings across plans; sibling repos too; no pass. Mark:
 and done-claims are checked against the tree, starting with the documents the
 doc audit flags. *Reading, not ruled*: it runs after P1, one lane at a time.
 
+Round 13, 2026-10-06, during the S14 pass. Evidence: phase A's records
+(batches 35 to 37) and how the judgment audit treats a record for a path the
+early-September snapshot already covers.
+
+**Ruling S34.** *Phase B re-judges 145 plans that already have
+early-September records; the judgment audit rejects a new batch record for any
+path the snapshot covers, and DOC_POLICY keeps the snapshot unchanged. Where
+should the re-judgments live?* Options: parser-shaped records in a new
+directory beside the snapshot, outside the coverage count, with no script
+change; the judgment audit changed so a dated batch record replaces the
+snapshot's record for that path; no per-document records, only a remediation
+receipt. Mark: **"Newer record supersedes"**. Follows:
+`scripts/mere_doc_judgment_audit.py` takes a batch record for a path the
+snapshot covers as superseding the snapshot's record, and coverage and totals
+count the batch record; the snapshot file stays unchanged; DOC_POLICY's
+addendum says so. Phase B's records are ordinary batch records.
+
+**Ruling S35.** *Three active receipts share the basename `RECEIPT.md`. Rename
+them?* Options: rename in place to dated names, updating their citations; the
+same with S10's flattened out of its single-file directory; keep the names and
+exempt them in the audit. Mark: **"Rename, flatten S10"**. Follows: the
+custody-backend receipt becomes
+`custody-backend/2026-09-08_custody_backend_receipt.md`, the R3 receipt
+`2026-09-20_resource_resolution_probes/2026-09-20_resource_resolution_receipt.md`,
+and S10's `mere_docs/testing/receipts/2026-09-09_s10_custody_transact_receipt.md`;
+their citations, the custody-backend artifact list's key and batch 37's
+headers follow.
+
+**Ruling S36.** *Phase A found three plans complete, and phase B will find
+more. What should phase C do with plans found complete?* Options: extract
+their open follow-ons to a named plan, then archive; correct the status only
+and keep them active; list them for case-by-case rulings. Mark: **"Extract and
+archive (Recommended)"**. Follows: in phase C each plan the pass finds
+complete has its open follow-ons moved to a named existing or new plan, then
+moves to `archive_docs/` with its DOC_README entry, links repaired and both
+audits green. *Reading, not ruled*: a plan whose completeness is itself in
+question (a record's fork) still goes to Mark first.
+
+**Ruling S37.** *The lexical capability plan says "not started", but
+`crates/intel/reference-data` (`9310518b`) carries much of its L2. Is
+`reference-data` the plan's L2?* Options: yes, re-scope L2 onto it; two
+surfaces, each justified; ask its lane first. Mark: **"Ask its lane first"**.
+Follows: the session that built `reference-data` is asked what it intended,
+and its answer comes back to Mark as this question's evidence; the lexical
+plan's record (batch 35) stands meanwhile.
+
 ## 3. Phases
 
 ### 3.1 This plan's lane
@@ -736,6 +782,11 @@ The done-conditions handed over for S3 and S4, kept for reference:
   works in `projection_compile`. Second pass (F8 to F11), rulings S7 to S10:
   the README fixed (S7), TERMINOLOGY gains pandect under Eidetic and the
   curation record (S8, S10), S9 sent to the identity lane.
+- **2026-10-06.** Round 13: S34 (a newer batch record supersedes the
+  snapshot's), S35 (the three receipts renamed, S10's flattened), S36 (plans
+  found complete are extracted and archived) and S37 (`reference-data`'s lane
+  asked first). Phase B's first wave (batches 1 to 4, 48 plans) returned;
+  the second (5 to 8) is running.
 - **2026-10-05.** The S14 pass, phase A done: D2 records for the 21
   documents added since the snapshot (batches 35 to 37), coverage 337 of 337.
   Three read-only subagents (opus) drafted them at `26060e88`; every stale
