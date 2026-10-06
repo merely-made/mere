@@ -1,8 +1,8 @@
 # Stack seams plan: catalog, shared device, actions, determinism, two words
 
 **Date:** 2026-10-04
-**Status (2026-10-06):** in progress. Sixty-five rulings in twenty-one rounds
-(S1 to S65); P1 landed on main (`1633be0c`); P2 staged (S27 to S31, four
+**Status (2026-10-06):** in progress. Sixty-six rulings in twenty-two rounds
+(S1 to S66); P1 landed on main (`1633be0c`); P2 staged (S27 to S31, four
 stages in §3.1) and landed on main (`40d7ae5e`); S32 (F19) landed on main
 (`48c08dee`); the S14 pass (S33) under way; P3 and S7 done as documents; S3 to
 S6 carried into the dynamics grammar plan (G8, G9); S9 done by the identity
@@ -808,6 +808,10 @@ Round 21, 2026-10-06. Evidence: the code of the two smolweb render designs (`cra
 
 **Ruling S65.** *The last two: which are archived?* Options: reticulum transport; doc policy consolidation (multi-select). Mark: **"Reticulum transport, Doc policy consolidation"**. Follows: both are archived: reticulum's forged legacy-binding test, README docs and Phase 3 decision to the backlog (retinue's plan covers the backend); the doc policy plan's genet docs/ merge to the backlog, with DOC_POLICY.md's "Track the work in" pointer repointed to DOC_POLICY itself.
 
+Round 22, 2026-10-06. Evidence: S62's reframing: enriching the ASTs that feed EngineDocument applies under every option; open only for structure blocks cannot carry (gopher's typed column, feed entries and enclosures).
+
+**Ruling S66.** *For smolweb structure that EngineDocument's blocks cannot carry even from a richer AST, which?* Options: extend EngineDocument with the block kind it lacks, one path, the per-format views retiring; keep bespoke per-format views for those exceptions. Mark: **"Extend EngineDocument (Recommended)"**. Follows: the EngineDocument lane is the single smolweb render path: the fidelity plan enriches the parse ASTs and adds whatever block kind EngineDocument lacks (a typed-column block first), so every host gets it through the lane; the per-format views in `cambium::nematic` retire (a follow-on code task); the native smolweb rendering plan's two-family model is historical, and the plan archives under S61 with its host-integration tail carried by the fidelity plan.
+
 ## 3. Phases
 
 ### 3.1 This plan's lane
@@ -951,6 +955,7 @@ The done-conditions handed over for S3 and S4, kept for reference:
 - **2026-10-06.** Round 19: S54 to S57, the next sixteen of S49's plans ruled; ten to archive (engine profile boundary, session service runner, bounty verification economy, capture provenance consent, insigne proofs, identity vault SSH agent, castellan OTP, dramatis tier, persona wallet carry layer, participant gate packs), six to stay active.
 - **2026-10-06.** Round 20: S58 to S61, all sixteen archived, with three directions: the four ML plans consolidate into one new plan now that Burn 0.22 is out; the four search and memory plans get a critical pass, Eidetic's development taken up; native smolweb's render-design question explained and put back.
 - **2026-10-06.** Round 21: S62 to S65. S62's smolweb question answered with Mark's own reframing (enrich the ASTs either way) and put back; S63 a consolidated ML plan written now; six more plans archived (spatial compute, tactile tier, derived faces, event model, reticulum, doc policy). S49's rounds are done: 42 of 53 plans to archive, 11 stay active.
+- **2026-10-06.** Round 22: S66, smolweb renders through one path: richer ASTs into an extended EngineDocument, the per-format Cambium views retiring.
 - **2026-10-06.** Round 16: S46 (live plans handed to their lanes), S47
   (reviewed write lanes) and S48 (ownerless tails to the archived plan tails
   backlog). S44's repins and S45's header re-run were flagged as separate
