@@ -1,8 +1,8 @@
 # Stack seams plan: catalog, shared device, actions, determinism, two words
 
 **Date:** 2026-10-04
-**Status (2026-10-06):** in progress. Forty-nine rulings in seventeen rounds
-(S1 to S49); P1 landed on main (`1633be0c`); P2 staged (S27 to S31, four
+**Status (2026-10-06):** in progress. Fifty-three rulings in eighteen rounds
+(S1 to S53); P1 landed on main (`1633be0c`); P2 staged (S27 to S31, four
 stages in §3.1) and landed on main (`40d7ae5e`); S32 (F19) landed on main
 (`48c08dee`); the S14 pass (S33) under way; P3 and S7 done as documents; S3 to
 S6 carried into the dynamics grammar plan (G8, G9); S9 done by the identity
@@ -768,6 +768,16 @@ each ticked plan is archived with its tails extracted (S36, S48), and each
 unticked plan stays active with its corrected status. The 46 plainly complete
 plans are archived under S36 without a round.
 
+Round 18, 2026-10-06. Evidence: phase C's per-plan open items for the first sixteen of the plans S49 brings to rulings; each question was multi-select, a ticked plan archived with its open items extracted, an unticked one staying active.
+
+**Ruling S50.** *Meerkat-era engine and flip plans: which are archived?* Options: the engine picker; the scrying tile; the genet scrying flipcarrier; the render ladder (multi-select). Mark: **"render ladder needs rethinking.,Scrying tile,Render ladder"**. Follows: the scrying tile and render ladder plans are archived, their open items to the archived plan tails backlog, the render ladder's carrying Mark's note that it needs rethinking; the engine picker and the flipcarrier stay active.
+
+**Ruling S51.** *Meerkat-era feature plans: which are archived?* Options: the comms shell; tear-out gestures; portable tiles; overlay roots and UA widgets (multi-select). Mark: **"Comms shell,Tear-out gestures"**. Follows: the comms shell and tear-out gestures plans are archived, open items to the backlog; portable tiles and overlay roots stay active.
+
+**Ruling S52.** *Canvas and graph-view plans: which are archived?* Options: the swatch primitive; orrery graph intelligence; the orrery custom layout element; node navigation lineage (multi-select). Mark: **"Orrery graph intelligence,Orrery custom layout element"**. Follows: the orrery graph intelligence and orrery custom layout element plans are archived, open items to the backlog; the swatch primitive and node navigation lineage stay active.
+
+**Ruling S53.** *Graph data and RDF plans: which are archived?* Options: the graph query layer; petgraph RDF; the graph write-path migration; graph delta capture and stats (multi-select). Mark: **"Graph query layer,Petgraph RDF,Graph write-path migration,Graph delta capture / stats"**. Follows: all four are archived: the graph query layer's #3 and Graph-results error to graph semantics P4 and its other residue to the backlog; petgraph RDF's open items to the graph semantics plan; the write-path plan's apply.rs split and the capture plan's regression log and per-table stats to the backlog.
+
 ## 3. Phases
 
 ### 3.1 This plan's lane
@@ -907,6 +917,7 @@ The done-conditions handed over for S3 and S4, kept for reference:
   works in `projection_compile`. Second pass (F8 to F11), rulings S7 to S10:
   the README fixed (S7), TERMINOLOGY gains pandect under Eidetic and the
   curation record (S8, S10), S9 sent to the identity lane.
+- **2026-10-06.** Round 18: S50 to S53, the first sixteen of S49's plans ruled; ten to archive (scrying tile, render ladder, comms shell, tear-out gestures, orrery graph intelligence, orrery custom layout element, graph query layer, petgraph RDF, graph write-path migration, graph delta capture), six to stay active.
 - **2026-10-06.** Round 16: S46 (live plans handed to their lanes), S47
   (reviewed write lanes) and S48 (ownerless tails to the archived plan tails
   backlog). S44's repins and S45's header re-run were flagged as separate
