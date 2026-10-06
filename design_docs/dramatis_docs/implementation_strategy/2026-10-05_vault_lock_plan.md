@@ -1,7 +1,7 @@
 # Vault Lock Plan
 
 **Date**: 2026-10-05
-**Status (2026-10-06)**: rulings 1 to 48 in §3; the threat statement is
+**Status (2026-10-06)**: rulings 1 to 49 in §3; the threat statement is
 still open. L1 (personae can lock) landed (`2556a20c`). L2's checkpoint A
 (every consumer obeys, the Secret Service aside) landed (`7c588deb`). L2
 checkpoint B (rulings 40, 41, 43) and the Secret Service on the ThinkPad
@@ -595,6 +595,19 @@ on the close (no window, but the agent's lock call waits on Knot's network
 shutdown, and it needs a multi-thread runtime). Mark: **"Close right after
 lock (Recommended)"**.
 
+**Ruling 49.** *When djinn closes the Knot lane on lock, no live copy of
+Knot's signing seed remains, but 19 to 20 copies are freed uncleared,
+because knot-editor's own functions (`author`, `KnotSyncHost::open`) take
+the seed by value into async code. knot-editor is Mark's repo, so this is
+not an upstream ledger item.* Options:
+- fix it in knot-editor (the seed borrowed or zeroizing, landing in Knot
+  first under the lockstep, with djinn's residue test made strict, and any
+  copies inside p2panda to the upstream ledger);
+- fix it with the dramatis plan's D8;
+- record only.
+
+Mark: **"Fix in knot-editor (Recommended)"**.
+
 Still open: a threat statement naming hibernation and the pagefile.
 
 ## 4. Phases
@@ -844,3 +857,35 @@ The Secret Service is checkpoint B, on the ThinkPad.
   - ruling 7 (the receipt's resident still opens with the environment
     passphrase, for ruling 42 to remove).
 - Rulings 40 to 45 settle its forks.
+
+**2026-10-06, L2 checkpoint B built** (branch `l2b`: `4f81b3c4`,
+`b7843783`, `8553bba5`, `a599c49d`; not merged):
+- **What it built:**
+  - `djinn --unlock` over the control route (41b);
+  - the door's two retained keys through a restricted provider, with
+    notochord accepting a signer bound to the network (46);
+  - native unlock by the card's `UnlockVault` and by `djinn --unlock
+    --native`, Hello first and then a passphrase box (47);
+  - the Knot lane closed by a gate when the watch reports Locked, and
+    reopened on unlock (48).
+- **The lane's receipt** (`20261006T175358Z-c0d7a28c`, 23 assertions):
+  lock over the wire, the status route reads Locked (H4's first condition),
+  `-X` refused, a wrong `--unlock` stays locked, the right one lists the
+  same identities and a signature checks, `-x` relocks, and a graceful stop
+  while locked exits 0.
+- **Verified in `mere-verify` at `a599c49d`:**
+  - personae 207 + 7 + 1, castellan 120 + 3 + 4 + 1, notochord 17 + 16 +
+    13, graphshell's 191 library tests (which do not compile in the lane's
+    worktree), djinn with every integration test (five door tests
+    included), and testkit;
+  - the receipt again (`20261006T182410Z-e247d160`, verified), the
+    harness's live tests and the gate;
+  - the installed resident identical;
+  - my control 1 (a closed Knot gate still accepting opens) failed
+    `route_reopens_over_joined_sync…`;
+  - my control 2 (the native unlock intent accepting a payload) failed
+    nothing. That behaviour has no test, so it went back to the lane.
+- **Finding:** the Knot seed's freed copies (ruling 49).
+- **Finding:** a resident whose door was never used before it locked has
+  no door keys until its first unlock. That is the shape ruling 42's
+  resident, which starts locked, will have.
