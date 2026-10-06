@@ -1,7 +1,12 @@
 # Bounty Verification Economy Plan
 
 **Date**: 2026-06-30  
-**Status**: Planned outer-ring architecture.  
+**Status (2026-10-06):** Planned outer-ring architecture; nothing built. None
+of the proposed types (`BountyEvent`, `ResultSpec`, `MootEpochHeader`,
+`WorkReceipt`, `RoleWitness`) exist, while the typed commitments it relies on
+do (`proofs::Commitment`, `proofs::Digest`). Its standing ledger, Tessera, is
+now mien's Standing (see Ledgers).
+
 **Related**:
 [`../../mere_docs/research/2026-06-04_resource_coordination_brief.md`](../../mere_docs/research/2026-06-04_resource_coordination_brief.md),
 [`../../mere_docs/implementation_strategy/2026-05-07_moot_tiers_and_voluntary_hosting_brief.md`](../../mere_docs/implementation_strategy/2026-05-07_moot_tiers_and_voluntary_hosting_brief.md),
@@ -98,6 +103,13 @@ Credits can appear at the cash edge. Tessera cannot. Spending is bounded by
 standing, and concord stays one-hop. The funded-bounty lane must not crowd out
 commons reciprocity or buy governance.
 
+**Corrected 2026-10-06 (S14 pass):** Tessera is not the live standing ledger.
+It is now mien's `Standing` (`crates/moot/mien/src/ledger.rs` and its
+neighbours), and gemot reads Tessera only as legacy: a `tessera.redb` file and
+the `tessera_operations` serde alias (`crates/moot/gemot/src/moot/service.rs`,
+lines 62-69 and 128). Read "tessera" in the Boundary, Moot Epoch Receipts and
+Done Conditions sections as Standing.
+
 ---
 
 ## Moot Epoch Receipts
@@ -179,3 +191,8 @@ Those layers must stay separate.
 - **2026-06-30** - Replaced raw `*_root: Hash` sketches with typed commitments
   and witnesses, keeping p2panda operation identity separate from application
   proof roots.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_50_s14_phase_b12.md: the status is dated and
+  records that nothing is built, and a vocabulary note records Tessera as now
+  mien's Standing.
