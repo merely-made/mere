@@ -109,7 +109,8 @@ changes the engine path itself.
 owners: the resident allocations and chunks into `conatus::resident`
 (`crates/conatus/conatus/src/resident/`, feature `resident`), field
 evaluation and Burn lowering into `numen` (`eval.rs`, `lower_burn.rs`), and
-its forces into `seiche` (`src/tensor_forces.rs`). Read "Quint" below (§2,
+its forces into `seiche` (`crates/conatus/seiche/src/tensor_forces.rs`).
+Read "Quint" below (§2,
 §3, §5 and the implementation order's items 4 and 6) as those owners.
 `conatus-brick` is `modulus` since `33f9b6b6` (2026-08-28).
 
@@ -391,7 +392,7 @@ state advanced directly on the GPU, or establish a shared frame or lease.
 *Annotation, 2026-10-06 (S14 pass; relayed, not verified here):* the S14
 pass's record (`support/doc-audit/d2/batch_46_s14_phase_b8.md`) and its
 coordinator relay that this slice's Isometry half (`15f5da2`) and §4's
-marker tenant (`7d45c40`) lived in Isometry's `crates/isometry-runtime`,
+marker tenant (`7d45c40`) lived in Isometry's `isometry-runtime` crate,
 which Isometry retired at `73a31409` on 2026-09-27 under wing ruling 299.
 Isometry's repository was not read for this annotation. Both are historical
 receipts, not live code; §1 already records the crate's retirement. Mere's
