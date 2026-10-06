@@ -76,6 +76,7 @@ use p2panda_net::{AddressBook, Discovery, MdnsDiscovery};
 use stickleback::MunimentAddressBook;
 use tokio::io::{AsyncRead, AsyncWrite, ReadBuf};
 use tokio::sync::{Mutex as TokioMutex, mpsc};
+use zeroize::{Zeroize, Zeroizing};
 
 mod open_connections;
 
@@ -422,9 +423,21 @@ enum BlobServing<'a> {
     Scoped(&'a BlobStore, BlobScope, BlobReadAuthorizer),
 }
 
+/// The seed a builder holds (vault lock ruling 51): boxed, so moving the
+/// builder through `bind`'s futures moves a pointer, and the bytes stay in
+/// one allocation, cleared when it drops. A `[u8; 32]` is `Copy`, and every
+/// future frame that took one by value kept a copy.
+type HeldSeed = Box<Zeroizing<[u8; 32]>>;
+
+fn hold(seed: &[u8; 32]) -> HeldSeed {
+    let mut held = Box::new(Zeroizing::new([0u8; 32]));
+    held.copy_from_slice(seed);
+    held
+}
+
 /// Builder for [`P2pandaTransport`]. Use [`P2pandaTransport::builder`].
 pub struct P2pandaTransportBuilder<'a> {
-    signing_seed: [u8; 32],
+    signing_seed: HeldSeed,
     alpns: Vec<Alpn>,
     blobs: BlobServing<'a>,
     mdns: Option<MdnsDiscoveryMode>,
@@ -555,7 +568,11 @@ impl<'a> P2pandaTransportBuilder<'a> {
 
 /// p2panda-net-backed [`Transport`].
 pub struct P2pandaTransport {
-    endpoint: Endpoint,
+    /// Boxed, as are the overlay and discovery handles below: p2panda-net's
+    /// endpoint handle carries the signing key by value (its
+    /// `IrohEndpointArgs`), and those handles hold clones of it, so none is
+    /// moved once made, and moving the transport moves pointers (ruling 51).
+    endpoint: Box<Endpoint>,
     address_book: AddressBook,
     /// The store under `address_book`, for the one write its actor cannot
     /// make atomically: a record only if none exists.
@@ -564,23 +581,34 @@ pub struct P2pandaTransport {
     queues: AlpnQueues,
     /// mDNS discovery handle, held so the service keeps running while the
     /// transport is alive.
-    _mdns: Option<MdnsDiscovery>,
+    _mdns: Option<Box<MdnsDiscovery>>,
     /// Random-walk discovery handle, held so the walkers keep running while the
     /// transport is alive (dropping it stops the discovery actor).
-    _discovery: Option<Discovery>,
+    _discovery: Option<Box<Discovery>>,
     /// Gossip overlay handle (the endpoint authority for space topics). `None`
     /// unless built with [`builder().gossip()`](P2pandaTransportBuilder::gossip);
     /// `subscribe`/`set_topics` use it.
-    gossip: Option<Gossip>,
+    gossip: Option<Box<Gossip>>,
     /// Connections open per remote on this endpoint, from the handshake hook.
     open: OpenConnections,
 }
 
 impl P2pandaTransport {
-    /// Start a builder for a new p2panda-net transport.
-    pub fn builder(master: &Ed25519Keypair) -> P2pandaTransportBuilder<'_> {
+    /// Start a builder for a new p2panda-net transport. The key is read once,
+    /// here, into the builder's held seed.
+    pub fn builder(master: &Ed25519Keypair) -> P2pandaTransportBuilder<'static> {
+        let mut seed = master.to_seed();
+        let builder = Self::builder_from_seed_ref(&seed);
+        seed.zeroize();
+        builder
+    }
+
+    /// Start a builder from borrowed Ed25519 seed material: the borrowing
+    /// path (ruling 51). The seed is copied once into the builder's held
+    /// seed, and no future frame ever holds it by value.
+    pub fn builder_from_seed_ref(signing_seed: &[u8; 32]) -> P2pandaTransportBuilder<'static> {
         P2pandaTransportBuilder {
-            signing_seed: master.to_seed(),
+            signing_seed: hold(signing_seed),
             alpns: Vec::new(),
             blobs: BlobServing::None,
             mdns: None,
@@ -597,34 +625,42 @@ impl P2pandaTransport {
     /// This is the identity-provider-neutral boundary for sibling apps. A
     /// Personae vault or another provider derives a protocol-scoped key and
     /// passes its 32-byte seed; transport never needs that provider's type.
-    pub fn builder_from_seed(signing_seed: [u8; 32]) -> P2pandaTransportBuilder<'static> {
-        P2pandaTransportBuilder {
-            signing_seed,
-            alpns: Vec::new(),
-            blobs: BlobServing::None,
-            mdns: None,
-            discovery: None,
-            relay_urls: Vec::new(),
-            gossip: false,
-            #[cfg(test)]
-            connection_hook: true,
-        }
+    ///
+    /// Kept for callers that pass the seed by value; it routes through
+    /// [`Self::builder_from_seed_ref`] and clears its own copy. Prefer that.
+    pub fn builder_from_seed(mut signing_seed: [u8; 32]) -> P2pandaTransportBuilder<'static> {
+        let builder = Self::builder_from_seed_ref(&signing_seed);
+        signing_seed.zeroize();
+        builder
     }
 
     /// Bind with just the given Mere ALPNs (no discovery; explicit `add_peer`).
-    pub async fn bind(master: &Ed25519Keypair, alpns: Vec<Alpn>) -> Result<Self, TransportError> {
-        Self::bind_seed(master.to_seed(), alpns).await
+    /// The seed is taken before the future exists, so no frame holds it.
+    pub fn bind(
+        master: &Ed25519Keypair,
+        alpns: Vec<Alpn>,
+    ) -> impl Future<Output = Result<Self, TransportError>> + 'static {
+        Self::builder(master).alpns(alpns).bind()
     }
 
-    /// Bind from raw protocol-scoped Ed25519 seed material.
-    pub async fn bind_seed(
+    /// Bind from raw protocol-scoped Ed25519 seed material, by value; kept for
+    /// existing callers, routed through the held seed. Prefer
+    /// [`Self::bind_seed_ref`].
+    pub fn bind_seed(
         signing_seed: [u8; 32],
         alpns: Vec<Alpn>,
-    ) -> Result<Self, TransportError> {
-        Self::builder_from_seed(signing_seed)
+    ) -> impl Future<Output = Result<Self, TransportError>> + 'static {
+        Self::builder_from_seed(signing_seed).alpns(alpns).bind()
+    }
+
+    /// Bind from borrowed protocol-scoped Ed25519 seed material.
+    pub fn bind_seed_ref(
+        signing_seed: &[u8; 32],
+        alpns: Vec<Alpn>,
+    ) -> impl Future<Output = Result<Self, TransportError>> + 'static {
+        Self::builder_from_seed_ref(signing_seed)
             .alpns(alpns)
             .bind()
-            .await
     }
 
     /// Bind with the given ALPNs and serve iroh-blobs against the provided store.
@@ -669,9 +705,14 @@ impl P2pandaTransport {
             #[cfg(test)]
             connection_hook,
         } = builder;
-        let signing_key = SigningKey::from_bytes(&signing_seed);
-        let peer_id = PeerID::from_bytes(signing_key.verifying_key().as_bytes())
-            .map_err(|error| TransportError::Backend(format!("transport key: {error}")))?;
+        // The key is made where it is handed over, never kept as a local
+        // across an await; the held seed is cleared once p2panda has it.
+        let peer_id = PeerID::from_bytes(
+            SigningKey::from_bytes(&signing_seed)
+                .verifying_key()
+                .as_bytes(),
+        )
+        .map_err(|error| TransportError::Backend(format!("transport key: {error}")))?;
         // p2panda's own default here was an in-memory SQLite store; this is the
         // same lifetime over muniment instead, which keeps sqlx out of the graph.
         // A caller wanting the address book to survive a restart hands a durable
@@ -686,22 +727,35 @@ impl P2pandaTransport {
         // Always on (ruling 51): every connection on the endpoint, whichever
         // protocol opens it, is counted for `connected` off the overlay.
         let open = OpenConnections::default();
-        let mut endpoint_builder = Endpoint::builder(address_book.clone()).signing_key(signing_key);
-        #[cfg(not(test))]
-        {
-            endpoint_builder = endpoint_builder.hooks(open.clone());
-        }
-        #[cfg(test)]
-        if connection_hook {
-            endpoint_builder = endpoint_builder.hooks(open.clone());
-        }
-        for url in relay_urls {
-            endpoint_builder = endpoint_builder.relay_url(url);
-        }
-        let endpoint = endpoint_builder
-            .spawn()
-            .await
-            .map_err(|e| TransportError::Backend(format!("endpoint: {e}")))?;
+        // p2panda's builder and its spawn future carry the signing key by
+        // value. They are built in a statement with no await and boxed, so
+        // they live in their own allocation, never in this frame; the held
+        // seed is cleared once p2panda has the key (ruling 51; the seed
+        // residue test).
+        let spawn = {
+            let mut endpoint_builder = Endpoint::builder(address_book.clone())
+                .signing_key(SigningKey::from_bytes(&signing_seed));
+            #[cfg(not(test))]
+            {
+                endpoint_builder = endpoint_builder.hooks(open.clone());
+            }
+            #[cfg(test)]
+            if connection_hook {
+                endpoint_builder = endpoint_builder.hooks(open.clone());
+            }
+            for url in relay_urls {
+                endpoint_builder = endpoint_builder.relay_url(url);
+            }
+            Box::pin(endpoint_builder.spawn())
+        };
+        drop(signing_seed);
+        // p2panda-net's handle carries the key by value: boxed where it lands,
+        // and lent from there, so no frame holds a moved copy.
+        let endpoint = Box::new(
+            spawn
+                .await
+                .map_err(|e| TransportError::Backend(format!("endpoint: {e}")))?,
+        );
         let queues: AlpnQueues = Arc::new(StdMutex::new(HashMap::new()));
         for alpn in &alpns {
             let (tx, rx) = mpsc::unbounded_channel();
@@ -760,14 +814,19 @@ impl P2pandaTransport {
 
         // Optional LAN discovery: mDNS populates the address book so peers on
         // the same network are reachable without an explicit `add_peer`.
+        // Each builder below takes a clone of that handle, key included: built
+        // and boxed in a statement with no await, it is p2panda's allocation.
         let mdns_handle = match mdns {
-            Some(mode) => Some(
-                MdnsDiscovery::builder(address_book.clone(), endpoint.clone())
-                    .mode(mode)
-                    .spawn()
-                    .await
-                    .map_err(|e| TransportError::Backend(format!("mdns: {e}")))?,
-            ),
+            Some(mode) => {
+                let spawn = Box::pin(
+                    MdnsDiscovery::builder(address_book.clone(), (*endpoint).clone())
+                        .mode(mode)
+                        .spawn(),
+                );
+                Some(Box::new(spawn.await.map_err(|e| {
+                    TransportError::Backend(format!("mdns: {e}"))
+                })?))
+            },
             None => None,
         };
 
@@ -776,13 +835,16 @@ impl P2pandaTransport {
         // peers' transport info over time. The handle is held so the walkers
         // keep running for the transport's life.
         let discovery_handle = match discovery {
-            Some(config) => Some(
-                Discovery::builder(address_book.clone(), endpoint.clone())
-                    .config(config)
-                    .spawn()
-                    .await
-                    .map_err(|e| TransportError::Backend(format!("discovery: {e}")))?,
-            ),
+            Some(config) => {
+                let spawn = Box::pin(
+                    Discovery::builder(address_book.clone(), (*endpoint).clone())
+                        .config(config)
+                        .spawn(),
+                );
+                Some(Box::new(spawn.await.map_err(|e| {
+                    TransportError::Backend(format!("discovery: {e}"))
+                })?))
+            },
             None => None,
         };
 
@@ -790,12 +852,11 @@ impl P2pandaTransport {
         // the same space topic. Held so the overlay actor lives for the
         // transport; `subscribe`/`set_topics` drive it.
         let gossip_handle = if gossip {
-            Some(
-                Gossip::builder(address_book.clone(), endpoint.clone())
-                    .spawn()
-                    .await
-                    .map_err(|e| TransportError::Backend(format!("gossip: {e}")))?,
-            )
+            let spawn =
+                Box::pin(Gossip::builder(address_book.clone(), (*endpoint).clone()).spawn());
+            Some(Box::new(spawn.await.map_err(|e| {
+                TransportError::Backend(format!("gossip: {e}"))
+            })?))
         } else {
             None
         };
@@ -1118,7 +1179,7 @@ impl P2pandaTransport {
     pub fn sync_parts(&self) -> Option<(Endpoint, Gossip)> {
         self.gossip
             .as_ref()
-            .map(|g| (self.endpoint.clone(), g.clone()))
+            .map(|g| ((*self.endpoint).clone(), (**g).clone()))
     }
 
     /// The application-owned endpoint authority for mounting another Iroh
@@ -1128,7 +1189,7 @@ impl P2pandaTransport {
     /// Burn Remote registers its ALPN here so blobs, LogSync, and compute keep
     /// one transport identity and one endpoint lifetime.
     pub fn protocol_endpoint(&self) -> Endpoint {
-        self.endpoint.clone()
+        (*self.endpoint).clone()
     }
 
     /// The peer's current dialable address set as a ticket, if the endpoint
