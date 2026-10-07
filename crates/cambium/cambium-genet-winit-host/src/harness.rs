@@ -419,12 +419,14 @@ where
             .map(|(x, y, width, height)| (x + width / 2.0, y + height / 2.0))
     }
 
-    /// The first element `selector` matches that paints.
+    /// The first element `selector` matches that is rendered and paints.
     fn resolve_node(&self, selector: &Selector) -> Option<NodeId> {
         let dom = self.runner().dom();
         let dom_ref = dom.borrow();
+        let layout = self.host.s.layout.as_ref()?;
         taproot::matching(&dom_ref, selector)
             .into_iter()
+            .filter(|node| layout.rendered_visible(&*dom_ref, *node))
             .find(|node| self.painted_rect(*node).is_some())
     }
 
