@@ -42,3 +42,9 @@ uxtree = { workspace = true }
 accesskit_consumer_windows = { package = "accesskit_consumer", version = "=0.35.0" }
 accesskit_consumer_unix = { package = "accesskit_consumer", version = "=0.36.0" }
 accesskit_consumer_macos = { package = "accesskit_consumer", version = "=0.38.0" }
+# Experiment E1b's probe (examples/e1b_two_sessions.rs) publishes the joined
+# trees through AccessKit's own winit adapter: Genet's AccessKitBridge drops
+# an action's target tree and answers activation with the latest update,
+# which under subtrees is a guest's.
+accesskit_winit = "0.32"
+cambium-winit = { version = "0.3.0", path = "../cambium-winit" }

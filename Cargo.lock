@@ -120,6 +120,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "accesskit_winit"
+version = "0.32.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1fe9a94394896352cc4660ca2288bd4ef883d83238853c038b44070c8f134313"
+dependencies = [
+ "accesskit",
+ "accesskit_macos",
+ "accesskit_unix",
+ "accesskit_windows",
+ "raw-window-handle",
+ "winit",
+]
+
+[[package]]
 name = "acto"
 version = "0.8.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2175,8 +2189,10 @@ dependencies = [
  "accesskit_consumer 0.35.0",
  "accesskit_consumer 0.36.0",
  "accesskit_consumer 0.38.0",
+ "accesskit_winit",
  "cambium",
  "cambium-rootstock",
+ "cambium-winit",
  "genet-render",
  "genet-scripted-dom",
  "genet-winit-host",
