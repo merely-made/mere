@@ -607,7 +607,25 @@ and 0.38, the consumers under the Windows, AT-SPI and macOS adapters:
   guest is one move, not a stop at the guest's stale focus; and the id
   reading above does not hold for in-process sessions.
 
-E1b, the headed walks, is next and needs Mark at each machine.
+E1b, the headed walks, is next and needs Mark at each machine. Its probe is
+`crates/cambium/cambium-winit-a11y/examples/e1b_two_sessions.rs` (in Mere:
+`Code/testing/mere/` is not reachable from the lane's cloud session). It
+publishes a host menu and two `ContainedSession` panes, joined by
+`uxtree::graft`, through AccessKit's own winit adapter. `--omit-a` and
+`--unboxed` are the positive controls; `--guests` and the printed memory
+are the recorded measure; `--self-check` reads the joined tree through the
+AT-SPI consumer without a window. Self-check on Linux (debug, windowless):
+reading order host menu, A's field, B's list to its last item; Tab cycles
+A's field, B's button, host menu; a reader's Click raises B's count; with
+`--omit-a` A is unreachable. Resident memory 13 MiB with no guest, 24 MiB
+with one, 25 to 26 MiB with two.
+
+*Found for hosts on Genet's winit bridge (Turnstone, Pelt):*
+`genet_winit_host::AccessKitBridge` drops an action request's
+`target_tree`, and answers activation with the latest update, which under
+subtrees is a guest's and is refused as an initial tree. Both block AC2 in
+those hosts until Genet's bridge carries the tree id and keeps the host's
+initial tree apart; `Composition::initial_host` supplies the latter.
 
 **Where it lives** is part of fork AC3. *Reading, not ruled:* E1a fits as
 tests beside the shared helper in Mere. E1b fits as a small binary under

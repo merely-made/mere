@@ -195,6 +195,20 @@ impl Composition {
     pub fn host(&self) -> &TreeUpdate {
         &self.host
     }
+
+    /// The host's tree as an adapter's activation request takes it, before
+    /// any subtree exists: a focus on a graft moves to the host's root. Pure;
+    /// a host that answers activation on another thread keeps this ready and
+    /// calls [`Grafts::activate`] once the adapter has asked.
+    pub fn initial_host(&self) -> TreeUpdate {
+        let mut host = self.host.clone();
+        if grafted(&host).contains_key(&host.focus)
+            && let Some(tree) = &host.tree
+        {
+            host.focus = tree.root;
+        }
+        host
+    }
 }
 
 /// What one adapter holds between frames: the subtrees it has received, the
@@ -227,14 +241,9 @@ impl Grafts {
     /// [`frame`](Self::frame) sends every guest as new.
     pub fn activate(&mut self, composition: &Composition) -> TreeUpdate {
         self.live.clear();
-        let mut host = composition.host.clone();
+        let host = composition.initial_host();
         if let Some(tree) = &host.tree {
             self.root = Some(tree.root);
-        }
-        if grafted(&host).contains_key(&host.focus)
-            && let Some(root) = self.root
-        {
-            host.focus = root;
         }
         self.focus = Some(host.focus);
         host
