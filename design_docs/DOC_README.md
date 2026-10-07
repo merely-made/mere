@@ -469,6 +469,10 @@ invisible to this index, the same defect the 2026-08-24 collapse fixed
 everywhere else. Both problems close together: everything below moved by
 `git mv` (history preserved) into this area root.
 
+### cambium_docs/research/
+
+- [app_composition_brief](cambium_docs/research/2026-10-06_app_composition_brief.md) — **research, 2026-10-06, nothing authorised to build** (Turnstone fork U8): how one Cambium application appears and works live inside another, comparing live pixels from another process (shared textures, or paint lists over `PaintEnvelope`) with tree-level composition (view level, retained session with its own document, a guest root in the host's forest document, cross-process session projection) on input, focus and IME, accessibility on all three operating systems, state and crash isolation, pin sets, and memory. Finds that Turnstone already hosts Knot's and Redshank's surfaces as in-process sessions, that the forest holds one application's windows, and that AccessKit 0.24.1 subtrees are implemented under every pinned adapter but unused by the stack. Recommends retained sessions joined as AccessKit subtrees, with room reserved for the forest mount; the experiment E1 (two sessions, one tree, three screen readers) and forks AC1 to AC6 are with Mark.
+
 ### cambium_docs/implementation_strategy/
 
 - [fact_visualization_leaves_plan](archive_docs/2026-10-06_completed_plans/2026-09-06_fact_visualization_leaves_plan.md) — **V0-V2 landed; archived 2026-10-06**: consumer-pulled Cambium/Sprigging contracts for a read-only multi-mark angle strip, a read-only dimension line, and a controlled range scrubber with labelled pins. Geometry stays generic and application values, labels, units, provenance, and persistence stay in DOM and product state. Cleromancy's Chart surface is the first consumer of all three.
