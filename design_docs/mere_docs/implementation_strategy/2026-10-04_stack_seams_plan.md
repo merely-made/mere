@@ -6,7 +6,8 @@
 stages in §3.1) and landed on main (`40d7ae5e`); S32 (F19) landed on main
 (`48c08dee`); the S14 pass (S33) done (`8d7702d2`, receipt
 `support/doc-audit/d2/remediation_2026-10-06.md`); S66's code follow-on
-(S70 to S75, the smolweb fidelity plan's WS4) landed bar R6 (`b4f14f2c`); P3
+(S70 to S77, the smolweb fidelity plan's WS4) landed (`b4f14f2c`, R6
+`1d87808a`); P3
 and S7 done as documents; S3 to S6 carried into the dynamics grammar plan (G8, G9); S9 done by the identity
 lane (`b52edea7`).
 
@@ -1037,6 +1038,10 @@ The done-conditions handed over for S3 and S4, kept for reference:
   fidelity plan's progress log carries the gates, readings and gaps.
 - **2026-10-06.** Round 26: S76 (publish gopher-protocol 0.2.0, then repin) and S77 (knot-editor's preview change noted in its plan, its lane to make it).
 - **2026-10-06.** S45 carried out, under rounds 27 and 28 (S78 to S82): Frozen evidence ledgered (`362c5d5a`), the header tool re-run over 75 owned sources in one commit (`43353861`), and the gate added to CI and the doc audit (`0b374437`). The receipt is in the license sweep plan's §6.
+- **2026-10-06.** S76 and S77 carried out: gopher-protocol 0.2.0 published
+  (smolweb `b0f1dda`) and repinned (`1d87808a`), completing WS4; knot-editor's
+  application workspace plan records the preview change its next repin needs
+  (`210ee64`).
 - **2026-10-06.** Round 16: S46 (live plans handed to their lanes), S47
   (reviewed write lanes) and S48 (ownerless tails to the archived plan tails
   backlog). S44's repins and S45's header re-run were flagged as separate
