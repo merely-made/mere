@@ -325,6 +325,66 @@ impl GraphJournal {
         })
     }
 
+    /// Semantic-only migration of a caller-qualified legacy baseline and prefix.
+    /// Ordinary replay does not infer a legacy profile from absent resource columns.
+    pub fn migrated_prefix_at_from(
+        &self,
+        baseline: &Graph,
+        cursor: Seq,
+    ) -> Result<
+        Option<super::legacy_resource_migration::MigratedReplay>,
+        super::legacy_resource_migration::LegacyMigrationError,
+    > {
+        let end = cursor.index();
+        if end > self.log.len() {
+            return Ok(None);
+        }
+        super::legacy_resource_migration::migrate_legacy_prefix(
+            baseline,
+            &self.log.entries()[..end],
+        )
+        .map(Some)
+    }
+
+    /// The graph-only convenience form of [`migrated_prefix_at_from`](Self::migrated_prefix_at_from).
+    pub fn migrated_snapshot_at_from(
+        &self,
+        baseline: &Graph,
+        cursor: Seq,
+    ) -> Result<Option<Graph>, super::legacy_resource_migration::LegacyMigrationError> {
+        self.migrated_prefix_at_from(baseline, cursor)
+            .map(|replay| replay.map(|replay| replay.graph))
+    }
+
+    /// Reconstruct retained history before replacing a legacy checkpoint atomically.
+    /// The full prefix supplies historical URLs and withdrawn handles; `since` is
+    /// validated but cannot substitute the checkpoint's current URL for that evidence.
+    pub fn migrated_replay_from_with_baseline(
+        &self,
+        since: Seq,
+        graph: &mut Graph,
+        baseline: &Graph,
+    ) -> Result<(), super::legacy_resource_migration::LegacyMigrationError> {
+        if since.index() > self.log.len() {
+            return Err(super::legacy_resource_migration::LegacyMigrationError(
+                "legacy checkpoint cursor is beyond retained history".into(),
+            ));
+        }
+        let mut replay =
+            super::legacy_resource_migration::migrate_legacy_prefix(baseline, self.log.entries())?;
+        replay.graph.recorder.0 = graph.recorder.0.take();
+        replay.graph.write_author = graph.write_author.clone();
+        replay.graph.current_session = graph.current_session;
+        replay.graph.revision = replay.graph.revision.max(graph.revision).saturating_add(1);
+        replay.graph.url_grouping_revision = replay
+            .graph
+            .url_grouping_revision
+            .max(graph.url_grouping_revision)
+            .saturating_add(1);
+        *graph = replay.graph;
+        Ok(())
+    }
+
     /// Stable, evenly distributed prefix cursors for a compact scrubber. This
     /// uses sequence order alone: journal history has no required wall-clock
     /// timestamp. `max_points == 1` yields only the current live cursor;
@@ -546,6 +606,34 @@ mod tests {
             url: url.to_string(),
             position: [0.0, 0.0],
         }
+    }
+
+    fn assert_live_add_captures(deltas: &[CapturedDelta], id: u128, url: &str) {
+        let resource = super::super::ResourceNode::new(url);
+        assert_eq!(deltas.len(), 4);
+        assert_eq!(deltas[0], add(id, url));
+        assert!(
+            matches!(&deltas[1], CapturedDelta::ReplayTouchNodeLastVisitedById {
+            node_id, ..
+        } if node_id == &Uuid::from_u128(id).to_string())
+        );
+        assert_eq!(
+            deltas[2],
+            CapturedDelta::ReplaySetResourceRecordById {
+                resource_id: resource.id().to_string(),
+                record: Some(crate::persistence::PersistedResourceRecord {
+                    canonical_iri: resource.canonical_iri().into(),
+                    facets: vec![],
+                }),
+            }
+        );
+        assert_eq!(
+            deltas[3],
+            CapturedDelta::ReplaySetShownResourceById {
+                surface_id: Uuid::from_u128(id).to_string(),
+                resource_id: Some(resource.id().to_string()),
+            }
+        );
     }
 
     #[test]
@@ -1100,12 +1188,7 @@ mod tests {
         add_node(&mut copy, 2);
         add_node(&mut Graph::new(), 3);
         let seen = seen.lock().unwrap();
-        assert_eq!(seen.len(), 2, "node 1 and its visit stamp, nothing else");
-        assert_eq!(seen[0], add(1, "https://1.test/"));
-        assert!(matches!(
-            seen[1],
-            CapturedDelta::ReplayTouchNodeLastVisitedById { .. }
-        ));
+        assert_live_add_captures(&seen, 1, "https://1.test/");
     }
 
     /// Replay reproduces the live graph exactly, clock-read visit stamps and
@@ -1210,15 +1293,26 @@ mod tests {
                 position: Point2D::new(0.0, 0.0),
             },
         );
-        // A new node is two entries: the add and its visit stamp.
+        // A live add records the surface, visit, resource and shown binding.
+        assert_live_add_captures(
+            &hooked
+                .lock()
+                .unwrap()
+                .entries()
+                .iter()
+                .map(|entry| entry.delta.clone())
+                .collect::<Vec<_>>(),
+            1,
+            "https://a.test/",
+        );
         assert_eq!(
             hooked.lock().unwrap().len(),
-            2,
+            4,
             "the thread hook sees live edits"
         );
         assert_eq!(
             *seen.lock().unwrap(),
-            2,
+            4,
             "the graph's recorder sees live edits"
         );
 
@@ -1229,12 +1323,12 @@ mod tests {
         assert_eq!(session.node_count(), 2);
         assert_eq!(
             hooked.lock().unwrap().len(),
-            2,
+            4,
             "replay reached the thread hook"
         );
         assert_eq!(
             *seen.lock().unwrap(),
-            2,
+            4,
             "replay reached the graph's recorder"
         );
 
@@ -1248,8 +1342,16 @@ mod tests {
                 position: Point2D::new(0.0, 0.0),
             },
         );
-        assert_eq!(hooked.lock().unwrap().len(), 4);
-        assert_eq!(*seen.lock().unwrap(), 4);
+        let captures = hooked
+            .lock()
+            .unwrap()
+            .entries()
+            .iter()
+            .map(|entry| entry.delta.clone())
+            .collect::<Vec<_>>();
+        assert_eq!(captures.len(), 8);
+        assert_live_add_captures(&captures[4..], 3, "https://c.test/");
+        assert_eq!(*seen.lock().unwrap(), 8);
         set_captured_delta_hook(None);
     }
 

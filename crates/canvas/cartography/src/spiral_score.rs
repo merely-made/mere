@@ -150,7 +150,8 @@ pub fn project_spiral_score_for_view(
         })
         .collect();
     let edges = graph
-        .relations()
+        .projected_relations()
+        .map(|(_, view)| view)
         .filter(|relation| relation.from != relation.to)
         .map(|relation| PositionedEdge {
             edge: None,

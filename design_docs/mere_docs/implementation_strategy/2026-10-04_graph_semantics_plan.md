@@ -1,13 +1,15 @@
 # Graph semantics plan: assertions, resources, saved queries, residency
 
 **Date:** 2026-10-04
-**Status (2026-10-06):** in progress. P1 implemented and gated on
+**Status (2026-10-07):** in progress. P1 implemented and gated on
 `graph-semantics`, with the ruling-9 exact-journal and legacy-checkpoint
 attribution repair complete after the original `459cad84` receipt. Those
 receipts covered IRI-safe handles; the C19 opaque-id gap is now repaired
 and its expanded RDF round-trip gate passes.
-Reconciled main `62219dd1` rulings 9–19 before P2 source edits; the graph
-plan is unchanged at main `d2d6ac3d`. A1/B1/C1 selected by "All 1";
+Reconciled main `62219dd1` rulings 9–19 before P2 source edits. A resumed
+read-only check of main `26857eaf` finds new S53 received obligations;
+phase-changing drift is recorded below before further implementation.
+A1/B1/C1 selected by "All 1";
 `ResourceNode`/`SurfaceNode` are settled by ruling 19, and B1/C1 remain
 approved. Mark authorized P2 after the P1 repair at `4bc9ae96`, then
 selected C7 identity namespaces with future moot aggregation and C8 resource
@@ -30,8 +32,20 @@ Mark selected C21 "With the mere, proceed" (ruling 34): custom placement
 declarations belong to the mere and govern subsequent writes after reopening.
 The built-in placement catalog is implemented and gated (367 kernel tests,
 workspace and wasm32 checks, documentation audit).
-Mutable declaration behavior remains held at C22 composition conflicts and
-C23 later nature changes.
+Mark selected C22/C23 option 1 with "1 & 1" (rulings 35–36): retain
+conflicting declarations and origins, require selection before new writes,
+and apply nature changes to new assertions while preserving held handles.
+Durable declaration storage, composition/export, checked assertion writers,
+page bindings and canvas lifting are qualified for a branch checkpoint.
+Final qualification also repairs the legacy predicate revision seam, canvas
+footprint cache lifecycle, enforcement of the pending C28 checkpoint and
+checked resource codicil imports. All touched-crate, workspace and wasm32
+gates pass; receipts are recorded in Progress. The prior 384-test receipt is
+historical. This checkpoint does not complete P2.
+Mark resumed with "Ok, proceed, orchestrating". New policy checkpoints
+C24–C28 hold aggregate restoration, walk hop costs, RDF identity input,
+automatic legacy migration activation and mixed raw/carried lineage; the
+already ruled semantics stand.
 Resource population and conflict migration remain incomplete.
 Replay-first migration and per-predicate placement govern P2. The committed
 identity/lifecycle slice and recreation repair pass their gates; P2 is incomplete.
@@ -1385,6 +1399,260 @@ traveling with the mere. The session-import guard continues to refuse resource
 inputs pending its already-held recorded resource import path
 (`crates/graph/graph-kernel/src/graph/merge.rs` 39). No guard is weakened here.
 
+### Resumption and integration checkpoints C24–C27 (2026-10-06)
+
+At resumption, the paused source was on `graph-semantics` at committed
+`b46b53f8` plus uncommitted P2 work. Independent source review found two bounded bugs rather
+than new policy choices: content-key reassertion updates only one identical
+handle copy in parallel resource buckets (`graph/assertion_write.rs` 458),
+and Pandect treats orphan legacy surface rows as active handle owners
+(`crates/system/pandect/src/snapshot_merge.rs` 236), unlike checked loading
+(`graph/snapshot/checked.rs` 213). The writer regression is strengthened before
+repair; composition now uses materialized endpoints, with active-collision,
+orphan, malformed and distinct-handle controls. New gate receipts are pending.
+Kernel paths in this finding are under `crates/graph/graph-kernel/src`.
+
+**C24: old aggregate relations after withdrawal/restoration.** The 23
+Provenance, Imported and Containment kinds store sets of kinds, with no
+assertion handle, time or asserter; 16 have ruled resource placement and seven
+surface placement (`graph/edge_data.rs` 442–453;
+`graph/predicate_registry.rs` 32–90). The outer journal carries an Author,
+but aggregate captures identify only a surface pair and kind or whole payload,
+without an undo-versus-new intent (`graph/journal.rs` 187;
+`graph/capture.rs` 50, 58, 224). Placement is settled; identity on reappearance
+is not. No census of Mark's saved graphs is claimed.
+
+1. **Stable legacy pair/kind identity (recommended).** Preserve the first
+   observed resource endpoints through absence/restoration. This preserves
+   restoration of an old claim, but cannot identify a fresh same-kind claim
+   after navigation from those old bytes.
+2. **Fresh identity on each return.** Each absent-to-present interval binds
+   to the resource shown then. Fresh reassertions fit, but an indistinguishable
+   undo can rebind an old claim to a later page.
+3. **Explicit authored promotion.** Retain legacy aggregates on surfaces
+   until promoted; preserves inputs but delays the 16 resource kinds and P2.
+
+**C25: shown associations in component/Ego walks.** Ruling 6 already requires
+both strata; shown-only adjacency cannot satisfy P2. The remaining choice is
+hop cost. Executed model, not a kernel receipt: A and A' show RA; RA has two
+Cites edges through unshown RB to RC shown by C; C has a Traversal to D.
+Current surface BFS reaches only A at every radius; C reaches D at radius one
+as the positive control (`graph/query.rs` 753, 782;
+`graph/relation_read.rs` 117, 151).
+
+1. **Zero-hop shown joins (recommended).** Ego zero includes A and A'; two
+   relation hops reach C and three reach D. Components include A, A', C and D.
+   Radius measures claims/traversals, rather than the representation binding.
+2. **Count each shown join as a hop.** Ego zero retains only A; A' first
+   appears at two hops, C at four and D at five. Components are unchanged.
+
+**C26: first materialization of RDF subject identity.** Ruling 29 fixes
+canonical pages versus exact term IRIs. `NodeContribution` carries arbitrary
+types and an id but no page/term intent (`crates/graph/linked-data/src/ingest.rs`
+43, 91, 178). Scheme classification cannot supply it. The frozen fixture in
+`crates/graph/linked-data/src/ingest/tests.rs` 25 expects four untyped RDF
+subjects to create four distinct surfaces but two page bindings: foreign #A
+and #B collapse, while ordinary page aliases correctly share a resource.
+Two added exact-term records remain distinct. This fixture passes in the
+51-test linked-data/query Cargo run; the identity-input repair remains held at
+C26. Existing records already preserve the prepared IRI and need no new replay
+identity mode.
+
+1. **Explicit intent, exact RDF default (recommended).** Add per-subject
+   intent at the apply boundary; generic foreign RDF defaults to exact IRIs,
+   while page extraction explicitly names page subjects. Supports mixed input
+   without changing the contribution or capture grammar.
+2. **Require intent for every new subject.** Refuse unresolved inputs before
+   mutation; each caller must classify every new subject.
+
+**C27: automatic legacy migration activation.** A modern custom surface
+claim with a later Resource declaration can have the same bytes as an old
+surface claim. C23 requires preserving the former store. `GraphSnapshot` has
+zero version/profile fields (`persistence.rs` 288–310), and bare JSON stores
+read it directly (`crates/system/pandect/src/session_graph_store.rs` 78–88).
+Codicil v1/v2 distinguish facet sidecars, not placement
+(`crates/system/pandect/src/graph_codicil.rs` 39–40, 58–65).
+
+1. **Durable placement profile at the session/codicil boundary (recommended).**
+   Record whether input is legacy or already migrated; use an explicitly
+   caller-qualified legacy adapter until that profile is present. Do not infer
+   historical store from current declarations or resource-column presence.
+2. **Placement format on every GraphSnapshot.** Add a version field and
+   propagate it through all producers/composition, coordinating consumer
+   struct-literal breaks before integration. Missing legacy values need a
+   defined policy.
+3. **Caller/load setting only.** Select legacy input explicitly without a
+   durable profile; transferred bare snapshots remain ambiguous.
+
+These checkpoints are put to Mark before implementation selects an answer.
+The bounded Semantic replay adapter and already ruled declaration/canvas work
+may proceed independently; ordinary activation remains held.
+
+### Mixed raw/carried lineage checkpoint C28 (2026-10-06)
+
+Raw journal assertions lack a carried id; that documented compatibility
+limitation remains unchanged. A later exact payload can introduce an id with
+the same predicate, scope and asserter after navigation. Those bytes do not
+prove whether the carried handle continues the earlier claim or introduces a
+distinct copy. B1 forbids silently aliasing distinct handles; it does not
+require rejecting distinct ids merely because their content matches.
+
+The source fixture at `graph/legacy_resource_migration.rs` 1530 contains three
+entries: raw Cites at the old page, navigation, and an exact payload with id
+`carried`. Its read-only probe expects one diagnostic with indices 0 and 2,
+two possible resource endpoints, and an unchanged journal. A distinct
+predicate and a distinct explicit Author are zero-diagnostic controls;
+the unknown-asserter marker remains uncertain. This test passes in the
+resumed 395-test kernel/store executable run.
+
+1. **Explicit endpoint resolution (recommended).** Retain the original
+   history and require an explicit resource-origin choice for each ambiguous
+   carried handle before activating that migration. Keep its exact id; do not
+   alias it to a generated raw handle. Unambiguous histories can proceed.
+2. **First carried appearance is a new claim.** Bind the carried handle to
+   the resource shown at that entry. Raw and carried identities stay distinct,
+   but an actual continuation can be bound to a later page.
+
+No diagnostic currently chooses either policy. Automatic activation remains
+held along with C27; exact-carried prefixes and raw-only author/endpoints are
+qualified separately.
+
+### Main archive handoff drift (2026-10-06)
+
+Read-only comparison with main `26857eaf` finds new received notes in its plan
+at lines 426–430 and 444–450, absent from the earlier `d2d6ac3d` scope. Stack
+seams ruling S53 transfers the archived petgraph-RDF open items to this plan;
+S68 keeps its Phase 4 in the separate backlog. No replacement of rulings
+1–36, merge, main edit or additional implementation is performed here.
+
+The inherited P2 obligations include JSON-LD named-scope and statement-metadata
+shaping, absent/default metadata omission and snapshot-size controls, review
+of the unaccepted ExampleOf/Summarizes vocabulary proposals, and removal of
+the older Oxigraph dependency/oracle. The prior-production spareval
+`sparql_materialized` oracle remains the P2 parity control
+(`crates/graph/linked-data/src/query.rs` 84–96, 129);
+removing Oxigraph does not require removing that control. Any needed lock
+change remains a stop under this lane's rules.
+
+Raw-IRI Semantic support and the borrowed QueryableDataset are already
+covered by this lane. The archived Phase 3 status question is still open;
+its explicitly deferred term-dictionary on-ramp is not a new P2 requirement.
+CONSTRUCT/DESCRIBE graph results belong to P4 under the existing ruling 3.
+The new JSON-LD/serialization obligations materially enlarge P2; record this
+drift and stop further implementation as the lane brief requires. Existing
+source qualification can finish while C24–C28 remain pending. Vocabulary
+alignment must return as its own evidence-backed fork before any new mapping.
+
+### Replay and canvas qualification findings (2026-10-07)
+
+The legacy predicate setter changed visible payload without advancing the
+graph revision (`graph/edge_ops.rs` 573). It now advances that revision only
+when the complete payload changes, retaining the existing-edge return value
+and all held assertion metadata. Two kernel tests cover predicate edits,
+clears, attribution-only repair, repeat inputs and missing edges. The canvas
+test `strategy_cache_tracks_replayed_raw_predicate_edits_with_identical_classifier_rows`
+checks the public replay path after warming the layout cache.
+
+Resource creation and shown bindings correctly advance graph truth, even
+when the visible relations stay unchanged. The private canvas strategy memo
+therefore compares surface identities, projected rows including multiplicity,
+and their complete owning payloads once per graph revision
+(`crates/canvas/pictograph/src/canvas/strategy_inputs.rs`). Steady frames reuse
+the memo. Graph replacement clears it. Walk-dependent inputs will need an
+extension when C25's consumers change; this does not qualify their current
+surface-only traversal.
+
+Runtime checks exposed two existing footprint lifecycle gaps: construction
+left the dependency baseline empty, and restoration claimed its cache hold
+before applying saved face sizes. Construction now records the resolved sizes
+without simulation work (`crates/canvas/pictograph/src/canvas/lifecycle.rs`
+236); restoration claims its hold after geometry is final
+(`crates/canvas/pictograph/src/canvas/strategy.rs` 306). Tests retain unchanged
+extents across no-link navigation, invalidate on a real resize, retain restored
+layouts until visible inputs change, and cover distinct assertion insertion,
+duplicate input, precise retraction and equal-revision graph replacement.
+The five-surface projection fixture uses distinct surface hosts so checked
+snapshot rebuilding does not introduce unrelated derived Domain rows.
+
+The opt-in migration adapter initially documented the C28 hold but did not
+enforce it: a direct call could bind the carried handle to the current page.
+It now preflights the read-only diagnostic and reports checkpoint C28 before
+constructing migrated output (`graph/legacy_resource_migration.rs` 198).
+All three additive journal APIs delegate through this guard. The mixed fixture
+checks refusal, unchanged graph, revisions, Author/session, journal and recorder,
+then uses a real title edit to prove the retained recorder still works.
+Distinct explicit Author and predicate controls migrate successfully. This is
+enforcement of the pending checkpoint, not a lineage resolution policy; C28
+is still unanswered. Detection depends on the supplied retained history and
+cannot recover raw events absent from it.
+
+### Resource codicil import qualification (2026-10-07)
+
+The first full Graphshell run passed 326 library tests and failed six: one
+staged transfer, the mixed scene/codicil round-trip and four H6 transfers.
+Each reached the temporary resource-bearing import refusal; the source log
+is retained as `graph-semantics-graphshell-resource-merge-failures.log` in
+the shared Mere target. Valid resource import must compose both strata,
+rather than discard resource columns or refuse the already ruled union.
+
+`product_import_edits` (`ports/graphshell/src/product.rs` 774) now applies
+C1's unknown-source marker without dropping raw records, then checks global
+handles before materialization can coalesce a conflicting surface record.
+It uses Pandect's checked union for resources and preserves the existing
+surface-field and incoming-facet import rules. Resource records, exact pair
+payloads and shown bindings are prepared in dependency order. Quiet scratch
+replay must reproduce the resource union and every carried assertion at its
+exact endpoints and store before one live journaled change is applied.
+The kernel's legacy surface-only importer retains its resource refusal.
+
+Two Product tests (lines 1583 and 1697) cover same-page distinct surfaces,
+exact handles, persistence and undo, empty-resource compatibility, no-op
+reimport, malformed records and conflicting handle reuse. Every refusal
+checks unchanged graph, journal and change count beside valid controls.
+Missing legacy sources normalize to C1 without changing explicit sources,
+ids or times. Independent read-only review found no actionable defect.
+The first focused Product run passed seven tests and failed two fixtures:
+one tried to declare fixed built-in taggedWith placement; the other expected
+only a semantic row where selected same-host surfaces also retain derived
+Domain containment. The custom-declaration control now uses a custom
+predicate, with the built-in refusal retained. Export checks all selected
+surface relations, explicit semantic inclusion/exclusion and valid containment,
+preserving the same-page shared-resource fixture. The unchanged production
+helper is rerun through the full suite; the failed log is retained as
+`graph-semantics-graphshell-product-fixture-failures.log`.
+The next full run passed 332 library tests with one declaration-control
+failure and four ignored. All six original import/transfer failures passed.
+That final control compared raw struct-ordered JSON against stored JSON values;
+resource loading parses facets to `serde_json::Value` and snapshot output
+serializes those values (`graph/resource.rs` 117, 161). The corrected control
+checks exact resource id/IRI, full typed declaration equality and every facet's
+parsed value. Production code is unchanged. This failed run is retained as
+`graph-semantics-graphshell-declaration-control-failure.log`.
+Runtime gates are recorded in Progress. This adds no migration activation,
+schema or consumer API change and selects none of C24–C28.
+
+### P2 remaining-work review (2026-10-07)
+
+Independent source review confirms that this checkpoint cannot close P2.
+C24 holds migration of the 16 resource-placed legacy aggregate kinds;
+C25 holds component/Ego joins (`graph/query.rs` 753–789), and C26 holds
+first-subject identity at RDF apply (`crates/graph/linked-data/src/ingest/apply.rs`
+69–99). C28's origin resolution and C27's durable input profile precede
+ordinary migration activation. The current adapter is explicitly qualified
+and Semantic-only; ordinary replay preserves held stores.
+
+Already ruled production routing also remains: compatibility semantic
+writers and deltas use surface writers (`graph/edge_ops.rs` 346–356,
+`graph/apply.rs` 1649–1668); tags, properties and classifications still use
+surface facets (`graph/node_facets.rs` 132, 170, 213). P2 needs resource tag
+concepts and tagging statements, resource literal metadata, full classification
+records and shared reads, then their RDF projection. Page-version captures'
+durable association with ResourceNode still needs verification; existing
+Eidetic fingerprints alone are not that receipt. S53's received work and
+its vocabulary/lock checkpoints remain as recorded above. The final P2
+done-condition battery follows these changes. No P3–P5 work begins here.
+Kernel paths in this finding are under `crates/graph/graph-kernel/src`.
+
 ## 3. Rulings
 
 Mark's answers, from multiple-choice rounds; each is the option label quoted
@@ -1705,6 +1973,16 @@ consistently after opening in another host. Installed host registries do not
 replace that authority. Composition must retain and resolve conflicting
 declarations; this ruling does not choose the conflict policy.
 
+**Ruling 35 (C22, 2026-10-06).** Mark: **"1 & 1"**. Selects option 1:
+composition retains conflicting predicate placement declarations and their
+origins. New assertions using a conflicted predicate require an explicit
+selection; historical claims and unaffected predicates remain usable.
+
+**Ruling 36 (C23, 2026-10-06).** The same answer selects option 1:
+nature changes govern newly created assertions. Existing handles retain their
+recorded owning store; reads and precise retractions search both strata rather
+than treating the current declaration as their locator.
+
 ## 4. Phases
 
 ### Placement by stratum (rulings 10, 14, 15)
@@ -1859,14 +2137,97 @@ comes back to Mark as a fork, with evidence, before the code commits to one.
 
 - **C21 (P2). Custom predicate placement ownership.** Ruled: with the mere,
   ruling 34. Historical placement remains preserved by exact captures; durable
-  declarations govern subsequent writes. Conflict policy remains open.
+  declarations govern subsequent writes. Ruling 35 settles conflict policy.
 
-- **C22 (P2). Conflicting placement declarations.** Open: retain variants
-  and require selection for new writes, or reject composition until reconciled.
-- **C23 (P2). Later nature changes.** Open: affect new assertions while
-  preserving held handles, or forbid changes while claims exist.
+- **C22 (P2). Conflicting placement declarations.** Ruled: option 1,
+  ruling 35. Retain variants and origins; require selection for new writes.
+- **C23 (P2). Later nature changes.** Ruled: option 1, ruling 36.
+  Affect new assertions while preserving held handles in their owning stores.
+- **C24 (P2). Legacy aggregate restoration identity.** Open; placement stays
+  ruled. First observed identity versus fresh identity on reappearance.
+- **C25 (P2). Walk hop costs.** Open; both-stratum traversal stays ruled.
+  Zero-cost shown joins versus one hop per shown association.
+- **C26 (P2). RDF identity input.** Open; exact terms/canonical pages stay
+  ruled. Foreign-exact default versus required intent for every new subject.
+- **C27 (P2). Legacy activation profile.** Open; distinguish legacy inputs
+  durably without reinterpreting modern historical surface claims.
+- **C28 (P2). Mixed raw/carried lineage.** Open; explicit resource-origin
+  resolution versus first carried appearance as a new claim. Never alias ids.
 
 ## 6. Progress
+
+- **2026-10-07. Qualified P2 branch checkpoint.** Reused the existing
+  worktree, stable target and three agents. The saved source includes durable
+  declarations, checked assertion APIs, live page bindings, canvas content
+  lifts and the explicitly qualified legacy Semantic adapter. Independent
+  review repaired the missing legacy setter revision, canvas footprint
+  lifecycle and the unenforced C28 hold; no unresolved lineage policy is
+  installed. Fresh offline, locked Cargo gates pass: kernel/store 397 units
+  plus one compile-fail doctest (one example ignored), linked-data/query 51,
+  Pandect 317, cartography 44, and pictograph/canvas 299 (13 ignored). The
+  focused cache suite also passes all eight controls; the corrected Product
+  suite passes all nine. Full Graphshell/personal-sync passes 333 library
+  tests and five integration tests (four ignored). The fresh post-import
+  locked workspace check and wasm32 kernel check both exit 0. Only Product
+  fixtures changed after the other crate/wasm receipts; their source remains
+  the gated source. Final rustfmt and diff checks pass. Documentation audit
+  exits 0, its planted-defect/clean-fixture self-test passes, and every audit
+  bucket equals HEAD baseline documents in the same environment. No active
+  document was added.
+  Logs are retained under `C:/t/cargo-targets/mere` as
+  `graph-semantics-<gate>.log`; the earlier canvas failures are preserved in
+  `graph-semantics-pictograph-cache-failures.log` and
+  `graph-semantics-pictograph-first-run.log`. The first linked-data build hit
+  Windows error 1450 before running tests; an unchanged offline/locked retry
+  passed. Its failure log and the stale Pandect sequence-count failure are
+  retained separately. The original six Graphshell import failures, the
+  subsequent two Product fixture failures and the final JSON-ordering control
+  failure are retained in their named logs; all pass on final source.
+  Ignored tests, headed/device or browser-hosted proofs,
+  sibling builds, P3–P5 and main integration are not qualified. A final
+  read-only check of main `e7ec66af` finds no further change to this plan since
+  `26857eaf`. C24–C28 and S53's phase-changing received scope remain the stop
+  points; ordinary migration activation and production routing are incomplete.
+
+  Qualified source and documentation are checkpointed on `graph-semantics`
+  for Mark's review. Nothing is pushed or integrated into main. No dependency,
+  manifest/lock change, download, extra target, Cargo home or worktree was
+  introduced by this resumption. Retained: the existing graph-semantics
+  worktree/branch, owned by this lane for incomplete P2 and review; the shared
+  stable Mere target and named gate logs for reusable builds and receipts.
+  No generated output belonging to another owner was removed. Stop before
+  choosing C24–C28 or implementing the phase-changing S53 additions.
+
+- **2026-10-06. Resumed source review and unit gate.** Saved the bounded
+  legacy Semantic adapter and three additive journal APIs, with eleven tests
+  for exact carried handles, historical endpoints, baseline uncertainty,
+  declarations, parallel copies, collisions, effective replay/undo and the
+  read-only mixed-history probe. Review repaired duplicate-copy reassertion,
+  orphan-row composition and unknown-marker diagnostics. Rustfmt and diff
+  checks pass. The focused Cargo regression passes (one test); running the
+  same freshly built kernel/store executable serially passes all 395 units
+  (`C:/t/cargo-targets/mere/graph-semantics-kernel-unit.log`). This is not a
+  Cargo documentation-test or broader workspace receipt. The full Cargo run
+  is cache-lock blocked; touched consumer crates, workspace and wasm checks
+  remain pending. Documentation audit exits 0 with counts equal to HEAD.
+  Source remains uncommitted, main integration held, and C24–C28 unanswered.
+  A separate read-only check records S53's phase-changing received scope from
+  main `26857eaf`; further implementation is stopped at that drift as well.
+
+- **2026-10-06. Resumed after Mark's pause.** Mark: "Ok, proceed,
+  orchestrating". Reused the existing worktree and three subagents; ownership
+  is replay adapter/journal, source review/composition, and walk/identity fork
+  qualification. The pre-pause 384-test kernel receipt is historical; remaining
+  crate/workspace/wasm gates are not claimed. Record C24–C28 before choosing
+  any of their policies. No main/sibling checkout or dependency change.
+
+- **2026-10-06. C22/C23 continuation authorized.** Mark selected both
+  recommendations with "1 & 1". Implement durable declarations on exact-IRI
+  predicate resources, using existing resource records and captures; preserve
+  conflicts in composition and declaration dependencies in selection exports.
+  Then connect new writes to effective placement, retaining exact historical
+  ownership for handle reads and retraction. P2 remains incomplete; this entry
+  records authorization and work in progress, not a new test receipt.
 
 - **2026-10-06. Fixed placement catalog qualified; stopped at C22/C23.**
   Added the kernel-owned built-in table, stratum type and default lookups;

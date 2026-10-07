@@ -202,9 +202,9 @@ pub fn build_positioned_edges(
 ) -> Vec<PositionedEdge> {
     request
         .graph
-        .relations()
-        .filter(|view| view.from != view.to)
-        .map(|view| PositionedEdge {
+        .projected_relations()
+        .filter(|(_, view)| view.from != view.to)
+        .map(|(_, view)| PositionedEdge {
             edge: None,
             from: view.from,
             to: view.to,

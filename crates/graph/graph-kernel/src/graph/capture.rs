@@ -1122,12 +1122,34 @@ mod tests {
         set_captured_delta_hook(None);
 
         let captured = captured.lock().expect("capture sink");
-        assert_eq!(
-            captured.len(),
-            4,
-            "add with its visit stamp, first set, and remove are captured; an identical set is not"
+        let [added, stamp, resource, shown, set, removed] = captured.as_slice() else {
+            panic!("expected add, visit, resource, shown, one facet set and remove: {captured:?}");
+        };
+        let resource_id = chartulary::resource_id("mere://facet-test").to_string();
+        assert!(
+            matches!(added, CapturedDelta::ReplayAddNodeWithIdIfMissing {
+            id: node_id, .. } if node_id == &id.to_string())
         );
-        let set_projection = replay_captured_deltas(captured[..3].iter().cloned());
+        assert!(
+            matches!(stamp, CapturedDelta::ReplayTouchNodeLastVisitedById {
+            node_id, .. } if node_id == &id.to_string())
+        );
+        assert!(
+            matches!(resource, CapturedDelta::ReplaySetResourceRecordById {
+            resource_id: captured_id, record: Some(record) }
+            if captured_id == &resource_id && record.canonical_iri == "mere://facet-test"
+                && record.facets.is_empty())
+        );
+        assert!(matches!(shown, CapturedDelta::ReplaySetShownResourceById {
+            surface_id, resource_id: Some(captured_id) }
+            if surface_id == &id.to_string() && captured_id == &resource_id));
+        assert!(matches!(set, CapturedDelta::ReplaySetNodeFacetById {
+            node_id, facet, value_json } if node_id == &id.to_string()
+                && facet == "example.portable/v1"
+                && serde_json::from_str::<serde_json::Value>(value_json).unwrap() == value));
+        assert!(matches!(removed, CapturedDelta::ReplayRemoveNodeFacetById {
+            node_id, facet } if node_id == &id.to_string() && facet == "example.portable/v1"));
+        let set_projection = replay_captured_deltas(captured[..captured.len() - 1].iter().cloned());
         assert_eq!(
             set_projection
                 .facets()
@@ -1140,6 +1162,22 @@ mod tests {
                 .facets()
                 .get(&id, &chartulary::FacetId::new("example.portable/v1"),)
                 .is_none()
+        );
+        assert_eq!(
+            set_projection.to_snapshot().resources,
+            graph.to_snapshot().resources
+        );
+        assert_eq!(
+            set_projection.to_snapshot().shown_resources,
+            graph.to_snapshot().shown_resources
+        );
+        assert_eq!(
+            removed_projection.to_snapshot().resources,
+            graph.to_snapshot().resources
+        );
+        assert_eq!(
+            removed_projection.to_snapshot().shown_resources,
+            graph.to_snapshot().shown_resources
         );
     }
 
@@ -2291,6 +2329,78 @@ mod tests {
             (3, 2),
             "three new nodes; hyperlink assertion with its predicate and open assertion captured"
         );
+        let expected_bindings = [
+            (21, "https://a.test"),
+            (22, "https://b.test"),
+            (23, "https://c.test"),
+            (21, "https://a.test/next"),
+            (22, "https://b.test/one"),
+            (22, "https://b.test/two"),
+            (22, "https://b.test/one"),
+            (22, "https://b.test/two"),
+            (23, "https://c.test/branched"),
+        ]
+        .map(|(surface, iri)| {
+            (
+                Uuid::from_u128(surface).to_string(),
+                chartulary::resource_id(iri).to_string(),
+            )
+        });
+        let actual_bindings = captured
+            .iter()
+            .filter_map(|delta| match delta {
+                CapturedDelta::ReplaySetShownResourceById {
+                    surface_id,
+                    resource_id: Some(resource_id),
+                } => Some((surface_id.clone(), resource_id.clone())),
+                _ => None,
+            })
+            .collect::<Vec<_>>();
+        assert_eq!(actual_bindings, expected_bindings);
+        let expected_records = [
+            "https://a.test",
+            "https://b.test",
+            "https://c.test",
+            "https://a.test/next",
+            "https://b.test/one",
+            "https://b.test/two",
+            "https://c.test/branched",
+        ]
+        .map(|iri| {
+            (
+                chartulary::resource_id(iri).to_string(),
+                chartulary::canonical_url(iri),
+            )
+        });
+        let actual_records = captured.iter().enumerate().filter_map(|(index, delta)| match delta {
+            CapturedDelta::ReplaySetResourceRecordById { resource_id, record: Some(record) } => {
+                assert!(record.facets.is_empty());
+                let shown = captured.iter().position(|delta| matches!(delta,
+                    CapturedDelta::ReplaySetShownResourceById { resource_id: Some(id), .. } if id == resource_id)).unwrap();
+                assert!(index < shown, "resource exists before the first shown binding");
+                assert!(captured[..index].iter().any(|delta| match delta {
+                    CapturedDelta::ReplayAddNodeWithIdIfMissing { url, .. }
+                    | CapturedDelta::ReplayNavigateNodeById { url, .. }
+                    | CapturedDelta::ReplaySetNodeUrlById { new_url: url, .. } => {
+                        chartulary::resource_id(url).to_string() == *resource_id
+                    },
+                    _ => false,
+                }));
+                Some((resource_id.clone(), record.canonical_iri.clone()))
+            },
+            _ => None,
+        }).collect::<Vec<_>>();
+        assert_eq!(
+            actual_records, expected_records,
+            "history revisits retain existing records"
+        );
+        let replayed = replay_captured_deltas(captured.iter().cloned());
+        let expected = graph.to_snapshot();
+        let actual = replayed.to_snapshot();
+        assert_eq!(actual.resources, expected.resources);
+        assert_eq!(actual.resource_edges, expected.resource_edges);
+        assert_eq!(actual.shown_resources, expected.shown_resources);
+        assert!(replayed.get_node_key_by_id(Uuid::from_u128(22)).is_none());
         let mut out = Vec::new();
         for (index, delta) in captured.iter().enumerate() {
             let stamp = index > 0
@@ -2299,7 +2409,14 @@ mod tests {
                     captured[index - 1],
                     CapturedDelta::ReplayAddNodeWithIdIfMissing { .. }
                 );
-            if !stamp && !matches!(delta, CapturedDelta::ReplaySetEdgesByIds { .. }) {
+            if !stamp
+                && !matches!(
+                    delta,
+                    CapturedDelta::ReplaySetEdgesByIds { .. }
+                        | CapturedDelta::ReplaySetResourceRecordById { .. }
+                        | CapturedDelta::ReplaySetShownResourceById { .. }
+                )
+            {
                 out.push(delta.clone());
             }
         }

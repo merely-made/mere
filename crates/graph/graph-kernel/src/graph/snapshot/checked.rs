@@ -168,6 +168,13 @@ fn validate_resource_columns(snapshot: &GraphSnapshot) -> Result<(), ResourceSna
         BTreeMap::new();
     for (index, record) in snapshot.resources.iter().enumerate() {
         let id = chartulary::resource_id_from_canonical_iri(&record.canonical_iri);
+        crate::graph::predicate_declarations::predicate_declarations_from_record(record).map_err(
+            |error| ResourceSnapshotError::InvalidFacet {
+                resource_id: id,
+                facet: crate::graph::predicate_declarations::PREDICATE_DECLARATIONS_FACET.into(),
+                detail: error.to_string(),
+            },
+        )?;
         let mut facets = BTreeMap::new();
         for facet in &record.facets {
             let value =

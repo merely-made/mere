@@ -324,7 +324,7 @@ pub fn project_fold(graph: &Graph, fold: &FoldRecord) -> Option<FoldProjection> 
     let mut bundles: BTreeMap<(NodeKey, FoldBoundaryDirection, EdgeFamily), usize> =
         BTreeMap::new();
     let mut internal_relation_count = 0;
-    for relation in graph.relations() {
+    for (_, relation) in graph.projected_relations() {
         let from_folded = members.contains(&relation.from);
         let to_folded = members.contains(&relation.to);
         match (from_folded, to_folded) {

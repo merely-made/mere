@@ -153,6 +153,9 @@ impl Graph {
         if resource.id() != id {
             return false;
         }
+        if super::predicate_declarations::predicate_declarations_from_record(&record).is_err() {
+            return false;
+        }
         let mut facets = std::collections::BTreeMap::new();
         for facet in record.facets {
             let Ok(value) = serde_json::from_str::<serde_json::Value>(&facet.value_json) else {

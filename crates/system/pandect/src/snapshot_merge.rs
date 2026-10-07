@@ -20,6 +20,9 @@ use std::collections::{HashMap, HashSet};
 
 use eidetic::{Error, Result};
 use kernel::graph::Graph;
+use kernel::graph::predicate_declarations::{
+    PREDICATE_DECLARATIONS_FACET, merge_predicate_declarations,
+};
 use kernel::persistence::{GraphSnapshot, PersistedEdge};
 
 /// What [`merge_snapshots`] did, for the Athanor proposal / diagnostics. Never a
@@ -171,14 +174,20 @@ pub(crate) fn merge_snapshots_with_remap(
             for facet in &record.facets {
                 if let Some(existing) = target
                     .facets
-                    .iter()
+                    .iter_mut()
                     .find(|existing| existing.facet == facet.facet)
                 {
                     let old: serde_json::Value = serde_json::from_str(&existing.value_json)
                         .map_err(|error| Error::new(error.to_string()))?;
                     let new: serde_json::Value = serde_json::from_str(&facet.value_json)
                         .map_err(|error| Error::new(error.to_string()))?;
-                    if old != new {
+                    if facet.facet == PREDICATE_DECLARATIONS_FACET {
+                        let declarations =
+                            merge_predicate_declarations(&target.canonical_iri, &old, &new)
+                                .map_err(|error| Error::new(error.to_string()))?;
+                        existing.value_json = serde_json::to_string(&declarations)
+                            .map_err(|error| Error::new(error.to_string()))?;
+                    } else if old != new {
                         return Err(Error::new(format!(
                             "resource {id} has conflicting facet {:?}; precise variant merge is required",
                             facet.facet
@@ -225,10 +234,24 @@ fn edge_signature(e: &PersistedEdge) -> (String, String, String) {
 }
 
 fn check_assertion_handles(snapshot: &GraphSnapshot) -> Result<()> {
+    let surfaces: HashSet<_> = snapshot
+        .nodes
+        .iter()
+        .filter_map(|node| uuid::Uuid::parse_str(&node.node_id).ok())
+        .collect();
     let mut handles = HashMap::new();
     for (resource, edge) in snapshot
         .edges
         .iter()
+        .filter(|edge| {
+            [&edge.from_node_id, &edge.to_node_id]
+                .into_iter()
+                .all(|id| {
+                    uuid::Uuid::parse_str(id)
+                        .ok()
+                        .is_some_and(|id| surfaces.contains(&id))
+                })
+        })
         .map(|edge| (false, edge))
         .chain(snapshot.resource_edges.iter().map(|edge| (true, edge)))
     {
@@ -262,6 +285,11 @@ mod tests {
     use euclid::default::Point2D;
     use kernel::graph::Graph;
     use kernel::graph::fixtures::GraphFixtures;
+    use kernel::graph::predicate_declarations::{
+        PredicateDeclaration, PredicateDeclarationError, PredicateDeclarations,
+        parse_predicate_declarations,
+    };
+    use kernel::graph::{Author, GraphStratum};
 
     /// A snapshot with one node per url (ids minted by the real graph API).
     fn snap(urls: &[&str]) -> GraphSnapshot {
@@ -410,6 +438,265 @@ mod tests {
             ..Default::default()
         });
         edge
+    }
+
+    fn declaration(
+        id: &str,
+        stratum: GraphStratum,
+        author: Author,
+        declared_at_ms: u64,
+    ) -> PredicateDeclaration {
+        PredicateDeclaration {
+            declaration_id: id.to_string(),
+            stratum,
+            author,
+            declared_at_ms: Some(declared_at_ms),
+        }
+    }
+
+    fn declaration_record(
+        predicate: &str,
+        variants: Vec<PredicateDeclaration>,
+        selected: Option<&str>,
+    ) -> kernel::persistence::PersistedResourceRecord {
+        let value = serde_json::to_string(&PredicateDeclarations {
+            variants,
+            selected: selected.map(str::to_string),
+        })
+        .unwrap();
+        resource_record(predicate, PREDICATE_DECLARATIONS_FACET, &value)
+    }
+
+    fn stored_declarations(snapshot: &GraphSnapshot, predicate: &str) -> PredicateDeclarations {
+        let facet = snapshot
+            .resources
+            .iter()
+            .find(|record| record.canonical_iri == predicate)
+            .unwrap()
+            .facets
+            .iter()
+            .find(|facet| facet.facet == PREDICATE_DECLARATIONS_FACET)
+            .unwrap();
+        parse_predicate_declarations(predicate, &serde_json::from_str(&facet.value_json).unwrap())
+            .unwrap()
+    }
+
+    #[test]
+    fn conflicting_declarations_retain_origins_and_claims_until_explicit_selection() {
+        let predicate = "https://vocabulary.test/ns#custom";
+        let resource_declaration = declaration(
+            "declaration-a",
+            GraphStratum::Resource,
+            Author::engine("source-a", "v1").via("host-a"),
+            41,
+        );
+        let surface_declaration = declaration(
+            "declaration-b",
+            GraphStratum::Surface,
+            Author::person("https://person.test/b").via("host-b"),
+            42,
+        );
+        let source = "https://source.test/";
+        let target = "https://target.test/";
+        let from = chartulary::resource_id_from_canonical_iri(source).to_string();
+        let to = chartulary::resource_id_from_canonical_iri(target).to_string();
+        let mut a = snap(&[source, target]);
+        let mut b = snap(&[source, target]);
+        a.resources = vec![
+            declaration_record(
+                predicate,
+                vec![resource_declaration.clone()],
+                Some("declaration-a"),
+            ),
+            resource_record(source, "test.source", "1"),
+            resource_record(target, "test.target", "2"),
+        ];
+        b.resources = vec![declaration_record(
+            predicate,
+            vec![surface_declaration.clone()],
+            Some("declaration-b"),
+        )];
+        let mut resource_claim = assertion(&from, &to, "held-resource");
+        resource_claim.semantic.as_mut().unwrap().statements[0].predicate = predicate.to_string();
+        let mut surface_claim = assertion(&b.nodes[0].node_id, &b.nodes[1].node_id, "held-surface");
+        surface_claim.semantic.as_mut().unwrap().statements[0].predicate = predicate.to_string();
+        a.resource_edges.push(resource_claim.clone());
+        b.edges.push(surface_claim.clone());
+        let before = (
+            serde_json::to_value(&a).unwrap(),
+            serde_json::to_value(&b).unwrap(),
+        );
+        let (merged, _) = try_merge_snapshots(&a, &b).unwrap();
+        let declarations = stored_declarations(&merged, predicate);
+        assert_eq!(
+            declarations.variants,
+            vec![resource_declaration, surface_declaration]
+        );
+        assert_eq!(
+            declarations.selected, None,
+            "composition chooses no survivor"
+        );
+        assert_eq!(merged.resource_edges, vec![resource_claim]);
+        assert_eq!(merged.edges, vec![surface_claim]);
+        let (reverse, _) = try_merge_snapshots(&b, &a).unwrap();
+        assert_eq!(stored_declarations(&reverse, predicate), declarations);
+        assert_eq!(serde_json::to_value(&a).unwrap(), before.0);
+        assert_eq!(serde_json::to_value(&b).unwrap(), before.1);
+
+        let mut graph = Graph::try_from_snapshot(&merged).unwrap();
+        assert!(matches!(
+            graph.effective_predicate_stratum(predicate),
+            Err(PredicateDeclarationError::Conflict { .. })
+        ));
+        assert_eq!(
+            graph
+                .effective_predicate_stratum("https://other.test/predicate")
+                .unwrap(),
+            GraphStratum::Resource,
+            "unaffected predicates stay usable"
+        );
+        let held = graph.to_snapshot();
+        assert!(
+            graph
+                .select_predicate_declaration(predicate, "declaration-b")
+                .unwrap()
+        );
+        assert_eq!(
+            graph.effective_predicate_stratum(predicate).unwrap(),
+            GraphStratum::Surface
+        );
+        let chosen = graph.to_snapshot();
+        assert_eq!(chosen.edges, held.edges);
+        assert_eq!(chosen.resource_edges, held.resource_edges);
+        assert_eq!(
+            chosen.edges[0].semantic.as_ref().unwrap().statements,
+            merged.edges[0].semantic.as_ref().unwrap().statements
+        );
+        assert_eq!(
+            chosen.resource_edges[0]
+                .semantic
+                .as_ref()
+                .unwrap()
+                .statements,
+            merged.resource_edges[0]
+                .semantic
+                .as_ref()
+                .unwrap()
+                .statements
+        );
+        assert_eq!(
+            stored_declarations(&chosen, predicate).variants,
+            declarations.variants
+        );
+        assert_eq!(
+            stored_declarations(&chosen, predicate).selected.as_deref(),
+            Some("declaration-b")
+        );
+    }
+
+    #[test]
+    fn equal_and_disjoint_declarations_remain_unambiguous_during_composition() {
+        let predicate = "https://vocabulary.test/ns#custom";
+        let other = "https://vocabulary.test/ns#other";
+        let first = declaration("first", GraphStratum::Surface, Author::person("a"), 1);
+        let second = declaration("second", GraphStratum::Surface, Author::rule("b", "v2"), 2);
+        let mut a = snap(&[]);
+        a.resources = vec![declaration_record(
+            predicate,
+            vec![first.clone()],
+            Some("first"),
+        )];
+        let (identical, _) = try_merge_snapshots(&a, &a).unwrap();
+        assert_eq!(
+            stored_declarations(&identical, predicate).variants,
+            vec![first.clone()]
+        );
+        assert_eq!(
+            stored_declarations(&identical, predicate)
+                .selected
+                .as_deref(),
+            Some("first")
+        );
+        let mut b = snap(&[]);
+        b.resources = vec![declaration_record(
+            predicate,
+            vec![second.clone()],
+            Some("second"),
+        )];
+        let (equal_nature, _) = try_merge_snapshots(&a, &b).unwrap();
+        assert_eq!(
+            stored_declarations(&equal_nature, predicate).variants,
+            vec![first, second]
+        );
+        let graph = Graph::try_from_snapshot(&equal_nature).unwrap();
+        assert_eq!(
+            graph.effective_predicate_stratum(predicate).unwrap(),
+            GraphStratum::Surface
+        );
+        b.resources = vec![declaration_record(
+            other,
+            vec![declaration(
+                "other",
+                GraphStratum::Resource,
+                Author::person("c"),
+                3,
+            )],
+            Some("other"),
+        )];
+        let (disjoint, _) = try_merge_snapshots(&a, &b).unwrap();
+        assert_eq!(disjoint.resources.len(), 2);
+        let graph = Graph::try_from_snapshot(&disjoint).unwrap();
+        assert_eq!(
+            graph.effective_predicate_stratum(predicate).unwrap(),
+            GraphStratum::Surface
+        );
+        assert_eq!(
+            graph.effective_predicate_stratum(other).unwrap(),
+            GraphStratum::Resource
+        );
+    }
+
+    #[test]
+    fn conflicting_declaration_handles_reject_atomically_with_distinct_handle_control() {
+        let predicate = "https://vocabulary.test/ns#custom";
+        let first = declaration("stable", GraphStratum::Resource, Author::person("a"), 1);
+        let mut a = snap(&[]);
+        a.resources = vec![declaration_record(
+            predicate,
+            vec![first.clone()],
+            Some("stable"),
+        )];
+        let mut b = a.clone();
+        let mut changed = first;
+        changed.author = Author::person("b");
+        b.resources = vec![declaration_record(
+            predicate,
+            vec![changed.clone()],
+            Some("stable"),
+        )];
+        let before = (
+            serde_json::to_value(&a).unwrap(),
+            serde_json::to_value(&b).unwrap(),
+        );
+        assert!(
+            try_merge_snapshots(&a, &b).is_err(),
+            "one handle cannot select an origin"
+        );
+        assert_eq!(serde_json::to_value(&a).unwrap(), before.0);
+        assert_eq!(serde_json::to_value(&b).unwrap(), before.1);
+        changed.declaration_id = "distinct".to_string();
+        b.resources = vec![declaration_record(
+            predicate,
+            vec![changed],
+            Some("distinct"),
+        )];
+        let (merged, _) = try_merge_snapshots(&a, &b).unwrap();
+        assert_eq!(stored_declarations(&merged, predicate).variants.len(), 2);
+        let graph = Graph::try_from_snapshot(&merged).unwrap();
+        assert_eq!(
+            graph.effective_predicate_stratum(predicate).unwrap(),
+            GraphStratum::Resource
+        );
     }
 
     #[test]
@@ -586,5 +873,59 @@ mod tests {
             check_assertion_handles(&cross_domain).is_err(),
             "one handle cannot name assertions in both active strata"
         );
+    }
+
+    #[test]
+    fn orphan_surface_rows_stay_retained_without_owning_active_assertion_handles() {
+        let mut source = snap(&["https://surface.test/a", "https://surface.test/b"]);
+        let from_iri = "https://resource.test/a";
+        let to_iri = "https://resource.test/b";
+        let from = chartulary::resource_id_from_canonical_iri(from_iri).to_string();
+        let to = chartulary::resource_id_from_canonical_iri(to_iri).to_string();
+        source.resources = vec![
+            resource_record(from_iri, "test.origin", "1"),
+            resource_record(to_iri, "test.origin", "2"),
+        ];
+        source.resource_edges = vec![assertion(&from, &to, "resource-handle")];
+        source.edges = vec![assertion(
+            &source.nodes[0].node_id,
+            &uuid::Uuid::from_u128(999).to_string(),
+            "resource-handle",
+        )];
+        assert!(Graph::try_from_snapshot(&source).is_ok());
+        let before = serde_json::to_value(&source).unwrap();
+        let empty = snap(&[]);
+        let merged = try_merge_snapshots(&source, &empty).unwrap().0;
+        assert_eq!(
+            serde_json::to_value(&source).unwrap(),
+            before,
+            "composition leaves source truth untouched"
+        );
+        assert_eq!(merged.edges, source.edges, "orphan rows stay retained");
+        assert_eq!(merged.resource_edges, source.resource_edges);
+        assert!(Graph::try_from_snapshot(&merged).is_ok());
+        assert_eq!(
+            try_merge_snapshots(&empty, &source)
+                .unwrap()
+                .0
+                .resource_edges,
+            source.resource_edges,
+        );
+
+        let mut invalid_endpoint = source.clone();
+        invalid_endpoint.edges[0].to_node_id = "not-a-uuid".into();
+        let merged = try_merge_snapshots(&invalid_endpoint, &empty).unwrap().0;
+        assert_eq!(merged.edges, invalid_endpoint.edges);
+        assert_eq!(merged.resource_edges, source.resource_edges);
+
+        let mut active = source.clone();
+        active.edges[0].to_node_id = active.nodes[1].node_id.to_uppercase();
+        assert!(check_assertion_handles(&active).is_err());
+        assert!(try_merge_snapshots(&active, &empty).is_err());
+        active.edges[0].semantic.as_mut().unwrap().statements[0].statement_id =
+            "distinct-surface-handle".into();
+        assert!(check_assertion_handles(&active).is_ok());
+        assert!(try_merge_snapshots(&active, &empty).is_ok());
+        assert_eq!(serde_json::to_value(&source).unwrap(), before);
     }
 }
