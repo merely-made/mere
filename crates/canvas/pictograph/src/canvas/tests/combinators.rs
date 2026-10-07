@@ -100,7 +100,10 @@ fn the_catalog_composes_converts_or_refuses_each_overlay_by_currency() {
     }
     assert_eq!(
         DENSITY_ADMITS,
-        &[PhysicsOverlay::DegreeRepulsion, PhysicsOverlay::GravityLocus]
+        &[
+            PhysicsOverlay::DegreeRepulsion,
+            PhysicsOverlay::GravityLocus
+        ]
     );
     // Density with Centre, as the catalog builds it, runs exactly as Density
     // converting with Centre, and apart from Density not converting (the
