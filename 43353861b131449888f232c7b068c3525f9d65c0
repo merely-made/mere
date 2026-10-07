@@ -1,0 +1,1 @@
+Correction (2026-10-06, same session): the body's split is wrong. Of the 75 swept files, 62 carried the short form (58 Copyright + SPDX, 4 SPDX alone) and were completed, and 13 were bare (4 of them behind a shebang). The 54/21 figures were taken from the 83-file dry-run before S79's eight frozen files, all bare, were set aside, and were not recomputed.
