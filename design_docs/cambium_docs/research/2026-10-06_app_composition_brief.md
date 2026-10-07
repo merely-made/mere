@@ -1,10 +1,13 @@
 # App composition brief: one Cambium application inside another
 
 **Date:** 2026-10-06
-**Status (2026-10-06):** research. Nothing in it is authorised to build. A
-read-only lane wrote it under fork U8 of Turnstone's unusual-protocols browser
-plan; no code changed and nothing was built or run. The forks in §9 are with
-Mark.
+**Status (2026-10-07):** research, ruled. AC1 to AC6 are ruled (§9,
+"Rulings (2026-10-07)"): retained in-process sessions joined as AccessKit
+subtrees through one Mere helper, E1a and E1b authorised, panics caught,
+room reserved for forest mounts, and paint lists as the cross-process research
+target. Turnstone's unusual-protocols lane owns the session-seam work and E1
+(Turnstone U15). A read-only lane wrote the brief under fork U8 of that plan;
+no code changed and nothing was built or run.
 
 Read against Mere `362c5d5a` (main moved during the read; no commit in that
 window touched `crates/cambium`), Turnstone `032463ae` (the committed tree:
@@ -685,6 +688,34 @@ grafted into the host's tree.
 - (b) Shared GPU textures plus AccessKit trees.
 - (c) Neither. Across processes, the stack composes by session projection
   only.
+
+### Rulings (2026-10-07)
+
+Put to Mark by the Turnstone unusual-protocols lane, as written above, with
+notes on where AC2 and AC3 meet that plan's stages SC (one browsing
+controller in `pelt-core`) and S8 (page accessibility).
+
+- **AC1.** Mark: **"1, but there is a utility to 2 that has yet to be
+  articulated. for now, 1 is good"**. *Follows:* (a), retained in-process
+  sessions with authority behind a Graphshell session where it must stay in
+  its own process. The forest mount keeps a use Mark has yet to articulate;
+  AC5 keeps room for it.
+- **AC2.** Mark: **"One mere subtree helper (Recommended)"**: (a). Turnstone's
+  page accessibility (S8) and Pelt's combined tree, which Turnstone adopts
+  through SC, both use the helper, and Turnstone's path-hash stitching
+  becomes a consumer of it.
+- **AC3.** Mark: **"E1a and E1b (Recommended)"**: (a). E1a as tests in Mere
+  beside the helper, E1b as a probe under `Code/testing/mere/`, Windows, then
+  macOS, then Linux.
+- **AC4.** Mark: **"Catch panics (Recommended)"**: (a).
+- **AC5.** Mark: **"Reserve room now (Recommended)"**: (a).
+- **AC6.** Mark: **"Paint lists + a11y trees (Recommended)"**: (a), research
+  only, after AC1's path is proven.
+- **Owner (Turnstone U15).** Mark: **"This lane (Recommended)"**: the
+  Turnstone unusual-protocols lane builds the helper, focus handback, panic
+  containment, key namespaces, AC5's reservations and E1, beside its
+  `pelt-core` work (Turnstone U11). Record:
+  `turnstone/design_docs/2026-10-06_unusual_protocols_browser_plan.md`, §7.
 
 ## 10. Cross-references
 
