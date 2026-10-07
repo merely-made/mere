@@ -524,7 +524,7 @@ fn the_caret_defaults_run_through_the_focused_text_seam() {
             ),
         ))
     }
-    const FIELD_SHEET: &str = "input { position:absolute; left:0px; top:0px; \
+    const FIELD_SHEET: &str = "[role=\"textbox\"] { position:absolute; left:0px; top:0px; \
          width:200px; height:30px; font-size:16px; }";
     let node = Rc::new(RefCell::new(None));
     let seen = node.clone();
@@ -533,10 +533,13 @@ fn the_caret_defaults_run_through_the_focused_text_seam() {
             let focused = runner.focus()?;
             let dom = runner.dom();
             let dom_ref = dom.borrow();
-            if layout_dom_api::LayoutDom::element_name(&*dom_ref, focused)?
-                .local
-                .as_ref()
-                != "input"
+            if dom_ref
+                .attribute(
+                    focused,
+                    &layout_dom_api::Namespace::from(""),
+                    &layout_dom_api::LocalName::from("data-cambium-text-value"),
+                )
+                .is_none()
             {
                 return None;
             }

@@ -31,11 +31,11 @@ type Host = Harness<Field, Logic, Child>;
 
 const LONG: &str = "C:/Users/someone/AppData/Local/Temp/a/very/long/folder/structure/that/keeps/going/document.djot";
 
-const SIZED: &str = "input { position:absolute; left:10px; top:10px; width:200px; \
+const SIZED: &str = "[role=\"textbox\"] { position:absolute; left:10px; top:10px; width:200px; \
      padding:4px 8px; border:1px solid black; font-size:16px; }";
 
 /// No width anywhere: the field's width is its own default.
-const UNSIZED: &str = "input { position:absolute; left:10px; top:10px; \
+const UNSIZED: &str = "[role=\"textbox\"] { position:absolute; left:10px; top:10px; \
      padding:4px 8px; border:1px solid black; font-size:16px; }";
 
 fn root(_: &Field) -> Child {
@@ -54,13 +54,18 @@ fn host(value: &str, sheet: &str) -> Host {
             let focused = runner.focus()?;
             let dom = runner.dom();
             let dom_ref = dom.borrow();
-            (LayoutDom::element_name(&*dom_ref, focused)?.local.as_ref() == "input").then(|| {
-                FocusedTextSlot {
+            dom_ref
+                .attribute(
+                    focused,
+                    &layout_dom_api::Namespace::from(""),
+                    &layout_dom_api::LocalName::from("data-cambium-text-value"),
+                )
+                .is_some()
+                .then(|| FocusedTextSlot {
                     node: focused,
                     get: Box::new(|field: &Field| &field.text),
                     get_mut: Box::new(|field: &mut Field| &mut field.text),
-                }
-            })
+                })
         }),
         ..inert_hooks()
     };
@@ -84,8 +89,12 @@ fn host(value: &str, sheet: &str) -> Host {
 fn field(host: &Host) -> NodeId {
     fn find(dom: &ScriptedDom, node: NodeId) -> Option<NodeId> {
         if dom
-            .element_name(node)
-            .is_some_and(|name| name.local.as_ref() == "input")
+            .attribute(
+                node,
+                &layout_dom_api::Namespace::from(""),
+                &layout_dom_api::LocalName::from("data-cambium-text-value"),
+            )
+            .is_some()
         {
             return Some(node);
         }

@@ -263,6 +263,35 @@ pub fn project_tree_with_actions<D: LayoutDom<NodeId = NodeId>>(
         {
             produced.push((id, key, semantics));
         }
+        if dom
+            .attribute(node, &Namespace::default(), &LocalName::from("role"))
+            .is_some_and(|role| role.trim().eq_ignore_ascii_case("textbox"))
+            && let Some(value) = dom.attribute(
+                node,
+                &Namespace::default(),
+                &LocalName::from("data-cambium-text-value"),
+            )
+            && let Some((_, access)) = tree
+                .nodes
+                .iter_mut()
+                .find(|(candidate, _)| *candidate == id)
+        {
+            // Cambium paints committed text alongside ephemeral preedit,
+            // ghost and caret nodes. The owner marker carries only the model
+            // value, so platform accessibility never mistakes painted
+            // decoration for the field's editable contents.
+            let multiline = dom.attribute(
+                node,
+                &Namespace::default(),
+                &LocalName::from("aria-multiline"),
+            ) == Some("true");
+            access.set_role(if multiline {
+                Role::MultilineTextInput
+            } else {
+                Role::TextInput
+            });
+            access.set_value(value.to_owned());
+        }
         if dom.attribute(
             node,
             &Namespace::default(),
@@ -305,7 +334,9 @@ fn add_producer_semantics(
         if let Some(name) = semantics.name {
             access.set_label(name);
         }
-        access.bounds().map_or((0.0, 0.0), |bounds| (bounds.x0, bounds.y0))
+        access
+            .bounds()
+            .map_or((0.0, 0.0), |bounds| (bounds.x0, bounds.y0))
     };
     let mut children = Vec::new();
     let mut buttons = Vec::new();
@@ -438,7 +469,11 @@ fn custom_leaf_key<D: LayoutDom<NodeId = NodeId>>(dom: &D, node: NodeId) -> Opti
 
 #[cfg(test)]
 mod dpi_tests {
+    use cambium_rootstock::{OwnedLayout, ProducerRegistry};
     use genet_scripted_dom::ScriptedDom;
+    use layout_dom_api::LayoutDomMut;
+    use sprigging::LeafRegistry;
+    use std::collections::HashMap;
 
     use super::*;
     use accesskit::{ActionRequest, Node, Role, Tree, TreeId};
@@ -482,6 +517,49 @@ mod dpi_tests {
             host.map_request(&request(Some(ActionData::NumericValue(f64::NAN)))),
             None,
         );
+    }
+
+    #[test]
+    fn committed_text_projects_as_an_editable_textbox_value() {
+        let mut dom = ScriptedDom::new();
+        let root = dom.document();
+        dom.set_inner_html(
+            root,
+            r#"<div aria-label="Notes" role="textbox" aria-multiline="true" data-cambium-text-value="Café 👩🏽‍🚀" style="width:240px;height:40px">Café 👩🏽‍🚀<span> ghost</span><span>preedit</span><span>│</span></div><div aria-label="Title" role="textbox" data-cambium-text-value="Résumé 🇫🇷" style="width:240px;height:32px">Résumé 🇫🇷<span>ghost</span></div><div role="button" data-cambium-text-value="not a field">Button</div>"#,
+        );
+        let layout = OwnedLayout::new(&dom, &[""], 320.0, 180.0, &[], &HashMap::new());
+        let mut leaves = LeafRegistry::new();
+        let (tree, _) = project_tree(
+            &dom,
+            &layout,
+            &mut leaves,
+            &mut ProducerRegistry::new(),
+            None,
+        );
+        let field = tree
+            .nodes
+            .iter()
+            .find(|(_, node)| node.role() == Role::MultilineTextInput)
+            .map(|(_, node)| node)
+            .expect("the field has multiline textbox semantics");
+        assert_eq!(field.value(), Some("Café 👩🏽‍🚀"));
+        assert_eq!(field.label(), Some("Notes"));
+        assert!(!field.is_read_only(), "text fields remain editable");
+        let title = tree
+            .nodes
+            .iter()
+            .find(|(_, node)| node.label() == Some("Title"))
+            .map(|(_, node)| node)
+            .expect("the single-line app field is projected");
+        assert_eq!(title.role(), Role::TextInput);
+        assert_eq!(title.value(), Some("Résumé 🇫🇷"));
+        let button = tree
+            .nodes
+            .iter()
+            .find(|(_, node)| node.role() == Role::Button)
+            .map(|(_, node)| node)
+            .expect("the non-field marker preserves its button role");
+        assert_eq!(button.value(), None);
     }
 
     /// A producer's slot is named by the producer, and each thing it draws
@@ -566,11 +644,19 @@ mod dpi_tests {
         assert_eq!(first.label(), Some("Card 0"));
         assert_eq!(
             first.bounds(),
-            Some(Rect { x0: 34.0, y0: 124.0, x1: 154.0, y1: 204.0 }),
+            Some(Rect {
+                x0: 34.0,
+                y0: 124.0,
+                x1: 154.0,
+                y1: 204.0
+            }),
             "placed where it is drawn, from the slot's corner"
         );
         assert_eq!(card(board.children()[1]).label(), Some("Card 1"));
-        assert!(card(board.children()[1]).children().is_empty(), "no actions, no buttons");
+        assert!(
+            card(board.children()[1]).children().is_empty(),
+            "no actions, no buttons"
+        );
 
         // Card 0's one action is a Button child taking Click, named by its
         // label and described by its description.
@@ -598,12 +684,18 @@ mod dpi_tests {
             key: 40,
             id: "pin".into(),
         };
-        assert_eq!(request, A11yRequest::produced(A11yAction::Click, produced.clone()));
+        assert_eq!(
+            request,
+            A11yRequest::produced(A11yAction::Click, produced.clone())
+        );
         assert!(producers.act(&produced), "the producer carried it out");
         assert_eq!(acted.borrow().as_slice(), &[(40, "pin".to_string())]);
         assert_eq!(host.map_request(&click(board.children()[0])), None);
         // An unknown slot reaches no producer.
-        assert!(!producers.act(&ProducedAction { slot: 9, ..produced }));
+        assert!(!producers.act(&ProducedAction {
+            slot: 9,
+            ..produced
+        }));
         // A producer without semantics leaves its slot alone.
         assert_eq!(producers.semantics(2), None);
     }

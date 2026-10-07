@@ -1044,7 +1044,9 @@ fn catalog(state: &CatalogState) -> CatalogView {
                 (
                     "Single line",
                     lens(
-                        |input: &mut TextInput| text_field_typed(input),
+                        |input: &mut TextInput| {
+                            text_field_typed(input).attr("aria-label", "Single line")
+                        },
                         |state: &mut CatalogState| &mut state.text,
                     ),
                 ),
@@ -1056,7 +1058,9 @@ fn catalog(state: &CatalogState) -> CatalogView {
                 (
                     "Multiline",
                     lens(
-                        |input: &mut TextInput| textarea_typed(input),
+                        |input: &mut TextInput| {
+                            textarea_typed(input).attr("aria-label", "Multiline")
+                        },
                         |state: &mut CatalogState| &mut state.multiline,
                     ),
                 ),
@@ -1082,6 +1086,7 @@ fn catalog(state: &CatalogState) -> CatalogView {
                                     },
                                 ],
                             )
+                            .attr("aria-label", "Styled editor")
                         },
                         |state: &mut CatalogState| &mut state.styled,
                     ),
@@ -1877,26 +1882,25 @@ fn assert_initial_surface(dom: &ScriptedDom, root: NodeId, width: CatalogWidth) 
     assert_attr(dom, disabled_slider, "tabindex", "-1");
 
     let text_root = find_id(dom, root, "catalog-text");
-    assert!(
-        find_where(dom, text_root, &|dom, node| {
-            dom.element_name(node)
-                .is_some_and(|name| name.local.as_ref() == "input")
-        })
-        .is_some()
-    );
+    let text = find_where(dom, text_root, &|dom, node| {
+        attr(dom, node, "role") == Some("textbox")
+    })
+    .expect("single-line textbox");
+    assert_attr(dom, text, "aria-label", "Single line");
     let textarea_root = find_id(dom, root, "catalog-textarea");
-    assert!(
-        find_where(dom, textarea_root, &|dom, node| {
-            dom.element_name(node)
-                .is_some_and(|name| name.local.as_ref() == "textarea")
-        })
-        .is_some()
-    );
-    find_class(
-        dom,
-        find_id(dom, root, "catalog-styled-editor"),
-        "syntax-keyword",
-    );
+    let textarea = find_where(dom, textarea_root, &|dom, node| {
+        attr(dom, node, "role") == Some("textbox")
+    })
+    .expect("multiline textbox");
+    assert_attr(dom, textarea, "aria-multiline", "true");
+    assert_attr(dom, textarea, "aria-label", "Multiline");
+    let styled_root = find_id(dom, root, "catalog-styled-editor");
+    let styled = find_where(dom, styled_root, &|dom, node| {
+        attr(dom, node, "role") == Some("textbox")
+    })
+    .expect("styled textbox");
+    assert_attr(dom, styled, "aria-label", "Styled editor");
+    find_class(dom, styled_root, "syntax-keyword");
 
     let action_root = find_id(dom, root, "catalog-action-list");
     let action_combobox = find_where(dom, action_root, &|dom, node| {
@@ -2244,10 +2248,9 @@ fn run_interactions(runner: &mut CatalogRunner) {
 
     let text_root = find_id(&runner.dom().borrow(), root, "catalog-text");
     let text = find_where(&runner.dom().borrow(), text_root, &|dom, node| {
-        dom.element_name(node)
-            .is_some_and(|name| name.local.as_ref() == "input")
+        attr(dom, node, "role") == Some("textbox")
     })
-    .expect("single-line input");
+    .expect("single-line textbox");
     runner.set_focus(Some(text));
     runner.dispatch_key(KeyEvent::new(Key::Character("!".into())));
     assert_eq!(runner.state().text.text(), "turnstone!");

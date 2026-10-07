@@ -29,7 +29,7 @@ type Logic = fn(&Doc) -> Child;
 type Host = Harness<Doc, Logic, Child>;
 
 const FIELD: &str = "body { margin:0; } \
-     textarea { display:block; width:300px; font-size:16px; line-height:20px; padding:0; border:none; white-space:pre-wrap; }";
+     [role=\"textbox\"] { display:block; width:300px; font-size:16px; line-height:20px; padding:0; border:none; white-space:pre-wrap; }";
 
 /// The field grows with its text and the window scrolls.
 const IN_WINDOW: &str = "";
@@ -67,13 +67,18 @@ fn host(layout: &str) -> Host {
             let focused = runner.focus()?;
             let dom = runner.dom();
             let dom_ref = dom.borrow();
-            (LayoutDom::element_name(&*dom_ref, focused)?.local.as_ref() == "textarea").then(|| {
-                FocusedTextSlot {
+            dom_ref
+                .attribute(
+                    focused,
+                    &Namespace::from(""),
+                    &LocalName::from("data-cambium-text-value"),
+                )
+                .is_some()
+                .then(|| FocusedTextSlot {
                     node: focused,
                     get: Box::new(|doc: &Doc| &doc.text),
                     get_mut: Box::new(|doc: &mut Doc| &mut doc.text),
-                }
-            })
+                })
         }),
         ..inert_hooks()
     };

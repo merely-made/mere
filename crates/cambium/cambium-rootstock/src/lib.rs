@@ -302,18 +302,19 @@ pub trait Accessibility {
     ) -> Vec<A11yRequest>;
 }
 
-/// This frame's layout as genet's renderer-neutral accessibility projection,
-/// which a host without an AccessKit adapter lowers to its platform's tree:
-/// the browser host lowers it to ARIA. `focus` is the focused node's opaque id,
-/// as [`Accessibility::sync`] receives it.
+/// This frame's renderer-neutral accessibility projection, including
+/// Cambium's app-owned committed text for marked textboxes. A host without an
+/// AccessKit adapter lowers it to its platform tree; the browser host lowers
+/// it to ARIA. `focus` is the focused node's opaque id, as
+/// [`Accessibility::sync`] receives it.
 pub fn document_projection(
     dom: &WindowDom<'_>,
     layout: &OwnedLayout,
     focus: Option<u64>,
 ) -> DocumentA11yProjection {
-    use layout_dom_api::LayoutDom as _;
+    use layout_dom_api::{LayoutDom as _, LocalName, Namespace, NodeKind};
     let focus = focus.and_then(|opaque| find_opaque(dom, dom.document(), opaque));
-    genet_render::document_a11y_projection_with_style(
+    let projection = genet_render::document_a11y_projection_with_style(
         dom,
         layout.fragments(),
         focus,
@@ -323,6 +324,51 @@ pub fn document_projection(
             generated: &|node| layout.generated_text(dom, node),
             rendered: &|node| layout.rendered_visible(dom, node),
         },
+    );
+
+    // Cambium fields paint committed text and transient decoration as DOM
+    // children. Preserve Genet's generic projection, then replace only the
+    // value of explicit Cambium textboxes from their app-owned marker.
+    let mut markers = std::collections::HashMap::new();
+    let mut pending = vec![dom.document()];
+    while let Some(node) = pending.pop() {
+        if dom.kind(node) == NodeKind::Element
+            && dom
+                .attribute(node, &Namespace::default(), &LocalName::from("role"))
+                .is_some_and(|role| role.trim().eq_ignore_ascii_case("textbox"))
+            && let Some(value) = dom.attribute(
+                node,
+                &Namespace::default(),
+                &LocalName::from("data-cambium-text-value"),
+            )
+        {
+            let multiline = dom.attribute(
+                node,
+                &Namespace::default(),
+                &LocalName::from("aria-multiline"),
+            ) == Some("true");
+            markers.insert(dom.opaque_id(node), (value.to_owned(), multiline));
+        }
+        pending.extend(dom.dom_children(node));
+    }
+    if markers.is_empty() {
+        return projection;
+    }
+
+    let mut nodes = projection.nodes().to_vec();
+    for node in &mut nodes {
+        let Some((value, multiline)) = markers.get(&node.id.get()) else {
+            continue;
+        };
+        node.value = Some(value.clone());
+        node.state.multiline = *multiline;
+        node.state.editable = !node.state.disabled && !node.state.read_only;
+    }
+    DocumentA11yProjection::new(
+        projection.revision(),
+        projection.support().clone(),
+        projection.root(),
+        nodes,
     )
 }
 
@@ -681,6 +727,79 @@ mod tests {
     use super::*;
 
     #[test]
+    fn cambium_textbox_projection_reads_committed_value_and_preserves_semantics() {
+        use genet_scripted_dom::ScriptedDom;
+        use layout_dom_api::{LayoutDom as _, LayoutDomMut as _, LocalName, Namespace};
+
+        let mut dom = ScriptedDom::new();
+        let root = dom.document();
+        dom.set_inner_html(
+            root,
+            r#"<div role="textbox" aria-label="Draft" aria-multiline="true" data-cambium-text-value="Café 👩🏽‍🚀" style="display:block;width:240px;height:40px">Café 👩🏽‍🚀<span> ghost</span><span>preedit</span><span>│</span></div><div role="textbox" aria-label="Title" data-cambium-text-value="Résumé 🇫🇷" style="display:block;width:240px;height:32px">Résumé 🇫🇷</div><div role="button" data-cambium-text-value="not a field">Button</div>"#,
+        );
+        let opaque_for = |needle: &str| {
+            let mut pending = vec![dom.document()];
+            while let Some(node) = pending.pop() {
+                if dom.attribute(node, &Namespace::default(), &LocalName::from("aria-label"))
+                    == Some(needle)
+                {
+                    return dom.opaque_id(node);
+                }
+                pending.extend(dom.dom_children(node));
+            }
+            panic!("missing fixture node named {needle}");
+        };
+        let focused = opaque_for("Draft");
+        let title = opaque_for("Title");
+        let layout = OwnedLayout::new(&dom, &[""], 320.0, 180.0, &[], &Default::default());
+        let projection = document_projection(&WindowDom::document(&dom), &layout, Some(focused));
+        let field = projection
+            .nodes()
+            .iter()
+            .find(|node| node.id.get() == focused)
+            .expect("the focused textbox remains in the projection");
+        assert_eq!(field.value.as_deref(), Some("Café 👩🏽‍🚀"));
+        assert_eq!(field.name.as_deref(), Some("Draft"));
+        assert_eq!(
+            field.role,
+            document_session_api::DocumentA11yRole::TextField
+        );
+        assert!(field.state.focused);
+        assert!(field.state.editable);
+        assert!(field.state.multiline);
+        assert!(field.bounds.is_some());
+        assert!(
+            field
+                .actions
+                .contains(&document_session_api::DocumentA11yAction::Click)
+        );
+        assert!(
+            field
+                .actions
+                .contains(&document_session_api::DocumentA11yAction::Focus)
+        );
+
+        let single_line = projection
+            .nodes()
+            .iter()
+            .find(|node| node.id.get() == title)
+            .expect("the single-line textbox remains in the projection");
+        assert_eq!(single_line.value.as_deref(), Some("Résumé 🇫🇷"));
+        assert!(single_line.state.editable);
+        assert!(!single_line.state.multiline);
+
+        let button = projection
+            .nodes()
+            .iter()
+            .find(|node| node.role == document_session_api::DocumentA11yRole::Button)
+            .expect("the button remains in the projection");
+        assert_eq!(button.value, None, "the marker only applies to textboxes");
+        assert_eq!(projection.root().get(), dom.opaque_id(dom.document()));
+        assert_eq!(projection.revision(), 0);
+        assert_eq!(projection.support().limitations().len(), 1);
+    }
+
+    #[test]
     fn character_press_carries_its_text() {
         let press = KeyPress::character("h");
         assert_eq!(press.text.as_deref(), Some("h"));
@@ -779,7 +898,10 @@ mod tests {
         let f10 = KeyPress::named(NamedKey::F10)
             .to_runner_key()
             .expect("F10 reaches the runner");
-        assert!(matches!(f10.key, cambium::Key::Named(cambium::NamedKey::F10)));
+        assert!(matches!(
+            f10.key,
+            cambium::Key::Named(cambium::NamedKey::F10)
+        ));
 
         let alt = KeyPress::named(NamedKey::Alt)
             .with_modifiers(Modifiers {
@@ -788,7 +910,10 @@ mod tests {
             })
             .to_runner_key()
             .expect("Alt reaches the runner");
-        assert!(matches!(alt.key, cambium::Key::Named(cambium::NamedKey::Alt)));
+        assert!(matches!(
+            alt.key,
+            cambium::Key::Named(cambium::NamedKey::Alt)
+        ));
         assert!(alt.mods.alt);
     }
 
@@ -906,6 +1031,6 @@ pub use host::{
 };
 pub use multi_host::{MultiHost, MultiRunner, WindowRequests, WindowSlot, WindowTree};
 pub use tree::HostTree;
-pub use window_dom::WindowDom;
 pub use wake::HostWake;
+pub use window_dom::WindowDom;
 pub use window_verbs::{AppRegion, WindowCommand, WindowCommands, WindowGeometry};
