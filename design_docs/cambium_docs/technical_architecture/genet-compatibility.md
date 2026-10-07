@@ -167,6 +167,13 @@ the end-of-run process scan could not inspect a compiler that then exited.
 The starting manifest, lock and router are restored. Preserve that attempt;
 a committed-source retry must establish the control and a fresh restored pass.
 
+The bounded Genet repair is qualified at `e84f9c7f`: 841 passes across Livery,
+documents, render and WPT, with zero failures and nine existing ignores. Its
+substitute route retains Block/Leaf root admission. Mere's frozen revised lock
+changes 33 source revisions and 31 dependency source references without moving
+versions, graph shape/checksums or the two legacy Knot identities. Locked
+metadata resolution and actual native-field tests remain required here.
+
 The downstream read-only audit finds old tag checks in Turnstone and Cleromancy.
 Their mechanical selector/caret/existing-label follow-ups await explicit scope
 authorization; currently unnamed fields retain that state. No sibling source
