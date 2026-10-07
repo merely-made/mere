@@ -50,6 +50,8 @@ adoption plan except for these sections, which other lanes wrote:
   `3b220f90`. P1 itself landed at `1633be0c`. This lane added only a dated
   "landed" line.
 
+**Added 2026-10-07.** The successor session also carries the [Scenograph editor plan](../implementation_strategy/2026-10-07_scenograph_editor_plan.md) (Mark, ruling SE4: "This session (Recommended)").
+
 ## Open and gated targets
 
 Nothing in either document is in progress. Every remaining target waits on a

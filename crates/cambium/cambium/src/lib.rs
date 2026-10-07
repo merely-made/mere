@@ -113,7 +113,7 @@ pub use disclosure::{
     TreeSelectionMode, TreeState, accordion, accordion_with, disclosure, disclosure_with,
     tree_view,
 };
-pub use editor::{EditHistory, pair_close, wrap_selection};
+pub use editor::{EditHistory, History, pair_close, wrap_selection};
 pub use graph_canvas::{
     GRAPH_CANVAS_SWATCH_CSS, GraphAtlasEvent, GraphCanvasEdge, GraphCanvasEvent, GraphCanvasNode,
     GraphCanvasNodeDrag, GraphCanvasNodeFootprint, GraphCanvasNodeRegion, GraphCanvasRelation,
