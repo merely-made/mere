@@ -93,21 +93,23 @@ def git_tracked(repo, exts):
     return files
 
 
-SKIP_SECTION = "retained licenses"
+#: ledger sections whose table rows are skipped: third-party code, and Mark's
+#: own sources whose bytes a receipt pins by SHA-256 (stack seams plan S79)
+SKIP_SECTIONS = {"retained licenses", "frozen evidence"}
 
 
 def load_ledger(repo):
-    """Paths to skip: first-column cells of the Retained licenses table.
+    """Paths to skip: first-column cells of the SKIP_SECTIONS tables.
 
     Deliberately narrow on two axes, each for a reason found in testing:
 
     - Only the *first column* of a table row counts. An earlier version took
       any backtick-quoted string containing a slash, which swept up prose,
       upstream URLs, and the tool's own path.
-    - Only rows under the `## Retained licenses` heading count. Other
-      sections document dispositions that are not skips: a substantial
-      derivative (luggage) keeps its upstream notice *and* receives Exhibit A,
-      so it must not be skipped, but it must still be recorded.
+    - Only rows under a SKIP_SECTIONS heading count. Other sections document
+      dispositions that are not skips: a substantial derivative (luggage)
+      keeps its upstream notice *and* receives Exhibit A, so it must not be
+      skipped, but it must still be recorded.
     """
     led = repo / "LICENSES.md"
     if not led.exists():
@@ -118,7 +120,7 @@ def load_ledger(repo):
     for line in text.splitlines():
         s = line.strip()
         if s.startswith("#"):
-            in_section = s.lstrip("#").strip().lower() == SKIP_SECTION
+            in_section = s.lstrip("#").strip().lower() in SKIP_SECTIONS
             continue
         if not in_section or not s.startswith("|"):
             continue
