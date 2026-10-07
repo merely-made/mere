@@ -10,9 +10,7 @@ remain for source compatibility during consumer migration.
 ## Crates
 
 - `meristem`: renderer-independent reactive diff and message core
-- `cambium`: Genet backend, application runner, controls, and composition;
-  its `nematic` feature adds reactive views over Errand's smolweb ASTs
-  (formerly the `cambium-nematic` crate)
+- `cambium`: Genet backend, application runner, controls, and composition
 - `cambium-winit`: winit keyboard translation for Cambium applications
 - `sprigging`: engine-neutral custom leaves and arrangement geometry
 - `mesquite`: the scenario lane over a document host — scenario ticking,
