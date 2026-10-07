@@ -19,7 +19,6 @@
 //! `cargo test --release -p pictograph --features canvas --lib tests::density_admits:: -- --ignored --nocapture`
 
 use super::density::{dealt, generated, until_settled};
-use super::*;
 use crate::canvas::physics_catalog::{LawSources, PhysicsLaw, PhysicsOverlay};
 
 /// What joins Density: nothing (as the catalog runs it, or converting), an

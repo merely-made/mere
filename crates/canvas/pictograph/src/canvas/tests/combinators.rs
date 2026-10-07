@@ -18,13 +18,16 @@ use crate::canvas::physics_catalog::{
     LawInputs, LawSources, PhysicsKindSource, PhysicsLaw, PhysicsMassSource, PhysicsOverlay,
 };
 
-/// Twenty-four nodes on four sites: a ring with every fourth node joined
-/// across, so the laws have structure to act on.
-fn ring() -> (
+/// The ring's keys, edges and sites.
+type Ring = (
     Vec<NodeKey>,
     Vec<(NodeKey, NodeKey)>,
     HashMap<NodeKey, String>,
-) {
+);
+
+/// Twenty-four nodes on four sites: a ring with every fourth node joined
+/// across, so the laws have structure to act on.
+fn ring() -> Ring {
     let keys: Vec<NodeKey> = (0..24).map(NodeKey::new).collect();
     let mut edges: Vec<(NodeKey, NodeKey)> =
         (0..24).map(|i| (keys[i], keys[(i + 1) % 24])).collect();
