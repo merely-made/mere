@@ -3,9 +3,12 @@
 **Date:** 2026-10-04
 **Status (2026-10-07):** in progress; scope bounded by Mark's "Bound it."
 Five phases remain. P2 closes against the six requirements in §4; independent
-archive cleanup is deferred. C5/C6 are the only planned future decision stops.
-The bounded plan is delivered before new implementation resumes. Saved work
-and accepted rulings remain retained; no new fork is being put to Mark.
+archive cleanup is deferred. C5/C6 are settled; no planned design question remains.
+The bounded plan is recorded; saved work and accepted rulings remain retained.
+No new fork is being put to Mark.
+The accepted C30/C31 P2 slices and literal attribution repair pass their fresh
+full unit, dependent, locked workspace and wasm32 gates. Their source remains
+uncommitted; P2 remains incomplete. P3–P5 have not begun.
 P1 implemented and gated on
 `graph-semantics`, with the ruling-9 exact-journal and legacy-checkpoint
 attribution repair complete after the original `459cad84` receipt. Those
@@ -56,7 +59,8 @@ profiles do not yet activate legacy replay. C29 option 1 is accepted (ruling
 42): persist exact translated effects bound to the retained source. Its session
 integration is in progress. C30 selects standard RDF reification and C31 selects
 extending the wallet-sealed transaction wrapper (rulings 43–44). Both are now
-in implementation; input grammar ambiguities remain separate stop points.
+in implementation; classic reification input handling follows the bounded
+conservative rules in §4.
 S53's RDF-profile fidelity and serialization checks remain P2 work. Its
 independent vocabulary remapping and older dependency/oracle retirement are
 deferred under the dated scope boundary in §4.
@@ -1884,6 +1888,85 @@ items move to the existing archived-plan tails backlog. Current mappings and
 locked dependencies remain in use. JSON-LD fidelity and sealed transactions
 remain explicitly accepted work (rulings 43–44); they are not deferred.
 
+### Remaining original questions C5/C6 (2026-10-07)
+
+On Mark's **"Ask the questions"**, the two remaining original checkpoints
+were presented together in native prompts. The turn remains active for the
+answers; no dependent implementation starts while they are pending.
+
+**C5, pending-link cache retention.** `StatementOutcome::pending_targets`
+currently returns unresolved target URLs without retaining a rebuildable index
+(`crates/graph/linked-data/src/statements.rs`, lines 56 and 86). P3 creates
+that index; it remains derived data, separate from source documents and graph
+truth. The default retention policy remains configurable. Choices presented:
+
+- **A, session-only cache (recommended):** retain while the mere is open,
+  clear on close, reconstruct from retained sources when needed.
+- **B, budgeted persistent cache:** retain across restarts, automatically
+  purge under configurable size/age limits.
+- **C, explicit-purge cache:** retain across restarts until explicitly
+  cleared; no automatic eviction policy is selected by that option.
+
+Every option preserves source documents and asserted claims when the index
+is purged. This question selects the default retention policy, not a new
+keeping level, storage engine or synchronization feature.
+
+**C6, frozen-selection ownership.** The current `GraphBearing for Node`
+implementation reports the SurfaceNode's nested log identity
+(`crates/graph/graph-kernel/src/graph/chart.rs`, line 73). Member resource
+references, copied statements, spec and revision remain fixed by rulings 3
+and 8; this question only selects which newly minted node bears them:
+
+- **A, frozen ResourceNode (recommended):** the resource owns the immutable
+  nested selection; surfaces display it. Identity and annotations are shared
+  independently of workspace appearances. Resource graph-bearing support is
+  part of the corresponding P4 implementation.
+- **B, frozen SurfaceNode:** the stable saved surface owns the immutable
+  nested selection through the existing bearing model; the surface and its
+  snapshot are shared together. Ownership follows that workspace identity,
+  with content metadata still following the existing resource rules.
+
+Neither answer has arrived at this finding's creation. No new checkpoint
+number, new feature target or answer is inferred.
+
+### Bounded P2 assertion and transaction repairs (2026-10-07)
+
+C30's complete dataset JSON-LD shaper is implemented in
+`crates/graph/linked-data/src/jsonld.rs` (export at 143, classic import bridge
+at 187). Both public shapers use it. Eligible records preserve carried assertion
+IDs and metadata; incomplete, ambiguous or unasserted descriptions retain
+ordinary RDF treatment. The profile gate covers all seven scopes, separate
+edge/literal asserters, opaque IDs, blank identity and idempotent reapplication
+across expanded/compact JSON-LD and N-Quads/TriG. This does not add missing
+Resource metadata to the underlying projection or finish production routing.
+
+C31's wallet adapter authenticates transactional reads, latches caught read
+errors and seals the whole batch before writes
+(`crates/system/pandect/src/wallet_sealed_backend.rs`, 133, 166, 256).
+Legacy activation now uses the retained-source guard inside the transaction
+(`graph_session.rs`, 337, 845); refusal precedes live state replacement.
+The additive qualification methods require native `Sync`, while wasm keeps
+local futures and ordinary session methods retain their existing bounds.
+An independent read-only review found no concrete atomicity or API-bound defect.
+
+The first full Pandect run passed 331 tests and failed two exact-replay tests.
+Diagnostics established identical complete Surface edge records in a different
+row order after graph slot reuse. `FrozenGraph::of` now sorts only complete
+Surface edge records (`graph_placement.rs`, 82), keeping strict equality,
+nested lists, Resource rows and exact stored-byte checksums. The control at
+370 verifies that changed IDs, sources, times, endpoints, missing records and
+duplicates remain differences. Temporary diagnostics were removed; the failing
+logs remain evidence. The repaired full suite passes 334 tests.
+
+The pre-existing literal assertion defect is repaired in
+`crates/graph/graph-kernel/src/types.rs` (531): equality includes the asserter.
+Single and batched live writes retain the first assertion ID when refreshing
+its time, and captures carry that stored ID (`graph/apply.rs`, 1405;
+`graph/node_facets.rs`, 180). Raw replay grammar is unchanged. Removing the
+asserter comparison makes both new invariant tests fail; restoring it passes
+the full 411-test kernel/store suite. This does not complete Resource literal
+routing. Fresh dependent checks and remaining P2 work are recorded in Progress.
+
 ## 3. Rulings
 
 Mark's answers, from multiple-choice rounds; each is the option label quoted
@@ -2263,6 +2346,19 @@ one transaction. Mere's wallet-sealed wrapper gains transactional reads and
 writes in this lane, preserving authenticated values and atomic refusal.
 An underlying backend without transactions still refuses qualification.
 
+**Ruling 45 (C5, 2026-10-07).** Mark:
+**"A. Session-only cache (Recommended): keep pending links while the mere is open, then clear the index. Rebuild from retained sources when needed. Limits retained cache data, but reopening may require more reconstruction."**
+The pending-link index defaults to session-only retention. Its retention policy
+remains a setting; clearing this rebuildable index preserves retained source
+documents and asserted claims.
+
+**Ruling 46 (C6, 2026-10-07).** Mark:
+**"A. Frozen ResourceNode (Recommended): a new resource owns the immutable selection, and surfaces display it. Its identity and annotations are shared independently of workspace appearances. This requires resource support for bearing a nested graph."**
+Freeze creates a ResourceNode bearing the immutable nested selection. Surfaces
+display that resource; its identity and annotations are shared independently
+of those appearances. The selection references member resources by id and
+copies their statements at the freeze revision, retaining its spec and revision.
+
 ## 4. Phases
 
 ### Scope boundary (2026-10-07)
@@ -2271,7 +2367,7 @@ Authority: Mark's **"Bound it."**, following the checkpoint-growth review.
 This dated amendment controls the remaining work; the historical findings and
 rulings above remain intact. The lane has five phases, P1–P5. P1 remains
 complete; P2-induced invariant repairs are included in P2's qualification.
-Accepted rulings 1–44 remain the semantic contract. Phase-end report/review
+Accepted rulings 1–46 remain the semantic contract. Phase-end report/review
 stops and the isolated Mere-only worktree boundary remain.
 
 P2 has exactly six closure requirements. They are completion checks inside P2,
@@ -2312,16 +2408,17 @@ consumer gate; this amendment does not authorize silently breaking an API.
 P3–P5 retain only their original feature targets and done-conditions below:
 
 - **P3:** coverage on query/projection results and a rebuildable, rederiving,
-  purgeable pending index. C5 is its one remaining policy decision.
+  purgeable pending index, defaulting to session-only retention (ruling 45).
 - **P4:** saved SPARQL specs through the existing query capability, sharing by
   spec, and a revision-frozen nested selection referencing resources and
-  copying statements. C6 is its one remaining representation decision.
+  copying statements, owned by a new ResourceNode (ruling 46).
 - **P5:** addressable storage of both strata and configured neighborhood
   residency, using P3's "not loaded" result and full-residency control. Reuse
   redb/IndexedDB; add no storage engine, scheduler or synchronization protocol.
 
-Only C5 and C6 are planned future decision stops, presented together before
-their dependent implementation. No further numbered C is automatically added.
+C5 and C6 were the remaining planned decisions at the bound; both are now
+settled in rulings 45–46. No planned design question remains, and no further
+numbered C is automatically added.
 An optional newly discovered behavior is deferred with evidence; a mandatory
 contradiction with an accepted ruling or a required done-condition stops the
 phase with one consolidated scope-exception report. It does not silently
@@ -2399,26 +2496,27 @@ In order; each phase lands green before the next starts. Code samples: none.
   claim made before a node navigated on the earlier page's resource, and a
   baseline-era claim lands on the current resource and in the migration note;
   `cargo check -p mere-kernel --target wasm32-unknown-unknown` stays green.
-- **P3. Coverage and the pending index (ruling 4).** A coverage note travels
+- **P3. Coverage and the pending index (rulings 4, 45).** A coverage note travels
   with every query result and scene projection, naming each layer that limited
   it: possession, residency, disclosure, synchronization, projection.
   `apply_link_statements` stops discarding: a recognized link whose target
   resource is absent goes to a pending index that is not graph truth, can be
   rebuilt from source documents, re-derives the statement when the target
   resource enters the graph, and can be purged under a policy that is a
-  setting.
+  setting, defaulting to session-only retention. Clearing the cache on close
+  preserves source documents and asserted claims.
   Done when: a recognized link to an absent target is re-derived when the
   target arrives, and the same test with the index purged first derives
   nothing (the control); rebuilding the index from documents reproduces it;
   purging touches no graph truth (snapshot equal before and after); a SPARQL
   result and a scene projection each carry a coverage note, and a test makes
   each layer fire at least once.
-- **P4. Saved queries (rulings 3, 8).** A `Linked` subgraph spec may be a SPARQL
+- **P4. Saved queries (rulings 3, 8, 46).** A `Linked` subgraph spec may be a SPARQL
   query beside the nine shapes, reconciled on revision change like the rest.
-  Sharing a saved query sends the spec. Freeze mints a node bearing a nested
+  Sharing a saved query sends the spec. Freeze mints a ResourceNode bearing a nested
   graph that holds member resource ids, copies of the statements among them as
   of the freeze revision, the spec and the revision; annotations attach to that
-  node. A subgraph itself never syncs.
+  resource, which surfaces display. A subgraph itself never syncs.
   Done when: a SPARQL-spec subgraph reconciles on a revision change and skips
   on an unchanged revision; a shared spec evaluated on a second graph yields
   that graph's members; a frozen selection is unchanged after a member
@@ -2450,9 +2548,10 @@ binding; this list no longer grows as a running implementation checklist.
 - **C3 (P2). Migration of existing claims.** Ruled: ruling 11.
 - **C4 (P2). Words.** Ruled: ruling 19 amends rulings 12 and 13
   (resource and surface; resource and surface strata).
-- **C5 (P3). Purge default.** The pending index's default purge policy.
-- **C6 (P4). The frozen node.** What kind of node bears a frozen selection, and
-  where it is placed.
+- **C5 (P3). Purge default.** Ruled: ruling 45, session-only cache by
+  default, with retention policy configurable.
+- **C6 (P4). The frozen node.** Ruled: ruling 46, a new ResourceNode owns
+  the frozen nested selection; surfaces display it.
 - **C7 (P2). Tag IRIs.** Ruled: ruling 20, identity namespace with an
   original-mere fallback for unattributed legacy concepts. Future moot
   aggregation is a direction; its mechanism remains open.
@@ -2507,6 +2606,95 @@ binding; this list no longer grows as a running implementation checklist.
   transactional qualification and sealed wrapper support in this lane.
 
 ## 6. Progress
+
+- **2026-10-07. Bounded C30/C31 and literal fixes pass fresh full suites.**
+  Final JSON-LD source, including the split nine-test control modules, passes
+  linked-data/query: 62 tests, no doctests. Literal repair passes kernel/store:
+  411 tests and one compile-fail doctest, one doc example ignored. Removing the
+  asserter comparison fails both literal invariant tests; restoring it passes.
+  Pandect passes 334 tests after its exact Surface-row freeze repair; the
+  plain/sealed activation lifecycle and full-record/multiplicity controls pass.
+  Initial C30 fixture compile/runtime failures and C31 trait/fixture compile
+  failures, the 331-pass/two-failure replay run and field diagnostics are retained
+  in the shared target logs. The repair preserves exact record content and
+  stored checksums. Read-only C31 review found no concrete defect; it supplies
+  no test receipt. Fresh dependent gates pass: cartography 44; pictograph/canvas
+  300, 13 ignored; Graphshell/personal-sync 333 library tests plus five others,
+  four ignored. Locked workspace, wasm32 kernel and wasm32 Pandect checks exit
+  zero. Cargo ran offline/locked with one build job; tests ran serially. Final
+  doc audit and diff checks pass. Ignored tests, headed/device proofs and sibling
+  builds were not run. No dependency/lock changes, downloads, isolated target
+  or Cargo home were introduced. The existing worktree and reusable Mere target
+  remain for unfinished P2 and its receipts. All source remains uncommitted;
+  this is not P2 completion or main integration. P3–P5 have not begun.
+  Receipts: `graph-semantics-c30-linked-data-final.log`,
+  `graph-semantics-kernel-literal-full.log`,
+  `graph-semantics-kernel-literal-broken-control.log`,
+  `graph-semantics-pandect-sealed-qualification.log`,
+  `graph-semantics-pandect-receipt-order-control.log`, the preserved
+  `graph-semantics-pandect-sealed-runtime-failure.log`,
+  `graph-semantics-closure-cartography.log`,
+  `graph-semantics-closure-pictograph.log`,
+  `graph-semantics-closure-graphshell.log`,
+  `graph-semantics-closure-kernel-wasm.log`,
+  `graph-semantics-closure-pandect-wasm.log`,
+  `graph-semantics-closure-workspace.log` and
+  `graph-semantics-doc-audit-c5-c6-qualification.log`.
+
+- **2026-10-07. C6 answered; planned questions closed.** Mark selected a
+  frozen ResourceNode. Recorded ruling 46 and applied rulings 45–46 to the
+  original P3/P4 requirements. The five phases and six P2 closure requirements
+  remain bounded; no new checkpoint is added. P3–P5 have not begun. The saved
+  literal repair passes the full kernel/store suite: 411 units and one
+  compile-fail doctest, with one example ignored. Removing its asserter key
+  made both new literal writer tests fail; source was restored before the
+  successful full run. Logs: `graph-semantics-kernel-literal-broken-control.log`
+  and `graph-semantics-kernel-literal-full.log`. C30/C31 qualification is still
+  running; no complete P2 receipt or source commit is claimed.
+
+- **2026-10-07. Independent bounded P2 work resumed with C6 still open.**
+  C6 governs P4 frozen-selection ownership and is not a dependency of P2's
+  already-selected contracts. Resumed two existing owners for C30 JSON-LD
+  reification and C31 sealed transactions/receipt activation. Root owns the
+  existing literal-attribution defect: `NodeProperty::content_eq` omitted its
+  asserter (`types.rs`); batched writes and live append captures also carried
+  the incoming handle on a same-asserter update rather than the stored first
+  handle (`node_facets.rs`, `apply.rs`). Repairs and writer/replay controls are
+  saved; fresh qualification is in progress. No new checkpoint, capability,
+  dependency or sibling implementation is added. C6 remains unanswered in a
+  standalone native prompt, and no P4 choice is inferred.
+
+- **2026-10-07. C5 answered; C6 prompt remains open.** Mark selected
+  session-only pending-link retention. Recorded ruling 45 without changing
+  earlier rulings. The frozen-selection owner remains unanswered; elapsed time
+  does not settle it. The saved kernel's offline/locked wasm32 check exits 0
+  (`graph-semantics-kernel-receipt-wasm.log`). The locked offline workspace
+  check subsequently exits 0 (`graph-semantics-receipt-workspace-check.log`).
+  These checks qualify compilation of the saved source, not P2 completion.
+  Source edits remain held.
+
+- **2026-10-07. Saved Pandect receipt preparation checked while prompts remain open.**
+  The offline/locked `pandect --no-run` test build exits 0. The prepared
+  transaction's retained-input guard test passes, and all three
+  `graph_placement::tests` pass, including same-host resource containment and
+  exact frozen receipt validation. Logs are
+  `graph-semantics-pandect-receipt-compile.log`,
+  `graph-semantics-pandect-retained-inputs.log` and
+  `graph-semantics-pandect-placement-receipts.log`. The initial short-name
+  `--exact` filter selected zero tests; that log is retained and is not a gate.
+  The corrected filter ran the guard test. This does not qualify activation:
+  `commit_translation` still refuses transactions pending C31 implementation.
+  The full Pandect suite and remaining source gates were not run.
+
+- **2026-10-07. Saved kernel replay repair verified while C5/C6 await answers.**
+  `cargo test -p mere-kernel --features store --offline --locked -j1 --
+  --test-threads=1` exits 0: 409 unit tests and the compile-fail doctest pass;
+  one doc example is ignored. The exact facet replay fixture retains its full
+  equality check and reversed-order control. The successful log is
+  `graph-semantics-kernel-replay-order.log`; the earlier failure log is retained.
+  This verifies the saved kernel repair only. Pandect activation, the remaining
+  touched crates, workspace and wasm32 gates have not been rerun for this source.
+  C5/C6 remain unanswered and implementation owners remain held.
 
 - **2026-10-07. Scope bounded on Mark's instruction.** Mark: "Bound it."
   Completed three read-only owner inventories and added §4's six P2 closure
