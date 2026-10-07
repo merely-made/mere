@@ -577,7 +577,8 @@ and it stays in `genet/design_docs/archive_docs/2026-09-02/`, cited by path.
   line model is not box-shaped, gopher's fixed-width typed column being the
   clear case, superseded 2026-10-06 by WS4, one render path (rulings S66 and
   S70 to S75: a typed `Block::Menu`, `Block` non-exhaustive, the feed fields
-  and an article reader, the per-format views retiring; not started). It also holds the Micron conformance lanes: reading slice,
+  and an article reader, the per-format views retiring; R0 to R5 landed
+  2026-10-06, `b4f14f2c`; R6, gopher-protocol 0.2.0, awaits sign-off). It also holds the Micron conformance lanes: reading slice,
   consumers and forms (lane 3) landed 2026-09-13, navigation (lane 2) runs in
   micron_navigation_plan, lanes 1 and 4 open. **WS1's enrichment lands
   wherever the grammar lives at the time** — if a grammar has moved to a
