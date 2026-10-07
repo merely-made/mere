@@ -5125,7 +5125,7 @@ checksum = "877a4ace8713b0bcf2a4e7eec82529c029f1d0619886d18145fea96c3ffe5c0f"
 
 [[package]]
 name = "errand"
-version = "0.3.4"
+version = "0.4.0"
 dependencies = [
  "finger-protocol",
  "gemini-protocol",
@@ -6454,9 +6454,9 @@ dependencies = [
 
 [[package]]
 name = "gopher-protocol"
-version = "0.1.1"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "113ad3045632e4931f7fc15331be9f1e0e29b91a7bdc88465dcc7801c23fc989"
+checksum = "b5d3f2e10ca1a90d7e0d2bec7421aa1121596ac2eddfae1cae9a440f58b1a378"
 dependencies = [
  "log",
  "tokio",
