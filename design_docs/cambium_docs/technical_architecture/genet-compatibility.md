@@ -143,6 +143,13 @@ column metric. `--cambium-field-intrinsic-width` lets the host override that
 fallback, and explicit host CSS widths retain priority. The new fallback and
 its host override require fresh native, component and catalog gates.
 
+The attempted substitute does not qualify: the fresh six-target native run
+executes 61 passes and two failures, with the same 87px short field and 400px
+long field. Sources are stable and the starting manifest/lock are restored
+exactly. The host harness now exposes its existing live computed-style reader
+so these regressions report resolved sizing properties before any further
+layout repair is chosen. The width contract remains open.
+
 The downstream read-only audit finds old tag checks in Turnstone and Cleromancy.
 Their mechanical selector/caret/existing-label follow-ups await explicit scope
 authorization; currently unnamed fields retain that state. No sibling source
