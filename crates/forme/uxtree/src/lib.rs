@@ -334,10 +334,20 @@ fn project_block(block: &Block, path: &str, nodes: &mut Vec<(NodeId, Node)>) -> 
             summary,
             article_url,
             source_url,
+            content_address,
             ..
         } => {
             let mut n = Node::new(Role::Article);
             n.set_label(title.clone());
+            // The entry's own document is somewhere to go, so it is a link.
+            if let Some(address) = content_address {
+                let link_id = node_id_for_path(&format!("{path}/read"));
+                let mut link = Node::new(Role::Link);
+                link.set_label("Read here");
+                link.set_value(address.clone());
+                nodes.push((link_id, link));
+                n.set_children(vec![link_id]);
+            }
             let mut bits: Vec<String> = Vec::new();
             if let Some(d) = date {
                 bits.push(d.clone());
@@ -586,6 +596,31 @@ mod tests {
         };
         assert_eq!(button.label(), Some("Search"));
         assert_eq!(button.value(), Some("gopher://h/7/find"));
+    }
+
+    #[test]
+    fn a_feed_entry_with_a_body_links_its_own_document() {
+        let doc = doc_with(vec![Block::FeedEntry {
+            title: "Post".to_string(),
+            date: None,
+            summary: None,
+            article_url: Some("https://x.test/post".to_string()),
+            source_url: None,
+            published: None,
+            updated: None,
+            guid: Some("post-1".to_string()),
+            enclosures: Vec::new(),
+            content_address: Some("gemini://x.test/feed.xml#post-1".to_string()),
+        }]);
+        let tree = project_document(&doc);
+        let link = tree
+            .nodes
+            .iter()
+            .map(|(_, n)| n)
+            .find(|n| n.role() == Role::Link)
+            .expect("a read link");
+        assert_eq!(link.label(), Some("Read here"));
+        assert_eq!(link.value(), Some("gemini://x.test/feed.xml#post-1"));
     }
 
     #[test]
