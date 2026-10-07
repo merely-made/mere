@@ -6504,6 +6504,7 @@ dependencies = [
 name = "graft-engine"
 version = "0.2.0"
 dependencies = [
+ "accesskit",
  "inker",
  "tracing",
 ]
@@ -7482,6 +7483,7 @@ checksum = "a257582fdcde896fd96463bf2d40eefea0580021c0712a0e2b028b60b47a837a"
 name = "inker"
 version = "0.1.1"
 dependencies = [
+ "accesskit",
  "document-session-api",
  "genet-scripted-dom",
  "getrandom 0.4.3",
