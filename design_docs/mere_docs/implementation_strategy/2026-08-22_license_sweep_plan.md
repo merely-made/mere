@@ -565,3 +565,14 @@ never before that repository's ledger is written.
   another lane's uncommitted lock), was still waiting on the package-cache
   lock when this entry was written; its result is the next entry. No
   manifest or lock changed between `ea74604b` and `43353861`.
+- **2026-10-06, S45's workspace check.** `cargo check --workspace --locked`
+  passes (exit 0, 4m05s) in the shared tree at `3032a629`, which contains
+  `43353861`. That lane's uncommitted manifests belong to the distillery
+  session fixture, which is not among the 101 workspace members. None of its
+  242 warning sites is in a swept file. The clean-worktree run at `43353861`
+  was stopped after 1,010 units with no error: on its fresh target the
+  `document-host` and `app-host` build scripts' nested guest `cargo build`
+  sat on the package-cache lock, and every new cargo command on the machine
+  waited behind it until it was killed; another session's workspace check
+  stalled the same way. A deadlock between the outer build and the nested
+  guest build is suspected, not proven, and is a follow-on outside this plan.
