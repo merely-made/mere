@@ -576,3 +576,10 @@ never before that repository's ledger is written.
   waited behind it until it was killed; another session's workspace check
   stalled the same way. A deadlock between the outer build and the nested
   guest build is suspected, not proven, and is a follow-on outside this plan.
+
+  **Corrected 2026-10-07:** not a deadlock. The nested guest builds were
+  waiting behind another lane's genet git checkout, which held the
+  package-cache lock for about sixteen minutes, and a fresh-target check of
+  both crates passes. See the
+  [lattice sync pass plan](2026-09-16_lattice_sync_pass_plan.md)'s progress,
+  2026-10-07.
