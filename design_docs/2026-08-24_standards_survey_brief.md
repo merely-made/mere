@@ -160,7 +160,7 @@ URI scheme, and two competing individual drafts (`draft-andesco-otpauth-uri`,
 `draft-linuxgemini-otpauth-uri`) disagree on issuer semantics. Implementations
 diverge on Base32 padding and on the SHA-256/SHA-512 algorithm values.
 
-The [OTP plan](mere_docs/implementation_strategy/2026-08-10_castellan_otp_plan.md)
+The [OTP plan](archive_docs/2026-10-06_completed_plans/2026-08-10_castellan_otp_plan.md)
 already refuses `otpauth-migration://` on exactly these grounds. The plain scheme
 deserves the same note on the record: RFC 6238 and RFC 4226 are Informational
 RFCs with published test vectors, but the URI that actually carries the seed
@@ -703,7 +703,7 @@ recorded in §1, §3.3, §5, §6 and §8.
 | PULL | Misuse-resistant AEAD: AES-SIV and AES-GCM-SIV | RFC 5297 (AES-SIV) and RFC 8452 (AES-GCM-SIV) | Not today. The consumer that would create real demand is **multi-writer P2P vault sync** — the moment two devices can both seal a record under the … |
 | SKIP | AES Key Wrap (KW / KWP) | NIST SP 800-38F | None in the vault. Would only appear as an interop requirement from a PKCS#11 token (CKM_AES_KEY_WRAP / CKM_AES_KEY_WRAP_KWP) or a FIPS-boundary … |
 | ADOPT | HKDF extract-and-expand key derivation | RFC 5869 (and NIST SP 800-56C Rev. 2 for the key-establishment case) | CORRECTED 2026-08-24: no current consumer. personae derive_child uses blake3::keyed_hash; HKDF is one of two candidate fixes for the missing context slot (see §2.1), not shipped |
-| PULL | Hierarchical deterministic key derivation and seed-phrase carry | BIP-32, BIP-39, SLIP-0010 | personae's master seed and the wallet carry layer. design_docs/mere_docs/implementation_strategy/2026-06-25_persona_wallet_carry_layer_plan.md … |
+| PULL | Hierarchical deterministic key derivation and seed-phrase carry | BIP-32, BIP-39, SLIP-0010 | personae's master seed and the wallet carry layer. design_docs/archive_docs/2026-10-06_completed_plans/2026-06-25_persona_wallet_carry_layer_plan.md … |
 | PULL | Shamir's Secret-Sharing for Mnemonic Codes | SLIP-0039 | personae vault-root recovery. design_docs/mere_docs/implementation_strategy/2026-05-07_event_dag_substrate_brief.md already lists 'Shamir's Secret … |
 | SKIP | OPAQUE augmented password-authenticated key exchange | RFC 9807 (and, as the balanced alternative, draft-irtf-cfrg-cpace-21) | **None, and that is the finding.** There is no sync server, no account, no server-side password file. The 2026-08-10 credential-port brief's … |
 | SKIP | Secure Remote Password (SRP-6a) | RFC 2945 (SRP-3) and RFC 5054 (SRP-6a for TLS) | None. Same reason as OPAQUE. Worth knowing only because **1Password's account model is built on SRP-6a** (combined with their Secret Key in a … |
@@ -1094,7 +1094,13 @@ answer and the choice is Mark's.
    `Passport`, `DriversLicense` and `CreditCard`. Which does castellan store,
    which does it drop on the floor, and which does it quarantine and tell the
    user about? This is a product decision that blocks the parser, not a
-   consequence of it.
+   consequence of it. **Ruled 2026-10-01** (Mark, rulings 10 to 15 in the
+   [dramatis tier architecture](dramatis_docs/technical_architecture/2026-09-30_dramatis_tier_architecture.md)
+   §7): the everyday credentials, notes, custom fields, addresses and names
+   are stored as chatelaine kinds; SSH keys go through castellan's SSH import;
+   item references become links. Identity documents, payment cards, passkeys,
+   files and types newer than v1.0 are quarantined: sealed, never exercised,
+   accepted one at a time. Nothing is dropped.
 6. **Whether a `dtcg` crate gets founded (§3.2).** There is no Rust
    implementation of a now-stable W3C-CG format that tabard needs anyway. That
    is either a small well-scoped piece of leverage or a distraction from tabard

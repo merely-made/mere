@@ -19,7 +19,10 @@ use std::sync::Mutex;
 
 use rapier2d::prelude::*;
 
-use crate::{Force, ForceContext, NodeKey};
+use crate::{
+    Class, Currency, Declared, Force, ForceContext, Kernel, Layout, NodeKey, Observable, State,
+    Term, Topology,
+};
 
 use super::{Rng, node_positions};
 
@@ -142,6 +145,16 @@ impl Force for Anneal {
         }
         let scale = self.step * (*temperature / self.initial_temperature).sqrt().max(0.05);
         for i in 0..positions.len() {
+            // A pinned (kinematic) body belongs to the drag: it stays in the
+            // energy as a neighbour but is never moved. Writing its
+            // translation would overwrite its kinematic target.
+            if !ctx
+                .bodies
+                .get(nodes[i].1)
+                .is_some_and(|body| body.is_dynamic())
+            {
+                continue;
+            }
             let angle = rng.unit() * std::f32::consts::TAU;
             let candidate =
                 positions[i].1 + Vector::new(angle.cos(), angle.sin()) * (scale * rng.unit());
@@ -158,6 +171,28 @@ impl Force for Anneal {
             }
         }
         *temperature *= self.cooling;
+    }
+}
+
+/// A realization rather than a kernel (class K): Metropolis moves over an
+/// energy with Springs' functional form (the brief's finding F-b), exposed
+/// so a receipt can watch it fall.
+impl Declared for Anneal {
+    fn terms(&self) -> Vec<Term> {
+        vec![
+            Term::force(
+                "annealing",
+                Topology::AllPairs { cutoff: None },
+                Kernel::PositionWrite,
+                Class::K,
+                Observable::Energy,
+            )
+            .moving(State::Position, Currency::Kinematic),
+        ]
+    }
+
+    fn energy(&self, _term: usize, layout: &Layout<'_>) -> Option<f64> {
+        Some(f64::from(Anneal::energy(self, layout.nodes, layout.edges)))
     }
 }
 
@@ -216,5 +251,37 @@ mod tests {
         for ((_, a), (_, b)) in positions_a.iter().zip(&positions_b) {
             assert!((a - b).length() < 1e-3, "a seeded run must reproduce");
         }
+    }
+
+    /// A pinned (kinematic) body is the drag's, not the walk's: it stays at
+    /// its kinematic target while the others anneal around it.
+    #[test]
+    fn a_pinned_body_stays_at_its_kinematic_target() {
+        let keys: Vec<NodeKey> = (0..8).map(NodeKey::new).collect();
+        let edges: Vec<(NodeKey, NodeKey)> = keys.windows(2).map(|w| (w[0], w[1])).collect();
+        let mut sim = Simulation::new();
+        sim.sync_nodes(
+            keys.iter()
+                .enumerate()
+                .map(|(i, &k)| (k, Point2D::new(i as f32 * 5.0, 0.0))),
+        );
+        sim.sync_edges(edges);
+        sim.set_forces(vec![Box::new(Anneal::seeded(11))]);
+        let target = Point2D::new(400.0, -300.0);
+        sim.pin(keys[3], target);
+        let free_start = sim.position_of(keys[5]).unwrap();
+        for _ in 0..120 {
+            sim.tick(1.0 / 60.0);
+        }
+        let pinned = sim.position_of(keys[3]).unwrap();
+        assert!(
+            (pinned - target).length() < 1e-3,
+            "the pinned body left its target: {pinned:?}"
+        );
+        let free = sim.position_of(keys[5]).unwrap();
+        assert!(
+            (free - free_start).length() > 1.0,
+            "the free bodies still anneal"
+        );
     }
 }

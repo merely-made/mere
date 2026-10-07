@@ -1169,8 +1169,8 @@ mod keyboard {
     use layout_dom_api::{LayoutDom, NodeKind};
 
     use crate::{
-        DomHandle, El, GenetAppRunner, GenetCtx, GenetElement, Key, KeyEvent, Modifiers, NamedKey,
-        OnClick, OnKey, PointerClick, View, el, focusable, on_click, on_key,
+        DomHandle, El, FocusExit, GenetAppRunner, GenetCtx, GenetElement, Key, KeyEvent, Modifiers,
+        NamedKey, OnClick, OnKey, PointerClick, View, el, focusable, on_click, on_key,
     };
 
     /// The app state: a text buffer a key handler edits.
@@ -1272,6 +1272,106 @@ mod keyboard {
         // Shift+Tab goes backward (wrapping to the last).
         runner.dispatch_key(tab(true));
         assert_eq!(runner.focus(), Some(b), "Shift+Tab goes backward (wraps)");
+    }
+
+    /// With focus exits on, Tab past the last focusable and Shift+Tab before
+    /// the first leave the runner: focus clears and the exit waits for the
+    /// host, once. Inside the set, traversal moves as before. A runner with
+    /// nothing focusable exits at once. (App composition brief: a composed
+    /// session must hand focus back to its host.)
+    #[test]
+    fn tab_exits_at_the_edges_when_focus_exits_are_on() {
+        let dom: DomHandle = Rc::new(RefCell::new(ScriptedDom::new()));
+        let noop: fn(&mut (), KeyEvent) = |_, _| {};
+        let mut runner = GenetAppRunner::<_, _, _, ()>::new(
+            dom.clone(),
+            move |_: &()| {
+                el::<_, (), ()>(
+                    "div",
+                    (
+                        on_key(el::<_, (), ()>("a", ()), noop),
+                        on_key(el::<_, (), ()>("b", ()), noop),
+                    ),
+                )
+            },
+            (),
+        );
+        let (a, b) = {
+            let d = dom.borrow();
+            let root = runner.root();
+            (
+                find_element_by_name(&d, root, "a").expect("<a>"),
+                find_element_by_name(&d, root, "b").expect("<b>"),
+            )
+        };
+        runner.set_focus_exits(true);
+
+        runner.dispatch_key(tab(false));
+        assert_eq!(runner.focus(), Some(a), "Tab from nothing still enters");
+        runner.dispatch_key(tab(false));
+        assert_eq!(runner.focus(), Some(b));
+        assert_eq!(runner.take_focus_exit(), None, "inside the set, no exit");
+
+        runner.dispatch_key(tab(false));
+        assert_eq!(runner.focus(), None, "Tab past the last leaves");
+        assert_eq!(runner.take_focus_exit(), Some(FocusExit::Forward));
+        assert_eq!(runner.take_focus_exit(), None, "an exit is taken once");
+
+        runner.set_focus(Some(a));
+        runner.dispatch_key(tab(true));
+        assert_eq!(runner.focus(), None, "Shift+Tab before the first leaves");
+        assert_eq!(runner.take_focus_exit(), Some(FocusExit::Backward));
+
+        // The host can enter from either end by traversing from nothing.
+        runner.focus_traverse(false);
+        assert_eq!(runner.focus(), Some(b));
+
+        // Turning exits off restores wrapping and drops a pending exit.
+        runner.focus_traverse(true);
+        runner.set_focus_exits(false);
+        assert_eq!(runner.take_focus_exit(), None);
+        runner.set_focus(Some(b));
+        runner.dispatch_key(tab(false));
+        assert_eq!(runner.focus(), Some(a), "wrapping again");
+
+        let empty_dom: DomHandle = Rc::new(RefCell::new(ScriptedDom::new()));
+        let mut empty =
+            GenetAppRunner::<_, _, _, ()>::new(empty_dom, |_: &()| el::<_, (), ()>("div", ()), ());
+        empty.set_focus_exits(true);
+        empty.dispatch_key(tab(false));
+        assert_eq!(empty.take_focus_exit(), Some(FocusExit::Forward));
+    }
+
+    /// A handler that consumes Tab at the last focusable keeps focus there:
+    /// the override wins over the exit, as it wins over wrapping.
+    #[test]
+    fn a_handled_tab_does_not_exit() {
+        let dom: DomHandle = Rc::new(RefCell::new(ScriptedDom::new()));
+        let trap: fn(&mut Editor, KeyEvent) = |s, ev| {
+            if matches!(ev.key, Key::Named(NamedKey::Tab)) {
+                s.text.push('\t');
+                ev.prevent_default();
+            }
+        };
+        let mut runner = GenetAppRunner::<_, _, _, ()>::new(
+            dom.clone(),
+            move |_: &Editor| {
+                el::<_, Editor, ()>("div", on_key(el::<_, Editor, ()>("textarea", ""), trap))
+            },
+            Editor {
+                text: String::new(),
+            },
+        );
+        let textarea = {
+            let d = dom.borrow();
+            find_element_by_name(&d, runner.root(), "textarea").expect("<textarea>")
+        };
+        runner.set_focus_exits(true);
+        runner.set_focus(Some(textarea));
+        runner.dispatch_key(tab(false));
+        assert_eq!(runner.focus(), Some(textarea));
+        assert_eq!(runner.take_focus_exit(), None);
+        assert_eq!(runner.state().text, "\t");
     }
 
     /// A key listener on a composite ancestor can observe Escape bubbling from

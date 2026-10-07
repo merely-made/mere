@@ -12,6 +12,11 @@ repository.workspace = true
 # published crate. Consumers take this from genet.git by branch.
 publish = false
 
+[features]
+default = ["image-decode"]
+# Forwards genet-livery's image decoding (mer3ly Ruling 111); on by default.
+image-decode = ["taproot/image-decode", "cambium-rootstock/image-decode", "cambium-winit-a11y/image-decode"]
+
 [dependencies]
 # The accessibility tree type the host projects into and hands the adapter;
 # named here so the `Harness` can return one for a test to assert against.
@@ -23,9 +28,9 @@ meristem = { version = "0.2.0", path = "../meristem" }
 cambium = { version = "0.3.3", path = "../cambium" }
 # The windowing-neutral half. This crate is now the winit event source for
 # it: it converts winit input into the neutral vocabulary and routes.
-cambium-rootstock = { version = "0.1.0", path = "../cambium-rootstock" }
+cambium-rootstock = { version = "0.1.0", path = "../cambium-rootstock", default-features = false }
 cambium-winit = { version = "0.3.0", path = "../cambium-winit" }
-cambium-winit-a11y = { version = "0.3.0", path = "../cambium-winit-a11y" }
+cambium-winit-a11y = { version = "0.3.0", path = "../cambium-winit-a11y", default-features = false }
 sprigging = { version = "0.2.1", path = "../sprigging" }
 # The semantic-selector resolver the headless `Harness` drives applications by,
 # so a host test targets a control by role and label rather than by pixel.
@@ -44,6 +49,7 @@ genet-render-host = { workspace = true }
 winit = { workspace = true }
 
 [dev-dependencies]
+workbench = { workspace = true }
 serde_json = { workspace = true }
 mesquite = { version = "0.1.0", path = "../mesquite" }
 

@@ -83,7 +83,8 @@ Pre-1.0. The data model retains proof artifacts and is tested with JSON and
 postcard reload followed by real signature checks. Persona-scoped persistence
 is available behind `muniment`, with host sealing through Castellan/Pandect.
 JSContact exchange is available behind `jscontact`. M1 library gates are complete;
-M2 resolver intake and application wiring remain in the founding plan.
+M2 address intake is implemented; checked key/PLC intake and application wiring
+remain in the founding plan.
 
 ## Persistence
 
@@ -122,6 +123,38 @@ Pandect supplies the adapter, so Gaz gains no cryptographic dependency. The
 host maps its persona to Gaz's opaque scope and owns historical epoch loading
 and rollback policy. The host receipt also checks the entire closed redb file
 for cleartext petnames and refuses damaged or transplanted ciphertext.
+
+## Address intake
+
+`ContactBook::intake_addresses(&AddressIntake, Option<NewLocalContact>)` stages
+unverified resolver address claims and commits one contact after validating
+all input. The primary typed handle selects exactly one existing contact.
+With no match, a host-selected unused LocalId and petname create a keyless
+Local contact. Multiple matches, occupied local ids and secondary handles held
+by another person refuse without changing the book. Secondary aliases never
+select, join or refile people.
+
+The input types contain no trust, tier, note, recency or keys. New handles and
+endpoints start Unverified; existing typed addresses keep their spelling,
+binding, alarms and usage. Intake preserves private names, notes, Kin, recency,
+root history and artifacts. Repeated, reordered and duplicate claims are
+no-ops. It does not fetch, save, rotate keys or check proofs.
+
+Intake identity comparison is separate from `Handle`'s human lookup helpers.
+`normalize_acct_handle` preserves account-name case, folds scheme/DNS host case,
+and normalizes percent hex and unreserved ASCII escapes. Non-Acct handles
+compare exact typed values; endpoints compare exact family and address.
+ASCII DNS/A-label hosts and bracketed IPv6 are supported. DNS trailing dots
+stay significant; internationalized-name construction, provider aliases and
+PRECIS validation are outside this bounded parser. Leading percent escapes
+follow the correction proposed in reported RFC 7565 erratum 7998.
+
+Gazette's `intake::WebFingerIntake::from_import` supplies these claims from its
+classified WebFinger result. It retains that result separately, selects by the
+queried account, and deliberately refuses a changed subject pending a checked
+migration path. Its supplied-result adapter performs no fetching. Real host
+receipts compose it with Castellan's existing sealed backend and JSON/postcard
+redb reload, without adding a Gazette or credential dependency to Gaz.
 
 ## JSContact exchange
 

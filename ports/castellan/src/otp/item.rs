@@ -4,95 +4,59 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! Persona-scoped, sealed one-time-password items.
+//! One-time passwords as chatelaine items in a persona's item store.
 //!
-//! An [`OtpItemStore`] is the narrow bridge between Personae's sealed-record
-//! substrate and the OTP core. It accepts an `otpauth://` URI, stores the
-//! configuration and seed in one sealed record, and can exercise that record
-//! to produce a code. Its read model contains only display metadata; the seed
-//! is neither a field nor an accessor on any public type here.
+//! An OTP is an item holding one `Otp` credential (ruling 16): its account,
+//! issuer, hash, code style and mode are chatelaine metadata, and its seed,
+//! with an HOTP item's next counter, is the credential's sealed payload
+//! (ruling 23). [`OtpItemStore`] imports `otpauth://` URIs and Steam Guard
+//! secrets into that shape and reads the secret-free metadata back; no type
+//! here holds or returns a seed.
 //!
 //! This is the storage seam below [`super::OtpReleaseGate`], which is the only
-//! public path that can turn a sealed record into a code-bearing tile.
+//! public path that can turn a sealed payload into a code-bearing tile.
 
 use std::fmt;
 
-use personae::{IdentityError, PersonaId, SealedRecordChange, SealedRecordStorage};
-use serde::{Deserialize, Serialize};
-use zeroize::Zeroize;
-
-use super::steam_guard::decode_shared_secret;
-use super::uri::OtpUri;
-use super::{
-    Otp, OtpAlgorithm, OtpCodeStyle, OtpCodeTile, OtpError, OtpKind, OtpUriError, SteamGuard,
-    SteamGuardError, parse_otpauth_uri,
+use chatelaine::{
+    Credential, CredentialId, CredentialKind, Item, ItemId, ItemState, OtpAlgorithm, OtpCodeStyle,
+    OtpMode,
 };
+use personae::{IdentityError, PersonaId, SealedRecordStorage};
 
-const LEGACY_RECORD_FORMAT_VERSION: u8 = 1;
-const RECORD_FORMAT_VERSION: u8 = 2;
-const RECORD_DIRECTORY: &str = "castellan/otp/v1";
+use super::credential::OtpFields;
+use super::steam_guard::decode_shared_secret;
+use super::{
+    Otp, OtpCodeTile, OtpCredential, OtpError, OtpKind, OtpUriError, SteamGuard, SteamGuardError,
+    parse_otpauth_uri,
+};
+use crate::items::{ItemStore, ItemStoreError, Payload, random_id_bytes};
 
-/// Stable handle for one sealed OTP item.
-///
-/// The handle is not a secret. It is unique only within the persona-scoped
-/// store that minted it; the record path also includes the owning persona.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct OtpItemId(uuid::Uuid);
+/// The issuer every Steam Guard item is filed under.
+const STEAM_ISSUER: &str = "Steam";
+/// Valve's fixed Steam Guard step.
+const STEAM_PERIOD_SECS: u64 = 30;
 
-impl OtpItemId {
-    fn mint() -> Self {
-        Self(uuid::Uuid::new_v4())
-    }
-
-    /// Reconstitute an item handle saved by a caller alongside its own view state.
-    pub fn from_uuid(uuid: uuid::Uuid) -> Self {
-        Self(uuid)
-    }
-
-    /// Return the UUID form suitable for a caller's own durable reference.
-    pub fn as_uuid(self) -> uuid::Uuid {
-        self.0
-    }
-}
-
-impl fmt::Display for OtpItemId {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        self.0.fmt(f)
-    }
-}
-
-/// Secret-free metadata for one stored OTP item.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct OtpItem {
-    /// Stable handle used to exercise or delete this item.
-    pub id: OtpItemId,
-    /// Account name supplied by the provisioning URI.
-    pub account: String,
-    /// Issuing service supplied by the provisioning URI, when present.
-    pub issuer: Option<String>,
-    /// HMAC hash behind the generated code.
-    pub algorithm: OtpAlgorithm,
-    /// Character vocabulary and width used to present each code.
-    pub code_style: OtpCodeStyle,
-    /// Whether this item is time- or counter-based.
-    pub kind: OtpKind,
-}
-
-/// Failure while importing, loading, or exercising an OTP item.
+/// Failure while importing, reading or exercising an OTP credential.
 #[derive(Debug)]
 pub enum OtpItemError {
-    /// Personae could not read, write, or remove the sealed record.
-    Storage(IdentityError),
+    /// The item store could not read, write or exercise a record.
+    Store(ItemStoreError),
     /// The supplied provisioning URI was malformed or unsupported.
     Import(OtpUriError),
     /// Steam Guard compatibility material was malformed.
     SteamGuard(SteamGuardError),
     /// A stored generator could not produce a code.
     Generation(OtpError),
-    /// The caller asked for an item absent from this persona's store.
-    NotFound(OtpItemId),
-    /// The sealed record was written by an unsupported item format.
-    UnsupportedRecordVersion(u8),
+    /// This persona's store holds no OTP credential at this address.
+    NotFound {
+        /// The item asked for.
+        item: ItemId,
+        /// The credential asked for.
+        credential: CredentialId,
+    },
+    /// The sealed payload does not fit its credential's metadata.
+    PayloadMismatch,
     /// The final HOTP value cannot be released because it could not be
     /// advanced before the replacement record could be persisted.
     HotpCounterExhausted,
@@ -101,13 +65,16 @@ pub enum OtpItemError {
 impl fmt::Display for OtpItemError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            OtpItemError::Storage(error) => write!(f, "sealed OTP storage: {error}"),
+            OtpItemError::Store(error) => write!(f, "OTP item store: {error}"),
             OtpItemError::Import(error) => write!(f, "OTP import: {error}"),
             OtpItemError::SteamGuard(error) => write!(f, "Steam Guard import: {error}"),
             OtpItemError::Generation(error) => write!(f, "OTP generation: {error}"),
-            OtpItemError::NotFound(id) => write!(f, "no OTP item {id} for this persona"),
-            OtpItemError::UnsupportedRecordVersion(version) => {
-                write!(f, "unsupported sealed OTP item version {version}")
+            OtpItemError::NotFound { item, credential } => write!(
+                f,
+                "no OTP credential {credential} in item {item} for this persona"
+            ),
+            OtpItemError::PayloadMismatch => {
+                f.write_str("the sealed OTP payload does not match its credential")
             },
             OtpItemError::HotpCounterExhausted => {
                 f.write_str("the HOTP counter has no next durable value")
@@ -119,20 +86,26 @@ impl fmt::Display for OtpItemError {
 impl std::error::Error for OtpItemError {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match self {
-            OtpItemError::Storage(error) => Some(error),
+            OtpItemError::Store(error) => Some(error),
             OtpItemError::Import(error) => Some(error),
             OtpItemError::SteamGuard(error) => Some(error),
             OtpItemError::Generation(error) => Some(error),
-            OtpItemError::NotFound(_)
-            | OtpItemError::UnsupportedRecordVersion(_)
+            OtpItemError::NotFound { .. }
+            | OtpItemError::PayloadMismatch
             | OtpItemError::HotpCounterExhausted => None,
         }
     }
 }
 
+impl From<ItemStoreError> for OtpItemError {
+    fn from(error: ItemStoreError) -> Self {
+        Self::Store(error)
+    }
+}
+
 impl From<IdentityError> for OtpItemError {
     fn from(error: IdentityError) -> Self {
-        Self::Storage(error)
+        Self::Store(ItemStoreError::from(error))
     }
 }
 
@@ -142,36 +115,58 @@ impl From<SteamGuardError> for OtpItemError {
     }
 }
 
-/// Sealed OTP items held for one persona.
-///
-/// The storage key is supplied by the already-unlocked Personae layer. This
-/// type binds the key's record namespace to `persona`, rather than deriving a
-/// new key or treating a display name as an identity boundary.
+impl From<OtpError> for OtpItemError {
+    fn from(error: OtpError) -> Self {
+        Self::Generation(error)
+    }
+}
+
+/// The OTP credentials of one persona's item store.
 #[derive(Clone)]
 pub struct OtpItemStore {
-    storage: SealedRecordStorage,
-    persona: PersonaId,
+    items: ItemStore,
 }
 
 impl OtpItemStore {
-    /// Open the OTP item namespace for one persona over an unlocked record store.
+    /// Open one persona's OTP credentials over an unlocked record store.
     pub fn new(storage: SealedRecordStorage, persona: PersonaId) -> Self {
-        Self { storage, persona }
+        Self::over(ItemStore::new(storage, persona))
     }
 
-    /// The persona whose namespace this store serves.
+    pub(crate) fn over(items: ItemStore) -> Self {
+        Self { items }
+    }
+
+    /// The persona whose items this store serves.
     pub fn persona(&self) -> PersonaId {
-        self.persona
+        self.items.persona()
     }
 
-    /// Parse and seal a provisioning URI, returning secret-free item metadata.
-    pub fn import_otpauth_uri(&self, uri: &str) -> Result<OtpItem, OtpItemError> {
+    /// The item store these OTP credentials live in.
+    pub fn items(&self) -> &ItemStore {
+        &self.items
+    }
+
+    /// Parse and seal a provisioning URI as a new item.
+    pub fn import_otpauth_uri(&self, uri: &str) -> Result<OtpCredential, OtpItemError> {
         let (otp, imported) = parse_otpauth_uri(uri).map_err(OtpItemError::Import)?;
-        let id = OtpItemId::mint();
-        let record = StoredOtpItem::from_import(otp, imported)?;
-        let item = record.item(id);
-        self.storage.save_record(self.record_path(id), &record)?;
-        Ok(item)
+        let (mode, counter) = match otp.kind {
+            OtpKind::Totp { period, t0 } => (OtpMode::Totp { period, t0 }, None),
+            OtpKind::Hotp { counter } => (OtpMode::Hotp, Some(counter)),
+        };
+        let payload = Payload::Otp {
+            secret: otp.secret.to_vec(),
+            counter,
+        };
+        let titles = titles(&imported.account, imported.issuer.as_deref());
+        let metadata = CredentialKind::Otp {
+            account: imported.account,
+            issuer: imported.issuer,
+            algorithm: otp.algorithm,
+            code_style: OtpCodeStyle::Decimal { digits: otp.digits },
+            mode,
+        };
+        self.insert(titles, metadata, payload)
     }
 
     /// Seal one Valve Steam Guard mobile authenticator `shared_secret`.
@@ -183,7 +178,7 @@ impl OtpItemStore {
         &self,
         account: &str,
         shared_secret: &str,
-    ) -> Result<OtpItem, OtpItemError> {
+    ) -> Result<OtpCredential, OtpItemError> {
         if account.is_empty()
             || account != account.trim()
             || account.len() > 256
@@ -191,356 +186,165 @@ impl OtpItemStore {
         {
             return Err(SteamGuardError::InvalidAccount.into());
         }
-        let id = OtpItemId::mint();
-        let record = StoredOtpItem::from_steam_guard(account, shared_secret)?;
-        let item = record.item(id);
-        self.storage.save_record(self.record_path(id), &record)?;
-        Ok(item)
+        let secret = decode_shared_secret(shared_secret)?;
+        let payload = Payload::Otp {
+            secret: secret.to_vec(),
+            counter: None,
+        };
+        let metadata = CredentialKind::Otp {
+            account: account.to_string(),
+            issuer: Some(STEAM_ISSUER.to_string()),
+            algorithm: OtpAlgorithm::Sha1,
+            code_style: OtpCodeStyle::SteamGuard,
+            mode: OtpMode::Totp {
+                period: STEAM_PERIOD_SECS,
+                t0: 0,
+            },
+        };
+        self.insert(titles(account, Some(STEAM_ISSUER)), metadata, payload)
     }
 
-    /// Read one item's secret-free metadata, or `None` when it is absent.
-    pub fn get(&self, id: OtpItemId) -> Result<Option<OtpItem>, OtpItemError> {
-        Ok(self.load(id)?.map(|record| record.item(id)))
+    /// Read one OTP credential's secret-free metadata, or `None` when this
+    /// persona holds no OTP credential at that address.
+    pub fn get(
+        &self,
+        item: ItemId,
+        credential: CredentialId,
+    ) -> Result<Option<OtpCredential>, OtpItemError> {
+        Ok(self
+            .items
+            .get(item)?
+            .and_then(|item| OtpCredential::from_item(item, credential)))
     }
 
-    /// Exercise one item after a participant-gated approval.
+    /// Exercise one credential after a participant-gated approval.
     ///
-    /// TOTP records are unchanged. HOTP advances its counter before returning
-    /// a code. The sealed-store update serializes load, exercise, and replace
-    /// across every clone of the opened store, including independent gates.
+    /// TOTP payloads are unchanged. HOTP advances its sealed counter, in the
+    /// payload record alone, before returning a code.
     pub(crate) fn release_tile_at_unix_time(
         &self,
-        id: OtpItemId,
+        item: ItemId,
+        credential: CredentialId,
         unix_secs: u64,
     ) -> Result<OtpCodeTile, OtpItemError> {
-        self.storage
-            .update_record(self.record_path(id), |record: Option<StoredOtpItem>| {
-                let mut record = record.ok_or(OtpItemError::NotFound(id))?.checked()?;
-                if matches!(record.kind, StoredOtpKind::Hotp { counter: u64::MAX }) {
-                    return Err(OtpItemError::HotpCounterExhausted);
-                }
-                let item = record.item(id);
-                let code = record.code_at_unix_time(unix_secs)?;
-                let change = if let StoredOtpKind::Hotp { counter } = &mut record.kind {
-                    *counter = counter
-                        .checked_add(1)
-                        .expect("HOTP counter was checked before the code was produced");
-                    SealedRecordChange::Replace(record)
-                } else {
-                    SealedRecordChange::Keep
+        self.items
+            .exercise(item, credential, |stored, held, payload| {
+                let fields =
+                    OtpFields::of(held).ok_or(OtpItemError::NotFound { item, credential })?;
+                let Payload::Otp { secret, counter } = payload else {
+                    return Err(OtpItemError::PayloadMismatch);
                 };
-                Ok((OtpCodeTile::new(item, code, unix_secs), change))
+                let code = match (fields.mode, counter.as_mut()) {
+                    (OtpMode::Hotp, Some(counter)) => {
+                        if *counter == u64::MAX {
+                            return Err(OtpItemError::HotpCounterExhausted);
+                        }
+                        let code = code_at(fields, secret, Some(*counter), unix_secs)?;
+                        *counter += 1;
+                        code
+                    },
+                    (OtpMode::Totp { .. }, None) => code_at(fields, secret, None, unix_secs)?,
+                    _ => return Err(OtpItemError::PayloadMismatch),
+                };
+                let changed = fields.mode == OtpMode::Hotp;
+                let shown = OtpCredential::from_item(stored.clone(), credential)
+                    .expect("the exercised credential is an Otp credential of this item");
+                Ok((OtpCodeTile::new(shown, code, unix_secs), changed))
             })
     }
 
-    /// Return seconds before a time-based item rolls over, or `None` for HOTP.
+    /// Return seconds before a time-based code rolls over, or `None` for
+    /// HOTP. Reads metadata only.
     pub fn seconds_remaining_at(
         &self,
-        id: OtpItemId,
+        item: ItemId,
+        credential: CredentialId,
         unix_secs: u64,
     ) -> Result<Option<u64>, OtpItemError> {
-        self.require(id)?.seconds_remaining_at(unix_secs)
+        let otp = self
+            .get(item, credential)?
+            .ok_or(OtpItemError::NotFound { item, credential })?;
+        match otp.mode() {
+            OtpMode::Totp { period: 0, .. } => Err(OtpError::ZeroPeriod.into()),
+            OtpMode::Totp { period, t0 } => Ok(unix_secs
+                .checked_sub(t0)
+                .map(|elapsed| period - (elapsed % period))),
+            OtpMode::Hotp => Ok(None),
+        }
     }
 
-    /// Remove one item from this persona's sealed namespace.
+    /// Remove one item, its OTP credential's payload included.
     ///
     /// Deleting an absent item succeeds, matching Personae's record-store
     /// deletion semantics.
-    pub fn delete(&self, id: OtpItemId) -> Result<(), OtpItemError> {
-        self.storage.delete_record(self.record_path(id))?;
-        Ok(())
+    pub fn delete(&self, item: ItemId) -> Result<(), OtpItemError> {
+        Ok(self.items.delete(item)?)
     }
 
-    fn require(&self, id: OtpItemId) -> Result<StoredOtpItem, OtpItemError> {
-        self.load(id)?.ok_or(OtpItemError::NotFound(id))
-    }
-
-    fn load(&self, id: OtpItemId) -> Result<Option<StoredOtpItem>, OtpItemError> {
-        let record = self
-            .storage
-            .load_record(self.record_path(id))?
-            .map(StoredOtpItem::checked)
-            .transpose()?;
-        Ok(record)
-    }
-
-    fn record_path(&self, id: OtpItemId) -> String {
-        format!("{RECORD_DIRECTORY}/{}/{}.json", self.persona.as_uuid(), id)
-    }
-}
-
-#[derive(Serialize, Deserialize)]
-struct StoredOtpItem {
-    version: u8,
-    account: String,
-    issuer: Option<String>,
-    secret: Vec<u8>,
-    algorithm: StoredOtpAlgorithm,
-    digits: u32,
-    #[serde(default)]
-    code_style: StoredOtpCodeStyle,
-    kind: StoredOtpKind,
-}
-
-impl Drop for StoredOtpItem {
-    fn drop(&mut self) {
-        self.secret.zeroize();
-    }
-}
-
-impl StoredOtpItem {
-    fn from_import(otp: Otp, imported: OtpUri) -> Result<Self, OtpItemError> {
-        Ok(Self {
-            version: RECORD_FORMAT_VERSION,
-            account: imported.account,
-            issuer: imported.issuer,
-            secret: otp.secret.to_vec(),
-            algorithm: otp.algorithm.into(),
-            digits: otp.digits,
-            code_style: StoredOtpCodeStyle::Decimal,
-            kind: otp.kind.into(),
-        })
-    }
-
-    fn from_steam_guard(account: &str, shared_secret: &str) -> Result<Self, OtpItemError> {
-        let secret = decode_shared_secret(shared_secret)?;
-        Ok(Self {
-            version: RECORD_FORMAT_VERSION,
-            account: account.to_string(),
-            issuer: Some("Steam".to_string()),
-            secret: secret.as_slice().to_vec(),
-            algorithm: StoredOtpAlgorithm::Sha1,
-            digits: 5,
-            code_style: StoredOtpCodeStyle::SteamGuard,
-            kind: StoredOtpKind::Totp { period: 30 },
-        })
-    }
-
-    fn checked(self) -> Result<Self, OtpItemError> {
-        if matches!(
-            self.version,
-            LEGACY_RECORD_FORMAT_VERSION | RECORD_FORMAT_VERSION
-        ) {
-            Ok(self)
-        } else {
-            Err(OtpItemError::UnsupportedRecordVersion(self.version))
-        }
-    }
-
-    fn item(&self, id: OtpItemId) -> OtpItem {
-        OtpItem {
-            id,
-            account: self.account.clone(),
-            issuer: self.issuer.clone(),
-            algorithm: self.algorithm.into(),
-            code_style: match self.code_style {
-                StoredOtpCodeStyle::Decimal => OtpCodeStyle::Decimal {
-                    digits: self.digits,
-                },
-                StoredOtpCodeStyle::SteamGuard => OtpCodeStyle::SteamGuard,
-            },
-            kind: self.kind.into(),
-        }
-    }
-
-    fn code_at_unix_time(&self, unix_secs: u64) -> Result<String, OtpItemError> {
-        match self.code_style {
-            StoredOtpCodeStyle::Decimal => self
-                .otp()?
-                .code_at_unix_time(unix_secs)
-                .map_err(OtpItemError::Generation),
-            StoredOtpCodeStyle::SteamGuard => {
-                Ok(SteamGuard::from_secret_bytes(&self.secret)?.code_at_unix_time(unix_secs))
-            },
-        }
-    }
-
-    fn seconds_remaining_at(&self, unix_secs: u64) -> Result<Option<u64>, OtpItemError> {
-        match self.code_style {
-            StoredOtpCodeStyle::Decimal => Ok(self.otp()?.seconds_remaining_at(unix_secs)),
-            StoredOtpCodeStyle::SteamGuard => Ok(Some(30 - (unix_secs % 30))),
-        }
-    }
-
-    fn otp(&self) -> Result<Otp, OtpItemError> {
-        let otp = match self.kind {
-            StoredOtpKind::Totp { period } => Otp::totp(self.secret.clone())
-                .map_err(OtpItemError::Generation)?
-                .with_period(period)
-                .map_err(OtpItemError::Generation)?,
-            StoredOtpKind::Hotp { counter } => {
-                Otp::hotp(self.secret.clone(), counter).map_err(OtpItemError::Generation)?
-            },
+    fn insert(
+        &self,
+        (title, subtitle): (String, Option<String>),
+        metadata: CredentialKind,
+        payload: Payload,
+    ) -> Result<OtpCredential, OtpItemError> {
+        let credential = CredentialId::from_random(random_id_bytes());
+        let item = Item {
+            id: ItemId::from_random(random_id_bytes()),
+            source_id: None,
+            title,
+            subtitle,
+            scope: None,
+            tags: Vec::new(),
+            favorite: false,
+            created_at: None,
+            modified_at: None,
+            credentials: vec![Credential {
+                id: credential,
+                kind: metadata,
+            }],
+            state: ItemState::Vault,
         };
-        otp.with_digits(self.digits)
-            .map_err(OtpItemError::Generation)
-            .map(|otp| otp.with_algorithm(self.algorithm.into()))
+        let item = self.items.insert(item, vec![(credential, payload)])?;
+        Ok(OtpCredential::from_item(item, credential)
+            .expect("an imported OTP item holds its Otp credential"))
     }
 }
 
-#[derive(Clone, Copy, Serialize, Deserialize)]
-enum StoredOtpAlgorithm {
-    Sha1,
-    Sha256,
-    Sha512,
-}
-
-#[derive(Clone, Copy, Default, Serialize, Deserialize)]
-enum StoredOtpCodeStyle {
-    #[default]
-    Decimal,
-    SteamGuard,
-}
-
-impl From<OtpAlgorithm> for StoredOtpAlgorithm {
-    fn from(algorithm: OtpAlgorithm) -> Self {
-        match algorithm {
-            OtpAlgorithm::Sha1 => Self::Sha1,
-            OtpAlgorithm::Sha256 => Self::Sha256,
-            OtpAlgorithm::Sha512 => Self::Sha512,
-        }
+/// An imported item's title and subtitle: the issuer with the account under
+/// it, or the account alone (ruling 42).
+fn titles(account: &str, issuer: Option<&str>) -> (String, Option<String>) {
+    match issuer {
+        Some(issuer) => (issuer.to_string(), Some(account.to_string())),
+        None => (account.to_string(), None),
     }
 }
 
-impl From<StoredOtpAlgorithm> for OtpAlgorithm {
-    fn from(algorithm: StoredOtpAlgorithm) -> Self {
-        match algorithm {
-            StoredOtpAlgorithm::Sha1 => Self::Sha1,
-            StoredOtpAlgorithm::Sha256 => Self::Sha256,
-            StoredOtpAlgorithm::Sha512 => Self::Sha512,
-        }
+/// The code for one exercise, from metadata and the sealed seed.
+fn code_at(
+    fields: OtpFields<'_>,
+    secret: &[u8],
+    counter: Option<u64>,
+    unix_secs: u64,
+) -> Result<String, OtpItemError> {
+    if fields.code_style == OtpCodeStyle::SteamGuard {
+        return Ok(SteamGuard::from_secret_bytes(secret)?.code_at_unix_time(unix_secs));
     }
-}
-
-#[derive(Clone, Copy, Serialize, Deserialize)]
-enum StoredOtpKind {
-    Totp { period: u64 },
-    Hotp { counter: u64 },
-}
-
-impl From<OtpKind> for StoredOtpKind {
-    fn from(kind: OtpKind) -> Self {
-        match kind {
-            OtpKind::Totp { period, .. } => Self::Totp { period },
-            OtpKind::Hotp { counter } => Self::Hotp { counter },
-        }
-    }
-}
-
-impl From<StoredOtpKind> for OtpKind {
-    fn from(kind: StoredOtpKind) -> Self {
-        match kind {
-            StoredOtpKind::Totp { period } => Self::Totp { period, t0: 0 },
-            StoredOtpKind::Hotp { counter } => Self::Hotp { counter },
-        }
-    }
+    let OtpCodeStyle::Decimal { digits } = fields.code_style else {
+        return Err(OtpItemError::PayloadMismatch);
+    };
+    let otp = match (fields.mode, counter) {
+        (OtpMode::Totp { period, t0 }, None) => {
+            let mut otp = Otp::totp(secret.to_vec())?.with_period(period)?;
+            otp.kind = OtpKind::Totp { period, t0 };
+            otp
+        },
+        (OtpMode::Hotp, Some(counter)) => Otp::hotp(secret.to_vec(), counter)?,
+        _ => return Err(OtpItemError::PayloadMismatch),
+    };
+    let otp = otp.with_digits(digits)?.with_algorithm(fields.algorithm);
+    Ok(otp.code_at_unix_time(unix_secs)?)
 }
 
 #[cfg(test)]
-mod tests {
-    use tempfile::tempdir;
-
-    use super::*;
-
-    const RFC6238_SHA1_SECRET_BASE32: &str = "GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ";
-    const STEAM_SHARED_SECRET: &str = "zvIayp3JPvtvX/QGHqsqKBk/44s=";
-
-    fn store(root: &std::path::Path, persona: PersonaId) -> OtpItemStore {
-        OtpItemStore::new(
-            SealedRecordStorage::open_with_key(root, [0x71; 32]),
-            persona,
-        )
-    }
-
-    fn provision_uri() -> String {
-        format!(
-            "otpauth://totp/Merely:mark?secret={RFC6238_SHA1_SECRET_BASE32}&issuer=Merely&digits=8"
-        )
-    }
-
-    #[test]
-    fn imported_item_reopens_with_its_secret_free_metadata() {
-        let dir = tempdir().unwrap();
-        let persona = PersonaId::new();
-        let items = store(dir.path(), persona);
-        let item = items.import_otpauth_uri(&provision_uri()).unwrap();
-
-        assert_eq!(item.account, "mark");
-        assert_eq!(item.issuer.as_deref(), Some("Merely"));
-        assert_eq!(item.code_style, OtpCodeStyle::Decimal { digits: 8 });
-
-        let reopened = store(dir.path(), persona);
-        assert_eq!(reopened.get(item.id).unwrap(), Some(item.clone()));
-        assert_eq!(reopened.seconds_remaining_at(item.id, 59).unwrap(), Some(1));
-    }
-
-    #[test]
-    fn stored_record_contains_neither_seed_nor_display_metadata_in_plaintext() {
-        let dir = tempdir().unwrap();
-        let items = store(dir.path(), PersonaId::new());
-        let item = items.import_otpauth_uri(&provision_uri()).unwrap();
-
-        let bytes = std::fs::read(dir.path().join(items.record_path(item.id))).unwrap();
-        let disk = String::from_utf8(bytes).unwrap();
-        assert!(!disk.contains(RFC6238_SHA1_SECRET_BASE32));
-        assert!(!disk.contains("Merely"));
-        assert!(!disk.contains("\"account\":\"mark\""));
-    }
-
-    #[test]
-    fn an_item_handle_has_no_meaning_in_another_persona_namespace() {
-        let dir = tempdir().unwrap();
-        let owner = store(dir.path(), PersonaId::new());
-        let item = owner.import_otpauth_uri(&provision_uri()).unwrap();
-        let other = store(dir.path(), PersonaId::new());
-
-        assert_eq!(other.get(item.id).unwrap(), None);
-        assert!(matches!(
-            other.seconds_remaining_at(item.id, 59),
-            Err(OtpItemError::NotFound(id)) if id == item.id
-        ));
-    }
-
-    #[test]
-    fn deletion_closes_the_item_without_affecting_the_persona_namespace() {
-        let dir = tempdir().unwrap();
-        let items = store(dir.path(), PersonaId::new());
-        let item = items.import_otpauth_uri(&provision_uri()).unwrap();
-
-        items.delete(item.id).unwrap();
-
-        assert_eq!(items.get(item.id).unwrap(), None);
-    }
-
-    #[test]
-    fn steam_guard_is_an_explicit_stored_style_and_uses_the_release_tile() {
-        let dir = tempdir().unwrap();
-        let items = store(dir.path(), PersonaId::new());
-        let item = items
-            .import_steam_guard("mark", STEAM_SHARED_SECRET)
-            .unwrap();
-
-        assert_eq!(item.issuer.as_deref(), Some("Steam"));
-        assert_eq!(item.code_style, OtpCodeStyle::SteamGuard);
-        assert_eq!(item.code_style.character_count(), 5);
-        assert_eq!(item.kind, OtpKind::Totp { period: 30, t0: 0 });
-        let tile = items
-            .release_tile_at_unix_time(item.id, 1_616_374_841)
-            .unwrap();
-        assert_eq!(tile.code_at_unix_time(1_616_374_841), Some("2F9J5"));
-        assert_eq!(tile.code_at_unix_time(1_616_374_860), None);
-    }
-
-    #[test]
-    fn steam_guard_import_does_not_reclassify_otpauth_extensions() {
-        let dir = tempdir().unwrap();
-        let items = store(dir.path(), PersonaId::new());
-        let item = items
-            .import_otpauth_uri(&format!(
-                "otpauth://totp/Steam:mark?secret={RFC6238_SHA1_SECRET_BASE32}&issuer=Steam&encoder=steam"
-            ))
-            .unwrap();
-
-        assert_eq!(item.code_style, OtpCodeStyle::Decimal { digits: 6 });
-    }
-}
+#[path = "item_tests.rs"]
+mod tests;

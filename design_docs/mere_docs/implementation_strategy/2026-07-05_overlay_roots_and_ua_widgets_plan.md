@@ -1,8 +1,15 @@
 # Overlay Roots and UA Widgets — browser features as views
 
 **Date**: 2026-07-05.
-**Status**: design/direction (with Mark). No code yet. Two directives, one
-substrate; this plan fixes the architecture and the build order.
+**Status (2026-10-06):** historical. P0 (both slots), P2 (engine-painted
+find-in-page) and P1 (the overlay-slot host seam) landed on 2026-07-05, the
+engine half in genet-layout and the host half in meerkat (see Progress). The
+meerkat half retired with meerkat 2026-07-18 (`c5f01064`), and the engine half
+went with genet-layout and Stylo in genet `55c05d11759` (2026-08-21): no
+`HighlightRegistry`, `OverlayRegistry`, `set_overlay` or `ContentLayout`
+remains in Mere or Genet's components. Surviving library parts: the control
+views and `host_pool`, now in Cambium. Open: P3 to P6 (the UA widgets, `<select>`,
+text inputs and the feature wave), never started.
 **The claim being bought**: today a browser feature that touches page content
 costs an actor protocol change + rect math + a compositor overlay + bespoke
 input routing (find-in-page is the four-part receipt). With overlay roots, the
@@ -86,6 +93,10 @@ subset, not bespoke machinery.
   the existing actor channel; the actor applies it into the content document's
   retained layout like any other batch. Cross-thread view diffing needs no new
   wire concept.
+
+  **Corrected 2026-10-06 (S14 pass):** there is no `BoxTree::graft_subtree` in
+  Genet's tree; genet-layout, which held it, was retired in genet
+  `55c05d11759` (2026-08-21).
 - **Layout-in-the-actor is the win, not the obstacle.** Because the content
   actor owns the page's `IncrementalLayout`, a satellite subtree laid out
   there rides everything for free: band emission (tall pages), scroll-lock
@@ -96,10 +107,20 @@ subset, not bespoke machinery.
   trees; genet's cascade rides stylo. The satellite root needs a cascade
   boundary (own sheet set, page cascade does not cross) — a scoping problem
   stylo has vocabulary for, not greenfield.
+
+  **Corrected 2026-10-06 (S14 pass):** Stylo is no longer genet's cascade; it
+  was retired with genet-layout in genet `55c05d11759` (2026-08-21).
 - **The controls are real.** `text_field` (+ styled/typed variants, caret and
   IME through the same genet caret primitives the omnibar uses), `select`,
   `slider`, `checkbox`/`toggle`, `radio`, `button` — the exact set `<input>`,
   `<select>`, `<details>` need.
+
+  **Corrected 2026-10-06 (S14 pass):** these hold under new names.
+  xilem-serval became Cambium: the controls are in
+  `crates/cambium/cambium/src/controls/` (`field.rs`, `toggle.rs`) and
+  `crates/cambium/cambium/src/` (`select.rs`, `slider.rs`), and `host_pool`
+  with its splice-safety test is in `crates/cambium/cambium/src/tags.rs`
+  (lines 123 and 269).
 
 ## Architecture
 
@@ -191,12 +212,22 @@ overlay slot on the focused input, state host-side, invisible to the page.
   document. Each is now a view + state slice; each lands as its own small
   plan citing this one.
 
+**Open, raised by the S14 pass (2026-10-06):** the substrate P3 to P6 were to
+build on (genet-layout's slots, Stylo's cascade, meerkat's host seam) is gone,
+and Genet's landed shadow DOM plan (2026-09-07) does not take this plan up.
+What becomes of P3 to P6? Options: rewrite them onto Cambium and Genet's
+shadow-DOM and spec work; keep the plan in place as a historical design record.
+
 ## Risks / gates
 
 - **Page-script invisibility is load-bearing** (autofill security, and
   correctness: `querySelector`/`children` must not see satellites). The
   DocumentScript mirror seam (`handlers.rs:86`) is the enforcement point to
   test explicitly, not assume.
+
+  **Corrected 2026-10-06 (S14 pass):** `handlers.rs:86` was meerkat's content
+  actor, removed with meerkat 2026-07-18 (`c5f01064`); the enforcement point
+  no longer exists.
 - **Cascade scoping**: satellites need their own stylist scope; verify stylo's
   shadow-tree machinery reaches genet's cascade path before P0 commits to a
   cheaper hack.
@@ -237,7 +268,7 @@ overlay slot on the focused input, state host-side, invisible to the page.
 
 ## Cross-refs
 
-- [unified_document_host_plan](2026-06-17_unified_document_host_plan.md) — the
+- [unified_document_host_plan](../../archive_docs/2026-10-06_completed_plans/2026-06-17_unified_document_host_plan.md) — the
   root topology this extends (kept in place as foundational record).
 - [interaction_model_spine](../technical_architecture/2026-06-18_interaction_model_spine.md)
   — ownership map; overlay roots slot into the Render/Interact stages.
@@ -245,11 +276,11 @@ overlay slot on the focused input, state host-side, invisible to the page.
   2026-07-04 checkpoint) — the inverted dual of the remote runner.
 - genet `docs/2026-07-02_dom_mutation_capture_replay_plan.md` +
   `BoxTree::graft_subtree` — the mutation transport + splice substrate.
-- [xilem_serval_control_adoption_plan](2026-06-25_xilem_serval_control_adoption_plan.md)
+- [xilem_serval_control_adoption_plan](../../archive_docs/2026-10-06_completed_plans/2026-06-25_xilem_serval_control_adoption_plan.md)
   — the chrome-side control adoption this makes bidirectional.
 - Archived [find_in_page_host_ui_plan](../../archive_docs/2026-07-03_completed_plans/2026-06-16_find_in_page_host_ui_plan.md)
   — the rect pipeline P2 retires.
-- [petgraph_rdf_plan](2026-06-18_petgraph_rdf_plan.md) statement buckets — the
+- [petgraph_rdf_plan](../../archive_docs/2026-10-06_completed_plans/2026-06-18_petgraph_rdf_plan.md) statement buckets — the
   annotation-pin backend.
 - Genet W3C knockout strategy (project memory) — P3-P5 is the first
   knockout-then-rebuild rebuild, done in the cheap layer; P0's spec subsets
@@ -290,7 +321,7 @@ overlay slot on the focused input, state host-side, invisible to the page.
   content emission unchanged, clear restores parity), and geometry
   **re-derives across relayout** (a wrapped narrow layout moves the
   highlighted word's fill down with no re-registration). 242/242
-  genet-layout lib tests green (genet `components/genet-layout`, one
+  genet-layout lib tests green (genet `components/genet-layout` *(historical citation)* <!-- doc-audit: historical-path -->, one
   commit). Next: P2 wires the find worker's matches onto `set_highlight` in
   the content actor and deletes the render.rs match-rect compositing — or the
   P0 top-layer/anchor probe, whichever lane is quiet.
@@ -416,3 +447,10 @@ overlay slot on the focused input, state host-side, invisible to the page.
     genet-layout P0 test's territory; the meerkat tests prove the actor integration and
     the host round-trip. `OverlayAnchor` is deliberately a role-named enum (v1: `Root`)
     so P6 adds `FindMatch` / `LinkAt` / a node handle without changing the command shape.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_49_s14_phase_b11.md: the "No code yet" status
+  replaced with what landed on 2026-07-05 and how it retired (meerkat
+  `c5f01064`, genet `55c05d11759`); `graft_subtree`, Stylo and the
+  `handlers.rs` seam marked gone; the controls and `host_pool` located in
+  Cambium; and the future of P3 to P6 opened as a question.

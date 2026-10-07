@@ -7,21 +7,29 @@
 param(
     [int]$Port = 8733,
     [string]$TargetDir = 'C:\t\cubek-browser-extrema-repro',
-    [string]$WasmBindgen = 'wasm-bindgen'
+    [string]$WasmBindgen = 'wasm-bindgen',
+    [switch]$NoServe
 )
 
 $ErrorActionPreference = 'Stop'
 $reproRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
+$mereRoot = (Resolve-Path (Join-Path $reproRoot '..\..\..\..\..')).Path
+# The repository's pinned toolchain (rust-toolchain.toml; burn plan 13.45),
+# not whatever rustup picks in the neutral directory below.
+. (Join-Path $mereRoot 'scripts\repo-toolchain.ps1')
+Use-RepoToolchain -MereRoot $mereRoot
 $env:CARGO_TARGET_DIR = $TargetDir
 
 New-Item -ItemType Directory -Force -Path $TargetDir | Out-Null
 $bindgenVersion = (& $WasmBindgen --version).Trim()
-if ($bindgenVersion -ne 'wasm-bindgen 0.2.122') {
-    throw "The repro requires wasm-bindgen CLI 0.2.122; got '$bindgenVersion'."
+if ($bindgenVersion -ne 'wasm-bindgen 0.2.129') {
+    throw "The repro requires wasm-bindgen CLI 0.2.129; got '$bindgenVersion'."
 }
 Push-Location $TargetDir
 try {
-    cargo build --locked --manifest-path (Join-Path $reproRoot 'Cargo.toml') --release --target wasm32-unknown-unknown
+    # The committed wasm cfg (.cargo/config.toml, ruling 558); this neutral
+    # directory would not find it.
+    cargo build --locked --manifest-path (Join-Path $reproRoot 'Cargo.toml') --config (Join-Path $reproRoot '.cargo\config.toml') --release --target wasm32-unknown-unknown
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 } finally {
     Pop-Location
@@ -34,5 +42,6 @@ if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 $url = "http://localhost:$Port/"
 Write-Host "Cubek browser extrema repro: $url"
+if ($NoServe) { exit 0 }
 Write-Host 'Press Ctrl+C to stop the server.'
 python -m http.server $Port --directory $reproRoot\web

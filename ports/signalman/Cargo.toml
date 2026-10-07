@@ -1,6 +1,3 @@
-[workspace]
-resolver = "2"
-
 [package]
 name = "mere-signalman"
 version = "0.0.1"
@@ -12,24 +9,24 @@ publish = false
 description = "Private Mere port for commissioning and operating Retinue stations through Castellan."
 
 [dependencies]
-blake3 = "1.5"
-castellan = { path = "../castellan", features = ["station-grants"] }
-personae = { path = "../../crates/dramatis/personae" }
+blake3.workspace = true
+castellan = { workspace = true, features = ["station-grants"] }
+personae.workspace = true
 # The check conclusions and faults, named directly (insigne proofs plan, B).
-insigne = { path = "../../crates/dramatis/insigne", features = ["verify"] }
+insigne = { workspace = true, features = ["verify"] }
 p2panda-core = "0.7.0"
 # This port is consumed from mere.git, where a sibling Retinue checkout does
 # not exist. Signalman's desktop workspace patches this exact source back to
 # its local Retinue crates so Cargo still builds one type-bearing family.
-outrider = { version = "=0.1.1", git = "https://github.com/merely-made/retinue.git", rev = "6af5c0ff6cb5f3b1297a6ff1321fff8f2bcefbb0" }
-postilion = { version = "=0.1.0", git = "https://github.com/merely-made/retinue.git", rev = "6af5c0ff6cb5f3b1297a6ff1321fff8f2bcefbb0" }
-radio-hand = { version = "=0.0.1", git = "https://github.com/merely-made/retinue.git", rev = "6af5c0ff6cb5f3b1297a6ff1321fff8f2bcefbb0" }
-retinue = { version = "=0.1.1", git = "https://github.com/merely-made/retinue.git", rev = "6af5c0ff6cb5f3b1297a6ff1321fff8f2bcefbb0", features = ["tulle-radio"] }
-serde = { version = "1", features = ["derive"] }
-serde_json = "1"
-pandect = { path = "../../crates/system/pandect" }
+outrider.workspace = true
+postilion.workspace = true
+radio-hand.workspace = true
+retinue = { workspace = true, features = ["tulle-radio"] }
+serde.workspace = true
+serde_json.workspace = true
+pandect.workspace = true
 tokio = { version = "1", features = ["net", "rt", "sync", "time"] }
-uuid = { version = "1", features = ["serde"] }
+uuid.workspace = true
 zeroize = "1"
 
 [dev-dependencies]

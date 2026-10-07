@@ -2,7 +2,7 @@
 
 **Date:** 2026-08-10
 **Kind:** research brief (design probe; nothing here is scheduled)
-**Anchors:** [dramatis tier plan](../implementation_strategy/2026-08-10_dramatis_tier_plan.md) (D4),
+**Anchors:** [dramatis tier plan](../../archive_docs/2026-10-06_completed_plans/2026-08-10_dramatis_tier_plan.md) (D4),
 [contact identity model brief](2026-06-15_contact_identity_model_brief.md),
 the 2026-07-22 vault/agent plan, the participant gate + packs plan.
 
@@ -14,6 +14,20 @@ the 2026-07-22 vault/agent plan, the participant gate + packs plan.
 > still accurate — that URI has no normative specification at all. Standards
 > across the whole stack, including the vault gaps this brief did not reach, are
 > surveyed in the [standards survey brief](../../2026-08-24_standards_survey_brief.md).
+
+> **Amended 2026-09-30.** "The gazette carries discovery *inward*" below stays
+> true but is no longer the whole of it: Mark ruled that castellan issues a
+> persona's public presentation and gazette *announces* it at that persona's
+> handle, so gazette also faces outward. Recorded with its reasoning in the
+> [dramatis tier architecture](../../dramatis_docs/technical_architecture/2026-09-30_dramatis_tier_architecture.md) §6,
+> which now holds the tier's architecture of record.
+>
+> **Amended 2026-10-01.** Three of the open questions below are answered there
+> (§7): *where chatelaine lives as code* (Part I, question 4: a plain taxonomy
+> crate, with CXF import policy ruled for all 17 types); *who polls* (Part
+> II, question 2: a gazette service composed by djinn); and *async first*
+> (Part II, question 1: gazette drops its blocking fetch for
+> finger-protocol's sans-io WebFinger, and the caller supplies HTTP).
 
 The dramatis tier holds the cast list: personae (me), gaz (them, kept),
 gazette (them, found). This brief maps its two growth fronts, which point in

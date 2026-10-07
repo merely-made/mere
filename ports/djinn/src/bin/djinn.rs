@@ -23,32 +23,44 @@ use djinn::pairing;
 use djinn::personal_sync as device_sync;
 use djinn::resident::DjinnResident;
 #[cfg(feature = "personal-sync")]
+use djinn::resident_devices::{self, DeviceDirectoryEndpoint, DeviceDirectorySource};
+#[cfg(feature = "personal-sync")]
 use djinn::resident_distillery::ResidentDistillery;
+use djinn::resident_events::EventLog;
 #[cfg(feature = "personal-sync")]
 use djinn::resident_mere::MereRoutes;
 use djinn::resident_reservoir::ReservoirLane;
+use djinn::resident_status::{
+    self, AgentListenerV1, RESIDENT_APP, RESIDENT_CONTROL_ROUTE, RESIDENT_STATUS_ROUTE,
+    ResidentControlEndpoint, ResidentEndpointsV1, ResidentStatusEndpoint, ResidentStatusSource,
+    ResidentStatusV1, STATUS_SCHEMA, StartupUnlockV1, StopSignal, SyncStatusV1,
+};
 #[cfg(feature = "personal-sync")]
 use djinn::settings::{self as owner_settings, SyncOverrides};
 use graphshell::browser_carrier::AllowedExtensions;
-use graphshell::identity::VaultProtectionView;
-#[cfg(feature = "personal-sync")]
-use graphshell::native::app_admission::AppId;
+use graphshell::identity::{VaultLockView, VaultProtectionView};
 use graphshell::native::app_admission::{
-    AllowedAppRoutes, AppRouteGrants, configured_app_endpoint,
+    AllowedAppRoutes, AppId, AppRouteGrants, AppRouteId, configured_app_endpoint,
+    default_app_endpoint,
 };
 use graphshell::native::app_broker::{AppEndpointCatalog, serve_app_broker};
+use graphshell::native::app_client::AppBrokerClient;
 #[cfg(feature = "personal-sync")]
 use graphshell::native::device_broker::serve_browser_broker_with_cards;
-use graphshell::native::device_broker::{configured_device_endpoint, serve_browser_broker};
+use graphshell::native::device_broker::{
+    configured_device_endpoint, default_device_endpoint, serve_browser_broker,
+};
 #[cfg(feature = "personal-sync")]
 use graphshell::native::endpoint_catalog::{ResidentEndpointCatalog, ResidentEndpointRoute};
 use graphshell::native::identity_ui::SystemNativeIdentityUi;
 use graphshell::native::personae_host::PersonaeHost;
 #[cfg(windows)]
 use graphshell::native::personae_host::STANDARD_WINDOWS_AGENT_ENDPOINT;
+use graphshell::native::tasks::ResidentTasks;
 use graphshell::profile::{default_vault_dir, resolve_selected_profile};
 use personae::bootstrap::{self, PASSPHRASE_ENV, Unlock};
 use personae::{IdentityVault, ProfileId};
+use serde_json::json;
 use ssh_agent_lib::agent::listen;
 
 const EXTRA_EXTENSIONS_ENV: &str = "DJINN_EXTENSION_IDS";
@@ -73,6 +85,27 @@ struct Args {
     app_endpoint: String,
     data_root: Option<PathBuf>,
     log_file: Option<PathBuf>,
+    /// Tracing directives (`info,iroh_gossip=debug`), in place of patching
+    /// the subscriber.
+    log_filter: String,
+    /// The lifecycle event file (`resident_events`).
+    events_file: Option<PathBuf>,
+    /// The installer launched this process: it alone may bind the default
+    /// endpoints.
+    installed: bool,
+    /// Print a running resident's status from its app door, and exit.
+    resident_status: bool,
+    /// Ask a running resident to stop through its app door, and exit.
+    stop_resident: bool,
+    /// Receipt control: leave one blob-store holder outside the task scope,
+    /// so a graceful stop must fail its borrower check.
+    control_unjoined_holder: bool,
+    /// Enrol a vault passphrase typed at the terminal, and exit.
+    enroll_passphrase: bool,
+    /// Unlock a running resident with a passphrase typed at the terminal.
+    unlock: bool,
+    /// With `--unlock`: have the resident show its own prompt instead.
+    native: bool,
     /// Command-line overrides folded over the profile's stored settings.
     #[cfg(feature = "personal-sync")]
     sync_overrides: SyncOverrides,
@@ -119,6 +152,36 @@ async fn main() {
             std::process::exit(2);
         },
     };
+    // Enrolment edits the vault directory and reports; it hosts nothing.
+    if args.enroll_passphrase {
+        match djinn::enrollment::enroll_passphrase(
+            &args.vault_dir,
+            &mut djinn::enrollment::read_from_terminal,
+        ) {
+            Ok(message) => {
+                println!("{message}");
+                return;
+            },
+            Err(error) => {
+                eprintln!("djinn: {error}");
+                std::process::exit(1);
+            },
+        }
+    }
+    // Status, stop and unlock talk to a running resident; this process hosts
+    // nothing.
+    if args.resident_status || args.stop_resident || args.unlock {
+        match resident_client(&args).await {
+            Ok(message) => {
+                println!("{message}");
+                return;
+            },
+            Err(error) => {
+                eprintln!("djinn: {error}");
+                std::process::exit(1);
+            },
+        }
+    }
     // Pairing is a management operation, not a run of the host: it edits the
     // settings and reports, so it writes to the console rather than the log.
     #[cfg(feature = "personal-sync")]
@@ -146,14 +209,115 @@ async fn main() {
             }
         }
     }
-    if let Err(error) = init_logging(args.log_file.as_deref()) {
+    if let Err(refusal) = refuse_default_endpoints(&args) {
+        eprintln!("djinn: {refusal}");
+        std::process::exit(2);
+    }
+    let events = match EventLog::open(args.events_file.as_deref()) {
+        Ok(events) => events,
+        Err(error) => {
+            eprintln!("djinn: open the event file: {error}");
+            std::process::exit(1);
+        },
+    };
+    if let Err(error) = init_logging(args.log_file.as_deref(), &args.log_filter) {
         eprintln!("djinn: initialize logging: {error}");
         std::process::exit(1);
     }
-    if let Err(error) = run(args).await {
+    events.emit(
+        "started",
+        json!({ "installed": args.installed, "version": env!("CARGO_PKG_VERSION") }),
+    );
+    let result = run(args, events.clone()).await;
+    let reason = events.stopping_reason();
+    match &result {
+        Ok(()) => events.emit("stopped", json!({ "reason": reason, "ok": true })),
+        Err(error) => events.emit(
+            "stopped",
+            json!({
+                "reason": reason.unwrap_or_else(|| "startup failed".into()),
+                "ok": false,
+                "error": error.to_string(),
+            }),
+        ),
+    }
+    if let Err(error) = result {
         tracing::error!(%error, "device host stopped");
         std::process::exit(1);
     }
+}
+
+const DEFAULT_LOG_FILTER: &str = "info";
+
+/// Only the installed resident binds the default endpoints (djinn test
+/// harness plan, ruling 8). The installer says which process that is by
+/// passing `--installed`; any other run names its own endpoints.
+fn refuse_default_endpoints(args: &Args) -> Result<(), String> {
+    let taken = resident_status::default_endpoints_taken(
+        args.installed,
+        matches!(args.agent, AgentEndpoint::Standard(_)),
+        (&args.browser_endpoint, &default_device_endpoint()),
+        (&args.app_endpoint, &default_app_endpoint()),
+    );
+    if taken.is_empty() {
+        return Ok(());
+    }
+    Err(format!(
+        "{} belong to the installed resident; name others with \
+         --receipt-agent-endpoint, --browser-endpoint and --app-endpoint, or pass \
+         --installed when this is the installed resident",
+        taken.join(", ")
+    ))
+}
+
+/// `--resident-status`, `--stop-resident` and `--unlock`, over the app door.
+/// Unlock rides the control route only: the status route never carries a
+/// passphrase (vault lock ruling 41).
+async fn resident_client(args: &Args) -> Result<String, String> {
+    let route = if args.stop_resident || args.unlock {
+        RESIDENT_CONTROL_ROUTE
+    } else {
+        RESIDENT_STATUS_ROUTE
+    };
+    // Read before the door opens, so a cancelled prompt opens nothing.
+    let passphrase = match args.unlock && !args.native {
+        true => Some(
+            djinn::enrollment::read_from_terminal("Vault passphrase: ")
+                .map_err(|error| error.to_string())?,
+        ),
+        false => None,
+    };
+    let route = AppRouteId::new(route).map_err(|error| error.to_string())?;
+    let mut client =
+        AppBrokerClient::open_route_at(&args.app_endpoint, AppId::new(RESIDENT_APP), route)
+            .await
+            .map_err(|error| error.to_string())?;
+    if args.unlock && args.native {
+        let unlocked = resident_status::request_native_unlock(&mut client).await;
+        let _ = client.close().await;
+        unlocked.map_err(|error| error.to_string())?;
+        return Ok("unlocked on the resident's own prompt".into());
+    }
+    if let Some(passphrase) = passphrase {
+        let unlocked = resident_status::request_unlock(&mut client, passphrase.as_bytes()).await;
+        drop(passphrase);
+        let _ = client.close().await;
+        unlocked.map_err(|error| error.to_string())?;
+        return Ok("unlocked".into());
+    }
+    if args.stop_resident {
+        resident_status::request_stop(&mut client)
+            .await
+            .map_err(|error| error.to_string())?;
+        // The resident is leaving; its door may close before ours does.
+        let _ = client.close().await;
+        return Ok("stop accepted".into());
+    }
+    let status = resident_status::read_status(&mut client)
+        .await
+        .map_err(|error| error.to_string())?;
+    let _ = client.close().await;
+    serde_json::to_string_pretty(&status).map_err(|error| error.to_string())
 }
 
 fn parse_args() -> Result<Args, String> {
@@ -165,6 +329,15 @@ fn parse_args() -> Result<Args, String> {
     let mut app_endpoint = configured_app_endpoint();
     let mut data_root = std::env::var_os(DATA_ROOT_ENV).map(PathBuf::from);
     let mut log_file = None;
+    let mut log_filter = DEFAULT_LOG_FILTER.to_string();
+    let mut events_file = None;
+    let mut installed = false;
+    let mut resident_status = false;
+    let mut stop_resident = false;
+    let mut control_unjoined_holder = false;
+    let mut enroll_passphrase = false;
+    let mut unlock = false;
+    let mut native = false;
     #[cfg(feature = "personal-sync")]
     let mut sync_graph = None;
     #[cfg(feature = "personal-sync")]
@@ -238,6 +411,21 @@ fn parse_args() -> Result<Args, String> {
                     argv.next().ok_or("--log-file needs a value")?,
                 ));
             },
+            "--log-filter" => {
+                log_filter = argv.next().ok_or("--log-filter needs directives")?;
+            },
+            "--events-file" => {
+                events_file = Some(PathBuf::from(
+                    argv.next().ok_or("--events-file needs a value")?,
+                ));
+            },
+            "--installed" => installed = true,
+            "--resident-status" => resident_status = true,
+            "--stop-resident" => stop_resident = true,
+            "--control-unjoined-holder" => control_unjoined_holder = true,
+            "--enroll-passphrase" => enroll_passphrase = true,
+            "--unlock" => unlock = true,
+            "--native" => native = true,
             #[cfg(feature = "personal-sync")]
             "--sync-graph" => {
                 sync_graph = Some(argv.next().ok_or("--sync-graph needs a value")?);
@@ -364,6 +552,15 @@ fn parse_args() -> Result<Args, String> {
         app_endpoint,
         data_root,
         log_file,
+        log_filter,
+        events_file,
+        installed,
+        resident_status,
+        stop_resident,
+        control_unjoined_holder,
+        enroll_passphrase,
+        unlock,
+        native,
         #[cfg(feature = "personal-sync")]
         sync_overrides: SyncOverrides {
             graph: sync_graph,
@@ -504,7 +701,6 @@ fn pair_device(args: &Args, request: &PairRequest) -> Result<String, String> {
     })
 }
 
-#[cfg(feature = "personal-sync")]
 fn now_ms() -> u64 {
     std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
@@ -517,7 +713,8 @@ fn usage() -> &'static str {
     "usage: djinn [--dir <vault-dir>] [--profile <name>] \
      [--agent-endpoint <standard-endpoint>] \
      [--browser-endpoint <private-endpoint>] [--data-root <dir>] \
-     [--log-file <path>]\n\
+     [--log-file <path>] [--log-filter <directives>] [--events-file <path>] \
+     [--installed]\n\
      personal sync: [--sync-graph <name>] [--sync-store <path>] \
      [--sync-root <64-hex-public-root>] [--sync-peer-node <64-hex-node-id>] \
      [--sync-peer <ticket>] [--sync-relay <url>] \
@@ -529,6 +726,9 @@ fn usage() -> &'static str {
      what the other device needs: --pairing-facts\n\
      seed a node at start: [--seed-node <address> <title>]\n\
      blobs at start: [--stage-blob <file>] [--fetch-blob <64-hex-hash>]\n\
+     a running resident: --resident-status | --stop-resident [--app-endpoint <endpoint>]\n\
+     enrol a vault passphrase at the terminal: --enroll-passphrase [--dir <vault-dir>]\n\
+     unlock a running resident at the terminal: --unlock [--native] [--app-endpoint <endpoint>]\n\
      receipt only: --receipt-agent-endpoint <isolated-endpoint>"
 }
 
@@ -556,7 +756,8 @@ fn default_agent_endpoint(vault_dir: &Path) -> String {
     }
 }
 
-fn init_logging(path: Option<&Path>) -> Result<(), std::io::Error> {
+fn init_logging(path: Option<&Path>, filter: &str) -> Result<(), std::io::Error> {
+    let filter = tracing_subscriber::EnvFilter::try_new(filter).map_err(std::io::Error::other)?;
     if let Some(path) = path {
         if let Some(parent) = path.parent() {
             std::fs::create_dir_all(parent)?;
@@ -566,19 +767,17 @@ fn init_logging(path: Option<&Path>) -> Result<(), std::io::Error> {
             .append(true)
             .open(path)?;
         tracing_subscriber::fmt()
-            .with_max_level(tracing::Level::INFO)
+            .with_env_filter(filter)
             .with_ansi(false)
             .with_writer(std::sync::Mutex::new(file))
             .init();
     } else {
-        tracing_subscriber::fmt()
-            .with_max_level(tracing::Level::INFO)
-            .init();
+        tracing_subscriber::fmt().with_env_filter(filter).init();
     }
     Ok(())
 }
 
-async fn run(args: Args) -> Result<(), Box<dyn std::error::Error>> {
+async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Error>> {
     let opened = bootstrap::open_storage(&args.vault_dir, Unlock::from_env())?;
     tracing::info!(storage = %opened.description, "Personae storage open");
     let profile_id =
@@ -587,11 +786,37 @@ async fn run(args: Args) -> Result<(), Box<dyn std::error::Error>> {
     if created {
         tracing::warn!(profile = %profile_id.0, "selected profile was created");
     }
-    let protection = if std::env::var_os(PASSPHRASE_ENV).is_some() {
-        VaultProtectionView::Passphrase
+    let (protection, startup_unlock) = if std::env::var_os(PASSPHRASE_ENV).is_some() {
+        (VaultProtectionView::Passphrase, StartupUnlockV1::Passphrase)
     } else {
-        VaultProtectionView::OsProtected
+        (VaultProtectionView::OsProtected, StartupUnlockV1::AutoOs)
     };
+    let status = ResidentStatusSource::new(ResidentStatusV1 {
+        schema: STATUS_SCHEMA.into(),
+        pid: std::process::id(),
+        started_ms: now_ms(),
+        installed: args.installed,
+        ready: false,
+        startup_unlock,
+        protection: protection.into(),
+        // The host's lock state follows once it exists (below).
+        lock: VaultLockView::Unlocked.into(),
+        endpoints: ResidentEndpointsV1 {
+            agent: match &args.agent {
+                AgentEndpoint::Standard(endpoint) | AgentEndpoint::Receipt(endpoint) => {
+                    endpoint.clone()
+                },
+            },
+            agent_listener: match &args.agent {
+                AgentEndpoint::Standard(_) => AgentListenerV1::Standard,
+                AgentEndpoint::Receipt(_) => AgentListenerV1::Receipt,
+            },
+            browser: args.browser_endpoint.clone(),
+            app: args.app_endpoint.clone(),
+        },
+        sync: None,
+    });
+    let stop = StopSignal::default();
     let personae = Arc::new(
         PersonaeHost::new(
             IdentityVault::with_profile(opened.storage, profile),
@@ -602,6 +827,49 @@ async fn run(args: Args) -> Result<(), Box<dyn std::error::Error>> {
         // applied to this resident.
         .with_vault_dir(args.vault_dir.clone()),
     );
+    // The status follows the lock (ruling 31's watch channel; harness H4).
+    // The doors' kept keys are captured now, while unlocked, so the doors
+    // stay open through any later lock (rulings 40, 46). A resident that
+    // starts locked (ruling 42, L3) captures them at its first unlock.
+    if let Err(error) =
+        graphshell::native::local_session::DoorIdentity::door_keys(personae.as_ref())
+    {
+        tracing::warn!(%error, "door keys not captured at start");
+    }
+    // `djinn --unlock` arrives here over the control route (ruling 41).
+    let unlocker: resident_status::Unlocker = {
+        let personae = Arc::clone(&personae);
+        Arc::new(move |passphrase: &[u8]| {
+            personae
+                .unlock_vault(personae::UnlockMethod::Passphrase(passphrase))
+                .map_err(|error| error.to_string())
+        })
+    };
+    // `djinn --unlock --native` shows the resident's own prompt (ruling 47).
+    let native_unlocker: resident_status::NativeUnlocker = {
+        let personae = Arc::clone(&personae);
+        Arc::new(move || {
+            let prompt = || {
+                graphshell::native::identity_ui::apply_native_identity_action(
+                    &personae,
+                    &SystemNativeIdentityUi::default(),
+                    graphshell::browser_carrier::NativeIdentityAction::UnlockVault,
+                )
+            };
+            // A dialog blocks; the worker it holds is handed over meanwhile.
+            match tokio::task::block_in_place(prompt) {
+                graphshell::browser_carrier::NativeIdentityResult::UnlockedVault => Ok(()),
+                other => Err(format!("the native unlock ended: {other:?}")),
+            }
+        })
+    };
+    let control_unlock = resident_status::ControlUnlock {
+        passphrase: Some(unlocker.clone()),
+        native: Some(native_unlocker),
+    };
+    let mut lock_state = personae.lock_state();
+    let initial_lock = *lock_state.borrow_and_update();
+    status.update(|status| status.lock = initial_lock.into());
 
     #[cfg(feature = "personal-sync")]
     let app_dir = owner_settings::default_app_dir();
@@ -625,6 +893,9 @@ async fn run(args: Args) -> Result<(), Box<dyn std::error::Error>> {
         Unlock::from_env(),
     )
     .await?;
+    // The credential keys follow the vault's lock (vault lock ruling 1).
+    #[cfg(feature = "personal-sync")]
+    personae.register_lock_holder(resident.credential_lock_holder());
     // The reservoir lives under the family-shared root, not this resident's
     // data root: every application of the identity reaches the same meres.
     #[cfg(feature = "personal-sync")]
@@ -677,8 +948,22 @@ async fn run(args: Args) -> Result<(), Box<dyn std::error::Error>> {
 
     // Keep every broker future inside this async block.  Its captures, most
     // notably the blob-store clones held by personal sync, are dropped before
-    // the resident begins its ordered shutdown.
-    let outcome: Result<(), Box<dyn std::error::Error>> = async {
+    // the resident begins its ordered shutdown. What the block spawns (door
+    // connections, sync's watchers) is not dropped with it, so it runs in a
+    // task scope that is cancelled and joined below. Boxed: the loop's future
+    // is large, and the scope must not carry it on the main thread's stack.
+    let tasks = ResidentTasks::new();
+    if args.control_unjoined_holder {
+        // A receipt control: one blob-store holder outside the scope, which
+        // the shutdown's borrower check must refuse.
+        let held = resident.blobs();
+        tokio::spawn(async move {
+            let _held = held;
+            std::future::pending::<()>().await;
+        });
+        tracing::warn!("control: a blob-store holder left outside the task scope");
+    }
+    let outcome: Result<(), Box<dyn std::error::Error>> = tasks.scope(Box::pin(async {
         #[cfg(not(windows))]
         prepare_unix_agent_endpoint(match &args.agent {
             AgentEndpoint::Standard(endpoint) | AgentEndpoint::Receipt(endpoint) => endpoint,
@@ -703,7 +988,7 @@ async fn run(args: Args) -> Result<(), Box<dyn std::error::Error>> {
             .with_additional(&std::env::var(EXTRA_EXTENSIONS_ENV).unwrap_or_default());
         let agent = listen(agent_listener, personae.agent_session());
         #[cfg(feature = "personal-sync")]
-        let supplemental_cards = device_sync::start(
+        let (supplemental_cards, device_directory) = match device_sync::start(
             personae.as_ref(),
             &app_dir,
             &args.vault_dir,
@@ -715,7 +1000,31 @@ async fn run(args: Args) -> Result<(), Box<dyn std::error::Error>> {
             args.blob_actions,
             resident.blobs(),
         )
-        .await?;
+        .await?
+        {
+            Some(started) => {
+                status.update(|status| {
+                    status.sync = Some(SyncStatusV1 {
+                        node_id: started.node_id.clone(),
+                        ticket: started.ticket.clone(),
+                    })
+                });
+                (Some(started.surface), started.directory)
+            },
+            None => (None, DeviceDirectorySource::sync_off()),
+        };
+        {
+            let now = status.read();
+            events.emit(
+                "listening",
+                json!({
+                    "agent": now.endpoints.agent,
+                    "browser": now.endpoints.browser,
+                    "app": now.endpoints.app,
+                    "ticket": now.sync.map(|sync| sync.ticket),
+                }),
+            );
+        }
         // Both doors are served from the same surface handle, so an application
         // and a browser on this device see one set of cards rather than two.
         #[cfg(feature = "personal-sync")]
@@ -741,6 +1050,26 @@ async fn run(args: Args) -> Result<(), Box<dyn std::error::Error>> {
                 .update(|catalog| resident.register_published_site_route(catalog))
                 .await?;
             grants.grant(AppId::new("knot-editor"), route);
+            // Owner-only and read-only: where each paired device is now.
+            let route = catalog
+                .update(|catalog| DeviceDirectoryEndpoint::register(device_directory, catalog))
+                .await?;
+            resident_devices::grant(&grants, route);
+            // Owner-only: the resident's own status, and its stop.
+            let route = catalog
+                .update(|catalog| ResidentStatusEndpoint::register(status.clone(), catalog))
+                .await?;
+            resident_status::grant(&grants, route);
+            let route = catalog
+                .update(|catalog| {
+                    ResidentControlEndpoint::register_with_unlock(
+                        stop.clone(),
+                        control_unlock.clone(),
+                        catalog,
+                    )
+                })
+                .await?;
+            resident_status::grant(&grants, route);
             // V1 grants the reservoir to the first-party clients this door
             // already knows; V4 makes it default-on for every one of them. Each
             // mere goes to the same clients on its own route (V2, step 5):
@@ -864,8 +1193,11 @@ async fn run(args: Args) -> Result<(), Box<dyn std::error::Error>> {
         // release. `stopping` and `works_running` exist to keep a resolved
         // future from being polled again.
         let mut stopping = false;
+        let mut lock_watched = true;
         let mut works_running = works_enabled;
         let mut exit: Option<Result<(), Box<dyn std::error::Error>>> = None;
+        status.update(|status| status.ready = true);
+        events.emit("ready", json!({}));
 
         loop {
             if exit.is_some() && !works_running {
@@ -874,7 +1206,13 @@ async fn run(args: Args) -> Result<(), Box<dyn std::error::Error>> {
             tokio::select! {
                 result = &mut interrupt, if !stopping => {
                     tracing::info!("shutdown requested");
+                    events.stopping("interrupt");
                     exit = Some(result.map_err(Into::into));
+                }
+                () = stop.raised(), if exit.is_none() => {
+                    tracing::info!("stop requested on the control route");
+                    events.stopping("stop intent");
+                    exit = Some(Ok(()));
                 }
                 result = &mut works_run, if works_running => {
                     works_running = false;
@@ -887,32 +1225,83 @@ async fn run(args: Args) -> Result<(), Box<dyn std::error::Error>> {
                     // A failure already recorded is the one that explains the
                     // run; the works stopping afterwards is a consequence.
                     if exit.is_none() {
+                        events.stopping("distillery works ended");
                         exit = Some(ended);
                     }
                 }
                 result = &mut agent, if exit.is_none() => {
+                    events.stopping("agent listener ended");
                     exit = Some(match result {
                         Ok(()) => Err("SSH agent listener ended unexpectedly".into()),
                         Err(error) => Err(error.into()),
                     });
                 }
                 result = &mut browser, if exit.is_none() => {
+                    events.stopping("browser broker ended");
                     exit = Some(match result {
                         Ok(()) => Err("browser device broker ended unexpectedly".into()),
                         Err(error) => Err(error.into()),
                     });
                 }
                 result = &mut apps, if exit.is_none() => {
+                    events.stopping("app broker ended");
                     exit = Some(match result {
                         Ok(()) => Err("first-party application broker ended unexpectedly".into()),
                         Err(error) => Err(error.into()),
                     });
+                }
+                changed = lock_state.changed(), if lock_watched => {
+                    match changed {
+                        Ok(()) => {
+                            let now = *lock_state.borrow_and_update();
+                            status.update(|status| status.lock = now.into());
+                            let event = match now {
+                                VaultLockView::Locked => "locked",
+                                VaultLockView::Unlocked => "unlocked",
+                            };
+                            tracing::info!(event, "vault lock state changed");
+                            events.emit(event, json!({}));
+                            // Knot's lane follows the lock (ruling 48). The
+                            // close runs after lock() returned: that window
+                            // is logged.
+                            let since = std::time::Instant::now();
+                            if now == VaultLockView::Unlocked {
+                                // Kept from the first unlock on (ruling 46).
+                                let _ = graphshell::native::local_session::DoorIdentity::door_keys(
+                                    personae.as_ref(),
+                                );
+                            }
+                            match now {
+                                VaultLockView::Locked => match resident.close_knot().await {
+                                    Ok(None) => {},
+                                    Ok(Some(cut)) => {
+                                        let window_ms = since.elapsed().as_millis() as u64;
+                                        tracing::info!(cut, window_ms, "Knot lane closed after the lock");
+                                        events.emit("knot-closed", json!({ "cut": cut, "window_ms": window_ms }));
+                                    },
+                                    Err(error) => tracing::error!(%error, "Knot lane did not close cleanly"),
+                                },
+                                VaultLockView::Unlocked => match resident.reopen_knot().await {
+                                    Ok(true) => {
+                                        tracing::info!("Knot lane reopened after the unlock");
+                                        events.emit("knot-reopened", json!({}));
+                                    },
+                                    Ok(false) => {},
+                                    Err(error) => tracing::error!(%error, "Knot lane did not reopen"),
+                                },
+                            }
+                        },
+                        Err(_) => lock_watched = false,
+                    }
                 }
                 _ = knot_refresh.tick(), if resident.knot_enabled() && exit.is_none() => {
                     if let Err(error) = resident.refresh().await {
                         tracing::warn!(%error, "could not refresh resident Knot authority");
                     }
                 }
+            }
+            if exit.is_some() {
+                status.update(|status| status.ready = false);
             }
             if exit.is_some() && works_running && !stopping {
                 stopping = true;
@@ -921,8 +1310,11 @@ async fn run(args: Args) -> Result<(), Box<dyn std::error::Error>> {
                 stop_works.notify_one();
             }
         }
-    }
+    }))
     .await;
+    // Before the release checks: every spawned holder ends and lets go.
+    let ended = tasks.cancel_and_join().await;
+    tracing::info!(tasks = ended, "resident tasks cancelled and joined");
 
     // The run loop borrowed the works; hand them back so the ordered shutdown
     // below is the one thing that closes them.

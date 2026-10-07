@@ -1,14 +1,14 @@
 # Device grants and delegation certificates
 
 **Decided 2026-08-11.** Spun out of the
-[wallet carry fold-in plan](../implementation_strategy/2026-08-10_wallet_carry_foldin_plan.md)'s
+[wallet carry fold-in plan](../../archive_docs/2026-10-06_completed_plans/2026-08-10_wallet_carry_foldin_plan.md)'s
 W3 ruling. Related: the
 [sited device identity brief](../research/2026-08-10_sited_device_identity_brief.md),
-the [castellan OTP plan](../implementation_strategy/2026-08-10_castellan_otp_plan.md),
+the [castellan OTP plan](../../archive_docs/2026-10-06_completed_plans/2026-08-10_castellan_otp_plan.md),
 `personae::delegation`, `session_runtime::wallet_grant`.
 
 **Ownership update (2026-09-29).** The reconciliation below remains the
-grammar ruling. Under the [Insigne proofs plan](../../dramatis_docs/implementation_strategy/2026-09-23_insigne_proofs_plan.md),
+grammar ruling. Under the [Insigne proofs plan](../../archive_docs/2026-10-06_completed_plans/2026-09-23_insigne_proofs_plan.md),
 statements, attenuation and checks now live in `insigne`; `personae::delegation`
 keeps `Issue` and `DelegationError`. Consumers import the proof data from
 Insigne directly. The following account describes the original 2026-08-11

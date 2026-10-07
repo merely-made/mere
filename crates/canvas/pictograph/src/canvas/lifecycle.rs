@@ -98,7 +98,9 @@ impl Canvas {
         for &(key, pos) in &positions {
             self.view.set_position(key, pos);
         }
+        self.reset_frame_time();
         self.physics.seed(positions);
+        self.reset_frame_time();
         self.physics.halt();
         self.generation += 1;
     }
@@ -120,6 +122,10 @@ impl Canvas {
         Self {
             graph,
             physics,
+            #[cfg(feature = "gpu")]
+            physics_device: None,
+            frame_timestamp: None,
+            elapsed_step: None,
             physics_paused: false,
             view,
             node_document,
@@ -131,6 +137,7 @@ impl Canvas {
             generation: 0,
             cursor: (0.0, 0.0),
             pan_velocity: (0.0, 0.0),
+            follow: false,
             middle_drag: None,
             orbit_drag: None,
             drag: None,
@@ -203,12 +210,14 @@ impl Canvas {
             paused_positions: None,
             projection_score: None,
             projection_representations: HashMap::new(),
-            arrangement_pull: seiche::DEFAULT_ANCHOR_STIFFNESS,
+            roles: Default::default(),
             physics_law: crate::canvas::PhysicsLaw::Springs,
             physics_overlays: Vec::new(),
             physics_kind_source: crate::canvas::PhysicsKindSource::Site,
             physics_mass_source: crate::canvas::PhysicsMassSource::Degree,
             physics_depth_source: crate::canvas::PhysicsDepthSource::Roots,
+            #[cfg(test)]
+            law_rebuilds: 0,
             restored_score_hold: None,
             scope: None,
             fold: None,
@@ -270,6 +279,19 @@ impl Canvas {
         // positions that the next frame will paint. Running physics keeps its
         // current view because apply_strategy_to_view only overlays when paused.
         self.apply_strategy_to_view();
+        match self.content_fit() {
+            Some(fit) => {
+                self.camera.zoom = fit.zoom;
+                self.camera.offset = fit.offset;
+            },
+            None => self.recenter(),
+        }
+    }
+
+    /// The camera [`fit_to_content`](Self::fit_to_content) would install for
+    /// the positions the view holds now, or `None` with no finite position.
+    /// Following the layout eases toward it.
+    pub(crate) fn content_fit(&self) -> Option<CameraView> {
         let mut min = (f32::INFINITY, f32::INFINITY);
         let mut max = (f32::NEG_INFINITY, f32::NEG_INFINITY);
         let mut any = false;
@@ -285,8 +307,7 @@ impl Canvas {
             max = (max.0.max(p.x), max.1.max(p.y));
         }
         if !any {
-            self.recenter();
-            return;
+            return None;
         }
         // Pad the bounds so rim nodes draw fully inside the viewport (a node's
         // disc + caption extend past its position point).
@@ -299,8 +320,10 @@ impl Canvas {
             .min(1.0)
             .clamp(MIN_ZOOM, MAX_ZOOM);
         let center = ((min.0 + max.0) / 2.0, (min.1 + max.1) / 2.0);
-        self.camera.zoom = zoom;
-        self.camera.offset = (w / 2.0 - center.0 * zoom, h / 2.0 - center.1 * zoom);
+        Some(CameraView {
+            offset: (w / 2.0 - center.0 * zoom, h / 2.0 - center.1 * zoom),
+            zoom,
+        })
     }
 
     /// Whether the graph is empty, or at least one node lies within the current
@@ -495,6 +518,7 @@ impl Canvas {
             fluid: Vec::new(),
             fluid_radius: 0.0,
             energy: 0.0,
+            speed: 0.0,
             generation: self.generation,
         });
         self.view.set_edges(dedup_edges(&self.graph));
@@ -504,6 +528,13 @@ impl Canvas {
     /// chains another frame while true.
     pub fn is_settling(&self) -> bool {
         self.physics.is_settling()
+    }
+
+    /// Whether the physics world asks for ticks of its own (a scene, or a law
+    /// whose flow has not converged), and the settle budget left: why a
+    /// layout is still moving. (Inline backend; offloaded reads `(false, 0)`.)
+    pub fn physics_tick_demand(&self) -> (bool, u32) {
+        self.physics.tick_demand()
     }
 
     /// Move physics onto an off-thread actor (the native always-offload path).
@@ -528,6 +559,7 @@ impl Canvas {
     /// session must not re-scramble), and any later interaction resumes the settle.
     /// (Window composition P1, OQ2 park.)
     pub fn park_physics(&mut self) {
+        self.reset_frame_time();
         self.physics.halt();
     }
 
@@ -571,6 +603,7 @@ impl Canvas {
         for &(key, pos) in &seeds {
             self.view.set_position(key, pos);
         }
+        self.reset_frame_time();
         self.physics.seed(seeds);
         self.settle_physics(SETTLE_TICKS);
         true

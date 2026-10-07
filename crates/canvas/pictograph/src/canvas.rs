@@ -113,7 +113,9 @@ fn blend_affinity_pairs(
 
 mod types;
 pub use crate::signals::{BridgeMetric, ImportanceMetric};
-pub use types::{CameraView, EdgeCell, Face, NodeShape, NodeState, PointerButton, Viewport};
+pub use types::{
+    CameraView, EdgeCell, Face, LayoutFraming, NodeShape, NodeState, PointerButton, Viewport,
+};
 
 // The graph-scene paint lane, merged from platen in the 2026-07-09
 // decomposition (platen is the pane home now; the canvas is the graph-truth
@@ -151,15 +153,21 @@ pub use palette::DerivedFacePalette;
 /// they are canvas glue (numen fields over placed nodes) that had been parked
 /// in the intel tier, where nothing consumed them.
 pub mod canvas_search;
+mod area_share;
 mod edge_cells;
 pub mod field_bridge;
 mod fields;
 pub use canvas_search::CanvasSearchSurface;
 pub use field_bridge::{build_query_similarity_field, register_query_similarity_field};
+mod elapsed;
 pub mod fold_projection;
 mod frame;
 mod frame_profile;
 pub use frame_profile::CanvasFrameProfile;
+pub use seiche::{
+    DEFAULT_BUDGET_SHARE, ElapsedStepConfig, ElapsedStepReport, FALLBACK_DISPLAY_PERIOD, PaceStats,
+    Speed, StepBudget, display_period,
+};
 mod cull;
 mod input;
 mod resolved_image_cache;
@@ -175,16 +183,30 @@ pub use ambient::{AmbientSim, GameOfLife, NBody, ParticleLife, SandFall, Tinctur
 /// the remote board and any other host share one inline/actor implementation.
 use seiche::Physics;
 
+/// A board scene: the cards and backdrops of a scene that is not a graph,
+/// painted where the physics board holds them.
+pub mod board_scene;
 /// The physics catalog over a scene's items that are not a graph: the
 /// remote board's physics. (Physics catalog — P3.)
 pub mod physics_board;
+/// The host's device for the canvas's and the board's repulsion (P5c).
+#[cfg(feature = "gpu")]
+pub mod physics_device;
+#[cfg(feature = "gpu")]
+pub use physics_device::{PhysicsDevice, physics_device_for};
 /// The physics catalog: the laws a graph can move under, the overlays composed
 /// onto them, and the named profiles. (Physics catalog — P1.)
 pub mod physics_catalog;
+pub use board_scene::{
+    BoardBackdrop, BoardCard, BoardFit, BoardFootprint, BoardRect, BoardScene, BoardText,
+    BoardTransform,
+    backdrop_color,
+};
 pub use physics_board::{BoardItem, PhysicsBoard, PhysicsChoice};
 pub use physics_catalog::{
     CANVAS_PHYSICS_DEPTH_SOURCES, CANVAS_PHYSICS_KIND_SOURCES, CANVAS_PHYSICS_LAWS,
     CANVAS_PHYSICS_MASS_SOURCES, CANVAS_PHYSICS_OVERLAYS, CANVAS_PHYSICS_PROFILES, LayoutStats,
+    OverlayRefusal,
     PhysicsDepthSource, PhysicsKindSource, PhysicsLaw, PhysicsMassSource, PhysicsOverlay,
     PhysicsProfile,
 };
@@ -221,6 +243,9 @@ pub const WHEEL_PAN_SCALE: f32 = 40.0;
 const ZOOM_STEP: f32 = 1.15;
 /// Pan-inertia decay per frame (lower = stops sooner).
 const PAN_DECAY: f32 = 0.85;
+/// Following the layout eases the camera toward fit-to-content with this time
+/// constant (seconds): about 63% of the way in one, 95% in three.
+const FOLLOW_EASE_SECONDS: f32 = 0.25;
 /// Clamp for the camera zoom.
 const MIN_ZOOM: f32 = 0.1;
 const MAX_ZOOM: f32 = 8.0;
@@ -250,12 +275,9 @@ struct Drag {
     node: NodeKey,
     /// Press position in screen px (the click/drag-slop origin).
     press: (f32, f32),
-    /// Set once the pointer has moved past the slop — a real drag.
+    /// Set once the pointer has moved past the slop — a real drag. Its release
+    /// follows the node's arrangement role (`Canvas::release_dragged`).
     moved: bool,
-    /// Whether the node was deliberately pinned before this transient pull
-    /// began. Releasing the pointer preserves that explicit pin; an ordinary
-    /// pull returns to dynamic layout.
-    was_pinned: bool,
 }
 
 /// The reversible, view-local portion of a fold action. Graph nodes, relation
@@ -275,6 +297,11 @@ pub struct Canvas {
     /// off-thread armillary actor (native always-offload). The canvas never reads
     /// it directly; it feeds positions into `view` each frame.
     physics: Physics,
+    /// The host's device, when the repulsion is staged on it (P5c).
+    #[cfg(feature = "gpu")]
+    physics_device: Option<PhysicsDevice>,
+    frame_timestamp: Option<std::time::Duration>,
+    elapsed_step: Option<ElapsedStepReport>,
     /// Whether the layout physics is paused (the user froze the graph with Space /
     /// the pause button). While paused the sim is halted and settle requests are
     /// suppressed, so the graph holds still through mutations until resumed.
@@ -305,6 +332,10 @@ pub struct Canvas {
     cursor: (f32, f32),
     /// Inertial pan velocity (px/frame); decays each frame when not dragging.
     pan_velocity: (f32, f32),
+    /// Whether the camera follows the layout while physics plays (eases toward
+    /// fit-to-content each frame). A pan, zoom or node drag clears it; off by
+    /// default.
+    follow: bool,
     /// `Some(last_cursor)` while a middle-button pan drag is in progress.
     middle_drag: Option<(f32, f32)>,
     /// `Some(last_cursor)` while an Alt+left-button **orbit** drag is in progress (horizontal =
@@ -600,8 +631,8 @@ pub struct Canvas {
     /// Persisted per pane via view-intent; the host pushes positions for it via
     /// [`apply_strategy_positions`](Canvas::apply_strategy_positions). (Layout picker.)
     active_strategy: Option<String>,
-    /// Stored positions for the active arrangement, used by anchor springs and
-    /// explicit restoration. Pausing physics does not replace these slots.
+    /// Stored positions for the active arrangement, which its roles read and
+    /// explicit restoration returns to. Pausing physics does not replace them.
     strategy_positions: Option<Vec<(NodeKey, PortablePoint)>>,
     /// The visible placement frozen by pause, independent of the stored arrangement.
     /// Reapplied after actor snapshots so a late update cannot undo a pause.
@@ -616,12 +647,10 @@ pub struct Canvas {
     /// geometry authority for layout, collision, picking, and paint bounds.
     /// (Projection proofs — P3b renderer consumption.)
     projection_representations: HashMap<NodeKey, sceno::Representation>,
-    /// How strongly a *playing* graph is pulled toward the active arrangement's
-    /// slots (`seiche::AnchorSpring` stiffness). `0.0` makes an arrangement a
-    /// pure initial condition; higher holds its shape against the graph's own
-    /// forces. The dial between "layout as authority" and "layout as
-    /// participant". (Arrangement as attractor.)
-    arrangement_pull: f32,
+    /// The roles the active arrangement's positions play once physics runs
+    /// (seeded, anchored, pinned), the anchored return's stiffness, and the
+    /// latest settle. (Dynamics grammar plan, G7.)
+    roles: roles::ArrangementRoles,
     /// The physics **law** the graph moves under — which dynamics, not how
     /// tuned (see [`physics_catalog`]). Springs is the force-directed default
     /// the canvas has always run. (Physics catalog — P1.)
@@ -638,6 +667,9 @@ pub struct Canvas {
     /// Where the Depth overlay reads a node's depth from (roots, layers, the
     /// focus). (Physics catalog — P1b.)
     physics_depth_source: PhysicsDepthSource,
+    /// How many times the law + overlay force set was rebuilt. Test only.
+    #[cfg(test)]
+    law_rebuilds: usize,
     /// A restored score's `(strategy id, graph revision, URL-authority revision, footprint revision)`
     /// claim on the layout.
     /// [`restore_projection_score`](Self::restore_projection_score) buffers the
@@ -678,16 +710,28 @@ impl Default for Canvas {
     }
 }
 
+mod actions;
 mod cartography;
 mod derived_face;
 mod gloss;
 mod lifecycle;
 mod nodes;
+pub(crate) mod at_rest;
+mod reader;
+mod roles;
 mod selection;
 mod source_time;
 mod strategy;
 mod view;
 
+pub use actions::{
+    AdvertisedAction, ArrangementAction, DRAG_INTENT, DRAG_SCHEMA, IntentEffect, IntentReference,
+    PIN_INTENT, PIN_SCHEMA, PermittedActions,
+};
+pub use at_rest::{HOME_FRAMES, SETTLE_SPEED_FLOOR};
+pub use reader::{CanvasDescription, DESCRIBED_ITEMS, DescribedItem};
+pub use roles::{SETTLED_ARRANGEMENT, StopReturn};
+pub use seiche::{Axes, DEFAULT_ANCHOR_STIFFNESS, Role, RoleTable};
 pub use source_time::{SourceTimeCanvas, SourceTimeSelection};
 
 #[cfg(test)]

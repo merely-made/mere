@@ -33,7 +33,9 @@
 //! dimensionality reduction — the adapter computes it once and discloses it on
 //! the item, rather than shipping source truth for a solver to re-derive.
 
+pub mod catalog;
 mod families;
+pub mod projection;
 pub mod registry;
 mod relax;
 mod solve;
@@ -42,5 +44,5 @@ pub use registry::{
     ArrangementId, Disclosure, RegisterError, SolveError, Solver, SolverCapability, SolverRegistry,
     solve_via,
 };
-pub use relax::{Relaxation, relax, relax_holding};
+pub use relax::{Relaxation, relax, relax_holding, relax_roles};
 pub use solve::{pinned_instances, solve, solve_with};

@@ -23,8 +23,13 @@
 //!
 //! ## Honest limits
 //!
-//! - Ed25519 only (the `ssh-key` dependency is built with only that
-//!   algorithm; other key types are refused with a clear error).
+//! - Ed25519, ECDSA (P-256, P-384) and RSA sign, through [`crate::ssh_sign`]:
+//!   RSA by `ring`, `rsa-sha2-256` or `rsa-sha2-512` per the request's flags,
+//!   2048 to 4096 bits; a flagless RSA request (`ssh-rsa`, SHA-1) is refused.
+//!   `ssh-add` of anything else, P-521 included, is refused with the reason
+//!   in the agent's log (the protocol carries none), and re-adding a held key
+//!   changes nothing. A P-256 or P-384 key whose scalar `ssh-key` 0.6.7
+//!   cannot decode fails inside `ssh-agent-lib`, before this agent sees it.
 //! - A standalone agent built with [`VaultAgent::new`] still refuses
 //!   [`UnlockTier::PerUse`]. A resident host may provide an
 //!   [`ApprovalBroker`] to enforce visible per-use decisions and bounded
@@ -34,11 +39,19 @@
 //!   destination constraints are not yet stored as key policy.
 //! - Any local process may connect to the agent endpoint, same as stock
 //!   ssh-agent (plan §threat-model note).
+//!
+//! ## While the vault is locked (vault lock rulings 8 and 9)
+//!
+//! OpenSSH's behaviour: no identities are listed; sign, add and remove fail,
+//! each refusal logged with its reason (the protocol carries none).
+//! `ssh-add -x` engages the resident's vault lock through
+//! [`VaultLockRequest`]; its lock password is cleared and never used, since
+//! hashing it would be our own mechanism. `ssh-add -X` is refused: unlocking
+//! happens only on the resident's own surface.
 
 use std::sync::{Arc, Mutex};
 use std::time::{SystemTime, UNIX_EPOCH};
 
-use signature::Signer;
 use ssh_agent_lib::agent::Session;
 use ssh_agent_lib::error::AgentError;
 use ssh_agent_lib::proto::extension::{QueryResponse, SessionBind};
@@ -52,17 +65,29 @@ use ssh_key::certificate::Certificate;
 use ssh_key::private::PrivateKey;
 use ssh_key::public::PublicKey;
 
+use crate::enroll;
 use crate::signing::{
     ApprovalBroker, SigningFailureCode, SigningPolicy, SigningRecordResult, SigningRequest,
 };
 use crate::ssh_ca::{self, SshCertAuthority, UserCertRequest};
 use crate::ssh_face;
 use crate::ssh_krl;
+use crate::ssh_sign;
 use crate::ssh_slot::{self, SshSlot};
 use crate::vault::{IdentityStorage, IdentityVault, ProtocolKey, UnlockTier};
-use crate::{InMemoryProvider, enroll};
+use crate::IdentityError;
 
 pub use crate::ssh_slot::{SSH_MOD_ID, protocol_key_for};
+
+/// What `ssh-add -x` engages (ruling 9): the resident's whole lock, so every
+/// holder of a vault-derived key drops it before the agent answers.
+pub trait VaultLockRequest: Send + Sync {
+    /// Lock now; a refusal (ruling 27) is an error.
+    fn lock_vault(&self) -> Result<(), IdentityError>;
+}
+
+/// The reason every locked refusal carries, in the log and the error.
+const LOCKED: &str = "refused while the vault is locked";
 
 /// Agent session over a shared vault.
 ///
@@ -74,6 +99,7 @@ pub struct VaultAgent<S: IdentityStorage> {
     approval: Option<ApprovalBroker>,
     adapter: String,
     binding: Option<VerifiedSshBinding>,
+    locker: Option<Arc<dyn VaultLockRequest>>,
 }
 
 #[derive(Clone)]
@@ -89,6 +115,7 @@ impl<S: IdentityStorage> Clone for VaultAgent<S> {
             approval: self.approval.clone(),
             adapter: self.adapter.clone(),
             binding: None,
+            locker: self.locker.clone(),
         }
     }
 }
@@ -101,7 +128,25 @@ impl<S: IdentityStorage> VaultAgent<S> {
             approval: None,
             adapter: "ssh-agent.local".to_string(),
             binding: None,
+            locker: None,
         }
+    }
+
+    /// Let `ssh-add -x` engage `locker`. Without one, the lock message is
+    /// refused, as before.
+    pub fn with_vault_lock(mut self, locker: Arc<dyn VaultLockRequest>) -> Self {
+        self.locker = Some(locker);
+        self
+    }
+
+    fn is_locked(&self) -> bool {
+        self.vault.lock().unwrap().is_locked()
+    }
+
+    /// The logged refusal for `operation` while locked.
+    fn refuse_locked(operation: &str) -> AgentError {
+        tracing::warn!(operation, "ssh agent {LOCKED}");
+        std::io::Error::other(format!("{operation} {LOCKED}")).into()
     }
 
     /// Wrap a vault and route tiered signing through a visible approval broker.
@@ -115,6 +160,7 @@ impl<S: IdentityStorage> VaultAgent<S> {
             approval: Some(approval),
             adapter: adapter.into(),
             binding: None,
+            locker: None,
         }
     }
 
@@ -129,6 +175,7 @@ impl<S: IdentityStorage> VaultAgent<S> {
             approval: Some(approval),
             adapter: adapter.into(),
             binding: None,
+            locker: None,
         }
     }
 
@@ -142,12 +189,16 @@ impl<S: IdentityStorage> VaultAgent<S> {
         self.approval.as_ref()
     }
 
+    /// Locked lists nothing (the vault answers `Locked`).
     fn ssh_identities(&self) -> Vec<SshSlot> {
-        ssh_slot::ssh_slots(self.vault.lock().unwrap().current_profile())
+        match self.vault.lock().unwrap().current_profile() {
+            Ok(profile) => ssh_slot::ssh_slots(profile),
+            Err(_) => Vec::new(),
+        }
     }
 
     fn find_by_public(&self, wanted: &PublicKey) -> Option<SshSlot> {
-        ssh_slot::find_by_public(self.vault.lock().unwrap().current_profile(), wanted)
+        ssh_slot::find_by_public(self.vault.lock().unwrap().current_profile().ok()?, wanted)
     }
 
     /// Mint a login certificate for one identity from the vault's own
@@ -156,11 +207,12 @@ impl<S: IdentityStorage> VaultAgent<S> {
     /// Minted per listing rather than cached: it costs one Ed25519
     /// signature, and a certificate that is re-minted on demand can never
     /// be the stale one left over from a policy that has since narrowed.
+    ///
+    /// The vault is the provider: no copy of the master seed is made.
     fn certificate_for(&self, slot: &SshSlot) -> Option<Certificate> {
         let vault = self.vault.lock().unwrap();
-        let profile = vault.current_profile();
-        let provider = InMemoryProvider::from_seed(profile.master.to_seed());
-        let ca = SshCertAuthority::derive(&provider).ok()?;
+        let profile = vault.current_profile().ok()?;
+        let ca = SshCertAuthority::derive(&*vault).ok()?;
         let policy = ssh_face::effective_policy(profile).ok()?;
         let ledger = ssh_krl::load_ledger(profile).ok()?;
         let now_ms = SystemTime::now()
@@ -168,7 +220,7 @@ impl<S: IdentityStorage> VaultAgent<S> {
             .ok()?
             .as_millis() as u64;
         let grant = ssh_ca::self_grant(
-            &provider,
+            &*vault,
             enroll::local_device_id(),
             &policy.action_refs(),
             ssh_ca::MAX_CERT_TTL_MS,
@@ -199,6 +251,10 @@ impl<S: IdentityStorage + 'static> Session for VaultAgent<S> {
         // ever seen the key still works. `sign` resolves both to the same
         // slot, because a credential's key_data is the key either way.
         let mut identities = Vec::new();
+        if self.is_locked() {
+            tracing::debug!("ssh agent lists no identities while the vault is locked");
+            return Ok(identities);
+        }
         for identity in self.ssh_identities() {
             let public = PublicKey::from(&identity.private);
             let comment = identity.private.comment().to_string();
@@ -217,15 +273,22 @@ impl<S: IdentityStorage + 'static> Session for VaultAgent<S> {
     }
 
     async fn sign(&mut self, request: SignRequest) -> Result<Signature, AgentError> {
+        if self.is_locked() {
+            return Err(Self::refuse_locked("sign"));
+        }
         let wanted: PublicKey = request.credential.key_data().clone().into();
         let Some(identity) = self.find_by_public(&wanted) else {
             return Err(std::io::Error::other("identity not found in vault").into());
         };
+        // Only the slot's public facts wait out an approval; the private key
+        // is fetched again afterwards, so a lock meanwhile refuses the sign.
+        let (fingerprint, tier, key) = (identity.fingerprint(), identity.tier, identity.key);
+        drop(identity.private);
         let authorization = if let Some(approval) = self.approval.clone() {
-            let profile = self.vault.lock().unwrap().current_profile().id.0.clone();
+            let profile = self.vault.lock().unwrap().profile_id().0.clone();
             let mut signing_request = SigningRequest::new(
                 profile,
-                identity.fingerprint(),
+                fingerprint,
                 "ssh.sign",
                 request.data.as_slice(),
                 self.adapter.clone(),
@@ -237,12 +300,12 @@ impl<S: IdentityStorage + 'static> Session for VaultAgent<S> {
             }
             Some(
                 approval
-                    .authorize(signing_request, SigningPolicy::from(identity.tier))
+                    .authorize(signing_request, SigningPolicy::from(tier))
                     .await
                     .map_err(|error| std::io::Error::other(error.to_string()))?,
             )
-        } else if identity.tier == UnlockTier::PerUse {
-            tracing::warn!(key = ?identity.key, "per-use slot refused: no confirmation UI yet");
+        } else if tier == UnlockTier::PerUse {
+            tracing::warn!(?key, "per-use slot refused: no confirmation UI yet");
             return Err(std::io::Error::other(
                 "per-use slot refused: the agent has no confirmation UI yet",
             )
@@ -250,11 +313,36 @@ impl<S: IdentityStorage + 'static> Session for VaultAgent<S> {
         } else {
             None
         };
-        tracing::info!(key = ?identity.key, "signing request");
-        let signed = identity
-            .private
-            .try_sign(request.data.as_slice())
-            .map_err(AgentError::other);
+        let identity = match self.is_locked() {
+            true => Err(Self::refuse_locked("sign")),
+            false => self
+                .find_by_public(&wanted)
+                .ok_or_else(|| std::io::Error::other("identity not found in vault").into()),
+        };
+        let identity = match identity {
+            Ok(identity) => identity,
+            Err(error) => {
+                if let (Some(approval), Some(authorization)) = (&self.approval, authorization) {
+                    approval.complete(
+                        authorization,
+                        SigningRecordResult::Failed {
+                            code: SigningFailureCode::AdapterFailure,
+                        },
+                    );
+                }
+                return Err(error);
+            },
+        };
+        tracing::info!(?key, flags = request.flags, "signing request");
+        let signed = ssh_sign::sign(
+            identity.private.key_data(),
+            request.data.as_slice(),
+            request.flags,
+        )
+        .map_err(AgentError::other);
+        if let Ok(signature) = &signed {
+            tracing::info!(?key, algorithm = %signature.algorithm(), "signed");
+        }
         if let (Some(approval), Some(authorization)) = (&self.approval, authorization) {
             let result = match &signed {
                 Ok(signature) => SigningRecordResult::Signed {
@@ -273,6 +361,9 @@ impl<S: IdentityStorage + 'static> Session for VaultAgent<S> {
     }
 
     async fn add_identity(&mut self, identity: AddIdentity) -> Result<(), AgentError> {
+        if self.is_locked() {
+            return Err(Self::refuse_locked("add identity"));
+        }
         let PrivateCredential::Key { privkey, comment } = identity.credential else {
             return Err(std::io::Error::other("unsupported credential type").into());
         };
@@ -281,16 +372,31 @@ impl<S: IdentityStorage + 'static> Session for VaultAgent<S> {
             private.set_comment(&comment);
         }
         let key = ssh_slot::protocol_key_for(&private);
+        let mut vault = self.vault.lock().unwrap();
+        // Ruling 54: a held key is never rewritten, its tier included.
+        if vault
+            .current_profile()
+            .map_err(AgentError::other)?
+            .slots
+            .contains_key(&key)
+        {
+            tracing::info!(?key, "ssh identity already held; left untouched");
+            return Ok(());
+        }
+        // Ruling 56: only keys the agent can sign are taken in.
+        if let Err(refused) = ssh_sign::check_signable(private.key_data()) {
+            tracing::warn!(?key, %refused, "ssh identity refused");
+            return Err(AgentError::other(refused));
+        }
         let slot = ssh_slot::slot_for(&private, UnlockTier::Session).map_err(AgentError::other)?;
         tracing::info!(?key, "adding ssh identity to vault");
-        self.vault
-            .lock()
-            .unwrap()
-            .add_slot(key, slot)
-            .map_err(AgentError::other)
+        vault.add_slot(key, slot).map_err(AgentError::other)
     }
 
     async fn remove_identity(&mut self, identity: RemoveIdentity) -> Result<(), AgentError> {
+        if self.is_locked() {
+            return Err(Self::refuse_locked("remove identity"));
+        }
         let wanted: PublicKey = identity.credential.key_data().clone().into();
         let Some(found) = self.find_by_public(&wanted) else {
             return Err(std::io::Error::other("identity not found in vault").into());
@@ -342,7 +448,42 @@ impl<S: IdentityStorage + 'static> Session for VaultAgent<S> {
         }
     }
 
+    /// `ssh-add -x`: engage the resident's vault lock. The password is
+    /// cleared unread. Locking a locked agent fails, as OpenSSH's does.
+    async fn lock(&mut self, mut password: String) -> Result<(), AgentError> {
+        zeroize::Zeroize::zeroize(&mut password);
+        let Some(locker) = self.locker.clone() else {
+            tracing::warn!("ssh agent lock refused: this agent has no vault lock to engage");
+            return Err(std::io::Error::other("this agent has no vault lock to engage").into());
+        };
+        if self.is_locked() {
+            tracing::warn!("ssh agent lock refused: the vault is already locked");
+            return Err(std::io::Error::other("the vault is already locked").into());
+        }
+        match locker.lock_vault() {
+            Ok(()) => {
+                tracing::info!("vault locked over the ssh agent protocol");
+                Ok(())
+            },
+            Err(error) => {
+                tracing::warn!(%error, "ssh agent lock refused");
+                Err(AgentError::other(error))
+            },
+        }
+    }
+
+    /// `ssh-add -X` is refused over the wire (ruling 9): unlocking happens
+    /// only on the resident's own surface.
+    async fn unlock(&mut self, mut password: String) -> Result<(), AgentError> {
+        zeroize::Zeroize::zeroize(&mut password);
+        tracing::warn!("ssh agent unlock refused: unlock on the resident's own surface");
+        Err(std::io::Error::other("unlock over the agent protocol is refused").into())
+    }
+
     async fn remove_all_identities(&mut self) -> Result<(), AgentError> {
+        if self.is_locked() {
+            return Err(Self::refuse_locked("remove all identities"));
+        }
         let keys: Vec<ProtocolKey> = self
             .ssh_identities()
             .into_iter()
@@ -362,6 +503,7 @@ mod tests {
     use super::*;
     use crate::Ed25519Keypair;
     use crate::signing::{ApprovalSource, RememberApproval, SigningDecision, SigningRecordResult};
+    use crate::ssh_sign::tests::fixture;
     use crate::vault::{InMemoryStorage, Profile, ProfileId};
     use signature::Verifier;
     use ssh_key::Algorithm;
@@ -383,7 +525,14 @@ mod tests {
     }
 
     fn vault_slot_count(agent: &VaultAgent<InMemoryStorage>) -> usize {
-        agent.vault.lock().unwrap().current_profile().slots.len()
+        agent
+            .vault
+            .lock()
+            .unwrap()
+            .current_profile()
+            .unwrap()
+            .slots
+            .len()
     }
 
     #[tokio::test]
@@ -415,7 +564,15 @@ mod tests {
             listed[0].credential.key_data(),
             listed[1].credential.key_data()
         );
-        assert!(agent.vault.lock().unwrap().slot(&stored_key).is_some());
+        assert!(
+            agent
+                .vault
+                .lock()
+                .unwrap()
+                .slot(&stored_key)
+                .unwrap()
+                .is_some()
+        );
     }
 
     /// Signing must work when the client picks the certificate, since that
@@ -660,6 +817,179 @@ mod tests {
         assert_eq!(vault_slot_count(&agent), 0);
     }
 
+    async fn add(agent: &mut VaultAgent<InMemoryStorage>, key: &PrivateKey) {
+        agent
+            .add_identity(AddIdentity {
+                credential: PrivateCredential::Key {
+                    privkey: key.key_data().clone(),
+                    comment: key.comment().to_string(),
+                },
+            })
+            .await
+            .unwrap();
+    }
+
+    async fn sign_with<S: IdentityStorage + 'static>(
+        agent: &mut VaultAgent<S>,
+        credential: PublicCredential,
+        data: &[u8],
+        flags: u32,
+    ) -> Result<Signature, AgentError> {
+        agent
+            .sign(SignRequest {
+                credential,
+                data: data.to_vec(),
+                flags,
+            })
+            .await
+    }
+
+    #[tokio::test]
+    async fn rsa_signs_through_the_agent_as_its_flags_ask() {
+        use crate::ssh_sign::{SSH_AGENT_RSA_SHA2_256, SSH_AGENT_RSA_SHA2_512};
+        use ssh_key::HashAlg;
+        let mut agent = test_agent();
+        let key = fixture("rsa3072");
+        add(&mut agent, &key).await;
+        let public = PublicKey::from(&key);
+        for (flags, hash) in [
+            (SSH_AGENT_RSA_SHA2_256, HashAlg::Sha256),
+            (SSH_AGENT_RSA_SHA2_512, HashAlg::Sha512),
+        ] {
+            let signature = sign_with(&mut agent, public.key_data().clone().into(), b"blob", flags)
+                .await
+                .unwrap();
+            assert_eq!(signature.algorithm(), Algorithm::Rsa { hash: Some(hash) });
+            public.key_data().verify(b"blob", &signature).unwrap();
+        }
+        let refused = sign_with(&mut agent, public.key_data().clone().into(), b"blob", 0)
+            .await
+            .unwrap_err();
+        assert!(refused.to_string().contains("SHA-1"), "got: {refused}");
+    }
+
+    /// `ssh` prefers the personae certificate; an RSA one signs per flags too.
+    #[tokio::test]
+    async fn an_rsa_certificate_credential_signs_with_its_underlying_key() {
+        use crate::ssh_sign::SSH_AGENT_RSA_SHA2_512;
+        let mut agent = test_agent();
+        let key = fixture("rsa2048");
+        add(&mut agent, &key).await;
+        let certificate = agent
+            .request_identities()
+            .await
+            .unwrap()
+            .into_iter()
+            .find(|identity| matches!(identity.credential, PublicCredential::Cert(_)))
+            .expect("a certificate is offered");
+        let signature = sign_with(
+            &mut agent,
+            certificate.credential,
+            b"cert",
+            SSH_AGENT_RSA_SHA2_512,
+        )
+        .await
+        .unwrap();
+        PublicKey::from(&key)
+            .key_data()
+            .verify(b"cert", &signature)
+            .unwrap();
+    }
+
+    #[tokio::test]
+    async fn ecdsa_signs_through_the_agent_on_p256_and_p384() {
+        let mut agent = test_agent();
+        for name in ["ecdsa256", "ecdsa384"] {
+            let key = fixture(name);
+            add(&mut agent, &key).await;
+            let public = PublicKey::from(&key);
+            let signature = sign_with(&mut agent, public.key_data().clone().into(), b"blob", 0)
+                .await
+                .unwrap();
+            assert_eq!(signature.algorithm(), public.algorithm(), "{name}");
+            public.key_data().verify(b"blob", &signature).unwrap();
+        }
+    }
+
+    /// The pre-P4a Ed25519 slot, captured at `d0d8372b` as its serialized
+    /// `PlaintextSlot`, stays byte-identical while RSA and ECDSA keys are
+    /// added, listed, re-added and used beside it, and signs as before.
+    #[tokio::test]
+    async fn an_existing_ed25519_slot_is_byte_identical_and_signs_as_before() {
+        use crate::profile_wire::slot_to_plaintext;
+        use crate::ssh_sign::tests::{BASELINE_MESSAGE, BASELINE_SIGNATURE};
+        const BASELINE_WIRE: &[u8] = include_bytes!("../tests/fixtures/ssh/ed25519.slot.json");
+
+        let ed25519 = fixture("ed25519");
+        let ed_key = protocol_key_for(&ed25519);
+        let wire = |agent: &VaultAgent<InMemoryStorage>| {
+            let vault = agent.vault.lock().unwrap();
+            let slot = vault
+                .current_profile()
+                .unwrap()
+                .slots
+                .get(&ed_key)
+                .expect("slot held");
+            serde_json::to_vec(&slot_to_plaintext(&ed_key, slot)).unwrap()
+        };
+        let mut agent = test_agent();
+        agent
+            .vault
+            .lock()
+            .unwrap()
+            .add_slot(
+                ed_key.clone(),
+                ssh_slot::slot_for(&ed25519, UnlockTier::Session).unwrap(),
+            )
+            .unwrap();
+        assert_eq!(
+            wire(&agent),
+            BASELINE_WIRE,
+            "the slot as pre-P4a code wrote it"
+        );
+
+        let others: Vec<PrivateKey> = ["rsa2048", "rsa4096", "ecdsa256", "ecdsa384"]
+            .into_iter()
+            .map(fixture)
+            .collect();
+        for key in &others {
+            add(&mut agent, key).await;
+        }
+        add(&mut agent, &others[0]).await;
+        add(&mut agent, &ed25519).await;
+        let listed = agent.request_identities().await.unwrap();
+        assert_eq!(
+            listed.len(),
+            2 * (1 + others.len()),
+            "a certificate and a key each"
+        );
+        for key in &others {
+            let flags = crate::ssh_sign::SSH_AGENT_RSA_SHA2_256;
+            let public = PublicKey::from(key);
+            let signature = sign_with(&mut agent, public.key_data().clone().into(), b"x", flags)
+                .await
+                .unwrap();
+            public.key_data().verify(b"x", &signature).unwrap();
+        }
+
+        let public = PublicKey::from(&ed25519);
+        let signature = sign_with(
+            &mut agent,
+            public.key_data().clone().into(),
+            BASELINE_MESSAGE,
+            0,
+        )
+        .await
+        .unwrap();
+        assert_eq!(hex::encode(signature.as_bytes()), BASELINE_SIGNATURE);
+        public
+            .key_data()
+            .verify(BASELINE_MESSAGE, &signature)
+            .unwrap();
+        assert_eq!(wire(&agent), BASELINE_WIRE, "untouched afterwards");
+        assert_eq!(vault_slot_count(&agent), 1 + others.len());
+    }
+
     #[tokio::test]
     async fn readding_the_same_key_is_idempotent() {
         let mut agent = test_agent();
@@ -676,5 +1006,265 @@ mod tests {
                 .unwrap();
         }
         assert_eq!(vault_slot_count(&agent), 1);
+    }
+
+    /// Ruling 54: `ssh-add` of a held PerUse key keeps it PerUse, byte for
+    /// byte, whatever comment the client sends.
+    #[tokio::test]
+    async fn readding_a_held_key_rewrites_nothing_its_tier_included() {
+        use crate::profile_wire::slot_to_plaintext;
+        let mut agent = test_agent();
+        let key = fixture("rsa2048");
+        let stored = protocol_key_for(&key);
+        agent
+            .vault
+            .lock()
+            .unwrap()
+            .add_slot(
+                stored.clone(),
+                ssh_slot::slot_for(&key, UnlockTier::PerUse).unwrap(),
+            )
+            .unwrap();
+        let wire = |agent: &VaultAgent<InMemoryStorage>| {
+            let vault = agent.vault.lock().unwrap();
+            let slot = vault.current_profile().unwrap().slots.get(&stored).unwrap();
+            serde_json::to_vec(&slot_to_plaintext(&stored, slot)).unwrap()
+        };
+        let before = wire(&agent);
+        agent
+            .add_identity(AddIdentity {
+                credential: PrivateCredential::Key {
+                    privkey: key.key_data().clone(),
+                    comment: "a different comment".into(),
+                },
+            })
+            .await
+            .unwrap();
+        assert_eq!(wire(&agent), before);
+        let tier =
+            agent.vault.lock().unwrap().current_profile().unwrap().slots[&stored].unlock_tier();
+        assert_eq!(tier, UnlockTier::PerUse);
+    }
+
+    // ─── Vault lock rulings 8 and 9 ───────────────────────────────────────
+
+    use crate::sealed_profile_storage::PASSPHRASE_ROOT_FILE;
+    use crate::unlock::UnlockMethod;
+    use crate::SealedProfileStorage;
+
+    const LOCK_PASSPHRASE: &[u8] = b"agent lock";
+
+    /// Locks the shared vault directly: the resident's broadcast is
+    /// castellan's, and this agent only needs something to engage.
+    struct DirectLock(Arc<Mutex<IdentityVault<SealedProfileStorage>>>);
+
+    impl VaultLockRequest for DirectLock {
+        fn lock_vault(&self) -> Result<(), IdentityError> {
+            self.0.lock().unwrap().lock()
+        }
+    }
+
+    /// A lockable agent over a temp vault holding one Ed25519 key.
+    fn lockable_agent(
+        dir: &std::path::Path,
+    ) -> (VaultAgent<SealedProfileStorage>, PrivateKey) {
+        let root = [0x6e; 32];
+        crate::save_passphrase_root(dir.join(PASSPHRASE_ROOT_FILE), &root, LOCK_PASSPHRASE)
+            .unwrap();
+        let storage = SealedProfileStorage::open_with_key(dir, root);
+        let key = random_key("locked");
+        let mut profile = Profile::new(
+            ProfileId("test".into()),
+            "test",
+            Ed25519Keypair::from_seed([7; 32]),
+        );
+        profile.slots.insert(
+            protocol_key_for(&key),
+            ssh_slot::slot_for(&key, UnlockTier::Session).unwrap(),
+        );
+        storage.save_profile(&profile).unwrap();
+        let vault = Arc::new(Mutex::new(IdentityVault::with_profile(storage, profile)));
+        let agent = VaultAgent::from_shared_vault(
+            Arc::clone(&vault),
+            ApprovalBroker::new(Duration::from_secs(1)),
+            "ssh-agent.test",
+        )
+        .with_vault_lock(Arc::new(DirectLock(vault)));
+        (agent, key)
+    }
+
+    fn credential(key: &PrivateKey) -> PublicCredential {
+        PublicKey::from(key).key_data().clone().into()
+    }
+
+    #[tokio::test]
+    async fn a_locked_agent_lists_nothing_and_refuses_sign_add_and_remove_with_the_reason() {
+        let dir = tempfile::tempdir().unwrap();
+        let (mut agent, key) = lockable_agent(dir.path());
+        let before = agent.request_identities().await.unwrap();
+        assert_eq!(before.len(), 2, "certificate and key");
+        agent.lock(String::from("ignored")).await.unwrap();
+
+        assert!(agent.request_identities().await.unwrap().is_empty());
+        let sign = sign_with(&mut agent, credential(&key), b"x", 0).await;
+        assert!(sign.unwrap_err().to_string().contains(LOCKED));
+        let other = random_key("newcomer");
+        let add = agent
+            .add_identity(AddIdentity {
+                credential: PrivateCredential::Key {
+                    privkey: other.key_data().clone(),
+                    comment: String::new(),
+                },
+            })
+            .await;
+        assert!(add.unwrap_err().to_string().contains(LOCKED));
+        let remove = agent
+            .remove_identity(RemoveIdentity {
+                credential: credential(&key),
+            })
+            .await;
+        assert!(remove.unwrap_err().to_string().contains(LOCKED));
+        let remove_all = agent.remove_all_identities().await;
+        assert!(remove_all.unwrap_err().to_string().contains(LOCKED));
+
+        // Unlocked on the resident's own surface: the same identities, signing.
+        agent
+            .vault
+            .lock()
+            .unwrap()
+            .unlock(UnlockMethod::Passphrase(LOCK_PASSPHRASE))
+            .unwrap();
+        let after = agent.request_identities().await.unwrap();
+        assert_eq!(
+            after.iter().map(|i| i.credential.key_data()).collect::<Vec<_>>(),
+            before.iter().map(|i| i.credential.key_data()).collect::<Vec<_>>()
+        );
+        let signature = sign_with(&mut agent, credential(&key), b"x", 0).await.unwrap();
+        PublicKey::from(&key).key_data().verify(b"x", &signature).unwrap();
+        assert_eq!(vault_slot_count_of(&agent), 1, "nothing added or removed");
+    }
+
+    fn vault_slot_count_of(agent: &VaultAgent<SealedProfileStorage>) -> usize {
+        agent.vault.lock().unwrap().current_profile().unwrap().slots.len()
+    }
+
+    #[tokio::test]
+    async fn the_lock_message_engages_the_vault_lock_and_unlock_is_refused() {
+        let dir = tempfile::tempdir().unwrap();
+        let (mut agent, _key) = lockable_agent(dir.path());
+        agent.lock(String::from("pw")).await.unwrap();
+        assert!(agent.vault.lock().unwrap().is_locked());
+        assert!(agent.vault.lock().unwrap().storage().is_locked());
+        // OpenSSH fails a second lock.
+        assert!(agent.lock(String::from("pw")).await.is_err());
+        // `-X` never unlocks, whatever the password.
+        let refused = agent.unlock(String::from("pw")).await.unwrap_err();
+        assert!(refused.to_string().contains("refused"), "{refused}");
+        let passphrase = String::from_utf8(LOCK_PASSPHRASE.to_vec()).unwrap();
+        assert!(agent.unlock(passphrase).await.is_err());
+        assert!(agent.vault.lock().unwrap().is_locked());
+    }
+
+    #[tokio::test]
+    async fn without_a_vault_lock_the_lock_message_is_refused() {
+        let mut agent = test_agent();
+        assert!(agent.lock(String::from("pw")).await.is_err());
+        assert!(!agent.vault.lock().unwrap().is_locked());
+    }
+
+    /// A lock while a sign waits for approval: the key is fetched again
+    /// after the approval, so the sign is refused and recorded failed.
+    #[tokio::test]
+    async fn a_lock_during_an_approval_refuses_the_sign() {
+        let dir = tempfile::tempdir().unwrap();
+        let (agent, _) = lockable_agent(dir.path());
+        let key = random_key("guarded");
+        agent
+            .vault
+            .lock()
+            .unwrap()
+            .add_slot(
+                protocol_key_for(&key),
+                ssh_slot::slot_for(&key, UnlockTier::PerUse).unwrap(),
+            )
+            .unwrap();
+        let broker = agent.approval_broker().unwrap().clone();
+        let mut signer = agent.clone();
+        let wanted = credential(&key);
+        let signing = tokio::spawn(async move { sign_with_any(&mut signer, wanted).await });
+        let pending = loop {
+            if let Some(pending) = broker.pending().into_iter().next() {
+                break pending;
+            }
+            tokio::task::yield_now().await;
+        };
+        agent.vault.lock().unwrap().lock().unwrap();
+        broker
+            .decide(
+                pending.request.request_id,
+                SigningDecision::Approve {
+                    remember: RememberApproval::Once,
+                },
+            )
+            .unwrap();
+        let error = signing.await.unwrap().unwrap_err();
+        assert!(error.to_string().contains(LOCKED), "{error}");
+        assert!(matches!(
+            broker.history()[0].result,
+            SigningRecordResult::Failed { .. }
+        ));
+    }
+
+    async fn sign_with_any<S: IdentityStorage + 'static>(
+        agent: &mut VaultAgent<S>,
+        credential: PublicCredential,
+    ) -> Result<Signature, AgentError> {
+        agent
+            .sign(SignRequest {
+                credential,
+                data: b"held".to_vec(),
+                flags: 0,
+            })
+            .await
+    }
+
+    /// Rulings 55 and 56: `ssh-add` refuses what the agent cannot sign, the
+    /// reason in the error, and stores nothing.
+    #[tokio::test]
+    async fn ssh_add_refuses_unsignable_keys_with_the_reason() {
+        let mut agent = test_agent();
+        let mut refused: Vec<(String, ssh_key::private::KeypairData)> = [
+            "rsa1024",
+            "rsa2560",
+            "rsa8192",
+            "rsa2048e3",
+            "dsa",
+            "ecdsa521",
+        ]
+        .into_iter()
+        .map(|name| (name.to_string(), fixture(name).key_data().clone()))
+        .collect();
+        for key in crate::ssh_sign::tests::security_keys() {
+            refused.push(("security key".into(), key));
+        }
+        for (name, privkey) in refused {
+            let error = agent
+                .add_identity(AddIdentity {
+                    credential: PrivateCredential::Key {
+                        privkey,
+                        comment: String::new(),
+                    },
+                })
+                .await
+                .unwrap_err();
+            let reason = error.to_string();
+            assert!(
+                reason.contains("2048 to 4096 bits")
+                    || reason.contains("does not sign")
+                    || reason.contains("P-521"),
+                "{name}: {reason}"
+            );
+        }
+        assert_eq!(vault_slot_count(&agent), 0);
     }
 }

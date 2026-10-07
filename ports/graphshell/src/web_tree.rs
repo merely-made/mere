@@ -57,6 +57,14 @@ const CANVAS_RASTER: u64 = 0x7472_6565;
 /// How far an arrow key pans and plus or minus zooms, as the main page does.
 const PAN_STEP: f32 = 42.0;
 const ZOOM_STEP: f32 = 40.0;
+/// The docked "Graph tools" region's width, logical px. The canvas takes the
+/// rest of the row.
+const TOOLS_WIDTH: u32 = 300;
+/// Below this tree width the region collapses to a "Graph tools" toggle that
+/// opens it over the canvas. Docked, the canvas keeps at least 600 px: a
+/// centred node dragged 220 px needs 476, and the fitted fixture spans
+/// about 320.
+const TOOLS_DOCK_MIN_WIDTH: u32 = TOOLS_WIDTH + 600;
 
 const SHEET: &str = "\
     :root { font-family: Roboto, sans-serif; font-size: 14px; color: #dce3e8; background: #070c0f; } \
@@ -65,7 +73,36 @@ const SHEET: &str = "\
     .tree-status { margin: 4px 12px 8px; } \
     .tree-controls { display:flex; gap:6px; padding:6px 12px; flex-wrap:wrap; } \
     .tree-controls button { background:#263640; color:#dce3e8; padding:5px 10px; border:1px solid #637581; } \
-    .tree-canvas { display: block; flex: 1 1 auto; min-height: 0; }";
+    .tree-body { display:flex; flex-direction:row; flex:1 1 auto; min-height:0; position:relative; }     .tools-overlay { position:absolute; top:0; right:0; bottom:0; z-index:10; }     .tools-storage { margin:2px 0 6px; color:#9fb0bb; font-size:12px; } \
+    .tree-graph { display:flex; flex-direction:column; flex:1 1 auto; min-width:0; } \
+    .tree-canvas { display: block; flex: 1 1 auto; min-height: 0; } \
+    .tree-tools { flex:0 0 auto; width:279px; padding:4px 10px; background:#0d161b; border-left:1px solid #2c3b44; overflow-y:auto; min-height:0; } \
+    .tree-tools .disclosure-trigger { display:block; width:100%; text-align:left; font-size:14px; background:transparent; border:none; padding:2px 0 4px; margin:0; } \
+    .tools-cards { margin:2px 0 4px; padding:0 0 0 16px; font-size:12px; color:#dce3e8; } \
+    .tree-tools h2 { font-size:14px; margin:2px 0 4px; } \
+    .tree-tools h3 { font-size:13px; margin:4px 0 2px; } \
+    .tools-section + .tools-section { margin-top:10px; border-top:1px solid #2c3b44; padding-top:4px; } \
+    .tools-switch button[aria-pressed=true] { background:#2d5a63; border-color:#79a9be; } \
+    .tools-active { margin:4px 0; color:#f0dfb8; font-size:12px; } \
+    .tree-tools label { display:block; margin:3px 0; } \
+    .tree-tools .tools-caption { display:block; color:#9fb0bb; font-size:12px; } \
+    .tree-tools button { background:#263640; color:#dce3e8; padding:3px 10px; margin:2px 0 4px; border:1px solid #637581; } \
+    .tools-overlays { display:flex; flex-wrap:wrap; margin:2px 0; } \
+    .tools-overlays label { width:136px; margin:1px 0; } \
+    .tools-overlays label.disabled { opacity:.45; } \
+    .tools-note { margin:2px 0 4px; color:#c9b27c; font-size:12px; } \
+    .tools-status { margin:4px 0; color:#9fb0bb; font-size:12px; } \
+    .select-box { background:#263640; border:1px solid #637581; padding:2px 8px; } \
+    .select-list { background:#17232b; border:1px solid #637581; z-index:20; width:262px; } \
+    .select-option { padding:1px 8px; } \
+    .tree-product { position:absolute;top:112px;left:12px;max-width:360px;z-index:5; } \
+    .tree-product p { margin:4px 0; } \
+    .tree-detail { background:#17232b;border:1px solid #637581;padding:12px; } \
+    .tree-detail label { display:block;margin:8px 0; } \
+    .tree-detail .detail-key { display:block; } \
+    .tree-detail .detail-value { display:block;margin:2px 0 8px;overflow-wrap:anywhere; } \
+    .tree-detail input { display:block;width:280px;height:26px;color:#dce3e8;background:#263640;border:1px solid #637581; } \
+    .tree-product button { background:#263640;color:#dce3e8;padding:5px 10px;border:1px solid #637581; }";
 
 /// What the page, its producer and its hooks share.
 struct Shared {
@@ -81,6 +118,45 @@ struct Shared {
     /// timing marks are written on them.
     gpu: RefCell<Option<(wgpu::Device, wgpu::Queue)>>,
     timing: RefCell<FrameTiming>,
+    physics_config: mere::canvas::ElapsedStepConfig,
+    /// The page's simulation speed and budget, and the frames the receipts read.
+    speed: crate::web_speed::SpeedOptions,
+    pace: RefCell<speed::PaceWindow>,
+    /// The speed reached, under the speed picker while the budget binds.
+    reached: RefCell<crate::web_speed::ReachedNote>,
+    /// The step budget, a share of the measured frame interval.
+    frame_budget: RefCell<crate::web_speed::FrameBudget>,
+    gpu_options: controls::GpuOptions,
+    /// The page's device for the canvas's and the board's repulsion, built
+    /// once from the host's render core on the producer's first frame.
+    physics_device: RefCell<Option<mere::canvas::PhysicsDevice>>,
+    visibility: Option<RefCell<visibility::Visibility>>,
+    /// A released drag's drop point, canvas-local px, until the first frame
+    /// that executes a physics step after the release.
+    release_watch: Cell<Option<(f32, f32)>>,
+    /// The focused node's distance from that drop point on that frame, and
+    /// how many physics steps the frame executed.
+    release_step: Cell<Option<(f32, u32)>>,
+    /// The same drop point in world units, and the same distance in world
+    /// units on that frame, whatever the zoom.
+    release_watch_world: Cell<Option<(f32, f32)>>,
+    release_step_world: Cell<Option<f32>>,
+    /// Where the last scripted press landed, canvas-local px, for the receipt.
+    press_point: Cell<Option<(f32, f32)>>,
+    /// Every recorded release, for the receipt.
+    release_log: RefCell<Vec<String>>,
+    /// Lines `log-physics` recorded, for the receipt.
+    physics_log: RefCell<Vec<String>>,
+    /// The last `measure-faces` reading, for the snapshot.
+    faces: Cell<Option<graphshell::canvas_faces::FaceAlignment>>,
+    /// The remote session (`remote::TreeRemote`); its channel's pumps reach
+    /// it from outside the runner.
+    remote: Rc<RefCell<remote::TreeRemote>>,
+    /// Whether the canvas leaf shows the remote board rather than the graph.
+    remote_shown: Cell<bool>,
+    /// A planted accessibility defect, the receipts' positive control
+    /// (`?plant_a11y=`; dynamics grammar plan, G9). `None` in use.
+    plant: graphshell::canvas_reader::Plant,
 }
 
 impl Shared {
@@ -101,8 +177,27 @@ struct CanvasProducer {
 impl TextureProducer for CanvasProducer {
     fn render(&mut self, cx: &ProducerContext<'_>) -> Option<ProducedTexture> {
         let shared = &self.shared;
+        let visibility_before = visibility::before(shared);
         if shared.gpu.borrow().is_none() {
             *shared.gpu.borrow_mut() = Some((cx.device.clone(), cx.queue.clone()));
+            let options = shared.gpu_options;
+            if options.enabled {
+                // The host's own device, never one of ours: the render core's
+                // handles are the ones every producer on this page draws with.
+                let device = mere::canvas::physics_device_for(&cx.core.renderer().wgpu_device.core)
+                    .with_threshold(options.threshold)
+                    .with_max_stale_steps(options.max_stale_steps);
+                shared
+                    .canvas
+                    .borrow_mut()
+                    .set_physics_device(Some(device.clone()));
+                shared
+                    .remote
+                    .borrow_mut()
+                    .board
+                    .set_physics_device(Some(device.clone()));
+                *shared.physics_device.borrow_mut() = Some(device);
+            }
         }
         let (width, height) = cx.frame.logical_size;
         let size = (
@@ -114,9 +209,73 @@ impl TextureProducer for CanvasProducer {
             canvas.resize(size.0, size.1);
             shared.size.set(size);
         }
+        // The step budget is a share of the display's period, read from the
+        // frames' intervals (ruled 2026-10-04, "Infer the period").
+        let frame_ms = cx
+            .frame
+            .timestamp
+            .map_or_else(now_ms, |timestamp| timestamp.as_secs_f64() * 1000.0);
+        let budget = shared.frame_budget.borrow_mut().frame(frame_ms);
+        canvas.set_physics_step_budget(Some(budget));
         let profile = shared.timing.borrow().active();
+        if shared.remote_shown.get() {
+            // One leaf, the producer picks the scene: the board, mirroring
+            // the canvas's law and speed, ticked once a frame and drawn from
+            // its bodies.
+            let choice = canvas.physics_choice();
+            let speed = canvas.physics_speed();
+            drop(canvas);
+            let scene = {
+                let mut remote = shared.remote.borrow_mut();
+                remote.sync_board(choice, speed);
+                remote.board.set_step_budget(Some(budget));
+                remote.board.tick();
+                let remote = &mut *remote;
+                let empty = mere::canvas::BoardScene::default();
+                let painted = if remote.mounted().is_some() {
+                    remote.board.scene()
+                } else {
+                    &empty
+                };
+                painted.paint_titled(
+                    remote.board.board(),
+                    size.0,
+                    size.1,
+                    remote::BOARD_FIT,
+                    &mut remote.text,
+                )
+            };
+            shared.dirty.set(false);
+            let [physical_width, physical_height] = cx.frame.physical_size;
+            shared.physical_size.set(cx.frame.physical_size);
+            let (texture, view) = cx.core.rasterize_scaled_for(
+                CANVAS_RASTER,
+                &scene,
+                physical_width,
+                physical_height,
+                ColorLoad::Clear(SHELL_CLEAR),
+                cx.frame.layout_scale,
+            );
+            self.texture = Some(texture);
+            self.generation += 1;
+            return Some(ProducedTexture {
+                view,
+                generation: self.generation,
+                alpha: SourceAlpha::Straight,
+                encoding: SourceEncoding::Srgb,
+            });
+        }
         let (scene, moving) = if profile {
-            let (scene, moving, sample) = canvas.frame_profiled(size.0, size.1, now_ms);
+            let (scene, moving, sample) = match cx.frame.timestamp {
+                Some(timestamp) => canvas.frame_profiled_at(
+                    size.0,
+                    size.1,
+                    timestamp,
+                    shared.physics_config,
+                    now_ms,
+                ),
+                None => canvas.frame_profiled(size.0, size.1, now_ms),
+            };
             shared.timing.borrow_mut().stages(
                 mere::canvas::CanvasFrameProfile::STAGES
                     .into_iter()
@@ -130,9 +289,55 @@ impl TextureProducer for CanvasProducer {
             ]);
             (scene, moving)
         } else {
-            canvas.frame(size.0, size.1)
+            match cx.frame.timestamp {
+                Some(timestamp) => {
+                    canvas.frame_at(size.0, size.1, timestamp, shared.physics_config)
+                },
+                None => canvas.frame(size.0, size.1),
+            }
         };
+        if profile && let Some(report) = canvas.elapsed_step_report() {
+            shared.timing.borrow_mut().counts([
+                ("physics_steps", report.steps as usize),
+                (
+                    "physics_discarded_us",
+                    report.discarded_elapsed.as_micros().min(usize::MAX as u128) as usize,
+                ),
+                (
+                    "physics_carried_us",
+                    report.carried_elapsed.as_micros() as usize,
+                ),
+            ]);
+        }
         shared.moving.set(moving);
+        speed::record(shared, &canvas, moving, budget.per_frame);
+        if let Some((x, y)) = shared.release_watch.get()
+            && cx.frame.timestamp.is_some()
+            && canvas.dragging_node().is_none()
+            && let Some(report) = canvas.elapsed_step_report()
+            && report.steps > 0
+        {
+            let focused = canvas.focused_screen_position();
+            let distance = focused.map_or(f32::NAN, |(fx, fy)| (fx - x).hypot(fy - y));
+            let from_press = focused
+                .zip(shared.press_point.get())
+                .map_or(f32::NAN, |((fx, fy), (px, py))| (fx - px).hypot(fy - py));
+            shared.release_step.set(Some((distance, report.steps)));
+            shared.release_step_world.set(
+                canvas
+                    .focused_world_position()
+                    .zip(shared.release_watch_world.get())
+                    .map(|((fx, fy), (wx, wy))| (fx - wx).hypot(fy - wy)),
+            );
+            shared.release_log.borrow_mut().push(format!(
+                "release-step {} {distance:.1} px after {} steps ({from_press:.1} px from the press point, zoom {:.2})",
+                canvas.physics_law().id(),
+                report.steps,
+                canvas.camera().zoom
+            ));
+            shared.release_watch.set(None);
+        }
+        visibility::after(shared, &canvas, visibility_before, cx.frame.timestamp);
         shared.dirty.set(false);
         // Rasterize every requested frame, as the presenter does. A settled
         // layout does not prove the first texture was complete: Vello can need
@@ -163,6 +368,47 @@ impl TextureProducer for CanvasProducer {
             encoding: SourceEncoding::Srgb,
         })
     }
+    fn suspend(&mut self) {
+        self.shared.canvas.borrow_mut().reset_frame_time();
+        self.texture = None;
+    }
+
+    /// While the board is shown, the slot is a list of its cards, each named
+    /// by its title and placed where it is painted. Otherwise it is the
+    /// graph's items on screen, each a group whose drag and pin are buttons
+    /// (dynamics grammar plan, F62, F65 to F67).
+    fn semantics(&mut self) -> Option<cambium_rootstock::ProducerSemantics> {
+        if !self.shared.remote_shown.get() {
+            return Some(graphshell::canvas_reader::describe_canvas(
+                &self.shared.canvas.borrow(),
+                self.shared.plant,
+            ));
+        }
+        let (width, height) = self.shared.size.get();
+        Some(remote::board_semantics(
+            &self.shared.remote.borrow(),
+            width,
+            height,
+        ))
+    }
+
+    /// A reader pressed one of an item's buttons: Pin pins it, Drag starts
+    /// a keyboard move the arrows steer.
+    fn act(&mut self, key: u64, id: &str) -> bool {
+        if self.shared.remote_shown.get() {
+            return false;
+        }
+        let done = graphshell::canvas_reader::canvas_act(
+            &mut self.shared.canvas.borrow_mut(),
+            key,
+            id,
+            self.shared.plant,
+        );
+        if done {
+            self.shared.dirty.set(true);
+        }
+        done
+    }
 }
 
 /// The application state the tree renders.
@@ -173,6 +419,21 @@ pub(crate) struct TreePage {
     nodes: usize,
     /// The address of the node the last click picked.
     picked: Option<String>,
+    product: Option<product::SavedProduct>,
+    /// The "Graph tools" arrangement and physics section.
+    physics: physics::PhysicsPanel,
+    /// Which session the canvas leaf shows.
+    session: remote::Session,
+    /// Which Graph tools sections are open.
+    sections: remote::Sections,
+    /// The open remote draft's field selects.
+    draft: remote::DraftControls,
+    /// The remote generation the view last rebuilt for.
+    remote_seen: u64,
+    /// Whether a remote link has been seen, so its section opens once.
+    remote_link_seen: bool,
+    /// Whether the collapsed Graph tools region is open over the canvas.
+    tools_open: bool,
     /// The tree's logical size, followed from the host each frame. Genet sizes
     /// a custom leaf's cross axis from its intrinsic size and does not stretch
     /// an absolutely placed box between its insets, so the view is told its
@@ -204,6 +465,31 @@ type Logic = fn(&TreePage) -> Child;
 
 fn view(page: &TreePage) -> Child {
     let (width, height) = page.size;
+    // Genet does not stretch a custom leaf across its cross axis, so the
+    // canvas column is told the width the tools region leaves it.
+    let docked = tools_docked(page);
+    let canvas_width = if docked {
+        width.saturating_sub(TOOLS_WIDTH).max(1)
+    } else {
+        width.max(1)
+    };
+    let graph = on_wheel(
+        on_key(
+            on_pointer(
+                custom_leaf::<TreePage, ()>(CANVAS_KEY, canvas_width, 1)
+                    .attr("class", "tree-canvas")
+                    .attr("role", "img")
+                    .attr("aria-label", "Graph"),
+                |page: &mut TreePage, event: cambium::PointerEvent| page.pointer(event),
+            ),
+            |page: &mut TreePage, event: cambium::KeyEvent| {
+                if keys(page, &event.key) {
+                    event.prevent_default();
+                }
+            },
+        ),
+        |page: &mut TreePage, wheel: WheelEvent| page.wheel(wheel),
+    );
     Box::new(
         el(
             "main",
@@ -213,31 +499,87 @@ fn view(page: &TreePage) -> Child {
                     .attr("class", "tree-status")
                     .attr("role", "status"),
                 controls::toolbar(page),
-                on_wheel(
-                    on_key(
-                        on_pointer(
-                            custom_leaf::<TreePage, ()>(CANVAS_KEY, width, 1)
-                                .attr("class", "tree-canvas")
-                                .attr("role", "img")
-                                .attr("aria-label", "Graph"),
-                            |page: &mut TreePage, event: cambium::PointerEvent| page.pointer(event),
-                        ),
-                        |page: &mut TreePage, event: cambium::KeyEvent| {
-                            if keys(&page.shared, &event.key) {
-                                event.prevent_default();
-                            }
+                product::controls(page),
+                el(
+                    "div",
+                    (
+                        el("div", graph).attr("class", "tree-graph"),
+                        if docked {
+                            Some(tools_region(page))
+                        } else {
+                            page.tools_open.then(|| {
+                                Box::new(
+                                    el("div", tools_region(page)).attr("class", "tools-overlay"),
+                                ) as Child
+                            })
                         },
                     ),
-                    |page: &mut TreePage, wheel: WheelEvent| page.wheel(wheel),
-                ),
+                )
+                .attr("class", "tree-body"),
             ),
         )
         .attr("style", format!("width:{width}px;height:{height}px;")),
     )
 }
 
-/// Arrows pan and plus or minus zoom, as on the main page.
-fn keys(shared: &Shared, key: &Key) -> bool {
+/// Whether the Graph tools region docks beside the canvas at this width.
+fn tools_docked(page: &TreePage) -> bool {
+    page.size.0 >= TOOLS_DOCK_MIN_WIDTH
+}
+
+/// The Graph tools region: the storage line on `app=local`, then its sections.
+fn tools_region(page: &TreePage) -> Child {
+    let mut children: Vec<Child> = Vec::new();
+    if let Some(product) = &page.product {
+        children.push(Box::new(
+            el("p", format!("Storage: {}", product.storage))
+                .attr("class", "tools-storage")
+                .attr("role", "status"),
+        ));
+    }
+    children.push(physics::section(page));
+    children.push(remote::section(page));
+    Box::new(
+        el("aside", children)
+            .attr("class", "tree-tools")
+            .attr("aria-label", "Graph tools"),
+    )
+}
+
+/// Arrows pan and plus or minus zoom, as on the main page. During a
+/// keyboard move the arrows nudge the item instead, Enter drops it and
+/// Escape puts it back (F67).
+fn keys(page: &mut TreePage, key: &Key) -> bool {
+    use graphshell::canvas_reader::{MoveKey, key_move};
+    let move_key = match key {
+        Key::Named(NamedKey::ArrowLeft) => Some(MoveKey::Left),
+        Key::Named(NamedKey::ArrowRight) => Some(MoveKey::Right),
+        Key::Named(NamedKey::ArrowUp) => Some(MoveKey::Up),
+        Key::Named(NamedKey::ArrowDown) => Some(MoveKey::Down),
+        Key::Named(NamedKey::Enter) => Some(MoveKey::Drop),
+        Key::Named(NamedKey::Escape) => Some(MoveKey::Back),
+        _ => None,
+    };
+    if let Some(move_key) = move_key
+        && key_move(&mut page.shared.canvas.borrow_mut(), move_key, PAN_STEP)
+    {
+        page.shared.dirty.set(true);
+        return true;
+    }
+    if let Some(product) = &mut page.product {
+        match key {
+            Key::Named(NamedKey::Enter) if product.selected.is_some() => {
+                product.open_detail(&page.shared.canvas.borrow());
+                return true;
+            },
+            Key::Named(NamedKey::Escape) if product.detail_open => {
+                product.detail_open = false;
+                return true;
+            },
+            _ => {},
+        }
+    }
+    let shared = &page.shared;
     let command = match key {
         Key::Named(NamedKey::ArrowLeft) => CanvasCommand::Pan {
             dx: -PAN_STEP,
@@ -317,14 +659,20 @@ async fn boot(root: Element) -> Result<(), String> {
     let width = canvas.client_width().max(1) as u32;
     let height = canvas.client_height().max(1) as u32;
 
-    let (graph, source) = match web_graphs::requested() {
-        Some((nodes, seed)) => (
-            web_graphs::generated(nodes, seed),
-            format!("generated, seed {seed}"),
-        ),
-        None => (fixture_graph()?, "fixture".to_string()),
+    let product = product::open().await?;
+    let (graph, source) = if let Some(product) = &product {
+        (product.graph(), "saved graph".to_string())
+    } else {
+        match web_graphs::requested() {
+            Some((nodes, seed)) => (
+                web_graphs::generated(nodes, seed, web_graphs::links()),
+                format!("generated, seed {seed}"),
+            ),
+            None => (fixture_graph()?, "fixture".to_string()),
+        }
     };
     let nodes = graph.node_count();
+    let speed_options = crate::web_speed::options()?;
     let shared = Rc::new(Shared {
         canvas: RefCell::new(web_graphs::prepared_canvas(graph, width, height)),
         dirty: Cell::new(true),
@@ -333,7 +681,32 @@ async fn boot(root: Element) -> Result<(), String> {
         physical_size: Cell::new([0, 0]),
         gpu: RefCell::new(None),
         timing: RefCell::new(FrameTiming::default()),
+        physics_config: controls::physics_config()?,
+        speed: speed_options,
+        pace: RefCell::new(speed::PaceWindow::default()),
+        reached: RefCell::new(crate::web_speed::ReachedNote::default()),
+        frame_budget: RefCell::new(crate::web_speed::frame_budget(speed_options)),
+        gpu_options: controls::gpu_options()?,
+        physics_device: RefCell::new(None),
+        visibility: visibility::requested()?,
+        release_watch: Cell::new(None),
+        release_step: Cell::new(None),
+        release_watch_world: Cell::new(None),
+        release_step_world: Cell::new(None),
+        press_point: Cell::new(None),
+        release_log: RefCell::new(Vec::new()),
+        physics_log: RefCell::new(Vec::new()),
+        faces: Cell::new(None),
+        remote: Rc::new(RefCell::new(remote::TreeRemote::new())),
+        remote_shown: Cell::new(false),
+        plant: controls::reader_plant()?,
     });
+    crate::web_speed::apply(
+        &mut shared.canvas.borrow_mut(),
+        shared.speed,
+        &shared.frame_budget.borrow(),
+    );
+    visibility::install(&shared, &document)?;
     let options = HostOptions {
         title: "Graphshell, one tree".into(),
         netrender: Box::new(|| NetrenderOptions {
@@ -345,6 +718,7 @@ async fn boot(root: Element) -> Result<(), String> {
         ..Default::default()
     };
     let page_shared = shared.clone();
+    let physics = physics::PhysicsPanel::new(&shared.canvas.borrow(), web_graphs::LAYOUT);
     let mounted = mount(
         canvas,
         options,
@@ -354,6 +728,14 @@ async fn boot(root: Element) -> Result<(), String> {
                 source,
                 nodes,
                 picked: None,
+                product,
+                physics,
+                tools_open: false,
+                session: remote::Session::Local,
+                sections: remote::Sections::default(),
+                draft: remote::DraftControls::default(),
+                remote_seen: 0,
+                remote_link_seen: false,
                 size: (width, height),
             },
             logic: view as Logic,
@@ -400,6 +782,54 @@ fn hooks(shared: Rc<Shared>) -> HostHooks<TreePage, Logic, Child> {
     let after_shared = shared.clone();
     HostHooks {
         frame: Box::new(move |ctx| {
+            if ctx
+                .runner
+                .state()
+                .product
+                .as_ref()
+                .is_some_and(|product| product.ready())
+            {
+                ctx.runner.update(|page| {
+                    if let Some(product) = &mut page.product {
+                        product.poll(&mut frame_shared.canvas.borrow_mut());
+                    }
+                });
+                frame_shared.dirty.set(true);
+            }
+            // The remote session moves outside the runner (its channel's
+            // pumps); rebuild the view when it has.
+            let (generation, linked) = {
+                let remote = frame_shared.remote.borrow();
+                (remote.generation, remote.live.is_some())
+            };
+            if ctx.runner.state().remote_seen != generation {
+                ctx.runner.update(|page| {
+                    page.remote_seen = generation;
+                    // The section starts closed and opens when a link exists.
+                    if linked && !page.remote_link_seen {
+                        page.remote_link_seen = true;
+                        page.sections.remote.expanded = true;
+                    }
+                });
+            }
+            // A stop that returned anchored items (G7, F24) starts its own.
+            if ctx.runner.state().physics.transition.is_some()
+                || frame_shared.canvas.borrow().has_stop_return()
+            {
+                ctx.runner.update(|page| page.advance_arrangement(now_ms()));
+            }
+            // The speed picker applies when chosen ("Speed select"), and the
+            // speed reached shows beneath it while the budget binds.
+            if ctx.runner.state().physics.speed_pending() {
+                ctx.runner.update(TreePage::apply_speed);
+            }
+            let (note, changed) = frame_shared
+                .reached
+                .borrow_mut()
+                .update(&frame_shared.canvas.borrow());
+            if changed {
+                ctx.runner.update(|page| page.physics.speed_note = note);
+            }
             let size = (
                 ctx.logical_size.0.round().max(1.0) as u32,
                 ctx.logical_size.1.round().max(1.0) as u32,
@@ -446,7 +876,7 @@ fn hooks(shared: Rc<Shared>) -> HostHooks<TreePage, Logic, Child> {
         }),
         after_wake: Box::new(|_ctx| {}),
         close_request: Box::new(|_ctx, _request| CloseDisposition::KeepVisible),
-        focused_text: Box::new(|_runner| None),
+        focused_text: Box::new(product::focused_text),
         key_intercept: Box::new(|_runner, _press| false),
     }
 }
@@ -461,6 +891,8 @@ pub(crate) fn run(text: &str) -> Result<(), String> {
             shared,
             errors: Vec::new(),
             pointer: None,
+            drop: None,
+            drop_world: None,
         },
         Some(taproot::Scenario::parse(text).map_err(|e| e.to_string())?),
         None,
@@ -479,7 +911,7 @@ pub(crate) fn run(text: &str) -> Result<(), String> {
 }
 
 /// Write the receipt where `loader.js` collects it, and say the run is done.
-fn publish(ok: bool, text: &str, shared: &Shared) {
+fn publish(ok: bool, text: &str, shared: &Shared, saved: Option<serde_json::Value>) {
     let result = if ok { "ok" } else { "fail" };
     // The sink writes its own RESULT line from `result`.
     let log: Vec<&str> = text.lines().skip(1).collect();
@@ -489,6 +921,7 @@ fn publish(ok: bool, text: &str, shared: &Shared) {
         "timings": shared.timing.borrow().json(),
         "canvas_logical_size": shared.size.get(),
         "canvas_physical_size": shared.physical_size.get(),
+        "saved_graph": saved,
     });
     let outcome = super::document().and_then(|document| {
         if let Ok(element) = web_scenario::page_element(&document, "scenario-log") {
@@ -509,4 +942,14 @@ fn publish(ok: bool, text: &str, shared: &Shared) {
 
 mod controls;
 mod lane;
+mod physics;
+mod product;
+mod remote;
+mod speed;
+mod visibility;
+
+/// Join a host over WebRTC as the tree's remote session (`?signal=`).
+pub(crate) fn connect_remote(signal_url: String, invite: Option<String>) -> Result<(), String> {
+    remote::connect(signal_url, invite)
+}
 use lane::TreeLane;

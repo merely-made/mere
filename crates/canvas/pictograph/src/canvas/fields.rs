@@ -190,6 +190,7 @@ impl Canvas {
         };
         let (cx, cy) = ((min_x + max_x) / 2.0, (min_y + max_y) / 2.0);
         // screen = world * zoom + offset; put the field's center at the viewport center.
+        self.follow = false;
         self.camera.offset.0 = self.view_w as f32 / 2.0 - cx * self.camera.zoom;
         self.camera.offset.1 = self.view_h as f32 / 2.0 - cy * self.camera.zoom;
         self.hidden_fields.remove(&id);

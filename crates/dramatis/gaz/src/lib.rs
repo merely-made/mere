@@ -83,7 +83,8 @@
 //! Muniment exist. Enable `muniment` for its `persistence` module, and let the host
 //! choose its backend and codec; Castellan/Pandect supply host sealing. Enable
 //! `jscontact` for public persona cards, unverified peer imports and explicit
-//! private backups. Resolver intake remains in the founding plan in `design_docs/`.
+//! private backups. `intake` adds unverified resolver addresses without replacing
+//! local state. Checked key/PLC intake and live host wiring remain in the founding plan.
 
 #![warn(missing_docs)]
 
@@ -92,6 +93,7 @@ pub mod book;
 pub mod contact;
 pub mod endpoint;
 pub mod handle;
+pub mod intake;
 #[cfg(feature = "jscontact")]
 pub mod jscontact;
 #[cfg(feature = "muniment")]

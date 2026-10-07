@@ -12,6 +12,7 @@ categories = ["visualization", "algorithms"]
 
 [dependencies]
 sceno = { version = "0.0.4", path = "../sceno" }
+scenograph = { version = "0.0.4", path = "../scenograph" }
 # The registry's capability records serialize, and a custom arrangement's
 # config is the opaque `serde_json::Value` the score already carries.
 serde = { version = "1.0.219", features = ["derive"] }

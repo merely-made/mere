@@ -120,7 +120,7 @@ impl ProbeConfig {
                 {
                     return Err("reference_tolerance must be finite and greater than zero");
                 }
-            }
+            },
             WorkloadKind::DecoderGeneration => {
                 if self.max_tokens.is_none_or(|tokens| tokens == 0) {
                     return Err("decoder max_tokens must be greater than zero");
@@ -131,7 +131,7 @@ impl ProbeConfig {
                 if self.expected_text.as_ref().is_none_or(String::is_empty) {
                     return Err("decoder expected_text must not be empty");
                 }
-            }
+            },
         }
         if self.mode == RunMode::Warm && self.manifest_id.is_none() {
             return Err("a warm run requires manifest_id");
@@ -647,7 +647,7 @@ mod worker {
                 drop(tokenizer_bytes);
                 drop(weight_bytes);
                 (manifest_id, hashes, fetched_config_size)
-            }
+            },
             RunMode::Warm => {
                 post_state("reopening", "resolving the prior manifest from IndexedDB")?;
                 let text = config
@@ -660,7 +660,7 @@ mod worker {
                     .clone()
                     .ok_or_else(|| "warm run omitted expected_hashes".to_string())?;
                 (ManifestId::from_hash(hash), expected, 0)
-            }
+            },
         };
 
         post_state("verifying", "resolving and hashing every stored component")?;
@@ -690,7 +690,9 @@ mod worker {
         // Burn's synchronous WGPU constructor is appropriate on native hosts,
         // but browser adapter/device creation is promise-backed. Initializing
         // it synchronously traps in wasm before the first tensor upload.
-        let device = Device::wgpu_options().init_async().await
+        let device = Device::wgpu_options()
+            .init_async()
+            .await
             .map_err(|error| error.to_string())?;
         let (model_load_ms, first_execution_ms, repeat_execution_ms, execution) =
             match config.workload {
@@ -803,7 +805,7 @@ mod worker {
                             diagnostic_trace,
                         },
                     )
-                }
+                },
                 WorkloadKind::DecoderGeneration => {
                     post_state(
                         "loading",
@@ -874,7 +876,7 @@ mod worker {
                             diagnostic_trace: None,
                         },
                     )
-                }
+                },
             };
 
         let report = WorkerRunReport {
@@ -906,6 +908,13 @@ mod worker {
         Ok(report)
     }
 
+    /// The module's start: pre.4 CubeCL's static constructors, once, before
+    /// any other Rust code (burn migration plan 13.33; rulings 532, 533, 536).
+    #[wasm_bindgen(start)]
+    pub fn start() {
+        cambium_genet_web_host::run_static_constructors_once();
+    }
+
     /// Ask the active decoder generation to stop before its next token is
     /// delivered to the observer.
     #[wasm_bindgen]
@@ -926,7 +935,7 @@ mod worker {
             Err(error) => {
                 let _ = post_state("failed", &error);
                 Err(JsValue::from_str(&error))
-            }
+            },
         }
     }
 }

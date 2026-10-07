@@ -2,12 +2,16 @@
 
 **Date:** 2026-09-23
 
-**Status:** in progress, 2026-09-23. C1-C3's clear-cut moves are landed and
-pushed. Mark ruled every open question the same day (see Rulings): C4's folds
-are in progress in this session, insigne's delegation split is the dramatis
-session's (phase A landed 2026-09-24 as `5364dfa0`; phases B to D follow in
-the [insigne proofs plan](../../dramatis_docs/implementation_strategy/2026-09-23_insigne_proofs_plan.md)),
-and chatelaine waits on a CXF-shaped taxonomy.
+**Status (2026-10-06):** C1 to C4 and C2a have landed (C2a's T1 to T5 by
+`8167d196`, C4's last fold `cambium::nematic` on 2026-09-25). insigne's
+phases A to D have landed (A `5364dfa0`, B `538226a3`; C in Mere and Knot and
+D in Gaz on 2026-09-29, per the
+[insigne proofs plan](../../archive_docs/2026-10-06_completed_plans/2026-09-23_insigne_proofs_plan.md)),
+and chatelaine's P1 to P3 (`da3c50bc`, `3e4992ec`, `ff68e86c`, by 2026-10-02),
+which meets C5's conditions. Open: C5's version baseline; C6's crates.io
+deletions, which are Mark's; and the dramatis facade (C2's dramatis row,
+unbuilt). Mark's rulings sit under "The ruling this serves" and in the C4
+table.
 
 ## The ruling this serves
 
@@ -47,10 +51,10 @@ the direction that makes no dependency cycle.
 | `mere-athanor` | the furnace passes: forgetting, image cleanup, consolidation, retirement | `pandect::athanor` | landed `1bda73d5` |
 | `mere-alembic` | the three memory levels, behind its `recall` feature | `pandect::memory_levels` | landed `1bda73d5` |
 | `mien` | standing (event grammar, ledger, persona chains and vault, gate, wire, store) and the composite reputation lens | `gemot::moot::standing`, `moothold::concord` | landed `a1551086` |
-| `chatelaine` | the secret-item taxonomy, shaped against CXF's credential kinds | castellan's secret-free OTP item types, once the taxonomy exists | ruled: design first |
-| `insigne` | presentable proofs: typed keys, delegation certificates and revocations, derived-key attestations | gaz's `TypedKey`; personae's delegation data types | `TypedKey` landed `0f3f854f`; the delegation types landed `5364dfa0` (insigne proofs plan, phase A); phases B to D open (dramatis session) |
-| `tabard` | theme and stylesheet authoring over tinct, illume and CSS | registry's theme module, the smolweb palettes, Pelt's theme persistence | ruled 2026-09-24; see C2a |
-| `dramatis` | the tier facade | none misplaced | nothing to move |
+| `chatelaine` | the secret-item taxonomy, shaped against CXF's credential kinds | castellan's secret-free OTP item types (`OtpItemId`, the `OtpItem` read model), once the taxonomy exists | ruled: design first; shape ruled 2026-10-01 (plain taxonomy, no secret bytes, storage or crypto; CXF import policy for all 17 types), unbuilt. **Corrected 2026-10-06 (S14 pass):** landed: the chatelaine plan's P1 to P3 (`da3c50bc`, `3e4992ec`, `ff68e86c`, by 2026-10-02) |
+| `insigne` | presentable proofs: typed keys, delegation certificates and revocations, derived-key attestations | gaz's `TypedKey`; personae's delegation data types | `TypedKey` landed `0f3f854f`; the delegation types landed `5364dfa0` (insigne proofs plan, phase A); phases B to D open (dramatis session). **Corrected 2026-10-06 (S14 pass):** landed: phase B `538226a3` (2026-09-26), C in Mere and Knot and D in Gaz (2026-09-29, insigne proofs plan) |
+| `tabard` | theme and stylesheet authoring over tinct, illume and CSS | registry's theme module, the smolweb palettes, Pelt's theme persistence | ruled 2026-09-24; see C2a. **Corrected 2026-10-06 (S14 pass):** landed: C2a's T1 to T5 (`63808506` to `8167d196`, 2026-09-24) |
+| `dramatis` | the tier facade | none misplaced | nothing to move; ruled 2026-10-01 a real facade re-exporting personae, insigne and gaz for repos outside mere, unbuilt |
 | `mere-apparatus` | shared diagnostics: bounded observations beneath product-owned views | renderer-independent store and optional Mesquite attachment; projection skeleton retained; product state and redaction stay local | Core published at Mere `ca2351b3`; focused gates pass. Redshank's real save-worker pilot at Woodshed `a57085b` passes 63 desktop tests and bounded native receipts. Turnstone `d6b62ad` passes the sealed-graph 612-test workspace gate with nine ignores, focused participant/UI checks and final native migration/restart with bounded loss. See the [diagnostics design](2026-06-08_system_diagnostics_and_accessibility_plan.md). Exact presented frame, broader worker qualification and human AT remain open |
 
 *Done when:* every row is landed, ruled out by Mark, or found to have
@@ -179,7 +183,7 @@ Ruled by Mark 2026-09-23:
 | `mere-canvas`, `mere-signals` | fold into `pictograph`, not the reverse; canvas becomes `pictograph::canvas` and the mere facade keeps exposing it at `mere::canvas`, so consumer paths do not change | landed: features `canvas` and `signals` on pictograph |
 | `scenograph` | stays a crate: its scene editing is useful beyond graphshell | ruled out |
 | `tabard` | stays a crate: the named home for theme and stylesheet authoring (C2) | ruled out |
-| `cambium-nematic` | fold into `cambium` as feature `nematic` (ruled 2026-09-25): no host took its views, since Pelt, Turnstone and Signalman read smolweb through document-lanes' engine-native lane | landed: `cambium::nematic` |
+| `cambium-nematic` | fold into `cambium` as feature `nematic` (ruled 2026-09-25): no host took its views, since Pelt, Turnstone and Signalman read smolweb through document-lanes' engine-native lane | landed: `cambium::nematic`. **Annotated 2026-10-06:** the feature and its views were removed under ruling S66 ([smolweb fidelity plan](../../nematic_docs/implementation_strategy/2026-07-01_smolweb_fidelity_plan.md) WS4, R0) |
 
 *Done when:* each ruled fold has landed with its tests and gates.
 
@@ -367,3 +371,31 @@ crate inventory at the Code root.
   conclusion or a `CheckFault`, and `verify() -> bool` is gone. insigne's
   API is settled, which meets the C5 baseline's insigne condition. Of the
   dramatis tier, chatelaine's CXF-shaped taxonomy remains.
+- 2026-10-01. Mark ruled the shapes of the two remaining dramatis
+  reservations, recorded with the evidence in the
+  [dramatis tier architecture](../../dramatis_docs/technical_architecture/2026-09-30_dramatis_tier_architecture.md)
+  §7. chatelaine is a plain taxonomy like insigne's core, and castellan's OTP
+  read model moves in; its CXF import policy is ruled for all 17 types.
+  dramatis is a real facade for repos outside mere. Both are unbuilt. C5's
+  baseline still waits on chatelaine's taxonomy landing (C5, above); with
+  its shape ruled, that condition is now buildable rather than waiting on
+  design. The facade is not a C5 condition.
+- 2026-10-01, later. The
+  [chatelaine and CXF plan](../../dramatis_docs/implementation_strategy/2026-10-01_chatelaine_cxf_plan.md)
+  is drafted. Mark ruled that chatelaine subsumes castellan's Secret Service
+  store as part of founding (its ruling 17), so C5's chatelaine condition is
+  met at that plan's P3: the taxonomy, OTP on it, and the Secret Service on
+  it, with a Linux `secret-tool` receipt. CXF import (P4 onward) is not a C5
+  condition.
+- 2026-10-02. **C5's chatelaine condition is met.** The chatelaine plan's P1
+  to P3 landed on `main` (`da3c50bc`, `3e4992ec`, `ff68e86c`): the taxonomy,
+  OTP on it, and the Secret Service on it, with the ThinkPad's `secret-tool`
+  receipt passing natively. chatelaine has its real contents for its one
+  publish at the baseline; castellan now depends on it, so chatelaine
+  publishes first.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_35_s14_phase_a1.md; the status records C1 to C4,
+  C2a, insigne A to D and chatelaine P1 to P3 landed, with C5's baseline,
+  C6's deletions and the dramatis facade open, and the C2 table's
+  chatelaine, insigne and tabard rows are annotated as landed.

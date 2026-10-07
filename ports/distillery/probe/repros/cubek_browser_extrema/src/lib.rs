@@ -28,7 +28,7 @@ pub struct ExtremaReceipt {
 
 #[cfg(target_arch = "wasm32")]
 mod browser {
-    use burn::tensor::{Device, DeviceKind, Tensor};
+    use burn::tensor::{Device, Tensor};
     use wasm_bindgen::prelude::*;
 
     use super::{ExtremaReceipt, ScalarReceipt};
@@ -79,7 +79,9 @@ mod browser {
 
     #[wasm_bindgen]
     pub async fn run_extrema_repro() -> Result<String, JsValue> {
-        let device = Device::wgpu_options().init_async().await
+        let device = Device::wgpu_options()
+            .init_async()
+            .await
             .map_err(|error| JsValue::from_str(&error.to_string()))?;
         let finite_max = classify(max(&[-3.0, 2.0, -1.0], &device).await?, 2.0);
         let negative_infinity_max = classify(

@@ -43,6 +43,8 @@ insigne = { workspace = true, features = ["verify"] }
 # HMAC + the three hashes RFC 6238 allows. RustCrypto, and sha2 is already a
 # workspace pin, so this adds one lineage rather than three.
 base64.workspace = true
+# The secret-free item taxonomy; the OTP display enums are defined there.
+chatelaine.workspace = true
 hmac = "0.13"
 notochord.workspace = true
 personae.workspace = true
@@ -69,11 +71,23 @@ zbus = { version = "5.19", default-features = false, features = ["tokio"], optio
 
 [dev-dependencies]
 gaz = { workspace = true, features = ["muniment"] }
+gazette.workspace = true
 muniment = { workspace = true, features = ["postcard", "redb"] }
 pollster = "0.4"
+# The read-model tests serialize chatelaine values to look for secrets.
+serde_json.workspace = true
 tempfile = "3"
 # The moved authority tests exercise the real SSH agent session and, on
 # Windows, the named-pipe wire.
 tokio = { version = "1", features = ["rt-multi-thread", "macros", "time", "net", "process"] }
 # The moved authority tests verify real signatures off the agent wire.
 signature = "2"
+
+# Vault lock ruling 6's no-residue instrument over the resident's lock path
+# (L2). Personae's tracker installs its own global allocator, so this runs
+# outside libtest's harness, on one thread.
+[[test]]
+name = "no_residue"
+path = "tests/no_residue.rs"
+harness = false
+required-features = ["keeper"]

@@ -68,6 +68,7 @@ pub mod passphrase_root;
 pub mod passphrase_storage;
 mod profile_wire;
 mod provider;
+mod retained;
 pub mod roster;
 pub mod seal;
 pub mod sealed_profile_storage;
@@ -80,10 +81,14 @@ pub mod ssh_ca;
 pub mod ssh_face;
 #[cfg(feature = "ssh")]
 pub mod ssh_krl;
+#[cfg(feature = "agent")]
+pub mod ssh_sign;
 #[cfg(feature = "ssh")]
 pub mod ssh_slot;
 pub mod startup_unlock;
+pub mod unlock;
 pub mod vault;
+mod zeroizing_json;
 
 pub use crate::error::IdentityError;
 pub use crate::keypair::{Ed25519Keypair, Ed25519PublicKey, Ed25519Signature};
@@ -95,6 +100,7 @@ pub use crate::passphrase_storage::PassphraseEncryptedStorage;
 pub use crate::provider::{
     AttestationKeys, IdentityProvider, InMemoryProvider, SealedIdentityProvider,
 };
+pub use crate::retained::RetainedKeys;
 pub use crate::roster::{OpenedVault, Roster, RosterEntry, open_shared};
 pub use crate::seal::{seal_bytes, unseal_bytes};
 pub use crate::sealed_profile_storage::SealedProfileStorage;
@@ -103,9 +109,10 @@ pub use crate::startup_unlock::{
     StartupUnlockMode, auto_unlock_backend_available, load_existing_auto_unlock_root,
     load_or_create_auto_unlock_root,
 };
+pub use crate::unlock::{OsPresence, UnlockMethod, UnlockMethods};
 pub use crate::vault::{
     CredentialLineage, IdentitySlot, IdentityStorage, IdentityVault, InMemoryStorage, Profile,
-    ProfileId, ProfileSummary, ProtocolKey, SecretBytes, UnlockTier,
+    ProfileId, ProfileSummary, ProtocolKey, PublicProfile, SecretBytes, SlotSummary, UnlockTier,
 };
 
 /// Identity of a persona — the user's mode-scoped identity boundary.

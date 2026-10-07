@@ -31,7 +31,10 @@ use numen::{
 };
 use rapier2d::prelude::*;
 
-use crate::{Force, ForceContext};
+use crate::{
+    Class, Currency, Declared, Force, ForceContext, Kernel, Layout, Observable, State, Term,
+    Topology,
+};
 
 /// A [`numen::Coupling`] compiled to a [`Force`]: evaluate the field at each
 /// target node's position and apply the response.
@@ -173,7 +176,11 @@ impl Force for CouplingForce {
                 let Some(field) = self.vector() else { return };
                 for (handle, x, y) in samples {
                     let (vx, vy) = eval_vector(field, &self.registry, x, y, 0.0);
-                    if let Some(body) = ctx.bodies.get_mut(handle) {
+                    // A pinned (kinematic) body belongs to the drag; writing
+                    // its translation would overwrite its kinematic target.
+                    if let Some(body) = ctx.bodies.get_mut(handle)
+                        && body.is_dynamic()
+                    {
                         let t = body.translation();
                         let next = t + Vector::new(vx, vy) * (self.strength * dt);
                         body.set_translation(next, true);
@@ -185,6 +192,61 @@ impl Force for CouplingForce {
             // The consumer that owns the family acts on them elsewhere.
             CouplingResponse::Open { .. } => {},
         }
+    }
+}
+
+/// Gradient responses (attract, repel, the wall) are E over the field's
+/// potential; the damping, alignment and advection responses write state
+/// (K). The open tail applies nothing, so it declares nothing.
+impl Declared for CouplingForce {
+    fn terms(&self) -> Vec<Term> {
+        let field = |class| {
+            Term::force(
+                "coupling",
+                Topology::Unary,
+                Kernel::Field,
+                class,
+                Observable::Residual,
+            )
+        };
+        match &self.response {
+            CouplingResponse::AttractToMin
+            | CouplingResponse::RepelFromMax
+            | CouplingResponse::ContainmentWall => vec![field(Class::E)],
+            CouplingResponse::DampenInside { .. } | CouplingResponse::AlignVelocity => {
+                vec![field(Class::K).moving(State::Velocity, Currency::Kinematic)]
+            },
+            CouplingResponse::FlowAdvect => {
+                vec![field(Class::K).moving(State::Position, Currency::Kinematic)]
+            },
+            CouplingResponse::Open { .. } => Vec::new(),
+        }
+    }
+
+    /// `∓s·φ` for attract and repel, `−(s/2)·φ²` inside the wall.
+    fn energy(&self, _term: usize, layout: &Layout<'_>) -> Option<f64> {
+        let scalar = self.scalar()?;
+        let s = f64::from(self.strength);
+        let at = |i: usize| {
+            let p = layout.nodes[i].1;
+            f64::from(eval_scalar(scalar, &self.registry, p.x, p.y, 0.0))
+        };
+        let targets: Vec<usize> = {
+            let index = layout.index();
+            self.targets
+                .iter()
+                .filter_map(|k| index.get(k).copied())
+                .collect()
+        };
+        let per_node: Box<dyn Fn(f64) -> f64> = match self.response {
+            CouplingResponse::AttractToMin => Box::new(move |phi| s * phi),
+            CouplingResponse::RepelFromMax => Box::new(move |phi| -s * phi),
+            CouplingResponse::ContainmentWall => {
+                Box::new(move |phi: f64| if phi > 0.0 { -0.5 * s * phi * phi } else { 0.0 })
+            },
+            _ => return None,
+        };
+        Some(targets.into_iter().map(|i| per_node(at(i))).sum())
     }
 }
 
@@ -304,6 +366,38 @@ mod tests {
         assert!(
             (sim.position_of(a).unwrap() - p0).length() < 1.0e-3,
             "an open-tail response must apply no force"
+        );
+    }
+
+    #[test]
+    fn flow_advect_leaves_a_pinned_body_at_its_kinematic_target() {
+        // FlowAdvect writes positions; a pinned (kinematic) body belongs to
+        // the drag, so it stays on its target while a free one is advected.
+        let mut g = Nodes::default();
+        let pinned = g.at(0.0, 0.0);
+        let free = g.at(100.0, 0.0);
+        let mut sim = Simulation::new();
+        g.sync(&mut sim);
+        sim.add_force(CouplingForce::new(
+            CouplingResponse::FlowAdvect,
+            1.0,
+            [pinned, free],
+            FieldDefinition::Vector(VectorField::ConstVec { x: 120.0, y: 0.0 }),
+        ));
+        let target = Point2D::new(-200.0, 50.0);
+        sim.pin(pinned, target);
+        let free_start = sim.position_of(free).unwrap();
+        for _ in 0..60 {
+            sim.tick(1.0 / 60.0);
+        }
+        let held = sim.position_of(pinned).unwrap();
+        assert!(
+            (held - target).length() < 1e-3,
+            "the pinned body left its target: {held:?}"
+        );
+        assert!(
+            sim.position_of(free).unwrap().x > free_start.x + 10.0,
+            "the free body is still advected"
         );
     }
 }

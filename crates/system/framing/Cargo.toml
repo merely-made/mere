@@ -1,0 +1,16 @@
+[package]
+name = "mere-framing"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish = true
+description = "A magic-and-version header for stored and sent postcard records."
+
+[lib]
+name = "framing"
+path = "src/lib.rs"
+
+[dependencies]
+postcard = { version = "1", features = ["alloc"] }
+serde = "1"

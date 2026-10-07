@@ -4,22 +4,33 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
+//! The Secret Service projected from a persona's item store (ruling 17).
+//!
+//! A collection is a chatelaine collection in the persona's index, its
+//! members and the aliases beside it (ruling 46). An item is a chatelaine
+//! item holding one `Secret` credential: its label is the item's title, its
+//! content type and lookup attributes are the credential's metadata, and its
+//! bytes are the credential's sealed payload. Listing, search and every
+//! property read are metadata reads; only [`SecretServiceStore::secret`]
+//! opens a payload, by exercising it. A secret is replaced copy-on-write
+//! (ruling 48), so a replace never tears.
+
 use std::collections::BTreeMap;
 use std::fmt;
-use std::sync::{Arc, Mutex};
 
-use personae::{IdentityError, PersonaId, SealedRecordChange, SealedRecordStorage};
+use chatelaine::{
+    CollectionId, Credential, CredentialId, CredentialKind, Item, ItemId, ItemState, Link,
+};
+use personae::{IdentityError, PersonaId};
 use serde::{Deserialize, Serialize};
 use zeroize::Zeroize;
 #[cfg(any(test, target_os = "linux"))]
 use zeroize::Zeroizing;
 
-const RECORD_VERSION: u8 = 1;
-const RECORD_DIRECTORY: &str = "castellan/secret-service/v1";
+use crate::items::{ItemStore, ItemStoreError, Payload, StoredIndex, Transaction, random_id_bytes};
 
-mod persistence;
-
-use persistence::{StoredCollection, StoredItem};
+mod collections;
+mod validate;
 
 /// Resource limits applied before any Secret Service value reaches storage.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -54,57 +65,67 @@ impl Default for SecretServiceLimits {
     }
 }
 
-/// Stable identifier for one Secret Service collection.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
-pub struct SecretCollectionId(uuid::Uuid);
+/// Stable identifier for one Secret Service collection: its chatelaine
+/// collection's id.
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+pub struct SecretCollectionId(CollectionId);
 
 impl SecretCollectionId {
     fn mint() -> Self {
-        Self(uuid::Uuid::new_v4())
+        Self(CollectionId::from_random(random_id_bytes()))
     }
 
     /// Recover an identifier from a D-Bus object-path UUID.
     pub fn from_uuid(id: uuid::Uuid) -> Self {
-        Self(id)
+        Self(CollectionId::from_bytes(id.into_bytes()))
     }
 
     /// Return the UUID used in the D-Bus object path.
     pub fn as_uuid(self) -> uuid::Uuid {
-        self.0
+        uuid::Uuid::from_bytes(*self.0.as_bytes())
     }
 }
 
-impl fmt::Display for SecretCollectionId {
-    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
-        self.0.fmt(formatter)
-    }
-}
-
-/// Stable identifier for one Secret Service item.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
-pub struct SecretItemId(uuid::Uuid);
+/// Stable identifier for one Secret Service item: its chatelaine item's id.
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+pub struct SecretItemId(ItemId);
 
 impl SecretItemId {
-    fn mint() -> Self {
-        Self(uuid::Uuid::new_v4())
-    }
-
     /// Recover an identifier from a D-Bus object-path UUID.
     pub fn from_uuid(id: uuid::Uuid) -> Self {
-        Self(id)
+        Self(ItemId::from_bytes(id.into_bytes()))
     }
 
     /// Return the UUID used in the D-Bus object path.
     pub fn as_uuid(self) -> uuid::Uuid {
-        self.0
+        uuid::Uuid::from_bytes(*self.0.as_bytes())
     }
 }
 
-impl fmt::Display for SecretItemId {
-    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
-        self.0.fmt(formatter)
-    }
+/// Both ids print as their bare UUID, as they did before P3, so policy and
+/// error text keep their form.
+macro_rules! uuid_text {
+    ($name:ident) => {
+        impl fmt::Display for $name {
+            fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+                self.as_uuid().fmt(formatter)
+            }
+        }
+
+        impl fmt::Debug for $name {
+            fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+                write!(
+                    formatter,
+                    concat!(stringify!($name), "({:?})"),
+                    self.as_uuid()
+                )
+            }
+        }
+    };
 }
+
+uuid_text!(SecretCollectionId);
+uuid_text!(SecretItemId);
 
 /// Secret-free collection metadata exposed through D-Bus properties.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -181,9 +202,12 @@ pub enum SecretServiceError {
     /// A sealed record was created by an unsupported format.
     #[error("unsupported Secret Service record version {0}")]
     UnsupportedRecordVersion(u8),
-    /// Stored catalog state names an absent child record.
+    /// Stored records disagree with one another.
     #[error("Secret Service catalog is inconsistent: {0}")]
     InconsistentCatalog(String),
+    /// The item store refused a record, such as one filed for another persona.
+    #[error("Secret Service item store: {0}")]
+    Items(ItemStoreError),
     /// A caller-provided value exceeds the configured resident limits.
     #[error("Secret Service input exceeds configured limit: {0}")]
     Limit(&'static str),
@@ -192,33 +216,39 @@ pub enum SecretServiceError {
     InvalidText(&'static str),
 }
 
+impl From<ItemStoreError> for SecretServiceError {
+    fn from(error: ItemStoreError) -> Self {
+        match error {
+            ItemStoreError::Storage(error) => Self::Storage(error),
+            ItemStoreError::Locked => Self::Storage(IdentityError::Locked),
+            ItemStoreError::UnsupportedRecordVersion(version) => {
+                Self::UnsupportedRecordVersion(version)
+            },
+            ItemStoreError::ItemNotFound(id) => Self::ItemNotFound(SecretItemId(id)),
+            ItemStoreError::CollectionNotFound(id) => {
+                Self::CollectionNotFound(SecretCollectionId(id))
+            },
+            ItemStoreError::Inconsistent(detail) => Self::InconsistentCatalog(detail),
+            other => Self::Items(other),
+        }
+    }
+}
+
 /// Persona-scoped Secret Service collections held by one resident authority.
 #[derive(Clone)]
 pub struct SecretServiceStore {
-    storage: SealedRecordStorage,
-    persona: PersonaId,
+    items: ItemStore,
     limits: SecretServiceLimits,
-    transaction: Arc<Mutex<()>>,
 }
 
 impl SecretServiceStore {
-    pub(crate) fn new(
-        storage: SealedRecordStorage,
-        persona: PersonaId,
-        limits: SecretServiceLimits,
-        transaction: Arc<Mutex<()>>,
-    ) -> Self {
-        Self {
-            storage,
-            persona,
-            limits,
-            transaction,
-        }
+    pub(crate) fn new(items: ItemStore, limits: SecretServiceLimits) -> Self {
+        Self { items, limits }
     }
 
     /// Persona whose collections this store serves.
     pub fn persona(&self) -> PersonaId {
-        self.persona
+        self.items.persona()
     }
 
     #[cfg(any(test, target_os = "linux"))]
@@ -226,165 +256,43 @@ impl SecretServiceStore {
         self.limits
     }
 
-    /// Ensure and return the collection behind the conventional `default` alias.
-    pub fn ensure_default_collection(
-        &self,
-        label: &str,
-        unix_secs: u64,
-    ) -> Result<SecretCollection, SecretServiceError> {
-        self.validate_name(label, "collection label")?;
-        let _guard = self.lock();
-        let catalog = self.load_catalog()?;
-        if let Some(id) = catalog.aliases.get("default").copied() {
-            return self.require_collection(id);
-        }
-        self.create_collection_locked(label, Some("default"), unix_secs)
-    }
-
-    /// Return every collection in stable identifier order.
-    pub fn collections(&self) -> Result<Vec<SecretCollection>, SecretServiceError> {
-        let _guard = self.lock();
-        self.load_catalog()?
-            .collections
-            .into_iter()
-            .map(|id| self.require_collection(id))
-            .collect()
-    }
-
-    /// Read one collection's secret-free metadata.
-    pub fn collection(
-        &self,
-        id: SecretCollectionId,
-    ) -> Result<SecretCollection, SecretServiceError> {
-        let _guard = self.lock();
-        self.require_collection(id)
-    }
-
-    /// Create a collection, optionally binding one well-known alias.
-    pub fn create_collection(
-        &self,
-        label: &str,
-        alias: Option<&str>,
-        unix_secs: u64,
-    ) -> Result<SecretCollection, SecretServiceError> {
-        self.validate_name(label, "collection label")?;
-        if let Some(alias) = alias {
-            self.validate_alias(alias)?;
-        }
-        let _guard = self.lock();
-        let catalog = self.load_catalog()?;
-        if let Some(existing) = alias.and_then(|alias| catalog.aliases.get(alias).copied()) {
-            self.set_collection_label_locked(existing, label, unix_secs)?;
-            return self.require_collection(existing);
-        }
-        self.create_collection_locked(label, alias, unix_secs)
-    }
-
-    /// Resolve a well-known alias.
-    pub fn read_alias(
-        &self,
-        alias: &str,
-    ) -> Result<Option<SecretCollectionId>, SecretServiceError> {
-        let _guard = self.lock();
-        Ok(self.load_catalog()?.aliases.get(alias).copied())
-    }
-
-    #[cfg(any(test, target_os = "linux"))]
-    pub(super) fn aliases(
-        &self,
-    ) -> Result<BTreeMap<String, SecretCollectionId>, SecretServiceError> {
-        let _guard = self.lock();
-        Ok(self.load_catalog()?.aliases)
-    }
-
-    /// Point or remove a well-known alias.
-    pub fn set_alias(
-        &self,
-        alias: &str,
-        collection: Option<SecretCollectionId>,
-    ) -> Result<(), SecretServiceError> {
-        self.validate_alias(alias)?;
-        let _guard = self.lock();
-        if let Some(id) = collection {
-            self.require_collection(id)?;
-        }
-        let mut catalog = self.load_catalog()?;
-        match collection {
-            Some(id) => {
-                catalog.aliases.insert(alias.to_string(), id);
-            },
-            None => {
-                catalog.aliases.remove(alias);
-            },
-        }
-        self.save_catalog(&catalog)
-    }
-
-    /// Change a collection label.
-    pub fn set_collection_label(
-        &self,
-        id: SecretCollectionId,
-        label: &str,
-        unix_secs: u64,
-    ) -> Result<(), SecretServiceError> {
-        self.validate_name(label, "collection label")?;
-        let _guard = self.lock();
-        self.set_collection_label_locked(id, label, unix_secs)
-    }
-
-    /// Delete a collection and tombstone every item it contained.
-    pub fn delete_collection(&self, id: SecretCollectionId) -> Result<(), SecretServiceError> {
-        let _guard = self.lock();
-        let collection = self
-            .load_collection_record(id)?
-            .ok_or(SecretServiceError::CollectionNotFound(id))?;
-        for item in collection.items {
-            self.storage.delete_record(self.item_path(item))?;
-        }
-        self.storage.delete_record(self.collection_path(id))?;
-        let mut catalog = self.load_catalog()?;
-        catalog.collections.retain(|candidate| *candidate != id);
-        catalog.aliases.retain(|_, candidate| *candidate != id);
-        self.save_catalog(&catalog)
-    }
-
-    /// Return every item in a collection.
+    /// Return every item in a collection. No payload is read.
     pub fn items(
         &self,
         collection: SecretCollectionId,
     ) -> Result<Vec<SecretItem>, SecretServiceError> {
-        let _guard = self.lock();
-        let collection = self
-            .load_collection_record(collection)?
-            .ok_or(SecretServiceError::CollectionNotFound(collection))?;
-        collection
-            .items
-            .into_iter()
-            .map(|id| self.require_item(id))
-            .collect()
+        let transaction = self.items.begin();
+        let index = transaction.index()?;
+        let mut found = Vec::new();
+        for link in &collections::find(&index, collection)?.items {
+            if let Some(item) = project(&transaction.indexed(link.item)?, collection) {
+                found.push(item);
+            }
+        }
+        Ok(found)
     }
 
-    /// Search all collections using exact matches for every supplied attribute.
+    /// Search all collections using exact matches for every supplied
+    /// attribute. Metadata only: no payload is read.
     pub fn search(
         &self,
         attributes: &BTreeMap<String, String>,
     ) -> Result<Vec<SecretItem>, SecretServiceError> {
         self.validate_attributes(attributes)?;
-        let _guard = self.lock();
+        let transaction = self.items.begin();
+        let index = transaction.index()?;
         let mut found = Vec::new();
-        for collection_id in self.load_catalog()?.collections {
-            let collection = self.load_collection_record(collection_id)?.ok_or_else(|| {
-                SecretServiceError::InconsistentCatalog(format!(
-                    "collection {collection_id} is indexed but absent"
-                ))
-            })?;
-            for id in collection.items {
-                let item = self.require_item_record(id)?;
+        for collection in &index.collections {
+            for link in &collection.items {
+                let item = transaction.indexed(link.item)?;
+                let Some(item) = project(&item, SecretCollectionId(collection.id)) else {
+                    continue;
+                };
                 if attributes
                     .iter()
                     .all(|(key, value)| item.attributes.get(key) == Some(value))
                 {
-                    found.push(item.metadata(id));
+                    found.push(item);
                 }
             }
         }
@@ -393,6 +301,9 @@ impl SecretServiceStore {
     }
 
     /// Create or exact-attribute-replace one item.
+    ///
+    /// The whole call, replace included, holds the persona's transaction
+    /// lock, and a replace is copy-on-write (ruling 48).
     pub fn create_item(
         &self,
         mut request: NewSecretItem,
@@ -401,52 +312,71 @@ impl SecretServiceStore {
         self.validate_name(&request.content_type, "content type")?;
         self.validate_attributes(&request.attributes)?;
         self.validate_secret(&request.secret)?;
-        let _guard = self.lock();
-        let mut collection_record = self
-            .load_collection_record(request.collection)?
-            .ok_or(SecretServiceError::CollectionNotFound(request.collection))?;
+        let transaction = self.items.begin();
+        let index = transaction.index()?;
+        let owner = request.collection;
+        let collection = collections::find(&index, owner)?;
         if request.replace {
-            for id in &collection_record.items {
-                let mut current = self.require_item_record(*id)?;
-                if current.attributes == request.attributes {
-                    current.label.clone_from(&request.label);
-                    current.secret.zeroize();
-                    current.secret = std::mem::take(&mut request.secret);
-                    current.content_type.clone_from(&request.content_type);
-                    current.modified = request.unix_secs;
-                    let metadata = current.metadata(*id);
-                    self.storage.save_record(self.item_path(*id), &current)?;
-                    return Ok(metadata);
-                }
+            for link in &collection.items {
+                let mut current = transaction.indexed(link.item)?;
+                let Some(old) = matching(&current, &request.attributes) else {
+                    continue;
+                };
+                current.title = std::mem::take(&mut request.label);
+                current.modified_at = Some(request.unix_secs);
+                set_content_type(&mut current, std::mem::take(&mut request.content_type));
+                let payload = Payload::Secret {
+                    bytes: std::mem::take(&mut request.secret),
+                };
+                let item = transaction.replace_payload(current, old, payload)?;
+                return shown(&item, owner);
             }
         }
-        if collection_record.items.len() >= self.limits.max_items_per_collection {
+        if collection.items.len() >= self.limits.max_items_per_collection {
             return Err(SecretServiceError::Limit("items per collection"));
         }
-        let id = SecretItemId::mint();
-        let record = StoredItem {
-            version: RECORD_VERSION,
-            collection: request.collection,
-            label: std::mem::take(&mut request.label),
-            attributes: std::mem::take(&mut request.attributes),
-            secret: std::mem::take(&mut request.secret),
-            content_type: std::mem::take(&mut request.content_type),
-            created: request.unix_secs,
-            modified: request.unix_secs,
+        let credential = CredentialId::from_random(random_id_bytes());
+        let item = Item {
+            id: ItemId::from_random(random_id_bytes()),
+            source_id: None,
+            title: std::mem::take(&mut request.label),
+            subtitle: None,
+            scope: None,
+            tags: Vec::new(),
+            favorite: false,
+            created_at: Some(request.unix_secs),
+            modified_at: Some(request.unix_secs),
+            credentials: vec![Credential {
+                id: credential,
+                kind: CredentialKind::Secret {
+                    content_type: std::mem::take(&mut request.content_type),
+                    attributes: std::mem::take(&mut request.attributes),
+                },
+            }],
+            state: ItemState::Vault,
         };
-        let metadata = record.metadata(id);
-        self.storage.save_record(self.item_path(id), &record)?;
-        collection_record.items.push(id);
-        collection_record.modified = request.unix_secs;
-        self.storage
-            .save_record(self.collection_path(request.collection), &collection_record)?;
-        Ok(metadata)
+        let payload = Payload::Secret {
+            bytes: std::mem::take(&mut request.secret),
+        };
+        let (id, unix_secs) = (item.id, request.unix_secs);
+        let item = transaction.insert(&index, item, vec![(credential, payload)], |index| {
+            let collection = index
+                .collections
+                .iter_mut()
+                .find(|candidate| candidate.id == owner.0)
+                .ok_or(ItemStoreError::CollectionNotFound(owner.0))?;
+            collection.items.push(Link { item: id });
+            collection.modified_at = Some(unix_secs);
+            Ok(())
+        })?;
+        shown(&item, owner)
     }
 
     /// Read one item's secret-free metadata.
     pub fn item(&self, id: SecretItemId) -> Result<SecretItem, SecretServiceError> {
-        let _guard = self.lock();
-        self.require_item(id)
+        let transaction = self.items.begin();
+        let (item, collection) = require(&transaction, &transaction.index()?, id)?;
+        shown(&item, collection)
     }
 
     /// Change an item's lookup attributes.
@@ -457,9 +387,15 @@ impl SecretServiceStore {
         unix_secs: u64,
     ) -> Result<(), SecretServiceError> {
         self.validate_attributes(&attributes)?;
-        self.update_item(id, |item| {
-            item.attributes = attributes;
-            item.modified = unix_secs;
+        self.update_metadata(id, |item| {
+            if let [credential] = item.credentials.as_mut_slice()
+                && let CredentialKind::Secret {
+                    attributes: held, ..
+                } = &mut credential.kind
+            {
+                *held = attributes;
+            }
+            item.modified_at = Some(unix_secs);
         })
     }
 
@@ -471,12 +407,13 @@ impl SecretServiceStore {
         unix_secs: u64,
     ) -> Result<(), SecretServiceError> {
         self.validate_name(label, "item label")?;
-        self.update_item(id, |item| {
-            item.label = label.to_string();
-            item.modified = unix_secs;
+        self.update_metadata(id, |item| {
+            item.title = label.to_string();
+            item.modified_at = Some(unix_secs);
         })
     }
 
+    /// Replace an item's bytes and content type, copy-on-write (ruling 48).
     #[cfg(any(test, target_os = "linux"))]
     pub(super) fn set_secret(
         &self,
@@ -485,109 +422,149 @@ impl SecretServiceStore {
         content_type: &str,
         unix_secs: u64,
     ) -> Result<(), SecretServiceError> {
+        let mut secret = Zeroizing::new(secret);
         self.validate_secret(&secret)?;
         self.validate_name(content_type, "content type")?;
-        self.update_item(id, |item| {
-            item.secret.zeroize();
-            item.secret = secret;
-            item.content_type = content_type.to_string();
-            item.modified = unix_secs;
-        })
+        let transaction = self.items.begin();
+        let (mut item, _) = require(&transaction, &transaction.index()?, id)?;
+        let old = item.credentials[0].id;
+        set_content_type(&mut item, content_type.to_string());
+        item.modified_at = Some(unix_secs);
+        let payload = Payload::Secret {
+            bytes: std::mem::take(&mut *secret),
+        };
+        transaction.replace_payload(item, old, payload)?;
+        Ok(())
     }
 
+    /// Release an item's bytes by exercising its payload, the one read that
+    /// opens one.
     #[cfg(any(test, target_os = "linux"))]
     pub(super) fn secret(&self, id: SecretItemId) -> Result<SecretValue, SecretServiceError> {
-        let _guard = self.lock();
-        let item = self.require_item_record(id)?;
+        let transaction = self.items.begin();
+        let (item, _) = require(&transaction, &transaction.index()?, id)?;
+        let credential = &item.credentials[0];
+        let CredentialKind::Secret { content_type, .. } = &credential.kind else {
+            return Err(SecretServiceError::ItemNotFound(id));
+        };
+        let bytes = transaction.exercise(&item, credential.id, |_, _, payload| match payload {
+            Payload::Secret { bytes } => Ok((Zeroizing::new(bytes.clone()), false)),
+            Payload::Otp { .. } => Err(SecretServiceError::InconsistentCatalog(format!(
+                "item {id} holds a payload that is not a secret"
+            ))),
+        })?;
         Ok(SecretValue {
-            bytes: Zeroizing::new(item.secret.clone()),
-            content_type: item.content_type.clone(),
+            bytes,
+            content_type: content_type.clone(),
         })
     }
 
-    /// Delete an item and remove it from its collection index.
+    /// Delete an item: its index entry and membership, then its records.
     pub fn delete_item(&self, id: SecretItemId) -> Result<(), SecretServiceError> {
-        let _guard = self.lock();
-        let item = self.require_item_record(id)?;
-        self.storage.delete_record(self.item_path(id))?;
-        let mut collection = self
-            .load_collection_record(item.collection)?
-            .ok_or_else(|| {
-                SecretServiceError::InconsistentCatalog(format!(
-                    "item {id} names absent collection {}",
-                    item.collection
-                ))
-            })?;
-        collection.items.retain(|candidate| *candidate != id);
-        self.storage
-            .save_record(self.collection_path(item.collection), &collection)
-            .map_err(SecretServiceError::from)
+        let transaction = self.items.begin();
+        require(&transaction, &transaction.index()?, id)?;
+        transaction.delete(id.0)?;
+        Ok(())
     }
 
-    fn create_collection_locked(
-        &self,
-        label: &str,
-        alias: Option<&str>,
-        unix_secs: u64,
-    ) -> Result<SecretCollection, SecretServiceError> {
-        let mut catalog = self.load_catalog()?;
-        if catalog.collections.len() >= self.limits.max_collections {
-            return Err(SecretServiceError::Limit("collections per persona"));
-        }
-        let id = SecretCollectionId::mint();
-        let record = StoredCollection {
-            version: RECORD_VERSION,
-            label: label.to_string(),
-            items: Vec::new(),
-            created: unix_secs,
-            modified: unix_secs,
-        };
-        self.storage
-            .save_record(self.collection_path(id), &record)?;
-        catalog.collections.push(id);
-        catalog.collections.sort();
-        if let Some(alias) = alias {
-            catalog.aliases.insert(alias.to_string(), id);
-        }
-        self.save_catalog(&catalog)?;
-        Ok(record.metadata(id))
-    }
-
-    fn set_collection_label_locked(
-        &self,
-        id: SecretCollectionId,
-        label: &str,
-        unix_secs: u64,
-    ) -> Result<(), SecretServiceError> {
-        let mut record = self
-            .load_collection_record(id)?
-            .ok_or(SecretServiceError::CollectionNotFound(id))?;
-        record.label = label.to_string();
-        record.modified = unix_secs;
-        self.storage
-            .save_record(self.collection_path(id), &record)
-            .map_err(SecretServiceError::from)
-    }
-
-    fn update_item(
+    fn update_metadata(
         &self,
         id: SecretItemId,
-        update: impl FnOnce(&mut StoredItem),
+        change: impl FnOnce(&mut Item),
     ) -> Result<(), SecretServiceError> {
-        let _guard = self.lock();
-        self.storage.update_record(
-            self.item_path(id),
-            |current: Option<StoredItem>| -> Result<_, SecretServiceError> {
-                let mut current = current
-                    .ok_or(SecretServiceError::ItemNotFound(id))?
-                    .check_version()?;
-                update(&mut current);
-                Ok(((), SealedRecordChange::Replace(current)))
-            },
-        )
+        let transaction = self.items.begin();
+        let (mut item, _) = require(&transaction, &transaction.index()?, id)?;
+        change(&mut item);
+        transaction.save_metadata(item)?;
+        Ok(())
+    }
+}
+
+/// The Secret Service item `id` names, with its collection. An item outside
+/// every collection, or not holding one `Secret` credential, is not one.
+fn require(
+    transaction: &Transaction<'_>,
+    index: &StoredIndex,
+    id: SecretItemId,
+) -> Result<(Item, SecretCollectionId), SecretServiceError> {
+    let collection = index
+        .items
+        .contains(&id.0)
+        .then(|| {
+            index
+                .collections
+                .iter()
+                .find(|collection| collection.items.contains(&Link { item: id.0 }))
+        })
+        .flatten()
+        .ok_or(SecretServiceError::ItemNotFound(id))?;
+    let item = transaction.indexed(id.0)?;
+    if project(&item, SecretCollectionId(collection.id)).is_none() {
+        return Err(SecretServiceError::ItemNotFound(id));
+    }
+    Ok((item, SecretCollectionId(collection.id)))
+}
+
+/// The item as the Secret Service shows it, if it holds one `Secret`
+/// credential.
+fn project(item: &Item, collection: SecretCollectionId) -> Option<SecretItem> {
+    let [credential] = item.credentials.as_slice() else {
+        return None;
+    };
+    let CredentialKind::Secret { attributes, .. } = &credential.kind else {
+        return None;
+    };
+    Some(SecretItem {
+        id: SecretItemId(item.id),
+        collection,
+        label: item.title.clone(),
+        attributes: attributes.clone(),
+        created: item.created_at.unwrap_or(0),
+        modified: item.modified_at.unwrap_or(0),
+    })
+}
+
+fn shown(item: &Item, collection: SecretCollectionId) -> Result<SecretItem, SecretServiceError> {
+    project(item, collection).ok_or_else(|| {
+        SecretServiceError::InconsistentCatalog(format!(
+            "item {} holds no single secret credential",
+            item.id
+        ))
+    })
+}
+
+/// The credential to replace when `item` is a secret with exactly these
+/// attributes.
+fn matching(item: &Item, attributes: &BTreeMap<String, String>) -> Option<CredentialId> {
+    let [credential] = item.credentials.as_slice() else {
+        return None;
+    };
+    match &credential.kind {
+        CredentialKind::Secret {
+            attributes: held, ..
+        } if held == attributes => Some(credential.id),
+        _ => None,
+    }
+}
+
+fn set_content_type(item: &mut Item, content_type: String) {
+    if let [credential] = item.credentials.as_mut_slice()
+        && let CredentialKind::Secret {
+            content_type: held, ..
+        } = &mut credential.kind
+    {
+        *held = content_type;
     }
 }
 
 #[cfg(test)]
 #[path = "store_tests.rs"]
 mod tests;
+
+#[cfg(test)]
+#[path = "store_limit_tests.rs"]
+mod limit_tests;
+
+#[cfg(test)]
+#[path = "store_replace_tests.rs"]
+mod replace_tests;

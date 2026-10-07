@@ -181,7 +181,7 @@ The renderer/multiplexer/session work has already absorbed the bulk of graphshel
 - Browser/PWA envelope (concept; T1-4 above sharpens the contract) — spatial-chrome plan Phase 5.
 - OS-plumbing audit — [OS plumbing reuse audit](2026-05-15_os_plumbing_reuse_audit_brief.md) *(historical citation)* <!-- doc-audit: historical-link -->.
 - Capability gates with persona / session / app layers — [capability gate catalogue](2026-05-14_capability_gate_catalogue_brief.md).
-- Engine profile binding — [engine profile boundary plan](../implementation_strategy/2026-05-14_engine_profile_boundary_plan.md).
+- Engine profile binding — [engine profile boundary plan](../../archive_docs/2026-10-06_retired_plans/2026-05-14_engine_profile_boundary_plan.md).
 - Event-DAG substrate — [event DAG substrate brief](../implementation_strategy/2026-05-07_event_dag_substrate_brief.md).
 - Session manifest + tear-out — [browser multiplexer framing](2026-05-11_browser_multiplexer_framing.md), [tearout operations brief](2026-05-11_tearout_operations_brief.md).
 - View intent sidecar — [view intent sidecar plan](../implementation_strategy/2026-05-14_view_intent_sidecar_plan.md) *(historical citation)* <!-- doc-audit: historical-link -->.

@@ -55,6 +55,7 @@ use std::path::PathBuf;
 use serde::{Deserialize, Serialize};
 use zeroize::{Zeroize, ZeroizeOnDrop};
 
+use crate::unlock::{UnlockMethod, UnlockMethods};
 use crate::{Ed25519Keypair, Ed25519PublicKey, IdentityError, IdentityProvider};
 use insigne::DerivedKeyAttestation;
 
@@ -317,6 +318,29 @@ pub trait IdentityStorage: Send + Sync {
 
     /// List all profiles in the storage.
     fn list_profiles(&self) -> Result<Vec<ProfileSummary>, IdentityError>;
+
+    /// Which unlock methods could re-key this storage on this device now.
+    fn unlock_methods(&self) -> UnlockMethods;
+
+    /// Forget the at-rest key. Until [`Self::unlock`], every profile call
+    /// returns [`IdentityError::Locked`]. Locking twice is harmless.
+    fn lock(&self);
+
+    /// Whether the at-rest key is forgotten.
+    fn is_locked(&self) -> bool;
+
+    /// Re-key from a user act. A wrong credential is an error and leaves
+    /// the storage locked.
+    fn unlock(&self, method: UnlockMethod<'_>) -> Result<(), IdentityError>;
+
+    /// Enrol a passphrase that can unlock this storage (ruling 39). Needs
+    /// the storage unlocked; an existing enrolment is refused, not replaced.
+    /// Backends that hold no OS-wrapped root refuse.
+    fn enroll_passphrase(&self, _passphrase: &[u8]) -> Result<(), IdentityError> {
+        Err(IdentityError::Backend(
+            "this storage cannot enrol a passphrase".to_string(),
+        ))
+    }
 }
 
 /// Borrowed storage delegates, so a vault can be opened over a backend
@@ -338,6 +362,26 @@ impl<T: IdentityStorage + ?Sized> IdentityStorage for &T {
     fn list_profiles(&self) -> Result<Vec<ProfileSummary>, IdentityError> {
         (**self).list_profiles()
     }
+
+    fn unlock_methods(&self) -> UnlockMethods {
+        (**self).unlock_methods()
+    }
+
+    fn lock(&self) {
+        (**self).lock()
+    }
+
+    fn is_locked(&self) -> bool {
+        (**self).is_locked()
+    }
+
+    fn unlock(&self, method: UnlockMethod<'_>) -> Result<(), IdentityError> {
+        (**self).unlock(method)
+    }
+
+    fn enroll_passphrase(&self, passphrase: &[u8]) -> Result<(), IdentityError> {
+        (**self).enroll_passphrase(passphrase)
+    }
 }
 
 /// Boxed storage delegates, so callers can pick a backend at runtime
@@ -358,6 +402,75 @@ impl<T: IdentityStorage + ?Sized> IdentityStorage for Box<T> {
     fn list_profiles(&self) -> Result<Vec<ProfileSummary>, IdentityError> {
         (**self).list_profiles()
     }
+
+    fn unlock_methods(&self) -> UnlockMethods {
+        (**self).unlock_methods()
+    }
+
+    fn lock(&self) {
+        (**self).lock()
+    }
+
+    fn is_locked(&self) -> bool {
+        (**self).is_locked()
+    }
+
+    fn unlock(&self, method: UnlockMethod<'_>) -> Result<(), IdentityError> {
+        (**self).unlock(method)
+    }
+
+    fn enroll_passphrase(&self, passphrase: &[u8]) -> Result<(), IdentityError> {
+        (**self).enroll_passphrase(passphrase)
+    }
+}
+
+/// What stays visible while the vault is locked: no secret material
+/// (vault lock ruling 11).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PublicProfile {
+    /// The profile id.
+    pub id: ProfileId,
+    /// Display name.
+    pub display_name: String,
+    /// The master public key.
+    pub master_public_key: Ed25519PublicKey,
+    /// Each slot's description, without its payload.
+    pub slots: Vec<SlotSummary>,
+}
+
+/// One slot, described without its secret.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct SlotSummary {
+    /// Where the slot lives.
+    pub key: ProtocolKey,
+    /// The protocol kind.
+    pub kind: String,
+    /// Recovery lineage.
+    pub lineage: CredentialLineage,
+    /// Unlock tier (consent, per ruling 12).
+    pub unlock_tier: UnlockTier,
+}
+
+impl PublicProfile {
+    fn of(profile: &Profile) -> Self {
+        let mut slots: Vec<SlotSummary> = profile
+            .slots
+            .iter()
+            .map(|(key, slot)| SlotSummary {
+                key: key.clone(),
+                kind: slot.kind().to_string(),
+                lineage: slot.lineage(),
+                unlock_tier: slot.unlock_tier(),
+            })
+            .collect();
+        slots.sort_by(|a, b| a.key.cmp(&b.key));
+        Self {
+            id: profile.id.clone(),
+            display_name: profile.display_name.clone(),
+            master_public_key: profile.master.public_key(),
+            slots,
+        }
+    }
 }
 
 /// User-facing identity vault.
@@ -366,9 +479,19 @@ impl<T: IdentityStorage + ?Sized> IdentityStorage for Box<T> {
 /// crates consume the vault either through the [`IdentityProvider`] impl
 /// (for the legacy single-master surface) or through the slot-aware API
 /// here (for multi-protocol consumers).
+///
+/// ## Locking
+///
+/// [`Self::lock`] drops the profile (its keys zeroize on drop) and has the
+/// storage forget its at-rest key, so nothing reloads it silently (vault
+/// lock plan, ruling 25). While locked, every accessor that reaches secret
+/// material returns [`IdentityError::Locked`]; [`Self::public_profile`]
+/// and the master public key stay readable. [`Self::unlock`] takes a user
+/// act and reloads the same profile.
 pub struct IdentityVault<S: IdentityStorage> {
     storage: S,
-    current: Profile,
+    current: Option<Profile>,
+    public: PublicProfile,
 }
 
 impl<S: IdentityStorage> IdentityVault<S> {
@@ -376,7 +499,7 @@ impl<S: IdentityStorage> IdentityVault<S> {
     #[tracing::instrument(level = "debug", skip(storage), fields(?id))]
     pub fn open(storage: S, id: &ProfileId) -> Result<Self, IdentityError> {
         let current = storage.load_profile(id)?;
-        Ok(Self { storage, current })
+        Ok(Self::with_profile(storage, current))
     }
 
     /// Open a vault with an already-loaded profile (no storage round-trip).
@@ -385,36 +508,112 @@ impl<S: IdentityStorage> IdentityVault<S> {
     pub fn with_profile(storage: S, profile: Profile) -> Self {
         Self {
             storage,
-            current: profile,
+            public: PublicProfile::of(&profile),
+            current: Some(profile),
         }
     }
 
-    /// The currently-loaded profile.
-    pub fn current_profile(&self) -> &Profile {
-        &self.current
+    /// The currently-loaded profile, or [`IdentityError::Locked`].
+    pub fn current_profile(&self) -> Result<&Profile, IdentityError> {
+        self.current.as_ref().ok_or(IdentityError::Locked)
     }
 
-    /// Borrow a slot by key.
-    pub fn slot(&self, key: &ProtocolKey) -> Option<&IdentitySlot> {
-        self.current.slots.get(key)
+    /// Borrow a slot by key, or [`IdentityError::Locked`].
+    pub fn slot(&self, key: &ProtocolKey) -> Result<Option<&IdentitySlot>, IdentityError> {
+        Ok(self.current_profile()?.slots.get(key))
+    }
+
+    /// The profile this vault speaks as, locked or not.
+    pub fn profile_id(&self) -> &ProfileId {
+        &self.public.id
+    }
+
+    /// The secret-free view of the current profile, locked or not.
+    pub fn public_profile(&self) -> &PublicProfile {
+        &self.public
     }
 
     /// Add or replace a slot in the current profile, persisting the
     /// updated profile to storage.
     #[tracing::instrument(level = "debug", skip(self, slot), fields(?key))]
     pub fn add_slot(&mut self, key: ProtocolKey, slot: IdentitySlot) -> Result<(), IdentityError> {
-        self.current.slots.insert(key, slot);
-        self.storage.save_profile(&self.current)
+        let current = self.current.as_mut().ok_or(IdentityError::Locked)?;
+        current.slots.insert(key, slot);
+        self.public = PublicProfile::of(current);
+        self.storage.save_profile(current)
     }
 
     /// Remove a slot from the current profile, persisting.
     #[tracing::instrument(level = "debug", skip(self), fields(?key))]
     pub fn remove_slot(&mut self, key: &ProtocolKey) -> Result<bool, IdentityError> {
-        let removed = self.current.slots.remove(key).is_some();
+        let current = self.current.as_mut().ok_or(IdentityError::Locked)?;
+        let removed = current.slots.remove(key).is_some();
         if removed {
-            self.storage.save_profile(&self.current)?;
+            self.public = PublicProfile::of(current);
+            self.storage.save_profile(current)?;
         }
         Ok(removed)
+    }
+
+    /// Whether the vault is locked.
+    pub fn is_locked(&self) -> bool {
+        self.current.is_none()
+    }
+
+    /// Which unlock methods this device offers for this vault now.
+    pub fn unlock_methods(&self) -> UnlockMethods {
+        self.storage.unlock_methods()
+    }
+
+    /// Enrol a passphrase over the vault's root (ruling 39), so a device
+    /// with no OS presence can lock (ruling 27). Refused while locked.
+    pub fn enroll_passphrase(&self, passphrase: &[u8]) -> Result<(), IdentityError> {
+        if self.current.is_none() {
+            return Err(IdentityError::Locked);
+        }
+        self.storage.enroll_passphrase(passphrase)
+    }
+
+    /// Lock: drop the profile and have the storage forget its key.
+    ///
+    /// Refused while no unlock method is available (ruling 27), so a lock
+    /// is never one nobody can undo. Locking a locked vault is a no-op.
+    #[tracing::instrument(level = "info", skip(self), fields(profile = %self.public.id.0))]
+    pub fn lock(&mut self) -> Result<(), IdentityError> {
+        if self.current.is_none() {
+            return Ok(());
+        }
+        if !self.storage.unlock_methods().any() {
+            return Err(IdentityError::Backend(
+                "refusing to lock: no unlock method is available on this device".to_string(),
+            ));
+        }
+        self.current = None;
+        self.storage.lock();
+        Ok(())
+    }
+
+    /// Unlock by a user act, reloading the profile that was current.
+    ///
+    /// A wrong credential, or a profile that will not load, leaves the vault
+    /// and its storage locked. Unlocking an unlocked vault is a no-op.
+    #[tracing::instrument(level = "info", skip_all, fields(profile = %self.public.id.0))]
+    pub fn unlock(&mut self, method: UnlockMethod<'_>) -> Result<(), IdentityError> {
+        if self.current.is_some() {
+            return Ok(());
+        }
+        self.storage.unlock(method)?;
+        match self.storage.load_profile(&self.public.id) {
+            Ok(profile) => {
+                self.public = PublicProfile::of(&profile);
+                self.current = Some(profile);
+                Ok(())
+            },
+            Err(error) => {
+                self.storage.lock();
+                Err(error)
+            },
+        }
     }
 
     /// Borrow the underlying storage.
@@ -432,25 +631,35 @@ impl<S: IdentityStorage> IdentityVault<S> {
     ///
     /// Loads before replacing, so a profile that will not load leaves the
     /// current one untouched rather than half-switched.
+    ///
+    /// Refused while locked (ruling 14), whether or not the storage could
+    /// load the target.
     #[tracing::instrument(level = "debug", skip(self), fields(?id))]
     pub fn switch_profile(&mut self, id: &ProfileId) -> Result<(), IdentityError> {
-        self.current = self.storage.load_profile(id)?;
+        if self.current.is_none() {
+            return Err(IdentityError::Locked);
+        }
+        let next = self.storage.load_profile(id)?;
+        self.public = PublicProfile::of(&next);
+        self.current = Some(next);
         Ok(())
     }
 }
 
+/// The master public key stays answerable while locked; derivation and
+/// attestation need the master secret and return [`IdentityError::Locked`].
 impl<S: IdentityStorage> IdentityProvider for IdentityVault<S> {
     fn master_public_key(&self) -> Ed25519PublicKey {
-        self.current.master.public_key()
+        self.public.master_public_key
     }
 
     fn derive_keypair(&self, salt: &[u8]) -> Result<Ed25519Keypair, IdentityError> {
-        Ok(self.current.master.derive_child(salt))
+        Ok(self.current_profile()?.master.derive_child(salt))
     }
 
     fn attest_derived_key(&self, salt: &[u8]) -> Result<DerivedKeyAttestation, IdentityError> {
         Ok(crate::provider::attest_derived_key(
-            &self.current.master,
+            &self.current_profile()?.master,
             salt,
         ))
     }
@@ -603,7 +812,26 @@ impl IdentityStorage for InMemoryStorage {
             })
             .collect())
     }
+
+    /// None: the fixture holds plaintext and has no key to forget, so a
+    /// vault over it refuses to lock.
+    fn unlock_methods(&self) -> UnlockMethods {
+        UnlockMethods::default()
+    }
+
+    fn lock(&self) {}
+
+    fn is_locked(&self) -> bool {
+        false
+    }
+
+    fn unlock(&self, _method: UnlockMethod<'_>) -> Result<(), IdentityError> {
+        Ok(())
+    }
 }
 
 #[cfg(test)]
 mod tests;
+
+#[cfg(test)]
+mod lock_tests;

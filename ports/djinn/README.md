@@ -13,8 +13,20 @@ when they use persona-held state.
 ## Run
 
 ```text
-cargo run -p djinn --bin djinn -- --dir <personae-vault> --data-root <data-root>
+cargo run -p djinn --bin djinn -- --dir <personae-vault> --data-root <data-root> \
+  --receipt-agent-endpoint <endpoint> --browser-endpoint <endpoint> --app-endpoint <endpoint>
 ```
+
+The standard SSH agent endpoint and the default browser and app endpoints
+belong to the installed resident, which the installer launches with
+`--installed`. Any other run refuses them and names its own.
+
+`--log-filter <directives>` sets the tracing filter (`info` by default, for
+example `info,iroh_gossip=debug`). `--events-file <path>` appends one JSON line
+per lifecycle event: `started`, `listening`, `ready`, `stopping` and `stopped`
+with its reason. `djinn --resident-status` prints a running resident's status
+from its app door, and `djinn --stop-resident` stops it the way Ctrl-C does;
+both routes are owner-only.
 
 The default configuration continues to read the existing Graphshell
 application directory. That is a compatibility bridge for selected profiles,
@@ -55,6 +67,23 @@ The initial caller is a command-line utility. Knot's desktop controls, explicit
 certificate rotation, additional protocols, public binding and governed moot
 hosting remain separate integration work. Exporting Tabard's Lagrange palette
 does not change Gemini page content or this listener's policy.
+
+## Paired devices
+
+`djinn-devices` asks the running resident where each paired device is now,
+through the same owner-only application broker. For every device paired in
+this profile's personal sync it prints the node id, label, root, pairing id and
+time added; whether the device is connected now; every address the transport
+holds for it, the live ones marked active; and the last saved dial hint,
+decoded into its direct addresses and relay.
+
+```text
+djinn-devices
+djinn-devices --json
+```
+
+The directory is read-only and lists paired devices only. The broker endpoint
+follows `GRAPHSHELL_APP_ENDPOINT`, as `djinn-site` does.
 
 ## Publishing
 

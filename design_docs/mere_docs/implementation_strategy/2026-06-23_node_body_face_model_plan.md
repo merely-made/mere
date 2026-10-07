@@ -1,8 +1,14 @@
 # Node Body & Face Model — decoupling shape from texture, authoring physical bodies
 
 **Date**: 2026-06-23
-**Status**: Planning (with Mark). Successor to the representation half of the
-[node_representation_arrangement_plan](2026-06-18_node_representation_arrangement_plan.md),
+**Status (2026-10-06):** in progress. B0 (the hull decoupled from the face), B1
+(`Face { Favicon, Derived, Sprite, Bare }`) and B2 (per-node material over
+`seiche::NodeMaterial`) landed in pictograph's canvas and seiche (first in the checkpoint
+`277751d3`, 2026-06-23), with materials and faces persisted. Open: B3 (the shape editor) and
+B4. Turnstone hosts sprite import with a hull; Graphshell has a face picker; no host has a
+material picker. Several follow-on owners named below are archived (see Collected
+follow-ons). Successor to the representation half of the
+[node_representation_arrangement_plan](../../archive_docs/2026-10-06_superseded_plans/2026-06-18_node_representation_arrangement_plan.md),
 which is substantially complete (P0 cues, P1 per-node form, P2-static sprite faces + the
 sprite-alpha hull collider, P3/P4 done) and whose representation axis this plan re-bases. The
 arrangement half already spun out to
@@ -51,6 +57,18 @@ into one mutually-exclusive `Representation` choice:
 
 So a sprite currently owns both the face *and* the only path to a tailored body + collider, and
 material character is not authored at all.
+
+**Corrected 2026-10-06 (S14 pass):** this section describes the tree before B0 to B2, which
+have since landed, though no Progress entry recorded them. Pictograph has no `Representation`
+enum (the only one in the tree is cambium's unrelated `sceno/src/scene.rs:95`). `node_collider`
+applies the hull "regardless of the face" (pictograph `canvas/lifecycle.rs:452-475`). The face
+is `enum Face { Favicon, Derived, Sprite, Bare }`, with `Bare` "(Formerly `Shape`.)"
+(`canvas/types.rs:147-165`). Material is no longer near-fixed: `set_node_material` /
+`clear_node_material` set it per node over `seiche::NodeMaterial` (`canvas/cartography.rs:400-430`;
+seiche `node_body.rs:77`), and `.with_materials` / `.with_faces` persist materials and faces
+(`cartography.rs:48,55`). Turnstone imports sprites with a hull
+(`turnstone/src/app/node_arms.rs:1732-1743`); Graphshell has a face picker (`web_product.rs:475-484`,
+the "Representation" select at lines 312-313 of `ports/graphshell/web/component.html`).
 
 ## The model: Body × Face, with tile/shape as body presets
 
@@ -109,7 +127,7 @@ unconfigured graph is unchanged. Persist via the cartography sidecar, where size
 hulls already ride.
 
 Done when a node can be made heavy / bouncy / slippery, the change is live and persists across
-reload, and it composes with the [physics_scenes_and_tangibility_plan](2026-06-22_physics_scenes_and_tangibility_plan.md)
+reload, and it composes with the [physics_scenes_and_tangibility_plan](../../archive_docs/2026-10-06_completed_plans/2026-06-22_physics_scenes_and_tangibility_plan.md)
 tangibility lever (a tangible, custom-material node interacts physically with a scene).
 
 ### B3 — The generalized shape editor (the swatch as body designer)
@@ -160,6 +178,15 @@ explicitly attributed to its owner.
 ## Collected follow-ons (so they are not orphaned)
 
 Open representation threads, each with its home, so closing the predecessor plan loses nothing:
+
+**Corrected 2026-10-06 (S14 pass):** two of the homes named below are archived. The
+settings-lane consolidation plan (in `archive_docs/2026-07-13_superseded_plans/`) owned the
+`node:<id>` facet pane, the scene-wide defaults and label density's settings page; the object
+card plan (in `archive_docs/2026-09-02_retired_plans/`) owned the per-object widget surface.
+
+**Open, raised by the S14 pass (2026-10-06):** which plan owns the `node:<id>` facet pane, the
+scene-wide representation defaults, label density and the per-object widget surface now?
+Options: a Turnstone plan; a canvas plan; this plan.
 
 - **Styling lens (Decision 3).** One styling lens over node shape + **edge style + field style**
   (the NODE_SHEET pattern widened), not three hardcoded paths. The node-shape half exists; the
@@ -266,3 +293,9 @@ fidelity) = a directly-authored hull, convex now, concave/compound as the B3 fid
   gloss dots lean on), and a status card (a summonable detail layer — composes with the inset
   rather than replacing it; belongs to the interaction-model spine if wanted). Revisit when the
   styling-lens follow-on lands, where per-state face treatments become lens material.
+  **Corrected 2026-10-06 (S14 pass):** the constant is now `const FACE_INSET: f32 = 0.72` in
+  pictograph's `canvas.rs:266`.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at mere 535bca11, from the
+  D2 record in support/doc-audit/d2/batch_48_s14_phase_b10.md: B0 to B2 recorded as landed with
+  B3 and B4 open, the pre-B0 "Current state" and the inset constant annotated, the archived
+  follow-on owners noted, and their re-homing written in as an open question.

@@ -64,7 +64,7 @@ stickleback.workspace = true
 # stickleback's muniment-backed store, so p2panda-store's bundled SQLite
 # backend (and sqlx with it) stays out of the graph entirely. Feature
 # unification means EVERY consumer has to opt out, not just one.
-p2panda-net = { package = "mere-p2panda-net", version = "=0.7.4", default-features = false, features = [
+p2panda-net = { package = "mere-p2panda-net", version = "=0.7.5", default-features = false, features = [
   "address_book",
   "iroh_endpoint",
   "iroh_mdns",
@@ -73,6 +73,8 @@ p2panda-net = { package = "mere-p2panda-net", version = "=0.7.4", default-featur
   "sync",
 ] }
 p2panda-core = "0.7.0"
+# The builder's held seed is cleared on drop (vault lock ruling 51).
+zeroize = "1"
 # Reticulum mesh-networking backend (optional, see [features]). `retinue` is
 # Mark's from-scratch RNS stack; `hkdf`/`sha2` derive its identity from the seed.
 retinue = { workspace = true, optional = true }
@@ -86,8 +88,18 @@ sha2 = { workspace = true, optional = true }
 name = "notochord"
 required-features = ["notochord"]
 
+# Vault lock ruling 51: what a bind leaves of its seed. Personae's tracker
+# installs its own global allocator, so this runs outside libtest.
+[[test]]
+name = "seed_residue"
+path = "tests/seed_residue.rs"
+harness = false
+
 [dev-dependencies]
 insigne = { workspace = true, features = ["verify"] }
+# The seed residue test's tracker (personae's) runs its own positive control.
+serde_json.workspace = true
+zeroize = "1"
 notochord = { workspace = true, features = ["tokio"] }
 # A scratch root for the disk-backed blob store's reopen test.
 tempfile = "3"

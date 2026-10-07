@@ -9,19 +9,29 @@
 use std::collections::HashMap;
 
 use genet_livery::{
-    Device, InteractionStates, LiveryLayout, LiveryPaintList, StylePlane, StyleSet, TextRange,
-    TextSystem, ViewportSizes, emit_paint_list_with_text_system_scrolled_with_images,
+    Device, InteractionStates, LiveryLayout, LiveryPaintList, StylePlane, StyleSet, TextPaintPhase,
+    TextRange, TextSystem, ViewportSizes, emit_paint_list_with_text_system_scrolled_with_images,
     hit_test_with_scroll, layout_with_text_system, resolve_styles,
 };
 use genet_render::{VisualAffinity, VisualCaret, VisualMovement, VisualSelection};
 use genet_scripted_dom::NodeId;
 use layout_dom_api::{LayoutDom, LocalName, Namespace, NodeKind};
-use paint_list_api::{ColorF, DeviceIntSize, LayoutPoint, LayoutRect, LayoutSize};
+use paint_list_api::{
+    ColorF, CommonPlacement, DeviceIntSize, LayoutPoint, LayoutRect, LayoutSize, PaintCmd, RectItem,
+};
 
 mod interaction;
 mod producer;
 #[cfg(test)]
+mod hidden_panel_tests;
+#[cfg(test)]
 mod tests;
+#[cfg(test)]
+mod text_paint_tests;
+
+/// Host-owned focus inputs. Paint emission resolves their geometry in layout
+/// coordinates; viewport-space caret APIs remain separate for IME and input.
+pub(crate) type FocusedTextPaint = (NodeId, VisualCaret, Option<(usize, usize)>);
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum ScrollTarget {
@@ -73,7 +83,11 @@ impl OwnedLayout {
     /// register into its text system, and image bytes to resolve `url()`
     /// against. The session is rebuilt whenever the ledger changes, so
     /// registration cannot outlive a face the host withdrew.
-    pub(crate) fn new<D: LayoutDom<NodeId = NodeId>>(
+    ///
+    /// Public so a host that is not rootstock can lay out a composed
+    /// session's own document and project it for accessibility
+    /// (`cambium_winit_a11y::project_tree`), as experiment E1a does.
+    pub fn new<D: LayoutDom<NodeId = NodeId>>(
         dom: &D,
         sheets: &[&str],
         width: f32,
@@ -190,6 +204,12 @@ impl OwnedLayout {
         node: NodeId,
     ) -> (String, String) {
         genet_livery::rendered_generated_text(dom, &self.styles, node)
+    }
+
+    /// Whether `node` is rendered and visible under this layout's styles: no
+    /// `display: none` above it and computed `visibility: visible`.
+    pub fn rendered_visible<D: LayoutDom<NodeId = NodeId>>(&self, dom: &D, node: NodeId) -> bool {
+        genet_livery::rendered_visible(dom, &self.styles, node)
     }
 
     /// Font instances this session's text system has materialised. The
@@ -518,6 +538,28 @@ impl OwnedLayout {
     ) -> Vec<genet_livery::TextRect> {
         let (scroll_x, scroll_y) = self.content_scroll(dom, node);
         let clip = self.content_clip(dom, node);
+        self.selection_rects_at(dom, node, start, end)
+            .into_iter()
+            .filter_map(|mut rect| {
+                rect.x -= scroll_x;
+                rect.y -= scroll_y;
+                match clip {
+                    Some(clip) => clip_text_rect(rect, clip),
+                    None => Some(rect),
+                }
+            })
+            .collect()
+    }
+
+    /// Unscrolled layout geometry for insertion inside the field's CSS paint
+    /// context. That context applies every ancestor clip, scroll and transform.
+    fn selection_rects_at<D: LayoutDom<NodeId = NodeId>>(
+        &self,
+        dom: &D,
+        node: NodeId,
+        start: usize,
+        end: usize,
+    ) -> Vec<genet_livery::TextRect> {
         // The selection starts where a caret at `start` would, and ends at
         // the close of the text before `end`.
         let (Some((anchor_node, anchor_offset)), Some((focus_node, focus_offset))) = (
@@ -533,20 +575,7 @@ impl OwnedLayout {
                 focus_node,
                 focus_offset,
             })
-            .map(|selection| {
-                selection
-                    .rects
-                    .into_iter()
-                    .filter_map(|mut rect| {
-                        rect.x -= scroll_x;
-                        rect.y -= scroll_y;
-                        match clip {
-                            Some(clip) => clip_text_rect(rect, clip),
-                            None => Some(rect),
-                        }
-                    })
-                    .collect()
-            })
+            .map(|selection| selection.rects)
             .unwrap_or_default()
     }
 
@@ -614,6 +643,7 @@ impl OwnedLayout {
         &mut self,
         dom: &D,
         viewport: DeviceIntSize,
+        focused: Option<FocusedTextPaint>,
         mut commands: F,
         mut fragment: G,
     ) -> LiveryPaintList
@@ -622,6 +652,47 @@ impl OwnedLayout {
         F: FnMut(u64) -> Option<Vec<paint_list_api::PaintCmd>>,
         G: FnMut(u64) -> Option<u64>,
     {
+        let text_paint = focused.map(|(node, caret, selection)| {
+            let selection_color = self
+                .selection_style(dom, node)
+                .map(|(bg, _)| ColorF {
+                    r: bg[0],
+                    g: bg[1],
+                    b: bg[2],
+                    a: bg[3],
+                })
+                .unwrap_or(ColorF {
+                    r: 0.20,
+                    g: 0.45,
+                    b: 0.90,
+                    a: 0.35,
+                });
+            let selection = selection
+                .map(|(start, end)| self.selection_rects_at(dom, node, start, end))
+                .unwrap_or_default()
+                .into_iter()
+                .map(|rect| text_rect_command(rect, selection_color))
+                .collect::<Vec<_>>();
+            let caret_color = self
+                .caret_color(dom, node)
+                .map(|rgba| ColorF {
+                    r: rgba[0],
+                    g: rgba[1],
+                    b: rgba[2],
+                    a: rgba[3],
+                })
+                .unwrap_or(ColorF {
+                    r: 0.92,
+                    g: 0.94,
+                    b: 0.98,
+                    a: 1.0,
+                });
+            let caret = self.caret_rect_at(dom, node, caret.byte).map(|mut rect| {
+                rect.width = 2.0;
+                text_rect_command(rect, caret_color)
+            });
+            (dom.opaque_id(node), selection, caret)
+        });
         let mut list = emit_paint_list_with_text_system_scrolled_with_images(
             dom,
             &self.styles,
@@ -636,21 +707,27 @@ impl OwnedLayout {
         // the document viewport transform is added so their indices and their
         // CSS paint context stay aligned.
         list.splice_host_leaf_slots(&mut commands, &mut fragment);
+        // These commands belong to the field, not to a window-wide overlay.
+        // The recorded slots retain its CSS clipping, opacity and transforms;
+        // raw coordinates avoid subtracting any scroll a second time.
+        list.splice_text_paint_slots(|owner, phase| {
+            let (focused_owner, selection, caret) = text_paint.as_ref()?;
+            if owner != *focused_owner {
+                return None;
+            }
+            Some(match phase {
+                // Keep the existing translucent selection over the field's
+                // glyphs and syntax backgrounds, followed by its caret. Both
+                // stay below DOM surfaces painted after the field.
+                TextPaintPhase::BeforeContent => Vec::new(),
+                TextPaintPhase::AfterContent => selection
+                    .iter()
+                    .cloned()
+                    .chain(caret.iter().cloned())
+                    .collect(),
+            })
+        });
         list.translated(-self.viewport_scroll.0, -self.viewport_scroll.1)
-    }
-
-    pub(crate) fn push_rect(
-        list: &mut LiveryPaintList,
-        rect: genet_livery::TextRect,
-        color: ColorF,
-    ) {
-        list.push_overlay_rect(
-            LayoutRect::from_origin_and_size(
-                LayoutPoint::new(rect.x, rect.y),
-                LayoutSize::new(rect.width, rect.height),
-            ),
-            color,
-        );
     }
 
     pub(crate) fn append_scrollbars<D: LayoutDom<NodeId = NodeId>>(
@@ -701,11 +778,11 @@ impl OwnedLayout {
         (self.viewport_scroll != before).then_some(ScrollTarget::Document)
     }
 
-    /// Bring `node` into view on the vertical axis: the nearest ancestor that
-    /// scrolls vertically and has room to, otherwise the document viewport,
-    /// moves by `align`, and the planes outside it follow (see
-    /// [`follow_out`](Self::follow_out)). Returns the planes that moved,
-    /// innermost first: none for a node that is gone or does not paint.
+    /// Bring `node` into view through its ancestor scrollports and the document.
+    /// Horizontal planes reveal the nearest edge; the first vertical plane
+    /// with room moves by `align`, and outer vertical planes follow by nearest.
+    /// Returns each plane that moved once, innermost first, even when both axes
+    /// moved. A retired node or one without painted bounds moves no planes.
     pub(crate) fn scroll_into_view<D: LayoutDom<NodeId = NodeId>>(
         &mut self,
         dom: &D,
@@ -716,11 +793,118 @@ impl OwnedLayout {
         if self.painted_rect(dom, node).is_none() {
             return Vec::new();
         }
-        let first = self.vertical_scroll_container(dom, node);
-        self.follow_out(dom, first, align, |layout, dom| {
-            let (_, top, _, height) = layout.painted_rect(dom, node)?;
-            Some((top, height))
-        })
+        let mut moved = Vec::new();
+        let mut vertical_align = align;
+        let mut ancestor = dom.parent(node);
+        while let Some(container) = ancestor {
+            let axes = scroll_axes(&self.styles, container);
+            if !axes.0 && !axes.1 {
+                ancestor = dom.parent(container);
+                continue;
+            }
+            let range = element_scroll_range(dom, &self.styles, &self.fragments, container);
+            let mut changed = false;
+            if axes.0 && range.0 > 0.0 {
+                changed = self.reveal_horizontal(dom, node, Some((container, range.0)));
+            }
+            if axes.1 && range.1 > 0.0 {
+                if let Some((_, top, _, height)) = self.painted_rect(dom, node) {
+                    changed |= self
+                        .move_plane(dom, Some((container, range.1)), top, height, vertical_align)
+                        .is_some();
+                }
+                vertical_align = ScrollAlign::Nearest;
+            }
+            if changed {
+                moved.push(ScrollTarget::Element(container));
+            }
+            ancestor = dom.parent(container);
+        }
+        let mut changed = self.reveal_horizontal(dom, node, None);
+        if let Some((_, top, _, height)) = self.painted_rect(dom, node) {
+            changed |= self
+                .move_plane(dom, None, top, height, vertical_align)
+                .is_some();
+        }
+        if changed {
+            moved.push(ScrollTarget::Document);
+        }
+        moved
+    }
+
+    /// Reveal only the part that can escape inner clips. In particular, a
+    /// hidden/clip box is not a scroll plane, and its invisible overflow must
+    /// not cause an outer plane to chase an unreachable target. Bounds are
+    /// re-read after every move, in the same painted coordinate space as the
+    /// scrollport; no additional viewport or nested-scroll subtraction applies.
+    fn reveal_horizontal<D: LayoutDom<NodeId = NodeId>>(
+        &mut self,
+        dom: &D,
+        node: NodeId,
+        plane: Option<(NodeId, f32)>,
+    ) -> bool {
+        let Some((left, _, width, _)) = self.painted_rect(dom, node) else {
+            return false;
+        };
+        let (mut left, mut right) = (left, left + width);
+        let mut ancestor = dom.parent(node);
+        while let Some(container) = ancestor {
+            if plane.is_some_and(|(owner, _)| owner == container) {
+                break;
+            }
+            if let Some((x, _, width, _)) = self.content_clip(dom, container) {
+                left = left.max(x);
+                right = right.min(x + width);
+                if right <= left {
+                    return false;
+                }
+            }
+            ancestor = dom.parent(container);
+        }
+        let (area_left, area_width, current, range) = match plane {
+            Some((container, range)) => {
+                let Some((x, _, width, _)) = self
+                    .content_clip(dom, container)
+                    .or_else(|| self.painted_rect(dom, container))
+                else {
+                    return false;
+                };
+                (
+                    x,
+                    width,
+                    self.element_scroll.get(&container).map_or(0.0, |s| s.0),
+                    range,
+                )
+            },
+            None => (
+                0.0,
+                self.viewport.0,
+                self.viewport_scroll.0,
+                (self.content_extent.0 - self.viewport.0).max(0.0),
+            ),
+        };
+        let to_left = left - area_left;
+        let to_right = right - (area_left + area_width);
+        // A target covering both edges already has its nearest visible part
+        // on screen. Leave it there rather than alternating between edges.
+        let delta = if to_left < 0.0 && to_right > 0.0 {
+            0.0
+        } else if to_left < 0.0 {
+            to_left
+        } else if to_right > 0.0 {
+            to_right.min(to_left)
+        } else {
+            0.0
+        };
+        let next = (current + delta).clamp(0.0, range);
+        if next == current {
+            return false;
+        }
+        match plane {
+            Some((container, _)) => self.element_scroll.entry(container).or_default().0 = next,
+            None => self.viewport_scroll.0 = next,
+        }
+        true
     }
 
     /// Walk the vertical planes out from `first`, a scroller or else the
@@ -993,6 +1177,16 @@ fn register_fonts(text: &mut TextSystem, fonts: &[crate::HostFont]) {
             None => text.register_font_bytes(font.bytes.clone()),
         }
     }
+}
+
+fn text_rect_command(rect: genet_livery::TextRect, color: ColorF) -> PaintCmd {
+    PaintCmd::DrawRect(RectItem {
+        placement: CommonPlacement::new(LayoutRect::from_origin_and_size(
+            LayoutPoint::new(rect.x, rect.y),
+            LayoutSize::new(rect.width, rect.height),
+        )),
+        color,
+    })
 }
 
 fn content_extent<D: LayoutDom<NodeId = NodeId>>(

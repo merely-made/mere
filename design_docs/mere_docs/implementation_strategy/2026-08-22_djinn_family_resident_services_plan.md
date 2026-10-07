@@ -1,8 +1,17 @@
 # Djinn Family Resident Services Plan
 
-**Status:** planned, gated on the `djinn 0.0.2` release
+**Status (2026-10-06):** Phases A to G are planned and still gated on the
+`djinn 0.0.2` release (§2): djinn is version 0.0.2, but its knot-site
+dependency is Git-only, so `cargo package` would refuse it. §13's ordinary
+Gemini publication service was implemented and receipted outside that gate on
+2026-09-13 (`ports/djinn/src/resident_site.rs`,
+`ports/djinn/src/bin/djinn_site.rs`). A4 is partly built: Luggage's
+`ReleaseRefV1` landed in `d10e04da` (2026-09-01) for the WebRTC carrier, while
+`ReleaseOfferV1` and the versioned manifest are open.
 **Date:** 2026-08-22
-**Amended:** 2026-09-04, notification ownership name corrected
+**Amended:** 2026-09-04, notification ownership name corrected; 2026-10-01,
+Gazette row added (Mark's ruling 6 in the
+[dramatis tier architecture](../../dramatis_docs/technical_architecture/2026-09-30_dramatis_tier_architecture.md))
 
 **Related:**
 
@@ -28,7 +37,14 @@ The resident composes domain crates rather than absorbing their semantics:
 | Notification records and delivery rules | Notification domain (`notifications` is the working package name) |
 | Authenticated streams and DNS-SD mechanics | Murm |
 | Local caller identity and durable secret authority | Personae and Castellan |
+| Directory resolution, feed polling, contact intake, announcing a persona's well-known documents | Gazette (ruled 2026-10-01; unbuilt) |
 | Firmware compatibility and flashing | Linkboy |
+
+**Corrected 2026-10-06 (S14 pass):** Gazette is not unbuilt. `ports/gazette`
+exists, and its manifest reports "Built today: ... WebFinger (RFC 7033)
+resolution and unverified Gaz address intake" (`ports/gazette/Cargo.toml`,
+line 7). What is unbuilt is the djinn composition: djinn has no gazette
+dependency.
 
 Djinn contains the scheduler. Athanor is one scheduled service and remains a
 proposal emitter; it does not become the generic scheduler or directly mutate
@@ -52,6 +68,11 @@ Done conditions:
 
 This plan targets the next source version. It does not fold new services into
 the `0.0.2` release.
+
+**Open, raised by the S14 pass (2026-10-06):** §13's ordinary Gemini service
+shipped on 2026-09-13 without passing this gate. How does the plan hold that?
+Options: scope this entry gate to Phases A to G only; split §13 into its own
+plan.
 
 ## 3. Invariants
 
@@ -214,6 +235,17 @@ Done conditions:
 - selecting a browser artifact cannot select a native installer or firmware
   entry with the same target spelling.
 
+**Corrected 2026-10-06 (S14 pass):** A4 is partly built, which this section
+did not record. `ReleaseRefV1` exists at `crates/system/luggage/src/release.rs`
+(line 62), landed in `d10e04da` (2026-09-01), and
+`crates/murm/webrtc-carrier/src/invite.rs` uses it. `ReleaseOfferV1` and the
+versioned manifest are absent.
+
+**Open, raised by the S14 pass (2026-10-06):** `ReleaseRefV1` landed for the
+WebRTC carrier rather than through this phase. Where is it credited? Options:
+credit A4 as partial here; leave it to the
+[browser WebRTC carrier plan](2026-08-25_browser_webrtc_carrier_plan.md).
+
 ## 5. Phase B: add the family update resident to Djinn
 
 ### B1. Installed-app inventory
@@ -348,7 +380,9 @@ Done conditions:
 ## 8. Phase E: extract the resident scheduler through real jobs
 
 Extract a small scheduler only after the update resident is working. Its first
-two consumers are family updates and one Athanor maintenance pass.
+two consumers are family updates and one Athanor maintenance pass. Gazette's
+feed polling is a later consumer (ruled 2026-10-01); it does not change the
+first two.
 
 The common contract is limited to:
 
@@ -620,3 +654,12 @@ Select accepted revisions/files by their hashes, retain them under the relevant
 lease and recheck hosting permission on restart and authority changes. Discovery
 advertises availability separately; retaining bytes grants neither editing rights
 nor decryption keys. Serving a saved ordinary site must keep working without a moot.
+
+## Progress
+
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_50_s14_phase_b12.md: the status records Phases A
+  to G as still gated and §13's service and A4's `ReleaseRefV1` as landed, the
+  Gazette row is corrected, and §13's relation to the gate and A4's credit are
+  raised as open questions.

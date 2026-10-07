@@ -7,8 +7,9 @@
 use super::{ProducerFrameStats, ResolvedAppearance};
 use crate::{AppCtx, Host, NodeId, meristem_bounds::RootView};
 
-impl<State: 'static, Logic, V> AppCtx<'_, State, Logic, V>
+impl<State: 'static, Logic, V, T> AppCtx<'_, State, Logic, V, T>
 where
+    T: crate::HostTree<State>,
     Logic: FnMut(&State) -> V,
     V: RootView<State>,
 {
@@ -26,7 +27,8 @@ where
     pub fn content_size(&self, node: NodeId) -> Option<(f32, f32)> {
         let dom = self.runner.dom();
         let dom = dom.borrow();
-        Some(self.layout?.element_geometry(&*dom, node)?.content_size())
+        let view = crate::WindowDom::new(&dom, self.runner.mount());
+        Some(self.layout?.element_geometry(&view, node)?.content_size())
     }
 
     /// Inverse document paint mapping into the node's content box. Rejects
@@ -36,24 +38,68 @@ where
         let layout = self.layout?;
         let dom = self.runner.dom();
         let dom = dom.borrow();
+        let view = crate::WindowDom::new(&dom, self.runner.mount());
         let scroll = layout.viewport_scroll();
         layout
-            .element_geometry(&*dom, node)?
+            .element_geometry(&view, node)?
             .map_to_content(x + scroll.0, y + scroll.1)
     }
 }
 
-impl<State: 'static, Logic, V> Host<State, Logic, V>
+impl<State: 'static, Logic, V, T> Host<State, Logic, V, T>
 where
+    T: crate::HostTree<State>,
     Logic: FnMut(&State) -> V + 'static,
     V: RootView<State>,
 {
+    /// Draw with a caller-supplied monotonic timestamp. Ordinary redraw remains
+    /// untimed for deterministic callers; timestamps never leak into later draws.
+    pub fn redraw_at(&mut self, timestamp: std::time::Duration) {
+        self.s.shared.producers.timestamp = Some(timestamp);
+        self.redraw();
+        self.s.shared.producers.timestamp = None;
+    }
+
+    /// Update platform visibility immediately, even if no frame will be delivered.
+    pub fn set_hidden(&mut self, hidden: bool) {
+        if self.s.hidden == hidden {
+            return;
+        }
+        self.s.hidden = hidden;
+        if hidden {
+            self.suspend_producers();
+        } else if let Some(window) = &self.s.window {
+            window.request_redraw();
+        }
+    }
+
     /// Retire staged images before a platform drops/replaces its surface, or
     /// suspend transient targets while the containing window is hidden.
     pub fn suspend_producers(&mut self) {
-        self.s
-            .producers
-            .suspend_all(self.s.surface.as_ref().map(|surface| surface.renderer()));
+        let dom = self
+            .s
+            .runner
+            .as_ref()
+            .map(|runner| (runner.dom(), runner.mount()));
+        let dom_ref = dom.as_ref().map(|(dom, mount)| (dom.borrow(), *mount));
+        let view = dom_ref
+            .as_ref()
+            .map(|(dom, mount)| crate::WindowDom::new(dom, *mount));
+        let shared = &mut self.s.shared;
+        let held = &shared.held_elsewhere;
+        let elsewhere = |key: u64, owner: Option<NodeId>| {
+            held.contains(&key)
+                || owner
+                    .zip(view.as_ref())
+                    .is_some_and(|(n, v)| v.elsewhere(n))
+        };
+        shared.producers.suspend_except(
+            &elsewhere,
+            self.s.surface.as_ref().map(|surface| surface.renderer()),
+        );
+        if held.is_empty() {
+            shared.producers.forget_device();
+        }
     }
 
     pub(crate) fn prepare_producers(&mut self, scale: f32) -> ProducerFrameStats {
@@ -62,15 +108,37 @@ where
             self.s.layout.as_ref(),
             self.s.runner.as_ref(),
         ) else {
-            self.s.producers.suspend_all(None);
+            let shared = &mut self.s.shared;
+            let held = &shared.held_elsewhere;
+            shared
+                .producers
+                .suspend_except(&|key, _| held.contains(&key), None);
+            if held.is_empty() {
+                shared.producers.forget_device();
+            }
             return ProducerFrameStats::default();
         };
-        if self.s.hidden {
-            self.s.producers.suspend_all(Some(surface.renderer()));
-            return ProducerFrameStats::default();
-        }
         let dom = runner.dom();
         let dom = dom.borrow();
-        self.s.producers.prepare(surface, layout, &*dom, scale)
+        let view = crate::WindowDom::new(&dom, runner.mount());
+        let shared = &mut self.s.shared;
+        let held = &shared.held_elsewhere;
+        // Another window owns a producer whose key it last laid out, or whose
+        // node now lives under its root.
+        let elsewhere = |key: u64, owner: Option<NodeId>| {
+            held.contains(&key) || owner.is_some_and(|n| view.elsewhere(n))
+        };
+        if self.s.hidden {
+            shared
+                .producers
+                .suspend_except(&elsewhere, Some(surface.renderer()));
+            if held.is_empty() {
+                shared.producers.forget_device();
+            }
+            return ProducerFrameStats::default();
+        }
+        shared
+            .producers
+            .prepare_window(surface, layout, &view, scale, &elsewhere)
     }
 }

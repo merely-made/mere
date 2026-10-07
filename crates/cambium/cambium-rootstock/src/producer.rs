@@ -60,6 +60,8 @@ pub struct ProducerFrameInfo {
     /// No prior image is usable: return a frame even if application data is
     /// unchanged. Set after resize, suspension, removal/recreation or a new device.
     pub needs_frame: bool,
+    /// Host monotonic time for this draw. None preserves deterministic callers.
+    pub timestamp: Option<std::time::Duration>,
     pub appearance: ResolvedAppearance,
 }
 
@@ -104,6 +106,100 @@ pub trait TextureProducer {
     fn retire(&mut self) {
         self.suspend();
     }
+
+    /// What the slot means to an assistive technology: a role and name for
+    /// the slot itself, and the things drawn in it as child nodes with their
+    /// rectangles. Read when the host publishes its accessibility tree, not
+    /// per frame. `None`, the default, leaves the slot's DOM semantics alone.
+    fn semantics(&mut self) -> Option<ProducerSemantics> {
+        None
+    }
+
+    /// A reader invoked action `id` of the drawn node `key` (a
+    /// [`ProducerNode`]'s own [`ProducerAction`]). Returns whether the producer
+    /// carried it out; `false`, the default, for one it does not know.
+    fn act(&mut self, key: u64, id: &str) -> bool {
+        let _ = (key, id);
+        false
+    }
+}
+
+/// A producer's accessible description of its slot. See
+/// [`TextureProducer::semantics`].
+#[derive(Clone, Debug, Default, PartialEq)]
+pub struct ProducerSemantics {
+    /// The slot's role, or `None` to keep its DOM role.
+    pub role: Option<ProducerRole>,
+    /// The slot's name, or `None` to keep its DOM name.
+    pub name: Option<String>,
+    /// What is drawn in the slot, in reading order.
+    pub children: Vec<ProducerNode>,
+}
+
+/// One thing drawn in a producer's slot.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ProducerNode {
+    /// The producer's stable name for the node, so a reader's request
+    /// reaches it however the list is ordered when the reader acts.
+    pub key: u64,
+    pub role: ProducerRole,
+    pub name: String,
+    /// Where it is drawn, `[x, y, width, height]` in the slot's own logical
+    /// (layout) pixels, from the slot's top-left corner.
+    pub rect: [f32; 4],
+    /// What a reader may do to it, each lowered to a button of its own
+    /// ([`TextureProducer::act`] carries one out).
+    pub actions: Vec<ProducerAction>,
+}
+
+/// One action a drawn node offers a reader. Neutral: a host maps its own
+/// action model onto it, and the id comes back through
+/// [`TextureProducer::act`].
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ProducerAction {
+    pub id: String,
+    /// The button's name.
+    pub label: String,
+    /// What the action does, a reader's description of the button.
+    pub description: String,
+}
+
+/// A drawn node's action, as a reader's request names it: the producer's
+/// slot (its registry key), the node's [`ProducerNode::key`] and the action's
+/// [`ProducerAction::id`].
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+pub struct ProducedAction {
+    pub slot: u64,
+    pub key: u64,
+    pub id: String,
+}
+
+/// The roles a producer's slot and its nodes can take. A small, neutral set
+/// that each host lowers to its own vocabulary (ARIA, AccessKit).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum ProducerRole {
+    /// A collection whose items are its children.
+    List,
+    ListItem,
+    /// A generic grouping.
+    Group,
+    /// A picture with a name.
+    Image,
+    /// A drawn object inside a graphic (a node on a canvas).
+    GraphicsObject,
+}
+
+impl ProducerRole {
+    /// The WAI-ARIA role this lowers to.
+    pub fn aria(self) -> &'static str {
+        match self {
+            ProducerRole::List => "list",
+            ProducerRole::ListItem => "listitem",
+            ProducerRole::Group => "group",
+            ProducerRole::Image => "img",
+            ProducerRole::GraphicsObject => "graphics-object",
+        }
+    }
 }
 
 impl<P: TextureProducer> TextureProducer for Rc<RefCell<P>> {
@@ -115,6 +211,12 @@ impl<P: TextureProducer> TextureProducer for Rc<RefCell<P>> {
     }
     fn retire(&mut self) {
         self.borrow_mut().retire();
+    }
+    fn semantics(&mut self) -> Option<ProducerSemantics> {
+        self.borrow_mut().semantics()
+    }
+    fn act(&mut self, key: u64, id: &str) -> bool {
+        self.borrow_mut().act(key, id)
     }
 }
 

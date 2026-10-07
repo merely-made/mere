@@ -12,7 +12,7 @@
 //! shutdown.
 
 use crate::p2panda_transport::{KnownPeer, MdnsDiscoveryMode, P2pandaTransportBuilder, RelayUrl};
-use crate::{P2pandaTransport, PeerID, Transport, TransportError};
+use crate::{P2pandaTransport, PeerID, PeerPath, Transport, TransportError};
 
 /// Owner-selected network policy for a resident p2panda endpoint.
 #[derive(Clone, Debug)]
@@ -163,6 +163,13 @@ impl P2pandaOverlayHost {
         let peer = PeerID::from_bytes(&peer)
             .map_err(|error| TransportError::Backend(format!("overlay peer id: {error}")))?;
         self.transport.peer_ticket(peer).await
+    }
+
+    /// Every address held for one peer, with which ones carry traffic now.
+    pub async fn peer_paths(&self, peer: [u8; 32]) -> Result<Vec<PeerPath>, TransportError> {
+        let peer = PeerID::from_bytes(&peer)
+            .map_err(|error| TransportError::Backend(format!("overlay peer id: {error}")))?;
+        self.transport.peer_paths(peer).await
     }
 
     /// Gracefully close the endpoint after protocol sessions have left.
