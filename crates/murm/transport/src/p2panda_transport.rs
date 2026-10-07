@@ -574,7 +574,9 @@ pub struct P2pandaTransport {
     /// moved once made, and moving the transport moves pointers (ruling 51).
     endpoint: Box<Endpoint>,
     /// iroh's endpoint, asked of p2panda's actor once, at bind: its handle
-    /// holds no key, and `close` then sends the actor no message (ruling 52).
+    /// holds no key, and nothing after bind sends the actor a message for it
+    /// (rulings 52, 54). ractor boxes such a message whole, unused bytes
+    /// included, and those can carry key bytes bind left on the stack.
     /// The actor is spawned unsupervised and binds once, so this stays its
     /// endpoint for the transport's life.
     iroh: iroh::Endpoint,
@@ -891,11 +893,7 @@ impl P2pandaTransport {
     /// peer's [`add_peer`](Self::add_peer), or share as a
     /// [`ticket`](Self::ticket), so they can connect without discovery.
     pub async fn endpoint_addr(&self) -> Result<EndpointAddr, TransportError> {
-        let iroh_ep = self
-            .endpoint
-            .endpoint()
-            .await
-            .map_err(|e| TransportError::Backend(format!("endpoint(): {e}")))?;
+        let iroh_ep = &self.iroh;
         // iroh discovers its direct (interface) addresses asynchronously just
         // after bind; give it a beat so the address carries the LAN
         // candidates a remote machine actually needs, not only the loopback
@@ -932,9 +930,7 @@ impl P2pandaTransport {
     /// iroh endpoint aborts its remaining connections and makes the remote end
     /// report a lost connection even after all application data was delivered.
     ///
-    /// Uses the handle kept at bind: a message to p2panda's actor here would
-    /// be boxed whole by ractor, unused bytes included, and those can carry
-    /// key bytes left on this thread's stack by bind (ruling 52).
+    /// Uses the handle kept at bind (ruling 52).
     pub async fn close(&self) -> Result<(), TransportError> {
         self.iroh.close().await;
         Ok(())
@@ -1034,17 +1030,6 @@ impl P2pandaTransport {
         } else {
             HashSet::new()
         };
-        // Asked only when the path decides, never by the live rule: each ask
-        // queues a message on the peer's iroh actor. A failure to obtain the
-        // handle is reported as "nothing is connected" rather than as an
-        // error: the address-book half of this answer is still worth
-        // returning, and a caller that cannot tell "not connected" from "could
-        // not ask" is exactly the problem this field exists to end.
-        let endpoint = if live {
-            None
-        } else {
-            self.endpoint.endpoint().await.ok()
-        };
         let mut peers = Vec::new();
         for info in infos {
             if info.node_id.as_bytes() == &local {
@@ -1057,22 +1042,22 @@ impl P2pandaTransport {
             } else if live {
                 self.open.count(info.node_id.as_bytes()) > 0
             } else {
-                match &endpoint {
-                    Some(endpoint) => endpoint
-                        .remote_info(
-                            iroh::PublicKey::from_bytes(info.node_id.as_bytes()).map_err(|e| {
-                                TransportError::Backend(format!("peer key for remote_info: {e}"))
-                            })?,
-                        )
-                        .await
-                        .map(|remote| {
-                            remote.addrs().any(|addr| {
-                                matches!(addr.usage(), iroh::endpoint::TransportAddrUsage::Active)
-                            })
+                // Off the live rule iroh's path decides, read from the handle
+                // kept at bind (ruling 54); a peer iroh does not know is not
+                // connected.
+                self.iroh
+                    .remote_info(
+                        iroh::PublicKey::from_bytes(info.node_id.as_bytes()).map_err(|e| {
+                            TransportError::Backend(format!("peer key for remote_info: {e}"))
+                        })?,
+                    )
+                    .await
+                    .map(|remote| {
+                        remote.addrs().any(|addr| {
+                            matches!(addr.usage(), iroh::endpoint::TransportAddrUsage::Active)
                         })
-                        .unwrap_or(false),
-                    None => false,
-                }
+                    })
+                    .unwrap_or(false)
             };
             peers.push(KnownPeer {
                 peer,
@@ -1089,8 +1074,9 @@ impl P2pandaTransport {
     /// manager's own record of its `NeighbourUp` and `NeighbourDown` events,
     /// the record LogSync reads too.
     ///
-    /// Empty without gossip, or when the overlay cannot be asked, the same
-    /// fallback as the endpoint in [`peers_for_topic`](Self::peers_for_topic).
+    /// Empty without gossip, or when the overlay cannot be asked: read as
+    /// nothing connected, the address-book half of
+    /// [`peers_for_topic`](Self::peers_for_topic) still returned.
     async fn gossip_neighbours(&self, topic: [u8; 32]) -> HashSet<[u8; 32]> {
         let Some(gossip) = &self.gossip else {
             return HashSet::new();
@@ -1216,11 +1202,7 @@ impl P2pandaTransport {
     /// yields the same ticket string, letting a caller compare tickets to
     /// decide whether anything actually changed.
     pub async fn peer_ticket(&self, peer: PeerID) -> Result<Option<String>, TransportError> {
-        let endpoint = self
-            .endpoint
-            .endpoint()
-            .await
-            .map_err(|e| TransportError::Backend(format!("endpoint: {e}")))?;
+        let endpoint = &self.iroh;
         let id = iroh::PublicKey::from_bytes(&peer.to_bytes())
             .map_err(|e| TransportError::Backend(format!("peer key: {e}")))?;
         let Some(info) = endpoint.remote_info(id).await else {
@@ -1245,11 +1227,7 @@ impl P2pandaTransport {
     /// [`connected`](KnownPeer::connected) with no address active here, or not
     /// connected while one still is.
     pub async fn peer_paths(&self, peer: PeerID) -> Result<Vec<PeerPath>, TransportError> {
-        let endpoint = self
-            .endpoint
-            .endpoint()
-            .await
-            .map_err(|e| TransportError::Backend(format!("endpoint: {e}")))?;
+        let endpoint = &self.iroh;
         let id = iroh::PublicKey::from_bytes(&peer.to_bytes())
             .map_err(|e| TransportError::Backend(format!("peer key: {e}")))?;
         let Some(info) = endpoint.remote_info(id).await else {

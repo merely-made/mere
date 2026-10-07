@@ -14,8 +14,10 @@
 //! it, with every p2panda future and handle boxed where it is made. What the
 //! transport adds beyond that baseline is its own: a block, freed or still
 //! live, whose size is in every transport run and in no baseline run fails.
-//! Each shape runs five times, so one-off scheduling blocks (and the rare
-//! iroh task still holding its key when the run disarms) do not count.
+//! The transport also asks, between bind and close, each question that reads
+//! iroh's endpoint. Each shape runs five times, so one-off scheduling blocks
+//! (and the rare iroh task still holding its key when the run disarms) do
+//! not count.
 //!
 //! The baseline also nests its bind and close as deep as the transport's.
 //! p2panda-net leaves key bytes on the worker's stack while it binds, and a
@@ -39,7 +41,7 @@ use p2panda_net::gossip::Gossip;
 use p2panda_net::{AddressBook, Endpoint};
 use residue::*;
 use stickleback::MunimentAddressBook;
-use transport::P2pandaTransport;
+use transport::{P2pandaTransport, Transport};
 
 const RUNS: usize = 5;
 
@@ -145,6 +147,8 @@ async fn p2panda_net(seed: &'static [u8; 32], gossip: bool) {
 }
 
 /// The transport, awaited inline and held by value, as residents hold it.
+/// Between bind and close it asks each question that reads iroh's endpoint
+/// (ruling 54), so a message to p2panda's actor from any of them shows here.
 async fn transport(seed: &'static [u8; 32], gossip: bool) {
     let builder = P2pandaTransport::builder_from_seed_ref(seed);
     let builder = match gossip {
@@ -152,6 +156,11 @@ async fn transport(seed: &'static [u8; 32], gossip: bool) {
         false => builder,
     };
     let bound = builder.bind().await.unwrap();
+    let me = bound.local_peer_id();
+    bound.endpoint_addr().await.unwrap();
+    bound.peers_for_topic([7; 32]).await.unwrap();
+    bound.peer_ticket(me).await.unwrap();
+    bound.peer_paths(me).await.unwrap();
     bound.close().await.unwrap();
     drop(bound);
 }
