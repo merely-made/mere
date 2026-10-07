@@ -1,7 +1,7 @@
 # Physics Catalog Plan
 
 **Date:** 2026-09-02
-**Status (2026-10-06):** in progress. P1 landed 2026-09-02; P1b, P2 on both hosts and P3 the remote board 2026-09-03; the runtime extraction 2026-09-04; P4's web half 2026-09-04, closing with the Graphshell tree port per the 2026-10-01 rulings in §5. P5a-c (kernel, cell list, lagged seam, setters and the web tree at the third-round web defaults, receipts green) merged 2026-10-02 (`8022cedd`); turnstone's wiring and P5d remain. P6a, Density's CPU tier, merged 2026-10-04 (`9b576c84`); P6b, the GPU tier, and P6c, its receipts, remain. Orbit's retune (`9ce5889f`) and Energy's, with the view following while playing (`562488b0`), merged 2026-10-04. Seiche's speed dial, the native entry point and the 1x-floor bound merged 2026-10-06 (`c6e8cc09`, calm round 24 of 24); the period estimator is on `seiche-speed-estimator`, not merged, and turnstone's repin and speed wiring follow the dial's merge (Progress, 2026-10-05). P7 moved to the [dynamics grammar plan](2026-10-02_dynamics_grammar_plan.md) 2026-10-02.
+**Status (2026-10-06):** in progress. P1 landed 2026-09-02; P1b, P2 on both hosts and P3 the remote board 2026-09-03; the runtime extraction 2026-09-04; P4's web half 2026-09-04, closing with the Graphshell tree port per the 2026-10-01 rulings in §5. P5a-c (kernel, cell list, lagged seam, setters and the web tree at the third-round web defaults, receipts green) merged 2026-10-02 (`8022cedd`); turnstone's wiring and P5d remain. P6a, Density's CPU tier, merged 2026-10-04 (`9b576c84`); P6b, the GPU tier, and P6c, its receipts, remain. Orbit's retune (`9ce5889f`) and Energy's, with the view following while playing (`562488b0`), merged 2026-10-04. Seiche's speed dial, the native entry point and the 1x-floor bound merged 2026-10-06 (`c6e8cc09`, calm round 24 of 24); the period estimator and its worker tiebreaker are on `seiche-speed-estimator`, not merged, and turnstone's repin and speed wiring follow the dial's merge (Progress, 2026-10-05). P7 moved to the [dynamics grammar plan](2026-10-02_dynamics_grammar_plan.md) 2026-10-02.
 **Scope:** A catalog of *distinct physics layout laws* — dynamical systems
 over the graph's bodies that produce different layouts because they are
 different physics — as a lever beside the arrangement catalog, plus the
@@ -2966,3 +2966,69 @@ binning are the useful patterns.
   passes under load counting, the 50x control's two misses under load (24.7x
   and 20.9x against 25, frames slow enough that 150 ticks filled the 3 ms
   budget) not counted and its third try green.
+- 2026-10-06 (seiche's speed, the worker tiebreaker built and checked, branch
+  `seiche-speed-estimator`). "Worker rAF, main thread fallback" (`7f7ccdc2`):
+  a dedicated worker, from an inline script, runs its own rAF loop over a
+  one-pixel `OffscreenCanvas` doing no work and posts its intervals in batches
+  of eight; both pages feed them to the frame budget each frame. The budget
+  reads the period from the worker's last 40 intervals while its last batch is
+  under a second old, else from the main thread's, and the pace lines, the
+  snapshot (`display-period-from`) and the product page say which: the worker,
+  or the main thread with the worker pending, disabled
+  (`physics_period_source=main`), without rAF or failed to start
+  (`physics_plant_worker=fail`, the planted failure), or stale. The clock's
+  grain is measured, not assumed (Chrome 100 us, Firefox 1 ms), the margin two
+  of its steps, and no period under six tolerances is read, so Firefox's main
+  thread, whose rAF is not on its refreshes, reads the period or the cap,
+  never the 3 to 5 ms its 2.1 ms tolerance let fit (the test fails with the
+  guard off, reading 5.58 ms). Neither lock changed: web-sys gains four
+  features. The even case reads the true period on both machines: this
+  machine's probe at an 11 ms busy-wait (main thread twice the 165 Hz period)
+  reads 6.06 ms from the worker beside it (96 of 96 windows, and the unit test
+  over the logged trace); the ThinkPad cannot show the trap (twice its 60 Hz
+  period is past the cap) and its worker read 16.67 ms at every load. Firefox
+  157 on the ThinkPad, in a throwaway profile (`--profile <dir> --no-remote
+  --new-instance`, nothing installed or set): its worker has rAF, 360
+  intervals in 6 s all one refresh at a 1 ms grain, read at the period in 32
+  of 32 windows; Firefox has no `navigator.gpu`, so the tree page cannot boot
+  there and the fallback's Firefox case stays the planted one. System-wide
+  load, on the product page: here, the 300-node page read 6.06 to 6.08 ms from
+  the worker calm, beside 8 and 20 busy processes on 16 logical CPUs (100%
+  CPU, 2 to 11 other lanes' builds) and beside seiche's GPU test looping,
+  fitting 0.97 to 1.00 in all seven runs; on the ThinkPad, 16.665 to 16.667 ms
+  calm and beside 8 busy processes (bundle `34a63551`, as here). Controls:
+  with the worker disabled the even case reads twice the period again, in the
+  unit test over the logged trace and on the probe, whose main thread alone
+  read it in 36 of 47 windows calm and 13 of 48 beside 8 busy processes; the
+  planted failure falls back, labelled "main (no worker rAF)", on both
+  machines (6.079 ms or the cap here, 16.666 ms on the ThinkPad). No cost to
+  the main thread shows at this noise: the 300-node page's frames ran at 255
+  to 309 ms median with the worker off and 267 to 324 with it on, the latter
+  at the busier times. Finding, once in eleven runs of the 300-node page here:
+  at 100% CPU with 14 other lanes' builds and this lane's gates running, the
+  worker's intervals left the refresh after a 15.1 ms gap, running 7.8 to 12.2
+  ms (multiples 1.3 to 1.6) for the rest of the run, so its 40 fitted 0.53 and
+  the budget fell back to the cap, as ruled; it did not recur in six reruns at
+  heavier load. Returned as a fork. Merges: main `459e4376` (`42c46627`),
+  `fd656553` (`9ea6511f`, stable Burn 0.22, CubeCL 0.11, Cubek 0.3 and the
+  genet image-decode repin) and `ebfb490a` (`19194e7e`, the genet chain's
+  djinn pin to Knot `ef89a18`), weave's result matching `git merge-file` on
+  every file both sides changed (the plan, graphshell-web's `Cargo.toml`); the
+  root lock is main's. The web lock, gitignored, was re-resolved offline from
+  the local registry with nothing fetched (`cargo update --offline -p uuid -p
+  cc`, 94 packages relocked, 76 changed, `87188cd2` to `be7d16e9`) and holds
+  `--locked` at `ebfb490a`, one genet (`d851a9db`) and no Knot in the web
+  graph; graphshell-web keeps image decoding on. Gates at `19194e7e`: seiche
+  129/129 (123 without actor, 129 + 3 with gpu), pictograph 310, graphshell
+  `web` 249, mere and graphshell checked clean. The dial rows on `34a63551`,
+  none calm (4 to 25 other lanes' Normal-priority builds, 25 to 100% CPU),
+  passes under load counting: slow; fast, Max at 2.25 times the page's 1x
+  (0.341x against 0.152x), the every-window bound holding (worst 40 us under);
+  its two controls failing for their planted reasons (the slowed Max at 0.57
+  of the page's 1x, the planted stall 9,762 us over the bound); the physics
+  Speed select; the tree Speed select on its second run, its first missing the
+  every-window bound by one frame 370 us over at 100% CPU beside 25 builds.
+  The 50x control missed four times under load (19.1, 13.0, 8.8 and 12.3 times
+  against 25, in 91 to 206 ms frames; in two the budget bound engaged, in two
+  one frame ran 269 and 1,372 us past it), calm not coming in three ten-minute
+  waits; unresolved, returned with the worker's off-refresh run.
