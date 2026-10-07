@@ -24,6 +24,7 @@ use cambium::{
     TextInput, WheelEvent, clickable, el, focusable, on_hover, on_key, on_pointer, on_wheel, text,
 };
 use cambium_genet_winit_host::{FocusedTextSlot, Harness, HostHooks, Init, Modifiers, inert_hooks};
+use layout_dom_api::LayoutDom as _;
 use taproot::Selector;
 use winit::keyboard::{Key, NamedKey};
 
