@@ -202,6 +202,12 @@ impl OwnedLayout {
         genet_livery::rendered_generated_text(dom, &self.styles, node)
     }
 
+    /// Whether `node` is rendered and visible under this layout's styles: no
+    /// `display: none` above it and computed `visibility: visible`.
+    pub fn rendered_visible<D: LayoutDom<NodeId = NodeId>>(&self, dom: &D, node: NodeId) -> bool {
+        genet_livery::rendered_visible(dom, &self.styles, node)
+    }
+
     /// Font instances this session's text system has materialised. The
     /// observable end of the host font seam.
     pub fn retained_font_count(&self) -> usize {
