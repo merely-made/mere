@@ -7,12 +7,14 @@ Micron's reading slice and both consumer integrations landed 2026-09-13, and
 lane 3 (forms) closed the same day; lane 2 runs in the
 [Micron navigation plan](2026-09-15_micron_navigation_plan.md), which carries
 its own status; lane 1's headed qualification and lane 4 are open. WS1 is
-partial: feeds keep `guid` and enclosures (`5630e256`), and the Spartan `=:`
-prompt is typed (`080a2141`, as `SpartanLine::Prompt`; a fork in §3); the feed
-date and content split, the channel `ttl`, and, now in gopher-protocol,
-gopher's `raw_type`, the `8`/`T` fix and CSO are open. WS2 has not started.
-WS3's bespoke rendering is superseded by WS4, one render path (§7, rulings
-S66 and S70 to S75), assessed 2026-10-06 and not started.
+partial: feeds keep `guid` and enclosures (`5630e256`) and, since WS4's R3,
+their published and updated dates and full content apart from the summary;
+the Spartan `=:` prompt is typed (`080a2141`, as `SpartanLine::Prompt`; a fork
+in §3); gopher's `raw_type`, the `8`/`T` fix and CSO shipped in
+gopher-protocol 0.2.0 (WS4's R6); the channel `ttl` is open. WS2 has not
+started. WS3's bespoke rendering is superseded by WS4, one render path (§7,
+rulings S66 and S70 to S77), done on main 2026-10-06: R0 to R5 in `b4f14f2c`,
+R6 in `1d87808a`.
 
 > **Home refinement, 2026-08-03**: WS1's AST enrichment lands wherever the
 > grammar lives at the time, per the
@@ -856,6 +858,36 @@ Stop rules:
 - **2026-10-06**: WS4 added from rulings S66 and S70 to S75 of the stack
   seams plan: the assessment against Mere `7cca393c`, phases R0 to R6 and
   their stop rules; §5's bespoke regime is superseded by it.
+- **2026-10-06**: WS4 R0 to R5 landed (merge `b4f14f2c`; R0 `bcf054b9`; R1,
+  R2 and R5 `d490e38d`; R3 and R4 `3cad2d1b` and `9a1c37c5`; rustfmt on the
+  branch's lines `2b94cea2`). Gates on the merged tree: `cargo check
+  --workspace --all-targets` clean; tests pass in errand, inker,
+  document-canvas, uxtree, Nematic, import, cambium and mere-document-lanes
+  (smolweb); the label-column test fails both its controls (no padding, the
+  proportional body face). WS1's feed done-condition is met by R3.
+  *Readings, not ruled*: `MenuItemKind`'s eleven kinds and their type labels;
+  a search row submits through its label and has no target; Nematic's feed
+  engine resolves an entry address, and document-lanes fetches without the
+  fragment; the article's links resolve against the article URL (Nematic
+  gains `url` 2.5, already in the graph); document-lanes' `smolweb` feature
+  enables `nematic/html-fragment`. Gaps recorded: Atom `type="xhtml"` content
+  is not captured; nex still lowers the old way, so `FIXED_WIDTH_MENU_TYPES`
+  keeps its typeface rule; enclosures are carried but not drawn; uxtree
+  projects no paragraph-level `Submit`. R6 is gopher-protocol 0.2.0 on the
+  smolweb branch `gopher-protocol-0.2.0` (`b0f1dda`): a raw item type, `8`
+  and `T` as telnet, a CSO kind; unpublished. knot-editor's desktop preview
+  needs a wildcard arm and a `..` in its `FeedEntry` pattern at its next
+  repin, which under the stop rules comes to Mark.
+- **2026-10-06**: WS4 R6 landed and WS4 is done. Mark ruled S76 (publish)
+  and S77 (knot-editor's preview change noted in its plan, its lane to make
+  it; knot-editor `210ee64`). gopher-protocol 0.2.0 was published to
+  crates.io from smolweb `b0f1dda` (a raw item type, `8` and `T` as telnet, a
+  CSO kind); Mere repinned to `=0.2.0` and errand moved to 0.4.0 under its
+  manifest's semver note (`249e9045`, merged `1d87808a`); Nematic's gopher
+  rows now take their marker from `raw_type`, so `g` and `I`, or `8` and
+  `T`, stay distinct, and CSO lowers as `Other`. Workspace check clean;
+  errand, Nematic and mere-document-lanes (smolweb) tests pass. smolweb's
+  local main holds `b0f1dda` unpushed.
 
 ## Cross-references
 

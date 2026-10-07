@@ -2072,7 +2072,6 @@ dependencies = [
 name = "cambium"
 version = "0.3.3"
 dependencies = [
- "errand",
  "genet-scripted-dom",
  "genet-text",
  "illume",
@@ -2081,7 +2080,6 @@ dependencies = [
  "meristem",
  "sceno",
  "sprigging",
- "tabard",
  "tinct",
  "workbench",
 ]
@@ -4520,7 +4518,7 @@ dependencies = [
  "scenotime",
  "serde",
  "serde_json",
- "sha2 0.10.9",
+ "sha2 0.11.0",
  "ssh-agent-lib",
  "tempfile",
  "thiserror 1.0.69",
@@ -5127,7 +5125,7 @@ checksum = "877a4ace8713b0bcf2a4e7eec82529c029f1d0619886d18145fea96c3ffe5c0f"
 
 [[package]]
 name = "errand"
-version = "0.3.4"
+version = "0.4.0"
 dependencies = [
  "finger-protocol",
  "gemini-protocol",
@@ -6456,9 +6454,9 @@ dependencies = [
 
 [[package]]
 name = "gopher-protocol"
-version = "0.1.1"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "113ad3045632e4931f7fc15331be9f1e0e29b91a7bdc88465dcc7801c23fc989"
+checksum = "b5d3f2e10ca1a90d7e0d2bec7421aa1121596ac2eddfae1cae9a440f58b1a378"
 dependencies = [
  "log",
  "tokio",
@@ -9404,6 +9402,7 @@ dependencies = [
  "p2panda-core",
  "personae",
  "retinue",
+ "serde_json",
  "sha2 0.11.0",
  "snow",
  "stickleback",
@@ -9412,6 +9411,7 @@ dependencies = [
  "tokio",
  "tokio-stream",
  "tracing",
+ "zeroize",
 ]
 
 [[package]]
@@ -10082,6 +10082,7 @@ dependencies = [
  "serde",
  "serde_json",
  "tracing",
+ "url",
 ]
 
 [[package]]
@@ -12364,7 +12365,6 @@ dependencies = [
  "script-runtime-api",
  "scrying-engine",
  "servo-webgl-wgpu",
- "sha2 0.10.9",
  "tabard",
  "tinct",
  "url",

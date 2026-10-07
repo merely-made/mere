@@ -1,7 +1,7 @@
 # Vault Lock Plan
 
 **Date**: 2026-10-05
-**Status (2026-10-06)**: rulings 1 to 54 in §3; the threat statement is
+**Status (2026-10-06)**: rulings 1 to 56 in §3; the threat statement is
 still open. L1 landed (`2556a20c`). L2's checkpoints A (`7c588deb`) and B
 (`ec1768ab`) landed. Still to come in L2: the Secret Service on the
 ThinkPad, ruling 42 (Linux starts locked), ruling 44 (Distillery's
@@ -653,6 +653,25 @@ does not cover them.* Options: move all four onto the kept handle (`peers`
 loses its "could not ask" branch); close only. Mark: **"Move all four
 (Recommended)"**.
 
+**Ruling 55** *(how Knot reaches the transport for ruling 49).* *Knot's
+head `ef89a18` has the P1 work and is djinn's pin, but Knot pins mere at
+`e0cea3e0`, before the transport's borrowing entry points, and Knot's
+repins have been the genet chain's.* Options: no Knot repin (Knot lends
+the seed through its own functions and passes it by value only at the one
+synchronous call into the transport, which boxes and clears it at once);
+repin Knot's mere rows to `83b06806` or later and call the borrowing entry
+directly, telling the genet chain. Mark: **"Repin Knot's mere rows"**.
+Follows: the genet-chain session and the burn coordinator were told on
+2026-10-06, before any edit.
+
+**Ruling 56** *(the order under Mark's three-tasks rule).* Options:
+- the Knot fix, then ruling 42 (no hardware), then the Secret Service on
+  the ThinkPad together with 42's Linux proof, then L3;
+- the Knot fix, then L3 (finishing Windows first);
+- pause after the Knot fix.
+
+Mark: **"Knot, then ruling 42 (Recommended)"**.
+
 Still open: a threat statement naming hibernation and the pagefile.
 
 ## 4. Phases
@@ -998,3 +1017,23 @@ unlock follow-through, and non-Windows startup unlock backends, from the
   - Linux starts locked and waits for the native or terminal prompt, with
     no OS-held root (ruling 42);
   - macOS joins with the pairing plan's D2 (ruling 22).
+
+**2026-10-06, the transport's seed path landed** (`83b06806`, merging
+`ed741806`, `01b4f632`, `de91e5cf` and `d636a125`; rulings 51, 52 and 54):
+- After bind, nothing in the transport asks p2panda's actor for iroh's
+  endpoint.
+- With `endpoint_addr` reverted to the actor path (the lane's
+  measurement), 392 came back in 11 of 15 gossip runs. That makes it a
+  control for the measurement, not for the test's verdict, because 392 is
+  in p2panda-net's own baseline.
+- **Verified in `mere-verify`:**
+  - at `d636a125`: the transport suite 3 of 3; the dialling test that
+    failed once for the lane, 5 of 5; the residue test; graphshell 191;
+    djinn 91; the gate;
+  - the gate again on the merge with `main` `b2cabfca`. The tree that
+    landed is that merge.
+- Knot `ef89a18` compiles against it with no errors (the lane's lockstep
+  run).
+- **Ruling 50's precondition is met.** The Knot lane's P1 work is in
+  `ef89a18`, which is Knot's origin/main and djinn's pin. Knot's own mere
+  rows are at `e0cea3e0`, which predates the borrowing entry points.

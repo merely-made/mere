@@ -3,12 +3,14 @@
 **This repository: MPL-2.0.** Every file Mark wrote carries Exhibit A and the
 SPDX tag `MPL-2.0`, per the
 [license posture brief](design_docs/2026-08-22_license_posture_brief.md) of
-2026-08-22. The full text is in [`LICENSE`](LICENSE).
+2026-08-22, except the frozen evidence below, which carries it through this
+ledger and the root licence. The full text is in [`LICENSE`](LICENSE).
 
 This file is the provenance ledger. It is the authority for what the relicense
-tool skips: `scripts/relicense_headers.py` reads the backtick-quoted paths
-below and never touches them. Provenance comes before license — a file gets
-Exhibit A only if Mark wrote it.
+tool skips: `scripts/relicense_headers.py` reads the backtick-quoted paths in
+the first column of the Retained licenses and Frozen evidence tables and never
+touches them. Provenance comes before license — a file gets Exhibit A only if
+Mark wrote it.
 
 ## Retained licenses
 
@@ -47,6 +49,23 @@ upstream, the author and the changes, and the license text sits beside it. The
 cell-walking force kernel that reads the bins (`kernels::exclude_cells`) and
 the host code that calls them are Mark's and stay MPL-2.0.
 
+## Frozen evidence
+
+Mark's own sources whose bytes a recorded receipt pins by SHA-256. They are
+MPL-2.0 like everything else he wrote, but a per-file header would change the
+bytes and break the receipt, so they carry none. Exhibit A allows the notice
+to sit where a recipient would look for it when a per-file notice is not
+desirable; for these paths that place is the root `LICENSE` and this ledger.
+The tool skips them, as it skips Retained licenses.
+
+| Path | Pinned by | Ruled |
+|---|---|---|
+| `design_docs/mere_docs/testing/receipts/2026-09-08_stack_pillar_probes` | `artifact-sha256.json` at its root and in `custody-backend/`, and the arena's run JSONs; its `.gitattributes` keeps the bytes so the digests survive checkout | 2026-10-06, ruling S79 of the [stack seams plan](design_docs/mere_docs/implementation_strategy/2026-10-04_stack_seams_plan.md) |
+
+A receipt that does not pin its sources' bytes is not frozen evidence: its
+sources take the header like any other (so the 2026-09-20 resource resolution
+probes do, under the same ruling).
+
 ## Derivatives carrying MPL-2.0 with an upstream notice retained
 
 These are **not** skipped. Each file receives Exhibit A and Mark's copyright
@@ -66,8 +85,9 @@ Apache-2.0); that version keeps its grant permanently and MPL-2.0 ships at its
 next functional bump, per the sweep plan's invariant 8.
 
 **This section is deliberately not the skip list.** The tool reads only the
-`## Retained licenses` table above. Adding a path here documents a disposition;
-it does not exempt the path from receiving a header.
+`## Retained licenses` and `## Frozen evidence` tables above. Adding a path
+here documents a disposition; it does not exempt the path from receiving a
+header.
 
 ## Published grants that arrived with a crate
 
