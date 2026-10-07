@@ -15,19 +15,28 @@
 //! scene conversion, scrolling policy, accessibility hosting, or lifetime
 //! management for the host.
 
+use std::cell::RefCell;
+use std::panic::{AssertUnwindSafe, catch_unwind};
+
 use genet_scripted_dom::NodeId;
-use mere_surface_api::{SurfaceAvailability, SurfaceDescriptor};
+use mere_surface_api::{SurfaceAvailability, SurfaceDescriptor, SurfaceUnavailableReason};
 use meristem::View;
 
 use crate::{
-    DomHandle, GenetAppRunner, GenetCtx, GenetElement, HoverEvent, KeyEvent, PointerClick,
-    PointerEvent, WheelEvent,
+    DomHandle, FocusExit, GenetAppRunner, GenetCtx, GenetElement, HoverEvent, KeyEvent,
+    PointerClick, PointerEvent, WheelEvent,
 };
 
 /// The smallest generic effect a retained surface can request from its host.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum SurfaceEffect {
     Redraw,
+    /// Traversal left the session past its last focusable (forward) or before
+    /// its first (backward), and the session cleared its focus. The host moves
+    /// focus to its next stop in that direction. Only a session whose host
+    /// turned on [focus exits](RetainedSurfaceSession::set_focus_exits)
+    /// reports it.
+    FocusExit(FocusExit),
 }
 
 /// Viewport facts supplied by a host after it has laid out a surface.
@@ -72,6 +81,20 @@ pub trait RetainedSurfaceSession {
     fn wheel_target(&self, hit: NodeId) -> Option<NodeId>;
     fn sync_viewport(&mut self, viewport: SurfaceViewport) -> Vec<SurfaceEffect>;
     fn dispatch(&mut self, event: ResolvedSurfaceEvent) -> Vec<SurfaceEffect>;
+
+    /// Stop focus traversal at the session's edges and report
+    /// [`SurfaceEffect::FocusExit`] there, instead of wrapping inside the
+    /// session. A host showing the session beside other content turns this on
+    /// so Tab can leave; without it every composed session is a keyboard trap.
+    ///
+    /// Returns whether the session honours it. The provided method returns
+    /// `false` and changes nothing, so a host can tell a session that still
+    /// wraps. Added 2026-10-07 (app composition brief, recommendation 1);
+    /// additive to v1.
+    fn set_focus_exits(&mut self, exits: bool) -> bool {
+        let _ = exits;
+        false
+    }
 }
 
 /// A generic retained-session wrapper around one concrete [`GenetAppRunner`].
@@ -124,10 +147,13 @@ where
     }
 
     fn effects(&mut self, actions: Vec<Action>) -> Vec<SurfaceEffect> {
-        let mut effects = Vec::with_capacity(actions.len() + 1);
+        let mut effects = Vec::with_capacity(actions.len() + 2);
         effects.push(SurfaceEffect::Redraw);
         for action in actions {
             effects.extend((self.action_effects)(action));
+        }
+        if let Some(exit) = self.runner.take_focus_exit() {
+            effects.push(SurfaceEffect::FocusExit(exit));
         }
         effects
     }
@@ -170,7 +196,7 @@ where
 
     fn focus_traverse(&mut self, forward: bool) -> Vec<SurfaceEffect> {
         self.runner.focus_traverse(forward);
-        vec![SurfaceEffect::Redraw]
+        self.effects(Vec::new())
     }
 
     fn focusables(&self) -> Vec<NodeId> {
@@ -223,6 +249,184 @@ where
         };
         self.effects(actions)
     }
+
+    fn set_focus_exits(&mut self, exits: bool) -> bool {
+        self.runner.set_focus_exits(exits);
+        true
+    }
+}
+
+/// A guest session's panic, caught at the session boundary by
+/// [`ContainedSession`].
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct SessionFailure {
+    /// The trait method the panic unwound out of.
+    pub call: &'static str,
+    /// The panic's message, when it carried a string.
+    pub message: Option<String>,
+}
+
+/// A retained session whose panics stop at the session boundary.
+///
+/// Every call into the wrapped session runs under `catch_unwind`. After the
+/// first caught panic the session is retired: it reports
+/// `Unavailable(Unhealthy)`, has no focus, focusables or targets, ignores input,
+/// and never calls the wrapped session again. The host shows an unavailable
+/// surface in its place and leaves the session's accessibility subtree out of
+/// its next frame. The DOM handle and root stay readable, as last seen, for a
+/// host that is mid-frame, but the host stops laying the session out.
+///
+/// Only unwinding panics are caught. A build with `panic = "abort"`, an abort,
+/// or a hang still takes the host down; containing those needs a process
+/// boundary (app composition brief, AC4, ruled 2026-10-07).
+pub struct ContainedSession<S> {
+    session: S,
+    descriptor: SurfaceDescriptor,
+    dom: RefCell<DomHandle>,
+    root: RefCell<NodeId>,
+    failure: RefCell<Option<SessionFailure>>,
+}
+
+impl<S: RetainedSurfaceSession> ContainedSession<S> {
+    pub fn new(session: S) -> Self {
+        Self {
+            descriptor: session.descriptor().clone(),
+            dom: RefCell::new(session.dom()),
+            root: RefCell::new(session.root()),
+            failure: RefCell::new(None),
+            session,
+        }
+    }
+
+    /// The caught panic, once the session has failed.
+    pub fn failure(&self) -> Option<SessionFailure> {
+        self.failure.borrow().clone()
+    }
+
+    fn failed(&self) -> bool {
+        self.failure.borrow().is_some()
+    }
+
+    fn record(&self, call: &'static str, payload: Box<dyn std::any::Any + Send>) {
+        let message = payload
+            .downcast_ref::<&str>()
+            .map(|text| (*text).to_owned())
+            .or_else(|| payload.downcast_ref::<String>().cloned());
+        *self.failure.borrow_mut() = Some(SessionFailure { call, message });
+    }
+
+    /// Ask the wrapped session, or answer `inert` once it has failed.
+    fn read<T>(&self, call: &'static str, inert: T, ask: impl FnOnce(&S) -> T) -> T {
+        if self.failed() {
+            return inert;
+        }
+        match catch_unwind(AssertUnwindSafe(|| ask(&self.session))) {
+            Ok(value) => value,
+            Err(payload) => {
+                self.record(call, payload);
+                inert
+            },
+        }
+    }
+
+    /// Drive the wrapped session. The call that fails asks for one redraw,
+    /// so the host paints the unavailable surface; later calls do nothing.
+    fn drive(
+        &mut self,
+        call: &'static str,
+        act: impl FnOnce(&mut S) -> Vec<SurfaceEffect>,
+    ) -> Vec<SurfaceEffect> {
+        if self.failed() {
+            return Vec::new();
+        }
+        match catch_unwind(AssertUnwindSafe(|| act(&mut self.session))) {
+            Ok(effects) => effects,
+            Err(payload) => {
+                self.record(call, payload);
+                vec![SurfaceEffect::Redraw]
+            },
+        }
+    }
+}
+
+impl<S: RetainedSurfaceSession> RetainedSurfaceSession for ContainedSession<S> {
+    fn descriptor(&self) -> &SurfaceDescriptor {
+        &self.descriptor
+    }
+
+    fn availability(&self) -> SurfaceAvailability {
+        let unhealthy = SurfaceAvailability::Unavailable(SurfaceUnavailableReason::Unhealthy);
+        self.read("availability", unhealthy, |session| session.availability())
+    }
+
+    fn dom(&self) -> DomHandle {
+        let last = self.dom.borrow().clone();
+        let dom = self.read("dom", last, |session| session.dom());
+        *self.dom.borrow_mut() = dom.clone();
+        dom
+    }
+
+    fn root(&self) -> NodeId {
+        let last = *self.root.borrow();
+        let root = self.read("root", last, |session| session.root());
+        *self.root.borrow_mut() = root;
+        root
+    }
+
+    fn focus(&self) -> Option<NodeId> {
+        self.read("focus", None, |session| session.focus())
+    }
+
+    fn set_focus(&mut self, node: Option<NodeId>) -> Vec<SurfaceEffect> {
+        self.drive("set_focus", |session| session.set_focus(node))
+    }
+
+    fn focus_traverse(&mut self, forward: bool) -> Vec<SurfaceEffect> {
+        self.drive("focus_traverse", |session| session.focus_traverse(forward))
+    }
+
+    fn focusables(&self) -> Vec<NodeId> {
+        self.read("focusables", Vec::new(), |session| session.focusables())
+    }
+
+    fn pointer_capture(&self) -> Option<NodeId> {
+        self.read("pointer_capture", None, |session| session.pointer_capture())
+    }
+
+    fn pointer_target(&self, hit: NodeId) -> Option<NodeId> {
+        self.read("pointer_target", None, |session| {
+            session.pointer_target(hit)
+        })
+    }
+
+    fn hover_target(&self, hit: NodeId) -> Option<NodeId> {
+        self.read("hover_target", None, |session| session.hover_target(hit))
+    }
+
+    fn wheel_target(&self, hit: NodeId) -> Option<NodeId> {
+        self.read("wheel_target", None, |session| session.wheel_target(hit))
+    }
+
+    fn sync_viewport(&mut self, viewport: SurfaceViewport) -> Vec<SurfaceEffect> {
+        self.drive("sync_viewport", |session| session.sync_viewport(viewport))
+    }
+
+    fn dispatch(&mut self, event: ResolvedSurfaceEvent) -> Vec<SurfaceEffect> {
+        self.drive("dispatch", |session| session.dispatch(event))
+    }
+
+    fn set_focus_exits(&mut self, exits: bool) -> bool {
+        if self.failed() {
+            return false;
+        }
+        match catch_unwind(AssertUnwindSafe(|| self.session.set_focus_exits(exits))) {
+            Ok(honoured) => honoured,
+            Err(payload) => {
+                self.record("set_focus_exits", payload);
+                false
+            },
+        }
+    }
 }
 
 #[cfg(test)]
@@ -236,7 +440,10 @@ mod tests {
         ProviderId, SourceKindId, SurfaceId, SurfaceSourceShape, SurfaceUnavailableReason,
     };
 
-    use crate::{DomHandle, El, GenetAppRunner, OnClick, PointerClick, el, on_click};
+    use crate::{
+        DomHandle, El, FocusExit, GenetAppRunner, Key, KeyEvent, Modifiers, NamedKey, OnClick,
+        PointerClick, el, on_click, on_key,
+    };
 
     use super::*;
 
@@ -389,5 +596,163 @@ mod tests {
         });
         assert_eq!(root_text(&first_dom, first_root), "first:1:0");
         assert_eq!(root_text(&second_dom, second_root), "second:20:240");
+    }
+
+    /// A session whose host turns on focus exits reports Tab past its last
+    /// focusable as an effect, so the host can move on; with exits off it
+    /// wraps, as standalone apps expect.
+    #[test]
+    fn a_session_reports_focus_leaving_past_its_edge() {
+        let dom = fresh_dom();
+        let noop: fn(&mut (), KeyEvent) = |_, _| {};
+        let runner = GenetAppRunner::<_, _, _, ()>::new(
+            dom,
+            move |_: &()| {
+                el::<_, (), ()>(
+                    "div",
+                    (
+                        on_key(el::<_, (), ()>("a", ()), noop),
+                        on_key(el::<_, (), ()>("b", ()), noop),
+                    ),
+                )
+            },
+            (),
+        );
+        let mut session = RunnerSurfaceSession::new(
+            descriptor("example.focus"),
+            runner,
+            |_: &()| SurfaceAvailability::Available,
+            |_: &mut (), _| {},
+            |_action: ()| Vec::new(),
+        );
+        let tab = |shift: bool| {
+            ResolvedSurfaceEvent::Key(KeyEvent::with_mods(
+                Key::Named(NamedKey::Tab),
+                Modifiers {
+                    shift,
+                    ..Default::default()
+                },
+            ))
+        };
+
+        session.focus_traverse(true);
+        session.focus_traverse(true);
+        assert_eq!(
+            session.dispatch(tab(false)),
+            vec![SurfaceEffect::Redraw],
+            "exits off: Tab wraps inside the session"
+        );
+        assert!(session.focus().is_some());
+
+        assert!(session.set_focus_exits(true));
+        session.focus_traverse(true);
+        assert_eq!(
+            session.dispatch(tab(false)),
+            vec![
+                SurfaceEffect::Redraw,
+                SurfaceEffect::FocusExit(FocusExit::Forward)
+            ]
+        );
+        assert_eq!(session.focus(), None);
+        assert_eq!(
+            session.focus_traverse(false),
+            vec![SurfaceEffect::Redraw],
+            "the host enters again from the far end"
+        );
+        assert_eq!(
+            session.dispatch(tab(true)),
+            vec![SurfaceEffect::Redraw],
+            "from the last, Shift+Tab moves back inside"
+        );
+        assert_eq!(
+            session.dispatch(tab(true)),
+            vec![
+                SurfaceEffect::Redraw,
+                SurfaceEffect::FocusExit(FocusExit::Backward)
+            ]
+        );
+    }
+
+    /// A panic in one guest's dispatch is caught at the boundary: that guest
+    /// retires as unhealthy and is never called again, and a guest beside it
+    /// carries on.
+    #[test]
+    fn a_contained_session_retires_on_a_panic_and_its_neighbour_carries_on() {
+        fn boom(_: &mut First, _: PointerClick) {
+            panic!("guest bug");
+        }
+        fn failing_view(state: &First) -> FirstView {
+            on_click(
+                el::<_, First, ()>("button", format!("first:{}", state.count)),
+                boom as fn(&mut First, PointerClick),
+            )
+        }
+
+        let failing_runner = GenetAppRunner::new(
+            fresh_dom(),
+            failing_view,
+            First {
+                count: 0,
+                width: 0.0,
+            },
+        );
+        let mut failing = ContainedSession::new(RunnerSurfaceSession::new(
+            descriptor("example.failing"),
+            failing_runner,
+            |_: &First| SurfaceAvailability::Available,
+            |_: &mut First, _| {},
+            |_action: ()| Vec::new(),
+        ));
+        let failing_root = failing.root();
+
+        let second_dom = fresh_dom();
+        let second_runner = GenetAppRunner::new(
+            second_dom.clone(),
+            second_view,
+            Second {
+                count: 0,
+                width: 0.0,
+            },
+        );
+        let mut second = ContainedSession::new(RunnerSurfaceSession::new(
+            descriptor("example.second"),
+            second_runner,
+            |_: &Second| SurfaceAvailability::Available,
+            |_: &mut Second, _| {},
+            |_action: ()| Vec::new(),
+        ));
+        let second_root = second.root();
+
+        assert_eq!(failing.availability(), SurfaceAvailability::Available);
+        let click = |target| ResolvedSurfaceEvent::Click {
+            target,
+            event: PointerClick::at((0.0, 0.0)),
+        };
+        assert_eq!(
+            failing.dispatch(click(failing_root)),
+            vec![SurfaceEffect::Redraw],
+            "the failing call asks for one redraw"
+        );
+        assert_eq!(
+            failing.failure(),
+            Some(SessionFailure {
+                call: "dispatch",
+                message: Some("guest bug".to_owned()),
+            })
+        );
+        assert_eq!(
+            failing.availability(),
+            SurfaceAvailability::Unavailable(SurfaceUnavailableReason::Unhealthy)
+        );
+        assert_eq!(failing.focusables(), Vec::<NodeId>::new());
+        assert_eq!(failing.focus(), None);
+        assert!(!failing.set_focus_exits(true));
+        assert_eq!(failing.dispatch(click(failing_root)), Vec::new());
+        assert_eq!(failing.root(), failing_root, "the root stays readable");
+
+        second.dispatch(click(second_root));
+        assert_eq!(root_text(&second_dom, second_root), "second:10:0");
+        assert_eq!(second.failure(), None);
+        assert_eq!(second.availability(), SurfaceAvailability::Available);
     }
 }
