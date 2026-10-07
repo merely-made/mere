@@ -94,8 +94,10 @@ fn field_body(
 /// the caret in view), and leaves the field's width to the sheet, since inline
 /// size containment takes the value out of it. Inline, so a host that styles
 /// the field cannot lose it.
-pub const SINGLE_LINE_FIELD_STYLE: &str =
-    "white-space: pre; overflow-x: auto; overflow-y: hidden; contain: inline-size;";
+/// The substitute intrinsic width preserves Genet's text-input default
+/// (20 columns at half an em each). A host can override the custom property
+/// without changing an explicit CSS width or the containment contract.
+pub const SINGLE_LINE_FIELD_STYLE: &str = "white-space: pre; overflow-x: auto; overflow-y: hidden; contain: inline-size; contain-intrinsic-size: var(--cambium-field-intrinsic-width, 10em) 1.2em;";
 
 /// Build the concrete [`TextField`] for `input` (the shared implementation
 /// behind both [`text_field`] and [`text_field_typed`]).
