@@ -134,6 +134,15 @@ adapters. Mark is asked whether to expose app textboxes as accessible leaves
 across adapters or prune children only in the browser mirror. No pruning policy
 is implemented before that ruling; drawn children stay app-owned in either case.
 
+The focused native gate executes 59 passes and one failure before stopping:
+an unsized app field shrinks to its child text (87px for short text, 400px for
+long text), whereas the former native input has a value-independent 20-column
+width. The repair gives single-line fields a font-relative substitute intrinsic
+width through `contain-intrinsic-size`, preserving Genet's existing half-em
+column metric. `--cambium-field-intrinsic-width` lets the host override that
+fallback, and explicit host CSS widths retain priority. The new fallback and
+its host override require fresh native, component and catalog gates.
+
 The downstream read-only audit finds old tag checks in Turnstone and Cleromancy.
 Their mechanical selector/caret/existing-label follow-ups await explicit scope
 authorization; currently unnamed fields retain that state. No sibling source

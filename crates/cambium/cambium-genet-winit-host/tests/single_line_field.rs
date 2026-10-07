@@ -141,8 +141,21 @@ fn a_long_value_stays_on_one_line_at_the_width_the_sheet_sets() {
 fn a_field_with_no_width_keeps_its_own_whatever_the_value() {
     let short = size(&host("notes.djot", UNSIZED));
     let long = size(&host(LONG, UNSIZED));
-    assert!(short.0 > 18.0, "the field has a width of its own");
+    assert_eq!(
+        short.0, 178.0,
+        "the former 20-column default plus padding and border"
+    );
     assert_eq!(long, short, "the value does not set the field's size");
+}
+
+#[test]
+fn a_host_can_set_the_unsized_fields_intrinsic_width() {
+    let sheet = format!("{UNSIZED} [role=\"textbox\"] {{ --cambium-field-intrinsic-width:12em; }}");
+    assert_eq!(
+        size(&host(LONG, &sheet)).0,
+        210.0,
+        "the host's 12em fallback plus padding and border"
+    );
 }
 
 #[test]
