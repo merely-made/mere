@@ -157,6 +157,16 @@ handoff, so a bounded repair awaits an explicit checkpoint. Independent
 Rootstock native-state bridge controls proceed while that ruling, accessible
 leaf policy and sibling scope are pending without response deadlines.
 
+Mark approves the bounded Genet layout repair as F4 in the dated Forms plan.
+Mere's width contract remains unqualified until its repaired candidate passes
+fresh consumer gates. The other two questions remain pending.
+
+The first disabled-routing attempt executes 71 passes and the intended single
+failure, but is not qualified: this note changed during its guarded run, and
+the end-of-run process scan could not inspect a compiler that then exited.
+The starting manifest, lock and router are restored. Preserve that attempt;
+a committed-source retry must establish the control and a fresh restored pass.
+
 The downstream read-only audit finds old tag checks in Turnstone and Cleromancy.
 Their mechanical selector/caret/existing-label follow-ups await explicit scope
 authorization; currently unnamed fields retain that state. No sibling source
