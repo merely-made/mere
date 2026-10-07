@@ -659,6 +659,13 @@ impl<B: Backend> GraphSession<B> {
     /// session begun in memory, new journal entries and changes, and a
     /// checkpoint once enough entries have accrued. New changes stamp the
     /// manifest `updated_at` with `at` (reservoir plan §7 item 28).
+    /// Whether anything waits for the next store, without building the batch.
+    pub fn has_unstored(&self) -> bool {
+        !self.head_stored
+            || self.journal.live_cursor() > self.saved
+            || self.changes.next_seq() > self.changes_saved
+    }
+
     pub fn pending(&self, at: SystemTime) -> Result<Pending, SessionError> {
         self.pending_with(at, false)
     }
@@ -1594,6 +1601,7 @@ mod tests {
                 store.list(SESSIONS_PREFIX).await.unwrap().is_empty(),
                 "nothing is written before the flush"
             );
+            assert!(session.has_unstored());
 
             let at = SystemTime::UNIX_EPOCH + std::time::Duration::from_secs(1_800_000_000);
             session.flush(at).await.unwrap();
@@ -1605,6 +1613,7 @@ mod tests {
                 session.pending(at).unwrap().is_empty(),
                 "a flush with nothing new writes nothing"
             );
+            assert!(!session.has_unstored(), "and nothing waits for one");
         });
     }
 
