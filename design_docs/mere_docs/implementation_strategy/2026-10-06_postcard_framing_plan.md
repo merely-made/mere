@@ -124,5 +124,5 @@ pass.
   - **Tests:** 11 pass, covering the five done-conditions plus wing-formats'
     own cases and the documented limit.
   - **Control.** With the legacy branch removed, its two tests fail.
-  - **Not yet claimed.** The crates.io publish that claims the name waits on
-    Mark's word (F7).
+  - **Claimed.** On Mark's word ("Publish 0.0.1 now (Recommended)"),
+    `mere-framing` 0.0.1 is on crates.io, published from `13a6b49d`.
