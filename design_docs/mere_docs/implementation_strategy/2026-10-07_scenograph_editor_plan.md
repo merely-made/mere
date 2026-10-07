@@ -1,7 +1,7 @@
 # Scenograph Editor Plan
 
 **Date:** 2026-10-07
-**Status (2026-10-07):** in progress. Rulings SE1 to SE9 recorded (§1). E1, the generic history, landed on main 2026-10-07 (`de06e4f0`); E2, undo in the projection editor, is under way.
+**Status (2026-10-07):** in progress. Rulings SE1 to SE9 recorded (§1). E1, the generic history, landed on main 2026-10-07 (`de06e4f0`) and moves into the `edit-history` leaf crate (SE10, SE13). E2, undo in the projection editor, is under way; E2b, saving into the mere session, follows it (SE11, SE12).
 **Scope:** the editor foundation that Scenograph's editing surfaces stand on: one undo history in Cambium, and arrangement options declared as data. Carries out the balaur review's rulings A and B. The projection editor in Graphshell is the first consumer of both.
 
 Not in scope, mapped in §3 and opened by later rounds:
@@ -48,9 +48,17 @@ Mark opened the lane: "i'm most curious about scenograph, honestly. wallpapers, 
 
 **SE9, the record and what follows.** Question: where the rulings are recorded and what comes next. Options: a plan doc, then build; into the balaur brief only; stay in chat. Mark: **"Plan doc, then build (Recommended)"**. *Follows:* this plan. E1 is built first, in a worktree off origin, and verified there before anything reaches main.
 
+**SE10, where the history lives (2026-10-07).** Question: E1 put `History` in the cambium crate, but Graphshell's projection editor also compiles under the native features, where Cambium is absent; depending on cambium adds 46 crates to the native build (vello, html5ever, `genet-scripted-dom`, a font stack), and the web build already has it. Options: a leaf crate in the Cambium family; Graphshell takes cambium; undo only under web. Mark: **"Leaf crate in Cambium family (Recommended)"**. *Follows:* `History` moves to a dependency-free crate under `crates/cambium/`, as `workbench` is. Cambium depends on it and re-exports `History`, so `EditHistory` and E1's API stay where they are. Graphshell depends on the leaf. This amends where SE5's history lives, not what it is.
+
+**SE11, the history and Eidetic (2026-10-07).** Mark asked: "Or wait, shouldn't that in some way rely on eidetic?" Evidence put with the question: pandect's `GraphSession` already keeps each author's undo and redo, rebuilt from a muniment journal, durable, and keeping the parts another author changed since (`crates/system/pandect/src/graph_session.rs`, `undo`, `redo`, `Reverted`); the editor's working edits coalesce within a 400 ms window. Options: two layers; the draft journaled in the mere; in memory, kept on close. Mark: **"Two layers (Recommended)"**. *Follows:* working edits use the in-memory `History`, a widget's working memory like a text field's undo. Saving writes the definition into the mere session, where saved changes get pandect's durable, attributed undo. Nothing at keystroke level reaches the journal.
+
+**SE12, the save path (2026-10-07).** Question: the editor's web sink saves definitions to browser localStorage, outside any mere (`ports/graphshell/src/web_main.rs`, `BrowserProjectionSink`), against the 2026-09-23 ambiance ruling that apps keep their session data in a mere. Options: yes, as track E2b; yes, before E2; not now, recorded. Mark: **"Yes, as track E2b (Recommended)"**. *Follows:* track E2b.
+
+**SE13, the crate's name (2026-10-07).** Question: the leaf crate's name; `edit-history`, `undo-history` and `cambium-history` were each checked free on crates.io. Mark: **"edit-history (Recommended)"**. *Follows:* `crates/cambium/edit-history`, `publish = false` until a publish is decided, so the name is chosen but not claimed.
+
 ## 2. Tracks
 
-E1 and E2 carry ruling A; E3 to E5 carry ruling B. E2 needs E1; E4 needs E3; E5 needs E2 and E4.
+E1 and E2 carry ruling A; E3 to E5 carry ruling B. E2 needs E1; E4 needs E3; E5 needs E2 and E4. *Added 2026-10-07:* E2b carries SE11 and SE12, after E2.
 
 ### E1 — one history in Cambium (A, SE5)
 
@@ -78,6 +86,15 @@ Done when:
 - Graphshell's web host binds undo and redo through its command surface and shows dirty;
 - a headed check in real Chromium (not the browser pane) edits, undoes, redoes and saves, with the capture under `Code/testing/mere/`.
 
+### E2b — saves go into the mere session (SE11, SE12)
+
+The web host's `ProjectionDefinitionSink` writes the definition into the mere session through Graphshell's `MereHost` (pandect), in place of browser localStorage, and reads it back from there on load. Saved changes are then attributed, durable and undoable through the session.
+
+Done when:
+- the localStorage sink is gone, and a saved definition reads back from the session after a reload;
+- a session undo after a save restores the previous saved definition, attributed to its author;
+- a headed check in real Chromium saves, reloads and finds the definition.
+
 ### E3 — the option declaration type (B, SE7)
 
 A declaration type in `crates/cambium/scenes/scenograph`: per option, its key, one of the seven kinds (`finite`, `positive`, `count`, `depth`, `flag`, `choice` with its names, `list`), its default, and a label for the editor.
@@ -101,6 +118,8 @@ Done when:
 Graphshell's arrangement panel builds one row per declared option of the chosen family or solver: its kind, its default and, for `choice`, its names. Edits go through E2's history.
 
 Done when the rows match the declaration for all eleven families and a test solver, and a headed check in real Chromium shows a family's rows and a refusal.
+
+*Annotation 2026-10-07 (SE10):* E1's `History` lives in `crates/cambium/edit-history`; the cambium crate depends on it and re-exports `History`, and `EditHistory` stays in `crates/cambium/cambium/src/editor.rs`.
 
 ## 3. Mapped, not opened
 
@@ -127,3 +146,4 @@ Verified 2026-10-07 against mere's origin unless named.
 - **2026-10-07.** Plan written from the chat assessment; rulings SE1 to SE9 recorded. The balaur brief and the projection grammar handoff carry dated pointers here.
 - **2026-10-07, E1 built on `sceno-editor-e1`, not merged.** `cambium::History<S, K>` in `crates/cambium/cambium/src/editor.rs`: key-and-window coalescing on a host-supplied millisecond time, a saved marker that shifts with the cap and is lost when its state falls off the cap or sat on a discarded redo stack. `EditHistory` is a newtype over `History<TextSnapshot>`, since `TextSnapshot` is crate-private; its API is unchanged and `TextInput` calls it as before. Eight new tests; `cargo test -p cambium --lib` passes, 257 tests. Two controls failed where they should: dropping the redo-discard reset, and dropping the cap shift, each fails one test. A first version of the redo-discard test passed under its control, because it never returned to the saved depth; it was fixed before the control was rerun. Found in passing: Cambium is not `cargo fmt`-clean at origin (`atlas.rs`, `graph_canvas.rs`, `lib.rs`, `workspace.rs`); `editor.rs` is.
 - **2026-10-07, E1 landed.** Mark: **"Merge E1, then E2 (Recommended)"** (options: that; E2 on the same branch first; stop). Rebased on origin with no change, `cargo test -p cambium --lib` rerun (257 pass) and `cargo check -p graphshell` clean, then fast-forwarded to main at `de06e4f0`.
+- **2026-10-07, SE10 to SE13; `edit-history` founded.** E2's first step found Graphshell's native build has no Cambium (46 crates to add), and Mark ruled a leaf crate (SE10), two layers over Eidetic (SE11), saves into the mere as E2b (SE12), and the name (SE13). `History` and its eight tests moved to `crates/cambium/edit-history`; cambium re-exports it. `cargo test -p edit-history -p cambium --lib`: 8 and 249 pass, the same 257 as before. Note: cambium is `publish = true` and now depends on an unpublished crate, so publishing cambium needs `edit-history` published first.

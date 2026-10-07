@@ -2086,6 +2086,7 @@ dependencies = [
 name = "cambium"
 version = "0.3.3"
 dependencies = [
+ "edit-history",
  "genet-scripted-dom",
  "genet-text",
  "illume",
@@ -4828,6 +4829,10 @@ dependencies = [
  "subtle",
  "zeroize",
 ]
+
+[[package]]
+name = "edit-history"
+version = "0.1.0"
 
 [[package]]
 name = "eidetic"
