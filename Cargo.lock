@@ -2172,12 +2172,18 @@ name = "cambium-winit-a11y"
 version = "0.3.0"
 dependencies = [
  "accesskit",
+ "accesskit_consumer 0.35.0",
+ "accesskit_consumer 0.36.0",
+ "accesskit_consumer 0.38.0",
+ "cambium",
  "cambium-rootstock",
  "genet-render",
  "genet-scripted-dom",
  "genet-winit-host",
  "layout-dom-api",
+ "mere-surface-api",
  "sprigging",
+ "uxtree",
  "winit",
 ]
 
