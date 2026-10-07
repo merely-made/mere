@@ -5,8 +5,9 @@
 (S1 to S75); P1 landed on main (`1633be0c`); P2 staged (S27 to S31, four
 stages in §3.1) and landed on main (`40d7ae5e`); S32 (F19) landed on main
 (`48c08dee`); the S14 pass (S33) done (`8d7702d2`, receipt
-`support/doc-audit/d2/remediation_2026-10-06.md`); P3 and S7 done as
-documents; S3 to S6 carried into the dynamics grammar plan (G8, G9); S9 done by the identity
+`support/doc-audit/d2/remediation_2026-10-06.md`); S66's code follow-on
+(S70 to S75, the smolweb fidelity plan's WS4) landed bar R6 (`b4f14f2c`); P3
+and S7 done as documents; S3 to S6 carried into the dynamics grammar plan (G8, G9); S9 done by the identity
 lane (`b52edea7`).
 
 A note sent to Mark listed weak seams in the stack. Each claim was checked
@@ -1007,6 +1008,13 @@ The done-conditions handed over for S3 and S4, kept for reference:
   its adoption plan's Track F (`28985298`).
 - **2026-10-06.** Round 24: S71 to S74, S66's code follow-on shaped: a typed `Block::Menu`, `Block` made `#[non_exhaustive]`, gopher-protocol's raw types prepared and released on sign-off, the feed fields and the article reader in scope.
 - **2026-10-06.** Round 25: S75, a feed entry's article renders as its own EngineDocument through the html-fragment engine.
+- **2026-10-06.** S70's objective landed: the smolweb fidelity plan's WS4,
+  R0 to R5, merged as `b4f14f2c` (per-format views retired; `Block`
+  non-exhaustive with `Block::Menu`; gopher lowered to it; the feed's dates,
+  bodies and enclosures apart; an entry's body as its own document; soft
+  breaks a setting). R6, gopher-protocol 0.2.0, is prepared in the smolweb
+  repository (`b0f1dda`) and waits on Mark's sign-off to publish. The
+  fidelity plan's progress log carries the gates, readings and gaps.
 - **2026-10-06.** Round 16: S46 (live plans handed to their lanes), S47
   (reviewed write lanes) and S48 (ownerless tails to the archived plan tails
   backlog). S44's repins and S45's header re-run were flagged as separate
