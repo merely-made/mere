@@ -532,7 +532,14 @@ engine adapters.
   Inker defines correlated viewport-only capture requests/results, but no
   engine yet claims support. Its progress log names meerkat, which was deleted
   2026-07-18; the Phase 0–3 host code left with it; the open phases have no host. Its body's
-  `components/inker/...` *(historical citation)* <!-- doc-audit: historical-path --> paths are genet's; the code is `crates/inker/` here.)
+  `components/inker/...` *(historical citation)* <!-- doc-audit: historical-path --> paths are genet's; the code is `crates/inker/` here.
+  **2026-10-07 current-browser family in progress:** main already carries the
+  shared Weld input and ordered Graft contracts; Genet's published decoder
+  repair is being adopted with current CEF, then Knot, Redshank and Turnstone
+  are qualified as one selected consumer family. Initial Mere/Graft neutral
+  all-target checks and seven adapter tests pass on the final Genet/Weld
+  source pair; CEF-enabled consumer, native and foreign accessibility gates
+  stay distinct.)
 
 ## nematic_docs/ — the smolweb engine and knot composition
 
