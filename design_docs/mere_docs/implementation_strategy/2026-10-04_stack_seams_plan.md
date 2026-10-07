@@ -1,8 +1,8 @@
 # Stack seams plan: catalog, shared device, actions, determinism, two words
 
 **Date:** 2026-10-04
-**Status (2026-10-06):** in progress. Seventy-five rulings in twenty-five rounds
-(S1 to S75); P1 landed on main (`1633be0c`); P2 staged (S27 to S31, four
+**Status (2026-10-06):** in progress. Seventy-seven rulings in twenty-six rounds
+(S1 to S77); P1 landed on main (`1633be0c`); P2 staged (S27 to S31, four
 stages in §3.1) and landed on main (`40d7ae5e`); S32 (F19) landed on main
 (`48c08dee`); the S14 pass (S33) done (`8d7702d2`, receipt
 `support/doc-audit/d2/remediation_2026-10-06.md`); S66's code follow-on
@@ -838,6 +838,12 @@ Round 25, 2026-10-06. Evidence: S74 put the article reader in scope. Errand gain
 
 **Ruling S75.** *How does a feed entry's article body render?* Options: its own document (the entry's content lowered through the html-fragment engine, addressed as the feed plus the entry's guid, the article URL its canonical link); inline in the feed document, folded closed; handed off to the web lane. Mark: **"Own document (Recommended)"**. Follows: opening an entry renders its `content` through Nematic's html-fragment engine as its own EngineDocument, addressed as the feed plus the entry's guid, with the article URL as its canonical link; it reads offline on the one path, and an entry without content shows its summary and a link out.
 
+Round 26, 2026-10-06. Evidence: WS4 R0 to R5 merged to main as `b4f14f2c` with every gate green. R6 sits on the smolweb branch `gopher-protocol-0.2.0` (`b0f1dda`): a raw item type, `8` and `T` as telnet, a CSO kind, 39 tests passing and the smolweb workspace clean. knot-editor's desktop preview matches `Block` exhaustively and needs a wildcard arm and a `..` in its `FeedEntry` pattern at its next repin; the fidelity plan's stop rules send changes in knot-editor to Mark.
+
+**Ruling S76.** *Publish gopher-protocol 0.2.0 (irreversible), after which Mere repins and Nematic's gopher engine reads the raw type?* Options: publish 0.2.0; merge into smolweb main without publishing; hold the branch. Mark: **"Publish 0.2.0 (Recommended)"**. Follows: the branch merges into smolweb main, gopher-protocol 0.2.0 is published to crates.io, Mere repins to `=0.2.0`, and Nematic's gopher engine takes each row's marker from `raw_type`.
+
+**Ruling S77.** *knot-editor's desktop preview needs a wildcard arm and a `..` in its `FeedEntry` pattern at its next repin past `b4f14f2c`, and could draw `Block::Menu`. Who does it?* Options: a dated note in knot-editor's application workspace plan, their lane doing it at the repin; this session makes the change in knot-editor; leave it until the repin goes red. Mark: **"Note it in their plan (Recommended)"**. Follows: a dated note in knot-editor's application workspace plan names the change and cites the fidelity plan's WS4; knot-editor's lane makes it at its next repin.
+
 ## 3. Phases
 
 ### 3.1 This plan's lane
@@ -1015,6 +1021,7 @@ The done-conditions handed over for S3 and S4, kept for reference:
   breaks a setting). R6, gopher-protocol 0.2.0, is prepared in the smolweb
   repository (`b0f1dda`) and waits on Mark's sign-off to publish. The
   fidelity plan's progress log carries the gates, readings and gaps.
+- **2026-10-06.** Round 26: S76 (publish gopher-protocol 0.2.0, then repin) and S77 (knot-editor's preview change noted in its plan, its lane to make it).
 - **2026-10-06.** Round 16: S46 (live plans handed to their lanes), S47
   (reviewed write lanes) and S48 (ownerless tails to the archived plan tails
   backlog). S44's repins and S45's header re-run were flagged as separate
