@@ -1,7 +1,7 @@
 # Scenograph Editor Plan
 
 **Date:** 2026-10-07
-**Status (2026-10-07):** in progress. Rulings SE1 to SE9 recorded (§1). E1, the generic history, landed on main 2026-10-07 (`de06e4f0`) and moves into the `edit-history` leaf crate (SE10, SE13). E2, undo in the projection editor, landed 2026-10-07 with its headed check. E2b, saving into the mere session (SE11, SE12), is next.
+**Status (2026-10-07):** in progress. Rulings SE1 to SE9 recorded (§1). E1, the generic history, landed on main 2026-10-07 (`de06e4f0`) and moves into the `edit-history` leaf crate (SE10, SE13). E2, undo in the projection editor, landed 2026-10-07 with its headed check. E2b, saving into the mere session (SE11, SE12, SE14 to SE17), is under way.
 **Scope:** the editor foundation that Scenograph's editing surfaces stand on: one undo history in Cambium, and arrangement options declared as data. Carries out the balaur review's rulings A and B. The projection editor in Graphshell is the first consumer of both.
 
 Not in scope, mapped in §3 and opened by later rounds:
@@ -56,6 +56,12 @@ Mark opened the lane: "i'm most curious about scenograph, honestly. wallpapers, 
 
 **SE13, the crate's name (2026-10-07).** Question: the leaf crate's name; `edit-history`, `undo-history` and `cambium-history` were each checked free on crates.io. Mark: **"edit-history (Recommended)"**. *Follows:* `crates/cambium/edit-history`, `publish = false` until a publish is decided, so the name is chosen but not claimed.
 
+**SE14 to SE17, E2b's shape (2026-10-07).** Mark said "Proceed" to E2b; these were put with the evidence: Graphshell saves scenes as a node at an address carrying a JSON facet (`save_product_scene`, `graphshell.saved-scene/v3`), a journaled edit pandect can undo; the editor has two localStorage writers, the plain sink and the executable practice path (definition plus selected occurrence), which `projection_authoring.scn` and `projection_reopen.scn` reopen through; the browser host calls `MereHost::persist` only at open, and `GraphSession::edit_now` holds an edit "not stored until the next flush", so a browser save appears never to reach IndexedDB (read in code, not seen at runtime); the web UI calls no session undo.
+- **SE14, where a definition lives.** Options: a node and facet, like scenes; a view intent; a facet on the session item. Mark: **"Node + facet, like scenes (Recommended)"**. *Follows:* a node at `mere://projection/<definition id>` carrying a `graphshell.projection-definition/v1` facet.
+- **SE15, which savers move.** Options: both paths; the plain sink only. Mark: **"Both paths (Recommended)"**. *Follows:* the executable path's facet carries the definition and the selected occurrence together; both scenarios reopen from the session, and localStorage leaves the editor.
+- **SE16, flushing.** Options: persist after each save; a general flush policy first. Mark: **"Persist after each save (Recommended)"**. *Follows:* a projection save persists the session at once. Whether scene saves are lost on reload is checked at runtime and reported as next door, not fixed here.
+- **SE17, proving undo.** Options: a native test only; a session undo control. Mark: **"Add a session undo control"**. *Follows:* the web host gains session Undo and Redo over `MereHost::undo` and `redo`, beside the editor's own, and the headed check uses it.
+
 ## 2. Tracks
 
 E1 and E2 carry ruling A; E3 to E5 carry ruling B. E2 needs E1; E4 needs E3; E5 needs E2 and E4. *Added 2026-10-07:* E2b carries SE11 and SE12, after E2.
@@ -94,6 +100,8 @@ Done when:
 - the localStorage sink is gone, and a saved definition reads back from the session after a reload;
 - a session undo after a save restores the previous saved definition, attributed to its author;
 - a headed check in real Chromium saves, reloads and finds the definition.
+
+*Amended 2026-10-07 (SE14 to SE17):* the definition lives at `mere://projection/<id>` under a `graphshell.projection-definition/v1` facet; the executable path moves too, its facet holding the selected occurrence; each save persists at once; and the web host gains session Undo and Redo, which the headed check drives.
 
 ### E3 — the option declaration type (B, SE7)
 
