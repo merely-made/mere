@@ -221,8 +221,10 @@ impl PhysicsLaw {
 /// ("Min 60, bar: all >= 0.7") at all sixteen dealt starts of both bar
 /// graphs. Hub room's lowest start reads 0.808 (gen-50) and 0.765 (gen-200),
 /// Centre's 0.703 and 0.735; Tide's 0.699 on gen-50 misses it.
-pub(crate) const DENSITY_ADMITS: &[PhysicsOverlay] =
-    &[PhysicsOverlay::DegreeRepulsion, PhysicsOverlay::GravityLocus];
+pub(crate) const DENSITY_ADMITS: &[PhysicsOverlay] = &[
+    PhysicsOverlay::DegreeRepulsion,
+    PhysicsOverlay::GravityLocus,
+];
 
 /// Why Density refuses the rest.
 pub(crate) const DENSITY_REFUSAL: &str = "Density takes only Hub room and Centre: converted into \

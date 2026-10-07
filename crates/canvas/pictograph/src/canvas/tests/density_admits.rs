@@ -148,7 +148,12 @@ fn every_overlay_density_admits_holds_its_bar_at_all_sixteen_starts() {
                     canvas.set_physics_overlays(vec![overlay]).unwrap();
                     let ticks = until_settled(&mut canvas, 60 * 122);
                     let stats = canvas.layout_stats();
-                    (stats.mass_area_rank, stats.density_cv, stats.overlaps, ticks)
+                    (
+                        stats.mass_area_rank,
+                        stats.density_cv,
+                        stats.overlaps,
+                        ticks,
+                    )
                 })
                 .collect();
             print_rows(name, Joining::Overlay(overlay), &rows);
