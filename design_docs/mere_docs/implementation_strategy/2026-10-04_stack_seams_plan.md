@@ -854,6 +854,10 @@ Round 27, 2026-10-06, carrying out S45. Evidence, at `ea74604b` with the tree cl
 
 **Ruling S81.** *Does the sweep's hash go into `.git-blame-ignore-revs`?* Options: leave it out (the file's stated rustfmt scope, P1's precedent); add it, widening the file to header sweeps. Mark: **"Leave it out (Recommended)"**. Follows: the file is unchanged.
 
+Round 28, 2026-10-06, during the S45 sweep. Evidence: before `--apply`, the tree was searched for every flagged file's SHA-256 and git blob id, whole and as 12-character prefixes, with S79's eight files as the positive control (all eight found, at 16 sites). Two sweep files are recorded in graphshell receipts' `source_sha256` maps of 2026-09-06: `ports/graphshell/web/co_op.js` (`co_op_browser_receipt.json`) and `ports/pelt/core/src/surface_policy.rs` (`projection_refresh_surface_reuse_receipt.json`). Both are live sources, and both maps are snapshots that had already gone mostly stale: 7 of 10 and 22 of 30 entries no longer recompute.
+
+**Ruling S82.** *How are the two live sources these receipts record treated?* Options: sweep them, the receipts staying as records of the 2026-09-06 state, "with 9 of 10 and 24 of 30 entries stale"; hold them out as frozen evidence; sweep them and annotate the receipts README. Mark: **"Sweep them (Recommended)"**. Follows: both take the header with the other 73, and Frozen evidence stays for frozen sources only. *Erratum*: the option's figures were miscounted by one each. After the sweep the maps stand at 8 of 10 and 23 of 30 stale (recomputed at `43353861`), one more entry each, which is what the option meant.
+
 ## 3. Phases
 
 ### 3.1 This plan's lane
@@ -1032,6 +1036,7 @@ The done-conditions handed over for S3 and S4, kept for reference:
   repository (`b0f1dda`) and waits on Mark's sign-off to publish. The
   fidelity plan's progress log carries the gates, readings and gaps.
 - **2026-10-06.** Round 26: S76 (publish gopher-protocol 0.2.0, then repin) and S77 (knot-editor's preview change noted in its plan, its lane to make it).
+- **2026-10-06.** S45 carried out, under rounds 27 and 28 (S78 to S82): Frozen evidence ledgered (`362c5d5a`), the header tool re-run over 75 owned sources in one commit (`43353861`), and the gate added to CI and the doc audit (`0b374437`). The receipt is in the license sweep plan's §6.
 - **2026-10-06.** Round 16: S46 (live plans handed to their lanes), S47
   (reviewed write lanes) and S48 (ownerless tails to the archived plan tails
   backlog). S44's repins and S45's header re-run were flagged as separate
