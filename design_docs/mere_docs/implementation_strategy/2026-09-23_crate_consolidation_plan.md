@@ -183,7 +183,7 @@ Ruled by Mark 2026-09-23:
 | `mere-canvas`, `mere-signals` | fold into `pictograph`, not the reverse; canvas becomes `pictograph::canvas` and the mere facade keeps exposing it at `mere::canvas`, so consumer paths do not change | landed: features `canvas` and `signals` on pictograph |
 | `scenograph` | stays a crate: its scene editing is useful beyond graphshell | ruled out |
 | `tabard` | stays a crate: the named home for theme and stylesheet authoring (C2) | ruled out |
-| `cambium-nematic` | fold into `cambium` as feature `nematic` (ruled 2026-09-25): no host took its views, since Pelt, Turnstone and Signalman read smolweb through document-lanes' engine-native lane | landed: `cambium::nematic` |
+| `cambium-nematic` | fold into `cambium` as feature `nematic` (ruled 2026-09-25): no host took its views, since Pelt, Turnstone and Signalman read smolweb through document-lanes' engine-native lane | landed: `cambium::nematic`. **Annotated 2026-10-06:** the feature and its views were removed under ruling S66 ([smolweb fidelity plan](../../nematic_docs/implementation_strategy/2026-07-01_smolweb_fidelity_plan.md) WS4, R0) |
 
 *Done when:* each ruled fold has landed with its tests and gates.
 
