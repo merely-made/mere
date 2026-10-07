@@ -4,7 +4,7 @@
 Its retained-paint direction landed as the `sprigging` workspace crate; the
 current authoring element is `<custom-leaf>`, with `<chisel-leaf>` retained
 only as a read-side compatibility spelling. The current catalog is
-[2026-07-15_component_catalog_growth_plan.md](./2026-07-15_component_catalog_growth_plan.md)
+[2026-07-15_component_catalog_growth_plan.md](../../archive_docs/2026-10-06_completed_plans/2026-07-15_component_catalog_growth_plan.md)
 and [component-catalog.md](../technical_architecture/component-catalog.md).
 `chisel` and `xilem-serval` below are the proposal's historical names.
 
@@ -12,7 +12,7 @@ and [component-catalog.md](../technical_architecture/component-catalog.md).
 widget-leaf layer that lets imperative custom-paint widgets (knobs, meters,
 waveforms, graph canvases) live as first-class serval elements without a second
 UI engine. Sits beside the reactive backend from
-[2026-05-27_serval_as_host_xilem_serval_plan.md](./2026-05-27_serval_as_host_xilem_serval_plan.md)
+[2026-05-27_serval_as_host_xilem_serval_plan.md](../../archive_docs/2026-10-06_completed_plans/2026-05-27_serval_as_host_xilem_serval_plan.md)
 and rides the paint seams from
 [2026-05-17_paintlist_polyglot_renderer.md](../../../../genet/docs/2026-05-17_paintlist_polyglot_renderer.md).
 Working crate name **`chisel`** (needs a crates.io check before reservation).
@@ -437,7 +437,7 @@ sheds the bespoke host-composite branch.
 
 ## Relationship to existing docs
 
-- [2026-05-27_serval_as_host_xilem_serval_plan.md](./2026-05-27_serval_as_host_xilem_serval_plan.md)
+- [2026-05-27_serval_as_host_xilem_serval_plan.md](../../archive_docs/2026-10-06_completed_plans/2026-05-27_serval_as_host_xilem_serval_plan.md)
   — the reactive backend chisel leaves are authored through. chisel is the leaf
   layer that plan's views wrap.
 - [2026-05-17_paintlist_polyglot_renderer.md](../../../../genet/docs/2026-05-17_paintlist_polyglot_renderer.md)

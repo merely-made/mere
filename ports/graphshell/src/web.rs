@@ -27,23 +27,22 @@ mod web_product;
 mod web_projection;
 mod web_practice;
 mod web_remote;
+mod web_rtc_link;
 mod web_scenario;
+mod web_speed;
 mod web_timing;
 mod web_tree;
 mod web_view;
 
 use std::cell::RefCell;
-use std::collections::HashMap;
 use std::rc::Rc;
 
 use genet_render::TextSystem;
 use graphshell::browser_storage::{StoragePersistence, decide, status_line};
-use graphshell::client::{ActionDraft, ActionDraftSemantics, ActionDraftTarget};
+use graphshell::client::{ActionDraft, ActionDraftSemantics, ActionForm};
 use graphshell::endpoint::{IntentSink, ProjectionSource};
 use graphshell::protocol::{IntentResult, ProjectionSession};
-use mere::canvas::{Canvas, PhysicsBoard, PointerButton};
-use mere::kernel::geometry::PortablePoint;
-use mere::kernel::graph::NodeKey;
+use mere::canvas::{Canvas, PointerButton};
 use netrender::Scene;
 use serde::Deserialize;
 use wasm_bindgen::JsCast;
@@ -63,13 +62,13 @@ use graphshell::capture::{
 use graphshell::mere_host::{
     FIXTURE_DEVICE_TWO_ADDRESS, FIXTURE_PERSONA_ADDRESS, FIXTURE_WEB_ADDRESS, SelectedPersonaRef,
 };
-use graphshell::product::{ProjectionClock, RelationFamilyFilter, SavedSceneV1};
+use graphshell::product::{RelationFamilyFilter, SavedSceneV2};
 use graphshell::projection_editor::{
     Appearance, Channel, EditorAction, Encoding, Interaction, ProjectionDefinition,
     ProjectionDefinitionSink, ProjectionDraft, ProjectionEditor, ProjectionPanel, Provenance,
     PublicSourceRevision, Reading, RevisionEvidence, SelectionMode, SourceBinding,
 };
-use graphshell::view::ProjectionLayoutView;
+use graphshell::remote_board::RemoteBoard;
 use graphshell_client::frozen::Satisfaction;
 use muniment::IndexedDbBackend;
 use uuid::Uuid;
@@ -86,23 +85,6 @@ const CAPTURE_VISITS_GLOBAL: &str = "graphshellInitialVisitsJson";
 const HISTORY_FILTER_GLOBAL: &str = "graphshellHistoryFilterJson";
 const HISTORY_FORGET_GLOBAL: &str = "graphshellHistoryForgetJson";
 const PROJECTION_EDITOR_STORAGE_KEY: &str = "graphshellProjectionDefinitionV1";
-
-/// Stable fallback paint for an open backdrop kind. Product hosts can replace
-/// this with native art; an unfamiliar remote scene still gets a distinct,
-/// deterministic face from its wire data.
-fn remote_backdrop_color(kind: &str) -> [f32; 4] {
-    const PALETTE: [[f32; 4]; 5] = [
-        [0.10, 0.19, 0.22, 1.0],
-        [0.16, 0.17, 0.25, 1.0],
-        [0.18, 0.14, 0.20, 1.0],
-        [0.13, 0.21, 0.17, 1.0],
-        [0.22, 0.18, 0.12, 1.0],
-    ];
-    let hash = kind.bytes().fold(0x811c_9dc5_u32, |hash, byte| {
-        (hash ^ u32::from(byte)).wrapping_mul(0x0100_0193)
-    });
-    PALETTE[hash as usize % PALETTE.len()]
-}
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 struct InitialCaptureSummary {
@@ -154,137 +136,6 @@ enum ActiveSession {
     Remote,
 }
 
-/// One opt-in playback of an analytic arrangement change. Scenotime owns the
-/// schedule; this browser host owns the frame clock and the NodeKey binding.
-struct CanvasTransition {
-    schedule: scenotime::TransitionSchedule,
-    clock: ProjectionClock,
-    node_of: HashMap<sceno::InstanceId, NodeKey>,
-    start_positions: Vec<(NodeKey, PortablePoint)>,
-    final_positions: Vec<(NodeKey, PortablePoint)>,
-}
-
-impl CanvasTransition {
-    fn between(
-        canvas: &Canvas,
-        final_positions: &[(NodeKey, PortablePoint)],
-    ) -> Result<Option<Self>, String> {
-        let final_of = final_positions.iter().copied().collect::<HashMap<_, _>>();
-        let old_geometry = canvas.cartography_geometry();
-        let old_of = old_geometry.iter().collect::<HashMap<_, _>>();
-        let extents = canvas.strategy_extents();
-        let mut nodes = canvas.graph().nodes().collect::<Vec<_>>();
-        nodes.sort_by_key(|(_, node)| node.id);
-
-        let mut scene = sceno::Scene::new();
-        scene.generation = canvas.graph().revision();
-        let mut node_of = HashMap::new();
-        let mut start_positions = Vec::with_capacity(nodes.len());
-        let mut operations = Vec::new();
-        for (key, node) in nodes {
-            let Some(target) = final_of.get(&key).copied() else {
-                continue;
-            };
-            let current = old_of
-                .get(&node.id)
-                .map(|(x, y)| PortablePoint::new(*x, *y))
-                .unwrap_or(target);
-            let source = scene.intern_source(sceno::SourceRef::new(
-                mere::canvas::MERE_GRAPH_ADAPTER,
-                node.id.to_string(),
-            ));
-            let (width, height) = extents.get(&key).copied().unwrap_or((36.0, 36.0));
-            let item = sceno::ProjectedItem {
-                source,
-                space: sceno::Scene::WORLD,
-                transform: sceno::Transform2::translation(current.x, current.y),
-                footprint: sceno::Footprint::Rect {
-                    size: sceno::Size2::new(width, height),
-                },
-                representation: canvas
-                    .projection_representation(key)
-                    .cloned()
-                    .unwrap_or(sceno::Representation::Card),
-                layer: 0,
-                visible: true,
-                hit: None,
-                channels: Vec::new(),
-            };
-            let instance = sceno::InstanceId(scene.items.len() as u32);
-            node_of.insert(instance, key);
-            start_positions.push((key, current));
-            scene.items.push(item.clone());
-            if current != target {
-                let mut target_item = item;
-                target_item.transform = sceno::Transform2::translation(target.x, target.y);
-                operations.push(scenotime::SceneOp::UpdateItem {
-                    index: instance,
-                    value: target_item,
-                });
-            }
-        }
-
-        if operations.is_empty() {
-            return Ok(None);
-        }
-        let before = scenotime::SceneSnapshot::from_dense(
-            scenotime::SceneEpoch(1),
-            scenotime::Revision(1),
-            scene,
-        )
-        .map_err(|error| format!("could not build transition start: {error:?}"))?;
-        let diff = scenotime::SceneDiff {
-            epoch: before.epoch,
-            base: before.revision,
-            revision: scenotime::Revision(before.revision.0 + 1),
-            operations,
-        };
-        let schedule = scenotime::TransitionSchedule::from_diff(
-            &before,
-            &diff,
-            &scenotime::TransitionSpec::default(),
-        )
-        .map_err(|error| format!("could not schedule arrangement transition: {error:?}"))?;
-        Ok(Some(Self {
-            schedule,
-            clock: ProjectionClock::default(),
-            node_of,
-            start_positions,
-            final_positions: final_positions.to_vec(),
-        }))
-    }
-
-    fn advance(&mut self, host_ms: f64) -> (Vec<(NodeKey, PortablePoint)>, bool) {
-        let frame = self.schedule.sample_at(self.clock.observe(host_ms));
-        if frame.complete {
-            return (self.final_positions.clone(), true);
-        }
-        let mut positions = self
-            .start_positions
-            .iter()
-            .copied()
-            .collect::<HashMap<_, _>>();
-        for sample in frame.items {
-            let Some(key) = self.node_of.get(&sample.instance).copied() else {
-                continue;
-            };
-            positions.insert(
-                key,
-                PortablePoint::new(
-                    sample.value.transform.translate.x,
-                    sample.value.transform.translate.y,
-                ),
-            );
-        }
-        let positions = self
-            .start_positions
-            .iter()
-            .filter_map(|(key, _)| positions.get(key).copied().map(|position| (*key, position)))
-            .collect();
-        (positions, false)
-    }
-}
-
 struct BrowserHost {
     app: GraphshellApp<IndexedDbBackend>,
     /// Where the remote projection lives (`web_remote`).
@@ -292,19 +143,23 @@ struct BrowserHost {
     /// The remote board's physics: the mounted scene's items as bodies, the
     /// score's positions as anchor slots, the local canvas's law mirrored.
     /// Synced whenever the acknowledged revision moves. (Physics catalog — P3.)
-    remote_board: PhysicsBoard,
-    remote_board_revision: Option<u64>,
+    remote_board: RemoteBoard,
     /// `layout_stats` is a pairwise pass over every node; recompute it only
     /// on motion, one frame past rest, and on a chrome change.
     layout_stats_stale: bool,
+    /// The speed reached, shown under the speed select while the layout moves.
+    reached_note: web_speed::ReachedNote,
+    /// The step budget, a share of the measured frame interval.
+    frame_budget: web_speed::FrameBudget,
     layout_moved: bool,
     layout_stats: mere::canvas::LayoutStats,
     /// Screen px where the last `drag-focused` released, for `data-drag-return`.
     drag_drop: Option<(f32, f32)>,
+    /// The same drop in world units, for `data-drag-return-world`.
+    drag_drop_world: Option<(f32, f32)>,
     remote_session: Option<ProjectionSession>,
     remote_status: String,
     remote_joining: bool,
-    remote_last_resume: String,
     active: ActiveSession,
     canvas: Canvas,
     canvas_element: HtmlCanvasElement,
@@ -314,10 +169,9 @@ struct BrowserHost {
     chrome_text: TextSystem,
     chrome_dirty: bool,
     detail_open: bool,
-    action_count: u32,
-    action_status: String,
-    action_draft: Option<ActionDraft>,
-    action_draft_target: Option<ActionDraftTarget>,
+    /// The page's own action surface, used until a WebRTC session holds one
+    /// (`form`, `form_mut`).
+    actions: ActionForm,
     rendered_action_draft: Option<ActionDraftSemantics>,
     action_draft_semantics_ready: bool,
     width: u32,
@@ -335,8 +189,8 @@ struct BrowserHost {
     last_export: String,
     export_bytes: usize,
     imported_nodes: usize,
-    saved_scene: Option<SavedSceneV1>,
-    arrangement_transition: Option<CanvasTransition>,
+    saved_scene: Option<SavedSceneV2>,
+    arrangement_transition: Option<graphshell::canvas_physics::ArrangementTransition>,
     primary_member: Option<Uuid>,
     last_detail_member: Option<Uuid>,
     projection_editor: ProjectionEditor,
@@ -360,6 +214,12 @@ struct BrowserHost {
     /// Frame times for a scenario's `timing` windows, measured as the tree
     /// page measures its own (the one-tree plan's phase 3).
     timing: web_timing::FrameTiming,
+    /// The layout where the last law was applied, and the scenario's
+    /// `log-layout` lines.
+    law_start: Option<graphshell::canvas_physics::LawStart>,
+    layout_log: Vec<String>,
+    /// The last `measure-faces` reading, for the snapshot.
+    faces: Option<graphshell::canvas_faces::FaceAlignment>,
 }
 
 struct BrowserProjectionSink;
@@ -494,7 +354,7 @@ impl BrowserHost {
             detail_open: self.detail_open,
             detail_address,
             selection,
-            action_status: self.action_status.clone(),
+            action_status: self.form().status.clone(),
             viewport_label: format!(
                 "{} × {} · {}",
                 self.width,
@@ -507,7 +367,9 @@ impl BrowserHost {
             physics_law,
             physics_paused,
             remote_cards,
-            action_draft: self.action_draft.as_ref().map(ActionDraft::semantics),
+            remote_speed: (self.active == ActiveSession::Remote && self.remote_mounted().is_some())
+                .then(|| web_speed::board_line(self.remote_board.speed())),
+            action_draft: self.form().draft.as_ref().map(ActionDraft::semantics),
         };
         if let Some(live) = &self.live_projection {
             live.decorate_chrome(&mut model);
@@ -557,6 +419,11 @@ impl BrowserHost {
             return Ok(());
         }
         self.advance_arrangement_transition(host_ms);
+        // The step budget is a share of the display's period, read from the
+        // frames' intervals (ruled 2026-10-04, "Infer the period").
+        let budget = self.frame_budget.frame(host_ms);
+        self.canvas.set_physics_step_budget(Some(budget));
+        self.remote_board.set_step_budget(Some(budget));
         if self.chrome_dirty {
             // A host command can move bodies without a settle.
             self.layout_stats_stale = true;
@@ -619,117 +486,16 @@ impl BrowserHost {
         Ok(())
     }
 
-    fn begin_arrangement_transition(
-        &mut self,
-        final_positions: &[(NodeKey, PortablePoint)],
-    ) -> Result<bool, String> {
-        self.arrangement_transition = CanvasTransition::between(&self.canvas, final_positions)?;
-        Ok(self.arrangement_transition.is_some())
-    }
-
     fn advance_arrangement_transition(&mut self, host_ms: f64) {
-        let Some((positions, complete)) = self
-            .arrangement_transition
-            .as_mut()
-            .map(|transition| transition.advance(host_ms))
-        else {
-            return;
-        };
-        if complete {
-            self.canvas.apply_strategy_positions(&positions);
-            self.arrangement_transition = None;
-            self.product_status = format!("Arrangement set to {}", self.layout_id);
+        if let Some(status) = graphshell::canvas_physics::advance_arrangement(
+            &mut self.canvas,
+            &mut self.arrangement_transition,
+            &self.layout_id,
+            host_ms,
+        ) {
+            self.product_status = status;
             self.chrome_dirty = true;
-        } else {
-            self.canvas.preview_strategy_positions(&positions);
         }
-    }
-
-    fn remote_scene(&self) -> Scene {
-        let mut scene = Scene::new(self.width, self.height);
-        scene.push_rect(
-            0.0,
-            0.0,
-            self.width as f32,
-            self.height as f32,
-            [0.025, 0.045, 0.057, 1.0],
-        );
-        let Some(mounted) = self.remote_mounted() else {
-            return scene;
-        };
-        let bounds = mounted.scene.tables.bounds;
-        let scale = ((self.width as f32 - 100.0) / bounds.size.w.max(1.0))
-            .min((self.height as f32 - 180.0) / bounds.size.h.max(1.0))
-            .min(1.0);
-        let origin_x = (self.width as f32 - bounds.size.w * scale) * 0.5 - bounds.origin.x * scale;
-        let origin_y = 116.0 - bounds.origin.y * scale;
-        let layout = ProjectionLayoutView::from_scene(&mounted.scene);
-        for backdrop in &layout.backdrops {
-            let x0 = origin_x + backdrop.x * scale;
-            let y0 = origin_y + backdrop.y * scale;
-            let x1 = x0 + backdrop.width * scale;
-            let y1 = y0 + backdrop.height * scale;
-            let color = remote_backdrop_color(&backdrop.kind);
-            scene.push_rect(x0, y0, x1, y1, color);
-            if backdrop.collidable {
-                let stroke = 2.0;
-                let edge = [0.78, 0.61, 0.31, 0.9];
-                scene.push_rect(x0, y0, x1, y0 + stroke, edge);
-                scene.push_rect(x0, y1 - stroke, x1, y1, edge);
-                scene.push_rect(x0, y0, x0 + stroke, y1, edge);
-                scene.push_rect(x1 - stroke, y0, x1, y1, edge);
-            }
-        }
-        for (instance, item) in mounted.scene.active_items_in_order() {
-            // Where the physics put the card, falling back to the score's
-            // own position for an item the board has not seen yet.
-            let (x, y) = self
-                .remote_board
-                .position(&instance.0.to_string())
-                .unwrap_or((item.transform.translate.x, item.transform.translate.y));
-            let center_x = origin_x + x * scale;
-            let center_y = origin_y + y * scale;
-            let (card_w, card_h) = match item.footprint {
-                sceno::Footprint::Rect { size } => (size.w * scale, size.h * scale),
-                _ => (120.0, 80.0),
-            };
-            // An item sitting where a person put it should not look identical
-            // to one the arrangement happened to place there. Read from the
-            // snapshot rather than inferred, which is why A1 puts the honored
-            // half on the wire beside the unmet half.
-            let pinned = Satisfaction::is_pinned(&mounted.scene.tables, instance);
-            let color = if instance.0 == 0 {
-                [0.16, 0.31, 0.35, 1.0]
-            } else {
-                [0.23, 0.28, 0.38, 1.0]
-            };
-            if pinned {
-                // A held edge, drawn outside the card so it reads as something
-                // done to the item rather than part of it.
-                scene.push_rect(
-                    center_x - card_w * 0.5 - 3.0,
-                    center_y - card_h * 0.5 - 3.0,
-                    center_x + card_w * 0.5 + 3.0,
-                    center_y + card_h * 0.5 + 3.0,
-                    [0.85, 0.72, 0.35, 1.0],
-                );
-            }
-            scene.push_rect(
-                center_x - card_w * 0.5 - 5.0,
-                center_y - card_h * 0.5 + 6.0,
-                center_x + card_w * 0.5 + 5.0,
-                center_y + card_h * 0.5 + 11.0,
-                [0.01, 0.02, 0.025, 0.45],
-            );
-            scene.push_rect(
-                center_x - card_w * 0.5,
-                center_y - card_h * 0.5,
-                center_x + card_w * 0.5,
-                center_y + card_h * 0.5,
-                color,
-            );
-        }
-        scene
     }
 
     /// Run one named command. `false` when no such command exists, so a
@@ -1042,8 +808,12 @@ impl BrowserHost {
             .app
             .open_address(&address, &self.handler_id)
             .map_err(|error| error.to_string());
-        self.action_count = self.action_count.saturating_add(1);
-        self.action_status = match result {
+        let count = {
+            let form = self.form_mut();
+            form.count = form.count.saturating_add(1);
+            form.count
+        };
+        let status = match result {
             Ok(IntentResult::Accepted)
                 if self.active == ActiveSession::Local && self.handler_id == "system.default" =>
             {
@@ -1053,110 +823,51 @@ impl BrowserHost {
                         .map_err(|_| "host-browser open failed".to_string())
                 }) {
                     Ok(Some(_)) => format!(
-                        "Accepted · opened in host browser · {} invocation(s)",
-                        self.action_count
+                        "Accepted · opened in host browser · {count} invocation(s)"
                     ),
                     Ok(None) => "Failed · host browser blocked the external open".to_string(),
                     Err(error) => format!("Failed · {error}"),
                 }
             },
-            Ok(IntentResult::Accepted) => format!("Accepted · {} invocation(s)", self.action_count),
+            Ok(IntentResult::Accepted) => format!("Accepted · {count} invocation(s)"),
             Ok(other) => format!("{other:?}"),
             Err(error) => format!("Failed · {error}"),
         };
+        self.form_mut().status = status;
         self.detail_open = true;
     }
 
-    fn open_remote_action_draft(&mut self) {
-        let Some(session) = self.remote_session.clone() else {
-            self.action_status = "Failed · remote projection is not mounted".to_string();
-            return;
-        };
-        let Some((observed_epoch, observed_revision)) = self
-            .remote_mounted()
-            .map(|mounted| (mounted.scene.epoch, mounted.scene.revision))
-        else {
-            self.action_status = "Failed · remote projection is not mounted".to_string();
-            return;
-        };
-        let tree = match self
-            .remote_client()
-            .ok_or("remote link is not discovered".to_string())
-            .and_then(|client| {
-                client
-                    .accessibility_tree(&session, &web_remote::remote_profile())
-                    .map_err(|error| format!("{error:?}"))
-            }) {
-            Ok(tree) => tree,
-            Err(error) => {
-                self.action_status = format!("Failed · remote accessibility tree: {error}");
-                return;
-            },
-        };
-        // A bounded form opens as a draft. Plain actions are offered as
-        // buttons by `update_remote_semantics`; opening the detail is enough.
-        let Some((target, action)) = tree.children.iter().find_map(|item| {
-            item.actions
-                .iter()
-                .find(|action| action.input_form.is_some())
-                .cloned()
-                .map(|action| (item.instance, action))
-        }) else {
-            let count = tree
-                .children
-                .iter()
-                .map(|item| item.actions.len())
-                .sum::<usize>();
-            self.action_status = format!("{count} remote action(s) advertised");
-            return;
-        };
-        self.action_status = format!("Choose values · {}", action.label);
-        self.action_draft = Some(ActionDraft::new(action));
-        self.action_draft_target = Some(ActionDraftTarget {
-            session,
-            target,
-            observed_epoch,
-            observed_revision,
-        });
-    }
-
     fn choose_action_draft(&mut self, field: &str, value: &str) {
-        let Some(draft) = self.action_draft.as_mut() else {
-            self.action_status = "Failed · no remote action draft is open".to_string();
-            return;
-        };
-        self.action_status = match draft.choose(field, value) {
-            Ok(()) => format!("Selected {field}"),
-            Err(error) => format!("Choose values · {error}"),
-        };
+        self.form_mut().choose(field, value);
         self.chrome_dirty = true;
     }
 
     fn submit_action_draft(&mut self) {
-        if matches!(self.remote, RemoteLink::WebRtc(_)) {
-            self.submit_remote_draft();
-            return;
-        }
-        let Some(target) = self.action_draft_target.clone() else {
-            self.action_status = "Failed · no remote action draft target is open".to_string();
+        self.detail_open = true;
+        let fixture = match &mut self.remote {
+            RemoteLink::Fixture(fixture) => fixture,
+            RemoteLink::WebRtc(live) => {
+                live.session.submit_draft();
+                return;
+            },
+        };
+        let form = &mut self.actions;
+        let Some(target) = form.target.clone() else {
+            form.status = "Failed · no remote action draft target is open".to_string();
             return;
         };
-        let Some(draft) = self.action_draft.as_mut() else {
-            self.action_status = "Failed · no remote action draft is open".to_string();
+        let Some(draft) = form.draft.as_mut() else {
+            form.status = "Failed · no remote action draft is open".to_string();
             return;
         };
         let invocation = match draft.invocation(&target) {
             Ok(invocation) => invocation,
             Err(error) => {
-                self.action_status = format!("Choose required values · {error}");
-                self.detail_open = true;
+                form.status = format!("Choose required values · {error}");
                 return;
             },
         };
-        self.action_count = self.action_count.saturating_add(1);
-        let RemoteLink::Fixture(fixture) = &mut self.remote else {
-            return;
-        };
+        form.count = form.count.saturating_add(1);
         match fixture.invoke(invocation) {
             Ok(IntentResult::Accepted) => match fixture.snapshot(fixture.request()) {
                 Ok(snapshot) => match self.app.mount_remote(snapshot) {
@@ -1168,34 +879,29 @@ impl BrowserHost {
                             .map(|mounted| mounted.scene.revision.0)
                             .unwrap_or_default();
                         self.remote_session = Some(session);
-                        self.action_status = format!(
+                        form.status = format!(
                             "Accepted · resnapshotted revision {revision} · {} invocation(s)",
-                            self.action_count
+                            form.count
                         );
-                        self.action_draft = None;
-                        self.action_draft_target = None;
+                        form.close();
                     },
                     Err(error) => {
-                        self.action_status =
-                            format!("Accepted · failed to mount resnapshot: {error}");
+                        form.status = format!("Accepted · failed to mount resnapshot: {error}");
                     },
                 },
                 Err(error) => {
-                    self.action_status =
-                        format!("Accepted · failed to request resnapshot: {error}");
+                    form.status = format!("Accepted · failed to request resnapshot: {error}");
                 },
             },
             Ok(IntentResult::Stale { .. }) => {
-                self.action_status = "Stale · reopen the remote action form".to_string();
-                self.action_draft = None;
-                self.action_draft_target = None;
+                form.status = "Stale · reopen the remote action form".to_string();
+                form.close();
             },
             Ok(IntentResult::Rejected { reason }) => {
-                self.action_status = format!("Rejected · {reason}");
+                form.status = format!("Rejected · {reason}");
             },
-            Err(error) => self.action_status = format!("Failed · {error}"),
+            Err(error) => form.status = format!("Failed · {error}"),
         }
-        self.detail_open = true;
     }
 
     fn pointer_position(&self, x: i32, y: i32) -> (f32, f32) {
@@ -1923,6 +1629,7 @@ fn publish_history_controls(
 }
 
 fn update_semantics(host: &mut BrowserHost) -> Result<(), String> {
+    host.pump_remote();
     if host.practice.is_some() {
         let body=root()?;
         if body.get_attribute("data-ready").as_deref()!=Some("true") {
@@ -2019,7 +1726,7 @@ fn update_semantics(host: &mut BrowserHost) -> Result<(), String> {
     .map_err(|_| "could not expose active session")?;
     body.set_attribute("data-detail-open", &host.detail_open.to_string())
         .map_err(|_| "could not expose detail state")?;
-    body.set_attribute("data-action-count", &host.action_count.to_string())
+    body.set_attribute("data-action-count", &host.form().count.to_string())
         .map_err(|_| "could not expose action count")?;
     body.set_attribute("data-storage", &host.storage_status)
         .map_err(|_| "could not expose storage state")?;
@@ -2116,10 +1823,13 @@ async fn run(root_element: Element) -> Result<(), String> {
     // tree page draws for those parameters, so the two can be timed side by
     // side (the one-tree plan's phase 3).
     let canvas_graph = match web_graphs::requested() {
-        Some((nodes, seed)) => web_graphs::generated(nodes, seed),
+        Some((nodes, seed)) => web_graphs::generated(nodes, seed, web_graphs::links()),
         None => app.host.graph().clone(),
     };
     let mut graph_canvas = web_graphs::prepared_canvas(canvas_graph, width, height);
+    let speed_options = web_speed::options()?;
+    let frame_budget = web_speed::frame_budget(speed_options);
+    web_speed::apply(&mut graph_canvas, speed_options, &frame_budget);
     let physics_paused = graph_canvas.physics_paused();
     graph_canvas.select_by_url(FIXTURE_WEB_ADDRESS);
     let primary_member = graph_canvas.focused_member();
@@ -2154,6 +1864,7 @@ async fn run(root_element: Element) -> Result<(), String> {
         physics_law: mere::canvas::PhysicsLaw::Springs.label().to_string(),
         physics_paused,
         remote_cards: Vec::new(),
+        remote_speed: None,
         action_draft: None,
     };
     // The chrome's font. A browser has no system fonts for fontique to find,
@@ -2167,16 +1878,17 @@ async fn run(root_element: Element) -> Result<(), String> {
     let state = Rc::new(RefCell::new(BrowserHost {
         app,
         remote: RemoteLink::Fixture(remote),
-        remote_board: PhysicsBoard::new(),
-        remote_board_revision: None,
+        remote_board: RemoteBoard::new(),
         layout_stats_stale: true,
+        reached_note: web_speed::ReachedNote::default(),
+        frame_budget,
         layout_moved: false,
         layout_stats: mere::canvas::LayoutStats::default(),
         drag_drop: None,
+        drag_drop_world: None,
         remote_session: Some(remote_session),
         remote_status: "fixture".to_string(),
         remote_joining: false,
-        remote_last_resume: String::new(),
         active: ActiveSession::Local,
         canvas: graph_canvas,
         canvas_element: canvas,
@@ -2185,10 +1897,7 @@ async fn run(root_element: Element) -> Result<(), String> {
         chrome_text,
         chrome_dirty: false,
         detail_open: false,
-        action_count: 0,
-        action_status: "Ready".to_string(),
-        action_draft: None,
-        action_draft_target: None,
+        actions: ActionForm::new("Ready"),
         rendered_action_draft: None,
         action_draft_semantics_ready: false,
         width,
@@ -2227,6 +1936,9 @@ async fn run(root_element: Element) -> Result<(), String> {
         capture_pending: None,
         capture_count: 0,
         timing: web_timing::FrameTiming::default(),
+        law_start: None,
+        layout_log: Vec::new(),
+        faces: None,
     }));
     web_scenario::install(&state);
     install_events(&state)?;
@@ -2241,6 +1953,9 @@ async fn run(root_element: Element) -> Result<(), String> {
 
 #[wasm_bindgen(start)]
 pub fn start() {
+    // First, before any other Rust code: pre.4 CubeCL's static constructors,
+    // once (burn migration plan §13.33; rulings 532 and 536).
+    cambium_genet_web_host::run_static_constructors_once();
     console_error_panic_hook::set_once();
 }
 

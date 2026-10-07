@@ -19,10 +19,13 @@ use std::fmt;
 use std::sync::{Arc, Mutex, MutexGuard};
 use std::time::{SystemTime, UNIX_EPOCH};
 
+use chatelaine::{CredentialId, ItemId, ItemState};
+
 use super::{
-    OtpCodeTile, OtpItem, OtpItemError, OtpItemId, OtpItemStore, OtpReleaseParticipantClaim,
+    OtpCodeTile, OtpCredential, OtpItemError, OtpItemStore, OtpReleaseParticipantClaim,
     OtpReleaseParticipantProof,
 };
+use crate::items::ItemStoreError;
 
 const DEFAULT_REQUEST_TTL_SECS: u64 = 5 * 60;
 const DEFAULT_MAX_PENDING: usize = 128;
@@ -98,8 +101,9 @@ pub struct OtpReleaseRequest {
     pub id: OtpReleaseId,
     /// Carrier-supplied recipient facts shown to the resident.
     pub participant: OtpReleaseParticipantClaim,
-    /// Secret-free item metadata shown to the resident before release.
-    pub item: OtpItem,
+    /// The secret-free item and the credential to exercise, shown to the
+    /// resident before release.
+    pub credential: OtpCredential,
     /// Gate-recorded Unix time when the petition arrived.
     pub requested_at_unix_secs: u64,
     /// Gate-recorded Unix time after which approval is refused.
@@ -146,6 +150,9 @@ impl OtpReleasedCode {
 /// Failure while submitting or resolving an OTP release petition.
 #[derive(Debug)]
 pub enum OtpReleaseError {
+    /// The vault is locked: no petition is taken and no code released
+    /// (vault lock ruling 10).
+    Locked,
     /// The candidate participant or session fact was absent, too long, padded
     /// with whitespace, or unsafe to retain in a visible request.
     InvalidParticipant,
@@ -171,6 +178,7 @@ pub enum OtpReleaseError {
 impl fmt::Display for OtpReleaseError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
+            OtpReleaseError::Locked => f.write_str("the vault is locked"),
             OtpReleaseError::InvalidParticipant => f.write_str(
                 "release participant facts must be trimmed printable text of at most 256 characters",
             ),
@@ -196,7 +204,8 @@ impl std::error::Error for OtpReleaseError {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match self {
             OtpReleaseError::Item(error) => Some(error),
-            OtpReleaseError::InvalidParticipant
+            OtpReleaseError::Locked
+            | OtpReleaseError::InvalidParticipant
             | OtpReleaseError::InvalidPolicy(_)
             | OtpReleaseError::ClockBeforeUnixEpoch
             | OtpReleaseError::TooManyPending { .. }
@@ -209,7 +218,10 @@ impl std::error::Error for OtpReleaseError {
 
 impl From<OtpItemError> for OtpReleaseError {
     fn from(error: OtpItemError) -> Self {
-        Self::Item(error)
+        match error {
+            OtpItemError::Store(ItemStoreError::Locked) => Self::Locked,
+            error => Self::Item(error),
+        }
     }
 }
 
@@ -241,7 +253,7 @@ impl OtpReleaseGate {
         Self::with_clock(store, policy, Arc::new(system_unix_secs))
     }
 
-    /// The persona namespace whose sealed OTP items this gate may exercise.
+    /// The persona whose sealed OTP credentials this gate may exercise.
     pub fn persona(&self) -> personae::PersonaId {
         self.store.persona()
     }
@@ -256,16 +268,22 @@ impl OtpReleaseGate {
     }
 
     /// Submit carrier-supplied participant claims for resident approval.
+    ///
+    /// Only an item in the vault may be petitioned (invariant 12).
     pub fn petition(
         &self,
-        item_id: OtpItemId,
+        item: ItemId,
+        credential: CredentialId,
         participant: OtpReleaseParticipantClaim,
     ) -> Result<OtpReleaseRequest, OtpReleaseError> {
         let now = (self.clock)()?;
-        let item = self
+        let credential = self
             .store
-            .get(item_id)?
-            .ok_or(OtpItemError::NotFound(item_id))?;
+            .get(item, credential)?
+            .ok_or(OtpItemError::NotFound { item, credential })?;
+        if credential.item().state != ItemState::Vault {
+            return Err(OtpItemError::Store(ItemStoreError::Quarantined(item)).into());
+        }
         let mut pending = lock_pending(&self.pending);
         retain_live(&mut pending, now);
         if pending.len() >= self.policy.max_pending {
@@ -276,7 +294,7 @@ impl OtpReleaseGate {
         let request = OtpReleaseRequest {
             id: OtpReleaseId::mint(),
             participant,
-            item,
+            credential,
             requested_at_unix_secs: now,
             expires_at_unix_secs: now.saturating_add(self.policy.request_ttl_secs),
         };
@@ -327,7 +345,11 @@ impl OtpReleaseGate {
             pending.remove(&id);
             return Err(OtpReleaseError::Expired(id));
         }
-        let tile = self.store.release_tile_at_unix_time(request.item.id, now)?;
+        let tile = self.store.release_tile_at_unix_time(
+            request.credential.item_id(),
+            request.credential.credential_id(),
+            now,
+        )?;
         pending.remove(&id);
         Ok(OtpReleasedCode { request, tile })
     }
@@ -419,7 +441,9 @@ mod tests {
             .unwrap();
         let clock = ManualClock::new(58);
         let gate = test_gate(items, &clock);
-        let request = gate.petition(item.id, participant()).unwrap();
+        let request = gate
+            .petition(item.item_id(), item.credential_id(), participant())
+            .unwrap();
 
         assert_eq!(gate.pending().unwrap(), vec![request.clone()]);
         clock.set(59);
@@ -451,11 +475,15 @@ mod tests {
             .unwrap();
         let clock = ManualClock::new(1);
         let gate = test_gate(items, &clock);
-        let denied = gate.petition(item.id, participant()).unwrap();
+        let denied = gate
+            .petition(item.item_id(), item.credential_id(), participant())
+            .unwrap();
 
         assert_eq!(gate.deny(denied.id).unwrap().request, denied);
         clock.set(2);
-        let approved = gate.petition(item.id, participant()).unwrap();
+        let approved = gate
+            .petition(item.item_id(), item.credential_id(), participant())
+            .unwrap();
         assert_eq!(
             gate.approve(approved.id)
                 .unwrap()
@@ -478,7 +506,9 @@ mod tests {
         let clock = ManualClock::new(1);
         let gate = test_gate(items, &clock);
 
-        let first = gate.petition(item.id, participant()).unwrap();
+        let first = gate
+            .petition(item.item_id(), item.credential_id(), participant())
+            .unwrap();
         assert_eq!(
             gate.approve(first.id).unwrap().tile().code_at_unix_time(1),
             Some("755224")
@@ -486,7 +516,9 @@ mod tests {
 
         clock.set(2);
         let reopened = test_gate(store(dir.path(), persona), &clock);
-        let second = reopened.petition(item.id, participant()).unwrap();
+        let second = reopened
+            .petition(item.item_id(), item.credential_id(), participant())
+            .unwrap();
         assert_eq!(
             reopened
                 .approve(second.id)
@@ -509,7 +541,9 @@ mod tests {
         let clock = ManualClock::new(10);
         let policy = OtpReleasePolicy::new(5, 2).unwrap();
         let gate = OtpReleaseGate::with_clock(items, policy, clock.function());
-        let request = gate.petition(item.id, participant()).unwrap();
+        let request = gate
+            .petition(item.item_id(), item.credential_id(), participant())
+            .unwrap();
 
         clock.set(15);
         assert!(matches!(
@@ -530,10 +564,11 @@ mod tests {
         let clock = ManualClock::new(10);
         let policy = OtpReleasePolicy::new(60, 1).unwrap();
         let gate = OtpReleaseGate::with_clock(items, policy, clock.function());
-        gate.petition(item.id, participant()).unwrap();
+        gate.petition(item.item_id(), item.credential_id(), participant())
+            .unwrap();
 
         assert!(matches!(
-            gate.petition(item.id, participant()),
+            gate.petition(item.item_id(), item.credential_id(), participant()),
             Err(OtpReleaseError::TooManyPending { limit: 1 })
         ));
     }

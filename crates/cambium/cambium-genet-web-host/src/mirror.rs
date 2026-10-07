@@ -43,6 +43,9 @@ pub struct MirrorNode {
     pub rect: Option<[f32; 4]>,
     /// Whether a reader may move focus to it.
     pub focusable: bool,
+    /// For a drawn node's action button, the action a reader's click on it
+    /// names (dynamics grammar plan, F65 and F66).
+    pub action: Option<cambium_rootstock::ProducedAction>,
     pub children: Vec<MirrorNode>,
 }
 
@@ -51,6 +54,51 @@ pub struct MirrorNode {
 pub struct LeafSemantics {
     pub role: Option<&'static str>,
     pub name: Option<String>,
+    /// What the leaf draws, each with its ARIA role, its name and where it is
+    /// drawn (`[x, y, width, height]` in the leaf's layout pixels).
+    pub children: Vec<LeafChild>,
+    /// Whether this name replaces the author's. A producer speaks for its
+    /// slot; a sprigging leaf's own label yields to an author's name.
+    pub names_itself: bool,
+    /// The producer's registry key, which a click on one of its drawn
+    /// nodes' action buttons names; `None` for a sprigging leaf.
+    pub slot: Option<u64>,
+}
+
+/// One thing a leaf draws, as the mirror places it.
+#[derive(Clone, Debug, PartialEq)]
+pub struct LeafChild {
+    /// The producer's stable name for it.
+    pub key: u64,
+    pub role: &'static str,
+    pub name: String,
+    pub rect: [f32; 4],
+    /// Each lowered to a button child.
+    pub actions: Vec<cambium_rootstock::ProducerAction>,
+}
+
+impl LeafSemantics {
+    /// A producer's own account of its slot, the producer registered under
+    /// `slot`.
+    pub fn from_producer(slot: u64, semantics: cambium_rootstock::ProducerSemantics) -> Self {
+        Self {
+            role: semantics.role.map(cambium_rootstock::ProducerRole::aria),
+            name: semantics.name,
+            children: semantics
+                .children
+                .into_iter()
+                .map(|child| LeafChild {
+                    key: child.key,
+                    role: child.role.aria(),
+                    name: child.name,
+                    rect: child.rect,
+                    actions: child.actions,
+                })
+                .collect(),
+            names_itself: true,
+            slot: Some(slot),
+        }
+    }
 }
 
 /// A leaf's AccessKit account of itself, in ARIA. A graphic keeps its role
@@ -67,6 +115,9 @@ pub fn leaf_semantics(node: &accesskit::Node) -> LeafSemantics {
     LeafSemantics {
         role,
         name: node.label().map(str::to_owned),
+        children: Vec::new(),
+        names_itself: false,
+        slot: None,
     }
 }
 
@@ -114,16 +165,30 @@ fn lower(
     leaf: &mut impl FnMut(u64, Option<&str>) -> Option<LeafSemantics>,
 ) -> MirrorNode {
     let id = node.id.get();
-    let semantics = leaf(id, node.name.as_deref());
+    let mut semantics = leaf(id, node.name.as_deref());
+    let drawn = semantics
+        .as_mut()
+        .map(|semantics| std::mem::take(&mut semantics.children))
+        .unwrap_or_default();
+    let slot = semantics.as_ref().and_then(|semantics| semantics.slot);
     let role = semantics
         .as_ref()
         .and_then(|semantics| semantics.role)
         .or_else(|| aria_role(node.role));
-    let name = node
-        .name
-        .clone()
-        .or_else(|| semantics.and_then(|semantics| semantics.name))
-        .filter(|name| !name.trim().is_empty());
+    // A producer names its slot; otherwise the author's name wins.
+    let names_itself = semantics
+        .as_ref()
+        .is_some_and(|semantics| semantics.names_itself);
+    let name = if !names_itself {
+        node.name
+            .clone()
+            .or_else(|| semantics.and_then(|semantics| semantics.name))
+    } else {
+        semantics
+            .and_then(|semantics| semantics.name)
+            .or_else(|| node.name.clone())
+    }
+    .filter(|name| !name.trim().is_empty());
 
     let mut attrs = Vec::new();
     if let Some(role) = role {
@@ -134,6 +199,14 @@ fn lower(
         (Placement::Label | Placement::Value, Some(name)) => attrs.push(("aria-label", name)),
         (Placement::Content, Some(name)) => text = Some(name),
         (_, None) => {},
+    }
+    // A description says more than the name: what a control does, say.
+    if let Some(description) = node
+        .description
+        .clone()
+        .filter(|description| !description.trim().is_empty())
+    {
+        attrs.push(("aria-description", description));
     }
     // A text control's content is its value, which is where a reader reads it.
     if matches!(
@@ -156,14 +229,102 @@ fn lower(
         ),
         None => (None, origin),
     };
+    let mut children = lower_children(nodes, node, child_origin, scale, leaf);
+    children.extend(
+        drawn
+            .into_iter()
+            .map(|child| drawn_node(id, slot, child, scale)),
+    );
     MirrorNode {
         id,
         attrs,
         text,
         rect,
         focusable: node.actions.contains(&DocumentA11yAction::Focus),
-        children: lower_children(nodes, node, child_origin, scale, leaf),
+        action: None,
+        children,
     }
+}
+
+/// One thing a leaf draws, as a mirror element over where it is drawn, its
+/// actions as button children over the same box (F65). Ids are stable for
+/// the leaf, the node's key and the action, and sit in a range a DOM node's
+/// opaque id never reaches.
+fn drawn_node(leaf: u64, slot: Option<u64>, child: LeafChild, scale: f32) -> MirrorNode {
+    let [x, y, width, height] = child.rect;
+    let mut attrs = vec![("role", child.role.to_string())];
+    let text = if child.role == "listitem" && child.actions.is_empty() {
+        Some(child.name)
+    } else {
+        attrs.push(("aria-label", child.name));
+        None
+    };
+    let key = child.key;
+    let buttons = child
+        .actions
+        .into_iter()
+        .map(|action| {
+            let mut attrs = vec![("role", "button".to_string())];
+            if !action.description.trim().is_empty() {
+                attrs.push(("aria-description", action.description));
+            }
+            MirrorNode {
+                id: drawn_id(leaf, key, Some(&action.id)),
+                attrs,
+                text: Some(action.label),
+                rect: Some([0.0, 0.0, width * scale, height * scale]),
+                focusable: true,
+                action: slot.map(|slot| cambium_rootstock::ProducedAction {
+                    slot,
+                    key,
+                    id: action.id,
+                }),
+                children: Vec::new(),
+            }
+        })
+        .collect();
+    MirrorNode {
+        id: drawn_id(leaf, key, None),
+        attrs,
+        text,
+        rect: Some([x * scale, y * scale, width * scale, height * scale]),
+        focusable: false,
+        action: None,
+        children: buttons,
+    }
+}
+
+/// A drawn node's mirror id, or its action button's: FNV-1a over the leaf,
+/// the key and the action, fixed so an element keeps its id frame to frame.
+fn drawn_id(leaf: u64, key: u64, action: Option<&str>) -> u64 {
+    let mut hash: u64 = 0xcbf2_9ce4_8422_2325;
+    let mut eat = |bytes: &[u8]| {
+        for byte in bytes {
+            hash ^= u64::from(*byte);
+            hash = hash.wrapping_mul(0x0100_0000_01b3);
+        }
+    };
+    eat(&leaf.to_le_bytes());
+    eat(&key.to_le_bytes());
+    if let Some(action) = action {
+        eat(&[1]);
+        eat(action.as_bytes());
+    }
+    (1 << 63) | (hash >> 1)
+}
+
+/// Every drawn node's action button in `nodes` and their descendants: its
+/// mirror id and the action a click on it names.
+pub fn produced_actions(nodes: &[MirrorNode]) -> Vec<(u64, cambium_rootstock::ProducedAction)> {
+    let mut out = Vec::new();
+    let mut stack: Vec<&MirrorNode> = nodes.iter().collect();
+    while let Some(node) = stack.pop() {
+        if let Some(action) = &node.action {
+            out.push((node.id, action.clone()));
+        }
+        stack.extend(node.children.iter());
+    }
+    out
 }
 
 /// Where ARIA looks for a role's name.

@@ -9,25 +9,57 @@
 //! A desktop host keeps one resident alive and gives applications admitted
 //! views or protocol adapters over it. Sandboxed applications may embed the
 //! same type. Either shape retains one OS file lock and one external freshness
-//! ledger for the lifetime of every clone.
+//! ledger for the lifetime of every clone, and one transaction lock per
+//! persona for every multi-record write.
+//!
+//! ## Locking (vault lock ruling 1)
+//!
+//! The record and freshness keys derive from the vault, so they follow its
+//! lock: [`CastellanResident::lock`] forgets both for every clone and every
+//! store handed out, and [`CastellanResident::unlock`] takes them back.
+//! [`CredentialLockHolder`] is the hook that does both from the resident
+//! host's lock.
 
-use std::path::PathBuf;
-
-#[cfg(feature = "secret-service")]
 use std::collections::BTreeMap;
-#[cfg(feature = "secret-service")]
+use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
 
-use personae::{IdentityError, PersonaId, SealedRecordStorage};
+use personae::{IdentityError, IdentityProvider, PersonaId, SealedRecordStorage};
+use zeroize::Zeroizing;
 
+use crate::items::ItemStore;
+use crate::lock::VaultLockHolder;
 use crate::otp::OtpItemStore;
+
+/// The record and freshness keys, cleared when dropped.
+type DerivedKeys = (Zeroizing<[u8; 32]>, Zeroizing<[u8; 32]>);
+
+/// The two salts a resident derives its record and freshness keys under.
+#[derive(Clone, Copy, Debug)]
+pub struct CredentialSalts {
+    /// Seals credential contents.
+    pub record: &'static [u8],
+    /// Authenticates the external freshness ledger.
+    pub freshness: &'static [u8],
+}
+
+impl CredentialSalts {
+    /// Both keys from the unlocked vault, cleared when dropped.
+    fn derive<P: IdentityProvider + ?Sized>(
+        &self,
+        vault: &P,
+    ) -> Result<DerivedKeys, IdentityError> {
+        let record = Zeroizing::new(vault.derive_keypair(self.record)?.to_seed());
+        let freshness = Zeroizing::new(vault.derive_keypair(self.freshness)?.to_seed());
+        Ok((record, freshness))
+    }
+}
 
 /// Exclusive authority over one Castellan credential-record directory.
 #[derive(Clone)]
 pub struct CastellanResident {
     records: SealedRecordStorage,
-    #[cfg(feature = "secret-service")]
-    secret_service_transactions: Arc<Mutex<BTreeMap<PersonaId, Arc<Mutex<()>>>>>,
+    transactions: Arc<Mutex<BTreeMap<PersonaId, Arc<Mutex<()>>>>>,
 }
 
 impl CastellanResident {
@@ -50,36 +82,96 @@ impl CastellanResident {
                 freshness_root,
                 freshness_key,
             )?,
-            #[cfg(feature = "secret-service")]
-            secret_service_transactions: Arc::new(Mutex::new(BTreeMap::new())),
+            transactions: Arc::new(Mutex::new(BTreeMap::new())),
         })
     }
 
-    /// Open the persona-scoped OTP namespace under this authority.
-    pub fn otp_items(&self, persona: PersonaId) -> OtpItemStore {
-        OtpItemStore::new(self.records.clone(), persona)
+    /// [`Self::claim`] with both keys derived from `vault` under `salts`.
+    pub fn claim_derived(
+        records_root: impl Into<PathBuf>,
+        freshness_root: impl Into<PathBuf>,
+        vault: &(impl IdentityProvider + ?Sized),
+        salts: CredentialSalts,
+    ) -> Result<Self, IdentityError> {
+        let (record, freshness) = salts.derive(vault)?;
+        Self::claim(records_root, *record, freshness_root, *freshness)
     }
 
-    /// Open the persona-scoped Freedesktop Secret Service store.
+    /// Forget the record and freshness keys for every clone and every store
+    /// this authority handed out. Locking twice is harmless.
+    pub fn lock(&self) {
+        self.records.lock();
+    }
+
+    /// Take both keys back.
+    pub fn unlock(&self, record_key: [u8; 32], freshness_key: [u8; 32]) -> Result<(), IdentityError> {
+        self.records.unlock(record_key, Some(freshness_key))
+    }
+
+    /// Whether the keys are forgotten.
+    pub fn is_locked(&self) -> bool {
+        self.records.is_locked()
+    }
+
+    /// The hook that locks this authority with the vault and re-derives its
+    /// keys under `salts` on unlock.
+    pub fn lock_holder(&self, salts: CredentialSalts) -> Arc<dyn VaultLockHolder> {
+        Arc::new(CredentialLockHolder {
+            resident: self.clone(),
+            salts,
+        })
+    }
+
+    /// Open one persona's sealed items under this authority.
+    pub fn items(&self, persona: PersonaId) -> ItemStore {
+        ItemStore::with_transaction(self.records.clone(), persona, self.transaction(persona))
+    }
+
+    /// Open one persona's OTP credentials under this authority.
+    pub fn otp_items(&self, persona: PersonaId) -> OtpItemStore {
+        OtpItemStore::over(self.items(persona))
+    }
+
+    /// Open the persona-scoped Freedesktop Secret Service store, a view of
+    /// the persona's items.
     #[cfg(feature = "secret-service")]
     pub fn secret_service(
         &self,
         persona: PersonaId,
         limits: crate::secret_service::SecretServiceLimits,
     ) -> crate::secret_service::SecretServiceStore {
-        let transaction = self
-            .secret_service_transactions
+        crate::secret_service::SecretServiceStore::new(self.items(persona), limits)
+    }
+
+    /// The one transaction lock every store for `persona` shares.
+    fn transaction(&self, persona: PersonaId) -> Arc<Mutex<()>> {
+        self.transactions
             .lock()
             .unwrap_or_else(std::sync::PoisonError::into_inner)
             .entry(persona)
             .or_insert_with(|| Arc::new(Mutex::new(())))
-            .clone();
-        crate::secret_service::SecretServiceStore::new(
-            self.records.clone(),
-            persona,
-            limits,
-            transaction,
-        )
+            .clone()
+    }
+}
+
+/// A [`CastellanResident`] as a vault lock holder.
+pub struct CredentialLockHolder {
+    resident: CastellanResident,
+    salts: CredentialSalts,
+}
+
+impl VaultLockHolder for CredentialLockHolder {
+    fn name(&self) -> &str {
+        "castellan credentials"
+    }
+
+    fn lock(&self) {
+        self.resident.lock();
+    }
+
+    fn unlock(&self, vault: &dyn IdentityProvider) -> Result<(), IdentityError> {
+        let (record, freshness) = self.salts.derive(vault)?;
+        self.resident.unlock(*record, *freshness)
     }
 }
 
@@ -117,9 +209,13 @@ mod tests {
         let participant =
             || OtpReleaseParticipantClaim::unverified("local:test", "resident:test").unwrap();
 
-        let first = left.petition(item.id, participant()).unwrap();
+        let first = left
+            .petition(item.item_id(), item.credential_id(), participant())
+            .unwrap();
         let first = left.approve(first.id).unwrap();
-        let second = right.petition(item.id, participant()).unwrap();
+        let second = right
+            .petition(item.item_id(), item.credential_id(), participant())
+            .unwrap();
         let second = right.approve(second.id).unwrap();
 
         assert_eq!(first.tile().code_at_unix_time(0), Some("755224"));
@@ -138,21 +234,27 @@ mod tests {
                 "otpauth://hotp/Steam:mark?secret={RFC4226_SECRET_BASE32}&issuer=Steam&counter=0"
             ))
             .unwrap();
+        // The HOTP counter lives in the credential's payload record alone.
         let record = records
-            .join("castellan/otp/v1")
+            .join("castellan/items/v1")
             .join(persona.as_uuid().to_string())
-            .join(format!("{}.json", item.id));
+            .join("payloads")
+            .join(format!("{}.json", item.credential_id()));
         let counter_zero = std::fs::read(&record).unwrap();
         let gate = OtpReleaseGate::new(items);
         let participant =
             || OtpReleaseParticipantClaim::unverified("local:test", "rollback:test").unwrap();
 
-        let first = gate.petition(item.id, participant()).unwrap();
+        let first = gate
+            .petition(item.item_id(), item.credential_id(), participant())
+            .unwrap();
         assert_eq!(
             gate.approve(first.id).unwrap().tile().code_at_unix_time(0),
             Some("755224")
         );
-        let second = gate.petition(item.id, participant()).unwrap();
+        let second = gate
+            .petition(item.item_id(), item.credential_id(), participant())
+            .unwrap();
         std::fs::write(&record, counter_zero).unwrap();
 
         let error = gate.approve(second.id).unwrap_err();

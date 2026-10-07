@@ -15,8 +15,9 @@ use zbus::zvariant::{OwnedObjectPath, OwnedValue};
 use super::service::ServiceInterface;
 use super::state::{SecretServiceOperation, ServiceState};
 use super::{
-    DbusSecret, ITEM_LABEL_PROPERTY, SERVICE_PATH, SecretDbusError, alias_path, collection_path,
-    item_path, now_unix_secs, property_attributes, property_string, register_item, root_path,
+    DbusSecret, ITEM_LABEL_PROPERTY, SERVICE_PATH, SecretBytes, SecretDbusError, alias_path,
+    collection_path, item_path, now_unix_secs, property_attributes, property_string, register_item,
+    root_path,
 };
 use crate::secret_service::{SecretCollectionId, SecretItemId};
 
@@ -124,6 +125,7 @@ impl CollectionInterface {
         #[zbus(connection)] connection: &Connection,
         #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
     ) -> Result<(OwnedObjectPath, OwnedObjectPath), SecretDbusError> {
+        let mut secret = secret;
         let caller = self
             .state
             .authorize(
@@ -157,7 +159,7 @@ impl CollectionInterface {
             collection: self.id,
             label,
             attributes,
-            secret: secret.2,
+            secret: secret.2.take(),
             content_type: secret.3,
             replace,
             unix_secs: now_unix_secs(),
@@ -366,7 +368,7 @@ impl ItemInterface {
         Ok((
             session,
             Vec::new(),
-            secret.bytes.to_vec(),
+            SecretBytes::new(secret.bytes),
             secret.content_type,
         ))
     }
@@ -377,6 +379,7 @@ impl ItemInterface {
         #[zbus(header)] header: Header<'_>,
         #[zbus(connection)] connection: &Connection,
     ) -> Result<(), SecretDbusError> {
+        let mut secret = secret;
         let caller = self
             .state
             .authorize(
@@ -394,7 +397,7 @@ impl ItemInterface {
         }
         self.state
             .store
-            .set_secret(self.id, secret.2, &secret.3, now_unix_secs())?;
+            .set_secret(self.id, secret.2.take(), &secret.3, now_unix_secs())?;
         self.emit_changed(connection).await
     }
 

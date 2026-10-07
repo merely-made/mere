@@ -238,9 +238,11 @@ impl PersonalSyncHost {
             blob_authority.retain(blob_scope, hash);
         }
         // Active mDNS is what makes a paired node id dialable without a stored
-        // ticket: it populates the address book, so tagging a known peer with
-        // the overlay topic is enough to bootstrap gossip. g5_peer proved this
-        // path Fedora-to-Windows and Windows-to-Fedora under H10.
+        // ticket: it writes the peer's address into the address book. Tagging
+        // the id onto the overlay gives it a record first, so it is in gossip's
+        // bootstrap set and the dial waits for that address (pairing plan D1b).
+        // g5_peer's H10 receipts dialled a known id in a retry loop instead, so
+        // they never exercised this path.
         //
         // `.blobs` serves the iroh-blobs ALPN off this same endpoint, so a
         // sibling reaches bytes through the pairing it already has. Without it
@@ -699,6 +701,18 @@ impl PersonalSyncHost {
     ) -> Result<Option<String>, PersonalSyncHostError> {
         self.network
             .peer_ticket(node)
+            .await
+            .map_err(|error| PersonalSyncHostError::Transport(error.to_string()))
+    }
+
+    /// Every address the endpoint holds for `node`, with which ones carry
+    /// traffic now: the readable current path a device directory reports.
+    pub async fn peer_paths(
+        &self,
+        node: [u8; 32],
+    ) -> Result<Vec<transport::PeerPath>, PersonalSyncHostError> {
+        self.network
+            .peer_paths(node)
             .await
             .map_err(|error| PersonalSyncHostError::Transport(error.to_string()))
     }

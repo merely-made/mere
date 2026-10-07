@@ -13,7 +13,7 @@ paint / backdrop), `crates/orrery/aether` *(historical citation)* <!-- doc-audit
 
 **Related**:
 
-- [node_representation_arrangement_plan](../implementation_strategy/2026-06-18_node_representation_arrangement_plan.md)
+- [node_representation_arrangement_plan](../../archive_docs/2026-10-06_superseded_plans/2026-06-18_node_representation_arrangement_plan.md)
   — the per-node "scripted" representation form is *per-node* scene decoration; an environment is
   *scene-wide*, so it is a different layer. Representation stays orthogonal (a node keeps its form
   inside any environment).

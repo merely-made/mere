@@ -25,7 +25,7 @@
 use euclid::default::{Point2D, Vector2D};
 use rapier2d::prelude::*;
 
-use crate::{Force, ForceContext};
+use crate::{Class, Declared, Force, ForceContext, Kernel, Layout, Observable, Term, Topology};
 
 /// Barnes–Hut approximation tuning.
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -107,17 +107,16 @@ impl Default for BarnesHutRepulsion {
 
 impl Force for BarnesHutRepulsion {
     fn apply(&self, ctx: &mut ForceContext<'_>, _dt: f32) {
-        // Snapshot bodies in a stable (handle, position) order, then build the
-        // tree over the positions and apply each body's approximated repulsion.
-        let mut handles: Vec<RigidBodyHandle> = Vec::with_capacity(ctx.bodies_by_node.len());
-        let mut positions: Vec<Point2D<f32>> = Vec::with_capacity(ctx.bodies_by_node.len());
-        for &handle in ctx.bodies_by_node.values() {
-            if let Some(body) = ctx.bodies.get(handle) {
-                let t = body.translation();
-                handles.push(handle);
-                positions.push(Point2D::new(t.x, t.y));
-            }
-        }
+        // Snapshot bodies in key order, then build the tree over the positions
+        // and apply each body's approximated repulsion. Key order makes the
+        // tree, and so every sum, the same in every run (ruled 2026-10-04, "Sum
+        // in key order"; HashMap order differed by up to ~70,000 ULP).
+        let nodes = crate::laws::node_positions(ctx);
+        let handles: Vec<RigidBodyHandle> = nodes.iter().map(|&(_, handle, _)| handle).collect();
+        let positions: Vec<Point2D<f32>> = nodes
+            .iter()
+            .map(|&(_, _, t)| Point2D::new(t.x, t.y))
+            .collect();
         // k = 1.0 folds the ideal-edge-length term out, leaving
         // `strength * mass / distance` per (pseudo-)body.
         let forces = repulsion_forces(
@@ -132,6 +131,33 @@ impl Force for BarnesHutRepulsion {
                 body.add_force(Vector::new(f.x, f.y), true);
             }
         }
+    }
+}
+
+/// The exact charge this force approximates: `−s·ln d` per pair, constant
+/// inside the distance floor (where the quadtree applies no push). The
+/// quadtree at `θ` is its Barnes–Hut rung, so its forces match this energy's
+/// gradient only to the rung's tolerance.
+impl Declared for BarnesHutRepulsion {
+    fn terms(&self) -> Vec<Term> {
+        vec![Term::force(
+            "charge",
+            Topology::AllPairs { cutoff: None },
+            Kernel::Repulsion { exponent: -1.0 },
+            Class::E,
+            Observable::Overlaps,
+        )]
+    }
+
+    fn energy(&self, _term: usize, layout: &Layout<'_>) -> Option<f64> {
+        let (s, m) = (f64::from(self.strength), f64::from(self.min_distance));
+        let mut energy = 0.0;
+        for i in 0..layout.nodes.len() {
+            for j in (i + 1)..layout.nodes.len() {
+                energy -= s * layout.distance(i, j).max(m).ln();
+            }
+        }
+        Some(energy)
     }
 }
 

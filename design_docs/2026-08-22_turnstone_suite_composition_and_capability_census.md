@@ -104,7 +104,7 @@ the family composition thesis's anti-shell test in its positive form: the
 manipulator is a platform capability whose receipt is a second host. One
 consequence it settles the same day: the Projection Editor, today a
 self-contained module in `ports/graphshell`, is **Scenograph** — the name the
-[boundary plan](mere_docs/implementation_strategy/2026-09-02_platform_boundary_and_repository_topology_plan.md)
+[boundary plan](archive_docs/2026-10-06_completed_plans/2026-09-02_platform_boundary_and_repository_topology_plan.md)
 §1 and P2 free by dissolving the generic `scenograph` facade into Cambium and
 reserve "for the scene/projection editor product, built with Cambium rather
 than naming the scene runtime itself." Scenograph is a Mere product crate,
@@ -224,7 +224,7 @@ The source half is planned already (lane correction 2026-08-24): the
 `External` pane source, which covers source identity. A2 is the graph runtime
 pool and `PaneId` / `graph_id` propagation lane. It does not own provider
 admission. The dedicated
-[Knot shared-surface plan](mere_docs/implementation_strategy/2026-08-24_knot_shared_surface_and_port_contribution_plan.md)
+[Knot shared-surface plan](archive_docs/2026-10-06_completed_plans/2026-08-24_knot_shared_surface_and_port_contribution_plan.md)
 owns that seam and uses A2 only for a surface that needs multi-graph context.
 
 The corrected seam separates a data-only surface description containing:
@@ -661,7 +661,7 @@ collaborative state; the historical `host_coop`/`join_coop` suggestion is retire
 
 I3 slice 1, bringing both consumers to this sequence and recording where they
 agree and differ, is planned in
-`design_docs/mere_docs/implementation_strategy/2026-09-16_coop_lifecycle_parity_plan.md`.
+`design_docs/archive_docs/2026-10-06_completed_plans/2026-09-16_coop_lifecycle_parity_plan.md`.
 
 Root consolidates each lane with a scoped diff, applicable tests, and current
 receipt links. Promote I2 and I3 from their actual consumer seams; additional
@@ -875,7 +875,7 @@ conversation exchange, not collaborative state, and is not that consumer.
 
 Both consumers now demonstrate I3's acceptance sequence, and the facts table
 recording where they agree and differ lives in
-`design_docs/mere_docs/implementation_strategy/2026-09-16_coop_lifecycle_parity_plan.md`.
+`design_docs/archive_docs/2026-10-06_completed_plans/2026-09-16_coop_lifecycle_parity_plan.md`.
 The practice fixture gained leave, a proof-only clock, revocation and a
 reconnect recheck (`5e3850f7`). Turnstone gained `Revoke place member`,
 optional grant lifetimes and named invitation expiry (`a1c9884`), then group
@@ -906,4 +906,4 @@ Turnstone's walk exposed two product gaps before it passed, a left session
 that read as never joined and no way back in after a local leave, both fixed
 in the product (`PlaceState::Left`, a persisted left mark, `Rejoin place`).
 The record and the filled facts table are in
-`design_docs/mere_docs/implementation_strategy/2026-09-16_coop_lifecycle_parity_plan.md`.
+`design_docs/archive_docs/2026-10-06_completed_plans/2026-09-16_coop_lifecycle_parity_plan.md`.

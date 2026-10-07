@@ -1,7 +1,19 @@
 # Mere-native session + storage store
 
 **Date**: 2026-06-23
-**Status**: Immediate HTTP/session work landed; 2026-07-04 reconciliation found
+**Status (2026-10-06):** the HTTP and durable session layers are live in
+`crates/system/fetch` (threads 1-5 and the incremental persistence: `2fa18ad`,
+`6bbe6f4`, netfetcher `7c22a65`, `514334c`). Cookie custody and a flush on each
+event-loop drain are in Turnstone (`turnstone/src/cookie_custody.rs`,
+`turnstone/src/shell/events.rs`, turnstone `3671ad3`, 2026-09-22). The scripted-rung
+`JarCookieProvider` landed in meerkat on 2026-06-23 (`435985d5`), retired with it
+2026-07-18 (`c5f01064`); surviving library parts: genet's `CookieProvider` and
+`StorageProvider` seams (genet `3cf326a`, `3ed0ed0`). No production `CookieProvider`
+is wired in mere, genet or Turnstone, so no script writes reach the jar. Open: a
+script cookie provider, durable `StorageProvider` backing, flip-back SESSION import,
+the per-persona jar registry, and the `Partitioned` / top-level-site refinements.
+
+Earlier status: Immediate HTTP/session work landed; 2026-07-04 reconciliation found
 the scripted-rung cookie wiring has also landed. Remaining native-session work is
 the JS-cookie persistence trigger, durable `localStorage` host backing, flip-back
 SESSION import, live multi-persona jar selection, and web-privacy refinements
@@ -93,6 +105,12 @@ One **Mere session substrate**, standard-shaped, consumed by every engine:
   (forward) and writes back on flip-back (a login made *inside* the WebView comes
   home). The WebView is synced one-shot, never continuously mirrored (charter §7).
 
+**Corrected 2026-10-06 (S14 pass):** meerkat, named as host and owner throughout this
+plan, was deleted 2026-07-18 (`c5f01064`). The fetch lane and its jar are
+`crates/system/fetch` (`session_jar` in `cookies.rs`, the flip in `cookies_flip.rs`,
+persistence in `cookies_persist.rs`), and Turnstone holds cookie custody; its
+`turnstone/src/cookie_custody.rs` cites this plan for persona keying.
+
 ## Threads
 
 1. **Persistent shared jar** *(this session)* — meerkat holds one long-lived
@@ -162,6 +180,13 @@ What landed:
   genet installs it before scripts run, so load-time scripts see the session jar.
 - Regression coverage: `scripted_rung_document_cookie_reaches_the_jar`.
 
+**Corrected 2026-10-06 (S14 pass):** this wiring, and thread 6a's "Meerkat wiring
+landed later" above, was meerkat's (`435985d5`, 2026-06-23) and left with it on
+2026-07-18 (`c5f01064`). `JarCookieProvider`, the `genet.scripted` consumer and the
+regression test have no hits in the tree. No production `CookieProvider` impl exists
+in mere, genet or Turnstone (genet's two impls are test-only); mere only re-exports
+the trait, from `ports/pelt/desktop`.
+
 Remaining:
 
 - **Persist trigger gap**: today the durable write fires after a *page fetch*. A
@@ -171,6 +196,15 @@ Remaining:
 - **Known gap**: netfetcher's `set_cookie` is source-agnostic, so a script *could* set
   an HttpOnly cookie (the spec forbids it). The real fix is a `CookieSource` arg on
   `set_cookie` (a netfetcher refinement); low-priority.
+
+**Corrected 2026-10-06 (S14 pass):** the drain flush exists: Turnstone flushes "any
+cookie a fetch or a script set since the last drain" on each event-loop drain
+(`turnstone/src/shell/events.rs`, via `turnstone/src/cookie_custody.rs`; turnstone `3671ad3`,
+2026-09-22). No script writer feeds it yet.
+
+**Open, raised by the S14 pass (2026-10-06):** is the persist-trigger item done?
+Options: mark it done, since Turnstone flushes on each drain; keep it open until a
+script `CookieProvider` is wired and a JS-set cookie is shown to survive a restart.
 
 ### 7 — flip-back SESSION
 
@@ -256,3 +290,12 @@ jar to follow the active persona:
   `(persona, origin)` `localStorage` backing for the scripted rung, implement
   flip-back SESSION import, and later replace the process-global jar with a live
   per-persona registry.
+
+  **Corrected 2026-10-06 (S14 pass):** the files this entry verified against were
+  meerkat's and left with it on 2026-07-18 (`c5f01064`); see the correction under
+  "6a — meerkat `CookieProvider` wiring" and the dated status.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at mere
+  535bca11, from the D2 record in support/doc-audit/d2/batch_40_s14_phase_b2.md: a
+  dated status (fetch layers live, custody and drain flush in Turnstone, the scripted
+  cookie wiring retired with meerkat, no script `CookieProvider` wired), meerkat's
+  ownership noted gone, and the persist-trigger question left open for this plan's lane.

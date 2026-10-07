@@ -54,6 +54,8 @@ mod lane;
 #[cfg(target_arch = "wasm32")]
 mod mount;
 #[cfg(target_arch = "wasm32")]
+mod start;
+#[cfg(target_arch = "wasm32")]
 mod surface;
 
 #[cfg(target_arch = "wasm32")]
@@ -71,6 +73,8 @@ pub use input::{
 pub use lane::WebCapture;
 #[cfg(target_arch = "wasm32")]
 pub use mount::{Mounted, mount};
+#[cfg(target_arch = "wasm32")]
+pub use start::run_static_constructors_once;
 #[cfg(target_arch = "wasm32")]
 pub use surface::{WebSurface, WebWindow};
 

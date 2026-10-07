@@ -1,6 +1,175 @@
 # Projection Grammar Adoption Plan
 
-**Status:** active: the executable Graphshell authoring proof landed 2026-09-04; A5 and the remaining portable-grammar questions stay open.
+**Status (2026-10-06):** active. Track F (the field receipts FT9 and FT10, from the archived projection receipts plan, ruling S61) was received gated.
+- The 2026-10-05 cross-domain relationship recipe continuation is published and
+  qualified (its own status line, below).
+- The executable compiler lives in `scenomise::projection` since `c79bb8c2`.
+- Stack seams P1's arrangement catalog landed on main at `1633be0c`: built-in
+  families, `ProjectionCompiler` with host `ItemSizes`.
+- A5 and the remaining portable-grammar questions stay open.
+
+This line supersedes the two older status lines in the document, the
+2026-09-04 one below and "Status (reconciled 2026-09-01)" further down. Both
+keep their words as history (stack seams S14 pass, batch 43).
+
+Earlier status (2026-09-04): active: the executable Graphshell authoring proof landed 2026-09-04; A5 and the remaining portable-grammar questions stay open.
+
+## Cross-domain relationship recipe continuation (2026-10-05)
+
+Status: shared implementation and Knot adoption published and qualified;
+visible Woodshed host adoption is published and qualified on committed source
+`c55461cc`, with acceptance documentation on main at `dad3f624`.
+The existing Scenograph authoring definitions are the source contract. The
+executable compiler has moved from Graphshell to `scenomise::projection`,
+preserving the authoring crate's independence from solvers and widgets.
+Graphshell continues to compose that capability into its reference host.
+
+Feature target: one editable relationship recipe over Knot sound selections and
+Woodshed Working Set occurrences. Start with authored order, occurrence labels,
+and disclosed relationships with explanations and method provenance. Duplicate
+occurrences may refer to one source; selection and relationship endpoints remain
+occurrence-specific. Domain calculations and owner actions stay in the adapters.
+
+Done conditions:
+
+- Both domains use the same shared recipe/compiler rather than copied layout
+  implementations, with explicit refusal for missing semantic roles.
+- A spacing/arrangement edit, occurrence selection, and explained relationship
+  survive save/reopen; compatible rebinding requires an explicit new source.
+- Knot embeds the capability in its reading workflow and retains validated
+  recipe versions in its own mere. Woodshed retains its own source custody.
+- Shared tests cover source freshness, duplicate occurrences, relation endpoints,
+  schema bounds and compatible/incompatible bindings; consumer tests exercise
+  actual domain results and owner actions. Native captures qualify only the
+  paths actually observed.
+
+This slice does not require the completion of dynamics G1–G6. Existing physics,
+pairing and dependency-migration lanes keep their owners. No recipe conveys a
+credential, data-access grant, or script execution authority.
+
+Findings: inspection of Mere `bd119a69d` confirms existing durable Scenograph
+definitions and the executable compiler's node/grid/scatter subset. The two
+consumer repositories remain separate; the local integration worktree is the
+single owner of shared compiler changes for this pass.
+
+Progress: Scenograph supplies the typed relationship recipe, shared draft edits
+and saved occurrence/relationship selection. Scenomise supplies bounded
+disclosure validation, source-revision checking, compilation and explained edge
+endpoints; Graphshell reexports the compiler instead of copying it. Named
+`authored_order`, `occurrence_labels` and `explained_relationships` facets are
+mandatory. Ordinal relationship recipes use a spaced grid; scatter coordinates
+are not inferred from occurrence order. The generic coordinate compiler retains
+its previous scatter support.
+
+Knot integrates actual Mora relationships into its reading UI and typed retained
+collection material. Woodshed supplies actual Working Set/catalog disclosure and
+retains shared recipe state through its existing session model. Woodshed's
+compiler adoption is exercised by a standalone compatibility instrument and a
+visible host recipe editor. Production uses one coherent Mere `5011e2f9` /
+Genet `bd3e8861` pair, without a local path override or copied compiler.
+
+Shared qualification (2026-10-05): `cargo test --locked -p scenograph -p
+scenomise` passes 8 authoring tests, 88 choreography tests (including nine new
+relationship regressions), and the authoring compile-fail doctest. The two
+crates also pass `cargo check --locked --target wasm32-unknown-unknown`.
+Graphshell's native `--features web` compiler compatibility suite passes 12
+tests; the generic compiler's prior grid/scatter semantics remain intact.
+Shared Clippy passes with only the explicit pre-existing `manual_contains`
+solver-lint allowance; unconditional strict Clippy is not claimed.
+
+Historical disclosure checkpoint: shared code is on Mere main at
+`c79bb8c203b52817991e0d7ba1c4ce3c3a2aac34`. Woodshed's disclosed source and
+session adoption are on main at `c92e7c96779ef316f5d8244a59de7cbc84f42a0b`.
+Its receipt reports core 189, views 97, desktop session 16, shared adoption 5,
+exporters 10 and integration 1 tests passing, plus separate-process restoration
+using the production session backend on an isolated unsealed fixture. It does
+not qualify a visible Woodshed editor or native rendering.
+
+Knot's actual Mora-derived recipe also rebinds through the common draft to the
+generated Woodshed disclosure: edited label/spacing, repeated-source identity,
+occurrence selection and exact musical explanation survive; neither dataset
+changes, missing semantic facets refuse, and Knot document anchors cannot be
+repurposed as music owner actions. Focused adapter test passes. Knot's native
+recipe scenario has four reviewed captures at 1280×1100 (bind, spacing, explained
+relation, authority refusal). Knot subsequently adopts shared horizontal reveal
+`5011e2f9` on implementation `e4cf739c`, published with acceptance docs at
+`9d0b955f`. Its compact recipe scenario passes four reviewed native captures at
+420×900 and four at 1280×900 / 400% UI zoom: real second occurrence selection
+reveals the full card, method/limits and source anchor remain readable across
+scroll positions, and unavailable-authority refusal is visible. Updated-pin
+qualification passes desktop 306 tests / one existing ignore, composition/readings
+61 / one existing ignore, locked build and metadata. Successful native personal-wallet
+retention remains unrun. Knot's canonical collection plan
+records its complete suite and encrypted-retention receipts. The visible
+Woodshed editor/renderer was qualified in the host continuation below; Knot's
+unrun native personal-wallet gate remains separate. The compact native receipt
+is `/Users/markik/Code/testing/knot-editor/recipe-responsive-20261005/receipt.json`;
+no retained collection reopen, browser runtime or other-platform claim is added.
+
+Host continuation starting point (2026-10-05): refreshed Woodshed main `c92e7c9` matches the
+published disclosure/session proof. Its production Mere `8106c7c` / Genet
+`34626a6` pair predates the shared compiler. The next bounded pass integrates
+the real shared draft/compiler into a visible Woodshed reading, preserving
+Working Set/Card identity and source custody. It includes explicit source
+navigation and rebind/refusal, durable edited state, actual host controls,
+separate-process reopen, and default/narrow native captures. Production pins
+must remain coherent; no local path override or copied layout/compiler counts
+as adoption. The Woodshed checkout lane owns implementation and its canonical
+plan; this coordinating lane owns capture review and shared status reconciliation.
+
+Shared host contribution `5011e2f9` is published: Woodshed's 420px native
+graph-node acceptance exposed that Rootstock's generic `scroll_into_view`
+handled only the vertical axis. The independent semantic-click fixture failed
+before the fix. The host now reveals horizontal targets through ancestor
+scrollports and the document, respects clipping, keeps oversized targets stable,
+and reports each moved plane once. Vertical alignment and caret-follow behavior
+remain unchanged. Qualification: 56 Rootstock unit tests and 157 native-host
+tests across 25 suites pass; the focused 18-test click/scroll gate is included
+in that host total. No solver, shader, domain calculation, or Genet pin change
+was required. Woodshed's production repin and final native matrix now pass.
+
+Visible host qualification (2026-10-05): Woodshed implementation source
+`c55461cc97bb29e9e78ecb2bb310bb4bda5accdf` uses the shared draft and compiler
+for editable labels/spacing, graph occurrence selection, and method-disclosed
+pitch-class relationships. A retained reading appears in Woodshed's own Mere
+view, linked to its exact captured Working Set. Navigation checks owner Set,
+Card identity, ordered content revision and full owner-derived disclosure;
+changed source instructions refuse until explicit rebind. Navigation does not
+start playback or transfer a background rehearsal owner. Invalid optional
+retained payloads are preserved, not silently overwritten.
+
+The final automated gate passes 558 tests (core 189, integration 1, desktop 63,
+graph 14, views 106, theory 181, doctests 4); the standalone compatibility
+instrument separately passes 5. Locked desktop build and native host check of
+the web crate pass. This is not a browser/wasm runtime acceptance claim.
+
+Committed-source native acceptance passes 8 captures at 1280×900, 8 at 420×900,
+and 2 after a separate-process reopen. All 18 captures were visually reviewed,
+including real last/middle graph-node selection at narrow width, readable
+explanation/method/limits, visible stale-source refusal, explicit rebind, retained
+owner disclosure, restored spacing/selection, and exact source Card navigation.
+The first final narrow attempt failed before any capture landed because the
+surface was occluded; its logs remain preserved. An unchanged-source replay in
+a fresh profile passed after explicit foreground Raise. External scenario copies
+only extend initial settling to allow native launch and Raise; assertions remain
+those of the committed scenarios.
+
+Evidence: `/Users/markik/Code/testing/woodshed/relationship-host-20261005/receipt.json`
+records source/binary/scenario hashes, automated logs, preserved failed attempts,
+and the committed baseline, narrow retry and reopen captures. Retention here
+uses the production session FsBackend in an isolated explicitly unsealed profile.
+It proves durable host state, not successful personal-wallet encryption. No
+high-zoom, other-platform, release-signing or browser-runtime qualification is
+claimed. A multi-reading library and explicit recovery UI for invalid payloads
+remain follow-ons; this bounded host slice does not complete A5 or dynamics G1–G6.
+
+Publication verified: Woodshed main and origin/main match
+`dad3f6240bef8339432effa2d9fe7840d5035612`, with a clean checkout. That
+acceptance-only commit follows the native-qualified implementation `c55461cc`.
+The existing Woodshed `design_docs/2026-07-11_stage_set_tools_plan.md` and
+document index record the final gates and their limits; no parallel plan was
+introduced. Mere's shared behavior fix is on main at
+`5011e2f90e988775410fe4b4213e9895fe64538e`.
 
 ## Executable authoring proof (2026-09-04, verified in current working tree)
 
@@ -29,6 +198,46 @@ registrations, channels, realization policies, and stale source revisions are
 explicit failures. Source ownership remains in Woodshed; the included export
 is a reproducible three-card Set made from its real musical catalog, not a live
 connection to a user's saved practice library.
+
+*2026-10-05, one arrangement catalog.* The
+[stack seams plan](2026-10-04_stack_seams_plan.md) ruled S1: "Resolve through
+scenomise (Recommended)". Graphshell maps the two families above by hand:
+- `arrangement_for` and `placement_for` in `ports/graphshell/src/projection_compile.rs`
+  (lines 666-691);
+- `grid.default` uses a fixed 184 by 84 cell and 8 columns;
+- `scatter.default` maps to `Geographic`;
+- every other id resolves to nothing.
+
+Both functions retire into one shared scenomise compile step. It resolves an
+id through the registry, takes its parameters from the definition, and makes
+every registered family authorable. That plan's P1 carries it out. Asked who
+takes P1, Mark answered: "Seams lane keeps P1 (Recommended)". This plan
+records the change and does not build it.
+*Superseded 2026-10-06* (stack seams S14 pass, batch 43). When this note was
+written, local main did not yet hold `c79bb8c2`, which had already moved the
+compiler into `scenomise::projection`. `ports/graphshell/src/projection_compile.rs`
+is now 432 lines and re-exports `scenomise::projection::*`, so the hand map
+above is gone. P1 then replaced it with the built-in catalog (next note).
+
+*2026-10-05, P1 under way (stack seams rulings S12, S15 to S20).* A
+cross-reference for the relationship-recipe pass, which moved the compiler
+into `scenomise::projection` at `c79bb8c2`. One correction to the note
+above: scenomise's registry holds only custom solvers (stack seams F12), so
+ids resolve through a built-in catalog of sceno's eleven named families beside
+it, and an unknown id falls through to the registry (S15). P1 changes the
+compiler where it now lives: the dataset types move to scenograph and stay
+re-exported from `scenomise::projection` (S12); `grid.default` and
+`scatter.default` resolve as aliases, so saved recipes load (S15); parameters a
+recipe leaves unset are measured from the items (S16); and item sizes come from
+the host instead of the 164 by 68 written into the compiler (S20), so the
+compile entry points take the host's sizes. A consumer sees two changes when it
+repins past P1: that signature, and grid pitch (cell plus gap), which becomes
+the host's card size plus the spacing (180 by 84 for a 164 by 68 card at
+spacing 16, against 200 by 100 today). Built on branch `stack-seams-p1`;
+nothing merges before Mark's review.
+*2026-10-06:* P1 landed on main at `1633be0c`, recorded in the stack seams plan
+at `add54925`. The compile entry points take a `ProjectionCompiler` built from
+host `ItemSizes` (`scenomise/src/projection.rs:520`, `:530`).
 
 Progress (2026-09-04): Luna produced the Woodshed exporter and Terra the
 compiler skeleton before both hit the account usage limit. Root completed
@@ -138,6 +347,7 @@ reopen, `?scenario=scenarios/co_op_retained.scn&sink=http://127.0.0.1:<port>/sce
 captures the retained GPU projection on that origin.
 
 **Date**: 2026-08-15
+*Superseded by the top status line (2026-10-06); kept as written.*
 **Status (reconciled 2026-09-01)**: A0, A6, A1, C1, B1, B2, B3, C3, A3 stage
 one, A4+C2, and A2 are closed. Turnstone `648bf19` is B1's definitive close,
 including routed screen-reader interaction. The Projection Receipts Plan's
@@ -160,12 +370,12 @@ lanes L1-L5 and governed by the
 [projection grammar catalog](../research/2026-08-15_projection_grammar_catalog.md)
 promotion rules.
 **Related**:
-[scenograph_0_0_3_release_plan](2026-07-24_scenograph_0_0_3_release_plan.md)
+[scenograph_0_0_3_release_plan](../../archive_docs/2026-10-06_completed_plans/2026-07-24_scenograph_0_0_3_release_plan.md)
 (historical 0.0.3 release; rulings D1-D4),
-[projection_proofs_plan](2026-07-21_projection_proofs_plan.md) (P1-P5 landed),
+[projection_proofs_plan](../../archive_docs/2026-10-06_completed_plans/2026-07-21_projection_proofs_plan.md) (P1-P5 landed),
 scene contract note
 (`design_docs/scenograph_docs/technical_architecture/2026-07-22_scene_contract_note.md`),
-[multi_window_plan](2026-06-10_multi_window_plan.md),
+[multi_window_plan](../../archive_docs/2026-10-06_completed_plans/2026-06-10_multi_window_plan.md),
 [graph_signals_layer_plan](../../archive_docs/2026-08-20_completed_plans/2026-06-22_graph_signals_layer_plan.md),
 [accesskit_screen_reader_verification](../../archive_docs/2026-09-02_retired_plans/2026-06-09_accesskit_screen_reader_verification.md).
 
@@ -221,7 +431,7 @@ What transfers, from where, to where. Landing sites verified against the tree
 
 | Transfer | Source system | Landing site |
 | --- | --- | --- |
-| Placement satisfaction state; pin = ensure (fails loudly), anchored home = encourage | WebCoLa silent-soft caution + Penrose `ensure`/`encourage` | sceno scene surface + scenomise solvers (A1), cambium chrome (C1) |
+| Placement satisfaction state; pin = ensure (fails loudly), anchored home = encourage *(2026-10-03: the pinned and anchored roles, beside seeded; see A1)* | WebCoLa silent-soft caution + Penrose `ensure`/`encourage` | sceno scene surface + scenomise solvers (A1), cambium chrome (C1) |
 | Selection clauses with declared resolution (single / union / intersect / crossfilter) | Mosaic selections + Vega-Lite selections | chirograph intent plane / mere host coordination (A2) |
 | LOD rungs as declarative conditions (measure, operation, threshold, hysteresis) | Gosling `visibility` | cartography representation profiles, then `ScoreItem.representation` selection (A3) |
 | Transition specs between epochs, host-owned clock | Gemini | scenotime, expansion lane L5 (A4, C2) |
@@ -315,6 +525,49 @@ silently best-efforted; the record crosses the graphshell wire.
 Done when: a remote viewer can distinguish "placed as pinned" from "pin
 unmet" without source access.
 
+**2026-10-03, the roles.** The
+[dynamics grammar plan](2026-10-02_dynamics_grammar_plan.md) retires ensure
+and encourage for three roles: seeded, anchored and pinned (F26). Read this
+target's ensure-class as pinned. Its encourage-class covered two different
+behaviours:
+- the anchored home, which returns to the arrangement (F19);
+- sceno's best-effort `Hold::Anchored` ("relaxation may carry it away",
+  `crates/cambium/scenes/sceno/src/score.rs`, lines 86–88), which nothing
+  returns. F19 and F25 name it seeded.
+
+F25 gives `Hold` all three: `Seeded` (the old `Anchored`'s meaning, read from
+old saves by a serde alias), `Anchored` (returns) and `Pinned`. The dynamics
+plan's G7 builds it. The Progress entries below keep their words: their
+`Hold::Anchored` and "encourage" are the seeded role, and their
+"ensure-class" is pinned.
+- A1's record is unchanged: `honored_holds` carries pinned holds only.
+  *Reading, not ruled:* anchored holds stay out of it, as seeded ones did, and
+  report a residual through the dynamics plan's G6 instead.
+- **A finding for mer3ly.** `PlacementDelta::holds`
+  (`mer3ly/crates/repo-graph/src/lib.rs`, line 1878) records a pin placed
+  under mer3ly's `anchored` motion as `Hold::Anchored`, "best effort by the
+  visitor's own choice", and a test at line 3034 asserts it. The sandbox's
+  `shelfmarkPlacement` (`mer3ly/assets/graph-sandbox.js`, line 1521) makes
+  the same choice in JS. The live path itself hard-pins a manual pin in
+  either motion (`pinNode`, `mer3ly/crates/repo-graph/src/lib.rs`, line 399),
+  so the recorded class already differs from the live behaviour under
+  `anchored`. Under F25 the Rust line keeps compiling but changes meaning,
+  from best effort to returning, the next time mer3ly repins mere. Scores mer3ly has already shared read
+  back as seeded, through the alias. Which role those pins should take
+  returns to Mark with mer3ly's mobility move, which G7 lists outside its
+  track.
+  *2026-10-03, ruled:* a manual pin records as `Hold::Pinned` in either
+  motion, once mer3ly takes up the roles. Mark: "A pin is a pin
+  (Recommended)" (mer3ly's site canvas plan, Ruling 103). Both mapping sites
+  drop the motion check. *Landed the same day,* ahead of mer3ly's repin
+  (mer3ly `f0fc678`), at Mark's "make the move". mer3ly no longer writes
+  `Hold::Anchored` anywhere, so G7 changes no meaning for it.
+- **The alias, as F25 is written.** A serde alias `"Anchored"` on `Seeded`
+  also catches the new `Anchored` on read. In a scratch probe,
+  `Hold::Anchored` serialized as `"Anchored"` and read back as `Seeded`, with
+  only an `unreachable_patterns` warning. How old saves are read is G7's
+  question, and it has gone to the dynamics grammar session.
+
 **A2. Selection clauses: coordination as data — CLOSED 2026-08-23.**
 Context: release ruling D1 stands (sceno ships no intent vocabulary; the
 protocol owns the triple). What the report adds is the *coordination* record
@@ -329,7 +582,7 @@ declaration; decide its home with evidence (chirograph beside the intent
 triple, or mere host state that graphshell serializes); wire two views over
 one authority through it.
 Forcing consumer: L3's entrance gate is met. Mer3ly shares a scene by URL hash,
-and Wave 1 of the [projection receipts plan](2026-08-23_projection_receipts_plan.md)
+and Wave 1 of the [projection receipts plan](../../archive_docs/2026-10-06_completed_plans/2026-08-23_projection_receipts_plan.md)
 supplies the genuine two-view ask: its spatial view and two-reading Matrix
 contribute named clauses over the same source identities. The proof forced
 crossfilter only; union and intersection remain absent until their behavior is
@@ -593,6 +846,36 @@ collidable one participates in placement.
 Done when: environment is scene data with declared properties on two
 consumers.
 
+### Track F: field receipts (gated; received 2026-10-06)
+
+The projection receipts plan's wave 3 came here when the stack seams S14
+archive pass retired that plan (stack seams ruling S61). Its tail is recorded
+in the [archived plan tails plan](2026-07-03_archived_plan_tails_plan.md),
+section "2026-10-06 archive pass". The archived plan is at
+[archive_docs/2026-10-06_completed_plans/2026-08-23_projection_receipts_plan.md](../../archive_docs/2026-10-06_completed_plans/2026-08-23_projection_receipts_plan.md),
+§5. The targets keep that plan's words. No work opens under either one until
+its gate's trigger is met: scheduling them here asserts order, not readiness.
+
+**F1 (was FT9). Derived-mark integrity (receipt 3) — gated.**
+A Distribution or Contour scene emits derived marks that remain selectable,
+name their values and contributors, and never masquerade as source nodes.
+Gate: a named statistical or field consumer.
+
+**F2 (was FT10). Field distinction (receipt 6) — gated.**
+One sample dataset produces Territory and Contour scenes whose categorical
+and scalar meanings remain distinct through rendering, picking, legends, and
+accessible output.
+Gate: a field-data consumer. The trigger candidates on record:
+- host-side radio and mesh placement facts. This is the sited-device brief's
+  fact surface: the node does not know where it is, the host knows where it
+  put it.
+- a simulator or radio model for Current.
+
+*Reading, not ruled:* both receipts are A5's territory, the remaining
+portable-grammar questions, which already wait on a forcing consumer. A field
+consumer that opens F2 would also force A5's gap 1, derived marks, scales and
+guides. So F1 and F2 open with A5 rather than ahead of it.
+
 ### Sequence
 
 Closed: **A0**, **A6**, **A1**, **C1**, **B1**, **B2**, **B3**, **C3**, **A2**,
@@ -712,6 +995,30 @@ receipts plan, and that is what makes it authority-grade; what it is not is
 evidence of product demand for the features its receipts prove. Whether that
 qualifies the consumer ruling's "its asks open gates" is not settled here; it
 is raised in Progress for Mark.
+*Settled 2026-09-30.* Mark, when opening the mer3ly.net canvas assessment:
+"my feeling is, the site counts as a consumer, but it should be consuming or
+creating stack capabilities, not special exceptions." mer3ly's asks open gates,
+but only for capabilities that another consumer could use unchanged. Recorded
+as Ruling 1 of mer3ly's `docs/2026-09-30_graphshell_site_canvas_plan.md`, which
+is that objective's assessment.
+*Added 2026-10-01.* Rulings in that assessment that land in mere:
+- A typed fold is promoted onto sceno's 0.0.4 line, with mer3ly as the forcing
+  consumer. Mere's native canvas, through pictograph's existing
+  `forme::FoldRecord` projection plus a product trigger and folds in
+  `MereHost` scenes, is the second (Ruling 11).
+- The two-reading matrix's contract types go into cartography, and its
+  derivation into a cartography sibling crate. Both mer3ly's copy and
+  `ports/gazette/src/ledger.rs` retire, as the catalog's
+  removal-on-promotion rule requires (Rulings 10 and 12).
+- *Amended 2026-10-01 (Rulings 19-20 there):* there is no sibling crate. The
+  matrix's types and a thin adapter go in cartography beside `src/adapters/`,
+  and the cell derivation goes in the scenes family, after the adapters' own
+  pattern. Cartography's "stays contract-only" comment (`Cargo.toml:18`)
+  predates `graph-layout`'s retirement at `739c87f4` and is stale. The fold
+  fact names its stand-in: either a member or a synthetic summary.
+- Separately, A4's text here runs together two histories that the assessment
+  separates: authority-revision history, the site's checkpoint slider, and
+  scene-edit history, `projection-proof`'s chained trace.
 
 ## Progress
 
@@ -1300,6 +1607,19 @@ is raised in Progress for Mark.
   each toolchain bump; if it links, drop the override. The served-endpoint
   ruling is closed by this receipt; A3 stage one now holds for the product
   endpoint.
+- 2026-10-03: **arrangement roles carried in.** The dynamics grammar plan's
+  F18–F30 are recorded in the projection grammar catalog:
+  - the Free, Anchored and Pinned policies are now the seeded, anchored and
+    pinned roles, chosen per item over a recipe default, with seeded as the
+    default and an encoded axis pinned;
+  - the §6 "Force and constraint" row moved out, and "Settled" joined as an
+    arrangement source;
+  - §7 reads drag, displacement, pick and stop by role;
+  - a scene recipe names an arrangement and, optionally, a dynamics recipe,
+    under one binding.
+
+  This plan gains A1's note on the old `Hold::Anchored`, which named the
+  seeded role, and the mer3ly finding. Doc-only; no code moved.
 
 ## 2026-09-05 practice workspace browser proof
 

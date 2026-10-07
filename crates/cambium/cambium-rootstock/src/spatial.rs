@@ -27,8 +27,9 @@ use crate::Host;
 use crate::meristem_bounds::RootView;
 use crate::{Box2, Direction, score};
 
-impl<State, Logic, V> Host<State, Logic, V>
+impl<State, Logic, V, T> Host<State, Logic, V, T>
 where
+    T: crate::HostTree<State>,
     State: 'static,
     Logic: FnMut(&State) -> V + 'static,
     V: RootView<State>,
@@ -40,11 +41,12 @@ where
         };
         let dom = runner.dom();
         let dom_ref = dom.borrow();
+        let view = crate::WindowDom::new(&dom_ref, runner.mount());
         let boxes = runner
             .focusables()
             .into_iter()
             .filter_map(|node| {
-                let (x, y, w, h) = layout.painted_rect(&*dom_ref, node)?;
+                let (x, y, w, h) = layout.painted_rect(&view, node)?;
                 // A zero-area control is not somewhere focus can usefully go.
                 (w > 0.0 && h > 0.0).then_some((node, Box2 { x, y, w, h }))
             })

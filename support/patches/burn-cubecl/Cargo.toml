@@ -12,7 +12,7 @@
 [package]
 edition = "2024"
 name = "burn-cubecl"
-version = "0.22.0-pre.2"
+version = "0.22.0-pre.4"
 authors = ["nathanielsimard <nathaniel.simard.42@gmail.com>"]
 build = false
 autolib = false
@@ -31,7 +31,6 @@ keywords = [
 categories = ["science"]
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/tracel-ai/burn/tree/main/crates/burn-cubecl"
-resolver = "2"
 
 [package.metadata.docs.rs]
 features = ["doc"]
@@ -47,6 +46,14 @@ autotune-checks = [
     "cubecl/autotune-checks",
     "burn-cubecl-fusion?/autotune-checks",
 ]
+cpu = [
+    "cubecl/cpu",
+    "burn-backend/cubecl-cpu",
+]
+cuda = [
+    "cubecl/cuda",
+    "burn-backend/cubecl-cuda",
+]
 default = [
     "autotune",
     "std",
@@ -56,12 +63,26 @@ default = [
     "burn-fusion?/default",
     "burn-cubecl-fusion?/default",
 ]
-doc = ["default"]
+doc = [
+    "default",
+    "wgpu",
+    "fft",
+]
+fft = ["cubek/fft"]
 fusion = [
     "burn-fusion",
     "burn-cubecl-fusion",
 ]
 fusion-experimental = ["fusion"]
+hip = [
+    "cubecl/hip",
+    "burn-backend/cubecl-hip",
+]
+metal = [
+    "wgpu",
+    "cubecl/metal",
+    "burn-backend/cubecl-metal",
+]
 std = [
     "cubecl/std",
     "burn-backend/std",
@@ -77,44 +98,63 @@ tracing = [
     "burn-fusion?/tracing",
     "burn-cubecl-fusion?/tracing",
 ]
+vulkan = [
+    "wgpu",
+    "cubecl/vulkan",
+    "burn-backend/cubecl-vulkan",
+]
+webgpu = [
+    "wgpu",
+    "cubecl/webgpu",
+    "burn-backend/cubecl-webgpu",
+]
+wgpu = [
+    "cubecl/wgpu",
+    "burn-backend/cubecl-wgpu",
+]
 
 [lib]
 name = "burn_cubecl"
 path = "src/lib.rs"
 
 [dependencies.burn-backend]
-version = "=0.22.0-pre.2"
-features = ["cubecl"]
+version = "=0.22.0-pre.4"
+features = [
+    "cubecl",
+    "cubecl-device",
+]
 default-features = false
 
 [dependencies.burn-cubecl-fusion]
-version = "=0.22.0-pre.2"
+version = "=0.22.0-pre.4"
 optional = true
 default-features = false
 
 [dependencies.burn-fusion]
-version = "=0.22.0-pre.2"
+version = "=0.22.0-pre.4"
 optional = true
 default-features = false
 
 [dependencies.burn-ir]
-version = "=0.22.0-pre.2"
+version = "=0.22.0-pre.4"
 default-features = false
 
 [dependencies.burn-std]
-version = "=0.22.0-pre.2"
+version = "=0.22.0-pre.4"
 default-features = false
 
 [dependencies.cubecl]
-version = "=0.11.0-pre.2"
+version = "=0.11.0-pre.4"
 features = ["stdlib"]
 default-features = false
 
 [dependencies.cubek]
-version = "=0.3.0-pre.2"
+version = "=0.3.0-pre.4"
 features = [
     "attention",
     "matmul",
+    "matmul-multi-level",
+    "matmul-tiled",
     "convolution",
     "interpolate",
     "pool",
@@ -122,7 +162,6 @@ features = [
     "random",
     "quantization",
     "stdlib",
-    "fft",
 ]
 default-features = false
 
@@ -157,6 +196,11 @@ features = ["attributes"]
 optional = true
 default-features = false
 
+[dev-dependencies.cubecl]
+version = "=0.11.0-pre.4"
+features = ["test-runtime"]
+default-features = false
+
 [lints.clippy]
 
 [lints.rustdoc]
@@ -165,9 +209,12 @@ invalid_html_tags = "deny"
 
 [workspace]
 
-[dev-dependencies.burn-backend]
-version = "=0.22.0-pre.2"
-features = ["cubecl-wgpu", "std"]
+[dev-dependencies.cubecl-common]
+version = "=0.11.0-pre.4"
+default-features = false
+
+[dev-dependencies.cubecl-environment]
+version = "=0.11.0-pre.4"
 default-features = false
 
 [patch.crates-io]

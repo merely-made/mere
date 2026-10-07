@@ -16,9 +16,12 @@ impl Canvas {
     }
 
     /// Switch the canvas's layout strategy. `Some(id)` selects a cartography adapter
-    /// (the host then pushes its positions via [`apply_strategy_positions`]) and halts
-    /// seiche so the analytic layout holds still; `None` reverts to force-directed,
-    /// dropping the buffered positions and re-settling the physics. (Layout picker.)
+    /// (the host then pushes its positions via [`apply_strategy_positions`]) and
+    /// pauses so its placement holds; `None` reverts to force-directed, dropping
+    /// the buffered positions and re-settling the physics. A host placing an
+    /// arrangement for its own reasons (a boot, a scene open) calls this; a
+    /// person's pick is [`pick_layout_strategy`](Self::pick_layout_strategy).
+    /// (Layout picker.)
     pub fn set_layout_strategy(&mut self, id: Option<String>) {
         let reverting = id.is_none() && self.active_strategy.is_some();
         self.active_strategy = id;
@@ -29,16 +32,28 @@ impl Canvas {
         // strategy. (Arrangements — the layout cache.)
         self.last_strategy_inputs = None;
         // Physics is a *global* capability, not a property of the arrangement
-        // (see `set_physics_paused`). Picking an analytic arrangement pauses by
-        // default — so its placement reads crisply the moment you choose it —
-        // but that is now an ordinary, visible, reversible pause the user can
-        // play at any time to watch forces relax the arrangement, not a hidden
-        // halt welded to the mode. Returning to no arrangement resumes.
+        // (see `set_physics_paused`). Placing an analytic arrangement pauses,
+        // so its placement reads the moment it lands. Returning to no
+        // arrangement resumes.
         if self.active_strategy.is_some() {
-            self.set_physics_paused(true);
+            self.set_physics_paused_quietly(true);
         } else if reverting {
             self.strategy_positions = None;
-            self.set_physics_paused(false);
+            self.set_physics_paused_quietly(false);
+        }
+    }
+
+    /// A person's pick of an arrangement (F24, "Pick keeps play"): it pauses
+    /// while the placement lands, by a transition or the snap of
+    /// [`apply_strategy_positions`](Self::apply_strategy_positions), and a
+    /// graph that was playing then plays on from the landed positions. A pick
+    /// made while paused stays paused.
+    pub fn pick_layout_strategy(&mut self, id: Option<String>) {
+        let was_playing = !self.physics_paused;
+        let picking = id.is_some();
+        self.set_layout_strategy(id);
+        if picking {
+            self.note_pick(was_playing);
         }
     }
 
@@ -154,13 +169,16 @@ impl Canvas {
             // running, the sim relaxes from here instead of snapping back to
             // wherever the force layout had left them. This is what lets any
             // arrangement compose with physics. (Physics as a capability.)
+            self.reset_frame_time();
             self.physics.seed(
                 positions
                     .iter()
                     .map(|(k, p)| (*k, Point2D::new(p.x, p.y)))
                     .collect(),
             );
-            self.sync_anchor_force();
+            self.adopt_settled(positions);
+            self.sync_arrangement_roles();
+            self.land_pick();
         }
     }
 
@@ -190,44 +208,10 @@ impl Canvas {
         let Some(positions) = self.strategy_positions.clone() else {
             return false;
         };
-        self.set_physics_paused(true);
+        self.set_physics_paused_quietly(true);
         self.apply_strategy_positions(&positions);
         self.apply_strategy_to_view();
         true
-    }
-
-    /// Install the active arrangement's slots as anchor springs, so a *playing*
-    /// graph is pulled toward the arrangement while repulsion, edge springs,
-    /// collisions, coupled fields, and drag all still act — the arrangement as
-    /// a participant, not an override. At zero stiffness the arrangement is a
-    /// pure initial condition (the seed-only reading); the dial in between is
-    /// "how much does the arrangement win". A no-op while paused: the buffered
-    /// positions are asserted directly then, so no force is needed.
-    /// (Arrangement as attractor.)
-    pub(crate) fn sync_anchor_force(&mut self) {
-        let anchors = match (&self.strategy_positions, self.arrangement_pull > 0.0) {
-            (Some(positions), true) if !self.physics_paused => Some(
-                seiche::AnchorSpring::new(positions.iter().map(|(k, p)| (*k, (p.x, p.y))))
-                    .with_stiffness(self.arrangement_pull),
-            ),
-            _ => None,
-        };
-        self.physics.set_anchor_force(anchors);
-    }
-
-    /// How strongly a playing graph is pulled toward the active arrangement's
-    /// slots. `0.0` = the arrangement only seeds and the graph's own forces take
-    /// over; higher holds its shape against them. (Arrangement as attractor.)
-    pub fn arrangement_pull(&self) -> f32 {
-        self.arrangement_pull
-    }
-
-    /// Set the arrangement pull, re-installing the anchor force and settling so
-    /// the new balance takes. (Arrangement as attractor.)
-    pub fn set_arrangement_pull(&mut self, stiffness: f32) {
-        self.arrangement_pull = stiffness.max(0.0);
-        self.sync_anchor_force();
-        self.settle_physics(SETTLE_TICKS);
     }
 
     /// Record the portable score that produced the active analytic layout.
@@ -326,9 +310,10 @@ impl Canvas {
         ));
         // Same default as picking an arrangement: hold the restored placement,
         // via the visible global pause rather than a hidden halt.
-        self.set_physics_paused(true);
+        self.set_physics_paused_quietly(true);
         self.strategy_positions = Some(positions.clone());
         self.paused_positions = Some(positions.clone());
+        self.reset_frame_time();
         self.physics.seed(
             positions
                 .iter()
@@ -455,7 +440,11 @@ impl Canvas {
         if self.bridge_cache.is_some() && self.bridge_cache_revision == revision {
             return;
         }
-        self.bridge_cache = Some(crate::signals::bridges(&self.graph, self.bridge_metric, 0.5));
+        self.bridge_cache = Some(crate::signals::bridges(
+            &self.graph,
+            self.bridge_metric,
+            0.5,
+        ));
         self.bridge_cache_revision = revision;
     }
 

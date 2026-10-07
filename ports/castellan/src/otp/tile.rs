@@ -15,8 +15,10 @@
 
 use std::fmt;
 
-use super::{OtpItem, OtpKind};
+use chatelaine::OtpMode;
 use zeroize::Zeroizing;
+
+use super::OtpCredential;
 
 /// One code prepared for an admitted host to show.
 ///
@@ -24,7 +26,7 @@ use zeroize::Zeroizing;
 /// but it is still a credential valid for a short interval and belongs on a
 /// screen, not in diagnostic output.
 pub struct OtpCodeTile {
-    item: OtpItem,
+    credential: OtpCredential,
     code: Zeroizing<String>,
     time_ring: Option<OtpTimeRing>,
 }
@@ -32,7 +34,7 @@ pub struct OtpCodeTile {
 impl fmt::Debug for OtpCodeTile {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("OtpCodeTile")
-            .field("item", &self.item)
+            .field("credential", &self.credential)
             .field("code", &"<redacted>")
             .field("time_ring", &self.time_ring)
             .finish()
@@ -40,9 +42,9 @@ impl fmt::Debug for OtpCodeTile {
 }
 
 impl OtpCodeTile {
-    pub(crate) fn new(item: OtpItem, code: String, unix_secs: u64) -> Self {
-        let time_ring = match item.kind {
-            OtpKind::Totp { period, t0 } => {
+    pub(crate) fn new(credential: OtpCredential, code: String, unix_secs: u64) -> Self {
+        let time_ring = match credential.mode() {
+            OtpMode::Totp { period, t0 } => {
                 let elapsed = unix_secs.saturating_sub(t0);
                 let seconds_remaining = period - (elapsed % period);
                 Some(OtpTimeRing {
@@ -50,18 +52,18 @@ impl OtpCodeTile {
                     expires_at_unix_secs: unix_secs.saturating_add(seconds_remaining),
                 })
             },
-            OtpKind::Hotp { .. } => None,
+            OtpMode::Hotp => None,
         };
         Self {
-            item,
+            credential,
             code: Zeroizing::new(code),
             time_ring,
         }
     }
 
-    /// Secret-free item metadata, suitable for the tile label.
-    pub fn item(&self) -> &OtpItem {
-        &self.item
+    /// The secret-free item and credential, suitable for the tile label.
+    pub fn credential(&self) -> &OtpCredential {
+        &self.credential
     }
 
     /// The code when it is still current at `unix_secs`.
@@ -133,23 +135,40 @@ impl OtpTimeRing {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::otp::{OtpAlgorithm, OtpCodeStyle, OtpItemId};
+    use crate::otp::{OtpAlgorithm, OtpCodeStyle};
+    use chatelaine::{Credential, CredentialId, CredentialKind, Item, ItemId, ItemState};
 
-    fn item(kind: OtpKind) -> OtpItem {
-        OtpItem {
-            id: OtpItemId::from_uuid(uuid::Uuid::from_u128(0x44)),
-            account: "mark".to_string(),
-            issuer: Some("Merely".to_string()),
-            algorithm: OtpAlgorithm::Sha1,
-            code_style: OtpCodeStyle::Decimal { digits: 6 },
-            kind,
-        }
+    fn item(mode: OtpMode) -> OtpCredential {
+        let credential = CredentialId::from_bytes([0x45; 16]);
+        let item = Item {
+            id: ItemId::from_bytes([0x44; 16]),
+            source_id: None,
+            title: "Merely".to_string(),
+            subtitle: Some("mark".to_string()),
+            scope: None,
+            tags: Vec::new(),
+            favorite: false,
+            created_at: None,
+            modified_at: None,
+            credentials: vec![Credential {
+                id: credential,
+                kind: CredentialKind::Otp {
+                    account: "mark".to_string(),
+                    issuer: Some("Merely".to_string()),
+                    algorithm: OtpAlgorithm::Sha1,
+                    code_style: OtpCodeStyle::Decimal { digits: 6 },
+                    mode,
+                },
+            }],
+            state: ItemState::Vault,
+        };
+        OtpCredential::from_item(item, credential).unwrap()
     }
 
     #[test]
     fn totp_tile_describes_the_remaining_time_ring_without_exposing_its_code_in_debug() {
         let tile = OtpCodeTile::new(
-            item(OtpKind::Totp { period: 30, t0: 0 }),
+            item(OtpMode::Totp { period: 30, t0: 0 }),
             "123456".to_string(),
             29,
         );
@@ -171,7 +190,7 @@ mod tests {
 
     #[test]
     fn hotp_tile_has_no_countdown_ring() {
-        let tile = OtpCodeTile::new(item(OtpKind::Hotp { counter: 7 }), "123456".to_string(), 59);
+        let tile = OtpCodeTile::new(item(OtpMode::Hotp), "123456".to_string(), 59);
 
         assert_eq!(tile.time_ring(), None);
         assert_eq!(tile.code_at_unix_time(u64::MAX), Some("123456"));

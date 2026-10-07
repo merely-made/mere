@@ -55,11 +55,10 @@ mod key;
 mod keyed;
 mod menu;
 mod multi;
-#[cfg(feature = "nematic")]
-pub mod nematic;
 mod optional_action;
 mod overlay;
 mod overlay_surface;
+mod frisket_presentation;
 mod pod;
 mod pointer;
 mod popover;
@@ -167,7 +166,7 @@ pub use reorderable_list::{
     ReorderItem, ReorderMove, ReorderState, reorderable_list, reorderable_list_with,
 };
 pub use resize_handle::{RESIZE_HANDLE_CSS, ResizeBounds, ResizeHandleEvent, resize_handle};
-pub use runner::GenetAppRunner;
+pub use runner::{FocusExit, GenetAppRunner};
 pub use select::{SelectState, select};
 pub use selection_bar::{
     Orientation, SelectionBarConfig, SelectionBarKind, SelectionItem, SelectionState,
@@ -195,6 +194,7 @@ pub use frisket::{
     content_target, decode_pane_path, divider_target, encode_pane_path, frisket, frisket_with,
     frisket_with_current, frisket_with_marks, slot_kind, stack_target, tab_drop_index, tab_target,
 };
+pub use frisket_presentation::frisket_presented_with;
 pub use popover::{
     POPOVER_CSS, Popover, PopoverEvent, PopoverPlacement, PopoverState, PopoverView, popover,
 };
@@ -205,8 +205,8 @@ pub use status_bar::{
     StatusView, status_bar,
 };
 pub use surface::{
-    ResolvedSurfaceEvent, RetainedSurfaceSession, RunnerSurfaceSession, SurfaceEffect,
-    SurfaceViewport,
+    ContainedSession, ResolvedSurfaceEvent, RetainedSurfaceSession, RunnerSurfaceSession,
+    SessionFailure, SurfaceEffect, SurfaceViewport,
 };
 pub use tabs::{
     TabAccentColors, TabBar, TabBarNames, TabItem, TabMark, TabStrip, tab_bar_view, tab_strip,
@@ -218,6 +218,7 @@ pub use value::{OnValue, OnValueState, ValueEvent, on_value};
 pub use wheel::{OnWheel, WheelEvent, on_wheel};
 pub use workspace::{
     WORKSPACE_CSS, WorkspaceModel, composited_slots, workspace_view, workspace_view_with_marks,
+    workspace_view_presented_with_marks,
 };
 
 // Compatibility aliases for consumers that still use the pre-extraction

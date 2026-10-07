@@ -7,6 +7,10 @@
 const originalError = console.error.bind(console);
 
 console.error = (...args) => {
+  const text = args.map(String).join(" ");
+  (window.graphshellErrors ??= []).push(text);
+  // A Rust panic reaches the page as console_error_panic_hook's message.
+  if (text.includes("panicked at")) (window.graphshellGateFailures ??= []).push(`panic: ${text}`);
   if (!document.title.startsWith("GRAPHSHELL H3 FAIL")) {
     document.title = `GRAPHSHELL H3 FAIL: ${args.map(String).join(" ").slice(0, 240)}`;
   }
@@ -16,12 +20,17 @@ console.error = (...args) => {
 // Every page error, kept: the host rewrites the title each frame, so a title
 // alone can hide one. A scenario receipt carries this list.
 window.graphshellErrors = [];
+// The receipt gate: every uncaught page error, unhandled rejection or panic.
+// Any entry fails the scenario receipt, whatever its steps asserted.
+window.graphshellGateFailures ??= [];
 window.addEventListener("error", (event) => {
   window.graphshellErrors.push(String(event.message));
+  window.graphshellGateFailures.push(`uncaught: ${event.message}`);
   document.title = `GRAPHSHELL H3 FAIL: ${event.message}`;
 });
 window.addEventListener("unhandledrejection", (event) => {
   window.graphshellErrors.push(`unhandled rejection: ${event.reason}`);
+  window.graphshellGateFailures.push(`unhandled rejection: ${event.reason}`);
 });
 
 function semanticNode(element) {
@@ -32,7 +41,7 @@ function semanticNode(element) {
     ] ?? null);
   const label =
     element.getAttribute("aria-label") ||
-    (element.matches('button, h1, h2, dd, [role="button"], [role="heading"], [role="status"]') ? element.textContent.trim() : null);
+    (element.matches('button, h1, h2, dd, li, [role="button"], [role="heading"], [role="status"], [role="listitem"]') ? element.textContent.trim() : null);
   const children = [...element.children]
     .filter((child) => child.getAttribute("aria-hidden") !== "true")
     .map(semanticNode)
@@ -41,6 +50,16 @@ function semanticNode(element) {
     ...(role ? { role } : {}),
     ...(label ? { label } : {}),
     ...(element.id ? { id: element.id } : {}),
+    ...(element.getAttribute("aria-description")
+      ? { description: element.getAttribute("aria-description") }
+      : {}),
+    // Where the mirror places a drawn item, CSS px, to compare with the paint.
+    ...(["listitem", "img"].includes(role) && element.getBoundingClientRect().width > 0
+      ? { box: (({ x, y, width, height }) => [x, y, width, height].map(Math.round))(element.getBoundingClientRect()) }
+      : {}),
+    ...(element.hasAttribute("aria-expanded")
+      ? { expanded: element.getAttribute("aria-expanded") === "true" }
+      : {}),
     ...(element.hasAttribute("aria-pressed")
       ? { pressed: element.getAttribute("aria-pressed") === "true" }
       : {}),
@@ -61,6 +80,7 @@ window.graphshellSemanticTree = () => {
 window.graphshellScenario = () => ({
   state: document.body.dataset.scenario ?? null,
   errors: [...window.graphshellErrors],
+  gate_failures: [...window.graphshellGateFailures],
   result: JSON.parse(document.getElementById("scenario-result")?.textContent || "null"),
   captures: [...document.querySelectorAll("#scenario-captures img")].map((img) => ({
     name: img.dataset.capture,
@@ -461,6 +481,9 @@ try {
             headers: { "content-type": "application/json" },
             body: JSON.stringify({
               scenario: window.graphshellScenario(),
+              title: document.title,
+              hidden: document.hidden,
+              semantic: window.graphshellSemanticTree(),
               frames: document.body.dataset.scenarioFrames,
               log: document.getElementById("scenario-log")?.textContent,
               remote: window.graphshellReceipt().remote,
@@ -475,6 +498,15 @@ try {
         "graphshell-scenario-complete",
         async () => {
           const scenario = window.graphshellScenario();
+          // The receipt gate: a run whose page threw, rejected or panicked
+          // fails, even when every step passed.
+          if (scenario.gate_failures.length > 0 && scenario.result) {
+            scenario.result.result = "fail";
+            (scenario.result.log ??= []).push(
+              `FAIL: receipt gate: ${scenario.gate_failures.length} uncaught page error(s), rejection(s) or panic(s)`,
+            );
+            document.body.dataset.scenario = "fail";
+          }
           const captures = [...document.querySelectorAll("#scenario-captures img")].map(
             (img) => ({ name: img.dataset.capture, dataUrl: img.src }),
           );
@@ -495,6 +527,18 @@ try {
         },
         { once: true },
       );
+    }
+    // The gate's positive control: `?plant_page_error=throw` raises an
+    // uncaught error, `=panic` logs a panic message, once the run is live.
+    const planted = params.get("plant_page_error");
+    if (planted) {
+      setTimeout(() => {
+        if (planted === "panic") {
+          console.error("panicked at receipt-gate-control: planted panic");
+        } else {
+          throw new Error("receipt-gate-control: planted page error");
+        }
+      }, 500);
     }
     module.run_scenario(text);
   }

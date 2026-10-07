@@ -1,3 +1,9 @@
+# Copyright 2026 Mark Alan Boykin
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# SPDX-License-Identifier: MPL-2.0
+
 """Offline regression checks for nested lock selection and portable provenance."""
 import os
 import json
@@ -98,7 +104,8 @@ class CargoModeTests(unittest.TestCase):
         result = self.mode("local", "metadata", "--offline", "--format-version", "1")
         packages = json.loads(result.stdout)["packages"]
         selected = next(p for p in packages if p["name"] == "cargo-mode-fixture-unique")
-        self.assertEqual(Path(selected["manifest_path"]).resolve(), external / "Cargo.toml")
+        # Resolve both sides: a Windows TEMP may be an 8.3 short path (RUNNER~1 on CI).
+        self.assertEqual(Path(selected["manifest_path"]).resolve(), (external / "Cargo.toml").resolve())
         self.assertEqual((self.root / "Cargo.lock").read_bytes(), before)
 
 

@@ -11,7 +11,7 @@
 //! detectable even though every restored ciphertext still authenticates.
 
 use std::path::{Path, PathBuf};
-use std::sync::Arc;
+use std::sync::{Arc, RwLock};
 
 use serde::{Deserialize, Serialize};
 use zeroize::Zeroizing;
@@ -53,7 +53,8 @@ pub(super) struct FileFreshnessLedger {
 
 struct FileFreshnessLedgerInner {
     root: PathBuf,
-    key: Zeroizing<[u8; 32]>,
+    /// `None` while the store is locked.
+    key: RwLock<Option<Zeroizing<[u8; 32]>>>,
 }
 
 impl FileFreshnessLedger {
@@ -64,9 +65,19 @@ impl FileFreshnessLedger {
         Ok(Self {
             inner: Arc::new(FileFreshnessLedgerInner {
                 root,
-                key: Zeroizing::new(key),
+                key: RwLock::new(Some(Zeroizing::new(key))),
             }),
         })
+    }
+
+    /// Forget the evidence key; every check until [`Self::unlock`] fails
+    /// closed with [`IdentityError::Locked`].
+    pub(super) fn lock(&self) {
+        *self.inner.key.write().unwrap_or_else(|e| e.into_inner()) = None;
+    }
+
+    pub(super) fn unlock(&self, key: [u8; 32]) {
+        *self.inner.key.write().unwrap_or_else(|e| e.into_inner()) = Some(Zeroizing::new(key));
     }
 
     pub(super) fn reconcile(
@@ -214,7 +225,9 @@ impl FileFreshnessLedger {
         let bytes = serde_json::to_vec(&unsigned).map_err(|error| {
             IdentityError::Backend(format!("encode freshness evidence: {error}"))
         })?;
-        Ok(*blake3::keyed_hash(&self.inner.key, &bytes).as_bytes())
+        let key = self.inner.key.read().unwrap_or_else(|e| e.into_inner());
+        let key = key.as_ref().ok_or(IdentityError::Locked)?;
+        Ok(*blake3::keyed_hash(key, &bytes).as_bytes())
     }
 
     fn path(&self, record_id: &str) -> PathBuf {

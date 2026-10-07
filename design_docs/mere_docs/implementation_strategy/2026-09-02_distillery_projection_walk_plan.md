@@ -1,23 +1,26 @@
 # Distillery Projection Walk Plan
 
 **Date:** 2026-09-02
-**Status:** W0 through W2 complete. W1's endpoint, admitted catalog seam,
-Graphshell mount, session-local resume by diff, detailed frozen table,
-machine-readable headless receipt, admitted `ResidentProjectionHost` carrier
-path, readable headed WebRTC fixture receipt, live Djinn-owned resident route,
-stable-topology authority diff, and live headed WebRTC receipt are green.
-W2's authored two-source recipe, authority-generation shelfmark, single-option
-variant, and headed binding receipt are green through 2026-09-08. Continuation
-across a fresh admission is a separate protocol question because it receives
-a fresh transcript-derived projection session (Progress). §2 was read at mere
-`77a3701f052` and corrected at
+**Status (2026-10-06):** W0 through W2 landed; W3 and W4 open. W0 landed
+2026-09-02 (verified 2026-09-03), W1 closed 2026-09-07 with the live headed
+WebRTC route, and W2 closed 2026-09-08 with the headed authored-binding
+receipt; main carries them in `0efc9ce5` (2026-09-09). On 2026-09-09 the
+host-neutral definition, validation, binding, variant, and deterministic-JSON
+contract moved into the `scenograph` authoring crate, Graphshell keeping its
+editor UI, compiler, persistence, and Chronicle recipe, and Turnstone adopted
+the revision split in turnstone `dc7d227`. Open: W3 (Circuit; no code yet)
+and W4 (hosts); W5 stays gated as §4 states; continuation across a fresh
+admission is a separate protocol question (Progress). §2 was read at
+`77a3701f052`, which is a genet commit, not a mere one, and corrected at
 `3ce750f5` by the W0 implementation, which read the code rather than this
-plan. On 2026-09-09 the host-neutral definition, validation, binding, variant,
-and deterministic-JSON contract moved into the `scenograph` authoring crate;
-Graphshell retains its editor UI, compiler, persistence, and Chronicle recipe.
+plan.
+**Open, raised by the S14 pass (2026-10-06):** which commit was §2 read at?
+`77a3701f052` does not exist in mere; it is a genet commit (2026-09-02, "docs:
+assess unifying the two layout builders"). Options: cite it as genet's;
+replace it with the intended mere commit, which is not recorded anywhere.
 **Scope:** the first end-to-end scene binding for a port — dataset → scene →
 Scenograph → host — walked on Distillery. This plan owns the walk; the
-[Distillery v0 plan](2026-08-12_distillery_v0_plan.md) owns the works
+[Distillery v0 plan](../../archive_docs/2026-10-06_completed_plans/2026-08-12_distillery_v0_plan.md) owns the works
 (resident authority, installed boundary, trainer, host-policy composition) and
 nothing here changes what that plan rules.
 **Companions:** the
@@ -206,6 +209,13 @@ projection session, so carrying an old acknowledgement across it requires an
 explicit continuity contract before this plan can claim reconnect across
 admissions.
 
+**Corrected 2026-10-06 (S14 pass):** W1 closed on 2026-09-07 (Progress). The
+"current next step" above was done: Graphshell's `admit_webrtc_catalog`
+(`ports/graphshell/src/native/projection_host.rs`) bridges the joined browser
+carrier into Djinn's catalog route, and the headed capture passed over the
+real WebRTC door. The header's "software acceptance implemented 2026-09-06"
+predates that close.
+
 **W2. The binding, authored.** The Chronicle recipe is expressed as a
 Scenograph definition — Source, Reading, Encoding, Arrangement, Interaction,
 Appearance, Provenance — over Distillery's endpoint, cited by a shelfmark whose
@@ -216,6 +226,10 @@ pointed at Djinn's resident log.
 *Done when:* one authored definition, two datasets, both read true in the
 headed receipt; the shelfmark round-trips; changing one lever (era bands off)
 yields a variant, not a new definition.
+
+**Corrected 2026-10-06 (S14 pass):** W2 landed: verified and closed on
+2026-09-08 (Progress), and its authored-definition contract moved into the
+`scenograph` crate on 2026-09-09.
 
 **W3. Circuit.** Training and Flora provenance as Circuit, subject to §3.2's
 entrance check; the workspace dependency graph as its second dataset.
@@ -594,3 +608,14 @@ runs onto the board. Not opened before that.
   seams remain owner-correlated event history for true Posted-to-terminal spans
   and a generation model that can cite accepted checkpoints alongside live
   materializations without conflating them.
+  **Corrected 2026-10-06 (S14 pass):** Turnstone adopted the split in
+  turnstone `dc7d227` (2026-09-09, on origin/main):
+  `turnstone/src/knot_authoring.rs` uses `PublicSourceRevision` and
+  `RuntimeSourceBinding`.
+
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_44_s14_phase_b6.md: the status names W3 and W4 as
+  the open work and `77a3701f052` as a genet commit, W1's stale next step and
+  W2's missing landed marker are annotated, and Turnstone's adoption in
+  `dc7d227` is recorded.

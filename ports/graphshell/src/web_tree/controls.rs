@@ -1,4 +1,7 @@
 // Copyright 2026 Mark Alan Boykin
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
 //! Graph controls use the same canvas operations as the existing product page.
@@ -49,7 +52,7 @@ pub(super) fn toolbar(page: &TreePage) -> Child {
             CanvasCommand::TogglePhysics,
         ),
     ];
-    let buttons: Vec<Child> = commands
+    let mut buttons: Vec<Child> = commands
         .into_iter()
         .map(|(label, command)| {
             Box::new(button(label, move |page: &mut TreePage, _| {
@@ -58,6 +61,18 @@ pub(super) fn toolbar(page: &TreePage) -> Child {
             })) as Child
         })
         .collect();
+    // Collapsed, the Graph tools region opens over the canvas from here.
+    if !tools_docked(page) {
+        buttons.push(Box::new(
+            button("Graph tools", |page: &mut TreePage, _| {
+                page.tools_open = !page.tools_open;
+            })
+            .attr(
+                "aria-expanded",
+                if page.tools_open { "true" } else { "false" },
+            ),
+        ));
+    }
     Box::new(
         el("nav", buttons)
             .attr("class", "tree-controls")
@@ -67,6 +82,9 @@ pub(super) fn toolbar(page: &TreePage) -> Child {
 
 impl TreePage {
     pub(super) fn pointer(&mut self, event: PointerEvent) {
+        if self.product.as_ref().is_some_and(|product| product.saving) {
+            return;
+        }
         if event.button != PointerButton::Primary {
             return;
         }
@@ -82,8 +100,95 @@ impl TreePage {
             PointerPhase::Up => {
                 canvas.pointer_up(mere::canvas::PointerButton::Left, x, y);
                 self.picked = canvas.focused_url().map(str::to_owned);
+                if let Some(product) = &mut self.product {
+                    product.select(canvas.selected_members().first().copied());
+                }
             },
         }
         self.shared.dirty.set(true);
     }
+}
+
+/// Probe-page configuration; the Canvas API accepts the same settings directly.
+/// The web host's GPU repulsion threshold: the node count at or above
+/// which the canvas stages `NodeExclusion` on the page's device, this host's
+/// measured crossover (physics stage 4.5 ms CPU against 1.5 on the device at
+/// 512 nodes, 1.1 against 3.1 at 256; ruled 2026-10-02, "Web N = 9, web
+/// threshold 400"). `gpu_threshold` overrides.
+pub(super) const WEB_GPU_THRESHOLD: usize = 400;
+/// How many steps old a device answer may be on this host. Chrome answers a
+/// readback about two frames after the submit, six steps at three a frame,
+/// so 9 covers it with a frame to spare (same ruling). `gpu_max_stale_steps`
+/// overrides.
+pub(super) const WEB_GPU_MAX_STALE_STEPS: u32 = 9;
+
+/// The page's GPU repulsion options: `gpu=off` keeps the CPU law (the
+/// baseline a receipt compares against), `gpu_threshold` and
+/// `gpu_max_stale_steps` override the host defaults above.
+#[derive(Clone, Copy, Debug)]
+pub(super) struct GpuOptions {
+    pub(super) enabled: bool,
+    pub(super) threshold: usize,
+    pub(super) max_stale_steps: u32,
+}
+
+pub(super) fn gpu_options() -> Result<GpuOptions, String> {
+    let search = web_sys::window()
+        .ok_or("no window")?
+        .location()
+        .search()
+        .map_err(|_| "cannot read page options")?;
+    let params =
+        web_sys::UrlSearchParams::new_with_str(&search).map_err(|_| "invalid page options")?;
+    let mut options = GpuOptions {
+        enabled: params.get("gpu").as_deref() != Some("off"),
+        threshold: WEB_GPU_THRESHOLD,
+        max_stale_steps: WEB_GPU_MAX_STALE_STEPS,
+    };
+    if let Some(value) = params.get("gpu_threshold") {
+        options.threshold = value.parse().map_err(|_| "invalid gpu_threshold")?;
+    }
+    if let Some(value) = params.get("gpu_max_stale_steps") {
+        options.max_stale_steps = value.parse().map_err(|_| "invalid gpu_max_stale_steps")?;
+    }
+    Ok(options)
+}
+
+/// A planted accessibility defect from `?plant_a11y=` (`missing_item`,
+/// `missing_action`, `dead_action`): the receipts' positive control.
+pub(super) fn reader_plant() -> Result<graphshell::canvas_reader::Plant, String> {
+    let search = web_sys::window()
+        .ok_or("no window")?
+        .location()
+        .search()
+        .map_err(|_| "cannot read page options")?;
+    let params =
+        web_sys::UrlSearchParams::new_with_str(&search).map_err(|_| "invalid page options")?;
+    match params.get("plant_a11y") {
+        None => Ok(graphshell::canvas_reader::Plant::None),
+        Some(value) => graphshell::canvas_reader::Plant::parse(&value)
+            .ok_or_else(|| format!("invalid plant_a11y {value}")),
+    }
+}
+
+pub(super) fn physics_config() -> Result<mere::canvas::ElapsedStepConfig, String> {
+    let mut config = mere::canvas::ElapsedStepConfig::default();
+    let search = web_sys::window()
+        .ok_or("no window")?
+        .location()
+        .search()
+        .map_err(|_| "cannot read page options")?;
+    let params =
+        web_sys::UrlSearchParams::new_with_str(&search).map_err(|_| "invalid page options")?;
+    if let Some(value) = params.get("physics_max_steps") {
+        config.max_steps = value.parse().map_err(|_| "invalid physics_max_steps")?;
+    }
+    if let Some(value) = params.get("physics_max_elapsed_ms") {
+        config.max_elapsed = std::time::Duration::from_millis(
+            value
+                .parse()
+                .map_err(|_| "invalid physics_max_elapsed_ms")?,
+        );
+    }
+    Ok(config)
 }

@@ -66,9 +66,20 @@ pub type NodeKey = petgraph::stable_graph::NodeIndex;
 /// instead of owning a frame loop and a settle budget of its own. (Lifted out
 /// of `mere-canvas` 2026-09-04.)
 pub mod runtime;
+#[cfg(not(all(target_family = "wasm", target_os = "unknown")))]
+pub use runtime::monotonic_clock;
 pub use runtime::{
-    ElapsedStepConfig, ElapsedStepReport, Physics, PhysicsCommand, PhysicsUpdate, TICK_DT,
-    TICK_DURATION,
+    DEFAULT_BUDGET_SHARE, ElapsedStepConfig, ElapsedStepReport, FALLBACK_DISPLAY_PERIOD, PaceStats,
+    Physics, PhysicsCommand, PhysicsUpdate, Speed, StepBudget, TICK_DT, TICK_DURATION,
+    display_period,
+};
+
+/// What each force is, term by term (topology, kernel, state, currency,
+/// class, metric, observable), and the instruments that check it.
+pub mod instruments;
+pub mod terms;
+pub use terms::{
+    Class, Currency, Declared, Kernel, Layout, Metric, Observable, State, Term, Topology,
 };
 
 /// Built-in force forces for the force-directed orrery layout.
@@ -82,8 +93,8 @@ pub use forces::{Boundary, EdgeSpring, NodeExclusion};
 pub mod laws;
 pub mod overlays;
 pub use laws::{
-    Anneal, Boids, Gravity, Hold, Kuramoto, LinLogForce, MagneticSpring, ParticleLife,
-    StressSpring, graph_distances,
+    Anneal, Boids, CounterDamping, Density, DensityGrid, DensityMedium, DensityStop, Gravity, Hold,
+    Kuramoto, LinLogForce, MagneticSpring, ParticleLife, StressSpring, graph_distances,
 };
 pub use overlays::{
     DegreeRepulsion, DepthGravity, DomainCluster, GravityLocus, GridSnap, HubGravity,
@@ -100,6 +111,17 @@ pub use tensor_forces::{
 pub use tensor_forces::{node_exclusion, repulsion};
 #[cfg(feature = "tensor-burn-wgpu")]
 pub use tensor_forces::{node_exclusion_wgpu_roundtrip, repulsion_wgpu_roundtrip};
+
+/// The lagged seam: a pairwise law evaluated elsewhere (the host's GPU) and
+/// applied a step or more later, the CPU law covering the steps it cannot.
+pub mod lagged;
+pub use lagged::{
+    DEFAULT_MAX_STALE_STEPS, LaggedLane, LaggedRepulsion, LaggedStats, Repulsion, RepulsionRoute,
+};
+
+/// [`LaggedRepulsion`] on the host's device through `conatus::resident`.
+#[cfg(feature = "gpu")]
+pub mod gpu;
 
 /// Barnes–Hut quadtree for O(n log n) approximate n-body repulsion — harvested
 /// from the retired `graph-layout`, for big-graph charge repulsion. The
@@ -124,6 +146,11 @@ pub use affinity_force::{
 
 pub mod anchor_force;
 pub use anchor_force::{AnchorSpring, DEFAULT_ANCHOR_SLACK, DEFAULT_ANCHOR_STIFFNESS};
+
+/// Arrangement roles: seeded, anchored or pinned, at recipe, group and item
+/// scope, and the axis locks an encoded axis takes. (Dynamics grammar plan, G7.)
+pub mod roles;
+pub use roles::{Axes, Role, RoleTable};
 
 /// Position-Based Fluids (PBF): our own small SPH liquid for the orrery (salva lags rapier badly,
 /// so we roll our own). The solver lives here; its seam onto the rigid world (loading + the two-way
@@ -255,8 +282,17 @@ fn scene_groups() -> InteractionGroups {
 /// Implementors should be cheap — the tick budget is ~16ms total —
 /// and write through `bodies.get_mut(...).add_force(...)` or
 /// equivalent. Forces are queried in registration order each tick.
-pub trait Force: Send {
+///
+/// Every force is [`Declared`]: it says what terms it applies, so a catalog
+/// reads its class and currency rather than restating them.
+pub trait Force: Declared + Send {
     fn apply(&self, ctx: &mut ForceContext<'_>, dt: f32);
+
+    /// Whether the force has motion of its own still to run, so the host
+    /// keeps ticking past its settle budget (a flow that has not converged).
+    fn wants_tick(&self) -> bool {
+        false
+    }
 }
 
 /// The complete law a [`RepulsionSolver`] must preserve.
@@ -354,13 +390,13 @@ impl std::fmt::Display for RepulsionSolverError {
 
 impl std::error::Error for RepulsionSolverError {}
 
-/// A host-injected, CPU-integrator pairwise-repulsion solver.
+/// A host-injected, synchronous pairwise-repulsion solver: the route tests
+/// and benches keep beside the lagged one ([`LaggedRepulsion`]).
 ///
-/// This is a staging seam: positions are supplied as host slices and validated
-/// forces return to Rapier. It is not the GPU-resident simulation interface;
-/// resident hosts keep buffers and scheduling at `conatus::resident` instead.
-/// [`NodeExclusion`] routes to it above [`Simulation::set_repulsion_solver`]'s
-/// threshold, falling back to its CPU law if it fails.
+/// Positions are supplied as host slices and validated forces return to
+/// Rapier in the same step. [`NodeExclusion`] routes to it above
+/// [`Simulation::set_repulsion_solver`]'s threshold, falling back to its CPU
+/// law if it fails.
 pub type RepulsionSolver = std::sync::Arc<
     dyn Fn(&[f32], &[f32], RepulsionRequest) -> Result<RepulsionForces, RepulsionSolverError>
         + Send
@@ -384,11 +420,13 @@ pub struct ForceContext<'a> {
     /// pairs, set via [`Simulation::sync_edges`]; seiche stays relation-taxonomy
     /// agnostic, so the caller decides which edge families feed the layout.
     pub edges: &'a [(NodeKey, NodeKey)],
-    /// Host-injected staging solver + the threshold above which
-    /// [`NodeExclusion`] routes to it, threaded from the [`Simulation`]. `None`
-    /// = always the native CPU scan.
-    pub repulsion_solver: Option<&'a RepulsionSolver>,
-    pub gpu_repulsion_threshold: usize,
+    /// The staged evaluator (synchronous or lagged) and the node count at or
+    /// above which [`NodeExclusion`] uses it, threaded from the
+    /// [`Simulation`]. `None` = always the native CPU scan.
+    pub repulsion: Option<&'a mut Repulsion>,
+    /// How many ticks the simulation has taken before this one: the clock a
+    /// lagged answer's age is measured on.
+    pub step: u64,
 }
 
 /// One rapier world + bookkeeping. The host owns one of these per
@@ -421,15 +459,17 @@ pub struct Simulation {
     /// affinity signal recomputes — and it applies in the same reset window as the built-ins.
     /// `None` = off (the default). (Graph signals — P4.)
     affinity_force: Option<AffinitySpring>,
-    /// Per-node springs toward arrangement-chosen slots: the layout as a
-    /// participant in the simulation rather than an override of it. Rebuilt
-    /// wholesale via [`set_anchor_force`](Self::set_anchor_force).
+    /// Per-node springs toward the anchored items' arrangement positions (the
+    /// anchored role, [`Role::Anchored`]). Rebuilt wholesale via
+    /// [`set_anchor_force`](Self::set_anchor_force).
     anchor_force: Option<AnchorSpring>,
-    /// Optional host-injected staging solver + the node count above which
-    /// [`NodeExclusion`] routes to it instead of its native CPU scan. `None` =
-    /// always native (the default). This does not give Rapier resident ownership.
-    repulsion_solver: Option<RepulsionSolver>,
-    gpu_repulsion_threshold: usize,
+    /// Optional host-injected staged evaluator (synchronous or lagged) + the
+    /// node count at or above which [`NodeExclusion`] routes to it instead of
+    /// its native CPU scan. `None` = always native (the default). Rapier keeps
+    /// every role either way.
+    repulsion: Option<Repulsion>,
+    /// Ticks taken so far; a lagged answer's age is counted on it.
+    steps: u64,
     /// Linear damping applied to every node body — runtime-tunable (the "inertia"
     /// the physics settings expose): lower keeps more drift after a settle, higher
     /// brings nodes to rest sooner. New bodies take this; [`set_linear_damping`]
@@ -506,8 +546,8 @@ impl Simulation {
             coupling_forces: Vec::new(),
             affinity_force: None,
             anchor_force: None,
-            repulsion_solver: None,
-            gpu_repulsion_threshold: DEFAULT_GPU_REPULSION_THRESHOLD,
+            repulsion: None,
+            steps: 0,
             linear_damping: DEFAULT_LINEAR_DAMPING,
             scene_bodies: HashMap::new(),
             scene_sprites: HashMap::new(),
@@ -553,8 +593,8 @@ impl Simulation {
     }
 
     /// Remove every built-in force (the catalog's `Still`): bodies coast to
-    /// rest under damping alone, and the arrangement's anchors — if installed
-    /// — are all that pulls.
+    /// rest under damping alone, and anchored items' springs, if installed,
+    /// are all that pulls.
     pub fn clear_forces(&mut self) {
         self.forces.clear();
     }
@@ -569,6 +609,21 @@ impl Simulation {
             .get(&node)
             .and_then(|&handle| self.bodies.get(handle))
             .map(|body| body.linvel())
+    }
+
+    /// The node bodies' rms speed, `√(Σ |v|² / n)`, in world units a second:
+    /// a settle is this falling under a floor, whatever the bodies' masses
+    /// or count (dynamics grammar plan, F46). Zero with no bodies.
+    pub fn rms_speed(&self) -> f32 {
+        let (sum, n) = self
+            .bodies_by_node
+            .values()
+            .filter_map(|&handle| self.bodies.get(handle))
+            .fold((0.0_f32, 0_u32), |(sum, n), body| {
+                let v = body.linvel();
+                (sum + v.x * v.x + v.y * v.y, n + 1)
+            });
+        if n == 0 { 0.0 } else { (sum / n as f32).sqrt() }
     }
 
     /// Total kinetic energy of the node bodies, `Σ ½ m v²` — the number a
@@ -605,8 +660,32 @@ impl Simulation {
     /// This does not make this Rapier simulation GPU-resident. See
     /// [`RepulsionSolver`].
     pub fn set_repulsion_solver(&mut self, solver: Option<RepulsionSolver>, threshold: usize) {
-        self.repulsion_solver = solver;
-        self.gpu_repulsion_threshold = threshold.max(1);
+        self.repulsion = solver.map(|solver| Repulsion {
+            route: RepulsionRoute::Sync(solver),
+            threshold: threshold.max(1),
+        });
+    }
+
+    /// Install (or clear, with `None`) a lagged evaluator: at or above
+    /// `threshold` nodes, [`NodeExclusion`] applies the newest answer that is
+    /// at most `max_stale_steps` old and for the same bodies, and runs its CPU
+    /// law on every other step. Replaces any synchronous solver. `threshold`
+    /// 0 behaves as 1: every non-empty graph uses the device.
+    pub fn set_lagged_repulsion(
+        &mut self,
+        solver: Option<Box<dyn LaggedRepulsion>>,
+        threshold: usize,
+        max_stale_steps: u32,
+    ) {
+        self.repulsion = solver.map(|solver| Repulsion {
+            route: RepulsionRoute::Lagged(LaggedLane::new(solver, max_stale_steps)),
+            threshold: threshold.max(1),
+        });
+    }
+
+    /// The installed lagged lane's counts (`None` when no lane is installed).
+    pub fn repulsion_stats(&self) -> Option<LaggedStats> {
+        self.repulsion.as_ref().and_then(Repulsion::stats)
     }
 
     /// Install (or clear, with `None`) the pairwise **affinity** force wholesale — the rebuild a
@@ -617,10 +696,9 @@ impl Simulation {
         self.affinity_force = force;
     }
 
-    /// Install (or clear, with `None`) per-node **anchor** springs toward an
-    /// arrangement's chosen slots. This is how a layout composes with running
-    /// physics: rather than overriding positions, it pulls toward them while
-    /// repulsion, edge springs, collisions, coupled fields, and drag keep
+    /// Install (or clear, with `None`) per-node **anchor** springs toward the
+    /// anchored items' arrangement positions: they return there while
+    /// repulsion, edge springs, collisions, coupled fields and drag keep
     /// acting. Position-preserving, like every other force swap; the host
     /// follows with a `settle` to let the new equilibrium take.
     pub fn set_anchor_force(&mut self, force: Option<AnchorSpring>) {
@@ -671,6 +749,7 @@ impl Simulation {
                 .map(|f| f.params().particle_radius)
                 .unwrap_or(0.0),
             energy: self.kinetic_energy(),
+            speed: self.rms_speed(),
             generation,
         }
     }
@@ -749,8 +828,8 @@ impl Simulation {
                 joints: &mut self.impulse_joints,
                 bodies_by_node: &self.bodies_by_node,
                 edges: &self.edges,
-                repulsion_solver: self.repulsion_solver.as_ref(),
-                gpu_repulsion_threshold: self.gpu_repulsion_threshold,
+                repulsion: self.repulsion.as_mut(),
+                step: self.steps,
             };
             for force in &self.forces {
                 force.apply(&mut ctx, dt);
@@ -764,9 +843,8 @@ impl Simulation {
             if let Some(force) = &self.affinity_force {
                 force.apply(&mut ctx, dt);
             }
-            // Anchor springs last: the arrangement's pull sits on top of the
-            // graph's own forces, so stiffness reads as "how much does the
-            // arrangement win". (Arrangement as attractor.)
+            // Anchor springs last: an anchored item's return sits on top of
+            // the graph's own forces. (Arrangement roles, G7.)
             if let Some(force) = &self.anchor_force {
                 force.apply(&mut ctx, dt);
             }
@@ -801,6 +879,7 @@ impl Simulation {
         // Two-way coupling: the pool bounces off the scene bodies + (when the graph is tangible) the
         // node bodies, and shoves the dynamic ones back. (Physics scenes P4c.)
         self.couple_fluid_to_bodies();
+        self.steps += 1;
     }
 
     // `write_positions_to(&mut Graph)` — which copied each body's translation back
@@ -862,6 +941,10 @@ const _: fn() = || {
 // physics through `sync_nodes` / `sync_edges`, not a mere `Graph`).
 #[cfg(test)]
 mod tests;
+
+/// The lagged seam's receipts on evaluators whose timing the test controls.
+#[cfg(test)]
+mod lagged_tests;
 
 /// Integration tests for the scene / fluid / field / emitter tiers (split alongside them).
 #[cfg(test)]

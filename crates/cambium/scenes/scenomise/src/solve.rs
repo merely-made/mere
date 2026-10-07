@@ -168,8 +168,8 @@ fn report_holds(score: &Score, mut scene: Scene) -> Scene {
 
     // A hold naming a source this score never placed is an unmet pin. Before
     // this it was dropped in silence, which is the same failure as moving a pin
-    // and saying nothing. Encourage-class holds are excluded on purpose: an
-    // anchored home that goes unplaced is best effort behaving as designed.
+    // and saying nothing. Seeded and anchored holds are excluded on purpose:
+    // neither must be honored, so one that goes unplaced is not a violation.
     scene.unmet_holds = score
         .holds
         .iter()
@@ -499,7 +499,7 @@ mod tests {
         let scene = solve(&score);
         let pinned = pinned_instances(&score, &scene);
         assert_eq!(pinned.len(), 2, "both instances of source 0 are pinned");
-        // Anchored is best effort, so it is not immovable.
+        // Anchored returns rather than holds, so it is not immovable.
         for instance in &pinned {
             assert_eq!(
                 scene.sources[scene.items[instance.0 as usize].source.0 as usize].id,
@@ -529,17 +529,17 @@ mod tests {
     }
 
     #[test]
-    fn an_anchored_hold_is_not_recorded_as_honored() {
-        // Encourage-class is a suggestion. Recording it as honored would invite
-        // a later pass to treat it as binding, which is the opposite of what
-        // anchored means.
-        let mut score = Score::new(Arrangement::Spiral(Spiral::default()));
-        score.items.push(card(0, 0));
-        score.holds.push(HeldPlacement::anchored(
-            SourceRef::new("fixture", "0"),
-            Vec2::new(1.0, 1.0),
-        ));
-        assert!(solve(&score).honored_holds.is_empty());
+    fn a_seeded_or_anchored_hold_is_not_recorded_as_honored() {
+        // Neither is binding. Recording one as honored would invite a later
+        // pass to treat it as a pin, which is the opposite of what both mean.
+        for held in [HeldPlacement::seeded, HeldPlacement::anchored] {
+            let mut score = Score::new(Arrangement::Spiral(Spiral::default()));
+            score.items.push(card(0, 0));
+            score
+                .holds
+                .push(held(SourceRef::new("fixture", "0"), Vec2::new(1.0, 1.0)));
+            assert!(solve(&score).honored_holds.is_empty());
+        }
     }
 
     #[test]
@@ -586,16 +586,18 @@ mod tests {
     }
 
     #[test]
-    fn an_unplaced_anchor_is_not_a_violation() {
-        // Encourage-class is best effort by definition, so its absence is not
-        // reported; only ensure-class earns a violation.
-        let mut score = Score::new(Arrangement::Spiral(Spiral::default()));
-        score.items.push(card(0, 0));
-        score.holds.push(HeldPlacement::anchored(
-            SourceRef::new("fixture", "ghost"),
-            Vec2::new(7.0, 7.0),
-        ));
-        assert!(solve(&score).unmet_holds.is_empty());
+    fn an_unplaced_seed_or_anchor_is_not_a_violation() {
+        // Neither must be honored, so its absence is not reported; only a pin
+        // earns a violation.
+        for held in [HeldPlacement::seeded, HeldPlacement::anchored] {
+            let mut score = Score::new(Arrangement::Spiral(Spiral::default()));
+            score.items.push(card(0, 0));
+            score.holds.push(held(
+                SourceRef::new("fixture", "ghost"),
+                Vec2::new(7.0, 7.0),
+            ));
+            assert!(solve(&score).unmet_holds.is_empty());
+        }
     }
 
     fn overlaps(a: &Rect, b: &Rect) -> bool {

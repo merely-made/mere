@@ -1,11 +1,21 @@
 # Eidetic Deferred Phases — Implementation Plan (2026-06-09)
 
-**Status**: Active (open tail spun out of the completed layered-stack plan).
+**Status (2026-10-06):** Active, the open tail of the completed layered-stack
+plan. Phase 8 and Phase 9's producer half moved to the browsing derivation
+plan (active), where `BrowsingMemory` and `crates/intel/eidetic-search` exist.
+Open here, with no code landed: Phase 7 (`eidetic-opfs`) and Phase 9's
+consume half (`EngramDirectory`).
 **Spun out of**: `archive_docs/.../2026-05-09_eidetic_layered_stack_plan.md` (Phases 1-6
 plus all nine sidequests shipped; that plan is archived as complete).
 **Source design**: [`../research/2026-05-09_eidetic_design_pass.md`](../research/2026-05-09_eidetic_design_pass.md)
 **Crate family**: `repos/mere/crates/eidetic/` (`eidetic-core`, `eidetic-fjall`,
 `eidetic-https-fetcher`, `eidetic-iroh-fetcher` shipped).
+**Corrected 2026-10-06 (S14 pass):** `eidetic-fjall`, `eidetic-https-fetcher`
+and `eidetic-iroh-fetcher` were folded into `eidetic` as features on
+2026-09-23 (`fjall` in `3943874f`; `https-fetcher` and `iroh-fetcher` in
+`254b23b6`; see `crates/eidetic/eidetic-core/Cargo.toml`). `crates/eidetic/`
+now holds chartulary, eidetic-core (package `eidetic`), hagiograph and
+muniment.
 
 The four-layer stack (blob → manifest → typed-payload → memory-domain), the
 schemas-as-engrams recursion, three-axis classification, BLAKE3/CIDv1 addressing,
@@ -77,10 +87,22 @@ durable layer, two faces. (DocumentScript's deferred `persistent-storage` profil
 world is the third: one host-agnostic WIT contract, `OpfsStore` browser /
 `FjallStore` native.)
 
+**Open, raised by the S14 pass (2026-10-06):** Phase 7 and the newer
+browser-storage work ignore each other. Muniment's `IndexedDbBackend`
+(`crates/eidetic/muniment/src/indexeddb_backend.rs`) is the browser store
+today, per the [redb over OPFS feasibility plan](../../archive_docs/2026-10-06_completed_plans/2026-08-22_redb_opfs_feasibility_plan.md),
+which has its own probe (`ports/muniment-opfs-probe`); and the
+[orrery browser lane plan](../../archive_docs/2026-10-06_superseded_plans/2026-06-24_orrery_browser_lane_plan.md)
+says its lane activates Phase 7, which this plan records only as a trigger
+emerging. What becomes of Phase 7? Options: keep the hand-rolled
+`eidetic-opfs` Store and reconcile it with Muniment's `IndexedDbBackend` and
+the redb-over-OPFS plan; fold Phase 7 into the redb-over-OPFS plan; retire
+Phase 7.
+
 ### Phase 8 — `eidetic::browsing` (Layer-4 browsing memory)
 
 **ACTIVATED 2026-06-12** → built under the
-[browsing derivation plan](2026-06-12_eidetic_browsing_derivation_plan.md)
+[browsing derivation plan](../../archive_docs/2026-10-06_completed_plans/2026-06-12_eidetic_browsing_derivation_plan.md)
 (slices E1/E2; the pull is Mark directly — the single-consumer rule).
 
 Browsing-memory accumulation composing `BrowsingTrace` and related typed payloads
@@ -99,7 +121,7 @@ than duplicate a visited-set.
 ### Phase 9 — `SearchIndex` schema + tantivy
 
 **Producer half ACTIVATED 2026-06-12** → built native-first under the
-[browsing derivation plan](2026-06-12_eidetic_browsing_derivation_plan.md)
+[browsing derivation plan](../../archive_docs/2026-10-06_completed_plans/2026-06-12_eidetic_browsing_derivation_plan.md)
 (slices E3/E4: `eidetic-search`, the format-versioned `SearchIndex` engram,
 BM25 recall + fast-field reports, the engine-agnostic hybrid-fusion seam).
 The **consume half stays here** (EngramDirectory over iroh-blobs ranges,
@@ -214,7 +236,7 @@ checkout at `Code/.tantivy-probe` — and the design pass §7.5):**
   hybrid-retrieval (BM25 + vector) tie to geist RAG. Still trigger-gated; no
   code.
 - 2026-06-12 — **Phase 8 and Phase 9's producer half activated** into the
-  [browsing derivation plan](2026-06-12_eidetic_browsing_derivation_plan.md)
+  [browsing derivation plan](../../archive_docs/2026-10-06_completed_plans/2026-06-12_eidetic_browsing_derivation_plan.md)
   (Mark pulled the user-value arc directly: derive useful information from
   your own browsing). This plan remains the umbrella for Phase 7, the wasm
   probe, and Phase 9's consume/federation half.
@@ -272,3 +294,4 @@ checkout at `Code/.tantivy-probe` — and the design pass §7.5):**
   unmeasured piece, deferred (needs `wasm-bindgen-cli`); it does not change the
   pack verdict. All probes (eidetic-opfs crate, the JS bench, the fjall bench) live in
   the scratchpad; no code landed in-tree.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at mere 535bca11, from the D2 record in support/doc-audit/d2/batch_39_s14_phase_b1.md: the status dated and narrowed to Phase 7 and Phase 9's consume half, the crate-family line corrected for the 2026-09-23 folds, and Phase 7's overlap with Muniment and the redb-over-OPFS plan raised as an open question.

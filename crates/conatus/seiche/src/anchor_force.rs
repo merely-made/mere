@@ -4,25 +4,26 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! Anchor springs — an arrangement expressed as a *field* rather than an
-//! override.
+//! Anchor springs: the anchored role's return (dynamics grammar plan, G7).
 //!
-//! A layout that writes positions is an authority: it decides where a node is,
-//! and the simulation has nothing to say. An anchor spring makes the same
-//! layout a **participant**: each node is pulled toward the slot the
-//! arrangement chose, while repulsion, edge springs, collisions, coupled
-//! fields, and the user's drag all still act on it. Stiffness is the dial
-//! between the two readings — high holds the arrangement's shape, low lets the
-//! graph's own forces win, zero is pure physics.
+//! An arrangement is positions, and physics acts on them (F11). An item whose
+//! position is **anchored** returns to it while physics runs: each anchored
+//! node is pulled toward its position while repulsion, edge springs,
+//! collisions, coupled fields and the user's drag all still act on it. Seeded
+//! items get no spring and pinned items are kinematic, so this force carries
+//! only the anchored ones ([`crate::Role`]). Stiffness is how firmly the
+//! return pulls; zero makes the anchor inert.
 //!
-//! This is what lets an arrangement compose with running physics instead of
-//! excluding it, and it is deliberately the same shape as
-//! [`CouplingForce`](crate::CouplingForce): a target, a response, a strength.
+//! It is deliberately the same shape as [`CouplingForce`](crate::CouplingForce):
+//! a target, a response, a strength.
 
 use rapier2d::prelude::*;
 use std::collections::HashMap;
 
-use crate::{Force, ForceContext, NodeKey};
+use crate::terms::spring;
+use crate::{
+    Class, Declared, Force, ForceContext, Kernel, Layout, NodeKey, Observable, Term, Topology,
+};
 
 /// Default pull toward an anchor, in force per unit of offset. Chosen so a node
 /// displaced by roughly a node-width returns without visible overshoot at the
@@ -33,7 +34,7 @@ pub const DEFAULT_ANCHOR_STIFFNESS: f32 = 12.0;
 /// node rests instead of jittering against its own target.
 pub const DEFAULT_ANCHOR_SLACK: f32 = 0.5;
 
-/// Per-node springs toward arrangement-chosen target positions.
+/// Per-node springs toward the anchored items' arrangement positions.
 ///
 /// Install with
 /// [`Simulation::set_anchor_force`](crate::Simulation::set_anchor_force). The
@@ -42,8 +43,8 @@ pub const DEFAULT_ANCHOR_SLACK: f32 = 0.5;
 pub struct AnchorSpring {
     anchors: HashMap<NodeKey, Vector>,
     /// Force per unit of offset from the anchor. Public for host tuning
-    /// (configurability over opinionated defaults): this is the dial between
-    /// "the arrangement holds" and "the graph's own forces win".
+    /// (configurability over opinionated defaults): how firmly an anchored
+    /// item returns.
     pub stiffness: f32,
     /// Offset below which the anchor is satisfied and exerts nothing.
     pub slack: f32,
@@ -62,8 +63,7 @@ impl AnchorSpring {
         }
     }
 
-    /// The same anchors at an explicit stiffness. `0.0` makes an inert force —
-    /// the arrangement becomes a pure initial condition.
+    /// The same anchors at an explicit stiffness. `0.0` makes an inert force.
     pub fn with_stiffness(mut self, stiffness: f32) -> Self {
         self.stiffness = stiffness.max(0.0);
         self
@@ -102,6 +102,41 @@ impl Force for AnchorSpring {
                 body.add_force(pull, true);
             }
         }
+    }
+}
+
+/// The anchored role's target term: a spring to each anchored node's
+/// position with a slack, class E.
+impl Declared for AnchorSpring {
+    fn terms(&self) -> Vec<Term> {
+        vec![Term::force(
+            "anchor",
+            Topology::Unary,
+            Kernel::Spring,
+            Class::E,
+            Observable::Residual,
+        )]
+    }
+
+    /// `(k/2)(|x − slot| − slack)²` beyond the slack.
+    fn energy(&self, _term: usize, layout: &Layout<'_>) -> Option<f64> {
+        if self.stiffness <= 0.0 {
+            return Some(0.0);
+        }
+        let (k, slack) = (f64::from(self.stiffness), f64::from(self.slack));
+        Some(
+            layout
+                .nodes
+                .iter()
+                .enumerate()
+                .filter_map(|(i, (key, _))| {
+                    let anchor = self.anchors.get(key)?;
+                    let (x, y) = layout.at(i);
+                    let d = (f64::from(anchor.x) - x).hypot(f64::from(anchor.y) - y);
+                    Some(if d > slack { spring(k, d, slack) } else { 0.0 })
+                })
+                .sum(),
+        )
     }
 }
 

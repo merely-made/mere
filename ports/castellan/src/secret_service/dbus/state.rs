@@ -4,7 +4,7 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-use std::collections::{BTreeSet, HashMap};
+use std::collections::BTreeSet;
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
 
@@ -17,6 +17,7 @@ use super::{
     DbusResult, SecretDbusError, SecretServiceLimits, SecretServiceStore, item_path,
     parse_collection_path, parse_item_path,
 };
+use crate::secret_service::sessions::{SessionRefusal, SessionTable};
 use crate::secret_service::{SecretCollectionId, SecretItemId};
 
 /// Bus-authenticated caller facts supplied to the resident access policy.
@@ -88,9 +89,8 @@ where
 
 pub(super) struct ServiceState {
     pub(super) store: SecretServiceStore,
-    limits: SecretServiceLimits,
     policy: Arc<dyn SecretServiceAccessPolicy>,
-    sessions: Mutex<HashMap<String, String>>,
+    sessions: SessionTable,
     locked_collections: Mutex<BTreeSet<SecretCollectionId>>,
     locked_items: Mutex<BTreeSet<SecretItemId>>,
 }
@@ -103,9 +103,8 @@ impl ServiceState {
     ) -> Self {
         Self {
             store,
-            limits,
             policy,
-            sessions: Mutex::new(HashMap::new()),
+            sessions: SessionTable::new(limits.max_sessions),
             locked_collections: Mutex::new(BTreeSet::new()),
             locked_items: Mutex::new(BTreeSet::new()),
         }
@@ -129,34 +128,20 @@ impl ServiceState {
     }
 
     pub(super) fn open_session(&self, owner: &str) -> DbusResult<OwnedObjectPath> {
-        let mut sessions = self.sessions.lock().unwrap();
-        if sessions.len() >= self.limits.max_sessions {
-            return Err(SecretDbusError::LimitsExceeded(format!(
-                "the resident retains at most {} Secret Service sessions",
-                self.limits.max_sessions
-            )));
-        }
-        let id = uuid::Uuid::new_v4();
-        let path =
-            OwnedObjectPath::try_from(format!("/org/freedesktop/secrets/session/{}", id.simple()))
-                .expect("UUID session path is valid");
-        sessions.insert(path.as_str().to_owned(), owner.to_string());
-        Ok(path)
+        let path = self.sessions.open(owner).map_err(session_error)?;
+        Ok(OwnedObjectPath::try_from(path).expect("UUID session path is valid"))
     }
 
     pub(super) fn require_session(&self, path: &OwnedObjectPath, owner: &str) -> DbusResult<()> {
-        match self.sessions.lock().unwrap().get(path.as_str()) {
-            Some(session_owner) if session_owner == owner => Ok(()),
-            _ => Err(SecretDbusError::NoSession(
-                "session is absent or belongs to another D-Bus connection".into(),
-            )),
-        }
+        self.sessions
+            .require(path.as_str(), owner)
+            .map_err(session_error)
     }
 
     pub(super) fn close_session(&self, path: &OwnedObjectPath, owner: &str) -> DbusResult<()> {
-        self.require_session(path, owner)?;
-        self.sessions.lock().unwrap().remove(path.as_str());
-        Ok(())
+        self.sessions
+            .close(path.as_str(), owner)
+            .map_err(session_error)
     }
 
     pub(super) fn collection_locked(&self, id: SecretCollectionId) -> bool {
@@ -247,6 +232,18 @@ impl ServiceState {
         for item in items {
             locked_items.remove(&item);
         }
+    }
+}
+
+/// The D-Bus errors the session table's refusals have always produced.
+fn session_error(refusal: SessionRefusal) -> SecretDbusError {
+    match refusal {
+        SessionRefusal::Full(max) => SecretDbusError::LimitsExceeded(format!(
+            "the resident retains at most {max} Secret Service sessions"
+        )),
+        SessionRefusal::Absent => SecretDbusError::NoSession(
+            "session is absent or belongs to another D-Bus connection".into(),
+        ),
     }
 }
 

@@ -15,13 +15,17 @@
 #![doc(html_no_source)]
 
 pub mod conditions;
+pub mod enrollment;
 pub mod pairing;
 pub mod personal_sync;
 pub mod resident;
 pub mod resident_blobs;
+pub mod resident_devices;
 pub mod resident_distillery;
+pub mod resident_events;
 pub mod resident_knot;
 pub mod resident_mere;
 pub mod resident_reservoir;
 pub mod resident_site;
+pub mod resident_status;
 pub mod settings;

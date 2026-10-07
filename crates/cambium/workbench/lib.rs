@@ -22,6 +22,11 @@
 /// A host-assigned identity for a tile, stable across the renders of one running
 /// surface. Opaque to the contract (the host mints + interprets it).
 mod float;
+mod presentation;
+pub use presentation::{
+    CollapsedStack, DrawerGeometry, PresentationEvent, SplitPresentation, StackPresentation,
+    WorkbenchPresentation,
+};
 pub use float::{
     FloatDockTarget, FloatEvent, FloatSizeConstraints, FloatingTile, RelativeRect, Workspace,
     WorkspaceEvent,

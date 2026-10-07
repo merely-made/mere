@@ -1,27 +1,32 @@
 # Conatus Shared Spatial Runtime
 
 **Date:** 2026-08-22  
-**Status:** active; body/runtime foundation, private-backend integrity, first
-profile-local resident body-position publication, and first product renderer
-tenant implemented; Nexus admission probe blocked at its upstream Windows
-shader build; scope corrected 2026-08-23. 2026-08-26: Mesocosm's runtime
+**Status (2026-10-06):** active; body/runtime foundation and private-backend
+integrity (`339e8567`) implemented. The first profile-local resident
+body-position publication and the first product renderer tenant were
+implemented in Isometry's `isometry-runtime`, since retired (relayed, §3), and
+stand as historical receipts. Nexus admission probe blocked at its upstream
+Windows shader build; scope corrected 2026-08-23. `quint` was folded into its
+owners at `eae87153` (Existing pieces). 2026-08-26: Mesocosm's runtime
 became the first product tactile consumer (terrarium picking over
-`BodyWorld`, Rapier private), quint's `ResidentChunk` join was proven with
-per-brick patches, tracer-validated read epochs, and allocator-observed
-bytes (V1b), and `conatus-brick` — the shared sparse-brick ABI both game
-vessels pin — advanced on `codex/conatus-brick-lift` to `bd8f0044`.
+`BodyWorld`, Rapier private), quint's `ResidentChunk` join (now
+`conatus::resident`) was proven with per-brick patches, tracer-validated read
+epochs, and allocator-observed bytes (V1b), and `conatus-brick` (`modulus`
+since `33f9b6b6`) — the shared sparse-brick ABI both game vessels pin —
+advanced on `codex/conatus-brick-lift` to `bd8f0044`.
 2026-09-26: `modulus`'s shrinking-retarget defect fixed and its atlas sized
 to the card by `AtlasLimits`, ruled by Mark (brick-atlas pass below).
 2026-09-27: `modulus`'s `brick_dda` takes each voxel crossing afresh from the
 eye instead of accumulating it and clamps its first voxel into the pointer
 volume, and the same walk is public on the CPU as `BrickMap::trace`, all
-ruled by Mark (brick-traversal precision pass below); on branch
-`dda-precision`, not yet merged.
+ruled by Mark (brick-traversal precision pass below); on main since
+2026-09-27 (`a404cd48`, `5e46956a`, `c3e054d6`).
 2026-09-28: body-binding shape and the T2 voxel-store lane carried from the
 wing's existing rulings into §1 and §2. Both are planned, not implemented;
 body bindings remain document-only under ruling 346, and T2 waits for the
-accepted pre.4 migration under ruling 363. This documentation pass neither
-implements nor certifies the separate query-refresh API.
+accepted pre.4 migration under ruling 363 (main is on pre.4 since
+2026-10-05; see T2). This documentation pass neither implements nor
+certifies the separate query-refresh API.
 **Scope:** Build the shared spatial runtime. Mesocosm, Paredros, Isometry,
 and Mere projections consume it through product-owned runtime profiles
 instead of incubating spatial machinery in product-local probes.
@@ -48,7 +53,7 @@ The corrections, each carried into the body text below:
 - Seiche remains the graph-oriented 2D specialist, not an eventual adapter.
 - The host/profile orders passes; allocation ownership follows advanced
   state (the host-conducts ruling,
-  [spatial compute plan](../technical_architecture/2026-08-13_spatial_compute_plan.md)).
+  [spatial compute plan](../../archive_docs/2026-10-06_completed_plans/2026-08-13_spatial_compute_plan.md)).
   Netrender's tenancy seam stays the device seam.
 - The engine-owned render view becomes a lean spatial frame with no cameras,
   lights, sprites, or presentation policy (§4).
@@ -98,6 +103,16 @@ changes the engine path itself.
 | Netrender | One-device tenancy and final frame composition |
 | Renderling | 3D scene/render implementation, consumed as a tenant |
 | Mesocosm voxel types | First source material for generic voxel storage, revision, dirty-region, collision, and meshing features; since 2026-08-26 Mesocosm is also a runtime consumer, holding `BodyWorld` tactile advice through its own `mesocosm-runtime` adapter |
+
+*Annotation, 2026-10-06 (S14 pass):* `quint` is no longer a crate.
+`eae87153` (authored 2026-08-31, on main 2026-09-02) folded it into its
+owners: the resident allocations and chunks into `conatus::resident`
+(`crates/conatus/conatus/src/resident/`, feature `resident`), field
+evaluation and Burn lowering into `numen` (`eval.rs`, `lower_burn.rs`), and
+its forces into `seiche` (`crates/conatus/seiche/src/tensor_forces.rs`).
+Read "Quint" below (§2,
+§3, §5 and the implementation order's items 4 and 6) as those owners.
+`conatus-brick` is `modulus` since `33f9b6b6` (2026-08-28).
 
 The dependency direction is runtime to implementation only. Product crates
 depend on Conatus. Conatus must not depend on a game.
@@ -151,6 +166,15 @@ Rapier imports and handles are confined to the private implementation, and
 warnings-denied checks pass. This proves a code boundary only. Nexus earns a
 backend seat later through an isolated lifecycle/query receipt and the exact
 host-device receipt; it does not inherit one from opacity alone.
+
+*Annotation, 2026-10-06, a tail taken from the archived spatial compute plan*
+(the S14 archive pass, recorded in `2026-07-03_archived_plan_tails_plan.md`, "2026-10-06
+archive pass"): **the Nexus adoption watch** is this plan's. The trigger is the
+tactile body count outgrowing CPU rapier. When a product's tactile body count
+meets that, Nexus's backend seat is reconsidered under the condition above:
+an isolated lifecycle and query receipt, plus the exact host-device receipt.
+Wing ruling 604 adds a requirement: any backend must keep G8's bit-for-bit
+replay across machines.
 
 Complete at Mere commit `339e8567`: six `conatus-voxel` tests, eighteen
 Conatus unit tests, the cross-package voxel-collider integration test, and
@@ -310,6 +334,22 @@ from this documentation update. The source rulings live in
 `isometry/eponym/design_docs/2026-09-09_functional_loops_plan.md` retains the
 product receipt and adoption dependencies.
 
+*Annotation, 2026-10-06 (S14 pass):* main moved to pre.4 on 2026-10-05,
+when S16 merged the pre.4 branch at `cec0b3a4` under ruling 557, "Promote,
+then handoffs" (burn migration plan §13.44). Whether that is the acceptance
+ruling 363 waits for is not recorded here.
+
+*Ruled 2026-10-06:* asked whether ruling 557's promotion, together with Knot's
+and djinn's repins onto pre.4, counts as 363's acceptance (options: yes; no,
+not until Isometry repins; ask the wing session), Mark answered **"Yes,
+however, 0.22 also dropped today."** *Follows:* T2's pre.4 condition is met. T2
+still needs its own lane and Isometry's pin. Burn 0.22.0 stable was published
+2026-10-06T18:46Z and CubeCL 0.11.0 at 15:59Z (crates.io), so the next Burn
+step is pre.4 → 0.22.0, which goes to Mark as its own assessment (burn plan).
+
+*Annotation, the same day:* the stable migration merged on mere main (burn plan
+§13.47), so T2's Burn baseline is now stable 0.22.0, not pre.4.
+
 1. **Nisus becomes the voxel world store** (330): a chunk map, world
    revision, revision log and additive writes extend its revision-gated
    chunk patches. `Ground` becomes a thin product layer over that store or
@@ -369,6 +409,15 @@ and tenant selection. Conatus's existing `FrameUpdate` remains unchanged.
 This disposable product projection does not settle allocation ownership for
 state advanced directly on the GPU, or establish a shared frame or lease.
 
+*Annotation, 2026-10-06 (S14 pass; relayed, not verified here):* the S14
+pass's record (`support/doc-audit/d2/batch_46_s14_phase_b8.md`) and its
+coordinator relay that this slice's Isometry half (`15f5da2`) and §4's
+marker tenant (`7d45c40`) lived in Isometry's `isometry-runtime` crate,
+which Isometry retired at `73a31409` on 2026-09-27 under wing ruling 299.
+Isometry's repository was not read for this annotation. Both are historical
+receipts, not live code; §1 already records the crate's retirement. Mere's
+half, `c382e734`, is on main, its resident code now in `conatus::resident`.
+
 Burn/CubeCL handles dense fields and authored kernels. Khal/rust-gpu artifacts
 are adopted where their explicit spatial algorithms are useful. Tool choice
 follows the operation. Allocation ownership follows advanced state: Conatus
@@ -399,6 +448,8 @@ suballocation directly, projects through configurable basis and appearance
 settings, renders into its own same-device texture, and gives Netrender an
 explicit external-composition boundary. Netrender learns neither Conatus body
 semantics nor Quint allocation policy.
+*Annotation, 2026-10-06 (S14 pass; relayed):* this tenant was retired with
+`isometry-runtime` (§3's annotation) and is a historical receipt.
 
 Renderling remains a candidate for a later 3D portion through another
 profile-owned adapter. It was not pulled into the 2D proof because its current
@@ -452,6 +503,8 @@ product systems use.
 1. Make the current private Rapier implementation a real internal boundary;
    keep backend selection private until a named product workload forces a
    second implementation.
+   *Annotation, 2026-10-06 (S14 pass):* done 2026-08-24 at `339e8567`, the
+   private backend integrity pass above; backend selection stays private.
 2. Keep extending `conatus` as the shared spatial package; `seiche` stays the
    2D graph specialist rather than the 2D graph API becoming the 3D core or
    being forced through it.
@@ -466,6 +519,10 @@ product systems use.
    Add a Renderling or other 3D adapter only when a product lens demands it,
    and keep shared frame vocabulary provisional until a second game challenges
    it.
+   *Annotation, 2026-10-06 (S14 pass; relayed):* the body-position view in
+   item 4 and this tenant were Isometry's, retired with `isometry-runtime`
+   (§3's annotation); Quint's allocations are `conatus::resident`'s (Existing
+   pieces).
 6. Add optional field adapters and spatial scripting against the shared
    resources without making Numen or Quint depend on Conatus.
 
@@ -527,6 +584,173 @@ contract declared in advance.
   build reaches `nexus_rbd3d`, then the Khal build script's `cargo-gpu 0.1.0`
   invocation fails while removing `Cargo.lock`. No Nexus kernel executed, so
   Nexus remains outside Conatus and shared buffer ownership remains unproven.
+  *Annotation (2026-10-01):* diagnosed and cleared after Mark ruled "Fix now"
+  (physics catalog plan §5). The failure was a race, not a missing-file bug:
+  two Nexus build scripts (vortx's and `nexus_rbd2d`'s) each run `cargo gpu
+  build`, and cargo-gpu 0.1.0 has no lock around its shared codegen install,
+  so one process's `Cargo.lock` removal or `target\` cleanup lands under the
+  other (os errors 2, 145 and 3; all three cold concurrent runs failed). The
+  rust-gpu fork's cargo-gpu 0.10.0-alpha.1 already takes a `FileLock` on the
+  install; with it unpatched, the same cold runs passed 2 of 2, `nexus_rbd2d`'s
+  five GPU radix-sort tests passed, and `nexus_rbd3d`'s `test_stacks_1_tiny`
+  ran 250 GPU steps on the RTX 4060 (Vulkan). Logs:
+  `Code/testing/nexus-build/`. No patch was made; whether to patch anyway,
+  replace the installed 0.1.0 binary, and pin the codegen version are open.
+  This proves Nexus kernels execute here; shared buffer ownership with the
+  host's device is still unproven.
+  Ruled the same day:
+  - **The fork patch.** Mark chose no patch ("1"), and added: "also make sure
+    we're up to date for, rust-gpu, renderling, and nexus. they develop fast.
+    let's get what we can from their respective upstreams". At that check,
+    nexus was 2 commits behind upstream main (`1cfbd76`), the rust-gpu fork
+    branch 27 behind (`0a9d096f32`, the v0.10.0 release) with our two
+    version-gate commits on top, renderling 1 behind with our four wgpu-30
+    commits plus 26 uncommitted files last touched 2026-09-15, and the
+    standalone cargo-gpu archived upstream (merged into rust-gpu).
+  - **The installed cargo-gpu.** "Replace, after checking renderling": build
+    renderling's shaders with the new cargo-gpu first; replace
+    `~/.cargo/bin/cargo-gpu` 0.1.0 only if they pass.
+  - **The codegen version.** Told the cache held `rustc_codegen_spirv` 0.10.0
+    while Nexus used spirv-std 0.10.0-alpha.1, Mark asked "wait. why aren't
+    we on the most up to date...? sure, 3": move Nexus to the 0.10.0 line
+    (upstream main) rather than pinning the codegen back. The answer to his
+    question: the forks were last synced in August and September, and
+    spirv-std 0.10.0 was released on 2026-10-01, so alpha.1 was current
+    until that day.
+  - **The sync, carried out and ruled further.** Nexus fast-forwarded to
+    upstream `1cfbd76`; spirv-std now resolves to 0.10.0 and the codegen to
+    0.10.0, and both GPU proofs pass again (`Code/testing/fork-sync/`).
+    rust-gpu's version-gate bug has no upstream fix but is latent (upstream
+    pins nightly-2026-07-03, 1.98). Mark chose "cargo-gpu 0.10.0 from
+    crates.io": the binary comes from the published release, the fork branch
+    stays as the record, and the standalone `crates/cargo-gpu` fork is no
+    longer used. The alternatives were building from tag v0.10.0, rebasing
+    and carrying the patch, or rebasing and filing it upstream. Renderling's
+    one upstream commit (`46bf54c`, manual chapters and a
+    `Stage::tonemapping()` accessor): "Merge upstream in" to
+    `mark-ik/wgpu-30`, keeping our four commits' hashes. Its 26 uncommitted
+    files, rustfmt output from the repo's nightly-only options with one
+    reflowed expression as the only non-comment change: "Commit as a
+    formatting commit" first. The three codegen caches Nexus no longer uses:
+    "Delete after renderling's check".
+  - **Renderling's check, and the binary** (2026-10-02). Renderling's
+    formatting commit (`e14b737`) and upstream merge (`260e2c2`) landed on
+    `mark-ik/wgpu-30`. Our branch's shaders build with neither cargo-gpu
+    0.1.0 nor 0.10.0: `naga` 30, a build-dependency since our wgpu-30 port,
+    needs rustc 1.87, and the shader toolchain is nightly-2025-02-16 (1.86).
+    Upstream renderling (`46bf54c`) builds with 0.10.0, all 45 `.spv`
+    byte-identical to the committed ones, which our branch shares; renderling's
+    95 library tests pass run serially. Mark chose "Replace now, fix the
+    branch separately": cargo-gpu 0.10.0 becomes the installed default and
+    the three unused codegen caches go. For the branch, "Port shaders to
+    rust-gpu 0.10": spirv-std 0.10 and nightly 1.98, one toolchain with
+    Nexus. The alternatives were an older naga for build.rs, gating build.rs
+    off for shader builds, or leaving it until a shader changes.
+  - **The renderling port's blocker** (2026-10-02). cargo-gpu 0.10.0 is now
+    the installed default and the unused caches are gone. A throwaway trial
+    ported renderling's shaders to spirv-std 0.10 with version and toolchain
+    moves only: 95 of 95 tests, WGSL byte-identical, 44 of 45 `.spv` rebuilt.
+    It is blocked by crabslab (`crates/crabslab`, `mark-ik/wgpu-30`
+    `a1ffc17`), which requires `spirv-std = "0.9.0"`; eponym builds against
+    the live crabslab and renderling checkouts. Mark chose "Sync crabslab
+    upstream first" (13 behind, upstream `f990323` on wgpu 26 and spirv-std
+    git `b3eda4df`); the alternatives were widening the range on
+    `mark-ik/wgpu-30`, or a new 0.10-only branch. The port runs in the
+    **live checkout** (eponym follows it), the rebuilt `.spv` are
+    **committed**, and renderling's build.rs running `cargo +nightly fmt` on
+    every host build is **recorded only**. *Reading, not ruled:* the crabslab
+    sync merges upstream in, as renderling's did.
+    *Reopened (2026-10-02):* the sync is not mechanical. Upstream's 13
+    commits rewrite craballoc (0.4.0 / crabslab 0.7.0, unreleased), deleting
+    `slab.rs`, `value.rs` and `wgpu_slab.rs`, the files our three wgpu-30
+    commits port; a merge conflicts in five files, three modify/delete.
+    Upstream is on wgpu 26 and spirv-std git `b3eda4df` (still 0.9.0). Both
+    upstream renderling and ours require craballoc 0.3.1 / crabslab 0.6.6 and
+    use the deleted API, so a merged checkout would stop matching their patch
+    and Cargo would silently take crates.io 0.3.1 on wgpu 26. Asked how
+    crabslab should move, Mark said: "Full adoption, or consider what would
+    suit the stack best… how could we make renderling the ideal for us?"
+    Open: an assessment of renderling's role in the stack comes back to him
+    first.
+    *Assessed and answered (2026-10-02):* renderling is already ruled out by
+    the presentation plan's L7 (`isometry/mesocosm/design_docs/
+    2026-09-11_orthographic_voxel_presentation_plan.md:418-426`, done-condition
+    unmet), ruling 27 keeps the renderer swappable (kiss3d first, renderling
+    "far later"), and ruling 442's recommendation retires it before the mode
+    host; only `eponym-client`'s `Tenant` and two probes use it. Upstream
+    craballoc 0.4 is unadopted by renderling and superseded by crabslab's
+    `feat/wgsl-rs` (crabslab 1.0 / craballoc 0.5, wgpu 28). Mark's answers:
+    - On reopening L7: "Hmm. Kiss is the straightforward choice for both 2d
+      and 3d. Renderling, the five things we'd get from it, how's that
+      compare to kiss, or other alternative prospective pieces of game engine
+      that would compose into the stack? Consider that in all cases, I am
+      willing to reshape a good candidate into an excellent stack
+      component/module/crate; i don't mind renderling, kiss, or another option
+      as long as they compose well and improve the whole stack with their
+      capabilities. Whether that's rendering, entity management systems, etc.
+      etc. i don't even mind measuring both, or considering wgsl-rs or
+      rust-gpu or whatever". Open: a comparative assessment of candidate
+      engine components comes back to him.
+    - Allocator and shader lane, if renderling is kept: "Residency via
+      conatus/CubeCL": slab residency is replaced by conatus buffers bound
+      directly, one allocator.
+    - Harvesting renderling's lighting: "Compare to what would suit the stack
+      and wing": folded into the comparative assessment.
+    - The R2 receipt: "Re-prove in isometer-render": `isometer-render` binds
+      conatus's CubeCL buffers directly, testing whether the copy and the
+      second allocator disappear.
+    *Engine-component comparison ruled (2026-10-02).* kiss3d 0.46 (wgpu 30,
+    WGSL, BSD-3) covers renderling's five features (shadow maps, clustered
+    lights, PBR/IBL, glTF animation, skinning with morphs on web) plus SSAO,
+    OIT, transmission and 2D lighting; it takes the host's device but keeps a
+    thread-local `Context` singleton (`kiss3d-0.46.0/src/context/context.rs:12`)
+    and wants a window. Renderling's edge is GPU-driven slab instancing. The
+    wing's terrain is traced and its bodies rasterised, joined by depth (L3).
+    - **Renderer tenant:** "kiss3d, reshaped": an explicit context handle in
+      place of the thread-local, a render-into-caller-targets entry with no
+      window, the tracer's depth as a pre-pass, its shadow atlas and light
+      buffer exported. The alternatives were growing isometer-render with
+      both as donors, re-adopting renderling, or measuring both first.
+    - **Lighting:** "Stack-owned light/environment block": sun and
+      day/night from sim fields, the point-light list and the water field
+      live in the scene contract, read by the tracer and the rasteriser; the
+      renderer exports shadow atlas, light buffer and depth. The alternative
+      let the renderer own lighting.
+    - **Shader lane:** "WGSL/WESL for raster, CubeCL for compute", amending
+      the 2026-08-16 "author in CubeCL, the brick renderer included" line to
+      match what ships (all five wing render shaders are WGSL); rust-gpu stays
+      for Nexus-derived compute. The alternatives were wgsl-rs, or rust-gpu
+      0.10 for raster.
+    - **The renderling fork:** "Archive the fork now". The renderling port to
+      rust-gpu 0.10 and the crabslab sync stop. *Reading, not ruled:* eponym
+      still path-depends on the live checkouts, so the archive move waits on
+      L7 or eponym breaks; put back to Mark.
+    These are games-wing decisions; their canonical home is the wing design
+    record in `isometry/mesocosm`, where they have not yet been carried.
+    Further, the same day:
+    - **Archive timing:** "L7 first, then archive": eponym-client's Tenant
+      and lighting move off renderling, its two probes are archived and the
+      patch rows dropped, then both forks move to `archive/`. This resolves
+      the reading above.
+    - **ECS:** "Not bevy, but can we compare the potential of the other
+      two?": hecs and shipyard are being compared; open.
+    - **2D:** "vello for documents, kiss3d 2D for lit games": kiss3d's 2D
+      only behind the scene contract for a lit 2D game. The alternative was
+      vello only.
+    - **Where they live:** "You can do 1, but let the wing session know":
+      they are carried into the wing design record as numbered rulings, with
+      the "Isometric game engine architecture" session told first; it was
+      mid-round (rulings 457 to 466 that night), so the carry waits on its
+      reply to avoid a numbering collision.
+    *Carried (2026-10-02):* the engine rulings are wing record rulings 471
+    to 476 (isometry `36f6f69`), and the ECS, ruled the same day, is 481 to
+    484 (isometry `b4a0387`): hecs stays; the mode host and armillary
+    schedule, the ECS is storage; the projection's diff comes from the
+    record's receipts; a boundary crate in Mere holds the ECS. The wing
+    record is their authority.
+  - **The logged token.** Four build logs captured this session's
+    environment, including its messaging token and account IDs; redacted on
+    Mark's choice.
 
 ## Progress (2026-08-25 resident-position pass)
 

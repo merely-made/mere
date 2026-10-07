@@ -42,6 +42,21 @@ pub struct CameraView {
     pub zoom: f32,
 }
 
+/// Where the layout sits against the viewport, from the canvas's own positions
+/// and camera rather than from pixels: what a framing receipt asserts on.
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+pub struct LayoutFraming {
+    /// Nodes the view holds a position for.
+    pub nodes: usize,
+    /// Of those, nodes whose centre falls outside the viewport inset by the
+    /// margin asked for, or whose position is not finite.
+    pub outside: usize,
+    /// The layout's world bounding box, `[min_x, min_y, max_x, max_y]`.
+    pub extent: [f32; 4],
+    /// The viewport's world bounding box, in the same order.
+    pub view: [f32; 4],
+}
+
 /// The full per-pane *view* state over a shared canvas: the complete camera (pan +
 /// zoom + isometric orbit/foreshorten) plus its pan inertia. The canvas
 /// *authority* owns the graph, physics, and node positions; the **view** owns one

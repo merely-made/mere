@@ -43,7 +43,8 @@ pub use authority::{AuthorityLapse, RetainedAuthority};
 pub use chain::{RevocationLedger, TrustedRoot, validate_chain};
 pub use facts::{CarrierKind, IngressFacts, ProofBinding, SessionFacts};
 pub use handshake::{
-    AdmittedPrincipal, AdmittedSession, HandshakeError, SessionHello, SessionReply, admit, respond,
+    AdmittedPrincipal, AdmittedSession, HandshakeError, SessionHello, SessionReply, admit,
+    network_session_signing_salt, respond,
 };
 #[cfg(feature = "tokio")]
 pub use io::{

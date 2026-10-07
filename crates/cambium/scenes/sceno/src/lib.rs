@@ -68,6 +68,6 @@ pub use score::{
     Arrangement, AxisValue, Embedded, EmbeddingFallback, Geographic, Grid, HeldPlacement, Hold,
     HonoredHold, Hulls, IterationDepth, Kanban, LSystem, LSystemGrammar, Penrose, PenroseVariant,
     Placement, Radial, RadialAngularPolicy, RadialUnreachablePolicy, SCORE_VERSION, Score,
-    ScoreItem, Spiral, SpiralCurve, Stack, SubdivisionCount, Timeline, TimelineFallback,
-    UnusedVertexPolicy,
+    ScoreItem, ScoreVersionError, Spiral, SpiralCurve, Stack, SubdivisionCount, Timeline,
+    TimelineFallback, UnusedVertexPolicy,
 };

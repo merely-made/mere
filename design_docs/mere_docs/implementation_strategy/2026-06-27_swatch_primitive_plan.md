@@ -2,22 +2,29 @@
 
 *Vocabulary updated 2026-09-12: graphlet → subgraph per TERMINOLOGY.md (retired 2026-09-05). Dated status and Progress entries keep the meerkat-era names they recorded (branch_graphlet_from, graphlets.rs, graphlet_classifier.rs, graphlets.json, GraphletBinding::Forked); read them as history. The live names are SessionSubgraphs in crates/graph/subgraph and the subgraphs.json sidecar.*
 
+**Corrected 2026-10-06 (S14 pass):** that crate path no longer exists. The
+subgraph crate was folded into mere in `61894570` (2026-09-23):
+`SessionSubgraphs` is in `crates/mere/src/subgraph.rs` and the shape
+classifier in `crates/mere/src/subgraph/classifier.rs`; `crates/graph` now
+holds only graph-kernel and linked-data.
+
 **Date**: 2026-06-27
-**Status (2026-07-01)**: P1, P2, and P3a/b/c landed — see Progress below. P2b
-(cartography re-layout, `Scope`/`SwatchInstance` unification) and the rest of P3's
-done condition (live projection toggle, frontier ghosts, contextual detectors,
-Linked/Astroid crystallize, chip-click crystallize) are deferred slices, still open.
-P4/P5 now have further downstream slices through the roster/orrery relation-cell
-work: 2026-07-01 closed the "gyre topology and springs remain endpoint-pair
-scoped" gap (springs are now per-visible-relation-cell — see the [roster detail
-cards plan](../../archive_docs/2026-09-02_retired_plans/2026-06-29_graph_object_roster_detail_cards_plan.md)'s 2026-07-01
-entry), but P4/P5's full done conditions (per-cell edge *thickness*, one shared
-element-model edge renderer between the orrery and the connections swatch, and
-the P5 `GraphDefault < GraphViewOverride < SelectionOverride` layered stack)
-remain open. **P6 did not land as scoped** (see Progress 2026-07-05): the gloss
-minimap migrated Scene->DOM through a separate, parallel implementation, not
-this plan's component; P7 remains unstarted. Sequence:
-**primitive-first** (Mark, 2026-06-27): P1 extract the
+**Status (2026-10-06):** P1, P2 and P3a/b/c landed in meerkat on 2026-06-27
+and 2026-06-28, retired with it 2026-07-18 (`c5f01064`): the host-generic
+`swatch_view<S>`, the connections swatch, the crystallize gesture and the chip
+strip left with it, as did the separate `gloss_view.rs` minimap that P6
+accepted in its place (2026-07-05). Surviving library parts: the shape
+classifier (`classify`, `classify_selection`) in
+`crates/mere/src/subgraph/classifier.rs`, `SessionSubgraphs::record_session`
+in `crates/mere/src/subgraph.rs`, and the per-visible-cell spring feed
+`visible_relation_edges`, now in pictograph
+(`crates/canvas/pictograph/src/canvas/seiche_bridge.rs`). The swatch's
+successor is Turnstone's swatch pane over Cambium's `GraphCanvasSwatch`
+(Gloss-minimap and Overmap presets), which Isometry also uses. Open: P4's
+per-cell thickness and shared edge renderer, P5's `GraphDefault <
+GraphViewOverride < SelectionOverride` stack, and P7; P2b and P3's deferred
+clauses were written against the meerkat swatch and have no host now.
+Sequence: **primitive-first** (Mark, 2026-06-27): P1 extract the
 generic component, P2 the connections swatch, P3 the classifier + strip, then the
 edge enrichment (P4/P5), the gloss migration (P6), and templates (P7).
 **The model is canonical, do not re-derive it.** This plan builds
@@ -39,7 +46,7 @@ each existing fragment; it extends them, it does not duplicate them.
   P2 adds the slot's multi-selection branch (`render/cards.rs:129` TODO).
 - [graphlet wiring plan](../../archive_docs/2026-07-04_completed_plans/2026-06-25_graphlet_wiring_plan.md) **owns the per-window
   instance machinery + subgraph derivation/reconcile**. P3 crystallize reuses it.
-- [petgraph / RDF plan](2026-06-18_petgraph_rdf_plan.md) **owns edge multigraph
+- [petgraph / RDF plan](../../archive_docs/2026-10-06_completed_plans/2026-06-18_petgraph_rdf_plan.md) **owns edge multigraph
   storage** and the ruling that visual collapse is an experience-LOD setting. P4 is
   that experience-LOD render; it needs no kernel storage change.
 - [graph signals layer plan](../../archive_docs/2026-08-20_completed_plans/2026-06-22_graph_signals_layer_plan.md) **owns the
@@ -97,6 +104,12 @@ swatch is their first multi-scope consumer; landing them in P1 with only the
 node-editor consumer would be unused scaffolding. The keystone P1 ships is the
 host-generic component itself.
 
+**Corrected 2026-10-06 (S14 pass):** meerkat, `swatch.rs` included, was
+deleted in `c5f01064` (2026-07-18, "The funeral: meerkat leaves the
+workspace"); no `fn swatch_view` exists in mere. The successor is Turnstone's
+swatch pane, one pane over Cambium `GraphCanvasSwatch` presets (Gloss-minimap
+and Overmap), which Isometry also uses.
+
 ### P2 — Connections swatch (scope = Selection)
 
 Wire the focus-card slot's multi-selection branch (`render/cards.rs:129` TODO,
@@ -133,6 +146,12 @@ inter-edge (`scry-shots/conn-07-selected.png` + `conn-07-crop.png`). Multi-selec
 already built (orrery `pointer_up` input.rs:209, host `set_shift` handler_window.rs:132). The
 drive's Ctrl-click was the wrong modifier, not a missing feature.
 
+**Corrected 2026-10-06 (S14 pass):** the connections swatch
+(`render/connections.rs`, `FocusCardKind::Connections`,
+`connections_swatch_view`, `connections_spec_from`) was deleted with meerkat in
+`c5f01064` (2026-07-18). No definition of these exists in any repository under
+`Code/repos`.
+
 ### P3 — Shape classifier + the strip
 
 Build the **shape classifier**, the 2026-06-13 doc's named "one real gap": the nine
@@ -167,6 +186,13 @@ and the Astroid option, chip-click crystallize, and the contextual detectors (Br
 Frontier / WorkbenchCorrespondence). Bin compiles; the chip render is not yet headed-verified (a
 low-risk text div over the verified P2 swatch; the app's pre-existing sqlx/sync crash makes a
 drive flaky).
+
+**Corrected 2026-10-06 (S14 pass):** the P3b gesture
+(`Shell::crystallize_selection`, `ContextAction::CrystallizeSelection`) and the
+P3c chip strip (`ConnectionsSpec.shape_chips`) were deleted with meerkat in
+`c5f01064` (2026-07-18). The P3a classifier survives as `classify` and
+`classify_selection` in `crates/mere/src/subgraph/classifier.rs`, and
+`record_session` in `crates/mere/src/subgraph.rs`.
 
 ### P4 — Cells-as-edges (Mark, 2026-06-27)
 
@@ -222,6 +248,12 @@ GraphViewOverride < SelectionOverride` layered stack itself — hide/show is
 still the one session-scoped layer it always was, just now spring-aware; there
 is no graph-level default layer yet.
 
+**Corrected 2026-10-06 (S14 pass):** `orrery::build::visible_relation_edges`
+now lives in pictograph's `seiche_bridge`
+(`crates/canvas/pictograph/src/canvas/seiche_bridge.rs`); pictograph's
+`build.rs` records the move, the caller is its `lifecycle.rs`, and
+`build_tests.rs` covers one tuple per visible cell.
+
 ### P6 — Migrate the gloss minimap onto the DOM swatch
 
 Replace the Scene-based gloss render (`render/paint.rs:278`, via
@@ -243,6 +275,14 @@ DOM node squares + an embedded-Scene edges backdrop, but via its own bespoke
 as a deliberate divergence, not an open gap to close later — see Progress for
 the reasoning. This phase's done-condition as literally written will not be
 pursued unless a third swatch consumer emerges.
+
+**Corrected 2026-10-06 (S14 pass):** meerkat's `gloss_view.rs`
+(`minimap_view`, `recent_view`) was deleted in `c5f01064` (2026-07-18). The
+2026-07-05 decision stands; the code it describes does not. The
+[graph view curation plan](2026-08-03_graph_view_curation_and_interaction_plan.md)
+(its "Supersession and adjacent authority" section) says Cambium plus Isometry
+now give "a new, real second-consumer seam"; this plan never recorded its
+third-consumer trigger as met.
 
 ### P7 — Templates
 
@@ -476,3 +516,4 @@ template renders a purpose-built UI over its own subgraph.
   third swatch consumer appears — at that point the real `Scope`/`SwatchInstance`
   abstraction pays for itself across 3+ call sites instead of being bespoke-built for
   one.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at mere 535bca11, from the D2 record in support/doc-audit/d2/batch_41_s14_phase_b3.md: P1, P2, P3b/c and the P6 gloss path recorded as landed in meerkat and retired with it (`c5f01064`), the surviving classifier, `record_session` and `visible_relation_edges` homes named, and the vocabulary banner's dead subgraph path corrected.

@@ -55,7 +55,7 @@ from those receipts.
 **Status 2026-07-05**: landed and measured; aether's wasm build receipt is
 green (getrandom 0.4 `wasm_js` + uuid `js`), embed's wasm receipt is a named
 follow-on slice (ahash-pulled getrandom 0.3 + tokenizers/onig); see the
-[burn_wgpu_flip_plan](../implementation_strategy/2026-07-04_burn_wgpu_flip_plan.md).
+[burn_wgpu_flip_plan](../../archive_docs/2026-10-06_completed_plans/2026-07-04_burn_wgpu_flip_plan.md).
 Headline: BERT is decisively GPU (3.2x at batch 1 up to 38x at 32×128);
 field eval stays CPU-default (ndarray wins through 100k positions on a
 cheap program; GPU needs resident data or heavier programs to pay).
@@ -99,7 +99,7 @@ llama-family decoder body — validated on the actual TinyLlama-1.1B
 checkpoint ("The capital of France is" → "Paris, …") at **9.95 tok/s on
 burn-wgpu vs 0.09 on ndarray CPU (110x)**, greedy output byte-identical
 across backends. Remaining per the
-[inference_provider_plan](../implementation_strategy/2026-07-05_inference_provider_plan.md):
+[inference_provider_plan](../../archive_docs/2026-10-06_completed_plans/2026-07-05_inference_provider_plan.md):
 sampling, eidetic loading (P2), the wasm half of the done-condition.
 
 ## Lane 4: training and LoRA on-device
@@ -138,7 +138,7 @@ and a large-graph force pass through the aether burn path beats the CPU path
 at a measured node count.
 
 **Status 2026-07-06**: both halves have their mechanism, per the
-[orrery_graph_intelligence_plan](../implementation_strategy/2026-07-06_orrery_graph_intelligence_plan.md).
+[orrery_graph_intelligence_plan](../../archive_docs/2026-10-06_completed_plans/2026-07-06_orrery_graph_intelligence_plan.md).
 
 - **Force pass (P1-P3)**: `aether::forces::repulsion` (N-body on burn,
   ndarray/wgpu) is wired into gyre via a burn-free `RepulsionSolver` closure
@@ -170,7 +170,7 @@ at a measured node count.
   provider, and a cross-cutting scaling plan for the O(N²) flat vector index (the
   affinity scan is the same kernel shape as the L5 force pass; one burn lift raises
   arrangement + recall + canvas-search together) —
-  [intel_vector_index_burn_lift_plan](../implementation_strategy/2026-07-06_intel_vector_index_burn_lift_plan.md).
+  [intel_vector_index_burn_lift_plan](../../archive_docs/2026-10-06_completed_plans/2026-07-06_intel_vector_index_burn_lift_plan.md).
 
 ## Commitments (what "shaped around burn" means)
 
@@ -227,7 +227,7 @@ at a measured node count.
     `<orrery>` element, if it lands). Until then no lane hard-codes either; the
     coalesce holds the UI usable on the shared device.
 - **D2 wasm model-size ceiling**: the
-  [headed-browser probe](../implementation_strategy/2026-08-09_browser_model_ceiling_probe_plan.md)
+  [headed-browser probe](../../archive_docs/2026-10-06_completed_plans/2026-08-09_browser_model_ceiling_probe_plan.md)
   owns artifact/storage copies, worker execution, cancellation, UI impact, and
   the configured size sweep. It proceeds independently of Lane 2.
 - **D3 burn-remote release timing**: the

@@ -95,7 +95,8 @@ impl Canvas {
     /// scene plus whether the host should request another frame (sim still
     /// settling, pan still gliding, or a node being dragged). Does not present.
     pub fn frame(&mut self, w: u32, h: u32) -> (Scene, bool) {
-        self.frame_observed(w, h, &mut super::frame_profile::Unprofiled)
+        self.reset_frame_time();
+        self.frame_observed(w, h, None, &mut super::frame_profile::Unprofiled)
     }
 
     /// Advance and compose a frame while measuring its CPU stages. The host
@@ -107,26 +108,38 @@ impl Canvas {
         h: u32,
         now_ms: impl FnMut() -> f64,
     ) -> (Scene, bool, super::CanvasFrameProfile) {
+        self.reset_frame_time();
         let mut observer = super::frame_profile::Profiled::new(now_ms);
-        let (scene, moving) = self.frame_observed(w, h, &mut observer);
+        let (scene, moving) = self.frame_observed(w, h, None, &mut observer);
         (scene, moving, observer.profile)
     }
 
-    fn frame_observed(
+    pub(super) fn frame_observed(
         &mut self,
         w: u32,
         h: u32,
+        elapsed: Option<(std::time::Duration, seiche::ElapsedStepConfig)>,
         observer: &mut impl super::frame_profile::Observer,
     ) -> (Scene, bool) {
         let (w, h) = (w.max(1), h.max(1));
         self.view_w = w;
         self.view_h = h;
         let viewport = DeviceIntSize::new(w as i32, h as i32);
+        // Host time for this frame, or one tick when the host gives none.
+        let dt = elapsed.map_or(seiche::TICK_DT, |(elapsed, _)| elapsed.as_secs_f32());
 
         // Advance physics (the in-thread tick, or the freshest actor snapshot)
         // into the read model, and learn whether the layout is still settling.
         // Everything below reprojects from the view — never the rapier world.
-        let settling = self.physics.advance_frame(&mut self.view);
+        let settling = if let Some((elapsed, config)) = elapsed {
+            let report = self
+                .physics
+                .advance_elapsed(&mut self.view, elapsed, config);
+            self.elapsed_step = Some(report);
+            report.settling
+        } else {
+            self.physics.advance_frame(&mut self.view)
+        };
         observer.mark(0);
         // Advance the ambient backdrop sim (it paces itself internally - GoL accumulates toward its
         // generation interval, a continuous sim integrates). A fixed ~frame dt is fine for a
@@ -137,6 +150,9 @@ impl Canvas {
         // A non-seiche layout strategy overrides the physics snapshot: write its buffered
         // positions into the view before anything reads it. (Layout picker.)
         self.apply_strategy_to_view();
+        // A playing graph come to rest replaces Settled and sends anchored
+        // items home (G7, F30, F45).
+        self.advance_roles();
         // Pick up any finished off-thread community partition (a no-op when computing inline), so a
         // result dispatched on an earlier frame lands before the rings paint. (Graph signals — P3.)
         self.drain_community();
@@ -182,6 +198,8 @@ impl Canvas {
         } else if self.middle_drag.is_none() {
             self.pan_velocity = (0.0, 0.0);
         }
+        // Following the layout: ease toward fit-to-content while physics plays.
+        let following = self.follow_step(dt);
         self.generation = self.generation.wrapping_add(1);
 
         // Reproject the underlay from the view positions (a
@@ -501,7 +519,10 @@ impl Canvas {
         }
         let scene = composite_paint_layers(viewport, &layers).scene;
 
-        let after_cull = layers.iter().map(|layer| layer.commands.len()).sum::<usize>();
+        let after_cull = layers
+            .iter()
+            .map(|layer| layer.commands.len())
+            .sum::<usize>();
         let culled = underlay.commands().len() - underlay_commands.len()
             + if self.render_gnodes_as_dom {
                 0
@@ -515,7 +536,8 @@ impl Canvas {
             after_cull,
         );
 
-        let needs_redraw = settling || gliding || dragging || self.ambient.is_some();
+        let needs_redraw =
+            settling || gliding || dragging || following || self.ambient.is_some();
         observer.mark(9);
         (scene, needs_redraw)
     }
@@ -547,13 +569,8 @@ impl Canvas {
                 else {
                     continue;
                 };
-                let (cx, cy) = self.camera.to_screen(*pos);
                 let side = self.node_size(key) * FACE_INSET * self.camera.zoom;
-                let half = side * 0.5;
-                let bounds = LayoutRect::new(
-                    LayoutPoint::new(cx - half, cy - half),
-                    LayoutPoint::new(cx + half, cy + half),
-                );
+                let bounds = self.face_rect_at(key, *pos);
                 let file = self
                     .derived_face_cache
                     .entry((crate::DERIVATION_VERSION, address.clone()))
@@ -561,9 +578,13 @@ impl Canvas {
                         crate::derive(address.as_bytes())
                             .expect("pictograph must encode every canonical node address")
                     });
-                let commands =
-                    crate::canvas::derived_face::commands(file, self.derived_face_palette, side, bounds)
-                        .expect("pictograph output must decode into flat paint-list paths");
+                let commands = crate::canvas::derived_face::commands(
+                    file,
+                    self.derived_face_palette,
+                    side,
+                    bounds,
+                )
+                .expect("pictograph output must decode into flat paint-list paths");
                 face_cmds.extend(commands);
                 continue;
             }
@@ -606,16 +627,8 @@ impl Canvas {
             // Inset within the face so the accent frames the icon: state /
             // selection must stay readable at a glance once an icon lands
             // (representations carry node identity).
-            let (cx, cy) = self.camera.to_screen(*pos);
-            // Inset within the node's *resolved* face, so a resized node carries
-            // its icon proportionally (identical at the default size).
-            let half = self.node_size(key) * 0.5 * FACE_INSET * self.camera.zoom;
-            let (x0, y0, x1, y1) = (cx - half, cy - half, cx + half, cy + half);
             face_cmds.push(PaintCmd::DrawImage(ImageItem {
-                placement: CommonPlacement::new(LayoutRect::new(
-                    LayoutPoint::new(x0, y0),
-                    LayoutPoint::new(x1, y1),
-                )),
+                placement: CommonPlacement::new(self.face_rect_at(key, *pos)),
                 image_key: img_key,
                 image_rendering: ImageRendering::Auto,
                 alpha_type: AlphaType::Alpha,

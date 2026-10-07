@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Remove the `nematic` feature and its `cambium::nematic` views
+  (`gemtext_view`, `gopher_view`, `nex_view`, `feed_view`, `SmolwebTheme`,
+  `stylesheet`), with the optional `errand` and `tabard` dependencies only it
+  used. No consumer called them; smolweb renders through mere-document-lanes'
+  EngineDocument lane (Mere stack seams plan, ruling S66; smolweb fidelity
+  plan WS4, R0). Breaking for anyone who enabled the feature.
 - Add `fold_projection`, a generic read-only source projection that validates a
   caller-held source-length witness, clips `StyleRange` highlights around
   collapsed regions, and renders `fold-marker` spans named "Folded content".

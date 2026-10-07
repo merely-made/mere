@@ -26,4 +26,9 @@ pub enum IdentityError {
     /// The keychain (or other identity backend) reported an error.
     #[error("identity backend error: {0}")]
     Backend(String),
+
+    /// The vault is locked; a user act must unlock it first (vault lock
+    /// plan, ruling 29).
+    #[error("the vault is locked")]
+    Locked,
 }

@@ -77,9 +77,10 @@ fn score_representation_changes_the_class_painted_by_frame() {
 }
 
 #[test]
-fn a_playing_arrangement_pulls_as_a_field_not_an_override() {
-    // The arrangement stops being an authority and becomes a participant: while
-    // playing, its slots are anchor springs the graph's own forces argue with.
+fn a_playing_arrangement_springs_only_its_anchored_items() {
+    // Physics acts on an arrangement (F11). Seeded, the default (F23), the
+    // positions only start the motion; anchored, they are springs the graph's
+    // own forces argue with while playing (G7).
     let mut canvas = Canvas::new();
     canvas.visit("https://pull-a.example");
     canvas.visit("https://pull-b.example");
@@ -90,24 +91,26 @@ fn a_playing_arrangement_pulls_as_a_field_not_an_override() {
         .map(|(i, k)| (*k, PortablePoint::new(i as f32 * 40.0, 0.0)))
         .collect();
 
+    canvas.set_physics_paused(true);
     canvas.set_layout_strategy(Some("phyllotaxis.default".to_string()));
     canvas.apply_strategy_positions(&slots);
     // Paused: the placement is asserted directly, so no anchor force is needed.
+    canvas.set_arrangement_role(seiche::Role::Anchored);
     assert!(canvas.physics_paused());
-    assert_eq!(canvas.physics.anchor_count(), 0, "paused needs no pull");
+    assert_eq!(canvas.physics.anchor_count(), 0, "paused needs no spring");
 
-    // Playing: the same slots become springs.
+    // Playing: the anchored slots become springs.
     canvas.set_physics_paused(false);
     assert_eq!(
         canvas.physics.anchor_count(),
         slots.len(),
-        "a playing arrangement anchors its slots"
+        "a playing anchored arrangement springs its slots"
     );
 
-    // Zero pull is the seed-only reading: the arrangement is an initial
-    // condition and the graph's own forces take over entirely.
-    canvas.set_arrangement_pull(0.0);
-    assert_eq!(canvas.physics.anchor_count(), 0, "no pull, no anchors");
+    // Seeded: the arrangement is an initial condition and the graph's own
+    // forces take over entirely.
+    canvas.set_arrangement_role(seiche::Role::Seeded);
+    assert_eq!(canvas.physics.anchor_count(), 0, "seeded, no springs");
     assert_eq!(
         canvas.layout_strategy(),
         Some("phyllotaxis.default"),
@@ -125,7 +128,7 @@ fn physics_is_global_and_composes_with_any_arrangement() {
     canvas.visit("https://phys-b.example");
     assert!(!canvas.physics_paused(), "runs by default");
 
-    // Picking an arrangement pauses *visibly* (the same flag the user drives),
+    // Placing an arrangement pauses *visibly* (the same flag the user drives),
     // so the analytic placement reads crisply on selection.
     canvas.set_layout_strategy(Some("phyllotaxis.default".to_string()));
     assert!(canvas.physics_paused(), "an arrangement pauses by default");

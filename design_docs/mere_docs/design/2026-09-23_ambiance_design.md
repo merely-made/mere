@@ -4,6 +4,11 @@
 **Kind:** design record. Mark's rulings on ambiance, the examples he gave, the
 stack precedents they cite, and how they sit in Mere's existing session and
 memory design. No code.
+> **Amended 2026-10-04 (Mark, [graph semantics plan](../implementation_strategy/2026-10-04_graph_semantics_plan.md)
+> ruling 17):** keeping's bottom step is now called **the ambient level**, so that
+> *tier* names only the t1–t4 socialization aspect. The meaning is unchanged; the
+> text below keeps "ambient tier" as written.
+
 **Status (2026-09-23):** recorded; every question raised while writing it was
 ruled the same day (§9).
 
@@ -214,6 +219,12 @@ was examined but not followed is in short-term memory too; a link never
 examined stays ambient. Turnstone is the browser "where browsing history is the
 graph rather than a tab strip" ([TERMINOLOGY](../../TERMINOLOGY.md)). Mark:
 "this obviously directly applies to turnstone."
+
+> **Amended 2026-10-04 (Mark, [graph semantics plan](../implementation_strategy/2026-10-04_graph_semantics_plan.md)
+> ruling 4):** a recognized link statement (cites, quotes) whose target is not
+> in the graph stays ambient, but it is no longer discarded: a rebuildable
+> index, which is not graph truth, re-derives it when the target returns, and
+> the index can be purged.
 
 ### Practice: Woodshed
 
@@ -499,7 +510,7 @@ Consequences:
 - **"tier".** Mere's in-product vocabulary already uses tiers for socialization:
   mere t1, moot t2, moothold t3, gemot t4 ([DOC_README](../../DOC_README.md),
   working principles). The
-  [physics scenes plan](../implementation_strategy/2026-06-22_physics_scenes_and_tangibility_plan.md)
+  [physics scenes plan](../../archive_docs/2026-10-06_completed_plans/2026-06-22_physics_scenes_and_tangibility_plan.md)
   uses "Tier 2, ambient separate sims" for the living backdrop. *The ambient
   tier* is neither: it is the bottom level of the keeping axis.
 - **"ambient".** The
@@ -532,7 +543,7 @@ Consequences:
   is now minted. It is unrelated to *reservoir sampling*, the random-sampling
   algorithm, which matters in RNG work. *Vault*, the other word offered, stays
   with the personae vault, `%LOCALAPPDATA%\personae\vault`
-  ([family shared identity plan](../implementation_strategy/2026-08-08_family_shared_identity_plan.md)),
+  ([family shared identity plan](../../archive_docs/2026-10-06_completed_plans/2026-08-08_family_shared_identity_plan.md)),
   and Knot's vault
   ([suite census](../../2026-08-22_turnstone_suite_composition_and_capability_census.md)).
 - **Entries.** On 2026-09-23 [TERMINOLOGY](../../TERMINOLOGY.md) gains

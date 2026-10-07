@@ -53,6 +53,12 @@ applies upstream's published corrections without changing CubeCL source. All
 eleven ESP rows then passed. This remains a compile receipt, not a headed
 browser execution claim.
 
+**2026-10-03 pre.4 annotation:** the migration branch moved this table to Burn
+`=0.22.0-pre.4`. All eleven ESP rows, plus Numen's, Seiche's and Conatus's wasm
+rows, pass as compile receipts there (Burn migration plan §13.18). The
+`cubecl-runtime` patch is now manifest-only, removing `persistence` from its
+defaults (ruling 375); pre.4 carries the wasm packaging fixes itself.
+
 The workspace ignores its generated `Cargo.lock`. Ordinary and offline wasm
 checks pass. `--locked` is not used as a portability receipt because concurrent
 workspace Cargo processes can regenerate the ignored target-specific lockfile.

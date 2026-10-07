@@ -1,9 +1,16 @@
 # Runtime Composition Acceptance Plan
 
 **Date:** 2026-08-23
-**Status:** active; Conatus foundation, first product profile, first resident
-body-position proof, first product renderer tenant, and shared brick/DDA owner
-complete; host adoption, 3D realization, and other second-consumer gates open
+**Status (2026-10-06):** active. C0 is complete (Mere `5767563c`), C1's
+Mesocosm commit `b112931` is integrated on isometry main, and the DDA
+promotion gate closed with `modulus` landing on main 2026-09-02 (Progress).
+C2, C2a and C2b completed in Isometry's `isometry-runtime` crate (`303e347`,
+`15f5da2`, `7d45c40`), which Isometry retired in `73a31409` (2026-09-27); the
+commits remain only as history, and whether those gates stand is open (see
+C2). Quint, named throughout as an owner, was folded in `eae87153`. Open: C3
+host adoption, C4's second-consumer challenge, 3D realization, and this
+ledger's reconciliation with the conatus engine plan's body-binding and T2
+rulings (see the ledger).
 **Scope:** Name how Merely games compose runtime organs, who owns each seam,
 and which executable receipts are required before a local shape becomes a
 shared contract.
@@ -63,6 +70,22 @@ research proposals do not promote a common clock, identifier or lease.
 | Persistence, checkpoints, and replay | Product record plus Mere storage/replication organs | Profile checkpoints product truth and rebuilds disposable organs | Existing Isometry and Mesocosm replay suites | Never serialize Conatus as a second product record | Established law; profile lifecycle open |
 | Diagnostics and packaging | Product host/tooling | Profile reports selected organs, revisions, refusals, and build provenance | Focused crate receipts exist | One useful cross-product report shape must be consumed twice | Open |
 
+**Corrected 2026-10-06 (S14 pass):** the tree has moved under three rows. The
+Isometry profile and tenant that the tactile, resident and 2D-realization rows
+cite lived in `isometry-runtime`, which Isometry retired in `73a31409`
+(2026-09-27); `303e347`, `15f5da2` and `7d45c40` remain only as history. Quint,
+the resident row's owner and the 2D row's "stamped Quint position view", was
+folded into its owners in `eae87153`: `ResidentChunk` and the resident module
+are now in `crates/conatus/conatus/src/resident/` (`chunk.rs`), eval and
+burn lowering in numen, and the tensor forces in seiche. The ledger has no
+entries after 2026-08-26.
+
+**Open, raised by the S14 pass (2026-10-06):** the conatus engine plan's
+2026-09-28 entry says this ledger still needs reconciling with its
+body-binding shape (§1) and T2 voxel-store rulings (§2). Should the ledger
+take them as gates? Options: add body-binding and T2 rows with their gates;
+leave them to the conatus engine plan alone.
+
 ## Product profiles
 
 ### Isometry
@@ -95,6 +118,12 @@ suballocation, renders to a tenant-owned texture, and enters Netrender at an
 explicit scene boundary. This proves direct resident realization and
 same-device composition. It does not establish a shared frame, lease, tenant,
 marker, camera, or 3D-rendering contract.
+
+**Corrected 2026-10-06 (S14 pass):** this profile, its resident plane and its
+renderer tenant no longer exist as code: Isometry retired `isometry-runtime`
+in `73a31409` (2026-09-27), and the slice survives only as the history of
+`303e347`, `15f5da2` and `7d45c40`. The Quint-backed plane's mechanism is now
+conatus's resident module (`eae87153`).
 
 ### Mesocosm
 
@@ -131,6 +160,11 @@ Done when the commit is integrated without crossing the concurrent dirty lane,
 the focused adapter tests and full core suite remain green, and the real
 resident-ground example resolves Quint from the same Mere provenance.
 
+**Corrected 2026-10-06 (S14 pass):** remote integration is no longer open:
+`b112931` is an ancestor of isometry main (HEAD 988b9929). Quint, which the
+done condition names, has since been folded into conatus, numen and seiche
+(`eae87153`).
+
 ### C2 — First runtime profile
 
 **Complete in the product at Isometry commit `303e347`.** `isometry-runtime`
@@ -138,6 +172,16 @@ proves map-qualified source bindings, accepted-event-only synchronization,
 stable body identity across moves, distinct identity across maps, unchanged-
 frame silence, and warnings-denied checks. Four focused tests and Clippy pass
 under Rust 1.96.0. Desktop wiring remains a separate adoption gate.
+
+**Corrected 2026-10-06 (S14 pass):** C2, C2a and C2b were met in
+`isometry-runtime`, which Isometry retired in `73a31409` (2026-09-27).
+`303e347`, `15f5da2` and `7d45c40` remain as history; no live code carries the
+profile, the resident body view or the tenant.
+
+**Open, raised by the S14 pass (2026-10-06):** with `isometry-runtime`
+retired, how do C2, C2a and C2b stand? Options: they stand as historical
+receipts, with C3 restated against current Isometry; they reopen as unmet
+until a live Isometry profile, resident view and tenant exist again.
 
 ### C2a — First resident body view
 
@@ -168,6 +212,11 @@ current Genet migration and protocol H2 gate are closed, the host constructs
 the product profile, and an accepted event yields one consumed spatial frame
 without any peer or Conatus re-derivation.
 
+**Corrected 2026-10-06 (S14 pass):** the profile this gate's host would
+construct was `isometry-runtime`'s, retired in `73a31409` (2026-09-27), so
+C3's premise no longer matches current Isometry; restating it waits on the
+question under C2.
+
 ### C4 — Second consumer challenge
 
 **Open.** Paredros or Mesocosm consumes the relevant Isometry profile shape and
@@ -192,6 +241,10 @@ contract. Product-specific fields and epistemic vocabulary remain local.
   conductor, source-binding schema, spatial frame, or lease contract.
 - An open row is a boundary map and receipt queue, not permission to found a
   catch-all engine crate.
+
+**Corrected 2026-10-06 (S14 pass):** "`ResidentChunk` stays Quint-owned" is out
+of date: quint was folded in `eae87153`, and `ResidentChunk` is now
+`crates/conatus/conatus/src/resident/chunk.rs`.
 
 ## Progress
 
@@ -229,3 +282,11 @@ contract. Product-specific fields and epistemic vocabulary remain local.
   its later compiler receipt may prove the general rebuild lifecycle, while C4
   still requires an embodied spatial consumer before any shared contract moves
   upward.
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_46_s14_phase_b8.md: the status records C1 as
+  integrated and C2/C2a/C2b as met in the since-retired `isometry-runtime`
+  (`73a31409`); the ledger, the Isometry section, C3 and the `ResidentChunk`
+  stop rule are annotated for that retirement and for quint's fold
+  (`eae87153`); and two open questions (how C2-C2b stand, whether the ledger
+  takes the body-binding and T2 gates) are written in.

@@ -9,7 +9,9 @@ rust-version = "1.92.0"
 description = "The composed graph library behind Turnstone and other graph-shaped applications."
 
 [features]
-default = ["graph", "linked-data", "canvas", "workbench"]
+default = ["graph", "linked-data", "canvas", "workbench", "image-decode"]
+# Forwards genet-livery's image decoding (mer3ly Ruling 111); on by default.
+image-decode = ["pictograph?/image-decode"]
 # The portable Mere graph/domain surface. This is deliberately smaller than
 # the composed desktop facade so browser hosts can take graph truth without
 # presentation or host-workbench dependencies.
@@ -35,6 +37,10 @@ canvas = [
     "dep:tracing",
     "dep:uxtree",
 ]
+# The canvas's repulsion staged on the host's GPU (`canvas::PhysicsDevice`,
+# `Canvas::set_physics_device`): pictograph `gpu` -> seiche `gpu` ->
+# conatus `resident`. Opt-in per consumer (ruled 2026-10-02).
+canvas-gpu = ["canvas", "pictograph/gpu"]
 # App-host composition and routing. Native hosts use this today; portable
 # graph consumers do not need to pay for it.
 workbench = [

@@ -3,8 +3,8 @@
 **Date:** 2026-08-10
 **Kind:** research brief (design probe; nothing here is scheduled)
 **Anchors:** [credential port + gazette brief](2026-08-10_credential_port_gazette_brief.md),
-[castellan OTP plan](../implementation_strategy/2026-08-10_castellan_otp_plan.md),
-[projection proofs plan](../implementation_strategy/2026-07-21_projection_proofs_plan.md) (P5),
+[castellan OTP plan](../../archive_docs/2026-10-06_completed_plans/2026-08-10_castellan_otp_plan.md),
+[projection proofs plan](../../archive_docs/2026-10-06_completed_plans/2026-07-21_projection_proofs_plan.md) (P5),
 retinue's `2026-08-09_signalman_cambium_desktop_scope.md`.
 
 **Execution note, 2026-08-11:** the station-identity origin boundary below is

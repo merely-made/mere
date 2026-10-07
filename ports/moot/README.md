@@ -39,7 +39,7 @@ invite/join/leave/reconnect/expire/revoke sequence against a consumer's own
 `LifecycleDriver` and takes those differences as declared `Capabilities`
 rather than failures. Domain state, history, merge and authorization stay with
 Gemot, Commons, the place worker and the fixture's store. See the
-[coop lifecycle parity plan](../../design_docs/mere_docs/implementation_strategy/2026-09-16_coop_lifecycle_parity_plan.md).
+[coop lifecycle parity plan](../../design_docs/archive_docs/2026-10-06_completed_plans/2026-09-16_coop_lifecycle_parity_plan.md).
 
 ## License
 

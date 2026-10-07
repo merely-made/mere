@@ -14,7 +14,7 @@ proof before adding public rendezvous infrastructure.
 **Related:**
 
 - [browser-to-native WebRTC feasibility](../research/2026-08-25_browser_native_webrtc_carrier_probe.md)
-- [Graphshell remote projection host](2026-07-22_graphshell_remote_projection_host_plan.md)
+- [Graphshell remote projection host](../../archive_docs/2026-10-06_completed_plans/2026-07-22_graphshell_remote_projection_host_plan.md)
 - [Graphshell reference host](2026-07-27_graphshell_reference_host_plan.md)
 - [reachability rungs and privacy lanes](2026-08-03_reachability_rungs_and_privacy_lanes_plan.md)
 - [net-media plan](2026-05-26_net_media_plan.md)
@@ -932,6 +932,10 @@ Five findings from landing it, three of them about the instrument:
    badge. The genet change is committed on genet `main`; mere's web manifest
    still pins genet at `eff0cb6`, so a clean checkout renders boxes until
    the pin is aligned past it — locally the config redirect makes it live.
+   **Corrected 2026-10-06 (S14 pass):** resolved. At mere 535bca11,
+   `ports/graphshell/web/Cargo.toml` pins genet `bd3e8861` (2026-10-02),
+   which contains the font fix `893ccb9b3d9` and the size fix `577e2471e97`,
+   so a clean checkout renders text.
 
 ## 8. C5: public rendezvous
 
@@ -1520,3 +1524,11 @@ Harness: `crates/probes/webrtc-ping` *(historical citation)* <!-- doc-audit: his
   manifest's `[profile.dev]` setting; the DOC_README index line for this
   plan still reads "C4 open" and belongs to the lane holding that file.
   Next: C5, public rendezvous.
+  **Corrected 2026-10-06 (S14 pass):** the index line is resolved; at mere
+  535bca11 DOC_README.md reads "C4 landed 2026-09-02 …; C5 next".
+
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  support/doc-audit/d2/batch_44_s14_phase_b6.md: the web manifest's genet pin
+  and the DOC_README index line, both left open on 2026-09-02, are marked
+  resolved.

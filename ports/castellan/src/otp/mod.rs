@@ -12,14 +12,17 @@
 //! remains usable for its time step, and an HOTP remains usable until its
 //! verifier consumes the matching counter.
 //!
-//! The core accepts an imported URI. [`OtpItemStore`] seals the configured
-//! generator under one persona and gives callers no way to retrieve its seed.
-//! [`OtpReleaseGate`] turns an explicit approval into an [`OtpCodeTile`], whose
-//! timing facts let any host render its own remaining-seconds ring. Direct
-//! petitions are marked unverified. [`OtpAdmittedSession`] instead derives the
-//! participant and exact item scope from Notochord, rechecks retained authority
-//! at approval and delivery, and pairs the opaque approval only with its
-//! original carrier. The host keeps its own application encoding.
+//! The core accepts an imported URI. [`OtpItemStore`] files it in the
+//! persona's [`crate::items::ItemStore`] as a chatelaine item holding one
+//! `Otp` credential, whose seed is that credential's sealed payload, and gives
+//! callers no way to retrieve the seed. [`OtpCredential`] is the secret-free
+//! item and credential a host sees. [`OtpReleaseGate`] turns an explicit
+//! approval into an [`OtpCodeTile`], whose timing facts let any host render
+//! its own remaining-seconds ring. Direct petitions are marked unverified.
+//! [`OtpAdmittedSession`] instead derives the participant and exact credential
+//! scope from Notochord, rechecks retained authority at approval and delivery,
+//! and pairs the opaque approval only with its original carrier. The host
+//! keeps its own application encoding.
 //!
 //! ```
 //! use castellan::otp::{Otp, OtpAlgorithm};
@@ -38,6 +41,7 @@
 
 mod admitted;
 pub mod base32;
+mod credential;
 mod item;
 mod participant;
 mod release;
@@ -62,7 +66,11 @@ pub use admitted::{
     OtpAdmittedSession, OtpApprovedRelease, OtpSessionDelivery, otp_item_path, otp_release_policy,
 };
 pub use base32::Base32Error;
-pub use item::{OtpItem, OtpItemError, OtpItemId, OtpItemStore};
+// The display enums are chatelaine's, one definition for the taxonomy and
+// castellan. `OtpKind` stays here: it carries the live HOTP counter.
+pub use chatelaine::{OtpAlgorithm, OtpCodeStyle, OtpMode};
+pub use credential::OtpCredential;
+pub use item::{OtpItemError, OtpItemStore};
 pub use participant::{OtpReleaseParticipantClaim, OtpReleaseParticipantProof};
 pub use release::{
     OtpReleaseDenied, OtpReleaseError, OtpReleaseGate, OtpReleaseId, OtpReleasePolicy,
@@ -81,35 +89,6 @@ pub const MIN_SECRET_BYTES: usize = 16;
 /// A deliberately small upper bound for a caller-selected comparison window.
 pub const MAX_SKEW_STEPS: u64 = 10;
 
-/// The HMAC hash behind a code.
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
-pub enum OtpAlgorithm {
-    /// SHA-1. The RFC 4226 original and what essentially every issuer uses.
-    #[default]
-    Sha1,
-    /// SHA-256.
-    Sha256,
-    /// SHA-512.
-    Sha512,
-}
-
-impl OtpAlgorithm {
-    /// The spelling used in an `otpauth://` URI.
-    pub fn as_uri_str(self) -> &'static str {
-        match self {
-            OtpAlgorithm::Sha1 => "SHA1",
-            OtpAlgorithm::Sha256 => "SHA256",
-            OtpAlgorithm::Sha512 => "SHA512",
-        }
-    }
-}
-
-impl fmt::Display for OtpAlgorithm {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str(self.as_uri_str())
-    }
-}
-
 /// Whether codes advance on a clock or on a stored counter.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum OtpKind {
@@ -125,28 +104,6 @@ pub enum OtpKind {
         /// The next counter value to use.
         counter: u64,
     },
-}
-
-/// Characters used to present a generated code.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum OtpCodeStyle {
-    /// RFC-style decimal output with an explicit width.
-    Decimal {
-        /// Number of decimal digits in the code.
-        digits: u32,
-    },
-    /// Valve's five-character Steam Guard compatibility alphabet.
-    SteamGuard,
-}
-
-impl OtpCodeStyle {
-    /// Number of visible characters in a code of this style.
-    pub fn character_count(self) -> u32 {
-        match self {
-            Self::Decimal { digits } => digits,
-            Self::SteamGuard => 5,
-        }
-    }
 }
 
 /// Why a generator could not be built or a code could not be produced.

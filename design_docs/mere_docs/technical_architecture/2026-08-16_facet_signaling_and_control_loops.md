@@ -16,7 +16,7 @@ participants *say to each other* through what nodes carry.
 [graph behaviors plan](../implementation_strategy/2026-08-13_graph_behaviors_plan.md)
 owns the watch and cascade substrate section 6 reasons over (its slices W0
 through W5 landed 2026-08-13 and its actuation deadband landed 2026-08-18); the
-[capability model plan](../implementation_strategy/2026-07-23_capability_model_plan.md)
+[capability model plan](../../archive_docs/2026-10-06_completed_plans/2026-07-23_capability_model_plan.md)
 owns the capability algebra section 7 proposes extending.
 
 ## 1. The question, and its correction

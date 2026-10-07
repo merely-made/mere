@@ -16,7 +16,7 @@ request, projection), `crates/forme` (topology, SplitPanes), numen `field.rs`/`c
 
 - [graph_projections_research](2026-06-22_graph_projections_research.md) pins the surface-level
   vocabulary (arrangement / lens / projection). This brief works below all three: the engine.
-- [modular_integration_plan §1](../implementation_strategy/2026-06-02_modular_integration_plan.md):
+- [modular_integration_plan §1](../../archive_docs/2026-10-06_superseded_plans/2026-06-02_modular_integration_plan.md):
   the graph-rooted projection model. Within mere that rule stands; §5 generalizes the *engine*
   beneath it to sources beyond mere's graph.
 - [data_oriented_doctrine_brief](../../2026-07-02_data_oriented_doctrine_brief.md): the §5 model
@@ -25,14 +25,14 @@ request, projection), `crates/forme` (topology, SplitPanes), numen `field.rs`/`c
   and [node_dissolution_facets_plan](../../archive_docs/2026-08-06_completed_plans/2026-07-18_node_dissolution_facets_plan.md):
   the facet system §5's source-fact modeling rides. **S2 is complete** (2026-07-19, `631b852`):
   the kernel `Node` carries no geometry; placement persists as `arrangement.position` facets.
-- [participant_gate_packs_plan](../implementation_strategy/2026-07-17_participant_gate_packs_plan.md):
+- [participant_gate_packs_plan](../../archive_docs/2026-10-06_completed_plans/2026-07-17_participant_gate_packs_plan.md):
   "gestures route back as authorized intents" (§1) is this gate's vocabulary; scene actions are
   typed proposals, not direct mutations.
-- [isometric_orrery_camera_plan](../implementation_strategy/2026-06-22_isometric_orrery_camera_plan.md):
+- [isometric_orrery_camera_plan](../../archive_docs/2026-10-06_completed_plans/2026-06-22_isometric_orrery_camera_plan.md):
   the shipped 2.5D lane §4 builds on.
 - [burn_utilization_brief](2026-07-04_burn_utilization_brief.md): §7's signal-producer posture
   consumes the approved burn direction, not a new lane.
-- [node_representation_arrangement_plan](../implementation_strategy/2026-06-18_node_representation_arrangement_plan.md):
+- [node_representation_arrangement_plan](../../archive_docs/2026-10-06_superseded_plans/2026-06-18_node_representation_arrangement_plan.md):
   representation stays orthogonal to placement; §5 sharpens this into "the representation
   measures, the projection places."
 
@@ -53,7 +53,7 @@ The second critique extends it into a destination:
 
 **2026-07-23 note:** this destination was realized as the scenograph family
 (sceno, scenomise, scenotime, scenograph), which the
-[repo consolidation plan](../implementation_strategy/2026-07-23_repo_consolidation_plan.md)
+[repo consolidation plan](../../archive_docs/2026-10-06_completed_plans/2026-07-23_repo_consolidation_plan.md)
 homes inside the mere repository. "Mere" in this brief names the platform,
 not one product among peers; Graphshell is its shell and remote port. Read
 repository boundaries as packaging, never as authority.
@@ -535,7 +535,7 @@ ProjectionLens), `crates/forme/forme/src/tree/layout.rs` (SplitPanes), numen
   recompute-gated host loop → headed receipt, `RESULT ok`); the spiral packs 15 fixed-extent
   nodes into overlap, making the footprint channel an **empirical finding, not a prediction**.
   Execution + findings tracked in the
-  [projection_proofs_plan](../implementation_strategy/2026-07-21_projection_proofs_plan.md);
+  [projection_proofs_plan](../../archive_docs/2026-10-06_completed_plans/2026-07-21_projection_proofs_plan.md);
   this brief stays the direction record.
 - 2026-07-24: **woodshed reconciliation, both directions.** Woodshed's plan already named the
   scenograph family, reframed its `StageGraphSnapshot` as a source adapter (the analog of

@@ -3,7 +3,7 @@
 **Status (updated 2026-09-06):** historical catalog and build-order record
 from 2026-07-08. In current practice, Cambium owns view composition and
 Sprigging owns retained paint leaves; the current catalog is
-[2026-07-15_component_catalog_growth_plan.md](./2026-07-15_component_catalog_growth_plan.md)
+[2026-07-15_component_catalog_growth_plan.md](../../archive_docs/2026-10-06_completed_plans/2026-07-15_component_catalog_growth_plan.md)
 and [component-catalog.md](../technical_architecture/component-catalog.md).
 `chisel`, `xilem-serval`, and the consumer routes below are the proposal's
 historical vocabulary.

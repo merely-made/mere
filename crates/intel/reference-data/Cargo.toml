@@ -1,0 +1,16 @@
+[package]
+name = "reference-data"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Opt-in, validated local lexical reference packs; no executable code or network transport."
+readme = "README.md"
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+blake3.workspace = true
+
+[lints]
+workspace = true

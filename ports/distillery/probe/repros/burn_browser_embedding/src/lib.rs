@@ -61,7 +61,7 @@ pub struct GraphCaseReceipt {
 #[cfg(target_arch = "wasm32")]
 mod browser {
     use burn::nn::LayerNormConfig;
-    use burn::tensor::{Device, DeviceKind, Int, Tensor, TensorData, module::embedding};
+    use burn::tensor::{Device, Int, Tensor, TensorData, module::embedding};
     use wasm_bindgen::prelude::*;
 
     use super::{EmbeddingCaseReceipt, EmbeddingReceipt, GraphCaseReceipt};
@@ -545,7 +545,9 @@ mod browser {
 
     #[wasm_bindgen]
     pub async fn run_embedding_repro() -> Result<String, JsValue> {
-        let device = Device::wgpu_options().init_async().await
+        let device = Device::wgpu_options()
+            .init_async()
+            .await
             .map_err(|error| JsValue::from_str(&error.to_string()))?;
         let graph_cases = run_layer_norm_graph_cases(&device).await?;
         let mut cases = vec![

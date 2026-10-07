@@ -1,9 +1,14 @@
 # Low-Power Radio and Managed Network Plan
 
-**Status:** in execution (2026-07-27). V1-V8 have landed; V7's carrier matrix
+**Status (2026-10-06):** in execution. V3-V8 have landed: V7's carrier matrix
 passes over Memory, real p2panda/Iroh, Reticulum/TCP, and headed
-Reticulum/direct-PHY RF. Murm's accept path consumes the carrier's accepted
-session directly. The V0/V2 power and sleep bench remains open.**
+Reticulum/direct-PHY RF, and Murm's accept path consumes the carrier's accepted
+session directly. V1 and V2 are implemented and compile-verified in Retinue
+(`a67472a`, `88c55cc`); Retinue's 2026-07-29 receipt partially accepts
+Light-sleep and one direct RF wake on hardware, but current and energy remain
+unmeasured, so the V0/V2 power and sleep bench is still open. V9 (signed
+offers), V10 (selective replication) and V11 (Tulle feedback, failover,
+bonding) have not started, so completion conditions 5-7 are unmet.
 
 This round joins two pieces that are useful independently and stronger
 together:
@@ -139,6 +144,11 @@ and keeps its own revocation ledger. It does not create another membership
 token. Gemot remains responsible for Moot membership and constitutional
 authority.
 
+**Corrected 2026-10-06 (S14 pass):** the grammar has since split. `5364dfa0`
+(2026-09-24) moved the delegation statements and their checks from personae to
+insigne; notochord depends on insigne with its `verify` feature
+(`crates/system/notochord/Cargo.toml`), and personae keeps issuing.
+
 ### D6. The session proof signs the transport context
 
 The handshake signs a canonical transcript containing:
@@ -190,6 +200,10 @@ independent bearers demonstrate aggregate goodput and graceful lane loss.
 - **Replication, storage, and compute domains** retain their existing
   authorizers.
 - **The host** persists owner settings and presents them for editing.
+
+**Corrected 2026-10-06 (S14 pass):** the delegation and revocation proof
+primitives are insigne's since `5364dfa0` (2026-09-24); personae supplies
+issuing only.
 
 `notochord` is a session-policy component, not a master policy engine.
 
@@ -754,6 +768,11 @@ Bonded acceptance requires:
 **Done when:** the evidence distinguishes useful independent capacity from two
 logical paths sharing one bottleneck.
 
+**Open, raised by the S14 pass (2026-10-06):** V9, V10 and V11 have no code at
+mere 535bca11 (no `NodeOffer`, no `InterfaceObservation`, no failover or
+bonding, in Mere or in Retinue). Where should they live? Options: keep them
+here as this round's open phases; extract them to their own plan; retire them.
+
 ## Verification wall
 
 ### Retinue workspace
@@ -900,6 +919,19 @@ of what is and is not established is
 `retinue/design_docs/2026-07-24_low_power_uart_personality.md`. Blocker 1
 (the bench session) still stands and is now the head of the lane.
 
+**Corrected 2026-10-06 (S14 pass):** not every wake claim is unproven any
+more. Retinue's
+`retinue/design_docs/2026-07-29_v4_light_sleep_rf_wake_acceptance.md` is
+"partially accepted on hardware": Light-sleep resumes without reset, the
+SX1262 stays usable across repeated timer wakes, and one direct RF wake was
+proved end to end. Repeated RF-triggered sleep continuity, current and energy
+remain unmeasured, so V0/V2 stays open.
+
+**Open, raised by the S14 pass (2026-10-06):** does Retinue's 2026-07-29
+receipt count toward V2 here? Options: record it as V2's first partial headed
+proof; keep it as Retinue-side evidence and leave V2 wholly open until the
+bench.
+
 **Blocker 2 is resolved:** retinue's V3 work is pushed; `main` and
 `origin/main` agree, so the reticulum-feature arm builds from a clean
 checkout.
@@ -1028,6 +1060,12 @@ evidence boundary are in
 qualifier remains a V0/V2 power and wake proof; the USB-powered direct-PHY
 carrier proof does not substitute for it.
 
+**Corrected 2026-10-06 (S14 pass):** this and the direct-PHY entry's closing
+paragraph were overtaken two days later in part: Retinue's 2026-07-29
+Light-sleep and RF-wake receipt (see the correction under 2026-07-25) proves
+Light-sleep and one direct RF wake on hardware. Current and energy remain
+unmeasured, so the power half of V0/V2 is still open.
+
 **V6 is closed as of 2026-07-27.** The done-condition is literal now: Murm
 grew a session lane (`murm::session_lane`, Notochord N2's Murm half), and an
 owner rule admits or refuses a real Murm connection with zero posts crossing
@@ -1039,6 +1077,16 @@ What first existed was the transport-shaped proof over a `tokio::io::duplex` pai
 and a refused one delivers **zero** application bytes. Wiring the adapter
 into Murm's real accept path and running it over p2panda's endpoint closed
 that gap above.
+
+### 2026-10-06 — S14 pass
+
+- **2026-10-06 (S14 pass).** Status and claims corrected against the tree at
+  mere 535bca11, from the D2 record in
+  `support/doc-audit/d2/batch_42_s14_phase_b4.md`: the status now separates
+  V3-V8 (landed) from V1/V2 (compile-verified, headed proofs waiting on the
+  bench) and names V9-V11 as not started; Retinue's 2026-07-29 partial
+  Light-sleep and RF-wake receipt is recorded against the "unproven" claims;
+  D5 and Ownership name insigne for the proof primitives (`5364dfa0`).
 
 ## Completion
 

@@ -148,7 +148,10 @@ malformed, wrong-kind, and newly resolving annotations.
 Every active Markdown document must have a D2 judgment record. The durable
 ledger lives under `support/doc-audit/d2/`: the original snapshot aggregate is
 retained unchanged, later documents receive parser-shaped supplemental batch
-records, and archived records remain as history. Run
+records, and archived records remain as history. A batch record for a
+document the snapshot already covers is a later judgment and supersedes the
+snapshot's record for that document; the snapshot file itself is never edited
+(amended 2026-10-06, ruling S34 of the stack seams plan). Run
 `python scripts/mere_doc_judgment_audit.py` whenever an active document is
 added, moved, or archived; the command must report full current-path coverage.
 
@@ -210,7 +213,14 @@ follows its subject, in both directions, in the same session as the code.
 docs move with it in the same session. An area root describing code that lives
 elsewhere is the failure this pass cleaned up, and core §4's "docs live with
 the repo that owns the subject" is the general form of it. Track the work in
-the [doc policy consolidation plan](mere_docs/implementation_strategy/2026-08-24_doc_policy_consolidation_plan.md).
+the [doc policy consolidation plan](archive_docs/2026-10-06_completed_plans/2026-08-24_doc_policy_consolidation_plan.md).
+
+**Amended 2026-10-06 (ruling S65 of the
+[stack seams plan](mere_docs/implementation_strategy/2026-10-04_stack_seams_plan.md)):**
+that plan is complete and archived. The work is recorded here, in this
+policy, instead: this addendum's area-root list and the round-trip
+paragraph above are the record of the 2026-09-03 return, and a later move
+is recorded the same way.
 
 **Member-crate scatter was collapsed 2026-08-24.** Nine `crates/*/design_docs/`
 directories held 20 documents, 18 of which `DOC_README.md` did not index. They
@@ -227,7 +237,7 @@ The donor graphshell repo was **GitHub-archived on 2026-05-27** (read-only at <h
 
 The Graphshell name was reclaimed on 2026-07-22 for the family-wide remote
 projection host, and on 2026-07-23 the
-[repo consolidation plan](mere_docs/implementation_strategy/2026-07-23_repo_consolidation_plan.md)
+[repo consolidation plan](archive_docs/2026-10-06_completed_plans/2026-07-23_repo_consolidation_plan.md)
 ruled Graphshell as Mere's shell and remote port, homed in this repository.
 Graphshell documentation belongs here under `mere_docs` (a dedicated
 `graphshell_docs/` area-root may be founded when volume warrants). The

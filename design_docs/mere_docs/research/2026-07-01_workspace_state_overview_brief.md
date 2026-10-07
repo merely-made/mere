@@ -6,7 +6,7 @@
 **Status**: cross-cutting state snapshot (research). Doc-derived: full
 `DOC_README.md` index read plus deep reads of the most recent plans
 ([roster detail cards](../../archive_docs/2026-09-02_retired_plans/2026-06-29_graph_object_roster_detail_cards_plan.md),
-[smolweb host integration](../implementation_strategy/2026-06-28_smolweb_host_integration_plan.md)),
+[smolweb host integration](../../archive_docs/2026-10-06_completed_plans/2026-06-28_smolweb_host_integration_plan.md)),
 then a second pass over the 2026-07-01-touched crop (§7). Statuses are as
 their owning docs report them; code-verified only where noted. Successor
 snapshot to the [in-the-wings audit](2026-06-15_in_the_wings_and_browser_bar_audit.md)
@@ -34,7 +34,7 @@ complete), user zoom shipped, auto-DPI planned.
   (both 2026-07-01).
 - **Spatial shell.** Multi-graph, multi-window, and the tear-out trichotomy
   (leaf / branch / fork) are functionally done; the
-  [gestures plan](../implementation_strategy/2026-06-24_tearout_gestures_plan.md)
+  [gestures plan](../../archive_docs/2026-10-06_completed_plans/2026-06-24_tearout_gestures_plan.md)
   retains the interactive tail (toast view, drag-out gesture, dock-side
   setting).
 - **Memory.** Alembic pane, Athanor idle daemon, engram save / open / compose
@@ -49,12 +49,12 @@ complete), user zoom shipped, auto-DPI planned.
 
 ## 2. Where we're headed
 
-- **The keystone: [capture / provenance / consent](../implementation_strategy/2026-06-26_capture_provenance_consent_plan.md).**
+- **The keystone: [capture / provenance / consent](../../archive_docs/2026-10-06_completed_plans/2026-06-26_capture_provenance_consent_plan.md).**
   The eidetic sink is built but nothing live writes a `BrowsingTrace`, and the
   Provenance family has zero writers. C1 (the live recorder) unlocks the
   browsing-memory vision: eidetic corpus, tessera pricing, the flora lane.
 - **Undo/redo, then the event log and Timeline**
-  ([event_log_timeline](../implementation_strategy/2026-07-01_event_log_timeline_plan.md):
+  ([event_log_timeline](../../archive_docs/2026-10-06_superseded_plans/2026-07-01_event_log_timeline_plan.md):
   undo ships first, with zero storage).
 - **The write side of knots**: the [djot editor](../../archive_docs/2026-08-06_completed_plans/2026-06-24_djot_editor_knot_nodes_plan.md)
   (jotdown + logos injection, pure Rust, wasm-safe), with

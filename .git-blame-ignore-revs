@@ -1,0 +1,7 @@
+# Formatting-only commits for `git blame --ignore-revs-file .git-blame-ignore-revs`
+# (or `git config blame.ignoreRevsFile .git-blame-ignore-revs`). The canonical
+# rustfmt policy (rustfmt.toml, 2026-09-04) asks that each conforming sweep be its
+# own commit and be listed here.
+
+# 2026-10-04 muniment OPFS probe, cargo fmt under the policy (burn plan 13.44, ruling 559)
+9d778fc5599e95906fba569246ea4cf8cca3c6a8

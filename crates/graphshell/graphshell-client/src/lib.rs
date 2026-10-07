@@ -10,11 +10,13 @@ pub mod action_draft;
 pub mod core;
 pub mod driver;
 pub mod frozen;
+pub mod remote;
 pub mod session;
 
 pub use action_draft::{ActionDraft, ActionDraftSemantics, ActionDraftTarget};
 pub use core::{Outcome, Progress, RESUME_ATTEMPTS, SessionCore};
 pub use driver::{Advance, SessionDriver};
+pub use remote::{ActionForm, RemoteOp, RemoteSession};
 pub use session::{
     RetainedEndpointSession, resume_after_notice, resume_request_for_notice, unexpected,
 };
@@ -127,7 +129,55 @@ pub struct AccessibleItem {
     pub instance: InstanceId,
     pub label: String,
     pub role: SemanticRole,
+    /// What the endpoint advertises for the item; invoking one submits it.
     pub actions: Vec<AdvertisedAction>,
+    /// What the viewer itself offers on the item, filled by the host
+    /// ([`LocalActions`]): invoking one calls the host's handler and never
+    /// the carrier, so a local action never leaves the device, and an
+    /// endpoint advertising the same intent keeps its own invocation
+    /// (dynamics grammar plan, F64).
+    pub local_actions: Vec<AdvertisedAction>,
+}
+
+/// A mounted item a host's local action is offered on or invoked for.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct LocalActionTarget<'a> {
+    pub session: &'a ProjectionSession,
+    pub instance: InstanceId,
+    /// The item's source, as the scene names it.
+    pub source: Option<&'a sceno::SourceRef>,
+}
+
+/// The viewer's own actions on mounted items (F64): which it offers, and
+/// carrying one out. Supplied by the host at the call; the client holds no
+/// handler and so never routes a local action anywhere else.
+pub trait LocalActions {
+    fn actions(&self, item: &LocalActionTarget<'_>) -> Vec<AdvertisedAction>;
+    /// Carry out `action`, one of [`Self::actions`] for `item`. Whether it
+    /// was carried out.
+    fn invoke(&mut self, item: &LocalActionTarget<'_>, action: &AdvertisedAction) -> bool;
+}
+
+/// No local actions: the tree as the endpoint alone describes it.
+pub struct NoLocalActions;
+
+impl LocalActions for NoLocalActions {
+    fn actions(&self, _: &LocalActionTarget<'_>) -> Vec<AdvertisedAction> {
+        Vec::new()
+    }
+    fn invoke(&mut self, _: &LocalActionTarget<'_>, _: &AdvertisedAction) -> bool {
+        false
+    }
+}
+
+/// Why a local action was not carried out.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum LocalActionError {
+    UnknownSession,
+    /// No active item has this instance.
+    UnknownItem,
+    /// The host does not list this intent for the item.
+    NotListed,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -378,12 +428,23 @@ impl ClientState {
         session: &ProjectionSession,
         profile: &CapabilityProfile,
     ) -> Result<AccessibilityTree, ResolutionError> {
+        self.accessibility_tree_with(session, profile, &NoLocalActions)
+    }
+
+    /// [`Self::accessibility_tree`], each item also carrying the host's own
+    /// actions on it (F64).
+    pub fn accessibility_tree_with(
+        &self,
+        session: &ProjectionSession,
+        profile: &CapabilityProfile,
+        local: &dyn LocalActions,
+    ) -> Result<AccessibilityTree, ResolutionError> {
         let mounted = self
             .mounted
             .get(session)
             .ok_or(ResolutionError::UnknownSession)?;
         let mut children = Vec::new();
-        for (instance, _) in mounted.scene.active_items_in_order() {
+        for (instance, item) in mounted.scene.active_items_in_order() {
             let Some(offers) = mounted.presentation.offers_for(instance) else {
                 continue;
             };
@@ -394,17 +455,55 @@ impl ClientState {
                 .ok_or(ResolutionError::UnknownPresentation)?
                 .semantics
                 .clone();
+            let target = LocalActionTarget {
+                session,
+                instance,
+                source: source_of(&mounted.scene, item),
+            };
             children.push(AccessibleItem {
                 instance,
                 label: semantics.label,
                 role: semantics.role,
                 actions: semantics.actions,
+                local_actions: local.actions(&target),
             });
         }
         Ok(AccessibilityTree {
             label: "Graphshell projection".into(),
             children,
         })
+    }
+
+    /// Carry out a local action the host lists for an item: its handler is
+    /// called, and nothing is sent to the endpoint (F64).
+    pub fn invoke_local(
+        &self,
+        session: &ProjectionSession,
+        instance: InstanceId,
+        intent: &chirograph::IntentReference,
+        local: &mut dyn LocalActions,
+    ) -> Result<bool, LocalActionError> {
+        let mounted = self
+            .mounted
+            .get(session)
+            .ok_or(LocalActionError::UnknownSession)?;
+        let (_, item) = mounted
+            .scene
+            .active_items_in_order()
+            .into_iter()
+            .find(|(candidate, _)| *candidate == instance)
+            .ok_or(LocalActionError::UnknownItem)?;
+        let target = LocalActionTarget {
+            session,
+            instance,
+            source: source_of(&mounted.scene, item),
+        };
+        let action = local
+            .actions(&target)
+            .into_iter()
+            .find(|action| action.intent == *intent)
+            .ok_or(LocalActionError::NotListed)?;
+        Ok(local.invoke(&target, &action))
     }
 
     pub fn acknowledgement(&self, session: &ProjectionSession) -> Option<ProjectionAck> {
@@ -670,6 +769,18 @@ fn check_persistence_policy<E>(
         },
         CacheRetention::EncryptedPersistent | CacheRetention::Exportable => Ok(()),
     }
+}
+
+/// The source a scene item was projected from.
+fn source_of<'a>(
+    scene: &'a SceneSnapshot,
+    item: &sceno::ProjectedItem,
+) -> Option<&'a sceno::SourceRef> {
+    scene
+        .tables
+        .sources
+        .get(item.source.0 as usize)
+        .and_then(Option::as_ref)
 }
 
 #[cfg(test)]

@@ -6,7 +6,7 @@
 **and** its physics hitbox. Raised by Mark off the P0-resize thread: *size* is a simple
 settled knob (shipped); the *sprite / editability / customizability* of a node is "totally
 unsettled." This doc frames that space; it does not settle it.
-**Related**: [node_representation_arrangement_plan](../implementation_strategy/2026-06-18_node_representation_arrangement_plan.md)
+**Related**: [node_representation_arrangement_plan](../../archive_docs/2026-10-06_superseded_plans/2026-06-18_node_representation_arrangement_plan.md)
 (the Representation forms + the size knob), the gyre collider (crates/orrery/gyre).
 
 ---

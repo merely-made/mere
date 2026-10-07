@@ -62,7 +62,7 @@ fn add_and_retrieve_slot_round_trip() {
     let key = ProtocolKey::new("nostr", None);
     vault.add_slot(key.clone(), nostr_slot()).unwrap();
 
-    let slot = vault.slot(&key).expect("slot present");
+    let slot = vault.slot(&key).unwrap().expect("slot present");
     assert_eq!(slot.kind(), "nostr");
     assert_eq!(
         slot.lineage(),
@@ -89,7 +89,7 @@ fn bootstrap_slot_carries_state_dir() {
         .add_slot(key.clone(), matrix_slot(dir.clone()))
         .unwrap();
 
-    match vault.slot(&key).expect("present") {
+    match vault.slot(&key).unwrap().expect("present") {
         IdentitySlot::Bootstrap {
             kind,
             bootstrap,
@@ -180,7 +180,7 @@ fn switching_profiles_is_live_and_a_failed_switch_changes_nothing() {
     let before = vault.master_public_key().to_bytes();
 
     vault.switch_profile(&personal.id).unwrap();
-    assert_eq!(vault.current_profile().id, personal.id);
+    assert_eq!(vault.current_profile().unwrap().id, personal.id);
     assert_ne!(
         vault.master_public_key().to_bytes(),
         before,
@@ -190,7 +190,7 @@ fn switching_profiles_is_live_and_a_failed_switch_changes_nothing() {
     // A profile that will not load leaves the current one untouched rather
     // than half-switched.
     assert!(vault.switch_profile(&ProfileId("absent".into())).is_err());
-    assert_eq!(vault.current_profile().id, personal.id);
+    assert_eq!(vault.current_profile().unwrap().id, personal.id);
 }
 
 #[test]

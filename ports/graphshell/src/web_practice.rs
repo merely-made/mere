@@ -1,11 +1,17 @@
 // Copyright 2026 Mark Alan Boykin
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
 //! A working session over disclosed source objects. Product evidence enters at
 //! the edge; the grammar places occurrences, Seiche moves a transient view,
-//! and Cambium/Genet build retained Netrender fragments. Motion never lays out
-//! text or recompiles a recipe. The browser's native controls are a keyed
-//! realization of the very same Control records, including their rectangles.
+//! and Cambium/Genet build retained Netrender fragments. An axis the recipe
+//! encodes from a data field is pinned on that axis, so motion never moves a
+//! card off its value there (dynamics grammar plan, G7, F28). Motion never
+//! lays out text or recompiles a recipe. The browser's native controls are a
+//! keyed realization of the very same Control records, including their
+//! rectangles.
 
 use cambium::{GenetAppRunner, el, text};
 use genet_render::TextSystem;
@@ -16,12 +22,12 @@ use graphshell::{
         PracticeWorkspace, PracticeWorkspaceSnapshot, Selection,
     },
     projection_compile::{
-        CompiledProjection, ProjectionDataset, ProjectionFieldType, ProjectionOccurrence,
-        ProjectionValue, compile, default_definition, refresh,
+        CompiledProjection, PRACTICE_CARD, ProjectionDataset, ProjectionFieldType,
+        ProjectionOccurrence, ProjectionValue, default_definition, practice_compiler,
     },
     projection_editor::{Channel, ProjectionDefinition, SourceBinding},
 };
-use mere::canvas::{BoardItem, PhysicsBoard};
+use mere::canvas::{ArrangementAction, Axes, BoardItem, PermittedActions, PhysicsBoard};
 use netrender::{Scene, ScenePath, Transform};
 use serde::{Deserialize, Serialize};
 use std::{
@@ -105,6 +111,16 @@ pub(super) struct PracticeHost {
     card_size: (f32, f32),
     selected_tone: Option<String>,
     focus_view: bool,
+}
+
+/// The axes `definition` encodes from data fields, declared from the
+/// encoding rather than inferred from positions.
+fn encoded_axes(definition: &ProjectionDefinition) -> Axes {
+    let field = |channel: &Channel| matches!(channel, Channel::Field(f) if !f.trim().is_empty());
+    Axes {
+        x: field(&definition.encoding.x),
+        y: field(&definition.encoding.y),
+    }
 }
 
 fn tones(value: &serde_json::Value) -> String {
@@ -201,9 +217,9 @@ impl PracticeHost {
         definition.appearance.title = "Thursday practice".into();
         definition.encoding.x = Channel::Field("x".into());
         definition.encoding.y = Channel::Field("y".into());
-        let compiled = compile(&definition, &dataset).map_err(|e| format!("{e:?}"))?;
+        let compiled = practice_compiler().compile(&definition, &dataset).map_err(|e| format!("{e:?}"))?;
         let mut board = PhysicsBoard::new();
-        board.set_pull(120.0);
+        board.set_encoded_axes(encoded_axes(&definition));
         Ok(Self {
             workspace,
             dataset,
@@ -225,7 +241,7 @@ impl PracticeHost {
             dragging: None,
             clock_ms: None,
             accumulator_ms: 0.0,
-            card_size: (164.0, 68.0),
+            card_size: (PRACTICE_CARD.w, PRACTICE_CARD.h),
             selected_tone: None,
             focus_view: false,
         })
@@ -245,10 +261,10 @@ impl PracticeHost {
         let scale = (available_w / bounds.size.w.max(1.0))
             .min(available_h / bounds.size.h.max(1.0))
             .min(1.5);
-        self.card_size = (164.0 * scale, 68.0 * scale);
+        self.card_size = (PRACTICE_CARD.w * scale, PRACTICE_CARD.h * scale);
         let stacked = width < 480;
         if stacked {
-            self.card_size = (width.saturating_sub(48) as f32, 68.0);
+            self.card_size = (width.saturating_sub(48) as f32, PRACTICE_CARD.h);
         }
         let origin_x = (width as f32 - bounds.size.w * scale) * 0.5;
         let origin_y = 216.0 + (available_h - bounds.size.h * scale) * 0.5;
@@ -276,14 +292,26 @@ impl PracticeHost {
             .collect();
         if !self.workspace.runtime().physics_enabled {
             self.board = PhysicsBoard::new();
-            self.board.set_pull(120.0);
         }
+        self.sync_permitted();
+        self.board.set_encoded_axes(encoded_axes(&self.definition));
         self.board.sync(items);
         if !self.workspace.runtime().physics_enabled {
             self.board.halt();
         }
         self.clock_ms = None;
         self.accumulator_ms = 0.0;
+    }
+
+    /// With motion off the board withdraws drag, so a still board holds its
+    /// cards; the pointer reads the board's advertisement (G9).
+    fn sync_permitted(&mut self) {
+        self.board
+            .set_permitted_actions(if self.workspace.runtime().physics_enabled {
+                PermittedActions::all()
+            } else {
+                PermittedActions::without(ArrangementAction::Drag)
+            });
     }
 
     pub(super) fn command(&mut self, command: &str) -> Result<(), String> {
@@ -328,7 +356,7 @@ impl PracticeHost {
                 "grid" | "scatter" => {
                     let mut definition = self.definition.clone();
                     definition.arrangement.kind = format!("{command}.default");
-                    let compiled = refresh(&self.compiled, &definition, &self.dataset)
+                    let compiled = practice_compiler().refresh(&self.compiled, &definition, &self.dataset)
                         .map_err(|e| format!("{e:?}"))?;
                     self.workspace
                         .set_runtime(PracticeRuntimeConfig {
@@ -357,6 +385,8 @@ impl PracticeHost {
                     if enabled {
                         self.sync_slots(self.extent.0, self.extent.1);
                     } else {
+                        // Withdrawing drag ends one under way, as a release.
+                        self.sync_permitted();
                         self.board.halt();
                         self.dragging = None;
                     }
@@ -397,7 +427,7 @@ impl PracticeHost {
                     if saved.workspace.runtime.layout_id != saved.definition.arrangement.kind {
                         return Err("Saved layout disagrees with recipe".into());
                     }
-                    let compiled = refresh(&self.compiled, &saved.definition, &self.dataset)
+                    let compiled = practice_compiler().refresh(&self.compiled, &saved.definition, &self.dataset)
                         .map_err(|e| format!("{e:?}"))?;
                     let workspace = PracticeWorkspace::reopen(
                         saved.workspace,
@@ -608,7 +638,7 @@ impl PracticeHost {
                 if width > 650 {
                     add(
                         "gesture",
-                        "Drag a card; release to settle toward its slot".into(),
+                        "Drag a card; release to return it to its slot".into(),
                         String::new(),
                         "quiet",
                         [210.0, y, w - 230.0, 33.0],
@@ -1072,6 +1102,10 @@ impl PracticeHost {
                 self.board.is_settling().to_string(),
             ),
             (
+                "data-practice-encoded-drift",
+                format!("{:.3}", self.board.encoded_drift()),
+            ),
+            (
                 "data-practice-metrics",
                 serde_json::to_string(&self.metrics).map_err(|e| e.to_string())?,
             ),
@@ -1195,7 +1229,9 @@ pub(super) fn install(state: &Rc<RefCell<BrowserHost>>) -> Result<(), String> {
                 return;
             };
             if phase == "pointerdown" {
-                if event.button() != 0 || !practice.workspace.runtime().physics_enabled {
+                // Whether the card may move is the board's advertisement,
+                // which `drag_start` reads (G9).
+                if event.button() != 0 {
                     return;
                 }
                 let Some(target) = event.target().and_then(|t| t.dyn_into::<Element>().ok()) else {
