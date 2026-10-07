@@ -112,6 +112,12 @@ struct Rest {
     frames: usize,
 }
 
+/// Forces built over a graph's edges.
+type Build = Box<dyn Fn(&[(NodeKey, NodeKey)]) -> Vec<Box<dyn Force>>>;
+
+/// A group per node.
+type Groups = HashMap<NodeKey, u32>;
+
 /// How the law slot is filled for a run.
 enum Slot {
     /// The picked law (Springs).
@@ -119,7 +125,7 @@ enum Slot {
     /// A composition through the catalog.
     Composition(PhysicsComposition),
     /// Forces built by the test over the canvas's graph.
-    Forces(Box<dyn Fn(&[(NodeKey, NodeKey)]) -> Vec<Box<dyn Force>>>),
+    Forces(Build),
 }
 
 /// Run `slot` over the graph on `members` from the scatter until rest.
@@ -236,12 +242,7 @@ fn line(name: &str, run: &Rest, against: &HashMap<NodeKey, u32>) -> Separation {
 
 /// The partitions on main, by node key of the full fixture (keys are dense
 /// in index order).
-fn partitions() -> (
-    HashMap<NodeKey, u32>,
-    HashMap<NodeKey, u32>,
-    HashMap<NodeKey, u32>,
-    HashMap<NodeKey, u32>,
-) {
+fn partitions() -> (Groups, Groups, Groups, Groups) {
     let (graph, keys) = graph_of(&all());
     let topics = keys
         .iter()

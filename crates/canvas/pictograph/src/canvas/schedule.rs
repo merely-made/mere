@@ -110,7 +110,7 @@ impl Canvas {
     /// The last capture's positions, if a schedule captured one.
     pub fn captured_positions(&self) -> Option<&[(NodeKey, PortablePoint)]> {
         (self.active_strategy.as_deref() == Some(CAPTURED_ARRANGEMENT))
-            .then(|| self.strategy_positions.as_deref())
+            .then_some(self.strategy_positions.as_deref())
             .flatten()
     }
 
