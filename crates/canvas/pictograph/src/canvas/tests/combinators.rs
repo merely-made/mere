@@ -73,8 +73,9 @@ fn every_law_reports_its_currency() {
 }
 
 /// Law by overlay: a force law composes every overlay, Still and Anneal
-/// take them converted, and Density takes Hub room and Centre
-/// converted and refuses the rest (F73), with the reason both pickers show.
+/// take them converted, and Density takes Hub room, Centre and Tide
+/// converted and refuses the rest (F73, F81), with the reason both pickers
+/// show.
 /// Through the canvas, Density with an overlay runs its conversion and
 /// Density alone does not.
 #[test]
@@ -102,7 +103,8 @@ fn the_catalog_composes_converts_or_refuses_each_overlay_by_currency() {
         DENSITY_ADMITS,
         &[
             PhysicsOverlay::DegreeRepulsion,
-            PhysicsOverlay::GravityLocus
+            PhysicsOverlay::GravityLocus,
+            PhysicsOverlay::Tide
         ]
     );
     // Density with Centre, as the catalog builds it, runs exactly as Density
@@ -202,10 +204,9 @@ fn a_composition_takes_force_laws_only_and_a_pick_replaces_it() {
     assert!(canvas.physics_composition().is_none(), "a pick replaces it");
 }
 
-/// Every term the catalog builds is on the common scale, or its kernel is
-/// one F5 names no reference for; the one term whose kernel has a reference
-/// and still reports none is Grid, whose cell (120) cannot hold an offset
-/// of the unit length (170). The lists are printed for the fork.
+/// Every term the catalog builds is on the common scale, or its kernel
+/// depends on no distance (F80); none has a reference and reports no scale.
+/// Grid reads at its half cell (F79). The lists are printed.
 #[test]
 fn every_catalog_term_is_on_the_common_scale_or_named_outside_it() {
     let (keys, edges, sites) = ring();
@@ -253,7 +254,7 @@ fn every_catalog_term_is_on_the_common_scale_or_named_outside_it() {
     println!("on the common scale, by weight: {}", scaled.join("; "));
     println!("kernels F5 names no reference for: {}", unnamed.join("; "));
     println!("a reference, but none reported: {}", uncovered.join("; "));
-    assert_eq!(uncovered, vec!["grid-snap grid".to_string()]);
+    assert!(uncovered.is_empty(), "{uncovered:?}");
 }
 
 /// The weighted sum, instant by instant: on the ring at a seeded scatter, a

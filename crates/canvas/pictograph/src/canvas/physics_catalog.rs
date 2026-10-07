@@ -216,20 +216,22 @@ impl PhysicsLaw {
     }
 }
 
-/// The overlays Density takes, converted into its flow: of the three F73
-/// named ("Hub room, Centre, Tide if they hold"), those that hold its own bar
+/// The overlays Density takes, converted into its flow: the three F73
+/// named ("Hub room, Centre, Tide if they hold"), against Density's own bar
 /// ("Min 60, bar: all >= 0.7") at all sixteen dealt starts of both bar
 /// graphs. Hub room's lowest start reads 0.808 (gen-50) and 0.765 (gen-200),
-/// Centre's 0.703 and 0.735; Tide's 0.699 on gen-50 misses it.
+/// Centre's 0.704 and 0.735, and Tide's 0.699 and 0.736, admitted with them
+/// (F81, "Admit Tide too").
 pub(crate) const DENSITY_ADMITS: &[PhysicsOverlay] = &[
     PhysicsOverlay::DegreeRepulsion,
     PhysicsOverlay::GravityLocus,
+    PhysicsOverlay::Tide,
 ];
 
 /// Why Density refuses the rest.
-pub(crate) const DENSITY_REFUSAL: &str = "Density takes only Hub room and Centre: converted into \
-                                          its flow, the other overlays keep room from following \
-                                          mass.";
+pub(crate) const DENSITY_REFUSAL: &str = "Density takes only Hub room, Centre and Tide: converted \
+                                          into its flow, the other overlays keep room from \
+                                          following mass.";
 
 /// Overlays a law refused: which, and why. The law itself was applied.
 #[derive(Clone, Debug, PartialEq, Eq)]
