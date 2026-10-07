@@ -557,7 +557,8 @@ and it stays in `genet/design_docs/archive_docs/2026-09-02/`, cited by path.
   model** — document family (djot/markdown/reader-HTML, native `Block`) versus
   smolweb family (gemtext/gopher/feed/scroll/misfin, a per-format AST, views
   shared with the host because they avoid `Block`). The views now live in
-  `cambium::nematic` with no consumer. Its §5 crate-home diagram is superseded
+  `cambium::nematic` with no consumer; **removed 2026-10-06** under S66 (the
+  fidelity plan's WS4, R0). Its §5 crate-home diagram is superseded
   by the smolweb home decision; crate homes read through that.)
 - [micron_navigation_plan](nematic_docs/implementation_strategy/2026-09-15_micron_navigation_plan.md)
   (**accepted, in progress (2026-10-06): C1 to P1c, Cambium's scroll request and A1's Knot half landed 2026-09-16; A1's Turnstone half next**: lane 2 of the fidelity plan. Anchors and
