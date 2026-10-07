@@ -536,7 +536,12 @@ leaf, whose key deliberately collides with a key of A's. Each session's
 AccessKit tree is published as a subtree under a graft node in the host's root
 tree. *Reading, not ruled:* the two documents' AccessKit ids will coincide,
 as two fresh arenas allocate alike, so the subtrees' independent id spaces are
-exercised for real. E1a checks it.
+exercised for real. E1a checks it. **Corrected 2026-10-07:** they do not
+coincide. Genet's `NodeId` carries a process-wide arena id, so in-process
+sessions never share AccessKit ids. The subtrees still carry each session's
+focus, route its actions and retire it whole, and coinciding ids do come
+from other sources (a host's path-hashed nodes, another process's tree), so
+E1a's tree half checks them with model guests.
 
 **E1a, windowless, on any machine.** The updates feed `accesskit_consumer`'s
 tree, the layer every pinned adapter uses. Done when:
@@ -582,6 +587,27 @@ did on 2026-08-20.
 
 **Recorded, no bar:** the host process's memory with no guest, with A, and
 with A and B.
+
+**Progress (2026-10-07).** E1a passes on branch `turnstone-session-seam`
+(Turnstone U15's lane), windowless, against `accesskit_consumer` 0.35, 0.36
+and 0.38, the consumers under the Windows, AT-SPI and macOS adapters:
+
+- *Tree half,* `crates/forme/uxtree/tests/e1a_subtrees.rs`, 27 checks: the
+  join itself with model guests whose ids coincide, including one focus move
+  into a new guest and between two held guests, and both controls failing as
+  they must.
+- *Session half,* `crates/cambium/cambium-winit-a11y/tests/e1a_sessions.rs`,
+  18 checks: two `RunnerSurfaceSession`s in `ContainedSession`, laid out and
+  projected on their own; done-conditions 1 to 6 above, with a shared leaf
+  registry as the control for 6.
+- *Built for it:* `uxtree::graft` (the AC2 helper), runner and session focus
+  exits, `ContainedSession`, per-session leaf registries (Turnstone U17), and
+  a public `OwnedLayout::new`.
+- *Found:* `Grafts` must order a frame's updates so that focus entering a
+  guest is one move, not a stop at the guest's stale focus; and the id
+  reading above does not hold for in-process sessions.
+
+E1b, the headed walks, is next and needs Mark at each machine.
 
 **Where it lives** is part of fork AC3. *Reading, not ruled:* E1a fits as
 tests beside the shared helper in Mere. E1b fits as a small binary under
