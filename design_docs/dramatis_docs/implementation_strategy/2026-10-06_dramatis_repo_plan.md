@@ -1,7 +1,7 @@
 # Dramatis Repo Plan
 
 **Date**: 2026-10-06
-**Status (2026-10-06)**: assessed; rulings D1 to D21 (§3). Nothing built.
+**Status (2026-10-07)**: assessed; rulings D1 to D23 (§3). Nothing built.
 The vault lock finishes first (D18), then phases DR-A to DR-E (§4).
 **Scope**: the identity tier leaves mere for its own repository, `dramatis`,
 which becomes the product. personae, insigne, gaz, chatelaine (the
@@ -342,6 +342,20 @@ Secret Service metadata); the types only; also personae's SSH slots shown
 as keychain items, one browse surface (CXF ruling 10 already routes
 imported SSH keys into personae slots). Mark: **"Also SSH keys as items"**.
 
+**Ruling D22** *(confirms D6; asked 2026-10-07).* *Notes Mark pasted on
+2026-10-07 proposed the identity repo hold castellan's custody and
+authority, with "the identity core and keeper" building and testing on
+their own.* Options: D6 stands (castellan in mere beside djinn, the repo
+holding only secret-free crates, no cycle); reopen, moving castellan to
+dramatis once its pandect and chirograph dependencies are cut. Mark:
+**"D6 stands (Recommended)"**.
+
+**Ruling D23** *(confirms D18).* *The same notes recommend promoting the
+boundary now and extracting once it works on its own; D18 finishes the
+vault lock first because L2 to L4 edit the castellan code DR-A moves.*
+Options: D18 stands; start DR-A beside the lock. Mark: **"D18 stands
+(Recommended)"**.
+
 Still open: whether gazette gets a matching facade name over gaz, the way
 chatelaine is the keychain.
 
@@ -433,3 +447,9 @@ now owns:
   it"). *Reading, not ruled:* D14 and D15 make the split unnecessary. The
   view types move to dramatis and graphshell stops naming castellan, so no
   consumer needs views from castellan without its authority.
+
+**2026-10-07, notes on promoting the identity family.** They agree with
+rulings already made: D7 (leaf crates first, gazette held until its
+projection is split), D10 (notochord moves) and DR-D's done-condition
+(two apps on one identity revision, no duplicate types). They differ on
+castellan's home and on timing; D22 and D23 keep D6 and D18.
