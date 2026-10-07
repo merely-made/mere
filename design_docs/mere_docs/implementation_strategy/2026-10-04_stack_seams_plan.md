@@ -1,8 +1,8 @@
 # Stack seams plan: catalog, shared device, actions, determinism, two words
 
 **Date:** 2026-10-04
-**Status (2026-10-06):** in progress. Seventy rulings in twenty-three rounds
-(S1 to S70); P1 landed on main (`1633be0c`); P2 staged (S27 to S31, four
+**Status (2026-10-06):** in progress. Seventy-four rulings in twenty-four rounds
+(S1 to S74); P1 landed on main (`1633be0c`); P2 staged (S27 to S31, four
 stages in §3.1) and landed on main (`40d7ae5e`); S32 (F19) landed on main
 (`48c08dee`); the S14 pass (S33) done (`8d7702d2`, receipt
 `support/doc-audit/d2/remediation_2026-10-06.md`); P3 and S7 done as
@@ -823,6 +823,16 @@ Round 23, 2026-10-06. Evidence: the phase C remediation receipt (`support/doc-au
 
 **Ruling S70.** *What is next now that the S14 pass is done?* Options: the S59 critical pass with Eidetic's development; S66's code follow-on (a typed-column block in EngineDocument, richer smolweb ASTs, the per-format `cambium::nematic` views retiring); the render ladder rethink; the F18/F20 measurements. Mark: **"S66 code follow-on"**. Follows: S66's code follow-on is the next objective, assessed first (the smolweb fidelity plan, EngineDocument, the views' consumers) before any code.
 
+Round 24, 2026-10-06. Evidence: S70's assessment. Nothing in any repository calls the per-format views (`gemtext_view`, `gopher_view`, `nex_view`, `feed_view`) and nothing enables cambium's `nematic` feature. Every host renders smolweb through document-canvas (`SmolwebDocument` holds Nematic's `EngineDocument`), which already has monospace text and a table grid. Nematic lowers gopher links to plain paragraphs and info lines to one preformatted block, losing each row's type. `InlineSpan::Submit` exists (the Spartan prompt uses it). Gemtext keeps line boundaries as `SoftBreak`, which document-canvas renders as a space (`text.rs:218`), so the hard-break setting is render-side. `Block` is not `#[non_exhaustive]`; about ten renderers in Mere and knot-editor's desktop preview match it exhaustively. gopher-protocol (smolweb repository, crates.io, pinned `=0.1.1`) has no raw item type, keeps the 8/T inversion and has no CSO kind; Errand and Nematic are published, so they cannot take a git dependency. Errand's `FeedEntry` has guid, link, one date, one summary and enclosures, no content; `Block::FeedEntry` has title, date, summary and two URLs.
+
+**Ruling S71.** *What shape does EngineDocument's typed-column block take?* Options: a typed menu block (new `Block::Menu`: rows with an item kind, the raw type character, label spans and an optional target, laid out as a fixed-width grid, a list of typed items to accessibility); `Block::Table` plus a fixed-width flag on `BlockPresentation`; a fixed-width wrapper only. Mark: **"Typed menu block (Recommended)"**. Follows: `Block::Menu` is added: each row carries an item kind, the raw type character, label spans and an optional target; info rows have no target and a search row carries `InlineSpan::Submit`; document-canvas lays it out as a fixed-width grid (type column, label column) and the accessibility projection exposes a list of typed items. Gopher lowers to it first.
+
+**Ruling S72.** *Adding a Block kind breaks every exhaustive match outside inker (about ten renderers in Mere, knot-editor's desktop preview). Does Block become `#[non_exhaustive]` in the same change?* Options: keep it exhaustive, the compiler finding every renderer, knot-editor briefly red first; mark it `#[non_exhaustive]`, every crate outside inker gaining a wildcard arm. Mark: **"Mark non_exhaustive"**. Follows: `Block` becomes `#[non_exhaustive]` in the same change; every crate outside inker, Mere's own renderers included, gains a wildcard arm, and knot-editor and Turnstone take that change once and then stop breaking on new block kinds. *Reading, not ruled*: a wildcard arm surfaces the kind it cannot draw as a `DocumentDiagnostic::UnsupportedConstruct` rather than dropping it silently, so the compiler check S72 gives up is replaced by a visible one.
+
+**Ruling S73.** *A faithful type column needs gopher-protocol to gain a raw item type, the 8/T fix and a CSO kind: a breaking 0.2.0 release, and publishing is irreversible. How is it sequenced?* Options: coarse now, release later (the block carries a raw-type field from day one, the crate changes prepared in the smolweb repository and published only on Mark's sign-off); release first; coarse kinds only. Mark: **"Coarse now, release later (Recommended)"**. Follows: `Block::Menu` carries the raw type character from the start, filled from today's kinds (`Other(char)` keeps unknown characters; a known kind maps to its canonical character); gopher-protocol's raw type, 8/T fix and CSO kind are prepared in the smolweb repository, and 0.2.0 is published only on Mark's sign-off, after which Mere repins.
+
+**Ruling S74.** *Is the feed part of this objective? Errand's feed tree and `Block::FeedEntry` would gain published and updated dates, a separate summary and content, and enclosures; content is HTML, so how the article reader renders it is an open lane decision.* Options: the fields now and the reader later; the typed column only; the fields and the reader. Mark: **"Fields and reader"**. Follows: the feed is in this objective: errand's feed tree and `Block::FeedEntry` gain published and updated dates, summary and content separately, and enclosures, in the same breaking change as `Block::Menu`; the article reader's lane is decided now, as the next round.
+
 ## 3. Phases
 
 ### 3.1 This plan's lane
@@ -991,6 +1001,7 @@ The done-conditions handed over for S3 and S4, kept for reference:
   owning their code path. Turnstone's untracked `.github/workflows/portable.yml`
   (2026-09-20) was left alone. The projection grammar lane took FT9/FT10 as
   its adoption plan's Track F (`28985298`).
+- **2026-10-06.** Round 24: S71 to S74, S66's code follow-on shaped: a typed `Block::Menu`, `Block` made `#[non_exhaustive]`, gopher-protocol's raw types prepared and released on sign-off, the feed fields and the article reader in scope.
 - **2026-10-06.** Round 16: S46 (live plans handed to their lanes), S47
   (reviewed write lanes) and S48 (ownerless tails to the archived plan tails
   backlog). S44's repins and S45's header re-run were flagged as separate
