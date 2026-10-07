@@ -1,7 +1,12 @@
 # Graph semantics plan: assertions, resources, saved queries, residency
 
 **Date:** 2026-10-04
-**Status (2026-10-07):** in progress. P1 implemented and gated on
+**Status (2026-10-07):** in progress; scope bounded by Mark's "Bound it."
+Five phases remain. P2 closes against the six requirements in §4; independent
+archive cleanup is deferred. C5/C6 are the only planned future decision stops.
+The bounded plan is delivered before new implementation resumes. Saved work
+and accepted rulings remain retained; no new fork is being put to Mark.
+P1 implemented and gated on
 `graph-semantics`, with the ruling-9 exact-journal and legacy-checkpoint
 attribution repair complete after the original `459cad84` receipt. Those
 receipts covered IRI-safe handles; the C19 opaque-id gap is now repaired
@@ -42,10 +47,19 @@ footprint cache lifecycle, enforcement of the pending C28 checkpoint and
 checked resource codicil imports. All touched-crate, workspace and wasm32
 gates pass; receipts are recorded in Progress. The prior 384-test receipt is
 historical. This checkpoint does not complete P2.
-Mark resumed with "Ok, proceed, orchestrating". New policy checkpoints
-C24–C28 hold aggregate restoration, walk hop costs, RDF identity input,
-automatic legacy migration activation and mixed raw/carried lineage; the
-already ruled semantics stand.
+Mark resumed with "Ok, proceed, orchestrating", then accepted option 1 for
+C24–C28 with "Agreed. Proceed." (rulings 37–41). Stable aggregate origins,
+zero-hop shown joins, explicit RDF identity intent, a durable boundary profile
+and explicit mixed-history origin resolution now govern the next P2 slice.
+Their source is implemented; dependent gates are in progress. Durable neutral
+profiles do not yet activate legacy replay. C29 option 1 is accepted (ruling
+42): persist exact translated effects bound to the retained source. Its session
+integration is in progress. C30 selects standard RDF reification and C31 selects
+extending the wallet-sealed transaction wrapper (rulings 43–44). Both are now
+in implementation; input grammar ambiguities remain separate stop points.
+S53's RDF-profile fidelity and serialization checks remain P2 work. Its
+independent vocabulary remapping and older dependency/oracle retirement are
+deferred under the dated scope boundary in §4.
 Resource population and conflict migration remain incomplete.
 Replay-first migration and per-predicate placement govern P2. The committed
 identity/lifecycle slice and recreation repair pass their gates; P2 is incomplete.
@@ -1653,6 +1667,223 @@ its vocabulary/lock checkpoints remain as recorded above. The final P2
 done-condition battery follows these changes. No P3–P5 work begins here.
 Kernel paths in this finding are under `crates/graph/graph-kernel/src`.
 
+### P2 replay and JSON-LD forks C29/C30 (2026-10-07)
+
+**C29: retain translated legacy effects.** The original raw assertion capture
+has no statement id (`graph/capture.rs`, `ReplayAssertRelationByIds`). The
+qualified adapter returns exact `baseline_effects` and one `entry_effects`
+list per retained entry (`graph/legacy_resource_migration.rs`, `MigratedReplay`).
+Pandect retains the original baseline and full journal, and its `edits_of`
+and `graph_at` still read those original captures (`graph_session.rs`). A
+checkpoint alone cannot make a later raw-history replay reproduce the first
+migration's generated handles. The pending fork was put to Mark with:
+
+1. **Persist translated effects (recommended).** Retain exact effects with
+   the placement profile, bound to the retained source digest; reopen,
+   history and undo use the same first-migration handles.
+2. **Checkpoint only.** Preserve the raw history and document that replay
+   outside the checkpoint may remint handles and cannot promise exact undo.
+
+Mark selected option 1 on 2026-10-07; ruling 42 records his answer. Exact
+receipt/session integration now proceeds. Neutral profile APIs and
+recorded-strata reads were implemented before that answer.
+
+**C30: JSON-LD assertion representation.** Current expanded and compact
+shapers use default-scope surface quads (`linked-data/src/lib.rs`,
+`node_quads`, `node_object`, `compact_node_object`). The complete dataset
+projection includes resource assertions and one RDF 1.2 reifier per assertion,
+but those shapers do not handle its triple terms. Ingest recognizes
+`rdf:reifies` triple terms, without a classic reification bridge
+(`linked-data/src/ingest.rs`, pass A). Pending choices:
+
+1. **RDF reification objects plus ingest bridge (recommended).** Export
+   subject/predicate/object records with exact handles, scope and provenance;
+   translate them into assertion records on import.
+2. **Mere assertion records.** Define a Mere-specific JSON-LD metadata graph
+   grammar, requiring Mere-aware readers for lossless assertion round trips.
+3. **Keep JSON-LD partial.** Require RDF 1.2 N-Quads/TriG for exact transfer;
+   this revises S53's inherited lossless JSON-LD done-condition.
+
+Mark selected standard RDF reification on 2026-10-07; ruling 43 records his
+answer. Human-readable default/absent metadata omission is
+independent, and must preserve the complete positional binary shape.
+
+Kernel paths above are under `crates/graph/graph-kernel/src`; Pandect paths are
+under `crates/system/pandect/src`; linked-data paths are under `crates/graph`.
+
+### C24–C28 source and S53 omission review (2026-10-07)
+
+The implemented adapter now covers all 23 legacy aggregate kinds: 16 on
+resources and seven retained on surfaces. Its lifetime catalog is keyed by
+original surface pair and kind; withdrawal changes active membership, not
+first endpoints or the first migration note. Explicit C28 choices must name
+an evidenced pair; exact carried handles stay distinct from raw-generated
+ones. New custom carried handles under unresolved declaration conflicts
+are refused; known held handles retain their store. These controls are in
+`graph/legacy_resource_migration.rs` (15 tests), with journal prefix entry
+points in `graph/journal.rs`.
+
+Component/Ego derivation in `graph/query.rs` collapses shown bindings at zero
+hops, then counts relations across both strata. Hidden resources carry the
+walk; public results remain surface ids. Canvas uses that same walk. Tests
+cover radii 0–3, aliases, reverse/parallel relations, self-loops, selectors,
+equal UUIDs in separate strata and read-only snapshots/revisions.
+
+RDF apply accepts explicit per-subject identity intent through
+`apply_contribution_with_identity` (`linked-data/src/ingest/apply.rs`).
+Existing bindings and resource metadata survive; generic RDF defaults to
+exact term identity and pages opt into canonical URL identity. No contribution
+DTO or capture grammar changed, and current production extractor callers have
+not yet been wired to the additive page callback.
+
+Pandect's `graph_placement.rs`, `graph_session.rs`, `session_graph_store.rs`
+and `graph_codicil.rs` persist explicit profiles at atomic boundaries and expose
+profiled snapshots/v3 codicils. Bare v1/v2 inputs remain unqualified. Known
+legacy inputs cannot bypass qualification through compatibility materializers.
+Ordinary legacy activation and production profile threading remain incomplete;
+C29's receipt integration is now authorized by ruling 42.
+
+Human-readable serialization in `types.rs` and `persistence_edge.rs` omits
+absent metadata and default scope, retaining every populated value. Binary
+serializers keep all eight property fields and all seven statement fields in
+their prior order. Four tests verify JSON omission/populated controls, exact
+Postcard byte parity and rkyv round trips. The size battery now includes actual
+Author attribution and a 50-surface/25-resource/50-binding baseline with 49
+resource assertions. Measured incremental cost is 198 bytes/property and 546
+bytes/assertion, including its edge wrapper; the existing 280/760-byte ceilings
+are unchanged. Annotated properties cost 301 bytes each and the rich resource
+snapshot grows from 63,594 to 67,465 bytes (bare 36,841), a positive size control.
+No binary layout or legacy edge compatibility fields were changed.
+
+The first kernel compile caught a test's nonexistent `GraphScope::Named`,
+corrected to `Custom`; the first linked-data compile caught three private
+resource-reader calls in a new test, replaced by complete public snapshot
+record comparisons. An initial cartography command used the library name
+instead of package `mere-cartography` and was corrected. The failed logs are
+retained alongside fresh gates; these are command/fixture failures, not passed
+receipts. Kernel/store now passes 407 units and the compile-fail doctest,
+linked-data/query 53, Pandect 321; dependent gates are still in progress.
+
+Kernel paths above are under `crates/graph/graph-kernel/src`, Pandect paths
+under `crates/system/pandect/src`, and linked-data paths under `crates/graph`.
+
+### Atomic legacy qualification checkpoint C31 (2026-10-07)
+
+The C29 receipt must be installed against the retained source it translated.
+A check followed by `Backend::apply` leaves a concurrent-write window. Four
+shipped backends support consistent transactional reads and atomic writes:
+Memory (`muniment/src/backend.rs`), Directory (`muniment/src/directory_backend.rs`),
+redb (`muniment/src/redb_backend.rs`) and IndexedDB (`muniment/src/indexeddb_backend.rs`).
+Pandect's `wallet_sealed_backend.rs` explicitly refuses transactions; the
+default `Backend::transact` also returns `NotTransactional`. The fork is:
+
+1. **Require transactions; defer wrapper (recommended).** Qualification
+   refuses sealed and other nontransactional backends; ordinary reads and
+   writes retain their existing contract.
+2. **Require transactions; extend wallet wrapper.** Add sealed transaction
+   support in Mere in this lane and qualify its read/write behavior.
+3. **Allow exclusive-writer fallback.** Require caller exclusivity without
+   a transaction; concurrent source changes are detected only on later reopen.
+
+Mark selected extending the wallet-sealed wrapper on 2026-10-07; ruling 44
+records his answer. Transactional activation and sealed transaction support
+now proceed together. The source
+transaction recheck includes the profile, receipt, retained baseline and the
+journal, including modern entries present at qualification.
+
+### C29 exact replay review (2026-10-07)
+
+Persisting baseline effects alone is insufficient: materializing aggregate-only
+surface edges can mint a handle that no baseline delta changes. The receipt
+therefore freezes the complete migrated baseline from the same materialization
+as the translated entry effects. Each entry retains its original Author; the
+cutoff is permanent and the later journal replays as recorded. Raw source bytes
+are captured at session open and checked again before qualification, preventing
+an old in-memory graph from being bound to a newer retained source.
+
+Independent review found that `GraphSnapshot::timestamp_secs` is stamped by
+`graph/snapshot/to.rs`, so comparing freshly replayed snapshot envelopes could
+reject an unchanged receipt on later reopen. `FrozenGraph` now compares all
+graph and facet truth while excluding only that envelope clock. The checksum
+still covers its exact stored bytes. A deterministic changed-clock positive
+control accompanies changed-resource and changed-facet refusal controls in
+`pandect/src/graph_placement.rs`. C31 still holds storage activation; its
+prepared transaction guard checks the retained source under the commit reader.
+
+The same review found a second loader seam: the legacy snapshot loader
+unconditionally rederives surface `Domain`/`UrlPath` relations
+(`graph/snapshot/from.rs`, `graph/query.rs`). Receipt materialization and
+receipt-bound checkpoints must instead restore their recorded claims without
+that inference, retaining checked resource validation. A narrow additive
+recorded loader and same-host parent/child controls are saved;
+unqualified legacy loading retains its existing behavior. This repair follows
+C29's exact replay contract and does not infer a placement profile. Receipt
+baselines and receipt-bound checkpoints both use `try_from_recorded_snapshot`;
+ordinary/unqualified loading remains unchanged. The source is frozen but its
+fresh Cargo gates remain unrun after the shared-cache wait was interrupted.
+
+### Checkpoint growth and implementation hold (2026-10-07)
+
+Mark challenged the increase from six original checkpoints to 31 and whether
+the plan had actually been finished. Comparison with branch base `36893553`
+confirms that its Progress called the phases final, while P2 combined identity,
+dual-stratum population, navigation, projection and query adaptation without
+settling several related preservation and boundary contracts. The current
+plan has 29 settled numbered checkpoints; original C5 (P3 purge default) and
+C6 (P4 frozen node) remain open. C7–C31 added 25 numbered checkpoints, all
+attached to P2 or P1/P2 boundaries. This count is checkpoint growth, not five
+times as many implementation phases.
+
+Three sources of growth are visible in the record. P2's original design left
+identity and assertion-preservation contracts under-specified; branch/main
+drift caused avoidable repeat C1–C3 questions before reconciliation; and S53
+later imported additional JSON-LD, serialization, vocabulary and dependency
+work. The lane did not consolidate those changes into a bounded review before
+continuing implementation. It also did not consistently distinguish new policy
+from consequences of earlier rulings. These are scope and planning failures;
+the existence of valid individual questions does not justify serial growth.
+
+New implementation is held for review, with saved WIP retained and all three
+owners stopped. C30/C31 answers remain recorded; neither implementation has
+begun. No C32 is added. *Reading, not ruled*: ruling 43's sentence about an
+input-policy checkpoint is an implementation interpretation, not a separately
+answered user decision. Existing C20 and RDF semantics must be checked before
+presenting any new input-policy fork. Review must separate original required
+work, explicitly added work and avoidable decision churn before continuation.
+
+### Bounded scope audit (2026-10-07)
+
+Mark instructed: **"Bound it."** Three read-only inventories found a finite
+P2 closure: production writer routing; shared resource metadata; exact durable
+migration and boundary profiles; existing page-capture association; projection,
+query and interchange parity; and final qualification. The six requirements
+in §4 consolidate those inventories without adding implementation phases or
+checkpoint numbers. Existing APIs already implement resource storage, typed
+captures/handles, predicate declarations, shown bindings and the borrowed query
+adapter; unfinished production paths and metadata representations remain.
+
+Verified seams: Surface-only production wrappers in
+`graph-kernel/src/graph/edge_ops.rs`; Surface tag/property/classification writers
+in `graph/node_facets.rs` and `graph/node_props.rs`; Resource semantic-only RDF
+projection and Surface metadata shaping in `linked-data/src/lib.rs`; Pandect's
+qualification transaction stub and sealed wrapper refusal; Graphshell/Pandect
+profile propagation; and capture hashes without a ResourceNode association in
+Eidetic's `browsing/text.rs` and document-lanes' `eidetic_bridge.rs`. The paths
+are bounded existing Mere responsibilities, not reasons for new feature lanes.
+Kernel and linked-data paths in this finding are under `crates/graph/`.
+
+The RDF inventory also found literal assertion metadata overwritten when two
+reifiers share one property slot (`linked-data/src/ingest.rs`), and property
+dedup omitting the asserter (`graph-kernel/src/types.rs`, `NodeProperty::content_eq`).
+Repair belongs to the accepted separate-assertion and RDF-profile invariants,
+alongside Resource property routing; it does not create a new decision stop.
+
+Scope growth from unaccepted ExampleOf/Summarizes mapping proposals and old
+Oxigraph retirement is independent of the dual-stratum invariants. These two
+items move to the existing archived-plan tails backlog. Current mappings and
+locked dependencies remain in use. JSON-LD fidelity and sealed transactions
+remain explicitly accepted work (rulings 43–44); they are not deferred.
+
 ## 3. Rulings
 
 Mark's answers, from multiple-choice rounds; each is the option label quoted
@@ -1983,7 +2214,121 @@ nature changes govern newly created assertions. Existing handles retain their
 recorded owning store; reads and precise retractions search both strata rather
 than treating the current declaration as their locator.
 
+**Ruling 37 (C24, 2026-10-07).** Mark: **"Agreed. Proceed."** Accepts
+option 1 for C24–C28. Legacy aggregate identity is its original surface pair
+and kind; its first observed resource endpoints survive withdrawal and
+restoration. Those old bytes cannot distinguish a fresh same-kind claim after
+navigation from restoration of the old claim.
+
+**Ruling 38 (C25, 2026-10-07).** The same answer accepts zero-hop shown
+joins. Component/Ego walks traverse both strata; radius counts relation hops,
+so surfaces showing one resource share its zero-hop neighborhood. Unshown
+resources remain traversable between shown resources.
+
+**Ruling 39 (C26, 2026-10-07).** The same answer accepts explicit
+per-subject identity intent at RDF apply. Generic foreign RDF defaults to
+exact IRIs; page extraction explicitly requests canonical page identity.
+Mixed input is supported without changing contribution or capture grammar.
+
+**Ruling 40 (C27, 2026-10-07).** The same answer accepts a durable
+placement profile at the session/codicil boundary. A caller-qualified legacy
+adapter remains necessary until that profile is present. Current declarations
+or resource-column presence cannot prove a historical placement profile.
+
+**Ruling 41 (C28, 2026-10-07).** The same answer accepts explicit
+resource-origin resolution for each ambiguous carried handle before that
+migration activates. Retain the original history and exact carried id; never
+alias it to a generated raw handle. Unambiguous histories can proceed.
+
+**Ruling 42 (C29, 2026-10-07).** Mark:
+**"1. Persist translated effects (Recommended)"**. Qualified legacy sessions
+retain the exact translated effects with their placement qualification, bound
+to a digest of the retained source. Reopening, undo and historical reads use
+the first migration's assertion ids, including held claims whose legacy
+baseline materialization would otherwise mint a fresh id. Original baseline
+and journal remain retained; the qualified legacy prefix ends at a permanent
+cutover and later recorded-strata entries keep their owning stores.
+
+**Ruling 43 (C30, 2026-10-07).** Mark:
+**"A. Standard RDF reification (Recommended): subject/predicate/object records plus metadata in one JSON-LD file. General RDF tools can inspect them; Mere adds an import bridge."**
+Lossless JSON-LD transfer uses classic RDF reification records for individual
+assertions, retaining exact identity, scope, attribution and timestamps. The
+bridge maps those records to the existing assertion model. Treatment of
+ambiguous or incomplete records remains an explicit input-policy checkpoint.
+
+**Ruling 44 (C31, 2026-10-07).** Mark:
+**"B. Extend the sealed wrapper now: implement and test sealed transactions in this lane, allowing qualification there too. Adds storage and encryption-wrapper work."**
+Legacy qualification checks the retained source and installs its receipt in
+one transaction. Mere's wallet-sealed wrapper gains transactional reads and
+writes in this lane, preserving authenticated values and atomic refusal.
+An underlying backend without transactions still refuses qualification.
+
 ## 4. Phases
+
+### Scope boundary (2026-10-07)
+
+Authority: Mark's **"Bound it."**, following the checkpoint-growth review.
+This dated amendment controls the remaining work; the historical findings and
+rulings above remain intact. The lane has five phases, P1–P5. P1 remains
+complete; P2-induced invariant repairs are included in P2's qualification.
+Accepted rulings 1–44 remain the semantic contract. Phase-end report/review
+stops and the isolated Mere-only worktree boundary remain.
+
+P2 has exactly six closure requirements. They are completion checks inside P2,
+not additional phases, user questions or a mechanism for expanding its scope.
+
+| Closure requirement | Remaining work | Completion evidence |
+| --- | --- | --- |
+| Production resource/surface routing | Wire existing live assertion APIs and GraphDelta paths to the settled placement table and custom declarations. Preserve held owning stores and legacy replay grammar. | Every listed Resource/Surface family lands in its ruled stratum; navigating leaves earlier content behind; custom overrides/conflicts, exact handles, retract, replay and undo controls pass. |
+| Shared resource content | Implement the already-ruled tag concepts/tagging assertions, typed literal properties, full classification variants/origins and precise record edits; wire production readers to the shown resource. | Two surfaces share content; navigation keeps earlier content on its resource; tag-owner identity/reuse, separate asserters, literal metadata, conflict variants and classification lifecycle controls pass. |
+| Exact durable migration | Activate the saved receipt using a source-checked transaction; implement C31's sealed wrapper transactions; carry explicit profiles through existing Graphshell, native/codicil and product/transfer boundaries. | First assertion IDs, Authors, facets and stores survive activation, history, undo/redo, checkpoint/fallback and reopen. Changed sources, damaged receipts and unsupported backends refuse atomically. Sealed reads/writes remain authenticated; absent profiles stay unqualified. |
+| Page-capture association | Associate existing immutable content hashes/captures with the common resource ID through current storage paths. | Association survives reopen, is shared by two surfaces and remains with the earlier resource after navigation. Existing capture/fetch/render machinery is reused. |
+| Projection, query and interchange | Complete Resource RDF-profile metadata projection; qualify existing canvas lifting/mixed walks and the borrowed query adapter; implement C30's classic reification JSON-LD bridge. | Adapter/materialized row parity; zero per-query dataset rebuild; radius/alias/hidden-resource controls; expanded/compact JSON-LD and N-Quads/TriG preserve profile assertion IDs, scope, source, time and typed/language literals. |
+| Final qualification and compatibility | Run the P2 done-condition battery and required touched-crate, locked workspace and wasm checks; report established consumer compatibility and branch commits. | Fresh source-qualified receipts; meaningful negative/positive controls; limitations and unrun checks stated. A consumer break stops integration with a concrete report. Main integration still requires Mark's review. |
+
+Implementation applies already-selected contracts rather than generating a
+new checkpoint for each error path or API seam. For classic reification,
+complete unambiguous records with an asserted base quad can represent an
+assertion. Incomplete, multi-valued or standalone descriptions remain ordinary
+RDF; they do not justify selecting a survivor or inventing an assertion.
+Reification alone does not assert its described triple, as specified by
+[W3C RDF Semantics](https://www.w3.org/TR/rdf-mt/#Reif).
+C20's malformed reserved-ID refusal remains atomic. These conservative input
+rules preserve data and existing identity decisions; no C32 is created.
+RDF fidelity is parity under the existing Mere projection profile, not a full
+GraphSnapshot backup or a promise to export arbitrary administrative facets.
+
+Explicitly outside this lane's completion gate: new ExampleOf/Summarizes
+alignments; retirement of the old Oxigraph oracle/dependency; a term dictionary,
+slotmap/backend replacement or new general RDF reasoning; new fetch/render or
+capture engines; new remote wire formats or transport protocols; sibling
+implementation; and new CONSTRUCT/DESCRIBE query capability. The vocabulary
+and oracle tails are retained in the
+[archived-plan tails backlog](2026-07-03_archived_plan_tails_plan.md#rdf-archive-cleanup-deferred-by-graph-semantics-2026-10-07).
+Current mappings/dependencies and the existing materialized query oracle are
+kept. Required compatibility changes remain subject to the established
+consumer gate; this amendment does not authorize silently breaking an API.
+
+P3–P5 retain only their original feature targets and done-conditions below:
+
+- **P3:** coverage on query/projection results and a rebuildable, rederiving,
+  purgeable pending index. C5 is its one remaining policy decision.
+- **P4:** saved SPARQL specs through the existing query capability, sharing by
+  spec, and a revision-frozen nested selection referencing resources and
+  copying statements. C6 is its one remaining representation decision.
+- **P5:** addressable storage of both strata and configured neighborhood
+  residency, using P3's "not loaded" result and full-residency control. Reuse
+  redb/IndexedDB; add no storage engine, scheduler or synchronization protocol.
+
+Only C5 and C6 are planned future decision stops, presented together before
+their dependent implementation. No further numbered C is automatically added.
+An optional newly discovered behavior is deferred with evidence; a mandatory
+contradiction with an accepted ruling or a required done-condition stops the
+phase with one consolidated scope-exception report. It does not silently
+change the contract or start another serial architecture round. Routine
+implementation choices and invariant repairs are the implementation lane's
+responsibility. Nothing received from another lane enlarges this bound without
+an explicit scope amendment from Mark.
 
 ### Placement by stratum (rulings 10, 14, 15)
 
@@ -2095,8 +2440,9 @@ In order; each phase lands green before the next starts. Code samples: none.
 
 ## 5. Checkpoints
 
-Choices with more than one defensible answer that the phases will meet. Each
-comes back to Mark as a fork, with evidence, before the code commits to one.
+Historical numbered decisions and the two remaining original checkpoints.
+The scope boundary in §4 controls future questions. Existing answers remain
+binding; this list no longer grows as a running implementation checklist.
 
 - **C1 (P1). Legacy statements.** Ruled: ruling 9.
 - **C2 (P2). Which families sit on resources.** Ruled: rulings 10 and 14; the
@@ -2143,18 +2489,92 @@ comes back to Mark as a fork, with evidence, before the code commits to one.
   ruling 35. Retain variants and origins; require selection for new writes.
 - **C23 (P2). Later nature changes.** Ruled: option 1, ruling 36.
   Affect new assertions while preserving held handles in their owning stores.
-- **C24 (P2). Legacy aggregate restoration identity.** Open; placement stays
-  ruled. First observed identity versus fresh identity on reappearance.
-- **C25 (P2). Walk hop costs.** Open; both-stratum traversal stays ruled.
-  Zero-cost shown joins versus one hop per shown association.
-- **C26 (P2). RDF identity input.** Open; exact terms/canonical pages stay
-  ruled. Foreign-exact default versus required intent for every new subject.
-- **C27 (P2). Legacy activation profile.** Open; distinguish legacy inputs
-  durably without reinterpreting modern historical surface claims.
-- **C28 (P2). Mixed raw/carried lineage.** Open; explicit resource-origin
-  resolution versus first carried appearance as a new claim. Never alias ids.
+- **C24 (P2). Legacy aggregate restoration identity.** Ruled: option 1,
+  ruling 37; original surface pair/kind and first resource endpoints.
+- **C25 (P2). Walk hop costs.** Ruled: option 1, ruling 38;
+  zero-hop shown joins across both strata.
+- **C26 (P2). RDF identity input.** Ruled: option 1, ruling 39;
+  explicit intent with foreign-exact default and canonical page opt-in.
+- **C27 (P2). Legacy activation profile.** Ruled: option 1, ruling 40;
+  durable boundary profile, caller-qualified adapter until present.
+- **C28 (P2). Mixed raw/carried lineage.** Ruled: option 1, ruling 41;
+  explicit resource-origin resolution, preserving distinct exact ids.
+- **C29 (P2). Translated legacy effects receipt.** Ruled: option 1,
+  ruling 42; persist source-bound exact effects for reopening, undo and history.
+- **C30 (P2). Lossless JSON-LD assertions.** Ruled: option A, ruling 43;
+  standard RDF reification plus import bridge in one JSON-LD file.
+- **C31 (P2). Atomic legacy qualification.** Ruled: option B, ruling 44;
+  transactional qualification and sealed wrapper support in this lane.
 
 ## 6. Progress
+
+- **2026-10-07. Scope bounded on Mark's instruction.** Mark: "Bound it."
+  Completed three read-only owner inventories and added §4's six P2 closure
+  requirements, explicit exclusions and the original P3–P5 limits. No accepted
+  ruling was edited or reopened, no C32 was created and no source work resumed.
+  C30/C31 remain included. Independent vocabulary/oracle cleanup is retained
+  in the existing backlog; it does not block graph-semantics completion.
+  The only planned future questions are C5/C6, to be presented together. The
+  saved source and failed receipt remain uncommitted and unqualified; this
+  pass changes documentation only. Documentation audit and its planted-defect
+  self-test exit 0, and diff checks pass. Fresh source Cargo gates were not run.
+
+- **2026-10-07. Scope challenged; implementation owners held.** Mark asked
+  why the original six checkpoints had multiplied to 31 and whether the plan
+  was unfinished. Held new source edits and stopped all three owners with WIP
+  intact. C30 interchange and C31 sealed transaction support have zero new
+  implementation edits. The migration fixture's failure was resource record
+  insertion order, not differing assertion ids; the source-only ordering repair
+  is saved, with full equality checks retained and its fresh gate still unrun.
+  No Cargo session remains active for this lane and no commit was made.
+  The existing worktree and stable target remain owned by graph-semantics for
+  retained WIP, failure receipts and review. The dated Finding above records
+  the comparison and scope failure; prior rulings remain unchanged.
+
+- **2026-10-07. C30/C31 answered and kernel replay gate resumed.** Mark
+  selected standard reification and extending the sealed transaction wrapper.
+  Recorded rulings 43–44 and released the two bounded implementation owners.
+  Keeping the active turn open allowed both native prompt answers to arrive.
+  The independent full kernel/store run compiled and returned 408 passed and
+  one failure: the exact facet replay fixture exposed resource insertion-order
+  differences while its UserGrouped assertion handle matched. The failed log is retained as
+  `graph-semantics-kernel-facet-replay-failure.log`; investigation precedes a
+  fresh gate. No receipt implementation is qualified or committed yet.
+
+- **2026-10-07. Continuation gates and receipt review.** Before C29 receipt
+  source changes, the C24–C28/S53 omission slice passed kernel/store 407 units
+  and its compile-fail doctest (one example ignored), linked-data/query 53,
+  Pandect 321, cartography 44, pictograph/canvas 300 (13 ignored), and
+  Graphshell/personal-sync 333 library plus five integration tests (four
+  ignored). Those binaries do not qualify the subsequent C29 source. The
+  fresh kernel receipt gate was interrupted while waiting on another workspace
+  lane's Cargo package-cache lock; the queued Pandect compile was interrupted
+  before source repair. No fresh receipt or activation test is claimed green.
+  Documentation audit and its planted-defect/clean-fixture self-test exit 0.
+  Changed Rust implementation files pass formatting with child traversal
+  disabled, and diff checks pass; a broader formatting scan also reports
+  existing unrelated module/import formatting, which was left unchanged.
+  Workspace/wasm32 checks have not been rerun for this continuation. Ignored,
+  headed, browser-hosted, device and sibling checks were not run. All source
+  remains uncommitted on `graph-semantics`; C30/C31 remain pending.
+
+- **2026-10-07. C29 accepted; exact receipt preparation.** Mark selected
+  "1. Persist translated effects (Recommended)". Recorded ruling 42. The
+  migration adapter now captures exact facet changes as well as graph effects,
+  preserving node birth/visit clocks and unknown facet values. Pandect is
+  preparing a complete migrated baseline, source-bound per-entry effects and
+  exact history/undo replay. C31 holds the activation storage policy; C30
+  remains pending. Fresh receipt gates have not yet qualified this source.
+
+- **2026-10-07. P2 continuation after C24–C28 agreement.** Mark accepted
+  the five option-1 recommendations with "Agreed. Proceed.". Recorded rulings
+  37–41 without changing earlier rulings. Reused clean `f98c7d43`, the existing
+  worktree and three agents: migration/origin resolutions, RDF identity input,
+  and durable placement profiles; root owns mixed-stratum walks and integration.
+  Main remains `e7ec66af`, with the graph plan unchanged from the recorded
+  S53 handoff. No main/sibling edits or integration are authorized here.
+  Implementation and fresh gates are pending. Previous checkpoint receipts
+  remain historical evidence, not qualification of the next source slice.
 
 - **2026-10-07. Qualified P2 branch checkpoint.** Reused the existing
   worktree, stable target and three agents. The saved source includes durable
