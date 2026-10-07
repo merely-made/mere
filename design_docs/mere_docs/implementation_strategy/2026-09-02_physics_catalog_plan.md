@@ -1,7 +1,7 @@
 # Physics Catalog Plan
 
 **Date:** 2026-09-02
-**Status (2026-10-06):** in progress. P1 landed 2026-09-02; P1b, P2 on both hosts and P3 the remote board 2026-09-03; the runtime extraction 2026-09-04; P4's web half 2026-09-04, closing with the Graphshell tree port per the 2026-10-01 rulings in §5. P5a-c (kernel, cell list, lagged seam, setters and the web tree at the third-round web defaults, receipts green) merged 2026-10-02 (`8022cedd`); turnstone's wiring and P5d remain. P6a, Density's CPU tier, merged 2026-10-04 (`9b576c84`); P6b, the GPU tier, and P6c, its receipts, remain. Orbit's retune (`9ce5889f`) and Energy's, with the view following while playing (`562488b0`), merged 2026-10-04. Seiche's speed dial, the native entry point and the 1x-floor bound merged 2026-10-06 (`c6e8cc09`, calm round 24 of 24); the period estimator is on `seiche-speed-estimator`, not merged, and turnstone's repin and speed wiring follow the dial's merge (Progress, 2026-10-05). P7 moved to the [dynamics grammar plan](2026-10-02_dynamics_grammar_plan.md) 2026-10-02.
+**Status (2026-10-06):** in progress. P1 landed 2026-09-02; P1b, P2 on both hosts and P3 the remote board 2026-09-03; the runtime extraction 2026-09-04; P4's web half 2026-09-04, closing with the Graphshell tree port per the 2026-10-01 rulings in §5. P5a-c (kernel, cell list, lagged seam, setters and the web tree at the third-round web defaults, receipts green) merged 2026-10-02 (`8022cedd`); turnstone's wiring and P5d remain. P6a, Density's CPU tier, merged 2026-10-04 (`9b576c84`); P6b, the GPU tier, and P6c, its receipts, remain. Orbit's retune (`9ce5889f`) and Energy's, with the view following while playing (`562488b0`), merged 2026-10-04. Seiche's speed dial, the native entry point and the 1x-floor bound merged 2026-10-06 (`c6e8cc09`, calm round 24 of 24); the period estimator and its worker tiebreaker are on `seiche-speed-estimator`, not merged, and turnstone's repin and speed wiring follow the dial's merge (Progress, 2026-10-05). P7 moved to the [dynamics grammar plan](2026-10-02_dynamics_grammar_plan.md) 2026-10-02.
 **Scope:** A catalog of *distinct physics layout laws* — dynamical systems
 over the graph's bodies that produce different layouts because they are
 different physics — as a lever beside the arrangement catalog, plus the
@@ -2910,3 +2910,213 @@ binning are the useful patterns.
   12 of 12 green, the worst admitted frame 233 us under to 67 us over its
   budget, none past the grain, so the one 567 us miss did not recur and the
   200 us margin stands.
+- 2026-10-06 (seiche's speed, the estimator, branch `seiche-speed-estimator`,
+  per "Both machines + planted"). Main `c6e8cc09`, seiche-speed merged, merged
+  in (`e68e0f2d`): no file changed on both sides, main's root lock kept; the
+  gitignored web lock took three zeroize edges for vault lock L1 (`cargo
+  metadata --offline`, now `87188cd2`). The estimator (`381ef289`,
+  `7f98fc4c`): the period is the largest in [1/360 s, 1/60 s] that 75% of the
+  last 40 intervals fit, within two clock steps and 0.1 ms of refresh jitter
+  (0.3 ms at the browser's 100 us), from candidates at the eight shortest
+  intervals over 1, 2, 3, ..., refined by least squares; lifted to twice or
+  three times itself when that keeps 85% of the fit and half the intervals, so
+  a fraction is not read where the period narrowly misses the quorum; stepped
+  down to a half or a third when that fits 0.15 more, so a multiple is not
+  read where a page's frames mostly take an even number of refreshes (the
+  300-node page's first frames take 30, and its first window read 12.157 ms
+  before the step-down); nothing read from fewer than 16 intervals; else the
+  1/60 s cap. Over every prefix window of this machine's 24 logged windows
+  (526, what the page saw as each interval arrived), it reads within 1% of
+  6.07 ms or falls back, none above or below. Twelve planted traces read as
+  they should: 60 Hz (the positive control), 165 Hz over 4 to 17 refreshes,
+  144 Hz on a 5 us clock, 30 fps caps at 60 and 144 Hz, variable refresh
+  falling back to the cap, switches 60 to 144, 144 to 60 and 120 to 60 Hz
+  reading the new rate, 15% outliers, 0.1 ms jitter, mostly six refreshes. The
+  one inherent case: a page whose frames all take an even number of refreshes
+  reads twice the period, the most its intervals show (never a fraction; the
+  cap bounds it); returned as the fork Mark named. Headed on bundle `7c5b48da`
+  both pages read 6.06 to 6.08 ms from their first window. Gates: seiche
+  129/129 (123 without actor, 129 + 3 with gpu), pictograph 310, graphshell
+  `web` 247, mere and graphshell checked clean. The dial rows, with the budget
+  now half this panel's real frame (3,030 us, not 8,333): slow, the 50x
+  control (150 ticks in 1.5 ms, unbound), the planted control (failing the
+  bound for its stall, 9,270 us over) and both Speed select receipts green;
+  the fast receipt misses `physics-effective-speed >= 1` calm in three of
+  three runs (0.82x, 0.75x, 0.81x, at 12 to 18% CPU with no Normal-priority
+  builds), its every-window bound holding (worst admitted frame 130 us under):
+  3 ms of physics in a 160 to 270 ms frame cannot reach 1x of simulated time
+  on this page, though it stays faster than the 1x setting there. Returned as
+  a fork. The law receipts were not rerun: at 1x the budget does not apply.
+  The ThinkPad (`thinkpad-l14-f`, Fedora 44, a 1366x768 panel at 60.003 Hz,
+  Chrome only as the Flatpak `com.google.Chrome`): reached over SSH, the
+  bundle copied and served on its loopback, a probe page loads, but the tree
+  page stops before its scenario: Chrome on Linux exposes no WebGPU adapter
+  unless launched with `--enable-unsafe-webgpu`, and netrender cannot boot
+  without one. Returned as a fork; nothing installed, no setting changed.
+- 2026-10-06 (seiche's speed, the estimator's three forks carried out, branch
+  `seiche-speed-estimator`). "WebGPU flag, throwaway profile": the ThinkPad's
+  Flatpak Chrome, only its throwaway profile
+  (`~/.var/app/com.google.Chrome/seiche-speed-profile`), launched with
+  `--enable-unsafe-webgpu --enable-features=Vulkan`, nothing set globally or
+  installed, its processes stopped after each run. Its 60.003 Hz panel read
+  16.666 to 16.667 ms on both pages in five runs, calm and under six and eight
+  busy processes. Replaying its 445 prefix windows found one the rule read at
+  half the period: the first candidate refined to 16.674 ms fitting 0.808, and
+  its half, refined exactly, fitted 0.962, clearing the step-down. The period
+  found is now polished to the best-fitting refined candidate within 1% before
+  lifting or stepping down (`021259ef`); since, every prefix window of both
+  machines (the ThinkPad's 445 within 1% of 16.666 ms, this machine's 700
+  within 1% of 6.07 ms) reads within 1% or falls back, none above or below,
+  the ThinkPad's windows are fixtures, and the test fails with polishing off.
+  "Relative to the page's 1x" (`f1c00c53`): the fast receipt runs the 300-node
+  page at 1x, marks the speed it reaches (`mark-pace`), switches to Max and
+  asserts Max's effective speed is at least the mark; the every-window bound
+  stays; the control, `p6_tree_speed_fast_slow_max`, plants a 500 ms busy-wait
+  in every frame at Max, outside physics, and must miss. Calm on bundle
+  `53d621a5`: Max 0.814x against the page's 1x at 0.246x (ratio 3.31), the
+  control at 0.799. "Look for a tiebreaker": a probe page that busy-waits each
+  frame recorded, side by side, its main-thread rAF intervals, the same with
+  one light frame in 30, a dedicated worker's own rAF loop over an
+  OffscreenCanvas doing no work, `requestVideoFrameCallback` on a video of its
+  captured canvas, and its callbacks' phase against `performance.now()`. On
+  this machine (165 Hz) at an 11 ms busy-wait the main thread's intervals read
+  twice the period in 36 of 47 windows, the even-multiple case; the worker's
+  rAF ran at one refresh at every load tried (991 intervals in 6 s, all 6.06
+  ms, at 9.5, 11, 17 and 21 ms), as it did on the ThinkPad (361 in 6 s, all
+  16.67 ms, at 24, 30 and 45 ms). Light frames helped only in part (49 of 51
+  windows at 11 ms), `requestVideoFrameCallback` follows the page's own
+  frames, the phase and the media hints carry no period. Recommended: read the
+  period from a worker's rAF loop. Gates: seiche 129/129 (123 without actor,
+  129 + 3 with gpu), pictograph 310, graphshell `web` 247, mere and graphshell
+  checked clean. The dial rows on `53d621a5`: slow, fast, its two controls
+  (the slowed Max missing the 1x comparison, the planted stall failing the
+  bound at 9,370 us), both Speed select receipts and the 50x control green;
+  the machine was not calm for the last four (4 to 9 Normal-priority builds),
+  passes under load counting, the 50x control's two misses under load (24.7x
+  and 20.9x against 25, frames slow enough that 150 ticks filled the 3 ms
+  budget) not counted and its third try green.
+- 2026-10-06 (seiche's speed, the worker tiebreaker built and checked, branch
+  `seiche-speed-estimator`). "Worker rAF, main thread fallback" (`7f7ccdc2`):
+  a dedicated worker, from an inline script, runs its own rAF loop over a
+  one-pixel `OffscreenCanvas` doing no work and posts its intervals in batches
+  of eight; both pages feed them to the frame budget each frame. The budget
+  reads the period from the worker's last 40 intervals while its last batch is
+  under a second old, else from the main thread's, and the pace lines, the
+  snapshot (`display-period-from`) and the product page say which: the worker,
+  or the main thread with the worker pending, disabled
+  (`physics_period_source=main`), without rAF or failed to start
+  (`physics_plant_worker=fail`, the planted failure), or stale. The clock's
+  grain is measured, not assumed (Chrome 100 us, Firefox 1 ms), the margin two
+  of its steps, and no period under six tolerances is read, so Firefox's main
+  thread, whose rAF is not on its refreshes, reads the period or the cap,
+  never the 3 to 5 ms its 2.1 ms tolerance let fit (the test fails with the
+  guard off, reading 5.58 ms). Neither lock changed: web-sys gains four
+  features. The even case reads the true period on both machines: this
+  machine's probe at an 11 ms busy-wait (main thread twice the 165 Hz period)
+  reads 6.06 ms from the worker beside it (96 of 96 windows, and the unit test
+  over the logged trace); the ThinkPad cannot show the trap (twice its 60 Hz
+  period is past the cap) and its worker read 16.67 ms at every load. Firefox
+  157 on the ThinkPad, in a throwaway profile (`--profile <dir> --no-remote
+  --new-instance`, nothing installed or set): its worker has rAF, 360
+  intervals in 6 s all one refresh at a 1 ms grain, read at the period in 32
+  of 32 windows; Firefox has no `navigator.gpu`, so the tree page cannot boot
+  there and the fallback's Firefox case stays the planted one. System-wide
+  load, on the product page: here, the 300-node page read 6.06 to 6.08 ms from
+  the worker calm, beside 8 and 20 busy processes on 16 logical CPUs (100%
+  CPU, 2 to 11 other lanes' builds) and beside seiche's GPU test looping,
+  fitting 0.97 to 1.00 in all seven runs; on the ThinkPad, 16.665 to 16.667 ms
+  calm and beside 8 busy processes (bundle `34a63551`, as here). Controls:
+  with the worker disabled the even case reads twice the period again, in the
+  unit test over the logged trace and on the probe, whose main thread alone
+  read it in 36 of 47 windows calm and 13 of 48 beside 8 busy processes; the
+  planted failure falls back, labelled "main (no worker rAF)", on both
+  machines (6.079 ms or the cap here, 16.666 ms on the ThinkPad). No cost to
+  the main thread shows at this noise: the 300-node page's frames ran at 255
+  to 309 ms median with the worker off and 267 to 324 with it on, the latter
+  at the busier times. Finding, once in eleven runs of the 300-node page here:
+  at 100% CPU with 14 other lanes' builds and this lane's gates running, the
+  worker's intervals left the refresh after a 15.1 ms gap, running 7.8 to 12.2
+  ms (multiples 1.3 to 1.6) for the rest of the run, so its 40 fitted 0.53 and
+  the budget fell back to the cap, as ruled; it did not recur in six reruns at
+  heavier load. Returned as a fork. Merges: main `459e4376` (`42c46627`),
+  `fd656553` (`9ea6511f`, stable Burn 0.22, CubeCL 0.11, Cubek 0.3 and the
+  genet image-decode repin) and `ebfb490a` (`19194e7e`, the genet chain's
+  djinn pin to Knot `ef89a18`), weave's result matching `git merge-file` on
+  every file both sides changed (the plan, graphshell-web's `Cargo.toml`); the
+  root lock is main's. The web lock, gitignored, was re-resolved offline from
+  the local registry with nothing fetched (`cargo update --offline -p uuid -p
+  cc`, 94 packages relocked, 76 changed, `87188cd2` to `be7d16e9`) and holds
+  `--locked` at `ebfb490a`, one genet (`d851a9db`) and no Knot in the web
+  graph; graphshell-web keeps image decoding on. Gates at `19194e7e`: seiche
+  129/129 (123 without actor, 129 + 3 with gpu), pictograph 310, graphshell
+  `web` 249, mere and graphshell checked clean. The dial rows on `34a63551`,
+  none calm (4 to 25 other lanes' Normal-priority builds, 25 to 100% CPU),
+  passes under load counting: slow; fast, Max at 2.25 times the page's 1x
+  (0.341x against 0.152x), the every-window bound holding (worst 40 us under);
+  its two controls failing for their planted reasons (the slowed Max at 0.57
+  of the page's 1x, the planted stall 9,762 us over the bound); the physics
+  Speed select; the tree Speed select on its second run, its first missing the
+  every-window bound by one frame 370 us over at 100% CPU beside 25 builds.
+  The 50x control missed four times under load (19.1, 13.0, 8.8 and 12.3 times
+  against 25, in 91 to 206 ms frames; in two the budget bound engaged, in two
+  one frame ran 269 and 1,372 us past it), calm not coming in three ten-minute
+  waits; unresolved, returned with the worker's off-refresh run.
+- 2026-10-06 (seiche's speed, the worker's two forks carried out, branch
+  `seiche-speed-estimator`). "Keep the cap fallback", the finding as ruled: on
+  one of eleven runs of the 300-node page here (`diag_display_period` on
+  bundle `34a63551`), at 66% CPU with 3 other lanes' builds when it started
+  and 100% with 14 when it ended, this lane's gates running beside it at
+  BelowNormal, the worker's intervals left the refresh in its fourth window:
+  27 intervals at 5.9 to 6.2 ms, a 15.1 ms gap, then 92 at 7.8 to 12.2 ms
+  (mean 8.78 ms; the last 40 at 1.3 to 1.6 times the 6.078 ms period, 12, 20,
+  5 and 3 of them). They fitted 0.53, and the budget fell back to the 16.667
+  ms cap (8,333 us), the three windows before all at the refresh (5.8 to 6.4
+  ms). It slipped once more this round, on the planted-stall row's rerun at
+  100% CPU beside 34 other lanes' builds: its first window read 6.08 ms from
+  the worker at 1.00, its second the cap at 0.70; that row does not log
+  intervals. Neither read a fraction of the period. "Base it on the page's own
+  1x": a diagnostic (`diag_speed_fifty.scn`) runs the 50x control's page (24
+  nodes) at 1x, marks it, then runs 50x in the same receipt. Under load (97 to
+  100% CPU, 5 to 19 other lanes' builds, this lane's gates in three of the
+  runs) it read 1x at 0.253 to 0.379 and 50x at 2.99 to 11.17 in five runs,
+  11.5, 21.7, 21.9, 21.9 and 29.5 times the page's 1x against a bar of 25. 1x
+  runs the 50 ms catch-up cap's three ticks a frame, in frames averaging 138
+  to 171 ms over the meter's 32. At 50x the budget bound in every run: its
+  costliest frames ran ticks at 19 to 92 us each (148 ticks in 2.8 ms at best,
+  36 in 3.3 at worst), and in the four runs whose intervals were logged the
+  gate admitted 28 to 56 of the 150 ticks owed a frame, in frames 0.61 to 0.92
+  the length of the 1x frames. The shortfall is the budget's, so the cap
+  decides the verdict, and it has more than one defensible form (half of the
+  lesser of 50 times the 1x and the speed the budget fits; the lesser of 25
+  times the 1x and that speed; the ratio where the budget is free and the
+  gate's fill where it binds), and the planted control's form follows it: a
+  per-frame busy-wait outside physics lowers the speed the budget fits at
+  those frames as much as it lowers 50x, so it fails only a bar whose cap is
+  counted in ticks a frame. Returned as a fork; the control is unchanged on
+  this branch. Merge of main `a45bada7` (`31e981b3`): weave's result matches
+  `git merge-file` on the one file both sides changed (this plan); the root
+  lock is main's; the web lock (`be7d16e9`) holds `--locked` offline, nothing
+  resolved or fetched; bundle `4c53d531`. The viewer cone has not reached
+  main, so the worker's three `web.rs` lines stay where they are. Gates at
+  `31e981b3`: seiche 129/129 (123 without actor, 129 + 3 with gpu), graphshell
+  `web` 249, mere and graphshell checked clean; pictograph 308 of 310 at 100%
+  CPU, its suite taking 1,200 s, not 122. The two misses were both timing.
+  `source_time_canvas_keeps_live_graph_and_arrangement_while_previewing_a_journal_prefix`
+  compares two snapshots whose `timestamp_secs` differed by one second, and
+  passed three of three on rerun.
+  `fast_forward_on_the_canvas_stops_at_the_budget_and_reports_the_speed`, its
+  worst frame 10.9 ms against a 4.4 ms budget, passed two of three on rerun
+  under load beside 22 other lanes' builds, the third missing at 23.8 ms
+  against 2.65; passes under load count. The dial rows on `4c53d531`, the 50x
+  control left out, none calm (12 to 34 other lanes' Normal-priority builds,
+  87 to 100% CPU; each rerun's ten-minute calm wait timed out), passes under
+  load counting: slow on its rerun, its first run reaching 0.141 against 0.15
+  beside 18 builds; fast on its rerun, Max 1.50 times the page's 1x (0.149
+  against 0.099) with the every-window bound held, its first run 1.56 times
+  but one frame's admitted ticks 1,570 us past the budget beside 14 builds;
+  the slowed-Max control missing as planted (0.665 of the page's 1x); the
+  planted stall failing the bound for its stall on its rerun (8,767 us over),
+  its first run catching no stall inside an admitted span (worst 562 us,
+  against the 1,000 it asserts) beside 28 builds; the tree Speed select on its
+  rerun, its first run one frame 368 us over beside 34 builds; the physics
+  Speed select on its first run.
