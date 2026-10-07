@@ -707,3 +707,30 @@ wrong source. Report to Mark; change nothing.
   manifest path before comparing them, so the script itself has no such
   mismatch. The later steps first run on CI at the next push, and whether
   they pass is not yet known.
+- **2026-10-07. The guest build scripts do not deadlock; a git checkout
+  stalled the machine.** On 2026-10-06 a fresh-target `cargo check
+  --workspace --locked` stopped advancing at about 1,010 units while the
+  `document-host` and `app-host` build scripts ran their nested guest `cargo
+  build`, and every new cargo command on the machine waited on the
+  package-cache lock for about twenty minutes. The license sweep plan's §6
+  suspected a deadlock between the outer and the nested build. It is not
+  one. A minimal model, an outer crate whose build script runs a nested
+  `cargo build --locked` the way those scripts do, sharing one private
+  `CARGO_HOME`, finishes in about a second. Its positive control, the nested
+  build given the outer's target directory, hangs on "Blocking waiting for
+  file lock on build directory" until killed, so the model does show a
+  deadlock when there is one. With the real scripts, `cargo check --locked
+  -p document-host -p app-host` on a fresh worktree and target at
+  `e4d5cd7d` passes in 3m10s: both nested builds produce artifacts while the
+  outer is still checking, all three guests are built, and the outer passes
+  `wasmtime-wasi`, where the stalled run had stopped. The stall was another
+  lane's build fetching new git revisions. Turnstone's lock at `4e217ef`
+  pins genet `679d831`, whose checkout in `~/.cargo/git/checkouts` ran from
+  22:43:58 to 22:59:29 local time (187,770 files), followed by knot-editor
+  and woodshed to 22:59:41. Cargo holds the package-cache lock exclusively
+  while it checks out a git dependency, so every resolution on the machine
+  waits as long as a genet checkout takes. Cargo's automatic cache GC was
+  ruled out (it last ran at 19:53). The finding that follows: the first
+  build at each new genet revision stalls every session on the machine for
+  about a quarter of an hour. A CI runner has no other sessions, so this
+  does not bear on `portable.yml`'s later steps.
