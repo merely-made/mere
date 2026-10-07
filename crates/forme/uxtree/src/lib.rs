@@ -564,7 +564,12 @@ mod tests {
         let doc = doc_with(vec![Block::Menu {
             rows: vec![
                 row(MenuItemKind::Info, 'i', "Welcome", None),
-                row(MenuItemKind::Directory, '1', "Phlog", Some("gopher://h/1/phlog")),
+                row(
+                    MenuItemKind::Directory,
+                    '1',
+                    "Phlog",
+                    Some("gopher://h/1/phlog"),
+                ),
                 MenuRow {
                     kind: MenuItemKind::Search,
                     marker: Some('7'),
@@ -578,7 +583,11 @@ mod tests {
         }]);
         let tree = project_document(&doc);
         let node = |role: Role| -> Vec<&Node> {
-            tree.nodes.iter().map(|(_, n)| n).filter(|n| n.role() == role).collect()
+            tree.nodes
+                .iter()
+                .map(|(_, n)| n)
+                .filter(|n| n.role() == role)
+                .collect()
         };
         let [list] = node(Role::List)[..] else {
             panic!("one list");
