@@ -198,7 +198,7 @@ impl LayoutDom for WindowDom<'_> {
         }
     }
 
-    fn form_control_state(&self, id: NodeId) -> Option<&FormControlState> {
+    fn form_control_state(&self, id: NodeId) -> Option<FormControlState> {
         if self.is_root(id) {
             None
         } else {
