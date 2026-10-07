@@ -150,6 +150,13 @@ exactly. The host harness now exposes its existing live computed-style reader
 so these regressions report resolved sizing properties before any further
 layout repair is chosen. The width contract remains open.
 
+The diagnostic run confirms the live host resolves the requested containment
+and substitute sizes correctly, including the host's 12em override; six other
+field cases pass. The remaining width failure reaches Genet's CSS layout
+handoff, so a bounded repair awaits an explicit checkpoint. Independent
+Rootstock native-state bridge controls proceed while that ruling, accessible
+leaf policy and sibling scope are pending without response deadlines.
+
 The downstream read-only audit finds old tag checks in Turnstone and Cleromancy.
 Their mechanical selector/caret/existing-label follow-ups await explicit scope
 authorization; currently unnamed fields retain that state. No sibling source
