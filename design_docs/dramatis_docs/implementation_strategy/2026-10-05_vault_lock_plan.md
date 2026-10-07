@@ -1,7 +1,7 @@
 # Vault Lock Plan
 
 **Date**: 2026-10-05
-**Status (2026-10-06)**: rulings 1 to 54 in §3; the threat statement is
+**Status (2026-10-06)**: rulings 1 to 56 in §3; the threat statement is
 still open. L1 landed (`2556a20c`). L2's checkpoints A (`7c588deb`) and B
 (`ec1768ab`) landed. Still to come in L2: the Secret Service on the
 ThinkPad, ruling 42 (Linux starts locked), ruling 44 (Distillery's
@@ -652,6 +652,25 @@ from transport runs (0 of 30; p2panda-net alone shows them in 6 to 23 of
 does not cover them.* Options: move all four onto the kept handle (`peers`
 loses its "could not ask" branch); close only. Mark: **"Move all four
 (Recommended)"**.
+
+**Ruling 55** *(how Knot reaches the transport for ruling 49).* *Knot's
+head `ef89a18` has the P1 work and is djinn's pin, but Knot pins mere at
+`e0cea3e0`, before the transport's borrowing entry points, and Knot's
+repins have been the genet chain's.* Options: no Knot repin (Knot lends
+the seed through its own functions and passes it by value only at the one
+synchronous call into the transport, which boxes and clears it at once);
+repin Knot's mere rows to `83b06806` or later and call the borrowing entry
+directly, telling the genet chain. Mark: **"Repin Knot's mere rows"**.
+Follows: the genet-chain session and the burn coordinator were told on
+2026-10-06, before any edit.
+
+**Ruling 56** *(the order under Mark's three-tasks rule).* Options:
+- the Knot fix, then ruling 42 (no hardware), then the Secret Service on
+  the ThinkPad together with 42's Linux proof, then L3;
+- the Knot fix, then L3 (finishing Windows first);
+- pause after the Knot fix.
+
+Mark: **"Knot, then ruling 42 (Recommended)"**.
 
 Still open: a threat statement naming hibernation and the pagefile.
 
