@@ -22,6 +22,16 @@ license text file (root `LICENSE` only), which struck one P1 done-condition;
 tinct's notice files were deleted by ruling (`642ca2d7`), and inker's, dropped
 in merge `0a8198ba`, stay deleted (ruling S40: inker is MPL-2.0). The gate for
 each remaining phase is unchanged: a clean tree in that repository.
+
+**Annotated 2026-10-06 (S45 carried out):** mere's drift is closed and
+gated. By `ea74604b` it had grown to 83 owned sources (S45's 61 `.rs`, 7 `.rs`
+added since, 15 scripts). Under rulings S78 to S82 of the stack seams plan,
+the eight hash-pinned sources of the 2026-09-08 stack pillar probes were
+ledgered as Frozen evidence (`362c5d5a`), the tool was re-run over the other
+75 in one commit (`43353861`), and `relicense_headers.py --check` now gates new
+owned sources in CI and the doc audit (`0b374437`). P1's zero-unheaded
+condition holds again; the receipt is in §6.
+
 **Scope:** Carry the 2026-08-22 ruling, MPL-2.0 by default with correct
 provenance, into every owned repository: manifests, source headers, LICENSE
 files, READMEs, and a provenance ledger per repository. No code changes, no
@@ -185,6 +195,10 @@ audit does not accept, and files added since P1 lack the header. Ruling S45
 has `scripts/relicense_headers.py` re-run over them on a clean tree in one
 commit, and a gate added so new owned files carry the header, as a follow-on
 task outside the S14 pass.
+
+**Restored 2026-10-06 (S45 carried out):** both conditions hold again at
+`43353861`. The grep returns only ledger paths, Frozen evidence now among them,
+and `--audit` reports 0 unheaded among 1,714 owned sources. See §6.
 
 ### P2. genet
 
@@ -511,3 +525,43 @@ never before that repository's ledger is written.
   files as settled under S40; dated notes on P1's done-conditions, the P6
   notice-file question and the genet P2 hazard, with one open question
   raised on the hazard.
+- **2026-10-06, S45 carried out in mere** (`362c5d5a`, `43353861`,
+  `0b374437`; rulings S78 to S82 of the
+  [stack seams plan](2026-10-04_stack_seams_plan.md)). **Drift:** at
+  `ea74604b`, tree clean, 83 owned tracked sources lacked Exhibit A: S45's 61
+  `.rs`, 7 `.rs` added since, and 13 `.py`, 1 `.js` and 1 `.ps1` that P1's
+  `.rs` grep does not see. All are Mark's; invariant 1's discovery
+  (`Copyright` unqualified, then read) found no third-party line in any.
+  **Frozen evidence (S79):** the eight sources of
+  `design_docs/mere_docs/testing/receipts/2026-09-08_stack_pillar_probes` are
+  pinned by that receipt's SHA-256 manifests (23 of 23 and 9 of 9
+  recompute). `LICENSES.md` gains a Frozen evidence section, which the tool
+  reads as a second skip list, so they stay unheaded, MPL-2.0 through the
+  root `LICENSE`. A search of the tree for every flagged file's SHA-256 and
+  blob id (whole and 12-character, the eight as positive control) found two
+  more recorded hashes, on live sources in graphshell receipts whose maps
+  were already mostly stale; S82 swept them. **Sweep:** 75 files, 62 with the
+  short Copyright + SPDX form (or SPDX alone) completed and 13 bare given
+  the header (4 behind a shebang). 284 lines were added and none removed;
+  every file's diff, header lines filtered out, is empty (the P2-hazard
+  rule); CRLF files gained only CRLF lines; a second run changes 0; the
+  swept Python compiles and `co_op.js` passes `node --check`. The sweep
+  commit's body misstates that split as 54 and 21; a git note on `43353861`
+  corrects it. It is not listed in `.git-blame-ignore-revs` (S81).
+  **Gate (S80):** `--check` (the `--audit` test through `git grep`, about
+  two seconds) and `--self-test` (planted defects must fail, the repaired
+  fixture pass) run first in `portable.yml`, ahead of the step that has
+  failed every recent run; `mere_doc_audit.py` reports
+  `unheaded_owned_sources` and `exhibit_b_sources` as findings, its own
+  self-test planting one of each. Controls: the real tree passes; a
+  throwaway worktree at `43353861` with six planted files fails on exactly
+  the three unheaded owned ones and the Exhibit B one, with the vendored and
+  frozen plants exempt, and `--audit` agrees. **Receipt (`--audit`,
+  after):** manifests, untouched by this pass, `{(none): 11,
+  MIT OR Apache-2.0: 5, MPL-2.0: 43, workspace: 74}`; owned sources 1,714 of
+  2,083 tracked, **0 without Exhibit A**, **0 Exhibit B hits**; `LICENSE`
+  and `LICENSES.md` at the root; 8 ledger paths. `cargo check --workspace
+  --locked` at `43353861`, in a clean worktree (the shared tree carried
+  another lane's uncommitted lock), was still waiting on the package-cache
+  lock when this entry was written; its result is the next entry. No
+  manifest or lock changed between `ea74604b` and `43353861`.
