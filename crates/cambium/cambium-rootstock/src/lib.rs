@@ -313,13 +313,16 @@ pub fn document_projection(
 ) -> DocumentA11yProjection {
     use layout_dom_api::LayoutDom as _;
     let focus = focus.and_then(|opaque| find_opaque(dom, dom.document(), opaque));
-    genet_render::document_a11y_projection_with_generated_text(
+    genet_render::document_a11y_projection_with_style(
         dom,
         layout.fragments(),
         focus,
         0,
         None,
-        &|node| layout.generated_text(dom, node),
+        &genet_render::A11yStyleQueries {
+            generated: &|node| layout.generated_text(dom, node),
+            rendered: &|node| layout.rendered_visible(dom, node),
+        },
     )
 }
 

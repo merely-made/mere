@@ -6,6 +6,13 @@ engine-side Livery and Scripted document runtime remains in `genet-documents`;
 Mere's application-facing reader and smolweb lanes live in
 `mere-document-lanes`.
 
+**Corrected 2026-10-06:** `cambium-nematic` folded into `cambium` as feature
+`nematic` on 2026-09-25, and that feature and its views were removed on
+2026-10-06 under ruling S66 of the Mere stack seams plan (the
+[smolweb fidelity plan](../../nematic_docs/implementation_strategy/2026-07-01_smolweb_fidelity_plan.md)
+WS4, R0): smolweb renders through `mere-document-lanes` only. The published
+`cambium-nematic` 0.3.1 stays on crates.io; its table row is history.
+
 ## Historical verified Genet seam set (2026-07-22)
 
 Verified on 2026-07-22:

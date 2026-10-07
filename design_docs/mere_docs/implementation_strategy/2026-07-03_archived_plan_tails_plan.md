@@ -733,6 +733,10 @@ Archived as [2026-10-06_completed_plans/2026-08-14_castellan_keeper_founding_pla
 - **Splitting `keeper` into two features**, once a consumer wants views
   without the agent stack — here. The dramatis repo plan's cut through
   castellan may take it, but does not name it.
+  **Amended 2026-10-06:** owner: the
+  [dramatis repo plan](../../dramatis_docs/implementation_strategy/2026-10-06_dramatis_repo_plan.md),
+  which took it in `73812e3a` and records, as a reading not ruled, that its
+  rulings D14 and D15 make the split unnecessary.
 
 #### From scenograph_absorption (S1 to S7 landed)
 
