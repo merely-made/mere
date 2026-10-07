@@ -139,6 +139,12 @@ impl<S, K> History<S, K> {
         self.saved = Some(self.undo.len());
     }
 
+    /// Forget the saved position: the stored document no longer matches any
+    /// state in the history, so it reads dirty until the next save.
+    pub fn forget_saved(&mut self) {
+        self.saved = None;
+    }
+
     /// Whether the document differs from its last save.
     pub fn is_dirty(&self) -> bool {
         self.saved != Some(self.undo.len())

@@ -745,23 +745,35 @@ impl<B: Backend> GraphSession<B> {
     /// changed since goes back; the rest is kept and reported with who changed
     /// it (reservoir plan §7 item 17). `None` when there is nothing to undo.
     pub async fn undo(&mut self, author: Author) -> Result<Option<Reverted>, SessionError> {
+        let reverted = self.undo_now(author)?;
+        self.store(wall_clock_now(), Vec::new(), false).await?;
+        Ok(reverted)
+    }
+
+    /// [`undo`](Self::undo), journaled but not stored until the next flush,
+    /// for a host that writes its batches itself ([`pending`](Self::pending),
+    /// then [`stored`](Self::stored)).
+    pub fn undo_now(&mut self, author: Author) -> Result<Option<Reverted>, SessionError> {
         let Some(of) = self.stacks(&author).0.last().copied() else {
             return Ok(None);
         };
-        self.revert(author, of, ChangeKind::Undo { of })
-            .await
-            .map(Some)
+        self.revert(author, of, ChangeKind::Undo { of }).map(Some)
     }
 
     /// Redo `author`'s most recent undo, unless an edit of theirs since has
     /// cleared it (§7 item 18). `None` when there is nothing to redo.
     pub async fn redo(&mut self, author: Author) -> Result<Option<Reverted>, SessionError> {
+        let reverted = self.redo_now(author)?;
+        self.store(wall_clock_now(), Vec::new(), false).await?;
+        Ok(reverted)
+    }
+
+    /// [`redo`](Self::redo), journaled but not stored until the next flush.
+    pub fn redo_now(&mut self, author: Author) -> Result<Option<Reverted>, SessionError> {
         let Some(of) = self.stacks(&author).1.last().copied() else {
             return Ok(None);
         };
-        self.revert(author, of, ChangeKind::Redo { of })
-            .await
-            .map(Some)
+        self.revert(author, of, ChangeKind::Redo { of }).map(Some)
     }
 
     /// `author`'s undo and redo stacks, rebuilt from the change log: an edit
@@ -802,7 +814,8 @@ impl<B: Backend> GraphSession<B> {
     }
 
     /// Revert change `of` as `kind`, recording what was kept and by whom.
-    async fn revert(
+    /// Journaled, not stored.
+    fn revert(
         &mut self,
         author: Author,
         of: Seq,
@@ -836,7 +849,11 @@ impl<B: Backend> GraphSession<B> {
                     .ok_or_else(|| SessionError::NotReplayable(format!("{edit:?}")))
             })
             .collect::<Result<Vec<_>, _>>()?;
-        let applied = self.apply_as(author, kind, deltas).await?;
+        let (_, applied) = self.edit_as(author, kind, |graph| {
+            for delta in deltas {
+                let _ = apply_graph_delta(graph, delta);
+            }
+        });
         Ok(Reverted { of, applied, kept })
     }
 
