@@ -37,7 +37,7 @@ use std::collections::HashMap;
 use std::hash::{Hash, Hasher};
 
 use accesskit::{Action, Node, NodeId, Role, Tree, TreeId, TreeUpdate};
-use inker::{Block, EngineDocument, FoldState, InlineSpan, inline_text};
+use inker::{Block, EngineDocument, FoldState, InlineSpan, MenuRow, inline_text};
 
 /// Crate version.
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -369,9 +369,66 @@ fn project_block(block: &Block, path: &str, nodes: &mut Vec<(NodeId, Node)>) -> 
             n.set_label(text.clone());
             n
         },
+        Block::Menu { rows } => project_menu(rows, path, nodes),
+        // A kind this projection does not know yet stays visible as a note
+        // naming it, rather than vanishing from the tree.
+        other => {
+            let mut n = Node::new(Role::Note);
+            n.set_label(format!("unsupported block: {}", other.kind_name()));
+            n
+        },
     };
     nodes.push((id, node));
     id
+}
+
+/// A menu as a list whose items name their kind in the description. A row
+/// with a target holds one link; a search row holds a button for its
+/// submission endpoint; other rows keep any inline links of their label.
+fn project_menu(rows: &[MenuRow], path: &str, nodes: &mut Vec<(NodeId, Node)>) -> Node {
+    let mut list = Node::new(Role::List);
+    list.set_description("menu");
+    let mut item_ids = Vec::with_capacity(rows.len());
+    for (i, row) in rows.iter().enumerate() {
+        let item_path = format!("{path}/menu/{i}");
+        let item_id = node_id_for_path(&item_path);
+        let label = inline_text(&row.label);
+        let mut item = Node::new(Role::ListItem);
+        item.set_label(label.clone());
+        item.set_description(row.kind.name());
+        if let Some(url) = &row.target {
+            let link_id = node_id_for_path(&format!("{item_path}/link"));
+            let mut link = Node::new(Role::Link);
+            link.set_label(label);
+            link.set_value(url.clone());
+            nodes.push((link_id, link));
+            item.set_children(vec![link_id]);
+        } else if let Some(target) = submit_target(&row.label) {
+            let button_id = node_id_for_path(&format!("{item_path}/submit"));
+            let mut button = Node::new(Role::Button);
+            button.set_label(label);
+            button.set_value(target.to_string());
+            nodes.push((button_id, button));
+            item.set_children(vec![button_id]);
+        } else {
+            attach_link_children(&row.label, &item_path, "menu-link", nodes, &mut item);
+        }
+        nodes.push((item_id, item));
+        item_ids.push(item_id);
+    }
+    list.set_children(item_ids);
+    list
+}
+
+/// The first submission endpoint in a span list.
+fn submit_target(spans: &[InlineSpan]) -> Option<&str> {
+    spans.iter().find_map(|span| match span {
+        InlineSpan::Submit { target, .. } => Some(target.as_str()),
+        InlineSpan::Presented { spans, .. }
+        | InlineSpan::Emphasis(spans)
+        | InlineSpan::Strong(spans) => submit_target(spans),
+        _ => None,
+    })
 }
 
 /// Walk inline spans for network and in-page links and project each as a
@@ -482,6 +539,52 @@ mod tests {
             a.nodes.iter().map(|(id, _)| *id).collect::<Vec<_>>(),
             b.nodes.iter().map(|(id, _)| *id).collect::<Vec<_>>(),
         );
+    }
+
+    #[test]
+    fn menu_projects_typed_items_with_link_and_submit_children() {
+        use inker::{MenuItemKind, MenuRow};
+        let row = |kind, marker, label: &str, target: Option<&str>| MenuRow {
+            kind,
+            marker: Some(marker),
+            label: vec![InlineSpan::Text(label.to_string())],
+            target: target.map(str::to_string),
+        };
+        let doc = doc_with(vec![Block::Menu {
+            rows: vec![
+                row(MenuItemKind::Info, 'i', "Welcome", None),
+                row(MenuItemKind::Directory, '1', "Phlog", Some("gopher://h/1/phlog")),
+                MenuRow {
+                    kind: MenuItemKind::Search,
+                    marker: Some('7'),
+                    label: vec![InlineSpan::Submit {
+                        target: "gopher://h/7/find".to_string(),
+                        spans: vec![InlineSpan::Text("Search".to_string())],
+                    }],
+                    target: None,
+                },
+            ],
+        }]);
+        let tree = project_document(&doc);
+        let node = |role: Role| -> Vec<&Node> {
+            tree.nodes.iter().map(|(_, n)| n).filter(|n| n.role() == role).collect()
+        };
+        let [list] = node(Role::List)[..] else {
+            panic!("one list");
+        };
+        assert_eq!(list.description(), Some("menu"));
+        let items = node(Role::ListItem);
+        let kinds: Vec<_> = items.iter().map(|n| n.description().unwrap()).collect();
+        assert_eq!(kinds, ["info", "directory", "search"]);
+        let [link] = node(Role::Link)[..] else {
+            panic!("one link");
+        };
+        assert_eq!(link.value(), Some("gopher://h/1/phlog"));
+        let [button] = node(Role::Button)[..] else {
+            panic!("one submit button");
+        };
+        assert_eq!(button.label(), Some("Search"));
+        assert_eq!(button.value(), Some("gopher://h/7/find"));
     }
 
     #[test]
