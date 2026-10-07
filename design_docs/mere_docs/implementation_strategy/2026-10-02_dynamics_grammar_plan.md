@@ -201,6 +201,10 @@ Mark's words are quoted as the physics catalog plan records them (§3, P7, and �
 
 **F76, when G2's returned questions come back (2026-10-07).** Options: right after this round; together with G3's forks; later. Mark: **"Together with G3's forks"**. *Follows:* G2's questions 17 to 22 (in the branch's copy of §3) and Density's control join G3's forks 5 to 8 and its as-built confirmations in one round.
 
+**F77, whether a converted force's reach may depend on the tick (2026-10-07; G3's seventh fork).** Question: the ruled conversion, `γ = m·(1/dt + c)`, the rule Hold already follows, moves a converted force half as far per second at 120 Hz as at 60 Hz. Options: keep it as ruled; `γ = m·c`, the force law's own terminal speed, independent of the tick and about 25 times faster at 60 Hz. Mark: **"Keep as ruled (Recommended)"**. *Follows:* the conversion stays as built, and its rate dependence is a known property of converted overlays under Still and Anneal.
+
+**F78, pickers for compositions (2026-10-07; G3's eighth fork).** Question: a mix, a grouping and a schedule are API only; a pick replaces them, and no picker builds them. Options: leave them to G4 with `PhysicsChoice`'s composition fields; a catalog profile for "Stress, then Springs, remembering it" now. Mark: **"Leave to G4 (Recommended)"**. *Follows:* G3 adds no picker; G4 carries composition pickers.
+
 **F40, G7 (2026-10-03).** Question: approve G7, arrangement roles (§2, proposed at `784ce5b5`), which carries out F18 to F30, and place it. Options: approve, with G7 before G3; approve, after G2; amend first. Mark: **"Approve; G7 before G3"**. *Follows:* G7 starts now beside G2's open work, and G3 follows it, since G3's schedules use captures with a role (F27).
 
 **F41, the README's text (2026-10-03).** Question: the design-vocabulary section F13 placed in the README, its projection half in Mark's words and its dynamics half drafted from the rulings, placed after Status. Options: use the text as shown; the projection half only; edit the wording. Mark: **"Use this text"**. *Follows:* the section is committed as shown.
