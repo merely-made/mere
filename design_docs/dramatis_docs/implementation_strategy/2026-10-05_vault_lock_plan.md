@@ -689,6 +689,33 @@ is met by `0096591`.
 repin to `ae3352e` now and again later. Mark: **"Once, after seed fix
 (Recommended)"**.
 
+**Ruling 59** *(the sync host's verdict).* *On `ae3352e` the strict paths
+fail (`author` leaves 4256) and with the fix pass. The sync host, judged
+against iroh alone and p2panda-net alone, still shows 7 sizes with the fix
+(8 without). Six are identical in both arms, and Knot now lends the seed
+only into the transport builder. So those copies come from below Knot,
+when the store joins gossip and sync, which neither baseline does.* Options:
+- a no-Knot baseline that binds the overlay host and joins as Knot's store
+  does, the fix committed only if the sync host passes against it and the
+  control still fails;
+- commit now, with the sync host reporting rather than failing;
+- name each block from allocation backtraces first.
+
+Mark: **"Baseline the join (Recommended)"**.
+
+**Ruling 60** *(mDNS residue).* *`P2pandaHostPolicy::default()` turns mDNS
+on (Active). The overlay host alone leaves 4 seed copies beyond the
+baselines with it on (472, 568, 784, 2424) and none with it off, in every
+app that binds through the overlay host. mere-transport's
+`seed_residue.rs` binds without the policy, so it never sees them.*
+Options:
+- a vault lock item, with `seed_residue.rs` gaining a default-policy run
+  and the copies attributed (iroh, p2panda-net, or Mere's wiring);
+- ledger only;
+- defer to L3.
+
+Mark: **"Vault lock item + test (Recommended)"**.
+
 Still open: a threat statement naming hibernation and the pagefile.
 
 ## 4. Phases
@@ -1069,3 +1096,23 @@ unlock follow-through, and non-Windows startup unlock backends, from the
   here.
 - **Rulings 57 and 58:** `f68af0d` retired unpushed, the fix moves onto
   `ae3352e`, and mere repins once after the fix.
+
+**2026-10-07, the seed fix on `ae3352e`, measured.**
+- **Knot.** The fix replayed cleanly onto `ae3352e` (branch
+  `seed-borrow-ae3352e` in `worktrees/knot-seed`). `cargo check --workspace
+  --all-targets` passes.
+- **djinn.** `resident_knot.rs` took the seed by value. It now holds it in
+  `Zeroizing` across its awaits and lends it to Knot, and its test passes.
+- **The instrument.** djinn's `knot_residue`, run against a by-path patch
+  of each Knot tree on mere `973a7fc1` (WIP `727100bf` in
+  `worktrees/mere-knot-seed`):
+  - **positive control:** passes in both arms;
+  - **`author`:** 4256 left on `ae3352e`, 0 with the fix;
+  - **source and session, capture retention:** 0 in both arms;
+  - **sync host, beyond iroh, p2panda-net and the overlay host with
+    mDNS:** 536, 632, 920, 1016, 1680, 2272, 7616 and 7632 on `ae3352e`;
+    the same six and 7568 with the fix.
+- **Diagnostic runs** (marked in the test): the overlay host alone leaves
+  nothing beyond the baselines with mDNS off, and 4 sizes with it on
+  (ruling 60).
+- **Rulings 59 and 60.** Next: the join baseline.
