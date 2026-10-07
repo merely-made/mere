@@ -1,0 +1,19 @@
+[package]
+name = "edit-history"
+version = "0.1.0"
+description = "Undo and redo over whole-document snapshots, with keyed coalescing on a host clock and a saved marker."
+authors.workspace = true
+edition.workspace = true
+rust-version = "1.92"
+license = "MPL-2.0"
+repository.workspace = true
+keywords = ["undo", "redo", "history", "editor"]
+categories = ["gui", "data-structures"]
+# Unclaimed on crates.io; publishing is a separate decision (Scenograph editor
+# plan, SE13).
+publish = false
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
