@@ -70,17 +70,23 @@ pub type TextField = OnKey<
     fn(&mut TextInput, KeyEvent),
 >;
 
-/// Build the field's `<input>` / `<textarea>` body: the text as the element's
+/// Build the app-owned field element: the text as the element's
 /// children, split at the caret to splice the IME preedit, then the ghost suffix.
 /// Delegates to the one style-aware body in [`styled_field`](crate::styled_field)
 /// with no styles (the plain case); [`styled_textarea`](crate::styled_textarea) is
 /// the same body with highlight classes, so the plain and styled fields share one
 /// implementation.
 fn field_body(
-    tag: &str,
     input: &TextInput,
+    multiline: bool,
 ) -> El<Vec<crate::styled_field::FieldChild>, TextInput, ()> {
-    el::<_, TextInput, ()>(tag, crate::styled_field::field_children(input, &[]))
+    let mut field = el::<_, TextInput, ()>("div", crate::styled_field::field_children(input, &[]))
+        .attr("role", "textbox")
+        .attr("data-cambium-text-value", input.text());
+    if multiline {
+        field = field.attr("aria-multiline", "true");
+    }
+    field
 }
 
 /// What makes a single-line field one line, whatever the host's sheet says:
@@ -96,7 +102,7 @@ pub const SINGLE_LINE_FIELD_STYLE: &str =
 fn build_text_field(input: &TextInput) -> TextField {
     let handler: fn(&mut TextInput, KeyEvent) = edit;
     on_key(
-        field_body("input", input).attr("style", SINGLE_LINE_FIELD_STYLE),
+        field_body(input, false).attr("style", SINGLE_LINE_FIELD_STYLE),
         handler,
     )
 }
@@ -104,7 +110,7 @@ fn build_text_field(input: &TextInput) -> TextField {
 /// A reusable, editable text field whose state *is* a [`TextInput`].
 ///
 /// Renders the field's [`display`](TextInput::display) (buffer + caret marker) as
-/// the text content of an `<input>` element wrapped in [`on_key`](crate::on_key);
+/// the children of an app-owned textbox element wrapped in [`on_key`](crate::on_key);
 /// the `on_key` makes the element focusable and routes typed keys to `edit`,
 /// which mutates the `&mut TextInput`. Knowing nothing but its own
 /// [`TextInput`], the field composes onto any larger app state through
@@ -116,11 +122,11 @@ fn build_text_field(input: &TextInput) -> TextField {
 /// that needs the *named* concrete type (to store the runner's `V`) uses
 /// [`text_field_typed`] instead.
 ///
-/// The element is an `<input>` so author CSS can target the field (e.g. a
-/// border/background) and so it reads as a control; Genet lays it out as
-/// whatever the cascade resolves, over the [`SINGLE_LINE_FIELD_STYLE`] it
-/// carries inline. It carries no browser `<input>` value semantics — its text
-/// is just its content, diffed like any other text on rebuild.
+/// The field is an ordinary `div` with `role="textbox"`; committed text is
+/// exposed in `data-cambium-text-value`, while the children keep the app's
+/// highlight, composition, ghost, and caret rendering. The role and value let
+/// host accessibility projection identify the control without native HTML
+/// input semantics.
 pub fn text_field(
     input: &TextInput,
 ) -> impl View<TextInput, (), GenetCtx, Element = GenetElement> + use<> {
@@ -140,12 +146,12 @@ pub fn text_field_typed(input: &TextInput) -> TextField {
 
 /// Build the concrete view for a multi-line [`textarea`]. Structurally identical
 /// to a [`TextField`] (an `on_key`-wrapped element over a [`TextInput`]); the
-/// difference is the [`edit_multiline`] handler and a `<textarea>` tag. With
+/// difference is the [`edit_multiline`] handler and multiline textbox metadata. With
 /// `\n`s in the buffer, Genet/parley break it into lines (Genet feeds raw text
 /// to parley, which honors `\n`).
 fn build_textarea(input: &TextInput) -> TextField {
     let handler: fn(&mut TextInput, KeyEvent) = edit_multiline;
-    on_key(field_body("textarea", input), handler)
+    on_key(field_body(input, true), handler)
 }
 
 /// A reusable multi-line text field over a [`TextInput`] — [`text_field`]'s

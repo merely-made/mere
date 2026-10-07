@@ -62,6 +62,46 @@ rendering engine.
 
 ## Current Mere-owned compatibility
 
+### 2026-10-07 Forms field ownership migration
+
+**Status:** implemented locally; qualification and a verified Genet repin are
+pending. The implementation plan and numbered rulings live in Genet's
+[dated Forms plan](https://github.com/merely-made/genet/blob/main/design_docs/2026-10-07_forms_value_validation_submission_plan.md).
+F3 authorizes this Mere migration and the later verified repin. The current
+source still pins Genet `965b64e206a47d1c8808472de9aa461233638768`; its older
+receipts do not qualify the Forms candidate.
+
+Native HTML inputs and textareas now keep live values in Genet's form-control
+arena. Cambium's `TextInput` owns app editing and paints highlighted committed
+runs, IME preedit, ghosts and carets as children. Those fields therefore use
+ordinary `div` elements with `role=textbox`, rather than native HTML form tags.
+Multiline fields carry `aria-multiline=true`; public field view APIs stay the
+same. Existing field CSS, caret lookup and semantic tests follow the app marker.
+Known visible labels are attached explicitly to the textbox, since a `div`
+cannot inherit a native input's wrapping-label association.
+
+`data-cambium-text-value` carries only `TextInput::text()`. Rootstock's existing
+neutral `document_projection` and the native AccessKit adapter read that
+Mere-owned marker on explicit textboxes. They preserve node identity, labels,
+geometry, focus and actions while exposing committed value and multiline/editable
+state. Preedit, ghost and caret children remain in drawing and are excluded from
+the accessible value. Genet receives no Cambium marker contract. Text-valued
+accessibility SetValue routing remains a separate existing gap.
+
+Qualification uses the focused Cambium, Rootstock, native adapter and native
+host package tests, including single-line editing, IME/caret routing, Unicode
+committed-value projection, catalog behavior and the browser accessibility
+example. A local consumer run must identify the exact candidate Genet source and
+lock; the later published-source repin must separately verify coherent family
+identities and repeat the affected gates. Human assistive-technology acceptance
+and standalone browser-hosted operation are not inferred from unit tests.
+
+The downstream read-only audit finds old tag checks in Turnstone and Cleromancy.
+Their mechanical selector/caret/existing-label follow-ups await explicit scope
+authorization; currently unnamed fields retain that state. No sibling source
+has changed. Existing target `C:/t/cargo-targets/mere` is reused for Mere gates
+if it has no live owner; Genet's qualification retains its separate stable target.
+
 ### 2026-09-29 generated accessible-name adoption
 
 **Status:** implemented and verified against the published source. All 207 tests

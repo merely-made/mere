@@ -136,24 +136,29 @@ fn editor_row(
 
 fn row_body(props: &RowProps, draft: &SettingDraft) -> ComponentView<SettingDraft, SettingValue> {
     match draft {
-        SettingDraft::Text(_) => editor_row(
-            props,
-            lens(
-                |input: &mut TextInput| text_field_typed(input),
-                |draft: &mut SettingDraft| {
+        SettingDraft::Text(_) => {
+            let aria_label = props.label.clone();
+            editor_row(
+                props,
+                lens(
+                    move |input: &mut TextInput| {
+                        text_field_typed(input).attr("aria-label", aria_label.clone())
+                    },
+                    |draft: &mut SettingDraft| {
+                        let SettingDraft::Text(input) = draft else {
+                            unreachable!("text draft routes to a text editor");
+                        };
+                        input
+                    },
+                ),
+                |draft| {
                     let SettingDraft::Text(input) = draft else {
-                        unreachable!("text draft routes to a text editor");
+                        unreachable!("text draft routes to a text apply");
                     };
-                    input
+                    SettingValue::Text(input.text().to_owned())
                 },
-            ),
-            |draft| {
-                let SettingDraft::Text(input) = draft else {
-                    unreachable!("text draft routes to a text apply");
-                };
-                SettingValue::Text(input.text().to_owned())
-            },
-        ),
+            )
+        },
         SettingDraft::Number(_) => {
             let (min, max) = match &props.spec.control {
                 SettingControl::Number { min, max, .. } => (*min, *max),
