@@ -96,6 +96,18 @@ lock; the later published-source repin must separately verify coherent family
 identities and repeat the affected gates. Human assistive-technology acceptance
 and standalone browser-hosted operation are not inferred from unit tests.
 
+Preparation against committed Genet `b8a3ec1d6abe88e07438ca4d53b9ca4d2b92111d`
+preserves all 1,688 locked package versions, dependency arrays and checksums.
+Only 33 current Genet, nine Boa and three Vano source revisions move; the two
+legacy Knot-owned Genet identities stay unchanged. The default resolved graph
+does not activate either JavaScript engine. The candidate lock is frozen as
+`testing/genet/forms/mere-forms-lock-preparation.Cargo.lock` under the Code root.
+The catalog acceptance program passes and regenerates both HTML receipts with
+the app textboxes and their existing names; this is artifact preparation, with
+fresh consumer tests still pending. Each run restores the original manifest and
+lock and checks all tracked source bytes and mtimes outside its owned outputs.
+The optional Cambium `highlight` feature also needs its own library test gate.
+
 The downstream read-only audit finds old tag checks in Turnstone and Cleromancy.
 Their mechanical selector/caret/existing-label follow-ups await explicit scope
 authorization; currently unnamed fields retain that state. No sibling source
