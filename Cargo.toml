@@ -12,6 +12,7 @@ members = [
     "crates/system/pandect",
     "crates/system/luggage",
     "crates/system/fetch",
+    "crates/system/framing",
     "crates/system/content-contract",
     "crates/system/proofs",
     "crates/system/shell-state",
