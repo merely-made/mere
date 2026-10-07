@@ -601,59 +601,69 @@ fn a_whole_choice_applies_with_one_rebuild_and_reads_back() {
     assert_eq!(canvas.physics_profile_id(), None);
 }
 
-/// Density refuses overlays, with a reason, through every setter: adding
-/// them, toggling one, switching to Density with some live, and a whole
-/// choice. Springs, the control, takes the same overlays.
+/// Density takes only the overlays that hold its bar converted (F73: Hub
+/// room and Centre, of the three it named) and refuses the rest, with a reason, through every
+/// setter: adding them, toggling one, switching to Density with some live,
+/// and a whole choice. Springs, the control, takes them all.
 #[test]
-fn density_refuses_overlays_with_a_reason() {
+fn density_refuses_all_but_its_three_overlays_with_a_reason() {
     use crate::canvas::PhysicsChoice;
     let mut canvas = Canvas::with_sample_graph();
     canvas.set_physics_law(PhysicsLaw::Density).unwrap();
     let refused = canvas
-        .set_physics_overlays(vec![PhysicsOverlay::Tide])
+        .set_physics_overlays(vec![PhysicsOverlay::GravityLocus, PhysicsOverlay::Tide])
         .unwrap_err();
     assert_eq!(refused.law, PhysicsLaw::Density);
     assert_eq!(refused.refused, [PhysicsOverlay::Tide]);
-    assert!(refused.reason.starts_with("Density takes no overlays"));
-    assert!(canvas.physics_overlays().is_empty());
-    assert_eq!(canvas.law_force_count(), 1, "Density alone");
-    assert!(!canvas.toggle_physics_overlay(PhysicsOverlay::GridSnap));
-    assert!(canvas.physics_overlays().is_empty());
+    assert!(
+        refused
+            .reason
+            .starts_with("Density takes only Hub room and Centre")
+    );
+    assert_eq!(canvas.physics_overlays(), &[PhysicsOverlay::GravityLocus]);
+    assert_eq!(canvas.law_force_count(), 2, "Density and the centre");
+    assert!(!canvas.toggle_physics_overlay(PhysicsOverlay::Skeleton));
+    assert_eq!(canvas.physics_overlays(), &[PhysicsOverlay::GravityLocus]);
+    assert!(canvas.toggle_physics_overlay(PhysicsOverlay::DegreeRepulsion));
     // The control: Springs takes them.
     canvas.set_physics_law(PhysicsLaw::Springs).unwrap();
     canvas
-        .set_physics_overlays(vec![PhysicsOverlay::Tide, PhysicsOverlay::GridSnap])
+        .set_physics_overlays(vec![PhysicsOverlay::GravityLocus, PhysicsOverlay::GridSnap])
         .unwrap();
     assert_eq!(
         canvas.law_force_count(),
         5,
         "springs' three and two overlays"
     );
-    // Switching to Density with overlays live applies the law, drops them,
-    // and says which.
+    // Switching to Density with overlays live applies the law, drops the
+    // ones it refuses, and says which.
     let dropped = canvas.set_physics_law(PhysicsLaw::Density).unwrap_err();
-    assert_eq!(
-        dropped.refused,
-        [PhysicsOverlay::Tide, PhysicsOverlay::GridSnap]
-    );
+    assert_eq!(dropped.refused, [PhysicsOverlay::GridSnap]);
     assert_eq!(canvas.physics_law(), PhysicsLaw::Density);
-    assert!(canvas.physics_overlays().is_empty());
-    assert_eq!(canvas.law_force_count(), 1);
-    // A whole choice: the law and sources apply, the overlays are refused.
+    assert_eq!(canvas.physics_overlays(), &[PhysicsOverlay::GravityLocus]);
+    assert_eq!(canvas.law_force_count(), 2);
+    // A whole choice: the law, the sources and the admitted overlay apply,
+    // the rest are refused.
     let choice = PhysicsChoice {
         law: PhysicsLaw::Density,
-        overlays: vec![PhysicsOverlay::HubGravity],
+        overlays: vec![PhysicsOverlay::HubGravity, PhysicsOverlay::DegreeRepulsion],
         mass: PhysicsMassSource::PageRank,
         ..PhysicsChoice::default()
     };
     let refused = canvas.set_physics_choice(&choice).unwrap_err();
     assert_eq!(refused.refused, [PhysicsOverlay::HubGravity]);
     assert_eq!(canvas.physics_mass_source(), PhysicsMassSource::PageRank);
-    assert!(canvas.physics_overlays().is_empty());
-    // No profile pairs a refusing law with overlays.
+    assert_eq!(
+        canvas.physics_overlays(),
+        &[PhysicsOverlay::DegreeRepulsion]
+    );
+    // No profile pairs a law with an overlay it refuses.
     for profile in CANVAS_PHYSICS_PROFILES {
         assert!(
-            profile.law.overlay_refusal().is_none() || profile.overlays.is_empty(),
+            profile
+                .overlays
+                .iter()
+                .all(|o| profile.law.refuses(*o).is_none()),
             "{} mixes overlays into {}",
             profile.id,
             profile.law.id()

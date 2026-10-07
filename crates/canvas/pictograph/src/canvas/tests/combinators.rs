@@ -73,44 +73,100 @@ fn every_law_reports_its_currency() {
 }
 
 /// Law by overlay: a force law composes every overlay, Still and Anneal
-/// take them converted, and Density's interim refusal holds whatever its
-/// currency would admit. The canvas refuses Density's overlays with the
-/// reason both pickers show, and takes Still's.
+/// take them converted, and Density takes Hub room and Centre
+/// converted and refuses the rest (F73), with the reason both pickers show.
+/// Through the canvas, Density with an overlay runs its conversion and
+/// Density alone does not.
 #[test]
 fn the_catalog_composes_converts_or_refuses_each_overlay_by_currency() {
+    use crate::canvas::physics_catalog::{DENSITY_ADMITS, DENSITY_REFUSAL};
     for law in PhysicsLaw::ALL {
         for overlay in PhysicsOverlay::ALL {
-            let admission = law.admits(overlay);
             let expected = match law.currency() {
                 Currency::Force => Admission::Compose,
+                _ if law == PhysicsLaw::Density && !DENSITY_ADMITS.contains(&overlay) => {
+                    Admission::Refuse(DENSITY_REFUSAL)
+                },
                 _ => Admission::Convert,
             };
-            assert_eq!(admission, expected, "{} with {}", law.id(), overlay.id());
+            assert_eq!(
+                law.admits(overlay),
+                expected,
+                "{} with {}",
+                law.id(),
+                overlay.id()
+            );
         }
-        let refused = law.overlay_refusal();
-        assert_eq!(
-            refused.is_some(),
-            law == PhysicsLaw::Density,
-            "{}: {refused:?}",
-            law.id()
-        );
     }
+    assert_eq!(
+        DENSITY_ADMITS,
+        &[PhysicsOverlay::DegreeRepulsion, PhysicsOverlay::GravityLocus]
+    );
+    // Density with Centre, as the catalog builds it, runs exactly as Density
+    // converting with Centre, and apart from Density not converting (the
+    // control): its conversion is on once it takes an overlay.
+    let (keys, edges, sites) = ring();
+    let inputs = LawInputs::from_parts(keys.clone(), edges.clone(), sites);
+    let sources = LawSources::bare();
+    let run = |forces: Vec<Box<dyn Force>>| {
+        let mut sim = seiche::Simulation::new();
+        sim.sync_nodes(keys.iter().enumerate().map(|(i, &k)| {
+            let a = i as f32 * 2.399_963;
+            let r = 20.0 * (i as f32 + 1.0).sqrt();
+            (k, euclid::default::Point2D::new(r * a.cos(), r * a.sin()))
+        }));
+        sim.sync_edges(edges.iter().copied());
+        sim.set_forces(forces);
+        for _ in 0..120 {
+            sim.tick(1.0 / 60.0);
+        }
+        sim.positions().collect::<HashMap<_, _>>()
+    };
+    let by_hand = |converts: bool| {
+        let mut density = crate::canvas::physics_catalog::density_law(inputs.masses(sources.mass));
+        density.converts = converts;
+        vec![
+            Box::new(density) as Box<dyn Force>,
+            inputs.overlay_force(PhysicsOverlay::GravityLocus, sources),
+        ]
+    };
+    let catalog = run(inputs.forces(
+        PhysicsLaw::Density,
+        &[PhysicsOverlay::GravityLocus],
+        sources,
+    ));
+    let converting = run(by_hand(true));
+    let not_converting = run(by_hand(false));
+    let apart = |a: &HashMap<NodeKey, euclid::default::Point2D<f32>>,
+                 b: &HashMap<NodeKey, euclid::default::Point2D<f32>>| {
+        a.iter()
+            .map(|(k, p)| (*p - b[k]).length())
+            .fold(0.0f32, f32::max)
+    };
+    println!(
+        "density with centre after 120 ticks: catalog against converting {:.4}, against not \
+         converting {:.4}",
+        apart(&catalog, &converting),
+        apart(&catalog, &not_converting)
+    );
+    assert_eq!(apart(&catalog, &converting), 0.0);
+    assert!(apart(&catalog, &not_converting) > 1e-2);
     let mut canvas = Canvas::with_sample_graph();
     canvas
-        .set_physics_overlays(vec![PhysicsOverlay::GravityLocus])
+        .set_physics_overlays(vec![PhysicsOverlay::GravityLocus, PhysicsOverlay::Skeleton])
         .unwrap();
     let refusal = canvas.set_physics_law(PhysicsLaw::Density).unwrap_err();
-    assert_eq!(refusal.refused, vec![PhysicsOverlay::GravityLocus]);
-    assert_eq!(
-        refusal.reason,
-        crate::canvas::physics_catalog::DENSITY_INTERIM
-    );
-    assert!(canvas.physics_overlays().is_empty());
+    assert_eq!(refusal.refused, vec![PhysicsOverlay::Skeleton]);
+    assert_eq!(refusal.reason, DENSITY_REFUSAL);
+    assert_eq!(canvas.physics_overlays(), &[PhysicsOverlay::GravityLocus]);
     canvas.set_physics_law(PhysicsLaw::Still).unwrap();
     canvas
-        .set_physics_overlays(vec![PhysicsOverlay::GravityLocus])
+        .set_physics_overlays(vec![PhysicsOverlay::GravityLocus, PhysicsOverlay::Skeleton])
         .unwrap();
-    assert_eq!(canvas.physics_overlays(), &[PhysicsOverlay::GravityLocus]);
+    assert_eq!(
+        canvas.physics_overlays(),
+        &[PhysicsOverlay::GravityLocus, PhysicsOverlay::Skeleton]
+    );
 }
 
 /// A mix or a grouping holds force laws only, refused with the reason
