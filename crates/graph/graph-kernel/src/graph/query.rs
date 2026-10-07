@@ -23,7 +23,7 @@ use uuid::Uuid;
 
 use super::edge_payload::EdgePayload;
 use super::edge_taxonomy::{ContainmentSubKind, EdgeAssertion, RelationSelector};
-use super::identity::{EdgeKey, NodeKey};
+use super::identity::{EdgeKey, NodeKey, RelationKey};
 use super::node::Node;
 use super::snapshot::containment_parent_url;
 use super::{ArrangementEdgeView, ContainmentEdgeView, Graph, RelationView, SemanticEdgeView};
@@ -96,6 +96,125 @@ fn relation_rows(from: NodeKey, to: NodeKey, payload: &EdgePayload) -> Vec<Relat
         }
     }
     out
+}
+
+#[cfg(test)]
+mod projected_relation_tests {
+    use super::*;
+    use crate::graph::{ResourceNode, SemanticStatement, SemanticSubKind};
+    use crate::persistence::PersistedResourceRecord;
+    use crate::types::GraphScope;
+
+    #[test]
+    fn projected_rows_keep_owner_direction_multiplicity_and_all_shown_pairs() {
+        let mut graph = Graph::new();
+        let [a, alias_a, b, alias_b, unbound] = std::array::from_fn::<_, 5, _>(|i| {
+            graph.add_node(format!("https://surface.test/{i}"), Default::default())
+        });
+        let surface_key = graph
+            .assert_relation(
+                a,
+                b,
+                EdgeAssertion::Semantic {
+                    sub_kind: SemanticSubKind::UserGrouped,
+                    label: None,
+                    decay_progress: None,
+                },
+            )
+            .unwrap();
+        let [ra, rb, unshown] = ["a", "b", "unshown"].map(|suffix| {
+            let iri = format!("https://resource.test/{suffix}");
+            let resource = ResourceNode::for_term(&iri);
+            assert!(graph.set_resource_record(
+                resource.id(),
+                Some(PersistedResourceRecord {
+                    canonical_iri: iri,
+                    facets: vec![],
+                })
+            ));
+            resource.id()
+        });
+        for (from, to, ids) in [
+            (ra, rb, vec!["forward-1", "forward-2"]),
+            (rb, ra, vec!["backward"]),
+            (ra, ra, vec!["self"]),
+            (ra, unshown, vec!["not-shown"]),
+        ] {
+            let records: Vec<_> = ids
+                .into_iter()
+                .map(|id| {
+                    let mut payload = EdgePayload::new();
+                    payload.push_persisted_semantic_statement(SemanticStatement {
+                        statement_id: id.into(),
+                        predicate: crate::graph::predicate_iri(SemanticSubKind::Cites).into(),
+                        recognized_sub_kind: Some(SemanticSubKind::Cites),
+                        label: Some(id.into()),
+                        graph_scope: GraphScope::Default,
+                        provenance_iri: Some("https://author.test/".into()),
+                        asserted_at_ms: Some(17),
+                    });
+                    super::super::snapshot::persisted_edge_for_ids(from, to, &payload)
+                })
+                .collect();
+            assert!(graph.set_resource_edges_between(from, to, &records));
+        }
+        assert_eq!(
+            graph.projected_relations().count(),
+            1,
+            "unshown truth stays stored"
+        );
+        for (surface, resource) in [(a, ra), (alias_a, ra), (b, rb), (alias_b, rb)] {
+            assert!(graph.set_shown_resource(graph.get_node(surface).unwrap().id, Some(resource)));
+        }
+        let rows: Vec<_> = graph.projected_relations().collect();
+        assert_eq!(rows.len(), 17); // surface + 8 forward + 4 backward + 4 self
+        assert_eq!(rows[0].0, surface_key, "surface prefix keeps its owner");
+        for source in [a, alias_a] {
+            for target in [b, alias_b] {
+                assert_eq!(
+                    rows.iter()
+                        .filter(|(key, row)| matches!(key, RelationKey::Resource(_))
+                            && row.from == source
+                            && row.to == target)
+                        .count(),
+                    2
+                );
+                assert_eq!(
+                    rows.iter()
+                        .filter(|(key, row)| matches!(key, RelationKey::Resource(_))
+                            && row.from == target
+                            && row.to == source)
+                        .count(),
+                    1
+                );
+            }
+            for target in [a, alias_a] {
+                assert_eq!(
+                    rows.iter()
+                        .filter(|(_, row)| row.from == source && row.to == target)
+                        .count(),
+                    1,
+                    "resource self-loop lifts every alias pair"
+                );
+            }
+        }
+        assert!(
+            rows.iter()
+                .all(|(key, _)| graph.get_relation(*key).is_some())
+        );
+        assert!(
+            rows.iter()
+                .all(|(_, row)| row.from != unbound && row.to != unbound)
+        );
+        assert_eq!(
+            graph.resource_relations().count(),
+            5,
+            "unshown assertion was retained"
+        );
+        assert!(graph.set_shown_resource(graph.get_node(alias_b).unwrap().id, None));
+        assert_eq!(graph.projected_relations().count(), 11);
+        assert_eq!(graph.resource_relations().count(), 5);
+    }
 }
 
 impl Graph {
@@ -173,6 +292,42 @@ impl Graph {
             .inner()
             .edge_references()
             .flat_map(|edge| relation_rows(edge.source(), edge.target(), edge.weight()))
+    }
+
+    /// Surface relations followed by content relations lifted to every pair of
+    /// surfaces showing their endpoints. The handle retains its owning store;
+    /// projection does not copy resource assertions into the surface graph.
+    pub fn projected_relations(&self) -> impl Iterator<Item = (RelationKey, RelationView)> + '_ {
+        let surfaces = self.inner.inner().edge_references().flat_map(|edge| {
+            let key = RelationKey::Surface(edge.id());
+            relation_rows(edge.source(), edge.target(), edge.weight())
+                .into_iter()
+                .map(move |row| (key, row))
+        });
+        let resources = self
+            .resource_relations()
+            .flat_map(|(key, from, to, payload)| {
+                let sources = self.surface_ids_showing_resource(from);
+                let targets = self.surface_ids_showing_resource(to);
+                let mut rows = Vec::new();
+                for source in sources {
+                    let Some(source) = self.get_node_key_by_id(source) else {
+                        continue;
+                    };
+                    for target in &targets {
+                        let Some(target) = self.get_node_key_by_id(*target) else {
+                            continue;
+                        };
+                        rows.extend(
+                            relation_rows(source, target, payload)
+                                .into_iter()
+                                .map(|row| (RelationKey::Resource(key), row)),
+                        );
+                    }
+                }
+                rows
+            });
+        surfaces.chain(resources)
     }
 
     /// Relations whose `from` endpoint is `key`, expanded with exactly the

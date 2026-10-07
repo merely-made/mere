@@ -148,12 +148,12 @@ pub use geometry::CartographyGeometry;
 pub mod palette;
 pub use palette::DerivedFacePalette;
 
+mod area_share;
 /// Query similarity over the canvas: the embedding→numen field bridge and the
 /// search surface built on it. Homed here in the 2026-08-12 eidetic reorg —
 /// they are canvas glue (numen fields over placed nodes) that had been parked
 /// in the intel tier, where nothing consumed them.
 pub mod canvas_search;
-mod area_share;
 mod edge_cells;
 pub mod field_bridge;
 mod fields;
@@ -196,16 +196,14 @@ pub use physics_device::{PhysicsDevice, physics_device_for};
 pub mod physics_catalog;
 pub use board_scene::{
     BoardBackdrop, BoardCard, BoardFit, BoardFootprint, BoardRect, BoardScene, BoardText,
-    BoardTransform,
-    backdrop_color,
+    BoardTransform, backdrop_color,
 };
 pub use physics_board::{BoardItem, PhysicsBoard, PhysicsChoice};
 pub use physics_catalog::{
     CANVAS_PHYSICS_DEPTH_SOURCES, CANVAS_PHYSICS_KIND_SOURCES, CANVAS_PHYSICS_LAWS,
     CANVAS_PHYSICS_MASS_SOURCES, CANVAS_PHYSICS_OVERLAYS, CANVAS_PHYSICS_PROFILES, LayoutStats,
-    OverlayRefusal,
-    PhysicsDepthSource, PhysicsKindSource, PhysicsLaw, PhysicsMassSource, PhysicsOverlay,
-    PhysicsProfile,
+    OverlayRefusal, PhysicsDepthSource, PhysicsKindSource, PhysicsLaw, PhysicsMassSource,
+    PhysicsOverlay, PhysicsProfile,
 };
 
 /// Force-directed settle length (frames) after a (re)seed, ~6s at 60fps.
@@ -480,13 +478,15 @@ pub struct Canvas {
     /// The [`Graph::revision`](kernel::graph::Graph::revision) [`community_cache`](Self::community_cache)
     /// was computed at, so a stale partition is recomputed and a fresh one reused. (Graph signals.)
     community_cache_revision: u64,
-    /// The inputs the active analytic layout was last computed for: strategy id, structural graph
-    /// revision, URL-authority grouping revision, Canvas footprint revision, viewport, and focus. The
+    /// The inputs the active analytic layout was last computed for: strategy id, visible graph
+    /// stamp, URL-authority grouping revision, Canvas footprint revision, viewport, and focus. The
     /// host gates its per-frame `project_canvas_strategy` call on these via
     /// [`needs_strategy_recompute`](Self::needs_strategy_recompute), so an unchanged analytic layout
     /// is computed once per real dependency change. `focus` is only recorded for focus-driven
     /// strategies (radial). Reset when the strategy changes. (Arrangements — the layout cache.)
     last_strategy_inputs: Option<(String, u64, u64, u64, u32, u32, Option<NodeKey>)>,
+    /// Recheck exact visible inputs once per graph revision; steady frames reuse the stamp.
+    strategy_graph_memo: std::sync::Mutex<Option<strategy_inputs::StrategyGraphMemo>>,
     /// Monotonic generation for the Canvas-resolved geometry that analytic layouts consume through
     /// [`strategy_extents`](Self::strategy_extents). This stays local because explicit sizes and
     /// size channels are view state, not graph truth.
@@ -667,7 +667,7 @@ pub struct Canvas {
     /// How many times the law + overlay force set was rebuilt. Test only.
     #[cfg(test)]
     law_rebuilds: usize,
-    /// A restored score's `(strategy id, graph revision, URL-authority revision, footprint revision)`
+    /// A restored score's `(strategy id, visible graph stamp, URL-authority revision, footprint revision)`
     /// claim on the layout.
     /// [`restore_projection_score`](Self::restore_projection_score) buffers the
     /// score's own positions; without this the host's very next
@@ -707,16 +707,17 @@ impl Default for Canvas {
     }
 }
 
+pub(crate) mod at_rest;
 mod cartography;
 mod derived_face;
 mod gloss;
 mod lifecycle;
 mod nodes;
-pub(crate) mod at_rest;
 mod roles;
 mod selection;
 mod source_time;
 mod strategy;
+mod strategy_inputs;
 mod view;
 
 pub use at_rest::{HOME_FRAMES, SETTLE_SPEED_FLOOR};

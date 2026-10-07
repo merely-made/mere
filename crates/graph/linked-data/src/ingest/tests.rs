@@ -22,6 +22,74 @@ const SAMPLE: &[u8] = br#"[
 ]"#;
 
 #[test]
+fn rdf_subjects_keep_exact_surface_ids_but_add_uses_page_binding() {
+    use kernel::graph::ResourceNode;
+    use kernel::persistence::PersistedResourceRecord;
+    use oxrdf::{GraphName, Literal, NamedNode};
+    let terms = ["https://vocab.test/terms#A", "https://vocab.test/terms#B"];
+    let pages = [
+        "https://PAGE.test:443/item#first",
+        "https://page.test/item#second",
+    ];
+    let quads = terms.into_iter().chain(pages).map(|iri| {
+        Quad::new(
+            NamedNode::new(iri).unwrap(),
+            NamedNode::new(SCHEMA_NAME).unwrap(),
+            Literal::new_simple_literal(iri),
+            GraphName::DefaultGraph,
+        )
+    });
+    let contribution = from_quads(quads, "identity-input").unwrap();
+    assert_eq!(contribution.nodes.len(), 4);
+    assert!(contribution.edges.is_empty());
+    assert!(
+        contribution.nodes.iter().all(|node| node.types.is_empty()),
+        "foreign subjects carry no entity/page hint"
+    );
+    let mut graph = Graph::new();
+    let outcome = apply_contribution(&mut graph, &contribution);
+    assert_eq!(outcome.nodes_created, 4);
+    assert_eq!(outcome.edges_skipped, 0);
+    let surface = |iri| graph.get_node_by_url(iri).unwrap().0;
+    assert_ne!(
+        graph.get_node(surface(terms[0])).unwrap().id,
+        graph.get_node(surface(terms[1])).unwrap().id
+    );
+    // Characterize the Add boundary on 2026-10-06, before the identity-input ruling.
+    let shown = |iri| graph.shown_resource_id(surface(iri)).unwrap();
+    assert_eq!(
+        shown(terms[0]),
+        shown(terms[1]),
+        "Add treats both foreign subjects as page aliases"
+    );
+    assert_eq!(
+        shown(pages[0]),
+        shown(pages[1]),
+        "ordinary page aliases are the positive control"
+    );
+    assert_ne!(shown(terms[0]), shown(pages[0]));
+    assert_eq!(graph.resource_nodes().count(), 2);
+    let exact = terms.map(ResourceNode::for_term);
+    assert_ne!(exact[0].id(), exact[1].id());
+    let mut snapshot = graph.to_snapshot();
+    snapshot
+        .resources
+        .extend(exact.iter().map(|resource| PersistedResourceRecord {
+            canonical_iri: resource.canonical_iri().into(),
+            facets: vec![],
+        }));
+    let restored = Graph::try_from_snapshot(&snapshot).unwrap();
+    assert_eq!(restored.resource_nodes().count(), 4);
+    for resource in exact {
+        assert_eq!(
+            restored.resource(resource.id()).unwrap().canonical_iri(),
+            resource.canonical_iri(),
+            "exact term storage retains both identities"
+        );
+    }
+}
+
+#[test]
 fn blank_nodes_skolemize_under_a_document_namespace() {
     // A blank node becomes `urn:mere:bnode:<doc-namespace>:<label>`. The
     // namespace is stable per document content; oxjsonld assigns the label

@@ -376,10 +376,9 @@ pub fn project_canvas_subgraph(
             );
         }
     }
-    // Induced edges: one per scoped pair (no self-loops), as a plain hyperlink so `relations()` (the
-    // spring topology the layouts read) sees it.
+    // Scratch topology: one surface relation per scoped pair, with no self-loops.
     let mut seen: HashSet<(NodeKey, NodeKey)> = HashSet::new();
-    for r in graph.relations() {
+    for (_, r) in graph.projected_relations() {
         if r.from == r.to || !scope_set.contains(&r.from) || !scope_set.contains(&r.to) {
             continue;
         }
@@ -403,7 +402,7 @@ pub fn project_canvas_subgraph(
             sa,
             sb,
             EdgeAssertion::Semantic {
-                sub_kind: SemanticSubKind::Hyperlink,
+                sub_kind: SemanticSubKind::UserGrouped,
                 label: None,
                 decay_progress: None,
             },

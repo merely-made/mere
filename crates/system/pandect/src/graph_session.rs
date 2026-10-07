@@ -2021,8 +2021,54 @@ mod tests {
                 )
                 .await
                 .unwrap();
-            assert_eq!(result.end, Seq(3));
+            assert_eq!(result.first, Seq(4));
+            assert_eq!(result.end, Seq(5));
             assert_eq!(session.graph().get_node(key).unwrap().title, "Seven");
+            let resource_id = kernel::graph::ResourceNode::new("https://seven.test/").id();
+            assert_eq!(session.graph().shown_resource_id(key), Some(resource_id));
+            let [added, visit, resource, shown, title] = session.journal().entries() else {
+                panic!("expected surface, visit, resource, shown binding and title");
+            };
+            let surface_id = Uuid::from_u128(7).to_string();
+            let resource_id_text = resource_id.to_string();
+            assert!(
+                matches!(&added.delta, CapturedDelta::ReplayAddNodeWithIdIfMissing {
+                id, url, ..
+            } if id == &surface_id && url == "https://seven.test/")
+            );
+            assert!(
+                matches!(&visit.delta, CapturedDelta::ReplayTouchNodeLastVisitedById {
+                node_id, ..
+            } if node_id == &surface_id)
+            );
+            assert!(
+                matches!(&resource.delta, CapturedDelta::ReplaySetResourceRecordById {
+                resource_id, record: Some(record)
+            } if resource_id == &resource_id_text
+                && record.canonical_iri == "https://seven.test")
+            );
+            assert!(
+                matches!(&shown.delta, CapturedDelta::ReplaySetShownResourceById {
+                surface_id: captured_surface, resource_id: Some(captured_resource)
+            } if captured_surface == &surface_id && captured_resource == &resource_id_text)
+            );
+            assert!(
+                matches!(&title.delta, CapturedDelta::ReplaySetNodeTitleById {
+                node_id, title
+            } if node_id == &surface_id && title == "Seven")
+            );
+            assert!(
+                session
+                    .journal()
+                    .entries()
+                    .iter()
+                    .all(|entry| entry.author == person())
+            );
+            drop(session);
+            let reopened = mere.open(id).await.unwrap();
+            let (key, node) = reopened.graph().get_node_by_id(Uuid::from_u128(7)).unwrap();
+            assert_eq!(node.title, "Seven");
+            assert_eq!(reopened.graph().shown_resource_id(key), Some(resource_id));
         });
     }
     #[test]

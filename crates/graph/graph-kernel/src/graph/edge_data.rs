@@ -334,7 +334,7 @@ impl SemanticData {
         self.rebuild_compat();
     }
 
-    fn rebuild_compat(&mut self) {
+    pub(crate) fn rebuild_compat(&mut self) {
         self.sub_kinds = self
             .statements
             .iter()

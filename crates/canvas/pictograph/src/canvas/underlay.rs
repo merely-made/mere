@@ -30,7 +30,9 @@ use kernel::graph::{Graph, NodeKey, RelationView};
 use paint_list_api::DeviceIntSize;
 
 use crate::canvas::coupling_paint::{paint_projection_with_visuals, visual_overlays};
-use crate::canvas::scene_paint::{Camera, CanvasPaintList, ScenePaintStyle, paint_projection_filtered};
+use crate::canvas::scene_paint::{
+    Camera, CanvasPaintList, ScenePaintStyle, paint_projection_filtered,
+};
 
 /// Build a [`Projection`] from a graph with **no positions** — every node lands
 /// at the origin (positions are no longer graph truth; S2). This is the
@@ -84,7 +86,7 @@ pub fn arrangement_of_keys(graph: &Graph, keys: &[NodeKey]) -> Arrangement {
 /// Build a [`Projection`] whose node SET comes from a forme [`Arrangement`]'s
 /// membership rather than the whole graph — the seam that makes the canvas a
 /// Cartography projection of an arrangement. Positions come from `position_of`
-/// (committed fallback); edges still come from `graph.relations()`. For an Identity
+/// (committed fallback); edges still come from `graph.projected_relations()`. For an Identity
 /// arrangement (every graph member) this is byte-identical to
 /// [`projection_from_positions`]; a curated arrangement projects only its members.
 pub fn projection_from_arrangement<F>(
@@ -150,7 +152,7 @@ where
 /// Projection core over an explicit node-key set — the membership source. Both the
 /// whole graph ([`project`]) and a forme [`Arrangement`]'s members
 /// ([`arrangement_keys`]) feed this; the output is identical when `keys` is every
-/// graph node in graph order. Edges still come from `graph.relations()` (an
+/// graph node in graph order. Edges still come from `graph.projected_relations()` (an
 /// arrangement is geometry-free and holds no spatial edges).
 fn project_keys<F, V>(
     graph: &Graph,
@@ -187,8 +189,8 @@ where
 }
 
 /// The graph's relations collapsed to undirected, de-duplicated `(from, to)`
-/// pairs — one [`PositionedEdge`] per connected pair, no self-loops. `relations()`
-/// projects without a stable `EdgeKey`, so `edge` is `None`.
+/// pairs — one [`PositionedEdge`] per connected pair, no self-loops. A mixed
+/// projected pair has no single surface `EdgeKey`, so `edge` is `None`.
 fn projected_undirected_edges(
     graph: &Graph,
     edge_visible: &impl Fn(&RelationView) -> bool,
@@ -198,7 +200,7 @@ fn projected_undirected_edges(
     // pair is seen records its endpoints + index; repeats just bump the weight. (Graph signals.)
     let mut index_of: HashMap<(NodeKey, NodeKey), usize> = HashMap::new();
     let mut edges: Vec<PositionedEdge> = Vec::new();
-    for rel in graph.relations() {
+    for (_, rel) in graph.projected_relations() {
         let (a, b) = (rel.from, rel.to);
         if a == b {
             continue; // no self-loops in the scene

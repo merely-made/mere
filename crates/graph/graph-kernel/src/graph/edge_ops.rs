@@ -54,13 +54,43 @@ impl Graph {
         asserted_at_ms: Option<u64>,
     ) -> Option<RelationKey> {
         if let EdgeAssertion::Semantic {
+            sub_kind, label, ..
+        } = assertion
+        {
+            return self
+                .assert_semantic_statement(
+                    from,
+                    to,
+                    SemanticStatementSpec {
+                        predicate: super::predicate_iri(sub_kind).into(),
+                        recognized_sub_kind: Some(sub_kind),
+                        label,
+                        graph_scope: GraphScope::Default,
+                        provenance_iri: Some(asserter_iri),
+                        asserted_at_ms,
+                    },
+                )
+                .and_then(|(edge, outcome)| outcome.changed.then_some(edge));
+        }
+        self.assert_surface_relation_as(from, to, assertion, asserter_iri, asserted_at_ms)
+    }
+
+    pub(crate) fn assert_surface_relation_as(
+        &mut self,
+        from: NodeKey,
+        to: NodeKey,
+        assertion: EdgeAssertion,
+        asserter_iri: String,
+        asserted_at_ms: Option<u64>,
+    ) -> Option<RelationKey> {
+        if let EdgeAssertion::Semantic {
             sub_kind,
             label,
             decay_progress: _,
         } = assertion
         {
             return self
-                .assert_semantic_statement(
+                .assert_surface_semantic_statement(
                     from,
                     to,
                     SemanticStatementSpec {
@@ -312,8 +342,18 @@ impl Graph {
     /// semantic statement with full per-statement metadata on the `(from, to)`
     /// pair bucket, creating the bucket edge if absent. Content-dedup returns
     /// the EXISTING fact handle (updating its metadata in place); a genuine
-    /// change bumps the revision. `None` only when an endpoint is missing.
+    /// change bumps the revision. This compatibility surface writer remains
+    /// during P2 integration; the checked counterpart uses durable placement.
     pub fn assert_semantic_statement(
+        &mut self,
+        from: NodeKey,
+        to: NodeKey,
+        spec: SemanticStatementSpec,
+    ) -> Option<(RelationKey, StatementAssert)> {
+        self.assert_surface_semantic_statement(from, to, spec)
+    }
+
+    pub(crate) fn assert_surface_semantic_statement(
         &mut self,
         from: NodeKey,
         to: NodeKey,
@@ -342,8 +382,18 @@ impl Graph {
     /// Assert a semantic statement whose id is ALREADY minted — the re-ingest /
     /// round-trip path (a reifier carried the fact handle, and preserving it is
     /// what makes `RDF -> kernel -> RDF` id-stable). Reasserting the same
-    /// asserter updates its existing handle; endpoints must exist.
+    /// asserter updates its existing handle; endpoints must exist. The checked
+    /// counterpart supplies declaration-aware placement and collision errors.
     pub fn assert_persisted_semantic_statement(
+        &mut self,
+        from: NodeKey,
+        to: NodeKey,
+        statement: SemanticStatement,
+    ) -> Option<RelationKey> {
+        self.assert_surface_persisted_semantic_statement(from, to, statement)
+    }
+
+    pub(crate) fn assert_surface_persisted_semantic_statement(
         &mut self,
         from: NodeKey,
         to: NodeKey,
@@ -380,6 +430,22 @@ impl Graph {
         to: NodeKey,
         statement_id: &str,
     ) -> bool {
+        let resource_match = self
+            .shown_resource_id(from)
+            .zip(self.shown_resource_id(to))
+            .is_some_and(|pair| {
+                self.resource_relations()
+                    .any(|(_, source, target, payload)| {
+                        pair == (source, target)
+                            && payload
+                                .semantic_statements()
+                                .iter()
+                                .any(|statement| statement.statement_id == statement_id)
+                    })
+            });
+        if resource_match {
+            return self.retract_assertion(statement_id);
+        }
         let Some(edge_key) = self.find_edge_key(from, to) else {
             return false;
         };
@@ -513,6 +579,7 @@ impl Graph {
         let Some(payload) = self.inner.edge_mut(key) else {
             return false;
         };
+        let before = payload.clone();
         payload.set_semantic_predicate(predicate);
         if let Some(semantic) = payload.semantic.as_mut() {
             for statement in &mut semantic.statements {
@@ -520,6 +587,9 @@ impl Graph {
                     statement.provenance_iri = Some(asserter.clone());
                 }
             }
+        }
+        if *payload != before {
+            self.bump_revision();
         }
         true
     }
@@ -602,5 +672,116 @@ impl Graph {
             None => Traversal::now(trigger),
         };
         self.push_traversal(from, to, traversal)
+    }
+}
+
+#[cfg(test)]
+mod legacy_predicate_revision_tests {
+    use super::*;
+
+    fn fixture(asserter: Option<&str>) -> (Graph, NodeKey, NodeKey, EdgeKey) {
+        let mut graph = Graph::new();
+        let from = graph.add_node("https://source.test/".into(), Point2D::zero());
+        let to = graph.add_node("https://target.test/".into(), Point2D::zero());
+        let mut payload = EdgePayload::new();
+        payload.push_persisted_semantic_statement(SemanticStatement {
+            statement_id: "carried legacy handle".into(),
+            predicate: "https://predicate.test/before".into(),
+            recognized_sub_kind: None,
+            label: Some("held label".into()),
+            graph_scope: GraphScope::User,
+            provenance_iri: asserter.map(str::to_owned),
+            asserted_at_ms: Some(17),
+        });
+        let edge = graph.inner.connect(from, to, payload);
+        (graph, from, to, edge)
+    }
+
+    #[test]
+    fn legacy_predicate_replay_advances_revision_only_for_changed_payload() {
+        use super::super::apply::{GraphDelta, GraphDeltaResult, apply_graph_delta};
+
+        let (mut graph, from, to, edge) = fixture(Some("https://author.test/"));
+        let original = graph.get_edge(edge).unwrap().semantic_statements()[0].clone();
+        let from_id = graph.get_node(from).unwrap().id;
+        let to_id = graph.get_node(to).unwrap().id;
+        let delta = GraphDelta::ReplaySetEdgeSemanticPredicateByIds {
+            from_id,
+            to_id,
+            predicate: Some("https://predicate.test/after".into()),
+            asserter_iri: "https://other-author.test/".into(),
+        };
+        let before_revision = graph.revision();
+        assert!(matches!(
+            apply_graph_delta(&mut graph, delta.clone()),
+            GraphDeltaResult::NodeMetadataUpdated(true)
+        ));
+        assert_eq!(graph.revision(), before_revision + 1);
+        let mut expected = original;
+        expected.predicate = "https://predicate.test/after".into();
+        assert_eq!(
+            graph.get_edge(edge).unwrap().semantic_statements(),
+            &[expected]
+        );
+
+        let edited = graph.get_edge(edge).unwrap().clone();
+        let edited_revision = graph.revision();
+        assert!(matches!(
+            apply_graph_delta(&mut graph, delta),
+            GraphDeltaResult::NodeMetadataUpdated(true)
+        ));
+        assert_eq!(graph.get_edge(edge), Some(&edited));
+        assert_eq!(
+            graph.revision(),
+            edited_revision,
+            "same input remains a no-op"
+        );
+
+        assert!(graph.set_edge_semantic_predicate_as(edge, None, "unused".into()));
+        assert!(
+            graph
+                .get_edge(edge)
+                .unwrap()
+                .semantic_statements()
+                .is_empty()
+        );
+        assert_eq!(graph.revision(), edited_revision + 1);
+        let cleared_revision = graph.revision();
+        assert!(graph.set_edge_semantic_predicate_as(edge, None, "unused".into()));
+        assert_eq!(graph.revision(), cleared_revision);
+        assert!(!graph.set_edge_semantic_predicate_as(EdgeKey::new(1_000), None, "unused".into()));
+        assert_eq!(graph.revision(), cleared_revision);
+    }
+
+    #[test]
+    fn legacy_predicate_attribution_repair_alone_advances_revision() {
+        let (mut graph, _, _, edge) = fixture(None);
+        let original = graph.get_edge(edge).unwrap().semantic_statements()[0].clone();
+        let before_revision = graph.revision();
+        assert!(graph.set_edge_semantic_predicate_as(
+            edge,
+            Some(original.predicate.clone()),
+            "https://author.test/".into()
+        ));
+        let mut expected = original;
+        expected.provenance_iri = Some("https://author.test/".into());
+        assert_eq!(
+            graph.get_edge(edge).unwrap().semantic_statements(),
+            &[expected]
+        );
+        assert_eq!(graph.revision(), before_revision + 1);
+        let repaired = graph.get_edge(edge).unwrap().clone();
+        let repaired_revision = graph.revision();
+        assert!(graph.set_edge_semantic_predicate_as(
+            edge,
+            Some("https://predicate.test/before".into()),
+            "https://other-author.test/".into()
+        ));
+        assert_eq!(graph.get_edge(edge), Some(&repaired));
+        assert_eq!(
+            graph.revision(),
+            repaired_revision,
+            "existing attribution stays exact"
+        );
     }
 }

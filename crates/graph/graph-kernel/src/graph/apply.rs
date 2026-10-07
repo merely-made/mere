@@ -565,6 +565,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 });
             }
             capture_visit_stamp(graph, key);
+            graph.refresh_surface_resource(key);
             GraphDeltaResult::NodeAdded(key)
         },
         GraphDelta::AssertRelation {
@@ -618,23 +619,21 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
             assertion,
             asserter_iri,
         } => {
+            let capture_assertion = assertion.clone();
+            let semantic = matches!(assertion, EdgeAssertion::Semantic { .. });
             let edge = graph
                 .get_node_key_by_id(from_id)
                 .zip(graph.get_node_key_by_id(to_id))
                 .and_then(|(from, to)| {
-                    match apply_graph_delta(
-                        graph,
-                        GraphDelta::AssertRelation {
-                            from,
-                            to,
-                            assertion,
-                            asserter_iri,
-                        },
-                    ) {
-                        GraphDeltaResult::EdgeAdded(edge) => edge,
-                        _ => unreachable!(),
-                    }
+                    graph.assert_surface_relation_as(from, to, assertion, asserter_iri, None)
                 });
+            if edge.is_some() && !semantic {
+                graph.record_delta(&CapturedDelta::ReplayAssertRelationByIds {
+                    from_id: from_id.to_string(),
+                    to_id: to_id.to_string(),
+                    assertion: capture_assertion,
+                });
+            }
             GraphDeltaResult::EdgeAdded(edge)
         },
         GraphDelta::ReplayRemoveNodeById { node_id } => {
@@ -767,6 +766,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                     node_id: node_id.to_string(),
                     new_url: capture_url,
                 });
+                graph.refresh_surface_resource(key);
             }
             GraphDeltaResult::NodeUrlUpdated(updated)
         },
@@ -1189,6 +1189,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 timestamp_ms,
                 last_session_visited,
             });
+            graph.refresh_surface_resource(key);
             GraphDeltaResult::Applied
         },
         GraphDelta::BranchHistory { child, parent } => {
@@ -1216,6 +1217,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                     node_id: node_id.to_string(),
                     timestamp_ms,
                 });
+                graph.refresh_surface_resource(key);
             }
             GraphDeltaResult::HistoryStepped(stepped)
         },
@@ -1231,6 +1233,7 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                     node_id: node_id.to_string(),
                     timestamp_ms,
                 });
+                graph.refresh_surface_resource(key);
             }
             GraphDeltaResult::HistoryStepped(stepped)
         },
@@ -1626,18 +1629,20 @@ pub fn apply_graph_delta(graph: &mut Graph, delta: GraphDelta) -> GraphDeltaResu
                 .get_node_key_by_id(from_id)
                 .zip(graph.get_node_key_by_id(to_id))
                 .and_then(|(from, to)| {
-                    match apply_graph_delta(
-                        graph,
-                        GraphDelta::AssertSemanticPredicate {
+                    graph
+                        .assert_surface_semantic_statement(
                             from,
                             to,
-                            predicate,
-                            asserter_iri,
-                        },
-                    ) {
-                        GraphDeltaResult::EdgeAdded(edge) => edge,
-                        _ => unreachable!(),
-                    }
+                            super::SemanticStatementSpec {
+                                predicate,
+                                recognized_sub_kind: None,
+                                label: None,
+                                graph_scope: GraphScope::Default,
+                                provenance_iri: Some(asserter_iri),
+                                asserted_at_ms: None,
+                            },
+                        )
+                        .and_then(|(edge, outcome)| outcome.changed.then_some(edge))
                 });
             GraphDeltaResult::EdgeAdded(edge)
         },

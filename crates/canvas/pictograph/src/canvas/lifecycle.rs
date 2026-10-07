@@ -56,6 +56,11 @@ impl Canvas {
     /// This is the Model-A graph swap the multi-graph switch drives. (Multi-graph MG2.)
     pub fn set_graph(&mut self, graph: Graph) {
         self.graph = graph;
+        self.last_strategy_inputs = None;
+        *self
+            .strategy_graph_memo
+            .get_mut()
+            .expect("strategy input cache") = None;
         self.selected.clear();
         self.selected_edges.clear();
         self.hidden_edges.clear();
@@ -119,7 +124,7 @@ impl Canvas {
             genet_livery::StyleSet::cambium(&crate::canvas::build::NODE_SHEET),
             genet_livery::Device::screen(1.0, 1.0),
         );
-        Self {
+        let mut canvas = Self {
             graph,
             physics,
             #[cfg(feature = "gpu")]
@@ -173,6 +178,7 @@ impl Canvas {
             community_cache: None,
             community_cache_revision: 0,
             last_strategy_inputs: None,
+            strategy_graph_memo: std::sync::Mutex::new(None),
             strategy_footprint_revision: 0,
             strategy_footprints: HashMap::new(),
             show_community_rings: false,
@@ -225,7 +231,14 @@ impl Canvas {
             fold_undo: Vec::new(),
             fold_redo: Vec::new(),
             render_gnodes_as_dom: false,
-        }
+        };
+        // Construction establishes the footprint baseline before any layout is cached.
+        canvas.strategy_footprints = canvas
+            .graph
+            .nodes()
+            .map(|(key, _)| (key, canvas.node_size(key)))
+            .collect();
+        canvas
     }
 
     /// Set the current app-launch session number (Alembic B5). The host calls this

@@ -56,7 +56,9 @@ pub mod cross_graph;
 /// the graph (the substrate's append-only-log primitive over mere's own edit
 /// vocabulary). See `graph/journal.rs`.
 pub mod journal;
+pub mod legacy_resource_migration;
 pub use cross_graph::ComponentCopy;
+mod assertion_write;
 pub mod edge_data;
 pub mod edge_payload;
 pub mod edge_taxonomy;
@@ -73,6 +75,7 @@ pub mod merge;
 pub mod node;
 pub mod node_facets;
 pub mod node_props;
+pub mod predicate_declarations;
 pub mod predicate_registry;
 mod relation_read;
 pub mod resource;
@@ -108,8 +111,12 @@ pub use identity::{
 // Node + NodeLifecycle extracted to `node.rs` per the same
 // decomposition target. Re-exported so `kernel::graph::Node`
 // continues to resolve.
+pub use assertion_write::StatementWriteError;
 pub use node::{Node, SurfaceNode};
 pub use node_facets::{NodeFacetStore, VisitHistoryFacet};
+pub use predicate_declarations::{
+    PredicateDeclaration, PredicateDeclarationError, PredicateDeclarations,
+};
 pub use predicate_registry::{
     GraphStratum, built_in_predicate_stratum, built_in_relation_stratum, default_predicate_stratum,
 };
@@ -583,6 +590,42 @@ impl Graph {
         Some(old_url)
     }
 
+    /// Establish the current page binding for a live write, retaining an
+    /// already recorded binding. Legacy replay does not call this helper.
+    pub(crate) fn ensure_surface_resource(&mut self, key: NodeKey) -> Option<Uuid> {
+        self.shown_resource_id(key)
+            .or_else(|| self.refresh_surface_resource(key))
+    }
+
+    /// Refresh a live surface's page binding after its surface mutation has
+    /// been captured. The resource record precedes the shown association.
+    pub(crate) fn refresh_surface_resource(&mut self, key: NodeKey) -> Option<Uuid> {
+        let node = self.get_node(key)?;
+        let surface_id = node.id;
+        let resource = ResourceNode::new(node.primary_address().as_url_str());
+        let resource_id = resource.id();
+        if self.resource(resource_id).is_none() {
+            let record = crate::persistence::PersistedResourceRecord {
+                canonical_iri: resource.canonical_iri().to_string(),
+                facets: Vec::new(),
+            };
+            if !self.set_resource_record(resource_id, Some(record.clone())) {
+                return None;
+            }
+            self.record_delta(&CapturedDelta::ReplaySetResourceRecordById {
+                resource_id: resource_id.to_string(),
+                record: Some(record),
+            });
+        }
+        if self.set_shown_resource(surface_id, Some(resource_id)) {
+            self.record_delta(&CapturedDelta::ReplaySetShownResourceById {
+                surface_id: surface_id.to_string(),
+                resource_id: Some(resource_id.to_string()),
+            });
+        }
+        Some(resource_id)
+    }
+
     /// Navigate `key` in place to `url`: record the visit in the node's own
     /// browse history (a forward-fork if the cursor had stepped back) and update
     /// its Primary URL. No new node and no edge — the node is a browsing surface
@@ -718,3 +761,7 @@ pub mod snapshot;
 // 600-LOC ceiling (kernel decomposition pass 2026-05-11).
 #[cfg(test)]
 mod tests;
+
+#[cfg(test)]
+#[path = "tests/resource_lifecycle.rs"]
+mod resource_lifecycle_tests;

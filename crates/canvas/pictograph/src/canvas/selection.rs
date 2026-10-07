@@ -509,8 +509,8 @@ impl Canvas {
         let to = self.graph.get_node_key_by_id(to_id)?;
         let cell = EdgeCell { from, to, selector };
         self.graph
-            .relations()
-            .any(|relation| {
+            .projected_relations()
+            .any(|(_, relation)| {
                 relation.from == from
                     && relation.to == to
                     && crate::canvas::edge_cells::selector_for_relation_kind(relation.kind)
@@ -532,8 +532,8 @@ impl Canvas {
     fn edge_cells_between_pair(&self, a: NodeKey, b: NodeKey) -> Vec<EdgeCell> {
         let pair = if a <= b { (a, b) } else { (b, a) };
         self.graph
-            .relations()
-            .filter_map(|relation| {
+            .projected_relations()
+            .filter_map(|(_, relation)| {
                 let rel_pair = if relation.from <= relation.to {
                     (relation.from, relation.to)
                 } else {

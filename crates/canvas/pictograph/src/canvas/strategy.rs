@@ -72,7 +72,7 @@ impl Canvas {
     }
 
     /// Whether the active analytic layout must be recomputed: `true` when its inputs — the strategy,
-    /// the kernel's structural [`Graph::revision`](kernel::graph::Graph::revision), URL-authority grouping
+    /// visible graph inputs, URL-authority grouping
     /// revision, Canvas footprint revision, viewport, and focus (only for focus-driven strategies) —
     /// differ from the last computed layout. The host gates its per-frame `project_canvas_strategy`
     /// call on this, so an unchanged analytic layout is computed once per real change, not every
@@ -84,13 +84,14 @@ impl Canvas {
         h: u32,
         focus: Option<NodeKey>,
     ) -> bool {
+        let graph_stamp = self.strategy_graph_stamp();
         // A freshly restored score owns the layout until a real input moves:
         // recomputing here would replace the saved arrangement with one derived
         // from live state (losing, e.g., the recency ordering and measured
         // spacing the score was saved with). (Projection proofs — P3 restore.)
         if let Some((sid, rev, url_groups, footprint)) = &self.restored_score_hold
             && sid.as_str() == id
-            && *rev == self.graph.revision()
+            && *rev == graph_stamp
             && (!Self::strategy_uses_url_grouping(id)
                 || *url_groups == self.graph.url_grouping_revision())
             && *footprint == self.strategy_footprint_revision
@@ -105,7 +106,7 @@ impl Canvas {
         match &self.last_strategy_inputs {
             Some((sid, rev, url_groups, footprint, sw, sh, sfocus)) => {
                 sid.as_str() != id
-                    || *rev != self.graph.revision()
+                    || *rev != graph_stamp
                     || (Self::strategy_uses_url_grouping(id)
                         && *url_groups != self.graph.url_grouping_revision())
                     || *footprint != self.strategy_footprint_revision
@@ -128,7 +129,7 @@ impl Canvas {
         };
         self.last_strategy_inputs = Some((
             id.to_string(),
-            self.graph.revision(),
+            self.strategy_graph_stamp(),
             self.graph.url_grouping_revision(),
             self.strategy_footprint_revision,
             w,
@@ -297,17 +298,6 @@ impl Canvas {
         }
         self.active_strategy = Some("phyllotaxis.default".to_string());
         self.last_strategy_inputs = None;
-        // Claim the layout for the restored score: the empty input cache would
-        // otherwise make the host recompute the arrangement on the very next
-        // frame — from *live* inputs, not the saved ones — and the restored
-        // positions would never paint. The claim lapses as soon as the graph
-        // changes or the user picks a layout.
-        self.restored_score_hold = Some((
-            "phyllotaxis.default".to_string(),
-            self.graph.revision(),
-            self.graph.url_grouping_revision(),
-            self.strategy_footprint_revision,
-        ));
         // Same default as picking an arrangement: hold the restored placement,
         // via the visible global pause rather than a hidden halt.
         self.set_physics_paused_quietly(true);
@@ -327,6 +317,13 @@ impl Canvas {
             self.node_sizes.insert(key, side.clamp(16.0, 160.0));
         }
         self.push_node_geometry();
+        // Claim the restored layout after its saved face measurements are applied.
+        self.restored_score_hold = Some((
+            "phyllotaxis.default".to_string(),
+            self.strategy_graph_stamp(),
+            self.graph.url_grouping_revision(),
+            self.strategy_footprint_revision,
+        ));
         true
     }
 
