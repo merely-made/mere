@@ -108,6 +108,16 @@ fresh consumer tests still pending. Each run restores the original manifest and
 lock and checks all tracked source bytes and mtimes outside its owned outputs.
 The optional Cambium `highlight` feature also needs its own library test gate.
 
+The first four-package consumer build fails before tests: Rootstock's
+`MutationRouter` exhaustively matches the old mutation enum. The compatibility
+repair routes `FormControlStateChanged` by its node to the owning window and
+forwards arena state through `WindowDom`, preserving the root's document view.
+Two fixtures cover live value versus default attribute and settled layouts in
+two windows. Independent controls will disable routing and forwarding before a
+fresh restored run. These changes require the candidate seam and are not claimed
+to compile against the retained starting Genet pin; publication must carry the
+verified repin with this migration.
+
 The downstream read-only audit finds old tag checks in Turnstone and Cleromancy.
 Their mechanical selector/caret/existing-label follow-ups await explicit scope
 authorization; currently unnamed fields retain that state. No sibling source
