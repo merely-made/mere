@@ -102,7 +102,7 @@ anchor embed's lib.rs cites).
   `VectorIndex` via eidetic. Start on the lexical embedding provider
   (deterministic, no Burn), `bert` behind its existing feature per esp's
   target matrix. *(Paths updated 2026-08-12 by the
-  [eidetic reorg](2026-08-12_eidetic_reorg_plan.md): the modules now live in
+  [eidetic reorg](../../archive_docs/2026-10-06_completed_plans/2026-08-12_eidetic_reorg_plan.md): the modules now live in
   the crates that will use them, not in the deleted `mere-embed`.)*
 - **W5 — fusion.** `fuse()` merges W2's lexical ranking with W4's vector
   ranking in the omnibar. Gated on both.

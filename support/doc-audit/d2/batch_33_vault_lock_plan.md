@@ -15,7 +15,7 @@ lane's, each marked in the plan by whether it was re-checked.
 ## dramatis_docs/implementation_strategy/2026-10-05_vault_lock_plan.md
 
 - disposition: current
-- status line: "Status (2026-10-06): rulings 1 to 51 in §3; the threat statement is still open. L1 landed (`2556a20c`). L2's checkpoints A (`7c588deb`) and B (`ec1768ab`) landed. Still to come in L2: the Secret Service on the ThinkPad, ruling 42 (Linux starts locked), ruling 44 (Distillery's transport key) and the seed residue fixes (rulings 49 to 51). The dramatis repo plan moves this code later. Chatelaine P4 (CXF import) waits on this plan (chatelaine rulings 64, 65)." — accurate: yes
+- status line: "Status (2026-10-06): rulings 1 to 54 in §3; the threat statement is still open. L1 landed (`2556a20c`). L2's checkpoints A (`7c588deb`) and B (`ec1768ab`) landed. Still to come in L2: the Secret Service on the ThinkPad, ruling 42 (Linux starts locked), ruling 44 (Distillery's transport key) and the seed residue fixes (rulings 49 to 51). The dramatis repo plan moves this code later. Chatelaine P4 (CXF import) waits on this plan (chatelaine rulings 64, 65)." — accurate: yes
 - claims checked: 7 — holds: 7, stale: 0, unverifiable: 0
 
 ### Stale claims

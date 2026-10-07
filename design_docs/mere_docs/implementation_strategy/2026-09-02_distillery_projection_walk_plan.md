@@ -20,7 +20,7 @@ assess unifying the two layout builders"). Options: cite it as genet's;
 replace it with the intended mere commit, which is not recorded anywhere.
 **Scope:** the first end-to-end scene binding for a port — dataset → scene →
 Scenograph → host — walked on Distillery. This plan owns the walk; the
-[Distillery v0 plan](2026-08-12_distillery_v0_plan.md) owns the works
+[Distillery v0 plan](../../archive_docs/2026-10-06_completed_plans/2026-08-12_distillery_v0_plan.md) owns the works
 (resident authority, installed boundary, trainer, host-policy composition) and
 nothing here changes what that plan rules.
 **Companions:** the

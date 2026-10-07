@@ -235,11 +235,14 @@ pub fn project_tree_with_actions<D: LayoutDom<NodeId = NodeId>>(
     let root = dom.document();
     let id_of = |d: &D, n: NodeId| A11yNodeId(d.opaque_id(n));
     let focused = focus.and_then(|opaque| find_opaque(dom, root, opaque));
-    let mut tree = genet_render::accesskit_tree_with_generated_text(
+    let mut tree = genet_render::accesskit_tree_with_style(
         dom,
         layout.fragments(),
         focused,
-        &|node| layout.generated_text(dom, node),
+        &genet_render::A11yStyleQueries {
+            generated: &|node| layout.generated_text(dom, node),
+            rendered: &|node| layout.rendered_visible(dom, node),
+        },
     );
     let mut action_map = HashMap::new();
     let mut produced = Vec::new();

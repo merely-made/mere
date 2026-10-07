@@ -79,7 +79,7 @@ textured-body / shape / scripted) and the **LOD "materialization is state" machi
 default, a DOM subtree on focus / expand, an underlay dot on cull). A node has up to three
 representation code paths today (in-scene gnode, demoted underlay rect, host DOM card) with no
 single contract; unifying them is the represent layer's job.
-**Owner: [node-representation + arrangement plan](../implementation_strategy/2026-06-18_node_representation_arrangement_plan.md)**,
+**Owner: [node-representation + arrangement plan](../../archive_docs/2026-10-06_superseded_plans/2026-06-18_node_representation_arrangement_plan.md)**,
 the Representation set and the LOD machine. The DOM-*materialization mechanism* (how a card or tile
 becomes a real genet subtree under the camera) is owned by unified-document-host.
 
@@ -142,7 +142,7 @@ The drift was five seams each claimed by two or three plans. The cut:
 ## Genet asks the model pulls (prioritized)
 
 Revised 2026-06-19 against the
-[unified-document-host](../implementation_strategy/2026-06-17_unified_document_host_plan.md) Phase 2
+[unified-document-host](../../archive_docs/2026-10-06_completed_plans/2026-06-17_unified_document_host_plan.md) Phase 2
 design pass: reading the engine showed the transform-aware hit-test already exists, so the first two
 asks are not engine work, and Phase 2a then landed the host wiring (orrery cards select + focus
 through the shell hit-test). The live engine asks are now image-decode and the

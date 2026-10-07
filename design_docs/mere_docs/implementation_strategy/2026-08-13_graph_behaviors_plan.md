@@ -22,7 +22,7 @@ conversation: one node triggering others nearby to refresh, summaries from
 connected nodes captured into a knot note, and the family of automations
 behind them).
 **Related:**
-[participant gate + packs](2026-07-17_participant_gate_packs_plan.md) (this
+[participant gate + packs](../../archive_docs/2026-10-06_completed_plans/2026-07-17_participant_gate_packs_plan.md) (this
 plan extends it: a behavior IS a participant, plus a trigger),
 [scriptable field regions](2026-06-13_scriptable_field_regions_plan.md)
 (owns the projection tier; not re-planned here),

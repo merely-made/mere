@@ -55,8 +55,6 @@ mod key;
 mod keyed;
 mod menu;
 mod multi;
-#[cfg(feature = "nematic")]
-pub mod nematic;
 mod optional_action;
 mod overlay;
 mod overlay_surface;

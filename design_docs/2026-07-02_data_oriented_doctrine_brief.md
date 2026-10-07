@@ -169,7 +169,7 @@ shared core.
    it nearly free. Done condition per layer: a failing frame can be reduced
    to a serialized delta log plus a table snapshot that replays the failure
    headlessly. Planned 2026-07-02 for the two unrecorded streams:
-   [graph_delta_capture_apparatus_stats_plan](mere_docs/implementation_strategy/2026-07-02_graph_delta_capture_apparatus_stats_plan.md)
+   [graph_delta_capture_apparatus_stats_plan](archive_docs/2026-10-06_completed_plans/2026-07-02_graph_delta_capture_apparatus_stats_plan.md)
    (mere: `GraphDelta`) and
    `genet:docs/2026-07-02_dom_mutation_capture_replay_plan.md`
    (genet: `DomMutation`).

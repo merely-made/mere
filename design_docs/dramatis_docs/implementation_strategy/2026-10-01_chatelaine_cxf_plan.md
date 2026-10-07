@@ -22,9 +22,9 @@ castellan's OTP items and its Secret Service store onto it; then import
   C5: the Mere 0.4 baseline waits on chatelaine's taxonomy landing.
 - [standards survey](../../2026-08-24_standards_survey_brief.md) §2.3: CXF
   ADOPT (import first), CXP WATCH, the plaintext hazard.
-- [castellan OTP plan](../../mere_docs/implementation_strategy/2026-08-10_castellan_otp_plan.md):
+- [castellan OTP plan](../../archive_docs/2026-10-06_completed_plans/2026-08-10_castellan_otp_plan.md):
   the RFC-vector-verified OTP core this plan re-homes, not rewrites.
-- [insigne proofs plan](2026-09-23_insigne_proofs_plan.md): the precedent for
+- [insigne proofs plan](../../archive_docs/2026-10-06_completed_plans/2026-09-23_insigne_proofs_plan.md): the precedent for
   a plain-data core with no cryptography, checked by a wasm build.
 
 ---
@@ -985,3 +985,12 @@ As ruled (26 to 29), with the workspace's lane rules:
   compiles. `--tests` and `--all-features` fail on `ring`'s C build script,
   reached only through castellan's dev-dependency on gazette (`reqwest`,
   `rustls`), so tests are compiled on the ThinkPad.
+
+**2026-10-06, tails inherited from the S14 archive pass** (recorded in the
+[archived plan tails plan](../../mere_docs/implementation_strategy/2026-07-03_archived_plan_tails_plan.md), "2026-10-06 archive pass"). This plan
+now owns:
+- **V4, broader item types**, from the
+  [identity vault SSH agent plan](../../archive_docs/2026-10-06_completed_plans/2026-07-22_identity-vault-ssh-agent_plan.md).
+  S56 answered that plan's question: V4 moves here.
+- **CXF import**, from the castellan OTP plan. That is this plan's P4
+  already, so nothing new.

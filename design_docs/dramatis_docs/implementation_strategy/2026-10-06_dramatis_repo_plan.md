@@ -406,3 +406,30 @@ lock's L2) and D5 (apps unify on calling djinn). The read-only assessment
 **2026-10-06.** The assessment reported 14 forks. My spot checks held;
 rulings D6 to D21 settle them. D7, D14 and D20 amend D1 and D2. Next: the
 vault lock's L2 (D18).
+
+**2026-10-06, tails inherited from the S14 archive pass** (recorded in the
+[archived plan tails plan](../../mere_docs/implementation_strategy/2026-07-03_archived_plan_tails_plan.md), "2026-10-06 archive pass"). This plan
+now owns:
+- **insigne's remaining repins:** Hocket, Woodshed and mer3ly. Turnstone
+  repinned in `d6b62ad`. From the
+  [insigne proofs plan](../../archive_docs/2026-10-06_completed_plans/2026-09-23_insigne_proofs_plan.md).
+  *Reading, not ruled:* these ride DR-D's repins, and Hocket's goes to the
+  live `woodshed/ports/hocket` (D13).
+- **The `dramatis` facade**, ruled real on 2026-10-01 and unbuilt. From the
+  [dramatis tier plan](../../archive_docs/2026-10-06_completed_plans/2026-08-10_dramatis_tier_plan.md). D1 makes it
+  the product; DR-D builds it.
+- **The wallet carry gaps:**
+  - PAKE/QR chrome and transport UI;
+  - copy-mode export and import;
+  - epoch history beyond the current epoch;
+  - a migration pass for cleartext private blobs.
+
+  From the
+  [persona wallet carry layer plan](../../archive_docs/2026-10-06_completed_plans/2026-06-25_persona_wallet_carry_layer_plan.md).
+  *Reading, not ruled:* these touch pandect's wallet, whose secret half
+  moves into castellan under D8, so they are assessed with DR-B.
+- **Splitting castellan's `keeper` feature** (from the castellan keeper
+  founding plan; the tails plan keeps it there and says this plan "may take
+  it"). *Reading, not ruled:* D14 and D15 make the split unnecessary. The
+  view types move to dramatis and graphshell stops naming castellan, so no
+  consumer needs views from castellan without its authority.

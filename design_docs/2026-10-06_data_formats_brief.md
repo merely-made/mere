@@ -134,6 +134,23 @@ postcard code found mentions in `graph-kernel` (7), `notochord` (11),
   `content-contract` and `chatelaine`, which showed no version header near
   their postcard records. The options were: audit through a lane; note only.
   Mark: "Audit through a lane (Recommended)".
+- **F6. One header helper.** Asked when the lanes were planned: "How should
+  postcard records get their version header?" The options were: one shared
+  helper in Mere (wing-formats' 8-byte magic and `u16` version, with
+  `frame`, `unframe` and `peek`, in one small Mere crate that Mere's crates
+  and wing-formats both use, old unheadered bytes loading as version 0);
+  per-crate headers. Mark: "One shared helper in Mere (Recommended)". F4's
+  lane is
+  [`2026-10-06_postcard_framing_plan.md`](mere_docs/implementation_strategy/2026-10-06_postcard_framing_plan.md).
+- **F7. The helper's name.** Asked at the framing plan's H1 checkpoint:
+  "What is mere's postcard framing helper crate called?" It must be
+  published, since muniment 0.1.2 is on crates.io and H4 moves it onto the
+  helper, and publishable Mere infrastructure takes `mere-` plus one plain
+  word (`mere-transport` is on crates.io). The options, all free on
+  crates.io and unused in the tree on 2026-10-06, were: `mere-framing`;
+  `mere-header`; `mere-frame`. Mark: "mere-framing (Recommended)". The name
+  is claimed by a real publish once H1 lands, and that publish waits on his
+  word like any other.
 - **F5. Isocosm's rosters.** Asked whether rosters (`Founding::SpacedRoster`,
   `SEEDED_KINDS`) move from Rust into datasheets. The options were: yes,
   through a plan; only new ones; not now. Mark: "Yes, through a plan

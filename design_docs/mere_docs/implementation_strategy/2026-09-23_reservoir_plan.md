@@ -34,7 +34,7 @@ builds on this one.
   clients.
 - [Graphshell reference host](2026-07-27_graphshell_reference_host_plan.md),
   the local session and admission layer.
-- [Family-shared identity](2026-08-08_family_shared_identity_plan.md), which
+- [Family-shared identity](../../archive_docs/2026-10-06_completed_plans/2026-08-08_family_shared_identity_plan.md), which
   created the shared root.
 - [Alembic memory and codicils](../technical_architecture/2026-06-09_alembic_memory_and_engrams.md)
   and its [implementation plan](2026-06-24_alembic_implementation_plan.md).

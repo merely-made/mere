@@ -5,7 +5,7 @@ for every deployment surface in the family (desktop apps, radio firmware,
 web/wasm, eventually mobile). Requirement from Mark: this is figured out
 before any load-bearing deployment; it is a utility in its own right, wanted
 alongside the identity vault
-([plan](mere_docs/implementation_strategy/2026-07-22_identity-vault-ssh-agent_plan.md)).
+([plan](archive_docs/2026-10-06_completed_plans/2026-07-22_identity-vault-ssh-agent_plan.md)).
 
 ## Requirements
 

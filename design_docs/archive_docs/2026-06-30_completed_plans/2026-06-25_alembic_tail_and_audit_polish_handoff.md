@@ -81,7 +81,7 @@ From the 2026-06-24 audit, verified against the code. One audit item was already
    cadence, no actor thread — forgetting is light enough to ride the existing `about_to_wait` tick).
    P2 (consolidation) and P3 (the off-thread armillary actor for heavier passes) remain, gated as
    documented in the spun-out plan. See
-   [athanor_steady_heat_actor_plan](../../mere_docs/implementation_strategy/2026-06-25_athanor_steady_heat_actor_plan.md).
+   [athanor_steady_heat_actor_plan](../2026-10-06_completed_plans/2026-06-25_athanor_steady_heat_actor_plan.md).
 
 2. **Surface the forget result in Steward.** ✅ **DONE 2026-06-25.** `HostObservability` now keeps a
    structured `ForgettingPass { dropped, at }` (the last pass), set by `record_forgetting_pass` which
