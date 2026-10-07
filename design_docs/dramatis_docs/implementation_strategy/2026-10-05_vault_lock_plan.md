@@ -1,7 +1,7 @@
 # Vault Lock Plan
 
 **Date**: 2026-10-05
-**Status (2026-10-06)**: rulings 1 to 56 in §3; the threat statement is
+**Status (2026-10-07)**: rulings 1 to 58 in §3; the threat statement is
 still open. L1 landed (`2556a20c`). L2's checkpoints A (`7c588deb`) and B
 (`ec1768ab`) landed. Still to come in L2: the Secret Service on the
 ThinkPad, ruling 42 (Linux starts locked), ruling 44 (Distillery's
@@ -672,6 +672,23 @@ Follows: the genet-chain session and the burn coordinator were told on
 
 Mark: **"Knot, then ruling 42 (Recommended)"**.
 
+**Ruling 57** *(amends ruling 55's means; asked 2026-10-07).* *The repin
+`f68af0d` (every mere row to `ea74604b`, with S77's preview change) was
+never pushed. Meanwhile Knot's `0096591` repinned all 35 mere rows to
+`57b4893d`, 34 commits past `ea74604b`, moved genet to `965b64e`, and
+carries its own S77 fallback; Knot's main is `ae3352e`. The uncommitted
+seed fix (21 files) shares one file with what origin changed.* Options:
+drop `f68af0d` and move the seed fix onto `ae3352e`, verified by the strict
+residue test before any push; rebase `f68af0d` anyway (moving the pins
+back); pause Knot. Mark: **"Drop f68af0d, rebase fix (Recommended)"**.
+Follows: ruling 55's precondition (Knot's mere rows at or past `83b06806`)
+is met by `0096591`.
+
+**Ruling 58** *(mere's Knot pin).* *mere's workspace and djinn pin Knot
+`ef89a186`.* Options: one repin, to the Knot commit carrying the seed fix;
+repin to `ae3352e` now and again later. Mark: **"Once, after seed fix
+(Recommended)"**.
+
 Still open: a threat statement naming hibernation and the pagefile.
 
 ## 4. Phases
@@ -1037,3 +1054,18 @@ unlock follow-through, and non-Windows startup unlock backends, from the
 - **Ruling 50's precondition is met.** The Knot lane's P1 work is in
   `ef89a18`, which is Knot's origin/main and djinn's pin. Knot's own mere
   rows are at `e0cea3e0`, which predates the borrowing entry points.
+
+**2026-10-07, the Knot repin overtaken.**
+- **The Knot work under ruling 55.** It produced `f68af0d` in
+  `worktrees/knot-seed`, on Knot `6cb57f1`: every mere row moved to
+  `ea74604b`, with S77. Its gates passed except knot-document's tests,
+  which never finished.
+- **The lane that wrote the seed fix died** on a usage limit, partway
+  through its control. It left 21 uncommitted files and, in
+  `worktrees/mere-knot-seed`, the strict `knot_residue.rs` and djinn's
+  baseline rows. All of this is unverified.
+- **Mark's "Repin knot and push"** was already done on Knot origin by
+  `0096591` (at mere `57b4893d`, genet `965b64e`) before it was pushed from
+  here.
+- **Rulings 57 and 58:** `f68af0d` retired unpushed, the fix moves onto
+  `ae3352e`, and mere repins once after the fix.
