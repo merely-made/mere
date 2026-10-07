@@ -1,7 +1,7 @@
 # Scenograph Editor Plan
 
 **Date:** 2026-10-07
-**Status (2026-10-07):** in progress. Rulings SE1 to SE9 recorded (§1). E1, the generic history, landed on main 2026-10-07 (`de06e4f0`) and moves into the `edit-history` leaf crate (SE10, SE13). E2, undo in the projection editor, landed 2026-10-07 with its headed check. E2b, saving into the mere session (SE11, SE12, SE14 to SE22), landed 2026-10-07 with headed checks in Chrome and Firefox; Safari is open. E3 is next. Mark asked for drag-to-pan on the canvas as a separate objective.
+**Status (2026-10-07):** in progress. Rulings SE1 to SE9 recorded (§1). E1, the generic history, landed on main 2026-10-07 (`de06e4f0`) and moves into the `edit-history` leaf crate (SE10, SE13). E2, undo in the projection editor, landed 2026-10-07 with its headed check. E2b, saving into the mere session (SE11, SE12, SE14 to SE22), landed 2026-10-07 with headed checks in Chrome and Firefox; Safari is open. Track C1 (drag to pan, right-drag select, and a command context menu; SE23 to SE30) is under way before E3.
 **Scope:** the editor foundation that Scenograph's editing surfaces stand on: one undo history in Cambium, and arrangement options declared as data. Carries out the balaur review's rulings A and B. The projection editor in Graphshell is the first consumer of both.
 
 Not in scope, mapped in §3 and opened by later rounds:
@@ -72,6 +72,30 @@ Mark opened the lane: "i'm most curious about scenograph, honestly. wallpapers, 
 
 *Note 2026-10-07, on SE22.* Mark: "Ehhh… i could also be persuaded to 3… but if 1 holds cross platform and browser engine hosts, then sure", and "if I find it to not work for chromium browsers, or firefox, or safari… eh". Evidence given: every muniment backend (memory, directory, redb, zip, IndexedDB) clones to a shared handle and `apply` takes `&self`, so a batch written through a clone lands in the same store everywhere; the split is synchronous pandect plus any `Backend`, nothing wasm-specific; native hosts keep the async path. Headed results are in Progress (E2b). A worker task (option 3) can still be layered on the same calls.
 
+### 1.3 The canvas and command rulings (2026-10-07)
+
+Mark, after E2b: "lemme also suggest we make it easier to move around the canvas by implementing drag canvas to pan". Evidence put: pictograph's canvas, shared by Graphshell's page, its tree page and Turnstone, pans on a middle-drag with momentum, pans on the wheel and zooms on Ctrl+wheel, moves a node on a left-drag, and starts a rectangle select on a left-drag over empty space.
+
+**SE23, the gesture.** Options: configurable, pan by default; pan with Shift+drag selecting; Space+drag pans. Mark: **"left. right drag can be rectangle select, no?"**. *Follows:* a left-drag on empty canvas pans; a right-drag selects.
+
+**SE24, where.** Options: in the pictograph canvas; Graphshell's page only. Mark: **"In the pictograph canvas (Recommended)"**. *Follows:* every host of the canvas gets it, touch included.
+
+**SE25, the record.** Options: before E3 as its own plan; before E3 as a track in this plan; after E3. Mark: **"Before E3, a track in this plan"**. *Follows:* track C1.
+
+**SE26, right-click.** Evidence put: a browser opens its native context menu on right-press on macOS and Linux and on release on Windows, before a drag is known; the canvas has no menu of its own. Options: suppress the native menu on the canvas; suppress only after a drag; right-drag with a modifier. Mark: **"Oh, we should replace the native context menu with ours, right? So right click: context menu, right click + drag, rectangle select"**. *Follows:* the canvas suppresses the native menu and opens Graphshell's own on a right-click that does not move past the click slop; a right-drag past it selects.
+
+**SE27, the cut.** Options: pan and right-drag now, the menu next; all in one track. Mark: **"All in one track"**.
+
+**SE28, the menu's content.** Mark: **"Commands, I suppose. Be nice if the right click gave you the context menu with the command palette's search bar at the top, then default + recently used commands under that. And if people could remove any of the commands and add new ones, at will, that would be great"**. *Follows:* the context menu is the command surface with its search field, then default commands, then recent ones, and its contents are the person's to change.
+
+**SE29, the command set.** Evidence put: Cambium's `command_surface` is the live, generic one (string ids, labels, shortcuts, depth-one submenus, disabled reasons), and filters by query only as a palette; Graphshell's page dispatches 43 string commands; graph-kernel's `actions` (a closed `ActionId` enum with categories and reserved recency and pin keys) and `chrome::command_palette` (a session with query, scope and a Tier-1 category cursor) survive from the egui shell with no live host. Four questions, each answered with the recommendation:
+- where the set lives: **"Generic, in Cambium (Recommended)"**: hosts register commands, and the set keeps defaults, recents and the person's adds and removes, for the menu and the palette alike;
+- where recents and changes are kept: **"In the mere session (Recommended)"**;
+- what adding means: **"Any registered command (Recommended)"**; user-written commands wait for the scripting comparison (SE3);
+- whether the menu follows the cursor: **"Yes, node commands first (Recommended)"**; search always covers every command.
+
+**SE30, the meerkat model.** Mark: **"That is one of the few things we did correctly in the meerkat era… historic, but worth reviving"**. *Reading, not ruled:* this is the donor command model the harvest brief kept (`2026-05-17_graphshell_harvest_brief.md`, "Command-context-rank policy", "Context-aware action visibility per surface type", "Disabled-action visibility with precondition tooltips") with what survives in code (`kernel::actions` categories and its recency and pin keys, `chrome::command_palette`'s scopes); the Cambium set revives it over open string ids rather than the closed enum.
+
 ## 2. Tracks
 
 E1 and E2 carry ruling A; E3 to E5 carry ruling B. E2 needs E1; E4 needs E3; E5 needs E2 and E4. *Added 2026-10-07:* E2b carries SE11 and SE12, after E2.
@@ -112,6 +136,18 @@ Done when:
 - a headed check in real Chromium saves, reloads and finds the definition.
 
 *Amended 2026-10-07 (SE14 to SE17):* the definition lives at `mere://projection/<id>` under a `graphshell.projection-definition/v1` facet; the executable path moves too, its facet holding the selected occurrence; each save persists at once; and the web host gains session Undo and Redo, which the headed check drives. *Amended again (SE18 to SE21):* two controls, the editor's Undo save over the `graphshell.projection-editor` channel and a host-wide pair in Graphshell's chrome; an undone or redone save reloads the draft as one step; kept parts are named in the status.
+
+### C1 — drag to pan, right-drag select, the command context menu (SE23 to SE30)
+
+Built and landed together (SE27).
+- **Canvas** (`crates/canvas/pictograph`): a left press on empty canvas becomes a pan once it moves past the click slop, with the middle-drag's momentum; a bare left click there keeps today's edge pick or clear. A right press begins a rectangle select that commits past the slop; a right click within it asks the host for its menu.
+- **Command set** (Cambium): registered commands with ids, labels, categories and the surfaces they belong to; defaults, a recency ring, and the person's adds and removes; ranked by where the menu was summoned. The context menu takes the search field the palette has.
+- **Graphshell**: registers its page commands; a right-click opens the menu at the cursor, node commands first on a node; recents and changes are kept in the mere session; the native menu never shows on the canvas.
+
+Done when:
+- the canvas tests cover the pan, its momentum, the bare click, the right-drag select and the right click;
+- the command set's tests cover ranking, recents, adds and removes, and search over every command;
+- a headed check drags to pan, right-drags to select, and right-clicks to a menu whose search finds a command, in Chrome and Firefox.
 
 ### E3 — the option declaration type (B, SE7)
 
