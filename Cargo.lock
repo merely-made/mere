@@ -2072,7 +2072,6 @@ dependencies = [
 name = "cambium"
 version = "0.3.3"
 dependencies = [
- "errand",
  "genet-scripted-dom",
  "genet-text",
  "illume",
@@ -2081,7 +2080,6 @@ dependencies = [
  "meristem",
  "sceno",
  "sprigging",
- "tabard",
  "tinct",
  "workbench",
 ]
