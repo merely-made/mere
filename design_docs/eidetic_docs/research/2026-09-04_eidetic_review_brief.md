@@ -4,7 +4,7 @@
 **Status**: Review brief. Findings only; every recommendation ends in a
 question for Mark rather than a change.
 **Occasion**: Mark, 2026-09-04, under the [platform boundary
-plan](../../mere_docs/implementation_strategy/2026-09-02_platform_boundary_and_repository_topology_plan.md)'s
+plan](../../archive_docs/2026-10-06_completed_plans/2026-09-02_platform_boundary_and_repository_topology_plan.md)'s
 P5: *"we should scrutinize the tantivy index and its utility; are there better
 approaches to searching, what we're trying to do there? eidetic needs a review
 pass and consideration for what we could use it for: probably deduplication,
@@ -166,7 +166,7 @@ Two further facts about that cost:
 - tantivy's native produce path uses the mmap directory
   (`eidetic-search/Cargo.toml:16-19` says so explicitly). The rest of the
   memory family has a proven browser lane — the [redb/OPFS feasibility
-  plan](../implementation_strategy/2026-08-22_redb_opfs_feasibility_plan.md)
+  plan](../../archive_docs/2026-10-06_completed_plans/2026-08-22_redb_opfs_feasibility_plan.md)
   established two-engine viability on 2026-08-22 — and `eidetic-search` is
   the one member that cannot follow it. It is absent from
   `ports/graphshell/web`.

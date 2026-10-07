@@ -22,7 +22,7 @@ pane-heavy phases build directly on Phase G1 below — G1 is the runway).
 *Out of scope (tracked elsewhere):* scrying X2's leftover host wiring (omnibar
 `load_url`, back/forward + `can_go_*`, `poll_navigation_event`,
 `poll_cursor_shape`, Tab focus) — a different crate, tracked in the
-[scrying tile plan](../../mere_docs/implementation_strategy/2026-06-10_scrying_tile_plan.md), not here.
+[scrying tile plan](../2026-10-06_completed_plans/2026-06-10_scrying_tile_plan.md), not here.
 
 ---
 

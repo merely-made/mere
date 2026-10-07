@@ -85,7 +85,7 @@ with no central server. This is the sharing gesture the federation tiers need, a
 it dovetails with Tessera as the trust receipt. **Mark's framing:** p2panda-dependent.
 It rides the persona and federation work
 ([persona transport unlinkability](../implementation_strategy/2026-06-25_persona_transport_unlinkability_plan.md),
-[persona wallet carry](../implementation_strategy/2026-06-25_persona_wallet_carry_layer_plan.md),
+[persona wallet carry](../../archive_docs/2026-10-06_completed_plans/2026-06-25_persona_wallet_carry_layer_plan.md),
 [actor constellation](../../archive_docs/2026-08-20_completed_plans/2026-06-03_actor_constellation_plan.md)),
 adopted as a layered borrow there rather than standalone.
 
@@ -170,7 +170,7 @@ feature in itself:**
 - [alembic implementation plan](../implementation_strategy/2026-06-24_alembic_implementation_plan.md):
   engram schema layer (Cambria home).
 - [persona transport unlinkability](../implementation_strategy/2026-06-25_persona_transport_unlinkability_plan.md),
-  [persona wallet carry](../implementation_strategy/2026-06-25_persona_wallet_carry_layer_plan.md),
+  [persona wallet carry](../../archive_docs/2026-10-06_completed_plans/2026-06-25_persona_wallet_carry_layer_plan.md),
   [actor constellation](../../archive_docs/2026-08-20_completed_plans/2026-06-03_actor_constellation_plan.md):
   persona and federation, for capability-scoped sharing.
 - [document script substrate](../../archive_docs/2026-07-03_completed_plans/2026-06-21_document_script_substrate_plan.md),

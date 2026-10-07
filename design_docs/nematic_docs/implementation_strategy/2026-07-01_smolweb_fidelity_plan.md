@@ -2,22 +2,36 @@
 
 **Date**: 2026-07-01
 **Status (2026-10-06):** in progress. Extends the
-[native smolweb rendering plan](2026-06-27_native_smolweb_rendering_plan.md).
+[native smolweb rendering plan](../../archive_docs/2026-10-06_completed_plans/2026-06-27_native_smolweb_rendering_plan.md).
 Micron's reading slice and both consumer integrations landed 2026-09-13, and
 lane 3 (forms) closed the same day; lane 2 runs in the
 [Micron navigation plan](2026-09-15_micron_navigation_plan.md), which carries
 its own status; lane 1's headed qualification and lane 4 are open. WS1 is
-partial: feeds keep `guid` and enclosures (`5630e256`), and the Spartan `=:`
-prompt is typed (`080a2141`, as `SpartanLine::Prompt`; a fork in §3); the feed
-date and content split, the channel `ttl`, and, now in gopher-protocol,
-gopher's `raw_type`, the `8`/`T` fix and CSO are open. WS2 and WS3 have not
-started.
+partial: feeds keep `guid` and enclosures (`5630e256`) and, since WS4's R3,
+their published and updated dates and full content apart from the summary;
+the Spartan `=:` prompt is typed (`080a2141`, as `SpartanLine::Prompt`; a fork
+in §3); the channel `ttl` is open, and gopher's `raw_type`, the `8`/`T` fix
+and CSO are prepared as gopher-protocol 0.2.0 (smolweb `b0f1dda`,
+unpublished). WS2 has not started. WS3's bespoke rendering is superseded by
+WS4, one render path (§7, rulings S66 and S70 to S75): R0 to R5 landed on main
+2026-10-06 (`b4f14f2c`); R6 waits on Mark's sign-off to publish.
 
 > **Home refinement, 2026-08-03**: WS1's AST enrichment lands wherever the
 > grammar lives at the time, per the
 > smolweb home decision (`smolweb/design_docs/technical_architecture/2026-08-03_smolweb_home_decision.md`)
 > (spec-accurate grammars follow the wire crates into the smolweb workspace;
 > WS2/WS3 are implementation-side and stay in genet/cambium-nematic).
+
+**Received 2026-10-06 (S14 archive pass):** Mere host integration and
+interactive eyeballing, under ruling S66: the EngineDocument lane is the
+single smolweb render path, so this plan enriches the parse ASTs that feed
+it and extends EngineDocument with the block kind it lacks (a typed-column
+block first), every host getting the result through the lane rather than
+through bespoke per-format views; the per-format views in
+`cambium::nematic` retire as a follow-on code task. From the archived
+[native smolweb rendering plan](../../archive_docs/2026-10-06_completed_plans/2026-06-27_native_smolweb_rendering_plan.md)
+(rulings S61 and S66 of the
+[stack seams plan](../../mere_docs/implementation_strategy/2026-10-04_stack_seams_plan.md)).
 
 **The three principles** (Mark's call, 2026-07-01):
 
@@ -599,13 +613,13 @@ same whether shown as a card or a focused tile.
 - **Surface in the host.** The meerkat smolweb lane (`ensure_smolweb` in
   `content/handlers.rs`) captures the fetch trust and exposes it so the tile chrome
   shows the posture. This is the host-integration touchpoint; see
-  smolweb host integration plan (`mere/design_docs/mere_docs/implementation_strategy/2026-06-28_smolweb_host_integration_plan.md`).
+  smolweb host integration plan (`mere/design_docs/archive_docs/2026-10-06_completed_plans/2026-06-28_smolweb_host_integration_plan.md`).
 
   **Corrected 2026-10-06 (S14 pass):** no `ensure_smolweb` exists in the tree;
   meerkat left the workspace on 2026-07-18 (`c5f01064`), as the 2026-09-02
   re-check below says. The hosts that surface trust are Turnstone and Mere's
   own, and the
-  [smolweb host integration plan](../../mere_docs/implementation_strategy/2026-06-28_smolweb_host_integration_plan.md)
+  [smolweb host integration plan](../../archive_docs/2026-10-06_completed_plans/2026-06-28_smolweb_host_integration_plan.md)
   is a historical meerkat receipt by its own 2026-09-05 note.
 - **Home for the shared type.** Decide with Mark whether `DocumentTrustState` moves to
   a small shared crate both errand and inker depend on, or errand defines its own and
@@ -649,6 +663,12 @@ same whether shown as a card or a focused tile.
 
 ## 5. Workstream 3 — bespoke where boxes fail (gopher first)
 
+**Superseded 2026-10-06 (rulings S66 and S71):** regime B is not taken. The
+gopher grid becomes `Block::Menu` on the one EngineDocument path (§7, R1 and
+R2), the type-7 search affordance is R2's `InlineSpan::Submit`, the Spartan
+prompt already lowers to `InlineSpan::Submit` (§3), and hard breaks are R5.
+The words below are kept as the design history.
+
 Only the presentation collapses, and only where the line model is genuinely not
 box-shaped.
 
@@ -688,6 +708,98 @@ Targets, not dates.
   align, a type-7 item takes a query, a spartan `=:` uploads, and gemtext hard-break
   preservation is a setting. B-full is entered only if B-lite alignment proves
   insufficient, and that decision is logged here.
+
+## 7. Workstream 4 — one render path (S66, S70 to S75)
+
+**Added 2026-10-06.** Ruled in the [stack seams plan](../../mere_docs/implementation_strategy/2026-10-04_stack_seams_plan.md) (rulings S66
+and S70 to S75): the EngineDocument lane is the single smolweb render path.
+Where §5 escalated a format to its own layout, the path now gains the block
+kind it lacks, and every host draws it through document-canvas.
+
+Assessed 2026-10-06 against Mere `7cca393c`:
+
+- nothing in any repository calls the per-format views in `cambium::nematic`,
+  and nothing enables cambium's `nematic` feature;
+- every host renders smolweb through document-canvas (`SmolwebDocument` holds
+  Nematic's `EngineDocument`), which already has monospace text and a table
+  grid;
+- Nematic's gopher engine lowers links to plain paragraphs and info lines to
+  one `Block::Preformatted`, losing each row's type
+  (`crates/nematic/nematic/src/gopher.rs`);
+- `InlineSpan::Submit` exists, and the Spartan prompt lowers to it;
+- gemtext keeps line boundaries as `InlineSpan::SoftBreak`, which
+  document-canvas renders as a space (`document-canvas/src/text.rs:218`);
+- `Block` is not `#[non_exhaustive]`: about ten renderers in Mere and
+  knot-editor's desktop preview match it exhaustively;
+- gopher-protocol (smolweb repository, crates.io, pinned `=0.1.1`) has no raw
+  item type, keeps the 8/T inversion and files CSO under `Other`; Errand and
+  Nematic are published crates, so they cannot take a git dependency;
+- errand's `FeedEntry` has one date, one summary and no content;
+  `Block::FeedEntry` has title, date, summary and two URLs;
+- Nematic's default html-fragment engine (`src/html.rs`) lowers HTML into
+  blocks reader-mode style, passing only a passive subset.
+
+Phases, each stopping at its done-conditions:
+
+- **R0. Retire the per-format views.** Remove `cambium::nematic`, cambium's
+  `nematic` feature and the optional `errand` and `tabard` dependencies only
+  it uses. Done when cambium checks with and without its other features, no
+  reference to the module remains, and the documents that cite it carry dated
+  notes.
+- **R1. `Block` non-exhaustive, and `Block::Menu` (S71, S72).** inker marks
+  `Block` `#[non_exhaustive]` and adds `Block::Menu`, whose rows each carry an
+  item kind, the raw type character, label spans and an optional target.
+  *Reading, not ruled*: the kind is a portable enum (info, document,
+  directory, search, binary, image, sound, telnet, external, error, other) so
+  nex listings can share it. document-canvas lays the menu out as a
+  fixed-width grid, type column then label column; uxtree exposes a list of
+  typed items; inker's HTML and export renderers and its link extraction
+  include it. Every other crate in Mere gains a wildcard arm that records a
+  `DocumentDiagnostic::UnsupportedConstruct` (S72's reading). Done when the
+  label column starts at one x in every row of a laid-out menu, a search
+  row's Submit is focusable, the accessibility tree lists typed items, and
+  `cargo check --workspace --all-targets` is clean with the touched crates'
+  tests passing.
+- **R2. Gopher lowers to the menu (S71, S73).** Nematic's gopher engine emits
+  `Block::Menu`: info and error rows untargeted, a search row carrying
+  `InlineSpan::Submit`, and the raw character taken from today's kinds
+  (`Other(char)` keeps unknown characters; a known kind maps to its canonical
+  character). Done when Nematic's gopher tests assert rows, markers and the
+  search Submit, and a smolweb session lays out a gopher menu with aligned
+  columns.
+- **R3. Feed fields (S74).** errand's `FeedEntry` gains `published`,
+  `updated` and `content` beside `summary`; `Block::FeedEntry` gains the
+  published and updated dates, the entry's guid and its enclosures. Done when
+  a feed round-trips published/updated, summary/content, enclosures and guid
+  through errand and Nematic (WS1's feed done-condition), with the lowering
+  tests green.
+- **R4. The article reader (S75).** Opening an entry renders its `content`
+  through the html-fragment engine as its own EngineDocument, addressed as the
+  feed plus the entry's guid, with the article URL as its canonical link; an
+  entry without content shows its summary and a link out. *Reading, not
+  ruled*: the address is the feed URL with the guid as its fragment, and
+  Nematic's feed engine resolves it from the feed body, so hosts need no new
+  session state. Done when an entry with content opens offline through
+  document-lanes as its own document and an entry without content links out,
+  both tested.
+- **R5. Hard line breaks as a setting.** document-canvas's style gains a
+  soft-break mode: reflow (a space, the default) or preserve (a line break).
+  Done when flipping it changes a gemtext document's layout, tested.
+- **R6. gopher-protocol 0.2.0 (S73).** In the smolweb repository: a raw item
+  type on `GopherItem`, the 8/T fix and a CSO kind, tested there. It is
+  published only on Mark's sign-off; Mere then repins and R2 reads the raw
+  type. Done when it is published and Mere is repinned.
+
+R0, R1, R2 and R5 do not wait on R3, R4 or R6; R6 can be prepared alongside.
+
+Stop rules:
+
+- Publishing gopher-protocol, or any crate, waits for Mark's sign-off.
+- A change needed in knot-editor, Turnstone or genet stops and comes to Mark.
+  R1's `#[non_exhaustive]` breaks their exhaustive matches once (knot-editor's
+  desktop preview at least); if a knot-editor crate that Mere's patch table
+  builds needs the change before Mere can land, that is the knot-first
+  lockstep, and it comes to Mark too.
 
 ---
 
@@ -743,13 +855,36 @@ Targets, not dates.
   and Spartan rows, the native lane's trust, the TOFU store, meerkat's
   touchpoint, errand as a Mere member, lane 2's plan and Knot's lane 3 fixes;
   four forks are written in for this plan's lane.
+- **2026-10-06**: WS4 added from rulings S66 and S70 to S75 of the stack
+  seams plan: the assessment against Mere `7cca393c`, phases R0 to R6 and
+  their stop rules; §5's bespoke regime is superseded by it.
+- **2026-10-06**: WS4 R0 to R5 landed (merge `b4f14f2c`; R0 `bcf054b9`; R1,
+  R2 and R5 `d490e38d`; R3 and R4 `3cad2d1b` and `9a1c37c5`; rustfmt on the
+  branch's lines `2b94cea2`). Gates on the merged tree: `cargo check
+  --workspace --all-targets` clean; tests pass in errand, inker,
+  document-canvas, uxtree, Nematic, import, cambium and mere-document-lanes
+  (smolweb); the label-column test fails both its controls (no padding, the
+  proportional body face). WS1's feed done-condition is met by R3.
+  *Readings, not ruled*: `MenuItemKind`'s eleven kinds and their type labels;
+  a search row submits through its label and has no target; Nematic's feed
+  engine resolves an entry address, and document-lanes fetches without the
+  fragment; the article's links resolve against the article URL (Nematic
+  gains `url` 2.5, already in the graph); document-lanes' `smolweb` feature
+  enables `nematic/html-fragment`. Gaps recorded: Atom `type="xhtml"` content
+  is not captured; nex still lowers the old way, so `FIXED_WIDTH_MENU_TYPES`
+  keeps its typeface rule; enclosures are carried but not drawn; uxtree
+  projects no paragraph-level `Submit`. R6 is gopher-protocol 0.2.0 on the
+  smolweb branch `gopher-protocol-0.2.0` (`b0f1dda`): a raw item type, `8`
+  and `T` as telnet, a CSO kind; unpublished. knot-editor's desktop preview
+  needs a wildcard arm and a `..` in its `FeedEntry` pattern at its next
+  repin, which under the stop rules comes to Mark.
 
 ## Cross-references
 
-- [native smolweb rendering plan](2026-06-27_native_smolweb_rendering_plan.md) — the
+- [native smolweb rendering plan](../../archive_docs/2026-10-06_completed_plans/2026-06-27_native_smolweb_rendering_plan.md) — the
   shipped transport → parse → native render this extends; the two-family model and the
   crate/dependency direction it defines.
-- smolweb host integration plan (`mere/design_docs/mere_docs/implementation_strategy/2026-06-28_smolweb_host_integration_plan.md`)
+- smolweb host integration plan (`mere/design_docs/archive_docs/2026-10-06_completed_plans/2026-06-28_smolweb_host_integration_plan.md`)
   — the meerkat genet lane; Workstream 2's trust surfacing lands against its P3/P4.
 
   **Corrected 2026-10-06 (S14 pass):** that plan is now a historical meerkat

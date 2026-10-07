@@ -11,7 +11,7 @@
 **Graphshell amendment (2026-07-22):** the old Graphshell browser product remains
 retired into Mere. The name is reclaimed for a distinct Merely-family product:
 the remote projection host over Scenograph, specified in the
-[Graphshell remote projection host plan](mere_docs/implementation_strategy/2026-07-22_graphshell_remote_projection_host_plan.md).
+[Graphshell remote projection host plan](archive_docs/2026-10-06_completed_plans/2026-07-22_graphshell_remote_projection_host_plan.md).
 Mere's internal chrome is simply its `shell` crate family and does not carry the
 Graphshell product name.
 

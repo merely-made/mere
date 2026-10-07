@@ -12,7 +12,7 @@ up; this doc is the menu and the shared framing, not a build schedule.
 
 **Related**:
 
-- [modular_integration_plan §1](../implementation_strategy/2026-06-02_modular_integration_plan.md)
+- [modular_integration_plan §1](../../archive_docs/2026-10-06_superseded_plans/2026-06-02_modular_integration_plan.md)
   — the graph-rooted projection model. The graph is the sole root; orrery / workbench / gloss /
   apparatus / tiles are contingent projections; no projection becomes the root. Every idea below
   obeys this.
@@ -22,7 +22,7 @@ up; this doc is the menu and the shared framing, not a build schedule.
 - [graph_signals_layer_plan](../../archive_docs/2026-08-20_completed_plans/2026-06-22_graph_signals_layer_plan.md)
   — the producer layer (communities / affinity / bridges / importance / embeddings). #5 below is a
   *consumer* surface of that layer, not a second producer; #4 borrows its importance signal.
-- [node_representation_arrangement_plan](../implementation_strategy/2026-06-18_node_representation_arrangement_plan.md)
+- [node_representation_arrangement_plan](../../archive_docs/2026-10-06_superseded_plans/2026-06-18_node_representation_arrangement_plan.md)
   — representation (a node's look) and arrangement (a layout) are orthogonal to which projection is
   reading the truth. A node's chosen form carries across all five.
 - [command_registry_configurable_menus_plan](../../archive_docs/2026-09-02_retired_plans/2026-06-21_command_registry_configurable_menus_plan.md)
@@ -191,7 +191,7 @@ rank within a cell.
 
 **New vs. existing.** The facet projection is built and tested. The matrix UI (axis pickers, the
 cross-tab, cell-to-subset action) is new. Distinct from the SPARQL query facet in
-[graph_query_layer_plan](../implementation_strategy/2026-06-18_graph_query_layer_plan.md), which is a
+[graph_query_layer_plan](../../archive_docs/2026-10-06_completed_plans/2026-06-18_graph_query_layer_plan.md), which is a
 text query language; the matrix is direct manipulation over the same truth. This is the cheapest of
 the five: the kernel primitive already exists.
 

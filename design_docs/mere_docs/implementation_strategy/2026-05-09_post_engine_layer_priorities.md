@@ -4,7 +4,7 @@
 **Status**: ~~Active forward-looking plan~~ **Superseded as a priorities list (2026-07-03 archive pass)** — the current
 workspace state and priority map live in the
 [workspace_state_overview_brief](../research/2026-07-01_workspace_state_overview_brief.md) and the
-[modular_integration_plan](2026-06-02_modular_integration_plan.md). Kept in place as the
+[modular_integration_plan](../../archive_docs/2026-10-06_superseded_plans/2026-06-02_modular_integration_plan.md). Kept in place as the
 post-migration historical record (the 2026-06-09 crate-rename banner below still applies).
 
 > **Crate-name note (2026-06-09 audit):** the §1 18-crate list and §2 host references are a 2026-05-09 **gpui-era** snapshot. The host is now `meerkat` (genet-as-host), not gpui: `mere-host`→`meerkat`, `mere-kernel`→`graph/graph-kernel`, `mere-host-contract`→`system/...`, `intelligence-embeddings`→`intel/embed`, `mere-transport`→`murm/transport`, `verso-tile`→`verso`. Dated status notes below are historical record.

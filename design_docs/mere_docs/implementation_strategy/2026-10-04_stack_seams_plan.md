@@ -1,11 +1,13 @@
 # Stack seams plan: catalog, shared device, actions, determinism, two words
 
 **Date:** 2026-10-04
-**Status (2026-10-06):** in progress. Sixty-six rulings in twenty-two rounds
-(S1 to S66); P1 landed on main (`1633be0c`); P2 staged (S27 to S31, four
+**Status (2026-10-06):** in progress. Seventy-five rulings in twenty-five rounds
+(S1 to S75); P1 landed on main (`1633be0c`); P2 staged (S27 to S31, four
 stages in §3.1) and landed on main (`40d7ae5e`); S32 (F19) landed on main
-(`48c08dee`); the S14 pass (S33) under way; P3 and S7 done as documents; S3 to
-S6 carried into the dynamics grammar plan (G8, G9); S9 done by the identity
+(`48c08dee`); the S14 pass (S33) done (`8d7702d2`, receipt
+`support/doc-audit/d2/remediation_2026-10-06.md`); S66's code follow-on
+(S70 to S75, the smolweb fidelity plan's WS4) landed bar R6 (`b4f14f2c`); P3
+and S7 done as documents; S3 to S6 carried into the dynamics grammar plan (G8, G9); S9 done by the identity
 lane (`b52edea7`).
 
 A note sent to Mark listed weak seams in the stack. Each claim was checked
@@ -87,7 +89,7 @@ Verified 2026-10-04 against Mere `c34449bd`.
   and core on every resume (636-650). Its doc rules out multi-window "per the
   Signalman desktop scope (retinue, 2026-08-09)" (18-19). The ratified GPU
   regime puts tenants on one device and one queue
-  ([spatial compute plan](../technical_architecture/2026-08-13_spatial_compute_plan.md),
+  ([spatial compute plan](../../archive_docs/2026-10-06_completed_plans/2026-08-13_spatial_compute_plan.md),
   lines 25 and 56). Consumers: mere-view, cambium-rootstock,
   cambium-genet-web-host and pelt's desktop port here; woodshed, hocket and
   redshank in the woodshed repository.
@@ -107,7 +109,7 @@ in two or more crates.
   graphshell), `ProjectionRequest` (cartography's in-process call beside
   chirograph's wire request), and the three tile structures (forme, platen's
   `TileLayout`, cambium's `TileTree`), which the
-  [workbench component plan](../../cambium_docs/implementation_strategy/2026-08-31_workbench_component_plan.md)
+  [workbench component plan](../../archive_docs/2026-10-06_completed_plans/2026-08-31_workbench_component_plan.md)
   rules as one pipeline: "Mere's Forme remains durable graph-arrangement
   authority; Platen compiles a Forme arrangement into a Workbench
   presentation". document-host's script `Grant` derives from servitor's
@@ -378,7 +380,7 @@ Mark (free text): **"Wait, why didn't we want a portable contract…?"**
 Answered: graphshell's comment ("supplied to the compiler without a product
 dependency or a portable product-data contract",
 `projection_compile.rs` 135) applies the
-[remote projection host plan](2026-07-22_graphshell_remote_projection_host_plan.md)'s
+[remote projection host plan](../../archive_docs/2026-10-06_completed_plans/2026-07-22_graphshell_remote_projection_host_plan.md)'s
 charter, ruled with Mark on 2026-07-22: portable contracts carry placement and
 representation only and stay product-free (line 81), "Keep product adapters
 beside their source truth" (579), and "later radio facts add data without
@@ -812,6 +814,30 @@ Round 22, 2026-10-06. Evidence: S62's reframing: enriching the ASTs that feed En
 
 **Ruling S66.** *For smolweb structure that EngineDocument's blocks cannot carry even from a richer AST, which?* Options: extend EngineDocument with the block kind it lacks, one path, the per-format views retiring; keep bespoke per-format views for those exceptions. Mark: **"Extend EngineDocument (Recommended)"**. Follows: the EngineDocument lane is the single smolweb render path: the fidelity plan enriches the parse ASTs and adds whatever block kind EngineDocument lacks (a typed-column block first), so every host gets it through the lane; the per-format views in `cambium::nematic` retire (a follow-on code task); the native smolweb rendering plan's two-family model is historical, and the plan archives under S61 with its host-integration tail carried by the fidelity plan.
 
+Round 23, 2026-10-06. Evidence: the phase C remediation receipt (`support/doc-audit/d2/remediation_2026-10-06.md`) and its readings not ruled; knot-editor carries near-identical copies of the Knot port, authoring consumer and knot-in-graphshell plans; about ten archived tails name plans in Turnstone, knot-editor and Isometry, whose sessions are offline.
+
+**Ruling S67.** *Who owns the tails of the three archived Knot plans (the knot port, the authoring consumer, Knot in graphshell): the 'one immutable revision' pin rule, the optional headed selected-clip receipt, Knot search S0/S1?* Options: knot-editor's copies, as S61 ruled for the publishing protocol; mere's backlog until a Knot plan names them. Mark: **"knot-editor's copies (Recommended)"**. Follows: knot-editor's copies own them; the tails section's `owner: knot-editor's copy` entries stand, and the receipt's reading is now ruled.
+
+**Ruling S68.** *Petgraph RDF's Phase 4 is gated and was not in that plan's Open list; S53 sends its open items to the graph semantics plan. Does Phase 4 go there too?* Options: the backlog, as recorded; a Received note in the graph semantics plan. Mark: **"Backlog (Recommended)"**. Follows: Phase 4 stays in the archived plan tails backlog; the receipt's reading is now ruled.
+
+**Ruling S69.** *About ten archived tails name plans in other repositories (Turnstone: the page capture C4 gate, the pane registry's A4, the pointer-capture gap; knot-editor: six items; Isometry: the Z5 figure). Their sessions are offline. What happens to them?* Options: record only, in mere's tails section; a dated note in each owning plan, widening scope to the three repositories; message each session when it is next online. Mark: **"Note in each plan"**. Follows: each owning plan in Turnstone, knot-editor and Isometry gets a short dated note naming its tail and citing mere's tails section and the archived plan; each repository's DOC_POLICY and git posture are read first, and the note is the only edit there.
+
+**Ruling S70.** *What is next now that the S14 pass is done?* Options: the S59 critical pass with Eidetic's development; S66's code follow-on (a typed-column block in EngineDocument, richer smolweb ASTs, the per-format `cambium::nematic` views retiring); the render ladder rethink; the F18/F20 measurements. Mark: **"S66 code follow-on"**. Follows: S66's code follow-on is the next objective, assessed first (the smolweb fidelity plan, EngineDocument, the views' consumers) before any code.
+
+Round 24, 2026-10-06. Evidence: S70's assessment. Nothing in any repository calls the per-format views (`gemtext_view`, `gopher_view`, `nex_view`, `feed_view`) and nothing enables cambium's `nematic` feature. Every host renders smolweb through document-canvas (`SmolwebDocument` holds Nematic's `EngineDocument`), which already has monospace text and a table grid. Nematic lowers gopher links to plain paragraphs and info lines to one preformatted block, losing each row's type. `InlineSpan::Submit` exists (the Spartan prompt uses it). Gemtext keeps line boundaries as `SoftBreak`, which document-canvas renders as a space (`text.rs:218`), so the hard-break setting is render-side. `Block` is not `#[non_exhaustive]`; about ten renderers in Mere and knot-editor's desktop preview match it exhaustively. gopher-protocol (smolweb repository, crates.io, pinned `=0.1.1`) has no raw item type, keeps the 8/T inversion and has no CSO kind; Errand and Nematic are published, so they cannot take a git dependency. Errand's `FeedEntry` has guid, link, one date, one summary and enclosures, no content; `Block::FeedEntry` has title, date, summary and two URLs.
+
+**Ruling S71.** *What shape does EngineDocument's typed-column block take?* Options: a typed menu block (new `Block::Menu`: rows with an item kind, the raw type character, label spans and an optional target, laid out as a fixed-width grid, a list of typed items to accessibility); `Block::Table` plus a fixed-width flag on `BlockPresentation`; a fixed-width wrapper only. Mark: **"Typed menu block (Recommended)"**. Follows: `Block::Menu` is added: each row carries an item kind, the raw type character, label spans and an optional target; info rows have no target and a search row carries `InlineSpan::Submit`; document-canvas lays it out as a fixed-width grid (type column, label column) and the accessibility projection exposes a list of typed items. Gopher lowers to it first.
+
+**Ruling S72.** *Adding a Block kind breaks every exhaustive match outside inker (about ten renderers in Mere, knot-editor's desktop preview). Does Block become `#[non_exhaustive]` in the same change?* Options: keep it exhaustive, the compiler finding every renderer, knot-editor briefly red first; mark it `#[non_exhaustive]`, every crate outside inker gaining a wildcard arm. Mark: **"Mark non_exhaustive"**. Follows: `Block` becomes `#[non_exhaustive]` in the same change; every crate outside inker, Mere's own renderers included, gains a wildcard arm, and knot-editor and Turnstone take that change once and then stop breaking on new block kinds. *Reading, not ruled*: a wildcard arm surfaces the kind it cannot draw as a `DocumentDiagnostic::UnsupportedConstruct` rather than dropping it silently, so the compiler check S72 gives up is replaced by a visible one.
+
+**Ruling S73.** *A faithful type column needs gopher-protocol to gain a raw item type, the 8/T fix and a CSO kind: a breaking 0.2.0 release, and publishing is irreversible. How is it sequenced?* Options: coarse now, release later (the block carries a raw-type field from day one, the crate changes prepared in the smolweb repository and published only on Mark's sign-off); release first; coarse kinds only. Mark: **"Coarse now, release later (Recommended)"**. Follows: `Block::Menu` carries the raw type character from the start, filled from today's kinds (`Other(char)` keeps unknown characters; a known kind maps to its canonical character); gopher-protocol's raw type, 8/T fix and CSO kind are prepared in the smolweb repository, and 0.2.0 is published only on Mark's sign-off, after which Mere repins.
+
+**Ruling S74.** *Is the feed part of this objective? Errand's feed tree and `Block::FeedEntry` would gain published and updated dates, a separate summary and content, and enclosures; content is HTML, so how the article reader renders it is an open lane decision.* Options: the fields now and the reader later; the typed column only; the fields and the reader. Mark: **"Fields and reader"**. Follows: the feed is in this objective: errand's feed tree and `Block::FeedEntry` gain published and updated dates, summary and content separately, and enclosures, in the same breaking change as `Block::Menu`; the article reader's lane is decided now, as the next round.
+
+Round 25, 2026-10-06. Evidence: S74 put the article reader in scope. Errand gains `content` (HTML) under S74; Nematic's default `html-fragment` engine (`crates/nematic/nematic/src/html.rs`) already lowers HTML into EngineDocument blocks reader-mode style, passing only a passive subset (no scripts, frames, forms, styling authority or active URL schemes); hosts today follow an entry's article URL to the web; document folds hang off headings only (`inker/src/document/navigation.rs`).
+
+**Ruling S75.** *How does a feed entry's article body render?* Options: its own document (the entry's content lowered through the html-fragment engine, addressed as the feed plus the entry's guid, the article URL its canonical link); inline in the feed document, folded closed; handed off to the web lane. Mark: **"Own document (Recommended)"**. Follows: opening an entry renders its `content` through Nematic's html-fragment engine as its own EngineDocument, addressed as the feed plus the entry's guid, with the article URL as its canonical link; it reads offline on the one path, and an entry without content shows its summary and a link out.
+
 ## 3. Phases
 
 ### 3.1 This plan's lane
@@ -956,6 +982,39 @@ The done-conditions handed over for S3 and S4, kept for reference:
 - **2026-10-06.** Round 20: S58 to S61, all sixteen archived, with three directions: the four ML plans consolidate into one new plan now that Burn 0.22 is out; the four search and memory plans get a critical pass, Eidetic's development taken up; native smolweb's render-design question explained and put back.
 - **2026-10-06.** Round 21: S62 to S65. S62's smolweb question answered with Mark's own reframing (enrich the ASTs either way) and put back; S63 a consolidated ML plan written now; six more plans archived (spatial compute, tactile tier, derived faces, event model, reticulum, doc policy). S49's rounds are done: 42 of 53 plans to archive, 11 stay active.
 - **2026-10-06.** Round 22: S66, smolweb renders through one path: richer ASTs into an extended EngineDocument, the per-format Cambium views retiring.
+- **2026-10-06.** The S14 pass, phase C done; the pass is complete. Fourteen
+  write lanes corrected 145 of their 155 documents (the other ten needed no
+  edit), merged `3e107e32` to `a3b69537`: 428 dated corrections in 134
+  documents and 75 Open notes; the live plans' lanes corrected eleven more
+  (S46). DOC_README lane D (`d2184520`) corrected 99 entries and indexed 9
+  orphans. Archive lane E (merged `8d7702d2`) moved 88 plans (77 completed,
+  7 superseded, 4 retired), rewrote 674 links, and recorded about 200 tails in
+  the archived plan tails plan's "2026-10-06 archive pass" section, the S59
+  critical-pass subsection among them; the identity and Conatus lanes took
+  their `owner:` tails the same day (`73812e3a`, `a0cfa30a`). The receipt is
+  `support/doc-audit/d2/remediation_2026-10-06.md`: per-lane counts, the
+  readings not ruled (knot-editor's copies as owners, petgraph RDF Phase 4
+  to the backlog), six record errata and the follow-ons (S44, S45, S59, S66's
+  code retirement, the render ladder rethink). Both audits exit 0; judgment
+  coverage 253/253.
+- **2026-10-06.** Round 23: S67 (knot-editor's copies own the Knot tails), S68 (petgraph RDF Phase 4 stays in the backlog), S69 (a dated note in each other repository's owning plan) and S70 (S66's code follow-on next).
+- **2026-10-06.** S69 done: dated notes in Turnstone (`a616ece`: the C4
+  consent gate in the page capture plan; workbench S3 and the pointer-capture
+  gap in the pane registry plan), knot-editor (`33cc855`: five plans, the
+  Knot tails under S60, S61 and S67) and Isometry (`929647b8`: Z5's figure).
+  *Reading, not ruled*: the two tails without a named plan went to the plan
+  owning their code path. Turnstone's untracked `.github/workflows/portable.yml`
+  (2026-09-20) was left alone. The projection grammar lane took FT9/FT10 as
+  its adoption plan's Track F (`28985298`).
+- **2026-10-06.** Round 24: S71 to S74, S66's code follow-on shaped: a typed `Block::Menu`, `Block` made `#[non_exhaustive]`, gopher-protocol's raw types prepared and released on sign-off, the feed fields and the article reader in scope.
+- **2026-10-06.** Round 25: S75, a feed entry's article renders as its own EngineDocument through the html-fragment engine.
+- **2026-10-06.** S70's objective landed: the smolweb fidelity plan's WS4,
+  R0 to R5, merged as `b4f14f2c` (per-format views retired; `Block`
+  non-exhaustive with `Block::Menu`; gopher lowered to it; the feed's dates,
+  bodies and enclosures apart; an entry's body as its own document; soft
+  breaks a setting). R6, gopher-protocol 0.2.0, is prepared in the smolweb
+  repository (`b0f1dda`) and waits on Mark's sign-off to publish. The
+  fidelity plan's progress log carries the gates, readings and gaps.
 - **2026-10-06.** Round 16: S46 (live plans handed to their lanes), S47
   (reviewed write lanes) and S48 (ownerless tails to the archived plan tails
   backlog). S44's repins and S45's header re-run were flagged as separate

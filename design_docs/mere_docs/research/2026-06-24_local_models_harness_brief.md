@@ -24,9 +24,9 @@ Mere, across the wasm and native targets.
 - eidetic [`models`](../../../crates/eidetic/eidetic-core/src/models/) (`ModelManifest` /
   `ModelComponents` / `ModelLibrary`) — content-addressed model + adapter storage. The harness loads
   from here.
-- [browser model ceiling probe](../implementation_strategy/2026-08-09_browser_model_ceiling_probe_plan.md)
+- [browser model ceiling probe](../../archive_docs/2026-10-06_completed_plans/2026-08-09_browser_model_ceiling_probe_plan.md)
   — the headed-browser storage, worker, execution, and measurement half of this brief's wasm claim.
-- [ESP consolidation plan](../implementation_strategy/2026-08-08_esp_consolidation_plan.md) — the
+- [ESP consolidation plan](../../archive_docs/2026-10-06_completed_plans/2026-08-08_esp_consolidation_plan.md) — the
   settled seam home: `esp::infer` and `esp::embed` in one published crate.
 
 ---

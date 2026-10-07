@@ -15,7 +15,7 @@ WASM layout mods.
 (§5, the strategy catalogue and the helper-era preset portfolio),
 [the cartography–gyre layout seam](../technical_architecture/2026-05-29_cartography_aether_layout_seam.md)
 (arrangements compute, physics simulates; the seed/read-back bridge),
-[physics scenes and tangibility plan](2026-06-22_physics_scenes_and_tangibility_plan.md)
+[physics scenes and tangibility plan](../../archive_docs/2026-10-06_completed_plans/2026-06-22_physics_scenes_and_tangibility_plan.md)
 (the scene and ambient catalogs this one sits beside),
 [browser WebRTC carrier plan](2026-08-25_browser_webrtc_carrier_plan.md)
 (the web host and the scenario lane the receipts run on).
@@ -867,6 +867,21 @@ pull reading −0.33 with 510 overlaps):
     miss is rerun calm (against pausing the sessions for a calm round).
     With the budget now 3 ms, the 50x control has read 20.9 to 24.7 times
     against its bar of 25 under load.
+  *Ruled 2026-10-06, the worker's two forks* (`seiche-speed-estimator`
+  `6c3fe45d`). The worker tiebreaker held on both machines: it read the true
+  period in the even case, under system-wide load, and in Firefox 157's
+  worker. Disabled, the even case read 2× again; a planted failure fell back,
+  labelled.
+  - On 1 of 11 runs at 100% CPU, the worker's intervals left the refresh
+    (7.8 to 12.2 ms after a 15 ms gap). The fit fell to 0.53 and the budget
+    fell back to the cap. Mark chose **"Keep the cap fallback"**: as ruled,
+    recorded as a finding (against holding the last good period, or trying
+    the main thread first).
+  - The 50x control missed 4 times under load (19.1, 13.0, 8.8, 12.3 against
+    25) and calm never came. Mark chose **"Base it on the page's own 1x"**:
+    its bar is re-expressed relative to the same page's 1x run, as the fast
+    receipt's is, so it scales with load (against a calm rerun, or merging
+    and settling it afterwards).
   The face offset, diagnosed (2026-10-04, `tree-face-zoom`): the face is
   drawn right and the body wrong, on both pages. Pictograph's gnode style
   scales each body about its centre (the CSS default Livery follows since

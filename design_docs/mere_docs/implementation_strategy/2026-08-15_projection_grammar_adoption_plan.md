@@ -1,6 +1,6 @@
 # Projection Grammar Adoption Plan
 
-**Status (2026-10-06):** active.
+**Status (2026-10-06):** active. Track F (the field receipts FT9 and FT10, from the archived projection receipts plan, ruling S61) was received gated.
 - The 2026-10-05 cross-domain relationship recipe continuation is published and
   qualified (its own status line, below).
 - The executable compiler lives in `scenomise::projection` since `c79bb8c2`.
@@ -370,12 +370,12 @@ lanes L1-L5 and governed by the
 [projection grammar catalog](../research/2026-08-15_projection_grammar_catalog.md)
 promotion rules.
 **Related**:
-[scenograph_0_0_3_release_plan](2026-07-24_scenograph_0_0_3_release_plan.md)
+[scenograph_0_0_3_release_plan](../../archive_docs/2026-10-06_completed_plans/2026-07-24_scenograph_0_0_3_release_plan.md)
 (historical 0.0.3 release; rulings D1-D4),
-[projection_proofs_plan](2026-07-21_projection_proofs_plan.md) (P1-P5 landed),
+[projection_proofs_plan](../../archive_docs/2026-10-06_completed_plans/2026-07-21_projection_proofs_plan.md) (P1-P5 landed),
 scene contract note
 (`design_docs/scenograph_docs/technical_architecture/2026-07-22_scene_contract_note.md`),
-[multi_window_plan](2026-06-10_multi_window_plan.md),
+[multi_window_plan](../../archive_docs/2026-10-06_completed_plans/2026-06-10_multi_window_plan.md),
 [graph_signals_layer_plan](../../archive_docs/2026-08-20_completed_plans/2026-06-22_graph_signals_layer_plan.md),
 [accesskit_screen_reader_verification](../../archive_docs/2026-09-02_retired_plans/2026-06-09_accesskit_screen_reader_verification.md).
 
@@ -582,7 +582,7 @@ declaration; decide its home with evidence (chirograph beside the intent
 triple, or mere host state that graphshell serializes); wire two views over
 one authority through it.
 Forcing consumer: L3's entrance gate is met. Mer3ly shares a scene by URL hash,
-and Wave 1 of the [projection receipts plan](2026-08-23_projection_receipts_plan.md)
+and Wave 1 of the [projection receipts plan](../../archive_docs/2026-10-06_completed_plans/2026-08-23_projection_receipts_plan.md)
 supplies the genuine two-view ask: its spatial view and two-reading Matrix
 contribute named clauses over the same source identities. The proof forced
 crossfilter only; union and intersection remain absent until their behavior is
@@ -845,6 +845,36 @@ renders identically remote; a hit-transparent backdrop never picks; a
 collidable one participates in placement.
 Done when: environment is scene data with declared properties on two
 consumers.
+
+### Track F: field receipts (gated; received 2026-10-06)
+
+The projection receipts plan's wave 3 came here when the stack seams S14
+archive pass retired that plan (stack seams ruling S61). Its tail is recorded
+in the [archived plan tails plan](2026-07-03_archived_plan_tails_plan.md),
+section "2026-10-06 archive pass". The archived plan is at
+[archive_docs/2026-10-06_completed_plans/2026-08-23_projection_receipts_plan.md](../../archive_docs/2026-10-06_completed_plans/2026-08-23_projection_receipts_plan.md),
+§5. The targets keep that plan's words. No work opens under either one until
+its gate's trigger is met: scheduling them here asserts order, not readiness.
+
+**F1 (was FT9). Derived-mark integrity (receipt 3) — gated.**
+A Distribution or Contour scene emits derived marks that remain selectable,
+name their values and contributors, and never masquerade as source nodes.
+Gate: a named statistical or field consumer.
+
+**F2 (was FT10). Field distinction (receipt 6) — gated.**
+One sample dataset produces Territory and Contour scenes whose categorical
+and scalar meanings remain distinct through rendering, picking, legends, and
+accessible output.
+Gate: a field-data consumer. The trigger candidates on record:
+- host-side radio and mesh placement facts. This is the sited-device brief's
+  fact surface: the node does not know where it is, the host knows where it
+  put it.
+- a simulator or radio model for Current.
+
+*Reading, not ruled:* both receipts are A5's territory, the remaining
+portable-grammar questions, which already wait on a forcing consumer. A field
+consumer that opens F2 would also force A5's gap 1, derived marks, scales and
+guides. So F1 and F2 open with A5 rather than ahead of it.
 
 ### Sequence
 
