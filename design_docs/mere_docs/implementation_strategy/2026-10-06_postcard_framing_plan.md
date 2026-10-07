@@ -1,6 +1,6 @@
 # Postcard framing: one version header for stored and sent records
 
-**Status:** plan, 2026-10-06. H1 is unblocked: the crate is `mere-framing` (F7).
+**Status:** in progress, 2026-10-06. H1 is landed; H2, the inventory, is next.
 
 Carries out F3, F4 and F6 of the
 [data formats brief](../../2026-10-06_data_formats_brief.md). postcard
@@ -106,3 +106,23 @@ pass.
 
 - 2026-10-06: plan written; F3, F4 and F6 recorded in the data formats
   brief.
+- 2026-10-06: H1 landed on branch `mere-framing`.
+  - **The crate.** `crates/system/framing`, published as `mere-framing` with
+    lib name `framing`, depending on postcard and serde only.
+  - **Its API.** `frame`, `unframe`, `peek` and `split` in wing-formats'
+    layout, byte for byte. A test writes the expected bytes out by hand.
+  - **The legacy path is its own entry point:** `split_or_legacy` and
+    `unframe_or_legacy`.
+    - Bytes not beginning with the magic decode as version 0.
+    - A later reader refuses them as version 0, so its caller can decode
+      the old shape and migrate.
+    - The magic with no version after it is refused as a truncated header.
+    - *Reading, not ruled:* the strict `unframe` keeps wing-formats'
+      `WrongSchema` refusal. A record that may predate its header opts into
+      the legacy path, since one function cannot both refuse a foreign magic
+      and read magic-less bytes.
+  - **Tests:** 11 pass, covering the five done-conditions plus wing-formats'
+    own cases and the documented limit.
+  - **Control.** With the legacy branch removed, its two tests fail.
+  - **Claimed.** On Mark's word ("Publish 0.0.1 now (Recommended)"),
+    `mere-framing` 0.0.1 is on crates.io, published from `13a6b49d`.

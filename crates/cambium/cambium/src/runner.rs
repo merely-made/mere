@@ -39,6 +39,16 @@ use crate::{
     KeyEvent, NamedKey, PointerButton, PointerClick, PointerEvent, ValueEvent, WheelEvent,
 };
 
+/// Which end of a runner's focusable set traversal left by, with
+/// [focus exits](GenetAppRunner::set_focus_exits) on.
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
+pub enum FocusExit {
+    /// Past the last focusable: the host's next stop comes after this runner.
+    Forward,
+    /// Before the first focusable: the host's next stop comes before it.
+    Backward,
+}
+
 /// The per-tree half of a runner: one `ScriptedDom` target, its [`GenetCtx`]
 /// (handler registries are keyed by this dom's `NodeId`s), the retained view
 /// tree, and the per-window interaction state (focus, pointer capture, the
@@ -81,6 +91,11 @@ where
     /// cell). Read via `default_prevented` after dispatch to gate the host's
     /// own default action.
     last_default_prevented: bool,
+    /// Whether focus traversal stops at the ends of the focusable set and
+    /// leaves the tree, instead of wrapping. Off unless a host turns it on.
+    focus_exits: bool,
+    /// The end traversal left by, waiting for the host to take it.
+    focus_exit: Option<FocusExit>,
     /// A file request a view filed in the latest build or rebuild, waiting
     /// for the host to take it.
     file_request: Option<crate::FileRequest>,
@@ -140,6 +155,8 @@ where
             focus,
             pointer_capture: None,
             last_default_prevented: false,
+            focus_exits: false,
+            focus_exit: None,
             file_request,
             phantom: PhantomData,
         }
@@ -514,6 +531,17 @@ where
         self.last_default_prevented
     }
 
+    pub(crate) fn set_focus_exits(&mut self, exits: bool) {
+        self.focus_exits = exits;
+        if !exits {
+            self.focus_exit = None;
+        }
+    }
+
+    pub(crate) fn take_focus_exit(&mut self) -> Option<FocusExit> {
+        self.focus_exit.take()
+    }
+
     pub(crate) fn focus(&self) -> Option<NodeId> {
         self.focus
     }
@@ -534,13 +562,6 @@ where
         actions
     }
 
-    /// Move focus to the next (`forward`) or previous focusable element in
-    /// document order, wrapping. The Tab-traversal default: a document engine has
-    /// no built-in tab order, so the runner provides one over the focusable set
-    /// (elements carrying a key handler, per [`GenetCtx::is_focusable`]) in DOM
-    /// pre-order. With nothing focused, `forward` focuses the first focusable and
-    /// backward the last. Rebuilds after (focus may drive `:focus` styling
-    /// later). No-op when there are no focusable elements.
     /// Every focusable element, in document order.
     pub(crate) fn focusables(&self) -> Vec<NodeId> {
         let dom = self.dom.borrow();
@@ -549,14 +570,33 @@ where
         out
     }
 
+    /// Move focus to the next (`forward`) or previous focusable element in
+    /// document order. The Tab-traversal default: a document engine has no
+    /// built-in tab order, so the runner provides one over the focusable set
+    /// (elements carrying a key handler, per [`GenetCtx::is_focusable`]) in DOM
+    /// pre-order. With nothing focused, `forward` focuses the first focusable and
+    /// backward the last. Rebuilds after (focus may drive `:focus` styling
+    /// later).
+    ///
+    /// Past the last focusable (forward) or the first (backward), traversal
+    /// wraps, or, with focus exits on, clears focus and records the exit for
+    /// the host. With no focusable elements it is a no-op, or an exit.
     pub(crate) fn focus_traverse(
         &mut self,
         logic: &mut impl FnMut(&State) -> V,
         state: &mut State,
         forward: bool,
     ) {
+        let exit = if forward {
+            FocusExit::Forward
+        } else {
+            FocusExit::Backward
+        };
         let focusables: Vec<NodeId> = self.focusables();
         if focusables.is_empty() {
+            if self.focus_exits {
+                self.focus_exit = Some(exit);
+            }
             return;
         }
         let next = match self
@@ -565,6 +605,12 @@ where
         {
             Some(i) => {
                 let len = focusables.len();
+                let at_edge = if forward { i + 1 == len } else { i == 0 };
+                if self.focus_exits && at_edge {
+                    self.focus_exit = Some(exit);
+                    self.set_focus(logic, state, None);
+                    return;
+                }
                 if forward {
                     (i + 1) % len
                 } else {
@@ -1198,10 +1244,30 @@ where
     }
 
     /// Move focus to the next (`forward`) or previous focusable element in
-    /// document order, wrapping.
+    /// document order, wrapping unless [focus exits](Self::set_focus_exits)
+    /// are on.
     pub fn focus_traverse(&mut self, forward: bool) {
         self.tree
             .focus_traverse(&mut self.logic, &mut self.state, forward);
+    }
+
+    /// Stop traversal at the ends of the focusable set instead of wrapping.
+    ///
+    /// For a host that shows this runner beside other content: a Tab past the
+    /// last focusable (or a Shift-Tab before the first) clears focus and
+    /// records a [`FocusExit`], which the host takes with
+    /// [`take_focus_exit`](Self::take_focus_exit) and answers by moving focus
+    /// to whatever comes next in its own order. Without it, Tab cycles inside
+    /// the runner and a keyboard user cannot leave. Off by default, which keeps
+    /// a standalone app's wrapping order. Turning it off drops a pending exit.
+    pub fn set_focus_exits(&mut self, exits: bool) {
+        self.tree.set_focus_exits(exits);
+    }
+
+    /// The end the latest traversal left by, once. `None` when traversal
+    /// stayed inside, or when focus exits are off.
+    pub fn take_focus_exit(&mut self) -> Option<FocusExit> {
+        self.tree.take_focus_exit()
     }
 
     /// Every focusable element, in document order — the set

@@ -690,3 +690,20 @@ wrong source. Report to Mark; change nothing.
   baseline and names the open L5, L3/L6/L7, P2-cleanup and P4 items (ruling
   S43), and done-condition 3 and the local-locks ruling are read through the
   Execution amendment.
+- **2026-10-06. Portable CI had never passed; its first gate step is
+  repaired.** All 164 runs of `portable.yml`, from the first on 2026-09-24
+  (`c1e7ad7f`), failed at "Exercise local lock isolation" on one assertion.
+  `test_local_config_keeps_relative_patch_base` compared Cargo's
+  `manifest_path` after `.resolve()` with a `tempfile` path that was not
+  resolved. The windows-latest runner's TEMP is the 8.3 short form
+  (`C:\Users\RUNNER~1\...`), which `.resolve()` expands to `runneradmin`.
+  Every later step, the portable verify and the three WASI guest builds, was
+  skipped on every run. So the S14 correction above, that the workflow is
+  published, is true, but the workflow has enforced nothing yet. Reproduced
+  locally with TEMP pointed at an 8.3 short path (same test, line and
+  assertion) and fixed by resolving both sides, in the commit that adds this
+  entry; the four tests pass under the short and the long TEMP.
+  `cargo_mode.py` resolves `repo`, the workspace root and each package's
+  manifest path before comparing them, so the script itself has no such
+  mismatch. The later steps first run on CI at the next push, and whether
+  they pass is not yet known.

@@ -18,7 +18,22 @@ that pins to stable identity, and inspector overlays.
 | `node_id_for_path(&str) -> NodeId` | Hashes a domain path to a stable id. |
 | `stitch(root_path: &str, root: Node, subtrees: Vec<UxTree>) -> UxTree` | Merges domain subtrees (workbench, gloss, apparatus, ...) under one application root, overwriting the root's children. |
 | `project_document(&inker::EngineDocument) -> UxTree` | Projects a document into a `Role::Document` root. |
+| `graft::tree_id_for_path(&str) -> TreeId` | Hashes a domain path to a stable subtree id, never the root's. |
+| `graft::graft_node(Role, TreeId, origin, size) -> Node` | A graft node for one guest tree: the origin becomes its transform, its bounds are pane-local. |
+| `graft::Composition::new(host, guests) -> Result<Composition, GraftError>` | Checks one frame's host tree and guest trees against the rules the AccessKit consumer enforces by panicking, and addresses each guest to its tree. |
+| `graft::Grafts` | Per adapter: `activate` answers the activation request; `frame` orders a composition's updates so grafts precede subtrees and focus into a new guest is one move. |
+| `graft::GraftTable<K>` | Routes a screen reader's `ActionRequest` to the host or to the guest that owns `target_tree`. |
 | `VERSION`, `STAGE` | Crate version string and lifecycle marker (`"pre-alpha"`). |
+
+## Joining sessions as subtrees
+
+`stitch` hashes every session's nodes into one id space. `graft` joins them
+as AccessKit 0.24 subtrees instead: each session keeps its own ids, the host
+tree carries one graft node per session, focus follows the graft chain, bounds
+compose through the graft's transform, and actions arrive addressed by tree.
+This is the stack's join for composed sessions (app composition brief, AC2).
+`tests/e1a_subtrees.rs` is experiment E1a's tree half, run against the
+consumer under each pinned adapter (`accesskit_consumer` 0.35, 0.36 and 0.38).
 
 ## Stable ids
 

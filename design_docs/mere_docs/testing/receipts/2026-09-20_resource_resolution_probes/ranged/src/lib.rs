@@ -1,3 +1,9 @@
+// Copyright 2026 Mark Alan Boykin
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// SPDX-License-Identifier: MPL-2.0
+
 //! R3-A: a ranged read through real netfetcher on a persona-scoped context,
 //! called the way a decoder calls it: blocking, from its own thread.
 //! This file is the regression manifest. Nothing here is a proposed API.

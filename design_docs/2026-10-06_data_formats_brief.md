@@ -151,6 +151,8 @@ postcard code found mentions in `graph-kernel` (7), `notochord` (11),
   `mere-header`; `mere-frame`. Mark: "mere-framing (Recommended)". The name
   is claimed by a real publish once H1 lands, and that publish waits on his
   word like any other.
+  *Claimed 2026-10-06:* Mark said "Publish 0.0.1 now (Recommended)", and
+  `mere-framing` 0.0.1 is on crates.io, published from mere `13a6b49d`.
 - **F5. Isocosm's rosters.** Asked whether rosters (`Founding::SpacedRoster`,
   `SEEDED_KINDS`) move from Rust into datasheets. The options were: yes,
   through a plan; only new ones; not now. Mark: "Yes, through a plan

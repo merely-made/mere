@@ -39,6 +39,13 @@ use std::hash::{Hash, Hasher};
 use accesskit::{Action, Node, NodeId, Role, Tree, TreeId, TreeUpdate};
 use inker::{Block, EngineDocument, FoldState, InlineSpan, MenuRow, inline_text};
 
+pub mod graft;
+
+pub use graft::{
+    ActionTarget, Composition, GraftError, GraftTable, Grafts, as_subtree, graft_node,
+    tree_id_for_path,
+};
+
 /// Crate version.
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 

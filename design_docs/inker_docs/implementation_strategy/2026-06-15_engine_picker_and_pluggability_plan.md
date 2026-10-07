@@ -288,3 +288,28 @@ reads.
   `turnstone/docs/receipts/browser_supplier_integration_20261006/`.
   The ordered Graft host contract remains library-qualified; the upstream
   Servo native consumer and supplementary Unicode/OS IME gates are separate.
+
+- **2026-10-07, current upstream and coordinated consumer family, in progress.**
+  Mark explicitly requests upstream Servo 0.7 (`aac43a3f`) and today's
+  CEF `154.5.0+154.0.34`, then a refreshed U9 family rather than the old
+  hash list. Current Mere main `d041cc69` already contains the shared Weld
+  input and ordered Graft fixes; the compatibility branch's only unique
+  source change is its older Genet pin. Its integration takes main's current
+  manifests and adopts published Genet `965b64e2`, whose bounded decoder
+  repair matches the earlier `679d8314` repair without copying its divergent
+  history. All 28 root Genet rows and the three Distillery-probe and seven
+  Graphshell-web rows move together. The initial resolver and locked
+  `mere,graft-engine --all-targets` check pass on Rust 1.98.1; this still
+  preceded the new Weld source pin. The final source pair also passes the
+  locked all-target Mere/Graft/Weld neutral check and all seven adapter
+  tests. Weld `c4dd593b` independently qualifies current CEF on Windows
+  with sandboxed native import pixel samples; the CEF-enabled Mere adapter
+  and combined Turnstone executable remain downstream gates.
+  Receipts: `../testing/receipts/2026-10-07_current_browser_family/`.
+  Mere's optional Djinn Knot dependency remains its independently selected
+  revision; its dormant older Genet packages in the full workspace lock
+  are not proof of a second enabled Turnstone type family. Verify the
+  selected consumer graph after Knot, Redshank and Turnstone repin, in that
+  order. Knot main has independently landed S77's preview fallback and
+  FeedEntry rest handling; unpublished identity seed work is not inferred.
+  Windows native pixels and foreign accessibility remain distinct gates.
