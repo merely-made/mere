@@ -1,12 +1,14 @@
 # Stack seams plan: catalog, shared device, actions, determinism, two words
 
 **Date:** 2026-10-04
-**Status (2026-10-06):** in progress. Seventy-five rulings in twenty-five rounds
-(S1 to S75); P1 landed on main (`1633be0c`); P2 staged (S27 to S31, four
+**Status (2026-10-06):** in progress. Seventy-seven rulings in twenty-six rounds
+(S1 to S77); P1 landed on main (`1633be0c`); P2 staged (S27 to S31, four
 stages in §3.1) and landed on main (`40d7ae5e`); S32 (F19) landed on main
 (`48c08dee`); the S14 pass (S33) done (`8d7702d2`, receipt
-`support/doc-audit/d2/remediation_2026-10-06.md`); P3 and S7 done as
-documents; S3 to S6 carried into the dynamics grammar plan (G8, G9); S9 done by the identity
+`support/doc-audit/d2/remediation_2026-10-06.md`); S66's code follow-on
+(S70 to S77, the smolweb fidelity plan's WS4) landed (`b4f14f2c`, R6
+`1d87808a`); P3
+and S7 done as documents; S3 to S6 carried into the dynamics grammar plan (G8, G9); S9 done by the identity
 lane (`b52edea7`).
 
 A note sent to Mark listed weak seams in the stack. Each claim was checked
@@ -837,6 +839,26 @@ Round 25, 2026-10-06. Evidence: S74 put the article reader in scope. Errand gain
 
 **Ruling S75.** *How does a feed entry's article body render?* Options: its own document (the entry's content lowered through the html-fragment engine, addressed as the feed plus the entry's guid, the article URL its canonical link); inline in the feed document, folded closed; handed off to the web lane. Mark: **"Own document (Recommended)"**. Follows: opening an entry renders its `content` through Nematic's html-fragment engine as its own EngineDocument, addressed as the feed plus the entry's guid, with the article URL as its canonical link; it reads offline on the one path, and an entry without content shows its summary and a link out.
 
+Round 26, 2026-10-06. Evidence: WS4 R0 to R5 merged to main as `b4f14f2c` with every gate green. R6 sits on the smolweb branch `gopher-protocol-0.2.0` (`b0f1dda`): a raw item type, `8` and `T` as telnet, a CSO kind, 39 tests passing and the smolweb workspace clean. knot-editor's desktop preview matches `Block` exhaustively and needs a wildcard arm and a `..` in its `FeedEntry` pattern at its next repin; the fidelity plan's stop rules send changes in knot-editor to Mark.
+
+**Ruling S76.** *Publish gopher-protocol 0.2.0 (irreversible), after which Mere repins and Nematic's gopher engine reads the raw type?* Options: publish 0.2.0; merge into smolweb main without publishing; hold the branch. Mark: **"Publish 0.2.0 (Recommended)"**. Follows: the branch merges into smolweb main, gopher-protocol 0.2.0 is published to crates.io, Mere repins to `=0.2.0`, and Nematic's gopher engine takes each row's marker from `raw_type`.
+
+**Ruling S77.** *knot-editor's desktop preview needs a wildcard arm and a `..` in its `FeedEntry` pattern at its next repin past `b4f14f2c`, and could draw `Block::Menu`. Who does it?* Options: a dated note in knot-editor's application workspace plan, their lane doing it at the repin; this session makes the change in knot-editor; leave it until the repin goes red. Mark: **"Note it in their plan (Recommended)"**. Follows: a dated note in knot-editor's application workspace plan names the change and cites the fidelity plan's WS4; knot-editor's lane makes it at its next repin.
+
+Round 27, 2026-10-06, carrying out S45. Evidence, at `ea74604b` with the tree clean: the license sweep's grep finds 68 owned `.rs` files without Exhibit A, S45's 61 plus 7 added since (speed and runtime files in pictograph, seiche and graphshell). `scripts/relicense_headers.py`, which also covers `.py`, `.js` and `.ps1` under the sweep's invariant 3, flags 83: 13 Python, 1 JavaScript and 1 PowerShell file more, all Mark's, with no third-party copyright line in any. Eight of them sit in `design_docs/mere_docs/testing/receipts/2026-09-08_stack_pillar_probes`, whose `artifact-sha256.json` files pin each one's bytes (23 of 23 and 9 of 9 recompute) and whose `.gitattributes` keeps bytes so the digests survive checkout. An index-based check (`git grep`) takes about a second against `--audit`'s forty. CI (`portable.yml`) has failed its last six runs at its second step, `test_cargo_mode.py`, skipping every later step. `.git-blame-ignore-revs` is scoped to rustfmt sweeps and never listed P1's header sweep.
+
+**Ruling S78.** *Which files does the S45 sweep cover?* Options: everything the tool flags (83 less S79's exemption, the gate checking all six extensions as `--audit` does); Rust only (68 less the exemption, the 15 scripts left unheaded). Mark: **"All the tool flags (Recommended)"**. Follows: every owned tracked source in the tool's six extensions takes shape C except S79's directory, and the gate checks all six.
+
+**Ruling S79.** *Eight flagged files are receipt sources in `2026-09-08_stack_pillar_probes` whose bytes the receipt pins by SHA-256. How are they treated?* Options: exempt as frozen evidence (a new LICENSES.md section the tool reads as a second skip list, MPL-2.0 through the root `LICENSE`, the unpinned 2026-09-20 probes taking headers); header them and re-record the hashes; exempt all of `testing/receipts`. Mark: **"Exempt as frozen evidence (Recommended)"**. Follows: LICENSES.md gains a Frozen evidence section naming that directory, the tool skips it as it skips Retained licenses, and its receipts keep recomputing; the 2026-09-20 resource resolution probes, which pin nothing, take headers.
+
+**Ruling S80.** *Where does the gate run?* Options: a CI step placed before the failing test, plus a finding category in the doc audit; CI only; the doc audit only. Mark: **"CI first step + doc audit (Recommended)"**. Follows: `relicense_headers.py --check` (index-based; exit 1 on an owned source without Exhibit A or with the Exhibit B notice) and `--self-test` (planted defects must fail, a clean fixture must pass) run as `portable.yml`'s first checks, and `mere_doc_audit.py` reports both as finding categories. *Reading, not ruled*: the two categories count toward `--fail-on-findings`, and the doc audit's self-test plants one of each.
+
+**Ruling S81.** *Does the sweep's hash go into `.git-blame-ignore-revs`?* Options: leave it out (the file's stated rustfmt scope, P1's precedent); add it, widening the file to header sweeps. Mark: **"Leave it out (Recommended)"**. Follows: the file is unchanged.
+
+Round 28, 2026-10-06, during the S45 sweep. Evidence: before `--apply`, the tree was searched for every flagged file's SHA-256 and git blob id, whole and as 12-character prefixes, with S79's eight files as the positive control (all eight found, at 16 sites). Two sweep files are recorded in graphshell receipts' `source_sha256` maps of 2026-09-06: `ports/graphshell/web/co_op.js` (`co_op_browser_receipt.json`) and `ports/pelt/core/src/surface_policy.rs` (`projection_refresh_surface_reuse_receipt.json`). Both are live sources, and both maps are snapshots that had already gone mostly stale: 7 of 10 and 22 of 30 entries no longer recompute.
+
+**Ruling S82.** *How are the two live sources these receipts record treated?* Options: sweep them, the receipts staying as records of the 2026-09-06 state, "with 9 of 10 and 24 of 30 entries stale"; hold them out as frozen evidence; sweep them and annotate the receipts README. Mark: **"Sweep them (Recommended)"**. Follows: both take the header with the other 73, and Frozen evidence stays for frozen sources only. *Erratum*: the option's figures were miscounted by one each. After the sweep the maps stand at 8 of 10 and 23 of 30 stale (recomputed at `43353861`), one more entry each, which is what the option meant.
+
 ## 3. Phases
 
 ### 3.1 This plan's lane
@@ -1007,6 +1029,19 @@ The done-conditions handed over for S3 and S4, kept for reference:
   its adoption plan's Track F (`28985298`).
 - **2026-10-06.** Round 24: S71 to S74, S66's code follow-on shaped: a typed `Block::Menu`, `Block` made `#[non_exhaustive]`, gopher-protocol's raw types prepared and released on sign-off, the feed fields and the article reader in scope.
 - **2026-10-06.** Round 25: S75, a feed entry's article renders as its own EngineDocument through the html-fragment engine.
+- **2026-10-06.** S70's objective landed: the smolweb fidelity plan's WS4,
+  R0 to R5, merged as `b4f14f2c` (per-format views retired; `Block`
+  non-exhaustive with `Block::Menu`; gopher lowered to it; the feed's dates,
+  bodies and enclosures apart; an entry's body as its own document; soft
+  breaks a setting). R6, gopher-protocol 0.2.0, is prepared in the smolweb
+  repository (`b0f1dda`) and waits on Mark's sign-off to publish. The
+  fidelity plan's progress log carries the gates, readings and gaps.
+- **2026-10-06.** Round 26: S76 (publish gopher-protocol 0.2.0, then repin) and S77 (knot-editor's preview change noted in its plan, its lane to make it).
+- **2026-10-06.** S45 carried out, under rounds 27 and 28 (S78 to S82): Frozen evidence ledgered (`362c5d5a`), the header tool re-run over 75 owned sources in one commit (`43353861`), and the gate added to CI and the doc audit (`0b374437`). The receipt is in the license sweep plan's §6.
+- **2026-10-06.** S76 and S77 carried out: gopher-protocol 0.2.0 published
+  (smolweb `b0f1dda`) and repinned (`1d87808a`), completing WS4; knot-editor's
+  application workspace plan records the preview change its next repin needs
+  (`210ee64`).
 - **2026-10-06.** Round 16: S46 (live plans handed to their lanes), S47
   (reviewed write lanes) and S48 (ownerless tails to the archived plan tails
   backlog). S44's repins and S45's header re-run were flagged as separate

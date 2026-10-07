@@ -180,12 +180,9 @@ script-engine-boa = { workspace = true, optional = true }
 script-engine-nova = { workspace = true, optional = true }
 # The `LayoutDom` trait (for the inline-`<script>` DOM walk) + QualName parts.
 layout-dom-api = { workspace = true, optional = true }
-# External-script post-fetch processing (scripted feature): `encoding_rs` decodes the
-# fetched bytes per the `<script charset>` (default UTF-8); `sha2` + `base64` verify a
-# `<script integrity>` Subresource-Integrity hash before the script is allowed to run.
+# `encoding_rs` (`<script charset>`) and `base64` (`<script integrity>`) served the
+# external-script processing L5 moved into genet-scripted; no feature enables them now.
 encoding_rs = { version = "0.8", features = ["serde"], optional = true }
-# Not mere's workspace sha2 (0.11): this carries genet's 0.10 line.
-sha2 = { version = "0.10", optional = true }
 base64 = { workspace = true, optional = true }
 
 [target.'cfg(target_os = "windows")'.dependencies]

@@ -352,7 +352,7 @@ genet-static-dom = { git = "https://github.com/merely-made/genet.git", rev = "d8
 mere-surface-api = { version = "0.1.0", path = "crates/system/surface-api" }
 workbench = { version = "=0.1.0", path = "crates/cambium/workbench" }
 mere-view = { version = "0.1.0", path = "crates/cambium/mere-view" }
-errand = { version = "0.3.4", path = "crates/system/errand" }
+errand = { version = "0.4.0", path = "crates/system/errand" }
 # Errand's wire layer: one spec-faithful crate per protocol, published under
 # names that belong to the protocols' communities rather than to the engine
 # that speaks them (the 2026-07-23 repo consolidation and the 2026-08-03
@@ -363,7 +363,7 @@ errand = { version = "0.3.4", path = "crates/system/errand" }
 nex-protocol = { version = "=0.1.1" }
 spartan-protocol = { version = "=0.1.1" }
 guppy-protocol = { version = "=0.1.1" }
-gopher-protocol = { version = "=0.1.1" }
+gopher-protocol = { version = "=0.2.0" }
 gemini-protocol = { version = "=0.1.7" }
 scroll-protocol = { version = "=0.1.0" }
 finger-protocol = { version = "=0.1.1", default-features = false, features = [

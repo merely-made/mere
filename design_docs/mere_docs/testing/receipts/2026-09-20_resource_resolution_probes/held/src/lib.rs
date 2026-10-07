@@ -1,3 +1,9 @@
+// Copyright 2026 Mark Alan Boykin
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+// SPDX-License-Identifier: MPL-2.0
+
 //! R3-B: held and partial episodes in iroh's blob store, read the way a decoder
 //! reads: blocking `Read + Seek` from its own thread.
 //! This file is the regression manifest. Nothing here is a proposed API.

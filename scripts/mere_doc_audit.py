@@ -1,4 +1,11 @@
 #!/usr/bin/env python3
+
+# Copyright 2026 Mark Alan Boykin
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# SPDX-License-Identifier: MPL-2.0
+
 """Audit Mere's active design-doc tree without modifying it.
 
 The documentation-policy plan's D3 exit condition is deliberately narrow:
@@ -9,6 +16,10 @@ This script reports those facts for `design_docs/` while excluding every
 Ambiguous bare crate roots, glob examples, and versioned Mere protocol/schema
 identifiers are reported separately as informational exclusions rather than
 being mistaken for concrete missing paths.
+
+One check reaches outside `design_docs/`, by ruling S80 of the stack seams
+plan: owned sources must carry the MPL-2.0 Exhibit A header and never the
+Exhibit B notice, read through `relicense_headers.py`'s `--check`.
 
 Run from any directory:
 
@@ -26,11 +37,14 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import subprocess
 import sys
 import tempfile
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from urllib.parse import unquote
+
+import relicense_headers
 
 
 MARKDOWN_LINK = re.compile(r"(?<!!)\[[^\]]*\]\(([^)]+)\)")
@@ -103,6 +117,8 @@ class Report:
     planned_missing_known_root_paths: list[Finding] = field(default_factory=list)
     invalid_historical_annotations: list[Finding] = field(default_factory=list)
     stale_historical_annotations: list[Finding] = field(default_factory=list)
+    unheaded_owned_sources: list[Finding] = field(default_factory=list)
+    exhibit_b_sources: list[Finding] = field(default_factory=list)
 
     def counts(self) -> dict[str, int]:
         return {
@@ -123,6 +139,8 @@ class Report:
             "planned_missing_known_root_paths": len(self.planned_missing_known_root_paths),
             "invalid_historical_annotations": len(self.invalid_historical_annotations),
             "stale_historical_annotations": len(self.stale_historical_annotations),
+            "unheaded_owned_sources": len(self.unheaded_owned_sources),
+            "exhibit_b_sources": len(self.exhibit_b_sources),
         }
 
     def has_findings(self) -> bool:
@@ -459,6 +477,16 @@ def audit(repo_root: Path) -> Report:
             report.invalid_historical_annotations.append(
                 finding(path, docs_root, label.group(0), "historical citation label has no valid same-line audit annotation")
             )
+
+    unheaded, exhibit_b = relicense_headers.header_violations(repo_root)
+    report.unheaded_owned_sources = [
+        Finding(source, "Exhibit A", "owned source lacks the MPL-2.0 header; see scripts/relicense_headers.py")
+        for source in unheaded
+    ]
+    report.exhibit_b_sources = [
+        Finding(source, "Exhibit B", "owned source carries the Exhibit B notice")
+        for source in exhibit_b
+    ]
     return report
 
 
@@ -488,6 +516,8 @@ def print_report(report: Report, json_output: bool) -> None:
         "planned_missing_known_root_paths",
         "invalid_historical_annotations",
         "stale_historical_annotations",
+        "unheaded_owned_sources",
+        "exhibit_b_sources",
     ):
         findings: list[Finding] = getattr(report, category)
         for item in findings[:12]:
@@ -534,6 +564,16 @@ def write_fixture(root: Path, defective: bool) -> None:
             (docs / "DOC_README.md").read_text(encoding="utf-8") + "- [links](bad_links.md)\n- [statusless](statusless_plan.md)\n",
             encoding="utf-8",
         )
+    # The license check reads tracked sources, so the fixture is a repository.
+    header = "\n".join(relicense_headers.build_header("//", False))
+    src = root / "crates" / "fixture" / "src"
+    src.mkdir(parents=True)
+    (src / "lib.rs").write_text(header + "\n\npub fn headed() {}\n", encoding="utf-8")
+    if defective:
+        (src / "bare.rs").write_text("pub fn bare() {}\n", encoding="utf-8")
+        (src / "notice.rs").write_text(header + "\n// " + relicense_headers.EXHIBIT_B + "\n", encoding="utf-8")
+    for args in (["init", "-q"], ["add", "-A"]):
+        subprocess.run(["git", "-C", str(root), *args], check=True, capture_output=True)
 
 
 def run_self_test() -> None:
@@ -587,6 +627,8 @@ def run_self_test() -> None:
             "planned_missing_known_root_paths",
             "invalid_historical_annotations",
             "stale_historical_annotations",
+            "unheaded_owned_sources",
+            "exhibit_b_sources",
         }
         missing = [key for key in expected if defective.counts()[key] == 0]
         if missing:
@@ -634,6 +676,11 @@ def run_self_test() -> None:
             )
         if len(defective.stale_historical_annotations) != 1:
             raise AssertionError("live historical annotation was not reported exactly once")
+        unheaded = [finding.source for finding in defective.unheaded_owned_sources]
+        if unheaded != ["crates/fixture/src/bare.rs"]:
+            raise AssertionError(f"license header control was not exact: {unheaded}")
+        if [finding.source for finding in defective.exhibit_b_sources] != ["crates/fixture/src/notice.rs"]:
+            raise AssertionError("Exhibit B control was not reported exactly once")
 
         clean_root = Path(temp) / "clean" / "repos" / "mere"
         write_fixture(clean_root, defective=False)
@@ -662,6 +709,6 @@ def main() -> int:
 if __name__ == "__main__":
     try:
         raise SystemExit(main())
-    except (AssertionError, FileNotFoundError) as error:
+    except (AssertionError, FileNotFoundError, RuntimeError, subprocess.CalledProcessError) as error:
         print(f"audit failed: {error}", file=sys.stderr)
         raise SystemExit(2)
