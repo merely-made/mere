@@ -21,3 +21,10 @@ tracing.workspace = true
 [dev-dependencies]
 # Fold projection tests lower the committed Micron probe pages.
 nematic.workspace = true
+# Experiment E1a (app composition brief, AC3): the subtree join is checked
+# against the consumer layer under each pinned adapter, on any machine.
+# accesskit_windows 0.32 uses consumer 0.35, accesskit_unix 0.21 (through
+# atspi_common 0.18) uses 0.36, and accesskit_macos 0.26 uses 0.38.
+accesskit_consumer_windows = { package = "accesskit_consumer", version = "=0.35.0" }
+accesskit_consumer_unix = { package = "accesskit_consumer", version = "=0.36.0" }
+accesskit_consumer_macos = { package = "accesskit_consumer", version = "=0.38.0" }

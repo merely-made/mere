@@ -31,3 +31,20 @@ genet-render = { workspace = true }
 genet-winit-host = { workspace = true }
 genet-scripted-dom = { workspace = true }
 layout-dom-api = { workspace = true }
+
+[dev-dependencies]
+# Experiment E1a's session half (app composition brief, AC3): two retained
+# sessions laid out, projected, grafted as AccessKit subtrees and read back
+# through the consumer under each pinned adapter.
+cambium = { version = "0.3.3", path = "../cambium" }
+mere-surface-api = { workspace = true }
+uxtree = { workspace = true }
+accesskit_consumer_windows = { package = "accesskit_consumer", version = "=0.35.0" }
+accesskit_consumer_unix = { package = "accesskit_consumer", version = "=0.36.0" }
+accesskit_consumer_macos = { package = "accesskit_consumer", version = "=0.38.0" }
+# Experiment E1b's probe (examples/e1b_two_sessions.rs) publishes the joined
+# trees through AccessKit's own winit adapter: Genet's AccessKitBridge drops
+# an action's target tree and answers activation with the latest update,
+# which under subtrees is a guest's.
+accesskit_winit = "0.32"
+cambium-winit = { version = "0.3.0", path = "../cambium-winit" }

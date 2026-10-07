@@ -10,11 +10,11 @@ its own status; lane 1's headed qualification and lane 4 are open. WS1 is
 partial: feeds keep `guid` and enclosures (`5630e256`) and, since WS4's R3,
 their published and updated dates and full content apart from the summary;
 the Spartan `=:` prompt is typed (`080a2141`, as `SpartanLine::Prompt`; a fork
-in §3); the channel `ttl` is open, and gopher's `raw_type`, the `8`/`T` fix
-and CSO are prepared as gopher-protocol 0.2.0 (smolweb `b0f1dda`,
-unpublished). WS2 has not started. WS3's bespoke rendering is superseded by
-WS4, one render path (§7, rulings S66 and S70 to S75): R0 to R5 landed on main
-2026-10-06 (`b4f14f2c`); R6 waits on Mark's sign-off to publish.
+in §3); gopher's `raw_type`, the `8`/`T` fix and CSO shipped in
+gopher-protocol 0.2.0 (WS4's R6); the channel `ttl` is open. WS2 has not
+started. WS3's bespoke rendering is superseded by WS4, one render path (§7,
+rulings S66 and S70 to S77), done on main 2026-10-06: R0 to R5 in `b4f14f2c`,
+R6 in `1d87808a`.
 
 > **Home refinement, 2026-08-03**: WS1's AST enrichment lands wherever the
 > grammar lives at the time, per the
@@ -32,6 +32,25 @@ through bespoke per-format views; the per-format views in
 [native smolweb rendering plan](../../archive_docs/2026-10-06_completed_plans/2026-06-27_native_smolweb_rendering_plan.md)
 (rulings S61 and S66 of the
 [stack seams plan](../../mere_docs/implementation_strategy/2026-10-04_stack_seams_plan.md)).
+
+**Received 2026-10-07 (Turnstone U3):** Turnstone's
+unusual-protocols browser plan
+(`turnstone/design_docs/2026-10-06_unusual_protocols_browser_plan.md`) gives
+this plan the Mere halves of its stages S1 to S4, with Turnstone as the
+forcing consumer. Mark: **"Mere's smolweb fidelity lane (Recommended)"**.
+The halves are: S1, document-lanes chooses its lowering by content type
+before scheme for `text/plain` and `text/markdown`, and XML bodies that
+sniff as RSS or Atom reach the feed engine; S2, smolweb sessions gain find,
+per-node page zoom, and text selection with copy; S3, WS2's trust posture
+per carrier (TLS TOFU state, unauthenticated TCP, a proven Reticulum
+destination) filling `EngineDocument.trust`; S4, WS4's tail, R6
+(`gopher-protocol` 0.2.0). Each Turnstone stage opens with its failing
+tests. Turnstone's accessibility-first ruling (its U2) puts S2 with its S8
+right after S1 and its Pelt convergence stage, so S1's and S2's halves come
+first. Its S8's Mere half, smolweb and Micron sessions implementing
+`accessibility_projection`, is not this plan's: Turnstone's U16 gives it to
+the Turnstone unusual-protocols lane, with the rest of the accessibility
+path.
 
 **The three principles** (Mark's call, 2026-07-01):
 
@@ -878,6 +897,16 @@ Stop rules:
   and `T` as telnet, a CSO kind; unpublished. knot-editor's desktop preview
   needs a wildcard arm and a `..` in its `FeedEntry` pattern at its next
   repin, which under the stop rules comes to Mark.
+- **2026-10-06**: WS4 R6 landed and WS4 is done. Mark ruled S76 (publish)
+  and S77 (knot-editor's preview change noted in its plan, its lane to make
+  it; knot-editor `210ee64`). gopher-protocol 0.2.0 was published to
+  crates.io from smolweb `b0f1dda` (a raw item type, `8` and `T` as telnet, a
+  CSO kind); Mere repinned to `=0.2.0` and errand moved to 0.4.0 under its
+  manifest's semver note (`249e9045`, merged `1d87808a`); Nematic's gopher
+  rows now take their marker from `raw_type`, so `g` and `I`, or `8` and
+  `T`, stay distinct, and CSO lowers as `Other`. Workspace check clean;
+  errand, Nematic and mere-document-lanes (smolweb) tests pass. smolweb's
+  local main holds `b0f1dda` unpushed.
 
 ## Cross-references
 
