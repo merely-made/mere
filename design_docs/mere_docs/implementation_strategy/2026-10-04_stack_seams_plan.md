@@ -1,8 +1,8 @@
 # Stack seams plan: catalog, shared device, actions, determinism, two words
 
 **Date:** 2026-10-04
-**Status (2026-10-06):** in progress. Seventy-four rulings in twenty-four rounds
-(S1 to S74); P1 landed on main (`1633be0c`); P2 staged (S27 to S31, four
+**Status (2026-10-06):** in progress. Seventy-five rulings in twenty-five rounds
+(S1 to S75); P1 landed on main (`1633be0c`); P2 staged (S27 to S31, four
 stages in §3.1) and landed on main (`40d7ae5e`); S32 (F19) landed on main
 (`48c08dee`); the S14 pass (S33) done (`8d7702d2`, receipt
 `support/doc-audit/d2/remediation_2026-10-06.md`); P3 and S7 done as
@@ -833,6 +833,10 @@ Round 24, 2026-10-06. Evidence: S70's assessment. Nothing in any repository call
 
 **Ruling S74.** *Is the feed part of this objective? Errand's feed tree and `Block::FeedEntry` would gain published and updated dates, a separate summary and content, and enclosures; content is HTML, so how the article reader renders it is an open lane decision.* Options: the fields now and the reader later; the typed column only; the fields and the reader. Mark: **"Fields and reader"**. Follows: the feed is in this objective: errand's feed tree and `Block::FeedEntry` gain published and updated dates, summary and content separately, and enclosures, in the same breaking change as `Block::Menu`; the article reader's lane is decided now, as the next round.
 
+Round 25, 2026-10-06. Evidence: S74 put the article reader in scope. Errand gains `content` (HTML) under S74; Nematic's default `html-fragment` engine (`crates/nematic/nematic/src/html.rs`) already lowers HTML into EngineDocument blocks reader-mode style, passing only a passive subset (no scripts, frames, forms, styling authority or active URL schemes); hosts today follow an entry's article URL to the web; document folds hang off headings only (`inker/src/document/navigation.rs`).
+
+**Ruling S75.** *How does a feed entry's article body render?* Options: its own document (the entry's content lowered through the html-fragment engine, addressed as the feed plus the entry's guid, the article URL its canonical link); inline in the feed document, folded closed; handed off to the web lane. Mark: **"Own document (Recommended)"**. Follows: opening an entry renders its `content` through Nematic's html-fragment engine as its own EngineDocument, addressed as the feed plus the entry's guid, with the article URL as its canonical link; it reads offline on the one path, and an entry without content shows its summary and a link out.
+
 ## 3. Phases
 
 ### 3.1 This plan's lane
@@ -1002,6 +1006,7 @@ The done-conditions handed over for S3 and S4, kept for reference:
   (2026-09-20) was left alone. The projection grammar lane took FT9/FT10 as
   its adoption plan's Track F (`28985298`).
 - **2026-10-06.** Round 24: S71 to S74, S66's code follow-on shaped: a typed `Block::Menu`, `Block` made `#[non_exhaustive]`, gopher-protocol's raw types prepared and released on sign-off, the feed fields and the article reader in scope.
+- **2026-10-06.** Round 25: S75, a feed entry's article renders as its own EngineDocument through the html-fragment engine.
 - **2026-10-06.** Round 16: S46 (live plans handed to their lanes), S47
   (reviewed write lanes) and S48 (ownerless tails to the archived plan tails
   backlog). S44's repins and S45's header re-run were flagged as separate
