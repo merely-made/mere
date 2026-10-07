@@ -1,6 +1,6 @@
 # Postcard framing: one version header for stored and sent records
 
-**Status:** plan, 2026-10-06. H1 waits on a crate name (checkpoint below).
+**Status:** plan, 2026-10-06. H1 is unblocked: the crate is `mere-framing` (F7).
 
 Carries out F3, F4 and F6 of the
 [data formats brief](../../2026-10-06_data_formats_brief.md). postcard
@@ -16,6 +16,8 @@ cannot change shape without breaking the bytes already written.
   still load.
 - **F6.** "One shared helper in Mere (Recommended)": wing-formats' header in
   one small Mere crate that Mere's crates and wing-formats both use.
+- **F7.** "mere-framing (Recommended)": the helper's name, published, since
+  muniment is.
 
 ## Findings (2026-10-06)
 
@@ -61,6 +63,9 @@ cannot change shape without breaking the bytes already written.
 **Checkpoint: the crate's name.** A new crate name is a naming decision.
 Plain technical candidates go to Mark, checked against crates.io and the
 naming ledger, before H1 starts.
+*Answered 2026-10-06, F7:* `mere-framing`. Checked that day: free on
+crates.io, unused in the tree, and the shape publishable Mere infrastructure
+already takes. The claim is a real publish after H1, on Mark's word.
 
 ### H2: the inventory
 
