@@ -6551,6 +6551,7 @@ dependencies = [
  "chartulary",
  "chirograph",
  "distillery",
+ "edit-history",
  "eidetic",
  "getrandom 0.3.4",
  "graphshell-client",
