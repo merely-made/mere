@@ -9396,6 +9396,7 @@ dependencies = [
  "p2panda-core",
  "personae",
  "retinue",
+ "serde_json",
  "sha2 0.11.0",
  "snow",
  "stickleback",
@@ -9404,6 +9405,7 @@ dependencies = [
  "tokio",
  "tokio-stream",
  "tracing",
+ "zeroize",
 ]
 
 [[package]]
