@@ -1,7 +1,7 @@
 # Scenograph Editor Plan
 
 **Date:** 2026-10-07
-**Status (2026-10-07):** plan. Rulings SE1 to SE9 recorded (§1). Track E1, the generic history, is next; nothing is built yet.
+**Status (2026-10-07):** in progress. Rulings SE1 to SE9 recorded (§1). E1, the generic history, is built and verified on branch `sceno-editor-e1`, not merged; E2 follows it.
 **Scope:** the editor foundation that Scenograph's editing surfaces stand on: one undo history in Cambium, and arrangement options declared as data. Carries out the balaur review's rulings A and B. The projection editor in Graphshell is the first consumer of both.
 
 Not in scope, mapped in §3 and opened by later rounds:
@@ -125,3 +125,4 @@ Verified 2026-10-07 against mere's origin unless named.
 ## Progress
 
 - **2026-10-07.** Plan written from the chat assessment; rulings SE1 to SE9 recorded. The balaur brief and the projection grammar handoff carry dated pointers here.
+- **2026-10-07, E1 built on `sceno-editor-e1`, not merged.** `cambium::History<S, K>` in `crates/cambium/cambium/src/editor.rs`: key-and-window coalescing on a host-supplied millisecond time, a saved marker that shifts with the cap and is lost when its state falls off the cap or sat on a discarded redo stack. `EditHistory` is a newtype over `History<TextSnapshot>`, since `TextSnapshot` is crate-private; its API is unchanged and `TextInput` calls it as before. Eight new tests; `cargo test -p cambium --lib` passes, 257 tests. Two controls failed where they should: dropping the redo-discard reset, and dropping the cap shift, each fails one test. A first version of the redo-discard test passed under its control, because it never returned to the saved depth; it was fixed before the control was rerun. Found in passing: Cambium is not `cargo fmt`-clean at origin (`atlas.rs`, `graph_canvas.rs`, `lib.rs`, `workspace.rs`); `editor.rs` is.
