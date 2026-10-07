@@ -12,6 +12,7 @@ members = [
     "crates/system/pandect",
     "crates/system/luggage",
     "crates/system/fetch",
+    "crates/system/page-load",
     "crates/system/framing",
     "crates/system/content-contract",
     "crates/system/proofs",
@@ -270,6 +271,7 @@ blake3 = "1"
 mere = { path = "crates/mere" }
 
 fetch = { package = "mere-fetch", version = "0.0.1", path = "crates/system/fetch" }
+page-load = { package = "mere-page-load", version = "0.0.1", path = "crates/system/page-load" }
 content-contract = { path = "crates/system/content-contract" }
 proofs = { package = "mere-proofs", version = "0.1.0", path = "crates/system/proofs" }
 shell-state = { path = "crates/system/shell-state" }

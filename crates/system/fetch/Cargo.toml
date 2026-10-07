@@ -29,6 +29,9 @@ flip = ["dep:inker"]
 # Genet's host-side resource contract, so a handle can serve a document
 # engine's images and stylesheets under the same policy as every other fetch.
 genet-host-api = { workspace = true }
+# The fetch vocabulary and the sans-IO page load, which this actor speaks and
+# re-exports, so controllers can share them without linking a transport.
+page-load = { workspace = true }
 armillary = { workspace = true, optional = true }
 eidetic = { workspace = true, optional = true }
 errand = { workspace = true, optional = true }
