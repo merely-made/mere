@@ -118,6 +118,22 @@ fresh restored run. These changes require the candidate seam and are not claimed
 to compile against the retained starting Genet pin; publication must carry the
 verified repin with this migration.
 
+The owned-snapshot correction qualifies four packages: Cambium 252, Rootstock
+72, native accessibility 22 and browser mirror nine passing tests, with zero
+failures and two existing ignored doctests. The native routing target then
+finds a missing trait import in its migrated fixture before tests; that import
+is corrected for the next gate. Catalog and highlight qualification and the
+independent negative controls remain pending.
+
+The mirror review finds a separate accessible-tree fork. Genet projects
+descendant elements beneath app DIV textboxes; Rootstock decorates only the
+parent's committed value, and the browser mirror lowers both that value and
+the projected children. Current full-pipeline tests use an empty field and
+check its name/role, while decorated-value fixtures stop at the neutral/native
+adapters. Mark is asked whether to expose app textboxes as accessible leaves
+across adapters or prune children only in the browser mirror. No pruning policy
+is implemented before that ruling; drawn children stay app-owned in either case.
+
 The downstream read-only audit finds old tag checks in Turnstone and Cleromancy.
 Their mechanical selector/caret/existing-label follow-ups await explicit scope
 authorization; currently unnamed fields retain that state. No sibling source
