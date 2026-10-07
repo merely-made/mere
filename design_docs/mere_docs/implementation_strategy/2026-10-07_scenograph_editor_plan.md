@@ -68,6 +68,8 @@ Mark opened the lane: "i'm most curious about scenograph, honestly. wallpapers, 
 - **SE20, the open draft.** Options: reload it as a draft step; reload fresh; leave it alone. Mark: **"Reload it as a draft step (Recommended)"**. *Follows:* after an undo or redo of a save, the editor takes the stored definition as one step on its own history and reads clean against the store.
 - **SE21, kept parts.** Options: the status names them; not surfaced yet. Mark: **"Status names them (Recommended)"**. *Follows:* the status says what was kept and who changed it.
 
+**SE22, session writes in the browser (2026-10-07).** Evidence put: `BrowserHost` lives in an `Rc<RefCell<…>>` that every handler and frame borrows, while `persist`, `undo` and `redo` await IndexedDB, so a borrow held across them panics on the next event; this is why browser scene saves never persist. pandect already splits a store into `pending(at)` and `stored(pending)`, and `MereHost` has a crate-private `stage`/`staged` for capture; undo and redo have no split. Options: split prepare, write and commit; hold the borrow and guard callers; a session worker task. Mark: **"Split prepare / write / commit (Recommended)"**. *Follows:* under the borrow, edit or revert in memory and take the pending batch; without it, write through a clone of the backend; under it again, mark the batch stored. pandect gains `undo_now` and `redo_now` (a revert journaled but not stored, like `edit_now`), `MereHost` gains public prepare and commit, and one write is in flight at a time.
+
 ## 2. Tracks
 
 E1 and E2 carry ruling A; E3 to E5 carry ruling B. E2 needs E1; E4 needs E3; E5 needs E2 and E4. *Added 2026-10-07:* E2b carries SE11 and SE12, after E2.
