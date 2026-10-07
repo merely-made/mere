@@ -3047,3 +3047,62 @@ binning are the useful patterns.
   against 25, in 91 to 206 ms frames; in two the budget bound engaged, in two
   one frame ran 269 and 1,372 us past it), calm not coming in three ten-minute
   waits; unresolved, returned with the worker's off-refresh run.
+- 2026-10-06 (seiche's speed, the worker's two forks carried out, branch
+  `seiche-speed-estimator`). "Keep the cap fallback", the finding as ruled: on
+  one of eleven runs of the 300-node page here (`diag_display_period` on
+  bundle `34a63551`), at 66% CPU with 3 other lanes' builds when it started
+  and 100% with 14 when it ended, this lane's gates running beside it at
+  BelowNormal, the worker's intervals left the refresh in its fourth window:
+  27 intervals at 5.9 to 6.2 ms, a 15.1 ms gap, then 92 at 7.8 to 12.2 ms
+  (mean 8.78 ms; the last 40 at 1.3 to 1.6 times the 6.078 ms period, 12, 20,
+  5 and 3 of them). They fitted 0.53, and the budget fell back to the 16.667
+  ms cap (8,333 us), the three windows before all at the refresh (5.8 to 6.4
+  ms). It slipped once more this round, on the planted-stall row's rerun at
+  100% CPU beside 34 other lanes' builds: its first window read 6.08 ms from
+  the worker at 1.00, its second the cap at 0.70; that row does not log
+  intervals. Neither read a fraction of the period. "Base it on the page's own
+  1x": a diagnostic (`diag_speed_fifty.scn`) runs the 50x control's page (24
+  nodes) at 1x, marks it, then runs 50x in the same receipt. Under load (97 to
+  100% CPU, 5 to 19 other lanes' builds, this lane's gates in three of the
+  runs) it read 1x at 0.253 to 0.379 and 50x at 2.99 to 11.17 in five runs,
+  11.5, 21.7, 21.9, 21.9 and 29.5 times the page's 1x against a bar of 25. 1x
+  runs the 50 ms catch-up cap's three ticks a frame, in frames averaging 138
+  to 171 ms over the meter's 32. At 50x the budget bound in every run: its
+  costliest frames ran ticks at 19 to 92 us each (148 ticks in 2.8 ms at best,
+  36 in 3.3 at worst), and in the four runs whose intervals were logged the
+  gate admitted 28 to 56 of the 150 ticks owed a frame, in frames 0.61 to 0.92
+  the length of the 1x frames. The shortfall is the budget's, so the cap
+  decides the verdict, and it has more than one defensible form (half of the
+  lesser of 50 times the 1x and the speed the budget fits; the lesser of 25
+  times the 1x and that speed; the ratio where the budget is free and the
+  gate's fill where it binds), and the planted control's form follows it: a
+  per-frame busy-wait outside physics lowers the speed the budget fits at
+  those frames as much as it lowers 50x, so it fails only a bar whose cap is
+  counted in ticks a frame. Returned as a fork; the control is unchanged on
+  this branch. Merge of main `a45bada7` (`31e981b3`): weave's result matches
+  `git merge-file` on the one file both sides changed (this plan); the root
+  lock is main's; the web lock (`be7d16e9`) holds `--locked` offline, nothing
+  resolved or fetched; bundle `4c53d531`. The viewer cone has not reached
+  main, so the worker's three `web.rs` lines stay where they are. Gates at
+  `31e981b3`: seiche 129/129 (123 without actor, 129 + 3 with gpu), graphshell
+  `web` 249, mere and graphshell checked clean; pictograph 308 of 310 at 100%
+  CPU, its suite taking 1,200 s, not 122. The two misses were both timing.
+  `source_time_canvas_keeps_live_graph_and_arrangement_while_previewing_a_journal_prefix`
+  compares two snapshots whose `timestamp_secs` differed by one second, and
+  passed three of three on rerun.
+  `fast_forward_on_the_canvas_stops_at_the_budget_and_reports_the_speed`, its
+  worst frame 10.9 ms against a 4.4 ms budget, passed two of three on rerun
+  under load beside 22 other lanes' builds, the third missing at 23.8 ms
+  against 2.65; passes under load count. The dial rows on `4c53d531`, the 50x
+  control left out, none calm (12 to 34 other lanes' Normal-priority builds,
+  87 to 100% CPU; each rerun's ten-minute calm wait timed out), passes under
+  load counting: slow on its rerun, its first run reaching 0.141 against 0.15
+  beside 18 builds; fast on its rerun, Max 1.50 times the page's 1x (0.149
+  against 0.099) with the every-window bound held, its first run 1.56 times
+  but one frame's admitted ticks 1,570 us past the budget beside 14 builds;
+  the slowed-Max control missing as planted (0.665 of the page's 1x); the
+  planted stall failing the bound for its stall on its rerun (8,767 us over),
+  its first run catching no stall inside an admitted span (worst 562 us,
+  against the 1,000 it asserts) beside 28 builds; the tree Speed select on its
+  rerun, its first run one frame 368 us over beside 34 builds; the physics
+  Speed select on its first run.
