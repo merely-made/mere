@@ -21,6 +21,7 @@ use std::panic::{AssertUnwindSafe, catch_unwind};
 use genet_scripted_dom::NodeId;
 use mere_surface_api::{SurfaceAvailability, SurfaceDescriptor, SurfaceUnavailableReason};
 use meristem::View;
+use sprigging::LeafRegistry;
 
 use crate::{
     DomHandle, FocusExit, GenetAppRunner, GenetCtx, GenetElement, HoverEvent, KeyEvent,
@@ -95,6 +96,17 @@ pub trait RetainedSurfaceSession {
         let _ = exits;
         false
     }
+
+    /// The session's own leaf registry, for a session whose document places
+    /// custom leaves. The host paints and projects this session's document
+    /// against it, and keeps the session's rendered-leaf cache apart too, so
+    /// two sessions that use the same leaf key each get their own leaf. Keys
+    /// stay as the product wrote them. The provided method returns `None`: the
+    /// session places no leaves of its own. Added 2026-10-07 (per-session
+    /// registries, ruled by Mark); additive to v1.
+    fn leaves(&mut self) -> Option<&mut LeafRegistry<u64>> {
+        None
+    }
 }
 
 /// A generic retained-session wrapper around one concrete [`GenetAppRunner`].
@@ -117,6 +129,7 @@ where
     viewport: Option<SurfaceViewport>,
     viewport_sync: ViewportSync,
     action_effects: ActionEffects,
+    leaves: Option<LeafRegistry<u64>>,
 }
 
 impl<State, Logic, V, Action, ViewportSync, ActionEffects>
@@ -143,7 +156,15 @@ where
             viewport: None,
             viewport_sync,
             action_effects,
+            leaves: None,
         }
+    }
+
+    /// Give the session its own leaf registry, holding the leaves its view
+    /// places with `custom_leaf`. See [`RetainedSurfaceSession::leaves`].
+    pub fn with_leaves(mut self, leaves: LeafRegistry<u64>) -> Self {
+        self.leaves = Some(leaves);
+        self
     }
 
     fn effects(&mut self, actions: Vec<Action>) -> Vec<SurfaceEffect> {
@@ -253,6 +274,10 @@ where
     fn set_focus_exits(&mut self, exits: bool) -> bool {
         self.runner.set_focus_exits(exits);
         true
+    }
+
+    fn leaves(&mut self) -> Option<&mut LeafRegistry<u64>> {
+        self.leaves.as_mut()
     }
 }
 
@@ -424,6 +449,24 @@ impl<S: RetainedSurfaceSession> RetainedSurfaceSession for ContainedSession<S> {
             Err(payload) => {
                 self.record("set_focus_exits", payload);
                 false
+            },
+        }
+    }
+
+    /// A failed session's leaves are no longer the host's to paint.
+    fn leaves(&mut self) -> Option<&mut LeafRegistry<u64>> {
+        if self.failed() {
+            return None;
+        }
+        // Asked twice: a borrow returned out of one arm of the match below
+        // would keep `self` borrowed in the arm that records the failure.
+        let session = &mut self.session;
+        match catch_unwind(AssertUnwindSafe(move || session.leaves().is_some())) {
+            Ok(true) => self.session.leaves(),
+            Ok(false) => None,
+            Err(payload) => {
+                self.record("leaves", payload);
+                None
             },
         }
     }
@@ -754,5 +797,79 @@ mod tests {
         assert_eq!(root_text(&second_dom, second_root), "second:10:0");
         assert_eq!(second.failure(), None);
         assert_eq!(second.availability(), SurfaceAvailability::Available);
+    }
+
+    /// A leaf the test can tell apart from another under the same key.
+    struct Tagged(&'static str);
+
+    impl sprigging::Leaf for Tagged {
+        fn measure(
+            &mut self,
+            _known: sprigging::SizeHint,
+            _available: sprigging::SizeHint,
+        ) -> sprigging::Size {
+            sprigging::Size {
+                width: 1.0,
+                height: 1.0,
+            }
+        }
+
+        fn paint(&mut self, _cx: &mut sprigging::PaintCx<'_>) {}
+
+        fn paint_dirty(&self) -> bool {
+            false
+        }
+    }
+
+    /// Two sessions that place a leaf under the same key each keep their own
+    /// leaf, because each owns its registry. The control: one registry shared
+    /// between them holds one leaf per key, so one session would paint the
+    /// other's.
+    #[test]
+    fn sessions_keep_their_own_leaves_under_a_shared_key() {
+        const KEY: u64 = 0x5753_4642;
+        let session = |name: &'static str| {
+            let mut leaves = LeafRegistry::new();
+            leaves.insert(KEY, Box::new(Tagged(name)));
+            let runner = GenetAppRunner::new(
+                fresh_dom(),
+                first_view,
+                First {
+                    count: 0,
+                    width: 0.0,
+                },
+            );
+            ContainedSession::new(
+                RunnerSurfaceSession::new(
+                    descriptor(name),
+                    runner,
+                    |_: &First| SurfaceAvailability::Available,
+                    |_: &mut First, _| {},
+                    |_action: ()| Vec::new(),
+                )
+                .with_leaves(leaves),
+            )
+        };
+        let mut sessions = [session("example.a"), session("example.b")];
+        let painted: Vec<&'static str> = sessions
+            .iter_mut()
+            .map(|session| {
+                session
+                    .leaves()
+                    .and_then(|leaves| leaves.get_mut_as::<Tagged>(&KEY))
+                    .map(|leaf| leaf.0)
+                    .expect("each session holds its leaf")
+            })
+            .collect();
+        assert_eq!(painted, ["example.a", "example.b"]);
+
+        let mut shared = LeafRegistry::new();
+        shared.insert(KEY, Box::new(Tagged("example.a")));
+        shared.insert(KEY, Box::new(Tagged("example.b")));
+        assert_eq!(
+            shared.get_mut_as::<Tagged>(&KEY).map(|leaf| leaf.0),
+            Some("example.b"),
+            "control: a shared registry lets the second session's leaf replace the first's"
+        );
     }
 }
