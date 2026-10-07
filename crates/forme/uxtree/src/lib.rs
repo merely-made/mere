@@ -334,6 +334,7 @@ fn project_block(block: &Block, path: &str, nodes: &mut Vec<(NodeId, Node)>) -> 
             summary,
             article_url,
             source_url,
+            ..
         } => {
             let mut n = Node::new(Role::Article);
             n.set_label(title.clone());
