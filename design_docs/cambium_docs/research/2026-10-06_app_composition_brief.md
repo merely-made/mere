@@ -716,6 +716,15 @@ controller in `pelt-core`) and S8 (page accessibility).
   containment, key namespaces, AC5's reservations and E1, beside its
   `pelt-core` work (Turnstone U11). Record:
   `turnstone/design_docs/2026-10-06_unusual_protocols_browser_plan.md`, §7.
+- **Leaf keys (Turnstone U17).** Asked once the lane found that no
+  contributed session hands leaves to a host yet: per-session registries,
+  namespaced keys in one host registry, or both. Mark: **"Per-session
+  registries (Recommended)"**. *Follows:* this refines AC5's "keys carry a
+  per-session namespace" for retained sessions. Each session owns its leaf
+  registry through the seam and keys stay as written; a namespace returns
+  only if forest mounts come to share one registry. Producers stay host-side
+  for now: `ProducerRegistry` lives in `cambium-rootstock`, above the seam,
+  and holds the host's device.
 
 ## 10. Cross-references
 
