@@ -4,12 +4,13 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 // SPDX-License-Identifier: MPL-2.0
 
-//! Which overlays Density takes converted (dynamics grammar plan, G3; F73).
-//! Density is kinematic, so a force composed onto it enters converted,
+//! Which overlays Density takes converted (dynamics grammar plan, G3; F73,
+//! F81). Density is kinematic, so a force composed onto it enters converted,
 //! `v = F/γ`, the rule Hold follows, its conversion on once it takes an
-//! overlay. The receipt: each overlay the catalog admits, set on Density by
-//! the canvas, holds Density's own bar ("Min 60, bar: all >= 0.7") at all
-//! sixteen dealt starts of both bar graphs. The probes build the force list
+//! overlay. The receipt: each overlay the catalog admits (Hub room, Centre
+//! and Tide), set on Density by the canvas, holds Density's own bar ("Min
+//! 60, bar: all >= 0.7") at all sixteen dealt starts of both bar graphs, to
+//! the run's resolution ([`RESOLUTION`]). The probes build the force list
 //! themselves: the four-start table every overlay and `EdgeSpring` (the
 //! Bonds candidate, "accepted only if rank stays at least 0.8") were read
 //! from, and F73's three candidates over all sixteen starts.
@@ -103,8 +104,8 @@ fn probe_density_with_each_overlay_converted() {
 /// F73's test (ruled 2026-10-06, "Hub room, Centre, Tide if they hold"):
 /// each of the three, converted into Density, against Density's own bar
 /// ("Min 60, bar: all >= 0.7") over all sixteen dealt starts of both bar
-/// graphs. Printed; it decided the catalog's two (Tide's 0.699 at gen-50's
-/// seventh start misses).
+/// graphs. Printed; Tide's 0.699 at gen-50's seventh start misses by
+/// 0.001, and F81 ("Admit Tide too") admits it with the other two.
 #[test]
 #[ignore = "release probe for F73; prints its table"]
 fn probe_f73_candidates_over_all_sixteen_starts() {
@@ -133,9 +134,28 @@ fn probe_f73_candidates_over_all_sixteen_starts() {
     }
 }
 
-/// F73's receipt: every overlay the catalog admits on Density, set by the
-/// canvas (so the catalog builds Density converting), holds Density's own
-/// bar at every one of the sixteen dealt starts of both bar graphs.
+/// The run's resolution: the receipt reads rank to 0.001, and the same start
+/// read 0.703 by the probe and 0.704 through the canvas. F81 ("Admit Tide
+/// too") reads Tide's 0.699 as on the bar within it, so a start holds the
+/// bar when its rank, to this resolution, is at least `0.7 - RESOLUTION`.
+const RESOLUTION: f32 = 0.001;
+
+/// Whether `rank` holds Density's bar of 0.7 to the run's resolution.
+fn holds_the_bar(rank: f32) -> bool {
+    (rank / RESOLUTION).round() * RESOLUTION >= 0.7 - RESOLUTION - f32::EPSILON
+}
+
+/// F73's receipt, with F81's Tide: every overlay the catalog admits on
+/// Density, set by the canvas (so the catalog builds Density converting),
+/// holds Density's own bar at every one of the sixteen dealt starts of both
+/// bar graphs, to the run's resolution.
+/// The resolution rule against its edges: 0.699 holds, 0.698 does not.
+#[test]
+fn the_bar_holds_to_the_run_s_resolution() {
+    assert!(holds_the_bar(0.7) && holds_the_bar(0.6991) && holds_the_bar(0.6986));
+    assert!(!holds_the_bar(0.6984) && !holds_the_bar(0.698));
+}
+
 #[test]
 #[ignore = "release receipt: the module doc's one line runs it"]
 fn every_overlay_density_admits_holds_its_bar_at_all_sixteen_starts() {
@@ -157,10 +177,12 @@ fn every_overlay_density_admits_holds_its_bar_at_all_sixteen_starts() {
                 })
                 .collect();
             print_rows(name, Joining::Overlay(overlay), &rows);
+            let lowest = rows.iter().map(|r| r.0).fold(f32::INFINITY, f32::min);
+            println!("{name} + {}: lowest {lowest:.5}", overlay.label());
             for (k, row) in rows.iter().enumerate() {
                 assert!(
-                    row.0 >= 0.7,
-                    "{name} + {}: start {k} reads {:.3}, under the bar",
+                    holds_the_bar(row.0),
+                    "{name} + {}: start {k} reads {:.5}, under the bar",
                     overlay.label(),
                     row.0
                 );

@@ -601,8 +601,8 @@ fn a_whole_choice_applies_with_one_rebuild_and_reads_back() {
     assert_eq!(canvas.physics_profile_id(), None);
 }
 
-/// Density takes only the overlays that hold its bar converted (F73: Hub
-/// room and Centre, of the three it named) and refuses the rest, with a reason, through every
+/// Density takes only the three overlays F73 named, converted (Hub room,
+/// Centre and Tide, F81), and refuses the rest, with a reason, through every
 /// setter: adding them, toggling one, switching to Density with some live,
 /// and a whole choice. Springs, the control, takes them all.
 #[test]
@@ -611,17 +611,33 @@ fn density_refuses_all_but_its_three_overlays_with_a_reason() {
     let mut canvas = Canvas::with_sample_graph();
     canvas.set_physics_law(PhysicsLaw::Density).unwrap();
     let refused = canvas
-        .set_physics_overlays(vec![PhysicsOverlay::GravityLocus, PhysicsOverlay::Tide])
+        .set_physics_overlays(vec![
+            PhysicsOverlay::GravityLocus,
+            PhysicsOverlay::Tide,
+            PhysicsOverlay::GridSnap,
+        ])
         .unwrap_err();
     assert_eq!(refused.law, PhysicsLaw::Density);
-    assert_eq!(refused.refused, [PhysicsOverlay::Tide]);
+    assert_eq!(refused.refused, [PhysicsOverlay::GridSnap]);
     assert!(
         refused
             .reason
-            .starts_with("Density takes only Hub room and Centre")
+            .starts_with("Density takes only Hub room, Centre and Tide")
+    );
+    assert_eq!(
+        canvas.physics_overlays(),
+        &[PhysicsOverlay::GravityLocus, PhysicsOverlay::Tide]
+    );
+    assert_eq!(
+        canvas.law_force_count(),
+        3,
+        "Density, the centre and the tide"
+    );
+    assert!(
+        !canvas.toggle_physics_overlay(PhysicsOverlay::Tide),
+        "toggled off"
     );
     assert_eq!(canvas.physics_overlays(), &[PhysicsOverlay::GravityLocus]);
-    assert_eq!(canvas.law_force_count(), 2, "Density and the centre");
     assert!(!canvas.toggle_physics_overlay(PhysicsOverlay::Skeleton));
     assert_eq!(canvas.physics_overlays(), &[PhysicsOverlay::GravityLocus]);
     assert!(canvas.toggle_physics_overlay(PhysicsOverlay::DegreeRepulsion));
