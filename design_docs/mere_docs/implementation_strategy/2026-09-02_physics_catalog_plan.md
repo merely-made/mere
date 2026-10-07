@@ -882,6 +882,20 @@ pull reading −0.33 with 510 overlaps):
     its bar is re-expressed relative to the same page's 1x run, as the fast
     receipt's is, so it scales with load (against a calm rerun, or merging
     and settling it afterwards).
+  *Ruled 2026-10-06, the 50x bar's form.* Run five times under load (1x, then
+  50x, on the same page), the ratios were 11.5, 21.7, 21.9, 21.9 and 29.5
+  against 25. The 3 ms budget bound in every run: of the 150 ticks owed each
+  frame, only 28 to 56 fit.
+  - Mark chose **"Half of the lesser"**: the bar is 0.5 × min(50 × the page's
+    1x, the speed the budget fits at this run's measured tick cost), using one
+    new snapshot field. This is against min(25 × 1x, the budget's speed) and
+    against splitting the bar by whether the budget binds. The old
+    `physics-budget-bound == false` assertion goes, and the every-window bound
+    stays.
+  - Mark chose **"Cap control; merge with the 50x work"**: the positive
+    control plants a cap so that 50x owes no more ticks a frame than 1x. Main
+    is merged once, together with the 50x change, including the full MPL
+    header for `web_period_worker.rs` under main's licence-header gate.
   The face offset, diagnosed (2026-10-04, `tree-face-zoom`): the face is
   drawn right and the body wrong, on both pages. Pictograph's gnode style
   scales each body about its centre (the CSS default Livery follows since
