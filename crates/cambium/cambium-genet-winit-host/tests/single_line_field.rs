@@ -109,6 +109,19 @@ fn size(host: &Host) -> (f32, f32) {
     (width, height)
 }
 
+fn sizing_style(host: &Host) -> Vec<(&'static str, Option<String>)> {
+    [
+        "position",
+        "width",
+        "contain",
+        "contain-intrinsic-size",
+        "font-size",
+    ]
+    .into_iter()
+    .map(|property| (property, host.computed_value(field(host), property)))
+    .collect()
+}
+
 /// Focus the field with a click near its left edge.
 fn focus(host: &mut Host) {
     let (x, y, _, height) = host.painted_rect(field(host)).expect("the field paints");
@@ -139,11 +152,15 @@ fn a_long_value_stays_on_one_line_at_the_width_the_sheet_sets() {
 
 #[test]
 fn a_field_with_no_width_keeps_its_own_whatever_the_value() {
-    let short = size(&host("notes.djot", UNSIZED));
-    let long = size(&host(LONG, UNSIZED));
+    let short_host = host("notes.djot", UNSIZED);
+    let long_host = host(LONG, UNSIZED);
+    let short = size(&short_host);
+    let long = size(&long_host);
     assert_eq!(
-        short.0, 178.0,
-        "the former 20-column default plus padding and border"
+        short.0,
+        178.0,
+        "the former 20-column default plus padding and border; resolved {:?}",
+        sizing_style(&short_host)
     );
     assert_eq!(long, short, "the value does not set the field's size");
 }
@@ -151,10 +168,12 @@ fn a_field_with_no_width_keeps_its_own_whatever_the_value() {
 #[test]
 fn a_host_can_set_the_unsized_fields_intrinsic_width() {
     let sheet = format!("{UNSIZED} [role=\"textbox\"] {{ --cambium-field-intrinsic-width:12em; }}");
+    let host = host(LONG, &sheet);
     assert_eq!(
-        size(&host(LONG, &sheet)).0,
+        size(&host).0,
         210.0,
-        "the host's 12em fallback plus padding and border"
+        "the host's 12em fallback plus padding and border; resolved {:?}",
+        sizing_style(&host)
     );
 }
 

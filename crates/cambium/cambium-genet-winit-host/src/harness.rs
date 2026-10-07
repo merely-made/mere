@@ -381,6 +381,12 @@ where
         layout.painted_rect(&*dom_ref, node)
     }
 
+    /// Read a resolved CSS property from the host's live layout, for assertions
+    /// that distinguish style resolution from the resulting painted geometry.
+    pub fn computed_value(&self, node: NodeId, property: &str) -> Option<String> {
+        self.host.s.layout.as_ref()?.computed_value(node, property)
+    }
+
     /// The cursor position the harness last delivered.
     pub fn cursor(&self) -> (f32, f32) {
         self.host.s.cursor
