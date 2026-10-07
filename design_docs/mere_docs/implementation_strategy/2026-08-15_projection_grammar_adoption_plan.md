@@ -1621,6 +1621,13 @@ is that objective's assessment.
   This plan gains A1's note on the old `Hold::Anchored`, which named the
   seeded role, and the mer3ly finding. Doc-only; no code moved.
 
+- 2026-10-07: **handed off.** Asked what a projection grammar handoff should
+  cover (the whole lane; mer3ly's site canvas plan only; the mere grammar docs
+  only), Mark answered "mere grammar docs only". The
+  [projection grammar handoff](../research/2026-10-07_projection_grammar_handoff.md)
+  covers this plan and the catalog: who owns which sections, the open and gated
+  targets, the rulings carried in, and the cross-session agreements.
+
 ## 2026-09-05 practice workspace browser proof
 
 The current-tree Graphshell practice proof gives one disclosed Woodshed
