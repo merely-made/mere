@@ -73,8 +73,15 @@ fn multi() -> (Multi, ProjectionId, ProjectionId) {
 fn multi_with(
     hooks: HostHooks<App, Logic, Child, WindowTree<App, Logic, Child>>,
 ) -> (Multi, ProjectionId, ProjectionId) {
+    multi_with_sheet(hooks, SHEET)
+}
+
+fn multi_with_sheet(
+    hooks: HostHooks<App, Logic, Child, WindowTree<App, Logic, Child>>,
+    sheet: &str,
+) -> (Multi, ProjectionId, ProjectionId) {
     let mut shared = AppShared::default();
-    shared.sheet = SHEET.into();
+    shared.sheet = sheet.into();
     let mut multi = MultiHost::new(App::default(), shared, hooks);
     let open = |multi: &mut Multi, label: &'static str, zoom: f32| {
         let s = HostState::new();
@@ -309,6 +316,39 @@ fn each_windows_accessibility_tree_is_its_own_subtree() {
     assert!(
         seen_a.is_disjoint(&seen_b),
         "no accessible node is in both windows"
+    );
+}
+
+/// What a person cannot perceive is not projected (genet d851a9db0cd's styled
+/// projection, mer3ly Ruling 114): a `visibility: hidden` button leaves the
+/// tree the host syncs, while the same button under the plain sheet is in it.
+#[test]
+fn a_hidden_element_leaves_the_accessibility_tree() {
+    let projected = |sheet: &str| {
+        let (mut multi, a, _) = multi_with_sheet(HostHooks::inert(), sheet);
+        let seen = Rc::new(std::cell::RefCell::new(HashSet::new()));
+        multi
+            .with_window(a, |h| h.s.a11y = Some(Box::new(Recording(seen.clone()))))
+            .unwrap();
+        layout_at(&mut multi, a, 400.0, 300.0);
+        multi.with_window(a, |h| h.sync_a11y()).unwrap();
+        let dom = multi.dom();
+        let d = dom.borrow();
+        let root = multi.window_root(a).unwrap();
+        let id = |needle| d.opaque_id(find(&d, root, needle).unwrap());
+        let seen = seen.borrow();
+        (seen.contains(&id("window A")), seen.contains(&id("count")))
+    };
+    assert_eq!(
+        projected(SHEET),
+        (true, true),
+        "the control: a visible button is projected"
+    );
+    let hidden = format!("{SHEET} button {{ visibility: hidden; }}");
+    assert_eq!(
+        projected(&hidden),
+        (true, false),
+        "a visibility: hidden button is not"
     );
 }
 
