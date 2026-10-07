@@ -359,6 +359,31 @@ macro_rules! e1a_against {
                 assert_eq!(log.0, [Some("B count 0".to_string())]);
             }
 
+            /// Focus moving from one held guest to another, whose own focus
+            /// changes in the same frame, is one move: no stop at the
+            /// destination's stale focus, and none at the guest being left.
+            #[test]
+            fn focus_between_held_guests_is_one_move() {
+                let mut host = Host::new();
+                host.focus = Focus::Pane(Pane::A);
+                let (mut tree, mut grafts) = open(&host);
+                assert_eq!(focus_label(&tree).as_deref(), Some("A field"));
+
+                host.focus = Focus::Pane(Pane::B);
+                let mut log = FocusLog::default();
+                for update in grafts.frame(host.composition()) {
+                    tree.update_and_process_changes(update, &mut log);
+                }
+                assert_eq!(log.0, [Some("B count 0".to_string())]);
+
+                host.focus = Focus::Host;
+                let mut log = FocusLog::default();
+                for update in grafts.frame(host.composition()) {
+                    tree.update_and_process_changes(update, &mut log);
+                }
+                assert_eq!(log.0, [Some("host".to_string())]);
+            }
+
             /// Done-condition 3: a Click addressed to B's tree reaches B's
             /// button; A's node with the same id is untouched.
             #[test]

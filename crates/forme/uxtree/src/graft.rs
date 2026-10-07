@@ -200,13 +200,15 @@ impl Composition {
 /// What one adapter holds between frames: the subtrees it has received, the
 /// host's root, and the host focus it last applied.
 ///
-/// AccessKit refuses focus on a graft whose subtree it has not received, and
-/// a graft must exist before its subtree. So a frame that grafts a new guest
-/// and focuses it in one go cannot send the host's focus with the host's
-/// update. [`frame`](Self::frame) sends the host's update with the focus it
-/// last applied, then the new guests, then one focus-only update, then the
-/// guests the adapter already holds, so the screen reader hears one focus
-/// move.
+/// A screen reader hears every change of the effective focus, which follows
+/// the host's focus through a graft to that guest's own focus. When the host
+/// moves its focus into a guest, the host's update cannot carry the move: the
+/// guest's subtree may not exist yet (AccessKit refuses focus on a graft
+/// without one), and if it does, its focus is last frame's until the guest's
+/// own update arrives. [`frame`](Self::frame) therefore keeps the focus it
+/// last applied in the host's update, sends the guest the focus moves into,
+/// then moves the focus with one focus-only update, then sends the rest. The
+/// reader hears one move.
 #[derive(Clone, Debug, Default)]
 pub struct Grafts {
     live: HashSet<TreeId>,
@@ -241,14 +243,17 @@ impl Grafts {
     /// The frame's updates in the order the adapter must apply them:
     ///
     /// 1. the host's, so every graft exists before its subtree arrives;
-    /// 2. each guest the adapter does not hold yet;
-    /// 3. if the host's focus is on one of those, one update that moves the
-    ///    focus there;
-    /// 4. each guest the adapter already holds, so a guest that loses the
-    ///    focus this frame changes its own focus only after the focus has
-    ///    left it.
+    /// 2. each guest the adapter does not hold yet, and the guest the host's
+    ///    focus moves into this frame;
+    /// 3. if the focus moves into a guest, one update that moves it there;
+    /// 4. every other guest, so a guest that loses the focus changes its own
+    ///    focus only after the focus has left it.
     ///
-    /// Within 2 and 4, guests keep the composition's order.
+    /// While the focus moves into a guest, the host's update in 1 keeps the
+    /// focus last applied if that node is in this frame's host update, and
+    /// otherwise the host's root. A host that sends its whole tree each frame
+    /// therefore always gets one move. Within 2 and 4, guests keep the
+    /// composition's order.
     pub fn frame(&mut self, composition: Composition) -> Vec<TreeUpdate> {
         let Composition { mut host, guests } = composition;
         if let Some(tree) = &host.tree {
@@ -256,10 +261,11 @@ impl Grafts {
         }
         let grafts = grafted(&host);
         let wanted = host.focus;
-        let waits = grafts
+        let entering = grafts
             .get(&wanted)
-            .is_some_and(|tree| !self.live.contains(tree));
-        if waits {
+            .copied()
+            .filter(|tree| self.focus != Some(wanted) || !self.live.contains(tree));
+        if entering.is_some() {
             let still_there = |id: &NodeId| {
                 host.nodes.iter().any(|(node_id, node)| {
                     node_id == id && node.tree_id().is_none_or(|tree| self.live.contains(&tree))
@@ -272,14 +278,18 @@ impl Grafts {
                 .unwrap_or(wanted);
         }
         let host_tree = host.tree_id;
-        let (held, new): (Vec<_>, Vec<_>) = guests
-            .into_iter()
-            .partition(|guest| self.live.contains(&guest.tree_id));
-        self.live = held.iter().chain(&new).map(|guest| guest.tree_id).collect();
-        let mut updates = Vec::with_capacity(held.len() + new.len() + 2);
+        let (first, rest): (Vec<_>, Vec<_>) = guests.into_iter().partition(|guest| {
+            !self.live.contains(&guest.tree_id) || Some(guest.tree_id) == entering
+        });
+        self.live = first
+            .iter()
+            .chain(&rest)
+            .map(|guest| guest.tree_id)
+            .collect();
+        let mut updates = Vec::with_capacity(first.len() + rest.len() + 2);
         updates.push(host);
-        updates.extend(new);
-        if waits {
+        updates.extend(first);
+        if entering.is_some() {
             updates.push(TreeUpdate {
                 nodes: Vec::new(),
                 tree: None,
@@ -287,7 +297,7 @@ impl Grafts {
                 focus: wanted,
             });
         }
-        updates.extend(held);
+        updates.extend(rest);
         self.focus = Some(wanted);
         updates
     }
