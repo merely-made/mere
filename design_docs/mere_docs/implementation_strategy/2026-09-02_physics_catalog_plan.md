@@ -1,7 +1,7 @@
 # Physics Catalog Plan
 
 **Date:** 2026-09-02
-**Status (2026-10-06):** in progress. P1 landed 2026-09-02; P1b, P2 on both hosts and P3 the remote board 2026-09-03; the runtime extraction 2026-09-04; P4's web half 2026-09-04, closing with the Graphshell tree port per the 2026-10-01 rulings in §5. P5a-c (kernel, cell list, lagged seam, setters and the web tree at the third-round web defaults, receipts green) merged 2026-10-02 (`8022cedd`); turnstone's wiring and P5d remain. P6a, Density's CPU tier, merged 2026-10-04 (`9b576c84`); P6b, the GPU tier, and P6c, its receipts, remain. Orbit's retune (`9ce5889f`) and Energy's, with the view following while playing (`562488b0`), merged 2026-10-04. Seiche's speed dial, the native entry point and the 1x-floor bound merged 2026-10-06 (`c6e8cc09`, calm round 24 of 24); the period estimator and its worker tiebreaker are on `seiche-speed-estimator`, not merged, and turnstone's repin and speed wiring follow the dial's merge (Progress, 2026-10-05). P7 moved to the [dynamics grammar plan](2026-10-02_dynamics_grammar_plan.md) 2026-10-02.
+**Status (2026-10-07):** in progress. P1 landed 2026-09-02; P1b, P2 on both hosts and P3 the remote board 2026-09-03; the runtime extraction 2026-09-04; P4's web half 2026-09-04, closing with the Graphshell tree port per the 2026-10-01 rulings in §5. P5a-c (kernel, cell list, lagged seam, setters and the web tree at the third-round web defaults, receipts green) merged 2026-10-02 (`8022cedd`); turnstone's wiring and P5d remain. P6a, Density's CPU tier, merged 2026-10-04 (`9b576c84`); P6b, the GPU tier, and P6c, its receipts, remain. Orbit's retune (`9ce5889f`) and Energy's, with the view following while playing (`562488b0`), merged 2026-10-04. Seiche's speed dial, the native entry point and the 1x-floor bound merged 2026-10-06 (`c6e8cc09`, calm round 24 of 24); the period estimator and its worker tiebreaker are integrated with the viewer cone on `viewer-cone`, not yet main, and turnstone's repin and speed wiring follow the dial's merge (Progress, 2026-10-05). P7 moved to the [dynamics grammar plan](2026-10-02_dynamics_grammar_plan.md) 2026-10-02.
 **Scope:** A catalog of *distinct physics layout laws* — dynamical systems
 over the graph's bodies that produce different layouts because they are
 different physics — as a lever beside the arrangement catalog, plus the
@@ -3120,3 +3120,24 @@ binning are the useful patterns.
   against the 1,000 it asserts) beside 28 builds; the tree Speed select on its
   rerun, its first run one frame 368 us over beside 34 builds; the physics
   Speed select on its first run.
+
+- 2026-10-07 (viewer cone review, at Mark's request after the other sessions
+  exhausted their capacity). Integrated `seiche-speed-estimator` at `4b916a2e`
+  into the cone (`8175b69e`) on main baseline `a59e4c47`. The worker module
+  stays shared; its field, feed and start call move into `web_main.rs`. The
+  tree's worker remains intact, as do the newer session seam and E1a. The root
+  Cargo lock is unchanged. No merge into main or rewriting of the other lane.
+  Source review found that the effective-speed meter retains 32 frames across
+  speed changes: the old short warmups mixed 1x and selected-speed samples.
+  `c91f7b85` warms both phases for a full window in the four relative-speed
+  receipts, preserving every assertion and the ruled bars. After that warmup,
+  the 500 ms slowed-Max plant still ran 2.571 times 1x on the ThinkPad; that
+  plant is insufficient as a control at steady state. `dd41d322` documents a
+  3000 ms configured plant with the same <= 0.99 assertion. The old run is
+  retained as a failed control, not a product failure. Fresh builds, receipts
+  and the final control verdict live in
+  `mer3ly/docs/handoffs/2026-10-07_viewer_cone/RESUME.md#candidate-review`.
+  Focused native `graphshell --no-default-features --features web --lib`
+  passes 117 tests (4 ignored); all eight wasm32 feature configurations pass
+  with warnings. These are bounded current gates, separate from the earlier
+  broad native and GPU receipts.
