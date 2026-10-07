@@ -62,6 +62,12 @@ Mark opened the lane: "i'm most curious about scenograph, honestly. wallpapers, 
 - **SE16, flushing.** Options: persist after each save; a general flush policy first. Mark: **"Persist after each save (Recommended)"**. *Follows:* a projection save persists the session at once. Whether scene saves are lost on reload is checked at runtime and reported as next door, not fixed here.
 - **SE17, proving undo.** Options: a native test only; a session undo control. Mark: **"Add a session undo control"**. *Follows:* the web host gains session Undo and Redo over `MereHost::undo` and `redo`, beside the editor's own, and the headed check uses it.
 
+**SE18 to SE21, scoping SE17 (2026-10-07).** Mark, on SE17: "Hmmm. That last one… we should scope". Evidence put: pandect's undo is per author, an author is a persona plus a channel (`via`), and every change the web host makes goes through `"graphshell"` (addresses, file metadata, scene saves, detail edits, and now projection saves), while extension captures come through their own channel; so `undo("graphshell")` reverses Graphshell's latest change of any kind. `Reverted.kept` names parts another author changed since.
+- **SE18, what it reaches.** Options: editor saves only, through their own channel; all of Graphshell's changes; both, as two controls. Mark: **"Both, as two controls"**. *Follows:* projection saves go through their own channel, `graphshell.projection-editor`, and the editor offers Undo save and Redo save over that channel alone; a host-wide session Undo and Redo reaches `"graphshell"`'s changes.
+- **SE19, where it sits.** Options: in the editor, named apart; in Graphshell's chrome. Mark: **"In Graphshell's chrome"**. *Reading, not ruled:* this places the host-wide pair, since SE18's two-control option put Undo save in the editor.
+- **SE20, the open draft.** Options: reload it as a draft step; reload fresh; leave it alone. Mark: **"Reload it as a draft step (Recommended)"**. *Follows:* after an undo or redo of a save, the editor takes the stored definition as one step on its own history and reads clean against the store.
+- **SE21, kept parts.** Options: the status names them; not surfaced yet. Mark: **"Status names them (Recommended)"**. *Follows:* the status says what was kept and who changed it.
+
 ## 2. Tracks
 
 E1 and E2 carry ruling A; E3 to E5 carry ruling B. E2 needs E1; E4 needs E3; E5 needs E2 and E4. *Added 2026-10-07:* E2b carries SE11 and SE12, after E2.
@@ -101,7 +107,7 @@ Done when:
 - a session undo after a save restores the previous saved definition, attributed to its author;
 - a headed check in real Chromium saves, reloads and finds the definition.
 
-*Amended 2026-10-07 (SE14 to SE17):* the definition lives at `mere://projection/<id>` under a `graphshell.projection-definition/v1` facet; the executable path moves too, its facet holding the selected occurrence; each save persists at once; and the web host gains session Undo and Redo, which the headed check drives.
+*Amended 2026-10-07 (SE14 to SE17):* the definition lives at `mere://projection/<id>` under a `graphshell.projection-definition/v1` facet; the executable path moves too, its facet holding the selected occurrence; each save persists at once; and the web host gains session Undo and Redo, which the headed check drives. *Amended again (SE18 to SE21):* two controls, the editor's Undo save over the `graphshell.projection-editor` channel and a host-wide pair in Graphshell's chrome; an undone or redone save reloads the draft as one step; kept parts are named in the status.
 
 ### E3 — the option declaration type (B, SE7)
 
