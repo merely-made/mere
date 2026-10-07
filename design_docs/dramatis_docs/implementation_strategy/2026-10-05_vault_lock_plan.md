@@ -998,3 +998,23 @@ unlock follow-through, and non-Windows startup unlock backends, from the
   - Linux starts locked and waits for the native or terminal prompt, with
     no OS-held root (ruling 42);
   - macOS joins with the pairing plan's D2 (ruling 22).
+
+**2026-10-06, the transport's seed path landed** (`83b06806`, merging
+`ed741806`, `01b4f632`, `de91e5cf` and `d636a125`; rulings 51, 52 and 54):
+- After bind, nothing in the transport asks p2panda's actor for iroh's
+  endpoint.
+- With `endpoint_addr` reverted to the actor path (the lane's
+  measurement), 392 came back in 11 of 15 gossip runs. That makes it a
+  control for the measurement, not for the test's verdict, because 392 is
+  in p2panda-net's own baseline.
+- **Verified in `mere-verify`:**
+  - at `d636a125`: the transport suite 3 of 3; the dialling test that
+    failed once for the lane, 5 of 5; the residue test; graphshell 191;
+    djinn 91; the gate;
+  - the gate again on the merge with `main` `b2cabfca`. The tree that
+    landed is that merge.
+- Knot `ef89a18` compiles against it with no errors (the lane's lockstep
+  run).
+- **Ruling 50's precondition is met.** The Knot lane's P1 work is in
+  `ef89a18`, which is Knot's origin/main and djinn's pin. Knot's own mere
+  rows are at `e0cea3e0`, which predates the borrowing entry points.
