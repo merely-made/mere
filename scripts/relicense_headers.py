@@ -21,6 +21,9 @@ Modes:
   --apply     write the changes
   --audit     counts per repository (manifests by license, unheaded owned
               sources, Exhibit B hits, LICENSE files present)
+  --check     the gate: exit 1 if an owned source lacks Exhibit A or carries
+              Exhibit B (index-based, about a second; stack seams plan S80)
+  --self-test planted defects must fail --check and a clean fixture pass it
 
 Line endings are preserved per file. Rerunning --apply is a no-op.
 """
@@ -31,6 +34,7 @@ import argparse
 import re
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 NOTICE = "Mark Alan Boykin"
@@ -312,6 +316,92 @@ def cmd_audit(repo):
     print("ledger paths         %d  %s" % (len(skips), skips))
 
 
+def header_violations(repo):
+    """Owned tracked sources without Exhibit A, and those carrying Exhibit B.
+
+    The same file set and test as --audit, read through `git grep` rather
+    than file by file, so it is fast enough to gate on. Returns two sorted
+    lists of repository-relative POSIX paths.
+    """
+    skips = load_ledger(repo)
+    specs = ["*" + ext for ext in COMMENT]
+
+    def grep(mode, needle):
+        r = subprocess.run(
+            ["git", "-C", str(repo), "grep", mode, "-z", "-F", "-e", needle, "--"] + specs,
+            capture_output=True, text=True, encoding="utf-8")
+        # git grep exits 1 when it lists nothing.
+        if r.returncode not in (0, 1):
+            raise RuntimeError("git grep failed in %s: %s" % (repo, r.stderr.strip()))
+        return sorted(p for p in r.stdout.split("\0")
+                      if p and Path(p).suffix in COMMENT and not skipped(Path(p), skips))
+
+    return grep("-L", COVERED_MARK), grep("-l", EXHIBIT_B)
+
+
+def cmd_check(repo):
+    unheaded, exhibit_b = header_violations(repo)
+    for p in unheaded:
+        print("  without Exhibit A  " + p)
+    for p in exhibit_b:
+        print("  Exhibit B notice   " + p)
+    if unheaded or exhibit_b:
+        print("header check FAILED: %d without Exhibit A, %d with Exhibit B. "
+              "Run --apply on a clean tree, or ledger third-party and frozen "
+              "paths in LICENSES.md." % (len(unheaded), len(exhibit_b)))
+        return 1
+    print("header check passed: every owned source carries Exhibit A, none Exhibit B")
+    return 0
+
+
+def self_test():
+    """A passing check is evidence only if the check can fail: planted defects
+    must be reported exactly, and repairing them with this tool must reach zero."""
+    rs_header = "\n".join(build_header("//", False))
+    fixture = {
+        "src/headed.rs": rs_header + "\n\nfn a() {}\n",
+        "src/bare.rs": "fn b() {}\n",
+        # the short form most of S45's files carried: SPDX is not Exhibit A
+        "src/short.rs": "// Copyright 2026 Mark Alan Boykin\n// " + SPDX + "\nfn c() {}\n",
+        "tools/notice.py": "\n".join(build_header("#", False)) + "\n# " + EXHIBIT_B + "\n",
+        "vendor/upstream/lib.rs": "fn v() {}\n",
+        "receipts/frozen/run.py": "print(1)\n",
+        "notes.txt": "fn not_a_source() {}\n",
+        # a Derivatives row documents a disposition and must not exempt
+        "LICENSES.md": "## Retained licenses\n\n| Path | License |\n|---|---|\n"
+                       "| `vendor/upstream` | MIT |\n\n"
+                       "## Frozen evidence\n\n| Path | Pinned by |\n|---|---|\n"
+                       "| `receipts/frozen` | a receipt |\n\n"
+                       "## Derivatives\n\n| Path | Upstream |\n|---|---|\n"
+                       "| `src/bare.rs` | not a skip |\n",
+    }
+    with tempfile.TemporaryDirectory(prefix="relicense-self-test-",
+                                     ignore_cleanup_errors=True) as tmp:
+        repo = Path(tmp)
+        for rel, text in fixture.items():
+            (repo / rel).parent.mkdir(parents=True, exist_ok=True)
+            (repo / rel).write_text(text, encoding="utf-8", newline="\n")
+        for args in (["init", "-q"], ["add", "-A"]):
+            subprocess.run(["git", "-C", str(repo)] + args, check=True, capture_output=True)
+
+        got = header_violations(repo)
+        want = (["src/bare.rs", "src/short.rs"], ["tools/notice.py"])
+        if got != want:
+            raise AssertionError("planted defects not reported exactly: got %r, want %r" % (got, want))
+
+        for rel in ("src/bare.rs", "src/short.rs"):
+            _, _, out = process(repo / rel, "//", bare=False)
+            (repo / rel).write_bytes(out.encode("utf-8"))
+        notice = repo / "tools/notice.py"
+        notice.write_text(notice.read_text(encoding="utf-8").replace(EXHIBIT_B, "repaired"),
+                          encoding="utf-8", newline="\n")
+        got = header_violations(repo)
+        if got != ([], []):
+            raise AssertionError("repaired fixture still fails: %r" % (got,))
+    print("self-test passed: planted defects detected exactly; repaired fixture reached zero")
+    return 0
+
+
 def main():
     ap = argparse.ArgumentParser(
         description=__doc__,
@@ -321,6 +411,10 @@ def main():
     g.add_argument("--dry-run", action="store_true")
     g.add_argument("--apply", action="store_true")
     g.add_argument("--audit", action="store_true")
+    g.add_argument("--check", action="store_true",
+                   help="exit 1 if an owned source lacks Exhibit A or carries Exhibit B")
+    g.add_argument("--self-test", action="store_true",
+                   help="prove --check fails on planted defects and passes once repaired")
     ap.add_argument("--bare", action="store_true",
                     help="Exhibit A with no copyright line (third-party-derived)")
     ap.add_argument("--retain-notice", action="store_true",
@@ -338,6 +432,10 @@ def main():
     if args.audit:
         cmd_audit(repo)
         return 0
+    if args.check:
+        return cmd_check(repo)
+    if args.self_test:
+        return self_test()
 
     if args.apply:
         # Invariant 7: never sweep a dirty tree. Another lane's in-flight files
