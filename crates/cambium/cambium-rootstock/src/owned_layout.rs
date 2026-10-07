@@ -83,7 +83,11 @@ impl OwnedLayout {
     /// register into its text system, and image bytes to resolve `url()`
     /// against. The session is rebuilt whenever the ledger changes, so
     /// registration cannot outlive a face the host withdrew.
-    pub(crate) fn new<D: LayoutDom<NodeId = NodeId>>(
+    ///
+    /// Public so a host that is not rootstock can lay out a composed
+    /// session's own document and project it for accessibility
+    /// (`cambium_winit_a11y::project_tree`), as experiment E1a does.
+    pub fn new<D: LayoutDom<NodeId = NodeId>>(
         dom: &D,
         sheets: &[&str],
         width: f32,
