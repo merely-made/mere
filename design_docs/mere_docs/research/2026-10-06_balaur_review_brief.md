@@ -71,6 +71,8 @@ modes are **"Short arc, as authored, clockwise and counter"**. Each
 interpolation, for spins and data-driven sweeps), Clockwise or
 Counter-clockwise.
 
+**Carried 2026-10-07.** Rulings A and B are carried by the [Scenograph editor plan](../implementation_strategy/2026-10-07_scenograph_editor_plan.md), tracks E1 to E5, with Mark's further rulings SE5 to SE8 on how: Cambium's `EditHistory` is generalized rather than joined by a second type, and the option-declaration type lives in scenograph.
+
 ## 2. What the review reads for
 
 The six slices named when the question was put:
