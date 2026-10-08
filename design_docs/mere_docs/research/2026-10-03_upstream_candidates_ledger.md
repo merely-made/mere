@@ -1,7 +1,7 @@
 # Upstream Candidates Ledger
 
 **Date**: 2026-10-03
-**Status (2026-10-06)**: open; eleven items, none raised. Kept by ruling 46 of
+**Status (2026-10-08)**: open; eleven items, none raised. Kept by ruling 46 of
 the device pairing plan: noted for a later review, raised only after a
 release passes them by. Item 9 (argon2) comes from the vault lock plan's
 ruling 33.
@@ -230,6 +230,18 @@ So, for each item:
   bind and asks the actor nothing afterwards (vault lock rulings 52 and
   54), so the 392 and 1824 blocks no longer appear in transport runs. The
   other blocks are p2panda-net's own and remain.
+- **With mDNS on (2026-10-08, vault lock ruling 60).**
+  - Spawning `MdnsDiscovery` (Active, after the endpoint and before gossip,
+    as Mere's default host policy does) adds 4 more blocks freed
+    uncleared: 472, 568, 784 and 2424. They appear in every run of
+    p2panda-net alone.
+  - Measured as not iroh's: iroh's `MdnsAddressLookup` 0.6.0, built the
+    same way from the public id with no p2panda actor, adds nothing beyond
+    iroh alone. The lookup is never handed the key.
+  - So the copies come from p2panda-net's `MdnsActor` layer, presumably the
+    same ractor boxing of a key-bearing stack as above. That is inferred,
+    not traced.
+  - mere-transport's `seed_residue.rs` now runs this shape.
 - **Last checked:** mere-p2panda-net 0.7.5 and p2panda-core 0.7.1 (fork
   tag `mere-p2panda-net-0.7.5`, `1bec457`), ractor 0.16.5.
 
@@ -243,3 +255,6 @@ Not raised.
 
 **2026-10-06.** Items 10 (iroh) and 11 (p2panda-net) added from the vault lock
 plan's rulings 49 to 52. Not raised.
+
+**2026-10-08.** Item 11 extended with p2panda-net's mDNS blocks (vault lock
+ruling 60), measured apart from iroh's mDNS lookup. Not raised.
