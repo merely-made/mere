@@ -1,0 +1,71 @@
+{
+  "schema": "graphshell.nested-host-groups-receipt/v1",
+  "recorded_at": "2026-10-08T16:53:34.864020+00:00",
+  "source_base": "4c796590cc922da21db96c9971bdd521e8f603e4",
+  "scope": "Explicit containment over a bounded manifest-declaration dataset; view-local expansion and entry; no saved-scene or portable-fold claim.",
+  "fixture": {
+    "occurrences": 18,
+    "relationships": 34,
+    "bytes": 51298
+  },
+  "checks": {
+    "scenomise_tests": 125,
+    "grouping_tests_included": 6,
+    "host_dataset_tests": 8,
+    "exporter_tests": 4,
+    "viewer_wasm_build": "passed",
+    "main_page_without_gpu_physics_check": "passed"
+  },
+  "browser": {
+    "headed": true,
+    "viewport": [
+      1440,
+      1000
+    ],
+    "backend": "Chrome default WebGPU; enable-unsafe-webgpu",
+    "runs": {
+      "nested-groups": {
+        "receipt_result": "fail",
+        "page_errors": [],
+        "gate_failures": [],
+        "hidden": false,
+        "failures": [
+          "FAIL: capture groups_expanded contains no visible graphshell-tree detail",
+          "FAIL: capture groups_entered contains no visible graphshell-tree detail",
+          "FAIL: capture groups_collapsed contains no visible graphshell-tree detail"
+        ],
+        "alert": null
+      },
+      "flat-site": {
+        "receipt_result": "fail",
+        "page_errors": [],
+        "gate_failures": [],
+        "hidden": false,
+        "failures": [
+          "FAIL: capture tree_host_dataset contains no visible graphshell-tree detail"
+        ],
+        "alert": null
+      },
+      "unknown-grouping": {
+        "receipt_result": null,
+        "page_errors": [],
+        "gate_failures": [],
+        "hidden": false,
+        "failures": [],
+        "alert": null
+      }
+    },
+    "retained_keyboard_and_breadcrumbs": "passed",
+    "visual_qualification": "pending: both grouped and flat routes produce blank captures",
+    "software_backend_attempt": "timed out before ready",
+    "warmup_seconds": 5
+  },
+  "source_sha256": {
+    "crates/cambium/scenes/scenomise/src/grouping.rs": "e832bd36165c8e9d08e5b5540ac13633eee79b4c1f4a131559930a9cf1732f22",
+    "ports/graphshell/src/host_dataset_view.rs": "c515cf9b52207eadb10c726783e5f74f16886d1dbbdd6979b47a6d295f1c6aa0",
+    "ports/graphshell/src/web_tree/grouping.rs": "e6b5f54832f2ad6d250f11c2eab5401d8c5002b93e376c0cdbed0576e3cdeee6",
+    "ports/graphshell/src/web_tree.rs": "5d445e4e8116d3d98b05a96a8963baa01466cd07af6a0e6946823b8bc064fab1",
+    "ports/graphshell/web/fixtures/grouped-manifest-components.json": "5b853515896c986a5347a72100794b8b698718c572462725a72e2e18ae51f48d",
+    "scripts/export_grouped_cargo.py": "f06f7c3e78648d61502b03ca3fa84e2fdd318dbb7da5126a7526a152044de243"
+  }
+}

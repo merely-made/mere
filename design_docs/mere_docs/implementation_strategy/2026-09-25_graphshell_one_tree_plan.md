@@ -6,6 +6,12 @@
 done on 2026-09-26. Phase 3 has headed correctness receipts. On 2026-09-27
 Mark approved proceeding to phase 4, with stack performance and live physics
 explicitly open.
+**Nested host-dataset continuation (2026-10-08):** implemented locally; visual
+qualification pending on
+`codex/nested-graph-view`. Mark approved implementing expandable repository
+groups and entering their constituent graph. This is a view-local projection
+over explicit membership; portable scene folds, saved scene integration and
+the live site's viewer replacement remain separate work.
 **Scope:** Graphshell's browser page becomes one retained Cambium tree. Its
 HTML controls become Cambium components, its display-only Cambium chrome
 joins them, pictograph's canvas renders into the tree as a texture producer,
@@ -544,6 +550,46 @@ built inside Graphshell.
 The mere view's panel is the reservoir plan's V2b step 5, one component in
 this tree.
 
+### Additional target: expandable host groups (2026-10-08)
+
+The host chooses a parent-to-member relationship kind through `?grouping=` or
+the root's `data-grouping-kind`. Scenomise validates this as a forest and
+projects a `GroupViewState`; dependency relationships never infer ownership.
+Graphshell consumes the result in its retained tree. No S1 schema extension,
+stored graph mutation, or second renderer is introduced. This first slice
+uses group nodes and membership edges, not nested frame geometry.
+
+*Done when:*
+- Multiple groups independently expand, including repository → workspace →
+  crate nesting; collapse restores their original identities.
+- Enter and breadcrumb controls retain external dependency endpoints while
+  excluding unrelated material. Membership and dependencies stay distinct.
+- Summary edges expose all original relationship ids, explanations and
+  provenance; internal dependencies remain inspectable without fake loops.
+- Opening a group preserves remembered coordinates, surviving selection and
+  the viewport. This first slice explicitly pauses physics; it does not retain
+  moving simulation velocities or per-item physics constraints across a swap.
+- A named Cargo metadata exporter supplies declarations with package, alias,
+  optional, dependency-kind, target and source coverage. It excludes absent
+  endpoints and machine-local paths, and refuses missing requested packages.
+- Shared tests cover a second hierarchy kind, ambiguous ownership and cycles;
+  the headed web proof covers controls and the existing ungrouped S1 route.
+
+The bounded fixture contains Mere, Genet and Woodshed repository groups and
+selected real member crates. It is a manifest-declaration slice, not a claim
+that current snapshot versions compile together or a full Cargo closure.
+The S1 byte and compiler budgets remain in force. Larger resolved-build
+datasets, lens reason accounting, scenes saved/reopened with group state,
+portable folds and nested frame layout follow after this bounded proof.
+
+Input generation is reproducible: capture each named workspace with
+`cargo metadata --locked --no-deps --format-version 1`, then pass the files
+to `scripts/export_grouped_cargo.py` using `--workspace repo=metadata.json`,
+`--authority`, `--output`, and optionally repeated `--package repo/package`.
+Excluded standalone workspaces can use a named `repo/workspace` scope. The
+source revision is a hash of the public disclosure, not a guessed Git revision.
+Open `tree.html?dataset=fixtures/grouped-manifest-components.json&grouping=contains`.
+
 ## 5. Stop rules
 
 - Nothing a screen reader reaches today is lost: a control moves only once
@@ -553,6 +599,35 @@ this tree.
 - No Graphshell-only UI pieces. What Cambium lacks is added to Cambium.
 
 ## 6. Progress
+
+- **2026-10-08 — expandable host groups:** implemented on
+  `codex/nested-graph-view`, based on main `4c796590c`. The shared Scenomise
+  forest projection preserves source occurrence identities and dependency
+  witnesses. Graphshell's host-input controller retains current coordinates,
+  viewport and surviving single focus; controls independently expand groups,
+  enter them, expose external context and navigate breadcrumbs. Changes pause
+  physics. The Cargo declaration exporter produced a bounded Mere/Genet/
+  Woodshed fixture with 18 occurrences, 34 relationships and 51,298 raw bytes.
+  - **Passed:** all 125 Scenomise tests, including six grouping tests; eight
+    Graphshell host-input tests, including a real Canvas swap with changed
+    coordinates and camera; four exporter tests. The wasm viewer builds, and
+    the `main-page` product/remote configuration checks without GPU physics.
+  - **Browser semantics passed, capture gate failed:** headed Chrome at
+    1440×1000 ran every assertion in `nested_host_groups.scn` and the flat
+    `tree_host_dataset.scn`. Both receipts fail only their capture detail
+    checks: all captures are blank. No page errors or gate failures occur.
+    A five-second warm-up did not resolve it; the software-renderer attempt
+    timed out before ready. Retained DOM keyboard activation and breadcrumbs
+    pass, and an unknown membership kind refuses with an alert and no page
+    error. This establishes disclosure/control behavior, not visible graph
+    rendering or layout usability. The flat route is the same built viewer
+    without grouping, not a separately rebuilt historical binary.
+  - **Evidence:** `ports/graphshell/docs/receipts/nested_host_groups.json`
+    summarizes the bounded tests and source hashes. Full runtime captures and
+    receipts remain in the local `Code/output/nested-graph-viewer/receipts/`
+    directory. Visual qualification, saved scene adoption, portable folds,
+    nested frame geometry, full Cargo closure/performance and the live site
+    replacement remain open. This commit is not a deploy or a size-budget gate.
 
 - 2026-09-25: plan written from the assessment in §2 and Mark's rulings in §1.
   The reservoir plan records them as §7 items 39 and 40.

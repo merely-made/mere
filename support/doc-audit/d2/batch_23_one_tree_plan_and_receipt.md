@@ -24,6 +24,17 @@ workstream's two to be covered.
 
 ## 2026-09-27 phase-3 follow-up
 
+### 2026-10-08 incremental continuation audit
+
+The one-tree plan's expandable-host-groups target was checked against
+`scenomise::grouping`, Graphshell's `GroupedHostDataset`, the retained tree
+controls and `scripts/export_grouped_cargo.py`. Its boundary is explicit
+membership, view-local disclosure and a bounded manifest fixture; it makes no
+claim about portable folds, saved scene adoption or live deployment. This is
+an incremental check of that added target; the original census totals below
+are not a fresh whole-document audit. Validation outcomes are recorded in
+the plan's Progress section after execution.
+
 The totals above remain the original 2026-09-26 audit, not a new full census.
 The plan's status now records phase 3 under headed verification and preserves
 Mark's timing ruling as the gate before phase 4. The clean dependency repin
