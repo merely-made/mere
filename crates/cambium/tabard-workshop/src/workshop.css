@@ -5,7 +5,7 @@ h1, h2, h3, p { margin: 0; }
 h1 { font-size: 23px; font-weight: 700; }
 h2 { font-size: 18px; font-weight: 700; }
 h3 { font-size: 13px; font-weight: 600; }
-.workshop-header { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 18px 24px; border-bottom: 1px solid #dde1e7; background: #ffffff; }
+.tabard-workshop > .cambium-title-bar { display: flex; align-items: center; justify-content: space-between; gap: 20px; --titlebar-padding: 24px; padding-top: 18px; padding-bottom: 18px; border-bottom: 1px solid #dde1e7; background: #ffffff; }
 .brand { display: flex; align-items: center; gap: 12px; }
 .tabard-mark { display: flex; align-items: center; justify-content: center; width: 39px; height: 44px; border-radius: 9px 9px 16px 16px; color: #ffffff; background: #304a60; font-size: 25px; font-weight: 700; }
 .brand-title p { margin-top: 3px; font-size: 12px; color: #667084; }
@@ -93,7 +93,7 @@ textarea:focus-visible { outline: 2px solid #2e6aa2; outline-offset: 2px; }
 .footer-note { color: #7b8797; }
 .preview-notice { padding: 10px; margin-bottom: 16px; font-size: 12px; line-height: 1.5; background: #fff4d8; color: #72521c; border: 1px solid #dbcba2; border-radius: 5px; }
 @media (max-width: 720px) {
-  .workshop-header { padding: 13px 14px; gap: 10px; flex-wrap: wrap; }
+  .tabard-workshop > .cambium-title-bar { --titlebar-padding: 14px; padding-top: 13px; padding-bottom: 13px; gap: 10px; flex-wrap: wrap; }
   .workshop-body { flex-direction: column; overflow-y: auto; }
   .theme-editor { width: 100%; overflow-y: visible; border-right: none; border-bottom: 1px solid #dde1e7; }
   .preview-area { overflow-y: visible; padding: 20px; }

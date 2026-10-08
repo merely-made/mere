@@ -20,6 +20,52 @@ does not establish implementation or consumer adoption of those preferences.
 derivation), `crates/meerkat/src/theme_sheets.rs` *(historical citation)* <!-- doc-audit: historical-path --> + `theme_edit.rs` (current sheet baking +
 switch path).
 
+## Shared authoring and title-bar composition (2026-10-08)
+
+**Decision:** expose the existing workshop as `crates/cambium/tabard-workshop`
+and add reusable composition to existing Cambium/native-host crates. The
+standalone desktop port remains the reference consumer. Turnstone, Woodshed,
+Knot editor and Cleromancy are adoption candidates; this change does not claim
+that their independent dependency pins or application settings are migrated.
+
+**Context:** theme derivation and syntax/document/graph previews already use
+Tinct, Illume and the existing document and graph components. The workshop
+lived under a product port, and native title-bar views were assembled locally
+by consumers even though the host already owned window behavior.
+
+**Ownership:** Tabard keeps definitions, modes, libraries and interchange;
+`tabard-workshop` keeps authoring state and its portable surface. Cambium owns
+`title_bar`, its ornament/title/action/caption slots and inset-aware stylesheet.
+The native host owns accessible caption adapters and `SceneProducer<T>` on its
+existing render device. Hosts choose application appearance, reader precedence,
+frame policy and native commands. Product identity is slot content and CSS,
+not another palette or window-control engine.
+
+**Alternatives:** copying the workshop or caption event handlers into each app
+would multiply the authoring and platform behavior. A new desktop-chrome crate
+would add a package for composition that fits existing ownership. Moving native
+commands into portable workshop state would couple embedded editors to a
+window. Callback adapters and view slots keep these seams additive.
+
+**Consequences:** consumers can share the complete authoring model and choose
+ornament content without replacing their command model. App-frame hosts mount
+`TITLE_BAR_CSS`, provide native captions (macOS retains traffic lights), and
+match the configured Maximize label to the Windows Snap label. Preview hosts
+register retained scenes with distinct raster keys and current semantic
+callbacks. Close still passes through each product's unsaved-work policy.
+
+**Adoption work:** integrate one consumer at a time, starting with an existing
+Cambium desktop host; preserve each app's settings, reader precedence and
+identity. Turnstone's browser-specific adapter and custom calculator editor
+remain separate follow-ups. Native Windows/Linux behavior needs platform
+acceptance beyond the windowless caption tests. The shared-kit slice passes
+285 windowless tests and the native authoring/narrow-layout scenario (five
+nonblank captures). Fresh-process state assertions pass but native acquisition
+can remain `Occluded`; a fresh empty-library control reproduces it. Preserve
+this presentation boundary in the desktop receipts. Investigate the shared
+host/Mesquite distinction between successful presentations and redraw attempts
+before treating a 120-attempt capture timeout as a state failure.
+
 ## Tabard small-web adapters (2026-09-13 scope)
 
 **Current code:** `Theme` in `crates/system/tabard/src/lib.rs` derives a Tinct palette and
@@ -131,8 +177,10 @@ presented as a successful canonical fallback by the authoring model.
 non-mutating preview, built-in protection, concurrent-edit/deletion/collision
 refusal, undo/redo branching, discard, and stylesheet/custom-mode handling.
 
-The next slice adds `ports/tabard` (`tabard-workshop`) and its thin desktop
-host. One retained state/view provides seed HSL controls, accent harmonies,
+The workshop package is `crates/cambium/tabard-workshop` (`tabard-workshop`),
+with its thin desktop host in `ports/tabard/desktop`. The package moved out of
+the product port on 2026-10-08 so sibling applications can embed the same
+surface and authoring workflow. One retained state/view provides seed HSL controls, accent harmonies,
 four canonical preview modes and chrome/reader/syntax/graph specimens. A
 secondary or tertiary hue under locked harmony is explained rather than
 offered as an ineffective control. Native name edits synchronize before
