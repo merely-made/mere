@@ -1,14 +1,16 @@
 # Graphshell on one Cambium tree
 
 **Date:** 2026-09-25
-**Status (2026-10-07):** in progress, reviewed against published Mere
-`cd3ebf26d`. Phases 1–2 are landed; phase 3 has its recorded headed producer
+**Status (2026-10-08):** in progress, checked against the current reservoir
+integration based on published Mere `05b7357de`. Phases 1–2 are landed; phase 3 has its recorded headed producer
 receipts and Mark's approval to proceed. Phase 4 remains unfinished: canvas
 controls, elapsed-time physics, saved-graph editing and remote-session slices
 have landed, but the complete page/control migration and acceptance wall have
 not closed. The legacy `web_gpu.rs` and `component.html` remain. The reservoir's
 mere panel is its V2b step 5, after this cutover. §2's current handoff names
-the remaining gates; linked plans own later editor and dynamics status.
+the remaining gates; linked plans own later editor and dynamics status. The
+reservoir's V3–V5 resident implementation has advanced independently; its
+process fixtures do not close this browser cutover or mount the mere panel.
 **Scope:** Graphshell's browser page becomes one retained Cambium tree. Its
 HTML controls become Cambium components, its display-only Cambium chrome
 joins them, pictograph's canvas renders into the tree as a texture producer,
@@ -487,10 +489,12 @@ completed application migration.
   of its own in a new 1,400 by 900 window. Before phase 3 nothing timed
   Graphshell's frames, and nothing generated a large graph.
 
-### Current cutover and reservoir handoff (2026-10-07)
+### Current cutover and reservoir handoff (2026-10-08)
 
-Source checked at Mere `cd3ebf26d`; this is not a fresh browser or performance
-receipt. The dated progress below records what individual lanes qualified.
+Source rechecked on the reservoir integration based on Mere `05b7357de`;
+the earlier 2026-10-07 refresh used `cd3ebf26d`. No fresh browser or performance
+receipt was produced by the resident wave. The dated progress below records
+what individual lanes qualified.
 
 - **Available:** the accessibility mirror, shared file seam, canvas producer,
   shared canvas commands and toolbar, captured dragging, pause/restore,
@@ -507,7 +511,9 @@ receipt. The dated progress below records what individual lanes qualified.
   adapter exist, but Graphshell's mounted session panel and its lifecycle/
   graph synchronization proof are V2b step 5 in the
   [reservoir plan](2026-09-23_reservoir_plan.md). Completing a remote board or
-  a scene editor does not prove that panel exists.
+  a scene editor does not prove that panel exists. That plan now records
+  integrated archive, grant enforcement and client-first embedded-owner
+  contracts with process fixtures; product adaptation follows its own gates.
 - **Shared follow-ons:** the
   [Scenograph editor plan](2026-10-07_scenograph_editor_plan.md) owns shared
   history, session saves and the later pan/selection/context-menu work. The
