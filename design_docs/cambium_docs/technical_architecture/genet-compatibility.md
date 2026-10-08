@@ -192,6 +192,17 @@ is not a catalog test pass. A read-only multiline review finds no newline or
 multiline-state loss through neutral, native or browser lowering; the existing
 fixtures cover those seams separately, rather than as one full-pipeline case.
 
+The fresh native bridge controls each produce 71 passes and exactly their
+intended failure when routing or forwarding is disabled. A fresh restored
+Rootstock library run passes all 72 tests. Catalog acceptance passes both tests,
+the optional highlighting library passes 254, and the browser accessibility
+example compiles for `wasm32-unknown-unknown` with the existing getrandom setting.
+All use the frozen `e84f9c7f` candidate lock and restore the starting inputs.
+The routing receipt also has an independent post-restoration source audit;
+later runs perform that second scan inside the guarded helper. These are local
+automated receipts, not browser-hosted operation or human AT acceptance. The
+accessible-leaf and sibling-scope questions remain pending.
+
 The downstream read-only audit finds old tag checks in Turnstone and Cleromancy.
 Their mechanical selector/caret/existing-label follow-ups await explicit scope
 authorization; currently unnamed fields retain that state. No sibling source
