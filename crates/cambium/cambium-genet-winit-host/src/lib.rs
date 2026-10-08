@@ -47,13 +47,13 @@ use winit::window::{Window, WindowId};
 use genet_scripted_dom::ScriptedDom;
 use std::{cell::RefCell, rc::Rc};
 
-mod decorations;
 mod caption_controls;
-mod scene_producer;
+mod decorations;
 mod files;
 mod harness;
 #[cfg(test)]
 mod headed_tests;
+mod scene_producer;
 mod windows;
 #[cfg(target_os = "windows")]
 mod windows_snap;
@@ -70,10 +70,10 @@ pub use cambium_rootstock::{
     RelayoutProfile, Runner, ScrollAlign, ScrollIntoView, Surface, WindowCommand, WindowCommands,
     WindowFrame, WindowGeometry, WindowTree, ZOOM_LADDER, fit_zoom, ladder_step, read_frame,
 };
-pub use caption_controls::{CaptionLabels, window_caption_controls, platform_caption_controls};
-pub use scene_producer::SceneProducer;
+pub use caption_controls::{CaptionLabels, platform_caption_controls, window_caption_controls};
 pub use files::{DialogFileChooser, choose_save_path, read_file};
 pub use harness::{Harness, inert_hooks};
+pub use scene_producer::SceneProducer;
 pub use windows::{WindowHooks, WindowHost, WindowsInit, run_windows};
 // Scenario execution lives in Mesquite; applications implement mesquite::Product.
 
@@ -97,6 +97,40 @@ enum HostEvent {
 /// the application, so it has no reason to branch between them.
 fn frame_trace() -> bool {
     std::env::var_os("CAMBIUM_HOST_FRAME_TRACE").is_some_and(|value| value != "0")
+}
+
+#[cfg(target_os = "macos")]
+fn trace_owned_macos_window(window: &Window, stage: &str) {
+    use objc2_app_kit::NSRunningApplication;
+    use raw_window_handle::{HasWindowHandle, RawWindowHandle};
+    if !frame_trace() {
+        return;
+    }
+    let Ok(handle) = window.window_handle() else {
+        return;
+    };
+    let RawWindowHandle::AppKit(handle) = handle.as_raw() else {
+        return;
+    };
+    // Called by the event-loop thread while this owned winit handle is alive.
+    let view: &objc2_app_kit::NSView = unsafe { handle.ns_view.cast().as_ref() };
+    let Some(native) = view.window() else {
+        return;
+    };
+    let app = NSRunningApplication::currentApplication();
+    eprintln!(
+        "[cambium-host] {stage} macos app_active={} app_hidden={} policy={:?} launched={} window_visible={} key={} can_key={} active_space={} occlusion={:?} frame={:?}",
+        app.isActive(),
+        app.isHidden(),
+        app.activationPolicy(),
+        app.isFinishedLaunching(),
+        native.isVisible(),
+        native.isKeyWindow(),
+        native.canBecomeKeyWindow(),
+        native.isOnActiveSpace(),
+        native.occlusionState(),
+        native.frame()
+    );
 }
 
 /// Opt-in CPU-side frame attribution. Kept separate from the frame-policy
@@ -897,6 +931,16 @@ where
     pub(crate) fn first_frame(&mut self) {
         self.redraw();
         self.sync_a11y();
+        #[cfg(target_os = "macos")]
+        if let Some(window) = self.native_window.as_ref() {
+            trace_owned_macos_window(window, "initial reveal");
+        }
+        // The synchronous frame was attempted while hidden. Showing the
+        // window must owe a fresh attempt even on platforms that do not send
+        // another RedrawRequested for this visibility transition.
+        if let Some(window) = self.native_window.as_ref() {
+            window.request_redraw();
+        }
     }
 
     /// The platform is taking the drawing surface away (Android, iOS; never on
@@ -1027,9 +1071,10 @@ where
                 // sees where the window is now, as the live query used to.
                 self.refresh_geometry();
                 self.redraw();
-                // After the frame is laid out and presented, refresh the
-                // accessibility tree and drain any screen-reader actions,
-                // then let the application pump per-presented-frame work.
+                // Layout and a11y still advance if acquiring a drawable failed.
+                // The hook receives this attempt's presentation identity (or
+                // None), so scenarios pause while async readback and bounded
+                // presentation waits keep receiving turns.
                 let a11y_started = std::time::Instant::now();
                 self.sync_a11y();
                 if let Some(profile) = self.s.last_frame_profile.as_mut() {
@@ -1039,6 +1084,19 @@ where
                     if perf_trace() {
                         eprintln!("[cambium-host] frame {}", profile.summary());
                     }
+                }
+                if frame_trace()
+                    && self.s.last_redraw_presentation.is_none()
+                    && let Some(window) = self.native_window.as_ref()
+                {
+                    #[cfg(target_os = "macos")]
+                    trace_owned_macos_window(window, "unpresented redraw");
+                    eprintln!(
+                        "[cambium-host] unpresented redraw visible={:?} focused={} minimized={:?}",
+                        window.is_visible(),
+                        window.has_focus(),
+                        window.is_minimized()
+                    );
                 }
                 self.with_ctx(Hook::AfterFrame);
             },
