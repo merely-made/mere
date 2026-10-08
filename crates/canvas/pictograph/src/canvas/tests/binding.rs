@@ -10,6 +10,7 @@
 //! as from the API, the seed reaching Kinds (F156), the roles through the
 //! target, and what a spec cannot hold refused (F157).
 
+use crate::canvas::tests::ThroughView;
 use std::collections::BTreeMap;
 
 use seiche::Role;
@@ -173,11 +174,11 @@ fn every_profile_names_itself_after_a_reopen() {
     assert_eq!(CANVAS_PHYSICS_PROFILES.len(), 20);
     for profile in CANVAS_PHYSICS_PROFILES {
         let (mut from, _) = canvas();
-        assert!(from.apply_physics_profile(profile.id));
+        assert!(from.pick_profile(profile.id));
         let saved = from.dynamics_spec().unwrap();
         let (mut to, _) = canvas();
         to.set_dynamics_spec(&saved).unwrap();
-        assert_eq!(to.physics_profile_id(), Some(profile.id));
+        assert_eq!(to.view().profile_id(), Some(profile.id));
         assert_eq!(to.dynamics_spec().unwrap(), saved);
     }
 }
@@ -307,11 +308,11 @@ fn the_record_keeps_an_opened_spec_and_what_an_edit_does_not_touch() {
         Some(&Role::Seeded)
     );
     assert_eq!(canvas.anchor_stiffness(), 0.3);
-    assert_eq!(canvas.physics_mass_source(), PhysicsMassSource::PageRank);
+    assert_eq!(canvas.view().mass, PhysicsMassSource::PageRank);
 
-    // A source edit: the recipe and the carried parts stay, the weights
-    // come back as the canvas holds them.
-    canvas.set_physics_kind_source(PhysicsKindSource::Degree);
+    // A source edit through the view: the recipe, its authored weights and
+    // the carried parts stay.
+    canvas.pick_kind(PhysicsKindSource::Degree);
     let edited = canvas.dynamics_spec().unwrap();
     assert_eq!(edited.channels["kind"], "kind.degree");
     assert_eq!((edited.seed, &edited.bars), (7, &given.bars));
@@ -321,15 +322,16 @@ fn the_record_keeps_an_opened_spec_and_what_an_edit_does_not_touch() {
     let Node::Mix { parts, .. } = &stages[1].node else {
         panic!("the mix stage")
     };
-    assert_eq!(parts[0].weight(), f64::from(0.1f32), "on the f32 grid");
+    assert_eq!(parts[0].weight(), 0.1, "the authored weight");
+    assert_eq!(edited.root, given.root);
     assert_eq!(
         edited.target.as_ref().unwrap().items.len(),
-        1,
-        "the absent item falls away once the record is the canvas's own"
+        2,
+        "an item the graph lacks rides on with the record (F105)"
     );
 
     // A law pick takes over from the recipe, keeping seed, bars, damping.
-    canvas.set_physics_law(PhysicsLaw::Charge).unwrap();
+    canvas.pick_law(PhysicsLaw::Charge).unwrap();
     let picked = canvas.dynamics_spec().unwrap();
     assert!(matches!(&picked.root, Node::Preset { id, .. } if id == PhysicsLaw::Charge.id()));
     assert_eq!((picked.seed, &picked.bars), (7, &given.bars));
@@ -384,7 +386,7 @@ fn a_composition_opened_from_its_spec_runs_as_the_api_set_one() {
             Box::new(move |c: &mut Canvas| {
                 c.set_physics_composition(Some(grouped.clone())).unwrap()
             }),
-            Box::new(|c: &mut Canvas| c.set_physics_law(PhysicsLaw::Springs).unwrap()),
+            Box::new(|c: &mut Canvas| c.pick_law(PhysicsLaw::Springs).unwrap()),
         ),
         (
             "schedule",
@@ -424,7 +426,7 @@ fn a_composition_opened_from_its_spec_runs_as_the_api_set_one() {
 #[test]
 fn the_seed_reaches_kinds() {
     let (mut api, _) = canvas();
-    api.set_physics_law(PhysicsLaw::Kinds).unwrap();
+    api.pick_law(PhysicsLaw::Kinds).unwrap();
     let mut spec = api.dynamics_spec().unwrap();
     assert_eq!(spec.seed, spec::DEFAULT_SEED);
     let (mut same, _) = canvas();

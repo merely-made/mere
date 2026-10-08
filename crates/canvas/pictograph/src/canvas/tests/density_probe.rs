@@ -10,6 +10,7 @@
 //! fresh field's CV) beside the canvas's (Spearman of mass against area,
 //! density CV, overlaps). Ignored; run optimized with `--ignored --nocapture`.
 
+use crate::canvas::tests::ThroughView;
 use std::sync::Arc;
 
 use super::density::{generated, run, seeded, uniform};
@@ -57,8 +58,8 @@ fn density_convergence_probe() {
                 continue;
             }
             let mut canvas = seeded(graph.clone(), *spacing);
-            canvas.set_physics_mass_source(mass);
-            canvas.set_physics_law(PhysicsLaw::Density).unwrap();
+            canvas.pick_mass(mass);
+            canvas.pick_law(PhysicsLaw::Density).unwrap();
             let mut law = Density::with_medium(
                 canvas.law_inputs().masses(mass),
                 Box::new(DensityGrid::new(

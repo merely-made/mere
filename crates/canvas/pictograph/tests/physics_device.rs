@@ -13,7 +13,9 @@
 
 use std::time::Duration;
 
-use pictograph::canvas::{BoardItem, Canvas, PhysicsBoard, PhysicsLaw, physics_device_for};
+use pictograph::canvas::{
+    BoardItem, Canvas, PhysicsBoard, PhysicsChoice, PhysicsLaw, physics_device_for,
+};
 
 fn device() -> Option<pictograph::canvas::PhysicsDevice> {
     let handles = netrender::boot().ok()?;
@@ -54,7 +56,13 @@ fn the_canvas_stages_its_repulsion_on_the_device_and_keeps_it_across_a_law_switc
     assert!(springs.device_steps > 0, "{springs:?}");
 
     // A law switch replaces the force set, not the lane.
-    canvas.set_physics_law(PhysicsLaw::Stress);
+    let mut spec = canvas.dynamics_spec().expect("the record reads");
+    PhysicsChoice {
+        law: PhysicsLaw::Stress,
+        ..PhysicsChoice::live(&canvas)
+    }
+    .write_into(&mut spec);
+    canvas.set_dynamics_spec(&spec).expect("Stress binds");
     frames(&mut canvas, 60);
     let stress = canvas.repulsion_stats().unwrap();
     println!("after the switch to Stress: {stress:?}");

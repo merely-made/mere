@@ -10,6 +10,7 @@
 //! are, slow motion draws every frame, and fast-forward under a real clock's
 //! budget reports the speed it reached.
 
+use crate::canvas::tests::ThroughView;
 use std::time::Duration;
 
 use super::*;
@@ -58,7 +59,7 @@ fn canvas(nodes: usize, law: PhysicsLaw) -> Canvas {
             })
             .collect(),
     );
-    canvas.set_physics_law(law).unwrap();
+    canvas.pick_law(law).unwrap();
     canvas
 }
 
