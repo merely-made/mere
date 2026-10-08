@@ -138,9 +138,9 @@ impl ChannelRegistry {
         true
     }
 
-    /// The bridge set under `metric` (`bridges.betweenness` or
-    /// `bridges.articulation`), one cache per metric, keyed by structure and
-    /// the threshold.
+    /// The bridge set under `metric` (`groups.bridges`, the metric its
+    /// option, F85), one cache per metric, keyed by structure and the
+    /// threshold.
     pub fn bridges(&mut self, graph: &Graph, metric: BridgeMetric, threshold: f32) -> &BridgeNodes {
         let slot = match metric {
             BridgeMetric::Betweenness => &mut self.bridges_betweenness,

@@ -21,9 +21,10 @@
 //! families"): Columns (by site) and (by cluster) read `groups.site` and
 //! `groups.cluster`, and the rest take families of their own,
 //! `order.recency`, `order.timeline`, `rings.focus`, `coords.spectral`,
-//! `weight.degree`, `importance.degree`, `importance.betweenness`, and
-//! `bridges.betweenness` and `bridges.articulation` (*Reading, not ruled*:
-//! the bridge family's name).
+//! `weight.degree`, `importance.degree` and `importance.betweenness`. The
+//! bridge nodes are one channel, `groups.bridges`, whose metric (betweenness
+//! or articulation) is the canvas's chosen bridge metric rather than part of
+//! the id (F85, "groups.bridges").
 
 use kernel::graph::{Graph, Node, NodeKey};
 
@@ -31,7 +32,7 @@ use super::physics_catalog::{LawInputs, PhysicsDepthSource, PhysicsKindSource, P
 use super::{
     AFFINITY_MIN_SIMILARITY, AffinityBlend, BRIDGE_THRESHOLD, Canvas, blend_affinity_pairs,
 };
-use crate::signals::{BridgeMetric, ImportanceMetric};
+use crate::signals::ImportanceMetric;
 
 /// A node's site: its URL authority. The one function behind the site
 /// channel and Columns (by site)'s column key.
@@ -44,7 +45,8 @@ pub(crate) fn site_of(node: &Node) -> &str {
 pub enum ChannelFamily {
     /// A kind per node, folded to at most eight: Kinds' kinds.
     Kind,
-    /// A group per node, unfolded: Group pull, and G3's grouped laws.
+    /// A group per node, unfolded: Group pull, and G3's grouped laws; and
+    /// the bridge nodes (`groups.bridges`), a member set.
     Groups,
     /// A weight per node: Orbit's masses, the hub overlays' weights.
     Mass,
@@ -64,12 +66,10 @@ pub enum ChannelFamily {
     Weight,
     /// Normalized importance per node: size by importance, the gloss.
     Importance,
-    /// The bridge nodes: the bridge rings, the gloss's bridge emphasis.
-    Bridges,
 }
 
 impl ChannelFamily {
-    pub const ALL: [ChannelFamily; 12] = [
+    pub const ALL: [ChannelFamily; 11] = [
         ChannelFamily::Kind,
         ChannelFamily::Groups,
         ChannelFamily::Mass,
@@ -81,7 +81,6 @@ impl ChannelFamily {
         ChannelFamily::Coords,
         ChannelFamily::Weight,
         ChannelFamily::Importance,
-        ChannelFamily::Bridges,
     ];
 
     pub fn id(self) -> &'static str {
@@ -97,7 +96,6 @@ impl ChannelFamily {
             ChannelFamily::Coords => "coords",
             ChannelFamily::Weight => "weight",
             ChannelFamily::Importance => "importance",
-            ChannelFamily::Bridges => "bridges",
         }
     }
 }
@@ -132,13 +130,13 @@ pub enum Channel {
     Weight,
     /// Importance by degree or betweenness, normalized.
     Importance(ImportanceMetric),
-    /// Betweenness brokers or articulation points.
-    Bridges(BridgeMetric),
+    /// The bridge nodes, under the canvas's bridge metric (betweenness
+    /// brokers or articulation points).
+    Bridges,
 }
 
 const ORDERS: [OrderSource; 2] = [OrderSource::Recency, OrderSource::Timeline];
 const IMPORTANCE: [ImportanceMetric; 2] = [ImportanceMetric::Degree, ImportanceMetric::Betweenness];
-const BRIDGES: [BridgeMetric; 2] = [BridgeMetric::Betweenness, BridgeMetric::Articulation];
 
 fn order_option(order: OrderSource) -> &'static str {
     match order {
@@ -174,7 +172,7 @@ impl Channel {
         all.extend(ORDERS.map(Channel::Order));
         all.extend([Channel::Rings, Channel::Coords, Channel::Weight]);
         all.extend(IMPORTANCE.map(Channel::Importance));
-        all.extend(BRIDGES.map(Channel::Bridges));
+        all.push(Channel::Bridges);
         all
     }
 
@@ -191,7 +189,7 @@ impl Channel {
             Channel::Coords => ChannelFamily::Coords,
             Channel::Weight => ChannelFamily::Weight,
             Channel::Importance(_) => ChannelFamily::Importance,
-            Channel::Bridges(_) => ChannelFamily::Bridges,
+            Channel::Bridges => ChannelFamily::Groups,
         }
     }
 
@@ -208,7 +206,7 @@ impl Channel {
             Channel::Coords => "spectral",
             Channel::Weight => "degree",
             Channel::Importance(metric) => metric.as_code(),
-            Channel::Bridges(metric) => metric.as_code(),
+            Channel::Bridges => "bridges",
         }
     }
 
@@ -222,6 +220,7 @@ impl Channel {
         let (family, option) = id.split_once('.')?;
         match family {
             "kind" => PhysicsKindSource::parse(option).map(Channel::Kind),
+            "groups" if option == "bridges" => Some(Channel::Bridges),
             "groups" => PhysicsKindSource::parse(option).map(Channel::Groups),
             "mass" => PhysicsMassSource::parse(option).map(Channel::Mass),
             "depth" => PhysicsDepthSource::parse(option).map(Channel::Depth),
@@ -241,10 +240,6 @@ impl Channel {
                 .into_iter()
                 .find(|metric| metric.as_code() == option)
                 .map(Channel::Importance),
-            "bridges" => BRIDGES
-                .into_iter()
-                .find(|metric| metric.as_code() == option)
-                .map(Channel::Bridges),
             _ => None,
         }
     }
@@ -328,10 +323,10 @@ impl Canvas {
                     self.channels.importance(&self.graph, metric),
                 ));
             },
-            Channel::Bridges(metric) => {
+            Channel::Bridges => {
                 let mut nodes = self
                     .channels
-                    .bridges(&self.graph, metric, BRIDGE_THRESHOLD)
+                    .bridges(&self.graph, self.bridge_metric, BRIDGE_THRESHOLD)
                     .bridges
                     .clone();
                 nodes.sort_by_key(|key| key.index());
@@ -375,7 +370,7 @@ impl Canvas {
             | Channel::Coords
             | Channel::Weight
             | Channel::Importance(_)
-            | Channel::Bridges(_) => unreachable!("resolved from the registry above"),
+            | Channel::Bridges => unreachable!("resolved from the registry above"),
         }
     }
 

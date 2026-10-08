@@ -15,7 +15,7 @@ use kernel::graph::fixtures::GraphFixtures;
 use super::arrangement_goldens::topic_fixture;
 use crate::canvas::channels::{Channel, OrderSource};
 use crate::canvas::{Canvas, PhysicsChoice, PhysicsKindSource, PhysicsLaw, PhysicsOverlay};
-use crate::signals::{BridgeMetric, ImportanceMetric, RegistryRuns};
+use crate::signals::{ImportanceMetric, RegistryRuns};
 
 const ARRANGEMENTS: [&str; 6] = [
     "kanban.default",
@@ -43,7 +43,7 @@ fn read_everything(canvas: &mut Canvas) {
             Channel::Coords,
             Channel::Weight,
             Channel::Importance(ImportanceMetric::Betweenness),
-            Channel::Bridges(BridgeMetric::Articulation),
+            Channel::Bridges,
         ] {
             canvas.channel_values(channel);
         }
@@ -83,8 +83,8 @@ fn every_fact_runs_once_with_its_readers_live_and_once_more_when_its_key_moves()
     read_everything(&mut canvas);
     let once = RegistryRuns {
         community: 1,
-        // Betweenness brokers for the rings, articulation points read once.
-        bridges: 2,
+        // Betweenness brokers, for the rings and `groups.bridges` alike (F85).
+        bridges: 1,
         affinity: 1,
         // Degree for size and the gloss, betweenness read once.
         importance: 2,
@@ -131,7 +131,7 @@ fn every_fact_runs_once_with_its_readers_live_and_once_more_when_its_key_moves()
         canvas.channel_runs(),
         RegistryRuns {
             community: 2,
-            bridges: 4,
+            bridges: 2,
             affinity: 2,
             importance: 4,
             recency: 3,

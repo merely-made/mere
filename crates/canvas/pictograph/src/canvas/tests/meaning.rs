@@ -162,10 +162,16 @@ fn every_channel_id_round_trips_and_resolves_over_every_node() {
         "kind.planet",
         "colour.site",
         "distances.miles",
+        // F85: the bridges are one channel, `groups.bridges`, the metric
+        // not part of the id; and a kind cannot be read as the bridge set.
+        "bridges.betweenness",
+        "bridges.articulation",
+        "kind.bridges",
         "",
     ] {
         assert_eq!(Channel::parse(bad), None, "{bad:?} is no channel");
     }
+    assert_eq!(Channel::parse("groups.bridges"), Some(Channel::Bridges));
     // A kind folds to at most eight; the groups channel keeps every group.
     let ChannelValues::Groups(kinds) =
         canvas.channel_values(Channel::Kind(PhysicsKindSource::Coloring))
