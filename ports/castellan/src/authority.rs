@@ -243,6 +243,9 @@ struct ResidentLock<S: IdentityStorage> {
     holders: Mutex<Vec<Arc<dyn VaultLockHolder>>>,
     state: watch::Sender<VaultLockView>,
     kept: Mutex<Option<KeptView>>,
+    /// The vault directory whose persisted lock this resident keeps (rulings
+    /// 5, 80), when it keeps one.
+    persisted: Mutex<Option<PathBuf>>,
 }
 
 impl<S: IdentityStorage + 'static> ResidentLock<S> {
@@ -261,6 +264,12 @@ impl<S: IdentityStorage + 'static> ResidentLock<S> {
         }
         *self.kept.lock().unwrap() = kept;
         drop(vault);
+        // Every lock, the agent's `ssh-add -x` included, persists (ruling 5).
+        if let Some(dir) = self.persisted.lock().unwrap().as_deref() {
+            if let Err(error) = personae::persist_lock(dir) {
+                tracing::error!(%error, "the lock holds, but a restart could reopen the vault");
+            }
+        }
         self.state.send_replace(VaultLockView::Locked);
         tracing::info!(holders = holders.len(), "vault locked");
         Ok(())
@@ -289,6 +298,11 @@ impl<S: IdentityStorage + 'static> ResidentLock<S> {
         }
         *self.kept.lock().unwrap() = None;
         drop(vault);
+        if let Some(dir) = self.persisted.lock().unwrap().as_deref() {
+            if let Err(error) = personae::clear_persisted_lock(dir) {
+                tracing::error!(%error, "unlocked, but the next start will still ask");
+            }
+        }
         self.state.send_replace(VaultLockView::Unlocked);
         tracing::info!(holders = holders.len(), "vault unlocked");
         Ok(())
@@ -415,6 +429,7 @@ impl<S: IdentityStorage + 'static> PersonaeHost<S> {
             holders: Mutex::new(Vec::new()),
             state: watch::channel(initial).0,
             kept: Mutex::new(None),
+            persisted: Mutex::new(None),
         });
         let approval = ApprovalBroker::new(decision_timeout);
         let agent =
@@ -437,6 +452,15 @@ impl<S: IdentityStorage + 'static> PersonaeHost<S> {
     /// choice for the rest of the family.
     pub fn with_vault_dir(mut self, dir: PathBuf) -> Self {
         self.vault_dir = Some(dir);
+        self
+    }
+
+    /// Keep the persisted lock in `dir`: every lock writes its marker and
+    /// every unlock clears it, so a restart under a lock waits for a user act
+    /// (rulings 5, 76, 80). Only the resident sets this; a host without it
+    /// leaves nothing on disk.
+    pub fn with_persisted_lock(self, dir: PathBuf) -> Self {
+        *self.lock.persisted.lock().unwrap() = Some(dir);
         self
     }
 

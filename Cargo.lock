@@ -4525,6 +4525,7 @@ dependencies = [
  "djinn",
  "djinn-testkit",
  "eidetic",
+ "futures-util",
  "gemini-protocol",
  "graphshell",
  "graphshell-endpoint",
@@ -4561,10 +4562,12 @@ dependencies = [
  "thiserror 1.0.69",
  "tokio",
  "tokio-rustls",
+ "toml 0.8.23",
  "tracing",
  "tracing-subscriber",
  "uuid",
  "windows",
+ "zbus",
  "zeroize",
 ]
 

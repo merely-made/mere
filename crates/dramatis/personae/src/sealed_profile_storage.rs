@@ -53,7 +53,8 @@ use crate::vault::{IdentityStorage, Profile, ProfileId, ProfileSummary};
 use crate::{Ed25519Keypair, IdentityError};
 
 const PROFILE_DIR: &str = "profiles";
-const AUTO_UNLOCK_ROOT_FILE: &str = "auto-unlock-root.json";
+/// The `AutoOs` root's file inside a vault directory.
+pub const AUTO_UNLOCK_ROOT_FILE: &str = "auto-unlock-root.json";
 
 /// Where the passphrase-wrapped copy of the root lives, beside the profiles
 /// (a [`crate::PassphraseWrappedRoot`], written by
@@ -105,6 +106,16 @@ impl SealedProfileStorage {
             return Ok(None);
         };
         Ok(Some(Self::open_with_key(root, key)))
+    }
+
+    /// Open over `root` without its key: locked until a user act unlocks it
+    /// (vault lock rulings 38, 76). Nothing is read until then.
+    pub fn open_locked(root: impl Into<PathBuf>) -> Self {
+        let root = root.into();
+        Self {
+            records: SealedRecordStorage::open_locked(&root),
+            root,
+        }
     }
 
     /// Open over an `AutoOs` root that already exists, never minting one.
@@ -203,12 +214,12 @@ impl IdentityStorage for SealedProfileStorage {
                         )
                     })?,
             ),
-            // The gate has been passed; the key comes from the OS store. L3's
-            // persisted lock (ruling 32) checks in `startup_unlock`'s loaders;
-            // a loader taking this `OsPresence` goes beside them, called here.
-            UnlockMethod::OsPresence(_verified) => Zeroizing::new(
-                crate::startup_unlock::load_existing_auto_unlock_root(
+            // The gate has been passed; the key comes from the OS store. The
+            // persisted lock waits for exactly this act, so its loader passes.
+            UnlockMethod::OsPresence(verified) => Zeroizing::new(
+                crate::startup_unlock::load_existing_auto_unlock_root_after_presence(
                     self.root.join(AUTO_UNLOCK_ROOT_FILE),
+                    &verified,
                 )?
                 .ok_or_else(|| {
                     IdentityError::Backend("no OS-held root for this vault".to_string())
