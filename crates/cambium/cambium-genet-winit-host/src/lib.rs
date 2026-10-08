@@ -48,6 +48,8 @@ use genet_scripted_dom::ScriptedDom;
 use std::{cell::RefCell, rc::Rc};
 
 mod decorations;
+mod caption_controls;
+mod scene_producer;
 mod files;
 mod harness;
 #[cfg(test)]
@@ -68,6 +70,8 @@ pub use cambium_rootstock::{
     RelayoutProfile, Runner, ScrollAlign, ScrollIntoView, Surface, WindowCommand, WindowCommands,
     WindowFrame, WindowGeometry, WindowTree, ZOOM_LADDER, fit_zoom, ladder_step, read_frame,
 };
+pub use caption_controls::{CaptionLabels, window_caption_controls, platform_caption_controls};
+pub use scene_producer::SceneProducer;
 pub use files::{DialogFileChooser, choose_save_path, read_file};
 pub use harness::{Harness, inert_hooks};
 pub use windows::{WindowHooks, WindowHost, WindowsInit, run_windows};

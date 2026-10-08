@@ -101,7 +101,6 @@ members = [
     # It is inker-family integration code, not Knot product source, so it
     # stays here; `ports/knot/` does not survive as a directory holding only
     # it.
-    "ports/tabard",
     "ports/tabard/desktop",
     "ports/pelt",
     "ports/pelt/core",
@@ -118,6 +117,8 @@ members = [
     "crates/cambium/cambium-winit",
     "crates/cambium/cambium-winit-a11y",
     "crates/cambium/cambium-genet-winit-host",
+    # Shared authoring surface; the standalone product is ports/tabard/desktop.
+    "crates/cambium/tabard-workshop",
     "crates/cambium/cambium-genet-web-host",
     "crates/cambium/edit-history",
     "crates/cambium/meristem",
@@ -385,7 +386,7 @@ pelt-core = { path = "ports/pelt/core" }
 # defaults off. Pelt re-enables livery/reader/netfetch through its own features.
 pelt-desktop = { path = "ports/pelt/desktop", default-features = false }
 tabard = { version = "0.0.1", path = "crates/system/tabard" }
-tabard-workshop = { path = "ports/tabard" }
+tabard-workshop = { path = "crates/cambium/tabard-workshop" }
 mere-document-lanes = { version = "0.1.0", path = "crates/system/document-lanes" }
 
 # Genet crates the landed ports reach. In genet these were relative paths into
