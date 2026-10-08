@@ -1,8 +1,162 @@
 {
   "schema": "graphshell.nested-host-groups-receipt/v1",
-  "recorded_at": "2026-10-08T20:49:59.549977+00:00",
-  "source_base": "4c796590cc922da21db96c9971bdd521e8f603e4",
+  "recorded_at": "2026-10-08T23:38:32.641065+00:00",
+  "qualification_status": "passed on the default Chrome/Radeon WebGPU adapter after the coarse traversal repair",
+  "qualification_base": "26f4c19a0 (main fbc149bd9) plus immutable renderer pins; exact source hashes below",
   "scope": "Explicit containment over a bounded manifest-declaration dataset; view-local expansion and entry; no saved-scene or portable-fold claim.",
+  "renderer_fix": {
+    "provider_repository": "https://github.com/mark-ik/vello",
+    "provider_revision": "865cbf419668a6fb5b5e96ea54eaaf9be160fd92",
+    "provider_base": "6a174d2777ab555286a851865384df20a313ce3c",
+    "source_sha256": "d70f75d609ebe090a9dafabecd516972d5be90b40be6756cb1ed5a82bbbacf4b",
+    "change": "Separate bitmap-slice traversal from set-bit consumption; preserve ascending draw order and clip state.",
+    "diagnostic_before": {
+      "first_tile_bitmaps": [
+        7,
+        256,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "expected_entries": 4,
+      "processed_entries": 1,
+      "bin_entries": 41,
+      "clip_depth_at_end": 1
+    },
+    "boundary": "Observed browser/Metal execution failure; exact Tint or driver instruction not established. No software fallback or shader substitution in the acceptance bundle.",
+    "checks": {
+      "coarse_bitmap_native_cpu_gpu": 2,
+      "existing_native_cpu_gpu": 9,
+      "existing_large_bin_test_ignored": 1,
+      "gpu_count_recovery": 1,
+      "graphshell_host_input": 8,
+      "root_metadata": "passed; Classic and its encoding/shader dependencies use the same immutable revision",
+      "locked_viewer_wasm_build": "passed",
+      "locked_main_page_without_gpu_physics_check": "passed"
+    },
+    "integration": {
+      "mere_main": "fbc149bd9",
+      "mere_merge": "26f4c19a0",
+      "genet_revision": "15713014e2e23b887360471552f75f60684f5384",
+      "netrender_revision": "9607d16f1907f6c2085648ae96abcaa30d7c3d41"
+    },
+    "bundle": {
+      "graphshell_web_bg.wasm": {
+        "debug_bytes": 327006625,
+        "sha256": "5ff75e8dfeb6edf0d48de02c7e58add891e4c6f1c6d6239c51150c19efe6b940"
+      },
+      "graphshell_web.js": {
+        "debug_bytes": 119359,
+        "sha256": "9859d0af33db0f9098a66b1af9b4925b82207d6cf099a4f7557bcfdfbbf7e016"
+      }
+    }
+  },
+  "current_browser": {
+    "headed": true,
+    "browser": "Google Chrome 152.0.7977.83",
+    "backend": "default WebGPU adapter, Radeon Pro Vega 56 (amd/gcn-5)",
+    "launch_flags": [
+      "--enable-unsafe-webgpu"
+    ],
+    "shader_hooks": false,
+    "software_adapter": false,
+    "viewport": [
+      1440,
+      1000
+    ],
+    "warmup_seconds": 5,
+    "runs": {
+      "nested-groups": {
+        "receipt_result": "ok",
+        "page_errors": [],
+        "gate_failures": [],
+        "hidden": false,
+        "failures": []
+      },
+      "flat-site": {
+        "receipt_result": "ok",
+        "page_errors": [],
+        "gate_failures": [],
+        "hidden": false,
+        "failures": []
+      },
+      "unknown-grouping": {
+        "receipt_result": null,
+        "page_errors": [],
+        "gate_failures": [],
+        "hidden": false,
+        "failures": [],
+        "refusal": "alert present; no scenario started"
+      }
+    },
+    "retained_keyboard_and_breadcrumbs": "passed",
+    "visual_qualification": "passed: all three original nested-group captures and the flat S1 capture",
+    "captures": {
+      "groups_expanded": {
+        "png_bytes": 306643,
+        "sha256": "7c9b515dc65b682fc32df376990cfa91b1419d251f2fa3e0b88cd577b6514929",
+        "viewport": [
+          1440,
+          1000
+        ]
+      },
+      "groups_entered": {
+        "png_bytes": 328752,
+        "sha256": "2b0c169442d760cd3e6a9b920f332998febc329b31f76883f72afafec47b9e1f",
+        "viewport": [
+          1440,
+          1000
+        ]
+      },
+      "groups_collapsed": {
+        "png_bytes": 261283,
+        "sha256": "6e3931263cd1492bd7019b056e8542b70947fa50e50dfe550c4063a4b2c2752c",
+        "viewport": [
+          1440,
+          1000
+        ]
+      },
+      "tree_host_dataset": {
+        "png_bytes": 261574,
+        "sha256": "cdcddee52a92d438ef23cc374b43e6123b50216865dae508902a309e1c699772",
+        "viewport": [
+          1440,
+          1000
+        ]
+      },
+      "keyboard-entered": {
+        "png_bytes": 225978,
+        "sha256": "3e9df98ef7c41944a08e3457834fa8db7f28813785e48912e25d57163c131782",
+        "viewport": [
+          1440,
+          1000
+        ]
+      },
+      "narrow-entered": {
+        "png_bytes": 100413,
+        "sha256": "32e279a4f9518a53efe27f95ef820534907ec01832812306ac41985178d0a6ab",
+        "viewport": [
+          420,
+          800
+        ]
+      }
+    },
+    "performance_qualification": "not measured",
+    "manual_capture_review": "Nodes, edges and retained controls are visible. Preserved camera leaves some nodes offscreen; substantial narrow-screen control area remains a usability issue.",
+    "old_shader_control": {
+      "receipt_result": "fail",
+      "failures": [
+        "FAIL: capture tree_host_dataset contains no visible graphshell-tree detail"
+      ],
+      "gpu_errors": [],
+      "page_errors": [],
+      "scope": "Only the old coarse WGSL was substituted into the source-built repaired viewer. This is a diagnostic control, not the acceptance bundle."
+    }
+  },
+  "source_base": "4c796590cc922da21db96c9971bdd521e8f603e4",
   "fixture": {
     "occurrences": 18,
     "relationships": 34,
@@ -14,7 +168,8 @@
     "host_dataset_tests": 8,
     "exporter_tests": 4,
     "viewer_wasm_build": "passed",
-    "main_page_without_gpu_physics_check": "passed"
+    "main_page_without_gpu_physics_check": "passed",
+    "scope": "Original grouping checks; current renderer qualification is recorded under renderer_fix and current_browser"
   },
   "browser": {
     "headed": true,
@@ -56,7 +211,7 @@
       }
     },
     "retained_keyboard_and_breadcrumbs": "passed",
-    "visual_qualification": "failed on the default adapter: both grouped and flat routes produce opaque black captures",
+    "visual_qualification": "Historical initial default-adapter failure, superseded by current_browser for the repaired source",
     "software_backend_attempt": "initial ANGLE-only attempt timed out; corrected WebGPU adapter run is recorded under software_browser",
     "warmup_seconds": 5
   },
@@ -64,12 +219,13 @@
     "crates/cambium/scenes/scenomise/src/grouping.rs": "e832bd36165c8e9d08e5b5540ac13633eee79b4c1f4a131559930a9cf1732f22",
     "ports/graphshell/src/host_dataset_view.rs": "c515cf9b52207eadb10c726783e5f74f16886d1dbbdd6979b47a6d295f1c6aa0",
     "ports/graphshell/src/web_tree/grouping.rs": "e6b5f54832f2ad6d250f11c2eab5401d8c5002b93e376c0cdbed0576e3cdeee6",
-    "ports/graphshell/src/web_tree.rs": "5d445e4e8116d3d98b05a96a8963baa01466cd07af6a0e6946823b8bc064fab1",
+    "ports/graphshell/src/web_tree.rs": "df761d8952f59bf4e338f388503cb6588b127cec489eef4786649ed7c775562b",
     "ports/graphshell/web/fixtures/grouped-manifest-components.json": "5b853515896c986a5347a72100794b8b698718c572462725a72e2e18ae51f48d",
     "scripts/export_grouped_cargo.py": "f06f7c3e78648d61502b03ca3fa84e2fdd318dbb7da5126a7526a152044de243",
-    "ports/graphshell/web/Cargo.toml": "d20189276eb7ceb06d28725a6fb7ae4bca30ad932c8cda478b1a9f089a0fb11f"
+    "ports/graphshell/web/Cargo.toml": "e1f6fe7ac86431da87f744e1f0279e1e00126d3c69a65b178d8f5b4b6e1c67f3",
+    "Cargo.toml": "0ced177694e79b15caa4aa77d02148ed864d83fc7d8cc94f770bb283e2157cb4",
+    "Cargo.lock": "2657314cb2ca8e115c18cb22114a8f80c1a51abe6fe69f84ce6b5bfa680a96c1"
   },
-  "qualification_base": "0051258e4 (includes main 42d6f17f6 via 7ec9c4503)",
   "integration": {
     "genet_revision": "e84f9c7f9aec23320c539784961d1465f8a53a9b",
     "root_and_standalone_web_agree": true,
@@ -193,5 +349,6 @@
         ]
       }
     }
-  }
+  },
+  "initial_qualification_base": "0051258e4 (includes main 42d6f17f6 via 7ec9c4503)"
 }

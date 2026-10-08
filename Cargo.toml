@@ -656,6 +656,12 @@ stickleback = { path = "crates/stickleback" }
 # netrender, so this workspace restates it. Retires by deletion when upstream
 # ships a wgpu-30 vello.
 vello = { git = "https://github.com/mark-ik/vello.git", tag = "vello-0.10.0" }
+# Qualified coarse-command traversal repair for Chrome WebGPU on Radeon.
+# Keep Classic and its encoding/shader types on one immutable maintenance source.
+# This preserves 0.10 APIs and GPU-count recovery; it does not adopt Vello 0.11.
+netrender-vello = { git = "https://github.com/mark-ik/vello.git", rev = "865cbf419668a6fb5b5e96ea54eaaf9be160fd92" }
+vello_encoding = { git = "https://github.com/mark-ik/vello.git", rev = "865cbf419668a6fb5b5e96ea54eaaf9be160fd92" }
+vello_shaders = { git = "https://github.com/mark-ik/vello.git", rev = "865cbf419668a6fb5b5e96ea54eaaf9be160fd92" }
 # cubecl-wgpu 0.10.0, vendored from the registry and moved to wgpu 30. This is
 # the "narrow CubeCL backport" of the 2026-08-15 wgpu 30 unification: it is the
 # ONLY crate in the burn 0.21 / cubecl 0.10 stack that names wgpu at all, so

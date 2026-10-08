@@ -1055,15 +1055,6 @@ dependencies = [
 
 [[package]]
 name = "bit-set"
-version = "0.9.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "34ddef2995421ab6a5c779542c81ee77c115206f4ad9d5a8e05f4ff49716a3dd"
-dependencies = [
- "bit-vec 0.9.1",
-]
-
-[[package]]
-name = "bit-set"
 version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "09ec2f926cc3060f09db9ebc5b52823d85268d24bb917e472c0c4bea35780a7d"
@@ -6930,12 +6921,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "hexf-parse"
-version = "0.2.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dfa686283ad6dd069f105e5ab091b04c62850d3e4cf5d67debad1933f55023df"
-
-[[package]]
 name = "hi_sparse_bitset"
 version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -9968,31 +9953,6 @@ dependencies = [
 
 [[package]]
 name = "naga"
-version = "29.0.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b2bf919621e7975acb27d881bae2fb993e0d45c8e0446e85e6272971e00dc8df"
-dependencies = [
- "arrayvec",
- "bit-set 0.9.1",
- "bitflags 2.13.2",
- "cfg-if",
- "cfg_aliases",
- "codespan-reporting",
- "half",
- "hashbrown 0.16.1",
- "hexf-parse",
- "indexmap",
- "libm",
- "log",
- "num-traits",
- "once_cell",
- "rustc-hash 1.1.0",
- "thiserror 2.0.20",
- "unicode-ident",
-]
-
-[[package]]
-name = "naga"
 version = "30.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a616d2fb8c89516ac2723a581f69d6c18576046bed761bd6b305e5618e6ae130"
@@ -10345,8 +10305,7 @@ dependencies = [
 [[package]]
 name = "netrender-vello"
 version = "0.10.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "35f7845140bb5b2cbb3ebebbb341b14d08bfdbcea6bcad345fd91e4c4c768e26"
+source = "git+https://github.com/mark-ik/vello.git?rev=865cbf419668a6fb5b5e96ea54eaaf9be160fd92#865cbf419668a6fb5b5e96ea54eaaf9be160fd92"
 dependencies = [
  "bytemuck",
  "futures-intrusive",
@@ -10356,7 +10315,7 @@ dependencies = [
  "skrifa 0.44.0",
  "static_assertions",
  "thiserror 2.0.20",
- "vello_encoding 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "vello_encoding 0.10.0 (git+https://github.com/mark-ik/vello.git?rev=865cbf419668a6fb5b5e96ea54eaaf9be160fd92)",
  "vello_shaders",
  "wgpu",
 ]
@@ -15169,7 +15128,7 @@ name = "servo-webgl-essl"
 version = "0.2.0"
 source = "git+https://github.com/merely-made/genet.git?rev=15713014e2e23b887360471552f75f60684f5384#15713014e2e23b887360471552f75f60684f5384"
 dependencies = [
- "naga 30.0.1",
+ "naga",
  "rspirv",
 ]
 
@@ -17398,8 +17357,7 @@ dependencies = [
 [[package]]
 name = "vello_encoding"
 version = "0.10.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1e31cd622201690d8dfe9fd8fea8d1ae59db1bfeea414856a617d1d03438418c"
+source = "git+https://github.com/mark-ik/vello.git?tag=vello-0.10.0#4354955e9d8637f32b7c78b20af2a58f842ba39e"
 dependencies = [
  "bytemuck",
  "guillotiere",
@@ -17411,7 +17369,7 @@ dependencies = [
 [[package]]
 name = "vello_encoding"
 version = "0.10.0"
-source = "git+https://github.com/mark-ik/vello.git?tag=vello-0.10.0#4354955e9d8637f32b7c78b20af2a58f842ba39e"
+source = "git+https://github.com/mark-ik/vello.git?rev=865cbf419668a6fb5b5e96ea54eaaf9be160fd92#865cbf419668a6fb5b5e96ea54eaaf9be160fd92"
 dependencies = [
  "bytemuck",
  "guillotiere",
@@ -17423,14 +17381,13 @@ dependencies = [
 [[package]]
 name = "vello_shaders"
 version = "0.10.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "abf943bd2920bfd22928a9c1bad39866f7ffcc1109b6ed924ab52773e3868a83"
+source = "git+https://github.com/mark-ik/vello.git?rev=865cbf419668a6fb5b5e96ea54eaaf9be160fd92#865cbf419668a6fb5b5e96ea54eaaf9be160fd92"
 dependencies = [
  "bytemuck",
  "log",
- "naga 29.0.4",
+ "naga",
  "thiserror 2.0.20",
- "vello_encoding 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "vello_encoding 0.10.0 (git+https://github.com/mark-ik/vello.git?rev=865cbf419668a6fb5b5e96ea54eaaf9be160fd92)",
 ]
 
 [[package]]
@@ -18252,7 +18209,7 @@ dependencies = [
  "hashbrown 0.17.1",
  "js-sys",
  "log",
- "naga 30.0.1",
+ "naga",
  "parking_lot",
  "portable-atomic",
  "profiling",
@@ -18283,7 +18240,7 @@ dependencies = [
  "hashbrown 0.17.1",
  "indexmap",
  "log",
- "naga 30.0.1",
+ "naga",
  "naga-types",
  "once_cell",
  "parking_lot",
@@ -18352,7 +18309,7 @@ dependencies = [
  "libc",
  "libloading 0.8.9",
  "log",
- "naga 30.0.1",
+ "naga",
  "naga-types",
  "ndk-sys",
  "objc2 0.6.4",
@@ -18390,7 +18347,7 @@ version = "30.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d2f62e73117bb7a62bfd9c5a5841438a823f6566c6442a808ee269d2d055c081"
 dependencies = [
- "naga 30.0.1",
+ "naga",
  "wgpu-types",
 ]
 

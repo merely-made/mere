@@ -50,6 +50,16 @@ the offscreen graph content and substantial narrow-screen control area as
 remaining usability work. It does not claim the exact renderer fault, site
 deployment or a performance measurement.
 
+The subsequent Radeon repair was checked against maintained Vello `865cbf41`
+and Mere's integration of main `fbc149bd9`. The shader separates slice and
+set-bit traversal while retaining draw order and clip state. Twelve provider
+tests pass, including visible-pixel assertions and overflow recovery. The
+original headed grouped and flat scenarios pass on the default hardware
+adapter without shader hooks; substituting only the old coarse shader restores
+the failed capture gate. This supersedes the earlier default-adapter failure
+for this qualified source and adapter. It does not close the site cutover,
+performance or layout-usability work.
+
 The totals above remain the original 2026-09-26 audit, not a new full census.
 The plan's status now records phase 3 under headed verification and preserves
 Mark's timing ruling as the gate before phase 4. The clean dependency repin
