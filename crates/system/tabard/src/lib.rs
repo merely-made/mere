@@ -18,6 +18,7 @@
 #![doc(html_no_source)]
 #![forbid(unsafe_code)]
 
+pub mod library;
 pub mod smolweb;
 pub mod theme;
 pub mod workshop;
