@@ -21,6 +21,9 @@ serde_json.workspace = true
 accesskit = ["dep:uxtree", "dep:accesskit"]
 
 [dev-dependencies]
+# Test-only: a shelfmark cites a portable capture by its content address
+# (site canvas plan, S6). The shipped client takes no incipit edge.
+incipit.workspace = true
 # Test-only: lets the frozen-realization tests solve the real coastal-map
 # fixture rather than assert against a hand-built stand-in.
 scenomise.workspace = true
