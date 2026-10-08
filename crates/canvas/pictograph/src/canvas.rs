@@ -203,6 +203,9 @@ pub mod physics_catalog;
 /// Schedules of compositions, each stage to its stop, with captures taken by
 /// role. (Dynamics grammar plan, G3.)
 pub mod schedule;
+/// The dynamics spec over this catalog: seiche's portable spec, with the
+/// laws and overlays as its presets. (Dynamics grammar plan, G4a.)
+pub mod dynamics_spec;
 pub use board_scene::{
     BoardBackdrop, BoardCard, BoardFit, BoardFootprint, BoardRect, BoardScene, BoardText,
     BoardTransform,
