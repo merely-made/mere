@@ -242,13 +242,12 @@ graphshell-endpoint = { version = "0.0.2", path = "crates/graphshell/graphshell-
 # Its sources left this repository on 2026-09-04 under that plan's E2; Djinn and
 # Turnstone consume one immutable revision. The `[patch]` table at the bottom of
 # this file makes this checkout the implementation source for the Mere contracts
-# Knot names, so those types keep one Cargo source identity. `ef89a186` is Knot
-# on one Mere revision, `e0cea3e0` (genet d851a9db0cd with image-decode, which
-# holds both P1 `19e6dc9f` and stable Burn `5fecd707`; mer3ly Rulings 111-117).
-# Knot moved first, as ruling 557 orders, and djinn's `knot-site` row follows
-# this one.
-knot-editor = { version = "0.0.3", git = "https://github.com/merely-made/knot-editor.git", rev = "ef89a186bbd89edf1761361b345ec524c4ae549e" }
-knot-document = { version = "0.0.1", git = "https://github.com/merely-made/knot-editor.git", rev = "ef89a186bbd89edf1761361b345ec524c4ae549e" }
+# Knot names, so those types keep one Cargo source identity. `eabd4434` is Knot
+# with the lent signing seed (vault lock rulings 49, 57-59), on Knot's
+# current-family repin: every Mere row at `f1d169c7`, genet `965b64e`. Knot
+# moved first, and djinn's `knot-site` row follows this one.
+knot-editor = { version = "0.0.3", git = "https://github.com/merely-made/knot-editor.git", rev = "eabd44345c3d02110891dbda0a63930ba4841d18" }
+knot-document = { version = "0.0.1", git = "https://github.com/merely-made/knot-editor.git", rev = "eabd44345c3d02110891dbda0a63930ba4841d18" }
 # The credential-keeper port (dramatis plan D4). No longer a reservation:
 # C1/C2 landed the OTP core, sealed OTP items, the release gate, and the
 # `keeper` identity surface graphshell re-exports.
