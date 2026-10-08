@@ -60,11 +60,12 @@ const fn entry(id: &'static str, label: &'static str) -> Entry {
     Entry { id, label }
 }
 
-/// Every shared id with its label, in the plan's order (F13).
+/// Every shared id with its label, in the plan's order (F13; four labels
+/// revised by SE52).
 pub const CATALOGUE: &[Entry] = &[
     entry(ids::NODE_NEW, "New node"),
     entry(ids::NODE_DELETE, "Delete node"),
-    entry(ids::NODE_EDIT, "Edit node"),
+    entry(ids::NODE_EDIT, "Edit selected node"),
     entry(ids::NODE_PIN, "Pin"),
     entry(ids::NODE_UNPIN, "Unpin"),
     entry(ids::NODE_PIN_TOGGLE, "Pin or unpin"),
@@ -81,10 +82,10 @@ pub const CATALOGUE: &[Entry] = &[
     entry(ids::VIEW_FIT, "Fit to view"),
     entry(ids::VIEW_ZOOM_IN, "Zoom in"),
     entry(ids::VIEW_ZOOM_OUT, "Zoom out"),
-    entry(ids::PHYSICS_TOGGLE, "Play or pause physics"),
+    entry(ids::PHYSICS_TOGGLE, "Pause or resume physics"),
     entry(ids::PHYSICS_SETTINGS, "Physics settings"),
-    entry(ids::SESSION_UNDO, "Undo"),
-    entry(ids::SESSION_REDO, "Redo"),
+    entry(ids::SESSION_UNDO, "Undo change"),
+    entry(ids::SESSION_REDO, "Redo change"),
     entry(ids::SESSION_SAVE, "Save session"),
     entry(ids::PANE_SETTINGS, "Open Settings pane"),
     entry(ids::PANE_TRAIL, "Open Trail pane"),
