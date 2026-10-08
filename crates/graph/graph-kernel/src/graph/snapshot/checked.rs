@@ -318,4 +318,13 @@ impl Graph {
         validate_resource_columns(snapshot)?;
         Ok(Self::from_snapshot_unchecked(snapshot))
     }
+
+    /// Load caller-qualified recorded truth without deriving relations from current URLs.
+    /// Explicit resource columns receive the same validation as legacy loads.
+    pub fn try_from_recorded_snapshot(
+        snapshot: &GraphSnapshot,
+    ) -> Result<Self, ResourceSnapshotError> {
+        validate_resource_columns(snapshot)?;
+        Ok(Self::from_recorded_snapshot_unchecked(snapshot))
+    }
 }

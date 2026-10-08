@@ -325,7 +325,7 @@ impl GraphJournal {
         })
     }
 
-    /// Semantic-only migration of a caller-qualified legacy baseline and prefix.
+    /// Migration of a caller-qualified legacy baseline and prefix.
     /// Ordinary replay does not infer a legacy profile from absent resource columns.
     pub fn migrated_prefix_at_from(
         &self,
@@ -344,6 +344,50 @@ impl GraphJournal {
             &self.log.entries()[..end],
         )
         .map(Some)
+    }
+
+    /// Validate choices against this complete qualified legacy journal, then read a prefix.
+    /// Future carried-handle choices do not change or invalidate earlier prefixes.
+    /// A host with a modern suffix must supply only its qualified legacy prefix to the adapter.
+    pub fn migrated_prefix_at_from_with_resolutions(
+        &self,
+        baseline: &Graph,
+        cursor: Seq,
+        resolutions: &[super::legacy_resource_migration::LegacyResourceOriginResolution],
+    ) -> Result<
+        Option<super::legacy_resource_migration::MigratedReplay>,
+        super::legacy_resource_migration::LegacyMigrationError,
+    > {
+        use super::legacy_resource_migration::{
+            migrate_legacy_prefix_with_resolutions, probe_legacy_mint_links,
+            validate_legacy_origin_resolutions,
+        };
+        let end = cursor.index();
+        if end > self.log.len() {
+            return Ok(None);
+        }
+        validate_legacy_origin_resolutions(baseline, self.log.entries(), resolutions)?;
+        let prefix = &self.log.entries()[..end];
+        let ids: std::collections::BTreeSet<_> = probe_legacy_mint_links(baseline, prefix)?
+            .into_iter()
+            .map(|diagnostic| diagnostic.statement_id)
+            .collect();
+        let relevant: Vec<_> = resolutions
+            .iter()
+            .filter(|choice| ids.contains(&choice.statement_id))
+            .cloned()
+            .collect();
+        migrate_legacy_prefix_with_resolutions(baseline, prefix, &relevant).map(Some)
+    }
+
+    pub fn migrated_snapshot_at_from_with_resolutions(
+        &self,
+        baseline: &Graph,
+        cursor: Seq,
+        resolutions: &[super::legacy_resource_migration::LegacyResourceOriginResolution],
+    ) -> Result<Option<Graph>, super::legacy_resource_migration::LegacyMigrationError> {
+        self.migrated_prefix_at_from_with_resolutions(baseline, cursor, resolutions)
+            .map(|replay| replay.map(|replay| replay.graph))
     }
 
     /// The graph-only convenience form of [`migrated_prefix_at_from`](Self::migrated_prefix_at_from).
@@ -365,13 +409,24 @@ impl GraphJournal {
         graph: &mut Graph,
         baseline: &Graph,
     ) -> Result<(), super::legacy_resource_migration::LegacyMigrationError> {
+        self.migrated_replay_from_with_baseline_and_resolutions(since, graph, baseline, &[])
+    }
+
+    pub fn migrated_replay_from_with_baseline_and_resolutions(
+        &self,
+        since: Seq,
+        graph: &mut Graph,
+        baseline: &Graph,
+        resolutions: &[super::legacy_resource_migration::LegacyResourceOriginResolution],
+    ) -> Result<(), super::legacy_resource_migration::LegacyMigrationError> {
         if since.index() > self.log.len() {
             return Err(super::legacy_resource_migration::LegacyMigrationError(
                 "legacy checkpoint cursor is beyond retained history".into(),
             ));
         }
-        let mut replay =
-            super::legacy_resource_migration::migrate_legacy_prefix(baseline, self.log.entries())?;
+        let mut replay = self
+            .migrated_prefix_at_from_with_resolutions(baseline, self.live_cursor(), resolutions)?
+            .expect("live cursor exists");
         replay.graph.recorder.0 = graph.recorder.0.take();
         replay.graph.write_author = graph.write_author.clone();
         replay.graph.current_session = graph.current_session;

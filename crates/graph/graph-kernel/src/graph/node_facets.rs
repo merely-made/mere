@@ -180,17 +180,17 @@ impl Graph {
                 .find(|existing| existing.content_eq(&property))
             {
                 Some(existing) => {
-                    if existing.provenance_iri == property.provenance_iri
-                        && existing.asserted_at_ms == property.asserted_at_ms
-                    {
+                    if existing.asserted_at_ms == property.asserted_at_ms {
                         continue;
                     }
-                    existing.provenance_iri = property.provenance_iri.clone();
                     existing.asserted_at_ms = property.asserted_at_ms;
+                    accepted.push(existing.clone());
                 },
-                None => properties.push(property.clone()),
+                None => {
+                    properties.push(property.clone());
+                    accepted.push(property);
+                },
             }
-            accepted.push(property);
         }
         if accepted.is_empty() {
             return false;

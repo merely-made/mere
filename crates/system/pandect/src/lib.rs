@@ -96,6 +96,7 @@ pub mod scene_facets;
 // filesystem). Save redacts private fields by default; open thaws read-only.
 pub mod codicil_seal;
 pub mod graph_codicil;
+pub mod graph_placement;
 // A mere's sessions over one muniment store: the session schema, the live
 // session core and the lifecycle (reservoir plan V2).
 pub mod graph_session;

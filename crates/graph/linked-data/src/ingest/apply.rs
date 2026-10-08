@@ -5,11 +5,11 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #[cfg(not(target_arch = "wasm32"))]
-use kernel::graph::apply::{self as graph_apply, GraphDelta, apply_graph_delta};
+use kernel::graph::apply::{self as graph_apply, GraphDelta, GraphDeltaResult, apply_graph_delta};
 #[cfg(not(target_arch = "wasm32"))]
 use kernel::graph::{
-    Graph, NodeKey, ProvenanceSubKind, SemanticStatement, SemanticStatementSpec, SemanticSubKind,
-    sub_kind_from_iri,
+    Graph, NodeKey, ProvenanceSubKind, ResourceNode, SemanticStatement, SemanticStatementSpec,
+    SemanticSubKind, sub_kind_from_iri,
 };
 #[cfg(not(target_arch = "wasm32"))]
 use kernel::types::{
@@ -18,7 +18,9 @@ use kernel::types::{
 };
 
 #[cfg(not(target_arch = "wasm32"))]
-use super::GraphContribution;
+use super::{GraphContribution, NodeContribution, SubjectIdentity};
+#[cfg(not(target_arch = "wasm32"))]
+use kernel::persistence::PersistedResourceRecord;
 
 /// What [`apply_contribution`] did.
 #[cfg(not(target_arch = "wasm32"))]
@@ -35,12 +37,26 @@ pub struct ApplyOutcome {
 /// (reused if matched by URL, else created), and one `Semantic` edge per edge —
 /// recognized predicate → typed sub-kind + canonical IRI; unrecognized → open
 /// predicate via [`Graph::assert_semantic_predicate`]. Curated literals
-/// (`title` / `tags`) are written onto the node; `@type` is not yet mapped.
+/// (`title` / `tags`) are written onto the node; `@type` becomes a classification.
+/// Generic RDF binds new subjects to exact-IRI resources. Page extraction uses
+/// [`apply_contribution_with_identity`] to identify its page subjects explicitly.
 ///
 /// `not(wasm32)`: `add_node` mints a UUID. A wasm host materializes from the same
 /// contribution using `add_node_with_id` with a host-provided UUID.
 #[cfg(not(target_arch = "wasm32"))]
 pub fn apply_contribution(graph: &mut Graph, contribution: &GraphContribution) -> ApplyOutcome {
+    apply_contribution_with_identity(graph, contribution, |_| SubjectIdentity::ExactIri)
+}
+
+/// Apply mixed RDF subjects with caller-owned resource identity intent.
+/// The callback identifies pages explicitly; RDF types and the parse base do not.
+/// Existing shown bindings and resource records are preserved.
+#[cfg(not(target_arch = "wasm32"))]
+pub fn apply_contribution_with_identity(
+    graph: &mut Graph,
+    contribution: &GraphContribution,
+    mut identity: impl FnMut(&NodeContribution) -> SubjectIdentity,
+) -> ApplyOutcome {
     use std::collections::HashMap;
 
     /// An ingested `@type` IRI as a classification under the `rdf:type` scheme
@@ -61,21 +77,65 @@ pub fn apply_contribution(graph: &mut Graph, contribution: &GraphContribution) -
     let mut key_for: HashMap<&str, NodeKey> = HashMap::new();
 
     for node in &contribution.nodes {
+        let subject_identity = identity(node);
         let key = graph
             .get_node_by_url(&node.id)
             .map(|(key, _)| key)
             .unwrap_or_else(|| {
-                outcome.nodes_created += 1;
                 // The `@id` is the node's identity here, so mint a deterministic
                 // UUIDv5 from it: two hosts ingesting the same document agree on
                 // node ids, so a federated merge needs no reconciliation.
-                graph_apply::add_node(
-                    graph,
-                    Some(Graph::node_namespace_id(&node.id)),
-                    node.id.clone(),
-                    Default::default(),
-                )
+                let id = Graph::node_namespace_id(&node.id);
+                if subject_identity == SubjectIdentity::Page {
+                    outcome.nodes_created += 1;
+                    graph_apply::add_node(graph, Some(id), node.id.clone(), Default::default())
+                } else {
+                    // The legacy Add grammar leaves binding to the exact typed captures below.
+                    match apply_graph_delta(
+                        graph,
+                        GraphDelta::ReplayAddNodeWithIdIfMissing {
+                            id,
+                            url: node.id.clone(),
+                            position: Default::default(),
+                        },
+                    ) {
+                        GraphDeltaResult::NodeMaybeAdded(Some(key)) => {
+                            outcome.nodes_created += 1;
+                            key
+                        },
+                        GraphDeltaResult::NodeMaybeAdded(None) => graph
+                            .get_node_key_by_id(id)
+                            .expect("an existing deterministic subject has a surface"),
+                        _ => unreachable!("ReplayAddNode returns NodeMaybeAdded"),
+                    }
+                }
             });
+        if graph.shown_resource_id(key).is_none() {
+            let resource = match subject_identity {
+                SubjectIdentity::ExactIri => ResourceNode::for_term(&node.id),
+                SubjectIdentity::Page => ResourceNode::new(&node.id),
+            };
+            if graph.resource(resource.id()).is_none() {
+                apply_graph_delta(
+                    graph,
+                    GraphDelta::ReplaySetResourceRecordById {
+                        resource_id: resource.id(),
+                        record: Some(PersistedResourceRecord {
+                            canonical_iri: resource.canonical_iri().into(),
+                            facets: vec![],
+                        }),
+                    },
+                );
+            }
+            let surface_id = graph.get_node(key).unwrap().id;
+            apply_graph_delta(
+                graph,
+                GraphDelta::ReplaySetShownResourceById {
+                    surface_id,
+                    resource_id: Some(resource.id()),
+                },
+            );
+        }
         if let Some(title) = &node.title {
             let _ = apply_graph_delta(
                 graph,

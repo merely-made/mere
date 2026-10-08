@@ -35,14 +35,14 @@
 
 #![doc(html_root_url = "https://docs.rs/linked-data/0.0.1")]
 
-use kernel::graph::{Graph, Node, NodeKey, SemanticData, predicate_iri, sub_kind_from_iri};
+use kernel::graph::{Graph, Node, NodeKey, SemanticData, predicate_iri};
 use kernel::types::ClassificationScheme;
 use kernel::types::{GraphScope, NodeProperty};
 use oxrdf::{GraphName, Literal, NamedNode, Quad, Term, Triple};
-use serde_json::{Map, Value, json};
-use std::collections::BTreeMap;
+use serde_json::{Map, Value};
 use time::{OffsetDateTime, format_description::well_known::Rfc3339};
 
+mod jsonld;
 mod reifier;
 
 use reifier::statement_reifier_id;
@@ -69,11 +69,12 @@ pub mod statements;
 pub mod query;
 
 #[cfg(not(target_arch = "wasm32"))]
-pub use ingest::{ApplyOutcome, apply_contribution};
+pub use ingest::{ApplyOutcome, apply_contribution, apply_contribution_with_identity};
 pub use ingest::{
-    ContextCache, EdgeContribution, GraphContribution, IngestError, NodeContribution, from_jsonld,
-    from_jsonld_with_contexts, from_jsonld_with_contexts_and_base_iri, from_quads,
-    is_bundled_context, referenced_context_urls,
+    ContextCache, EdgeContribution, GraphContribution, IngestError, NodeContribution,
+    SubjectIdentity, from_jsonld, from_jsonld_with_contexts,
+    from_jsonld_with_contexts_and_base_iri, from_quads, is_bundled_context,
+    referenced_context_urls,
 };
 pub use serialize::{from_nquads, from_trig, to_nquads, to_trig};
 pub use statements::{StatementOutcome, apply_link_statements, resolve_rel};
@@ -96,16 +97,10 @@ const GRAPH_SCOPE_USER: &str = "https://mere.computer/ns/graph#user";
 const GRAPH_SCOPE_AGENT: &str = "https://mere.computer/ns/graph#agent";
 const GRAPH_SCOPE_MOOT: &str = "https://mere.computer/ns/graph#moot";
 
-/// Export the whole graph as expanded JSON-LD: a [`Value::Array`] of node
-/// objects, one per graph node, in node-insertion order. Deterministic (tags and
-/// edge targets are sorted), so the output is safe to pin in a golden test.
+/// Export the complete RDF projection as expanded JSON-LD.
+/// Named graphs retain their scopes; assertions use classic RDF reification.
 pub fn to_jsonld(graph: &Graph) -> Value {
-    Value::Array(
-        graph
-            .nodes()
-            .map(|(key, node)| node_object(graph, key, node))
-            .collect(),
-    )
+    jsonld::export(graph, false)
 }
 
 /// Pretty-printed [`to_jsonld`], for goldens and human inspection.
@@ -521,7 +516,7 @@ fn node_dataset_quads(graph: &Graph, key: NodeKey, node: &Node) -> Vec<Quad> {
 }
 
 /// The RDF quads for one node, restricted to the default graph. This remains
-/// the JSON-LD shaper's input until named-graph JSON-LD export lands.
+/// the compatibility view for callers that need direct default-graph node quads.
 pub fn node_quads(graph: &Graph, key: NodeKey, node: &Node) -> Vec<Quad> {
     node_direct_quads(graph, key, node)
         .into_iter()
@@ -583,159 +578,10 @@ pub(crate) fn dataset_quad_iter(graph: &Graph) -> impl Iterator<Item = Quad> + '
         )
 }
 
-fn node_object(graph: &Graph, key: NodeKey, node: &Node) -> Value {
-    let mut obj = Map::new();
-    obj.insert("@id".to_string(), Value::String(node_id(node)));
-
-    // Render the node's quads as expanded JSON-LD: `@type` collects the `rdf:type`
-    // objects; every other predicate is an array of `{@id}` / `{@value}` entries,
-    // grouped and key-sorted (`BTreeMap`) for a stable document. The quads already
-    // arrive in a deterministic order, so per-predicate entry order is stable.
-    let mut types: Vec<String> = Vec::new();
-    let mut by_predicate: BTreeMap<String, Vec<Value>> = BTreeMap::new();
-    for quad in node_quads(graph, key, node) {
-        let predicate = quad.predicate.as_str();
-        if predicate == RDF_TYPE {
-            if let Term::NamedNode(object) = &quad.object {
-                types.push(object.as_str().to_string());
-            }
-            continue;
-        }
-        let entry = match &quad.object {
-            Term::NamedNode(object) => json!({ "@id": object.as_str() }),
-            Term::Literal(object) => literal_json_value(object),
-            _ => continue,
-        };
-        by_predicate
-            .entry(predicate.to_string())
-            .or_default()
-            .push(entry);
-    }
-
-    if !types.is_empty() {
-        obj.insert(
-            "@type".to_string(),
-            Value::Array(types.into_iter().map(Value::String).collect()),
-        );
-    }
-    for (predicate, values) in by_predicate {
-        obj.insert(predicate, Value::Array(values));
-    }
-
-    Value::Object(obj)
-}
-
-/// Export the whole graph as **compacted** JSON-LD: `{"@context": {…}, "@graph":
-/// […]}`. A recognized relation and the curated literals are emitted as short
-/// terms backed by an inline `@context` (term → IRI); an open / raw predicate
-/// keeps its full IRI as the key (the open tail stays explicit). This is the
-/// curated kernel-vocabulary context's first consumer, and it round-trips through
-/// [`from_jsonld`], which expands the inline context. Deterministic, like
-/// [`to_jsonld`].
+/// Export the complete RDF projection under an inline context.
+/// Curated and recognized predicates use short terms; open predicates retain IRIs.
 pub fn to_jsonld_compact(graph: &Graph) -> Value {
-    let mut context = Map::new();
-    let graph_nodes: Vec<Value> = graph
-        .nodes()
-        .map(|(key, node)| compact_node_object(graph, key, node, &mut context))
-        .collect();
-    json!({ "@context": Value::Object(context), "@graph": Value::Array(graph_nodes) })
-}
-
-/// The short term for a recognized predicate IRI: its fragment or last path
-/// segment (`…/rel#cites` → `cites`, `schema.org/name` → `name`).
-fn term_for(iri: &str) -> &str {
-    iri.rsplit(['#', '/']).next().unwrap_or(iri)
-}
-
-fn compact_node_object(
-    graph: &Graph,
-    key: NodeKey,
-    node: &Node,
-    context: &mut Map<String, Value>,
-) -> Value {
-    let mut obj = Map::new();
-    obj.insert("@id".to_string(), Value::String(node_id(node)));
-
-    // Render the node's quads as compacted JSON-LD. `@type` collects the
-    // `rdf:type` objects; the curated literals become the `name` (scalar) and
-    // `keywords` (array) short terms; a recognized relation becomes a short term
-    // registered in the inline context; a raw predicate keeps its full IRI as the
-    // key. Edge and open-property values collapse to a scalar when single.
-    let mut types: Vec<String> = Vec::new();
-    let mut name: Option<String> = None;
-    let mut keywords: Vec<String> = Vec::new();
-    let mut by_key: BTreeMap<String, Vec<Value>> = BTreeMap::new();
-
-    for quad in node_quads(graph, key, node) {
-        let predicate = quad.predicate.as_str();
-        if predicate == RDF_TYPE {
-            if let Term::NamedNode(object) = &quad.object {
-                types.push(object.as_str().to_string());
-            }
-            continue;
-        }
-        if predicate == SCHEMA_NAME {
-            if let Term::Literal(object) = &quad.object {
-                name = Some(object.value().to_string());
-            }
-            continue;
-        }
-        if predicate == SCHEMA_KEYWORDS {
-            if let Term::Literal(object) = &quad.object {
-                keywords.push(object.value().to_string());
-            }
-            continue;
-        }
-        let (emit_key, value) = match &quad.object {
-            Term::NamedNode(object) => {
-                let emit_key = if sub_kind_from_iri(predicate).is_some() {
-                    let term = term_for(predicate).to_string();
-                    context
-                        .entry(term.clone())
-                        .or_insert_with(|| json!(predicate));
-                    term
-                } else {
-                    predicate.to_string()
-                };
-                (emit_key, json!({ "@id": object.as_str() }))
-            },
-            Term::Literal(object) => (predicate.to_string(), compact_literal_json_value(object)),
-            _ => continue,
-        };
-        by_key.entry(emit_key).or_default().push(value);
-    }
-
-    if !types.is_empty() {
-        obj.insert(
-            "@type".to_string(),
-            Value::Array(types.into_iter().map(Value::String).collect()),
-        );
-    }
-    if let Some(name) = name {
-        context
-            .entry("name".to_string())
-            .or_insert_with(|| json!(SCHEMA_NAME));
-        obj.insert("name".to_string(), Value::String(name));
-    }
-    if !keywords.is_empty() {
-        context
-            .entry("keywords".to_string())
-            .or_insert_with(|| json!(SCHEMA_KEYWORDS));
-        obj.insert(
-            "keywords".to_string(),
-            Value::Array(keywords.into_iter().map(Value::String).collect()),
-        );
-    }
-    for (emit_key, mut values) in by_key {
-        let value = if values.len() == 1 {
-            values.pop().expect("length checked")
-        } else {
-            Value::Array(values)
-        };
-        obj.insert(emit_key, value);
-    }
-
-    Value::Object(obj)
+    jsonld::export(graph, true)
 }
 
 #[cfg(test)]
@@ -989,10 +835,29 @@ mod tests {
         assert_eq!(a["@type"], json!(["https://schema.org/Article"]));
     }
 
+    fn instance_objects(document: &serde_json::Value, reifier_count: usize) -> serde_json::Value {
+        let nodes = document.as_array().expect("expanded node array");
+        let is_reifier = |node: &&serde_json::Value| {
+            node["@type"].as_array().is_some_and(|types| {
+                types.contains(&serde_json::Value::String(
+                    crate::jsonld::RDF_STATEMENT.into(),
+                ))
+            })
+        };
+        assert_eq!(nodes.iter().filter(is_reifier).count(), reifier_count);
+        serde_json::Value::Array(
+            nodes
+                .iter()
+                .filter(|node| !is_reifier(node))
+                .cloned()
+                .collect(),
+        )
+    }
+
     #[test]
     fn exports_recognized_and_raw_predicates_with_literals() {
         assert_eq!(
-            to_jsonld(&seed()),
+            instance_objects(&to_jsonld(&seed()), 2),
             json!([
                 {
                     "@id": "https://a.test/",
@@ -1025,7 +890,7 @@ mod tests {
         graph.assert_semantic_predicate(a, b, "https://schema.org/citation".to_string());
 
         assert_eq!(
-            to_jsonld(&graph),
+            instance_objects(&to_jsonld(&graph), 2),
             json!([
                 {
                     "@id": "https://a.test/",
@@ -1068,14 +933,16 @@ mod tests {
 
     #[test]
     fn expanded_export_round_trips_through_ingest() {
-        let doc = serde_json::to_vec(&to_jsonld(&seed())).expect("serialize");
-        assert_round_trip(&from_jsonld(&doc).expect("round-trip parse"));
+        let graph = seed();
+        let doc = serde_json::to_vec(&to_jsonld(&graph)).expect("serialize");
+        assert_round_trip(&from_jsonld(&doc).expect("round-trip parse"), &graph);
     }
 
     #[test]
     fn compact_export_round_trips_through_ingest() {
-        let doc = serde_json::to_vec(&to_jsonld_compact(&seed())).expect("serialize");
-        assert_round_trip(&from_jsonld(&doc).expect("round-trip parse"));
+        let graph = seed();
+        let doc = serde_json::to_vec(&to_jsonld_compact(&graph)).expect("serialize");
+        assert_round_trip(&from_jsonld(&doc).expect("round-trip parse"), &graph);
     }
 
     /// Both export forms must ingest back to the same logical content: A's curated
@@ -1255,7 +1122,7 @@ mod tests {
         );
     }
 
-    fn assert_round_trip(contribution: &GraphContribution) {
+    fn assert_round_trip(contribution: &GraphContribution, graph: &Graph) {
         let a = contribution
             .nodes
             .iter()
@@ -1263,26 +1130,12 @@ mod tests {
             .expect("node a");
         assert_eq!(a.title.as_deref(), Some("Article A"));
         assert_eq!(a.tags, vec!["research".to_string()]);
-        assert!(contribution.edges.contains(&EdgeContribution {
-            subject: "https://a.test/".into(),
-            predicate: "https://mere.computer/ns/rel#cites".into(),
-            object: "https://b.test/".into(),
-            graph_scope: GraphScope::Default,
-            statement_id: None,
-            label: None,
-            provenance_iri: None,
-            asserted_at_ms: None,
-        }));
-        assert!(contribution.edges.contains(&EdgeContribution {
-            subject: "https://a.test/".into(),
-            predicate: "https://schema.org/citation".into(),
-            object: "https://c.test/".into(),
-            graph_scope: GraphScope::Default,
-            statement_id: None,
-            label: None,
-            provenance_iri: None,
-            asserted_at_ms: None,
-        }));
+        let expected = crate::from_quads(crate::dataset_quads(graph), "round-trip oracle")
+            .expect("native RDF contribution");
+        assert_eq!(
+            contribution, &expected,
+            "JSON-LD preserves the exact assertion metadata"
+        );
     }
 
     #[cfg(feature = "query")]

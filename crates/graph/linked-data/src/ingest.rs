@@ -16,16 +16,20 @@
 //! skolemized to a `urn:mere:bnode:` IRI.
 //!
 //! [`apply_contribution`] materializes a contribution into a [`Graph`]: it
-//! creates a node per subject/object (or reuses one matched by URL) and asserts
+//! creates a surface per subject/object (or reuses one matched by URL), binds
+//! new subjects to exact-IRI resources and asserts
 //! each edge — a recognized predicate as a typed `Semantic` edge (sub-kind +
 //! canonical IRI), an unrecognized one as an **open-predicate** edge via
 //! `Graph::assert_semantic_predicate`. It is `not(wasm32)` because `add_node`
 //! mints a UUID; a wasm host materializes from the same contribution with
 //! `add_node_with_id`.
+//! Page extractors supply explicit per-subject [`SubjectIdentity::Page`] intent
+//! through [`apply_contribution_with_identity`]. Contribution transport does
+//! not infer identity from a document base or an RDF type.
 //!
 //! The parser expands `@type` values and can resolve explicitly cached remote
 //! contexts without network access. Class-IRI projection policy and complete
-//! named-graph / statement metadata fidelity remain outside this layer.
+//! named-graph and assertion metadata are shared across all supported formats.
 
 use crate::reifier::statement_id_from_reifier;
 use crate::{SCHEMA_KEYWORDS, SCHEMA_NAME};
@@ -37,6 +41,17 @@ use std::collections::BTreeMap;
 /// `rdf:type` — the predicate JSON-LD `@type` expands to.
 const RDF_TYPE: &str = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
 const XSD_STRING: &str = "http://www.w3.org/2001/XMLSchema#string";
+
+/// How a newly bound subject identifies its resource at the apply boundary.
+/// Existing shown-resource associations retain their prepared identity.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub enum SubjectIdentity {
+    /// Preserve the prepared subject IRI, including fragment and case.
+    #[default]
+    ExactIri,
+    /// A caller-identified page uses the common URL canonicalizer.
+    Page,
+}
 
 /// A node described by an ingested JSON-LD document.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -228,7 +243,7 @@ pub fn from_jsonld(bytes: &[u8]) -> Result<GraphContribution, IngestError> {
 
 /// Ingest a set of RDF quads directly — the dataset path (`dataset_quads` /
 /// Turtle / N-Quads), and the half of the Phase 2 round-trip gate that JSON-LD
-/// cannot carry: RDF 1.2 reifier metadata (triple terms) is recognized here
+/// represents with classic records: RDF 1.2 reifier metadata (triple terms) is recognized here
 /// and attached to the matching edge / property contributions.
 pub fn from_quads(
     quads: impl IntoIterator<Item = Quad>,
@@ -362,7 +377,7 @@ enum ReifiedObject {
 
 /// Parse an `xsd:dateTime` lexical back to unix ms — the inverse of the
 /// export's `prov:generatedAtTime` formatting.
-fn parse_xsd_datetime_ms(lexical: &str) -> Option<u64> {
+pub(crate) fn parse_xsd_datetime_ms(lexical: &str) -> Option<u64> {
     let parsed =
         time::OffsetDateTime::parse(lexical, &time::format_description::well_known::Rfc3339)
             .ok()?;
@@ -387,10 +402,39 @@ fn collect_contribution<E: std::fmt::Display>(
     let mut plain: Vec<Quad> = Vec::new();
     let mut reified: BTreeMap<String, ReifiedStatement> = BTreeMap::new();
     let mut reifier_meta: Vec<Quad> = Vec::new();
+    let quads = quads
+        .map(|quad| quad.map_err(|error| IngestError::Parse(error.to_string())))
+        .collect::<Result<Vec<_>, _>>()?;
+    // Reserved assertion identifiers have the same validation in both formats,
+    // including descriptions that otherwise stay ordinary RDF.
+    let mut classic_reifiers = std::collections::HashSet::new();
+    for quad in &quads {
+        if quad.predicate.as_str() == RDF_TYPE
+            && matches!(&quad.object, Term::NamedNode(node)
+                if node.as_str() == crate::jsonld::RDF_STATEMENT)
+        {
+            let reifier = subject_iri(&quad.subject, namespace);
+            statement_id_from_reifier(&reifier).map_err(|error| {
+                IngestError::Parse(format!("invalid assertion ID reifier {reifier}: {error}"))
+            })?;
+            classic_reifiers.insert(reifier);
+        }
+    }
+    let quads = crate::jsonld::bridge_classic_reification(quads);
+    let descriptions: std::collections::HashSet<_> = quads
+        .iter()
+        .filter(|quad| {
+            quad.predicate.as_str() == RDF_TYPE
+                && matches!(&quad.object, Term::NamedNode(node)
+                    if node.as_str() == crate::jsonld::RDF_STATEMENT)
+        })
+        .map(|quad| subject_iri(&quad.subject, namespace))
+        .collect();
+    classic_reifiers.retain(|reifier| !descriptions.contains(reifier));
     for quad in quads {
-        let quad = quad.map_err(|err| IngestError::Parse(err.to_string()))?;
         if quad.predicate.as_str() == RDF_REIFIES
             && let Term::Triple(triple) = &quad.object
+            && !descriptions.contains(&subject_iri(&quad.subject, namespace))
         {
             let reifier = subject_iri(&quad.subject, namespace);
             let statement_id = statement_id_from_reifier(&reifier).map_err(|error| {
@@ -429,7 +473,22 @@ fn collect_contribution<E: std::fmt::Display>(
         // Split off the reifier-subject metadata quads; the rest stay plain.
         let mut rest = Vec::with_capacity(plain.len());
         for quad in plain {
-            if reified.contains_key(&subject_iri(&quad.subject, namespace)) {
+            let reifier = subject_iri(&quad.subject, namespace);
+            if reified.get(&reifier).is_some_and(|statement| {
+                if classic_reifiers.contains(&reifier) {
+                    statement.graph_scope == scope_from_graph_name(&quad.graph_name, namespace)
+                        && crate::jsonld::representable_metadata(
+                            quad.predicate.as_str(),
+                            &quad.object,
+                        )
+                } else {
+                    matches!(
+                        (quad.predicate.as_str(), &quad.object),
+                        (RDFS_LABEL | PROV_GENERATED_AT_TIME, Term::Literal(_))
+                            | (PROV_WAS_ATTRIBUTED_TO, Term::NamedNode(_))
+                    )
+                }
+            }) {
                 reifier_meta.push(quad);
             } else {
                 rest.push(quad);
@@ -559,6 +618,7 @@ fn collect_contribution<E: std::fmt::Display>(
             }
         }
     }
+    let asserted_literals: std::collections::HashSet<_> = property_index.keys().cloned().collect();
     for statement in reified.into_values() {
         let statement_id = statement.statement_id;
         match &statement.object {
@@ -616,11 +676,25 @@ fn collect_contribution<E: std::fmt::Display>(
                     lang.clone(),
                     statement.graph_scope.clone(),
                 );
-                let Some(&position) = property_index.get(&match_key) else {
+                if !asserted_literals.contains(&match_key) {
                     continue;
-                };
+                }
                 let Some(node) = nodes.get_mut(&statement.subject) else {
                     continue;
+                };
+                let position = match property_index.remove(&match_key) {
+                    Some(position) => position,
+                    None => {
+                        // The shared base literal is consumed once, but each
+                        // attributable reifier keeps its own assertion record.
+                        let mut property =
+                            NodeProperty::new(statement.predicate.clone(), value.clone())
+                                .with_graph_scope(statement.graph_scope.clone());
+                        property.datatype = match_key.3.clone();
+                        property.lang = lang.clone();
+                        node.properties.push(property);
+                        node.properties.len() - 1
+                    },
                 };
                 let property = &mut node.properties[position];
                 if let Some(id) = statement_id {
@@ -653,6 +727,8 @@ fn collect_contribution<E: std::fmt::Display>(
                     a.datatype.as_deref(),
                     a.lang.as_deref(),
                     &a.graph_scope,
+                    &a.provenance_iri,
+                    &a.statement_id,
                 )
                     .cmp(&(
                         b.predicate.as_str(),
@@ -660,6 +736,8 @@ fn collect_contribution<E: std::fmt::Display>(
                         b.datatype.as_deref(),
                         b.lang.as_deref(),
                         &b.graph_scope,
+                        &b.provenance_iri,
+                        &b.statement_id,
                     ))
             });
             node.properties.dedup_by(|a, b| a.content_eq(b));
@@ -793,6 +871,6 @@ mod apply;
 #[cfg(not(target_arch = "wasm32"))]
 pub use apply::ApplyOutcome;
 #[cfg(not(target_arch = "wasm32"))]
-pub use apply::apply_contribution;
+pub use apply::{apply_contribution, apply_contribution_with_identity};
 #[cfg(test)]
 mod tests;
