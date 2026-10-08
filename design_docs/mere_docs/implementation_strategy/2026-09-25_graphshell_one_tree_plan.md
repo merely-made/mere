@@ -12,12 +12,12 @@ mere panel is its V2b step 5, after this cutover. §2's current handoff names
 the remaining gates; linked plans own later editor and dynamics status. The
 reservoir's V3–V5 resident implementation has advanced independently; its
 process fixtures do not close this browser cutover or mount the mere panel.
-**Nested host-dataset continuation (2026-10-08):** pushed on the branch; visual
-qualification pending on
-`codex/nested-graph-view`. Mark approved implementing expandable repository
-groups and entering their constituent graph. This is a view-local projection
-over explicit membership; portable scene folds, saved scene integration and
-the live site's viewer replacement remain separate work.
+**Nested host-dataset continuation (2026-10-08):** implemented on
+`codex/nested-graph-view`; the bounded headed proof now passes on the default
+Radeon WebGPU adapter after the coarse bitmap traversal repair. Mark approved
+implementing expandable repository groups and entering their constituent graph.
+This is a view-local projection over explicit membership; portable scene folds,
+saved scene integration and the live site's viewer replacement remain separate work.
 **Scope:** Graphshell's browser page becomes one retained Cambium tree. Its
 HTML controls become Cambium components, its display-only Cambium chrome
 joins them, pictograph's canvas renders into the tree as a texture producer,
@@ -654,6 +654,36 @@ Open `tree.html?dataset=fixtures/grouped-manifest-components.json&grouping=conta
 
 ## 6. Progress
 
+- **2026-10-08 — Radeon coarse-command repair:** merged current main
+  `fbc149bd9` at `26f4c19a0`, retaining the new intake controls and coherent
+  Genet `15713014` pins. On the default Radeon Pro Vega 56 adapter, the old
+  coarse loop processes one entry from sampled bitmap slices containing four
+  entries, leaving an opening clip without subsequent drawing or closure.
+  Binning and path bounds are valid. The maintained Vello fix `865cbf41`
+  traverses slices explicitly, then consumes each set bit in ascending order.
+  Mere and standalone Graphshell web patch Classic, encoding and shaders to
+  that one immutable source, preserving 0.10 APIs and buffer recovery.
+  - **Source-built headed proof:** the original nested-group and flat-dataset
+    scenarios pass all four strict captures on the default Radeon adapter,
+    without shader hooks or a software adapter. Keyboard expansion, entry and
+    breadcrumbs pass, and unknown grouping refuses without a page error.
+    Wide and 420×800 captures display graph nodes, edges and retained controls.
+  - **Provider gates:** two new native CPU/GPU regressions cover empty slices,
+    bit 31, later-draw order and clip closure across slices. Nine existing
+    comparisons and allocation-count buffer recovery also pass: 12 tests,
+    with the existing long-running large-bin comparison still ignored.
+  - **Immutable consumer gates:** the Git-pinned locked viewer build and the
+    locked `main-page` check without GPU physics pass; all eight host-input
+    tests pass. The hardware browser run repeats all four captures and keyboard
+    gates from that bundle. Substituting only the old coarse shader restores
+    the failed pixel gate without GPU/page errors. The linked JSON receipt
+    retains the initial failures and software run, then records the repaired
+    hardware acceptance with source, bundle and capture hashes.
+  - **Boundary:** this repairs the qualified Chrome/Radeon rendering failure;
+    it does not identify the exact Tint or driver instruction. It is a 0.10
+    maintenance fix, not adoption of upstream Vello 0.11. Preserved-camera
+    offscreen content, narrow-screen control density, saved scene state,
+    large Cargo closure/performance and live-site cutover remain open.
 - **2026-10-08 — current-main qualification:** nested-group branch merged
   published main `42d6f17f6` at `7ec9c4503`. The standalone web manifest now
   agrees with the root's Genet revision `e84f9c7f9`; its old explicit pins did
