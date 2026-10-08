@@ -300,6 +300,44 @@ impl<F: 'static> PeltContent<F> {
         }
     }
 
+    /// Load `request` in place, as the current entry, in whichever lane it
+    /// routes to. A host that keeps history (Turnstone's graph) calls this for
+    /// the entry it chose; see [`PeltController::open`].
+    pub fn open(&mut self, request: SessionSpawnRequest) -> PeltHostEffect {
+        match &mut self.lane {
+            Lane::Document(controller) => {
+                let effect = controller.open(request);
+                self.after_document(effect)
+            },
+            Lane::Surface(_) => {
+                let address = request.address.clone();
+                if let Some(routed) = &self.routed {
+                    match routed.registries.choose(
+                        &request.address,
+                        request.content_type.as_deref(),
+                        routed.request.engine_override.as_deref(),
+                        false,
+                    ) {
+                        Ok(LoadRoute::Document { route, .. }) => {
+                            let route = route.expect("routed choices carry their route");
+                            let mut effect = PeltHostEffect::default();
+                            self.swap_lane(PeltReroute { request, route }, &mut effect);
+                            return effect;
+                        },
+                        Ok(LoadRoute::Surface(_)) => {},
+                        Err(error) => {
+                            return PeltHostEffect {
+                                error: Some(error),
+                                ..PeltHostEffect::default()
+                            };
+                        },
+                    }
+                }
+                self.surface_command(SessionNavigationCommand::Address(address))
+            },
+        }
+    }
+
     /// Drain the next ordered web event from a surface lane. A document lane
     /// returns `Ok(None)`.
     pub fn poll_web_event(&mut self) -> Result<Option<WebSurfaceEvent>, String> {
@@ -508,6 +546,9 @@ fn open_lane<F: 'static>(
             let mut config = PeltControllerConfig::from_request(engine_id, request.request.clone());
             if registries.host_loading() {
                 config = config.with_host_loading();
+            }
+            if registries.host_history() {
+                config = config.with_host_history();
             }
             let mut controller = PeltController::new_shared_boxed(
                 registries.sessions_arc(),
