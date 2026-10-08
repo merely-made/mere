@@ -234,10 +234,14 @@ impl Canvas {
         self.physics_composition.as_ref()
     }
 
-    /// Run `composition` in the law slot instead of the picked law (`None`
-    /// returns to the law), with one rebuild and one settle. Refused, with
-    /// nothing changed, if it holds a law that is not a force law.
-    pub fn set_physics_composition(
+    /// Run `composition` in the law slot instead of the law (`None` returns
+    /// to the law), with one rebuild and one settle. Refused, with nothing
+    /// changed, if it holds a law that is not a force law. Crate-internal: a
+    /// host runs a composition through its spec (F162); this is the way in
+    /// for a partition the host hands in, which has no spec (F157); only the
+    /// separation receipts hand one in.
+    #[cfg(test)]
+    pub(crate) fn set_physics_composition(
         &mut self,
         composition: Option<PhysicsComposition>,
     ) -> Result<(), CompositionRefusal> {
@@ -263,20 +267,39 @@ impl Canvas {
         inputs: &LawInputs<'_>,
         sources: LawSources,
     ) -> Vec<Box<dyn Force>> {
-        let mut forces = match &self.physics_composition {
-            None => inputs.law_forces_taking(self.physics_law, sources, &self.physics_overlays),
+        inputs.composed(
+            self.physics_law,
+            self.physics_composition.as_ref(),
+            &self.physics_overlays,
+            sources,
+        )
+    }
+}
+
+impl LawInputs<'_> {
+    /// The law slot's forces, `law` or `composition` when one is set, then
+    /// the overlays: what a canvas runs, and a board mirroring its stage.
+    pub(crate) fn composed(
+        &self,
+        law: PhysicsLaw,
+        composition: Option<&PhysicsComposition>,
+        overlays: &[PhysicsOverlay],
+        sources: LawSources,
+    ) -> Vec<Box<dyn Force>> {
+        let mut forces = match composition {
+            None => self.law_forces_taking(law, sources, overlays),
             Some(PhysicsComposition::Mix(laws)) => laws
                 .iter()
-                .flat_map(|(law, weight)| inputs.weighted_law(*law, *weight, sources))
+                .flat_map(|(law, weight)| self.weighted_law(*law, *weight, sources))
                 .collect(),
             Some(PhysicsComposition::Grouped(grouping)) => {
-                vec![inputs.grouped_force(grouping, sources)]
+                vec![self.grouped_force(grouping, sources)]
             },
         };
         forces.extend(
-            self.physics_overlays
+            overlays
                 .iter()
-                .map(|overlay| inputs.overlay_force(*overlay, sources)),
+                .map(|overlay| self.overlay_force(*overlay, sources)),
         );
         forces
     }

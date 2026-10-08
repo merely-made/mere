@@ -203,6 +203,7 @@ pub mod composition;
 /// The physics catalog: the laws a graph can move under, the overlays composed
 /// onto them, and the named profiles. (Physics catalog — P1.)
 pub mod physics_catalog;
+mod physics_view;
 /// Schedules of compositions, each stage to its stop, with captures taken by
 /// role. (Dynamics grammar plan, G3.)
 pub mod schedule;
@@ -217,7 +218,7 @@ pub use board_scene::{
 };
 pub use composition::{CompositionRefusal, GroupSource, PhysicsComposition, PhysicsGrouping};
 pub use dynamics_record::DynamicsReport;
-pub use physics_board::{BoardItem, PhysicsBoard, PhysicsChoice};
+pub use physics_board::{BoardItem, PhysicsBoard};
 pub use physics_catalog::{
     CANVAS_PHYSICS_DEPTH_SOURCES, CANVAS_PHYSICS_KIND_SOURCES, CANVAS_PHYSICS_LAWS,
     CANVAS_PHYSICS_MASS_SOURCES, CANVAS_PHYSICS_OVERLAYS, CANVAS_PHYSICS_PROFILES, LayoutStats,
@@ -225,6 +226,7 @@ pub use physics_catalog::{
     PhysicsDepthSource, PhysicsKindSource, PhysicsLaw, PhysicsMassSource, PhysicsOverlay,
     PhysicsProfile,
 };
+pub use physics_view::PhysicsChoice;
 /// The channel registry: every source the laws, overlays and slots read, by
 /// id. (Dynamics grammar plan, G2.)
 pub mod channels;

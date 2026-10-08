@@ -45,7 +45,6 @@ use seiche::{Admission, Force, Role};
 
 use super::channels::Channel;
 use super::composition::{GroupSource, PhysicsComposition, PhysicsGrouping};
-use super::physics_board::PhysicsChoice;
 use super::physics_catalog::{
     LawInputs, LawSources, PhysicsDepthSource, PhysicsKindSource, PhysicsLaw, PhysicsMassSource,
     PhysicsOverlay,
@@ -480,52 +479,4 @@ pub fn schedule_node(stages: &[PhysicsStage]) -> Result<Node, String> {
         weight: 1.0,
         overlays: Vec::new(),
     })
-}
-
-impl PhysicsChoice {
-    /// The choice as a spec: its law and overlays at the root, every slot
-    /// written, the default seed, no target (F146).
-    pub fn into_spec(&self) -> DynamicsSpec {
-        let mut spec = DynamicsSpec::new(law_node(self.law, &self.overlays));
-        spec.channels = self.sources().channels();
-        spec
-    }
-
-    /// The flat view of a spec: its sources, and the law and overlays its
-    /// root (or its first stage) runs; a composition's first law (F157).
-    pub fn from_spec(spec: &DynamicsSpec) -> Result<Self, BindError> {
-        Ok(Self::flat(bind(spec)?))
-    }
-
-    /// The flat view of a bound spec.
-    pub(crate) fn flat(bound: Bound) -> Self {
-        let (law, overlays) = match bound.root {
-            BoundRoot::Law { law, overlays } | BoundRoot::Composed { law, overlays, .. } => {
-                (law, overlays)
-            },
-            BoundRoot::Schedule(stages) => (stages[0].law, stages[0].overlays.clone()),
-        };
-        Self::of(law, overlays, bound.sources)
-    }
-
-    fn of(law: PhysicsLaw, overlays: Vec<PhysicsOverlay>, sources: BoundSources) -> Self {
-        Self {
-            law,
-            overlays,
-            kind: sources.kind,
-            groups: sources.groups,
-            mass: sources.mass,
-            depth: sources.depth,
-        }
-    }
-
-    /// The choice's four sources.
-    pub fn sources(&self) -> BoundSources {
-        BoundSources {
-            kind: self.kind,
-            groups: self.groups,
-            mass: self.mass,
-            depth: self.depth,
-        }
-    }
 }
