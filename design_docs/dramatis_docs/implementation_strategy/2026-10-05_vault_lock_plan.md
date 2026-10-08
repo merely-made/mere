@@ -1,7 +1,7 @@
 # Vault Lock Plan
 
 **Date**: 2026-10-05
-**Status (2026-10-07)**: rulings 1 to 58 in §3; the threat statement is
+**Status (2026-10-07)**: rulings 1 to 60 in §3; the threat statement is
 still open. L1 landed (`2556a20c`). L2's checkpoints A (`7c588deb`) and B
 (`ec1768ab`) landed. Still to come in L2: the Secret Service on the
 ThinkPad, ruling 42 (Linux starts locked), ruling 44 (Distillery's
@@ -689,6 +689,33 @@ is met by `0096591`.
 repin to `ae3352e` now and again later. Mark: **"Once, after seed fix
 (Recommended)"**.
 
+**Ruling 59** *(the sync host's verdict).* *On `ae3352e` the strict paths
+fail (`author` leaves 4256) and with the fix pass. The sync host, judged
+against iroh alone and p2panda-net alone, still shows 7 sizes with the fix
+(8 without). Six are identical in both arms, and Knot now lends the seed
+only into the transport builder. So those copies come from below Knot,
+when the store joins gossip and sync, which neither baseline does.* Options:
+- a no-Knot baseline that binds the overlay host and joins as Knot's store
+  does, the fix committed only if the sync host passes against it and the
+  control still fails;
+- commit now, with the sync host reporting rather than failing;
+- name each block from allocation backtraces first.
+
+Mark: **"Baseline the join (Recommended)"**.
+
+**Ruling 60** *(mDNS residue).* *`P2pandaHostPolicy::default()` turns mDNS
+on (Active). The overlay host alone leaves 4 seed copies beyond the
+baselines with it on (472, 568, 784, 2424) and none with it off, in every
+app that binds through the overlay host. mere-transport's
+`seed_residue.rs` binds without the policy, so it never sees them.*
+Options:
+- a vault lock item, with `seed_residue.rs` gaining a default-policy run
+  and the copies attributed (iroh, p2panda-net, or Mere's wiring);
+- ledger only;
+- defer to L3.
+
+Mark: **"Vault lock item + test (Recommended)"**.
+
 Still open: a threat statement naming hibernation and the pagefile.
 
 ## 4. Phases
@@ -1069,3 +1096,54 @@ unlock follow-through, and non-Windows startup unlock backends, from the
   here.
 - **Rulings 57 and 58:** `f68af0d` retired unpushed, the fix moves onto
   `ae3352e`, and mere repins once after the fix.
+
+**2026-10-07, the seed fix on `ae3352e`, measured.**
+- **Knot.** The fix replayed cleanly onto `ae3352e` (branch
+  `seed-borrow-ae3352e` in `worktrees/knot-seed`). `cargo check --workspace
+  --all-targets` passes.
+- **djinn.** `resident_knot.rs` took the seed by value. It now holds it in
+  `Zeroizing` across its awaits and lends it to Knot, and its test passes.
+- **The instrument.** djinn's `knot_residue`, run against a by-path patch
+  of each Knot tree on mere `973a7fc1` (WIP `727100bf` in
+  `worktrees/mere-knot-seed`):
+  - **positive control:** passes in both arms;
+  - **`author`:** 4256 left on `ae3352e`, 0 with the fix;
+  - **source and session, capture retention:** 0 in both arms;
+  - **sync host, beyond iroh, p2panda-net and the overlay host with
+    mDNS:** 536, 632, 920, 1016, 1680, 2272, 7616 and 7632 on `ae3352e`;
+    the same six and 7568 with the fix.
+- **Diagnostic runs** (marked in the test): the overlay host alone leaves
+  nothing beyond the baselines with mDNS off, and 4 sizes with it on
+  (ruling 60).
+- **Rulings 59 and 60.** Next: the join baseline.
+
+**2026-10-07, ruling 49 landed in Knot and Mere.**
+- **The join baseline (ruling 59)** binds the overlay host under the default
+  policy and calls Knot's `store.join` with the seed held by the test. It
+  accounts for the six mid-size blocks exactly.
+- **The last block was the run's own future.** In every run, the one large
+  block matched that run's future size exactly: iroh alone 7720, the join
+  6904, the sync host 7568. That copy sits in the run's outer frame, whose
+  size changes with nesting, so the test compares outer frames by presence,
+  not by size. The overlay host alone (future 2264) has no copy in its
+  outer frame, so the copy comes from the join, awaited inline, below Knot.
+- **Verdicts.** Against `ae3352e` the test fails: `author` leaves 4256, and
+  the sync host leaves 7632 beside its 7616 outer frame. Against the fix it
+  passes. *Reading, not ruled:* this outer-frame rule implements ruling 59.
+  A Knot copy held only in its own outer frame could not be told apart from
+  the join's copy; the strict paths still catch a seed taken by value.
+- **Knot `eabd443`** is the fix rebased onto Knot `14cd06e`, which repins
+  every Mere row to `f1d169c7`; pushed with Mark's OK.
+  - Gates: the workspace check, `knot-editor`, `knot-desktop` and
+    `knot-document` tests (33 suites, 565 passed).
+  - One `knot-editor` lib test hung once in an earlier full run (6 hours,
+    14 s of CPU). It passed alone and in a full rerun (149 in 17 s), so it
+    is recorded as a one-off.
+- **Mere repins Knot once (ruling 58)**: `knot-editor`, `knot-document`
+  and djinn's `knot-site` are at `eabd4434`.
+  - Gates: `cargo_mode.py verify`, and djinn's tests (20 suites, 116
+    passed, `knot_residue` included, with no patch).
+  - A first run hit a rustc out-of-memory on the shared machine; the
+    rerun used `-j 4`.
+- **Next:** ruling 60's default-policy run in mere-transport's
+  `seed_residue.rs`, then ruling 42 (ruling 56's order).

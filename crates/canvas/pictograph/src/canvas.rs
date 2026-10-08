@@ -291,6 +291,28 @@ struct Drag {
     moved: bool,
 }
 
+/// An in-progress left press on empty canvas: a click until the pointer passes
+/// [`CLICK_SLOP`], then a pan that carries the middle-drag's momentum
+/// (Scenograph editor plan, SE23).
+#[derive(Clone, Copy)]
+struct EmptyPress {
+    /// Press position in screen px (the click/pan-slop origin).
+    press: (f32, f32),
+    /// The cursor at the last pan step.
+    last: (f32, f32),
+    /// Set once the pointer has moved past the slop: a pan.
+    panning: bool,
+}
+
+/// A right click the canvas did not use, for the host to answer with its
+/// context menu (SE26): where it landed, and the node under it, if any.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct ContextRequest {
+    /// Screen px.
+    pub at: (f32, f32),
+    pub node: Option<uuid::Uuid>,
+}
+
 /// The reversible, view-local portion of a fold action. Graph nodes, relation
 /// cells, and physics positions deliberately do not participate.
 #[derive(Clone)]
@@ -622,9 +644,13 @@ pub struct Canvas {
     /// (hubs highest), with a stem to its ground anchor — the isometric "fake height".
     /// Purely visual (the seiche body does not move). Default off. (Isometric camera P3.)
     height_by_degree: bool,
-    /// `Some(press_origin)` (screen px) while a left-drag marquee on empty space
-    /// is in progress.
+    /// `Some(press_origin)` (screen px) while a right-drag marquee is in
+    /// progress (SE23).
     marquee: Option<(f32, f32)>,
+    /// A left press on empty canvas, a click or a pan (SE23).
+    empty_press: Option<EmptyPress>,
+    /// A right click waiting for the host's context menu (SE26).
+    context_request: Option<ContextRequest>,
     /// Whether Ctrl is held (gates wheel-zoom vs wheel-pan).
     ctrl: bool,
     /// Whether Shift is held (a node click adds to / toggles the selection rather

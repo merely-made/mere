@@ -216,7 +216,8 @@ impl ResidentKnot {
             device_root,
             authority.writers(),
         )?;
-        let signing_seed = startup.signing_seed();
+        // Held across the awaits below, so cleared on drop (vault lock ruling 49).
+        let signing_seed = zeroize::Zeroizing::new(*startup.signing_seed());
         let store = startup.store().clone();
         let source = startup.into_resident_source()?;
 
@@ -272,7 +273,7 @@ impl ResidentKnot {
                 Some(
                     KnotSyncHost::open_with_scoped_evidence(
                         &store,
-                        signing_seed,
+                        &signing_seed,
                         host_config,
                         blobs,
                         readers,
@@ -455,7 +456,7 @@ mod tests {
             KnotSyncFileStore::open(root.path().join("sync.redb"), space, [writer]).unwrap();
         store
             .author(
-                seed,
+                &seed,
                 &vault,
                 &KnotSyncEvent::Put(VaultDocument {
                     id: "field-note".into(),
@@ -466,7 +467,7 @@ mod tests {
             )
             .await
             .unwrap();
-        let source = KnotResidentSource::from_synced_vault(vault, store.clone(), seed).unwrap();
+        let source = KnotResidentSource::from_synced_vault(vault, store.clone(), &seed).unwrap();
         let scope = BlobScope::new(space);
         let readers = BlobReadAuthorizer::new();
         let retention = KnotContentRetentionPort::open_scoped(
@@ -488,7 +489,7 @@ mod tests {
         source.grant_content_retention(retention);
         let host = KnotSyncHost::open_with_scoped_evidence(
             &store,
-            seed,
+            &seed,
             KnotSyncHostConfig::default(),
             blobs.clone(),
             readers.clone(),
@@ -508,7 +509,7 @@ mod tests {
         )
         .unwrap();
         let other_host =
-            KnotSyncHost::open(&other_store, other_seed, KnotSyncHostConfig::default())
+            KnotSyncHost::open(&other_store, &other_seed, KnotSyncHostConfig::default())
                 .await
                 .unwrap();
         assert_ne!(host.node_id(), other_host.node_id());

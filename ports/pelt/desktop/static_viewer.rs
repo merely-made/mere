@@ -459,6 +459,18 @@ mod livery_route_tests {
     use netrender::{Scene, SceneOp};
     use pelt_core::{PeltController, PeltControllerConfig};
 
+    /// A checked-in example's `index.html`, joined with the host's own path
+    /// separator so the receipts run on every platform.
+    fn example_index(example: &str) -> String {
+        std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("..")
+            .join("examples")
+            .join(example)
+            .join("index.html")
+            .to_string_lossy()
+            .into_owned()
+    }
+
     #[cfg(feature = "scripted")]
     #[derive(Clone)]
     struct ReceiptClock(std::rc::Rc<std::cell::Cell<f64>>);
@@ -487,10 +499,7 @@ mod livery_route_tests {
 
     #[test]
     fn local_livery_route_keeps_resource_identity_and_interaction_after_resize() {
-        let fixture = format!(
-            r"{}\..\examples\livery-route\index.html",
-            env!("CARGO_MANIFEST_DIR")
-        );
+        let fixture = example_index("livery-route");
         let mut registry: SessionRegistry<Scene> = SessionRegistry::new();
         registry.register(Box::new(LiverySessionEngine::new(LocalFetcher)));
         let request = SessionSpawnRequest::new(&fixture).with_viewport(960, 640);
@@ -649,10 +658,7 @@ mod livery_route_tests {
 
     #[test]
     fn article_product_receipt_drives_the_checked_in_fixture() {
-        let fixture = format!(
-            r"{}\..\examples\livery-route\index.html",
-            env!("CARGO_MANIFEST_DIR")
-        );
+        let fixture = example_index("livery-route");
         let mut registry: SessionRegistry<Scene> = SessionRegistry::new();
         registry.register(Box::new(LiverySessionEngine::new(LocalFetcher)));
         let controller = PeltController::new(
@@ -684,10 +690,7 @@ mod livery_route_tests {
 
     #[test]
     fn controls_product_receipt_drives_nested_scroll_and_retained_editing() {
-        let fixture = format!(
-            r"{}\..\examples\p5-controls\index.html",
-            env!("CARGO_MANIFEST_DIR")
-        );
+        let fixture = example_index("p5-controls");
         let mut registry: SessionRegistry<Scene> = SessionRegistry::new();
         registry.register(Box::new(LiverySessionEngine::new(LocalFetcher)));
         let controller = PeltController::new(
@@ -719,10 +722,7 @@ mod livery_route_tests {
 
     #[test]
     fn responsive_product_receipt_reflows_grid_and_preserves_table_geometry() {
-        let fixture = format!(
-            r"{}\..\examples\p5-responsive\index.html",
-            env!("CARGO_MANIFEST_DIR")
-        );
+        let fixture = example_index("p5-responsive");
         let mut registry: SessionRegistry<Scene> = SessionRegistry::new();
         registry.register(Box::new(LiverySessionEngine::new(LocalFetcher)));
         let controller = PeltController::new(
@@ -921,10 +921,7 @@ mod livery_route_tests {
     #[cfg(feature = "scripted")]
     #[test]
     fn scripted_product_receipt_pumps_then_navigates_through_the_controller() {
-        let fixture = format!(
-            r"{}\..\examples\p5-scripted\index.html",
-            env!("CARGO_MANIFEST_DIR")
-        );
+        let fixture = example_index("p5-scripted");
         let mut registry: SessionRegistry<Scene> = SessionRegistry::new();
         registry.register(Box::new(ScriptedSessionEngine::<
             script_engine_boa::BoaEngine,
@@ -988,10 +985,7 @@ mod livery_route_tests {
 
     #[test]
     fn text_fragment_product_receipt_selects_scrolls_and_fetches_once() {
-        let fixture = format!(
-            r"{}\..\examples\text-fragment\index.html",
-            env!("CARGO_MANIFEST_DIR")
-        );
+        let fixture = example_index("text-fragment");
         let address = format!("{fixture}#:~:text=The%20retained%20text%20fragment%20target");
         let document_fetches = std::sync::Arc::new(std::sync::atomic::AtomicUsize::new(0));
         let mut registry: SessionRegistry<Scene> = SessionRegistry::new();
