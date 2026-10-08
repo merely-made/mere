@@ -644,6 +644,19 @@ Open `tree.html?dataset=fixtures/grouped-manifest-components.json&grouping=conta
 
 ## 6. Progress
 
+- **2026-10-08 — current-main qualification:** nested-group branch merged
+  published main `42d6f17f6` at `7ec9c4503`. The standalone web manifest now
+  agrees with the root's Genet revision `e84f9c7f9`; its old explicit pins did
+  not inherit the root repin. Repeated checks passed: 125 Scenomise tests,
+  eight host-input tests, four exporter tests, the viewer wasm build and
+  `main-page` product/remote compile check without GPU physics. Headed
+  grouped/flat scenarios and keyboard activation retain their semantic
+  passes, but all four strict pixel captures remain blank. A direct WebGPU
+  clear control displays correctly in the same Chrome setup. Instrumentation
+  records compute dispatches, nonzero render dimensions and a zero bump
+  failure counter; sampled intermediate scene/staging texture centres are
+  transparent before the final composition. The exact renderer cause remains
+  open. These diagnostic samples are not a rendering or performance receipt.
 - **2026-10-08 — expandable host groups:** implemented on
   `codex/nested-graph-view`, based on main `4c796590c`. The shared Scenomise
   forest projection preserves source occurrence identities and dependency
