@@ -9210,6 +9210,7 @@ dependencies = [
  "errand",
  "genet-host-api",
  "inker",
+ "mere-page-load",
  "netfetcher",
  "pandect",
  "pollster",
@@ -9355,6 +9356,10 @@ dependencies = [
  "tokio-util",
  "tracing",
 ]
+
+[[package]]
+name = "mere-page-load"
+version = "0.0.1"
 
 [[package]]
 name = "mere-persona-picker"
@@ -12362,6 +12367,7 @@ version = "0.2.0"
 dependencies = [
  "genet-host-api",
  "inker",
+ "mere-page-load",
  "url",
  "workbench",
 ]
