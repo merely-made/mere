@@ -184,6 +184,14 @@ behavior. Exact manifest/lock restoration and unowned source bytes/mtimes are
 verified. Catalog and bridge-control qualification follow; the two outstanding
 policy/scope questions still await Mark's answers.
 
+Fresh catalog generation at the repaired candidate changes only the two
+single-line textbox styles in each HTML receipt, adding the configured
+containment substitute. Its guarded transaction preserves all other tracked
+source bytes and mtimes and restores the starting manifest and lock. Generation
+is not a catalog test pass. A read-only multiline review finds no newline or
+multiline-state loss through neutral, native or browser lowering; the existing
+fixtures cover those seams separately, rather than as one full-pipeline case.
+
 The downstream read-only audit finds old tag checks in Turnstone and Cleromancy.
 Their mechanical selector/caret/existing-label follow-ups await explicit scope
 authorization; currently unnamed fields retain that state. No sibling source
