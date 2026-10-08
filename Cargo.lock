@@ -4512,6 +4512,7 @@ dependencies = [
  "chirograph",
  "chrono",
  "distillery",
+ "djinn",
  "djinn-testkit",
  "eidetic",
  "gemini-protocol",

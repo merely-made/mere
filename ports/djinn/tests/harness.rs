@@ -139,12 +139,15 @@ fn one_resident_is_killed_stopped_and_restarted_on_the_same_roots() {
     );
     let node = first.sync.clone().expect("sync is configured").node_id;
     let events: Vec<String> = r.events().into_iter().map(|e| e.event).collect();
+    // A passphrase vault starts locked and, on fresh roots, is created from
+    // the handed-over passphrase before any door listens (rulings 63 to 65).
+    let expected = ["started", "waiting-for-unlock", "vault-created", "listening", "ready"];
     run.require(
-        "the event file runs started, listening, ready",
+        "the event file runs started, waiting-for-unlock, vault-created, listening, ready",
         Bound::State,
-        ["started", "listening", "ready"],
+        expected,
         &events,
-        events == ["started", "listening", "ready"],
+        events == expected,
     );
 
     // The crash case: no stopped event, and the same roots start again.
