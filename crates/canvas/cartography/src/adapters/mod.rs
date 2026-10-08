@@ -28,6 +28,7 @@ use crate::request::{AxisValue, ProjectionRequest};
 use crate::signals::{COORDS_HOST, COORDS_SPECTRAL, ORDER_TIMELINE, RINGS_FOCUS, WEIGHT_DEGREE};
 use crate::strategy::LayoutStrategy;
 
+pub mod changes;
 pub mod matrix;
 #[cfg(test)]
 mod parity;
