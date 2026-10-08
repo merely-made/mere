@@ -2305,6 +2305,7 @@ dependencies = [
  "blake3",
  "chatelaine",
  "chirograph",
+ "futures-util",
  "gaz",
  "gazette",
  "hmac 0.13.0",

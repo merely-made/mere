@@ -30,7 +30,10 @@ use zeroize::Zeroizing;
 use crate::items::{ItemStore, ItemStoreError, Payload, StoredIndex, Transaction, random_id_bytes};
 
 mod collections;
+mod snapshot;
 mod validate;
+
+pub use snapshot::MetadataSnapshot;
 
 /// Resource limits applied before any Secret Service value reaches storage.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -234,6 +237,13 @@ impl From<ItemStoreError> for SecretServiceError {
     }
 }
 
+/// Whether `item` carries every supplied attribute exactly.
+fn matches(item: &SecretItem, attributes: &BTreeMap<String, String>) -> bool {
+    attributes
+        .iter()
+        .all(|(key, value)| item.attributes.get(key) == Some(value))
+}
+
 /// Persona-scoped Secret Service collections held by one resident authority.
 #[derive(Clone)]
 pub struct SecretServiceStore {
@@ -288,10 +298,7 @@ impl SecretServiceStore {
                 let Some(item) = project(&item, SecretCollectionId(collection.id)) else {
                     continue;
                 };
-                if attributes
-                    .iter()
-                    .all(|(key, value)| item.attributes.get(key) == Some(value))
-                {
+                if matches(&item, attributes) {
                     found.push(item);
                 }
             }
