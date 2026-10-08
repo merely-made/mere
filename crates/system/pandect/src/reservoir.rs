@@ -144,6 +144,20 @@ struct ReservoirIndex {
     schema: String,
     persona: PersonaId,
     meres: BTreeMap<DomainId, MereRecord>,
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    access: BTreeMap<MereId, BTreeMap<String, MereApplicationAccess>>,
+}
+
+/// A recorded owner decision for one application and one mere. Explicit
+/// access defaults on; ambient crossing defaults off. A denial blocks both
+/// routes without erasing the independent ambient decision.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct MereApplicationAccess {
+    pub denied: bool,
+    pub ambient: bool,
+    pub recorded_at_ms: u64,
+    pub author: crate::Author,
 }
 
 /// Why the reservoir refused.
@@ -269,6 +283,7 @@ impl<B: Backend> ReservoirStore<B> {
                 schema: RESERVOIR_INDEX_SCHEMA.to_string(),
                 persona,
                 meres: BTreeMap::new(),
+                access: BTreeMap::new(),
             },
             Some(index) => {
                 verify_index(&index, persona)?;
@@ -293,6 +308,43 @@ impl<B: Backend> ReservoirStore<B> {
 
     pub fn get_by_id(&self, id: MereId) -> Option<&MereRecord> {
         self.index.meres.values().find(|record| record.id == id)
+    }
+
+    /// Recorded application decisions, in mere/application order.
+    pub fn access(&self) -> impl Iterator<Item = (MereId, &str, &MereApplicationAccess)> {
+        self.index.access.iter().flat_map(|(mere, apps)| {
+            apps.iter()
+                .map(move |(app, access)| (*mere, app.as_str(), access))
+        })
+    }
+
+    pub fn application_access(&self, mere: MereId, app: &str) -> Option<&MereApplicationAccess> {
+        self.index.access.get(&mere)?.get(app)
+    }
+
+    /// Commit a decision in the reservoir's existing muniment index. Neither
+    /// an unknown mere nor an ambiguous application label may acquire policy.
+    /// Failed writes leave the in-memory decision unchanged.
+    pub async fn set_application_access(
+        &mut self,
+        mere: MereId,
+        app: String,
+        access: MereApplicationAccess,
+    ) -> Result<(), ReservoirError> {
+        if self.get_by_id(mere).is_none() || !valid_application(&app) {
+            return Err(ReservoirError::Corrupt(
+                "access decision names an unknown mere or invalid application".into(),
+            ));
+        }
+        let mut candidate = self.index.clone();
+        candidate
+            .access
+            .entry(mere)
+            .or_default()
+            .insert(app, access);
+        self.slots.save(RESERVOIR_INDEX_SLOT, &candidate).await?;
+        self.index = candidate;
+        Ok(())
     }
 
     /// The domain's mere, created if the reservoir has none yet. Returns the
@@ -346,7 +398,24 @@ fn verify_index(index: &ReservoirIndex, persona: PersonaId) -> Result<(), Reserv
             )));
         }
     }
+    for (mere, apps) in &index.access {
+        if !index.meres.values().any(|record| record.id == *mere)
+            || apps.keys().any(|app| !valid_application(app))
+        {
+            return Err(ReservoirError::Corrupt(
+                "access decisions name an unknown mere or invalid application".into(),
+            ));
+        }
+    }
     Ok(())
+}
+
+fn valid_application(app: &str) -> bool {
+    !app.is_empty()
+        && app.len() <= 256
+        && app == app.trim()
+        && app == app.to_ascii_lowercase()
+        && !app.chars().any(char::is_control)
 }
 
 #[cfg(test)]
@@ -522,5 +591,89 @@ mod tests {
             .join("manifest.json");
         assert!(manifest.is_file(), "{} exists", manifest.display());
         assert!(manifest.starts_with(reservoir_dir(root.path(), persona(1)).join(MERES_DIR)));
+    }
+    #[derive(Clone)]
+    struct Fallible {
+        memory: MemoryBackend,
+        fail: std::sync::Arc<std::sync::atomic::AtomicBool>,
+    }
+    #[async_trait::async_trait]
+    impl Backend for Fallible {
+        async fn get(&self, key: &str) -> Result<Option<Vec<u8>>, StoreError> {
+            self.memory.get(key).await
+        }
+        async fn put(&self, key: &str, bytes: &[u8]) -> Result<(), StoreError> {
+            if self.fail.load(std::sync::atomic::Ordering::SeqCst) {
+                return Err(StoreError::Backend("injected grant write failure".into()));
+            }
+            self.memory.put(key, bytes).await
+        }
+        async fn delete(&self, key: &str) -> Result<(), StoreError> {
+            self.memory.delete(key).await
+        }
+        async fn list(&self, prefix: &str) -> Result<Vec<String>, StoreError> {
+            self.memory.list(prefix).await
+        }
+        async fn scan(&self, start: &str, end: &str) -> Result<Vec<String>, StoreError> {
+            self.memory.scan(start, end).await
+        }
+        async fn apply(&self, ops: &[muniment::WriteOp]) -> Result<(), StoreError> {
+            self.memory.apply(ops).await
+        }
+    }
+
+    #[test]
+    fn access_defaults_migrate_and_failed_writes_change_no_decision() {
+        block_on(async {
+            let backend = Fallible {
+                memory: MemoryBackend::new(),
+                fail: Default::default(),
+            };
+            let mut store = ReservoirStore::open(backend.clone(), persona(1))
+                .await
+                .unwrap();
+            let (mere, _) = store.ensure(domain("divination"), 1).await.unwrap();
+            // The v1 index has no access field when no decisions exist.
+            let raw = backend.get(RESERVOIR_INDEX_SLOT).await.unwrap().unwrap();
+            assert!(!String::from_utf8(raw).unwrap().contains("access"));
+            drop(store);
+            let mut store = ReservoirStore::open(backend.clone(), persona(1))
+                .await
+                .unwrap();
+            assert!(store.application_access(mere.id, "cleromancy").is_none());
+            let recorded = MereApplicationAccess {
+                denied: false,
+                ambient: true,
+                recorded_at_ms: 2,
+                author: crate::Author::person(persona(1).as_uuid().to_string()).via("turnstone"),
+            };
+            store
+                .set_application_access(mere.id, "cleromancy".into(), recorded.clone())
+                .await
+                .unwrap();
+            backend
+                .fail
+                .store(true, std::sync::atomic::Ordering::SeqCst);
+            let mut denied = recorded.clone();
+            denied.denied = true;
+            assert!(
+                store
+                    .set_application_access(mere.id, "cleromancy".into(), denied)
+                    .await
+                    .is_err()
+            );
+            assert_eq!(
+                store.application_access(mere.id, "cleromancy"),
+                Some(&recorded)
+            );
+            drop(store);
+            let reopened = ReservoirStore::open(backend.clone(), persona(1))
+                .await
+                .unwrap();
+            assert_eq!(
+                reopened.application_access(mere.id, "cleromancy"),
+                Some(&recorded)
+            );
+        });
     }
 }
