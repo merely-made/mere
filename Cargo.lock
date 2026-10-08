@@ -14660,6 +14660,7 @@ dependencies = [
 name = "scenotime"
 version = "0.0.4"
 dependencies = [
+ "edit-history",
  "sceno",
  "serde",
  "serde_json",

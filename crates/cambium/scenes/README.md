@@ -30,7 +30,7 @@ interaction structure; a scene is a projection of content.
 | --- | --- |
 | [sceno](sceno/) | Core contracts. `SourceRef` / `SourceIx`, `Space` / `SpaceId`, `InstanceId`, `Backdrop`, `Footprint`, `Representation`, `ProjectedItem`, `RoutedRelation`, `Region`, `Scene`, plus the persisted `Score` / `ScoreItem` / `Arrangement` / `Placement` / `SCORE_VERSION` vocabulary and the geometry types `Vec2`, `Size2`, `Rect`, `Transform2`. |
 | [scenomise](scenomise/) | Choreography. `solve(&Score) -> Scene` realizes the arrangements; `relax(&mut Scene, &Relaxation)` is a dependency-free repulsion / spring / arrangement-pull pass for surfaces without their own physics sim, including static collision against collidable backdrops. |
-| [scenotime](scenotime/) | Runtime. `SceneSnapshot` / `SceneTables` with tombstoned slots, `SceneEpoch` / `Revision` / `BackdropId` / `RelationId` / `RegionId`, `SceneDiff` / `SceneOp` / `apply_diff` returning `ApplyOutcome`, `TransitionSpec` / `TransitionSchedule` with pure host-time sampling, and `pick(world) -> Option<InstanceId>`. |
+| [scenotime](scenotime/) | Runtime. `SceneSnapshot` / `SceneTables` with tombstoned slots, `SceneEpoch` / `Revision` / `BackdropId` / `RelationId` / `RegionId`, `SceneDiff` / `SceneOp` / `apply_diff` returning `ApplyOutcome`, `TransitionSpec` / `TransitionSchedule` with pure host-time sampling, `SceneTrace` (a base snapshot and labelled steps, each an optional diff plus an opaque host annotation, chain-checked and replayed with `snapshot_at`; no cursor, which is host policy), and `pick(world) -> Option<InstanceId>`. |
 | [scenograph](scenograph/) | Host-neutral authoring model. Durable projection definitions, local validation, reusable definition binding and variants, deterministic JSON, public source revisions, and opaque runtime witness binding. It owns neither a widget UI, a source authority, a solver, nor a renderer. |
 
 ## Vocabulary
@@ -65,7 +65,8 @@ item's `hit` shape when present and its footprint otherwise.
 
 `sceno` depends on `serde` alone. `scenomise` depends on `sceno`, `serde` and
 `serde_json` — the last two for the solver registry it absorbed. `scenotime`
-depends on `sceno` and `serde`. `scenograph` depends on `serde` and
+depends on `sceno`, `serde` and `serde_json`, the last for a scene trace's
+opaque host annotation. `scenograph` depends on `serde` and
 `serde_json` for its durable authoring wire format. No product, engine, or GPU
 dependencies: the scene lane does not reach up into Cambium's widgets or down
 into Genet.
