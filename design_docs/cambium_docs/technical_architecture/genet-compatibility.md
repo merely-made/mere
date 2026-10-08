@@ -64,9 +64,9 @@ rendering engine.
 
 ### 2026-10-07 Forms field ownership migration
 
-**Status:** local consumer gates pass. F5 authorizes bounded sibling changes;
-F6 chooses app textboxes as accessibility leaves across projections. Those
-implementation gates and a verified published-source Genet repin remain pending.
+**Status:** local consumer gates pass, including F6's accessibility leaves
+across projections. F5 sibling source is committed; its consumer gates and a
+verified published-source Genet repin remain pending.
 The implementation plan and numbered rulings live in Genet's
 [dated Forms plan](https://github.com/merely-made/genet/blob/main/design_docs/2026-10-07_forms_value_validation_submission_plan.md).
 F3 authorizes this Mere migration and the later verified repin. The current
@@ -226,14 +226,42 @@ Genet's fresh optimized runner passes all 15 value-model fixtures on both
 engines and its CSS guard reports `unexpected=0`; all sixteen summary counts
 match the starting guard and expectation files remain unchanged. The qualified
 product stays `e84f9c7f`; its frozen runner head is the documentation descendant
-`79a7f011`. This completes currently authorized automated gates. The two
-pending decisions still precede final acceptance and the verified repin.
+`79a7f011`. This completed the gates authorized before F5 and F6; their
+implementation receipts follow below before final acceptance and the verified repin.
 
-The downstream read-only audit finds old tag checks in Turnstone and Cleromancy.
-Their mechanical selector/caret/existing-label follow-ups await explicit scope
-authorization; currently unnamed fields retain that state. No sibling source
-has changed. Existing target `C:/t/cargo-targets/mere` is reused for Mere gates
-if it has no live owner; Genet's qualification retains its separate stable target.
+The downstream audit found old tag checks in Turnstone and Cleromancy. F5 now
+authorizes their mechanical selector/caret/existing-label edits, committed in
+Turnstone `c951afa` and Cleromancy `523d54d` plus fixture correction `b6b521d`.
+Their locked public-source gates remain in progress. Consumers do not stamp
+Mere's marker or duplicate its committed-value projection; unnamed fields keep
+that state. Existing native-tag support preserves the current public pins.
+
+F6 is implemented and locally qualified at Mere `7d133ddc`. Neutral and native
+projections prune app textbox descendants; the browser mirror consumes the
+neutral topology. Native pruning follows producer decoration and removes hidden
+action routes. Nested descendant focus resolves to the surviving outer textbox.
+The drawing DOM remains intact. Unicode/newline fixtures, nested native focus
+and the full neutral-to-browser lowering cover these seams. Generated pseudo
+rows are traversed, without a separate pseudo fixture in this slice.
+
+`mere-forms-accessible-leaves-disabled` preserves committed-value decoration
+but disables pruning: 83 passes and exactly four intended failures across the
+neutral, native and browser libraries. The first restored run retains a Windows
+DLL-initialization launch failure before native tests (`0xc0000142`), so it is
+unqualified. The unchanged restored retry passes 357 tests: Cambium 252,
+Rootstock 72, native accessibility 23 and browser mirror 10, with zero failures
+and two existing ignored doctests. The fresh Wasm accessibility-example compile
+also passes. Guards verify unchanged unowned source bytes/mtimes and restore
+the starting manifest/lock. The same frozen `e84f9c7f` lock is used throughout.
+No published-source repin or human AT/browser operation is inferred.
+
+Existing target `C:/t/cargo-targets/mere` is reused without another live owner;
+Genet's qualification retains its borrowed `C:/t/cargo-targets/genet-encoding`
+and `C:/t/cargo-homes/genet-streams` for the recorded gate owner. No new isolated
+target, Cargo home or worktree is created in this slice. The helper's generated
+bytecode under `Code/testing/genet/forms/__pycache__` remains because automatic
+approval review rejected its removal with only "blocked by policy"; that
+rejected action is not retried through a different method.
 
 ### 2026-09-29 generated accessible-name adoption
 
