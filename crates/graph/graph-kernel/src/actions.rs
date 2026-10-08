@@ -13,8 +13,8 @@
 //! in the graphshell crate, which also carried host-coupled helpers
 //! (input-binding lookup, action-registry-driven `ActionContext`
 //! filtering). This module splits off the portable leaves so that
-//! downstream portable state — `CommandPaletteSession`'s Tier 1
-//! selection, the omnibar's action-match types, future iced-host
+//! downstream portable state — the omnibar's action-match types,
+//! future iced-host
 //! action-dispatch — can reference the vocabulary without pulling in
 //! the host-side registry machinery.
 //!
@@ -45,12 +45,6 @@ pub enum ActionCategory {
     Graph,
     Persistence,
 }
-
-/// Persistent-storage key for the recency ring used by palette ranking.
-pub const CATEGORY_RECENCY_PERSIST_KEY: &str = "command_palette_category_recency";
-
-/// Persistent-storage key for user-pinned category ordering.
-pub const CATEGORY_PIN_ORDER_PERSIST_KEY: &str = "command_palette_category_pins";
 
 impl ActionCategory {
     /// Display label for the category group heading.

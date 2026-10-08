@@ -96,9 +96,6 @@ pub struct FrameViewModel {
     /// Graph-search (Ctrl+G) panel state projection.
     pub graph_search: GraphSearchViewModel,
 
-    /// Command-palette (F2 / Ctrl+K) session projection.
-    pub command_palette: CommandPaletteViewModel,
-
     /// Overlay descriptors the host must paint this frame (focus
     /// rings, selection strokes, lens glyphs, etc.).
     pub overlays: Vec<OverlayStrokePass>,
@@ -358,27 +355,6 @@ pub struct GraphSearchViewModel {
     pub filter_mode: bool,
     pub match_count: usize,
     pub active_match_index: Option<usize>,
-}
-
-/// Command-palette projection.
-#[derive(Debug, Clone, Default, PartialEq)]
-pub struct CommandPaletteViewModel {
-    pub open: bool,
-    pub contextual_mode: bool,
-    pub query: String,
-    pub scope: CommandPaletteScopeView,
-    pub selected_index: Option<usize>,
-    pub toggle_requested: bool,
-}
-
-/// Host-neutral projection of `SearchPaletteScope`.
-#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
-pub enum CommandPaletteScopeView {
-    CurrentTarget,
-    ActivePane,
-    ActiveGraph,
-    #[default]
-    Workbench,
 }
 
 /// Which dialogs / overlays are open. Flags for booleans; detailed

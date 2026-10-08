@@ -15,7 +15,6 @@
 #![doc(html_root_url = "https://docs.rs/chrome/0.0.1")]
 
 pub mod authorities;
-pub mod command_palette;
 pub mod frame_model;
 pub mod host_intent;
 pub mod nav;
