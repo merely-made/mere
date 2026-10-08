@@ -44,17 +44,18 @@ use graphshell::native::app_admission::{AppId, AppRequest, AppRouteGrants, AppRo
 use graphshell::native::app_broker::AppEndpointCatalog;
 use graphshell::native::endpoint_catalog::ResidentEndpointRoute;
 use graphshell::session_item::{
-    self, ATTACH_SESSION_INTENT, ApplyEditsV1, FORK_SESSION_INTENT, MERE_GRAPH, MERE_SESSIONS,
-    MINT_SESSION_INTENT, RESTORE_SESSION_INTENT, SESSIONS_SCHEMA, SESSIONS_SOURCE,
-    SessionsActionV1, SetViewV1, StepV1, TRASH_SESSION_INTENT,
+    self, ARCHIVE_SCHEMA, ARCHIVE_SOURCE, ATTACH_SESSION_INTENT, ApplyEditsV1, ArchiveActionV1,
+    COMPOSE_CODICILS_INTENT, FORK_SESSION_INTENT, MERE_ARCHIVE, MERE_GRAPH, MERE_SESSIONS,
+    MINT_SESSION_INTENT, OPEN_CODICIL_INTENT, RESTORE_SESSION_INTENT, SAVE_CODICIL_INTENT,
+    SESSIONS_SCHEMA, SESSIONS_SOURCE, SessionsActionV1, SetViewV1, StepV1, TRASH_SESSION_INTENT,
 };
 use graphshell_endpoint::{
     IntentSink, PresentationSource, ProjectionCatalog, ProjectionNoticeSource, ProjectionSource,
 };
-use muniment::DirectoryBackend;
+use muniment::{DirectoryBackend, RedbBackend};
 use pandect::{
     Author, GraphSessionManifest, MereApplicationAccess, MereId, MereRecord, MereSessions,
-    SessionId, open_mere_backend,
+    SessionId, open_mere_archive_backend, open_mere_backend,
 };
 use personae::PersonaId;
 use sceno::{
@@ -104,6 +105,7 @@ struct Routes {
     catalog: AppEndpointCatalog,
     grants: AppRouteGrants,
     apps: Vec<AppId>,
+    validators: BTreeMap<String, pandect::GraphValidator>,
     served: Mutex<BTreeMap<String, Arc<MereShared>>>,
     access: Mutex<BTreeMap<(MereId, AppId), MereApplicationAccess>>,
     access_loaded: AtomicBool,
@@ -126,6 +128,7 @@ impl MereRoutes {
                 catalog,
                 grants,
                 apps,
+                validators: BTreeMap::new(),
                 served: Mutex::new(BTreeMap::new()),
                 access: Mutex::new(BTreeMap::new()),
                 access_loaded: AtomicBool::new(false),
@@ -213,6 +216,20 @@ impl MereRoutes {
         });
     }
 
+    /// Register product authority before serving routes. The callback is reused
+    /// for edits, archive save/open/compose and loaded sessions.
+    pub fn with_domain_validator(
+        mut self,
+        domain: impl Into<String>,
+        validator: pandect::GraphValidator,
+    ) -> Self {
+        Arc::get_mut(&mut self.inner)
+            .expect("set validator before cloning or serving routes")
+            .validators
+            .insert(domain.into(), validator);
+        self
+    }
+
     /// Serve `mere` on `mere/<domain>`: open its store, register its route and
     /// grant it, unless it is served already.
     pub async fn serve(&self, mere: &MereRecord) -> Result<ResidentEndpointRoute, String> {
@@ -235,6 +252,13 @@ impl MereRoutes {
             .map_err(|error| error.to_string())?;
         let shared = Arc::new(MereShared {
             domain: domain.clone(),
+            validator: self.inner.validators.get(&domain).cloned(),
+            archive: open_mere_archive_backend(
+                &self.inner.shared_root,
+                self.inner.persona,
+                mere.id,
+            )
+            .map_err(|e| e.to_string())?,
             backend,
             persona: self.inner.persona,
             hosts: Mutex::new(HashMap::new()),
@@ -406,7 +430,9 @@ type SharedHost = Arc<Mutex<MereHost<DirectoryBackend>>>;
 /// attached to.
 struct MereShared {
     domain: String,
+    validator: Option<pandect::GraphValidator>,
     backend: DirectoryBackend,
+    archive: RedbBackend,
     persona: PersonaId,
     hosts: Mutex<HashMap<SessionId, SharedHost>>,
     /// The sessions projection's revision: it moves with every lifecycle step.
@@ -414,6 +440,13 @@ struct MereShared {
 }
 
 impl MereShared {
+    fn validate(&self, graph: &pandect::graph_codicil::GraphCandidate) -> Result<(), String> {
+        if let Some(validator) = &self.validator {
+            validator(graph)?;
+        }
+        Ok(())
+    }
+
     fn sessions(&self) -> MereSessions<DirectoryBackend> {
         MereSessions::new(self.backend.clone())
     }
@@ -438,7 +471,7 @@ impl MereShared {
             return Ok(Arc::clone(host));
         }
         let persona = self.persona_id();
-        let host = MereHost::open_session(
+        let host = MereHost::open_session_checked(
             self.backend.clone(),
             id,
             SelectedPersonaRef {
@@ -451,6 +484,7 @@ impl MereShared {
                 device: "djinn".to_string(),
                 at_ms: 0,
             },
+            self.validator.clone(),
         )
         .await
         .map_err(|error| error.to_string())?
@@ -510,6 +544,7 @@ struct MereEndpoint {
     seen_graph: (SceneEpoch, Revision),
     /// The sessions revision this connection last saw or was told of.
     seen_sessions: u64,
+    seen_archive: u64,
 }
 
 impl MereEndpoint {
@@ -541,6 +576,7 @@ impl MereEndpoint {
             };
             Ok(Self {
                 seen_sessions: shared.lifecycle.load(Ordering::SeqCst),
+                seen_archive: shared.lifecycle.load(Ordering::SeqCst),
                 shared,
                 app,
                 attached,
@@ -597,6 +633,9 @@ impl MereEndpoint {
             if id == self.attached {
                 badges.push("Attached".to_string());
             }
+            if manifest.codicil_read_only {
+                badges.push("Read-only thaw; editing forks".into());
+            }
             if trashed {
                 badges.push("Trashed".to_string());
             }
@@ -625,7 +664,10 @@ impl MereEndpoint {
     /// The steps a session's card offers as the session stands now: attach
     /// unless this connection holds it, fork, and trash or restore.
     fn session_actions(&self, manifest: &GraphSessionManifest) -> Vec<AdvertisedAction> {
-        let mut actions = Vec::new();
+        let mut actions = vec![session_item::archive_action(
+            SAVE_CODICIL_INTENT,
+            "Save as codicil",
+        )];
         if manifest.session_id != self.attached {
             actions.push(lifecycle_action(
                 ATTACH_SESSION_INTENT,
@@ -655,12 +697,21 @@ impl MereEndpoint {
     }
 
     fn sessions_snapshot(&mut self) -> Result<ProjectionSnapshot, String> {
-        let revision = self.sessions_revision();
         let cards = self.session_cards()?;
+        self.cards_snapshot(cards, Self::sessions_session(), SESSIONS_SOURCE)
+    }
+
+    fn cards_snapshot(
+        &mut self,
+        cards: Vec<SessionsCard>,
+        session: ProjectionSession,
+        source_kind: &str,
+    ) -> Result<ProjectionSnapshot, String> {
+        let revision = self.sessions_revision();
         let mut scene = Scene::new();
         let mut presentation = PresentationManifest::default();
         for (index, card) in cards.iter().enumerate() {
-            let source = scene.intern_source(SourceRef::new(SESSIONS_SOURCE, &card.source));
+            let source = scene.intern_source(SourceRef::new(source_kind, &card.source));
             scene.items.push(ProjectedItem {
                 source,
                 space: Scene::WORLD,
@@ -695,15 +746,172 @@ impl MereEndpoint {
                 }],
             );
         }
-        self.seen_sessions = revision.0;
+        if session.0 == MERE_ARCHIVE {
+            self.seen_archive = revision.0;
+        } else {
+            self.seen_sessions = revision.0;
+        }
         Ok(ProjectionSnapshot {
             version: ProtocolVersion::V1,
-            session: Self::sessions_session(),
+            session,
             scene: SceneSnapshot::from_dense(SESSIONS_EPOCH, revision, scene)
                 .map_err(|error| format!("{error:?}"))?,
             presentation,
             cache_policy: CachePolicy::default(),
         })
+    }
+
+    fn archive_session() -> ProjectionSession {
+        ProjectionSession(MERE_ARCHIVE.into())
+    }
+
+    fn archive_cards(&self) -> Result<Vec<SessionsCard>, String> {
+        let shared = Arc::clone(&self.shared);
+        run(async move {
+            let mut store = shared.archive.clone();
+            let mut manifests = pandect::graph_codicil::list_graph_codicils(&mut store)
+                .await
+                .map_err(|e| e.to_string())?;
+            manifests.sort_by_key(|manifest| (manifest.created_at, manifest.id.to_string()));
+            let mut cards = vec![SessionsCard {
+                source: "archive".into(),
+                label: "Eidetic archive".into(),
+                bytes: serde_json::to_vec(&PortableCardV1 {
+                    title: "Eidetic archive".into(),
+                    values: Vec::new(),
+                    badges: Vec::new(),
+                    media: Vec::new(),
+                })
+                .map_err(|e| e.to_string())?,
+                actions: vec![session_item::archive_action(
+                    COMPOSE_CODICILS_INTENT,
+                    "Compose codicils",
+                )],
+            }];
+            for manifest in manifests {
+                let id = manifest.id.to_string();
+                let card = PortableCardV1 {
+                    title: format!("Codicil {}", &id[..12]),
+                    values: vec![
+                        CardValueV1 {
+                            label: "Codicil".into(),
+                            value: id.clone(),
+                        },
+                        CardValueV1 {
+                            label: "Sources".into(),
+                            value: manifest
+                                .provenance
+                                .upstream
+                                .iter()
+                                .map(ToString::to_string)
+                                .collect::<Vec<_>>()
+                                .join(", "),
+                        },
+                    ],
+                    badges: vec!["Read-only archive".into()],
+                    media: Vec::new(),
+                };
+                cards.push(SessionsCard {
+                    source: id,
+                    label: card.title.clone(),
+                    bytes: serde_json::to_vec(&card).map_err(|e| e.to_string())?,
+                    actions: vec![session_item::archive_action(
+                        OPEN_CODICIL_INTENT,
+                        "Open as session",
+                    )],
+                });
+            }
+            Ok(cards)
+        })
+    }
+
+    fn invoke_archive(&mut self, intent: IntentInvocation) -> Result<IntentResult, String> {
+        if intent.observed_epoch != SESSIONS_EPOCH {
+            return Ok(IntentResult::Stale {
+                current_epoch: SESSIONS_EPOCH,
+                current_revision: self.sessions_revision(),
+            });
+        }
+        let outcome = (|| -> Result<Option<(SessionId, SharedHost)>, String> {
+            let payload: ArchiveActionV1 =
+                serde_json::from_slice(&intent.payload).map_err(|e| e.to_string())?;
+            if payload.schema != ARCHIVE_SCHEMA {
+                return Err("unknown archive schema".into());
+            }
+            let ids = payload
+                .codicils
+                .iter()
+                .map(|id| pandect::graph_codicil::parse_codicil_id(id))
+                .collect::<Result<Vec<_>, _>>()?;
+            let shared = Arc::clone(&self.shared);
+            let app = self.app.clone();
+            run(async move {
+                let mut store = shared.archive.clone();
+                match intent.intent.as_str() {
+                    SAVE_CODICIL_INTENT if ids.is_empty() => {
+                        let id = payload.session.ok_or("save names no session")?;
+                        let host = shared.host(id).await?;
+                        let mut host = host.lock().await;
+                        let payload = host.graph_session().codicil_payload();
+                        let id = pandect::graph_codicil::save_session_codicil_checked(
+                            &mut store,
+                            payload,
+                            pandect::graph_codicil::archive_timestamp(),
+                            |graph| shared.validate(graph),
+                        )
+                        .await
+                        .map_err(|e| e.to_string())?;
+                        host.archive_receipt(&app, id.to_string())
+                            .await
+                            .map_err(|e| e.to_string())?;
+                    },
+                    OPEN_CODICIL_INTENT if payload.session.is_none() && ids.len() == 1 => {
+                        let manifest = shared
+                            .sessions()
+                            .open_codicil_from_checked(
+                                &mut store,
+                                ids[0],
+                                shared.author(&app),
+                                |graph| shared.validate(graph),
+                            )
+                            .await
+                            .map_err(|e| e.to_string())?;
+                        shared.moved();
+                        return Ok(Some((
+                            manifest.session_id,
+                            shared.host(manifest.session_id).await?,
+                        )));
+                    },
+                    COMPOSE_CODICILS_INTENT if payload.session.is_none() && ids.len() >= 2 => {
+                        if pandect::graph_codicil::compose_graph_codicils_checked(
+                            &mut store,
+                            &ids,
+                            pandect::graph_codicil::archive_timestamp(),
+                            |graph| shared.validate(graph),
+                        )
+                        .await
+                        .map_err(|e| e.to_string())?
+                        .is_none()
+                        {
+                            return Err("compose names a missing codicil".into());
+                        }
+                    },
+                    _ => return Err("invalid archive action or operands".into()),
+                }
+                shared.moved();
+                Ok(None)
+            })
+        })();
+        match outcome {
+            Ok(Some((id, host))) => {
+                self.attached = id;
+                self.host = host;
+                self.seen_graph = (SceneEpoch(0), Revision(0));
+                Ok(IntentResult::Accepted)
+            },
+            Ok(None) => Ok(IntentResult::Accepted),
+            Err(reason) => Ok(IntentResult::Rejected { reason }),
+        }
     }
 
     fn invoke_sessions(&mut self, intent: IntentInvocation) -> Result<IntentResult, String> {
@@ -833,13 +1041,107 @@ impl MereEndpoint {
     }
 
     fn invoke_graph(&mut self, intent: IntentInvocation) -> Result<IntentResult, String> {
+        // Stage the first edit and its fork together. A refused candidate leaves
+        // the thaw, session set and store byte-for-byte unchanged.
+        let read_only = run(async {
+            self.host
+                .lock()
+                .await
+                .graph_session()
+                .manifest()
+                .codicil_read_only
+        });
+        if read_only {
+            let shared = Arc::clone(&self.shared);
+            let parent = Arc::clone(&self.host);
+            let app = self.app.clone();
+            let candidate = run(async move {
+                let parent = parent.lock().await;
+                if intent.observed_epoch != parent.projection_epoch() {
+                    return Ok::<_, String>(Err(IntentResult::Stale {
+                        current_epoch: parent.projection_epoch(),
+                        current_revision: parent.projection_revision(),
+                    }));
+                }
+                if Some(intent.target) != parent.session_instance() {
+                    return Ok(Err(IntentResult::Rejected {
+                        reason: "read-only archive; explicitly fork before node actions".into(),
+                    }));
+                }
+                let source = parent.graph_session();
+                let author = shared.author(&app);
+                let mut fork = shared
+                    .sessions()
+                    .begin_fork_at(source, source.journal().live_cursor(), author.clone())
+                    .map_err(|e| e.to_string())?;
+                match intent.intent.as_str() {
+                    session_item::APPLY_EDITS_INTENT => {
+                        let payload: ApplyEditsV1 =
+                            serde_json::from_slice(&intent.payload).map_err(|e| e.to_string())?;
+                        if payload.schema != session_item::APPLY_EDITS_SCHEMA
+                            || payload.edits.is_empty()
+                        {
+                            return Err("invalid or empty archive edit".into());
+                        }
+                        fork.apply_now(author, payload.edits)
+                            .map_err(|e| e.to_string())?;
+                        if fork.journal().live_cursor().0 == 0 {
+                            return Err("archive edit changes nothing".into());
+                        }
+                    },
+                    session_item::SET_VIEW_INTENT => {
+                        let payload: SetViewV1 =
+                            serde_json::from_slice(&intent.payload).map_err(|e| e.to_string())?;
+                        if payload.schema != session_item::SET_VIEW_SCHEMA {
+                            return Err("unknown view schema".into());
+                        }
+                        fork.set_view_now(
+                            author,
+                            pandect::ViewKey::new(&app, payload.view).map_err(|e| e.to_string())?,
+                            payload.state,
+                        )
+                        .map_err(|e| e.to_string())?;
+                    },
+                    _ => return Err("read-only archive; fork before this action".into()),
+                }
+                fork.flush(SystemTime::now())
+                    .await
+                    .map_err(|e| e.to_string())?;
+                Ok(Ok(fork.id()))
+            });
+            match candidate {
+                Ok(Ok(id)) => {
+                    self.attached = id;
+                    self.host = run(self.shared.host(id))?;
+                    self.shared.moved();
+                    self.seen_graph = (SceneEpoch(0), Revision(0));
+                    return Ok(IntentResult::Accepted);
+                },
+                Ok(Err(result)) => return Ok(result),
+                Err(reason) => return Ok(IntentResult::Rejected { reason }),
+            }
+        }
         let host = Arc::clone(&self.host);
         let app = self.app.clone();
         let (result, seen) = run(async move {
             let mut host = host.lock().await;
             if Some(intent.target) != host.session_instance() {
-                let result = host.invoke(intent).map_err(|error| error.to_string());
-                return (result, None);
+                let result = host.through(app.clone(), |host| host.invoke(intent));
+                let result = match result {
+                    Ok(IntentResult::Accepted) => host
+                        .persist(now_secs())
+                        .await
+                        .map(|()| IntentResult::Accepted)
+                        .map_err(|e| e.to_string()),
+                    Ok(result) => Ok(result),
+                    Err(error) => Ok(IntentResult::Rejected {
+                        reason: error.to_string(),
+                    }),
+                };
+                return (
+                    result,
+                    Some((host.projection_epoch(), host.projection_revision())),
+                );
             }
             let (epoch, revision) = (host.projection_epoch(), host.projection_revision());
             // By id at any revision (§7 item 32), but not across an epoch.
@@ -925,6 +1227,14 @@ impl ProjectionCatalog for MereEndpoint {
                     label: "Attached session".to_string(),
                     request: graph,
                 },
+                ProjectionOffer {
+                    label: "Archive".into(),
+                    request: ProjectionRequest {
+                        version: ProtocolVersion::V1,
+                        session: Self::archive_session(),
+                        score: Score::new(Arrangement::Spiral(Default::default())),
+                    },
+                },
             ],
         }
     }
@@ -936,6 +1246,10 @@ impl ProjectionSource for MereEndpoint {
     fn snapshot(&mut self, request: ProjectionRequest) -> Result<ProjectionSnapshot, Self::Error> {
         match request.session.0.as_str() {
             MERE_SESSIONS => self.sessions_snapshot(),
+            MERE_ARCHIVE => {
+                let cards = self.archive_cards()?;
+                self.cards_snapshot(cards, Self::archive_session(), ARCHIVE_SOURCE)
+            },
             MERE_GRAPH => {
                 let host = Arc::clone(&self.host);
                 let snapshot = run(async move {
@@ -955,9 +1269,13 @@ impl PresentationSource for MereEndpoint {
 
     fn resource(&mut self, request: ResourceRequest) -> Result<ResourceResponse, Self::Error> {
         match request.session.0.as_str() {
-            MERE_SESSIONS => {
-                let bytes = self
-                    .session_cards()?
+            MERE_SESSIONS | MERE_ARCHIVE => {
+                let cards = if request.session.0 == MERE_ARCHIVE {
+                    self.archive_cards()?
+                } else {
+                    self.session_cards()?
+                };
+                let bytes = cards
                     .into_iter()
                     .find(|card| ContentHash::of(&card.bytes) == request.resource)
                     .map(|card| card.bytes)
@@ -985,7 +1303,9 @@ impl IntentSink for MereEndpoint {
 
     fn invoke(&mut self, intent: IntentInvocation) -> Result<IntentResult, Self::Error> {
         match intent.session.0.as_str() {
+            MERE_SESSIONS if intent.intent == SAVE_CODICIL_INTENT => self.invoke_archive(intent),
             MERE_SESSIONS => self.invoke_sessions(intent),
+            MERE_ARCHIVE => self.invoke_archive(intent),
             MERE_GRAPH => self.invoke_graph(intent),
             other => Ok(IntentResult::Rejected {
                 reason: format!("this mere serves no projection {other:?}"),
@@ -1003,6 +1323,14 @@ impl ProjectionNoticeSource for MereEndpoint {
             self.seen_sessions = sessions;
             return Ok(Some(CarrierNotice {
                 session: Self::sessions_session(),
+                epoch: SESSIONS_EPOCH,
+                revision: Revision(sessions),
+            }));
+        }
+        if sessions != self.seen_archive {
+            self.seen_archive = sessions;
+            return Ok(Some(CarrierNotice {
+                session: Self::archive_session(),
                 epoch: SESSIONS_EPOCH,
                 revision: Revision(sessions),
             }));
@@ -1078,6 +1406,14 @@ mod tests {
     }
 
     async fn fixture(persona_n: u128, domain: &str) -> Fixture {
+        fixture_with_validator(persona_n, domain, None).await
+    }
+
+    async fn fixture_with_validator(
+        persona_n: u128,
+        domain: &str,
+        validator: Option<pandect::GraphValidator>,
+    ) -> Fixture {
         let root = tempfile::tempdir().unwrap();
         let reservoir = ResidentReservoir::open(root.path(), Some(persona(persona_n)))
             .await
@@ -1091,6 +1427,11 @@ mod tests {
             grants.clone(),
             vec![AppId::new("turnstone"), AppId::new("knot-editor")],
         );
+        let routes = if let Some(validator) = validator {
+            routes.with_domain_validator(domain, validator)
+        } else {
+            routes
+        };
         catalog
             .update(|catalog| reservoir.register(catalog, Some(routes.clone())))
             .await
@@ -1289,6 +1630,267 @@ mod tests {
             intent: intent.into(),
             payload: serde_json::to_vec(&payload).unwrap(),
         }
+    }
+
+    fn archive_ids(snapshot: &ProjectionSnapshot) -> Vec<String> {
+        snapshot
+            .scene
+            .active_items_in_order()
+            .into_iter()
+            .filter_map(|(_, item)| {
+                snapshot.scene.tables.sources[item.source.0 as usize]
+                    .as_ref()
+                    .filter(|source| source.adapter == ARCHIVE_SOURCE && source.id != "archive")
+                    .map(|source| source.id.clone())
+            })
+            .collect()
+    }
+
+    fn archive_step(
+        snapshot: &ProjectionSnapshot,
+        intent: &str,
+        payload: ArchiveActionV1,
+    ) -> IntentInvocation {
+        IntentInvocation {
+            session: snapshot.session.clone(),
+            target: InstanceId(0),
+            observed_epoch: snapshot.scene.epoch,
+            observed_revision: snapshot.scene.revision,
+            intent: intent.into(),
+            payload: serde_json::to_vec(&payload).unwrap(),
+        }
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn domain_authority_checks_route_batches_archive_compose_and_first_edit_forks() {
+        let validator: pandect::GraphValidator = Arc::new(|graph| {
+            if graph.nodes().count() > 1 || graph.nodes().any(|(_, n)| n.title == "Forbidden") {
+                Err("domain forbids this complete candidate".into())
+            } else {
+                Ok(())
+            }
+        });
+        let fixture = fixture_with_validator(25, "bounded-domain", Some(validator)).await;
+        let mut app = fixture.attach("turnstone").await;
+        let start = graph(&mut app);
+        assert!(matches!(
+            app.invoke(apply(&start, vec![node(1), retitle(1, "Forbidden")]))
+                .unwrap(),
+            IntentResult::Rejected { .. }
+        ));
+        assert_eq!(
+            nodes(&graph(&mut app)),
+            0,
+            "complete rejected batch installs nothing"
+        );
+        assert_eq!(
+            app.invoke(apply(&start, vec![node(1)])).unwrap(),
+            IntentResult::Accepted
+        );
+        let list = projection(&mut app, 0);
+        let original = session_ids(&list)[0];
+        assert_eq!(
+            app.invoke(archive_step(
+                &list,
+                SAVE_CODICIL_INTENT,
+                ArchiveActionV1::save(original)
+            ))
+            .unwrap(),
+            IntentResult::Accepted
+        );
+        assert_eq!(
+            app.invoke(sessions_step(
+                &list,
+                MINT_SESSION_INTENT,
+                SessionsActionV1::mint(None)
+            ))
+            .unwrap(),
+            IntentResult::Accepted
+        );
+        let list = projection(&mut app, 0);
+        let second = *session_ids(&list)
+            .iter()
+            .find(|id| **id != original)
+            .unwrap();
+        assert_eq!(
+            app.invoke(sessions_step(
+                &list,
+                ATTACH_SESSION_INTENT,
+                SessionsActionV1::on(second)
+            ))
+            .unwrap(),
+            IntentResult::Accepted
+        );
+        let current_graph = graph(&mut app);
+        assert_eq!(
+            app.invoke(apply(&current_graph, vec![node(2)])).unwrap(),
+            IntentResult::Accepted
+        );
+        let list = projection(&mut app, 0);
+        assert_eq!(
+            app.invoke(archive_step(
+                &list,
+                SAVE_CODICIL_INTENT,
+                ArchiveActionV1::save(second)
+            ))
+            .unwrap(),
+            IntentResult::Accepted
+        );
+        let archive = projection(&mut app, 2);
+        let ids = archive_ids(&archive);
+        assert_eq!(ids.len(), 2);
+        assert!(matches!(
+            app.invoke(archive_step(
+                &archive,
+                COMPOSE_CODICILS_INTENT,
+                ArchiveActionV1::on(ids.clone())
+            ))
+            .unwrap(),
+            IntentResult::Rejected { .. }
+        ));
+        assert_eq!(
+            archive_ids(&projection(&mut app, 2)),
+            ids,
+            "refused union writes no codicil"
+        );
+        assert_eq!(
+            app.invoke(archive_step(
+                &archive,
+                OPEN_CODICIL_INTENT,
+                ArchiveActionV1::on(vec![ids[0].clone()])
+            ))
+            .unwrap(),
+            IntentResult::Accepted
+        );
+        let before = projection(&mut app, 0);
+        let thaw_graph = projection(&mut app, 1);
+        assert!(matches!(
+            app.invoke(apply(&thaw_graph, vec![node(3)])).unwrap(),
+            IntentResult::Rejected { .. }
+        ));
+        assert_eq!(
+            session_ids(&projection(&mut app, 0)),
+            session_ids(&before),
+            "refused candidate creates no durable fork"
+        );
+        assert_eq!(nodes(&projection(&mut app, 1)), 1);
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn archive_intents_save_browse_fork_and_compose_through_the_resident() {
+        let fixture = fixture(24, "archive-test").await;
+        let mut first = fixture.attach("turnstone").await;
+        let start = graph(&mut first);
+        assert_eq!(
+            first.invoke(apply(&start, vec![node(1)])).unwrap(),
+            IntentResult::Accepted
+        );
+        let list = projection(&mut first, 0);
+        let original = session_ids(&list)[0];
+        assert_eq!(
+            first
+                .invoke(archive_step(
+                    &list,
+                    SAVE_CODICIL_INTENT,
+                    ArchiveActionV1::save(original)
+                ))
+                .unwrap(),
+            IntentResult::Accepted
+        );
+        let archive = projection(&mut first, 2);
+        let first_id = archive_ids(&archive)[0].clone();
+        assert_eq!(
+            first
+                .invoke(archive_step(
+                    &archive,
+                    OPEN_CODICIL_INTENT,
+                    ArchiveActionV1::on(vec![first_id.clone()])
+                ))
+                .unwrap(),
+            IntentResult::Accepted
+        );
+        let list = projection(&mut first, 0);
+        let thaw = *session_ids(&list)
+            .iter()
+            .find(|id| **id != original)
+            .unwrap();
+        let mut other = fixture.attach("knot-editor").await;
+        let before = graph(&mut first);
+        assert_eq!(nodes(&before), 1);
+        let mut invalid = apply(&before, vec![node(2)]);
+        invalid.payload = b"invalid".to_vec();
+        assert!(matches!(
+            first.invoke(invalid).unwrap(),
+            IntentResult::Rejected { .. }
+        ));
+        assert_eq!(
+            session_ids(&projection(&mut first, 0)).len(),
+            2,
+            "rejected first edit creates no fork"
+        );
+        assert_eq!(
+            first.invoke(apply(&before, vec![node(2)])).unwrap(),
+            IntentResult::Accepted
+        );
+        assert_eq!(nodes(&graph(&mut first)), 2);
+        let list = projection(&mut first, 0);
+        assert_eq!(session_ids(&list).len(), 3);
+        assert_eq!(
+            nodes(&graph(&mut other)),
+            1,
+            "another connection still browses the unchanged thaw"
+        );
+        let fork = *session_ids(&list)
+            .iter()
+            .find(|id| **id != original && **id != thaw)
+            .unwrap();
+        assert_eq!(
+            first
+                .invoke(archive_step(
+                    &list,
+                    SAVE_CODICIL_INTENT,
+                    ArchiveActionV1::save(fork)
+                ))
+                .unwrap(),
+            IntentResult::Accepted
+        );
+        let archive = projection(&mut first, 2);
+        let ids = archive_ids(&archive);
+        assert_eq!(ids.len(), 2);
+        assert_eq!(
+            first
+                .invoke(archive_step(
+                    &archive,
+                    COMPOSE_CODICILS_INTENT,
+                    ArchiveActionV1::on(ids.clone())
+                ))
+                .unwrap(),
+            IntentResult::Accepted
+        );
+        let archive = projection(&mut first, 2);
+        let composed = archive_ids(&archive)
+            .into_iter()
+            .find(|id| !ids.contains(id))
+            .unwrap();
+        let mere = fixture.reservoir.meres().await.remove(0);
+        let archive_path =
+            mere_dir(fixture._root.path(), persona(24), mere.id).join("archive.redb");
+        assert!(archive_path.is_file());
+        assert!(
+            muniment::RedbBackend::open(&archive_path).is_err(),
+            "resident remains the only archive owner"
+        );
+        assert_eq!(
+            first
+                .invoke(archive_step(
+                    &archive,
+                    OPEN_CODICIL_INTENT,
+                    ArchiveActionV1::on(vec![composed])
+                ))
+                .unwrap(),
+            IntentResult::Accepted
+        );
+        assert_eq!(nodes(&graph(&mut first)), 2);
     }
 
     #[tokio::test(flavor = "multi_thread")]

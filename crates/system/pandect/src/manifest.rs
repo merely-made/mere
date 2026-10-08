@@ -166,6 +166,12 @@ pub struct GraphSessionManifest {
     /// Its keys stay where they are; restoring clears the mark.
     #[serde(default)]
     pub trashed: Option<TrashMark>,
+    /// Immutable archive this session was opened from. Retained by edit forks.
+    #[serde(default)]
+    pub source_codicil: Option<CodicilId>,
+    /// A thaw is browsed read-only; its first edit must create a separate fork.
+    #[serde(default)]
+    pub codicil_read_only: bool,
 }
 
 /// Who put a session in the trash, and when.
@@ -199,6 +205,8 @@ impl GraphSessionManifest {
             storage_path: None,
             forked_at: None,
             trashed: None,
+            source_codicil: None,
+            codicil_read_only: false,
         }
     }
 
