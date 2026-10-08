@@ -64,14 +64,18 @@ rendering engine.
 
 ### 2026-10-07 Forms field ownership migration
 
-**Status, 2026-10-08:** current `9105b1ef` integration consumer gates pass, including F6's accessibility
-leaves across projections. Both F5 public-pin sibling gates pass; publication
-and a verified published-source Genet repin remain pending.
+**Status, 2026-10-08:** the permanent Genet Forms repin at Mere `632c1d29`
+qualifies against public Git sources on ThinkPad: 362 package passes, 63
+native-host passes and a Wasm accessibility-example compile, with zero failures
+and two existing ignored doctests. F6's accessible leaves are included. The
+older F5 public-pin sibling gates pass; their refreshed integration gates and
+publication are tracked separately in the Forms plan.
 The implementation plan and numbered rulings live in Genet's
 [dated Forms plan](https://github.com/merely-made/genet/blob/main/design_docs/2026-10-07_forms_value_validation_submission_plan.md).
-F3 authorizes this Mere migration and the later verified repin. The current
-source still pins Genet `965b64e206a47d1c8808472de9aa461233638768`; its older
-receipts do not qualify the Forms candidate.
+F3 authorizes this Mere migration and verified repin. The current modern Genet
+family pins published `e84f9c7f9aec23320c539784961d1465f8a53a9b`; published
+Knot retains its two explicit Genet `965b64e2` identities. The dated receipts
+below retain their original source boundaries.
 
 F6 preserves the app textbox's identity, existing name, committed value,
 geometry, state, actions and focus while excluding its decorative accessibility
@@ -325,6 +329,49 @@ bytecode under `Code/testing/genet/forms/__pycache__` was removed on 2026-10-08
 after Mark explicitly authorized cleanup. Its earlier automatic-review
 rejection ("blocked by policy") remains historical. Mark also authorized
 publication and push, and requested remaining serial tests on ThinkPad.
+
+### 2026-10-08 public-source Forms qualification on ThinkPad
+
+Mere `632c1d298dee1ecd5c3dfe00879c95d4a012f8ea` adopts Genet
+`e84f9c7f9aec23320c539784961d1465f8a53a9b` after integrating published Mere
+`4fd2f3f1`. The permanent manifest and lock preserve package versions,
+checksums, owner edges and resolved features after the authorized revision
+mapping. Metadata moves from 1,566 to 1,568 packages because published Knot
+`eabd4434` retains separate Fleece 0.5.0 and LayoutDom 0.1.1 identities at
+Genet `965b64e2`. The five selected Cambium roots retain the same 605-package
+dependency closure, which activates neither JavaScript engine. The committed
+lock SHA256 is
+`69eb637d64e7387179cda95b1a2e80768e076d95da29c24b9203d0c573551cd5`.
+
+On Fedora ThinkPad, Cargo 1.98.1 runs with one build job and one test thread.
+The four-package gate passes Cambium 257, Rootstock 72, native accessibility
+23 and browser mirror 10, with zero failures and two existing ignored doctests.
+All six native-host integration targets pass 63 tests; the Wasm `a11y_page`
+example compiles with its existing getrandom setting. These are automated
+tests and compilation, without a new physical window, browser operation or
+human assistive-technology receipt. Source, manifest and lock are stable across
+each run. The first package compile is interrupted when a separate Cargo owner
+appears; it runs no tests and remains unqualified. The unchanged serial retry
+supplies the complete result.
+
+Normal Cargo Git checkouts contain the exact clean published Genet and Knot
+commits. The audit finds no local source replacements or Git URL rewrites.
+Raw receipts use prefixes `thinkpad-forms-20261008-mere-packages-retry1`,
+`thinkpad-forms-20261008-mere-native-host` and
+`thinkpad-forms-20261008-mere-web-wasm` under
+`Code/testing/genet/forms/thinkpad`. Graph and provenance qualification are
+`thinkpad-forms-graph-qualification.json` and
+`thinkpad-forms-20261008-provenance.json` under `Code/testing/genet/forms`.
+The later merge of published Mere `9ed44a5e` changes only documentation and
+packages outside the tested closure; its manifests, lock and tested closure
+remain identical. Mark's publication authorization includes the normal main
+push carrying the preserved shared history.
+
+The remote Mere worktree is required by an existing primary-checkout Knot
+lane; Turnstone's worktree protects primary untracked receipts. Both use
+stable repository targets. Worktrees can be removed after publication and
+evidence transfer when they have no live owner. The primary work and other
+agents' targets remain preserved.
 
 ### 2026-09-29 generated accessible-name adoption
 
