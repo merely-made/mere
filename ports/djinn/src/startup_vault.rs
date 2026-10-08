@@ -13,12 +13,15 @@
 //! asks again after a backoff; with neither a box nor a terminal there is
 //! nothing to ask with, and the start fails naming both. With no vault the
 //! prompt creates one, asking twice (ruling 64). The OS-rooted vault (DPAPI)
-//! still opens unattended. The environment is never read (ruling 7).
+//! still opens unattended, unless its vault carries the persisted lock: then
+//! the start waits at the same prompt, Hello first (rulings 5, 76, 80). The
+//! environment is never read (ruling 7).
 
 use std::path::Path;
 use std::time::Duration;
 
 use personae::bootstrap::{self, OpenedStorage, PASSPHRASE_VAULT_FILE, Unlock};
+use personae::{AUTO_UNLOCK_ROOT_FILE, IdentityStorage, OsPresence, SealedProfileStorage, UnlockMethod};
 use zeroize::Zeroizing;
 
 /// Which vault a start opens.
@@ -30,11 +33,17 @@ pub enum VaultChoice {
     Passphrase,
 }
 
-/// The passphrase vault when the platform holds no root, when a passphrase
-/// was handed over, or when the directory already holds one; else the OS's.
+/// The passphrase vault when the platform holds no root, when the directory
+/// already holds one, or when a passphrase was handed over and no OS-rooted
+/// vault is there yet; else the OS's (whose persisted lock a handed-over
+/// passphrase then answers).
 pub fn choose(vault_dir: &Path, passphrase_given: bool) -> VaultChoice {
     let os_root = cfg!(windows);
-    if passphrase_given || !os_root || vault_dir.join(PASSPHRASE_VAULT_FILE).exists() {
+    let os_vault = vault_dir.join(AUTO_UNLOCK_ROOT_FILE).exists();
+    if !os_root
+        || vault_dir.join(PASSPHRASE_VAULT_FILE).exists()
+        || (passphrase_given && !os_vault)
+    {
         VaultChoice::Passphrase
     } else {
         VaultChoice::AutoOs
@@ -82,6 +91,12 @@ pub enum Answer {
 pub trait Prompt {
     /// Ask once. `Err` when this source cannot ask at all.
     fn ask(&mut self, ask: &Ask) -> Result<Answer, String>;
+
+    /// The OS's own check of the user (Windows Hello), where this source
+    /// offers one; `None` when unavailable, cancelled or not verified.
+    fn presence(&mut self) -> Option<OsPresence> {
+        None
+    }
 }
 
 /// The native box where the desktop has one, else the terminal (ruling 63).
@@ -91,6 +106,10 @@ pub struct NativeOrTerminal<U> {
 }
 
 impl<U: graphshell::native::identity_ui::NativeIdentityUi> Prompt for NativeOrTerminal<U> {
+    fn presence(&mut self) -> Option<OsPresence> {
+        self.native.verify_presence().ok().flatten()
+    }
+
     fn ask(&mut self, ask: &Ask) -> Result<Answer, String> {
         let message = ask.message();
         match self.native.ask_vault_passphrase(&message) {
@@ -155,6 +174,9 @@ pub fn open(
     waiting: &mut dyn Waiting,
     sleep: &mut dyn FnMut(Duration),
 ) -> Result<Started, String> {
+    if choice == VaultChoice::AutoOs && personae::lock_persisted(vault_dir) {
+        return open_under_persisted_lock(vault_dir, prompt, waiting, sleep);
+    }
     if choice == VaultChoice::AutoOs {
         let opened =
             bootstrap::open_storage(vault_dir, Unlock::AutoOs).map_err(|error| error.to_string())?;
@@ -231,6 +253,69 @@ pub fn open(
             },
         }
     }
+}
+
+/// An OS-rooted vault whose lock persisted: open it locked and wait for a
+/// user act, Hello once and then the passphrase box, before anything else
+/// exists (rulings 5, 76). The marker clears with the unlock.
+fn open_under_persisted_lock(
+    vault_dir: &Path,
+    prompt: &mut dyn Prompt,
+    waiting: &mut dyn Waiting,
+    sleep: &mut dyn FnMut(Duration),
+) -> Result<Started, String> {
+    waiting.emit(
+        "waiting-for-unlock",
+        serde_json::json!({ "persisted_lock": true }),
+    );
+    let storage = SealedProfileStorage::open_locked(vault_dir);
+    let mut unlocked = match prompt.presence() {
+        Some(verified) => storage.unlock(UnlockMethod::OsPresence(verified)).is_ok(),
+        None => false,
+    };
+    let mut misses = 0u32;
+    let mut retry: Option<String> = None;
+    while !unlocked {
+        let passphrase = match prompt.ask(&Ask::Unlock {
+            retry: retry.take(),
+        })? {
+            Answer::Passphrase(passphrase) if passphrase.is_empty() => {
+                retry = Some("An empty passphrase is not accepted.".into());
+                continue;
+            },
+            Answer::Passphrase(passphrase) => passphrase,
+            Answer::Cancelled => {
+                waiting.emit("unlock-cancelled", serde_json::json!({ "misses": misses }));
+                sleep(backoff(misses));
+                misses += 1;
+                continue;
+            },
+        };
+        match storage.unlock(UnlockMethod::Passphrase(passphrase.as_bytes())) {
+            Ok(()) => unlocked = true,
+            Err(error) => {
+                waiting.emit(
+                    "unlock-refused",
+                    serde_json::json!({ "reason": error.to_string() }),
+                );
+                retry = Some(format!("That did not open the vault ({error})."));
+            },
+        }
+    }
+    personae::clear_persisted_lock(vault_dir).map_err(|error| error.to_string())?;
+    waiting.emit("unlocked-at-start", serde_json::json!({ "persisted_lock": true }));
+    Ok(Started {
+        opened: OpenedStorage {
+            storage: Box::new(storage),
+            description: format!(
+                "OS auto-unlock sealed records at {} (DPAPI-wrapped root), opened by a user act \
+                 under the persisted lock",
+                vault_dir.display()
+            ),
+        },
+        choice: VaultChoice::AutoOs,
+        passphrase: None,
+    })
 }
 
 /// One passphrase from standard input, for the harness (ruling 65): one
@@ -311,15 +396,17 @@ mod tests {
     }
 
     fn start(dir: &Path, prompt: &mut Script) -> (Result<Started, String>, Vec<String>, Vec<Duration>) {
+        start_as(dir, VaultChoice::Passphrase, prompt)
+    }
+
+    fn start_as(
+        dir: &Path,
+        choice: VaultChoice,
+        prompt: &mut Script,
+    ) -> (Result<Started, String>, Vec<String>, Vec<Duration>) {
         let mut log = Log(Vec::new());
         let mut slept = Vec::new();
-        let started = open(
-            dir,
-            VaultChoice::Passphrase,
-            prompt,
-            &mut log,
-            &mut |wait| slept.push(wait),
-        );
+        let started = open(dir, choice, prompt, &mut log, &mut |wait| slept.push(wait));
         (started, log.0, slept)
     }
 
@@ -427,6 +514,45 @@ mod tests {
         assert_eq!(bare == VaultChoice::AutoOs, cfg!(windows));
         std::fs::write(dir.path().join(PASSPHRASE_VAULT_FILE), b"{}").unwrap();
         assert_eq!(choose(dir.path(), false), VaultChoice::Passphrase);
+    }
+
+    /// Rulings 5, 76 and 80 on Windows: an OS-rooted vault opens unattended
+    /// until its lock persists, then waits for the passphrase, and opens
+    /// unattended again once that unlock cleared the marker.
+    #[cfg(windows)]
+    #[test]
+    fn a_persisted_lock_makes_the_os_vault_wait_for_its_passphrase() {
+        let dir = tempfile::tempdir().unwrap();
+        {
+            let storage = SealedProfileStorage::open_auto_os(dir.path()).unwrap().unwrap();
+            let id = personae::vault::ProfileId("p".into());
+            bootstrap::load_or_create_profile(&storage, &id).unwrap();
+            storage.enroll_passphrase(b"right").unwrap();
+        }
+        assert_eq!(choose(dir.path(), true), VaultChoice::AutoOs, "the OS vault is there");
+
+        let (unattended, events, _) = start_as(dir.path(), VaultChoice::AutoOs, &mut script(&[]));
+        assert!(unattended.is_ok());
+        assert!(events.is_empty(), "no lock persisted: no prompt");
+
+        personae::persist_lock(dir.path()).unwrap();
+        let mut prompt = script(&[Some("wrong"), None, Some("right")]);
+        let (started, events, slept) = start_as(dir.path(), VaultChoice::AutoOs, &mut prompt);
+        let (opened, choice, second) = started.unwrap().into_parts();
+        assert_eq!(choice, VaultChoice::AutoOs);
+        assert!(matches!(second, Unlock::AutoOs));
+        assert!(!opened.storage.is_locked());
+        assert_eq!(
+            events,
+            ["waiting-for-unlock", "unlock-refused", "unlock-cancelled", "unlocked-at-start"]
+        );
+        assert_eq!(slept, [backoff(0)]);
+        assert!(!personae::lock_persisted(dir.path()), "the unlock cleared the marker");
+        drop(opened);
+
+        let (again, events, _) = start_as(dir.path(), VaultChoice::AutoOs, &mut script(&[]));
+        assert!(again.is_ok());
+        assert!(events.is_empty());
     }
 
     #[test]
