@@ -41,10 +41,10 @@ use seiche::{
 use crate::canvas::SETTLE_TICKS;
 use crate::canvas::actions::{self, AdvertisedAction, ArrangementAction, PermittedActions};
 use crate::canvas::at_rest::AtRest;
-use crate::canvas::physics_catalog::{
-    LawInputs, LawSources, PhysicsDepthSource, PhysicsKindSource, PhysicsLaw, PhysicsMassSource,
-    PhysicsOverlay,
-};
+use crate::canvas::composition::PhysicsComposition;
+use crate::canvas::dynamics_spec::{BindError, BoundRoot, DynamicsSpec, bind};
+use crate::canvas::physics_catalog::{LawInputs, LawSources};
+use crate::canvas::physics_view::PhysicsChoice;
 
 /// How firmly an anchored card returns to its slot. Gentle by design, a
 /// twenty-fourth of the canvas's [`DEFAULT_ANCHOR_STIFFNESS`] (the board's
@@ -52,32 +52,9 @@ use crate::canvas::physics_catalog::{
 /// cards are seeded unless a role says otherwise (F23).
 pub const DEFAULT_BOARD_ANCHOR_STIFFNESS: f32 = DEFAULT_ANCHOR_STIFFNESS / 24.0;
 
-/// The physics choice a board runs: what the host's own canvas runs, mirrored.
-/// A board has no partition and no Meaning snapshot of its own, so its
-/// cluster and meaning sources read site.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct PhysicsChoice {
-    pub law: PhysicsLaw,
-    pub overlays: Vec<PhysicsOverlay>,
-    pub kind: PhysicsKindSource,
-    /// Group pull's groups channel.
-    pub groups: PhysicsKindSource,
-    pub mass: PhysicsMassSource,
-    pub depth: PhysicsDepthSource,
-}
-
-impl Default for PhysicsChoice {
-    fn default() -> Self {
-        Self {
-            law: PhysicsLaw::Springs,
-            overlays: Vec::new(),
-            kind: PhysicsKindSource::Site,
-            groups: PhysicsKindSource::Site,
-            mass: PhysicsMassSource::Degree,
-            depth: PhysicsDepthSource::Roots,
-        }
-    }
-}
+/// Why a board refuses a schedule.
+const SCHEDULE_ON_A_BOARD: &str =
+    "a board runs a law or a composition; the canvas drives a schedule's stages";
 
 /// One item the board holds: its stable id, its slot (the score position)
 /// and its site (the grouping the Kinds law and the group overlay read).
@@ -96,7 +73,13 @@ pub struct PhysicsBoard {
     keys: HashMap<String, NodeKey>,
     next_key: usize,
     items: Vec<BoardItem>,
+    /// The stage the board runs, as the spec it was given (F150, F162).
+    stage: DynamicsSpec,
+    /// That stage read: the flat choice, a composition in the law slot, and
+    /// the seed.
     choice: PhysicsChoice,
+    composition: Option<PhysicsComposition>,
+    seed: u64,
     /// The roles the slots play; groups are sites.
     roles: RoleTable,
     anchor_stiffness: f32,
@@ -133,7 +116,10 @@ impl PhysicsBoard {
             keys: HashMap::new(),
             next_key: 0,
             items: Vec::new(),
+            stage: PhysicsChoice::default().into_spec(),
             choice: PhysicsChoice::default(),
+            composition: None,
+            seed: crate::canvas::dynamics_spec::DEFAULT_SEED,
             roles: RoleTable::default(),
             anchor_stiffness: DEFAULT_BOARD_ANCHOR_STIFFNESS,
             encoded: Axes::NONE,
@@ -182,9 +168,10 @@ impl PhysicsBoard {
         self.physics.repulsion_stats()
     }
 
-    /// The live choice.
-    pub fn choice(&self) -> &PhysicsChoice {
-        &self.choice
+    /// The stage the board runs: a law or a composition, as a spec. A
+    /// reader reads it through [`PhysicsChoice::view`].
+    pub fn stage(&self) -> &DynamicsSpec {
+        &self.stage
     }
 
     /// The roles the slots play.
@@ -327,16 +314,37 @@ impl PhysicsBoard {
         self.settle_for_choice();
     }
 
-    /// Switch the law, overlays and sources; the force set is replaced
-    /// wholesale and a settle (or a continuous run) follows. A no-op when
-    /// nothing changed, so a host may mirror its canvas every frame.
-    pub fn set_choice(&mut self, choice: PhysicsChoice) {
-        if choice == self.choice {
-            return;
+    /// Run `stage`: a law or a composition with its overlays, sources and
+    /// seed (dynamics grammar plan, F150, F162), the canvas's
+    /// [`live_stage_spec`](crate::canvas::Canvas::live_stage_spec) when the
+    /// board mirrors one. The force set is replaced wholesale and a settle
+    /// (or a continuous run) follows. A schedule is refused: the canvas
+    /// drives one and the board follows its stage. A no-op when nothing
+    /// changed, so a host may mirror its canvas every frame. The board has
+    /// no partition or Meaning snapshot of its own, so a cluster or meaning
+    /// source reads site.
+    pub fn set_stage(&mut self, stage: &DynamicsSpec) -> Result<(), BindError> {
+        if *stage == self.stage {
+            return Ok(());
         }
-        self.choice = choice;
+        let bound = bind(stage)?;
+        let composition = match &bound.root {
+            BoundRoot::Law { .. } => None,
+            BoundRoot::Composed { composition, .. } => Some(composition.clone()),
+            BoundRoot::Schedule(_) => {
+                return Err(BindError::Unbound {
+                    place: "root".into(),
+                    reason: SCHEDULE_ON_A_BOARD.into(),
+                });
+            },
+        };
+        self.seed = bound.seed;
+        self.choice = PhysicsChoice::flat(bound);
+        self.composition = composition;
+        self.stage = stage.clone();
         self.rebuild_forces();
         self.settle_for_choice();
+        Ok(())
     }
 
     /// Reconcile the bodies to `items`: departed items drop, new ones spawn
@@ -690,9 +698,14 @@ impl PhysicsBoard {
             mass: self.choice.mass,
             depth: self.choice.depth,
             focus: None,
-            seed: crate::canvas::physics_catalog::LAW_SEED,
+            seed: self.seed,
         };
-        let forces = inputs.forces(self.choice.law, &self.choice.overlays, sources);
+        let forces = inputs.composed(
+            self.choice.law,
+            self.composition.as_ref(),
+            &self.choice.overlays,
+            sources,
+        );
         self.physics.set_forces(forces);
     }
 
@@ -702,8 +715,12 @@ impl PhysicsBoard {
     fn settle_for_choice(&mut self) {
         self.unpark();
         self.halted = false;
-        let living =
-            self.choice.law.never_rests() || self.choice.overlays.iter().any(|o| o.never_rests());
+        let laws = self
+            .composition
+            .as_ref()
+            .map_or_else(|| vec![self.choice.law], PhysicsComposition::laws);
+        let living = laws.iter().any(|law| law.never_rests())
+            || self.choice.overlays.iter().any(|o| o.never_rests());
         self.physics
             .settle(if living { u32::MAX } else { SETTLE_TICKS });
     }
@@ -712,6 +729,7 @@ impl PhysicsBoard {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::canvas::physics_catalog::PhysicsLaw;
 
     fn item(id: &str, x: f32, y: f32) -> BoardItem {
         BoardItem {
@@ -850,11 +868,12 @@ mod tests {
         let charge = PhysicsChoice {
             law: PhysicsLaw::Charge,
             ..PhysicsChoice::default()
-        };
+        }
+        .into_spec();
         let mut anchored = PhysicsBoard::new();
         anchored.set_roles(RoleTable::uniform(Role::Anchored));
         anchored.sync(pair());
-        anchored.set_choice(charge.clone());
+        anchored.set_stage(&charge).unwrap();
         let mut widest: f32 = 0.0;
         for _ in 0..SETTLE_TICKS * 4 {
             anchored.tick();
@@ -869,7 +888,7 @@ mod tests {
 
         let mut board = PhysicsBoard::new();
         board.sync(pair());
-        board.set_choice(charge);
+        board.set_stage(&charge).unwrap();
         for _ in 0..SETTLE_TICKS {
             board.tick();
         }
@@ -877,10 +896,15 @@ mod tests {
         assert!(gap > 60.0, "charge pushed the seeded pair apart: {gap:.0}");
         assert!(!board.tick(), "charge comes to rest");
 
-        board.set_choice(PhysicsChoice {
-            law: PhysicsLaw::Orbit,
-            ..PhysicsChoice::default()
-        });
+        board
+            .set_stage(
+                &PhysicsChoice {
+                    law: PhysicsLaw::Orbit,
+                    ..PhysicsChoice::default()
+                }
+                .into_spec(),
+            )
+            .unwrap();
         for _ in 0..120 {
             assert!(board.tick(), "orbit keeps ticking");
         }
@@ -889,5 +913,44 @@ mod tests {
             "orbit carries energy: {}",
             board.energy()
         );
+    }
+
+    /// F150: the board takes the canvas's live stage, a composition
+    /// included (a mix runs graph-free, Charge's repulsion between the site
+    /// groups), and refuses a schedule, whose stages the canvas drives; a
+    /// refused stage leaves the board as it was.
+    #[test]
+    fn the_board_takes_a_stage_and_refuses_a_schedule() {
+        use crate::canvas::composition::{GroupSource, PhysicsGrouping};
+        use crate::canvas::dynamics_spec::{running_node, schedule_node};
+        use crate::canvas::physics_catalog::PhysicsKindSource;
+        use crate::canvas::schedule::{PhysicsStage, StageStop};
+        let mut board = PhysicsBoard::new();
+        board.sync(vec![item("a", 0.0, 0.0), item("b", 4.0, 2.0)]);
+        let mut stage = PhysicsChoice::default().into_spec();
+        for composition in [
+            PhysicsComposition::Mix(vec![(PhysicsLaw::Charge, 2.0), (PhysicsLaw::Springs, 1.0)]),
+            PhysicsComposition::Grouped(PhysicsGrouping::charge_between(GroupSource::Channel(
+                PhysicsKindSource::Cluster,
+            ))),
+        ] {
+            stage.root = running_node(PhysicsLaw::Charge, Some(&composition), &[]).unwrap();
+            board.set_stage(&stage).unwrap();
+            assert_eq!(board.stage(), &stage);
+            assert_eq!(board.composition.as_ref(), Some(&composition));
+            for _ in 0..SETTLE_TICKS {
+                board.tick();
+            }
+            assert!(
+                board.gap("a", "b").unwrap() > 10.0,
+                "{composition:?} moved them"
+            );
+        }
+        let held = board.stage().clone();
+        let mut schedule = held.clone();
+        schedule.root =
+            schedule_node(&[PhysicsStage::law(PhysicsLaw::Springs, StageStop::Rest)]).unwrap();
+        assert!(board.set_stage(&schedule).is_err());
+        assert_eq!(board.stage(), &held, "a refused stage changes nothing");
     }
 }

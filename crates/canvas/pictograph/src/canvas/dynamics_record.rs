@@ -23,6 +23,7 @@ use super::dynamics_spec::{
     Realization, Target, bind, running_node, schedule_node,
 };
 use super::physics_catalog::PhysicsKindSource;
+use super::physics_view::PhysicsChoice;
 use super::schedule::PhysicsStage;
 
 /// The parts of the record the canvas does not run: carried from the spec
@@ -62,21 +63,19 @@ pub struct DynamicsReport {
 
 impl Canvas {
     /// Run `spec` and hold it as the record: its sources, seed, root, roles
-    /// and damping. Nothing changes when it is refused, and the refusal names
-    /// where (F97, F149).
+    /// and damping, each applied only where it differs from what the canvas
+    /// runs (F162), so a picker's edit of the root does not re-apply the
+    /// roles or the damping. A root equal to the record's is left running,
+    /// and earns the settle an apply always has: a schedule already given is
+    /// not restarted by being given again. Nothing
+    /// changes when the spec is refused, and the refusal names where (F97,
+    /// F149).
     pub fn set_dynamics_spec(&mut self, spec: &DynamicsSpec) -> Result<DynamicsReport, BindError> {
         let bound = bind(spec)?;
-        let sources = bound.sources;
-        self.physics_kind_source = sources.kind;
-        self.physics_group_source = sources.groups;
-        self.physics_mass_source = sources.mass;
-        self.physics_depth_source = sources.depth;
-        self.dynamics.seed = bound.seed;
-        self.dynamics.bars = spec.bars.clone();
-        self.dynamics.damping = bound.damping;
-        self.dynamics.arrangement = bound.target.as_ref().map(|t| t.arrangement.clone());
         let mut report = DynamicsReport::default();
-        match &bound.target {
+        self.dynamics.bars = spec.bars.clone();
+        self.dynamics.arrangement = bound.target.as_ref().map(|t| t.arrangement.clone());
+        let (source, stiffness, table) = match &bound.target {
             Some(target) => {
                 let items: HashMap<NodeKey, Role> = target
                     .items
@@ -87,51 +86,117 @@ impl Canvas {
                         Some((key?, *role))
                     })
                     .collect();
-                self.set_role_group_source(target.group_source);
-                self.set_anchor_stiffness(target.anchored_pull);
-                self.set_arrangement_roles(RoleTable {
+                let table = RoleTable {
                     default: target.default_role,
                     groups: target.groups.clone(),
                     items,
-                });
+                };
+                (target.group_source, target.anchored_pull, table)
             },
-            None => {
-                self.set_role_group_source(PhysicsKindSource::Site);
-                self.set_arrangement_roles(RoleTable::uniform(Role::Seeded));
-            },
+            None => (
+                PhysicsKindSource::Site,
+                self.anchor_stiffness(),
+                RoleTable::uniform(Role::Seeded),
+            ),
+        };
+        if source != self.role_group_source() {
+            self.set_role_group_source(source);
         }
-        if let Some(damping) = bound.damping {
-            self.set_physics_damping(damping as f32);
+        if stiffness.max(0.0) != self.anchor_stiffness() {
+            self.set_anchor_stiffness(stiffness);
         }
-        match bound.root {
-            BoundRoot::Law { law, overlays } => {
-                self.dynamics.schedule = None;
-                self.schedule = None;
-                self.physics_composition = None;
-                self.physics_overlays = overlays;
-                self.physics_law = law;
-                self.rebuild_law_forces();
-                self.settle_for_law();
+        if table != *self.arrangement_roles() {
+            self.set_arrangement_roles(table);
+        }
+        match bound.damping {
+            Some(damping) if self.dynamics.damping != Some(damping) => {
+                self.dynamics.damping = Some(damping);
+                self.set_physics_damping(damping as f32);
             },
-            BoundRoot::Composed {
-                law,
-                composition,
-                overlays,
-            } => {
-                self.dynamics.schedule = None;
-                self.schedule = None;
-                self.physics_overlays = overlays;
-                self.physics_law = law;
-                self.physics_composition = Some(composition);
+            Some(_) => {},
+            None => self.dynamics.damping = None,
+        }
+        let sources = bound.sources;
+        let reread =
+            sources != PhysicsChoice::live(self).sources() || bound.seed != self.dynamics.seed;
+        self.physics_kind_source = sources.kind;
+        self.physics_group_source = sources.groups;
+        self.physics_mass_source = sources.mass;
+        self.physics_depth_source = sources.depth;
+        self.dynamics.seed = bound.seed;
+        if bound.root != self.running_root() {
+            match bound.root {
+                BoundRoot::Law { law, overlays } => {
+                    self.dynamics.schedule = None;
+                    self.schedule = None;
+                    self.physics_composition = None;
+                    self.physics_overlays = overlays;
+                    self.physics_law = law;
+                    self.rebuild_law_forces();
+                    self.settle_for_law();
+                },
+                BoundRoot::Composed {
+                    law,
+                    composition,
+                    overlays,
+                } => {
+                    self.dynamics.schedule = None;
+                    self.schedule = None;
+                    self.physics_overlays = overlays;
+                    self.physics_law = law;
+                    self.physics_composition = Some(composition);
+                    self.rebuild_law_forces();
+                    self.settle_for_law();
+                },
+                BoundRoot::Schedule(stages) => self.run_physics_schedule(stages),
+            }
+        } else {
+            // The same root: rebuilt only when what it reads moved, and
+            // settled as every apply of a law has been.
+            if reread {
                 self.rebuild_law_forces();
-                self.settle_for_law();
-            },
-            BoundRoot::Schedule(stages) => self.run_physics_schedule(stages),
+            }
+            self.settle_for_law();
         }
         let mut given = spec.clone();
         given.version = DYNAMICS_SPEC_VERSION;
         self.dynamics.opened = self.running_spec().ok().map(|read| (given, read));
         Ok(report)
+    }
+
+    /// What the record's root runs, as the binding reads a root.
+    fn running_root(&self) -> BoundRoot {
+        match (&self.dynamics.schedule, &self.physics_composition) {
+            (Some(stages), _) => BoundRoot::Schedule(stages.clone()),
+            (None, Some(composition)) => BoundRoot::Composed {
+                law: self.physics_law,
+                composition: composition.clone(),
+                overlays: self.physics_overlays.clone(),
+            },
+            (None, None) => BoundRoot::Law {
+                law: self.physics_law,
+                overlays: self.physics_overlays.clone(),
+            },
+        }
+    }
+
+    /// The stage the canvas runs now as a spec: its law or composition with
+    /// overlays, the stage under way when a schedule runs, with the sources,
+    /// seed and damping; no target or bars. What a board mirroring the canvas
+    /// takes ([`PhysicsBoard::set_stage`](crate::canvas::PhysicsBoard::set_stage),
+    /// F150). Refused for a grouping on a partition the host handed in.
+    pub fn live_stage_spec(&self) -> Result<DynamicsSpec, String> {
+        let mut spec = DynamicsSpec::new(running_node(
+            self.physics_law,
+            self.physics_composition.as_ref(),
+            &self.physics_overlays,
+        )?);
+        spec.seed = self.dynamics.seed;
+        spec.channels = PhysicsChoice::live(self).sources().channels();
+        spec.realization = Realization::Integrate {
+            damping: self.dynamics.damping,
+        };
+        Ok(spec)
     }
 
     /// The record: what the canvas runs, as a spec (F146), the target's
@@ -163,7 +228,7 @@ impl Canvas {
         let mut spec = DynamicsSpec::new(root);
         spec.seed = self.dynamics.seed;
         spec.bars = self.dynamics.bars.clone();
-        spec.channels = self.physics_choice().sources().channels();
+        spec.channels = PhysicsChoice::live(self).sources().channels();
         spec.realization = Realization::Integrate {
             damping: self.dynamics.damping,
         };

@@ -85,7 +85,7 @@ pub(crate) struct ScheduleRun {
 impl Canvas {
     /// Run `stages` in order from the current layout, playing. An empty
     /// schedule clears any schedule under way.
-    pub fn run_physics_schedule(&mut self, stages: Vec<PhysicsStage>) {
+    pub(crate) fn run_physics_schedule(&mut self, stages: Vec<PhysicsStage>) {
         if stages.is_empty() {
             self.schedule = None;
             self.dynamics.schedule = None;
