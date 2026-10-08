@@ -108,6 +108,16 @@ Mark, on SE30: **"Uhhh, just to say, remember the scope of meerkat was different
 
 **SE35, who carries the Turnstone follow-up (2026-10-07).** Evidence put: Turnstone pins 51 mere dependencies at `f1d169c`, before C1, set that morning by a coordinated browser family repin with Windows and Linux qualification gates (Turnstone `abb349c`, `e00869c`, its unusual-protocols plan's S0); that lane was active the same day. Options: brief Turnstone's lane; this lane does it under their gates; wait. Mark: **"Brief Turnstone's lane (Recommended)"**. *Follows:* the brief in §3; nothing is written in Turnstone by this lane.
 
+### 1.4 The scripting rulings (2026-10-07)
+
+Mark chose the scripting comparison (SE3) while E3 and E4 wait. Evidence put: the family's lanes are placed (graph behaviors plan §1: rhai for privileged local automation, piccolo Lua for sandboxed participant bodies, Wasm components for portable untrusted mods, with the browser's jco path designed in `crates/script/document-host` but not built; JavaScript through genet's seam for page scripts); Scenograph's concrete need is region and scene rules that run on events and emit declarative effects Rust evaluates (field regions plan P4, numen's field AST), so they must run native and in the browser, be deterministic, and be safe when shared; rhai 1.26.1 (September 2026) is in mere with numen's `field-rhai` bindings; piccolo's upstream last released June 2024, genet runs Mark's fork and Isometry crates.io 0.3; Rune 0.14.2 (May 2026) and Starlark 0.14.2 (June 2026, deterministic and hermetic by design, wasm unverified) are new to the family.
+
+**SE36, the rule language.** Options: rhai with privilege by bindings; by trust tier; Starlark; decide after probes. Mark: **"rhai, privilege by bindings (Recommended)"**. *Follows:* scene and region rules are rhai whoever wrote them; a shared scene's rules run with a narrower binding set under rhai's operation budget, with maths routed through libm for G8.
+
+**SE37, the seam.** Options: a small value seam in mere; extend `script-engine-api`; embed directly. Mark: **"scope 2, if unreasonable then 1, failing that then 3"**. *Follows:* extending genet's `script-engine-api` with a value layer is assessed first; if unreasonable, a value seam in mere's `crates/script`; failing that, rhai is embedded directly.
+
+**SE38, probes.** Options (several): Starlark; Rune; an rhai baseline; none. Mark: **"Starlark,Rune,rhai baseline"**. *Follows:* a scratch probe outside mere's tree builds each native and for wasm32 and measures binary size, a budgeted rule's time, and float determinism across the two.
+
 ## 2. Tracks
 
 E1 and E2 carry ruling A; E3 to E5 carry ruling B. E2 needs E1; E4 needs E3; E5 needs E2 and E4. *Added 2026-10-07:* E2b carries SE11 and SE12, after E2.
