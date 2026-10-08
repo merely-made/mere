@@ -690,6 +690,7 @@ impl PhysicsBoard {
             mass: self.choice.mass,
             depth: self.choice.depth,
             focus: None,
+            seed: crate::canvas::physics_catalog::LAW_SEED,
         };
         let forces = inputs.forces(self.choice.law, &self.choice.overlays, sources);
         self.physics.set_forces(forces);

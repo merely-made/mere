@@ -212,6 +212,7 @@ impl Canvas {
             physics_depth_source: crate::canvas::PhysicsDepthSource::Roots,
             physics_composition: None,
             schedule: None,
+            dynamics: Default::default(),
             #[cfg(test)]
             law_rebuilds: 0,
             restored_score_hold: None,
