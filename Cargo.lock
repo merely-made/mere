@@ -9222,7 +9222,7 @@ dependencies = [
 
 [[package]]
 name = "mere-framing"
-version = "0.0.1"
+version = "0.0.2"
 dependencies = [
  "postcard",
  "serde",
