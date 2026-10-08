@@ -122,7 +122,7 @@ pub use history::{
 // through [`EdgeAssertion`].
 pub use capture::{
     CapturedDelta, DeltaRecorder, GraphTableStats, replay_captured_deltas,
-    replay_captured_deltas_onto, set_captured_delta_hook,
+    replay_captured_deltas_onto, set_captured_delta_hook, with_isolated_capture,
 };
 pub use journal::{
     AttributedDelta, Author, AuthorKind, GraphJournal, USER_AUTHOR, journal_capture_hook,

@@ -808,6 +808,13 @@ impl Drop for QuietThread {
     }
 }
 
+/// Run a candidate edit with only its own graph recorder. The legacy thread
+/// observer is restored on return or panic; rejected candidates cannot reach it.
+pub fn with_isolated_capture<R>(edit: impl FnOnce() -> R) -> R {
+    let _quiet = QuietThread::begin();
+    edit()
+}
+
 impl Graph {
     /// Emit a delta this graph just applied: to its own recorder, if it opted
     /// in, and to the thread's hook.
