@@ -424,7 +424,8 @@ fn probe_grouped_readings() {
 }
 
 /// F49's key, alongside (F70): a group override reads the chosen `groups.*`
-/// channel. Under `groups.cluster` a role set on one Louvain cluster's label
+/// channel, a group labelled by its smallest member's id (F134). Under
+/// `groups.cluster` a role set on one Louvain cluster's label
 /// holds that cluster's members and no other node; the same label under the
 /// default `groups.site` matches no node (the control); back on the site,
 /// a site's override reads as before.
@@ -448,7 +449,15 @@ fn a_group_role_reads_the_chosen_groups_channel() {
 
     canvas.set_role_group_source(PhysicsKindSource::Cluster);
     let label = canvas.role_group_of(keys[0]).expect("a cluster label");
-    assert!(label.starts_with("groups.cluster#"), "{label}");
+    // F134: the label is the cluster's smallest member's stable id, not its
+    // index, so a renumbered partition keeps it.
+    let smallest = keys
+        .iter()
+        .filter(|key| clusters[*key] == clusters[&keys[0]])
+        .map(|key| canvas.graph().get_node(*key).unwrap().id)
+        .min()
+        .unwrap();
+    assert_eq!(label, format!("groups.cluster#{smallest}"));
     canvas.set_group_role(&label, Some(Role::Pinned));
     for key in &keys {
         let same = clusters[key] == clusters[&keys[0]];

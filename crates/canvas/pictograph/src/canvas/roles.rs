@@ -108,7 +108,8 @@ impl Canvas {
 
     /// A group's role (`None` clears it), by the group's label under the
     /// role group source ([`Self::role_group_of`]): a site's URL host, or
-    /// `groups.<source>#<index>` for another groups channel.
+    /// `groups.<source>#<id>` for another groups channel, the id its smallest
+    /// member's (F134).
     pub fn set_group_role(&mut self, group: &str, role: Option<Role>) {
         match role {
             Some(role) => self.roles.table.groups.insert(group.to_string(), role),
@@ -182,11 +183,22 @@ impl Canvas {
             self.channels.sites_fresh(&self.graph),
         )
         .with_meaning(self.meaning.snapshot());
+        // A group is named by its smallest member's stable id (F134), which
+        // survives the partition renumbering its groups.
+        let groups = inputs.groups(source);
+        let mut smallest: HashMap<u32, uuid::Uuid> = HashMap::new();
+        for (key, group) in &groups {
+            if let Some(node) = self.graph.get_node(*key) {
+                let id = smallest.entry(*group).or_insert(node.id);
+                *id = (*id).min(node.id);
+            }
+        }
         Some(
-            inputs
-                .groups(source)
+            groups
                 .into_iter()
-                .map(|(key, group)| (key, format!("{channel}#{group}")))
+                .filter_map(|(key, group)| {
+                    Some((key, format!("{channel}#{}", smallest.get(&group)?)))
+                })
                 .collect(),
         )
     }
