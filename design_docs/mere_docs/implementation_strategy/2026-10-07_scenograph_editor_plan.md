@@ -1,7 +1,7 @@
 # Scenograph Editor Plan
 
 **Date:** 2026-10-07
-**Status (2026-10-07):** in progress. Rulings SE1 to SE9 recorded (§1). E1, the generic history, landed on main 2026-10-07 (`de06e4f0`) and moves into the `edit-history` leaf crate (SE10, SE13). E2, undo in the projection editor, landed 2026-10-07 with its headed check. E2b, saving into the mere session (SE11, SE12, SE14 to SE22), landed 2026-10-07 with headed checks in Chrome and Firefox; Safari is open. Track C1 (drag to pan, right-drag select, and a command context menu; SE23 to SE33) landed 2026-10-07 with headed checks in Chrome and Firefox. E3 and E4 wait for the site session's S1 to land (SE34); the Turnstone follow-up (SE32) goes first.
+**Status (2026-10-07):** in progress. Rulings SE1 to SE9 recorded (§1). E1, the generic history, landed on main 2026-10-07 (`de06e4f0`) and moves into the `edit-history` leaf crate (SE10, SE13). E2, undo in the projection editor, landed 2026-10-07 with its headed check. E2b, saving into the mere session (SE11, SE12, SE14 to SE22), landed 2026-10-07 with headed checks in Chrome and Firefox; Safari is open. Track C1 (drag to pan, right-drag select, and a command context menu; SE23 to SE33) landed 2026-10-07 with headed checks in Chrome and Firefox. E3 and E4 wait for the site session's S1 to land (SE34); the Turnstone follow-up (SE32) is briefed to Turnstone's lane for its next coordinated repin (SE35).
 **Scope:** the editor foundation that Scenograph's editing surfaces stand on: one undo history in Cambium, and arrangement options declared as data. Carries out the balaur review's rulings A and B. The projection editor in Graphshell is the first consumer of both.
 
 Not in scope, mapped in §3 and opened by later rounds:
@@ -106,6 +106,8 @@ Mark, on SE30: **"Uhhh, just to say, remember the scope of meerkat was different
 
 **SE34, the order after C1 (2026-10-07).** Evidence put: S1 (a versioned host dataset envelope, `scenomise::host_dataset`, `pub(crate)` on the relationship helpers) was checked file by file against E4 and does not collide. Options: E3 and E4 beside S1; the Turnstone follow-up first; pause E3 and E4 until S1 lands. Mark: **"Pause E3/E4 until S1 lands"**. *Follows:* the Turnstone follow-up runs meanwhile.
 
+**SE35, who carries the Turnstone follow-up (2026-10-07).** Evidence put: Turnstone pins 51 mere dependencies at `f1d169c`, before C1, set that morning by a coordinated browser family repin with Windows and Linux qualification gates (Turnstone `abb349c`, `e00869c`, its unusual-protocols plan's S0); that lane was active the same day. Options: brief Turnstone's lane; this lane does it under their gates; wait. Mark: **"Brief Turnstone's lane (Recommended)"**. *Follows:* the brief in §3; nothing is written in Turnstone by this lane.
+
 ## 2. Tracks
 
 E1 and E2 carry ruling A; E3 to E5 carry ruling B. E2 needs E1; E4 needs E3; E5 needs E2 and E4. *Added 2026-10-07:* E2b carries SE11 and SE12, after E2.
@@ -186,6 +188,12 @@ Done when the rows match the declaration for all eleven families and a test solv
 *Annotation 2026-10-07 (SE10):* E1's `History` lives in `crates/cambium/edit-history`; the cambium crate depends on it and re-exports `History`, and `EditHistory` stays in `crates/cambium/cambium/src/editor.rs`.
 
 ## 3. Mapped, not opened
+
+**The Turnstone brief (SE32, SE35), sent to its unusual-protocols lane 2026-10-07.** To take at its next coordinated repin past mere `16c1ef8d`:
+- **What C1 offers.** `cambium::CommandSet` (register commands with an id, a label and a category; `menu(choices, context, query)` puts the context's commands first, then the kept ones, then recent ones; a query searches every command; `record_use`, `add`, `remove`). pictograph's canvas pans on a left-drag over empty canvas, selects on a right-drag, and leaves a `ContextRequest` on a right click within the slop (`take_context_request`). pandect's `ViewIntent` has `commands: Option<CommandMenuView>`, and `set_view_now` stores a view in the next batch.
+- **What Mark ruled for this.** SE28: the right click gives the command palette's search at the top, then defaults and recent commands, with any command removable and addable. SE29: a generic set, kept in the mere session, adding means any registered command, node commands first. SE31: kept as a view, not graph truth. SE32: Turnstone's rule that contextual rows lead stays, and is now the set's.
+- **The change in Turnstone.** `available_actions` (`src/app/palette.rs`) registers into, or is read through, the set, keeping its contextual-first order and its single composition for palette, snapshot and automation. The `>` lane shows kept and recent commands with keep and drop. `src/shell/input.rs` opens the palette on a right release that `take_context_request` reports, rather than on the press, so a right-drag reaches the canvas as a select.
+
 
 Each comes back as its own round of questions.
 - **Scripting (SE3).** Compare every candidate, Rune included, through `script-engine-api` and embedded. F6 is the starting evidence.
