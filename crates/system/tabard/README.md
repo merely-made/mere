@@ -103,9 +103,17 @@ use the existing theme derivation; authored stylesheet previews are returned
 as sheets, and unresolved custom calculators are reported explicitly.
 
 Draft previews never change the active theme. Registry commits do not write
-files; a host owns persistence, rendering and applying appearance. A visible
-Cambium workshop surface and mode-aware export parity remain follow-ups in
-the theme modes plan.
+files. `library::ThemeLibraryStore` loads and saves a versioned authored-theme
+library separately from the host's appearance choice. It validates user
+definitions, refuses stale/busy writers and replaces the file atomically;
+failed writes leave its loaded snapshot intact.
+
+The reusable [Cambium workshop](../../../ports/tabard) composes that draft and
+library into seed/harmony controls, mode previews, history and explicit Save,
+Discard and Reopen actions. Its [desktop host](../../../ports/tabard/desktop)
+mounts the same surface. Hosts still own applying appearance; stylesheet
+editing, custom calculator previews and mode-aware export parity remain
+follow-ups in the theme modes plan.
 
 ## License
 

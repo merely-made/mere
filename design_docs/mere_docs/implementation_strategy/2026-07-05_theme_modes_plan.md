@@ -87,7 +87,8 @@ remaining consumer adapter and exporter acceptance work above.
 
 ## Appearance workshop (2026-10-07)
 
-**Status (2026-10-07):** W1 implemented; W2–W3 open. Mark asked to start Tabard's larger authoring role,
+**Status (2026-10-07):** W1–W2 implemented; W3 authored-library persistence implemented,
+with stylesheet/custom-calculator rendering and export parity still open. Mark asked to start Tabard's larger authoring role,
 with the browser's SC step 2 proceeding independently. The suite census owns
 its product charter: an appearance workshop with authored themes and live
 preview, shared by a standalone host and Turnstone.
@@ -99,12 +100,16 @@ preview, shared by a standalone host and Turnstone.
   theme or rewrite reader content. Done when tests prove those boundaries.
 - **W2 — Visible authoring surface.** Compose W1 into the reusable Cambium
   surface with seed controls, mode selection and representative chrome,
-  reader, syntax and graph specimens. Select the first host and scope with
-  Mark; no host integration is claimed by W1.
+  reader, syntax and graph specimens. Mark authorized proceeding with a native
+  standalone host and the reusable surface. Done when real-control retained
+  tests and headed native captures show edits, modes, history and save/reopen.
 - **W3 — Artifact fidelity and persistence.** Keep authored definitions
   distinct from exports and host appearance preferences; carry explicit modes,
   harmony and unsupported-role diagnostics through preview/export adapters.
-  Current CSS/DTCG methods still use their documented normal-contrast profile.
+  Done for the library when versioned authored definitions survive save/reload
+  and stale/busy/failed writes cannot advance the editing save point. Current
+  CSS/DTCG methods still use their documented normal-contrast profile; explicit
+  mode-profile syntax derivation is available for the live workshop preview.
 
 **Findings (2026-10-07):** `ThemeRegistry` already supports CRUD, but editing
 through it writes immediately. `derive_from_def_for_mode` supplies canonical
@@ -116,7 +121,54 @@ presented as a successful canonical fallback by the authoring model.
 10 artifact integration, 5 workshop integration). The new tests cover
 non-mutating preview, built-in protection, concurrent-edit/deletion/collision
 refusal, undo/redo branching, discard, and stylesheet/custom-mode handling.
-No visible authoring surface or new disk-persistence path is claimed.
+
+The next slice adds `ports/tabard` (`tabard-workshop`) and its thin desktop
+host. One retained state/view provides seed HSL controls, accent harmonies,
+four canonical preview modes and chrome/reader/syntax/graph specimens. A
+secondary or tertiary hue under locked harmony is explained rather than
+offered as an ineffective control. Native name edits synchronize before
+navigation and save guards. Previewing never changes the registry's active
+appearance; built-ins are forked into user definitions.
+
+`tabard::library::ThemeLibraryStore` persists version 1 authored definitions,
+including mode sheets, separately from host appearance preferences. Save
+validates and persists a candidate before replacing the live draft/registry;
+failure retains edits and history. The store rejects corrupt/future files,
+invalid definitions, external changes and cooperating busy writers. Read does
+not create a missing library. External editors must honor the lock to exclude
+all concurrent check/rename races.
+
+The syntax specimen uses `tinct::derive_syntax_palette_with`: its surface is
+the exact selected profile's surface and all syntax roles clear 4.5:1 at
+normal contrast or 7:1 at high contrast. The existing syntax API and CSS/DTCG
+export behavior remain compatible. Derived specimens explicitly disclose an
+attached mode sheet; rendering/editing that sheet, custom calculators,
+portable import/export controls and Turnstone mounting remain open.
+
+**Validation (2026-10-07, macOS x86_64):** 55 shared Tabard tests, 8 retained
+workshop tests, 4 desktop tests and 17 Tinct tests pass, plus Tinct's doctest.
+The surface tests operate real pointer/keyboard controls and assert laid-out
+specimen styles, all four profiles, history, native text synchronization,
+save/reload, failed-write recovery and exact AccessKit names/roles/hit boxes.
+The desktop wheel test reaches specimens in the stacked 640 × 780 layout.
+This verifies the accessibility projection, not a live screen-reader session.
+
+All three headed Mesquite scenarios exit successfully: workshop (8 captures),
+fresh-process reopen (1), and narrow preview (3); no captured frame is blank.
+The wide logical size is 1180 × 800 at 2× scale; the narrow size is 640 × 780.
+Representative images and complete scenario receipts are retained in
+[`ports/tabard/desktop/receipts/2026-10-07`](../../../ports/tabard/desktop/receipts/2026-10-07).
+Initial/seed/dark frame digests are `7fbfa063e24fb8f2`, `f91bc08134eeb2aa` and
+`fd2ddd39027ee59e`; fresh-process reopen is `d4ac3b00f6859e3b`, and the revealed
+narrow specimen is `60601a374190fd4c`. The narrow headed lane uses normal
+selector scroll-into-view; its wheel behavior is covered by the host test.
+
+`check_port_boundaries.py` passes with both new packages. Strict Clippy with
+`--no-deps` passes for `tabard-workshop`, `tabard-desktop` and Tinct. Broader
+strict dependency linting remains blocked by existing Meristem type-complexity
+and shared Tabard documentation/large-enum/filter-map lints. The documentation
+judgment audit reports inherited snapshot-digest and browser-receipt coverage
+errors (257/258 active documents); this slice creates no active design document.
 
 ## The model (decision record)
 

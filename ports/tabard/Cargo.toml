@@ -1,0 +1,22 @@
+[package]
+name = "tabard-workshop"
+version = "0.0.1"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish = false
+description = "Tabard's reusable appearance workshop surface and authored-theme workflow"
+
+[dependencies]
+tabard.workspace = true
+tinct.workspace = true
+cambium.workspace = true
+
+[dev-dependencies]
+cambium-genet-winit-host.workspace = true
+taproot.workspace = true
+genet-scripted-dom.workspace = true
+layout-dom-api.workspace = true
+accesskit = "0.24"
+winit.workspace = true
+tempfile = "3"
