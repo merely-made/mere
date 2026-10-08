@@ -16,6 +16,7 @@ use std::sync::atomic::{AtomicU64, Ordering};
 use serde::{Deserialize, Serialize};
 
 use crate::Theme;
+use crate::portable::WriteMode;
 use crate::theme::registry::{Harmony, ThemeRegistry, ThemeSource};
 
 const LIBRARY_VERSION: u32 = 1;
@@ -109,88 +110,136 @@ impl ThemeLibraryStore {
         };
         let mut bytes = serde_json::to_vec_pretty(&document).map_err(io::Error::other)?;
         bytes.push(b'\n');
-        let parent = self.path.parent().expect("absolute file path has a parent");
-        fs::create_dir_all(parent)?;
-        let lock = OpenOptions::new()
-            .create(true)
-            .truncate(false)
-            .read(true)
-            .write(true)
-            .open(suffixed_path(&self.path, ".lock"))?;
-        lock.try_lock().map_err(|error| match error {
-            TryLockError::WouldBlock => io::Error::new(
-                io::ErrorKind::WouldBlock,
-                "another writer is saving this theme library",
-            ),
-            TryLockError::Error(error) => error,
-        })?;
-        self.check_snapshot()?;
-        let (temp_path, mut temp) = temporary_file(&self.path)?;
-        let result = (|| {
-            temp.write_all(&bytes)?;
-            // Preserve existing access permissions on the replacement.
-            if let Ok(metadata) = fs::metadata(&self.path) {
-                temp.set_permissions(metadata.permissions())?;
-            }
-            temp.sync_all()?;
-            self.check_snapshot()?;
-            // Close before rename for platforms that restrict open-file moves.
-            drop(temp);
-            fs::rename(&temp_path, &self.path)
-        })();
-        if let Err(error) = result {
-            let _ = fs::remove_file(&temp_path);
-            return Err(error);
-        }
+        atomic_write(&self.path, &bytes, WriteMode::Replace, Some(&self.snapshot))?;
         self.themes = document.themes;
         self.snapshot = Some(bytes);
-        Ok(())
-    }
-
-    fn check_snapshot(&self) -> io::Result<()> {
-        if read_snapshot(&self.path)? != self.snapshot {
-            return Err(io::Error::new(
-                io::ErrorKind::WouldBlock,
-                "theme library changed on disk; reload it before saving",
-            ));
-        }
         Ok(())
     }
 }
 
 fn validate(themes: &[Theme]) -> Result<(), String> {
-    let mut registry = ThemeRegistry::default();
     let mut ids = BTreeSet::new();
     for theme in themes {
         let id = theme.id.trim().to_ascii_lowercase();
-        if id.is_empty() || theme.name.trim().is_empty() {
-            return Err("authored themes must have a nonblank id and name".into());
-        }
-        if theme.source != ThemeSource::User {
-            return Err(format!(
-                "theme {:?} is not an authored user theme",
-                theme.id
-            ));
-        }
         if !ids.insert(id.clone()) {
             return Err(format!("duplicate authored theme id {id:?}"));
         }
-        if registry.theme_def(&id).is_some() {
-            return Err(format!("authored theme id {id:?} collides with a built-in"));
-        }
-        if let Harmony::Locked {
-            secondary_deg,
-            tertiary_deg,
-        } = theme.harmony
-            && (!secondary_deg.is_finite() || !tertiary_deg.is_finite())
-        {
-            return Err(format!("theme {id:?} has nonfinite harmony offsets"));
-        }
-        registry
-            .add_user_theme(theme.clone())
-            .map_err(|error| format!("invalid authored theme {id:?}: {error}"))?;
+        validate_user_theme(theme)?;
     }
     Ok(())
+}
+
+/// Validation shared by the library, portable artifacts and draft constructors.
+/// A portable built-in remains an inert definition until explicitly forked.
+pub(crate) fn validate_definition(theme: &Theme) -> Result<(), String> {
+    let id = theme.id.trim().to_ascii_lowercase();
+    if id.is_empty() || theme.name.trim().is_empty() {
+        return Err("themes must have a nonblank id and name".into());
+    }
+    if let Harmony::Locked {
+        secondary_deg,
+        tertiary_deg,
+    } = theme.harmony
+        && (!secondary_deg.is_finite() || !tertiary_deg.is_finite())
+    {
+        return Err(format!("theme {id:?} has nonfinite harmony offsets"));
+    }
+    ThemeRegistry::default()
+        .add_user_theme(theme.clone())
+        .map_err(|error| format!("invalid theme {id:?}: {error}"))
+}
+
+pub(crate) fn validate_user_theme(theme: &Theme) -> Result<(), String> {
+    if theme.source != ThemeSource::User {
+        return Err(format!(
+            "theme {:?} is not an authored user theme",
+            theme.id
+        ));
+    }
+    if ThemeRegistry::default().theme_def(&theme.id).is_some() {
+        return Err(format!(
+            "authored theme id {:?} collides with a built-in",
+            theme.id
+        ));
+    }
+    validate_definition(theme)
+}
+
+/// One shared writer for libraries and exported artifacts. An optional
+/// expected snapshot protects an already loaded library. Exports capture the
+/// current bytes under the same lock, then check them before replacement.
+pub(crate) fn atomic_write(
+    path: &Path,
+    bytes: &[u8],
+    mode: WriteMode,
+    expected: Option<&Option<Vec<u8>>>,
+) -> io::Result<()> {
+    let path = if path.is_absolute() {
+        path.to_path_buf()
+    } else {
+        std::env::current_dir()?.join(path)
+    };
+    if path.file_name().is_none() {
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidInput,
+            "an artifact path must name a file",
+        ));
+    }
+    let parent = path.parent().expect("absolute file path has a parent");
+    fs::create_dir_all(parent)?;
+    let lock = OpenOptions::new()
+        .create(true)
+        .truncate(false)
+        .read(true)
+        .write(true)
+        .open(suffixed_path(&path, ".lock"))?;
+    lock.try_lock().map_err(|error| match error {
+        TryLockError::WouldBlock => io::Error::new(
+            io::ErrorKind::WouldBlock,
+            "another writer is saving this artifact",
+        ),
+        TryLockError::Error(error) => error,
+    })?;
+    let snapshot = read_snapshot(&path)?;
+    if mode == WriteMode::CreateNew && fs::symlink_metadata(&path).is_ok() {
+        return Err(io::Error::new(
+            io::ErrorKind::AlreadyExists,
+            "the export path already exists; choose another path or explicitly replace it",
+        ));
+    }
+    if let Some(expected) = expected
+        && snapshot != *expected
+    {
+        return Err(io::Error::new(
+            io::ErrorKind::WouldBlock,
+            "theme library changed on disk; reload it before saving",
+        ));
+    }
+    let (temp_path, mut temp) = temporary_file(&path)?;
+    let result = (|| {
+        temp.write_all(bytes)?;
+        if snapshot.is_some() {
+            temp.set_permissions(fs::metadata(&path)?.permissions())?;
+        }
+        temp.sync_all()?;
+        if read_snapshot(&path)? != snapshot {
+            return Err(io::Error::new(
+                io::ErrorKind::WouldBlock,
+                "artifact changed on disk before replacement",
+            ));
+        }
+        drop(temp);
+        match mode {
+            WriteMode::Replace => fs::rename(&temp_path, &path),
+            // Publishing a hard link is atomic and refuses an existing path,
+            // including one created after the initial existence check.
+            WriteMode::CreateNew => fs::hard_link(&temp_path, &path),
+        }
+    })();
+    // On successful CreateNew the complete file is now reachable at its final
+    // path; cleanup errors cannot turn a published artifact into a failed save.
+    let _ = fs::remove_file(&temp_path);
+    result
 }
 
 fn read_snapshot(path: &Path) -> io::Result<Option<Vec<u8>>> {

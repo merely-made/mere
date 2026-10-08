@@ -68,7 +68,7 @@ pub use cambium_rootstock::{
     RelayoutProfile, Runner, ScrollAlign, ScrollIntoView, Surface, WindowCommand, WindowCommands,
     WindowFrame, WindowGeometry, WindowTree, ZOOM_LADDER, fit_zoom, ladder_step, read_frame,
 };
-pub use files::{DialogFileChooser, read_file};
+pub use files::{DialogFileChooser, choose_save_path, read_file};
 pub use harness::{Harness, inert_hooks};
 pub use windows::{WindowHooks, WindowHost, WindowsInit, run_windows};
 // Scenario execution lives in Mesquite; applications implement mesquite::Product.
