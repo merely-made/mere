@@ -135,6 +135,9 @@ pub mod sprite_hull;
 /// The canvas scene-paint underlay (edges + demoted node rects + overlays).
 pub mod underlay;
 
+/// The channel registry the free projection functions read their facts from
+/// (dynamics grammar plan, F87).
+pub use crate::signals::ChannelRegistry;
 pub use ::cartography::MERE_GRAPH_ADAPTER;
 pub use cartography_scene::{
     CANVAS_LAYOUT_STRATEGIES, CanvasStrategyProjection, CartographySceneOptions,

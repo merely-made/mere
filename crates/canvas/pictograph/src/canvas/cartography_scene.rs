@@ -338,8 +338,11 @@ pub fn signal_overlays(
 /// from [`signal_overlays`]). The gloss is the first consumer of the overlay channel: it paints the
 /// overlays at its own lens positions, so a second lens can show the clusters/brokers under a
 /// different layout than the main view. Positions-only callers use [`project_canvas_strategy`].
-/// (Graph signals — P6b, the overlay pipe.)
+/// (Graph signals — P6b, the overlay pipe.) The facts come from `registry`, the one serving `graph`
+/// (dynamics grammar plan, F87).
+#[allow(clippy::too_many_arguments)]
 pub fn project_canvas_lens(
+    registry: &mut ChannelRegistry,
     id: &str,
     graph: &Graph,
     focus: Option<NodeKey>,
@@ -349,15 +352,7 @@ pub fn project_canvas_lens(
     bridges: Option<&cartography::BridgeNodes>,
 ) -> cartography::Projection {
     let mut projection = project_canvas_dispatch(
-        &mut ChannelRegistry::new(),
-        id,
-        graph,
-        focus,
-        width,
-        height,
-        clusters,
-        None,
-        false,
+        registry, id, graph, focus, width, height, clusters, None, false,
     );
     projection.overlays = signal_overlays(clusters, bridges);
     projection
@@ -432,22 +427,39 @@ pub fn project_canvas_subgraph(
         .and_then(|n| sub.get_node_key_by_id(n.id));
     // Project the subgraph, then remap each position back to the original graph via the node id.
     // Extents are keyed by the original graph's NodeKeys, which do not survive the subgraph
-    // re-add, so the subgraph path stays unmeasured for now; recency ordering likewise off.
-    project_canvas_strategy(id, &sub, sub_focus, width, height, None, None, false)
-        .into_iter()
-        .filter_map(|(sub_key, pos)| {
-            let nid = sub.get_node(sub_key)?.id;
-            let main_key = graph.get_node_key_by_id(nid)?;
-            Some((main_key, pos))
-        })
-        .collect()
+    // re-add, so the subgraph path stays unmeasured for now; recency ordering likewise off. The
+    // subgraph is a graph of its own, built for this call, so its facts come from a registry of
+    // its own: one registry serves one graph (F87; *Reading, not ruled*).
+    project_canvas_strategy(
+        &mut ChannelRegistry::new(),
+        id,
+        &sub,
+        sub_focus,
+        width,
+        height,
+        None,
+        None,
+        false,
+    )
+    .into_iter()
+    .filter_map(|(sub_key, pos)| {
+        let nid = sub.get_node(sub_key)?.id;
+        let main_key = graph.get_node_key_by_id(nid)?;
+        Some((main_key, pos))
+    })
+    .collect()
 }
 
 /// Compute an canvas layout strategy's node positions: the `(NodeKey, position)` pairs the canvas
 /// applies through [`Canvas::apply_strategy_positions`](../../canvas). Empty for an unknown or
 /// not-yet-wired id (the host then leaves the layout unchanged). The positions-only path the main
-/// view uses; the gloss uses [`project_canvas_lens`] when it also needs the overlay channel.
+/// view uses; the gloss uses [`project_canvas_lens`] when it also needs the overlay channel. The
+/// facts come from `registry`, the one serving `graph`: a canvas's own
+/// ([`Canvas::registry_and_graph`](crate::canvas::Canvas::registry_and_graph)), or one a host
+/// without a canvas holds across calls (dynamics grammar plan, F87).
+#[allow(clippy::too_many_arguments)]
 pub fn project_canvas_strategy(
+    registry: &mut ChannelRegistry,
     id: &str,
     graph: &Graph,
     focus: Option<NodeKey>,
@@ -458,7 +470,7 @@ pub fn project_canvas_strategy(
     recent_first: bool,
 ) -> Vec<(NodeKey, PortablePoint)> {
     project_canvas_dispatch(
-        &mut ChannelRegistry::new(),
+        registry,
         id,
         graph,
         focus,
@@ -477,7 +489,9 @@ pub fn project_canvas_strategy(
 /// Like [`project_canvas_strategy`], with the product-free score when the
 /// selected strategy has one. Mere builds the score; `scenomise` alone solves
 /// its placement.
+#[allow(clippy::too_many_arguments)]
 pub fn project_canvas_strategy_with_score(
+    registry: &mut ChannelRegistry,
     id: &str,
     graph: &Graph,
     focus: Option<NodeKey>,
@@ -488,6 +502,7 @@ pub fn project_canvas_strategy_with_score(
     recent_first: bool,
 ) -> CanvasStrategyProjection {
     project_canvas_strategy_with_score_for_view(
+        registry,
         id,
         graph,
         focus,
@@ -502,6 +517,12 @@ pub fn project_canvas_strategy_with_score(
 }
 
 impl crate::canvas::Canvas {
+    /// This canvas's channel registry and the graph it serves, for the free projection functions
+    /// (dynamics grammar plan, F87, "Registry argument": a canvas passes its own).
+    pub fn registry_and_graph(&mut self) -> (&mut ChannelRegistry, &Graph) {
+        (&mut self.channels, &self.graph)
+    }
+
     /// Project arrangement `id` over this canvas's graph with the facts its
     /// channel registry holds: every disclosure the arrangement reads, the
     /// Louvain partition Kinds and Group pull by cluster read among them, each
@@ -539,11 +560,10 @@ impl crate::canvas::Canvas {
 /// Like [`project_canvas_strategy_with_score`], evaluated for the host's
 /// current zoom and prior score. These two view facts affect only the selected
 /// representation rung and its hysteresis; placement remains score-driven.
-/// Computes its facts in a registry of its own; a canvas's
-/// [`project_arrangement_for_view`](crate::canvas::Canvas::project_arrangement_for_view)
-/// reads the canvas's.
+/// Reads its facts from `registry`, the one serving `graph` (F87).
 #[allow(clippy::too_many_arguments)]
 pub fn project_canvas_strategy_with_score_for_view(
+    registry: &mut ChannelRegistry,
     id: &str,
     graph: &Graph,
     focus: Option<NodeKey>,
@@ -556,7 +576,7 @@ pub fn project_canvas_strategy_with_score_for_view(
     previous_score: Option<&sceno::Score>,
 ) -> CanvasStrategyProjection {
     project_strategy_in(
-        &mut ChannelRegistry::new(),
+        registry,
         id,
         graph,
         focus,
@@ -685,6 +705,7 @@ mod tests {
             graph.assert_semantic_predicate(n[a], n[b], "links".to_string());
         }
         let positions = project_canvas_strategy(
+            &mut ChannelRegistry::new(),
             "kanban.community",
             &graph,
             None,
@@ -716,6 +737,7 @@ mod tests {
         let (graph, [a, _, _]) = triangle_graph();
         // With a focus, radial lays out the whole graph (focus at center).
         let with_focus = project_canvas_strategy(
+            &mut ChannelRegistry::new(),
             "radial.default",
             &graph,
             Some(a),
@@ -736,8 +758,17 @@ mod tests {
             "the focus sits at the radial center"
         );
         // Without a focus there is nothing to center on, so it leaves the layout alone.
-        let no_focus =
-            project_canvas_strategy("radial.default", &graph, None, 800, 600, None, None, false);
+        let no_focus = project_canvas_strategy(
+            &mut ChannelRegistry::new(),
+            "radial.default",
+            &graph,
+            None,
+            800,
+            600,
+            None,
+            None,
+            false,
+        );
         assert!(no_focus.is_empty(), "radial without a selection no-ops");
     }
 
@@ -795,6 +826,7 @@ mod tests {
         }
         let clusters = crate::signals::community_louvain(&graph);
         let lens = project_canvas_lens(
+            &mut ChannelRegistry::new(),
             "spectral.default",
             &graph,
             None,
@@ -812,6 +844,7 @@ mod tests {
         assert_eq!(halos, 2, "two communities => two halos ride the projection");
         // The positions-only path is unchanged (it drops the overlays).
         let positions = project_canvas_strategy(
+            &mut ChannelRegistry::new(),
             "spectral.default",
             &graph,
             None,

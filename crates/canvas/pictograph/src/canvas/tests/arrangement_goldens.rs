@@ -180,6 +180,7 @@ pub(crate) fn arrangement_hashes(graph: &Graph, keys: &[NodeKey]) -> Vec<(String
             record(
                 format!("{id} recent_first {recent_first}"),
                 project_canvas_strategy_with_score_for_view(
+                    &mut registry,
                     id,
                     graph,
                     None,
@@ -197,6 +198,7 @@ pub(crate) fn arrangement_hashes(graph: &Graph, keys: &[NodeKey]) -> Vec<(String
     record(
         "radial.default focus 0".to_string(),
         project_canvas_strategy_with_score_for_view(
+            &mut registry,
             "radial.default",
             graph,
             Some(keys[0]),
