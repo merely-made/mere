@@ -1039,6 +1039,114 @@ Every capture was inspected whole-frame:
 
 **Not run here:** the `app=local` route, and the old page's three originals.
 
+## Durable address/file intake on the current stack (2026-10-08)
+
+**Source:** intake `da466027afe2a2a9e543962f8927a05c037c6833`, archive fingerprint
+repair `f279692f9dfefbbc24c728c3159aaf5bdfa542f4`, on published Mere
+`79fbbeb75b04e7aa0b2c91f9ec68d4b435909931`. This incorporates the coherent
+Genet `15713014e2e23b887360471552f75f60684f5384` repin and current vault-lock L3
+source. Qualification is scoped to this source, not a release or all-family
+acceptance.
+
+**Behavior:** `tree.html?app=local` adds an address and optional title through
+`MereHost`, or actual chosen bytes through Cambium's existing `open_file`
+callback. SHA256 drives the existing NI file identity; name, media type, byte
+length and modification time remain owner facets. The same app performs its
+existing persistence operation. Success selects and opens the member only
+after acknowledgement and structural Canvas ingest; a failed write keeps its
+pending member for Retry intake. Empty addresses/unnamed files refuse before
+mutation. Repeated identities reuse members. The ingest preserves existing
+positions, camera, roles and physics choice; ordinary topology settling can
+continue after ingest. Selection/detail changes are guarded during the chooser
+and save, including mirror reader actions, while Tab still traverses focus.
+
+The saved-product panel now anchors inside the tree body below the wrapping
+toolbar. Current Cambium single-line field markers receive explicit width and
+height, preserving the shared host's text/caret path and clipping long values.
+This repairs the absent empty-field box and narrow toolbar/panel overlap found
+during the initial browser pass.
+
+**Automated native gates:** locked checks at the clean source above pass:
+
+| Gate | Passed | Scope |
+| --- | ---: | --- |
+| Pandect library | 299 | Existing graph/session/archive contracts |
+| Kernel undo | 8 | Exact graph revert behavior |
+| Djinn resident | 40 | Scoped `resident_` library tests |
+| Pandect archive process | 2 | Owner-bound archive reopen/fork and fingerprint regression |
+| Djinn process targets | 8 | Embedded owner (4), validator, mere, access and reservoir (1 each) |
+| Graphshell local intake | 5 | Refusals, actual byte metadata, dedup/reopen, rejected-write retry, Canvas preservation |
+| Graphshell local edit | 4 | Existing metadata save/refusal/reopen/geometry regressions |
+
+Each process target's child helper is ignored in the parent invocation and
+run by its fixture. All 2,266 tracked Rust/TOML/lock files retained aggregate
+SHA256 `5fa8df8a900da39f3f3331a87ccf114a9eb704fb557321ba39e44f2d4c5ca1ed`
+before and after every gate; source and HEAD were unchanged and clean.
+`CARGO_BUILD_JOBS=2`, `TMPDIR=/tmp`; the expanded personal-sync test remains
+excluded after its earlier hang. The archive regression ignores only the
+generated snapshot-envelope timestamp for state comparison, with a positive
+control that changed node content differs. Visit clocks remain exact; no
+archive format, undo policy or product storage changed.
+
+**Web build:** the default WASM build and no-default-features viewer check pass
+with `--locked` on the source above. The ignored standalone web lock was
+regenerated after the upstream Genet pin changed, then preserved and used for
+both locked checks. Official wasm-bindgen CLI `0.2.129` matches the library.
+The bound bundle's WASM SHA256 is
+`557657df8c073771aeb5b31a153353cb5d092597e8929a197cbe905d3093097f`; this
+is a large debug qualification artifact, not a release-size/performance result.
+
+**Browser scope:** macOS arm64, Codex in-app browser, visible document,
+1280×900 and 420×900 viewport overrides. Separate loopback origins isolate
+fixture stores; each save/reopen pair uses the same origin and an independent
+page load. Mesquite results, semantic trees and full-frame PNGs are retained
+under `/Users/markik/Code/testing/mere/one-tree-product-20261008/browser`.
+Final-stack receipts start at `receipt-10.json`; earlier receipts include
+interim stack checks and the superseded cancellation assertion failure.
+
+
+
+| Final browser check | 1280×900 receipt | 420×900 receipt | Result |
+| --- | --- | --- | --- |
+| Address refusal/create/edit/dedup | 10 | 19 | Pass; new member then repeat keeps 12 nodes |
+| Independent address reopen | 11 | 20 | Pass; exact member/session/title/tags |
+| Pending chooser/detail guard and DOM cancel | 12 | 21 | Pass; original selection/count/layout preserved |
+| Actual file chooser bytes and reopen | 13 | 22 | Pass; 90 bytes, `text/plain`, exact NI/name/mtime |
+| Repeat file choice then independent reopen | 14 | 23 | Pass; same file member/session/facets, 13 nodes |
+| Existing Title/Tags saved edit | 15 | 17 | Pass; geometry/camera/physics/identity unchanged |
+| Existing Title/Tags independent reopen | 16 | 18 | Pass; exact member/session/title/tags |
+| Collapsed/overlay Graph tools, apply Charge, Enter toggle | — | 24 | Pass |
+
+All 15 final scenario results are `ok`, with no errors or gate failures and
+visible documents. All 18 full frames were reviewed, including both empty
+intake fields, long values/file NI, wrapped toolbar clearance and Graph tools
+collapse/overlay. Actual narrow keyboard typing produced `Caret proof`; Home,
+Right, Shift+Right and `X` produced `CXret proof`, and Tab reached New node
+without changing graph selection. This is caret/selection evidence, not an
+IME-composition or screen-reader acceptance claim.
+
+The actual CUA chooser instrument supplies the fixture through the real
+shared file callback; each subsequent independent load checks its stored owner
+facets against the fixture's SHA256 and filesystem modification time. DOM
+cancel dispatches the actual hidden input's `cancel` listener; the earlier
+headless shared callback cancellation fixture also passes (1 test). CUA's
+chooser instrument refuses an empty file list, so **OS-dialog Cancel remains
+unverified**. Failed durable writes/retry are proven with the native backend
+fixture, not injected browser storage failure. IndexedDB reports “not
+persistent, may be evicted” in these runs.
+
+Logs, hashes, exact source snapshots, the final ignored web lock, all browser
+results/captures and stable-identity pair comparisons are preserved in
+`/Users/markik/Code/testing/mere/one-tree-product-20261008/qualification-receipt.json`
+and its linked `native/final-stack/receipt.json` and `wasm/receipt.json`. The
+pre-existing lane formatting findings and documentation audit debt were
+compared with the source baseline; this slice adds no new findings.
+
+This advances V2b step 4 only. Remaining detail/product controls, all five
+public pages, the full scenario/accessibility/live-performance wall, legacy
+presenter retirement, V2b step 5's mounted session panel and actual native
+consumer adoption retain their independent gates.
+
 ## Open gates
 
 - Genet commit `27d20d3fc51ac5fcd2a2db231e035a3e06013ae1` admits safe retained
@@ -1063,8 +1171,10 @@ Every capture was inspected whole-frame:
   browser receipts, which use the CPU path. At 2,000 nodes a single step
   already exceeds a nominal 16.7 ms frame budget; catch-up caps alone cannot
   solve that cost.
-- The local IndexedDB graph and Title/Tags editor have a passing opt-in tree
-  save/reopen receipt. The WebRTC remote session reached the tree on
+- The local IndexedDB graph, Title/Tags editor and bounded address/file intake
+  have passing opt-in tree save/reopen receipts. OS-dialog Cancel remains
+  unverified; the cancellation fixture exercises the real DOM listener and
+  the shared headless callback, not operating-system dialog interaction. The WebRTC remote session reached the tree on
   2026-10-01 (section above); the in-process canary and the other
   product panels still belong to the old presenter. Ctrl+wheel modifiers and
   middle-button parity,
