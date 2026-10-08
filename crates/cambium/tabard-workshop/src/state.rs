@@ -627,11 +627,12 @@ impl WorkshopState {
     }
     pub fn cancel_close(&mut self) {
         self.close_requested = false;
+        self.exit_requested = false;
         self.status = "Continue editing".into();
     }
     pub fn save_and_close(&mut self) {
         self.save();
-        if !self.is_dirty() {
+        if !self.is_dirty() && !self.has_changes() {
             self.close_requested = false;
             self.exit_requested = true;
         }
@@ -680,6 +681,85 @@ impl WorkshopState {
 
     pub fn selected_graph_node(&self) -> Option<u8> {
         self.graph.swatch.selected
+    }
+}
+
+#[cfg(test)]
+mod embedded_close_tests {
+    use super::*;
+
+    #[test]
+    fn cancelling_discard_exit_restores_the_unsaved_guard_for_an_embedded_session() {
+        let mut state = WorkshopState::in_memory();
+        state.new_copy();
+        assert!(!state.request_close());
+        state.discard_and_close();
+        assert!(state.exit_requested());
+        state.cancel_close();
+        assert!(!state.exit_requested());
+        assert!(!state.close_requested());
+        assert!(state.has_changes());
+        assert!(!state.request_close());
+        assert!(state.close_requested());
+    }
+
+    #[test]
+    fn cancelling_saved_exit_does_not_skip_guards_after_the_next_edit() {
+        let mut state = WorkshopState::in_memory();
+        state.new_copy();
+        state.save_and_close();
+        assert!(state.exit_requested());
+        assert!(!state.has_changes());
+        state.cancel_close();
+        assert!(!state.exit_requested());
+        assert!(!state.close_requested());
+        assert!(state.request_close());
+        state.new_copy();
+        assert!(!state.request_close());
+        assert!(state.close_requested());
+    }
+
+    #[test]
+    fn failed_save_of_initial_blank_draft_does_not_authorize_exit() {
+        let directory = tempfile::tempdir().unwrap();
+        let path = directory.path().join("themes.json");
+        let mut state = WorkshopState::load(&path).unwrap();
+        assert!(!state.has_changes());
+        assert!(state.is_dirty());
+        std::fs::write(&path, "external modification").unwrap();
+        state.save_and_close();
+        assert!(!state.exit_requested());
+        assert!(state.status().contains("Could not save"));
+        assert_eq!(
+            std::fs::read_to_string(path).unwrap(),
+            "external modification"
+        );
+    }
+
+    #[test]
+    fn failed_save_of_an_untouched_import_does_not_authorize_exit() {
+        let directory = tempfile::tempdir().unwrap();
+        let path = directory.path().join("themes.json");
+        let mut state = WorkshopState::load(&path).unwrap();
+        let mut theme = state.draft_theme().clone();
+        theme.id = "theme:imported-close".into();
+        theme.name = "Imported close".into();
+        theme.source = ThemeSource::User;
+        state.import_theme_json(&tabard::portable::theme_json(&theme).unwrap());
+        assert!(state.has_changes());
+        assert!(state.is_dirty());
+        assert!(!state.request_close());
+        std::fs::write(&path, "external modification").unwrap();
+        state.save_and_close();
+        assert!(!state.exit_requested());
+        assert!(state.close_requested());
+        assert!(state.has_changes());
+        assert_eq!(state.draft_theme(), &theme);
+        assert!(state.status().contains("Could not save"));
+        assert_eq!(
+            std::fs::read_to_string(path).unwrap(),
+            "external modification"
+        );
     }
 }
 

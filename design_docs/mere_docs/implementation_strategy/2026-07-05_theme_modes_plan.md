@@ -62,9 +62,30 @@ acceptance beyond the windowless caption tests. The shared-kit slice passes
 285 windowless tests and the native authoring/narrow-layout scenario (five
 nonblank captures). Fresh-process state assertions pass but native acquisition
 can remain `Occluded`; a fresh empty-library control reproduces it. Preserve
-this presentation boundary in the desktop receipts. Investigate the shared
-host/Mesquite distinction between successful presentations and redraw attempts
-before treating a 120-attempt capture timeout as a state failure.
+this presentation boundary in the desktop receipts.
+
+**Presentation lifecycle follow-up (2026-10-08):** Rootstock now exposes the
+current redraw's existing `PresentedFrame` identity and clears it on an
+unsuccessful attempt. Mesquite advances native scenario steps, settling,
+frame limits and capture grace only after a new presentation; asynchronous
+readbacks still receive every hook turn. A separate ten-second continuous
+presentation deadline fails with presentation/redraw counts and cancels only
+that lane's capture callbacks. Explicit windowless harness turns keep their
+test clock. Validation passes 69 Rootstock tests, 24 Mesquite tests, 18 native
+host library tests and four windowless capture/pairing regressions.
+
+Fresh and saved-library native retries produce zero presentations and zero
+captures, with 218 and 201 lane redraw turns respectively before the elapsed
+deadline; an additional native-state diagnostic produces 129 turns. The owned
+macOS window has valid geometry, is visible, can become key and is on the active
+Space, but the application remains inactive and its native occlusion state
+lacks the Visible bit that Metal checks before acquiring a drawable. A one-time
+`focus_window` experiment did not change that result and was removed. The host
+retains an owed redraw after initial reveal and opt-in native diagnostics.
+Fresh-process presentation remains open at the activation/compositor boundary;
+these failed receipts do not replace the earlier five successful captures.
+[Concise native evidence and structured receipt projections](../../../ports/tabard/desktop/receipts/2026-10-08_stack/presentation_wait/README.md)
+preserve the exact results without attributing the failure to authored state.
 
 ## Tabard small-web adapters (2026-09-13 scope)
 
