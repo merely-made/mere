@@ -15,6 +15,7 @@
 #![doc(html_no_source)]
 
 pub mod conditions;
+pub mod embedded_reservoir;
 pub mod enrollment;
 pub mod pairing;
 pub mod personal_sync;
