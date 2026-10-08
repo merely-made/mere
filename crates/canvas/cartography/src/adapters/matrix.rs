@@ -31,6 +31,8 @@ pub use scenomise::matrix::{
     MatrixRole, derive_matrix,
 };
 
+use scenomise::history::{ComparedFields, RevisionView, classify_revisions};
+
 use crate::reading::{ActorScope, GraphReadingProfile, ReadingEmphasis, ReadingSurface};
 
 /// The id of the two-reading matrix profile.
@@ -69,8 +71,13 @@ pub struct ReadingAxis<'a> {
     pub profile: &'a GraphReadingProfile,
     /// The focus occurrence, for a focus reading.
     pub focus: Option<&'a str>,
+    /// The revision read: the authority's current dataset and relationships.
     pub dataset: &'a ProjectionDataset,
     pub relationships: &'a [DisclosedRelationship],
+    /// The revision before it, which an adjacent-revision reading compares
+    /// against. Without one, that reading selects every current actor, as
+    /// for a first revision. [`ReadingAxis::of_history`] fills it.
+    pub previous: Option<RevisionView<'a>>,
     /// The text field whose value labels a source; the occurrence id when
     /// absent.
     pub label_field: &'a str,
@@ -83,9 +90,6 @@ pub enum MatrixReadingError {
     NotAnActorReading { axis: MatrixRole, reading: String },
     /// A focus reading without a focus that names a disclosed occurrence.
     MissingFocus { axis: MatrixRole },
-    /// The axis's reading needs a predecessor revision, which a single
-    /// dataset does not carry. The `changes` adapter reads one.
-    NeedsHistory { axis: MatrixRole, reading: String },
     /// The shared derivation refused the axes.
     Matrix(MatrixError),
 }
@@ -101,12 +105,6 @@ impl fmt::Display for MatrixReadingError {
             },
             Self::MissingFocus { axis } => {
                 write!(f, "the {axis} axis needs a focus that names an occurrence")
-            },
-            Self::NeedsHistory { axis, reading } => {
-                write!(
-                    f,
-                    "the {axis} axis reading {reading} needs a revision history"
-                )
             },
             Self::Matrix(error) => error.fmt(f),
         }
@@ -129,19 +127,10 @@ pub fn project_two_reading_matrix(
     rows: &ReadingAxis<'_>,
     columns: &ReadingAxis<'_>,
 ) -> Result<Matrix, MatrixReadingError> {
-    let row_axis = read_axis(rows, MatrixRole::Rows, None)?;
-    let column_axis = read_axis(columns, MatrixRole::Columns, None)?;
-    derive_from_axes(row_axis, column_axis, [rows, columns])
-}
-
-/// Cross two axes already read, resolving relations from `inputs`.
-pub(crate) fn derive_from_axes(
-    rows: MatrixAxis,
-    columns: MatrixAxis,
-    inputs: [&ReadingAxis<'_>; 2],
-) -> Result<Matrix, MatrixReadingError> {
+    let row_axis = read_axis(rows, MatrixRole::Rows)?;
+    let column_axis = read_axis(columns, MatrixRole::Columns)?;
     let mut relations: HashMap<(SourceRef, SourceRef), Vec<MatrixContributor>> = HashMap::new();
-    for input in inputs {
+    for input in [rows, columns] {
         let sources = input
             .dataset
             .occurrences
@@ -165,7 +154,7 @@ pub(crate) fn derive_from_axes(
                 });
         }
     }
-    Ok(derive_matrix(rows, columns, |row, column| {
+    Ok(derive_matrix(row_axis, column_axis, |row, column| {
         Ok(
             match relations.get(&(row.source.clone(), column.source.clone())) {
                 Some(found) => CellReading::Relations(found.clone()),
@@ -175,13 +164,8 @@ pub(crate) fn derive_from_axes(
     })?)
 }
 
-/// Evaluate one axis's actor scope. `adjacent` is the actor set an
-/// adjacent-revision reading selected, when the caller has a history.
-pub(crate) fn read_axis(
-    input: &ReadingAxis<'_>,
-    role: MatrixRole,
-    adjacent: Option<Vec<MatrixAxisSource>>,
-) -> Result<MatrixAxis, MatrixReadingError> {
+/// Evaluate one axis's actor scope over its dataset.
+fn read_axis(input: &ReadingAxis<'_>, role: MatrixRole) -> Result<MatrixAxis, MatrixReadingError> {
     if input.profile.surface != ReadingSurface::Spatial {
         return Err(MatrixReadingError::NotAnActorReading {
             axis: role,
@@ -189,19 +173,34 @@ pub(crate) fn read_axis(
         });
     }
     let occurrences = &input.dataset.occurrences;
-    let sources = match (input.profile.actor_scope, adjacent) {
-        (ActorScope::AdjacentRevision, Some(sources)) => sources,
-        (ActorScope::AdjacentRevision, None) => {
-            return Err(MatrixReadingError::NeedsHistory {
-                axis: role,
-                reading: input.profile.id.clone(),
-            });
+    let sources = match input.profile.actor_scope {
+        // The current actors and then the removed ones, as the changes
+        // reading lists them; the comparison itself does not choose actors.
+        ActorScope::AdjacentRevision => {
+            let current = RevisionView {
+                dataset: input.dataset,
+                relationships: input.relationships,
+            };
+            let changes = classify_revisions(input.previous, current, &ComparedFields::All);
+            let mut by_id = input
+                .previous
+                .iter()
+                .flat_map(|previous| &previous.dataset.occurrences)
+                .chain(occurrences)
+                .map(|occurrence| (occurrence.occurrence_id.as_str(), occurrence))
+                .collect::<HashMap<_, _>>();
+            changes
+                .occurrences
+                .iter()
+                .filter_map(|entry| by_id.remove(entry.occurrence_id.as_str()))
+                .map(|occurrence| axis_source(input, occurrence))
+                .collect()
         },
-        (ActorScope::All, _) => occurrences
+        ActorScope::All => occurrences
             .iter()
             .map(|occurrence| axis_source(input, occurrence))
             .collect(),
-        (ActorScope::FocusAndNeighbors, _) => {
+        ActorScope::FocusAndNeighbors => {
             let focus = input
                 .focus
                 .filter(|focus| {
@@ -236,10 +235,7 @@ pub(crate) fn read_axis(
     })
 }
 
-pub(crate) fn axis_source(
-    input: &ReadingAxis<'_>,
-    occurrence: &ProjectionOccurrence,
-) -> MatrixAxisSource {
+fn axis_source(input: &ReadingAxis<'_>, occurrence: &ProjectionOccurrence) -> MatrixAxisSource {
     MatrixAxisSource {
         source: occurrence.source.clone(),
         label: occurrence
@@ -253,4 +249,4 @@ pub(crate) fn axis_source(
 
 #[cfg(test)]
 #[path = "matrix_tests.rs"]
-mod tests;
+pub(crate) mod tests;

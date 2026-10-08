@@ -77,7 +77,7 @@ pub mod signals;
 pub mod spiral_score;
 pub mod strategy;
 
-pub use adapters::matrix;
+pub use adapters::{changes, matrix};
 pub use minimap::{MinimapDescriptor, MinimapOverlayKind};
 pub use overlay::Overlay;
 pub use projection::{PositionedEdge, PositionedNode, Projection, ProjectionMetadata};

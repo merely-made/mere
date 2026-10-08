@@ -138,6 +138,8 @@ fn the_site_matrix_reproduces_through_the_shared_derivation() {
         );
         (axis, dataset, relationships)
     });
+    // The column axis is the site's `changes` reading of an authority with
+    // one revision, whose actors are every occurrence.
     let axes = data
         .each_ref()
         .map(|(axis, dataset, relationships)| ReadingAxis {
@@ -147,19 +149,10 @@ fn the_site_matrix_reproduces_through_the_shared_derivation() {
             focus: axis["focus"].as_str(),
             dataset,
             relationships,
+            previous: None,
             label_field: "label",
         });
-    // The column axis is the site's `changes` reading of an authority with
-    // one revision, whose actors are every occurrence.
-    let changes = axes[1]
-        .dataset
-        .occurrences
-        .iter()
-        .map(|occurrence| axis_source(&axes[1], occurrence))
-        .collect();
-    let rows = read_axis(&axes[0], MatrixRole::Rows, None).unwrap();
-    let columns = read_axis(&axes[1], MatrixRole::Columns, Some(changes)).unwrap();
-    let matrix = derive_from_axes(rows, columns, [&axes[0], &axes[1]]).unwrap();
+    let matrix = project_two_reading_matrix(&axes[0], &axes[1]).unwrap();
 
     for (axis, role) in [(&matrix.rows, "rows"), (&matrix.columns, "columns")] {
         let expected = fixture[role]["expected_sources"]
@@ -252,6 +245,7 @@ fn a_two_reading_matrix_crosses_neighbors_with_the_graph() {
         focus,
         dataset: &dataset,
         relationships: &relationships,
+        previous: None,
         label_field: "label",
     };
     let matrix =
@@ -294,6 +288,7 @@ fn axis_readings_are_actor_readings_with_their_inputs() {
         focus,
         dataset: &dataset,
         relationships: &relationships,
+        previous: None,
         label_field: "label",
     };
     let graph = axis("graph", None);
@@ -310,13 +305,11 @@ fn axis_readings_are_actor_readings_with_their_inputs() {
             axis: MatrixRole::Columns
         }
     );
-    assert_eq!(
-        project_two_reading_matrix(&graph, &axis("changes", None)).unwrap_err(),
-        MatrixReadingError::NeedsHistory {
-            axis: MatrixRole::Columns,
-            reading: "changes".into()
-        }
-    );
+    // Without a predecessor, the changes reading selects every actor.
+    let first =
+        project_two_reading_matrix(&axis("neighbors", Some("genet")), &axis("changes", None))
+            .unwrap();
+    assert_eq!(first.columns.sources.len(), dataset.occurrences.len());
 }
 
 #[test]
