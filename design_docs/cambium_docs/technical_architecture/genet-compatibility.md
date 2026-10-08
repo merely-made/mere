@@ -321,9 +321,10 @@ Existing target `C:/t/cargo-targets/mere` is reused without another live owner;
 Genet's qualification retains its borrowed `C:/t/cargo-targets/genet-encoding`
 and `C:/t/cargo-homes/genet-streams` for the recorded gate owner. No new isolated
 target, Cargo home or worktree is created in this slice. The helper's generated
-bytecode under `Code/testing/genet/forms/__pycache__` remains because automatic
-approval review rejected its removal with only "blocked by policy"; that
-rejected action is not retried through a different method.
+bytecode under `Code/testing/genet/forms/__pycache__` was removed on 2026-10-08
+after Mark explicitly authorized cleanup. Its earlier automatic-review
+rejection ("blocked by policy") remains historical. Mark also authorized
+publication and push, and requested remaining serial tests on ThinkPad.
 
 ### 2026-09-29 generated accessible-name adoption
 
