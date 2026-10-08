@@ -1161,8 +1161,7 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
                 })
                 .await?;
             resident_status::grant(&grants, route);
-            // V1 grants the reservoir to the first-party clients this door
-            // already knows; V4 makes it default-on for every one of them. Each
+            // The reservoir admits this door's first-party clients. Each
             // mere goes to the same clients on its own route (V2, step 5):
             // those the reservoir holds now, and each one ensured later.
             let first_party = vec![AppId::new("turnstone"), AppId::new("knot-editor")];
@@ -1184,6 +1183,7 @@ async fn run(args: Args, events: EventLog) -> Result<(), Box<dyn std::error::Err
                 }
             }
             if let (Some(routes), Some(reservoir)) = (&routes, resident.reservoir().reservoir()) {
+                routes.load_access(reservoir).await?;
                 for mere in reservoir.meres().await {
                     match routes.serve(&mere).await {
                         Ok(route) => tracing::info!(route = route.id(), "mere route open"),

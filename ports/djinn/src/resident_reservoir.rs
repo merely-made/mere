@@ -9,7 +9,8 @@
 //! Djinn holds the only open handle on the selected persona's reservoir: the
 //! index of every mere the persona keeps, one per data domain. Applications
 //! reach it through the admitted `reservoir` route. Each session sees the
-//! persona's meres and may ensure the mere for a domain; nobody else opens the
+//! persona's meres except those denied to its application, and may ensure a
+//! mere for a domain; nobody else opens the
 //! reservoir's files, and a second owner is refused by the store's lock.
 //!
 //! The lane is on unless the owner turns it off (Mark, 2026-09-23: meres are
@@ -30,13 +31,17 @@ use chirograph::{
     ProjectionOffer, ProjectionRequest, ProjectionSession, ProjectionSnapshot, ProtocolVersion,
     ResourceRequest, ResourceResponse, SemanticRole,
 };
+use graphshell::native::app_admission::AppId;
 use graphshell::native::endpoint_catalog::{
     ResidentEndpointCatalog, ResidentEndpointCatalogError, ResidentEndpointRoute,
 };
 use graphshell_endpoint::{IntentSink, PresentationSource, ProjectionCatalog, ProjectionSource};
 use muniment::RedbBackend;
 use pandect::wallet_store::resolve_persona;
-use pandect::{DomainId, MereRecord, ReservoirStore, open_reservoir_backend};
+use pandect::{
+    Author, DomainId, MereApplicationAccess, MereId, MereRecord, ReservoirStore,
+    open_reservoir_backend,
+};
 use personae::PersonaId;
 use sceno::{
     Arrangement, Footprint, InstanceId, ProjectedItem, Representation, Scene, Score, Size2,
@@ -56,7 +61,6 @@ pub const RESIDENT_RESERVOIR_NOTICE_POLL: Duration = Duration::from_millis(50);
 pub const RESERVOIR_ENSURE_MERE_INTENT: &str = "mere.reservoir.ensure";
 /// Schema of [`EnsureMereV1`].
 pub const ENSURE_MERE_SCHEMA: &str = "mere.reservoir.ensure/v1";
-
 const SESSION: &str = "djinn.reservoir/v1";
 const SOURCE_KIND: &str = "mere.reservoir";
 const EPOCH: SceneEpoch = SceneEpoch(1);
@@ -161,6 +165,49 @@ impl ResidentReservoir {
         self.shared.store.lock().await.meres().cloned().collect()
     }
 
+    /// The reservoir's durable policy, never an application-private copy.
+    pub async fn access_decisions(&self) -> Vec<(MereId, AppId, MereApplicationAccess)> {
+        self.shared
+            .store
+            .lock()
+            .await
+            .access()
+            .map(|(mere, app, access)| (mere, AppId::new(app), access.clone()))
+            .collect()
+    }
+
+    pub(crate) async fn record_access(
+        &self,
+        mere: MereId,
+        app: AppId,
+        denied: bool,
+        ambient: bool,
+        via: AppId,
+    ) -> Result<(), String> {
+        self.shared
+            .store
+            .lock()
+            .await
+            .set_application_access(
+                mere,
+                app.to_string(),
+                MereApplicationAccess {
+                    denied,
+                    ambient,
+                    recorded_at_ms: SystemTime::now()
+                        .duration_since(UNIX_EPOCH)
+                        .map(|time| time.as_millis() as u64)
+                        .unwrap_or_default(),
+                    author: Author::person(self.persona().as_uuid().to_string())
+                        .via(via.to_string()),
+                },
+            )
+            .await
+            .map_err(|error| error.to_string())?;
+        self.shared.revision.fetch_add(1, Ordering::SeqCst);
+        Ok(())
+    }
+
     /// Register the reservoir route. Every admitted open receives its own
     /// session over the one shared reservoir. With `routes`, each mere the
     /// route ensures is served on its own route (reservoir plan V2, step 5).
@@ -169,11 +216,21 @@ impl ResidentReservoir {
         catalog: &mut ResidentEndpointCatalog,
         routes: Option<MereRoutes>,
     ) -> Result<(), ResidentEndpointCatalogError> {
+        if let Some(routes) = &routes {
+            tokio::task::block_in_place(|| {
+                tokio::runtime::Handle::current().block_on(routes.load_access(self))
+            })
+            .map_err(|reason| ResidentEndpointCatalogError::Open {
+                id: RESIDENT_RESERVOIR_ROUTE.into(),
+                reason,
+            })?;
+        }
         let shared = Arc::clone(&self.shared);
-        catalog.register(RESIDENT_RESERVOIR_ROUTE, "Reservoir", move |_| {
+        catalog.register(RESIDENT_RESERVOIR_ROUTE, "Reservoir", move |context| {
             Ok(ReservoirEndpoint {
                 shared: Arc::clone(&shared),
                 routes: routes.clone(),
+                application: context.application().map(AppId::new),
             })
         })
     }
@@ -189,6 +246,7 @@ impl ResidentReservoir {
 struct ReservoirEndpoint {
     shared: Arc<Shared>,
     routes: Option<MereRoutes>,
+    application: Option<AppId>,
 }
 
 /// A card and the bytes it is served as.
@@ -236,11 +294,16 @@ impl ReservoirEndpoint {
     /// The reservoir card first, then one card per mere in domain order.
     fn cards(&self) -> Result<Vec<ServedCard>, String> {
         let meres = self.run(async {
-            self.shared
-                .store
-                .lock()
-                .await
+            let store = self.shared.store.lock().await;
+            store
                 .meres()
+                .filter(|mere| {
+                    self.application.as_ref().is_none_or(|app| {
+                        !store
+                            .application_access(mere.id, app.as_str())
+                            .is_some_and(|access| access.denied)
+                    })
+                })
                 .cloned()
                 .collect::<Vec<_>>()
         });
@@ -430,6 +493,21 @@ impl IntentSink for ReservoirEndpoint {
                         });
                     },
                 };
+                let denied = self.run(async {
+                    let store = self.shared.store.lock().await;
+                    store.get(&domain).is_some_and(|mere| {
+                        self.application.as_ref().is_some_and(|app| {
+                            store
+                                .application_access(mere.id, app.as_str())
+                                .is_some_and(|access| access.denied)
+                        })
+                    })
+                });
+                if denied {
+                    return Ok(IntentResult::Rejected {
+                        reason: "this application is explicitly denied the mere".into(),
+                    });
+                }
                 let created_at_ms = SystemTime::now()
                     .duration_since(UNIX_EPOCH)
                     .map(|elapsed| elapsed.as_millis() as u64)
