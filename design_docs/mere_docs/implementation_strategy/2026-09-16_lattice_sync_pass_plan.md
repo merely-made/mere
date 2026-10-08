@@ -734,3 +734,14 @@ wrong source. Report to Mark; change nothing.
   build at each new genet revision stalls every session on the machine for
   about a quarter of an hour. A CI runner has no other sessions, so this
   does not bear on `portable.yml`'s later steps.
+
+  **Corrected 2026-10-07, by Mark:** the quarter hour is not the
+  checkout's own cost. Mark: "dude, it's a windows security prompt. i gotta
+  run back to clear it every time." The stall lasts until he clears a
+  Windows security prompt, so its length measures his trip back to the
+  machine, not genet's size, and the finding above about each new genet
+  revision is withdrawn. The Defender, Code Integrity and SmartScreen logs
+  for the period do not show the prompt, so what raises it is not
+  identified here. *Reading, not ruled*: a stall of this shape, with every
+  cargo on the machine waiting on the package-cache lock behind an idle
+  holder, goes to Mark before anyone diagnoses it.
