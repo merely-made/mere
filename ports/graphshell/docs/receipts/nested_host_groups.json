@@ -1,6 +1,6 @@
 {
   "schema": "graphshell.nested-host-groups-receipt/v1",
-  "recorded_at": "2026-10-08T20:30:03.289931+00:00",
+  "recorded_at": "2026-10-08T20:49:59.549977+00:00",
   "source_base": "4c796590cc922da21db96c9971bdd521e8f603e4",
   "scope": "Explicit containment over a bounded manifest-declaration dataset; view-local expansion and entry; no saved-scene or portable-fold claim.",
   "fixture": {
@@ -56,8 +56,8 @@
       }
     },
     "retained_keyboard_and_breadcrumbs": "passed",
-    "visual_qualification": "pending: both grouped and flat routes produce blank captures",
-    "software_backend_attempt": "timed out before ready",
+    "visual_qualification": "failed on the default adapter: both grouped and flat routes produce opaque black captures",
+    "software_backend_attempt": "initial ANGLE-only attempt timed out; corrected WebGPU adapter run is recorded under software_browser",
     "warmup_seconds": 5
   },
   "source_sha256": {
@@ -69,7 +69,7 @@
     "scripts/export_grouped_cargo.py": "f06f7c3e78648d61502b03ca3fa84e2fdd318dbb7da5126a7526a152044de243",
     "ports/graphshell/web/Cargo.toml": "d20189276eb7ceb06d28725a6fb7ae4bca30ad932c8cda478b1a9f089a0fb11f"
   },
-  "qualification_base": "7ec9c4503 (merges origin/main 42d6f17f6)",
+  "qualification_base": "0051258e4 (includes main 42d6f17f6 via 7ec9c4503)",
   "integration": {
     "genet_revision": "e84f9c7f9aec23320c539784961d1465f8a53a9b",
     "root_and_standalone_web_agree": true,
@@ -82,6 +82,116 @@
     "compute_dispatch": "nonzero coarse and fine dispatches at nonzero render dimensions",
     "gpu_errors": "none reported in the unmodified instrumented page",
     "bump_failure_counter": 0,
-    "interpretation": "Rendering failure localized before final composition; exact cause still under investigation. Sampled centres are not a full pixel census."
+    "interpretation": "Rendering failure localized before final composition; exact cause still under investigation. Sampled centres are not a full pixel census.",
+    "native_pinned_renderer_control": {
+      "netrender_revision": "9607d16f1907f6c2085648ae96abcaa30d7c3d41",
+      "command": "cargo test --locked -p netrender --test p2prime_vello_rects -j2",
+      "passed": 3,
+      "includes": "painter order, transformed rectangle, clipped rectangle"
+    },
+    "hardware": "Radeon Pro Vega 56, Metal 3",
+    "browser_comparison": "Chrome default adapter and Chromium 151.0.7922.34 both blank; unmodified Chrome with SwiftShader displays the flat S1 page",
+    "swiftshader_launch_flags": [
+      "--enable-unsafe-webgpu",
+      "--use-webgpu-adapter=swiftshader",
+      "--enable-unsafe-swiftshader"
+    ],
+    "flag_reference": "https://chromium.googlesource.com/chromium/src/+/refs/heads/main/third_party/blink/web_tests/FlagSpecificConfig",
+    "clip_input_check": "The sampled source stream has six begin and six end tags. GPU clip inputs and end-monoid fixups are present. Hardware coarse output samples leave an opening clip command followed by end-of-command-stream.",
+    "temporary_shader_controls": "Constant final output and a render-dimension/alpha control display correctly; removing the failure guard alone leaves the blank output; a final clip-depth/alpha control indicates an open clip and zero alpha. No shader replacement is in the shipped bundle.",
+    "boundary": "Evidence narrows the failure to the default-adapter compute path; it does not establish the exact faulty compiler or shader instruction. Software adapter acceptance is recorded separately."
+  },
+  "software_browser": {
+    "headed": true,
+    "browser": "Google Chrome 152.0.7977.83",
+    "backend": "WebGPU SwiftShader; unmodified viewer WASM",
+    "launch_flags": [
+      "--enable-unsafe-webgpu",
+      "--use-webgpu-adapter=swiftshader",
+      "--enable-unsafe-swiftshader"
+    ],
+    "viewport": [
+      1440,
+      1000
+    ],
+    "warmup_seconds": 5,
+    "runs": {
+      "nested-groups": {
+        "receipt_result": "ok",
+        "page_errors": [],
+        "gate_failures": [],
+        "hidden": false,
+        "failures": []
+      },
+      "flat-site": {
+        "receipt_result": "ok",
+        "page_errors": [],
+        "gate_failures": [],
+        "hidden": false,
+        "failures": []
+      },
+      "unknown-grouping": {
+        "receipt_result": null,
+        "page_errors": [],
+        "gate_failures": [],
+        "hidden": false,
+        "failures": [],
+        "refusal": "alert present; no scenario started"
+      }
+    },
+    "retained_keyboard_and_breadcrumbs": "passed",
+    "visual_qualification": "passed: all three original nested-group capture gates and the flat S1 capture gate",
+    "performance_qualification": "not measured; software rendering is diagnostic, not representative of site performance",
+    "manual_capture_review": "Expanded, entered, collapsed and narrow screenshots display nodes, edges and retained controls. The preserved viewport leaves some graph nodes offscreen. The narrow 420x800 layout uses substantial space for controls. This is not a completed site usability review.",
+    "captures": {
+      "groups_expanded": {
+        "png_bytes": 305737,
+        "sha256": "335d322095c29b476068abc68871d9351f96a965484c1dd82b440448c923da38",
+        "viewport": [
+          1440,
+          1000
+        ]
+      },
+      "groups_entered": {
+        "png_bytes": 327386,
+        "sha256": "a537971c0b5a0a8d9cb65170471570928e3a9d43580c300fd319d41a29c727a6",
+        "viewport": [
+          1440,
+          1000
+        ]
+      },
+      "groups_collapsed": {
+        "png_bytes": 259985,
+        "sha256": "de1376edcee519ed02c6b15d94679ed634ab88bbd88f521ac56a09639e7959b9",
+        "viewport": [
+          1440,
+          1000
+        ]
+      },
+      "tree_host_dataset": {
+        "png_bytes": 260870,
+        "sha256": "10a532c59f26434ab1612f43c7f090f7e32696f962961fb5e39021ae2609f84b",
+        "viewport": [
+          1440,
+          1000
+        ]
+      },
+      "keyboard-entered": {
+        "png_bytes": 225625,
+        "sha256": "86dbedf939bf259e810bac37a88ef5562527ca1320fba065feaae21e5ce859f1",
+        "viewport": [
+          1440,
+          1000
+        ]
+      },
+      "narrow-entered": {
+        "png_bytes": 100192,
+        "sha256": "6b39b4a3ee4da668432d0f9263736b7373df988283285d41f5118cda14c59985",
+        "viewport": [
+          420,
+          800
+        ]
+      }
+    }
   }
 }

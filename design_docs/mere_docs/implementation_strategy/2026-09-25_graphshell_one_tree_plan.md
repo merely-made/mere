@@ -657,6 +657,24 @@ Open `tree.html?dataset=fixtures/grouped-manifest-components.json&grouping=conta
   failure counter; sampled intermediate scene/staging texture centres are
   transparent before the final composition. The exact renderer cause remains
   open. These diagnostic samples are not a rendering or performance receipt.
+  - **Default-adapter boundary:** the same unmodified page displays on
+    Chrome's SwiftShader WebGPU adapter. Chromium 151 also remains blank on
+    the default adapter. The machine has a Radeon Pro Vega 56; three pinned
+    native Netrender controls pass, including a clipped rectangle. Sampled
+    input has balanced begin/end tags and GPU clip fixups, while hardware
+    coarse commands leave an open clip. Temporary output controls display
+    pixels and dimensions, narrowing the issue to compute rendering without
+    identifying the exact compiler or shader fault. No shader substitution
+    is shipped. On the corrected SwiftShader WebGPU launch, the original
+    grouped scenario passes all three strict pixel captures and the flat S1
+    scenario passes its capture. Keyboard expansion, entry and breadcrumbs
+    pass; an unknown grouping kind refuses without a page error. The expanded,
+    entered, collapsed and 420×800 narrow screenshots were inspected. They
+    display the graph and retained controls, but the preserved camera leaves
+    some nodes offscreen and controls take substantial narrow-screen space.
+    This software acceptance, with six PNG hashes in the linked receipt,
+    cannot close the default-adapter gate, site usability or performance
+    budget. The unmodified code qualified is `0051258e4`.
 - **2026-10-08 — expandable host groups:** implemented on
   `codex/nested-graph-view`, based on main `4c796590c`. The shared Scenomise
   forest projection preserves source occurrence identities and dependency
@@ -682,9 +700,11 @@ Open `tree.html?dataset=fixtures/grouped-manifest-components.json&grouping=conta
   - **Evidence:** `ports/graphshell/docs/receipts/nested_host_groups.json`
     summarizes the bounded tests and source hashes. Full runtime captures and
     receipts remain in the local `Code/output/nested-graph-viewer/receipts/`
-    directory. Visual qualification, saved scene adoption, portable folds,
-    nested frame geometry, full Cargo closure/performance and the live site
-    replacement remain open. This commit is not a deploy or a size-budget gate.
+    directory; the later software-adapter run is kept separately in
+    `receipts-swiftshader/`. Default-adapter visual qualification, saved scene
+    adoption, portable folds, nested frame geometry, full Cargo
+    closure/performance and the live site replacement remain open. This commit
+    is not a deploy or a size-budget gate.
 
 - 2026-09-25: plan written from the assessment in §2 and Mark's rulings in §1.
   The reservoir plan records them as §7 items 39 and 40.
