@@ -64,8 +64,9 @@ rendering engine.
 
 ### 2026-10-07 Forms field ownership migration
 
-**Status:** implemented locally; qualification and a verified Genet repin are
-pending. The implementation plan and numbered rulings live in Genet's
+**Status:** local consumer gates pass; accessible-tree and sibling-scope
+rulings and a verified published-source Genet repin remain pending.
+The implementation plan and numbered rulings live in Genet's
 [dated Forms plan](https://github.com/merely-made/genet/blob/main/design_docs/2026-10-07_forms_value_validation_submission_plan.md).
 F3 authorizes this Mere migration and the later verified repin. The current
 source still pins Genet `965b64e206a47d1c8808472de9aa461233638768`; its older
@@ -202,6 +203,22 @@ The routing receipt also has an independent post-restoration source audit;
 later runs perform that second scan inside the guarded helper. These are local
 automated receipts, not browser-hosted operation or human AT acceptance. The
 accessible-leaf and sibling-scope questions remain pending.
+
+The final restored four-package gate at Mere `ee699000` passes 355 tests:
+Cambium 252, Rootstock 72, native accessibility 22 and browser mirror nine,
+with zero failures and two existing ignored doctests. The disabled committed-
+value control has exactly two intended failures and 74 other passes. Its first
+attempt is retained as unqualified because the helper expected the native test
+under `tests` rather than its actual `dpi_tests` module; the corrected fresh
+run validates, restores both producers with fresh mtimes, and precedes the
+restored pass. All guarded inputs remain unchanged outside owned restoration.
+
+Genet's fresh optimized runner passes all 15 value-model fixtures on both
+engines and its CSS guard reports `unexpected=0`; all sixteen summary counts
+match the starting guard and expectation files remain unchanged. The qualified
+product stays `e84f9c7f`; its frozen runner head is the documentation descendant
+`79a7f011`. This completes currently authorized automated gates. The two
+pending decisions still precede final acceptance and the verified repin.
 
 The downstream read-only audit finds old tag checks in Turnstone and Cleromancy.
 Their mechanical selector/caret/existing-label follow-ups await explicit scope
