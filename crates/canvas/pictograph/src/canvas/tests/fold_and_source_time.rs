@@ -224,15 +224,19 @@ fn source_time_canvas_scrubs_every_canvas_arrangement_without_rewriting_live_tru
             .live_canvas_mut()
             .set_selected_members(&[shared_member]);
         let positions = {
-            let live = source_canvas.live_canvas();
+            // The canvas passes its own registry (F87).
+            let live = source_canvas.live_canvas_mut();
+            let extents = live.strategy_extents();
+            let (registry, graph) = live.registry_and_graph();
             project_canvas_strategy(
+                registry,
                 arrangement_id,
-                live.graph(),
+                graph,
                 Some(focus),
                 800,
                 600,
                 None,
-                Some(&live.strategy_extents()),
+                Some(&extents),
                 false,
             )
         };

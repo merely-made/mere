@@ -29,7 +29,7 @@ pub fn bridge_nodes(graph: &impl TopologyView, threshold: f32) -> BridgeNodes {
 /// removal disconnects part of the graph — single point of failure). They overlap but differ: a hub
 /// inside a dense cluster can have high betweenness yet not be a cut vertex, and a low-degree node
 /// joining two blobs is a cut vertex with modest betweenness. (Graph signals — bridges.)
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Default)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Default)]
 pub enum BridgeMetric {
     /// Betweenness brokers (thresholded normalized betweenness). The default.
     #[default]

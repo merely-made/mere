@@ -10,28 +10,206 @@
 //! of these signals construct an [`IntelligenceSignals`] value and
 //! hand it to cartography; the signal-producer crate's internal shapes
 //! never leak through this type.
+//!
+//! Signals are keyed by channel id, `family.option` (dynamics grammar plan,
+//! F32 and F55), each a variant of one [`Signal`] type (F86, "Keyed
+//! signals"). The host's channel registry computes them; cartography
+//! computes none. An adapter names the ids it reads and reports one that is
+//! missing or of the wrong kind ([`SignalFault`]). View configuration (a
+//! host's axes, the extents) stays on [`crate::ViewIntent`].
+
+use std::collections::BTreeMap;
 
 use kernel::graph::NodeKey;
 use serde::{Deserialize, Serialize};
 
-/// Signals from intelligence layers that strategies can consume.
+/// The enumeration order every score's ordinal follows (F84): the order is
+/// computed once, by the host's registry, and travels in the request.
+pub const ORDER_TIMELINE: &str = "order.timeline";
+/// Most recently visited first, the Spiral's order when recency leads.
+pub const ORDER_RECENCY: &str = "order.recency";
+/// Each node's recency in `0..=1`, which picks its Spiral rung (F132).
+pub const WEIGHT_RECENCY: &str = "weight.recency";
+/// The graph Laplacian's coordinates, which Spectral places by.
+pub const COORDS_SPECTRAL: &str = "coords.spectral";
+/// Coordinates a host's own projection produced (UMAP, t-SNE, PCA), which
+/// the semantic-embedding strategy places by (*Reading, not ruled*: the id,
+/// G2b's question 4 (a), ruled as F55's pattern).
+pub const COORDS_HOST: &str = "coords.host";
+/// Degree plus one, which Radial's weighted policy spreads its rings by.
+pub const WEIGHT_DEGREE: &str = "weight.degree";
+/// Breadth-first rings from the view's focus, Radial's.
+pub const RINGS_FOCUS: &str = "rings.focus";
+
+/// Signals from intelligence layers that strategies can consume, keyed by
+/// channel id.
 ///
-/// Every field is optional: strategies that don't need a particular
-/// signal simply ignore it, and producers that don't compute one yet
-/// leave it `None`. This keeps the contract additive — adding a new
-/// signal type doesn't break existing strategies.
+/// A strategy reads the ids it needs and ignores the rest; a host supplies
+/// the ids its strategies read. Serialized as a map from id to signal.
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
+#[serde(transparent)]
 pub struct IntelligenceSignals {
-    pub clusters: Option<ClusterSet>,
-    pub affinity: Option<AffinityScores>,
-    pub bridges: Option<BridgeNodes>,
-    pub importance: Option<ImportanceWeights>,
-    /// Per-node 2D coordinates from a projection step (UMAP / t-SNE /
-    /// PCA / etc.) — host runs the projection externally and supplies
-    /// the results here. Distinct from [`AffinityScores`] (pairwise
-    /// similarity): embeddings are absolute 2D positions ready for
-    /// layout consumption.
-    pub embeddings: Option<NodeEmbeddings>,
+    signals: BTreeMap<String, Signal>,
+}
+
+/// One channel's values.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub enum Signal {
+    /// A partition into named clusters (`groups.cluster`).
+    Groups(ClusterSet),
+    /// Weighted node pairs (`pairs.*`).
+    Pairs(AffinityScores),
+    /// A set of nodes (`groups.bridges`).
+    Nodes(BridgeNodes),
+    /// A weight per node (`weight.degree`, `importance.*`).
+    Weights(ImportanceWeights),
+    /// A coordinate pair per node (`coords.spectral`, `coords.host`).
+    Coords(NodeEmbeddings),
+    /// A ring index per node (`rings.focus`).
+    Rings(NodeRings),
+    /// Every node, in order (`order.timeline`).
+    Order(NodeOrder),
+}
+
+/// Which variant a [`Signal`] is, for a fault's report.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub enum SignalKind {
+    Groups,
+    Pairs,
+    Nodes,
+    Weights,
+    Coords,
+    Rings,
+    Order,
+}
+
+impl Signal {
+    pub fn kind(&self) -> SignalKind {
+        match self {
+            Signal::Groups(_) => SignalKind::Groups,
+            Signal::Pairs(_) => SignalKind::Pairs,
+            Signal::Nodes(_) => SignalKind::Nodes,
+            Signal::Weights(_) => SignalKind::Weights,
+            Signal::Coords(_) => SignalKind::Coords,
+            Signal::Rings(_) => SignalKind::Rings,
+            Signal::Order(_) => SignalKind::Order,
+        }
+    }
+}
+
+/// Why a strategy could not read a channel: absent, or present as another
+/// kind. Reported on the projection's metadata.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub enum SignalFault {
+    Missing {
+        id: String,
+    },
+    Mistyped {
+        id: String,
+        expected: SignalKind,
+        found: SignalKind,
+    },
+}
+
+impl std::fmt::Display for SignalFault {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            SignalFault::Missing { id } => write!(f, "channel {id} is missing"),
+            SignalFault::Mistyped {
+                id,
+                expected,
+                found,
+            } => write!(f, "channel {id} is {found:?}, not {expected:?}"),
+        }
+    }
+}
+
+macro_rules! typed_read {
+    ($(#[$doc:meta])* $name:ident, $variant:ident, $ty:ty) => {
+        $(#[$doc])*
+        pub fn $name(&self, id: &str) -> Result<&$ty, SignalFault> {
+            match self.signals.get(id) {
+                Some(Signal::$variant(value)) => Ok(value),
+                Some(other) => Err(SignalFault::Mistyped {
+                    id: id.to_string(),
+                    expected: SignalKind::$variant,
+                    found: other.kind(),
+                }),
+                None => Err(SignalFault::Missing { id: id.to_string() }),
+            }
+        }
+    };
+}
+
+impl IntelligenceSignals {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// `signal` under `id`, replacing any signal there.
+    pub fn insert(&mut self, id: impl Into<String>, signal: Signal) {
+        self.signals.insert(id.into(), signal);
+    }
+
+    /// With `signal` under `id`.
+    pub fn with(mut self, id: impl Into<String>, signal: Signal) -> Self {
+        self.insert(id, signal);
+        self
+    }
+
+    pub fn get(&self, id: &str) -> Option<&Signal> {
+        self.signals.get(id)
+    }
+
+    /// Every id held, in order.
+    pub fn ids(&self) -> impl Iterator<Item = &str> {
+        self.signals.keys().map(String::as_str)
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.signals.is_empty()
+    }
+
+    typed_read!(
+        /// The partition under `id`.
+        groups, Groups, ClusterSet
+    );
+    typed_read!(
+        /// The pairs under `id`.
+        pairs, Pairs, AffinityScores
+    );
+    typed_read!(
+        /// The node set under `id`.
+        nodes, Nodes, BridgeNodes
+    );
+    typed_read!(
+        /// The weights under `id`.
+        weights, Weights, ImportanceWeights
+    );
+    typed_read!(
+        /// The coordinates under `id`.
+        coords, Coords, NodeEmbeddings
+    );
+    typed_read!(
+        /// The rings under `id`.
+        rings, Rings, NodeRings
+    );
+    typed_read!(
+        /// The order under `id`.
+        order, Order, NodeOrder
+    );
+}
+
+/// A ring index per node, from a focus.
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
+pub struct NodeRings {
+    pub rings: Vec<(NodeKey, u32)>,
+}
+
+/// Every node, in an order.
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
+pub struct NodeOrder {
+    pub order: Vec<NodeKey>,
 }
 
 /// A partition of nodes into named clusters with confidence scores.
@@ -130,13 +308,67 @@ mod tests {
     use super::*;
 
     #[test]
-    fn intelligence_signals_default_is_all_none() {
+    fn intelligence_signals_default_holds_no_channel() {
         let s = IntelligenceSignals::default();
-        assert!(s.clusters.is_none());
-        assert!(s.affinity.is_none());
-        assert!(s.bridges.is_none());
-        assert!(s.importance.is_none());
-        assert!(s.embeddings.is_none());
+        assert!(s.is_empty());
+        assert_eq!(
+            s.coords(COORDS_SPECTRAL),
+            Err(SignalFault::Missing {
+                id: COORDS_SPECTRAL.into()
+            })
+        );
+    }
+
+    /// F86: a channel is read by id and kind; an absent id and a present id
+    /// of another kind are each reported, and the right kind reads back.
+    #[test]
+    fn a_keyed_signal_reads_by_id_and_reports_a_missing_or_mistyped_channel() {
+        let a = NodeKey::new(0);
+        let signals = IntelligenceSignals::new()
+            .with(ORDER_TIMELINE, Signal::Order(NodeOrder { order: vec![a] }))
+            .with(
+                WEIGHT_DEGREE,
+                Signal::Weights(ImportanceWeights {
+                    weights: vec![(a, 2.0)],
+                }),
+            );
+        assert_eq!(signals.order(ORDER_TIMELINE).unwrap().order, vec![a]);
+        assert_eq!(signals.weights(WEIGHT_DEGREE).unwrap().lookup(a), Some(2.0));
+        assert_eq!(
+            signals.rings(ORDER_TIMELINE),
+            Err(SignalFault::Mistyped {
+                id: ORDER_TIMELINE.into(),
+                expected: SignalKind::Rings,
+                found: SignalKind::Order,
+            })
+        );
+        assert_eq!(
+            signals.rings(RINGS_FOCUS),
+            Err(SignalFault::Missing {
+                id: RINGS_FOCUS.into()
+            })
+        );
+        assert_eq!(
+            signals.ids().collect::<Vec<_>>(),
+            vec![ORDER_TIMELINE, WEIGHT_DEGREE]
+        );
+    }
+
+    /// The keyed shape on the wire: a map from id to signal, which reads
+    /// back whole.
+    #[test]
+    fn keyed_signals_round_trip_as_a_map_by_id() {
+        let a = NodeKey::new(3);
+        let signals = IntelligenceSignals::new().with(
+            RINGS_FOCUS,
+            Signal::Rings(NodeRings {
+                rings: vec![(a, 1)],
+            }),
+        );
+        let json = serde_json::to_string(&signals).unwrap();
+        assert!(json.starts_with("{\"rings.focus\":"), "{json}");
+        let back: IntelligenceSignals = serde_json::from_str(&json).unwrap();
+        assert_eq!(back, signals);
     }
 
     #[test]

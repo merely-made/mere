@@ -61,6 +61,7 @@ const P2_EDGES: [(usize, usize); 10] = [
 /// The catalog's default sources, the web host's choice.
 const SOURCES: LawSources = LawSources {
     kind: PhysicsKindSource::Site,
+    groups: PhysicsKindSource::Site,
     mass: PhysicsMassSource::Degree,
     depth: PhysicsDepthSource::Roots,
     focus: None,

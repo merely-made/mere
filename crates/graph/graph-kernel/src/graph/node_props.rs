@@ -46,6 +46,7 @@ impl Graph {
             return false;
         }
         node.title = title;
+        self.bump_content_revision();
         true
     }
 

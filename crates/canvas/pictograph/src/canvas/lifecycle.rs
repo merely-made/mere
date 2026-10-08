@@ -56,6 +56,7 @@ impl Canvas {
     /// This is the Model-A graph swap the multi-graph switch drives. (Multi-graph MG2.)
     pub fn set_graph(&mut self, graph: Graph) {
         self.graph = graph;
+        self.meaning.forget_graph();
         self.selected.clear();
         self.selected_edges.clear();
         self.hidden_edges.clear();
@@ -71,15 +72,12 @@ impl Canvas {
         self.node_materials.clear();
         self.pending_image_requests.clear();
         self.requested_images.clear();
-        self.node_importance.clear();
-        self.importance_dirty = true;
-        self.node_recency.clear();
         self.projection_score = None;
         self.projection_representations.clear();
         self.restored_score_hold = None;
         self.strategy_positions = None;
         self.paused_positions = None;
-        self.community_cache = None;
+        self.channels = crate::signals::ChannelRegistry::new();
         self.drag = None;
         self.pinned_nodes.clear();
         self.field_drag = None;
@@ -166,12 +164,8 @@ impl Canvas {
             size_by_degree: false,
             size_by_importance: false,
             size_by_recency: false,
-            node_recency: HashMap::new(),
             importance_metric: crate::signals::ImportanceMetric::Degree,
-            node_importance: HashMap::new(),
-            importance_dirty: true,
-            community_cache: None,
-            community_cache_revision: 0,
+            channels: crate::signals::ChannelRegistry::new(),
             last_strategy_inputs: None,
             strategy_footprint_revision: 0,
             strategy_footprints: HashMap::new(),
@@ -179,12 +173,8 @@ impl Canvas {
             offthread_wake: None,
             community_actor: None,
             show_bridge_rings: false,
-            bridge_cache: None,
-            bridge_cache_revision: 0,
             bridge_metric: crate::signals::BridgeMetric::default(),
             cluster_by_affinity: false,
-            affinity_cache: None,
-            affinity_cache_revision: 0,
             installed_affinity_revision: None,
             content_affinity: None,
             content_affinity_dirty: false,
@@ -216,6 +206,8 @@ impl Canvas {
             physics_law: crate::canvas::PhysicsLaw::Springs,
             physics_overlays: Vec::new(),
             physics_kind_source: crate::canvas::PhysicsKindSource::Site,
+            physics_group_source: crate::canvas::PhysicsKindSource::Site,
+            meaning: Default::default(),
             physics_mass_source: crate::canvas::PhysicsMassSource::Degree,
             physics_depth_source: crate::canvas::PhysicsDepthSource::Roots,
             physics_composition: None,
@@ -359,11 +351,8 @@ impl Canvas {
     /// selection, or restart the settle; callers do that as they need. The pool
     /// is structural, so it is rebuilt, not grown incrementally.
     pub(crate) fn reconcile_derived(&mut self) {
-        // The graph topology changed (this is the topology-change hook), so any degree-derived
-        // signal is stale: mark the importance cache for recompute on the next push. (Graph signals.)
-        // The expensive caches (community) gate on `Graph::revision` instead — bumped at the kernel
-        // mutation source, so a spurious reconcile (e.g. a selection change) cannot invalidate them.
-        self.importance_dirty = true;
+        // The registry's facts gate on `Graph::revision` — bumped at the kernel mutation source, so
+        // a spurious reconcile (e.g. a selection change) cannot invalidate them. (Graph signals.)
         // New bodies spawn at the origin (positions are no longer graph truth, S2);
         // `sync_nodes` leaves existing bodies at their simulated position, so a live
         // node is not teleported by a topology change.

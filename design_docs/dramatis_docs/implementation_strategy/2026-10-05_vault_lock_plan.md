@@ -1,7 +1,7 @@
 # Vault Lock Plan
 
 **Date**: 2026-10-05
-**Status (2026-10-07)**: rulings 1 to 60 in §3; the threat statement is
+**Status (2026-10-08)**: rulings 1 to 66 in §3; the threat statement is
 still open. L1 landed (`2556a20c`). L2's checkpoints A (`7c588deb`) and B
 (`ec1768ab`) landed. Still to come in L2: the Secret Service on the
 ThinkPad, ruling 42 (Linux starts locked), ruling 44 (Distillery's
@@ -716,6 +716,83 @@ Options:
 
 Mark: **"Vault lock item + test (Recommended)"**.
 
+**Ruling 61** *(p2panda-net's mDNS copies; asked 2026-10-08).* *Ruling 60's
+measurement puts the 4 blocks in p2panda-net's mDNS layer: our
+`mere-p2panda-net` 0.7.5 fork, with mDNS on by default. iroh's own lookup
+leaves none, and Mere's wiring adds none.* Options:
+- ledger only, as item 11's other p2panda-net blocks are;
+- mDNS off in the default host policy;
+- trace them, then carry a minimal patch in the fork.
+
+Mark: **"Ledger only (Recommended)"**. Follows: ruling 42 is next (ruling
+56's order).
+
+Rulings 62 to 65 were asked on 2026-10-08 from ruling 42's assessment (§6).
+
+**Ruling 62** *(ruling 42's scope).* *Ruling 42 names Linux. Ruling 7
+forbids the environment passphrase for any resident that locks, and the
+Windows test harness uses it.* Options:
+- every resident on the passphrase vault starts locked: Linux always,
+  Windows when it uses that vault, while DPAPI Windows still auto-unlocks;
+- Linux only, keeping the Windows environment path as a recorded exception.
+
+Mark: **"Every passphrase vault (Recommended)"**. Follows: djinn no longer
+reads `PERSONAE_PASSPHRASE`, and the path is tested here on the passphrase
+vault.
+
+**Ruling 63** *(the first unlock).* *A resident admits door sessions only
+with the door keys, which come from the vault (rulings 40 and 46). Before
+its first unlock it has none, so `djinn --unlock` cannot reach it.*
+Options:
+- the resident's own prompt at start (the native box where the desktop
+  has a dialog provider, else its terminal), with no doors until it
+  succeeds, and a cancel exiting;
+- the same plus an owner-only pre-door unlock socket;
+- the resident's own prompt, with a cancel re-showing it (with backoff)
+  instead of exiting.
+
+Mark: **"Prompt, and re-prompt on cancel"**. *Reading, not ruled:*
+- a cancel or a wrong passphrase re-prompts;
+- with no dialog provider and no terminal there is nothing to re-show, so
+  the resident exits with an error naming both.
+
+**Ruling 64** *(first run).* *No vault exists, and nothing creates a
+passphrase vault without the environment (`--enroll-passphrase` enrols
+only over the sealed DPAPI vault).* Options: a `djinn --create-vault`
+terminal command; the start prompt creates it. Mark: **"The start prompt
+creates it"**. *Reading, not ruled:* it asks twice, and a mismatch
+re-prompts.
+
+**Ruling 65** *(the harness).* *With the environment gone, the harness
+cannot type into `rpassword`, which reads only the console or tty.*
+Options:
+- `--passphrase-fd N` (GnuPG's convention), compiled only under a test or
+  receipt feature;
+- the same in release builds;
+- the environment kept, harness only.
+
+Mark: **"Passphrase over an fd (Recommended)"**.
+
+**Ruling 66** *(what "starts locked" builds; asked 2026-10-08).* *A vault
+object opened locked would have no master public key, but
+`IdentityProvider::master_public_key()` is infallible, with about 200
+calls. Under ruling 63 nothing reaches the vault before the first unlock.*
+Options:
+- wait before the vault: the resident prompts before building any
+  storage key, profile, door or lane, then opens the passphrase vault as
+  today; `open` already rejects a wrong passphrase and creates a missing
+  vault;
+- a locked vault object, with personae's `open_locked` constructors and a
+  fallible master key.
+
+Mark: **"Wait before the vault (Recommended)"**. Follows: personae is
+unchanged, and the first done-condition of ruling 42's build is
+superseded (§6, 2026-10-08). *Reading, not ruled:* without the
+environment, djinn picks the passphrase vault when the platform has no OS
+root, when `--passphrase-fd` is given, or when the vault directory holds
+`vault.json`; otherwise DPAPI. The installed resident's directory holds
+only `auto-unlock-root.json` and `profiles`, so it stays on DPAPI.
+
 Still open: a threat statement naming hibernation and the pagefile.
 
 ## 4. Phases
@@ -1147,3 +1224,114 @@ unlock follow-through, and non-Windows startup unlock backends, from the
     rerun used `-j 4`.
 - **Next:** ruling 60's default-policy run in mere-transport's
   `seed_residue.rs`, then ruling 42 (ruling 56's order).
+
+**2026-10-08, ruling 60: the mDNS copies are p2panda-net's.**
+- **mere-transport's `seed_residue.rs`** gains a third shape. The transport
+  is built through `P2pandaHostPolicy::default()`, gossip on, and judged
+  against p2panda-net alone with `MdnsDiscovery` (Active) spawned in the
+  transport's order. It passes: the transport adds nothing beyond
+  p2panda-net in any of the three shapes.
+- **Attribution, measured and reported:**
+  - iroh's own `MdnsAddressLookup`, built from the public id without
+    p2panda, adds nothing beyond iroh alone;
+  - p2panda-net's mDNS layer adds exactly the 4 blocks (472, 568, 784,
+    2424).
+
+  So they are p2panda-net's, in its `MdnsActor` layer, and not Mere's
+  wiring. They are recorded in the upstream candidates ledger, item 11.
+  The mechanism (ractor boxing a stack that still held key bytes) is
+  inferred, not traced.
+- **Dev-dependency:** `iroh-mdns-address-lookup = "=0.6.0"`, the version
+  p2panda-net already locks. `cargo_mode.py verify` passes.
+- **Ruling 61:** ledger only. Next: ruling 42.
+
+**2026-10-08, ruling 42 assessed** (at `19de6eab`).
+- **What exists:**
+  - the passphrase vault locks and unlocks;
+  - Linux has the native prompt: graphshell's `SystemNativeIdentityUi`
+    uses `light-file-dialog`'s password box, through whatever graphical
+    dialog provider the desktop offers;
+  - `djinn --unlock` and `--native` (rulings 41 and 47);
+  - the door keys captured at first unlock (ruling 46).
+- **What is missing:**
+  - **Nothing opens locked.** `PassphraseEncryptedStorage::open` and
+    `IdentityVault::{open, with_profile}` all need the secret.
+  - **djinn's `run()` does everything after an unlocked open:** the
+    profile load, the door keys, a second vault open in
+    `DjinnResident::open` (which re-reads the environment), and the Knot,
+    Distillery, reservoir and sync lanes.
+  - **No door before the first unlock.** `admit_local_client` asks the
+    door for its keys before it admits anything, so the first unlock can
+    only be the resident's own prompt (ruling 63).
+  - **No first-run path off DPAPI.** `--enroll-passphrase` opens the
+    sealed vault only (ruling 64).
+  - **The environment in the harness.** djinn-testkit sets
+    `PERSONAE_PASSPHRASE` (ruling 65).
+- **Not in this scope:** `personae-agent` and `personae-vault` still use
+  `Unlock::from_env()`. The standalone agent is Linux's deployed agent
+  until the pairing plan's D2.
+- **The build. Done when:**
+  - [ ] personae opens a passphrase vault locked (salt only, profile id
+        only). Every guard refuses until a passphrase unlock loads the
+        profile; a wrong passphrase stays locked; tests cover each.
+        *2026-10-08: superseded by ruling 66. The resident waits before
+        building the vault, so personae is unchanged.*
+  - [x] djinn's resident path reads no passphrase from the environment
+        (measured by search). A control resident given
+        `PERSONAE_PASSPHRASE` and nothing else stays locked.
+        *2026-10-08: the search is clean for djinn and djinn-testkit. The
+        control resident is not run: on Windows the native box is always
+        available, so it would open a real dialog on the desktop mid-test.
+        The live tests stand in for it: they pass with no environment.*
+  - [x] A passphrase-vault resident starts locked, prompts, re-prompts on
+        a cancel or a wrong passphrase, and serves its doors only after
+        the unlock. The door keys, lanes and second open follow the
+        unlock. *2026-10-08: the prompt logic by scripted unit tests; a
+        live resident's events run `started, waiting-for-unlock,
+        vault-created, listening, ready`. The real native box and terminal
+        are Mark's attended step.*
+  - [x] With no vault, the start prompt asks twice and creates it.
+  - [x] `--passphrase-fd` exists only under the test or receipt feature,
+        and the harness, its receipts and djinn's tests use it. *A plain
+        build answers "unknown argument: --passphrase-fd".*
+  - [ ] Gates: personae, castellan and djinn tests, the receipt, and
+        `cargo_mode.py verify`. The Linux build and runtime proof go to
+        the ThinkPad with the Secret Service (ruling 56).
+
+**2026-10-08, ruling 42 built** (`55ff58e4`, branch `start-locked`).
+- **What changed:**
+  - djinn's new `startup_vault` chooses the vault and holds the prompt
+    loop;
+  - `run()` and the pairing commands open through it;
+  - `--passphrase-fd 0` sits behind the `passphrase-fd` feature, which the
+    tests turn on through djinn's dev-dependency on itself;
+  - djinn-testkit hands the passphrase over on standard input;
+  - graphshell's `NativeIdentityUi` gains `ask_vault_passphrase(message)`;
+  - personae gains a named constant, `PASSPHRASE_VAULT_FILE`, and no other
+    change.
+- ***Readings, not ruled:***
+  - any refused open asks again, with the reason shown, rather than matching
+    personae's "incorrect passphrase" string;
+  - only fd 0 is read, since Windows has no other inherited descriptor
+    numbers;
+  - the passphrase is kept in zeroizing memory only for Distillery's second
+    open of the same directory.
+- **Verified in the worktree:**
+  - djinn's tests, startup_vault's 8 included; personae, djinn-testkit and
+    castellan (32 suites, 346 passed);
+  - graphshell's tests compile;
+  - the live tests: `harness` 4 of 4, `lock_agent` and the two-resident
+    directory test;
+  - `cargo_mode.py verify`.
+- **Finding, not this change's:** `mdns_first_contact_two_instance` fails
+  at "a restarted: contact within 90s", 3 of 3 runs on the branch and 1 of
+  1 on its base `19de6eab`, at the same step. It belongs to the device
+  pairing plan's D1b receipts.
+- **Still open:**
+  - the Linux build and runtime proof on the ThinkPad, with the Secret
+    Service (ruling 56);
+  - the real native box and terminal prompt, which are Mark's attended
+    step;
+  - outside djinn, `Unlock::from_env()` remains in `personae-agent`,
+    `personae-vault`, `distillery-installed`, graphshell's `profile.rs`
+    and its web-extension smoke host.

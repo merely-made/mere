@@ -6,11 +6,12 @@
 
 use std::collections::HashMap;
 
-use cartography::adapters::project_graph_only;
-use cartography::{IntelligenceSignals, Projection, ProjectionRequest, TargetSize, ViewIntent};
+use cartography::adapters::{channels_read, project_graph_only};
+use cartography::{Projection, ProjectionRequest, TargetSize, ViewIntent};
 use kernel::geometry::PortablePoint;
 use kernel::graph::apply::{add_node, assert_relation};
 use kernel::graph::{EdgeAssertion, Graph, SemanticSubKind};
+use pictograph::signals::ChannelRegistry;
 use uuid::Uuid;
 
 use crate::model::GraphModel;
@@ -75,7 +76,14 @@ pub fn lay_out(
         assert_relation(&mut scratch, from, to, link);
     }
 
-    let signals = IntelligenceSignals::default();
+    // Every fact a layout reads comes from the channel registry, keyed by
+    // channel id; cartography computes none (dynamics grammar plan, G2b, F53,
+    // F84, F86). The scratch graph is built for this call, so the registry is
+    // too: one registry serves one graph.
+    let mut registry = ChannelRegistry::new();
+    let mut channels: Vec<&str> = channels_read(layout).to_vec();
+    channels.extend(channels_read(DEFAULT_LAYOUT));
+    let signals = registry.disclose(&scratch, &channels, None);
     let request = ProjectionRequest {
         graph: &scratch,
         signals: &signals,

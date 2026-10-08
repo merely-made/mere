@@ -165,6 +165,9 @@ impl Canvas {
         if self.show_bridge_rings {
             self.ensure_bridges_fresh();
         }
+        // Take a finished Meaning run, start one when the content moved, and hand a new snapshot
+        // to Kinds, Group pull and the affinity signal, before the affinity sync reads it. (G2.)
+        self.sync_meaning();
         // Keep the affinity-clustering force in step with the toggle + the current affinity signal
         // (installs / rebuilds / clears once per real change, with a settle so it takes; a no-op when
         // the toggle is off and no force is installed). (Graph signals — P4.)
@@ -308,7 +311,7 @@ impl Canvas {
         // Community rings: a halo per node in its community's colour, spliced into the same
         // world-space transform. (Graph signals — community to a ring.)
         if self.show_community_rings
-            && let Some(community) = self.community_cache.as_ref()
+            && let Some(community) = self.channels.community_held()
         {
             let rings = community_ring_overlay(&self.view, community, |k| self.node_size(k) / 2.0);
             underlay.splice_world_overlays(rings);
@@ -316,7 +319,7 @@ impl Canvas {
         // Bridge rings: a bold ring on the high-betweenness brokers, over the community rings so the
         // connectors stand out. (Graph signals — bridges.)
         if self.show_bridge_rings
-            && let Some(bridges) = self.bridge_cache.as_ref()
+            && let Some(bridges) = self.channels.bridges_held(self.bridge_metric)
         {
             let rings = bridge_ring_overlay(&self.view, bridges, |k| self.node_size(k) / 2.0);
             underlay.splice_world_overlays(rings);
@@ -537,8 +540,14 @@ impl Canvas {
             after_cull,
         );
 
-        let needs_redraw =
-            settling || gliding || dragging || following || self.ambient.is_some();
+        // A sliced Meaning run advances once a frame, so it asks for the next
+        // one until it lands. (Dynamics grammar plan, G2, F35.)
+        let needs_redraw = settling
+            || gliding
+            || dragging
+            || following
+            || self.ambient.is_some()
+            || self.meaning_pending();
         observer.mark(9);
         (scene, needs_redraw)
     }

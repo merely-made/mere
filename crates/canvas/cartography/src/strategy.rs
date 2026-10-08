@@ -68,6 +68,7 @@ mod tests {
                 metadata: ProjectionMetadata {
                     strategy_id: Some(self.projection_id().to_string()),
                     settled: true,
+                    faults: Vec::new(),
                 },
                 ..Projection::empty()
             }

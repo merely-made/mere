@@ -1,11 +1,14 @@
 # Graphshell on one Cambium tree
 
 **Date:** 2026-09-25
-**Status:** in progress, ruled 2026-09-25 (reservoir plan §7 items 39 and
-40). Phases 1 and 2, accessibility in the browser and the file seam, were
-done on 2026-09-26. Phase 3 has headed correctness receipts. On 2026-09-27
-Mark approved proceeding to phase 4, with stack performance and live physics
-explicitly open.
+**Status (2026-10-07):** in progress, reviewed against published Mere
+`cd3ebf26d`. Phases 1–2 are landed; phase 3 has its recorded headed producer
+receipts and Mark's approval to proceed. Phase 4 remains unfinished: canvas
+controls, elapsed-time physics, saved-graph editing and remote-session slices
+have landed, but the complete page/control migration and acceptance wall have
+not closed. The legacy `web_gpu.rs` and `component.html` remain. The reservoir's
+mere panel is its V2b step 5, after this cutover. §2's current handoff names
+the remaining gates; linked plans own later editor and dynamics status.
 **Scope:** Graphshell's browser page becomes one retained Cambium tree. Its
 HTML controls become Cambium components, its display-only Cambium chrome
 joins them, pictograph's canvas renders into the tree as a texture producer,
@@ -483,6 +486,41 @@ completed application migration.
   `run-graphshell-web-scenario.ps1` launches the same Chrome with a profile
   of its own in a new 1,400 by 900 window. Before phase 3 nothing timed
   Graphshell's frames, and nothing generated a large graph.
+
+### Current cutover and reservoir handoff (2026-10-07)
+
+Source checked at Mere `cd3ebf26d`; this is not a fresh browser or performance
+receipt. The dated progress below records what individual lanes qualified.
+
+- **Available:** the accessibility mirror, shared file seam, canvas producer,
+  shared canvas commands and toolbar, captured dragging, pause/restore,
+  elapsed-time physics, saved Title/Tags editing and remote-session controls.
+  Their scope and limits remain in the linked receipts and the
+  [migration inventory](2026-09-27_graphshell_tree_migration_inventory.md).
+- **Still required for phase 4:** complete the remaining product controls;
+  make every required page mount the single tree; retire the old presenter
+  and component page; rerun the live scenario inventory with full-frame capture
+  review and accessibility checks under the done-conditions in §4. Performance
+  results must name their revision, graph, motion state, dimensions and machine
+  load; old debug medians are not a current responsiveness verdict.
+- **Reservoir boundary:** this is V2b step 4. The common mere view and route
+  adapter exist, but Graphshell's mounted session panel and its lifecycle/
+  graph synchronization proof are V2b step 5 in the
+  [reservoir plan](2026-09-23_reservoir_plan.md). Completing a remote board or
+  a scene editor does not prove that panel exists.
+- **Shared follow-ons:** the
+  [Scenograph editor plan](2026-10-07_scenograph_editor_plan.md) owns shared
+  history, session saves and the later pan/selection/context-menu work. The
+  [dynamics grammar plan](2026-10-02_dynamics_grammar_plan.md) owns declarations,
+  compositions, channel registration, portable dynamics persistence and replay.
+  Their progress does not close this plan's full page-migration wall, and
+  does not establish Cleromancy adoption.
+
+For the next implementation pass, select an unfinished inventory target and
+its scenario/page gate. Record its result here and in the inventory, then
+hand the mounted-panel acceptance back to the reservoir plan. Keep V3–V5's
+independent resident/storage work visible there instead of treating the whole
+reservoir as one browser migration.
 
 ## 3. Target shape
 
@@ -968,3 +1006,9 @@ this tree.
   - Not run: the `app=local` route, and the old page's originals.
   - The [controls receipt](../testing/2026-09-27_graphshell_controls_physics_receipt.md)
     records the evidence.
+
+- 2026-10-07: source/history refresh at Mere `cd3ebf26d`. Dated the status and
+  added the current cutover/remaining-gates map, preserving all historical
+  native/browser and performance limits. The reservoir panel remains V2b step
+  5; shared editor and dynamics status is linked to its owning plans. No new
+  runtime verification or phase-completion claim.

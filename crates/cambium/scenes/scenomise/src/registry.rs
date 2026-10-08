@@ -22,6 +22,7 @@ use std::collections::HashMap;
 use std::sync::Arc;
 
 use sceno::{ScoreItem, Vec2};
+use scenograph::options::OptionSpec;
 use serde::{Deserialize, Serialize};
 
 /// A registered solver's identifier, matched against
@@ -69,6 +70,11 @@ pub struct SolverCapability {
     /// Free-form tags for filtering: `"spatial-memory"`, `"time-axis"`,
     /// `"hierarchical"`, `"organic"`.
     pub tags: Vec<String>,
+    /// The options the solver reads from a recipe, declared as data. A key it
+    /// does not declare is refused when the projection compiles, before
+    /// solving; a solver that declares none takes none (SE8).
+    #[serde(default)]
+    pub options: Vec<OptionSpec>,
 }
 
 impl SolverCapability {
@@ -82,6 +88,7 @@ impl SolverCapability {
             requires: Vec::new(),
             recommended_max_items: None,
             tags: Vec::new(),
+            options: Vec::new(),
         }
     }
 }

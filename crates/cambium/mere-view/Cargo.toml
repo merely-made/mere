@@ -14,6 +14,9 @@ publish = true
 cambium = { workspace = true }
 # Graph-only layouts by strategy id, over a kernel graph built from the model.
 cartography = { workspace = true }
+# The channel registry: the spectral coordinates a graph-only layout reads
+# (dynamics grammar plan, G2b, F53).
+pictograph = { workspace = true, features = ["signals"] }
 incipit = { workspace = true }
 kernel = { workspace = true }
 # The paint leaf's colour type; hosts supply the palette.

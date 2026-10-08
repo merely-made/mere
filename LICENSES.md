@@ -26,6 +26,7 @@ relicensed, and nothing here receives a Merely copyright line.
 | `support/patches/burn-remote` | MIT OR Apache-2.0 | [tracel-ai/burn](https://github.com/tracel-ai/burn) | upstream's |
 | `ports/pelt/examples/resources` | MPL-2.0 | [servo/servo](https://github.com/servo/servo) (`resources/`), by way of genet | Servo's |
 | `crates/conatus/conatus/src/resident/binning` | Apache-2.0 | [dimforge/nexus](https://github.com/dimforge/nexus) at `1cfbd76`, by Sébastien Crozet / Dimforge | `LICENSE-APACHE` in-tree; port and change notice in `mod.rs` |
+| `crates/canvas/pictograph/src/canvas/tests/data/arxiv_topics.tsv` | CC0-1.0 (arXiv metadata) | [arXiv API](https://export.arxiv.org/api/query), terms at <https://info.arxiv.org/help/api/tou.html> | `arxiv_topics.provenance.json` beside it: the twelve requests, the licence quote, the window, the selection |
 
 `ports/pelt/examples/resources` holds two Servo logo images that Pelt's
 example documents reference by URLs that climb to the repository root and
@@ -48,6 +49,15 @@ Apache-2.0 per the 2026-10-01 licensing ruling; the module header names the
 upstream, the author and the changes, and the license text sits beside it. The
 cell-walking force kernel that reads the bins (`kernels::exclude_cells`) and
 the host code that calls them are Mark's and stay MPL-2.0.
+
+`crates/canvas/pictograph/src/canvas/tests/data/arxiv_topics.tsv` is test
+data for the Meaning channel's purity receipt (dynamics grammar plan, F42 and
+F43): 900 arXiv ids, titles and primary categories, 150 in each of six,
+fetched by the coordinator on 2026-10-03 with each request approved by Mark.
+arXiv says of this metadata: "You are free to use descriptive metadata about
+arXiv e-prints under the terms of the Creative Commons Universal (CC0 1.0)
+Public Domain Declaration." CC0 asks for no notice; the row and the
+provenance note record where the bytes came from (SHA-256 `942a7716…`).
 
 ## Frozen evidence
 

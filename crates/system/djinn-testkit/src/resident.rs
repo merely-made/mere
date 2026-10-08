@@ -9,7 +9,7 @@
 //! status route, and stopped by a kill or by the owner-only stop intent.
 
 use std::collections::{BTreeMap, BTreeSet};
-use std::io::Read;
+use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
 use std::process::{Child, Command, ExitStatus, Output, Stdio};
 use std::sync::Arc;
@@ -29,9 +29,9 @@ const COMMAND_PATIENCE: Duration = Duration::from_secs(60);
 /// The log filter a resident gets unless the test names one.
 pub const DEFAULT_LOG_FILTER: &str = "info";
 
-/// How the resident's vault opens. Lock-enabled residents will not read a
-/// passphrase from the environment (vault lock ruling 7); their unlock
-/// arrives with H4.
+/// How the resident's vault opens. djinn never reads a passphrase from the
+/// environment (vault lock ruling 7); the harness hands it over on standard
+/// input with `--passphrase-fd 0` (ruling 65).
 #[derive(Clone, Debug)]
 pub enum Unlock {
     Passphrase(String),
@@ -194,9 +194,6 @@ impl Resident {
     fn env_map(&self) -> BTreeMap<String, String> {
         let mut env =
             guard::isolated_env(&self.root, &self.endpoint("app"), &self.endpoint("browser"));
-        if let Some(Unlock::Passphrase(passphrase)) = &self.unlock {
-            env.insert("PERSONAE_PASSPHRASE".into(), passphrase.clone());
-        }
         env.extend(self.extra_env.clone());
         env.retain(|name, _| !self.left_out.contains(name));
         env
@@ -233,14 +230,35 @@ impl Resident {
         }
         guard::create_roots(&env).map_err(|error| Refusal(error.to_string()))?;
         let mut command = Command::new(program);
-        command
-            .env_clear()
-            .envs(&env)
-            .args(args)
-            .stdin(Stdio::null());
+        command.env_clear().envs(&env).args(args).stdin(Stdio::null());
+        // djinn reads a passphrase vault's passphrase from standard input,
+        // never the environment (vault lock rulings 7, 65).
+        if self.passphrase_for(program).is_some() {
+            command.arg("--passphrase-fd").arg("0").stdin(Stdio::piped());
+        }
         #[cfg(not(windows))]
         sys::die_with_parent(&mut command);
         Ok(command)
+    }
+
+    /// The passphrase a run of `program` is handed: djinn's, with a
+    /// passphrase vault.
+    fn passphrase_for(&self, program: &Path) -> Option<&str> {
+        match &self.unlock {
+            Some(Unlock::Passphrase(passphrase)) if program == self.shared.binary => {
+                Some(passphrase)
+            },
+            _ => None,
+        }
+    }
+
+    /// Write the passphrase to a spawned djinn and close its input. A
+    /// command that never reads it (status, stop) leaves it in the pipe.
+    fn hand_over(&self, program: &Path, child: &mut Child) {
+        if let (Some(passphrase), Some(mut stdin)) = (self.passphrase_for(program), child.stdin.take())
+        {
+            let _ = stdin.write_all(format!("{passphrase}\n").as_bytes());
+        }
     }
 
     fn adopt(&self, child: &Child, label: String) -> Result<(u32, u64), HarnessError> {
@@ -257,11 +275,12 @@ impl Resident {
 
     /// Spawn a guarded process into the run's job and leave it running.
     pub fn spawn(&self, program: &Path, args: &[String]) -> Result<Child, HarnessError> {
-        let child = self
+        let mut child = self
             .command(program, args)?
             .stdout(Stdio::piped())
             .stderr(Stdio::piped())
             .spawn()?;
+        self.hand_over(program, &mut child);
         let label = format!(
             "{} {}",
             program.file_name().unwrap_or_default().to_string_lossy(),
@@ -457,8 +476,9 @@ impl Resident {
             },
         };
         let stderr = std::fs::File::create(self.stderr_path())?;
-        let child = command.stdout(Stdio::null()).stderr(stderr).spawn()?;
+        let mut child = command.stdout(Stdio::null()).stderr(stderr).spawn()?;
         let spawned_at = Instant::now();
+        self.hand_over(&self.shared.binary.clone(), &mut child);
         let label = format!("{} start {}", self.name, self.starts);
         let (pid, _) = self.adopt(&child, label)?;
         for path in [self.log_path(), self.events_path(), self.stderr_path()] {

@@ -41,6 +41,9 @@ canvas = [
 # `Canvas::set_physics_device`): pictograph `gpu` -> seiche `gpu` ->
 # conatus `resident`. Opt-in per consumer (ruled 2026-10-02).
 canvas-gpu = ["canvas", "pictograph/gpu"]
+# The Meaning channel's sentence model on the host's device (native hosts;
+# dynamics grammar plan, G2).
+canvas-meaning-gpu = ["canvas-gpu", "pictograph/meaning-gpu"]
 # App-host composition and routing. Native hosts use this today; portable
 # graph consumers do not need to pay for it.
 workbench = [

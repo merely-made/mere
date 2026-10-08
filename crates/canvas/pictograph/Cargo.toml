@@ -19,6 +19,11 @@ signals = ["dep:kernel", "dep:cartography", "dep:chartulary"]
 # The canvas's and the board's repulsion staged on the host's GPU
 # (`Canvas::set_physics_device`; physics catalog plan, P5c). Opt-in per consumer.
 gpu = ["canvas", "seiche/gpu"]
+# The Meaning channel's sentence model on the host's own device
+# (`canvas::meaning_device`; dynamics grammar plan, G2, "Burn on the host
+# device, off-path"). Native hosts only: the wasm web build leaves it off and
+# takes the lexical fallback.
+meaning-gpu = ["gpu", "esp/bert-wgpu", "esp/index-burn-wgpu"]
 # The graph canvas (`pictograph::canvas`): graph truth presented through
 # seiche physics, the camera, the node-children pool and the scene-paint
 # underlay. Mere's facade exposes it as `mere::canvas`.
@@ -44,6 +49,8 @@ canvas = [
     "dep:sceno",
     "dep:scenomise",
     "dep:seiche",
+    # The dynamics spec's wire (dynamics grammar plan, G4a).
+    "seiche/serde",
     "dep:serde",
     "dep:serde_json",
     "dep:tincture",

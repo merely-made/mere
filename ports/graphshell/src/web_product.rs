@@ -133,13 +133,10 @@ impl BrowserHost {
         self.canvas.apply_cartography_faces(old.face_iter());
 
         let extents = self.canvas.strategy_extents();
-        let projection = project_canvas_strategy_with_score_for_view(
+        let projection = self.canvas.project_arrangement_for_view(
             &self.layout_id,
-            self.canvas.graph(),
-            self.canvas.focused_key(),
             self.width,
             self.height,
-            None,
             Some(&extents),
             true,
             camera.zoom,
@@ -241,6 +238,10 @@ impl BrowserHost {
         // failing the restore. (Physics catalog — P1.)
         self.canvas.set_physics_kind_source(
             mere::canvas::PhysicsKindSource::parse(&scene.physics_kind_source)
+                .unwrap_or(mere::canvas::PhysicsKindSource::Site),
+        );
+        self.canvas.set_physics_group_source(
+            mere::canvas::PhysicsKindSource::parse(&scene.physics_group_source)
                 .unwrap_or(mere::canvas::PhysicsKindSource::Site),
         );
         self.canvas.set_physics_mass_source(
@@ -406,16 +407,21 @@ impl BrowserHost {
         }
         let previous_score = self.canvas.projection_score().cloned();
         let extents = self.canvas.strategy_extents();
+        let focus = self.canvas.focused_key();
+        let zoom = self.canvas.camera().zoom;
+        // The canvas passes its own registry (dynamics grammar plan, F87).
+        let (registry, graph) = self.canvas.registry_and_graph();
         let projection = project_canvas_strategy_with_score_for_view(
+            registry,
             &self.layout_id,
-            self.canvas.graph(),
-            self.canvas.focused_key(),
+            graph,
+            focus,
             self.width,
             self.height,
             None,
             Some(&extents),
             true,
-            self.canvas.camera().zoom,
+            zoom,
             previous_score.as_ref(),
         );
         self.canvas.set_projection_score(projection.score);
@@ -447,6 +453,8 @@ impl BrowserHost {
             law,
             overlays: canvas_physics::ticked_overlays(|overlay| ticked.contains(&overlay)),
             kind: PhysicsKindSource::parse(&select_value("kind-source-select")?)
+                .unwrap_or(PhysicsKindSource::Site),
+            groups: PhysicsKindSource::parse(&select_value("group-source-select")?)
                 .unwrap_or(PhysicsKindSource::Site),
             mass: PhysicsMassSource::parse(&select_value("mass-source-select")?)
                 .unwrap_or(PhysicsMassSource::Degree),
@@ -546,6 +554,7 @@ impl BrowserHost {
                 .map(|overlay| overlay.id().to_string())
                 .collect(),
             physics_kind_source: self.canvas.physics_kind_source().id().to_string(),
+            physics_group_source: self.canvas.physics_group_source().id().to_string(),
             physics_mass_source: self.canvas.physics_mass_source().id().to_string(),
             physics_depth_source: self.canvas.physics_depth_source().id().to_string(),
             arrangement_pull: self.canvas.anchor_stiffness(),
@@ -556,6 +565,8 @@ impl BrowserHost {
                 )
                 .saved(),
             ),
+            // Nothing writes a spec yet (G4a, F100); G4b's binding does.
+            dynamics: None,
             camera_offset: camera.offset,
             camera_zoom: camera.zoom,
             default_handler: select_value("handler-select")?,
@@ -755,6 +766,10 @@ pub(super) fn update_product_semantics(
         (
             "data-physics-kind-source",
             host.canvas.physics_kind_source().id().to_string(),
+        ),
+        (
+            "data-physics-group-source",
+            host.canvas.physics_group_source().id().to_string(),
         ),
         (
             "data-physics-mass-source",
@@ -981,6 +996,7 @@ fn ensure_physics_controls(host: &BrowserHost) -> Result<(), String> {
     }
     fill_select("physics-select", CANVAS_PHYSICS_LAWS, None)?;
     fill_select("kind-source-select", CANVAS_PHYSICS_KIND_SOURCES, None)?;
+    fill_select("group-source-select", CANVAS_PHYSICS_KIND_SOURCES, None)?;
     fill_select("mass-source-select", CANVAS_PHYSICS_MASS_SOURCES, None)?;
     fill_select("depth-source-select", CANVAS_PHYSICS_DEPTH_SOURCES, None)?;
     let profiles: Vec<(&str, &str)> = CANVAS_PHYSICS_PROFILES
@@ -1033,6 +1049,10 @@ fn sync_physics_controls(host: &BrowserHost) -> Result<(), String> {
             .set_checked(host.canvas.physics_overlays().contains(&overlay));
     }
     set_select_value("kind-source-select", host.canvas.physics_kind_source().id())?;
+    set_select_value(
+        "group-source-select",
+        host.canvas.physics_group_source().id(),
+    )?;
     set_select_value("mass-source-select", host.canvas.physics_mass_source().id())?;
     set_select_value(
         "depth-source-select",
