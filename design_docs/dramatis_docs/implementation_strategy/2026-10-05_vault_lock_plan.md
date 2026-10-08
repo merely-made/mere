@@ -1,7 +1,7 @@
 # Vault Lock Plan
 
 **Date**: 2026-10-05
-**Status (2026-10-08)**: rulings 1 to 70 in §3; the threat statement is
+**Status (2026-10-08)**: rulings 1 to 72 in §3; the threat statement is
 still open. L1 landed (`2556a20c`). L2's checkpoints A (`7c588deb`) and B
 (`ec1768ab`) landed. Still to come in L2: the Secret Service on the
 ThinkPad, ruling 42 (Linux starts locked), ruling 44 (Distillery's
@@ -823,6 +823,26 @@ during `save` (3 of 3 runs; clean on Windows at the same commit).* Options:
 trace it now, with ruling 42's Linux proof waiting; ruling 42's proof
 first; record it and go on to L3. Mark: **"Trace it now (Recommended)"**.
 
+Rulings 71 and 72 were asked on 2026-10-08 from ruling 70's trace (§6).
+
+**Ruling 71** *(the slot table).* *On lock the vault frees its profile's
+slot `HashMap` uncleared. Values moved into it carry stale stack bytes in
+their padding, the master seed among them: Linux, 3 of 4 runs, depending
+on layout.* Options:
+- the slots move to `Vec` storage that `zeroize` wipes whole, padding and
+  spare capacity included, on drop and on growth;
+- clear only at lock;
+- ledger it.
+
+Mark: **"Zeroizing Vec storage (Recommended)"**.
+
+**Ruling 72** *(the test fixture).* *The original Linux hit was
+`no_residue`'s own canary profile, built inside the measured window. Its
+`HashMap` caught half the root key from the test's stack copy.* Options:
+build the fixtures unarmed and drop them after disarming, as the
+passphrase scenario does; keep them armed. Mark: **"Build fixtures unarmed
+(Recommended)"**.
+
 Still open: a threat statement naming hibernation and the pagefile.
 
 ## 4. Phases
@@ -1451,3 +1471,19 @@ unlock follow-through, and non-Windows startup unlock backends, from the
   holds on Windows only. Not yet traced.
 - **Still open:** djinn's wiring and the hand-over from gnome-keyring
   (ruling 69); ruling 42's Linux runtime proof; the Linux residue above.
+
+**2026-10-08, ruling 70's trace.**
+- **Method:** on the ThinkPad, a temporary trap (`int3`) in the tracker's
+  allocator fired at the 564-byte allocation during `save`, and `gdb`
+  printed its stack. A temporary hex dump showed the block's contents.
+  Both were reverted.
+- **The block** was the `HashMap` table of `no_residue`'s own
+  `canary_profile()`, allocated inside the measured window. Beside heap
+  and stack pointers it held 16 bytes of the root key. The key was the
+  test's own stack local, passed by value to `open_with_key` and picked up
+  through padding when slot values were moved into the table.
+- **Building the fixture unarmed** clears "sealed vault locked" (7 of 7
+  runs). It then shows "passphrase vault locked" failing in 3 of 4 runs:
+  the master seed in a 564-byte block allocated at open and freed at lock.
+  That is the vault's own slot table, by the same mechanism, in personae's
+  code. Rulings 71 and 72 settle both.
