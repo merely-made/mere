@@ -1,8 +1,9 @@
 # Graphshell on one Cambium tree
 
 **Date:** 2026-09-25
-**Status (2026-10-08):** in progress, checked against the current reservoir
-integration based on published Mere `05b7357de`. Phases 1–2 are landed; phase 3 has its recorded headed producer
+**Status (2026-10-08):** in progress, checked against the current Graphshell
+intake slice `da466027a`, based on published Mere `79fbbeb75` with Genet
+`15713014`. Phases 1–2 are landed; phase 3 has its recorded headed producer
 receipts and Mark's approval to proceed. Phase 4 remains unfinished: canvas
 controls, elapsed-time physics, saved-graph editing and remote-session slices
 have landed, but the complete page/control migration and acceptance wall have
@@ -491,14 +492,21 @@ completed application migration.
 
 ### Current cutover and reservoir handoff (2026-10-08)
 
-Source rechecked on the reservoir integration based on Mere `05b7357de`;
-the earlier 2026-10-07 refresh used `cd3ebf26d`. No fresh browser or performance
-receipt was produced by the resident wave. The dated progress below records
-what individual lanes qualified.
+Source and bounded intake acceptance rechecked at Mere `da466027a`, based on
+`79fbbeb75` (Genet `15713014`, including the current vault-lock stack). The
+resident wave published earlier as `9403b90a7`; the 2026-10-07 refresh used
+`cd3ebf26d`. The [controls receipt](../testing/2026-09-27_graphshell_controls_physics_receipt.md)
+records this slice's fresh wide/narrow browser checks and native regression
+gates. They do not replace the complete phase-4 scenario or performance wall.
 
 - **Available:** the accessibility mirror, shared file seam, canvas producer,
   shared canvas commands and toolbar, captured dragging, pause/restore,
-  elapsed-time physics, saved Title/Tags editing and remote-session controls.
+  elapsed-time physics, saved Title/Tags editing, durable address/file intake
+  through the existing owner and shared Cambium chooser, and remote-session
+  controls. Intake acknowledges persistence before selecting/opening the new
+  member; rejected writes retain a retryable pending member. Repeated addresses
+  or byte-identical files reuse their identity. The panel now follows the
+  wrapped toolbar, and current text-field sizing is checked at both widths.
   Their scope and limits remain in the linked receipts and the
   [migration inventory](2026-09-27_graphshell_tree_migration_inventory.md).
 - **Still required for phase 4:** complete the remaining product controls;
@@ -522,8 +530,10 @@ what individual lanes qualified.
   Their progress does not close this plan's full page-migration wall, and
   does not establish Cleromancy adoption.
 
-For the next implementation pass, select an unfinished inventory target and
-its scenario/page gate. Record its result here and in the inventory, then
+The next bounded product target is the remaining detail actions (facets,
+relations, handlers and representation), followed by find/arrange and the
+other inventory panels. For each implementation pass, select its unfinished
+target and scenario/page gate. Record its result here and in the inventory, then
 hand the mounted-panel acceptance back to the reservoir plan. Keep V3–V5's
 independent resident/storage work visible there instead of treating the whole
 reservoir as one browser migration.
