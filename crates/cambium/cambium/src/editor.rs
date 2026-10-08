@@ -2,21 +2,24 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-//! Host-agnostic text-editing helpers over [`TextInput`]: an undo/redo
-//! [`EditHistory`] and an auto-pair [`wrap_selection`]. These need nothing but the
-//! buffer, so any Genet host gets undoable, bracket-wrapping fields for free — the
-//! omnibar, a note editor, a chat compose box, a form field. Prose- or
-//! grammar-specific editing (list continuation, structural selection over a djot
-//! container tree) stays with the host that knows the grammar.
+//! Host-agnostic editing helpers: the generic undo/redo [`History`] (from the
+//! `edit-history` crate), the text field's [`EditHistory`] built on it,
+//! and an auto-pair [`wrap_selection`]. Any Genet host gets undoable editors
+//! and bracket-wrapping fields for free — the omnibar, a note editor, a form
+//! field, a projection editor. Prose- or grammar-specific editing (list
+//! continuation, structural selection over a djot container tree) stays with
+//! the host that knows the grammar.
 
 use crate::controls::TextInput;
 use crate::controls::TextSnapshot;
 
-/// Undo/redo history for a [`TextInput`]: a bounded stack of committed text,
-/// caret, and selection snapshots. Composition and completion text are transient
-/// and are cleared when a snapshot is restored. A run of consecutive character
-/// inserts coalesces into one entry, while a delete, newline, or caret move
-/// starts a fresh group.
+pub use edit_history::History;
+
+/// Undo/redo for a [`TextInput`]: a [`History`] of committed text, caret, and
+/// selection snapshots. Composition and completion text are transient and are
+/// cleared when a snapshot is restored. A run of consecutive character inserts
+/// coalesces into one entry, while a delete, newline, or caret move starts a
+/// fresh group.
 ///
 /// This companion is for hosts that need transaction-level grouping and do not
 /// use [`TextInput::apply`](crate::TextInput::apply)'s built-in journal:
@@ -29,37 +32,19 @@ use crate::controls::TextSnapshot;
 /// history.undo(&mut field);
 /// history.redo(&mut field);
 /// ```
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct EditHistory {
-    undo: Vec<TextSnapshot>,
-    redo: Vec<TextSnapshot>,
-    /// Whether the current run of character inserts is coalescing into one entry.
-    coalescing: bool,
-    /// Depth cap; the oldest entry is dropped past it. `0` means unbounded.
-    cap: usize,
-}
-
-impl Default for EditHistory {
-    fn default() -> Self {
-        Self::new()
-    }
-}
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct EditHistory(History<TextSnapshot>);
 
 impl EditHistory {
-    /// A fresh history with a sensible default depth cap (200 — a text field is short and
+    /// A fresh history with the default depth cap (200 — a text field is short and
     /// each entry is a whole-buffer clone, so a bounded stack keeps memory flat).
     pub fn new() -> Self {
-        Self {
-            undo: Vec::new(),
-            redo: Vec::new(),
-            coalescing: false,
-            cap: 200,
-        }
+        Self(History::new())
     }
 
     /// A history with an explicit depth `cap` (`0` = unbounded).
     pub fn with_cap(cap: usize) -> Self {
-        Self { cap, ..Self::new() }
+        Self(History::new().with_cap(cap))
     }
 
     /// Record `input`'s pre-edit state, to call *before* a mutating edit. `coalesce_insert`
@@ -71,31 +56,21 @@ impl EditHistory {
     }
 
     pub(crate) fn record_snapshot(&mut self, snapshot: TextSnapshot, coalesce_insert: bool) {
-        if coalesce_insert && self.coalescing {
-            return;
-        }
-        self.undo.push(snapshot);
-        if self.cap != 0 && self.undo.len() > self.cap {
-            self.undo.remove(0);
-        }
-        self.redo.clear();
-        self.coalescing = coalesce_insert;
+        self.0.record(snapshot, coalesce_insert.then_some(()), 0);
     }
 
     /// End the current insert-coalescing run without snapshotting — for a caret move, so
     /// the next insert starts a fresh group even though nothing was deleted.
     pub fn break_coalesce(&mut self) {
-        self.coalescing = false;
+        self.0.break_run();
     }
 
     /// Undo the last edit: restore the top undo snapshot into `input`, moving the current
     /// buffer onto the redo stack. Returns whether anything was undone.
     pub fn undo(&mut self, input: &mut TextInput) -> bool {
-        let current = input.snapshot();
-        match self.undo_snapshot(current) {
+        match self.undo_snapshot(input.snapshot()) {
             Some(previous) => {
                 input.restore(previous);
-                self.coalescing = false;
                 true
             },
             None => false,
@@ -103,20 +78,15 @@ impl EditHistory {
     }
 
     pub(crate) fn undo_snapshot(&mut self, current: TextSnapshot) -> Option<TextSnapshot> {
-        let previous = self.undo.pop()?;
-        self.redo.push(current);
-        self.coalescing = false;
-        Some(previous)
+        self.0.undo(current)
     }
 
     /// Redo the last undone edit: restore the top redo snapshot into `input`, moving the
     /// current buffer back onto the undo stack. Returns whether anything was redone.
     pub fn redo(&mut self, input: &mut TextInput) -> bool {
-        let current = input.snapshot();
-        match self.redo_snapshot(current) {
+        match self.redo_snapshot(input.snapshot()) {
             Some(next) => {
                 input.restore(next);
-                self.coalescing = false;
                 true
             },
             None => false,
@@ -124,27 +94,22 @@ impl EditHistory {
     }
 
     pub(crate) fn redo_snapshot(&mut self, current: TextSnapshot) -> Option<TextSnapshot> {
-        let next = self.redo.pop()?;
-        self.undo.push(current);
-        self.coalescing = false;
-        Some(next)
+        self.0.redo(current)
     }
 
     /// Drop all history (on a field reset, so a fresh document never undoes into a prior one).
     pub fn clear(&mut self) {
-        self.undo.clear();
-        self.redo.clear();
-        self.coalescing = false;
+        self.0.clear();
     }
 
     /// Whether there is anything to undo.
     pub fn can_undo(&self) -> bool {
-        !self.undo.is_empty()
+        self.0.can_undo()
     }
 
     /// Whether there is anything to redo.
     pub fn can_redo(&self) -> bool {
-        !self.redo.is_empty()
+        self.0.can_redo()
     }
 }
 

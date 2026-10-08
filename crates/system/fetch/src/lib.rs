@@ -27,7 +27,7 @@
 
 #[cfg(feature = "actor")]
 use std::collections::HashMap;
-use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
+use std::sync::atomic::{AtomicBool, Ordering};
 #[cfg(feature = "actor")]
 use std::sync::mpsc::Receiver;
 use std::sync::{Arc, OnceLock};
@@ -64,112 +64,11 @@ const PAGE_BODY_CAP: usize = 64 * 1024 * 1024;
 #[cfg(feature = "actor")]
 const SUBRESOURCE_BODY_CAP: usize = 32 * 1024 * 1024;
 
-/// Process-local correlation for one page request. The id crosses the actor
-/// boundary unchanged so hosts can cancel one node's load without affecting a
-/// second node fetching the same address.
-pub type FetchRequestId = u64;
-
-static NEXT_FETCH_REQUEST: AtomicU64 = AtomicU64::new(1);
-
-pub fn next_fetch_request_id() -> FetchRequestId {
-    NEXT_FETCH_REQUEST.fetch_add(1, Ordering::Relaxed)
-}
-
-/// Successfully fetched content. Rendering uses the decoded text while hosts
-/// that retain or download a response use the original bytes.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct Fetched {
-    pub content_type: Option<String>,
-    pub content_disposition: Option<String>,
-    pub bytes: Vec<u8>,
-    pub body: String,
-}
-
-impl Fetched {
-    /// Build a text fixture while keeping the byte and decoded views coherent.
-    pub fn text(content_type: Option<String>, body: impl Into<String>) -> Self {
-        let body = body.into();
-        let bytes = body.as_bytes().to_vec();
-        Self {
-            content_type,
-            content_disposition: None,
-            bytes,
-            body,
-        }
-    }
-}
-
-/// A page request that needs host participation rather than being reducible
-/// to a terminal error string. The fetch actor preserves these arms so a UI
-/// host can continue the protocol conversation without parsing prose.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub enum FetchFailure {
-    /// The host explicitly stopped this request.
-    Cancelled,
-    /// A Gemini-style input response. `url` is the final request address after
-    /// redirects and is therefore the address the submitted query belongs to.
-    InputRequired {
-        url: String,
-        prompt: String,
-        sensitive: bool,
-    },
-    /// The server requires a client certificate. Identity selection remains
-    /// a host decision; carrying the target keeps that later conversation
-    /// typed instead of collapsing it into an ordinary transport failure.
-    ClientCertificateRequired {
-        url: String,
-        prompt: String,
-        code: Option<u8>,
-    },
-    /// A Gemini capsule presented a certificate that differs from its durable
-    /// pin. The request was not sent; the host must ask a human before replacing
-    /// `pinned` with `seen` and retrying `url`.
-    CertificateChanged {
-        url: String,
-        target: String,
-        pinned: String,
-        seen: String,
-    },
-    /// A terminal transport, protocol, HTTP, or size-limit failure.
-    Failed(String),
-}
-
-impl std::fmt::Display for FetchFailure {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Self::Cancelled => f.write_str("cancelled"),
-            Self::InputRequired { prompt, .. } => write!(f, "input required: {prompt}"),
-            Self::ClientCertificateRequired { .. } => f.write_str("client certificate required"),
-            Self::CertificateChanged { target, .. } => {
-                write!(f, "certificate for {target} changed")
-            },
-            Self::Failed(error) => f.write_str(error),
-        }
-    }
-}
-
-/// The result of one fetch, tagged with the requested URL so the host routes it
-/// back to the right node's content slot.
-pub struct FetchOutcome {
-    pub request: FetchRequestId,
-    pub url: String,
-    pub result: Result<Fetched, FetchFailure>,
-}
-
-/// One exact page-body fragment observed before the terminal fetch outcome.
-/// Only Gemini currently exposes transport reads incrementally; the final
-/// [`FetchOutcome`] remains authoritative and retains the complete bytes.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct PageProgress {
-    /// Exact actor request this fragment belongs to.
-    pub request: FetchRequestId,
-    /// Original address used to correlate the actor request.
-    pub url: String,
-    /// Address of the successful response after any redirects.
-    pub response_url: String,
-    pub content_type: Option<String>,
-    pub bytes: Vec<u8>,
-}
+/// The fetch vocabulary lives in `page-load` so a controller can speak it
+/// without linking this actor's transport. Re-exported unchanged.
+pub use page_load::{
+    FetchFailure, FetchOutcome, FetchRequestId, Fetched, PageProgress, next_fetch_request_id,
+};
 
 /// One explicit small-web mutation. Kept separate from page fetches so the
 /// actor cannot deduplicate, redirect-follow, or retry a write as if it were a

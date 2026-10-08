@@ -324,6 +324,7 @@ impl Canvas {
     pub(crate) fn advance_roles(&mut self) {
         self.note_settle();
         self.advance_home();
+        self.advance_schedule();
     }
 
     /// Fold one frame into the settle record: a playing graph whose bodies'

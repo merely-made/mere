@@ -200,6 +200,8 @@ impl Canvas {
             weighted_edges_rebuilds: 0,
             height_by_degree: false,
             marquee: None,
+            empty_press: None,
+            context_request: None,
             ctrl: false,
             shift: false,
             alt: false,
@@ -216,6 +218,8 @@ impl Canvas {
             physics_kind_source: crate::canvas::PhysicsKindSource::Site,
             physics_mass_source: crate::canvas::PhysicsMassSource::Degree,
             physics_depth_source: crate::canvas::PhysicsDepthSource::Roots,
+            physics_composition: None,
+            schedule: None,
             #[cfg(test)]
             law_rebuilds: 0,
             restored_score_hold: None,

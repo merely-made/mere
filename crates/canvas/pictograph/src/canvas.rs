@@ -194,14 +194,21 @@ pub mod physics_board;
 pub mod physics_device;
 #[cfg(feature = "gpu")]
 pub use physics_device::{PhysicsDevice, physics_device_for};
+/// Compositions beyond a law and its overlays: a weighted mix of force laws
+/// and groups. (Dynamics grammar plan, G3.)
+pub mod composition;
 /// The physics catalog: the laws a graph can move under, the overlays composed
 /// onto them, and the named profiles. (Physics catalog — P1.)
 pub mod physics_catalog;
+/// Schedules of compositions, each stage to its stop, with captures taken by
+/// role. (Dynamics grammar plan, G3.)
+pub mod schedule;
 pub use board_scene::{
     BoardBackdrop, BoardCard, BoardFit, BoardFootprint, BoardRect, BoardScene, BoardText,
     BoardTransform,
     backdrop_color,
 };
+pub use composition::{CompositionRefusal, PhysicsComposition, PhysicsGrouping};
 pub use physics_board::{BoardItem, PhysicsBoard, PhysicsChoice};
 pub use physics_catalog::{
     CANVAS_PHYSICS_DEPTH_SOURCES, CANVAS_PHYSICS_KIND_SOURCES, CANVAS_PHYSICS_LAWS,
@@ -210,6 +217,7 @@ pub use physics_catalog::{
     PhysicsDepthSource, PhysicsKindSource, PhysicsLaw, PhysicsMassSource, PhysicsOverlay,
     PhysicsProfile,
 };
+pub use schedule::{CAPTURED_ARRANGEMENT, PhysicsStage, StageStop};
 
 /// Force-directed settle length (frames) after a (re)seed, ~6s at 60fps.
 const SETTLE_TICKS: u32 = 360;
@@ -278,6 +286,28 @@ struct Drag {
     /// Set once the pointer has moved past the slop — a real drag. Its release
     /// follows the node's arrangement role (`Canvas::release_dragged`).
     moved: bool,
+}
+
+/// An in-progress left press on empty canvas: a click until the pointer passes
+/// [`CLICK_SLOP`], then a pan that carries the middle-drag's momentum
+/// (Scenograph editor plan, SE23).
+#[derive(Clone, Copy)]
+struct EmptyPress {
+    /// Press position in screen px (the click/pan-slop origin).
+    press: (f32, f32),
+    /// The cursor at the last pan step.
+    last: (f32, f32),
+    /// Set once the pointer has moved past the slop: a pan.
+    panning: bool,
+}
+
+/// A right click the canvas did not use, for the host to answer with its
+/// context menu (SE26): where it landed, and the node under it, if any.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct ContextRequest {
+    /// Screen px.
+    pub at: (f32, f32),
+    pub node: Option<uuid::Uuid>,
 }
 
 /// The reversible, view-local portion of a fold action. Graph nodes, relation
@@ -611,9 +641,13 @@ pub struct Canvas {
     /// (hubs highest), with a stem to its ground anchor — the isometric "fake height".
     /// Purely visual (the seiche body does not move). Default off. (Isometric camera P3.)
     height_by_degree: bool,
-    /// `Some(press_origin)` (screen px) while a left-drag marquee on empty space
-    /// is in progress.
+    /// `Some(press_origin)` (screen px) while a right-drag marquee is in
+    /// progress (SE23).
     marquee: Option<(f32, f32)>,
+    /// A left press on empty canvas, a click or a pan (SE23).
+    empty_press: Option<EmptyPress>,
+    /// A right click waiting for the host's context menu (SE26).
+    context_request: Option<ContextRequest>,
     /// Whether Ctrl is held (gates wheel-zoom vs wheel-pan).
     ctrl: bool,
     /// Whether Shift is held (a node click adds to / toggles the selection rather
@@ -667,6 +701,11 @@ pub struct Canvas {
     /// Where the Depth overlay reads a node's depth from (roots, layers, the
     /// focus). (Physics catalog — P1b.)
     physics_depth_source: PhysicsDepthSource,
+    /// A composition the law slot runs instead of the law: a weighted mix of
+    /// force laws, or groups. `None` runs the law. (Dynamics grammar plan, G3.)
+    physics_composition: Option<composition::PhysicsComposition>,
+    /// A schedule of compositions under way, if any. (Dynamics grammar plan, G3.)
+    schedule: Option<schedule::ScheduleRun>,
     /// How many times the law + overlay force set was rebuilt. Test only.
     #[cfg(test)]
     law_rebuilds: usize,
