@@ -32,6 +32,7 @@ pub struct PeltRegistries<F> {
     fallback_document_engine: String,
     surface_profile: EngineProfileBinding,
     host_loading: bool,
+    host_history: bool,
 }
 
 impl<F> Clone for PeltRegistries<F> {
@@ -44,6 +45,7 @@ impl<F> Clone for PeltRegistries<F> {
             fallback_document_engine: self.fallback_document_engine.clone(),
             surface_profile: self.surface_profile.clone(),
             host_loading: self.host_loading,
+            host_history: self.host_history,
         }
     }
 }
@@ -65,6 +67,7 @@ impl<F> PeltRegistries<F> {
             fallback_document_engine: fallback_document_engine.into(),
             surface_profile,
             host_loading: false,
+            host_history: false,
         }
     }
 
@@ -77,6 +80,17 @@ impl<F> PeltRegistries<F> {
 
     pub fn host_loading(&self) -> bool {
         self.host_loading
+    }
+
+    /// Every document controller opened through these registries leaves
+    /// history to the host (see [`crate::PeltHistoryMode::Host`]).
+    pub fn with_host_history(mut self) -> Self {
+        self.host_history = true;
+        self
+    }
+
+    pub fn host_history(&self) -> bool {
+        self.host_history
     }
 
     pub fn sessions(&self) -> &SessionRegistry<F> {

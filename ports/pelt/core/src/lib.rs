@@ -80,6 +80,39 @@ pub enum PeltLoadMode {
     Host,
 }
 
+/// Who keeps a controller's back/forward history.
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+pub enum PeltHistoryMode {
+    /// The controller keeps a linear history: links push, Back and Forward
+    /// traverse. Pelt's original mode.
+    #[default]
+    Linear,
+    /// The host keeps history. The controller holds only its current entry:
+    /// a link or GET form becomes a [`PeltNavigationRequest`] in the host
+    /// effect and nothing loads, Back and Forward come back unhandled, and the
+    /// host loads its chosen entry with [`PeltController::open`]. Turnstone's
+    /// history is its graph: a link opens or mints a node.
+    Host,
+}
+
+/// Why a document asked to navigate, so a host-history policy can choose a
+/// disposition (this content, a new node, a new tile).
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub enum PeltNavigationCause {
+    /// A link the user activated, with the modifiers held at the time.
+    Link { modifiers: inker::SessionModifiers },
+    /// A GET form submission, its fields already in the address.
+    FormGet,
+}
+
+/// A navigation a host-history controller hands to its host instead of
+/// loading. The address is resolved against the current document.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct PeltNavigationRequest {
+    pub request: SessionSpawnRequest,
+    pub cause: PeltNavigationCause,
+}
+
 /// One command for the host's transport.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum PeltLoadCommand {
@@ -177,6 +210,7 @@ pub struct PeltControllerConfig {
     pub engine_id: String,
     pub request: SessionSpawnRequest,
     pub load_mode: PeltLoadMode,
+    pub history_mode: PeltHistoryMode,
 }
 
 impl PeltControllerConfig {
@@ -199,6 +233,7 @@ impl PeltControllerConfig {
             engine_id: engine_id.into(),
             request,
             load_mode: PeltLoadMode::Engine,
+            history_mode: PeltHistoryMode::Linear,
         }
     }
 
@@ -207,6 +242,12 @@ impl PeltControllerConfig {
     /// first fetch.
     pub fn with_host_loading(mut self) -> Self {
         self.load_mode = PeltLoadMode::Host;
+        self
+    }
+
+    /// Let the host keep history (see [`PeltHistoryMode::Host`]).
+    pub fn with_host_history(mut self) -> Self {
+        self.history_mode = PeltHistoryMode::Host;
         self
     }
 }
@@ -225,6 +266,8 @@ pub struct PeltHostEffect {
     pub download: Option<PeltDownload>,
     /// A routed controller's new load belongs to a surface lane.
     pub reroute: Option<PeltReroute>,
+    /// A host-history controller's navigation, for the host to place.
+    pub navigation: Option<PeltNavigationRequest>,
 }
 
 /// Pelt's reusable one-session browser controller.
@@ -247,6 +290,7 @@ pub struct PeltController<F> {
     instance_id: u64,
     session_generation: u64,
     load_mode: PeltLoadMode,
+    history_mode: PeltHistoryMode,
     load: PageLoad,
     pending: Option<PendingLoad>,
     load_commands: Vec<PeltLoadCommand>,
@@ -318,6 +362,7 @@ impl<F: 'static> PeltController<F> {
             // session" for hosts that retain child trees across tiles.
             session_generation: 1,
             load_mode: config.load_mode,
+            history_mode: config.history_mode,
             load: PageLoad::default(),
             pending: None,
             load_commands: Vec::new(),
@@ -334,6 +379,23 @@ impl<F: 'static> PeltController<F> {
 
     pub fn load_mode(&self) -> PeltLoadMode {
         self.load_mode
+    }
+
+    pub fn history_mode(&self) -> PeltHistoryMode {
+        self.history_mode
+    }
+
+    /// Load `request` as the current entry, replacing it rather than adding
+    /// history. A held body opens directly, whichever loading mode is set;
+    /// otherwise the request loads as any other (engine fetch or host
+    /// transport). It is routed like any new load, so it may change engine or
+    /// hand the content a surface reroute. A host-history host calls this for
+    /// the entry its own history chose.
+    pub fn open(&mut self, request: SessionSpawnRequest) -> PeltHostEffect {
+        let mut host_effect = PeltHostEffect::default();
+        let request = request.with_viewport(self.viewport.0, self.viewport.1);
+        self.load_request(request, HistoryCommit::Replace, &mut host_effect);
+        host_effect
     }
 
     /// Route every new load through shared registries, keeping `route` as
@@ -587,6 +649,7 @@ impl<F: 'static> PeltController<F> {
     }
 
     pub fn input(&mut self, input: SessionInput) -> PeltHostEffect {
+        let modifiers = input_modifiers(&input);
         let SessionInputResult {
             effect,
             cursor,
@@ -602,11 +665,15 @@ impl<F: 'static> PeltController<F> {
             ..PeltHostEffect::default()
         };
         match effect {
-            SessionEffect::Navigate(target) => self.navigate_effect(target, &mut host_effect),
+            SessionEffect::Navigate(target) => self.follow(
+                target,
+                PeltNavigationCause::Link { modifiers },
+                &mut host_effect,
+            ),
             SessionEffect::Submit(submission) => match submission.method {
                 SessionFormMethod::Get => {
                     let target = get_submission_target(&submission.action, &submission.fields);
-                    self.navigate_effect(target, &mut host_effect);
+                    self.follow(target, PeltNavigationCause::FormGet, &mut host_effect);
                 },
                 SessionFormMethod::Post => {
                     let address = self.address().to_owned();
@@ -623,6 +690,20 @@ impl<F: 'static> PeltController<F> {
     }
 
     pub fn command(&mut self, command: SessionNavigationCommand) -> PeltHostEffect {
+        if self.history_mode == PeltHistoryMode::Host {
+            match command {
+                // The host's history traverses; this controller has none.
+                SessionNavigationCommand::Back | SessionNavigationCommand::Forward => {
+                    return PeltHostEffect::default();
+                },
+                // The host's own address request opens in place.
+                SessionNavigationCommand::Address(address) => {
+                    let target = resolve_href(self.address(), &address);
+                    return self.open(SessionSpawnRequest::new(target));
+                },
+                SessionNavigationCommand::Reload | SessionNavigationCommand::Stop => {},
+            }
+        }
         if self.load_mode == PeltLoadMode::Host {
             return self.host_load_command(command);
         }
@@ -880,17 +961,39 @@ impl<F: 'static> PeltController<F> {
                 engine_id,
                 request: pending.entry.clone(),
             };
-            match pending.commit {
-                HistoryCommit::Push => {
-                    self.history.truncate(self.history_index + 1);
-                    self.history.push(entry);
-                    self.history_index += 1;
-                },
-                HistoryCommit::Replace => self.history[self.history_index] = entry,
-                HistoryCommit::Traverse(index) => self.history_index = index,
-            }
+            self.commit_entry(entry, pending.commit);
         }
         Ok(())
+    }
+
+    fn commit_entry(&mut self, entry: HistoryEntry, commit: HistoryCommit) {
+        match commit {
+            HistoryCommit::Push => {
+                self.history.truncate(self.history_index + 1);
+                self.history.push(entry);
+                self.history_index += 1;
+            },
+            HistoryCommit::Replace => self.history[self.history_index] = entry,
+            HistoryCommit::Traverse(index) => {
+                self.history[index] = entry;
+                self.history_index = index;
+            },
+        }
+    }
+
+    /// Retire a host load in flight, cancelling its exact request.
+    fn abandon_pending(&mut self) {
+        if self.pending.take().is_some()
+            && let Some(request) = self.load.stop_active()
+        {
+            self.load_commands.push(PeltLoadCommand::Cancel { request });
+        }
+    }
+
+    fn pinned_engine(&self) -> Option<String> {
+        self.router
+            .as_ref()
+            .and_then(|router| router.engine_override.clone())
     }
 
     fn replace_live_body(&mut self, url: &str, body: &str) -> bool {
@@ -908,10 +1011,42 @@ impl<F: 'static> PeltController<F> {
         }
     }
 
+    /// A document's own navigation: placed by the host under host history,
+    /// pushed onto this controller's history otherwise.
+    fn follow(
+        &mut self,
+        target: String,
+        cause: PeltNavigationCause,
+        host_effect: &mut PeltHostEffect,
+    ) {
+        if self.history_mode == PeltHistoryMode::Host {
+            let target = resolve_href(self.address(), &target);
+            host_effect.handled = true;
+            host_effect.navigation = Some(PeltNavigationRequest {
+                request: SessionSpawnRequest::new(target)
+                    .with_viewport(self.viewport.0, self.viewport.1),
+                cause,
+            });
+            return;
+        }
+        self.navigate_effect(target, host_effect);
+    }
+
     fn navigate_effect(&mut self, target: String, host_effect: &mut PeltHostEffect) {
         let target = resolve_href(self.address(), &target);
         let request =
             SessionSpawnRequest::new(target).with_viewport(self.viewport.0, self.viewport.1);
+        self.load_request(request, HistoryCommit::Push, host_effect);
+    }
+
+    /// Route and load one new request, committing it to history as `commit`
+    /// says once it opens.
+    fn load_request(
+        &mut self,
+        request: SessionSpawnRequest,
+        commit: HistoryCommit,
+        host_effect: &mut PeltHostEffect,
+    ) {
         let choice = match self.route_load(&request) {
             Ok(choice) => choice,
             Err(error) => return self.document_error(request.address, error, host_effect),
@@ -927,20 +1062,44 @@ impl<F: 'static> PeltController<F> {
             },
             LoadRoute::Document { engine_id, route } => (engine_id, route),
         };
+        if request.body.is_some() {
+            // A held body opens now; any transfer still in flight is
+            // superseded. Its media type may choose another document engine.
+            self.abandon_pending();
+            let (engine_id, route) = match &self.router {
+                Some(_) if self.pinned_engine().is_none() => match self.document_route(&request) {
+                    Ok(choice) => choice,
+                    Err(error) => {
+                        return self.document_error(request.address, error, host_effect);
+                    },
+                },
+                _ => (engine_id, route),
+            };
+            return self.spawn_and_commit(engine_id, route, request, commit, host_effect);
+        }
         if self.load_mode == PeltLoadMode::Host {
             // The response's media type may still choose another document
             // engine, so only an explicit pin is carried to the open.
             let pinned = self
-                .router
-                .as_ref()
-                .and_then(|router| router.engine_override.clone())
+                .pinned_engine()
                 .or_else(|| self.router.is_none().then(|| engine_id.clone()));
-            self.begin_load(request, pinned, HistoryCommit::Push);
+            self.begin_load(request, pinned, commit);
             host_effect.handled = true;
             host_effect.redraw = true;
             host_effect.editable = false;
             return;
         }
+        self.spawn_and_commit(engine_id, route, request, commit, host_effect);
+    }
+
+    fn spawn_and_commit(
+        &mut self,
+        engine_id: String,
+        route: Option<PeltRoute>,
+        request: SessionSpawnRequest,
+        commit: HistoryCommit,
+        host_effect: &mut PeltHostEffect,
+    ) {
         match self.spawn_with(&engine_id, &request) {
             Ok(session) => {
                 let address = request.address.clone();
@@ -948,9 +1107,7 @@ impl<F: 'static> PeltController<F> {
                 if route.is_some() {
                     self.route = route;
                 }
-                self.history.truncate(self.history_index + 1);
-                self.history.push(HistoryEntry { engine_id, request });
-                self.history_index += 1;
+                self.commit_entry(HistoryEntry { engine_id, request }, commit);
                 self.document_state = PeltDocumentState::Loading { address };
                 host_effect.handled = true;
                 host_effect.redraw = true;
@@ -1057,6 +1214,16 @@ impl<F: 'static> PeltController<F> {
         // though the active session and history stay unchanged.
         host_effect.handled = true;
         host_effect.redraw = true;
+    }
+}
+
+/// The modifiers an input carried, for a link's disposition.
+fn input_modifiers(input: &SessionInput) -> inker::SessionModifiers {
+    match input {
+        SessionInput::PointerButton { modifiers, .. }
+        | SessionInput::PointerMoved { modifiers, .. }
+        | SessionInput::Key { modifiers, .. } => *modifiers,
+        _ => inker::SessionModifiers::default(),
     }
 }
 
