@@ -1,5 +1,5 @@
 {
-  "schema": "pictograph.meaning-model/v1",
+  "schema": "esp.meaning-model/v1",
   "model": {
     "model_id": "intfloat/e5-base-v2",
     "revision": "f52bf8ec8c7124536f0efb74aca902b2995e5bcd",

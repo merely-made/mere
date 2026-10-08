@@ -20,6 +20,32 @@ import transformers
 from transformers import AutoModel, AutoTokenizer
 
 
+MANIFEST_SCHEMA = "esp.meaning-model/v1"
+
+
+def resolve_row(row: dict, mere_root: Path) -> dict:
+    """A row naming a manifest takes its pin from that file, the one copy of
+    it: ESP's pinned Meaning model (dynamics grammar plan, F89). The row keeps
+    its own fetch path and reference."""
+    if "manifest" not in row:
+        return row
+    pin = json.loads((mere_root / row["manifest"]).read_text(encoding="utf-8"))
+    if pin["schema"] != MANIFEST_SCHEMA:
+        raise ValueError(f"{row['manifest']} had schema {pin['schema']!r}")
+    model = pin["model"]
+    return {
+        "model_id": model["model_id"],
+        "revision": model["revision"],
+        "model_base_url": row["model_base_url"],
+        "architecture": model["architecture"],
+        "license": model["license"],
+        "pooling": model["pooling"],
+        "expected_dimensions": model["dimensions"],
+        "artifacts": model["artifacts"],
+        "reference": row.get("reference"),
+    }
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--matrix", type=Path, default=Path(__file__).with_name("model-matrix.json"))
@@ -29,7 +55,7 @@ def main() -> None:
     matrix = json.loads(arguments.matrix.read_text(encoding="utf-8"))
     mere_root = arguments.matrix.resolve().parents[3]
     results = []
-    for row in matrix["models"]:
+    for row in (resolve_row(row, mere_root) for row in matrix["models"]):
         if arguments.model and row["model_id"] != arguments.model:
             continue
         model_dir = mere_root / row["model_base_url"].removeprefix("/")

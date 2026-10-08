@@ -80,6 +80,32 @@ function formatBytes(bytes) {
   return `${(bytes / 1_000_000).toFixed(1)} MB`;
 }
 
+// A row naming a manifest takes its pin from that file, the one copy of it:
+// ESP's pinned Meaning model (dynamics grammar plan, F89), served from the
+// Mere root as run-probe.ps1 serves it. The row keeps its own fetch path and
+// reference.
+async function resolveRow(row) {
+  if (!row.manifest) return row;
+  const response = await fetch(`/${row.manifest}`, { cache: "no-store" });
+  if (!response.ok) throw new Error(`${row.manifest}: HTTP ${response.status}`);
+  const pin = await response.json();
+  if (pin.schema !== "esp.meaning-model/v1") {
+    throw new Error(`${row.manifest} had the wrong schema`);
+  }
+  const model = pin.model;
+  return {
+    model_id: model.model_id,
+    revision: model.revision,
+    model_base_url: row.model_base_url,
+    architecture: model.architecture,
+    license: model.license,
+    pooling: model.pooling,
+    expected_dimensions: model.dimensions,
+    artifacts: model.artifacts,
+    reference: row.reference,
+  };
+}
+
 async function loadMatrix() {
   const response = await fetch("../model-matrix.json", { cache: "no-store" });
   if (!response.ok) throw new Error(`model matrix: HTTP ${response.status}`);
@@ -87,6 +113,7 @@ async function loadMatrix() {
   if (parsed.schema !== "distillery.browser-model-matrix/v1" || !parsed.models?.length) {
     throw new Error("model matrix had the wrong schema or no rows");
   }
+  parsed.models = await Promise.all(parsed.models.map(resolveRow));
   matrixConfiguration = parsed;
   modelSelection.replaceChildren();
   for (const model of parsed.models) {

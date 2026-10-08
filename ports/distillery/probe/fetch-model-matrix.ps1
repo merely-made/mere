@@ -15,7 +15,31 @@ $mereRoot = (Resolve-Path (Join-Path $probeRoot '..\..\..')).Path
 $modelsRoot = Join-Path $mereRoot 'models'
 $configuration = Get-Content -Raw $Matrix | ConvertFrom-Json
 $decoderConfiguration = Get-Content -Raw $Decoder | ConvertFrom-Json
-$models = @($configuration.models) + @($decoderConfiguration.model)
+
+# A row naming a manifest takes its pin from that file, the one copy of it:
+# ESP's pinned Meaning model (dynamics grammar plan, F89). The row keeps its
+# own fetch path and reference.
+function Resolve-Row($row) {
+    if (-not $row.manifest) { return $row }
+    $pin = (Get-Content -Raw (Join-Path $mereRoot $row.manifest) | ConvertFrom-Json)
+    if ($pin.schema -ne 'esp.meaning-model/v1') {
+        throw "$($row.manifest) had schema '$($pin.schema)'"
+    }
+    $model = $pin.model
+    [pscustomobject]@{
+        model_id            = $model.model_id
+        revision            = $model.revision
+        model_base_url      = $row.model_base_url
+        architecture        = $model.architecture
+        license             = $model.license
+        pooling             = $model.pooling
+        expected_dimensions = $model.dimensions
+        artifacts           = $model.artifacts
+        reference           = $row.reference
+    }
+}
+
+$models = @($configuration.models | ForEach-Object { Resolve-Row $_ }) + @($decoderConfiguration.model)
 
 foreach ($model in $models) {
     $relativeDirectory = $model.model_base_url -replace '^/models/', ''
