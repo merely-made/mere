@@ -174,6 +174,16 @@ changes 33 source revisions and 31 dependency source references without moving
 versions, graph shape/checksums or the two legacy Knot identities. Locked
 metadata resolution and actual native-field tests remain required here.
 
+Locked resolution now verifies the same 1,564-node default graph after source
+revision and checkout-path normalization. It resolves 28 of 33 locked current
+Genet packages, preserves both legacy identities and activates neither engine.
+The uncached Git revision is fetched from the primary checkout using only the
+process-local rewrite. All six native targets then pass 63 tests, including
+the repaired default and configurable widths and existing caret/scroll/routing
+behavior. Exact manifest/lock restoration and unowned source bytes/mtimes are
+verified. Catalog and bridge-control qualification follow; the two outstanding
+policy/scope questions still await Mark's answers.
+
 The downstream read-only audit finds old tag checks in Turnstone and Cleromancy.
 Their mechanical selector/caret/existing-label follow-ups await explicit scope
 authorization; currently unnamed fields retain that state. No sibling source
