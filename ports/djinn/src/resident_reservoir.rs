@@ -61,32 +61,6 @@ pub const RESIDENT_RESERVOIR_NOTICE_POLL: Duration = Duration::from_millis(50);
 pub const RESERVOIR_ENSURE_MERE_INTENT: &str = "mere.reservoir.ensure";
 /// Schema of [`EnsureMereV1`].
 pub const ENSURE_MERE_SCHEMA: &str = "mere.reservoir.ensure/v1";
-/// Record independent explicit-access and ambient-crossing decisions.
-pub const RESERVOIR_SET_ACCESS_INTENT: &str = "mere.reservoir.set-access";
-pub const SET_ACCESS_SCHEMA: &str = "mere.reservoir.set-access/v1";
-
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct SetMereAccessV1 {
-    pub schema: String,
-    pub mere: MereId,
-    pub application: String,
-    pub denied: bool,
-    pub ambient: bool,
-}
-
-impl SetMereAccessV1 {
-    pub fn new(mere: MereId, app: &AppId, denied: bool, ambient: bool) -> Self {
-        Self {
-            schema: SET_ACCESS_SCHEMA.into(),
-            mere,
-            application: app.to_string(),
-            denied,
-            ambient,
-        }
-    }
-}
-
 const SESSION: &str = "djinn.reservoir/v1";
 const SOURCE_KIND: &str = "mere.reservoir";
 const EPOCH: SceneEpoch = SceneEpoch(1);
@@ -317,18 +291,6 @@ impl ReservoirEndpoint {
         }
     }
 
-    fn access_action() -> AdvertisedAction {
-        AdvertisedAction {
-            intent: IntentReference(RESERVOIR_SET_ACCESS_INTENT.into()),
-            label: "Set mere access".into(),
-            explanation: "Record an application denial or opt in a mere for ambient reading."
-                .into(),
-            payload_schema: SET_ACCESS_SCHEMA.into(),
-            input_form: None,
-            effect: IntentEffect::DomainTruth,
-        }
-    }
-
     /// The reservoir card first, then one card per mere in domain order.
     fn cards(&self) -> Result<Vec<ServedCard>, String> {
         let meres = self.run(async {
@@ -365,11 +327,7 @@ impl ReservoirEndpoint {
             source: "reservoir".into(),
             label: "Reservoir".into(),
             bytes: serde_json::to_vec(&reservoir).map_err(|error| error.to_string())?,
-            actions: if self.routes.is_some() && self.application.is_some() {
-                vec![Self::ensure_action(), Self::access_action()]
-            } else {
-                vec![Self::ensure_action()]
-            },
+            actions: vec![Self::ensure_action()],
         });
         for mere in meres {
             let card = PortableCardV1 {
@@ -513,47 +471,6 @@ impl IntentSink for ReservoirEndpoint {
             return Ok(result);
         }
         match intent.intent.as_str() {
-            RESERVOIR_SET_ACCESS_INTENT => {
-                let Some(via) = self.application.clone() else {
-                    return Ok(IntentResult::Rejected {
-                        reason: "access decisions require an admitted application".into(),
-                    });
-                };
-                let Some(routes) = &self.routes else {
-                    return Ok(IntentResult::Rejected {
-                        reason: "mere access routes are unavailable".into(),
-                    });
-                };
-                let access: SetMereAccessV1 = match serde_json::from_slice(&intent.payload) {
-                    Ok(access) => access,
-                    Err(error) => {
-                        return Ok(IntentResult::Rejected {
-                            reason: format!("invalid access payload: {error}"),
-                        });
-                    },
-                };
-                if access.schema != SET_ACCESS_SCHEMA {
-                    return Ok(IntentResult::Rejected {
-                        reason: "unknown mere access schema".into(),
-                    });
-                }
-                let reservoir = ResidentReservoir {
-                    shared: Arc::clone(&self.shared),
-                };
-                return Ok(
-                    match self.run(routes.set_access(
-                        &reservoir,
-                        access.mere,
-                        AppId::new(access.application),
-                        access.denied,
-                        access.ambient,
-                        via,
-                    )) {
-                        Ok(()) => IntentResult::Accepted,
-                        Err(reason) => IntentResult::Rejected { reason },
-                    },
-                );
-            },
             RESERVOIR_ENSURE_MERE_INTENT => {
                 let ensure: EnsureMereV1 = match serde_json::from_slice(&intent.payload) {
                     Ok(ensure) => ensure,

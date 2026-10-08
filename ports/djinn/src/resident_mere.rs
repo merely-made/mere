@@ -153,6 +153,9 @@ impl MereRoutes {
         Ok(())
     }
 
+    /// Owner-side permission management for trusted resident configuration.
+    /// Ordinary admitted product endpoints never expose this capability. The
+    /// `via` label records provenance; it is not evidence of owner approval.
     /// Commit first, then publish an atomic door update. A failed storage
     /// write changes no grant; a restarted resident replays the committed
     /// decisions before it opens any routes.
@@ -1858,60 +1861,74 @@ mod tests {
         endpoint.describe().projections[0].request.clone()
     }
     #[tokio::test(flavor = "multi_thread")]
-    async fn reservoir_access_intent_records_the_admitted_author_and_validates_payload() {
-        use crate::resident_reservoir::{RESERVOIR_SET_ACCESS_INTENT, SetMereAccessV1};
+    async fn a_product_client_cannot_clear_denial_or_opt_in_ambient_through_the_reservoir() {
         let fixture = fixture(25, "divination").await;
         let mere = fixture.reservoir.meres().await.remove(0);
-        let mut control = fixture
-            .catalog
-            .update(|catalog| catalog.open(RESIDENT_RESERVOIR_ROUTE, &context("turnstone")))
+        let denied = AppId::new("knot-editor");
+        fixture
+            .routes
+            .set_access(
+                &fixture.reservoir,
+                mere.id,
+                denied.clone(),
+                true,
+                false,
+                AppId::new("turnstone"),
+            )
             .await
             .unwrap();
-        let snapshot = projection(&mut control, 0);
-        let payload = SetMereAccessV1::new(mere.id, &AppId::new("knot-editor"), true, false);
-        let invoke = |bytes| IntentInvocation {
-            session: snapshot.session.clone(),
-            target: InstanceId(0),
-            observed_epoch: snapshot.scene.epoch,
-            observed_revision: snapshot.scene.revision,
-            intent: RESERVOIR_SET_ACCESS_INTENT.into(),
-            payload: bytes,
-        };
-        let mut spoofed = serde_json::to_value(&payload).unwrap();
-        spoofed["author"] = "a different person".into();
-        assert!(matches!(
-            control
-                .invoke(invoke(serde_json::to_vec(&spoofed).unwrap()))
-                .unwrap(),
-            IntentResult::Rejected { .. }
-        ));
-        assert!(fixture.reservoir.access_decisions().await.is_empty());
-        assert_eq!(
-            control
-                .invoke(invoke(serde_json::to_vec(&payload).unwrap()))
-                .unwrap(),
-            IntentResult::Accepted
-        );
-        assert!(matches!(
-            control
-                .invoke(invoke(serde_json::to_vec(&payload).unwrap()))
-                .unwrap(),
-            IntentResult::Stale { .. }
-        ));
-        let decisions = fixture.reservoir.access_decisions().await;
-        assert_eq!(decisions.len(), 1);
-        assert_eq!(decisions[0].1, AppId::new("knot-editor"));
-        assert!(decisions[0].2.denied && !decisions[0].2.ambient);
-        assert_eq!(decisions[0].2.author.via.as_deref(), Some("turnstone"));
-        assert!(
+        let before = fixture.reservoir.access_decisions().await;
+        // Both the denied client and another admitted product may inspect
+        // the reservoir, but neither receives permission-management authority.
+        for actor in ["knot-editor", "turnstone"] {
             fixture
                 .grants
-                .current()
-                .admit(&AppRequest {
-                    app: AppId::new("knot-editor"),
-                    route: AppRouteId::new(&fixture.route).unwrap()
-                })
-                .is_err()
-        );
+                .grant(AppId::new(actor), ResidentReservoir::route());
+            let request = AppRequest {
+                app: AppId::new(actor),
+                route: AppRouteId::new(RESIDENT_RESERVOIR_ROUTE).unwrap(),
+            };
+            assert!(fixture.grants.current().admit(&request).is_ok());
+            let mut control = fixture
+                .catalog
+                .update(|catalog| catalog.open(RESIDENT_RESERVOIR_ROUTE, &context(actor)))
+                .await
+                .unwrap();
+            let snapshot = projection(&mut control, 0);
+            assert!(
+                snapshot
+                    .presentation
+                    .offers
+                    .values()
+                    .flatten()
+                    .flat_map(|offer| &offer.semantics.actions)
+                    .all(|action| action.intent.0 != "mere.reservoir.set-access")
+            );
+            let invocation = IntentInvocation { session: snapshot.session.clone(), target: InstanceId(0), observed_epoch: snapshot.scene.epoch, observed_revision: snapshot.scene.revision, intent: "mere.reservoir.set-access".into(), payload: serde_json::to_vec(&serde_json::json!({ "schema": "mere.reservoir.set-access/v1", "mere": mere.id, "application": "knot-editor", "denied": false, "ambient": true, "via": "turnstone" })).unwrap() };
+            assert!(matches!(
+                control.invoke(invocation).unwrap(),
+                IntentResult::Rejected { .. }
+            ));
+        }
+        assert_eq!(fixture.reservoir.access_decisions().await, before);
+        for route in [&fixture.route, &ambient_mere_route_id("divination")] {
+            assert!(
+                fixture
+                    .grants
+                    .current()
+                    .admit(&AppRequest {
+                        app: denied.clone(),
+                        route: AppRouteId::new(route).unwrap()
+                    })
+                    .is_err()
+            );
+            assert!(
+                fixture
+                    .catalog
+                    .update(|catalog| catalog.open(route, &context("knot-editor")))
+                    .await
+                    .is_err()
+            );
+        }
     }
 }
