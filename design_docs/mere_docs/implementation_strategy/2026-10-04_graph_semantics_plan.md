@@ -10,7 +10,9 @@ shared resource content, profile propagation, capture association and Resource
 RDF metadata changes are implemented in the lane and undergoing fresh qualification.
 Earlier receipts remain historical, as recorded in Progress. The fresh full
 kernel gate passes 430 tests plus its compile-fail type check; one doc example
-remains ignored. Independent dependent-crate qualification continues. RDF tag
+remains ignored. Pandect passes 345 tests, Canvas 303 and Graphshell 346 plus
+five integration tests after the final admission and fixture repairs. The
+locked workspace check exits 0. RDF tag
 metadata exposes one mandatory representation gap; the consolidated scope
 exception below is pending Mark's answer.
 Turnstone's owner has prepared reader adoption at its current pin; that is not
@@ -1935,7 +1937,20 @@ and persisted bytes remain unchanged in the same run
 `[false, false]`, expected `[true, true]`). Admission now compares complete
 `FrozenGraph` truth with receipt replay at the same cursor before journal-tail
 replay or session publication. Ordinary checkpoint admission is unchanged.
-The full Pandect and dependent gates are running after this repair.
+The full Pandect gate passes 345 tests after this repair, and its wasm32 check
+exits 0 (`graph-semantics-p2-pandect-checkpoint-qualified.log`). Graphshell then
+exposed a persisted/runtime enum mismatch in the timestamp fixture; correcting
+it retains the explicit 100/200 timestamps. Its next run passes 345 and fails
+only the geometry fixture's ordered collection of a `HashSet` of tag labels.
+The fixture now sorts that set before exact membership comparison; full peer
+records and all geometry/camera/selection/play assertions are unchanged.
+The final Graphshell gate passes 346 units and five integration tests, with
+four ignored (`graph-semantics-p2-graphshell-full.log`). The compile and unordered
+label failures remain in `graph-semantics-p2-graphshell-timestamp-compile.log`
+and `graph-semantics-p2-graphshell-label-order-control.log`. The locked workspace
+check exits 0 (`graph-semantics-p2-workspace-final.log`). The package-cache lock
+cleared without changing Cargo settings,
+isolating a Cargo home or disturbing another lane's processes/cache.
 
 Eidetic already holds immutable text blobs with a mutable current-URL reference.
 The additive `browsing/captures.rs` ledger associates those existing hashes with
@@ -2711,7 +2726,7 @@ binding; this list no longer grows as a running implementation checklist.
   Production routing, shared content, replay/profile guards, existing immutable
   capture association and projection readers are saved in the existing lane.
   Full final kernel/store: 430 passed plus one compile-fail doctest, one example
-  ignored. Pandect: 344 passed after final journal-tail admission repairs.
+  ignored. Pandect: 345 passed after final checkpoint admission repairs.
   Exact migration controls now compare complete
   snapshots and facet stores for both baseline and retained raw content writes.
   Eidetic/Fjall: 118 passed, two doc examples ignored. Linked-data/query:
@@ -2728,21 +2743,27 @@ binding; this list no longer grows as a running implementation checklist.
   329, failed 16 and ignored four; mixed-store reader and exact-retraction
   repairs, actor-correct metadata controls and title-only Canvas publication
   are now saved. Fresh canvas passes 303 tests with 13 ignored. Graphshell
-  passes 345, fails its new timestamp fixture and ignores four; the 16 prior
-  failures are resolved. Workspace checking has not run in this sequence.
+  initially passed 345 and failed its new timestamp fixture, then exposed a
+  fixture enum mismatch and an unordered-set comparison. Those repairs retain
+  all exact peer metadata controls. The final Graphshell gate passes 346 units
+  and five integration tests, with four ignored. Locked workspace checking
+  exits 0 after all final repairs.
   Read-only review found a translated
   checkpoint consistency gap; exact checkpoint-versus-receipt comparison and
   its admission controls are implemented within the replay closure requirement.
   The control fails on both valid altered payloads before the guard; full
-  qualification after the guard is in progress.
+  qualification after the guard passes all 345 Pandect tests and its wasm check.
   Current receipts are `graph-semantics-p2-kernel-final.log`,
-  `graph-semantics-p2-pandect-final-qualified.log`,
-  `graph-semantics-resource-capture-eidetic-final.log` and
+  `graph-semantics-p2-pandect-checkpoint-qualified.log`,
+  `graph-semantics-resource-capture-eidetic-final.log`,
+  `graph-semantics-p2-graphshell-full.log`,
+  `graph-semantics-p2-workspace-final.log` and
   `graph-semantics-p2-rdf-exception-controls.log` in the reusable Mere target.
   Intermediate doc audit and diff check exit 0. A branch checkpoint preserves
-  this in-progress source under Mark's commit/push authorization. Final Pandect,
-  Graphshell and workspace validation after the latest repairs is pending;
-  Cargo is waiting on the shared package-cache lock. P2 is incomplete, and
+  this in-progress source under Mark's commit/push authorization at `586167bd`.
+  Two final test-fixture corrections and this passing gate record follow that
+  checkpoint. P2 remains incomplete at the RDF import representation exception;
+  no planned checkpoint remains open, and
   P3–P5 have not begun. Final supplier compatibility is
   unqualified at Turnstone; its existing-pin receipt remains separate.
 
